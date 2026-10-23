@@ -1,0 +1,23 @@
+{
+  "verified_at_UTC": "2026-10-22T01:28:14.010419+00:00",
+  "archive_name": "quiescent-followup-thirteenth.tar.gz",
+  "archive_sha256": "8e705305be5bf267e19ebc49b93aae9e6ca850abfb1f496cc0ec668692858fd0",
+  "archive_bytes": 37671534,
+  "included_files": 743,
+  "included_source_bytes": 411547993,
+  "roots": [
+    "review-Niger-1091"
+  ],
+  "excluded_entries": 74,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "cfdab56f4cb9b1d3f29c968fbf7b77c4cb1598281d80d310019fb2f197385916",
+  "private_full_manifest_sha256": "41e703af9f8bed5e8afd58f87159f96fcd2427548925f7d9dbdbc0b2c267a1c1",
+  "private_evidence_not_exported_to_Git": true
+}

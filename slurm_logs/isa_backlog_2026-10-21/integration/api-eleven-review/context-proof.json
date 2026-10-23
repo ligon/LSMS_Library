@@ -1,0 +1,13 @@
+{
+  "frozen_head": "7886f7ece49767b2357a2f559c474e0eb710561f",
+  "Burkina_Benin_Togo_country_blobs_and_modes_exact_to_cfd078276": true,
+  "shared_1077_fix_in_ancestry": "e7ea575fd7d8de1cb353badc20a7e4d1dceabf67",
+  "comparator_tier_grade_counts": {
+    "country:fresh": 6,
+    "wave:fresh": 4,
+    "wave:legacy": 2
+  },
+  "country_complete_coverage_manifests": 6,
+  "normal_hashless_script_wave_outputs_retained": 2,
+  "no_manual_stamping": true
+}

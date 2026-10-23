@@ -1,0 +1,25 @@
+{
+  "recorded_at_UTC": "2026-10-22T05:44:18.323862+00:00",
+  "stage": "ROOT_APPROVED_STAGE2_APPLY_PINNED_PATCH_AND_TARGETED_VERIFICATION",
+  "diagnosis_acceptance": "/local/job40255479/control/isa-backlog-20261021/1196-diagnosis-root-verification.json",
+  "ledger_first": "ee533e09af4b29408985a0c7a1abf815c5c385d1",
+  "patch_sha256": "6fa0329189b79af399be0bcd89e2367b71041ebe39b648a1c88145906d879482",
+  "design_sha256": "bb8c47fa06cfc77d0aee6db59d1eeae5c94364157bc5d84cf9ddeee4c647aed2",
+  "scope": "Exact proposed.patch local_tools helper/successful parquet read path, focused tests/task ledger/dated Niger and Uganda notes. No unrelated changes.",
+  "approved_fingerprint_cost": "Actual candidate must measure549/549 API,39/39framework and1362/1362 declared-wave changes before data builds; prediction is not a pass or permission for all-country rebuild.",
+  "required_routes": [
+    "Niger food_acquired Default normal source-cold/fresh warm",
+    "Uganda cluster_features Default AND Make normal source-cold/fresh warm",
+    "Niger Make source route becomes actual measurement if declared held sources suffice; otherwise stop dependent scope/report exact gap"
+  ],
+  "no_schema_exclusion_dependency_writer_science_ID_cache_stamp_changes": true,
+  "root_notes": [
+    "New footer read uses same already-open file, preserves existing parser/fallback errors; assert this actual path for local and supported stream inputs.",
+    "Explicitly test physical metadata mapping for unnamed/duplicate logical index names, mixed string policies, Range/nonstring and absent/malformed metadata; do not claim real IO support from helper-only tests.",
+    "set_levels verify_integrity=False is allowed only for policy-preserving level lengths/values; exact codes/dtypes/order/unusedlevels/sortorder and masks must be tested.",
+    "Empty/all-null actual non-StringDtype reconstruction, descriptor ambiguity on a valid target, unexpected fingerprint scope or new parser behavior are stops before broadening helper.",
+    "No complete corpus rebuild, dependency change or user scientific ruling needed for this metadata policy preservation."
+  ],
+  "independently_reviewed": false,
+  "signed": "Sue"
+}

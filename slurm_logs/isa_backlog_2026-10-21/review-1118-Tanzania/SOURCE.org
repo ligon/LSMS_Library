@@ -1,0 +1,7 @@
+#+title: Tanzania independent-review export
+
+=REVIEW.md= and =verdict.json= are verbatim source-safe exports from the private review root =/local/job40255479/control/isa-backlog-20261021/review-1118-Tanzania/=.
+Supporting files linked by the review remain in that private root; complete raw frames, source IDs and warning examples are not exported.
+The full runtime review pins =0c8d9645e= and separately approves documentation-only descendant =e75be9c56=.
+
+Sue

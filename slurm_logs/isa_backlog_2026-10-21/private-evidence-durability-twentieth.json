@@ -1,0 +1,23 @@
+{
+  "verified_at_UTC": "2026-10-22T04:29:26.608815+00:00",
+  "archive_name": "quiescent-followup-twentieth.tar.gz",
+  "archive_sha256": "b0d6d944d37658764128a5283e48012c50ecef3c3847550b30c843785b5e5040",
+  "archive_bytes": 27066878,
+  "included_files": 985,
+  "included_source_bytes": 172581042,
+  "roots": [
+    "review-Burkina_Faso-1119"
+  ],
+  "excluded_entries": 29,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "7700699edf8e03d7e9e39ec18937e36fed8e7a9c1d9df42686698fb093d5572b",
+  "private_full_manifest_sha256": "4af58671a42aff2bc27264ceb34877dbe7842cf812ab2f1062333d1e727d8b4f",
+  "private_evidence_not_exported_to_Git": true
+}

@@ -1,0 +1,155 @@
+{
+  "status": "PASS_CORRECTED_KIND_O_SAVED_ARTIFACT_SUPPLEMENT",
+  "helper_sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94",
+  "helper_negative_controls_rejected": 42,
+  "positive_frame_groups": 1160,
+  "old_empty_expected_memory_gap_inspections": 38,
+  "extra18_direct_marked_single_country_Feature_memory_gaps_retained": 2,
+  "cohorts": {
+    "17": {
+      "positive_groups": 196,
+      "qualified_original_stage_groups": 2,
+      "empty_original_expected_memory_gaps": 0,
+      "groups": {
+        "main-own-cold-warm": 88,
+        "order-own-cold-warm": 50,
+        "income-same-source-matching-arguments": 4,
+        "order-food-own-main-control": 16,
+        "actual-source-test-saved-snapshot": 14,
+        "healing-own-current-control": 4,
+        "healing-own-cold-warm": 3,
+        "scanner-known-native-cluster": 12,
+        "scanner-new-cache-parent-candidate": 4,
+        "NEW-artifact-only-nine-zero-reconstruction": 1
+      },
+      "object_checks": {
+        "object_EA_blocks": 8,
+        "object_EA_cell_pairs": 32,
+        "dtype_class:pandas.core.dtypes.dtypes.NumpyEADtype": 8,
+        "left_scalar_class:builtins.str": 32,
+        "right_scalar_class:builtins.str": 32
+      },
+      "rows_including_repeated_operands": 39121735
+    },
+    "18": {
+      "positive_groups": 265,
+      "qualified_original_stage_groups": 1,
+      "empty_original_expected_memory_gaps": 18,
+      "groups": {
+        "normal_cold_warm": 28,
+        "all_native_source_oracle": 40,
+        "raw_country_matching_layer": 34,
+        "actual17_18_supported": 6,
+        "old_Make_sole_attrs_difference_exact_elsewhere": 1,
+        "populated_freshwarm": 10,
+        "populated_existing_contract": 2,
+        "covered_empty_parent": 4,
+        "current_country_Feature": 4,
+        "CLI_supported_parent": 4,
+        "CLI_unsupported_backends": 1,
+        "CLI_actual_writer_frame_attrs": 8,
+        "producer-native-original-reference": 60,
+        "producer-supported-reviewed-public": 28,
+        "producer-country-original-reference": 20,
+        "producer-current17-Niger-public": 2,
+        "producer-current17-Niger-native": 4,
+        "producer-current17-Niger-country": 2,
+        "producer-current17-Niger-cold-warm": 1,
+        "producer-Feature-current-component": 4,
+        "producer-source-oracle-postread-reference": 1,
+        "NEW-retained-oracle-parquet-stage": 1
+      },
+      "object_checks": {
+        "object_EA_blocks": 16,
+        "dtype_class:pandas.core.dtypes.dtypes.NumpyEADtype": 16
+      },
+      "rows_including_repeated_operands": 35636991
+    },
+    "19": {
+      "positive_groups": 603,
+      "qualified_original_stage_groups": 3,
+      "empty_original_expected_memory_gaps": 11,
+      "groups": {
+        "normal_populated_cold_warm": 56,
+        "all_native_source_oracle": 176,
+        "normalized_country_layers": 72,
+        "legacy_raw_native_concat": 20,
+        "candidate_supported_actual18": 16,
+        "covered_empty_parent": 3,
+        "current_raw_parent": 1,
+        "old_Make_sole_flag_difference_exact_elsewhere": 1,
+        "matched_current_Country_Feature_science": 20,
+        "extra_crossstage_full_exact": 18,
+        "1196_sole_dtype_exception_exact_elsewhere": 2,
+        "Make_Feature_actual18_matching_arguments": 2,
+        "CLI_actual_writer_fullattrs": 8,
+        "CLI_supported_parent": 4,
+        "producer-native-original-corrected1088-reference": 176,
+        "producer-corrected1088-public": 8,
+        "producer-actual18-both-stages": 16,
+        "producer-extra-Mali-original-reference": 4
+      },
+      "object_checks": {
+        "object_EA_blocks": 9,
+        "dtype_class:pandas.core.dtypes.dtypes.NumpyEADtype": 9
+      },
+      "rows_including_repeated_operands": 22162524
+    },
+    "1200": {
+      "positive_groups": 96,
+      "qualified_original_stage_groups": 2,
+      "empty_original_expected_memory_gaps": 9,
+      "groups": {
+        "matrix_cold_warm": 12,
+        "supported_vs_actual_parent_default": 6,
+        "native_matched_parent": 16,
+        "source_oracle_native": 2,
+        "native_walked_normalized_raw": 2,
+        "raw_country_parent": 1,
+        "matched_science_Feature_CLI": 16,
+        "Make_CLI": 2,
+        "Make_Feature_parent": 2,
+        "populated_parent_controls": 9,
+        "cross_stage_full_exact": 14,
+        "1196_sole_dtype_exception_exact_elsewhere": 2,
+        "producer-parent-main-coldwarm": 2,
+        "producer-parent-absent-coldwarm": 2,
+        "producer-parent-absent-native-oracle": 4,
+        "producer-standalone-Mali-control": 1,
+        "producer-NEW-retained-subset-endpoint": 2,
+        "producer-NEW-retained-populated-native": 1
+      },
+      "object_checks": {
+        "object_EA_blocks": 6,
+        "dtype_class:pandas.core.dtypes.dtypes.NumpyEADtype": 6
+      },
+      "rows_including_repeated_operands": 5890732
+    }
+  },
+  "object_EA_checks": {
+    "object_EA_blocks": 39,
+    "object_EA_cell_pairs": 32,
+    "dtype_class:pandas.core.dtypes.dtypes.NumpyEADtype": 39,
+    "left_scalar_class:builtins.str": 32,
+    "right_scalar_class:builtins.str": 32
+  },
+  "numeric_array_checks": {
+    "str": 7393,
+    "string": 1111,
+    "Float64": 1718,
+    "numeric_nonmissing_arrays": 5449,
+    "float64": 1828,
+    "Int64": 16,
+    "int64": 1875,
+    "object": 39,
+    "float32": 12
+  },
+  "findings": [],
+  "all_original_and_new_copied_operands_preserved": true,
+  "old_frozen_release_roots_unchanged": true,
+  "no_source_API_build_test_replays": true,
+  "not_new_unique_pair_count": true,
+  "root_acceptance_pending": true,
+  "all_campaign_result": false,
+  "signed": "Sue"
+}

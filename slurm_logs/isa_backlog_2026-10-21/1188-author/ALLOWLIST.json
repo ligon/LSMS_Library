@@ -1,0 +1,42 @@
+{
+  "files": {
+    "REPORT.org": {
+      "sha256": "9a37552ec9ebd2a0474cb37392ac7a110533a2d2b4916e36202b271571d8abda",
+      "bytes": 8109
+    },
+    "validation.json": {
+      "sha256": "917723f61b3b6b096d5f1b7062e126ec87f02935f9ba2575e7cca01eedb3e46f",
+      "bytes": 13055
+    },
+    "pins.json": {
+      "sha256": "db641aa39966de4c25665296838b592748a276cd2c52de5121e54e6820888513",
+      "bytes": 1266
+    },
+    "protection.json": {
+      "sha256": "450e8ebe33ec1db061d347037e6f439a83369fa8205ed2edc18afca54a6b670f",
+      "bytes": 1748
+    },
+    "commands.json": {
+      "sha256": "d6b4609c9641162e6f01cd01f457f8bc7855eed28dc32bd233fd20303f35308c",
+      "bytes": 29192
+    },
+    "source.diff": {
+      "sha256": "cd6f44d12fee135f8495b6dfdd7b020d01eb8de50a4d1143a44024519372699d",
+      "bytes": 40005
+    },
+    "empty-optional-dtypes-residual.json": {
+      "sha256": "897c247f8568abf02467d08a4ac4dbc05fdc4bc9e714788ed7811b78f2944e34",
+      "bytes": 12792
+    },
+    "empty-optional-dtypes-residual.md": {
+      "sha256": "67976800d27eaf0d2ae50ba3abaa1bc0cb99bf906f283e4d7a168b2536a88a87",
+      "bytes": 2795
+    },
+    "empty-optional-dtype-static-options.md": {
+      "sha256": "581d994b2ad5c44473d4a619ea91bec6ae46393906b4cde94048b8034762f62e",
+      "bytes": 2883
+    }
+  },
+  "scope": "Only these aggregate/source exports; no raw operands, rows, full logs or private receipts",
+  "signed": "Sue"
+}

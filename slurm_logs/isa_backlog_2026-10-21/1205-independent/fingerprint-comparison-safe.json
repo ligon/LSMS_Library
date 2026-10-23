@@ -1,0 +1,84 @@
+{
+  "status": "ZERO_FINGERPRINT_MOVEMENT",
+  "country": 549,
+  "framework": 39,
+  "declared_wave": 1362,
+  "complete_keysets_values_ordered_names": {
+    "country": true,
+    "framework": true,
+    "declared_wave": true,
+    "ordered_public_names": true
+  },
+  "preserved_actor_exit_codes": [
+    1,
+    1
+  ],
+  "qualification": "Both completed census outputs were saved before an overstrict no-directory assertion. Only the empty dvc-cache directory created by data_root exists; zero data files. No census replay.",
+  "inputs": {
+    "candidate": {
+      "sha256": "c513f6a3b477dec00504d316fdc8b1447b5b2b09d7f30fe3138685395f689001",
+      "bytes": 219642,
+      "mode": 384,
+      "mtime_ns": 1792691692377807825,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 3944839,
+      "symlink": false,
+      "link": null
+    },
+    "base": {
+      "sha256": "8d919c9c30aeaf26f63e54d0a27312e5e78642e602d8807922de970d67a2ce08",
+      "bytes": 219642,
+      "mode": 384,
+      "mtime_ns": 1792691716538942492,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 3944841,
+      "symlink": false,
+      "link": null
+    }
+  },
+  "data_trees": {
+    "candidate": {
+      ".": {
+        "kind": "directory",
+        "bytes": 4096,
+        "mode": 448,
+        "mtime_ns": 1792691645385549649,
+        "nlink": 3,
+        "device": 64770,
+        "inode": 5385669
+      },
+      "dvc-cache": {
+        "kind": "directory",
+        "bytes": 4096,
+        "mode": 448,
+        "mtime_ns": 1792691645385549649,
+        "nlink": 2,
+        "device": 64770,
+        "inode": 5385670
+      }
+    },
+    "base": {
+      ".": {
+        "kind": "directory",
+        "bytes": 4096,
+        "mode": 448,
+        "mtime_ns": 1792691671595693648,
+        "nlink": 3,
+        "device": 64770,
+        "inode": 5516118
+      },
+      "dvc-cache": {
+        "kind": "directory",
+        "bytes": 4096,
+        "mode": 448,
+        "mtime_ns": 1792691671595693648,
+        "nlink": 2,
+        "device": 64770,
+        "inode": 5516119
+      }
+    }
+  },
+  "signed": "Sue"
+}

@@ -1,0 +1,87 @@
+{
+  "recorded_at_UTC": "2026-10-22T00:50:54.240142+00:00",
+  "source_head": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+  "runtime": "6be6576607f1862b603d123acfb74ace4026fd3f",
+  "status": "AUTHOR_READY_PENDING_INDEPENDENT_REVIEW",
+  "manifest_sha256": "237003a67682a1a354406df29d6fe31fbcfffdfe90569a1a7749999ff65e635b",
+  "root_verified_tests_tree": "a2c9ba05f0faf6625885bc6a0bd5f3bd71bece43",
+  "root_verified_final_library_tree": "00cb01e7c1ca727dcefd5ed04d3de49d951a5276",
+  "package_delta_from_runtime_CONTENTS_only": true,
+  "original_aggregate_overwritten_before_first_manifest": true,
+  "original_final_aggregate_size_SHA_unavailable": true,
+  "reconstruction_is_separate_not_original_bytes": true,
+  "original_auxiliary_delta_remains_unidentified": true,
+  "independent_review_pending": true,
+  "exports": [
+    {
+      "source": "Niger/1091-fix/safe-exports/REPORT.org",
+      "export": "REPORT.org",
+      "sha256": "72a0db34e5967f9d5ae8c0ee933e9084d79f5210f2947949cf9abb3f61bcfdd1",
+      "bytes": 13614,
+      "byte_exact": true
+    },
+    {
+      "source": "Niger/1091-fix/safe-exports/validation.json",
+      "export": "validation.json",
+      "sha256": "feec274e48afc0af45e4a0d699d4059cb49861103cad3da6cfc043e697ed679b",
+      "bytes": 23402,
+      "byte_exact": true
+    },
+    {
+      "source": "Niger/1091-fix/safe-exports/proof.json",
+      "export": "proof.json",
+      "sha256": "c1234a11afb18313df821e21c23a49b82c8fd41a2914f2eedb8146ecd3250c50",
+      "bytes": 3489,
+      "byte_exact": true
+    },
+    {
+      "source": "Niger/1091-fix/safe-exports/REPRODUCE.sh",
+      "export": "REPRODUCE.sh",
+      "sha256": "a7e4f5e102c7eb3b6522ce29d21e6ec9728b3fa49fe0c4aaf138e94e6948f977",
+      "bytes": 2398,
+      "byte_exact": true
+    },
+    {
+      "source": "Niger/1091-fix/safe-exports/DRAFT-RESIDUAL.md",
+      "export": "DRAFT-RESIDUAL.md",
+      "sha256": "47beff573b5aa565cfb219314b214215c1a4a807c816d64fa7f6756b752c5313",
+      "bytes": 2102,
+      "byte_exact": true
+    },
+    {
+      "source": "Niger/1091-fix/safe-exports/DRAFT-PR.md",
+      "export": "DRAFT-PR.md",
+      "sha256": "9c3009893f0ffdce8eb8fe354d1cea90607f44f1c4f332037942810aadf56781",
+      "bytes": 2153,
+      "byte_exact": true
+    },
+    {
+      "source": "Niger/1091-fix/safe-exports/INDEPENDENT-REVIEW.md",
+      "export": "INDEPENDENT-REVIEW.md",
+      "sha256": "e8998ae4c06de17b4b16c218709c89b331ea76f67cdc7a4c67bea0e8d00174ad",
+      "bytes": 2955,
+      "byte_exact": true
+    },
+    {
+      "source": "Niger/1091-fix/freeze-proof-final.json",
+      "export": "freeze-proof-final.json",
+      "sha256": "34cade47e4bf017839bfa72dee84b83ea0623d709cd04cd02df0965bd0798869",
+      "bytes": 2719,
+      "byte_exact": true
+    },
+    {
+      "source": "Niger/1091-fix/packaging-change-inventory-safe.json",
+      "export": "packaging-change-inventory-safe.json",
+      "sha256": "a3625ee1b46d55a686b8356dbcea35fd874d1ffdf0335ab4e6a5b4c59546b1a0",
+      "bytes": 1792,
+      "byte_exact": true
+    },
+    {
+      "source": "Niger/1091-fix/READY.json",
+      "export": "READY.json",
+      "sha256": "4fdfe71240422b6834677b106a8ad650be444e311612fccbe91a79ee994b9f5f",
+      "bytes": 1999,
+      "byte_exact": true
+    }
+  ]
+}

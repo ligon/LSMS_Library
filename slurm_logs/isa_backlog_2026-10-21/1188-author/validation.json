@@ -1,0 +1,516 @@
+{
+  "candidate_disjoint_bounded_tests": {
+    "synthetic_passed": 14,
+    "held_passed": 2
+  },
+  "actual_parent_controls": {
+    "synthetic_failed": 7,
+    "synthetic_passed": 7,
+    "held_failed": 1,
+    "held_passed": 1
+  },
+  "test_launch_qualification": "--noconftest omits repository credential detection/skip machinery. Bounded guarded held selections, not standard full-suite evidence; no auth injection.",
+  "test_process_identities": {
+    "tests-candidate-synthetic": {
+      "controller_and_both_workers_exact": true,
+      "process_receipts": 3
+    },
+    "tests-candidate-held": {
+      "controller_and_both_workers_exact": true,
+      "process_receipts": 3
+    },
+    "tests-parent-synthetic": {
+      "controller_and_both_workers_exact": true,
+      "process_receipts": 3
+    },
+    "tests-parent-held": {
+      "controller_and_both_workers_exact": true,
+      "process_receipts": 3
+    }
+  },
+  "normal_cold_freshwarm_actors_passed": 8,
+  "normal_scope": "Country/Feature Burkina_Faso only, supported/all/unsupported waves, Default/Make, unchanged seed_kg/nitrogen_kg",
+  "source_rows": 22877,
+  "code21_preserved": 602,
+  "purchase_yes": 7689,
+  "gift_yes": 802,
+  "flag_disagreements_with_parent": 8297,
+  "purchase_quantity_mask_disagreements_with_parent": 8371,
+  "initial_full_strict_comparisons": 458,
+  "initial_passed": 398,
+  "initial_failures_retained": 60,
+  "original_prewrite_vs_persisted_native_failures_retained": 56,
+  "additional_persisted_native_full_strict_passes": 56,
+  "true_empty_optional_dtype_failures_retained": 4,
+  "empty_cases": [
+    {
+      "phase": "cold",
+      "request": "country-2014",
+      "candidate-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "string",
+          "Received_as_gift": "boolean",
+          "Quantity_received_as_gift": "Float64",
+          "Unit_received_as_gift": "string"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "candidate-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "object",
+          "Received_as_gift": "object",
+          "Quantity_received_as_gift": "object",
+          "Unit_received_as_gift": "object"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      }
+    },
+    {
+      "phase": "cold",
+      "request": "country-2021",
+      "candidate-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "string",
+          "Received_as_gift": "boolean",
+          "Quantity_received_as_gift": "Float64",
+          "Unit_received_as_gift": "string"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "candidate-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "object",
+          "Received_as_gift": "object",
+          "Quantity_received_as_gift": "object",
+          "Unit_received_as_gift": "object"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      }
+    },
+    {
+      "phase": "fresh-warm",
+      "request": "country-2014",
+      "candidate-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "string",
+          "Received_as_gift": "boolean",
+          "Quantity_received_as_gift": "Float64",
+          "Unit_received_as_gift": "string"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "candidate-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "object",
+          "Received_as_gift": "object",
+          "Quantity_received_as_gift": "object",
+          "Unit_received_as_gift": "object"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      }
+    },
+    {
+      "phase": "fresh-warm",
+      "request": "country-2021",
+      "candidate-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "string",
+          "Received_as_gift": "boolean",
+          "Quantity_received_as_gift": "Float64",
+          "Unit_received_as_gift": "string"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "candidate-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased",
+          "Unit_purchased",
+          "Received_as_gift",
+          "Quantity_received_as_gift",
+          "Unit_received_as_gift"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64",
+          "Unit_purchased": "object",
+          "Received_as_gift": "object",
+          "Quantity_received_as_gift": "object",
+          "Unit_received_as_gift": "object"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-default": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      },
+      "base-make": {
+        "rows": 0,
+        "columns": [
+          "Quantity",
+          "Purchased",
+          "Quantity_purchased"
+        ],
+        "dtypes": {
+          "Quantity": "Float64",
+          "Purchased": "boolean",
+          "Quantity_purchased": "Float64"
+        },
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "input",
+          "crop",
+          "u"
+        ]
+      }
+    }
+  ],
+  "native_storage_qualification": "Expected source-built writer operands serialized/read back through unchanged to_parquet in new private proof artifacts. No actual-frame cast, attrs transplantation, cache stamp/promotion or completed398-check/API/grid/raw-decode repetition.",
+  "footer_snapshots_verified": 280,
+  "exact_normal_final_footprints": {
+    "candidate-default": {
+      "L1": 6,
+      "L2": 6,
+      "exact_files": 12,
+      "no_other_features_spine": true
+    },
+    "candidate-make": {
+      "L1": 6,
+      "L2": 4,
+      "exact_files": 10,
+      "no_other_features_spine": true
+    },
+    "base-default": {
+      "L1": 6,
+      "L2": 6,
+      "exact_files": 12,
+      "no_other_features_spine": true
+    },
+    "base-make": {
+      "L1": 6,
+      "L2": 4,
+      "exact_files": 10,
+      "no_other_features_spine": true
+    }
+  },
+  "inventory": {
+    "country_total": 549,
+    "Burkina_country_changed": 24,
+    "other_country_exact": 525,
+    "wave_total": 1362,
+    "Burkina2018_wave_changed": 18,
+    "other_wave_exact": 1344,
+    "framework_exact": 39
+  },
+  "actual_outputs_built": "plot_inputs and required sample waves only; no output claim for the other invalidated tables",
+  "unmodified_Feature_audit": {
+    "candidate_exit": 0,
+    "parent_exit": 0,
+    "warning_records_each": 4,
+    "full_records_byte_exact": true,
+    "failures": 0,
+    "errors": 0
+  },
+  "api_audit_program_exit": 0,
+  "guard_noncalibration_denied_binds_unattributed": 51,
+  "guard_has_no_original_call_stacks": true,
+  "no_zero_network_attempt_claim": true,
+  "copy_budget_exception": "Original24-copy budget exceeded by one local get_data_file preflight copy. Root-approved additive quarantine preserves it; actual25copies/26332243bytes. Original preflight was not L1-only.",
+  "independent_review_required": true,
+  "signed": "Sue"
+}

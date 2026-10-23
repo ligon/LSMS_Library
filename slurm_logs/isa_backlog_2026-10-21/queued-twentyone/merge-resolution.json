@@ -1,0 +1,12 @@
+{
+  "recorded_at_UTC": "2026-10-22T05:33:13.414059+00:00",
+  "resolution": "Complete current20 Uganda CONTENTS (including earlier internal changes) plus exact reviewed085 appended addition; no narrative rewrite",
+  "base_lines": 3604,
+  "current20_lines": 3655,
+  "leaf_lines": 3671,
+  "merged_lines": 3722,
+  "unchanged_current20_bytes_sha256": "b4719d46fc9eab28060e923b62698d9a20ab76199b53459784b6c21348ad9c00",
+  "exact_leaf_added_suffix_sha256": "fc9ec3c536388785efbf2ecaff9e4967eee4fdf42bdb7f7673fd05312a7c27bb",
+  "conflict_original_sha256": "0e09b187fbbd1e12cd154a358b62de09b54253650594c65b380d6f5b8ddf59a4",
+  "signed": "Sue"
+}

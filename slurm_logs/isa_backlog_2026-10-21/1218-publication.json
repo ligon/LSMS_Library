@@ -1,0 +1,20 @@
+{
+  "issue": 1218,
+  "title": "Constructed empty tables ignore declared types of country-local optional fields",
+  "body_exact_readback": true,
+  "url": "https://github.com/ligon/LSMS_Library/issues/1218",
+  "root_tier": "B: empty schema/type wiring, existing explicit type contract",
+  "scope": "Constructed empty results only; populated output remains unchanged.",
+  "runtime_evidence_qualification": "Author BF1188 runtime observations; independent static source account root authenticated. Final author/full independent runtime acceptance pending.",
+  "dedup_queries": [
+    "optional dtype",
+    "_enforce_declared_dtypes",
+    "_empty_declared_frame"
+  ],
+  "distinct_closed_predecessors": [
+    386,
+    1099
+  ],
+  "separate_order_issue": 1215,
+  "signed": "Sue"
+}

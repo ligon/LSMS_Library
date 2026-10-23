@@ -1,0 +1,18 @@
+{
+  "pr": 1170,
+  "body_exact_readback": true,
+  "body_length": 27914,
+  "campaign_commit": "7dcaa241437f8ec835eb04fba55064a559b88759",
+  "implementation_PRs": 30,
+  "open_scope_issue_records": 114,
+  "PR_linked_records": 27,
+  "active_records": 2,
+  "other_records": 85,
+  "explicit_user_1215_decision": "declaration order",
+  "CI_bodies_exact": [
+    1216,
+    1217
+  ],
+  "human_merge_required": true,
+  "signed": "Sue"
+}

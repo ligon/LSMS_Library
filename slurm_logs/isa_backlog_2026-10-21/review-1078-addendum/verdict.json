@@ -1,0 +1,37 @@
+{
+  "status": "PASS_BOUNDED_ADDENDUM_FROZEN",
+  "runtime_head": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+  "final_author_head": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+  "full_suite_status": "FAIL_9_ISOLATION_FAILURES",
+  "original_and_new_outcomes": {
+    "passed": 4689,
+    "skipped": 4453,
+    "failed": 9,
+    "errors": 0,
+    "warnings": 70
+  },
+  "full_9151_identity_outcome_multiset_exact": true,
+  "new_diagnostic_full_selections": 1,
+  "new_24_denials_attributed": true,
+  "original_metadata_free_event_attribution_limit_retained": true,
+  "separate_prior_nine_case_private_operand_PASS_not_repeated": true,
+  "artifact_only_explicit_exact_value_full_typed_attrs_controls": "PASS",
+  "artifact_inputs_unchanged": 195,
+  "sole_Niger_cross_stage_u_dtype_exception_both_heads_retained": true,
+  "preliminary_unguarded_type_census": "Explicitly qualified in ADDENDUM.org; not retroactively claimed guarded or network-free; no broader incident inferred without evidence.",
+  "guarded_unit_artifact_IP_attempts": 0,
+  "LSMS_data_root_and_in_tree_parquets": 0,
+  "intentional_synthetic_private_pytest_temp_parquets": 251,
+  "old_author_diagnosis_review_source_reference_receipts_exact": true,
+  "new_runtime_bytes_filesystem_modes_index_head_clean_exact": true,
+  "no_new_held_microdata_or_source_backed_API_phase": true,
+  "synthetic_unit_Country_API_exercise_preserved": true,
+  "no_product_blockers_found_in_this_addendum": true,
+  "broader_limits": [
+    "No corpus rebuild",
+    "Historical suite interleaving remains unproved",
+    "#1062/global16 composition remains unproved",
+    "No Uganda849 work"
+  ],
+  "author": "Sue (GPT-6)"
+}

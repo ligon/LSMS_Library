@@ -1,0 +1,67 @@
+{
+  "status": "PASS_FROZEN_ZERO_CONSUMERS",
+  "signed": "Sue",
+  "UTC": "2026-10-22T01:23:14.346268+00:00",
+  "candidate": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+  "parent": "d602f8d63520e521a730f85551b366c4d45d9a35",
+  "runtime_tests": "6be6576607f1862b603d123acfb74ace4026fd3f",
+  "source_trees_clean_exact": true,
+  "runtime_tests_blob_Git_modes_exact": true,
+  "two_documentation_FS_mode_differences_explicit": true,
+  "author_manifest_SHA256": "237003a67682a1a354406df29d6fe31fbcfffdfe90569a1a7749999ff65e635b",
+  "review_manifest_entries": 1437,
+  "review_manifest_SHA256": "9bf86ab634b8913e2e5bfcbadec051de05206b2475cef0b6db58e7f274402808",
+  "safe_exports": {
+    "REVIEW.org": {
+      "sha256": "c26c5e63ebcac250d1cbead9df736217f8e980b345b171aa88857489d32735cb",
+      "bytes": 15030,
+      "mode": 420
+    },
+    "verdict.json": {
+      "sha256": "0cc498502b17e47300c2aafcdccfcd486c277ab52dc24b013d4acf116f379ff5",
+      "bytes": 3093,
+      "mode": 420
+    },
+    "REPRODUCE.md": {
+      "sha256": "05a738e98f782cf801c288bf25cc66bb15f026b2c698215152c613495869d1f2",
+      "bytes": 4098,
+      "mode": 420
+    },
+    "proof.json": {
+      "sha256": "21fbaa0ffa2c95fd7a94107c22191778f3a6fbd527385d04374607cee850b4d4",
+      "bytes": 2902,
+      "mode": 420
+    },
+    "checker-sources.json": {
+      "sha256": "534879ae94b84711f1b9aaa419e1047459288624ade24b63392ec529c363247b",
+      "bytes": 3912,
+      "mode": 420
+    }
+  },
+  "live_task_consumers": 0,
+  "full_data_logs_coordinates_IDs_private": true,
+  "source_frame_warning_tests_limits_in_REVIEW": true,
+  "no_public_action": true,
+  "manifest_excluded_controls": [
+    "FINAL-READY.json",
+    "final-review-manifest-private.json",
+    "package-review-log-private.txt",
+    "package-package_review-diagnostic-safe.json"
+  ],
+  "post_wrapper_manifest_entries_exact": 1437,
+  "excluded_wrapper_final_receipts": {
+    "package-package_review-diagnostic-safe.json": {
+      "sha256": "5fc2ee6f7f8891449f0de68e0fdf49a73965359878e3ab8f44a25bf5ae319b66",
+      "bytes": 21,
+      "mode": 420,
+      "mtime_ns": 1792632194346769174
+    },
+    "package-review-log-private.txt": {
+      "sha256": "a3141ca65dec6a92dd6d4c1f7f2e2a8e767456ec90f48b53d7da16c74d69beb9",
+      "bytes": 270,
+      "mode": 420,
+      "mtime_ns": 1792632194346769174
+    }
+  },
+  "final_seal_completed": true
+}

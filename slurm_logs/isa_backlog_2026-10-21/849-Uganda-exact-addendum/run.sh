@@ -1,0 +1,16 @@
+#!/bin/bash
+set -eu
+P=/local/job40255479/control/isa-backlog-20261021/Uganda/849-exact-addendum
+TASK_ROOT=/local/job40255479/worktrees/isa-Uganda-849
+export REVIEW_ROOT="$P" TASK_ROOT LSMS_EXPECTED_ROOT="$TASK_ROOT"
+export PYTHONPATH="$TASK_ROOT:$P" LSMS_COUNTRIES_ROOT="$TASK_ROOT/lsms_library/countries"
+export LSMS_DATA_DIR="$P/data" LSMS_CONFIG_DIR="$P/config" TMPDIR="$P/tmp" DVC_SITE_CACHE_DIR="$P/dvc-site"
+export MPLCONFIGDIR="$P/matplotlib" XDG_CACHE_HOME="$P/xdg-cache" XDG_CONFIG_HOME="$P/xdg-config"
+export PATH=/local/job40255479/venv_img/bin:$PATH GIT_OPTIONAL_LOCKS=0 PYTHONDONTWRITEBYTECODE=1 PYTHONHASHSEED=1
+export LSMS_SKIP_AUTH=1 AWS_EC2_METADATA_DISABLED=true LSMS_S3_CREDS="$P/absent-credentials"
+export LSMS_BUILD_WORKERS=1 LSMS_MAKE_JOBS=1 MAKEFLAGS=-j1
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 BLIS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1
+export LSMS_ISSUES_LOG="$P/issues-private.jsonl"
+unset LSMS_NO_CACHE LSMS_BUILD_BACKEND LSMS_ALLOW_INTREE_SOURCES PYTHONSAFEPATH VAR_DIR LSMS_DATA_ROOT
+cd "$TASK_ROOT"
+exec unshare -rn /local/job40255479/venv_img/bin/python "$P/bootstrap.py" "$@"

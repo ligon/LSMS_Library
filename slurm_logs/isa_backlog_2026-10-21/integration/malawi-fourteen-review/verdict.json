@@ -1,0 +1,58 @@
+{
+  "verdict": "PASS",
+  "reviewer": "Sue (GPT-6)",
+  "global14_head": "653f77b1437886138f6b29078dcfb6108bf1e9c6",
+  "actual_global13_control": "5dde66645a444b025aa69682838cdf7c033a6e88",
+  "reviewed_composed_parent": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+  "blocking_findings": [],
+  "tests": {
+    "passed": 129,
+    "skipped": 0,
+    "failed": 0,
+    "errors": 0
+  },
+  "Country_rows": [
+    180184,
+    179949
+  ],
+  "default_Feature_rows": [
+    264400,
+    264165
+  ],
+  "organic_rows_full_order_payload_and_attrs_preserved": 11075,
+  "same_source_pair_sums_exact": 235,
+  "all_native_rawcountry_Country_Feature_full_parent_expectations_pass": true,
+  "nitrogen_full_frame_attrs_exact_fd235": true,
+  "nitrogen_total": 1028195.63206,
+  "inorganic_numeric_sum_conserved": 2899339.95,
+  "all_old_2013_2016_nonfertilizer_payload_attrs_exact": true,
+  "healthy_Uganda_plot_inputs_rows": 84216,
+  "healthy_Uganda_sample_rows": 24362,
+  "fresh_current_hash_full_wave_coverage_and_four_roots_zero_warm_writes": true,
+  "actual_scanner": {
+    "records": 15,
+    "full_exact": 11,
+    "expected_count_changes": 4,
+    "normalization": false,
+    "phase2_kwargs_grid": false
+  },
+  "all_five_frozen_trees_and_all_referenced_evidence_unchanged": true,
+  "new_default_cold_Feature_frames_serialized": true,
+  "original_fd235_serialization_limit_preserved": true,
+  "network_attempts": 0,
+  "unauthorized_mutations": 0,
+  "quiescent_release": true,
+  "public_PRs_unmerged_by_review": true,
+  "limits": [
+    "Bounded global14 coexistence, not a full suite, new549/39 census or repeat standalone source/instrument study.",
+    "Uganda is a genuine current-hash physically copied healthy warm comparator, not a cold Uganda reconstruction.",
+    "2013/2016 C4 instrument authority remains open; no new acquisition.",
+    "Missing/qualified seed units, purchases, nominal composition, retention and container/free-text decisions remain separate.",
+    "All same-UID command lines were checked; ten unrelated process environments were inaccessible."
+  ],
+  "safe_artifacts": [
+    "REVIEW.org",
+    "proof.json",
+    "commands.sh"
+  ]
+}

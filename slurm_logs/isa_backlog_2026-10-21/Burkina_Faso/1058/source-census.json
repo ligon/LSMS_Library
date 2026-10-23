@@ -1,0 +1,134 @@
+{
+  "Burkina_Faso/2018-19": {
+    "source_rows": 12441,
+    "retained_native_parcel_rows": 12441,
+    "filtered_rows": 0,
+    "both_native_parcel_parts_missing": 0,
+    "partial_native_parcel_parts_missing": 0,
+    "null_native_key_cells_retained": 0,
+    "duplicate_native_parcel_keys_retained": 0,
+    "q46_headers": [],
+    "q45_variable_label": "16A.45. La parcelle a-t-elle \u00e9t\u00e9 mesur\u00e9e par GPS?",
+    "q47_variable_label": "16A.47. Quelle est la superficie de la parcelle selon les mesures GPS ?",
+    "coordinate_variable_labels": {}
+  },
+  "Burkina_Faso/2021-22": {
+    "source_rows": 8467,
+    "retained_native_parcel_rows": 7350,
+    "filtered_rows": 1117,
+    "both_native_parcel_parts_missing": 1117,
+    "partial_native_parcel_parts_missing": 0,
+    "null_native_key_cells_retained": 0,
+    "duplicate_native_parcel_keys_retained": 0,
+    "q46_headers": [
+      "s16aq46__latitude",
+      "s16aq46__longitude",
+      "s16aq46__accuracy",
+      "s16aq46__altitude",
+      "s16aq46__timestamp"
+    ],
+    "q45_variable_label": "16A.45. La parcelle  [ %rostertitle% ] a-t-elle \u00e9t\u00e9 mesur\u00e9e par GPS?",
+    "q47_variable_label": "16A.47. Quelle est la superficie (en hectare) de la parcelle  [ %rostertitle% ]",
+    "coordinate_variable_labels": {
+      "s16aq46__latitude": "16A.46. Coordonn\u00e9es GPS de la parcelle  [ %rostertitle% ]: Latitude",
+      "s16aq46__longitude": "16A.46. Coordonn\u00e9es GPS de la parcelle  [ %rostertitle% ]: Longitude",
+      "s16aq46__accuracy": "16A.46. Coordonn\u00e9es GPS de la parcelle  [ %rostertitle% ]: Accuracy",
+      "s16aq46__altitude": "16A.46. Coordonn\u00e9es GPS de la parcelle  [ %rostertitle% ]: Altitude",
+      "s16aq46__timestamp": "16A.46. Coordonn\u00e9es GPS de la parcelle  [ %rostertitle% ]: Timestamp"
+    },
+    "coordinates": {
+      "all": {
+        "rows": 8467,
+        "both_present": 4180,
+        "latitude_only": 0,
+        "longitude_only": 0,
+        "both_missing": 4287,
+        "latitude_dtype": "float64",
+        "longitude_dtype": "float64",
+        "coordinate_columns_have_value_labels": false
+      },
+      "retained": {
+        "rows": 7350,
+        "both_present": 4180,
+        "latitude_only": 0,
+        "longitude_only": 0,
+        "both_missing": 3170,
+        "latitude_dtype": "float64",
+        "longitude_dtype": "float64",
+        "coordinate_columns_have_value_labels": false
+      },
+      "filtered": {
+        "rows": 1117,
+        "both_present": 0,
+        "latitude_only": 0,
+        "longitude_only": 0,
+        "both_missing": 1117,
+        "latitude_dtype": "float64",
+        "longitude_dtype": "float64",
+        "coordinate_columns_have_value_labels": false
+      }
+    },
+    "flag_coordinate_census": [
+      {
+        "gps_measured_code": "1.0",
+        "rows": 4190,
+        "both_present": 4180,
+        "partial_present": 0,
+        "q47_area_present": 4190
+      },
+      {
+        "gps_measured_code": "2.0",
+        "rows": 3151,
+        "both_present": 0,
+        "partial_present": 0,
+        "q47_area_present": 0
+      },
+      {
+        "gps_measured_code": "nan",
+        "rows": 9,
+        "both_present": 0,
+        "partial_present": 0,
+        "q47_area_present": 0
+      }
+    ]
+  },
+  "Mali/2021-22": {
+    "source_rows": 9924,
+    "retained_native_parcel_rows": 6638,
+    "filtered_rows": 3286,
+    "both_native_parcel_parts_missing": 3286,
+    "partial_native_parcel_parts_missing": 0,
+    "null_native_key_cells_retained": 0,
+    "duplicate_native_parcel_keys_retained": 0,
+    "q46_headers": [],
+    "q45_variable_label": "16A.45. La parcelle a-t-elle \u00e9t\u00e9 mesur\u00e9e par GPS?",
+    "q47_variable_label": "16A.47. Quelle est la superficie de la parcelle selon les mesures GPS ?",
+    "coordinate_variable_labels": {}
+  },
+  "Niger/2021-22": {
+    "source_rows": 5729,
+    "retained_native_parcel_rows": 5729,
+    "filtered_rows": 0,
+    "both_native_parcel_parts_missing": 0,
+    "partial_native_parcel_parts_missing": 0,
+    "null_native_key_cells_retained": 0,
+    "duplicate_native_parcel_keys_retained": 0,
+    "q46_headers": [],
+    "q45_variable_label": "16A.45. La parcelle a-t-elle \u00e9t\u00e9 mesur\u00e9e par GPS?",
+    "q47_variable_label": "16A.47. Quelle est la superficie de la parcelle selon les mesures GPS ?",
+    "coordinate_variable_labels": {}
+  },
+  "Senegal/2021-22": {
+    "source_rows": 6112,
+    "retained_native_parcel_rows": 6112,
+    "filtered_rows": 0,
+    "both_native_parcel_parts_missing": 0,
+    "partial_native_parcel_parts_missing": 0,
+    "null_native_key_cells_retained": 0,
+    "duplicate_native_parcel_keys_retained": 0,
+    "q46_headers": [],
+    "q45_variable_label": "16A.45. La parcelle a-t-elle \u00e9t\u00e9 mesur\u00e9e par GPS?",
+    "q47_variable_label": "16A.47. Quelle est la superficie de la parcelle selon les mesures GPS ?",
+    "coordinate_variable_labels": {}
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "scope": "pr1180-author",
+  "status": "READY_BOUNDED_SAVED_CONTENT_SUPPLEMENT_WITH_PRESERVED_FAILURES_AND_GAPS",
+  "pins": {
+    "pr1180-author-full-manifest-private.json": "728d804c6a2a543c24d0a2692e7ddc4b590a2b542786186e8399032e74512fad",
+    "pr1180-author-postexit-private.json": "28e808a563bada05c5c2b542b7a1d0cc81712e7527a25323aad6cb2772a8b406",
+    "pr1180-author-safe-allowlist.json": "0ace5b6f119b61cf51476c590db63b038983dc6aef16eca63ca0c57304e48494"
+  },
+  "final_safe_sha256": "29fa9f9a23f293845fd37eca0e58eac1646d1519691be1c87487c1ae84aabf62",
+  "packager_terminal_exit": 0,
+  "postexit_terminal_exit": 0,
+  "remaining_consumers": 0,
+  "signed": "Sue"
+}

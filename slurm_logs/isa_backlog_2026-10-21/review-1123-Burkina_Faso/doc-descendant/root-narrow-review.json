@@ -1,0 +1,22 @@
+{
+  "verdict": "PASS",
+  "reviewer": "Sue root; independent of writer",
+  "full_review_head": "3848778d0e8676c798883c11ea3e33fc88e8a591",
+  "runtime_head": "69ed4d2028a6f989a8ac45d117a5cffc60a831fd",
+  "documentation_head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+  "changed_authorized_prose_paths": [
+    ".coder/ledger/1123-burkina-input-identity.md",
+    "lsms_library/countries/Burkina_Faso/_/CONTENTS.org",
+    "slurm_logs/isa_backlog_2026-10-21/Burkina_Faso/1123/DRAFT-ISSUES.md",
+    "slurm_logs/isa_backlog_2026-10-21/Burkina_Faso/1123/REPORT.md"
+  ],
+  "other_tracked_blobs_modes_exact": 14882,
+  "country_hashes_compared": 549,
+  "additional_country_hash_changes": 0,
+  "framework_fingerprints_compared": 39,
+  "additional_framework_changes": 0,
+  "source_API_or_tests_repeated": false,
+  "clean_frozen_head": true,
+  "documentation_content_review": "All four diffs read; exact gift/purchase counts/units and18recovered purchases agree with independent source review;1187/1188links accurate; explicitly reviewed but unmerged; no source binding/physical unit/grain change.",
+  "reviewed_inventory_sha256": "a6a81870d6c9c370a67a764ef61a2a399876796e42594b8d8aeeb3f08a40f2c2"
+}

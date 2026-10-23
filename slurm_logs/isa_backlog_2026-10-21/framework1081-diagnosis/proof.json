@@ -1,0 +1,26 @@
+{
+  "HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "branch": "fix/1081-derived-categorical-errors-20261021",
+  "tracked_files_content_modes_symlinks_exact": 14880,
+  "clean": true,
+  "source_git_refs_fixtures_dependencies_GH_changes": false,
+  "private_data_root_files": 0,
+  "in_tree_untracked_raw_or_parquet": 0,
+  "network_attempts": 0,
+  "source_write_attempts": 0,
+  "active_socket_methods_and_path_guard": true,
+  "prior_Malawi_composition_safe_artifacts_and_copied_guard_source_exact": true,
+  "existing_tests": {
+    "passed": 162
+  },
+  "proposed_contract_baseline": {
+    "failed": 42,
+    "passed": 31
+  },
+  "all_three_errors_and_both_handler_families_discriminate": true,
+  "current_behavior_probes": 166,
+  "valuation_controls": 5,
+  "implementation_applied": false,
+  "candidate_hash_scope_measured": false,
+  "subprocesses_remaining": 0
+}

@@ -1,0 +1,16 @@
+{
+  "cold": {
+    "strict_complete_frame_pairs": 26,
+    "values_nulls_keys_order_dtypes_axes_fullattrs_exact": true,
+    "full_warning_category_message_multisets_exact": true,
+    "warning_occurrences": 60
+  },
+  "warm": {
+    "strict_complete_frame_pairs": 26,
+    "values_nulls_keys_order_dtypes_axes_fullattrs_exact": true,
+    "full_warning_category_message_multisets_exact": true,
+    "warning_occurrences": 58
+  },
+  "baseline_whole_cold_warm_inventory_exact": 73,
+  "candidate_whole_cold_warm_inventory_exact": 73
+}

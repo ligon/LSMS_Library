@@ -1,0 +1,215 @@
+{
+  "status": "PASS_FROZEN",
+  "runtime_head": "fdadc0698efcd300f5f09c21b60c30f570f96621",
+  "final_head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+  "baseline": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+  "source_oracle": {
+    "status": "PASS",
+    "source_files": 2,
+    "eligible_rows": 155931,
+    "obs_counts": {
+      "1": 66699,
+      "2": 49014,
+      "3": 40218
+    },
+    "visit_counts": {
+      "1": 66159,
+      "2": 89772
+    },
+    "positive_unresolved_unit_entries_excluded": 129,
+    "raw_positive_slots": 156060,
+    "slots": [
+      {
+        "visit": 1,
+        "obs": 1,
+        "raw_rows": 66555,
+        "positive_price": 28697,
+        "eligible": 28672
+      },
+      {
+        "visit": 1,
+        "obs": 2,
+        "raw_rows": 66555,
+        "positive_price": 20692,
+        "eligible": 20636
+      },
+      {
+        "visit": 1,
+        "obs": 3,
+        "raw_rows": 66555,
+        "positive_price": 16860,
+        "eligible": 16851
+      },
+      {
+        "visit": 2,
+        "obs": 1,
+        "raw_rows": 78752,
+        "positive_price": 38045,
+        "eligible": 38027
+      },
+      {
+        "visit": 2,
+        "obs": 2,
+        "raw_rows": 78752,
+        "positive_price": 28389,
+        "eligible": 28378
+      },
+      {
+        "visit": 2,
+        "obs": 3,
+        "raw_rows": 78752,
+        "positive_price": 23377,
+        "eligible": 23367
+      }
+    ],
+    "all_native_values_keys_masks_dtypes_order_axes_full_typed_attrs_exact": true,
+    "candidate_wave_helper_or_finalizer_called_for_expected_rows": false,
+    "source_oracle_and_native_serialization_layers_separate": true,
+    "postread_oracle_uses_actual_unchanged_writer_control": true,
+    "initial_strict_prewrite_vs_postread_dtype_stop_preserved": true,
+    "missing_passage2_unit_dictionaries_confirmed": true,
+    "exact_known_community_dictionary_correspondence": true
+  },
+  "candidate_runtime_counts": {
+    "stages": 40,
+    "cold": 20,
+    "unsupported": 32,
+    "warm": 20,
+    "supported": 8,
+    "country_comparisons": 20,
+    "native_comparisons": 24
+  },
+  "default_fresh_warm_zero_cache_changes": 10,
+  "Make_supported_fresh_warm_native_bytes_size_modes_exact_mtime_rewrite": 2,
+  "parent_cases": 12,
+  "parent_initial_normal_cold_2017_api_completed_then_layer_harness_stop_preserved": true,
+  "parent_2017_poststop_freshwarm_actual_native_layer_exact_zero_writes": true,
+  "parent_Make_unsupported_wrong_2014_rows": 155931,
+  "parent_Default_unsupported_public_rows": 0,
+  "parent_Default_unsupported_raw_full_2014_unsupported_manifest_mismatch": true,
+  "parent_Make_only_missing_id_converted_attr_explicit": true,
+  "candidate_focused": {
+    "passed": 111,
+    "skipped": 0,
+    "errors": 0,
+    "warnings": 7
+  },
+  "baseline_28_counterfactual": {
+    "failed": 24,
+    "passed": 4,
+    "errors": 0,
+    "skipped": 0,
+    "causes": {
+      "country_script_still_present": 1,
+      "country_var_rule_still_present": 1,
+      "retired_country_builder_reached": 18,
+      "unexpected_unsupported_wave_build": 4
+    }
+  },
+  "unchanged_822_public_test_direct_held_call_PASS": true,
+  "normal_pytest_marked_test_explicitly_deselected_no_auth_skip_weakened": true,
+  "Niger_current_L2_rows": 46043,
+  "Feature_rows_each_currency_variant": 201974,
+  "complete_paired_Country_Feature_frames_full_typed_attrs": 4,
+  "scoped_scanner_full_records_byte_exact": true,
+  "scoped_scanner_records": 2,
+  "scanner_warn": 2,
+  "scanner_fail_error": 0,
+  "CLI": {
+    "parent_default_and_candidate_request": [
+      "2017-18",
+      "2018-19",
+      "2021-22"
+    ],
+    "rows_all_controls": 0,
+    "candidate_default_make_three_stages_full_frame_full_typed_attrs_exact": true,
+    "candidate_empty_API_exact_actual_empty_declared_factory_and_finalizer": true,
+    "candidate_default_make_full_arrow_schema_and_metadata_exact": true,
+    "all_three_artifacts_exact_independent_unchanged_writer_controls": true,
+    "parent_artifact_and_API_identical_to_candidate": false,
+    "parent_candidate_empty_full_typed_attrs_exact": true,
+    "parent_empty_visit_obs_dtype": "int64",
+    "candidate_declared_empty_visit_obs_dtype": "str",
+    "candidate_Description_API_dtype": "object",
+    "candidate_Description_postread_dtype": "string",
+    "writer_source_SHA256": "e697a53f93279add6268c011b87dd3784c6245a588563223176d1c32db9009a3",
+    "supported_CLI_two_backends_full_frame_full_typed_attrs_and_footer_exact_parent_artifact": true,
+    "supported_CLI_API_prewrite_full_frame_full_typed_attrs_exact_parent_API": true,
+    "supported_API_to_artifact_typed_attrs_identical": false,
+    "supported_artifact_exact_unchanged_writer_control": true,
+    "framework_or_writer_changes": false
+  },
+  "hash_scope": {
+    "actual_before_any_review_build": true,
+    "baseline_head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+    "candidate_head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+    "country_cells": 549,
+    "changed_Mali": 24,
+    "other_country_exact": 525,
+    "framework_exact": 39,
+    "changed_cells": [
+      "Mali/sample",
+      "Mali/cluster_features",
+      "Mali/household_roster",
+      "Mali/individual_education",
+      "Mali/subjective_well_being",
+      "Mali/food_security",
+      "Mali/food_acquired",
+      "Mali/interview_date",
+      "Mali/panel_ids",
+      "Mali/assets",
+      "Mali/housing",
+      "Mali/shocks",
+      "Mali/food_coping",
+      "Mali/plot_features",
+      "Mali/crop_production",
+      "Mali/plot_inputs",
+      "Mali/livestock",
+      "Mali/plot_labor",
+      "Mali/people_last7days",
+      "Mali/community_prices",
+      "Mali/food_expenditures",
+      "Mali/food_prices",
+      "Mali/food_quantities",
+      "Mali/household_characteristics"
+    ]
+  },
+  "runtime_main_and_child_Python_warnings": 0,
+  "guarded_network_attempts": 0,
+  "guarded_protected_write_attempts": 0,
+  "other_23_Mali_outputs_rebuilt_claim": false,
+  "full_suite_claim": false,
+  "no_source_acquisition": true,
+  "metadata_availability": {
+    "optional_fresh_variable_label_probe": "STOPPED_BEFORE_METADATA",
+    "first_get_data_file_returned_None": true,
+    "cause_proven_by_actual_No_permissions_warning_and_matching_return_branch": true,
+    "actual_materialized_raw_copies": 0,
+    "fresh_variable_labels_or_PDF_not_claimed": true,
+    "current_value_label_dictionaries_freshly_read_with_get_dataframe": true,
+    "both_raw_source_MD5_SHA_and_source_oracle_verified": true,
+    "no_permission_or_source_reader_bypass": true
+  },
+  "warning_accounting": {
+    "focused_pytest_warning_categories": {
+      "CacheRebuildWarning": 4,
+      "UserWarning": 3
+    },
+    "synthetic_rebuild_warnings": 4,
+    "synthetic_make_failure_warnings": 2,
+    "other_synthetic_missing_builder_warnings": 1,
+    "all_seven_complete_records_retained_privately": true,
+    "complete_record_digest": "6d35620ed1ab06d19e0d7bbc34be71f1d0fbec4e01860898ac0b9b60158cc38b",
+    "terminal_runtime_main_and_child_warning_headers": 0,
+    "Feature_and_CLI_warnings": 0,
+    "scanner_WARN_records_separately_accounted": 2,
+    "optional_metadata_get_data_file_logger_warning_stop_preserved": true
+  },
+  "strict_api_audit_exit": 0,
+  "private_strict_harness_stops_preserved": [
+    "categorical mapper absolute-path/cwd",
+    "prewrite oracle vs post-Parquet native dtype",
+    "parent unsupported eight-level fallback vs supported seven-level raw country"
+  ],
+  "bounded_private_log_tail_tool_transcript_handling_error_explicit": true
+}

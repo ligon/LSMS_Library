@@ -1,0 +1,54 @@
+{
+  "safe_exports": [
+    {
+      "name": "REVIEW.org",
+      "sha256": "87bb81973b4baee557951daa9066ab803974704ee72524e74b4f51bd195040c9",
+      "size": 13621,
+      "mode": 384,
+      "mtime_ns": 1792639809862337244,
+      "type": "file"
+    },
+    {
+      "name": "COUNTRY-NOTE-PROPOSAL.org",
+      "sha256": "e8a4cd0dd7adfdbbafecc83a265cd8a1fdc49fdf36fad319c8ac6dc97c788b85",
+      "size": 1072,
+      "mode": 384,
+      "mtime_ns": 1792639809862337244,
+      "type": "file"
+    },
+    {
+      "name": "REPRODUCE.sh",
+      "sha256": "17820950cfa89ff1bfd14c3d824d9b8a8978b610c13557f21824aa6fae82dde2",
+      "size": 3440,
+      "mode": 384,
+      "mtime_ns": 1792639635235405241,
+      "type": "file"
+    },
+    {
+      "name": "validation.json",
+      "sha256": "d676319bb1e8c8f4ed7dc49d2d02ec613af12f2d10a097a91d6bfe1a62c6d21f",
+      "size": 100975,
+      "mode": 420,
+      "mtime_ns": 1792639988400323227,
+      "type": "file"
+    },
+    {
+      "name": "verdict.json",
+      "sha256": "4916c970d49b993125514cba15d196e70793c284970cab178a30d9aaea8d4fff",
+      "size": 3063,
+      "mode": 420,
+      "mtime_ns": 1792639988396323205,
+      "type": "file"
+    },
+    {
+      "name": "proof.json",
+      "sha256": "932b63fe145cdb6bac5be68e7732e6b394abd18da38441414489486b6636393b",
+      "size": 2990,
+      "mode": 420,
+      "mtime_ns": 1792639988395323200,
+      "type": "file"
+    }
+  ],
+  "self_digest_is_recorded_in_READY": true,
+  "no_frames_records_coordinates_raw_warnings_or_tracebacks": true
+}

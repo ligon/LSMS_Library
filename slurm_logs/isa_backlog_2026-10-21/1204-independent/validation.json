@@ -1,0 +1,108 @@
+{
+  "status": "INDEPENDENT_REVIEW_COMPLETE_WITH_FOUR_KNOWN_ORDERING_FAILURES",
+  "candidate_targeted": {
+    "tests": 8,
+    "failed": 0,
+    "passed": 8,
+    "controller_pid": 4012866,
+    "worker_pid": 4012874,
+    "identity_receipts": 6,
+    "before_collection_controller_and_worker_exact": true,
+    "failures": []
+  },
+  "actual_parent_same_targeted": {
+    "tests": 8,
+    "failed": 7,
+    "passed": 1,
+    "controller_pid": 4012867,
+    "worker_pid": 4012877,
+    "identity_receipts": 6,
+    "before_collection_controller_and_worker_exact": true,
+    "failures": [
+      "test_uganda_crop_has_no_country_builder",
+      "test_direct_make_crop_target_builds_native_waves_only",
+      "test_supported_cold_subset_keeps_native_observations_and_audit[make]",
+      "test_barren_cold_subset_never_populates_crop_cache[dvc]",
+      "test_barren_cold_subset_never_populates_crop_cache[make]",
+      "test_alternating_requests_keep_raw_coverage_true[dvc]",
+      "test_alternating_requests_keep_raw_coverage_true[make]"
+    ]
+  },
+  "supporting_tests": {
+    "passed": 170,
+    "failed": 0,
+    "skipped": 0,
+    "actual_terminal": 0,
+    "original_Popen_pid": 4018702
+  },
+  "complete_nonempty_synthetic_grain_transport": {
+    "passed": 2,
+    "actual_terminal": 0,
+    "original_Popen_pid": 4042680,
+    "both_backends": true,
+    "complete_recursively_typed_records": true,
+    "Default_cold_country_footer_ledger_and_fresh_warm_replay": true,
+    "Make_normal_rebuild_on_second_call": true,
+    "full_strict_cold_warm_frames": true
+  },
+  "held_real_nonempty_grain_records": 0,
+  "comparator_faults_rejected": 34,
+  "original_grid": {
+    "candidate": {
+      "actors": 30,
+      "actual_terminal": 0,
+      "tool_session": 9775,
+      "final_chunk": "528d92"
+    },
+    "actual_parent": {
+      "actors": 29,
+      "actual_terminal": 0,
+      "tool_session": 5908,
+      "final_chunk": "1f4215"
+    },
+    "country_endpoints": 44,
+    "Feature_endpoints": 12,
+    "scanners": 2,
+    "direct_Make": 1
+  },
+  "strict_pairs": 113,
+  "strict_pass": 109,
+  "strict_fail": 4,
+  "full_native_frame_footer_producer_source_pairs": 21,
+  "serialized_retired_native_source_oracle_full_strict_pairs": 2,
+  "original_pre_serialization_oracle_diagnostic_strict_FAIL_preserved": true,
+  "scanner_literal_ordered_records_equal": 22,
+  "API_surface_audit_strict": "PASS",
+  "fingerprint_scope": {
+    "country_hashes": {
+      "total": 549,
+      "changed": 28
+    },
+    "framework_hashes": {
+      "total": 39,
+      "changed": 0
+    },
+    "wave_hashes": {
+      "total": 1362,
+      "changed": 171
+    }
+  },
+  "complete_key_value_maps_equal_author_on_both_heads": true,
+  "changed_fingerprints_all_Uganda": true,
+  "public_ordered_names_and_materialization_equal": true,
+  "all_wave_rows": 133761,
+  "supported_wave_rows": 15630,
+  "null_v_rows_preserved": 928,
+  "null_production_obs_rows": 0,
+  "derived_harvest_kg_total_preserved": 42026694.99297963,
+  "actual_parent_cold_barren_raw_rows_under_false_coverage": 133761,
+  "candidate_cold_barren_no_CROP_cache_writes": true,
+  "candidate_cold_barren_SAMPLE_cache_writes": 9,
+  "candidate_populated_barren_crop_cache_complete_physical_preservation_cases": 3,
+  "actual_parent_wrong_Make_subset_endpoints": 10,
+  "private_cache_roots": 12,
+  "complete_current_parquet_footprints_and_footers": 177,
+  "actual_parent_caches_rejected_stale_by_candidate": 3,
+  "direct_Make_alias_seven_native_waves_no_country_crop_parquet": true,
+  "source_API_data_test_replay_for_packaging": false
+}

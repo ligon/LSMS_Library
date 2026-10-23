@@ -1,0 +1,33 @@
+{
+  "status": "ROOT_AUTHENTICATED_BF1188_AUTHOR_PACKET_INDEPENDENT_DATA_REVIEW_REQUIRED",
+  "at_UTC": "2026-10-22T20:05:31.212484+00:00",
+  "final_source": "657fed11a63354886772d0f978cec8adb2ad647e",
+  "tested_runtime": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+  "actual_parent": "3dc9d28510dd783c648413987011832669f8bcf7",
+  "manifest_entries": 967,
+  "tracked_source_receipts": 29788,
+  "genuine_providers": 6,
+  "private_binary_copies": 25,
+  "private_binary_bytes": 26332243,
+  "initial_24_copy_budget_exception_retained": true,
+  "normal_grid_actors": 8,
+  "bounded_tests_pass": 16,
+  "parent_controls_fail": 8,
+  "parent_controls_pass": 8,
+  "original_strict_pass": 398,
+  "original_strict_failures_retained": 60,
+  "new_persisted_native_stage_pass": 56,
+  "true_empty_optional_dtype_failures_retained": 4,
+  "residual_issue": 1218,
+  "all_pins": {
+    "READY.json": "aa9fb4252e651680ecd43e7a028d293945806647318d3b45d5659ab54959658f",
+    "final-private-manifest.json": "5c01b1581034aeb5a42254e64ee9a43a41950ce3a4a212f95cdc91dfa07d9484",
+    "safe-exports/ALLOWLIST.json": "3823891ab05fcae33910eb82fd74976519e8436dcb59d485f9b84079e2299527",
+    "final-protection.json": "f9450d9592c6ff0aebeae9eb9529056c3b6214057dafb721c3a163e14eafab9b"
+  },
+  "checker_sha256": "d1fc1a4eed5a080ce6590a537fced218e44b76c918df47ba7cc1e77b8fb7f253",
+  "root_no_payload_decode_API_test_or_controller_reexecution": true,
+  "independent_review_required": true,
+  "full_corpus_or_science_certification": false,
+  "signed": "Sue"
+}

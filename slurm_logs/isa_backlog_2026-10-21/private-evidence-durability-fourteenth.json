@@ -1,0 +1,23 @@
+{
+  "verified_at_UTC": "2026-10-22T01:31:58.637480+00:00",
+  "archive_name": "quiescent-followup-fourteenth.tar.gz",
+  "archive_sha256": "52b4f89817fd07f0ab52920845ad1f02830f1d32a53c6315137914b02adbb68e",
+  "archive_bytes": 19133955,
+  "included_files": 1004,
+  "included_source_bytes": 116524991,
+  "roots": [
+    "Tanzania/1091"
+  ],
+  "excluded_entries": 59,
+  "all_archive_members_verified": true,
+  "all_included_source_after_receipts_exact": true,
+  "directory_access_mode": "0700 (setgid may also be set)",
+  "archive_manifest_launcher_modes": "0600",
+  "owner_matches_session_uid": true,
+  "raw_source_extensions_and_duplicate_L1_L2_trees_excluded": true,
+  "derived_frames_remain_in_owner_only_archive": true,
+  "new_public_PDF_exception": false,
+  "launcher_sha256": "f41daf934734baecec3e1c55b75bb352f6ce2b10df4a1724ef0c7a24c5d242d5",
+  "private_full_manifest_sha256": "5c59a5ee6344d1eaa02924dbf6473644c101b6abbc805aab34d33e4ba4740150",
+  "private_evidence_not_exported_to_Git": true
+}

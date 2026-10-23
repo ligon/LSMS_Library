@@ -1,0 +1,104 @@
+{
+  "checked_at_UTC": "2026-10-22T07:02:31.852104+00:00",
+  "exact_head_queries": [
+    {
+      "PR": 1207,
+      "query_commit": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+      "run_id": 39735520713,
+      "workflow_status": "completed",
+      "workflow_conclusion": "success",
+      "jobs": [
+        {
+          "name": "unit-tests",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "windows-smoke",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "windows-script-build",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "docs",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "data-tests",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "dvc-remote-reachability",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "dvc-lock-check",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "refresh-dvc-locks",
+          "status": "completed",
+          "conclusion": "skipped"
+        }
+      ]
+    },
+    {
+      "PR": 1208,
+      "query_commit": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+      "run_id": 39735616155,
+      "workflow_status": "completed",
+      "workflow_conclusion": "success",
+      "jobs": [
+        {
+          "name": "windows-smoke",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "unit-tests",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "windows-script-build",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "dvc-lock-check",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "docs",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "refresh-dvc-locks",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "data-tests",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "dvc-remote-reachability",
+          "status": "completed",
+          "conclusion": "skipped"
+        }
+      ]
+    }
+  ],
+  "credentialed_data_suite_pass_claimed": false
+}

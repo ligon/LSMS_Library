@@ -1,0 +1,266 @@
+{
+  "status": "DIAGNOSIS_COMPLETE_NO_IMPLEMENTATION",
+  "source_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "public_frame_classes": {
+    "Niger": "MultiIndex(i,t,v,j,u,s)",
+    "Uganda": "MultiIndex(t,v)"
+  },
+  "real_cases": {
+    "Niger": {
+      "rows": 239877,
+      "affected_level": "u"
+    },
+    "Uganda": {
+      "rows": 4805,
+      "affected_level": "v",
+      "null_v": 0
+    }
+  },
+  "cause_per_case": {
+    "Niger": {
+      "field": "u",
+      "recorded_numpy_type": "string",
+      "default_column_na": "float NaN",
+      "declared_dtype_arrow_conversion_na": "pd.NA",
+      "values_masks_exact": true,
+      "actual_write_read_Arrow_schema_bytes_exact": true,
+      "first_observed_divergence": "pyarrow.pandas_compat._extract_index_level -> ChunkedArray.to_pandas(types_mapper=None)",
+      "no_library_normalization_precedes_it": true
+    },
+    "Uganda": {
+      "field": "v",
+      "recorded_numpy_type": "string",
+      "default_column_na": "float NaN",
+      "declared_dtype_arrow_conversion_na": "pd.NA",
+      "values_masks_exact": true,
+      "actual_write_read_Arrow_schema_bytes_exact": true,
+      "first_observed_divergence": "pyarrow.pandas_compat._extract_index_level -> ChunkedArray.to_pandas(types_mapper=None)",
+      "no_library_normalization_precedes_it": true
+    }
+  },
+  "new_actual_warm": {
+    "processes": 2,
+    "calls_per_process": 2,
+    "new_objects": 4,
+    "complete_frames_full_typed_attrs_exact_to_saved_warm_and_each_other": true,
+    "each_process_cache_files": 21,
+    "bytes_modes_mtimes_inodes_changed": 0
+  },
+  "original_cold_public_vs_warm": {
+    "strict_failures": 2,
+    "only_exact_NA_sentinel_dtype_exception": true,
+    "all_other_full_properties_and_typed_attrs_exact": true
+  },
+  "tests": {
+    "draft_expected_dtype_fail": 8,
+    "existing_GH645_pass": 7,
+    "error": 0,
+    "skip": 0,
+    "additional_empty_strict_fail": 1,
+    "already_nan_exact_control": true,
+    "negative_comparator_controls": 10,
+    "atomic_failure_controls": 2
+  },
+  "native_raw_schema_comparisons": 18,
+  "typed_attrs_stages": {
+    "Niger": {
+      "raw_generic_reader_to_map_index_full_exact": true,
+      "metadata": {
+        "complete_read_attrs_match_existing_JSON_serialization_exactly": true,
+        "prepared_to_read_typed_attrs_identical": false,
+        "prepared_attr_types": [
+          "builtins.bool",
+          "builtins.dict",
+          "builtins.int",
+          "builtins.list",
+          "builtins.str",
+          "lsms_library.population.PopulationRecord",
+          "lsms_library.recall.RecallRecord"
+        ],
+        "postread_attr_types": [
+          "builtins.bool",
+          "builtins.dict",
+          "builtins.int",
+          "builtins.list",
+          "builtins.str"
+        ],
+        "not_a_dtype_fix_or_original_cold_cache_input": true
+      },
+      "plain": {
+        "complete_read_attrs_match_existing_JSON_serialization_exactly": true,
+        "prepared_to_read_typed_attrs_identical": false,
+        "prepared_attr_types": [
+          "builtins.bool",
+          "builtins.dict",
+          "builtins.int",
+          "builtins.list",
+          "builtins.str",
+          "lsms_library.population.PopulationRecord",
+          "lsms_library.recall.RecallRecord"
+        ],
+        "postread_attr_types": [
+          "builtins.bool",
+          "builtins.dict",
+          "builtins.int",
+          "builtins.list",
+          "builtins.str"
+        ],
+        "not_a_dtype_fix_or_original_cold_cache_input": true
+      }
+    },
+    "Uganda": {
+      "raw_generic_reader_to_map_index_full_exact": true,
+      "metadata": {
+        "complete_read_attrs_match_existing_JSON_serialization_exactly": true,
+        "prepared_to_read_typed_attrs_identical": false,
+        "prepared_attr_types": [
+          "builtins.NoneType",
+          "builtins.bool",
+          "builtins.dict",
+          "builtins.float",
+          "builtins.int",
+          "builtins.str",
+          "lsms_library.population.PopulationRecord",
+          "lsms_library.recall.RecallRecord",
+          "lsms_library.sampling.SamplingRecord",
+          "lsms_library.sampling._FrozenDict",
+          "lsms_library.sampling._FrozenList"
+        ],
+        "postread_attr_types": [
+          "builtins.NoneType",
+          "builtins.bool",
+          "builtins.dict",
+          "builtins.float",
+          "builtins.int",
+          "builtins.list",
+          "builtins.str"
+        ],
+        "not_a_dtype_fix_or_original_cold_cache_input": true
+      },
+      "plain": {
+        "complete_read_attrs_match_existing_JSON_serialization_exactly": true,
+        "prepared_to_read_typed_attrs_identical": false,
+        "prepared_attr_types": [
+          "builtins.NoneType",
+          "builtins.bool",
+          "builtins.dict",
+          "builtins.float",
+          "builtins.int",
+          "builtins.str",
+          "lsms_library.population.PopulationRecord",
+          "lsms_library.recall.RecallRecord",
+          "lsms_library.sampling.SamplingRecord",
+          "lsms_library.sampling._FrozenDict",
+          "lsms_library.sampling._FrozenList"
+        ],
+        "postread_attr_types": [
+          "builtins.NoneType",
+          "builtins.bool",
+          "builtins.dict",
+          "builtins.float",
+          "builtins.int",
+          "builtins.list",
+          "builtins.str"
+        ],
+        "not_a_dtype_fix_or_original_cold_cache_input": true
+      }
+    },
+    "actual_fresh_process_fullframes_full_typedattrs_exact": true,
+    "actual_immutable_record_declared_absence_negative_rejected": true,
+    "guard_denial_function_AST_exact_after_task_label_substitution": true,
+    "initial_tracked_ledger_pin": "468d9733701e1b1402dcc4d428b980830e0ce298",
+    "grounding_read_timing_qualification": "Tracked task ledger/STANDING/local backlog and Feature guidance/actual IO and gate sources preceded experiments; shared prior-art and code-reviewer skill text loaded later during report preparation, orgmode before authoring report."
+  },
+  "fingerprint_boundary_prediction_only": {
+    "method": "Existing tests/test_build_transform_hash.py::_probe_edit pattern; artificial AST source marker solely in inspect.getsource, not executed code or on-disk source; process-local memo reset",
+    "not_a_postfix_hash_measurement": true,
+    "results": {
+      "generic_reader": {
+        "country": {
+          "moved": 549,
+          "total": 549
+        },
+        "framework": {
+          "moved": 39,
+          "total": 39
+        },
+        "declared_wave": {
+          "moved": 1362,
+          "total": 1362
+        }
+      },
+      "generic_writer": {
+        "country": {
+          "moved": 549,
+          "total": 549
+        },
+        "framework": {
+          "moved": 39,
+          "total": 39
+        },
+        "declared_wave": {
+          "moved": 1362,
+          "total": 1362
+        }
+      },
+      "excluded_country_read_gate": {
+        "country": {
+          "moved": 0,
+          "total": 549
+        },
+        "framework": {
+          "moved": 0,
+          "total": 39
+        },
+        "declared_wave": {
+          "moved": 0,
+          "total": 1362
+        }
+      }
+    },
+    "zero_data_endpoint_changes": true
+  },
+  "physical_preparation": {
+    "status": "TERMINAL_SUCCESS_BEFORE_PAYLOAD_READ",
+    "copies": 59,
+    "raw_sources_staged": 0,
+    "cache_files": 21,
+    "protected": 72,
+    "additional_manifest_gated_JSON_copies": 4
+  },
+  "limits": [
+    "No original raw-memory/native-prewrite artifact in staged cohort",
+    "No raw decode or new source-cold/Make/Feature/scanner/full-suite claim",
+    "Generic writer JSON attrs conversion is separate and unchanged",
+    "Unused source-level pruning occurs before Arrow in existing writer",
+    "Static fingerprint predictions are not future patch hashes",
+    "Shared skill text loaded after initial experiments; root ledger/STANDING/local guidance preceded them"
+  ],
+  "signed": "Sue",
+  "route_coverage": {
+    "source_head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "Niger_food_acquired": {
+      "materialize_make": false,
+      "Default": "source-bound country.py5811->load_with_dvc_cache->load_dataframe_with_dvc5498->_read_l2_country_cache; actual copied-current/fullcoverage warm state observed",
+      "Make": "source-only5800\u20135823 use_dvcFalse and prefer_make_backendFalse -> load_from_waves5249 -> YAML Wave.grab_data/wave read gate; country read gate bypassed",
+      "Make_runtime_evidence": "not in this new cohort or staged original1078 Niger food calls; no Make API replay performed"
+    },
+    "Uganda_cluster_features": {
+      "materialize_make": false,
+      "Default": "same Default branch and actual copied-current/fullcoverage warm calls",
+      "Make": "same country-gate bypass -> load_from_waves -> YAML Wave gates; four original saved4805row caller endpoints corroborate actual cold/warm Make observations on both1198 heads",
+      "Make_runtime_evidence": "immutable1198 report/build-v2.py/manifest-gated saved per-call endpoints; not newly executed or newly instrumented"
+    }
+  },
+  "isolation_qualification": {
+    "denied_remove_relative_t_parquet": 6,
+    "denied_pytest_cache_mkdir": 2,
+    "existing_mkdir_FIE": 2,
+    "exact_retrospective_call_stacks_or_dir_fd_not_recorded": true,
+    "six_remove_pattern": "consistent with six GH645 TemporaryDirectory roundtrips and shutil dir_fd-relative unlink; tempfile PermissionError fallback can unlink absolute private path; not individually attributed",
+    "two_mkdir_pattern": "matches pytest cacheprovider._ensure_cache_dir_and_supporting_files TemporaryDirectory prefix under cachedir.parent; no successful source write",
+    "test_replay_or_guard_weakening": false,
+    "full_original_guard_log_retained": true,
+    "source_bytes_modes_mtimes_HEAD_clean_exact": true
+  }
+}

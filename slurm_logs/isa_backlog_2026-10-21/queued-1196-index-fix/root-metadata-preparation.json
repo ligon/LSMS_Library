@@ -1,0 +1,23 @@
+{
+  "recorded_at_UTC": "2026-10-22T05:31:00.880720+00:00",
+  "rows": [
+    {
+      "label": "candidate",
+      "checkout": "/local/job40255479/worktrees/isa-1196-index-fix",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "ignored_link": "/local/job40255479/worktrees/isa-1196-index-fix/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/shared1196-fix/candidate-dvc-tmp"
+    },
+    {
+      "label": "base",
+      "checkout": "/local/job40255479/worktrees/isa-1196-index-fix-base",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "ignored_link": "/local/job40255479/worktrees/isa-1196-index-fix-base/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/shared1196-fix/base-dvc-tmp"
+    }
+  ],
+  "stage": "PATCH_PROPOSAL_ONLY_NO_PRODUCT_EDITS",
+  "tests_builds": 0,
+  "assigned": false,
+  "signed": "Sue"
+}

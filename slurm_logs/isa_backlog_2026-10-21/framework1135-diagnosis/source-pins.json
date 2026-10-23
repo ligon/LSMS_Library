@@ -1,0 +1,45 @@
+{
+  "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "country_notes": {
+    "Ethiopia": {
+      "path": "lsms_library/countries/Ethiopia/_/CONTENTS.org",
+      "lines": 2350,
+      "sha256": "87e4d5cafcbbdba09e2c7b477dd37286447fbe0545ca1cc253fdb36223cdd3ce",
+      "full_read_including_tasks_and_logbooks": true,
+      "read_basis": "exact immutable f8 reading in completed review1081, current blob reverified"
+    },
+    "Tanzania": {
+      "path": "lsms_library/countries/Tanzania/_/CONTENTS.org",
+      "lines": 2111,
+      "sha256": "84699943b8e64395345bc3890d9981eaf3ece11bb73bd8d1f98f61d6c507c32f",
+      "full_read_including_tasks_and_logbooks": true,
+      "read_basis": "full current file read in this task"
+    },
+    "Uganda": {
+      "path": "lsms_library/countries/Uganda/_/CONTENTS.org",
+      "lines": 3604,
+      "sha256": "774d5bc13c35ca5a6d9543766648f88dbc1efe508d73aa388d5ac6e81146256c",
+      "full_read_including_tasks_and_logbooks": true,
+      "read_basis": "exact immutable f8 reading in completed review1081, current blob reverified"
+    },
+    "Nigeria": {
+      "path": "lsms_library/countries/Nigeria/_/CONTENTS.org",
+      "lines": 2166,
+      "sha256": "93bcd7230736ddfdf607f3b9a4a53dbc9cdbed297fca16489b79171d8d90a65f",
+      "full_read_including_tasks_and_logbooks": true,
+      "read_basis": "full current file read in this task"
+    },
+    "GhanaLSS": {
+      "path": "lsms_library/countries/GhanaLSS/_/CONTENTS.org",
+      "lines": 5838,
+      "sha256": "2b88b5b6a7ebf9d743dc0475f0152c20b6c71f3879d18c651875a06f720720ec",
+      "full_read_including_tasks_and_logbooks": true,
+      "read_basis": "full current file read in this task"
+    }
+  },
+  "live_context_sha256": "26a0a267c6c8dea8a7948d63970bab4b89b0be5aa5c9bf31781727a40f681be6",
+  "historical_receipts": "root-historical-1137/root-copy-receipts-private.json",
+  "historical_count_table": "root-historical-1137/h2h3.out",
+  "historical_measurement_code": "root-historical-1137/h2h3.py",
+  "no_current_data_calls": true
+}

@@ -1,0 +1,11 @@
+#+TITLE: Proposed source note after Tanzania1091 independent review
+
+Fresh metadata from both held community modules names cm_f061/cm_f062/cm_f063 as Unit/Weight/Price (Village/MTAA), with cm_f064/cm_f065/cm_f066 the separate District Capital triple.
+The shared native unit codebook is 1 Kg, 2 Gram, 3 Litre, 4 Millilitre, 5 Piece; label case differs by release (uppercase2019, lowercase2020).
+Weight here remains the reported basis in its native unit; this review supplies no new physical factor or Kg interpretation.
+The existing positive-price/positive-basis predicate admits3077/14625 entries before the resolved-unit gate, leaving3076/14623 retained rows.
+Three entries fail that existing resolved-unit predicate; this count does not establish their validity or authorize a fallback/filter change.
+Source-code variety, interview__key community identity, the i==v compatibility shim and own-record price/basis division remain unchanged.
+
+This is a proposed documentation addition from a read-only reviewer, not an implemented note or a new issue ownership claim.
+Sue.

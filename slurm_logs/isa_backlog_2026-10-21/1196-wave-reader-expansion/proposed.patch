@@ -1,0 +1,88 @@
+--- a/lsms_library/local_tools.py
++++ b/lsms_library/local_tools.py
+@@ -1746,6 +1746,23 @@
+     return df
+ 
+ 
++def _read_parquet_with_index_policy(f, *, read_errors=(), **kwargs):
++    """Read an already-open parquet stream and its same-file index policy.
++
++    Return (frame, None), or (None, error) for only the caller's existing
++    payload-read errors. Footer/metadata/restoration errors stay outside
++    that catch. Callers retain their own miss, format and fallback policy.
++    No source lookup, path reopening, audit or non-parquet parser runs here.
++    """
++    try:
++        df = pd.read_parquet(f, **kwargs)
++    except read_errors as error:
++        return None, error
++    import pyarrow.parquet as pq
++    metadata = pq.read_schema(f).pandas_metadata
++    return _restore_parquet_index_string_policy(df, metadata), None
++
++
+ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False) -> pd.DataFrame:
+     """From a file named fn, try to return a dataframe.
+ 
+@@ -1896,17 +1913,15 @@
+                         NotImplementedError) as exc:
+                     raise ValueError(f'{fn} claims SPSS but cannot be decoded') from exc
+ 
+-        try:
+-            df = pd.read_parquet(f, engine='pyarrow')
+-        except (ArrowInvalid,) as exc:
++        df, parquet_error = _read_parquet_with_index_policy(
++            f, engine='pyarrow', read_errors=(ArrowInvalid,),
++        )
++        if parquet_error is not None:
+             if Path(fn).suffix.lower() == '.parquet':
+-                raise ParquetFormatError(f'{fn} has a Parquet header but cannot be decoded') from exc
+-            failure = exc
++                raise ParquetFormatError(f'{fn} has a Parquet header but cannot be decoded') from parquet_error
++            failure = parquet_error
+         else:
+-            import pyarrow.parquet as pq
+-            # The same open file binds metadata to the payload just decoded.
+-            metadata = pq.read_schema(f).pandas_metadata
+-            return _restore_parquet_index_string_policy(df, metadata)
++            return df
+ 
+         # Stata -- only when the header says so (GH #712).  Handed a file
+         # that is NOT Stata, ``StataReader`` reads a garbage header and dies
+--- a/lsms_library/country.py
++++ b/lsms_library/country.py
+@@ -53,6 +53,7 @@
+     read_parquet_cache_waves,
+     read_parquet_datetime_audit,
+     read_parquet_build_drops,
++    _read_parquet_with_index_policy,
+     source_tier,
+     _collect_file_paths_from_block,
+ )
+@@ -1719,9 +1720,14 @@
+             if (cache_freshness(cache_path, expected_wave_hash) != "stale"
+                     and degraded_verdict != "rebuild"):
+                 try:
+-                    df_cached = pd.read_parquet(cache_path)
+-                except (OSError, ArrowInvalid):
++                    cache_file = open(cache_path, 'rb')
++                except OSError:
+                     df_cached = None
++                else:
++                    with cache_file:
++                        df_cached, _ = _read_parquet_with_index_policy(
++                            cache_file, read_errors=(OSError, ArrowInvalid),
++                        )
+                 if df_cached is not None:
+                     if (expected_wave_hash is not None
+                             and read_parquet_cache_hash(cache_path) is None):
+@@ -2175,7 +2181,8 @@
+                 logger.warning(f"Parquet file for {request} still missing after running Makefile.")
+                 return pd.DataFrame()
+ 
+-            df = pd.read_parquet(parquet_fn)
++            with open(parquet_fn, 'rb') as parquet_file:
++                df, _ = _read_parquet_with_index_policy(parquet_file)
+             # GH #868: the wave script ran out of process; whatever its
+             # reducer reported lives only in the stamp it wrote.
+             _replay_wave_stamp(parquet_fn, self.country.name, request, self.year)

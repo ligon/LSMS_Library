@@ -1,0 +1,7 @@
+{
+  "time": "2026-10-21T18:09:20.069291+00:00",
+  "session": 10257,
+  "exit_code": 1,
+  "tests_executed": false,
+  "reason": "Launcher asserted socket class module; offline guard actually patches connect/connect_ex methods. Correct check and preserve this terminal launch evidence."
+}

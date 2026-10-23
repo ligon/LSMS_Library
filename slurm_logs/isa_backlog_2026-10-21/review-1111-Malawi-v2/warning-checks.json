@@ -1,0 +1,23 @@
+{
+  "head": "a9356f2c5b2bb1709fedf9a288d12ef255ae44f3",
+  "fresh_cold_warning_records_each": 18,
+  "full_records_order_category_message_image_filename_and_line_exact": true,
+  "cold_event_counts": {
+    "hh_a22": 5,
+    "hh_a23": 5,
+    "hh_a37": 4,
+    "hh_a40": 4
+  },
+  "main_candidate_events": 6,
+  "main_event_counts": {
+    "hh_a22": 2,
+    "hh_a23": 2,
+    "hh_a37": 1,
+    "hh_a40": 1
+  },
+  "distinct_source_metadata_bindings": 10,
+  "all_named_value_label_sets_absent": true,
+  "all_warned_fields_unused_by_sample": true,
+  "fresh_sample_warm_warnings_each": 0,
+  "metadata_binding_count_not_equated_to_build_event_count": true
+}

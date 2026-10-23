@@ -1,0 +1,376 @@
+diff --git a/.coder/ledger/1204-uganda-crop-wave-coverage.md b/.coder/ledger/1204-uganda-crop-wave-coverage.md
+new file mode 100644
+index 000000000..dd4523ba8
+--- /dev/null
++++ b/.coder/ledger/1204-uganda-crop-wave-coverage.md
+@@ -0,0 +1,70 @@
++# Prior-Art Ledger - GH1204 Uganda requested-wave crop coverage
++
++**Search tier used:** ripgrep + git + Python stdlib static inspection. No GitNexus or cross-session memory tool is exposed. Source grounding is anchored to actual parent `491daf5654b9ee45332bec97e1296ae821ff46d5` (reviewed PR1207 over PR1202). This initial ledger precedes diagnosis, production edits, and project/data imports.
++
++## §1 Task, restated
++Repair ordinary `Country('Uganda').crop_production(waves=...)` routing for supported and genuinely barren requests, under Default and Make, including truthful raw country-cache contents and coverage. Preserve the reviewed native observation grain and twelve factor bindings. A public-only filter or invented coverage is insufficient. Root must approve the source-bound proposal before implementation or held-source runs.
++
++## §2 Existing machinery
++
++| symbol / path | role | existing tests | decision |
++|---|---|---|---|
++| `country.py:4893 Country._has_country_builder` | Real script / GNU Make rule discovery; selects existing framework wave assembly when no country builder exists | `test_gh1039_make_backend_no_country_rule.py::test_real_country_builders`, `test_multi_target_country_rule_keeps_the_make_route` | reuse; retirement is not yet assumed sufficient |
++| `country.py:5249 load_from_waves` | Wave declaration/build, ID walk, normalization, concat, country fallback | `test_gh1039_make_backend_no_country_rule.py`, `test_gh866_stale_country_parquet_not_laundered.py` | reuse; trace every caller in phase0 |
++| `country.py:5004 absent_subset_frame`; `country.py:1050 _empty_declared_frame` | GH1099 declared typed empty result without replacing other waves' country cache, when no country builder exists | `test_absent_subset_is_typed_and_preserves_other_cached_waves`, `test_covered_subset_cache_hit_does_not_construct_waves` in GH1039 tests | reuse |
++| `country.py:4317 _cache_covers_waves`; `local_tools.py:3103 read_parquet_cache_waves`; `local_tools.py:3225 to_parquet` | GH891 coverage manifest and monotone requested/cached union | `test_gh891_wave_subset_cache.py` coverage/union/request tests | reuse; measure actual raw result and footer |
++| `country.py:4738 _evict_stale_country_cache` | GH866 stale fallback target protection | `test_gh866_stale_country_parquet_not_laundered.py` | reuse |
++| `country.py:5245 _replay_wave_stamp`; `country.py:7827 _replay_wave_stamp`; `country.py:7792 _replay_grain_audit` | Existing wave-to-country grain/date/drop transport, including out-of-process scripts | `test_gh868_reduce_to_agreed_ledger.py`, grain tests | reuse; prove all relevant routes |
++| `country.py:5352`, `country.py:3874`; `local_tools.py:3636 id_walk` | Framework ID conversion and finalizer use closure-resolved maps plus `id_converted` | `test_id_walk.py::test_id_walk_idempotent_on_two_step_chain`, `test_id_walk_sets_id_converted_attr` | reuse; compare country-local walk and reviewed map |
++| `countries/Uganda/_/crop_production.py`; `countries/Uganda/_/Makefile:103-107` | Legacy all-wave country concat, local `uganda.id_walk`, wave-grain audit fold, raw var write | existing held-source GH1198/GH849 evidence; new actual-parent control required | investigate authority and transport before choosing edit |
++| `countries/Uganda/_/uganda.py:679 id_walk` | Country-local one-pass wave-scoped renamer differs in implementation from generic closure-resolved walk | reviewed `updated_ids.json`, existing ID tests | verify actual map equivalence; no speculative rewrite |
++| `countries/Uganda/2018-19/_/crop_production.py` and six sibling loaders | Retained maximal production observations with literal source-fingerprint references and per-wave audit write | `test_gh1198_uganda_production_observations.py`, `test_gh849_uganda_reported_factors.py` | preserve unchanged |
++
++## §3 Definitions and conventions in force
++Inherit `STANDING.md` §§3-4, `CLAUDE.md` cache/read-only source/ID/grain rules and `lsms_library/data_info.yml` canonical schema. Full Uganda `_/CONTENTS.org` read, including TODO/WAITING/LOGBOOK, before other task material.
++
++- GH1198 dated section: `production_obs` follows `season`; source IDs, actual condition slots, and explicit release-row identities are distinct source observations, even with equal payloads. Preserve the legacy conditional null-key boundary and all eligible public null-v records.
++- GH849 dated section: the twelve reported-factor bindings are reviewed, with the existing numeric/nonpositive handling and downstream screen unchanged. Older `KgFactor` text says "Wired for 2018-19 only, deliberately"; the 2026-10-22 addendum says "The five previously unwired rounds now carry their own reported kg-per-unit fields". Preserve both as dated evidence; do not silently reinterpret the current baseline.
++- 2013-14 AGSEC5A unit/condition variable labels are swapped; value vocabularies govern. 2018-19 AGSEC5A asks a unit but the extract has two condition columns and no harvest-unit column. Mixed legacy/WB names occur within one file.
++- GH829 remains WAITING: the measured 2015-16 sale-value x100 correction is producer-undocumented and conditional on the held release; no rescaling change here. A/B are module/visit labels, not universal calendar-season order.
++- GH1204 is explicitly recorded under GH1198/GH849: Make supported/barren subsets return all waves. Default final-result emptiness alone does not prove correct raw-cache coverage.
++- The old "100% of crop rows" parcel-match claim is contradicted by the dated held-source account; GH1205 area/key repair is separate. Population, sampling, recall and derivation attrs are typed carriers; finalized all-wave filtering is not a full-attrs subset oracle.
++
++## §4 Invariants and assumptions
++Inherit `STANDING.md` §4. No cache bypass/stamping/promotion, source acquisition, new reducer, factor estimator, eligibility change, area repair, or fixture refresh. 2005-06 has area allocation without crop-level harvest quantities and must stay genuinely barren. Compare actual491 counts by stage rather than forcing older issue counts. Every project/numerical/data actor needs a fresh offline namespace and pre-import socket/write guards, exact controller AND pytest-worker source/config/data identity, private roots and one-thread/build/Make pins. Provider gates precede held-source copy/decode. Preserve all stops and guard events privately. The old Malawi1209 evidence is immutable.
++
++## §5 Reuse decision
++
++| behavior | decision | reason |
++|---|---|---|
++| Requested-wave assembly | reuse existing `load_from_waves` if transport proof succeeds | Framework already handles supported and absent requests; country retirement is only a hypothesis until phase0 trace and controls |
++| Raw coverage and union | reuse GH891/GH1099 | No new footer format or public post-hoc filter |
++| Canonical household IDs | reuse reviewed map and existing walk | Compare local and framework semantics on source metadata and targeted tests; no new ID rule |
++| Native observation/factor/quantity semantics | preserve existing loaders/helper/transforms | GH1198/GH849 already own these definitions |
++| Regression coverage | extend narrowly | Actual491 parent controls must discriminate both wrong Make output and wrong Default raw end state |
++
++## §6 Source-bound decision and remaining review
++
++On 2026-10-22 root approved retiring only the duplicate country crop script and var rule, adjusting the all-list, retaining a native-only phony alias, and adding documentation/regressions. The phase0 check binds the seven source hashes and the clean ledger-first commit `a53f71bad6a26307eb83d051b57a6cdd9c9424cc`.
++
++The framework already owns the required assembly. Both no-stage Default paths use `load_from_waves`; Make with `country_builder=False` uses that same implementation. `absent_subset_frame` runs before a barren descent/cache write. `_replay_wave_stamp`, `_replay_grain_audit`, the finalizer and `id_walk` supply the existing transport; no helper, framework, scheme, native loader, map, factor, reducer or science change is needed. The reviewed map contains 11,343 string mappings (1,833 + 3,305 + 3,176 + 3,029), all terminal, so the old local one-pass and framework closure-resolved walks agree on this actual map. The source-order wave list equals framework sorted order.
++
++The implementation commit is `a4e154ba0`; `69bcbd5ff` corrects only the regression fixture's omission of already-required `harvest_month` and `intercropped`. Every runtime source byte is tested on clean `69bcbd5ff`; this final ledger update is the only later change. Normal commit hooks publish each commit. The approved five-path diff is the ledger, Uganda CONTENTS, Uganda Makefile, deleted country crop script, and the new regression file.
++
++### Phase 3 verification: author evidence complete, independent review pending
++
++- Eight targeted regressions pass. The exact actual `491daf5654b9ee45332bec97e1296ae821ff46d5` parent fails seven and passes one; actual controller and worker package/config/cwd/rootdir identities are asserted before and after collection. The selected existing ID-walk, coverage, no-builder, stale-cache, grain, observation and factor tests pass 170 cases with zero skips/errors. The API audit exits zero.
++- The complete prebuild census measures 28 of 549 country and 171 of 1,362 wave fingerprints changed, all Uganda; none of 39 framework fingerprints change. Discovery, public names and materialization declarations remain equal. Three real parent country footers grade stale under candidate expectations; the unchanged read gate rejects stale content before its data read. No artificial cache migration is used.
++- Thirty-seven genuine binary providers pass authority/sidecar, binary MD5, SHA256, declared size and physical gates before copy/decode. Twelve L1-only roots contain 444 new distinct-inode nonsymlink/nlink1 copies, totaling 533,307,636 bytes in the measured DVC3 layout. No acquisition, shared-cache writes, bypass, stamping or promotion occurs.
++- All 59 accepted actors exit zero: 44 Country requests, 12 Feature requests, two unmodified scoped scanners and one direct native Make call. The grid covers supported 2018-19 and barren 2005-06, true cold L2, both alternating population orders, ordinary all-wave calls and fresh-process warm controls on both heads/backends. Direct Make builds seven native waves and no crop country parquet.
++- Actual-parent Default cold-barren returns zero public rows but stores 133,761 raw rows from other waves under false `['2005-06']` coverage. The candidate produces zero rows without creating a crop country cache. Three populated-barren controls preserve the existing valid crop parquet byte-for-byte. Candidate raw waves stay within truthful coverage, and Make writes no crop country parquet. All twelve final footprints match their exact expected paths/producer receipts (177 final cache footers).
++- All-wave rows remain 133,761, including 928 eligible null-v rows and zero null `production_obs`; supported 2018-19 remains 15,630 rows. The exact all-wave harvest total remains 42,026,694.99297963. No historical counts are forced. All seven native tables, complete native footer bytes and production-observation/factor fields remain exact across 21 pairs. This held release has no native crop grain-audit footer or crop grain-ledger records on either head; nonempty audit transport is proved by the synthetic native-write regressions under both backends and unchanged replay code.
++- The accepted comparator rejects 49 calibrated faults, including tiny/nextafter numeric differences, nullable/object scalar type changes, altered unused domains/codes/widths, string storage/NA policy and typed attrs/record fields/key types. Of 65 full-frame pairs, 61 pass and four zero-row pairs retain strict FAIL verdicts. All nonempty public/raw/Feature/harvest pairs pass. Five additional actual-parent Make all-wave public/raw/harvest/cold-warm pairs pass. No frames are normalized, reordered or cast.
++- The four strict failures are an explicit empty-column-order residual. Native/cached order is `Quantity, Quantity_sold, Value_sold, Unit_sold, Condition_sold, harvest_month, intercropped, KgFactor`; declared-empty order is `Quantity, Quantity_sold, Value_sold, harvest_month, intercropped, Unit_sold, Condition_sold, KgFactor`. Full empty axes and typed attrs are exact; per-name field/storage/dtype checks are narrower diagnostics, not full equality. At actual491, Default cold-barren and supported-cache-then-barren use native order while writing the wrong raw end state. Retirement newly exposes the unchanged required-then-optional constructor there. Covered Default barren reads on both heads retain native order; candidate Make barren calls use declared-empty order. This observable Uganda behavior is not described as already inherited at491. Root will classify/deduplicate the precise residual; no framework/scheme edit or extra API prefix erases it.
++- Both unmodified scanners produce 22 literally equal ordered warning records and no failures. Existing broad Make wave eviction after a subset is preserved and belongs to GH1210. GH1196 string-null behavior, GH1205 area/key repair and the documented scientific/source caveats remain separate.
++
++Verification actors use fresh offline namespaces, pre-import dir_fd-aware socket/write guards, private configuration/temp/data/DVC roots, exact source identities, all thread/build/Make pins at one and actual Make helper `None`. Original IPv6 loopback bind denials are retained without attributing their unrecorded original call stacks; static urllib3 probe code is context only. There is no whole-task zero-network-attempt claim. Two original execnet anonymous-pipe precollection failures and the four-failure synthetic fixture run/confounded v2 parent control remain intact; approved fresh guard/fixture prefixes produce the final controls above. The phase0 AST metadata stop and a later absent-file metadata read are also retained. No completed prefix is replayed to package evidence.
++
++Source/provider/copy protection, an exact aggregate safe allowlist, immutable private manifest/READY, separately observed read-only postexit and independent review accompany root acceptance. This ledger records scoped author evidence, not scientific certification, self-approval or permission to merge. No human scientific decision is requested by this change.
++
++Sue
+diff --git a/lsms_library/countries/Uganda/_/CONTENTS.org b/lsms_library/countries/Uganda/_/CONTENTS.org
+index 8f6063dd3..f77b451ba 100644
+--- a/lsms_library/countries/Uganda/_/CONTENTS.org
++++ b/lsms_library/countries/Uganda/_/CONTENTS.org
+@@ -3739,3 +3739,33 @@ filtering an already-finalized all-wave frame is not a full-attrs oracle.
+ The original strict subset comparison stop is retained in the task evidence.
+ See =slurm_logs/isa_backlog_2026-10-21/Uganda/849-fix/= for the safe report,
+ source-grounded aggregates, exact hash scope, tests and explicit evidence limits.
++
++* Requested crop waves use framework assembly (GH #1204, 2026-10-22)
++
++The country =_/crop_production.py= compiler and its country-parquet Make rule
++are retired.
++That compiler concatenated every native wave without accepting a requested
++wave set, which explains the supported and barren subset caveat recorded above.
++The existing framework now assembles this table on both Default and Make,
++using the same seven native loaders, canonical household ID walk and
++wave-to-country grain-audit transport.
++The reviewed household map terminates in one step in every wave, so replacing
++the compiler's local walk with the existing framework walk changes no binding.
++
++2005-06 remains genuinely barren: it has crop-area allocation without
++crop-level harvest quantities.
++The existing typed-empty path answers that request before a country-cache
++rebuild or write; it preserves any other waves already cached.
++Default supported builds retain the existing coverage manifest and monotone
++union rule.
++Make uses requested native waves and writes no country crop parquet.
++The direct =make crop_production= target builds only the native wave parquets.
++
++This changes routing, not the source observation, identifier, factor or
++scientific contracts recorded under GH #1198 and GH #849.
++Native =production_obs=, reported factors, the conditional legacy null-key
++boundary, the sample join and the 2015-16 sale-value correction are unchanged.
++The older country-builder subset and warm-write measurements above remain
++historical evidence; they are not guarantees about this new route.
++The separate area/key limitation (GH #1205) and support-string null-policy
++observation (GH #1196) remain outside this change.
+diff --git a/lsms_library/countries/Uganda/_/Makefile b/lsms_library/countries/Uganda/_/Makefile
+index 106d3f42b..5eaf8dbb7 100644
+--- a/lsms_library/countries/Uganda/_/Makefile
++++ b/lsms_library/countries/Uganda/_/Makefile
+@@ -23,7 +23,6 @@ var = $(VAR_DIR)/shocks.parquet $(VAR_DIR)/nonfood_expenditures.parquet $(VAR_DI
+ 	  $(VAR_DIR)/assets.parquet $(VAR_DIR)/earnings.parquet $(VAR_DIR)/income.parquet \
+ 	  $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
+ 	  $(VAR_DIR)/plot_features.parquet \
+-	  $(VAR_DIR)/crop_production.parquet \
+ 	  $(VAR_DIR)/plot_inputs.parquet \
+ 	  $(VAR_DIR)/plot_labor.parquet \
+ 	  $(VAR_DIR)/livestock.parquet \
+@@ -103,8 +102,10 @@ $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
+ crop_production = $(shell find $(rounds) -name crop_production.py)
+ crop_production_parquet := $(crop_production:.py=.parquet)
+ 
+-$(VAR_DIR)/crop_production.parquet: crop_production.py $(crop_production_parquet)
+-	python crop_production.py
++# GH1204: Country owns requested-wave assembly, ID conversion and audit
++# transport. Direct Make builds native waves without a second country writer.
++.PHONY: crop_production
++crop_production: $(crop_production_parquet)
+ 
+ plot_inputs = $(shell find $(rounds) -name plot_inputs.py)
+ plot_inputs_parquet := $(plot_inputs:.py=.parquet)
+diff --git a/lsms_library/countries/Uganda/_/crop_production.py b/lsms_library/countries/Uganda/_/crop_production.py
+deleted file mode 100644
+index 64efdba48..000000000
+--- a/lsms_library/countries/Uganda/_/crop_production.py
++++ /dev/null
+@@ -1,49 +0,0 @@
+-"""Concatenate wave-level crop_production data for Uganda (GAP 1).
+-
+-Each wave's ``Uganda/<wave>/_/crop_production.py`` produces a parquet
+-indexed ``(t, i, plot_id, j, u, condition, season, production_obs)`` with the REPORTED harvest columns
+-(Quantity, Quantity_sold, Value_sold, harvest_month, intercropped,
+-perennial, planting_month).  This script concatenates them across waves
+-and applies cross-wave id_walk so the household index uses the panel
+-canonical id scheme.
+-
+-2005-06 is intentionally absent: its AGSEC5A is a crop-area allocation
+-matrix with no crop-level harvest quantities (and the WB LSMS-ISA panel
+-starts at wave 1 = 2009-10).
+-"""
+-import json
+-
+-import pandas as pd
+-
+-from lsms_library.local_tools import get_dataframe, to_parquet, read_parquet_grain_audit
+-from lsms_library.paths import data_root
+-from uganda import Waves, id_walk
+-
+-
+-pieces = []
+-# Preserve the existing wave-to-country grain-audit transport. GH1198 no
+-# longer reduces distinct native observations or blanks conflicting labels.
+-# Wave parquets live under data_root() only (GH #803), never in-tree.
+-audit = []
+-for t in Waves.keys():
+-    fn = f'../{t}/_/crop_production.parquet'
+-    try:
+-        df = get_dataframe(fn)
+-    except Exception:
+-        # Wave not wired for crop_production (no .py / parquet, e.g.
+-        # 2005-06).  DVC raises PathMissingError here, not FileNotFoundError.
+-        continue
+-    pieces.append(df)
+-    for r in read_parquet_grain_audit(
+-            data_root('Uganda') / t / '_' / 'crop_production.parquet') or []:
+-        if r not in audit:
+-            audit.append({**r, 'wave': r.get('wave') or t})
+-
+-assert pieces, "crop_production: no wave-level parquets found"
+-
+-p = pd.concat(pieces)
+-
+-updated_ids = json.load(open('updated_ids.json'))
+-p = id_walk(p, updated_ids)
+-
+-to_parquet(p, '../var/crop_production.parquet', grain_audit=audit or None)
+diff --git a/tests/test_gh1204_uganda_crop_wave_coverage.py b/tests/test_gh1204_uganda_crop_wave_coverage.py
+new file mode 100644
+index 000000000..b88335bca
+--- /dev/null
++++ b/tests/test_gh1204_uganda_crop_wave_coverage.py
+@@ -0,0 +1,176 @@
++"""GH1204: real Uganda routing respects native crop wave coverage.
++
++The actual registry and Makefile select the builder. Synthetic native writes
++exercise the shipped Wave read/audit path without requiring microdata.
++Held-source raw/public/Feature and fresh-process checks are separate evidence.
++"""
++from __future__ import annotations
++
++import shutil
++import subprocess
++from pathlib import Path
++
++import pandas as pd
++import pytest
++
++import lsms_library.country as C
++from lsms_library import local_tools as lt
++from lsms_library.paths import data_root
++
++
++needs_make = pytest.mark.skipif(shutil.which('make') is None,
++                                reason='GNU make not on PATH')
++SUPPORTED = '2018-19'
++BARREN = '2005-06'
++NATIVE_INDEX = ['t', 'i', 'plot_id', 'j', 'u', 'condition', 'season',
++                'production_obs']
++
++
++@needs_make
++def test_uganda_crop_has_no_country_builder():
++    assert C.Country('Uganda', preload_panel_ids=False)._has_country_builder(
++        'crop_production') is False
++
++
++@needs_make
++def test_direct_make_crop_target_builds_native_waves_only(tmp_path):
++    c = C.Country('Uganda', preload_panel_ids=False)
++    result = subprocess.run(
++        ['make', '-n', f'LSMS_DATA_ROOT={tmp_path / "data"}', 'crop_production'],
++        cwd=c.file_path / '_', capture_output=True, text=True, check=True)
++    lines = [line for line in result.stdout.splitlines()
++             if 'python ./crop_production.py' in line]
++    assert len(lines) == 7
++    assert all(f'../{w}/_' in result.stdout for w in c.waves if w != BARREN)
++    assert f'../{BARREN}/_' not in result.stdout
++    assert 'var/crop_production.parquet' not in result.stdout
++    assert not (tmp_path / 'data').exists()
++
++
++@pytest.fixture
++def native_crop(tmp_path, monkeypatch):
++    monkeypatch.setenv('LSMS_DATA_DIR', str(tmp_path / 'data'))
++    monkeypatch.setenv('LSMS_BUILD_WORKERS', '1')
++    data_root.cache_clear()
++    C._GRAIN_LEDGER.clear()
++    built = []
++
++    def write_native(cwd, relative, *, force=False):
++        wave = Path(relative).parts[0]
++        assert wave != BARREN
++        built.append(wave)
++        frame = pd.DataFrame({
++            't': [wave] * 3, 'i': ['raw-house'] * 3,
++            'plot_id': ['plot'] * 3, 'j': ['Maize'] * 3, 'u': ['Kg'] * 3,
++            'condition': ['fresh'] * 3, 'season': ['A'] * 3,
++            'production_obs': ['slot:1', 'slot:2', 'slot:3'],
++            'Quantity': [2.5, 2.5, 0.0], 'KgFactor': [1.0, 1.0, 1.0],
++            'Quantity_sold': [1.0, 1.0, 0.0], 'Value_sold': [9.0, 9.0, 0.0],
++            'harvest_month': pd.array([6, 6, None], dtype='Int64'),
++            'intercropped': pd.array([False, False, None], dtype='boolean'),
++            'Unit_sold': ['Kg', 'Kg', None],
++        }).set_index(NATIVE_INDEX)
++        frame.attrs['transport_marker'] = {'flag': True, 'integer': 1}
++        # Synthetic audit payload tests transport through the real wave read.
++        # It makes no claim about Uganda's current native source observations.
++        report = {'site': 'reduce_to_agreed', 'kind': 'cells_blanked',
++                  'country': 'Uganda', 'table': 'crop_production', 'wave': wave,
++                  'levels': NATIVE_INDEX, 'rows': 3, 'groups': 3,
++                  'destroyed': 0, 'nan_key_rows': 0, 'cells_blanked': 1,
++                  'conflicting_groups': 1, 'columns': {'Unit_sold': 1},
++                  'examples': ['synthetic GH1204 transport fixture']}
++        target = data_root('Uganda') / wave / '_' / 'crop_production.parquet'
++        target.parent.mkdir(parents=True, exist_ok=True)
++        lt.to_parquet(frame, target, absolute_path=True, grain_audit=[report])
++
++    monkeypatch.setattr(C, '_build_wave_script_target', write_native)
++    monkeypatch.setattr(lt, '_warm_dvc_cache_for_feature', lambda *a, **k: None)
++    # Preserve real metadata/finalization, without building a second feature.
++    monkeypatch.setattr(C.Country, '_join_v_from_sample', lambda self, df: df)
++    real_run = C.subprocess.run
++
++    def probe_only(command, *args, **kwargs):
++        if isinstance(command, list) and command and command[0] == 'make' and '-n' in command:
++            return real_run(command, *args, **kwargs)
++        raise AssertionError('selected the retired country crop builder')
++
++    monkeypatch.setattr(C.subprocess, 'run', probe_only)
++
++    def country():
++        c = C.Country('Uganda', preload_panel_ids=False)
++        c._panel_ids_attempted = True
++        c._updated_ids_cache = {w: {'raw-house': 'canonical-house'} for w in c.waves}
++        return c
++
++    yield country, built, data_root('Uganda') / 'var' / 'crop_production.parquet'
++    C._GRAIN_LEDGER.clear()
++    data_root.cache_clear()
++
++
++def _waves(frame):
++    return set(frame.index.get_level_values('t'))
++
++
++@needs_make
++@pytest.mark.parametrize('backend', ['dvc', 'make'])
++def test_supported_cold_subset_keeps_native_observations_and_audit(
++        native_crop, monkeypatch, backend):
++    monkeypatch.setenv('LSMS_BUILD_BACKEND', backend)
++    country, built, var = native_crop
++    out = country().crop_production(waves=[SUPPORTED], currency=None)
++    assert built == [SUPPORTED]
++    assert len(out) == 3 and out.index.is_unique
++    assert _waves(out) == {SUPPORTED}
++    assert out.index.get_level_values('i').tolist() == ['canonical-house'] * 3
++    assert out.index.get_level_values('production_obs').tolist() == ['slot:1', 'slot:2', 'slot:3']
++    assert out.Quantity.tolist() == [2.5, 2.5, 0.0]
++    assert out.KgFactor.tolist() == [1.0, 1.0, 1.0]
++    assert out.harvest_month.iloc[:2].tolist() == [6, 6]
++    assert out.intercropped.iloc[:2].tolist() == [False, False]
++    assert pd.isna(out.harvest_month.iloc[2]) and pd.isna(out.intercropped.iloc[2])
++    assert out.attrs['id_converted'] is True
++    assert out.attrs['transport_marker'] == {'flag': True, 'integer': 1}
++    assert [r['wave'] for r in C.grain_reports('Uganda', 'crop_production')] == [SUPPORTED]
++    if backend == 'dvc':
++        raw = pd.read_parquet(var)
++        assert _waves(raw) == {SUPPORTED} and len(raw) == 3
++        assert raw.attrs['id_converted'] is True
++        assert lt.read_parquet_cache_waves(var) == [SUPPORTED]
++        assert lt.read_parquet_grain_audit(var)[0]['wave'] == SUPPORTED
++    else:
++        assert not var.exists()
++
++
++@needs_make
++@pytest.mark.parametrize('backend', ['dvc', 'make'])
++def test_barren_cold_subset_never_populates_crop_cache(native_crop, monkeypatch, backend):
++    monkeypatch.setenv('LSMS_BUILD_BACKEND', backend)
++    country, built, var = native_crop
++    out = country().crop_production(waves=[BARREN], currency=None)
++    assert out.empty and not built and not var.exists()
++    assert 'production_obs' in out.index.names and 'Quantity' in out.columns
++
++
++@needs_make
++@pytest.mark.parametrize('backend', ['dvc', 'make'])
++def test_alternating_requests_keep_raw_coverage_true(native_crop, monkeypatch, backend):
++    monkeypatch.setenv('LSMS_BUILD_BACKEND', backend)
++    country, built, var = native_crop
++    country().crop_production(waves=[SUPPORTED], currency=None)
++    before = var.read_bytes() if var.exists() else None
++    empty = country().crop_production(waves=[BARREN], currency=None)
++    assert empty.empty
++    if before is not None:
++        assert var.read_bytes() == before, 'barren request replaced other-wave raw cache'
++    full = country().crop_production(currency=None)
++    assert len(full) == 21 and _waves(full) == set(country().waves) - {BARREN}
++    before = var.read_bytes() if var.exists() else None
++    subset = country().crop_production(waves=[SUPPORTED], currency=None)
++    assert len(subset) == 3 and _waves(subset) == {SUPPORTED}
++    assert country().crop_production(waves=[BARREN], currency=None).empty
++    if backend == 'dvc':
++        assert var.read_bytes() == before
++        assert len(pd.read_parquet(var)) == 21
++        assert lt.read_parquet_cache_waves(var) == country().waves
++    else:
++        assert not var.exists()

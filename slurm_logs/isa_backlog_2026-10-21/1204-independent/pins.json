@@ -1,0 +1,57 @@
+{
+  "reviewer": "Sue (GPT-6)",
+  "candidate": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "actual_parent": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+  "author_tested_runtime": "69bcbd5ff79883606008c67dd36e81580c3f497b",
+  "candidate_final_delta_from_author_tested_runtime": "task ledger only",
+  "source_roots": {
+    "base": {
+      "root": "/local/job40255479/worktrees/isa-review-Uganda-1204-base",
+      "head": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+      "tracked_files": 14912
+    },
+    "candidate": {
+      "root": "/local/job40255479/worktrees/isa-review-Uganda-1204",
+      "head": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+      "tracked_files": 14913
+    }
+  },
+  "runtime_binary": {
+    "sha256": "99b9e30b1e34701e7136448414fe5e4d2b788bc768cba4ddeca9e5e18bc18b91",
+    "bytes": 23864,
+    "mode": 493,
+    "mtime_ns": 1738885408891840994,
+    "nlink": 1,
+    "device": 36,
+    "inode": 6421342728535199562,
+    "uid": 65534,
+    "gid": 65534,
+    "symlink": false,
+    "link": null,
+    "hash_semantics": "file-bytes"
+  },
+  "mounted_VENV_GENERATION": {
+    "sha256": "97e6ed8a488dad718f71cc4a43c17e1ea34bba0b014465b52fe780c8af5d0852",
+    "bytes": 271,
+    "mode": 420,
+    "mtime_ns": 1792447943000000000,
+    "nlink": 1,
+    "device": 64770,
+    "inode": 46928666,
+    "uid": 43292,
+    "gid": 501,
+    "symlink": false,
+    "link": null,
+    "hash_semantics": "file-bytes"
+  },
+  "author_packet": {
+    "READY.json": "5febb754720e182cc0834ca2f8b4f45fbb91dba1406b8b88e0dfe72497de9f08",
+    "final-private-manifest.json": "920a0d87c1473651e0704b2988648178853a6981949e51840520e2814b610d54",
+    "safe-exports/ALLOWLIST.json": "2eb8283f17b6f407faa14067e4b72a17d13db26fce1080fa65cc28be149b5d3a"
+  },
+  "guard_sha256": "3ada6b36dfc9864ff9c88f519713a6659d76ebcfdf92753e42f425f390007b63",
+  "comparator_sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94",
+  "all_build_BLAS_Make_workers": 1,
+  "actual_module_make_jobs_flag": null,
+  "backend": "normal Default or Make, no cache bypass"
+}

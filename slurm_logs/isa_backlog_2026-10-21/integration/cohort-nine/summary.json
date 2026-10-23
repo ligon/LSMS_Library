@@ -1,0 +1,17 @@
+{
+  "source_head": "483b4aa117c2c05ac00bf023adab97e47782df46",
+  "exit_code": 0,
+  "seconds": 270.243,
+  "selection_files": 18,
+  "workers": 8,
+  "offline_guard": true,
+  "network_namespace": "unshare -rn",
+  "tracked_content_modes_unchanged": true,
+  "head_unchanged": true,
+  "clean_status": true,
+  "full_credentialed_corpus": false,
+  "cases": 656,
+  "outcomes": {
+    "passed": 656
+  }
+}

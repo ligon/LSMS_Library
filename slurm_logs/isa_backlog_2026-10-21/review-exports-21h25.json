@@ -1,0 +1,177 @@
+{
+  "observed_at_UTC": "2026-10-21T21:25:19.712899+00:00",
+  "source_safe_selected_reports_only": true,
+  "files": [
+    {
+      "path": "review-1111-Malawi-v2/REVIEW.org",
+      "bytes": 13249,
+      "sha256": "a23eb364c08e74cadb3941596692db83b37ee136958d2c856eb2c46fc0147764"
+    },
+    {
+      "path": "review-1111-Malawi-v2/verdict.json",
+      "bytes": 3710,
+      "sha256": "9e4fab6909451a2fe1224889c1c6e9da31a7ca7594769e87a2c587bd99bcbb69"
+    },
+    {
+      "path": "review-1111-Malawi-v2/proof.json",
+      "bytes": 3336,
+      "sha256": "5cead4205512d69c486f83c038b193be5e5e05724cafd99523a5e89f2d9bd91d"
+    },
+    {
+      "path": "review-1111-Malawi-v2/REPRODUCE.org",
+      "bytes": 4961,
+      "sha256": "0b86e358511a221a6657e79360ca692fbc3b09e0fd2a4204db12a73e667eda02"
+    },
+    {
+      "path": "review-1111-Malawi-v2/instrument-check.json",
+      "bytes": 719,
+      "sha256": "2975d6154e173d53c362aee915666ad568251055621c787223018a5be9a910da"
+    },
+    {
+      "path": "review-1111-Malawi-v2/source-oracle.json",
+      "bytes": 2669,
+      "sha256": "c3f7eab52c14c16edb622cb3f084b24ed3a9667c6362cd4f07bdbe6177c3687b"
+    },
+    {
+      "path": "review-1111-Malawi-v2/runtime-comparison.json",
+      "bytes": 1195,
+      "sha256": "4307ac326ebc8a22f6e4e1147b88d2f5503f0676c8d64b8c8afb68b889e5cd2a"
+    },
+    {
+      "path": "review-1111-Malawi-v2/warning-checks.json",
+      "bytes": 640,
+      "sha256": "05bb31a428699054cf994b2cd470ef113118121bc1fcb70884c2ac2da509d801"
+    },
+    {
+      "path": "review-1111-Malawi-v2/hash-scope.json",
+      "bytes": 1060,
+      "sha256": "908fcea7f3260ed4e0f5bc535ff0dab109f64ae286d9cc859a28d712cb3b40f3"
+    },
+    {
+      "path": "review-1111-Malawi-v2/scanner-comparison.json",
+      "bytes": 4747,
+      "sha256": "b0007057598cd635c464cc18fb67ec92f485edab3ed54b60d344ecba86072718"
+    },
+    {
+      "path": "review-1095-Nigeria/REVIEW.org",
+      "bytes": 11126,
+      "sha256": "27975b8d0551b9ebfbbb0aaead05db75db96d904470a9c63829aa1b9238243fc"
+    },
+    {
+      "path": "review-1095-Nigeria/verdict.json",
+      "bytes": 943,
+      "sha256": "fb43557d9fc6b5e34986b9f00657d25be563f86fa924ae4944102b185ff25234"
+    },
+    {
+      "path": "review-1095-Nigeria/proof.json",
+      "bytes": 7778,
+      "sha256": "326b1fd33d64b3c383ed1b77618289c51f95164969e79af0860c020f024394e8"
+    },
+    {
+      "path": "review-1095-Nigeria/source-proof.json",
+      "bytes": 2343,
+      "sha256": "545d98c96c3ed56e9fad18737d51cfcd6128efaba203232b153513aea6cebfa1"
+    },
+    {
+      "path": "review-1095-Nigeria/final-proof.json",
+      "bytes": 2691,
+      "sha256": "c14c04cd4fe0fcd8525862a5af2d4e4be148980ec8dd901987183f1869cffb7d"
+    },
+    {
+      "path": "review-1095-Nigeria/adversarial.json",
+      "bytes": 294,
+      "sha256": "42e8a79bca293a5d6efce61fc2ddb082b4bfa6dadeb5a4e65ecabaec0a6df18a"
+    },
+    {
+      "path": "review-1095-Nigeria/quiescence.json",
+      "bytes": 166,
+      "sha256": "5895e2e09371f8c2e7b82226db0e0986c2671f57ce3e8154323fba602d0b469e"
+    },
+    {
+      "path": "review-1111-Malawi-composition/REVIEW.org",
+      "bytes": 11927,
+      "sha256": "67a78790f8a0194935d14c24c6e839fef677f7bf2ece7aa874c4cfe589a26fcf"
+    },
+    {
+      "path": "review-1111-Malawi-composition/verdict.json",
+      "bytes": 5622,
+      "sha256": "16b147089fd96cfddadc64307dacb5155f097c61868542e9638e872dbe33da4e"
+    },
+    {
+      "path": "review-1111-Malawi-composition/proof.json",
+      "bytes": 2728,
+      "sha256": "c9582f279a4d8db41f3196afc1500cd1403056468616021d900d3f31dfd9214f"
+    },
+    {
+      "path": "review-1111-Malawi-composition/REPRODUCE.org",
+      "bytes": 5175,
+      "sha256": "8e095c5dc27b034d086f9924cd6333039747157a61a2d5c2cd67c62fbe924a79"
+    },
+    {
+      "path": "review-1111-Malawi-composition/composition-summary.json",
+      "bytes": 1486,
+      "sha256": "7c218a3c26c55c750b847ab0d569c364f9c1d6ff43c98cdd810d27d9058fe4f5"
+    },
+    {
+      "path": "review-1111-Malawi-composition/scanner-comparison.json",
+      "bytes": 4742,
+      "sha256": "31cf55bcb4efd5c594cad4ea572c4c7d6d003e51dbe24a215e27256c22944718"
+    },
+    {
+      "path": "review-1111-Malawi-composition/source-oracle.json",
+      "bytes": 2665,
+      "sha256": "ea2681a2d7b329161283e08127c063c028528f030ee619fa5bce6e8f3aef8ee6"
+    },
+    {
+      "path": "Burkina_Faso/1058/DIAGNOSIS.md",
+      "bytes": 12622,
+      "sha256": "e7a28dda4294d9c58591a0d17bb8fb6de8cfa4001df23ea33e252446ed06ba5e"
+    },
+    {
+      "path": "Burkina_Faso/1058/PROPOSAL.md",
+      "bytes": 4544,
+      "sha256": "64821f26cfe45b5de0b3a61788100638ced057179c7e3822b2e6d8cc33329f45"
+    },
+    {
+      "path": "Burkina_Faso/1058/ledger-draft.md",
+      "bytes": 4673,
+      "sha256": "9defabf24aaf18bc3f9bc8f90d87dbc70103189049d390b19daf0096937daaa3"
+    },
+    {
+      "path": "Burkina_Faso/1058/freeze-proof.json",
+      "bytes": 1503,
+      "sha256": "8e9c9f90d927889b5e0b009b210a044767c14738c829ff408cf67b2e5d1d52cd"
+    },
+    {
+      "path": "Burkina_Faso/1058/source-census.json",
+      "bytes": 4905,
+      "sha256": "f0a981a993799bc6f957a44a119103c9b18a686eb23187abf7c6d52fd30c91d9"
+    },
+    {
+      "path": "Burkina_Faso/1058/baseline-projection.json",
+      "bytes": 2752,
+      "sha256": "b4d2ef4a5cc75288bd41b670ca26cc8befe13e76d005e2df6c5ebc34afc5bbdc"
+    },
+    {
+      "path": "Burkina_Faso/1058/eligibility.json",
+      "bytes": 194,
+      "sha256": "cce82430f23d4f56485a8382e26299023735a682b005b91bd67206a8e237cebc"
+    },
+    {
+      "path": "Burkina_Faso/1058/finding-accounting.json",
+      "bytes": 937,
+      "sha256": "ab41683d155b1d3df16ad2c2386b619dc6ab2dac216c53d230637d0f53765732"
+    },
+    {
+      "path": "Burkina_Faso/1058/scanner-summary.json",
+      "bytes": 364,
+      "sha256": "82185bdb7e738455657d1c278bcd1146f5838169bdbd17cf225b9a937ac84bd8"
+    },
+    {
+      "path": "Burkina_Faso/1058/anticipated-hash-scope.json",
+      "bytes": 1745,
+      "sha256": "3fa3ce9b8b8660e2b0af1b0a769bcfcadc7fb4f80e5844a06e549af04251acef"
+    }
+  ],
+  "full_raw_frames_source_IDs_coordinates_and_logs_excluded": true
+}

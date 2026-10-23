@@ -1,0 +1,13 @@
+{
+  "status": "PASS_SAVED_SOURCE_PRODUCT_PREDICATES",
+  "PR": 1193,
+  "NEW_full_pair_members_recipe_frames": 2,
+  "exact_original_normalized_key_group_amount_predicates": 4,
+  "source_slots_each": 33193,
+  "positive_same_source_pairs_each": 235,
+  "source_decode_and_identifier_closure_replay": 0,
+  "original_raw_source_headers_and_raw_memory_not_recovered": true,
+  "grouped_complete_index_metadata_not_an_original_map_predicate": true,
+  "all_original_copy_receipts_preserved": true,
+  "signed": "Sue"
+}

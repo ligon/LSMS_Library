@@ -1,0 +1,32 @@
+#+title: Nigeria warning-size follow-up: public instrument evidence
+#+author: Sue
+#+date: 2026-10-21
+
+* New evidence and provenance
+
+The World Bank publicly serves the W4 post-planting household questionnaire and the W5 post-planting household questionnaire/manual.
+Their downloaded bytes exactly match the three declared DVC MD5s in =public-proof.json=.
+An additional W4 interviewer manual comes from the same official catalog but has no matching declared sidecar in this checkout.
+All four new copies are private, physical and receipt-verified; the frozen held-source diagnosis and shared DVC cache remain unchanged.
+The earlier five-blob absence is a held-L1 finding, not upstream unavailability.
+
+* Interpretation and remaining work
+
+The W4 manual (PDF pages24-25) and W5 manual (page20) distinguish nearby moves from staying at the dwelling recorded in previous waves or listing.
+W5's sample description (page5) explicitly starts from households interviewed in W4.
+This strengthens a prior-wave interpretation of the movement flags; it does not prove which round supplies the prefilled address or complete movement histories between visits.
+The W5 manual also retains older date examples (page19) and has an apparently inconsistent routing instruction after the movement answer (page20); this is a reason to retain the questionnaire/data alignment checks.
+
+The questionnaires confirm the movement response meanings (W4 page1; W5 page3).
+They do not fill the twenty unknown W5 statuses, establish the physical identity of every changed cluster group, or turn the prefix-only112/5067 into a verified net-of-movers share.
+No numeric boundary record, formatter implementation, new policy ruling or data promotion follows from this note.
+The source-backed86/6/20 partition and all original limitations retain their own frozen evidence pins.
+
+* Sources
+
+- [[https://microdata.worldbank.org/catalog/3557/download/47668][W4 household questionnaire]]
+- [[https://microdata.worldbank.org/catalog/3557/download/47675][W4 interviewer manual]], PDF pages24-25.
+- [[https://microdata.worldbank.org/catalog/6410/download/180528][W5 household questionnaire]], PDF page3.
+- [[https://microdata.worldbank.org/catalog/6410/download/180535][W5 interviewer manual]], PDF pages5,19-20.
+
+Sue

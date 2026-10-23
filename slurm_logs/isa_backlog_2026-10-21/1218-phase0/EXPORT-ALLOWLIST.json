@@ -1,0 +1,14 @@
+{
+  "files": {
+    "PROPOSAL.md": {
+      "bytes": 16735,
+      "sha256": "0d425d57220e388a0b73c5449c1da2b65b2d18bb54a727360f015abc810cdf42"
+    },
+    "safe-summary.json": {
+      "bytes": 2181,
+      "sha256": "c21ddaa8284d352ad4f22011e38b04f2daab18c6b90c89d93103d8cb65b2af92"
+    }
+  },
+  "scope": "Static proposal and aggregate summary only; no private metadata or provider payloads",
+  "signed": "Sue"
+}

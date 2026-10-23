@@ -1,0 +1,2342 @@
+{
+  "captured_at_UTC": "2026-10-22T22:01:19.731922+00:00",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "method": "Complete gh issue open limit500 and PR open limit100 refresh; all114 scope records OPEN and all32 implementation exact head SHAs/base branch names verified. Original base SHAs remain historical creation/stack prerequisites.",
+  "repository_open_issues": 173,
+  "isa_related_open_issue_records": 114,
+  "pr_linked_issue_records": 29,
+  "active_issue_records": 1,
+  "other_open_issue_records": 84,
+  "open_unmerged_implementation_prs": 32,
+  "initial_in_scope_still_open": 96,
+  "new_campaign_issue_records": 18,
+  "original_duplicate_now_closed": 1089,
+  "limitations": [
+    "Issue records overlap across umbrellas and countries;114 is not114 distinct confirmed bugs.",
+    "PR-linked does not mean fully implemented: explicit partial scopes remain.",
+    "Open unassigned includes source-authority/design/acquisition/validation/enhancement tasks, not only ready code fixes.",
+    "Initial triage approach/tier retained as historical routing guidance; live issue plus country notes must be reread before dispatch.",
+    "No merges, release refreshes, corpus rebuilds or full campaign certification performed by this snapshot."
+  ],
+  "issues": [
+    {
+      "number": 218,
+      "title": "Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/218",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [
+        1208
+      ],
+      "residual": "Malawi registration repair reviewed. Remaining named Makefile cleanup is outside ISA.",
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Remove Malawi food_expenditures/food_prices registrations with next Malawi rewarm; optional no-derived-registration guard. OthercountriesMake cleanup outsideISA.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 226,
+      "title": "feat: principled auto-aggregation script for harmonize_food's Aggregate Label column",
+      "url": "https://github.com/ligon/LSMS_Library/issues/226",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Malawi",
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Validate beta/weight/coherence criterion against existing aggregation tools before any new estimator; do not auto-curate country buckets.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 438,
+      "title": "Extend the WB-parity item-feature stack to non-ISA countries (where survey modules permit)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/438",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Limit to BF still-live label join/gap issues; reuse1123/1119 rather than reopening structural rollout.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 439,
+      "title": "Exploit LSMS+ individual/intra-household (male vs female) disaggregation \u2014 new feature direction",
+      "url": "https://github.com/ligon/LSMS_Library/issues/439",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia",
+        "Malawi",
+        "Tanzania",
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Audit actual embedded ISA respondent/owner modules and align existing decided owner axis with plot_cultivation season/role proposal #862. Preserve individual detail; do not bolt a new aggregate onto plot_features.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 449,
+      "title": "Pull WB geovariables (weather/distance/soil) for older Tanzania NPS waves (W1\u2013W3)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/449",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Tanzania"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "D",
+      "initial_triage_approach": "Acquire permitted W1-W3 per-wave geovars and design explicit join to UPD r_hhid; do not claim UPD already carries them or that they solve community linkage.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 450,
+      "title": "Expose the LSMS-ISA harmonised dataset (geovariables/weather) as a feature via the household-id bridge",
+      "url": "https://github.com/ligon/LSMS_Library/issues/450",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia",
+        "Malawi",
+        "Mali",
+        "Niger",
+        "Nigeria",
+        "Tanzania",
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Decidev2vsfrozenv1/union,covariatesandgrain; then sourcehouseholdbridge only,documentagricultural subsample.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 587,
+      "title": "Triage 39 'dropped' (country\u00d7feature\u00d7wave) cells surfaced by the coverage matrix",
+      "url": "https://github.com/ligon/LSMS_Library/issues/587",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Nigeria",
+        "Ethiopia",
+        "Burkina_Faso",
+        "Mali",
+        "Tanzania"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Reconcile household-characteristic deletion #594 and Nigeria date repair #1094. Re-adjudicate remaining Nigeria housing/date and Tanzania food_coping cells using instrument evidence. Mark PH-only C8 and PP-only plot/coping correctly empty rather than fabricating other-round rows.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 592,
+      "title": "cluster_features: 18 waves across 6 countries have zero GPS (Latitude/Longitude) \u2014 will be hidden by the wave-slice grader fix",
+      "url": "https://github.com/ligon/LSMS_Library/issues/592",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia",
+        "Nigeria",
+        "Malawi",
+        "Niger",
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Keep Ethiopia/Nigeria old six-wave fixes reconciled; obtain current per-wave GPS census for remaining Malawi/Uganda cells and document genuinely unreleased Niger cells. Track Nigeria W5 release separately #978. Ask other ISA lanes for current evidence before closure.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 637,
+      "title": "Complete the remaining first/last aggregation key-soundness audit after the merged reviews",
+      "url": "https://github.com/ligon/LSMS_Library/issues/637",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Malawi",
+        "Niger",
+        "Nigeria",
+        "Tanzania"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Map11historical tail sites to current code/tests, measure raw entities and keys perwave, repair only demonstrated loss. Treat#1123 added wave sites explicitly; preserve#871 policy.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 647,
+      "title": "question: Uganda 2019-20 crop_production silently drops the PART-harvest columns (s5aq06*_11/_21)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/647",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Read instrument and decide part-harvest semantics for _11/_21, season B and sibling waves; document inclusion/exclusion reason before adding columns or grain.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 650,
+      "title": "Documentation/ should not be optional: 3 waves carry only a provenance stub, and add_wave() never fetches the real thing",
+      "url": "https://github.com/ligon/LSMS_Library/issues/650",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia",
+        "Niger"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "D",
+      "initial_triage_approach": "Define minimum docs standard and extend add_wave related-material fetch with synthetic tests; independently backfill Ethiopia/Niger2021-22 documents through sanctioned reviewed acquisition. Senegal remains outside this campaign.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 660,
+      "title": "bug: Ethiopia \u2014 120 / 40 households appear in the agriculture files but not the cover page",
+      "url": "https://github.com/ligon/LSMS_Library/issues/660",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Use cover/release documentation and cached source keys to classify agricultural households absent from household cover; measure W1-W3 as well. Do not invent weights/v or drop observed agriculture.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 689,
+      "title": "Uganda: `cluster_features` is at PARISH grain from 2013-14 \u2014 coarser than the sampling cluster (EA)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/689",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Reconcile issue with now-existing CONTENTS.org disclosure, then decide user-facing cluster_features schema description, Rural interpretation and evidence for a recoverable real EA. Do not silently blank more or change v.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 771,
+      "title": "Uganda/Ethiopia nutrition.py: Ethiopia has no FCT csv and hits the USDA API on EVERY build; both carry a literal API key; the silent fallback remains",
+      "url": "https://github.com/ligon/LSMS_Library/issues/771",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Uganda",
+        "Ethiopia"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Keep tracked Uganda FCT; remove silent build-time network fallback and literal credentials, freeze Ethiopia composition inputs with provenance and exact nutrition deltas. No live API call during triage.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 778,
+      "title": "Tests that rebuild in the SHARED root under LSMS_NO_CACHE still open the #866 delete-then-rebuild window; assume_cache_fresh has an exists()-then-read race",
+      "url": "https://github.com/ligon/LSMS_Library/issues/778",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Nigeria"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Narrow to policy for assume_cache_fresh serving a country script output without verified stamp. Do not re-fix test isolation or missing-file recovery.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 787,
+      "title": "labels=: resolve ambiguous Preferred Label targets, curate Aggregate variants, fix numeric-target examples",
+      "url": "https://github.com/ligon/LSMS_Library/issues/787",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso",
+        "Malawi",
+        "Niger",
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Decide duplicate Preferred\u2192distincttarget refusal; curate intended country buckets under existing contract; fix Malawi doc-number inconsistency separately.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 791,
+      "title": "Add UEMOA PHMECV as a source: 4 missing EHCVM 2021-22 waves + 8 ERI-ESI studies (access is human-reviewed)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/791",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso",
+        "Mali",
+        "Niger"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "D",
+      "initial_triage_approach": "Keep archive access with human; accept locally obtained approved archive and design rar/bare-dta ingest. Existing missingEHCVM waves are nonISA; ERI-ESI opportunity includesBF/Mali/Niger.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 794,
+      "title": "Finish Mali mojibake repair and decide strategy-B migration",
+      "url": "https://github.com/ligon/LSMS_Library/issues/794",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso",
+        "Mali"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Remove completed Mali cp1252 work from issue; retain only format118/double-encoding cohort migration with synchronized crosswalk rekey and matching proof.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 798,
+      "title": "Mali interview_date: rewrite the stale data_scheme.yml:69-73 comment (state the measured collapse loss) and refresh the coverage matrix",
+      "url": "https://github.com/ligon/LSMS_Library/issues/798",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Mali",
+        "Tanzania"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Refresh raw-cache versus served coverage matrix on final source; reconcile strictness/accessor residual with existing datetime_parse policies, not reimplement parser.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 812,
+      "title": "Investigate remaining EHCVM allocation and strata gaps after Guinea-Bissau/Togo documentation fixes",
+      "url": "https://github.com/ligon/LSMS_Library/issues/812",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso",
+        "Mali",
+        "Niger"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Investigate declared strata/allocation from country-specific documentation, then source metadata; distinguish measured allocation from design inference.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 816,
+      "title": "Burkina Faso coverage starts at 2014: the Enqu\u00eate Prioritaire series (1994, 1998) exists and is a different instrument",
+      "url": "https://github.com/ligon/LSMS_Library/issues/816",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "D",
+      "initial_triage_approach": "Confirm catalog/access and held-versus-comparable coverage design before ingest; do not present priority surveys as continuous ISA panel.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 820,
+      "title": "Ethiopia crop_production reads ESS \u00a711 (field crops) only; the \u00a712 tree/fruit/root module -- more sale records than \u00a711 -- is unwired",
+      "url": "https://github.com/ligon/LSMS_Library/issues/820",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Wire W1-W3 PH section12 only after questionnaire/source-key audit; concatenate at actual plot/crop/unit grain without fan-out. Independently verify W4/W5 folded instrument before extending them.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 821,
+      "title": "Mali 2018-19 ships a grappe-grain community price module (s05_co_mli2018.dta, 549/549 grappes) that community_prices never wires; data_scheme.yml wrongly says EHCVM waves have no grappe key",
+      "url": "https://github.com/ligon/LSMS_Library/issues/821",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Mali"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Wire both2018 s05 price readings, size-resolved unit mapping, and correct false absence comment; leave2021 region-grain module as distinct design.",
+      "scope_recheck_required_before_dispatch": true,
+      "current_dispatch_assessment": "Mali2018community price wiring remains viable; direct currentCONTENTS901-946 contradict issue proposal to copy2014Poids denominator. Source2018declaredfields shown in notes are unit-size/code and two recordedPrices, not2014weight fields. Preserve native size labels; do not fabricateWeight/Quantity or unit crosswalk. Use actual pre-code ledger, full country docs and source-field diagnosis.",
+      "current_dispatch_assessment_at_UTC": "2026-10-22T20:42:31.807466+00:00"
+    },
+    {
+      "number": 822,
+      "title": "Mali 2014-15 community_prices: restore readings 1-2 and declare native observation slots",
+      "url": "https://github.com/ligon/LSMS_Library/issues/822",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Mali"
+      ],
+      "implementation_prs": [
+        1180
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Melt allthree unit/weight/price triples into obs1-3; read weight as kilograms, preserve all variety/passage readings. #1089 duplicate.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 823,
+      "title": "Niger 2018-19 ships an unwired cluster-grain community price file (s05_co_ner2018.dta, 504/504 grappes); data_scheme.yml says the wave has none -- twin of Mali #821, check the other six EHCVM countries",
+      "url": "https://github.com/ligon/LSMS_Library/issues/823",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Niger"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Wire both s05 readings with size-resolved unit crosswalk, native variety/visit/obs; correct false no-file comment.",
+      "scope_recheck_required_before_dispatch": true,
+      "current_dispatch_assessment": "Niger2018community price wiring viable but countryCONTENTS1183-1206 explicitly defers while native size-qualified unit crosswalk is missing. Quote/reconcile that note; preserving native reported labels and delivering downstream comparability are separate claims. Do not infer2014weight basis.",
+      "current_dispatch_assessment_at_UTC": "2026-10-22T20:42:31.807466+00:00"
+    },
+    {
+      "number": 824,
+      "title": "Complete sold-unit audits and use Unit_sold in farmgate consumers",
+      "url": "https://github.com/ligon/LSMS_Library/issues/824",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso",
+        "Ethiopia",
+        "Malawi",
+        "Mali",
+        "Niger",
+        "Nigeria",
+        "Tanzania",
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Audit remaining ISA Ethiopia/Tanzania/Mali/BF sale fields; preserve Tanzania explicitlykg. Update consumers to use reported sold unit while flagging disagreements, not presuming sold unit always right.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 827,
+      "title": "Malawi community_prices: u and NumberOfUnits jointly blank on 38,506 of 82,635 rows (46%) -- the price basis is unknown for half the yardstick",
+      "url": "https://github.com/ligon/LSMS_Library/issues/827",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Inspect per-wave CK unit/number fields and other-specify text for recoverability; keep blanks unknown, count exclusions and distinguish nonfoods.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 828,
+      "title": "food_expenditures(basis='total') silently equals 'purchased' where a country records no in-kind value; should raise or warn like units= now does",
+      "url": "https://github.com/ligon/LSMS_Library/issues/828",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia",
+        "Malawi",
+        "Mali",
+        "Niger",
+        "Nigeria",
+        "Tanzania"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Choose typed refusal vs warning+attrs when total lacks nonpurchase valuation; then reuse structured Feature degrade/carrier pattern.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 833,
+      "title": "Resolve remaining raw/processed commodity folds after Malawi and Niger repairs",
+      "url": "https://github.com/ligon/LSMS_Library/issues/833",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia",
+        "Malawi",
+        "Niger",
+        "Tanzania",
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Keep processing states separate until exact physical-unit/source evidence; reevaluate Malawi groundnut ratio on corrected sale ladder.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 837,
+      "title": "Resolve source-grain cluster disagreements without bypassing the signed audit",
+      "url": "https://github.com/ligon/LSMS_Library/issues/837",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia",
+        "Tanzania"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Investigate source coordinate disagreements and district harmonization without early reduce_to_agreed blanking; preserve signed Site-2 audit and household grain.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 839,
+      "title": "Correct Mali's stale food-acquired config comment; Tanzania's quantity note is already resolved",
+      "url": "https://github.com/ligon/LSMS_Library/issues/839",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Mali",
+        "Tanzania"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Correct Mali food-shape comment with next substantive data_scheme edit; keep Tanzania superseded historical text visibly dated.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 843,
+      "title": "Nigeria crop_production has no sale price in W3-W5 (0 of 37,315 rows): secta3ii is hh-crop grain, the build needs a plot",
+      "url": "https://github.com/ligon/LSMS_Library/issues/843",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Nigeria"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Design a separate household-crop sale frame or explicit non-plot grain that preserves all sales without fan-out. Do not merge one sale into every crop plot or fabricate plot ids.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 844,
+      "title": "Nigeria asks a farmgate valuation of the whole harvest (sa3q18, 76% of rows) that no table carries",
+      "url": "https://github.com/ligon/LSMS_Library/issues/844",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Nigeria"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Compare reported hypothetical whole-harvest values with sale-price ladder first, per maintainer comment; inspect later-wave question identity, then decide separate declared column and provenance.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 845,
+      "title": "Price provenance: is Price elicited or derived for Panama/GhanaLSS/Guatemala/Serbia; explain Uganda's ~5% gap; decide on a read-time diagnostic",
+      "url": "https://github.com/ligon/LSMS_Library/issues/845",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Explain raw 2009-10 and 2011-12 ~5% Price-versus-Expenditure/Quantity discrepancies; keep other countries source provenance and optional diagnostic decision separate.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 846,
+      "title": "Tanzania: record a not-asked capability for food price and own-consumption value (Section J qq.2-6 is the C4 evidence)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/846",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Tanzania"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Record questionnaire-backed not-asked capability/verdict via accepted mechanism, checks C1;C2;C4 and Section J citations; do not impute own-consumption values.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 849,
+      "title": "Uganda: wire reported kg factors in the remaining five waves after preserving native production records",
+      "url": "https://github.com/ligon/LSMS_Library/issues/849",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1207
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Wire reported q6d only after private baseline/candidate per-wave factor agreement, conversion coverage, kg totals and implausible tally. The former #972/#967 dependencies have merged.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 851,
+      "title": "Recall Phase II: integrate approved period= conversion, disclosure and Country/Feature error contract",
+      "url": "https://github.com/ligon/LSMS_Library/issues/851",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso",
+        "Ethiopia",
+        "Malawi",
+        "Mali",
+        "Niger",
+        "Nigeria",
+        "Tanzania",
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Implement approved Phase II period= and Contract B with shortfall disclosure; split actual per-household exposure follow-up. Maintain refusal on food_prices and no default scaling.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 855,
+      "title": "Malawi: _livestock_block never reads ag_r07 (\"owned exactly 12 months ago\"), which is present in all four waves",
+      "url": "https://github.com/ligon/LSMS_Library/issues/855",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Count ag_r07 nullness bywave, choose canonical prior-year stock name, expose separately without replacing current stock or deriving flows at build.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 856,
+      "title": "Malawi: measure the harvest-side 'other (specify)' free-text residue per wave before deciding on recovery",
+      "url": "https://github.com/ligon/LSMS_Library/issues/856",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Count raw harvest other-unit/crop codes and distinct own-source text per wave; recover only if material, no stored Quantity rescaling.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 860,
+      "title": "Nigeria: no factors for heaps/ridges/stands areas; EPAR's two grids disagree by a median of 4.9x",
+      "url": "https://github.com/ligon/LSMS_Library/issues/860",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Nigeria"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Do not adopt competing BID versus observed factors silently. Separate single plots-factor question; preserve GPS and already convertible areas under any chosen extension.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 862,
+      "title": "Schema proposal: plot_cultivation, a per-season plot decision-maker table (#167's reserved name, #439's convention)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/862",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Uganda",
+        "Tanzania",
+        "Ethiopia"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Produce accepted plot_cultivation schema with season/pid/role and stated Ethiopia season rule before wiring existing decision-maker columns.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 864,
+      "title": "Resolve Burkina Faso 2014 quantity semantics and unread autoconsumption values",
+      "url": "https://github.com/ligon/LSMS_Library/issues/864",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Read p1 quantity grid wording/item skips and p2-p4 own/gift value wording; measure and wire reported streams only after semantics resolved.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 881,
+      "title": "DECISION: Nigeria W4 purchased row -- identity derivation labelling the 30-day window (A) or a derived 7-day Expenditure per the #876 EHCVM precedent (B)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/881",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Nigeria"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Choose registered identity disclosure or explicit 7-day derived expenditure while retaining survey purchase event inputs; implement only approved construction.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 882,
+      "title": "DECISION: Niger 2011-12 people_last7days dummies -- keep as served (A), re-point wage_work to ms04q01 so all three are 30-day (B), or serve NA (C)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/882",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Niger"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Choose A documented current mixed30day/12month, B all30day wage analogue, or C NA; do not silently normalize 7day interpretation.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 894,
+      "title": "panel_ids: convert Malawi and Nigeria from the cache-parquet path to committed _/panel_ids.json + updated_ids.json (Design A)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/894",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Malawi",
+        "Nigeria"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Build source-relative maintainer scripts from existing YAML crosswalks, commit reviewed JSON, remove DESIGN_B_PENDING names; preserve dict/API exactly.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 905,
+      "title": "Finish the vectorized min_count reducer sweep",
+      "url": "https://github.com/ligon/LSMS_Library/issues/905",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Malawi",
+        "Mali",
+        "Tanzania"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Map current residual sites; convert only demonstrated equivalent reductions; test column order/missingness and <=4ULP. Bundle with country edits.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 926,
+      "title": "Resolve remaining curated C1 keys and transcoding policy after GhanaLSS repair",
+      "url": "https://github.com/ligon/LSMS_Library/issues/926",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso",
+        "Mali",
+        "Niger",
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Narrow to still-live double-encoding keys and exact transcoding evidence; do not rekey repaired cp1252 class or blindly transcode all tables.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 978,
+      "title": "Nigeria W5: acquire WB v02 (NGA_2023_GHSP-W5_v02_M) and wire NGA_HouseholdGeovariables_Y5.dta as cluster_features df_geo",
+      "url": "https://github.com/ligon/LSMS_Library/issues/978",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Nigeria"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "D",
+      "initial_triage_approach": "Resume pre-existing acquisition evidence if present; review revised/new files before store push; wire household-geovars on hhid and replace no-GPS test only after sidecar/source landing.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1000,
+      "title": "Reconcile Uganda FCT 4003's generic zero note with its specific yellow-variety carotenoid derivation",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1000",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Verify cited Kidmose yellow-variety source/preparation basis and carotenoid-to-RAE derivation; reconcile generic zero wording. Preserve density absent source-supported correction.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1006,
+      "title": "Uganda derived-table tests skip successful builds and retain obsolete index/dtype assertions",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1006",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1191
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Use real food_acquired/household_roster prerequisite availability, canonical Price/Quantity numeric assertions, explicit default-v and requested-market m tests; eliminate obsolete migration xfails; keep caches physically private.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1033,
+      "title": "Nigeria W4 food unit labels carry invented W3 size prefixes; W4's size columns (s7bq2c/s7bq9c/s10bq2c/s10bq9c) are never read",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1033",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Nigeria"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Decide size-less versus code+size labels and PP/PH-specific vocabulary. Preserve cvn kg and raw size inputs; compare native-unit prices separately.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1034,
+      "title": "Nigeria W3 post-planting unit codes 131/151/152/161 are labelled in the planting .dta but served as 'other specify (13x)'",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1034",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Nigeria"
+      ],
+      "implementation_prs": [
+        1172
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Add W3 .dta-established Sack/Bag Medium, Basin Medium/Large, Bundle Medium to the 2015-16 u column; avoid changing other waves. Add independently transcribed-label and synthetic food-row tests, then private cold affected table/round accounting.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1043,
+      "title": "Ethiopia crop_production tags a missing harvest unit as 'Other (Specify)' (ethiopia.py:1827), hiding it from the sentinel mask",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1043",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Count missing-harvest-unit rows per wave and compare harvest kg factor sources under Unknown. Separately verify later-wave sale-unit fillna(Kg); do not change by analogy without evidence.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1045,
+      "title": "Parse every calendar quantity at build time with one parser (dates, year-months, month-of-year, years); read-time cast becomes a pass-through",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1045",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso",
+        "Ethiopia",
+        "Malawi",
+        "Mali",
+        "Niger",
+        "Nigeria",
+        "Tanzania",
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Reuse datetime_parse parser and existing inventory; migrate remaining interview_date and other calendar columns in small country scopes, with explicit timestamp/timezone decision and exact value deltas.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1055,
+      "title": "DECISION: Ethiopia 2021-22 interview_date dates the post-harvest agriculture visit (1,475 of 4,959 households), not the household interview",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1055",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Decide how W5 agricultural visit dates are represented relative to W4 household interviews: document, omit wave, find valid timestamp or add visit dimension.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1056,
+      "title": "Ethiopia interview_date serves 33 device-clock dates years outside fieldwork (W4 15, W5 18)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1056",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Choose source-level null/count versus framework plausibility reporting; retain raw recorded data/evidence and align with Site Q policy before screening.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1057,
+      "title": "DECISION: Burkina Faso 2021-22 cluster_features -- serve the 2018-19 cluster GPS for the 527 tracked grappes (registered derivation)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1057",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Decide whether same-grappe EA identity licenses carry-forward for527 tracked fixes; register derivation and assumption if approved.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1058,
+      "title": "Burkina Faso 2021 plot_features: expose 4,180 reported GPS pairs on 7,350 retained parcels",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1058",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Burkina_Faso",
+        "Mali",
+        "Niger"
+      ],
+      "implementation_prs": [
+        1194
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Wire BF2021 parcel coordinates in script/schema, then verify Mali/Niger source headers before declaring GPS absent.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1059,
+      "title": "Burkina Faso cluster_features District: 50 cross-wave spelling variants (mapping table) and 3 genuine province disagreements on shared grappes",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1059",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Add District curation for50 spelling-only cases under canonical spelling choice; keep three distinct-province conflicts separate and disclose to GPS proposal.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1060,
+      "title": "Burkina Faso 2014: province varies within 94 of 900 zd in the source (pre-existing cluster_features GrainCollapseWarning, 1,034 of 10,800 rows)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1060",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Choose retain most-complete row, modal province or NA for94 source-conflicting EAs; never call this a wiring fix.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1062,
+      "title": "Uganda: Makefile recipes rewrite sibling var/ tables without a hash (fct by nutrition, earnings by income) -- apply the #788 ruling",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1062",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1173
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Split nutrition/FCT target-specific output; income obtains framework-authoritative earnings and enterprise_income then reads verified raw pre-finalize parquets. Remove compiler prerequisites that rewrite siblings. Census all Uganda outputs and compare other country consumers separately.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1063,
+      "title": "EHCVM household_roster row order differs between builds of the same commit (Benin, Guinea-Bissau; CotedIvoire, Mali, Togo on 10-14)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1063",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Mali"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Identify unordered build step, then sort deterministically without changing values/types/nulls; build twice using same immutable sources.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1068,
+      "title": "DECISION: native-unit modes treat U_UNKNOWN as a pooled pseudo-unit (food_prices(units='unitvalue'), food_quantities(units='units'))",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1068",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Nigeria",
+        "Ethiopia",
+        "Malawi",
+        "Niger"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Decide exclusion-with-count versus NaN versus retained disclosure in native unitvalue/units modes. Avoid pooling Unknown quantities as meaningful physical units.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1071,
+      "title": "DECISION: the wave and country cache tiers disagree on LSMS_NO_CACHE spelling and on corrupt-file handling",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1071",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Nigeria",
+        "Ethiopia"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Decide accepted LSMS_NO_CACHE spellings and script/YAML corruption behavior. Keep parser error typing already delivered by #1105 separate.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1074,
+      "title": "DECISION: Malawi rows served u=Unknown keep a shipped code-23 survey_kg (29 Mango rows at 10.99 kg per mango, 7,088 kg)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1074",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Decide whether shipped code23 factor remains authoritative on Unknown rows; country-side suppression or framework ladder census are distinct options.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1075,
+      "title": "Malawi leftover unit codes: 2010-11 suffixed codes (16b/16a/12a/21b/12b/03a, 13 rows) and IHS2 '90 kg bag' (2004-05, 4 of 6 uses contradict the label)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1075",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "D",
+      "initial_triage_approach": "Locate decisive forms for13 suffixed codes; keep IHS2 90kg bag six uses until a per-row rule is explicitly chosen.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1077,
+      "title": "Label selection: handle nonfinite keys and prevent missing-input label fabrication",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1077",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Ethiopia",
+        "Mali",
+        "Nigeria",
+        "Niger",
+        "Tanzania",
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1182
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Guard non-finite float keys before int conversion; retain ordinary integer/float spelling augmentation. Exercise real ISA mapping/target cells plus nan and inf synthetic keys.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1078,
+      "title": "Uganda food cache: confirmed producer race writes nine missing values as zero under current hash",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1078",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1197
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "First fix #1062; isolate Uganda-touching tests and prove exact nine NaN-vs-zero cells retain values under concurrency. Do not close from removal of other countries test contamination.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1081,
+      "title": "Derived food/roster methods: reviewed categorical-error preservation awaits merge",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1081",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Ethiopia"
+      ],
+      "implementation_prs": [
+        1195
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Re-raise EmptyCategoricalTableError and CategoricalMappingConflictError ahead of generic derived food/roster fallback. Test bare/Aggregate calls and unchanged legitimate legacy fallback.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1084,
+      "title": "recall windows: read the questionnaires for the 32 not-recorded food cells (period= converts each with no code change)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1084",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso",
+        "Malawi",
+        "Mali",
+        "Niger",
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Prioritize ISA questionnaire cells, record exact evidence in food_recall.csv and promote with existing script; preserve not-recorded until read.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1087,
+      "title": "DECISION: how to serve a second source record that disagrees with the first (Niger community_prices, 30 rows)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1087",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Niger"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Choose obs4-6 vs record level vs disclosed first-record selection; do not infer which keying discrepancy is true.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1088,
+      "title": "Niger CS07: recognize the stored 9999.9 missing-quantity code without changing Price",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1088",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Niger"
+      ],
+      "implementation_prs": [
+        1176
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Recognize declared float32 9999.9 quantity sentinel only at read; preserve price and finite valid quantities, check99999 and repeat-entry interactions.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1090,
+      "title": "Niger `cs07q01` \"Riz\" decodes to `j = 'Autre Riz local'` for both of its varieties",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1090",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Niger"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Compare household rice labels and imported/local variety wording, then choose correct j mapping without breaking joins.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1091,
+      "title": "Retire duplicate country community-price builders in Mali, Niger and Tanzania",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1091",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Mali",
+        "Niger",
+        "Tanzania"
+      ],
+      "implementation_prs": [
+        1199,
+        1200,
+        1201
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Retire country-only concatenation scripts using existing framework wave aggregation under #788 ruling; compare cold default/make API output exactly.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1095,
+      "title": "Nigeria community_prices: land recorded-unit recovery and decide future unplaced-label retention",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1095",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Nigeria"
+      ],
+      "implementation_prs": [
+        1192
+      ],
+      "residual": "Ten held unit labels recovered by PR. Future unresolved-label retention/collision representation remains a design residual.",
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Extend community-specific unit canonicalization with recorded labels and reuse _canon_units reporting. Preserve separate intentional unknown-size drop; compare recovered rows/prices per PH quarter and retain remaining unplaced-label warnings.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1096,
+      "title": "DECISION: Nigeria interview_date serves visit dates for households that were not interviewed (interview_result refused / unavailable / not found)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1096",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Nigeria"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Census recorded outcome/status columns, then decide completed interviews only, explicit status column or documented attempts; do not silently discard attempts.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1106,
+      "title": "Malawi `NPK Fertilizer` is Chitowe 23:21:0+4S but is served at the shared map's NPK 17-17-17 (0.17 vs 0.23 N)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1106",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Prefer source-specific Chitowe label mapped0.23 over adding country axis, subject to maintainer choice.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1109,
+      "title": "Malawi organic fertilizer: restore reported quantities and units; retain missing amounts without fabricating zero",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1109",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [
+        1175
+      ],
+      "residual": "Organic repair reviewed. Nonorganic missing-quantity diagnosis is separately owned by1174.",
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Use sum(min_count=1) for assemble_plot_inputs Quantity; test true zero, all-null and mixed-null groups through real helper.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1110,
+      "title": "`fertilizer_rate`'s default `on='parcel'` mis-joins Malawi and empties Ethiopia; its docstring's \"measured no-op on Malawi\" is false",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1110",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia",
+        "Malawi"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Measure symmetric parcel reduction versus country-specific explicit plot joining; obtain land-grain choice before changing default. Correct false Malawi no-op docstring along with chosen behavior.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1111,
+      "title": "Malawi applied fertilizer: correct timing-derived units while retaining enumerator kg totals",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1111",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [
+        1193
+      ],
+      "residual": "2010/2019 enumerator-kg repair reviewed. Literal questionnaire/source authority for 2013/2016 remains.",
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Read each wave ModuleD Q39 applied-unit list; only then decode applied codebook and read missing slot2 unit; fill remaining missing with U_UNKNOWN.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1116,
+      "title": "#600 residual: override records take their note and validation from `_OVERRIDES`, over a hand edit to the file",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1116",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Nigeria",
+        "Niger"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Decide whether _OVERRIDES/config notes are authoritative or refuse hand-edited divergence; then change documentation or guards.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1118,
+      "title": "plot_inputs: complete country missing-unit normalization under the #1041 ruling",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1118",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Ethiopia",
+        "Malawi",
+        "Mali",
+        "Nigeria",
+        "Tanzania"
+      ],
+      "implementation_prs": [
+        1181,
+        1185
+      ],
+      "residual": "Ethiopia/Tanzania PRs reviewed. Malawi/Mali/Nigeria unit normalization remains; other countries outside ISA are separate.",
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Fill every missing unit with existing U_UNKNOWN at build, including native Malawi u index; retain use/cost records with no quantity. Nigeria dropping non-input rows is optional separate decision, not needed to fill.",
+      "scope_recheck_required_before_dispatch": false,
+      "current_dispatch_assessment": "Mali and Malawi remaining null-unit normalization are stronger next mechanical candidates under settled1041. Stack Malawi after1175/1193; preserve source eligibility, unchanged known units and postcollapse grain. Nigeria fill-vs-drop remains a separate source-eligibility decision.",
+      "current_dispatch_assessment_at_UTC": "2026-10-22T20:42:31.807466+00:00"
+    },
+    {
+      "number": 1119,
+      "title": "#569 residual A: the \"not crop-specific\" marker on `plot_inputs.j` is spelled five ways, and two EHCVM countries spell two crops differently from their crop_production",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1119",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Burkina_Faso",
+        "Ethiopia",
+        "Malawi",
+        "Mali",
+        "Niger",
+        "Nigeria",
+        "Tanzania",
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1203
+      ],
+      "residual": "Burkina maize/cowpea label repair reviewed. Shared not-crop-specific marker design remains; non-ISA countries separate.",
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Repair BF seed maize/cowpea target spellings against crop_production; separately decide shared noncrop marker and NaN replacement. Do not collapse real crop detail.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1120,
+      "title": "#569 residual C: NaN keys on declared plot-table index levels, now all named by Site I; `LSMS_READ_STRICT=1` newly raises on three reads",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1120",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Uganda",
+        "Malawi",
+        "Ethiopia",
+        "Nigeria"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Separate missing plot ids from households absent in sample. Begin Ethiopia cover/module mismatch with #660; preserve rows and audit signal. Require source/id evidence before assigning v or suppressing strict errors.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1121,
+      "title": "plot_labor.source: land Mali casing fix and decide remaining taxonomy",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1121",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Mali"
+      ],
+      "implementation_prs": [
+        1186
+      ],
+      "residual": "Mali casing PR reviewed. Shared labor-source taxonomy remains a design residual, largely non-ISA examples.",
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Change only Mali harmonize_labor_source Preferred Label cells to family/hired/other and matching comments; preserve richer source vocabularies elsewhere.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1123,
+      "title": "plot_inputs: land Burkina repair and diagnose remaining country-level identity collapses",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1123",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Burkina_Faso",
+        "Niger"
+      ],
+      "implementation_prs": [
+        1189
+      ],
+      "residual": "Burkina identity PR reviewed. Niger identity-collapse diagnosis remains; Senegal/CotedIvoire outside ISA.",
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Measure raw input-slot/crop/unit identities, make seed mapping injective or retain required slot grain; avoid mechanical reducer changes.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1127,
+      "title": "Ethiopia 2021-22: acquire ESPS-5 v03_M (replaces the plot geovariables file) and re-stamp SOURCE.org (#1114 ruling)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1127",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "D",
+      "initial_triage_approach": "Resume existing authorized acquisition receipt/branch if present; review v03 downloaded content and sidecars before store push. Correct held-release note and SOURCE only with held evidence. Do not re-acquire during diagnosis.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1133,
+      "title": "Uganda: harmonise `v` (`comm`) across the survey's two renderings (int32 8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11), so that one EA stops carrying two ids",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1133",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Inspect CSECTION1 key rendering; reconstruct 322 linked-household pair table and two non-bijective pairs; apply common read-point mapping to sample+cluster_features, preserve community joins, then remeasure and update sampling boundary.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1134,
+      "title": "DECISION (#793 residual): the frozen `DESIGN_TAGS` (2 values) cannot express an undocumented or single-stage design, so no non-Uganda design record can be written until it is widened",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1134",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso",
+        "Ethiopia",
+        "Malawi",
+        "Mali",
+        "Niger",
+        "Nigeria",
+        "Tanzania"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Implement existing option-A ruling: not-stated tag only for not-found/derived-from-data; ship one evidence-supported record; add structural tags later with first evidenced use.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1135,
+      "title": "ClusterIdentityWarning: implement the settled first-line size ruling and verify net-of-movers counts",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1135",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia",
+        "Nigeria",
+        "Tanzania",
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "A",
+      "initial_triage_approach": "Keep SPAN and no threshold. Add measured cluster-renumber counts and linked-household change share net of movers to boundary records and warning first line; test Nigeria 2016Q1->2018Q3 and a 100% boundary.",
+      "scope_recheck_required_before_dispatch": true,
+      "current_dispatch_assessment": "Initial A classification is historical; current source measurements do not satisfy the complete settled measurement contract. Do not dispatch an all-unknown formatter patch or treat moved-prefix filtering as all-movers removal.",
+      "current_dispatch_assessment_at_UTC": "2026-10-22T20:42:31.807466+00:00"
+    },
+    {
+      "number": 1136,
+      "title": "#793 residual: curate design fields beyond Uganda (NADA DDI probe, per-country evidence, missing strata)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1136",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso",
+        "Ethiopia",
+        "Malawi",
+        "Mali",
+        "Niger",
+        "Nigeria",
+        "Tanzania",
+        "Uganda"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "After #1134, curate evidenced design triples, remaining country panel declarations, ETH Q6, Q7 cluster_reference, audit sampling-report drain. Split deterministic renumbering crosswalk work into its own decision-backed issue.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1144,
+      "title": "Nigeria food_acquired j is decoded wave-blind: W1 'Other vegetables' served as 'Leaves', 'Leaves' as 'Dry Pepper' (item twin of #607)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1144",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Nigeria"
+      ],
+      "implementation_prs": [
+        1178
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Add a food-only quarter-aware decoder using harmonize_food quarter columns. Preserve existing no-argument crop/community code resolvers. Validate native-to-canonical label aliases explicitly, especially W2 maize. Compare affected item rows and derived prices/nutrition in a private cold root.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1146,
+      "title": "Test-side follow-ups to #1113: baseline generator pins partial parquets; Nigeria sold-unit test latent; cold-session invariance coverage",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1146",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Uganda",
+        "Nigeria"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "C",
+      "initial_triage_approach": "Refuse or omit partial-coverage raw var parquets in baseline generation; coverage-gate Nigeria sold-unit test. Keep proposed rebuild-on-skip policy separate for human decision.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1148,
+      "title": "Household recall exposure: adjudicate passage-status evidence before normalization (Burkina 2014; GhanaLSS follow-up)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1148",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Read passage cover interview outcomes, carry per-household/per-column asks to period conversion; never count food rows as interviews.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1149,
+      "title": "add_wave: on re-acquisition, place each zip member at its existing sidecar's path (nested Data/ layouts); stage before placing; report leftovers recursively",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1149",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Nigeria",
+        "Ethiopia"
+      ],
+      "implementation_prs": [
+        1211
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Implement ruled stage/compare/place with recursive case-insensitive existing-sidecar basename matching, collision refusal, zip-relative new paths and recursive retirement report. Use synthetic fixtures before any live acquisition.",
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1150,
+      "title": "plot_features: serve the WB plot geovariables (elevation, slope, wetness, distance to dwelling) for Ethiopia W1-W5, and declare Nigeria's PlotSlope (#1127 ruling A)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1150",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia",
+        "Nigeria"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "After #1127, inspect every held plot-geovariables schema; left-join optional raster attributes at holder/household/parcel/field grain. Declare Nigeria PlotSlope and consistent units; register any percent-to-degree derivation. Preserve WB distance tails.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1171,
+      "title": "Ethiopia nutrition: diagnose the legacy food_acquired Make prerequisite and unused FCT target",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1171",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1174,
+      "title": "Malawi plot_inputs: determine reported use for 437 nonorganic rows whose missing quantities become zero",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1174",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1177,
+      "title": "Nigeria: verify inherited W4-PH maize-shell and tinned-milk qualifiers against its instrument",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1177",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Nigeria"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1179,
+      "title": "Mali EAC-I community prices: diagnose positive-priced entries with unresolved unit codes",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1179",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Mali"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1183,
+      "title": "Ethiopia plot_inputs: diagnose missing seed-purchase answers before recoding them as No/zero",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1183",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1184,
+      "title": "Ethiopia W2 plot_inputs: diagnose all-missing holder/crop seed-purchase quantities summed to zero",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1184",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Ethiopia"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1187,
+      "title": "Burkina Faso 2018-19: establish the source meaning of unlabelled agricultural input code21",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1187",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Burkina_Faso"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1188,
+      "title": "Burkina Faso 2018-19 plot_inputs: gift/donation fields are served as purchase fields",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1188",
+      "github_state": "open",
+      "queue_state": "PR_OPEN_AWAIT_HUMAN_MERGE",
+      "countries": [
+        "Burkina_Faso"
+      ],
+      "implementation_prs": [
+        1219
+      ],
+      "residual": "Shared constructed-empty optional dtype exposure remains1218; original151strict matrix/guarded-execution qualifications retained. Country purchase/gift source routing independently accepted and PR1219awaits human merge.",
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1190,
+      "title": "Malawi plot_inputs: preserve seed purchase-unit identity before aggregating or joining planted quantities",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1190",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1196,
+      "title": "Cold/warm index StringDtype drift: Niger food_acquired and Uganda cluster_features",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1196",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Niger",
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1212
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1198,
+      "title": "Uganda crop_production: preserve distinct production records before pairing quantities with kg factors",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1198",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1202
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1204,
+      "title": "Uganda crop_production: merge the reviewed requested-wave assembly repair",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1204",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1217
+      ],
+      "residual": "Reviewed/root-accepted PR1217 awaits human merge after1207.109/113strictPASS;fournewempty-orderFAIL owned by1215,whose narrowpolicy is human-approved. All nonempty products preserved; held real grain ledgers empty, nonempty transport synthetic-only.",
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1205,
+      "title": "Uganda yield_kg: merge the reviewed parcel-area repair and coverage correction",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1205",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Uganda"
+      ],
+      "implementation_prs": [
+        1216
+      ],
+      "residual": "Independently reviewed and root-accepted; stacked PR1216 awaits human review/merge after1207. Source eligibility exclusions and comparator/metadata limits explicit.",
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1206,
+      "title": "Campaign validation: finish exact numeric and object-type saved-result reassessment",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1206",
+      "github_state": "open",
+      "queue_state": "OPEN_UNASSIGNED",
+      "countries": [
+        "Cross-country validation"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1209,
+      "title": "Malawi: country food_acquired Make builder expects retired wave columns",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1209",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Malawi"
+      ],
+      "implementation_prs": [
+        1213
+      ],
+      "residual": null,
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1210,
+      "title": "Malawi: invalid food wave request evicts native caches before raising",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1210",
+      "github_state": "open",
+      "queue_state": "PR_OPEN",
+      "countries": [
+        "Malawi",
+        "Shared framework"
+      ],
+      "implementation_prs": [
+        1214
+      ],
+      "residual": "Rootaccepted bounded repair; PR1214awaits humanmerge. Iterator/error timing and broadfingerprint invalidation explicit. Independent privateproofs durablearchive29; CIrun/job metadata inconsistency prevents completed-unit claim.",
+      "current_active_scope": null,
+      "initial_triage_tier": null,
+      "initial_triage_approach": null,
+      "scope_recheck_required_before_dispatch": false
+    },
+    {
+      "number": 1215,
+      "title": "Constructed empty tables: implement the approved declaration-order rule",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1215",
+      "github_state": "open",
+      "queue_state": "PR_OPEN_AWAIT_HUMAN_MERGE",
+      "countries": [
+        "Uganda",
+        "Shared framework"
+      ],
+      "implementation_prs": [
+        1220
+      ],
+      "residual": "Declaration order reviewed and root-accepted in1220. Empty explicit-field types remain separate1218.",
+      "current_active_scope": null,
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Reuse existing schema/empty/native ordering machinery; measure affected scope before framework edit. Closed1099row/errorbehavior and1204rawcoverage are different owners; no normalizedcomparison or native-data changes.",
+      "scope_recheck_required_before_dispatch": true
+    },
+    {
+      "number": 1218,
+      "title": "Constructed empty tables ignore declared types of country-local optional fields",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1218",
+      "github_state": "open",
+      "queue_state": "ACTIVE",
+      "countries": [
+        "Burkina_Faso",
+        "Shared framework"
+      ],
+      "implementation_prs": [],
+      "residual": null,
+      "current_active_scope": "Minimal source7eb on1215f7 prepared, runtime stillHELD. Independent source review found predataread dir_fd/fd/extensionlessL1 gaps, synthetic fixture child data-root mismatch, and source-epoch Git optional-lock/expectedHEAD+opaquenames gating gaps beforeexecution. Additive v2 controllers/guard/calibration/plan underpreparation; old14sources and plan8b72 preserved.",
+      "initial_triage_tier": "B",
+      "initial_triage_approach": "Honor explicit optional types on constructed-empty results using existing dtype machinery, preserving populated outputs. Four root-authenticated BF author cases; independent static account accepted; independent genuine runtime validation still required.",
+      "scope_recheck_required_before_dispatch": true
+    }
+  ],
+  "implementation_prs": [
+    {
+      "number": 1172,
+      "state": "open",
+      "merged": false,
+      "head_sha": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1172"
+    },
+    {
+      "number": 1173,
+      "state": "open",
+      "merged": false,
+      "head_sha": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1173"
+    },
+    {
+      "number": 1175,
+      "state": "open",
+      "merged": false,
+      "head_sha": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1175"
+    },
+    {
+      "number": 1176,
+      "state": "open",
+      "merged": false,
+      "head_sha": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1176"
+    },
+    {
+      "number": 1178,
+      "state": "open",
+      "merged": false,
+      "head_sha": "a1ba246f59d341c331c69471f914d3ca798e6894",
+      "base": "fix/1034-nigeria-w3-unit-labels-20261021",
+      "base_sha": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1178"
+    },
+    {
+      "number": 1180,
+      "state": "open",
+      "merged": false,
+      "head_sha": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1180"
+    },
+    {
+      "number": 1181,
+      "state": "open",
+      "merged": false,
+      "head_sha": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1181"
+    },
+    {
+      "number": 1182,
+      "state": "open",
+      "merged": false,
+      "head_sha": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1182"
+    },
+    {
+      "number": 1185,
+      "state": "open",
+      "merged": false,
+      "head_sha": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1185"
+    },
+    {
+      "number": 1186,
+      "state": "open",
+      "merged": false,
+      "head_sha": "6e97eaeb488096459d673486c127043f016c4f8d",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1186"
+    },
+    {
+      "number": 1189,
+      "state": "open",
+      "merged": false,
+      "head_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1189"
+    },
+    {
+      "number": 1191,
+      "state": "open",
+      "merged": false,
+      "head_sha": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1191"
+    },
+    {
+      "number": 1192,
+      "state": "open",
+      "merged": false,
+      "head_sha": "b8b03e448783c6803648623dcf5318673b3ddde1",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1192"
+    },
+    {
+      "number": 1193,
+      "state": "open",
+      "merged": false,
+      "head_sha": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+      "base": "fix/1109-malawi-organic-quantity-v2-20261021",
+      "base_sha": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1193"
+    },
+    {
+      "number": 1194,
+      "state": "open",
+      "merged": false,
+      "head_sha": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1194"
+    },
+    {
+      "number": 1195,
+      "state": "open",
+      "merged": false,
+      "head_sha": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1195"
+    },
+    {
+      "number": 1197,
+      "state": "open",
+      "merged": false,
+      "head_sha": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1197"
+    },
+    {
+      "number": 1199,
+      "state": "open",
+      "merged": false,
+      "head_sha": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+      "base": "fix/822-mali-community-readings-20261021",
+      "base_sha": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1199"
+    },
+    {
+      "number": 1200,
+      "state": "open",
+      "merged": false,
+      "head_sha": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+      "base": "fix/1088-niger-quantity-sentinel-20261021",
+      "base_sha": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1200"
+    },
+    {
+      "number": 1201,
+      "state": "open",
+      "merged": false,
+      "head_sha": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+      "base": "fix/1118-tanzania-unknown-units-20261021",
+      "base_sha": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1201"
+    },
+    {
+      "number": 1202,
+      "state": "open",
+      "merged": false,
+      "head_sha": "0854303bc5f60daa698b2927fc3b193822a4c090",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1202"
+    },
+    {
+      "number": 1203,
+      "state": "open",
+      "merged": false,
+      "head_sha": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "base": "fix/1123-burkina-input-identity-20261021",
+      "base_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1203"
+    },
+    {
+      "number": 1207,
+      "state": "open",
+      "merged": false,
+      "head_sha": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+      "base": "fix/1198-uganda-production-observations-20261022",
+      "base_sha": "0854303bc5f60daa698b2927fc3b193822a4c090",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1207"
+    },
+    {
+      "number": 1208,
+      "state": "open",
+      "merged": false,
+      "head_sha": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1208"
+    },
+    {
+      "number": 1211,
+      "state": "open",
+      "merged": false,
+      "head_sha": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1211"
+    },
+    {
+      "number": 1212,
+      "state": "open",
+      "merged": false,
+      "head_sha": "ee520afeb11ea028a76a371e0c89dc2aba6ad0a4",
+      "base": "development",
+      "base_sha": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1212"
+    },
+    {
+      "number": 1213,
+      "state": "open",
+      "merged": false,
+      "head_sha": "47b3c5d76371acc457c5553ebf8adfb1859e115b",
+      "base": "fix/218-malawi-derived-registrations-20261022",
+      "base_sha": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1213"
+    },
+    {
+      "number": 1214,
+      "state": "open",
+      "merged": false,
+      "head_sha": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+      "base": "development",
+      "base_sha": "06710190305e0057d9e19d42059753d4cc0db012",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1214"
+    },
+    {
+      "number": 1216,
+      "state": "open",
+      "merged": false,
+      "head_sha": "884775a461d769fd4bb5181005ca3238513b5b01",
+      "base": "fix/849-uganda-reported-factors-20261022",
+      "base_sha": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1216"
+    },
+    {
+      "number": 1217,
+      "state": "open",
+      "merged": false,
+      "head_sha": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+      "base": "fix/849-uganda-reported-factors-20261022",
+      "base_sha": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1217"
+    },
+    {
+      "number": 1219,
+      "state": "open",
+      "merged": false,
+      "head_sha": "657fed11a63354886772d0f978cec8adb2ad647e",
+      "base": "fix/1119-burkina-seed-crop-labels-20261022",
+      "base_sha": "3dc9d28510dd783c648413987011832669f8bcf7",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1219"
+    },
+    {
+      "number": 1220,
+      "state": "open",
+      "merged": false,
+      "head_sha": "f7c33dd64d4b2d6e9a62838c33cc30d07863d706",
+      "base": "fix/1204-uganda-crop-wave-coverage-20261022",
+      "base_sha": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1220"
+    }
+  ],
+  "signed": "Sue",
+  "publication_development_advance": {
+    "sha": "06710190305e0057d9e19d42059753d4cc0db012",
+    "only_change_from_tested_f8": "poetry.lock certifi bundle update; GitHub compare files exactly one",
+    "mounted_runtime_not_updated_or_new_dependency_environment_certified": true
+  },
+  "active_progress_updated_at_UTC": "2026-10-22T22:01:19.731922+00:00"
+}

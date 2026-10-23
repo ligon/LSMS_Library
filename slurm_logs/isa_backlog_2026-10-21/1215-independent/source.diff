@@ -1,0 +1,295 @@
+diff --git a/.coder/ledger/1215-uganda-empty-column-order.md b/.coder/ledger/1215-uganda-empty-column-order.md
+new file mode 100644
+index 000000000..07b302c51
+--- /dev/null
++++ b/.coder/ledger/1215-uganda-empty-column-order.md
+@@ -0,0 +1,106 @@
++# Prior-Art Ledger - GH1215 Uganda empty-column order
++
++**Author:** Sue (GPT-6). **Phase:** user-approved Option A implementation.
++**Source parent:** `a417b69d71c460ab33f6a494b4df5d67cd792de5`.
++**Search tier:** direct source reads, ripgrep, git, and stdlib AST/text inspection.
++No GitNexus or memory connector is available in this session.
++
++## §1 Task, restated
++
++Diagnose why the existing typed-empty country response can enumerate required
++columns before optional columns while Uganda's native/covered-cache response
++uses another order. Establish the existing contract and all affected callers,
++then implement the user-approved Option A: constructed empties preserve
++declaration order using unchanged required/optional membership. The frozen
++static packet predates that decision. Populated ordering and optional dtype
++policy remain unchanged.
++
++## §2 Existing machinery (source anchors at a417)
++
++| machinery | source authority | role | coverage status | decision |
++|---|---|---|---|---|
++| Module-level `_empty_declared_frame` | `country.py:1050` | required-then-optional typed-empty constructor | GH1039 test431; only required x followed by optional y, so order policy is not discriminated | reuse/possibly extend |
++| `_required_scheme_columns`, `_optional_scheme_columns` | `country.py:1020/1038` | existing ordered membership within each group | GH323 site4 test181; null-read optional test232 | reuse without changing membership/audit semantics |
++| `absent_subset_frame`, `load_from_waves` | `country.py:5004/5249`; constructor calls5027/5403 | only two production constructor callers | GH1099 matrix310 and error/lazy-hit controls; GH1204 barren test146 | preserve routing/cache/error boundary |
++| `_finalize_result`, `_restrict_to_waves`, cache reads | `country.py:3815/4357/4434/4637` | ordinary finalization; cache row restriction preserves column order | existing GH1099 strict one-field empty controls | preserve |
++| Native crop projection | `countries/Uganda/_/uganda.py:1568/1645`; scheme127 | explicit eight-column order equals original declaration order | native producer source; existing GH1204 fixture is not the exact eight-column order oracle | reuse as independent order authority |
++| `Feature.__call__`, `_harmonize_country_frame` | `feature.py:1076/695/1186` | skips empties, may drop nonempty all-NA columns, concatenates native columns | canonical-index/assembly tests | preserve; not a typed-empty schema oracle |
++| Optional dict dtype enforcement | `country.py:7103/7141/7163`; `tests/test_table_structure.py:68/110` | country coercer skips dict type specs; global canonical types can rescue only known fields | existing tests document extended dict syntax; no new runtime here | separate actionable dtype proposal, not order implementation |
++
++## §3 Definitions & conventions in force
++
++- Inherit `STANDING.md` §3 and `CLAUDE.md`; canonical schema is
++  `lsms_library/data_info.yml`. Do not invent a column-order contract.
++- Uganda `CONTENTS.org`: "A shared axis NAME is still not a shared VOCABULARY."
++  Crop `plot_id` contains native household/parcel/plot identity, while area IDs
++  have a different vocabulary. Keep order diagnosis separate from ID repair.
++- The native crop index retains `production_obs` after `season` (GH1198),
++  condition, unit and actual source-season detail. A/B denote modules, not
++  universally the calendar's first and second seasons.
++- `KgFactor`, `Unit_sold`, and `Condition_sold` are optional ordinary columns;
++  missing sold labels are NA-bearing rather than invented index sentinels.
++- GH1204 documents 2005-06 as genuinely barren and the existing typed-empty
++  response as preceding a country-cache rebuild/write.
++
++## §4 Invariants & assumptions
++
++- Inherit `STANDING.md` §4 and root's implementation release. Approved source
++  paths are the narrow country helper/docstring, GH1039/GH1204 regression tests,
++  Uganda CONTENTS and this ledger. Frozen static evidence stays immutable.
++- Guard calibration precedes the full metadata fingerprint census and bounded
++  synthetic tests. Genuine37-provider/four-root data work is held for a concrete
++  budget/gate release. No acquisition, shared cache or old-prefix replay.
++- Preserve dtype/index names, optional membership, attrs, native grain and all
++  pre-existing failure evidence. Stable column order alone is not full-frame
++  equality or cold/warm equivalence.
++- Quote contradictory documentation as evidence; do not silently replace it.
++  The notes say Region is "complete for every household" and separately
++  document three missing Regions in 2019-20. The notes also retain historical
++  reducer/factor/cache statements and explicitly dated superseding sections.
++
++## §5 Reuse decision
++
++| quantity | decision | reason |
++|---|---|---|
++| Column identity/order authority | reuse | actual Uganda declaration and explicit native projection agree; no universal native-order promise found |
++| Empty dtype/index construction | extend order only | user approved original entry iteration restricted to existing required/optional membership; no dtype-coercion edit |
++| Metadata/Feature verification | reuse | bounded same-request attrs, typed axes, optional-presence and synthetic healthy controls; no new public grain |
++| Static census | new private analysis only | stdlib lexical inventory38 scheme files/448 entries;48 optional-bearing;33 order-sensitive across21 countries; no runtime reachability inference |
++
++## §6 Approved boundary and remaining runtime gates
++
++- On2026-10-22 the user explicitly selected "Use declaration order
++  (Recommended)". Root released Option A and the exact minimal source/test/doc
++  edits. No universal native/cached order or optional-membership promise follows.
++- The constructor is reachable from the all-table tagged aggregator and is not
++  fingerprint-excluded; actual549/39/1362 hash cost is unmeasured and must be
++  assessed before any separately released data build.
++- The concrete proposal and bounded actual-parent/healthy/metadata/Feature
++  controls remain in frozen private PHASE0.md. Root released guarded calibration,
++  the predata census and bounded synthetic tests in a new mutable prefix.
++  Genuine payload work awaits its concrete37-provider/148-copy budget gate.
++- Root's BF1188 author observation is separately qualified: four new optional
++  fields are absent from actual parent3dc9d285. Read-only detached3d39096
++  declarations/tests bind their names/types; no independent runtime result is
++  claimed. Owned a417 static census finds101 optional dict fields,20 globally
++  typed and81 without global type coverage. These are not81 observed failures.
++
++### Phase 3 - verification
++
++- OK (anchored on §2/§5): recommendation reuses ordered schema membership and
++  existing typed-empty construction; no new constructor or schema hardcoding.
++- Static phase OK (anchored on §3/§4): the frozen packet contains no production,
++  schema/test/data change or new runtime result; all four original author strict
++  failures remain failures. New implementation verification is pending.
++- CONTRADICTION retained (anchored on §3): historic2018-only factors versus
++  dated newly-wired rounds, universal parcel-match claim versus held-area
++  qualification, and source-season shorthand versus actual module chronology.
++  They authorize no scientific/identity rewrite in an order task.
++- Static census v1 stopped at the existing CLAUDE->AGENTS link before schema
++  analysis; v2 explicitly binds that link and target and completes0. Both
++  sources, original terminal1/stderr and corrected terminal0 are retained.
++- Initial ledger commit467b3b59c preceded analysis; static ledger666bde649 and
++  its24-entry packet were sealed before applying the later user decision.
++  Source changes reuse both membership helpers and preserve dtype/index and
++  populated-frame behavior; interleaved and real-schema tests are now written
++  but have not yet run. No numerical/project imports precede active guards.
+diff --git a/lsms_library/countries/Uganda/_/CONTENTS.org b/lsms_library/countries/Uganda/_/CONTENTS.org
+index f77b451ba..ab3f2f130 100644
+--- a/lsms_library/countries/Uganda/_/CONTENTS.org
++++ b/lsms_library/countries/Uganda/_/CONTENTS.org
+@@ -3769,3 +3769,21 @@ The older country-builder subset and warm-write measurements above remain
+ historical evidence; they are not guarantees about this new route.
+ The separate area/key limitation (GH #1205) and support-string null-policy
+ observation (GH #1196) remain outside this change.
++
++* Constructed empty crop columns retain declaration order (GH #1215, 2026-10-22)
++
++A barren crop request constructed by the framework retains the original
++=data_scheme.yml= field order, including optional fields in their declared
++positions.
++For this table that order equals the native helper's explicit eight-column
++projection: =Quantity, Quantity_sold, Value_sold, Unit_sold, Condition_sold,
++harvest_month, intercropped, KgFactor=.
++The previous required-before-optional grouping moved the sold-label columns
++behind the two later required fields on this newly exposed GH1204 route.
++
++Required/optional membership, index identity, nullable dtype handling and the
++GH1204 no-build/no-country-cache-write boundary remain unchanged.
++Populated output is not reordered.
++This empty-construction rule does not promise that every country's native
++writer uses declaration order or emits every optional column.
++The separate country-local optional-dict dtype gap is not repaired here.
+diff --git a/lsms_library/country.py b/lsms_library/country.py
+index c233eb731..3300313e2 100644
+--- a/lsms_library/country.py
++++ b/lsms_library/country.py
+@@ -1051,17 +1051,18 @@ def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
+     """A 0-row frame with a table's DECLARED shape (GH #1039).
+ 
+     The declared index levels (``str``, as a built index's are) as its index
+-    and every declared column, required and ``optional: true``, as an object
+-    column for ``_finalize_result``'s canonical dtypes to coerce.  It answers
++    and every declared column, required and ``optional: true``, in original
++    declaration order as an object column for ``_finalize_result``'s canonical
++    dtypes to coerce.  It answers
+     a request whose waves all lack the table on a no-builder route
+     (GH #1039/#1099): 0 rows, as a warm cache would serve, shaped so
+     that ``Country._assert_built_required_columns`` reads it as a well-formed
+     empty table rather than as a build that lost its columns.
+     """
+-    entry = scheme_entry if isinstance(scheme_entry, dict) else None
++    entry = scheme_entry if isinstance(scheme_entry, dict) else {}
+     levels = _declared_index_levels(entry)
+-    columns = [c for c in _required_scheme_columns(entry) + _optional_scheme_columns(entry)
+-               if c not in levels]
++    declared = set(_required_scheme_columns(entry)) | set(_optional_scheme_columns(entry))
++    columns = [c for c in entry if c in declared and c not in levels]
+     empty = pd.DataFrame({c: pd.Series(dtype="str" if c in levels else object)
+                           for c in levels + columns})
+     return empty.set_index(levels) if levels else empty
+diff --git a/tests/test_gh1039_make_backend_no_country_rule.py b/tests/test_gh1039_make_backend_no_country_rule.py
+index 994928a12..ae0b8b5e1 100644
+--- a/tests/test_gh1039_make_backend_no_country_rule.py
++++ b/tests/test_gh1039_make_backend_no_country_rule.py
+@@ -440,6 +440,50 @@ def test_empty_declared_frame_has_the_declared_shape():
+     assert C._empty_declared_frame(None).empty
+ 
+ 
++def test_empty_declared_frame_keeps_interleaved_optional_declaration_order():
++    entry = {
++        'index': '(t, i)',
++        'Unit': {'type': 'str', 'optional': True},
++        'Quantity': 'float',
++        'Flag': {'type': 'bool', 'optional': True},
++        'Count': 'int',
++        'Factor': {'type': 'float', 'optional': True},
++        'Label': {'type': 'str', 'optional': False},
++        't': 'str',
++        'i': {'type': 'str', 'optional': True},
++        'materialize': 'make',
++        'backend': 'make',
++        'aggregation': {'Quantity': 'sum'},
++        1: 'str',
++    }
++    frame = C._empty_declared_frame(entry)
++    # A source declaration is the oracle; requiredness is not a sort key.
++    assert list(frame.columns) == ['Unit', 'Quantity', 'Flag', 'Count',
++                                   'Factor', 'Label']
++    assert frame.empty and list(frame.index.names) == ['t', 'i']
++    assert all(str(frame.index.get_level_values(n).dtype) == 'str'
++               for n in frame.index.names)
++    # This constructor does not coerce measures or expand dict dtype policy.
++    assert all(dtype == object for dtype in frame.dtypes)
++
++
++@pytest.mark.parametrize('entry,columns,levels', [
++    ({'Z': 'float', 'A': 'str'}, ['Z', 'A'], [None]),
++    ({'Z': {'type': 'float', 'optional': True},
++      'A': {'type': 'str', 'optional': True}}, ['Z', 'A'], [None]),
++    ({'index': '(t, i)', 't': 'str', 'i': 'str'}, [], ['t', 'i']),
++    ({'index': '(t, i)', 'Z': 'float',
++      'A': {'type': 'str', 'optional': False}}, ['Z', 'A'], ['t', 'i']),
++    (None, [], [None]),
++    ('not a mapping', [], [None]),
++])
++def test_empty_declared_order_preserves_existing_shapes(entry, columns, levels):
++    frame = C._empty_declared_frame(entry)
++    assert frame.empty
++    assert list(frame.columns) == columns
++    assert list(frame.index.names) == levels
++
++
+ # ---------------------------------------------------------------------------
+ # A country builder that EXISTS keeps the legacy route
+ # ---------------------------------------------------------------------------
+diff --git a/tests/test_gh1204_uganda_crop_wave_coverage.py b/tests/test_gh1204_uganda_crop_wave_coverage.py
+index b88335bca..11dfb9653 100644
+--- a/tests/test_gh1204_uganda_crop_wave_coverage.py
++++ b/tests/test_gh1204_uganda_crop_wave_coverage.py
+@@ -24,6 +24,8 @@ SUPPORTED = '2018-19'
+ BARREN = '2005-06'
+ NATIVE_INDEX = ['t', 'i', 'plot_id', 'j', 'u', 'condition', 'season',
+                 'production_obs']
++NATIVE_COLUMNS = ['Quantity', 'Quantity_sold', 'Value_sold', 'Unit_sold',
++                  'Condition_sold', 'harvest_month', 'intercropped', 'KgFactor']
+ 
+ 
+ @needs_make
+@@ -64,12 +66,17 @@ def native_crop(tmp_path, monkeypatch):
+             'plot_id': ['plot'] * 3, 'j': ['Maize'] * 3, 'u': ['Kg'] * 3,
+             'condition': ['fresh'] * 3, 'season': ['A'] * 3,
+             'production_obs': ['slot:1', 'slot:2', 'slot:3'],
+-            'Quantity': [2.5, 2.5, 0.0], 'KgFactor': [1.0, 1.0, 1.0],
++            # Match crop_production_for_wave's explicit final projection,
++            # independently of the empty constructor's grouping policy.
++            'Quantity': [2.5, 2.5, 0.0],
+             'Quantity_sold': [1.0, 1.0, 0.0], 'Value_sold': [9.0, 9.0, 0.0],
++            'Unit_sold': pd.array(['Kg', 'Kg', None], dtype='string'),
++            'Condition_sold': pd.array(['fresh', 'fresh', None], dtype='string'),
+             'harvest_month': pd.array([6, 6, None], dtype='Int64'),
+             'intercropped': pd.array([False, False, None], dtype='boolean'),
+-            'Unit_sold': ['Kg', 'Kg', None],
++            'KgFactor': [1.0, 1.0, 1.0],
+         }).set_index(NATIVE_INDEX)
++        assert list(frame.columns) == NATIVE_COLUMNS
+         frame.attrs['transport_marker'] = {'flag': True, 'integer': 1}
+         # Synthetic audit payload tests transport through the real wave read.
+         # It makes no claim about Uganda's current native source observations.
+@@ -174,3 +181,40 @@ def test_alternating_requests_keep_raw_coverage_true(native_crop, monkeypatch, b
+         assert lt.read_parquet_cache_waves(var) == country().waves
+     else:
+         assert not var.exists()
++
++
++@needs_make
++@pytest.mark.parametrize('backend', ['dvc', 'make'])
++@pytest.mark.parametrize('prior', ['cold', 'supported', 'all'])
++def test_barren_crop_order_matches_native_declaration_without_cache_writes(
++        native_crop, monkeypatch, backend, prior):
++    monkeypatch.setenv('LSMS_BUILD_BACKEND', backend)
++    country, built, var = native_crop
++    if prior != 'cold':
++        populated = country().crop_production(
++            waves=[SUPPORTED] if prior == 'supported' else None, currency=None)
++        assert list(populated.columns) == NATIVE_COLUMNS
++        assert len(populated) == (3 if prior == 'supported' else 21)
++    before_built = list(built)
++    before = {
++        path: (path.read_bytes(), path.stat().st_mode, path.stat().st_mtime_ns)
++        for path in var.parent.parent.rglob('*.parquet')
++    }
++    empty = country().crop_production(waves=[BARREN], currency=None)
++    assert empty.empty and list(empty.columns) == NATIVE_COLUMNS
++    assert built == before_built
++    assert set(var.parent.parent.rglob('*.parquet')) == set(before)
++    for path, receipt in before.items():
++        assert (path.read_bytes(), path.stat().st_mode, path.stat().st_mtime_ns) == receipt
++    assert empty.Quantity.dtype == pd.Float64Dtype()
++    assert empty.Quantity_sold.dtype == pd.Float64Dtype()
++    assert empty.Value_sold.dtype == pd.Float64Dtype()
++    assert empty.KgFactor.dtype == pd.Float64Dtype()
++    assert empty.harvest_month.dtype == pd.Int64Dtype()
++    assert empty.intercropped.dtype == pd.BooleanDtype()
++    assert empty.Unit_sold.dtype == pd.StringDtype()
++    assert empty.Condition_sold.dtype == pd.StringDtype()
++    assert 'production_obs' in empty.index.names
++    assert empty.attrs['country'] == 'Uganda'
++    if backend == 'make' or prior == 'cold':
++        assert not var.exists()

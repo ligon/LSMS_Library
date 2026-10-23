@@ -1,0 +1,43 @@
+{
+  "basis": "Compare every first-manifest path; hash all original nonraw payloads. Do not reread raw sources: 44 copied L1 blobs match prior SHA receipts plus current inode/device/nlink/size/mode/mtime.",
+  "first_manifest_entries": 1680,
+  "original_manifest_payload_paths_modified": {},
+  "original_manifest_payload_paths_removed": [],
+  "raw_copy_metadata_identity_checks": 44,
+  "original_nonraw_payloads_rehashed_exact": 1636,
+  "control_path_replaced": {
+    "READY.json": {
+      "first_preserved": "attempt1-freeze-private/READY.json",
+      "first_SHA256": "1e69e5a034479c4969b8fc0b488a37f465fcee2fb9dc40ccba7391354747c4c5",
+      "final_hash_not_embedded_to_avoid_recursive_control_hash": true
+    }
+  },
+  "first_manifest_and_proof_unchanged": true,
+  "replacement_validation_unchanged": true,
+  "new_paths": [
+    "attempt1-freeze-private/READY.json",
+    "attempt1-freeze-private/freeze-final-private.log",
+    "attempt1-freeze-private/freeze-proof.json",
+    "attempt1-freeze-private/payload-manifest-private.json",
+    "finalize-packaging.py",
+    "freeze-proof-final.json",
+    "packaging-change-inventory-private.json",
+    "packaging-change-inventory-safe.json",
+    "packaging-final-private.log",
+    "packaging-incident-private.json",
+    "payload-manifest-final-private.json",
+    "reconstruct-aggregate.py",
+    "reconstruction-private.log",
+    "safe-exports/DRAFT-PR.md",
+    "safe-exports/DRAFT-RESIDUAL.md",
+    "safe-exports/INDEPENDENT-REVIEW.md",
+    "safe-exports/REPORT.org",
+    "safe-exports/REPRODUCE.sh",
+    "safe-exports/proof.json",
+    "safe-exports/validation.json",
+    "validation-reconstructed-private.json"
+  ],
+  "excluded_current_output_log": "packaging-final-private.log",
+  "no_raw_source_byte_reread": true,
+  "no_API_or_test_replay": true
+}

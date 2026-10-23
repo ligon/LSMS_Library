@@ -1,0 +1,109 @@
+{
+  "status": "FINAL_RELEASE",
+  "verdict": "PASS",
+  "candidate": "3dc9d28510dd783c648413987011832669f8bcf7",
+  "actual_parent": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+  "manifest": "/local/job40255479/control/isa-backlog-20261021/review-Burkina_Faso-1119/private-final-manifest.json",
+  "manifest_receipt": {
+    "sha256": "437a0580aa838b1f108caaba90e1fbdade24c88658a337b012b3a2cee7762565",
+    "bytes": 284584,
+    "mode": 384,
+    "mtime_ns": 1792642874214373210,
+    "type": "file"
+  },
+  "manifest_entries": 1173,
+  "safe_export_allowlist": {
+    "safe-exports/REPRODUCE.md": {
+      "sha256": "cef23427f81810bb2adb3f61048088433910211f38c51162139b001ca04b8c15",
+      "bytes": 4464,
+      "mode": 384,
+      "mtime_ns": 1792642753932675719,
+      "type": "file"
+    },
+    "safe-exports/RESIDUALS.md": {
+      "sha256": "b447c8679913d60fe9bf6830c139d61acf90355d7109e714cfc60b2ff485fd1b",
+      "bytes": 1666,
+      "mode": 384,
+      "mtime_ns": 1792642753932675719,
+      "type": "file"
+    },
+    "safe-exports/REVIEW.org": {
+      "sha256": "7cf22d1b71602aacf23c6c0a21d0cde958de21af4519d6cecc1468ed0119dd59",
+      "bytes": 17694,
+      "mode": 384,
+      "mtime_ns": 1792642825692091655,
+      "type": "file"
+    },
+    "safe-exports/checker-sources.json": {
+      "sha256": "0a19f8d328ea7f6b8f5d6891943b3a0513884faf78ecfb0bfe4ad3b86f04e41c",
+      "bytes": 4097,
+      "mode": 384,
+      "mtime_ns": 1792642872710364270,
+      "type": "file"
+    },
+    "safe-exports/proof.json": {
+      "sha256": "7928bc1ab0486af897568e757c575a7873d9d4d7936174fe8540ea7f700bbed6",
+      "bytes": 15185,
+      "mode": 384,
+      "mtime_ns": 1792642753932675719,
+      "type": "file"
+    },
+    "safe-exports/verdict.json": {
+      "sha256": "32436ad9a7b3a7cf37f6d4d7690832d43febe3d42b148222c69361cd5b871f6c",
+      "bytes": 2642,
+      "mode": 384,
+      "mtime_ns": 1792642753932675719,
+      "type": "file"
+    }
+  },
+  "excluded_controls": {
+    "finish-seal-private.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "mtime_ns": 1792642918154634393,
+      "type": "file"
+    },
+    "package-seal-private.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "mtime_ns": 1792642868670340256,
+      "type": "file"
+    },
+    "private-final-manifest.json": {
+      "sha256": "437a0580aa838b1f108caaba90e1fbdade24c88658a337b012b3a2cee7762565",
+      "bytes": 284584,
+      "mode": 384,
+      "mtime_ns": 1792642874214373210,
+      "type": "file"
+    },
+    "terminal-seal-private.json": {
+      "sha256": "efeca5095a2a8862b8a1af5158bdecddfa9d43676b3dc8795eeedfa2a2a95a1a",
+      "bytes": 254,
+      "mode": 384,
+      "mtime_ns": 1792642923058663543,
+      "type": "file"
+    }
+  },
+  "exact_relative_exclusions": [
+    "FINAL-READY.json",
+    "finish-seal-error-private.txt",
+    "finish-seal-private.log",
+    "package-seal-error-private.txt",
+    "package-seal-private.log",
+    "private-final-manifest.json",
+    "terminal-seal-private.json"
+  ],
+  "terminal_seal": {
+    "status": "TERMINAL_SUCCESS",
+    "payload_entries": 1173,
+    "all_payload_receipts_exact": true,
+    "exact_payload_path_set": true,
+    "tracked_source_endpoints_exact": 29779,
+    "zero_task_consumers": true,
+    "no_API_source_test_replay_for_seal": true
+  },
+  "zero_consumers_at_seal": true,
+  "reviewer": "Sue / GPT-6"
+}

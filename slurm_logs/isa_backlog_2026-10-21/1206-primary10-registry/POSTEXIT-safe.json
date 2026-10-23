@@ -1,0 +1,11 @@
+{
+  "status": "POSTEXIT_FROZEN_PRIMARY_RETAINED10_REGISTRY_VERIFIED",
+  "manifest_entries": 75,
+  "manifest_SHA256": "65ef324a8962cab7d998cc9441d7195080f527d19299f1bcc85b2cc1da565341",
+  "READY_SHA256": "8851c5ef630a3770344f2cde48c91a31c65b20cde2ec20166445248b7b033950",
+  "all_assigned10_have_postexit_packets": true,
+  "active_primary_payload_consumers": [],
+  "old_releases_unchanged": true,
+  "new_archive182_work": false,
+  "signed": "Sue"
+}

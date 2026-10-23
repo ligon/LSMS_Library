@@ -1,0 +1,26 @@
+{
+  "observed_at_UTC": "2026-10-21T21:25:19.712899+00:00",
+  "archive": "/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/quiescent-followup-21h00.tar.gz",
+  "archive_sha256": "4a9bc56d4d307d2da0434f36b06d026bee8990fc4e97eb1ab218e7252d74776a",
+  "archive_bytes": 185096692,
+  "private_files_verified": 1236,
+  "quiescent_review_roots": 10,
+  "source_after_exact": true,
+  "archive_contents_verified": true,
+  "private_directory_mode": "owner rwx only; inherited setgid retained",
+  "raw_sources_and_duplicate_L1_L2_excluded": true,
+  "full_private_manifest": "/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/quiescent-followup-21h00.manifest.private.json",
+  "roots": [
+    "integration/uganda-twelve-review",
+    "review-1111-Malawi",
+    "review-1111-Malawi-v2",
+    "Malawi/1111",
+    "Malawi/1111-fix",
+    "Malawi/1111-tests-descendant",
+    "Nigeria/1095",
+    "Uganda/1006",
+    "Burkina_Faso/1123",
+    "pdf-tools"
+  ],
+  "limits": "Adds these ten completed roots to the earlier eighteen-root archive; overlap is historical and file counts are not unique combined counts. Independent Nigeria1095, Malawi composition, Burkina1058 and active global13/framework1081/fix roots need later quiescent archival."
+}

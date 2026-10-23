@@ -1,0 +1,116 @@
+Independent re-review -- Uganda GH #1062 amendment
+Sue, 2026-10-21
+Verdict: PASS
+
+Frozen tree: /local/job40255479/worktrees/isa-review-1062-v2
+HEAD: 4ef24fb72421e0573841aeb63b8c19b93a4f97d8
+Amendment base: 58ccfc2ca03644006a5ddcf6bd399de81a25a415
+Original campaign baseline: f8d236694c26fe9e709c5548f02c70f74ea72c33
+The earlier NEEDS_FIX review and its frozen tree remain preserved.
+
+No remaining source-anchored findings within the approved boundary.
+
+Resolved finding
+
+income.py:23-31 selects dvc only while each normal public sibling API call
+runs. Its finally block restores the exact prior backend string, including
+empty string, or removes the key when it was originally absent. Restoration
+happens before the original get_dataframe raw read. Exceptions propagate.
+No arithmetic, raw reader, schema, global helper, LSMS_NO_CACHE policy,
+scientific input or dependency changed.
+
+The exact prior failing real sequence was independently rerun on a new
+physical private L2 copy: build earnings and enterprise_income for 2011-12
+through the default API, then request all-wave income with inherited make.
+Both initial source caches carried valid hashes and one-wave manifests.
+Amended income returns 14,740 x 1/eight waves, versus 1,810 x 1/one wave at 58ccfc2.
+Both source raw frames and raw/served income match the original full-frame
+references exactly, including IDs, ordering, names, dtypes and attrs. Both
+source hashes verify against the new checkout and coverage expands to 8 waves.
+The parent backend remains make. No finalized source return is an operand.
+
+Independent checks
+
+- 29 focused tests pass with 2 loadfile workers. The ten added controls include
+ a real public-API/Make/coverage regression and nine environment cases.
+- 20 additional actual-script controlled-IO cases pass: original backend
+ absent/empty/make/dvc; success, either sibling failure, raw-read failure and
+ KeyboardInterrupt. LSMS_NO_CACHE=1 and MAKEFLAGS='-j1 -B' remain unchanged.
+- 8 affected fresh-process warm/default/make/forced/subset order checks pass.
+ Watched unrequested sibling bytes, mtime, hash, coverage stay identical once
+ inputs are current. Three raw source/income frames and each served answer
+ remain exactly equal to original references at every step.
+- Affected Feature audit repeats the exact 6 held warning records; no new finding.
+- Independently recomputed 549 country hashes and 39 framework fingerprints,
+ exactly matching the owner's amended inventory: only 28 Uganda hashes move,
+ all 521 other-country hashes and all 39 framework fingerprints remain equal.
+- AST comparison proves income arithmetic identical after removing backend
+ scope nodes. nutrition.py, Makefile and historical GH #772 test git blobs are
+ unchanged from 58ccfc2. The earlier full-boundary review therefore carries
+ forward for those unchanged files.
+- All 14,859 tracked file contents match their before
+ SHA-256 manifest; HEAD and clean git status are unchanged. No tracked source
+ edits, git mutations, GitHub writes, DVC CLI, shared-cache changes, acquisition,
+ fixture/baseline/dependency changes occurred. Private L1 remains 588 files /
+483,097,209 bytes.
+
+Reproduction
+
+Image interpreter: /local/job40255479/venv_img/bin/python
+Cwd/PYTHONPATH: /local/job40255479/worktrees/isa-review-1062-v2
+LSMS_COUNTRIES_ROOT: /local/job40255479/worktrees/isa-review-1062-v2/lsms_library/countries
+Use this review's guard/ as an additional PYTHONPATH entry; it blocks outbound
+sockets and DVC CLI dispatch. Runners assert exact package/config identities.
+Each scenario has a physical private L2. Only the review's copied L1 is shared
+between scenarios. Set PYTHONDONTWRITEBYTECODE=1, OPENBLAS_NUM_THREADS=1,
+OMP_NUM_THREADS=1, MKL_NUM_THREADS=1, LSMS_BUILD_WORKERS=1, LSMS_MAKE_JOBS=1.
+
+Focused command:
+ python -m pytest tests/test_gh1062_uganda_sibling_writes.py \
+   tests/test_gh772_uganda_earnings_shape.py -n2 --dist=loadfile \
+   -p no:cacheprovider --basetemp=<review>/pytest-tmp -q
+ Output: pytest.log (29 passed in 12.11s).
+
+Former failing live case:
+ LSMS_DATA_DIR=<review>/subset-make MAKEFLAGS=-j2 \
+   python <review>/subset_make.py
+ Output: subset-make-result.json; subset-make.log.
+
+Independent restoration:
+ python <review>/check_restoration.py
+ Output: restoration-result.json (20 cases).
+
+Order sweep, after verify_current_inputs.py verifies the private seed:
+ LSMS_DATA_DIR=<review>/order-data EVIDENCE_OUT=<review>/order-evidence-current \
+ REFERENCE_EVIDENCE=<panel>/1062/candidate-evidence MAKEFLAGS=-j2 \
+ python slurm_logs/isa_backlog_2026-10-21/1062/amendment/verify_income_orders.py
+ Output: order-evidence-current/summary.json; orders-current.log.
+
+Feature command:
+ python bench/feature_audit/scan.py --features earnings enterprise_income income \
+   --countries Uganda --out <review>/feature-audit-current.jsonl
+
+Hash/AST/proof files:
+ frozen-hashes.json, delta-checks.json, frozen-before.json, frozen-after.json,
+ validation.json. check_delta.py and finalize_review.py reproduce comparisons.
+
+Setup observations and limits
+
+The first order attempt used old-generation caches and correctly rebuilt
+source inputs; its warm-preservation assertion rejected that setup. The first
+descent is retained in order-evidence/order-0.log. After verifying all three
+raw frames, current hashes and full coverage, all eight controls passed.
+The first Feature run repaired the Make-written hashless income cache and
+reported one additional expected CacheRebuildWarning. A subsequent current
+cache run matches the six held warnings exactly. Neither event is a defect.
+
+No full suite/corpus rebuild or live API/raw acquisition was attempted.
+Actual survey builds under LSMS_NO_CACHE=1 were not added; its preservation
+was checked at the actual script boundary with controlled IO. MAKEFLAGS=-j2
+was exercised live; -B preservation was checked only with controlled IO.
+Explicit Make income may still write its own output hashless under the
+existing backend contract; source verification and numeric identity pass.
+General arbitrary-stale Make policy, GH #1078, and other countries remain outside
+this amendment review. No amended mutable owner tree was used.
+
+Sue

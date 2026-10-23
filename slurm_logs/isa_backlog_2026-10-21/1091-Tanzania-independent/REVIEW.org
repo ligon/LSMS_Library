@@ -1,0 +1,156 @@
+#+TITLE: Independent review - Tanzania GH1091 country-builder retirement
+#+AUTHOR: Sue (GPT-6)
+#+DATE: 2026-10-22
+
+* Verdict and exact source
+
+PASS for the bounded Tanzania-only retirement.
+Candidate =fa457f90edbedfd7282eaf988c8231e4e87ba082= is reviewed against actual parent =99c824079da480ab2646e499c06ac70e457ff271=.
+Runtime/tests remain =cccdc1b5ba32b69f7f195b3bcec3f1ea4ef9b270=; the final descendant changes only the additive excluded country note within library/tests.
+The reviewer made no product, source, Git/ref or GitHub change.
+This does not merge a PR, close GH1091, or establish broader composition.
+
+The production diff is exactly the 45-line country concatenator deletion and original Make145-149 deletion.
+Every other Make byte, both native wave scripts, helper, mappings, own-price/basis division, eligibility, IDs, grain, xwalk, declaration, materialize flag, registry and framework remain exact.
+The reviewed PR1185 plot-input helper/wave/country/test blobs remain exact; its 408-unit result is retained prior proof, with no new agriculture staging or output claim.
+Fresh empty-target discovery measures parent country-builder true and candidate false.
+Both native rules and actual Make all dry-runs remain available; direct country targets fail honestly after retirement.
+
+* Country grounding
+
+Read the complete current 2170-line CONTENTS, including LOGBOOK/WAITING/TODO.
+UPHI is the descendant household identity back-cast from Round4, while r_hhid is the interviewed-round household; unique keys alone do not establish panel grain.
+Live WAITING #114 remains, including the wave-level asserted lossless exact-duplicate caveat after the old food concatenator's retirement.
+The first four logical waves map to the single 2008-15 folder.
+2014-15 pools Extended and Refresh; 2019-20 follows Extended, while 2020-21 follows Refresh plus the 545-household urban booster.
+Native community v is interview__key, with the existing i==v compatibility shim removed by framework normalization; it is not a household sample-cluster link.
+Source variety code and questionnaire Description remain distinct, and district-capital prices are excluded.
+
+Preserve the documentary contrasts instead of erasing history.
+CONTENTS:735 calls the geography-only link "infeasible without a lossy, unverifiable crosswalk", while :879 says the 2020 cluster is "BAKED INTO the community admin codes" and records a separate implemented crosswalk.
+The initial panel note at :76 says "This inconsistency is unresolved"; the dated WAITING update at :1175 narrows the food-specific residue.
+The older quantity table at :646-648 says "MISSING", while the 2026-09-08 LOGBOOK at :605 says "all three are present".
+None authorizes ID, household-join, xwalk or science changes here.
+Mali CONTENTS blob =91c950348d2e6544747eb78365434c8e9482eefe= exactly matches the earlier complete f8 reading; its two passages, source variety codes and household-independent community IDs were carried explicitly.
+
+* Independent source and frame evidence
+
+Only two held community Stata sources were staged, with declared sidecar MD5/size and actual SHA256/size/mode/mtime/physical-identity gates before source decoding and normal builds.
+Both L1 layouts are physical private copies.
+There are 176 distinct-inode, nonsymlink, nlink1 raw copies including separately gated populated roots.
+No acquisition, DVC CLI, shared-cache mutation/clear/promotion, bypass, manual stamp or in-tree payload occurred.
+
+| Wave | Source rows | Retained | Excluded by existing predicates | Varieties | Coarse cells | Multiple-variety groups | Price-disagreeing groups |
+|------+-------------+----------+---------------------------------+-----------+--------------+-------------------------+-------------------------|
+| 2019-20 | 5148 | 3076 | 2072 | 52 | 2769 | 261 | 243 |
+| 2020-21 | 25376 | 14623 | 10753 | 52 | 13062 | 1281 | 1149 |
+
+The independent field-binding oracle does not derive eligibility through either helper output.
+Each retained Price is its own cm_f063 divided by its own positive cm_f062 basis, under resolved item/unit/key predicates.
+Fresh primary labels confirm Unit/Weight/Price (Village/MTAA) versus the separate District Capital triple.
+The helper equals the oracle in memory; actual matched writer-stage frames equal native parquets.
+Walked/normalized/raw/public comparisons preserve complete records and their existing metadata.
+All 17699 records survive, without Quantity fabrication or a reducer.
+
+There are 152 main strict full-frame comparisons, 76 additional cold/warm native/raw cache comparisons, and ten source-oracle/helper/writer/normalized-raw comparisons across the two heads.
+Checks retain frame/axis classes, all levels including unused levels, codes and code dtypes, column/index dtypes, order, null masks and recursively typed full attrs including immutable record field presence and attributes.
+Numeric checks explicitly use check_exact=True, rtol=atol=0.
+Eight deliberate nextafter/null/order/axis/unused-level/dtype/typed-attrs mutations are rejected.
+The tested exact comparator function AST is reused with source receipts; old top-level artifact checkers were never executed.
+Mechanical probe/CLI routines were copied with receipts into this review root; the source oracle and final assessment are independent.
+
+* Requests, caches and intended route changes
+
+Each head completed 20 normal target-cold, 20 fresh-process/new-object warm, and 20 populated requests across both backends.
+
+| Request | Candidate Default | Candidate Make | Parent Make negative |
+|---------+-------------------+----------------+----------------------|
+| All six declared waves | 17699 | 17699 | 17699 |
+| 2019-20 only | 3076 | 3076 | 17699 |
+| 2020-21 only | 14623 | 14623 | 17699 |
+| Both modern waves | 17699 | 17699 | 17699 |
+| Each older singleton, or all four older waves | 0 | 0 | 17699 |
+| 2008-09 plus 2019-20 | 3076 | 3076 | 17699 |
+
+Supported candidate frames match complete authoritative parent Default frames, including id_converted=True.
+Old Make's supported payload is unchanged, but its missing id_converted attr is intentionally replaced by the authoritative framework attrs.
+Parent unsupported Default cold requests built unrelated modern raw data and stamped a requested-only manifest before serving zero; those raw mismatches remain negative evidence.
+Candidate unsupported fresh-root requests build no unrelated modern parquet.
+
+All Default fresh-warm and populated calls change zero data-root bytes/modes/mtimes.
+Candidate Make creates no country cache, ignores an unrelated existing payload in the discriminating tests, and preserves a genuinely current populated country cache byte/mode/mtime/footer exactly.
+Natural hashless native evictions, rewrites and unrequested-sibling deletions are classified, not suppressed or called a bypass.
+44 final data-root endpoints match their last recorded receipts exactly.
+Final footer inventory has 20 genuine current country files, 57 legitimate hashless native script files, and 11 explicitly negative hashless parent-Make country files.
+Healthy Mali's current hash and all-four coverage (2014-15/2017-18/2018-19/2021-22) are verified; it remains the source-compatible 40218-row cache, not the later 155931-row version.
+
+Keep empty and serialization distinctions explicit.
+Fresh no-country-cache absent subsets follow the existing factory: object Description, no id_converted attr.
+Covered Default cache slices carry string Description and id_converted=True; populated Make still returns the factory empty while preserving the country cache.
+Parent cold fallback empties differ from candidate factory empties by Description dtype; strict failures are retained and every other component is checked.
+No universal empty representation is asserted for untested partial-coverage misses/union rebuilds.
+Source-memory/native string-index missing-value declaration differences remain strict failures; matched actual writer stages pass exactly.
+API attrs and post-read JSON attrs are not called identical; matched API and matched serialized artifact stages are separately exact.
+
+* Tests, Feature, CLI, scanner and hash cost
+
+Candidate: 27 new plus 58 existing focused tests pass, zero failures/errors/skips.
+The same unchanged 27 new tests on actual parent give 20 meaningful failures and seven passes, zero fixture errors/skips.
+Failures discriminate builder presence, wrong-wave returns, unwanted country writes and the old attrs route; actual JUnit/case causes remain private.
+Eleven existing held-data assertion bodies pass per head separately from pytest collection; credential-marked built cases are deselected, credentials are absent and not fabricated.
+The direct existing API audit passes on both heads with the mounted interpreter; no Poetry/dependency operation was used.
+
+Actual argument-matched Tanzania+Mali Features contain 57917 rows under default and currency=None separately.
+Full first/fresh, parent/candidate and candidate-Make Tanzania-only comparisons pass, with full typed attrs.
+Mali's complete public frames and original/copy cache receipts remain exact.
+Sixteen actual CLI artifacts match actual API writer controls in complete Arrow footer, schema metadata and file bytes.
+CLI supported Make matches authoritative parent Default; Make unsupported follows the measured existing factory rather than the old wrong-wave artifact.
+
+Unmodified phases1/2 produce four warning records per head, zero failure/error/skip records.
+Complete occurrence multisets also match the source-pinned author records.
+Two findings concern legitimate absence of household i on community tables; one is canonical sentinel alignment without loss; one is the missing Tanzania2020-21 population statement.
+There is no community_prices phase2 kwargs grid.
+Full raw scanner records, all 172 complete captured warning-message files (24 nonempty), matrix-call warning counts and full private subprocess logs are preserved.
+Categories/stack fields were not separately persisted for every captured Python warning; do not infer a richer warning-event trace.
+
+Actual prebuild inventories measured all549 API hashes and39 framework fingerprints before rebuilding.
+25 Tanzania cells move; 524 other cells and all39 framework fingerprints are exact.
+The Makefile's country-wide re-warm cost is explicit.
+No other Tanzania table output or broad corpus/full-suite claim follows.
+
+* Author evidence gaps and preserved review stops
+
+The author initially hashed four convenience symlink targets per head through Path.as_posix, not literal readlink bytes.
+Original snapshots and stopped freezers survive; separate literal os.readlink/Git receipts substantiate current exact targets and original physical modes.
+No original-literal observation is invented.
+
+The first partial summary JSON was overwritten before its archive glob and has no original byte/size/SHA receipt.
+All seven original per-call full frames/endpoints/log/script survive and are independently verified against frozen manifest receipts and the retained completed operands.
+The completed aggregate and explicitly labelled NOT-ORIGINAL reconstruction do not recover the missing original.
+The failed CLI prefix never opened its wrapper or changed caches; source and endpoints substantiate resumption of only the missing CLI tail.
+Neither limitation is hidden by replaying an original prefix.
+
+Own preserved stops: initial stdlib manifest verification assumed list rather than Uganda's mapping form; the corrected metadata-only verifier passes.
+The final scanner log redirection used an absolute script path in a log basename and stopped before scanner execution on each head; only that missing scanner step resumed.
+Its pre-scanner data endpoint equals the last completed assertion endpoint.
+The first terminal footer check hard-coded shortened Mali wave names; the earlier actual preparation had correctly gated canonical full names.
+The corrected terminal checker uses those saved declared-wave operands; no data/API/test replay occurred.
+Provisional progress-status summaries are not source/product measurement artifacts.
+
+* Freeze, limits and handoff
+
+Candidate, parent, author writer and own Uganda1198 tracked bytes/size/modes/mtimes/literal symlinks/HEAD/clean state match initial review receipts.
+Complete frozen author2894, diagnosis1216 and Uganda1198 4122-entry manifests remain exact.
+The other old source roots match their frozen literal byte/mode/HEAD proofs; their original proof omitted source mtimes, so no retrospective mtime claim is made for those roots.
+Physical review/writer modes are checked within each tree, not asserted equal across separately prepared trees.
+Private guard exceptions are limited to the exact prepared ignored tmp resolutions; numerical/build/Make threads are one, test workers two, and network attempts zero.
+Final manifest and READY pin checkers, saved operands, logs, source/reference receipts, safe exports and zero consumers.
+
+No new source API/test stage is needed for this verdict.
+No first-cold Feature, agriculture/FCT/food build, other-country source-cold, full suite or all-country output claim is made.
+Known Niger1196 dtype and prior global17 full-selection/guard-mtime limits remain outside this cohort and are not relabelled as passes.
+GH1091's Niger/Mali scope must be reconciled by actual accepted pins and publication status; the Tanzania result alone does not close it.
+Retain #113, WAITING114, #637 and the population caveat separately.
+The proposed country-note addendum is supplied for root/author consideration; no tracked note was edited in this read-only review.
+
+Signed: Sue.

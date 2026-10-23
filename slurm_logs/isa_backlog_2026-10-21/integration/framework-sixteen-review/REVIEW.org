@@ -1,0 +1,143 @@
+#+title: Independent global16 combined handler review
+#+date: 2026-10-21
+#+author: Sue
+
+* Verdict and source pins
+PASS for frozen global16 =d527249ba9d3eaebf190a075e39043e36d2dbb85= against actual global15 =4227e3a802c7349b11f41ec70a924d712159e587=.
+This is bounded composition of the independently reviewed #1081 handler change with the existing fifteen-fix integration, including #1077 and #1062.
+It is not a public merge, a new implementation, a full suite or a corpus rebuild.
+Final source/quiescence release is in =proof.json=; machine checks and all individual scanner records are in =verdict.json=.
+
+* Country grounding and contradictions
+I first read the entire current Ethiopia CONTENTS (2,385 lines) and Uganda CONTENTS (3,626 lines), including TODO, WAITING and LOGBOOK entries.
+Their exact hashes are in =boundary.json=.
+Ethiopia's W2/W3 use household_id2 and reidentified EAs; Panel I and Panel II do not link; W1 Urban means small towns and W5 excludes Tigray from the represented population.
+Its build-time unit cleaning differs from API-time label mapping.
+Applied is the sole reported datum for organic/pesticide plot-input rows, and holder/crop seed purchases attach only to a unique plot; those source caveats and #1183/#1184 remain outside this handler change.
+The live FCT TODO #115 is distinct from kilogram conversion.
+
+The Ethiopia overview says "rural and small-town areas in waves 1-3", while the documentary section limits that restriction to wave1 alone.
+The food-price note says explicit unitprice "returns an empty (0, 1) frame ... by design"; both actual15 and global16 instead retain the intended country-named UnitsUnavailableError because no reported Price field exists.
+The latter is a reportable documentation contradiction, not permission to invent a price or change refusal policy.
+Proposed note: "An explicit food_prices(units='unitprice') request raises country-named UnitsUnavailableError under the existing units contract; no reported Price field is present."
+
+Uganda's v changes from EA to parish identifiers; 2009-10 combines comm with synthetic coordinate bins for movers/split-offs.
+Rotating refresh, membership/residence rules and different panel/cross-sectional weights matter to household-derived frames.
+The live 2019-20 panel-weight LOGBOOK, unknown nonfood recall window, #829 WAITING provenance and #1078 concurrency caveat remain in force.
+The unconditional sentence "Beginning in 2013-14, one-third of the original sample is refreshed each wave" conflicts with the quoted DDI "This same sample was used for the UNPS 2015/16 (Wave 5)"; the file records that design-versus-fielding tension explicitly.
+
+The current Uganda unit section correctly distinguishes the Code/Preferred Label build decoder from query-time label selection.
+Its later historical quotation still says per-wave columns are "unused at runtime"; that blanket wording is incompatible with the query-time resolver and must be read with the current correction.
+No country note was edited.
+A future clarification may qualify that historical quotation; no new statistical source claim or categorical policy follows.
+
+* Exact incremental scope
+The actual15-to16 diff has exactly seven paths: country.py, the focused test, ledger and four safe evidence files.
+All six added Git blobs are exact to independently reviewed =bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0=.
+Removing the exact three imports and two bare re-raise clauses, nine production lines, reconstructs the ENTIRE actual15 country.py byte for byte.
+The complete UnitsUnavailable handler is byte-identical.
+Parser/local_tools, Feature, transformations, both country config trees, #1077 regressions, fixtures, global conftest and dependencies are exact to actual15.
+No conflict marker or unmerged index entry exists.
+
+The existing EmptyCategoricalTableError, CategoricalMappingConflictError and CategoricalKeyDeclarationError now escape only the two approved generated catches.
+No hierarchy, wrapper, resolver, scientific quantity or fallback design was added.
+Each tree keeps its own initial filesystem modes.
+The standalone writer's five new documentation files were 0644 versus detached-review 0600, with identical Git100644 blobs; this review never asserts cross-tree filesystem-mode equality.
+
+* Prerequisite stop and approved source-backed staging
+The first complete gate stopped BEFORE any dependent API/test/fault probe: only42 of60 inputs were current across the permitted combined private pools.
+It copied nothing and did not invoke acquisition.
+The exact18-file stop is preserved in =PREREQUISITE-BLOCK.json= and its inventory/log.
+The five sample companions were initially called YAML in the stop description; they are script-path companions, and that classification is corrected here without changing the actual missing-file result.
+
+Root explicitly approved a separate actual15 checkout and new private Ethiopia staging root.
+Twenty declared held L1 sources were physically copied after sidecar MD5 plus SHA/bytes/modes/mtimes and single-link gates completed terminally.
+Normal empty-L2 builds then materialized ONLY sample, cluster_features, household_roster and food_acquired across the five waves.
+No raw source was acquired and no earlier evidence or seed was changed.
+
+That source-backed staging produced24 current parquets: four COUNTRY files with current hashes/full coverage, ten current-hash YAML wave files and ten legitimate hashless sample/food script companions.
+Food326,456 and roster126,376 complete source-built public frames and FULLattrs match the known healthy references.
+Sample25,914 and clusters2,168 match the recorded per-wave construction.
+A fresh process rechecks all four complete frames and changes zero cache bytes/modes/mtimes.
+The staging source checkout, twenty source receipts and all24 cache receipts froze unchanged, with zero consumers.
+
+An initial postbuild harness assertion had confused sample with the25,528-row household_characteristics table.
+All four normal builds and both complete food/roster reference comparisons had already succeeded; the bad sample expectation stopped the terminal receipt.
+The full stop and initial files remain preserved.
+A corrected fresh-process verification, using the measured25,914 sample and existing24 current caches, completed all metadata/full-frame checks with zero writes before staging was released.
+The earlier source-inventory stop assuming sample had a YAML block is also preserved; the actual sample.py source binding was then inspected and included before L1 preparation.
+No product error or source-value discrepancy was ignored.
+The final aggregate verifier also initially rejected normal empty dvc-cache directories; it was corrected to require zero L1 files, while preserving that stricter failed check and log.
+A direct shell launch of the nonexecutable private run.sh stopped before execution; all substantive commands use bash run.sh.
+
+Only AFTER staging froze did the review complete its60-file physical preparation gate.
+Each review root contains24 naturally rebuilt Ethiopia prerequisites and36 immutable current global12 Uganda controls,120 distinct single-link copies in total.
+There are no derived parquets or L1 blobs in these two review roots.
+This is an explicitly source-backed Ethiopia prerequisite extension followed by normal current-L2 combined checks, not an original entirely-warm or whole-country source-cold proof.
+Uganda remains a held warm comparator; the unresolved #1078 race is not claimed repaired.
+
+* Actual healthy frames, attrs and cache metadata
+Actual15 and global16 each perform17 complete initial frame comparisons and17 fresh-process warm comparisons,68 total, with new Country/Feature objects.
+Every value, row/column order, axis metadata, dtype, null mask and FULL logical attrs matches actual15 and the identically called known healthy references.
+Nothing is sorted, re-keyed, rounded, stripped or normalized to make those complete-frame comparisons pass.
+
+| country | food_acquired | roster | expenditures | prices | quantities | characteristics |
+|---------+---------------+--------+--------------+--------+------------+-----------------|
+| Ethiopia |326456|126376|264091|263627|326082|25528|
+| Uganda |355571|144704|247049|348181|355487|24364|
+
+Explicit unitvalue and Uganda Aggregate expenditures have separate controls.
+Feature default currency and explicit currency=None use separate references and retain their distinct currency index signatures; both have511,140 rows.
+Ethiopia's Aggregate and reported-price absence retain their intended typed refusals.
+Healthy warning category/message multisets match actual15 AND the source-pinned standalone healthy references:110 initial and133 warm records.
+Warning filename/line equality across different checkouts is not claimed; full records remain private.
+
+All60 parquets per root retain exact source/destination SHA/size/modes/mtimes through initial, warm, tests and scanners.
+No derived parquet is manufactured.
+Each checkout independently recomputes relevant metadata expectations: eight COUNTRY files have current hashes and complete wave coverage,34 YAML wave files have current hashes, and18 script companions legitimately remain hashless.
+All scoped hashes/coverage records are exact between actual15 and16.
+There is no stamp, assumed-fresh, NO_CACHE, backend override or read-gate bypass.
+
+* Tests and composed fault controls
+The candidate passes354 tests, zero failures/errors/skips:235 #1081/supporting cases plus119 #1077 nonfinite-key joint regressions.
+The same73 new case bodies/parameters on actual15 reproduce42 failures and31 passes, with zero errors/skips:24 source-site failures and18 food-finalizer failures.
+The private negative file's AST is exact to the committed file after excluding only its docstring and unused Path import.
+
+All166 generated-handler controls pass per head with baseline/candidate expectations kept separate.
+They include32 generic fallback and11 UnitsUnavailable controls per head.
+Five explicit valuation controls and six synthetic actual Feature cases pass per head.
+Another72 candidate controls attach non-null cause and Python context, multiple notes and custom fields to real parser-produced errors; all preserve exact object/args/cause/context/notes/suppression state and make zero legacy calls.
+Successful legacy masking is simulated with controlled legacy results, not claimed as a real healthy Ethiopia legacy cache.
+Feature's existing healthy retention, generic warn/drop behavior and labels/units markers remain intact; the intended categorical diagnostic now names the original typed error.
+Strict API audit passes.
+
+* Complete scanner and hash-scope accounting
+The actual scoped scanner runs phases1/2 for food_acquired, food_expenditures, food_prices, food_quantities, household_roster and household_characteristics, with Ethiopia/Uganda and the harness's complete registered kwargs grid.
+The full unmodified finding MULTISET is exact between actual15 and16: 398 records, statuses {'warn': 393, 'pass': 5}.
+There are zero failures, errors or skips.
+Every record's feature/phase/kwargs/check/fingerprint is individually accounted for in verdict.json; raw messages/metrics remain private.
+No scanner message, path or metric was normalized or fabricated to create equality.
+
+The standalone actual0/549 country hashes and0/39 framework fingerprints are carried only with their exact bfbb source pin and immutable receipts.
+They were not recomputed for this bounded seven-path union.
+The exact9-line reconstruction plus independently measured relevant60-file gates establish the incremental boundary.
+No output claim is made for unbuilt tables, other countries, whole-country cold coverage or a full suite.
+
+* Isolation, immutability and release
+Exact cwd/PYTHONPATH/LSMS_EXPECTED_ROOT/package/countries/data realpaths and frozen heads are asserted per process.
+The mounted image is used directly; numeric/build/Make threads are one, the candidate pytest uses two explicit loadfile workers, and one data consumer uses each root at a time.
+Socket guards plus unshare -rn are active.
+Data/config/temp/DVC site/XDG/matplotlib state is private.
+Only the root-prepared baseline DVC tmp symlink resolves metadata writes into its exact private owner-only target.
+The candidate's preexisting real tmp/btime remains unchanged and existing exclusive creates receive FileExistsError.
+
+Before/after snapshots preserve 14 original tracked trees and 12 prior immutable evidence roots, including original author/reviewer/cache/seed receipts, contents, modes, symlink tokens/mtimes, heads and clean status.
+The separately approved Ethiopia staging checkout and frozen evidence also remain exact.
+The initial prerequisite stop, sample inventory/count stops and an initial static comparison of differing inventory HEAD fields are preserved; the actual549/39 dictionary equality was then checked under its two proper source heads.
+No Git/ref/checkout/branch/commit/GitHub mutation, tracked edit, acquisition, DVC CLI, shared-cache write/clear/promotion or in-tree payload occurred.
+Final proof records zero remaining consumers and releases only this bounded review freeze.
+
+Commands and one-shot boundaries: REPRODUCE.sh plus the separate staging launcher/preparer/build/verify/freeze scripts.
+Full frames, coordinates/IDs, parser contexts, warnings and logs remain private.
+
+Sue

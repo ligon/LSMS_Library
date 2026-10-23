@@ -1,0 +1,11 @@
+{
+  "status": "POSTEXIT_NEW_1193_INTEGRATION14_SAVED_SUPPLEMENT",
+  "READY_sha256": "e3412e73385f16054168f92caa3513afb81b04cc28fdb74d574b85b0ed2a6d26",
+  "manifest_sha256": "c6b46be71238f67d2820e566be04846e70f8061cb13578cb7df40f7611d76a00",
+  "manifest_entries": 165,
+  "all646_original_and85_copy_receipts_exact": true,
+  "all_parent_authority_links_and_prior1197_receipts_exact": true,
+  "source_clean_and_zero_payload_consumers_denials": true,
+  "prior_initial_hold_stopped_v1_and_unsaved_memory_gaps_preserved": true,
+  "signed": "Sue"
+}

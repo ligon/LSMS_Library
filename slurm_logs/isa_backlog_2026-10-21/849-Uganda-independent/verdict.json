@@ -1,0 +1,16 @@
+{
+  "verdict": "PASS_BOUNDED",
+  "blocking_findings": [],
+  "candidate": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+  "parent": "0854303bc5f60daa698b2927fc3b193822a4c090",
+  "scope": "Exactly12 reported-factor map additions at the settled1198 native observation grain, unchanged normalization/screens/science/identity.",
+  "source_safe_exports": [
+    "REVIEW.org",
+    "verdict.json",
+    "proof.json",
+    "validation.json",
+    "REPRODUCE.md",
+    "checker-sources.json"
+  ],
+  "final_seal": "Required separately; this packaging is not release until FINAL-READY and terminal readback."
+}

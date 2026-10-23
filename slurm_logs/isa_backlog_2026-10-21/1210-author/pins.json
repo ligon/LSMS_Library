@@ -1,0 +1,40 @@
+{
+  "source_head": "128cc095a62cbd210e30d2256359acfe53d4a2c5",
+  "ledger": "cf95d6812c190304b38af4ce492c3339285528c8",
+  "actual_parent": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "data_runtime_head": "dirty f8 with tested source receipts; final Country bytes identical",
+  "country_source_sha256": "5b0602d0fdda974445fa2ec6a446a74589e9f3940684af3a00180087dbb6eade",
+  "regression_source_sha256": "c0e837401eb7b26ba597710a7f2586f2167404781875fb61ab9b1155a51d900d",
+  "python_sha256": "99b9e30b1e34701e7136448414fe5e4d2b788bc768cba4ddeca9e5e18bc18b91",
+  "mounted_generation_sha256": "97e6ed8a488dad718f71cc4a43c17e1ea34bba0b014465b52fe780c8af5d0852",
+  "versions": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "dvc": "3.67.1",
+    "pytest": "8.4.2",
+    "pytest-xdist": "3.8.0"
+  },
+  "comparator_sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94",
+  "script_sha256": {
+    "run.sh": "073c2c2c0eb4d543e9999645db6b29d31849febdf0a49dc4d0f69c455510c0e4",
+    "entry.py": "2dff1c48489e9e98554f415c1c77d03e0f29fdd005c85994154e7047b4319324",
+    "identity.py": "c7493747bb24a3d7a12e62deed82137fdc8721b38381d2163ab3718dbe69e6f8",
+    "sitecustomize.py": "3bafe408f66246fd761dbbebe5ffe0a56d03af1a88b2b9342fc3f22cb24cf819",
+    "common.py": "e2f59371689fa8cc804490989d695abcd18df4cf309fca5bb6aeb955957cc5ff",
+    "probe.py": "b94d5766bcb61c6dbb43d750d85c6c9dc26d7b8fd9d953bc81f96940a87a451b",
+    "invalid.py": "d2bea55f82fdaee2a9779fcfa309c101b63aeca63c97d8a13ed310b705449a1c",
+    "sequence.py": "4d4603d90d4ccf4e1842d4d5405088e99149325ea2eaf6279a8b6fb503dcab46",
+    "compare.py": "7967efe4f7d2f46cc9b46cd9aed6d4d3cf75db846e53363c98e5dc1f3336473c",
+    "artifacts.py": "3dacd54c5be12bdb941556571618b0f55826e76a12772263fd16ff39046d0036",
+    "prepare.py": "021036f1d25f8b46e901594b670aaccfe2a037869274d9d66a0b734b84f51d39",
+    "runtime_identity_plugin-v2.py": "02f014ab0926e20403f35665378a7a097332c6221509dcc0121b3120f4728b5f",
+    "runtime_identity_plugin.py": "5d3e874b6bfb849cac0d34b52bddd65588c690c1ef1a7acc4ccf0aac90527722",
+    "protect.py": "9e350e696d3812b006a60cf42d82c13e69ef4273b7a513ad3ff423ddebe7c1da",
+    "protect-v2.py": "54a2c6411a77b3dde139ff3265993a4ef808d4293f09a25629bb3b85cb9bb58d",
+    "qualify-protection-v2.py": "de776cfc1b0d25ffc2893158a2824f65f8154bc8b201500ebc19b1992ea25d80",
+    "seal.py": "b16508f03eaa9aeb08b56e4474a9152c6cce7177d64ef8826d76c13f1e9f0266",
+    "postexit.py": "6beec930eb65b1f7742281f864417b090802fe3878c80de8989e50105fdc0f57"
+  },
+  "guard_log_sha256": "6ab8bdea5387bafde436a30cfc753d9000ee95815ed0e1801fa2e1bee89c380c"
+}

@@ -1,0 +1,1392 @@
+{
+  "captured_at": "2026-10-21T15:45:20.130137+00:00",
+  "repository": "ligon/LSMS_Library",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "scope_countries": [
+    "Burkina_Faso",
+    "Ethiopia",
+    "Malawi",
+    "Mali",
+    "Niger",
+    "Nigeria",
+    "Tanzania",
+    "Uganda"
+  ],
+  "counts": {
+    "open_issues": 156,
+    "open_prs": 0,
+    "recent_merged_prs": 300
+  },
+  "issues": [
+    {
+      "number": 1150,
+      "title": "plot_features: serve the WB plot geovariables (elevation, slope, wetness, distance to dwelling) for Ethiopia W1-W5, and declare Nigeria's PlotSlope (#1127 ruling A)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1150",
+      "updatedAt": "2026-10-20T10:31:04Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1149,
+      "title": "add_wave: on re-acquisition, place each zip member at its existing sidecar's path (nested Data/ layouts); stage before placing; report leftovers recursively",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1149",
+      "updatedAt": "2026-10-20T10:28:38Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1148,
+      "title": "period=: per-household exposure from each passage's interview status (Burkina 2014, GhanaLSS) instead of one declared constant per wave (#851 option B)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1148",
+      "updatedAt": "2026-10-20T10:26:48Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1146,
+      "title": "Test-side follow-ups to #1113: baseline generator pins partial parquets; Nigeria sold-unit test latent; cold-session invariance coverage",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1146",
+      "updatedAt": "2026-10-20T03:45:29Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1145,
+      "title": "GhanaLSS 1998-99 / 2005-06 / 2012-13 8H screener: measure blank-screener rows with real answers, and align to 'drop only No' (#1140 ruling)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1145",
+      "updatedAt": "2026-10-20T02:23:39Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1144,
+      "title": "Nigeria food_acquired j is decoded wave-blind: W1 'Other vegetables' served as 'Leaves', 'Leaves' as 'Dry Pepper' (item twin of #607)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1144",
+      "updatedAt": "2026-10-19T22:58:05Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1142,
+      "title": "GhanaLSS 1991-92 `sample` omits 29 interviewed households, so their 142 roster rows serve a NaN `v`",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1142",
+      "updatedAt": "2026-10-19T22:57:06Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1141,
+      "title": "#1008 residual e: GhanaLSS `inputs_produced_farmgate` returns ungated 8H rows",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1141",
+      "updatedAt": "2026-10-19T22:57:05Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1139,
+      "title": "#1008 residual c: GhanaLSS GLSS1/2 `sample` serves 13 data-less cover-page households; 114518 may duplicate the recovered 114519",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1139",
+      "updatedAt": "2026-10-19T22:57:02Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1138,
+      "title": "#1008 residual b: GhanaLSS GLSS1/2 `labor` keeps 20 null-`v` rows for ids with no cover, roster or food record",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1138",
+      "updatedAt": "2026-10-19T22:57:01Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1136,
+      "title": "#793 residual: curate design fields beyond Uganda (NADA DDI probe, per-country evidence, missing strata)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1136",
+      "updatedAt": "2026-10-19T22:56:02Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1135,
+      "title": "DECISION (#942): `ClusterIdentityWarning`: which boundaries count (H2: any in span vs adjacent), and whether a partial renumbering needs a size threshold (H3)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1135",
+      "updatedAt": "2026-10-20T02:30:57Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1134,
+      "title": "DECISION (#793 residual): the frozen `DESIGN_TAGS` (2 values) cannot express an undocumented or single-stage design, so no non-Uganda design record can be written until it is widened",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1134",
+      "updatedAt": "2026-10-20T02:29:17Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1133,
+      "title": "Uganda: harmonise `v` (`comm`) across the survey's two renderings (int32 8-digit in 2005-06/2011-12, 7-character string in 2009-10/2010-11), so that one EA stops carrying two ids",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1133",
+      "updatedAt": "2026-10-19T22:55:59Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1131,
+      "title": "Re-check the GhanaLSS `food_security` 1987-88 and 1988-89 `unsure` verdicts: the GLSS1 questionnaire scans are readable as images",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1131",
+      "updatedAt": "2026-10-19T22:48:38Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1130,
+      "title": "GhanaLSS 1991-92 own-produce valuation: decide the `All` unit, then extend `8h-farmgate` to GLSS3",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1130",
+      "updatedAt": "2026-10-19T22:48:37Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1129,
+      "title": "`food_prices(units='unitvalue')` serves exactly 1.0 for every `u='Value'` row: 1,107,464 GhanaLSS rows across all seven waves",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1129",
+      "updatedAt": "2026-10-19T22:48:36Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1127,
+      "title": "Ethiopia 2021-22: acquire ESPS-5 v03_M (replaces the plot geovariables file) and re-stamp SOURCE.org (#1114 ruling)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1127",
+      "updatedAt": "2026-10-20T10:31:05Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1123,
+      "title": "#569 residual F: wave-level destructive collapses in EHCVM `plot_inputs` (Country path, pre-existing)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1123",
+      "updatedAt": "2026-10-19T22:38:38Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1122,
+      "title": "#569 residual E: stale \"plot_labor / plot-level features not registered in index_info\" comments",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1122",
+      "updatedAt": "2026-10-19T22:38:37Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1121,
+      "title": "#569 residual D: the `plot_labor.source` vocabulary is not harmonised across countries",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1121",
+      "updatedAt": "2026-10-19T22:38:36Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1120,
+      "title": "#569 residual C: NaN keys on declared plot-table index levels, now all named by Site I; `LSMS_READ_STRICT=1` newly raises on three reads",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1120",
+      "updatedAt": "2026-10-19T22:38:36Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1119,
+      "title": "#569 residual A: the \"not crop-specific\" marker on `plot_inputs.j` is spelled five ways, and two EHCVM countries spell two crops differently from their crop_production",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1119",
+      "updatedAt": "2026-10-19T22:38:35Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1118,
+      "title": "`Country(...).plot_inputs()` serves `u` NA on 122,900 rows in six countries, where `Feature('plot_inputs')` serves `'Unknown'` \u2014 contradicting the #1041 ruling",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1118",
+      "updatedAt": "2026-10-19T22:38:33Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1116,
+      "title": "#600 residual: override records take their note and validation from `_OVERRIDES`, over a hand edit to the file",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1116",
+      "updatedAt": "2026-10-19T22:20:22Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1111,
+      "title": "Malawi applied-fertilizer unit `ag_d39e`/`ag_d39j` probably misread \u2014 13,302 rows served as grams carry 203.8 kg N that would be 203,843.6 kg as kilograms; 17,044 rows NULL `u`",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1111",
+      "updatedAt": "2026-10-19T21:29:58Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1110,
+      "title": "`fertilizer_rate`'s default `on='parcel'` mis-joins Malawi and empties Ethiopia; its docstring's \"measured no-op on Malawi\" is false",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1110",
+      "updatedAt": "2026-10-19T21:29:57Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1109,
+      "title": "Malawi organic-fertilizer `Quantity` is a fabricated 0.0 (`'Quantity': 'sum'` without `min_count`)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1109",
+      "updatedAt": "2026-10-19T21:29:56Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1108,
+      "title": "GhanaLSS `Fertilizer` (1,091 rows with a quantity) has no product identity, so it gets no N share",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1108",
+      "updatedAt": "2026-10-19T21:29:55Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1107,
+      "title": "Guinea-Bissau `nitrogen_kg` returns 0 rows \u2014 its four Portuguese inorganic labels are keyed to nothing",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1107",
+      "updatedAt": "2026-10-19T21:29:53Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1106,
+      "title": "Malawi `NPK Fertilizer` is Chitowe 23:21:0+4S but is served at the shared map's NPK 17-17-17 (0.17 vs 0.23 N)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1106",
+      "updatedAt": "2026-10-19T21:29:52Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1103,
+      "title": "Kosovo 2000 kinship: truncated labels 'Other re' (71) and 'Niece/Ne' (455) need the code list",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1103",
+      "updatedAt": "2026-10-19T18:30:36Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1102,
+      "title": "DECISION: kinship conflations of the #698 shape outside its wording (Timor-Leste Adopted/stepchild, Cambodia Adopted/Foster, Guyana Servant/Other, bare 'Other')",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1102",
+      "updatedAt": "2026-10-19T18:30:35Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1101,
+      "title": "GhanaLSS GLSS3/4 code 6 'Relative of head or head's spouse' is served [null, null, consanguineal] (2,977 people)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1101",
+      "updatedAt": "2026-10-19T18:30:34Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1100,
+      "title": "Ghana: parent-or-parent-in-law code is served Parent [1, 0, consanguineal] (2,962 people) -- the #698 'X or X-in-law' form, relabelled upstream",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1100",
+      "updatedAt": "2026-10-19T18:30:33Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1096,
+      "title": "DECISION: Nigeria interview_date serves visit dates for households that were not interviewed (interview_result refused / unavailable / not found)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1096",
+      "updatedAt": "2026-10-19T16:58:31Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1095,
+      "title": "Nigeria community_prices silently drops W4/W5 rows whose recorded unit the canonicaliser does not know (2,482 W4 + 2,746 W5 rows)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1095",
+      "updatedAt": "2026-10-19T16:58:30Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1091,
+      "title": "retire the Mali / Niger / Tanzania community_prices concatenators",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1091",
+      "updatedAt": "2026-10-19T16:45:06Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1090,
+      "title": "Niger `cs07q01` \"Riz\" decodes to `j = 'Autre Riz local'` for both of its varieties",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1090",
+      "updatedAt": "2026-10-19T16:45:05Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1089,
+      "title": "Mali community_prices reads only relev\u00e9 3 of three",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1089",
+      "updatedAt": "2026-10-19T16:45:04Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1088,
+      "title": "Niger CS07 9999 quantity sentinel arrives as float32 9999.9 and is not caught",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1088",
+      "updatedAt": "2026-10-19T16:45:03Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1087,
+      "title": "DECISION: how to serve a second source record that disagrees with the first (Niger community_prices, 30 rows)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1087",
+      "updatedAt": "2026-10-19T16:45:01Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1085,
+      "title": "DECISION: a country entry that is a symlink escaping countries_root() is listed by countries() but refused by Country() as path traversal",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1085",
+      "updatedAt": "2026-10-19T16:12:11Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1084,
+      "title": "recall windows: read the questionnaires for the 32 not-recorded food cells (period= converts each with no code change)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1084",
+      "updatedAt": "2026-10-19T15:56:18Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1083,
+      "title": "GhanaLSS 1991-92 (GLSS3): the food recall window varies by stratum (urban 30 d, rural 14 d) -- stamp it per row so period= can convert the wave",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1083",
+      "updatedAt": "2026-10-19T15:56:17Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1082,
+      "title": "GhanaLSS 1987-88 / 1988-89 declare FOODCD twice in one categorical_mapping.org; the cascade and the read-time merge read different copies",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1082",
+      "updatedAt": "2026-10-19T15:55:37Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1081,
+      "title": "Derived food/roster tables turn EmptyCategoricalTableError / CategoricalMappingConflictError into a generic 'Could not materialize'",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1081",
+      "updatedAt": "2026-10-19T15:55:36Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1080,
+      "title": "DECISION: the read-time categorical merge treats an empty declared table as a silent override (and can lose global rows)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1080",
+      "updatedAt": "2026-10-19T15:55:35Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1079,
+      "title": "DECISION: a declared NON-empty categorical table lacking the requested value column still falls through to a lower level",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1079",
+      "updatedAt": "2026-10-19T15:55:34Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1078,
+      "title": "A full-suite run left Uganda var/food_acquired.parquet stamped with the CURRENT hash but 9 wrong cells (0.0 for NaN, 2011-12) -- same hash, different content",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1078",
+      "updatedAt": "2026-10-19T16:57:10Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1077,
+      "title": "labels={'u': 'Code'} (and 35 other table/target cells) crash with 'cannot convert float NaN to integer' in _augment_numeric_code_keys",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1077",
+      "updatedAt": "2026-10-19T15:21:15Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1075,
+      "title": "Malawi leftover unit codes: 2010-11 suffixed codes (16b/16a/12a/21b/12b/03a, 13 rows) and IHS2 '90 kg bag' (2004-05, 4 of 6 uses contradict the label)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1075",
+      "updatedAt": "2026-10-19T14:23:38Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1074,
+      "title": "DECISION: Malawi rows served u=Unknown keep a shipped code-23 survey_kg (29 Mango rows at 10.99 kg per mango, 7,088 kg)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1074",
+      "updatedAt": "2026-10-19T14:23:37Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1073,
+      "title": "DECISION: GhanaLSS egg units priced like one egg (All, Nut, Finger, Stick, Barrel, Bunch) get ~1 kg each -- extend the no-kg declaration to every egg unit?",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1073",
+      "updatedAt": "2026-10-19T14:23:36Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1072,
+      "title": "GhanaLSS nutrition ignores _/no_kg_factor.yml and weighs counted eggs at 0.50 kg; make the declaration a hashed input of nutrition",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1072",
+      "updatedAt": "2026-10-19T14:23:34Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1071,
+      "title": "DECISION: the wave and country cache tiers disagree on LSMS_NO_CACHE spelling and on corrupt-file handling",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1071",
+      "updatedAt": "2026-10-19T17:20:13Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1069,
+      "title": "Cache mechanism still inside the build fingerprint after #908/#1040 (eviction, replay, pre-warm, footer readers)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1069",
+      "updatedAt": "2026-10-19T14:14:22Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1068,
+      "title": "DECISION: native-unit modes treat U_UNKNOWN as a pooled pseudo-unit (food_prices(units='unitvalue'), food_quantities(units='units'))",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1068",
+      "updatedAt": "2026-10-19T14:08:36Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1066,
+      "title": "The no-DVC-repo L2-country write stamps no lsms_grain_audit, so a grain loss is silent on every warm read (pip-install / LSMS_COUNTRIES_ROOT route)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1066",
+      "updatedAt": "2026-10-19T21:21:21Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1064,
+      "title": "DECISION: data_access still accepts the in-tree countries/.dvc/s3_creds as a credential fallback (reader rung reports 'read' on a file DVCFileSystem never uses)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1064",
+      "updatedAt": "2026-10-19T13:20:52Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1063,
+      "title": "EHCVM household_roster row order differs between builds of the same commit (Benin, Guinea-Bissau; CotedIvoire, Mali, Togo on 10-14)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1063",
+      "updatedAt": "2026-10-19T12:56:48Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1062,
+      "title": "Uganda: Makefile recipes rewrite sibling var/ tables without a hash (fct by nutrition, earnings by income) -- apply the #788 ruling",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1062",
+      "updatedAt": "2026-10-19T12:56:34Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1061,
+      "title": "EthiopiaRHS 1994a: unit codes 40/76/80-82/85/86 are the round-1 scheme but are decoded with 1997's labels (238 rows)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1061",
+      "updatedAt": "2026-10-19T12:50:07Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1060,
+      "title": "Burkina Faso 2014: province varies within 94 of 900 zd in the source (pre-existing cluster_features GrainCollapseWarning, 1,034 of 10,800 rows)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1060",
+      "updatedAt": "2026-10-19T12:19:44Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1059,
+      "title": "Burkina Faso cluster_features District: 50 cross-wave spelling variants (mapping table) and 3 genuine province disagreements on shared grappes",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1059",
+      "updatedAt": "2026-10-19T12:19:43Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1058,
+      "title": "Burkina Faso 2021-22 plot_features: wire parcel GPS s16aq46__latitude/__longitude (4,180 of 8,467 parcels); check Mali/Niger/Senegal s16a",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1058",
+      "updatedAt": "2026-10-19T12:19:42Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1057,
+      "title": "DECISION: Burkina Faso 2021-22 cluster_features -- serve the 2018-19 cluster GPS for the 527 tracked grappes (registered derivation)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1057",
+      "updatedAt": "2026-10-19T12:19:41Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 1056,
+      "title": "Ethiopia interview_date serves 33 device-clock dates years outside fieldwork (W4 15, W5 18)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1056",
+      "updatedAt": "2026-10-19T12:19:40Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1055,
+      "title": "DECISION: Ethiopia 2021-22 interview_date dates the post-harvest agriculture visit (1,475 of 4,959 households), not the household interview",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1055",
+      "updatedAt": "2026-10-19T12:19:39Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1051,
+      "title": "Degraded-build grading (#675) residuals: outage crashes the build, single-file probe, read-only L1 never heals, offline probe cost, precursor drops",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1051",
+      "updatedAt": "2026-10-19T02:26:56Z",
+      "labels": [
+        "framework"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 1048,
+      "title": "GhanaLSS 1998-99 (GLSS4): the questionnaire prints two conflicting 8H unit-code lists (codes 10/11/17); verify which one the data use",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1048",
+      "updatedAt": "2026-10-18T16:58:17Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1045,
+      "title": "Parse every calendar quantity at build time with one parser (dates, year-months, month-of-year, years); read-time cast becomes a pass-through",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1045",
+      "updatedAt": "2026-10-19T21:21:24Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1044,
+      "title": "EthiopiaRHS food units: float-stringified codes 31.0/83.0/95.0 leak inferred kg after 1989, and 1989 serves raw unit codes",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1044",
+      "updatedAt": "2026-10-19T14:52:10Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1043,
+      "title": "Ethiopia crop_production tags a missing harvest unit as 'Other (Specify)' (ethiopia.py:1827), hiding it from the sentinel mask",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1043",
+      "updatedAt": "2026-10-18T05:50:48Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1034,
+      "title": "Nigeria W3 post-planting unit codes 131/151/152/161 are labelled in the planting .dta but served as 'other specify (13x)'",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1034",
+      "updatedAt": "2026-10-18T05:50:40Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1033,
+      "title": "Nigeria W4 food unit labels carry invented W3 size prefixes; W4's size columns (s7bq2c/s7bq9c/s10bq2c/s10bq9c) are never read",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1033",
+      "updatedAt": "2026-10-18T05:50:39Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 1032,
+      "title": "DVC writes countries_root()/.dvc/tmp/btime when the DVCFileSystem is built: the last runtime write into the config tree",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1032",
+      "updatedAt": "2026-10-19T13:21:39Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1009,
+      "title": "Panama: Region-market food variants lack a geography lookup",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1009",
+      "updatedAt": "2026-10-15T07:00:43Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1006,
+      "title": "Uganda derived-table tests skip successful builds and retain obsolete index/dtype assertions",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1006",
+      "updatedAt": "2026-10-15T06:24:05Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 1000,
+      "title": "Reconcile Uganda FCT 4003's generic zero note with its specific yellow-variety carotenoid derivation",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1000",
+      "updatedAt": "2026-10-15T05:13:50Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 978,
+      "title": "Nigeria W5: acquire WB v02 (NGA_2023_GHSP-W5_v02_M) and wire NGA_HouseholdGeovariables_Y5.dta as cluster_features df_geo",
+      "url": "https://github.com/ligon/LSMS_Library/issues/978",
+      "updatedAt": "2026-10-20T02:33:36Z",
+      "labels": [
+        "data-gap"
+      ],
+      "lane": "east"
+    },
+    {
+      "number": 977,
+      "title": "Panama 1997 and Serbia & Montenegro 2002: sample weights 100% null -- questionnaire check (C4) before calling it not-asked",
+      "url": "https://github.com/ligon/LSMS_Library/issues/977",
+      "updatedAt": "2026-10-15T00:44:11Z",
+      "labels": [
+        "data-gap"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 976,
+      "title": "Sentinel sweep: 2,180 of 6,803 .dta blobs were unobtainable (absent from L1, unfetchable from S3); 20 waves entirely unscanned",
+      "url": "https://github.com/ligon/LSMS_Library/issues/976",
+      "updatedAt": "2026-10-15T00:44:09Z",
+      "labels": [
+        "data-gap"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 975,
+      "title": "Kyrgyz Republic: four waves of data (1993, 1996, 1997, 1998) and no _/ config at all",
+      "url": "https://github.com/ligon/LSMS_Library/issues/975",
+      "updatedAt": "2026-10-15T00:44:07Z",
+      "labels": [
+        "data-gap"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 956,
+      "title": "GhanaLSS wave-level harmonize_food carries an Aggregate Label column nothing can read, and it disagrees with the country table on 407 of 962 rows",
+      "url": "https://github.com/ligon/LSMS_Library/issues/956",
+      "updatedAt": "2026-09-18T18:40:11Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 939,
+      "title": "Check whether partition ranking is stable in min_goods before relying on the aggregation selection",
+      "url": "https://github.com/ligon/LSMS_Library/issues/939",
+      "updatedAt": "2026-09-17T00:44:22Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 932,
+      "title": "247 requires_s3 tests skip on every PR and on development, so a red suite reports green",
+      "url": "https://github.com/ligon/LSMS_Library/issues/932",
+      "updatedAt": "2026-10-15T17:03:22Z",
+      "labels": [
+        "framework"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 926,
+      "title": "Resolve remaining curated C1 keys and transcoding policy after GhanaLSS repair",
+      "url": "https://github.com/ligon/LSMS_Library/issues/926",
+      "updatedAt": "2026-10-15T05:14:12Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 920,
+      "title": "Cache-miss rebuild is silent on a git checkout (DECISION: info vs warning); profile the per-call read-path transforms on GhanaLSS",
+      "url": "https://github.com/ligon/LSMS_Library/issues/920",
+      "updatedAt": "2026-10-18T14:25:40Z",
+      "labels": [
+        "framework"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 913,
+      "title": "DECISION: GhanaLSS 1991-92 own production -- value the 28% of rows carrying both factors (A), define u='All' as a whole-harvest construction with its own key (B), or keep NA plus a basis='total' source-coverage warning (C)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/913",
+      "updatedAt": "2026-10-15T00:43:24Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 905,
+      "title": "Finish the vectorized min_count reducer sweep",
+      "url": "https://github.com/ligon/LSMS_Library/issues/905",
+      "updatedAt": "2026-10-15T05:13:50Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 894,
+      "title": "panel_ids: convert Malawi and Nigeria from the cache-parquet path to committed _/panel_ids.json + updated_ids.json (Design A)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/894",
+      "updatedAt": "2026-10-15T00:43:21Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 882,
+      "title": "DECISION: Niger 2011-12 people_last7days dummies -- keep as served (A), re-point wage_work to ms04q01 so all three are 30-day (B), or serve NA (C)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/882",
+      "updatedAt": "2026-10-15T00:43:19Z",
+      "labels": [
+        "data-gap"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 881,
+      "title": "DECISION: Nigeria W4 purchased row -- identity derivation labelling the 30-day window (A) or a derived 7-day Expenditure per the #876 EHCVM precedent (B)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/881",
+      "updatedAt": "2026-10-15T00:43:17Z",
+      "labels": [
+        "data-gap"
+      ],
+      "lane": "east"
+    },
+    {
+      "number": 864,
+      "title": "Resolve Burkina Faso 2014 quantity semantics and unread autoconsumption values",
+      "url": "https://github.com/ligon/LSMS_Library/issues/864",
+      "updatedAt": "2026-10-15T05:14:07Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 862,
+      "title": "Schema proposal: plot_cultivation, a per-season plot decision-maker table (#167's reserved name, #439's convention)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/862",
+      "updatedAt": "2026-09-09T19:21:24Z",
+      "labels": [
+        "enhancement",
+        "framework"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 860,
+      "title": "Nigeria: no factors for heaps/ridges/stands areas; EPAR's two grids disagree by a median of 4.9x",
+      "url": "https://github.com/ligon/LSMS_Library/issues/860",
+      "updatedAt": "2026-09-09T19:21:22Z",
+      "labels": [
+        "enhancement",
+        "data-gap"
+      ],
+      "lane": "east"
+    },
+    {
+      "number": 856,
+      "title": "Malawi: measure the harvest-side 'other (specify)' free-text residue per wave before deciding on recovery",
+      "url": "https://github.com/ligon/LSMS_Library/issues/856",
+      "updatedAt": "2026-10-15T00:43:15Z",
+      "labels": [
+        "enhancement",
+        "data-gap"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 855,
+      "title": "Malawi: _livestock_block never reads ag_r07 (\"owned exactly 12 months ago\"), which is present in all four waves",
+      "url": "https://github.com/ligon/LSMS_Library/issues/855",
+      "updatedAt": "2026-09-09T19:21:17Z",
+      "labels": [
+        "enhancement",
+        "data-gap"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 851,
+      "title": "DECISION: recall windows Phase II -- ship period= on food_expenditures/food_quantities with coverage at 28 of 67 cells under Contract B, and refuse period= on food_prices",
+      "url": "https://github.com/ligon/LSMS_Library/issues/851",
+      "updatedAt": "2026-10-20T10:26:47Z",
+      "labels": [
+        "framework"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 849,
+      "title": "Uganda: carry the survey-reported KgFactor (a5?q6d) in all seven waves, not only 2018-19, once harvest_kg prefers it -- measure the kg movement per wave first",
+      "url": "https://github.com/ligon/LSMS_Library/issues/849",
+      "updatedAt": "2026-10-15T00:43:11Z",
+      "labels": [
+        "enhancement"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 846,
+      "title": "Tanzania: record a not-asked capability for food price and own-consumption value (Section J qq.2-6 is the C4 evidence)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/846",
+      "updatedAt": "2026-09-09T19:26:08Z",
+      "labels": [
+        "documentation",
+        "data-gap"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 845,
+      "title": "Price provenance: is Price elicited or derived for Panama/GhanaLSS/Guatemala/Serbia; explain Uganda's ~5% gap; decide on a read-time diagnostic",
+      "url": "https://github.com/ligon/LSMS_Library/issues/845",
+      "updatedAt": "2026-10-18T05:52:24Z",
+      "labels": [
+        "documentation",
+        "framework"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 844,
+      "title": "Nigeria asks a farmgate valuation of the whole harvest (sa3q18, 76% of rows) that no table carries",
+      "url": "https://github.com/ligon/LSMS_Library/issues/844",
+      "updatedAt": "2026-09-09T19:26:07Z",
+      "labels": [
+        "data-gap"
+      ],
+      "lane": "east"
+    },
+    {
+      "number": 843,
+      "title": "Nigeria crop_production has no sale price in W3-W5 (0 of 37,315 rows): secta3ii is hh-crop grain, the build needs a plot",
+      "url": "https://github.com/ligon/LSMS_Library/issues/843",
+      "updatedAt": "2026-09-08T23:38:38Z",
+      "labels": [
+        "data-gap"
+      ],
+      "lane": "east"
+    },
+    {
+      "number": 839,
+      "title": "A config comment the data contradict: Mali data_scheme.yml (3 false claims since #380) and Tanzania CONTENTS.org (#112)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/839",
+      "updatedAt": "2026-09-08T23:37:31Z",
+      "labels": [
+        "bug",
+        "documentation"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 837,
+      "title": "Resolve source-grain cluster disagreements without bypassing the signed audit",
+      "url": "https://github.com/ligon/LSMS_Library/issues/837",
+      "updatedAt": "2026-10-15T05:13:48Z",
+      "labels": [
+        "bug"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 833,
+      "title": "Resolve remaining raw/processed commodity folds after Malawi and Niger repairs",
+      "url": "https://github.com/ligon/LSMS_Library/issues/833",
+      "updatedAt": "2026-10-15T05:13:45Z",
+      "labels": [
+        "bug"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 830,
+      "title": "Extend monetary scale diagnostics beyond isolated neighbor jumps",
+      "url": "https://github.com/ligon/LSMS_Library/issues/830",
+      "updatedAt": "2026-10-15T17:03:17Z",
+      "labels": [
+        "enhancement",
+        "framework",
+        "diagnostics"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 828,
+      "title": "food_expenditures(basis='total') silently equals 'purchased' where a country records no in-kind value; should raise or warn like units= now does",
+      "url": "https://github.com/ligon/LSMS_Library/issues/828",
+      "updatedAt": "2026-10-18T05:52:23Z",
+      "labels": [
+        "enhancement",
+        "framework"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 827,
+      "title": "Malawi community_prices: u and NumberOfUnits jointly blank on 38,506 of 82,635 rows (46%) -- the price basis is unknown for half the yardstick",
+      "url": "https://github.com/ligon/LSMS_Library/issues/827",
+      "updatedAt": "2026-09-08T22:27:46Z",
+      "labels": [
+        "bug"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 824,
+      "title": "Complete sold-unit audits and use Unit_sold in farmgate consumers",
+      "url": "https://github.com/ligon/LSMS_Library/issues/824",
+      "updatedAt": "2026-10-15T17:03:15Z",
+      "labels": [
+        "bug",
+        "framework"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 823,
+      "title": "Niger 2018-19 ships an unwired cluster-grain community price file (s05_co_ner2018.dta, 504/504 grappes); data_scheme.yml says the wave has none -- twin of Mali #821, check the other six EHCVM countries",
+      "url": "https://github.com/ligon/LSMS_Library/issues/823",
+      "updatedAt": "2026-09-08T22:18:40Z",
+      "labels": [
+        "data-gap"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 822,
+      "title": "Mali community_prices reads only relev\u00e9 3 of 3: 40,237 of 156,060 readings used, 26,745 (t,v,j,u) rows lost; weight field is the per-kg basis, not NumberOfUnits",
+      "url": "https://github.com/ligon/LSMS_Library/issues/822",
+      "updatedAt": "2026-09-08T22:13:56Z",
+      "labels": [
+        "bug"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 821,
+      "title": "Mali 2018-19 ships a grappe-grain community price module (s05_co_mli2018.dta, 549/549 grappes) that community_prices never wires; data_scheme.yml wrongly says EHCVM waves have no grappe key",
+      "url": "https://github.com/ligon/LSMS_Library/issues/821",
+      "updatedAt": "2026-09-08T22:13:55Z",
+      "labels": [
+        "data-gap"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 820,
+      "title": "Ethiopia crop_production reads ESS \u00a711 (field crops) only; the \u00a712 tree/fruit/root module -- more sale records than \u00a711 -- is unwired",
+      "url": "https://github.com/ligon/LSMS_Library/issues/820",
+      "updatedAt": "2026-09-09T19:26:05Z",
+      "labels": [
+        "data-gap"
+      ],
+      "lane": "east"
+    },
+    {
+      "number": 816,
+      "title": "Burkina Faso coverage starts at 2014: the Enqu\u00eate Prioritaire series (1994, 1998) exists and is a different instrument",
+      "url": "https://github.com/ligon/LSMS_Library/issues/816",
+      "updatedAt": "2026-09-08T09:08:35Z",
+      "labels": [
+        "enhancement"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 812,
+      "title": "Investigate remaining EHCVM allocation and strata gaps after Guinea-Bissau/Togo documentation fixes",
+      "url": "https://github.com/ligon/LSMS_Library/issues/812",
+      "updatedAt": "2026-10-15T05:14:03Z",
+      "labels": [
+        "documentation"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 804,
+      "title": "Tajikistan 1999 household_roster: code 14 served as 'lodger' but the questionnaire prints 14 = Other (13 = Lodger never occurs); 13 people, needs the 1999 BID codebook",
+      "url": "https://github.com/ligon/LSMS_Library/issues/804",
+      "updatedAt": "2026-09-18T15:46:52Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 798,
+      "title": "Mali interview_date: rewrite the stale data_scheme.yml:69-73 comment (state the measured collapse loss) and refresh the coverage matrix",
+      "url": "https://github.com/ligon/LSMS_Library/issues/798",
+      "updatedAt": "2026-10-18T13:50:13Z",
+      "labels": [
+        "framework"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 794,
+      "title": "Finish Mali mojibake repair and decide strategy-B migration",
+      "url": "https://github.com/ligon/LSMS_Library/issues/794",
+      "updatedAt": "2026-10-15T05:13:37Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 792,
+      "title": "Document the remaining sample-design gaps after closing the handle leak",
+      "url": "https://github.com/ligon/LSMS_Library/issues/792",
+      "updatedAt": "2026-10-15T05:14:00Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 791,
+      "title": "Add UEMOA PHMECV as a source: 4 missing EHCVM 2021-22 waves + 8 ERI-ESI studies (access is human-reviewed)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/791",
+      "updatedAt": "2026-09-06T14:33:43Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 787,
+      "title": "labels=: resolve ambiguous Preferred Label targets, curate Aggregate variants, fix numeric-target examples",
+      "url": "https://github.com/ligon/LSMS_Library/issues/787",
+      "updatedAt": "2026-10-18T05:53:46Z",
+      "labels": [
+        "framework"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 778,
+      "title": "Tests that rebuild in the SHARED root under LSMS_NO_CACHE still open the #866 delete-then-rebuild window; assume_cache_fresh has an exists()-then-read race",
+      "url": "https://github.com/ligon/LSMS_Library/issues/778",
+      "updatedAt": "2026-10-21T05:09:40Z",
+      "labels": [
+        "framework"
+      ],
+      "lane": "east"
+    },
+    {
+      "number": 771,
+      "title": "Uganda/Ethiopia nutrition.py: Ethiopia has no FCT csv and hits the USDA API on EVERY build; both carry a literal API key; the silent fallback remains",
+      "url": "https://github.com/ligon/LSMS_Library/issues/771",
+      "updatedAt": "2026-10-15T00:42:51Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 740,
+      "title": "test_extraction_is_cluster_grain fails on any data-credentialed machine, and CI cannot see it",
+      "url": "https://github.com/ligon/LSMS_Library/issues/740",
+      "updatedAt": "2026-10-15T00:42:49Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 737,
+      "title": "DECISION: EthiopiaRHS TLU -- relabel the *lvs5 files to t='1989' and apply the library's tlu() (A), or serve IFPRI's scalar under TLU with a convention marker (B)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/737",
+      "updatedAt": "2026-10-15T00:42:47Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 709,
+      "title": "Docs: 1.7498e100 is Stata's pre-108 double missing code -- append the correction block to FINDINGS_threshold_rules.org",
+      "url": "https://github.com/ligon/LSMS_Library/issues/709",
+      "updatedAt": "2026-10-15T00:44:13Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 706,
+      "title": "CotedIvoire 1985-89: four unwired community-questionnaire files (COMM85-88.DAT), rural-only",
+      "url": "https://github.com/ligon/LSMS_Library/issues/706",
+      "updatedAt": "2026-08-22T17:02:16Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 702,
+      "title": "Afghanistan: `_/` config exists but declares no `Data Scheme:` \u2014 two waves of data unreachable",
+      "url": "https://github.com/ligon/LSMS_Library/issues/702",
+      "updatedAt": "2026-08-22T12:26:11Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 701,
+      "title": "Peru: wire ENNIV 1991 \u2014 the closest of the three unwired waves to a quick win",
+      "url": "https://github.com/ligon/LSMS_Library/issues/701",
+      "updatedAt": "2026-08-22T12:25:49Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 699,
+      "title": "Wire Peru 1990 tables after the XPORT reader repair",
+      "url": "https://github.com/ligon/LSMS_Library/issues/699",
+      "updatedAt": "2026-10-15T05:13:58Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 698,
+      "title": "DECISION: kinship -- extend the conflation rule to the Affinity slot alone ([G, D, null]) for 'X of head or spouse' / 'X or X-in-law' labels",
+      "url": "https://github.com/ligon/LSMS_Library/issues/698",
+      "updatedAt": "2026-10-19T20:56:25Z",
+      "labels": [
+        "framework"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 689,
+      "title": "Uganda: `cluster_features` is at PARISH grain from 2013-14 \u2014 coarser than the sampling cluster (EA)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/689",
+      "updatedAt": "2026-08-22T01:31:51Z",
+      "labels": [
+        "bug"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 660,
+      "title": "bug: Ethiopia \u2014 120 / 40 households appear in the agriculture files but not the cover page",
+      "url": "https://github.com/ligon/LSMS_Library/issues/660",
+      "updatedAt": "2026-07-22T04:48:56Z",
+      "labels": [
+        "bug"
+      ],
+      "lane": "east"
+    },
+    {
+      "number": 650,
+      "title": "Documentation/ should not be optional: 3 waves carry only a provenance stub, and add_wave() never fetches the real thing",
+      "url": "https://github.com/ligon/LSMS_Library/issues/650",
+      "updatedAt": "2026-10-15T17:02:50Z",
+      "labels": [
+        "bug",
+        "framework"
+      ],
+      "lane": "east"
+    },
+    {
+      "number": 647,
+      "title": "question: Uganda 2019-20 crop_production silently drops the PART-harvest columns (s5aq06*_11/_21)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/647",
+      "updatedAt": "2026-07-21T21:56:28Z",
+      "labels": [
+        "bug"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 637,
+      "title": "Complete the remaining first/last aggregation key-soundness audit after the merged reviews",
+      "url": "https://github.com/ligon/LSMS_Library/issues/637",
+      "updatedAt": "2026-10-15T17:02:37Z",
+      "labels": [
+        "bug",
+        "framework"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 592,
+      "title": "cluster_features: 18 waves across 6 countries have zero GPS (Latitude/Longitude) \u2014 will be hidden by the wave-slice grader fix",
+      "url": "https://github.com/ligon/LSMS_Library/issues/592",
+      "updatedAt": "2026-07-12T13:32:14Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 587,
+      "title": "Triage 39 'dropped' (country\u00d7feature\u00d7wave) cells surfaced by the coverage matrix",
+      "url": "https://github.com/ligon/LSMS_Library/issues/587",
+      "updatedAt": "2026-07-12T16:55:48Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 567,
+      "title": "India housing: decode numeric Roof/Floor codes (1-5) then harmonize (split from #170)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/567",
+      "updatedAt": "2026-06-20T17:46:26Z",
+      "labels": [
+        "enhancement"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 562,
+      "title": "GhanaLSS Phase 3: community_prices feature + inverse price->quantity imputation (split from #109)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/562",
+      "updatedAt": "2026-06-20T16:13:25Z",
+      "labels": [
+        "enhancement"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 560,
+      "title": "Cambodia nutrition: obtain + wire the Food Conversion Table (SMILING/ASEANFOODS) \u2014 split from #108",
+      "url": "https://github.com/ligon/LSMS_Library/issues/560",
+      "updatedAt": "2026-06-20T15:43:26Z",
+      "labels": [
+        "enhancement",
+        "data-gap"
+      ],
+      "lane": "east"
+    },
+    {
+      "number": 552,
+      "title": "WB microdata coverage gaps (June 2026 audit): EHCVM-2 \u00d74 + classic-LSMS, tiered by obtainability \u2014 post-0.8.0",
+      "url": "https://github.com/ligon/LSMS_Library/issues/552",
+      "updatedAt": "2026-07-12T16:56:13Z",
+      "labels": [
+        "enhancement",
+        "data-gap"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 468,
+      "title": "EthiopiaRHS crop_production: wire deferred 1999 (R5) wave (packed-hhid keyspace)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/468",
+      "updatedAt": "2026-06-16T02:29:16Z",
+      "labels": [
+        "enhancement"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 458,
+      "title": "EthiopiaRHS plot_features: extend to R2\u2013R4 (follow-up to #278)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/458",
+      "updatedAt": "2026-06-15T20:45:41Z",
+      "labels": [],
+      "lane": "east"
+    },
+    {
+      "number": 450,
+      "title": "Expose the LSMS-ISA harmonised dataset (geovariables/weather) as a feature via the household-id bridge",
+      "url": "https://github.com/ligon/LSMS_Library/issues/450",
+      "updatedAt": "2026-06-14T23:01:14Z",
+      "labels": [],
+      "lane": "west"
+    },
+    {
+      "number": 449,
+      "title": "Pull WB geovariables (weather/distance/soil) for older Tanzania NPS waves (W1\u2013W3)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/449",
+      "updatedAt": "2026-06-14T22:08:15Z",
+      "labels": [],
+      "lane": "panel"
+    },
+    {
+      "number": 439,
+      "title": "Exploit LSMS+ individual/intra-household (male vs female) disaggregation \u2014 new feature direction",
+      "url": "https://github.com/ligon/LSMS_Library/issues/439",
+      "updatedAt": "2026-10-15T17:03:20Z",
+      "labels": [
+        "enhancement",
+        "framework"
+      ],
+      "lane": "east"
+    },
+    {
+      "number": 438,
+      "title": "Extend the WB-parity item-feature stack to non-ISA countries (where survey modules permit)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/438",
+      "updatedAt": "2026-09-09T19:26:12Z",
+      "labels": [
+        "enhancement"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 381,
+      "title": "food-derivation: noisy 'No rule to make target \u2026food_acquired.parquet' for YAML-path / no-data countries",
+      "url": "https://github.com/ligon/LSMS_Library/issues/381",
+      "updatedAt": "2026-10-15T17:03:06Z",
+      "labels": [
+        "enhancement",
+        "framework"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 279,
+      "title": "Feature: bespoke label schemes without modifying the package tree",
+      "url": "https://github.com/ligon/LSMS_Library/issues/279",
+      "updatedAt": "2026-10-15T17:03:19Z",
+      "labels": [
+        "framework"
+      ],
+      "lane": "panel"
+    },
+    {
+      "number": 226,
+      "title": "feat: principled auto-aggregation script for harmonize_food's Aggregate Label column",
+      "url": "https://github.com/ligon/LSMS_Library/issues/226",
+      "updatedAt": "2026-05-07T05:10:49Z",
+      "labels": [
+        "enhancement"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 218,
+      "title": "Remove remaining references to the retired food_prices_quantities_and_expenditures family (Togo/CotedIvoire/Afghanistan Makefiles, Malawi registrations)",
+      "url": "https://github.com/ligon/LSMS_Library/issues/218",
+      "updatedAt": "2026-10-18T04:34:39Z",
+      "labels": [
+        "enhancement",
+        "framework"
+      ],
+      "lane": "west"
+    },
+    {
+      "number": 140,
+      "title": "[umbrella] Rebuild GhanaSPS: registration, data refresh, feature gap",
+      "url": "https://github.com/ligon/LSMS_Library/issues/140",
+      "updatedAt": "2026-09-04T16:24:07Z",
+      "labels": [],
+      "lane": "east"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "recorded_at_UTC": "2026-10-22T06:04:04.198654+00:00",
+  "status": "FROZEN_INDEPENDENT_SYNTHETIC_ONLY_PROOF",
+  "entries": 6,
+  "manifest": "FROZEN-MANIFEST.json",
+  "manifest_sha256": "b7b0c74292e4f27e0a04143a1ce34543f4902540b6d7b004bcdab0fd7c5e1dae",
+  "safe_exports": [
+    "independent-synthetic.py",
+    "ROOT-SYNTHETIC-PROOF.json"
+  ],
+  "actual_country_product_mismatch": false,
+  "data_API_or_old_test_replay": 0,
+  "old_evidence_changes": false,
+  "owner_only": true,
+  "signed": "Sue"
+}

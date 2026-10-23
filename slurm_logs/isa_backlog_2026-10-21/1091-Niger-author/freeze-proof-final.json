@@ -1,0 +1,53 @@
+{
+  "status": "FROZEN_AUTHOR_READY_PENDING_INDEPENDENT_REVIEW",
+  "source_head": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+  "source_root": "/local/job40255479/worktrees/isa-Niger-1091-fix",
+  "clean": true,
+  "runtime_test_snapshot": "6be6576607f1862b603d123acfb74ace4026fd3f",
+  "complete_package_and_tests_Git_trees_identical_to_first_freeze": true,
+  "tests_Git_tree_identical_to_runtime_snapshot": true,
+  "runtime_snapshot_package_tests_diff_is_CONTENTS_only": [
+    "lsms_library/countries/Niger/_/CONTENTS.org"
+  ],
+  "first_to_final_source_changes": [
+    ".coder/ledger/1091-niger-community-builder.md",
+    "slurm_logs/isa_backlog_2026-10-21/Niger/1091/DRAFT-PR.md",
+    "slurm_logs/isa_backlog_2026-10-21/Niger/1091/DRAFT-RESIDUAL.md",
+    "slurm_logs/isa_backlog_2026-10-21/Niger/1091/INDEPENDENT-REVIEW.md",
+    "slurm_logs/isa_backlog_2026-10-21/Niger/1091/REPORT.org",
+    "slurm_logs/isa_backlog_2026-10-21/Niger/1091/proof.json",
+    "slurm_logs/isa_backlog_2026-10-21/Niger/1091/validation.json"
+  ],
+  "shared_mirror_published_head_exact": true,
+  "first_freeze_full_tracked_bytes_modes_and_source_reference_proof": "attempt1-freeze-private/freeze-proof.json",
+  "first_freeze_proof_SHA256": "b0ec1d0782242dea757e20158e5777bab96eb5f3a4c099291f3064dd5c35433b",
+  "first_freeze_manifest_SHA256": "11e775f9ea8c670d9d881e6972f385b28e865cd95c0d5c04d9ac937d9ff364b9",
+  "first_freeze_source_counts": {
+    "held_sources": 11,
+    "sidecars": 11,
+    "physical_copies": 44
+  },
+  "first_freeze_original_Niger_690_manifest_and_14885_tracked_files_exact": true,
+  "original_auxiliary_delta_unidentified": true,
+  "packaging_qualification": "Private detailed aggregate was replaced by safe export before first manifest. Final original size/SHA unavailable. Replacement and both freezes retained; separate reconstruction is not original bytes.",
+  "replacement_safe_validation_SHA256": "dc9c20ef67545902a4b0f71edbe4059d520492bc37543d59166746b566b2856e",
+  "reconstruction": "validation-reconstructed-private.json",
+  "reconstruction_SHA256": "fea136bef530a8a03803bed17d282fe4d77772773b2e302294ad7c9dd1144670",
+  "no_API_source_reads_or_test_repeats_for_recovery": true,
+  "source_byte_hash_receipts_reused_without_reread": true,
+  "safe_export_allowlist": [
+    "safe-exports/REPORT.org",
+    "safe-exports/validation.json",
+    "safe-exports/proof.json",
+    "safe-exports/REPRODUCE.sh",
+    "safe-exports/DRAFT-RESIDUAL.md",
+    "safe-exports/DRAFT-PR.md",
+    "safe-exports/INDEPENDENT-REVIEW.md",
+    "freeze-proof-final.json",
+    "packaging-change-inventory-safe.json",
+    "READY.json"
+  ],
+  "zero_consumers_excluding_final_receipt_writer": true,
+  "no_final_PASS": true,
+  "signed": "Sue (GPT-6)"
+}

@@ -1,0 +1,166 @@
+#+TITLE: Independent Burkina Faso GH1119 review
+#+AUTHOR: Sue (GPT-6)
+
+* Verdict and exact boundary
+PASS for candidate =3dc9d28510dd783c648413987011832669f8bcf7= against actual reviewed1123 parent =cfd0782766068da6dc7e7605334e957f988a4ab1=.
+I did not author this1119 implementation.
+The accepted1123 authority/grain remains in force; this review tests the different author's two-cell vocabulary increment independently.
+No product correction is required within that boundary.
+This is a partial GH1119 review, not issue closure or publication permission.
+
+Exactly two production Preferred Label cells change: Semences de maïs maps from Maïs en grain to Maïs; Semences de haricots/niébé maps from Niébé/Haricots secs to Niébé.
+Accents are the exact curated/source vocabulary.
+All original keys, other table cells/comments, harmonize_food, scripts/helpers,1123 uniqueness guard, data schemes, IDs, eligibility, units, measurements and reducers remain exact.
+The old identity test changes exactly two corresponding CROP_BY_CODE values, without removing an assertion.
+Nine new cases test the actual Org parser, production pure resolvers, crop vocabulary, actual-slot injectivity and unaffected cells/markers.
+Only the two test paths change; the full increment has ten tracked paths including ledger/docs/safe evidence.
+Final tests tree and all non-CONTENTS library blobs/modes are exactly tested runtime =c5134f57f76bc53e84df6c3398ffc9a3781e9e1c=.
+Ledger-first =0e9f1f696153562b62d3a3d2d389e309b96c9238= is recorded by the author's frozen ledger/commit history.
+No Git/ref/GitHub/source edits were made by this reviewer.
+
+* Country grounding, inherited policy and contradictions
+I read the complete current1486-line Burkina_Faso CONTENTS FIRST after the full brief/metadata receipt, including all TODO/WAITING/LOGBOOK/history and the1119 append.
+SHA256 is =7ee964c7489ebfd26b1b9b4f81c8d230e09334d0b94d93d123fb195bb2397d28=.
+Three live TODOs are food_items.org, nutrition and Makefile; no extra WAITING/LOGBOOK body is hidden.
+Applicable guidance/standing/backlog/cross-country/audit bytes match the previously fully read accepted checkout; task1119 and1123 ledgers and complete1123 independent review were read.
+
+The2018 input roster is HOUSEHOLD x native input slot, with no parcel axis.
+Use injective ehcvm_i (grappe + literal zero + two-digit-padded menage), rather than the older formatter; vague is a sample split, not a repeated input observation.
+EMC2014 has four independent food recalls and quantities only in passage1, with passage identity in filenames.
+EHCVM2021-22 is a half-panel restricted to original EAs with distinct cross-sectional/panel weights.
+The qualified code21 token remains on602 records; it is an identity fallback, not evidence of physical crop meaning.
+Legacy input=Seed remains unverified under1187.
+Purchased/Quantity_purchased preserve existing gift/donation bindings; their column names do not certify purchase semantics, separately owned by1188.
+
+Contradictions remain findings, not stale-document assumptions.
+CONTENTS:507--509 quotes "10,224 households", "6,961 households" and "3,218 households"; current fresh sample outputs are10411/7010/3227 (20648 total), clusters900/585/550.
+CONTENTS:212--220 splits the ZD sample, whereas :229--231 quotes the English "divided each enumeration area into two equal groups"; this label repair changes no sampling interpretation.
+The old harmonize_input comment calls21 "the 'Autres semences' code -> Seed", while the dated1123 note and held dictionary bind20 to Autres semences and leave21 unlabelled.
+Existing plot_inputs comments call q05/q07a purchased fields; CONTENTS:1442 quotes q05 asking "sous forme de cadeau ou de don", and :1445--1450 distinguishes q08/q09a actual purchase fields and their own unit.
+No field/unit rerouting follows here.
+The old plot_features "no decimal-degree parcel GPS" statement also has its dated2021 correction in this file; this review does not reopen GPS work or use coordinates.
+
+Complete Benin676-line and Togo751-line CONTENTS were read before comparator analysis.
+Benin has one configured2018-19 wave and its duplicate directory/SOURCE.org promotion trap, seasonal halves and known native-slot uniqueness guard.
+Its one-vague-per-grappe convention conflicts with the DDI's within-EA split wording, explicitly documented as such.
+Togo uses2018/Data1 agriculture sources, not the legacy Data extracts, and the declared seed-slot uniqueness guard; its source says Lome Commune "all respondents are from rural areas" while the notes flag the urban/rural tension.
+No comparator design, source or mapping is changed.
+
+* Prebuild census and held-source gates
+Fresh separate exact-source processes enumerate549 API hashes,39 framework fingerprints and12 relevant BF Wave hashes BEFORE any review source build.
+Exactly24 BF API hashes move,525 other API hashes and all39 framework fingerprints are exact; all12 scoped wave hashes move.
+This new prebuild wave proof does not retroactively repair the author's omitted prebuild wave census: theirs remains post-build, with the original wrong Country.wave accessor stop preserved.
+Whole-country Org hashing explains the footprint; only sample, cluster_features, plot_inputs and crop_production are rebuilt, not the other20 BF outputs.
+
+Nine declared held source files and nine sidecars pass terminal physical MD5/raw SHA/declared size/mode/mtime/distinct inode/nlink1/nonsymlink gates BEFORE decoding/pickles/dependent APIs.
+Both L1 layouts are staged in four independent default/Make roots; the oracle has separate held copies of the two agricultural modules.
+All143 initial physical copies remain exact at final verification.
+No BF L2 was seeded in any cold root.
+All source reads use sanctioned get_dataframe/get_data_file resolution; no acquisition, DVC CLI, shared-cache write/clear/promotion, manual stamp, assumed-fresh/read-gate bypass or in-tree payload occurs.
+
+Twelve held Benin/Togo L2 files per root are physically copied from the frozen author's manifest-pinned current caches.
+The six country files have actual expected hashes and complete requested one-wave coverage before copy; YAML companions have current hashes and native script companions are truthfully hashless with pinned provenance.
+Default healthy Country/Feature reads are current/full-coverage L2 proof, not comparator source-cold reconstruction.
+Static country.py:5268 shows a Make descent evicts hashless waves and would request unheld comparator raw sources.
+Root explicitly bounded Make to BF Country/seed/subsets/BF-only Features on the nine held sources; no Make-pooled or comparator Make/source-cold call was attempted or claimed.
+
+* Independent source oracle and actual grain
+The held numeric/labelled input source has22877 applied rows, nonnull and unique on native grappe/menage/s16bq01.
+It supplies2274 maize and2156 cowpea seed observations; code21 is unlabelled on602.
+The native crop source has15593 rows with2671 Maïs and2898 Niébé records; neither old seed target occurs in that vocabulary.
+The new mapping is injective over the actual eleven present seed slots; unused spelling aliases are not falsely claimed injective.
+
+The complete native expected frames are projected independently from source fields/explicit native-code identities, existing ID convention and actual local Org BUILD dictionaries, without candidate extraction/finalizer helpers as the expected-row generator.
+The first expected native unit vector incorrectly used Country's read-time dictionary and failed strictly on16196 u values; all other axes and numeric/boolean payload were exact.
+That failed expectation and its exact operands remain immutable.
+Unique v2 expected artifacts use only saved numeric/labelled source frames and independently checked local Org parser/Original Label/q03b field binding, never candidate output values or ad hoc unit normalization.
+No source/API replay was used to reconstruct them.
+Existing generic writer controls establish the serialized-native layer; memory/native/public/CLI layers remain separate.
+Eight complete native source-oracle comparisons now pass across both heads/backends, including every input payload and all15593 native crop rows.
+
+Every22877 public input line survives, including all602 qualified unknowns; exactly4430 crop label values change (2274/2156), all other keys, multiplicities, order, dtypes, masks and full typed attrs exact.
+Native crop15593/public crop15587 is the unchanged preexisting six-row distinction, not repaired or hidden.
+At actual household (t,i,crop) existence grain, matches improve maize0 ->2251/2274 and cowpea0 ->2097/2156.
+The remaining23/59 have no corresponding crop row; no harvest or parcel assignment is fabricated.
+Existing seed_kg remains exactly4229 rows on (t,i), not crop-parcel allocation or a newly crop-specific API.
+
+* Normal API, Feature, warm, CLI and tests
+Both heads run normal physically cold default and Make BF builds, followed by separate-process warm/new-Country/subset controls.
+All-wave/2018 supported input/crop frames and unsupported2014/2021 zero-row frames are captured at their actual backend/coverage representations.
+No universal equality between factory empties and covered-cache slices is imposed.
+Sample20648, clusters2035, input22877, public crop15587 and household seed_kg4229 remain exact across heads.
+All raw country and available native wave support frames are compared completely.
+
+Default fresh warm/new-object calls leave every data-root byte/mode/nanosecond mtime exact.
+Each Make warm end state changes only the two native2018 input/crop parquets' mtimes, preserving complete bytes/modes; per-call endpoints account ordinary repeated script rewrites.
+No BF country parquet is created by Make.
+All before/after added/modified/deleted endpoints are saved BEFORE assertions.
+The first candidate warm sample succeeded and saved all endpoints, then the harness omitted a required comparator label argument.
+Its exact saved frame/zero-write receipts were checked artifact-only; remaining warm calls resumed without replaying that prefix, with planned new-object controls still executed.
+This split warm handling is explicit, not relabelled as an uninterrupted first attempt.
+
+Healthy default Benin10605/Togo13730 full Country frames/attrs/cache receipts stay exact.
+Pooled default and explicit currency=None Features each contain47212 rows, with their actual argument/currency provenance retained.
+BF-only Make Features contain22877.
+Complete counterfactual Feature assembly changes only BF labels and uses existing canonical alignment/sentinels plus matched parent's currency axis.
+Shared unused j-level vocabulary necessarily changes with BF; healthy Country payloads stay exact and full assembled axes/unused levels/codes/attrs match the complete expected frames.
+No global label substitution that renames healthy observations is accepted.
+
+The strict checker reads195 saved pickle inputs and completes184 pair checks:63 cross-head unchanged,25 two-label-only,72 fresh warm/new-object,8 source-native,8 argument-matched Feature and8 Feature warm.
+Seven meaningful comparator mutations are rejected.
+All values use explicit check_exact=True, rtol=atol=0; full index/column classes, unused levels, codes, sort order, dtypes, masks/order and recursively TYPED full attrs, including immutable _FIELDS presence/values, remain checked.
+No pandas default float tolerance, attr stripping, frame normalization or pickle-byte substitute for logical attrs is used.
+
+Four actual supported2018 CLI cases cover both heads/backends.
+Prewrite APIs compare at API stage; actual artifacts compare at artifact stage to the unchanged generic writer, with complete full-attrs frame, Arrow footer/schema and byte equality.
+Strict API-versus-artifact differences are preserved for all four; serialization is not misreported as API type identity.
+No unsupported CLI or all-command coverage claim is made.
+
+Candidate focused pytest reports131 PASS/0 FAIL/ERROR/SKIP with two explicit loadfile workers.
+Identical nine new actual-parent cases give5 meaningful FAIL/4 PASS/0 ERROR/SKIP: two Org target, two real resolver agreement and one complete mapping expectation failures, no fixture errors.
+Two credential-marked source tests remain explicitly deselected; their complete unchanged assertion bodies pass directly on held normal API twice per head, not presented as normal credential-free pytest passes.
+Official strict API audit and diff checks pass; no full suite was run.
+
+All76 complete paired warning category/message multisets are collectively asserted true across152 captured files.
+Only exact checkout/data path prefixes may be substituted; originals remain literal/private.
+Capture records count48 NullReadWarning,16 UserWarning,12 GrainCollapseWarning,20 QuantityImplausibleWarning and20 NullIndexKeyWarning occurrences over repeated calls; those are occurrence counts, not unique findings.
+Separate standard-log grouping records two NutrientCoverageWarning headers, not unique event counts.
+The unmodified phase1/2 scanner has six WARN records per head: three index_levels_match_scheme and three runtime_warning, zero FAIL/ERROR/SKIP.
+Complete occurrence multisets match with the explicit prefix rule; in this independent run the original JSONL bytes also happen to match exactly and are checked.
+The author only proved path-normalized records; this does not retroactively strengthen their literal-byte claim.
+There is no plot_inputs phase2 kwargs grid; none is invented.
+Scanner data-root receipts have zero changes.
+
+* Strict stops and evidence handling
+All author originals remain immutable, including first Feature expectation lacking default currency and the wrong-accessor/post-build wave census stop.
+No author APIs were replayed to erase either; all594 author manifest payloads plus READY/control receipts are rehashed exactly.
+
+Reviewer stops remain under uniquely named stops/ directories:
+- Preparation assumed a path-keyed manifest; actual author594 is a list of relative_path records. TypeError occurred before copying/decoding/APIs. Original script/log/diagnostic/trace/snapshots remain.
+- An inline metadata-only follow-up repeated a .values assumption and emitted an AttributeError source traceback to tool output. It contained no raw data/IDs. This is recorded as a diagnostic-handling error, not retrospectively described as wrapper-controlled. Subsequent nontrivial diagnostics use the aggregate wrapper.
+- Warm's missing comparator label and synthetic negative control's missing level=0 argument are harness setup stops, retained without product/strict-check weakening or API prefix replay.
+- The16196-unit native/read-time oracle expectation mismatch is retained; only uniquely named source-artifact projection v2 uses the correct build dictionary, without changing any returned/stored native frame.
+- The first footer census compared baseline wave files to a candidate-interpreter hash. All twelve emitted stamped-wave footers per side match their own saved prebuild inventories; only that private expected-source lookup was corrected, with metadata-only evidence and no stamp/build/API replay.
+
+The disclosed metadata-only inline AttributeError is the sole emitted traceback; all source/data/comparison failure traces, IDs and full frames/logs stay private.
+No raw failure-log search or print was used to diagnose these stops.
+Safe aggregate/source inspections outside the launcher are not retroactively claimed socket-guarded; preparation/decode/pickle/API/pytest/checker stages assert exact identity under active guards and unshare-rn.
+All numerical/build/Make threads are1, maximum2 explicit loadfile workers.
+
+* Preservation, residuals and release
+Final verification preserves29779 tracked source-file endpoints across candidate/base: bytes, Git blobs/modes, filesystem modes/mtime/inodes, HEAD and clean tracked status exact; no in-tree parquet exists.
+All143 initial physical copies/nine held sources+sidecars and594 author payloads remain exact.
+Nine older explicit control/source receipts actually read are exact, including1123 review/proof and frozen19 reused comparator/diagnostic sources plus manifest/READY; older acceptance chains are pinned rather than claiming a fresh unbounded rehash of every old root.
+Final data contains88 parquets:40 current stamped YAML waves,16 truthfully hashless native script companions and32 current/full-coverage country caches.
+There are102 private parquets total, including six original/v2 generic writer oracles and eight CLI/control artifacts; no blanket zero-private-parquet claim.
+The guard records48 handled existing-directory probes, zero unexpected write denials and zero guarded outbound IP attempts.
+Only the two exact prepared ignored DVC metadata paths resolving under this private root are checkout write exceptions.
+
+GH1119 remains partial: Senegal, Guinea-Bissau and shared farm-level/not-crop-specific/missing marker decisions are separate;1187/1188 and absent-wave builders remain separate.
+Root's02:48 live scope receipt is pinned, not claimed to be a new live GitHub query at release; parent/issue reconciliation and publication/merge/closure remain dispatcher-owned.
+A useful future methods note is to distinguish actual local Org BUILD mappings from query-time Country categorical mappings when constructing source oracles; native/public measurement layers must be compared separately.
+No country note is edited by the reviewer.
+Dedicated safe-exports never overwrite private evidence basenames.
+Actual checker/launcher pins, complete payload manifest and terminal zero-consumer FINAL-READY establish the freeze; this pre-seal report alone is not release.
+
+Sue

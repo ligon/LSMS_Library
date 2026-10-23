@@ -1,0 +1,25 @@
+{
+  "recorded_at_UTC": "2026-10-22T05:50:52.380154+00:00",
+  "rows": [
+    {
+      "label": "candidate",
+      "checkout": "/local/job40255479/worktrees/isa-1149-acquisition",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "ignored_link": "/local/job40255479/worktrees/isa-1149-acquisition/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/candidate-dvc-tmp"
+    },
+    {
+      "label": "base",
+      "checkout": "/local/job40255479/worktrees/isa-1149-acquisition-base",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "ignored_link": "/local/job40255479/worktrees/isa-1149-acquisition-base/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/framework1149-fix/base-dvc-tmp"
+    }
+  ],
+  "stage": "PREPARED_UNASSIGNED",
+  "tests_builds": 0,
+  "data_API_calls": 0,
+  "actual_acquisition_authorized": false,
+  "approved_ruling": "GH1149 OptionC 2026-10-20",
+  "signed": "Sue"
+}

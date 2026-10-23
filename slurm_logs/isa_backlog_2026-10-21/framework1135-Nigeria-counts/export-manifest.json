@@ -1,0 +1,43 @@
+{
+  "exported_at": "2026-10-21T23:04:17.924158+00:00",
+  "source_root": "/local/job40255479/control/isa-backlog-20261021/framework1135-Nigeria-counts",
+  "files": [
+    {
+      "name": "DIAGNOSIS.md",
+      "bytes": 13476,
+      "sha256": "10da2008312d7846fe4d2ac80a71097e460f59f8b81cbfa2bc7a9fad6b379c6e"
+    },
+    {
+      "name": "PROPOSAL.md",
+      "bytes": 7821,
+      "sha256": "c4e51d79e5a34d8ba7e7f61923442a08197fd76b656715585f60c0a0947f95d5"
+    },
+    {
+      "name": "validation.json",
+      "bytes": 12570,
+      "sha256": "5052c196e6cbf12e875e64f4105b27d62fe43b87f9cc1e9dd0284a90cb99de3d"
+    },
+    {
+      "name": "ledger-DRAFT.md",
+      "bytes": 4717,
+      "sha256": "dcda085cd4a58ddd18bc08dec472e2fbe7eb079bec98ee0eec02a4f9d1839d29"
+    },
+    {
+      "name": "REPRODUCE.md",
+      "bytes": 2600,
+      "sha256": "d4ed392ae7edea000fd7f9de7bc0d1d846d19f1a2ed831fa4696c77037d924c7"
+    },
+    {
+      "name": "freeze-proof.json",
+      "bytes": 865,
+      "sha256": "50aae2799725189c49c352890e4a307d2ab26257b39d67898a2d449adef5958a"
+    },
+    {
+      "name": "counts-safe.json",
+      "bytes": 5426,
+      "sha256": "5dc2b1a6300f175c65d31a3f03cbf55be31e2351764590e3de801e6acc69c213"
+    }
+  ],
+  "all_exported_bytes_source_exact": true,
+  "raw_pairs_IDs_full_frames_raw_warnings_logs_excluded": true
+}

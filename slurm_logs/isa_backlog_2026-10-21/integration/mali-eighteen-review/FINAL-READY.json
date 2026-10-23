@@ -1,0 +1,56 @@
+{
+  "status": "FINAL_READY_FROZEN",
+  "candidate": "f9feb3c807aff5206134c37768992302ceb431fa",
+  "baseline": "7ecf8e95fef567554fe93870ba95abddd1955a86",
+  "verdict": "PASS",
+  "manifest": "/local/job40255479/control/isa-backlog-20261021/integration/mali-eighteen-review/private-final-manifest.json",
+  "manifest_entries": 1885,
+  "manifest_SHA256": "2406d10a2c013a08df6da2336a2fdc2643213e88981c3f1b2167c6f87284ea02",
+  "exact_relative_path_exclusions": [
+    "FINAL-READY.json",
+    "final-seal-proof.json",
+    "final-seal2-error-private.txt",
+    "final-seal2-error-safe.json",
+    "final-seal2-launch-private.log",
+    "private-final-manifest.json",
+    "seal-package-launch-private.log",
+    "seal-package-package-diagnostic-safe.json"
+  ],
+  "safe_export_allowlist": [
+    "safe-exports/REVIEW.org",
+    "safe-exports/verdict.json",
+    "safe-exports/proof.json",
+    "safe-exports/REPRODUCE.md",
+    "safe-exports/checker-sources.json"
+  ],
+  "final_seal_completed": true,
+  "zero_other_consumers_at_package": true,
+  "signer": "Sue",
+  "zero_consumers_at_final_seal": true,
+  "excluded_control_receipts": {
+    "final-seal-proof.json": {
+      "sha256": "3451105178504a45eff7a06d05cef4b5df89d73f53db97be392a233fdc7a0063",
+      "bytes": 618,
+      "mode": 420,
+      "mtime_ns": 1792635981877057132
+    },
+    "final-seal2-launch-private.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 420,
+      "mtime_ns": 1792635968207984613
+    },
+    "seal-package-launch-private.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 420,
+      "mtime_ns": 1792635928143772767
+    },
+    "seal-package-package-diagnostic-safe.json": {
+      "sha256": "5fc2ee6f7f8891449f0de68e0fdf49a73965359878e3ab8f44a25bf5ae319b66",
+      "bytes": 21,
+      "mode": 420,
+      "mtime_ns": 1792635938228825919
+    }
+  }
+}

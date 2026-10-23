@@ -1,0 +1,131 @@
+#+title: Independent review -- Mali GH #822
+#+author: Sue
+#+date: 2026-10-21
+
+* Verdict
+
+PASS; no blocking findings.
+The full source/runtime review is pinned to frozen =23d338e50b60e6a36982ba56e997c82b17f8e3e8= in =/local/job40255479/worktrees/isa-review-822=, against =f8d236694c26fe9e709c5548f02c70f74ea72c33= in the separate baseline checkout.
+I did not author this patch, edit either tree, change refs, write GitHub, acquire data, or mutate shared caches.
+The reviewed descendant =aba2badfe2f701a8b3793f1243fd8ed4fce18a53= changes only one trailing space in the ledger heading; every other Git-tree entry, including all runtime and tests, is identical to the fully reviewed commit.
+The descendant's full =git diff --check= against baseline is clean.
+No runtime or tests were repeated for this whitespace-only descendant.
+
+* Grounding and source authority
+
+Mali =_/CONTENTS.org= was read first and in full, including its TODO declaration and any task/log sections; it has no active TODO/WAITING/LOGBOOK entries.
+Relevant idiosyncrasies are the KG lot-weight definition, per-lot Price, the variety CODE because passage descriptions differ in quote characters, distinct passage visits, and the native-cluster =i==v= compatibility shim.
+The approved design and per-task ledger preserve existing item/unit/positive-price eligibility, unresolved-unit exclusions, the reading-3 frame, and the separate 2018 module/labor scopes.
+
+The standing document says =community_prices.Quantity= is a "WEIGHT IN KG, not a count of units".
+Held Stata metadata independently confirms all six Unit/Poids/Prix triples and the missing passage-2 q03/q06 dictionaries.
+All three passage-1 dictionaries and passage-2 q09 have the exact same community codebook, including code 99 Manquant; the runtime literal dictionary equals that held metadata exactly.
+The lot-weight-in-KG instrument definition is inherited from the standing questionnaire record, not newly confirmed by opening an unheld PDF.
+No food-code dictionary or fractional truncation is used in the new decoding.
+
+An inherited contradiction remains documented under the separate 2018 scope: the scheme's claim that EHCVM prices are "only at the region x milieu IHPC grain" conflicts with CONTENTS' recorded =s05_co_mli2018.dta= cluster module.
+That is the acknowledged GH #821 gap, not authority to change this patch's scope.
+No new contradiction against the approved 2014 price/weight/slot contract was found.
+
+* Independent source and API accounting
+
+The oracle was assembled directly from numeric raw source columns, held Stata metadata dictionaries, and unchanged Org label curation.
+It never invokes the candidate reshape or =community_prices_finalize= to define expected rows.
+Both raw blobs were MD5-verified, physically copied into separate private L1 roots, and read only through sanctioned readers.
+Network namespaces disabled outbound access for the actual builds and descendants; additional in-process guards recorded zero connection attempts.
+Package/config realpaths, exact frozen heads and private data roots were asserted.
+BLAS/OMP/MKL and library build workers were pinned to one.
+
+| Reading | Passage 1 | Passage 2 | Eligible |
+|---------+-----------+-----------+----------|
+|       1 |     28672 |     38027 |    66699 |
+|       2 |     20636 |     28378 |    49014 |
+|       3 |     16851 |     23367 |    40218 |
+|   Total |     66159 |     89772 |   155931 |
+
+The actual initially cold candidate Country build equals the independent full-source expectation exactly, including all index/column dtypes.
+Its fresh-process warm frame equals the cold frame exactly, and warm reading changes no private parquet bytes.
+The actual baseline cold/warm frames are likewise exact.
+Candidate =obs=3= equals the entire original 40218-row public frame, including values, missingness, index and column dtypes.
+The full source-position reading-3 keep/drop masks are identical: 40218 kept and 105089 dropped slots, including all 19 positive-price unresolved-unit exclusions.
+All 23646 original base cells survive; the new coverage is 39245 base cells, with 115713 additional reading-1/2 rows.
+The 155931 full native keys are unique and non-null.
+
+All 129 positive-price unresolved-unit entries remain excluded: 49 code 99, 19 code 0, 58 other integers, and 3 fractional values.
+Their weights partition into 79 positive nonsentinel, 22 zero, 15 sentinel-999 and 13 missing values.
+Neither positivity nor those weight masks adjudicate an unresolved unit as valid.
+The existing 999/9999 quantity treatment is unchanged; the private census records the other exact all-nines candidate counts without interpreting or cleaning them.
+
+* Tests, public assembly and cache scope
+
+The scoped actual-script/declaration/assembly/public Country/Feature selection passes 33 cases with zero skips.
+The six real Mali built controls pass with zero skips.
+The exact frozen baseline counterfactual fails 20 of the 21 new tests; the existing duplicate-key rejection remains the one pass.
+This includes a failing baseline public native-index check, so success does not depend only on a mocked source harness.
+Deliberate duplicate full keys fail, equal quotes in separate obs slots survive, and invalid native obs values are rejected.
+The new exact/unlisted/fractional-code controls exercise the actual wave script.
+
+Shared test edits are limited to Mali's new native obs declaration, independently reconciled row/cell counts, and counting distinct tomato-paste varieties after slot expansion.
+The latter preserves the original variety assertion's meaning and is stronger than relying on a row count when each variety has several readings.
+Niger controls are unchanged; no source fixture, golden, dependency, framework or unrelated country change is present.
+
+A current-hash/full-wave Niger release-seed comparator was physically copied to each private data root.
+Its bytes remain unchanged, and its public baseline/candidate frames compare exactly.
+Combined Feature output has 86261 baseline rows and 201974 candidate rows, unique keys, and exact country-frame conservation.
+Mali's candidate native frame survives assembly directly, without a neutral obs filler; Niger's native frame is exact in both versions.
+The scoped phase-1/2 audits contain 3 findings before and 2 after, with zero added findings or failure/error records.
+Only Mali's neutral =obs=1= filler warning disappears; the two retained findings are the existing no-household-i warnings on native cluster tables.
+Community prices has no phase-2 kwarg grid.
+
+All 549 country/table hashes and 39 framework fingerprints were independently recomputed in both frozen checkouts.
+Only 24 Mali hashes move; all 525 other-country hashes and all 39 framework fingerprints remain identical.
+This is the approved all-Mali re-warm event, not a shared-cache promotion or broad rebuild.
+
+* Residuals and evidence
+
+The unresolved-unit residual accurately requests source/instrument diagnosis first and does not call all 129 entries valid prices.
+The unheld questionnaire limitation, unchanged eligibility, exact original reading-3 drop set, separate GH #821 module and GH #1121 labor scope remain explicit.
+The initial ledger-heading whitespace nit was corrected only in the narrow descendant described above.
+There are no remaining blocking findings.
+
+Safe aggregate proof is =validation.json= alongside this report.
+Full raw frames, source-position masks, metadata, logs and complete scanner findings remain private in this review directory.
+=prepare.py= and =review_check.py= capture the physical held-only seeds, independent oracle, actual cold/warm API checks and all-country hashes.
+=compare.py= checks reading-3 retention and source/hash/comparator accounting; =feature_check.py= verifies public assembly and comparator equality.
+=finish_review.py= compares every tracked content hash, checks the narrow descendant, verifies source-free trees and records no remaining owned task process.
+All tracked files in both checkouts retain their initial content hashes and both heads/statuses remain unchanged/clean.
+
+* Runnable commands
+
+The private =run.sh= selects the matching checkout/import/config/private-data identity and applies =unshare -rn= with the mounted image and one numerical/build thread.
+The cold mode deliberately refuses existing harmonized Mali parquets; reproducing a cold build requires a new private data root seeded only with the two held L1 blobs, as in =prepare.py=.
+The following are the review commands, with their complete output retained privately:
+
+#+begin_src sh
+review=/local/job40255479/control/isa-backlog-20261021/review-822
+bash "$review/run.sh" candidate "$review/review_check.py" candidate expectation
+bash "$review/run.sh" baseline "$review/review_check.py" baseline expectation
+bash "$review/run.sh" candidate "$review/review_check.py" candidate cold
+bash "$review/run.sh" baseline "$review/review_check.py" baseline cold
+bash "$review/run.sh" candidate "$review/review_check.py" candidate warm
+bash "$review/run.sh" baseline "$review/review_check.py" baseline warm
+bash "$review/run.sh" candidate "$review/review_check.py" candidate hashes
+bash "$review/run.sh" baseline "$review/review_check.py" baseline hashes
+bash "$review/run.sh" candidate -m pytest -o addopts= -p no:cacheprovider -q \
+  tests/test_mali_community_price_readings.py \
+  tests/test_community_prices_variety.py::TestDeclaration \
+  tests/test_community_prices_variety.py::TestAssembly
+bash "$review/run.sh" candidate "$review/run_pytest.py" -o addopts= \
+  -p no:cacheprovider -q tests/test_community_prices_variety.py::TestBuilt -k 'Mali or mali'
+bash "$review/run.sh" baseline "$review/run_pytest.py" -o addopts= \
+  -p no:cacheprovider -q \
+  /local/job40255479/worktrees/isa-review-822/tests/test_mali_community_price_readings.py
+bash "$review/run.sh" candidate bench/feature_audit/scan.py \
+  --features community_prices --countries Mali Niger --phases 1,2 --jobs 1 \
+  --out "$review/audit-candidate.jsonl"
+bash "$review/run.sh" baseline bench/feature_audit/scan.py \
+  --features community_prices --countries Mali Niger --phases 1,2 --jobs 1 \
+  --out "$review/audit-baseline.jsonl"
+#+end_src
+
+Sue

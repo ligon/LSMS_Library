@@ -1,0 +1,21 @@
+{
+  "archive": "/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/quiescent-followup-22h30.tar.gz",
+  "sha256": "d1e70973e78908579d8cbe9bf687ec3ac123e65f4ba5976e9cb4ec6737187c29",
+  "bytes": 174537777,
+  "roots": [
+    "review-1058-Burkina_Faso",
+    "integration/burkina-fifteen-review",
+    "framework1081-fix",
+    "review-1081"
+  ],
+  "verified_files": 1518,
+  "source_bytes": 1298672709,
+  "excluded_entries": 35,
+  "archive_contents_verified": true,
+  "source_after_exact": true,
+  "private_directory_owner_only": true,
+  "archive_manifest_launcher_mode": "0600",
+  "launcher": "/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/archive_quiescent_followup_22h30.py",
+  "launcher_sha256": "3f9d87019e72c4552e355dcac0872289f3e08f3cfe37a9ec1117ac1ca1909ff7",
+  "limit": "No raw-source/instrument extension payloads or duplicate cache trees. Root counts overlap prior archives; do not sum as unique evidence. Active Uganda1078/global16/framework1135 not included."
+}

@@ -1,0 +1,48 @@
+{
+  "status": "ROOT_ACCEPTED_SCOPED_MALAWI1209_FIX",
+  "at_UTC": "2026-10-22T16:30:42.584455+00:00",
+  "candidate": "47b3c5d76371acc457c5553ebf8adfb1859e115b",
+  "parent": "d29a56783d08a8a647e2622150a4ee5fbdd7246a",
+  "READY_sha256": "7ae6dff356f391ddbb3b07d604a97d0218c5d986bd9009b9ac3b4baaff7f3101",
+  "manifest_sha256": "fdf2907b8bae4f4cda5de886ae9cc3fdf5bccd957dc439c9438848467c7c73cb",
+  "independent_tests": {
+    "candidate_pass": 6,
+    "existing_pass": 13,
+    "parent_config_fail": 4,
+    "parent_config_pass": 2
+  },
+  "parent_pytest_identity_qualification": "actual-parent CONFIG control under byte-identical library framework code; not exact-parent pytest package identity",
+  "parent_library_blobs_identical_and_actual_parent_config_Make_cwd_bound": true,
+  "Country_strict_pairs": 56,
+  "Feature_strict_pairs": 24,
+  "native_strict_pairs": 10,
+  "calibration_rejects": 49,
+  "footers": 98,
+  "parent_country_footers_grade_stale": 2,
+  "scanner_records_each": 163,
+  "scanner_statuses": {
+    "warn": 158,
+    "pass": 3,
+    "fail": 2
+  },
+  "warning_pairs_checkout_path_only": 16,
+  "literal_warning_pairs": 0,
+  "country_hashes_changed": 26,
+  "framework_hashes_changed": 0,
+  "wave_hashes_changed": 97,
+  "tracked_source_receipts_rehashed_by_root": 29779,
+  "manifest_entries_physical_metadata_checked_by_root": 906,
+  "non_L1_entries_rehashed_by_root": 602,
+  "raw_L1_copies_full_hash_checked_by_independent_protection_and_postexit_not_rehashed_again_by_root": 304,
+  "observed_sealer_and_full_postexit_terminal_zero": [
+    34361,
+    99254
+  ],
+  "author_old_diagnostics_and_metadata_utility_exceptions_retained": true,
+  "no_global_zero_outside_write_or_science_or_corpus_claim": true,
+  "root_read_actual_checkers_and_wrapper_source": true,
+  "root_project_import_payload_decode_API_test_cache_replay": 0,
+  "root_checker_sha256": "9c8bedae1fc72d5e833a70acdf641df6de85cc59e23eb5aebe7d06af4b9aa21a",
+  "human_merge_required": true,
+  "signed": "Sue"
+}

@@ -1,0 +1,279 @@
+{
+  "status": "PASS_BOUNDED_SAVED_ARTIFACTS",
+  "strict_checks": [
+    "default-supported-full-matched-parent-nonfactor",
+    "default-supported-all-factor-control2018-or-empty",
+    "default-unsupported-full-matched-parent-nonfactor",
+    "default-unsupported-all-factor-control2018-or-empty",
+    "default-combined-full-matched-parent-nonfactor",
+    "default-combined-all-factor-control2018-or-empty",
+    "make-supported-full-matched-parent-nonfactor",
+    "make-unsupported-full-matched-parent-nonfactor",
+    "make-combined-full-matched-parent-nonfactor",
+    "CLI-actual-prewrite-all-nonfactor",
+    "CLI-actual-postread-all-nonfactor",
+    "CLI-expected-postread-all-nonfactor"
+  ],
+  "subsets": [
+    {
+      "backend": "default",
+      "request": "supported",
+      "rows": 15630,
+      "actual_waves": [
+        "2018-19"
+      ],
+      "full_matched_nonfactor_axes_dtypes_masks_typed_attrs_exact": true
+    },
+    {
+      "backend": "default",
+      "request": "unsupported",
+      "rows": 0,
+      "actual_waves": [],
+      "full_matched_nonfactor_axes_dtypes_masks_typed_attrs_exact": true
+    },
+    {
+      "backend": "default",
+      "request": "combined",
+      "rows": 15630,
+      "actual_waves": [
+        "2018-19"
+      ],
+      "full_matched_nonfactor_axes_dtypes_masks_typed_attrs_exact": true
+    },
+    {
+      "backend": "make",
+      "request": "supported",
+      "rows": 133761,
+      "actual_waves": [
+        "2009-10",
+        "2010-11",
+        "2011-12",
+        "2013-14",
+        "2015-16",
+        "2018-19",
+        "2019-20"
+      ],
+      "full_matched_nonfactor_axes_dtypes_masks_typed_attrs_exact": true
+    },
+    {
+      "backend": "make",
+      "request": "unsupported",
+      "rows": 133761,
+      "actual_waves": [
+        "2009-10",
+        "2010-11",
+        "2011-12",
+        "2013-14",
+        "2015-16",
+        "2018-19",
+        "2019-20"
+      ],
+      "full_matched_nonfactor_axes_dtypes_masks_typed_attrs_exact": true
+    },
+    {
+      "backend": "make",
+      "request": "combined",
+      "rows": 133761,
+      "actual_waves": [
+        "2009-10",
+        "2010-11",
+        "2011-12",
+        "2013-14",
+        "2015-16",
+        "2018-19",
+        "2019-20"
+      ],
+      "full_matched_nonfactor_axes_dtypes_masks_typed_attrs_exact": true
+    }
+  ],
+  "first_subset_stop_expected_operand": {
+    "original_expected_serialized_at_stop": false,
+    "surviving_actual": "base/default-subsets/supported-private.pkl",
+    "surviving_full_reference": "base/default-warm/Uganda-crop-bare-private.pkl",
+    "reference_sha256": "aaca07e76f7221574ee52cd7fe37b887ecb250026d07f8caa2a1356f116f3c10",
+    "new_reconstruction_file": "artifact-final-checks/base-supported-expected-filter-RECONSTRUCTED-private.pkl",
+    "no_API_replay": true,
+    "differing_typed_attrs_keys": [
+      "sampling",
+      "population",
+      "recall"
+    ]
+  },
+  "CLI_serialization_limits": [
+    {
+      "side": "base",
+      "changed_typed_attrs_keys": [
+        "sampling",
+        "population",
+        "recall"
+      ],
+      "index_dtype_differences": [
+        {
+          "level": "v",
+          "before_class": "Index",
+          "after_class": "Index",
+          "before_dtype": "<StringDtype(na_value=<NA>)>",
+          "after_dtype": "<StringDtype(na_value=nan)>",
+          "before_storage": "pyarrow",
+          "after_storage": "pyarrow",
+          "before_na_value": "<NA>",
+          "after_na_value": "nan"
+        }
+      ],
+      "matched_actual_API_and_serialized_oracle_exact": true
+    },
+    {
+      "side": "candidate",
+      "changed_typed_attrs_keys": [
+        "sampling",
+        "population",
+        "recall"
+      ],
+      "index_dtype_differences": [
+        {
+          "level": "v",
+          "before_class": "Index",
+          "after_class": "Index",
+          "before_dtype": "<StringDtype(na_value=<NA>)>",
+          "after_dtype": "<StringDtype(na_value=nan)>",
+          "before_storage": "pyarrow",
+          "after_storage": "pyarrow",
+          "before_na_value": "<NA>",
+          "after_na_value": "nan"
+        }
+      ],
+      "matched_actual_API_and_serialized_oracle_exact": true
+    }
+  ],
+  "eligible_literal_source_factor_counts": [
+    {
+      "wave": "2009-10",
+      "retained_observations": 22549,
+      "literal_nonmissing": 0,
+      "coerced_missing": 22549,
+      "zero": 0,
+      "negative": 0,
+      "positive_infinite": 0,
+      "positive_finite": 0
+    },
+    {
+      "wave": "2010-11",
+      "retained_observations": 21051,
+      "literal_nonmissing": 20335,
+      "coerced_missing": 716,
+      "zero": 5,
+      "negative": 0,
+      "positive_infinite": 0,
+      "positive_finite": 20330
+    },
+    {
+      "wave": "2011-12",
+      "retained_observations": 20200,
+      "literal_nonmissing": 15058,
+      "coerced_missing": 5142,
+      "zero": 0,
+      "negative": 0,
+      "positive_infinite": 0,
+      "positive_finite": 15058
+    },
+    {
+      "wave": "2013-14",
+      "retained_observations": 17646,
+      "literal_nonmissing": 13254,
+      "coerced_missing": 4392,
+      "zero": 1,
+      "negative": 0,
+      "positive_infinite": 0,
+      "positive_finite": 13253
+    },
+    {
+      "wave": "2015-16",
+      "retained_observations": 19639,
+      "literal_nonmissing": 17278,
+      "coerced_missing": 2361,
+      "zero": 0,
+      "negative": 0,
+      "positive_infinite": 0,
+      "positive_finite": 17278
+    },
+    {
+      "wave": "2018-19",
+      "retained_observations": 15630,
+      "literal_nonmissing": 15106,
+      "coerced_missing": 524,
+      "zero": 23,
+      "negative": 0,
+      "positive_infinite": 0,
+      "positive_finite": 15083
+    },
+    {
+      "wave": "2019-20",
+      "retained_observations": 17046,
+      "literal_nonmissing": 16200,
+      "coerced_missing": 846,
+      "zero": 16,
+      "negative": 0,
+      "positive_infinite": 0,
+      "positive_finite": 16184
+    }
+  ],
+  "focused_tests": {
+    "passed": 416,
+    "skipped": 10,
+    "failed": 0,
+    "errors": 0,
+    "tests": 426,
+    "skips": [
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_livestock_sales_value",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "84dc2060b459112c3bef2aa29a9f1648aca62f1f2e0be67309d5a00e5769f65a"
+      },
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_food_acquired_hdds_partition_guard_bites",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "b0f2821e7843183edc08fe8a549d1dc2394849245c6b11267d91b250190840b9"
+      },
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_food_acquired_hdds_scores_in_range",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "b0f2821e7843183edc08fe8a549d1dc2394849245c6b11267d91b250190840b9"
+      },
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_fertilizer_rate",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "69c1cbaf37ee175893d8e7e889c36fa774aaca250fdea3c22ab4190cc2ef0b02"
+      },
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_nitrogen_kg_resolves_the_fertilizer_labels",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "69c1cbaf37ee175893d8e7e889c36fa774aaca250fdea3c22ab4190cc2ef0b02"
+      },
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_crop_revenue_by_crop_sums_back_to_the_household",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "130eb3dc8ddca1ea54cdb92474446e8c4f28f09cc0938ffc93f49306c79fc5ca"
+      },
+      {
+        "test": "tests.test_863_transforms.test_malawi_warm_crop_diversity",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "130eb3dc8ddca1ea54cdb92474446e8c4f28f09cc0938ffc93f49306c79fc5ca"
+      },
+      {
+        "test": "tests.test_feature_canonical_index.test_warm_corpus_assembly_loses_no_rows",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "96a4f4d2158b9b1acfa9d03855284331c0574104339d433401b44c1b8460c6b3"
+      },
+      {
+        "test": "tests.test_feature_canonical_index.test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_labor]",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "e739fdfa881bac77df5826a7272ba1d33c457e47d333fc02b9db762b0d81781a"
+      },
+      {
+        "test": "tests.test_feature_canonical_index.test_warm_corpus_plot_table_assembly_keeps_every_country_and_row[plot_inputs]",
+        "category": "known_unavailable_country_data",
+        "reason_sha256": "8d74deb09d40c6fa602b69748d91df8792d1cb976a10733069b6517e235c675f"
+      }
+    ]
+  }
+}

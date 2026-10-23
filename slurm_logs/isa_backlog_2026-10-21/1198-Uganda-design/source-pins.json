@@ -1,0 +1,48 @@
+{
+  "recorded_at_UTC": "2026-10-22T00:50:54.299168+00:00",
+  "source_head": "989fbf3d98439be802d1f9cebd8ab5197c56b002",
+  "baseline": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "runtime_config_schema_tests_exact_baseline": true,
+  "manifest_sha256": "c336abbaad17d4b9dadab19f6c5abd00319aa55f118162ad773525faa49cc223",
+  "phase": "Frozen design/private prototype; revised root implementation contract is a separate decision",
+  "root_decision": "../1198-root-engineering-decision.md",
+  "no_source_cold_or_real_yield_or_real_comparator_claim": true,
+  "raw_frames_IDs_full_logs_private": true,
+  "exports": [
+    {
+      "source": "Uganda/1198/safe-exports/DESIGN.md",
+      "export": "DESIGN.md",
+      "sha256": "58a84aac3a61350f554ae73f5a97edd7bff5e11bcab0068cd2f940fe756ca51f",
+      "bytes": 13812,
+      "byte_exact": true
+    },
+    {
+      "source": "Uganda/1198/safe-exports/PROTOTYPE.md",
+      "export": "PROTOTYPE.md",
+      "sha256": "1ae6f8127e24ea48afb7c41ba83e3e3a17d60067dfcd312da876a9c0cf02be1e",
+      "bytes": 5028,
+      "byte_exact": true
+    },
+    {
+      "source": "Uganda/1198/safe-exports/REPRODUCE.md",
+      "export": "REPRODUCE.md",
+      "sha256": "1d82395c962d7676bb0f6eda5252800c52d4d4d07b6124ed06fa49a320884455",
+      "bytes": 2290,
+      "byte_exact": true
+    },
+    {
+      "source": "Uganda/1198/safe-exports/validation.json",
+      "export": "validation.json",
+      "sha256": "6c0dadd00bce370d63f7e5f007a3fe8f20d114f46a7a9c6a94a5002d48914c18",
+      "bytes": 7218,
+      "byte_exact": true
+    },
+    {
+      "source": "Uganda/1198/FINAL-READY.json",
+      "export": "FINAL-READY.json",
+      "sha256": "97aee0933037bbe7b0c189185eec47bc2db5875e35b92eacc277112e217d05be",
+      "bytes": 1780,
+      "byte_exact": true
+    }
+  ]
+}

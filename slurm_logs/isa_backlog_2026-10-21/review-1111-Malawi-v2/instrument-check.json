@@ -1,0 +1,25 @@
+{
+  "verified": [
+    {
+      "wave": "2010-11",
+      "PDF_page": 13,
+      "MD5": "d6e0d71486fd6ae4d7dda5b8e1854278",
+      "two_enumerator_total_kg_headers": true,
+      "native_quantity_unit_and_timing_headers_distinct": true,
+      "evidence": "layout-preserving text extraction; no page-image claim"
+    },
+    {
+      "wave": "2019-20",
+      "PDF_page": 10,
+      "MD5": "86cc1f419c1320eb969d11a6d24a63e0",
+      "two_enumerator_total_kg_headers": true,
+      "native_quantity_unit_and_timing_headers_distinct": true,
+      "evidence": "layout-preserving text extraction; no page-image claim"
+    }
+  ],
+  "excluded_waves": [
+    "2013-14",
+    "2016-17"
+  ],
+  "no_native_pair_or_timing_as_total_unit": true
+}

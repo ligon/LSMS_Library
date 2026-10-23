@@ -1,0 +1,71 @@
+{
+  "scope": "Only these aggregate exports are safe; all other artifacts and full warnings/rows are private.",
+  "files": {
+    "REPORT.org": {
+      "sha256": "14969166a17992f2859d23e1387967b4e22b08138a51eaa8d7283b7cbc92975f",
+      "bytes": 5835,
+      "mode": 384,
+      "mtime_ns": 1792685352508357710,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 2885693,
+      "symlink": false,
+      "link": null
+    },
+    "commands.json": {
+      "sha256": "85ab5ae44041340c2d90de122c6c23fc41ff0db5a9b61e65f420d775aec75a72",
+      "bytes": 16626,
+      "mode": 384,
+      "mtime_ns": 1792685352420357244,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 2885691,
+      "symlink": false,
+      "link": null
+    },
+    "pins.json": {
+      "sha256": "d4ce96780f13e5fd282c3788aa10e00f0c96f5d86a74eb67a3959a1fb215d115",
+      "bytes": 819,
+      "mode": 384,
+      "mtime_ns": 1792685352404357159,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 2885689,
+      "symlink": false,
+      "link": null
+    },
+    "protection.json": {
+      "sha256": "5d696affd6900f1c004efa47a73de0b52a862a688fbec3a564779c39e16576e1",
+      "bytes": 601,
+      "mode": 384,
+      "mtime_ns": 1792685352404357159,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 2885690,
+      "symlink": false,
+      "link": null
+    },
+    "source.diff": {
+      "sha256": "0184e26b0be70221e67834aeff1d69f8a6dea0c7320689eabd0efb5ab0e9c9ca",
+      "bytes": 16241,
+      "mode": 384,
+      "mtime_ns": 1792685352508357710,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 2885692,
+      "symlink": false,
+      "link": null
+    },
+    "validation.json": {
+      "sha256": "d8bde2a468a0b5884a413c55f0f96190532e503b149aacc271881cba7de92716",
+      "bytes": 2626,
+      "mode": 384,
+      "mtime_ns": 1792685352394357106,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 2885688,
+      "symlink": false,
+      "link": null
+    }
+  }
+}

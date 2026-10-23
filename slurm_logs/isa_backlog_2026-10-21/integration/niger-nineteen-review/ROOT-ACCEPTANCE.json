@@ -1,0 +1,46 @@
+{
+  "recorded_at_UTC": "2026-10-22T03:40:17.667563+00:00",
+  "verdict": "ROOT_ACCEPT_BOUNDED_GLOBAL19_NIGER_INCREMENT",
+  "candidate": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e",
+  "actual18_control": "471f5bb57c0ea9f02455f3cb50ed502ad4afaaf3",
+  "READY_sha256": "1d4dd6b393ac314be348db47899ee9bace6165d700653a7132161f9392546095",
+  "manifest_sha256": "0e341b01f80172c203e483ff98336a4384c3684d4d4ec6ac16bd52ab1a5ab18d",
+  "all_manifest_entries_verified": 2842,
+  "safe_exports_verified": 5,
+  "all_checker_source_pins_verified": true,
+  "root_read_full_review_actual_exact_oracle_probe_artifact_warning_CLI_protection_and_seal_sources": true,
+  "root_independent_JUnit": {
+    "candidate": {
+      "pass": 114
+    },
+    "base": {
+      "fail": 12,
+      "pass": 5
+    }
+  },
+  "root_independent_hash_scope": {
+    "Niger_changed": 23,
+    "other_API_exact": 526,
+    "framework_exact": 39
+  },
+  "exact_twelve_path_mode_blob_delta_independently_verified": true,
+  "root_independent_scanner": {
+    "records": 2,
+    "WARN": 2,
+    "complete_JSONL_bytes_exact": true
+  },
+  "warning_multisets_literal_true": 82,
+  "source_readings": 46043,
+  "healthy_Mali_rows": 155931,
+  "matched_Feature_rows": 201974,
+  "limits": [
+    "Bounded nineteen-increment Niger/Mali coexistence, no unrestricted nineteen-change/full suite or other country output claim.",
+    "Historical17 full13FAIL/doc-child guard-mtime/eight unrequested stale companions retain original pins.",
+    "Known1196 dtype and factory/covered empty/API-writer serialization distinctions remain explicit.",
+    "Original Niger author auxiliary zero-write delta and overwritten aggregate byte history remain unavailable; no replay or retrospective repair.",
+    "One nonexecutable-launcher126 stop retained; correct bash invocation completed artifact-only checker."
+  ],
+  "source_GitHub_publication_completed": false,
+  "public_PRs_merged": false,
+  "signed": "Sue"
+}

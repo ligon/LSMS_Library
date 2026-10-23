@@ -1,0 +1,38 @@
+{
+  "status": "PASS_WITH_DECLARED_EMPTY_ORDER_RESIDUAL",
+  "tracked_source_receipts": 29825,
+  "source_clean": true,
+  "approved_diff_paths": [
+    ".coder/ledger/1204-uganda-crop-wave-coverage.md",
+    "lsms_library/countries/Uganda/_/CONTENTS.org",
+    "lsms_library/countries/Uganda/_/Makefile",
+    "lsms_library/countries/Uganda/_/crop_production.py",
+    "tests/test_gh1204_uganda_crop_wave_coverage.py"
+  ],
+  "tested_clean_head": "69bcbd5ff79883606008c67dd36e81580c3f497b",
+  "final_head": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "post_test_delta_only_task_ledger": true,
+  "all_tested_runtime_source_physical_receipts_exact": true,
+  "runtime_and_generation_exact": true,
+  "genuine_providers_exact": 37,
+  "physical_copies_exact": 444,
+  "copy_bytes": 533307636,
+  "all_final_cache_footprints_exact": 12,
+  "all_compared_operands_and_metadata_exact": true,
+  "no_intree_payloads": true,
+  "prepared_source_DVC_tmp_declared_targets_exact": 2,
+  "guard_event_counts": {
+    "socket.bind": 273,
+    "open": 3,
+    "os.mkdir": 57
+  },
+  "denied_IPv6_loopback_binds_unattributed": 273,
+  "network_connect_or_DNS_attempts_observed": 0,
+  "initial_IPC_precollection_setup_denials": 2,
+  "seeded_guard_denials": 2,
+  "outside_existing_directory_noops_denied": 56,
+  "unexpected_guard_events": 0,
+  "whole_task_zero_network_attempt_claim": false,
+  "provider_gates_before_copy_and_decode": true,
+  "signed": "Sue"
+}

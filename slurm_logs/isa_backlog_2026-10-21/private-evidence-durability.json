@@ -1,0 +1,15 @@
+{
+  "observed_at_UTC": "2026-10-21T20:34:13.582213+00:00",
+  "archive": "/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/quiescent-reviews-20h45.tar.gz",
+  "archive_sha256": "e828a78dca5b82e9863d35700ef408f475e5693c2742286c1a8ce1acb3007858",
+  "archive_bytes": 153526829,
+  "private_files_verified": 957,
+  "quiescent_review_roots": 18,
+  "source_after_exact": true,
+  "archive_contents_verified": true,
+  "private_directory_mode": "owner rwx only, inherited setgid retained",
+  "duplicate_L1_L2_and_raw_sources_excluded": true,
+  "full_private_manifest": "/global/scratch/fsa/fc_jevons/ligon/isa-backlog-evidence/2026-10-21-job40255479/quiescent-reviews-20h45.manifest.private.json",
+  "launcher_sha256": "e2e357e76096e24e2852933111334f12247cc62100668c9e631a049e2c55601e",
+  "limits": "Completed review evidence only; active Nigeria1095/Malawi1111/Uganda-twelve roots and writer diagnostics need later quiescent archival. No data source acquired or moved."
+}

@@ -1,0 +1,75 @@
+{
+  "status": "NO_EXISTING_OWNER_FOUND_FOR_NEW_UGANDA_EMPTY_COLUMN_ORDER_RESIDUAL",
+  "queries": [
+    {
+      "query": "repo:ligon/LSMS_Library is:issue \"column order\"",
+      "results": [
+        {
+          "number": 905,
+          "title": "Finish the vectorized min_count reducer sweep",
+          "body_scope": "Different issue scope"
+        },
+        {
+          "number": 941,
+          "title": "master data-tests: EHCVM food_acquired served WITHOUT Derivation / inkind rows in the sequential cold CI session (52 failures in test_ehcvm_7day.py); not reproducible cold locally",
+          "body_scope": "Different issue scope"
+        },
+        {
+          "number": 727,
+          "title": "canonical_housing_labels: GhanaSPS separates Bamboo from Wood and the canon folds them — plus three compound-option mappings made without the questionnaire",
+          "body_scope": "Different issue scope"
+        },
+        {
+          "number": 797,
+          "title": "household_roster: `Relationship` ships un-harmonized survey verbiage, and categorical mappings run *after* `_expand_kinship` so they can't canonicalize it (surfaced on GhanaLSS 2016-17)",
+          "body_scope": "Different issue scope"
+        },
+        {
+          "number": 1160,
+          "title": "fertilizer_rate silently merges countries with colliding plot IDs in numerator and area",
+          "body_scope": "Different issue scope"
+        },
+        {
+          "number": 386,
+          "title": "bool dtype coercion wipes ALL boolean feature columns to null on the cached path (food_security, shocks, plot_features, …)",
+          "body_scope": "Different issue scope"
+        }
+      ]
+    },
+    {
+      "query": "repo:ligon/LSMS_Library is:issue \"_empty_declared_frame\"",
+      "results": [
+        {
+          "number": 1099,
+          "title": "Default backend: a barren-subset request (a wave that does not declare the table) serves 0 rows warm but raises 'Could not materialize' cold",
+          "body_scope": "Closed predecessor fixes absent-table row/error behavior, not column order"
+        }
+      ]
+    },
+    {
+      "query": "repo:ligon/LSMS_Library is:issue \"barren\"",
+      "results": [
+        {
+          "number": 1204,
+          "title": "Uganda crop_production: country fallback violates requested wave coverage",
+          "body_scope": "Existing requested-wave/raw-coverage owner; new empty-column-order issue was found during its repair"
+        },
+        {
+          "number": 1099,
+          "title": "Default backend: a barren-subset request (a wave that does not declare the table) serves 0 rows warm but raises 'Could not materialize' cold",
+          "body_scope": "Closed predecessor fixes absent-table row/error behavior, not column order"
+        },
+        {
+          "number": 866,
+          "title": "Country-level script-path table: try_make returns exit 0 on a rule-less EXISTING var/ parquet, so a stale hash 'rebuilds' nothing and re-stamps the stale content fresh (20 tables / 13 countries; LSMS_NO_CACHE does not help)",
+          "body_scope": "Different issue scope"
+        }
+      ]
+    }
+  ],
+  "closed_predecessor_1099_verified": true,
+  "source_head": "a417b69d71c460ab33f6a494b4df5d67cd792de5",
+  "actual_parent": "491daf5654b9ee45332bec97e1296ae821ff46d5",
+  "proof": "Root authenticated full1839author entries/29825source receipts and exact eight safe exports; independent static review confirms unchanged constructor/newly exposed Uganda route. Runtime independent review remains in progress.",
+  "signed": "Sue"
+}

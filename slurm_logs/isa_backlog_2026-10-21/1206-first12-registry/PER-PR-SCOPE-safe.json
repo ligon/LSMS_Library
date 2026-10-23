@@ -1,0 +1,139 @@
+{
+  "scope": "bounded registry before separate archive1 discovery",
+  "PRs": {
+    "1172": {
+      "PR": 1172,
+      "source_head": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "AUTHORITY_HOLD_NO_ORIGINAL_PAYLOAD_DECODE",
+      "source_count": 9,
+      "overlapping_locator_sites": 458,
+      "test_only_locator_sites": 396,
+      "available": "No authorized original saved positive pair. fa/factor/selected helper expected objects in proof.py were in memory, not serialized. 38 cache candidates are not those public/helper operands.",
+      "needed": "Authenticated source-content authority and exact stage mapping for matching saved harmonized 1034-v2 operands, if any. Original in-memory fa/factor/test objects cannot be recovered by replay. Current digest alone is not authority."
+    },
+    "1173": {
+      "PR": 1173,
+      "source_head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "AUTHORITY_HOLD_NO_ORIGINAL_PAYLOAD_DECODE",
+      "source_count": 15,
+      "overlapping_locator_sites": 258,
+      "test_only_locator_sites": 99,
+      "available": "No authorized pair in review1062-v2 subset/order data or author panel1062 candidate-evidence. Actual20-script IO/env controls used unsaved synthetic outputs; original order served0..7 files exist but lack located authoritative original receipts.",
+      "needed": "Historical content authority for review1062-v2/order-evidence-current/served-0..7.parquet, subset-make/Uganda/var/{income,earnings,enterprise_income}.parquet and panel/1062/candidate-evidence/{raw-*,served-*}.parquet at their original stages. No API/Make prefix replay."
+    },
+    "1175": {
+      "PR": 1175,
+      "source_head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "FROZEN_NEW_SUPPLEMENT_WITH_ORIGINAL_GAPS",
+      "source_count": 18,
+      "overlapping_locator_sites": 764,
+      "test_only_locator_sites": 462,
+      "available": "Six saved original harmonized operands full historical fields bound by14snapshot. Five explicit original field views + full nitrogen; source/raw/warm-Country/Feature-expected/negative fixtures remain gaps.",
+      "needed": "Only further original saved expected/warm-Country/source-oracle authority if it exists; otherwise preserve memory gaps."
+    },
+    "1176": {
+      "PR": 1176,
+      "source_head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "PARTIAL_EXACT_NAMED_CONTENT_ONLY_OTHER_ORIGINALS_HELD",
+      "source_count": 8,
+      "overlapping_locator_sites": 453,
+      "test_only_locator_sites": 117,
+      "available": "Only candidate-cold.parquet has root-authorized SHA-content baseline; API9 initial/warm independent products and their initial-warm pair are checked. Original baseline-cold, original warm return, raw76-source mappings and native dedup objects remain unavailable or authority-held.",
+      "needed": "Authenticated baseline-cold.parquet original content and exact other saved warm/Feature operands if any. No reconstructing76 original keys from source or invoking helpers."
+    },
+    "1178": {
+      "PR": 1178,
+      "source_head": "a1ba246f59d341c331c69471f914d3ca798e6894",
+      "source_base": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "status": "PARTIAL_EXACT_NAMED_CONTENT_ONLY_OTHER_ORIGINALS_HELD",
+      "source_count": 13,
+      "overlapping_locator_sites": 587,
+      "test_only_locator_sites": 388,
+      "available": "Only after-data/food_acquired.pkl has exact-nine original content authority and API9 independent comparisons. Before data and all other derived/factor/derivation objects remain authority-held; public/order/Aggregate returns were unsaved.",
+      "needed": "Authenticated original before-data and other after-data named harmonized artifacts plus original source-proof quarter map authority for pure relabel reconstruction. Do not invent mapper/source expected values or rerun derived/API/Feature."
+    },
+    "1180": {
+      "PR": 1180,
+      "source_head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "PARTIAL_REVIEW_CONTENT_PLUS_SEPARATE_AUTHOR_SUBCOHORT",
+      "source_count": 9,
+      "overlapping_locator_sites": 308,
+      "test_only_locator_sites": 139,
+      "available": "Review candidate-cold-served.parquet exact-nine content only; API9 typed-record boundary qualified numeric checks. Four author822 saved public pickles authenticated separately through tracked1199 READY/manifest/protected snapshot; two full cold/warm and two qualified obs3 groups. Independent expected/masks/baseline/warm still held.",
+      "needed": "Independent review822 original expected/raw-mask/old/new warm/full baseline content authority to cover its original review pair assertions. No raw/source-slot or finalizer reconstruction."
+    },
+    "1181": {
+      "PR": 1181,
+      "source_head": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "PARTIAL_EXACT_NAMED_CONTENT_ONLY_OTHER_ORIGINALS_HELD",
+      "source_count": 22,
+      "overlapping_locator_sites": 1027,
+      "test_only_locator_sites": 661,
+      "available": "Only candidate-cold-Ethiopia.private.pkl exact-nine original content authority. API9 independently produced initial/warm and their initial-warm pair checked. Baseline/helper/other country/Feature/nitrogen and purchase/residual expected objects remain authority-held or unsaved.",
+      "needed": "Authenticated original baseline/candidate helper and saved cold/warm Uganda/nitrogen/Feature contents and actual stage/args; raw purchase oracle/transient diagnostic variants remain gaps without replay."
+    },
+    "1182": {
+      "PR": 1182,
+      "source_head": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "PARTIAL_EXACT_TWO_NAMED_CONTENTS_ONLY_OTHER_ORIGINALS_HELD",
+      "source_count": 20,
+      "overlapping_locator_sites": 621,
+      "test_only_locator_sites": 400,
+      "available": "Exact-nine rule covers candidate-default.pkl and candidate-code.pkl only. Four API9 reference pairs and two API9 initial/warm pairs full-strict; actual original candidate Code non-u projection newly full-strict on declared view. Baseline/raw8waves and repeat/warm/Feature expected memory remain held/gaps.",
+      "needed": "Original baseline/raw/wave payload authority and distinct saved repeat/warm/Feature operands if any.34 metadata-cell synthetic and guard-only faults were unsaved; no mapping/API/test replay."
+    },
+    "1185": {
+      "PR": 1185,
+      "source_head": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "PARTIAL_EXACT_TWO_NAMED_CONTENTS_ONLY_OTHER_ORIGINALS_HELD",
+      "source_count": 15,
+      "overlapping_locator_sites": 1306,
+      "test_only_locator_sites": 846,
+      "available": "Rule covers private-candidate-cold-country.pkl and private-candidate-Uganda.pkl only. Four API9 reference pairs and two initial-warm pairs full-strict. Original baseline missing408 unit mask, warm country, Feature/native/source expected and mutant fixture objects remain held or unsaved.",
+      "needed": "Original baseline and independently saved warm/Feature/helper/source-oracle harmonized content authority; original controlled early-fill objects remain unsaved. No source driver, canonicalizer or API replay."
+    },
+    "1186": {
+      "PR": 1186,
+      "source_head": "6e97eaeb488096459d673486c127043f016c4f8d",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "AUTHORITY_HOLD_NO_ORIGINAL_PAYLOAD_DECODE",
+      "source_count": 14,
+      "overlapping_locator_sites": 289,
+      "test_only_locator_sites": 161,
+      "available": "Saved baseline/review cold/warm Mali,Niger,Feature and wave caches exist but no original authoritative payload source receipt located. Transform outputs and demographic basis captures are unsaved.",
+      "needed": "Authenticated original content authority for review1121-Mali/{baseline,review}-{cold,warm}-{Mali,Niger,Feature}.private.pkl and two native wave payloads, with pure project mapping source/stage. No labor transformer, source, driver or test replay."
+    },
+    "1189": {
+      "PR": 1189,
+      "source_head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "FROZEN_NEW_SUPPLEMENT_WITH_ORIGINAL_GAPS",
+      "source_count": 18,
+      "overlapping_locator_sites": 406,
+      "test_only_locator_sites": 160,
+      "available": "40 harmonized original saved operands full historical fields bound by15snapshot.16 full strict pairs, one original crop-exclusion, one explicit NEW source-pinned native reconstruction; two qualified Feature complete-domain findings. Raw/public expected and retained raw selected_keys unsaved.",
+      "needed": "Original source/public expected objects if independently saved; no raw/script/API replay to recover them."
+    },
+    "1191": {
+      "PR": 1191,
+      "source_head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "source_base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "status": "FROZEN_NEW_SUPPLEMENT_WITH_ORIGINAL_AUTHOR_GAPS",
+      "source_count": 16,
+      "overlapping_locator_sites": 473,
+      "test_only_locator_sites": 257,
+      "available": "22 full-historical original review receipts bound by16->12 reference chain. Nine actual candidate-vs-baseline full-strict, two explicitly NEW saved attrition baseline/candidate full-strict; six exact scalar checks. Original author private-* third references and transient controls remain authority-held/unsaved.",
+      "needed": "Independent original Uganda/1006/private-* author expectation content authority for its distinct original assertions; no test/API/panel-attrition transform replay."
+    }
+  },
+  "static_counts_not_runtime_or_pairs": true,
+  "signed": "Sue"
+}

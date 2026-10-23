@@ -1,0 +1,127 @@
+#+title: Independent Mali #1121 review
+#+author: Sue
+#+date: 2026-10-21
+
+* PASS -- bounded source-case correction
+
+Reviewed frozen detached =6e97eaeb488096459d673486c127043f016c4f8d= against =f8d236694c26fe9e709c5548f02c70f74ea72c33=.
+No must-fix findings.
+The runtime boundary is exactly three Preferred Label cells in =Mali/_/categorical_mapping.org:629=: Family/Hired/Other -> family/hired/other.
+The matching schema comment, country note, ledger, tests and safe evidence account for all eight changed paths.
+The real curation resolver is exercised; this is not an unused auxiliary table or a broad lowercase transform.
+Uppercase/off-label Codes remain unmapped, preserving eligibility.
+Existing =total_family_labor_days= / =total_hired_labor_days= select exact lower-case labels and now accept Mali's actual output.
+
+* Ledger and country design
+
+The full Mali CONTENTS was read first; its only TODO/WAITING occurrence is the keyword declaration, with no task LOGBOOK entries.
+The prior-art ledger, standing guidance, code-reviewer, cross-country and backlog skills anchor this review.
+Shared repository guidance is byte-identical to the baseline and to the version read earlier in this persistent session.
+
+EAC-I 2014-15 uses agricultural holdings in rural strata and households in urban strata.
+EAC-I 2017-18 uses one-third Lourd / two-thirds Leger rural questionnaires, so Lourd-only modules represent a subsample.
+Neither wave is EHCVM; EHCVM's one-vague-per-grappe convention must not be imported into these labor records.
+The existing overview opens "Mali EHCVM [...] Four waves are configured", while its own correction says "Only 2018-19 and 2021-22 are EHCVM; 2014-15 and 2017-18 are EAC-I".
+That documented tension is retained, not silently declared stale or resolved by this patch.
+
+The actual labor blocks are family, non-family hired/remunerated labor, and mutual-aid labor (=groupe d'entraide=).
+These are fixed PP/PH questionnaire blocks, not values decoded from one raw category column.
+The previous capitalized table contradicted the driver's lower-case ={family, hired, other}= prose and the existing selectors; the new cells settle that case discrepancy without changing meanings.
+The existing sums over passage, activity and men/women/children remain unchanged; no passage/task/demographic level is added or dropped here.
+
+* Independent source and contribution controls
+
+Seventeen already-held Mali blobs were verified against the reviewed sidecars and physically copied to each of two private roots.
+Each root began with no Mali L2 parquet at all; no shared cache or assumed-fresh read was used.
+The current-hash, complete Niger comparator was physically copied and retained byte-for-byte.
+The network guard was actively tested in every wrapper invocation.
+All numerical, build and Make thread counts were one; pytest used two loadfile workers.
+
+Fresh held metadata verifies all 54 person/day variable-pair labels and their men/women/children meanings.
+Independent basis records exercise every one of those 54 terms, all 18 hired-wage terms, and a separate 2017 child control: PersonDays 6 with Wage 1000.
+All 73 basis records pass through the actual unedited drivers and real curation/finalizer.
+A private mutant using child c1*c3 instead of c1*c2 is rejected.
+
+For 2017 PH, =s7eq13c1= is the child workforce count, =s7eq13c2= is child days, and =s7eq13c3= is total remuneration.
+The held c1*c2 contribution has 383 nonmissing products, 382 positive products and a raw product sum of 5,229.4 before the unchanged finalizer.
+The rejected persons-times-wage expression would sum to 8,756,650; this is only a private negative counterfactual, never a production labor measure.
+The driver's existing c1*c2 correction remains intact.
+
+Legacy value-label bytes prevent a uniform UTF-8 metadata read.
+Private evidence retains the Latin1 metadata strings and a separate UTF-8 display repair where reversible; source bytes and product decoding are untouched.
+No questionnaire PDF was inspected or acquired, and the review makes no new claim about unwired EHCVM labor instruments.
+
+* Full normal API and cache proof
+
+Independent normal empty-Mali-L2 cold builds and separate-process warm reads produce:
+
+| Frame           | Rows   |
+|-----------------+--------|
+| Mali 2014-15    |  14843 |
+| Mali 2017-18    |  37214 |
+| Mali total      |  52057 |
+| Niger comparator|  53041 |
+| Feature total   | 105098 |
+
+Every complete native wave, Country and Feature frame equals its independently built baseline after only the one-to-one source-case projection.
+Values, dtypes, non-source keys, null masks, multiplicities and attrs are exact, with no tolerance or row sampling.
+All public keys remain unique and non-null.
+PersonDays remain 11,544,571.100000001 and Wage remains 214,685,819 FCFA.
+Mali source counts remain family 33,655 / hired 9,565 / other 8,837.
+Existing family/hired selector outputs equal the baseline source selections, totaling 7,867,691.5 / 1,197,091.3 person-days.
+The complete total-labor transform is unchanged.
+Feature source groups are family 57,671 / hired 26,719 / other 20,708, with exact attrs and no case-split groups.
+
+Both country hashes grade fresh with complete declared wave manifests.
+The fresh-process warm proof preserves every byte, size and mtime of all 23 private parquets.
+The author measured 28 because its seed also contained unused Mali cluster caches; this review started with the entire Mali L2 absent and builds only the required labor/sample outputs.
+This cache-population difference is explicit, not an unexplained five-file loss.
+
+* Tests, all scanner findings and fingerprints
+
+All 335 final scoped tests pass with zero skips.
+The ten new regressions independently fail seven / pass three at immutable f8.
+The first review wrapper omitted =LSMS_EXPECTED_ROOT=, causing the dedicated identity test to skip; it was set and the complete selection rerun successfully.
+The wrapper also asserts exact cwd, package/config realpaths and private data root independently of that test.
+=make api-audit= passes.
+
+Both complete scoped phase-1/2 scans emit exactly eight warnings, zero failures and zero errors.
+The full warning multisets are exact after replacing checkout/private-data roots and dropping timing fields only.
+All eight findings are retained and classified:
+
+- Mali sample strata null in three waves: phase 1a and 1b, two findings.
+- Niger sample strata null in three waves: phase 1a and 1b, two findings.
+- API-joined =v= extends each native scheme: one diagnostic per country, two findings.
+- Declared canonical sentinel alignment: one finding, no row loss.
+- Population heterogeneity: one finding, no country exclusion.
+
+Plot labor has no phase-2 kwarg-grid entry; the scanner still ran both requested phases.
+No warning was suppressed or excluded from the comparison.
+
+Independently enumerated actual hashes cover all 549 country/table pairs and all 39 framework fingerprints in separate baseline/review processes.
+Only the 24 Mali hashes change; the other 525 pairs and all 39 framework fingerprints are exact.
+Other Mali tables were not rebuilt or compared: their result is a hash-scope claim only.
+
+* Independence, immutability and residuals
+
+The wave drivers, country concatenator, Makefile and transformations are byte-identical at f8, the reviewed head and frozen #822 head =aba2badfe2f701a8b3793f1243fd8ed4fce18a53=.
+Both labor helper function bodies also match exactly across all three.
+This is an f8-based correction with no #822 implementation dependency.
+Final snapshots verify every tracked content/mode, HEAD and clean status unchanged in the reviewed detached tree, baseline and #822 lane.
+No tracked edit, ref change, checkout/reset/clean, GitHub write, acquisition, DVC CLI, shared-cache write/clear/promotion, or in-tree parquet occurred.
+
+GhanaSPS's seven categories and GhanaLSS exchange/hired remain the separate Tier C design question.
+This PASS approves only Mali's case correction; it does not approve a global labor taxonomy, new source eligibility or a grain/reducer change.
+The author's residual issue draft preserves that boundary.
+
+* Evidence and runnable commands
+
+All files below are under =/local/job40255479/control/isa-backlog-20261021/review-1121-Mali/=.
+=validation.json= holds source-safe aggregates and the complete eight-finding accounting.
+=commands.sh= contains the exact runnable test, negative, source-basis, warm API, scanner, hash and immutable-snapshot commands.
+=prepare.py= records the physical held-only source preparation; it deliberately refuses to overwrite existing roots.
+=check_api.py cold= was run before any Mali parquet existed in either private root.
+For another cold replay, create fresh physical private roots as documented in =commands.sh=; do not clear these roots or shared caches.
+Raw frames, raw group keys, full warnings, source-label extracts and complete tracked-file snapshots remain in private files.
+
+Sue

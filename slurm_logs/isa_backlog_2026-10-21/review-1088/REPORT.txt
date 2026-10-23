@@ -1,0 +1,145 @@
+Independent adversarial review -- Niger GH #1088
+Sue, 2026-10-21
+Verdict: PASS
+
+Frozen checkout: /local/job40255479/worktrees/isa-review-1088
+HEAD: d602f8d63520e521a730f85551b366c4d45d9a35
+Baseline: f8d236694c26fe9e709c5548f02c70f74ea72c33
+No remaining findings within the approved quantity-only boundary.
+
+Source review
+
+At niger.py:1360, the new quantity tuple adds exactly nominal 9999.9 and
+9999.900390625. At niger.py:1465, only the existing quantity membership mask
+uses that tuple. Price retains its original 9999/99999 filter. Removing
+that constant and restoring the former mask name yields an AST identical
+to the original country module. Thus units, native weights, keys,
+variety/visit/obs, product-absence filtering, finishing and duplicate-entry
+logic have no additional production change. No framework or other country
+source changed; the complete Mali and Tanzania git trees are identical.
+
+Country documentation was read in full: 1,559 lines, with no live
+TODO/WAITING/LOGBOOK entry beyond the TODO keyword declaration. Relevant
+idiosyncrasies are substantive: CS07 Quantity is a WEIGHT in the native
+unit and Price covers that quantity; community rows with no unit/product
+availability remain deliberately dropped; variety is a code because labels
+change; second source records require the existing duplicate-entry policy.
+The notes say the 30 nonrepeat observations "stay obs 4-6 for now" and leave
+their representation to the maintainer. They remain unchanged here.
+The documented 2018-19 s05_co module is unwired, contradicting blanket
+comments claiming that no EHCVM EA-level price module exists. This task
+neither rewires it nor infers its absence. Passage 1 lacks numquest;
+passage 2 and 2014 carry it, as the existing rank fallback handles.
+
+The precision qualification is correct: held 2014 quantity columns are
+Stata DOUBLE, already holding 9999.900390625, which equals promoted
+float32(9999.9). float32(9999) remains exactly 9999. No numeric value-label
+set is assigned to these quantity columns. Earlier precision history is
+unproven. Treating nominal 9999.9 as missing follows the existing issue /
+CONTENTS ruling, not newly obtained instrument evidence.
+
+Independent runtime verification
+
+- Four actual API runs: baseline and candidate each start with a distinct
+  physical private L2 root and three copied, MD5-verified held L1 blobs;
+  each cold run is followed by a fresh-process warm run. These are actual
+  Country builds, not an in-memory-only counterfactual. All four return
+  46,043 rows, with exact cold/warm equality for each version.
+- Source row counts independently reproduce 23,409 / 34,380 / 21,960.
+  All three MD5s match their sidecars. Metadata and source units are read
+  only after sanctioned source resolution from held private blobs.
+- Exactly 76 API Quantity values become NA. Every one maps back to its
+  actual raw row, slot and native unit: 43 / 32 / 1 by slot, 21 clusters,
+  five varieties. Every key, Price, other column and the other 45,967
+  quantities match exactly, including missingness and dtypes.
+- Existing wide duplicate counts remain 0 / 13,478 / 0; content-repeat
+  removals remain 0 / 17 / 117. The 30 nonrepeat second-record rows match
+  exactly across all columns, including the reported weights of 1.
+- All 55 unit/assembly tests and 12 real Niger/Mali tests pass with zero
+  skips. The eight selected negative controls all fail on baseline for
+  the missing quantity normalization. Controls cover both exact forms,
+  all slots, old codes/nonpositive values, adjacent float32 and double
+  weights, Price retention and second-record equality.
+- A held Mali comparator is checked in a clean process for its current
+  content hash and full coverage, then physically copied privately:
+  40,218 rows. Direct Feature assembly is unique and keeps 86,261 rows,
+  exactly Niger 46,043 plus Mali 40,218. A full-wave Niger API request
+  also matches the two wired-wave cold frame exactly.
+- The scoped scanner reproduces exactly the three committed warnings,
+  with zero fail/error records: generic household-index checks on the
+  two cluster-level tables, plus Mali's fabricated obs=1 schema level.
+- Fresh-process hash inventories reproduce 23/23 Niger changes, 0/24
+  Mali changes and 0/25 Tanzania changes. Framework and other-country
+  preservation are additionally verified structurally against git.
+
+Public evidence hygiene
+
+The frozen feature-audit.jsonl was inspected before approval. Lines 1-2
+contain static household-index contract messages with empty metrics; line 3
+contains schema-alignment metadata adding Mali obs=1, also with empty
+metrics. No raw household/individual records or sensitive source examples
+are exported. The independent scanner emits identical records. The review
+JSON/report contain aggregates only; returned frames remain private.
+
+Immutability and reproducibility
+
+All 14,839 tracked file contents retain their starting SHA-256 values;
+all 47 tracked symlink targets also match HEAD. These checks cover all
+14,885 tracked entries, with one file symlink included in both counts.
+HEAD remains d602f8d and git status is clean. No in-tree Niger parquet
+exists. No source edits, git mutations, commits, GitHub writes, DVC CLI,
+shared-cache edits/deletion/promotion, acquisition, fixture/golden or
+dependency changes occurred.
+
+Image interpreter: /local/job40255479/venv_img/bin/python
+Set cwd, PYTHONPATH and LSMS_COUNTRIES_ROOT to the exact tested checkout.
+The baseline runs use the existing frozen isa-baseline checkout; candidate
+runs use isa-review-1088. All runners assert identities. Numerical/build
+threads are one; pytest uses two loadfile workers. Every live process and
+its children run under unshare -rn, with extra socket denial in API/source
+runners. LSMS_SKIP_AUTH=1 and PYTHONDONTWRITEBYTECODE=1 are set.
+
+Commands and artifacts under this review directory:
+
+  python run_pair.py baseline
+  python run_pair.py candidate
+    baseline/candidate cold/warm JSON and logs; private frame snapshots.
+    Cold seeds must be new; do not rerun by deleting existing evidence.
+
+  python -m pytest tests/test_community_prices_variety.py \
+    -m 'not requires_s3' -n 2 --dist=loadfile -p no:cacheprovider -q
+    unit.log: 55 passed in 6.28 s.
+
+  python -m pytest tests/test_community_prices_variety.py::TestBuilt \
+    -k 'niger or mali' -n 2 --dist=loadfile -p no:cacheprovider -q
+    built.log: 12 passed in 14.55 s.
+
+  Baseline config/package with the frozen new quantity test class:
+    -k 'exact_missing_code_keeps_price_through_finalize or
+        second_record_uses_existing_content_equality'
+    negative.log: eight expected failures in 5.10 s.
+
+  python check_sources.py
+    source-checks.json; source-checks-verified.log.
+  python finish_checks.py
+    structural-and-Feature.json; finish-checks-final.log.
+  python bench/feature_audit/scan.py --features community_prices \
+    --countries Niger Mali --out <review>/feature-audit.jsonl
+  python finalize_review.py
+    validation.json; frozen-after.json. Starting inventory: frozen-before.json.
+
+Limits and review plumbing
+
+No full suite or corpus rebuild was run. Only the three held wired ECVMA
+sources and a current held warm Mali comparator were needed. No PDF was
+acquired; independent instrument confirmation remains unavailable. The
+existing tail representation and unwired EHCVM module remain outside scope.
+
+The metadata resolver initially tried credential validation and was stopped
+by the offline guard before any connection. Metadata-only replay thereafter
+restricts its permission answer to MD5-verified held L1 and refuses a missing
+blob. Those local audit wrappers affect introspected fingerprints, so all
+comparator/hash checks run in separate clean, uninstrumented processes.
+These controls alter no production file or shared permission setting.
+
+Sue

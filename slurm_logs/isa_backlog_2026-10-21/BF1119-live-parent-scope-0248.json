@@ -1,0 +1,16 @@
+{
+  "verified_at_UTC": "2026-10-22 02:47:14 UTC",
+  "parent_PR": 1189,
+  "parent_state": "open",
+  "parent_merged": false,
+  "parent_head_branch": "fix/1123-burkina-input-identity-20261021",
+  "parent_head_sha": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+  "issue": 1119,
+  "issue_state": "open",
+  "issue_updated_at": "2026-10-19T22:38:35Z",
+  "issue_comments": 0,
+  "spelling_scope_quote": "- **Spelling split** (new, from r1). Burkina_Faso and Senegal `plot_inputs` say `Maïs en grain` (2,274 / 735 rows) and `Niébé/Haricots secs` (2,156 / 460 rows), where their `crop_production` says `Maïs` and `Niébé`. Coverage including the marker is Burkina_Faso 5/9 and Senegal 6/10. A join of `seed_kg` onto `crop_production` on `j` silently misses maize and cowpea seed in those two countries. Fix it in the two countries' `harmonize_seed_crop` (or equivalent) mapping.",
+  "approved_ISA_boundary": "Two Burkina_Faso harmonize_seed_crop Preferred Label cells and necessary exact test expectations; marker policy, Senegal and Guinea-Bissau remain residual.",
+  "publication_gate": "BF author freeze plus different-agent independent review and current metadata reconciliation; no root publication approval is implied by this scope receipt.",
+  "signed": "Sue"
+}

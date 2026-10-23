@@ -1,0 +1,45 @@
+#+TITLE: Uganda1198 final documentary qualification review
+#+AUTHOR: Sue
+#+DATE: 2026-10-22
+
+* Verdict and exact source boundary
+
+PASS at0854303bc5f60daa698b2927fc3b193822a4c090 against6e735eca93e3f68e63d79ce65ac71607ee9493bf.
+The sole change is CONTENTS.org:3660's one-sentence replacement with seven lines, mode100644.
+Every other tracked path/blob/Git mode is exact; runtime/tests/config remain unchanged.
+Both review trees retain exact initial/final actual tracked bytes, literal Git symlink bytes, modes, HEAD and clean status.
+Snapshots and Git status/head were captured before metadata inventories.
+
+The new text preserves the author's separate17 byte-identical-file/mtime-only observation and directly reports the independent same17-path0644-to0600-plus-mtime observation.
+It makes no copied-L2 or inferred-starting-state claim and gives no general warm zero-write or mode-preservation guarantee.
+The independent frozen cold endpoint shows no initial Uganda L2 cache; the outputs came from ordinary cold builds.
+Both warm endpoints prove17 modified paths, identical bytes/sizes, and0644-to0600 transitions.
+Those JSON receipts are SHA-gated against the frozen runtime manifest; no raw frame or pickle was read.
+The73ad wording defect remains frozen as NEEDS_FIX in its own separate source/evidence root, not rewritten as accepted history.
+
+* Actual metadata measurements and country context
+
+Actual549 API hashes and39 framework fingerprints are identical in separate exact-source metadata-only processes.
+Mounted image Python, exact cwd/package/PYTHONPATH/countries/config/data identities, unshare-rn and active socket/write guards precede imports.
+Numeric/build/Make threads are1; no source builder or pytest worker was launched.
+Private data roots have no file or symlink; empty import-created metadata directories are allowed.
+No source decode/data API/old-root unpickle/test/CLI replay was performed.
+
+The previous full3,665-line Uganda CONTENTS reading carries by exact base blob be81d30d8816827af537ba67dcef511e17a7bc08 and the sole paragraph diff.
+The current file has3,671 lines and every other TODO/WAITING/LOGBOOK passage is unchanged.
+A/B remains a module convention:2015A second2014/B first2015; native IDs, actual wide slots and explicit release-row coordinates remain distinct.
+The2013 swapped labels,2018A missing distributed harvest unit/mixed B fields, conditional403 old-null exclusions and928 retained null-v observations remain qualified.
+The misleading2018B slot2 calendar label is already adjudicated by CONTENTS1414-1434/2315-2324 and loader35-38 using dates/vocabulary; the frozen independent saved-date tally corroborates it.
+That is a settled ruling, not a new calendar inference or unresolved design issue.
+The pre-existing subset-routing, real-area coverage, support dtype and historical XML/warning gaps remain exactly as qualified in the runtime review.
+No new849 factor, unit, ID, area, grain or builder change is included.
+
+* Evidence protection and release
+
+All52 entries of the prior73ad small metadata proof were freshly content/mode/mtime checked, and its actual source remains exact and clean.
+The frozen runtime proof's1,908 recorded file sizes/modes/mtimes/types remain exact, and READY/manifest/14exports are also content-hashed exactly.
+No full runtime data-content rehash is claimed; metadata continuity and the strict outside-root write guard preserve those immutable data operands without reopening them.
+Network attempts are0; no tracked/product/Git/ref/GitHub edit occurred.
+READY records the final complete small proof manifest, checker pins and zero other consumers.
+
+Sue

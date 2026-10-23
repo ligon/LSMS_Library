@@ -1,0 +1,11 @@
+{
+  "status": "RETAINED_ROOT_METADATA_CHECKER_PATH_ASSERTION_STOP",
+  "original_tool_session": 72962,
+  "terminal_chunk": "4640ef",
+  "actual_exit_code": 1,
+  "original_checker_sha256": "56b018b16953d87c8f7319f5a91ed7cf03c1460ca55443adb9891276457919bf",
+  "stderr_sha256": "a1b2f25529bf5eb621f78ce65c0c6591466a29baa5400dde2875e6b38f634d2a",
+  "cause": "Root checker guessed wrong task-ledger basename in final docs-only delta. Actual git diff lists purchase-routing ledger and country CONTENTS, matching documented scope.",
+  "corrective_change": "New v2 checker corrects exact expected basename; original source and streams preserved. Metadata/opaque authentication may repeat; no project/data decode/API/test/controller execution.",
+  "signed": "Sue"
+}

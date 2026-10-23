@@ -1,0 +1,119 @@
+{
+  "sources": {
+    "api_audit.py": {
+      "sha256": "83f7cbe59e1c56af8162fac096e4ff7c9615e7471c189f8e5ad79624dc479541",
+      "bytes": 150
+    },
+    "bootstrap.py": {
+      "sha256": "c882fc9c80273102d551bda7f62c50aa526e1ca24e184ef6e0c24b370879ea47",
+      "bytes": 976
+    },
+    "build.py": {
+      "sha256": "8443709446627ca9a57e87c2d06404cced0d6a3c7ca374861a0622ba74b0b06b",
+      "bytes": 3787
+    },
+    "check_artifacts.py": {
+      "sha256": "320c26e8c88c913ab46b6a17a500c07c2664f099a2323e51d5d1099b78a4504d",
+      "bytes": 7362
+    },
+    "cli_check.py": {
+      "sha256": "90ff74056afba40a0212f6d35321fbf4914fc389d965c2e4ea5e9c1f8617d912",
+      "bytes": 1783
+    },
+    "common.py": {
+      "sha256": "01e36f20f513875f4711bafb4584ca8af10732f1ee2eb781526667bce13b0449",
+      "bytes": 2437
+    },
+    "diagnostic.py": {
+      "sha256": "e642ed0b6063a1df26b9d2d23f2b0939af62fb50d3acaf9da8cbb0ba4dea1e71",
+      "bytes": 912
+    },
+    "exact.py": {
+      "sha256": "c8c503db2d65b58cb806e7e57d9440935c6454d78caa161577bed4d1f0cc83fa",
+      "bytes": 4419
+    },
+    "finish_seal.py": {
+      "sha256": "6c820250be5dc82c5eb8c6343731699f6fb9ee047e0a6cb60333da49083786aa",
+      "bytes": 1681
+    },
+    "footer_side_diagnostic.py": {
+      "sha256": "2ba496ceb4310fd101b81cb25b3d8164cdcebad73cb6d2026d46ae8d129dc17b",
+      "bytes": 1120
+    },
+    "freeze_verify.py": {
+      "sha256": "4a0036dfa6c6131df8f6d394b70b9ed268d12baafb2f8ef9750f83cffbdd95b3",
+      "bytes": 6169
+    },
+    "hash_inventory.py": {
+      "sha256": "799460a575cf103dfce3c8dca4d0b848d76d8277aa4cb872da2ae9757ec77759",
+      "bytes": 915
+    },
+    "inspect_manifest_safe.py": {
+      "sha256": "da99f6c95d1e3bb9198ba90ce814ed90c0f466c746e70ace3a4fb9fc3970f017",
+      "bytes": 472
+    },
+    "oracle_axis_diagnostic.py": {
+      "sha256": "b9b55b8c7e569712684fb09bdccd10ee101ccff981bb7bcb286b6aa506117e37",
+      "bytes": 1726
+    },
+    "oracle_projection_v2.py": {
+      "sha256": "07bc5c39bf0534ebe98d1b45d208c1bcc2a8e721267b582d34164bb6f95243d5",
+      "bytes": 4332
+    },
+    "package_reports.py": {
+      "sha256": "ba1e161e298140cbe29b10cede251fc55e17395fdc1b1379ffc98e3830d79ee1",
+      "bytes": 28517
+    },
+    "package_seal.py": {
+      "sha256": "7f748499bc98851657d3acf03d4563a57872ec463324d6b65ca0689fea876c09",
+      "bytes": 1669
+    },
+    "prepare.py": {
+      "sha256": "a469c60ce2e190d582d152e6f47be4c35414574b942fd67ce3e58c5c35d94f60",
+      "bytes": 8096
+    },
+    "preserve_artifact_stop.py": {
+      "sha256": "f2641b1c39c4f7e2d6a8d4f59c90de06d5726c5f03f9c689dc52a7176eff65cc",
+      "bytes": 610
+    },
+    "preserve_warm_stop.py": {
+      "sha256": "652665d8a5096e699e29fe2fd4f04ad48394d0494d87a9cf6c3c1452d6754b0d",
+      "bytes": 980
+    },
+    "run.sh": {
+      "sha256": "d0172f655e185a71eb718d9b30d7bc2d46d193fd19ca73d31e4547d3227481c5",
+      "bytes": 1535
+    },
+    "scanner.py": {
+      "sha256": "11e7bca6f4fcf92ea120311334f99f694965cb05d24c4095ae0f3da8c23bad71",
+      "bytes": 539
+    },
+    "seal_bootstrap.py": {
+      "sha256": "996802950111224b433884c2a8d4756d5446f5283c90cd8a93d7dd02e111251e",
+      "bytes": 1341
+    },
+    "seal_utils.py": {
+      "sha256": "241514beaca07a29a7e7de5a68707e3d487c952e47311b046dda556089991504",
+      "bytes": 3709
+    },
+    "sitecustomize.py": {
+      "sha256": "0d38e128a68c41ca66c7e9b40a0af105222935eda960decabbaf6c95426e3b67",
+      "bytes": 2495
+    },
+    "source_oracle.py": {
+      "sha256": "c72f07bcc3c84e0795152b36d2b9ee29d0772438b2f128079d674dc4a14b4d9e",
+      "bytes": 4527
+    },
+    "test_launch.py": {
+      "sha256": "d0be1366dfa8b93fbbd6846290a1610690b5fe03700d94c2379ecd6605104b4d",
+      "bytes": 719
+    },
+    "warnings_check.py": {
+      "sha256": "d4c04779a7a5d803d703f1a1cd128113e9f02cf46b1e2ed9855fd77995524c1d",
+      "bytes": 3800
+    }
+  },
+  "exact_semantics": "check_exact=True, rtol=atol=0; full axes levels/codes/classes/dtypes/null masks/order and recursively typed attrs/immutable _FIELDS presence and values.",
+  "all_raw_source_frames_logs_warnings_private": true,
+  "reviewer": "Sue / GPT-6"
+}

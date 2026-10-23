@@ -1,0 +1,12 @@
+{
+  "verify_second_remaining_and_precision_root.py": {
+    "sha256": "e952e5be81695d42307e5d569c12adb9df96cb11b841adb78e2bb7884b3f5948",
+    "bytes": 11176,
+    "stdlib_only": true
+  },
+  "verify_api9_role_source_root.py": {
+    "sha256": "322b8d5d4ecf59ccd5610a8ed5cf111c8571ff132562b5ca5e84af522afb7321",
+    "bytes": 2690,
+    "stdlib_only": true
+  }
+}

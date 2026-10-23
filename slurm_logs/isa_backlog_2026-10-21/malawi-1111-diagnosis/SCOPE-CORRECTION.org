@@ -1,0 +1,23 @@
+#+title: Malawi #1111 diagnosis scope correction
+#+author: Sue
+#+date: 2026-10-21
+
+The original read-only REPORT.md records a narrower-footprint expectation for wave-driver-only edits.
+Subsequent measurement of the proposed two-driver correction supersedes that expectation: all 26 Malawi API entries change hash, comprising 22 nonderived and four derived entries.
+All 523 other-country entries and all 39 tagged framework fingerprints remain exact.
+The cause is the existing Wave._input_hash implementation, which includes every Python body in a wave's underscore directory in each table hash.
+Supporting sample therefore rebuilds through the normal cache path even though no sample code changes.
+The original diagnosis and its receipts are retained unchanged.
+
+Both the released f8 baseline and reviewed organic de9 branch have 180,184 plot-input rows.
+The 169,109 figure is the nonorganic subset; f8 also retains 11,075 organic rows with the existing zero behavior.
+The #1111 writer independently preserves f8 organic behavior and changes only the questionnaire-covered 2010/2019 inorganic unit declarations.
+Its 235 application-pair coalescences preserve every selected positive kg contribution through the existing additive reducer.
+Composition with PR #1175 must separately preserve the latter's recovered organic quantities and Applied semantics.
+
+The writer has verified exact sample frames, cache frames and fresh-process no-write behavior.
+Its fresh baseline/candidate sample-only cold runs each emit the same 18 categorical warnings, in the same order and with identical category, message, filename and line.
+The main candidate build emits six such events; these are build-event counts and must not be equated to the ten source metadata bindings with missing label sets.
+Independent review of the final #1111 implementation remains pending.
+
+Sue

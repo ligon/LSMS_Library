@@ -1,0 +1,92 @@
+{
+  "verdict": "PASS",
+  "findings": [],
+  "frozen_head": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+  "runtime_base": "6fda46bc5437758bd650cf4016f0782a124281cf",
+  "frozen_tree_clean_unchanged": true,
+  "all_24_Nigeria_hashes_identical_to_frozen_6f": true,
+  "held_food_cache_matches_original_independent_cold_frame_exactly": true,
+  "old_failure_is_invalid_all_round_exclusivity": true,
+  "source_conversion_file_test_executed_passed": true,
+  "amended_tests": {
+    "total": 78,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exitcode": 0
+  },
+  "baseline_test": {
+    "total": 1,
+    "failed": 1,
+    "errors": 0,
+    "skipped": 0,
+    "exitcode": 1
+  },
+  "proof": {
+    "head": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+    "base": "6fda46bc5437758bd650cf4016f0782a124281cf",
+    "runtime_tree_blob": "c55a3c8c54d1fb13e70fa3b6b1250de224199853",
+    "all_runtime_config_sources_identical": true,
+    "all_other_test_code_AST_identical": true,
+    "all_original_calls_retained_except_invalid_exclusivity": true,
+    "all_original_assignments_retained_except_intended_on_mass_scope": true,
+    "original_assertions_retained_except_invalid_exclusivity": 5,
+    "old_target_assertions": 6,
+    "new_target_assertions": 9,
+    "observed": {
+      "sized_by_round": {
+        "2011Q1": 3809,
+        "2015Q3": 11
+      },
+      "W1_mass_fraction": 1856,
+      "W1_mass_whole": 1566,
+      "later_shared_rows": 11,
+      "later_rungs": {
+        "unit": 11
+      },
+      "later_Quantity_kg_nonnull": 0,
+      "later_W1_derivation": 0,
+      "actual_unmodified_ladder_assertions_pass": true
+    },
+    "in_memory_negative_controls": {
+      "W1_fraction_wrong_card": "rejected",
+      "W1_whole_survey_kg": "rejected",
+      "later_survey_kg": "rejected",
+      "sized_metric": "rejected",
+      "litre_survey_kg": "rejected",
+      "later_W1_derivation": "rejected",
+      "unrelated_later_derivation": "permitted"
+    },
+    "runtime_hashes": {
+      "sample": "d0e8b0b4c2c3c906da14f2a03d593d4bc9674734ea3365d0278736b04e52a9e5",
+      "cluster_features": "253343cd93e90c9ffd89a3feb6b40830c3cbdfefe3b7e03b52a81a1adb1a46e5",
+      "shocks": "c38f3c5889fccc50faa9e2351e14d1691ce3822db0e29789e19bffca07ced080",
+      "food_acquired": "13f1a1f4d0ac66c40406d0f8c921d5dcb4ab2d6e0ae43ac93275306b319659db",
+      "household_roster": "053bf39ec94136767865836b6cdd1703c0f15f7f12f57a64b68beba2692551f1",
+      "individual_education": "5e9ef88c52d514db3f1671f0b156e51c1a50b62285fb3a2834d779b4b1269260",
+      "panel_ids": "cb90d7a99c24b52bae92d444b24d71dcc718806013f7cb78f85a68483508a96d",
+      "assets": "72e31f374ca226018125d13c5129d1c5515451a185ab15276ced37f291cf7119",
+      "interview_date": "485350f323ea96a793cd8f843f84eb505a778ee1a244f8e34f6bd13eee49ddd2",
+      "housing": "59ff892f612c9ab3647b58c8a08d1085f7e060b6b3ca23ee8ab822a6e2a3b15c",
+      "plot_features": "1690290256c2f2c9a7900c5ee9ed23486f68c13bd6cd55bf373fb8e24b2595c7",
+      "crop_production": "87838da24b9e71a15b4c3a226319790a5875582d480e7af5ec79ecb440423079",
+      "plot_inputs": "22fe0876b4a0f48445632347055e7d663799335b4d7621063c3821ced3d8fc94",
+      "food_coping": "e2922b0fab91872ae13ab571d17549e9f41e24e46e3ac991425c9f3098541ff8",
+      "livestock": "f645018f6369217cf02f2c1d160ac2dd8860d2a5b72e7f5c12890aa9b2a66456",
+      "anthropometry": "23dda16ab8c2cc32e35c1fd9942a324bcf291fed99e1cd9f962a15e277ce5e79",
+      "plot_labor": "418d5967f799ae480b0cbd36615dfdbc46526043636df8dcc13039dd921efe57",
+      "people_last7days": "9cc4cc8bc3884d196b2c69f041da3fd8982835f46f0424c3ef05a985743b896b",
+      "community_prices": "a250d10f78dd63a09b4310889f95460fc839dab35863a457af728bf94ffd0c4d",
+      "nonfood_expenditures": "f8ddc5686e992cf815d3bd0cce5238a44f4b8b3e2e24489d0cc180be2c7d7068",
+      "food_expenditures": "008f0d87c06bc54bb8db072a054f24e8f1f559b3b3b30b13019c0b749f8d7473",
+      "food_prices": "6078c94ae190f4710976fe1fb9e69cd9b6833ce542d11c4547fa232a497ff825",
+      "food_quantities": "498bd3956e36118041b80adf1ea18e394343875c3739c3a054e3b93b675c229b",
+      "household_characteristics": "e8147c405119cc478814c4ca6684bc51d2b061a28eb6ff32bd1713bf2c74c52d"
+    }
+  },
+  "limits": [
+    "Warm physical private L2 copy; no new cold source rebuild",
+    "Runtime/source approval remains the preserved independent review at 6f",
+    "Warning logs and JUnit remain private"
+  ]
+}

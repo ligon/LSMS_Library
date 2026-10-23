@@ -1,0 +1,20 @@
+{
+  "baseline_original_tracked_files": 14880,
+  "candidate_tracked_files": 14886,
+  "original_tracked_content_modes_symlinks_exact_except_country_py": 14879,
+  "original_changed_paths": [
+    "lsms_library/country.py"
+  ],
+  "new_allowed_paths": [
+    ".coder/ledger/1081-derived-categorical-errors.md",
+    "slurm_logs/isa_backlog_2026-10-21/framework1081/REPORT.md",
+    "slurm_logs/isa_backlog_2026-10-21/framework1081/REPRODUCE.md",
+    "slurm_logs/isa_backlog_2026-10-21/framework1081/RESIDUALS.md",
+    "slurm_logs/isa_backlog_2026-10-21/framework1081/VALIDATION.json",
+    "tests/test_1081_derived_categorical_errors.py"
+  ],
+  "original_diagnosis_source_exact_baseline": true,
+  "author_source_Git_tree_and_runtime_test_filesystem_modes_exact_review_candidate": true,
+  "five_documentation_filesystem_modes": "author0644 versus detached0600; identical content and Git100644 mode; each frozen tree unchanged",
+  "ledger_first_commit_contains_only_ledger": true
+}

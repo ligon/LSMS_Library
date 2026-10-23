@@ -1,0 +1,50 @@
+{
+  "status": "ROOT_ACCEPTED_BOUNDED_PR1175_AND_EXACT_NINE_API9_WITH_SEPARATE_PRECISION",
+  "at_UTC": "2026-10-22T14:34:20.783487+00:00",
+  "pr1175": {
+    "full_strict_groups": 1,
+    "original_field_projection_groups": 2,
+    "qualified_unused_u_domain_groups": 3,
+    "preserved_complete_axis_failures": 3,
+    "original_scalar_predicates": 14,
+    "u_code_dtype_all_three": "int8",
+    "all_original_memory_and_source_gaps_preserved": true
+  },
+  "api9": {
+    "authenticated_original_contents": 9,
+    "full_strict_reference_pairs": 14,
+    "preserved_typed_attrs_failures": 4,
+    "record_vs_plain_dict_boundaries": 8,
+    "additional_actual_initial_warm_full_strict_pairs": 9,
+    "original_Code_projection_pair": 1,
+    "all_stored_field_values_types_and_plain_str_keys_exact": true,
+    "historical_original_size_mode_mtime_absent": true,
+    "new_physical_interval_only": true
+  },
+  "classification": "Malawi unused u domains are inherited from actual organic-unit gains; API9 record class/_FIELDS differences are the original documented JSON attrs serialization versus public-record reconstruction boundary. All original strict failures remain. No full equality is substituted for qualified pairs.",
+  "source_tracked_receipts": 14880,
+  "frozen_entries": 230,
+  "original_or_prior_operand_copies": 33,
+  "additional_precision_copies": 10,
+  "packet_pins": {
+    "pr1175": {
+      "READY_sha256": "cd18f06411b6ec6187d14ecd8bf879fcf453c8ba907745d41d8b7954b1d86d31",
+      "manifest_sha256": "eb487511265173e6007bf1b4bc5a6d198b266ced5b6052d176e8293bdd9b9ae3",
+      "entries": 84
+    },
+    "api9-products": {
+      "READY_sha256": "37305d1c4058ab0503c770fbb773de7c7ecef67e2e3bdca7002fa99f14fb39ef",
+      "manifest_sha256": "bd49382ab666da604c7eb0b781afe23fb7044094043eab35ab8a1264a7a3d9cd",
+      "entries": 104
+    },
+    "precision-supplement": {
+      "READY_sha256": "ef2077d0f19f8ad33f08e7bd1bf299b5b8fdef0b12be7fe002e4e43a63c508b6",
+      "manifest_sha256": "ce11931191354bbf6554b07a37c3c176b0d8d820b97cd9e34338a68a278e6782",
+      "entries": 42
+    }
+  },
+  "root_read_actual_checkers_preparations_boundary_and_precision_source": true,
+  "root_metadata_only_no_payload_API_source_test_replay": true,
+  "no_all_campaign_or_scientific_approval": true,
+  "signed": "Sue"
+}

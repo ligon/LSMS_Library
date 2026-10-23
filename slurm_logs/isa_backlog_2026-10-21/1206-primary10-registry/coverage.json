@@ -1,0 +1,424 @@
+{
+  "status": "PRIMARY_RETAINED10_AND_INTEGRATION_BOUNDED_SAVED_EVIDENCE_REGISTRY",
+  "at_UTC": "2026-10-22T15:01:42.141135+00:00",
+  "assigned_primary_PRs": [
+    1192,
+    1193,
+    1194,
+    1195,
+    1197,
+    1199,
+    1200,
+    1201,
+    1202,
+    1203
+  ],
+  "retained10": [
+    {
+      "PR": 1192,
+      "owner": "/root/validation_reassess",
+      "bounded_saved_evidence_counts_not_additive": {
+        "strict_original_frame_groups_pass": 25,
+        "original_strict_complete_axis_findings_preserved": 12,
+        "two_NEW_source_identical_full_axis_constructions": true
+      },
+      "root_acceptance_status_from_latest_explicit_messages": "ROOT_CLASSIFICATION_PENDING_12_COMPLETE_UNUSED_AXIS_DIFFERENCES",
+      "qualifications_and_gaps": "Original terminal1 immutable. Complete levels/codes/storage/names/sort order and gain-key operations characterized under actual recovered-unit patch/stages. Numeric values/masks/observed keys do not mismatch. No axis normalization or blanket qualification; four producer attrs predicates remain distinct from never-made assertions.",
+      "packets": [
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1192-Nigeria-release",
+          "READY_SHA256": "e843b3f4bfe03595f367d337f9ea23c4d3cfbdf1cee9e3e2d38b02c4eeb905a5",
+          "manifest_SHA256": "9e6f53e8130380c86bbb315b46d17acbe10562d69a1066731a11f959b43570f3",
+          "manifest_entries": 114,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1192-Nigeria-release-attestation",
+            "READY_SHA256": "fd987902287136bbf634122adf75767bf00f7ab66c0192188575a376fc8be8b1",
+            "manifest_SHA256": "3507d3e10f9f28972fc786355bdcc081d89c23b358b7e8bbbd0f7e34a44258c6",
+            "manifest_entries": 3
+          }
+        }
+      ]
+    },
+    {
+      "PR": 1193,
+      "owner": "/root/validation_reassess",
+      "bounded_saved_evidence_counts_not_additive": {
+        "standalone_composed_strict_frames": 251,
+        "standalone_composed_NEW_pair_member_frames": 2,
+        "standalone_composed_original_perkey_predicates": 4,
+        "integration14_strict_frames": 135,
+        "integration14_NEW_pair_member_frames": 1,
+        "integration14_original_perkey_maps": 2,
+        "integration14_inline_frame_sets": 4
+      },
+      "root_acceptance_status_from_latest_explicit_messages": "FROZEN_ROOT_ACCEPTANCE_PENDING",
+      "qualifications_and_gaps": "Initial integration14 authority hold preserved; NEW authorized 1190->1078->global14 chain packet resolves saved predicates only. Stage-specific standalone organic-zero and composed organic-reported states stay. Original stopped dict O(n2) source/log terminal143 and predecode size/bytes format stop remain; NEW terminal0 versions do not replay completed main checks. Cold public/fresh-return/fixture memories absent.",
+      "packets": [
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1193-Malawi-standalone-composed-release",
+          "READY_SHA256": "96e379ce1eecfe92cb8931f95a38182ea7a6ddb1b6960c9636e4b91fddacb0ba",
+          "manifest_SHA256": "7140d29680a7e283550470aa6107b7b2e7c714d6105310e135fbd7bd46959165",
+          "manifest_entries": 284,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1193-Malawi-standalone-composed-release-attestation",
+            "READY_SHA256": "b7d24c6e8aa6d4a876cf41efdd5746cf083cf403a48535dc27c7ee574843a216",
+            "manifest_SHA256": "c7096a9293436254d642bcca9b49884c6f95449b14cac9990951cc7f89c844a0",
+            "manifest_entries": 4
+          }
+        },
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1193-integration14-release",
+          "READY_SHA256": "e3412e73385f16054168f92caa3513afb81b04cc28fdb74d574b85b0ed2a6d26",
+          "manifest_SHA256": "c6b46be71238f67d2820e566be04846e70f8061cb13578cb7df40f7611d76a00",
+          "manifest_entries": 165,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1193-integration14-release-attestation",
+            "READY_SHA256": "dbc24af632084a897133731bd0125e6d2befef899ea1a0e00356c8a7831dceff",
+            "manifest_SHA256": "c80885bf4c614813d288c92234b4460ac2b753d177aaa1d234ef3292c66213a8",
+            "manifest_entries": 5
+          }
+        }
+      ]
+    },
+    {
+      "PR": 1194,
+      "owner": "/root/validation_reassess",
+      "bounded_saved_evidence_counts_not_additive": {
+        "strict_frame_groups": 87,
+        "physical_copies": 58,
+        "historical_original_receipts": 189
+      },
+      "root_acceptance_status_from_latest_explicit_messages": "FROZEN_ROOT_ACCEPTANCE_PENDING",
+      "qualifications_and_gaps": "Eight original walked native expected memories, projected source-coordinate/bit-array memories and fixtures remain absent. Twelve NEW retained endpoint controls are labelled NEW. Senegal original two-season/split-EA/weights/encoding distinctions retained; no API/source reconstruction.",
+      "packets": [
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1194-Burkina-release",
+          "READY_SHA256": "cccc34f3112629a88a8966a18ac06133ba94d621fefe22e6af351017a0df338a",
+          "manifest_SHA256": "97024d37d257ccf6aba5676c17158247682fc0b630b1b4b231b2e89923bc1d1c",
+          "manifest_entries": 110,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1194-Burkina-release-attestation",
+            "READY_SHA256": "63c841c17daa8be1496d537e6dec10085f2eea538e04e5ca001324e18a94fbfc",
+            "manifest_SHA256": "831483f2b24e0199eb37076090112ee7a604aa0b1d1e84049c5b6a83370d17c7",
+            "manifest_entries": 4
+          }
+        }
+      ]
+    },
+    {
+      "PR": 1195,
+      "owner": "/root/validation_reassess",
+      "bounded_saved_evidence_counts_not_additive": {
+        "strict_frame_groups": 142,
+        "historical_review_receipts": 1298,
+        "later_protected_author_receipts": 856,
+        "physical_copies": 97
+      },
+      "root_acceptance_status_from_latest_explicit_messages": "FROZEN_ROOT_ACCEPTANCE_PENDING",
+      "qualifications_and_gaps": "Healthy defaults/explicit unitvalue/Uganda Aggregate/Feature default and None remain distinct. Six unsaved warm-return memories and235 test-fixture memories not replayed. Current Ethiopia empty-unitprice prose contradicts original healthy.py plus four saved typed-refusal JSONs. Runtime exception identity/cause/context not recovered.",
+      "packets": [
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1195-categorical-release",
+          "READY_SHA256": "7c41e97b3fa40b83dd9722ff5f11a9e6b248acf74d83c420fd8a39a6685c65d5",
+          "manifest_SHA256": "a1b65ab532262a716b79c70a0e72923b0faf805878981b25bd53838ae142815e",
+          "manifest_entries": 156,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1195-categorical-release-attestation",
+            "READY_SHA256": "d826517a89abb6051d28b47663449d044ae7342692fbed8e50de940ac1f33ee7",
+            "manifest_SHA256": "3ffb5acb1ca691292abfbf9f4bdf251da424bbc2e3cd78fc279591baf6ee13e2",
+            "manifest_entries": 4
+          }
+        }
+      ]
+    },
+    {
+      "PR": 1197,
+      "owner": "/root/validation_reassess",
+      "bounded_saved_evidence_counts_not_additive": {
+        "bounded_positive_frames": 152,
+        "bounded_strict": 150,
+        "bounded_original_u_NA_qualified": 2,
+        "separate_original_source_row_predicate_sets": 9
+      },
+      "root_acceptance_status_from_latest_explicit_messages": "FROZEN_ROOT_ACCEPTANCE_PENDING",
+      "qualifications_and_gaps": "Nine source-row predicates mean six Quantity-NA/three Expenditure-NA sets and positive counterpart/operand-list checks; NOT nine full frames, full counterpart numeric equality or38743-row reconstruction. Old authority hold remains in earlier packet. Original suite4689pass4453skip9fail, six denial attribution gaps, unguarded preliminary census and scheduling/global16 composition limits remain.",
+      "packets": [
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1197-provenance-release",
+          "READY_SHA256": "c3617b331974d9568e0e976427b57f7f4a2b31e69e6660b4ec3537beda65aac6",
+          "manifest_SHA256": "62bdcf92a54c5fb797fee8b56c793be7f86db628d6dfe84730a970af908fd207",
+          "manifest_entries": 259,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1197-provenance-release-attestation",
+            "READY_SHA256": "c2d0b653c2d927d0d4d277c98fcdfdc05bb980c9def6dedfa0c45fa13201af86",
+            "manifest_SHA256": "cc8e9932d42c996fa42b4f2a69e80663d6741f59f7eea111a5860579981a22e2",
+            "manifest_entries": 4
+          }
+        },
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1197-source-details-release",
+          "READY_SHA256": "da565b90ec39d08e117bd987da07a200b909c9a832120b7ab04d16d34e34794c",
+          "manifest_SHA256": "a80bfed657e2c9796ca21450fea0b0c29aae3e62a10bc1bb2b50040671ae3b64",
+          "manifest_entries": 65,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1197-source-details-release-attestation",
+            "READY_SHA256": "a74420f4da985d423a2db152735b2ba824e65010695ffe784d5b553fb35dcf23",
+            "manifest_SHA256": "0369bdea69e95e7595612967cdcf2cea2a5ec73125cca004f58a6c5207bb66c5",
+            "manifest_entries": 4
+          }
+        }
+      ]
+    },
+    {
+      "PR": 1199,
+      "owner": "/root/validation_reassess",
+      "bounded_saved_evidence_counts_not_additive": {
+        "positive_frames": 209,
+        "strict_frames": 208,
+        "original_qualified_frame": 1,
+        "attrs_only_predicates": 3,
+        "physical_copies": 193
+      },
+      "root_acceptance_status_from_latest_explicit_messages": "ROOT_REPORTED_ACCEPTED",
+      "qualifications_and_gaps": "Original1190 historical mtime is absent. Explicit root ruling permits NEW current physical baseline against authenticated historical SHA/bytes/mode only. Failed initial gate preserved; no invented historicalmtime continuity. Original empty/direct-test/fixture memories absent.",
+      "packets": [
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1199-Mali-content-v2-release",
+          "READY_SHA256": "ba8e4e5b1d78085596329ca7f65db98aa1be986c64e95ce5d008b9b4ee9b5dd0",
+          "manifest_SHA256": "b9da253fa7d3b1dc7cf1965c5b188992e29a0dbadef1bbebc393c2800d4938c5",
+          "manifest_entries": 274,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1199-Mali-content-v2-release-attestation",
+            "READY_SHA256": "72f01a07e215fd9e880e252baa4d2478975fa86530c24c9fe397a40bc39aa839",
+            "manifest_SHA256": "b2ae34fe33b249443920579b06d8c52c22415d9e4fa25bd6cef3218d18444227",
+            "manifest_entries": 2
+          }
+        }
+      ]
+    },
+    {
+      "PR": 1200,
+      "owner": "/root/validation_reassess",
+      "bounded_saved_evidence_counts_not_additive": {
+        "positive_frame_groups": 96,
+        "strict": 94,
+        "original_u_NA_qualified": 2,
+        "original_empty_expected_memory_gaps": 9
+      },
+      "root_acceptance_status_from_latest_explicit_messages": "CORRECTED_V3_96_NUMERIC_GROUPS_ROOT_ACCEPTED_IN1160_FULL_PACKET_ACCEPTANCE_NOT_ASSERTED",
+      "qualifications_and_gaps": "All actual fast-v2 groups separately corrected-v3 in accepted1160; no old frozen release mutated. Original nine empty expected memories, writer/aggregate/auxiliary delta and test-fixture/endpoint limits remain.",
+      "packets": [
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1200-Niger-release",
+          "READY_SHA256": "d890a05de4144c39e7f0c19437c6def7e8e328b05eafe993bf41f78147d6963d",
+          "manifest_SHA256": "5f84978ef09d97f8f0909091c948383613ab7ec6f47dd3308347603f7a4df4b7",
+          "manifest_entries": 201,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1200-Niger-release-attestation",
+            "READY_SHA256": "e0f5c3b59d9cbe7bfa5f50cd5a7f1f9ffd53cda7196356052f11242cc34f0cab",
+            "manifest_SHA256": "8bba807a4c8d55e11be8ff8c9ad8c42fe385535316729c0379bd7bc8c111e2bd",
+            "manifest_entries": 2
+          }
+        }
+      ]
+    },
+    {
+      "PR": 1201,
+      "owner": "/root/validation_reassess",
+      "bounded_saved_evidence_counts_not_additive": {
+        "positive_frames": 322,
+        "strict": 307,
+        "original_qualified": 15,
+        "old_negative_controls": 30,
+        "CLI_byte_controls": 16,
+        "physical_copies": 416
+      },
+      "root_acceptance_status_from_latest_explicit_messages": "ROOT_REPORTED_ACCEPTED",
+      "qualifications_and_gaps": "Original40-source census/author7 supplement mapped. Eleven held tests frames/fixtures and partial aggregate child logs remain absent. Tanzania NPS backcasting/refresh/subpanel/key caveats retained. Old stops and native/writer/JSON/attrs stages unchanged.",
+      "packets": [
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1201-Tanzania-release",
+          "READY_SHA256": "865329a1ab0f592e909d3501d865a6db51b7bcdecaf99f5a02f1fe725c603eac",
+          "manifest_SHA256": "673875482f78d900c61be343f85caac7c9edfd784d4654a44ae5f97d44a15eea",
+          "manifest_entries": 507,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1201-Tanzania-release-attestation",
+            "READY_SHA256": "893e2ca9945388251c932c6ea38d970118b20652f5bdea1f77135dce3f686021",
+            "manifest_SHA256": "819e371fce8627bd3d5b1cd646fe6fc04a43965ac290a75c48c12da0701057da",
+            "manifest_entries": 2
+          }
+        }
+      ]
+    },
+    {
+      "PR": 1202,
+      "owner": "/root/validation_reassess",
+      "bounded_saved_evidence_counts_not_additive": {
+        "persisted_positive_frames": 278,
+        "persisted_strict": 274,
+        "original_v_NA_qualified": 4,
+        "NEW_exact6e_recipe_paths": 9,
+        "partial_original_crosshead_attrs_predicates": 3,
+        "CLI_full_footer_schema_byte_pairs": 2,
+        "original_cross_stage_CLI_rejections": 2,
+        "available_count_predicate_sets": 40
+      },
+      "root_acceptance_status_from_latest_explicit_messages": "FROZEN_ROOT_ACCEPTANCE_PENDING",
+      "qualifications_and_gaps": "Separate f8 persisted hold unchanged; NEW exact6e source/config/guards supplies nine explicit pure original recipes, six currency argument paths with duplicate bare/index targets plus three pooled Feature. No Country/Wave/Feature runtime methods called. Two median-helper array pairs, fixture memories, source/header/eligible prefix and original warning/XML gaps remain. Original Make17 mode+mtime and parcel-area/documentary contradictions stay.",
+      "packets": [
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1202-Uganda-persisted-release",
+          "READY_SHA256": "4b47d28cfb6305a631b5caf6b8018cc8ab922e5dfc0ef0720e9f155b1c424fb5",
+          "manifest_SHA256": "fc4b1d77c7dbcc6ad7b3418a1ff1041ae34f6fbf0162152c21fb529502ebaabb",
+          "manifest_entries": 555,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1202-Uganda-persisted-release-attestation",
+            "READY_SHA256": "d92907f6c31a61987d310c945f41d286d4e72dd04c6f780d32b2e865f67d8154",
+            "manifest_SHA256": "1e755b35493ff91847bd62e82d64b9af51051456ebacb7bda02a3d671fd103d8",
+            "manifest_entries": 4
+          }
+        },
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1202-Uganda-exact-source-release",
+          "READY_SHA256": "b2c1ab80d258daebd1b885d0d03b1fe4462536b6e3baf94f7c8f75f35bb74ca8",
+          "manifest_SHA256": "9ada12caa1bf81c5f3d896de3941a75a9dc3068e473d8ff6631fbe15f9ae0abd",
+          "manifest_entries": 93,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1202-Uganda-exact-source-release-attestation",
+            "READY_SHA256": "0a2aecba0320d1fbc8774bed6b3d8a22e89d34bdedd79a6be5e9cc68a94675fe",
+            "manifest_SHA256": "90d4733c3cc2b773559bd3476c49db247237fa7db402aaa3ab0f0409fae3e48c",
+            "manifest_entries": 4
+          }
+        }
+      ]
+    },
+    {
+      "PR": 1203,
+      "owner": "/root/validation_reassess",
+      "bounded_saved_evidence_counts_not_additive": {
+        "positive_strict_frames": 192,
+        "separate_payload_only_diagnostic": 1,
+        "old_negative_stages": 5,
+        "full_CLI_footer_schema_byte_pairs": 4,
+        "physical_copies": 204
+      },
+      "root_acceptance_status_from_latest_explicit_messages": "ROOT_REPORTED_ACCEPTED",
+      "qualifications_and_gaps": "One payload-only diagnostic is not a full-frame equality claim. Original33-source/test census; two direct test-frame memory gaps and initial wrong-unit/CLI stops retained. Eight Feature and25 relabel NEW expectations explicitly not recovered memory.",
+      "packets": [
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1203-Burkina_Faso-release",
+          "READY_SHA256": "f212cfa2e0ba34bb358de123d81ba6bcf21173c2386409576c2b8e1819785996",
+          "manifest_SHA256": "61ace40be6c441731dd813c3d979610e8468cdf09fb1c39e426a5fa9de4dc0bd",
+          "manifest_entries": 284,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/pr1203-Burkina_Faso-release-attestation",
+            "READY_SHA256": "758263a847d99216b92406a5e15caa69e18a1895a4945891334569f77c25282a",
+            "manifest_SHA256": "febee17a73c24caa0ad9879cc57cd4cb106ed5da9f13a825e7ad068bceef0eba",
+            "manifest_entries": 3
+          }
+        }
+      ]
+    }
+  ],
+  "integration_cohorts": [
+    {
+      "cohort": "17",
+      "packets": [
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/integration17-release",
+          "READY_SHA256": "ccd1339a4f66de660ca53bf8d934cf71011c556f4635ff74572d6823ed34590f",
+          "manifest_SHA256": "06fbb9a93e156828bae6296fa74fac9c8fdf13b14178e5ff5a38da5c16b575d7",
+          "manifest_entries": 777,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/integration17-release-attestation",
+            "READY_SHA256": "970d5e3c5fe3e93ee7a65f865b81b3b15d11c0a8d35c9b4099cbf515607abf96",
+            "manifest_SHA256": "10e93241b3e4fbb3f2b5890aa02805c067b9c3e4175f185423043db73632598a",
+            "manifest_entries": 2
+          }
+        },
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/corrected-object-v3",
+          "READY_SHA256": "09dec74118c5131863ce92b6c78214c6ecf87146a121aa758774ff892a5780b2",
+          "manifest_SHA256": "96b5c506e1955748ba62dca453260d773772d9ed9e1f261942500de45c13eeba",
+          "manifest_entries": 1202,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/corrected-object-v3-attestation",
+            "READY_SHA256": "afe74ed2c4677711f83862372d4978656c9db05c3a491bc532f7fb6d94e5c56c",
+            "manifest_SHA256": "1aa0b6cbcf0f0ff414e26ac83cd561cea4ae638356bf85559fbc2ea69c5a3fda",
+            "manifest_entries": 2
+          }
+        }
+      ],
+      "coverage": "448 positive groups:446 strict/two original u NA qualifications.196 actual fast-v2 producer uses corrected-v3 within accepted1160.252 earlier groups remain their original slow strict proof; do not sum overlapping supplements.",
+      "limits": "Eight stale states excluded; original suite5148pass4459skip13fail and original docguard attribution gap remain. Full410-site census plus producer addendum. Corrected1160 numeric supplement root accepted; full17 packet acceptance not asserted."
+    },
+    {
+      "cohort": "18/19",
+      "packets": [
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/integration18-19-release",
+          "READY_SHA256": "b071b06e2ca33cd8e4bc680f95c0db4d09f0d9e6b6e5ceb4067039ceb2051fb6",
+          "manifest_SHA256": "872db2c93a9f064e14b3cb4e3a5c1848c848fe07a25acb52422ef0e34adc024d",
+          "manifest_entries": 1132,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/integration18-19-release-attestation",
+            "READY_SHA256": "0f3bdad1c31b86d6035918a1c719e0284d0d2d55e117c131951b5413c159582f",
+            "manifest_SHA256": "ead5a0244cd90eb1734650a1e4455b1a392a5d81b4d923cd669010b2f6c3961c",
+            "manifest_entries": 2
+          }
+        }
+      ],
+      "corrected_v3_packet_shared_with17": "corrected-object-v3",
+      "coverage": "868 positive groups:265 integration18 and603 integration19; all actual fast-v2 uses corrected in accepted1160. Four original stage qualifications remain.347/248 complete source-census sites and addenda.",
+      "limits": "29 original empty memories plus two direct18-test memories absent;20CLI byte controls. No campaign/suite/unsaved/runtime replay. Full18/19 packet acceptance not asserted."
+    },
+    {
+      "cohort": "critical20/1196",
+      "packets": [
+        {
+          "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/critical-release",
+          "READY_SHA256": "63419e4e8f4559e34f411d346eefce85906877057641696351a92fc75affa91a",
+          "manifest_SHA256": "ff982bd1561f6f79151f18a0b048cfb694990514a8ef5562fceb4f32795bd309",
+          "manifest_entries": 449,
+          "postexit": {
+            "private_release": "/local/job40255479/control/isa-backlog-20261021/comparator-values-reassessment/critical-release-attestation",
+            "READY_SHA256": "408ae7ced1fdbf4b3ce86ac223f633dc264ca68bea3d2229101ac9f849acd82c",
+            "manifest_SHA256": "598f1016f1dca1c0454176ac8735e34af82906caffe5a527817a8d865b910bb3",
+            "manifest_entries": 3
+          }
+        }
+      ],
+      "coverage": "433 positive groups:407 strict/26 original stage qualifications. Root reported accepted.",
+      "limits": "Original missing child logs/memory and source/raw/native-before-write limits remain. No blanket campaign acceptance."
+    }
+  ],
+  "other12": {
+    "owner": "/root/acquisition_1149",
+    "PRs": [
+      1172,
+      1173,
+      1175,
+      1176,
+      1178,
+      1180,
+      1181,
+      1182,
+      1185,
+      1186,
+      1189,
+      1191
+    ],
+    "status": "ROOT_REPORTED_FIRST12_BOUNDED_REGISTRY_ACCEPTED_NOT_INDEPENDENTLY_ATTESTED_HERE",
+    "new_archive182_scope": "ROOT_REPORTS_NEW_CONTENT_AUTHORITY; NOT_READ_OR_DECODED_BY_THIS_AGENT; OLD_HOLDS_UNCHANGED; SEPARATE_DISPATCH_REQUIRED"
+  },
+  "all22_completed_or_accepted": false,
+  "integration21": "OUTSIDE_THIS_ASSIGNMENT_CURRENT_STATUS_NOT_ATTESTED",
+  "numeric_value_claim": "No new unexplained numeric/mask/observed-used-key mismatch was demonstrated in completed available retained10 saved checks; original12 complete-axis findings on1192 remain for root classification. Missing operands are not positive proof.",
+  "counts_warning": "Rows are site/stage-specific and supplements overlap. Do not total them as independent datasets, complete original runtime coverage or campaign success.",
+  "corrected_helper_SHA256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94",
+  "calibration_SHA256": "22b472f1989a47ef15a53d2e50cbcd83878999be3e4c6ced94da8b2acbc2015a",
+  "source_API_pytest_CLI_cache_acquisition_GitHub_replays_or_mutations": 0,
+  "frozen_old_releases_mutated": false,
+  "campaign_edits": "Only assigned ledger63a7e3fb5 was committed/published earlier; this work adds private packets only.",
+  "signed": "Sue"
+}

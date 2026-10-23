@@ -1,0 +1,26 @@
+{
+  "recorded_at_UTC": "2026-10-22T07:09:15.102869+00:00",
+  "status": "ROOT_APPROVES_EXACT_SHARED_PARQUET_ONLY_EXPANSION_CONDITIONAL_ON_AUTHOR_BD80_SEAL_TERMINAL_SUCCESS",
+  "base_head": "bd80d86c26786ca92680160abd790260bc924c3f",
+  "patch_sha256": "942527406d9abaa3a58e853b11255ef5740de4d59a982ca028dd72dce7b26c31",
+  "design_sha256": "3661423d205757cd044538d9e792df322d8a5515d0a36262cc48cf8763799be5",
+  "source_paths": [
+    "lsms_library/local_tools.py",
+    "lsms_library/country.py"
+  ],
+  "root_read_full_actual_patch_design_callers_generic_fallback_and_original_error_tuples": true,
+  "git_apply_check_exit": 0,
+  "same_open_stream_and_caller_specific_payload_errors_required": true,
+  "no_generic_get_dataframe_substitution_in_Wave": true,
+  "both_YAML_and_script_routes_required": true,
+  "no_schema_exclusion_writer_science_source_or_acquisition_change": true,
+  "actual_hash_census_vs_bd80_and_f8_required_before_new_builds": true,
+  "new_tests_actual_bd80_counterfactual_source": "/local/job40255479/worktrees/isa-1196-index-fix-bd80",
+  "new_counterfactual_exact_ignored_metadata_receipt": "bd80-control-metadata-preparation.json",
+  "runtime_verification": "New candidate source-cold and fresh-process/new-object warm under BOTH Default and Make for Nigerfood and Ugandacluster. Immutable oldf8/bd80 reference outputs may be reused only with actual argument/stage/source and full physical receipt gates; no old completed prefix replay to replace evidence. If new control API execution is necessary for a genuinely changed interaction, explain its new question and preserve separate outputs.",
+  "new_reader_and_wave_gate_parser_missing_corrupt_payload_footer_restore_sameFD_race_controls_required": true,
+  "scoped_actual_scanner_full_warnings_and_matched_CLI_stage_verification_approved": true,
+  "existing_singleton_full_shape_columns_unused_levels_qualification_retained": true,
+  "independent_review_and_root_acceptance_still_required": true,
+  "signed": "Sue"
+}

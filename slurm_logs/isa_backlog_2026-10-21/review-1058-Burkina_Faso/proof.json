@@ -1,0 +1,95 @@
+{
+  "frozen_source_head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+  "runtime_head": "7eee549b15cacbe1e86b60a925b0899dc85d49e6",
+  "tracked_roots": {
+    "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso": {
+      "head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "tracked_files": 14885,
+      "clean": true
+    },
+    "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso-base": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_files": 14880,
+      "clean": true
+    },
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1058-fix": {
+      "head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "tracked_files": 14885,
+      "clean": true
+    },
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1058": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_files": 14880,
+      "clean": true
+    },
+    "/local/job40255479/worktrees/isa-baseline": {
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "tracked_files": 14880,
+      "clean": true
+    },
+    "/local/job40255479/worktrees/isa-Burkina_Faso-1123": {
+      "head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "tracked_files": 14886,
+      "clean": true
+    },
+    "/local/job40255479/worktrees/isa-Burkina_Faso": {
+      "head": "a63d26d7f7cdc5204931c1fbe334c1fcc6cea8fb",
+      "tracked_files": 14889,
+      "clean": true
+    }
+  },
+  "protected_evidence_files": {
+    "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1058": 186,
+    "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1058-fix": 199,
+    "/local/job40255479/control/isa-backlog-20261021/Burkina_Faso/1123": 258,
+    "/local/job40255479/control/isa-backlog-20261021/review-1123-Burkina_Faso": 192
+  },
+  "all_protected_content_modes_heads_clean_states_exact": true,
+  "all_protected_regular_file_evidence_SHA_modes_mtimes_exact": true,
+  "administrative_link_receipt_limit": "One pytest-current link recorded final-only; no source/payload symlinks and no initial link-target equality claimed",
+  "absent_misnamed_bootstrap_path_unchanged": [
+    "/local/job40255479/worktrees/isa-review-1123-Burkina_Faso"
+  ],
+  "approved_DVC_metadata_targets": [
+    {
+      "checkout": "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso-base",
+      "head": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+      "ignored_metadata_symlink": "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso-base/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/review-1058-Burkina_Faso/baseline-dvc-tmp",
+      "tracked_tree_unchanged": true
+    },
+    {
+      "checkout": "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso",
+      "head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "ignored_metadata_symlink": "/local/job40255479/worktrees/isa-review-1058-Burkina_Faso/lsms_library/countries/.dvc/tmp",
+      "exact_private_target": "/local/job40255479/control/isa-backlog-20261021/review-1058-Burkina_Faso/candidate-dvc-tmp",
+      "tracked_tree_unchanged": true
+    }
+  ],
+  "owned_live_review_data_test_processes": 0,
+  "private_receipt_SHA256": {
+    "protected-trees-before-private.json": "f1324cf4b6317328f352cca5f1600c8121ea437300e9b03235a4936c5816b193",
+    "protected-evidence-before-private.json": "4c56f21de39ffda2cfd5cf3c1ad2d03534b5c7931f8982e3e5dd23951566b8d8",
+    "protected-after-private.json": "f1324cf4b6317328f352cca5f1600c8121ea437300e9b03235a4936c5816b193",
+    "copy-receipts-private.json": "132065a75855223762f803f743c067eb680644b27b829f49d5966b15712f8312",
+    "source-manifest-private.json": "bcef4554c433f4e73d34a32f7959bb80c87dfb983b82b8b6e556e46db81b8f7a",
+    "candidate-hashes.json": "db0c4d8de8d4e3bd5b7e6ba87874a2892b7a33d5426c34d01c124875b8557815",
+    "baseline-hashes.json": "29ecede245be4de97b4ff7a7eb6466f8a4fa8f3776425c835e409b3984a8f070"
+  },
+  "review_script_SHA256": {
+    "run.sh": "d97dbabaf644316777617101d50f98762d366cee41332bd7ca8df85f053015c0",
+    "sitecustomize.py": "cf5042efbd99744413007cd0d1ad0377658ee09ef81bfe82ae8b606a81554979",
+    "common.py": "9e716f9a622f6141e82833cb0485380f73c4d01a8acc43c0d544d164a99a7371",
+    "prepare.py": "53772f888009a600845b664ca8c4e5e051ad746471dab8d12fcb6d328fe05ee6",
+    "build_verify.py": "ec5b4b501160a00cf6bcdef74c46b70bb383fcf45dd119c19f2aa781a1c8cf59",
+    "test_independent_edges.py": "5e95073bfbdb39efc95c0ea9f840da6bfc06fadc93142b037d7c1dbc3a934fb6",
+    "source_oracle.py": "ff24a37571b102d3c6dad8f8e52ade3f9ded9e42c3688f08a4c00f238fa74182",
+    "boundary.py": "545261e530539d7272105a515b8bccfffa802994ceaba5a49ea5a23424dc52f9",
+    "hashes.py": "646220571978cfc8465ee030c3344f10c4e5c2b8a52665e4ab96b2ba3b019cc5",
+    "finish_checks.py": "b01007650a5c3b37d00188583b611183d24f3ff87680d8e6290ceb13337eb090",
+    "protect.py": "398f2ef57f8e9f2d9c9862700502b9698d5bc3b942c24afe4c94920ffa03a77c",
+    "release_review.py": "465096285103d9f648b2d6bc081a66b08ae9963ddd1364c25f9730c463c77692",
+    "REPRODUCE.sh": "860592fca560a694f8e743541e2036d4ab3db5a296128c35103755f670f72895",
+    "REVIEW.org": "9ba1f229baa26aeaf11b4a306aa3e6b5efadc7ed1b2e121eeac0a16b6a1ee5cc"
+  }
+}

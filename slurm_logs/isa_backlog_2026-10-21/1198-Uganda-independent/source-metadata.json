@@ -1,0 +1,210 @@
+{
+  "status": "PASS_SOURCE_METADATA_GROUNDED",
+  "modules": [
+    {
+      "wave": "2009-10",
+      "module": "A",
+      "source_rows": 15403,
+      "reported_id_field": null,
+      "reported_id_nonmissing": null,
+      "reported_id_distinct_nonmissing": null,
+      "source_labels": {
+        "a5aq6a": "Quantity Harvested"
+      },
+      "declared_sidecar_sha256": "5bf8b1b79f428d25ce2d5a5353e3b7fb54b3bf54e4d3c51b0cfe76877cc1fcc9",
+      "raw_sha256": "a5e28b3e9161c3fe42de6d7b62dbca43c8a485e1917dab7f2f4853795554ceda"
+    },
+    {
+      "wave": "2009-10",
+      "module": "B",
+      "source_rows": 15273,
+      "reported_id_field": null,
+      "reported_id_nonmissing": null,
+      "reported_id_distinct_nonmissing": null,
+      "source_labels": {
+        "a5bq6a": "Quantity Harvested"
+      },
+      "declared_sidecar_sha256": "4fd4c69666a352af5a66fb95f42210e60cce83dd8a7963a8f2006268d55cf868",
+      "raw_sha256": "dbb73ecb638e812cd9416ff91451340e7230e42098f9abdd897a0660bb148e85"
+    },
+    {
+      "wave": "2010-11",
+      "module": "A",
+      "source_rows": 13873,
+      "reported_id_field": null,
+      "reported_id_nonmissing": null,
+      "reported_id_distinct_nonmissing": null,
+      "source_labels": {
+        "a5aq6a": "How much did you harvest during the first seaon of 2010 and in what state-Qty"
+      },
+      "declared_sidecar_sha256": "144bd08c25da0935c02de879eaa2fa5c9de694a8070f7c43d0d2d304fc93304b",
+      "raw_sha256": "e8b9be6b5616c9bd222ecb676212034a043e1c09bc5bf18e034112e1edfccef5"
+    },
+    {
+      "wave": "2010-11",
+      "module": "B",
+      "source_rows": 9413,
+      "reported_id_field": null,
+      "reported_id_nonmissing": null,
+      "reported_id_distinct_nonmissing": null,
+      "source_labels": {
+        "a5bq6a": "How much did you harvest during the second seaon of 2010 and in what state-Qty"
+      },
+      "declared_sidecar_sha256": "26258ec66916c116caceb3c030aba3fa38992185e4d61a1ea1fbc50853123a83",
+      "raw_sha256": "d2c19a750138f9cf4ba3949d48c329e0728dfb8a9c34ad7190fd885b8a4e5c6e"
+    },
+    {
+      "wave": "2011-12",
+      "module": "A",
+      "source_rows": 12361,
+      "reported_id_field": "productionID",
+      "reported_id_nonmissing": 12361,
+      "reported_id_distinct_nonmissing": 27,
+      "source_labels": {
+        "productionID": "Crop Production & Disposition"
+      },
+      "declared_sidecar_sha256": "f8c43f5fc4db424ee84d29f5fdaec7a398d1c940aada6430a0a35dd74d956346",
+      "raw_sha256": "4d855c4aaf3a29d71086a7f4663be8aea8e9b69bc24c20c5f1f971b1c306a04b"
+    },
+    {
+      "wave": "2011-12",
+      "module": "B",
+      "source_rows": 10348,
+      "reported_id_field": "production2ID",
+      "reported_id_nonmissing": 10348,
+      "reported_id_distinct_nonmissing": 28,
+      "source_labels": {
+        "production2ID": "ACrop2_Production"
+      },
+      "declared_sidecar_sha256": "08e25b6cb6222ecfad49812155a8949d77464a71fde7ea971a6e10d266829a2d",
+      "raw_sha256": "891fdf8def6bac4b7cd9b3ccbcfbf992ef9023b1a879f74760249302edc66acd"
+    },
+    {
+      "wave": "2013-14",
+      "module": "A",
+      "source_rows": 10774,
+      "reported_id_field": "Production_ID",
+      "reported_id_nonmissing": 10774,
+      "reported_id_distinct_nonmissing": 20,
+      "source_labels": {
+        "Production_ID": "Crop Production & Disposition"
+      },
+      "declared_sidecar_sha256": "6336387d0cb6778b95a1c2062a9550ec45ad572ca90a0331b95b1504ee4e3c30",
+      "raw_sha256": "35244762e67a9be52e3650adaa81d2dc56657e9384694635f43144d32364ddda"
+    },
+    {
+      "wave": "2013-14",
+      "module": "B",
+      "source_rows": 10424,
+      "reported_id_field": "Production2_ID",
+      "reported_id_nonmissing": 10424,
+      "reported_id_distinct_nonmissing": 22,
+      "source_labels": {
+        "Production2_ID": "ACrop2_Production"
+      },
+      "declared_sidecar_sha256": "7b0bc8c09f320e395d57b1acba268240c2d4152f8ed8a24850b291faa370d54d",
+      "raw_sha256": "7085a5d92f1e7630b8d9cf1d1e9e9875c15801ca0f1327996fd034e9ce4c411a"
+    },
+    {
+      "wave": "2015-16",
+      "module": "A",
+      "source_rows": 10678,
+      "reported_id_field": "Production_ID",
+      "reported_id_nonmissing": 10678,
+      "reported_id_distinct_nonmissing": 22,
+      "source_labels": {
+        "Production_ID": "Crop production & disposition"
+      },
+      "declared_sidecar_sha256": "cbc1da32262790cfd365dff76fc95d1c84956611bb8bc311c6e81690ec3d304f",
+      "raw_sha256": "e902db5490dde7492e95928468f7aff55ef9396b2d428757846557b3e60c3aa9"
+    },
+    {
+      "wave": "2015-16",
+      "module": "B",
+      "source_rows": 8971,
+      "reported_id_field": "Production2_ID",
+      "reported_id_nonmissing": 8971,
+      "reported_id_distinct_nonmissing": 20,
+      "source_labels": {
+        "Production2_ID": "Acrop2_production"
+      },
+      "declared_sidecar_sha256": "754086db997216d8528534229ca4e154aad22b2955d9ac502d3ab72e2179f372",
+      "raw_sha256": "4323761f608c78fa674e7b6d7ad08b78561d68e1a584805a4cd89202f84fd652"
+    },
+    {
+      "wave": "2018-19",
+      "module": "A",
+      "source_rows": 7153,
+      "reported_id_field": null,
+      "reported_id_nonmissing": null,
+      "reported_id_distinct_nonmissing": null,
+      "source_labels": {
+        "s5aq06a_1": "6a. How much %rostertitle% did you harvest during the second season of 2017 (fir",
+        "s5aq06a_1_1": "6a1. Were the decisions concerning the use of the crop output made by a single H",
+        "s5aq06a_2_1": "6a2. Who is the primary decision maker concerning the use of crop output?"
+      },
+      "declared_sidecar_sha256": "0f9a83a63df2798d077ea93627dfd66e17d75d87ffd22165edfc882a117cdbb6",
+      "raw_sha256": "81de4ad9c683dd30e303452d592ac6f8b19b78f15719592f61b61282d91a030e"
+    },
+    {
+      "wave": "2018-19",
+      "module": "B",
+      "source_rows": 7041,
+      "reported_id_field": null,
+      "reported_id_nonmissing": null,
+      "reported_id_distinct_nonmissing": null,
+      "source_labels": {
+        "s5bq06a_1": "6a. How much %rostertitle% did you harvest during the first season of 2018, and ",
+        "s5bq06a_1_1": "6a1. Were the decisions concerning the use of the crop output made by a single H",
+        "s5bq06a_2_1": "6a2. Who is the primary decision maker concerning the use of crop output?",
+        "s5bq06a_2": "6a. How much %rostertitle% did you harvest during the second season of 2017, and",
+        "s5bq06a_1_2": "6a1. Were the decisions concerning the use of the crop output made by a single H",
+        "s5bq06a_2_2": "6a2. Who is the primary decision maker concerning the use of crop output?"
+      },
+      "declared_sidecar_sha256": "7cf0b53195099d93528d9ee53883134c23b9ee7d357a335f6e51e26372e3708c",
+      "raw_sha256": "1393ee911f2dafa1446e1e381bc8764779fc544d8e96de8e57fabf5b9ab29da0"
+    },
+    {
+      "wave": "2019-20",
+      "module": "A",
+      "source_rows": 8429,
+      "reported_id_field": null,
+      "reported_id_nonmissing": null,
+      "reported_id_distinct_nonmissing": null,
+      "source_labels": {
+        "s5aq06a_1": "6a. Qty of harvest (2018, full harvest, condition1)",
+        "s5aq06a_1_1": "6a1. Type of decision maker for use of crop output(2018,full harvest,condition1)",
+        "s5aq06a_2_1": "6a2. Primary decision maker for use of crop output(2018,full harvest,condition1)",
+        "s5aq06a_2": "6a. Qty of harvest (2018, full harvest, condition2)",
+        "s5aq06a_1_2": "6a1. Type of decision maker for use of crop output(2018,full harvest,condition2)",
+        "s5aq06a_2_2": "6a2. Primary decision maker for use of crop output(2018,full harvest,condition2)",
+        "s5aq06a_11": "6a. Qty of harvest (2018, part harvest, condition1)",
+        "s5aq06a_1_11": "6a1. Type of decision maker for use of crop output(2018,part harvest,condition1)",
+        "s5aq06a_2_11": "6a2. Primary decision maker for use of crop output(2018,part harvest,condition1)",
+        "s5aq06a_21": "6a. Qty of harvest (2018, part harvest, condition2)",
+        "s5aq06a_1_21": "6a1. Type of decision maker for use of crop output(2018,part harvest,condition2)",
+        "s5aq06a_2_21": "6a2. Primary decision maker for use of crop output(2018,part harvest,condition2)"
+      },
+      "declared_sidecar_sha256": "433211da10152b33222a3acce55030d52f6e6f8e8258701bd45105dc17bbe5d1",
+      "raw_sha256": "e8a887b6c831ce7f3a3442cf3e4e9722a4f06795b4c3e41eb005ac05abffc0a2"
+    },
+    {
+      "wave": "2019-20",
+      "module": "B",
+      "source_rows": 9356,
+      "reported_id_field": null,
+      "reported_id_nonmissing": null,
+      "reported_id_distinct_nonmissing": null,
+      "source_labels": {
+        "s5bq06a_1": "6a. Qty of harvest (2019, condition1)",
+        "s5bq06a_1_1": "6a1. Type of decision maker for use of crop output(2019,condition1)",
+        "s5bq06a_2_1": "6a2. Primary decision maker for use of crop output(2019,condition1)",
+        "s5bq06a_2": "6a. Qty of harvest (2019, condition2)",
+        "s5bq06a_1_2": "6a1. Type of decision maker for use of crop output(2019,condition2)",
+        "s5bq06a_2_2": "6a2. Primary decision maker for use of crop output(2019,condition2)"
+      },
+      "declared_sidecar_sha256": "eb2969021ebd4e2410c607ae96611e7ce75f7031f40970969bbd7db73a8751fb",
+      "raw_sha256": "3863fb5ae93f26b5cb8f00b7db5c29987da8dc0f5a01c3d064cd318dd614c25b"
+    }
+  ]
+}

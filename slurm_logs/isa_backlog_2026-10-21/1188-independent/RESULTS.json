@@ -1,0 +1,40 @@
+{
+  "normal_API_calls": 40,
+  "returned": 38,
+  "nonempty_rows_each": 22877,
+  "nonempty_returns": 28,
+  "empty_returns": 10,
+  "expected_label_errors": 2,
+  "original_strict_matrix": {
+    "total": 151,
+    "PASS": 111,
+    "FAIL": 40,
+    "within111_PASS": {
+      "exact_source_bound_writer_readback": 40,
+      "other_full_strict": 71
+    }
+  },
+  "new_empty_full_strict_matrix": {
+    "PASS": 2,
+    "FAIL": 2
+  },
+  "new_empty_axis_and_typed_attrs_pass": 4,
+  "narrow_named_payload_checks_PASS": 28,
+  "usage_derived_full_strict_PASS": 36,
+  "sample_cache_full_strict_PASS": 7,
+  "strict_faults_rejected": 12,
+  "raw_source_aggregate_observations": {
+    "raw_rows": 22877,
+    "applied_rows": 22877,
+    "unique_native_keys": 22877,
+    "source21": 602,
+    "purchase_yes": 7689,
+    "gift_yes": 802,
+    "flag_differences": 8297,
+    "quantity_or_mask_differences": 8371,
+    "purchase_quantity_nonmissing": 7689,
+    "gift_quantity_nonmissing": 801,
+    "known_unit_code_differences_purchase_used": 193,
+    "known_unit_code_differences_gift_used": 23
+  }
+}

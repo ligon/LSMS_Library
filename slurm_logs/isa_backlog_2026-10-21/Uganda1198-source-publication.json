@@ -1,0 +1,12 @@
+{
+  "recorded_at_UTC": "2026-10-22T04:08:01.746283+00:00",
+  "source_GitHub_ref": "refs/heads/fix/1198-uganda-production-observations-20261022",
+  "source_head": "0854303bc5f60daa698b2927fc3b193822a4c090",
+  "original_local_author_head": "6e735eca93e3f68e63d79ce65ac71607ee9493bf",
+  "original_runtime_evidence_unchanged": true,
+  "documentation_acceptance": "1198-Uganda-documentation-qualification/ROOT-DOC-ACCEPTANCE.json",
+  "runtime_acceptance": "1198-Uganda-independent/ROOT-RUNTIME-ACCEPTANCE.json",
+  "PR_created": false,
+  "public_PRs_merged": false,
+  "signed": "Sue"
+}

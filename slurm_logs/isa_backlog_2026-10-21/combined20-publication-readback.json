@@ -1,0 +1,41 @@
+{
+  "recorded_at_UTC": "2026-10-22 05:26:35 UTC",
+  "reference_campaign_commit": "cd0f41e0f60137116418ef5025820d26b82c094b",
+  "all_readbacks_exact": true,
+  "all_open": true,
+  "human_merges": 0,
+  "updates": [
+    {
+      "number": 1170,
+      "title": "LSMS-ISA backlog: inventory, precise residuals and execution evidence",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1170",
+      "state": "open",
+      "head_sha": "cd0f41e0f60137116418ef5025820d26b82c094b",
+      "body_readback_exact": true
+    },
+    {
+      "number": 1201,
+      "title": "Tanzania: build community prices from requested waves",
+      "url": "https://github.com/ligon/LSMS_Library/pull/1201",
+      "state": "open",
+      "head_sha": "fa457f90edbedfd7282eaf988c8231e4e87ba082",
+      "body_readback_exact": true
+    },
+    {
+      "number": 1091,
+      "title": "Retire duplicate country community-price builders in Mali, Niger and Tanzania",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1091",
+      "state": "open",
+      "head_sha": null,
+      "body_readback_exact": true
+    }
+  ],
+  "publication_correction": {
+    "error": "Root treated connector envelope as direct PR; briefly wrote ERROR as1201body.",
+    "correction": "Restored entire retained verified original body plus bounded20 addition; independently refetched exact.",
+    "product_or_review_payload_change": false,
+    "source": "StatusCurrentPR1201.structuredContent.body",
+    "signed": "Sue"
+  },
+  "signed": "Sue"
+}

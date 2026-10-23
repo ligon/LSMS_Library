@@ -1,0 +1,143 @@
+#+TITLE: GH1196 parquet index policy: author evidence
+#+AUTHOR: Sue
+
+* Status and source boundary
+
+AUTHOR READY FOR INDEPENDENT REVIEW; this is not an independent acceptance or a public merge.
+Tested runtime is =7f4b222c2d3cb936e1b93f4fa4baa9d98fc732a1=.
+The final documentation descendant is pinned separately in READY.
+Ledger-first commits are =ee533e09af4b29408985a0c7a1abf815c5c385d1= for the original proposal and =29cb3cf8d= for the explicitly approved Wave expansion.
+The original local-tools-only runtime =bd80d86c26786ca92680160abd790260bc924c3f= and its failed Make observations remain frozen.
+
+The two production files are =lsms_library/local_tools.py= and =lsms_library/country.py=.
+Their tested SHA256s are respectively =64e8da43640fceb38cb3d4d55e4a006f9f7f7a5be4b5a5c79996299db3c80569= and =aae765551f8a9863b302697e8b70573085f96e067c72c4819ce7968e7247fb0f=.
+The root approved the exact expansion patch =942527406d9abaa3a58e853b11255ef5740de4d59a982ca028dd72dce7b26c31= and design =3661423d205757cd044538d9e792df322d8a5515d0a36262cc48cf8763799be5=.
+
+* Country grounding
+
+Complete current Niger and Uganda CONTENTS, including TODO/WAITING/LOGBOOK, were carried only after exact blob verification against the complete diagnosis readings.
+Niger retains grappe/EXTENSION identity, OriginalLabel unit dictionaries and the seasonal survey caveats.
+Its opening says "each grappe is visited in exactly one =vague=" while the later sampling account says both seasonal visits cover "half of every EA"; this is retained as a documentation contradiction.
+Uganda retains its EA/GPS-bin/parish eras and district/parish identity.
+The statement that sample Region "is complete for every household" is explicitly qualified later by three missing 2019-20 Region observations.
+The settled 2018 second-harvest condition-slot ruling remains in force; no season, factor, area or identifier policy changes here.
+The dated country notes record the actual parquet-policy observations, including the newly established Uganda per-wave versus country-union distinction below.
+
+* Cause and repair
+
+Both complete observed public frames have a MultiIndex: Niger food_acquired has 239,877 rows and Uganda cluster_features has 4,805 rows.
+The reported u/v Index objects were extracted levels, not the complete frame index.
+Arrow 25/pandas 3 reconstructs index fields before its ordinary extension-data-column restoration; recorded =numpy_type="string"= was being read as the NaN-policy =str= dtype.
+
+The reader restores only recognized =string= versus =str= missing policy on already-string index fields, preserving the storage already read.
+Physical index-column descriptors select positions, including unnamed and duplicate logical names.
+It preserves values, null masks, names, codes/code dtypes, unused reconstructed levels, order, data columns and full typed attrs.
+Nonstring/Range/absent/unknown/malformed metadata retain their bounded no-op or original parser behavior.
+
+The first patch fixed get_dataframe but actual Make evidence exposed two direct Wave reads that bypassed it.
+A parquet-only shared reader now serves get_dataframe and BOTH YAML and script Wave routes, binding payload and footer to the same open stream.
+Each caller retains its original payload-error disposition: generic parser/fallback cause, YAML missing/corrupt cache miss, and loud script-path errors.
+Footer/restoration failures remain loud.
+The Wave routes do not enter generic source lookup, DVC or network fallback on a disappearing cache.
+The restore helper is AST-exact to bd80; the writers, map_index and df_data_grabber are unchanged.
+No schema/dependency/exclusion/stamp, scientific factor, unit, ID, reducer or source-eligibility change is included.
+
+* Actual prebuild scope and held sources
+
+Before new data builds, guarded actual inventories on candidate, clean bd80 and f8 measured 549 API hashes, 39 framework fingerprints and 1,362 declared-wave hashes each.
+Candidate differs on every entry against BOTH controls, with exact key sets and zero data endpoint changes.
+This broad invalidation is a measured cost, not an all-country output claim or permission for a corpus rebuild.
+
+All 17 declared sources were held: two Niger food sources and 15 Uganda cover/geo sources.
+Thirty-four physical copies into two new backend roots passed declared MD5, raw SHA/size/mode/mtime, nlink1/distinct-inode and sidecar gates terminally before decoding or APIs.
+Sidecar size omissions were not invented.
+Both roots started with L1 only and empty L2.
+Original source receipts remain unchanged; no acquisition, DVC CLI, shared-cache mutation or bypass was used.
+New normal builds capture actual native writer inputs/prepared frames; immutable prior raw-source-memory operands are references, not a newly repeated raw-decode prefix.
+
+* Tests and actual routes
+
+| Cohort | Recorded result |
+|-------+-----------------|
+| Original local-tools candidate v1 | 85 PASS / 2 FAIL / 0 skip; original 87-case XML retained |
+| Original narrow fixture/comparator correction | 4 PASS; only affected nodes plus two nullable-float negatives |
+| Actual f8 public-IO counterfactual | 23 dtype failures / 1 PASS / 0 errors or skips |
+| Expansion existing affected controls | 72 PASS, plus original new-file collection ERROR retained |
+| Corrected new Wave/helper controls only | 47 PASS / 0 skip; no 72-node prefix replay |
+| Actual bd80 new counterfactual | 21 PASS / 26 FAIL / 0 errors or skips |
+| Strict API surface audit | exit 0 |
+
+The collection error was a test-only sibling-module import and was corrected before the 47 new nodes ran.
+The bd80 failures comprise 12 index-policy assertions, six absent-helper API-contract negatives, four footer-boundary controls, two restoration-boundary controls and two same-stream contracts.
+They are not all source-value or row-loss negatives.
+Disappearance, corrupt payload and original payload-error disposition controls pass on both versions.
+Same-stream controls use real pandas reads and actual atomic path replacement.
+Generic IO covers physical unnamed/duplicate-name/mixed-policy metadata, empty/all-null, nonstring/Range, parser causes, both writer branches, GH645 and atomicity.
+
+Both new source-cold actors and separate fresh-process/new-object warm actors completed normally.
+Default captured 23 actual calls per phase, 12 normal cold writes and 12 current-hash caches, with full requested coverage manifests (four Niger/eight Uganda waves).
+Make captured 21 calls per phase, ten normal cold native writes and ten current-hash native caches, and wrote no country cache.
+Both backends serve Niger 239,877 / Uganda 4,805 rows, with supported singleton counts 108,333 / 824.
+Both warm phases made zero writer calls and zero cache byte/mode/mtime changes.
+The historical diagnosis's Niger-Make runtime gap is resolved by this new held-source cohort.
+
+* Exact comparisons and serialization stages
+
+The strengthened saved-artifact reassessment has 329 comparisons: 256 full exact, 72 intentional recorded-policy-only changes and one explicitly unequal existing backend singleton comparison.
+All 44 within-route cold/warm full comparisons pass, including complete axes/levels/codes/classes/dtypes/order/masks, data-column extension operands and recursively typed attrs.
+All 22 native/country cache footer comparisons reconstruct exactly by changing only the expected hash, including nested ARROW:schema bytes and complete file metadata.
+These are saved-artifact checks, not another API/source replay.
+
+Pandas frame equality can accept tiny nullable-Float64 differences despite exact/zero arguments.
+Independent EA and NumPy checks therefore accompany frame equality.
+A further private comparator audit found object-element gaps in the earlier checker, which is preserved unchanged.
+The new comparator recurses object-kind columns, non-MultiIndex axes and ExtensionArray attrs, skipping only StringDtype; it has no np.dtype-class shortcut.
+Eight negative controls reject object scalar/null-type, nested object-EA/Series/ndarray, axis and tiny/nextafter differences; positive clones and both string policies pass.
+The same saved 329 operands were reassessed with that stronger comparator, with zero unexpected differences.
+
+The unequal Uganda 2019-20 singleton remains explicit: Default is 824x5 with unused all-wave levels; Make is 824x3 with requested-wave levels.
+Default's extra Latitude/Longitude columns are Float64 and entirely null.
+Full typed attrs and common-column EA values/dtypes/masks agree, and expanded label values/masks agree.
+Their v dtype policies also differ correctly at these different materialization stages: native 2019 writer input/prepared/footer/read/Make subset are =str=, while full-country footer/raw/Default subset are =string=.
+Only the native 2009-10 footer records =string=; the other seven native waves record =str=.
+The bd80 artifacts already show this distinction.
+No levels, columns or dtypes were normalized to claim full equality.
+
+Two actual CLI commands passed matched Country-input and post-serialization-stage comparisons with the stronger comparator.
+Six saved CLI stage frames are full exact to bd80; two scanner baseline frames are also full exact.
+The writer's existing JSON typed-attrs conversion and pre-Arrow unused-source-level preparation are explicit stage boundaries, not called API-to-artifact typed equality.
+CLI and scanner each made zero cache endpoint changes.
+
+* Warnings and scanner
+
+All 88 new API calls persist complete warning category/message/file/line records before assertions (210 warning occurrences).
+Across 176 matched reference-call comparisons, 136 full raw warning multisets are exact; all 176 category/message multisets are exact as a separate property.
+Forty comparisons retain location differences from source/caller changes; raw locations are not normalized or called equal.
+Some original cold-reference calls came from the preserved continuation process, which is recorded separately.
+
+The unmodified scoped scanner ran phases 1a/1b/2 with the actual declared grid: Niger food Aggregate, no invented cluster phase2 grid.
+Its complete 27-occurrence raw finding multiset is exact to BOTH f8 and bd80: 26 WARN / 1 existing FAIL.
+The existing Aggregate-unavailable degrade/nonempty failure remains; this is not a zero-finding or full-suite PASS claim.
+Scanner-internal warnings persist messages through its finding format, not complete categories/stacks for every warning; outer API warning records are separate.
+
+* Preserved stops, protection and limits
+
+The original diagnosis, local-tools-only Make failures, original JUnits, invalid nonmonetary currency caller stop and continued-only-unexecuted calls remain untouched.
+The stage1 manifest includes the root approval FILE; source/product stayed unchanged and no package imports or data work occurred before the explicit proceed MESSAGE.
+No claim is made that the manifest predates that approval FILE.
+Comparator preparation key/path/schema stops remain with unique source/checker lineage.
+The overly strong singleton expanded-index dtype assertion is preserved and is not relabelled as a successful full-frame check.
+An attempted missing-v4 launch's stdout/stderr basenames were reused by the later successful artifact checker; those original stream bytes lack a separate receipt, while its unique full failure trace and safe receipt survive.
+No API, source or test prefix was replayed to fill that gap.
+
+Final protection verifies all 281 diagnosis receipts, all 795 bd80-stop receipts, original held-provider receipts and new physical L1 copies.
+The diagnosis source and f8 control retain all originally recorded tracked-file receipt dimensions, HEAD and clean status.
+The new bd80 control retains clean HEAD/bytes and both pretest production-file receipts; its complete initial mtime snapshot was not captured, so current full snapshots are not called initial equality.
+Existing-directory FileExists guard events and six denied relative cleanup attempts remain explicit; there is no zero-denial claim or retrospective PID/dir_fd/stack attribution.
+The private-process guard also refused the first attempted tracked-report directory creation; the preserved packaging stop was followed by a separately authorized scoped documentation copy, without weakening the guard.
+No network attempt or new in-tree data artifact was observed.
+Nine pre-existing tracked CSV codebooks/FCT tables remain exact to the original source snapshot; a blanket source-suffix assertion that wrongly counted them is preserved as a private protection stop.
+No FCT/nutrition API, public GitHub write or merge was performed.
+Final READY pins the clean documentation descendant, complete private manifest, safe exports and zero task consumers.
+
+Sue

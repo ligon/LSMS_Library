@@ -1,0 +1,13 @@
+{
+  "at_UTC": "2026-10-22T22:28:49.557228+00:00",
+  "user_authorized": "Delegate consistency checks and merge outstanding LSMS-ISA PRs into development",
+  "owner": "malawi_1209",
+  "implementation_PR_snapshot": 32,
+  "destination": "development",
+  "tracker1170_root_owned_and_held_until_frozen": true,
+  "expected_head_SHA_merge_protection": true,
+  "independent_testing_and_qualifications_required": true,
+  "tracker_authorization_exact_readback": true,
+  "no_actual_merge_claimed_in_this_authorization_record": true,
+  "signed": "Sue"
+}

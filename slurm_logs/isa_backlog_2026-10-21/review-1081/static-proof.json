@@ -1,0 +1,16 @@
+{
+  "production_added_lines": 9,
+  "exact_existing_imports": 3,
+  "bare_re_raise_clauses": 2,
+  "all_other_production_bytes_exact": true,
+  "UnitsUnavailable_handler_source_bytes_exact": true,
+  "final_docs_only_runtime_config_test_modes_blobs_exact": true,
+  "current_test_AST_exact_to_executed_draft_except_docstring_unused_Path": true,
+  "doc_descendant_paths": [
+    ".coder/ledger/1081-derived-categorical-errors.md",
+    "slurm_logs/isa_backlog_2026-10-21/framework1081/REPORT.md",
+    "slurm_logs/isa_backlog_2026-10-21/framework1081/REPRODUCE.md",
+    "slurm_logs/isa_backlog_2026-10-21/framework1081/RESIDUALS.md",
+    "slurm_logs/isa_backlog_2026-10-21/framework1081/VALIDATION.json"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "verified_at": "2026-10-22T17:12:15.739Z",
+  "tracker": 1170,
+  "state": "open",
+  "head_sha": "cc194414c23b9e28d8042ada65b56488b6e8221d",
+  "corrected_body_readback_exact": true,
+  "original_nested_safe_pins": "all five full physical/content receipts exact; earlier anticipated mismatch absent",
+  "guard_attribution_supplement_still_pending": true,
+  "signed": "Sue"
+}

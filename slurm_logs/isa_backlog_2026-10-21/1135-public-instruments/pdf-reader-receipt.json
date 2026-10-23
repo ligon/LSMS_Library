@@ -1,0 +1,11 @@
+{
+  "retrieved_at_UTC": "2026-10-21T23:19:56.422354+00:00",
+  "package": "pypdf",
+  "version": "6.21.2",
+  "metadata_url": "https://pypi.org/pypi/pypdf/json",
+  "wheel": "pypdf-6.21.2-py3-none-any.whl",
+  "wheel_url": "https://files.pythonhosted.org/packages/1b/4d/c9d2d67f204eff463237a1a8f5e25a6923b7b1043982b91fcaf104c8ef60/pypdf-6.21.2-py3-none-any.whl",
+  "wheel_sha256": "1d44d1a3a200f25062adff0085b02040e4646431ac2ccac22e42679e91466084",
+  "target": "/local/job40255479/control/isa-backlog-20261021/root-public-instruments-1135/pdf-reader",
+  "purpose": "Private pure-Python public-PDF text reader only; no venv/project dependency/configuration modification"
+}

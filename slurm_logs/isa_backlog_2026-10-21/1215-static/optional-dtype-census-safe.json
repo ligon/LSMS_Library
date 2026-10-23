@@ -1,0 +1,17 @@
+{
+  "status": "STATIC_OPTIONAL_DICT_DTYPE_GAP_IDENTIFIED_NOT_REPRODUCED",
+  "candidate_bf_head": "3d39096d55bc2b2a8a4e387e9d939aabe8951ecd",
+  "actual_bf_parent": "3dc9d28510dd783c648413987011832669f8bcf7",
+  "newly_declared_bf_fields": 4,
+  "new_fields_absent_in_actual_parent": true,
+  "four_fields_have_no_global_type_in_owned_a417_schema": true,
+  "optional_dict_fields_in_owned_census": 101,
+  "optional_dict_fields_with_global_type": 20,
+  "optional_dict_fields_without_global_type": 81,
+  "core_mechanism_source": "Owned a417 country.py1050/7103/7141/7163",
+  "separate_actionable_bug_from_column_order": true,
+  "bf_runtime_claim_authority": "Root-transmitted live author observation; not independently rerun or decoded.",
+  "no_claim_of_identical_actual_parent_failure": true,
+  "no_package_import_payload_decode_copy_API_test_build_or_acquisition": true,
+  "signed": "Sue"
+}

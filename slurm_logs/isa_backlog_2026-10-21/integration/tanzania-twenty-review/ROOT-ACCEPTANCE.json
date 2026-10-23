@@ -1,0 +1,59 @@
+{
+  "recorded_at_UTC": "2026-10-22T05:21:37.804334+00:00",
+  "verdict": "ROOT_ACCEPT_BOUNDED_GLOBAL20_WITH_EXPLICIT_POPULATED_CHILD_LOG_HISTORY_LIMIT",
+  "candidate": "de38fe9a29da5b24ff70bef11f2e37bfd7f73dc2",
+  "actual19_control": "2566a3e490c0aefe03ab31d538d7d04e9b77c77e",
+  "READY_sha256": "c01c1f984b7ce0743ac8641f01331c37f63003d778a09bab26afac0d8d38bbaa",
+  "manifest_sha256": "74b8958b3914c9012401555c1fbe293cdd5672c09cf548130c82dd6e6a3d1b9f",
+  "all_manifest_payloads_verified": 2629,
+  "safe_exports_verified": 6,
+  "actual_checker_sources_verified": 40,
+  "exact_leaf_path_blob_mode_delta": 9,
+  "root_read_actual_checker_and_guard_sources_with_explicit_byte_exact_prior_reading_carry": true,
+  "root_independent_JUnit": {
+    "base/new-junit-private.xml": {
+      "fail": 20,
+      "pass": 7
+    },
+    "candidate/new-junit-private.xml": {
+      "pass": 27
+    },
+    "candidate/existing-junit-private.xml": {
+      "pass": 58
+    }
+  },
+  "actual_prebuild_scope": {
+    "Tanzania_changed": 25,
+    "other_API_exact": 524,
+    "framework_exact": 39,
+    "Tanzania_wave_changed": 6,
+    "comparator_wave_exact": 8
+  },
+  "main_strict_pairs": 162,
+  "source_bound_cache_pairs": 152,
+  "comparison_families_not_asserted_disjoint": true,
+  "literal_true_warning_pairs": 92,
+  "scanner": {
+    "WARN": 5,
+    "other": 0,
+    "complete_ordered_records_and_bytes_exact": true
+  },
+  "source_endpoints_verified": 30085,
+  "source_rows": 17699,
+  "modern_wave_rows": [
+    3076,
+    14623
+  ],
+  "current_Mali": 155931,
+  "current_Niger": 46043,
+  "pooled_Feature": 219673,
+  "preserved_limits": [
+    "Earlier per-key populated child stdout/stderr were overwritten by backend-only names; unique full frames, endpoints, statuses and main warning structures survive. Original missing bytes and occurrences remain unavailable; no replay or complete populated child-log/warning equality claim.",
+    "No full20 suite/corpus/other24 Tanzania output rebuild/Make-pooled/source-cold healthy comparator claim.",
+    "Matching-stage native/walked/public, factory/covered-empty and API/serialized-artifact representations remain distinct.",
+    "Leaf normalized-link/partial aggregate/complete warning-stack gaps and historical17 full13FAIL/doc-child guard/mtime/stale8/1196 remain at their original pins.",
+    "Root verification hashes and inspects saved artifacts only; no data API, pickle decode or test replay."
+  ],
+  "GitHub_publication_or_merge_or_issue_closure": false,
+  "signed": "Sue"
+}

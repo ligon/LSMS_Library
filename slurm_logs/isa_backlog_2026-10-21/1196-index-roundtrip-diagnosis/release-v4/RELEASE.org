@@ -1,0 +1,28 @@
+#+TITLE: GH1196 final release metadata addendum
+#+AUTHOR: Sue
+#+DATE: 2026-10-22
+
+The first successful READY.json and273-entry final-private-manifest.json remain unchanged and are included in the new release manifest.
+Its complete entry-by-entry post-exit verification passed, but a separate directory-membership check found one extra file: postexit-readonly.py was created after that manifest had actually completed, before its tool session was polled.
+There were0 missing or changed original payloads.
+The stopped membership command and bounded extra-path enumeration are retained in the tool record; this addendum records their result without recreating a lost file or replaying data work.
+
+The final release uses READY-v4.json and final-private-manifest-v4.json.
+Both verifier sources and this sealing source were present before that manifest was constructed.
+The new read-only verifier checks the complete directory membership as well as every SHA/MD5/size/mode/mtime/inode/link receipt and zero other consumers.
+The first stdlib-only release wrapper stopped on a Path/string binding TypeError inside its write-allowlist check before creating any release file; its source and tool traceback are preserved, and the uniquely named fixed wrapper changes only that binding and the expected source-file inventory.
+No library import, unpickle, test, source decode, Country/Feature API, data write or new measurement occurs in this metadata-only addendum.
+The original guard log is preserved byte-exact: this stdlib-only sealer uses its own narrowly scoped socket/write guard and does not invoke the old logging launcher.
+
+The authoritative safe reports are final/DIAGNOSIS.org, final/PROPOSAL.md, final/ROUTE-COVERAGE.md, final/validation.json and the other files named by ALLOWLIST-v4.json.
+Earlier partial safe-exports root files are preserved stopped-seal evidence, not publication exports.
+The original273-payload metadata proof,8 guard-denial qualification,94 legacy-link-hash stop, actual source/typed-attrs/stage evidence, static fingerprint prediction and absent native-prewrite evidence all remain in force.
+The four added Uganda Make caller endpoints are original manifest-gated metadata, not new runtime calls; Niger Make remains source-only/unmeasured.
+No production implementation or corpus rebuild is authorized or claimed.
+
+Post-exit command, after this writer terminates:
+#+begin_src sh
+GIT_OPTIONAL_LOCKS=0 unshare -rn /local/job40255479/venv_img/bin/python -B -I /local/job40255479/control/isa-backlog-20261021/shared1196-diagnosis/postexit-v4-readonly.py
+#+end_src
+
+Sue

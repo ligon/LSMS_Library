@@ -1,0 +1,33 @@
+{
+  "recorded_at_UTC": "2026-10-22T02:08:32.724814+00:00",
+  "candidate": "b4ad74d5da39f939a7c2ecec030891cb82c02ade",
+  "base": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+  "scope": "Two country documentation paragraphs; zero data API/decode/test replay",
+  "changed_paths": [
+    "lsms_library/countries/Mali/_/CONTENTS.org"
+  ],
+  "tests_tree_exact": true,
+  "other_tracked_blobs_modes_exact": true,
+  "changed_path_Git_mode": "100644 unchanged",
+  "API_hashes_unchanged": 549,
+  "framework_fingerprints_unchanged": 39,
+  "changed_hashes": 0,
+  "actual_separate_process_inventory": true,
+  "network_attempts": 0,
+  "unexpected_write_denials": 0,
+  "parquets_written": 0,
+  "hash_receipts": {
+    "base-hashes.json": {
+      "sha256": "e7a8e216c99eb06d0d700245490210f9f021705d2a1f5d0eea7229cb1ab73861",
+      "bytes": 57498
+    },
+    "candidate-hashes.json": {
+      "sha256": "084261363f591e913eb52581c3979e071a26470c3de5269bf559950c2dc063ce",
+      "bytes": 57498
+    }
+  },
+  "old_runtime_proofs_retained_at_exact_heads": true,
+  "independent_wording_review": "pending",
+  "GitHub_publication": false,
+  "signed": "Sue"
+}

@@ -1,0 +1,2805 @@
+{
+  "status": "DIAGNOSIS_COMPLETE_NO_IMPLEMENTATION",
+  "source_head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+  "matrix": {
+    "default-all": {
+      "requested": null,
+      "cold_rows": 46043,
+      "cold_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "warm_rows": 46043,
+      "warm_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "warm_changed_files": [],
+      "cold_seconds": 9.538778173737228,
+      "country_hash": "d494e0e9505758547e15539e8ac2f4ea32d98968bc5e5920b8993a2cceb3c920",
+      "country_coverage": [
+        "2011-12",
+        "2014-15",
+        "2018-19",
+        "2021-22"
+      ]
+    },
+    "default-2011": {
+      "requested": [
+        "2011-12"
+      ],
+      "cold_rows": 32352,
+      "cold_waves": {
+        "2011-12": 32352
+      },
+      "warm_rows": 32352,
+      "warm_waves": {
+        "2011-12": 32352
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "warm_changed_files": [],
+      "cold_seconds": 5.5974696623161435,
+      "country_hash": "d494e0e9505758547e15539e8ac2f4ea32d98968bc5e5920b8993a2cceb3c920",
+      "country_coverage": [
+        "2011-12"
+      ]
+    },
+    "default-2014": {
+      "requested": [
+        "2014-15"
+      ],
+      "cold_rows": 13691,
+      "cold_waves": {
+        "2014-15": 13691
+      },
+      "warm_rows": 13691,
+      "warm_waves": {
+        "2014-15": 13691
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "warm_changed_files": [],
+      "cold_seconds": 5.043785781599581,
+      "country_hash": "d494e0e9505758547e15539e8ac2f4ea32d98968bc5e5920b8993a2cceb3c920",
+      "country_coverage": [
+        "2014-15"
+      ]
+    },
+    "default-2018": {
+      "requested": [
+        "2018-19"
+      ],
+      "cold_rows": 0,
+      "cold_waves": {},
+      "warm_rows": 0,
+      "warm_waves": {},
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "warm_changed_files": [],
+      "cold_seconds": 65.55453179869801,
+      "country_hash": "d494e0e9505758547e15539e8ac2f4ea32d98968bc5e5920b8993a2cceb3c920",
+      "country_coverage": [
+        "2018-19"
+      ]
+    },
+    "default-2021": {
+      "requested": [
+        "2021-22"
+      ],
+      "cold_rows": 0,
+      "cold_waves": {},
+      "warm_rows": 0,
+      "warm_waves": {},
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "warm_changed_files": [],
+      "cold_seconds": 63.886453265324235,
+      "country_hash": "d494e0e9505758547e15539e8ac2f4ea32d98968bc5e5920b8993a2cceb3c920",
+      "country_coverage": [
+        "2021-22"
+      ]
+    },
+    "default-absent": {
+      "requested": [
+        "2018-19",
+        "2021-22"
+      ],
+      "cold_rows": 0,
+      "cold_waves": {},
+      "warm_rows": 0,
+      "warm_waves": {},
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "warm_changed_files": [],
+      "cold_seconds": 64.0317128635943,
+      "country_hash": "d494e0e9505758547e15539e8ac2f4ea32d98968bc5e5920b8993a2cceb3c920",
+      "country_coverage": [
+        "2018-19",
+        "2021-22"
+      ]
+    },
+    "make-all": {
+      "requested": null,
+      "cold_rows": 46043,
+      "cold_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "warm_rows": 46043,
+      "warm_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "warm_changed_files": [],
+      "cold_seconds": 62.133998352102935,
+      "country_hash": null,
+      "country_coverage": null
+    },
+    "make-2011": {
+      "requested": [
+        "2011-12"
+      ],
+      "cold_rows": 46043,
+      "cold_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "warm_rows": 46043,
+      "warm_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "warm_changed_files": [],
+      "cold_seconds": 67.29234710242599,
+      "country_hash": null,
+      "country_coverage": null
+    },
+    "make-2014": {
+      "requested": [
+        "2014-15"
+      ],
+      "cold_rows": 46043,
+      "cold_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "warm_rows": 46043,
+      "warm_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "warm_changed_files": [],
+      "cold_seconds": 63.14454539399594,
+      "country_hash": null,
+      "country_coverage": null
+    },
+    "make-2018": {
+      "requested": [
+        "2018-19"
+      ],
+      "cold_rows": 46043,
+      "cold_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "warm_rows": 46043,
+      "warm_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "warm_changed_files": [],
+      "cold_seconds": 64.2484979396686,
+      "country_hash": null,
+      "country_coverage": null
+    },
+    "make-2021": {
+      "requested": [
+        "2021-22"
+      ],
+      "cold_rows": 46043,
+      "cold_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "warm_rows": 46043,
+      "warm_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "warm_changed_files": [],
+      "cold_seconds": 69.25490491371602,
+      "country_hash": null,
+      "country_coverage": null
+    },
+    "make-absent": {
+      "requested": [
+        "2018-19",
+        "2021-22"
+      ],
+      "cold_rows": 46043,
+      "cold_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "warm_rows": 46043,
+      "warm_waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cold_warm_strict": {
+        "exact": true
+      },
+      "warm_changed_files": [],
+      "cold_seconds": 63.289535094983876,
+      "country_hash": null,
+      "country_coverage": null
+    }
+  },
+  "native_layer_checks": {
+    "default-all-2011-12": {
+      "exact": true
+    },
+    "default-all-2014-15": {
+      "exact": true
+    },
+    "default-2011-2011-12": {
+      "exact": true
+    },
+    "default-2014-2014-15": {
+      "exact": true
+    },
+    "default-2018-2011-12": {
+      "exact": true
+    },
+    "default-2018-2014-15": {
+      "exact": true
+    },
+    "default-2021-2011-12": {
+      "exact": true
+    },
+    "default-2021-2014-15": {
+      "exact": true
+    },
+    "default-absent-2011-12": {
+      "exact": true
+    },
+    "default-absent-2014-15": {
+      "exact": true
+    },
+    "make-all-2011-12": {
+      "exact": true
+    },
+    "make-all-2014-15": {
+      "exact": true
+    },
+    "make-2011-2011-12": {
+      "exact": true
+    },
+    "make-2011-2014-15": {
+      "exact": true
+    },
+    "make-2014-2011-12": {
+      "exact": true
+    },
+    "make-2014-2014-15": {
+      "exact": true
+    },
+    "make-2018-2011-12": {
+      "exact": true
+    },
+    "make-2018-2014-15": {
+      "exact": true
+    },
+    "make-2021-2011-12": {
+      "exact": true
+    },
+    "make-2021-2014-15": {
+      "exact": true
+    },
+    "make-absent-2011-12": {
+      "exact": true
+    },
+    "make-absent-2014-15": {
+      "exact": true
+    }
+  },
+  "strict_controls": {
+    "default_vs_legacy_make_all": {
+      "exact": false,
+      "payload_exact": true,
+      "typed_attrs_exact": false,
+      "error": "recursively typed full attrs differ",
+      "attrs_keys_a": [
+        "id_converted",
+        "country",
+        "population",
+        "population_resolution"
+      ],
+      "attrs_keys_b": [
+        "country",
+        "population",
+        "population_resolution"
+      ]
+    }
+  },
+  "scanner": {
+    "total_records": 3,
+    "status_counts": {
+      "warn": 3
+    },
+    "scope": "Actual phases1,2; no community_prices KWARG_GRID entry, so zero phase2 scenarios exist. No fabricated grid.",
+    "findings": [
+      {
+        "phase": "1a-sanity",
+        "country": "Mali",
+        "check": "has_household_index",
+        "status": "warn",
+        "accounting": "Native cluster-level feature intentionally lacks household i."
+      },
+      {
+        "phase": "1a-sanity",
+        "country": "Niger",
+        "check": "has_household_index",
+        "status": "warn",
+        "accounting": "Native cluster-level feature intentionally lacks household i."
+      },
+      {
+        "phase": "1b-assembly",
+        "country": null,
+        "check": "runtime_warning",
+        "status": "warn",
+        "accounting": "Mali lacks obs; canonical sentinel1 adds no rows and preserves86261."
+      }
+    ]
+  },
+  "populated": {
+    "default-all": {
+      "rows": 46043,
+      "waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cache_changed": [],
+      "vs_own_cold": {
+        "exact": true
+      }
+    },
+    "default-2011": {
+      "rows": 32352,
+      "waves": {
+        "2011-12": 32352
+      },
+      "cache_changed": [],
+      "vs_own_cold": {
+        "exact": true
+      }
+    },
+    "default-2014": {
+      "rows": 13691,
+      "waves": {
+        "2014-15": 13691
+      },
+      "cache_changed": [],
+      "vs_own_cold": {
+        "exact": true
+      }
+    },
+    "default-2018": {
+      "rows": 0,
+      "waves": {},
+      "cache_changed": [],
+      "vs_own_cold": {
+        "exact": false,
+        "payload_exact": true,
+        "typed_attrs_exact": false,
+        "error": "recursively typed full attrs differ",
+        "attrs_keys_a": [
+          "country",
+          "population",
+          "population_resolution"
+        ],
+        "attrs_keys_b": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ]
+      },
+      "exact_attr_difference": "Populated authoritative cache retains id_converted=True; cold fallback empty has no flag. Every common recursively typed attr exact; strict whole-attrs failure retained."
+    },
+    "default-2021": {
+      "rows": 0,
+      "waves": {},
+      "cache_changed": [],
+      "vs_own_cold": {
+        "exact": false,
+        "payload_exact": true,
+        "typed_attrs_exact": false,
+        "error": "recursively typed full attrs differ",
+        "attrs_keys_a": [
+          "country",
+          "population",
+          "population_resolution"
+        ],
+        "attrs_keys_b": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ]
+      },
+      "exact_attr_difference": "Populated authoritative cache retains id_converted=True; cold fallback empty has no flag. Every common recursively typed attr exact; strict whole-attrs failure retained."
+    },
+    "default-absent": {
+      "rows": 0,
+      "waves": {},
+      "cache_changed": [],
+      "vs_own_cold": {
+        "exact": false,
+        "payload_exact": true,
+        "typed_attrs_exact": false,
+        "error": "recursively typed full attrs differ",
+        "attrs_keys_a": [
+          "country",
+          "population",
+          "population_resolution"
+        ],
+        "attrs_keys_b": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ]
+      },
+      "exact_attr_difference": "Populated authoritative cache retains id_converted=True; cold fallback empty has no flag. Every common recursively typed attr exact; strict whole-attrs failure retained."
+    },
+    "make-all": {
+      "rows": 46043,
+      "waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cache_changed": [],
+      "vs_own_cold": {
+        "exact": false,
+        "payload_exact": true,
+        "typed_attrs_exact": false,
+        "error": "recursively typed full attrs differ",
+        "attrs_keys_a": [
+          "country",
+          "population",
+          "population_resolution"
+        ],
+        "attrs_keys_b": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ]
+      }
+    },
+    "make-2011": {
+      "rows": 46043,
+      "waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cache_changed": [],
+      "vs_own_cold": null
+    },
+    "make-2014": {
+      "rows": 46043,
+      "waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cache_changed": [],
+      "vs_own_cold": null
+    },
+    "make-2018": {
+      "rows": 46043,
+      "waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cache_changed": [],
+      "vs_own_cold": null
+    },
+    "make-2021": {
+      "rows": 46043,
+      "waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cache_changed": [],
+      "vs_own_cold": null
+    },
+    "make-absent": {
+      "rows": 46043,
+      "waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "cache_changed": [],
+      "vs_own_cold": null
+    }
+  },
+  "baseline_declared_tables": [
+    "assets",
+    "cluster_features",
+    "community_prices",
+    "crop_production",
+    "food_acquired",
+    "food_security",
+    "household_roster",
+    "housing",
+    "individual_education",
+    "interview_date",
+    "livestock",
+    "panel_ids",
+    "people_last7days",
+    "plot_features",
+    "plot_inputs",
+    "plot_labor",
+    "sample",
+    "shocks",
+    "subjective_well_being"
+  ],
+  "baseline_declared_table_count": 19,
+  "baseline_api_tables": [
+    "assets",
+    "cluster_features",
+    "community_prices",
+    "crop_production",
+    "food_acquired",
+    "food_expenditures",
+    "food_prices",
+    "food_quantities",
+    "food_security",
+    "household_characteristics",
+    "household_roster",
+    "housing",
+    "individual_education",
+    "interview_date",
+    "livestock",
+    "panel_ids",
+    "people_last7days",
+    "plot_features",
+    "plot_inputs",
+    "plot_labor",
+    "sample",
+    "shocks",
+    "subjective_well_being"
+  ],
+  "baseline_api_table_count": 23,
+  "baseline_api_hashes": {
+    "sample": "430264498b02ae43e40cd82efa1e2fd5647c4d096c4c8be1a35253455fa03786",
+    "cluster_features": "5c566891a72afa6a3c1406185668bc71eaa4f534956437d2e00a4d52595705da",
+    "household_roster": "ee3ae570b39aa2f10643a8ad381620f5d5c19b06098d0b141f1eb84b3ef6f52a",
+    "individual_education": "1c40389735cf5e8d6541db9b058ef483335b8d51e3dd4a37dbc52e92d6d13684",
+    "panel_ids": "c40d8828099fdaabd92e65a06c56f4f28b6fb34026623fcea05041c9c132e062",
+    "food_acquired": "105e94ec058c68fbb037c7230ab4798afac75caf13b896c88e511e2f8970a267",
+    "shocks": "41833e8041e4f82953f7bc7a7a801a649d568e5f89edeb57743d8227384a1054",
+    "assets": "5a58df28c3daca47078f18298ec379d04f0729615d9de99fcec9b5f1c125eb22",
+    "housing": "956d9b3bdca414791ff099dc09e96d15d7de23b5df6e443bd2f8e17ad65e1093",
+    "food_security": "d6796ab523fba51d5e24e588820311a6952f9941acebffbcadc18665b4d49346",
+    "subjective_well_being": "41c89fc2c03d1d56a83f83737459d712cb8cbeab705af25cca76fcfae67f6c0b",
+    "interview_date": "d5b2c2c7630ad328500feb9247ae7bff85f27455a6c5da2b178724074a96b25f",
+    "plot_features": "775b1b4dc8114ce93807b81bc3dab9a8ab848a8c6933a35b1112131f3dadc814",
+    "crop_production": "e1a3d94095c1f28a3c0d3d769bbc13f1ba2db7bb86069633193994e298e11245",
+    "plot_inputs": "b0c33a034cb59addb046f743c977952a77b9297bb5fd0f2b549d066a182f900d",
+    "livestock": "568321f785be86a5cdbbff3f9d1905703e9fe692fbf84a986b5dacf15b6a0005",
+    "plot_labor": "eb56033d529f5f483a678620cc4b355519778b59f9a34f218f4994dc37d47f65",
+    "people_last7days": "ef6069f5f14391528f7e2ca2b30a55d2af8e989dd61923202a46f12f6e8ea5bb",
+    "community_prices": "d494e0e9505758547e15539e8ac2f4ea32d98968bc5e5920b8993a2cceb3c920",
+    "food_expenditures": "85c60dd9fa00b5072068adde929f211122c5a3a2e5c690c8ac7fefebd86fc253",
+    "food_prices": "5689b70e16c3c1723ffa031e9d9d394896919b84e3ba04db91d4ded24bc1b456",
+    "food_quantities": "c02fb0444233ea73ef9f1f6be35bf8f86027b5018cebdb9e1c6f5edacab2c786",
+    "household_characteristics": "958e8f9f9a4ab937100d24b544e1de2abf8a891e028744f9f915e87d9e5ad6ea"
+  },
+  "predicted_hash_scope": {
+    "status": "PREDICTION_ONLY_NO_CANDIDATE",
+    "scope": "All Niger country and wave table hashes: whole country Makefile + removed country .py are hashed shared inputs (country.py:4249-4265,1318-1327). No framework or other-country change proposed. Actual candidate measurement required before implementation validation."
+  },
+  "empty_contract": {
+    "measurement": "Existing pure helper plus real finalizer only; NOT candidate API/build-route proof. No route/config monkeypatch.",
+    "declared_empty": {
+      "rows": 0,
+      "columns": [
+        "Price",
+        "Quantity",
+        "Description"
+      ],
+      "dtypes": [
+        "object",
+        "object",
+        "object"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs"
+      ],
+      "index_dtypes": [
+        "str",
+        "str",
+        "str",
+        "str",
+        "str",
+        "str",
+        "str"
+      ],
+      "waves": {},
+      "nulls": {
+        "Price": 0,
+        "Quantity": 0,
+        "Description": 0
+      },
+      "unique": true,
+      "attrs_keys": [],
+      "typed_attrs_sha256": "d052273dd15e125ab278d663814ce65fffb1cb8645d9abcbff2ecfb889dc2ac4"
+    },
+    "finalized_declared_empty": {
+      "rows": 0,
+      "columns": [
+        "Price",
+        "Quantity",
+        "Description"
+      ],
+      "dtypes": [
+        "Float64",
+        "Float64",
+        "object"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs"
+      ],
+      "index_dtypes": [
+        "str",
+        "str",
+        "str",
+        "str",
+        "str",
+        "str",
+        "str"
+      ],
+      "waves": {},
+      "nulls": {
+        "Price": 0,
+        "Quantity": 0,
+        "Description": 0
+      },
+      "unique": true,
+      "attrs_keys": [
+        "country",
+        "population",
+        "population_resolution"
+      ],
+      "typed_attrs_sha256": "73191df3967423684288ed5e89577ccfea988feca426bedf828871e533f946ec"
+    },
+    "old_absent_public": {
+      "rows": 0,
+      "columns": [
+        "Price",
+        "Quantity",
+        "Description"
+      ],
+      "dtypes": [
+        "Float64",
+        "Float64",
+        "string"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs"
+      ],
+      "index_dtypes": [
+        "str",
+        "str",
+        "str",
+        "str",
+        "str",
+        "int64",
+        "int64"
+      ],
+      "waves": {},
+      "nulls": {
+        "Price": 0,
+        "Quantity": 0,
+        "Description": 0
+      },
+      "unique": true,
+      "attrs_keys": [
+        "country",
+        "population",
+        "population_resolution"
+      ],
+      "typed_attrs_sha256": "0bc36aea9a2cee660953226bf85429c3f8eb3a7175b38cd3144bf21992c86f7f"
+    },
+    "strict": {
+      "exact": false,
+      "payload_exact": false,
+      "typed_attrs_exact": true,
+      "error": "DataFrame.index level [5] are different\n\nAttribute \"inferred_type\" are different\n[left]:  integer\n[right]: string",
+      "attrs_keys_a": [
+        "country",
+        "population",
+        "population_resolution"
+      ],
+      "attrs_keys_b": [
+        "country",
+        "population",
+        "population_resolution"
+      ]
+    },
+    "dtype_differences": [
+      {
+        "position": 5,
+        "name": "visit",
+        "old": "dtype('int64')",
+        "declared_empty_finalized": "<StringDtype(na_value=nan)>"
+      },
+      {
+        "position": 6,
+        "name": "obs",
+        "old": "dtype('int64')",
+        "declared_empty_finalized": "<StringDtype(na_value=nan)>"
+      },
+      {
+        "column": "Description",
+        "old": "<StringDtype(na_value=<NA>)>",
+        "declared_empty_finalized": "dtype('O')"
+      }
+    ]
+  },
+  "make_cli_feature": {
+    "backend": "make",
+    "arguments": {
+      "feature-default": {
+        "countries": [
+          "Niger"
+        ]
+      },
+      "feature-native": {
+        "countries": [
+          "Niger"
+        ],
+        "currency": null
+      },
+      "cli": [
+        "/local/job40255479/venv_img/bin/python",
+        "-m",
+        "lsms_library.cli",
+        "materialize",
+        "--country",
+        "Niger",
+        "--table",
+        "community_prices",
+        "--wave",
+        "2011-12",
+        "--out",
+        "/local/job40255479/control/isa-backlog-20261021/Niger/1091/make-all/make-cli-singleton-private.parquet"
+      ]
+    },
+    "api": {
+      "rows": 46043,
+      "columns": [
+        "Price",
+        "Quantity",
+        "Description"
+      ],
+      "dtypes": [
+        "Float64",
+        "Float64",
+        "string"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs"
+      ],
+      "index_dtypes": [
+        "str",
+        "str",
+        "str",
+        "str",
+        "str",
+        "int64",
+        "int64"
+      ],
+      "waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "nulls": {
+        "Price": 0,
+        "Quantity": 640,
+        "Description": 0
+      },
+      "unique": true,
+      "attrs_keys": [
+        "country",
+        "population",
+        "population_resolution"
+      ],
+      "typed_attrs_sha256": "7fdf0244d57f513c462ad2256fe3f079b34e5966c50f16a4aeaad32a3bb326f0"
+    },
+    "artifact": {
+      "rows": 46043,
+      "columns": [
+        "Price",
+        "Quantity",
+        "Description"
+      ],
+      "dtypes": [
+        "Float64",
+        "Float64",
+        "string"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs"
+      ],
+      "index_dtypes": [
+        "str",
+        "str",
+        "str",
+        "str",
+        "str",
+        "int64",
+        "int64"
+      ],
+      "waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "nulls": {
+        "Price": 0,
+        "Quantity": 640,
+        "Description": 0
+      },
+      "unique": true,
+      "attrs_keys": [
+        "country",
+        "population",
+        "population_resolution"
+      ],
+      "typed_attrs_sha256": "3491f1c809075a404ba484f3eb4222584391e1cd6e5aea3276e7a4f4ea4a932a"
+    },
+    "api_vs_artifact": {
+      "exact": false,
+      "payload_exact": true,
+      "typed_attrs_exact": false,
+      "error": "recursively typed full attrs differ",
+      "attrs_keys_a": [
+        "country",
+        "population",
+        "population_resolution"
+      ],
+      "attrs_keys_b": [
+        "country",
+        "population",
+        "population_resolution"
+      ]
+    },
+    "artifact_vs_matched_serialization_control": {
+      "exact": true
+    },
+    "feature-default": {
+      "rows": 46043,
+      "columns": [
+        "Price",
+        "Quantity",
+        "Description"
+      ],
+      "dtypes": [
+        "Float64",
+        "Float64",
+        "string"
+      ],
+      "index_names": [
+        "country",
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs",
+        "currency"
+      ],
+      "index_dtypes": [
+        "str",
+        "str",
+        "str",
+        "str",
+        "str",
+        "str",
+        "int64",
+        "int64",
+        "string"
+      ],
+      "waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "nulls": {
+        "Price": 0,
+        "Quantity": 640,
+        "Description": 0
+      },
+      "unique": true,
+      "attrs_keys": [
+        "country",
+        "population",
+        "population_resolution"
+      ],
+      "typed_attrs_sha256": "7fdf0244d57f513c462ad2256fe3f079b34e5966c50f16a4aeaad32a3bb326f0"
+    },
+    "feature-native": {
+      "rows": 46043,
+      "columns": [
+        "Price",
+        "Quantity",
+        "Description"
+      ],
+      "dtypes": [
+        "Float64",
+        "Float64",
+        "string"
+      ],
+      "index_names": [
+        "country",
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit",
+        "obs"
+      ],
+      "index_dtypes": [
+        "str",
+        "str",
+        "str",
+        "str",
+        "str",
+        "str",
+        "int64",
+        "int64"
+      ],
+      "waves": {
+        "2011-12": 32352,
+        "2014-15": 13691
+      },
+      "nulls": {
+        "Price": 0,
+        "Quantity": 640,
+        "Description": 0
+      },
+      "unique": true,
+      "attrs_keys": [
+        "country",
+        "population",
+        "population_resolution"
+      ],
+      "typed_attrs_sha256": "7fdf0244d57f513c462ad2256fe3f079b34e5966c50f16a4aeaad32a3bb326f0"
+    },
+    "changed": []
+  },
+  "layers": {
+    "2011-12": {
+      "memory_vs_native_disk": {
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": true,
+        "error": "DataFrame.index level [1] are different\n\nAttribute \"dtype\" are different\n[left]:  <StringDtype(na_value=<NA>)>\n[right]: <StringDtype(na_value=nan)>",
+        "attrs_keys_a": [],
+        "attrs_keys_b": []
+      },
+      "dtype_differences": [
+        {
+          "axis": "index",
+          "position": 1,
+          "name": "v",
+          "left": "<StringDtype(na_value=<NA>)>",
+          "right": "<StringDtype(na_value=nan)>"
+        },
+        {
+          "axis": "index",
+          "position": 2,
+          "name": "i",
+          "left": "<StringDtype(na_value=<NA>)>",
+          "right": "<StringDtype(na_value=nan)>"
+        },
+        {
+          "axis": "index",
+          "position": 3,
+          "name": "j",
+          "left": "<StringDtype(na_value=<NA>)>",
+          "right": "<StringDtype(na_value=nan)>"
+        },
+        {
+          "axis": "index",
+          "position": 4,
+          "name": "u",
+          "left": "<StringDtype(na_value=<NA>)>",
+          "right": "<StringDtype(na_value=nan)>"
+        },
+        {
+          "axis": "index",
+          "position": 5,
+          "name": "variety",
+          "left": "<StringDtype(na_value=<NA>)>",
+          "right": "<StringDtype(na_value=nan)>"
+        }
+      ],
+      "serialized_oracle_vs_native_disk": {
+        "exact": true
+      }
+    },
+    "2014-15": {
+      "memory_vs_native_disk": {
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": true,
+        "error": "DataFrame.index level [1] are different\n\nAttribute \"dtype\" are different\n[left]:  <StringDtype(na_value=<NA>)>\n[right]: <StringDtype(na_value=nan)>",
+        "attrs_keys_a": [],
+        "attrs_keys_b": []
+      },
+      "dtype_differences": [
+        {
+          "axis": "index",
+          "position": 1,
+          "name": "v",
+          "left": "<StringDtype(na_value=<NA>)>",
+          "right": "<StringDtype(na_value=nan)>"
+        },
+        {
+          "axis": "index",
+          "position": 2,
+          "name": "i",
+          "left": "<StringDtype(na_value=<NA>)>",
+          "right": "<StringDtype(na_value=nan)>"
+        },
+        {
+          "axis": "index",
+          "position": 3,
+          "name": "j",
+          "left": "<StringDtype(na_value=<NA>)>",
+          "right": "<StringDtype(na_value=nan)>"
+        },
+        {
+          "axis": "index",
+          "position": 4,
+          "name": "u",
+          "left": "<StringDtype(na_value=<NA>)>",
+          "right": "<StringDtype(na_value=nan)>"
+        },
+        {
+          "axis": "index",
+          "position": 5,
+          "name": "variety",
+          "left": "<StringDtype(na_value=<NA>)>",
+          "right": "<StringDtype(na_value=nan)>"
+        }
+      ],
+      "serialized_oracle_vs_native_disk": {
+        "exact": true
+      }
+    },
+    "cli": {
+      "typed_attrs_differences": [
+        {
+          "path": "attrs.population.Niger.2011-12",
+          "left_type": "lsms_library.population.PopulationRecord",
+          "right_type": "builtins.dict"
+        }
+      ],
+      "dtype_differences": []
+    },
+    "feature-default": {
+      "exact": {
+        "exact": true
+      },
+      "dtype_differences": [],
+      "typed_attrs_differences": []
+    },
+    "feature-native": {
+      "exact": {
+        "exact": true
+      },
+      "dtype_differences": [],
+      "typed_attrs_differences": []
+    },
+    "food-acquired": {
+      "exact": {
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": true,
+        "error": "DataFrame.index level [4] are different\n\nAttribute \"dtype\" are different\n[left]:  <StringDtype(na_value=<NA>)>\n[right]: <StringDtype(na_value=nan)>",
+        "attrs_keys_a": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution",
+          "recall",
+          "derivations"
+        ],
+        "attrs_keys_b": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution",
+          "recall",
+          "derivations"
+        ]
+      },
+      "dtype_differences": [
+        {
+          "axis": "index",
+          "position": 4,
+          "name": "u",
+          "left": "<StringDtype(na_value=<NA>)>",
+          "right": "<StringDtype(na_value=nan)>"
+        }
+      ],
+      "typed_attrs_differences": []
+    },
+    "food-prices": {
+      "exact": {
+        "exact": true
+      },
+      "dtype_differences": [],
+      "typed_attrs_differences": []
+    },
+    "food-quantities": {
+      "exact": {
+        "exact": true
+      },
+      "dtype_differences": [],
+      "typed_attrs_differences": []
+    },
+    "food-expenditures": {
+      "exact": {
+        "exact": true
+      },
+      "dtype_differences": [],
+      "typed_attrs_differences": []
+    }
+  },
+  "extra_cold": {
+    "stage": "cold",
+    "identity": {
+      "cwd": "/local/job40255479/worktrees/isa-Niger-1091",
+      "import_path": "/local/job40255479/worktrees/isa-Niger-1091/lsms_library/__init__.py",
+      "countries": "/local/job40255479/worktrees/isa-Niger-1091/lsms_library/countries",
+      "data": "/local/job40255479/control/isa-backlog-20261021/Niger/1091/data-default-all"
+    },
+    "arguments": {
+      "feature-default": {
+        "countries": [
+          "Niger",
+          "Mali"
+        ]
+      },
+      "feature-native": {
+        "countries": [
+          "Niger",
+          "Mali"
+        ],
+        "currency": null
+      },
+      "cli": [
+        "/local/job40255479/venv_img/bin/python",
+        "-m",
+        "lsms_library.cli",
+        "materialize",
+        "--country",
+        "Niger",
+        "--table",
+        "community_prices",
+        "--wave",
+        "2011-12",
+        "--out",
+        "/local/job40255479/control/isa-backlog-20261021/Niger/1091/default-all/cold-cli-private.parquet"
+      ]
+    },
+    "comparisons": {
+      "2011-12-source-replay-native": {
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": true,
+        "error": "DataFrame.index level [1] are different\n\nAttribute \"dtype\" are different\n[left]:  <StringDtype(na_value=<NA>)>\n[right]: <StringDtype(na_value=nan)>",
+        "attrs_keys_a": [],
+        "attrs_keys_b": []
+      },
+      "2014-15-source-replay-native": {
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": true,
+        "error": "DataFrame.index level [1] are different\n\nAttribute \"dtype\" are different\n[left]:  <StringDtype(na_value=<NA>)>\n[right]: <StringDtype(na_value=nan)>",
+        "attrs_keys_a": [],
+        "attrs_keys_b": []
+      },
+      "normalized-concat-vs-raw-country": {
+        "exact": true
+      },
+      "cli-api-vs-artifact": {
+        "exact": false,
+        "payload_exact": true,
+        "typed_attrs_exact": false,
+        "error": "recursively typed full attrs differ",
+        "attrs_keys_a": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ],
+        "attrs_keys_b": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ]
+      }
+    },
+    "frames": {
+      "public-community": {
+        "rows": 46043,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2011-12": 32352,
+          "2014-15": 13691
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 640,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ],
+        "typed_attrs_sha256": "fa8290e2af22f3a1eeb9ccc86aad2c9609221dee1e1b44d7895ce0078a5af5a2"
+      },
+      "2011-12-native": {
+        "rows": 32352,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "i",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2011-12": 32352
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 410,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [],
+        "typed_attrs_sha256": "d052273dd15e125ab278d663814ce65fffb1cb8645d9abcbff2ecfb889dc2ac4"
+      },
+      "2011-12-walked": {
+        "rows": 32352,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "i",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2011-12": 32352
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 410,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted"
+        ],
+        "typed_attrs_sha256": "f18344c04d6d1cfd57ac5472f5b9a652d89c29c7cd1ee088964a1c59e527830a"
+      },
+      "2011-12-normalized": {
+        "rows": 32352,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2011-12": 32352
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 410,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted"
+        ],
+        "typed_attrs_sha256": "f18344c04d6d1cfd57ac5472f5b9a652d89c29c7cd1ee088964a1c59e527830a"
+      },
+      "2014-15-native": {
+        "rows": 13691,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "i",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2014-15": 13691
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 230,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [],
+        "typed_attrs_sha256": "d052273dd15e125ab278d663814ce65fffb1cb8645d9abcbff2ecfb889dc2ac4"
+      },
+      "2014-15-walked": {
+        "rows": 13691,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "i",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2014-15": 13691
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 230,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted"
+        ],
+        "typed_attrs_sha256": "f18344c04d6d1cfd57ac5472f5b9a652d89c29c7cd1ee088964a1c59e527830a"
+      },
+      "2014-15-normalized": {
+        "rows": 13691,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2014-15": 13691
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 230,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted"
+        ],
+        "typed_attrs_sha256": "f18344c04d6d1cfd57ac5472f5b9a652d89c29c7cd1ee088964a1c59e527830a"
+      },
+      "raw-country": {
+        "rows": 46043,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2011-12": 32352,
+          "2014-15": 13691
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 640,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted"
+        ],
+        "typed_attrs_sha256": "f18344c04d6d1cfd57ac5472f5b9a652d89c29c7cd1ee088964a1c59e527830a"
+      },
+      "feature-default": {
+        "rows": 86261,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "country",
+          "t",
+          "v",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs",
+          "currency"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64",
+          "string"
+        ],
+        "waves": {
+          "2011-12": 32352,
+          "2014-15": 53909
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 3376,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "canonical_alignment",
+          "population",
+          "population_resolution",
+          "recall"
+        ],
+        "typed_attrs_sha256": "db8d6f9efc9f93699b6dc41e9454c04f9e9b7458cb333c393acc9554436184d8"
+      },
+      "feature-native": {
+        "rows": 86261,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "country",
+          "t",
+          "v",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2011-12": 32352,
+          "2014-15": 53909
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 3376,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "canonical_alignment",
+          "population",
+          "population_resolution",
+          "recall"
+        ],
+        "typed_attrs_sha256": "db8d6f9efc9f93699b6dc41e9454c04f9e9b7458cb333c393acc9554436184d8"
+      },
+      "food-acquired": {
+        "rows": 239877,
+        "columns": [
+          "Quantity",
+          "Expenditure",
+          "Derivation"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "string",
+          "str"
+        ],
+        "waves": {
+          "2018-19": 108333,
+          "2021-22": 131544
+        },
+        "nulls": {
+          "Quantity": 0,
+          "Expenditure": 74848,
+          "Derivation": 33430
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution",
+          "recall",
+          "derivations"
+        ],
+        "typed_attrs_sha256": "832a2fa23ff2e0f9bbee1b19c4f88a3391ffb487bd729e35ff11349f86f4e5e6"
+      },
+      "food-prices": {
+        "rows": 165027,
+        "columns": [
+          "Price"
+        ],
+        "dtypes": [
+          "Float64"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "string",
+          "str",
+          "str",
+          "str"
+        ],
+        "waves": {
+          "2018-19": 66783,
+          "2021-22": 98244
+        },
+        "nulls": {
+          "Price": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution",
+          "recall",
+          "derivations",
+          "price_rows_dropped",
+          "kg_factor_sources",
+          "kg_factor_wave_spread",
+          "kg_factor_baseline_gate",
+          "kg_factor_declared_none"
+        ],
+        "typed_attrs_sha256": "f8b7fc23fa14198f9dc7552fe77979a54abcb5e463748cb58970e87d73208379"
+      },
+      "food-quantities": {
+        "rows": 239855,
+        "columns": [
+          "Quantity"
+        ],
+        "dtypes": [
+          "float64"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "string",
+          "str",
+          "str",
+          "str"
+        ],
+        "waves": {
+          "2018-19": 108333,
+          "2021-22": 131522
+        },
+        "nulls": {
+          "Quantity": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "kg_factor_sources",
+          "kg_factor_wave_spread",
+          "kg_factor_baseline_gate",
+          "kg_factor_declared_none",
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution",
+          "recall"
+        ],
+        "typed_attrs_sha256": "af3f3ae41021c1341cb298b4fd9be13f6f69d364c512d9ccdeef3278e059c153"
+      },
+      "food-expenditures": {
+        "rows": 165014,
+        "columns": [
+          "Expenditure"
+        ],
+        "dtypes": [
+          "Float64"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "s"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "string",
+          "str",
+          "str"
+        ],
+        "waves": {
+          "2018-19": 66783,
+          "2021-22": 98231
+        },
+        "nulls": {
+          "Expenditure": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution",
+          "recall",
+          "derivations"
+        ],
+        "typed_attrs_sha256": "832a2fa23ff2e0f9bbee1b19c4f88a3391ffb487bd729e35ff11349f86f4e5e6"
+      },
+      "cli-api-control": {
+        "rows": 32352,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2011-12": 32352
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 410,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ],
+        "typed_attrs_sha256": "3e761440d93a235cca0c20de193d691e959c280a45edda61c1f38eb85c751cc5"
+      },
+      "cli-artifact": {
+        "rows": 32352,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2011-12": 32352
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 410,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ],
+        "typed_attrs_sha256": "03382518b5cfb8498876c3d2803c04f1faf2975ef00a42557b96c1695e3567b1"
+      }
+    },
+    "source_counts": [
+      {
+        "wave": "2011-12",
+        "file": "ecvmacoms07_p1.dta",
+        "rows": 23409,
+        "columns": 15,
+        "long_rows": 13291,
+        "second_record_slots": 0
+      },
+      {
+        "wave": "2011-12",
+        "file": "ecvmacoms07_p2.dta",
+        "rows": 34380,
+        "columns": 16,
+        "long_rows": 19650,
+        "second_record_slots": 15
+      },
+      {
+        "wave": "2014-15",
+        "file": "comprixcs07.dta",
+        "rows": 21960,
+        "columns": 14,
+        "long_rows": 13691,
+        "second_record_slots": 15
+      }
+    ],
+    "source_1088": {
+      "2014_missing_quantity": 230,
+      "served_sentinel_codes": 0,
+      "late_obs": {
+        "2011-12": 15,
+        "2014-15": 15
+      }
+    },
+    "hashes": {
+      "community_prices": {
+        "stored": "d494e0e9505758547e15539e8ac2f4ea32d98968bc5e5920b8993a2cceb3c920",
+        "expected": "d494e0e9505758547e15539e8ac2f4ea32d98968bc5e5920b8993a2cceb3c920",
+        "coverage": [
+          "2011-12",
+          "2014-15",
+          "2018-19",
+          "2021-22"
+        ]
+      },
+      "food_acquired": {
+        "stored": "105e94ec058c68fbb037c7230ab4798afac75caf13b896c88e511e2f8970a267",
+        "expected": "105e94ec058c68fbb037c7230ab4798afac75caf13b896c88e511e2f8970a267",
+        "coverage": [
+          "2011-12",
+          "2014-15",
+          "2018-19",
+          "2021-22"
+        ]
+      }
+    },
+    "cache_changed": [
+      "Niger/2011-12/_/sample.parquet",
+      "Niger/2014-15/_/sample.parquet",
+      "Niger/2018-19/_/food_acquired.parquet",
+      "Niger/2018-19/_/sample.parquet",
+      "Niger/2021-22/_/food_acquired.parquet",
+      "Niger/2021-22/_/sample.parquet",
+      "Niger/var/food_acquired.parquet",
+      "Niger/var/sample.parquet"
+    ]
+  },
+  "extra_warm": {
+    "stage": "warm",
+    "identity": {
+      "cwd": "/local/job40255479/worktrees/isa-Niger-1091",
+      "import_path": "/local/job40255479/worktrees/isa-Niger-1091/lsms_library/__init__.py",
+      "countries": "/local/job40255479/worktrees/isa-Niger-1091/lsms_library/countries",
+      "data": "/local/job40255479/control/isa-backlog-20261021/Niger/1091/data-default-all"
+    },
+    "arguments": {
+      "feature-default": {
+        "countries": [
+          "Niger",
+          "Mali"
+        ]
+      },
+      "feature-native": {
+        "countries": [
+          "Niger",
+          "Mali"
+        ],
+        "currency": null
+      },
+      "cli": [
+        "/local/job40255479/venv_img/bin/python",
+        "-m",
+        "lsms_library.cli",
+        "materialize",
+        "--country",
+        "Niger",
+        "--table",
+        "community_prices",
+        "--wave",
+        "2011-12",
+        "--out",
+        "/local/job40255479/control/isa-backlog-20261021/Niger/1091/default-all/warm-cli-private.parquet"
+      ]
+    },
+    "comparisons": {
+      "feature-default-cold-warm": {
+        "exact": true
+      },
+      "feature-native-cold-warm": {
+        "exact": true
+      },
+      "food-acquired-cold-warm": {
+        "exact": false,
+        "payload_exact": false,
+        "typed_attrs_exact": true,
+        "error": "DataFrame.index level [4] are different\n\nAttribute \"dtype\" are different\n[left]:  <StringDtype(na_value=<NA>)>\n[right]: <StringDtype(na_value=nan)>",
+        "attrs_keys_a": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution",
+          "recall",
+          "derivations"
+        ],
+        "attrs_keys_b": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution",
+          "recall",
+          "derivations"
+        ]
+      },
+      "food-prices-cold-warm": {
+        "exact": true
+      },
+      "food-quantities-cold-warm": {
+        "exact": true
+      },
+      "food-expenditures-cold-warm": {
+        "exact": true
+      },
+      "cli-api-vs-artifact": {
+        "exact": false,
+        "payload_exact": true,
+        "typed_attrs_exact": false,
+        "error": "recursively typed full attrs differ",
+        "attrs_keys_a": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ],
+        "attrs_keys_b": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ]
+      },
+      "cli-artifact-cold-warm": {
+        "exact": true
+      }
+    },
+    "frames": {
+      "public-community": {
+        "rows": 46043,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2011-12": 32352,
+          "2014-15": 13691
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 640,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ],
+        "typed_attrs_sha256": "fa8290e2af22f3a1eeb9ccc86aad2c9609221dee1e1b44d7895ce0078a5af5a2"
+      },
+      "feature-default": {
+        "rows": 86261,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "country",
+          "t",
+          "v",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs",
+          "currency"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64",
+          "string"
+        ],
+        "waves": {
+          "2011-12": 32352,
+          "2014-15": 53909
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 3376,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "canonical_alignment",
+          "population",
+          "population_resolution",
+          "recall"
+        ],
+        "typed_attrs_sha256": "db8d6f9efc9f93699b6dc41e9454c04f9e9b7458cb333c393acc9554436184d8"
+      },
+      "feature-native": {
+        "rows": 86261,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "country",
+          "t",
+          "v",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2011-12": 32352,
+          "2014-15": 53909
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 3376,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "canonical_alignment",
+          "population",
+          "population_resolution",
+          "recall"
+        ],
+        "typed_attrs_sha256": "db8d6f9efc9f93699b6dc41e9454c04f9e9b7458cb333c393acc9554436184d8"
+      },
+      "food-acquired": {
+        "rows": 239877,
+        "columns": [
+          "Quantity",
+          "Expenditure",
+          "Derivation"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "str"
+        ],
+        "waves": {
+          "2018-19": 108333,
+          "2021-22": 131544
+        },
+        "nulls": {
+          "Quantity": 0,
+          "Expenditure": 74848,
+          "Derivation": 33430
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution",
+          "recall",
+          "derivations"
+        ],
+        "typed_attrs_sha256": "832a2fa23ff2e0f9bbee1b19c4f88a3391ffb487bd729e35ff11349f86f4e5e6"
+      },
+      "food-prices": {
+        "rows": 165027,
+        "columns": [
+          "Price"
+        ],
+        "dtypes": [
+          "Float64"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "string",
+          "str",
+          "str",
+          "str"
+        ],
+        "waves": {
+          "2018-19": 66783,
+          "2021-22": 98244
+        },
+        "nulls": {
+          "Price": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution",
+          "recall",
+          "derivations",
+          "price_rows_dropped",
+          "kg_factor_sources",
+          "kg_factor_wave_spread",
+          "kg_factor_baseline_gate",
+          "kg_factor_declared_none"
+        ],
+        "typed_attrs_sha256": "f8b7fc23fa14198f9dc7552fe77979a54abcb5e463748cb58970e87d73208379"
+      },
+      "food-quantities": {
+        "rows": 239855,
+        "columns": [
+          "Quantity"
+        ],
+        "dtypes": [
+          "float64"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "u",
+          "s"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "string",
+          "str",
+          "str",
+          "str"
+        ],
+        "waves": {
+          "2018-19": 108333,
+          "2021-22": 131522
+        },
+        "nulls": {
+          "Quantity": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "kg_factor_sources",
+          "kg_factor_wave_spread",
+          "kg_factor_baseline_gate",
+          "kg_factor_declared_none",
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution",
+          "recall"
+        ],
+        "typed_attrs_sha256": "af3f3ae41021c1341cb298b4fd9be13f6f69d364c512d9ccdeef3278e059c153"
+      },
+      "food-expenditures": {
+        "rows": 165014,
+        "columns": [
+          "Expenditure"
+        ],
+        "dtypes": [
+          "Float64"
+        ],
+        "index_names": [
+          "i",
+          "t",
+          "v",
+          "j",
+          "s"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "string",
+          "str",
+          "str"
+        ],
+        "waves": {
+          "2018-19": 66783,
+          "2021-22": 98231
+        },
+        "nulls": {
+          "Expenditure": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution",
+          "recall",
+          "derivations"
+        ],
+        "typed_attrs_sha256": "832a2fa23ff2e0f9bbee1b19c4f88a3391ffb487bd729e35ff11349f86f4e5e6"
+      },
+      "cli-api-control": {
+        "rows": 32352,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2011-12": 32352
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 410,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ],
+        "typed_attrs_sha256": "3e761440d93a235cca0c20de193d691e959c280a45edda61c1f38eb85c751cc5"
+      },
+      "cli-artifact": {
+        "rows": 32352,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2011-12": 32352
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 410,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [
+          "id_converted",
+          "country",
+          "population",
+          "population_resolution"
+        ],
+        "typed_attrs_sha256": "03382518b5cfb8498876c3d2803c04f1faf2975ef00a42557b96c1695e3567b1"
+      }
+    },
+    "hashes": {
+      "community_prices": {
+        "stored": "d494e0e9505758547e15539e8ac2f4ea32d98968bc5e5920b8993a2cceb3c920",
+        "expected": "d494e0e9505758547e15539e8ac2f4ea32d98968bc5e5920b8993a2cceb3c920",
+        "coverage": [
+          "2011-12",
+          "2014-15",
+          "2018-19",
+          "2021-22"
+        ]
+      },
+      "food_acquired": {
+        "stored": "105e94ec058c68fbb037c7230ab4798afac75caf13b896c88e511e2f8970a267",
+        "expected": "105e94ec058c68fbb037c7230ab4798afac75caf13b896c88e511e2f8970a267",
+        "coverage": [
+          "2011-12",
+          "2014-15",
+          "2018-19",
+          "2021-22"
+        ]
+      }
+    },
+    "cache_changed": []
+  },
+  "final_wave_controls": {
+    "2011-12": {
+      "wave_api": {
+        "rows": 32352,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "i",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2011-12": 32352
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 410,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [],
+        "typed_attrs_sha256": "d052273dd15e125ab278d663814ce65fffb1cb8645d9abcbff2ecfb889dc2ac4"
+      },
+      "vs_native_parquet": {
+        "exact": true
+      }
+    },
+    "2014-15": {
+      "wave_api": {
+        "rows": 13691,
+        "columns": [
+          "Price",
+          "Quantity",
+          "Description"
+        ],
+        "dtypes": [
+          "Float64",
+          "Float64",
+          "string"
+        ],
+        "index_names": [
+          "t",
+          "v",
+          "i",
+          "j",
+          "u",
+          "variety",
+          "visit",
+          "obs"
+        ],
+        "index_dtypes": [
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "str",
+          "int64",
+          "int64"
+        ],
+        "waves": {
+          "2014-15": 13691
+        },
+        "nulls": {
+          "Price": 0,
+          "Quantity": 230,
+          "Description": 0
+        },
+        "unique": true,
+        "attrs_keys": [],
+        "typed_attrs_sha256": "d052273dd15e125ab278d663814ce65fffb1cb8645d9abcbff2ecfb889dc2ac4"
+      },
+      "vs_native_parquet": {
+        "exact": true
+      }
+    },
+    "Mali-public": {
+      "rows": 40218,
+      "columns": [
+        "Price",
+        "Quantity",
+        "Description"
+      ],
+      "dtypes": [
+        "Float64",
+        "Float64",
+        "string"
+      ],
+      "index_names": [
+        "t",
+        "v",
+        "j",
+        "u",
+        "variety",
+        "visit"
+      ],
+      "index_dtypes": [
+        "str",
+        "str",
+        "str",
+        "str",
+        "str",
+        "int64"
+      ],
+      "waves": {
+        "2014-15": 40218
+      },
+      "nulls": {
+        "Price": 0,
+        "Quantity": 2736,
+        "Description": 0
+      },
+      "unique": true,
+      "attrs_keys": [
+        "id_converted",
+        "country",
+        "population",
+        "population_resolution",
+        "recall"
+      ],
+      "typed_attrs_sha256": "bb6c85d55fbd70378185f46d1b25fcb44671f84fe6466c5e1df5543ada3f6780"
+    },
+    "helper_import": "/local/job40255479/worktrees/isa-Niger-1091/lsms_library/countries/Niger/_/niger.py",
+    "cache_changed": []
+  },
+  "tests": {
+    "pytest_passed": 97,
+    "pytest_skipped": 0,
+    "workers": 2,
+    "distribution": "loadfile",
+    "actual_existing_built_assertions": 12,
+    "built_assertion_cache_writes": 0
+  },
+  "dtype_residual_owner": "https://github.com/ligon/LSMS_Library/issues/1196"
+}

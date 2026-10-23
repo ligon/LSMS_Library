@@ -1,0 +1,167 @@
+{
+  "verdict": "PASS",
+  "candidate_HEAD": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+  "baseline_HEAD": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+  "runtime_HEAD": "ca3e5cc119896983b49f50a6b9dade6a5f825131",
+  "ledger_first_HEAD": "12346145ab715c28b604f3cc8cdfba7d82db7072",
+  "candidate_tests": {
+    "tests": 235,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "baseline_counterfactual": {
+    "tests": 73,
+    "failed": 42,
+    "errors": 0,
+    "skipped": 0
+  },
+  "baseline_failed_sites": {
+    "source": 24,
+    "food_finalizer": 18
+  },
+  "first_launcher_identity_skip_preserved": {
+    "tests": 235,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 1
+  },
+  "generated_handler_probes_per_head": 166,
+  "valuation_controls_per_head": 5,
+  "actual_synthetic_Feature_cases_per_head": 6,
+  "extra_independent_context_cause_controls": 72,
+  "actual_hash_scope": {
+    "country_cells": 549,
+    "country_changed": 0,
+    "framework_tags": 39,
+    "framework_changed": 0
+  },
+  "healthy_frame_stages": [
+    {
+      "side": "baseline",
+      "stage": "initial",
+      "frames": 17,
+      "warnings": 110,
+      "all_complete_values_axes_dtypes_nulls_attrs_exact": true
+    },
+    {
+      "side": "candidate",
+      "stage": "initial",
+      "frames": 17,
+      "warnings": 110,
+      "all_complete_values_axes_dtypes_nulls_attrs_exact": true
+    },
+    {
+      "side": "baseline",
+      "stage": "warm",
+      "frames": 17,
+      "warnings": 133,
+      "all_complete_values_axes_dtypes_nulls_attrs_exact": true
+    },
+    {
+      "side": "candidate",
+      "stage": "warm",
+      "frames": 17,
+      "warnings": 133,
+      "all_complete_values_axes_dtypes_nulls_attrs_exact": true
+    }
+  ],
+  "healthy_full_frame_comparisons": 68,
+  "additional_author_full_frame_references_exact": true,
+  "warnings": {
+    "initial": {
+      "records": 110,
+      "category_message_multisets_exact": true,
+      "categories": {
+        "QuantityImplausibleWarning": 69,
+        "ClusterIdentityWarning": 21,
+        "StatedVsInferredKgWarning": 4,
+        "NullIndexKeyWarning": 13,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 2
+      }
+    },
+    "warm": {
+      "records": 133,
+      "category_message_multisets_exact": true,
+      "categories": {
+        "QuantityImplausibleWarning": 85,
+        "ClusterIdentityWarning": 25,
+        "StatedVsInferredKgWarning": 4,
+        "NullIndexKeyWarning": 15,
+        "UserWarning": 1,
+        "PopulationHeterogeneityWarning": 3
+      }
+    }
+  },
+  "physical_L2_copies": 120,
+  "parquets_per_private_root": 60,
+  "all_copy_source_destinations_SHA_size_mode_mtime_exact": true,
+  "all8country_hash_full_wave_gates_fresh": true,
+  "derived_parquets_created": 0,
+  "normal_initial_and_fresh_process_warm_zero_parquet_writes": true,
+  "immutable_tracked_heads": {
+    "/local/job40255479/worktrees/isa-review-1081": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+    "/local/job40255479/worktrees/isa-review-1081-base": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "/local/job40255479/worktrees/isa-framework-1081": "f8d236694c26fe9e709c5548f02c70f74ea72c33",
+    "/local/job40255479/worktrees/isa-framework-1081-fix": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0"
+  },
+  "immutable_tracked_content_modes_heads_clean_exact": true,
+  "immutable_reference_files": {
+    "/local/job40255479/control/isa-backlog-20261021/framework1081-diagnosis": 457,
+    "/local/job40255479/control/isa-backlog-20261021/framework1081-fix": 801
+  },
+  "fixtures_schema_country_configs_parsers_global_conftest_dependencies_exact": true,
+  "static_proof": {
+    "production_added_lines": 9,
+    "exact_existing_imports": 3,
+    "bare_re_raise_clauses": 2,
+    "all_other_production_bytes_exact": true,
+    "UnitsUnavailable_handler_source_bytes_exact": true,
+    "final_docs_only_runtime_config_test_modes_blobs_exact": true,
+    "current_test_AST_exact_to_executed_draft_except_docstring_unused_Path": true,
+    "doc_descendant_paths": [
+      ".coder/ledger/1081-derived-categorical-errors.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/REPORT.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/REPRODUCE.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/RESIDUALS.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/VALIDATION.json"
+    ]
+  },
+  "network_attempts": 0,
+  "source_write_attempts": 0,
+  "functional_network_guards": 2,
+  "functional_protected_tree_guards": 4,
+  "in_tree_parquets": 0,
+  "strict_API_audit": "PASS",
+  "remaining_task_processes": 0,
+  "source_pin_manifest_SHA256": "bec0ac32d0168e34c5e19b3147d47a086214178edb3db19c0ba4370242521eb0",
+  "limits": [
+    "Normal current-hash L2 behavior; not L1 or source-cold reconstruction.",
+    "Three existing typed errors through two approved handlers; other wrappers unchanged.",
+    "Successful legacy masking is mocked, not an observed healthy Ethiopia legacy cache.",
+    "Healthy warning category/message multisets exact; cross-checkout file/line equality not claimed.",
+    "Scoped235 tests plus controls and549/39 metadata inventory; no full suite or full corpus rebuild."
+  ],
+  "completion_time_UTC": "2026-10-21T22:10:42Z",
+  "full_original_tree_scope": {
+    "baseline_original_tracked_files": 14880,
+    "candidate_tracked_files": 14886,
+    "original_tracked_content_modes_symlinks_exact_except_country_py": 14879,
+    "original_changed_paths": [
+      "lsms_library/country.py"
+    ],
+    "new_allowed_paths": [
+      ".coder/ledger/1081-derived-categorical-errors.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/REPORT.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/REPRODUCE.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/RESIDUALS.md",
+      "slurm_logs/isa_backlog_2026-10-21/framework1081/VALIDATION.json",
+      "tests/test_1081_derived_categorical_errors.py"
+    ],
+    "original_diagnosis_source_exact_baseline": true,
+    "author_source_Git_tree_and_runtime_test_filesystem_modes_exact_review_candidate": true,
+    "five_documentation_filesystem_modes": "author0644 versus detached0600; identical content and Git100644 mode; each frozen tree unchanged",
+    "ledger_first_commit_contains_only_ledger": true
+  }
+}

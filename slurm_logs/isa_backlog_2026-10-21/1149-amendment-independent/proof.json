@@ -1,0 +1,78 @@
+{
+  "heads": {
+    "candidate": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+    "runtime_tests": "21f5cb7f91152c5a86eba8cfd264dd24124b523a",
+    "base": "fb1571035eac6f0f67e4496fd58d4b101b164ce9"
+  },
+  "independent_AST": {
+    "module_AST_equal_after_exactly_two_wrappers_removed": true,
+    "test_AST_equal_after_one_added_function_removed": true,
+    "wrapper_handlers_clear_only_current_key_and_bare_reraise": true,
+    "changed_paths": [
+      ".coder/ledger/1149-staged-reacquisition.md",
+      "lsms_library/data_access.py",
+      "tests/test_staged_reacquisition.py"
+    ],
+    "original_extractor_sidecar_hash_provenance_success_confirmation_semantics_unchanged": true,
+    "original_fixture_skill_country_feature_bytes_unchanged": true,
+    "new_Country_Feature_CLI_data_measurement": false
+  },
+  "actual_fingerprints": {
+    "actual_counts_and_moves": {
+      "country": {
+        "count": 549,
+        "exact_keyset": true,
+        "moved": 0
+      },
+      "framework": {
+        "count": 39,
+        "exact_keyset": true,
+        "moved": 0
+      },
+      "wave": {
+        "count": 1362,
+        "exact_keyset": true,
+        "moved": 0
+      }
+    },
+    "data_endpoints_unchanged_both_heads": true,
+    "Country_Feature_CLI_data_calls": 0,
+    "census_stderr_diagnostic_lines_each": 3,
+    "stderr_nonISA_Peru_diagnostics_only_known_checkout_prefix_qualified": true
+  },
+  "country_document_bindings": {
+    "Nigeria": {
+      "lines": 2166,
+      "sha256": "93bcd7230736ddfdf607f3b9a4a53dbc9cdbed297fca16489b79171d8d90a65f",
+      "matching_blob": "e548594c034362bc5bf08e08b3d447444ef6c8db",
+      "complete_previous_personal_reading_carried_after_current_identity": true
+    },
+    "Ethiopia": {
+      "lines": 2350,
+      "sha256": "87e4d5cafcbbdba09e2c7b477dd37286447fbe0545ca1cc253fdb36223cdd3ce",
+      "matching_blob": "21d795f41c9a294511a4abe37f2dd80d7fd3f828",
+      "complete_previous_personal_reading_carried_after_current_identity": true
+    }
+  },
+  "source_equivalence": {
+    "candidate": "4f9344f42a322c80a42bbbe013fc16116b8f3451",
+    "runtime_tests": "21f5cb7f91152c5a86eba8cfd264dd24124b523a",
+    "runtime_tests_is_ancestor": true,
+    "library_test_and_skill_blobs_modes_identical": true,
+    "only_ledger_descendant": true
+  },
+  "physical_protection": {
+    "stage": "after",
+    "frozen_entries_unchanged": 7067,
+    "source_checkouts": 8,
+    "tracked_source_endpoints_unchanged": 119058,
+    "old_artifacts_sources_verdicts_unchanged": true,
+    "installed_hash_sources": 2,
+    "prepared_metadata_links": 2
+  },
+  "old_review_READY": "aac79aacbcd34eb7482348ac32a7a734e92b14d146ea62cadb6fa4894e3b9e63",
+  "old_review_manifest": "5ffc80cd88184122d4dd923299017d652b58f1409ea690ab3431ac3031f9c4a0",
+  "new_data_acquisition_or_payload_copy": false,
+  "network_events": 0,
+  "write_guard_denials": 0
+}

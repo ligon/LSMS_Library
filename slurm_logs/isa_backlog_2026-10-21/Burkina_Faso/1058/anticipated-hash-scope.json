@@ -1,0 +1,43 @@
+{
+  "actual_baseline_country_cells": 549,
+  "actual_baseline_framework_tags": 39,
+  "actual_baseline_exact_immutable_f8_inventory": true,
+  "actual_cells_reading_proposed_Burkina_country_module_and_scheme": [
+    "Burkina_Faso/sample",
+    "Burkina_Faso/cluster_features",
+    "Burkina_Faso/household_roster",
+    "Burkina_Faso/individual_education",
+    "Burkina_Faso/subjective_well_being",
+    "Burkina_Faso/panel_ids",
+    "Burkina_Faso/food_acquired",
+    "Burkina_Faso/assets",
+    "Burkina_Faso/housing",
+    "Burkina_Faso/shocks",
+    "Burkina_Faso/plot_features",
+    "Burkina_Faso/food_security",
+    "Burkina_Faso/food_coping",
+    "Burkina_Faso/months_food_inadequate",
+    "Burkina_Faso/interview_date",
+    "Burkina_Faso/crop_production",
+    "Burkina_Faso/plot_inputs",
+    "Burkina_Faso/livestock",
+    "Burkina_Faso/plot_labor",
+    "Burkina_Faso/people_last7days",
+    "Burkina_Faso/food_expenditures",
+    "Burkina_Faso/food_prices",
+    "Burkina_Faso/food_quantities",
+    "Burkina_Faso/household_characteristics"
+  ],
+  "anticipated_changed_Burkina_country_cells": 24,
+  "anticipated_unchanged_other_country_cells": 525,
+  "anticipated_framework_fingerprint_changes": 0,
+  "proposed_file_boundary": [
+    "Burkina_Faso/_/burkina_faso.py",
+    "Burkina_Faso/2021-22/_/plot_features.py",
+    "Burkina_Faso/_/data_scheme.yml",
+    "Burkina_Faso/_/CONTENTS.org",
+    "focused tests and task ledger"
+  ],
+  "method": "Read-only sys.setprofile capture of actual _table_cache_hash inputs; no production callable replacement, private config mutation, or candidate-hash claim. Country cmod and cscheme are whole-file build inputs in all24 actual Burkina cells. CONTENTS is excluded.",
+  "candidate_content_hashes_available": false
+}

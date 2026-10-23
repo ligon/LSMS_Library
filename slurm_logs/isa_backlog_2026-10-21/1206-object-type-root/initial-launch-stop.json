@@ -1,0 +1,6 @@
+{
+  "command": "python",
+  "exit": 127,
+  "before_directory_creation_or_imports": true,
+  "reason": "python alias absent; corrected to available python3 for stdlib preparation"
+}

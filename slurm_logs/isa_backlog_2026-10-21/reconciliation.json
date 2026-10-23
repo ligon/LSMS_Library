@@ -1,0 +1,468 @@
+{
+  "observed_at": "2026-10-22T01:32:30.004463+00:00",
+  "actions": [
+    {
+      "issue": 822,
+      "action": "narrowed to remaining2014-15 readings1-2 after independent duplicate/source review"
+    },
+    {
+      "issue": 1089,
+      "action": "closed duplicate of822; no implementation claimed",
+      "comment_url": "https://github.com/ligon/LSMS_Library/issues/1089#issuecomment-6320344229"
+    },
+    {
+      "issue": 1171,
+      "action": "opened Ethiopia diagnosis residual split from1062",
+      "parent_comment_url": "https://github.com/ligon/LSMS_Library/issues/1062#issuecomment-6320609557"
+    },
+    {
+      "issue": 1062,
+      "action": "narrowed to Uganda implementation and completed current census; Ethiopia split1171, known dangling nonISA recipes218; PR1173 independently reviewed"
+    },
+    {
+      "issue": 822,
+      "action": "corrected native-vs-Feature index distinction: Country has no obs; add native slots1-3, Feature currently supplies alignment sentinel1"
+    },
+    {
+      "issue": 1109,
+      "action": "corrected false no-quantity source premise after independent raw-header/loaded-source review; narrowed to organic quantity/unit recovery and protected public finalization; no final fix claim yet"
+    },
+    {
+      "issue": 1088,
+      "action": "corrected nominal9999.9 vs stored-double/float32-promoted representation; exact76currentservedrows confirmed, quantity-only fix pending"
+    },
+    {
+      "issue": 1174,
+      "action": "filed precise437nonorganic source-use diagnosis, separate from organic1109; linked existing905/1118/637 without claiming duplicate implementation"
+    },
+    {
+      "issue": 1109,
+      "action": "source-corrected scope; independent original-baseline PASS, reviewed PR1175 pending human merge; residual1174 linked"
+    },
+    {
+      "issue": 1034,
+      "action": "preserved6f snapshot, independently reviewed test-only amendment3e658, fast-forwarded original PRhead; runtime/configall24hashesidentical; no public merge"
+    },
+    {
+      "issue": 1177,
+      "action": "Filed separate W4-PH qualifier diagnosis after independent #1144 review; 20 maize and 340 milk rows, no instrument or curation adjudication claimed"
+    },
+    {
+      "issue": 1088,
+      "action": "Independent source/cold/warm/Feature PASS; reviewed PR1176 pending human merge"
+    },
+    {
+      "issue": 1144,
+      "action": "Linked reviewed stacked PR1178 and source-backed W2 corrections; split W4-PH instrument qualifier diagnosis to1177, no merge or nutrition-feature claim"
+    },
+    {
+      "issue": 1148,
+      "action": "Replaced stale shipped-period premise with Phase I/current integration dependency, exact source-status contradictions/unknowns and qualified historical food-row upper-bound percentages; no household exposure chosen"
+    },
+    {
+      "issue": 851,
+      "action": "Retitled as approved Phase II implementation/integration, preserving existing maintainer rulings; no repeat decision request or merge claim"
+    },
+    {
+      "issue": 1034,
+      "action": "Linked reviewed PR1172 and corrected broad harvest-file claim: unwired s10bq2b has labels, wired PH fields do not; original source snapshot and test-only review preserved"
+    },
+    {
+      "issue": 1088,
+      "action": "Updated live issue with independently reviewed PR1176, exact cold/warm invariants and pending human landing"
+    },
+    {
+      "issue": 1179,
+      "action": "Filed diagnosis-only129unresolved-unit entries; no blanket validity or eligibility-change claim"
+    },
+    {
+      "issue": 822,
+      "action": "Linked independently reviewed PR1180 and exact native observation recovery; documented old versus eligible counts/base cells and split1179"
+    },
+    {
+      "issue": 1077,
+      "action": "Corrected historical36cell and zero-cache-cost premises; current34cells, missing-source lookup filter required to prevent null-label fabrication; frozen candidate under independent review"
+    },
+    {
+      "issue": 1118,
+      "action": "Retitled remaining country normalization work, linked independently reviewed EthiopiaPR1181, flagged original counts historical and Tanzania independent review pending; no whole-issue closure"
+    },
+    {
+      "issue": 1077,
+      "action": "Linked independently reviewedPR1182; runtimePASS3f520 plus documentation-only descendant780f; current34cells; no publicmerge"
+    },
+    {
+      "issue": 1183,
+      "action": "Filed source-grounded missing-purchase-flag/caller diagnosis, separate1118;4426W1+60W2served effects,371W1retention counterfactual; no policy change"
+    },
+    {
+      "issue": 1184,
+      "action": "Filed separate all-missing W2holder/crop purchase-sum diagnosis;265sourcegroups/187attachedzeroamounts under unchangeddecoder; no policy change"
+    },
+    {
+      "issue": 1118,
+      "action": "Linked independently reviewed TanzaniaPR1185; Ethiopia documentation-only source-caveat descendant1bce independently confirmed. Other-country scopes remain open; historical counts qualified."
+    },
+    {
+      "issue": 637,
+      "action": "Added independently source-confirmed six2020Tanzania mixed-unit groups as existing audit-tail defect; no reducer rewrite or closure claimed"
+    },
+    {
+      "issue": 1123,
+      "action": "Corrected current Burkina loss183 vs historical163:20equal-payload extras also lose native identity; two-cell comparator fix insufficient, source-qualified unknown21 and guard approved/in progress; other-country counts explicitly historical"
+    },
+    {
+      "issue": 1121,
+      "action": "Mali source case repair independently PASS335tests and source/fullframe/Feature proof; PR1186 at6e97eaeb4 CI39661144364 success; Ghana taxonomy residual retained without closing umbrella"
+    },
+    {
+      "issue": 1123,
+      "action": "Reviewed BF identity PR1189 awaits humanmerge; all183native lines recovered. Body retains pendinglanding plus othercountrydiagnoses and source-qualified residuals1187/1188."
+    },
+    {
+      "issue": 1187,
+      "action": "Filed TierD2018code21authority; fourexactinstrument sidecar/MD5 gaps recorded; noacquisition and no physicalclass inference."
+    },
+    {
+      "issue": 1188,
+      "action": "Filed separate TierB gift/donation fields bound aspurchases;8297flag/8371quantity differences,193purchase-used unitmismatches; 18recovered lines actually purchased. Identity bindings unchanged."
+    },
+    {
+      "issue": 1111,
+      "action": "Replaced oldunitcode hypothesis with primaryquantity/timing binding evidence; approved onlyquestionnaire-covered2010+2019 beforeaggregation, existingnumericamounts/reducer preserved. LiteralC4 gaps2013/2016remain.235coalescences, no1000x rule."
+    },
+    {
+      "issue": 1190,
+      "action": "Filed seed purchase-unit residual afterdedup:13mixed groups and1066not same singleton unitset, overlapping counts; distinctfromfertilizer/retention/composition."
+    },
+    {
+      "issue": 1006,
+      "action": "Fullindependenttest-onlyPASS; PR1191readyhumanreview, preservewholeissuehistoricalevidence and explicitpendinglanding; no prod/fixture/persistencechange"
+    },
+    {
+      "issue": 1095,
+      "action": "Independent PASS; PR1192 open and CIgreen, all5228 recorded-unit recoveries verified. Live issue retains explicit future unplaced-label retention TierC residual; nothing merged."
+    },
+    {
+      "issue": 1058,
+      "action": "Fresh diagnosis corrects denominator to7350 retained parcels with4180pairs, excluding1117null-key placeholders; held Mali/Niger/Senegal source checks negative. Approved only2021sourcecoordinate projection in separate writer; live issue updated, no PR yet."
+    },
+    {
+      "issue": 1111,
+      "action": "Standalone101-test PASS and composed129-test PASS; stacked partial PR1193 on1175 ready for human review. All11075organic answers and235same-source pair sums exact.2013/2016 C4 residuals stay open; first cold Feature capture limitation retained."
+    },
+    {
+      "issue": 1081,
+      "action": "Actual generated handlers reproduce all three deliberately typed categorical RuntimeErrors masked by legacy fallback. Explicit root-approved third KeyDeclarationError scope; real parser tests discriminate42fail/31pass onf8. Mocked successful fallback qualifies old blanket loud-failure claim, not an observed healthy Ethiopia legacy cache. New separate writer approved; no candidate/PR/PASS claimed yet. Live issue title/body updated, original report retained."
+    },
+    {
+      "issue": 1111,
+      "action": "Independent bounded global14 PASS at653f against actual5dde:129tests/full parent-based frames+attrs/all235pair sums/organic/N/Uganda/scanner/warm. Dedicated default Feature target-cold returns serialized in new roots; earlier fd235 limitation remains historical. Validation source public and PR1193 body updated. No public merge;2013/2016 C4 residuals remain."
+    },
+    {
+      "issue": 1058,
+      "action": "Independent44-test PASS; PR1194 open awaitinghumanmerge. Actual4180pairs/7350parcels/19784public/33608Feature and all13scanner records verified;24BFhash moves only. Live issue records implementation and completed negative held-country source checks. New global15 coexistence with prior1123 in progress; no public merge."
+    },
+    {
+      "issue": 1081,
+      "action": "Independent PASS atbfbb;rootread final review/verdict/commands/release+diff;public PR1195awaitinghumanmerge. Liveissue corrected to reviewed scope. Source-cold notclaimed;mode and initiallauncher qualifications retained."
+    },
+    {
+      "issue": 1078,
+      "action": "Read-only confirmed actual controlled race onf8 and1062 with exact9historic missing-to-zero cells, valid current hashes/full8wavecoverage, both named testsPASS. Fresh ordinary warm reads persist badvalues withoutwrites. Historical original interleaving unidentified;untagged producer/healing concern reported;proposal pending/no implementation."
+    },
+    {
+      "issue": 1135,
+      "action": "Activated separate immutablef8 read-only diagnosis under settledhumanH2SPAN/noH3threshold;precise per-boundary first-line size/schema/provenance/hash scope to ground beforeimplementation. No human decision reopened."
+    },
+    {
+      "issue": 1058,
+      "action": "Bounded global15 PASS at4227 againstactual653f:57tests,35completeframes/process,fullattrs,prior1123 gains and allGPS exact;31parquetmetadata/root current or legitimatehashless,0warmwrites,13GPS+6inputscanner exact. Rootread finalproof,published4227public andupdatedPR1194,then clean-merged1195into newfrozen16head d527 with no inheritedPASS/publicmerge."
+    },
+    {
+      "issue": 1078,
+      "action": "Complete quiescent diagnosis12tests/341source copies/directDTA missing oracle; bothheads actual race/currenthash/fullcoverage and persistent ordinary warm corruption. Separate FCT controls write correctfood6vs1, hashless3vs0. Rootread allproposal/ledger/proof, approved isolated framework writer with private actual origin/defaultDataFrame contract, legitimate legacy preserved, foodtag plus measured alltable plumbing cost and natural healing. Liveissue narrowed to confirmed mechanism, historicalinterleaving limit retained; no fixPR yet."
+    },
+    {
+      "issue": 1135,
+      "action": "Complete readonly97synthetic tests/4negative+1preservation/119policycombinations, all12historicalexactprefix counts found via verifieddurable1137copies. They neither classify allmovers norcountclusters. Rootread proposal and chose separate Nigeria2-boundary held-source/current-cache count diagnosis before useful partial implementation; no policy reopened or emptyformatterPR. Tenother measurement residuals retained."
+    },
+    {
+      "issue": 1081,
+      "action": "Global16d527 independently PASSES354tests0skip against actual15;42negative31positive control;68fullframes/fullattrs;398raw scannerrecords byte-exact;0warmwrites;14trees/12priorroots exact;freeze released/zero consumers. Root verified rawscannerSHA,publishedsource andupdatedPR1195body; no public implementation merge."
+    },
+    {
+      "issue": 1135,
+      "action": "Completed Nigeria source followup reproduces prefix10/1493,112/5067 but sourceflags expose6movers20unknown withinW5P112. Sentinel incomplete, physicalK/intervalR unverified;five held instrument gaps/other10boundaries remain. Exported safe reports with root qualification of initial-referenceboolean and sorted companionoracle. Liveissue retitled/reconciled as settled implementation+measurement work; historicalbody/ruling preserved, no codeapproved."
+    },
+    {
+      "issue": 1078,
+      "action": "Frozen runtimea4 naturally heals genuine current-baseline-hash corruptUgcache under new ordinaryhash;all9missingcells/fullframe/attrs restored.64targetedPASS;26fullframes per matchedstage,6actual test executions and217rawscannerrecords preserved. Broad549/39/1362cost explicit;Niger coldwarmdtypepre-existing residual separate. Independent fullcredentialfree prephase4689pass4453skip9source-utimeguardstops retained;not fullsuitePASS, nine-case privateconfig rerunpending."
+    },
+    {
+      "issue": 1091,
+      "action": "Dispatched narrow read-only Mali retirement diagnosis on reviewed822aba after rootread settled788/1086context and actualconcatenators. SourceMD5 gates succeeded;bothbackends155931payload exact,Makeattrs/rawlayer difference retained as explicit result. No implementationapprovedyet;Niger/Tanzania residuals unchanged."
+    },
+    {
+      "issue": 849,
+      "action": "Live967/972 merge status verified, stale prerequisite resolved. Rootread issue/comments/currentcolmap and dispatched newf8readonly actual fivewave source/screen/agree/kgmovement diagnosis with2018control, private passedcolmap projections only. No config implementation/promotion or scientific override approved;1078authorfinalroot remains immutable."
+    },
+    {
+      "issue": 1091,
+      "action": "ReadonlyMali diagnosisCOMPLETE12cold6freshwarm155931native/oldobs3preserved, baselineMakewrongwaveforallunsupported andsoleattrs id_converted omission explicit. RootFULLread proposal/ledger/testplan/proof andapprovedboundednewwriter atreviewed822:removeonlycountryconcatenator+explicitvarrule/adjacentcomments,retainwave/scheme/framework,discriminating source/subset/fullattrs/CLI/Feature/hashscope tests. Safe7reportexport exact. No candidatePASS/PRyet;Niger/Tanzania residuals remain."
+    },
+    {
+      "issue": 1135,
+      "action": "Root retrieved4public official questionnaire/manual PDFs separately;3exactdeclaredDVCMD5matches. Read W4pp24/25 andW5pp5/19/20/23 andquestionnairecover. Prior-wave/listing language strengthens flaginterpretation, but unknown20/exactaddress-round/physicalK unresolved; manual carryover/routing tension explicit. Liveissuefollowup published withdirectsources;frozenhelddiagnosis/cache untouched. No numericcuration/formatter implementationapproved."
+    },
+    {
+      "issue": 1078,
+      "action": "Opened independently reviewed PR1197 at d46795c303e2409ddb8ed5e4c62efca4e87ca347 after explicit exact artifact and denial-attribution publication gates. Full-suite failures, execution qualification, broad coordinated rebuild cost and missing1062/global16 composition remain explicit."
+    },
+    {
+      "issue": 1196,
+      "action": "Filed deduplicated Niger public food u StringDtype cold/warm residual, reproduced on both f8 and1078 runtime; complete payload/typed attrs otherwise exact under explicit artifact proof. No fix or normalized equality claimed."
+    },
+    {
+      "issue": 1091,
+      "action": "Mali candidate frozen9e8ebeabb,111author passes and24meaningful baseline failures/fourpasses; independent review active. Separate Niger diagnosis on reviewed1088 finds wrong-wave Make outputs for supported singleton and unsupported requests; no Niger implementation yet. Tanzania checkout prepared only."
+    },
+    {
+      "issue": 849,
+      "action": "Source diagnosis and new 85-check explicit exact saved-artifact addendum complete. Native production carrier loss is real; no factor-only promotion or invented converted total. Root preparing a distinct source-grain owner and reconciliation of already merged967/972 prerequisites."
+    },
+    {
+      "issue": 1091,
+      "action": "Full Niger proposal read and country-only writer authorized on reviewed1088. Frozen diagnosis has36calls,97tests and12actualbuilt assertions; distinct candidate source and hashes remain to verify. Mali independent review remains active; Tanzania separate/queued."
+    },
+    {
+      "issue": 1078,
+      "action": "Clean validation-only global17 source composed at7ecf8e95fef567554fe93870ba95abddd1955a86 in separate checkout; actual global16 source preserved. New independent review must establish source/race/healing/1062 interactions before publication."
+    },
+    {
+      "issue": 1198,
+      "action": "Filed the concrete Uganda native production-record carrier defect, with source identity/slot evidence and85-check artifact qualification. Assigned design/private-prototype phase in a separate f8 checkout; no production/schema contract chosen."
+    },
+    {
+      "issue": 849,
+      "action": "Reconciled live title/body:967/972 already merged, five-wave measurement complete, actual blocker1198 and remaining lossless-carrier-then-mapping work explicit; historical request/dependencies retained as history. No issue closed or factor-only promotion."
+    },
+    {
+      "issue": 1091,
+      "action": "Mali independent PASS fully read by root, including actual comparator/source oracle/runtime/CLI and freeze receipts; preparing stacked PR on verified live1180head. Niger writer measured23/526/39 before rebuild; distinct13FAIL global17 full-suite result remains under narrow attribution outside this task."
+    },
+    {
+      "issue": 1091,
+      "action": "Opened independently reviewed Mali PR1199, stacked on exact live1180head, and verified CI success. Reconciled umbrella title/body with settled788/840/1086 authority, unmerged Mali work and remaining Niger/Tanzania; historical draft preserved. No issue closed and no public merge."
+    },
+    {
+      "issue": 839,
+      "action": "Reconciled live title/body after exact f8 source inspection: Tanzania quantity note is already DONE with explicitly superseded history; Mali stale YAML comment remains. Original issue retained as history. No new microdata/implementation/closure/hash measurement claimed."
+    },
+    {
+      "issue": 1091,
+      "action": "Niger final author670de9cc is clean/published; root verified tests and package-equivalence boundaries and manifestSHA. Different-agent independent review started in new detached candidate/base roots. Author lost-delta and overwritten-aggregate qualifications retained. Tanzania read-only diagnosis started after complete CONTENTS/ledger-first; no implementation yet."
+    },
+    {
+      "issue": 1198,
+      "action": "Root read complete frozen design and actual prototype/checker sources. Approved revised production_obs and unresolved sentinel contract; reuse existing source_fingerprint with explicit loader refs and physical positions, no new provenance attrs promise. New isolated implementation checkout prepared; writer queued after global17 release; source-cold/real-comparator/real-area/yield and actual hash gates remain."
+    },
+    {
+      "issue": 1078,
+      "action": "Root accepted released independent bounded functional17 review at7ec against actual16, independently reconstructed entire country.py and verified raw236scannerrecords/9620JUnitoutcomes. Published NEW isa/integration-seventeen branch; old16branch unchanged. Full13FAIL/doc-childguard-mtime/stale8companions/1196/broadhashcost remain explicit. No PR merged."
+    },
+    {
+      "issue": 1091,
+      "action": "Root accepted frozen independent Niger-only review at670de9c,1437manifestentries. OpenedPR1200 stacked on actual1176d602; all author/review limitations retained. No closure/merge. Actual18 bounded composition separately dispatched to niger_lane."
+    },
+    {
+      "issue": 1091,
+      "action": "Tanzania read-only diagnosis frozen99c/exacte75runtime:17699source rows,60normalrequests,58existingtests,4scannerWARN. Rootapproved ONLYcountryconcat+Make145-149 retirement; writer dispatched with new candidate/actual-parent checkouts, no candidate proof or PR yet. Niger1200exact-headCI39705606211success. Umbrella remainsopen/unmerged."
+    }
+  ],
+  "verified_issue_metadata": [
+    {
+      "number": 822,
+      "state": "OPEN",
+      "title": "Mali 2014-15 community_prices: restore readings 1-2 and declare native observation slots",
+      "updatedAt": "2026-10-21; corrected after source inspection",
+      "url": "https://github.com/ligon/LSMS_Library/issues/822"
+    },
+    {
+      "number": 1089,
+      "state": "CLOSED",
+      "title": "Mali community_prices reads only relev\u00e9 3 of three",
+      "updatedAt": "2026-10-21T15:56:39Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1089"
+    },
+    {
+      "number": 1171,
+      "state": "OPEN",
+      "title": "Ethiopia nutrition: diagnose the legacy food_acquired Make prerequisite and unused FCT target",
+      "updatedAt": "2026-10-21T16:08:19Z",
+      "url": "https://github.com/ligon/LSMS_Library/issues/1171"
+    }
+  ],
+  "implementation_prs_merged": 0,
+  "implementation_prs": [
+    {
+      "number": 1172,
+      "issue": 1034,
+      "head": "3e658298753db4f2934ea1b703415a1bdfa9f6af",
+      "review": "Source PASS6f plus test-only amendment PASS3e658;78passed",
+      "ci": "success on3e658; returned ready after independent78-test review"
+    },
+    {
+      "number": 1173,
+      "issue": 1062,
+      "head": "4ef24fb72421e0573841aeb63b8c19b93a4f97d8",
+      "review": "PASS after amendment",
+      "ci": "success; no credentialed data rebuild"
+    },
+    {
+      "number": 1175,
+      "issue": 1109,
+      "head": "de9c2734b8a6bcf1326d0d4285ff9c1db1221767",
+      "review": "PASS vs originalf8",
+      "ci": "success; no credentialed corpus rebuild"
+    },
+    {
+      "number": 1176,
+      "issue": 1088,
+      "head": "d602f8d63520e521a730f85551b366c4d45d9a35",
+      "review": "PASS; 67 tests, zero skips",
+      "ci": "success; no credentialed corpus rebuild"
+    },
+    {
+      "number": 1178,
+      "issue": 1144,
+      "head": "a1ba246f59d341c331c69471f914d3ca798e6894",
+      "runtime_review_head": "1e6111e2b0580e045084d3c077c258469f8d7dc0",
+      "review": "PASS; 116 tests, zero skips; documentation-only amendment PASS",
+      "base": "fix/1034-nigeria-w3-unit-labels-20261021",
+      "dependency_pr": 1172,
+      "ci": "success; run39645861519"
+    },
+    {
+      "number": 1180,
+      "issue": 822,
+      "head": "aba2badfe2f701a8b3793f1243fd8ed4fce18a53",
+      "review": "PASS;39tests zero skips; original obs3/source masks exact",
+      "ci": "success; run39649319628"
+    },
+    {
+      "number": 1181,
+      "issue": 1118,
+      "head": "1bce11cc8d12fd8435d20cd0f6a8ac2b217a6302",
+      "review": "PASS at286108;58focused+6independentcontrols; report-only descendant confirmed",
+      "ci": "success;run39657028262"
+    },
+    {
+      "number": 1182,
+      "issue": 1077,
+      "head": "780f6798683c88a9a5f6844dd355da96c7eaace1",
+      "review": "PASS230tests/source/Code/Feature/hash; runtime3f520 plus doc-only descendantPASS",
+      "ci": "success;run39654667663"
+    },
+    {
+      "number": 1185,
+      "issue": 1118,
+      "head": "e75be9c56fa6c318ce32cea5a8be6d448578bed1",
+      "review": "PASS246tests/source/normalcold/freshwarm/Feature/hash; runtime0c8 plusdoc-onlydescendantPASS",
+      "ci": "success;run39657075627"
+    },
+    {
+      "number": 1186,
+      "issue": 1121,
+      "head": "6e97eaeb488096459d673486c127043f016c4f8d",
+      "review": "PASS335tests/source/normalcold/freshwarm/Feature/hash; exactly3Preferredcasecells",
+      "ci": "success;run39661144364"
+    },
+    {
+      "number": 1189,
+      "issue": 1123,
+      "head": "cfd0782766068da6dc7e7605334e957f988a4ab1",
+      "runtime": "69ed4d2028a6f989a8ac45d117a5cffc60a831fd",
+      "review": "PASS13focused+8adversarial/source/normalcold/freshwarm/Feature/hash; full384 plusdocdesc rootnarrowPASS",
+      "ci": "success;run39666499914"
+    },
+    {
+      "number": 1191,
+      "issue": 1006,
+      "head": "2b6cf4ccb474665bfd9ced256371a0fdc5e25c93",
+      "runtime": "1eb9bb377157c78f74962c7a9de59807d446b239",
+      "review": "PASS25scoped+41support; test-onlyallproduction/fixtureblobs exactf8;9frames+2matrices/strongfaults/cleanup/absence/creds",
+      "ci": "success; run39669180447"
+    },
+    {
+      "number": 1192,
+      "issue": 1095,
+      "head": "b8b03e448783c6803648623dcf5318673b3ddde1",
+      "runtime": "e55de22856064ab3b01f1bc5fcfac681f2f3ebc8",
+      "review": "PASS60tests/23adversarial;5228gains exact/full source/native/Country/Feature/attrs/scanner/hash/warm",
+      "ci": "success; run39676834859",
+      "partial_residual": "Future unresolved-label retention remains TierC in1095"
+    },
+    {
+      "number": 1193,
+      "issue": 1111,
+      "head": "fd2356ee94ecfc7448527dc0085b9e4d60368049",
+      "review": "Standalone PASS101; composed PASS129/full source/native/Country/Feature/attrs/scanner/warm; explicit cold Feature snapshot provenance limit",
+      "base": "fix/1109-malawi-organic-quantity-v2-20261021",
+      "dependency_pr": 1175,
+      "ci": "success; run39678420581",
+      "partial_residual": "2013/2016 literalC4 instrument authority remains"
+    },
+    {
+      "number": 1194,
+      "issue": 1058,
+      "head": "20a5541867ef0b991b01031cd4c766681b537fc0",
+      "runtime": "7eee549b15cacbe1e86b60a925b0899dc85d49e6",
+      "review": "PASS44tests/source-native-walked-public/full13frames+attrs/Feature/warm/scanner/hash; Senegal2freshcountry+2freshYAML+2legitimatehashless; one non-source symlink final-onlyreceipt qualified",
+      "ci": "success; run39683305731"
+    },
+    {
+      "number": 1195,
+      "issue": 1081,
+      "head": "bfbbf8efe81fdd0dd539928087ad06c6edb5ccb0",
+      "runtime": "ca3e5cc119896983b49f50a6b9dade6a5f825131",
+      "base": "development",
+      "review": "PASS235tests0skip/166handler controls perhead/72extra cause-context/68fullframe/fullattrs/0warm writes/actual0of549and0of39",
+      "ci": "success; run39685546468"
+    },
+    {
+      "number": 1197,
+      "issue": 1078,
+      "head": "d46795c303e2409ddb8ed5e4c62efca4e87ca347",
+      "runtime": "a4c92ccf6a40a8bf75cbb6c0bf2933cd1e69ec7b",
+      "base": "development",
+      "review": "PASS scoped source/race/healing/healthy plus bounded exactness/attribution addendum; full-suite FAIL4689pass4453skip9protected-utime failures; separate9case private-operand pass",
+      "ci": "success; run39696155414",
+      "coordinated_rebuild_window_required": true,
+      "composition_with_current_global16_verified": true,
+      "composition_scope": "Bounded Uganda/Niger source/race/healing/1062/default/Feature review at7ec; no unrestricted all17/corpus claim; full selection FAIL13 and explicit isolation limits."
+    },
+    {
+      "number": 1199,
+      "issue": 1091,
+      "head": "9e8ebeabb0e996684d325d05987763a8c3581cc8",
+      "runtime": "fdadc0698efcd300f5f09c21b60c30f570f96621",
+      "base": "fix/822-mali-community-readings-20261021",
+      "dependency_pr": 1180,
+      "review": "Independent PASS111 tests;24 meaningful parent failures/four passes;40 candidate stages; complete strict source/native/public/typed-attrs/CLI/Feature/scanner/hash proof with explicit qualifications.",
+      "ci": "success; run39699773895",
+      "partial_residual": "Umbrella1091 remains open for Niger/Tanzania and human merge of all three countries."
+    },
+    {
+      "number": 1200,
+      "issue": 1091,
+      "head": "670de9cc073f6a1436aaf9b55cf6371a244f232d",
+      "runtime": "6be6576607f1862b603d123acfb74ace4026fd3f",
+      "base": "fix/1088-niger-quantity-sentinel-20261021",
+      "dependency_pr": 1176,
+      "review": "IndependentPASS114tests,12meaningfulparentfailures/fivepasses; source oracle46043/30late/76masks, strict fullframes/typedattrs/scanner/CLI. Explicit original aggregate/auxiliary and independent receipt/seal limits retained.",
+      "ci": "success;run39705606211;unit-tests/windows-smoke passed;other six jobs skipped",
+      "partial_residual": "Umbrella1091 stays open: Mali1199 and Niger1200 await human merge; Tanzania diagnosis/implementation separate."
+    }
+  ]
+}

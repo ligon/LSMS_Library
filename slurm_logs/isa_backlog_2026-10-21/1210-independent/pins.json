@@ -1,0 +1,57 @@
+{
+  "comparator": {
+    "sha256": "68be90fadd95ef16d46a7911bee1b26e4d671662d669ccf681230b60a09c7e94",
+    "bytes": 5198,
+    "mode": 384,
+    "mtime_ns": 1792686170464992837,
+    "nlink": 1,
+    "device": 64770,
+    "inode": 2754523,
+    "symlink": false,
+    "link": null
+  },
+  "source_before": {
+    "sha256": "f1f070defca2973e52703e61cd6555143d0ebc96e61432383d75d57ee33353d4",
+    "bytes": 11777937,
+    "mode": 384,
+    "mtime_ns": 1792686170464992837,
+    "nlink": 1,
+    "device": 64770,
+    "inode": 2754522,
+    "symlink": false,
+    "link": null
+  },
+  "scope": {
+    "sha256": "0f216a7237980684c1658f3515e438f2b61f74ebda77bfcb358bce63bde3a9b3",
+    "bytes": 345,
+    "mode": 384,
+    "mtime_ns": 1792686352547843464,
+    "nlink": 1,
+    "device": 64770,
+    "inode": 2754555,
+    "symlink": false,
+    "link": null
+  },
+  "protection": {
+    "sha256": "e9efd37239ffe82b62b0029e815b9fe053e40604220e388cb27a53fc44666c77",
+    "bytes": 1526,
+    "mode": 384,
+    "mtime_ns": 1792688324140460694,
+    "nlink": 1,
+    "device": 64770,
+    "inode": 2754734,
+    "symlink": false,
+    "link": null
+  },
+  "native_operands": {
+    "sha256": "49e14fd3f204253848cbea2caba628a66b06a4164f59e387aa0b377378482905",
+    "bytes": 19080,
+    "mode": 384,
+    "mtime_ns": 1792688324139460689,
+    "nlink": 1,
+    "device": 64770,
+    "inode": 2754733,
+    "symlink": false,
+    "link": null
+  }
+}

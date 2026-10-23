@@ -1,0 +1,13 @@
+{
+  "status": "POSTEXIT_1193_STANDALONE_COMPOSED_RECEIPTS_PRESERVED",
+  "READY_sha256": "96e379ce1eecfe92cb8931f95a38182ea7a6ddb1b6960c9636e4b91fddacb0ba",
+  "manifest_sha256": "7140d29680a7e283550470aa6107b7b2e7c714d6105310e135fbd7bd46959165",
+  "manifest_entries": 284,
+  "historical_original_receipts_exact": 668,
+  "physical_product_copies_exact": 200,
+  "zero_payload_consumers": true,
+  "source_clean": true,
+  "network_and_write_denials": 0,
+  "integration14_own_output_authority_hold_remains": true,
+  "signed": "Sue"
+}

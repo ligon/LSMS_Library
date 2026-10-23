@@ -1,0 +1,18 @@
+{
+  "status": "EXACT_ALLOWLIST",
+  "signed": "Sue",
+  "files": {
+    "SAFE-SUMMARY.json": {
+      "sha256": "7f3578124cce3dd1520e0dc680475f57b828baba10eba77834f1ef3e86e58ada",
+      "bytes": 1147,
+      "mode": 384,
+      "mtime_ns": 1792689003512216692,
+      "nlink": 1,
+      "device": 64770,
+      "inode": 12715963,
+      "symlink": false,
+      "link": null
+    }
+  },
+  "scope": "Additive PID association and corrected anticipated packaging qualification; root joint acceptance pending."
+}
