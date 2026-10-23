@@ -284,8 +284,14 @@ def test_documented_release_member_lists_with_synthetic_payloads(
     unchanged = []
     for row in case["held"]:
         relative = Path(row["held_path"])
-        real_sidecar = real_data / (str(relative) + ".dvc")
-        assert hashlib.sha256(real_sidecar.read_bytes()).hexdigest() == row["sidecar_sha256"]
+        # The held rows are the tree at the fixture's ``source_commit``.  A
+        # member the release revised or removed is exactly what acquiring it
+        # changes (#978 / #1127), so only members BOTH releases ship are pinned
+        # to the live sidecars: a pin on a queued release's held state breaks
+        # the day its acquisition merges (TestShippedRecordsSayWhatWeMeasured).
+        if relative.name not in revised and relative.name not in removed:
+            real_sidecar = real_data / (str(relative) + ".dvc")
+            assert hashlib.sha256(real_sidecar.read_bytes()).hexdigest() == row["sidecar_sha256"]
         payload = b"synthetic-held:" + str(relative).encode()
         held = _sidecar(data / relative, payload)
         if relative.name in removed:
