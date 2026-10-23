@@ -40,21 +40,66 @@ housing:
         Floor: h9q6
 
 sample:
-    file: gsec1.dta
-    idxvars:
-        i: HHID
-    myvars:
-        v: parish_code
-        weight: h_xwgt_W5  # cross-sectional weight (covers both panel and refreshment sample)
-        panel_weight: hwgt_W5  # longitudinal weight (zero for refreshment sample)
-        strata: sregion
-        Rural: urban
-        Region: region
+    # GH #1120 D1 (@ligon 2026-10-23): `sample` takes the households the survey
+    # recorded in ANOTHER cover from that cover, with that cover's weight.
+    # AGSEC1, the agriculture cover, records 72 households that gsec1 does not
+    # (every one has `interview = nonresp = 3 "Not done"`: the household
+    # questionnaire was not completed).  It carries their `parish_code` --
+    # this wave's `v`, same 8-digit codes (it agrees with gsec1 on all 2,622
+    # households both files hold) -- plus sregion / urban / region, and ONE
+    # weight, `hwgt_W5` ("Panel hh weight for wave5", identical to its `mult`,
+    # "Household weight").  Following Uganda's single-weight precedent
+    # (2005-06 .. 2011-12, 2019-20) it fills both `weight` and
+    # `panel_weight`.  It is a different vintage from gsec1's `hwgt_W5` (they
+    # agree on 0 of the 1,458 households both weight positively; median ratio
+    # 0.93) and 33 of the 72 are 0.  Measured, cold: CONTENTS.org "GH #1120".
+    #
+    # The `_ag_` columns are applied ONLY to a household gsec1 lacks (no
+    # `_cover` marker) by the country hook `uganda.sample`; a gsec1 household
+    # keeps every gsec1 value, including a missing one.
+    dfs:
+        - df_main
+        - df_ag
+    df_main:
+        file: gsec1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            v: parish_code
+            weight: h_xwgt_W5  # cross-sectional weight (covers both panel and refreshment sample)
+            panel_weight: hwgt_W5  # longitudinal weight (zero for refreshment sample)
+            strata: sregion
+            Rural: urban
+            Region: region
+            _cover: HHID
+    df_ag:
+        file: AGSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _ag_v: parish_code
+            _ag_weight: hwgt_W5
+            _ag_panel_weight: hwgt_W5
+            _ag_strata: sregion
+            _ag_Rural: urban
+            _ag_Region: region
+    merge_on:
+        - i
+    final_index:
+        - t
+        - i
 
 cluster_features:
+    # GH #1120 D1: the 72 households `sample` takes from AGSEC1 (see its
+    # comment) carry AGSEC1's parish_code as `v`; 8 of them sit in parishes
+    # no gsec1 household is in.  `df_ag` gives those clusters their AGSEC1
+    # Region / Rural / District, so `sample` and `cluster_features` keep one
+    # keyspace.  Applied by the country hook `uganda.cluster_features` only
+    # to households gsec1 lacks (no `_cover` marker), exactly as in `sample`.
     dfs:
         - df_main
         - df_geo
+        - df_ag
     df_main:
         file: gsec1.dta
         idxvars:
@@ -64,6 +109,7 @@ cluster_features:
             Region: region
             Rural: urban
             District: district
+            _cover: HHID
     # GPS from the public geovar (modified/offset coordinates), joined on
     # household id then collapsed to cluster grain by final_index (GH #161).
     df_geo:
@@ -73,6 +119,15 @@ cluster_features:
         myvars:
             Latitude: pub_lat_mod
             Longitude: pub_lon_mod
+    df_ag:
+        file: AGSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _ag_v: parish_code
+            _ag_Region: region
+            _ag_Rural: urban
+            _ag_District: district
     merge_on:
         - i
     final_index:

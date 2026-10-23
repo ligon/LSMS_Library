@@ -69,25 +69,48 @@ housing:
         Floor: h9q06
 
 sample:
-    file: GSEC1.dta
-    idxvars:
-        i: hhid
-    myvars:
-        # GH #323: the composite DISTRICT/PARISH key built by this wave's
-        # mapping.v().  parish_name ALONE is not a cluster key -- 20 parish
-        # names recur across districts ('CENTRAL' in ten of them).  `sample`
-        # and `cluster_features` MUST declare the identical pair, or they
-        # desynchronise and _join_v_from_sample hands every other table a key
-        # that does not exist in cluster_features.  (parish_code is unusable:
-        # 19 distinct values for 751 parishes.)
-        v:
-            - distirct_name   # sic: the source misspells "district"
-            - parish_name
-        weight: wgt  # cross-sectional weight
-        panel_weight: hwgt_W7  # longitudinal weight (NaN for refreshment sample)
-        strata: subreg
-        Rural: urban
-        Region: region
+    # GH #1120 D2 (@ligon 2026-10-23): GSEC1 ships only `response_status == 1`
+    # households.  66 more are in the roster (GSEC2) and the agriculture
+    # cover (AGSEC1) -- the same 66 in both -- and no file locates them:
+    # AGSEC1's region / urban / wgt / hwgt_w7 are null for every one of them.
+    # `df_ag` puts them into the frame (the `_frame` marker; `i` only); the
+    # country hook `uganda.sample` gives each a SINGLETON `v`
+    # (`moved-{hhid}`, Nigeria's convention), never NaN.  Their weight,
+    # strata, Rural and Region are NaN: no file states them.
+    dfs:
+        - df_main
+        - df_ag
+    df_main:
+        file: GSEC1.dta
+        idxvars:
+            i: hhid
+        myvars:
+            # GH #323: the composite DISTRICT/PARISH key built by this wave's
+            # mapping.v().  parish_name ALONE is not a cluster key -- 20 parish
+            # names recur across districts ('CENTRAL' in ten of them).  `sample`
+            # and `cluster_features` MUST declare the identical pair, or they
+            # desynchronise and _join_v_from_sample hands every other table a
+            # key that does not exist in cluster_features.  (parish_code is
+            # unusable: 19 distinct values for 751 parishes.)
+            v:
+                - distirct_name   # sic: the source misspells "district"
+                - parish_name
+            weight: wgt  # cross-sectional weight
+            panel_weight: hwgt_W7  # longitudinal weight (NaN for refreshment sample)
+            strata: subreg
+            Rural: urban
+            Region: region
+    df_ag:
+        file: AGSEC1.dta
+        idxvars:
+            i: hhid
+        myvars:
+            _frame: hhid
+    merge_on:
+        - i
+    final_index:
+        - t
+        - i
 
 cluster_features:
     dfs:

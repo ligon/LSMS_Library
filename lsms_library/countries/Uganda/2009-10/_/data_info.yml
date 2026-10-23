@@ -56,9 +56,20 @@ sample:
     # synthetic `@lat,lon` cluster label built from the modified GPS
     # coordinates in the geovars file.  See Uganda/_/CONTENTS.org for
     # the full rationale.
+    #
+    # GH #1120 D2 (@ligon 2026-10-23): a household with neither -- the 24
+    # "no comm, no GPS" households -- gets a SINGLETON `v` (`moved-{hhid}`,
+    # Nigeria's convention) from the country hook `uganda.sample`, never NaN.
+    # `df_frame` puts into the frame the households that no 2009-10
+    # cover records but a served table does: 3 split-off ids found only in
+    # the season-B agriculture modules (AGSEC3B/4B/5B; plot_labor,
+    # plot_inputs, crop_production) and 1 found only in the enterprise module
+    # GSEC12 (enterprise_income).  They contribute `i` only (the `_frame`
+    # marker); each gets its singleton.
     dfs:
         - df_main
         - df_geo
+        - df_frame
     df_main:
         file: ../Data/GSEC1.dta
         idxvars:
@@ -90,6 +101,17 @@ sample:
         myvars:
             _lat: lat_mod
             _lon: lon_mod
+    df_frame:
+        # One sub-df, two files concatenated: two plot/enterprise-grain
+        # sub-dfs merged in turn would both repeat `i`, which the `dfs:` merge
+        # rightly refuses as a cartesian (GH #323 site 4).
+        file:
+            - ../Data/AGSEC3B.dta
+            - ../Data/GSEC12.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _frame: HHID
     merge_on:
         - i
     final_index:

@@ -40,16 +40,38 @@ housing:
         Floor: h9q6
 
 sample:
-    file: ../Data/GSEC1.dta
-    idxvars:
-        i: HHID
-    myvars:
-        v: comm
-        weight: mult
-        panel_weight: mult  # pre-refreshment — same as cross-sectional
-        strata: sregion
-        Rural: urban
-        Region: region
+    # GH #1120 D2 (@ligon 2026-10-23): AGSEC1, the agriculture cover, records
+    # 57 households that GSEC1 does not, and it carries no location or weight
+    # for them (no geographic column at all in this wave).  `df_ag` puts them
+    # into the frame (the `_frame` marker; `i` only) so the plot tables'
+    # households have a `sample` row; the country hook `uganda.sample` gives
+    # each a SINGLETON `v` (`moved-{hhid}`, Nigeria's convention), never NaN.
+    # Their weight, strata, Rural and Region are NaN: no file states them.
+    dfs:
+        - df_main
+        - df_ag
+    df_main:
+        file: ../Data/GSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            v: comm
+            weight: mult
+            panel_weight: mult  # pre-refreshment — same as cross-sectional
+            strata: sregion
+            Rural: urban
+            Region: region
+    df_ag:
+        file: ../Data/AGSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _frame: HHID
+    merge_on:
+        - i
+    final_index:
+        - t
+        - i
 
 cluster_features:
     dfs:

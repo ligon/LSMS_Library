@@ -255,14 +255,35 @@ def cluster_features(df):
     averaging it would smear two places into one and hide the evidence -- the
     same argument that retired core's ``.mean()`` on 2026-07-13.
 
-    Rows whose ``v`` is missing are dropped HERE, with a count, rather than
-    disappearing inside a ``groupby(dropna=True)`` further downstream (GH #323
-    Site 3: delete and report, decision D2).  A cluster with no identifier cannot
-    be addressed by any consumer.
+    Two steps run BEFORE the projection, and they are ``sample``'s, applied to
+    the same rows by the same functions so the two tables publish one keyspace
+    (GH #1120; Nigeria serves its ``moved-{hhid}`` singletons from both):
+
+    * a household recorded only by an ALTERNATE cover takes that cover's
+      columns (2015-16: AGSEC1, D1) -- :func:`_adopt_alternate_cover`;
+    * a COVER household with no cluster id gets its singleton ``v`` (D2) --
+      :func:`singleton_v`.  "Cover household" means the row carries a cover
+      attribute (``Region``, ``Rural`` or ``District``): 2009-10's 24 "no
+      comm, no GPS" households, the 2013-14 household with a blank parish
+      code and the 2019-20 household with a blank district.  Each becomes a
+      one-household cluster row with its own cover attributes.
+
+    Rows whose ``v`` is STILL missing are dropped here, with a count, rather
+    than disappearing inside a ``groupby(dropna=True)`` further downstream (GH
+    #323 Site 3: delete and report, decision D2).  After the two steps above
+    these are geovar rows with no cover row at all -- 2005-06's 368 2009-10
+    split-offs that the outer geovar merge brings in (the open TODO
+    "``cluster_features`` 2005-06: 368 phantom rows").  They are not 2005-06
+    households, so they get no cluster, singleton or otherwise.
     """
     from lsms_library.build_transforms import reduce_to_agreed
 
-    flat = df.reset_index()
+    flat = _adopt_alternate_cover(df.reset_index())
+    if 'v' in flat.columns and 'i' in flat.columns:
+        cover = [c for c in _COVER_ATTRIBUTES if c in flat.columns]
+        has_cover = (flat[cover].notna().any(axis=1) if cover
+                     else pd.Series(False, index=flat.index))
+        flat['v'] = _with_singletons(flat['v'], flat['i'], where=has_cover)
     # The household level has no place in a cluster-grain table, and leaving it
     # in would make every multi-household cluster look like a conflict (`i` is
     # distinct by construction).  Drop it whether it arrived as an index level
@@ -279,13 +300,151 @@ def cluster_features(df):
     if n_blank:
         warnings.warn(
             f"Uganda/cluster_features: dropping {n_blank:,} household row(s) "
-            f"with no cluster id (`v` is missing).  They cannot be addressed by "
-            f"any consumer, and keeping them would put an unnamed cluster in a "
-            f"table keyed on the cluster.  GH #323 (Site 3).",
+            f"with no cluster id (`v` is missing) and no cover attribute "
+            f"(Region/Rural/District) -- geovar rows with no cover-page row.  "
+            f"They cannot be addressed by any consumer, and keeping them would "
+            f"put an unnamed cluster in a table keyed on the cluster.  "
+            f"GH #323 (Site 3); GH #1120 D2 gives cover households a singleton.",
             stacklevel=2,
         )
         flat = flat[flat['v'].notna()]
     return reduce_to_agreed(flat.set_index(['t', 'v']), on_conflict='na')
+
+
+# ---------------------------------------------------------------------------
+# GH #1120 D1 / D2 (@ligon 2026-10-23) -- the `sample` frame, and a cluster id
+# for every household in it.
+#
+# `sample` is the single source of `v` for every other Uganda table
+# (`_join_v_from_sample`), so a household missing from it, or present with a
+# NaN `v`, is served with a NaN `v` everywhere -- a NULL on a declared index
+# level, which the first `groupby` deletes (CLAUDE.md "Grain Collapse" 3b).
+#
+#   D1  A household the survey recorded in ANOTHER cover is taken from that
+#       cover, with that cover's weight.  Uganda 2015-16: AGSEC1 carries
+#       `parish_code` (2015-16's `v`) and `hwgt_W5` for 72 households that
+#       gsec1 does not.  Declared in that wave's `sample:` block as a `df_ag`
+#       sub-df whose columns are prefixed `_ag_`, beside a `_cover` marker on
+#       the gsec1 sub-df (:func:`_adopt_alternate_cover`).
+#   D2  A household that NO file locates gets a SINGLETON `v` of its own,
+#       never a shared sentinel (which would weld unrelated households into
+#       one cluster) and never NaN (which deletes them downstream) -- the
+#       argument `Nigeria/_/nigeria.py` makes for `moved-{hhid}`.  The
+#       households are put INTO the frame by `_frame`-marked sub-dfs naming
+#       the file that records them (2009-10 AGSEC3B + GSEC12, 2011-12 and
+#       2018-19 AGSEC1), and :func:`sample` then gives every row whose `v` is
+#       still missing its singleton -- which also covers the cover households
+#       with a blank cluster field (2009-10's 24 "no comm, no GPS", 2013-14's
+#       blank parish code, 2019-20's blank district).
+# ---------------------------------------------------------------------------
+
+#: Prefix of the per-household singleton cluster id.  Spelled EXACTLY as
+#: Nigeria spells it (``Nigeria/_/nigeria.py`` ``cluster_id``:
+#: ``'moved-{hhid}'``), per the GH #1120 D2 ruling.  NOTE: Uganda's
+#: unlocated households are not all movers -- the word is Nigeria's, and the
+#: prefix is an open question for @ligon (see CONTENTS.org).
+SINGLETON_V_PREFIX = 'moved'
+
+#: Marker myvar of a wave's PRIMARY cover sub-df in a ``sample`` /
+#: ``cluster_features`` ``dfs:`` block that also reads an alternate cover.
+_COVER_MARKER = '_cover'
+#: Prefix of the columns an ALTERNATE cover supplies (D1).
+_ALT_COVER_PREFIX = '_ag_'
+#: Marker myvar of a frame-extension sub-df: it contributes households only.
+_FRAME_MARKER = '_frame'
+#: Columns that only a cover page supplies, on ``cluster_features``.
+_COVER_ATTRIBUTES = ('Region', 'Rural', 'District')
+
+
+def singleton_v(hhid):
+    """``moved-{hhid}``: a cluster id that can hold exactly one household.
+
+    Built as ``Nigeria/_/nigeria.py``'s ``cluster_id`` builds its mover id --
+    the prefix, a hyphen, and the household id through ``format_id`` -- and
+    ``None`` when there is no household id.  ``format_id`` leaves the result
+    unchanged, so the v-join's own ``format_id`` pass does not alter it.
+    """
+    hh = format_id(hhid)
+    return f'{SINGLETON_V_PREFIX}-{hh}' if hh is not None else None
+
+
+def _with_singletons(v, i, where=None):
+    """``v`` with each missing (NA or blank) entry replaced by ``singleton_v(i)``.
+
+    ``where`` (boolean, aligned) restricts which rows are eligible.
+    """
+    v = v.astype('object')
+    blank = v.isna() | (v.astype('string').str.strip().fillna('') == '')
+    if where is not None:
+        blank = blank & where.astype(bool)
+    if not blank.any():
+        return v
+    out = v.copy()
+    out.loc[blank] = [singleton_v(x) for x in i.loc[blank]]
+    return out
+
+
+def _adopt_alternate_cover(flat):
+    """Give rows the PRIMARY cover lacks the ALTERNATE cover's columns (D1).
+
+    A ``dfs:`` block marks its primary-cover sub-df with ``_cover`` and names
+    the alternate cover's columns ``_ag_<column>``.  A row with no ``_cover``
+    was recorded only by the alternate cover; it takes ``<column>`` from
+    ``_ag_<column>``.  A row the primary cover has keeps every primary value,
+    even a missing one -- the alternate cover's weight is a different vintage
+    (2015-16: AGSEC1's ``hwgt_W5`` agrees with gsec1's on none of the 1,458
+    households both weight positively), so it must not fill gsec1's gaps.
+
+    The temporary columns are dropped.  A frame without them is returned
+    unchanged (every wave but 2015-16).
+    """
+    alt = [c for c in flat.columns if str(c).startswith(_ALT_COVER_PREFIX)]
+    if _COVER_MARKER in flat.columns and alt:
+        only_alt = flat[_COVER_MARKER].isna()
+        for c in alt:
+            target = c[len(_ALT_COVER_PREFIX):]
+            src = flat[c]
+            if target == 'v':
+                # A myvar has no `v` formatter, and the outer merge floats it.
+                src = src.map(format_id)
+            if target not in flat.columns:
+                flat[target] = pd.NA
+            flat[target] = flat[target].astype('object')
+            flat.loc[only_alt, target] = src.loc[only_alt].astype('object')
+    temps = [c for c in flat.columns
+             if c in (_COVER_MARKER, _FRAME_MARKER)
+             or str(c).startswith(_ALT_COVER_PREFIX)]
+    return flat.drop(columns=temps)
+
+
+def sample(df):
+    """Country-level ``df_edit`` hook for ``sample`` (every Uganda wave).
+
+    1. Adopt the alternate cover for households only it records (D1).
+    2. Collapse the repeats a frame-extension sub-df brings in.  A sub-df read
+       at plot or person grain repeats a household once per source row; it
+       contributes ``i`` only, so the repeats are identical rows.  That is
+       PROVED before they are dropped -- a household whose repeats differ
+       raises rather than letting a reducer pick one.
+    3. Give every household with no ``v`` its singleton (D2).
+    """
+    idx = [n for n in df.index.names if n is not None]
+    flat = _adopt_alternate_cover(df.reset_index())
+    key = [k for k in ('t', 'i') if k in flat.columns]
+    if key:
+        rep = flat.duplicated(key, keep=False)
+        if rep.any():
+            distinct = flat[rep].drop_duplicates()
+            n_bad = int(distinct.duplicated(key).sum())
+            if n_bad:
+                raise ValueError(
+                    f"Uganda/sample: {n_bad} household(s) appear more than once "
+                    f"with DIFFERENT values after the frame extension.  A "
+                    f"frame-extension sub-df must contribute `i` only (GH #1120).")
+            flat = flat.drop_duplicates(key)
+    if 'v' in flat.columns and 'i' in flat.columns:
+        flat['v'] = _with_singletons(flat['v'], flat['i'])
+    return flat.set_index(idx) if idx else flat
 
 
 def _format_agsec_hhid(s, t):
@@ -325,6 +484,40 @@ def _format_agsec_hhid(s, t):
         return xs
 
     return out.apply(_decode)
+
+
+#: The EPISTEMIC plot sentinel (GH #1120 D3, @ligon 2026-10-23), registered
+#: under ``plot_id:`` in ``lsms_library/data_info.yml``: the survey recorded a
+#: plot-grain answer but the source leaves the plot identifier blank.  Named
+#: like ``unknown_condition``; distinct from the STRUCTURAL ``Farm-level``.
+#: It is NOT a plot -- it joins no ``plot_features`` row, and two
+#: ``unknown_plot`` rows of one household are not one plot.
+UNKNOWN_PLOT = 'unknown_plot'
+
+
+def _plot_key(hh, parcel, plot):
+    """The ``{hhid}-{parcel}-{plot}`` plot id of the UNPS plot modules.
+
+    Where the source leaves the parcel or the plot id blank, the whole key is
+    :data:`UNKNOWN_PLOT` (GH #1120 D3).  It used to be NaN: pandas 3's
+    ``astype(str)`` keeps a missing component missing, so the concatenation
+    was NaN, and a NaN on a declared index level is a deferred deletion --
+    ``crop_production`` and ``plot_inputs`` deleted those rows in their
+    de-dup step (``groupby(dropna=True)``) and ``plot_labor`` served them on a
+    NaN key.  A known parcel with a blank plot gets the sentinel too: the plot
+    is what the key names, and the registered sentinel is the bare string so
+    a consumer can test ``plot_id == 'unknown_plot'``.  A row with no
+    household id keeps a NaN key (none exists in any wave; that would be a
+    broken ``i``, not an unknown plot).
+
+    Only the served STRING changes.  Lookups that join on the separate
+    ``(hh, parcel, plot)`` components (``crop_production``'s intercrop
+    roster) are untouched, so an ``unknown_plot`` row can never borrow
+    another household's answer through the shared sentinel.
+    """
+    key = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+    blank = (parcel.isna() | plot.isna()) & hh.notna()
+    return key.mask(blank, UNKNOWN_PLOT)
 
 
 # Data to link household ids across waves
@@ -1494,7 +1687,7 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None,
         parcel = _require(df5, cm['parcel'], w, 'parcel id').apply(format_id)
         plot = (_require(df5, cm['plot'], w, 'plot id').apply(format_id)
                 if cm.get('plot') else pd.Series(['']*len(df5), index=df5.index))
-        plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+        plot_id = _plot_key(hh, parcel, plot)   # GH #1120 D3
         crop_code = _to_int_code(_require(df5, cm['crop'], w, 'crop code'))
         j = crop_code.map(lambda c: crop_map.get(int(c), pd.NA) if pd.notna(c) else pd.NA)
 
@@ -2131,6 +2324,11 @@ CROP_COLMAPS = {
 # NO seed_kg / nitrogen_kg / any-use flags — those are transformations.
 
 _INPUT_TABLE = 'harmonize_input'
+# The one canonical "not crop-specific" marker on plot_inputs `j` (GH #1119,
+# @ligon 2026-10-23; `lsms_library/data_info.yml`, plot_inputs Index Info).
+# Spelled as Niger defines it (Niger/_/niger.py CROP_NA) and as Mali and the
+# EHCVM siblings inline it.  Uganda wrote 'n/a' before #1119.
+CROP_NA = '(not crop-specific)'
 # pesticide unit scheme is a tiny 1=Kg / 2=Litres code (a3aq24a / a3aq28a),
 # distinct from the UNPS harvest/seed unit scheme reused for seed via
 # harvest_units.  Stored in its own harmonize_pesticide_unit table.
@@ -2258,7 +2456,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
         plot = (df3[cm['plot']].apply(format_id)
                 if cm.get('plot') and cm['plot'] in df3.columns
                 else pd.Series([''] * len(df3), index=df3.index))
-        plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+        plot_id = _plot_key(hh, parcel, plot)   # GH #1120 D3
 
         for block in ('organic', 'inorganic', 'pesticide'):
             b = cm.get(block)
@@ -2329,7 +2527,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
         plot = (df4a[sc['plot']].apply(format_id)
                 if sc.get('plot') and sc['plot'] in df4a.columns
                 else pd.Series([''] * len(df4a), index=df4a.index))
-        plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+        plot_id = _plot_key(hh, parcel, plot)   # GH #1120 D3
 
         crop_code = (_to_int_code(df4a[sc['crop']])
                      if sc.get('crop') and sc['crop'] in df4a.columns
@@ -2398,13 +2596,15 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
     # u may be NaN (a reported pesticide with no unit label); sentinel so it
     # is not an issue for downstream code that strings the column.
     df['u'] = df['u'].astype('object').where(df['u'].notna(), 'Unknown')
-    # j is the seed's crop (on harmonize_crop labels) for seed rows, and a
-    # 'n/a' sentinel for fertilizer/pesticide rows (no crop linkage).  It is
-    # an INDEX level so per-crop seed rows on a multi-crop plot stay distinct
-    # (the maintainer's "plot-crop seed grain") rather than collapsing —
-    # 37.9% of seeded plots in 2011-12 carry >1 crop.  The sentinel keeps the
-    # level non-null so it is a valid index level.
-    df['j'] = df['j'].astype('object').where(df['j'].notna(), 'n/a')
+    # j is the seed's crop (on harmonize_crop labels) for seed rows, and the
+    # canonical marker CROP_NA = '(not crop-specific)' for fertilizer /
+    # pesticide rows (no crop linkage).  It is an INDEX level so per-crop seed
+    # rows on a multi-crop plot stay distinct (the maintainer's "plot-crop seed
+    # grain") rather than collapsing — 37.9% of seeded plots in 2011-12 carry
+    # >1 crop.  The marker keeps the level non-null so it is a valid index
+    # level.  It was spelled 'n/a' until GH #1119 (@ligon 2026-10-23: one
+    # marker everywhere, the EHCVM / Mali spelling).
+    df['j'] = df['j'].astype('object').where(df['j'].notna(), CROP_NA)
 
     df = df.set_index(['t', 'i', 'plot_id', 'input', 'j', 'season'])
     # Collapse only EXACT-duplicate (t,i,plot,input,j,season) tuples — the same
@@ -3250,7 +3450,7 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
         plot = (df3[cm['plot']].apply(format_id)
                 if cm.get('plot') and cm['plot'] in df3.columns
                 else pd.Series([''] * len(df3), index=df3.index))
-        plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+        plot_id = _plot_key(hh, parcel, plot)   # GH #1120 D3
 
         # Reported person-days per source (one Series each, aligned to df3).
         source_days = {}
