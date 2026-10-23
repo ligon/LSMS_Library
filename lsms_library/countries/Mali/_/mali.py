@@ -432,10 +432,12 @@ def plot_inputs_finalize(df):
     Expects raw columns already assembled:
         t, i, plot, input (harmonize_input Code), crop (decoded crop name or
         NA), u (decoded unit label or NA), Quantity, Purchased (nullable
-        bool), Quantity_purchased, Improved (nullable bool).
+        bool), Quantity_purchased, Improved (nullable bool), and optionally
+        Applied (nullable bool; the plot-level group use answer, set only on
+        the 'inorganic_fertilizer' / 'phytosanitary' group rows).
     Maps input/unit/crop labels, coerces dtypes, drops content-free rows
     (an input slot the household did not use -> no quantity, no purchase,
-    no improved flag), sets the (t, i, plot, input, crop) index, and
+    no improved flag, no use answer), sets the (t, i, plot, input, crop) index, and
     collapses exact-duplicate index rows by summing the reported quantities
     and taking the first/any of the flags.
     """
@@ -455,6 +457,11 @@ def plot_inputs_finalize(df):
         df.loc[df[c].isin([99, 999, 9999, 99999]), c] = pd.NA
     df['Purchased'] = df['Purchased'].astype('boolean')
     df['Improved'] = df['Improved'].astype('boolean')
+    # Applied: the survey's plot-level GROUP use answer (inorganic fertilizer /
+    # phytosanitary products), served on its own row; NA on every type row.
+    if 'Applied' not in df.columns:
+        df['Applied'] = pd.NA
+    df['Applied'] = df['Applied'].astype('boolean')
 
     # Drop content-free rows: an input slot for which the household reported
     # nothing positive.  A reported Quantity, a reported purchased quantity,
@@ -464,7 +471,7 @@ def plot_inputs_finalize(df):
     # fertilizer type the household neither applied here nor bought).
     has_content = (df['Quantity'].notna() | df['Quantity_purchased'].notna()
                    | df['Purchased'].fillna(False).astype('boolean')
-                   | df['Improved'].notna())
+                   | df['Improved'].notna() | df['Applied'].notna())
     df = df[has_content]
 
     # plot / crop may be NA; carry as NA-able strings so the index level is
@@ -483,8 +490,10 @@ def plot_inputs_finalize(df):
         'u':                  g['u'].first(),
         'Purchased':          g['Purchased'].max(),
         'Improved':           g['Improved'].max(),
+        'Applied':            g['Applied'].max(),
     })
-    out = out[['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']]
+    out = out[['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved',
+               'Applied']]
     # GH #1118 under the #1041 ruling: a retained record with no unit carries
     # the canonical sentinel, never NaN.  Filled AFTER the collapse so a blank
     # duplicate cannot displace a real unit via g['u'].first().  Measured on

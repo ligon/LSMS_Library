@@ -5319,6 +5319,20 @@ _ORGANIC_INPUT_PATTERN = re.compile(
 # instrument does not name and which carries no share by ruling (@ligon
 # 2026-10-14).  The warning now names it as a gap, as it already named
 # Nigeria's ``Other Inorganic Fertilizer``.
+def is_use_answer_label(label):
+    """True for a ``plot_inputs.input`` label that names a USE ANSWER, not an input.
+
+    Convention (maintainer decision, 2026-10-22): an ``input`` label ending in
+    ``'?'`` is the survey's own yes/no answer to a use question asked about a
+    GROUP of inputs on the plot -- e.g. Mali's ``'Inorganic Fertilizer?'``
+    (``Applied`` True/False, no ``Quantity``).  It is not an application of
+    any input, so the plot-input transforms skip it before label matching:
+    it contributes no mass, and it is neither a matched nor an unmatched
+    input in :func:`nitrogen_kg`'s tally.
+    """
+    return str(label).rstrip().endswith('?')
+
+
 _FERTILIZER_LABEL_HINTS = ('fertilizer', 'fertiliser', 'manure', 'compost',
                            'organic', 'adubo', 'engrais')
 
@@ -5558,6 +5572,13 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
         inp = df['input'].astype(str)
     else:
         raise ValueError("plot_inputs must have an 'input' level or column")
+    # Use-answer rows ('...?', see is_use_answer_label) are not inputs: drop
+    # them before matching so they neither match a share nor count as an
+    # unmatched fertilizer-shaped label.
+    answer = inp.map(is_use_answer_label).to_numpy(dtype=bool)
+    if answer.any():
+        df = df[~answer]
+        inp = inp[~answer]
     # Labels are passed through VERBATIM (not pre-lowered) so the tally and
     # the warning name them as the country writes them; the normalisation
     # lives in _normalise_input_label, where the three candidate spellings
