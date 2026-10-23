@@ -1,0 +1,31 @@
+{
+ "recovered_priced_rows_non_unknown": 21641,
+ "recovered_j_in_household_j": [
+  "Bottled/ Canned Beer"
+ ],
+ "household_u_for_those_j": {
+  "Bottled/ Canned Beer": [
+   "4 Bottles",
+   "Basket shelled",
+   "Bottle",
+   "Bottle (Small)",
+   "Bottles",
+   "Carlsberg Beer",
+   "Crate",
+   "Cup",
+   "Gram",
+   "Kilogramme",
+   "Krate",
+   "Litre",
+   "Millilitre",
+   "Pail (Large)",
+   "Piece",
+   "Satchet/Tube",
+   "Tin",
+   "Unknown"
+  ]
+ },
+ "matched_cells": 0,
+ "reference_unit_bearing_matched_cells": 10964,
+ "reference_ratio_median": 1.0
+}

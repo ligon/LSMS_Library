@@ -4169,6 +4169,14 @@ def assemble_people_last7days(t, pieces):
 # median/mean -- those are transformations.  There is no household i, so
 # v is NATIVE in the index (the framework's _join_v_from_sample does not
 # apply).  2016-17 (IHS4) collected no Module CK -> absent for that wave.
+# u is never null (GH #827): the item's fixed unit for the 17 items whose
+# unit cell the form strikes out (_CK_ITEM_FIXED_UNIT), else the decoded
+# unit code, else `Unknown`.  On those 17 items the form strikes the NUMBER
+# OF UNITS cell too, and a PRICED row of one is served NumberOfUnits = 1, the
+# registered derivation Malawi::community_prices::struck-item-one-unit
+# (derive_ck_struck_one_unit; ruling @ligon 2026-10-23, the analogue of
+# Niger's community_prices one-item-per-price) -- except CK33 cigarettes,
+# whose bimodal prices leave the count NA (_CK_ONE_UNIT_EXCLUDED).
 
 def _price_item_code_map():
     """{int item code 1-51: Preferred Label} for community_prices `j`."""
@@ -4178,6 +4186,54 @@ def _price_item_code_map():
 def _price_unit_code_map():
     """{int unit code 1-21: Preferred Label} for community_prices `u`."""
     return _malawi_code_map('harmonize_price_unit')
+
+
+# GH #827.  The Module CK form STRIKES OUT the NUMBER OF UNITS and UNIT
+# CODES cells for these 17 items: a diagonal line through both cells on
+# CK3, CK4, CK30-CK35, CK42, CK44-CK51 on IHS3 Community questionnaire p. 20
+# (`2010-11/Documentation/IHS3.Community.Qx.FINAL.pdf`), IHPS Market
+# questionnaire p. 12 ("MODULE E: PRICES", the 2013-14 list, which lacks
+# CK51), and IHS5 Community questionnaire p. 20.
+# The unit is not asked because the ITEM fixes it -- "Coca-Cola, Fanta
+# (bottle)", "Cigarettes, Embassy (packet)", "Cost to grind 50 kg bag of
+# maize", "Ganyu wage, 1 day, adult male" -- and no unit code or count is
+# recorded on any of their rows in any wave or half (2010-11, 2013-14,
+# 2019-20 Cross_Sectional and Panel: 0 of 28,631 served rows, 21,641 of
+# them priced).  Precedent:
+# Nigeria W1/W2 community prices, where "the questionnaire fixes one unit
+# per item, so the per-item unit is supplied" (nigeria.py, `_W1W2_PRICE_UNIT`).
+# The unit is the item's, so it is supplied on EVERY row of the item,
+# available or not.  Labels transcribe the printed item text where it names
+# a basis (bottle, packet, 50 kg bag, per 50 kg per kilometre, 1 day); the
+# count goods whose text names none (trousers, battery, watch, hoe, panga,
+# sickle, axe, bicycle, mattress, net -- "single" on CK49/CK50 is a bed size,
+# not a count) are served `Piece`, Malawi's own count label (CK code 9).
+# `Piece` is an INFERENCE from the struck count cell, not a transcription;
+# see Malawi/_/CONTENTS.org.  NumberOfUnits is not READ here (the form
+# struck that cell too, and no row records one): the 1 a priced row of these
+# items is served is a construction, the registered derivation
+# CK_STRUCK_ONE_UNIT, stamped by derive_ck_struck_one_unit after the collapse
+# in assemble_community_prices -- on every struck item EXCEPT CK33 cigarettes
+# (_CK_ONE_UNIT_EXCLUDED: bimodal packet / single-stick prices).
+_CK_ITEM_FIXED_UNIT = {
+    3: '50 kg Bag',            # Cost to grind 50 kg bag of maize
+    4: '50 kg Bag',            # Cost to grind 50 kg bag of rice
+    30: 'Piece',               # Trousers (kaunjika)
+    31: 'Bottle',              # Coca-Cola, Fanta (bottle)
+    32: 'Bottle',              # Carlsberg beer (bottle)
+    33: 'Packet',              # Cigarettes, Embassy (packet)
+    34: 'Piece',               # Battery (dry cell) for radio
+    35: 'Piece',               # Watch, digital (simple), plastic
+    42: '50 kg per Kilometre', # Motorized transport of crop output (per 50kg per kilometer)
+    44: 'Piece',               # Hand hoe, without handle
+    45: 'Piece',               # Panga
+    46: 'Piece',               # Sickle
+    47: 'Piece',               # Axe
+    48: 'Piece',               # Bicycle
+    49: 'Piece',               # Foam mattress (10 cm, single)
+    50: 'Piece',               # Mosquito net (white, not treated with insecticide, single)
+    51: 'Day',                 # Ganyu wage, 1 day, adult male
+}
 
 
 def _strip_ck(series):
@@ -4196,7 +4252,23 @@ def _price_block(df, *, ea_col, item_col, price_col, nunits_col, unit_col,
     convert_categoricals=False so codes are numeric / 'CK<n>' strings).
     Returns a long DataFrame with columns [t, v, j, u, _item_code, Price,
     NumberOfUnits, Available] -- NO aggregation, one row per source row.
+
+    ``u`` is never null (GH #827): an item whose form strikes out the unit
+    cell gets the unit the item fixes (``_CK_ITEM_FIXED_UNIT``); on every
+    other item a unit code that is blank, or on no Module CK list (codes
+    outside 1-21: 2013-14's 0/22/23/25/48/50/69/200/500, 2010-11's one 23),
+    is the missing-unit sentinel ``U_UNKNOWN`` -- the Malawi rule for codes
+    "on no instrument's list" (CONTENTS.org, GH #1042).  A null on the
+    declared ``u`` level is not served as a gap: ``local_tools.map_index``
+    renames it to the literal ``'unit'`` on every read.
+
+    ``NumberOfUnits`` is the RECORDED count here, NA on every struck item
+    (the form strikes that cell).  The 1 a priced struck row (CK33
+    cigarettes excepted) is served is added later, after the collapse, by
+    ``derive_ck_struck_one_unit`` in ``assemble_community_prices``.
     """
+    from lsms_library.transformations import U_UNKNOWN
+
     item_map = _price_item_code_map()
     unit_map = _price_unit_code_map()
 
@@ -4212,7 +4284,21 @@ def _price_block(df, *, ea_col, item_col, price_col, nunits_col, unit_col,
         u = ucode.map(unit_map)
         u = u.astype('string').where(u.notna(), pd.NA)
     else:
+        ucode = pd.Series(pd.NA, index=df.index, dtype='Int64')
         u = pd.Series(pd.NA, index=df.index, dtype='string')
+
+    fixed = code.isin(list(_CK_ITEM_FIXED_UNIT))
+    fixed = fixed.fillna(False).astype(bool)
+    recorded_on_fixed = fixed & ucode.notna()
+    if recorded_on_fixed.any():
+        raise ValueError(
+            f'community_prices {t}: {int(recorded_on_fixed.sum())} row(s) record a '
+            'unit code on an item whose Module CK unit cell is struck out '
+            f'(item codes {sorted(set(code[recorded_on_fixed].dropna().astype(int)))}); '
+            '_CK_ITEM_FIXED_UNIT would overwrite a recorded answer -- re-check '
+            'the instrument for this wave (GH #827).')
+    u = u.mask(fixed, code.map(_CK_ITEM_FIXED_UNIT).astype('string'))
+    u = u.mask(u.isna() & code.notna(), U_UNKNOWN)
 
     price = (pd.to_numeric(df[price_col], errors='coerce').astype('Float64')
              if price_col in df.columns
@@ -4251,22 +4337,34 @@ def assemble_community_prices(t, pieces):
     the canonical community_prices DataFrame for wave ``t``.
 
     Returns a DataFrame indexed (t, v, j, u) with reported columns Price,
-    NumberOfUnits, Available.  Drops rows whose item failed to resolve to a
-    Preferred Label (j NaN) -- those cannot sit on the shared j axis.  Where
-    a unit failed to resolve (u NaN, rare 2013-14 data-entry artifacts) the
-    row is kept with u = <NA> in the index (the price is still reported).
+    NumberOfUnits, Available, and ``Derivation`` (the registry key on a
+    derived row, NA on a reported one).  Drops rows whose item failed to
+    resolve to a Preferred Label (j NaN) -- those cannot sit on the shared j
+    axis.  ``u``
+    arrives non-null from _price_block (GH #827): the item's fixed unit
+    where the form strikes out the unit cell, else the decoded code, else
+    the missing-unit sentinel ``Unknown`` (a blank or off-list code, which
+    includes every not-available row of an item whose unit IS asked -- the
+    skip pattern jumps past price and unit).  The row is kept either way.
+    After the collapse, ``derive_ck_struck_one_unit`` serves
+    ``NumberOfUnits = 1`` on a priced struck-item row (CK33 cigarettes
+    excepted) and stamps the key.
     """
     cat = pd.concat(pieces, ignore_index=True)
-    cat = cat[cat['j'].notna()].drop(columns=['_item_code'])
+    cat = cat[cat['j'].notna()]
 
     # Collapse any exact (v, j, u) duplicates (none expected -- (ea, item)
     # is unique per wave -- but guard the index).  first() keeps the single
-    # reported record.
+    # reported record.  `_item_code` rides along so the derivation below
+    # tests the item CODE, not its label.
     cat = cat.groupby(['t', 'v', 'j', 'u'], as_index=False, dropna=False).agg({
+        '_item_code':    'first',
         'Price':         'first',
         'NumberOfUnits': 'first',
         'Available':     'first',
     })
+    # Stamped AFTER the collapse (CLAUDE.md "Derived Values", step 3).
+    cat = derive_ck_struck_one_unit(cat).drop(columns=['_item_code'])
 
     # community_prices is a CLUSTER table -- there is no household i, the
     # natural grain is (t, v, j, u).  But the framework's
@@ -4284,10 +4382,126 @@ def assemble_community_prices(t, pieces):
     # reaches the API.
     cat['i'] = cat['v']
     out = cat.set_index(['t', 'v', 'i', 'j', 'u'])
-    out = out[['Price', 'NumberOfUnits', 'Available']]
+    out = out[['Price', 'NumberOfUnits', 'Available', 'Derivation']]
 
     chk = out.reset_index()
     assert not chk.duplicated(['t', 'v', 'j', 'u']).any(), \
         f"Non-unique (t,v,j,u) in community_prices {t}"
     assert len(out) > 0, f"community_prices {t} produced no rows"
     return out
+
+
+# GH #827 ruling (@ligon, 2026-10-23): "on struck-unit items, NumberOfUnits =
+# 1 as a registered derivation, consistent with Niger D2.  The form prices
+# one unit of the named item."  Registry entry: Malawi/_/derivations.yml.
+CK_STRUCK_ONE_UNIT = 'Malawi::community_prices::struck-item-one-unit'
+
+#: Struck items EXCLUDED from CK_STRUCK_ONE_UNIT (ruling @ligon 2026-10-23,
+#: round 2).  CK33 "Cigarettes, Embassy (packet)": its prices are bimodal --
+#: about 541 of the 1,599 priced rows sit at single-cigarette prices -- so a
+#: served 1 would assert "one packet" on about a third of the rows the data
+#: say were priced per stick.  Its `u` stays `Packet` (the printed text, from
+#: _CK_ITEM_FIXED_UNIT); its NumberOfUnits stays NA and carries no key.
+_CK_ONE_UNIT_EXCLUDED = {33: 'Cigarettes, Embassy (packet): prices bimodal, '
+                             'packet vs single cigarette'}
+
+
+def derive_ck_struck_one_unit(df):
+    """``NumberOfUnits = 1`` on a PRICED row of a struck Module CK item,
+    stamped with the registry key ``CK_STRUCK_ONE_UNIT`` in ``Derivation``.
+
+    On the 17 items of ``_CK_ITEM_FIXED_UNIT`` the form strikes out both the
+    NUMBER OF UNITS and the UNIT CODES cells (IHS3 Community p. 20, IHPS
+    Market p. 12, IHS5 Community p. 20): the item text names the unit
+    ("Coca-Cola, Fanta (bottle)", "Ganyu wage, 1 day, adult male") and the
+    price asked is the price of one of it.  No held file records a count on
+    any of their rows, so the 1 is a construction from the form, not an
+    answer, and the row carries the key.
+
+    Target rows: item code in ``_CK_ITEM_FIXED_UNIT`` and NOT in
+    ``_CK_ONE_UNIT_EXCLUDED`` (CK33 cigarettes, whose prices are bimodal
+    packet / single stick), ``Price`` recorded (not NA; a recorded 0 counts --
+    six 2019-20 mosquito-net rows), and ``NumberOfUnits`` NA.  A recorded
+    count is never overwritten.  A row with
+    no price gets no count: a count says what quantity a price refers to, and
+    Niger's ``one-item-per-price`` (the precedent) stamps only rows that carry
+    a price -- its reshape serves no unpriced row.  Unit-asked items are
+    untouched.
+
+    Takes a frame with ``_item_code`` (the bare 1-51 code), ``Price`` and
+    ``NumberOfUnits`` -- the collapsed frame inside
+    ``assemble_community_prices``, or a ``_price_block`` output -- and returns
+    a copy with ``Derivation`` added (the key on a target row, NA elsewhere).
+    No options; the raw rows are ``inputs_community_prices_struck_one_unit``.
+    """
+    if 'Derivation' in df.columns:
+        raise ValueError('derive_ck_struck_one_unit: the frame already carries '
+                         'a Derivation column; combine keys explicitly')
+    out = df.copy()
+    code = pd.to_numeric(out['_item_code'], errors='coerce').astype('Int64')
+    struck = code.isin(list(_CK_ITEM_FIXED_UNIT)).fillna(False).astype(bool)
+    struck &= ~code.isin(list(_CK_ONE_UNIT_EXCLUDED)).fillna(False).astype(bool)
+    nunits = out['NumberOfUnits'].astype('Float64')
+    target = struck & out['Price'].notna() & nunits.isna()
+    out['NumberOfUnits'] = nunits.mask(target, 1.0)
+    out['Derivation'] = pd.Series(pd.NA, index=out.index,
+                                  dtype='string').mask(target, CK_STRUCK_ONE_UNIT)
+    return out
+
+
+#: The Module CK price file(s) per wave, read exactly as the wave scripts
+#: (``<wave>/_/community_prices.py``) read them: the path under
+#: ``<wave>/Data/``, the ``_price_block`` column keywords, and whether the
+#: item code is the 'CK<n>' string (2013-14).  Used by the registry
+#: ``inputs`` callable; the data-gated #827 test checks it joins the
+#: served rows.
+_CK_PRICE_SOURCES = {
+    '2010-11': [('Full_Sample/Community/com_ck.dta',
+                 dict(ea_col='ea_id', item_col='com_ck00a', price_col='com_ck00b1',
+                      nunits_col='com_ck00b2', unit_col='com_ck00b3',
+                      avail_col='com_ck00c'), False)],
+    '2013-14': [('COM_MOD_K_13.dta',
+                 dict(ea_col='ea_id', item_col='com_ck00a', price_col='com_ck00b1',
+                      nunits_col='com_ck00b2', unit_col='com_ck00b3',
+                      avail_col='com_ck00c'), True)],
+    '2019-20': [(rel, dict(ea_col='ea_id', item_col='com_ck00a', price_col='ckb',
+                           nunits_col='ckc', unit_col='ckd', avail_col='cka'), False)
+                for rel in ('Cross_Sectional/com_ck.dta', 'Panel/com_ck_19.dta')],
+}
+
+
+def inputs_community_prices_struck_one_unit(wave):
+    """The registry ``inputs`` callable for ``CK_STRUCK_ONE_UNIT``: the raw
+    Module CK rows behind every served row that carries the key, one source
+    row per served row, under the ORIGINAL variable names (2010-11 / 2013-14
+    ``ea_id, com_ck00a, com_ck00c, com_ck00b1, com_ck00b2, com_ck00b3``;
+    2019-20 ``ea_id, com_ck00a, cka, ckb, ckc, ckd``) plus ``source_file``
+    (the file under ``<wave>/Data/``; 2019-20 has two halves).  Indexed by
+    the served ``(t, v, j, u)``, computed by the build's own
+    ``_price_block``, so each stamped row finds the record it came from.
+    """
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    if wave not in _CK_PRICE_SOURCES:
+        raise ValueError(f'community_prices Module CK is read for '
+                         f'{sorted(_CK_PRICE_SOURCES)}, not {wave!r}')
+    data = countries_root() / 'Malawi' / wave / 'Data'
+    frames = []
+    for rel, cols, strip_ck in _CK_PRICE_SOURCES[wave]:
+        raw = get_dataframe(str(data / rel),
+                            convert_categoricals=False).reset_index(drop=True)
+        block = derive_ck_struck_one_unit(
+            _price_block(raw, t=wave, strip_ck=strip_ck, **cols))
+        hit = block[(block['Derivation'] == CK_STRUCK_ONE_UNIT).fillna(False)
+                    & block['j'].notna()]
+        rows = raw.loc[hit.index].copy()
+        # _price_block keeps the source row's position as its index; check it.
+        recorded = pd.to_numeric(rows[cols['price_col']], errors='coerce')
+        assert recorded.astype('Float64').equals(hit['Price'].astype('Float64')), \
+            f'{wave} {rel}: inputs rows do not align with _price_block'
+        rows['source_file'] = rel
+        for k in ('t', 'v', 'j', 'u'):
+            rows[k] = hit[k].values
+        frames.append(rows)
+    out = pd.concat(frames, ignore_index=True)
+    return out.set_index(['t', 'v', 'j', 'u'])
