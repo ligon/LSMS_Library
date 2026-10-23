@@ -13,7 +13,7 @@ Merge them *together with every per-country PR you accept*, before anyone re-war
   - #1266 (Site Q, read path).  *Sequencing:* the second of #1263 / #1266 to land deletes #1263's "known excess" test block.
 - *Corpus re-warm:* #1233 (empty-frame fingerprint and cache race), #1251 (=map_index= -> =Unknown=, cold and warm).
 - *Per country* (each re-warms only its country, so it is free inside the corpus re-warm):
-  - Malawi: #1229, #1238, #1239, #1258 (country tier only), #1265 (also Nigeria).
+  - Malawi: #1229, #1238, #1239, #1258 (country tier only), #1265 (also Nigeria), #1269 (#637 tail: seed fan-out, blank harvests, 2010-11 repeats).
   - Niger: #1227, #1241 (also Senegal and CotedIvoire).
   - Nigeria: #1268 (W3 community prices =obs= 1/2), with #1265.
   - Burkina Faso: #1242, #1249.
@@ -52,7 +52,7 @@ Merge them *together with every per-country PR you accept*, before anyone re-war
 1235, 1237, 1240, 1243, 1244, 1245, 1247, 1250, 1252, 1253, 1254, 1256, 1259, 1260, 1261, 1264.  #1123 was narrowed.
 
 ** Still running at the time of writing
-#637 Malawi tail (vectorising, then PR); #824 Burkina 2018-19 =Unit_sold=; #824 Mali =Unit_sold= + #1267 tree-crop =Quantity=.
+#824 Burkina 2018-19 =Unit_sold=; #824 Mali =Unit_sold= + #1267 tree-crop =Quantity=; Ethiopia bundle #1253/#1252/#1256 STACKED on #1257 (branch =fix/1252-1253-1256-ethiopia-bundle-20261023=; its PR will target #1257's branch).
 
 * Current handoff -- 2026-10-22 evening, Sue / Claude Opus 5.5, job 40390255 (n0114.savio4, 12 cores, ~3 days)
 
