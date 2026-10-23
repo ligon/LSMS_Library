@@ -343,7 +343,8 @@ Data Scheme:
     # crop_production resolves crops via harmonize_food).  `crop` (index)
     # is the seed's crop on the shared harmonize_food Preferred Label (so
     # seed rows join food_acquired.j / crop_production.crop); non-seed
-    # crop-agnostic inputs carry crop = 'n/a'.  u is normalized to the
+    # crop-agnostic inputs carry crop = '(not crop-specific)' (the canonical
+    # marker, GH #1119; 'n/a' until 2026-10-23).  u is normalized to the
     # shared `u` table base labels (chemicals: Kg/g/l/cl; animal traction:
     # days).
     #

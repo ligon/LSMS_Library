@@ -944,12 +944,17 @@ def crop_production_for_wave(t, frames, crop_labels):
 # Tractor-Machinery) carried on the harmonize_input categorical table.
 # A `crop` index level (harmonize_food labels) disambiguates the multiple
 # seed rows a plot can carry (one per crop); non-seed inputs are not
-# crop-specific and carry crop = 'n/a' (a non-null sentinel so the index
-# stays unique and free of null index levels).
+# crop-specific and carry crop = '(not crop-specific)' -- the ONE canonical
+# marker for an input applied to the plot or farm as a whole (GH #1119,
+# @ligon 2026-10-23; lsms_library/data_info.yml, Index Info).  It replaced
+# this country's 'n/a' (34,641 rows); it is a non-null value so the index
+# stays unique and free of null index levels, and it is NOT the structural
+# plot_id sentinel `Farm-level`.
 #
 # Stores REPORTED item-level fields ONLY:
 #   input               harmonized input-type label (index)
-#   crop                seed's crop (index; 'n/a' for non-seed inputs)
+#   crop                seed's crop (index; '(not crop-specific)' for
+#                       non-seed inputs)
 #   Quantity, u         reported quantity + native unit
 #   Purchased           bool: any of this input acquired by purchase
 #   Quantity_purchased  reported purchased quantity (where recorded)
@@ -978,7 +983,9 @@ INPUT_HERBICIDE = 'Herbicide'
 INPUT_ANIMAL = 'Animal Traction'
 INPUT_TRACTOR = 'Tractor/Machinery'
 
-NO_CROP = 'n/a'      # crop-level sentinel for non-seed (crop-agnostic) rows
+# crop-level marker for non-seed (crop-agnostic) rows -- the canonical
+# spelling (GH #1119); was 'n/a' until 2026-10-23.
+NO_CROP = '(not crop-specific)'
 
 
 def _seed_unit_label(unit_series, unit_dec, where=''):
