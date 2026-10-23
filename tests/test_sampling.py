@@ -714,6 +714,9 @@ def test_the_warning_is_excluded_from_every_build_fingerprint():
 class TestShippedDeclarations:
 
     @pytest.mark.parametrize("country,wave,value", [
+        ("Niger", "2014-15", "stable"),              # ECVMA panel keeps GRAPPE
+        ("Niger", "2018-19", "redefined"),           # ECVMA / EHCVM serials overlap
+        ("Niger", "2021-22", "stable"),              # s00q07f1 == grappe
         ("GhanaLSS", "1988-89", "wave-scoped"),      # GLSS2 renumbering
         ("GhanaLSS", "1991-92", "unobservable"),     # no linkage: correct to group
         ("Ethiopia", "2013-14", "wave-scoped"),      # ea_id -> ea_id2
@@ -735,6 +738,27 @@ class TestShippedDeclarations:
         r = sampling_records("Tanzania")["2020-21"]
         assert r.household_continuity == "refresh"
         assert r.cluster_id_continuity == "unobservable"
+
+    def test_niger_programme_switch_warns_and_its_panels_do_not(self):
+        """Niger (GH #1247): ECVMA (2011-12, 2014-15) and EHCVM (2018-19,
+        2021-22) are two programmes with no household linkage, but BOTH number
+        their clusters from 1, so 267 ids recur and Region agrees on 27 --
+        chance.  `unobservable` is silent because grouping across DISJOINT
+        keyspaces is correct (GhanaLSS 1991-92); these overlap, so the
+        boundary must warn.  Inside EHCVM the 79 new 2021-22 grappes are
+        numbered 900-996, above 2018-19's 710 -- disjoint, which is why that
+        boundary is `stable` and not `mixed`.  The 2014-15 note names the
+        '20012' id collision so nobody re-measures it as a renumbering."""
+        recs = sampling_records("Niger")
+        r = recs["2018-19"]
+        assert r.household_continuity == "independent"
+        assert r.cluster_id_continuity in S.INCOMPARABLE_CLUSTER_IDS
+        note = " ".join(r["panel"]["cluster_id_note"].split())
+        assert "keyspaces OVERLAP" in note and "26.5 expected by chance" in note
+        for wave in ("2014-15", "2021-22"):
+            assert recs[wave].cluster_id_continuity not in S.INCOMPARABLE_CLUSTER_IDS
+        assert "DISJOINT" in recs["2021-22"]["panel"]["cluster_id_note"]
+        assert "'20012'" in recs["2014-15"]["panel"]["cluster_id_note"]
 
     def test_a_verified_linkage_is_never_declared_unobservable(self):
         """Uganda 2010-11 -> 2011-12: 2,510 households link and 0 keep `v`,
@@ -791,6 +815,23 @@ class TestTheReproduction:
         _, caught = warns(lambda: self._fresh().household_roster(
             waves=["2005-06", "2012-13"]))
         assert caught == []
+
+    def test_niger_warns_across_the_ecvma_ehcvm_boundary_only(self):
+        """GH #1247: 2014-15 (ECVMA `GRAPPE`) and 2018-19 (EHCVM `grappe`)
+        reuse the integers 1-270 for unrelated clusters; each programme's
+        panel keeps its own `v`.  One warning wherever that boundary is
+        spanned, none inside either panel."""
+        S._clear_sampling_reports()
+        _, caught = warns(lambda: self._fresh("Niger").sample(
+            waves=["2014-15", "2018-19"]))
+        assert len(caught) == 1, [str(w.message)[:200] for w in caught]
+        assert ("2014-15 -> 2018-19: cluster_id_continuity=redefined"
+                in str(caught[0].message))
+        _, caught = warns(lambda: self._fresh("Niger").sample())
+        assert len(caught) == 1, [str(w.message)[:200] for w in caught]
+        for pair in (["2011-12", "2014-15"], ["2018-19", "2021-22"]):
+            _, caught = warns(lambda: self._fresh("Niger").sample(waves=pair))
+            assert caught == [], (pair, [str(w.message)[:200] for w in caught])
 
     def test_the_served_data_are_identical_with_and_without_the_record(
             self, monkeypatch):
