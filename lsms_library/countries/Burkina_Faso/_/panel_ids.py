@@ -74,10 +74,20 @@ baseline_ids = {
     .itertuples(index=False)
 }
 
-# Read the 2021-22 cover sheet.  Today every row is a panel household
-# (3,227 rows, all with a non-null grappe_EHCVM1), but do not *assume* that:
-# see the full-cover cur_set below (GH #548).
+# Read the 2021-22 cover sheets.  The round has TWO components (GH #1276):
+# Data/Panel/ (WB 6224, 3,227 panel households, all with a non-null
+# grappe_EHCVM1) and Data/Cross_Section/ (WB 6277, 7,176 households of a new
+# frame, no 2018-19 antecedent and no linkage columns).  Only the panel cover
+# yields links; BOTH covers are "occupied" 2021-22 ids for the collision guard
+# below -- the Mali GH #536 rule: the occupied set is EVERY 2021-22 household,
+# not just the panel-linked ones.
 df = get_dataframe('../2021-22/Data/Panel/s00_me_bfa2021.dta', convert_categoricals=True)
+cross = get_dataframe('../2021-22/Data/Cross_Section/s00_me_bfa2021.dta',
+                      convert_categoricals=True)
+cross_ids = {_id_2021_22(g, m) for g, m in
+             cross[['grappe', 'menage']].itertuples(index=False)}
+cross_ids.discard(None)
+assert len(cross_ids) == len(cross), "cross-section (grappe, menage) not unique"
 
 # Current wave ID, in the 2021-22 tables' format.  The survey's hhid carries
 # the same digits; assert it so a future release that changes either fails
@@ -95,8 +105,15 @@ assert (df['i'] == _hhid).all(), (
 _prev = [_id_2018_19(g, m) for g, m in
          df[['grappe_EHCVM1', 'menage_EHCVM1']].itertuples(index=False)]
 orphans = sum(p is not None and p not in baseline_ids for p in _prev)
+# A target that IS a cross-section household's live id would be a rename onto
+# a household that keeps its id -- a merge under id_walk's single pass, and a
+# raw 2021-22 frame that id_walk refuses as mixed (local_tools.id_walk).  The
+# Mali #536 rule: drop such a link and count it.  (The cross-section's ids are
+# namespaced apart by GH #1244, after which this count is 0.)
+held_by_cross = sum(p is not None and p in baseline_ids and p in cross_ids
+                    for p in _prev)
 df['previous_i'] = pd.Series(
-    [p if p in baseline_ids else pd.NA for p in _prev],
+    [p if (p in baseline_ids and p not in cross_ids) else pd.NA for p in _prev],
     index=df.index, dtype=object)
 
 df['t'] = '2021-22'
@@ -131,7 +148,9 @@ D, updated_ids = panel_ids(panel_df)
 # silently: a future cover with refreshment households fails here, at
 # regeneration, instead of colliding at read time.  The "occupied" set is the
 # FULL cover, not just panel-linked rows (GH #548 / #536).
-cur_set = set(df['i'].dropna())
+cur_set = set(df['i'].dropna()) | cross_ids
+assert not (set(df['i'].dropna()) & cross_ids), (
+    "a panel household's 2021-22 id equals a cross-section household's")
 _w21 = updated_ids.get('2021-22', {})
 _held = sorted(prev for cur, prev in _w21.items()
                if prev != cur and prev in cur_set and _w21.get(prev, prev) == prev)
@@ -156,4 +175,5 @@ with open(_HERE / 'updated_ids.json', 'w') as f:
 
 print(f"Burkina Faso 2021-22 -> 2018-19: {len(_w21)} linked "
       f"({chained} onto an id another 2021-22 household moves off, "
-      f"{orphans} targets absent from the 2018-19 cover)")
+      f"{orphans} targets absent from the 2018-19 cover, "
+      f"{held_by_cross} dropped: target held by a cross-section household)")

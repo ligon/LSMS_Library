@@ -9,7 +9,6 @@ from lsms_library.transformations import (
 from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
     food_acquired_ehcvm as _food_acquired_ehcvm,
-    inputs_last_purchase as _inputs_last_purchase,
 )
 
 # GH #876.  The wide frame's `Expenditure` used to be `s07bq08`, the value of
@@ -24,12 +23,48 @@ FOOD_ACQUIRED_DERIVATION = _derivation_key('Burkina_Faso')
 def inputs_food_acquired(wave):
     """The registry `inputs` callable: raw section-7B answers at (t, i, j).
 
+    ``Burkina_Faso/_/derivations.yml`` points at THIS wrapper for both EHCVM
+    waves (GH #1276).  2021-22 reads ``s07b_me_bfa2021.dta`` from two
+    components -- ``Panel/`` (WB 6224) and ``Cross_Section/`` (WB 6277) -- and
+    ``ehcvm.inputs_last_purchase`` assumes ONE ``file:``
+    (``(filename, cols), = mapping.items()``).  So this is that function with a
+    loop over the files, each read with its OWN per-file mapping (a per-file
+    ``i`` override reaches the raw frame exactly as it reaches the served one).
+    A wave with one file (2018-19) gets the same frame
+    ``inputs_last_purchase`` returns.
+
+    Kept here, not in ``lsms_library/ehcvm.py``: ``inputs_last_purchase`` is in
+    the import closure of all twelve EHCVM waves' ``mapping.py``, so editing it
+    would move eight countries' cache hashes; this file moves Burkina's only.
+
     A wave-level wrapper rather than a `functools.partial` in the country
     module, so that binding the country name does not put this code in
     Burkina_Faso/_/burkina_faso.py -- which is in EVERY Burkina_Faso table's cache
     fingerprint.
     """
-    return _inputs_last_purchase('Burkina_Faso', wave)
+    from lsms_library.country import Country
+    from lsms_library.ehcvm import RAW_VARIABLES, _normalise_index_as_served
+    from lsms_library.local_tools import df_data_grabber
+
+    wave_obj = Country('Burkina_Faso')[wave]
+    info = wave_obj.resources.get('food_acquired')
+    if not info:
+        raise ValueError(f"Burkina_Faso/{wave} declares no food_acquired in data_info.yml")
+    spec = dict(info)
+    spec['idxvars'] = {k: v for k, v in spec['idxvars'].items() if k in ('i', 'j')}
+    spec['myvars'] = {name: name for name in RAW_VARIABLES}
+    mapping = wave_obj.column_mapping('food_acquired', spec)
+    mapping.pop('df_edit', None)
+    mapping.pop('datetime_specs', None)
+    frames = []
+    for filename, cols in mapping.items():
+        out = df_data_grabber(str(wave_obj.file_path / 'Data' / filename),
+                              cols['idxvars'], **cols['myvars'])
+        frames.append(out.reset_index())
+    out = pd.concat(frames, ignore_index=True)
+    out['t'] = wave
+    out = out.set_index(['t', 'i', 'j'])[RAW_VARIABLES]
+    return _normalise_index_as_served(out, wave_obj)
 
 
 def food_acquired(df):

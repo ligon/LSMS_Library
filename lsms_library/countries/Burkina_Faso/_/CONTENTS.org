@@ -296,6 +296,13 @@ what this sample can represent.
 
 *** THE THING TO KNOW: this wave is a panel sub-sample, not a fresh national draw
 
+/Superseded in part, 2026-10-23 (GH #1276): this describes WB 6224, the panel
+COMPONENT of the round.  The same round also has a fresh cross-section, WB
+6277 (7,176 households, 600 new grappes from the 2019 census frame), which the
+library now holds in =Data/Cross_Section/= and serves beside the panel -- see
+the section "2021-22 is ONE round in TWO catalog entries" at the end of this
+file.  Everything below remains true of the panel component./
+
 =bid_bfa_ehcvm2.pdf=, "Sample", p. 4, VERBATIM (three separate passages from that
 page):
 
@@ -1928,3 +1935,64 @@ grappe), not the panel's =ehcvm_panel_ponderations_bfa2021.dta=.  Its cover
 ponderations file's by up to 0.5 per grappe (ratio 0.98-1.01: the cover's is
 rounded) -- the ponderations file is the one wired, as in the other two EHCVM
 waves.
+
+*Phase 3 (both components served).*  Every 2021-22 table that reads a
+household file now reads it from both components: the 12 single-file
+=data_info.yml= blocks are two-file lists (=Panel/<f>=, =Cross_Section/<f>=),
+=2021-22/_/plot_features.py= reads both =s16a= files, and the derivation
+registry's raw-input callable reads both =s07b= files.
+- *Weights* (@ligon's ruling, the Malawi precedent): =weight= is each
+  component's own weight -- the panel's =hhweight2021=, the cross-section's
+  =hhweight= (a per-file override) -- and =panel_weight= is the panel's
+  =hhweight_panel= only: NaN for all 7,176 cross-section households, because
+  the cross-section's weights file has no such column and a two-file read
+  passes =missing_ok=True=.  Each component is weighted to the national total
+  on its own: raw sums over households 3,084,993 (=hhweight2021=, 3,227 panel
+  households) and 3,233,016 (=hhweight=, 7,176 cross-section households).  *A
+  pooled 2021-22 weighted mean therefore BLENDS TWO FRAMES*, each counted as
+  if it were the whole country: 48.8% / 51.2% of the weight, and after
+  =_normalise_sample_weights= a panel household's mean weight is 1.574
+  against a cross-section household's 0.742.  To analyse one frame, select
+  on =v= (=<= 585= is the panel, =>= 586= the cross-section) or rescale.
+- *Columns one component lacks.*  A two-file =file:= list fills a column
+  absent from one file with NaN instead of raising.  Measured on the headers
+  of every file each block reads: the only requested column absent from a
+  component is =hhweight_panel= (the cross-section's weights file) -- honest:
+  the cross-section has no panel weight.  =plot_features= (a script) reads the
+  parcel coordinates =s16aq46__latitude= / =__longitude=, which 6277 does not
+  ship; its parcels carry =Latitude= / =Longitude= NA, explicitly, and honest
+  ("not shipped for this component"; both are =optional: true= value columns,
+  not index levels, so no sentinel applies).  6277 also lacks the panel's
+  preloaded-roster block =s01q00b=-=s01q00f= (and =s00q06=-=s00q20=, the
+  panel-tracking questions of the cover), the cover's household GPS
+  timestamp/accuracy/altitude, =s16aq03b=, and most of the fishing module
+  =s18_1=/=s18_2=/=s18_3= (the files ship, the question columns do not); *no
+  table reads any of them*, so none becomes a served NaN.
+- *Panel crosswalk* (the Mali #536 rule): =_/panel_ids.py= now counts BOTH
+  covers as occupied 2021-22 ids.  Two panel households' 2018-19 targets are
+  ids a cross-section household serves as its own (the investigation's "2
+  crosswalk targets collide"), and a single-pass =id_walk= rename onto them
+  would merge two households -- =id_walk= refuses such a frame as mixed.  So
+  those 2 links are dropped and counted: 3,227 -> 3,225 entries (0 changed, 0
+  added).  The two households keep their 2021-22 ids, neither of which is a
+  2018-19 id.  This is the state BEFORE the cross-section's ids are
+  namespaced (GH #1244, Phase 4 below), which makes both links come back.
+- *Not yet namespaced*: 9 cross-section ids equal a 2018-19 id (2018-19
+  builds =i= as =grappe + '0' + menage.zfill(2)=, so (59, 612) spells
+  ='590612'=, which is also the cross-section's (590, 612)).
+- =ehcvm.inputs_last_purchase= assumes one =file:=; the registry's =inputs:=
+  for Burkina now points at =2021-22/_/mapping.py:inputs_food_acquired=, which
+  loops over the files with each file's own mapping.  Not generalised in
+  =lsms_library/ehcvm.py= because that function is in the import closure of
+  all twelve EHCVM waves' =mapping.py=: an edit there moves eight countries'
+  cache hashes.
+- =sampling.yml= 2021-22: =household_continuity: rotating-panel= (was
+  =panel=), =cluster_id_continuity: stable= unchanged -- the cross-section's
+  grappes 586-1185 are disjoint from 2018-19's 1-585 (the Niger 2021-22
+  precedent).  =population.yml= 2021-22: =mixed-national+panel= (was
+  =panel-inherited=), regenerated from the evidence document; the
+  cross-section's universe field is the NADA boilerplate, and its BID records
+  a FRAME exclusion: "Some EAs, inaccessible due to security reasons, were
+  excluded from the sampling frame before the selection of the 600 sample
+  EAs.  However, all strata for analysis (regions) are represented in the
+  sample." (6277 BID, PDF p. 16; the BID is a catalog resource, not held).

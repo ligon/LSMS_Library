@@ -96,8 +96,8 @@ UNIVERSE_TAGS: frozenset[str] = frozenset({
     "region-excluded",           # 18 -- national minus named regions/districts
     "subnational-area",          # 11 -- a named sub-national area from the outset
     "not-stated",                #  7 -- no population statement exists
-    "panel-inherited",           #  5 -- defined only by reference to an earlier wave
-    "mixed-national+panel",      #  2 -- one wave dir, two declared universes
+    "panel-inherited",           #  4 -- defined only by reference to an earlier wave
+    "mixed-national+panel",      #  3 -- one wave dir, two declared universes
     "rural-and-small-town",      #  1 -- Ethiopia ESS1
     "specialized",               #  1 -- Liberia NHFS (forest-proximate EAs)
     "agricultural-households",   #  1 -- Nigeria 2012-13 (per the WB catalog field)

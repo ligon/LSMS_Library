@@ -22,7 +22,7 @@ What it checks before writing (any failure aborts)
 2. Every entry's ``source_type`` / ``confidence`` / ``universe_tag`` agrees with
    the independent summary table in section 2.
 3. The resulting tag / source_type / confidence histograms equal the counts the
-   document itself publishes (40/28/18/11/7/5/2/1/1/1, 66/41/7, 88/24/2;
+   document itself publishes (40/28/18/11/7/4/3/1/1/1, 66/41/7, 88/24/2;
    111 waves in the 2026-07-21 sweep plus GhanaAHIES 2022/2023/2024, whose
    three year rows expand to twelve quarter labels via wave_folder_map).
 4. Every wave in ``Country.waves``, for every configured country, receives
@@ -75,8 +75,8 @@ EXPECTED_TAGS = {
     "region-excluded": 18,
     "subnational-area": 11,
     "not-stated": 7,
-    "panel-inherited": 5,
-    "mixed-national+panel": 2,
+    "panel-inherited": 4,
+    "mixed-national+panel": 3,
     "rural-and-small-town": 1,
     "specialized": 1,
     "agricultural-households": 1,

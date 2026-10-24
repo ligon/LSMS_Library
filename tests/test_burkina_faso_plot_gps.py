@@ -1,4 +1,10 @@
-"""Source-faithful optional Burkina 2021 parcel coordinates (GH #1058)."""
+"""Source-faithful optional Burkina 2021 parcel coordinates (GH #1058).
+
+2021-22 reads s16a from BOTH components of the round (GH #1276): the panel
+(Data/Panel/, WB 6224) ships s16aq46 coordinates; the cross-section
+(Data/Cross_Section/, WB 6277) ships none, so its parcels are served with
+Latitude / Longitude NA.
+"""
 import ast
 import importlib.util
 import runpy
@@ -58,29 +64,51 @@ def source():
     }, index=[2, 5, 9, 13, 21, 34])
 
 
-def _id(grappe, menage, wave):
+@pytest.fixture
+def cross_source(source):
+    """A cross-section s16a: same instrument, its own grappes (586-1185), and
+    no s16aq46 columns -- as WB 6277 ships it."""
+    cross = source.drop(columns=list(POSITIONS.values())).copy()
+    cross['grappe'] = 600
+    return cross
+
+
+def _id(grappe, menage, wave, component='panel'):
     if wave == '2021-22':
         return tools.format_id(grappe) + tools.format_id(menage, zeropadding=3)
     return (tools.format_id(grappe) + '0'
             + tools.format_id(menage, zeropadding=2))
 
 
-def _expected(source, wave):
+def _expected(source, wave, component='panel'):
     rows = source.loc[source.s16aq02.notna() & source.s16aq03.notna()]
+    if component == 'cross':
+        lat = lon = pd.array([pd.NA] * len(rows), dtype='Float64')
+    else:
+        lat = pd.array(rows.s16aq46__latitude, dtype='Float64')
+        lon = pd.array(rows.s16aq46__longitude, dtype='Float64')
     expected = pd.DataFrame({
         't': wave,
-        'i': [_id(g, m, wave) for g, m in zip(rows.grappe, rows.menage)],
+        'i': [_id(g, m, wave, component) for g, m in zip(rows.grappe, rows.menage)],
         'plot_id': [tools.format_id(f) + '_' + tools.format_id(p)
                     for f, p in zip(rows.s16aq02, rows.s16aq03)],
-        'Latitude': pd.array(rows.s16aq46__latitude, dtype='Float64'),
-        'Longitude': pd.array(rows.s16aq46__longitude, dtype='Float64'),
+        'Latitude': lat,
+        'Longitude': lon,
     })
     return expected.set_index(['t', 'i', 'plot_id'])
 
 
-def _assert_positions(frame, source, wave):
+def _expected_2021(panel, cross):
+    """Both components of 2021-22, panel first (the script's concat order)."""
+    return pd.concat([_expected(panel, '2021-22'),
+                      _expected(cross, '2021-22', 'cross')])
+
+
+def _assert_positions(frame, source, wave, expected=None):
+    if expected is None:
+        expected = _expected(source, wave)
     pd.testing.assert_frame_equal(frame[['Latitude', 'Longitude']],
-                                  _expected(source, wave), check_exact=True)
+                                  expected, check_exact=True)
 
 
 def _build(helper, source, colmap):
@@ -125,13 +153,18 @@ def test_absent_optional_keys_leave_existing_wave_columns(helper, source):
 
 
 @pytest.mark.parametrize('wave', ['2018-19', '2021-22'])
-def test_actual_wave_script_binds_its_source_and_formatter(monkeypatch, source, wave):
+def test_actual_wave_script_binds_its_source_and_formatter(monkeypatch, source,
+                                                          cross_source, wave):
     captured = {}
+    reads = []
 
     def read(path, convert_categoricals=True):
         assert not convert_categoricals
         assert Path(path).name == ('s16a_me_bfa2018.dta' if wave == '2018-19'
                                    else 's16a_me_bfa2021.dta')
+        reads.append(Path(path).parent.name)
+        if Path(path).parent.name == 'Cross_Section':
+            return cross_source.copy()
         return source.copy()
 
     def write(frame, path):
@@ -145,10 +178,12 @@ def test_actual_wave_script_binds_its_source_and_formatter(monkeypatch, source, 
     runpy.run_path(str(ROOT / wave / '_' / 'plot_features.py'))
     result = captured['frame']
     if wave == '2021-22':
-        _assert_positions(result, source, wave)
+        assert reads == ['Panel', 'Cross_Section'], reads
+        expected = _expected_2021(source, cross_source)
+        _assert_positions(result, source, wave, expected)
     else:
         assert list(result.columns) == OLD_COLUMNS
-    expected = _expected(source, wave)
+        expected = _expected(source, wave)
     pd.testing.assert_index_equal(result.index, expected.index)
 
 
@@ -182,20 +217,22 @@ def test_held_wave_output_matches_native_source_coordinates(wave):
     if wave == '2018-19':
         assert list(frame.columns) == OLD_COLUMNS
     else:
-        source = tools.get_dataframe(ROOT / wave / 'Data' / 'Panel' /
-                                     's16a_me_bfa2021.dta',
-                                     convert_categoricals=False)
-        _assert_positions(frame, source, wave)
+        panel, cross = (tools.get_dataframe(ROOT / wave / 'Data' / sub /
+                                            's16a_me_bfa2021.dta',
+                                            convert_categoricals=False)
+                        for sub in ('Panel', 'Cross_Section'))
+        _assert_positions(frame, panel, wave, _expected_2021(panel, cross))
 
 
 @pytest.mark.requires_s3
 def test_public_coordinates_follow_existing_panel_key_mapping():
     country = ll.Country('Burkina_Faso')
     actual = country.plot_features(waves=['2021-22'])
-    source = tools.get_dataframe(ROOT / '2021-22' / 'Data' / 'Panel' /
-                                 's16a_me_bfa2021.dta',
-                                 convert_categoricals=False)
-    expected = tools.id_walk(_expected(source, '2021-22'), country.updated_ids)
+    panel, cross = (tools.get_dataframe(ROOT / '2021-22' / 'Data' / sub /
+                                        's16a_me_bfa2021.dta',
+                                        convert_categoricals=False)
+                    for sub in ('Panel', 'Cross_Section'))
+    expected = tools.id_walk(_expected_2021(panel, cross), country.updated_ids)
     actual = actual[['Latitude', 'Longitude']].droplevel('v')
     actual = actual.reorder_levels(expected.index.names)
     pd.testing.assert_frame_equal(actual.sort_index(), expected.sort_index(),

@@ -1,6 +1,14 @@
 """Build plot_features for Burkina Faso EHCVM 2021-22 (GH #167; EHCVM cluster).
 
-Single source file: s16a_me_bfa2021.dta (agriculture-parcel module).
+Source: s16a_me_bfa2021.dta (agriculture-parcel module), from BOTH components
+of the round (GH #1276): ``Data/Panel/`` (WB 6224, the panel) and
+``Data/Cross_Section/`` (WB 6277, the cross-section).  Same instrument, same
+variables, with one exception: the cross-section's release ships no parcel
+coordinates (no ``s16aq46__latitude`` / ``__longitude``), so its rows carry
+``Latitude`` / ``Longitude`` NA -- "not shipped for this component", not a
+measured absence.  ``plot_features_for_wave`` raises on a declared column the
+source lacks, so the cross-section is built without those two keys and the
+columns are added empty.
 plot_id = "{field_no}_{parcel_no}" (s16aq02 _ s16aq03); unique within
 each (grappe, menage).  See
 lsms_library/countries/Burkina_Faso/_/burkina_faso.py:plot_features_for_wave
@@ -33,7 +41,9 @@ def _old_i(grappe, menage):
 
 # convert_categoricals=False keeps the integer s16a codes that the
 # categorical_mapping.org harmonize_* tables key on.
-src = get_dataframe('../Data/Panel/s16a_me_bfa2021.dta', convert_categoricals=False)
+panel = get_dataframe('../Data/Panel/s16a_me_bfa2021.dta', convert_categoricals=False)
+cross = get_dataframe('../Data/Cross_Section/s16a_me_bfa2021.dta',
+                      convert_categoricals=False)
 
 colmap = dict(
     grappe        = 'grappe',
@@ -52,7 +62,16 @@ colmap = dict(
     water_source  = 's16aq17',
 )
 
-df = plot_features_for_wave('2021-22', src, colmap, id_fn=_old_i)
+df_panel = plot_features_for_wave('2021-22', panel, colmap, id_fn=_old_i)
+
+# The cross-section ships no s16aq46: no coordinate keys, then empty columns.
+colmap_cross = {k: v for k, v in colmap.items() if k not in ('latitude', 'longitude')}
+df_cross = plot_features_for_wave('2021-22', cross, colmap_cross, id_fn=_old_i)
+for col in ('Latitude', 'Longitude'):
+    df_cross[col] = pd.array([pd.NA] * len(df_cross), dtype='Float64')
+df_cross = df_cross[df_panel.columns]
+
+df = pd.concat([df_panel, df_cross])
 
 assert df.index.is_unique, "Non-unique (t, i, plot_id) index in plot_features 2021-22"
 assert len(df) > 0, "plot_features 2021-22 produced no rows"

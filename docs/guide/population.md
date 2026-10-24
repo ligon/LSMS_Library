@@ -136,8 +136,8 @@ the extractor's `notes`. The exclusions matter most: they are what makes two
 | `region-excluded` | 18 | national minus named regions (Tirana, Kosovo and Metohija, Likoma, Kidal, Tigray, Arlit, rural Borno, FATA, …) |
 | `subnational-area` | 11 | a named sub-national area from the outset (rural Hebei/Liaoning; four UP/Bihar regions; 15 Ethiopian peasant associations; metropolitan Lima) |
 | `not-stated` | 7 | no population statement exists |
-| `panel-inherited` | 5 | defined only by reference to an earlier wave's sample |
-| `mixed-national+panel` | 2 | one wave directory, two declared universes (Malawi IHS4/IHS5 + IHPS) |
+| `panel-inherited` | 4 | defined only by reference to an earlier wave's sample |
+| `mixed-national+panel` | 3 | one wave directory, two declared universes (Malawi IHS4/IHS5 + IHPS; Burkina Faso 2021-22 EHCVM-2 cross-section + EHCVM-P panel, GH #1276) |
 | `rural-and-small-town` | 1 | Ethiopia ESS1 |
 | `specialized` | 1 | Liberia NHFS — forest-proximate EAs, urban Montserrado excluded |
 | `agricultural-households` | 1 | Nigeria 2012-13, per the WB catalog's own `Universe` field |

@@ -26,7 +26,10 @@ Burkina_Faso::food_acquired::7day-purchase-at-last-purchase-unit-value:
     Expenditure was s07bq08 itself: the value of one purchase of unrecorded
     size made up to 30 days earlier, beside a 7-day quantity.
   function: lsms_library.ehcvm:derive_ehcvm_purchase_value
-  inputs: lsms_library.countries.Burkina_Faso.2018-19._.mapping:inputs_food_acquired
+  # 2021-22 reads s07b from two components (Panel/ = WB 6224, Cross_Section/ =
+  # WB 6277; GH #1276), and ehcvm.inputs_last_purchase assumes one file; the
+  # 2021-22 wrapper loops over the files and serves 2018-19 identically.
+  inputs: lsms_library.countries.Burkina_Faso.2021-22._.mapping:inputs_food_acquired
   raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s07bq07a,
                   s07bq07b, s07bq07c, s07bq08]
   assumptions:
