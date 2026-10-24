@@ -4366,10 +4366,22 @@ label) -- its own before/after, not done here.
 ** What this does NOT fix
 The two whole-wave =i= mismatches (TODO under "Known Issues": =housing=
 2015-16, =nonfood_expenditures= 2009-10 / 2010-11) keep a NaN =v= on every
-row -- they are not unlocated households.  So Site I and
-=LSMS_READ_STRICT=1= are clean on =v= and =plot_id= for every Uganda plot
-table (and on =v= for every other v-joined table), but NOT for those two
-tables.
+row -- they are not unlocated households.
+
+Measured under =LSMS_READ_STRICT=1= on the warm branch cache (base in
+brackets): =plot_labor= and =plot_inputs= now pass [both raised
+=NullIndexKeyError= on =v= and =plot_id=], as do =sample=,
+=household_roster=, =food_acquired= and =earnings= [the roster and
+=food_acquired= raised on =v=].  Site I finds no NaN =v= or =plot_id= on
+=crop_production= or =plot_features= either, but both still raise under the
+same lever for an UNRELATED, pre-existing Site B finding (a required column
+100% null in some wave: =crop_production.harvest_month= in 2009-10 / 2010-11,
+=plot_features.ErosionProtection= in 2005-06), as does =anthropometry=
+(=Age_months=, 2018-19 / 2019-20).  =nonfood_expenditures= still raises
+=NullIndexKeyError= on =v= -- 54,027 rows, 2009-10 / 2010-11, the id mismatch
+above (base 54,048: its 21 2013-14 / 2019-20 rows were blank-cluster-field
+households, now singletons).  =housing= passes because =v= is not one of its
+declared index levels, so Site I does not count its 3,312.
 
 ** Cost
 =uganda.py=, =data_scheme.yml= and four wave =data_info.yml= files are in
