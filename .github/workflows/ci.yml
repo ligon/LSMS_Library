@@ -493,7 +493,15 @@ jobs:
         # assertion's source line and the test's own message, so a test that
         # follows the counts-only message convention cannot leak.  Local runs keep
         # full introspection.
+        # `--disable-warnings`: the library's audit warnings NAME rows by design
+        # (Site Q prints `i=<household>` beside the item; grain and null-key
+        # reports list keys), and pytest's warnings summary prints every uncaught
+        # one -- measured on the full suite: 415 warning entries, Site Q lines
+        # carrying household ids.  The flag hides only the summary DISPLAY;
+        # `pytest.warns` / `recwarn` capture is unchanged (verified).  `--tb=short`
+        # (kept) already omits the failing test's argument values, which the
+        # default long traceback would print (fixtures that are whole frames).
         run: >-
-          poetry run pytest --tb=short --assert=plain
+          poetry run pytest --tb=short --assert=plain --disable-warnings
           --timeout=600 --timeout-method=thread
           --durations=25
