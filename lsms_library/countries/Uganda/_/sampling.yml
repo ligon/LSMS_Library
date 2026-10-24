@@ -477,7 +477,12 @@ Sampling:
         The `DISTRICT/PARISH` composite both sides.  Measured: 2,812 of 2,986 linked
         households (94.2%) keep `v`; the changes are single households, among them
         district re-creation (Kwania carved from Apac) and parish-name spellings
-        (`NICU PARISH` / `NICU`) -- not a renumbering of clusters.
+        (`NICU PARISH` / `NICU`) -- not a renumbering of clusters.  Since GH #1120
+        D2 (2026-10-23) 2018-19's frame also holds 66 households GSEC1 does not
+        (it ships only `response_status == 1`); no 2018-19 file locates them, so
+        each is its own `moved-{hhid}` singleton, and 43 of them link to 2019-20
+        (3,029 linked; the 2,986 both covers locate are the figure above) -- a
+        household fact, not a renumbering, as at 2010-11 -> 2011-12.
       source_type: derived-from-data
       confidence: medium
       source_file: null
