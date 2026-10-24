@@ -296,6 +296,15 @@ def test_a_seed_line_with_no_crop_code_is_dropped_and_counted(mw):
 # data-gated pins on the built tables (counts and sums only)
 # ---------------------------------------------------------------------------
 
+class _Tables(dict):
+    """The built tables.  pytest prints a failing test's ARGUMENTS in a long
+    traceback, and the tail of a frame's repr shows a row -- with its ids --
+    so the repr is withheld."""
+
+    def __repr__(self):
+        return f'<Malawi tables {sorted(self)}: repr withheld (the frames hold ids)>'
+
+
 @pytest.fixture(scope='module')
 def built():
     import lsms_library as ll
@@ -315,8 +324,8 @@ def built():
     # tests assert counts; the warnings are not what they test.
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        return {t: getattr(c, t)().reset_index()
-                for t in ('crop_production', 'plot_labor', 'plot_inputs')}
+        return _Tables({t: getattr(c, t)().reset_index()
+                        for t in ('crop_production', 'plot_labor', 'plot_inputs')})
 
 
 def _by_wave(df, f):

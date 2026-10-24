@@ -270,7 +270,11 @@ LATER_MODULES = {
 def _country_table(table):
     import lsms_library as ll
     try:   # skip ONLY on an unavailable source; any other error is a failure
-        return getattr(ll.Country('Malawi'), table)()
+        # Warnings silenced: Site Q's QuantityImplausibleWarning names the
+        # offending households, and pytest prints warnings (a public CI log).
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            return getattr(ll.Country('Malawi'), table)()
     except FileNotFoundError as e:                  # pragma: no cover - no microdata
         pytest.skip(f'Malawi {table} not buildable here: {e}')
 
@@ -411,8 +415,8 @@ class TestRawOracle:
         assert na_exp == na_q == HARVEST_NA[wave], (na_exp, na_q, HARVEST_NA[wave])
         sum_exp, sum_q = float(exp.sum()), float(q.sum())
         assert sum_exp == pytest.approx(sum_q, abs=1e-6)
-        unk_exp = int((exp.index.get_level_values('plot_id') == 'unknown_plot').sum())
-        unk_q = int((q.index.get_level_values('plot_id') == 'unknown_plot').sum())
+        unk_exp = int(exp.index.get_level_values('plot_id').isin(['unknown_plot']).sum())
+        unk_q = int(q.index.get_level_values('plot_id').isin(['unknown_plot']).sum())
         assert unk_exp == unk_q, (unk_exp, unk_q)
 
 
