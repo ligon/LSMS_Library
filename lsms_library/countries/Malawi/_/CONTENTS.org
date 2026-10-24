@@ -2621,8 +2621,11 @@ Verified before applying the rule (counts in the evidence below):
   test now asserts the 0 NaN, so the agreement is checked, not assumed.
 - It measures what it says: the geo file's =distY1Y2= is populated for
   exactly the 724 households whose coordinate is off their EA's fix and
-  equals =dist_to_IHS3location= on every one; every household within 1 km
-  sits on the fix.
+  agrees with =dist_to_IHS3location= within 0.0001 km on every one
+  (maximum difference 0.0000293 km), rather than being exactly equal;
+  every household within 1 km sits on the fix.  Independent review on
+  2026-10-24 found that rounding the maximum to four decimals had hidden
+  this floating-point precision difference; no retention decision changes.
 - The stayers cover all 204 EAs (min 4, median 13), 0 EAs split (also at
   0.5, 2 and 5 km), and their fix equals the 2010-11 coordinate in all 204
   (max 1.89e-6 degrees), continuing and short-term-only EAs alike.
