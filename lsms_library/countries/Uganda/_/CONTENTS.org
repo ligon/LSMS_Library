@@ -149,6 +149,16 @@ frame carrying =v= across them:
    two boundaries are declared =mixed=.
 3. *A change of KIND*: EA (=comm=) -> parish code (2013-14) -> =DISTRICT/PARISH=
    name composite (2018-19).  Declared =redefined=; no crosswalk can exist.
+   /Measured 2026-10-23 (GH #1135 review), not adjudicated:/ at 2015-16 ->
+   2018-19, 576 of the 788 earlier parish codes whose households change =v=
+   map one-to-one to a single name composite -- most of the sample looks
+   like a renaming of the same parishes, which sits closer to =wave-scoped=
+   than to "no crosswalk can exist".  (At 2011-12 -> 2013-14, 65 of 212 EA
+   ids map one-to-one to a parish: a coincidence of the sample, since a
+   parish is not an EA.)  Recorded in each boundary's
+   =cluster_id_measurement= note; aggregates in
+   =slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json=.
+   The declaration is unchanged.
 
 *** Why 2018-19 / 2019-20 =v= is a =DISTRICT/PARISH= composite (GH #323)
 
