@@ -689,7 +689,9 @@ class TestSymlinks:
         outside = tmp_path / "OUTSIDE"
         outside.mkdir()
         os.symlink(outside, _data(root) / "Cross_Section")
-        with pytest.raises(ValueError, match="symbolic link"):
+        # The pre-check's own refusal (its message), not only the second
+        # guard in _acquisition_data_dir, which get_data_file's test pins.
+        with pytest.raises(ValueError, match="symbolic link; refusing"):
             _add_wave(CROSS_ID, push=True, subdir="Cross_Section")
         assert list(outside.iterdir()) == [] and wb["downloads"] == []
 
@@ -698,7 +700,7 @@ class TestSymlinks:
         _held(root, PANEL_ONLY)
         os.symlink("Panel", _data(root) / "Cross_Section")
         before = _snapshot(_data(root) / "Panel")
-        with pytest.raises(ValueError, match="symbolic link"):
+        with pytest.raises(ValueError, match="symbolic link; refusing"):
             _add_wave(CROSS_ID, push=True, subdir="Cross_Section")
         assert _snapshot(_data(root) / "Panel") == before
 

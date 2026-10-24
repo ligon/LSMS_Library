@@ -95,6 +95,12 @@ class TestRecord:
         # Red team r2:
         ([f"{CROSS_ID} {CROSS_IDNO}"], [f"{CROSS_ID} {V02} 2026-13-45"],
          SUBDIRS, "YYYY-MM-DD"),                      # not a real date
+        # ISO 8601 forms date.fromisoformat accepts (Python 3.11) that are
+        # not the YYYY-MM-DD the format names:
+        ([f"{CROSS_ID} {CROSS_IDNO}"], [f"{CROSS_ID} {V02} 20261001"],
+         SUBDIRS, "YYYY-MM-DD"),
+        ([f"{CROSS_ID} {CROSS_IDNO}"], [f"{CROSS_ID} {V02} 2026-W40-1"],
+         SUBDIRS, "YYYY-MM-DD"),
         ([], [f"{CROSS_ID} {V02} 2026-10-01"], SUBDIRS,
          "nothing is held"),                          # nothing held to be ahead of
         ([f"{CROSS_ID} {CROSS_IDNO}"], [f"{CROSS_ID} {CROSS_IDNO} 2026-10-01"],
