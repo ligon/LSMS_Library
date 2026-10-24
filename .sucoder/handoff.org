@@ -1,5 +1,85 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
+* HANDOFF -- 2026-10-23 late evening, Sue / Claude Opus 5.5 (job 40390255).  START HERE.
+Stopped at Ethan's request (subscription budget nearly exhausted).  All agents and
+burst jobs are stopped.  Nothing is half-merged.  =development= on GitHub = =57d255585=
+(the validated ISA batch + docs tidy); mirror development synced; shared cache promoted.
+
+** Standing authority and rules (Ethan, 2026-10-23)
+- Merge a batch once its integration branch passes a full cold rebuild (burst
+  shards) + the full suite; then promote the cache.  A MOVED or failing test
+  baseline goes to Ethan first (list below).
+- Run all heavy compute on burst: =/global/scratch/fsa/fc_jevons/ligon/burst/=
+  (=burst.sbatch=, =README.md=, =AGENT_RULES.md=; co_carleton / savio4_htc).
+- S3 writer creds now at =~/.config/lsms_library/s3_write_creds= (600); the
+  legacy mirror path is a symlink to it.
+- Public repo: tests count-only; data-tests CI gets =--tb=short --assert=plain
+  --disable-warnings= (PR #1294).
+
+** READY PRs (next batch; merge in this order after validation)
+| PR | what | cache cost |
+|----+------+-----------|
+| #1295 | data_info.yml vocab: =unknown_plot=, =unknown_crop=, =(not crop-specific)= | 0 |
+| #1294 | CI data-tests privacy flags | 0 |
+| #1293 | =add_wave(subdir=)=, CATALOG_SUBDIR, refresh-only, #1283 per-entry HELD/LATEST (2 red-team rounds) | 0 |
+| #1286 | Malawi 2016-17/2019-20 Panel = catalog 3819 (provenance; SUBDIR/HELD lines) | 0 |
+| #1284 | Ethiopia 2021-22 holds v03 (acquired; duplicate sidecar retired) | 0 |
+| #1285 | Nigeria 2023-24 holds v02 (acquired; geovariables NOT wired -- #978 next step) | 0 |
+| #1289 | Niger && + missing-wave refusal, 4 tables | Niger |
+| #1296 | Malawi 2013-14 stayer GPS (red-teamed, fixed) | Malawi |
+| #1282 | single-pass =id_walk= (#1245) | CORPUS-WIDE |
+Batch procedure: integration branch (mirror only) merging these in order ->
+burst shard array (=bench/matrix.py --countries C= into a staging root) + full
+suite (=-n 20 --dist=loadfile=, BLAS pinned, =LSMS_BUILD_WORKERS=1=) -> merge on
+GitHub -> sync mirror -> promote staging to the shared cache.  Template scripts:
+=/global/scratch/fsa/fc_jevons/ligon/isa-batch-20261023/{shard,tests}.sbatch=.
+Known pre-existing failure: =test_ethiopia_shipped_factors.py::test_shipped_quintal_matches_the_external_answer_key=.
+
+** IN-FLIGHT BRANCHES (stopped; resume from these heads; fix lists are below)
+| branch | head | state | remaining |
+|--------+------+-------+-----------|
+| =fix/uganda-1120-1119-20261023= | =7631c13ec= | red-teamed: fit w/ fixes | (1) D1 weight -> =panel_weight= ONLY, =weight= NaN for the 72 (RULED); (2) re-pin =test_crop_kg_factor::test_uganda_harvest_kg_baseline= (134,164 / 89,207 / 42,096,972.24); (3) drop D3 plot-less rows duplicating a plot-keyed row (2 strong + 2 weak, 2009-10 AGSEC5A); (4) =cluster_features= rows for the 127 singletons lacking one; (5) adopted households must not alter an existing parish (Rural NA bug; Ethiopia precedent); (6) keep =v= dtype =string=; merge =add672a0d=; synthetic id in tests; scalar assert in =test_sample.py= |
+| =fix/ethiopia-1120-1119-w1-trees-20261023= | =80e71f3a4= (WIP, unverified) | red-teamed: NO data defect | finish privacy assert (sect12 test :418) + quiet fixtures; pin =intercropped= on minted W1 rows (mutant M20); make synthetic =saq01/saq02= differ (M15); CONTENTS.org:548-549 W5 grain (56.9 km two-fix EA); =derivations.yml:131-132= W1 wording; nits (20 tables; =test_gh1119= exact 69,024) |
+| =fix/nigeria-1120-1119-variety-20261023= | =83f3b0ff2= | red-teamed: no data defect | NEW RULING: post-harvest =ea==0= + labelled "same location" answer -> post-planting EA as =v= (registered derivation, e.g. =Nigeria::sample::ph-ea-from-pp-same-location=; W4 =hhsmlc=1= 20/66; W5 =hh_moved=2= 31/64; W2 =tracked_obs=0= if labelled not-mover; W3 unlabelled stays sentinel); rewrite false "every v difference is a mover" prose; quiet fixtures (tests print ids via long tracebacks); pin per-round weight coverage (mutant supplement_first); record crosswalk/sample disagreement counts (#1264); then re-measure =households_changed= for #1135 |
+| =fix/malawi-637a-1120-1119-20261023= | =8f01ef7af= | done; NOT yet red-teamed | apply =unknown_crop= to blank crop codes (59 seed lines 2010-11, 4 harvest lines); code 49 (2019-20, unlabelled) passes through; merge =add672a0d=; then red-team |
+| =fix/1135-cluster-measurement-record-20261023= | =9a34f5516= | round-2 review: fit w/ fixes | Tanzania 2012-13->2014-15 "35" -> "not measured" (9 reverts / 26 relinks in note); Tanzania 2014-15->2019-20 -> "not measured" (not "not applicable"); Uganda 2015-16->2018-19 -> =wave-scoped= (Sue's call on the vocabulary + 93.1% evidence; caveat in note); formatter mutants N16/N17; validator gaps; Ethiopia note wording; Nigeria W5 line 2 = 113; RECONCILE Nigeria counts with the Nigeria branch at integration |
+| =fix/mali-tree-sales-as-recorded-20261023= | =0ece1e030= | red-team fixes DONE | open PR (Mali-only re-warm); 999998 also masked; window-mismatch disclosed |
+| =fix/burkina-2021-22-two-components-20261023= | =5663505be= | done; red-team was STOPPED early | built on #1282 + #1293 (merge base =3d7befff9=); 6277 ACQUIRED + pushed (55 files); both components wired; =EMC_= / =CS_= namespaces (APPROVED); re-run the red team; SQUASH-MERGE (commits =a445b0395=, =140a69f2b= contain a real grappe/menage example pair, replaced at =bc233435a=); delete the branch after merge |
+| =fix/plot-transforms-epistemic-sentinels-20261023= | (none) | stopped before any commit | =harvest_kg= etc. must exclude =unknown_plot= / =unknown_crop= and report counts in attrs (Uganda 227 rows, Malawi 41) |
+| =ci/data-tests-assert-plain-20261023= | PR #1294 | ready | -- |
+
+** Moved test pins awaiting Ethan's OK (all move by exactly their ruled change)
+- Uganda =tests/fixtures/uganda_baseline.json= (sample [24362->24561], cluster_features [4807->4841]) + =test_crop_kg_factor= Uganda pin.
+- Ethiopia: sect12 (2), 1256 (2), empty-row filter, 1253, shipped-factors (now exactly 5.7879).
+- Nigeria: cluster-identity tests rewritten for per-round covers.
+- =test_staged_reacquisition= narrowed (#1284/#1285).  Mali tree tests (#1272 follow-up).
+- Burkina: =test_ehcvm_7day= 2021-22 (84,809,339.18 / 19,893), =test_burkina_faso_2014_passages=, =test_burkina_faso_plot_gps=.
+
+** Rulings today (all on their issues)
+#1283 option (b) secondaries only; #1276 serve both components, =subdir==, Malawi
+weights; #1244 =EMC_=/=CS_=; #1135 Nigeria 2018Q3 net "not measured"; Mali tree sales
+as recorded (=tree-sale-window=); #1120 D1/D2/D3 + Uganda =panel_weight= only +
+Nigeria =ea==0= rule; D2 spelling =unlocated-{hhid}= (=moved-= = movers only);
+acquisitions approved (Malawi 2024-25 #1275, newer releases diff-first, Tanzania
+W1-W3 geovariables #449, Burkina 1994/1998 #816); feature proposals (#226 #438
+#439 #450 #851 #862 #1136) IN SCOPE after defects drain.
+
+** Not started (queued)
+#1281 (config KeyError drops a wave -> raise; #675 precedent); #1287 (~50
+concatenators skip a missing wave); #1288; #1290 #1291 (Uganda id mismatches,
+54,027 rows); #1292 (Nigeria education duplicate rows); #1297 #1298; #1254 + #824
+=median_price_valuation=; #771 FDC key; Tanzania/GhanaLSS #1119 marker; Mali
+KgFactor; Nigeria geovariables wiring (#978; EA multi-fix count 112/708 vs 34/510
+unsettled); acquisitions (Malawi 2024-25 via =subdir=, Tanzania geovariables,
+Burkina 1994/1998 -- may need =repositories= widening + =idno_pattern=).
+
+** Evidence
+Job-local =data-private/= copied (no raw data) to
+=/global/scratch/fsa/fc_jevons/ligon/isa-handoff-20261023/data-private/= (700).
+Burst job dirs (reviews, builds, mutations) persist under =.../burst/jobs/<tag>/=.
+Release-diff report: =.../isa-handoff-20261023/data-private/release-diff/REPORT.md=.
+
+
 * MORNING BRIEFING for Ethan -- 2026-10-23, Sue / Claude Opus 5.5 (job 40390255)
 Nothing was merged overnight.  Open PRs below.  Every PR body lists its own decisions, evidence and cache cost.
 
