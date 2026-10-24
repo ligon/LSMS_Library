@@ -291,3 +291,112 @@ not cached here=, =Uganda food_acquired parquet not cached=, =fewer than three
 =crop_production=).  After a last docstring edit to the 2017-18 wave script,
 a fresh cold build was frame-equal to the measured one (served table and all
 four downstream frames) and the census was re-run on the final tree.
+
+* Round 5 -- red-team follow-up on round 4 (2026-10-23)
+
+An independent red team reviewed =9fbfdae86= (fit for a PR with fixes; its
+outputs are in =burst/jobs/mali-sales-review/=).  This round fixes what it
+found.  Every cold build, test run, mutant run and hash census ran on Slurm
+through the burst runner (job dir =burst/jobs/mali-sales-r5/=), each checkout
+with its own data root.  Base: development =57d255585=; final branch head
+=08db84a06= (code unchanged since =dcf246602=, whose L2 hashes it equals:
+0 / 549, 0 / 40, 0 / 2,109 moved).  Scripts in =scripts/r5/=; the
+build, compare and mutation scripts are adapted from the red team's.
+Aggregate outputs are in =out/r5/=.
+
+| script                  | output                          | what                                                    |
+|-------------------------+---------------------------------+---------------------------------------------------------|
+| =r5/build_all.py=       | (private) every Mali table      | cold build, one side (red-team script + identity assert) |
+| =r5/compare_all.py=     | =compare_all_tables_r5.txt=     | base vs branch, all 23 tables                            |
+| =r5/probe_r5.py=        | =probe_r5.txt= (+ =_before_999998=) | PRICED tuples, value codes, edge counts, window mismatch, price table, =median_price_valuation=, raw code counts |
+| =r5/gcr_price_r5.py=    | =gcr_r5.txt=, =price_table_r5.txt= | =gross_crop_revenue= by household; =harvest_kg=, =yield_kg=; the tree price table with every cell's n |
+| =r5/mutate.py=, =run_mut.sh=, =idleak.py= | =mutants_r5.txt= (+ =_idleak_before_quiet_fixtures=) | 17 mutants + control; ids in failure output |
+| hash census             | =hash_diff_r5.txt=              | base vs branch                                          |
+
+** The red team's items, as fixed
+
+1. *Tests printed household ids on failure.*  Every =TestServed= assertion
+   in both files now compares a count held in a local, with a count-only
+   message.  That alone did NOT stop the leak, measured on the mutants: 7-9
+   failure blocks per mutant still carried ids, because pytest's long
+   traceback prints a failing test's ARGUMENTS, and the fixtures were frames.
+   The fixtures now return a DataFrame subclass whose repr is its shape
+   (=<627 rows x 16 columns, not printed>=).  Final run: *0 failure blocks
+   with an id in any of the 17 mutants* (=mutants_r5.txt=).  The one
+   id-shaped token left in each output, including the passing control's, is
+   in pytest's warnings summary.  It comes from test_derivations'
+   =TestDelivered= GhanaLSS build: a framework Site Q warning that names
+   GhanaLSS households by design.  That is framework, outside this change.
+2. *Mutant D survived* (dropping =s3bq13b= from the sale inputs).  New tests:
+   =derivation_inputs= returns exactly the declared =raw_variables=, per key
+   and wave, none of them empty (data); =mali._TREE_RAW= / =_TREE_SALE_RAW=
+   equal the registry lists (no data).  D is killed, and so are the new K
+   and L (the 2017-18 sold unit; the 2014-15 harvest unit).
+3. *The window mismatch is disclosed* in the registry rule, CONTENTS.org,
+   =mali.py= and a pinned test.  On the 258 tree rows whose sold and harvest
+   units agree, the median of =Quantity_sold / Quantity= is 0.375 and the
+   ratio exceeds 1 on 16 rows.  The median of the rescaled share
+   =Quantity_sold x months_harvested / Quantity= is 0.917, above 1 on 28.
+   At =57d255585= the plain ratio was the share: 0.917 and 28.  (The red
+   team counted 262 rows under a slightly different filter.)
+4. *Price evidence made durable and corrected*: =price_table_r5.txt= (every
+   cell's n, thin cells marked) is cited by the registry's
+   =validated_against= and by CONTENTS.org.  2017-18 cashew total reading
+   250 at the served n = 21 (the ruling's check had 245 at n = 20).  Orange
+   n = 2 and banana n = 4 are marked thin.  The 2014-15 cashew figure is
+   275 at n = 12 again (item 7).
+5. *3B.10 (and 3B.13) quoted in full*: the 2014-15 manual has the
+   enumerator build the figures up from daily / weekly ones and names no
+   window.  In 2014-15 the per-month window comes from the printed form.
+6. *=median_price_valuation= knock-on*, item keys =(t, crop)=, geography
+   =v=.  At =9fbfdae86=: Kg-only sold quantities moved 71 2014-15 cashew rows
+   by x 1.0909 (+197,400 FCFA, +0.03%); default kg conversion moved 0.  At
+   the final head: 0 and 0 (=probe_r5.txt= vs =probe_r5_before_999998.txt=).
+   The 71 came from one value code (item 7).
+7. *Pre-existing.*  (a) The 12 FIELD rows serving 999999: masked.  The
+   questionnaire convention reserves a field's top values (AGR P1 p. 8:
+   9998 NSP, 9999 Non declare).  The household forms' 6-digit amounts take
+   "Si NSP INSCRIRE 999998".  Precedents: the WB =MLI_EACI1.do:645= (2014-15
+   seed value =>= 999998=) and Mali's own =_LIVESTOCK_SENTINELS= /
+   =_LABOR_SENTINELS=.  In the data, 7 of the 12 sit beside a zero quantity
+   sold.  *Scope deviation*: the same search found one tree value of
+   999998, the "ne sait pas" value.  It is the cashew sale beside a missing
+   month count that rounds 1-3 hid and round 4 served; as an amount it
+   prices at 18,182 FCFA/kg against a cell median of 275.  It alone moved the
+   2014-15 cashew median to 300 and the 71 =median_price_valuation= rows, and
+   it is masked too (=mali._VALUE_CODES = (999998, 999999)=).  (b) A harvest
+   of 0 beside a positive sale: 6 tree rows in 2014-15, 1 in 2017-18
+   (documented in CONTENTS.org, no data change).
+
+** Results (final head =08db84a06= vs =57d255585=)
+
+- All 23 Mali tables cold: 22 identical (values, index, warnings text,
+  =attrs=).  =crop_production= (35,060 rows both, index identical) moves only
+  =Quantity_sold= (2014-15 tree 137, 2017-18 tree 100), =Value_sold= (2014-15
+  tree 130, 2017-18 tree 99, 2014-15 field 12) and =Derivation= (331).  Its
+  warnings text is identical, so Site Q, Site I and Site B are unchanged.
+- Priced rows: 2014-15 tree 190 -> 195, field 569 -> 567; 2017-18 tree 127,
+  field 451.  Tree =Value_sold= NA: 2014-15 162 -> 157.  Sale key on 331
+  tree rows (203 + 128).
+- =gross_crop_revenue=: 2014-15 1.127e8 -> 6.438e7 (93 households: 92 down,
+  1 up); 2017-18 2.332e8 -> 1.619e8 (88, all down).  =harvest_kg= equal
+  (2,175 rows); =yield_kg= equal (empty on both: Mali =plot_features= covers
+  the EHCVM waves only).
+- Raw oracle (the tests' oracles, and the probe's raw counts): tree columns
+  and =Derivation= 357 / 357 and 270 / 270.  The 12 field rows on a raw
+  999999 serve no value (12 / 12; served 999999 on all 12 at the base).
+- Hash census: country 24 / 549 (Mali 24 / 24), wave 96 / 2,109 (Mali
+  96 / 96), btf 0 / 40.  No other country.
+
+** Tests (round 5, burst, =-n 8 --dist=loadfile=, BLAS pinned, =LSMS_BUILD_WORKERS=1=)
+
+| run                                                              | result                                   |
+|------------------------------------------------------------------+------------------------------------------|
+| 42 Mali test files + =test_derivations.py=, branch =08db84a06=   | 1,445 passed, 15 skipped                 |
+| the same 42 files as base has them, =57d255585=                  | 1,430 passed, 15 skipped                 |
+| the branch's two test files copied onto =57d255585=              | 23 failed, 5 errors, 36 passed           |
+| mutants: control + 17 (two files + =test_derivations.py=)        | control 108 passed; every mutant killed (2-16 failures each) |
+
+The 15 skips are identical on both sides (cache-state conditions of a fresh
+root).  The 5 errors on the base are the =raw_sale= fixture, whose
+=derivation_inputs= key does not exist there.

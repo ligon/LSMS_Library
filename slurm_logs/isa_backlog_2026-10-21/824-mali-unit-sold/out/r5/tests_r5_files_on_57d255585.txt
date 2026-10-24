@@ -10,12 +10,12 @@ FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_inputs_variable
 FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_the_value_code_mask
 FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_the_sale_derivation_is_the_identity
 FAILED tests/test_gh1267_mali_tree_quantity.py::TestDerive::test_stamp_puts_the_sale_key_on_positive_sales_only
-FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_tree_rows_and_their_keys
 FAILED tests/test_gh824_mali_unit_sold.py::TestServed::test_priced_rows_and_label_disagreements_reproduce[2014-15-field]
 FAILED tests/test_gh824_mali_unit_sold.py::TestServed::test_priced_rows_and_label_disagreements_reproduce[2014-15-tree]
 FAILED tests/test_gh824_mali_unit_sold.py::TestServed::test_no_row_serves_a_value_code
-FAILED tests/test_gh824_mali_unit_sold.py::TestServed::test_the_field_value_code_rows_serve_no_value
+FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_tree_rows_and_their_keys
 FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_inputs_return_exactly_the_declared_raw_variables[2014-15-s3b-Mali::crop_production::tree-sale-window]
+FAILED tests/test_gh824_mali_unit_sold.py::TestServed::test_the_field_value_code_rows_serve_no_value
 FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_inputs_return_exactly_the_declared_raw_variables[2017-18-s11f-Mali::crop_production::tree-sale-window]
 FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_edge_rule_na_counts[2014-15-Quantity_sold]
 FAILED tests/test_gh1267_mali_tree_quantity.py::TestServed::test_edge_rule_na_counts[2014-15-Value_sold]
@@ -26,4 +26,4 @@ ERROR tests/test_gh1267_mali_tree_quantity.py::TestServed::test_2017_18_harvest_
 ERROR tests/test_gh1267_mali_tree_quantity.py::TestServed::test_a_sale_beside_a_zero_or_missing_month_count_is_served
 ERROR tests/test_gh1267_mali_tree_quantity.py::TestServed::test_value_over_quantity_sold_is_the_recorded_ratio[2014-15-s3bq14-s3bq13a]
 ERROR tests/test_gh1267_mali_tree_quantity.py::TestServed::test_value_over_quantity_sold_is_the_recorded_ratio[2017-18-s11fq15-s11fq14a]
-23 failed, 36 passed, 6 warnings, 5 errors in 11.70s
+23 failed, 36 passed, 6 warnings, 5 errors in 35.99s

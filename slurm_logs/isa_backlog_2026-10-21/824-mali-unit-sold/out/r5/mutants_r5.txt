@@ -1,0 +1,39 @@
+A_rescale_both pytest rc=1 :: ============ 14 failed, 94 passed, 14 warnings in 404.29s (0:06:44) ============
+A2_rescale_value pytest rc=1 :: ============ 15 failed, 93 passed, 14 warnings in 404.30s (0:06:44) ============
+B_drop_sale_key pytest rc=1 :: ============ 3 failed, 105 passed, 14 warnings in 404.29s (0:06:44) ============
+C_sale_key_all_trees pytest rc=1 :: ============ 2 failed, 106 passed, 14 warnings in 404.33s (0:06:44) ============
+B2_drop_harvest_key_on_sold pytest rc=1 :: ============ 3 failed, 105 passed, 14 warnings in 404.29s (0:06:44) ============
+A3_rescale_qty pytest rc=1 :: ============ 16 failed, 92 passed, 14 warnings in 404.38s (0:06:44) ============
+M0_control pytest rc=0 :: ================= 108 passed, 14 warnings in 404.31s (0:06:44) =================
+B3_unsorted_join pytest rc=1 :: ============ 3 failed, 105 passed, 14 warnings in 404.32s (0:06:44) ============
+H_blank_edge_sales pytest rc=1 :: ============ 11 failed, 97 passed, 14 warnings in 369.93s (0:06:09) ============
+G_unmask_value_code pytest rc=1 :: ============ 13 failed, 95 passed, 14 warnings in 369.93s (0:06:09) ============
+J_unmask_tree_code pytest rc=1 :: ============ 10 failed, 98 passed, 14 warnings in 370.79s (0:06:10) ============
+I_unmask_field_code pytest rc=1 :: ============ 4 failed, 104 passed, 14 warnings in 370.72s (0:06:10) ============
+C2_sale_key_on_zero pytest rc=1 :: ============ 2 failed, 106 passed, 14 warnings in 369.84s (0:06:09) ============
+E_inputs_all_roster pytest rc=1 :: ============ 3 failed, 105 passed, 14 warnings in 370.70s (0:06:10) ============
+F_yml_drop_value_col pytest rc=1 :: ============ 2 failed, 106 passed, 14 warnings in 370.75s (0:06:10) ============
+D_inputs_drop_unit pytest rc=1 :: ============ 2 failed, 106 passed, 14 warnings in 369.96s (0:06:09) ============
+L_harvest_inputs_drop_unit pytest rc=1 :: ============ 2 failed, 106 passed, 14 warnings in 356.17s (0:05:56) ============
+K_inputs_drop_2017_unit pytest rc=1 :: ============ 2 failed, 106 passed, 14 warnings in 356.25s (0:05:56) ============
+== id leak check Fri Oct 23 17:56:13 PDT 2026
+Mali crop_production ids (>= 5 chars): 6595
+A2_rescale_value.pytest.txt: failure blocks 13, with an id 0 {}; ids elsewhere in the output 1 :: ============ 15 failed, 93 passed, 14 warnings in 404.30s (0:06:44) ============
+A3_rescale_qty.pytest.txt: failure blocks 14, with an id 0 {}; ids elsewhere in the output 1 :: ============ 16 failed, 92 passed, 14 warnings in 404.38s (0:06:44) ============
+A_rescale_both.pytest.txt: failure blocks 14, with an id 0 {}; ids elsewhere in the output 1 :: ============ 14 failed, 94 passed, 14 warnings in 404.29s (0:06:44) ============
+B2_drop_harvest_key_on_sold.pytest.txt: failure blocks 3, with an id 0 {}; ids elsewhere in the output 1 :: ============ 3 failed, 105 passed, 14 warnings in 404.29s (0:06:44) ============
+B3_unsorted_join.pytest.txt: failure blocks 3, with an id 0 {}; ids elsewhere in the output 1 :: ============ 3 failed, 105 passed, 14 warnings in 404.32s (0:06:44) ============
+B_drop_sale_key.pytest.txt: failure blocks 3, with an id 0 {}; ids elsewhere in the output 1 :: ============ 3 failed, 105 passed, 14 warnings in 404.29s (0:06:44) ============
+C2_sale_key_on_zero.pytest.txt: failure blocks 2, with an id 0 {}; ids elsewhere in the output 1 :: ============ 2 failed, 106 passed, 14 warnings in 369.84s (0:06:09) ============
+C_sale_key_all_trees.pytest.txt: failure blocks 2, with an id 0 {}; ids elsewhere in the output 1 :: ============ 2 failed, 106 passed, 14 warnings in 404.33s (0:06:44) ============
+D_inputs_drop_unit.pytest.txt: failure blocks 2, with an id 0 {}; ids elsewhere in the output 1 :: ============ 2 failed, 106 passed, 14 warnings in 369.96s (0:06:09) ============
+E_inputs_all_roster.pytest.txt: failure blocks 3, with an id 0 {}; ids elsewhere in the output 1 :: ============ 3 failed, 105 passed, 14 warnings in 370.70s (0:06:10) ============
+F_yml_drop_value_col.pytest.txt: failure blocks 2, with an id 0 {}; ids elsewhere in the output 1 :: ============ 2 failed, 106 passed, 14 warnings in 370.75s (0:06:10) ============
+G_unmask_value_code.pytest.txt: failure blocks 12, with an id 0 {}; ids elsewhere in the output 1 :: ============ 13 failed, 95 passed, 14 warnings in 369.93s (0:06:09) ============
+H_blank_edge_sales.pytest.txt: failure blocks 11, with an id 0 {}; ids elsewhere in the output 1 :: ============ 11 failed, 97 passed, 14 warnings in 369.93s (0:06:09) ============
+I_unmask_field_code.pytest.txt: failure blocks 4, with an id 0 {}; ids elsewhere in the output 1 :: ============ 4 failed, 104 passed, 14 warnings in 370.72s (0:06:10) ============
+J_unmask_tree_code.pytest.txt: failure blocks 9, with an id 0 {}; ids elsewhere in the output 1 :: ============ 10 failed, 98 passed, 14 warnings in 370.79s (0:06:10) ============
+K_inputs_drop_2017_unit.pytest.txt: failure blocks 2, with an id 0 {}; ids elsewhere in the output 1 :: ============ 2 failed, 106 passed, 14 warnings in 356.25s (0:05:56) ============
+L_harvest_inputs_drop_unit.pytest.txt: failure blocks 2, with an id 0 {}; ids elsewhere in the output 1 :: ============ 2 failed, 106 passed, 14 warnings in 356.17s (0:05:56) ============
+M0_control.pytest.txt: failure blocks 0, with an id 0 {}; ids elsewhere in the output 1 :: ================= 108 passed, 14 warnings in 404.31s (0:06:44) =================
+== done Fri Oct 23 17:56:16 PDT 2026

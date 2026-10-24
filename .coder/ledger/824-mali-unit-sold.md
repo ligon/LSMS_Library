@@ -241,3 +241,45 @@ quantity, and round 3's row "tree `Value_sold`".  Base: development
   campaign sale; under the revised ruling it is the recorded (month-or-season)
   value.  Whether the framework should rescale or skip `tree-sale-window`
   rows is a framework decision, out of scope.
+
+---
+## Round 5 — red-team follow-up on round 4 (2026-10-23)
+
+Red team on `9fbfdae86`: fit for a PR with fixes.  Base still development
+`57d255585`.  All cold builds, tests, mutants and the hash census ran on Slurm
+(burst runner, job dir `jobs/mali-sales-r5/`), per AGENT_RULES.
+
+### §2''' Prior art reused
+
+| symbol | path | reuse |
+|---|---|---|
+| `_LIVESTOCK_SENTINELS`, `_LABOR_SENTINELS` | `Mali/_/mali.py` | **in-country precedent**: 999999 already masked on Mali's other FCFA columns (livestock `SalesValue`, plot-labour wage) |
+| WB `MLI_EACI1.do:645` | reference copy | same wave masks the seed value at `>= 999998` |
+| instrument convention | AGR P1 p. 8 (`9998` NSP / `9999` Non declare); MEN P1 pp. 18, 22, P2 p. 11 (`Si NSP INSCRIRE 999998`) | the reserved values of a field |
+| red-team `mutate.py`, `idleak.py`, `build_all.py`, `compare.py` | `jobs/mali-sales-review/scripts/` | adapted into `scripts/r5/` (anchors updated, mutants I-L added) |
+| AGENT_RULES count-only asserts | `burst/AGENT_RULES.md` | every TestServed assert compares a local count |
+
+### §5''' Decisions
+
+| quantity | decision | reason |
+|---|---|---|
+| 2014-15 field `Value_sold` = 999999 (12 rows) | masked (NA) | the questionnaire convention + data (7 of 12 beside a zero sale) + the two precedents above; coordinator: "if the questionnaire convention shows ... mask it there as well" |
+| tree / field `Value_sold` = 999998 (1 tree row) | masked (NA) — **scope deviation, reported** | the instrument's NSP value for a 6-digit amount; the row (cashew, 55 Kg, missing month count) prices at 18,182 FCFA/kg against a cell median of 275, and it alone moved the 2014-15 cashew per-Kg median 275 -> 300 and `median_price_valuation`'s Kg-only prices of 71 rows |
+| window mismatch on the row | disclosed (registry rule, CONTENTS, a pinned test), not changed | ruling: harvest x months, sale as recorded |
+| harvest 0 beside a positive sale (6 + 1 rows) | documented, not changed | coordinator item 7 |
+| test hygiene | count-only asserts AND a quiet-repr fixture wrapper | the asserts alone did not stop the leak: pytest prints a failing test's arguments (the fixture frames) — measured on the mutants |
+
+### Phase 3''''' — verification (numbers in the evidence README, round 5)
+
+- All 23 Mali tables cold, base vs branch: 22 identical (values, index,
+  warnings text, attrs); `crop_production` moves only tree `Quantity_sold`
+  (137 / 100), `Value_sold` (tree 130 / 99, field 12) and `Derivation` (331).
+- Prices: 2014-15 cashew per-Kg back to 275 (n = 12); `median_price_valuation`
+  moves 0 rows in both modes (71 at `9fbfdae86`).
+- Hash census: Mali only (24 / 24, 96 / 96, btf 0 / 40).
+
+### §6''' Open (still)
+
+- test_derivations' `TestDelivered` builds GhanaLSS and its Site Q warning
+  (framework text, by design) prints household ids into pytest's warnings
+  summary of a PASSING run; framework, out of scope here.

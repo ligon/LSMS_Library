@@ -1,6 +1,6 @@
-1430 passed, 15 skipped, 127 warnings in 320.64s (0:05:20)
-      1 tests/test_867_nitrogen_content.py:257: Ethiopia plot_inputs is not warm here (/global/scratch/fsa/fc_jevons/ligon/burst/jobs/mali-sales-r5/data-tests-base/Ethiopia)
-      1 tests/test_867_nitrogen_content.py:257: Malawi plot_inputs is not warm here (/global/scratch/fsa/fc_jevons/ligon/burst/jobs/mali-sales-r5/data-tests-base/Malawi)
+1430 passed, 15 skipped, 128 warnings in 459.37s (0:07:39)
+      1 tests/test_867_nitrogen_content.py:257: Ethiopia plot_inputs is not warm here (/global/scratch/fsa/fc_jevons/ligon/burst/jobs/mali-sales-r5/data-tests3-base/Ethiopia)
+      1 tests/test_867_nitrogen_content.py:257: Malawi plot_inputs is not warm here (/global/scratch/fsa/fc_jevons/ligon/burst/jobs/mali-sales-r5/data-tests3-base/Malawi)
       1 tests/test_feature_canonical_index.py:885: fewer than three crop_production caches are warm
       1 tests/test_feature_canonical_index.py:885: fewer than three plot_inputs caches are warm
       1 tests/test_feature_canonical_index.py:885: fewer than three plot_labor caches are warm

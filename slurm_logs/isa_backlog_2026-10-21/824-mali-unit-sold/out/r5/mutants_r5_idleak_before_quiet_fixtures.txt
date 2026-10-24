@@ -1,0 +1,22 @@
+== before the quiet fixtures (dcf246602): failure blocks carrying an id
+== id leak check Fri Oct 23 17:26:19 PDT 2026
+Mali crop_production ids (>= 5 chars): 6595
+A2_rescale_value.pytest.txt: failure blocks 9, with an id 7 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 15 failed, 93 passed, 14 warnings in 355.98s (0:05:55) ============
+A3_rescale_qty.pytest.txt: failure blocks 10, with an id 8 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 16 failed, 92 passed, 14 warnings in 356.46s (0:05:56) ============
+A_rescale_both.pytest.txt: failure blocks 11, with an id 9 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 14 failed, 94 passed, 14 warnings in 356.41s (0:05:56) ============
+B2_drop_harvest_key_on_sold.pytest.txt: failure blocks 3, with an id 2 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 3 failed, 105 passed, 14 warnings in 355.97s (0:05:55) ============
+B3_unsorted_join.pytest.txt: failure blocks 3, with an id 2 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 3 failed, 105 passed, 14 warnings in 356.51s (0:05:56) ============
+B_drop_sale_key.pytest.txt: failure blocks 3, with an id 2 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 3 failed, 105 passed, 14 warnings in 355.93s (0:05:55) ============
+C2_sale_key_on_zero.pytest.txt: failure blocks 2, with an id 1 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 2 failed, 106 passed, 14 warnings in 346.63s (0:05:46) ============
+C_sale_key_all_trees.pytest.txt: failure blocks 2, with an id 1 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 2 failed, 106 passed, 14 warnings in 355.92s (0:05:55) ============
+D_inputs_drop_unit.pytest.txt: failure blocks 1, with an id 0 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 2 failed, 106 passed, 14 warnings in 348.91s (0:05:48) ============
+E_inputs_all_roster.pytest.txt: failure blocks 1, with an id 1 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 3 failed, 105 passed, 14 warnings in 348.84s (0:05:48) ============
+F_yml_drop_value_col.pytest.txt: failure blocks 2, with an id 1 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 2 failed, 106 passed, 14 warnings in 349.00s (0:05:49) ============
+G_unmask_value_code.pytest.txt: failure blocks 9, with an id 7 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 13 failed, 95 passed, 14 warnings in 343.21s (0:05:43) ============
+H_blank_edge_sales.pytest.txt: failure blocks 8, with an id 8 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 11 failed, 97 passed, 14 warnings in 349.00s (0:05:48) ============
+I_unmask_field_code.pytest.txt: failure blocks 3, with an id 3 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 4 failed, 104 passed, 14 warnings in 348.97s (0:05:48) ============
+J_unmask_tree_code.pytest.txt: failure blocks 7, with an id 6 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 10 failed, 98 passed, 14 warnings in 348.86s (0:05:48) ============
+K_inputs_drop_2017_unit.pytest.txt: failure blocks 1, with an id 0 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 2 failed, 106 passed, 14 warnings in 339.63s (0:05:39) ============
+L_harvest_inputs_drop_unit.pytest.txt: failure blocks 1, with an id 0 {per-test counts omitted}; ids elsewhere in the output 1 :: ============ 2 failed, 106 passed, 14 warnings in 339.47s (0:05:39) ============
+M0_control.pytest.txt: failure blocks 0, with an id 0 {per-test counts omitted}; ids elsewhere in the output 1 :: ================= 108 passed, 14 warnings in 357.40s (0:05:57) =================
+== done Fri Oct 23 17:26:21 PDT 2026

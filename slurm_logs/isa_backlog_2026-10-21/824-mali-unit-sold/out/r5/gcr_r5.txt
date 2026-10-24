@@ -1,6 +1,8 @@
 gross_crop_revenue rows 6968 6968 added 0 dropped 0
   2014-15: changed 93 (up 1, down 92); sum 1.12659e+08 -> 6.43804e+07
   2017-18: changed 88 (up 0, down 88); sum 2.33204e+08 -> 1.61886e+08
+harvest_kg base vs branch {'shape': [[2175, 1], [2175, 1]], 'equal': True}
+yield_kg base vs branch {'shape': [[0, 1], [0, 1]], 'equal': True}
 # Mali crop_production, tree rows sold in Kg and priced (Quantity_sold > 0, Value_sold > 0),
 # served table at the branch head (cold build).  Median FCFA/kg:
 #   same_footing  = Value_sold / Quantity_sold (the value on the per-month quantity's footing; served)
