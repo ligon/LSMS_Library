@@ -724,6 +724,18 @@ round has its own cover page (GH #1120 D1, #1261, 2026-10-23)]]).  They are
 deliberately NOT given a NaN =v=, which the downstream =groupby()= would
 silently drop from every derived table.
 
+*The two singleton spellings* (GH #1120, 2026-10-23; shared with Uganda):
+- =moved-{hhid}= -- a REAL mover: the survey recorded =ea == 0= for the
+  household (on the round's cover, or on its roster where the roster is what
+  locates it).  Built by =cluster_id=.
+- =unlocated-{hhid}= -- GH #1120 D2: a household that NO file locates (no
+  cover lists it and its roster records no location).  Built by
+  =nigeria.unlocated_id=, with =hhid= formatted exactly as =cluster_id=
+  formats it (=format_id=); weights NA.  It fires on no household in the
+  current data.
+Both are singletons, one per household, and can never be pooled; neither is
+a sampling cluster.
+
 Cluster counts after the fix (real clusters + moved singletons), per ROUND
 since GH #1120 (each round from its own cover; until 2026-10-23 the PH round
 repeated the PP columns):

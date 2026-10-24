@@ -238,7 +238,12 @@ class TestRosterLocator:
 
     def test_singleton_spelling_is_not_the_mover_one(self, ng):
         assert ng.unlocated_id(17) == 'unlocated-17'
-        assert ng.UNLOCATED_PREFIX != 'moved-'
+        assert ng.UNLOCATED_PREFIX == 'unlocated-'   # shared with Uganda
+        # The id part is formatted exactly as cluster_id formats a mover's.
+        for raw in (17, 17.0, '17', '0017'):
+            moved = ng.cluster_id(1, 101, 0, raw)
+            assert moved.startswith('moved-')
+            assert ng.unlocated_id(raw) == 'unlocated-' + moved[len('moved-'):]
 
     @pytest.mark.parametrize('folder', FOLDERS)
     def test_every_round_names_its_roster(self, ng, folder):
