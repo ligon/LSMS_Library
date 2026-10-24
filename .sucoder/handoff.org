@@ -88,6 +88,29 @@ Nothing was merged overnight.  Open PRs below.  Every PR body lists its own deci
     - acquisitions: Malawi 2024-25, Tanzania W1-W3 geovariables (#449), Burkina 1994/1998 (#816);
     - feature designs.
     Filed #1283 (no held-release record for a secondary entry).
+4m. STATUS ~19:30 PDT 2026-10-23.
+    - OPEN PRs FOR THE NEXT BATCH:
+      - #1282 (single-pass =id_walk=; corpus re-warm);
+      - #1284 Ethiopia v03 / #1285 Nigeria v02 (0 hashes);
+      - #1286 Malawi provenance (0 hashes);
+      - #1289 Niger && plus refusal (Niger re-warm);
+      - #1293 =add_wave(subdir=)= plus #1283 (0 hashes).
+    - IN REVIEW / FIXING:
+      - Nigeria #1120 (red-team);
+      - Ethiopia #1120 (red-team);
+      - #1135 (round 2);
+      - Mali tree sales (fixing red-team items);
+      - Uganda #1120 (fixing: =unlocated-= prefix, weight vintages, 790 Watermelon);
+      - Malawi (2013-14 GPS fixes, then #637A/D3/#1119).
+    - RUNNING: Burkina 2021-22 (move, acquire 6277, wire, namespace; branch =fix/burkina-2021-22-two-components-20261023= on #1282 + #1293).
+    - CI: =ci/data-tests-assert-plain-20261023= (=--assert=plain= for the public data-tests job); full-suite check job 40421615.
+    - RULINGS THIS EVENING (@ligon):
+      - #1283 option (b), secondaries only;
+      - #1135: Nigeria 2018Q3 net "not measured";
+      - Mali sales as recorded.
+    - D2 SPELLING: =unlocated-{hhid}= (Nigeria, Uganda); =moved-= for movers only.
+    - FILED: #1281 #1283 #1287 #1288 #1290 #1291 #1292.
+    - MOVED TEST PINS (need @ligon's OK at merge): Uganda =uganda_baseline.json= (sample/cluster_features shapes); Ethiopia re-baselines (sect12, 1256, empty-row, 1253, shipped-factors 5.7879); Nigeria cluster-identity tests rewritten; =test_staged_reacquisition= narrowed (#1284/#1285); Mali tree tests.
 5. If green: merge the PRs on GitHub in the same order, resolving the same three conflicts identically; check the development tree equals the integration tree; sync the mirror; promote the staging L2 into the shared cache (identical trees mean identical hashes).
 
 ** Merge plan: ONE corpus re-warm
