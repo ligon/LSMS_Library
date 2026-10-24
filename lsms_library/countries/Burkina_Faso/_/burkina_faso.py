@@ -53,8 +53,9 @@ def ehcvm_i(grappe, menage):
 # EHCVM-1 its grappes 1-585, the 2021-22 cross-section 586-1185.  So unrelated
 # households shared served ids: 583 between 2014 (``zd + menage.zfill(3)``)
 # and 2018-19 (``grappe + '0' + menage.zfill(2)``), and 9 between the 2021-22
-# cross-section and 2018-19 (2018-19's (59, 612) and the cross-section's
-# (590, 612) both spell '590612').  A cross-wave ``groupby('i')`` merged them.
+# cross-section and 2018-19 (for a three-digit menage m, 2018-19's (g, m)
+# spells g + '0' + m, the same string as the cross-section's (10g, m)).  A
+# cross-wave ``groupby('i')`` merged them.
 #
 # @ligon's ruling on #1244: namespace the samples that are NOT the EHCVM-1
 # panel lineage, Niger's way (``niger.i`` prefixes EHCVM ids ``'E_'`` to keep

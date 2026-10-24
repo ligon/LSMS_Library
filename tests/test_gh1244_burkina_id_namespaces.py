@@ -48,12 +48,14 @@ def bf_mod():
 def test_the_formatters(bf_mod):
     assert bf_mod.emc_i(1, 1) == "EMC_1001"
     assert bf_mod.emc_i(59, 12) == "EMC_59012"
-    assert bf_mod.cross_section_i(590, 612) == "CS_590612"
-    assert bf_mod.cs_i(pd.Series([590.0, 612.0])) == "CS_590612"
+    assert bf_mod.cross_section_i(600, 123) == "CS_600123"
+    assert bf_mod.cs_i(pd.Series([600.0, 123.0])) == "CS_600123"
     assert bf_mod.emc_i(None, 1) is None and bf_mod.cross_section_i(1, None) is None
-    # The panel lineage is untouched.
-    assert bf_mod.ehcvm_i(59, 612) == "590612"
-    assert bf_mod.i(pd.Series([590, 612])) == "590612"
+    # The panel lineage is untouched -- and shows the collision the prefix
+    # removes (synthetic numbers): 2018-19's (g, m) with a three-digit m and
+    # the country i of (10g, m) are the same string.
+    assert bf_mod.ehcvm_i(60, 123) == "600123"
+    assert bf_mod.i(pd.Series([600, 123])) == "600123"
 
 
 def test_the_2014_wave_overrides_i_with_the_emc_namespace():

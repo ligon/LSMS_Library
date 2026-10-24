@@ -514,12 +514,21 @@ Sampling design table: cluster, weights, strata, and Rural classification.
 - *2014 (EMC)*: Single file =emc2014_welfare.dta=.  Weight variable =hhweight= (cross-sectional); no distinct panel weight (same variable used for both).  Numeric =strate= column (1--26, Region x Milieu).  10,224 households across 900 clusters.
 - *2018-19 (EHCVM)*: Two-file merge: cover page =s00_me_bfa2018.dta= (cluster, Rural) + =ehcvm_ponderations_bfa2018.dta= (cluster-level =hhweight=, same for both weight columns).  6,961 households across 585 clusters.  No explicit strata variable.
 - *2021-22 (EHCVM)*: Two-file merge: cover page =s00_me_bfa2021.dta= + =ehcvm_panel_ponderations_bfa2021.dta=.  Distinct weights: =hhweight2021= (cross-sectional) and =hhweight_panel= (panel/longitudinal).  Both weights are cluster-level (same value for all households in a grappe).  3,218 households across 550 clusters.  No explicit strata variable.
+  CORRECTION (2026-10-23, GH #1276): this describes the panel component
+  only.  2021-22 now also serves the cross-section (WB 6277,
+  =Data/Cross_Section/=), whose own weight =hhweight= (from
+  =ehcvm_ponderations_bfa2021.dta=) is its =weight= and whose =panel_weight=
+  is NaN: 10,403 households across 1,150 clusters, and a pooled weighted
+  mean blends two frames.  See the GH #1276 section at the end of this file.
 
 *** Notes
 - 2014 uses =grappe= (equivalent to =zd= in other 2014 files) as the cluster identifier.
 - EHCVM ponderation files are cluster-level, merged on =v= (grappe).
 - Strata are available only for 2014 (numeric 1--26); EHCVM waves lack an explicit strata variable.  Region x Milieu could be reconstructed from =cluster_features= if needed.
 - Weighted population sums: 2014 ~2.4M, 2018-19 ~3.1M, 2021-22 ~3.1M.
+  (2021-22: the panel component's raw =hhweight2021= sum over households
+  is 3,084,993; the cross-section's =hhweight= adds 3,233,016 -- each
+  component is weighted to the national total on its own, GH #1276.)
 
 ** DONE cluster_features -- served WITHOUT GPS: =df_geo= names columns its files lack (GH #1050)
 
@@ -1980,8 +1989,9 @@ registry's raw-input callable reads both =s07b= files.
   2018-19 id.  This is the state BEFORE the cross-section's ids are
   namespaced (GH #1244, Phase 4 below), which makes both links come back.
 - *Not yet namespaced*: 9 cross-section ids equal a 2018-19 id (2018-19
-  builds =i= as =grappe + '0' + menage.zfill(2)=, so (59, 612) spells
-  ='590612'=, which is also the cross-section's (590, 612)).
+  builds =i= as =grappe + '0' + menage.zfill(2)=, so for a three-digit
+  menage m its (g, m) spells g + '0' + m, which is also the country =i= of
+  the cross-section's (10g, m)).
 - =ehcvm.inputs_last_purchase= assumes one =file:=; the registry's =inputs:=
   for Burkina now points at =2021-22/_/mapping.py:inputs_food_acquired=, which
   loops over the files with each file's own mapping.  Not generalised in
@@ -2006,8 +2016,8 @@ EHCVM-1 its grappes 1-585, the 2021-22 cross-section 586-1185.  So
 unrelated households shared served ids: 583 between 2014 (=zd +
 menage.zfill(3)=) and 2018-19 (=grappe + '0' + menage.zfill(2)=; their
 clusters' Region agreed for 80), and 9 between the cross-section and 2018-19
-(2018-19's (59, 612) and the cross-section's (590, 612) both spell
-='590612'=), 2 of them also crosswalk targets.  @ligon's ruling: namespace
+(for a three-digit menage m, 2018-19's (g, m) and the cross-section's
+(10g, m) spell the same string), 2 of them also crosswalk targets.  @ligon's ruling: namespace
 the samples that are NOT the EHCVM-1 panel lineage, Niger's way (=niger.i=
 prefixes EHCVM ids ='E_'=):
 - 2014 (EMC): ='EMC_' + zd + menage.zfill(3)= (=burkina_faso.emc_i=), bound

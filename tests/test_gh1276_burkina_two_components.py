@@ -327,3 +327,34 @@ def test_the_panel_components_food_numbers_are_untouched(bf):
                   int((x["s"] == "inkind").sum()))
     assert out["panel"] == (27_888_221.36, 6_148), out["panel"]
     assert out["cross"] == (56_921_117.82, 13_745), out["cross"]
+
+
+# The columns a component may lack, by design: the cross-section has no panel
+# weight, and 6277's s16a ships no parcel coordinates.
+EMPTY_IN_CROSS_BY_DESIGN = {"sample": {"panel_weight"},
+                            "plot_features": {"Latitude", "Longitude"}}
+
+
+@pytest.mark.requires_s3
+@pytest.mark.parametrize("table", ["sample", "cluster_features"] + HOUSEHOLD_TABLES)
+def test_no_column_is_served_empty_for_one_component_only(bf, table):
+    """The served-level guard on the two-file reads' ``missing_ok=True``: a
+    column a component's file lacks would be filled NaN silently.  Every
+    column that carries a value for one component carries one for the other,
+    except the two documented by design."""
+    df = getattr(bf, table)(waves=[WAVE]).reset_index()
+    if "v" not in df.columns:
+        s = bf.sample(waves=[WAVE]).reset_index()
+        df["v"] = df["i"].map(dict(zip(s["i"], s["v"])))
+    comp = _component(df["v"])
+    index_cols = {"t", "v", "i", "pid", "j", "u", "s", "visit", "plot_id", "Shock"}
+    one_sided = []
+    for col in df.columns:
+        if col in index_cols:
+            continue
+        has_p = bool(df.loc[comp == "panel", col].notna().any())
+        has_x = bool(df.loc[comp == "cross", col].notna().any())
+        if has_p != has_x:
+            one_sided.append(col)
+    expected = sorted(EMPTY_IN_CROSS_BY_DESIGN.get(table, set()))
+    assert sorted(one_sided) == expected, (sorted(one_sided), expected)

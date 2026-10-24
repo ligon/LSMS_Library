@@ -13,15 +13,16 @@ Wave: 2021-22
 # HOUSEHOLD IDS (GH #1244).  The panel component keeps the country `i`
 # (grappe + menage.zfill(3)), which panel_ids / updated_ids link to 2018-19.
 # The cross-section is an independent sample, and with the same formatter 9
-# of its ids equal 2018-19 ids (2018-19's (59, 612) and the cross-section's
-# (590, 612) both spell '590612'), so every Cross_Section/ entry that builds
-# `i` overrides it per file with `cs_i`: 'CS_' + grappe + menage.zfill(3)
-# (burkina_faso.CROSS_SECTION_PREFIX).  cluster_features' `i: menage` is only
-# projected away, so it needs none.
+# of its ids equal 2018-19 ids (for a three-digit menage m, 2018-19's (g, m)
+# spells g + '0' + m, as does the cross-section's (10g, m)), so every
+# Cross_Section/ entry that builds `i` overrides it per file with `cs_i`:
+# 'CS_' + grappe + menage.zfill(3) (burkina_faso.CROSS_SECTION_PREFIX).
+# cluster_features' `i: menage` is only projected away, so it needs none.
+#
 # A two-file `file:` list makes Wave.grab_data pass missing_ok=True, so a
 # column absent from ONE component is filled NaN instead of raising.  The
-# only requested columns that are: hhweight2021 / hhweight_panel (absent from
-# the cross-section's weights file; see `sample`).  Pinned by
+# only requested column that is: hhweight_panel (absent from the
+# cross-section's weights file; see `sample`).  Pinned by
 # tests/test_gh1276_burkina_two_components.py.
 
 sample:
