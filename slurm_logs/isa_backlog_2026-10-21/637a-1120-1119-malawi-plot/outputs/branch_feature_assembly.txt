@@ -1,0 +1,14 @@
+crop_production: rows 151439; kept ['Malawi', 'Tanzania']; index ['country', 't', 'v', 'i', 'plot_id', 'j', 'u', 'condition', 'season', 'production_obs', 'currency']
+   exclusion warnings: 1 ['crop_production: this result pools 4 materially different population universes, plus 1 wave(s) whose universe is not documented at all. Nothing was dropped -- e']
+   Malawi rows 135370
+   Malawi production_obs: reported:<G|P>:<code> 135370 | unresolved_observation 0 | NaN 0
+   Malawi plot_id unknown_plot 41 | NaN 0
+plot_inputs: rows 189559; kept ['Malawi', 'Tanzania']; index ['country', 't', 'v', 'i', 'plot_id', 'input', 'j', 'u', 'season', 'currency']
+   exclusion warnings: 1 ['plot_inputs: this result pools 4 materially different population universes, plus 1 wave(s) whose universe is not documented at all. Nothing was dropped -- every']
+   Malawi rows 179850
+   Malawi plot_id unknown_plot 0 | NaN 0
+   Malawi j '(not crop-specific)' 67554 | NaN j 0 | Tanzania NaN j 2830
+plot_labor: rows 88624; kept ['Malawi', 'Tanzania']; index ['country', 't', 'v', 'i', 'plot_id', 'stage', 'source', 'worker', 'season', 'currency']
+   exclusion warnings: 1 ['plot_labor: this result pools 4 materially different population universes, plus 1 wave(s) whose universe is not documented at all. Nothing was dropped -- every ']
+   Malawi rows 79997
+   Malawi plot_id unknown_plot 40 | NaN 0
