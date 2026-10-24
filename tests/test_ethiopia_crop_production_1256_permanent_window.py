@@ -16,7 +16,7 @@ each crop row itself (§4 Q15, ``s4q15``: W4 "IS THIS CROP A FRUIT TREE
 CROP?", W5 variable label "IS THIS CROP A Permanent/TREE CROP?" -- no W5
 questionnaire is held).  Rows whose crop that flag marks permanent (every §4
 line of the key says Yes) and that serve one of the three numbers are stamped
-``Derivation = 'Ethiopia::crop_production::permanent-crop-12-month-window'``;
+``Derivation = 'Ethiopia::crop_production::12-month-harvest-window'``;
 the values are untouched (the registered function is the identity).
 
 Tiers: the synthetic and static tests need no data; ``requires_s3`` tests
@@ -35,7 +35,7 @@ import pytest
 from lsms_library.paths import countries_root
 
 ROOT = countries_root() / "Ethiopia"
-KEY = "Ethiopia::crop_production::permanent-crop-12-month-window"
+KEY = "Ethiopia::crop_production::12-month-harvest-window"
 W45 = {"2018-19": 4, "2021-22": 5}
 
 
@@ -128,9 +128,9 @@ def test_the_stamp_moves_no_value_and_no_row(eth):
     pd.testing.assert_frame_equal(with_flag.drop(columns="Derivation"), plain)
 
 
-def test_derive_permanent_crop_window_is_the_identity(eth):
+def test_derive_harvest_window_is_the_identity(eth):
     q, qs, vs = pd.Series([1.0, nan]), pd.Series([nan, 2.0]), pd.Series([0.0, 5.0])
-    out = eth.derive_permanent_crop_window(q, qs, vs)
+    out = eth.derive_harvest_window(q, qs, vs)
     pd.testing.assert_series_equal(out["Quantity"], q, check_names=False)
     pd.testing.assert_series_equal(out["Quantity_sold"], qs, check_names=False)
     pd.testing.assert_series_equal(out["Value_sold"], vs, check_names=False)
@@ -143,8 +143,8 @@ def test_the_derivation_is_registered_and_resolves():
     # serve §12 Q3, a harvest "in the past 12 months".
     assert rec.waves == ["2011-12", "2018-19", "2021-22"]
     assert rec.columns == ["Quantity", "Quantity_sold", "Value_sold"]
-    assert rec.resolve().__name__ == "derive_permanent_crop_window"
-    assert rec.resolve("inputs").__name__ == "inputs_permanent_crop_window"
+    assert rec.resolve().__name__ == "derive_harvest_window"
+    assert rec.resolve("inputs").__name__ == "inputs_harvest_window"
 
 
 @pytest.mark.parametrize("wave", sorted(W45))

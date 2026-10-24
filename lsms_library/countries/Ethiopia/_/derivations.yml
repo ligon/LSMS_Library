@@ -34,7 +34,7 @@ Ethiopia::crop_production::sect12-sale-period:
     section 9 excludes (one row per (holder, crop) at the crop's unique
     section-4 field, Quantity = Q3; @ligon ruling 2026-10-23, PR #1257): a
     row that serves both carries both keys, this one and
-    permanent-crop-12-month-window, joined by '+'.
+    12-month-harvest-window, joined by '+'.
   function: lsms_library.countries.Ethiopia._.ethiopia:derive_sect12_sale
   inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_sect12_sale
   raw_variables:
@@ -83,7 +83,7 @@ Ethiopia::crop_production::sect12-sale-period:
         keyed (household, holder, crop) with no parcel or field, the grain of
         section 11.  In W1, for a crop section 9 excludes, the only plot is
         the minted row at the crop's unique section-4 field (rule of
-        permanent-crop-12-month-window)
+        12-month-harvest-window)
       basis: config-comment
       evidence: >-
         Ethiopia/_/ethiopia.py, SALES GRAIN CAVEAT (the section-11 rule since
@@ -117,7 +117,7 @@ Ethiopia::crop_production::sect12-sale-period:
   contents: Ethiopia/_/CONTENTS.org, "§12 wired as a second sale source (GH #820)"
   since: '2026-10-23'
 
-Ethiopia::crop_production::permanent-crop-12-month-window:
+Ethiopia::crop_production::12-month-harvest-window:
   waves: ['2011-12', '2018-19', '2021-22']
   columns: [Quantity, Quantity_sold, Value_sold]
   rule: >-
@@ -149,9 +149,13 @@ Ethiopia::crop_production::permanent-crop-12-month-window:
     section-4 permanent flag of the W4 kind: section 12's roster is the
     instrument's own selection, and it includes root crops and vegetables
     (potato, sweet potato, garlic, leafy greens) that are not permanent --
-    the WINDOW is what this key records, not the crop's permanence.
-  function: lsms_library.countries.Ethiopia._.ethiopia:derive_permanent_crop_window
-  inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_permanent_crop_window
+    the WINDOW is what this key records, not the crop's permanence.  Hence
+    the name: registered on 2026-10-23 as permanent-crop-12-month-window
+    and renamed the same day, before any release (a key names an OPERATION,
+    CLAUDE.md "Derived Values"; the operation is the 12-month harvest
+    window, in all three waves).
+  function: lsms_library.countries.Ethiopia._.ethiopia:derive_harvest_window
+  inputs: lsms_library.countries.Ethiopia._.ethiopia:inputs_harvest_window
   raw_variables:
     - sect9_ph_w{4,5}.holder_id / parcel_id / field_id / s9q00b (crop code)
     - sect9_ph_w{4,5}.s9q04 (Q4 harvested any? -- "for permanent crop harvested between March 10, 2018 to March 9, 2019")

@@ -397,7 +397,7 @@ def test_the_stamp_rides_to_the_served_table(cp):
     against development (9,502).  Every stamped row carries a sale cell, and
     the attrs summary counts exactly the stamped rows."""
     key = "Ethiopia::crop_production::sect12-sale-period"
-    window = "Ethiopia::crop_production::permanent-crop-12-month-window"
+    window = "Ethiopia::crop_production::12-month-harvest-window"
     d = cp["Derivation"].astype("string")
     t = cp.index.get_level_values("t")
     carries = d.str.contains(key, regex=False).fillna(False)

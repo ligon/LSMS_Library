@@ -17,7 +17,7 @@ months", s11q04 trees), so the ESS4 design -- a permanent crop's harvest and
 sales on a fixed 12 months, not the season (W4 §9 Q4) -- is taken to hold.
 The rows whose crop the §4 roster flags permanent (s4q15, variable label
 "IS THIS CROP A Permanent/TREE CROP?"; colmap ``pl_permanent``) are stamped
-``Derivation = 'Ethiopia::crop_production::permanent-crop-12-month-window'``.
+``Derivation = 'Ethiopia::crop_production::12-month-harvest-window'``.
 """
 import sys
 

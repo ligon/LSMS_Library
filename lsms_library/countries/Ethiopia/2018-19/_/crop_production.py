@@ -17,7 +17,7 @@ to March 9, 2019"; §11 Q1: "FOR PERMANENT CROPS PLEASE INCLUDE CROP
 HARVESTED BETWEEN MARCH 10, 2018 TO MARCH 9, 2019").  The rows whose crop the
 §4 roster flags permanent (PP §4 Q15 "IS THIS CROP A FRUIT TREE CROP?",
 s4q15; colmap ``pl_permanent``) are stamped
-``Derivation = 'Ethiopia::crop_production::permanent-crop-12-month-window'``.
+``Derivation = 'Ethiopia::crop_production::12-month-harvest-window'``.
 """
 import sys
 

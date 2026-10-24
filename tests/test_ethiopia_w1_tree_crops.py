@@ -13,7 +13,7 @@ Rulings (@ligon, 2026-10-23, on PR #1257):
 W1's §9 is headed "EXCLUDE TREE/ROOT CROPS", so these crops had no row: 6,134
 §12 lines (1,679 with a positive sale, 1.83M Birr) were counted, not served.
 The minted row's ``Quantity`` is §12 Q3, "harvested in the past 12 months" (KG),
-so it carries ``permanent-crop-12-month-window`` (waves widened to 2011-12);
+so it carries ``12-month-harvest-window`` (waves widened to 2011-12);
 its sale is attached by the reviewed §12 attach and carries
 ``sect12-sale-period``; a row with both carries both, joined by ``'+'``.
 
@@ -36,7 +36,7 @@ from lsms_library.paths import countries_root
 
 ROOT = countries_root() / "Ethiopia"
 SALE = "Ethiopia::crop_production::sect12-sale-period"
-WINDOW = "Ethiopia::crop_production::permanent-crop-12-month-window"
+WINDOW = "Ethiopia::crop_production::12-month-harvest-window"
 BOTH = WINDOW + "+" + SALE
 nan = np.nan
 
@@ -199,7 +199,7 @@ def test_the_window_key_is_widened_to_w1():
     derivation_records.cache_clear()
     rec = derivation_records("Ethiopia")[WINDOW]
     assert rec.waves == ["2011-12", "2018-19", "2021-22"]
-    assert rec.resolve("inputs").__name__ == "inputs_permanent_crop_window"
+    assert rec.resolve("inputs").__name__ == "inputs_harvest_window"
 
 
 # ---------------------------------------------------------------------------

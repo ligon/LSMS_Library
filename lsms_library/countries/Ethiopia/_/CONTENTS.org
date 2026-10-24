@@ -2284,7 +2284,7 @@ permanent only if EVERY §4 line says Yes (4 W4 / 5 W5 keys whose lines
 disagree, and the 93 / 235 §9 rows with no §4 line, are not marked).  Every
 served row so marked that serves a =Quantity=, =Quantity_sold= or
 =Value_sold= is stamped =Derivation =
-'Ethiopia::crop_production::permanent-crop-12-month-window'= (registered in
+'Ethiopia::crop_production::12-month-harvest-window'= (registered in
 =Ethiopia/_/derivations.yml=; function =derive_permanent_crop_window=, the
 identity; inputs =inputs_permanent_crop_window=, every §9 row with its
 =s4q15= and every §11 line, original names, =(t, i, j)=).  Stamped AFTER the
@@ -2341,7 +2341,7 @@ the core collapse serves one (=GrainCollapseWarning= W5 +1 group, +1 row
 destroyed; the other three waves' reports unchanged).  §12: all 29
 positive lines (11,339 Birr) now served; class 7 holds no line with a
 value.  Stamps: =sect12-sale-period= W2 4,463 -> 4,672, W3 4,495 -> 4,557;
-=permanent-crop-12-month-window= W4 3,713 -> 3,796, W5 3,723 -> 3,875.
+=12-month-harvest-window= (then =permanent-crop-12-month-window=) W4 3,713 -> 3,796, W5 3,723 -> 3,875.
 =NullIndexKeyWarning= (=v= missing): 382 -> 387 rows (W4 +4, W5 +1 -- added
 rows of households =sample()= does not carry; the W4 orphan rate noted under
 "Household id emitted as i").  Downstream: =gross_crop_revenue= +5,409 /
@@ -2396,17 +2396,27 @@ through the reviewed §12 attach (=_attach_sect12_sales=), which fills Q6-Q8
 and stamps =sect12-sale-period=.
 
 *Stamps.*  Q3 is the harvest "in the past 12 months", served beside §9's
-season harvests -- the window =permanent-crop-12-month-window= registers, its
+season harvests -- the window =12-month-harvest-window= registers, its
 =waves:= widened to 2011-12 (the brief: "reuse them, widening =waves:= as
 needed").  A minted row that serves Q3 carries it; one that also serves a §12
 sale carries both keys, joined by the registry's =MULTI_SEP=:
-=Ethiopia::crop_production::permanent-crop-12-month-window+Ethiopia::crop_production::sect12-sale-period=.
+=Ethiopia::crop_production::12-month-harvest-window+Ethiopia::crop_production::sect12-sale-period=.
 =derivation_inputs(window key, wave='2011-12')= returns every §12 line and
-every §4 crop line (the field), original names, =(t, i, j)=.  *Open naming
-question:* W1 §12 includes root crops and vegetables (the window rows'
-=perennial=: 1,983 True, 1,287 False; top crops Leafy Greens 320, Coffee 276,
-Berbere 262, Pumpkin 204, Enset 194), so "permanent-crop" names the window,
-not the crop; the entry's rule says so.
+every §4 crop line (the field), original names, =(t, i, j)=.
+
+*Renamed: =12-month-harvest-window= (2026-10-23, before release).*  W1 §12
+includes root crops and vegetables (the window rows' =perennial=: 1,983
+True, 1,287 False; top crops Leafy Greens 320, Coffee 276, Berbere 262,
+Pumpkin 204, Enset 194), so the original name =permanent-crop-12-month-window=
+named a crop property the key does not record.  A key names an OPERATION
+(CLAUDE.md "Derived Values"), and the operation is the 12-month harvest
+window in all three waves, so the key -- registered with GH #1256 and not yet
+released -- is renamed in W1, W4 and W5 alike, with its callables
+(=HARVEST_WINDOW_DERIVATION=, =derive_harvest_window=,
+=inputs_harvest_window=).  The name keeps this registry's own spelling,
+"12-month" (cf. Mali's =tree-twelve-month-total=), and drops only the crop
+qualifier.  The W4/W5 rows it marks are still chosen by the §4 permanent /
+tree flag (=pl_permanent=), which keeps its name: that IS a crop property.
 
 *Measured, cold, development =57d255585= -> this branch*
 (=Country('Ethiopia').crop_production()=):

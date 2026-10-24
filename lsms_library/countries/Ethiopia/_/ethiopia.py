@@ -1947,17 +1947,21 @@ def inputs_sect12_sale(wave):
     return out
 
 
-#: The registry key stamped on ``crop_production.Derivation`` for every W4/W5
-#: row whose crop the post-planting roster flags PERMANENT (GH #1256).  Entry:
-#: ``Ethiopia/_/derivations.yml``.  What is derived is the WINDOW: ESS4 puts a
-#: permanent crop's harvest (§9 Q4/Q5) and sales (§11) on the fixed 12 months
-#: March 10, 2018 - March 9, 2019, while the season rows beside it are this
-#: agricultural season.  The W1-W3 analogue is SECT12_SALE_DERIVATION.
-PERMANENT_CROP_WINDOW_DERIVATION = 'Ethiopia::crop_production::permanent-crop-12-month-window'
+#: The registry key of the 12-month harvest WINDOW (GH #1256): stamped on
+#: every W4/W5 row whose crop the post-planting roster flags PERMANENT, and on
+#: every W1 row minted from §12 that serves a Q3 harvest (GH #820 ruling).
+#: Entry: ``Ethiopia/_/derivations.yml``.  ESS4 puts a permanent crop's
+#: harvest (§9 Q4/Q5) and sales (§11) on the fixed 12 months March 10, 2018 -
+#: March 9, 2019; W1 §12 Q3 is the harvest "in the past 12 months"; the
+#: season rows beside them are this agricultural season.  The key names the
+#: window, not the crop -- it was ``permanent-crop-12-month-window`` until its
+#: unreleased rename on 2026-10-23.  The §12 sale analogue is
+#: SECT12_SALE_DERIVATION.
+HARVEST_WINDOW_DERIVATION = 'Ethiopia::crop_production::12-month-harvest-window'
 
 #: Waves whose §9 / §11 carry the permanent-crop window, the files and the
 #: crop-code / flag variables (W5's §11 crop code is ``s11q01b``).
-PERMANENT_WINDOW_SOURCES = {
+HARVEST_WINDOW_SOURCES = {
     '2018-19': dict(s9='sect9_ph_w4.dta', s9_code='s9q00b', s4='sect4_pp_w4.dta',
                     s4_code='s4q01b', s11='sect11_ph_w4.dta', s11_code='s11q01'),
     '2021-22': dict(s9='sect9_ph_w5.dta', s9_code='s9q00b', s4='sect4_pp_w5.dta',
@@ -1969,21 +1973,22 @@ PERMANENT_WINDOW_SOURCES = {
 #: (Q15), and §11's permanent-crop block (Q2 last completed production
 #: period, Q3 harvest in the last 12 months, Q4 trees) and sales (Q7 sold?,
 #: Q11 quantity + unit, Q12 value).
-PERMANENT_WINDOW_S9_VARIABLES = ['holder_id', 'parcel_id', 'field_id', 's9q00b', 's9q04',
+HARVEST_WINDOW_S9_VARIABLES = ['holder_id', 'parcel_id', 'field_id', 's9q00b', 's9q04',
                                  's9q05a', 's9q05b', 's9q08a', 's9q08b']
-PERMANENT_WINDOW_S11_VARIABLES = ['holder_id', 's11q02a1', 's11q02a2', 's11q02b1', 's11q02b2',
+HARVEST_WINDOW_S11_VARIABLES = ['holder_id', 's11q02a1', 's11q02a2', 's11q02b1', 's11q02b2',
                                   's11q03a1', 's11q03a2', 's11q04', 's11q07', 's11q11a',
                                   's11q11b', 's11q12']
 
 
-def derive_permanent_crop_window(quantity, quantity_sold, value_sold):
-    """W4/W5 permanent-crop rows -> the ``Quantity`` / ``Quantity_sold`` /
-    ``Value_sold`` they serve (GH #1256): THE IDENTITY.
+def derive_harvest_window(quantity, quantity_sold, value_sold):
+    """The 12-month-window rows -> the ``Quantity`` / ``Quantity_sold`` /
+    ``Value_sold`` they serve (GH #1256; W1 since the GH #820 ruling): THE
+    IDENTITY.  W1's minted rows serve §12 Q3 as ``Quantity`` exactly so.
 
     The numbers are served exactly as ``crop_production`` serves every row
     (§9 Q5 for ``Quantity``; §11 Q11 / Q12 through the §11 sale rule for the
     sale columns).  What the registered derivation
-    (``Ethiopia::crop_production::permanent-crop-12-month-window``) records is
+    (``Ethiopia::crop_production::12-month-harvest-window``) records is
     the WINDOW: for a permanent crop the ESS4 post-harvest questionnaire asks
     for the crop "harvested between March 10, 2018 to March 9, 2019" (§9 Q4;
     §11 Q1's header), a fixed 12 months, while every other row beside it is
@@ -1999,7 +2004,7 @@ def derive_permanent_crop_window(quantity, quantity_sold, value_sold):
 #: W1 (GH #820 ruling, 2026-10-23): §12 crops with no §9 row are served as
 #: rows of their own (:func:`_mint_sect12_rows`); their ``Quantity`` is §12 Q3,
 #: the harvest "in the past 12 months", so they carry the same window key.
-PERMANENT_WINDOW_S12_WAVES = ('2011-12',)
+HARVEST_WINDOW_S12_WAVES = ('2011-12',)
 
 #: §4 (post-planting crop roster) variables that key a minted W1 row to its
 #: field: the crop's unique (holder, parcel, field).
@@ -2030,8 +2035,8 @@ def _inputs_sect12_minted_rows(wave):
     return pd.concat([a, b])
 
 
-def inputs_permanent_crop_window(wave):
-    """The raw answers behind the ``permanent-crop-12-month-window`` rows (GH #1256).
+def inputs_harvest_window(wave):
+    """The raw answers behind the ``12-month-harvest-window`` rows (GH #1256).
 
     One long frame indexed ``(t, i, j)`` (``i`` the wave-native
     ``household_id``; ``j`` through :func:`_eth_crop_label_map_for_wave`), with
@@ -2039,11 +2044,11 @@ def inputs_permanent_crop_window(wave):
     variable names as columns:
 
     * ``sect9_ph`` -- EVERY §9 harvest row (plot-crop grain;
-      :data:`PERMANENT_WINDOW_S9_VARIABLES`) with the §4 roster's ``s4q15``
+      :data:`HARVEST_WINDOW_S9_VARIABLES`) with the §4 roster's ``s4q15``
       joined on (holder, parcel, field, crop) -- the flag the stamp reads (an
       ambiguous key, whose §4 lines disagree, carries <NA>);
     * ``sect11_ph`` -- EVERY §11 line (holder-crop grain;
-      :data:`PERMANENT_WINDOW_S11_VARIABLES`), whose sales the build attaches
+      :data:`HARVEST_WINDOW_S11_VARIABLES`), whose sales the build attaches
       to a crop's single §9 plot (the SALES GRAIN CAVEAT).
 
     A served row's §9 line is found by ``(t, i, j)`` plus its ``plot_id``
@@ -2051,15 +2056,15 @@ def inputs_permanent_crop_window(wave):
     holder.  Nothing is cached.
     """
     from lsms_library.paths import countries_root
-    if wave in PERMANENT_WINDOW_S12_WAVES:
+    if wave in HARVEST_WINDOW_S12_WAVES:
         return _inputs_sect12_minted_rows(wave)
-    if wave not in PERMANENT_WINDOW_SOURCES:
+    if wave not in HARVEST_WINDOW_SOURCES:
         raise ValueError(
             f"the permanent-crop 12-month window is an ESS4 / ESPS-5 §9/§11 "
-            f"design ({sorted(PERMANENT_WINDOW_SOURCES)}) and W1's §12 rows "
-            f"({list(PERMANENT_WINDOW_S12_WAVES)}), not {wave!r}; W2/W3 serve "
+            f"design ({sorted(HARVEST_WINDOW_SOURCES)}) and W1's §12 rows "
+            f"({list(HARVEST_WINDOW_S12_WAVES)}), not {wave!r}; W2/W3 serve "
             f"§12 sales on §9 rows (sect12-sale-period).")
-    src = PERMANENT_WINDOW_SOURCES[wave]
+    src = HARVEST_WINDOW_SOURCES[wave]
     d = countries_root() / 'Ethiopia' / wave / 'Data'
     cmap = _eth_crop_label_map_for_wave(wave)
     s9 = get_dataframe(str(d / src['s9']), convert_categoricals=False)
@@ -2080,7 +2085,7 @@ def inputs_permanent_crop_window(wave):
     flag = (k4.drop_duplicates(['_k', '_c']).set_index(['_k', '_c'])['s4q15']
               .where(agree))
     k9 = _key(s9, src['s9_code'])
-    a = s9[PERMANENT_WINDOW_S9_VARIABLES].copy()
+    a = s9[HARVEST_WINDOW_S9_VARIABLES].copy()
     a['s4q15'] = pd.MultiIndex.from_frame(k9).map(flag.to_dict()).values
     a['s4q15'] = pd.to_numeric(a['s4q15'], errors='coerce').astype('Int64')
     a.insert(0, 'module', 'sect9_ph')
@@ -2089,7 +2094,7 @@ def inputs_permanent_crop_window(wave):
          s9['household_id'].apply(format_id).values,
          k9['_c'].map(cmap).astype('string').values], names=['t', 'i', 'j'])
 
-    b = s11[PERMANENT_WINDOW_S11_VARIABLES].copy()
+    b = s11[HARVEST_WINDOW_S11_VARIABLES].copy()
     b[src['s11_code']] = s11[src['s11_code']].values
     b.insert(0, 'module', 'sect11_ph')
     c11 = pd.to_numeric(s11[src['s11_code']], errors='coerce').astype('Int64')
@@ -2414,7 +2419,7 @@ def _mint_sect12_rows(t, out, sale12, planting, sale, colmap):
     period, not a harvest month; it is in ``derivation_inputs``).  The sale
     is NOT set here: the row is a one-plot (holder, crop), so the reviewed
     sale attach fills Q6-Q8 onto it and stamps ``sect12-sale-period``.  The
-    caller stamps :data:`PERMANENT_CROP_WINDOW_DERIVATION` on every minted
+    caller stamps :data:`HARVEST_WINDOW_DERIVATION` on every minted
     row that serves a ``Quantity``: Q3 is the harvest "in the past 12
     months", served beside §9's season harvests.
 
@@ -2547,7 +2552,7 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
             pl_permanent    — §4 per-crop permanent/tree flag (W4/W5
                               ``s4q15``, 1 = Yes); when given, rows of a
                               crop flagged permanent are stamped
-                              ``PERMANENT_CROP_WINDOW_DERIVATION`` (GH #1256)
+                              ``HARVEST_WINDOW_DERIVATION`` (GH #1256)
             s_crop_code, s_sold_flag, s_qty, s_value, s_unit  — §11 cols
                               (s_unit None => Kg, W1 sales report kilos)
             s12_crop_code, s12_sold_flag, s12_qty, s12_value — §12 cols
@@ -2577,9 +2582,9 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         intercropped (boolean), perennial (boolean), and -- only when
         ``sale12`` is given -- Derivation (string: ``SECT12_SALE_DERIVATION``
         on the rows §12 filled, NA elsewhere) or -- only when colmap names
-        ``pl_permanent`` -- Derivation (``PERMANENT_CROP_WINDOW_DERIVATION``
+        ``pl_permanent`` -- Derivation (``HARVEST_WINDOW_DERIVATION``
         on the permanent-crop rows, NA elsewhere).  W1's minted §12 rows
-        carry ``PERMANENT_CROP_WINDOW_DERIVATION`` where they serve a Q3
+        carry ``HARVEST_WINDOW_DERIVATION`` where they serve a Q3
         harvest, joined with ``SECT12_SALE_DERIVATION`` (``'+'``) where they
         also serve a §12 sale.
     """
@@ -2681,7 +2686,7 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
     # planting_month.  A crop row is permanent only if EVERY §4 line of its
     # key says Yes (1): a key whose §4 lines disagree, or a §9 row with no §4
     # line, is not marked (counted in CONTENTS.org).  Used for the
-    # PERMANENT_CROP_WINDOW_DERIVATION stamp below.
+    # HARVEST_WINDOW_DERIVATION stamp below.
     if planting is not None and c.get('pl_permanent'):
         n0 = len(out)
         pf = pd.DataFrame({
@@ -2825,7 +2830,7 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
     if '_minted' in out.columns:
         # GH #820 ruling, W1: a minted §12 row's harvest is §12 Q3, "harvested
         # in the past 12 months", served beside §9's season harvests -- the
-        # window PERMANENT_CROP_WINDOW_DERIVATION registers (its `waves:`
+        # window HARVEST_WINDOW_DERIVATION registers (its `waves:`
         # widened to 2011-12).  Its sale, if any, already carries
         # SECT12_SALE_DERIVATION from the attach; a row with both carries
         # both, joined by the registry's MULTI_SEP (sorted, as
@@ -2835,7 +2840,7 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         win = minted & out['Quantity'].notna().to_numpy()
         stamp = out['Derivation'].astype('string')
         stamp[win] = [MULTI_SEP.join(sorted(
-            {PERMANENT_CROP_WINDOW_DERIVATION}
+            {HARVEST_WINDOW_DERIVATION}
             | (set(str(x).split(MULTI_SEP)) if pd.notna(x) else set())))
             for x in stamp[win]]
         n_bare = int((minted & stamp.isna().to_numpy()).sum())
@@ -2850,13 +2855,13 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         # season rows.  Stamped on every row the §4 roster flags permanent
         # that serves one of those numbers -- after every filter above, so
         # the stamp rides only on served rows.  The values are not touched
-        # (`derive_permanent_crop_window` is the identity).
+        # (`derive_harvest_window` is the identity).
         win = (out['_permanent'].to_numpy(dtype=bool)
                & out[['Quantity', 'Quantity_sold', 'Value_sold']].notna().any(axis=1).to_numpy())
         stamp = (out['Derivation'].astype('string') if 'Derivation' in out.columns
                  else pd.Series(pd.NA, index=out.index, dtype='string'))
         assert stamp[win].isna().all(), f"{t}: a row already carries a Derivation"
-        stamp[win] = PERMANENT_CROP_WINDOW_DERIVATION
+        stamp[win] = HARVEST_WINDOW_DERIVATION
         out['Derivation'] = stamp
         out = out.drop(columns=['_permanent'])
     out = out.drop(columns=['_holder', '_code'])
