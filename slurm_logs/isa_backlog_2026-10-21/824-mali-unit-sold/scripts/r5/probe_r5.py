@@ -5,6 +5,8 @@ import os, sys, json, warnings
 warnings.simplefilter('ignore')
 import numpy as np, pandas as pd
 base_dir, br_dir, checkout = sys.argv[1:4]
+import lsms_library
+assert os.path.realpath(lsms_library.__file__).startswith(os.path.realpath(checkout) + os.sep), lsms_library.__file__
 IDX = ['i', 't', 'v', 'plot_id', 'crop']
 fr = {s: pd.read_parquet(f'{d}/crop_production.parquet') for s, d in (('base', base_dir), ('branch', br_dir))}
 out = {}

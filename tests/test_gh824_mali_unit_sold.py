@@ -55,11 +55,13 @@ TABLE = "crop_production"
 #: masked the 999999 value code, which 2 more priced rows carry (both sold
 #: in Kg, beside a different harvest unit: differ 42 -> 40) -> (190, 188,
 #: 184, 40) at development 57d255585.  The revised ruling serves the sale as
-#: recorded, so the 6 return (none is a disagreement) and the 2 code rows
-#: stay out.
+#: recorded, so 5 of the 6 return (none is a disagreement; the sixth records
+#: the 999998 value code) and the 2 999999 rows stay out.  The FIELD row lost
+#: the 2 priced rows whose value is the 999999 code (569 -> 567; the PR #1272
+#: follow-up masks it on field values too).
 PRICED = {
-    ("2014-15", "field"): (569, 568, 567, 95),
-    ("2014-15", "tree"): (196, 194, 188, 40),
+    ("2014-15", "field"): (567, 566, 565, 95),
+    ("2014-15", "tree"): (195, 193, 187, 40),
     ("2017-18", "field"): (451, 451, 449, 87),
     ("2017-18", "tree"): (127, 127, 127, 18),
 }
@@ -72,7 +74,7 @@ AUTRE_TONNE_2017 = 30
 #: 2014-15 served field rows whose raw s3aq24 is the 999999 code (and whose
 #: sale was not answered 'Non'): served 999999 at development 57d255585,
 #: NA now (the PR #1272 follow-up, 2026-10-23).
-FIELD_VALUE_CODE_2014 = None  # measured
+FIELD_VALUE_CODE_2014 = 12
 #: 2017-18 field rows served Quantity_sold == 0 / Value_sold == 0 (ruling on
 #: PR #1272: 0 only on an explicit s7gq20 == 'Non').  8,806 'Non' rows each,
 #: plus one 'Oui' sale line that records a quantity of 0 (its value is not
@@ -276,18 +278,19 @@ class TestServed:
         got = (len(g), _n(g.Unit_sold.notna()), _n(knows), _n(knows & (g.Unit_sold != g.u)))
         assert got == PRICED[(wave, kind)], f"{got} != {PRICED[(wave, kind)]}"
 
-    def test_no_row_serves_the_999999_value_code(self, flat):
+    def test_no_row_serves_a_value_code(self, flat):
         """At development 57d255585 FIELD_VALUE_CODE_2014 field rows of 2014-15
-        served 999999 as a sale value; it is the field's 'non declare' code."""
-        n = _n(flat.Value_sold == 999999)
-        assert n == 0, f"{n} rows serve the 999999 value code"
+        served 999999 as a sale value; 999999 / 999998 are the six-digit
+        field's 'non declare' / 'ne sait pas' codes."""
+        n = _n(flat.Value_sold.isin([999998, 999999]))
+        assert n == 0, f"{n} rows serve a value code"
 
     def test_the_field_value_code_rows_serve_no_value(self, flat, mali):
         """Raw oracle: every served 2014-15 field row whose raw s3aq24 is 999999
         (and whose sale was not answered 'Non') serves Value_sold NA."""
         s = get_dataframe(str(_root() / "2014-15" / "Data" / "EACIS3A_p2.dta"))
         f = pd.to_numeric(s["s3aq24"], errors="coerce")
-        code = (f == 999999).fillna(False) & ~s["s3aq22"].astype("string").str.strip().eq("Non").fillna(False)
+        code = f.isin([999998, 999999]).fillna(False) & ~s["s3aq22"].astype("string").str.strip().eq("Non").fillna(False)
         f0 = s[code.to_numpy(dtype=bool)]
         hh = f0.apply(lambda r: mali.i(pd.Series([r["grappe"], r["menage"]])), axis=1)
         pf = f0["s3aq01"].astype("Int64").astype("string") + "_" + f0["s3aq02"].astype("Int64").astype("string")

@@ -5,6 +5,7 @@ Usage: python build_all.py <outdir> [table ...]  (default: every table)."""
 import sys, os, time, warnings, json
 import pandas as pd
 import lsms_library as ll
+assert os.path.realpath(ll.__file__).startswith(os.path.realpath(os.environ['CLONE']) + os.sep), ll.__file__
 out = sys.argv[1]; os.makedirs(out, exist_ok=True)
 c = ll.Country('Mali')
 scheme = list(c.data_scheme)

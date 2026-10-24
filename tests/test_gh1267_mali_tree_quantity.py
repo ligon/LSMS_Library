@@ -76,41 +76,47 @@ STILL_EQUAL_2014 = 126
 #: Quantity 86 = 85 'Aucune recolte' rows with no answer + 1 beside a
 #: positive harvest.  THE SALE (as recorded, revised ruling): 2014-15
 #: Quantity_sold 2 = the two missing codes, and Value_sold 156 = 153 unsold or
-#: unrecorded + the 3 rows carrying the 999999 code -- the 0 / missing month
-#: count no longer blanks a sale (it did in rounds 1-3: 8 and 162 at
-#: development 57d255585); 2017-18 85 and 143, unchanged.
+#: unrecorded + the 3 rows carrying the 999999 code + the 1 carrying 999998
+#: (the six-digit field's "ne sait pas" value) -- the 0 / missing month count
+#: no longer blanks a sale (it did in rounds 1-3: 8 and 162 at development
+#: 57d255585); 2017-18 85 and 143, unchanged.
 EDGE_NA = {("2014-15", "Quantity"): 7, ("2014-15", "Quantity_sold"): 2,
-           ("2014-15", "Value_sold"): 156,
+           ("2014-15", "Value_sold"): 157,
            ("2017-18", "Quantity"): 86, ("2017-18", "Quantity_sold"): 85,
            ("2017-18", "Value_sold"): 143}
 #: Tree rows with a positive served sale (Quantity_sold > 0 or Value_sold >
-#: 0), which carry SALE_KEY beside KEY: 2014-15 203 = 196 priced + 4 with a
-#: zero value + 2 whose value is the 999999 code + 1 with a value and no
-#: positive quantity; 2017-18 128 = 127 priced + 1 with no value recorded.
+#: 0), which carry SALE_KEY beside KEY: 2014-15 203 = 195 priced + 4 with a
+#: zero value + 3 whose value is a code (999999 twice, 999998 once) + 1 with
+#: a value and no positive quantity; 2017-18 128 = 127 priced + 1 with no
+#: value recorded.
 SALE_ROWS = {"2014-15": 203, "2017-18": 128}
 #: Priced tree rows (Quantity_sold > 0 and Value_sold > 0) by wave: 2014-15
-#: 190 -> 196 against development 57d255585, the six whose month count is 0
-#: (3) or missing (3) now serving their recorded sale.
-PRICED_TREES = {"2014-15": 196, "2017-18": 127}
+#: 190 -> 195 against development 57d255585 -- the six sales beside a month
+#: count of 0 (3) or missing (3) are served as recorded, and one of them
+#: records the 999998 ("ne sait pas") value code, so five price.
+PRICED_TREES = {"2014-15": 195, "2017-18": 127}
 #: Served price (Value_sold / Quantity_sold) of tree rows SOLD IN Kg, median
 #: FCFA/kg, (wave, crop) -> (n, median), crops with n >= 5.  On every row
 #: priced both before and after the revised ruling the price is identical
-#: (both columns were multiplied by the same month count); the 2014-15
-#: cashew cell gains one row, a sale beside a 0 or missing month count, and
-#: its median moves 275 (n=12, development 57d255585) -> 300 (n=13).
+#: (both columns were multiplied by the same month count).  The 2014-15
+#: cashew cell is 12 rows and 275, as at development 57d255585: the one sale
+#: that would have joined it (beside a missing month count) records the
+#: 999998 value code, which priced at 18,182 FCFA/kg and moved the median
+#: to 300 until the code was masked (red team, 2026-10-23).
+KG_PRICES = {("2014-15", "Noix de cajou"): (12, 275.0), ("2014-15", "Mangue"): (9, 300.0),
+             ("2014-15", "Orange"): (5, 500.0),
+             ("2017-18", "Noix de cajou"): (21, 500.0), ("2017-18", "Mangue"): (9, 125.0)}
 #: The window mismatch, disclosed (CONTENTS.org): on tree rows whose sold
 #: and harvest units agree, with a positive harvest and a recorded sale --
 #: (rows, median Quantity_sold / Quantity, median Quantity_sold x
 #: months_harvested / Quantity, rows sold > harvest, rows rescaled sold >
 #: harvest).  The plain ratio is NOT a sold share (the harvest is a 12-month
-#: total, the sale per harvest month); the rescaled one is.
-WINDOW_MISMATCH = None  # measured below
+#: total, the sale per harvest month); the rescaled one is.  At development
+#: 57d255585, where both quantities were x months: (258, 0.917, 1.937, 28, 158).
+WINDOW_MISMATCH = (258, 0.375, 0.917, 16, 28)
 #: Tree rows serving a harvest of 0 beside a positive sale, by wave
 #: (recorded, not changed: CONTENTS.org).
-ZERO_HARVEST_SOLD = None  # measured below
-KG_PRICES = {("2014-15", "Noix de cajou"): (13, 300.0), ("2014-15", "Mangue"): (9, 300.0),
-             ("2014-15", "Orange"): (5, 500.0),
-             ("2017-18", "Noix de cajou"): (21, 500.0), ("2017-18", "Mangue"): (9, 125.0)}
+ZERO_HARVEST_SOLD = {"2014-15": 6, "2017-18": 1}
 
 
 def _root() -> Path:
@@ -131,10 +137,10 @@ def mali(monkeypatch):
 
 def _recorded(answer: pd.Series, *, value: bool = False) -> pd.Series:
     """A recorded answer, written independently of mali.py: a quantity loses
-    the 99 / 9999 / 9999.9 codes, a value the 999999 code."""
+    the 99 / 9999 / 9999.9 codes, a value the 999998 / 999999 codes."""
     x = pd.to_numeric(answer, errors="coerce").astype("float64")
     if value:
-        return x.mask(x == 999999)
+        return x.mask(x.isin([999998, 999999]))
     return x.mask(x.isin([99, 9999]) | np.isclose(x.to_numpy(dtype="float64"), 9999.9))
 
 
@@ -291,9 +297,11 @@ class TestDerive:
                 assert selected == declared, f"{key} {wave}: selected {selected} != declared {declared}"
 
     def test_the_value_code_mask(self, mali):
-        """999999 is a code on a value (field and tree); 9,999 FCFA is an amount."""
-        got = mali._mask_value_code(pd.Series([999999, 9999, 0, None, 500])).tolist()
-        assert pd.isna(got[0]) and pd.isna(got[3]) and got[1:3] == [9999.0, 0.0] and got[4] == 500.0
+        """999999 / 999998 are codes on a value (field and tree); 9,999 and
+        999,997 FCFA are amounts."""
+        got = mali._mask_value_code(pd.Series([999999, 9999, 0, None, 500, 999998, 999997])).tolist()
+        assert [bool(pd.isna(x)) for x in got] == [True, False, False, True, False, True, False]
+        assert got[1:3] == [9999.0, 0.0] and got[4] == 500.0 and got[6] == 999997.0
 
     def test_the_sale_derivation_is_the_identity(self, mali):
         qs = pd.Series([5.0, 0.0, np.nan, 99.0], index=[10, 11, 12, 13])
@@ -453,7 +461,8 @@ class TestServed:
         """The month count no longer touches the sale: the 2014-15 rows with a
         positive sale beside 0 months (3) or a missing count (3) serve their
         recorded sale (rounds 1-3 served the sold quantity there NA, round 3
-        the value too), and carry the sale key."""
+        the value too), and carry the sale key.  One of them records the
+        999998 value code, so five serve a value."""
         s = raw_sale[raw_sale.t == "2014-15"].copy()
         m = pd.to_numeric(s["s3bq09"], errors="coerce")
         pos = (_recorded(s["s3bq13a"]) > 0) | (_recorded(s["s3bq14"], value=True) > 0)
@@ -461,7 +470,7 @@ class TestServed:
         j = trees.merge(edge, on=["t", "i", "crop"], how="inner")
         got = (len(j), _n(j.Quantity_sold.notna()), _n(j.Value_sold.notna()),
                _n(j.Derivation.astype("string").eq(BOTH)))
-        assert got == (6, 6, 6, 6), f"(rows, Quantity_sold served, Value_sold served, sale key) {got}"
+        assert got == (6, 6, 5, 6), f"(rows, Quantity_sold served, Value_sold served, sale key) {got}"
 
     @pytest.mark.parametrize("wave, v, qs", [("2014-15", "s3bq14", "s3bq13a"),
                                              ("2017-18", "s11fq15", "s11fq14a")])

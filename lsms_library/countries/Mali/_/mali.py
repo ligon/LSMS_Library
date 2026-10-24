@@ -397,11 +397,11 @@ def _month_num(series):
 #
 # The edges:
 #   - the missing codes are masked on the recorded answer, before anything
-#     else: 99 / 9999 / 9999.9 on the two QUANTITY answers, and 999999 on
-#     the VALUE -- 2014-15's six-digit field maximum, which nothing exceeds
-#     in s3aq24 or s3bq14 and which 7 of its 12 field rows carry beside a
-#     zero quantity sold, so a code, not an amount.  The quantity codes are
-#     not applied to the value (9,999 FCFA is an amount).
+#     else: 99 / 9999 / 9999.9 on the two QUANTITY answers, and 999998 /
+#     999999 on the VALUE -- the "ne sait pas" / "non declare" values of
+#     2014-15's six-digit amount field (_VALUE_CODES; masked on the field
+#     value s3aq24 too).  The quantity codes are not applied to the value
+#     (9,999 FCFA is an amount).
 #     crop_production_finalize does not re-mask a tree row (a genuine
 #     harvest total can be 99);
 #   - THE HARVEST (the product): a per-month answer of 0 gives 0 whatever
@@ -415,6 +415,11 @@ def _month_num(series):
 #     other sale (the Ethiopia section-12 rule: an answer beside a
 #     contradicting flag is kept as reported); its key says the window is
 #     unsettled, and a user rescaling by months_harvested gets 0 / NA there.
+# THE WINDOW MISMATCH ON THE ROW (disclosed, red team 2026-10-23): a tree
+# row's Quantity is a 12-month total while its Quantity_sold is per harvest
+# month, so Quantity_sold / Quantity is NOT a sold share; the share is
+# Quantity_sold x months_harvested / Quantity.  On same-unit tree rows the
+# plain ratio's median is 0.375 (258 rows), the rescaled share's 0.917.
 # Every tree row carries tree-twelve-month-total, including one whose total
 # ends NA; tree-sale-window joins it (MULTI_SEP, sorted) on a tree row with
 # a positive Quantity_sold or Value_sold -- a zero sale is zero in any window.
@@ -460,23 +465,27 @@ _TREE_SALE_RAW = {
 #: and on the sold quantity served as recorded).
 _QUANTITY_SENTINELS = (99, 9999)
 _QUANTITY_SENTINEL_FLOAT = 9999.9
-#: The EAC-I code on a sale VALUE (FCFA): 999999, the all-nines value of
-#: 2014-15's six-digit amount fields s3aq24 (3A.24, field crops) and s3bq14
-#: (3B.14, trees).  The data dictionary gives both "Width: 6 ... Range:
-#: 0-999999" and declares no code, but the instrument's own convention is
-#: that a field's all-nines value is "Non declare" and the value ending in
-#: 8 is "ne sait pas": the 2014-15 agriculture P1 form, p. 8, "inscrire 9998
-#: si la personne ne connait pas l'annee, inscrire 9999 pour Non Declare",
-#: and the household forms ask a 6-digit amount "Si NSP INSCRIRE 999998"
-#: (4.29, 4.66); the WB harmonised MLI_EACI1.do:645 masks the 2014-15 seed
-#: value at ">= 999998"; and this module already masks 999999 on Mali's
-#: other FCFA columns, livestock SalesValue (_LIVESTOCK_SENTINELS) and the
-#: plot_labor wage (_LABOR_SENTINELS).  The data agree: nothing in s3aq24 or s3bq14
-#: exceeds it, and 7 of the 12 field rows carrying it report 0 sold.  Masked
-#: on BOTH field and tree values (field rows since the PR #1272 follow-up
-#: of 2026-10-23; trees since round 3) through :func:`_mask_value_code`.  No
-#: 2017-18 value equals it (amounts there reach 4,500,000).
-_VALUE_SENTINEL = 999999
+#: The EAC-I codes on a sale VALUE (FCFA): 999998 and 999999, the reserved
+#: values of 2014-15's six-digit amount fields s3aq24 (3A.24, field crops)
+#: and s3bq14 (3B.14, trees).  The data dictionary gives both "Width: 6 ...
+#: Range: 0-999999" and declares no code, but the instrument's own
+#: convention is that a field's all-nines value is "Non declare" and the
+#: value ending in 8 is "ne sait pas": the 2014-15 agriculture P1 form,
+#: p. 8, "inscrire 9998 si la personne ne connait pas l'annee, inscrire 9999
+#: pour Non Declare", and the household forms ask a 6-digit amount "Si NSP
+#: INSCRIRE 999998" (section 4, MEN P1 pp. 18 and 22).  The WB harmonised MLI_EACI1.do:645 masks
+#: the 2014-15 seed value at ">= 999998", and this module already masks
+#: 999999 on Mali's other FCFA columns, livestock SalesValue
+#: (_LIVESTOCK_SENTINELS) and the plot_labor wage (_LABOR_SENTINELS).  The
+#: data agree: nothing in s3aq24 or s3bq14 exceeds 999999; s3aq24 carries
+#: 999999 on 12 rows, 7 of them beside a zero quantity sold; s3bq14 carries
+#: 999999 on 3 rows and 999998 on 1 -- a cashew sale of 55 Kg beside a
+#: missing month count, which as an amount prices at 18,182 FCFA/kg against
+#: its cell's median of 275.  Masked on BOTH field and tree values (field
+#: rows and 999998 since the PR #1272 follow-up of 2026-10-23; 999999 on
+#: trees since round 3) through :func:`_mask_value_code`.  No 2017-18 value
+#: equals either (amounts there reach 4,500,000).
+_VALUE_CODES = (999998, 999999)
 
 
 def _is_quantity_sentinel(series):
@@ -486,14 +495,14 @@ def _is_quantity_sentinel(series):
 
 
 def _mask_value_code(series):
-    """A recorded sale VALUE (FCFA) as float64, with the 999999 code -> NaN.
+    """A recorded sale VALUE (FCFA) as float64, its codes 999998 / 999999 -> NaN.
 
     Used for the 2014-15 field value s3aq24 (wave script) and for every tree
-    value (:func:`tree_crop_rows`); see :data:`_VALUE_SENTINEL`.  The
+    value (:func:`tree_crop_rows`); see :data:`_VALUE_CODES`.  The
     quantity codes 99 / 9999 are NOT applied: 9,999 FCFA is an amount.
     """
     x = pd.to_numeric(series, errors='coerce').astype('float64')
-    return x.mask(x.eq(_VALUE_SENTINEL))
+    return x.mask(x.isin(_VALUE_CODES))
 
 
 def producing_trees(src, wave):
@@ -587,7 +596,8 @@ def tree_crop_rows(src, wave):
     :func:`derive_tree_twelve_month_total` of the per-month harvest, first
     cleared of the 99 / 9999 / 9999.9 missing codes; Quantity_sold and
     Value_sold are :func:`derive_tree_sale_window` -- the recorded answers,
-    the quantity cleared of the same codes and the value of 999999, not
+    the quantity cleared of the same codes and the value of 999998 /
+    999999 (:func:`_mask_value_code`), not
     multiplied by the month count; u and Unit_sold are the decoded Stata
     labels (``crop_production_finalize`` maps both through the ``u`` table);
     months_harvested is the month count.

@@ -1526,7 +1526,10 @@ after the document search, following the Ethiopia #1257 precedent)*:
   replaces the two #1267 identity keys (=3b-per-harvest-month=,
   =11f-per-harvest-month=).  The form and the 2017-18 manual (11F.11,
   "Quantite moyenne recoltee par mois") ask the harvest per month, so the
-  product is well founded; the 2014-15 manual states no window for 3B.10;
+  product is well founded.  The 2014-15 manual names no window for 3B.10:
+  it has the enumerator build the harvest up from daily or weekly figures
+  (quoted in the decision subsection below), so in 2014-15 the per-month
+  window is the printed form's;
 - =Quantity_sold= and =Value_sold= AS RECORDED -- the quantity sold per month
   and the sale value, not multiplied.  Registered identity
   =Mali::crop_production::tree-sale-window= (=mali.derive_tree_sale_window=),
@@ -1668,9 +1671,18 @@ among the shipped files):
   de la quantite totale vendue. »
 - The 2017-18 manual puts the quantities per month: 11F.11-14 (PDF p. 75)
   « en moyenne par mois durant la periode indiquee en (11F.10) ».  The 2014-15
-  manual states no window for 3B.10 / 3B.13 (PDF pp. 67-68; 3B.13 « ...
-  determiner la frequence des ventes et les quantites vendues a chaque
-  fois »); the printed form asks both "en moyenne chaque mois".
+  manual names no window for 3B.10 or 3B.13; it has the enumerator build each
+  figure up from smaller ones.  PDF p. 67, 3B.10: « Quantites produites. La
+  quantite produite est inscrite dans la colonne Quantite selon l'unite de
+  mesure locale dans la colonne UML. On ecrira l'equivalence en Kg de l'unite
+  de mesure locale notee. Il peut etre difficile de determiner ces quantites
+  produites. L'enqueteur utilisera des questions subsidiaires en demandant la
+  quantite produite par jour ou par semaine selon la periode la plus
+  appropriee, avant d'estimer la quantite ».  PDF p. 68, 3B.13: « ... De meme
+  que precedemment, la quantite vendue peut ne pas etre facile a evaluer. On
+  essaye la meme approche de determiner la frequence des ventes et les
+  quantites vendues a chaque fois. »  The printed form asks both "en moyenne
+  chaque mois", which is where the 2014-15 per-month window comes from.
 - The printed forms ask 3B.13 / 11F.14 as monthly averages and 3B.14 / 11F.15
   as "le montant total de cette vente"; the catalog's literal questions for
   =s3bq14= and =s11fq15= read "total" too.  Only the 2017-18 Stata label

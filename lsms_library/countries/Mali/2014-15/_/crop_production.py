@@ -83,8 +83,9 @@ seasonal = pd.DataFrame({
     'Quantity': s3a['s3aq08a'],
     'Quantity_sold': s3a['s3aq23a'],
     'Unit_sold': s3a['s3aq23b'],
-    # 999999 is the six-digit field's "non declare" code, not an amount
-    # (mali._VALUE_SENTINEL): 12 rows, 7 of them beside a zero quantity sold.
+    # 999999 / 999998 are the six-digit field's "non declare" / "ne sait pas"
+    # codes, not amounts (mali._VALUE_CODES): 999999 on 12 rows, 7 of them
+    # beside a zero quantity sold.
     'Value_sold': _mask_value_code(s3a['s3aq24']),
     'harvest_month': s3a['s3aq07b'],
     'planting_month': pd.NA,

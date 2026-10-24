@@ -152,10 +152,19 @@ Mali::crop_production::tree-twelve-month-total:
         derniers mois"; 11F.11 "Quantite moyenne recoltee par mois : ... la
         quantite moyenne de fruits recoltes par mois durant la periode
         indiquee en (11F.10)".  The 2014-15 manual (catalog 2583, resource
-        47800) PDF p. 67 states no window for 3B.10 ("Quantites produites")
-        and illustrates 3B.09 with "Un manguier va par exemple donner des
-        mangues pendant 3 a 4 mois dans l'annee".  Stata label s3bq10a
-        "Quantite en UML recoltee en moyenne chaque mois".
+        47800) PDF p. 67 names no window for 3B.10; it tells the enumerator
+        to build the figure up from daily or weekly quantities: "3B.10.
+        Quantites produites. La quantite produite est inscrite dans la
+        colonne Quantite selon l'unite de mesure locale dans la colonne UML.
+        On ecrira l'equivalence en Kg de l'unite de mesure locale notee. Il
+        peut etre difficile de determiner ces quantites produites.
+        L'enqueteur utilisera des questions subsidiaires en demandant la
+        quantite produite par jour ou par semaine selon la periode la plus
+        appropriee, avant d'estimer la quantite"; and it illustrates 3B.09
+        with "Un manguier va par exemple donner des mangues pendant 3 a 4
+        mois dans l'annee".  The per-month window comes from the printed form
+        in 2014-15.  Stata label s3bq10a "Quantite en UML recoltee en moyenne
+        chaque mois".
     - text: >-
         a month count of 0 beside a positive per-month harvest is a
         contradiction, not a zero: no total is formed and Quantity is NA.
@@ -208,12 +217,21 @@ Mali::crop_production::tree-sale-window:
     a seasonal figure the instrument cannot settle, and a user who wants the
     12-month reading multiplies both by months_harvested.  The edges: the
     missing codes are masked on the recorded answer -- 99 / 9999 / 9999.9 on
-    the quantity, and 999999 on the value (2014-15's six-digit field
-    maximum, a code); the month count does not touch the sale, so a sale
-    beside a month count of 0 or a missing one (2014-15's 99 code) is served
-    as recorded, and the 12-month rescaling is 0 / NA there.  A zero sale is
-    zero in any window and carries no key.  On the row the key is joined
-    to tree-twelve-month-total, which every tree row carries ('+', sorted).
+    the quantity, and 999998 / 999999 on the value (the "ne sait pas" /
+    "non declare" values of 2014-15's six-digit amount field); the month
+    count does not touch the sale, so a sale beside a month count of 0 or a
+    missing one (2014-15's 99 code) is served as recorded, and the 12-month
+    rescaling is 0 / NA there.  A zero sale is zero in any window and carries
+    no key.  On the row the key is joined to tree-twelve-month-total, which
+    every tree row carries ('+', sorted).  THE ROW MIXES TWO WINDOWS: its
+    Quantity is the 12-month harvest and its Quantity_sold the sale per
+    harvest month, so Quantity_sold / Quantity is NOT a sold share; the
+    share is Quantity_sold x months_harvested / Quantity.  Measured on the
+    258 tree rows whose sold and harvest units agree (positive harvest,
+    recorded sale): the plain ratio's median is 0.375 and it exceeds 1 on 16
+    rows; the rescaled share's median is 0.917 and it exceeds 1 on 28 (at
+    development 57d255585, where both quantities were x months, the plain
+    ratio was the share: 0.917 and 28).
     History: rounds 1-3 of the 2026-10-23 rulings on PR #1272 served the sold
     quantity (and, in round 3, the value) times months_harvested, under
     tree-twelve-month-total; this key replaces that.
@@ -238,9 +256,14 @@ Mali::crop_production::tree-sale-window:
         11F.11-14: "en moyenne par mois durant la periode indiquee en
         (11F.10)"; 11F.14 "la quantite des recoltes vendue en moyenne par
         mois".  The 2014-15 manual (catalog 2583, resource 47800) PDF p. 68
-        states no window for 3B.13 ("La quantite vendue est inscrite dans la
-        colonne Quantite ... determiner la frequence des ventes et les
-        quantites vendues a chaque fois").
+        names no window for 3B.13; like 3B.10 it has the enumerator build the
+        figure up from the individual sales: "3B.13. Quantite du produit
+        vendue. La quantite vendue est inscrite dans la colonne Quantite,
+        selon la meme unite qu'en 3B.08. Si la quantite est nulle, inscrire
+        0. De meme que precedemment, la quantite vendue peut ne pas etre
+        facile a evaluer. On essaye la meme approche de determiner la
+        frequence des ventes et les quantites vendues a chaque fois."  The
+        per-month window comes from the printed form in 2014-15.
     - text: >-
         both enumerator manuals instruct the enumerator to record the sale
         value as a TOTAL, and the printed forms ask "le montant total de
@@ -307,18 +330,30 @@ Mali::crop_production::tree-sale-window:
         exactly as reported")
     - text: >-
         the missing codes are masked on the recorded answer: 99 / 9999 /
-        9999.9 on the quantity sold, and 999999 on the value -- 2014-15's
-        six-digit field maximum: no value in s3aq24 or s3bq14 exceeds it, 7 of
-        the 12 field rows that carry it report 0 sold, and 3 tree rows carry
-        it.  Masked on those tree rows; the 12 field rows keep it as recorded
-        (pre-existing).  The quantity codes are not applied to the value
-        (9,999 FCFA is an amount).
-      basis: modelling-choice
+        9999.9 on the quantity sold, and 999998 / 999999 on the value -- the
+        "ne sait pas" / "non declare" values of 2014-15's six-digit amount
+        fields s3aq24 (field crops) and s3bq14 (trees), masked on both.  The
+        data dictionary declares no code for either field ("Width: 6 ...
+        Range: 0-999999"), but the instrument's convention reserves them: the
+        agriculture P1 form, p. 8, "inscrire 9998 si la personne ne connait
+        pas l'annee, inscrire 9999 pour Non Declare", and the household forms'
+        6-digit amounts "Si NSP INSCRIRE 999998" (section 4).  The data
+        agree: nothing exceeds 999999; s3aq24 carries it on 12 rows, 7 beside
+        a zero quantity sold; s3bq14 carries 999999 on 3 rows and 999998 on
+        1, a cashew sale of 55 Kg beside a missing month count that as an
+        amount prices at 18,182 FCFA/kg against its cell's median of 275.
+        The quantity codes are not applied to the value (9,999 FCFA is an
+        amount).
+      basis: questionnaire
       evidence: >-
-        GH #1267 (the 9999.9 code on 3B's float columns); s3aq24 / s3bq14
-        maximum 999999 with nothing above it (2017-18 s7gq22 / s11fq15 reach
-        4,000,000 / 4,500,000, none 999999); Mali/_/CONTENTS.org,
-        crop_production section
+        2014-15 EACI2014_AGR_LOURD_P1_17062014.pdf p. 8;
+        EACI2014_MEN_LOURD_P1_17062014.pdf pp. 18, 22 and
+        EACI2014_MEN_LOURD_P2_11082014.pdf p. 11 ("Si NSP INSCRIRE 999998");
+        data dictionary (2014-15 Documentation.pdf) s3aq24 / s3bq14;
+        precedents: the WB harmonised MLI_EACI1.do:645 (2014-15 seed value
+        masked at ">= 999998"), and Mali/_/mali.py's own _LIVESTOCK_SENTINELS
+        and _LABOR_SENTINELS (999999 masked on SalesValue and the wage);
+        GH #1267 (the 9999.9 code on 3B's float columns)
   validated_against: >-
     The window is a stated conflict, not a calibrated one: nothing rescales
     the sale, so there is no target for the level.  The raw oracle: on every
@@ -326,12 +361,19 @@ Mali::crop_production::tree-sale-window:
     recorded answers under the code rule, Unit_sold the recorded sold unit,
     and the key sits on exactly the rows with a positive sale
     (tests/test_gh1267_mali_tree_quantity.py, joined on (t, i, crop) through
-    Country.derivation_inputs).  The footing of the value: median FCFA/kg of
-    2017-18 tree rows sold in Kg, value on the per-month quantity's footing
-    vs the value read as a total over the harvest months -- cashew 500 vs
-    245 (FAOSTAT Senegal 461), mango 125 vs 42 (FAOSTAT 196), banana 150 vs
-    12.5 (FAOSTAT 124-437), orange 370 vs 143 (FAOSTAT 347); 2014-15 is
-    mixed (cashew 275 vs 138).  Within crop x sold-unit cells, the slope of
+    Country.derivation_inputs).  The footing of the value, measured on the
+    served table (tree rows sold in Kg and priced; median FCFA/kg of
+    Value_sold / Quantity_sold, the value on the per-month quantity's
+    footing, vs Value_sold / (Quantity_sold x months_harvested), the value
+    read as a total over the harvest months; n is the cell): 2017-18 cashew
+    500 vs 250 (n = 21), mango 125 vs 41.7 (n = 9), banana 150 vs 12.5
+    (n = 4, thin), orange 370 vs 143.3 (n = 2, thin); 2014-15 cashew 275 vs
+    137.5 (n = 12), mango 300 vs 100 (n = 9), orange 500 vs 500 (n = 5),
+    banana 1,352 vs 1,229 (n = 4, thin).  FAOSTAT producer prices, quoted
+    from the ruling and not re-derived here: cashew 461 (Senegal), mango
+    196, banana 124-437, orange 347.  The aggregates, with every cell's n:
+    slurm_logs/isa_backlog_2026-10-21/824-mali-unit-sold/out/r5/price_table_r5.txt.
+    Within crop x sold-unit cells, the slope of
     log(value / per-month quantity sold) on log(months) is -0.05 (se 0.30,
     n = 156) in 2014-15 and -0.52 (se 0.47, n = 104) in 2017-18, where a
     total value beside a per-month quantity predicts 1 -- rejected at about
