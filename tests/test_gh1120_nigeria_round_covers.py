@@ -113,6 +113,19 @@ class TestRouting:
             return out
 
         monkeypatch.setattr(ng, '_cover_frame', fake_cover)
+        # The rosters: 'e' is recorded by the PH roster only (D1: located by
+        # it); 'a' is on a cover too, and the cover must win.
+        rosters = {
+            spec['pp_roster']: _cover(['a'], ['9/9/9'], [np.nan]),
+            spec['ph_roster']: _cover(['a', 'e'], ['9/9/9', 'moved-e'], [np.nan, np.nan]),
+        }
+
+        def fake_roster(fn, spec_, cover_fn):
+            rel = fn.split('/Data/', 1)[1]
+            seen.append((rel, 'roster'))
+            return rosters[rel].copy()
+
+        monkeypatch.setattr(ng, '_roster_locator', fake_roster)
         return seen
 
     def test_pp_round_reads_pp_cover_and_ph_round_reads_ph_cover(self, ng, fake):
@@ -124,7 +137,7 @@ class TestRouting:
         assert sorted(q3.index) == ['a', 'b', 'c', 'd']
         # PH: the PH cover's own households -- 'c' (not revisited) is gone,
         # 'd' (PH-only) is there.
-        assert sorted(q1.index) == ['a', 'b', 'd']
+        assert sorted(q1.index) == ['a', 'b', 'd', 'e']
         # A mover is the PH cover's singleton in Q1 only.
         assert q3.loc['b', 'v'] == '1/1/1' and q1.loc['b', 'v'] == 'moved-b'
         # Each round carries its own cover's weight.
@@ -140,6 +153,16 @@ class TestRouting:
         assert pd.isna(s.loc['d', 'weight']) and pd.isna(s.loc['d', 'panel_weight'])
         assert ('Post Planting Wave 2/Agriculture/secta_plantingw2.dta', False) in fake
 
+    def test_roster_locates_a_household_no_cover_lists(self, ng, fake):
+        s = ng.sample_for_wave('2012-13')
+        q1 = s.xs('2013Q1', level='t')
+        # 'e': only the PH roster records it -- its v, no weight (D1).
+        assert q1.loc['e', 'v'] == 'moved-e'
+        assert pd.isna(q1.loc['e', 'weight']) and pd.isna(q1.loc['e', 'panel_weight'])
+        # The roster never overrides a cover: 'a' keeps the cover's v.
+        assert q1.loc['a', 'v'] == '1/1/1' and q1.loc['a', 'weight'] == 1.0
+        assert s.xs('2012Q3', level='t').loc['a', 'v'] == '1/1/1'
+
     def test_cluster_features_joins_geo_left_onto_each_round(self, ng, fake, monkeypatch):
         import lsms_library.local_tools as lt
         geo = pd.DataFrame({'Latitude': [1.0, 2.0, 3.0], 'Longitude': [4.0, 5.0, 6.0]},
@@ -151,7 +174,7 @@ class TestRouting:
         # 'z' is geo-only: on no cover, in no round (GH #1261 -- a left join).
         assert not r.i.eq('z').any()
         assert sorted(r[r.t == '2012Q3'].i) == ['a', 'b', 'c', 'd']
-        assert sorted(r[r.t == '2013Q1'].i) == ['a', 'b', 'd']
+        assert sorted(r[r.t == '2013Q1'].i) == ['a', 'b', 'd', 'e']
         got = r.set_index(['t', 'i'])['Latitude']
         assert got[('2013Q1', 'd')] == 2.0 and pd.isna(got[('2012Q3', 'c')])
 
@@ -162,8 +185,66 @@ class TestRouting:
                   spec['ph']: _cover(['a'], ['1/1/1'], [1.0])}
         monkeypatch.setattr(ng, '_cover_frame',
                             lambda fn, spec_, weights=True: covers[fn.split('/Data/', 1)[1]].copy())
+        monkeypatch.setattr(ng, '_roster_locator',
+                            lambda fn, spec_, cover_fn: _cover(['a'], ['1/1/1'], [np.nan]))
         cf = ng.cluster_features_for_wave('2023-24')
         assert cf['Latitude'].isna().all() and cf['Longitude'].isna().all()
+
+
+class TestRosterLocator:
+    """``_roster_locator``: D1 location from a roster, the D2 singleton."""
+
+    @pytest.fixture
+    def files(self, ng, monkeypatch):
+        import lsms_library.local_tools as lt
+        roster_raw = pd.DataFrame({
+            'hhid': [1, 1, 2, 3, 3],
+            'zone': [5, 5, 5, 5, 5], 'state': [32, 32, 32, 32, 32],
+            'lga': [3201, 3201, 3201, 3201, 3201],
+            'ea': [10, 10, 0, np.nan, np.nan],
+            'sector': [2, 2, 2, 2, 2]})
+        roster_dec = roster_raw.assign(zone='5. SOUTH SOUTH', state='32. Rivers',
+                                       sector='2. RURAL')
+        cover_raw = pd.DataFrame({'hhid': [9], 'zone': [5], 'state': [32],
+                                  'lga': [3201], 'ea': [10], 'sector': [2]})
+        cover_dec = cover_raw.assign(zone='south south', state='rivers',
+                                     sector='2. RURAL')
+        frames = {('roster', False): roster_raw, ('roster', True): roster_dec,
+                  ('cover', False): cover_raw, ('cover', True): cover_dec}
+
+        def fake_get(fn, convert_categoricals=True, **k):
+            return frames[(fn, convert_categoricals)].copy()
+
+        monkeypatch.setattr(lt, 'get_dataframe', fake_get)
+        return frames
+
+    def test_located_moved_and_unlocated(self, ng, files):
+        out = ng._roster_locator('roster', ng.ROUND_COVERS['2015-16'], 'cover')
+        assert out.loc['1', 'v'] == '32/3201/10'          # D1: the roster's EA
+        assert out.loc['2', 'v'] == 'moved-2'             # ea == 0: the Moved sentinel
+        assert out.loc['3', 'v'] == 'unlocated-3'         # D2: no location recorded
+        assert out['weight'].isna().all() and out['panel_weight'].isna().all()
+
+    def test_labels_are_the_covers_spelling(self, ng, files):
+        out = ng._roster_locator('roster', ng.ROUND_COVERS['2015-16'], 'cover')
+        assert set(out['Region']) == {'south south'}
+        assert set(out['District']) == {'rivers'}
+        assert set(out['Rural']) == {'Rural'}
+
+    def test_a_household_with_two_locations_raises(self, ng, files):
+        files[('roster', False)].loc[1, 'ea'] = 11
+        with pytest.raises(AssertionError, match='two locations'):
+            ng._roster_locator('roster', ng.ROUND_COVERS['2015-16'], 'cover')
+
+    def test_singleton_spelling_is_not_the_mover_one(self, ng):
+        assert ng.unlocated_id(17) == 'unlocated-17'
+        assert ng.UNLOCATED_PREFIX != 'moved-'
+
+    @pytest.mark.parametrize('folder', FOLDERS)
+    def test_every_round_names_its_roster(self, ng, folder):
+        spec = ng.ROUND_COVERS[folder]
+        assert 'sect1_planting' in spec['pp_roster']
+        assert 'sect1_harvest' in spec['ph_roster']
 
 
 def _aws_creds_available() -> bool:
@@ -215,6 +296,31 @@ class TestBuilt:
                     for r in grain_reports('Nigeria', 'cluster_features')}
         n = sum(nan_rows.values())
         assert n == 0, nan_rows
+
+    def test_roster_located_households_get_a_cluster(self, nigeria):
+        # D1 via the round's roster: two 2016Q1 households are recorded by the
+        # post-harvest modules but listed on no PH cover (39 rows had no v).
+        # The one row left is the 2015Q3 individual_education copy of a PH
+        # record (the YAML block stamps PH education onto the PP quarter):
+        # no PP-round file records that household, so it is not located.
+        got = {}
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            for table in ('household_roster', 'nonfood_expenditures',
+                          'anthropometry', 'individual_education'):
+                got[table] = self._nan_v(getattr(nigeria, table)())
+        assert got == {'household_roster': {}, 'nonfood_expenditures': {},
+                       'anthropometry': {},
+                       'individual_education': {'2015Q3': 1}}, got
+
+    def test_no_household_is_unlocated(self, nigeria):
+        # GH #1120 D2's `unlocated-{hhid}` singleton fires on no household:
+        # every roster household is located by a cover or its own roster.
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            s = nigeria.sample().reset_index()
+        n = int(s['v'].astype(str).str.startswith('unlocated-').sum())
+        assert n == 0, n
 
     def test_w2_post_harvest_clusters_are_served(self, nigeria):
         # Two EAs have no household on W2's PP household cover; their PH-cover

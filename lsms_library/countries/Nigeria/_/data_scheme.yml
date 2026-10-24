@@ -13,7 +13,11 @@ Data Scheme:
     # households the PP cover lacks; every wave's PH cover drops PP households
     # it did not revisit).  W2's PP round also takes the 21 households the PP
     # AGRICULTURE cover lists and the PP household cover does not (weights
-    # NA).  Built by <wave>/_/sample.py -> nigeria.sample_for_wave: two
+    # NA), and any round takes a household its own ROSTER records with a
+    # location and no cover lists (2016Q1: 2; weights NA) -- both GH #1120 D1.
+    # A household no file locates would get the D2 singleton
+    # `unlocated-{hhid}` (fires on none today).  Built by <wave>/_/sample.py
+    # -> nigeria.sample_for_wave: two
     # source files per folder, each with its own `t` -> materialize: make.
     # See CONTENTS.org, "Sampling Design".
     index: (i, t)

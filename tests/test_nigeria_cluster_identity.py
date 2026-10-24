@@ -226,17 +226,19 @@ def test_moved_sentinel_does_not_fire_in_the_baseline_wave(sample):
 # (2026-10-23) and pinned below.
 
 # Households in each round of `sample` (= that round's cover page; 2012Q3 also
-# takes the 21 households only the PP agriculture cover lists).
+# takes the 21 households only the PP agriculture cover lists, 2016Q1 the 2
+# only its roster records -- GH #1120 D1).
 HOUSEHOLDS = {
     '2010Q3': 5000, '2011Q1': 4939,
     '2012Q3': 4880, '2013Q1': 4854,
-    '2015Q3': 4696, '2016Q1': 4592,
+    '2015Q3': 4696, '2016Q1': 4594,
     '2018Q3': 5263, '2019Q1': 5025,
     '2023Q3': 5067, '2024Q1': 4771,
 }
 # Households in BOTH rounds of a wave whose `v` differs between them: every one
-# a mover recorded on one cover with ea == 0 (`moved-{hhid}`).
-ROUND_MOVERS = {'2010Q3': 0, '2012Q3': 17, '2015Q3': 41, '2018Q3': 66,
+# a mover recorded with ea == 0 (`moved-{hhid}`) by one round's cover -- or,
+# for one 2016Q1 household, by the PH roster that locates it (GH #1120 D1).
+ROUND_MOVERS = {'2010Q3': 0, '2012Q3': 17, '2015Q3': 42, '2018Q3': 66,
                 '2023Q3': 64}
 
 
