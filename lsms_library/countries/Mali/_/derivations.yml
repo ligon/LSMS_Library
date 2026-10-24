@@ -343,8 +343,10 @@ Mali::crop_production::tree-sale-window:
         1, a cashew sale of 55 Kg beside a missing month count that as an
         amount prices at 18,182 FCFA/kg against its cell's median of 275.
         The quantity codes are not applied to the value (9,999 FCFA is an
-        amount).
-      basis: questionnaire
+        amount).  A modelling choice: no document names these codes for
+        s3aq24 / s3bq14; the convention is read from other fields of the
+        same instrument, the data and two precedents.
+      basis: modelling-choice
       evidence: >-
         2014-15 EACI2014_AGR_LOURD_P1_17062014.pdf p. 8;
         EACI2014_MEN_LOURD_P1_17062014.pdf pp. 18, 22 and

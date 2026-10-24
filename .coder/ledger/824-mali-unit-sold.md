@@ -264,7 +264,7 @@ Red team on `9fbfdae86`: fit for a PR with fixes.  Base still development
 | quantity | decision | reason |
 |---|---|---|
 | 2014-15 field `Value_sold` = 999999 (12 rows) | masked (NA) | the questionnaire convention + data (7 of 12 beside a zero sale) + the two precedents above; coordinator: "if the questionnaire convention shows ... mask it there as well" |
-| tree / field `Value_sold` = 999998 (1 tree row) | masked (NA) — **scope deviation, reported** | the instrument's NSP value for a 6-digit amount; the row (cashew, 55 Kg, missing month count) prices at 18,182 FCFA/kg against a cell median of 275, and it alone moved the 2014-15 cashew per-Kg median 275 -> 300 and `median_price_valuation`'s Kg-only prices of 71 rows |
+| tree / field `Value_sold` = 999998 (1 tree row) | masked (NA) — **scope deviation, reported**; registry basis `modelling-choice` (the convention is read from other fields) | the instrument's NSP value for a 6-digit amount; the row (cashew, 55 Kg, missing month count) prices at 18,182 FCFA/kg against a cell median of 275, and it alone moved the 2014-15 cashew per-Kg median 275 -> 300 and `median_price_valuation`'s Kg-only prices of 71 rows |
 | window mismatch on the row | disclosed (registry rule, CONTENTS, a pinned test), not changed | ruling: harvest x months, sale as recorded |
 | harvest 0 beside a positive sale (6 + 1 rows) | documented, not changed | coordinator item 7 |
 | test hygiene | count-only asserts AND a quiet-repr fixture wrapper | the asserts alone did not stop the leak: pytest prints a failing test's arguments (the fixture frames) — measured on the mutants |
