@@ -254,6 +254,14 @@ Index Info:
   # (Malawi, Tanzania) -- are migrated per country.  It is a `j` value, distinct
   # from the STRUCTURAL `plot_id` sentinel `Farm-level` (see `plot_id:` at the
   # top of this file); do not reuse `Farm-level` for it.
+  # A crop-specific record whose crop the survey did NOT record (e.g. a seed
+  # purchase with crop code 0 and no value label; Uganda 2011-12) is NOT
+  # `(not crop-specific)`: it gets the EPISTEMIC `j` sentinel `unknown_crop`,
+  # named like `unknown_plot` / `unknown_condition` / `unknown_season` /
+  # `unknown_variety` (GH #1120 / #1119, 2026-10-23).  A crop code that is
+  # recorded but unmapped passes through as itself (Mali / Niger precedent).
+  # CONSUMER RULE: `unknown_crop` is not a crop; exclude it from per-crop
+  # quantities and report how many rows you excluded.
   # plot_labor needs no alias: every country already spells `plot_id` and
   # `source`.
   level_aliases:
