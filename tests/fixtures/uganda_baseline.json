@@ -971,6 +971,7 @@
       "t",
       "v"
     ],
+    "note": "GH #1120 D1/D2 (2026-10-23): +34 cluster rows (26 unlocated-{hhid} cover households, 8 parishes only AGSEC1 households occupy) and one 2015-16 Rural cell NA; re-pinned on a cold build, pending @ligon's approval with the batch's other moved pins.",
     "shape": [
       4841,
       5
@@ -1454,6 +1455,7 @@
       "i",
       "t"
     ],
+    "note": "GH #1120 D1/D2 (2026-10-23): +199 households (2009-10 4, 2011-12 57, 2015-16 72 from AGSEC1, 2018-19 66) and 153 unlocated-{hhid} singleton v; re-pinned on a cold build, pending @ligon's approval with the batch's other moved pins.",
     "shape": [
       24561,
       6

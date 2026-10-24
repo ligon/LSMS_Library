@@ -9,7 +9,9 @@ Implement @ligon's 2026-10-23 rulings for Uganda.
   2015-16: AGSEC1 (agriculture cover) holds 72 households gsec1 lacks, with
   `parish_code` (2015-16's `v`) and `hwgt_W5`.
 - **D2** — a household that no file locates gets a singleton `v` per household,
-  Nigeria's `moved-{hhid}`; never a shared sentinel, never NaN.
+  following Nigeria's `moved-{hhid}` CONVENTION (coordinator, 2026-10-23: the
+  convention, not the word), spelled `unlocated-{hhid}`; never a shared
+  sentinel, never NaN.
 - **D3** — a plot-grain row whose plot id is blank in the source gets
   `plot_id = 'unknown_plot'` (registered in `data_info.yml`, commit `1865cf884`).
 - **#1119** — `plot_inputs` `j` marker `n/a` → `(not crop-specific)`.
@@ -18,7 +20,9 @@ Implement @ligon's 2026-10-23 rulings for Uganda.
 
 | symbol | path:line | what it does | tested? | reuse / extend / new |
 |--------|-----------|--------------|---------|----------------------|
-| `nigeria.cluster_id` | `countries/Nigeria/_/nigeria.py:109-125` | `f'moved-{format_id(hhid)}'`, `None` without an id | `tests/test_nigeria_cluster_identity.py` | **precedent, copied** (`uganda.singleton_v`) |
+| `nigeria.cluster_id` | `countries/Nigeria/_/nigeria.py:109-125` | `f'moved-{format_id(hhid)}'`, `None` without an id | `tests/test_nigeria_cluster_identity.py` | **precedent, copied** (`uganda.singleton_v`, prefix `unlocated`) |
+| Mali/Niger seed crop | `countries/Mali/_/mali.py` (CROP_NA block), `niger._crop_labels` | a seed row is never marked; an unmapped recorded crop keeps its own label | Mali/Niger tests | **reused** for Uganda seed rows |
+| `unknown_condition` / `unknown_season` / `unknown_variety` / `unknown_plot` | `data_info.yml` | epistemic index sentinels, `unknown_<level>` | yes | naming precedent for `unknown_crop` |
 | `uganda.cluster_features` | `countries/Uganda/_/uganda.py` (df_edit hook) | projects GSEC1 rows to `(t, v)` via `reduce_to_agreed`, drops NaN `v` with a count | `test_uganda_v_grain_invariants.py` | **extended**: alternate-cover adoption + singleton for cover rows |
 | `Wave.grab_data` `dfs:` path | `lsms_library/country.py:~1950-2140` | merges sub-dfs on `merge_on`, `derived:`, `drop:`, then the df_edit hook | yes | reused (no framework edit) |
 | `Wave._merge_subframes` | `country.py:~1650` | refuses a many-to-many merge (GH #323 site 4) | yes | constraint: one multi-row extension sub-df per block (2009-10 uses a 2-file `file:` list) |
@@ -64,21 +68,21 @@ Implement @ligon's 2026-10-23 rulings for Uganda.
 
 | quantity | decision | reason |
 |----------|----------|--------|
-| singleton `v` | reuse Nigeria's spelling (`moved-{format_id(hhid)}`) | the ruling; flagged as an open question because Uganda's households are not movers |
+| singleton `v` | reuse Nigeria's construction, prefix `unlocated` (`unlocated-{format_id(hhid)}`) | coordinator ruling 2026-10-23: these households are unlocated, not known to have moved; Nigeria's D2 households take the same spelling |
 | D1 frame extension | extend: a `df_ag` sub-df + `_cover` marker + `uganda._adopt_alternate_cover` | no framework mechanism for "rows only the second cover has"; a new `derived:` kind would move every country's fingerprint |
 | D2 frame extension | extend: `_frame`-marked sub-dfs naming the file that records the households | YAML-declared so the source sidecars enter the hash |
 | D1 weight | the cover's single weight in both columns | Uganda's single-weight precedent (pre-refresh waves, 2019-20) |
 | `unknown_plot` | new helper `uganda._plot_key` used by all three builders | one definition; only the served string changes, lookups unaffected |
-| `(not crop-specific)` | reuse the Niger/Mali constant name `CROP_NA` | ruling #1119 |
+| `(not crop-specific)` | reuse the Niger/Mali constant name `CROP_NA`, NON-seed rows only | ruling #1119; a seed is crop-specific (Mali) |
+| seed row, unmapped crop | 790 -> Watermelon in `harmonize_crop` (Stata value label); other unmapped codes pass through; code 0 -> `unknown_crop` | coordinator ruling 2026-10-23; 0 is not a UNPS crop code |
+| D1 weight vintages | measured, accepted | AGSEC1/gsec1 `hwgt_W5` median 0.933, IQR 0.924-0.946, range 0.603-6.467 (bar: median within ~0.5-2) |
 
 ## §6 Open questions for the human
-- The singleton prefix: `moved-` is Nigeria's word; Uganda's unlocated
-  households are AGSEC1-only / GSEC2-only / split-off-id households and
-  blank-cluster-field cover households, not (all) movers.
-- 6 `plot_inputs` seed rows carry the marker because their crop code is
-  unmapped (5 × code 790 "Watermelon" per the 2013-14/2015-16 Stata labels,
-  absent from `harmonize_crop`; 1 × code 0). Pre-existing; the rename is a
-  spelling swap.
+- Settled by the coordinator (2026-10-23): prefix `unlocated-`; the D1 weight
+  stays as ruled after the vintage measurement; seed rows never carry the
+  marker (790 -> Watermelon, code 0 -> `unknown_crop`).
+- Remaining: `unknown_crop` is not registered in `lsms_library/data_info.yml`
+  (a cross-country vocabulary edit, the coordinator's call).
 
 ---
 ### Phase 3 — verification
@@ -94,7 +98,7 @@ Implement @ligon's 2026-10-23 rulings for Uganda.
   only for rows with a cover attribute; 2005-06's 368 still dropped.
 - `uganda._plot_key` — OK (§3 `unknown_plot`): bare sentinel; lookups on the
   components unchanged.
-- `uganda.CROP_NA` — OK (§2 Niger/Mali `CROP_NA`).
-- Not anchored, disclosed: the 6 seed rows with an unmapped crop code that the
-  marker now labels (§6), and the 11 2009-10 `plot_inputs` Seed keys that fold
+- `uganda.CROP_NA` — OK (§2 Niger/Mali `CROP_NA`), non-seed rows only.
+- `uganda.SEED_CROP_UNKNOWN` — OK (§2 `unknown_<level>` naming); 1 row.
+- Not anchored, disclosed: the 11 2009-10 `plot_inputs` Seed keys that fold
   two plot-less lines each (no conflicting reported value).

@@ -270,7 +270,7 @@ Sampling:
         and keeps its 7-character rendering.  Since GH #1120 D2 (2026-10-23)
         2011-12's frame also holds 57 households only its agriculture cover
         records, 30 of them linked to 2010-11; no 2011-12 file locates them, so
-        each is its own `moved-{hhid}` singleton -- a household fact, not a
+        each is its own `unlocated-{hhid}` singleton -- a household fact, not a
         renumbering (Nigeria's stable boundaries carry its movers the same
         way).  The 2,510 households both covers locate all keep `v`.
       source_type: derived-from-data
@@ -394,7 +394,15 @@ Sampling:
     design_statement: |-
       However, the probabilities of selection for the rural portions of ten districts that had been oversampled by the UNHS 2005/06 were adjusted accordingly.
     documentation_status: carried-forward
-    notes: 'population.yml notes repeat the 2009-10 "3,123 households over 322 EAs" boilerplate.'
+    notes: |-
+      population.yml notes repeat the 2009-10 "3,123 households over 322 EAs" boilerplate.
+      GH #1120 D1 (2026-10-23): `sample()` also holds the 72 households only the
+      agriculture cover AGSEC1 records (household interview "Not done"), with
+      AGSEC1's parish_code as `v` and its single weight `hwgt_W5` in both weight
+      columns.  That weight is a different vintage from gsec1's `hwgt_W5`: on the
+      1,458 households both weight positively, AGSEC1 / gsec1 has median 0.933,
+      IQR 0.924-0.946, range 0.603-6.467 (87.7% within 0.9-1.1; 24 above 2, none
+      below 0.5); 33 of the 72 are 0.  Measured from the raw files.
     record_source: 'CONTENTS.org "Sampling Design" > oversamples'
 
   '2018-19':
@@ -480,7 +488,7 @@ Sampling:
         (`NICU PARISH` / `NICU`) -- not a renumbering of clusters.  Since GH #1120
         D2 (2026-10-23) 2018-19's frame also holds 66 households GSEC1 does not
         (it ships only `response_status == 1`); no 2018-19 file locates them, so
-        each is its own `moved-{hhid}` singleton, and 43 of them link to 2019-20
+        each is its own `unlocated-{hhid}` singleton, and 43 of them link to 2019-20
         (3,029 linked; the 2,986 both covers locate are the figure above) -- a
         household fact, not a renumbering, as at 2010-11 -> 2011-12.
       source_type: derived-from-data

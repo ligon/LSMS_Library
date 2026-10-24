@@ -22,6 +22,9 @@ run clears it.  No entry currently carries a null: the two that did (GH #772)
 were regenerated once data access was available.  The mechanism is kept for
 the next fix that lands without it.
 
+An optional free-text ``note`` field records why an entry was last re-pinned
+(e.g. GH #1120); the test never reads it.
+
 An optional ``content_hash_variants`` list permits only measured exact raw
 fingerprints in addition to the primary hash.  Uganda nutrition's Haswell
 OpenBLAS result differs from its approved SkylakeX result by at most two

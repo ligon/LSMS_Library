@@ -270,7 +270,7 @@ hybrid rule:
   24 households, the refreshment / geo-missing tail that is also
   reported in the =UNPS_Geovars_0910= docs as /Invalid: 24/.  /Since
   GH #1120 D2 (2026-10-23)/ each of these gets a singleton
-  =v = moved-{hhid}= instead; see below.
+  =v = unlocated-{hhid}= instead; see below.
 
 Implementation: in =data_info.yml= the =sample:= block uses the
 =dfs:=/=derived:=/=drop:= pattern to merge GSEC1 and the geovars
@@ -305,11 +305,13 @@ v-join handed a NaN =v= to every table they appear in -- 9 of them reach
 person rows with no =v= (diagnosis on GH #1120, 2026-10-23).  A NaN =v= is a
 deferred deletion: the first =groupby= drops it.
 
-Each of the 24 now gets a *singleton* =v= of its own, =moved-{hhid}=, from
+Each of the 24 now gets a *singleton* =v= of its own, =unlocated-{hhid}=, from
 the country hook =uganda.sample=, and the SAME singleton is a one-household
 =cluster_features= row carrying the household's own =Region= / =Rural= /
 =District= (no GPS: that is why it has no bin).  This is Nigeria's rule for its
-=ea == 0= movers (=Nigeria/_/nigeria.py= =cluster_id=), chosen on precedent:
+=ea == 0= movers (=Nigeria/_/nigeria.py= =cluster_id=, =moved-{hhid}=), chosen
+on precedent -- the convention, not the word: these households are unlocated
+at EA level, not known to have moved:
 a singleton is not a fabricated cluster -- it can never pool two households --
 and NaN is the outcome Nigeria rejected because downstream =groupby=s delete
 it.  See [[*GH #1120 / #1119 (2026-10-23): the =sample= frame, singleton =v=, =unknown_plot=, the crop marker]].
@@ -1226,7 +1228,7 @@ is decision D2 of =slurm_logs/DESIGN_grain_collapse_sites_2026-07-13.org=
 they are now deleted *out loud*, with a count, at the place that knows
 why.  /Since GH #1120 D2 (2026-10-23)/ the surviving NaN-key rows of 2009-10
 (24), 2013-14 (1) and 2019-20 (1) are cover households, and each is now a
-one-household =moved-{hhid}= cluster row carrying its own =Region= / =Rural=
+one-household =unlocated-{hhid}= cluster row carrying its own =Region= / =Rural=
 / =District=; only 2005-06's 368 geovar-only rows are still deleted.  The
 table is 4,803 -> 4,837 rows (those 26 plus 8 2015-16 parishes only AGSEC1
 households occupy, D1).
@@ -3532,9 +3534,11 @@ must not touch them.  They are the two largest Site I cells in Uganda, so
   (the =sample= key) for none.  Re-key on the =HHID= that =gsec1= pairs with
   =hh= (or read =HHID= from =gsec9= if it carries one).
 - *=nonfood_expenditures= 2009-10 / 2010-11: 29,235 / 24,792 rows (2,752 /
-  2,639 households).*  The wave scripts emit a float-stringified =i=
-  (='...0'=: every one of those households ends in =.0=), so it matches no
-  =sample= =i=; 2011-12 onward is clean.  The CLAUDE.md "=format_id= is
+  2,639 households).*  The wave scripts pass =HHID='hh'=, GSEC15c's
+  *float64* =hh=, and emit it float-stringified (every one of those
+  households ends in =.0=), so it matches no =sample= =i=; through =format_id=
+  it would match =GSEC1.HHID= for all 2,752 / 2,639.  2011-12 onward pass
+  =HHID= and are clean.  The CLAUDE.md "=format_id= is
   auto-applied to =idxvars= but NOT to =myvars=" trap, in a script.
 
 ** TODO Missing panel weight for 2019-20
@@ -4250,8 +4254,14 @@ completed, the agriculture one was.  AGSEC1 carries:
   =mult=, "Household weight").  Following Uganda's single-weight precedent
   (2005-06 .. 2011-12 and 2019-20 put one source weight in both columns) it
   fills =weight= AND =panel_weight=.  It is *not* =gsec1='s =hwgt_W5=: on the
-  1,458 households both files weight positively they agree on none (median
-  ratio 0.93), so 2015-16 =panel_weight= now mixes two vintages for 72 rows,
+  1,458 households both files weight positively they agree on none.  The
+  ratio AGSEC1 / gsec1 there has median *0.933*, IQR *0.924-0.946* and range
+  *0.603-6.467* (87.7% within 0.9-1.1; 24 above 2, none below 0.5) -- one
+  vintage rescaled by about 7%, not a different weight, which is why mixing
+  them was accepted (the coordinator's bar: a median outside about 0.5-2
+  would have gone back to @ligon).  The zeros agree too: 1,161 households are
+  0 in both, 1 is 0 in gsec1 only, none in AGSEC1 only.  So 2015-16
+  =panel_weight= now mixes two vintages for 72 rows,
   and 33 of the 72 are 0 (the refresh households, as in =gsec1=, whose
   =hwgt_W5= has 1,547 zeros).  =weight= gains 33 zeros where =gsec1='s
   =h_xwgt_W5= has none.
@@ -4270,8 +4280,9 @@ ratios within the wave are unchanged by construction; every 2015-16 weight
 value served changes in its 4th significant digit.
 
 ** D2 -- a household no file locates gets a singleton =v=
-=v = moved-{hhid}=, spelled exactly as Nigeria spells it
-(=Nigeria/_/nigeria.py= =cluster_id=), built by =uganda.singleton_v= and
+=v = unlocated-{hhid}=, built by =uganda.singleton_v= exactly as Nigeria's
+=cluster_id= (=Nigeria/_/nigeria.py=) builds its =moved-{hhid}= -- the prefix,
+a hyphen, the household id through =format_id= -- and
 applied by the country =df_edit= hook =uganda.sample= to every =sample= row
 whose =v= is still missing.  Never NaN (deleted downstream) and never a
 shared sentinel (it welds unrelated households into one "cluster" -- the
@@ -4308,12 +4319,15 @@ cover attribute, and still DROPS one that carries none -- 2005-06's 368
 geovar rows of 2009-10 split-offs (the TODO below), which are not 2005-06
 households at all.
 
-*Open question for @ligon: the prefix.*  =moved-= is Nigeria's word for an
-=ea == 0= mover.  Uganda's are AGSEC1-only, GSEC2-only and split-off-id
-households and cover households with a blank cluster field; some 2009-10
-ones are movers or split-offs, most are not known to have moved.  Kept
-literally as ruled; a Uganda-specific prefix is a one-constant change
-(=uganda.SINGLETON_V_PREFIX=).
+*The prefix is =unlocated-=, not =moved-=* (coordinator ruling, 2026-10-23).
+D2's "following Nigeria's =moved-{hhid}=" names the convention -- one cluster
+per household -- not the word.  Nigeria's =moved-= marks a household the cover
+records as having left its EA (=ea == 0=); Uganda's are AGSEC1-only,
+GSEC2-only and split-off-id households and cover households with a blank
+cluster field, which no file locates and which are not known to have moved.
+Nigeria's own D2 households take the same =unlocated-= spelling; its real
+movers keep =moved-=.  The first version of this branch used =moved-=
+literally; =uganda.SINGLETON_V_PREFIX= is the one place it is spelled.
 
 ** D3 -- =unknown_plot=
 A plot-grain row whose parcel or plot id is blank in the source gets
@@ -4349,19 +4363,36 @@ resurrects rows:
 ** #1119 -- =(not crop-specific)=
 =plot_inputs= =j= on a fertilizer / pesticide row is now the canonical marker
 =(not crop-specific)= (=uganda.CROP_NA=, Niger's / Mali's spelling), not
-=n/a=: 10,294 rows (10,292 before plus 2 of D3's resurrected rows).
+=n/a=: 10,288 rows, all non-seed (10,292 =n/a= before, of which 6 were seed
+rows -- below -- plus 2 non-seed rows D3 resurrected).
 =plot_labor= has no =j=, and =crop_production= drops a row with no crop label
 before indexing, so the marker exists only on =plot_inputs=.
 
-*Six SEED rows carry it too, and that is a mislabel, pre-existing*: the fill
-applies to every row with no resolved crop, and 6 seed rows have a crop code
-=harmonize_crop= does not map -- 5 x code 790, which the 2013-14 and 2015-16
-AGSEC4A value labels call /Watermelon/ (4 in 2013-14, 1 in 2015-16), and 1 x
-code 0 in 2011-12 (no label).  Mali's rule is that a seed row is never marked
-(its crop is crop-specific even when unknown).  Adding =790 Watermelon= to
-=harmonize_crop= would fix five of them but also adds Watermelon rows to
-=crop_production= (code 790 harvest records are dropped today for want of a
-label) -- its own before/after, not done here.
+*A seed row never carries the marker* (coordinator ruling, 2026-10-23: a seed
+is crop-specific, just possibly unmapped; Mali's precedent).  The fill used to
+reach every row with no resolved crop, and 6 seed rows had a crop code
+=harmonize_crop= did not map:
+- *5 x code 790* (2013-14 4, 2015-16 1), which the 2013-14 and 2015-16
+  AGSEC4A value labels on =cropID= call /Watermelon/.  =790 Watermelon= is now
+  in =harmonize_crop=.  It restores *0* =crop_production= rows: code 790
+  occurs in no wave's AGSEC5A/5B, so nothing there was dropped for want of it.
+- *1 x code 0* (2011-12): a full AGSEC4A seed line -- 40 kg, traditional
+  seed, 19 of its 20 fields filled -- on a plot that has three other crop
+  rows.  0 is not a code in the UNPS crop scheme (no value label in any wave;
+  the scheme starts at 111), so the survey recorded no crop.  Served as
+  =j = 'unknown_crop'= (=uganda.SEED_CROP_UNKNOWN=), spelled like the corpus's
+  other epistemic index sentinels (=unknown_condition=, =unknown_season=,
+  =unknown_variety=, =unknown_plot=).  Passing ='0'= through was rejected: it
+  would put a non-label on a crop-label axis.  /Not registered in
+  =lsms_library/data_info.yml= (a cross-country vocabulary edit)./
+- A recorded code =harmonize_crop= does not map now passes through as itself
+  (Mali / Niger: an unmapped recorded crop keeps its own label).  No seed row
+  in any wave has such a code today; the 790 and 0 rows were the only ones.
+
+/Found, not fixed:/ 2009-10 AGSEC5B's =a5bq5= ("Crop Code", no value labels)
+carries 26 codes the scheme does not have (2, 3, 4, ... 44, and 621) on 221 of
+its 15,273 rows; only 1 of the 221 carries a harvest or sale measure, so
+=crop_production= loses at most one record to them.
 
 ** What this does NOT fix
 The two whole-wave =i= mismatches (TODO under "Known Issues": =housing=
