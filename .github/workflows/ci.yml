@@ -177,6 +177,7 @@ jobs:
           poetry run pytest --collect-only -q
           tests/test_windows_portability.py
           tests/test_schema_consistency.py
+          tests/test_private_ci_check.py
       - name: Run portability + config tests
         env:
           LSMS_SKIP_AUTH: "1"
