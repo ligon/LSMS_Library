@@ -13,7 +13,7 @@ for f in sorted(glob.glob(f'{sys.argv[2]}/*.pytest.txt')):
     m = re.search(r'\n=+ FAILURES =+\n(.*?)(\n=+ (warnings summary|short test summary info) =+\n|\Z)', txt, re.S)
     fail = m.group(1) if m else ''
     rest = txt.replace(fail, '') if fail else txt
-    blocks = re.split(r'\n_{3,} (\S+) _{3,}\n', '\n' + fail)
+    blocks = re.split(r'\n_+ (\S+) _+\n', '\n' + fail)
     per = {name: len(set(TOK.findall(body)) & ids) for name, body in zip(blocks[1::2], blocks[2::2])}
     hit_blocks = {k: v for k, v in per.items() if v}
     print(f"{os.path.basename(f)}: failure blocks {len(per)}, with an id {len(hit_blocks)} {hit_blocks}; "

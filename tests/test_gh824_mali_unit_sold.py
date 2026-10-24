@@ -105,6 +105,26 @@ def mali(monkeypatch):
     return module
 
 
+class _Quiet(pd.DataFrame):
+    """A served frame whose repr is its shape only.  A failing test's
+    ARGUMENTS -- fixture values -- are printed in pytest's long traceback, and
+    served Mali frames carry household ids (public repository; red team
+    2026-10-23).  Slicing returns a plain DataFrame (pandas' ``_constructor``),
+    which is a local and is not printed."""
+
+    def __repr__(self):
+        return f"<{len(self)} rows x {self.shape[1]} columns, not printed>"
+
+    __str__ = __repr__
+    _repr_html_ = None
+
+
+def _quiet(df: pd.DataFrame) -> _Quiet:
+    q = _Quiet(df)
+    q.attrs = dict(df.attrs)
+    return q
+
+
 def _n(mask) -> int:
     """True cells of a boolean mask, NA counted False -- a count, never a row.
     TestServed asserts on counts held in locals: pytest's assertion rewrite
@@ -254,13 +274,13 @@ class TestServed:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             df = ll.Country(COUNTRY).crop_production()
-        return df
+        return _quiet(df)
 
     @pytest.fixture(scope="class")
     def flat(self, built):
         f = built.reset_index()
         f["kind"] = np.where(f["perennial"].fillna(False), "tree", "field")
-        return f
+        return _quiet(f)
 
     def test_unit_sold_is_a_string_column_never_a_sentinel(self, built):
         dtype = str(built["Unit_sold"].dtype)

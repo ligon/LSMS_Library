@@ -1,0 +1,426 @@
+{
+ "base": {
+  "PRICED 2014-15 field": [
+   569,
+   568,
+   567,
+   95,
+   83
+  ],
+  "PRICED 2014-15 tree": [
+   190,
+   188,
+   184,
+   40,
+   35
+  ],
+  "PRICED 2017-18 field": [
+   451,
+   451,
+   449,
+   87,
+   67
+  ],
+  "PRICED 2017-18 tree": [
+   127,
+   127,
+   127,
+   18,
+   45
+  ],
+  "Value_sold == 999999 by t/kind": {
+   "2014-15/field": 12
+  },
+  "tree NA by wave": {
+   "2014-15": {
+    "Quantity": 7,
+    "Quantity_sold": 8,
+    "Value_sold": 162
+   },
+   "2017-18": {
+    "Quantity": 86,
+    "Quantity_sold": 85,
+    "Value_sold": 143
+   }
+  },
+  "tree positive-sale rows by wave": {
+   "2014-15": 197,
+   "2017-18": 128
+  },
+  "Derivation": {
+   "<NA>": 34433,
+   "Mali::crop_production::tree-twelve-month-total": 627
+  },
+  "zero harvest beside positive sale by wave": {
+   "2014-15": 5,
+   "2017-18": 1
+  },
+  "  ... of which months_harvested (value counts)": {
+   "12": 3,
+   "3": 1,
+   "5": 1,
+   "1": 1
+  },
+  "WINDOW_MISMATCH (rows, median ratio, median rescaled share, sold>harvest, rescaled sold>harvest)": [
+   258,
+   0.917,
+   1.937,
+   28,
+   158
+  ],
+  "  ... by wave": {
+   "2014-15": [
+    148,
+    0.9
+   ],
+   "2017-18": [
+    110,
+    1.0
+   ]
+  },
+  "price per kg (tree, sold in Kg)": {
+   "2014-15 Banane douce": [
+    4,
+    1351.9,
+    1229.2
+   ],
+   "2014-15 Citron": [
+    2,
+    450.0,
+    200.0
+   ],
+   "2014-15 Goyave": [
+    1,
+    200.0,
+    200.0
+   ],
+   "2014-15 Lime mexicaine": [
+    1,
+    300.0,
+    150.0
+   ],
+   "2014-15 Mangue": [
+    9,
+    300.0,
+    100.0
+   ],
+   "2014-15 Noix de cajou": [
+    12,
+    275.0,
+    137.5
+   ],
+   "2014-15 Orange": [
+    5,
+    500.0,
+    500.0
+   ],
+   "2014-15 Papaye": [
+    1,
+    4687.5,
+    4687.5
+   ],
+   "2017-18 Autres cultures": [
+    3,
+    4000.0,
+    2000.0
+   ],
+   "2017-18 Banane douce": [
+    4,
+    150.0,
+    12.5
+   ],
+   "2017-18 Citron": [
+    1,
+    222.2,
+    111.1
+   ],
+   "2017-18 Mandarine": [
+    1,
+    2000.0,
+    2000.0
+   ],
+   "2017-18 Mangue": [
+    9,
+    125.0,
+    41.7
+   ],
+   "2017-18 Noix de cajou": [
+    21,
+    500.0,
+    250.0
+   ],
+   "2017-18 Orange": [
+    2,
+    370.0,
+    143.3
+   ],
+   "2017-18 Pamplemousse": [
+    1,
+    83.3,
+    83.3
+   ],
+   "2017-18 Papaye": [
+    3,
+    863.6,
+    714.3
+   ]
+  }
+ },
+ "branch": {
+  "PRICED 2014-15 field": [
+   567,
+   566,
+   565,
+   95,
+   83
+  ],
+  "PRICED 2014-15 tree": [
+   196,
+   194,
+   188,
+   40,
+   36
+  ],
+  "PRICED 2017-18 field": [
+   451,
+   451,
+   449,
+   87,
+   67
+  ],
+  "PRICED 2017-18 tree": [
+   127,
+   127,
+   127,
+   18,
+   45
+  ],
+  "Value_sold == 999999 by t/kind": {},
+  "tree NA by wave": {
+   "2014-15": {
+    "Quantity": 7,
+    "Quantity_sold": 2,
+    "Value_sold": 156
+   },
+   "2017-18": {
+    "Quantity": 86,
+    "Quantity_sold": 85,
+    "Value_sold": 143
+   }
+  },
+  "tree positive-sale rows by wave": {
+   "2014-15": 203,
+   "2017-18": 128
+  },
+  "Derivation": {
+   "<NA>": 34433,
+   "Mali::crop_production::tree-sale-window+Mali::crop_production::tree-twelve-month-total": 331,
+   "Mali::crop_production::tree-twelve-month-total": 296
+  },
+  "zero harvest beside positive sale by wave": {
+   "2014-15": 6,
+   "2017-18": 1
+  },
+  "  ... of which months_harvested (value counts)": {
+   "12": 3,
+   "3": 1,
+   "0": 1,
+   "5": 1,
+   "1": 1
+  },
+  "WINDOW_MISMATCH (rows, median ratio, median rescaled share, sold>harvest, rescaled sold>harvest)": [
+   258,
+   0.375,
+   0.917,
+   16,
+   28
+  ],
+  "  ... by wave": {
+   "2014-15": [
+    148,
+    0.468
+   ],
+   "2017-18": [
+    110,
+    0.333
+   ]
+  },
+  "price per kg (tree, sold in Kg)": {
+   "2014-15 Banane douce": [
+    4,
+    1351.9,
+    1229.2
+   ],
+   "2014-15 Citron": [
+    2,
+    450.0,
+    200.0
+   ],
+   "2014-15 Goyave": [
+    1,
+    200.0,
+    200.0
+   ],
+   "2014-15 Lime mexicaine": [
+    1,
+    300.0,
+    150.0
+   ],
+   "2014-15 Mangue": [
+    9,
+    300.0,
+    100.0
+   ],
+   "2014-15 Noix de cajou": [
+    13,
+    300.0,
+    137.5
+   ],
+   "2014-15 Orange": [
+    5,
+    500.0,
+    500.0
+   ],
+   "2014-15 Papaye": [
+    1,
+    4687.5,
+    4687.5
+   ],
+   "2017-18 Autres cultures": [
+    3,
+    4000.0,
+    2000.0
+   ],
+   "2017-18 Banane douce": [
+    4,
+    150.0,
+    12.5
+   ],
+   "2017-18 Citron": [
+    1,
+    222.2,
+    111.1
+   ],
+   "2017-18 Mandarine": [
+    1,
+    2000.0,
+    2000.0
+   ],
+   "2017-18 Mangue": [
+    9,
+    125.0,
+    41.7
+   ],
+   "2017-18 Noix de cajou": [
+    21,
+    500.0,
+    250.0
+   ],
+   "2017-18 Orange": [
+    2,
+    370.0,
+    143.3
+   ],
+   "2017-18 Pamplemousse": [
+    1,
+    83.3,
+    83.3
+   ],
+   "2017-18 Papaye": [
+    3,
+    863.6,
+    714.3
+   ]
+  }
+ },
+ "index equal": true,
+ "changed rows by column, wave/kind": {
+  "Quantity_sold": {
+   "2014-15/tree": 137,
+   "2017-18/tree": 100
+  },
+  "Value_sold": {
+   "2014-15/tree": 131,
+   "2017-18/tree": 99,
+   "2014-15/field": 12
+  },
+  "Derivation": {
+   "2014-15/tree": 203,
+   "2017-18/tree": 128
+  }
+ },
+ "down base": {
+  "gross_crop_revenue sum by t": {
+   "2014-15": 112659276.0,
+   "2017-18": 233204405.0
+  },
+  "gross_crop_revenue rows": 6968
+ },
+ "down branch": {
+  "gross_crop_revenue sum by t": {
+   "2014-15": 65380350.0,
+   "2017-18": 161885905.0
+  },
+  "gross_crop_revenue rows": 6968
+ },
+ "median_price_valuation base -> branch": {
+  "default": {
+   "rows": 35060,
+   "price changed rows": 0,
+   "changed by crop": {},
+   "changed by t": {},
+   "Value sum by t base": {
+    "2014-15": 1511976920.1310873,
+    "2017-18": 396476625.0924806
+   },
+   "Value sum by t branch": {
+    "2014-15": 1511976920.1310873,
+    "2017-18": 396476625.0924806
+   }
+  },
+  "kgonly": {
+   "rows": 35060,
+   "price changed rows": 71,
+   "changed by crop": {
+    "Noix de cajou": 71
+   },
+   "changed by t": {
+    "2014-15": 71
+   },
+   "Value sum by t base": {
+    "2014-15": 589741472.2866101,
+    "2017-18": 412117959.03107715
+   },
+   "Value sum by t branch": {
+    "2014-15": 589938872.2866101,
+    "2017-18": 412117959.03107715
+   },
+   "price ratio branch/base": {
+    "count": 71.0,
+    "mean": 1.090909090909091,
+    "std": 2.2362501351651286e-16,
+    "min": 1.0909090909090908,
+    "25%": 1.0909090909090908,
+    "50%": 1.0909090909090908,
+    "75%": 1.0909090909090908,
+    "max": 1.0909090909090908
+   }
+  }
+ },
+ "raw s3aq24": {
+  "rows": 9995,
+  "== 999999": 12,
+  "== 999999 and not Non": 12,
+  "== 999999 beside s3aq23a == 0": 7,
+  ">= 999998": 12,
+  "max below 999999": 950000.0,
+  "values > 900000 (count)": 1
+ },
+ "raw s3bq14": {
+  "== 999999": 3,
+  ">= 999998": 4,
+  "max below 999999": 999998.0
+ }
+}
+{"served field rows on a raw 999999 code (base)": [12, 12, 12, 7, 2]}
+{"served field rows on a raw 999999 code (branch)": [12, 0, 0, 7, 2]}

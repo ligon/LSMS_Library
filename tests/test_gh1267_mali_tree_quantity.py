@@ -165,6 +165,26 @@ def _months_2017(labels: pd.Series) -> pd.Series:
     return labels.map(conv).astype("float64")
 
 
+class _Quiet(pd.DataFrame):
+    """A served frame whose repr is its shape only.  A failing test's
+    ARGUMENTS -- fixture values -- are printed in pytest's long traceback, and
+    served Mali frames carry household ids (public repository; red team
+    2026-10-23).  Slicing returns a plain DataFrame (pandas' ``_constructor``),
+    which is a local and is not printed."""
+
+    def __repr__(self):
+        return f"<{len(self)} rows x {self.shape[1]} columns, not printed>"
+
+    __str__ = __repr__
+    _repr_html_ = None
+
+
+def _quiet(df: pd.DataFrame) -> _Quiet:
+    q = _Quiet(df)
+    q.attrs = dict(df.attrs)
+    return q
+
+
 def _n(mask) -> int:
     """True cells of a boolean mask, NA counted False -- a count, never a row."""
     return int(pd.Series(mask).fillna(False).astype(bool).sum())
@@ -351,24 +371,24 @@ class TestServed:
     def built(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            return ll.Country(COUNTRY).crop_production()
+            return _quiet(ll.Country(COUNTRY).crop_production())
 
     @pytest.fixture(scope="class")
     def trees(self, built):
         f = built.reset_index()
-        return f[f["perennial"].fillna(False)]
+        return _quiet(f[f["perennial"].fillna(False)])
 
     @pytest.fixture(scope="class")
     def raw(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            return ll.Country(COUNTRY).derivation_inputs(KEY).reset_index()
+            return _quiet(ll.Country(COUNTRY).derivation_inputs(KEY).reset_index())
 
     @pytest.fixture(scope="class")
     def raw_sale(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            return ll.Country(COUNTRY).derivation_inputs(SALE_KEY).reset_index()
+            return _quiet(ll.Country(COUNTRY).derivation_inputs(SALE_KEY).reset_index())
 
     def test_tree_rows_and_their_keys(self, built, trees):
         """Every tree row carries the harvest key; the sale-window key joins it

@@ -1,0 +1,419 @@
+{
+ "tables_base": 23,
+ "tables_branch": 23,
+ "same table list": true,
+ "assets": {
+  "shape": [
+   [
+    75590,
+    7
+   ],
+   [
+    75590,
+    7
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "cluster_features": {
+  "shape": [
+   [
+    3006,
+    6
+   ],
+   [
+    3006,
+    6
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "community_prices": {
+  "shape": [
+   [
+    155931,
+    10
+   ],
+   [
+    155931,
+    10
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "crop_production": {
+  "shape": [
+   [
+    35060,
+    16
+   ],
+   [
+    35060,
+    16
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {
+   "Quantity_sold": {
+    "n": 237,
+    "by": {
+     "2014-15/tree": 137,
+     "2017-18/tree": 100
+    }
+   },
+   "Value_sold": {
+    "n": 241,
+    "by": {
+     "2014-15/tree": 130,
+     "2017-18/tree": 99,
+     "2014-15/field": 12
+    }
+   },
+   "Derivation": {
+    "n": 331,
+    "by": {
+     "2014-15/tree": 203,
+     "2017-18/tree": 128
+    }
+   }
+  },
+  "warnings identical": true,
+  "attrs identical": false
+ },
+ "food_acquired": {
+  "shape": [
+   [
+    431046,
+    9
+   ],
+   [
+    431046,
+    9
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "food_coping": {
+  "shape": [
+   [
+    18261,
+    5
+   ],
+   [
+    18261,
+    5
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "food_expenditures": {
+  "shape": [
+   [
+    298267,
+    6
+   ],
+   [
+    298267,
+    6
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "food_prices": {
+  "shape": [
+   [
+    308134,
+    7
+   ],
+   [
+    308134,
+    7
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "food_quantities": {
+  "shape": [
+   [
+    416396,
+    7
+   ],
+   [
+    416396,
+    7
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "food_security": {
+  "shape": [
+   [
+    12733,
+    12
+   ],
+   [
+    12733,
+    12
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "household_characteristics": {
+  "shape": [
+   [
+    24786,
+    18
+   ],
+   [
+    24786,
+    18
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "household_roster": {
+  "shape": [
+   [
+    220732,
+    11
+   ],
+   [
+    220732,
+    11
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "housing": {
+  "shape": [
+   [
+    24939,
+    5
+   ],
+   [
+    24939,
+    5
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "individual_education": {
+  "shape": [
+   [
+    117408,
+    5
+   ],
+   [
+    117408,
+    5
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "interview_date": {
+  "shape": [
+   [
+    24939,
+    4
+   ],
+   [
+    24939,
+    4
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "livestock": {
+  "shape": [
+   [
+    40696,
+    7
+   ],
+   [
+    40696,
+    7
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "people_last7days": {
+  "shape": [
+   [
+    131246,
+    12
+   ],
+   [
+    131246,
+    12
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "plot_features": {
+  "shape": [
+   [
+    13961,
+    13
+   ],
+   [
+    13961,
+    13
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "plot_inputs": {
+  "shape": [
+   [
+    179817,
+    12
+   ],
+   [
+    179817,
+    12
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "plot_labor": {
+  "shape": [
+   [
+    52057,
+    7
+   ],
+   [
+    52057,
+    7
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "sample": {
+  "shape": [
+   [
+    24939,
+    7
+   ],
+   [
+    24939,
+    7
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "shocks": {
+  "shape": [
+   [
+    26774,
+    10
+   ],
+   [
+    26774,
+    10
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ },
+ "subjective_well_being": {
+  "shape": [
+   [
+    12689,
+    4
+   ],
+   [
+    12689,
+    4
+   ]
+  ],
+  "columns equal": true,
+  "index equal": true,
+  "diffs": {},
+  "warnings identical": true,
+  "attrs identical": true
+ }
+}

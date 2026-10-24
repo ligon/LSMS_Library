@@ -1,0 +1,25 @@
+# Mali crop_production, tree rows sold in Kg and priced (Quantity_sold > 0, Value_sold > 0),
+# served table at the branch head (cold build).  Median FCFA/kg:
+#   same_footing  = Value_sold / Quantity_sold (the value on the per-month quantity's footing; served)
+#   total_reading = Value_sold / (Quantity_sold x months_harvested) (the value read as a total
+#                   over the harvest months, the quantity per month)
+# n is the cell; cells with n < 5 are thin.  Aggregates only.
+                          n  same_footing  total_reading thin (n < 5)
+wave    crop                                                         
+2014-15 Banane douce      4        1351.9         1229.2         thin
+        Citron            2         450.0          200.0         thin
+        Goyave            1         200.0          200.0         thin
+        Lime mexicaine    1         300.0          150.0         thin
+        Mangue            9         300.0          100.0             
+        Noix de cajou    12         275.0          137.5             
+        Orange            5         500.0          500.0             
+        Papaye            1        4687.5         4687.5         thin
+2017-18 Autres cultures   3        4000.0         2000.0         thin
+        Banane douce      4         150.0           12.5         thin
+        Citron            1         222.2          111.1         thin
+        Mandarine         1        2000.0         2000.0         thin
+        Mangue            9         125.0           41.7             
+        Noix de cajou    21         500.0          250.0             
+        Orange            2         370.0          143.3         thin
+        Pamplemousse      1          83.3           83.3         thin
+        Papaye            3         863.6          714.3         thin
