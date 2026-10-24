@@ -133,6 +133,9 @@ def _harvest(rows):
         'i': [r[0] for r in rows], 'plot_id': [r[1] for r in rows],
         'crop': [r[2] for r in rows],
         '_crop_code': pd.array([r[3] for r in rows], dtype='Int64'),
+        # what `_harvest_block` emits since GH #637 defect A (Module G here)
+        'production_obs': pd.array([f'reported:G:{r[3]}' for r in rows],
+                                   dtype='string'),
         'u': pd.array([r[4] for r in rows], dtype='string'),
         'condition': pd.array([r[5] for r in rows], dtype='string'),
         'crop_variety': pd.array([f'v{r[3]}' for r in rows], dtype='string'),
@@ -167,10 +170,12 @@ class TestBlankHarvest:
         q = out.reset_index().set_index('plot_id')['Quantity']
         assert pd.isna(q['R1']) and q['R2'] == 0.0
 
-    def test_two_blank_codes_merged_at_the_declared_grain_stay_blank(self, mw):
-        """Defect A's collapse (codes 1 and 3 share `crop == 'Maize'`) is NOT
-        changed here, but its quantity reducer must not re-mint the zero
-        (2013-14: one such row)."""
+    def test_two_blank_codes_of_one_label_stay_two_blank_rows(self, mw):
+        """Codes 1 and 3 share `crop == 'Maize'`.  Defect A's collapse (GH #637
+        tail) summed them into one row -- with `min_count=1` so two blanks were
+        not re-minted to 0.0.  Since the `production_obs` ruling (2026-10-23)
+        there is no collapse: each code is its own row, a blank stays blank,
+        and nothing is summed across codes."""
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             out = mw.assemble_crop_production('2010-11', [_harvest([
@@ -178,10 +183,12 @@ class TestBlankHarvest:
                 ('h2', 'R1', 'Maize', 3, None, UNK, None),
                 ('h3', 'R1', 'Maize', 1, KG, S, None),
                 ('h3', 'R1', 'Maize', 3, KG, S, 7.0)])], [])
-        out = out.reset_index().set_index('i')
-        assert len(out) == 2
-        assert pd.isna(out.loc['h2', 'Quantity'])          # development: 0.0
-        assert out.loc['h3', 'Quantity'] == 7.0
+        out = out.reset_index()
+        n_rows, n_blank = len(out), int(out['Quantity'].isna().sum())
+        assert (n_rows, n_blank) == (4, 3), (n_rows, n_blank)
+        q = out.set_index(['i', 'production_obs'])['Quantity']
+        assert q[('h3', 'reported:G:3')] == 7.0
+        assert pd.isna(q[('h3', 'reported:G:1')])
 
 
 # ---------------------------------------------------------------------------

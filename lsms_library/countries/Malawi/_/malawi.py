@@ -1177,6 +1177,33 @@ _CONDITION_UNKNOWN = 'unknown_condition'
 
 _CONDITION_TABLE = 'harmonize_crop_condition'
 
+#: GH #1120 D3 (@ligon, 2026-10-23): the EPISTEMIC plot sentinel, registered in
+#: lsms_library/data_info.yml (`plot_id:`).  A record the survey keeps at plot
+#: grain whose plot identifier is MISSING in the source -- 2010-11 Module D
+#: stubs with a blank `ag_d00` that carry labour days; 2016-17 Module P lines
+#: with a blank `gardenid` / `plotid` -- is served on this value, never NaN
+#: (a NaN on a declared index level is a deferred silent deletion).  Distinct
+#: from the STRUCTURAL `Farm-level`.  CONSUMER RULE (data_info.yml): it is NOT
+#: a plot -- it joins no plot_features row, and two `unknown_plot` records of
+#: one household are not one plot.  So the blocks set it before any groupby,
+#: the assemblers RAISE rather than merge two such records, and a
+#: household-crop sale is never attached to one (``_attach_sales``).
+PLOT_UNKNOWN = 'unknown_plot'
+
+#: GH #1119 (@ligon, 2026-10-23): the one canonical `j` marker for a
+#: plot_inputs record that is not about any crop -- registered in
+#: lsms_library/data_info.yml.  In Malawi that is exactly the Module D rows
+#: (inorganic / organic fertilizer, agrochemicals), which the instrument asks
+#: per PLOT with no crop item; Module G seed rows are asked per plot-CROP and
+#: always carry a crop.  See ``assemble_plot_inputs``.
+NOT_CROP_SPECIFIC = '(not crop-specific)'
+
+
+def _plot_ids(series):
+    """Plot keys as served: a key missing in the source -> ``PLOT_UNKNOWN``."""
+    s = series.astype('string')
+    return s.where(s.notna(), PLOT_UNKNOWN)
+
 #: Code -> un-collapsed crop VARIETY label; see `categorical_mapping.org`.
 _VARIETY_TABLE = 'harmonize_crop_variety'
 
@@ -1346,8 +1373,19 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     All keyword args are RAW column names in ``df`` (or None when the
     wave/module lacks that field).  ``df`` must already carry an ``hhid``
     string column.  Returns a long DataFrame with the canonical columns
-    (i, plot, crop, crop_code, Quantity, u, condition, planting_month,
-    harvest_month, intercropped, perennial) -- NO aggregation.
+    (i, plot, crop, crop_code, production_obs, Quantity, u, condition,
+    planting_month, harvest_month, intercropped, perennial) -- NO
+    aggregation.
+
+    ``production_obs`` (GH #637 defect A, ruling of 2026-10-23) is the
+    canonical native-observation coordinate (lsms_library/data_info.yml,
+    GH #1198): ``reported:G:<code>`` / ``reported:P:<code>``, the module
+    and the INSTRUMENT's own crop code as recorded (before the +1000
+    perennial offset and the IHS4/IHS5 recode).  The module letter is
+    load-bearing: raw code 1 is local maize in G and cassava in P.  So
+    codes that ``harmonize_crop`` lumps under one ``crop`` label (Maize 1-4,
+    the rices, groundnuts, citrus) keep separate rows, sales and kg
+    factors.  A blank plot key is served ``PLOT_UNKNOWN`` (GH #1120 D3).
 
     ``condition`` is Module G's ``ag_g13c`` ("(S/U)").  It was accepted and
     silently DISCARDED from this function's first version until GH #854;
@@ -1369,14 +1407,22 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     unit_map = _malawi_code_map('harmonize_crop_unit')
 
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
-    plot = df[plotkey].apply(format_id).astype('string')
+    plot = _plot_ids(df[plotkey].apply(format_id))
+    # The instrument's own code, positionally aligned with `out` below.
+    raw_code = df[cropcode].apply(format_id).astype('string')
+    production_obs = ('reported:' + ('P' if perennial else 'G') + ':'
+                      + raw_code).astype('string')
 
     # The crop at its NATIVE grain, un-collapsed (GH #854 red-team item 2).
     # `harmonize_crop` maps codes 1-4 all to 'Maize' and 17-26 all to 'Rice';
     # the shipped IHS5 conversion tables key their kg factors on the VARIETY,
     # and the varieties genuinely differ.  Carried as a COLUMN, never an index
-    # level: it is functionally determined by the crop code, so putting it in
-    # the grain would split no key and only widen the index.
+    # level: it is functionally determined by the crop code, which the grain
+    # now carries as `production_obs` (GH #637 defect A), so it splits no key.
+    # (Until that ruling this comment said "splits no key" while the grain
+    # did NOT carry the code: the collapse at the end of
+    # `assemble_crop_production` merged codes of one label in 127 / 54 / 7 /
+    # 98 groups and kept the first row's variety.)
     crop_variety = _map_codes(crop_code_int, _malawi_code_map(_VARIETY_TABLE))
 
     # GH #856: 13 OTHER (SPECIFY) rows whose own specify text restates a
@@ -1421,6 +1467,7 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
         'plot_id':           plot.values,
         'crop':           crop_label.values,
         '_crop_code':     crop_code_int.values,
+        'production_obs': production_obs.values,
         'Quantity':       quantity.values,
         'u':              u.values,
         'condition':      crop_condition.values,
@@ -1878,9 +1925,22 @@ def _attach_sales(t, harv, sale):
         {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
     sale['_srow'] = range(len(sale))
 
-    nplots = (harv.groupby(['i', '_crop_code'])['plot_id']
-              .nunique().rename('_nplots').reset_index())
-    harv = harv.merge(nplots, on=['i', '_crop_code'], how='left')
+    # The single-plot gate counts KNOWN plots, and a crop with any record on
+    # an `unknown_plot` line is not "on exactly one plot" (GH #1120 D3: that
+    # sentinel is not a plot, and two of them are not one).  Before the
+    # sentinel those lines carried a NaN plot_id, which `nunique` ignores --
+    # so a crop seen only there got no sale, as now, but a crop seen there
+    # AND on one known plot would have handed the known row the whole
+    # household sale.  No held household-crop is in that second case
+    # (2016-17's 41 such crops are on no known plot).
+    known = harv['plot_id'].ne(PLOT_UNKNOWN)
+    nplots = (harv[known].groupby(['i', '_crop_code'])['plot_id']
+              .nunique().rename('_nplots'))
+    nunknown = harv[~known].groupby(['i', '_crop_code']).size()
+    nplots = nplots.reindex(nplots.index.union(nunknown.index), fill_value=0)
+    nplots = nplots.where(nunknown.reindex(nplots.index, fill_value=0).eq(0), 0)
+    harv = harv.merge(nplots.rename('_nplots').reset_index(),
+                      on=['i', '_crop_code'], how='left')
     n_harv = len(harv)
     harv['_hrow'] = range(n_harv)
     pairs = harv[['_hrow', 'i', '_crop_code', 'crop', 'u', 'condition', '_nplots']] \
@@ -2099,12 +2159,30 @@ def _consolidate_harvest(harvest_pieces):
     harv = pd.concat(harvest_pieces, ignore_index=True)
     harv['u'] = harv['u'].astype('string')
     harv['condition'] = harv['condition'].astype('string')
-    keys = ['i', 'plot_id', 'crop', 'u', 'condition', '_crop_code']
+    keys = ['i', 'plot_id', 'crop', 'u', 'condition', '_crop_code',
+            'production_obs']
+    # GH #1120 D3: two `unknown_plot` lines of one household are NOT one
+    # plot, so they must never be summed here.  None exist in the held data
+    # (2016-17's 41 Module P lines with a blank plot key are 41 distinct
+    # household-codes); raise rather than merge should one appear.
+    unk = harv['plot_id'].eq(PLOT_UNKNOWN).to_numpy()
+    n_merge = int(harv[unk].duplicated(keys, keep=False).sum())
+    if n_merge:
+        raise ValueError(
+            f"Malawi crop_production: {n_merge} harvest lines with no plot id "
+            f"({PLOT_UNKNOWN}) share a household, crop code, unit and condition; "
+            f"they are different plots and must not be summed (GH #1120 D3)")
     return _sum_reported(harv.groupby(keys, as_index=False, dropna=False), keys, {
         # EXACT, not a reduction: `crop_variety` is a function of
         # `_crop_code`, which is in the key, so every row in a group carries
         # the same value.
         'crop_variety':   'first',
+        # A plot-crop recorded on SEVERAL lines of one code, unit and
+        # condition (49 / 4 / 10 / 46 groups by wave) is ONE native record;
+        # its quantity is summed and each month is the first non-null one in
+        # line order (@ligon, 2026-10-23: document only).  harvest_month differs
+        # between the lines of 8 / 0 / 5 / 13 of those groups and
+        # planting_month of 1 / 1 / 0 / 0 (Malawi/_/CONTENTS.org).
         'planting_month': 'first',
         'harvest_month':  'first',
         'intercropped':   'first',
@@ -2136,16 +2214,20 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     Returns
     -------
     pd.DataFrame indexed (t, i, plot, crop) with columns Quantity, u,
-    condition, Quantity_sold, Value_sold, Derivation, planting_month,
-    harvest_month, intercropped, perennial.  Quantities and values remain
+    condition, production_obs, Quantity_sold, Value_sold, Derivation,
+    planting_month, harvest_month, intercropped, perennial.  One row per
+    NATIVE record: ``production_obs`` (``reported:<G|P>:<instrument crop
+    code>``, GH #637 defect A) keeps codes that share a ``crop`` label apart,
+    and a repeat at the full grain raises.  Quantities and values remain
     reported; attachment/basis interpretation may be derived by the ladder
-    below.  The reported harvest condition is preserved.  ``u`` and
-    ``condition`` are declared INDEX LEVELS in
+    below.  The reported harvest condition is preserved.  ``u``,
+    ``condition`` and ``production_obs`` are declared INDEX LEVELS in
     ``_/data_scheme.yml`` and are promoted by the framework; they are left
     as columns here for the same reason ``u`` always was.
 
     Sale attachment is the LADDER above (``_attach_sales``): a sale is
-    attached ONLY where the (i, crop) is grown on exactly one plot, to the
+    attached ONLY where the (i, crop code) is grown on exactly one known plot
+    and on no ``unknown_plot`` line (GH #1120 D3), to the
     harvest row measured in the SAME unit ``u`` as the sale (the sale
     quantity is asked in its own unit, ag_i02b / ag_q02b, which differs
     from the harvest unit for 22.2% of 2010-11 sale rows, GH #824), and only
@@ -2219,29 +2301,22 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         tallies = {'sale_suppressed': tally, 'sale_basis_mismatch': mismatch,
                    'sale_basis_ladder': {}}
 
-    # The 2026-09-08 RESIDUAL is CLOSED by GH #854.  It read: the defensive
-    # collapse at the end of this function keys on (t, i, plot, crop) -- u is
-    # a COLUMN here -- so it fires when a plot-crop was harvested in TWO
-    # units, and .first() skips NA per column, so it could take `u` from one
-    # row and `Quantity_sold` from another, re-creating exactly the
-    # mislabelling the (i, _crop_code, u) merge above removes.  (Measured then
-    # on the raw modules: 32 plot-crops of 135,410, 0.024%, carry more than
-    # one harvest unit.)  The collapse below now keys on the FULL declared
-    # grain (t, i, plot, crop, u, condition), so it can no longer mix two
-    # units -- or two states -- into one row.
-    #
-    # It is NOT "a guard against a genuinely repeated line" (what this comment
-    # used to say; GH #637 tail diagnosis, 2026-10-23).  A repeated line at
-    # this grain shares its `_crop_code` too, so `_consolidate_harvest` has
-    # already merged it; the collapse below never sees one.  It fires in EVERY
-    # wave -- 127 / 54 / 7 / 98 groups (2010-11 / 2013-14 / 2016-17 /
-    # 2019-20) -- and every one of those groups is two or more DISTINCT crop
-    # codes that `harmonize_crop` maps to one label (Maize 1-4, Citrus, the
-    # groundnut and rice varieties): it sums their harvests and keeps the
-    # first row's `crop_variety` and sale.  That is defect A of the #637 tail,
-    # held for a grain ruling (@ligon) -- not changed here.  Only the quantity
-    # reducer moved: `_sum_reported`, so two codes that BOTH left the quantity
-    # blank (1 group, 2013-14) are not re-minted into a harvest of 0.0.
+    # No collapse at the declared grain any more (GH #637 defect A; ruling
+    # @ligon 2026-10-23: populate `production_obs` with the native crop
+    # code, the #1198 precedent, as Tanzania did in #1263).  Until then a
+    # defensive collapse here keyed on (t, i, plot, crop, u, condition) and
+    # fired in EVERY wave -- 127 / 54 / 7 / 98 groups (2010-11 / 2013-14 /
+    # 2016-17 / 2019-20), every one of them two or more DISTINCT crop codes
+    # that `harmonize_crop` maps to one label (Maize 1-4, Citrus, the
+    # groundnut and rice varieties): it summed their harvests, kept the
+    # first row's `crop_variety` (which keys the shipped kg factor) and the
+    # first row's sale, dropping 28,900 / 18,200 / 50,000 / 276,500 MWK of
+    # attached sales.  `production_obs` (reported:<G|P>:<instrument code>,
+    # set in `_harvest_block`) now keeps each code its own row, and
+    # `_consolidate_harvest` keys on it, so a repeat at the full grain is a
+    # source defect: raise, never reduce.  (The 2026-09-08 residual this
+    # collapse once carried -- one plot-crop in two units -- was closed by
+    # GH #854 putting `u` and `condition` in the grain.)
     # crop must be non-null for the index; rows where the code did not map
     # to a Preferred Label are dropped from the index axis.  No crop code
     # in harmonize_crop maps to a null Preferred Label, so this fires only
@@ -2264,26 +2339,21 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     harv = harv.drop(columns=['_crop_code'])
     harv['t'] = t
 
-    # Defensive de-duplication at the DECLARED grain.  `u` and `condition`
-    # stay COLUMNS (the framework promotes them, exactly as it always has for
-    # `u`), so the check is on columns rather than on index levels; keeping
-    # them out of the index also keeps the ~8.5k rows whose `u` is NULL,
-    # which a set_index + groupby would delete on a NaN key (GH #323 3b).
-    _grain = ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
-    if harv.duplicated(_grain).any():
-        harv = _sum_reported(harv.groupby(_grain, as_index=False, dropna=False), _grain, {
-            'crop_variety':   'first',
-            'Quantity_sold':  'first',
-            'Value_sold':     'first',
-            '_branch':        'first',
-            'planting_month': 'first',
-            'harvest_month':  'first',
-            'intercropped':   'first',
-            'perennial':      'first',
-        })
+    # Uniqueness at the DECLARED grain.  `u`, `condition` and
+    # `production_obs` stay COLUMNS (the framework promotes them, exactly as
+    # it always has for `u`), so the check is on columns rather than on index
+    # levels.
+    _grain = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs']
+    n_rep = int(harv.duplicated(_grain, keep=False).sum())
+    if n_rep:
+        raise ValueError(
+            f"Malawi crop_production {t}: {n_rep} rows repeat a native "
+            f"coordinate {_grain}; `_consolidate_harvest` keys on the native "
+            f"crop code, so this is a source defect -- raised, never reduced "
+            f"(GH #637 defect A)")
 
-    # The registry key, stamped AFTER the collapse (CLAUDE.md, "Derived
-    # Values": a post-collapse stamp is the wave script's own uniqueness
+    # The registry key, stamped on the unique native rows (CLAUDE.md,
+    # "Derived Values": the stamp is the wave script's own uniqueness
     # claim).  '' is an exact match and carries NO key; NA where no sale
     # attached at all.
     branch = harv['_branch'].astype(object)
@@ -3251,7 +3321,7 @@ def _fertilizer_block(df, *, hhid, plotkey, type1, qty1, unit1,
             u = pd.Series(pd.NA, index=df.index, dtype='string')
         piece = pd.DataFrame({
             'i':           df['hhid'].astype('string').values,
-            'plot_id':        df['plotkey'].astype('string').values,
+            'plot_id':        _plot_ids(df['plotkey']).values,
             '_input_code': code.values,
             'crop':        pd.array([pd.NA] * len(df), dtype='string'),
             'Quantity':    q.values,
@@ -3292,7 +3362,7 @@ def _organic_block(df, *, hhid, plotkey, flag, t,
         u = pd.Series(U_UNKNOWN, index=df.index, dtype='string')
     out = pd.DataFrame({
         'i':           df['hhid'].astype('string').values,
-        'plot_id':        df['plotkey'].astype('string').values,
+        'plot_id':        _plot_ids(df['plotkey']).values,
         '_input_code': _MWI_INPUT_ORGANIC,
         'crop':        pd.array([pd.NA] * len(df), dtype='string'),
         'Quantity':    q.values,
@@ -3334,7 +3404,7 @@ def _pesticide_block(df, *, hhid, plotkey, gate, slots, t):
             u = pd.Series(pd.NA, index=df.index, dtype='string')
         piece = pd.DataFrame({
             'i':           df['hhid'].astype('string').values,
-            'plot_id':        df['plotkey'].astype('string').values,
+            'plot_id':        _plot_ids(df['plotkey']).values,
             '_input_code': code.values,
             'crop':        pd.array([pd.NA] * len(df), dtype='string'),
             'Quantity':    q.values,
@@ -3373,7 +3443,7 @@ def _seed_block(df, *, hhid, plotkey, cropcode, qty, unit, improved=None,
         imp = pd.Series(pd.NA, index=df.index, dtype='boolean')
     out = pd.DataFrame({
         'i':           df['hhid'].astype('string').values,
-        'plot_id':        df['plotkey'].astype('string').values,
+        'plot_id':        _plot_ids(df['plotkey']).values,
         '_input_code': _MWI_INPUT_SEED,
         'crop':        crop_label.values,
         'Quantity':    q.values,
@@ -3381,8 +3451,23 @@ def _seed_block(df, *, hhid, plotkey, cropcode, qty, unit, improved=None,
         'Improved':    imp.values,
     })
     # Keep a seed row only where a crop identity is present (the seed item
-    # is meaningless without the crop it seeds).
-    out = out[crop_label.notna().values]
+    # is meaningless without the crop it seeds).  NOT a "not crop-specific"
+    # record (GH #1119): Module G asks seed per plot-CROP, so a seed line
+    # with no crop label has a MISSING crop code -- blank (2010-11: 330
+    # lines, 59 with a seed quantity) or one no instrument list carries
+    # (2019-20 Cross_Sectional code 49: 66 lines, all with a quantity).
+    # No epistemic `j` sentinel is registered, so these stay dropped -- and
+    # COUNTED, the GH #869 precedent for unmapped crop codes.
+    keep = crop_label.notna().to_numpy()
+    if not keep.all():
+        n_qty = int((~keep & (q.fillna(0) > 0).to_numpy(dtype=bool)).sum())
+        warnings.warn(
+            f"Malawi/plot_inputs {t}: {int((~keep).sum())} seed line(s) "
+            f"({n_qty} with a seed quantity) carry no crop code harmonize_crop "
+            f"knows and are DROPPED: a seed line is crop-specific by the "
+            f"instrument, so it cannot take the '{NOT_CROP_SPECIFIC}' marker "
+            f"(GH #1119; GH #869 precedent).", stacklevel=2)
+    out = out[keep]
     return out
 
 
@@ -3451,6 +3536,25 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     df['input'] = _input_labels(df['_input_code'])
     # An input row needs a resolved input label to land on the index.
     df = df[df['input'].notna()]
+
+    # GH #1119 (@ligon, 2026-10-23): the `crop` (-> `j`) of a record that is
+    # not about any crop is the canonical marker, never NaN.  Told apart BY
+    # THE INSTRUMENT, not by the value: every Module D input (inorganic and
+    # organic fertilizer, agrochemicals) is asked per PLOT with no crop item,
+    # so its crop is not missing -- it does not exist; a Module G seed line is
+    # asked per plot-CROP, so a seed row without a crop would be a MISSING
+    # code, which `_seed_block` drops and counts before it gets here.  Encode
+    # that, rather than rely on it: the marker goes on non-seed rows only,
+    # and a seed row without a crop raises.
+    seed_row = df['input'].eq('Seed').to_numpy()
+    no_crop = df['crop'].isna().to_numpy()
+    if (seed_row & no_crop).any():
+        raise ValueError(
+            f"Malawi plot_inputs {t}: {int((seed_row & no_crop).sum())} seed "
+            f"row(s) have no crop; a missing crop code is not "
+            f"'{NOT_CROP_SPECIFIC}' (GH #1119)")
+    df['crop'] = df['crop'].astype('string').mask(~seed_row & no_crop,
+                                                  NOT_CROP_SPECIFIC)
     if 'Applied' not in df.columns:
         df['Applied'] = pd.array([pd.NA] * len(df), dtype='boolean')
     df['Applied'] = df['Applied'].astype('boolean')
@@ -3481,10 +3585,19 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
                 'Quantity_purchased'].sum(min_count=1)
             seed = df['input'] == 'Seed'
             # Count plots per (i, crop) among seed rows; attach only when a
-            # crop's seed is on exactly one plot (unambiguous).
+            # crop's seed is on exactly one KNOWN plot and on no
+            # `unknown_plot` line (GH #1120 D3, as `_attach_sales`; no held
+            # seed row has an unknown plot).
             seed_rows = df[seed]
-            nplots = (seed_rows.groupby(['i', 'crop'])['plot_id']
-                      .nunique().rename('_nplots').reset_index())
+            known = seed_rows['plot_id'].ne(PLOT_UNKNOWN)
+            nplots = (seed_rows[known].groupby(['i', 'crop'])['plot_id']
+                      .nunique().rename('_nplots'))
+            nunknown = seed_rows[~known].groupby(['i', 'crop']).size()
+            nplots = nplots.reindex(nplots.index.union(nunknown.index),
+                                    fill_value=0)
+            nplots = nplots.where(
+                nunknown.reindex(nplots.index, fill_value=0).eq(0), 0)
+            nplots = nplots.rename('_nplots').reset_index()
             attach = sp.merge(nplots, on=['i', 'crop'], how='inner')
             attach = attach[attach['_nplots'] == 1][
                 ['i', 'crop', 'Quantity_purchased']]
@@ -3508,12 +3621,29 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     # Consolidate exact-duplicate reported lines: same (i, plot, input,
     # crop, u) summed on Quantity (a plot may record the same fertilizer
     # in two slots with the same unit); first-wins on the flag columns.
-    # Rows in different units `u` stay distinct.  NaN crop / u participate
-    # in the grouping (dropna=False) so fertilizer/pesticide rows (crop
-    # NaN) are not silently dropped.
+    # Rows in different units `u` stay distinct.  NaN u participates in the
+    # grouping (dropna=False) so a unit-less row is not silently dropped;
+    # `crop` is never NaN here (the marker above).
+    #
+    # SAME-TYPE FERTILIZER SLOT PAIRS (@ligon, 2026-10-23: keep summing, no
+    # data change).  Module D's two inorganic slots name the same fertilizer
+    # type on one plot in 89 / 59 / 78 / 187 records (2010-11 / 2013-14 /
+    # 2016-17 / 2019-20); they are read as TWO APPLICATIONS and summed here.
+    # In 72 / 50 / 51 / 143 of them the two quantities are identical -- a
+    # possible double entry, recorded in Malawi/_/CONTENTS.org, not undone.
     df['crop'] = df['crop'].astype('string')
     df['u'] = df['u'].astype('string')
+    # GH #1120 D3: two `unknown_plot` lines of one household are not one
+    # plot; none exist in the held data -- raise rather than sum.
     keys = ['t', 'i', 'plot_id', 'input', 'crop', 'u']
+    unk = df['plot_id'].eq(PLOT_UNKNOWN).to_numpy()
+    n_merge = int(df[unk].duplicated([k for k in keys if k != 'plot_id'],
+                                     keep=False).sum())
+    if n_merge:
+        raise ValueError(
+            f"Malawi plot_inputs {t}: {n_merge} input lines with no plot id "
+            f"({PLOT_UNKNOWN}) share a household, input, crop and unit; they "
+            f"are different plots and must not be summed (GH #1120 D3)")
     grp = df.groupby(keys, as_index=False, dropna=False).agg({
         'Quantity':           'sum',
         'Quantity_purchased': 'first',
@@ -3525,10 +3655,10 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     # The natural per-input-line grain is (t, i, plot, input, crop, u): a
     # plot may carry several seed crops (same input='Seed', distinct crop)
     # and a fertilizer may be reported in two slots in different units
-    # (same input, crop NaN, distinct u).  crop / u therefore belong in the
-    # index to keep it unique; both are NaN for the inputs that don't carry
-    # them (fertilizer/pesticide have NaN crop; organic-fertilizer rows have
-    # NaN u as well).  dropna=False above keeps those NaN-keyed rows.
+    # (same input, crop marker, distinct u).  crop / u therefore belong in
+    # the index to keep it unique; fertilizer / organic / pesticide rows
+    # carry the '(not crop-specific)' marker on crop (GH #1119), and
+    # dropna=False above keeps any NaN-u row.
     grp = grp.set_index(keys)
     # GH #1109 (ledger sections 2-4): organic use is reported in Applied,
     # not as a measured zero quantity.  Keep its missingness without changing
@@ -3975,7 +4105,9 @@ def _plot_labor_block(df, *, hhid, plotkey, t, hired_suffix,
     """
     work = pd.DataFrame({
         'i':    df[hhid].astype('string').values,
-        'plot_id': df[plotkey].astype('string').values,
+        # GH #1120 D3: a Module D line with a blank plot key (2010-11's
+        # `ag_d00` stubs) keeps its labour days on `unknown_plot`.
+        'plot_id': _plot_ids(df[plotkey]).values,
     }, index=df.index)
 
     rows = []
@@ -4039,6 +4171,16 @@ def assemble_plot_labor(t, pieces):
     """
     cat = pd.concat(pieces, ignore_index=True)
     cat['t'] = t
+    # GH #1120 D3: two `unknown_plot` lines of one household are not one plot.
+    # 2010-11's blank-key stubs are one per household, so this never fires on
+    # the held data; raise rather than sum should two ever meet.
+    unk = cat['plot_id'].eq(PLOT_UNKNOWN).to_numpy()
+    n_merge = int(cat[unk].duplicated(['i', 'source'], keep=False).sum())
+    if n_merge:
+        raise ValueError(
+            f"Malawi plot_labor {t}: {n_merge} labour lines with no plot id "
+            f"({PLOT_UNKNOWN}) share a household and source; they are "
+            f"different plots and must not be summed (GH #1120 D3)")
     grp = cat.groupby(['t', 'i', 'plot_id', 'source'], as_index=False,
                       dropna=False).agg({
         'PersonDays': 'sum',

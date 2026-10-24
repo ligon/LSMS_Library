@@ -247,13 +247,30 @@ Data Scheme:
     # issue (malawi.crop_conversion_factors) key their kg factors ON this
     # axis, so without it their shelled and unshelled factors are ambiguous
     # and `harvest_kg(shipped_factors=...)` refuses the table outright.
-    index: (t, i, plot_id, crop, u, condition)
+    #
+    # production_obs (GH #637 defect A, @ligon 2026-10-23; the #1198
+    # precedent, as Tanzania in #1263) is the canonical native-observation
+    # coordinate, `reported:G:<code>` / `reported:P:<code>`: the harvest
+    # module and the INSTRUMENT's own crop code.  `crop` lumps codes (Maize
+    # 1-4, the rices, groundnuts, citrus); until this level a collapse at the
+    # end of malawi.assemble_crop_production summed the codes of one label
+    # into one row (127 / 54 / 7 / 98 groups), kept the first code's variety
+    # and sale, and dropped 28,900 / 18,200 / 50,000 / 276,500 MWK of
+    # attached sales.  Each code now keeps its own row, sale and kg factor.
+    #
+    # plot_id `unknown_plot` (GH #1120 D3): a harvest line whose plot key is
+    # blank in the source (2016-17: 41 Module P lines) -- not a plot; see
+    # lsms_library/data_info.yml `plot_id:`.
+    index: (t, i, plot_id, crop, u, condition, production_obs)
     Quantity: float
     # crop_variety (GH #854) is the crop at its NATIVE grain -- the Module G/P
     # value label for the same code `crop` was collapsed from ('Maize Hybrid',
     # 'Rice Faya', 'Groundnut CG7'; `harmonize_crop_variety` in
     # categorical_mapping.org).  A COLUMN, not a level: it is functionally
-    # determined by the crop code, so it splits no key.  It exists because the
+    # determined by the crop code, which the grain carries as production_obs,
+    # so it splits no key.  (Before production_obs this said "splits no key"
+    # while 127 / 54 / 7 / 98 groups of distinct codes WERE collapsed under
+    # one row and one variety -- GH #637 tail diagnosis.)  It exists because the
     # shipped IHS5 conversion tables key their kg factors on the variety and
     # the varieties genuinely differ -- unshelled paddy in a 50 kg bag is
     # 29.04 kg for RICE LOCAL against 49.00 for eight improved varieties.
@@ -283,8 +300,13 @@ Data Scheme:
     # `input` is the shared harmonize_input Preferred Label
     # (NPK/DAP/CAN/Urea/D-Compound/Other fertilizer, Organic Fertilizer,
     # Insecticide/Herbicide/Fungicide/Fumigant/Other Pesticide, Seed).
-    # `crop` is the harmonize_crop->harmonize_food label for seed rows
-    # (NaN for fertilizer/pesticide).  `u` is the reported native unit
+    # `crop` is the harmonize_crop->harmonize_food label for seed rows and
+    # `(not crop-specific)` for every Module D row -- fertilizer, organic,
+    # pesticide, which the instrument asks per plot with no crop item (GH
+    # #1119; NaN until 2026-10-23).  A seed line with a missing crop code is
+    # dropped and counted, never marked.  plot_id is never NaN: a blank
+    # source plot key would be `unknown_plot` (GH #1120 D3; none in the held
+    # plot_inputs data).  `u` is the reported native unit
     # label. Organic units use their own ag_d37b dictionary; missing units
     # are Unknown and unlisted recorded codes are source-qualified raw
     # identities (Organic unit code N). crop / u are in
@@ -401,6 +423,11 @@ Data Scheme:
     # those halves carry no `other` rows (reported, not faked).  2004-05
     # (IHS2) is DEFERRED (household-level aggregated ag file, no plot-labor
     # roster).  See _/malawi.py:_plot_labor_block / assemble_plot_labor.
+    # plot_id `unknown_plot` (GH #1120 D3, @ligon 2026-10-23): 2010-11's
+    # Module D stubs with a blank `ag_d00` that carry labour days (40 rows,
+    # 32 households) -- the plot is missing in the source, not absent by
+    # design; NOT a plot (lsms_library/data_info.yml `plot_id:`).  NaN until
+    # this sentinel.
     index: (t, i, plot_id, source)
     PersonDays: float
     Wage: float

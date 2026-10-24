@@ -2,8 +2,10 @@
 
 Each buildable wave's ``Malawi/<wave>/_/crop_production.py`` produces a
 parquet indexed (t, i, plot, crop) with the canonical item-level columns
-(Quantity, u, Quantity_sold, Value_sold, planting_month, harvest_month,
-intercropped, perennial).  This script concatenates them.  Cross-wave
+(Quantity, u, condition, production_obs, Quantity_sold, Value_sold,
+planting_month, harvest_month, intercropped, perennial); ``condition`` and
+``production_obs`` (the native crop record, GH #637 defect A) are declared
+index levels the framework promotes.  This script concatenates them.  Cross-wave
 id_walk (panel-id chaining) and the join of the cluster id ``v`` are
 applied by the framework at API time in _finalize_result.
 

@@ -57,14 +57,17 @@ sale = [
 
 df = assemble_crop_production(WAVE, harvest, sale)
 
-# GH #854: `u` and `condition` are declared index levels that ride as
-# COLUMNS out of assemble_crop_production (the framework promotes them), so
-# the uniqueness that matters is on the full declared grain, not on the
-# 4-level index.  (t, i, plot, crop) is legitimately non-unique now: one
-# plot-crop can be reported shelled AND unshelled.
-_GRAIN = ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
+# GH #854 / #637 defect A: `u`, `condition` and `production_obs` are declared
+# index levels that ride as COLUMNS out of assemble_crop_production (the
+# framework promotes them), so the uniqueness that matters is on the full
+# declared grain, not on the 4-level index.  (t, i, plot, crop) is
+# legitimately non-unique: one plot-crop can be reported shelled AND
+# unshelled, and two crop codes can share one `crop` label.
+_GRAIN = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs']
 assert not df.reset_index().duplicated(_GRAIN).any(), \
-    f"Non-unique (t,i,plot,crop,u,condition) in crop_production {WAVE}"
+    f"Non-unique (t,i,plot,crop,u,condition,production_obs) in crop_production {WAVE}"
+assert df['production_obs'].notna().all(), \
+    f"crop_production {WAVE}: a row without its native crop code"
 assert len(df) > 0, f"crop_production {WAVE} produced no rows"
 
 to_parquet(df, 'crop_production.parquet')
