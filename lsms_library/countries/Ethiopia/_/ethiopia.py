@@ -608,6 +608,192 @@ def ea_id2_crosswalk(*covers):
     return pairs[unique].set_index('ea_id')['ea_id2'].to_dict()
 
 
+def _agriculture_only_households(t, hh, pp, colmap, codes, ea_crosswalk=None):
+    """The households the AGRICULTURE cover ``pp`` records and the household
+    cover ``hh`` does not, one row each (GH #1120 D1), or ``None`` if there
+    are none.  Both frames are read with ``convert_categoricals=False``.
+
+    Columns: ``i``, ``v`` (the agriculture cover's EA -- ``colmap['pp_ea']``,
+    default ``colmap['ea']`` -- placed in the household cover's keyspace
+    through ``ea_crosswalk`` where given), ``weight`` (when ``colmap`` names
+    one) and the raw ``codes`` columns.  The cover is HOLDER grain: a
+    household's rows must agree on EA, weight and every code, or this RAISES;
+    so does a blank EA or one the crosswalk cannot place (absent or
+    ambiguous).  Nothing is guessed.
+    """
+    c = colmap
+    pp_ea = c.get('pp_ea', c['ea'])
+    hh_ids = set(hh[c['hhid']].apply(format_id).dropna())
+    i = pp[c['hhid']].apply(format_id)
+    keep = (i.notna() & (i.astype('string').str.strip() != '') & ~i.isin(hh_ids)).to_numpy()
+    if not keep.any():
+        return None
+    a = pd.DataFrame({'i': i[keep].values,
+                      '_ea': pp.loc[keep, pp_ea].apply(format_id).values})
+    agree = ['_ea']
+    if c.get('weight'):
+        a['weight'] = pd.to_numeric(pp.loc[keep, c['weight']], errors='coerce').astype(float).values
+        agree.append('weight')
+    for col in codes:
+        a[col] = pd.to_numeric(pp.loc[keep, col], errors='coerce').values
+        agree.append(col)
+    vary = a.groupby('i')[agree].nunique(dropna=False)
+    n_vary = int((vary > 1).any(axis=1).sum())
+    if n_vary:
+        raise ValueError(
+            f"{t}: {n_vary} agriculture-cover household(s) carry more than one "
+            f"EA / weight / {' / '.join(codes)} code across their holder rows; "
+            "which is the household's is not something the survey says.")
+    a = a.drop_duplicates('i').reset_index(drop=True)
+    v = a['_ea'].map(ea_crosswalk) if ea_crosswalk is not None else a['_ea']
+    n_v = int((v.isna() | (v.astype('string').str.strip() == '')).sum())
+    if n_v:
+        raise ValueError(
+            f"{t}: {n_v} agriculture-cover household(s) have no EA in the "
+            "sample's v keyspace (blank, or not placed by the crosswalk -- "
+            "absent from it or ambiguous in it).")
+    a['v'] = v.values
+    return a.drop(columns='_ea')
+
+
+def _decode_codes(t, hh, hh_values, col, codes):
+    """Decode agriculture-cover ``codes`` of variable ``col`` through the
+    HOUSEHOLD cover: ``hh`` holds its codes (``convert_categoricals=False``),
+    ``hh_values`` the value each household-cover row carries for ``col``
+    (its label, or the value a built frame serves), row for row.  The two
+    covers label the same codes differently, so decoding by code is what
+    makes an agriculture household spelled as the household cover spells it.
+    A code the household cover labels two ways, or never uses, RAISES."""
+    m = pd.DataFrame({'code': pd.to_numeric(hh[col], errors='coerce').values,
+                      'label': pd.Series(hh_values).values})
+    m = m.dropna(subset=['code']).drop_duplicates()
+    if not m['code'].is_unique:
+        raise ValueError(f"{t}: the household cover labels one {col} code two ways")
+    lut = dict(zip(m['code'], m['label']))
+    codes = pd.Series(codes).reset_index(drop=True)
+    n_code = int((~codes.isin(list(lut))).sum())
+    if n_code:
+        raise ValueError(
+            f"{t}: {n_code} agriculture-cover household(s) carry a {col} code "
+            "the household cover never uses, so there is no household-cover "
+            "label to decode it with.")
+    return codes.map(lut)
+
+
+#: GH #1120 D1, cluster_features: per wave, the household cover and the
+#: geovariables file the wave's YAML ``cluster_features`` block reads
+#: (``df_main`` / ``df_geo`` -- pinned equal to them by
+#: tests/test_gh1120_ethiopia_agriculture_cover.py), plus the agriculture
+#: cover, the EA column it carries and, for W3, the covers that crosswalk it.
+CLUSTER_AGRICULTURE_SOURCES = {
+    '2011-12': dict(cover='sect_cover_hh_w1.dta', agri='sect_cover_pp_w1.dta',
+                    hhid='household_id', ea='ea_id', rural='rural',
+                    geo=('Pub_ETH_HouseholdGeovariables_Y1.dta', 'LAT_DD_MOD', 'LON_DD_MOD')),
+    '2013-14': dict(cover='sect_cover_hh_w2.dta', agri='sect_cover_pp_w2.dta',
+                    hhid='household_id2', ea='ea_id2', rural='rural',
+                    geo=('Pub_ETH_HouseholdGeovars_Y2.dta', 'lat_dd_mod', 'lon_dd_mod')),
+    '2015-16': dict(cover='sect_cover_hh_w3.dta', agri='sect_cover_pp_w3.dta',
+                    hhid='household_id2', ea='ea_id2', pp_ea='ea_id', rural='rural',
+                    crosswalk=(('2015-16', 'sect_cover_hh_w3.dta'),
+                               ('2013-14', 'sect_cover_hh_w2.dta')),
+                    geo=('ETH_HouseholdGeovars_y3.dta', 'lat_dd_mod', 'lon_dd_mod')),
+    '2018-19': dict(cover='sect_cover_hh_w4.dta', agri='sect_cover_pp_w4.dta',
+                    hhid='household_id', ea='ea_id', rural='saq14',
+                    geo=('ETH_HouseholdGeovariables_Y4.dta', 'lat_mod', 'lon_mod')),
+    '2021-22': dict(cover='sect_cover_hh_w5.dta', agri='sect_cover_pp_w5.dta',
+                    hhid='household_id', ea='ea_id', rural='saq14',
+                    geo=('eth_householdgeovariables_y5.dta', 'lat_dd_mod', 'lon_dd_mod')),
+}
+
+
+def cluster_features(df):
+    """``df_edit`` hook of every wave's YAML ``cluster_features`` (GH #1120 D1).
+
+    ``sample()`` takes the households the survey recorded ONLY in the
+    agriculture cover (:func:`with_agriculture_cover_households`), so
+    ``sample.v`` holds EAs that have no household-cover row -- 1 / 1 / 6 / 3
+    in W2-W5 -- and that ``cluster_features``, built from the household cover,
+    did not hold.  ``sample.v`` and ``cluster_features.v`` must be one
+    keyspace (the Nigeria ruling of 2026-10-23, GH #1261), so this hook
+    appends, at the HOUSEHOLD grain the YAML frame has, the agriculture-only
+    households of exactly those EAs; ``Wave.cluster_features`` then projects
+    the frame onto ``(t, v)`` through the audited Site 2 collapse, as always.
+
+    * Only EAs the household cover LACKS.  An EA it has keeps the household
+      cover as authoritative (the YAML's own ``merge_how: left`` rationale),
+      so every existing ``(t, v)`` row is unchanged; its agriculture-only
+      households would add nothing but projection noise (W5: one sits 120 km
+      from its EA's fix).
+    * ``Region`` / ``District`` / ``Rural`` are decoded by CODE through the
+      values this very frame's household-cover rows carry -- the household
+      cover's labels, after the YAML's own ``mapping:`` -- so a new EA is
+      spelled exactly as the YAML spells the others.  A code no household-
+      cover row uses RAISES (:func:`_decode_codes`).
+    * ``Latitude`` / ``Longitude`` come from the wave's geovariables file, by
+      household, only where the household is in it (W3's are not; W5's 5 of
+      29 are not) -- never borrowed from another EA or wave.
+    * W3's agriculture cover carries only ``ea_id``: ``v`` comes through
+      :func:`ea_id2_crosswalk`, as for ``sample``, and must be the prefix of
+      its ``household_id2``.
+
+    The hook reads the covers by path (``countries_root()``); like any
+    dynamically-read source they are covered by this module's text hash, not
+    by a sidecar md5 (CLAUDE.md, cache limitation (a)).
+    """
+    if df.empty or 't' not in (df.index.names or []) or 'v' not in df.index.names:
+        return df
+    waves = set(map(str, df.index.get_level_values('t')))
+    if len(waves) != 1:
+        return df
+    t = waves.pop()
+    spec = CLUSTER_AGRICULTURE_SOURCES.get(t)
+    if spec is None:
+        return df
+    from lsms_library.paths import countries_root
+    root = countries_root() / 'Ethiopia'
+
+    def _read(wave, fn, convert=False):
+        return get_dataframe(str(root / wave / 'Data' / fn), convert_categoricals=convert)
+
+    hh = _read(t, spec['cover'])
+    xw = (ea_id2_crosswalk(*[_read(w, f) for w, f in spec['crosswalk']])
+          if spec.get('crosswalk') else None)
+    rural = spec['rural']
+    colmap = {k: spec[k] for k in ('hhid', 'ea', 'pp_ea') if k in spec}
+    a = _agriculture_only_households(t, hh, _read(t, spec['agri']), colmap,
+                                     codes=['saq01', 'saq02', rural], ea_crosswalk=xw)
+    if a is None:
+        return df
+    if xw is not None:
+        n_pfx = int((a['v'].astype(str) != a['i'].astype(str).str[:15]).sum())
+        assert n_pfx == 0, f"{t}: {n_pfx} crosswalked EAs are not their household_id2's prefix"
+    a = a[~a['v'].isin(set(df.index.get_level_values('v')))].reset_index(drop=True)
+    if a.empty:
+        return df
+
+    served = df.reset_index()
+    served = served[~served['i'].duplicated()].set_index('i')
+    hh_i = hh[spec['hhid']].apply(format_id)
+    new = pd.DataFrame({'t': t, 'v': a['v'].astype(object).values,
+                        'i': a['i'].astype(object).values})
+    for code, col in (('saq01', 'Region'), ('saq02', 'District'), (rural, 'Rural')):
+        if col in served.columns:
+            new[col] = _decode_codes(t, hh, hh_i.map(served[col]).values, code,
+                                     a[code]).values
+    fn, lat, lon = spec['geo']
+    geo = _read(t, fn)
+    gi = geo[spec['hhid']].apply(format_id)
+    g = pd.DataFrame({'Latitude': geo[lat].values, 'Longitude': geo[lon].values},
+                     index=gi.values)
+    g = g[g.index.isin(set(new['i']))]
+    assert g.index.is_unique, f"{t}: {fn} gives a household two fixes"
+    for col in ('Latitude', 'Longitude'):
+        if col in served.columns:
+            new[col] = new['i'].map(g[col]).values
+    new = new.set_index(list(df.index.names))[list(df.columns)]
+    return pd.concat([df, new])
+
+
 def with_agriculture_cover_households(sample, t, hh, hh_labels, pp, colmap,
                                       rural_map, ea_crosswalk=None):
     """Append to a wave's ``sample`` the households recorded ONLY in the
@@ -647,57 +833,16 @@ def with_agriculture_cover_households(sample, t, hh, hh_labels, pp, colmap,
     """
     c = colmap
     region = c.get('region', 'saq01')
-    pp_ea = c.get('pp_ea', c['ea'])
-    hh_ids = set(hh[c['hhid']].apply(format_id).dropna())
-    i = pp[c['hhid']].apply(format_id)
-    keep = (i.notna() & (i.astype('string').str.strip() != '') & ~i.isin(hh_ids)).to_numpy()
-    if not keep.any():
+    a = _agriculture_only_households(t, hh, pp, colmap, codes=[region, c['rural']],
+                                     ea_crosswalk=ea_crosswalk)
+    if a is None:
         return sample
-    a = pd.DataFrame({
-        'i': i[keep].values,
-        '_ea': pp.loc[keep, pp_ea].apply(format_id).values,
-        'weight': pd.to_numeric(pp.loc[keep, c['weight']], errors='coerce').astype(float).values,
-        '_region': pd.to_numeric(pp.loc[keep, region], errors='coerce').values,
-        '_rural': pd.to_numeric(pp.loc[keep, c['rural']], errors='coerce').values,
-    })
-    vary = a.groupby('i')[['_ea', 'weight', '_region', '_rural']].nunique(dropna=False)
-    n_vary = int((vary > 1).any(axis=1).sum())
-    if n_vary:
-        raise ValueError(
-            f"{t}: {n_vary} agriculture-cover household(s) carry more than one "
-            "EA / weight / region / rural code across their holder rows; "
-            "which is the household's is not something the survey says.")
-    a = a.drop_duplicates('i').reset_index(drop=True)
-
-    def _code_labels(col):
-        m = pd.DataFrame({'code': pd.to_numeric(hh[col], errors='coerce').values,
-                          'label': hh_labels[col].astype(str).values})
-        m = m.dropna(subset=['code']).drop_duplicates()
-        if not m['code'].is_unique:
-            raise ValueError(f"{t}: the household cover labels one {col} code two ways")
-        return dict(zip(m['code'], m['label']))
-
-    rmap, umap = _code_labels(region), _code_labels(c['rural'])
-    n_code = int((~a['_region'].isin(list(rmap)) | ~a['_rural'].isin(list(umap))).sum())
-    if n_code:
-        raise ValueError(
-            f"{t}: {n_code} agriculture-cover household(s) carry a {region} / "
-            f"{c['rural']} code the household cover never uses, so there is no "
-            "household-cover label to decode it with.")
-
-    if ea_crosswalk is not None:
-        v = a['_ea'].map(ea_crosswalk)
-    else:
-        v = a['_ea']
-    n_v = int((v.isna() | (v.astype('string').str.strip() == '')).sum())
-    if n_v:
-        raise ValueError(
-            f"{t}: {n_v} agriculture-cover household(s) have no EA in the "
-            "sample's v keyspace (blank, or not placed by the crosswalk -- "
-            "absent from it or ambiguous in it).")
-
-    rural = a['_rural'].map(umap).map(rural_map)
-    strata = (a['_region'].map(rmap).astype(str).str.strip() + ' '
+    region_label = _decode_codes(t, hh, hh_labels[region].astype(str), region, a[region])
+    rural_label = _decode_codes(t, hh, hh_labels[c['rural']].astype(str), c['rural'],
+                                a[c['rural']])
+    v = a['v']
+    rural = rural_label.map(rural_map)
+    strata = (region_label.astype(str).str.strip() + ' '
               + rural.fillna('')).str.strip()
     extra = pd.DataFrame({
         'i': a['i'].astype(object).values,

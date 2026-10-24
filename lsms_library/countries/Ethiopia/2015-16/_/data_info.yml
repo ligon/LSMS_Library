@@ -18,6 +18,10 @@ Wave: 2015-16
 # for this wave (see _/CONTENTS.org).  Verified unique and blank-free in BOTH
 # frames (4,954 / 4,954 rows, 0 keys duplicated in both).
 cluster_features:
+    # GH #1120 D1: sample() also takes the households recorded ONLY in the
+    # agriculture cover, so ethiopia.cluster_features (this table's df_edit
+    # hook) appends those of the EAs this household cover LACKS -- one v
+    # keyspace with sample.  Existing EAs are untouched.  See _/CONTENTS.org.
     dfs:
         - df_main
         - df_geo

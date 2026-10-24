@@ -150,6 +150,91 @@ def test_the_crosswalk_refuses_an_ambiguous_or_absent_ea(eth):
 
 
 # ---------------------------------------------------------------------------
+# Synthetic: the cluster_features hook (GH #1120 D1 -- one v keyspace)
+# ---------------------------------------------------------------------------
+
+def _cf_files():
+    """Household cover HA (EA E1), HB (EA E2); agriculture cover adds HC (a new
+    EA E3, two holder rows), HD (existing EA E2) and HE (a new EA E4, no fix)."""
+    hh = pd.DataFrame({"hid": ["HA", "HB"], "ea": ["E1", "E2"], "saq01": [3.0, 7.0],
+                       "saq02": [1.0, 2.0], "rural": [1.0, 2.0]})
+    pp = pd.DataFrame({"hid": ["HA", "HC", "HC", "HD", "HE"],
+                       "ea": ["E1", "E3", "E3", "E2", "E4"],
+                       "saq01": [3.0, 7.0, 7.0, 7.0, 3.0], "saq02": [1.0, 2.0, 2.0, 2.0, 1.0],
+                       "rural": [1.0, 2.0, 2.0, 2.0, 1.0]})
+    geo = pd.DataFrame({"hid": ["HA", "HB", "HC", "HD"], "lat": [10.0, 11.0, 12.0, 11.5],
+                        "lon": [40.0, 41.0, 42.0, 41.5]})
+    return {"hh.dta": hh, "pp.dta": pp, "geo.dta": geo}
+
+
+def _cf_frame():
+    """The YAML frame the hook receives: household grain, (t, v, i)."""
+    idx = pd.MultiIndex.from_tuples([("T", "E1", "HA"), ("T", "E2", "HB")],
+                                    names=["t", "v", "i"])
+    return pd.DataFrame({"Region": ["Amhara", "SNNP"], "District": [1, 2],
+                         "Rural": ["Rural", "Urban"], "Latitude": [10.0, 11.0],
+                         "Longitude": [40.0, 41.0]}, index=idx)
+
+
+@pytest.fixture()
+def cf(eth, monkeypatch):
+    files = _cf_files()
+    monkeypatch.setattr(eth, "get_dataframe",
+                        lambda path, **kw: files[str(path).rsplit("/", 1)[-1]].copy())
+    monkeypatch.setitem(eth.CLUSTER_AGRICULTURE_SOURCES, "T",
+                        dict(cover="hh.dta", agri="pp.dta", hhid="hid", ea="ea",
+                             rural="rural", geo=("geo.dta", "lat", "lon")))
+    return files
+
+
+def test_cluster_features_gains_the_agriculture_only_eas(eth, cf):
+    base = _cf_frame()
+    out = eth.cluster_features(base.copy())
+    pd.testing.assert_frame_equal(out.iloc[:2], base)      # household rows untouched
+    add = out.iloc[2:]
+    got = sorted(add.index.get_level_values("v"))
+    assert got == ["E3", "E4"], got                          # new EAs only, HC once
+    hc = add.xs("HC", level="i").iloc[0]
+    # decoded by code through the household rows' own served values
+    assert (hc["Region"], hc["District"], hc["Rural"]) == ("SNNP", 2, "Urban")
+    assert hc["Latitude"] == 12.0 and hc["Longitude"] == 42.0
+    he = add.xs("HE", level="i").iloc[0]
+    assert pd.isna(he["Latitude"])                           # not in the geo file
+    assert (he["Region"], he["Rural"]) == ("Amhara", "Rural")
+
+
+def test_an_existing_ea_keeps_only_its_household_cover_rows(eth, cf):
+    out = eth.cluster_features(_cf_frame())
+    hd = int((out.index.get_level_values("i") == "HD").sum())
+    assert hd == 0, hd
+
+
+def test_a_code_no_household_row_uses_is_refused(eth, cf):
+    cf["pp.dta"].loc[4, "saq01"] = 15.0
+    with pytest.raises(ValueError, match="never uses"):
+        eth.cluster_features(_cf_frame())
+
+
+def test_an_unknown_wave_is_left_alone(eth, cf):
+    f = _cf_frame().rename(index={"T": "X"}, level="t")
+    assert eth.cluster_features(f) is f
+
+
+@pytest.mark.parametrize("wave", sorted(WAVES))
+def test_the_hook_reads_the_files_the_yaml_reads(eth, wave):
+    """The hook's map must not drift from the YAML block it extends."""
+    import yaml
+    block = yaml.safe_load((ROOT / wave / "_" / "data_info.yml").read_text())["cluster_features"]
+    spec = eth.CLUSTER_AGRICULTURE_SOURCES[wave]
+    main, geo = block["df_main"], block["df_geo"]
+    assert spec["cover"] == main["file"]
+    assert (spec["ea"], spec["hhid"]) == (main["idxvars"]["v"], main["idxvars"]["i"])
+    assert spec["rural"] == main["myvars"]["Rural"][0]
+    assert spec["geo"] == (geo["file"], geo["myvars"]["Latitude"], geo["myvars"]["Longitude"])
+    assert spec["agri"] == f"sect_cover_pp_w{WAVES[wave]}.dta"
+
+
+# ---------------------------------------------------------------------------
 # Static: every wave applies the rule; the crosswalk script reads both covers
 # ---------------------------------------------------------------------------
 

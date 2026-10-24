@@ -21,6 +21,10 @@ Wave: 2013-14
 # 0 keys duplicated in both).  This matches the wave's v (ea_id2) and the
 # i that sample/household_roster emit -- see _/CONTENTS.org.
 cluster_features:
+    # GH #1120 D1: sample() also takes the households recorded ONLY in the
+    # agriculture cover, so ethiopia.cluster_features (this table's df_edit
+    # hook) appends those of the EAs this household cover LACKS -- one v
+    # keyspace with sample.  Existing EAs are untouched.  See _/CONTENTS.org.
     dfs:
         - df_main
         - df_geo

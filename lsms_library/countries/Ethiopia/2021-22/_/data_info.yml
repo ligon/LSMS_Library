@@ -18,6 +18,10 @@ Wave: 2021-22
 # 4,890 rows.  It was the KEY that was wrong, not the data -- so this is wired
 # up, NOT marked optional.  Joining on household_id lets the cover supply v.
 cluster_features:
+    # GH #1120 D1: sample() also takes the households recorded ONLY in the
+    # agriculture cover, so ethiopia.cluster_features (this table's df_edit
+    # hook) appends those of the EAs this household cover LACKS -- one v
+    # keyspace with sample.  Existing EAs are untouched.  See _/CONTENTS.org.
     dfs:
         - df_main
         - df_geo

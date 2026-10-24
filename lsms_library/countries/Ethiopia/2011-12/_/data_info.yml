@@ -17,6 +17,10 @@ Wave: 2011-12
 # with Latitude/Longitude 100% absent.  Verified against the source: the file
 # carries LAT_DD_MOD/LON_DD_MOD non-null for all 3,917 rows.
 cluster_features:
+    # GH #1120 D1: sample() also takes the households recorded ONLY in the
+    # agriculture cover, so ethiopia.cluster_features (this table's df_edit
+    # hook) appends those of the EAs this household cover LACKS -- one v
+    # keyspace with sample.  Existing EAs are untouched.  See _/CONTENTS.org.
     dfs:
         - df_main
         - df_geo
