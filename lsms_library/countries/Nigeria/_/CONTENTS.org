@@ -538,10 +538,44 @@ cover can give a 2012Q3 =v=.  Following the ruling's general form (households
 the survey recorded in another cover come from that cover, with that cover's
 weight -- Ethiopia's agriculture cover), 2012Q3 takes them from it
 (=ROUND_COVERS['2012-13']['pp_supplement']=), the household cover winning for
-every household on both; their weight / panel_weight are NA.  Their
-state/lga/ea agree with the PH cover's on all 21.  This one step goes past the
-literal Nigeria ruling ("the post-planting cover") and is a single dict entry
-if it should come out.  No other wave ships a PP agriculture cover.
+every household on both; their weight / panel_weight are NA because that cover
+carries no weight.  Their state/lga/ea agree with the PH cover's on all 21.
+This is a D1 application on the Ethiopia precedent, and it is kept
+(dispatcher decision, 2026-10-23).  No other wave ships a PP agriculture
+cover.
+
+*The round's own roster (D1), and the D2 singleton.*  Last in precedence, a
+household the round's ROSTER records (=sect1_{planting,harvest}{wN}=, the
+file =household_roster= reads; =ROUND_COVERS[...]['pp_roster' / 'ph_roster']=)
+and no cover lists is located by that roster: every member row carries the
+household's zone/state/lga/sector/ea.  Measured on all ten rosters: the
+location is constant within every household and agrees with the round's cover
+on every shared household (one W1 PH household excepted, 4,916 of 4,917; the
+cover wins).  Only 2016Q1 has roster households that no cover lists -- two,
+behind the 39 rows of =household_roster= / =individual_education= /
+=anthropometry= / =nonfood_expenditures= that still had no =v=:
+- one is on the 2015-16 PP cover (response code 4, refused; =tracked_obs =
+  0=; null weight) but not the PH cover, and the PH roster records it with
+  =ea == 0=, so in 2016Q1 it is =moved-{hhid}= -- the survey's own Moved
+  sentinel, recorded by that round;
+- the other is on neither cover; its PH roster gives a real EA (a 9-household
+  cluster of the round).
+Both come from the roster with NA weights.  The roster's labels differ from
+the cover's for the same code (W3 roster ='32. Rivers'= / ='5. SOUTH SOUTH'=,
+cover ='rivers'= / ='south south'=), so a roster household takes the COVER's
+label for its codes -- otherwise one cluster would hold two spellings.
+
+GH #1120 D2 (@ligon, 2026-10-23): a household that NO file locates gets a
+singleton =v= per household, never a shared sentinel.  It is spelled
+=unlocated-{hhid}= (=nigeria.UNLOCATED_PREFIX=), deliberately NOT
+=moved-{hhid}=: =moved-= is the survey's ea == 0 Moved sentinel (see "Cluster
+(PSU) identifier"), a recorded fact the mover counts in this file and in
+=sampling.yml= rely on, whereas a D2 household has no recorded location at all
+-- reusing =moved-= would assert a move nobody recorded.  Both are singletons,
+so neither can be pooled.  A roster that lacks a geography column (2015Q3's
+has no =state=) or a blank location produces it.  *In these data D2 fires on
+no household*: every roster household is located by a cover or by its own
+roster.
 
 *#1261 (the geovariables merge).*  The household geovariables now join LEFT
 onto each round's cover.  The old outer YAML merge admitted 39 W2 households
@@ -556,9 +590,9 @@ one W3 geo-only household is on neither cover and has no =ea=.
 (the =panel_ids:= blocks; GH #1264 is that crosswalk's own issue).
 
 *What the served tables show* (cold builds, base =1865cf884= vs the GH #1120
-branch, 2026-10-23; every Nigeria table built through =Country('Nigeria')=).
-Rows and every non-=v= value are identical in every household table; only
-the joined =v= moves.  NaN-=v= rows, base -> branch:
+branch at =cdf140095=, 2026-10-23; every Nigeria table built through
+=Country('Nigeria')=).  Rows and every non-=v= value are identical in every
+household table; only the joined =v= moves.  NaN-=v= rows, base -> branch:
 
 | table                  | base                         | branch                    |
 |------------------------+------------------------------+---------------------------|
@@ -567,40 +601,39 @@ the joined =v= moves.  NaN-=v= rows, base -> branch:
 | plot_features          | 22 (2012Q3)                  | 0                         |
 | crop_production        | 86 (2013Q1)                  | 0                         |
 | food_acquired          | 368 (2013Q1)                 | 0                         |
-| household_roster       | 210 (2013Q1 208, 2016Q1 2)   | 6 (2016Q1)                |
-| nonfood_expenditures   | 338 (2013Q1 323, 2016Q1 15)  | 28 (2016Q1)               |
+| household_roster       | 210 (2013Q1 208, 2016Q1 2)   | 0                         |
+| nonfood_expenditures   | 338 (2013Q1 323, 2016Q1 15)  | 0                         |
 | interview_date         | 42 (2013Q1)                  | 0                         |
 | housing                | 39 (2013Q1)                  | 0                         |
-| anthropometry          | 20 (2013Q1)                  | 1 (2016Q1)                |
-| individual_education   | 2 (2015Q3 1, 2016Q1 1)       | 5 (2015Q3 1, 2016Q1 4)    |
+| anthropometry          | 20 (2013Q1)                  | 0                         |
+| individual_education   | 2 (2015Q3 1, 2016Q1 1)       | 1 (2015Q3)                |
 | food_expenditures / prices / quantities | 253 / 252 / 368 (2013Q1) | 0 / 0 / 0     |
 
-2,171 NaN-=v= rows become 40.  *New residual, one W3 household* (21 rows:
-roster 4, education 3, anthropometry 1, nonfood 13): it is on the 2015-16
-PP cover (response code 4, refused; =tracked_obs = 0=; null weight) but NOT
-on the PH cover, yet the PH modules record it, so 2016Q1 now gives it no
-=v=.  The other 19 rows (one 2016Q1 household, one 2015Q3) are on neither
-cover and were NaN before.  Neither is given a =v= here: households no cover
-locates are GH #1120 D2's (singleton =v=), which was not dispatched for
-Nigeria.
+2,171 NaN-=v= rows become 1.  The round's covers locate 2,131 of them, the
+round's roster the 39 rows of the two 2016Q1 households above, and the
+=unlocated-= singleton is given to none.  The one row left is the 2015Q3
+=individual_education= copy of a post-harvest record (see "individual_education
+copies every post-harvest record onto the PP quarter" below): no PP-round file
+records that household, so it is neither located nor a D2 case.
 
 Other moves: a household that moved between the visits is =moved-{hhid}= in
-the PH round (=sample=: 186 rows; =food_acquired=: 1,839), 2 households the
-other way; =sample= 49,770 -> 49,087 rows (PH rounds lose the households
-their cover does not list, W2 gains 44 + 21); 2011Q1's normalised weights
-move by one constant factor (4,939 rows: W1's PH cover drops 61 weighted
-households); Rural on 22 / strata on 4 movers' rows follow their PH cover.
-=cluster_features=: PP rounds identical except 2012Q3's +2 EAs; PH rounds
-gain the movers' singletons and lose the EAs / singletons their cover does
-not hold (2013Q1 647 -> 662, 2016Q1 792 -> 822, 2019Q1 685 -> 725, 2024Q1
-911 -> 931).  On clusters both builds serve, Region / District change only
-on moved singletons whose PH cover names another state (2016Q1 1, 2024Q1
-4 / 8), Rural on 1 (2019Q1), and Latitude / Longitude on 6 (2016Q1) and 4
-(2019Q1): the Site 2 collapse selects among a different household set.  The
-Site 2 conflict count falls in every PH round (2013Q1 70 -> 45, 2016Q1 78 ->
-4, 2019Q1 129 -> 24): the coordinate disagreements were largely movers whose
-PH cover already says they moved.  =nan_key_rows= is 0 in every round (#1261).
-=community_prices.v= joins =sample= in 2013Q1 on 496 of 496 clusters (was
+the PH round (=sample=: 187 rows; =food_acquired=: 1,839), 2 households the
+other way; =sample= 49,770 -> 49,089 rows (PH rounds lose the households
+their cover does not list; W2 gains 44 + 21, 2016Q1 the roster's 2);
+2011Q1's normalised weights move by one constant factor (4,939 rows: W1's PH
+cover drops 61 weighted households); Rural on 23 / strata on 4 movers' rows
+follow their PH cover or roster.  =cluster_features=: PP rounds identical
+except 2012Q3's +2 EAs; PH rounds gain the movers' singletons and lose the
+EAs / singletons their cover does not hold (2013Q1 647 -> 662, 2016Q1 792 ->
+823, 2019Q1 685 -> 725, 2024Q1 911 -> 931).  On clusters both builds serve,
+Region / District change only on moved singletons whose PH cover names
+another state (2016Q1 1, 2024Q1 4 / 8), Rural on 1 (2019Q1), and Latitude /
+Longitude on 6 (2016Q1) and 4 (2019Q1): the Site 2 collapse selects among a
+different household set.  The Site 2 conflict count falls in every PH round
+(2013Q1 70 -> 45, 2016Q1 78 -> 4, 2019Q1 129 -> 24): the coordinate
+disagreements were largely movers whose PH cover already says they moved.
+=nan_key_rows= is 0 in every round (#1261).  =community_prices.v= joins
+=sample= in 2013Q1 on 496 of 496 clusters (was
 494), and in 2019Q1 on 516 of 517 (was 517; see "v -> sample() keyspace").
 
 ** Panel crosswalk: =_/panel_ids.py= and the committed JSON (GH #894, 2026-10-23)
@@ -685,7 +718,9 @@ fake clusters like =(Lagos, ETI-OSA, Moved)=.  Such households have no sampling
 cluster and each gets its own singleton =v= (=moved-{hhid}=): 152 / 306 / 166 /
 393 households in W2 / W3 / W4 / W5 on the post-planting cover, and 165 / 336
 / 209 / 421 on the post-harvest cover (which each PH round reads since GH
-#1120; it also marks households that moved BETWEEN the two visits).  They are
+#1120; it also marks households that moved BETWEEN the two visits), plus one
+2016Q1 household whose post-harvest ROSTER records =ea == 0= (see [[*Each
+round has its own cover page (GH #1120 D1, #1261, 2026-10-23)]]).  They are
 deliberately NOT given a NaN =v=, which the downstream =groupby()= would
 silently drop from every derived table.
 
@@ -697,7 +732,7 @@ repeated the PP columns):
 |---------+---------+----------+---------+----------|
 | 2010-11 |     500 |        0 |     500 |        0 |
 | 2012-13 |     497 |      152 |     497 |      165 |
-| 2015-16 |     486 |      306 |     486 |      336 |
+| 2015-16 |     486 |      306 |     486 |      337 |
 | 2018-19 |     519 |      166 |     516 |      209 |
 | 2023-24 |     518 |      393 |     510 |      421 |
 
@@ -817,7 +852,7 @@ the PH round repeated the PP row):
 | 2012Q3 | 4716/4880 | 4671/4880    |
 | 2013Q1 | 4716/4854 | 4671/4854    |
 | 2015Q3 | 4581/4696 | 4407/4696    |
-| 2016Q1 | 4581/4592 | 4407/4592    |
+| 2016Q1 | 4581/4594 | 4407/4594    |
 | 2018Q3 | 4976/5263 | 1425/5263    |
 | 2019Q1 | 4976/5025 | 1425/5025    |
 | 2023Q3 | 4715/5067 | 1358/5067    |
@@ -828,7 +863,8 @@ weight); the households it drops, and W2's 44 it adds, all carry null weights.
 So the within-round mean-one normalisation is unchanged there.  W1 is the
 exception: its PH cover drops 61 weighted households, so 2011Q1's normalised
 weights move by one constant factor (4,939 rows).  2012Q3's +21 are the
-unweighted PP-agriculture-cover households.
+unweighted PP-agriculture-cover households; 2016Q1's +2 the unweighted
+households only its roster records.
 
 The large NaN count in =panel_weight= for waves 4--5 reflects the
 refreshment sample: new panel households receive cross-sectional
@@ -1582,8 +1618,11 @@ appear in the community file with no household-side cluster in that round.
 The 2013Q1 pair that used to be in this list (48 rows) are the two EAs that
 only the PH cover holds (GH #1120); the 2019Q1 one is one of the 3 W4 EAs
 whose households the PH cover does not list -- the post-harvest community
-questionnaire priced it, the post-harvest household cover has no household in
-it.  The 2024Q1 row
+questionnaire priced it, the post-harvest household cover (and roster) has no
+household in it.  Documented, not changed (dispatcher decision, 2026-10-23):
+=community_prices= keeps the =v= the COMMUNITY file gives it, so those 68
+rows stay priced in their own cluster, which simply holds no 2019Q1
+household.  The 2024Q1 row
 used to read =0 (0%)= in the =cluster_features= column because the table was
 not declared for W5 at all; it is since GH #841 (declared without
 coordinates, see [[*Wave 5 ships NO household geovariables file (GH #841)]]),
@@ -2466,6 +2505,25 @@ refused):
 So =interview_date= is a *visit* date, not an interview date, for 419 rows
 (216 W1--W3, 203 W4).  Not filtered: whether it should be is a semantics
 decision, drafted as a residual (tier DECISION, 2026-10-19).
+
+* TODO individual_education copies every post-harvest record onto the PP quarter (found 2026-10-23, not fixed)
+
+Section 2 (education) is fielded in the post-harvest round, and each wave
+folder has an =individual_education.py= that writes it at the PH quarter
+only.  But every wave's =data_info.yml= also declares an
+=individual_education:= YAML block reading the same PH file, and a YAML
+block wins over the script and is read once per ROUND -- the same "one
+block, both rounds" shape GH #1120 D1 removed from =sample=.  So each PH
+record is served twice, at the PH quarter and again at the PP quarter:
+643 / 313 / 17,687 / 19,271 / 19,053 rows in 2010Q3 / 2012Q3 / 2015Q3 /
+2018Q3 / 2023Q3, each identical to its PH twin.  The one row that still has
+no =v= after GH #1120 (2015Q3) is such a copy: its household is recorded by
+no PP-round file (it is on neither W3 cover, and its 2016Q1 twin is located
+by the PH roster), so it is not given a PP-round =v=, and it is not a D2
+case either -- giving it one would put a household into the 2015Q3 sample
+that the PP round never saw.  The fix (serve section 2 at the PH quarter
+only, as the wave scripts do) removes ~57,000 served rows and is a decision
+of its own.
 
 * nonfood_expenditures (sect8a-e / sect11a-e) -- long since GH #817
 

@@ -89,10 +89,11 @@ Sampling:
       household_continuity: panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        Post-harvest revisit, from the PH cover.  Measured: 4,551 of 4,592
-        linked households (99.1%) keep `v`; the 41 that change moved between
-        the two visits (`moved-{hhid}` singletons).  104 PP households are not
-        on the PH cover.
+        Post-harvest revisit, from the PH cover (and, for 2 households it does
+        not list, the PH roster).  Measured: 4,551 of 4,593 linked households
+        (99.1%) keep `v`; the 42 that change moved between the two visits
+        (`moved-{hhid}` singletons; one recorded by the PH roster).  103 PP
+        households are on neither the PH cover nor the PH roster.
       source_type: derived-from-data
       confidence: high
       source_file: null

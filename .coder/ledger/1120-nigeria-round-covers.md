@@ -73,16 +73,21 @@ Four maintainer rulings for Nigeria (@ligon, 2026-10-23), one branch:
 | quantity | decision | reason |
 |----------|----------|--------|
 | per-round sample | new `sample_for_wave` + thin wave scripts (reuse `df_data_grabber`, `cluster_id`) | YAML cannot read a different file per round except through an unused override |
-| W2 PP agriculture cover (21 hh) | extend (`pp_supplement`) | D1 general form, Ethiopia precedent; the 63 plot_inputs NaN-`v` rows are at 2012Q3 |
+| W2 PP agriculture cover (21 hh) | extend (`pp_supplement`) | D1 application on the Ethiopia precedent ("the agriculture cover, with that cover's weight"; NA here, the cover has none); the 63 plot_inputs NaN-`v` rows are at 2012Q3.  Kept (dispatcher decision, 2026-10-23) |
+| a round's own roster (2016Q1: 2 hh) | extend (`pp_roster` / `ph_roster`, last in precedence) | D1: the roster records each household's state/lga/ea on every member row, so these households are located, not D2 cases; NA weights; the cover's label for the roster's codes |
+| household no file locates | new: `unlocated-{hhid}` singleton (D2) | D2 ruling ("a singleton per household, never a shared sentinel", following `moved-{hhid}`); spelled apart from `moved-`, which records the survey's ea == 0 sentinel.  Fires on no household today |
 | geo join | LEFT onto the round's cover | #1261; Ethiopia 2013-14 `merge_how: left` precedent |
 | `variety` | reuse #840's definition (code as string) | ruling |
 | crop marker | reuse the canonical constant | ruling |
 
 ## §6 Open questions for the human
 
-- The W2 PP agriculture cover supplement goes one step past the literal
-  Nigeria ruling ("the post-planting cover"); it is one dict entry
-  (`ROUND_COVERS['2012-13']['pp_supplement']`) if it should come out.
+- None open.  Settled by the dispatcher (2026-10-23): keep the W2 PP
+  agriculture cover (D1, Ethiopia precedent); apply D2 (`unlocated-{hhid}`)
+  to households no file locates; document the 2019Q1 community-price
+  cluster with no 2019Q1 household.
+- Found, not fixed: `individual_education` serves each PH record at the PP
+  quarter too (~57,000 duplicated rows; CONTENTS.org TODO).
 
 ---
 ### Phase 3 — verification
