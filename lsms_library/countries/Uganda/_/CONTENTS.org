@@ -3630,6 +3630,26 @@ fix-up (=gsec15c='s =hhid= is the wrong variable; the real one comes from
 are reading an old script or notebook against this table, check which level it
 thought was which.*
 
+** Early non-food household ID rendering (GH #1291)
+
+The 2009-10 and 2010-11 wave scripts pass the numeric =GSEC15c.hh= field
+to the country helper. Its legacy repair handles an already-stringified
+decimal ID but leaves a numeric float untouched. The scripts now apply the
+existing =local_tools.format_id= to the helper's household index before
+stamping =t=, so an integral numeric household code uses the same decimal
+string as =sample= and =household_roster=.
+
+The existing final uniqueness assertion runs after this rekeying; a collision
+raises before writing. Genuine missing IDs stay missing. This rendering
+normalization does not replace the separate 2015-16 =gsec1.hh= to =HHID=
+bridge, change item aggregation or expenditure arithmetic, or locate a
+household whose sampling cluster is genuinely absent.
+Synthetic tests execute both scripts and check household joins, exact payload
+and attrs preservation, leading-zero strings, missing IDs, the existing
+formatter's fractional-number policy, and refusal on a rekey collision.
+Held-source integrality, key correspondence and complete-frame verification
+remain pending; no new real-data counts are claimed here.
+
 ** WAITING No =RecallWindow=, and the window is ITEM-SPECIFIC -- a real gap
 
 *Do not read the absent column as "Uganda uses one window".*  An earlier draft
