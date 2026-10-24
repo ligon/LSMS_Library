@@ -252,7 +252,12 @@ jobs:
           LSMS_DATA_DIR: ${{ runner.temp }}\lsmsdata
           LSMS_BUILD_WORKERS: "1"
           PYTHONUNBUFFERED: "1"
-        run: python "%GITHUB_WORKSPACE%\scripts\windows_build_check.py" Uganda:shocks Uganda:assets
+        # System Python owns capture; the existing installed-wheel check runs
+        # inside it with the same conda environment and arguments.
+        run: >-
+          python "%GITHUB_WORKSPACE%\scripts\private_ci_check.py"
+          --stage windows-script-build --
+          python "%GITHUB_WORKSPACE%\scripts\windows_build_check.py" Uganda:shocks Uganda:assets
 
   # DVC remote reachability (GH #750).  Every .dvc sidecar's blob must be on
   # the S3 remote; a sidecar that was `dvc add`ed and never `dvc push`ed is
@@ -478,30 +483,20 @@ jobs:
           s.loader.exec_module(m);
           assert m.aws_creds_available(), 'requires_s3 tests would be SKIPPED: no reader credentials'"
       - name: Build Uganda tables
-        run: |
-          cd lsms_library/countries/Uganda/_
-          poetry run make -j2
+        working-directory: lsms_library/countries/Uganda/_
+        run: >-
+          python "$GITHUB_WORKSPACE/scripts/private_ci_check.py"
+          --stage data-prebuild -- poetry run make -j2
         timeout-minutes: 30
       - name: Run full test suite
-        # `--assert=plain`: this repository and its Actions logs are PUBLIC, and
-        # these are the only tests that read real microdata.  pytest's assertion
-        # rewriting prints the operands of a failing `assert` -- a DataFrame,
-        # Series or index of household ids, plot ids or coordinates -- even under
-        # `--tb=short` and even inside `bool(...)` / `int(...)`.  Two independent
-        # reviews (2026-10-23, Malawi #1260 and Mali #1272 tests) reproduced real
-        # ids and coordinates in failure output.  Plain asserts report only the
-        # assertion's source line and the test's own message, so a test that
-        # follows the counts-only message convention cannot leak.  Local runs keep
-        # full introspection.
-        # `--disable-warnings`: the library's audit warnings NAME rows by design
-        # (Site Q prints `i=<household>` beside the item; grain and null-key
-        # reports list keys), and pytest's warnings summary prints every uncaught
-        # one -- measured on the full suite: 415 warning entries, Site Q lines
-        # carrying household ids.  The flag hides only the summary DISPLAY;
-        # `pytest.warns` / `recwarn` capture is unchanged (verified).  `--tb=short`
-        # (kept) already omits the failing test's argument values, which the
-        # default long traceback would print (fixtures that are whole frames).
+        # Capture both streams before Poetry/pytest starts. Assertion rewriting,
+        # explicit messages, warnings and plugins can all contain row values;
+        # flags alone do not form the public-output boundary. The wrapper emits
+        # a fixed stage/status and numeric JUnit counts only, then removes the
+        # runner-local output/XML. Do not upload those private files as artifacts.
+        # Plain assertions and warning-summary suppression remain defense in depth.
         run: >-
+          python scripts/private_ci_check.py --stage data-tests --junit results.xml --
           poetry run pytest --tb=short --assert=plain --disable-warnings
           --timeout=600 --timeout-method=thread
-          --durations=25
+          --durations=25 --junitxml={junit}
