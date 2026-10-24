@@ -156,14 +156,15 @@ Sampling:
       cluster_id_measurement:
         linked_households: 2601
         households_changed: 191
+        not_applicable: [clusters_renumbered]
         note: |-
           2,607 households link across the boundary; 6 have no 2009-10 `v`,
           so 2,601 carry `v` on both sides.  2,410 keep it; the 191 that do
           not are this wave's synthetic `@lat,lon` bins -- movers and
           split-offs with a blank `comm` -- so most are movers, but no
           movement classification was applied and no net-of-movers share is
-          recorded.  A bin is not a cluster, so no count of renumbered
-          cluster ids is recorded either.
+          recorded.  A bin is not a cluster, so a count of renumbered
+          cluster ids does not apply (no real EA id changes: 0 of 0).
         source_type: derived-from-data
         confidence: high
         locator: 'this boundary''s cluster_id_note and CONTENTS.org "v across waves: three different defects (GH #942)" (re-measured 2026-10-22 through Country("Uganda").sample() after GH #1133)'
@@ -230,13 +231,15 @@ Sampling:
       cluster_id_measurement:
         linked_households: 2640
         households_changed: 433
+        not_applicable: [clusters_renumbered]
         note: |-
           2,647 households link across the boundary; 7 have no 2009-10 `v`,
           so 2,640 carry `v` on both sides.  2,207 keep it; the 433 that do
           not had a synthetic `@lat,lon` bin in 2009-10 and their
           original-sample EA here.  No movement classification was applied,
           so no net-of-movers share is recorded, and a bin is not a cluster,
-          so no count of renumbered cluster ids either.  (Before GH #1133
+          so a count of renumbered cluster ids does not apply (no real EA id
+          changes).  (Before GH #1133
           harmonised the renderings of `comm`, a further 388 changed.)
         source_type: derived-from-data
         confidence: high
@@ -356,14 +359,17 @@ Sampling:
       cluster_id_measurement:
         linked_households: 1717
         households_changed: 1717
+        not_applicable: [clusters_renumbered]
         note: |-
           None of the 1,717 linked households keeps `v`, because `v` changes
           kind (EA code -> parish code): every household changes, mover or
-          not, and no EA id maps to a parish id, so no count of renumbered
-          cluster ids applies.  No movement classification was applied.
+          not, and a count of renumbered cluster ids does not apply.  (65 of
+          the 212 earlier EA ids that change happen to map one-to-one to a
+          parish id, measured 2026-10-23; a parish is not an EA, so that is
+          not a renumbering.)  No movement classification was applied.
         source_type: derived-from-data
         confidence: high
-        locator: 'this boundary''s cluster_id_note (re-measured 2026-10-19 through Country("Uganda").sample()); GH #1135 H3 table (1,717 linked, 1,717 change)'
+        locator: 'this boundary''s cluster_id_note (re-measured 2026-10-19 through Country("Uganda").sample()); GH #1135 H3 table (1,717 linked, 1,717 change); one-to-one count: slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable
@@ -470,15 +476,19 @@ Sampling:
       cluster_id_measurement:
         linked_households: 2973
         households_changed: 2973
+        not_applicable: [clusters_renumbered]
         note: |-
           None of the 2,973 linked households keeps `v`, because `v` changes
           kind again (numeric parish code -> DISTRICT/PARISH name
-          composite): every household changes, mover or not, and no count of
-          renumbered cluster ids applies.  No movement classification was
-          applied.
+          composite): every household changes, mover or not, and a count of
+          renumbered cluster ids does not apply.  But 576 of the 788 earlier
+          parish codes that change map one-to-one to a single name composite
+          (measured 2026-10-23), which looks like a renaming of the same
+          parishes for most of the sample; the `redefined` declaration is
+          not revisited here.  No movement classification was applied.
         source_type: derived-from-data
         confidence: high
-        locator: 'this boundary''s cluster_id_note (re-measured 2026-10-19 through Country("Uganda").sample()); GH #1135 H3 table (2,973 linked, 2,973 change)'
+        locator: 'this boundary''s cluster_id_note (re-measured 2026-10-19 through Country("Uganda").sample()); GH #1135 H3 table (2,973 linked, 2,973 change); one-to-one count: slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json'
     oversamples:
       - what: 'rural portions of ten districts oversampled by the UNHS 2005/06'
         status: attested-not-identifiable

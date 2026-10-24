@@ -88,6 +88,7 @@ Sampling:
       cluster_id_measurement:
         linked_households: 521
         households_changed: 108
+        clusters_renumbered: 35
         note: |-
           556 households link across the boundary, 521 with `v` on both
           sides; 413 of the 521 keep `v`, so 108 change.  They mix three
@@ -95,11 +96,14 @@ Sampling:
           round-2 id (58 households), 10 households in 8 clusters moving to
           new-format ids, and 35 linked to refresh-sample ids through a
           linkage that is itself unverified (rounds 3 and 4 reuse r_hhid
-          strings).  So no count of renumbered cluster ids and no
-          net-of-movers share is recorded.
+          strings).  Of the 57 earlier ids those 108 households hold, 35
+          map one-to-one to a single different id (measured 2026-10-23,
+          the red-team review's count reproduced); the other 22 split.  The
+          35 rest partly on that unverified linkage, hence confidence
+          medium.  No net-of-movers share is recorded.
         source_type: derived-from-data
         confidence: medium
-        locator: 'this boundary''s cluster_id_note (re-measured 2026-10-19 through Country("Tanzania").sample()); GH #1135 H3 table (521 linked, 108 change)'
+        locator: 'this boundary''s cluster_id_note (re-measured 2026-10-19 through Country("Tanzania").sample()); GH #1135 H3 table (521 linked, 108 change); clusters_renumbered: slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json (strict_k, Tanzania 2012-13->2014-15)'
 
   '2019-20':
     panel:
@@ -121,16 +125,20 @@ Sampling:
       cluster_id_measurement:
         linked_households: 849
         households_changed: 849
+        not_applicable: [clusters_renumbered]
         note: |-
           907 households link across the boundary, 849 with `v` on both
-          sides, and none keeps `v`.  Their 310 cluster pairs are NOT a
-          bijection (131 ids map to more than one id) because tracked
-          households genuinely moved, so the 849 include movers: neither a
-          count of renumbered cluster ids nor a net-of-movers share is
+          sides, and none keeps `v`.  NPS-SDD re-lays-out EVERY cluster id
+          (9 characters for 8), and because tracked households genuinely
+          moved, the old -> new relation is many-to-many: only 2 of the 74
+          earlier ids map one-to-one; the other 72 split across ids or share
+          one (measured 2026-10-23).  A count of one-to-one renumberings (2) would
+          misdescribe a boundary that renames every id, so it does not
+          apply.  The 849 include movers; no net-of-movers share is
           recorded.
         source_type: derived-from-data
         confidence: high
-        locator: 'this boundary''s cluster_id_note (re-measured 2026-10-19 through Country("Tanzania").sample()); GH #1135 H3 table (849 linked, 849 change)'
+        locator: 'this boundary''s cluster_id_note (re-measured 2026-10-19 through Country("Tanzania").sample()); GH #1135 H3 table (849 linked, 849 change); one-to-one count: slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json (strict_k, Tanzania 2014-15->2019-20)'
 
   '2020-21':
     panel:

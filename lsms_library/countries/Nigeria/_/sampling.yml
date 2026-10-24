@@ -20,9 +20,10 @@
 # the survey records them with `ea == 0`, and the library gives each its own
 # singleton `v = moved-{hhid}` rather than a fake pooled cluster.  So a mover
 # has a different `v` in each round by design, not because an EA was
-# renumbered.  The sentinel does NOT mark every mover, though: households that
-# report moving can keep a real EA code (GH #1135, CONTENTS.org), which is why
-# only 2018Q3's `cluster_id_measurement` records a net-of-movers count.
+# renumbered.  The sentinel is NOT a movement classifier, though: it misses
+# households that report moving and marks many that report staying (GH #1135,
+# CONTENTS.org), so neither warning boundary records a net-of-movers count --
+# each `cluster_id_measurement` note gives the count under each marker.
 # (Whether a mover's DESIGN cluster is its original EA -- the BID pins its
 # weight there -- is DESIGN.org Q7, `cluster_reference`, not decided.)
 
@@ -100,7 +101,9 @@ Sampling:
         W4 is a partial refresh: 360 new EAs plus a 159-EA "long panel" of the
         2010 sample (BID, quoted in CONTENTS.org).  Measured over the
         long-panel households: 1,414 of 1,493 (94.7%) keep `v`; of the 79 that
-        change, 69 are movers' `moved-{hhid}` singletons and 10 are that EA.
+        change, 69 carry the `moved-{hhid}` singleton (`ea == 0`) and 10 are
+        that EA.  The sentinel is not a movement classifier: 40 of the 69
+        answer hhsmlc = 1, "same location" (GH #1135; CONTENTS.org).
       source_type: derived-from-data
       confidence: high
       source_file: null
@@ -108,24 +111,26 @@ Sampling:
       cluster_id_measurement:
         linked_households: 1493
         households_changed: 79
-        households_changed_net_of_movers: 10
         clusters_renumbered: 1
-        mover_rule: |-
-          A household is a mover if it carries the `moved-{hhid}` singleton
-          (`ea == 0`) on either side: 69 of the 79.  The other 10 all answer
-          the W4 cover's hhsmlc ("DOES THE HOUSEHOLD LIVE AT THE SAME
-          LOCATION?") with 1, YES, so none of them is a recorded mover.
         note: |-
-          The 10 are one EA id whose LGA code changes (same state and EA
-          serial), a one-to-one relation.  Confidence is medium, not high,
-          because the "same location" of hhsmlc is read as the dwelling of
-          the previous wave: the W4 interviewer manual (PDF pp. 24-25)
-          supports that reading, but the round that pre-fills the address is
-          not confirmed against the instrument.  The 2026-10-19 ruling on
-          GH #1135 quotes this boundary as 0.67%.
+          Net of movers is NOT measured, because the count depends on which
+          mover marker is used (households among the 79 that are not movers
+          by that marker, out of 1,493):
+            `moved-` sentinel (`ea == 0` on either side) ..... 10
+            W4 tracked_obs ("TRACKED OBSERVATION") = 0 ....... 25
+            W4 hhsmlc ("DOES THE HOUSEHOLD LIVE AT THE SAME
+              LOCATION?") = 1, YES .......................... 50..56
+          (hhsmlc: 50 answer 1, 23 answer 2 "MOVED WITHIN LOCALITY", 6 have
+          no answer.)  40 of the 69 sentinel households answer hhsmlc = 1, so
+          the sentinel over-counts movers; only 23 of the 79 are recorded
+          movers.  The 0.67% (10 of 1,493) quoted by the 2026-10-19 ruling
+          is the sentinel row; @ligon withdrew it from the first line on
+          2026-10-23 after the red-team review.  The 10 real-id changes are
+          one EA id (same state and EA serial, new LGA code), a one-to-one
+          relation, and all 10 answer hhsmlc = 1.
         source_type: derived-from-data
-        confidence: medium
-        locator: 'slurm_logs/isa_backlog_2026-10-21/framework1135-Nigeria-counts/counts-safe.json, boundary 2016Q1 -> 2018Q3 (source pin f8d236694; DIAGNOSIS.md there); W4 manual reading: slurm_logs/isa_backlog_2026-10-21/1135-public-instruments/PUBLIC-INSTRUMENTS.org; GH #1135 thread'
+        confidence: high
+        locator: 'cold build 2026-10-23, served Country("Nigeria").sample() joined to the raw W4 cover secta_plantingw4.dta on hhid (1,493 of 1,493 matched): slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json ("2016Q1->2018Q3"); reproduces the red-team review (GH #1135, 2026-10-23) and counts-safe.json in slurm_logs/isa_backlog_2026-10-21/framework1135-Nigeria-counts/'
 
   '2019Q1':
     panel:
@@ -144,15 +149,17 @@ Sampling:
       household_continuity: panel
       cluster_id_continuity: wave-scoped
       cluster_id_note: |-
-        Partial: 12 EAs (112 households) have their raw LGA code changed, so
-        their composite `v` changes whole (21/2111/260 -> 21/2112/260,
-        5/509/1064 -> 5/508/1064, ...; no old id occurs in W5 and no new id in
-        W4); every other EA keeps its id.  W5 revisits both W4 sub-samples
-        (long panel and refresh).  Measured: 4,724 of 5,067 linked households
-        (93.2%) keep `v`; of the 343 that change, 231 are movers'
-        `moved-{hhid}` singletons and 112 are those 12 EAs.  The sentinel
-        does not catch every mover, so the 112 are not "net of movers": see
-        cluster_id_measurement and CONTENTS.org (GH #1135).
+        Partial: 12 EA ids have their raw LGA code changed (112 linked
+        households), so their composite `v` changes -- for every linked
+        household in 11 of them, for 7 of 8 in the 12th; every other EA keeps
+        its id.  Examples: 21/2111/260 -> 21/2112/260, 5/509/1064 ->
+        5/508/1064; no old id occurs in W5 and no new id in W4.  W5 revisits
+        both W4 sub-samples (long panel and refresh).  Measured: 4,724 of
+        5,067 linked households (93.2%) keep `v`; of the 343 that change, 231
+        carry the `moved-{hhid}` singleton and 112 change real EA id.  The
+        sentinel is not a movement classifier (140 of the 231 answer
+        hh_moved = 2, "in original dwelling"), so neither figure is "net of
+        movers": see cluster_id_measurement and CONTENTS.org (GH #1135).
       source_type: derived-from-data
       confidence: high
       source_file: null
@@ -160,24 +167,32 @@ Sampling:
       cluster_id_measurement:
         linked_households: 5067
         households_changed: 343
-        clusters_renumbered: 12
+        clusters_renumbered: 11
         note: |-
-          Of the 343 that change `v`, 231 carry the `moved-{hhid}` singleton
-          (`ea == 0`) on a side and 112 change real EA id: 12 earlier ids,
-          each to one new id (same state and EA serial, new LGA code).  The
-          sentinel is not a complete movement classifier.  On the W5 cover,
-          hh_moved ("HAS THE HOUSEHOLD MOVED FROM THE ORIGINAL LOCATION?")
-          puts 86 of the 112 in the original dwelling, 6 moved close to it
-          and 20 have no answer.  So 112 is net of the sentinel only, and a
-          net-of-movers numerator of 86..106 holds ONLY IF "original
-          location" means the W4 dwelling -- conditional, not established,
-          and deliberately not recorded as a count: the warning prints "not
-          measured".  The 12 counts ids: 10 have at least one household
-          reporting the original dwelling, while the other 2 hold the 20
-          with no answer, so 12 is not 12 verified physical clusters.
+          Net of movers is NOT measured, because the count depends on which
+          mover marker is used (households among the 343 that are not movers
+          by that marker, out of 5,067):
+            `moved-` sentinel (`ea == 0` on either side) ..... 112
+            W5 trackedw5pp ("WAS THIS HOUSEHOLD TRACKED DURING
+              POST-PLANTING W5?") = 2, NO ..................... 150
+            W5 hh_moved ("HAS THE HOUSEHOLD MOVED FROM THE
+              ORIGINAL LOCATION?") = 2, "NO, IN ORIGINAL
+              DWELLING" ....................................... 226..249
+          (hh_moved: 226 answer 2, 93 answer 1 "moved close to original
+          dwelling", 1 answers 3 "moved far", 23 have no answer; the range
+          also assumes "original location" means the W4 dwelling, which the
+          W5 manual supports but does not settle.)  The sentinel over-counts
+          movers: 140 of the 231 households carrying it answer hh_moved = 2.
+          An earlier version of this record quoted a conditional bound that
+          counted only the 112 real-id changes; it was wrong under its own
+          condition and is withdrawn.  clusters_renumbered: of the 12
+          earlier EA ids whose households change real id, 11 map one-to-one
+          to a single new id; the 12th sends 7 of its 8 linked households to
+          one new id and 1 to a `moved-` singleton, so it is not counted.
+          10 of the 12 have a household answering hh_moved = 2.
         source_type: derived-from-data
-        confidence: medium
-        locator: 'slurm_logs/isa_backlog_2026-10-21/framework1135-Nigeria-counts/counts-safe.json, boundary 2019Q1 -> 2023Q3 (source pin f8d236694; DIAGNOSIS.md there); GH #1135 thread and its 2026-10-23 ruling'
+        confidence: high
+        locator: 'cold build 2026-10-23, served Country("Nigeria").sample() joined to the raw W5 cover Post Planting Wave 5/Household/secta_plantingw5.dta on hhid (5,067 of 5,067 matched): slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json ("2019Q1->2023Q3"); reproduces the red-team review (GH #1135, 2026-10-23); counts-safe.json in slurm_logs/isa_backlog_2026-10-21/framework1135-Nigeria-counts/'
 
   '2024Q1':
     panel:

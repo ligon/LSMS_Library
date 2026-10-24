@@ -89,6 +89,7 @@ import contextvars
 import functools
 import json
 import os
+import re
 import warnings
 from functools import lru_cache
 from pathlib import Path
@@ -96,9 +97,10 @@ from typing import Any, Iterable, Mapping
 
 import numpy as np
 import pandas as pd
+import yaml
 
 from .paths import countries_root
-from .yaml_utils import load_yaml
+from .yaml_utils import SchemeLoader
 
 __all__ = [
     "ATTRS_KEY",
@@ -204,37 +206,58 @@ _PANEL_FIELDS: frozenset[str] = frozenset({
 })
 
 #: The counts a ``panel.cluster_id_measurement`` block may carry (GH #1135).
-#: Each is a non-negative ``int``; an ABSENT (or ``null``) count means "not
-#: measured", which the warning prints as such -- never as zero.
+#: Each is a non-negative ``int``.  A count is in one of three states, and the
+#: warning's first line prints each differently -- never a missing count as 0:
+#: present (the number), listed in ``not_applicable`` ("not applicable": the
+#: quantity does not describe this boundary), or absent ("not measured").
 #:
 #: ``linked_households``  N: households linked across the boundary with `v`
 #:     on BOTH sides, as ``Country(C).sample()`` serves them (after the panel
 #:     id walk).  Where a note gives a larger "linked" figure that includes
 #:     households lacking `v` on one side, N is the with-`v` figure: it is
 #:     the share's denominator (the #1135 H3 table's definition).
-#: ``households_changed``  of N, those whose `v` differs across the boundary,
-#:     ALL causes -- movers included.
-#: ``households_changed_net_of_movers``  of those, the ones that are not
-#:     movers under the block's ``mover_rule``.  The quantity the ruling asks
-#:     the first line to state as a share of N; recorded only where a mover
-#:     rule was actually applied.  A sentinel that marks SOME movers is not a
-#:     rule for all of them (Nigeria W5: the ``moved-`` singleton misses
-#:     households that report moving with a real EA code).
-#: ``clusters_renumbered``  distinct earlier-wave cluster IDS, among linked
-#:     households, that map one-to-one to a different `v` -- a count of ids,
-#:     not a claim about physical clusters (GhanaLSS 79, Ethiopia 333 and
-#:     Tanzania 82 are all such "cluster pairs").
+#: ``households_changed``  D: of N, those whose `v` differs across the
+#:     boundary, ALL causes -- movers included ("counting movers").
+#: ``households_changed_net_of_movers``  of D, the ones that are not movers
+#:     under the block's ``mover_rule``: the share the 2026-10-19 ruling asks
+#:     the first line for.  Recorded only where ONE mover marker settles it.
+#:     No shipped record carries it today: in Nigeria, the only country with
+#:     movement markers on its covers, the count depends on which marker is
+#:     used (the `moved-` sentinel, ``tracked_obs``, ``hhsmlc`` / ``hh_moved``
+#:     disagree by a factor of 2-5), so after the red-team review @ligon ruled
+#:     (2026-10-23) that it is printed "not measured" and the dependence goes
+#:     in ``note``.  The field stays so a settled measurement can land.
+#: ``clusters_renumbered``  K: distinct earlier-wave cluster IDS among linked
+#:     households (synthetic ids -- `moved-` singletons, `@lat,lon` bins --
+#:     excluded) ALL of whose linked households carry one single different
+#:     `v`, which no other earlier id maps to: a clean one-to-one renumbering.
+#:     A count of ids, not a claim about physical clusters (GhanaLSS 79,
+#:     Ethiopia 333 and Tanzania 82 are all such "cluster pairs").  Where `v`
+#:     changes KIND or the ids are synthetic, no renumbering count describes
+#:     the boundary: list it in ``not_applicable``.
 _MEASUREMENT_COUNTS: tuple[str, ...] = (
     "linked_households", "households_changed",
     "households_changed_net_of_movers", "clusters_renumbered",
 )
-#: Every field a measurement block may carry: the counts, ``mover_rule`` (how
-#: movers were told apart; required with, and only with, the net-of-movers
-#: count), ``note`` (free-text qualification -- bounds, caveats; never printed
-#: by the warning), and the provenance triple every reading in this file
-#: travels with.
+#: Every field a measurement block may carry: the counts; ``not_applicable``
+#: (a list of count names that do not describe this boundary -- distinct from
+#: "not measured"); ``mover_rule`` (how movers were told apart; required
+#: with, and only with, the net-of-movers count); ``note`` (free-text
+#: qualification -- marker dependence, bounds, caveats; never printed by the
+#: warning); and the provenance triple every reading in this file travels
+#: with.  ``locator`` / ``mover_rule`` / ``note`` are non-empty strings.
 _MEASUREMENT_FIELDS: frozenset[str] = frozenset(_MEASUREMENT_COUNTS) | {
-    "mover_rule", "note", "source_type", "confidence", "locator",
+    "not_applicable", "mover_rule", "note", "source_type", "confidence",
+    "locator",
+}
+#: Fields frozen into the schema that no shipped record uses, each with its
+#: reason.  ``test_every_frozen_field_name_is_used_by_a_shipped_record``
+#: exempts exactly these and nothing else.
+_MEASUREMENT_FIELDS_UNUSED: dict[str, str] = {
+    "households_changed_net_of_movers":
+        "the ruled quantity; its only instance (Nigeria 2018Q3) was withdrawn "
+        "by @ligon 2026-10-23 because the count depends on the mover marker",
+    "mover_rule": "travels with households_changed_net_of_movers",
 }
 
 # ---------------------------------------------------------------------------
@@ -270,24 +293,31 @@ HOUSEHOLD_CONTINUITY: frozenset[str] = frozenset({
 #:     shared integer names an unrelated cluster (Burkina Faso 2014 ->
 #:     2018-19, EMC `zd` vs EHCVM `grappe`; Niger 2014-15 -> 2018-19, ECVMA vs
 #:     EHCVM `grappe`).
-#: An independent draw whose keyspace is DISJOINT from the preceding wave's
-#: is ``unobservable``, not ``redefined``: grouping on `v` across it merges
-#: nothing (GhanaLSS 1991-92 onward).  OVERLAP is what makes it a hazard.
+#:
+#: ``unobservable`` -- no household links across the boundary, so whether `v`
+#: keeps its meaning cannot be measured, AND no id the two waves share is
+#: known to name an unrelated cluster: grouping on `v` across it merges no
+#: unrelated clusters.  The keyspaces are disjoint (GhanaLSS 1991-92 onward)
+#: or share only ids that appear to name the same EA (Ethiopia 2015-16 ->
+#: 2018-19, see its sampling.yml note).  Missing linkage alone does not make
+#: a boundary `unobservable`: Burkina Faso and Niger have none, but their
+#: shared ids name unrelated clusters, so they are `redefined`.
 CLUSTER_ID_CONTINUITY: frozenset[str] = frozenset({
     "stable",        # the same EA keeps its id
     "wave-scoped",   # renumbered; a crosswalk is meaningful
     "redefined",     # a different unit list: another KIND of unit, or an
                      # independent draw with overlapping serials (above)
     "mixed",         # some of the boundary's `v` are synthetic, not clusters
-    "unobservable",  # no verified linkage; cannot be determined
+    "unobservable",  # no linkage, and no shared id names an unrelated
+                     # cluster (above)
 })
 
 #: The values on which a cross-wave `v` is NOT comparable -- what the
-#: Country-level warning fires on.  Deliberately NOT `unobservable`: GhanaLSS
-#: 1991-92 onward are genuinely different EAs with no linkage, AND their
-#: keyspaces are disjoint, so grouping on `v` across them is CORRECT, and
-#: warning there would teach the reader to ignore the warning (DESIGN §4.2).
-#: Unlinked draws whose keyspaces OVERLAP are `redefined` and do warn.
+#: Country-level warning fires on.  Deliberately NOT `unobservable`: across
+#: GhanaLSS 1991-92 onward no household links and no id recurs, so grouping
+#: on `v` there merges nothing it should not, and warning would teach the
+#: reader to ignore the warning (DESIGN §4.2).  Unlinked draws whose shared
+#: ids name UNRELATED clusters are `redefined` and do warn.
 INCOMPARABLE_CLUSTER_IDS: frozenset[str] = frozenset({
     "wave-scoped", "redefined", "mixed",
 })
@@ -688,18 +718,22 @@ def _check_measurement(where: str, block: Any, *, continuity: Any) -> None:
     """Validate a ``panel.cluster_id_measurement`` block (GH #1135).
 
     * Field names are frozen (``_MEASUREMENT_FIELDS``).
-    * It measures a DECLARED boundary, so the panel must carry a
-      ``cluster_id_continuity``.
+    * It sizes a boundary the warning fires on, so the panel's
+      ``cluster_id_continuity`` must be ``wave-scoped`` / ``redefined`` /
+      ``mixed``: a ``stable`` or ``unobservable`` boundary is never printed,
+      and a size on it would be a number nobody reads.
     * Its own provenance: ``source_type`` and ``confidence`` (controlled) and a
-      ``locator`` are required.  ``not-found`` is refused -- a measurement
-      nobody found is expressed by leaving the block out, which the warning
-      prints as "not measured".
+      non-empty string ``locator``.  ``not-found`` is refused -- a measurement
+      nobody found is expressed by leaving the count out ("not measured").
+    * ``locator`` / ``mover_rule`` / ``note`` are non-empty strings.
     * At least one count; every count present is a plain non-negative
-      ``int`` (not ``bool``, not ``float``, not a string), so the share the
-      warning prints is computed from exact integers and never parsed from
-      prose.
-    * Coherence: changed <= linked; net-of-movers <= changed (and <= linked);
-      a household count needs its denominator ``linked_households``.
+      ``int`` (not ``bool``, not ``float``, not a string), so the shares the
+      warning prints are computed from exact integers and never parsed from
+      prose.  (Non-canonical YAML integers -- ``012``, ``0x10``, ``1_493`` --
+      are refused earlier, by the loader.)
+    * ``not_applicable`` lists count names, none of which is also given.
+    * Coherence: K <= D <= N, net <= D, net <= N, K <= N; a household
+      count needs its denominator ``linked_households``.
     * ``mover_rule`` comes with, and only with, the net-of-movers count: a
       net figure without its rule is unfalsifiable, and a rule without the
       figure describes nothing (put it in ``note``).
@@ -709,10 +743,11 @@ def _check_measurement(where: str, block: Any, *, continuity: Any) -> None:
         raise ValueError(f"{where}: {name} must be a mapping, "
                          f"got {type(block).__name__}")
     _check_nested(where, name, block, _MEASUREMENT_FIELDS)
-    if continuity is None:
+    if continuity not in INCOMPARABLE_CLUSTER_IDS:
         raise ValueError(
-            f"{where}: {name} measures a declared boundary, but the panel "
-            "declares no cluster_id_continuity (GH #1135).")
+            f"{where}: {name} sizes a boundary the warning fires on, but "
+            f"cluster_id_continuity={continuity!r}; a measurement is allowed "
+            f"only on {sorted(INCOMPARABLE_CLUSTER_IDS)} (GH #1135).")
     missing = [k for k in ("source_type", "confidence", "locator")
                if not block.get(k)]
     if missing:
@@ -727,8 +762,27 @@ def _check_measurement(where: str, block: Any, *, continuity: Any) -> None:
     if block["source_type"] == "not-found":
         raise ValueError(
             f"{where}: {name}.source_type='not-found' -- a measurement that "
-            "was looked for and not found is written by OMITTING the block; "
+            "was looked for and not found is written by OMITTING the count; "
             "the warning then prints 'not measured'.")
+    for k in ("locator", "mover_rule", "note"):
+        v = block.get(k)
+        if v is not None and (not isinstance(v, str) or not v.strip()):
+            got = "an empty string" if isinstance(v, str) else type(v).__name__
+            raise ValueError(
+                f"{where}: {name}.{k} must be a non-empty string, got {got}.")
+    na = block.get("not_applicable")
+    if na is not None:
+        if (not isinstance(na, list) or not na
+                or any(not isinstance(x, str) for x in na)
+                or len(set(na)) != len(na)
+                or not set(na) <= set(_MEASUREMENT_COUNTS)):
+            raise ValueError(
+                f"{where}: {name}.not_applicable must be a non-empty list of "
+                f"distinct count names from {list(_MEASUREMENT_COUNTS)}.")
+        both = sorted(x for x in na if block.get(x) is not None)
+        if both:
+            raise ValueError(
+                f"{where}: {name}: {both} is both given and not_applicable.")
     counts = {k: block.get(k) for k in _MEASUREMENT_COUNTS
               if block.get(k) is not None}
     if not counts:
@@ -744,6 +798,7 @@ def _check_measurement(where: str, block: Any, *, continuity: Any) -> None:
     n = counts.get("linked_households")
     d = counts.get("households_changed")
     r = counts.get("households_changed_net_of_movers")
+    k_ = counts.get("clusters_renumbered")
     if (d is not None or r is not None) and n is None:
         raise ValueError(
             f"{where}: {name} gives a household count without its "
@@ -751,7 +806,10 @@ def _check_measurement(where: str, block: Any, *, continuity: Any) -> None:
     for num, num_name, den, den_name in (
             (d, "households_changed", n, "linked_households"),
             (r, "households_changed_net_of_movers", d, "households_changed"),
-            (r, "households_changed_net_of_movers", n, "linked_households")):
+            (r, "households_changed_net_of_movers", n, "linked_households"),
+            # each renumbered id holds at least one changed linked household
+            (k_, "clusters_renumbered", d, "households_changed"),
+            (k_, "clusters_renumbered", n, "linked_households")):
         if num is not None and den is not None and num > den:
             raise ValueError(
                 f"{where}: {name}.{num_name}={num} exceeds {den_name}={den}.")
@@ -766,6 +824,40 @@ def _check_measurement(where: str, block: Any, *, continuity: Any) -> None:
 # ---------------------------------------------------------------------------
 # config loading
 # ---------------------------------------------------------------------------
+
+class _NonCanonicalIntError(ValueError):
+    """An integer in ``sampling.yml`` spelled other than plain decimal."""
+
+
+#: Plain decimal, optional minus, no leading zero.
+_CANONICAL_INT = re.compile(r"-?(0|[1-9][0-9]*)")
+
+
+class _SamplingLoader(SchemeLoader):
+    """``SchemeLoader`` with one change: integers must be plain decimal.
+
+    PyYAML implements YAML 1.1, which reads ``012`` as octal 10, ``0x10`` as
+    16, ``1_493`` as 1493 and ``1:30`` (sexagesimal) as 90 -- silently.  A
+    curated count is copied by hand from a note, so a leading zero is a typo,
+    not an octal literal: refused at load (GH #1135 red team), as a config
+    bug, not swallowed as an unreadable file.
+    """
+
+
+def _construct_canonical_int(loader: yaml.SafeLoader, node: yaml.Node) -> int:
+    text = loader.construct_scalar(node)
+    if not _CANONICAL_INT.fullmatch(str(text)):
+        raise _NonCanonicalIntError(
+            f"line {node.start_mark.line + 1}: integer {text!r} is not plain "
+            "decimal; YAML 1.1 would read it as "
+            f"{yaml.SafeLoader.construct_yaml_int(loader, node)!r}. Write the "
+            "number in plain decimal (or quote it if it is not a number).")
+    return int(text)
+
+
+_SamplingLoader.add_constructor("tag:yaml.org,2002:int",
+                                _construct_canonical_int)
+
 
 def _sampling_path(country: str) -> Path:
     """Resolved via ``countries_root()`` so ``LSMS_COUNTRIES_ROOT`` is honoured
@@ -789,7 +881,10 @@ def sampling_records(country: str) -> dict[str, SamplingRecord]:
     if not path.exists():
         return {}
     try:
-        data = load_yaml(path) or {}
+        with open(path, "r", encoding="utf-8") as fh:
+            data = yaml.load(fh, Loader=_SamplingLoader) or {}
+    except _NonCanonicalIntError as exc:           # a config bug: refuse
+        raise ValueError(f"{path}: {exc}") from None
     except Exception as exc:                       # unreadable / invalid YAML
         warnings.warn(f"could not read {path}: {type(exc).__name__}: {exc}")
         return {}
@@ -889,6 +984,12 @@ def attach(df, country: str, *,
     gets nothing attached: absence is silence, exactly like population's
     ``{}``.  Pass *known_waves* (the country's ``Country.waves``) so a frame of
     an uncurated wave resolves ``exact``; see :func:`records_for_frame`.
+
+    A warning boundary's record carries its size (GH #1135) nested at
+    ``df.attrs['sampling'][country][wave]['panel']['cluster_id_measurement']``
+    -- the same immutable mapping the warning's first line is printed from
+    (counts, ``not_applicable``, ``note``, provenance; ``_MEASUREMENT_FIELDS``).
+    A ``to_parquet`` round trip hands it back as a plain dict.
 
     Never raises.  This runs inside ``Country._finalize_result``, on every
     read of every table.
@@ -1117,37 +1218,51 @@ def _share(num: int, den: int) -> str:
 
 
 def _size_fragment(b: Mapping[str, Any]) -> str:
-    """One boundary's size, for the warning's FIRST line (GH #1135 ruling,
-    2026-10-23): what is measured, and "not measured" for what is not.
+    """One boundary's size, for the warning's FIRST line (GH #1135 rulings,
+    2026-10-23): what is measured, "not applicable" for a quantity that does
+    not describe the boundary, and "not measured" for the rest.
 
     Built only from the curated integers in ``cluster_id_measurement`` --
-    never from a note, never computed from the frame.  A boundary with no
-    net-of-movers count says so, and the all-causes share it does have is
-    labelled "counting movers" so it cannot be read as the ruled quantity.
+    never from a note, never computed from the frame.  The all-causes share
+    is labelled "counting movers" so it cannot be read as the ruled
+    net-of-movers share, which is always stated separately.  A boundary that
+    lies between the requested waves says so here too, not only on its detail
+    line (SPAN, #1135 H2).
     """
-    head = f"{b['from']} -> {b['to']}: "
+    head = f"{b['from']} -> {b['to']}"
+    if not b.get("in_frame", True):
+        head += " (between the waves you asked for)"
+    head += ": "
     m = b.get("measurement")
     if not m:
         return head + "size not measured"
+    na = set(m.get("not_applicable") or ())
+
+    def state(field: str, label: str) -> str:
+        return f"{label}: {'not applicable' if field in na else 'not measured'}"
+
     k = m.get("clusters_renumbered")
-    parts = [
-        "cluster ids renumbered: not measured" if k is None else
-        f"{k:,} cluster id{'' if k == 1 else 's'} renumbered"]
+    parts = [state("clusters_renumbered", "cluster ids renumbered")
+             if k is None else
+             f"{k:,} cluster id{'' if k == 1 else 's'} renumbered"]
     n = m.get("linked_households")
     d = m.get("households_changed")
     r = m.get("households_changed_net_of_movers")
-    if n == 0:
+    if n is None:
+        parts.append(state("linked_households", "linked households"))
+    elif n == 0:
         parts.append("no household is linked across it, so no household share")
-    elif r is not None and n:
-        parts.append(f"{r:,} of {n:,} linked households ({_share(r, n)}) "
-                     "change `v` net of movers")
     else:
-        text = "net-of-movers share: not measured"
-        if d is not None and n:
-            text += (f" ({d:,} of {n:,} linked households, {_share(d, n)}, "
-                     "change `v` counting movers)")
-        parts.append(text)
-    return head + ", ".join(parts)
+        parts.append(
+            state("households_changed", "households changing `v`")
+            if d is None else
+            f"{d:,} of {n:,} linked households ({_share(d, n)}) change `v` "
+            "counting movers")
+        parts.append(
+            state("households_changed_net_of_movers", "net-of-movers share")
+            if r is None else
+            f"net-of-movers share: {r:,} of {n:,} ({_share(r, n)})")
+    return head + "; ".join(parts)
 
 
 def _format_cluster_report(report: dict[str, Any]) -> str:
@@ -1160,7 +1275,7 @@ def _format_cluster_report(report: dict[str, Any]) -> str:
         f"{len(report['boundaries'])} wave boundary(ies) in this frame "
         f"(waves {report['waves'][0]} .. {report['waves'][-1]}). Size by "
         "boundary -- "
-        + "; ".join(_size_fragment(b) for b in report["boundaries"]) + "."]
+        + " | ".join(_size_fragment(b) for b in report["boundaries"]) + "."]
     for b in report["boundaries"]:
         src = b["source_type"]
         how = (f"{src}, confidence {b['confidence']}" if src in
@@ -1237,7 +1352,13 @@ def sampling_reports(country: str | None = None,
     """Cluster-identity reports filed during this process (GH #942).
 
     The twin of ``null_read_reports()`` / ``quantity_reports()``: for tests,
-    ``bench/feature_audit``, and anyone who silenced the warning.
+    ``bench/feature_audit``, and anyone who silenced the warning.  Each report
+    is ``{country, table, waves, boundaries}``; each boundary is ``{from, to,
+    cluster_id_continuity, household_continuity, source_type, confidence,
+    locator, note, measurement, in_frame}``, where ``measurement`` is that
+    boundary's ``panel.cluster_id_measurement`` (or ``None``: not measured) --
+    the integers the first line prints, so nobody parses the message (GH
+    #1135).
     """
     out: list[dict[str, Any]] = []
     for (c, t), reports in _CLUSTER_LEDGER.items():

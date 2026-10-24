@@ -63,10 +63,17 @@ Sampling:
         ESS4 is a NEW panel ("Panel II"), "not a follow-up of the previous ESS
         waves": no household links to 2015-16 (0 shared `i`), so `v` cannot be
         compared across this boundary, and `ea_id` here is a fresh draw's EA.
+        The keyspaces are not quite disjoint: 3 of 2018-19's 535 ids also
+        occur among 2015-16's 432 (measured 2026-10-23 through sample()).
+        `ea_id` encodes region/zone/woreda/town/EA, and Region and Rural
+        agree on all 3 (District on none, its labels not compared further),
+        so they are not known to name unrelated EAs -- unlike Burkina Faso's
+        or Niger's overlapping serials -- and 3 ids merge too little to
+        matter: `unobservable`, not `redefined`.
       source_type: wb-catalog
       confidence: high
       source_file: null
-      locator: 'WB catalog 3823, series_info (quoted in CONTENTS.org, "ESS4 is a NEW panel -- Panel I and Panel II do not link")'
+      locator: 'WB catalog 3823, series_info (quoted in CONTENTS.org, "ESS4 is a NEW panel -- Panel I and Panel II do not link"); shared ids: slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json (ethiopia_2015_16_2018_19)'
 
   '2021-22':
     panel:

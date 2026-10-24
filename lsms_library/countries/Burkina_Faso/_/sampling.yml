@@ -58,14 +58,15 @@ Sampling:
       locator: 'measured 2026-10-23 through Country("Burkina_Faso").sample() and .cluster_features() on a cold build at development 9a0ed5f3c; draws quoted in CONTENTS.org, "2014 -- ... Sample design" and "2018-19 -- ... Sample-size figures"; no linkage: Burkina_Faso/_/panel_ids.py docstring'
       cluster_id_measurement:
         linked_households: 0
+        not_applicable: [clusters_renumbered]
         note: |-
           No household links EMC 2014 to EHCVM-1: the 2018-19 cover carries
           no pointer to 2014 and panel_ids.py records no linkage.  Do NOT
           count shared `i` through sample(): 583 coincide only because both
           waves build `i` from the cluster serial (an id collision).  The
           hazard here is the 585 shared `v` integers naming unrelated
-          clusters (Region differs for 517), not a renumbering, so no count
-          of renumbered cluster ids applies.
+          clusters (Region differs for 517), not a renumbering, so a count
+          of renumbered cluster ids does not apply.
         source_type: derived-from-data
         confidence: high
         locator: 'this boundary''s cluster_id_note; the 2018-19 cover s00_me_bfa2018.dta (18 columns, no 2014 pointer) and the Burkina_Faso/_/panel_ids.py docstring; CONTENTS.org "2026-10-23 -- v across wave boundaries"'
