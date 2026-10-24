@@ -61,3 +61,8 @@ ids.
 
 ## §6 Open questions for the human
 - (filled per phase)
+
+---
+### Phase log
+- **Phase 1** (`93db8ef22`): 53 sidecars `git mv`'d to `Data/Panel/`; `#+CATALOG_SUBDIR: 6224 Panel` via `provenance.with_catalog_subdir` (parse -> render a fixed point; a second call returns the same object); 13 `file:` entries + 3 scripts + `sampling.yml` + 4 test paths.  `make panel-ids`: empty JSON diff.
+- **Phase 2**: `add_wave("Burkina_Faso", "6277", wave="2021-22", subdir="Cross_Section", confirm=False)` under a driver-side spy (`_extract_all_from_zip`) and gate (`push_to_cache_batch`, raise before the original): 55 members / 55 inside / 0 outside / 0 revised / 0 leftovers / 0 md5 mismatches / Panel sidecars unchanged -> 55 pushed.  `unpushed_blobs` empty; empty-L1 read-back 55/55; raw copies deleted after md5 = sidecar.  The driver is not committed (Ethiopia #1127 / Nigeria #978 precedent).

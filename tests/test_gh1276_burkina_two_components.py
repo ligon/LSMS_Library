@@ -103,3 +103,58 @@ def test_script_literals_name_held_sidecars(script):
            if not (path.parent / f"{lit}.dvc").resolve().exists()]
     n = len(bad)
     assert n == 0, f"{script}: {n} literal path(s) with no sidecar: {bad}"
+
+
+# ---------------------------------------------------------------------------
+# Phase 2: 6277 acquired into Data/Cross_Section/ through add_wave(subdir=)
+# ---------------------------------------------------------------------------
+
+def test_source_org_records_both_entries():
+    """The shipped record says what the acquisition measured (the
+    ``TestShippedRecordsSayWhatWeMeasured`` precedent): both entries listed,
+    each mapped to its subdirectory, 6277's held release on its own line, and
+    the primary's scalars still describing 6224 (GH #1283 ruling)."""
+    prov = provenance.read_provenance(countries_root(), COUNTRY, WAVE)
+    ids = list(prov.catalog_ids)
+    assert ids == ["6224", "6277"], ids
+    mapping = prov.subdir_map()
+    assert mapping == {"6224": "Panel", "6277": "Cross_Section"}, mapping
+    held = prov.held_release_of("6277")
+    assert held is not None and held.idno == "BFA_2021_EHCVM-2_v01_M", held
+    primary = prov.held_release_of("6224")
+    assert primary is not None and primary.idno == "BFA_2021_EHCVM-P_v04_M", primary
+    latest = prov.latest_releases()
+    n = len(latest)
+    assert n == 0, f"{n} #+CATALOG_LATEST line(s)"
+
+
+def test_the_cross_section_holds_its_55_sidecars():
+    xs = _data_dir() / "Cross_Section"
+    names = {p.name[:-4] for p in xs.glob("*.dta.dvc")}
+    n = len(names)
+    assert n == 55, f"{n} != 55"
+    # Its own weights file, not the panel's.
+    assert "ehcvm_ponderations_bfa2021.dta" in names
+    assert "ehcvm_panel_ponderations_bfa2021.dta" not in names
+    panel = {p.name[:-4] for p in (_data_dir() / "Panel").glob("*.dta.dvc")}
+    shared = len(names & panel)
+    assert shared == 52, f"{shared} != 52 file names shared with Panel/"
+    raw = [p for p in xs.iterdir() if not p.name.endswith(".dvc")]
+    n_raw = len(raw)
+    assert n_raw == 0, f"{n_raw} raw workspace copies left in Cross_Section/"
+
+
+def test_no_two_sidecars_name_the_same_blob():
+    """Disjoint entries: no panel sidecar and cross-section sidecar share an
+    md5, i.e. the same-named files really are different files."""
+    def md5s(sub):
+        out = {}
+        for p in (_data_dir() / sub).glob("*.dvc"):
+            out[p.name] = yaml.safe_load(p.read_text())["outs"][0]["md5"]
+        return out
+    panel, cross = md5s("Panel"), md5s("Cross_Section")
+    common = set(panel.values()) & set(cross.values())
+    n = len(common)
+    # Measured 2026-10-23: 0, even for ehcvm_nsu_bfa2021 (the non-standard
+    # unit table has the same 20,493 x 9 shape in both, different bytes).
+    assert n == 0, f"{n} blobs shared between the components"

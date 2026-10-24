@@ -1904,3 +1904,27 @@ reference moved with them: the 13 =file:= entries of =2021-22/_/data_info.yml=
 (now =Panel/<file>=), =2021-22/_/plot_features.py=, the dead
 =2021-22/_/food_acquired.py=, =_/panel_ids.py=, =_/sampling.yml='s
 =source_file= and four test paths.  The Malawi 2016-17 / 2019-20 layout (#600).
+
+*Phase 2 (acquisition).*  6277 was acquired with
+=add_wave("Burkina_Faso", "6277", wave="2021-22", subdir="Cross_Section",
+confirm=False)= -- a full (not refresh-only) acquisition into an empty
+subdirectory -- behind a driver-side gate that would have raised before
+=push_to_cache_batch= unless the membership and every md5 equalled the
+investigation's own download: 55 members, all new to =Cross_Section/=, 0
+placed elsewhere, 0 revised, 0 leftovers, 0 skipped, 55 md5 equal, the 53
+=Panel/= sidecars byte-identical before and after.  55 pushed;
+=unpushed_blobs()= on the 55 is empty; a read-back through =get_dataframe=
+into an EMPTY L1 fetched all 55 from S3 with the download's shapes.
+=SOURCE.org= now lists =#+CATALOG_ID: 6224, 6277=, =#+CATALOG_SUBDIR: 6277
+Cross_Section= and =#+CATALOG_HELD: 6277 BFA_2021_EHCVM-2_v01_M= (no DOI on
+the catalog entry); the primary's =#+CATALOG_IDNO:= still names 6224 (GH #1283
+ruling).  =discover_waves('Burkina_Faso')= reads 6277 =yes=, =held_idnos=
+=['BFA_2021_EHCVM-2_v01_M']=.  0 of the 55 cross-section sidecars share a
+blob with a panel sidecar -- not even =ehcvm_nsu_bfa2021.dta=, which has the
+same 20,493 x 9 shape in both.  The cross-section's weights file is
+=ehcvm_ponderations_bfa2021.dta= (=grappe=, =hhweight=; 600 rows, one per
+grappe), not the panel's =ehcvm_panel_ponderations_bfa2021.dta=.  Its cover
+=s00_me_bfa2021.dta= also carries an =hhweight= column, which differs from the
+ponderations file's by up to 0.5 per grappe (ratio 0.98-1.01: the cover's is
+rounded) -- the ponderations file is the one wired, as in the other two EHCVM
+waves.
