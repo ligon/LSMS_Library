@@ -132,8 +132,10 @@ All three are VALIDATED by every accessor that reads them
 (:meth:`WaveProvenance.validate_entry_lines`), never at parse time, so a bad
 line survives parse -> render and is refused where it would be used: a line
 naming an id ``#+CATALOG_ID:`` does not list, a ``HELD`` / ``LATEST`` line
-naming the primary entry, an id named twice under one key, or a line that is
-not of its form.
+naming the primary entry, an id named twice under one key, a line that is
+not of its form, a ``LATEST`` line for an entry with no ``HELD`` line or
+naming the release ``HELD`` already holds, and a first-seen that is not a
+real date.
 
 Everything under :data:`NOTES_HEADING` belongs to a human and is carried
 verbatim, ``#+KEY:`` lines included (GH #1115): ``GhanaSPS/2017-18`` records a
@@ -271,7 +273,7 @@ _ISO_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 # Windows device names: a directory called ``CON`` or ``nul.txt`` cannot be
 # created there, so a checkout holding one is not portable.
-_WINDOWS_RESERVED_RE = re.compile(r"(?i)(con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?")
+_WINDOWS_RESERVED_RE = re.compile(r"(?i)(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?")
 
 
 def normalise_subdir(subdir) -> str | None:
@@ -288,7 +290,8 @@ def normalise_subdir(subdir) -> str | None:
     ``/`` or ``\\``, ``:`` (a drive letter or an NTFS stream), ``~``, NUL or any
     control character, leading or trailing whitespace, a trailing ``.``
     (which also covers ``.`` and ``..``), and a Windows device name
-    (``CON``, ``NUL``, ``COM1``, ...).  ``None`` means no subdirectory.
+    (``CON``, ``NUL``, ``COM0``-``COM9``, ``LPT0``-``LPT9``, ...).  ``None``
+    means no subdirectory.
     """
     if subdir is None:
         return None
@@ -573,17 +576,35 @@ class WaveProvenance:
 
     def latest_releases(self) -> dict[str, LatestRelease]:
         """The secondary entries' ``#+CATALOG_LATEST:`` lines, by catalog id
-        (GH #1283).  Raises :class:`CatalogEntryError` (see the module), also
-        for a first-seen that is not an ISO date."""
+        (GH #1283).  Raises :class:`CatalogEntryError` (see the module), and
+        for a first-seen that is not a real ``YYYY-MM-DD`` date, a ``LATEST``
+        line for an entry with no ``HELD`` line (there is no held release to
+        be ahead of), or one naming the release ``HELD`` already names (the
+        catalog is not ahead, so the line should not be there)."""
         lines = self._entry_lines(
             "CATALOG_LATEST", self.catalog_latest,
             "<catalog id> <idno> <first-seen> [<doi>]", (3, 4))
+        held = self.held_releases()
         out: dict[str, LatestRelease] = {}
         for cid, toks in lines.items():
-            if not _ISO_DATE_RE.fullmatch(toks[2]):
+            raw = " ".join(toks)
+            try:
+                if not _ISO_DATE_RE.fullmatch(toks[2]):
+                    raise ValueError
+                _dt.date.fromisoformat(toks[2])
+            except ValueError:
                 raise CatalogEntryError(
-                    f"#+CATALOG_LATEST: {' '.join(toks)!r}: first-seen "
-                    f"{toks[2]!r} is not YYYY-MM-DD")
+                    f"#+CATALOG_LATEST: {raw!r}: first-seen {toks[2]!r} is "
+                    "not a YYYY-MM-DD date") from None
+            if cid not in held:
+                raise CatalogEntryError(
+                    f"#+CATALOG_LATEST: {raw!r}: {cid} has no #+CATALOG_HELD: "
+                    "line, so nothing is held for a newer release to be "
+                    "ahead of")
+            if held[cid].idno == toks[1]:
+                raise CatalogEntryError(
+                    f"#+CATALOG_LATEST: {raw!r} names the release "
+                    f"#+CATALOG_HELD: already holds for {cid}")
             out[cid] = LatestRelease(cid, toks[1], toks[2],
                                      toks[3] if len(toks) > 3 else None)
         return out

@@ -277,8 +277,46 @@ once.
    only one. It is refused when the record lists several entries and maps
    none to the subdirectory.
 
-Without `subdir=`, acquisition behaves as it did before, including the
-ambiguity error.
+   **Into a subdirectory that already holds sidecars, an acquisition is
+   REFRESH-ONLY** (red team r2): only release members that match a held
+   sidecar there are placed and pushed; every other member is reported "not
+   placed: outside the held subset". A `HELD` line says which release the
+   held files came from, never that the subdirectory holds the whole entry,
+   so the held release (`HELD`, or the primary's `#+CATALOG_IDNO:`) moves only
+   when every held member was verified or replaced from the new release: a
+   held file the release does not ship blocks it. `add_members=True` places
+   the other members as well. Use it only when a new release adds files to a
+   holding that is **complete**. The first acquisition into an empty
+   subdirectory, such as Burkina's 6277, is a full one.
+
+**Malawi's 3819 is a PARTIAL holding.** `2016-17/Data/Panel/` holds the 2016
+round, 99 of the 396 data files 3819's zip ships, and `2019-20/Data/Panel/`
+holds the 2019 round, 98 files. Refresh either one with
+
+```python
+add_wave("Malawi", "3819", wave="2016-17", subdir="Panel", confirm=False)
+```
+
+which is refresh-only: it places nothing new and reports the 297 files of the
+other rounds as not placed. **Never pass `add_members=True` there**, because it
+would import the 2010, 2013 and 2019 rounds into one wave's `Panel/`. And
+never re-acquire 2939 (`Malawi/_/CONTENTS.org`, "GH #1277": that would be a
+regression).
+
+**Without `subdir=`**, acquisition behaves as it did before, including the
+ambiguity error, **except on a record that has a `#+CATALOG_SUBDIR:` line**,
+where it is refused. The error names the `subdir=` the requested entry maps
+to. Unconfined, an acquisition on such a record matched sidecars across every
+subdirectory and put new members at the top of `Data/`. For a secondary entry
+it also replaced the record: in the red team's probe, Malawi 2016-17 lost
+2936, `COVERS 2939`, both `SUBDIR` lines, `HELD` and its note.
+
+**Known and accepted** (red team r2): the mapping is trusted as written. A
+hand edit that contradicts the tree, such as two `SUBDIR` lines swapped, is
+not detected. That is inherent to recording the mapping in `SOURCE.org`, and
+reviewed config is the defence. A nested layout built by hand (an entry's
+files inside another entry's subdirectory) is not detected either. The API
+cannot create one, and the mapping cannot name one.
 
 ### Step 3: Register the wave in `{country}.py`
 

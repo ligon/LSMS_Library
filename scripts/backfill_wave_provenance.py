@@ -700,10 +700,10 @@ def secondary_releases(new: WaveProvenance, by_id: dict[str, dict],
     For a secondary with a ``#+CATALOG_HELD:`` line and a catalog row: the
     same idno -> its ``LATEST`` line is removed; another idno -> it is written
     (in place, if one was there), its first-seen kept while the latest is
-    unchanged, else today.  A secondary with no ``HELD`` line, or no row,
-    keeps whatever ``LATEST`` line it had: there is no held release to be
-    ahead of, or no catalog fact to judge by.  ``HELD`` lines are never
-    touched.
+    unchanged, else today.  A secondary with no catalog row keeps whatever
+    ``LATEST`` line it had (no catalog fact to judge by); one with no ``HELD``
+    line has no ``LATEST`` line either -- the validator refuses that record,
+    and the caller leaves it intact.  ``HELD`` lines are never touched.
 
     Returns ``(record, stale, unheld)``: the record (*new* itself when
     nothing changed), the secondaries whose catalog release differs from

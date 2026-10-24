@@ -298,6 +298,59 @@ def _check_subdir_acquisition(country: str, wave: str,
             "entries apart on this wave.")
 
 
+def _is_refresh_only(country: str, wave: str, subdir: str | None,
+                     add_members: bool) -> bool:
+    """Is a ``subdir=`` acquisition REFRESH-ONLY (GH #1276, red team r2)?
+
+    Yes when ``Data/<subdir>/`` already holds sidecars and *add_members* is
+    false: only release members matching a held sidecar there are placed,
+    the rest are reported "not placed: outside the held subset".  A
+    subdirectory may hold PART of an entry -- Malawi's ``2016-17/Data/Panel/``
+    holds the 2016 round of 3819, 99 of the 396 files 3819's zip ships -- and
+    a full re-acquisition would import the other rounds.  The first
+    acquisition into an empty subdirectory (Burkina 6277) is a full one.
+    """
+    if subdir is None:
+        return False
+    target = _acquisition_data_dir(country, wave, subdir)
+    return (not add_members and target.is_dir()
+            and any(True for _ in target.rglob("*.dvc")))
+
+
+def _refuse_unconfined(country: str, wave: str,
+                       catalog_id: str | None) -> None:
+    """Refuse an acquisition WITHOUT ``subdir=`` on a record that maps its
+    entries to subdirectories (GH #1276, red team r2).
+
+    Unconfined, the acquisition matches sidecars across every subdirectory,
+    places new members at the top of ``Data/``, and -- for an entry other
+    than the primary -- replaces the record: Malawi 2016-17 lost 2936,
+    ``#+CATALOG_COVERS: 2939``, both ``SUBDIR`` lines, ``HELD`` and the note
+    in the red team's probe.  A record with no ``#+CATALOG_SUBDIR:`` line is
+    not affected: there the pre-#1276 behaviour is unchanged.  *catalog_id*
+    ``None`` means the record's primary entry (``populate_and_push``).
+    """
+    prov = read_provenance(_COUNTRIES_DIR, country, wave)
+    if not prov.catalog_subdirs:
+        return
+    catalog_id = catalog_id or prov.catalog_id
+    try:
+        mapping = prov.subdir_map()
+    except CatalogEntryError:
+        mapping = {}
+    where = mapping.get(catalog_id) if catalog_id else None
+    hint = (f"Use subdir={where!r}." if where else
+            f"{catalog_id or 'The entry'} is not mapped: record its "
+            "subdirectory (#+CATALOG_SUBDIR: <id> <subdir>), or acquire it "
+            "into a new one with subdir=.")
+    raise ValueError(
+        f"{country}/{wave}: Documentation/SOURCE.org maps its entries to "
+        f"subdirectories of Data/ ({'; '.join(prov.catalog_subdirs)}). An "
+        "acquisition without subdir= would match sidecars across all of them, "
+        "place new members at the top of Data/ and, for an entry other than "
+        f"the primary, replace the record. {hint}")
+
+
 def _acquisition(func):
     """Run an ACQUISITION entry point inside
     ``local_tools.allow_intree_sources()`` (GH #831).
@@ -1322,7 +1375,8 @@ def _download_and_extract(download_url: str, zip_filename: str,
 
 def _extract_all_from_zip(download_url: str, zip_filename: str,
                           dest_dir: Path, api_key: str,
-                          report: dict | None = None) -> list[Path]:
+                          report: dict | None = None, *,
+                          refresh_only: bool = False) -> list[Path]:
     """Stage a whole release, compare it, then place its data files (GH #1149).
 
     An existing sidecar's unique, case-insensitive basename fixes the member's
@@ -1342,11 +1396,20 @@ def _extract_all_from_zip(download_url: str, zip_filename: str,
     ``leftovers`` names old sidecars absent from the resolved release; nothing
     retires them. Recoverable download/IO errors retain partial results and
     set ``error``, so the existing provenance gate refuses a complete release.
+
+    With *refresh_only* (GH #1276, red team r2) a member is placed only when
+    it matches a held sidecar under *dest_dir*; every other data member is
+    named in ``report['not_placed']`` and neither staged nor placed.  That is
+    how a subdirectory holding PART of an entry is refreshed without
+    importing the rest: Malawi's ``2016-17/Data/Panel/`` holds the 99 files of
+    3819's 2016 round, and 3819's zip ships 396.  A not-placed member is not
+    shipped, so it cannot turn a held sidecar into a non-leftover.
     """
     # The report is the existing acquisition receipt, not a second provenance
     # pipeline (ledger 1149-staged-reacquisition sections2/4).
     report = report if report is not None else {}
-    report.update(skipped=[], error=None, members=[], revised=[], leftovers=[])
+    report.update(skipped=[], error=None, members=[], revised=[], leftovers=[],
+                  not_placed=[])
     import urllib.request
     import yaml
     from dvc_data.hashfile.hash import fobj_md5
@@ -1388,6 +1451,10 @@ def _extract_all_from_zip(download_url: str, zip_filename: str,
                             f"Ambiguous sidecars for {member.filename}: "
                             + ", ".join(str(p.relative_to(dest_dir)) for p in matches))
                     sidecar = matches[0] if matches else None
+                    if refresh_only and sidecar is None:
+                        # Outside the held subset: reported, never placed.
+                        report["not_placed"].append(member.filename)
+                        continue
                     dest = (sidecar.with_suffix("") if sidecar is not None
                             else dest_dir.joinpath(*relative.parts))
                     if (not dest.resolve().is_relative_to(root)
@@ -1491,6 +1558,8 @@ class _AcquiredRelease(NamedTuple):
     error: str | None               # the download / extraction failed
     members: tuple[Path, ...] = ()  # written OR verified byte-identical
     subdir: str | None = None       # Data/<subdir>/ it was confined to (GH #1276)
+    refresh_only: bool = False      # placed only members matching held sidecars
+    not_placed: tuple[str, ...] = ()  # release members outside the held subset
 
 
 def _acquired_data_files(country: str, wave: str,
@@ -1879,6 +1948,13 @@ def _record_acquired_release(country: str, wave: str,
     otherwise it is looked up (for the DOI, title and years).  Returns the
     record written, or ``None``.
 
+    A REFRESH-ONLY acquisition (a ``subdir=`` that already held sidecars;
+    GH #1276 red team r2) is recorded only when every held member in the
+    subdirectory was verified or replaced from the release: a held file the
+    release does not ship blocks it, where in a full acquisition it is only
+    named.  Release members outside the held subset were not placed and do
+    not block (a ``HELD`` line never claims the whole entry, GH #1283).
+
     An acquisition confined to ``Data/<subdir>/`` (GH #1276) of an entry
     that is NOT the record's primary one is a secondary entry: it is
     appended to ``#+CATALOG_ID:``, its ``#+CATALOG_HELD:`` line names the
@@ -1931,6 +2007,21 @@ def _record_acquired_release(country: str, wave: str,
             (".dta", ".csv", ".sav", ".dta.gz"))
         and (f.with_suffix("") if f.suffix == ".dvc" else f).resolve()
         not in shipped)
+    if others and acq.refresh_only:
+        # A refresh-only acquisition demonstrates only that the HELD SUBSET
+        # came from this release, so every held member must have been
+        # verified or replaced from it.  A held file it does not ship is a
+        # held file of some other release: the subset is not this release's,
+        # and the held release does not move (GH #1276 red team r2, #1114).
+        # Full mode is the opposite on purpose: there the whole release
+        # landed, and a leftover is only named (Ethiopia 6161, GH #1149).
+        logger.warning(
+            "%s/%s: %s holds %d file(s) that %s does not ship (e.g. %s). A "
+            "refresh-only acquisition records the held release only when "
+            "every held member was verified or replaced from it, so "
+            "SOURCE.org was not updated (GH #1276).", country, wave, where,
+            len(others), acq.idno, ", ".join(others[:5]))
+        return None
     if others:
         logger.warning("%s/%s: %s also holds %d file(s) (searched "
                        "recursively) that %s does not ship: %s. They "
@@ -1991,7 +2082,8 @@ def _record_acquired_release(country: str, wave: str,
 @_acquisition
 def populate_and_push(country: str, wave: str,
                       remote: str | None = None,
-                      subdir: str | None = None) -> list[Path]:
+                      subdir: str | None = None,
+                      add_members: bool = False) -> list[Path]:
     """Download all data files for a wave from WB and push to DVC cache.
 
     Convenience wrapper that follows the procedure in CONTRIBUTING.org:
@@ -2028,6 +2120,14 @@ def populate_and_push(country: str, wave: str,
         *subdir* is refused, since it cannot say which to fetch; name the
         entry with :func:`add_wave`.  Every refusal of
         :func:`_check_subdir_acquisition` applies, before any download.
+        Into a subdirectory that already holds sidecars the acquisition is
+        REFRESH-ONLY: only release members matching a held sidecar there are
+        placed and pushed, the rest are reported.  Without ``subdir=``, a
+        record that maps its entries to subdirectories is refused.
+    add_members : bool
+        With ``subdir=`` only: place release members that match no held file
+        too -- for a new release that adds files to a holding that is
+        COMPLETE.  Never on a partial holding (Malawi's 3819 in ``Panel/``).
 
     Returns
     -------
@@ -2035,8 +2135,12 @@ def populate_and_push(country: str, wave: str,
         Paths of files successfully pushed.
     """
     subdir = _normalise_subdir(subdir)
-    route: dict[str, str] = {}      # without subdir= the pre-#1276 call
-    if subdir is not None:
+    if add_members and subdir is None:
+        raise ValueError("add_members= applies only with subdir=")
+    route: dict = {}      # without subdir= the pre-#1276 call
+    if subdir is None:
+        _refuse_unconfined(country, wave, None)
+    else:
         prov = read_provenance(_COUNTRIES_DIR, country, wave)
         held = prov.catalog_ids
         owner = next((i for i, s in _subdir_mapping(country, wave,
@@ -2054,6 +2158,8 @@ def populate_and_push(country: str, wave: str,
         fetch = owner or prov.catalog_id
         _check_subdir_acquisition(country, wave, fetch, subdir, prov)
         route["_subdir"] = subdir
+        if _is_refresh_only(country, wave, subdir, add_members):
+            route["_refresh_only"] = True
         if fetch is not None and fetch != prov.catalog_id:
             # A secondary entry: route the download to it, as add_wave does.
             route["_source_url"] = ("https://microdata.worldbank.org/"
@@ -2553,7 +2659,8 @@ def add_wave(country: str, catalog_id: str,
              push: bool = True,
              remote: str | None = None,
              verbose: bool = True,
-             subdir: str | None = None) -> list[Path]:
+             subdir: str | None = None,
+             add_members: bool = False) -> list[Path]:
     """Download a new survey wave from the WB and register it locally.
 
     Creates the directory structure (``Data/``, ``Documentation/``,
@@ -2608,7 +2715,19 @@ def add_wave(country: str, catalog_id: str,
         ``#+CATALOG_ID:``, its ``#+CATALOG_HELD:`` line records the release
         acquired and its ``#+CATALOG_LATEST:`` line is cleared (GH #1283);
         ``#+CATALOG_IDNO:`` / ``#+CATALOG_DOI:`` keep describing the primary.
-        ``None`` (the default) is the whole of ``Data/``, as before.
+        Into a subdirectory that already holds sidecars the acquisition is
+        REFRESH-ONLY: only release members matching a held sidecar there are
+        placed and pushed; every other member is reported "not placed:
+        outside the held subset", and the held release is recorded only when
+        every held member was verified or replaced.  ``None`` (the default) is
+        the whole of ``Data/``, as before -- except on a record that maps its
+        entries to subdirectories (``#+CATALOG_SUBDIR:``), where an
+        acquisition without ``subdir=`` is refused.
+    add_members : bool
+        With ``subdir=`` only: also place release members that match no held
+        file -- for a new release that adds files to a holding that is
+        COMPLETE.  Never on a partial holding: Malawi's ``Panel/`` holds one
+        round of 3819, and ``add_members=True`` would import the other three.
 
     Returns
     -------
@@ -2619,6 +2738,8 @@ def add_wave(country: str, catalog_id: str,
     import time
 
     subdir = _normalise_subdir(subdir)      # refuse before any download
+    if add_members and subdir is None:
+        raise ValueError("add_members= applies only with subdir=")
     con = _get_console(verbose)
 
     def status(msg):
@@ -2673,6 +2794,11 @@ def add_wave(country: str, catalog_id: str,
         # Refuse a subdirectory that could overwrite, duplicate or mislabel
         # another entry's files, before anything is downloaded (GH #1276).
         _check_subdir_acquisition(country, wave, cat_id, subdir)
+    else:
+        # ... and an unconfined acquisition on a record that maps its
+        # entries to subdirectories (red team r2).
+        _refuse_unconfined(country, wave, cat_id)
+    refresh = _is_refresh_only(country, wave, subdir, add_members)
 
     # --- Confirmation -------------------------------------------------------
     if confirm:
@@ -2685,7 +2811,8 @@ def add_wave(country: str, catalog_id: str,
             lines.append(f"  Country:    {country}\n")
             lines.append(f"  Wave:       {wave}{status_note}\n")
             if subdir is not None:
-                lines.append(f"  Into:       Data/{subdir}/ only\n")
+                lines.append(f"  Into:       Data/{subdir}/ only"
+                             + (" (refresh only)" if refresh else "") + "\n")
             lines.append(f"  Catalog:    {catalog_url}\n")
             lines.append(f"  IDNO:       {idno}\n")
             lines.append(f"  Push to S3: {'yes' if push else 'no'}")
@@ -2694,7 +2821,8 @@ def add_wave(country: str, catalog_id: str,
             print(f"\n  Country:    {country}")
             print(f"  Wave:       {wave}{status_note}")
             if subdir is not None:
-                print(f"  Into:       Data/{subdir}/ only")
+                print(f"  Into:       Data/{subdir}/ only"
+                      + (" (refresh only)" if refresh else ""))
             print(f"  Catalog:    {catalog_url}")
             print(f"  IDNO:       {idno}")
             print(f"  Push to S3: {'yes' if push else 'no'}")
@@ -2739,6 +2867,8 @@ def add_wave(country: str, catalog_id: str,
         dummy = f"{country}/{wave}/Data/_probe_.dta"
         # Without subdir= the call is exactly the pre-#1276 one.
         confine = {"_subdir": subdir} if subdir is not None else {}
+        if refresh:
+            confine["_refresh_only"] = True
         if needs_source_override:
             # Route this acquisition explicitly without replacing any existing
             # record before the requested release actually lands (#1128).
@@ -2878,7 +3008,8 @@ def _as_countries_relative(path: Path) -> Path:
 def get_data_file(path: str | Path,
                   populate_cache: bool = False, *,
                   _source_url: str | None = None,
-                  _subdir: str | None = None) -> Path | None:
+                  _subdir: str | None = None,
+                  _refresh_only: bool = False) -> Path | None:
     """Obtain a raw data file, trying local -> DVC remotes -> World Bank.
 
     Parameters
@@ -2897,6 +3028,9 @@ def get_data_file(path: str | Path,
         Internal acquisition-only confinement (GH #1276): extract the release
         into ``Data/<_subdir>/`` and match sidecars only there.  Same guard as
         *_source_url*.
+    _refresh_only : bool
+        Internal, with *_subdir* only: place only release members that match a
+        held sidecar there (see :func:`_extract_all_from_zip`).
 
     Returns
     -------
@@ -2913,6 +3047,8 @@ def get_data_file(path: str | Path,
         if not populate_cache or not _ALLOW_INTREE_SOURCES.get():
             raise ValueError("A subdir confinement requires acquisition mode")
         _subdir = _normalise_subdir(_subdir)
+    if _refresh_only and _subdir is None:
+        raise ValueError("A refresh-only acquisition requires a subdir")
     path = _as_countries_relative(Path(path))
     # Read from the config tree if the file is already there (a maintainer
     # checkout with real data in it is a normal working state, and every
@@ -3044,12 +3180,24 @@ def get_data_file(path: str | Path,
         # The release's whole scope: Data/, or Data/<subdir>/ (GH #1276).
         data_dir = _acquisition_data_dir(country, wave, _subdir)
         report: dict = {}
-        extracted = _extract_all_from_zip(download_url, zip_filename,
-                                          data_dir, api_key, report=report)
+        extracted = _extract_all_from_zip(
+            download_url, zip_filename, data_dir, api_key, report=report,
+            # Without it, the pre-#1276 call.
+            **({"refresh_only": True} if _refresh_only else {}))
         _ACQUIRED_RELEASES[_receipt_key(country, wave, _subdir)] = _AcquiredRelease(
             catalog_id=catalog_id, idno=idno, extracted=tuple(extracted),
             skipped=tuple(report["skipped"]), error=report["error"],
-            members=tuple(report["members"]), subdir=_subdir)
+            members=tuple(report["members"]), subdir=_subdir,
+            refresh_only=_refresh_only,
+            not_placed=tuple(report["not_placed"]))
+        if report["not_placed"]:
+            logger.warning(
+                "%s/%s: %d member(s) of %s not placed: outside the held subset "
+                "of Data/%s/ (e.g. %s). Nothing was placed, and nothing will "
+                "be pushed, for them. Pass add_members=True only when a new "
+                "release adds files to a holding that is complete (GH #1276).",
+                country, wave, len(report["not_placed"]), idno, _subdir,
+                ", ".join(report["not_placed"][:5]))
         if abs_path.exists():
             return abs_path
         for f in report["members"]:

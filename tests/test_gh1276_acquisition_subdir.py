@@ -291,13 +291,19 @@ class TestSecondEntryIntoItsSubdirectory:
 # Without subdir=, nothing changes -- including the ambiguity error
 # ---------------------------------------------------------------------------
 
-class TestWithoutSubdirBehaviourIsUnchanged:
+class TestWithoutSubdir:
+    """Without ``subdir=``: on a record with no ``#+CATALOG_SUBDIR:`` line the
+    pre-#1276 behaviour is unchanged (pinned below, hazards included); on a
+    record that maps its entries to subdirectories it is REFUSED (red team
+    r2): unconfined, it matched sidecars across every subdirectory, put new
+    members at the top of Data/ and, for a secondary entry, replaced the
+    record."""
 
     @pytest.mark.parametrize("entrypoint", ["add_wave", "populate_and_push"])
-    def test_both_entries_held_and_no_subdir_is_still_ambiguous(
+    def test_unmapped_both_entries_held_is_still_ambiguous(
             self, wb, entrypoint):
         root = wb["root"]
-        _held(root, BOTH, cross=True)
+        _held(root, BOTH_UNMAPPED, cross=True)
         data_before = _snapshot(_data(root))
         with pytest.raises(ValueError, match="Ambiguous sidecars") as caught:
             if entrypoint == "add_wave":
@@ -307,23 +313,46 @@ class TestWithoutSubdirBehaviourIsUnchanged:
         assert "Panel/s00_me_bfa2021.dta.dvc" in str(caught.value)
         assert "Cross_Section/s00_me_bfa2021.dta.dvc" in str(caught.value)
         assert _snapshot(_data(root)) == data_before
-        assert _source(root).read_text(encoding="utf-8") == BOTH
+        assert _source(root).read_text(encoding="utf-8") == BOTH_UNMAPPED
         assert wb["pushes"] == []
 
-    def test_no_subdir_second_entry_still_matches_held_sidecars_by_name(
+    def test_unmapped_second_entry_still_matches_held_sidecars_by_name(
             self, wb):
-        """The pre-#1276 hazard, pinned as unchanged: without ``subdir=`` the
-        second entry's same-named members land on the panel's sidecars (GH
-        #1149 "revised"), and the record's primary entry is replaced -- and a
-        mapping that described the old primary goes with it."""
+        """The pre-#1276 hazard, pinned as unchanged on a record with no
+        mapping: the second entry's same-named members land on the panel's
+        sidecars (GH #1149 "revised"), and the record's primary is replaced."""
         root = wb["root"]
-        _held(root, PANEL_ONLY)
+        _held(root, PANEL_UNMAPPED)
         _add_wave(CROSS_ID, push=True)
         panel = _data(root) / "Panel"
         assert (panel / "s00_me_bfa2021.dta").read_bytes() == b"cross:s00"
-        prov = pv.read_provenance(root, COUNTRY, WAVE)
-        assert prov.catalog_ids == [CROSS_ID]
-        assert prov.catalog_subdirs == []
+        assert pv.read_provenance(root, COUNTRY, WAVE).catalog_ids == [CROSS_ID]
+
+    @pytest.mark.parametrize("call,hint", [
+        (lambda: _add_wave(CROSS_ID, push=True), "subdir='Cross_Section'"),
+        (lambda: _add_wave(PANEL_ID, push=True), "subdir='Panel'"),
+        (lambda: da.populate_and_push(COUNTRY, WAVE), "subdir='Panel'"),
+        (lambda: _add_wave("7777", push=True), "7777 is not mapped")])
+    def test_a_mapped_record_refuses_an_unconfined_acquisition(
+            self, wb, monkeypatch, call, hint):
+        root = wb["root"]
+        monkeypatch.setitem(IDNOS, "7777", "BFA_X_v01_M")
+        _held(root, BOTH, cross=True)
+        data_before = _snapshot(_data(root))
+        with pytest.raises(ValueError, match="without subdir=") as caught:
+            call()
+        assert hint in str(caught.value)
+        assert wb["downloads"] == [] and wb["pushes"] == [] and wb["writes"] == []
+        assert _snapshot(_data(root)) == data_before
+        assert _source(root).read_text(encoding="utf-8") == BOTH
+
+    def test_add_members_needs_a_subdir(self, wb):
+        _held(wb["root"], PANEL_UNMAPPED)
+        with pytest.raises(ValueError, match="add_members= applies only"):
+            _add_wave(PANEL_ID, push=True, add_members=True)
+        with pytest.raises(ValueError, match="add_members= applies only"):
+            da.populate_and_push(COUNTRY, WAVE, add_members=True)
+        assert wb["downloads"] == []
 
 
 # ---------------------------------------------------------------------------
@@ -421,6 +450,151 @@ class TestReacquisition:
             _add_wave(CROSS_ID, push=True, subdir="Cross_Section")
         assert caplog.text == "" and wb["writes"] == []
         assert _source(root).read_text(encoding="utf-8") == BOTH + note
+
+
+# ---------------------------------------------------------------------------
+# Refresh-only: a subdirectory that already holds sidecars (red team r2)
+# ---------------------------------------------------------------------------
+
+# Malawi 2016-17 as #1286 records it: Panel/ holds ONE round (2016) of 3819,
+# whose zip re-ships the 2010, 2013 and 2019 rounds beside it (99 of 396 data
+# members in the real release; 3 of 9 here).  Synthetic payloads.
+M_COUNTRY, M_WAVE = "Malawi", "2016-17"
+IHS4, IHS4_IDNO = "2936", "MWI_2016_IHS-IV_v04_M"
+IHPS, IHPS_V06 = "3819", "MWI_2010-2019_IHPS_v06_M"
+IHPS_V07 = "MWI_2010-2019_IHPS_v07_M"
+IHPS_DOI = "https://doi.org/10.48529/q5q1-2a34"
+ROUND16 = {f"{m}_16.dta": f"2016:{m}".encode()
+           for m in ("hh_mod_a_filt", "hh_mod_b", "ag_mod_e3")}
+OTHER_ROUNDS = {f"{m}_{y}.dta": f"20{y}:{m}".encode()
+                for m in ("hh_mod_a_filt", "hh_mod_b") for y in ("10", "13", "19")}
+IHS4_FILES = {"hh_mod_a_filt.dta": b"ihs4:a", "hh_mod_b.dta": b"ihs4:b"}
+MALAWI = f"""SOURCE
+
+{URL.format(IHS4)}
+
+#+CATALOG_ID: {IHS4}, {IHPS}
+#+CATALOG_COVERS: 2939
+#+CATALOG_SUBDIR: {IHS4} Cross_Sectional
+#+CATALOG_SUBDIR: {IHPS} Panel
+#+CATALOG_HELD: {IHPS} {IHPS_V06} {IHPS_DOI}
+#+CATALOG_IDNO: {IHS4_IDNO}
+#+CATALOG_URL: {URL.format(IHS4)}
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_RECORDED: 2026-10-23
+"""
+
+
+@pytest.fixture
+def malawi(wb, monkeypatch):
+    root = wb["root"]
+    monkeypatch.setitem(IDNOS, IHS4, IHS4_IDNO)
+    monkeypatch.setitem(IDNOS, IHPS, IHPS_V06)
+    wb["zips"][IHPS_V06] = _zip({**ROUND16, **OTHER_ROUNDS})
+    source = pv.source_org_path(root, M_COUNTRY, M_WAVE)
+    source.parent.mkdir(parents=True)
+    source.write_text(MALAWI, encoding="utf-8")
+    data = root / M_COUNTRY / M_WAVE / "Data"
+    _hold(data / "Panel", ROUND16)
+    _hold(data / "Cross_Sectional", IHS4_FILES)
+    return dict(wb, source=source, data=data, panel=data / "Panel")
+
+
+def _m_acquire(entrypoint, **kwargs):
+    if entrypoint == "add_wave":
+        return da.add_wave(M_COUNTRY, IHPS, wave=M_WAVE, subdir="Panel",
+                           confirm=False, verbose=False, push=True, **kwargs)
+    return da.populate_and_push(M_COUNTRY, M_WAVE, subdir="Panel", **kwargs)
+
+
+def _names(directory):
+    return sorted(p.name for p in directory.glob("*.dta"))
+
+
+class TestRefreshOnly:
+
+    @pytest.mark.parametrize("entrypoint", ["add_wave", "populate_and_push"])
+    def test_malawi_refresh_places_only_the_held_round(self, malawi, caplog,
+                                                       entrypoint):
+        """The red team's r2 repro: the call the skill prescribes used to
+        grow Panel/ from 99 to 395 files and push all 396."""
+        cross_before = _snapshot(malawi["data"] / "Cross_Sectional")
+        with caplog.at_level("WARNING", logger="lsms_library.data_access"):
+            _m_acquire(entrypoint)
+        n_placed = len(_names(malawi["panel"]))
+        assert n_placed == len(ROUND16), f"{n_placed} != {len(ROUND16)}"
+        assert _names(malawi["panel"]) == sorted(ROUND16)
+        assert malawi["downloads"] == [IHPS_V06]
+        assert malawi["pushes"] == [sorted(malawi["panel"] / n for n in ROUND16)]
+        assert f"{len(OTHER_ROUNDS)} member(s) of {IHPS_V06} not placed" \
+            in caplog.text and "add_members=True" in caplog.text
+        assert _snapshot(malawi["data"] / "Cross_Sectional") == cross_before
+        # The same release, every held member verified: nothing to record.
+        assert malawi["writes"] == []
+        assert malawi["source"].read_text(encoding="utf-8") == MALAWI
+
+    def test_add_members_places_the_rest_on_request(self, malawi):
+        _m_acquire("add_wave", add_members=True)
+        n_placed = len(_names(malawi["panel"]))
+        want = len(ROUND16) + len(OTHER_ROUNDS)
+        assert n_placed == want, f"{n_placed} != {want}"
+        assert len(malawi["pushes"][0]) == want
+
+    @pytest.mark.parametrize("entrypoint", ["add_wave", "populate_and_push"])
+    def test_a_newer_release_moves_held_when_every_held_member_is_refreshed(
+            self, malawi, monkeypatch, entrypoint):
+        monkeypatch.setitem(IDNOS, IHPS, IHPS_V07)
+        malawi["zips"][IHPS_V07] = _zip(
+            {**{n: b + b":v07" for n, b in ROUND16.items()}, **OTHER_ROUNDS})
+        _m_acquire(entrypoint)
+        prov = pv.read_provenance(malawi["root"], M_COUNTRY, M_WAVE)
+        assert prov.held_release_of(IHPS) == pv.HeldRelease(IHPS, IHPS_V07, None)
+        assert (prov.idno, prov.catalog_subdirs) == (
+            IHS4_IDNO, [f"{IHS4} Cross_Sectional", f"{IHPS} Panel"])
+        assert _names(malawi["panel"]) == sorted(ROUND16)
+        assert len(malawi["writes"]) == 1
+
+    @pytest.mark.parametrize("entrypoint", ["add_wave", "populate_and_push"])
+    def test_a_held_member_the_release_does_not_ship_keeps_held(
+            self, malawi, monkeypatch, caplog, entrypoint):
+        """#1114 per entry: the refresh did not demonstrate that the held
+        subset is this release's -- one held file is some other release's."""
+        monkeypatch.setitem(IDNOS, IHPS, IHPS_V07)
+        shipped = dict(list(ROUND16.items())[:2])
+        malawi["zips"][IHPS_V07] = _zip(
+            {**{n: b + b":v07" for n, b in shipped.items()}, **OTHER_ROUNDS})
+        mtime = os.stat(malawi["source"]).st_mtime_ns
+        with caplog.at_level("WARNING", logger="lsms_library.data_access"):
+            _m_acquire(entrypoint)
+        assert malawi["writes"] == []
+        assert os.stat(malawi["source"]).st_mtime_ns == mtime
+        assert malawi["source"].read_text(encoding="utf-8") == MALAWI
+        assert "does not ship" in caplog.text
+        assert malawi["pushes"] == [sorted(malawi["panel"] / n for n in shipped)]
+
+    def test_a_primary_is_refreshed_under_the_same_gate(self, wb, monkeypatch):
+        """Ledger §6: the primary's #+CATALOG_IDNO: moves by the same rule."""
+        root = wb["root"]
+        v05 = "BFA_2021_EHCVM-P_v05_M"
+        monkeypatch.setitem(IDNOS, PANEL_ID, v05)
+        _held(root, PANEL_ONLY)
+        partial = dict(list(PANEL_FILES.items())[:2])
+        wb["zips"][v05] = _zip(partial)
+        _add_wave(PANEL_ID, push=True, subdir="Panel")
+        assert pv.read_provenance(root, COUNTRY, WAVE).idno == PANEL_IDNO
+        assert wb["writes"] == []
+        wb["zips"][v05] = _zip({**PANEL_FILES, "s99_me_bfa2021.dta": b"new"})
+        _add_wave(PANEL_ID, push=True, subdir="Panel")
+        assert pv.read_provenance(root, COUNTRY, WAVE).idno == v05
+        assert not (_data(root) / "Panel" / "s99_me_bfa2021.dta").exists()
+
+    def test_the_first_acquisition_into_an_empty_subdir_is_full(self, wb):
+        root = wb["root"]
+        _held(root, PANEL_ONLY)
+        wb["zips"][CROSS_IDNO] = _zip({**CROSS_FILES, "extra_round.dta": b"x"})
+        _add_wave(CROSS_ID, push=True, subdir="Cross_Section")
+        names = _names(_data(root) / "Cross_Section")
+        assert names == sorted([*CROSS_FILES, "extra_round.dta"])
 
 
 # ---------------------------------------------------------------------------
@@ -573,6 +747,7 @@ class TestSubdirNames:
         "", " ", "Cross_Section ", " Panel", "Panel/Cross", "Panel\\Cross",
         "/abs", "../Panel", ".", "..", "...", "Panel.", "C:x", "~", "~Panel",
         "Cross\x00Section", "Cross\tSection", "CON", "nul.txt", "com1",
+        "COM0", "lpt0.txt",
         PureWindowsPath("Panel/Cross"), PurePosixPath("Panel/Cross")])
     @pytest.mark.parametrize("entrypoint", ["add_wave", "populate_and_push"])
     def test_an_unsafe_subdir_is_refused_before_any_download(

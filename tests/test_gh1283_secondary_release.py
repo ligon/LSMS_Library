@@ -92,6 +92,13 @@ class TestRecord:
         (["abc X_v01_M"], [], SUBDIRS, "is not"),
         ([], [f"{CROSS_ID} {V02}"], SUBDIRS, "is not"),
         ([], [f"{CROSS_ID} {V02} 23/10/2026"], SUBDIRS, "YYYY-MM-DD"),
+        # Red team r2:
+        ([f"{CROSS_ID} {CROSS_IDNO}"], [f"{CROSS_ID} {V02} 2026-13-45"],
+         SUBDIRS, "YYYY-MM-DD"),                      # not a real date
+        ([], [f"{CROSS_ID} {V02} 2026-10-01"], SUBDIRS,
+         "nothing is held"),                          # nothing held to be ahead of
+        ([f"{CROSS_ID} {CROSS_IDNO}"], [f"{CROSS_ID} {CROSS_IDNO} 2026-10-01"],
+         SUBDIRS, "already holds"),                   # the catalog is not ahead
     ])
     def test_validation_refuses(self, held, latest, subdirs, message):
         prov = _parse(_text(held, latest, subdirs=subdirs))
