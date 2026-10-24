@@ -1,0 +1,28 @@
+Final head 806a659c4 (burst job p2-last) and bd6b3c6f8 (p2-final-build / p2-final-tests).
+== full cold build at bd6b3c6f8 vs the dd16d0682 branch build: every table IDENTICAL; vs base 1865cf884: 28 of 31 IDENTICAL (crop_production, plot_inputs, plot_labor differ)
+country: 26 of 549 moved; only-base 0 only-branch 0
+btf: 0 of 40 moved; only-base 0 only-branch 0
+wave: 130 of 2109 moved; only-base 0 only-branch 0
+== tests
+clean (Malawi + related): 979 passed, 5 skipped, 179 warnings in 360.46s (0:06:00)
+mutation sentinel_off (long): 6 failed, 40 passed in 211.03s (0:03:31)
+mutation marker_off (long): 2 failed, 44 passed in 215.06s (0:03:35)
+mutation sentinel_off (short): 6 failed, 40 passed in 23.34s
+mutation marker_off (short): 2 failed, 44 passed in 24.73s
+bd6b3c6f8 mutation sentinel_off: 9 failed, 37 passed, 4 warnings in 243.30s (0:04:03)
+bd6b3c6f8 mutation marker_off: 6 failed, 40 passed, 4 warnings in 210.22s (0:03:30)
+bd6b3c6f8 mutation library_code: 1 failed, 75 passed, 69 deselected in 5.66s
+bd6b3c6f8 mutation no_module: 1 failed, 75 passed, 69 deselected in 6.00s
+bd6b3c6f8 mutation unknown_guard_off: 1 failed, 75 passed, 69 deselected in 5.73s
+bd6b3c6f8 mutation old_gate: 1 failed, 75 passed, 69 deselected in 6.95s
+bd6b3c6f8 mutation seed_raise_off: 1 failed, 75 passed, 69 deselected in 6.72s
+bd6b3c6f8 mutation obs_not_in_consolidation: 20 failed, 56 passed, 69 deselected in 10.23s
+new test file on base 1865cf884: base: 1865cf884 data_info.yml: register the unknown_plot sentinel and the (n
+base: 18 failed, 16 warnings in 143.43s (0:02:23)
+== leak scan (EA codes, panel ids, 12-digit case ids, Malawi-range coordinates)
+pytest_clean_all.txt: FAILED=0 ERROR=0 | report-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0} | any-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 10, 'lat': 0, 'lon': 0}
+pytest_mut_marker_off_long.txt: FAILED=2 ERROR=0 | report-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0} | any-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0}
+pytest_mut_marker_off_short.txt: FAILED=2 ERROR=0 | report-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0} | any-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0}
+pytest_mut_sentinel_off_long.txt: FAILED=6 ERROR=0 | report-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0} | any-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0}
+pytest_mut_sentinel_off_short.txt: FAILED=6 ERROR=0 | report-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0} | any-line hits {'ea_code_8': 0, 'panel_id': 0, 'case_id_12': 0, 'lat': 0, 'lon': 0}
+The 10 any-line case-id hits in pytest_clean_all are Site Q QuantityImplausibleWarning lines in pytest's warnings summary, emitted by OTHER test files' builds (pre-existing); 0 in any failure report.
