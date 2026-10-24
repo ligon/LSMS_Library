@@ -38,8 +38,10 @@ label and numeric status/outcome counts. No real survey data is used in tests.
 - Inherit `STANDING.md §4`: no raw survey IO, DVC CLI, cache changes or schema
   changes. Tests use synthetic secret sentinels only.
 - Commands are argv, `shell=False`; never reconstruct a shell command.
-- Temp directory is owner-only; output and optional XML live there and are
-  removed on exit. No private output/XML upload artifacts.
+- Temp directory uses OS user temp. POSIX modes are explicitly0700/0600;
+  hosted Windows inherits the runner user temp/profile ACL, per root clarification
+  2026-10-24. This is a public Actions output boundary, not same-user isolation.
+  Output and optional XML are removed on normal exit; no private uploads.
 - Preserve the child's status; negative POSIX signal statuses become shell
   convention `128 + signal`. Startup failure has an explicit nonzero status.
 - Wrapper startup errors and cleanup failures never print exception text.
@@ -60,11 +62,36 @@ label and numeric status/outcome counts. No real survey data is used in tests.
 
 ## §6 Open questions
 
-- Windows owner-only ACL implementation must be verified; POSIX chmod alone
-  does not establish Windows DACL privacy. Ask root if its concrete runtime
-  constraints require a different supported Windows version. No native Windows
-  result will be claimed from Linux verification.
+None blocking the scoped correction. Root explicitly approved the hosted Windows
+user temp/profile ACL assumption (2026-10-24), counts-only JUnit, and the private
+`{junit}` argv placeholder. Native Windows executable behavior remains a CI gate;
+Linux tests do not establish a native Windows result.
 
 ### Phase 3 — verification
 
-Pending implementation and synthetic subprocess validation. No data tests run.
+- `private_ci_check.main` — OK (§3/§4): argv subprocess capture starts before
+  child execution, fixed validated stages only, no child/exception/XML text is
+  forwarded, startup failure125 and real child failures preserved.
+- `_junit_counts` — OK (§2/§3): extends existing stdlib XML approach; derives
+  testcase outcomes, ignores names/parameter values/text/properties and refuses
+  malformed/unexpected/DTD documents. No safe source-id provenance is assumed.
+- `_exit_status` — OK (§4): preserves ordinary statuses and normalizes negative
+  POSIX signal status to shell128+signal. Signal15 gives143 in actual subprocess.
+- Three workflow calls — OK (§2/§4): existing Uganda Make and full pytest args,
+  credential gates, installed-wheel Windows commands/env unchanged; all output
+  is captured before Poetry/Make/pytest starts. No private artifact upload.
+- Reuse recheck — OK (§2/§5): repo has no equivalent generic command wrapper;
+  existing credential helper and Windows fingerprint script remain unchanged.
+- Verification: `tests/test_private_ci_check.py`: **30 passed, 0 failed**,9.48s,
+  mounted Python3.11.6, taskset22,24, xdist2 `--dist=loadfile`, BLAS/OMP/MKL1,
+  `LSMS_BUILD_WORKERS=1`, `LSMS_SKIP_AUTH=1`. Exact real-path worktree import
+  identity was asserted; logs live under campaign fix1294 control directory.
+- Synthetic child pytest failures exercise explicit assert/exception messages,
+  stdout/stderr/logs/warnings, setup/teardown/collection failures, skip/xfail and
+  parameter names; both ordinary pytest and installed pytest-instafail0.5 paths
+  preserve failure status without publishing fake sentinels. Passing warning
+  capture still passes. Missing/malformed/malicious JUnit, argv with spaces and
+  shell metacharacters, permissions/cleanup/startup statuses also pass.
+- Scope: four authorized files only; no real microdata/network/acquisition,
+  dependency/fixture/lock edits or weakened existing assertions. No native
+  Windows execution claim. SIGKILL/host teardown cleanup remains OS/runner-owned.
