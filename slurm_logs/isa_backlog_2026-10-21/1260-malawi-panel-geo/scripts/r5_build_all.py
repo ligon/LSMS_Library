@@ -1,6 +1,10 @@
 """Cold-build every Malawi table into $OUT (one pickle per table) + the
 cluster_features wave frames.  Idempotent: skips tables already written.
 Prints shapes / errors only -- never data."""
+import os as _os, lsms_library as _ll
+_top = _os.path.realpath(_os.environ.get("CLONE") or _os.getcwd())
+assert _os.path.realpath(_ll.__file__).startswith(_top + _os.sep), _ll.__file__
+
 import os, sys, time, traceback, warnings
 import pandas as pd
 import lsms_library as ll
