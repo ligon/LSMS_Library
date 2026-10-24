@@ -3,6 +3,9 @@ SOURCE
 https://microdata.worldbank.org/index.php/catalog/3818
 
 #+CATALOG_ID: 3818, 3819
+#+CATALOG_SUBDIR: 3818 Cross_Sectional
+#+CATALOG_SUBDIR: 3819 Panel
+#+CATALOG_HELD: 3819 MWI_2010-2019_IHPS_v06_M https://doi.org/10.48529/q5q1-2a34
 #+CATALOG_IDNO: MWI_2019_IHS-V_v06_M
 #+CATALOG_TITLE: Fifth Integrated Household Survey 2019-2020
 #+CATALOG_YEARS: 2019-2020
@@ -12,8 +15,8 @@ https://microdata.worldbank.org/index.php/catalog/3818
 #+PROVENANCE_SOURCE: worldbank
 #+PROVENANCE_METHOD: source-url
 #+PROVENANCE_VALIDATION: content-validated
-#+PROVENANCE_RECORDED: 2026-07-12
-#+PROVENANCE_NOTE: TWO catalog entries live in this one directory (GH #600). Data/Cross_Sectional/ is the Fifth Integrated Household Survey, id 3818 (103 of 108 of 3818's files). Data/Panel/ is the 2019 wave of the Integrated Household Panel Survey, id 3819 (MWI_2010-2019_IHPS_v06_M, "Long-Term Panel, 102 EAs"): 96 of its 97 files appear in 3819's WB datafile list and NONE in 3818's. The other CATALOG_* keys above describe the primary entry (3818). We hold 3819's 2019 wave; 3819 also re-releases the 2010/2013/2016 IHPS data, which we hold in their original release form (1003, 2248, 2939). Checked 2026-07-12 against the WB datafile API.
+#+PROVENANCE_RECORDED: 2026-10-23
+#+PROVENANCE_NOTE: TWO catalog entries live in this one directory (GH #600). Data/Cross_Sectional/ is the Fifth Integrated Household Survey, id 3818 (103 of 108 of 3818's files). Data/Panel/ is the 2019 wave of the Integrated Household Panel Survey, id 3819 (MWI_2010-2019_IHPS_v06_M, "Long-Term Panel, 102 EAs"): 96 of its 97 files appear in 3819's WB datafile list and NONE in 3818's. The other CATALOG_* keys above describe the primary entry (3818). We hold 3819's 2019 wave; 3819 also re-releases the 2010/2013/2016 IHPS data, which we hold in their original release form (1003, 2248) except 2016: 2016-17/Data/Panel/ is 3819's own re-release of the 2016 round, not 2939 (GH #1277). Checked 2026-07-12 against the WB datafile API. CATALOG_HELD records 3819's release (GH #1283 ruling, secondary entry): content-validated, all 98 held Data/Panel/ sidecar md5s equal members of MWI_2010-2019_IHPS_v06_M_Stata.zip (zip md5 abebe37e96f42ff56994b054af42454e, downloaded 2026-10-23).
 
 * Notes (preserved from the original SOURCE.org)
 GH #1260 (2026-10-23): Data/Panel/householdgeovariables_y4.dta is now held -- the household geovariables file of entry 3819 (MWI_2010-2019_IHPS_v06_M; WB data file F403, 3,178 cases, keyed on y4_hhid, every key in Panel/hh_mod_a_filt_19), taken from 3819's own Stata zip (MWI_2010-2019_IHPS_v06_M_Stata.zip, downloaded 2026-10-23) and published with push_to_cache_batch; md5 13ffd98972e697a2fbb0ab62463b0ba3. Before it, the 102 panel EAs had no coordinates. Release check: all 97 previously held Data/Panel/ sidecars are byte-identical to that zip's members, so the held Panel files are the current v06 upload.
