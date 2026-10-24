@@ -259,8 +259,14 @@ def test_the_ehcvm_waves_ask_once_and_carry_visit_one(delivered):
     # reduces nothing -- is unchanged; only the level the numbers sit at moved.
     assert delivered.xs('2018-19', level='t')['Expenditure'].sum() == \
         pytest.approx(52_466_280.38, rel=1e-6)
-    assert delivered.xs('2021-22', level='t')['Expenditure'].sum() == \
-        pytest.approx(27_888_221.36, rel=1e-6)
+    # Re-pinned 2026-10-23 (GH #1276): 2021-22 serves BOTH components of the
+    # round.  The panel component (grappes <= 585, WB 6224) keeps its
+    # 27,888,221.36 to the cent; the cross-section (grappes >= 586, WB 6277)
+    # adds the rest.
+    w21 = delivered.xs('2021-22', level='t')
+    panel = w21.index.get_level_values('v').astype(int) <= 585
+    assert w21.loc[panel, 'Expenditure'].sum() == pytest.approx(27_888_221.36, rel=1e-6)
+    assert w21['Expenditure'].sum() == pytest.approx(84_809_339.18, rel=1e-6)
 
 
 @_data

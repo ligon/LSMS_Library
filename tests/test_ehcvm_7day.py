@@ -69,7 +69,9 @@ BEFORE_SUM = {
     ('Niger', '2018-19'): 84_069_921.87,
     ('Niger', '2021-22'): 99_448_402.27,
     ('Burkina_Faso', '2018-19'): 65_315_307.5,
-    ('Burkina_Faso', '2021-22'): 39_905_158.0,
+    # GH #1276: 2021-22 reads s07b from both components; this is the raw
+    # s07bq08 total over both (panel 39,905,158 + cross-section 83,572,255).
+    ('Burkina_Faso', '2021-22'): 123_477_413.0,
     ('CotedIvoire', '2018-19'): 119_107_505.0,
 }
 
@@ -88,7 +90,9 @@ AFTER = {
     ('Niger', '2018-19'): (53_351_991.10, 8_141),
     ('Niger', '2021-22'): (67_358_383.42, 7_112),
     ('Burkina_Faso', '2018-19'): (52_466_280.38, 9_386),
-    ('Burkina_Faso', '2021-22'): (27_888_221.36, 6_148),
+    # GH #1276: both components; the panel component's share is unchanged at
+    # 27,888,221.36 / 6,148 (asserted in test_gh1276_burkina_two_components.py).
+    ('Burkina_Faso', '2021-22'): (84_809_339.18, 19_893),
     ('CotedIvoire', '2018-19'): (105_011_084.65, 35_289),
 }
 

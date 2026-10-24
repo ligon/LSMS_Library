@@ -262,6 +262,12 @@ def test_every_household_table_carries_the_cross_section(bf, table):
     households `sample()` knows (same `i`, same `v`)."""
     df = getattr(bf, table)(waves=[WAVE]).reset_index()
     s = bf.sample(waves=[WAVE]).reset_index()
+    if "v" not in df.columns:
+        # Tables whose canonical index has no `v` (assets, shocks: GH #436's
+        # v-join opt-out) -- read each household's `v` off sample().
+        df["v"] = df["i"].map(dict(zip(s["i"], s["v"])))
+        n_unmapped = int(df["v"].isna().sum())
+        assert n_unmapped == 0, f"{n_unmapped} rows whose i is not in sample()"
     comp = _component(df["v"])
     hh_cross = df.loc[comp == "cross", "i"].nunique()
     hh_panel = df.loc[comp == "panel", "i"].nunique()
@@ -304,3 +310,20 @@ def test_derivation_inputs_read_both_components(bf):
     keys = set(zip(served["t"], served["i"], served["j"]))
     missing = len(keys - set(raw.index))
     assert missing == 0, f"{missing} of {len(keys)} served purchased keys have no raw row"
+
+
+@pytest.mark.requires_s3
+def test_the_panel_components_food_numbers_are_untouched(bf):
+    """Adding the cross-section adds rows; it changes none of the panel's.
+    The panel component's purchased Expenditure and its gift rows are the
+    numbers 2021-22 served before GH #1276 (tests/test_ehcvm_7day.py pinned
+    27,888,221.36 / 6,148 then)."""
+    fa = bf.food_acquired(waves=[WAVE]).reset_index()
+    comp = _component(fa["v"])
+    out = {}
+    for c in ("panel", "cross"):
+        x = fa[comp == c]
+        out[c] = (round(float(x.loc[x["s"] == "purchased", "Expenditure"].sum()), 2),
+                  int((x["s"] == "inkind").sum()))
+    assert out["panel"] == (27_888_221.36, 6_148), out["panel"]
+    assert out["cross"] == (56_921_117.82, 13_745), out["cross"]
