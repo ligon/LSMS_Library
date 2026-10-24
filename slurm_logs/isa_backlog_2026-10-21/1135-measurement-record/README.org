@@ -43,3 +43,12 @@ one-to-one renumbering counts on every warning boundary; Ethiopia 2015-16 /
 only): the verbatim variable and value labels of those markers.  Both reproduce
 the red team's Nigeria figures independently (2018Q3: 10 / 25 / 50..56;
 2023Q3: 112 / 150 / 226..249; W5 strict K 11, not 12).  Counts and labels only.
+
+=summary-review.json= (jobs 40425363 base / 40425364 branch at =c73a4ce3e=, cold
+data roots): census 0 of 549 / 0 of 40 / 0 of 2,109; =sample= and
+=cluster_features= digests equal to base for all seven countries; one warning
+per call; the new first lines, including three SPAN calls showing the
+"(between the waves you asked for)" qualifier.  =tests/test_sampling.py= +
+=tests/test_uganda_comm_frame_ea.py=: branch 238 passed; the branch's tests on
+base 95 failed / 143 passed (every failure a #1135 test).  Mutants: the red
+team's 26 retargeted plus 15 new = 41; 40 killed, 1 equivalent (M04b).

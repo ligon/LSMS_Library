@@ -141,4 +141,4 @@ Definitions this task fixes (in `sampling.py`, next to `_MEASUREMENT_FIELDS`):
   (K <= D <= N, block only on warning boundaries, string fields, plain-decimal
   YAML integers); "not applicable" vs "not measured"; SPAN qualifier on
   line 1; `unobservable` / `redefined` glosses reconciled.  All 26 red-team
-  mutants retargeted plus 14 new: 39 killed, 1 equivalent (M04b).
+  mutants retargeted plus 15 new (41): 40 killed, 1 equivalent (M04b).

@@ -1,0 +1,325 @@
+{
+ "base": "57d255585 (development)",
+ "branch": "c73a4ce3e",
+ "census": {
+  "btf": {
+   "base": 40,
+   "branch": 40,
+   "moved": 0,
+   "symdiff": 0
+  },
+  "country": {
+   "base": 549,
+   "branch": 549,
+   "moved": 0,
+   "symdiff": 0
+  },
+  "wave": {
+   "base": 2109,
+   "branch": 2109,
+   "moved": 0,
+   "symdiff": 0
+  }
+ },
+ "countries": {
+  "Burkina_Faso": {
+   "cluster_features_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     2035,
+     2035
+    ]
+   },
+   "first_line": {
+    "base": "Burkina_Faso/sample: `v` is not a comparable cluster id across 1 wave boundary(ies) in this frame (waves 2014 .. 2021-22):",
+    "branch": "Burkina_Faso/sample: `v` is not a comparable cluster id across 1 wave boundary(ies) in this frame (waves 2014 .. 2021-22). Size by boundary -- 2014 -> 2018-19: cluster ids renumbered: not applicable; no household is linked across it, so no household share."
+   },
+   "sample_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     20648,
+     20648
+    ]
+   },
+   "served_oracle": {
+    "2014->2018-19": {
+     "changed_v": 0,
+     "dup_i_t": 0,
+     "linked_with_v_both_sides": 583
+    }
+   }
+  },
+  "Ethiopia": {
+   "cluster_features_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     2168,
+     2168
+    ]
+   },
+   "first_line": {
+    "base": "Ethiopia/sample: `v` is not a comparable cluster id across 1 wave boundary(ies) in this frame (waves 2011-12 .. 2021-22):",
+    "branch": "Ethiopia/sample: `v` is not a comparable cluster id across 1 wave boundary(ies) in this frame (waves 2011-12 .. 2021-22). Size by boundary -- 2011-12 -> 2013-14: 333 cluster ids renumbered; 3,776 of 3,776 linked households (100%) change `v` counting movers; net-of-movers share: not measured."
+   },
+   "sample_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     25914,
+     25914
+    ]
+   },
+   "served_oracle": {
+    "2011-12->2013-14": {
+     "changed_v": 3776,
+     "dup_i_t": 0,
+     "linked_with_v_both_sides": 3776
+    }
+   }
+  },
+  "GhanaLSS": {
+   "cluster_features_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     3791,
+     3791
+    ]
+   },
+   "first_line": {
+    "base": "GhanaLSS/sample: `v` is not a comparable cluster id across 1 wave boundary(ies) in this frame (waves 1987-88 .. 2016-17):",
+    "branch": "GhanaLSS/sample: `v` is not a comparable cluster id across 1 wave boundary(ies) in this frame (waves 1987-88 .. 2016-17). Size by boundary -- 1987-88 -> 1988-89: 79 cluster ids renumbered; 712 of 712 linked households (100%) change `v` counting movers; net-of-movers share: not measured."
+   },
+   "sample_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     56334,
+     56334
+    ]
+   },
+   "served_oracle": {
+    "1987-88->1988-89": {
+     "changed_v": 712,
+     "dup_i_t": 0,
+     "linked_with_v_both_sides": 712
+    }
+   }
+  },
+  "Niger": {
+   "cluster_features_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     1599,
+     1599
+    ]
+   },
+   "first_line": {
+    "base": "Niger/sample: `v` is not a comparable cluster id across 1 wave boundary(ies) in this frame (waves 2011-12 .. 2021-22):",
+    "branch": "Niger/sample: `v` is not a comparable cluster id across 1 wave boundary(ies) in this frame (waves 2011-12 .. 2021-22). Size by boundary -- 2014-15 -> 2018-19: cluster ids renumbered: not applicable; no household is linked across it, so no household share."
+   },
+   "sample_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     20231,
+     20231
+    ]
+   },
+   "served_oracle": {
+    "2014-15->2018-19": {
+     "changed_v": 0,
+     "dup_i_t": 0,
+     "linked_with_v_both_sides": 0
+    }
+   }
+  },
+  "Nigeria": {
+   "cluster_features_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     7070,
+     7070
+    ]
+   },
+   "first_line": {
+    "base": "Nigeria/sample: `v` is not a comparable cluster id across 2 wave boundary(ies) in this frame (waves 2010Q3 .. 2024Q1):",
+    "branch": "Nigeria/sample: `v` is not a comparable cluster id across 2 wave boundary(ies) in this frame (waves 2010Q3 .. 2024Q1). Size by boundary -- 2016Q1 -> 2018Q3: 1 cluster id renumbered; 79 of 1,493 linked households (5.29%) change `v` counting movers; net-of-movers share: not measured | 2019Q1 -> 2023Q3: 11 cluster ids renumbered; 343 of 5,067 linked households (6.77%) change `v` counting movers; net-of-movers share: not measured."
+   },
+   "sample_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     49770,
+     49770
+    ]
+   },
+   "served_oracle": {
+    "2016Q1->2018Q3": {
+     "changed_v": 79,
+     "dup_i_t": 0,
+     "linked_with_v_both_sides": 1493
+    },
+    "2019Q1->2023Q3": {
+     "changed_v": 343,
+     "dup_i_t": 0,
+     "linked_with_v_both_sides": 5067
+    }
+   }
+  },
+  "Tanzania": {
+   "cluster_features_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     2387,
+     2387
+    ]
+   },
+   "first_line": {
+    "base": "Tanzania/sample: `v` is not a comparable cluster id across 3 wave boundary(ies) in this frame (waves 2008-09 .. 2020-21):",
+    "branch": "Tanzania/sample: `v` is not a comparable cluster id across 3 wave boundary(ies) in this frame (waves 2008-09 .. 2020-21). Size by boundary -- 2010-11 -> 2012-13: 82 cluster ids renumbered; 591 of 2,904 linked households (20.35%) change `v` counting movers; net-of-movers share: not measured | 2012-13 -> 2014-15: 35 cluster ids renumbered; 108 of 521 linked households (20.73%) change `v` counting movers; net-of-movers share: not measured | 2014-15 -> 2019-20: cluster ids renumbered: not applicable; 849 of 849 linked households (100%) change `v` counting movers; net-of-movers share: not measured."
+   },
+   "sample_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     22433,
+     22433
+    ]
+   },
+   "served_oracle": {
+    "2010-11->2012-13": {
+     "changed_v": 591,
+     "dup_i_t": 0,
+     "linked_with_v_both_sides": 2904
+    },
+    "2012-13->2014-15": {
+     "changed_v": 108,
+     "dup_i_t": 0,
+     "linked_with_v_both_sides": 521
+    },
+    "2014-15->2019-20": {
+     "changed_v": 849,
+     "dup_i_t": 0,
+     "linked_with_v_both_sides": 849
+    }
+   }
+  },
+  "Uganda": {
+   "cluster_features_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     4803,
+     4803
+    ]
+   },
+   "first_line": {
+    "base": "Uganda/sample: `v` is not a comparable cluster id across 4 wave boundary(ies) in this frame (waves 2005-06 .. 2019-20):",
+    "branch": "Uganda/sample: `v` is not a comparable cluster id across 4 wave boundary(ies) in this frame (waves 2005-06 .. 2019-20). Size by boundary -- 2005-06 -> 2009-10: cluster ids renumbered: not applicable; 191 of 2,601 linked households (7.34%) change `v` counting movers; net-of-movers share: not measured | 2009-10 -> 2010-11: cluster ids renumbered: not applicable; 433 of 2,640 linked households (16.4%) change `v` counting movers; net-of-movers share: not measured | 2011-12 -> 2013-14: cluster ids renumbered: not applicable; 1,717 of 1,717 linked households (100%) change `v` counting movers; net-of-movers share: not measured | 2015-16 -> 2018-19: cluster ids renumbered: not applicable; 2,973 of 2,973 linked households (100%) change `v` counting movers; net-of-movers share: not measured."
+   },
+   "sample_all": {
+    "frame_digest_equal": true,
+    "n_warnings": [
+     1,
+     1
+    ],
+    "rows": [
+     24362,
+     24362
+    ]
+   },
+   "served_oracle": {
+    "2005-06->2009-10": {
+     "changed_v": 191,
+     "dup_i_t": 0,
+     "linked_with_v_both_sides": 2601
+    },
+    "2009-10->2010-11": {
+     "changed_v": 433,
+     "dup_i_t": 0,
+     "linked_with_v_both_sides": 2640
+    },
+    "2011-12->2013-14": {
+     "changed_v": 1717,
+     "dup_i_t": 0,
+     "linked_with_v_both_sides": 1717
+    },
+    "2015-16->2018-19": {
+     "changed_v": 2973,
+     "dup_i_t": 0,
+     "linked_with_v_both_sides": 2973
+    }
+   }
+  }
+ },
+ "jobs": {
+  "base": 40425363,
+  "branch": 40425364
+ },
+ "mutants": {
+  "equivalent_survivor": "M04b (n == 0 -> not n after the n is None branch)",
+  "killed": 40,
+  "total": 41
+ },
+ "pytest": {
+  "base_with_branch_tests": "95 failed, 143 passed",
+  "branch": "238 passed"
+ },
+ "span_first_lines": {
+  "Nigeria ['2016Q1', '2024Q1']": [
+   "Nigeria/sample: `v` is not a comparable cluster id across 2 wave boundary(ies) in this frame (waves 2016Q1 .. 2024Q1). Size by boundary -- 2016Q1 -> 2018Q3 (between the waves you asked for): 1 cluster id renumbered; 79 of 1,493 linked households (5.29%) change `v` counting movers; net-of-movers share: not measured | 2019Q1 -> 2023Q3 (between the waves you asked for): 11 cluster ids renumbered; 343 of 5,067 linked households (6.77%) change `v` counting movers; net-of-movers share: not measured."
+  ],
+  "Tanzania ['2008-09', '2014-15']": [
+   "Tanzania/sample: `v` is not a comparable cluster id across 2 wave boundary(ies) in this frame (waves 2008-09 .. 2014-15). Size by boundary -- 2010-11 -> 2012-13 (between the waves you asked for): 82 cluster ids renumbered; 591 of 2,904 linked households (20.35%) change `v` counting movers; net-of-movers share: not measured | 2012-13 -> 2014-15 (between the waves you asked for): 35 cluster ids renumbered; 108 of 521 linked households (20.73%) change `v` counting movers; net-of-movers share: not measured."
+  ],
+  "Uganda ['2005-06', '2011-12']": [
+   "Uganda/sample: `v` is not a comparable cluster id across 2 wave boundary(ies) in this frame (waves 2005-06 .. 2011-12). Size by boundary -- 2005-06 -> 2009-10 (between the waves you asked for): cluster ids renumbered: not applicable; 191 of 2,601 linked households (7.34%) change `v` counting movers; net-of-movers share: not measured | 2009-10 -> 2010-11 (between the waves you asked for): cluster ids renumbered: not applicable; 433 of 2,640 linked households (16.4%) change `v` counting movers; net-of-movers share: not measured."
+  ]
+ }
+}
