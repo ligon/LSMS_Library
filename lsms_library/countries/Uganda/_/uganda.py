@@ -257,7 +257,7 @@ def cluster_features(df):
 
     Two steps run BEFORE the projection, and they are ``sample``'s, applied to
     the same rows by the same functions so the two tables publish one keyspace
-    (GH #1120; Nigeria serves its ``moved-{hhid}`` singletons from both):
+    (GH #1120; Nigeria serves its per-household singletons from both):
 
     * a household recorded only by an ALTERNATE cover takes that cover's
       columns (2015-16: AGSEC1, D1) -- :func:`_adopt_alternate_cover`;
@@ -329,7 +329,9 @@ def cluster_features(df):
 #   D2  A household that NO file locates gets a SINGLETON `v` of its own,
 #       never a shared sentinel (which would weld unrelated households into
 #       one cluster) and never NaN (which deletes them downstream) -- the
-#       argument `Nigeria/_/nigeria.py` makes for `moved-{hhid}`.  The
+#       argument `Nigeria/_/nigeria.py` makes for `moved-{hhid}`.  Spelled
+#       `unlocated-{hhid}`: the convention is the singleton, not the word --
+#       these households are not known to have moved.  The
 #       households are put INTO the frame by `_frame`-marked sub-dfs naming
 #       the file that records them (2009-10 AGSEC3B + GSEC12, 2011-12 and
 #       2018-19 AGSEC1), and :func:`sample` then gives every row whose `v` is
@@ -338,12 +340,15 @@ def cluster_features(df):
 #       blank parish code, 2019-20's blank district).
 # ---------------------------------------------------------------------------
 
-#: Prefix of the per-household singleton cluster id.  Spelled EXACTLY as
-#: Nigeria spells it (``Nigeria/_/nigeria.py`` ``cluster_id``:
-#: ``'moved-{hhid}'``), per the GH #1120 D2 ruling.  NOTE: Uganda's
-#: unlocated households are not all movers -- the word is Nigeria's, and the
-#: prefix is an open question for @ligon (see CONTENTS.org).
-SINGLETON_V_PREFIX = 'moved'
+#: Prefix of the per-household singleton cluster id (GH #1120 D2).  The
+#: ruling's "following Nigeria's ``moved-{hhid}``" names the CONVENTION -- one
+#: cluster per household, never a shared sentinel -- not the word: Nigeria's
+#: ``moved-`` is for a household recorded as having left its EA (``ea == 0``),
+#: and these households are not known to have moved; no file locates them.
+#: Coordinator ruling 2026-10-23: ``unlocated-{hhid}``, formatted exactly as
+#: ``Nigeria/_/nigeria.py`` ``cluster_id`` formats its id (Nigeria's own D2
+#: households take the same spelling; its real movers keep ``moved-``).
+SINGLETON_V_PREFIX = 'unlocated'
 
 #: Marker myvar of a wave's PRIMARY cover sub-df in a ``sample`` /
 #: ``cluster_features`` ``dfs:`` block that also reads an alternate cover.
@@ -357,7 +362,7 @@ _COVER_ATTRIBUTES = ('Region', 'Rural', 'District')
 
 
 def singleton_v(hhid):
-    """``moved-{hhid}``: a cluster id that can hold exactly one household.
+    """``unlocated-{hhid}``: a cluster id that can hold exactly one household.
 
     Built as ``Nigeria/_/nigeria.py``'s ``cluster_id`` builds its mover id --
     the prefix, a hyphen, and the household id through ``format_id`` -- and
@@ -2345,6 +2350,13 @@ _INPUT_TABLE = 'harmonize_input'
 # Spelled as Niger defines it (Niger/_/niger.py CROP_NA) and as Mali and the
 # EHCVM siblings inline it.  Uganda wrote 'n/a' before #1119.
 CROP_NA = '(not crop-specific)'
+# A SEED row whose crop field records no crop (UNPS code 0, which no wave's
+# value labels define, or a blank).  Spelled like the corpus's other epistemic
+# index sentinels -- `unknown_condition`, `unknown_season`, `unknown_variety`,
+# `unknown_plot` -- because the raw value is not a crop label: passing '0'
+# through would put a non-label on a label axis.  Measured: 1 row (2011-12,
+# 40 kg of traditional seed on a plot with three other crop rows).
+SEED_CROP_UNKNOWN = 'unknown_crop'
 # pesticide unit scheme is a tiny 1=Kg / 2=Litres code (a3aq24a / a3aq28a),
 # distinct from the UNPS harvest/seed unit scheme reused for seed via
 # harvest_units.  Stored in its own harmonize_pesticide_unit table.
@@ -2548,7 +2560,14 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
         crop_code = (_to_int_code(df4a[sc['crop']])
                      if sc.get('crop') and sc['crop'] in df4a.columns
                      else pd.Series([pd.NA] * len(df4a), index=df4a.index, dtype='Int64'))
-        j = crop_code.map(lambda c: crop_map.get(int(c), pd.NA)
+        # A seed is CROP-specific, so an unresolved crop is never the
+        # not-crop-specific marker (GH #1119 follow-up).  A recorded code
+        # harmonize_crop does not map passes through as itself -- Mali's and
+        # Niger's rule that an unmapped recorded crop keeps its own label
+        # (Mali/_/mali.py, niger._crop_labels).  Code 0 is no crop at all: it
+        # is not a code in the UNPS crop scheme (no value label in any wave)
+        # and is filled with SEED_CROP_UNKNOWN below, after the keep test.
+        j = crop_code.map(lambda c: crop_map.get(int(c), str(int(c)) if int(c) != 0 else pd.NA)
                           if pd.notna(c) else pd.NA)
 
         qty = (pd.to_numeric(df4a[sc['qty']], errors='coerce')
@@ -2596,7 +2615,12 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
         # purchased, or a crop label) — a plot-crop with a recorded seed.
         keep = (piece['Quantity'].notna() | piece['Improved'].notna()
                 | piece['Purchased'].notna() | piece['j'].notna())
-        pieces.append(piece[keep.values])
+        piece = piece[keep.values].copy()
+        # A kept seed row that records no crop (code 0 / blank) is still a
+        # crop's seed: the epistemic sentinel, never CROP_NA.
+        piece['j'] = piece['j'].astype('object').where(piece['j'].notna(),
+                                                       SEED_CROP_UNKNOWN)
+        pieces.append(piece)
 
     cols = ['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']
     if not pieces:
@@ -2619,7 +2643,13 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
     # grain") rather than collapsing — 37.9% of seeded plots in 2011-12 carry
     # >1 crop.  The marker keeps the level non-null so it is a valid index
     # level.  It was spelled 'n/a' until GH #1119 (@ligon 2026-10-23: one
-    # marker everywhere, the EHCVM / Mali spelling).
+    # marker everywhere, the EHCVM / Mali spelling).  Seed rows never reach
+    # this fill: their j is a crop label, a passed-through code or
+    # SEED_CROP_UNKNOWN (set in the seed block above).
+    is_seed = df['input'] == input_map.get(_INPUT_BASE['seed'], 'Seed')
+    if df.loc[is_seed, 'j'].isna().any():
+        raise ValueError(f"Uganda plot_inputs {t}: a seed row has no j "
+                         f"(GH #1119: a seed is crop-specific)")
     df['j'] = df['j'].astype('object').where(df['j'].notna(), CROP_NA)
 
     df = df.set_index(['t', 'i', 'plot_id', 'input', 'j', 'season'])

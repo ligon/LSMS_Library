@@ -357,8 +357,8 @@ class TestClusterFeatures:
         cf = built['cluster_features'].reset_index()
         vals = cf.loc[cf['t'] == wave, 'v'].dropna().astype(str)
         # GH #1120 D2: a cover household with a blank district is its own
-        # one-household cluster, `moved-{hhid}` (2019-20 has exactly one).
-        single = vals.str.startswith('moved-')
+        # one-household cluster, `unlocated-{hhid}` (2019-20 has exactly one).
+        single = vals.str.startswith('unlocated-')
         n_single = int(single.sum())
         assert n_single == {'2018-19': 0, '2019-20': 1}[wave], n_single
         vals = vals[~single]
@@ -410,12 +410,12 @@ class TestClusterFeatures:
         have = set(map(tuple, cf[['t', 'v']].dropna().astype(str).values))
         want = set(map(tuple, sm[['t', 'v']].dropna().drop_duplicates().astype(str).values))
         orphans = want - have
-        # GH #1120 D2: a `moved-{hhid}` singleton is a cluster_features row
+        # GH #1120 D2: a `unlocated-{hhid}` singleton is a cluster_features row
         # only where a cover page recorded the household (it then carries
         # that household's Region / Rural / District).  The 127 households only
         # a non-cover file records -- 2009-10 4 (AGSEC3B / GSEC12), 2011-12 57
         # and 2018-19 66 (AGSEC1) -- have no attribute to serve.
-        single = {p for p in orphans if p[1].startswith('moved-')}
+        single = {p for p in orphans if p[1].startswith('unlocated-')}
         n_single = len(single)
         assert n_single == 127, n_single
         n_orphan = len(orphans - single)
@@ -506,15 +506,15 @@ class TestClusterGrainHook:
 
     def test_a_cover_household_with_no_cluster_id_is_its_own_cluster(self, hook):
         """GH #1120 D2: a household the cover page records (it has a Region)
-        but locates in no cluster gets its singleton `moved-{hhid}` -- the
+        but locates in no cluster gets its singleton `unlocated-{hhid}` -- the
         same id `sample` gives it -- not a drop."""
         df = self._frame([
             {'t': 't1', 'v': 'c1', 'i': 'h1', 'Region': 'Central'},
             {'t': 't1', 'v': None, 'i': 'h2', 'Region': 'Western'},
         ])
         out = hook(df)
-        assert sorted(out.index.get_level_values('v')) == ['c1', 'moved-h2']
-        assert out.loc[('t1', 'moved-h2'), 'Region'] == 'Western'
+        assert sorted(out.index.get_level_values('v')) == ['c1', 'unlocated-h2']
+        assert out.loc[('t1', 'unlocated-h2'), 'Region'] == 'Western'
 
     def test_missing_v_is_an_error_not_a_silent_reshape(self, hook):
         df = pd.DataFrame({'t': ['t1'], 'i': ['h1'], 'Region': ['Central']}).set_index(['t', 'i'])

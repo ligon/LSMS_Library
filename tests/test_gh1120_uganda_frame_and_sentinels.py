@@ -4,7 +4,9 @@
   that cover, with that cover's weight (2015-16: AGSEC1's ``parish_code`` and
   ``hwgt_W5``).
 * D2 -- a household that no file locates gets a SINGLETON ``v`` of its own,
-  ``moved-{hhid}`` as Nigeria spells it, never NaN and never a shared sentinel.
+  ``unlocated-{hhid}`` -- Nigeria's one-cluster-per-household convention
+  (``moved-{hhid}``), spelled for a household not known to have moved --
+  never NaN and never a shared sentinel.
 * D3 -- a plot-grain row whose plot id is blank in the source gets
   ``plot_id = 'unknown_plot'``.
 * #1119 -- the not-crop-specific ``plot_inputs`` ``j`` marker is
@@ -49,15 +51,15 @@ def uganda_module():
 # D2: the singleton
 # ---------------------------------------------------------------------------
 
-def test_singleton_v_is_nigerias_spelling(uganda_module):
+def test_singleton_v_follows_nigerias_convention(uganda_module):
     from lsms_library.local_tools import format_id
     u = uganda_module
     got = u.singleton_v("1013000101")
-    assert got == "moved-1013000101"
+    assert got == "unlocated-1013000101"
     # The v-join maps v through format_id; it must leave the singleton alone.
     assert format_id(got) == got
     # A float-rendered id is canonicalised first, as Nigeria's cluster_id does.
-    assert u.singleton_v(1013000101.0) == "moved-1013000101"
+    assert u.singleton_v(1013000101.0) == "unlocated-1013000101"
     assert u.singleton_v(None) is None
     assert u.singleton_v(np.nan) is None
 
@@ -82,7 +84,7 @@ def test_sample_hook_gives_every_unlocated_household_its_own_v(uganda_module):
     assert n_na == 0, f"{n_na} household(s) still have no v"
     assert v.loc[("2019-20", "A")] == "KAMPALA/X"
     singles = [v.loc[("2019-20", h)] for h in ("B", "C", "D")]
-    assert singles == ["moved-B", "moved-C", "moved-D"]
+    assert singles == ["unlocated-B", "unlocated-C", "unlocated-D"]
     # Never a SHARED sentinel: one cluster per household.
     n_distinct = len(set(singles))
     assert n_distinct == 3, f"{n_distinct} != 3"
@@ -106,7 +108,7 @@ def test_sample_hook_collapses_frame_extension_repeats(uganda_module):
     n = len(out)
     assert n == 2, f"{n} != 2"
     assert "_frame" not in out.columns
-    assert out.loc[("2009-10", "E"), "v"] == "moved-E"
+    assert out.loc[("2009-10", "E"), "v"] == "unlocated-E"
     assert out.loc[("2009-10", "A"), "v"] == "10110001"
 
 
@@ -198,8 +200,8 @@ def test_cluster_features_hook_singletons_cover_rows_only(uganda_module):
     with pytest.warns(UserWarning, match="dropping 1 household"):
         out = u.cluster_features(df)
     keys = set(out.index.get_level_values("v"))
-    assert keys == {"D1/P1", "moved-C"}
-    assert out.loc[("2019-20", "moved-C"), "Region"] == "Eastern"
+    assert keys == {"D1/P1", "unlocated-C"}
+    assert out.loc[("2019-20", "unlocated-C"), "Region"] == "Eastern"
 
 
 # ---------------------------------------------------------------------------
@@ -245,6 +247,30 @@ def test_plot_inputs_keeps_plotless_rows_and_marks_not_crop_specific(
     # #1119: the marker, not 'n/a'.
     js = set(flat["j"])
     assert js == {"(not crop-specific)"}, f"{len(js)} j value(s)"
+
+
+def test_seed_rows_never_carry_the_not_crop_specific_marker(uganda_module,
+                                                          monkeypatch):
+    """GH #1119 follow-up: a seed is crop-specific.  790 is Watermelon (the
+    2013-14 / 2015-16 AGSEC4A value label; now in harmonize_crop); an
+    unmapped recorded code passes through as itself (Mali / Niger); code 0
+    records no crop and is the epistemic 'unknown_crop'."""
+    u = uganda_module
+    monkeypatch.chdir(countries_root() / "Uganda" / "_")
+    sc = u.INPUT_COLMAPS["2013-14"]["seed"]
+    df4a = pd.DataFrame({
+        sc["hhid"]: ["H00110-04-01"] * 4,
+        sc["parcel"]: [1.0, 1.0, 1.0, 1.0],
+        sc["plot"]: [1.0, 1.0, 1.0, 1.0],
+        sc["crop"]: [130.0, 790.0, 0.0, 777.0],
+        sc["qty"]: [5.0, 2.0, 40.0, 1.0],
+        sc["unit"]: [1.0, 1.0, 1.0, 1.0],
+        sc["seed_type"]: [1.0, 1.0, 1.0, 2.0],
+    })
+    out = u.plot_inputs_for_wave("2013-14", None, None, df4a,
+                                 u.INPUT_COLMAPS["2013-14"])
+    js = sorted(out.index.get_level_values("j"))
+    assert js == ["777", "Maize", "Watermelon", "unknown_crop"], js
 
 
 def test_plot_labor_plotless_rows_carry_unknown_plot(uganda_module):
@@ -306,7 +332,7 @@ def test_sample_has_no_missing_v(uga_sample):
 @pytest.mark.requires_s3
 def test_sample_singletons_are_one_household_each(uga_sample):
     flat = uga_sample.reset_index()
-    single = flat[flat["v"].astype(str).str.startswith("moved-")]
+    single = flat[flat["v"].astype(str).str.startswith("unlocated-")]
     per = single.groupby(["t", "v"]).size()
     n_shared = int((per > 1).sum())
     assert n_shared == 0, f"{n_shared} singleton v shared by >1 household"
@@ -326,7 +352,7 @@ def test_2015_16_agsec1_households_are_located(uga_sample):
     w = flat[flat["t"] == "2015-16"]
     n = len(w)
     assert n == 3305 + 72, f"{n} != {3305 + 72}"
-    n_moved = int(w["v"].astype(str).str.startswith("moved-").sum())
+    n_moved = int(w["v"].astype(str).str.startswith("unlocated-").sum())
     assert n_moved == 0, f"{n_moved} singleton(s) in 2015-16"
 
 
@@ -355,8 +381,16 @@ def test_plot_tables_have_no_null_plot_or_v(uga, table):
 
 @pytest.mark.requires_s3
 def test_plot_inputs_marker_is_canonical(uga):
-    j = pd.Series(uga.plot_inputs().index.get_level_values("j"))
+    pi = uga.plot_inputs()
+    j = pd.Series(pi.index.get_level_values("j"))
     n_old = int((j == "n/a").sum())
     assert n_old == 0, f"{n_old} rows still carry 'n/a'"
     n_new = int((j == "(not crop-specific)").sum())
     assert n_new > 0
+    # A seed is crop-specific: no seed row carries the marker (GH #1119
+    # follow-up; 6 did before 790 Watermelon and 'unknown_crop').
+    inp = pd.Series(pi.index.get_level_values("input"))
+    n_seed = int(((inp == "Seed") & (j == "(not crop-specific)")).sum())
+    assert n_seed == 0, f"{n_seed} seed rows carry the marker"
+    n_unknown = int((j == "unknown_crop").sum())
+    assert n_unknown == 1, f"{n_unknown} != 1 unknown_crop seed rows"

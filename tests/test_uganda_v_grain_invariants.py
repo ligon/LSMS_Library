@@ -120,7 +120,7 @@ class TestNoRosterHouseholdFallsIntoTheMoverBucket:
 
     Since GH #1120 D2 (@ligon 2026-10-23) Uganda has no such rows: every
     household ``sample()`` holds has a ``v`` -- a cluster, or its own
-    ``moved-{hhid}`` singleton -- and the frame holds every roster household
+    ``unlocated-{hhid}`` singleton -- and the frame holds every roster household
     (2018-19's 66 GSEC2/AGSEC1-only households included).  So the warning
     must NOT fire, and no household may land in the shared bucket, where it
     would be welded to every other unlocated household.  Before #1120 this

@@ -58,8 +58,9 @@ sample:
     # the full rationale.
     #
     # GH #1120 D2 (@ligon 2026-10-23): a household with neither -- the 24
-    # "no comm, no GPS" households -- gets a SINGLETON `v` (`moved-{hhid}`,
-    # Nigeria's convention) from the country hook `uganda.sample`, never NaN.
+    # "no comm, no GPS" households -- gets a SINGLETON `v` (`unlocated-{hhid}`:
+    # Nigeria's one-cluster-per-household convention, spelled for a household
+    # no file locates) from the country hook `uganda.sample`, never NaN.
     # `df_frame` puts into the frame the households that no 2009-10
     # cover records but a served table does: 3 split-off ids found only in
     # the season-B agriculture modules (AGSEC3B/4B/5B; plot_labor,

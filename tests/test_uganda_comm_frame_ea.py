@@ -293,8 +293,8 @@ class TestServed:
         for wave in SEVEN_CHAR_WAVES:
             v = served[served.t == wave].v.dropna()
             # GH #1120 D2: a household no file locates is its own cluster,
-            # `moved-{hhid}` -- not an EA code, so not this test's subject.
-            real = v[~v.str.startswith("@") & ~v.str.startswith("moved-")]
+            # `unlocated-{hhid}` -- not an EA code, so not this test's subject.
+            real = v[~v.str.startswith("@") & ~v.str.startswith("unlocated-")]
             odd = set(real[real.str.len() != 8])
             n_odd = len(odd - {UNMAPPED})
             assert n_odd == 0, f"{wave}: {n_odd} non-8-digit EA code(s)"
@@ -303,9 +303,9 @@ class TestServed:
         v = served[served.t == "2009-10"].v
         bins = v[v.str.startswith("@").fillna(False)]
         # GH #1120 D2 (2026-10-23): the 24 "no comm, no GPS" households used
-        # to be served v = NA; each is now its own `moved-{hhid}` cluster, and
+        # to be served v = NA; each is now its own `unlocated-{hhid}` cluster, and
         # so are the 4 households only AGSEC3B / GSEC12 record -- 28 in all.
-        single = v[v.str.startswith("moved-").fillna(False)]
+        single = v[v.str.startswith("unlocated-").fillna(False)]
         got = (len(bins), bins.nunique(), int(v.isna().sum()), len(single),
                single.nunique())
         assert got == (541, 339, 0, 28, 28), got
@@ -314,9 +314,9 @@ class TestServed:
         # GH #1120 D2: 2011-12's frame now holds the 57 households only its
         # agriculture cover (AGSEC1) records; 30 of them are 2010-11
         # households.  No 2011-12 file locates them, so each is its own
-        # `moved-{hhid}` cluster and cannot keep its 2010-11 EA.  Every
+        # `unlocated-{hhid}` cluster and cannot keep its 2010-11 EA.  Every
         # household 2011-12's GSEC1 locates still keeps its v.
-        located = served[~served.v.astype(str).str.startswith("moved-")]
+        located = served[~served.v.astype(str).str.startswith("unlocated-")]
         kept, linked = _keep(located, "2010-11", "2011-12")
         assert kept == linked == 2510, (kept, linked)
         _, linked_all = _keep(served, "2010-11", "2011-12")
@@ -328,7 +328,7 @@ class TestServed:
         v09 = served[served.t == "2009-10"].set_index("i").v
         # A bin, a GH #1120 D2 singleton (it was NA until 2026-10-23) and NA
         # are not real EAs.
-        real = v09[~(v09.str.startswith("@") | v09.str.startswith("moved-")).fillna(True)]
+        real = v09[~(v09.str.startswith("@") | v09.str.startswith("unlocated-")).fillna(True)]
         assert kept == len(real.index.intersection(
             served[served.t == "2005-06"].set_index("i").index))
         assert (kept, linked) == (2410, 2607)

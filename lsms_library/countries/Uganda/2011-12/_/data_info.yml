@@ -45,7 +45,8 @@ sample:
     # for them (no geographic column at all in this wave).  `df_ag` puts them
     # into the frame (the `_frame` marker; `i` only) so the plot tables'
     # households have a `sample` row; the country hook `uganda.sample` gives
-    # each a SINGLETON `v` (`moved-{hhid}`, Nigeria's convention), never NaN.
+    # each a SINGLETON `v` (`unlocated-{hhid}`: Nigeria's one-cluster-per-
+    # household convention, spelled for a household no file locates), never NaN.
     # Their weight, strata, Rural and Region are NaN: no file states them.
     dfs:
         - df_main

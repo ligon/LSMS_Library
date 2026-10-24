@@ -862,11 +862,11 @@ class TestTheReproduction:
         wide = idx.pivot_table(index="i", columns="t", values="v",
                                aggfunc="first").dropna()
         # GH #1120 D2: 30 linked households are recorded in 2011-12 only by
-        # its agriculture cover, so their 2011-12 v is a `moved-{hhid}`
+        # its agriculture cover, so their 2011-12 v is a `unlocated-{hhid}`
         # singleton (a household fact, not a renumbering -- Nigeria's stable
         # boundaries carry its movers the same way).  Every household both
         # covers locate keeps its v.
-        single = wide["2011-12"].astype(str).str.startswith("moved-")
+        single = wide["2011-12"].astype(str).str.startswith("unlocated-")
         n_single = int(single.sum())
         assert n_single == 30, n_single
         located = wide[~single]

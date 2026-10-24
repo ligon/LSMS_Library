@@ -467,7 +467,7 @@ class TestUganda2009HybridV:
       - 24 HH are genuinely NA (no comm AND no coords).
 
     GH #1120 D2 (@ligon 2026-10-23): those 24 are no longer NA -- each is its
-    own singleton cluster `moved-{hhid}` -- and the frame also holds the 4
+    own singleton cluster `unlocated-{hhid}` -- and the frame also holds the 4
     households only AGSEC3B / GSEC12 record (3 split-off ids + 1), each a
     singleton too: 2975 -> 2979 rows, 24 NA -> 0, 28 singletons.
     """
@@ -488,7 +488,7 @@ class TestUganda2009HybridV:
     def test_na_exact(self, s09):
         n_na = int(s09["v"].isna().sum())
         assert n_na == 0, f"expected no NA v (GH #1120 D2), got {n_na}"
-        single = s09["v"].astype("string").str.startswith("moved-").fillna(False)
+        single = s09["v"].astype("string").str.startswith("unlocated-").fillna(False)
         n_single = int(single.sum())
         assert n_single == 28, (
             f"expected 28 singleton v's (24 no-comm-no-GPS + 4 frame "
@@ -506,7 +506,7 @@ class TestUganda2009HybridV:
         v = s09["v"].astype("string")
         numeric = v.str.fullmatch(r"\d+", na=False)
         synthetic = v.str.startswith("@").fillna(False)
-        single = v.str.startswith("moved-").fillna(False)   # GH #1120 D2
+        single = v.str.startswith("unlocated-").fillna(False)   # GH #1120 D2
         na = v.isna()
         # No overlap.
         assert not (numeric & synthetic).any()
@@ -601,14 +601,14 @@ class TestUgandaRegionOnSample:
         refreshment tail.
 
         GH #1120 D2: the frame also holds households only a NON-cover file
-        records (2009-10 4, 2011-12 57, 2018-19 66, each a `moved-{hhid}`
+        records (2009-10 4, 2011-12 57, 2018-19 66, each a `unlocated-{hhid}`
         singleton); no file states their Region.  They are counted
         separately, so the cover households' coverage is still checked."""
         unlocated = {"2009-10": 4, "2011-12": 57, "2018-19": 66}
         for wave, sub in uga_sample.groupby("t"):
             v = sub["v"].astype("string")
             no_region = sub["Region"].isna()
-            ext = v.str.startswith("moved-").fillna(False) & no_region
+            ext = v.str.startswith("unlocated-").fillna(False) & no_region
             n_ext = int(ext.sum())
             if wave != "2019-20":
                 assert n_ext == unlocated.get(wave, 0), (wave, n_ext)
