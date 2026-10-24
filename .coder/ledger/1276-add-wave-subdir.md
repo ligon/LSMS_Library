@@ -72,4 +72,15 @@ default (a `HELD` line never claims the whole entry: Malawi holds one round of
 ---
 ### Phase 3 -- verification
 
-Filled in at the end of the task; see the report for the measurements.
+Anchored check against the entries above (head `d9215733b`):
+
+- `_normalise_subdir` / `provenance.normalise_subdir` -- OK (§4, §2 `_fetch_destination`): one directory name; the destination is still `_fetch_destination`'s (`_acquisition_data_dir`).
+- `_check_subdir_acquisition`, `_refuse_unconfined` -- OK (§3 #600, §4): refuse before any download; the second is reachable only when a record has a `#+CATALOG_SUBDIR:` line, so the default path is unchanged (red-team default trace byte-identical to base).
+- `_extract_all_from_zip(refresh_only=)` -- OK (§2, extends #1149's staged extraction; §3 leftovers): a not-placed member is never staged, never shipped.
+- `_AcquiredRelease` (`subdir`, `refresh_only`, `not_placed`), `_receipt_key` -- OK (§2): the existing receipt extended, no parallel ledger; the key is the pre-#1276 one without `subdir=`.
+- `_record_acquired_release` (secondary branch, refresh-only gate) -- OK (§3 held release, #1114 per entry): the same complete-release / confirmed-push gates; under refresh-only a leftover blocks.  Open: the gate on a PRIMARY entry (§6).
+- `held_secondary_entry`, `with_catalog_subdir`, `held_release_of`, `latest_release_of`, `validate_entry_lines` -- OK (§3 #1283 ruling): secondaries only; the primary's scalars untouched.
+- `local_held_idnos` -- OK (§3): secondaries' `HELD` added; nothing else.
+- backfill `secondary_releases`, `held_changed` -- OK (§2 mirrors `latest_release`; §3 #1128): never writes `HELD`.
+- No REINVENTION found: no new reader, writer or hash path; no CONTRADICTION of §3/§4.
+- Census (burst, base `57d255585` vs head): 0 of 549 country, 0 of 40 btf, 0 of 2,109 wave hashes moved (§4).
