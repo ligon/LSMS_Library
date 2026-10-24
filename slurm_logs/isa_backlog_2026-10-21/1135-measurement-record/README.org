@@ -32,3 +32,14 @@ plus docs): census against the same base, again 0 of 549 / 0 of 40 / 0 of
 2,109; served frames and warning texts byte-identical to the =0b471ce87=
 run; =tests/test_sampling.py= 174 passed.
 tests/test_uganda_comm_frame_ea.py (pins the ABSENCE of the warning on Uganda 2010-11/2011-12) at 9986454d3: 30 passed (job 40420956).
+
+* Review round (red team at =13d47fe4a=, @ligon ruling 2026-10-23)
+
+=oracle.json= (job 40424184, =oracle_probe.py=): the served =sample()= joined
+to the raw Nigeria covers on =hhid= (1,493 / 1,493 and 5,067 / 5,067 matched),
+movement markers tabulated for the households whose =v= changes; strict
+one-to-one renumbering counts on every warning boundary; Ethiopia 2015-16 /
+2018-19 shared ids.  =labels.json= (job 40424554, =labels_probe.py=, metadata
+only): the verbatim variable and value labels of those markers.  Both reproduce
+the red team's Nigeria figures independently (2018Q3: 10 / 25 / 50..56;
+2023Q3: 112 / 150 / 226..249; W5 strict K 11, not 12).  Counts and labels only.

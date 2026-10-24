@@ -1,0 +1,212 @@
+{
+ "2016Q1->2018Q3": {
+  "D": 79,
+  "D_real": 10,
+  "D_sentinel": 69,
+  "N": 1493,
+  "N_matched_to_cover": 1493,
+  "ea0_among_D_sentinel": 69,
+  "markers": {
+   "hhidyn": {
+    "changed_all": {
+     "1": 73,
+     "2": 6
+    },
+    "changed_real": {
+     "1": 10
+    },
+    "changed_sentinel": {
+     "1": 63,
+     "2": 6
+    }
+   },
+   "hhsmlc": {
+    "changed_all": {
+     "1": 50,
+     "2": 23,
+     "NA": 6
+    },
+    "changed_real": {
+     "1": 10
+    },
+    "changed_sentinel": {
+     "1": 40,
+     "2": 23,
+     "NA": 6
+    }
+   },
+   "tracked_obs": {
+    "changed_all": {
+     "0": 25,
+     "1": 54
+    },
+    "changed_real": {
+     "0": 10
+    },
+    "changed_sentinel": {
+     "0": 15,
+     "1": 54
+    }
+   }
+  },
+  "strict_k": {
+   "earlier_real_changed": 1,
+   "not_one_to_one": [],
+   "one_to_one": 1
+  }
+ },
+ "2019Q1->2023Q3": {
+  "D": 343,
+  "D_real": 112,
+  "D_sentinel": 231,
+  "N": 5067,
+  "N_matched_to_cover": 5067,
+  "ea0_among_D_sentinel": 231,
+  "markers": {
+   "hh_moved": {
+    "changed_all": {
+     "1": 93,
+     "2": 226,
+     "3": 1,
+     "NA": 23
+    },
+    "changed_real": {
+     "1": 6,
+     "2": 86,
+     "NA": 20
+    },
+    "changed_sentinel": {
+     "1": 87,
+     "2": 140,
+     "3": 1,
+     "NA": 3
+    }
+   },
+   "trackedw4": {
+    "changed_all": {
+     "1": 64,
+     "2": 279
+    },
+    "changed_real": {
+     "2": 112
+    },
+    "changed_sentinel": {
+     "1": 64,
+     "2": 167
+    }
+   },
+   "trackedw5pp": {
+    "changed_all": {
+     "1": 193,
+     "2": 150
+    },
+    "changed_real": {
+     "2": 112
+    },
+    "changed_sentinel": {
+     "1": 193,
+     "2": 38
+    }
+   }
+  },
+  "strict_k": {
+   "earlier_real_changed": 12,
+   "not_one_to_one": [
+    {
+     "households_by_destination": {
+      "real-new": 7,
+      "sentinel": 1
+     },
+     "n_real_new_ids": 1,
+     "real_new_ids_shared_with_other_earlier_ids": 0
+    }
+   ],
+   "one_to_one": 11
+  }
+ },
+ "ethiopia_2015_16_2018_19": {
+  "attribute_agreement_on_shared_v": {
+   "District": [
+    0,
+    3
+   ],
+   "Region": [
+    3,
+    3
+   ],
+   "Rural": [
+    3,
+    3
+   ]
+  },
+  "keyspace_a": 432,
+  "keyspace_b": 535,
+  "shared_i": 0,
+  "shared_v": 3
+ },
+ "strict_k": {
+  "Ethiopia 2011-12->2013-14": {
+   "D": 3776,
+   "N": 3776,
+   "earlier_real_changed": 333,
+   "n_not_one_to_one": 0,
+   "one_to_one": 333
+  },
+  "GhanaLSS 1987-88->1988-89": {
+   "D": 712,
+   "N": 712,
+   "earlier_real_changed": 79,
+   "n_not_one_to_one": 0,
+   "one_to_one": 79
+  },
+  "Tanzania 2010-11->2012-13": {
+   "D": 591,
+   "N": 2904,
+   "earlier_real_changed": 82,
+   "n_not_one_to_one": 0,
+   "one_to_one": 82
+  },
+  "Tanzania 2012-13->2014-15": {
+   "D": 108,
+   "N": 521,
+   "earlier_real_changed": 57,
+   "n_not_one_to_one": 22,
+   "one_to_one": 35
+  },
+  "Tanzania 2014-15->2019-20": {
+   "D": 849,
+   "N": 849,
+   "earlier_real_changed": 74,
+   "n_not_one_to_one": 72,
+   "one_to_one": 2
+  },
+  "Uganda 2005-06->2009-10": {
+   "D": 191,
+   "N": 2601,
+   "earlier_real_changed": 0,
+   "n_not_one_to_one": 0,
+   "one_to_one": 0
+  },
+  "Uganda 2009-10->2010-11": {
+   "D": 433,
+   "N": 2640,
+   "earlier_real_changed": 0,
+   "n_not_one_to_one": 0,
+   "one_to_one": 0
+  },
+  "Uganda 2011-12->2013-14": {
+   "D": 1717,
+   "N": 1717,
+   "earlier_real_changed": 212,
+   "n_not_one_to_one": 147,
+   "one_to_one": 65
+  },
+  "Uganda 2015-16->2018-19": {
+   "D": 2973,
+   "N": 2973,
+   "earlier_real_changed": 788,
+   "n_not_one_to_one": 212,
+   "one_to_one": 576
+  }
+ }
+}

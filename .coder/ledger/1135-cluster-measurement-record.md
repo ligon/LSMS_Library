@@ -65,11 +65,17 @@ Definitions this task fixes (in `sampling.py`, next to `_MEASUREMENT_FIELDS`):
 - `households_changed`: of N, those whose `v` differs (all causes, movers
   included).
 - `households_changed_net_of_movers`: of those, the ones not classified as
-  movers by the stated `mover_rule`; recorded only where a rule was applied.
+  movers by the stated `mover_rule`; recorded only where ONE marker settles
+  it -- nowhere today (see §4, review round).
 - `clusters_renumbered`: distinct earlier-wave cluster IDS (not physical
-  clusters) among linked households that map one-to-one to a different `v`.
-  This is the definition the corpus already uses (GhanaLSS 79, Ethiopia 333,
-  Tanzania 82 are all "cluster pairs").
+  clusters; synthetic ids excluded) among linked households ALL of whose
+  linked households go to one single different `v` that no other earlier id
+  receives.  The corpus's "cluster pairs" usage (GhanaLSS 79, Ethiopia 333,
+  Tanzania 82), made exact after the red team: Nigeria W5 is 11, not 12.
+- `not_applicable`: a count that does not describe the boundary (a
+  renumbering count across a change of KIND, synthetic bins, no linkage, or a
+  wholesale re-layout with movers) -- printed "not applicable", distinct from
+  "not measured".
 
 ## §4 Invariants & assumptions
 
@@ -79,11 +85,15 @@ Definitions this task fixes (in `sampling.py`, next to `_MEASUREMENT_FIELDS`):
   `sample()` fetch would recurse (diagnosis PROPOSAL.md).  Counts come from config.
 - Every frozen field must be used by a shipped record (pinned test), so the
   measurement block may carry no field that no boundary uses.
-- Nigeria's `moved-` sentinel (`ea == 0`) is NOT a complete movement
-  classifier (counts-safe.json: W5 480 movers with a real EA; 254 `ea == 0`
-  households report the original dwelling; the 112 real-id changes split
-  86 original / 6 moved nearby / 20 no status).  So 112/5,067 is not "net of
-  movers"; 86..106 is conditional on the W5 question's reference interval.
+- Nigeria's `moved-` sentinel (`ea == 0`) is NOT a movement classifier: it
+  misses movers with a real EA (W5: 480) and marks non-movers (2018Q3: 40 of
+  the 69 sentinel households answer `hhsmlc` = 1; 2023Q3: 140 of 231 answer
+  `hh_moved` = 2).  Review round (red team + @ligon 2026-10-23): the net
+  count depends on the marker -- 2018Q3 10 / 25 / 50..56 (sentinel /
+  `tracked_obs` / `hhsmlc`), 2023Q3 112 / 150 / 226..249 (sentinel /
+  `trackedw5pp` / `hh_moved`) -- so NEITHER boundary records a net count; the
+  first round's 10/1,493 and "86..106" are withdrawn (the latter counted
+  only real-id changes and was wrong under its own condition).
 - Burkina 2014 -> 2018-19 shares 583 `i` by id COLLISION: N there is 0, cited
   to `panel_ids.py` / the cover, never to `sample()`.  Niger: 0 shared `i` by
   construction (`E_` prefix), not evidence; no-linkage cited the same way.
@@ -93,8 +103,9 @@ Definitions this task fixes (in `sampling.py`, next to `_MEASUREMENT_FIELDS`):
 | quantity | decision | reason |
 |---|---|---|
 | N / changed / renumbered per boundary | reuse (lift from the current `cluster_id_note`) | already measured and committed; re-measuring is out of scope |
-| net of movers | reuse for Nigeria 2018Q3 only (10/1,493) | the only boundary with a mover rule applied (sentinel + `hhsmlc` = same location for all 10); the 2026-10-19 ruling itself names the 0.67% |
-| Nigeria 2023Q3 net of movers | not recorded as a count | 86..106 is conditional; 112 is sentinel-net only; both stay in the block's `note`, which the warning never prints |
+| net of movers | not recorded anywhere (review ruling 2026-10-23) | marker-dependent; the per-marker counts go in each Nigeria block's `note`; the field stays in the schema, its non-use named in `_MEASUREMENT_FIELDS_UNUSED` |
+| K where it does not describe the boundary | `not_applicable` | Uganda x4, Burkina Faso, Niger, Tanzania 2019-20 |
+| Tanzania 2012-13 -> 2014-15 K | 35, confidence medium | red-team count reproduced on the served sample; partly rests on the unverified r_hhid linkage |
 | schema | extend `_PANEL_FIELDS` + new `_MEASUREMENT_FIELDS` | the freeze is widened by editing a frozenset with a reason |
 | first-line formatter | extend `_format_cluster_report` | detail lines kept verbatim (tests match them) |
 
@@ -125,3 +136,9 @@ Definitions this task fixes (in `sampling.py`, next to `_MEASUREMENT_FIELDS`):
 - Cache: 0 of 549 / 40 / 2,109 (base `57d255585` vs branch `0b471ce87`).
   Served `sample` and `cluster_features` identical for all 7 countries.
   Evidence: `slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/`.
+- Review round (red team at `13d47fe4a`): Nigeria figures corrected against
+  the raw covers (`oracle.json` in the evidence dir); validator tightened
+  (K <= D <= N, block only on warning boundaries, string fields, plain-decimal
+  YAML integers); "not applicable" vs "not measured"; SPAN qualifier on
+  line 1; `unobservable` / `redefined` glosses reconciled.  All 26 red-team
+  mutants retargeted plus 14 new: 39 killed, 1 equivalent (M04b).

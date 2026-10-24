@@ -1,0 +1,46 @@
+{
+ "Nigeria/2018-19/Data/secta_plantingw4.dta": {
+  "hhsmlc": {
+   "label": "DOES THE HOUSEHOLD LIVE AT THE SAME LOCATION?",
+   "values": {
+    "1": "1. YES",
+    "2": "2. MOVED WITHIN LOCALITY"
+   }
+  },
+  "tracked_obs": {
+   "label": "TRACKED OBSERVATION",
+   "values": {}
+  },
+  "hhidyn": {
+   "label": "HAVE YOU BEEN ABLE TO IDENTIFY AND LOCATE THE HOUSEHOLD?",
+   "values": {
+    "1": "1. YES",
+    "2": "2. NO"
+   }
+  }
+ },
+ "Nigeria/2023-24/Data/Post Planting Wave 5/Household/secta_plantingw5.dta": {
+  "hh_moved": {
+   "label": "HAS THE HOUSEHOLD MOVED FROM THE ORIGINAL LOCATION?",
+   "values": {
+    "1": "1. YES, MOVED CLOSE TO ORIGINAL DWELLING",
+    "2": "2. NO, IN ORIGINAL DWELLING",
+    "3": "3. YES, MOVED FAR FROM ORIGINAL DWELLING"
+   }
+  },
+  "trackedw4": {
+   "label": "WAS THIS HOUSEHOLD TRACKED DURING W4?",
+   "values": {
+    "1": "1. YES",
+    "2": "2. NO"
+   }
+  },
+  "trackedw5pp": {
+   "label": "WAS THIS HOUSEHOLD TRACKED DURING POST-PLANTING W5?",
+   "values": {
+    "1": "1. YES",
+    "2": "2. NO"
+   }
+  }
+ }
+}
