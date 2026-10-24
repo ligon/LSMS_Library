@@ -287,7 +287,10 @@ Data Scheme:
     #   j      — the seed's crop, on harmonize_crop labels, for seed rows;
     #            the canonical marker '(not crop-specific)' for fertilizer /
     #            pesticide rows (no crop linkage; spelled 'n/a' until GH #1119,
-    #            @ligon 2026-10-23).  In the index so per-crop seed rows on a
+    #            @ligon 2026-10-23).  A seed row never carries the marker: an
+    #            unmapped recorded crop code passes through as itself, and a
+    #            seed row recording no crop (code 0) is 'unknown_crop'.  In the
+    #            index so per-crop seed rows on a
     #            multi-crop plot stay distinct (plot-crop seed grain) — ~38%
     #            of seeded plots carry >1 crop.
     #   season — 'A' (first season) / 'B' (second season).  Carried in the

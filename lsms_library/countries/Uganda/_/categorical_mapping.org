@@ -729,6 +729,14 @@
 # Pawpaw into 'Other Fruits', Eggplant / Pumpkins / Carrots into
 # 'Other Veg.'.  Folding a named crop into a residual bucket is a
 # modelling decision, not a defect, and it is lossy in one direction only.
+#
+# Added 2026-10-23 (GH #1119 follow-up): 790 Watermelon.  The 2013-14 and
+# 2015-16 AGSEC4A value labels on =cropID= read 790 = "Watermelon"; the code
+# was missing here, so 5 seed rows (2013-14 4, 2015-16 1) were served the
+# not-crop-specific marker.  Named, like Avocado / Pineapple / Pawpaw, rather
+# than folded into the food module's 'Other Fruits' (harmonize_food code 169
+# Watermelon -> Aggregate 'Other Fruits').  Code 790 occurs in no wave's
+# AGSEC5A/5B, so crop_production gains no row from it.
 #+name: harmonize_crop
 | Code | Preferred Label  |
 |------+------------------|
@@ -775,6 +783,7 @@
 |  760 | Jackfruit        |
 |  770 | Avocado          |
 |  780 | Passion Fruits   |
+|  790 | Watermelon       |
 |  810 | Coffee           |
 |  811 | Coffee           |
 |  812 | Coffee           |
