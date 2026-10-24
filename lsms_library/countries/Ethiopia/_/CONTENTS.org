@@ -512,11 +512,52 @@ of every table is unchanged, except
 the within-wave mean-1 weight normalisation, which moves every W2-W5 weight
 by at most 0.12% / 0.07% / 0.74% / 0.12% (W1 unchanged).
 
-*Not done, and recorded.*  The new =v= values in EAs with no household-cover
-row (1 / 1 / 6 / 3 EAs in W2-W5) join no =cluster_features= row, so a
-=market== lookup gives those households NA.  The agriculture cover carries
-region / zone / woreda for them; adding those EAs to =cluster_features= is
-outside D1's ruling.
+*=cluster_features= follows (2026-10-23, coordinator ruling on the Nigeria
+precedent: =sample.v= and =cluster_features.v= are one keyspace).*  The new
+=v= values in EAs with no household-cover row -- 1 / 1 / 6 / 3 EAs in W2-W5 --
+used to join no =cluster_features= row.  =ethiopia.cluster_features=, the
+=df_edit= hook of every wave's YAML =cluster_features=, now appends at
+household grain the agriculture-only households of exactly those EAs, and
+=Wave.cluster_features='s audited Site 2 collapse projects them like every
+other EA.  The YAML blocks, the site-4 merge guard and the GH #323 tests are
+unchanged (why not Nigeria's script path: Nigeria needed one cover PER ROUND
+inside one wave folder, which YAML could not express; Ethiopia needs only an
+append, and Malawi 2016-17's =cluster_features= hook is the precedent).
+- *Only EAs the household cover lacks.*  An EA it has keeps the household
+  cover as authoritative (the YAML's own =merge_how: left= rationale).
+  Measured: W2's 24 and W4's 60 agriculture-only households in existing EAs
+  sit at exactly their EA's fix, W3's 17 have none, and W5's 11 include one
+  120 km from its EA's fix -- appending them would add projection noise and
+  nothing else.
+- =Region= / =District= / =Rural= are decoded by code through the values the
+  frame's own household-cover rows carry (household labels after the YAML
+  =mapping:=), so all 11 new EAs are spelled as the YAML spells the rest;
+  =District= codes are only unique within a region, but code -> served value
+  is still a function in every wave (checked).
+- GPS from the wave's geovariables file, by household, where present: the
+  W2, W4 and W5 files carry exactly the agriculture-only households the
+  household cover lacks (the "25 / 124 / 35 households the cover does not"
+  that the YAML's =merge_how: left= comments name); W3's carries none of its
+  27.  So 10 of the 11 new EAs have a fix; W3's has none.
+
+Measured cold (my previous branch head -> this change): =cluster_features=
+2,168 -> 2,179 rows (333 / 434 / 433 / 541 / 438), every existing =(t, v)= row
+identical; 0 =sample= =(t, v)= without a =cluster_features= row in every wave;
+added rows: Region / District / Rural never null, Rural 10 Rural + 1 Urban.
+Grain audit: W3's 10 new households project to one EA losslessly (the
+collapse's =dropped= 4,522 -> 4,531); W5's new EAs mix households with and
+without a fix, so its =GrainCollapseWarning= moves 1,240 -> 1,257 rows
+destroyed, 111 -> 113 groups (the selector serves the row with the fix).
+Every other table is identical.
+
+*A =market== lookup DROPS what it cannot place* -- =Country._add_market_index=
+ends in =dropna(subset=['m'])= (it does not serve =m= = NA).  Ethiopia's
+=sample()= has no =Region=, so =market='Region'= falls back to
+=cluster_features= by =(t, v)=.  Rows served by =market='Region'=:
+development drops the 1,823 / 882 / 942 / 387 / 1 rows with no =v=
+(=plot_labor= / =plot_inputs= / =plot_features= / =crop_production= /
+=interview_date=); after D1 alone the 1,323 / 612 / 616 / 321 plot-table
+rows of the 11 new EAs were still dropped (2,872); now every row is served.
 
 ** Panel crosswalk: the agriculture-only households are walked (GH #1120, 2026-10-23)
 

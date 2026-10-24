@@ -35,13 +35,17 @@ Three @ligon rulings of 2026-10-23, applied to Ethiopia:
 | `_attach_sect12_sales` | `ethiopia.py:2103` | §12 sale onto a one-plot (holder, crop) row; 8-class partition; stamps `sect12-sale-period` | `test_ethiopia_crop_production_sect12.py` | **reuse** -- minted rows go through it unchanged |
 | `_no_sale_reading` / `derive_sect12_sale` | `ethiopia.py:1890` / `:1864` | a "No" with blank cells is a sale of 0 (GH #1253) | yes | reuse |
 | empty-row filter | `ethiopia.py:2818` (development `:2457`, commit `0663ac4fe`, PR #1274) | keeps a row with any of Quantity / Quantity_sold / Value_sold | `test_ethiopia_crop_production_empty_row_filter.py` | already landed -- cited, not changed |
-| `PERMANENT_CROP_WINDOW_DERIVATION` | `ethiopia.py`, `Ethiopia/_/derivations.yml` | W4/W5 12-month window key (GH #1256) | `test_..._1256_permanent_window.py` | **extend** (waves + W1 clause; `inputs` W1 branch) |
+| `HARVEST_WINDOW_DERIVATION` (was `PERMANENT_CROP_WINDOW_DERIVATION`) | `ethiopia.py`, `Ethiopia/_/derivations.yml` | the 12-month window key (GH #1256), renamed `12-month-harvest-window` before release | `test_..._1256_permanent_window.py` | **extend** (waves + W1 clause; `inputs` W1 branch; renamed) |
 | `derivations.MULTI_SEP` | `derivations.py:115` | separator for two keys on one row; `_key_counts` splits it | yes | reuse (imported, not copied) |
 | EHCVM / Mali `CROP_NA` | `Niger/_/niger.py:668`, `Mali/_/mali.py:715` | `'(not crop-specific)'` | yes | **reuse** the name and value |
 
-New: `ethiopia.with_agriculture_cover_households` (`ethiopia.py:611`),
-`ethiopia.ea_id2_crosswalk` (`:588`), `ethiopia._mint_sect12_rows`
-(`:2376`), `ethiopia._inputs_sect12_minted_rows` (`:2009`).
+New: `ethiopia.with_agriculture_cover_households`, `ethiopia.ea_id2_crosswalk`,
+`ethiopia._agriculture_only_households` / `_decode_codes` (shared by the
+sample helper and the hook), `ethiopia.cluster_features` (the `df_edit` hook
+of every wave's YAML `cluster_features`; Malawi 2016-17 `mapping.py`
+`cluster_features` is the hook precedent, Nigeria `16636094f` the
+one-keyspace precedent), `ethiopia._mint_sect12_rows`,
+`ethiopia._inputs_sect12_minted_rows`.
 
 Prior art the brief named: Uganda's §11/§12 handling -- Uganda has no
 holder-grain tree-crop module (its AGSEC5 sales are plot-grain), so it offers
@@ -98,17 +102,18 @@ derivation), Malawi Module P / Q (single-plot sale attachment), and
 
 ## §6 Open questions for the human
 
-- **The window key's name on W1 rows.**  `permanent-crop-12-month-window` now
-  also labels W1 §12 Q3 harvests, and W1 §12's roster includes root crops and
-  vegetables (2,040 of the 3,740 unique-field lines' §4 rows say "not a tree
-  fruit crop": garlic, leafy greens, potato...).  The key records the WINDOW,
-  and its rule says so; whether the name should become crop-neutral is a
-  naming decision (it would rename a key served on W4/W5 rows too).
-- **`cluster_features` coverage of the new `v`s.**  Households from the
-  agriculture cover sit in 1 / 1 / 6 / 3 EAs (W2-W5) with no household-cover
-  row, so those `v` join no `cluster_features` row (`market=` lookups give
-  NA).  The agriculture cover carries region / zone / woreda for them; adding
-  those EAs to `cluster_features` is outside D1's ruling.
+Both questions raised in the first round were settled by the coordinator on
+precedent (2026-10-23) and are done:
+
+- The window key's name -> renamed `12-month-harvest-window` in W1, W4 and W5
+  (a key names an OPERATION; the key was unreleased).
+- `cluster_features` coverage of the new `v`s -> the agriculture-only EAs
+  (1 / 1 / 6 / 3, W2-W5) get rows through the `cluster_features` hook (one
+  `v` keyspace with `sample`, the Nigeria ruling).  Scope decision: EAs the
+  household cover already has are NOT extended -- the household cover stays
+  authoritative there (the YAML's own `merge_how: left` rationale); W2/W4's
+  agriculture households in existing EAs share their EA's fix exactly, but one
+  W5 household sits 120 km from its EA's fix.
 
 ---
 ### Phase 3 — verification
@@ -131,6 +136,13 @@ frame-diffed with base rows re-keyed through the crosswalk delta.
 - window-key widening + MULTI_SEP join — OK (§2 MULTI_SEP reused, not copied;
   a string constant reaches no build fingerprint).
 - Empty-row filter — not changed; verified landed (`0663ac4fe`).
+- `cluster_features` hook (round 2) — OK, REUSE (§2 shared selection /
+  decode helpers; the Malawi hook and the Nigeria one-keyspace precedents):
+  +11 EAs, every existing `(t, v)` row identical; every `sample` `(t, v)` has a
+  cluster row; `market='Region'` no longer drops 2,872 plot-table rows.
+- Window-key rename (round 2) — OK (§3 a key names an operation): only
+  `Derivation` moves, on exactly the 10,941 window rows; W1 3,270 / W4 3,796 /
+  W5 3,875.
 
 Hash census: Ethiopia 25 / 25 country and 125 / 125 wave hashes; 0 / 40
 `build_transforms_fingerprint`; no other country.

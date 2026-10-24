@@ -360,3 +360,41 @@ def test_ethiopia_plot_tables_are_clean_on_v(table):
     v = df.index.get_level_values("v") if "v" in df.index.names else df["v"]
     n_na = int(pd.isna(v).sum())
     assert n_na == 0, (table, n_na)
+
+
+@pytest.mark.requires_s3
+def test_cluster_features_holds_every_sample_ea(sample):
+    """One v keyspace: every (t, v) sample() serves has a cluster_features row.
+    The hook adds the 1 / 1 / 6 / 3 agriculture-only EAs (W2-W5)."""
+    from lsms_library import Country
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        cf = Country("Ethiopia").cluster_features()
+    t = cf.index.get_level_values("t")
+    got = {w: int((t == w).sum()) for w in WAVES}
+    assert got == {"2011-12": 333, "2013-14": 434, "2015-16": 433,
+                   "2018-19": 541, "2021-22": 438}, got
+    keys = set(zip(t, cf.index.get_level_values("v")))
+    sv = sample["v"] if "v" in sample.columns else sample.index.get_level_values("v")
+    pairs = list(zip(sample.index.get_level_values("t"), sv))
+    n_missing = sum(1 for p in pairs if p not in keys)
+    assert n_missing == 0, n_missing
+    n_region = int(cf["Region"].isna().sum())
+    assert n_region == 0, n_region
+
+
+@pytest.mark.requires_s3
+@pytest.mark.parametrize("table", ["plot_inputs", "plot_labor", "crop_production",
+                                   "plot_features"])
+def test_a_market_lookup_keeps_every_plot_row(table):
+    """``market='Region'`` drops a row it cannot place (``dropna(subset=['m'])``
+    in ``Country._add_market_index``).  Before D1 the rows with no v were
+    dropped; after D1 without the cluster_features hook, the rows of the 11
+    agriculture-only EAs (2,872 plot-table rows) were.  Now none is."""
+    from lsms_library import Country
+    c = Country("Ethiopia")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        n_all = int(len(getattr(c, table)()))
+        n_mkt = int(len(getattr(c, table)(market="Region")))
+    assert n_mkt == n_all, (table, n_all - n_mkt)
