@@ -1,0 +1,19 @@
+== base crop_production
+  2010-11: rows 33420; Quantity NA 32, zero 1255, sum 970,088.8; Value_sold sum 130,650,105, non-NA 6011; Quantity_sold sum 433,548.25; keys [947, 1, 0, 5, 117, 67, 19]
+  2013-14: rows 12616; Quantity NA 283, zero 310, sum 257,839.0; Value_sold sum 94,992,745, non-NA 1978; Quantity_sold sum 110,050.25; keys [341, 0, 0, 0, 11, 18, 9]
+  2016-17: rows 37170; Quantity NA 200, zero 3723, sum 1,871,058.4; Value_sold sum 409,967,725, non-NA 6976; Quantity_sold sum 253,802.00; keys [520, 8, 2, 42, 37, 46, 23]
+  2019-20: rows 51872; Quantity NA 276, zero 3343, sum 1,260,873.9; Value_sold sum 529,435,948, non-NA 9267; Quantity_sold sum 314,377.00; keys [1137, 29, 2, 67, 131, 84, 51]
+  key order: ['sale-basis-unknown-wildcard', 'sale-basis-from-price', 'sale-basis-from-price-overrule', 'sale-basis-not-applicable', 'sale-basis-no-reference', 'contradiction-price-sale', 'contradiction-price-harvest']
+== branch crop_production
+  2010-11: rows 33549; Quantity NA 32, zero 1258, sum 970,088.8; Value_sold sum 130,679,005, non-NA 6017; Quantity_sold sum 433,679.25; keys [949, 1, 0, 5, 117, 67, 19]
+  2013-14: rows 12671; Quantity NA 284, zero 310, sum 257,839.0; Value_sold sum 95,010,945, non-NA 1981; Quantity_sold sum 110,061.25; keys [344, 0, 0, 0, 11, 18, 9]
+  2016-17: rows 37177; Quantity NA 200, zero 3723, sum 1,871,058.4; Value_sold sum 410,017,725, non-NA 6977; Quantity_sold sum 253,813.00; keys [521, 8, 2, 42, 37, 46, 23]
+  2019-20: rows 51973; Quantity NA 276, zero 3349, sum 1,260,873.9; Value_sold sum 529,712,448, non-NA 9284; Quantity_sold sum 314,519.00; keys [1142, 29, 2, 67, 131, 84, 51]
+  key order: ['sale-basis-unknown-wildcard', 'sale-basis-from-price', 'sale-basis-from-price-overrule', 'sale-basis-not-applicable', 'sale-basis-no-reference', 'contradiction-price-sale', 'contradiction-price-harvest']
+branch groups at the old grain with >1 native record, by wave: {'2010-11': 127, '2013-14': 54, '2016-17': 7, '2019-20': 98} rows in them: {'2010-11': 256, '2013-14': 109, '2016-17': 14, '2019-20': 199}
+branch crop_variety distinct within those groups (groups with >1 variety): 286
+plot_labor: base rows 79997, branch rows 79997; branch 'unknown_plot' on plot_id: 40; base NaN plot_id: 40; branch NaN plot_id: 0; branch == base once 'unknown_plot' is read back as NaN: True
+  unknown_plot rows by wave: {'2010-11': 40} households: 32 by source: {'family': 31, 'hired': 7, 'other': 2} PersonDays on them: 500.0
+plot_inputs: base rows 179850, branch rows 179850; branch '(not crop-specific)' on crop: 67554; base NaN crop: 67554; branch NaN crop: 0; branch == base once '(not crop-specific)' is read back as NaN: True
+  marker rows by wave: {'2010-11': 18964, '2013-14': 6225, '2016-17': 20152, '2019-20': 22213} on Seed: 0
+crop_production unknown_plot rows: 41 by wave {'2016-17': 41} with Quantity 33 Quantity sum 92.0 with a sale 0 perennial 41

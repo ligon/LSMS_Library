@@ -1,0 +1,40 @@
+anthropometry                              IDENTICAL (31038, 4)
+assets                                     IDENTICAL (356297, 5)
+cluster_features                           IDENTICAL (3235, 5)
+community_prices                           IDENTICAL (82635, 4)
+crop_production                            DIFFERENT base (135078, 9) branch (135370, 9)
+  cols only base [] only branch []
+  index rows only base 135078 only branch 135370 common 0; dup idx base 0 branch 0
+  index names differ: base ['i', 't', 'v', 'plot_id', 'crop', 'u', 'condition'] branch ['i', 't', 'v', 'plot_id', 'crop', 'u', 'condition', 'production_obs']
+food_acquired                              IDENTICAL (971531, 3)
+food_coping                                IDENTICAL (200738, 1)
+food_expenditures                          IDENTICAL (681980, 1)
+food_prices                                IDENTICAL (680400, 1)
+food_quantities                            IDENTICAL (971028, 1)
+food_security                              IDENTICAL (27878, 9)
+household_characteristics                  IDENTICAL (56918, 15)
+household_roster                           IDENTICAL (260612, 7)
+housing                                    IDENTICAL (57118, 2)
+individual_education                       IDENTICAL (184667, 1)
+interview_date                             IDENTICAL (69484, 1)
+livestock                                  IDENTICAL (39126, 4)
+months_food_inadequate                     IDENTICAL (40152, 2)
+panel_ids                                  IDENTICAL (non-frame, len 5686 / 5686)
+people_last7days                           IDENTICAL (207713, 8)
+plot_features                              IDENTICAL (68339, 10)
+plot_inputs                                DIFFERENT base (179850, 5) branch (179850, 5)
+  cols only base [] only branch []
+  index rows only base 67554 only branch 67554 common 112296; dup idx base 0 branch 0
+  common rows differing in any column: 0
+plot_labor                                 DIFFERENT base (79997, 2) branch (79997, 2)
+  cols only base [] only branch []
+  index rows only base 40 only branch 40 common 79957; dup idx base 0 branch 0
+  common rows differing in any column: 0
+sample                                     IDENTICAL (57118, 7)
+shocks                                     IDENTICAL (104691, 7)
+subjective_well_being                      IDENTICAL (36147, 3)
+wf_cluster_features_2004-05                IDENTICAL (11280, 3)
+wf_cluster_features_2010-11                IDENTICAL (12271, 5)
+wf_cluster_features_2013-14                IDENTICAL (4000, 5)
+wf_cluster_features_2016-17                IDENTICAL (14955, 5)
+wf_cluster_features_2019-20                IDENTICAL (14612, 5)

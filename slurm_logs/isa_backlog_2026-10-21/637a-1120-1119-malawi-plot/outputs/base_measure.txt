@@ -1,0 +1,66 @@
+
+######## 2010-11
+crop_production: harvest block rows 33600; plot_id NaN 0
+  multi-line consolidation groups (same code): 49; rows in them 99; harvest_month conflicting 8; planting_month conflicting 1; harvest_month identical-or-single 41
+  declared-grain collapse groups 127; with >1 crop code 127; rows 256; groups with >1 attached sale 6; Value_sold dropped by 'first' 28,900 MWK; served Value_sold total 130,679,005
+  served crop_production rows 33420; plot_id NaN 0; Quantity sum 970,088.8
+plot_inputs seed block: rows 28134; dropped for no crop label 330 (blank code 330, unmapped code 0); of them with seed quantity > 0: 59
+plot_inputs fertilizer: same-type slot pairs 89; identical quantity 72
+plot_inputs served rows 46576; plot_id NaN 0; crop NaN 18964
+  crop NaN by input: {'NPK Fertilizer': 7778, 'Urea Fertilizer': 7531, 'Organic Fertilizer': 1991, 'CAN Fertilizer': 856, 'Insecticide': 290, 'D Compound Fertilizer': 273, 'DAP Fertilizer': 102, 'Herbicide': 87, 'Other Fertilizer': 20, 'Fungicide': 13, 'Fumigant': 12, 'Other Pesticide': 11}
+  crop non-NaN by input: {'Seed': 27612}
+  plot_id NaN by input: {}
+plot_labor served rows 21016; plot_id NaN rows 40 in 32 households; by source {'family': 31, 'hired': 7, 'other': 2}
+  Module D rows 19265; blank plot key 275 in 275 households; max per household 1
+plot_features served rows 18990; plot_id NaN 0
+
+######## 2013-14
+crop_production: harvest block rows 12699; plot_id NaN 0
+  multi-line consolidation groups (same code): 4; rows in them 8; harvest_month conflicting 0; planting_month conflicting 1; harvest_month identical-or-single 4
+  declared-grain collapse groups 54; with >1 crop code 54; rows 109; groups with >1 attached sale 2; Value_sold dropped by 'first' 18,200 MWK; served Value_sold total 95,010,945
+  served crop_production rows 12616; plot_id NaN 0; Quantity sum 257,839.0
+plot_inputs seed block: rows 10169; dropped for no crop label 184 (blank code 184, unmapped code 0); of them with seed quantity > 0: 0
+plot_inputs fertilizer: same-type slot pairs 59; identical quantity 50
+plot_inputs served rows 16167; plot_id NaN 0; crop NaN 6225
+  crop NaN by input: {'NPK Fertilizer': 2571, 'Urea Fertilizer': 2303, 'Organic Fertilizer': 822, 'CAN Fertilizer': 151, 'Insecticide': 151, 'D Compound Fertilizer': 91, 'Herbicide': 58, 'Other Fertilizer': 29, 'DAP Fertilizer': 20, 'Other Pesticide': 13, 'Fumigant': 9, 'Fungicide': 7}
+  crop non-NaN by input: {'Seed': 9942}
+  plot_id NaN by input: {}
+plot_labor served rows 9197; plot_id NaN rows 0 in 0 households; by source {}
+  Module D rows 6490; blank plot key 158 in 158 households; max per household 1
+plot_features served rows 6331; plot_id NaN 0
+
+######## 2016-17
+crop_production: harvest block rows 37187; plot_id NaN 41
+  multi-line consolidation groups (same code): 10; rows in them 20; harvest_month conflicting 5; planting_month conflicting 0; harvest_month identical-or-single 5
+  declared-grain collapse groups 7; with >1 crop code 7; rows 14; groups with >1 attached sale 1; Value_sold dropped by 'first' 50,000 MWK; served Value_sold total 410,017,725
+  served crop_production rows 37170; plot_id NaN 41; Quantity sum 1,871,058.4
+plot_inputs seed block: rows 26506; dropped for no crop label 531 (blank code 531, unmapped code 0); of them with seed quantity > 0: 0
+plot_inputs seed block: rows 6289; dropped for no crop label 0 (blank code 0, unmapped code 0); of them with seed quantity > 0: 0
+plot_inputs fertilizer: same-type slot pairs 43; identical quantity 38
+plot_inputs fertilizer: same-type slot pairs 35; identical quantity 13
+plot_inputs served rows 52416; plot_id NaN 0; crop NaN 20152
+  crop NaN by input: {'NPK Fertilizer': 8025, 'Urea Fertilizer': 7045, 'Organic Fertilizer': 3617, 'CAN Fertilizer': 459, 'Insecticide': 366, 'Other Fertilizer': 202, 'Herbicide': 160, 'D Compound Fertilizer': 133, 'DAP Fertilizer': 59, 'Other Pesticide': 45, 'Fumigant': 24, 'Fungicide': 17}
+  crop non-NaN by input: {'Seed': 32264}
+  plot_id NaN by input: {}
+plot_labor served rows 22627; plot_id NaN rows 0 in 0 households; by source {}
+  Module D rows 15724; blank plot key 0 in 0 households; max per household 0
+  Module D rows 4042; blank plot key 6 in 5 households; max per household 2
+plot_features served rows 15724; plot_id NaN 0
+
+######## 2019-20
+crop_production: harvest block rows 52098; plot_id NaN 0
+  multi-line consolidation groups (same code): 46; rows in them 105; harvest_month conflicting 13; planting_month conflicting 0; harvest_month identical-or-single 33
+  declared-grain collapse groups 98; with >1 crop code 98; rows 199; groups with >1 attached sale 16; Value_sold dropped by 'first' 276,500 MWK; served Value_sold total 529,712,448
+  served crop_production rows 51872; plot_id NaN 0; Quantity sum 1,260,873.9
+plot_inputs seed block: rows 32677; dropped for no crop label 92 (blank code 26, unmapped code 66); of them with seed quantity > 0: 66
+plot_inputs seed block: rows 9984; dropped for no crop label 6 (blank code 6, unmapped code 0); of them with seed quantity > 0: 0
+plot_inputs fertilizer: same-type slot pairs 154; identical quantity 119
+plot_inputs fertilizer: same-type slot pairs 33; identical quantity 24
+plot_inputs served rows 64691; plot_id NaN 0; crop NaN 22213
+  crop NaN by input: {'NPK Fertilizer': 8228, 'Urea Fertilizer': 7112, 'Organic Fertilizer': 4645, 'Insecticide': 811, 'CAN Fertilizer': 559, 'Herbicide': 244, 'D Compound Fertilizer': 224, 'Other Fertilizer': 142, 'DAP Fertilizer': 92, 'Fumigant': 80, 'Fungicide': 43, 'Other Pesticide': 33}
+  crop non-NaN by input: {'Seed': 42478}
+  plot_id NaN by input: {}
+plot_labor served rows 27157; plot_id NaN rows 0 in 0 households; by source {}
+  Module D rows 17693; blank plot key 0 in 0 households; max per household 0
+  Module D rows 5570; blank plot key 2 in 2 households; max per household 1
+plot_features served rows 17693; plot_id NaN 0

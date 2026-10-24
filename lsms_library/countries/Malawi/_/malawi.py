@@ -1204,6 +1204,11 @@ def _plot_ids(series):
     s = series.astype('string')
     return s.where(s.notna(), PLOT_UNKNOWN)
 
+
+def _is_unknown_plot(series):
+    """Boolean numpy mask of ``PLOT_UNKNOWN`` rows (NA-safe)."""
+    return series.astype('string').eq(PLOT_UNKNOWN).fillna(False).to_numpy(dtype=bool)
+
 #: Code -> un-collapsed crop VARIETY label; see `categorical_mapping.org`.
 _VARIETY_TABLE = 'harmonize_crop_variety'
 
@@ -1933,7 +1938,7 @@ def _attach_sales(t, harv, sale):
     # AND on one known plot would have handed the known row the whole
     # household sale.  No held household-crop is in that second case
     # (2016-17's 41 such crops are on no known plot).
-    known = harv['plot_id'].ne(PLOT_UNKNOWN)
+    known = ~_is_unknown_plot(harv['plot_id'])
     nplots = (harv[known].groupby(['i', '_crop_code'])['plot_id']
               .nunique().rename('_nplots'))
     nunknown = harv[~known].groupby(['i', '_crop_code']).size()
@@ -2165,7 +2170,7 @@ def _consolidate_harvest(harvest_pieces):
     # plot, so they must never be summed here.  None exist in the held data
     # (2016-17's 41 Module P lines with a blank plot key are 41 distinct
     # household-codes); raise rather than merge should one appear.
-    unk = harv['plot_id'].eq(PLOT_UNKNOWN).to_numpy()
+    unk = _is_unknown_plot(harv['plot_id'])
     n_merge = int(harv[unk].duplicated(keys, keep=False).sum())
     if n_merge:
         raise ValueError(
@@ -3589,7 +3594,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
             # `unknown_plot` line (GH #1120 D3, as `_attach_sales`; no held
             # seed row has an unknown plot).
             seed_rows = df[seed]
-            known = seed_rows['plot_id'].ne(PLOT_UNKNOWN)
+            known = ~_is_unknown_plot(seed_rows['plot_id'])
             nplots = (seed_rows[known].groupby(['i', 'crop'])['plot_id']
                       .nunique().rename('_nplots'))
             nunknown = seed_rows[~known].groupby(['i', 'crop']).size()
@@ -3636,7 +3641,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     # GH #1120 D3: two `unknown_plot` lines of one household are not one
     # plot; none exist in the held data -- raise rather than sum.
     keys = ['t', 'i', 'plot_id', 'input', 'crop', 'u']
-    unk = df['plot_id'].eq(PLOT_UNKNOWN).to_numpy()
+    unk = _is_unknown_plot(df['plot_id'])
     n_merge = int(df[unk].duplicated([k for k in keys if k != 'plot_id'],
                                      keep=False).sum())
     if n_merge:
@@ -4174,7 +4179,7 @@ def assemble_plot_labor(t, pieces):
     # GH #1120 D3: two `unknown_plot` lines of one household are not one plot.
     # 2010-11's blank-key stubs are one per household, so this never fires on
     # the held data; raise rather than sum should two ever meet.
-    unk = cat['plot_id'].eq(PLOT_UNKNOWN).to_numpy()
+    unk = _is_unknown_plot(cat['plot_id'])
     n_merge = int(cat[unk].duplicated(['i', 'source'], keep=False).sum())
     if n_merge:
         raise ValueError(

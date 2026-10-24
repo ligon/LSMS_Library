@@ -71,16 +71,19 @@ SINCE = {OV: '2026-09-25', NR: '2026-09-25'}
 #: keeps one variety's sale -- 2 / 3 / 1 / 5 keyed wildcard sales, and 27
 #: sales / 373,600 MWK in all (6 / 3 / 1 / 17 per wave), a pre-existing
 #: composition the ladder does not touch (issue text in
-#: slurm_logs/backlog_fix_2026-09-24/issues_to_file.org).  Unsold Module I/Q
+#: slurm_logs/backlog_fix_2026-09-24/issues_to_file.org).  GH #637 defect A
+#: (production_obs, ruling of 2026-10-23) removed that collapse: the 2 / 3 /
+#: 1 / 5 keyed wildcard sales are back on their own codes' rows (W 947 / 341
+#: / 520 / 1,137 -> 949 / 344 / 521 / 1,142).  Unsold Module I/Q
 #: lines summed to 0/0 by `_sale_block` (901 / 225 / 2,433 / 2,185) attach on
 #: the wildcard as 0.0, as they always did, and carry NO key.
 #: Before 2026-09-25 the not-applicable key carried N + NR (122 / 11 / 79 /
 #: 198) and the from-price key's harvest side refused what OV now carries.
 ROWS = {
-    '2010-11': {W: 947, P: 1, OV: 0, N: 5, NR: 117, CS: 67, CH: 19},
-    '2013-14': {W: 341, P: 0, OV: 0, N: 0, NR: 11, CS: 18, CH: 9},
-    '2016-17': {W: 520, P: 8, OV: 2, N: 42, NR: 37, CS: 46, CH: 23},
-    '2019-20': {W: 1137, P: 29, OV: 2, N: 67, NR: 131, CS: 84, CH: 51},
+    '2010-11': {W: 949, P: 1, OV: 0, N: 5, NR: 117, CS: 67, CH: 19},
+    '2013-14': {W: 344, P: 0, OV: 0, N: 0, NR: 11, CS: 18, CH: 9},
+    '2016-17': {W: 521, P: 8, OV: 2, N: 42, NR: 37, CS: 46, CH: 23},
+    '2019-20': {W: 1142, P: 29, OV: 2, N: 67, NR: 131, CS: 84, CH: 51},
 }
 #: GH #856 (2026-10-22) moved the two IHS4/IHS5 waves: recovering 90 KG BAG /
 #: BASKET (DENGU) from the unit specify text on BOTH sides attached 71 / 97
@@ -98,8 +101,11 @@ ROWS = {
 #: 409,090,925) and 2019-20 by +120,000 (527,653,548 -> 527,773,548).
 VALUE_SOLD_BEFORE = {'2010-11': 126_816_048.0, '2013-14': 94_338_845.0,
                      '2016-17': 394_826_755.0, '2019-20': 496_063_698.0}
-VALUE_SOLD_AFTER = {'2010-11': 130_650_105.0, '2013-14': 94_992_745.0,
-                    '2016-17': 409_967_725.0, '2019-20': 529_435_948.0}
+VALUE_SOLD_AFTER = {'2010-11': 130_679_005.0, '2013-14': 95_010_945.0,
+                    '2016-17': 410_017_725.0, '2019-20': 529_712_448.0}
+#: GH #637 defect A (2026-10-23) moved every wave by exactly the sales the
+#: declared-grain collapse's 'first' dropped: +28,900 / +18,200 / +50,000 /
+#: +276,500 (was 130,650,105 / 94,992,745 / 409,967,725 / 529,435,948).
 #: GH #856 moved 2016-17 by +876,800 (409,090,925 -> 409,967,725) and 2019-20
 #: by +1,662,400 (527,773,548 -> 529,435,948): 3,601,200 MWK newly attached,
 #: 1,062,000 detached (see the ROWS comment above and CONTENTS.org, GH #856).
@@ -132,7 +138,9 @@ UNRESOLVED_GROUNDS = {'contradiction_no_separation': 271,
                       'na_sale_price_undecided': 6,
                       'na_harvest_price_undecided': 7,
                       'claimed_by_tier_a': 0}
-TOTAL_ROWS = {'2010-11': 33_420, '2013-14': 12_616, '2016-17': 37_170, '2019-20': 51_872}
+#: Rows +129 / +55 / +7 / +101 with GH #637 defect A (was 33,420 / 12,616 /
+#: 37,170 / 51,872): the codes the collapse merged are their own rows.
+TOTAL_ROWS = {'2010-11': 33_549, '2013-14': 12_671, '2016-17': 37_177, '2019-20': 51_973}
 
 
 @pytest.fixture(scope='module')
@@ -652,7 +660,7 @@ def country():
 def delivered(country):
     try:
         cp = country.crop_production()
-    except Exception as e:                    # pragma: no cover - no microdata
+    except FileNotFoundError as e:            # pragma: no cover - no microdata
         pytest.skip(f'{COUNTRY} crop_production not buildable here: {e}')
     return cp
 
@@ -663,7 +671,8 @@ class TestDelivered:
     @pytest.mark.parametrize('wave', WAVES)
     def test_rows_per_key_per_wave(self, delivered, wave):
         x = delivered.xs(wave, level='t', drop_level=False)
-        assert len(x) == TOTAL_ROWS[wave]
+        n = len(x)    # a local: an assert on len(frame) prints the frame
+        assert n == TOTAL_ROWS[wave], (n, TOTAL_ROWS[wave])
         got = x['Derivation'].value_counts().to_dict()
         assert {k: got.get(k, 0) for k in KEYS} == ROWS[wave]
         assert set(got) <= set(KEYS)

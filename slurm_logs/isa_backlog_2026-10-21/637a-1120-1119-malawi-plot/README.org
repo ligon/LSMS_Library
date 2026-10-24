@@ -1,0 +1,26 @@
+#+title: Malawi plot tables -- GH #637 defect A, GH #1120 D3, GH #1119 (2026-10-23)
+
+Rulings of @ligon (2026-10-23): =production_obs= = native crop code
+(=crop_production=); =unknown_plot= for a plot key missing in the source (every
+plot table); =(not crop-specific)= for the =plot_inputs= =j= of a record that
+is not about a crop.  Documentation only: the multi-line harvest-month rule and
+same-type fertilizer slot pairs.  Ledger:
+=.coder/ledger/637a-1120-1119-malawi-plot.md=; narrative: Malawi
+=_/CONTENTS.org=, "native records, =unknown_plot=, =(not crop-specific)=".
+
+All runs on the burst runner (savio4_htc), base =1865cf884=
+(=fix/plot-sentinel-vocab-20261023=) and this branch each cold in its own data
+root.  Every file under =outputs/= is counts and sums only.
+
+| output | script | what |
+|---+---+---|
+| =base_measure.txt= | =p2_measure.py= | base: collapse groups, dropped sales, multi-line month groups, NaN plot ids per table, seed lines without a crop, fertilizer slot pairs |
+| =base_diag.txt= | =p2_diag.py= | base: 2016-17 G / P blank plot keys; seed lines with a blank or unmapped crop code (code 49) |
+| =base_diag2.txt= | =p2_diag2.py= | base: unknown-plot collisions (0), known-plus-unknown crops with a sale (0).  Its 2010-11 "(module, hh, _crop_code) with >1 raw code" figure is an ARTIFACT: the 2010-11 frames lose their repeat records first, so their index is not contiguous and the script's label-aligned `_raw` is misaligned; the build's own raise on a repeated native coordinate (none fired) is the check |
+| =base_extra.txt=, =branch_extra.txt= | =p2_extra.py= | =harvest_kg= with / without the shipped factors, index, NaN keys, Site I reports |
+| =branch_oracle.txt= | =oracle.py= | raw oracle: distinct (hh, plot, module, raw code) = served distinct (i, plot_id, production_obs) per wave |
+| =compare_all_tables.txt= | =compare.py= | every Malawi table and the five =cluster_features= wave frames, base vs branch |
+| =compare_details.txt= | =p2_cmp_extra.py= | per wave rows, NA / zero, =Value_sold=, sale-basis keys; sentinel and marker cells |
+| =branch_harvest_kg.txt= | =p2_hkg.py= | =harvest_kg= on all rows vs off =unknown_plot= |
+| =hash_census.txt= | =hash_diff.py= over =hash_census.py= | 26 / 549 country, 130 / 2,109 wave, 0 / 40 btf, all Malawi |
+| =tests_round1.txt=, =tests_final.txt= | burst =run.sh= | test summaries, base and branch, mutations, leak scan |

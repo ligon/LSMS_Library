@@ -208,10 +208,13 @@ def test_two_unknown_plot_lines_of_one_household_are_never_summed(mw):
 
 
 def test_no_sale_is_attached_to_or_beside_an_unknown_plot_line(mw):
+    """h2's unknown-plot line is in ANOTHER unit, so it is no candidate for
+    the KG sale: only the single-plot gate keeps the sale off h2's known row
+    (with a NaN plot, `nunique` saw one plot and attached it there)."""
     out = _assemble(mw, [
         ('h1', UNKNOWN_PLOT, 'Maize', 1, KG, S, 10.0),        # only unknown
         ('h2', 'R1', 'Maize', 1, KG, S, 10.0),                # known + unknown
-        ('h2', UNKNOWN_PLOT, 'Maize', 1, KG, S, 3.0),
+        ('h2', UNKNOWN_PLOT, 'Maize', 1, '50 kg Bag', S, 3.0),
         ('h3', 'R1', 'Maize', 1, KG, S, 10.0)],               # one known plot
         [('h1', 1, KG, S, 5.0, 100.0), ('h2', 1, KG, S, 5.0, 100.0),
          ('h3', 1, KG, S, 5.0, 100.0)])
@@ -306,8 +309,14 @@ def built():
     except FileNotFoundError as exc:  # pragma: no cover
         pytest.skip(f'Malawi agriculture source unavailable: {exc}')
     c = ll.Country('Malawi')
-    return {t: getattr(c, t)().reset_index()
-            for t in ('crop_production', 'plot_labor', 'plot_inputs')}
+    # Built with warnings silenced: the build's own audit warnings (Site Q's
+    # QuantityImplausibleWarning) NAME the offending households, and pytest
+    # would print them in its warnings summary -- a public CI log.  These
+    # tests assert counts; the warnings are not what they test.
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        return {t: getattr(c, t)().reset_index()
+                for t in ('crop_production', 'plot_labor', 'plot_inputs')}
 
 
 def _by_wave(df, f):

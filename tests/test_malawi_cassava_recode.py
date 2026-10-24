@@ -56,7 +56,7 @@ def malawi_mod():
 def cp():
     try:
         df = Country('Malawi').crop_production()
-    except Exception as exc:                                # pragma: no cover
+    except FileNotFoundError as exc:                                # pragma: no cover
         pytest.skip(f'Malawi crop_production unavailable: '
                     f'{type(exc).__name__}: {exc}')
     if df is None or df.empty:                              # pragma: no cover
@@ -130,10 +130,12 @@ class TestDelivered:
             assert got == n, f'{wave} tree classes: got {got}, expected {n}'
 
     def test_old_waves_gain_nothing(self, cp):
-        """The recode is a no-op pre-IHS4: total rows must not move."""
+        """The recode is a no-op pre-IHS4: total rows must not move.  (Pinned
+        at 33,420 / 12,616 until GH #637 defect A, 2026-10-23, which keeps the
+        codes of one label as separate rows: +129 / +55.)"""
         tot = cp.reset_index().groupby('t').size()
-        assert int(tot['2010-11']) == 33420
-        assert int(tot['2013-14']) == 12616
+        got = (int(tot['2010-11']), int(tot['2013-14']))
+        assert got == (33549, 12671), got
 
     def test_no_unmapped_codes_warn_or_survive(self, cp):
         """No delivered row may carry a crop label outside harmonize_crop's

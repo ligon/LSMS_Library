@@ -1,0 +1,13 @@
+harvest_kg (no shipped) by wave: {'2010-11': 8507430.2, '2013-14': 2336456.0, '2016-17': 8171320.7, '2019-20': 19690709.8}
+harvest_kg (shipped)    by wave: {'2010-11': 8495298.1, '2013-14': 2477200.7, '2016-17': 8432613.5, '2019-20': 20327801.0}
+harvest_kg rows: no shipped 62923 shipped 71173
+kg_factor_sources (shipped): {'reported': 0, 'shipped': 94343, 'survey_median': 0, 'metric': 17343, 'inferred': 0, 'none': 23684, 'reported_implausible': 0, 'shipped_implausible': 4653, 'shipped_matched': 98996, 'declared': 0}
+crop_production index: ['i', 't', 'v', 'plot_id', 'crop', 'u', 'condition', 'production_obs']
+crop_production rows by wave: {'2010-11': 33549, '2013-14': 12671, '2016-17': 37177, '2019-20': 51973}
+  NaN plot_id: 0
+  NaN u: 0
+  NaN condition: 0
+  NaN production_obs: 0
+Site I reports crop_production: 0 []
+Site I reports plot_labor: 0 []
+Site I reports plot_inputs: 0 []

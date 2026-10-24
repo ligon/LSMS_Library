@@ -236,10 +236,13 @@ class TestRepeatedRecords:
 # ---------------------------------------------------------------------------
 
 #: Served crop_production.Quantity per wave (cold build, 2026-10-23).  NA was
-#: 0 / 0 / 0 / 0 on development; 2013-14 has 284 blank consolidation groups,
-#: two of which are codes of one label merged at the declared grain -> 283.
-HARVEST_NA = {'2010-11': 32, '2013-14': 283, '2016-17': 200, '2019-20': 276}
-HARVEST_ZERO = {'2010-11': 1255, '2013-14': 310, '2016-17': 3723, '2019-20': 3343}
+#: 0 / 0 / 0 / 0 on development; 2013-14 has 284 blank consolidation groups.
+#: Until GH #637 defect A's ruling (production_obs, 2026-10-23) two of them --
+#: codes of one label -- were merged at the declared grain (283 NA), and a
+#: recorded zero summed with a sibling code's harvest vanished into the sum
+#: (zeros 1,255 / 310 / 3,723 / 3,343); each code is now its own row.
+HARVEST_NA = {'2010-11': 32, '2013-14': 284, '2016-17': 200, '2019-20': 276}
+HARVEST_ZERO = {'2010-11': 1258, '2013-14': 310, '2016-17': 3723, '2019-20': 3349}
 #: 2010-11 fell by 67 = 42 (Module G repeats) + 25 (the Module P repeat).
 HARVEST_SUM = {'2010-11': 970_088.8, '2013-14': 257_839.0,
                '2016-17': 1_871_058.4, '2019-20': 1_260_873.9}
@@ -266,9 +269,9 @@ LATER_MODULES = {
 
 def _country_table(table):
     import lsms_library as ll
-    try:
+    try:   # skip ONLY on an unavailable source; any other error is a failure
         return getattr(ll.Country('Malawi'), table)()
-    except Exception as e:                          # pragma: no cover - no microdata
+    except FileNotFoundError as e:                  # pragma: no cover - no microdata
         pytest.skip(f'Malawi {table} not buildable here: {e}')
 
 
@@ -296,10 +299,12 @@ def _raw(rel):
 class TestDelivered:
     @pytest.mark.parametrize('wave', WAVES)
     def test_blank_harvests_are_na_and_recorded_zeros_stay(self, crop_production, wave):
+        # counts on locals: an assert on the Series would print household ids
         q = crop_production.xs(wave, level='t')['Quantity']
-        assert int(q.isna().sum()) == HARVEST_NA[wave]
-        assert int((q == 0).sum()) == HARVEST_ZERO[wave]
-        assert float(q.sum()) == pytest.approx(HARVEST_SUM[wave], abs=1e-6)
+        n_na, n_zero, total = int(q.isna().sum()), int((q == 0).sum()), float(q.sum())
+        assert n_na == HARVEST_NA[wave], (n_na, HARVEST_NA[wave])
+        assert n_zero == HARVEST_ZERO[wave], (n_zero, HARVEST_ZERO[wave])
+        assert total == pytest.approx(HARVEST_SUM[wave], abs=1e-6)
 
     @pytest.mark.parametrize('wave', WAVES)
     def test_seed_quantity_and_purchases(self, plot_inputs, wave):
@@ -365,6 +370,9 @@ class TestRawOracle:
 
     @pytest.mark.parametrize('wave', WAVES)
     def test_harvest_blanks_from_raw_modules(self, crop_production, wave):
+        """At the native grain (GH #637 defect A): one row per (household,
+        plot, crop, unit, condition, module + INSTRUMENT crop code); a blank
+        plot key is `unknown_plot` (GH #1120 D3)."""
         from lsms_library.local_tools import format_id
         crop, unit, cond = (_org_codes(t) for t in
                             ('harmonize_crop', 'harmonize_crop_unit', 'harmonize_crop_condition'))
@@ -377,6 +385,8 @@ class TestRawOracle:
                 col = half['gcrop'] if mod == 'g' else (
                     half.get('pcrop') or ('ag_p0c' if 'ag_p0c' in df.columns else 'crop_code'))
                 code = pd.to_numeric(df[col], errors='coerce')
+                obs = ('reported:' + ('P' if perennial else 'G') + ':'
+                       + code.astype('Int64').astype('string'))
                 if perennial:
                     code = (code + 1000).replace({1100: 1001, 1021: 1018})
                 c = (pd.to_numeric(df['ag_g13c'], errors='coerce').map(cond).fillna(UNK)
@@ -386,16 +396,24 @@ class TestRawOracle:
                     'i': half['hh'](df, format_id),
                     'plot_id': half['plot' if mod == 'g' else 'pplot'](df, format_id),
                     'crop': code.map(crop), 'u': u.fillna('<NA>'), 'condition': c,
+                    'production_obs': obs,
                     'Quantity': pd.to_numeric(df['ag_g13a' if mod == 'g' else 'ag_p09a'],
                                               errors='coerce')}))
         R = pd.concat(parts, ignore_index=True)
         R = R[R['crop'].notna()]
-        R['plot_id'] = R['plot_id'].fillna('<NA>')
-        exp = R.groupby(['i', 'plot_id', 'crop', 'u', 'condition'])['Quantity'].sum(min_count=1)
+        R['plot_id'] = R['plot_id'].fillna('unknown_plot')
+        exp = R.groupby(['i', 'plot_id', 'crop', 'u', 'condition', 'production_obs']
+                        )['Quantity'].sum(min_count=1)
         q = crop_production.xs(wave, level='t')['Quantity']
-        assert len(exp) == len(q)
-        assert int(exp.isna().sum()) == int(q.isna().sum()) == HARVEST_NA[wave]
-        assert float(exp.sum()) == pytest.approx(float(q.sum()), abs=1e-6)
+        n_exp, n_q = len(exp), len(q)
+        na_exp, na_q = int(exp.isna().sum()), int(q.isna().sum())
+        assert n_exp == n_q, (n_exp, n_q)
+        assert na_exp == na_q == HARVEST_NA[wave], (na_exp, na_q, HARVEST_NA[wave])
+        sum_exp, sum_q = float(exp.sum()), float(q.sum())
+        assert sum_exp == pytest.approx(sum_q, abs=1e-6)
+        unk_exp = int((exp.index.get_level_values('plot_id') == 'unknown_plot').sum())
+        unk_q = int((q.index.get_level_values('plot_id') == 'unknown_plot').sum())
+        assert unk_exp == unk_q, (unk_exp, unk_q)
 
 
 def _org_codes(name):

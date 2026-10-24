@@ -112,6 +112,13 @@ is right; it just should not have been silent.  The drop is now an
 explicit =dropna(subset=['plot_id'])= immediately before the groupby,
 which leaves the returned frame bit-for-bit what it was.
 
+/Not the same as =unknown_plot= (GH #1120 D3, 2026-10-23)./  =plot_labor=
+reads the SAME 2010-11 Module D stubs with a blank =ag_d00=, and serves the
+40 of them that carry labour days on =plot_id = unknown_plot= (see "native
+records, =unknown_plot=, =(not crop-specific)=" below).  The two tables treat
+one stub differently because of what it carries: here no area, no unit, no
+GPS -- nothing to serve; there, recorded person-days.
+
 *No =.first(skipna=False)= anywhere.*  It would change nothing here
 (there are no multi-row groups) and the repo has already rejected that
 approach.
@@ -1193,7 +1200,10 @@ EPAR reached the same conclusion first and shouted it:
 :   -- Malawi IHS Wave 1/EPAR_UW_Malawi_IHS_W1.do:1327
 
 So =crop_production= now carries *=crop_variety=*, a COLUMN (never a level --
-it is a function of the crop code and splits no key), decoded through the new
+it is a function of the crop code and splits no key -- /true only since
+2026-10-23/, when =production_obs= put the native code in the grain: before
+that a collapse merged codes of one label under one variety in 286 groups,
+see "native records" below), decoded through the new
 =harmonize_crop_variety= table, and the loader keys on it by default.
 Measured on the built table:
 
@@ -1503,13 +1513,160 @@ before and after; the grain, Site I and Site B reports are unchanged.
 - Defect A: =assemble_crop_production='s collapse at the declared grain
   merges distinct crop codes under one =harmonize_crop= label (127 / 54 / 7 /
   98 groups), keeping one code's =crop_variety= and sale.  Awaits a grain
-  ruling.  The "splits no key" claims about =crop_variety= (=malawi.py=
-  =_harvest_block=, =data_scheme.yml='s =crop_production= comment, and the
-  "Why the join keys on the VARIETY" section above) belong to it and are left
-  as they are.
+  ruling.  /Since done/ (ruling 2026-10-23, =production_obs=): see "native
+  records, =unknown_plot=, =(not crop-specific)=" below; the "splits no key"
+  claims about =crop_variety= are now true and say why.
 - Seed =Improved= conflicts when two codes share one plot-crop (2019-20: 59
   groups), the month reducers, the same-type fertilizer slot pairs (see the
   #1111 entry), and #1174's minted zeros on nonorganic plot_inputs rows.
+
+* crop_production / plot_labor / plot_inputs: native records, =unknown_plot=, =(not crop-specific)= (2026-10-23)
+
+Three rulings of @ligon (2026-10-23), on the vocabulary registered in
+=lsms_library/data_info.yml= at =1865cf884=.  Ledger:
+=.coder/ledger/637a-1120-1119-malawi-plot.md=; aggregates and scripts:
+=slurm_logs/isa_backlog_2026-10-21/637a-1120-1119-malawi-plot/=.
+
+** Native records: =production_obs= (GH #637 defect A)
+
+*Ruling:* populate =crop_production='s canonical =production_obs= with the
+native crop code, so codes that share a =harmonize_crop= label keep separate
+rows, sales and kg factors (the #1198 precedent; Tanzania did the same in
+#1263).
+
+=production_obs= = =reported:G:<code>= / =reported:P:<code>=: the harvest
+module and the *instrument's own* crop code, as recorded -- before the +1000
+perennial offset and the IHS4/IHS5 Module P recode (=_PERENNIAL_RECODE=, GH
+#869), so IHS4 cassava is =reported:P:100= though its library code is 1001.
+*The module letter is load-bearing*: raw code 1 is local maize in Module G and
+cassava in Module P.  It is set in =_harvest_block= on every row;
+=_consolidate_harvest= keys on it (a plot-crop recorded on several lines of ONE
+code, unit and condition is still one record, summed as before); and the
+collapse at the declared grain at the end of =assemble_crop_production= is
+GONE -- a repeat of =(t, i, plot_id, crop, u, condition, production_obs)= now
+raises, as in Tanzania.  Declared index:
+=(t, i, plot_id, crop, u, condition, production_obs)=.
+
+What the collapse did, measured at the base: 127 / 54 / 7 / 98 groups (2010-11
+/ 2013-14 / 2016-17 / 2019-20), *every one* two or more distinct codes of one
+label (Maize 1-4, the rices, groundnuts, citrus), 256 / 109 / 14 / 199 rows; it
+summed their harvests, kept the first code's =crop_variety= (the key of the
+shipped IHS5 kg factor -- the 286 groups carry two or more varieties), and kept
+the first code's sale.  Now:
+
+| wave    | rows            | =Value_sold= (MWK)               | sales served  | wildcard key | NA / zero =Quantity=     |
+|---------+-----------------+----------------------------------+---------------+--------------+--------------------------|
+| 2010-11 | 33,420 -> 33,549 | 130,650,105 -> 130,679,005 (+28,900)  | 6,011 -> 6,017 | 947 -> 949   | 32 / 1,255 -> 32 / 1,258 |
+| 2013-14 | 12,616 -> 12,671 | 94,992,745 -> 95,010,945 (+18,200)    | 1,978 -> 1,981 | 341 -> 344   | 283 / 310 -> 284 / 310   |
+| 2016-17 | 37,170 -> 37,177 | 409,967,725 -> 410,017,725 (+50,000)  | 6,976 -> 6,977 | 520 -> 521   | 200 / 3,723 (unchanged)  |
+| 2019-20 | 51,872 -> 51,973 | 529,435,948 -> 529,712,448 (+276,500) | 9,267 -> 9,284 | 1,137 -> 1,142 | 276 / 3,343 -> 276 / 3,349 |
+
+- The sale increase is *exactly* the 28,900 / 18,200 / 50,000 / 276,500 MWK
+  (27 sales, 373,600 MWK) the GH #637 tail diagnosis says ='first'= dropped.
+  =Quantity= sums are unchanged in every wave: nothing new is summed.
+- The NA / zero moves are rows the collapse had merged: the 2013-14 group whose
+  two codes were both blank is now two blank rows (284 = the 284 blank
+  consolidation groups); 3 + 6 recorded zeros (2010-11, 2019-20) had been
+  summed into a sibling code's positive harvest.
+- *Raw oracle* (=scripts/oracle.py=, its own reading of the raw G / P files):
+  the distinct =(household, plot, module, raw code)= with a crop label equal
+  the served distinct =(i, plot_id, production_obs)= in every wave (33,530 /
+  12,668 / 37,166 / 51,955); the remaining served rows (19 / 3 / 11 / 18) are
+  one record split by unit or condition.
+- *kg factors:* =harvest_kg(shipped_factors=...)= now applies each code's own
+  variety factor: wave totals +0.3 / -70.8 / -72.4 / -987.1 kg (2016-17
+  measured off the =unknown_plot= rows, see below).  =harvest_kg= without the
+  shipped factors does not move (inferred factors are not variety-keyed).
+- =crop_variety= stays a COLUMN: it is a function of the native code, which is
+  now in the grain, so the "splits no key" claims are finally true.
+- Still at the LABEL grain (not this ruling): =plot_inputs= seed rows (Module G
+  seed of two codes of one label is one =(i, plot_id, Seed, crop, u)= row) --
+  the seed =Improved= conflict in "Not changed here" above stands.
+
+** =unknown_plot= where the source has no plot key (GH #1120 D3)
+
+*Ruling:* a =plot_id= missing from the source gets the epistemic sentinel
+=unknown_plot= (registered in =data_info.yml=, distinct from the structural
+=Farm-level=).  It is set in every block (=_plot_ids=) before any groupby, so
+it never travels as NaN.  Where it lands, every plot table checked:
+
+| table           | wave    | rows | what they are                                              |
+|-----------------+---------+------+------------------------------------------------------------|
+| =plot_labor=      | 2010-11 |   40 | Module D stubs with a blank =ag_d00= that carry labour days: 32 households (31 family, 7 hired, 2 other rows), 500 person-days |
+| =crop_production= | 2016-17 |   41 | Module P lines whose =gardenid= or =plotid= is blank (15 cross-section + 26 panel), all with a crop code; 33 carry a quantity (92.0 native units); none has a sale |
+| =plot_inputs=     | all     |    0 | Module D stubs carry no input; the seed lines with a blank plot key have no crop either and are dropped |
+| =plot_features=   | all     |    0 | dropped on purpose: no area, no unit, no GPS (GH #637 first sites, "468 rows deleted on a null key") |
+
+Every other wave and table had 0 NaN plot ids already.  Site I
+(=null_index_reports=) reported each of the three tables at the base and
+reports none on the branch.
+
+*Consumer rule (data_info.yml): it is NOT a plot.*  So:
+- Two =unknown_plot= records of one household are never summed:
+  =_consolidate_harvest=, =assemble_plot_labor= and =assemble_plot_inputs=
+  RAISE instead.  None exist in the held data (each 2010-11 household has one
+  stub; the 41 Module P lines are 41 distinct household-codes).
+- A household-crop sale (and a seed purchase) attaches only where the crop is
+  on exactly one KNOWN plot and on no =unknown_plot= line.  With a NaN plot,
+  =nunique= ignored the line: a crop seen only there got no sale (still so),
+  but a crop seen there AND on one known plot would have handed the known row
+  the whole household sale.  No held crop is in that second case, so no sale
+  moved.
+- *Not yet applied by the transformations* (framework, not changed here):
+  =harvest_kg= / =yield_kg= group by =plot_id= and so treat =unknown_plot= as
+  one plot per household-crop.  The 41 rows used to vanish there (NaN key);
+  now 12 plot-crops / 2,740 kg (2,973.5 kg with the shipped factors) enter
+  2016-17 =harvest_kg= under =unknown_plot=.  Exclude them by the consumer rule
+  and report the count.
+
+** =(not crop-specific)= on =plot_inputs= (GH #1119)
+
+*Ruling:* one marker everywhere for a =plot_inputs= record that is not about
+any crop.  Malawi served NaN.
+
+*Told apart by the instrument, not by the value.*  Every Module D input --
+inorganic fertilizer, organic fertilizer, agrochemicals -- is asked per PLOT
+with no crop item, so its crop does not exist; a Module G seed line is asked
+per plot-CROP, so a seed line without a crop is a MISSING code.  Measured at
+the base: every NaN-crop row is a Module D input (18,964 / 6,225 / 20,152 /
+22,213 rows), and no Seed row has a NaN crop, because =_seed_block= drops
+crop-less seed lines before they reach the table.  The code now encodes that
+rather than relying on it: the marker goes on non-seed rows only, and a seed
+row reaching =assemble_plot_inputs= without a crop raises.  Served: 67,554
+marked rows, 0 on Seed, 0 NaN; every other value of the table is unchanged.
+
+The dropped seed lines are now COUNTED (a warning, the GH #869 precedent):
+2010-11 330 lines with a blank crop code (59 with a seed quantity); 2013-14
+184, 2016-17 531, 2019-20 26 + 6 blank (none with a quantity); and 2019-20
+cross-section 66 lines under crop code *49*, all with a seed quantity -- 49 is
+on no instrument list (no Stata value label) and not in =harmonize_crop=.  No
+epistemic =j= sentinel is registered for a missing crop, so they stay dropped.
+Four 2010-11 Module G lines with a blank crop code also carry a harvest
+quantity; =_harvest_block= drops them before the #869 count sees them.
+
+** Documentation-only rulings (no data change)
+
+- *Multi-line harvest months.*  A plot-crop recorded on several lines of one
+  code, unit and condition is one native record (49 / 4 / 10 / 46 groups);
+  its quantity is summed and each month is the *first non-null value in line
+  order*.  =harvest_month= differs between the lines of 8 / 0 / 5 / 13 of
+  those groups and =planting_month= of 1 / 1 / 0 / 0.  (Lines of DIFFERENT
+  codes are separate rows since =production_obs=, so their months no longer
+  meet.)
+- *Same-type fertilizer slot pairs* -- see the #1111 entry below: 89 / 59 /
+  78 / 187 pairs summed as two applications; 72 / 50 / 51 / 143 with identical
+  quantities, recorded as possible double entry.
+
+** Cost and checks
+
+Cold builds of every Malawi table (base =1865cf884= vs this change, separate
+data roots): =crop_production= changes as above; =plot_labor= and =plot_inputs=
+are row-for-row identical except the 40 sentinel and 67,554 marker cells; the
+other 23 tables and the five =cluster_features= wave frames are identical.
+Hash census: =Country._table_cache_hash= 26 of 549 (all Malawi),
+=Wave._input_hash= 130 of 2,109 (all five Malawi waves x 26),
+=build_transforms_fingerprint= 0 of 40 -- =malawi.py= and the wave scripts are
+in every Malawi wave's input hash, so the whole country re-warms once.
 
 * community_prices: what Module CK actually asks
 
@@ -3880,6 +4037,7 @@ Two applications of the same fertilizer on the same plot therefore consolidate w
 The raw Module D files hold *89* (2010-11) and *187* (2019-20, cross-section + panel) plot rows naming one fertilizer type in both slots, every one with =ag_d38= ("Did you use any inorganic fertilizer on this [PLOT]") = 1 and two positive kg answers (72 / 143 of them with equal kg); the build sums all of them.
 The other 38 / 3 already shared a key before #1111 (both slots' timing codes decoded to the same label, or both to none) and were already being summed.
 Whether a same-type pair is a double entry or two applications is still a decision (the #637 tail diagnosis, matching PR #1263's decision 4).
+*Ruled (@ligon, 2026-10-23): keep summing; read a same-type pair as two applications; record the identical-quantity pairs as possible double entry -- no data change.*  The census per wave, with 2013-14 and 2016-17 added: same-type pairs 89 / 59 / 78 / 187 (2010-11 / 2013-14 / 2016-17 / 2019-20; the last two cross-section + panel: 43 + 35, 154 + 33), of which 72 / 50 / 51 / 143 carry the identical quantity in both slots (38 + 13, 119 + 24) -- those are the possible double entries.  The comment above the consolidation in =malawi.assemble_plot_inputs= says the same.
 
 This qualifies two earlier claims rather than treating them as authority.
 The preceding unit entry calls =ag_d39c= "acquired-amount" and =e/j= applied units; the shared =_MWI_FERT_UNIT_LABELS= comment also claims those fields use one unit dictionary and treats 11/12 as free-text residuals.

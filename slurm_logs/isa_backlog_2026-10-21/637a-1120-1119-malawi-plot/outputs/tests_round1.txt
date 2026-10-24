@@ -1,0 +1,11 @@
+clean (Malawi + related): 17 failed, 953 passed, 14 skipped, 190 warnings in 344.92s (0:05:44)
+mutation sentinel_off: 3 failed, 31 passed, 8 skipped, 12 warnings, 4 errors in 154.69s (0:02:34)
+mutation marker_off: 9 failed, 37 passed, 18 warnings in 206.97s (0:03:26)
+mutation library_code: 1 failed, 75 passed, 69 deselected in 6.17s
+mutation no_module: 1 failed, 75 passed, 69 deselected in 5.42s
+mutation unknown_guard_off: 1 failed, 75 passed, 69 deselected in 5.98s
+mutation old_gate: 76 passed, 69 deselected in 6.16s
+mutation seed_raise_off: 1 failed, 75 passed, 69 deselected in 5.71s
+mutation obs_not_in_consolidation: 20 failed, 56 passed, 69 deselected in 9.54s
+base: 1865cf884 data_info.yml: register the unknown_plot sentinel and the (n
+base: 18 failed, 16 warnings in 143.43s (0:02:23)

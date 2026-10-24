@@ -1,0 +1,8 @@
+2010-11: harvest rows 33600; unknown-plot rows 0 (with qty 0); unknown-plot rows sharing (hh, module, raw code, u, condition) 0; sharing (hh, module, raw code) 0; (module, hh, _crop_code) with >1 raw code 2676
+   (i, crop code) with unknown-plot rows 0: only unknown 0 (with a sale 0, MWK 0); known+unknown 0 (one known plot 0, with a sale 0, MWK 0)
+2013-14: harvest rows 12699; unknown-plot rows 0 (with qty 0); unknown-plot rows sharing (hh, module, raw code, u, condition) 0; sharing (hh, module, raw code) 0; (module, hh, _crop_code) with >1 raw code 0
+   (i, crop code) with unknown-plot rows 0: only unknown 0 (with a sale 0, MWK 0); known+unknown 0 (one known plot 0, with a sale 0, MWK 0)
+2016-17: harvest rows 37187; unknown-plot rows 41 (with qty 33); unknown-plot rows sharing (hh, module, raw code, u, condition) 0; sharing (hh, module, raw code) 0; (module, hh, _crop_code) with >1 raw code 0
+   (i, crop code) with unknown-plot rows 41: only unknown 41 (with a sale 39, MWK 3,600); known+unknown 0 (one known plot 0, with a sale 0, MWK 0)
+2019-20: harvest rows 52098; unknown-plot rows 0 (with qty 0); unknown-plot rows sharing (hh, module, raw code, u, condition) 0; sharing (hh, module, raw code) 0; (module, hh, _crop_code) with >1 raw code 0
+   (i, crop code) with unknown-plot rows 0: only unknown 0 (with a sale 0, MWK 0); known+unknown 0 (one known plot 0, with a sale 0, MWK 0)

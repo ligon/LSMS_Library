@@ -103,7 +103,7 @@ def shipped(malawi_mod):
 def cp():
     try:
         df = Country('Malawi').crop_production()
-    except Exception as exc:                                # pragma: no cover
+    except FileNotFoundError as exc:                        # pragma: no cover
         pytest.skip(f'Malawi crop_production unavailable: '
                     f'{type(exc).__name__}: {exc}')
     if df is None or df.empty:                              # pragma: no cover
@@ -404,9 +404,10 @@ class TestAgainstCropProduction:
 
     def test_the_declared_grain_is_unique(self, cp):
         f = cp.reset_index()
-        keys = [k for k in ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
-                if k in f.columns]
-        assert not f.duplicated(keys).any()
+        keys = [k for k in ['t', 'i', 'plot_id', 'crop', 'u', 'condition',
+                            'production_obs'] if k in f.columns]
+        n_dup = int(f.duplicated(keys).sum())   # a count: the frame holds ids
+        assert 'production_obs' in keys and n_dup == 0, (keys, n_dup)
 
     def test_with_region_resolves_the_lower_case_key(self, malawi_mod, cp):
         out = malawi_mod.with_region(cp)

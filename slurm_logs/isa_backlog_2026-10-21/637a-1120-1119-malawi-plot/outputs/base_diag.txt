@@ -1,0 +1,18 @@
+== 2016-17 garden/plot ids in G and P, both halves
+  xs Cross_Sectional/ag_mod_g.dta: rows 26506; gardenid NaN 0; plotid NaN 0; key NaN 531; key-NaN rows with crop code 0, with quantity 0 (>0: 0); households with key-NaN rows 467
+    key-NaN rows per household: max 3; households 467; rows by (hh, crop code) duplicated 64
+    same households' other rows in this module: 807
+  xs Cross_Sectional/ag_mod_p.dta: rows 4251; gardenid NaN 0; plotid NaN 0; key NaN 81; key-NaN rows with crop code 15, with quantity 8 (>0: 8); households with key-NaN rows 68
+    key-NaN rows per household: max 6; households 68; rows by (hh, crop code) duplicated 1
+    same households' other rows in this module: 0
+  panel Panel/ag_mod_g_16.dta: rows 6289; gardenid NaN 0; plotid NaN 0; key NaN 0; key-NaN rows with crop code 0, with quantity 0 (>0: 0); households with key-NaN rows 0
+  panel Panel/ag_mod_p_16.dta: rows 1064; gardenid NaN 0; plotid NaN 0; key NaN 49; key-NaN rows with crop code 26, with quantity 25 (>0: 19); households with key-NaN rows 38
+    key-NaN rows per household: max 5; households 38; rows by (hh, crop code) duplicated 0
+    same households' other rows in this module: 0
+== seed rows (Module G) with no crop label
+  2010-11 Full_Sample/Agriculture/ag_mod_g.dta: no label 330; blank code 330; unmapped code values (count, rows with seed qty>0): {}
+    blank-code rows with seed qty>0: 59; of them with a harvest quantity ag_g13a>0: 4
+    their Stata value labels: {}
+  2019-20 Cross_Sectional/ag_mod_g.dta: no label 92; blank code 26; unmapped code values (count, rows with seed qty>0): {49: (66, 66)}
+    blank-code rows with seed qty>0: 0; of them with a harvest quantity ag_g13a>0: 0
+    their Stata value labels: {'49.0': 66}

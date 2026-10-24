@@ -1,0 +1,7 @@
+country: 26 of 549 moved; only-base 0 only-branch 0
+   by {'Malawi': 26}
+btf: 0 of 40 moved; only-base 0 only-branch 0
+   by []
+wave: 130 of 2109 moved; only-base 0 only-branch 0
+   by {'Malawi/2004-05': 26, 'Malawi/2010-11': 26, 'Malawi/2013-14': 26, 'Malawi/2016-17': 26, 'Malawi/2019-20': 26}
+errors base 0 branch 0

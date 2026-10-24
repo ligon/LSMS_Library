@@ -1,0 +1,4 @@
+2010-11: raw distinct (hh, plot, module, code) with a label 33530; served distinct (i, plot_id, production_obs) 33530; served rows 33549; raw lines with a label and no plot key 0; served unknown_plot rows 0
+2013-14: raw distinct (hh, plot, module, code) with a label 12668; served distinct (i, plot_id, production_obs) 12668; served rows 12671; raw lines with a label and no plot key 0; served unknown_plot rows 0
+2016-17: raw distinct (hh, plot, module, code) with a label 37166; served distinct (i, plot_id, production_obs) 37166; served rows 37177; raw lines with a label and no plot key 41; served unknown_plot rows 41
+2019-20: raw distinct (hh, plot, module, code) with a label 51955; served distinct (i, plot_id, production_obs) 51955; served rows 51973; raw lines with a label and no plot key 0; served unknown_plot rows 0
