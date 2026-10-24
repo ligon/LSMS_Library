@@ -197,7 +197,7 @@ def test_2021_22_household_gps_file_is_blank(bf_root):
     """2021-22 ships the household GPS variables but not one value.  If a
     re-release populates them, map them (household grain: see GH #323 Site 2)
     and revisit ``optional: true``."""
-    df = _read(bf_root / "2021-22" / "Data" / S00_2021)
+    df = _read(bf_root / "2021-22" / "Data" / "Panel" / S00_2021)
     assert {"GPS__Latitude", "GPS__Longitude"} <= set(df.columns)
     assert df["GPS__Latitude"].isna().all()
     assert df["GPS__Longitude"].isna().all()

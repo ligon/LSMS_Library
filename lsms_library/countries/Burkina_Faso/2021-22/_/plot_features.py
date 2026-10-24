@@ -33,7 +33,7 @@ def _old_i(grappe, menage):
 
 # convert_categoricals=False keeps the integer s16a codes that the
 # categorical_mapping.org harmonize_* tables key on.
-src = get_dataframe('../Data/s16a_me_bfa2021.dta', convert_categoricals=False)
+src = get_dataframe('../Data/Panel/s16a_me_bfa2021.dta', convert_categoricals=False)
 
 colmap = dict(
     grappe        = 'grappe',

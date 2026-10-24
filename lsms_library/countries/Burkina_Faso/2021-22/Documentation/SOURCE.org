@@ -3,6 +3,7 @@ SOURCE
 https://microdata.worldbank.org/index.php/catalog/6224
 
 #+CATALOG_ID: 6224
+#+CATALOG_SUBDIR: 6224 Panel
 #+CATALOG_IDNO: BFA_2021_EHCVM-P_v04_M
 #+CATALOG_TITLE: Enquête Harmonisée sur le Conditions de Vie des Ménages, Panel Survey 2021-2022
 #+CATALOG_YEARS: 2021-2022

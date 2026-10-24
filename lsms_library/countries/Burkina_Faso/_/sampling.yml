@@ -76,5 +76,5 @@ Sampling:
         (GH #1245).  The raw count is the measurement.
       source_type: derived-from-data
       confidence: high
-      source_file: 'lsms_library/countries/Burkina_Faso/2021-22/Data/s00_me_bfa2021.dta'
+      source_file: 'lsms_library/countries/Burkina_Faso/2021-22/Data/Panel/s00_me_bfa2021.dta'
       locator: 'grappe vs grappe_EHCVM1 in that file, read via get_dataframe 2026-10-23; design: bid_bfa_ehcvm2.pdf p. 4 (quoted in CONTENTS.org, "THE THING TO KNOW"); re-measured through Country("Burkina_Faso").sample() and .cluster_features() at development 9a0ed5f3c'

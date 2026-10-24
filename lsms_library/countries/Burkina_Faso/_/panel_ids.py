@@ -77,7 +77,7 @@ baseline_ids = {
 # Read the 2021-22 cover sheet.  Today every row is a panel household
 # (3,227 rows, all with a non-null grappe_EHCVM1), but do not *assume* that:
 # see the full-cover cur_set below (GH #548).
-df = get_dataframe('../2021-22/Data/s00_me_bfa2021.dta', convert_categoricals=True)
+df = get_dataframe('../2021-22/Data/Panel/s00_me_bfa2021.dta', convert_categoricals=True)
 
 # Current wave ID, in the 2021-22 tables' format.  The survey's hhid carries
 # the same digits; assert it so a future release that changes either fails

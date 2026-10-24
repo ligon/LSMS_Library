@@ -9,7 +9,7 @@ import numpy as np
 
 #data recorded for two periods: seven days before the survey and thirty days before the survey.
 
-df = get_dataframe('../Data/s07b_me_bfa2021.dta', convert_categoricals=True, encoding='iso-8859-1')
+df = get_dataframe('../Data/Panel/s07b_me_bfa2021.dta', convert_categoricals=True, encoding='iso-8859-1')
 
 df["j"] = df["hhid"].astype(int).astype(str)
 

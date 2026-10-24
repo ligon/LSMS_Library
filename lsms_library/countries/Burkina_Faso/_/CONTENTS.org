@@ -1881,3 +1881,26 @@ This change does not alter either count.
 Cache: =panel_ids.py= and both JSON files are build inputs, so every Burkina Faso hash moves and no other country's does.
 Ledger: =.coder/ledger/1240-burkina-panel-ids.md=.
 Aggregate evidence: =slurm_logs/isa_backlog_2026-10-21/1240-burkina-panel-ids/=.
+
+* 2026-10-23 -- 2021-22 is ONE round in TWO catalog entries: 6224 in =Data/Panel/=, 6277 in =Data/Cross_Section/= (GH #1276)
+
+*The idiosyncrasy.*  The 2021-22 EHCVM round was released as two disjoint
+World Bank entries: 6224 (=BFA_2021_EHCVM-P_v04_M=, the panel component:
+3,227 re-interviewed 2018-19 households in grappes 2-585) and 6277
+(=BFA_2021_EHCVM-2_v01_M=, a cross-section drawn from the 2019 census frame:
+7,176 households in 600 new grappes 586-1185).  0 households overlap, by key
+or by a key-free roster match; the questionnaire and fieldwork window are the
+same (investigation of 2026-10-23, quoted on GH #1276).  52 of 6277's 55 file
+names equal files 6224 holds, so the two cannot share one =Data/= directory.
+Mali and Niger have no such gap: their EHCVM-2 revisited the 2018 clusters
+and was released as one entry.  "THE THING TO KNOW" above (a panel
+sub-sample, not a fresh national draw) describes 6224 only.
+
+*Phase 1 (layout, no data change).*  The 53 held 6224 sidecars moved from
+=2021-22/Data/= to =2021-22/Data/Panel/= (=git mv=: a sidecar's =path:= is the
+bare file name and blobs are content-addressed, so nothing was re-pushed), and
+=Documentation/SOURCE.org= records =#+CATALOG_SUBDIR: 6224 Panel=.  Every
+reference moved with them: the 13 =file:= entries of =2021-22/_/data_info.yml=
+(now =Panel/<file>=), =2021-22/_/plot_features.py=, the dead
+=2021-22/_/food_acquired.py=, =_/panel_ids.py=, =_/sampling.yml='s
+=source_file= and four test paths.  The Malawi 2016-17 / 2019-20 layout (#600).
