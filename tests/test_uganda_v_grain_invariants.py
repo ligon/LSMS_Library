@@ -140,7 +140,7 @@ class TestNoRosterHouseholdFallsIntoTheMoverBucket:
 
     def test_no_household_in_the_mover_bucket(self, uga_hc):
         hc, _ = uga_hc
-        n = int((hc.index.get_level_values('v') == 'Mover').sum())
+        n = int((pd.Series(hc.index.get_level_values('v')) == 'Mover').sum())
         assert n == 0, f"{n} household(s) in the shared 'Mover' bucket"
 
 
