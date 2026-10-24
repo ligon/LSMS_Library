@@ -9,6 +9,15 @@ Wave: 2021-22
 #   Data/Cross_Section/  WB 6277, EHCVM-2: 7,176 households in 600 new
 #                        grappes 586-1185, drawn from the 2019 census frame.
 # The two are disjoint (0 households in both) and share the questionnaire.
+#
+# HOUSEHOLD IDS (GH #1244).  The panel component keeps the country `i`
+# (grappe + menage.zfill(3)), which panel_ids / updated_ids link to 2018-19.
+# The cross-section is an independent sample, and with the same formatter 9
+# of its ids equal 2018-19 ids (2018-19's (59, 612) and the cross-section's
+# (590, 612) both spell '590612'), so every Cross_Section/ entry that builds
+# `i` overrides it per file with `cs_i`: 'CS_' + grappe + menage.zfill(3)
+# (burkina_faso.CROSS_SECTION_PREFIX).  cluster_features' `i: menage` is only
+# projected away, so it needs none.
 # A two-file `file:` list makes Wave.grab_data pass missing_ok=True, so a
 # column absent from ONE component is filled NaN instead of raising.  The
 # only requested columns that are: hhweight2021 / hhweight_panel (absent from
@@ -22,7 +31,11 @@ sample:
     df_cover:
         file:
             - Panel/s00_me_bfa2021.dta
-            - Cross_Section/s00_me_bfa2021.dta
+            - Cross_Section/s00_me_bfa2021.dta:
+                i:
+                    - grappe
+                    - menage
+                    - mapping: cs_i
         idxvars:
             v: grappe
             i:
@@ -80,7 +93,11 @@ household_roster:
     df_main:
         file:
             - Panel/s01_me_bfa2021.dta
-            - Cross_Section/s01_me_bfa2021.dta
+            - Cross_Section/s01_me_bfa2021.dta:
+                i:
+                    - grappe
+                    - menage
+                    - mapping: cs_i
         idxvars:
             v: grappe
             i:
@@ -103,7 +120,11 @@ household_roster:
     df_cover:
         file:
             - Panel/s00_me_bfa2021.dta
-            - Cross_Section/s00_me_bfa2021.dta
+            - Cross_Section/s00_me_bfa2021.dta:
+                i:
+                    - grappe
+                    - menage
+                    - mapping: cs_i
         idxvars:
             v: grappe
             i:
@@ -127,7 +148,11 @@ individual_education:
     # overlap the roster after format_id).  i = country i([grappe, menage]).
     file:
         - Panel/ehcvm_individu_bfa2021.dta
-        - Cross_Section/ehcvm_individu_bfa2021.dta
+        - Cross_Section/ehcvm_individu_bfa2021.dta:
+            i:
+                - grappe
+                - menage
+                - mapping: cs_i
     idxvars:
         v: grappe
         i:
@@ -162,7 +187,11 @@ cluster_features:
 shocks:
     file:
         - Panel/s14b_me_bfa2021.dta
-        - Cross_Section/s14b_me_bfa2021.dta
+        - Cross_Section/s14b_me_bfa2021.dta:
+            i:
+                - grappe
+                - menage
+                - mapping: cs_i
     idxvars:
         i:
             - grappe
@@ -227,7 +256,11 @@ shocks:
 assets:
     file:
         - Panel/s12_me_bfa2021.dta
-        - Cross_Section/s12_me_bfa2021.dta
+        - Cross_Section/s12_me_bfa2021.dta:
+            i:
+                - grappe
+                - menage
+                - mapping: cs_i
     idxvars:
         i:
             - grappe
@@ -242,7 +275,11 @@ assets:
 food_acquired:
     file:
         - Panel/s07b_me_bfa2021.dta
-        - Cross_Section/s07b_me_bfa2021.dta
+        - Cross_Section/s07b_me_bfa2021.dta:
+            i:
+                - grappe
+                - menage
+                - mapping: cs_i
     idxvars:
         v: grappe
         visit: vague
@@ -290,7 +327,11 @@ food_acquired:
 housing:
     file:
         - Panel/s11_me_bfa2021.dta
-        - Cross_Section/s11_me_bfa2021.dta
+        - Cross_Section/s11_me_bfa2021.dta:
+            i:
+                - grappe
+                - menage
+                - mapping: cs_i
     idxvars:
         i:
             - grappe
@@ -319,7 +360,11 @@ housing:
 interview_date:
     file:
         - Panel/s00_me_bfa2021.dta
-        - Cross_Section/s00_me_bfa2021.dta
+        - Cross_Section/s00_me_bfa2021.dta:
+            i:
+                - grappe
+                - menage
+                - mapping: cs_i
     idxvars:
         i:
             - grappe
@@ -342,7 +387,11 @@ food_security:
     # mapping.py's food_security() post-processor.
     file:
         - Panel/s08a_me_bfa2021.dta
-        - Cross_Section/s08a_me_bfa2021.dta
+        - Cross_Section/s08a_me_bfa2021.dta:
+            i:
+                - grappe
+                - menage
+                - mapping: cs_i
     idxvars:
         i:
             - grappe
@@ -385,7 +434,11 @@ subjective_well_being:
     # (Très pauvre=1 ... Riche=4); Ne sait pas -> NaN.
     file:
         - Panel/s20a_me_bfa2021.dta
-        - Cross_Section/s20a_me_bfa2021.dta
+        - Cross_Section/s20a_me_bfa2021.dta:
+            i:
+                - grappe
+                - menage
+                - mapping: cs_i
     idxvars:
         i:
             - grappe

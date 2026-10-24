@@ -1791,6 +1791,8 @@ Site C measurement reads as =stable=; their clusters' =Region= agrees for 80
 of 583 -- an id collision, not 583 households.  A cross-wave =groupby('i')=
 over 2014 and 2018-19 merges unrelated households.  Site C covers only =v=;
 the =i= collision is recorded here, not fixed (it would change served =i=).
+/Fixed 2026-10-23 (GH #1244, @ligon's ruling): the 2014 ids are namespaced
+='EMC_'= -- see "Phase 4" of the GH #1276 section at the end of this file./
 
 *2018-19 -> 2021-22.*  In the raw 2021-22 cover, =grappe == grappe_EHCVM1=
 for 3,227 of 3,227 panel households, in 550 grappes, all among 2018-19's
@@ -1996,3 +1998,35 @@ registry's raw-input callable reads both =s07b= files.
   excluded from the sampling frame before the selection of the 600 sample
   EAs.  However, all strata for analysis (regions) are represented in the
   sample." (6277 BID, PDF p. 16; the BID is a catalog resource, not held).
+
+*Phase 4 (household-id namespaces, GH #1244).*  *The idiosyncrasy*: every
+wave builds =i= from its cluster SERIAL plus the household number, and the
+serials of independent draws overlap -- EMC 2014 numbers its ZD 1-900,
+EHCVM-1 its grappes 1-585, the 2021-22 cross-section 586-1185.  So
+unrelated households shared served ids: 583 between 2014 (=zd +
+menage.zfill(3)=) and 2018-19 (=grappe + '0' + menage.zfill(2)=; their
+clusters' Region agreed for 80), and 9 between the cross-section and 2018-19
+(2018-19's (59, 612) and the cross-section's (590, 612) both spell
+='590612'=), 2 of them also crosswalk targets.  @ligon's ruling: namespace
+the samples that are NOT the EHCVM-1 panel lineage, Niger's way (=niger.i=
+prefixes EHCVM ids ='E_'=):
+- 2014 (EMC): ='EMC_' + zd + menage.zfill(3)= (=burkina_faso.emc_i=), bound
+  as the 2014 wave's own =i= in =2014/_/mapping.py= (the 2018-19 wave already
+  overrides =i= that way) and used by the two 2014 scripts that build =i=
+  inline (=food_coping.py=, =months_food_inadequate.py=).  The whole acronym,
+  not Niger's single letter: =E_= would read as EHCVM.
+- the 2021-22 cross-section: ='CS_' + grappe + menage.zfill(3)=
+  (=burkina_faso.cross_section_i=; =cs_i= as a per-file override on every
+  =Cross_Section/= entry that builds =i= -- 11 of them;
+  =2021-22/_/plot_features.py= and =_/panel_ids.py= use the same function).
+  Malawi's name for the same component (=cs_i=, ='cs-17-'=) in Niger's
+  spelling.
+- 2018-19 and the 2021-22 panel component are untouched: =panel_ids= /
+  =updated_ids= link them, and the crosswalk's 3,227 entries are byte-identical
+  to before GH #1276 (Phase 3's two dropped links are back; =panel_ids.py=
+  asserts again, as GH #1245 ruled, instead of dropping).
+- Letters cannot occur in the numeric ids, so a prefixed id cannot equal an
+  unprefixed one whatever the serials do.  0 =i= are shared across the
+  2014 -> 2018-19, 2014 -> 2021-22 and cross-section -> 2018-19 boundaries.
+  The legacy, unreferenced =2014/_/food_acquired.py= and =_/food_acquired.py=
+  were not touched.

@@ -22,9 +22,11 @@
 # EHCVM-1's `grappe`; and a new cross-section whose 600 grappes are numbered
 # 586-1185, disjoint from EHCVM-1's 1-585.
 #
-# Do NOT measure the 2014 boundary by shared `i`: both waves build `i` from
-# the cluster serial, so 583 ids coincide and all 583 "keep" `v` -- an id
+# Do NOT measure the 2014 boundary by shared `i`: both waves built `i` from
+# the cluster serial, so 583 ids coincided and all 583 "kept" `v` -- an id
 # collision, not 583 households (see the 2018-19 note and CONTENTS.org).
+# Since GH #1244 the 2014 ids carry an 'EMC_' prefix and 0 are shared, which
+# is evidence about nothing.
 
 Sampling:
 
@@ -53,7 +55,10 @@ Sampling:
         loosely); `wave-scoped` would claim a crosswalk is meaningful, and
         none is (GH #1243).  District is compared case- and accent-folded,
         Koulpelgo = Koulpelogo (measured before GH #1059's spelling table,
-        PR #1242, landed); unfolded it differed for all 585.
+        PR #1242, landed); unfolded it differed for all 585.  Since GH #1244
+        the 2014 ids are namespaced 'EMC_' (burkina_faso.emc_i), so 0 `i`
+        are shared across this boundary by construction -- which says
+        nothing about `v`, exactly as Niger's 'E_' does not.
       source_type: derived-from-data
       confidence: high
       source_file: null

@@ -75,7 +75,9 @@ def cross_source(source):
 
 def _id(grappe, menage, wave, component='panel'):
     if wave == '2021-22':
-        return tools.format_id(grappe) + tools.format_id(menage, zeropadding=3)
+        # The cross-section is namespaced 'CS_' (GH #1244).
+        prefix = 'CS_' if component == 'cross' else ''
+        return prefix + tools.format_id(grappe) + tools.format_id(menage, zeropadding=3)
     return (tools.format_id(grappe) + '0'
             + tools.format_id(menage, zeropadding=2))
 

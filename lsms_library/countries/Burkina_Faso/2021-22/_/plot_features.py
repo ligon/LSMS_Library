@@ -24,14 +24,18 @@ build plot_features' i with the SAME formatter, so it passes the
 country i() (wrapped to ehcvm_i's (grappe, menage) signature).  Using
 ehcvm_i here would instead strand every 3-digit-menage household off
 sample().  (plot_features 2021-22 already reconciled 100% before #460;
-this keeps it so while #460 fixes the 2018-19 mismatch.)
+this keeps it so while #460 fixes the 2018-19 mismatch.)  That is the PANEL
+component.  The cross-section's households are an independent sample whose
+ids are namespaced 'CS_' (GH #1244), so its parcels are built with
+``burkina_faso.cross_section_i`` -- the formatter data_info.yml's per-file
+``cs_i`` override applies to the cross-section's sample() rows.
 """
 import sys
 import pandas as pd
 
 sys.path.append('../../_/')
 from lsms_library.local_tools import get_dataframe, to_parquet
-from burkina_faso import plot_features_for_wave, i as country_i
+from burkina_faso import plot_features_for_wave, i as country_i, cross_section_i
 
 
 def _old_i(grappe, menage):
@@ -66,7 +70,9 @@ df_panel = plot_features_for_wave('2021-22', panel, colmap, id_fn=_old_i)
 
 # The cross-section ships no s16aq46: no coordinate keys, then empty columns.
 colmap_cross = {k: v for k, v in colmap.items() if k not in ('latitude', 'longitude')}
-df_cross = plot_features_for_wave('2021-22', cross, colmap_cross, id_fn=_old_i)
+# The cross-section is an independent sample: its ids are namespaced 'CS_'
+# exactly as data_info.yml's per-file `cs_i` override builds them (GH #1244).
+df_cross = plot_features_for_wave('2021-22', cross, colmap_cross, id_fn=cross_section_i)
 for col in ('Latitude', 'Longitude'):
     df_cross[col] = pd.array([pd.NA] * len(df_cross), dtype='Float64')
 df_cross = df_cross[df_panel.columns]

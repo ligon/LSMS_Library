@@ -48,7 +48,7 @@ from lsms_library.local_tools import panel_ids, get_dataframe
 # The script's own directory (``_/``) is sys.path[0] when run as
 # ``python panel_ids.py``; Mali's script imports ``from mali import i`` the
 # same way.  Reuse the country's formatters rather than re-implementing them.
-from burkina_faso import ehcvm_i, i as country_i  # noqa: E402
+from burkina_faso import ehcvm_i, i as country_i, cross_section_i  # noqa: E402
 
 
 def _id_2018_19(grappe, menage):
@@ -84,10 +84,16 @@ baseline_ids = {
 df = get_dataframe('../2021-22/Data/Panel/s00_me_bfa2021.dta', convert_categoricals=True)
 cross = get_dataframe('../2021-22/Data/Cross_Section/s00_me_bfa2021.dta',
                       convert_categoricals=True)
-cross_ids = {_id_2021_22(g, m) for g, m in
+# The cross-section's ids, as its tables serve them: namespaced 'CS_' (GH
+# #1244; data_info.yml's per-file `cs_i`).  Unprefixed, 9 of them equal a
+# 2018-19 id and 2 equal a panel household's crosswalk target -- a rename
+# onto a household that keeps its id, i.e. a merge.  With the prefix neither
+# can happen, and the asserts below say so rather than assume it.
+cross_ids = {cross_section_i(g, m) for g, m in
              cross[['grappe', 'menage']].itertuples(index=False)}
 cross_ids.discard(None)
 assert len(cross_ids) == len(cross), "cross-section (grappe, menage) not unique"
+assert not (cross_ids & baseline_ids), "a cross-section id equals a 2018-19 id"
 
 # Current wave ID, in the 2021-22 tables' format.  The survey's hhid carries
 # the same digits; assert it so a future release that changes either fails
@@ -105,15 +111,8 @@ assert (df['i'] == _hhid).all(), (
 _prev = [_id_2018_19(g, m) for g, m in
          df[['grappe_EHCVM1', 'menage_EHCVM1']].itertuples(index=False)]
 orphans = sum(p is not None and p not in baseline_ids for p in _prev)
-# A target that IS a cross-section household's live id would be a rename onto
-# a household that keeps its id -- a merge under id_walk's single pass, and a
-# raw 2021-22 frame that id_walk refuses as mixed (local_tools.id_walk).  The
-# Mali #536 rule: drop such a link and count it.  (The cross-section's ids are
-# namespaced apart by GH #1244, after which this count is 0.)
-held_by_cross = sum(p is not None and p in baseline_ids and p in cross_ids
-                    for p in _prev)
 df['previous_i'] = pd.Series(
-    [p if (p in baseline_ids and p not in cross_ids) else pd.NA for p in _prev],
+    [p if p in baseline_ids else pd.NA for p in _prev],
     index=df.index, dtype=object)
 
 df['t'] = '2021-22'
@@ -175,5 +174,5 @@ with open(_HERE / 'updated_ids.json', 'w') as f:
 
 print(f"Burkina Faso 2021-22 -> 2018-19: {len(_w21)} linked "
       f"({chained} onto an id another 2021-22 household moves off, "
-      f"{orphans} targets absent from the 2018-19 cover, "
-      f"{held_by_cross} dropped: target held by a cross-section household)")
+      f"{orphans} targets absent from the 2018-19 cover; "
+      f"{len(cross_ids)} cross-section households, none linked, all occupied)")
