@@ -58,13 +58,15 @@ the last two matters:
 A wave directory is **not** in 1:1 correspondence with a catalog entry (GH
 #600), in either direction, so two of the keys above are **lists**:
 
-``#+CATALOG_ID: 2936, 2939``
+``#+CATALOG_ID: 2936, 3819``
     The directory holds the files of *several* catalog entries.
     ``Malawi/2016-17/`` is one: ``Data/Cross_Sectional/`` is the Fourth
-    Integrated Household Survey (2936) and ``Data/Panel/`` is the 2016 wave of
-    the Integrated Household Panel Survey (2939) — 97 of its 98 files appear in
-    2939's World Bank datafile list and **none** in 2936's.  Recording only the
-    first made ``discover_waves()`` report a study we hold as missing.
+    Integrated Household Survey (2936) and ``Data/Panel/`` is the 2016 round
+    of the Integrated Household Panel Survey as re-released in 3819
+    (``MWI_2010-2019_IHPS_v06_M``) -- all 99 held files byte-identical to its
+    2016-round members (GH #1277; the record named 2939, which it now
+    ``#+CATALOG_COVERS:``).  Recording only the first made
+    ``discover_waves()`` report a study we hold as missing.
 
 ``#+CATALOG_COVERS: 76, 1050, 2252, 2862``
     The entry we hold **subsumes** the content of other entries whose files we
@@ -95,6 +97,46 @@ record names two of them, under different keys (GH #1114 / #1128):
     ``rg CATALOG_LATEST_IDNO lsms_library/countries`` is the queue of waves
     whose newer release has not been acquired.
 
+Both pairs describe the PRIMARY entry only, and stay the primary's (GH #1283
+ruling, @ligon 2026-10-23: no fact is stated twice, and the 128 single-entry
+records are untouched).  A SECONDARY entry -- one listed after the first in
+``#+CATALOG_ID:``, e.g. one acquired into its own subdirectory with
+``add_wave(..., subdir=...)`` (GH #1276) -- has its own lines, positional, one
+per entry:
+
+``#+CATALOG_HELD: <catalog_id> <idno> [<doi>]``
+    The release the files in that entry's subdirectory came from.  It does
+    NOT claim the subdirectory holds the whole entry (Malawi holds one round
+    of 3819 in each of 2016-17 and 2019-20).  Moved, as ``#+CATALOG_IDNO:``
+    is, only by a demonstrated complete acquisition of that entry (or a
+    human's evidence-backed edit); never by the catalog alone, so the
+    backfill never writes it (#1114 / #1128 applied per entry).
+``#+CATALOG_LATEST: <catalog_id> <idno> <first-seen> [<doi>]``
+    The catalog's newer release of that entry, present only while the
+    catalog is ahead -- the secondary's twin of the ``#+CATALOG_LATEST_*``
+    trio, written and cleared by the backfill.
+
+Read them with :meth:`WaveProvenance.held_release_of` /
+:meth:`WaveProvenance.latest_release_of`, which answer for ANY listed entry
+(the scalars for the primary, the lines for a secondary).
+
+``#+CATALOG_SUBDIR: 6277 Cross_Section``
+    Which subdirectory of ``Data/`` holds which entry's files, one line per
+    entry (GH #1276).  ``add_wave(..., subdir=...)`` writes the line on its
+    first acquisition into a subdirectory and refuses a later call that
+    contradicts it, so an entry cannot be acquired over another entry's
+    same-named files by naming the wrong subdirectory.  Read it with
+    :meth:`WaveProvenance.subdir_map`.  It says nothing about releases.
+
+All three are VALIDATED by every accessor that reads them
+(:meth:`WaveProvenance.validate_entry_lines`), never at parse time, so a bad
+line survives parse -> render and is refused where it would be used: a line
+naming an id ``#+CATALOG_ID:`` does not list, a ``HELD`` / ``LATEST`` line
+naming the primary entry, an id named twice under one key, a line that is
+not of its form, a ``LATEST`` line for an entry with no ``HELD`` line or
+naming the release ``HELD`` already holds, and a first-seen that is not a
+real date.
+
 Everything under :data:`NOTES_HEADING` belongs to a human and is carried
 verbatim, ``#+KEY:`` lines included (GH #1115): ``GhanaSPS/2017-18`` records a
 second, Dataverse vintage of ten files as ``#+SECONDARY_SOURCE*`` lines in the
@@ -106,9 +148,11 @@ from __future__ import annotations
 
 import datetime as _dt
 import logging
+import os
 import re
 from dataclasses import dataclass, field, replace
 from pathlib import Path
+from typing import NamedTuple
 
 logger = logging.getLogger(__name__)
 
@@ -146,8 +190,8 @@ _KEYWORD_RE = re.compile(r"^[ \t]*#\+([A-Z_]+):[ \t]*(.*?)[ \t]*$", re.MULTILINE
 _URL_RE = re.compile(r"https?://[^\s\]\)]+")
 _CATALOG_ID_RE = re.compile(r"/catalog/(\d+)")
 
-# Separator inside a list-valued keyword: ``#+CATALOG_ID: 2936, 2939``.  Commas
-# or whitespace, so both ``2936,2939`` and ``2936 2939`` parse.
+# Separator inside a list-valued keyword: ``#+CATALOG_ID: 2936, 3819``.  Commas
+# or whitespace, so both ``2936,3819`` and ``2936 3819`` parse.
 _LIST_SEP_RE = re.compile(r"[,\s]+")
 
 # Human-written prose in a legacy SOURCE.org (e.g. the EthiopiaRHS round map)
@@ -176,7 +220,8 @@ LATEST_KEYS = ("CATALOG_LATEST_IDNO", "CATALOG_LATEST_DOI",
 # Every keyword WaveProvenance has a field for.  Any other #+KEY: above the
 # notes heading is carried in ``extra`` and rendered back after these.
 _KNOWN_KEYS = frozenset({
-    "CATALOG_ID", "CATALOG_COVERS", "CATALOG_IDNO", "CATALOG_TITLE",
+    "CATALOG_ID", "CATALOG_COVERS", "CATALOG_SUBDIR", "CATALOG_HELD",
+    "CATALOG_LATEST", "CATALOG_IDNO", "CATALOG_TITLE",
     "CATALOG_YEARS", "CATALOG_REPOSITORY", "CATALOG_DOI", "CATALOG_URL",
     *LATEST_KEYS,
     "PROVENANCE_SOURCE", "PROVENANCE_METHOD", "PROVENANCE_VALIDATION",
@@ -196,6 +241,72 @@ _SCALAR_FIELDS = {
     "PROVENANCE_RECORDED": "recorded", "PROVENANCE_NOTE": "note",
     "PROVENANCE_SUPERSEDED_URL": "superseded_url",
 }
+
+
+class CatalogEntryError(ValueError):
+    """A per-entry line (``#+CATALOG_SUBDIR:`` / ``#+CATALOG_HELD:`` /
+    ``#+CATALOG_LATEST:``) that cannot be trusted (GH #1276 / #1283)."""
+
+
+class CatalogSubdirError(CatalogEntryError):
+    """A ``subdir=`` or ``#+CATALOG_SUBDIR:`` value that cannot be trusted
+    (GH #1276)."""
+
+
+class HeldRelease(NamedTuple):
+    """The release of one catalog entry a directory holds files of."""
+    catalog_id: str
+    idno: str
+    doi: str | None = None
+
+
+class LatestRelease(NamedTuple):
+    """The catalog's newer release of one entry, first seen on *seen*."""
+    catalog_id: str
+    idno: str
+    seen: str | None
+    doi: str | None = None
+
+
+_ISO_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+
+# Windows device names: a directory called ``CON`` or ``nul.txt`` cannot be
+# created there, so a checkout holding one is not portable.
+_WINDOWS_RESERVED_RE = re.compile(r"(?i)(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?")
+
+
+def normalise_subdir(subdir) -> str | None:
+    """Validate a subdirectory of a wave's ``Data/`` that holds one catalog
+    entry (GH #1276) and return it as a string.
+
+    It must be ONE directory name directly inside ``Data/``
+    (``'Cross_Section'``, ``'Panel'``), the #600 layout of ``Malawi/2016-17``.
+    Nested subdirectories are refused: an entry held in ``Panel/Cross/``
+    would sit inside the subtree an acquisition into ``Panel/`` scans, so the
+    two would no longer be confined from each other.  Also refused, whether
+    given as a string or a ``Path`` (a Windows ``Path('a/b')`` spells
+    ``'a\\b'``, so both separators are refused alike): an empty name, a
+    ``/`` or ``\\``, ``:`` (a drive letter or an NTFS stream), ``~``, NUL or any
+    control character, leading or trailing whitespace, a trailing ``.``
+    (which also covers ``.`` and ``..``), and a Windows device name
+    (``CON``, ``NUL``, ``COM0``-``COM9``, ``LPT0``-``LPT9``, ...).  ``None``
+    means no subdirectory.
+    """
+    if subdir is None:
+        return None
+    text = os.fspath(subdir)
+    if (not isinstance(text, str) or not text or text != text.strip()
+            or text.endswith(".")
+            or any(c in text for c in "/\\:~")
+            or any(ord(c) < 32 or ord(c) == 127 for c in text)
+            or _WINDOWS_RESERVED_RE.fullmatch(text)):
+        raise CatalogSubdirError(
+            "subdir must be ONE directory name directly inside Data/, e.g. "
+            "'Cross_Section': no '/', '\\', ':', '~', control character, "
+            "leading or trailing whitespace, trailing '.', or Windows device "
+            f"name; got {subdir!r}")
+    return text
 
 
 def _regions(text: str) -> tuple[list[str], list[str]]:
@@ -358,6 +469,14 @@ class WaveProvenance:
     latest_doi: str | None = None
     latest_seen: str | None = None        # ISO date a re-stamp first saw it
     scalar_keywords: dict[str, list[str]] = field(default_factory=dict)
+    # ``#+CATALOG_SUBDIR:`` values as written, ``"<catalog id> <subdir>"``, one
+    # per line (GH #1276).  Raw, so a malformed line survives parse -> render;
+    # subdir_map() is where they are checked.
+    catalog_subdirs: list[str] = field(default_factory=list)
+    # ``#+CATALOG_HELD:`` / ``#+CATALOG_LATEST:`` values as written, one per
+    # secondary entry (GH #1283); raw for the same reason.
+    catalog_held: list[str] = field(default_factory=list)
+    catalog_latest: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         # Keep the scalar and the list in agreement whichever one was supplied.
@@ -378,6 +497,147 @@ class WaveProvenance:
         ``False`` only for :data:`SOURCE_UNKNOWN` — i.e. a genuine gap.
         """
         return self.is_worldbank or self.source == SOURCE_EXTERNAL
+
+    def _entry_lines(self, key: str, values: list[str], form: str,
+                     sizes: tuple[int, ...], *, primary_ok: bool = False,
+                     maxsplit: int = -1) -> dict[str, list[str]]:
+        """``{catalog id: tokens}`` for one per-entry key, or
+        :class:`CatalogEntryError` (GH #1283's refusals)."""
+        out: dict[str, list[str]] = {}
+        for raw in values:
+            toks = [s.strip() for s in raw.split(None, maxsplit)]
+            if len(toks) not in sizes or not toks[0].isdigit():
+                raise CatalogEntryError(f"#+{key}: {raw!r} is not '{form}'")
+            cid = toks[0]
+            if cid not in self.catalog_ids:
+                raise CatalogEntryError(
+                    f"#+{key}: {raw!r} names {cid}, which #+CATALOG_ID: does "
+                    f"not list ({', '.join(self.catalog_ids) or 'no entry'})")
+            if cid == self.catalog_id and not primary_ok:
+                raise CatalogEntryError(
+                    f"#+{key}: {raw!r} names the primary entry {cid}, whose "
+                    "release #+CATALOG_IDNO: / #+CATALOG_DOI: (and "
+                    "#+CATALOG_LATEST_*) record")
+            if cid in out:
+                raise CatalogEntryError(f"#+{key}: names {cid} twice")
+            out[cid] = toks
+        return out
+
+    def validate_entry_lines(self) -> None:
+        """Refuse a ``#+CATALOG_SUBDIR:`` / ``HELD`` / ``LATEST`` line that
+        cannot be trusted (:class:`CatalogEntryError`).  Called by every
+        accessor below; parse and render never refuse, so a bad line survives
+        until something would use it."""
+        self.subdir_map()
+        self.held_releases()
+        self.latest_releases()
+
+    def subdir_map(self) -> dict[str, str]:
+        """``{catalog id: subdirectory of Data/}`` from ``#+CATALOG_SUBDIR:``.
+
+        Raises :class:`CatalogSubdirError` on a line that is not
+        ``<numeric catalog id> <subdirectory>``, a subdirectory
+        :func:`normalise_subdir` refuses, an id ``#+CATALOG_ID:`` does not
+        list, an id named twice, or two ids mapped to one subdirectory
+        (compared ignoring case).
+        """
+        try:
+            lines = self._entry_lines(
+                "CATALOG_SUBDIR", self.catalog_subdirs,
+                "<catalog id> <subdirectory>", (2,), primary_ok=True,
+                maxsplit=1)
+        except CatalogEntryError as exc:
+            raise CatalogSubdirError(str(exc)) from None
+        out: dict[str, str] = {}
+        owners: dict[str, str] = {}
+        for cid, (_, sub) in lines.items():
+            try:
+                normalise_subdir(sub)
+            except CatalogSubdirError as exc:
+                raise CatalogSubdirError(
+                    f"#+CATALOG_SUBDIR: {cid} {sub}: {exc}") from None
+            owner = owners.get(sub.casefold())
+            if owner is not None:
+                raise CatalogSubdirError(
+                    f"#+CATALOG_SUBDIR: maps both {owner} and {cid} to "
+                    f"Data/{sub}/")
+            out[cid] = sub
+            owners[sub.casefold()] = cid
+        return out
+
+    def held_releases(self) -> dict[str, HeldRelease]:
+        """The secondary entries' ``#+CATALOG_HELD:`` lines, by catalog id
+        (GH #1283).  Raises :class:`CatalogEntryError` (see the module)."""
+        lines = self._entry_lines("CATALOG_HELD", self.catalog_held,
+                                  "<catalog id> <idno> [<doi>]", (2, 3))
+        return {cid: HeldRelease(cid, toks[1],
+                                 toks[2] if len(toks) > 2 else None)
+                for cid, toks in lines.items()}
+
+    def latest_releases(self) -> dict[str, LatestRelease]:
+        """The secondary entries' ``#+CATALOG_LATEST:`` lines, by catalog id
+        (GH #1283).  Raises :class:`CatalogEntryError` (see the module), and
+        for a first-seen that is not a real ``YYYY-MM-DD`` date, a ``LATEST``
+        line for an entry with no ``HELD`` line (there is no held release to
+        be ahead of), or one naming the release ``HELD`` already names (the
+        catalog is not ahead, so the line should not be there)."""
+        lines = self._entry_lines(
+            "CATALOG_LATEST", self.catalog_latest,
+            "<catalog id> <idno> <first-seen> [<doi>]", (3, 4))
+        held = self.held_releases()
+        out: dict[str, LatestRelease] = {}
+        for cid, toks in lines.items():
+            raw = " ".join(toks)
+            try:
+                if not _ISO_DATE_RE.fullmatch(toks[2]):
+                    raise ValueError
+                _dt.date.fromisoformat(toks[2])
+            except ValueError:
+                raise CatalogEntryError(
+                    f"#+CATALOG_LATEST: {raw!r}: first-seen {toks[2]!r} is "
+                    "not a YYYY-MM-DD date") from None
+            if cid not in held:
+                raise CatalogEntryError(
+                    f"#+CATALOG_LATEST: {raw!r}: {cid} has no #+CATALOG_HELD: "
+                    "line, so nothing is held for a newer release to be "
+                    "ahead of")
+            if held[cid].idno == toks[1]:
+                raise CatalogEntryError(
+                    f"#+CATALOG_LATEST: {raw!r} names the release "
+                    f"#+CATALOG_HELD: already holds for {cid}")
+            out[cid] = LatestRelease(cid, toks[1], toks[2],
+                                     toks[3] if len(toks) > 3 else None)
+        return out
+
+    def held_release_of(self, catalog_id: str) -> HeldRelease | None:
+        """The release held of ANY entry this record lists: the primary's
+        ``#+CATALOG_IDNO:`` / ``#+CATALOG_DOI:``, or a secondary's
+        ``#+CATALOG_HELD:`` line.  ``None`` when none is recorded; a
+        :class:`CatalogEntryError` for an id the record does not list, or a
+        per-entry line that cannot be trusted."""
+        catalog_id = str(catalog_id)
+        self.validate_entry_lines()
+        if catalog_id not in self.catalog_ids:
+            raise CatalogEntryError(
+                f"{self.country}/{self.wave} does not list {catalog_id} in "
+                "#+CATALOG_ID:")
+        if catalog_id == self.catalog_id:
+            return (HeldRelease(catalog_id, self.idno.strip(), self.doi)
+                    if self.idno else None)
+        return self.held_releases().get(catalog_id)
+
+    def latest_release_of(self, catalog_id: str) -> LatestRelease | None:
+        """The catalog's newer release of ANY listed entry, as recorded: the
+        primary's ``#+CATALOG_LATEST_*`` trio or a secondary's
+        ``#+CATALOG_LATEST:`` line.  ``None`` when the catalog is not ahead
+        (or nothing has looked)."""
+        catalog_id = str(catalog_id)
+        self.held_release_of(catalog_id)            # validates, and the id
+        if catalog_id == self.catalog_id:
+            return (LatestRelease(catalog_id, self.latest_idno.strip(),
+                                  self.latest_seen, self.latest_doi)
+                    if self.latest_idno else None)
+        return self.latest_releases().get(catalog_id)
 
     @property
     def is_stale_release(self) -> bool:
@@ -484,6 +744,9 @@ def parse_source_org(text: str, country: str, wave: str) -> WaveProvenance:
         scalar_keywords={k: list(v) for k, v in kw.items()
                          if k in _SCALAR_FIELDS
                          and (len(v) > 1 or not v[-1])},
+        catalog_subdirs=list(kw.get("CATALOG_SUBDIR", [])),
+        catalog_held=list(kw.get("CATALOG_HELD", [])),
+        catalog_latest=list(kw.get("CATALOG_LATEST", [])),
     )
 
 
@@ -497,7 +760,9 @@ def render_source_org(prov: WaveProvenance) -> str:
     repeated one, an empty value as a bare ``#+KEY:`` -- and the notes are
     carried as parsed.
     """
-    if (prov.catalog_ids or prov.covers) and not prov.is_worldbank:
+    if ((prov.catalog_ids or prov.covers or prov.catalog_subdirs
+         or prov.catalog_held or prov.catalog_latest)
+            and not prov.is_worldbank):
         # A repeated PROVENANCE_SOURCE can leave the last-value accessor
         # external/unknown while the record still holds catalog identity.
         # Emitting none/unknown below would erase that identity (#1115).
@@ -519,6 +784,15 @@ def render_source_org(prov: WaveProvenance) -> str:
     # only for a WB record: "covers" without a holding is meaningless.
     if prov.is_worldbank and prov.covers:
         lines.append(f"#+CATALOG_COVERS: {', '.join(prov.covers)}")
+    # Which subdirectory of Data/ holds which entry (GH #1276): a holdings
+    # fact, so it sits with the ids.  Every line as written, in order.
+    # A secondary entry's held and newer releases (GH #1283) sit beside it.
+    if prov.is_worldbank:
+        for key, values in (("CATALOG_SUBDIR", prov.catalog_subdirs),
+                            ("CATALOG_HELD", prov.catalog_held),
+                            ("CATALOG_LATEST", prov.catalog_latest)):
+            for value in values:
+                lines.append(f"#+{key}: {value}".rstrip())
 
     for key, val in (("CATALOG_IDNO", prov.idno),
                      ("CATALOG_TITLE", prov.title),
@@ -631,6 +905,89 @@ def acquired_release(existing: WaveProvenance | None, *, country: str,
         recorded=recorded, superseded_url=superseded,
         notes=existing.notes if existing is not None else None,
         extra=dict(existing.extra) if existing is not None else {})
+
+
+def held_secondary_entry(existing: WaveProvenance, catalog_id: str,
+                         idno: str | None = None,
+                         doi: str | None = None) -> WaveProvenance:
+    """The record to write once an acquisition into a SUBDIRECTORY of
+    ``Data/`` holds release *idno* of *catalog_id*, an entry other than the
+    directory's primary one (GH #1276 / #1283; the #600 pattern of
+    ``Malawi/2016-17``).
+
+    *catalog_id* is appended to ``#+CATALOG_ID:`` if absent.  With *idno*,
+    its ``#+CATALOG_HELD:`` line is written or updated in place and its
+    ``#+CATALOG_LATEST:`` line removed -- the newer release a re-stamp queued
+    is now the one held -- exactly as :func:`acquired_release` moves the
+    primary's scalars.  The primary's ``#+CATALOG_IDNO:`` / ``#+CATALOG_DOI:``
+    and every other key stay as they were.  Call it only for a demonstrated
+    complete acquisition (#1114).
+
+    *doi*, when not given, is taken from the record only where it describes
+    *idno*: the queued ``LATEST`` line's if that is the release acquired, the
+    ``HELD`` line's if it is the release already held.
+
+    Returns *existing* itself when nothing changes, so a re-acquisition of
+    the same release need not rewrite the file.
+    """
+    catalog_id = str(catalog_id)
+    if not existing.is_worldbank:
+        raise ValueError(
+            f"{existing.country}/{existing.wave} records no World Bank primary "
+            f"entry, so {catalog_id} cannot be added beside one")
+    if catalog_id == existing.catalog_id:
+        raise ValueError(
+            f"{catalog_id} is the primary entry of {existing.country}/"
+            f"{existing.wave}; its held release is recorded by acquired_release")
+    new = (existing if catalog_id in existing.catalog_ids else
+           replace(existing, catalog_ids=[*existing.catalog_ids, catalog_id]))
+    if idno is None:
+        return new
+    idno = idno.strip()
+    held, latest = new.held_releases(), new.latest_releases()
+    new.validate_entry_lines()
+    if doi is None:
+        if catalog_id in latest and latest[catalog_id].idno == idno:
+            doi = latest[catalog_id].doi
+        elif catalog_id in held and held[catalog_id].idno == idno:
+            doi = held[catalog_id].doi
+    line = f"{catalog_id} {idno}" + (f" {doi}" if doi else "")
+    lines = [line if raw.split(None, 1)[0] == catalog_id else raw
+             for raw in new.catalog_held]
+    if catalog_id not in held:
+        lines.append(line)
+    queue = [raw for raw in new.catalog_latest
+             if raw.split(None, 1)[0] != catalog_id]
+    if lines == new.catalog_held and queue == new.catalog_latest:
+        return new
+    return replace(new, catalog_held=lines, catalog_latest=queue)
+
+
+def with_catalog_subdir(prov: WaveProvenance, catalog_id: str,
+                        subdir: str) -> WaveProvenance:
+    """*prov* with ``#+CATALOG_SUBDIR: <catalog_id> <subdir>`` (GH #1276).
+
+    Returns *prov* itself when the line is already there, so the caller can
+    skip the write.  Raises :class:`CatalogSubdirError` when the record maps
+    *catalog_id* to another subdirectory, or *subdir* to another entry: the
+    mapping is only ever added to, never rewritten by an acquisition.
+    """
+    catalog_id, sub = str(catalog_id), normalise_subdir(subdir)
+    mapping = prov.subdir_map()
+    if mapping.get(catalog_id) == sub:
+        return prov
+    if catalog_id in mapping:
+        raise CatalogSubdirError(
+            f"{prov.country}/{prov.wave}: #+CATALOG_SUBDIR: maps {catalog_id} "
+            f"to Data/{mapping[catalog_id]}/, not Data/{sub}/")
+    owner = next((i for i, s in mapping.items()
+                  if s.casefold() == sub.casefold()), None)
+    if owner is not None:
+        raise CatalogSubdirError(
+            f"{prov.country}/{prov.wave}: #+CATALOG_SUBDIR: maps "
+            f"Data/{mapping[owner]}/ to {owner}, not {catalog_id}")
+    return replace(prov, catalog_subdirs=[*prov.catalog_subdirs,
+                                          f"{catalog_id} {sub}"])
 
 
 def read_provenance(countries_dir: Path, country: str,
