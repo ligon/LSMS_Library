@@ -60,5 +60,27 @@ scope; no corpus-clean claim follows from synthetic verification.
 
 ## Phase 3 verification
 
-Pending baseline reproduction, candidate tests, hash impact and independent
-review. The ledger does not claim the issue is fixed.
+The new synthetic suite has 10 passing candidate cases. The actual baseline
+fails all four malformed-column/index cases; the corrected stale-cache
+control also fails on the baseline. The first baseline run included one
+test-fixture missing-directory failure, retained in its original log.
+Healthy, absent, empty, selected-subset and AttributeError controls pass.
+
+The selected regression run passes 308 tests. It included the two unmarked
+CotedIvoire real-data degradation tests in `test_gh675_degraded_build.py`:
+`-m 'not requires_s3'` does not exclude them. Their fixture uses private L2
+roots and the shared L1/probe; do not describe that run as data-free or as
+proof of zero remote/cache activity. Future offline selections use an empty
+private data root as well as explicit test selection.
+
+Independent source critique accepts the narrow branch with qualifications:
+worker transport preserves the chained KeyError as traceback text rather
+than `__cause__`, and derived API fallback safety is not proved here.
+Guarded parent metadata census: 549 country hashes / 40 fingerprints /
+2,109 wave hashes / zero errors. Candidate hash impact and final independent
+runtime review remain pending. No new PR is opened while existing PRs take
+integration priority under the user's steering.
+
+`build_wave` — OK (anchored on §§2–4): aborts before concat/cache writes;
+reuses established extraction, writer and exception relay. No new cache
+metadata mechanism, schema rule or country-specific survey interpretation.
