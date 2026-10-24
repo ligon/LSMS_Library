@@ -82,10 +82,15 @@ defect A (the crop-code merge at the end of `assemble_crop_production`) for
   would split no key", ~line 1240), `data_scheme.yml`'s `crop_production`
   comment ("so it splits no key", ~line 256), and `CONTENTS.org`'s "Why the
   join keys on the VARIETY" ("splits no key") — the diagnosis measured 286
-  groups split.  To be corrected with the ruling.
+  groups split.  To be corrected with the ruling.  *RULED and done*
+  (@ligon 2026-10-23: `production_obs` = native crop code) -- see
+  `.coder/ledger/637a-1120-1119-malawi-plot.md`; the three "splits no key"
+  passages are corrected there.
 - `ag_g09a` ("harvested so far") carries a quantity on 186 of 265 blank 2013-14
   Module G rows; serving it is new wiring.
 - Same-type fertilizer slot pairs (89 / 187): double entry or two applications.
+  *RULED* (@ligon 2026-10-23): keep summing, two applications; identical pairs
+  recorded as possible double entry (Malawi `CONTENTS.org`, #1111 entry).
 - `Quantity_purchased` still has no served unit.
 
 ---
