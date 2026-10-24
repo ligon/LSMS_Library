@@ -2636,9 +2636,14 @@ re-release, 3819 (=MWI_2010-2019_IHPS_v06_M=), which re-ships the 2010, 2013
 and 2016 rounds beside 2019.  The files we hold are 3819's.  All 99 held
 =2016-17/Data/Panel/= sidecars are byte-identical to members of
 =MWI_2010-2019_IHPS_v06_M_Stata.zip= (and all 98 of =2019-20/Data/Panel/='s,
-measured 2026-10-23); every one traces to git commit =ae90114fb= (2025-04-18),
-which added =MalawiIHPS/2010-2019/Data/= before it was split into the two wave
-directories.  94 of the 99 are also byte-identical in 2939.  The 5 that are
+measured 2026-10-23). The 98 / 97 pre-existing Panel files trace to git
+commit =ae90114fb= (2025-04-18), which added =MalawiIHPS/2010-2019/Data/=
+before its split into the two wave directories. The household geovariable
+sidecars were added to the current wave paths by =fd5c12474= (2026-10-23,
+GH #1260): =2016-17/Data/Panel/HouseholdGeovariablesIHPSY3.dta.dvc= and
+=2019-20/Data/Panel/householdgeovariables_y4.dta.dvc=. Both also have the same
+md5 as their same-named sidecar in =ae90114fb=. This distinguishes historical
+byte lineage from introduction at the current wave paths.  94 of the 99 are also byte-identical in 2939.  The 5 that are
 not -- =ag_mod_e3_16=, =ag_mod_j_16=, =hh_mod_a_filt_16=, =hh_mod_e_16=,
 =hh_mod_g1_16= -- are 3819's later, corrected saves: in 3819
 =hh_mod_a_filt_16='s =case_id= links to the IHS3 baseline for 2,508 of 2,508
