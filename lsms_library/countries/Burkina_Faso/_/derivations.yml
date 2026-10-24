@@ -57,7 +57,8 @@ Burkina_Faso::food_acquired::7day-purchase-at-last-purchase-unit-value:
         positive), 1,684 because the last purchase used a different unit CODE,
         2,157 because it used the same code in a different SIZE (Petit / Moyen
         / Grand / Taille unique), which is a different container and so a
-        different price per unit. 2021-22: 7,065 of the 52,820 SERVED
+        different price per unit. 2021-22, the panel component (WB 6224;
+        measured before GH #1276 added the 6277 cross-section): 7,065 of the 52,820 SERVED
         purchased rows (13.4%) -- 4,859 because no last purchase was reported
         at all (s07bq08 or s07bq07a missing / not positive), 1,708 because the
         last purchase used a different unit CODE, 498 because it used the same
@@ -75,7 +76,7 @@ Burkina_Faso::food_acquired::7day-purchase-at-last-purchase-unit-value:
         ehcvm_conso reproduces.  The alternatives, measured, are A = the gross
         7-day consumption s07bq03a (which would put the value of own-produced
         and gifted food into Expenditure) and B = net of own production only.
-        2018-19: A 54,075,976, B 53,497,881, C (served) 52,466,280 FCFA, against a raw s07bq08 total of 65,315,308.  2021-22: A 29,381,603, B 29,220,369, C (served) 27,888,221 FCFA, against a raw s07bq08 total of 39,905,158.
+        2018-19: A 54,075,976, B 53,497,881, C (served) 52,466,280 FCFA, against a raw s07bq08 total of 65,315,308.  2021-22, the panel component (WB 6224): A 29,381,603, B 29,220,369, C (served) 27,888,221 FCFA, against a raw s07bq08 total of 39,905,158.  The 2021-22 cross-section (WB 6277, served since GH #1276, 2026-10-23) adds C 56,921,118 FCFA against a raw s07bq08 total of 83,572,255 (A and B not measured).
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
     - text: >-
@@ -86,7 +87,7 @@ Burkina_Faso::food_acquired::7day-purchase-at-last-purchase-unit-value:
         people who built the aggregate rather than an answer anybody gave -- so
         it is checked and not served.  Own production keeps the identical
         treatment it already had (s = 'produced' from s07bq04, Expenditure NA).
-        2018-19: 9,386 inkind rows carrying 31,929 units, 0 with an Expenditure.  2021-22: 6,148 inkind rows carrying 24,918 units, 0 with an Expenditure.
+        2018-19: 9,386 inkind rows carrying 31,929 units, 0 with an Expenditure.  2021-22, the panel component: 6,148 inkind rows carrying 24,918 units, 0 with an Expenditure; the cross-section (GH #1276) adds 13,745 inkind rows.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
   validated_against: >-
