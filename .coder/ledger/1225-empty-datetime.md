@@ -51,24 +51,34 @@ wave parsing, country config or populated date interpretation.
 
 ## §5 Reuse decision
 
-Extend the existing helper with an empty-input cast to the parser's existing
-microsecond dtype. Prefer `s.astype('datetime64[us]')` to a newly constructed
-Series because it carries pandas' existing index/name/attrs propagation.
-Verify that propagation explicitly rather than assuming it. Reuse the
-existing mixed-date test module and helper/caller coverage.
+Extend the existing helper with a typed empty Series constructor, following
+the existing empty-input constructor in `parse_datetime` (`datetime_parse.py`,
+section 2). Preserve `s.index` and `s.name` explicitly, copy `s.attrs`, and
+keep the literal already-datetime pass-through before this branch. A cast
+from the input dtype is unsuitable: independent review demonstrated that
+an empty `timedelta64[ns]` Series rejects conversion to `datetime64[us]`.
+Zero rows require no interpretation of the source dtype. Do not introduce
+an intermediate object cast to work around that unsupported conversion.
+Reuse the existing mixed-date test module, adding timedelta cases for all
+three index shapes and both dtype enforcers.
 
 ## §6 Open questions for the coordinator
 
 None. The coordinator reviewed ledger commit `b405437ef` and released the
-narrow plan before test or production edits. Implementation and regression
-tests are committed as `e7c2931030eadf275772f9c7a3336d34b7edbf87`.
+original narrow plan before test or production edits. Independent review
+then found the empty-timedelta cast failure in implementation
+`e7c2931030eadf275772f9c7a3336d34b7edbf87`. The coordinator preauthorized
+the explicit empty-constructor amendment above, still within the same three
+tracked paths. Commit this updated reuse plan before production/test edits.
+Retain the original red/pass logs; reproduce the new timedelta cases on
+the unchanged original implementation, then verify the amended candidate.
 
 ## Phase 3 verification
 
-- `_coerce_datetime_column`: OK (sections 2-4). The three added lines reuse
-  the existing microsecond date contract only for non-datetime zero-row
-  input, after the literal datetime pass-through. The populated path is
-  unchanged; no separate parser or calendar assumption was introduced.
+- `_coerce_datetime_column`: amendment pending. The original three-line
+  cast preserved the tested object/string inputs but contradicted section 4
+  for empty timedelta input. The replacement must use the existing parser's
+  empty-constructor precedent with explicit metadata preservation.
 - Empty metadata and dtype tests: OK (sections 3-4). Six object/string cases
   cover an ordinary Index, an empty MultiIndex and a MultiIndex retaining
   unused string/integer levels. Full Series/index equality, name, attrs,
@@ -114,7 +124,9 @@ top = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'], text=True
 assert os.path.realpath(lsms_library.__file__).startswith(os.path.realpath(top) + os.sep)
 ```
 
-No contradiction or reinvention was found against this ledger. Country data
+The original verification did not cover empty timedelta input. Independent
+review found that contradiction; the amended reuse plan resolves it without
+changing populated parsing. Amendment verification is pending. Country data
 behavior and a full-corpus numerical hash census are outside this check.
 
 Sue
