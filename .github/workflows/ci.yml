@@ -224,7 +224,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: false
-          miniforge-version: latest
+          miniforge-version: 26.7.2-1
           environment-file: environment-windows.yml
           activate-environment: lsms
       - name: Install the library
