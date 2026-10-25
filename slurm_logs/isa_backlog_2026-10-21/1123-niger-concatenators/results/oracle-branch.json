@@ -1,0 +1,82 @@
+{
+ "crop_production": {
+  "each_wave_parquet_has_only_its_t": true,
+  "var_equals_concat_of_wave_parquets": true,
+  "var_rows_by_wave": {
+   "2011-12": 11983,
+   "2014-15": 9528,
+   "2018-19": 13719,
+   "2021-22": 12933
+  },
+  "wave_rows": {
+   "2011-12": 11983,
+   "2014-15": 9528,
+   "2018-19": 13719,
+   "2021-22": 12933
+  }
+ },
+ "livestock": {
+  "each_wave_parquet_has_only_its_t": true,
+  "var_equals_concat_of_wave_parquets": true,
+  "var_rows_by_wave": {
+   "2011-12": 6614,
+   "2014-15": 5018,
+   "2018-19": 9764,
+   "2021-22": 8834
+  },
+  "wave_rows": {
+   "2011-12": 6614,
+   "2014-15": 5018,
+   "2018-19": 9764,
+   "2021-22": 8834
+  }
+ },
+ "people_last7days": {
+  "each_wave_parquet_has_only_its_t": true,
+  "var_equals_concat_of_wave_parquets": true,
+  "var_rows_by_wave": {
+   "2011-12": 25125,
+   "2014-15": 26579,
+   "2018-19": 35406,
+   "2021-22": 44320
+  },
+  "wave_rows": {
+   "2011-12": 25125,
+   "2014-15": 26579,
+   "2018-19": 35406,
+   "2021-22": 44320
+  }
+ },
+ "plot_inputs": {
+  "each_wave_parquet_has_only_its_t": true,
+  "var_equals_concat_of_wave_parquets": true,
+  "var_rows_by_wave": {
+   "2011-12": 8538,
+   "2014-15": 8179,
+   "2018-19": 13401,
+   "2021-22": 12439
+  },
+  "wave_rows": {
+   "2011-12": 8538,
+   "2014-15": 8179,
+   "2018-19": 13401,
+   "2021-22": 12439
+  }
+ },
+ "plot_labor": {
+  "each_wave_parquet_has_only_its_t": true,
+  "var_equals_concat_of_wave_parquets": true,
+  "var_rows_by_wave": {
+   "2011-12": 19643,
+   "2014-15": 15935,
+   "2018-19": 9457,
+   "2021-22": 8006
+  },
+  "wave_rows": {
+   "2011-12": 19643,
+   "2014-15": 15935,
+   "2018-19": 9457,
+   "2021-22": 8006
+  }
+ }
+}

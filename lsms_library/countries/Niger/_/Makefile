@@ -37,12 +37,20 @@ panel-ids:
 # to_parquet); the in-tree paths here are only the make prerequisites'
 # script files, so we run the country script unconditionally to (re)build
 # the wave parquets it reads, then concatenate.
+#
+# All five country recipes here (crop_production, plot_inputs, livestock,
+# plot_labor, people_last7days) chain their wave scripts with `&&`, and
+# every concatenator refuses a missing wave parquet via
+# niger.concat_wave_parquets (GH #1123; extended from plot_inputs to the
+# other four on 2026-10-23).  Both halves are needed: `&&` makes a failed
+# wave fail make, and the framework then runs the concatenator as its
+# Python fallback, which used to skip the absent wave.  The rationale for
+# `&&` over `;` (and over Malawi's prerequisite form) is at plot_inputs.
 CROP_WAVES := 2011-12 2014-15 2018-19 2021-22
 
 $(VAR_DIR)/crop_production.parquet: crop_production.py niger.py categorical_mapping.org \
 		$(foreach w,$(CROP_WAVES),../$(w)/_/crop_production.py)
-	$(foreach w,$(CROP_WAVES),(cd ../$(w)/_ && python crop_production.py);)
-	python crop_production.py
+	$(foreach w,$(CROP_WAVES),(cd ../$(w)/_ && python crop_production.py) &&) python crop_production.py
 
 ../%/_/crop_production.parquet: ../%/_/crop_production.py niger.py categorical_mapping.org
 	(cd $(@D) && python crop_production.py)
@@ -80,8 +88,7 @@ LIVESTOCK_WAVES := 2011-12 2014-15 2018-19 2021-22
 
 $(VAR_DIR)/livestock.parquet: livestock.py niger.py categorical_mapping.org \
 		$(foreach w,$(LIVESTOCK_WAVES),../$(w)/_/livestock.py)
-	$(foreach w,$(LIVESTOCK_WAVES),(cd ../$(w)/_ && python livestock.py);)
-	python livestock.py
+	$(foreach w,$(LIVESTOCK_WAVES),(cd ../$(w)/_ && python livestock.py) &&) python livestock.py
 
 ../%/_/livestock.parquet: ../%/_/livestock.py niger.py categorical_mapping.org
 	(cd $(@D) && python livestock.py)
@@ -95,8 +102,7 @@ PLOT_LABOR_WAVES := 2011-12 2014-15 2018-19 2021-22
 
 $(VAR_DIR)/plot_labor.parquet: plot_labor.py niger.py \
 		$(foreach w,$(PLOT_LABOR_WAVES),../$(w)/_/plot_labor.py)
-	$(foreach w,$(PLOT_LABOR_WAVES),(cd ../$(w)/_ && python plot_labor.py);)
-	python plot_labor.py
+	$(foreach w,$(PLOT_LABOR_WAVES),(cd ../$(w)/_ && python plot_labor.py) &&) python plot_labor.py
 
 ../%/_/plot_labor.parquet: ../%/_/plot_labor.py niger.py
 	(cd $(@D) && python plot_labor.py)
@@ -107,8 +113,7 @@ PEOPLE7_WAVES := 2011-12 2014-15 2018-19 2021-22
 
 $(VAR_DIR)/people_last7days.parquet: people_last7days.py niger.py \
 		$(foreach w,$(PEOPLE7_WAVES),../$(w)/_/people_last7days.py)
-	$(foreach w,$(PEOPLE7_WAVES),(cd ../$(w)/_ && python people_last7days.py);)
-	python people_last7days.py
+	$(foreach w,$(PEOPLE7_WAVES),(cd ../$(w)/_ && python people_last7days.py) &&) python people_last7days.py
 
 ../%/_/people_last7days.parquet: ../%/_/people_last7days.py niger.py
 	(cd $(@D) && python people_last7days.py)

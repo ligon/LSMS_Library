@@ -1,0 +1,45 @@
+{
+ "backend": "make",
+ "broken_wave": "2018-19",
+ "case": "andandonly-livestock-2018-19",
+ "child_rc": 0,
+ "intree_parquets": 0,
+ "mode": "andand-only",
+ "result": {
+  "columns": [
+   "HeadCount",
+   "HeadAcquired",
+   "HeadSold"
+  ],
+  "error": null,
+  "index": [
+   "i",
+   "t",
+   "animal"
+  ],
+  "rows": 11632,
+  "rows_by_wave": {
+   "2011-12": 6614,
+   "2014-15": 5018
+  },
+  "seconds": 25.1,
+  "type": "frame",
+  "warning_categories": {
+   "UserWarning": 3
+  },
+  "warning_heads": {
+   "Makefile execution failed for Niger/_ livestock: Command '['": 3
+  }
+ },
+ "stderr_injected_failures": 1,
+ "stderr_refusal_lines_any_wave": 0,
+ "stderr_refusal_lines_naming_wave": 0,
+ "table": "livestock",
+ "var_parquet_written": true,
+ "warn_makefile_failed": 3,
+ "warn_python_fallback_failed": 0,
+ "wave_parquets_built": [
+  "2011-12",
+  "2014-15"
+ ]
+}

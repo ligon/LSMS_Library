@@ -1,0 +1,621 @@
+{
+ "frames": {
+  "default": {
+   "assets": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 94478,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 94478,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "cluster_features": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 1599,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 1599,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "community_prices": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 130487,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 130487,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "crop_production": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 46376,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 46376,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "food_acquired": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 239877,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 239877,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "food_expenditures": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 165014,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 165014,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "food_prices": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 165027,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 165027,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "food_quantities": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 239855,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 239855,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "food_security": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 16256,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 16256,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "household_characteristics": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 20165,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 20165,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "household_roster": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 121956,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 121956,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "housing": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 20231,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 20231,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "individual_education": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 80445,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 80445,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "interview_date": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 37898,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 37898,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "livestock": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 30230,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 30230,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "panel_ids": {
+    "base": {
+     "error": null,
+     "len": 8118,
+     "rows": null,
+     "type": "dict"
+    },
+    "branch": {
+     "error": null,
+     "len": 8118,
+     "rows": null,
+     "type": "dict"
+    },
+    "dict_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "people_last7days": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 125294,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 125294,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "plot_features": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 12413,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 12413,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "plot_inputs": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 42435,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 42435,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "plot_labor": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 53041,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 53041,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "sample": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 20231,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 20231,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "shocks": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 17506,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 17506,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "subjective_well_being": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 12543,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 12543,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   }
+  },
+  "make": {
+   "crop_production": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 46376,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 46376,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "livestock": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 30230,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 30230,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "people_last7days": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 125294,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 125294,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "plot_inputs": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 42435,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 42435,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   },
+   "plot_labor": {
+    "attrs_equal": true,
+    "base": {
+     "error": null,
+     "len": null,
+     "rows": 53041,
+     "type": "frame"
+    },
+    "branch": {
+     "error": null,
+     "len": null,
+     "rows": 53041,
+     "type": "frame"
+    },
+    "frame_equal": true,
+    "rows_by_wave_equal": true,
+    "warning_categories_equal": true
+   }
+  }
+ },
+ "hash": {
+  "btf": {
+   "moved": 0,
+   "moved_countries": null,
+   "moved_keys": [],
+   "niger_total": 0,
+   "total": 40
+  },
+  "country": {
+   "moved": 23,
+   "moved_countries": [
+    "Niger"
+   ],
+   "moved_keys": [
+    "Niger/assets",
+    "Niger/cluster_features",
+    "Niger/community_prices",
+    "Niger/crop_production",
+    "Niger/food_acquired",
+    "Niger/food_expenditures",
+    "Niger/food_prices",
+    "Niger/food_quantities",
+    "Niger/food_security",
+    "Niger/household_characteristics",
+    "Niger/household_roster",
+    "Niger/housing",
+    "Niger/individual_education",
+    "Niger/interview_date",
+    "Niger/livestock",
+    "Niger/panel_ids",
+    "Niger/people_last7days",
+    "Niger/plot_features",
+    "Niger/plot_inputs",
+    "Niger/plot_labor",
+    "Niger/sample",
+    "Niger/shocks",
+    "Niger/subjective_well_being"
+   ],
+   "niger_total": 23,
+   "total": 549
+  },
+  "errors_equal": true,
+  "n_errors": 0,
+  "wave": {
+   "moved": 92,
+   "moved_countries": [
+    "Niger"
+   ],
+   "moved_keys": null,
+   "niger_total": 92,
+   "total": 2109
+  }
+ },
+ "var_parquets": {
+  "crop_production": {
+   "equal": true,
+   "rows_base": 48163,
+   "rows_branch": 48163,
+   "rows_by_wave_branch": {
+    "2011-12": 11983,
+    "2014-15": 9528,
+    "2018-19": 13719,
+    "2021-22": 12933
+   }
+  },
+  "livestock": {
+   "equal": true,
+   "rows_base": 30230,
+   "rows_branch": 30230,
+   "rows_by_wave_branch": {
+    "2011-12": 6614,
+    "2014-15": 5018,
+    "2018-19": 9764,
+    "2021-22": 8834
+   }
+  },
+  "people_last7days": {
+   "equal": true,
+   "rows_base": 131430,
+   "rows_branch": 131430,
+   "rows_by_wave_branch": {
+    "2011-12": 25125,
+    "2014-15": 26579,
+    "2018-19": 35406,
+    "2021-22": 44320
+   }
+  },
+  "plot_inputs": {
+   "equal": true,
+   "rows_base": 42557,
+   "rows_branch": 42557,
+   "rows_by_wave_branch": {
+    "2011-12": 8538,
+    "2014-15": 8179,
+    "2018-19": 13401,
+    "2021-22": 12439
+   }
+  },
+  "plot_labor": {
+   "equal": true,
+   "rows_base": 53041,
+   "rows_branch": 53041,
+   "rows_by_wave_branch": {
+    "2011-12": 19643,
+    "2014-15": 15935,
+    "2018-19": 9457,
+    "2021-22": 8006
+   }
+  }
+ }
+}

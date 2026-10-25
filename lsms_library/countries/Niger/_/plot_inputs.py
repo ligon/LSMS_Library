@@ -24,32 +24,16 @@ parquet means that script failed or was never run -- never "not wired".  It
 is refused, not skipped (GH #1123): under ``LSMS_BUILD_BACKEND=make`` this
 script is also the fallback the framework runs after a failed ``make``, and
 skipping the absent wave there served the other three waves with no Python
-warning.  The parquet is looked up where ``to_parquet`` writes it (under
-``data_root()``), as ``Ethiopia/_/food_coping.py`` does.
+warning.  The refusal is ``niger.concat_wave_parquets``, shared with the
+four sibling concatenators (crop_production, livestock, plot_labor,
+people_last7days).
 """
-from pathlib import Path
-
-import pandas as pd
-
-from lsms_library.local_tools import data_root, get_dataframe, to_parquet
+from lsms_library.local_tools import to_parquet
+from niger import concat_wave_parquets
 
 
 WAVES = ['2011-12', '2014-15', '2018-19', '2021-22']
 
-unwired = [t for t in WAVES if not Path(f'../{t}/_/plot_inputs.py').exists()]
-assert not unwired, f'Niger plot_inputs: WAVES lists {unwired} with no wave script'
-
-pieces = []
-for t in WAVES:
-    fn = Path(data_root('Niger')) / t / '_' / 'plot_inputs.parquet'
-    if not fn.exists():
-        raise FileNotFoundError(
-            f'Niger plot_inputs: wave {t} declares plot_inputs '
-            f'(../{t}/_/plot_inputs.py) but its parquet was not built; refusing '
-            f'to concatenate the other waves without it (GH #1123).  Run that '
-            f'wave script and read its error.')
-    pieces.append(get_dataframe(fn))
-
-p = pd.concat(pieces)
+p = concat_wave_parquets('plot_inputs', WAVES)
 
 to_parquet(p, '../var/plot_inputs.parquet')
