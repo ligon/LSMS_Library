@@ -97,7 +97,7 @@ EMPTY_INDEXES = [
 
 @pytest.mark.parametrize('index', EMPTY_INDEXES,
                          ids=['index', 'multiindex', 'unused-levels'])
-@pytest.mark.parametrize('dtype', [object, 'string'])
+@pytest.mark.parametrize('dtype', [object, 'string', 'timedelta64[ns]'])
 def test_empty_datetime_coercion_preserves_metadata(index, dtype):
     s = pd.Series([], index=index, dtype=dtype, name='Int_t')
     s.attrs = {'source': {'kind': 'empty'}}
@@ -138,8 +138,9 @@ def test_empty_datetime_column_is_a_literal_pass_through(index, unit):
 @pytest.mark.parametrize('index', EMPTY_INDEXES,
                          ids=['index', 'multiindex', 'unused-levels'])
 @pytest.mark.parametrize('enforcer', ['declared', 'canonical'])
-def test_empty_datetime_enforcers_preserve_metadata(index, enforcer):
-    df = pd.DataFrame({'Int_t': pd.Series([], index=index, dtype=object)})
+@pytest.mark.parametrize('dtype', [object, 'timedelta64[ns]'])
+def test_empty_datetime_enforcers_preserve_metadata(index, enforcer, dtype):
+    df = pd.DataFrame({'Int_t': pd.Series([], index=index, dtype=dtype)})
     df.attrs = {'source': {'kind': 'empty'}}
     expected = pd.DataFrame({'Int_t': pd.Series([], index=index,
                                                dtype='datetime64[us]')})
