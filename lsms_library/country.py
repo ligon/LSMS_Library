@@ -5509,7 +5509,16 @@ class Country:
                 if wave_has_table:
                     try:
                         wave_result = getattr(wave_obj, method_name)()
-                    except (KeyError, AttributeError) as error:
+                    except KeyError as error:
+                        # GH #1281 (ledger §4): a declared wave's config or
+                        # hook failure is not absence. Stop before concat can
+                        # cache the remaining waves under the current hash.
+                        raise RuntimeError(
+                            f"{self.name}/{w}: declared table {method_name!r} "
+                            f"failed with KeyError: {error}. Check this wave's "
+                            "configuration and source columns."
+                        ) from error
+                    except AttributeError as error:
                         warnings.warn(str(error))
 
                 use_legacy = wave_has_table and (
