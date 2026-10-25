@@ -113,3 +113,46 @@ baseline. No global cache clear or acquisition was performed.
 `build_wave` — OK (anchored on §§2–4): aborts before concat/cache writes;
 reuses established extraction, writer and exception relay. No new cache
 metadata mechanism, schema rule or country-specific survey interpretation.
+
+### Recovery against reviewed development - 2026-10-25
+
+The recovered PR1300 head is a348bda6e6d690efece158b2e34d936406923b89.
+The coordinator merged reviewed development6a86604615e28a8e4f6767de8889b71d18db9828
+into an isolated recovery branch, preserving both histories. Product/test gate
+pin76ac157f32a5bd570cda92cc3d0709f0930534d1 differs from development only in
+the original four PR paths. Production and tests are not amended here.
+The later merge base includes the separately reviewed Arrow test reduction
+repair; that diagnostic identified no causation by the declared-wave guard.
+
+The old private review-final receipts named above are unavailable in this
+recovery. Their83-pass/21-deselected and metadata results remain attributed
+historical evidence, not freshly authenticated acceptance. No missing result
+is reconstructed as successful. Other recovery metadata runs demonstrated
+that errors={} alone is insufficient when a guard denies real config inputs;
+fresh cache-impact proof must verify actual inputs and every denial.
+
+Independent source review found no blocker in this narrow handler, with the
+serial-cause, worker traceback-note and derived RuntimeError fallback limits
+explicit. It also corrects a historical shorthand: Malawi2013cluster_features
+has a dfs block; the escaping KeyError concerns its PRIMARY sub-df, as current
+issue1281comment6376116241 states. One cover file does not make the whole
+table a single-file declaration. The promoted requires_s3 regression is no
+longer xfail in this candidate; the country note records the earlier state.
+No coordinate, acquisition or household-link policy changes here.
+
+The NEW finite offline proposal has84 current-source cases plus21 data-gated
+deselections: ten synthetic YAML/CSV cases,31Malawi hook/config cases, six
+worker-relay cases,25id_walk cases, all10declarative v-join cases and two new
+independent controls. The last two are recreated recovery tests, not recovered
+historical receipts: an escaping hook-style boundary error, and actual
+two-worker malformed CSV extraction with a barrier and distinct worker PIDs.
+Actual collection/counts and complete failure causes must be checked after
+root release; no test has run at this authoring stage.
+
+The control uses current development plus the identical external ten-case
+test carrier and new two-case module, leaving tracked product bytes unchanged.
+Predictions are seven meaningful failures and five healthy passes. Candidate
+tests and all provider/country builds remain unexecuted here. Root supplies
+the guarded receiving-node setup and owns acceptance. A separately verified
+metadata census and the requested final-source corpus catch/build inventory
+remain required; no full corpus-health or whole-issue completion is claimed.
