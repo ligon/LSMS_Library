@@ -197,6 +197,52 @@ def _script_subprocess_env(*extra_pythonpath: str | Path) -> dict[str, str]:
     return env
 
 
+def _make_target_is_missing(diagnostics: str | bytes, target: str | Path) -> bool:
+    """Positive GNU Make evidence that the requested target has no rule.
+
+    Shared by the GH #1039 rule probe and GH #1288 strict country runner
+    (ledger 1288 §2/§4). A missing prerequisite means a broken existing rule,
+    and a nested make's no-rule message followed by a recipe failure does too.
+    Callers use the C locale; unfamiliar diagnostics are never absence.
+    """
+    if isinstance(diagnostics, bytes):
+        # Classify a copy; the original bytes remain on CalledProcessError and
+        # are replayed without decoding/newline translation by the runner.
+        diagnostics = diagnostics.decode("utf-8", errors="replace")
+    lines = [line for line in diagnostics.splitlines() if line.strip()]
+    no_rule = [line for line in lines if "No rule to make target" in line]
+    if not no_rule or any("needed by" in line for line in no_rule):
+        return False
+    # Extra diagnostics may be a failed recipe (including a recursive Make),
+    # or an error we cannot classify. Neither proves that this target lacks
+    # a rule. Fail closed instead of recovering from an unknown failure.
+    if len(lines) != len(no_rule):
+        return False
+    # Match the quoted name exactly: a longer prerequisite/target sharing its
+    # prefix is not evidence about the requested target. Older GNU Make uses
+    # an opening backtick and a closing apostrophe under the C locale.
+    missing = (r"\*\*\* No rule to make target [`']" + re.escape(str(target))
+               + r"'\.\s+Stop\.\s*$")
+    return all(re.search(missing, line) is not None for line in no_rule)
+
+
+def _reemit_make_stderr(diagnostics: str | bytes) -> None:
+    """Keep Make diagnostics on stderr, including native non-UTF8 bytes."""
+    if isinstance(diagnostics, bytes):
+        binary = getattr(sys.stderr, "buffer", None)
+        if binary is not None:
+            sys.stderr.flush()
+            binary.write(diagnostics)
+            binary.flush()
+        else:
+            # A caller's text-only redirect has no byte stream. Retain an
+            # explicit escaped representation instead of losing the failure
+            # to UnicodeDecodeError or silently dropping undecodable bytes.
+            sys.stderr.write(diagnostics.decode("utf-8", errors="backslashreplace"))
+    else:
+        sys.stderr.write(diagnostics)
+
+
 _NO_MAKE_WARNED = False
 
 
@@ -5121,10 +5167,7 @@ class Country:
                 return None     # no answer; the caller fails safe (True)
         if probe.returncode == 0:
             return True
-        no_rule = [line for line in probe.stderr.splitlines()
-                   if "No rule to make target" in line]
-        if no_rule and not any("needed by" in line for line in no_rule) \
-                and any(str(target) in line for line in no_rule):
+        if _make_target_is_missing(probe.stderr, target):
             return absent("no Make rule for $(VAR_DIR)/"
                           f"{method_name}.parquet")
         return True
@@ -5230,9 +5273,13 @@ class Country:
 
             return pd.concat(aligned_dfs.values(), axis=0, sort=False)
 
-        def run_make_target(method_name: str, wave: str | None = None):
+        def run_make_target(method_name: str, wave: str | None = None, *,
+                            strict_country_make: bool = False):
             """
             Execute legacy Makefile targets either at the country level or for a specific wave.
+
+            Only the direct non-DVC materialize:make country-builder route
+            opts into terminal recipe failures (GH #1288, ledger §4).
             """
             base_path = self.file_path if wave is None else self[wave].file_path
             # Resolve the wave folder for path construction (e.g. '2008-09' -> '2008-15')
@@ -5336,10 +5383,36 @@ class Country:
                     if jobs_flag:
                         make_cmd.append(jobs_flag)
                     make_cmd.append(str(target))
+                    make_env = build_env()
+                    run_options = {}
+                    if strict_country_make:
+                        make_env.update(LC_ALL="C", LANGUAGE="C")
+                        # Keep stdout streamed. Replay actual stderr on both
+                        # success and failure; the private CI wrapper remains
+                        # the publication boundary, not this classifier.
+                        run_options = {"stderr": subprocess.PIPE}
                     try:
-                        subprocess.run(make_cmd, cwd=make_dir, check=True, env=build_env())
+                        built = subprocess.run(make_cmd, cwd=make_dir, check=True,
+                                               env=make_env, **run_options)
+                        if strict_country_make and built.stderr:
+                            _reemit_make_stderr(built.stderr)
                         logger.info(f"Makefile executed successfully for {self.name}/{wave or 'ALL'}. Rechecking for {method_name}...")
-                    except (subprocess.CalledProcessError, FileNotFoundError) as error:
+                    except subprocess.CalledProcessError as error:
+                        if strict_country_make:
+                            diagnostics = error.stderr or ""
+                            if diagnostics:
+                                _reemit_make_stderr(diagnostics)
+                            if not _make_target_is_missing(diagnostics, target):
+                                raise RuntimeError(
+                                    f"Make build failed for {self.name}/{method_name} "
+                                    f"at target {target}; refusing cached output "
+                                    "and alternate/Python fallbacks after a "
+                                    "failed country recipe or prerequisite."
+                                ) from error
+                        warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
+                        continue
+                    except FileNotFoundError as error:
+                        # Missing Make retains the existing script fallback.
                         warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
                         continue
                     # Check the data_root candidate locations (GH #803: never in-tree)
@@ -6001,7 +6074,10 @@ class Country:
                         and self._has_country_builder(method_name)):
                     df = load_from_waves(waves, country_builder=not prefer_make_backend)
                 else:
-                    df = run_make_target(method_name)
+                    df = run_make_target(
+                        method_name,
+                        strict_country_make=(has_data_scheme_entry
+                                             and prefer_make_backend))
                     if df is None:
                         raise _rebuild_failure_error(self.name, method_name)
             except Exception as error:
