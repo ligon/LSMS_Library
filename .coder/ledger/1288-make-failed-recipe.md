@@ -36,6 +36,8 @@ No cleanup, successful-target freshness policy or survey changes belong here.
   “Every Niger wave has a wave script for all five concatenated tables”. Its
   plot_features 2011/2014 skips are legitimate and outside this change. The
   missing-wave refusal does not authenticate an existing old wave parquet.
+- Declared `float` maps to nullable `pd.Float64Dtype()` in shipped
+  `_SCHEME_DTYPE_MAP`; exact healthy oracles use that dtype on EXPECTED values.
 - The required narrow contract was adopted by the parent before implementation:
   real failed country recipes are terminal; zero-exit stale outputs and other
   backend routes remain separately tracked.
@@ -72,8 +74,37 @@ parent will measure approved pins later. No registry exclusions or census here.
 
 ### Phase 3 — verification
 
-Pending implementation and bounded guarded synthetic selection. Baseline proof:
-`fix1288/baseline-control/REPORT.org`, final 1 genuine contract FAIL +3 healthy
-PASS, two preserved attempts, no guard violations. Cold/replacement baseline
-checks did not persist complete pandas dtype objects; warm compared exact typed
-frames and actual attrs. Carry that qualification forward.
+- **OK (§2/§4)** `_make_target_is_missing`: one extracted classifier serves
+  both existing probe and strict execution. Exact quoted target, no needed-by,
+  only recognized diagnostics; binary classification uses a decoded copy.
+- **OK (§4)** strict `run_make_target`: only direct non-DVC declared
+  materialize:make country-builder call opts in. Original CalledProcessError
+  and country/table/target context survive; stdout streamed, stderr replayed.
+  No default/JSON/wave-route or eviction-policy change.
+- **OK (§2/§3)** healthy expected frames retain exact column/index/value/dtype
+  checks and use declared nullable Float64; actual frames are unchanged.
+  Warm also compares actual attrs and exact output inode/mtime/size/SHA256.
+- **OK (§4)** candidate synthetic selection at040a34e8:75PASS plus two healthy
+  oracle failures (expected NumPyfloat64 vs declared nullable Float64).
+  Oracle-only3d36102f changes three lines; ONLY those two controls rerun and
+  PASS. Thus77 distinct tests verified, not a fictitious single77PASS run.
+  Wall125.18s+57.58s=182.76s; both guarded runs had zero refusals. No more
+  author tests, no corpus/provider build, no hash census.
+- **Intentional behavior contradiction, not stale-document assumption:** Niger
+  CONTENTS2056–2062 describes “three \"Makefile execution failed\" warnings and
+  one \"Python fallback failed\"”; the parent-approved strict policy stops at
+  the first real country recipe failure. Its dated measured evidence is
+  retained verbatim; no country document is edited in this scoped patch.
+- **Boundary:** native recipe stderr bytes are preserved (including a tested
+  nonUTF8 byte/CRLF). NonUTF8-encoded Windows *target names* may not match the
+  UTF8-decoded positive-absence classifier and fail closed. ASCII Windows
+  path/quote variants are synthetic classifier controls, not native Windows
+  execution evidence. No permission to broaden encoding/fallback semantics.
+- Baseline proof remains `fix1288/baseline-control/REPORT.org`: genuine
+  contractFAIL+3healthyPASS after preserved oracle correction. Baseline
+  cold/replacement checks did not persist full pandas dtype objects; baseline
+  warm compared exact typed frames and actual attrs. That qualification is
+  retained independently of this candidate's stronger typed oracle.
+- Report, guard countmaps and two unfiled freshness residual drafts live under
+  `fix1288/implementation/`. Zero-exit freshness/country-var staleness and
+  independently measured fingerprint cost remain outside this author run.
