@@ -47,7 +47,8 @@ one cover file carries ``dist_to_IHS3location`` directly, so the status is a
 plain ``df_main`` myvar there, and a misspelled distance raises ``KeyError``
 at extraction rather than reaching the hook as an all-NaN column.  What the
 country build then does with that ``KeyError`` is GH #1281, pinned below as a
-strict xfail.  Its stayers' fix is the coordinate 2010-11 serves in all 204
+regression: it must raise before writing a country parquet.  Its stayers' fix
+is the coordinate 2010-11 serves in all 204
 EAs and 2016-17 / 2019-20 serve in the 102 that continue into the long-term
 panel.
 
@@ -829,7 +830,7 @@ def test_2013_14_cluster_attributes_come_from_a_stayer(malawi):
 def _misspell_2013_14_status(monkeypatch):
     """Route ``Wave.resources`` so 2013-14's df_main reads a misspelled
     distance variable.  ``pytest.fail`` (not ``assert``) when the config has
-    no such myvar, so the #1281 xfail below cannot absorb a missing wiring."""
+    no such myvar, so a missing wiring cannot masquerade as the intended error."""
     import copy
     from lsms_library.country import Wave
     if STATUS_COL not in _cluster_cfg(W13)["df_main"].get("myvars", {}):
@@ -906,26 +907,19 @@ def _names(exc, needle):
 
 
 @pytest.mark.requires_s3
-@pytest.mark.xfail(
-    strict=True, raises=AssertionError,
-    reason="GH #1281: a config KeyError in a wave's PRIMARY sub-df drops the "
-           "whole wave (build_wave), and the shortened country parquet is "
-           "cached under the current hash.  Resolution: raise before anything "
-           "is written.  Goes red (XPASS, strict) the day that lands.")
 def test_2013_14_config_keyerror_is_not_cached_as_a_valid_build(
         monkeypatch, private_data_root):
     """What the COUNTRY build does with the extraction KeyError above.
 
-    Today: ``build_wave`` catches it, warns, and drops 2013-14; the four-wave
-    table is written to ``var/cluster_features.parquet`` under the current
-    hash, and every later read serves it with no 2013-14 rows and no warning
-    (``cluster_features(waves=['2013-14'])`` then returns 0 rows).  Nothing
-    wrong is served -- never a mover's location -- but a wave is lost.
+    Before GH #1281, ``build_wave`` caught it, warned, and dropped 2013-14;
+    the four-wave table was written to ``var/cluster_features.parquet`` under
+    the current hash, and later reads served no 2013-14 rows and no warning
+    (``cluster_features(waves=['2013-14'])`` returned 0 rows).  A wave was lost
+    without serving a mover's location.
 
     Asserts the #1281 resolution: the call raises an error naming the
     misspelled variable, and no country parquet is written.  Any OTHER
-    exception is re-raised and fails the test (``raises=AssertionError``
-    keeps it from being absorbed as the expected failure)."""
+    exception is re-raised and fails the test."""
     import lsms_library as ll
     _source(W13, COVER[W13])            # skips only if the cover is unavailable
     _misspell_2013_14_status(monkeypatch)
