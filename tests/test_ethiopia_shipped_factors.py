@@ -526,7 +526,8 @@ def test_shipped_quintal_matches_the_external_answer_key(ethiopia):
     u = fa.index.get_level_values("u")
     t = fa.index.get_level_values("t")
     quintal = u == "Quintal"
-    assert int(quintal.sum()) == 13_977
+    # Arrow-backed index comparisons need pandas' reduction interface.
+    assert int(pd.Series(quintal).sum()) == 13_977
 
     # (a) the WB table, against the key: every Quintal row it serves.
     shipped_q = quintal & fa["kg_shipped"].notna()
