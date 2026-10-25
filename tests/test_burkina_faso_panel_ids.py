@@ -117,13 +117,27 @@ def test_panel_ids_json_agrees_with_updated_ids():
     assert _updated_ids().get(PREV, {}) == {}
 
 
-def test_crosswalk_is_injective_and_chain_free():
-    """id_walk closure-resolves a wave's map (``_close_id_map``), so a target
-    that is also a key would chain two households onto one id."""
+def test_crosswalk_is_injective_and_collision_free_under_a_single_pass():
+    """GH #1245: ``id_walk`` is a single-pass rename, so a target that is also
+    a moving key is SAFE (its occupant moves off it in the same pass) and the
+    80 such links are kept.  What a single pass cannot survive is two sources
+    on one target, or a target held by a household that keeps its id.
+
+    Every 2021-22 household is a crosswalk source (the cover is 100% panel), so
+    the sources are the whole occupied set."""
     xw = _crosswalk()
     targets = pd.Series(list(xw.values()))
     assert not targets.duplicated().any()
-    assert not [t for t in xw.values() if t in xw and xw[t] != t]
+    held = [t for s, t in xw.items() if t != s and t in xw and xw[t] == t]
+    assert not held, f'{len(held)} targets held by a household that keeps its id'
+
+
+def test_every_2021_22_household_is_linked_including_the_80_chained():
+    """Pins the #1245 outcome: 3,227 entries, 80 of them onto an id another
+    2021-22 household moves off (the chain guard used to drop all 80)."""
+    xw = _crosswalk()
+    assert len(xw) == 3227
+    assert sum(1 for s, t in xw.items() if t != s and t in xw) == 80
 
 
 # --------------------------------------------------------------------------

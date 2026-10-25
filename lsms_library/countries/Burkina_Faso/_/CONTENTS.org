@@ -1857,16 +1857,22 @@ As a check that does not rely on the crosswalk, the household heads were compare
 For the 1,106 newly linked households, 93.9% of heads have the same sex and 74.6% are 1-5 years older.
 The 2,041 previously linked households give 94.0% and 74.8%.
 
-*Still open: 80 households cannot link, and 8 of them are served under another household's id.*
+*80 households could not link, and 8 of them were served under another household's id (fixed by GH #1245).*
 2021-22 renumbered =menage= within the grappe: only 477 of 3,227 households kept their 2018-19 menage.
 As a result, a household's 2018-19 id is sometimes another household's 2021-22 id.
-=id_walk= closure-resolves a wave's map (=local_tools._close_id_map=), so ={A: B, B: C}= would serve both as =C=.
-The chain guard therefore drops every entry whose target is an occupied 2021-22 id: 80 entries, down from 95.
-A dropped household keeps its 2021-22 id.
+=id_walk= used to closure-resolve a wave's map (=local_tools._close_id_map=), so ={A: B, B: C}= would serve both as =C=.
+The chain guard therefore dropped every entry whose target is an occupied 2021-22 id: 80 entries, down from 95.
+A dropped household kept its 2021-22 id.
 For 8 of the 80, that id is the served 2018-19 id of a DIFFERENT household, and no head is 1-5 years older across the pair (0 of 8).
-*For these two waves, an =i= match on a household that is not in =updated_ids.json= is not evidence that it is the same household.*
-Removing the residue needs a change to =id_walk= semantics or a disjoint id namespace for one wave.
-Both are framework or design decisions and are not taken here.
+
+*GH #1245 (@ligon's ruling, 2026-10-23).*  =id_walk= is now a single-pass rename: every id goes to its own target, chains are never followed.
+The chain guard is gone and =make panel-ids= links all 3,227 households (80 entries added; 0 changed, 0 removed).
+Simulated on the 2021-22 cover: 3,227 linked to their own 2018-19 household, 0 to a different one, 0 duplicate ids.
+Under the old closure the same 3,227-entry map would have merged 157 households into 77 ids (80 duplicates).
+For each of the 80, the target is held by another 2021-22 household that moves off it in the same pass.
+=panel_ids.py= now ASSERTS the condition a single pass needs instead of dropping links: no target may be held by a 2021-22 household that keeps its id.
+That holds today because the 2021-22 cover is 100% panel; a cover with refreshment households could break it, and the script would then fail at regeneration.
+A single pass is safe only if it runs once; =id_walk= recognises an already-walked wave from its own ids and leaves it alone.
 
 *Also measured, not reconciled.*  On a fresh data root =sample()= serves 7,010 2018-19 and 3,227 2021-22 households.
 The =DONE sample= section above records "6,961 households across 585 clusters" and "3,218 households across 550 clusters".

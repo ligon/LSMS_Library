@@ -1,0 +1,27 @@
+{
+ "Mali": {
+  "2021-22": {
+   "committed": 5011,
+   "unguarded": 5022,
+   "added": 11,
+   "changed": 0,
+   "added_onto_a_moving_occupant": 3,
+   "added_onto_a_staying_occupant": 8,
+   "single_pass_duplicate_ids": 8,
+   "current_ids": 6143
+  }
+ },
+ "Niger": {
+  "2014-15": {
+   "committed": 3529,
+   "unguarded": 3534,
+   "added": 5,
+   "changed": 0,
+   "added_onto_a_moving_occupant": 4,
+   "added_onto_a_staying_occupant": 1,
+   "single_pass_duplicate_ids": 1,
+   "current_ids": 3617
+  }
+ },
+ "GhanaLSS": {}
+}

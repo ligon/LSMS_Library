@@ -147,12 +147,17 @@ for _, row in uniq_gme.iterrows():
 # the 2011-12 hid = g*100+m are both digit strings and share a namespace:
 # (g=1, m=1, e=0) gives cur_i='10010', which is also the hid of the 2011-12
 # household (g=100, m=10).  If (100, 10, 0) were linked to '10010',
-# updated_ids['2014-15'] would hold the chain '1000100'->'10010'->'101' and
-# id_walk (closure-resolved, local_tools._close_id_map) would send BOTH
-# 2014-15 households to '101'.  We skip any linkage whose prev_i is also
+# updated_ids['2014-15'] would hold the chain '1000100'->'10010'->'101'.
+# While id_walk closure-resolved a wave's map (until GH #1245) that sent BOTH
+# 2014-15 households to '101'.  id_walk is now a single-pass rename, under
+# which a chain is safe when the occupant of the target moves off it; only a
+# target held by a household that KEEPS its id still merges two households.
+# This guard predates that and still skips any linkage whose prev_i is also
 # some household's cur_i.  Measured: 5 households skipped under the
 # three-column key ('10010', '10110', '20010', '20012', '20110' as prev_i);
-# under the old two-column key this guard skipped 286.
+# under the old two-column key this guard skipped 286.  Of the 5, 4 land on
+# an occupant that moves (single-pass safe) and 1 on one that stays (measured
+# in scratch for GH #1245; the guard is left as it is -- a separate decision).
 #
 # The guard cannot cover the OTHER direction -- an UNLINKED 2014-15 id that
 # equals a 2011-12 hid stays as it is and reads as that 2011-12 household

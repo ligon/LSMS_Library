@@ -1,0 +1,18 @@
+{
+ "country": {
+  "total": 549,
+  "moved_vs_base": 549,
+  "moved_vs_round1": 549
+ },
+ "btf": {
+  "total": 40,
+  "moved_vs_base": 40,
+  "moved_vs_round1": 40
+ },
+ "wave": {
+  "total": 2109,
+  "moved_vs_base": 2109,
+  "moved_vs_round1": 2109
+ },
+ "errors": 0
+}
