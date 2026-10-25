@@ -86,6 +86,76 @@ def test_datetime_column_passes_through_with_its_resolution():
     assert warned == []
 
 
+EMPTY_INDEXES = [
+    pd.Index([], dtype='string', name='i'),
+    pd.MultiIndex.from_tuples([], names=['t', 'i']),
+    pd.MultiIndex(levels=[pd.Index(['w1', 'w2'], dtype='string'),
+                          pd.Index([1, 2], dtype='int64')],
+                  codes=[[], []], names=['t', 'i']),
+]
+
+
+@pytest.mark.parametrize('index', EMPTY_INDEXES,
+                         ids=['index', 'multiindex', 'unused-levels'])
+@pytest.mark.parametrize('dtype', [object, 'string'])
+def test_empty_datetime_coercion_preserves_metadata(index, dtype):
+    s = pd.Series([], index=index, dtype=dtype, name='Int_t')
+    s.attrs = {'source': {'kind': 'empty'}}
+    before = s.copy(deep=True)
+    expected = pd.Series([], index=index, dtype='datetime64[us]', name='Int_t')
+    expected.attrs = s.attrs.copy()
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter('always')
+        out = _coerce_datetime_column(s, country='X', table='interview_date',
+                                      column='Int_t')
+
+    pd.testing.assert_series_equal(out, expected)
+    pd.testing.assert_index_equal(out.index, before.index, exact=True)
+    assert out.attrs == before.attrs
+    pd.testing.assert_series_equal(s, before)
+    assert s.attrs == before.attrs
+    assert caught == []
+
+
+@pytest.mark.parametrize('index', EMPTY_INDEXES,
+                         ids=['index', 'multiindex', 'unused-levels'])
+@pytest.mark.parametrize('unit', ['s', 'ms', 'us', 'ns'])
+def test_empty_datetime_column_is_a_literal_pass_through(index, unit):
+    s = pd.Series([], index=index, dtype=f'datetime64[{unit}]', name='Int_t')
+    s.attrs = {'source': {'kind': 'already parsed'}}
+    before = s.copy(deep=True)
+
+    out, warned = _record(_coerce_datetime_column, s)
+
+    assert out is s
+    pd.testing.assert_series_equal(out, before)
+    pd.testing.assert_index_equal(out.index, before.index, exact=True)
+    assert out.attrs == before.attrs
+    assert warned == []
+
+
+@pytest.mark.parametrize('index', EMPTY_INDEXES,
+                         ids=['index', 'multiindex', 'unused-levels'])
+@pytest.mark.parametrize('enforcer', ['declared', 'canonical'])
+def test_empty_datetime_enforcers_preserve_metadata(index, enforcer):
+    df = pd.DataFrame({'Int_t': pd.Series([], index=index, dtype=object)})
+    df.attrs = {'source': {'kind': 'empty'}}
+    expected = pd.DataFrame({'Int_t': pd.Series([], index=index,
+                                               dtype='datetime64[us]')})
+    expected.attrs = df.attrs.copy()
+
+    if enforcer == 'declared':
+        _enforce_declared_dtypes(df, {'Int_t': 'datetime'}, country='X',
+                                 table='interview_date')
+    else:
+        _enforce_canonical_dtypes(df, 'interview_date', country='X')
+
+    pd.testing.assert_frame_equal(df, expected)
+    pd.testing.assert_index_equal(df.index, expected.index, exact=True)
+    assert df.attrs == expected.attrs
+
+
 def test_both_enforcers_use_the_helper():
     df = pd.DataFrame({'Int_t': pd.Series(THREE_FORMATS, dtype='string')})
     _enforce_declared_dtypes(df, {'Int_t': 'datetime'}, country='X',

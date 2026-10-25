@@ -7214,6 +7214,9 @@ def _coerce_datetime_column(s: pd.Series, *, country: str | None = None,
         # served exactly as the parquet stores it -- no re-parse, no
         # resolution change.
         return s
+    if s.empty:
+        # GH #1225: retain metadata and the build parser's microsecond dtype.
+        return s.astype('datetime64[us]')
     was_str = s.map(lambda x: isinstance(x, str) and x.strip() != '',
                     na_action='ignore').fillna(False).astype(bool)
     if _datetime_parse.READ_CAST_WARNS_ON_STRINGS and bool(was_str.any()):
