@@ -83,7 +83,12 @@ parent will measure approved pins later. No registry exclusions or census here.
 - **OK (§4)** strict `run_make_target`: only direct non-DVC declared
   materialize:make country-builder call opts in. Original CalledProcessError
   and country/table/target context survive; stdout streamed, stderr replayed.
-  No default/JSON/wave-route or eviction-policy change.
+  Default/JSON/wave execution does not opt into the strict flag, and eviction
+  policy is unchanged. The shared builder probe also uses the strengthened
+  exact-target classifier: prefix-only target matches and absence messages
+  accompanied by extra diagnostics now conservatively retain builder-present
+  status. Those probe/routing decisions can affect default-backend subset
+  requests too; no blanket default-behavior equivalence is claimed.
 - **OK (§2/§3)** healthy expected frames retain exact column/index/value/dtype
   checks and use declared nullable Float64; actual frames are unchanged.
   Warm also compares actual attrs and exact output inode/mtime/size/SHA256.
@@ -176,3 +181,41 @@ wave output, or an existing country-var target mtime-skipped before any
 recipe runs, never enters the terminal-failure branch. Those freshness
 residuals and default/JSON/wave fallback policies remain separate; successful
 verification here will not justify closing the whole issue.
+
+### Fresh recovery evidence and census refusal - 2026-10-25
+
+Frozen source c5d2593faa1f775d449768fe910530f5f160b64e was checked in
+receiving-node private clones by Slurm job40501304. The finite candidate
+selection collected and passed all77 cases, with no skipped/error cases.
+The current-development control collected13: ten failures with the intended
+causes and three healthy passes. Root inspected all10 JUnit causes: three
+generic materialization errors lost the original recipe context, and seven
+failed-recipe/prerequisite calls returned instead of raising. The baseline
+failure alone does not authenticate the returned stale payload's full values.
+Parent/child guard calibration denied the outside synthetic DTA and loopback
+connection while allowing the private fixture. Test guard refusals concerned
+only the absent native standard-library python311.zip search candidate;
+they are retained, with receiving-node absence evidence, not called zero
+refusals. Audit coverage is Python-level and is not an operating-system sandbox.
+
+Independent source review found no blocking defect. The noted low coverage
+gap is lack of shared-probe integration tests for unusual prefix-only or
+mixed diagnostics; the classifier itself covers these cases. Strict execution
+scope and the shared probe's conservative hardening are distinguished above.
+
+The original job nevertheless FAILED1 at its summary guard check. Both
+metadata censuses produced549country/40framework/2109wave entries and no
+reported errors, but the guard blocked nine present tracked CSV build inputs.
+cached_file_hash catches PermissionError as OSError and substitutes None, so
+errors={} is insufficient evidence of complete fingerprints. Root rejects
+these census values and their provisional all-entry movement counts as final
+cache-impact proof. Preserve the original manifests/logs/JUnit/failed summary;
+correct only the metadata harness in an additive run, without replaying77tests.
+
+A separate pinned-Git static inventory found446raw declarations in38countries:
+171 non-JSON materialize:make review candidates, including90 in the eight ISA
+countries. The171 split into93with own country scripts,46Makefile-only clues
+and32with neither. Script/Makefile presence is not observed reachability;
+every row is explicitly UNMEASURED. This is a reproducible first exposure
+inventory, not a claim that171pairs fail or that the requested runtime exposure
+measurement is complete. Source blobs, exclusions and unknowns are retained.
