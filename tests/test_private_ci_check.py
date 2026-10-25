@@ -261,3 +261,11 @@ def test_workflow_wraps_each_credentialed_data_command_without_changing_coverage
     assert windows["shell"] == "cmd /C CALL {0}"
     assert 'python "%GITHUB_WORKSPACE%\\scripts\\private_ci_check.py"' in windows["run"]
     assert '--stage windows-script-build -- python "%GITHUB_WORKSPACE%\\scripts\\windows_build_check.py" Uganda:shocks Uganda:assets' in windows["run"]
+
+
+def test_windows_smoke_executes_private_wrapper_tests():
+    jobs = yaml.safe_load((ROOT / ".github/workflows/ci.yml").read_text())["jobs"]
+    execution = next(step for step in jobs["windows-smoke"]["steps"]
+                     if step.get("name") == "Run portability + config tests")
+    assert "--collect-only" not in execution["run"].split()
+    assert "tests/test_private_ci_check.py" in execution["run"].split()

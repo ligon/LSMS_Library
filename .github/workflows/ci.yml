@@ -195,6 +195,7 @@ jobs:
           --timeout=600 --timeout-method=thread
           tests/test_windows_portability.py
           tests/test_schema_consistency.py
+          tests/test_private_ci_check.py
 
   # Windows script-path builds (GH #964): the conda route documented in
   # environment-windows.yml -- conda-forge make + m2 tools, the library via
