@@ -1,8 +1,11 @@
 # Prior-Art Ledger — GH #1288: failed country Make recipes
 
 **Search tier:** ripgrep + git floor (explicit AGENTS.md GitNexus substitute).
-**Base:** 0bf64b472830fc87fd73648c57eb47d95e0006f1; isolated branch
+**Original base:** `0bf64b472830fc87fd73648c57eb47d95e0006f1`, branch
 `fix/1288-make-failure-20261025`. Inherits `STANDING.md`.
+**Recovery branch:** `fix/1288-recovered-make-failure-20261025`.
+**Recovery control:** current development `3f77cf3ca`; recovered source/test
+pin `aaf02bc113ba2030e196a26fd34d635923f5929d`.
 
 ## §1 Task, restated
 
@@ -72,7 +75,7 @@ work is zero-exit/no-replacement freshness and stale country-var serving.
 Fingerprint cost is expected to be broad because the orchestrator is ALL scoped;
 parent will measure approved pins later. No registry exclusions or census here.
 
-### Phase 3 — verification
+### Phase 3 — historical author verification (not fresh acceptance)
 
 - **OK (§2/§4)** `_make_target_is_missing`: one extracted classifier serves
   both existing probe and strict execution. Exact quoted target, no needed-by,
@@ -108,3 +111,68 @@ parent will measure approved pins later. No registry exclusions or census here.
 - Report, guard countmaps and two unfiled freshness residual drafts live under
   `fix1288/implementation/`. Zero-exit freshness/country-var staleness and
   independently measured fingerprint cost remain outside this author run.
+
+### Recovery and pending fresh verification - 2026-10-25
+
+The shared-mirror original head `78173e7b83d783a5ba7e58d7456e2511068b6b4d`
+preserves ledger `47c62e9a`, implementation `040a34e8`, healthy-oracle fix
+`3d36102f` and final ledger `78173e7b`. The coordinator cherry-picked only
+those four commits onto `0102af8cf`, then merged development `3f77cf3ca`
+(reviewed GH1225/PR1302), yielding the recovery pin above. The original
+preview's pending GH1281 declared-wave KeyError guard was not imported.
+The complete recovery delta against `3f77cf3ca` remains these four paths:
+this ledger, `country.py`, `test_gh1288_make_failed_recipe.py` and
+`test_niger_concatenator_refusal.py`. No production adaptation is proposed.
+
+The complete current Niger `_/CONTENTS.org` (all 2,080 lines, including
+residuals) was read during recovery. Its relevant distinction is explicit:
+all four waves have scripts for all five concatenated tables; missing output
+means a failed/unrun wave. `plot_features` legitimately skips the 2011/2014
+waves and is outside this change. The dated three-Make-warning plus Python
+fallback description at lines 2056-2062 intentionally differs from the
+approved first-failure terminal behavior; retain that historical evidence.
+
+The historical runtime reports/guards named above are unavailable locally.
+The completed-evidence archive at `isa-resume-20261025T1430Z` explicitly
+excluded live GH1288. Committed source and this ledger survive; the old
+75-pass/two-oracle-failure plus two-pass continuation is an attributed author
+record, not independently recovered runtime proof. Do not assume the ended
+job's node-local files survive or reconstruct missing results as successes.
+
+Proposed fresh finite selection, all synthetic and private, on Slurm:
+
+- Candidate: the new GH1288 module (34 predicted cases), full Niger
+  concatenator module (25), GH968 module (5), nine named synthetic GH1039
+  compatibility controls and four GH866 structural placement controls:
+  **77 predicted cases**. This is a newly specified selection, not a claim
+  to have recovered the historical selection. Assert actual collection count
+  before running; record the exact selected node IDs.
+- Current-base discriminators: overlay only the recovered new test module
+  into a fresh control clone, preserving all tracked product bytes. Select
+  six failed-wave cases, three viable-recovery recipe cases and one broken
+  prerequisite case, plus healthy replacement, exact warm equality and
+  missing-Make controls. Predictions are ten meaningful failures and three
+  healthy passes; actual causes and JUnit records, not exit status alone,
+  determine whether the control discriminates the defect.
+- Healthy controls retain full frame/index/dtype and attrs checks; no oracle
+  weakening. Preserve failed/unreached old wave bytes, original stderr/cause,
+  positive absence/tool fallback and successful warm output identity checks.
+- A separately approved metadata-only control/candidate hash census reuses
+  `slurm_logs/isa_backlog_2026-10-21/1218-current-validation/hash_census.py`.
+  It enumerates every country-table across each country's waves, including
+  pairs without wave declarations; compare complete keysets and errors as
+  well as changed hashes. No provider reads, builds, network, fingerprint
+  exclusions or speculative fixed corpus counts are permitted.
+
+The coordinator supplies the vetted Slurm isolation/setup. This worker will
+prepare only the finite selection and `run.sh` payload in private control
+storage after surfacing this plan; no local tests/builds/census or job
+submission. Receiving-node state, clones, caches and temporary files must
+be under that job's `/local`, with the existing image, exact package/config
+identity, private roots and numerical/build worker counts pinned to one.
+
+This is a partial GH1288 repair. A zero-exit Make recipe that leaves old
+wave output, or an existing country-var target mtime-skipped before any
+recipe runs, never enters the terminal-failure branch. Those freshness
+residuals and default/JSON/wave fallback policies remain separate; successful
+verification here will not justify closing the whole issue.
