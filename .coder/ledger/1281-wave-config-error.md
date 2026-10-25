@@ -77,9 +77,38 @@ Independent source critique accepts the narrow branch with qualifications:
 worker transport preserves the chained KeyError as traceback text rather
 than `__cause__`, and derived API fallback safety is not proved here.
 Guarded parent metadata census: 549 country hashes / 40 fingerprints /
-2,109 wave hashes / zero errors. Candidate hash impact and final independent
-runtime review remain pending. No new PR is opened while existing PRs take
-integration priority under the user's steering.
+2,109 wave hashes / zero errors. The existing PR queue was integrated first
+under the user's steering; see the current verification below.
+
+### Integrated-baseline verification, 2026-10-25
+
+The fix cleanly incorporates development763bd90a. Candidate06edcea36 also
+promotes the strict GH1281 Malawi regression to an ordinary data-gated test,
+preserving its assertions and requires_s3 marker. That real-data test was not
+executed in this offline review.
+
+Independent final gate:83passed,0failed/errors/skips,21data-gated cases
+deselected,0guard violations under private empty roots and exact candidate
+imports. It covers the ten new synthetic cases,31Malawi offline hook/config
+cases, six worker-relay cases,25id_walk cases,nine v-join cases and two
+independent controls. The latter verify an escaping hook-style KeyError at
+the Wave.grab_data boundary and a real two-worker YAML/CSV failure. Serial
+transport retains __cause__; the parallel transport preserves the original
+KeyError in worker traceback notes, with no country cache written. No full
+formatting-hook dispatch or all-country source build is claimed.
+
+Fresh baseline and candidate metadata censuses both complete at549country/
+40fingerprint/2109wave hashes,0errors. All549/40/2109hashes change, so this
+fix requires a corpus-wide re-warm, including countries outside the eight
+campaign countries. This intentionally invalidates potentially poisoned old
+caches. Each census used the same unmodified helper and guard, allowed no
+existing raw-source/network/build attempt, and denied/counts expected absent
+source probes. The measurement establishes hash impact, not corpus health.
+
+Evidence: private control/fix1281/review-final, including the final gate and
+both guarded census receipts. The shared package file, inherited id_walk
+changes and the promoted regression were reviewed against the integrated
+baseline. No global cache clear or acquisition was performed.
 
 `build_wave` — OK (anchored on §§2–4): aborts before concat/cache writes;
 reuses established extraction, writer and exception relay. No new cache
