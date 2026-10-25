@@ -69,41 +69,52 @@ original narrow plan before test or production edits. Independent review
 then found the empty-timedelta cast failure in implementation
 `e7c2931030eadf275772f9c7a3336d34b7edbf87`. The coordinator preauthorized
 the explicit empty-constructor amendment above, still within the same three
-tracked paths. Commit this updated reuse plan before production/test edits.
-Retain the original red/pass logs; reproduce the new timedelta cases on
-the unchanged original implementation, then verify the amended candidate.
+tracked paths. Amendment plan commit `45805deec` preceded production/test
+edits. The final source/test pin is
+`5123365b9a3d3fe93004399dd23b4bf2c913d0f2`; original and amended red/pass
+logs remain separate and unchanged.
 
 ## Phase 3 verification
 
-- `_coerce_datetime_column`: amendment pending. The original three-line
-  cast preserved the tested object/string inputs but contradicted section 4
-  for empty timedelta input. The replacement must use the existing parser's
-  empty-constructor precedent with explicit metadata preservation.
-- Empty metadata and dtype tests: OK (sections 3-4). Six object/string cases
+- `_coerce_datetime_column`: OK (sections 2-4). The original cast preserved
+  tested object/string inputs but failed for empty timedelta input. The
+  amended implementation reuses the parser's empty-constructor precedent,
+  explicitly preserving index, name and attrs. The already-datetime early
+  return and all populated parsing code remain unchanged.
+- Empty metadata and dtype tests: OK (sections 3-4). Nine object/string/timedelta cases
   cover an ordinary Index, an empty MultiIndex and a MultiIndex retaining
   unused string/integer levels. Full Series/index equality, name, attrs,
   input preservation and absence of warnings are checked explicitly.
   Twelve already-datetime empty cases retain literal identity and the
   original second/millisecond/microsecond/nanosecond resolution.
-- Caller integration: OK (section 2). Six empty-frame cases exercise both
+- Caller integration: OK (section 2). Twelve object/timedelta empty-frame cases exercise both
   dtype enforcers and verify the full frame/index and attrs.
 - Discriminating control: with production still byte-identical to base
   `0102af8cf`, the new tests gave **12 failed, 12 passed, 19 deselected**
   in 3.42 seconds. Ordinary empty input returned seconds instead of
   microseconds; empty MultiIndex input raised the reported alignment error,
   swallowed by the enforcers. Existing-datetime pass-through controls passed.
-- Candidate: **49 passed, 2 deselected** in 4.03 seconds. This includes the
+- Original candidate: **49 passed, 2 deselected** in 4.03 seconds. This includes the
   complete hermetic mixed-date module, the six GH1045 read-time controls,
   its build-parser empty-MultiIndex control and the existing structural and
   measured read/build-fingerprint regression. Zero test failures or skips.
   The two warm-corpus tests were explicitly deselected; no source-data
   build, acquisition, shared-cache mutation or corpus census ran.
+- Amendment discriminating control: after an explicit Git diff assertion
+  that `country.py` still matched `e7c293103`, the new timedelta selection
+  gave **9 failed, 43 deselected** in 2.27 seconds. The direct helper raised
+  `TypeError`; the enforcers silently retained `timedelta64[ns]`. The log is
+  `control/fix1225/e7-timedelta-regressions.log` beneath this job's local root.
+- Amended candidate: **58 passed, 2 deselected** in 3.63 seconds, zero test
+  skips/failures. This is the entire original finite selection plus nine
+  timedelta controls. The log is
+  `control/fix1225/amended-candidate-hermetic-tests.log`. No data/census ran.
 - Both invocations emitted the same Google API Core FutureWarning about
   future Python 3.11 support before pytest started. No new helper warning
   was observed. Full logs remain private in
   `/local/job40498884/control/fix1225/{base-new-tests,candidate-hermetic-tests}.log`.
 
-The candidate selection was:
+The original and amended candidate selections were:
 
 ```text
 tests/test_gh798_datetime_mixed.py
@@ -113,7 +124,7 @@ tests/test_build_transform_hash.py::test_empty_constructor_dtype_code_is_not_in_
 -k 'not warm_interview_date' -q -p no:cacheprovider
 ```
 
-Both runs used `/local/job40498884/venv_img/bin/python` from this worktree,
+All runs used `/local/job40498884/venv_img/bin/python` from this worktree,
 with `PYTHONPATH` naming this worktree, `LSMS_SKIP_AUTH=1`, private
 `LSMS_DATA_DIR`/`LSMS_CONFIG_DIR` under `control/fix1225`, and
 `OPENBLAS_NUM_THREADS=OMP_NUM_THREADS=MKL_NUM_THREADS=LSMS_BUILD_WORKERS=1`.
@@ -125,8 +136,9 @@ assert os.path.realpath(lsms_library.__file__).startswith(os.path.realpath(top) 
 ```
 
 The original verification did not cover empty timedelta input. Independent
-review found that contradiction; the amended reuse plan resolves it without
-changing populated parsing. Amendment verification is pending. Country data
+review found that contradiction; the amended reuse plan and discriminating
+tests resolve it without changing populated parsing. No remaining
+contradiction or reinvention was found against this ledger. Country data
 behavior and a full-corpus numerical hash census are outside this check.
 
 Sue
