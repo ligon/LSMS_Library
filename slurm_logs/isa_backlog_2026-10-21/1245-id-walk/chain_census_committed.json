@@ -1,0 +1,356 @@
+{
+ "Burkina_Faso": [
+  {
+   "wave": "2018-19",
+   "entries": 0,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2021-22",
+   "entries": 3147,
+   "nonidentity": 2846,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  }
+ ],
+ "Ethiopia": [
+  {
+   "wave": "2013-14",
+   "entries": 3776,
+   "nonidentity": 3776,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2015-16",
+   "entries": 4954,
+   "nonidentity": 3639,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  }
+ ],
+ "EthiopiaRHS": [],
+ "GhanaLSS": [
+  {
+   "wave": "1987-88",
+   "entries": 0,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "1988-89",
+   "entries": 714,
+   "nonidentity": 714,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "1991-92",
+   "entries": 0,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "1998-99",
+   "entries": 0,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2005-06",
+   "entries": 0,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2012-13",
+   "entries": 0,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2016-17",
+   "entries": 0,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  }
+ ],
+ "Malawi": [
+  {
+   "wave": "2013-14",
+   "entries": 4000,
+   "nonidentity": 4000,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2016-17",
+   "entries": 2508,
+   "nonidentity": 2508,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2019-20",
+   "entries": 3178,
+   "nonidentity": 3178,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  }
+ ],
+ "Mali": [
+  {
+   "wave": "2014-15",
+   "entries": 0,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2017-18",
+   "entries": 0,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2018-19",
+   "entries": 0,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2021-22",
+   "entries": 5011,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  }
+ ],
+ "Niger": [
+  {
+   "wave": "2011-12",
+   "entries": 0,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2014-15",
+   "entries": 3529,
+   "nonidentity": 3529,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2018-19",
+   "entries": 0,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2021-22",
+   "entries": 4589,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  }
+ ],
+ "Nigeria": [
+  {
+   "wave": "2012Q3",
+   "entries": 4859,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2013Q1",
+   "entries": 4859,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2015Q3",
+   "entries": 4696,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2016Q1",
+   "entries": 4696,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  }
+ ],
+ "Senegal": [
+  {
+   "wave": "2018-19",
+   "entries": 0,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2021-22",
+   "entries": 6127,
+   "nonidentity": 0,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  }
+ ],
+ "Tanzania": [
+  {
+   "wave": "2010-11",
+   "entries": 3077,
+   "nonidentity": 3077,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2012-13",
+   "entries": 3544,
+   "nonidentity": 3544,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2014-15",
+   "entries": 636,
+   "nonidentity": 636,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2019-20",
+   "entries": 907,
+   "nonidentity": 907,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2020-21",
+   "entries": 3042,
+   "nonidentity": 3042,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  }
+ ],
+ "Uganda": [
+  {
+   "wave": "2013-14",
+   "entries": 1833,
+   "nonidentity": 1833,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2015-16",
+   "entries": 3305,
+   "nonidentity": 3305,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2018-19",
+   "entries": 3176,
+   "nonidentity": 3176,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  },
+  {
+   "wave": "2019-20",
+   "entries": 3029,
+   "nonidentity": 3029,
+   "chain_keys": 0,
+   "closure_differs": 0,
+   "noninjective_single": 0,
+   "noninjective_closed": 0
+  }
+ ]
+}

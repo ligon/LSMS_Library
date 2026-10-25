@@ -177,6 +177,7 @@ jobs:
           poetry run pytest --collect-only -q
           tests/test_windows_portability.py
           tests/test_schema_consistency.py
+          tests/test_private_ci_check.py
       - name: Run portability + config tests
         env:
           LSMS_SKIP_AUTH: "1"
@@ -194,6 +195,7 @@ jobs:
           --timeout=600 --timeout-method=thread
           tests/test_windows_portability.py
           tests/test_schema_consistency.py
+          tests/test_private_ci_check.py
 
   # Windows script-path builds (GH #964): the conda route documented in
   # environment-windows.yml -- conda-forge make + m2 tools, the library via
@@ -252,7 +254,12 @@ jobs:
           LSMS_DATA_DIR: ${{ runner.temp }}\lsmsdata
           LSMS_BUILD_WORKERS: "1"
           PYTHONUNBUFFERED: "1"
-        run: python "%GITHUB_WORKSPACE%\scripts\windows_build_check.py" Uganda:shocks Uganda:assets
+        # System Python owns capture; the existing installed-wheel check runs
+        # inside it with the same conda environment and arguments.
+        run: >-
+          python "%GITHUB_WORKSPACE%\scripts\private_ci_check.py"
+          --stage windows-script-build --
+          python "%GITHUB_WORKSPACE%\scripts\windows_build_check.py" Uganda:shocks Uganda:assets
 
   # DVC remote reachability (GH #750).  Every .dvc sidecar's blob must be on
   # the S3 remote; a sidecar that was `dvc add`ed and never `dvc push`ed is
@@ -478,12 +485,20 @@ jobs:
           s.loader.exec_module(m);
           assert m.aws_creds_available(), 'requires_s3 tests would be SKIPPED: no reader credentials'"
       - name: Build Uganda tables
-        run: |
-          cd lsms_library/countries/Uganda/_
-          poetry run make -j2
+        working-directory: lsms_library/countries/Uganda/_
+        run: >-
+          python "$GITHUB_WORKSPACE/scripts/private_ci_check.py"
+          --stage data-prebuild -- poetry run make -j2
         timeout-minutes: 30
       - name: Run full test suite
+        # Capture both streams before Poetry/pytest starts. Assertion rewriting,
+        # explicit messages, warnings and plugins can all contain row values;
+        # flags alone do not form the public-output boundary. The wrapper emits
+        # a fixed stage/status and numeric JUnit counts only, then removes the
+        # runner-local output/XML. Do not upload those private files as artifacts.
+        # Plain assertions and warning-summary suppression remain defense in depth.
         run: >-
-          poetry run pytest --tb=short
+          python scripts/private_ci_check.py --stage data-tests --junit results.xml --
+          poetry run pytest --tb=short --assert=plain --disable-warnings
           --timeout=600 --timeout-method=thread
-          --durations=25
+          --durations=25 --junitxml={junit}

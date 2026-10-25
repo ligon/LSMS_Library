@@ -171,6 +171,6 @@ fix: injected 2018-19 collision (`'20' -> Mil`, 252 duplicate tuples) ->
   refusal and positive control) fail on `06d0749c9`'s tree and pass here.
 - Hashes vs `06d0749c9`: Niger only (23 country, 92 wave); cumulative vs
   development unchanged in scope (Niger 23, Senegal 22, CotedIvoire 21).
-- Residual: Niger's `crop_production`, `livestock`, `plot_labor`,
-  `people_last7days` recipes still chain with `;` and their concatenators
-  still skip.
+- Residual (closed 2026-10-23): Niger's `crop_production`, `livestock`,
+  `plot_labor`, `people_last7days` now take the same `&&` + refusal; see
+  `1123-niger-concatenator-refusal.md`.

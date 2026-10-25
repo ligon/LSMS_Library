@@ -305,6 +305,11 @@ def _run_niger_concatenator(monkeypatch, tmp_path, waves_present):
     monkeypatch.setattr(local_tools, 'get_dataframe', lambda fn, **k: pd.read_parquet(fn))
     monkeypatch.setattr(local_tools, 'to_parquet',
                         lambda frame, *a, **k: written.append(frame.copy()))
+    # The refusal now lives in niger.concat_wave_parquets (shared with the four
+    # sibling concatenators); runpy.run_path does not put the script's own
+    # directory on sys.path, so put it there, and import niger afresh.
+    monkeypatch.syspath_prepend(str(countries_root() / 'Niger' / '_'))
+    monkeypatch.delitem(sys.modules, 'niger', raising=False)
     monkeypatch.chdir(countries_root() / 'Niger' / '_')
     runpy.run_path(str(countries_root() / 'Niger' / '_' / 'plot_inputs.py'),
                    run_name='__gh1123_concat__')

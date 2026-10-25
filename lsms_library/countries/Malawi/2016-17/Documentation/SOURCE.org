@@ -2,7 +2,11 @@ SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/2936
 
-#+CATALOG_ID: 2936, 2939
+#+CATALOG_ID: 2936, 3819
+#+CATALOG_COVERS: 2939
+#+CATALOG_SUBDIR: 2936 Cross_Sectional
+#+CATALOG_SUBDIR: 3819 Panel
+#+CATALOG_HELD: 3819 MWI_2010-2019_IHPS_v06_M https://doi.org/10.48529/q5q1-2a34
 #+CATALOG_IDNO: MWI_2016_IHS-IV_v04_M
 #+CATALOG_TITLE: Fourth Integrated Household Survey 2016-2017
 #+CATALOG_YEARS: 2016-2017
@@ -12,8 +16,8 @@ https://microdata.worldbank.org/index.php/catalog/2936
 #+PROVENANCE_SOURCE: worldbank
 #+PROVENANCE_METHOD: source-url
 #+PROVENANCE_VALIDATION: content-validated
-#+PROVENANCE_RECORDED: 2026-07-12
-#+PROVENANCE_NOTE: TWO catalog entries live in this one directory (GH #600). Data/Cross_Sectional/ is the Fourth Integrated Household Survey, id 2936 (99 of 99 files match 2936's WB datafile list). Data/Panel/ is the 2016 wave of the Integrated Household Panel Survey, id 2939 (MWI_2010-2016_IHPS_v03_M, "Long-Term Panel, 102 EAs"): 97 of its 98 files appear in 2939's WB datafile list and NONE in 2936's. The other CATALOG_* keys above describe the primary entry (2936). We hold 2939's 2016 wave; 2939 also re-releases the 2010 and 2013 IHPS data with updated panel weights, which we hold in their original release form (1003, 2248). Checked 2026-07-12 against the WB datafile API.
+#+PROVENANCE_RECORDED: 2026-10-23
+#+PROVENANCE_NOTE: TWO catalog entries live in this one directory (GH #600). Data/Cross_Sectional/ is the Fourth Integrated Household Survey, id 2936 (99 of 99 files match 2936's WB datafile list). Data/Panel/ is the 2016 round of the Integrated Household Panel Survey AS RE-RELEASED IN id 3819 (MWI_2010-2019_IHPS_v06_M, "Long-Term Panel, 102 EAs") -- not id 2939, which this note named until GH #1277. Evidence: all 99 held Data/Panel/ files are byte-identical to the 2016-round members of MWI_2010-2019_IHPS_v06_M_Stata.zip (checked 2026-10-23). The 98 pre-existing Panel files trace to git commit ae90114fb (2025-04-18), which added MalawiIHPS/2010-2019/Data/ before its split into the wave directories. HouseholdGeovariablesIHPSY3.dta.dvc was added to the current 2016-17/Data/Panel/ path by fd5c12474 (2026-10-23, GH #1260); its md5 also matches the same-named sidecar in ae90114fb, so historical byte lineage and introduction at the current path are distinct facts. 94 of the 99 are also byte-identical in 2939 (MWI_2010-2016_IHPS_v03_M); the 5 that are not -- ag_mod_e3_16, ag_mod_j_16, hh_mod_a_filt_16, hh_mod_e_16, hh_mod_g1_16 -- are 3819's later, corrected saves (e.g. hh_mod_a_filt_16's case_id links to the IHS3 baseline for 2,508 of 2,508 households in 3819 and 0 of 2,508 in 2939). So 2939's content is subsumed, not held: it is recorded as CATALOG_COVERS, following 2019-20, whose Panel is also 3819. The other CATALOG_* keys above describe the primary entry (2936). CATALOG_HELD records 3819's release (GH #1283 ruling, secondary entry): content-validated, all 99 held Data/Panel/ sidecar md5s equal members of MWI_2010-2019_IHPS_v06_M_Stata.zip (zip md5 abebe37e96f42ff56994b054af42454e, downloaded 2026-10-23).
 
 * Notes (preserved from the original SOURCE.org)
 GH #1260 (2026-10-23): Data/Panel/HouseholdGeovariablesIHPSY3.dta is now held -- the household geovariables file of entry 2939 (MWI_2010-2016_IHPS_v03_M; WB data file F283, 2,508 cases, keyed on y3_hhid, every key in Panel/hh_mod_a_filt_16), taken from 2939's own Stata zip (MWI_2010-2013-2016_IHPS_v03_M_Stata.zip, downloaded 2026-10-23) and published with push_to_cache_batch; md5 cd3970675b30de62f619b23a8f99b876 (3819 re-releases a byte-identical copy). Before it, the 101 panel-only EAs had no coordinates. Release check of that zip against the held Data/Panel/ sidecars: 93 of 98 byte-identical, 5 differ (ag_mod_e3_16, ag_mod_j_16, hh_mod_a_filt_16, hh_mod_e_16, hh_mod_g1_16; in hh_mod_a_filt_16 only case_id differs, in all 2,508 rows, and y3_hhid is identical), so the other held Panel files are not all from the current v03 upload. They were not re-acquired.

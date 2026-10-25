@@ -1,0 +1,25 @@
+{
+ "backend": "dvc",
+ "broken_wave": "2018-19",
+ "case": "dvc-livestock-2018-19",
+ "child_rc": 0,
+ "intree_parquets": 0,
+ "mode": "raise",
+ "result": {
+  "error": "CalledProcessError: Command '['make', '-s', '-j2', '../2018-19/_/livestock.parquet']' returned non-zero exit status 2.",
+  "seconds": 26.4,
+  "warning_categories": {},
+  "warning_heads": {}
+ },
+ "stderr_injected_failures": 1,
+ "stderr_refusal_lines_any_wave": 0,
+ "stderr_refusal_lines_naming_wave": 0,
+ "table": "livestock",
+ "var_parquet_written": false,
+ "warn_makefile_failed": 0,
+ "warn_python_fallback_failed": 0,
+ "wave_parquets_built": [
+  "2011-12",
+  "2014-15"
+ ]
+}

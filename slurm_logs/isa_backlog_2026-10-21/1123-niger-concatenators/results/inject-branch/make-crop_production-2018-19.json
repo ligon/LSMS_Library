@@ -1,0 +1,30 @@
+{
+ "backend": "make",
+ "broken_wave": "2018-19",
+ "case": "make-crop_production-2018-19",
+ "child_rc": 0,
+ "intree_parquets": 0,
+ "mode": "raise",
+ "result": {
+  "error": "RuntimeError: Could not materialize Niger/crop_production: no wave-level build succeeded and no cached parquet was found at /global/scratch/fsa/fc_jevons/ligon/burst/jobs/niger-andand/work-branch/make-crop_production-2018-19/data/Niger/var/crop_production.parquet.\n\nCommon causes:\n  - installed via `pip install gi",
+  "seconds": 34.4,
+  "warning_categories": {
+   "UserWarning": 4
+  },
+  "warning_heads": {
+   "Makefile execution failed for Niger/_ crop_production: Comma": 3,
+   "Python fallback failed for /global/scratch/fsa/fc_jevons/lig": 1
+  }
+ },
+ "stderr_injected_failures": 1,
+ "stderr_refusal_lines_any_wave": 1,
+ "stderr_refusal_lines_naming_wave": 1,
+ "table": "crop_production",
+ "var_parquet_written": false,
+ "warn_makefile_failed": 3,
+ "warn_python_fallback_failed": 1,
+ "wave_parquets_built": [
+  "2011-12",
+  "2014-15"
+ ]
+}

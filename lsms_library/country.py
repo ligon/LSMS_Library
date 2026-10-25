@@ -2937,7 +2937,10 @@ class Country:
             and not frame.attrs.get('id_converted')
             and self.updated_ids is not None
         ):
-            frame = id_walk(frame, self.updated_ids)
+            # Raw survey rows by construction: tell id_walk so, or a small
+            # frame of only chained ids would be refused as undecidable
+            # (GH #1245 review: Malawi inputs carry 1-2 households per wave).
+            frame = id_walk(frame, self.updated_ids, state='raw')
         return frame
 
     def provenance(self) -> pd.DataFrame:
@@ -3244,12 +3247,14 @@ class Country:
         if 'v' not in new_idx:
             new_idx.append('v')
         result = flat.set_index(new_idx)
-        # pandas merge() and set_index() both drop DataFrame.attrs.
-        # We preserve them across the v-join as a *performance* hint:
-        # the surviving id_converted flag lets _finalize_result skip a
-        # redundant id_walk pass.  Correctness no longer depends on
-        # this — id_walk is idempotent by construction (see
-        # _close_id_map in local_tools.py and tests/test_id_walk.py).
+        # This merge DISAGREES on attrs (tests/test_population.py::
+        # TestVJoinIsADisagreeingMerge), so it would drop them.  We
+        # preserve them as a *performance* hint: the surviving
+        # id_converted flag lets _finalize_result skip a redundant
+        # id_walk pass.  Correctness does not depend on it -- id_walk is a
+        # single-pass rename that recognises an already-walked wave from
+        # its own ids and leaves it alone (GH #1245; _walk_partition in
+        # local_tools.py and tests/test_id_walk.py).
         # Historical context: commit 4db41a27 added this line as a
         # correctness fix for the Burkina Faso 2021-22 chain-collision
         # bug, before id_walk itself was made safe.
@@ -3981,6 +3986,15 @@ class Country:
             # (tests/test_population.py::TestVJoinIsADisagreeingMerge).
             # The `reorder_levels` block stays after the v-join: it is the join
             # that adds the `v` level it has to place.
+            #
+            # GH #1245: a frame can reach here already walked with no flag --
+            # every table DERIVED from a served one does (`food_quantities`
+            # from the served `food_acquired`; Uganda's `nutrition` script
+            # from the served `food_quantities`; measured on d353b7ea7, both
+            # re-walked here).  The closure-resolved map made that harmless;
+            # the single-pass rename is safe only because `id_walk` detects an
+            # already-walked wave from its own ids and leaves it alone.  So
+            # the flag is a fast path here, not the exactly-once guarantee.
             if (
                 'i' in df.index.names
                 and not df.attrs.get('id_converted')
@@ -5500,7 +5514,11 @@ class Country:
                         and not wave_result.attrs.get('id_converted')
                         and self._updated_ids_cache is not None
                     ):
-                        wave_result = id_walk(wave_result, self.updated_ids)
+                        # A wave's own build: unwalked (GH #1245, state='raw'
+                        # only lets an undecidable wave be renamed; a wave that
+                        # is detectably walked is still left alone).
+                        wave_result = id_walk(wave_result, self.updated_ids,
+                                              state='raw')
                     wave_result = self._augment_index_from_related_tables(
                         wave_result,
                         scheme_entry,

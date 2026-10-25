@@ -1092,22 +1092,48 @@ none (34 / 5 / 0 / 0 / 49; in 2021-22, 10 EAs are both) -- so W1's
 populated row there.  Evidence:
 =slurm_logs/isa_backlog_2026-10-21/592-gps-census/=.
 
-** 2021-22 holds ESPS-5 release =v02_M=, not the catalog's =v03_M= (GH #600)
+** 2021-22 holds ESPS-5 release =v03_M= (GH #1127, acquired 2026-10-23)
 
-=2021-22/Documentation/SOURCE.org= records =#+CATALOG_IDNO: ETH_2021_ESPS-W5_v02_M=,
-and that is the release on disk.  WB catalog 6161 now reports =v03_M=, whose
-=version_notes= say only: "Version 03: 'ETH_PlotGeovariables_Y5.dta' replaced
-with 'Pub_ETH_PlotGeovariables_Y5.dta'".  Our 68 sidecars match the v03 file
-list in every file but that one -- we hold =Data/eth_plotgeovariables_y5.dta=,
-the pre-v03 name -- and the acquisition commit =14b6de1dc= (2026-03-31) names
-=ETH_2021_ESPS-W5_v02_M=.  The catalog's own dates (v03 =version_date=
-2023-07-20) do not fit an acquisition of v02 in 2026; trust the file names.
+=2021-22/Documentation/SOURCE.org= records =#+CATALOG_IDNO: ETH_2021_ESPS-W5_v03_M=,
+written by =data_access.add_wave= once the whole release had landed and been
+pushed.  Until then this directory held =v02_M= (acquisition commit
+=14b6de1dc=, 2026-03-31), which GH #600 recorded and the provenance backfill
+listed as =release-changed=.
 
-The provenance backfill (=scripts/backfill_wave_provenance.py=) therefore lists
-this wave as =release-changed= and leaves the record intact, until v03 is
-acquired or decided against.  The changed file is the PLOT geovariables, whose
-coordinates are =**CONFIDENTIAL**= anyway (see "GPS redaction"), so the content
-change may not matter; the release recorded must still be the one held.
+*v03 is the September 2026 release.*  The catalog DDI's document-level version
+statement reads "Version 03 (September 2026).  'ETH_PlotGeovariables_Y5.dta'
+replaced with 'Pub_ETH_PlotGeovariables_Y5.dta'", and the new member's zip
+timestamp is 2026-09-14.  The study-level =version_date= (2023-07-20) was not
+moved with it; that stale date is why this section used to say the catalog's
+dates did not fit.
+
+*What changed, measured by =add_wave='s own staged comparison* (and by the
+diff-first review on #1127 before it): 67 of v02's 68 files are byte-identical
+in v03, 0 are revised, 1 is new and 1 is no longer shipped.
+
+- *The file v02 shipped as the W5 PLOT geovariables was the HOUSEHOLD
+  geovariables file.*  =eth_plotgeovariables_y5.dta= and
+  =eth_householdgeovariables_y5.dta= carried the same md5
+  (=329854352aeab5196ff48a7535bfe92f=, 813,299 bytes: 4,890 household rows,
+  =lat_dd_mod= / =lon_dd_mod=, no plot key) -- a mis-shipped duplicate, which
+  v03 drops.  Its sidecar was retired with =git rm= in the same change; nothing
+  read it (=rg -i plotgeovar= over the country config finds no reader).  The
+  household file, which =cluster_features= reads, is unchanged.
+- *Correction.*  This section used to say the changed file's coordinates were
+  "=**CONFIDENTIAL**= anyway".  That conflated two files.  The redaction (see
+  "GPS redaction" above) is in the post-planting plot ROSTER =sect3_pp_w5.dta=
+  (=s3q09__Latitude= / =__Longitude=); no geovariables file is redacted.
+- *The new file is a genuine plot-level file, and holds no coordinates.*
+  =Data/Pub_ETH_PlotGeovariables_Y5.dta=: 14,399 plots x 9 columns, keyed
+  uniquely on =holder_id + parcelroster_id + fieldroster_id= (W4's
+  =ETH_PlotGeovariables_Y4= spells the last two =parcel_id= / =field_id=), plus
+  =household_id=, an =id= column, and the four geovariables =plot_twi=,
+  =plot_srtm=, =plot_srtmslp= and =dist_household=.  =dist_household= is a
+  STRING with 16 literal ="NA"= values -- cast it, do not trust its dtype.
+  Against =sect3_pp_w5= (=holder_id + parcel_id + field_id=, 14,878 fields):
+  14,311 plots match, 88 are in the geovariables only, 567 roster fields have
+  no geovariables.  *Not wired*: serving it in =plot_features= as declared
+  optional columns is GH #1150 (@ligon's option A on #1127, 2026-10-20).
 
 ** Area and the local-unit gap
 

@@ -4584,3 +4584,126 @@ def inputs_community_prices_struck_one_unit(wave):
         frames.append(rows)
     out = pd.concat(frames, ignore_index=True)
     return out.set_index(['t', 'v', 'j', 'u'])
+
+
+# --- cluster_features: IHPS panel coordinates (GH #1260) -------------------
+# ONE implementation of the rule, called by a thin `cluster_features` hook in
+# each IHPS wave's `_/mapping.py` (2013-14, 2016-17, 2019-20); each wave's
+# own measurements are in its mapping.py and in CONTENTS.org (GH #1260).  The
+# name is deliberately NOT `cluster_features`: every callable here is a
+# country-level formatting function, and one called `cluster_features` would
+# run as the table's df_edit hook in 2004-05 and 2010-11 too.
+#
+# IHPS (the Integrated Household Panel Survey) gives each panel household its
+# CURRENT, displaced location and tracks movers, so a panel EA's households
+# can sit hundreds of km apart.  The households still at their baseline (IHS3
+# 2010) location -- `dist_to_IHS3location` <= 1 km on the panel cover --
+# share EXACTLY ONE coordinate per EA: the EA's displaced fix.  It is the same
+# coordinate in every IHPS round (2013-14, 2016-17, 2019-20, for the 102 EAs
+# of the long-term panel) and equals the EA's 2010-11 coordinate (all 204 IHPS
+# 2013 EAs).  It does NOT carry over to an independent cross-section that
+# draws the same EA again: IHS4 / IHS5 displace their own households, so such
+# an EA carries that survey's own fix (CONTENTS.org, GH #1260).
+#
+# The hook keeps every panel coordinate that IS that fix (movers who sit on
+# it included), blanks the rest -- judged by coordinate, not by the distance
+# alone, because the distance only finds the fix -- and puts each EA's
+# stayers first, so the grain collapse (country.most_complete_row, which
+# breaks ties by order) takes a stayer's Region / District / Rural.
+# Coordinates are blanked, never rows dropped.
+#
+# FAILS CLOSED.  A panel household (id NNNN-NNN, the y{2,3,4}_hhid shape)
+# whose status is null means the distance variable did not arrive -- renamed
+# upstream, which a two-file `file:` list's missing_ok turns into an all-NaN
+# column -- and serving every panel coordinate, movers included, would be the
+# silent result.  So it raises, as does a status on a non-panel id and
+# stayers that disagree.
+
+IHPS_STAYER_KM = 1.0
+IHPS_STATUS = '_ihps_baseline_status'
+IHPS_PANEL_ID = r'\d{4}-\d{3}'
+
+
+def ihps_baseline_status(row):
+    """'stayer' / 'moved' / 'unrecorded' from `dist_to_IHS3location` (km).
+
+    The ``mapping:`` each IHPS wave's ``data_info.yml`` applies to the panel
+    cover's distance.  A STRING on purpose: a numeric sentinel for
+    "unrecorded" (+inf) is rewritten to NaN by grab_data's >1e99
+    missing-value rule.  Only panel rows carry a status (2016-17 / 2019-20
+    read it through the panel cover's file override, so cross-sectional rows
+    carry NaN; in 2013-14 every household is a panel household).  A null
+    status on a panel row is therefore never "unrecorded" -- it is a missing
+    column, and the hook refuses it.
+    """
+    x = row.iloc[0]
+    if pd.isna(x):
+        return 'unrecorded'
+    return 'stayer' if float(x) <= IHPS_STAYER_KM else 'moved'
+
+
+def ihps_panel_cluster_features(df, *, status_source):
+    """Keep only panel coordinates that are their EA's fix (GH #1260).
+
+    Per panel EA, the stayers' single coordinate is the EA fix; a panel
+    household's coordinate is kept iff it equals that fix.  Stayers' rows
+    are moved first, so the collapse takes a stayer's Region / District /
+    Rural.  Cross-sectional rows keep their values.  Drops the
+    ``IHPS_STATUS`` helper column.
+
+    ``status_source`` says where the calling wave's ``data_info.yml`` reads
+    the status column from (it differs by wave); it is used only in the
+    error raised when that column is missing.
+
+    Raises ``RuntimeError`` if the status column is missing, a panel
+    household has no status, a non-panel household has one, or an EA's
+    stayers disagree.
+    """
+    if IHPS_STATUS not in df.columns:
+        raise RuntimeError(
+            f"Malawi cluster_features: the `{IHPS_STATUS}` column is missing, "
+            f"so movers cannot be told from stayers (GH #1260).  This wave "
+            f"reads it from {status_source}; check that entry in its "
+            f"data_info.yml.")
+    status = df.pop(IHPS_STATUS)
+    ids = pd.Series(df.index.get_level_values('i'), dtype='string')
+    panel = ids.str.fullmatch(IHPS_PANEL_ID).fillna(False).to_numpy(dtype=bool)
+    known = status.notna().to_numpy()
+    if (panel & ~known).any():
+        raise RuntimeError(
+            f"Malawi cluster_features: {int((panel & ~known).sum())} of "
+            f"{int(panel.sum())} panel households have NO baseline status -- "
+            f"the panel cover's dist_to_IHS3location did not arrive (renamed or "
+            f"misspelled?), and without it movers' locations would be served "
+            f"as their EA's (GH #1260).")
+    if (~panel & known).any():
+        raise RuntimeError(
+            f"Malawi cluster_features: {int((~panel & known).sum())} "
+            f"households carry a baseline status but not a panel id "
+            f"(NNNN-NNN) -- the panel id shape changed (GH #1260).")
+    if not {'Latitude', 'Longitude'} <= set(df.columns):
+        return df
+    coords = ['Latitude', 'Longitude']
+    xy = pd.DataFrame({
+        'v': df.index.get_level_values('v').astype(str),
+        'lat': df['Latitude'].to_numpy(dtype=float),
+        'lon': df['Longitude'].to_numpy(dtype=float)})
+    stayer = (panel & status.eq('stayer').fillna(False).to_numpy(dtype=bool)
+              & xy['lat'].notna().to_numpy() & xy['lon'].notna().to_numpy())
+    fix = xy[stayer].drop_duplicates()
+    if fix['v'].duplicated().any():
+        raise RuntimeError(
+            f"Malawi cluster_features: the stayers of "
+            f"{int(fix['v'].duplicated().sum())} panel EA(s) disagree on the "
+            f"EA coordinate, so there is no single EA fix to keep (GH #1260).")
+    fix = fix.set_index('v')
+    at_fix = ((xy['lat'].to_numpy() == fix['lat'].reindex(xy['v']).to_numpy())
+              & (xy['lon'].to_numpy() == fix['lon'].reindex(xy['v']).to_numpy()))
+    df.loc[panel & ~at_fix, coords] = np.nan
+    # A mover sitting on the fix keeps its coordinate, so its row is as
+    # complete as a stayer's -- but its Region / District / Rural describe
+    # where it lives now.  The grain collapse keeps the most complete row and
+    # breaks ties by ORDER (country.most_complete_row), so put each panel
+    # EA's stayers first: the cluster then takes a stayer's attributes.
+    is_stayer = panel & status.eq('stayer').fillna(False).to_numpy(dtype=bool)
+    return df.iloc[np.argsort(~is_stayer, kind='stable')]

@@ -113,51 +113,32 @@ panel_df = pd.concat([dummy, panel_df])
 
 D, updated_ids = panel_ids(panel_df)
 
-# Skip transitive-chain collisions.  The 2021-22 ids and the 2018-19 ids are
-# built from (grappe, menage) in one numeric-string namespace, and 2021-22
-# renumbered menage within the grappe (only 477 of 3,227 keep their 2018-19
-# menage), so a household's 2018-19 id can be ANOTHER 2021-22 household's
-# current id (e.g. 4021 -> 4065, where 4065 is also a 2021-22 id).
-# id_walk closure-resolves each wave's map (local_tools._close_id_map), so
-# {A: B, B: C} would serve both A and B as C.  Drop every entry whose target
-# is an occupied 2021-22 id: 80 of 3,227 entries since GH #1240 (95 before,
-# when the targets were in the wrong format).  Caught by
-# check_panel_consistency's id_walk_idempotent check (diagnostics.py).
+# No chain guard (GH #1245).  The 2021-22 ids and the 2018-19 ids are built
+# from (grappe, menage) in one numeric-string namespace, and 2021-22 renumbered
+# menage within the grappe (only 477 of 3,227 keep their 2018-19 menage), so a
+# household's 2018-19 id can be ANOTHER 2021-22 household's current id: 4021
+# -> 4065, where 4065 is itself a 2021-22 household that moves on.  80 of the
+# 3,227 entries are such links.  While id_walk closure-resolved a wave's map,
+# {A: B, B: C} served both A and B as C, so this script dropped all 80 (and 8
+# of those households were then served under a DIFFERENT 2018-19 household's
+# id, GH #1240).  id_walk is now a single-pass rename -- every id to its own
+# target -- and refuses to walk a wave twice, so every entry is kept.
 #
-# A dropped household keeps its 2021-22 id, which can coincide with the id of
-# a DIFFERENT 2018-19 household (8 of the 80 since GH #1240): for these two
-# waves an ``i`` match on an unlinked household is not evidence that it is the
-# same household.  See CONTENTS.org (GH #1240).
-#
-# GH #548 (hardening; byte-identical today): the "occupied" set must be
-# EVERY 2021-22 household id, not just the panel-linked candidates.  Built
-# from updated_ids.keys() it saw only panel households -- the exact
-# panel-only pattern GH #536 had to fix in Mali, where a household renaming
-# onto a slot held by a NON-panel current household collided under id_walk
-# and groupby().first() silently dropped one of each pair.  Burkina's
-# 2021-22 cover happens to be 100% panel (3,227/3,227), so panel-only and
-# full-cover coincide *today* and this edit changes nothing; a future cover
-# with refreshment households would otherwise resurface the Mali bug
-# silently.  Build cur_set from the full cover.
+# What a single pass CANNOT survive is a target held by a 2021-22 household
+# that keeps its id: renaming onto it would merge two households.  That is
+# impossible today (every 2021-22 household is a panel household, and every
+# occupied target's occupant moves on), so assert it rather than drop links
+# silently: a future cover with refreshment households fails here, at
+# regeneration, instead of colliding at read time.  The "occupied" set is the
+# FULL cover, not just panel-linked rows (GH #548 / #536).
 cur_set = set(df['i'].dropna())
-filtered_21 = {}
-skipped_chains = 0
-for cur, prev in updated_ids.get('2021-22', {}).items():
-    if prev in cur_set and cur != prev:
-        skipped_chains += 1
-        continue
-    filtered_21[cur] = prev
-updated_ids['2021-22'] = filtered_21
-
-# Rebuild the RecursiveDict with the skipped entries removed.
-from lsms_library.local_tools import RecursiveDict  # noqa: E402
-D_filtered = RecursiveDict()
-for k, v in D.data.items():
-    # k = (wave, cur_id), v = (prev_wave, prev_id)
-    if k[0] == '2021-22' and k[1] not in filtered_21:
-        continue
-    D_filtered[k] = v
-D = D_filtered
+_w21 = updated_ids.get('2021-22', {})
+_held = sorted(prev for cur, prev in _w21.items()
+               if prev != cur and prev in cur_set and _w21.get(prev, prev) == prev)
+assert not _held, (
+    f"{len(_held)} 2021-22 crosswalk target(s) are held by a 2021-22 household "
+    f"that keeps its id; a single-pass rename would merge them: {_held[:5]}")
+chained = sum(1 for cur, prev in _w21.items() if prev != cur and prev in cur_set)
 
 # GH #914: write beside THIS script, never into the process's cwd.  These two
 # files are committed sources; `make panel-ids` regenerates them in place for a
@@ -173,6 +154,6 @@ with open(_HERE / 'panel_ids.json', 'w') as f:
 with open(_HERE / 'updated_ids.json', 'w') as f:
     json.dump(updated_ids, f)
 
-print(f"Burkina Faso 2021-22 -> 2018-19: {len(filtered_21)} linked "
-      f"({skipped_chains} transitive-chain entries skipped, "
+print(f"Burkina Faso 2021-22 -> 2018-19: {len(_w21)} linked "
+      f"({chained} onto an id another 2021-22 household moves off, "
       f"{orphans} targets absent from the 2018-19 cover)")

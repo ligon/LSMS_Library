@@ -2011,9 +2011,70 @@ and "Python fallback failed" warnings), and =CalledProcessError= on the
 default backend, as before.  Normal builds are unchanged on both backends
 (42,435 rows; each backend's frame equal to its pre-fix frame).  The sibling
 Niger recipes (=crop_production=, =livestock=, =plot_labor=,
-=people_last7days=) still chain with =;= and their concatenators still skip;
-not changed here.
+=people_last7days=) were extended the same way on 2026-10-23: see "Every
+country concatenator refuses a missing wave" below.
 
 *Cache.*  =_/categorical_mapping.org= is a build input of every Niger table:
 all 23 Niger country hashes move (one Niger re-warm); no other country and no
 framework fingerprint moves.
+
+* 2026-10-23 -- Every country concatenator refuses a missing wave (GH #1123, extended)
+
+The maintainer accepted #1241's refusal ("#1241 refusal accepted") and
+extended it, with the =&&= recipe, to Niger's other four country
+concatenations: =crop_production=, =livestock=, =plot_labor=,
+=people_last7days=.
+
+*The idiosyncrasy this rests on.*  Every Niger wave has a wave script for
+all five concatenated tables (=ls Niger/20*/_/=), so a missing wave parquet
+can only mean a failed or unrun wave script -- never "not wired".  That is
+what makes refusing correct here.  =plot_features= is different: 2011-12 and
+2014-15 have no wave script, its concatenator must skip them, and it has no
+country recipe; it is not changed.
+
+*The four recipes were silent in two ways* (measured cold, development
+=57d255585=, a scratch config tree with =raise SystemExit= prepended to one
+wave script, =LSMS_BUILD_BACKEND=make=, fresh data root per case; aggregate
+evidence =slurm_logs/isa_backlog_2026-10-21/1123-niger-concatenators/=):
+
+- *A broken wave other than the last* (2018-19): the recipe's first line
+  (the wave scripts joined by =;=) took the LAST wave's exit status, so make
+  carried on, the concatenator skipped 2018-19, and the table came back short
+  with NO warning at all: =crop_production= 32,659 of 46,376 rows,
+  =livestock= 20,466 of 30,230, =plot_labor= 43,584 of 53,041,
+  =people_last7days= 90,146 of 125,294 -- in each case exactly the 2018-19
+  rows missing.
+- *The last wave* (2021-22, =crop_production=): make did fail, and the
+  framework then ran the concatenator as its Python fallback, which skipped
+  2021-22: 34,453 rows served, warned only as "Makefile execution failed".
+  This is why =&&= alone is not enough.  Measured on the branch with the
+  refusal mutated back to a skip: =crop_production= 20,736 rows,
+  =livestock= 11,632, =plot_labor= 35,578, =people_last7days= 51,704 --
+  only 2011-12 and 2014-15, because =&&= also stops the waves after the
+  broken one from building.
+
+*Now* all five chain the wave scripts with =&&= and call
+=niger.concat_wave_parquets=, #1241's refusal moved out of =plot_inputs.py=
+(same message, same =FileNotFoundError=).  Every case above raises
+=RuntimeError: Could not materialize Niger/<table>=, after three "Makefile
+execution failed" warnings and one "Python fallback failed"; the
+concatenator's stderr names the wave (=wave 2018-19 declares <table>=); no
+=var/= parquet is written.  The default backend was already loud
+(=CalledProcessError= from the wave's own make rule) and still is.  Healthy
+cold builds are unchanged: all 23 Niger tables on the default backend, and
+the five concatenated tables on the make backend, frame-equal (exact) to
+=57d255585=, attrs included; the concatenators' own =var/= outputs are
+frame-equal too.
+
+*Not covered: a STALE wave parquet.*  Under =LSMS_BUILD_BACKEND=make= a
+country-builder table goes straight to =run_make_target= and never through
+=load_from_waves=, so =_evict_hashless_wave_caches= does not run.  If a wave
+script fails where an earlier successful build left that wave's parquet,
+the fallback concatenator reads the old parquet.  The refusal catches an
+absent parquet only (GH #866 / #479 territory).
+
+*Cache.*  =_/Makefile= is in every Niger country hash and =niger.py= plus
+the five =_/*.py= in every Niger wave hash: all 23 Niger country hashes and
+all 92 Niger wave hashes move (one Niger re-warm); no other country, and 0
+of 40 build fingerprints.
+

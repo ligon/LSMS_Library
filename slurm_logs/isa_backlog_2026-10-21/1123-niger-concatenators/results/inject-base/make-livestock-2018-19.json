@@ -1,0 +1,43 @@
+{
+ "backend": "make",
+ "broken_wave": "2018-19",
+ "case": "make-livestock-2018-19",
+ "child_rc": 0,
+ "intree_parquets": 0,
+ "mode": "raise",
+ "result": {
+  "columns": [
+   "HeadCount",
+   "HeadAcquired",
+   "HeadSold"
+  ],
+  "error": null,
+  "index": [
+   "i",
+   "t",
+   "animal"
+  ],
+  "rows": 20466,
+  "rows_by_wave": {
+   "2011-12": 6614,
+   "2014-15": 5018,
+   "2021-22": 8834
+  },
+  "seconds": 55.6,
+  "type": "frame",
+  "warning_categories": {},
+  "warning_heads": {}
+ },
+ "stderr_injected_failures": 1,
+ "stderr_refusal_lines_any_wave": 0,
+ "stderr_refusal_lines_naming_wave": 0,
+ "table": "livestock",
+ "var_parquet_written": true,
+ "warn_makefile_failed": 0,
+ "warn_python_fallback_failed": 0,
+ "wave_parquets_built": [
+  "2011-12",
+  "2014-15",
+  "2021-22"
+ ]
+}

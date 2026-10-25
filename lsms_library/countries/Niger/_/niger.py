@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 import numpy as np
 import json
@@ -1758,3 +1760,45 @@ def interview_date(df):
     'Interview end'; collapsing `visit` with `first` reproduces the legacy
     single-date table."""
     return tools.melt_visit_intervals(df)
+
+
+def concat_wave_parquets(table, waves):
+    """Concatenate a table's script-written wave parquets, REFUSING a missing
+    wave (GH #1123).
+
+    The one implementation behind Niger's five country concatenators,
+    ``_/{plot_inputs, crop_production, livestock, plot_labor,
+    people_last7days}.py``.  Each runs with cwd ``Niger/_`` (the Makefile
+    recipe and the framework's ``try_script`` fallback both run it there) and
+    keeps its own ``to_parquet(p, '../var/<table>.parquet')`` call, because
+    ``_resolve_data_path`` infers the destination from the calling script.
+
+    EVERY wave in ``waves`` must have a ``../<wave>/_/<table>.py`` script
+    (asserted), so a missing wave parquet means that script failed or was
+    never run -- never "not wired".  It is refused, not skipped.  Under
+    ``LSMS_BUILD_BACKEND=make`` the country recipe chains the wave scripts
+    with ``&&``, so a failed wave fails ``make``; the framework then runs the
+    concatenator as its Python fallback, and a concatenator that skipped the
+    absent wave there served the other waves with no Python warning
+    (measured on ``plot_inputs``: 29,034 rows, all 13,401 of 2018-19 gone).
+    ``&&`` without this refusal still loses the wave, through that fallback.
+
+    The parquet is looked up where ``to_parquet`` writes it, under
+    ``data_root()`` (as ``Ethiopia/_/food_coping.py`` does), never in-tree
+    (GH #803).  Only an ABSENT wave parquet is caught: a stale one left by an
+    earlier successful build is read like any other.
+    """
+    unwired = [t for t in waves if not Path(f'../{t}/_/{table}.py').exists()]
+    assert not unwired, f'Niger {table}: WAVES lists {unwired} with no wave script'
+
+    pieces = []
+    for t in waves:
+        fn = Path(tools.data_root('Niger')) / t / '_' / f'{table}.parquet'
+        if not fn.exists():
+            raise FileNotFoundError(
+                f'Niger {table}: wave {t} declares {table} '
+                f'(../{t}/_/{table}.py) but its parquet was not built; refusing '
+                f'to concatenate the other waves without it (GH #1123).  Run that '
+                f'wave script and read its error.')
+        pieces.append(tools.get_dataframe(fn))
+    return pd.concat(pieces)
