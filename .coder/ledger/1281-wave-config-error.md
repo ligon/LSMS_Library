@@ -156,3 +156,57 @@ tests and all provider/country builds remain unexecuted here. Root supplies
 the guarded receiving-node setup and owns acceptance. A separately verified
 metadata census and the requested final-source corpus catch/build inventory
 remain required; no full corpus-health or whole-issue completion is claimed.
+
+### Fresh recovery acceptance - 2026-10-25
+
+The production/test pin is ac463e6f668d8f8ee608f04abafa830a4956bb11,
+compared with reviewed development3dcdb23b6bc83d94a4dbdde7dde0eea9cf4f8487.
+Both source histories are preserved. This final change adds evidence to this
+ledger only; it changes no production code, selected test or data fixture.
+
+Fresh targeted verification is composed from two separate receiving-node runs:
+job40502578 passed83candidate cases with21requires_s3 cases deselected, and
+job40502636 passed the one remaining actual two-worker extraction control.
+Together they cover the exact84selected case IDs; this is not84passes in one
+fresh run. The original remaining case failed because its Barrier mmap backing
+chose /dev/shm outside private roots, before workers or product error transport.
+The supplement kept test bytes/assertions unchanged, used the original stdlib
+Arena with receiving TMPDIR, and proved actual local FD/inode backing inherited
+by both distinct worker PIDs. No worker, CPU availability or exception was
+simulated. The baseline has six meaningful DID NOT RAISE failures plus the
+separate parallel discriminator failure; its five healthy controls passed.
+Root independently checked actual JUnit causes, collection/source paths,
+source/config identity, fork receipts and zero genuine supplement denials.
+
+Earlier new harness attempts stopped before tests: default pytest logging used
+/dev/null, then outside-root raw test IDs omitted filenames. Those receipts and
+the original IPC failure remain intact. The corrected verifier records private
+logs and authoritative Item.path bindings. Its inert null-device exception was
+independently calibrated; no provider or source/config permission widened.
+The first root partial review also mistook conditional skipif marker presence
+for an actual skip; corrected review used JUnit skipped0 and no xfail reports,
+without replaying tests. No historical83-pass receipt was reconstructed.
+
+Fresh metadata job40502864 completed once per exact source pin. Root verified
+all9configuration CSV inputs and9989tracked sidecars before/after, actual input
+read sets, parent/child calibration, stat-only ENOENT probes, unchanged source
+and zero genuine guard denials. The global key sets match with no census errors:
+549country hashes,40framework fingerprints and2109wave-input grid entries.
+Every hash changes. Corpus-wide re-warm is required, including non-ISA countries;
+no cache-schema/exclusion shortcut hides possibly poisoned old country caches.
+The wave grid includes undeclared wave/table combinations: this measures hash
+impact, not successful corpus builds or historical swallowed-error frequency.
+
+Private original logs/inputs/operands and root acceptance are retained under
+burst/jobs/isa-1281-finite-v3-20261025-40498884,
+isa-1281-parallel-supplement-v2-20261025-40498884 and
+isa-1281-census-v1-20261025-40498884. Bounded public summaries are in
+slurm_logs/isa_recovery_2026-10-25 on docs/isa-recovery-20261025.
+The actual requires_s3 Malawi regression, complete suite, corpus catch/warm
+manifest comparison and derived/Feature fallback audit remain unexecuted.
+Malawi2013cluster_features uses a PRIMARY dfs block; older single-file/no-dfs
+wording is inaccurate for that example. The original serial cause and worker
+traceback-note transport limits remain in force. No acquisition, shared-cache
+clear, baseline JSON regeneration or country scientific policy change occurred.
+
+Sue / GPT-6
