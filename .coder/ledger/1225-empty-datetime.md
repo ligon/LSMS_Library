@@ -17,8 +17,8 @@ wave parsing, country config or populated date interpretation.
 
 | Machinery | Source | Existing coverage | Decision |
 |---|---|---|---|
-| Read-time coercion | `lsms_library/country.py:7169`, `_coerce_datetime_column` | `tests/test_gh798_datetime_mixed.py`; `TestReadTime` in `tests/test_gh1045_parse_datetime.py` | Extend the existing helper only. |
-| Already-datetime pass-through | `lsms_library/country.py:7211` | `TestReadTime.test_datetime64_is_a_pass_through`; mixed-date module's resolution test | Keep this check before the empty-input branch. |
+| Read-time coercion | `lsms_library/country.py:7169`, `_coerce_datetime_column` | `tests/test_gh798_datetime_mixed.py`; `TestReadTimeCast` in `tests/test_gh1045_parse_datetime.py` | Extend the existing helper only. |
+| Already-datetime pass-through | `lsms_library/country.py:7211` | `TestReadTimeCast.test_datetime64_is_a_pass_through`; mixed-date module's resolution test | Keep this check before the empty-input branch. |
 | Stored date dtype and empty parser precedent | `lsms_library/datetime_parse.py:540`, `parse_datetime`, especially its zero-row branch at line 584 | `TestRound2.test_empty_input_with_a_multiindex` in `tests/test_gh1045_parse_datetime.py` | Reuse the `datetime64[us]` contract; do not invoke the build parser or change its calendar/report rules. |
 | Declared and canonical dtype entry points | `lsms_library/country.py`, `_enforce_declared_dtypes` and `_enforce_canonical_dtypes` | `tests/test_gh798_datetime_mixed.py::test_both_enforcers_use_the_helper` | Keep callers and exception policy unchanged; add empty-frame integration controls. |
 | Read/build fingerprint boundary | `lsms_library/_build_registry.py:228` and `tests/test_build_transform_hash.py:585` | `test_empty_constructor_dtype_code_is_not_in_any_build_closure` | Reuse existing exclusion and regression; no exclusion changes. |
@@ -59,14 +59,62 @@ existing mixed-date test module and helper/caller coverage.
 
 ## §6 Open questions for the coordinator
 
-None about date semantics. Production edits await coordinator review of this
-ledger and the narrow reuse plan. First add the empty-index regressions and
-run them against the unchanged base; then apply the minimal helper fix and
-run the affected hermetic module. Exclude the two warm-corpus cases by name
-to honor the no-data-access scope, and retain that qualification.
+None. The coordinator reviewed ledger commit `b405437ef` and released the
+narrow plan before test or production edits. Implementation and regression
+tests are committed as `e7c2931030eadf275772f9c7a3336d34b7edbf87`.
 
 ## Phase 3 verification
 
-Pending. No implementation or runtime success is claimed by this ledger.
+- `_coerce_datetime_column`: OK (sections 2-4). The three added lines reuse
+  the existing microsecond date contract only for non-datetime zero-row
+  input, after the literal datetime pass-through. The populated path is
+  unchanged; no separate parser or calendar assumption was introduced.
+- Empty metadata and dtype tests: OK (sections 3-4). Six object/string cases
+  cover an ordinary Index, an empty MultiIndex and a MultiIndex retaining
+  unused string/integer levels. Full Series/index equality, name, attrs,
+  input preservation and absence of warnings are checked explicitly.
+  Twelve already-datetime empty cases retain literal identity and the
+  original second/millisecond/microsecond/nanosecond resolution.
+- Caller integration: OK (section 2). Six empty-frame cases exercise both
+  dtype enforcers and verify the full frame/index and attrs.
+- Discriminating control: with production still byte-identical to base
+  `0102af8cf`, the new tests gave **12 failed, 12 passed, 19 deselected**
+  in 3.42 seconds. Ordinary empty input returned seconds instead of
+  microseconds; empty MultiIndex input raised the reported alignment error,
+  swallowed by the enforcers. Existing-datetime pass-through controls passed.
+- Candidate: **49 passed, 2 deselected** in 4.03 seconds. This includes the
+  complete hermetic mixed-date module, the six GH1045 read-time controls,
+  its build-parser empty-MultiIndex control and the existing structural and
+  measured read/build-fingerprint regression. Zero test failures or skips.
+  The two warm-corpus tests were explicitly deselected; no source-data
+  build, acquisition, shared-cache mutation or corpus census ran.
+- Both invocations emitted the same Google API Core FutureWarning about
+  future Python 3.11 support before pytest started. No new helper warning
+  was observed. Full logs remain private in
+  `/local/job40498884/control/fix1225/{base-new-tests,candidate-hermetic-tests}.log`.
+
+The candidate selection was:
+
+```text
+tests/test_gh798_datetime_mixed.py
+tests/test_gh1045_parse_datetime.py::TestReadTimeCast
+tests/test_gh1045_parse_datetime.py::TestRound2::test_empty_input_with_a_multiindex
+tests/test_build_transform_hash.py::test_empty_constructor_dtype_code_is_not_in_any_build_closure
+-k 'not warm_interview_date' -q -p no:cacheprovider
+```
+
+Both runs used `/local/job40498884/venv_img/bin/python` from this worktree,
+with `PYTHONPATH` naming this worktree, `LSMS_SKIP_AUTH=1`, private
+`LSMS_DATA_DIR`/`LSMS_CONFIG_DIR` under `control/fix1225`, and
+`OPENBLAS_NUM_THREADS=OMP_NUM_THREADS=MKL_NUM_THREADS=LSMS_BUILD_WORKERS=1`.
+Before calling `pytest.main` in the same process, each run asserted:
+
+```python
+top = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'], text=True).strip()
+assert os.path.realpath(lsms_library.__file__).startswith(os.path.realpath(top) + os.sep)
+```
+
+No contradiction or reinvention was found against this ledger. Country data
+behavior and a full-corpus numerical hash census are outside this check.
 
 Sue
