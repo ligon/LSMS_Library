@@ -36,6 +36,7 @@ import runpy
 import shutil
 import subprocess
 import sys
+import warnings
 
 import pandas as pd
 import pytest
@@ -228,12 +229,17 @@ def niger_tree(tmp_path, monkeypatch):
 def test_make_backend_refuses_instead_of_serving_the_other_waves(niger_tree, capfd, table):
     """Before: the three good waves came back, 2018-19 silently absent."""
     c = niger_tree(table, failing='2018-19')
-    with pytest.warns(UserWarning, match='Python fallback failed'):
-        with pytest.raises(RuntimeError, match=f'Could not materialize Niger/{table}'):
+    # GH #1288: a genuine failed country recipe is terminal before the Python
+    # concatenator fallback. Its missing-wave refusal is tested separately.
+    with warnings.catch_warnings(record=True) as seen:
+        warnings.simplefilter('always')
+        with pytest.raises(RuntimeError, match=f'Make build failed for Niger/{table}') as caught:
             getattr(c, table)()
-    # The refusal names the wave (the concatenator's stderr, via make's fallback).
+    assert isinstance(caught.value.__cause__, subprocess.CalledProcessError)
+    assert caught.value.__cause__.returncode == 2
+    assert not any('Python fallback' in str(w.message) for w in seen)
     err = capfd.readouterr().err
-    assert f'wave 2018-19 declares {table}' in err, f'{table}: refusal not seen'
+    assert 'injected wave failure' in err, f'{table}: recipe diagnostic not seen'
     # Not vacuous: the waves before the failed one did build.
     built = sorted(p.parent.parent.name for p in data_root().glob(f'Niger/*/_/{table}.parquet'))
     assert built == ['2011-12', '2014-15'], f'{table}: wave parquets {built}'
