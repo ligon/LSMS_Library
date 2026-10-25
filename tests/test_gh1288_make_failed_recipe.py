@@ -56,6 +56,9 @@ def _assert_niger_fresh(frame):
     # i,t,v,m order. Never normalize the actual result to observed values.
     expected = pd.concat([_frame(NIGER_TABLE, w, n=2) for w in WAVES])
     expected = expected.reorder_levels(['i', 't', 'plot_id', 'crop', 'u'])
+    # The fixture declares Quantity: float. The shipped schema contract maps
+    # float to nullable Float64 (_SCHEME_DTYPE_MAP), not NumPy float64.
+    expected['Quantity'] = expected['Quantity'].astype(pd.Float64Dtype())
     pd.testing.assert_frame_equal(frame, expected, check_exact=True)
     assert frame.attrs['country'] == 'Niger'
     assert frame.attrs['id_converted'] is True
