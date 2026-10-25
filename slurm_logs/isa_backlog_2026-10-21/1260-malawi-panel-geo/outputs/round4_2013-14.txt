@@ -1,0 +1,118 @@
+## Round 4 (2013-14): the GH #1260 rule extended to IHPS 2013.  COUNTS ONLY.
+## development 8a8278a2a (dev) vs branch fix/malawi-2013-14-panel-stayer-geo-20261023 (branch); cold builds, separate fresh LSMS_DATA_DIR each
+
+## 1. Source structure (scripts/r4_structure13.py)
+cover shape (4000, 93) | geo shape (4000, 51)
+cover columns with dist/mov/ihs3/split/track: ['baseline_rural', 'district', 'dist_to_IHS3location', 'qx_type']
+geo columns with dist/ihs3: ['dist_road', 'dist_popcenter', 'dist_admarc', 'dist_auction', 'dist_boma', 'dist_borderpost', 'dist_agmrkt', 'distY1Y2']
+dist dtype float32 | non-null 4000 of 4000 | <=1 2660 | ==0 357 | <0 0
+dist quantiles (0, .25,.5,.75,.9,1): [0.0, 0.01, 0.09, 2.65, 48.305, 699.04]
+smallest positive values (5): [0.009999999776482582, 0.019999999552965164, 0.029999999329447746, 0.03999999910593033, 0.05000000074505806]
+y2_hhid unique 4000 of 4000 | matches NNNN-NNN 4000
+geo y2_hhid unique 4000 | geo keys in cover 4000 | cover keys in geo 4000
+EAs 204 | households per EA min/median/max [12.0, 19.0, 28.0]
+2013-14 EAs in 2016-17 panel 102 | in 2019-20 panel 102 | in both 102 | in neither 102 | 2016 panel EAs not in 2013 0 | 2019 panel EAs not in 2013 0
+column qx_type present; value counts (top 6): {'PANEL A': 2033, 'PANEL B': 1967}
+column panelweight present; value counts (top 6): 2100 distinct
+column hh_wgt present; value counts (top 6): 202 distinct
+column baseline_rural present; value counts (top 6): {'rural': 2924, 'urban': 1076}
+column reside present; value counts (top 6): {'rural': 2954, 'urban': 1046}
+column stratum present; value counts (top 6): {'South - Rural': 1156, 'Center - Rural': 1111, 'North - Rural': 657, 'South - Urban': 462, 'Center - Urban': 373, 'North - Urban': 241}
+coords non-null 4000 of 4000 | lat/lon null pattern equal True
+strict <=1 km: stayers 2660 | EAs covered 204 of 204 | EAs with >1 coord 0 | per EA min 4 median 13.0 | continuing EAs covered 102 of 102 | short-term-only covered 102 of 102
+fillna(0) <= 1 (existing test): stayers 2660 | EAs covered 204 of 204 | EAs with >1 coord 0 | per EA min 4 median 13.0 | continuing EAs covered 102 of 102 | short-term-only covered 102 of 102
+  <= 0.5 km: stayers 2410 EAs 204 | EAs with >1 coord 0
+  <= 2 km: stayers 2912 EAs 204 | EAs with >1 coord 0
+  <= 5 km: stayers 3171 EAs 204 | EAs with >1 coord 0
+households ON their EA fix 3276 | stayers 2660 | movers 616 | unrecorded (NaN dist) 0
+NaN-distance households 0 | with coordinate 0 | on fix 0 | off fix with coord 0 | EAs 0
+dist vs km to EA fix (displaced): spearman 0.663 | households with dist > 1: median km to fix 7.4 | with dist <= 1: max km to fix 0.0 | dist > 20 and km_fix < 1: 70 | dist <= 1 and km_fix > 20: 0
+
+## 2. Is the distance what it says?  Cross-round fix at source (scripts/r4_validate13.py)
+distY1Y2 non-null 724 of 4000 | both 724 | max |diff| 0.0 | <=1 agree 724
+qx_type x stayer: {False: {'PANEL A': 714, 'PANEL B': 626}, True: {'PANEL A': 1319, 'PANEL B': 1341}}
+2010-11: EAs 768 | EAs with >1 coord 0
+2013-14 stayer fix vs 2010-11 EA coordinate: 204 of 204 EAs in 2010-11 | max |diff| deg 1.89e-06 | EAs differing > 2e-6: 0
+   continuing: 102 EAs, max |diff| deg 1.86e-06
+   short-term-only: 102 EAs, max |diff| deg 1.89e-06
+households on their EA 2010-11 coordinate 3276 | of which dist<=1 2660 | dist>1 616 | dist<=1 NOT on it 0
+movers on the fix: dist quantiles [1.01, 1.56, 2.36, 4.15, 24.74, 390.23] | same district as EA modal stayer district? None
+   stayers: 2660 hh | district == EA stayers' modal district: 2655
+   movers on fix: 616 hh | district == EA stayers' modal district: 602
+   movers off fix: 724 hh | district == EA stayers' modal district: 224
+
+## 3. Cold builds, dev vs branch (scripts/r4_build_side.py, scripts/r4_compare.py)
+2013-14 source: EAs 204 | with stayers 204 | continuing 102 | short-term-only 102
+cluster_features shapes {'dev': (3235, 5), 'branch': (3235, 5)} | index equal True
+
+== 2013-14
+   dev: wave rows 4000 | clusters 204, without GPS 0 | EAs serving the EA fix 180 of 204 (continuing 91 of 102, short-term-only 89 of 102) | EAs with >1 coordinate 188 | households keeping a coordinate 4000 of 4000 | served off the fix: max km 608, median km over those 66
+   branch: wave rows 4000 | clusters 204, without GPS 0 | EAs serving the EA fix 204 of 204 (continuing 102 of 102, short-term-only 102 of 102) | EAs with >1 coordinate 0 | households keeping a coordinate 3276 of 4000 | served off the fix: max km 0, median km over those 0
+   branch: blanked 724 | of which distY1Y2 non-null 724 | kept with distY1Y2 non-null 0 | kept movers (dist > 1) 616
+   stayers' modal value tied in EAs: {'Region': 0, 'District': 0, 'Rural': 0}
+   Region: moved 3 EAs (55 hh) | moved INTO the stayers' mode 3, OUT of it 0 | served = stayers' mode: dev 201 -> branch 204 of 204
+   District: moved 18 EAs (353 hh) | moved INTO the stayers' mode 18, OUT of it 0 | served = stayers' mode: dev 186 -> branch 204 of 204
+   Rural: moved 7 EAs (136 hh) | moved INTO the stayers' mode 7, OUT of it 0 | served = stayers' mode: dev 197 -> branch 204 of 204
+   baseline_rural: EAs where it varies within the EA 0 of 204 | served Rural = baseline_rural: dev 197 -> branch 204 of 204
+
+other waves identical dev vs branch: {'2004-05': True, '2010-11': True, '2016-17': True, '2019-20': True}
+   wave frame 2016-17 identical: True
+   wave frame 2019-20 identical: True
+sample.parquet dev vs branch DataFrame.equals True
+housing.parquet dev vs branch DataFrame.equals True
+
+Site 2 (destroyed, conflicting groups): dev -> branch
+  2013-14 (3540, 188) -> (3540, 188)
+  2016-17 (2563, 111) -> (2563, 111)
+  2019-20 (3184, 110) -> (3184, 110)
+
+cross-round, SERVED coordinate (branch country table): EAs compared, max |diff| deg, EAs > 2e-6, NaN
+   2013-14 vs 2016-17 (continuing): 102 EAs | max 0.00e+00 | > 2e-6: 0 | NaN 0
+   2013-14 vs 2019-20 (continuing): 102 EAs | max 1.86e-06 | > 2e-6: 0 | NaN 0
+   2016-17 vs 2019-20 (continuing): 102 EAs | max 1.86e-06 | > 2e-6: 0 | NaN 0
+   2013-14 vs 2010-11 (all 204): 204 EAs | max 1.89e-06 | > 2e-6: 0 | NaN 0
+   (dev) 2013-14 vs 2016-17 (continuing): 102 EAs | max 5.30e+00 | > 2e-6: 11
+   (dev) 2013-14 vs 2010-11 (all 204): 204 EAs | max 5.30e+00 | > 2e-6: 24
+
+## 4. Same on every path (scripts/r4_paths.py; vs the cold branch build)
+warm: shape (3235, 5) | DataFrame.equals cold True | 2013-14 equal True
+LSMS_NO_CACHE: shape (3235, 5) | DataFrame.equals cold True | 2013-14 equal True
+LSMS_BUILD_BACKEND=make (cold root): shape (3235, 5) | DataFrame.equals cold True | 2013-14 equal True
+
+## 5. Fail closed: dist_to_IHS3location misspelled in 2013-14 df_main (copied config tree, LSMS_COUNTRIES_ROOT, cold LSMS_DATA_DIR; scripts/r4_mutation.py)
+-- wave level: Country("Malawi")["2013-14"].grab_data("cluster_features")
+   raised KeyError "['dist_to_IHS3locationX'] not in columns of dataframe."
+-- country level: Country("Malawi").cluster_features()
+   returned (3031, 5) | waves ['2004-05', '2010-11', '2016-17', '2019-20']
+   warning UserWarning "['dist_to_IHS3locationX'] not in columns of dataframe."
+   warning UserWarning Makefile execution failed for Malawi/2013-14 cluster_features: Command '['make', '-s', '-j6', '<mut>/data/Malawi/2013-14/_/cluster_features.parquet']' returned no
+   warning UserWarning Makefile execution failed for Malawi/2013-14 cluster_features: Command '['make', '-s', '-j6', '<mut>/data/Malawi/var/cluster_features.parquet']' returned non-zero
+   warning UserWarning Makefile execution failed for Malawi/2013-14 cluster_features: Command '['make', '-s', '-j6', '<mut>/countries/Malawi/2013-14/_/cluster_features.parquet']' return
+   warning UserWarning Makefile execution failed for Malawi/2013-14 cluster_features: Command '['make', '-s', '-j6', '<mut>/countries/Malawi/var/cluster_features.parquet']' returned non
+   warning UserWarning Makefile execution failed for Malawi/2013-14 cluster_features: Command '['make', '-s', '-j6', '<mut>/countries/Malawi/_/cluster_features.parquet']' returned non-z
+   warning GrainCollapseWarning Malawi/cluster_features/2016-17: cluster_features was projected from HOUSEHOLD grain onto the cluster grain (t, v), and the households in a cluster DISAGREE. Collapsing it DESTROYED 2,563 of 14,955 
+   warning GrainCollapseWarning Malawi/cluster_features/2019-20: cluster_features was projected from HOUSEHOLD grain onto the cluster grain (t, v), and the households in a cluster DISAGREE. Collapsing it DESTROYED 3,184 of 14,612 
+-- second run, same (now warm) LSMS_DATA_DIR:
+   -- wave level: Country("Malawi")["2013-14"].grab_data("cluster_features")
+      raised KeyError "['dist_to_IHS3locationX'] not in columns of dataframe."
+   -- country level: Country("Malawi").cluster_features()
+      returned (3031, 5) | waves ['2004-05', '2010-11', '2016-17', '2019-20']
+      warning GrainCollapseWarning Malawi/cluster_features/2016-17: cluster_features was projected from HOUSEHOLD grain onto the cluster grain (t, v), and the households in a cluster DISAGREE. Collapsing
+      warning GrainCollapseWarning Malawi/cluster_features/2019-20: cluster_features was projected from HOUSEHOLD grain onto the cluster grain (t, v), and the households in a cluster DISAGREE. Collapsing
+      warning NullReadWarning Malawi/cluster_features: required declared column 'Latitude' is 100% NULL in wave(s) [2004-05] while other waves carry it. The column is PRESENT, so the shape guards (Countr
+      warning NullReadWarning Malawi/cluster_features: required declared column 'Longitude' is 100% NULL in wave(s) [2004-05] while other waves carry it. The column is PRESENT, so the shape guards (Count
+
+## 6. Hash census (hash_census.py from 1218-current-validation; scripts/r4_hash_diff.py), base 8a8278a2a vs branch
+   country: 26/549 moved
+      by country: {'Malawi': 26}
+   btf: 0/40 moved
+   wave: 26/2109 moved
+      by wave: {'Malawi/2013-14': 26}
+   errors base 0 tip 0
+
+## 7. Tests
+tests/test_gh1260_malawi_panel_geo.py, branch: 44 passed, 68 warnings in 10.82s
+same file on development 8a8278a2a (copied in, then removed): 13 failed, 31 passed, 68 warnings in 8.00s
+   the 13 that fail on development are the 13 new cases (5 synthetic hook tests [2013-14], misspelled-distance [2013-14], 7 in section 3)
+mutation, stayer-first removed from the 2013-14 hook: -k '2013_14 or same_code' -> 1 failed, 6 passed, 37 deselected, 25 warnings in 12.22s (only test_hook_is_the_same_code_in_every_ihps_wave fails; the data tests pass, ordering is not load-bearing on 2013-14 data); -k 2013 -> 1 failed, 11 passed (test_hook_keeps_coordinates_on_the_eas_fix[2013-14])
+Malawi geo/cluster set (gh1260, gh323_malawi_cluster_key, gh323_malawi_gb_cartesian, gh323_site4_dfs_merge, sample, declared_spellings, build_transform_hash, provenance, wave_provenance), branch, -n 4 --dist=loadfile: 860 passed, 85 skipped, 4 xfailed, 159 warnings in 304.88s (0:05:04)
