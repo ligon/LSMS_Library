@@ -300,25 +300,43 @@ This tells the library: "look up the org table named `harmonize_food`, use the `
 
 ### Step 7: Verify
 
-**FIRST — defeat the cache, or you may verify stale data.** The library does
-NOT auto-invalidate caches when you edit a `data_info.yml`, a `_/{table}.py`
-script, or an upstream `.dta` (see CLAUDE.md "Cache Behavior"). A warm L2
-parquet from before your change will silently shadow your new wiring, so
-`c.{feature_name}()` can return old data — making a broken build look fine, or
-a correct fix look broken. Always verify a fresh build:
+**FIRST -- establish a fresh, private verification build.** Content hashes
+normally invalidate declared config, module, script, Make/Org and DVC-sidecar
+changes automatically; see AGENTS.md "Cache Behavior" and
+`docs/guide/caching.md`. Raw bytes changed without a corresponding declared
+sidecar/input change are not covered by that guarantee.
+
+Use the approved interpreter and checkout/import identity check from AGENTS.md.
+Have the launcher provide a new empty private `LSMS_DATA_DIR` and an absolute
+`PYTHON` interpreter path, then run from the intended checkout:
 
 ```bash
-# either force a no-cache read for the session …
-LSMS_NO_CACHE=1 python -c "import lsms_library as ll; ll.Country('{Country}').{feature_name}()"
-# … or hard-clear this country's caches, then rebuild
-lsms-library cache clear --country {Country}
+: "${LSMS_DATA_DIR:?set a new empty private verification data root}"
+: "${PYTHON:?set the absolute approved interpreter path}"
+PYTHONPATH="$PWD" LSMS_COUNTRIES_ROOT="$PWD/lsms_library/countries" \
+LSMS_NO_CACHE=1 "$PYTHON" - <<'PYTHON_CHECK'
+from pathlib import Path
+import lsms_library as ll
+from lsms_library.paths import countries_root
+
+checkout = Path.cwd().resolve()
+assert Path(ll.__file__).resolve().is_relative_to(checkout)
+assert countries_root().resolve() == checkout / 'lsms_library/countries'
+ll.Country('{Country}').{feature_name}()
+PYTHON_CHECK
 ```
 
-For script-path tables (`materialize: make`) a stale **L2-wave** parquet can
-shadow a source-script fix even under `LSMS_NO_CACHE=1`; prefer
-`lsms-library cache clear --country {Country}` (or `pytest --rebuild-caches`)
-in that case. This is not hypothetical — stale caches have masked real build
-bugs and broken tests (see the cache-staleness notes in CLAUDE.md).
+`LSMS_DATA_DIR` moves all three cache tiers, including L1 raw blobs; plan the
+allowed source staging/provider access before the cold build. Record whether
+verification exercised a cold build, a warm read or an explicit bypass.
+Hashless script-wave outputs are evicted before framework rebuild descents,
+but `LSMS_NO_CACHE=1` and a successful Make exit are not universal freshness
+proofs for every builder/backend path (GH #479/#866/#1288).
+
+The CLI `cache clear` and `pytest --rebuild-caches` physically remove caches.
+Use them only against your own verification root during parallel work; avoid
+clearing another worker's shared outputs. An existing parquet or a matching
+hash is not a substitute for the source-backed preservation checks.
 
 **Then run the built-in sanity checker** (against the fresh build):
 ```python
@@ -472,3 +490,7 @@ The corresponding `data_scheme.yml` entry:
   - In a **script** (`materialize: make`) that assumes *numeric codes* — e.g. `df['itemcode'].astype('Int64').map(CODE_MAP)` or `pd.to_numeric(df['have_flag'])` — the default makes the column come back as the **label string** (`'Watches'`, `'Yes'`), so `int(...)`/`to_numeric` fails or NaNs out (→ empty melt, `No objects to concatenate`). Pass `get_dataframe(path, convert_categoricals=False)` to keep numeric codes.
   - In **`data_info.yml`**, the flag is *inverted by presence*: `converted_categoricals: False` sets `convert_categoricals=False` (raw codes); **omitting** the line decodes labels. Setting it `False` on a file that carries labels surfaces raw codes (e.g. Sex `1.0/2.0`, Relationship undecoded → kinship not expanded). Match it to whether the source carries the labels you want.
 - **Bespoke `(t, i)` value tables + the no-v-join exemption:** Some instruments record **household-level value aggregates**, not the canonical item-level `(t,i,j)` (e.g. EthiopiaRHS `assets`/`livestock`/`income`: farm/non-farm value, herd value, income subtotals). Model these as a documented bespoke `(t, i)` table with value columns (declare the bespoke index + columns in `data_scheme.yml`, comment why; cf. Liberia's reduced `assets`). You must also exempt the table from the automatic v-join, or `_join_v_from_sample` injects an all-NaN `v` index level for any `(i,t)` table when the wave has no matching `sample`, failing `no_null_index_levels`. **This is now declarative — no `country.py` edit (GH #436).** Two ways, both in the canonical schema `lsms_library/data_info.yml`: (a) if the table is a cross-country table, declare its canonical index under `Index Info > index_info` *without* `v` (this auto-exempts it, e.g. `shocks`/`assets`/`panel_ids`); (b) otherwise add the feature name to the `Join v from sample > skip_extra` list (e.g. `livestock`/`income`). Multiple identical-schema source files (e.g. one per village/region) **row-concatenate** automatically when listed together under `file:` — no script needed.
+
+## Guidance update, 2026-10-26
+Replaced pre-content-hash cache advice with current invalidation limits and
+private-root verification. Earlier wording remains in Git history.

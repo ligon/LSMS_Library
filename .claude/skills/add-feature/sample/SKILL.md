@@ -63,7 +63,7 @@ Weight variable names change across waves and countries. There is no standard.
 | Country | Cross-section weight | Panel weight | File | Notes |
 |---------|---------------------|-------------|------|-------|
 | **Uganda** | `hmult`/`wgt09`/`wgt10`/`mult`/`wgt_X`/`h_xwgt_W5`/`wgt` | `hmult`/`wgt09`/`wgt10`/`mult`/`wgt`/`hwgt_W5`/`hwgt_W7`/`wgt` | GSEC1 | Both weights change name every wave |
-| **Nigeria** | `wt_wave{N}` | `wt_longpanel` (wave 5) | `secta_plantingw{N}` | Wave 5 adds explicit panel/cross distinction |
+| **Nigeria** | W1-W4: `wt_wave{N}`; W5: `wt_cross_wave5` | W1: `wt_wave1`; W4: `wt_longpanel`; W5: `wt_longpanel_wave5` | The locating round's `secta_plantingw{N}` / `secta_harvestw{N}` | Check each round's source; panel and cross-sectional weights are distinct |
 | **Tanzania** | `weight`/`y5_crossweight` | `sdd_weights`/`y5_panelweight` | `hh_sec_a` | 2020-21 has both; earlier waves may have one |
 | **Ethiopia** | `pw_w{N}` | (check BID) | `sect_cover_hh_w{N}` | |
 | **Malawi** | `hh_wgt` | (check BID) | `hh_mod_a_filt` | |
@@ -97,7 +97,7 @@ The cluster identifier is what becomes `v` in the library's index convention.
 | Country | Cluster variable pattern | Notes |
 |---------|------------------------|-------|
 | **Uganda** | `comm`, `h1aq4a`, `parish_code`, `parish_name`, `s1aq04a` | Switches from numeric codes to parish names circa 2015-16 |
-| **Nigeria** | `ea` | Consistent across waves |
+| **Nigeria** | `state` / `lga` / `ea` composite | `ea` alone is not globally unique; use `nigeria.cluster_id` with the household key for the documented mover sentinel |
 | **Tanzania** | `clusterid` | Numeric; `sdd_cluster`/`y5_cluster` are string alternatives |
 | **Ethiopia** | `ea_id` | |
 | **Malawi** | `ea_id` | |
@@ -412,3 +412,8 @@ Some countries (CLAUDE.md notes Armenia, some Timor-Leste waves) have configs bu
 - **GhanaLSS**: 7-wave repeated cross-section spanning 30 years, evolving weight types (self-weighting to expansion). `lsms_library/countries/GhanaLSS/`
 - **Niger**: EHCVM multi-file pattern with varying weight sources per wave. `lsms_library/countries/Niger/`
 - **Burkina Faso**: EHCVM with genuine dual weights in 2021-22 panel ponderation. `lsms_library/countries/Burkina_Faso/`
+
+## Guidance update, 2026-10-26
+Corrected Nigeria W5 weight names and the full EA identity against the wave
+YAML and `Nigeria/_/nigeria.py`. This does not certify a pending country repair.
+Earlier wording remains in Git history.

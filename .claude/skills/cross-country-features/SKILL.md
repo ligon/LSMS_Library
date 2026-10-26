@@ -19,9 +19,13 @@ mislabelled as that feature. This recurred ~6× in `individual_education`:
 - Tanzania `hh_c04` = *age started school*; real `hh_c07` (grade completed).
 - Nigeria `s2q9` = literacy y/n; real `s2aq9`.
 
-**Discipline:** never trust the wired column or the config comment. Read the Stata/SPSS
-*variable label* (`pyreadstat` metadata, or `get_dataframe(convert_categoricals=True)`)
-and cross-validate the values against `agey` / years-of-schooling. The "numeric
+**Discipline:** verify the wired column and config comment against the Stata/SPSS
+*variable label* or questionnaire, then cross-check the response values against
+`agey` / years-of-schooling. An approved metadata/header read can supply variable
+labels; `get_dataframe(convert_categoricals=True)` decodes value labels instead.
+Its `categories_only` dictionaries are value-label maps, not question wording,
+and the current `ligonlibrary.from_dta` implementation reads rows before returning
+them. Budget the actual header/full-row calls for the pinned reader. The "numeric
 long-pole" features are almost always a *mis-identified column*, not genuinely numeric
 data. The `.DCT` dictionaries for legacy fixed-width `.DAT` (GLSS1/2/3, CILSS) are
 redundant — `get_dataframe` reads the `.DAT` directly, and `GRADE`/`s2q2` is usually the
@@ -44,7 +48,7 @@ consistent. Heterogeneity blocks it (and naive registration can make it worse):
   `transformations._CROP_LEVELS` / `_PLOT_LEVELS` still exist.
   **The plot axis is `plot_id`** (@ligon, 2026-09-10) — the spelling all 23
   `plot_features` countries already declare — so `crop_production` is registered
-  `(t, v, i, plot_id, j, u, condition, season)` and `plot` is the alias, not the
+  `(t, v, i, plot_id, j, u, condition, season, production_obs)` and `plot` is the alias, not the
   target. Every `transformations.py` plot-grain transform (`harvest_kg`,
   `nitrogen_kg`, `seed_kg`, `yield_kg`, `fertilizer_rate`) EMITS `plot_id`
   whichever spelling it was handed. A shared axis NAME is not a shared
@@ -59,7 +63,7 @@ consistent. Heterogeneity blocks it (and naive registration can make it worse):
   a declared index level is a deferred silent deletion. Prefer the sentinel for anything
   new.
 - Different granularity (one country `(i,t,v)`, another `(i,t,v,pid)`) → registration
-  `groupby().first()`-drops the extra level and can INTRODUCE silent data loss
+  drops the extra level and selects an observed row under section 3, which can lose detail
   (people_last7days: registering `(t,v,i)` would drop 87% of Malawi's varying per-`pid`
   counts). Check before registering.
 - **Keep `v` in the registered index** unless the table genuinely has none:
@@ -84,21 +88,28 @@ point (a country that moves toward the canonical index must not be the one exclu
 but it means registering a canonical shape nobody-but-one country emits would exclude
 everybody else. Measure before registering.
 
-## 3. The collapse is `groupby().first()` — check losslessness
-When an extra index level is dropped and the index is then non-unique, the frame
-collapses via `first()`. Before trusting it:
-- Are the collapsed rows IDENTICAL (benign) or distinct (loss)?
-  `g.groupby(keys)[measures].nunique().max(axis=1) > 1`.
-- For ADDITIVE measures it must SUM, not `first()`: GhanaLSS `food_acquired` has ~12
-  per-visit recall rows (summed per CONTENTS.org); `first()` kept only 48% of Quantity.
-  Fix sums Quantity/Expenditure and recomputes `Price = Expenditure/Quantity` (price is
-  per-unit, NOT additive). See `_ADDITIVE_MEASURE_COLUMNS` / `_collapse_duplicate_index`.
-- Dates / non-additive columns have no right sum — decide and document (interview_date
-  keeps one household date; per-visit detail stays on `Country(...)`).
+## 3. Check the observed-row selection and declared reducers
+When dropping an extra index level leaves duplicate keys,
+`feature._collapse_duplicate_index` selects the most complete observed row via
+`country.most_complete_row`; ties retain original order (GH #871).
+The old `groupby().first()` selected each column's first non-null value and
+could fabricate a composite record. It is no longer the selection rule.
+Before treating a collapse as lossless:
+- Compare the complete source rows, including missing values and attributes.
+  A conflict can destroy information even when an additive total is preserved.
+- Consult `_ADDITIVE_MEASURE_COLUMNS`: `food_acquired` sums Quantity and
+  Expenditure, while `assets` sums Value. A unit Price is recomputed from
+  Expenditure/Quantity; it is not additive. Other columns still come from
+  the selected observed row. Additive provenance keys are unioned.
+- Dates and other non-additive answers have no automatic sum. Preserve their
+  detail at Country grain and consult the documented grain policy before
+  changing a reducer. The collapse audit and NA-key behavior remain relevant.
 
 ## 4. Redteam before filing a Feature "glitch"
 Most apparent glitches are misdiagnoses (an audit ruled out ~150 of ~180). Rule out:
-- **Stale cache** — re-run with `LSMS_NO_CACHE=1`; if it vanishes cold it was stale.
+- **Stale cache** -- compare source-backed results in a new private verification root,
+  using the add-feature skill's Step 7 and AGENTS.md cache limits.
+  `LSMS_NO_CACHE=1` alone does not establish a cold build on every backend.
 - **Warning ≠ crash** — `Feature` wraps each country in try/except and continues; a
   per-country `Failed to load …` (esp. the no-microdata countries Nepal/Armenia/
   Timor-Leste 2001/Guatemala) is expected, not a crash.
@@ -117,15 +128,28 @@ canonical index by an `m` level (as `currency` does). Asterisks: the prepended
 `country` level, Feature-only defaults (`currency='index'`), property-features
 (`panel_ids`/`updated_ids` take no options).
 
-## 6. Verifying a fix — the `.pth` split
-- Config under `countries/{C}/_/…` → verify in a worktree with
-  `LSMS_COUNTRIES_ROOT=<wt>/lsms_library/countries` (delegatable to worktree agents).
-- Framework code AND `lsms_library/data_info.yml` are NOT under `countries/` → the
-  `.pth` pins them to the MAIN checkout; verify there (or build a fresh venv).
-  This split decides what can be parallel-delegated vs. done in the main checkout.
+## 6. Verify the intended checkout and configuration
+Use the approved interpreter, `cd` into the intended checkout, and set
+`PYTHONPATH` to its absolute top level. Assert that the real path of
+`lsms_library.__file__` lies under that exact checkout, using the import-identity
+check in AGENTS.md. A path substring is insufficient.
+- Config under `countries/{C}/_/...`: also set
+  `LSMS_COUNTRIES_ROOT=<checkout>/lsms_library/countries`.
+- Framework code and `lsms_library/data_info.yml`: `LSMS_COUNTRIES_ROOT` alone
+  does not select them; the package import must resolve to the intended tree.
+- `python -c` and `python -m` put cwd ahead of `PYTHONPATH`; a script invocation
+  puts the script's directory there. Always check cwd and import identity.
+The former pinned-`.pth`/main-checkout advice predates GH #957. Older environments
+may still carry that file, which makes the identity assertion necessary.
+On Savio, mount the approved image with `bin/savio_venv.sh mount` from the local
+checkout and follow AGENTS.md; do not build a fresh venv or use the writable master.
 
 ## 7. Workflow shape that worked
 Scout inline → fan out. For N independent countries: profile (read-only) → harmonize
 (one worktree agent per country) → review mappings for *semantic* correctness (not just
 "no leftovers"; a leftover-check passes `K`=Koranic mapped to Pre-primary). Worktree-
 agent commits live in `.git` (cherry-pick by SHA) even after the worktree is cleaned.
+
+## Guidance update, 2026-10-26
+Corrected the obsolete `first()` and pinned-`.pth` advice against GH #871/#957
+and current `feature.py` / `country.py`. Earlier wording remains in Git history.
