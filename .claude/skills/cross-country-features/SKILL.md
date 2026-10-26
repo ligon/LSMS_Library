@@ -117,12 +117,19 @@ canonical index by an `m` level (as `currency` does). Asterisks: the prepended
 `country` level, Feature-only defaults (`currency='index'`), property-features
 (`panel_ids`/`updated_ids` take no options).
 
-## 6. Verifying a fix — the `.pth` split
-- Config under `countries/{C}/_/…` → verify in a worktree with
-  `LSMS_COUNTRIES_ROOT=<wt>/lsms_library/countries` (delegatable to worktree agents).
-- Framework code AND `lsms_library/data_info.yml` are NOT under `countries/` → the
-  `.pth` pins them to the MAIN checkout; verify there (or build a fresh venv).
-  This split decides what can be parallel-delegated vs. done in the main checkout.
+## 6. Verifying a fix — exact checkout and runtime identity
+- Run from your own checkout and set `PYTHONPATH=<checkout>` before Python starts.
+  Assert the real `lsms_library.__file__` is beneath that exact checkout; do not
+  rely on cwd or an editable-install assumption. Framework code and
+  `lsms_library/data_info.yml` are verified there, alongside configuration edits.
+- Set `LSMS_COUNTRIES_ROOT=<checkout>/lsms_library/countries` before import so
+  configuration and script outputs use the same tree. Writable caches and DVC
+  metadata must be private to the worker/reviewer; preserve the shared mirror.
+- On Savio compute nodes reuse `bin/savio_venv.sh mount` and the approved image,
+  with explicit `LSMS_VENV_SHARE` when origin is private `results.git`. Verify
+  interpreter/prefix and import/config identity; do not build a fresh venv or
+  use the writable Lustre master. Other environments use their normal venv.
+  AGENTS.md contains the current runtime and cache-path contract.
 
 ## 7. Workflow shape that worked
 Scout inline → fan out. For N independent countries: profile (read-only) → harmonize
