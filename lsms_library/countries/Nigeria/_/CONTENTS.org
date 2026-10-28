@@ -1294,6 +1294,17 @@ W3 25% / W4 56% / W5 49%).
   across waves (panel_ids maps previous_i = hhid), so there is no
   per-wave remapping dict (mirrors Nigeria food_acquired).
 
+** Country concatenator requires every declared folder (GH #1287, 2026-10-28)
+
+All five folders in =nigeria.Waves= ship a =_/plot_features.py= script.
+The country concatenator previously caught every reader exception and wrote
+whatever folders succeeded, provided at least one did. It now propagates a
+failed declared-folder read before writing a partial country table.
+The folder order and each source frame's PP-quarter =t= values are unchanged.
+Invented reader/writer regression checks conserve healthy rows, nulls and
+dtypes and refuse a missing, unreadable or malformed middle-wave input;
+no native payload, cache, or public API acceptance is asserted here.
+
 * community_prices (GAP C -- OURS-ONLY, maintainer priority)
 
 Item-level REPORTED community food prices at natural grain (t, v, j, u):

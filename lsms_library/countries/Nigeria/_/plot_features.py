@@ -19,13 +19,9 @@ from nigeria import Waves
 pieces = []
 for t in Waves.keys():
     fn = f'../{t}/_/plot_features.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not wired (script absent or parquet not yet built).
-        # DVC raises PathMissingError here, not FileNotFoundError.
-        continue
-    pieces.append(df)
+    # All five folders declare plot_features. A read failure must stop
+    # before the country write, rather than silently omit a declared wave.
+    pieces.append(get_dataframe(fn))
 
 assert pieces, "plot_features: no wave-level parquets found"
 
