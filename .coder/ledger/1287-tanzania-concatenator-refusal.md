@@ -36,19 +36,19 @@ Authoritative issue body retrieved read-only from https://github.com/ligon/LSMS_
 Quoted verbatim below, including its distinction between declared and unwired waves:
 
 > Found while extending Niger's missing-wave refusal (branch `fix/niger-concatenator-andand-20261023`, following #1241). Same family as #1281.
-> 
+>
 > **About 50 country-level concatenators in 14 countries silently skip a wave whose wave parquet is missing.** Among them are Ethiopia, Malawi, Mali, Tanzania and Uganda. Each reads `{wave}/_/<table>.parquet` for the waves it knows and drops the ones that are absent. A failed or unrun wave script therefore yields a country table that lacks that wave, with no error. Under `;`-chained Make recipes the failure is not even surfaced by `make`.
-> 
+>
 > **Measured on Niger before the fix** (cold build, make backend, one wave script broken on purpose): the four tables served 32,659 of 46,376, 20,466 of 30,230, 43,584 of 53,041 and 90,146 of 125,294 rows, each missing exactly that wave, with no warning.
-> 
+>
 > **Fix pattern** (#1241 and its Niger extension):
 > 1. Chain the recipe's wave scripts and the concatenator with `&&`.
 > 2. In the concatenator, refuse when a wave that **declares** the table produced no parquet. "Declares" must be read from the config: a wave that does not wire the table is a legitimate skip (e.g. Niger `plot_features` 2011-12 and 2014-15).
-> 
+>
 > `&&` alone is worse than `;`, because it also stops the later waves from building. The refusal is what makes it safe.
-> 
+>
 > **Scope:** per country, one re-warm each. Inventory first: which concatenators skip, and whether every skipped wave declares the table.
-> 
+>
 > Related: #1123, #1241, #1281.
 
 The earlier 5b1b6110a extraction and its 99 candidate passes / 58 original failures / 41 healthy controls establish the bounded all-current-producers refusal. Those source/evidence packets remain immutable. They did not implement runtime config retirement: a genuinely unwired enumerated folder would still be read/refused. This is an unimplemented issue acceptance case, not a newly observed failure on the present 29 declarations.
@@ -70,4 +70,3 @@ Keep the existing 99 cases and actual id_walk. Add actual Country/Wave declarati
 For each enumerated table/folder and both declaration forms, run the actual compiler with invented IO leaves: no retired-folder read, exactly the remaining rows, no fabricated empty/missing wave, same real ID walk. Also cover all-declarations-retired preserving the preexisting no-input failure without any read/write. No Country/Wave implementation, compiler or id_walk stub is permitted; this is actual declaration API on synthetic metadata, not public Country.table data acceptance.
 
 Static proposed count: existing99 +12 actual-config premises +58 one-folder-retirement cases +24 all-retired cases =193. Compiler executions:87+58+24=169;24 presence/metadata-only cases execute none. Prior5b scripts should retain the111 established/premise passes while exposing82 new retirement failures; exact original d65 would additionally retain its58 old refusal failures. These are expected controls, not executed results. No broad suite, Make/cache/native source, #905/#846 or scientific acceptance is authorized by this preparation.
-
