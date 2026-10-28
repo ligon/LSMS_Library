@@ -7,32 +7,42 @@ columns.  This script concatenates the waves that have one (2018-19,
 out of scope).  ``v`` is NOT baked in — the framework joins it from
 ``sample()`` at API time.
 
-Like Mali's concatenator (PR #284), this does NOT apply ``id_walk``
-here.  Cached parquets store pre-transformation data; the framework runs
-``id_walk`` in ``_finalize_result`` on every read.  Applying id_walk at
-cache-write time would collide panel "moved" households whose 2021-22 id
-maps to the same 2018-19 baseline id, baking a non-unique index into the
-parquet.  Leaving the index pre-walk keeps it globally unique; the
-framework's idempotent id_walk handles the panel remap consistently with
-every other Burkina table.
+This concatenator preserves each wave's native household ids. The framework
+applies its exactly-once panel rename (GH #1245); this script does not apply
+``id_walk``. The default ``load_from_waves`` route walks ids before writing
+its country parquet, whereas this standalone script writes native ids.
+
+Both listed waves declare a builder, so a missing output is a failed or
+unrun build, never an unwired wave (GH #1287). Refuse it before writing a
+partial country table; other reader errors propagate unchanged. Like the
+Niger refusal, this checks absence, not the freshness of an existing output.
 """
+from pathlib import Path
+
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library.paths import data_root
 
 
 WAVES = ['2018-19', '2021-22']
 
+# Reuse the Niger source-script premise and data-root lookup (ledger #1287 §2).
+country_dir = Path(__file__).resolve().parent.parent
+unwired = [t for t in WAVES
+           if not (country_dir / t / '_' / 'plot_features.py').is_file()]
+assert not unwired, f'Burkina_Faso plot_features: WAVES lists {unwired} with no wave script'
+
 pieces = []
 for t in WAVES:
-    fn = f'../{t}/_/plot_features.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not wired for plot_features (no .py script / no parquet).
-        # DVC raises PathMissingError here, not FileNotFoundError.
-        continue
-    pieces.append(df)
+    fn = data_root('Burkina_Faso') / t / '_' / 'plot_features.parquet'
+    if not fn.exists():
+        raise FileNotFoundError(
+            f'Burkina_Faso plot_features: wave {t} declares plot_features '
+            f'but its parquet was not built; refusing to concatenate the '
+            f'other waves without it (GH #1287). Run that wave script and '
+            f'read its error.')
+    pieces.append(get_dataframe(fn))
 
 assert pieces, "plot_features: no wave-level parquets found"
 
