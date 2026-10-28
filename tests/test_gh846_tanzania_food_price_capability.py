@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from lsms_library.capability import (
+    CATALOG_ONLY,
     QUESTIONNAIRE_VALIDATED,
     SeriesCapability,
     capability,
@@ -72,15 +73,37 @@ def test_evidence_does_not_close_whole_food_features_or_section_f():
     assert set(CONCEPTS).isdisjoint(feature_vocabulary())
 
 
-def test_staged_evidence_does_not_install_live_or_series_verdicts():
+@pytest.mark.parametrize('unrelated_capability', [False, True])
+def test_staged_evidence_does_not_install_live_or_series_verdicts(
+        monkeypatch, unrelated_capability):
     # An explicit-path loader check is not a live matrix integration (§4/§6).
+    # A legitimate capability about another feature must remain possible.
+    if unrelated_capability:
+        import importlib
+
+        registry = importlib.import_module('lsms_library.capability')._SERIES_CAPABILITY
+        monkeypatch.setitem(registry, ('Tanzania', 'NPS-SDD'), SeriesCapability(
+            country='Tanzania', series='NPS-SDD',
+            provides=('household_roster',), lacks=('housing',),
+            validation=CATALOG_ONLY, evidence='Synthetic unrelated capability',
+        ))
+        assert proposed_absent_verdicts('Tanzania', 'NPS-SDD', ['2019-20'])[0][
+            'feature'] == 'housing'
     staged = load_verdicts(RECORD)
     assert len(staged) == 2
-    assert set(staged).isdisjoint(load_verdicts())
+    live = load_verdicts()
+    assert set(staged).isdisjoint(live)
+    waves = ['2008-09', '2010-11', '2012-13', '2014-15', '2019-20', '2020-21']
+    for concept in CONCEPTS:
+        for wave in waves:
+            assert _absent_tier('Tanzania', concept, wave, live)[0] == 'absent'
     for series in ('NPS', 'NPS-SDD', 'NPS-R1', 'NPS-R2', 'NPS-R3',
                    'NPS-R4', 'NPS-R5', 'NPS-UPD'):
-        assert capability('Tanzania', series) is None
-        assert proposed_absent_verdicts('Tanzania', series, ['2019-20']) == []
+        record = capability('Tanzania', series)
+        if record is not None:
+            assert all(record.verdict_for(concept) is None for concept in CONCEPTS)
+        proposed = proposed_absent_verdicts('Tanzania', series, waves)
+        assert not any(row['feature'] in CONCEPTS for row in proposed)
 
 
 def test_evidence_gate_still_rejects_an_unsupported_close(tmp_path):
