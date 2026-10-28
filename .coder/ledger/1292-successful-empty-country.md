@@ -204,3 +204,55 @@ metadata census, independent review and Nigeria public API acceptance remain
 unexecuted and conditional on the root's resolved source design and releases.
 
 Sue
+
+## Root implementation decision -- 2026-10-28
+
+The two source-design questions above are now resolved sufficiently for a
+focused implementation and counterfactual tests. This supersedes the phase-1
+hold; it does not authorize real-source reads or scientific acceptance.
+
+- Extend the existing private `_with_origin` keyword through the actual
+  dynamic Wave getter and the two explicit table getters (`food_acquired`,
+  `cluster_features`). Keep default public returns and processing unchanged.
+  The dynamic default must still call `grab_data(name)` without the private
+  keyword, preserving existing overrides. Country requests the private return
+  only from getters that explicitly support it; unsupported overrides retain
+  the old conservative route. Bind proof to this same invocation, never a
+  later cache-existence check or mutable last-origin field.
+- A truthy YAML resource declaration together with that invocation's
+  `memory`, `parquet` or `materialized` origin identifies YAML production;
+  `missing`, script resources and unsupported overrides do not prove it.
+  A successful zero-row result must avoid the second legacy build. Do not use
+  `DataFrame.empty` to classify row-bearing, zero-column frames as zero rows.
+- Keep `_parallel_waves`' outer `(has_table, result)` protocol. Its actual
+  `_build_captured` and `relay` implementations only store and return the
+  second value; neither interprets the frame. Carry per-result proof inside
+  that second value, with tests of capture/relay and serial behavior. No
+  production change to the scheduler module is needed.
+- Retain the original normalized zero-row schema witness, rather than
+  constructing declared payload columns. In a strict subset, only when all
+  requested outcomes are accounted for as absent or successful YAML empty,
+  at least one is successful, and the existing builder probe completes with
+  no builder, return the original empty witness. Real/unknown builders,
+  failed or script outcomes and all-wave empty requests retain prior behavior.
+  Nonempty union assembly retains its existing path and write semantics.
+- Reuse `_CONSTRUCTED_EMPTY_ATTR` as the existing zero-row answer/no-write
+  marker, widening its private documentation to include an original empty
+  witness. It is not producer provenance. This protects both pre-finalize
+  cache writes without fabricating a schema. Capture the validation condition
+  locally before finalization; finalize exactly once, then reuse the required
+  membership check for this successful-empty answer. Missing required payload
+  must raise, optional absence may pass, and supported finalizer-produced
+  fields must pass. Extend the guard with an honest YAML diagnostic rather
+  than claiming every error is a stale script parquet.
+
+Implementation must include meaningful baseline-red/candidate-green actual
+Country/Wave routing tests, getter default compatibility, aliases/kinship/v,
+missing required versus optional fields, cache non-overwrite/union coverage,
+full-empty failure, legacy/script and unknown-builder controls. Test only
+synthetic fixtures under the approved interpreter with private runtime paths
+and one CPU; real source/API acceptance and the broader metadata hash census
+remain subsequent coordinated stages. Root will independently review the
+implementation before publication.
+
+Sue
