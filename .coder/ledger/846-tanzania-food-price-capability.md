@@ -58,8 +58,11 @@ assets, not refreshed live history.
   Whole `food_prices` / `food_acquired` negatives would contradict §3.
 - Shared code, global registries, snapshots, scientific baselines and ID JSONs
   are coordinator-owned; no changes here.
-- `CONTENTS.org` is excluded from cache inputs. The new CSV/Markdown evidence
-  is not a declared build input; avoid a new `_/*.org` file (hashed build input).
+- `CONTENTS.org` is excluded from cache inputs. Markdown is not hashed; the
+  verdict CSV lives under `_/capabilities/`, outside the direct `_/` file glob
+  in `Country._table_cache_hash` / `Wave._input_hash`. A direct `_/*.csv` is
+  hashed too, as the API audit caught during placement review; avoid that
+  location and new `_/*.org` build inputs for this documentation.
   Thus no intended table-build fingerprint change; no live hashes measured.
 
 ## §5 Reuse decision
