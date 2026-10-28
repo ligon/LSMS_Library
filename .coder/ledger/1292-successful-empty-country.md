@@ -1,0 +1,206 @@
+# Prior-art ledger -- successful empty YAML results (Nigeria 1292)
+
+Sue / GPT-6, 2026-10-28. Phase 1 only: ledger and source-level proposal.
+Base: `d65e8b13683409ab0005f1a5590208cd7d94ae62` on the isolated
+`fix/1292-successful-empty-country-20261028` branch.
+Search tier: git + ripgrep; GitNexus is unavailable. Inherits `STANDING.md`,
+current `AGENTS.md`/`CLAUDE.md`, and canonical `lsms_library/data_info.yml`.
+Read current guidance changes, relevant prior ledgers/history and tests.
+No production/test implementation, imports, tests, census or provider reads.
+
+## §1 Task, restated
+
+Preserve a successfully produced, valid zero-row YAML wave answer instead of
+using its emptiness as grounds for a second legacy build. A strict subset that
+is positively barren and has no country builder must return an honest typed
+empty answer without replacing valid other-wave country-cache content. Keep
+real failures, malformed results, script fallback, JSON, full-empty failures,
+country-builder authority, unknown rule probes and nonempty union builds.
+
+The motivating country repair is recovered Nigeria
+`e569358f5d4481bb45ae4e90609a83df3b267f83`: five explicit source dates stop
+copying selected PH education answers onto PP. Its own ledger and complete
+2,754-line `_/CONTENTS.org` were read, including WAITING entries. The relevant
+idiosyncrasy is one physical wave folder serving two rounds while its selected
+education source is PH. W5 YAML selects `s2q9`, its legacy script `s2q3`.
+The existing CONTENTS qualification explicitly preserves the possibility of
+genuine PP education in W1/W2 instruments; no new PP availability claim follows.
+Country-specific sources/sample closure remain with the Nigeria owner.
+
+## §2 Existing machinery
+
+All code locators below are on d65e8b1, unless a recovered ref is specified.
+Its `country.py` is byte-identical to recovered e569358.
+
+| Machinery | Source | Contract / existing controls | Decision |
+|---|---|---|---|
+| Actual Wave getters | `country.py:1194-1222`, `:2365-2449` | Dynamic getter calls grab_data; cluster and food getters perform additional processing; `test_wave_getattr.py`, GH1078 tests | Preserve actual getter, never bypass with a direct grab_data call |
+| Wave declarations | `country.py:1262-1303` | Scripts plus YAML keys; other_features/cluster_features compatibility; declaration is not producer success | Reuse for eligibility, never sole proof |
+| Private producer origin | `country.py:1873-1917`, `:2354`, `:2428-2437` | `_with_origin` reports actual memory/parquet/materialized/missing route without public attrs; GH1078 ledger/tests | Candidate extension, protocol unresolved below |
+| Explicit source date | `country.py:1595-1596`, `:2317-2318` | Per-file t override and real requested-quarter filter; recovered GH1292 Wave tests | Reuse unchanged |
+| Current legacy decision | `country.py:5499-5549` | None OR DataFrame.empty triggers fallback; GH535 then filters legacy t | Extend only proven-success empty handling |
+| Early absent subset | `country.py:5203-5227` | GH1099 strict subset with no declarations and completed no-builder proof; cache hits remain earlier | Preserve; declared empty is a separate case |
+| Post-wave assembly | `country.py:5584-5666` | Normalization, empty discard, nonempty concat; country_builder=False constructor; otherwise country fallback | Extend after outcome accounting |
+| Parallel protocol | `_parallel_waves.py:478-505`, `:560-580`, `:600+` | Builder returns exactly (has_table, result); result is processed by worker/relay orchestration; `test_parallel_waves.py` | Preserve outer pair; audit every consumer before any carrier change |
+| Required/optional fields | `country.py:1070-1097` | Shared authoritative membership | Reuse, no copied required-column list |
+| Constructed empty and marker | `country.py:1100-1163` | Declaration-order typed payload; zero rows plus marker means non-cacheable answer | Reuse after original result validity is established |
+| Country write guards | `country.py:5817-5821`, `:6021-6022` | Constructed answers skip both country parquet writes | Preserve both; no union coverage on an empty answer |
+| Country builder probe | `country.py:5069-5173` | Completed absence only; unknown errors/timeouts fail safe, not memoized | Reuse; no rule regex or file-existence success inference |
+| Real finalizer | `country.py:3958-4356` | Normalization, Relation alias, categorical mappings, kinship, v join, types and attrs | Reuse actual contract, no parallel schema interpreter |
+| Required-column guard | `country.py:4993-5041` | Checks after finalization, allowing fields created there; GH323 Site4 tests and script-path tests | Reuse membership/placement principle; do not manufacture fields before checking |
+| Alias handling | `country.py:8663+`, `:7104+`, `:7205+` | Normalizer undoes j-to-i when declaration requires j; canonical level aliases have their own consumers; rejected column spellings use metadata | Test actual supported semantics; do not invent alias equivalence |
+| Related-table metadata | `country.py:3194-3207`, `:3533+`, `:4064-4069` | Even empty results may request sample/spatial data | Existing IO cost is material; no second finalizer pass |
+
+Relevant prior ledgers: `1099-empty-subset.md`,
+`1218-constructed-empty-explicit-types.md`,
+`1218-current-development-integration.md`, `1281-wave-config-error.md`,
+`1288-make-failed-recipe.md`, and `1078-food-producer-provenance.md`.
+Their history and existing tests anchor the distinctions, not predicted counts.
+
+## §3 Definitions and conventions in force
+
+- STANDING sections 3-4 and current AGENTS govern schema, sanctioned IO,
+  pre-finalize caches, sample-owned v and ID handling. Current AGENTS clarifies
+  that L2-country i is already walked; preserve that current contract rather
+  than repeating older baseline wording about all cache columns being raw.
+- GH1099's absence means no declaration, not an exception or an empty file.
+  This task adds a distinct success case and must preserve that distinction.
+- GH1039 ruling, issue comment 6259386847: the framework assembles waves when
+  no country builder exists. It does not authorize skipping a real builder.
+- `_empty_declared_frame` is an answer constructor, not evidence a build was
+  complete. Constructing declared columns before validation would conceal an
+  actual missing required field.
+- Zero rows means `len(df) == 0`. DataFrame.empty also includes a frame with
+  rows but no columns; such a frame is not this task's empty answer.
+- GH1078 ledger explicitly disallows public attrs sentinels, mutable globals
+  and an instance last-origin field as substitutes for per-result provenance.
+  An earlier scratch suggestion of a last-origin/receipt field therefore is
+  withdrawn; no such field is approved by this ledger.
+- Full finalization supplies fields that do not exist in a raw Wave result:
+  Relation becomes Relationship, kinship creates Generation/Distance/Affinity,
+  and sample may supply v. A blanket pre-finalize required-field test rejects
+  valid supported inputs and is not an acceptable substitute.
+
+## §4 Invariants and observed mechanism
+
+1. Actual getter exceptions retain their existing handling. GH1281 KeyError
+   remains a contextual RuntimeError with original cause; AttributeError keeps
+   its existing compatibility path. No failure becomes absence.
+2. A successful YAML zero-row result currently enters use_legacy at5524-5527.
+   GH535 filters legacy t at5543-5548, so this source diagnosis does NOT prove
+   the legacy W5 question is returned at PP. Extra IO and cold empty-request
+   failure are supported; public question-substitution outcomes are unmeasured.
+3. Empty results are discarded at5605-5606. Default DVC/manual descents pass the
+   default country_builder=True; ordinary non-DVC YAML does too. With no rows
+   they reach country fallback5658. Existing GH1099 cannot short-circuit
+   Nigeria's declared education table.
+4. Valid supported zero-row YAML cases must be fixed, including outputs whose
+   supported aliases/finalizer complete their schema. Leaving them on legacy
+   solely because a raw-shape predicate is easier preserves the defect.
+5. A malformed empty, missing required payload, failed extraction, script
+   missing-result or row-bearing zero-column frame must never be filled into
+   success by the declared-empty constructor. Optional absence stays optional.
+6. Keep JSON semantics, unknown/invalid waves, genuine/unknown country builders,
+   full/all-wave-empty failures and valid populated cache unions unchanged.
+7. A coverage-union rebuild may legitimately write populated union content
+   while serving an empty requested subset. Do not impose blanket zero writes.
+   A constructed answer alone must never replace bytes/coverage for other waves.
+8. No worker-local closure mutable set may carry proof back to the parent.
+   Serial and parallel paths need the same explicit outcome evidence. The
+   outer two-value protocol is fixed; a nested carrier is not automatically
+   transparent and must be audited through all frame consumers.
+9. Keep warm gates before additional declaration/producer inspection. Broad
+   build hash impact remains visible; no new exclusion or fake schema bump.
+
+## §5 Reuse decision and concrete patch sketch for review
+
+| Need | Decision | Reason |
+|---|---|---|
+| Valid empty answer type/order/no-write behavior | Reuse typed constructor and marker | Existing tested schema/serialization policy |
+| No country builder | Reuse conservative probe | Actual rule authority, grouped targets and unknown cases already handled |
+| Actual producer proof through getters | Extend existing private origin, subject to root protocol choice | Truthy resource config plus an empty frame is insufficient; direct grab_data bypass and mutable last-origin are ruled out |
+| Schema completeness | Reuse real normalization/finalization and required membership | Aliases/kinship/sample-v must be honored, malformed schema must not be fabricated |
+| Hash invalidation | Reuse tagged orchestrator/loader closure | Routing is content-producing and broad cost must be measured |
+
+Proposed source edit sequence AFTER root chooses the unresolved mechanics:
+
+1. Bind producer proof to the same invocation of the real Wave getter.
+   Extend the existing private per-result origin return through actual getter
+   contracts; default public getters and DataFrame attrs remain unchanged.
+   Resolve YAML-cache origin versus script-parquet origin explicitly, and
+   preserve cluster/food wrappers and aliases. This is not yet a concrete
+   approved signature/carrier edit: `_with_origin` is currently a grab_data
+   option consumed by food_acquired, not a generic Country getter protocol.
+2. In build_wave, suppress the second legacy build only for a genuinely
+   successful zero-row YAML outcome. Keep None, missing/script and exceptions
+   on their existing paths. Propagate the original witness explicitly; do not
+   replace it with a full declared schema before validity is checked.
+3. Account for all actual build_waves outcomes, including union members. Keep
+   populated results on existing concat/write/restrict routes. Only a fully
+   proven barren strict subset with completed no-builder proof may become the
+   existing non-cacheable declared answer; preserve full-empty failure.
+4. Validate original zero-row witnesses through the actual supported schema
+   contract before a constructor can supply missing columns. Finalize exactly
+   once on the normal path. Placement relative to constructor and write guards
+   is an unresolved design dependency, not permission to add a second pass or
+   duplicate a schema-only interpretation of finalizer behavior.
+
+### Specific design gaps requiring root review before code
+
+- **Producer transport:** the safe extension of `_with_origin` through generic
+  and special actual getters, plus each parallel frame consumer, has not been
+  selected. A mutable last-origin field contradicts GH1078; a tuple wrapper
+  cannot be assumed transparent. No carrier implementation is authorized.
+- **Validation placement:** existing required checking is post-finalize, but
+  country writes occur before the finalizer and the declared constructor adds
+  the very fields being checked. A design must retain the original schema
+  witness until checked, keep it out of cache, support aliases/kinship/sample-v
+  and avoid an extra finalizer/source-IO pass. The current sketch does not
+  claim this ordering solved. A pre-finalize raw-field check or a second full
+  finalizer is explicitly not the accepted shortcut.
+
+## §6 Root review questions and finite verification proposal
+
+Root owns the two design choices above; there is no newly inferred survey
+policy question. This phase ends with ledger review, before implementation.
+Nigeria owner owns the five-PH-source oracle and sample closure. No imports,
+tests, census, source reads or cache operations are released by this ledger.
+
+After source/protocol review, prepare identical synthetic counterfactual
+carriers on d65 framework with recovered Nigeria config versus the candidate
+framework with the SAME config. Preserve actual Country/Wave/getter/finalizer behavior;
+stub only sanctioned source leaves and observable subprocess boundaries.
+
+- Successful zero-row YAML must avoid legacy execution for dynamic, food and
+  cluster getters, including supported alias and finalizer-dependent fields.
+- Malformed shaped empty and missing required payload fail without constructor
+  laundering. Cover absent optional fields, all-null-but-present payload,
+  row-bearing zero-column frames and missing/script/None outcomes separately.
+- Both backends: cold, full/partial/stale/bypassed country cache, no-stage and
+  DVC-exception writes; PP-only, PH-only, mixed and all-wave requests; fresh
+  Country instances and covered cache hits. Preserve full union when rebuilt;
+  never stamp a constructed empty with populated union coverage.
+- Actual source/config errors, unknown/missing Make probe, real/broken country
+  builders, JSON and invalid requests retain original behavior and causes.
+- Exercise serial and prebuild/relay paths, warning/ledger/attrs preservation,
+  and ensure no producer receipt is reused across requests or wave instances.
+- Reuse GH1039/1099/1218 tests, GH1281 tests, GH1288 Make failure controls,
+  GH891 coverage tests, invalid-wave tests, GH1078 producer tests,
+  test_wave_getattr.py, test_parallel_waves.py and recovered GH1292 Wave tests.
+  Extend discriminating tests; do not rewrite scientific pins to match results.
+
+The hash-impact plan reuses the reviewed metadata census: exact baseline and
+candidate processes, complete ordered Country/framework/Wave maps, identical
+keysets and per-map errors retained, empty private data roots, and exhaustive
+tracked CSV plus DVC sidecar metadata permissions (including Data1/outside Data).
+Raw/source payload/network access refuses. Verify source/runtime identities
+before/after and keep guard refusals explicit. Previous 549/40/2109 counts are
+historical, not this task's measured results. No full corpus build is implied.
+
+### Phase 3 -- verification status
+
+Not started. Only the new ledger/proposal is authored. Source/runtime tests,
+metadata census, independent review and Nigeria public API acceptance remain
+unexecuted and conditional on the root's resolved source design and releases.
+
+Sue
