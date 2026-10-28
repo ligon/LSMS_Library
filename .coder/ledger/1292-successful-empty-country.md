@@ -249,6 +249,33 @@ subsequent coordinated stages. No hash exclusion or schema bump was added.
 
 Sue
 
+## Review correction -- witnessed empties on the Make backend
+
+Root accepted the independent supported-route counterexample as an unmet
+contract in this task, also present before 52eb. With `materialize: make`, an
+existing country Makefile and unavailable `make`, the established helper
+returns False under its executable-builder policy. The positive-empty gate
+correctly refuses unknown rule absence, but `country_builder=False` then
+constructs declaration columns over the original witness (country.py:5701).
+Reviewer `review-framework1292-52eb/run-v2.log` records both valid-empty and
+missing-required cases unexpectedly succeeding, with zero guard denials.
+
+Reuse the existing successful-empty witness and failure machinery: when the
+positive-empty proof does not return its original witness, the old no-builder
+constructor must reject any retained positive witness. Do not change genuine
+declaration absence, None/script/error behavior, the Make probe, finalization
+count or aggregate schema membership. A positive-empty plus a failed declared
+outcome must likewise not become a fabricated declaration answer.
+
+Add supported Make-backend controls for unknown-builder valid/malformed empty,
+completed no-builder valid/malformed empty, genuine declaration absence, and
+positive-empty plus declared missing output. Retain the exact new tests against
+the unchanged 52eb module as baseline, then verify the focused existing cohort
+once. Root authorizes this narrow correction and finite synthetic checks.
+After publication, run only the corrected candidate's full metadata census
+under the reviewed v4 guard and compare with the verified original d65 maps;
+preserve every original packet and failed dispatch roster unchanged.
+
 ## Root implementation decision -- 2026-10-28
 
 The two source-design questions above are now resolved sufficiently for a
