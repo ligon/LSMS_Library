@@ -1,7 +1,13 @@
 # Prior-Art Ledger — #846 Tanzania food-price capability
 
 **Search tier used:** ripgrep + git; no GitNexus tool is available. Baseline:
-`8aa4d86b6594eb0b03bdd50fe3ca04f4f4ac6b26`. Inherits `STANDING.md`.
+`8aa4d86b6594eb0b03bdd50fe3ca04f4f4ac6b26` (historical investigation).
+Continuation starts at `3831b94d96967fef63934774444f2ec758f21109`, the
+coordinator's four-file recovery from `845856fe58f202c659b68ad601992142af5f1fd5`
+on preserved parent `02de2e8b65fbb9bf73c9441d2946b3c0263821c6`. The required
+development pin `d65e8b13683409ab0005f1a5590208cd7d94ae62` was absent from
+ancestry and merged normally as `a96529bf71896de3e94f07b03e182a53d97df00a`.
+Inherits `STANDING.md`. No whole-snapshot restoration.
 
 ## §1 Task, restated
 
@@ -75,6 +81,15 @@ assets, not refreshed live history.
 | purchase unit value | reuse existing API unchanged | instrument pairs numerator and denominator |
 | own-consumption imputation | out of scope | separate #585 analyst-facing decision |
 
+Continuation source finding: `CONTENTS.org` says the two-row country-local
+record is at `_/capabilities/food_price_absent_verdicts.csv`, but the file is
+absent at the recovery head. The unchanged five staged tests on the merged
+baseline give **4 failed, 1 passed**; all four failures follow from that missing
+file (`load_verdicts` deliberately returns `{}`). Add only the two documented
+2019-20 Section J rows, using the existing schema and retained REPORT §1
+locator. Do not restore a snapshot to recover them. Add a negative control that
+the default loader and Tanzania series registry still contain no such verdicts.
+
 ## §6 Open questions for coordinator
 
 Recorded in the absolute `QUESTIONS_FROM_AGENT.txt`; no interactive wait.
@@ -87,6 +102,19 @@ No shared implementation patch is authorized here. Such read-only metadata
 integration should not move build hashes; exclude any read-path callable from
 build fingerprints only if its placement otherwise makes it reachable.
 
+`docs/guide/coverage.md` requires all applicable checks before a live close;
+the staged C4-only source-concept record does not satisfy or bypass that live
+integration policy. The loader validates evidence presence and tier, not the
+scientific sufficiency of C1–C4. Tests exercising `_absent_tier` with an explicit
+path are serialization/dispatch checks, not authority to close a matrix cell.
+
 ### Phase 3 — verification
 
-Pending targeted source/metadata tests. No scientific/API acceptance claimed.
+Baseline: unchanged staged file, 4 failed / 1 passed in 0.45 s, one CPU,
+approved runtime and exact package/config/data identity asserted; no blocked
+data/network/database operations. Final source/metadata check pending. Finite
+selection: the staged #846 file and existing synthetic `tests/test_capability.py`;
+120 s process bound, native thread pools and build/make workers fixed at one,
+private temporary fixtures, constructors/data-reader leaves refused by runner.
+No scientific/API acceptance claimed. Fresh questionnaire verification and all
+real-source/API stages remain unexecuted and require coordinator authorization.
