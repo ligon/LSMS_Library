@@ -112,9 +112,25 @@ path are serialization/dispatch checks, not authority to close a matrix cell.
 
 Baseline: unchanged staged file, 4 failed / 1 passed in 0.45 s, one CPU,
 approved runtime and exact package/config/data identity asserted; no blocked
-data/network/database operations. Final source/metadata check pending. Finite
-selection: the staged #846 file and existing synthetic `tests/test_capability.py`;
-120 s process bound, native thread pools and build/make workers fixed at one,
-private temporary fixtures, constructors/data-reader leaves refused by runner.
+data/network/database operations. Final finite selection: the six #846 cases
+and 19 existing synthetic `tests/test_capability.py` cases, **25 passed in
+0.42 s**. The runner enforces a 120 s process bound, native thread pools and
+build/make workers fixed at one, private temporary fixtures and refused
+constructors/data-reader leaves; no forbidden operation was attempted.
+The source-only API audit (`scripts/api_surface_audit.py --strict`, equivalent
+to `make api-audit` through the approved interpreter without Poetry) passed:
+10 documented kwargs, 15 listed skills, no untracked hashed input. Six unused
+public helpers are informational, not new findings.
+
+OK (anchored on §§2–5): the missing CSV is now tracked explicitly (the broad
+`*.csv` ignore rule explains why a normal add omitted it); only two exact
+2019-20 keys load, all other waves and whole-feature controls stay open, a
+`dropped` cell treats the staged `not-asked` as inert, and empty evidence is
+rejected. Default verdicts and Tanzania series capabilities are unaffected.
+No shared implementation, table configuration or build input changed.
 No scientific/API acceptance claimed. Fresh questionnaire verification and all
-real-source/API stages remain unexecuted and require coordinator authorization.
+real-source/API stages remain unexecuted and require coordinator authorization;
+the coverage guide's all-applicable-check rule is still pending for any live
+integration. The expanded frozen #846 issue's “all six” and “C1;C2;C4” claims
+are not adopted: REPORT §1 explicitly locates only the 2019-20 instrument, and
+a historical zero-row API result is not a new C1 label sweep.
