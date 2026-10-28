@@ -98,3 +98,42 @@ originalscript7fail/4pass; metadata postcheck continuation is separately
 qualified. Recheck the exact extracted head before opening a PR.
 
 Sue
+
+
+## Current declaration correction and public-head extraction (2026-10-28)
+
+Earlier source-script-only definitions/invariants above describe the first
+repair and are superseded for table eligibility: actual `Country.waves`,
+`Country.__getitem__` folder mapping and `Wave.data_scheme` (native script
+AND YAML keys) govern. Reuse these APIs; no YAML-null override or new helper.
+Undeclared/retired tables skip before output existence/readers, declared
+absence/errors stay loud, healthy/empty/native IDs and concat attrs unchanged.
+STANDING §2/§4 and current single-pass/exactly-once `local_tools.id_walk`
+govern; this country compiler does not walk. No namespace/panel/science edit.
+
+Public parent0270c293fc5fa001b96782226d8d397ec48d010a (d65e8b136 base)
+is the sole extraction parent. Product bytes from privatef86213a3 are
+SHA256d6b0425afae59cc74137552114d5acb9ed7949fb6c06c304eedcc9cdae98af9d.
+Only compiler, two targeted tests, this ledger and own CONTENTS change.
+All inherited scientific/component/factor changes and peer review ledgers
+are excluded. No public ref, original checkout or shared cache mutation.
+
+Author19PASS versus historical-script10FAIL/9PASS is meaningful: failure
+causes are retired/YAML/map/native-only eligibility and new-wave omission;
+9healthy/error/empty cases remain healthy. The public0270 script is exactly
+historicalf853918f; all5 recorded framework hashes match0270. Source-run
+HEAD109e7e1 had separate pre/post-bound product/test bytes before commit,
+so do not relabel that run exactf862/extracted-head acceptance. No existing
+retirement-red cohort needs replay solely for extraction.
+
+The extracted candidate requires a newly released bounded31-case run:
+19 unchanged metadata tests +11 adapted prior tests +1 genuine id_walk
+post-compiler boundary case. The last case uses invented chained identities
+and actual single-pass id_walk, no production panel JSON/provider. Existing
+wrong CONFIGERROR test/result bytes are retained as historical evidence.
+Preparation performs source/AST/hash checks only; no tests/import/data actor
+or scientific/whole-Country/cache/hash-census acceptance is claimed.
+
+## Independent extracted-candidate verification
+
+Root ran all31candidate cases once on the public0270-based extraction:31PASS,0errors/skips/guarddenials, unchanged bound source/config, empty data/L1, and77zero-byte output markers. This includes19author declaration cases,11adapted earlier cases and one new actual id_walk boundary on invented chained identities. No old retirement-red cohort replay; this proves neither real-source nor full Country/Feature/cache/scientific closure. Guard and JUnit/source-before/after receipts are kept in the private root-runtime-v1 record.

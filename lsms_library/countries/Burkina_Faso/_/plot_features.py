@@ -12,30 +12,28 @@ applies its exactly-once panel rename (GH #1245); this script does not apply
 ``id_walk``. The default ``load_from_waves`` route walks ids before writing
 its country parquet, whereas this standalone script writes native ids.
 
-Both listed waves declare a builder, so a missing output is a failed or
-unrun build, never an unwired wave (GH #1287). Refuse it before writing a
-partial country table; other reader errors propagate unchanged. Like the
-Niger refusal, this checks absence, not the freshness of an existing output.
+Only waves whose own metadata declares this table contribute. A retired or
+unwired wave is skipped before reading; a declared native or YAML output
+must exist and be readable (GH #1287). This checks absence, not the freshness
+of an existing output.
 """
-from pathlib import Path
-
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
 from lsms_library.paths import data_root
 
 
-WAVES = ['2018-19', '2021-22']
-
-# Reuse the Niger source-script premise and data-root lookup (ledger #1287 §2).
-country_dir = Path(__file__).resolve().parent.parent
-unwired = [t for t in WAVES
-           if not (country_dir / t / '_' / 'plot_features.py').is_file()]
-assert not unwired, f'Burkina_Faso plot_features: WAVES lists {unwired} with no wave script'
-
+country = Country('Burkina_Faso')
 pieces = []
-for t in WAVES:
-    fn = data_root('Burkina_Faso') / t / '_' / 'plot_features.parquet'
+for t in country.waves:
+    wave = country[t]
+    # Wave.data_scheme includes both native scripts and YAML declarations;
+    # Country resolves logical waves through its declared folder mapping.
+    # A parquet's presence is never a table declaration (ledger §7).
+    if 'plot_features' not in wave.data_scheme:
+        continue
+    fn = data_root(country.name) / wave.wave_folder / '_' / 'plot_features.parquet'
     if not fn.exists():
         raise FileNotFoundError(
             f'Burkina_Faso plot_features: wave {t} declares plot_features '

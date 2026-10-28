@@ -5,7 +5,6 @@ output markers and copied script declarations are private tmp_path fixtures.
 """
 from __future__ import annotations
 
-import ast
 from pathlib import Path
 import runpy
 
@@ -13,7 +12,7 @@ import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
 
-from lsms_library import local_tools, paths
+from lsms_library import Country, local_tools, paths
 
 
 SOURCE = Path(__file__).resolve().parents[1] / 'lsms_library/countries/Burkina_Faso'
@@ -39,6 +38,9 @@ def run_concat(tmp_path, monkeypatch):
     country = tmp_path / 'countries' / 'Burkina_Faso'
     build = country / '_'
     build.mkdir(parents=True)
+    (build / 'data_scheme.yml').write_text(
+        "Country: Burkina_Faso\nWaves: ['2014', '2018-19', '2021-22']\n"
+        'Data Scheme:\n  plot_features:\n    materialize: make\n')
     target = build / 'plot_features.py'
     target.write_text(SCRIPT.read_text())
     for wave in ['2014', *WAVES]:
@@ -65,6 +67,8 @@ def run_concat(tmp_path, monkeypatch):
                         lambda frame, *a, **k: writes.append(frame.copy(deep=True)))
     monkeypatch.setattr(paths, 'data_root',
                         lambda country=None: root / country if country else root)
+    monkeypatch.setenv('LSMS_COUNTRIES_ROOT', str(country.parent))
+    paths.countries_root.cache_clear()
     monkeypatch.chdir(build)
     present, failures = set(WAVES), {}
 
@@ -87,17 +91,13 @@ def run_concat(tmp_path, monkeypatch):
         return writes
 
     run.reads, run.writes, run.root, run.frames = reads, writes, root, frames
-    return run
+    yield run
+    paths.countries_root.cache_clear()
 
 
-def test_list_covers_exactly_the_configured_wave_scripts():
-    # The script is the declaration for this script-path table, not a parquet.
-    tree = ast.parse(SCRIPT.read_text())
-    assignment = next(n for n in tree.body if isinstance(n, ast.Assign)
-                      and any(isinstance(t, ast.Name) and t.id == 'WAVES' for t in n.targets))
-    listed = ast.literal_eval(assignment.value)
-    configured = sorted(p.parent.parent.name for p in SOURCE.glob('[12]*/_/plot_features.py'))
-    assert listed == configured == WAVES
+def test_current_wave_metadata_declares_exactly_the_ehcvm_waves():
+    country = Country('Burkina_Faso')
+    assert [w for w in country.waves if 'plot_features' in country[w].data_scheme] == WAVES
     assert not (SOURCE / '2014/_/plot_features.py').exists()
 
 
@@ -134,11 +134,14 @@ def test_reads_configured_data_root(run_concat):
 
 
 @pytest.mark.parametrize('undeclare', WAVES)
-def test_listed_wave_without_builder_is_a_configuration_error(run_concat, undeclare):
-    with pytest.raises(AssertionError, match='with no wave script'):
-        run_concat(undeclare=undeclare)
-    assert run_concat.reads == []
-    assert run_concat.writes == []
+def test_retired_wave_is_skipped_before_reader(run_concat, undeclare):
+    # Root's explicit GH1287 correction replaces the earlier CONFIGERROR
+    # expectation. Original test bytes/results remain in private historical
+    # evidence; an absent script AND absent YAML means genuinely unwired.
+    run_concat(undeclare=undeclare)
+    retained = [w for w in WAVES if w != undeclare]
+    assert [w for w, _ in run_concat.reads] == retained
+    assert_frame_equal(run_concat.writes[0], run_concat.frames[retained[0]], check_exact=True)
 
 
 def test_duplicate_index_still_refuses(run_concat):
