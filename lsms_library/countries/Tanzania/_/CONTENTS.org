@@ -2299,3 +2299,29 @@ Both dated accounts remain; this retirement changes neither that crosswalk nor t
 The Extended/Refresh split, split-off back-casting and live WAITING #114 caveats remain unchanged.
 The separate reviewed 408 plot-input unit replacements (86 plus 322) are preserved by exact source/test identity; no agriculture sources or plot-input outputs were rebuilt here.
 Changing the shared country Makefile moves all 25 enumerated Tanzania API cache hashes; other tables were not rebuilt for this check.
+
+* 2026-10-28 -- Country concatenators consult declarations before reading (GH #1287)
+
+The twelve country concatenators consult the existing =Country= / =Wave.data_scheme=
+declaration API before attempting an enumerated folder. Logical waves are mapped
+to physical folders through =Wave.wave_folder=; the four UPD logical waves share
+=2008-15=. A folder with no declaration is a legitimate skip, before either reader.
+A declaration on any logical wave mapped to a folder retains that output.
+
+Seven scripts still enumerate the two modern folders. Anthropometry,
+individual_education, food_coping, life_satisfaction and shocks still enumerate
+all three physical folders and preserve both existing read candidates. A declared
+folder whose reads fail raises with table/folder context and the original cause;
+a successful relative fallback and readable-empty output remain allowed.
+
+The prior all-current-producer refusal and its 99-case synthetic evidence remain
+valid for the current configuration; the new declaration-retirement controls are
+prepared separately and have not been run at this source checkpoint.
+Private metadata fixtures use the actual Country/Wave declaration API, while
+invented readers/writers supply frames. No compiler or id_walk is stubbed.
+This is not real-source, public Country/Feature routing or scientific acceptance.
+
+Availability is distinct from logical-round completeness: food_coping's UPD
+declaration still omits round 1, without inventing a required row. The existing
+folder order, household walks, reducers, back-casting, Extended/Refresh split and
+live WAITING #114 caveats remain unchanged. No #905 or #846 change is included.

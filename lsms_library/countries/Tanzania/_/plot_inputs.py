@@ -18,21 +18,34 @@ import json
 
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
 from tanzania import id_walk
 
 
 WAVES = ['2019-20', '2020-21']
 
+# GH #1287: declarations belong to logical waves; readers use physical folders.
+country = Country('Tanzania', preload_panel_ids=False)
+declared_folders = {
+    wave.wave_folder
+    for wave in (country[year] for year in country.waves)
+    if 'plot_inputs' in wave.data_scheme
+}
+
 pieces = []
 for t in WAVES:
+    if t not in declared_folders:
+        continue
     fn = f'../{t}/_/plot_inputs.parquet'
     try:
         df = get_dataframe(fn)
-    except Exception:
-        # Wave not yet wired / parquet not built.  DVC raises
-        # PathMissingError here, not FileNotFoundError.
-        continue
+    except Exception as exc:
+        # Each folder reaching this reader declares a producer (ledger #1287 §8).
+        # Refuse partial country output when a declared build cannot be read.
+        raise RuntimeError(
+            f'Tanzania/plot_inputs: could not load declared folder {t} ({fn})'
+        ) from exc
     pieces.append(df)
 
 assert pieces, "plot_inputs: no wave-level parquets found"
