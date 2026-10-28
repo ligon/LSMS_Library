@@ -62,3 +62,9 @@ PP t, keys, nulls, Float64 and reader inputs exactly. No new aggregator,
 transform or source reader was introduced. api_surface_audit.py passes using
 PROJECT_PYTHON (Poetry is absent), and git diff --check passes. Own author
 checks only; independent review and native/API acceptance remain pending.
+
+## Declaration continuation (2026-10-28)
+
+Actual `Country.waves`, `Country.__getitem__`, `Wave.data_scheme`, and `wave_folder_map` are the existing metadata machinery. Native scripts and YAML keys both declare a table; this change adds no YAML override policy. PP/PH logical quarters share physical folders, read once in original registry order. Stable hhid/plot_id and PP-quarter output follow CONTENTS.org; no ID walk, table builder, source mapping or science policy changes.
+
+Source extracted from private0416008120af723b592bb6cba3b8cec41b00c6a1 onto public14df451d8837e14f0bf6fb3089ab195295d6e799, excluding inherited unrelated work. Author cohort27PASS versus13retirementFAIL/14healthy; independent extracted-candidate verification passed the same27cases with zero errors/skips/guard denials, unchanged source/config and empty data/L1. This is the same27-case population, not54unique cases. Prior four controls remain separate.

@@ -2424,3 +2424,26 @@ development served.  Nothing served moves: =individual_education= reads
 =s2aq9= of this file, never =s2aq10=.  To recover the text, a consumer can
 =s.encode('latin-1').decode('utf-8', errors='ignore')= -- which yields
 =... /  ‘O LEVEL=, the closing quote being genuinely gone.
+
+** Declaration membership supplement (GH #1287)
+
+
+*Declaration qualification (continuation, 2026-10-28).* The five physical
+=Waves= and today's five producer scripts do not themselves establish
+per-table membership after a retirement. The compiler now obtains each logical
+PP/PH quarter through the actual =Country('Nigeria')[quarter]= lookup and
+=Wave.data_scheme=, which includes native scripts AND YAML declarations.
+Both quarters map to one physical folder through =wave_folder_map=; the
+compiler reads each declared folder once in its original order. A folder
+without either declaration skips before any reader, even if an output is
+available. Declared reader errors retain their original exception before any
+country write. No source-column mapping, round selection or metadata API is
+substituted. All-retired inputs still fail without writing; successful declared
+empty frames remain valid, including when every declared frame is empty.
+
+The separate new 27-case private-metadata/invented-IO cohort records the old
+compiler's 13 declaration failures and 14 healthy passes, then 27 passes after
+this correction. It preserves native PP keys, repeated indices, nulls, dtypes,
+order, source frames and the existing agreeing/disagreeing-attrs concat rule.
+The original four controls remain historical evidence for current wiring.
+Neither cohort establishes real source/Make/cache/API or scientific acceptance.
