@@ -14,20 +14,23 @@ with no plot-level input roster.
 """
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
 
 
-WAVES = ['2010-11', '2013-14', '2016-17', '2019-20']
+country = Country('Malawi')
+assert 'plot_inputs' in country.data_scheme, "plot_inputs: not declared for Malawi"
 
 pieces = []
-for t in WAVES:
-    fn = f'../{t}/_/plot_inputs.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not yet wired / parquet not built (DVC raises
-        # PathMissingError here, not FileNotFoundError).
+# Reuse actual table discovery, including native scripts and YAML declarations.
+# Ledger: malawi-compiler-declarations-20261028.md §§2–5.
+for t in country.waves:
+    wave = country[t]
+    if 'plot_inputs' not in wave.data_scheme:
         continue
+    fn = f'../{wave.wave_folder}/_/plot_inputs.parquet'
+    # A declared output that cannot be read is a failed build, not absence.
+    df = get_dataframe(fn)
     pieces.append(df)
 
 assert pieces, "plot_inputs: no wave-level parquets found"
