@@ -351,6 +351,73 @@ def test_missing_make_does_not_prove_a_country_rule_absent(survey, monkeypatch):
     assert any(call[0] == 'make' for call in survey.legacy)
 
 
+@pytest.mark.parametrize('make_available', [False, True])
+@pytest.mark.parametrize('missing_required', [False, True])
+def test_make_backend_preserves_empty_witness_or_refuses_unproven_builder(
+        survey, monkeypatch, make_available, missing_required):
+    survey.configure(entry={'index': '(t, i)', 'x': 'float', 'materialize': 'make'},
+                     myvars={'Other': 'raw_x'} if missing_required else {'x': 'raw_x'})
+    (survey.country_path / '_' / 'Makefile').write_text('# synthetic rule probe\n')
+    monkeypatch.setenv('LSMS_BUILD_BACKEND', 'make')
+    monkeypatch.setattr(C.shutil, 'which',
+                        lambda *args, **kwargs: '/synthetic/make' if make_available else None)
+    probes = []
+
+    def completed_absence(argv, **kwargs):
+        assert argv[:2] == ['make', '-n'], argv
+        probes.append(argv)
+        return subprocess.CompletedProcess(
+            argv, 2, '', f"make: *** No rule to make target '{argv[-1]}'.  Stop.\n")
+
+    monkeypatch.setattr(C.subprocess, 'run', completed_absence)
+    if not make_available:
+        with pytest.raises(RuntimeError, match='Could not materialize'):
+            survey.load([PP])
+    elif missing_required:
+        with pytest.raises(RuntimeError, match='successful empty YAML.*required.*x'):
+            survey.load([PP])
+    else:
+        got = survey.load([PP])
+        assert len(got) == 0 and list(got.columns) == ['x']
+        assert got.x.dtype == pd.Float64Dtype()
+    assert len(probes) == int(make_available)
+    assert survey.legacy == [] and not survey.cache.exists()
+
+
+@pytest.mark.parametrize('unknown_country_rule', [False, True])
+def test_make_backend_genuine_declaration_absence_keeps_constructor(
+        survey, monkeypatch, unknown_country_rule):
+    survey.configure(entry={'index': '(t, i)', 'x': 'float', 'materialize': 'make'})
+    monkeypatch.setenv('LSMS_BUILD_BACKEND', 'make')
+    if unknown_country_rule:
+        (survey.country_path / '_' / 'Makefile').write_text('# unavailable rule probe\n')
+        monkeypatch.setattr(C.shutil, 'which', lambda *args, **kwargs: None)
+    got = survey.load([OTHER])
+    assert len(got) == 0 and list(got.columns) == ['x']
+    assert got.x.dtype == pd.Float64Dtype()
+    assert survey.reads == [] and survey.legacy == [] and not survey.cache.exists()
+
+
+def test_make_backend_empty_witness_cannot_hide_declared_missing_output(survey, monkeypatch):
+    survey.configure(entry={'index': '(t, i)', 'x': 'float', 'materialize': 'make'})
+    other = survey.country_path / '2002/_/data_info.yml'
+    other.write_text((survey.country_path / '2000-01/_/data_info.yml').read_text())
+    monkeypatch.setenv('LSMS_BUILD_BACKEND', 'make')
+    original = C.Wave.grab_data
+    missing_calls = []
+
+    def getter(self, name, *, _with_origin=False):
+        if self.year == OTHER:
+            missing_calls.append(self.year)
+            return (None, 'missing') if _with_origin else None
+        return original(self, name, _with_origin=_with_origin)
+
+    monkeypatch.setattr(C.Wave, 'grab_data', getter)
+    with pytest.raises(RuntimeError, match='Could not materialize'):
+        survey.load([PP, OTHER])
+    assert missing_calls == [OTHER] and not survey.cache.exists()
+
+
 def test_yaml_empty_wave_cache_is_positive_producer_evidence(survey):
     wave = survey.country()[PP]
     empty = wave.facts()

@@ -5699,7 +5699,11 @@ class Country:
             # a strict subset whose waves lack the table is a correct EMPTY
             # answer, the 0 rows the default backend serves from a warm cache.
             if not country_builder:
-                if {str(w) for w in waves} >= {str(w) for w in self.waves}:
+                # A positive witness needs the completed proof above. If that
+                # failed, declaration-only construction would fabricate its
+                # schema or hide another declared wave's missing outcome.
+                if (empty_witnesses
+                        or {str(w) for w in waves} >= {str(w) for w in self.waves}):
                     raise _rebuild_failure_error(self.name, method_name)
                 return _empty_declared_frame(scheme_entry)
 
