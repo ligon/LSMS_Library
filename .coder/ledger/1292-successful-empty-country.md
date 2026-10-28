@@ -1,12 +1,14 @@
 # Prior-art ledger -- successful empty YAML results (Nigeria 1292)
 
-Sue / GPT-6, 2026-10-28. Phase 1 only: ledger and source-level proposal.
+Sue / GPT-6, 2026-10-28. Ledger, root-approved implementation and finite
+synthetic author verification; independent review remains pending.
 Base: `d65e8b13683409ab0005f1a5590208cd7d94ae62` on the isolated
 `fix/1292-successful-empty-country-20261028` branch.
 Search tier: git + ripgrep; GitNexus is unavailable. Inherits `STANDING.md`,
 current `AGENTS.md`/`CLAUDE.md`, and canonical `lsms_library/data_info.yml`.
 Read current guidance changes, relevant prior ledgers/history and tests.
-No production/test implementation, imports, tests, census or provider reads.
+The root decision below supersedes the original phase-1 implementation hold.
+No real-source/provider build or broad metadata census has been performed.
 
 ## §1 Task, restated
 
@@ -145,7 +147,7 @@ Proposed source edit sequence AFTER root chooses the unresolved mechanics:
    is an unresolved design dependency, not permission to add a second pass or
    duplicate a schema-only interpretation of finalizer behavior.
 
-### Specific design gaps requiring root review before code
+### Phase-1 design gaps resolved by the root decision below
 
 - **Producer transport:** the safe extension of `_with_origin` through generic
   and special actual getters, plus each parallel frame consumer, has not been
@@ -199,9 +201,51 @@ historical, not this task's measured results. No full corpus build is implied.
 
 ### Phase 3 -- verification status
 
-Not started. Only the new ledger/proposal is authored. Source/runtime tests,
-metadata census, independent review and Nigeria public API acceptance remain
-unexecuted and conditional on the root's resolved source design and releases.
+Implementation/test freeze: `52eb6c6ee8c9485680a9a4b98ecfa9d69700cff6`.
+Only `country.py` and `tests/test_gh1292_successful_empty_country.py` change
+scientific/runtime code. The tested working bytes were committed unchanged:
+country SHA256 `6d322a026aa447b2916c06df38e6b0f034bdec51fb0199cee49b493036e31c6c`,
+test SHA256 `fea8c8b6df9a23ea49a4ee0807b367dcad96b4582c76932e3d402e4992aa9472`.
+
+- Reuse/definition checks (§§2-4): actual getters return private invocation
+  origins; scheduler outer pairs are unchanged. Original normalized empty
+  witnesses concatenate before exactly one normal finalizer and the shared
+  required-membership guard. No declared payload is filled, and the existing
+  zero-row no-write marker protects both country write sites.
+- Root clarified aggregate-level membership: complementary original empty
+  schemas may satisfy the same union contract as populated Country assembly.
+  A single malformed witness or a union entirely missing a required payload
+  fails. There is no new per-wave required-schema policy or extra finalizer.
+- Strict-subset classification uses the original API request, even when a
+  stale cache's manifest expands the internal rebuild union to all waves.
+  A proven empty subset preserves that existing country cache; an original
+  all-wave empty request retains its failure behavior.
+- Guarded finite cohort: **133 passed** (11.05 s). This includes 35 new
+  actual Country/Wave/extraction/finalizer/cache tests and focused existing
+  Wave getter, GH1281 config-error, GH1078 producer, GH1039/GH1218 typed-empty
+  and scheduler accounting/grouping controls. Capture/relay includes pickle
+  transport, warnings and attrs; no actual multi-CPU pool was run.
+- Same 35 new tests with the exact `f02936b0d` country module supplied by a
+  private import loader: **21 expected failures, 14 passes** (10.64 s).
+  Identical configurations/assertions were retained. This is an explicit
+  single-module baseline counterfactual, not a claim of a separate complete
+  baseline checkout or a hash-impact measurement.
+- Both runs used the approved `/local/job40561868/venv_img/bin/python`, exact
+  package/config/data identity assertions, private synthetic files, one CPU
+  and numerical/build threads 1; source bytes matched before/after and guard
+  denials were zero. Real source/cache/provider/network access and unapproved
+  subprocesses refused. Only tracked metadata and new private synthetic
+  parquet/CSV/config/temp files were permitted. Loader setup failures and
+  fixture corrections are retained separately, not counted as production
+  test evidence.
+
+Durable evidence:
+`/global/scratch/fsa/fc_jevons/ligon/burst/isa-country-owners-20261028/framework-empty-success-52eb6c6e/`.
+It includes launchers, the frozen baseline module, exact selections, identity,
+source hashes, JUnit, logs, guard results and report. The broader metadata
+hash census, native Nigeria same-config public API carrier, actual fork-pool
+execution, independent review and real-source scientific acceptance remain
+subsequent coordinated stages. No hash exclusion or schema bump was added.
 
 Sue
 
