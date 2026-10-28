@@ -300,25 +300,30 @@ This tells the library: "look up the org table named `harmonize_food`, use the `
 
 ### Step 7: Verify
 
-**FIRST — defeat the cache, or you may verify stale data.** The library does
-NOT auto-invalidate caches when you edit a `data_info.yml`, a `_/{table}.py`
-script, or an upstream `.dta` (see CLAUDE.md "Cache Behavior"). A warm L2
-parquet from before your change will silently shadow your new wiring, so
-`c.{feature_name}()` can return old data — making a broken build look fine, or
-a correct fix look broken. Always verify a fresh build:
+**FIRST — choose verification for the path you changed.** Follow AGENTS.md's
+current Cache Behavior contract. Hash-covered configuration, source inputs and
+build-transform closures invalidate their affected tables; assembly-time
+changes run on reads. Neither a blanket claim that caches never invalidate nor
+an unconditional cold rebuild is correct.
 
-```bash
-# either force a no-cache read for the session …
-LSMS_NO_CACHE=1 python -c "import lsms_library as ll; ll.Country('{Country}').{feature_name}()"
-# … or hard-clear this country's caches, then rebuild
-lsms-library cache clear --country {Country}
-```
+Set `PYTHONPATH` and `LSMS_COUNTRIES_ROOT` to this checkout before import and
+assert the exact package/configuration identity. Use private writable data for
+both the implementer and independent reviewer. For an uncovered build path,
+legacy/hashless output, or a script-path cache that can shadow the change, use
+a fresh private data root or clear only that worker's scoped country cache.
+`LSMS_NO_CACHE=1` alone is not a universal cold guarantee for Make/script paths.
+Never clear a shared cache or verify framework changes in the shared checkout.
+Record the warm/cold policy, exact source/runtime and checks actually executed.
 
-For script-path tables (`materialize: make`) a stale **L2-wave** parquet can
-shadow a source-script fix even under `LSMS_NO_CACHE=1`; prefer
-`lsms-library cache clear --country {Country}` (or `pytest --rebuild-caches`)
-in that case. This is not hypothetical — stale caches have masked real build
-bugs and broken tests (see the cache-staleness notes in CLAUDE.md).
+The `Country` wave-rebuild descent already evicts hashless wave outputs,
+including on `LSMS_NO_CACHE` descents. Direct Make/script execution that
+bypasses that descent can still encounter existing outputs; inspect that
+specific route before choosing a cold check. Prefer a fresh private data root.
+If maintenance is needed, first validate `LSMS_DATA_DIR` is this worker's
+private root, inspect `lsms-library cache clear --dry-run` with explicit
+`--country`, `--method` and `--wave` selections, then clear only that scope.
+`pytest --rebuild-caches` purges every country in its selected data root; do
+not use it as a generic remedy or point it at a shared root.
 
 **Then run the built-in sanity checker** (against the fresh build):
 ```python
