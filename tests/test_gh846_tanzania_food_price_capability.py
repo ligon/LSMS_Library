@@ -7,7 +7,12 @@ from pathlib import Path
 
 import pytest
 
-from lsms_library.capability import QUESTIONNAIRE_VALIDATED, SeriesCapability
+from lsms_library.capability import (
+    QUESTIONNAIRE_VALIDATED,
+    SeriesCapability,
+    capability,
+    proposed_absent_verdicts,
+)
 from lsms_library.coverage_matrix import (
     _absent_tier,
     _dropped_tier,
@@ -65,6 +70,17 @@ def test_evidence_does_not_close_whole_food_features_or_section_f():
         assert tier == 'absent', feature
     # This staging file is not a new canonical feature registry.
     assert set(CONCEPTS).isdisjoint(feature_vocabulary())
+
+
+def test_staged_evidence_does_not_install_live_or_series_verdicts():
+    # An explicit-path loader check is not a live matrix integration (§4/§6).
+    staged = load_verdicts(RECORD)
+    assert len(staged) == 2
+    assert set(staged).isdisjoint(load_verdicts())
+    for series in ('NPS', 'NPS-SDD', 'NPS-R1', 'NPS-R2', 'NPS-R3',
+                   'NPS-R4', 'NPS-R5', 'NPS-UPD'):
+        assert capability('Tanzania', series) is None
+        assert proposed_absent_verdicts('Tanzania', series, ['2019-20']) == []
 
 
 def test_evidence_gate_still_rejects_an_unsupported_close(tmp_path):

@@ -64,7 +64,10 @@ and wave-scoped integration with explicit actual checks. Do not copy these
 rows into the global verdict file as if the matrix already had those cells,
 or add `lacks=('food_prices',)` to an NPS registry entry. See
 `.coder/ledger/846-tanzania-food-price-capability.md` §§2–6 and the coordinator
-question channel. No shared framework or build inputs are changed.
+question channel. The coverage guide's requirement to run all applicable checks
+before a live close still applies; an explicit-path loader test checks metadata
+dispatch, not the scientific sufficiency of this retained C4-only evidence.
+No shared framework or build inputs are changed.
 
 Recorded by Sue / Codex, using retained source evidence; scientific and
 integration acceptance remain with the coordinator.
