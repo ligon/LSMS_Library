@@ -73,6 +73,15 @@ reviews source/manifest/guard/launcher BEFORE any execution. Proposed19new-
 composition cases use core40/8GiB/120seconds/pytestn0/allthreads1 and retain
 4ULP/sourceclamps/provider/native/build traps. No data/cache/provider/native,
 Country/Feature build or performance acceptance is implied. Livestock-only
-parity and synthetic scope remain pending this new finite run; real-source/API/
-performance acceptance remain future. Module text moves country build inputs;
+parity and synthetic scope passed the reviewed standalone run at
+31aa0c1373b28eb9126dab367e174ca076ace15b:19passed, zero guard denials,
+twelve adverse receipts, empty private data and exact1823source/67config/
+guard/reader/old-helper/target bindings. The external oracle environment was
+omitted; reconstructed reference source matched the exact public helper.
+Root independently checked JUnit and all twelve numeric receipts; the earlier
+two-failure signed witness remains preserved. Durable ARTIFACTS manifest
+66692c2e7f8ef0f71350730f753d210bc861b44520dda38837fb633c8d5b3b9b
+binds ordinary evidence and source custody. This ledger-only follow-up changes
+no tested production/test bytes. Real-source/API/performance acceptance remains
+future. Module text moves country build inputs;
 no live hash census or cache rewrite is authorized. Root integrates separately.
