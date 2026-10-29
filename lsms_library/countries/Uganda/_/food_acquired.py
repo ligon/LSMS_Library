@@ -18,13 +18,19 @@ import json
 
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
-from uganda import Waves, id_walk
+from uganda import id_walk
 
 
 p = []
-for t in Waves.keys():
-    df = get_dataframe('../' + t + '/_/food_acquired.parquet').squeeze()
+country = Country('Uganda')
+for t in country.waves:
+    wave = country[t]
+    # The actual native/YAML union declares the table, not an offered output.
+    if 'food_acquired' not in wave.data_scheme:
+        continue
+    df = get_dataframe('../' + wave.wave_folder + '/_/food_acquired.parquet')
     # Wave parquet already has canonical index [t, i, j, u, s] and
     # columns [Quantity, Expenditure, Price] from
     # food_acquired_to_canonical().

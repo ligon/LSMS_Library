@@ -4193,3 +4193,29 @@ in =anthropometry=, =livestock=, =plot_inputs= and =plot_labor=, and the narrowe
 =FileNotFoundError= skip in =interview_date=, remain separate #1287 work.
 No source acquisition, cache content, native database or baseline was accessed.
 Ledger: =.coder/ledger/1287-uganda-concatenator-refusal.md=.
+
+* Public compiler composition and declaration folders (GH #1287, 2026-10-29)
+
+The eleven active country compilers for =assets=, =shocks=,
+=months_food_inadequate=, =nonfood_expenditures=, =anthropometry=, =livestock=,
+=plot_inputs=, =plot_labor=, =interview_date=, =food_acquired= and
+=plot_features= select registered logical waves through =Country.waves=,
+resolve physical folders through =Country.__getitem__=, and check
+=Wave.data_scheme='s native-script/YAML union before reader access. A genuinely
+undeclared table skips even when an old output is offered; a failed declared
+read propagates before any household walk or country write. Food preserves
+DataFrames instead of squeezing singleton or one-column frames.
+
+This isolated public-base candidate extracts only compiler wiring and tests;
+scientific helpers, wave sources, sample/cluster policy, IDs, schema and
+fixtures keep public bytes. Existing concat/casts/date filtering, duplicate
+nonfood-key refusal, parcel A/B vocabulary and exactly one local ID walk stay
+unchanged. All-empty inputs retain the existing walker/concat failures.
+
+The private ten-compiler208case evidence is retained history, not verification
+of this public composition. Its additional23case plot carrier had not run
+before the crash; the profile observer now chains the prior guard callback.
+Fresh exact-candidate verification remains pending. Real source, Make/cache,
+Country/Feature, rewarm and scientific acceptance are separate; no source
+acquisition or fixture update is implied. Ledger:
+=.coder/ledger/1287-uganda-public-compiler-composition.md=.
