@@ -137,22 +137,73 @@ def test_concatenator_concatenates_every_wave(monkeypatch, tmp_path, table):
 
 
 @pytest.mark.parametrize('table', NAMES)
-def test_concatenator_refuses_a_listed_wave_with_no_script(monkeypatch, tmp_path, table):
-    """The refusal is only correct because every listed wave HAS a wave
-    script: a missing parquet then means a failed build, never "not wired".
-    The concatenator asserts that premise (here, in a copy of the tree with
-    one wave script removed)."""
+def test_concatenator_accepts_a_yaml_declared_wave_with_no_script(monkeypatch, tmp_path, table):
+    """The historical test asserted "WAVES lists ... with no wave script"
+    in a tree with no wave YAML. That pinned only the old native-script
+    premise, not actual declarations. GH #1287 now checks the real union:
+    a YAML declaration without a script must still be read. The new finite
+    metadata carrier separately covers true retirement and stray outputs.
+    """
+    import hashlib
+    import json
+    from pathlib import Path
+
+    # SOURCE is a CONFIG-root binding for the older build tests. This
+    # source-only control binds compiler bytes independently of CONFIG.
+    source = Path(__file__).resolve().parents[1] / 'lsms_library/countries/Niger'
     tree = tmp_path / 'Niger'
-    shutil.copytree(SOURCE / '_', tree / '_', ignore=shutil.ignore_patterns('__pycache__'))
+    (tree / '_').mkdir(parents=True)
+    for name in ['niger.py', f'{table}.py']:
+        (tree / '_' / name).write_bytes((source / '_' / name).read_bytes())
+    index, column = TABLES[table]
+    (tree / '_' / 'data_scheme.yml').write_text(
+        'Country: Niger\nWaves: ' + str(WAVES) + '\nData Scheme:\n'
+        f'  {table}:\n    index: ({", ".join(index)})\n    {column}: float\n')
+    root = tmp_path / 'data'
+    frames, written = {}, []
     for t in WAVES:
         (tree / t / '_').mkdir(parents=True)
+        (tree / t / '_' / 'data_info.yml').write_text(f'{table}: {{}}\n')
         if t != '2014-15':
             (tree / t / '_' / f'{table}.py').write_text('')
+        path = root / 'Niger' / t / '_' / f'{table}.parquet'
+        path.parent.mkdir(parents=True)
+        path.touch()  # Existence marker only, never serialized table IO.
+        frames[path] = _frame(table, t)
+    monkeypatch.setenv('LSMS_COUNTRIES_ROOT', str(tmp_path))
+    monkeypatch.setenv('LSMS_DATA_DIR', str(root))
+    countries_root.cache_clear()
+    data_root.cache_clear()
+    monkeypatch.setattr(local_tools, 'get_dataframe', lambda path: frames[Path(path)].copy())
+    monkeypatch.setattr(local_tools, 'to_parquet', lambda frame, *a, **k: written.append(frame.copy()))
     monkeypatch.syspath_prepend(str(tree / '_'))
     monkeypatch.delitem(sys.modules, 'niger', raising=False)
     monkeypatch.chdir(tree / '_')
-    with pytest.raises(AssertionError, match=r"WAVES lists \['2014-15'\] with no wave script"):
+    def fingerprint():
+        result = {}
+        for p in sorted(tmp_path.rglob('*')):
+            if p.is_file():
+                if p.suffix == '.parquet':
+                    assert p.stat().st_size == 0
+                    content = b''
+                else:
+                    content = p.read_bytes()
+                result[str(p.relative_to(tmp_path))] = hashlib.sha256(content).hexdigest()
+        return result
+    before = fingerprint()
+    print('COMPILER_CONFIG_BEFORE', json.dumps({'table': table, 'root': str(tmp_path), 'sha256': before}, sort_keys=True))
+    try:
         runpy.run_path(str(tree / '_' / f'{table}.py'), run_name=f'__unwired_{table}__')
+        assert len(written) == 1
+        pd.testing.assert_frame_equal(written[0], pd.concat(list(frames.values())), check_exact=True)
+    finally:
+        after = fingerprint()
+        print('COMPILER_CONFIG_AFTER', json.dumps({'table': table, 'root': str(tmp_path), 'sha256': after}, sort_keys=True))
+        assert before == after
+        for name in ['niger.py', f'{table}.py']:
+            assert (tree / '_' / name).read_bytes() == (source / '_' / name).read_bytes()
+        countries_root.cache_clear()
+        data_root.cache_clear()
 
 
 # ---------------------------------------------------------------------------
