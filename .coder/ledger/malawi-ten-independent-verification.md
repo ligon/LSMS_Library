@@ -82,3 +82,10 @@ FINAL-RESULT.json SHA e7a226d56b1a1f9d86776a700e6ae356a1c2aa5f54758183c0a72a5659
 Exact commands are preserved in per-table actor.json and command.json, with
 frozen guard-v1/guard.py and launcher-v1/launch.py. Do not rerun those existing
 exclusive directories. A reproduction requires a new private root and receipt.
+
+Final extraction-only doc review removed copied author CONTENTS descriptions of
+production_obs/input_obs as live public producer behavior. They are absent from
+the retained public helper; invented extra axes prove opaque transport only.
+Copied author ledger is explicitly historical to its carrier. This correction
+changes docs only, preserving all tested product/test/config/helper bytes; no
+completed cohort was repeated. Original review-v1 seal remains historical.

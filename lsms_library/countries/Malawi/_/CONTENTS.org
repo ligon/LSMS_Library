@@ -4231,8 +4231,8 @@ Each keeps its existing successful concat and no-input assertion. No native
 module/helper, YAML registration or scientific reduction is changed.
 
 Two compiler details matter to conservation. =crop_production= still promotes
-its native =u= column into the index after concat; condition and production_obs
-remain as the native helper writes them until framework promotion. The native
+its native =u= column into the index after concat; all other native columns
+remain opaque compiler inputs. No new observation schema is introduced. The native
 =community_prices= helper deliberately writes an extra =i=v= level before =j=
 to avoid =map_index='s legacy item/household inversion; its country compiler
 must preserve that intermediate axis. Framework normalization removes it from
@@ -4246,13 +4246,17 @@ The explanation now names the committed framework input. The compiler continues
 to concatenate raw wave IDs without running =id_walk= itself; no crosswalk is
 read, regenerated or changed by this repair or its invented-IO verification.
 
-* 2026-10-28 -- plot_inputs compiler's remaining fixed-wave discovery gap
+* 2026-10-28 -- plot_inputs compiler declaration and failure handling
 
-The earlier GH #1287 repair already propagated reader failures; its eleven-case
-result above is retained and was not replayed. A separate new metadata control
-found that the fixed four-wave list still read stale outputs for unwired or
-unregistered waves and ignored mapped physical folders. It now uses the same
-actual Country/Wave discovery rule as the other concatenators. Reader propagation,
-concat, native =input_obs= coordinates, typed hollow records and every G/H/D
-producer and scientific boundary remain unchanged. No finalizer eligibility
-or framework/schema change is part of this compiler correction.
+The public-baseline extraction removes its broad reader suppression and fixed
+four-wave list together. It now uses the same actual Country/Wave discovery
+rule as the other concatenators and propagates declared failures before writes.
+The author's earlier eleven-case repair belongs to its separately pinned
+inherited carrier; that history is retained in the author ledger and was not
+replayed or adopted as a scientific implementation here.
+
+Native producers, household IDs, concat, schema and finalizer eligibility remain
+public-baseline bytes. Invented test frames carry extra opaque observation axes
+to check transport only; no input_obs or production_obs producer/schema change
+is part of this extraction. No G/H/D source, scientific or empty-producer policy
+is introduced.

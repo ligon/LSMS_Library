@@ -1,5 +1,10 @@
 # Malawi compiler declarations and fail-loud assembly
 
+> Historical author ledger from carrier3edb4a0f, retained with its exact pins.
+> Scientific/observation references describe that inherited carrier, not the
+> publicd65 extraction. See malawi-ten-independent-extraction.md and
+> malawi-ten-independent-verification.md for extracted scope and actual checks.
+
 ## §1 Scope and pins
 Sue / GPT-6 Codex. Dispatch d664d8d682e14452a0921c6834f0c5f5;
 initial d2cf441e42206d6284ded8b99b549b4e64790b9d. Git/rg search tier.
