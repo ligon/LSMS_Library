@@ -104,15 +104,20 @@ def metadata(tmp_path, monkeypatch):
 def test_selected_question_mapping_and_actual_quarter_registry(metadata, binding):
     country, roots = metadata
     folder, pp, ph, source, column = binding
-    old, new = country('baseline'), country('candidate')
     expected_question = {VALUE: [column, {'mappings': [
         'harmonize_education', 'Original Label', 'Preferred Label']}]}
-    for obj in (old, new):
+    specs = {}
+    # Country.file_path follows the current override dynamically; read each
+    # arm's real resources while that arm is selected, rather than retaining
+    # an object across a later override and accidentally reading candidate twice.
+    for arm in ('baseline', 'candidate'):
+        obj = country(arm)
         assert pp in obj.waves and ph in obj.waves
         assert obj.wave_folder_map[pp] == obj.wave_folder_map[ph] == folder
         assert obj[pp].wave_folder == obj[ph].wave_folder == folder
         assert TABLE in obj[pp].data_scheme and TABLE in obj[ph].data_scheme
-    old_spec, new_spec = old[ph].resources[TABLE], new[ph].resources[TABLE]
+        specs[arm] = obj[ph].resources[TABLE]
+    old_spec, new_spec = specs['baseline'], specs['candidate']
     assert old_spec['file'] == source
     assert new_spec['file'] == [{source: {'t': ph}}]
     assert old_spec['idxvars'] == {'i': 'hhid', 'pid': 'indiv'}
