@@ -148,6 +148,9 @@ def test_concatenator_accepts_a_yaml_declared_wave_with_no_script(monkeypatch, t
     import json
     from pathlib import Path
 
+    # The copied-source fixture is read-only, including interpreter side effects.
+    monkeypatch.setattr(sys, 'dont_write_bytecode', True)
+
     # SOURCE is a CONFIG-root binding for the older build tests. This
     # source-only control binds compiler bytes independently of CONFIG.
     source = Path(__file__).resolve().parents[1] / 'lsms_library/countries/Niger'
