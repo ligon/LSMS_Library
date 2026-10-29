@@ -20,6 +20,7 @@ collapsed the unit columns.  Replaced 2026-05-07.
 """
 import sys
 sys.path.append('../../_/')
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
 
 import pandas as pd
@@ -52,9 +53,27 @@ def id_walk(df, wave, waves):
     return df
 
 
+country = Country('Ethiopia', preload_panel_ids=False)
 p = []
-for t in Waves.keys():
-    df = get_dataframe('../' + t + '/_/food_acquired.parquet').squeeze()
+seen_folders = set()
+for t in country.waves:
+    wave = country[t]
+    folder = wave.wave_folder
+    if folder in seen_folders:
+        continue
+    seen_folders.add(folder)
+    # Reuse actual Wave declarations, including YAML-only/null entries
+    # (ledger #1287-ethiopia-food-country-selector §§2–4).
+    if 'food_acquired' not in wave.data_scheme:
+        continue
+    fn = f'../{folder}/_/food_acquired.parquet'
+    try:
+        df = get_dataframe(fn).squeeze()
+    except Exception as exc:
+        raise RuntimeError(
+            f'Ethiopia food_acquired: declared wave {t!r} '
+            f'(folder {folder!r}) could not be read from {fn!r}'
+        ) from exc
     # Wave parquet already has canonical index [t, i, j, u, s] and
     # columns [Quantity, Expenditure] from food_acquired_to_canonical().
     df1 = id_walk(df, t, Waves)
