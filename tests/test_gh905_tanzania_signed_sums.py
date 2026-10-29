@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-from test_gh905_tanzania_vectorised_sums import load_helper, stub_maps, source_case
+from tests.test_gh905_tanzania_vectorised_sums import load_helper, stub_maps, source_case
 
 KINDS = ['plot_inputs', 'livestock', 'plot_labor']
 POPULATIONS = ['signed_cancellation', 'nonnegative_mixed', 'nullable', 'all_na']
