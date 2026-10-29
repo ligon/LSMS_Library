@@ -75,3 +75,26 @@ new five cases and remaining208 receive independent acceptance.
 _run_script — planned reuse/extend (§§2,4–5); verify expected-test AST identity,
 actual metadata APIs, private ownership and absence of helper bytecode import.
 Runtime verification remains pending a finite exact root release.
+
+## Root integration verification — 2026-10-29
+
+Root independently accepted 231 declaration/compiler cases at e3dd407e
+(tree69cecd3e): v3 plot23 plus v4 remaining208, zero unexpected denials,
+unchanged1,825Python/14config files and empty private data roots. The original
+v3 publication transaction remains STOPPED; its23passing ordinary receipts
+were salvaged without test replay. V4 finished exit0/PASS; root rehashed2,071
+copied durable receipt files. Incidental native font-cache bytes were omitted,
+with their hashes/sizes retained separately.
+
+The new fixture-only source2d66374d (treec06e3e69) passes all5existing assets
+cases, with5actual id_walk calls and zero denials/data files. Root independently
+checked JUnit/stage counts,38copied durable receipts, full source/config hashes
+and exact AST equality for _frame and both test functions/decorators/expected
+values. Only the fixture and this ledger differ from the verified231source;
+production and the three231case carriers are byte-identical. No231case cohort
+was replayed for this fixture change. This result-note commit changes no tested
+code/test bytes. Full public CI is the next check.
+
+This verifies invented-IO compiler behavior and actual declaration discovery,
+not real source, Make, Country/Feature data, cache re-warm or scientific
+acceptance. Future shared physical-folder semantics remain unestablished.
