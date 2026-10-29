@@ -59,3 +59,14 @@ No execution is authorized until root's new source/guard release. CI full-suite
 failure remains historical and is repaired only by later exact-head CI success.
 Production source is byte-equal to publice8a; source/API/Make/rewarm/science
 acceptance remains as qualified in PR1316. Root alone publishes to the same PR.
+
+The reviewed a23b157aa50fd0324fb4d3b2bde65e3353bf25dd run completed4passes,
+zero guard denials, unchanged1844source hashes and closed metadata epochs.
+Root independently verified each actual test body started with bytecode writes
+enabled (False), each compiler entered with the local read-only flagTrue,
+monkeypatch restoredFalse and the guard restoredTrue. Full file-fingerprint,
+frame and once-write assertions remain; the other150cases were not replayed.
+Source/ordinary evidence is durable under independent-reviews-v1/
+niger-ci-portability-20261029-v1, ROOT-CUSTODY47a73209ef80d27db43be3d32b41089460d909f54356b26c7234b07677b8a42c.
+This ledger-only follow-up changes no tested production/test bytes. The earlier
+failed full CI is preserved; fresh public-head CI must verify the update.
