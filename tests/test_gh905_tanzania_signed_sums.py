@@ -4,23 +4,49 @@ These invented inputs add signed-cancellation coverage missing from the old
 nonnegative comparison. Never remove the source helper's existing clamps.
 """
 import importlib.util
+import hashlib
+from types import ModuleType
 import json
 import os
 from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-from tests.test_gh905_tanzania_vectorised_sums import load_helper, stub_maps, source_case
+from tests.test_gh905_tanzania_vectorised_sums import SOURCE, load_helper, stub_maps, source_case
 
 KINDS = ['plot_inputs', 'livestock', 'plot_labor']
 POPULATIONS = ['signed_cancellation', 'nonnegative_mixed', 'nullable', 'all_na']
 
 
+OLD_PUBLIC_SHA256 = 'c61473b1b743025357078c6bd324bc598b7c4a52b122476b98377b959cb7e44c'
+VECTORIZED_LIVESTOCK = """        out = (out.groupby(level=['t', 'i', 'animal'])[LIVESTOCK_COLUMNS]
+               .sum(min_count=1))"""
+LEGACY_LIVESTOCK = """        out = out.groupby(level=['t', 'i', 'animal']).agg({
+            'HeadCount': lambda s: s.sum(min_count=1),
+            'HeadAcquired': lambda s: s.sum(min_count=1),
+            'HeadSold': lambda s: s.sum(min_count=1),
+        })"""
+
+
 def load_old():
-    path = Path(os.environ['TZ905_OLD_PUBLIC_HELPER'])
-    spec = importlib.util.spec_from_file_location('_tz905_actual_old_public', path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    external = os.environ.get('TZ905_OLD_PUBLIC_HELPER')
+    if external:
+        path = Path(external)
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == OLD_PUBLIC_SHA256
+        spec = importlib.util.spec_from_file_location('_tz905_actual_old_public', path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+    # CI has no private old-helper file. Reverse only the livestock optimization;
+    # the complete digest proves this is the exact independently attested public
+    # source, rather than an approximation or a second full helper fixture.
+    current = SOURCE.read_text(encoding='utf-8')
+    assert current.count(VECTORIZED_LIVESTOCK) == 1
+    public = current.replace(VECTORIZED_LIVESTOCK, LEGACY_LIVESTOCK, 1)
+    assert hashlib.sha256(public.encode('utf-8')).hexdigest() == OLD_PUBLIC_SHA256
+    module = ModuleType('_tz905_actual_old_public')
+    module.__file__ = str(SOURCE)
+    exec(compile(public, str(SOURCE), 'exec'), module.__dict__)
     return module
 
 
@@ -56,7 +82,7 @@ def operands(kind, population):
 
 @pytest.mark.parametrize('kind', KINDS)
 @pytest.mark.parametrize('population', POPULATIONS)
-def test_actual_helpers_preserve_adverse_population(monkeypatch, kind, population):
+def test_actual_helpers_preserve_adverse_population(monkeypatch, tmp_path, kind, population):
     old, new = load_old(), load_helper()
     stub_maps(old, monkeypatch)
     stub_maps(new, monkeypatch)
@@ -84,7 +110,8 @@ def test_actual_helpers_preserve_adverse_population(monkeypatch, kind, populatio
                'new': {c: b.tolist() for c, a, b in comparisons},
                'old_new_index_order_dtypes_attrs_NA_exact': True,
                'source_clamps_unchanged': True}
-    with (Path(os.environ['TZ905_EVIDENCE'])/'adverse-observations.jsonl').open('a') as stream:
+    evidence = Path(os.environ.get('TZ905_EVIDENCE', str(tmp_path)))
+    with (evidence/'adverse-observations.jsonl').open('a') as stream:
         stream.write(json.dumps(receipt) + '\n')
     for col, a, b in comparisons:
         np.testing.assert_array_max_ulp(a, b, maxulp=4)
