@@ -1,67 +1,66 @@
-# #905 Tanzania: public extraction and independent verification
+# #905 Tanzania: livestock-only public extraction
 
 ## §1 Task
 
-Carry only the three existing numeric callback optimizations from private
-647f7df3b15422e150713248bbef84f31c5b6dab onto public development
-d65e8b13683409ab0005f1a5590208cd7d94ae62. The private product is not an
-ancestor of that public base. Its original baseline c164d8fd8f929d1eb4dd546993e6caedebba3533
-nevertheless has the EXACT public helper bytes: SHA256 c61473b1b743025357078c6bd324bc598b7c4a52b122476b98377b959cb7e44c.
-No inherited #637/source/schema/ID/846/crosswalk work is imported.
+Retain only the numeric callback optimization in livestock_for_wave on public
+development d65e8b13683409ab0005f1a5590208cd7d94ae62. Restore plot_inputs_for_wave
+and plot_labor_for_wave exactly to public bytes after the fresh signed parity
+witness; never relax the inherited <=4ULP bound, alter source clamps, or treat
+mathematically improved cancellation as observational equivalence.
 
 ## §2 Existing machinery and search
 
-Git/ripgrep/AST source inspection; reuse STANDING.md, CLAUDE.md #871/Site I,
-existing tests/test_gh905_vectorised_min_count_sum.py, and private
-905-tanzania-vectorised-sums.md. Shared grouped.sum(min_count=1) is already
-used elsewhere; do not introduce a new reducer. Six modern wave scripts call
-the three helpers. Same-named functions in other countries are independent.
-Source patch is exactly the private three blocks; test carrier is exact
-private d5234161ecc9a9855c34cbef4bc16be9bb78dcd2 (seven cases), not an old
-approximate-assertion version.
+Git/ripgrep/AST floor. Reuse STANDING.md and CLAUDE.md; grouped.sum(min_count=1)
+already exists throughout the package. The public actual old helper SHA256 is
+c61473b1b743025357078c6bd324bc598b7c4a52b122476b98377b959cb7e44c. Each held
+function is restored in full, so its source semantics and legacy callbacks
+remain exact. Livestock numeric columns retain explicit LIVESTOCK_COLUMNS.
+No inherited scientific, schema, source, crosswalk, grain or #846 work is added.
 
 ## §3 Definitions and country qualification
 
-COMPLETE public Tanzania CONTENTS.org (2301 lines, TODO/WAITING/LOGBOOK included)
-was read before edits. NPS UPHI back-casts descendant households into earlier
-waves; the 2019 Extended and 2020 Refresh subpanels are disjoint. WAITING #114
-is live. In the affected modern helpers, 2019 family roster IDs are not days;
-2020 family-day variables are. Nonseed crop NA and Unknown unit residuals,
-unit-grain and signed two-fertilizer-slot rulings are unchanged.
-Quoted contradictions remain: opening plot_inputs text says
-"grain is =(t, i, plot_id, input, crop)=" while its following #637 section says
-"declared index is now =(t, i, plot_id, input, crop, u)=". The #118 entry still
-says recent waves lack quantities while #112 LOGBOOK says they are present.
-Those historical statements are preserved, not scientific-edit authority.
+Inherit STANDING.md §§3–4, CLAUDE.md and lsms_library/data_info.yml. Complete
+Tanzania CONTENTS.org was read, including LOGBOOK/TODO/WAITING: UPHI back-casts
+Round4 descendant households into earlier rounds; Extended2019 and Refresh2020
+subpanels are disjoint; WAITING#114 remains live. Preserve documented Unknown
+unit, purchased-unit, crop-module, ID, source eligibility and fertilizer-slot
+rulings. Existing legacy contradictions are not authority to change grain.
 
-## §4 Invariants
+## §4 Invariants and actual counterexample
 
-Preserve exact group keys/dropna defaults, nullable dtypes, NA masks, output
-order/attrs, source-use records, Purchased/Improved maxima and purchased-unit
-conflict refusal. Only numeric sum dispatch changes. Existing <=4 ULP bound
-is a finite fixture oracle, not a universal theorem for arbitrary signed
-cancellation. Historical randomized comparisons only use nonnegative amounts;
-real-source parity and runtime speed remain UNMEASURED. Module text moves
-country build-hash inputs; no live hash census/cache rewrites are released.
+Preserve group keys/dropna defaults, nullable dtypes, NA masks, order/attrs,
+source-use records, source clamps and all public policies. Existing <=4ULP is
+the finite fixture oracle, not a universal signed-cancellation theorem.
+Fresh v3actual old/new helpers with accepted numeric operands[1e16,1,1,-1e16]
+returned OLD0 versus NEW2 for plot_inputs.Quantity and plot_labor.Wage, beyond
+4ULP. Run070167 source had2failed17passed with0guarddenials, exact1823Python/
+67config hashes and empty private data. All12adverse receipts preceded numeric
+assertions. Durable source/receipt manifest is independent-reviews-v1/
+tanzania905-d65-recovery-v3/recovery-source-evidence/ARTIFACTS.json SHA256
+2bff801d8f6b848335938dc03ab17da490aa9d94cf27dca57e5de7a09db3ce0c.
+This is an actual admitted-code witness, not a claim those values occur in real
+survey files. The two sites are held and restored, not given a weaker bound.
 
-## §5 Reuse and finite verification
+## §5 Reuse and deliberate partial optimization
 
-Reuse exactly three existing candidate blocks and the unchanged seven-case
-four-ULP carrier. Authenticate nine ordinary historical files without replay:
-3 meaningful old callback reds/4 healthy,63 candidate passes, tightened7,
-12 fixed/seeded comparisons max1ULP. Old runner logged HEAD but lacked per-run
-product/test hash closure; 63/12 logs print4a80 while candidate was dirty.
-Final-source-pins authenticates preserved source, not retrospective exact-run
-bytes. Old initial comparison exit4/zero tests is retained.
-New PUBLIC-EXTRACTED-CANDIDATE-ONLY source is separately frozen and checked
-under exact approved parent runtime, core40/8GiB/120seconds/n0/thread1 with
-private CONFIG/data/L1/tmp/DVC and strict invented-IO/provider/native traps.
-No old-source comparison/cohort is replayed. Runtime result will be recorded
-in a separate review receipt, preserving failures and source qualifications.
+Extend existing vectorized numeric grouping ONLY for livestock's HeadCount,
+HeadAcquired and HeadSold, with existing filters/clamps and column order exact.
+Restore plot_inputs and plot_labor to public implementations. Keep all12actual
+old/new adverse comparisons. The3-way callback control asserts0per-group
+callbacks for livestock and >0legacycallbacks for the2held sites; this is root's
+explicit partial-scope test design, not a scientific/baseline exception. All
+other shipping assertions remain unchanged. New composition has19cases
+(7shipping plus12adverse); it is distinct from completed v3three-site candidate.
 
-## §6 Limits and next gate
+## §6 Verification and limits
 
-No scientific baseline, grouping/ID/schema/unit/eligibility/window change,
-provider/cache/raw/typed/native data, real Country/Feature build, performance
-benchmark or public action. Root integrates public source separately. The
-shared issue905 and real-source/scientific acceptance remain open. Sue.
+First preserve v1collection error,v2strict-guard bytecode-probe failure and v3
+signed witness without modification or replay. Prepare NEWv4 source/bindings/
+paths using v3strict guard and exact absent-selected-bytecode-probe rule; root
+reviews source/manifest/guard/launcher BEFORE any execution. Proposed19new-
+composition cases use core40/8GiB/120seconds/pytestn0/allthreads1 and retain
+4ULP/sourceclamps/provider/native/build traps. No data/cache/provider/native,
+Country/Feature build or performance acceptance is implied. Livestock-only
+parity and synthetic scope remain pending this new finite run; real-source/API/
+performance acceptance remain future. Module text moves country build inputs;
+no live hash census or cache rewrite is authorized. Root integrates separately.
