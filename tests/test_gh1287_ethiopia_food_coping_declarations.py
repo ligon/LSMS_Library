@@ -36,7 +36,10 @@ def actor(request, monkeypatch, tmp_path, record_property):
     private_root, private_data = tmp_path / 'countries', tmp_path / 'invented-outputs'
     home = private_root / 'Ethiopia'
     (home / '_').mkdir(parents=True, mode=0o700)
-    assert tmp_path.resolve().is_relative_to(Path(os.environ['TMPDIR']).resolve())
+    project_tmp = request.getfixturevalue('tmp_path_factory').getbasetemp().resolve()
+    assert tmp_path.resolve().is_relative_to(project_tmp)
+    assert private_root.resolve().is_relative_to(tmp_path.resolve())
+    assert private_data.resolve().is_relative_to(tmp_path.resolve())
     (home / '_/data_scheme.yml').write_text(yaml.safe_dump({
         'Country': 'Ethiopia', 'Data Scheme': {
             'food_coping': {'index': '(t, i, Strategy)', 'Days': 'int', 'materialize': 'make'},

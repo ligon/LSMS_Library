@@ -31,7 +31,9 @@ def metadata_actor(request, monkeypatch, tmp_path, record_property, table, frame
     private_root = tmp_path / 'countries'
     home = private_root / 'Ethiopia'
     (home / '_').mkdir(parents=True, mode=0o700)
-    assert private_root.resolve().is_relative_to(Path(os.environ['TMPDIR']).resolve())
+    project_tmp = request.getfixturevalue('tmp_path_factory').getbasetemp().resolve()
+    assert tmp_path.resolve().is_relative_to(project_tmp)
+    assert private_root.resolve().is_relative_to(tmp_path.resolve())
     sample, _ = frame_factory(CURRENT_WAVES[0])
     scheme = {'index': str(tuple(sample.index.names)), 'materialize': 'make'}
     scheme.update({column: str(dtype) for column, dtype in sample.dtypes.items()})
