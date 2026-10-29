@@ -69,3 +69,17 @@ one-country rewarm remain unverified. Broad country-module cache impact is
 inferred, not measured here. Fourteen-country issue1287 remains open;1123native
 slot representation and shared canonical integration remain separate decisions.
 No runtime execution is released until root reviews the new guard and launcher.
+
+The reviewed v2 actor completed at22b22b6c06def879a66579c8c576eb890c358333:
+154unique candidate passes in25/125/4populations and154actual compiler calls,
+all three guards exit0, zero denials, exact source/configuration epochs and
+matching protocol/JUnit counts, empty base data/L1. Root independently verified
+the three terminal/JUnit records and all1844source hashes. Earlier expiry-input
+preflight refusal and zero-case pytest bytecode-probe collection failure remain
+preserved; --assert=plain retains the same Python assertions. FINAL-SEAL-v2
+2bb780025877ff9cb11a5996a5012b4c52fd405518481915927d0aa2b16bd96e
+and RESULT-ARTIFACTS1185bb4e99aca0b58198e313f650f53a3a168ea5b6a9ea2bf5e00fca6a6d2555
+bind source/ordinary evidence; root publishes it under independent-reviews-v1/
+niger-six-public-20261029-v2. This ledger-only result update changes no tested
+production/test bytes. All real-source/Make/API/cache/re-warm and scientific
+gates above remain open.
