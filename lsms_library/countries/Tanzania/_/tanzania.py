@@ -1638,6 +1638,9 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
     # carry no purchased quantity to add (the unit is asked only when one is
     # recorded), so they do not disagree.
     if not df.index.is_unique:
+        def _sum1(s):
+            return s.sum(min_count=1)
+
         def _agreed_unit(s):
             units = s.dropna().unique()
             if len(units) > 1:
@@ -1647,16 +1650,12 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
                     f"{s.index[0]!r}; Quantity_purchased cannot be summed")
             return units[0] if len(units) else pd.NA
 
-        # Reuse #905's numeric sum path; preserve the #637 non-sum rules
-        # and final column order (ledger 905-tanzania-vectorised-sums §5).
-        grouped = df.groupby(level=PLOT_INPUTS_INDEX, dropna=False)
-        totals = grouped[['Quantity', 'Quantity_purchased']].sum(min_count=1)
-        flags = grouped.agg({
-            'Purchased': 'max',
+        df = df.groupby(level=PLOT_INPUTS_INDEX, dropna=False).agg({
+            'Quantity': _sum1,
+            'Purchased': 'max', 'Quantity_purchased': _sum1,
             'Unit_purchased': _agreed_unit,
             'Improved': 'max',
         })
-        df = pd.concat([totals, flags], axis=1)
         df['Unit_purchased'] = df['Unit_purchased'].astype('string')
     df = df[PLOT_INPUTS_COLUMNS]
     return df
@@ -1926,8 +1925,11 @@ def plot_labor_for_wave(t, sec3a, colmap):
     # Collapse the rare duplicate (t,i,plot_id,source): sum reported days,
     # sum reported wage (min_count=1 keeps an all-NA group NA).
     if not df.index.is_unique:
-        df = (df.groupby(level=['t', 'i', 'plot_id', 'source'])[PLOT_LABOR_COLUMNS]
-              .sum(min_count=1))
+        def _sum1(s):
+            return s.sum(min_count=1)
+        df = df.groupby(level=['t', 'i', 'plot_id', 'source']).agg({
+            'PersonDays': _sum1, 'Wage': _sum1,
+        })
     df = df[PLOT_LABOR_COLUMNS]
     return df
 

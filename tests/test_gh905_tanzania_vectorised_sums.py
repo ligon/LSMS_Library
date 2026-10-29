@@ -1,7 +1,8 @@
 """Tanzania #905: exercise actual helper duplicate paths on synthetic sources.
 
-Ledger 905-tanzania-vectorised-sums §§2-6: preserve source-use and all-NA
-values, exact keys/order/dtypes, unit guards and the signed fertilizer sum.
+Ledger 905-tanzania-public-extraction §§2-6: optimize livestock only; preserve
+held legacy reducers, source-use, all-NA values, exact keys/order/dtypes,
+unit guards and the signed fertilizer sum.
 No Country, provider, source-file or cache build is needed.
 """
 import importlib.util
@@ -93,7 +94,7 @@ def helper(monkeypatch):
 
 
 @pytest.mark.parametrize('kind', ['plot_inputs', 'livestock', 'plot_labor'])
-def test_duplicate_helpers_use_no_per_group_series_sum(helper, monkeypatch, kind):
+def test_duplicate_helpers_match_declared_numeric_sum_scope(helper, monkeypatch, kind):
     original = pd.Series.sum
     calls = []
 
@@ -105,7 +106,12 @@ def test_duplicate_helpers_use_no_per_group_series_sum(helper, monkeypatch, kind
     monkeypatch.setattr(pd.Series, 'sum', spy)
     out = build(helper, kind)
     assert len(out) > 1
-    assert calls == [], f'per-group Python sum callbacks remain: {calls}'
+    if kind == 'livestock':
+        assert calls == [], f'livestock per-group Python sum callbacks remain: {calls}'
+    else:
+        # Root-approved partial scope: signed cancellation exceeded 4ULP here.
+        # Keep the exact public legacy callbacks; do not change the bound.
+        assert len(calls) > 0, f'held {kind} legacy sum callbacks were replaced'
 
 
 def test_plot_input_rows_flags_units_and_na_survive(helper):

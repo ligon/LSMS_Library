@@ -2300,18 +2300,21 @@ The Extended/Refresh split, split-off back-casting and live WAITING #114 caveats
 The separate reviewed 408 plot-input unit replacements (86 plus 322) are preserved by exact source/test identity; no agriculture sources or plot-input outputs were rebuilt here.
 Changing the shared country Makefile moves all 25 enumerated Tanzania API cache hashes; other tables were not rebuilt for this check.
 
-* Numeric duplicate reducers (GH #905; source extraction)
+* Numeric duplicate reducers (GH #905; livestock-only source extraction)
 
-Only the numeric sum dispatch in =plot_inputs_for_wave=, =livestock_for_wave=
-and =plot_labor_for_wave= changes from per-group Python callbacks to the
-existing grouped =sum(min_count=1)= path.
-Group keys, NA handling, max flags, purchased-unit conflict refusal and output
-column order remain; the 2019 family roster IDs are still never counted as days.
-The signed #637 two-fertilizer-slot ruling, Unknown-unit residual and all source
-grain/ID decisions above remain.
-The seven-case synthetic carrier uses the inherited four-ULP fixture bound;
-it is not a universal bound for arbitrary signed cancellation.
-Private historical controls are source-qualified in
-=.coder/ledger/905-tanzania-public-extraction.md=; independent extracted-source
-verification is recorded separately.
+Only =livestock_for_wave='s three numeric sums use the existing grouped
+=sum(min_count=1)= path, retaining source eligibility, count clamps, group keys,
+nullable dtypes, NA handling and output order. No source/grain/ID policy changes.
+
+The proposed =plot_inputs_for_wave= and =plot_labor_for_wave= optimizations are
+HELD and restored exactly to public implementations: a fresh actual-old/new
+synthetic signed case =[1e16, 1, 1, -1e16]= gave OLD 0 versus NEW 2 for seed
+=Quantity= and labor =Wage=, beyond the unchanged four-ULP parity bound.
+This says nothing about occurrence in actual survey files; do not alter source
+clamps, eligibility or the bound to make the optimizer pass.
+All twelve adverse comparisons remain; callback controls explicitly preserve
+legacy dispatch at the two held sites. The signed #637 fertilizer-slot ruling,
+Unknown-unit residual, 2019 family roster IDs and all science remain unchanged.
+Exact source/evidence and staged verification live in
+=.coder/ledger/905-tanzania-public-extraction.md=.
 Real-source parity, runtime speed and live build-hash impact remain unmeasured.
