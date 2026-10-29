@@ -117,8 +117,11 @@ individual_education:
     # coverage (~640 rows) in W1.  Raw labels mapped onto the canonical
     # ordinal vocabulary via the row-additive harmonize_education table
     # (global base + Nigeria delta in _/categorical_mapping.org).
-    file: Post Harvest Wave 1/Household/sect2a_harvestw1.dta
+    file:
+        - Post Harvest Wave 1/Household/sect2a_harvestw1.dta:
+            t: '2011Q1'
     idxvars:
+        t: hhid
         i: hhid
         pid: indiv
     myvars:

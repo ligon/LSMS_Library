@@ -133,8 +133,11 @@ individual_education:
     # members who had LEFT school -> low coverage (~310 rows) in W2.
     # Raw labels mapped onto the canonical ordinal vocabulary via the
     # row-additive harmonize_education table.
-    file: Post Harvest Wave 2/Household/sect2a_harvestw2.dta
+    file:
+        - Post Harvest Wave 2/Household/sect2a_harvestw2.dta:
+            t: '2013Q1'
     idxvars:
+        t: hhid
         i: hhid
         pid: indiv
     myvars:
