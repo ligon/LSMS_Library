@@ -25,3 +25,13 @@ Extend the four fixture-root ownership checks to the existing request/tmp_path m
 ## §6 Evidence and gates
 
 Retain old333guarded passes at8a3dd4 and failed CI at public3c50 as distinct receipts. CI run40876684587/job123457181650 reports6461passed/4611skipped/333errors, each new compiler fixture failing on mandatory TMPDIR. This is a fixture environment failure, not evidence of a product regression. Root source review precedes nine NEWcandidate-only <=120s/core42/8GiB/n0/thread1 populations. Actual-source/API/Make/cache/scientific acceptance remains outside scope.
+
+The corrected aea9678ae5e69bfdc000e00632f250e5cb6f651c composition completed
+333unique passes across nine complete zero-denial guards. Root independently
+checked999JUnit proofs that TMPDIR was absent at setup/call/teardown, the
+333provenance audits, exact source/configuration/runtime bindings and empty
+production delta. All behavior assertions and profiling observers remain.
+Durable SEALED-v1 manifest4db9534a20fa3ba4113cea26942061443d74a502307e2151acd6b913e43aa22f
+binds181ordinary files and source/full-failed-CI custody. This ledger-only
+follow-up changes no tested code/test bytes. The old failed CI remains failed;
+new public-head CI must run independently. No real-data acceptance is implied.
