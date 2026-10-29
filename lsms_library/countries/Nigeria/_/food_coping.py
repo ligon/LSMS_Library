@@ -12,18 +12,24 @@ intentionally absent; the framework joins it from sample() at API time.
 """
 import pandas as pd
 
+from lsms_library import Country
+
 from lsms_library.local_tools import get_dataframe, to_parquet
 from nigeria import Waves
 
+country = Country('Nigeria', preload_panel_ids=False)
+declared_folders = set()
+for quarter in country.waves:
+    wave = country[quarter]
+    if 'food_coping' in wave.data_scheme:
+        declared_folders.add(wave.wave_folder)
+
 pieces = []
 for t in Waves.keys():
-    fn = f'../{t}/_/food_coping.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not wired (script absent or parquet not yet built).
-        # DVC raises PathMissingError here, not FileNotFoundError.
+    if t not in declared_folders:
         continue
+    fn = f'../{t}/_/food_coping.parquet'
+    df = get_dataframe(fn)
     pieces.append(df)
 
 assert pieces, "food_coping: no wave-level parquets found"

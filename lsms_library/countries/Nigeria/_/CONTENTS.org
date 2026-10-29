@@ -2447,3 +2447,29 @@ this correction. It preserves native PP keys, repeated indices, nulls, dtypes,
 order, source frames and the existing agreeing/disagreeing-attrs concat rule.
 The original four controls remain historical evidence for current wiring.
 Neither cohort establishes real source/Make/cache/API or scientific acceptance.
+
+* 2026-10-28 -- four country compilers use actual table declarations (GH #1287)
+
+=community_prices=, =food_coping=, =household_roster= and =housing= now collect
+eligible physical folders through actual logical-quarter =Country= lookup and
+=Wave.data_scheme=. Native script stems and YAML keys form the existing union;
+a null YAML key does not disable a retained native declaration. A physical
+folder is read once, in its existing enumeration order. Unwired/unregistered
+folders skip before offered outputs, and malformed metadata propagates.
+Declared reader errors stop before the country writer, preserving the original
+exception. Successful typed-empty inputs remain valid; all-retired inputs keep
+the existing no-input error. This does not establish native-producer emptiness.
+
+The compilers preserve source quarters, concat/sort/uniqueness behavior, native
+IDs and opaque payload/axes; they add no ID walk or new schema. Housing's current
+script quarters remain PH/PH/PP/PP/PH, while roster has both rounds and C8 is
+PH-only. These are source bindings, not fresh instrument/data measurements.
+Ten roster/housing wave recipes change only =cd ...; python ...= to
+=cd ... && python ...=, so a failed directory change cannot execute in the
+wrong directory. No Make execution or freshness claim follows from that syntax.
+
+The narrow public-421 extraction excludes the author's inherited module,
+source/config, sample/cluster, education and scientific changes. Invented extra
+price axes in tests check opaque transport; they do not add native production
+semantics to this baseline. Previous qualified community timeout/traceback
+observations remain distinct from new extracted-candidate verification.
