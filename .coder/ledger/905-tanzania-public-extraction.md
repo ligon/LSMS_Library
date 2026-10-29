@@ -52,6 +52,18 @@ explicit partial-scope test design, not a scientific/baseline exception. All
 other shipping assertions remain unchanged. New composition has19cases
 (7shipping plus12adverse); it is distinct from completed v3three-site candidate.
 
+Ordinary repository CI has no private oracle/evidence environment. The adverse
+test therefore reconstructs the exact attested public helper from current SOURCE
+by reversing ONLY the one livestock vectorized block, asserts full reconstructed
+SHA256c61473b1b743025357078c6bd324bc598b7c4a52b122476b98377b959cb7e44c,
+and compiles it in ModuleType with SOURCE as __file__. If an external old-helper
+environment path is supplied, require that same full hash before importing it.
+No Git/network/duplicate full helper fixture is needed. Evidence uses the guard's
+explicit private destination when supplied, otherwise pytest's tmp_path. These
+are harness transport corrections; all12numerical comparisons remain unchanged.
+The one new19case run will omit the external-oracle environment to exercise this
+standalone reconstruction while still binding the separately attested old file.
+
 ## §6 Verification and limits
 
 First preserve v1collection error,v2strict-guard bytecode-probe failure and v3
