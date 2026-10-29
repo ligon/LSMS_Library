@@ -7,7 +7,7 @@ day-count waves are wired: W1 (2011-12), W2 (2013-14), W3 (2015-16).
 
 W4 (2018-19) §8 is a different rCSI/coping battery (s8q02a..h) and W5
 (2021-22) §8 is FAO FIES (wired separately as ``food_security``); neither
-emits a ``food_coping.py``, so they are silently skipped below.
+declares ``food_coping``, so they are skipped before reading below.
 
 The wave parquets carry the wave-native household id matching ``sample().i``
 (``household_id2`` for W2/W3, ``household_id`` for W1).  ``id_walk`` converts
@@ -19,20 +19,28 @@ import os
 
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import data_root, get_dataframe, id_walk, to_parquet
-from ethiopia import Waves
 
 
+country = Country('Ethiopia', preload_panel_ids=False)
 pieces = []
-for t in Waves.keys():
+seen_folders = set()
+for t in country.waves:
+    wave = country[t]
+    folder = wave.wave_folder
+    if folder in seen_folders:
+        continue
+    seen_folders.add(folder)
+    # Output presence is not a declaration: missing declared outputs must
+    # reach the reader, while genuinely unwired folders remain skipped.
+    if 'food_coping' not in wave.data_scheme:
+        continue
     # The wave scripts write their parquet under data_root() (to_parquet
     # redirects there), so read it back from that canonical location.
     # Reading the in-tree relative path via get_dataframe would trigger a
     # slow DVCFS sidecar-tree walk when the file is absent in-tree.
-    fn = os.path.join(str(data_root('Ethiopia')), t, '_', 'food_coping.parquet')
-    if not os.path.exists(fn):
-        # Wave not wired (W4/W5 emit no food_coping.py) -> skip.
-        continue
+    fn = os.path.join(str(data_root('Ethiopia')), folder, '_', 'food_coping.parquet')
     df = get_dataframe(fn)
     pieces.append(df)
 
