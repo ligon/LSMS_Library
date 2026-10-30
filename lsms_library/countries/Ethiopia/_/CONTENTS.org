@@ -2989,3 +2989,33 @@ The nine extracted compilers still require guarded candidate-composition
 verification; current-source Make/API/cache, per-country re-warm and scientific
 acceptance are separate gates. See the consolidated ledger
 =.coder/ledger/1287-ethiopia-nine-public-extraction.md=.
+
+** 2026-10-30 -- Missing harvest units use Unknown (GH #1043)
+
+The historical sale-value retention notes above say that unitless retained rows
+have =u='Other (Specify)'=. That records the former builder behavior, but conflicts
+with the existing #1041 rule: an unrecorded unit is never a real one. The closed
+sentinel is =transformations.U_UNKNOWN= (=Unknown=); a genuinely recorded Other
+code remains =Other (Specify)=. Implicit instrument-defined kilograms and blank
+sale-unit join keys retain their existing, different meanings.
+
+An actual paired diagnosis of the five native builders changes only missing-unit
+labels on 0 / 379 / 79 / 168 / 278 rows (904 total). Native rows remain 87,045.
+Normal Country/Feature assembly serves 86,403 rows, with 0 / 379 / 79 / 168 / 277
+Unknown rows (903 total). The distinction is existing grain collapse, including
+the documented W5 duplicate, not a missing household or an eligibility inference.
+Genuine served Other counts stay 0 / 4,321 / 111 / 666 / 381. All non-unit keys and
+payload values, dtypes and missing masks are preserved as full row multisets by
+explicit ExtensionArray and nonmissing NumPy comparisons. The missing-unit class
+still includes 11 positive-harvest-quantity rows and 884 sale-value-only rows.
+
+Default and shipped-factor kilogram coverage and totals remain unchanged. Default
+factors cover 40,525 rows (45,878 none); the shipped ladder covers 70,526 rows
+(62,705 shipped, 7,821 metric; 15,877 none). This correction makes unit missingness
+visible to sentinel audits; it does not supply an unknown conversion factor.
+Normal private-cache cold and fresh-process warm API checks passed. The earlier
+baseline measurement failed on a Feature sentinel-axis comparison assumption;
+that receipt remains failed, and its completed cache was read back without
+producer replay. See =.coder/ledger/1043-ethiopia-harvest-missing-unit.md= for
+precise scopes and retained limitations. Crop reference windows, recorded units,
+sale grain, household walks and scientific assertions are unchanged.

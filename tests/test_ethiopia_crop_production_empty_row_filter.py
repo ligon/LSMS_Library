@@ -8,7 +8,7 @@ rows that §11 or §12 had given a sale value: on development, §11 rows with a
 positive value 1 / 2 / 27 / 32 (W2-W5; 1,500 / 7,750 / 41,442 / 33,482 Birr)
 and 29 positive §12 lines (11,339 Birr, #1257's "attached, then dropped"
 class).  The filter now also requires ``Value_sold`` to be missing; such a row
-is served with the no-unit tag ``u = 'Other (Specify)'`` and only its
+is served with the no-unit tag ``u = 'Unknown'`` and only its
 (unit-free) ``Value_sold``.
 
 Tiers: the synthetic tests need no data; ``requires_s3`` tests build the table.
@@ -80,7 +80,7 @@ def test_a_row_with_a_sect11_sale_value_is_kept(eth):
     df, _ = _build(eth)
     r = _row(df, "H1")
     assert r["Value_sold"].tolist() == [300.0]
-    assert list(r.index.get_level_values("u")) == ["Other (Specify)"]
+    assert list(r.index.get_level_values("u")) == ["Unknown"]
     assert r["Quantity"].isna().all() and r["Quantity_sold"].isna().all()
 
 
@@ -114,9 +114,10 @@ def cp():
 @pytest.mark.requires_s3
 def test_served_rows_whose_only_number_is_a_sale_value(cp):
     """Measured cold 2026-10-23 (the GH #1256 commit -> this ruling): 884 rows
-    added, all u = 'Other (Specify)' with no Quantity / Quantity_sold and a
+    added, historically all u = 'Other (Specify)' with no Quantity / Quantity_sold and a
     Value_sold -- W2 361 (§11 152, §12 209), W3 79 (17, 62), W4 168, W5 276;
-    every pre-existing row unchanged.  §11 rows kept reconcile with the #820
+    every pre-existing row unchanged. GH #1043 now expects Unknown for this
+    absent-unit class while preserving the same row/payload counts. §11 rows kept reconcile with the #820
     review's development count of sale rows the filter dropped (155 / 17 /
     171 / 277), less the 3 W2 and 3 W4 all-blank groups GH #1253 stopped
     serving as 0 (still empty, still dropped); W5's 277 wave rows serve as 276
@@ -125,7 +126,7 @@ def test_served_rows_whose_only_number_is_a_sale_value(cp):
     positive lines / 11,339 Birr, all now served."""
     t = np.asarray(cp.index.get_level_values("t"), dtype=object)
     u = np.asarray(cp.index.get_level_values("u"), dtype=object)
-    only_value = ((u == "Other (Specify)")
+    only_value = ((u == "Unknown")
                   & cp["Quantity"].isna().to_numpy()
                   & cp["Quantity_sold"].isna().to_numpy())
     got = {w: int((only_value & cp["Value_sold"].notna().to_numpy() & (t == w)).sum())
