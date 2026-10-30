@@ -121,3 +121,19 @@ migration, complete per-entry held-release/acquisition receipts, other2021module
 coverage, CS cluster_features/market lookup and missing-secondary provider healing
 remain open. The gate returnsNone with an actionable warning; it enables no new
 secondary download and does not assert an acquisition-complete holding.
+
+
+## PR1322 configured CI read-only guard correction
+
+Exact9764b58 CI40997114673 retained6475PASS/1FAIL/4611SKIP. The only failure
+was GH831's conservative static write-site guard classifying the new read-only
+read_provenance(_COUNTRIES_DIR,country,wave) assignment as an unknown sink.
+provenance.read_provenance993–1010 only checks existence, readsSOURCE.org and
+parses it. Production/data_access/source metadata remain unchanged.
+The guard now admits only that exact stripped assignment, with five pure controls
+that reject direct sinks, write_provenance, a chainedwrite_text and a disguised
+comment. Existing read/cache/acquisition destination assertions remain unchanged.
+New targeted source verification:194uniqueJUnitPASS/0failure/error/skip,4.57s,
+private mountedPython/core32/8GiB/120+5/thread1/n0. Scope is GH83111controls,
+secondaryfallback7, existing mockedGH1276/GH1283176. Original191 and failedCI
+remain separate receipts; this is not a fullCI rerun or any data/API replay.
