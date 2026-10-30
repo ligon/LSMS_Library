@@ -1,44 +1,66 @@
 # Prior-Art Ledger — GH #1150 plot geovariables
 
-Search tier: git + ripgrep floor; no GitNexus tool used. Inherits STANDING.md.
+Search tier: git + ripgrep floor; inherits STANDING.md. Independent unit review
+used a separate read-only agent and coordinator's independent source reviewer.
 
 ## §1 Task
-Option A: attach held WB plot covariates to Ethiopia field rows, disclose
-provenance, use canonical optional declarations, and declare Nigeria's existing
-PlotSlope consistently. No acquisition, coordinate reconstruction or #1183 work.
+Option A: attach WB plot covariates to Ethiopia W1-W5 fields, declare optional
+canonical columns/provenance, and declare Nigeria's unchanged existing slope
+in the same native PERCENT unit under the final coordinator disposition.
 
 ## §2 Existing machinery
 - Ethiopia/_/ethiopia.py:plot_features_for_wave: field constructor with holder-aware
   parcel join; tests/test_ethiopia_shipped_factors.py covers area conversion.
-- Five Ethiopia wave plot_features.py drivers supply native colmaps. Extend them.
-- Nigeria/_/nigeria.py:plot_features_for_wave already emits degree PlotSlope; reuse.
-- lsms_library/derivations.py: registry, Derivation column, API attrs, input accessor;
-  tests/test_derivations.py. Reuse for percent-to-degree conversion.
-- Country finalization and Feature composition: reuse; declaration-concat tests
-  in test_gh1287_ethiopia_plot_features_declarations.py cover existing assembly.
-- No arctan/percent-slope conversion or #1150 implementation found in supplied refs.
+- Five Ethiopia wave plot_features.py drivers supply native colmaps. Extended.
+- Nigeria/_/nigeria.py:plot_features_for_wave emits unconverted PlotSlope;
+  preserve arithmetic. Older degree docstrings are contradicted and corrected.
+- lsms_library/derivations.py: existing registry, input accessor, row disclosure;
+  read and tested, but no new derivation is needed for native-value passthrough.
+- Country finalization and Feature composition reused; existing declaration
+  concatenator tests cover assembly. No new registry or independent builder.
+- No #1150 implementation found in supplied refs/ledgers. #1127 acquisition
+  already merged; historical fix ref not adopted. #1183 untouched.
 
 ## §3 Definitions
-STANDING.md §3 and canonical data_info.yml govern column names and optionality.
-Ethiopia CONTENTS "Source granularity" and "Household id emitted as i": fields,
-full holder/household/parcel/field join, W2/W3 output household_id2.
-Nigeria CONTENTS plot_features: lasting attributes are PP only; W5 renumbered.
-Supplied authenticated ISSUE-1150 approves default degrees = atan(percent/100).
+STANDING.md §3 and canonical data_info.yml govern names/optionality.
+Ethiopia CONTENTS: fields, full holder/household/parcel/field native join;
+W2/W3 output household_id2 differs from join household_id. Nigeria CONTENTS:
+lasting attributes PP-only, W5 questionnaire renumbered, W5 no geovar source.
+All five Ethiopia source labels independently confirm percent/metres/km.
+Nigeria W4 held label confirms percent. W1-W3 official dictionaries
+catalog1002/F3,1952/F19,2734/F98 confirm percent for the current drivers'
+srtmslp_nga; W4 official catalog3557/F96 independently corroborates its label.
+Final coordinator ruling clears canonical native-percent PlotSlope for both.
 
 ## §4 Invariants
-STANDING.md §4; preserve base rows, order, payload, masks, dtypes and attrs.
-Never admit geo-only rows or reduce duplicate geo keys. No confidential coordinates.
-Missing matches stay missing; distance tail stays intact. W5 genuine v03 only.
-Raw W1-W3 units must be inspected before wiring; similar names are not evidence.
+STANDING.md §4: preserve base rows, keys/order, payload/masks/dtypes/attrs.
+No geo-only plots, duplicate-key reduction, coordinate reconstruction, clipping,
+winsorization, or soil/PCA/aggregate columns. Distances keep their long tail.
+No percent reconstruction by inverting rejected degree outputs.
+W1-W3 CSV dictionary evidence is not new measured-byte export provenance.
 
-## §5 Decisions
-Extend existing field constructor with optional enrichment; reuse sanctioned IO.
-New named slope conversion only because no existing conversion was found; reuse
-existing derivation registry rather than add a registry or implicit conversion.
-Unit-named alternative preserves percent but fragments the existing PlotSlope API;
-prefer registered degrees if source labels confirm percent for each wired wave.
+## §5 Reuse decisions
+Extend existing constructor with a small full-key alignment/attachment helper;
+reuse get_dataframe, to_parquet, Country/Feature and canonical optionality.
+Pass original numeric slope percent without conversion or derivation marker.
+Text distance NA/blanks become missing; numeric distance never round-trips text.
+No Derivation entry: unlike the rejected angular conversion, serving WB native
+values introduces no library numerical construction.
 
-## §6 Residuals
-W1-W3 raw geovariable blobs absent in checked shared L1; alternate held location
-requested through dispatch channel. No scientific inference of their units.
-Independent product/source review is pending root review before public integration.
+## §6 Residuals and verification
+- Final native-percent decision supersedes the initial issue's uncited Nigeria
+  degree premise. Rejected candidate and failed attempts remain private evidence.
+- Exact original payload/native-key/cold-warm evidence was obtained before this
+  correction. Final changed attachment values are verified directly against
+  closed ORIGINAL source frames, not inverse angular outputs; no broad native
+  replay after coordinator steering. Final full cold/warm rebuild is not claimed.
+- Original Nigeria W1-W3 CSV export receipts are not held; official dictionary
+  evidence plus current wiring is the stated source basis, approved by root.
+- Independent public-integration review remains pending.
+
+### Phase 3
+OK (§2): sanctioned IO and existing assembly reused; no duplicate registry.
+OK (§4): five-wave 132,694-row original payload conservation; source-key joins
+and exact NumPy/ExtensionArray negative calibrations exercised.
+CONTRADICTION RESOLVED (§3): Nigeria degree comments contradicted W4 measured
+label and four official dictionaries; final common unit is native percent.
