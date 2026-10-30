@@ -31,89 +31,52 @@ panel-ids:
 ../%/_/plot_features.parquet: ../%/_/plot_features.py
 	(cd $(@D) && python plot_features.py)
 
-# crop_production (GAP 1, item-level).  Country-level var/ parquet built by
-# the concatenator, which depends on each wave's parquet; the pattern rule
-# below runs each wave script.  Wave parquets land under data_root() (via
-# to_parquet); the in-tree paths here are only the make prerequisites'
-# script files, so we run the country script unconditionally to (re)build
-# the wave parquets it reads, then concatenate.
-#
-# All five country recipes here (crop_production, plot_inputs, livestock,
-# plot_labor, people_last7days) chain their wave scripts with `&&`, and
-# every concatenator refuses a missing wave parquet via
-# niger.concat_wave_parquets (GH #1123; extended from plot_inputs to the
-# other four on 2026-10-23).  Both halves are needed: `&&` makes a failed
-# wave fail make, and the framework then runs the concatenator as its
-# Python fallback, which used to skip the absent wave.  The rationale for
-# `&&` over `;` (and over Malawi's prerequisite form) is at plot_inputs.
-CROP_WAVES := 2011-12 2014-15 2018-19 2021-22
+# Five native country compilers consume the declared wave producers (#1287).
+# Discovery uses Country/Wave registration, declarations and physical folders;
+# no four-wave list and no prerequisite for an absent native script. Secondary
+# expansion supplies declaration metadata as prerequisites. The phony failure
+# prerequisite makes a discovery error terminal despite $(shell)'s exit policy.
+# See .coder/ledger/1287-niger-producer-routing.md, sections 2-5.
+PYTHON ?= python
+.SECONDEXPANSION:
+niger_wave_dependencies = $(shell $(PYTHON) wave_producers.py --dependencies $(1) || printf '%s\n' __niger_producer_discovery_failed__)
 
-$(VAR_DIR)/crop_production.parquet: crop_production.py niger.py categorical_mapping.org \
-		$(foreach w,$(CROP_WAVES),../$(w)/_/crop_production.py)
-	$(foreach w,$(CROP_WAVES),(cd ../$(w)/_ && python crop_production.py) &&) python crop_production.py
+.PHONY: __niger_producer_discovery_failed__
+__niger_producer_discovery_failed__:
+	@echo "Niger producer discovery failed; refusing country compilation" >&2
+	@false
+
+$(VAR_DIR)/crop_production.parquet: crop_production.py niger.py categorical_mapping.org wave_producers.py data_scheme.yml \
+		$$(call niger_wave_dependencies,crop_production)
+	$(PYTHON) wave_producers.py crop_production && $(PYTHON) crop_production.py
 
 ../%/_/crop_production.parquet: ../%/_/crop_production.py niger.py categorical_mapping.org
 	(cd $(@D) && python crop_production.py)
 
-# plot_inputs (GAP 2, item-level).  Same shape as crop_production: the
-# country-level var/ parquet is built by the concatenator, which reads each
-# wave's parquet; the country script is run unconditionally to (re)build the
-# wave parquets it reads, then concatenates.
-#
-# The wave scripts are chained with `&&`, NOT `;` (GH #1123).  The recipe is
-# ONE shell line, so with `;` only the LAST command's exit status reached
-# make: a wave script that failed -- e.g. the 2018-19 / 2021-22 uniqueness
-# guard -- was ignored, the concatenator ran without that wave's parquet, and
-# LSMS_BUILD_BACKEND=make served the other waves with no Python warning
-# (measured: an injected 2018-19 collision returned 29,034 rows, all 13,401
-# of 2018-19 gone).  `&&` is the `(cd $(@D) && python ...)` idiom every
-# pattern rule here already uses, extended across the waves; the
-# prerequisite form of Malawi/_/Makefile:71-77 would also stop on a failed
-# wave, but it lets make mtime-skip a wave parquet, which this recipe's
-# unconditional re-run exists to avoid.
-INPUT_WAVES := 2011-12 2014-15 2018-19 2021-22
-
-$(VAR_DIR)/plot_inputs.parquet: plot_inputs.py niger.py categorical_mapping.org \
-		$(foreach w,$(INPUT_WAVES),../$(w)/_/plot_inputs.py)
-	$(foreach w,$(INPUT_WAVES),(cd ../$(w)/_ && python plot_inputs.py) &&) python plot_inputs.py
+$(VAR_DIR)/plot_inputs.parquet: plot_inputs.py niger.py categorical_mapping.org wave_producers.py data_scheme.yml \
+		$$(call niger_wave_dependencies,plot_inputs)
+	$(PYTHON) wave_producers.py plot_inputs && $(PYTHON) plot_inputs.py
 
 ../%/_/plot_inputs.parquet: ../%/_/plot_inputs.py niger.py categorical_mapping.org
 	(cd $(@D) && python plot_inputs.py)
 
-# livestock (GAP 4, item-level).  Same shape as crop_production / plot_inputs:
-# the country-level var/ parquet is built by the concatenator, which reads
-# each wave's parquet; the country script is run unconditionally to (re)build
-# the wave parquets it reads, then concatenates.
-LIVESTOCK_WAVES := 2011-12 2014-15 2018-19 2021-22
-
-$(VAR_DIR)/livestock.parquet: livestock.py niger.py categorical_mapping.org \
-		$(foreach w,$(LIVESTOCK_WAVES),../$(w)/_/livestock.py)
-	$(foreach w,$(LIVESTOCK_WAVES),(cd ../$(w)/_ && python livestock.py) &&) python livestock.py
+$(VAR_DIR)/livestock.parquet: livestock.py niger.py categorical_mapping.org wave_producers.py data_scheme.yml \
+		$$(call niger_wave_dependencies,livestock)
+	$(PYTHON) wave_producers.py livestock && $(PYTHON) livestock.py
 
 ../%/_/livestock.parquet: ../%/_/livestock.py niger.py categorical_mapping.org
 	(cd $(@D) && python livestock.py)
 
-# plot_labor (GAP 3, item-level).  Same shape as the siblings above: the
-# country-level var/ parquet is built by the concatenator, which reads each
-# wave's parquet; the country script is run unconditionally to (re)build the
-# wave parquets it reads, then concatenates.  (No categorical table dep --
-# the labor `source` vocabulary is an inline code mapping.)
-PLOT_LABOR_WAVES := 2011-12 2014-15 2018-19 2021-22
-
-$(VAR_DIR)/plot_labor.parquet: plot_labor.py niger.py \
-		$(foreach w,$(PLOT_LABOR_WAVES),../$(w)/_/plot_labor.py)
-	$(foreach w,$(PLOT_LABOR_WAVES),(cd ../$(w)/_ && python plot_labor.py) &&) python plot_labor.py
+$(VAR_DIR)/plot_labor.parquet: plot_labor.py niger.py wave_producers.py data_scheme.yml \
+		$$(call niger_wave_dependencies,plot_labor)
+	$(PYTHON) wave_producers.py plot_labor && $(PYTHON) plot_labor.py
 
 ../%/_/plot_labor.parquet: ../%/_/plot_labor.py niger.py
 	(cd $(@D) && python plot_labor.py)
 
-# people_last7days (GAP 3, item-level).  Same shape; Industry / hours are
-# derived in code (no categorical table dep).
-PEOPLE7_WAVES := 2011-12 2014-15 2018-19 2021-22
-
-$(VAR_DIR)/people_last7days.parquet: people_last7days.py niger.py \
-		$(foreach w,$(PEOPLE7_WAVES),../$(w)/_/people_last7days.py)
-	$(foreach w,$(PEOPLE7_WAVES),(cd ../$(w)/_ && python people_last7days.py) &&) python people_last7days.py
+$(VAR_DIR)/people_last7days.parquet: people_last7days.py niger.py wave_producers.py data_scheme.yml \
+		$$(call niger_wave_dependencies,people_last7days)
+	$(PYTHON) wave_producers.py people_last7days && $(PYTHON) people_last7days.py
 
 ../%/_/people_last7days.parquet: ../%/_/people_last7days.py niger.py
 	(cd $(@D) && python people_last7days.py)
