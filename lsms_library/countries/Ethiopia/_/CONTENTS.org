@@ -1449,6 +1449,48 @@ The existing unique-plot attachment restriction must remain; ambiguous holder/cr
 Changing the decoder/caller as well alters the grouping census and can affect three further W2 purchase-only records, so the two boundaries must not be conflated.
 No purchase policy, amount, flag or row-retention change is included in #1118.
 
+*** 2026-10-30 -- All-unreported W2 seed-purchase sums stay missing (GH #1184)
+
+The W2 post-planting form, section5 Q3, routes explicit No to Q13. Q5 asks
+total purchased/credit quantity; the form's zero-if-nothing instruction belongs
+to Q10's up-front payment, not Q5. Normal cached-source checks distinguish
+287 explicit-Yes source rows with both quantity components missing from 49
+explicit-Yes rows reporting both zero. No missing purchase flag is imputed.
+
+Only the existing holder/crop quantity sum changes to =sum(min_count=1)=.
+Fresh paired checks reproduce 265 groups whose post-caller amounts are all
+missing and 187 attached W2 Seed amounts formerly manufactured as zero. All 187
+stay served with =Purchased=True=; keys, all other payloads, dtypes, masks,
+ordering and attrs remain exact. The unique-plot attachment restriction stays.
+W1's direct join and all W3–W5 values remain unchanged. Explicit No/zero answers
+and known components of partially reported sums retain their former values.
+
+Normal baseline/candidate Country and Feature builds each serve 180,900 rows.
+W2 purchased-quantity zeros change 6,541→6,354 and missing amounts
+21,256→21,443. The full 25,914-row sample remains exact. Fresh-process warm
+reads preserve all 32 private data-cache entries byte/size/mode/mtime exactly.
+Ten new synthetic cases plus fourteen retained unit cases pass. Numeric proof
+uses explicit ExtensionArray and nonmissing NumPy equality (GH #1206), not
+pandas frame equality alone. See =.coder/ledger/1183-1184-ethiopia-seed-purchases.md=.
+
+*** GH #1183 remains a separate retention question
+
+The existing same-country =_yesno_bool_col= and #1250/#1253 precedent already
+distinguish missing from No. One W2 missing purchase flag carries a positive
+purchase value and financing answer, while 20 W1 missing flags carry financing
+answers: missing Q3 cannot universally be interpreted as the documented No skip.
+The present #1184 change deliberately leaves the decoder and caller unchanged.
+
+Uganda/Tanzania retain some seed rows on a recorded crop identity, but their
+source rosters are not automatic authority for every Ethiopian planting record.
+Malawi's value-backed purchase filter likewise does not justify dropping an ESS
+explicit-Yes row. Independent red-team review leaves source-specific retention
+unsettled for the purchase-only class identified by #1183 (earlier diagnostics:
+371 W1 rows and three further W2 rows if both flag and sum boundaries change).
+Those diagnostics are not a new replay or authorization to remove records.
+Keep the existing issue open for raw-key attribution and a source-backed
+retention rule; no new scientific decision, flag recode or row deletion is made.
+
 ** 2026-10-19 -- =transformations.nitrogen_kg= credits NPS at 0.19 (GH #867)
 
 Ruling (@ligon, 2026-10-18): NPS gets a CITED share; organic inputs a
@@ -2990,6 +3032,35 @@ verification; current-source Make/API/cache, per-country re-warm and scientific
 acceptance are separate gates. See the consolidated ledger
 =.coder/ledger/1287-ethiopia-nine-public-extraction.md=.
 
+** 2026-10-30 -- Missing harvest units use Unknown (GH #1043)
+
+The historical sale-value retention notes above say that unitless retained rows
+have =u='Other (Specify)'=. That records the former builder behavior, but conflicts
+with the existing #1041 rule: an unrecorded unit is never a real one. The closed
+sentinel is =transformations.U_UNKNOWN= (=Unknown=); a genuinely recorded Other
+code remains =Other (Specify)=. Implicit instrument-defined kilograms and blank
+sale-unit join keys retain their existing, different meanings.
+
+An actual paired diagnosis of the five native builders changes only missing-unit
+labels on 0 / 379 / 79 / 168 / 278 rows (904 total). Native rows remain 87,045.
+Normal Country/Feature assembly serves 86,403 rows, with 0 / 379 / 79 / 168 / 277
+Unknown rows (903 total). The distinction is existing grain collapse, including
+the documented W5 duplicate, not a missing household or an eligibility inference.
+Genuine served Other counts stay 0 / 4,321 / 111 / 666 / 381. All non-unit keys and
+payload values, dtypes and missing masks are preserved as full row multisets by
+explicit ExtensionArray and nonmissing NumPy comparisons. The missing-unit class
+still includes 11 positive-harvest-quantity rows and 884 sale-value-only rows.
+
+Default and shipped-factor kilogram coverage and totals remain unchanged. Default
+factors cover 40,525 rows (45,878 none); the shipped ladder covers 70,526 rows
+(62,705 shipped, 7,821 metric; 15,877 none). This correction makes unit missingness
+visible to sentinel audits; it does not supply an unknown conversion factor.
+Normal private-cache cold and fresh-process warm API checks passed. The earlier
+baseline measurement failed on a Feature sentinel-axis comparison assumption;
+that receipt remains failed, and its completed cache was read back without
+producer replay. See =.coder/ledger/1043-ethiopia-harvest-missing-unit.md= for
+precise scopes and retained limitations. Crop reference windows, recorded units,
+sale grain, household walks and scientific assertions are unchanged.
 
 * Food country selector: retained local-walk caveat (GH #1287, 2026-10-29)
 

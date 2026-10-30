@@ -1923,3 +1923,65 @@ These are bounded historical observations with actual product/test prehashes, no
 The adapted prior test and an additional genuine =id_walk= boundary check await finite independent verification on the extracted source.
 The old missing-builder CONFIGERROR expectation and original results remain historical, not current retirement policy.
 See =.coder/ledger/1287-burkina-plot-concatenator.md= for source pins, scope and verification limits.
+
+* 2026-10-29 -- scoped cached-source recovery: independent sample namespaces (#1244/#1276)
+
+This section updates the *current sample and roster* coverage. Earlier panel-only
+2021-22 statements above describe catalog 6224, not the newly included 6277
+cross-section. Historical sample counts labelled "Also measured, not reconciled"
+remain attributed as written; no interview/exposure definition is changed.
+
+Recovered the already-selected =EMC_= / =CS_= namespace implementation from
+ordinary product source =94d12f2f93dd2e55c7da0158db0a76e69b2f4396=, narrowed to
+=sample= and =household_roster=. The old failed worker's acceptance/custody
+classifications are unchanged. This receiving job used matching already-cached
+sources through =get_dataframe= and the standard Country/Wave APIs, with fresh
+private data/configuration and no provider acquisition.
+
+On public =d65e8b136=, 2014/2018-19 =sample= share 583 household ID strings;
+=household_roster= shares 604, since its 2014 household set is larger. These
+are independent draws, not links. The EMC wave now formats every YAML household
+ID through =emc_i=; its two live script consumers (=food_coping= and
+=months_food_inadequate=) use the same helper. Both overlaps are zero after
+prefixing, and all old payloads and within-wave memberships are preserved.
+The cluster axis =v= is not renamed: its independent-draw warning still applies.
+
+For 2021-22, =sample= now serves 10,403 households: 3,227 panel households in
+550 grappes plus 7,176 cross-section households in 600 disjoint grappes.
+=household_roster= retains all 22,362 panel person rows and adds all 47,090 CS
+person rows (69,452 total). There are no 2021 roster household orphans against
+sample. The cross-section's unprefixed formatter would coincide with nine
+2018 household IDs; the =CS_= prefix prevents those false links. The panel
+crosswalk JSON and exactly-once single-pass rename are unchanged.
+
+Each component retains its own raw weight: =hhweight2021= for panel households,
+=hhweight= from the CS ponderations file for cross-section households.
+=panel_weight= comes only from =hhweight_panel= and remains missing for every
+CS household. The existing API normalization divides by the *whole wave's*
+non-null mean; it does not separately reweight each component. Raw values in
+L2-country and normalized values at the API match an independent source-key
+oracle. The retained population record discloses two universes, each with its
+own nationally scaled weights; pooled estimates still need that distinction.
+
+Current scope is deliberately partial: only three Cross_Section sidecars and
+the sample/roster bindings are recovered. Other 2021 tables still serve the
+panel component only, including =cluster_features=; CS region/market lookup
+coverage is not established here. The panel sidecars remain at their public
+flat =Data/= paths. Full Panel relocation, acquisition routing, other module
+wiring and complete held-release receipts remain #1276 integration work.
+=SOURCE.org= records partial declarations without claiming a secondary held
+release. The population evidence source and generator recover the existing
+=mixed-national+panel= definition; only Burkina's generated record is written.
+
+Fresh-process warm Country requests, restricted wave requests and one-country
+Feature assembly preserve sample/roster rows and values. Four invented-input
+regression tests fail against public d65 and pass with the repair; the metadata
+test additionally pins the two-component disclosure. Actual cached-source
+execution of the EMC scripts preserves 51,099 food-coping rows and 10,230
+months-food-inadequate rows exactly except for the namespace prefix.
+The pre-existing 389 EMC roster households absent from sample (1,506 person
+rows with null =v=) and missing EHCVM strata remain visible and unchanged.
+
+Private receiving evidence contains source/cache hashes, exact API commands,
+raw witnesses and the aggregate report. No raw IDs are published here.
+This is scoped API acceptance, not a full Burkina re-warm or #1307 plot acceptance.

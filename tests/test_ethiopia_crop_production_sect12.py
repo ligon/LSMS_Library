@@ -200,7 +200,7 @@ def test_a_row_carrying_a_sect12_sale_is_no_longer_dropped(eth):
     row, which records neither a unit nor a quantity.  The empty-row filter
     used to ignore Value_sold and remove the row; since the 2026-10-23 ruling
     a row carrying a sale value is never dropped, so H9 is served with its
-    25 Birr, the no-unit tag 'Other (Specify)' and the §12 stamp.  Without
+    25 Birr, the no-unit tag 'Unknown' and the §12 stamp.  Without
     §12 the row carries nothing and is still dropped."""
     base, _ = _build(eth, with12=False)
     new, _ = _build(eth)
@@ -208,7 +208,7 @@ def test_a_row_carrying_a_sect12_sale_is_no_longer_dropped(eth):
     h9 = _row(new, "H9", "Sugar Cane")
     assert h9["Value_sold"].tolist() == [25.0]
     assert h9["Quantity"].isna().all() and h9["Quantity_sold"].isna().all()
-    assert list(h9.index.get_level_values("u")) == ["Other (Specify)"]
+    assert list(h9.index.get_level_values("u")) == ["Unknown"]
     assert list(h9["Derivation"]) == ["Ethiopia::crop_production::sect12-sale-period"]
 
 

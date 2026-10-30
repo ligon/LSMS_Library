@@ -4187,6 +4187,80 @@ Every wave named in a =*_waves= list must carry its script.
 The Makefile is hashed into every Malawi table, so this is one Malawi re-warm.
 Measurements are in =slurm_logs/isa_backlog_2026-10-21/1237-malawi-make-prereqs/=.
 
+* 2026-10-28 -- months_food_inadequate compiler follows actual declarations
+
+The country compiler now selects =Country('Malawi').waves= and resolves each
+wave through =Country.__getitem__=, including =wave_folder_map=. It reads an
+output only when the table is in that wave's =data_scheme=. That property is
+an actual union of native script stems and YAML keys: removing a YAML key while
+retaining its native driver does not retire the table. No YAML-null override
+is introduced. An unregistered country table refuses before any read.
+
+A selected declared reader failure propagates unchanged before the country
+writer runs. Unwired waves skip before even a stale output can be read. The
+existing no-input assertion and successful concat remain. Typed-empty declared
+frames are compiler inputs, not a new native-producer empty-success policy.
+
+The H04 gate, calendar interpretation, range/eligibility rules, native household
+IDs, later cross-sectional-only Module H selection and framework ID walk are
+unchanged. This supersedes the preceding source-only compiler proposal's held
+implementation status; it does not settle a new data or scientific question.
+All new verification is bounded invented IO; no real Country build, cache/hash
+census, source replay or scientific acceptance is implied.
+
+* 2026-10-28 -- livestock and plot_labor compiler declaration/error control
+
+Both concatenators follow the same actual Country/Wave discovery rule documented
+for =months_food_inadequate= above. They skip an unwired wave before reading,
+resolve its physical folder through =Country.__getitem__= and propagate every
+selected declared reader failure before any country write. Their native-script/
+YAML union remains the framework's existing declaration rule.
+
+The livestock ownership keep-filter, current stock/flow columns, per-animal
+value and species namespaces are unchanged; =ag_r07= remains unwired. Plot labor
+keeps recorded days on =unknown_plot= stubs. Both retain native household IDs,
+concat order, dtype/attrs behavior and existing framework ID handling. No new
+field, source, plot identity, unit, reducer or eligibility rule is introduced.
+
+* 2026-10-28 -- remaining country concatenator catches and native shapes
+
+=food_coping=, =anthropometry=, =people_last7days=, =plot_features=,
+=crop_production= and =community_prices= now use the same actual declaration/
+physical-folder discovery and fail-loud reader rule as the three compilers above.
+Each keeps its existing successful concat and no-input assertion. No native
+module/helper, YAML registration or scientific reduction is changed.
+
+Two compiler details matter to conservation. =crop_production= still promotes
+its native =u= column into the index after concat; all other native columns
+remain opaque compiler inputs. No new observation schema is introduced. The native
+=community_prices= helper deliberately writes an extra =i=v= level before =j=
+to avoid =map_index='s legacy item/household inversion; its country compiler
+must preserve that intermediate axis. Framework normalization removes it from
+the served =(t,v,j,u)= table. It is not a household identifier or a new ID walk.
+Today's community-price declarations still cover only 2010/2013/2019; discovery
+does not add a driver to either absent wave.
+
+The =plot_features= compiler docstring formerly said "Malawi has no country-level
+updated_ids.json". That contradicts the existing GH #894 design-A entry above.
+The explanation now names the committed framework input. The compiler continues
+to concatenate raw wave IDs without running =id_walk= itself; no crosswalk is
+read, regenerated or changed by this repair or its invented-IO verification.
+
+* 2026-10-28 -- plot_inputs compiler declaration and failure handling
+
+The public-baseline extraction removes its broad reader suppression and fixed
+four-wave list together. It now uses the same actual Country/Wave discovery
+rule as the other concatenators and propagates declared failures before writes.
+The author's earlier eleven-case repair belongs to its separately pinned
+inherited carrier; that history is retained in the author ledger and was not
+replayed or adopted as a scientific implementation here.
+
+Native producers, household IDs, concat, schema and finalizer eligibility remain
+public-baseline bytes. Invented test frames carry extra opaque observation axes
+to check transport only; no input_obs or production_obs producer/schema change
+is part of this extraction. No G/H/D source, scientific or empty-producer policy
+is introduced.
+
 * plot_inputs: Module G source-observation identity (GH #1298)
 
 All six G sources in 2010-11, 2013-14, 2016-17 and 2019-20 carry

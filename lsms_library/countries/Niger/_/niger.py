@@ -1791,10 +1791,21 @@ def concat_wave_parquets(table, waves=None):
 
     country = Country('Niger')
     pieces = []
+    seen_physical, seen_logical = set(), set()
     for t in country.waves if waves is None else waves:
         wave = country[t]
         if table not in wave.data_scheme:
             continue
+        # A native/YAML physical output may contain several logical years.
+        # Preserve it whole once for distinct logical aliases, without a t
+        # filter or native-row reduction (integration ledger §§3-5). Explicit
+        # repetitions of the same logical wave retain legacy multiplicity.
+        physical = wave.file_path.resolve()
+        repeated_logical = t in seen_logical
+        seen_logical.add(t)
+        if physical in seen_physical and not repeated_logical:
+            continue
+        seen_physical.add(physical)
         fn = Path(tools.data_root('Niger')) / wave.wave_folder / '_' / f'{table}.parquet'
         if not fn.exists():
             raise FileNotFoundError(

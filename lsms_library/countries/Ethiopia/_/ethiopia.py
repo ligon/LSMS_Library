@@ -1983,6 +1983,8 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
     ``'_attached'`` frame of the attached (holder, crop) pairs, which
     :func:`_report_sect12_sales` consumes.
     """
+    from lsms_library.transformations import U_UNKNOWN
+
     c = colmap
     s = sale12
     n0 = len(out)
@@ -2060,7 +2062,7 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
     key = pd.DataFrame({
         'i': out['i'].astype('string'), 'plot_id': out['plot_id'].astype('string'),
         'j': out['j'].astype('string'),
-        'u': out['u'].astype('string').fillna('Other (Specify)'),
+        'u': out['u'].astype('string').fillna(U_UNKNOWN),
         '_holder': out['_holder'].astype('string'), '_code': out['_code'],
     }).dropna(subset=['i', 'plot_id', 'j', '_code'])
     ncodes = key.groupby(['i', 'plot_id', 'j', 'u'])['_code'].transform('nunique')
@@ -2236,6 +2238,8 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         ``pl_permanent`` -- Derivation (``PERMANENT_CROP_WINDOW_DERIVATION``
         on the permanent-crop rows, NA elsewhere).
     """
+    from lsms_library.transformations import U_UNKNOWN
+
     c = colmap
     crop_map = _eth_crop_label_map_for_wave(t)   # GH #1252: codes drift by wave
 
@@ -2441,8 +2445,8 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
 
     out = out.dropna(subset=['i', 'plot_id', 'j'])
     # `u` is an index level (cannot be null).  A row may legitimately
-    # report a quantity with an unrecorded unit -> tag it 'Other (Specify)'
-    # (a value already in the `u` table); rows with no recorded unit and
+    # report a quantity with an unrecorded unit -> tag it U_UNKNOWN (#1043),
+    # distinct from a recorded Other (Specify) response; rows with no unit and
     # NOTHING to serve -- no quantity, no sold quantity, no sale value --
     # are empty placeholders -> drop.
     #
@@ -2451,7 +2455,7 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
     # ignore Value_sold, so a §9 row with no unit and no quantity lost the
     # §11 or §12 sale attached to it (§11: 1 / 2 / 27 / 32 rows with a
     # positive value in W2-W5; §12: 29 positive lines, 11,339 Birr).  Such a
-    # row is now served with u = 'Other (Specify)' (the no-unit tag above)
+    # row is now served with u = U_UNKNOWN (the no-unit tag above)
     # and only its Value_sold, which is unit-free.
     empty_u = out['u'].isna()
     out = out[~(empty_u & out['Quantity'].isna()
@@ -2479,7 +2483,7 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         out['Derivation'] = stamp
         out = out.drop(columns=['_permanent'])
     out = out.drop(columns=['_holder', '_code'])
-    out['u'] = out['u'].fillna('Other (Specify)')
+    out['u'] = out['u'].fillna(U_UNKNOWN)
     out = out.set_index(['t', 'i', 'plot_id', 'j', 'u'])
     # Stable column order.  `Derivation` exists only where §12 was read
     # (W1-W3: its registry key on the rows §12 filled) or the §4 permanent
@@ -2743,7 +2747,9 @@ def plot_inputs_for_wave(t, plot_roster, planting, seeds, colmap, labels=None):
                 pagg = pagg.dropna(subset=['_holder', '_code'])
                 pa2 = pagg.groupby(['_holder', '_code'], as_index=False).agg(
                     _purch_any=('_purch_any', 'max'),
-                    Quantity_purchased=('Quantity_purchased', 'sum'),
+                    # GH #1184: an explicit Yes with no reported amount is
+                    # missing, not a fabricated zero. Preserve recorded zeros.
+                    Quantity_purchased=('Quantity_purchased', lambda x: x.sum(min_count=1)),
                 )
                 nplots = (seed_df.dropna(subset=['_code'])
                           .groupby(['_holder', '_code'])['plot_id'].nunique()
