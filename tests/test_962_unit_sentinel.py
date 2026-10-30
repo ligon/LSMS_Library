@@ -524,18 +524,12 @@ MINTED_UNIT_SPELLINGS = {
         'Orphan script, as 2012-13.'),
     ('Nigeria/2018-19/_/individual_unit_values.py', 'None'): (
         'Orphan script, as 2012-13.'),
-    ('Ethiopia/_/ethiopia.py', 'Other (Specify)'): (
-        'crop_production (not food): a harvest quantity with an unrecorded '
-        'unit is tagged with the existing u-table value "Other (Specify)", '
-        'so _unit_sentinel_mask does not see it.  Crop-side sentinel '
-        'question, outside #962 food scope; reported as a residual.'),
     ('Ethiopia/_/ethiopia.py', 'Kg'): (
-        'crop_production, two sites.  (a) harvest u (`out["u"] = "Kg"`): '
+        'crop_production: harvest u (`out["u"] = "Kg"`): '
         'the else-branch for a wave with no harvest unit column; the site '
-        'comments that W1 reports kilograms directly.  (b) sale unit '
-        '(fillna): the site comments that W1/W2 sale quantities are kilos; '
-        'whether a NaN DECODED sale unit in a later wave is also kilos is '
-        'UNVERIFIED (#962 inventory did not cover crop tables).'),
+        'comments that W1 reports kilograms directly. W1/W2 sale quantities '
+        'are also instrument-defined kilos; merged GH1253 already preserves '
+        'blank decoded sale units as NA in later waves.'),
     ('EthiopiaRHS/_/community_prices.py', 'Kg'): (
         'community_prices (module constant U): the ERHS price instruments '
         'record price per kilogram (module docstring: price1234_rev p_r1..'
