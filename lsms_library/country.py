@@ -6080,6 +6080,10 @@ class Country:
                                              and prefer_make_backend))
                     if df is None:
                         raise _rebuild_failure_error(self.name, method_name)
+                    # Country builders can return every wave regardless of the
+                    # request. Reuse the cache route's selection contract,
+                    # including full-country and no-t pass-through semantics.
+                    df = self._restrict_to_waves(df, waves)
             except Exception as error:
                 # broad catch intentional: tee-into-log then re-raise so
                 # _log_issue() captures every materialization failure for
