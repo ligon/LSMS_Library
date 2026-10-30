@@ -12,6 +12,7 @@ from pathlib import Path
 import sys
 from types import SimpleNamespace
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -43,13 +44,27 @@ def _frame(wave, *, empty=False, one_column=False):
 
 
 def _equal(actual, expected):
-    pd.testing.assert_frame_equal(actual, expected, check_exact=True)
+    if isinstance(expected, pd.Series):
+        pd.testing.assert_series_equal(actual, expected, check_exact=True)
+        columns = [(actual, expected)]
+    else:
+        pd.testing.assert_frame_equal(actual, expected, check_exact=True)
+        columns = [(actual[c], expected[c]) for c in expected]
+    # GH #1206: frame/series equality alone can miss nullable numeric changes.
+    for x, y in columns:
+        pd.testing.assert_extension_array_equal(x.array, y.array, check_exact=True,
+                                                rtol=0, atol=0, check_dtype=True)
+        np.testing.assert_array_equal(x[x.notna()].to_numpy(),
+                                      y[y.notna()].to_numpy(), strict=True)
     assert actual.attrs == expected.attrs
 
 
-def _renamed(frame):
+def _renamed(frame, *, converted=True):
     # Both codes share a label intentionally; renaming must never aggregate.
-    return frame.rename(index={'raw-a': 'Food', 'raw-b': 'Food'}, level='j')
+    out = frame.rename(index={'raw-a': 'Food', 'raw-b': 'Food'}, level='j')
+    if converted:
+        out.attrs['id_converted'] = True
+    return out
 
 
 @pytest.fixture
@@ -76,13 +91,13 @@ def sandbox(tmp_path, monkeypatch):
     assert data_root().resolve() == (tmp_path / 'unused-data').resolve()
 
     reads, writes, covers, label_calls, denials = [], [], [], [], []
-    frames = {}
+    frames, maps = {}, {}
 
     def denied(*args, **kwargs):
         denials.append('real-data/build leaf')
         raise AssertionError('real-data/build leaf is forbidden in selector tests')
 
-    for cls, names in ((C.Country, ('_compute_panel_ids', '_aggregate_wave_data',
+    for cls, names in ((C.Country, ('_aggregate_wave_data',
                                   '_read_l2_country_cache', '_read_assumed_fresh_cache')),
                        (C.Wave, ('grab_data',)), (ll.Feature, ('__call__',))):
         for name in names:
@@ -94,6 +109,15 @@ def sandbox(tmp_path, monkeypatch):
     for name in ('read_parquet', 'read_stata', 'read_csv', 'read_spss'):
         monkeypatch.setattr(pd, name, denied)
     monkeypatch.setattr(pd.DataFrame, 'to_parquet', denied)
+
+    def map_leaf(self):
+        # The actual Country property is exercised, with only its committed
+        # map input leaf invented. No crosswalk file/build may be consulted.
+        self._panel_ids_attempted = True
+        self._panel_ids_cache = {}
+        self._updated_ids_cache = maps
+
+    monkeypatch.setattr(C.Country, '_compute_panel_ids', map_leaf)
 
     def reader(path, *args, **kwargs):
         assert not args and not kwargs
@@ -179,7 +203,8 @@ def sandbox(tmp_path, monkeypatch):
 
     yield SimpleNamespace(install=install, run=run, frames=frames, reads=reads,
                           writes=writes, covers=covers, label_calls=label_calls,
-                          helper=helper, country_dir=country_dir)
+                          helper=helper, country_dir=country_dir, maps=maps,
+                          Country=C.Country, local_tools=local_tools)
     assert not denials
     countries_root.cache_clear()
     data_root.cache_clear()
@@ -223,8 +248,8 @@ def test_food_selector_skips_retired_despite_invented_stale_output(sandbox, reti
     sandbox.run()
     assert sandbox.reads == [f'../{active}/_/food_acquired.parquet']
     _equal(sandbox.writes[0][0], _renamed(_frame(active)))
-    # Retirement changes selection, not the historical local walk.
-    assert sandbox.covers == ['../2013-14/Data/sect_cover_hh_w2.dta']
+    # Shared committed maps replace the obsolete raw-cover/j-axis loop.
+    assert sandbox.covers == []
 
 
 @pytest.mark.parametrize('unwired', ('missing', 'empty', 'unrelated'))
@@ -309,22 +334,21 @@ def test_food_selector_empty_and_squeezed_contributions(sandbox, one_column, emp
                            for w, f in zip((first, second), frames)})
     sandbox.run()
     assert sandbox.reads == [f'../{w}/_/food_acquired.parquet' for w in (first, second)]
-    _equal(sandbox.writes[0][0], _renamed(pd.concat(frames)))
+    # Preserve the existing squeeze: a one-column contribution is a Series.
+    expected = pd.concat([f.squeeze() for f in frames])
+    _equal(sandbox.writes[0][0], _renamed(expected))
 
 
 def test_food_selector_preserves_public_single_row_squeeze_failure(sandbox):
     wave = WAVES[0]
     sandbox.install([wave], {wave: 'native'})
     sandbox.frames[f'../{wave}/_/food_acquired.parquet'] = _frame(wave).iloc[:1]
-    # The public squeeze produces a Series without j. Do not repair the
-    # resulting local-walker failure as part of the selector change.
+    # The unchanged squeeze produces a Series without a j index. Removing
+    # the obsolete local walker does not authorize emitting that malformed
+    # single-row contribution or changing the writer contract.
     with pytest.raises(KeyError, match='j') as caught:
         sandbox.run()
-    assert caught.value.args == ('j',)
-    # pandas chains the missing-column engine KeyError; the compiler must
-    # retain that public KeyError rather than wrap this walker failure.
-    assert isinstance(caught.value.__cause__, KeyError)
-    assert caught.value.__cause__.args == ('j',)
+    assert 'j' in str(caught.value)
     assert sandbox.writes == []
 
 
@@ -335,33 +359,79 @@ def test_food_selector_preserves_public_no_contribution_failure(sandbox):
     assert sandbox.reads == sandbox.writes == sandbox.label_calls == []
 
 
-def test_food_selector_public_walk_changes_j_and_keeps_i(sandbox, monkeypatch):
+def test_food_selector_shared_walk_changes_household_i_and_keeps_food_j(sandbox):
     wave = WAVES[1]
     sandbox.install([wave], {wave: 'native'})
     source = _frame(wave)
     sandbox.frames[f'../{wave}/_/food_acquired.parquet'] = source
-    monkeypatch.setattr(sandbox.helper, 'get_dataframe', lambda _path: pd.DataFrame({
-        'household_id2': ['raw-a', 'raw-b'],
-        'household_id': ['raw-b', 'walked-food'],
-    }))
+    sandbox.maps[wave] = {'hh-a': 'earlier-a', 'hh-b': 'earlier-b',
+                          'raw-a': 'wrong-food-axis', 'raw-b': 'wrong-food-axis'}
     sandbox.run()
-    expected = source.rename(index={'raw-a': 'raw-b', 'raw-b': 'walked-food'}, level='j')
+    expected = source.rename(index={'hh-a': 'earlier-a', 'hh-b': 'earlier-b'}, level='i')
     _equal(sandbox.writes[0][0], _renamed(expected))
-    assert sandbox.writes[0][0].index.get_level_values('i').equals(
-        source.index.get_level_values('i'))
+    assert sandbox.writes[0][0].index.get_level_values('j').tolist() == ['Food'] * 3
+    assert sandbox.writes[0][0].attrs['id_converted'] is True
+    assert sandbox.covers == []
 
 
 def test_food_selector_walk_leaf_failure_stays_public_and_prevents_write(sandbox, monkeypatch):
     wave = WAVES[1]
     sandbox.install([wave], {wave: 'native'})
     sandbox.frames[f'../{wave}/_/food_acquired.parquet'] = _frame(wave)
-    failure = ValueError('invented cover refusal')
+    failure = ValueError('invented shared map refusal')
 
-    def refused(_path):
+    def refused(*args, **kwargs):
         raise failure
 
-    monkeypatch.setattr(sandbox.helper, 'get_dataframe', refused)
+    monkeypatch.setattr(sandbox.local_tools, 'id_walk', refused)
     with pytest.raises(ValueError) as caught:
         sandbox.run()
     assert caught.value is failure and caught.value.__cause__ is None
     assert sandbox.writes == sandbox.label_calls == []
+
+
+def test_food_selector_raw_chain_is_one_substitution(sandbox):
+    wave = WAVES[1]
+    sandbox.install([wave], {wave: 'native'})
+    source = _frame(wave)
+    sandbox.frames[f'../{wave}/_/food_acquired.parquet'] = source
+    sandbox.maps[wave] = {'hh-a': 'hh-b', 'hh-b': 'hh-c'}
+    sandbox.run()
+    expected = source.rename(index={'hh-a': 'hh-b', 'hh-b': 'hh-c'}, level='i')
+    _equal(sandbox.writes[0][0], _renamed(expected))
+    assert sandbox.writes[0][0].index.get_level_values('i').tolist() == ['hh-c', 'hh-b', 'hh-b']
+
+
+def test_food_selector_converted_frame_is_not_walked_again(sandbox):
+    wave = WAVES[1]
+    sandbox.install([wave], {wave: 'native'})
+    source = _frame(wave)
+    source.attrs['id_converted'] = True
+    sandbox.frames[f'../{wave}/_/food_acquired.parquet'] = source
+    sandbox.maps[wave] = {'hh-a': 'hh-b', 'hh-b': 'hh-c'}
+    sandbox.run()
+    _equal(sandbox.writes[0][0], _renamed(source))
+
+
+def test_food_selector_future_registered_wave_uses_shared_map(sandbox):
+    wave = '2030-31'
+    sandbox.install([wave], {wave: 'null'})
+    source = _frame(wave)
+    sandbox.frames[f'../{wave}/_/food_acquired.parquet'] = source
+    sandbox.maps[wave] = {'hh-a': 'future-canonical-a', 'hh-b': 'future-canonical-b'}
+    sandbox.run()
+    expected = source.rename(index=sandbox.maps[wave], level='i')
+    _equal(sandbox.writes[0][0], _renamed(expected))
+    assert sandbox.covers == []
+
+
+def test_food_selector_map_load_failure_prevents_payload_or_writer(sandbox, monkeypatch):
+    sandbox.install([WAVES[0]], {WAVES[0]: 'native'})
+    failure = ValueError('invented committed-map refusal')
+    def refused(self):
+        raise failure
+    monkeypatch.setattr(sandbox.Country, '_compute_panel_ids', refused)
+    with pytest.raises(ValueError) as caught:
+        sandbox.run()
+    assert caught.value is failure
+    assert sandbox.reads == sandbox.writes == sandbox.covers == []

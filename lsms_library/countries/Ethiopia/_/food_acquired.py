@@ -21,11 +21,11 @@ collapsed the unit columns.  Replaced 2026-05-07.
 import sys
 sys.path.append('../../_/')
 from lsms_library import Country
-from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library.local_tools import get_dataframe, id_walk, to_parquet
 
 import pandas as pd
 import numpy as np
-from ethiopia import change_id, Waves, harmonized_food_labels
+from ethiopia import Waves, harmonized_food_labels
 
 
 def fix_food_labels():
@@ -42,18 +42,8 @@ def fix_food_labels():
     return D
 
 
-def id_walk(df, wave, waves):
-    use_waves = list(waves.keys())
-    T = use_waves.index(wave)
-    for t in use_waves[T::-1]:
-        if len(waves[t]):
-            df = change_id(df, '../%s/Data/%s' % (t, waves[t][0]), *waves[t][1:])
-        else:
-            df = change_id(df)
-    return df
-
-
 country = Country('Ethiopia', preload_panel_ids=False)
+updated_ids = country.updated_ids
 p = []
 seen_folders = set()
 for t in country.waves:
@@ -76,8 +66,14 @@ for t in country.waves:
         ) from exc
     # Wave parquet already has canonical index [t, i, j, u, s] and
     # columns [Quantity, Expenditure] from food_acquired_to_canonical().
-    df1 = id_walk(df, t, Waves)
-    p.append(df1)
+    # Match the framework's native-contribution stage: household is i,
+    # food is j. The obsolete local walk mapped the latter as household.
+    # A source-native frame uses one substitution, never transitive closure;
+    # an explicitly converted frame must not be walked again (GH #1245).
+    if ('i' in df.index.names and not df.attrs.get('id_converted')
+            and updated_ids is not None):
+        df = id_walk(df, updated_ids, state='raw')
+    p.append(df)
 
 p = pd.concat(p)
 
