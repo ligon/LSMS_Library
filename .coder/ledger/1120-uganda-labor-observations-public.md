@@ -17,3 +17,6 @@ Reuse exact f916 code/test/schema delta, with only a docstring correction and ad
 
 ## §6 Open questions
 No scientific decision remains for this scoped observation identity. Root approved extraction after full source/runtime review; exact public diff must return to root before publication. Four-cluster standing exception, #829/#647/#1297 and panel weights stay separate. No actual replay is authorized or needed for mechanical extraction.
+
+
+Verification: OK anchored on §§2–4. All50 other current-public function/class ASTs unchanged; entire country-module AST matches reviewed f916 after docstrings are removed. All seven drivers, focused tests and country labor schema match f916 bytes; shared data_info preserves current optional geovariables/#824 prose and changes only the three reviewed labor declarations. Initial whole-file private equality assertion correctly failed on that newer shared schema; scoped proof retained those public changes. Changed Python AST parses and git diff --check PASS. No raw/API/import/test replay; product commit90a35781. CONTEXT/ordinary/witness authentication and independent review b437ddf6 support the qualified checkpoint, not clean-cold or all-seven-native validation. Exact public diff returns to root before any publication.
