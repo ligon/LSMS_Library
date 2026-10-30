@@ -3250,3 +3250,59 @@ Final native-percent attachments were checked against closed original source
 operands. Earlier native/API/fresh-warm comparisons used the rejected degree
 candidate; only valid unchanged payload/join predicates are reused. A final
 full cold/warm rebuild was not repeated after the unit correction.
+
+* GH #1120 locating-cover correction (2026-10-30)
+D1 extends the household-cover sample with agriculture-cover-only households,
+using recorded cover weights. Household-cover rows, payload and first-seen order
+remain authoritative. Holder repetitions must agree exactly, including missing
+versus populated values, before reduction. W3 agriculture ea_id is translated
+through recorded W2 AND W3 household-cover relations; the household prefix is
+only a consistency check, never linkage authority.
+
+The five-wave source census adds respectively 0, 25, 27, 124 and 40 households.
+Native sample sizes are 3969, 5287, 4981, 6894 and 4999. Mean-one normalization
+uses the complete new within-wave denominator; neither panel-weight policy nor
+Rural definitions change. Panel I and Panel II remain separate.
+
+Cluster closure adds only previously absent EAs (0, 1, 1, 6, 3), with geography
+joined by household. Existing household rows remain authoritative for existing
+EAs. The older YAML mean/centroid comments contradict the later observed-row
+selection correction above and the core implementation; they do not authorize
+a new centroid policy. Final cluster GPS missing counts are 0, 0, 1, 19, 3.
+Located sample keys have complete cluster-key coverage; missing GPS is retained.
+
+D2 source inventory included separate HH, PP and PH covers in all five waves.
+PH adds no identifiable households beyond HH/PP for the selected plot sources.
+Two W3 PH source rows (one each in sections 9 and 10) have BOTH household
+identifiers, EA and administrative fields blank, although holder/parcel/field
+keys are populated. These are anonymous rows, NOT evidence of two identified
+unlocated households. Do not infer household identity from holder prefixes or
+label cover absence as movement. No speculative singleton implementation is
+introduced from those rows. The maintainer's
+[[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][GH #1357 option 1 ruling]] settles their representation: continue excluding
+anonymous records from household-keyed tables. Existing missing-i constructors
+remain unchanged; no orphan table, unknown household or holder-prefix identity
+is introduced. The aggregate source-row facts and private audit remain, without
+claiming positive or otherwise-eligible payload loss.
+D3 found no missing holder/parcel/field identifiers in the selected declared
+plot-source inventory; no unknown_plot repair or Farm-level substitution was
+needed. This finding does not license parcel-to-field inference.
+
+Panel-map corrections were checked against the independently reviewed scientific
+oracle with W1 PP as the explicit conditional sixth baseline source. W2 adds
+25 links with 3776 unchanged; W3 adds 27 and corrects 12 identity links, with
+4942 unchanged. Both mapping directions match the oracle exactly. W3 PP's old
+household_id is not linkage authority; HH3 baseline remains diagnostic.
+
+Validation qualification: composed five-wave sample/cluster and warm API checks
+passed, but an initial cold actor failed after an observer changed the parquet
+call stack. The corrected composed run reused verified native sample outputs;
+it is not a clean cold acceptance run. Three W1-W3 plot-geovar raw blobs were
+unavailable, so existing #1150 source evidence and preserved code are distinct
+from new actual plot-geovar validation. The final targeted selection records
+55 passes. Country attrs were compared by value equality, not recursive typed
+equality. Runtime Feature checks cover named axes, payload, masks and counts;
+separate earlier/warm closed Feature pickle byte equality is an export fact,
+not an executed fully typed Country-to-Feature metadata assertion. Independent
+Burkina source/receipt review supports this bounded D1/panel extraction; #1120
+and its other country/eligibility scopes remain open.
