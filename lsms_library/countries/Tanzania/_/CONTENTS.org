@@ -2467,3 +2467,69 @@ This accepts four bounded transport/API cells. The seven other compiler
 entries, #905 held optimizers, #114 back-casting/grain and all scientific
 caveats remain separate. The two failed complete-metadata predicates remain
 failed; whole #1287/#1288 is not closed.
+
+* 2026-10-30 -- Seven remaining actual compiler checkpoints (GH #1287)
+
+At fixed runtime source =d94ac3f683e6be5ef2c7c61abeef1513172cb2ed=,
+six absent-target GNU Make units executed their real producers and compilers.
+=community_cluster_xwalk= has no Make rule: its two natives and compiler ran
+as direct scripts, not a seventh Make acceptance. Previously accepted cells
+were excluded. Compiler rows were:
+
+| table | rows |
+|-------+------|
+| anthropometry | 78,674 |
+| community_cluster_xwalk | 587 |
+| food_coping | 153,315 |
+| individual_education | 43,367 |
+| life_satisfaction | 152,048 |
+| people_last7days | 29,179 |
+| shocks | 45,655 |
+
+All 26 writer RETURN/storage and seven native-storage/existing-compiler-CALL
+comparisons pass. Full/first/last Country and aligned singleton Feature
+(=currency=None=) pass cold and fresh warm for the six non-shocks tables.
+Strong extension-array/nonmissing NumPy checks supplement pandas assertions.
+These are existing-production composition predicates, not survey-science or
+crosswalk oracles. All 26 pre-API parquets survive separately.
+
+Five direct CALL/RETURN full-metadata predicates remain failed: country
+anthropometry, education, life_satisfaction and shocks, plus UPD native shocks.
+Twelve failed writer transitions across direct/API phases are characterized;
+observed payload equality is not claimed for every transition. No actual
+operand was normalized to make a failed predicate pass.
+
+Modern shocks uses YAML before the extant scripts. Its initial native-only
+API model therefore had the wrong route premise. Saved mixed-route operands
+plus existing assembly exactly match the 128,311-row API writer CALL; CALL
+plus existing finalization matches the 35,746-row cold Country result.
+Three original cold predicates and one warm full-Country predicate remain
+failed. Cold/warm observed ordered keys, typed payload/masks and attrs agree,
+but complete household dictionaries/codes differ: 15,425 -> 10,843. The writer
+preparation compacts that domain while the cold path finalizes its pre-write
+frame. Both endpoint subsets pass. This records the representation boundary;
+it neither chooses a shock universe nor trims metadata to conceal failure.
+
+Twenty-five held sources total 198,118,296 bytes; original-byte, selected-DVC
+hash, raw-SHA and sidecar closure pass. Four source-bound sample parquets pass
+current-country-hash/six-wave-coverage admission without rebuild or restamp.
+Observed source calls are 24 Make/direct plus 24 API, zero sample/warm.
+All 55 warm snapshot entries retain exact bytes, sizes, modes and mtimes;
+observed warm raw/decoder/script/write activity is zero. Main execution took
+1,114.512 seconds; closed export ended 1,205.458 seconds after its start.
+The 450 closed witnesses authenticate; owned phase groups are empty.
+
+Both startup failures and missing-Poetry audit failure remain. The separately
+written private config was NOT effective; explicit data/countries/DVC identities
+remain proven. Worker documentation says 2,700 seconds plus 300 cleanup versus
+the approved plus-five grace; no deadline expiry or exercised 300-second grace
+was observed. Directory metadata/exhaustive low-level I/O and hostile escape
+are unmeasured. Earlier UPHI/r_hhid and community-link contradictions,
+Extended/Refresh, WAITING #114, #113/#846 and held #905 work remain separate.
+Full-axis failures remain qualifications under #1206/#1287; whole #1287/#1288
+is not closed, and seven strict API cells are not claimed.
+
+Dispatch =b6778c4acbf941eaa93bd1a1061aa881=, job =40653376=; private result
+=e2204963b483dea889ade6999d35d14baec5ae0e=. Independent review SHA256
+=ed305697cb7cac14bd4b1b1aa9a9f1e713494ae56440030db460ea8d8151f5e4=;
+[[https://github.com/ligon/LSMS_Library/issues/1287#issuecomment-6527690457][accepted bounded checkpoint]].

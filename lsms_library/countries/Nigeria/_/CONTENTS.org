@@ -2825,3 +2825,56 @@ recorded; 34 observed processes closed before witness export. The separate
 successor is limited to the two unexecuted targets with compatible saved sample
 prerequisites. No broader #1287/#1288, #1095 retention, source-grain or pooled
 recall-window acceptance follows, and no production rule changes here.
+
+* 2026-10-30 -- Plot/community actual compiler successor (GH #1287)
+
+The separate successor uses unchanged product source
+=73c5d955e782c9a335d9e4dda96456c3c207cb53=, executed operator/ledger descendant
+=8558512303cb7cb8a0d6f0c149e18e7bd5f546e8=. Two absent-target Make units
+run five natives each and their actual country compilers. =plot_features=
+native rows 6,086 / 5,893 / 5,824 / 11,076 / 9,232 yield 38,111 compiler rows
+and 38,045 served rows. =community_prices= rows 27,104 / 27,079 / 23,153 /
+31,757 / 30,064 yield 139,157 compiler and served rows. Historical C8 counts
+remain dated; this does not silently substitute the older 136,566-row total.
+
+All 26 writer/compiler/storage, 14 cold and 12 fresh-process warm predicates
+pass, including complete axes/levels/codes, dtypes, masks, typed attrs and
+strong extension-array/nonmissing NumPy checks. Numeric and mask mutations
+are rejected. Expectations use existing ordered native concat (community's
+actual sort), logical-quarter restriction, mapping/walk/normalization,
+assembly, finalizer/sample join and aligned singleton Feature (=currency=None=).
+Raw-cache subset restriction precedes finalization. This proves production
+composition, not independent science or the individual dispositions behind
+the plot 66-row reduction. Optional isolated saved-count diagnosis failed
+before producing counts; its exit/traceback remain without retry.
+
+Twenty original held objects total 50,140,494 bytes. Fifteen explicit-md5
+objects use byte hashes; five absent-hash CSV sidecars use the installed
+=md5-dos2unix= semantics. Raw bytes, metadata and sidecars are unchanged;
+no checksum waiver or line-ending rewrite occurred. Six source-bound saved
+sample parquets (628,645 bytes) pass exact bytes, current country hash and
+ten-quarter coverage admission; hashless native samples are prerequisites,
+not fresh-hash claims. No sample, roster, coping or housing producer was replayed.
+Observed source calls are 24 Make plus 24 cold API, zero warm. Both 38-file
+warm snapshots retain exact bytes, sizes, modes and mtimes; observed warm
+raw/decoder/helper/script/write activity is zero. All nine stage actors exit0
+and owned descendants close. Main execution is 369.638 seconds within the
+749-second cap computed from Slurm remaining time with a 240-second closure
+reserve. The 216 closed witnesses include 12 pre-API and 12 final parquets.
+
+Original verifier failures, the 0.075-second pre-child import failure and six
+once-passing stdlib controls remain separate; no old failure is relabelled.
+The task and publication completed, while native terminal state is interrupted
+143 / Slurm FAILED 15:0 at 42:59. The submitted 45-minute command requested
+=B:TERM@120=; timing is consistent with advance signaling, not proof of
+preemption. Closed data actors and publication remain independently evidenced.
+Original =REPORT.md= is unchanged; actual evidence is additive. The earlier
+three housing axis failures, #1095 Tier C, unit/observation/recall policies,
+independent plot row-disposition question and #1288 failure/freshness paths
+remain. No whole #1287/#1288 or scientific closure follows.
+
+Dispatch =cdea6582a0994891912223b33d2f3ab7=, job =40653317=; final published
+snapshot =a2838b6ae4bca3a7bd25eaf24e6de6f5c988f712=. Additive report SHA256
+=d8785ea5a5108a649ff401af20a4db3939a2319c4514442fe1c0287a0b922035=;
+independent review =d7945f156d033adbfd9f42a89e556d341dee5e63248b2534d1040ee577fbc6d2=;
+[[https://github.com/ligon/LSMS_Library/issues/1287#issuecomment-6527830265][accepted bounded checkpoint]].
