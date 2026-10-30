@@ -40,4 +40,23 @@ No formulas, reducers, weights, eligibility or compiler retirement.
 None blocking authorized scope. Root retains independent review/publication.
 
 ## Phase 3
-Pending scoped baseline, patched synthetic and actual cached-source checks.
+- OK (§2–§5): direct branch reuses _restrict_to_waves after the None gate;
+  no duplicate filtering algorithm, builder change or failure-policy change.
+- OK (§4): nine new direct-route cases plus updated GH1039 deferred assertion;
+  baseline corrected new tests 2 fail / 6 pass before the ninth missing-output
+  case was added. Patched broad selection 195 pass / 2 known oracle-contract
+  failures / 3 credential skips; corrected affected selection 10 pass. Union:
+  197 distinct passing cases, 3 skips. Original failures retained in evidence.
+- OK (§3–§4): actual private fresh-L2 Tanzania baseline Make returns 6,555 rows
+  for 2019-20; patched returns 1,212 (2020-21 5,343; absent supported wave zero).
+  Full output remains 6,555, native 6,562; seven all-null rows are removed by
+  the unchanged finalizer. 26 cross-revision/backend comparisons exact in keys,
+  order, dtype, null mask, attrs and nonmissing NumPy numeric payload.
+- OK (§4): metadata-only sample moves all five fingerprints/country hashes;
+  conservatively expect broad invalidation, not just Tanzania/Make. Repeated
+  Make work and successful-output freshness remain outside this repair.
+- No contradiction or reinvention in the product change. Test oracle correction:
+  attrs describe the selected frame, so expected attrs must come from finalizing
+  the selected native rows, not slicing already-finalized full-frame metadata.
+- Root retains independent review, public publication and PR1312 integration.
+
