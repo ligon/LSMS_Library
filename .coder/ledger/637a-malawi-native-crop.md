@@ -26,7 +26,9 @@ definitions, merged labor and G/H work remain exact. No global schema/core edit.
 Nine production/test files are extracted byte-exact from reviewed/tested f4e40f.
 That source's bounded synthetic selection passed58,35 data-gated deselected;
 no cohort is replayed for publication. Current base retains all Malawi source
-and target tests from104655, and core/schema/runtime-lock equivalence is checked.
+and target tests from104655, and Country/Feature/paths/schema/runtime-lock bytes are exact. The public
+local_tools.py retains its separately merged tuple-transform chain fix in
+df_data_grabber; this extraction does not edit it.
 
 Accepted staged actual evidence used24 G/P/I/Q captures once,8 native children,
 2 real compilers and4 independent native-code/own-payload/sale oracles. Candidate

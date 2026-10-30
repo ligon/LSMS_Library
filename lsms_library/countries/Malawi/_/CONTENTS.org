@@ -4577,3 +4577,67 @@ reused rather than replayed. Named guards and reviewed read routes support the
 finite no-replay claim, not universal kernel IO measurement. #1174 eligibility,
 #1190 units, #1278 namespace, other compiler/reader caveats and whole #1120
 closure remain separate.
+
+
+* 2026-10-30 -- native crop codes retained at the served grain (GH #637 A)
+
+The settled [[https://github.com/ligon/LSMS_Library/issues/637#issuecomment-6366561080][native-code ruling]] is now implemented: =production_obs= is
+=reported:G:<original code>= or =reported:P:<original code>=, before the
+perennial offset/recode. Seasonal G and perennial P have overlapping native
+code spaces. Distinct codes mapping to one preferred crop label now retain
+their own quantities, missing masks, variety/factor identity and attached
+sales. Same-code/unit/condition repeated lines retain the existing reported
+sum and first nonmissing dates. This coordinate is neither a physical plot
+identifier nor raw source-line position.
+
+The historical “crop_variety ... splits no key” and “awaits a grain ruling”
+passages above record the earlier state; the coordinate now resolves defect A.
+Only three helper functions, four native uniqueness guards and the country
+index declaration change. Existing sale-basis ladder, units, factor tables,
+source eligibility, G/H and labor behavior remain unchanged. No global schema
+change or factor estimation is introduced.
+
+The reviewed source's bounded synthetic selection passed 58 tests (35
+source-gated cases deselected). Accepted staged verification captured the 24
+G/P/I/Q inputs once, then ran four baseline and four candidate native children,
+both real country compilers and four source-keyed native-code/own-payload/sale
+oracles. Candidate native rows by wave were 33,549 / 12,671 / 37,177 / 51,973
+(total 135,370), versus 135,078 at the old collapsed grain. These are observed
+counts, not hard-coded expectations. Unrecognized-crop exclusions 1 / 24 / 0 /
+66 remain explicit. No perennial alias-pair coexistence was observed within a
+wave; all 12 old/new reference-pool comparisons passed. Sales behavior is not
+assumed invariant merely because its helper is unchanged.
+
+Separate saved-output checks passed full typed compiler CALL parity and the
+135,370-row normal Country comparison against the source-composed expectation.
+The first genuine Feature and fresh-process Country/Feature warm checks passed
+exact typed axes/order/payload/attrs comparisons. Five cache files, committed
+maps and seven adopted inputs closed unchanged. This combines matching stages:
+native prerequisites and finalized sample-v were explicitly composed from
+closed evidence; it is not fresh normal sample/cache/weight verification.
+The source-only test and actual operands were not replayed for publication.
+
+Two original failed stages remain failed: an internal 120-second compiler-check
+timeout (not established preemption; later saved comparisons passed) and the
+strict-read rejection below. Eight native writer RETURN/storage full typed
+comparisons also remain false. Qualified saved-output attribution found strict
+axes/dtypes and separately unchanged rows/payload/masks, with attrs explained by
+JSON metadata representation. That explanation does not make them full typed
+frame passes.
+
+** Existing missing plots: current 41 versus historical 40
+
+The historical 40-row statement above is retained. Current closed baseline,
+candidate and independent pre-sales evidence each contain 41 missing =plot_id=
+rows in 2016-17, all perennial-module rows with known households. The normal
+Country and its expectation retain those same 41; =i=, =v= and =production_obs=
+are nonmissing. The native-code change did not introduce these missing plots.
+=LSMS_READ_STRICT= correctly raises =NullIndexKeyError= for this existing
+nullable declared axis; default reads warn and preserve the rows. No sentinel,
+plot inference or deletion is added here to obtain strict green.
+
+This differs from [[https://github.com/ligon/LSMS_Library/issues/1357][GH #1357]]: genuinely anonymous households remain excluded
+from household-keyed tables. Its ruling does not authorize deleting known
+households' observations merely because plot identity is missing. Missing-plot
+representation, other #1120/#637 scope and #1228/#1190/#1174/#1278 caveats remain
+separate; this checkpoint does not close the whole backlog.

@@ -1347,8 +1347,8 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     All keyword args are RAW column names in ``df`` (or None when the
     wave/module lacks that field).  ``df`` must already carry an ``hhid``
     string column.  Returns a long DataFrame with the canonical columns
-    (i, plot, crop, crop_code, Quantity, u, condition, planting_month,
-    harvest_month, intercropped, perennial) -- NO aggregation.
+    (i, plot, crop, crop_code, production_obs, Quantity, u, condition,
+    planting_month, harvest_month, intercropped, perennial) -- NO aggregation.
 
     ``condition`` is Module G's ``ag_g13c`` ("(S/U)").  It was accepted and
     silently DISCARDED from this function's first version until GH #854;
@@ -1371,13 +1371,18 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
 
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
     plot = df[plotkey].apply(format_id).astype('string')
+    # Native instrument code before perennial offset/recode; canonical axis
+    # and G/P qualification follow the GH #637 ruling (ledger 637a §2-3).
+    raw_code = df[cropcode].apply(format_id).astype('string')
+    production_obs = ('reported:' + ('P' if perennial else 'G') + ':'
+                      + raw_code).astype('string')
 
     # The crop at its NATIVE grain, un-collapsed (GH #854 red-team item 2).
     # `harmonize_crop` maps codes 1-4 all to 'Maize' and 17-26 all to 'Rice';
     # the shipped IHS5 conversion tables key their kg factors on the VARIETY,
-    # and the varieties genuinely differ.  Carried as a COLUMN, never an index
-    # level: it is functionally determined by the crop code, so putting it in
-    # the grain would split no key and only widen the index.
+    # and the varieties genuinely differ. crop_variety stays a column, while
+    # production_obs carries the native code in the declared grain. The old
+    # "splits no key" claim was false before that code survived final collapse.
     crop_variety = _map_codes(crop_code_int, _malawi_code_map(_VARIETY_TABLE))
 
     # GH #856: 13 OTHER (SPECIFY) rows whose own specify text restates a
@@ -1422,6 +1427,7 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
         'plot_id':           plot.values,
         'crop':           crop_label.values,
         '_crop_code':     crop_code_int.values,
+        'production_obs': production_obs.values,
         'Quantity':       quantity.values,
         'u':              u.values,
         'condition':      crop_condition.values,
@@ -2100,7 +2106,8 @@ def _consolidate_harvest(harvest_pieces):
     harv = pd.concat(harvest_pieces, ignore_index=True)
     harv['u'] = harv['u'].astype('string')
     harv['condition'] = harv['condition'].astype('string')
-    keys = ['i', 'plot_id', 'crop', 'u', 'condition', '_crop_code']
+    keys = ['i', 'plot_id', 'crop', 'u', 'condition', '_crop_code',
+            'production_obs']
     return _sum_reported(harv.groupby(keys, as_index=False, dropna=False), keys, {
         # EXACT, not a reduction: `crop_variety` is a function of
         # `_crop_code`, which is in the key, so every row in a group carries
@@ -2137,11 +2144,11 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     Returns
     -------
     pd.DataFrame indexed (t, i, plot, crop) with columns Quantity, u,
-    condition, Quantity_sold, Value_sold, Derivation, planting_month,
-    harvest_month, intercropped, perennial.  Quantities and values remain
+    condition, production_obs, Quantity_sold, Value_sold, Derivation,
+    planting_month, harvest_month, intercropped, perennial.  Quantities and values remain
     reported; attachment/basis interpretation may be derived by the ladder
-    below.  The reported harvest condition is preserved.  ``u`` and
-    ``condition`` are declared INDEX LEVELS in
+    below. The reported harvest condition is preserved. ``u``, ``condition``
+    and ``production_obs`` are declared INDEX LEVELS in
     ``_/data_scheme.yml`` and are promoted by the framework; they are left
     as columns here for the same reason ``u`` always was.
 
@@ -2220,29 +2227,10 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         tallies = {'sale_suppressed': tally, 'sale_basis_mismatch': mismatch,
                    'sale_basis_ladder': {}}
 
-    # The 2026-09-08 RESIDUAL is CLOSED by GH #854.  It read: the defensive
-    # collapse at the end of this function keys on (t, i, plot, crop) -- u is
-    # a COLUMN here -- so it fires when a plot-crop was harvested in TWO
-    # units, and .first() skips NA per column, so it could take `u` from one
-    # row and `Quantity_sold` from another, re-creating exactly the
-    # mislabelling the (i, _crop_code, u) merge above removes.  (Measured then
-    # on the raw modules: 32 plot-crops of 135,410, 0.024%, carry more than
-    # one harvest unit.)  The collapse below now keys on the FULL declared
-    # grain (t, i, plot, crop, u, condition), so it can no longer mix two
-    # units -- or two states -- into one row.
-    #
-    # It is NOT "a guard against a genuinely repeated line" (what this comment
-    # used to say; GH #637 tail diagnosis, 2026-10-23).  A repeated line at
-    # this grain shares its `_crop_code` too, so `_consolidate_harvest` has
-    # already merged it; the collapse below never sees one.  It fires in EVERY
-    # wave -- 127 / 54 / 7 / 98 groups (2010-11 / 2013-14 / 2016-17 /
-    # 2019-20) -- and every one of those groups is two or more DISTINCT crop
-    # codes that `harmonize_crop` maps to one label (Maize 1-4, Citrus, the
-    # groundnut and rice varieties): it sums their harvests and keeps the
-    # first row's `crop_variety` and sale.  That is defect A of the #637 tail,
-    # held for a grain ruling (@ligon) -- not changed here.  Only the quantity
-    # reducer moved: `_sum_reported`, so two codes that BOTH left the quantity
-    # blank (1 group, 2013-14) are not re-minted into a harvest of 0.0.
+    # GH #637 defect A: keep each native crop coordinate instead of final
+    # sum/first across codes sharing a preferred label. Same-code/unit/state
+    # line reduction remains in _consolidate_harvest; sales and factors retain
+    # their existing code-based rules (ledger 637a §4-5).
     # crop must be non-null for the index; rows where the code did not map
     # to a Preferred Label are dropped from the index axis.  No crop code
     # in harmonize_crop maps to a null Preferred Label, so this fires only
@@ -2265,28 +2253,13 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     harv = harv.drop(columns=['_crop_code'])
     harv['t'] = t
 
-    # Defensive de-duplication at the DECLARED grain.  `u` and `condition`
-    # stay COLUMNS (the framework promotes them, exactly as it always has for
-    # `u`), so the check is on columns rather than on index levels; keeping
-    # them out of the index also keeps the ~8.5k rows whose `u` is NULL,
-    # which a set_index + groupby would delete on a NaN key (GH #323 3b).
-    _grain = ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
+    # These columns are promoted by the framework. Refuse a repeated full
+    # native coordinate rather than selecting another code's variety/sale.
+    _grain = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs']
     if harv.duplicated(_grain).any():
-        harv = _sum_reported(harv.groupby(_grain, as_index=False, dropna=False), _grain, {
-            'crop_variety':   'first',
-            'Quantity_sold':  'first',
-            'Value_sold':     'first',
-            '_branch':        'first',
-            'planting_month': 'first',
-            'harvest_month':  'first',
-            'intercropped':   'first',
-            'perennial':      'first',
-        })
+        raise ValueError('Malawi crop_production repeats a native crop coordinate')
 
-    # The registry key, stamped AFTER the collapse (CLAUDE.md, "Derived
-    # Values": a post-collapse stamp is the wave script's own uniqueness
-    # claim).  '' is an exact match and carries NO key; NA where no sale
-    # attached at all.
+    # Stamp the unchanged registered sale-basis branch on each native row.
     branch = harv['_branch'].astype(object)
     harv['Derivation'] = pd.array(
         [pd.NA if (b is None or pd.isna(b) or b == '') else str(b) for b in branch],
