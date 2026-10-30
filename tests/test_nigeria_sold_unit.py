@@ -96,6 +96,21 @@ EXPECTED_CANON_AGREEMENT = {
 }
 
 
+def _skip_partial_sold_unit_cache(path):
+    """The two pinned PH-wave counts require recorded coverage (GH #1146)."""
+    from lsms_library.local_tools import read_parquet_cache_waves
+
+    coverage = read_parquet_cache_waves(path)
+    if coverage is None:  # GH #1113: legacy/Make coverage remains unknown.
+        return
+    missing = sorted(set(EXPECTED_RAW_AGREEMENT) - set(coverage))
+    if missing:
+        pytest.skip(
+            f"partial warm Nigeria {TABLE} cache: lsms_cache_waves lacks "
+            f"required sold-unit waves {missing}; no cold rebuild (GH #1146)"
+        )
+
+
 # --------------------------------------------------------------------------
 # helpers
 # --------------------------------------------------------------------------
@@ -320,10 +335,12 @@ class TestBuiltTable:
         path = data_root() / "Nigeria" / "var" / f"{TABLE}.parquet"
         # The read is the check, not a prior exists(): since GH #866 a rebuild
         # deletes var/ first, so the file can vanish in between (GH #778).
+        _skip_partial_sold_unit_cache(path)
         try:
             df = pd.read_parquet(path)
         except FileNotFoundError:
             pytest.skip("no warm Nigeria crop_production parquet (absent, or mid-rebuild)")
+        _skip_partial_sold_unit_cache(path)
         if UNIT_SOLD not in df.columns:
             pytest.skip("warm Nigeria crop_production parquet predates Unit_sold (re-warm needed)")
         t = df.index.get_level_values("t") if "t" in df.index.names else df["t"]
@@ -342,10 +359,12 @@ class TestBuiltTable:
         from lsms_library.local_tools import data_root
         path = data_root() / "Nigeria" / "var" / f"{TABLE}.parquet"
         # The read is the check (GH #778); see the test above.
+        _skip_partial_sold_unit_cache(path)
         try:
             cols = pd.read_parquet(path, columns=None).columns
         except FileNotFoundError:
             pytest.skip("no warm Nigeria crop_production parquet (absent, or mid-rebuild)")
+        _skip_partial_sold_unit_cache(path)
         if UNIT_SOLD not in cols:
             pytest.skip("warm Nigeria crop_production parquet predates Unit_sold (re-warm needed)")
         import lsms_library as ll
@@ -355,6 +374,7 @@ class TestBuiltTable:
                 df = ll.Country("Nigeria", assume_cache_fresh=True).crop_production()
             except FileNotFoundError:
                 pytest.skip("warm Nigeria crop_production parquet vanished mid-read (rebuild in progress)")
+        _skip_partial_sold_unit_cache(path)
         assert UNIT_SOLD in df.columns
         assert str(df[UNIT_SOLD].dtype).startswith("string"), df[UNIT_SOLD].dtype
         assert UNIT_SOLD not in df.index.names
