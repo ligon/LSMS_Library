@@ -241,6 +241,13 @@ def test_explicit_alias_selection_and_same_logical_repetition(actor):
     actual = compiler.concat_wave_parquets(table, ['2021-22', '2021-22'])
     exact(actual, pd.concat([store['shared'], store['shared']]))
     assert [e[1] for e in events if e[0] == 'read'] == ['shared', 'shared']
+    events.clear()
+    actual = compiler.concat_wave_parquets(
+        table, ['2011-12', '2021-22', '2021-22', '2011-12'])
+    # First occurrence of the second alias skips; each SAME logical repeat
+    # retains one additional complete physical frame, even after an alias.
+    exact(actual, pd.concat([store['shared']] * 3))
+    assert [e[1] for e in events if e[0] == 'read'] == ['shared'] * 3
 
 
 @pytest.mark.parametrize('empty', ['first', 'last', 'all'])
