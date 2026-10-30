@@ -2750,3 +2750,32 @@ second recorded full-warm passes. Own-round membership, composite sample =v=,
 native source EA and existing panel/recall-window caveats remain distinct.
 This accepts one roster runtime cell, leaving plot_features, community_prices,
 food_coping and housing runtime cells, #1288 failure paths and whole #1287 open.
+
+* GH #1150 slope-unit reconciliation (2026-10-30)
+
+The issue and older =nigeria.py=/wave comments called =PlotSlope= degrees.
+That uncited premise was contradicted, not silently treated as reliable:
+direct metadata inspection of held W4 =nga_plotgeovariables_y4.dta=
+(MD5 =bba0142518076269462546a9990f005e=) labels =srtmslp_nga=
+"Plot Slope (percent)" and stores it as text. The helper only parses the
+number; it does NOT convert percent to degrees. An independent review then
+checked EACH feeding source's official dictionary, all reporting percent:
+
+| Feed | Driver source | Official dictionary |
+|------+---------------+---------------------|
+| W1 | nga_plotgeovariables_y1.csv | [[https://microdata.worldbank.org/index.php/catalog/1002/data-dictionary/F3?file_name=NGA_PlotGeovariables_Y1][catalog1002/F3]] |
+| W2 | nga_plotgeovariables_y2.csv | [[https://microdata.worldbank.org/index.php/catalog/1952/data-dictionary/F19?file_name=NGA_PlotGeovariables_Y2][catalog1952/F19]] |
+| W3 | nga_plotgeovariables_y3.csv | [[https://microdata.worldbank.org/catalog/2734/data-dictionary/F98?file_name=NGA_PlotGeovariables_Y3][catalog2734/F98]] |
+| W4 | nga_plotgeovariables_y4.dta | [[https://microdata.worldbank.org/index.php/catalog/3557/data-dictionary/F96?file_name=nga_plotgeovariables_y4][catalog3557/F96]] |
+
+The W1-W3 evidence is official variable documentation plus current driver
+mapping, NOT a new measured-byte comparison to the original CSV export.
+The missing historical CSV export receipt remains a provenance limitation.
+W4 has both the measured held-file label and independent official-document
+corroboration. W5 has no plot geovariables feed and remains missing.
+
+Under the coordinator's final #1150 disposition, =PlotSlope= is now declared
+optional in native PERCENT for Nigeria and Ethiopia. No Nigeria value, join,
+key, dtype or round assignment changes; no inverse conversion or range-based
+unit inference was used. The post-planting-only design and W5 questionnaire
+renumbering remain in force. The rejected degree conversion is not shipped.

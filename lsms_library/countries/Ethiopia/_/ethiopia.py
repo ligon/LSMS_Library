@@ -929,7 +929,58 @@ def _convert_local_area_units(t, field, colmap, area_ha, native_unit):
     return out, n_converted, n_implausible
 
 
-def plot_features_for_wave(t, sect2, sect3, colmap):
+PLOT_GEOVARIABLE_COLUMNS = ['plot_twi', 'plot_srtm', 'plot_srtmslp',
+                           'dist_household']
+
+
+def _plot_geovariables_for_fields(field, geovar, colmap):
+    """Align WB values to existing fields without merging their payload.
+
+    Reuses native holder-aware identity (ledger #1150 §§2–4). W2/W3's
+    output household_id2 is deliberately NOT the source join household_id.
+    Duplicate keys, including collisions after format_id, are errors.
+    """
+    c = colmap
+    keys = [c['holder_id'], c['join_hhid'], c['parcel_id'], c['field_id']]
+    geo = geovar.rename(columns={'parcelroster_id': c['parcel_id'],
+                                 'fieldroster_id': c['field_id']})
+    def key_index(frame):
+        return pd.MultiIndex.from_arrays(
+            [frame[k].map(format_id) for k in keys], names=keys)
+    source_index = key_index(geo)
+    if geo[keys].isna().any(axis=None):
+        raise ValueError('plot geovariables have missing native keys')
+    if not source_index.is_unique:
+        raise ValueError('plot geovariables have duplicate/conflicting native keys')
+    values = geo[PLOT_GEOVARIABLE_COLUMNS].copy()
+    values.index = source_index
+    aligned = values.reindex(key_index(field))
+    aligned.index = field.index
+    return aligned
+
+
+def _attach_plot_geovariables(out, field, geovar, colmap):
+    """Attach WB native values to assembled fields; preserve payload and attrs.
+
+    PlotSlope is percent in all five sources, as in Nigeria's source
+    dictionaries (GH #1150). This is passthrough, not a library derivation.
+    """
+    raw = _plot_geovariables_for_fields(field, geovar, colmap)
+    for source, target in [('plot_twi', 'PlotWetnessIndex'),
+                           ('plot_srtm', 'PlotElevation'),
+                           ('plot_srtmslp', 'PlotSlope')]:
+        out[target] = pd.to_numeric(raw[source], errors='raise').array
+    # WB text "NA" and empty/whitespace strings are missing, not zero.
+    # Numeric W1-W3 distances never round-trip through text.
+    distance = raw['dist_household']
+    if not pd.api.types.is_numeric_dtype(distance):
+        distance = distance.astype('string').str.strip()
+        distance = distance.replace({'': pd.NA, 'NA': pd.NA})
+    out['PlotDistanceToHousehold'] = pd.to_numeric(distance, errors='raise').array
+    return out
+
+
+def plot_features_for_wave(t, sect2, sect3, colmap, geovar=None):
     """Build canonical ``plot_features`` for one Ethiopia ESS wave.
 
     Parameters
@@ -974,6 +1025,11 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
             region / zone / woreda — the geography columns the WB woreda
                           factor table keys on (default ``saq01`` /
                           ``saq02`` / ``saq03``).
+
+    geovar : pd.DataFrame, optional
+        WB plot covariates, attached on the full native field key. Adds
+        PlotElevation (metres), PlotWetnessIndex, PlotDistanceToHousehold
+        (km), and PlotSlope (percent, unchanged WB value). Omitted inputs add no columns.
 
     Returns
     -------
@@ -1113,6 +1169,8 @@ def plot_features_for_wave(t, sect2, sect3, colmap):
         'ErosionProtection': erosion.values,
         'Certificate':       field['_Certificate'].astype('boolean').values,
     })
+    if geovar is not None:
+        out = _attach_plot_geovariables(out, field, geovar, c)
     out = out.dropna(subset=['i', 'plot_id'])
     out = out.set_index(['t', 'i', 'plot_id'])
     return out

@@ -40,7 +40,8 @@ colmap = dict(
     erosion_yes= 2, erosion_no = 1,   # W1-W3 code 2=Yes / 1=No
 )
 
-df = plot_features_for_wave('2013-14', sect2, sect3, colmap)
+geovar = get_dataframe('../Data/Pub_ETH_PlotGeovariables_Y2.dta', convert_categoricals=False)
+df = plot_features_for_wave('2013-14', sect2, sect3, colmap, geovar=geovar)
 
 assert df.index.is_unique, "Non-unique (t, i, plot_id) index in plot_features 2013-14"
 assert len(df) > 0, "plot_features 2013-14 produced no rows"
