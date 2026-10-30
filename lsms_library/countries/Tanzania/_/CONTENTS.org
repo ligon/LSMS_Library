@@ -2388,3 +2388,37 @@ Unknown-unit residual, 2019 family roster IDs and all science remain unchanged.
 Exact source/evidence and staged verification live in
 =.coder/ledger/905-tanzania-public-extraction.md=.
 Real-source parity, runtime speed and live build-hash impact remain unmeasured.
+
+* 2026-10-30 -- Livestock actual runtime checkpoint (GH #1287 / #905)
+
+At source =d378c7e6245f86e481b8d58b13317cfcd6d323d9=, dispatch
+=9b5b98461a8444caa7c42ca3e38adbc2= (job 40648418) executed both modern
+native livestock producers and the country compiler through GNU Make.
+The 1,219 / 5,343 native rows produce 6,562 compiler rows, exactly matching
+their ordered concatenation followed by the existing household walk.
+Typed CALL/RETURN and production-reader storage comparisons pass. The exact
+historical/current livestock helpers also agree on the captured source inputs.
+This supplies selected real-source parity missing at the earlier checkpoint;
+runtime speed and live build-hash impact remain unmeasured. The two held
+agriculture optimizations remain held.
+
+Normal Country assembly legitimately rebuilt the hashless native outputs.
+It matches existing-finalizer expectations: 6,555 full rows and 1,212 for
+2019-20, with seven all-null rows removed only at that existing boundary.
+Singleton Feature matches with explicit =currency=None= and its named-axis
+alignment. A fresh process passes exact full/subset Country and aligned Feature
+comparisons, including row order and attrs. Five owned data-root files retain
+exact hashes, sizes, modes and nanosecond mtimes, with no observed warm raw read,
+producer, compiler or sanctioned write.
+
+Three failed harness phases remain recorded: bare-pandas index representation,
+historical-helper lookup from the wrong working directory, and incompatible
+default Feature alignment. Saved-operand/manual continuations did not rerun
+Make or extend the deadline. Decoder entrypoints and directory metadata were
+not measured; pre-API direct-Make parquet bytes were not separately archived,
+although their successful storage comparisons and CALL/RETURN witnesses remain.
+Final API parquets were archived. The worker task remains unfinished for its
+stronger unmeasured instrumentation predicates. Existing-production composition/finalization
+is not an independent scientific oracle for IDs or population. This accepts
+one of twelve compiler runtime cells, not whole #1287, panel/grain policy or
+country closure. Back-casting, Extended/Refresh and WAITING #114 remain live.
