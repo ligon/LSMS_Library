@@ -6,13 +6,29 @@
 :CUSTOM_ID: food-price-capability-846
 :END:
 
-The retained C4 quotation in =slurm_logs/price_sources/Tanzania/REPORT.org=,
-§1 “The questionnaire, quoted”, explicitly names the *2019-20 NPS-SDD*
-household instrument =nps_sdd_household_qx_final_english_.pdf=, Section J
-qq2-6. That module asks no separate purchase unit price, and q5 asks
-own-production consumption *quantity*, not monetary value. Record these two
-source concepts as =not-asked= for *2019-20 Section J only*, =checks_run=C4=;
-do not transfer the claim to an unsearched wave or claim a fresh API run.
+Authenticated independent C4 review supports two findings in each of the six
+logical waves' *depicted household food modules*: no separately elicited
+purchase unit price, and own-production consumption quantity/unit without a
+monetary response. These are =instrument_finding=not-asked-within-module=;
+all twelve country-local coverage records remain =verdict=unsure=,
+=closes=False=. C1 shipped-source label census and C3 applicability/direct
+versus derived harmonized lineage remain outstanding. No live cell is closed.
+
+Exact one-based PDF locators: UPQ 87-88 is the union model; original R1
+(2008-09) K1 is 95-96, R2 (2010-11) K1 is 93-94, R3 (2012-13) J1 is 91-92,
+and R4 (2014-15) J1 is 89-90. UPD BID 5-6/19/29 establishes these reconstructed
+original-round panels, not four independently held original PDFs. The common
+=2008-15/= folder alone is not round provenance. SDD 2019-20 J1 is PDF 53-57;
+Y5 2020-21 standard J1 is PDF 34-38 and *released alternate J1A* is 39-42.
+DDI 5639 describes =hh_sec_ja1= and =j1_selection= despite editorial marks;
+retain both forms without inferring assignment, item eligibility or API loss.
+
+Completed =checks_run=C2;C4= means scoped instrument/channel and official
+dictionary comparison plus independent questionnaire review, not raw-header
+C1. Secondary layout extraction emitted 14 rotated-text/incomplete-layout
+warnings; normal-text hashes reproduced 30 critical pages. No full raster/OCR
+or complete visual-blackout inspection is claimed. BID 19's broad quantity/value
+summary is not a monetary value question for every channel.
 
 Q4 spending is explicitly paired with q3 purchased quantity: their ratio is
 a genuine purchased-food unit value. Section F's market value of unpurchased
@@ -20,15 +36,14 @@ food *outside the household* concerns a different universe/grain. Neither
 fact licenses declaring the whole =food_prices= / =food_acquired= table
 absent, and an imputed own-consumption value remains a separate #585 choice.
 
-See =_/food_price_capability.md= for exact retained evidence and scope, and
-=_/capabilities/food_price_absent_verdicts.csv= for the country-local two-row record in
-the existing verdict CSV schema. Its =feature= values are price-study source
-concepts, not canonical features. The live coverage matrix does *not* load
-this staged record. Shared concept/wave-scoped integration belongs to the
-coordinator; the current =SeriesCapability= registry is whole-feature/series
-and automatically reports =C1;C4=, which this retained evidence cannot claim.
-Other waves remain unadjudicated. No questionnaire or microdata was newly
-read for this source-only recording (Sue / Codex).
+See =_/food_price_capability.md= for document hashes, exact module scope and
+accepted review limits; =_/capabilities/food_price_absent_verdicts.csv= extends
+the existing country-local schema with actual instrument findings and open
+coverage acceptance. Its =feature= values are price-study source concepts,
+not canonical features. The live matrix does *not* load it. No shared accessor
+is added; =SeriesCapability='s whole-series/feature scope and automatic C1;C4
+cannot represent this partial evidence. The original #846 live integration
+requirement remains open. No microdata, table or current API replay occurred.
 
 * Survey design --- read before touching ANY 2008-15 table
 :PROPERTIES:
