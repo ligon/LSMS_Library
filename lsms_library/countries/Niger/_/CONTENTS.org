@@ -2106,3 +2106,24 @@ declared-grain doctrine remain in tension. This change preserves those native
 duplicates and takes no missing-axis/reducer decision. See the public-extraction
 ledger for retained failed/partial tests and finite candidate-only verification.
 
+
+* 2026-10-29 -- proposed producer/physical compiler composition (GH #1287)
+
+Source preparation only, not runtime or survey acceptance. The five country
+recipes use a declaration-aware producer before the country compiler. Distinct
+logical aliases of one physical folder produce/read its complete native frame
+once in first-seen logical order; no t filter or native-row reducer is added.
+An explicit helper selection repeating the SAME logical wave retains its
+previous multiplicity. A shared YAML physical destination may also be a
+logical-year L2 path: YAML loads therefore scope LSMS_NO_CACHE=1, restoring
+exact prior presence/value on all outcomes. This is process-global and requires
+a serial dedicated producer process, not concurrent producer/cache-user threads.
+
+A null/empty declaration without a native script remains declared but lacks an
+executable extraction producer, so it refuses before builds rather than reading
+a script cache. Native scripts retain precedence over null and !make metadata.
+A scriptless !make declaration is a separate UNSUPPORTED builder gate, not
+missing data or retirement; custom Make routing is not implemented or accepted.
+Native-script cache bypass, stale outputs/#1288, actual-source/default/Make/API
+equality, cache census/re-warm and scientific definitions remain separate gates.
+See ledger 1287-niger-producer-compiler-integration and its unexecuted new tests.
