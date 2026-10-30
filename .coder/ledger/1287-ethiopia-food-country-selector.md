@@ -146,3 +146,53 @@ The helper mapsj/keepsi documentation discrepancy, split PanelI/PanelII, origina
 native143 provenance and original STOPPED/accepted0 transaction retain their
 existing meaning. Root owns any public PR integration; no further tests or
 public writes are performed by this source-only preparation.
+
+
+### Phase4 — real cached compiler and composed normal API validation
+
+The earlier synthetic-only holds are historical. Under resumed scoped authority,
+one real cached country compiler run on543481ba passed:326456rows from the five
+native wave parquets(1,458,512B), plus seven decoded cover reads on twoMD5-verified
+W2/W3 blobs(4,088,105B). Full reader frames/attrs, output payload/t/i/u/s, seven
+input files(bytes/modes/mtimes) and11source bindings remained exact; the sanctioned
+writer reread matched. Outer8.61s, core32/8GiB/120+5. Localjwalker/label behavior
+was preserved; this is not new household linkage or raw-food science acceptance.
+
+A separate seeded private normalAPI process used ten declaredMD5-verifiedL1
+objects(369,754,673B) and twelveL2seeds(3,585,960B), current hash invalidation,
+committed crosswalkJSONs and normalMake/Python producers, core32/8GiB/600+5.
+It ran five food and five sample Make targets, then FAILED at89.73s because the
+review script incorrectly compared Country/Feature MultiIndex levels positionally.
+Feature._harmonize_country_frame(feature.py732–737) explicitly reorders named
+levels; both actualframes held326456rows. That failed actor remains failed,
+with its source/command/log/receipt preserved; no clean coldPASS is claimed.
+Parent observers did not measure raw reader calls inside producer children.
+
+A new source-only verification successor corrected only the expected named-axis
+projection: require identical level-name sets and compare Feature's country
+slice to Country.reorder_levels(Feature-level-names), retaining exact values,
+row order/dtypes/categorical assertions and original operands. It copied the
+already-produced private cache, reverified ten rawMD5s and exact copied cache
+hash/size/mode/mtime snapshots; no native producers were replayed.
+Readback then a fresh-process warm both passed(17.13s/13.15s outer), each bounded
+120+5s oncore32/8GiB. Both required zeroMake, zero parentraw reads and zero walks;
+all22private cache entries and37source bindings remained exact. Each route's
+sanctioned oracle completeframe/dtype/attrs checks passed. This is composed
+failed-rebuild plus successful readback/warm evidence, not a repeated cleancold.
+
+Country and Feature serve326456rows withv on every row, wave rows:
+30815/44304/67209/99541/84587 forW1–W5. Q3/Q5/Q6 and source-specific units,
+Expenditure NA where unasked, original singleton squeeze and the localj-versus-i
+walker discrepancy remain unchanged. Quantity warnings59/25/32/8/2 perwave,
+the cluster code-space boundary and three population universes are retained;
+these quantities are not clipped or scientifically adjudicated. RawW1 warning
+purchased positive quantity/no unit count10 contradicts the existingCONTENTS9;
+both attributed measurements remain. W3 source decoding emitted the existing
+UTF-8→Latin-1 warning; no encoding or label repair is claimed.
+
+Original65PASS1FAIL/STOPPEDaccepted0 and corrected singleton1PASS remain separate,
+as does configured publicCI at543481ba(unit+Windows success;data jobs skipped).
+No full66 or historical333 was replayed. This documentation successor changes
+no production/helper/test bytes. Exact public-headCI/root publication are separate;
+no kilogram/price/factor repair, new-wave scientific support or resolution of
+sampling/panel/doc contradictions follows from this finite validation.
