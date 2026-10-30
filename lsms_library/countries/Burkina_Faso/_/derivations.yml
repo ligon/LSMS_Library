@@ -100,3 +100,53 @@ Burkina_Faso::food_acquired::7day-purchase-at-last-purchase-unit-value:
     labels), so the reading carries by inference, not by measurement here.
   contents: 'Burkina_Faso/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
+
+Burkina_Faso::community_prices::quoted-native-unit-count:
+  waves: ['2018-19']
+  columns: [Quantity]
+  rule: >-
+    Quantity=1 counts one QUOTED native unit-size u per reported FCFA price.
+    It is not a reported physical quantity, kg weight or unit-conversion
+    factor. The source records no quantity. Price is served unchanged in
+    both slots; complete product+unit codes remain in the constructed variety
+    coordinate. Raw inputs expose the original seven fields without Quantity.
+  function: lsms_library.countries.Burkina_Faso.2018-19._.mapping:derive_quoted_native_unit_count
+  inputs: lsms_library.countries.Burkina_Faso.2018-19._.mapping:inputs_community_prices
+  raw_variables: [grappe, vague, Existe, s05q01, s05q02, s05q03, s05q04]
+  assumptions:
+    - text: >-
+        The own Burkina PRICE CAPI form selects up to six unit-sizes per
+        product and generates two integer FCFA price questions5.03/5.04
+        per selected unit-size, with positive/multiple5 validators and no
+        quantity entry. This is a different instrument from the FOCUS
+        workbook, which shows three quantity/price pairs.
+      basis: questionnaire
+      evidence: >-
+        UEMOA catalogue43, Qx_EHCVM_PRIX_BF and Qx_EHCVM_PRIX_BF_V2,
+        https://phmecv.uemoa.int/nada/index.php/catalog/43/download/104
+        (v1p10) and /download/105 (v2p9). Authenticated PDF SHA256
+        d6eb8a277defdae6c775cadef99dc594d0216baa4c185a420c7a2b1c30172f41
+        and78195ddbc9c7b01ec660e5d4acf8f9249c4ec32f276068a8d31a1889ef7dc30d.
+    - text: >-
+        Interpret the selected-unit quote as the price of one native u,
+        following the explicit Niger one-item-per-price precedent and
+        GH1226 direction. The count is constructed, not an observed answer;
+        a sack or Demi remains one quoted sack or half, never inferred kg.
+        No price rounding, positivity filtering or missing-value filling
+        follows from the form validators.
+      basis: modelling-choice
+      evidence: >-
+        Shared community_prices Price-one-u contract; Niger derivation
+        one-item-per-price; own Burkina PRICE instrument above; GH #1226
+        source/instrument review (2026-10-30).
+  validated_against: >-
+    Instrument and modelling contract only. No reported quantity exists
+    against which the derived count can be numerically validated. Native,
+    API and fresh-process warm validation on authenticated closed source
+    operands pass at c8f8bcc976 (138,534 rows). This is saved-source reuse,
+    not a fresh raw decoder/source read or standalone Make/compiler claim.
+    Direct native-to-storage strict transport remains failed: visit index
+    nullable Int64 becomes NumPy int64; matching-storage scientific proof
+    passes without normalizing actual frames.
+  contents: 'Burkina_Faso/_/CONTENTS.org, GH1226 PRICE instrument'
+  since: '2026-10-30'

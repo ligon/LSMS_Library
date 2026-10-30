@@ -212,3 +212,125 @@ def shocks(df):
     df['HowCoped2'] = how_coped[2]
     df = df.drop(columns=cope_cols)
     return df
+
+
+# Own PRICE instrument, not the separate FOCUS community workbook (#1226).
+# Exact code-label attestations: UEMOA catalogue43/download/104 and /105,
+# Qx_EHCVM_PRIX_BF / Qx_EHCVM_PRIX_BF_V2. Dictionary labels take precedence.
+_PRICE_PRODUCT_LABELS = {
+    '140': 'Sorgho rouge',       # v2 p6 / v1 p7
+    '141': 'Macoroni',          # printed spelling, v2 p6 / v1 p7
+    '143': 'Sucre en carreaux', # v2 p15 / v1 p16
+}
+_PRICE_UNIT_LABELS = {'1161': 'Canari-petit'}  # v2 p17, BOISSONS
+COMMUNITY_PRICES_DERIVATION = 'Burkina_Faso::community_prices::quoted-native-unit-count'
+_PRICE_INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
+_PRICE_SOURCE = 's05_co_bfa2018.dta'
+
+
+def _price_labels(categories, name):
+    return {tools.format_id(code): str(label)
+            for code, label in categories.get(name, {}).items()
+            if pd.notna(label) and str(label).strip()}
+
+
+def _price_base(codes, community_categories, household_categories):
+    """Native priced-line identity before slot expansion (ledger1226 §§3–5).
+
+    j follows this country's household Original Label crosswalk by product
+    code. Full community unit-size labels supply u; no digit decomposition
+    or guessed kg factor is used. variety is a constructed source coordinate,
+    NOT an answer about physical variety. Raw codes remain available too.
+    """
+    from lsms_library.paths import countries_root
+    path = countries_root() / 'Burkina_Faso'
+    item_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Original Label',
+        dirs=[str(path / '2018-19' / '_'), str(path / '_')],
+        **{'Preferred Label': 'Preferred Label'})
+    codes = codes.reset_index(drop=True)
+    product = codes['s05q01'].map(tools.format_id).astype('string')
+    unit = codes['s05q02'].map(tools.format_id).astype('string')
+    v = codes['grappe'].map(tools.format_id).astype('string')
+    visit = pd.to_numeric(codes['vague'], errors='raise').astype('Int64')
+    if product.isna().any() or unit.isna().any() or v.isna().any() or visit.isna().any():
+        raise ValueError('Burkina s05 has missing native observation keys; cannot discard them')
+    community_items = _price_labels(community_categories, 's05q01')
+    household_items = _price_labels(household_categories, 's07bq01')
+    community_units = _price_labels(community_categories, 's05q02')
+
+    def description(code):
+        return community_items.get(code, _PRICE_PRODUCT_LABELS.get(
+            code, f'Unknown [Burkina_Faso 2018-19 s05q01={code}]')).strip()
+
+    def item(code):
+        raw = household_items.get(code, description(code))
+        return str(item_map.get(raw, raw)).strip()
+
+    def sized_unit(code):
+        # In particular1001 is NOT inferred to be Kg(Petit). Codes2540/2550
+        # keep their own Demi/Entier labels, not an assumed physical mass.
+        return community_units.get(code, _PRICE_UNIT_LABELS.get(
+            code, f'Unknown [Burkina_Faso 2018-19 s05q02={code}]')).strip()
+
+    return pd.DataFrame({
+        't': '2018-19', 'v': v, 'j': product.map(item).astype('string'),
+        'u': unit.map(sized_unit).astype('string'),
+        'variety': ('s05q01=' + product + ';s05q02=' + unit).astype('string'),
+        'visit': visit, 'Description': product.map(description).astype('string'),
+        'SourceProductCode': product, 'SourceUnitCode': unit,
+        'SourceRow': pd.Series(range(len(codes)), dtype='Int64'),
+    })
+
+
+def community_prices_s05(codes, community_categories, household_categories):
+    """Both recorded slots of every Burkina PRICE source row, unaltered.
+
+    No Existe/price filter, repeat removal, averaging or unit conversion.
+    Repeated native keys, including equal-valued rows, get obs3/4,5/6 in
+    file order. Complete product+unit codes protect identity if public j/u
+    mappings coalesce. Quantity is not a source field; see the separate
+    registered quoted-native-unit-count construction below.
+    """
+    from lsms_library.ehcvm import community_price_slots
+    codes = codes.reset_index(drop=True)
+    base = _price_base(codes, community_categories, household_categories)
+    rank = base.groupby(['t', 'v', 'variety', 'visit'], sort=False,
+                        dropna=False).cumcount()
+    out = community_price_slots(base, codes, ('s05q03', 's05q04'), rank)
+    out = out.set_index(_PRICE_INDEX).sort_index()
+    if not out.index.is_unique:
+        raise ValueError('Burkina s05 has colliding full observation keys')
+    return out
+
+
+def derive_quoted_native_unit_count(df):
+    """One QUOTED native unit, not measured quantity or kg (registry1226)."""
+    out = df.copy()
+    out['Quantity'] = pd.Series(1.0, index=out.index, dtype='Float64')
+    out['Derivation'] = pd.Series(COMMUNITY_PRICES_DERIVATION,
+                                  index=out.index, dtype='string')
+    return out
+
+
+def inputs_community_prices(wave='2018-19'):
+    """Original seven source fields and matching native join keys; no quantity.
+
+    One source record yields two served price slots. SourceRow retains the
+    original position even when a native key repeats. No household ID is
+    created; #1357's household exclusion policy remains unchanged.
+    """
+    if wave != '2018-19':
+        raise ValueError('Burkina community price inputs support only2018-19')
+    from lsms_library.paths import countries_root
+    root = countries_root() / 'Burkina_Faso' / wave / 'Data'
+    source = root / _PRICE_SOURCE
+    codes = tools.get_dataframe(source, convert_categoricals=False)
+    community_categories = tools.get_dataframe(source, categories_only=True)
+    household_categories = tools.get_dataframe(root / 's07b_me_bfa2018.dta',
+                                                categories_only=True)
+    base = _price_base(codes, community_categories, household_categories)
+    out = codes.reset_index(drop=True).copy()
+    for column in base:
+        out[column] = base[column]
+    return out.set_index(_PRICE_INDEX[:-1])
