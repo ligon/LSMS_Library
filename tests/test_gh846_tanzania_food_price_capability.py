@@ -1,6 +1,7 @@
 """Source-only review of the scoped C4 record (ledger #846 §§2–4).
 
-These are source-concept verdicts, deliberately not a live matrix integration.
+Instrument findings and coverage verdicts are deliberately separate. The
+explicit-path loader must keep every partly reviewed coverage cell open.
 No Country construction, source reader, parquet read, or provider is needed.
 """
 from pathlib import Path
@@ -9,7 +10,6 @@ import pytest
 
 from lsms_library.capability import (
     CATALOG_ONLY,
-    QUESTIONNAIRE_VALIDATED,
     SeriesCapability,
     capability,
     proposed_absent_verdicts,
@@ -25,34 +25,66 @@ from lsms_library.coverage_matrix import (
 ROOT = Path(__file__).resolve().parents[1]
 RECORD = ROOT / 'lsms_library/countries/Tanzania/_/capabilities/food_price_absent_verdicts.csv'
 CONCEPTS = ('reported_purchase_price', 'own_consumption_valuation')
+WAVES = ('2008-09', '2010-11', '2012-13', '2014-15', '2019-20', '2020-21')
+PAGES = {
+    '2008-09': '87;88;95;96',
+    '2010-11': '87;88;93;94',
+    '2012-13': '87;88;91;92',
+    '2014-15': '87;88;89;90',
+    '2019-20': '53;54;55;56;57',
+    '2020-21': '34;35;36;37;38;39;40;41;42',
+}
 
 
-def test_record_is_exactly_two_c4_concepts_in_the_attested_wave():
+def test_record_separates_twelve_module_findings_from_open_coverage():
+    import csv
+
+    with RECORD.open(newline='') as stream:
+        serialized = list(csv.DictReader(stream))
     rows = load_verdicts(RECORD)
-    assert set(rows) == {('Tanzania', concept, '2019-20') for concept in CONCEPTS}
+    assert len(serialized) == len(rows) == 12  # duplicates must not be hidden
+    assert set(rows) == {
+        ('Tanzania', concept, wave) for concept in CONCEPTS for wave in WAVES
+    }
     for row in rows.values():
-        assert row['verdict'] == 'not-asked'
-        assert row['checks_run'] == 'C4'
-        assert 'REPORT.org' in row['evidence']
-        assert 'nps_sdd_household_qx_final_english_.pdf' in row['evidence']
-        assert 'Section J' in row['evidence']
-        # Reuse the existing validation-to-verdict rule, not the row generator
-        # whose automatic C1;C4 would overstate our evidence (ledger §2).
-        cap = SeriesCapability(
-            country='Tanzania', series='NPS-SDD', provides=(),
-            lacks=(row['feature'],), validation=QUESTIONNAIRE_VALIDATED,
-            evidence=row['evidence'],
+        assert row['verdict'] == 'unsure'
+        assert row['instrument_finding'] == 'not-asked-within-module'
+        assert row['closes'] == 'False'
+        assert row['checks_run'] == 'C2;C4'
+        assert row['outstanding_checks'] == 'C1;C3'
+        assert 'not shipped-source census' in row['completed_methods']
+        assert 'no raster/OCR' in row['completed_methods']
+        assert row['pdf_pages'] == PAGES[row['wave']]
+        assert 'Section' in row['module_scope']
+        assert len(row['instrument_sha256']) == 64
+        assert row['review_sha256'] == (
+            '370da7f8c8cce9bc1e2d817697a31642328caca4b2f07098ad970e4f6fbf9c64'
         )
-        assert cap.verdict_for(row['feature']) == row['verdict']
+        assert 'Coverage unsure:' in row['evidence']
+        if row['wave'] in WAVES[:4]:
+            assert 'nps_upq_questionnaire.pdf' in row['instrument_file']
+            assert 'reconstructed original R' in row['original_round_provenance']
+            assert 'PDF5-6,19,29' in row['original_round_provenance']
+        elif row['wave'] == '2019-20':
+            assert 'nps_sdd_household_qx_final_english_.pdf' in row['instrument_file']
+        else:
+            assert 'nps_household_qx_y5_final_.pdf' in row['instrument_file']
+            assert 'released J1A' in row['module_scope']
+            assert 'j1_selection' in row['original_round_provenance']
 
 
 @pytest.mark.parametrize('concept', CONCEPTS)
-def test_existing_loader_closes_only_the_attested_absent_concept(concept):
+def test_existing_loader_leaves_all_reviewed_cells_open(concept):
     rows = load_verdicts(RECORD)
-    tier, detail = _absent_tier('Tanzania', concept, '2019-20', rows)
-    assert tier == 'not-asked'
-    assert 'Section J' in detail
-    for wave in ('2008-09', '2010-11', '2012-13', '2014-15', '2020-21', ''):
+    for wave in WAVES:
+        tier, detail = _absent_tier('Tanzania', concept, wave, rows)
+        assert tier == 'absent', (concept, wave)
+        assert detail.startswith('unsure:') and 'Coverage unsure:' in detail
+        tier, _ = _absent_tier(
+            'Tanzania', concept, wave, rows, default_tier='undeclared',
+        )
+        assert tier == 'undeclared'
+    for wave in ('', '2008-15', '2021-22'):
         tier, _ = _absent_tier('Tanzania', concept, wave, rows)
         assert tier == 'absent', (concept, wave)
     # Existing absent-verdict semantics must not disguise a declared build drop.
@@ -67,8 +99,9 @@ def test_evidence_does_not_close_whole_food_features_or_section_f():
     rows = load_verdicts(RECORD)
     for feature in ('food_acquired', 'food_prices', 'food_expenditures',
                     'community_prices', 'outside_household_food_value'):
-        tier, _ = _absent_tier('Tanzania', feature, '2019-20', rows)
-        assert tier == 'absent', feature
+        for wave in WAVES:
+            tier, _ = _absent_tier('Tanzania', feature, wave, rows)
+            assert tier == 'absent', (feature, wave)
     # This staging file is not a new canonical feature registry.
     assert set(CONCEPTS).isdisjoint(feature_vocabulary())
 
@@ -90,7 +123,7 @@ def test_staged_evidence_does_not_install_live_or_series_verdicts(
         assert proposed_absent_verdicts('Tanzania', 'NPS-SDD', ['2019-20'])[0][
             'feature'] == 'housing'
     staged = load_verdicts(RECORD)
-    assert len(staged) == 2
+    assert len(staged) == 12
     live = load_verdicts()
     assert set(staged).isdisjoint(live)
     waves = ['2008-09', '2010-11', '2012-13', '2014-15', '2019-20', '2020-21']
@@ -110,7 +143,9 @@ def test_evidence_gate_still_rejects_an_unsupported_close(tmp_path):
     import csv
 
     rows = list(load_verdicts(RECORD).values())
-    rows[0] = {**rows[0], 'evidence': ''}
+    # Module evidence is not closing authority. Preserve the existing gate
+    # against an evidence-free future closing edit (ledger §§3–5).
+    rows[0] = {**rows[0], 'verdict': 'not-asked', 'evidence': ''}
     path = tmp_path / 'unsupported.csv'
     with path.open('w', newline='') as stream:
         writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
@@ -118,5 +153,5 @@ def test_evidence_gate_still_rejects_an_unsupported_close(tmp_path):
         writer.writerows(rows)
     with pytest.warns(UserWarning, match='REQUIRES'):
         accepted = load_verdicts(path)
-    assert ('Tanzania', rows[0]['feature'], '2019-20') not in accepted
-    assert len(accepted) == 1
+    assert ('Tanzania', rows[0]['feature'], rows[0]['wave']) not in accepted
+    assert len(accepted) == 11
