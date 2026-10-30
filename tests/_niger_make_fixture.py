@@ -82,8 +82,18 @@ try:
         table = args[2] if dependencies_only else args[1]
         dependencies, members = discover(table)
         if dependencies_only:
+            names = [table + '.py', 'niger.py', 'wave_producers.py', 'data_scheme.yml']
+            if table in ('crop_production', 'plot_inputs', 'livestock'):
+                names.append('categorical_mapping.org')
+            static = [build / name for name in names]
+            for path in static:
+                if not path.is_file():
+                    raise FileNotFoundError('required Make input missing: ' + str(path))
+            dependencies = list(dict.fromkeys(map(str, static + list(map(Path, dependencies)))))
+            # Complete representation before reporting a successful discovery.
+            rendered = ' '.join(make_path(name) for name in dependencies)
             event('dependencies', table=table, members=members)
-            print(' '.join(make_path(name) for name in dependencies))
+            print(rendered)
         else:
             event('produce', table=table)
             for folder, mechanism in members:

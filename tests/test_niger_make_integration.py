@@ -1,4 +1,4 @@
-"""Forty NEW real-GNU-Make/private-command controls; source prepared only.
+"""Fifty real-GNU-Make/private-command controls; outcomes belong to receipts.
 
 No project imports, serialized survey frames or actual producers execute in this
 carrier. The real Makefile expands its own dynamic prerequisites and chains an
@@ -149,4 +149,37 @@ def test_matching_transitive_discovery_failure_stays_terminal(recipe):
     (h.root / 'Niger' / WAVES[-1] / '_/data_info.yml').write_text('{bad JSON')
     failed = h.run(goal='requested', extra=extra)
     assert failed.returncode != 0 and 'Niger producer discovery failed' in failed.stderr
+    assert producers(h) == earlier and receipt(h.target) == before
+
+
+def test_missing_static_input_refuses_even_with_a_warm_target(recipe):
+    h = recipe
+    assert h.run().returncode == 0
+    before, earlier = receipt(h.target), producers(h)
+    names = [h.table + '.py', 'niger.py', 'wave_producers.py', 'data_scheme.yml']
+    if h.table in ('crop_production', 'plot_inputs', 'livestock'):
+        names.append('categorical_mapping.org')
+    for name in names:
+        path = h.build / name
+        original = path.read_bytes()
+        path.unlink()
+        try:
+            failed = h.run()
+            assert failed.returncode != 0, (name, failed.stdout, failed.stderr)
+            assert 'Niger producer discovery failed' in failed.stderr
+            assert producers(h) == earlier and receipt(h.target) == before
+        finally:
+            path.write_bytes(original)
+
+
+def test_unrepresentable_dependency_refuses_instead_of_globbing_stale_target(recipe):
+    h = recipe
+    assert h.run().returncode == 0
+    before, earlier = receipt(h.target), producers(h)
+    h.install(waves=(WAVES[0], '2025-26'), folders={'2025-26': 'mapped[glob]'},
+              mechanisms={'2025-26': 'yaml'})
+    failed = h.run()
+    assert failed.returncode != 0
+    assert 'unsupported Make syntax' in failed.stderr
+    assert 'Niger producer discovery failed' in failed.stderr
     assert producers(h) == earlier and receipt(h.target) == before

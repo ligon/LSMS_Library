@@ -155,12 +155,39 @@ def produce(table):
 
 
 def make_path(path):
-    """Escape a prerequisite filename for GNU Make, without shell evaluation."""
+    """Quote a filename inserted AFTER Make's secondary variable expansion.
+
+    This is a parse_file_seq input, not a literal Makefile line: neither '#'
+    nor '$' is reinterpreted as a comment/variable here. Literal-source escapes
+    (\\# and $$) instead name the wrong file and can discard an implicit rule.
+    Refuse grammar we do not represent rather than glob/retag a prerequisite.
+    """
     value = str(path)
-    if '\n' in value or '\r' in value:
-        raise ValueError('Niger producer dependency contains a newline')
-    return (value.replace('\\', '\\\\').replace('$', '$$')
-            .replace('#', '\\#').replace(' ', '\\ ').replace(':', '\\:'))
+    if any(character in value for character in '\x00\n\r\\*?[()'):
+        raise ValueError(f'Niger producer dependency has unsupported Make syntax: {value!r}')
+    return value.replace(' ', '\\ ').replace('\t', '\\\t').replace('|', '\\|')
+
+
+def make_dependencies(table):
+    """Validate all inputs before emitting deferred Make prerequisites.
+
+    A missing static prerequisite must reach the discovery failure gate, not
+    discard an implicit rule and make an old country target look up to date.
+    This CLI is invoked from the country build directory, which also owns the
+    compiler/module/registry files in copied private metadata trees.
+    """
+    if table not in TABLES:
+        raise ValueError(f'Unsupported Niger country producer: {table}')
+    directory = Path.cwd()
+    names = [f'{table}.py', 'niger.py', 'wave_producers.py', 'data_scheme.yml']
+    if table in ('crop_production', 'plot_inputs', 'livestock'):
+        names.append('categorical_mapping.org')
+    static = [directory / name for name in names]
+    for path in static:
+        if not path.is_file():
+            raise FileNotFoundError(f'Niger {table}: required Make input missing: {path}')
+    _, _, dependencies = discover(table)
+    return ' '.join(make_path(path) for path in dict.fromkeys(static + dependencies))
 
 
 def main(argv=None):
@@ -169,9 +196,8 @@ def main(argv=None):
     parser.add_argument('table', choices=TABLES)
     args = parser.parse_args(argv)
     if args.dependencies:
-        _, _, dependencies = discover(args.table)
         # Do not emit a partially discovered prerequisite list on failure.
-        print(' '.join(make_path(path) for path in dependencies))
+        print(make_dependencies(args.table))
     else:
         produce(args.table)
 
