@@ -118,10 +118,9 @@ def test_cluster_rows_share_repaired_key_and_keep_existing_geo_join(ng, sources)
     assert set(ph.index[ph['Derivation'].notna()]) == {'1', '8'}
     assert set(ph['Derivation'].dropna()) == {'Nigeria::cluster_features::ph-same-location'}
     assert '99' not in ph.index
-    if folder == '2018-19':
-        assert ph.loc['1', 'Latitude'] == 1.
-    else:
-        assert ph[['Latitude', 'Longitude']].isna().all().all()
+    # W5's acquired v02 source now follows the same household-left geo join.
+    assert ph.loc['1', 'Latitude'] == 1.
+    assert ph.loc['8', 'Latitude'] == 8.
 
 
 def test_missing_label_does_not_authorize_reuse(ng, sources):
