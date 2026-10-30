@@ -215,69 +215,52 @@ def test_moved_sentinel_does_not_fire_in_the_baseline_wave(sample):
 # ROUND SAFETY -- the pp/ph question
 # --------------------------------------------------------------------------
 
+# GH #1120 D1 (owner ruling 2026-10-23; comment6380186741 refinement):
+# each round uses its OWN cover. The old PP-for-both assertions were preserved
+# in the dispatch evidence (9 failures / 2 passes) before reconciliation.
 @pytest.mark.parametrize('pp,ph', ROUNDS)
-def test_v_is_round_invariant_within_a_wave(sample, pp, ph):
-    """A household must get the SAME cluster in the planting and the harvest
-    quarter of one wave.
-
-    It does, by construction: both quarters of a wave read the SAME post-planting
-    cover page (the wave folder has one data_info.yml and both Wave(t)s use it),
-    so there is no second geo-coding to drift from.  This test is the guard that
-    keeps it that way -- e.g. if someone later points the harvest quarter at
-    secta_harvest*.dta, 17/41/66/64 households in W2/W3/W4/W5 would flip to a
-    `moved-` singleton (they relocate BETWEEN the two visits) and `v` would stop
-    being a stable within-wave cluster key.
-    """
-    s = sample.reset_index()
-    a = s[s.t == pp][['i', 'v']].rename(columns={'v': 'v_pp'})
-    b = s[s.t == ph][['i', 'v']].rename(columns={'v': 'v_ph'})
-    m = a.merge(b, on='i', how='inner')
-    assert len(m) > 0, f'no households shared between {pp} and {ph}'
-    differs = m[m.v_pp != m.v_ph]
-    assert len(differs) == 0, (
-        f'{len(differs)} households change cluster between {pp} and {ph}; '
-        f'`v` must be constant within a wave.  e.g.\n{differs.head().to_string()}'
-    )
+def test_v_matches_each_rounds_recorded_location(sample, pp, ph):
+    from nigeria_round_oracle import recorded_round
+    for t in (pp, ph):
+        actual = sample.xs(t, level='t')
+        expected = recorded_round(t)
+        assert actual.index.is_unique
+        assert set(actual.index) == set(expected.index)
+        assert actual['v'].to_dict() == expected['v'].to_dict()
 
 
 @pytest.mark.parametrize('pp,ph', CF_ROUNDS)
-def test_cluster_features_carries_both_rounds_and_they_agree(cf, pp, ph):
-    """Both quarters must be present, with the same cluster set and identical
-    attributes -- neither round may overwrite or collide with the other."""
-    c = cf.reset_index()
-    A = c[c.t == pp].set_index('v').drop(columns='t')
-    B = c[c.t == ph].set_index('v').drop(columns='t')
-
-    assert len(A) > 0, f'{pp} missing from cluster_features'
-    assert len(B) > 0, f'{ph} missing from cluster_features'
-    assert set(A.index) == set(B.index), (
-        f'{pp} and {ph} disagree on the cluster set '
-        f'({len(A)} vs {len(B)} clusters)'
-    )
-    for col in ['Region', 'District', 'Rural', 'Latitude', 'Longitude']:
-        x, y = A[col], B.loc[A.index, col]
-        mismatched = int(((x != y) & ~(x.isna() & y.isna())).sum())
-        assert mismatched == 0, (
-            f'{col} differs between {pp} and {ph} for {mismatched} cluster(s)'
-        )
+def test_cluster_features_matches_each_rounds_recorded_geography(cf, pp, ph):
+    from nigeria_round_oracle import recorded_geo
+    for t in (pp, ph):
+        actual = cf.xs(t, level='t')
+        expected = recorded_geo(t)
+        assert actual.index.is_unique and len(actual) > 0
+        assert set(actual.index) == set(expected['v'])
+        # A served fix is one recorded household pair, never a cross-column
+        # composite or a mean. Missing W5 geo remains missing, not zero.
+        def pair(values):
+            return tuple(None if pd.isna(x) else float(x) for x in values)
+        for v, group in expected.groupby('v'):
+            observed = {pair(row) for row in
+                        group[['Latitude', 'Longitude']].to_numpy()}
+            assert pair(actual.loc[v, ['Latitude', 'Longitude']]) in observed
 
 
 def test_sample_is_one_row_per_household_per_round(sample):
-    """sample is keyed (i, t) with t the QUARTER, so a household in a pp/ph wave
-    has exactly two rows -- one per round.  The GH #323 rekey changed `v`'s
-    VALUE, and must not have changed this grain (development and this branch both
-    return 49,770 rows)."""
-    assert sample.index.names == ['i', 't'] or set(sample.index.names) == {'i', 't'}
-    assert int(sample.index.duplicated().sum()) == 0
-
-    s = sample.reset_index()
+    from nigeria_round_oracle import recorded_round, assert_numeric_exact
+    assert set(sample.index.names) == {'i', 't'}
+    assert sample.index.is_unique
     for pp, ph in ROUNDS:
-        n_pp = s[s.t == pp]['i'].nunique()
-        n_ph = s[s.t == ph]['i'].nunique()
-        assert n_pp == n_ph and n_pp > 0, (
-            f'{pp} has {n_pp} households but {ph} has {n_ph}; both rounds of a '
-            f'wave are populated from the same cover page and must match'
-        )
+        for t in (pp, ph):
+            actual = sample.xs(t, level='t').sort_index()
+            expected = recorded_round(t)
+            assert set(actual.index) == set(expected.index) and len(actual) > 0
+            expected = expected.loc[actual.index]
+            for col in ('weight', 'panel_weight'):
+                raw = expected[col].astype(float)
+                mean = raw.groupby(pd.Series(t, index=raw.index)).transform('mean')
+                assert_numeric_exact(actual[col], raw / mean)
 
 
 # --------------------------------------------------------------------------
