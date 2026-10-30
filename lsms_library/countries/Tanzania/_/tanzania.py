@@ -1788,11 +1788,8 @@ def livestock_for_wave(t, lf, colmap):
     out = out.set_index(['t', 'i', 'animal'])
     # Guard against a duplicated (t,i,animal): sum reported head counts.
     if not out.index.is_unique:
-        out = out.groupby(level=['t', 'i', 'animal']).agg({
-            'HeadCount': lambda s: s.sum(min_count=1),
-            'HeadAcquired': lambda s: s.sum(min_count=1),
-            'HeadSold': lambda s: s.sum(min_count=1),
-        })
+        out = (out.groupby(level=['t', 'i', 'animal'])[LIVESTOCK_COLUMNS]
+               .sum(min_count=1))
     out = out[LIVESTOCK_COLUMNS]
     return out
 
