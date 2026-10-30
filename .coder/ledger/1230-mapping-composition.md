@@ -17,3 +17,8 @@ Reuse df_data_grabber, format_id and actual pandas; invented getter only. Extend
 
 ## §6 Open questions
 Confirm observed mapping is silently skipped versus raising in particular formatter shapes. Numeric-key semantics and mixed nested sequences remain outside initial reproduction; no human permission needed for this hermetic diagnosis.
+
+## Current evidence
+Actual parser-through-grabber reproduction silently drops the dictionary after the formatter. Six regression cases give five failures/one pass on parent ffbe9121, then the candidate plus existing resolution/value-column tests gives62passed/1skipped. No survey input was read. The candidate reuses grabber for every stage, passing a one-column temporary frame between stages so only the first stage sees composite raw columns.
+
+Inventory covers all100tracked wave data_info.yml files:177list-table mappings, no nested explicit sequences. Actual imported formatter registries for the76waves containing those declarations have no target-name collisions and no import errors, under source-payload/network refusal. This bounds current declared automatic formatter+dict paths; arbitrary Python callers are not an exhaustive runtime census. The build-transform fingerprint still changes globally; this is not a corpus rewarm acceptance claim. Item1 Org numeric-key policy remains open. Independent source review pending.
