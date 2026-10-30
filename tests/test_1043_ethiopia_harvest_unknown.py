@@ -64,5 +64,5 @@ def test_unitless_empty_placeholder_is_still_dropped(eth):
     assert build(eth, pd.Series([None], dtype=object), quantity=np.nan).empty
 
 
-def test_w1_instrument_defined_kilograms_remain_kilograms(eth):
+def test_absent_unit_column_keeps_instrument_defined_kilograms(eth):
     assert build(eth, None).index.get_level_values('u').tolist() == ['Kg']

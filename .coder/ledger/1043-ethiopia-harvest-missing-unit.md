@@ -24,6 +24,11 @@ This source-policy contradiction is retained as history, then explicitly correct
 for missing harvest units under the closed U_UNKNOWN vocabulary (#1041/#1234).
 Reported Other codes/labels remain genuine reported units and must not be remapped.
 W1 implicitKg is instrument-defined and staysKg; blank decoded sale units remainNA.
+The controlling contract is the units skill's closed-vocabulary rule
+(`.claude/skills/add-feature/food-acquired/units/SKILL.md`, lines150–153),
+`transformations.U_UNKNOWN` / `_U_SENTINELS`, and the existing #1041 missing-unit
+handling recorded in CONTENTS. These settle an actually absent unit as Unknown;
+the issue's older TierC wording does not authorize relabelling a reported Other.
 
 ## §4 Invariants and finite source scope
 Preserve rowpopulation/order, all quantities/sale values/flags/dtypes and recorded
@@ -54,3 +59,19 @@ shippedfactor duplicate rule and crop/sale reference windows remain unchanged.
 If paired source validation finds row/payload or linkage changes, report them
 before treating this as an index-label-only fix. No actual source observation is
 claimed at this source-preparation commit.
+
+## §7 Native source results (separate from served API grain)
+The retained one-shot paired normal-reader diagnosis completed35calls across
+23logical sources. Both helpers returned87,045 native rows. Missing-unit labels
+changed Other(Specify)→Unknown on0/379/79/168/278 rows in chronological wave order
+(904total); reported Other stayed0/4,349/111/666/381. This is native-builder grain,
+not a Country/Feature count. Native kg-layer accounting and totals were unchanged
+with both default and shipped factors. The original in-memory pandas checks are
+not promoted to exact numeric proof: a separate supplement read only the ten
+owned saved operands, passed explicit ExtensionArray and nonmissing NumPy value
+equality with exact dtypes/masks, and detected both tiny/nextafter negative controls.
+No raw-reader or constructor replay was used for that supplement. Receipts live
+under `/local/job40561868/ethiopia1043-harvest-unit-v1/`; API grain remains a
+separate next validation scope. Synthetic118pass/16deselected is also retained;
+the unit-column-absent branch test was renamed because its synthetic time is
+2013-14, whereas the actual native W1 observation separately verifies W1Kg.
