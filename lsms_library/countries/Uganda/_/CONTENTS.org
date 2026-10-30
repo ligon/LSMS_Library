@@ -58,10 +58,12 @@ changed:
 All are drawn from GSEC1 (the household cover page).  =comm= is ONE
 identifier rendered two ways in the raw files -- int32 8-digit in 2005-06 and
 2011-12, a 7-character string in 2009-10 and 2010-11 -- and since GH #1133 all
-four waves serve the 8-digit frame EA (item 1 below).  The shift
-from numeric EA codes to parish names occurred around 2015-16 as
-the sampling frame evolved from strict EA boundaries to parish-level
-clusters to accommodate split-off households.
+four waves serve the 8-digit frame EA (item 1 below). From 2013-14 the
+library's available cover-page key is instead a parish code, followed by
+district/parish names in 2018-19 and 2019-20. This is a change in the grain
+of the library's =v=, not evidence that the survey redesigned its sampling
+PSU as a parish (GH #689). The separate =sampling.yml= record continues to
+describe enumeration-area PSUs, with its per-wave documentation qualifications.
 
 *** =v= across waves: three different defects (GH #942)
 
@@ -1149,6 +1151,13 @@ neither is a bug we can configure away:
 
 For a per-household answer use =sample()=, which carries exact
 household-level =Rural= and =Region= for every household.
+
+*Parish disclosure (GH #689).* The =data_scheme.yml= =cluster_features=
+block also states this grain distinction so a reader does not mistake its
+=v= for a design EA. This disclosure changes no keys, attributes or reducer:
+the conflict nulls remain the honest output. Whether a source-backed EA
+identifier can be obtained elsewhere is a separate source-search question;
+this note neither reconstructs one nor claims every shipped source lacks it.
 
 *GPS is not averaged.*  Where the within-cluster coordinates vary at all
 they vary by a MEDIAN of 4.6--42.9 km and by up to 584 km (measured, all
