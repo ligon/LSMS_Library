@@ -94,6 +94,7 @@ from .derivations import (attach as attach_derivations, records_for as _derivati
                           union_keys_by_group as _union_derivation_keys_by_group)
 import importlib.util
 import hashlib
+import inspect
 import logging
 import os
 import re
@@ -1098,9 +1099,9 @@ def _optional_scheme_columns(scheme_entry: Any) -> list[str]:
 
 
 # GH #1218 / PR #1221 follow-up: the ``attrs`` key that marks a frame built by
-# ``_empty_declared_frame``.  Such a frame is an ANSWER (the requested waves
-# lack the table), not a BUILD, so no cache write may store it: written to the
-# L2-country parquet with the descent's union coverage manifest, it would claim
+# ``_empty_declared_frame`` or an original successful zero-row YAML witness
+# (GH #1292). Such a frame is an ANSWER, not a BUILD, so no cache write may
+# store it: written to L2-country with the descent's union manifest, it would claim
 # 0 rows for waves that have rows (measured, Iraq ``shocks``: 8,812 rows of
 # 2012 served as 0).  Every write of a ``load_from_waves`` result checks it via
 # ``_is_constructed_empty``.
@@ -1108,7 +1109,7 @@ _CONSTRUCTED_EMPTY_ATTR = "_constructed_empty"
 
 
 def _is_constructed_empty(obj: Any) -> bool:
-    """True for a frame ``_empty_declared_frame`` built (never cache it).
+    """True for a marked zero-row answer (constructed or original; never cache it).
 
     Requires 0 rows as well as the marker: ``attrs`` can ride onto a frame
     with rows (``reindex``, ``combine_first``, ``align``, ``.loc``
@@ -1212,7 +1213,9 @@ class Wave:
         self.__dict__['_in_getattr'] = True
         try:
             if method_name in wave_scheme or method_name in country_scheme:
-                def method():
+                def method(*, _with_origin: bool = False):
+                    if _with_origin:
+                        return self.grab_data(method_name, _with_origin=True)
                     return self.grab_data(method_name)
                 method.__doc__ = f"Return {method_name} for wave {self.year}."
                 method.__name__ = method_name
@@ -1879,7 +1882,7 @@ class Wave:
         Output:
             df: pd.DataFrame, the data requested
 
-        ``_with_origin`` is private producer plumbing for ``food_acquired``.
+        ``_with_origin`` is private producer plumbing for the actual getters.
         It returns (frame, origin) without adding public DataFrame attributes.
         Origin describes the route that supplied this result, not whether its
         cache path still exists (GH #1078; task ledger sections 2 and 4).
@@ -2362,8 +2365,11 @@ class Wave:
     # method builds, so the coupling is explicit rather than incidental to
     # Site 1's all-tables tag.
     @build_transform(tables=['cluster_features'])
-    def cluster_features(self) -> pd.DataFrame:
-        df = self.grab_data('cluster_features')
+    def cluster_features(self, *, _with_origin: bool = False) -> pd.DataFrame | tuple[pd.DataFrame, str]:
+        if _with_origin:
+            df, origin = self.grab_data('cluster_features', _with_origin=True)
+        else:
+            df = self.grab_data('cluster_features')
         # Some countries declare ``i: <HHID>`` in cluster_features
         # ``idxvars`` so the YAML can merge a household-level df_geo
         # for GPS.  The result then has HH grain (one row per
@@ -2419,22 +2425,22 @@ class Wave:
             df = df.reset_index(level = 'm').rename(columns = {'m':'Region'})
         if 'm' in df.columns:
             df = df.rename(columns = {'m':'Region'})
-        return df
+        return (df, origin) if _with_origin else df
     
     # Food acquired method is explicitly defined because potentially categorical mapping is required after calling grab_data.
     # GH #1078: this content-producing compatibility route must invalidate
     # already-corrupt current-hash country caches as well as prevent new ones.
     @build_transform(tables=['food_acquired'])
-    def food_acquired(self) -> pd.DataFrame:
+    def food_acquired(self, *, _with_origin: bool = False) -> pd.DataFrame | tuple[pd.DataFrame, str]:
         df, origin = self.grab_data('food_acquired', _with_origin=True)
         if df.empty:
-            return df
+            return (df, origin) if _with_origin else df
         # Use the actual producer, not a later existence check: a concurrent
         # normal rebuild may already have evicted the script cache we read.
         # Successful YAML materialization also supplied a completed frame;
         # failed/disabled writes remain memory producers (ledger section 4).
         if origin in ('parquet', 'materialized'):
-            return df
+            return (df, origin) if _with_origin else df
         #Customed
         agg_functions = {'Expenditure': 'sum', 'Quantity': 'sum', 'Produced': 'sum', 'Price': 'first'}
         index = df.index.names
@@ -2446,7 +2452,7 @@ class Wave:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors='coerce')
         df = df.groupby(index).agg(agg_func)
-        return df
+        return (df, origin) if _with_origin else df
 
 
     
@@ -4992,10 +4998,12 @@ class Country:
 
     def _assert_built_required_columns(self, df: Any, method_name: str,
                                        scheme_entry: Any,
-                                       is_script_path: bool) -> None:
-        """Fail loudly if a script-path table is missing a required declared
-        column -- the signature of a stale hashless wave parquet shadowing a
-        wave-script fix (residual cache hazard, GH #479).
+                                       is_script_path: bool, *, successful_empty: bool = False) -> None:
+        """Check required membership after the real finalizer.
+
+        Script-path omissions can indicate a stale hashless wave parquet
+        (GH #479). Successful empty YAML answers also retain their original
+        schema and must pass this check before being served (GH #1292).
 
         Script-path wave parquets are hashless and historically could silently
         union a divergent per-era schema (e.g. GhanaLSS ``food_acquired`` served
@@ -5003,9 +5011,10 @@ class Country:
         wrong-data outcome into a loud, actionable error.
 
         Scope and safety:
-        - Only *script-path* tables are checked (built by a ``_/{table}.py``
+        - Normally only *script-path* tables are checked (built by a ``_/{table}.py``
           wave script / country concatenator or ``materialize: make``); pure
-          YAML-path tables self-invalidate per-wave and are skipped.
+          YAML-path populated tables self-invalidate per-wave and are skipped.
+          ``successful_empty`` additionally checks an original no-write answer.
         - Called POST-``_finalize_result`` (see the call site), so kinship-
           decomposed columns (``Generation``/``Distance``/``Affinity``, added
           from ``Relationship`` by ``_expand_kinship``) and the joined ``v``
@@ -5016,7 +5025,7 @@ class Country:
         contract ``test_declared_columns_present`` enforces -- so this never
         breaks a healthy build; it only fires on a malformed (stale-cache) one.
         """
-        if not is_script_path or not isinstance(df, pd.DataFrame):
+        if not (is_script_path or successful_empty) or not isinstance(df, pd.DataFrame):
             return
         if not isinstance(scheme_entry, dict):
             return
@@ -5028,6 +5037,14 @@ class Country:
         )
         missing = [c for c in required if c not in present]
         if missing:
+            if successful_empty:
+                raise RuntimeError(
+                    f"{self.name}/{method_name}: successful empty YAML result is missing "
+                    f"required declared column(s) {missing} after finalization "
+                    f"(built columns: {sorted(map(str, df.columns))}). "
+                    "Check the wave configuration and source columns; an empty "
+                    "answer must preserve its original required schema."
+                )
             raise RuntimeError(
                 f"{self.name}/{method_name}: freshly-built table is missing "
                 f"required declared column(s) {missing} (built columns: "
@@ -5192,6 +5209,7 @@ class Country:
             waves = self.waves
         else:
             waves = self._validate_waves(waves)
+        requested_wave_set = {str(w) for w in waves}
 
         scheme_entry = self._materialization_entry(method_name)
         materialize_backend = None
@@ -5505,10 +5523,29 @@ class Country:
                 wave_obj = self[w]
                 wave_has_table = method_name in wave_obj.data_scheme
                 wave_result = None
+                successful_empty = False
 
                 if wave_has_table:
                     try:
-                        wave_result = getattr(wave_obj, method_name)()
+                        getter = getattr(wave_obj, method_name)
+                        # Explicit opt-in only: old/custom getters and grab_data
+                        # overrides keep their original invocation (ledger 1292).
+                        try:
+                            supports_origin = (
+                                '_with_origin' in inspect.signature(getter).parameters
+                                and '_with_origin' in inspect.signature(
+                                    wave_obj.grab_data).parameters)
+                        except (AttributeError, TypeError, ValueError):
+                            supports_origin = False
+                        if supports_origin and method_name not in JSON_CACHE_METHODS:
+                            wave_result, origin = getter(_with_origin=True)
+                            successful_empty = (
+                                bool(wave_obj.resources.get(method_name))
+                                and origin in ('memory', 'parquet', 'materialized')
+                                and isinstance(wave_result, pd.DataFrame)
+                                and len(wave_result) == 0)
+                        else:
+                            wave_result = getter()
                     except KeyError as error:
                         # GH #1281 (ledger §4): a declared wave's config or
                         # hook failure is not absence. Stop before concat can
@@ -5521,7 +5558,7 @@ class Country:
                     except AttributeError as error:
                         warnings.warn(str(error))
 
-                use_legacy = wave_has_table and (
+                use_legacy = wave_has_table and not successful_empty and (
                     wave_result is None
                     or (isinstance(wave_result, pd.DataFrame) and wave_result.empty)
                 )
@@ -5546,7 +5583,9 @@ class Country:
                         wave_result = wave_result[
                             wave_result.index.get_level_values('t') == w
                         ]
-                return wave_has_table, wave_result
+                # _parallel_waves keeps this second payload opaque. Proof is
+                # per invocation, not a worker-local mutable closure or attrs.
+                return wave_has_table, (wave_result, successful_empty)
 
             # GH #797: fan stage 1 out over a fork pool, one worker per
             # distinct make target (waves sharing a folder build serially in
@@ -5570,16 +5609,19 @@ class Country:
                 country=self.name, table=method_name,
             )
             results = {}
+            empty_witnesses = []
+            barren_outcomes = []
             for w in waves:
                 if prebuilt is not None:
                     # Replays this wave's captured warnings and ledger entries
                     # before its post stage, so the parent-side order of
                     # side effects matches a serial build; re-raises the
                     # wave's exception (original type) if it failed.
-                    wave_has_table, wave_result = _parallel_waves.relay(
+                    wave_has_table, outcome = _parallel_waves.relay(
                         prebuilt[w], country=self.name, table=method_name)
                 else:
-                    wave_has_table, wave_result = build_wave(w)
+                    wave_has_table, outcome = build_wave(w)
+                wave_result, successful_empty = outcome
 
                 if isinstance(wave_result, pd.DataFrame):
                     if (
@@ -5600,6 +5642,10 @@ class Country:
                     wave_result = _normalize_dataframe_index(wave_result, scheme_entry, w, method_name,
                                                             country=self.name)
 
+                barren_outcomes.append(
+                    (not wave_has_table and wave_result is None) or successful_empty)
+                if successful_empty:
+                    empty_witnesses.append(wave_result)
                 if wave_result is None and not wave_has_table:
                     continue
                 if isinstance(wave_result, pd.DataFrame) and wave_result.empty:
@@ -5628,6 +5674,19 @@ class Country:
                     return safe_concat_dataframe_dict(non_empty_df)
                 return pd.concat(non_empty_df.values(), axis=0, sort=False)
 
+            if (empty_witnesses and all(barren_outcomes) and requested_wave_set
+                    and requested_wave_set < {str(w) for w in self.waves}
+                    and method_name not in JSON_CACHE_METHODS
+                    and not ((self.file_path / '_' / 'Makefile').exists()
+                             and not shutil.which('make', path=_script_subprocess_env().get('PATH')))
+                    and not self._has_country_builder(method_name)):
+                # Keep the original schema, including omissions: the normal
+                # finalizer supplies supported fields, then the required gate
+                # checks it. Never fabricate declared payload columns here.
+                witness = pd.concat(empty_witnesses, axis=0, sort=False)
+                witness.attrs[_CONSTRUCTED_EMPTY_ATTR] = True
+                return witness
+
             # GH #1039 (red team r1): the make backend came here because
             # `_has_country_builder` found NO country-level rule or script, so
             # the country fallback below has nothing to run.  It could only
@@ -5640,7 +5699,11 @@ class Country:
             # a strict subset whose waves lack the table is a correct EMPTY
             # answer, the 0 rows the default backend serves from a warm cache.
             if not country_builder:
-                if {str(w) for w in waves} >= {str(w) for w in self.waves}:
+                # A positive witness needs the completed proof above. If that
+                # failed, declaration-only construction would fabricate its
+                # schema or hide another declared wave's missing outcome.
+                if (empty_witnesses
+                        or {str(w) for w in waves} >= {str(w) for w in self.waves}):
                     raise _rebuild_failure_error(self.name, method_name)
                 return _empty_declared_frame(scheme_entry)
 
@@ -6086,6 +6149,7 @@ class Country:
                 # the issues tracker before the exception propagates.
                 _log_issue(self.name, method_name, waves, error)
                 raise
+        successful_empty = _is_constructed_empty(df)
         result = self._finalize_result(df, scheme_entry, method_name, currency=currency)
         # Loud schema gate (GH #479): for script-path tables (whose hashless
         # wave parquets can shadow a wave-script fix), fail with an actionable
@@ -6101,7 +6165,7 @@ class Country:
         # round dirs), without constructing a Wave.
         is_script_path = self._is_script_path(method_name, materialize_backend, waves)
         self._assert_built_required_columns(result, method_name, scheme_entry,
-                                            is_script_path)
+                                            is_script_path, successful_empty=successful_empty)
         return result
 
     def _compute_panel_ids(self) -> None:
