@@ -8,6 +8,7 @@ from copy import deepcopy
 from pathlib import Path
 import os
 import shutil
+import sys
 
 import numpy as np
 import pandas as pd
@@ -57,45 +58,54 @@ def metadata(tmp_path, monkeypatch):
     """Exact public metadata copies, except baseline restores the five dates."""
     from lsms_library import paths
 
-    roots = {}
-    for arm in ('baseline', 'candidate'):
-        root = tmp_path / arm / 'countries'
-        roots[arm] = root
-        for name in ('nigeria.py', 'data_scheme.yml', 'categorical_mapping.org'):
-            target = root / 'Nigeria/_' / name
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(COUNTRY_SOURCE / '_' / name, target)
-        for folder, pp, ph, source, column in BINDINGS:
-            original = COUNTRY_SOURCE / folder / '_/data_info.yml'
-            target = root / 'Nigeria' / folder / '_/data_info.yml'
-            target.parent.mkdir(parents=True, exist_ok=True)
-            content = original.read_text(encoding='utf-8')
-            if arm == 'baseline':
-                content = baseline_yaml(content, source, ph)
-            target.write_text(content, encoding='utf-8')
-            mapping = original.parent / 'mapping.py'
-            if mapping.is_file():
-                shutil.copyfile(mapping, target.parent / mapping.name)
-    data = tmp_path / 'data'
-    data.mkdir()
-    monkeypatch.setenv('LSMS_NO_CACHE', '1')
-    monkeypatch.setenv('LSMS_DATA_DIR', str(data))
-    monkeypatch.setenv('LSMS_SKIP_AUTH', '1')
-    paths.data_root.cache_clear()
-    before = {arm: _snapshot(root) for arm, root in roots.items()}
-
-    def country(arm):
-        from lsms_library import Country
-
-        monkeypatch.setenv('LSMS_COUNTRIES_ROOT', str(roots[arm]))
-        paths.countries_root.cache_clear()
-        return Country('Nigeria', preload_panel_ids=False)
-
     try:
-        yield country, roots
+        with monkeypatch.context() as scoped:
+            # Real Country.waves imports the copied executable metadata.
+            # Keep the complete byte snapshot invariant under ordinary CI,
+            # rather than exempting generated files from that invariant.
+            scoped.setattr(sys, 'dont_write_bytecode', True)
+            roots = {}
+            for arm in ('baseline', 'candidate'):
+                root = tmp_path / arm / 'countries'
+                roots[arm] = root
+                for name in ('nigeria.py', 'data_scheme.yml', 'categorical_mapping.org'):
+                    target = root / 'Nigeria/_' / name
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(COUNTRY_SOURCE / '_' / name, target)
+                for folder, pp, ph, source, column in BINDINGS:
+                    original = COUNTRY_SOURCE / folder / '_/data_info.yml'
+                    target = root / 'Nigeria' / folder / '_/data_info.yml'
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    content = original.read_text(encoding='utf-8')
+                    if arm == 'baseline':
+                        content = baseline_yaml(content, source, ph)
+                    target.write_text(content, encoding='utf-8')
+                    mapping = original.parent / 'mapping.py'
+                    if mapping.is_file():
+                        shutil.copyfile(mapping, target.parent / mapping.name)
+            data = tmp_path / 'data'
+            data.mkdir()
+            scoped.setenv('LSMS_NO_CACHE', '1')
+            scoped.setenv('LSMS_DATA_DIR', str(data))
+            scoped.setenv('LSMS_SKIP_AUTH', '1')
+            paths.data_root.cache_clear()
+            before = {arm: _snapshot(root) for arm, root in roots.items()}
+
+            def country(arm):
+                from lsms_library import Country
+
+                scoped.setenv('LSMS_COUNTRIES_ROOT', str(roots[arm]))
+                paths.countries_root.cache_clear()
+                return Country('Nigeria', preload_panel_ids=False)
+
+            try:
+                yield country, roots
+            finally:
+                assert {arm: _snapshot(root) for arm, root in roots.items()} == before
+                assert not [p for p in data.rglob('*') if p.is_file()]
     finally:
-        assert {arm: _snapshot(root) for arm, root in roots.items()} == before
-        assert not [p for p in data.rglob('*') if p.is_file()]
+        # The child context restores env/bytecode before clearing resolution
+        # caches. Invariant assertions and setup/case failures cannot skip this.
         paths.countries_root.cache_clear()
         paths.data_root.cache_clear()
 
@@ -222,3 +232,40 @@ def test_actual_wave_keeps_ph_payload_and_refuses_false_pp_date(
         assert not new[ph].index.is_unique
     pd.testing.assert_frame_equal(operand, protected, check_exact=True)
     assert operand.attrs == attrs == protected.attrs
+
+
+@pytest.mark.parametrize('prior_bytecode', [False, True])
+def test_metadata_refusal_restores_process_paths(tmp_path, monkeypatch, prior_bytecode):
+    """A real private metadata mutation must fail without poisoning later tests."""
+    from lsms_library import paths
+
+    monkeypatch.setattr(sys, 'dont_write_bytecode', prior_bytecode)
+    keys = ('LSMS_COUNTRIES_ROOT', 'LSMS_DATA_DIR', 'LSMS_SKIP_AUTH', 'LSMS_NO_CACHE')
+    environment = {key: os.environ.get(key) for key in keys}
+    paths.countries_root.cache_clear()
+    paths.data_root.cache_clear()
+    original_country_root = paths.countries_root()
+    original_data_root = paths.data_root()
+    transaction = metadata.__wrapped__(tmp_path, monkeypatch)
+    try:
+        country, roots = next(transaction)
+        country('candidate')
+        assert paths.countries_root() == roots['candidate']
+        assert paths.data_root() == tmp_path / 'data'
+        assert sys.dont_write_bytecode is True
+        # Deliberately violate the full source snapshot after the fixture has
+        # yielded. No ignored filename or weaker mutation rule is introduced.
+        target = roots['candidate'] / 'Nigeria/_/data_scheme.yml'
+        target.write_bytes(target.read_bytes() + b'\n# deliberate invented mutation\n')
+        with pytest.raises(AssertionError):
+            next(transaction)
+        assert {key: os.environ.get(key) for key in keys} == environment
+        assert sys.dont_write_bytecode is prior_bytecode
+        assert paths.countries_root.cache_info().currsize == 0
+        assert paths.data_root.cache_info().currsize == 0
+        assert paths.countries_root() == original_country_root
+        assert paths.data_root() == original_data_root
+    finally:
+        transaction.close()
+        paths.countries_root.cache_clear()
+        paths.data_root.cache_clear()
