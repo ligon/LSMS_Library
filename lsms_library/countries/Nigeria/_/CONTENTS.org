@@ -534,8 +534,9 @@ these rule-qualified rows. =ea=0= is a source sentinel, not a complete census
 of dwelling moves; a nonzero EA can accompany a movement answer too.
 
 D2 =unlocated-{hhid}= remains a different singleton from recorded =ea=0=
-=moved-{hhid}=. No source household requires D2 in these builds. W5's held geo
-file remains unwired (#978); its coordinates remain missing. Site 2 continues
+=moved-{hhid}=. No source household requires D2 in these builds. That repair deliberately kept W5's held geo
+file unwired; #978 subsequently adds its reference coordinates as documented
+above. Site 2 continues
 to select the most complete observed household row and report disagreements;
 it never averages geo fixes, and only the selected row's derivation survives.
 The panel crosswalk remains its committed source (#1264), unchanged here.
@@ -660,7 +661,7 @@ carrying =v= across them raises a =ClusterIdentityWarning=; every other
 boundary is =stable=.  A 13-entry alias table would make them stable again, but
 it would change served =v= values and is not done here.
 
-*** Wave 5 geovariables: v02 is HELD, the coordinates are NOT YET WIRED (GH #841 / #978)
+*** Wave 5 geovariables: acquired v02 household reference coordinates (GH #841 / #978)
 
 Until 2026-10-23 this wave held =NGA_2023_GHSP-W5_v01_M=: 106 files and no
 household geovariables file, and the cover page =secta_plantingw5.dta=
@@ -686,28 +687,70 @@ the other 106:
 - =Data/nga_householdgeovariables_y5.dta=: 4,883 households x 55 columns,
   =hhid= unique, coordinates =lat_mod= / =lon_mod= (all 4,883 non-null and
   inside Nigeria's bounding box).  It carries NO EA key: join it to the cover
-  page on =hhid= (all 4,883 are there).  How many clusters it gives more than
-  one fix depends on the cluster key, which =ea= alone is not (see "Cluster
-  (PSU) identifier"): 112 of 708 =(zone, state, lga, ea)= groups, against the
-  release diff's 34 of 510 under another key.  Settle it when wiring.
+  page on =hhid= (all 4,883 are on the PP cover; 4,771 are on the PH cover).
+  The older 112/708 and 34/510 disagreement counts used different populations:
+  the first included =ea=0= pseudo-groups; the second counted real EAs with
+  coordinates. Their exact reconciliation is below.
 - =Data/totcons_final.dta=: the consumption aggregate, 4,715 households x 62
   columns, with the weights =wt_wave5= and =popw= and three =totcons_adj*=
   columns.
 
-*Not wired.*  Wiring =df_geo= is the separate, reviewed served change GH #978
-asks for; until it lands, =cluster_features=
-for 2023-24 is declared from the cover page alone (=df_key= +
-=df_main=, no =df_geo=, unlike W1--W4): =Region= / =District= / =Rural= are
-fully populated for 2023Q3 and 2024Q1 (911 clusters each), and =Latitude= /
-=Longitude= are 100% NaN there pending that wiring.  (The comment at
-=2023-24/_/data_info.yml:70-71= still describes v02 as unacquired; it is
-left for the wiring change because that file is a build input.)  The Site B
-null-content guard warns for exactly those two waves on every
-=cluster_features()= read; that is the known country-grain =optional:=
-mismatch (CLAUDE.md) and must NOT be silenced with =optional: true= in
-=data_scheme.yml=, which would disarm W1--W4 as well.  A side effect of having
-no coordinates: the Site 2 household -> cluster collapse is lossless for W5
-(no =GrainCollapseWarning= fires for 2023Q3 / 2024Q1).  Measured 2026-10-14
+*Historical pre-wiring state.* The old YAML declared W5 from the PP cover
+alone, with no =df_geo= and both quarters holding 911 clusters and all-null
+coordinates. The earlier note that =2023-24/_/data_info.yml:70-71= described
+v02 as unacquired was itself superseded by #1311: that YAML block no longer
+exists. The own-round compiler is now authoritative. Its W5 geo tuple names
+the root-level file and verified =hhid= / =lat_mod= / =lon_mod= bindings.
+No =optional: true= bypass is added: that would also disarm W1--W4.
+
+*W5-only cached-source diagnosis and existing-selector comparison, 2026-10-30.*
+The official v02 dictionary describes =lat_mod= / =lon_mod= as reference
+coordinates anonymized to preserve place confidentiality
+([[https://microdata.worldbank.org/catalog/6410/data-dictionary/F107][World Bank file dictionary]], variables V4477/V4478). They are not exact
+household GPS positions or an EA centroid. The file has no visit key, so its
+same recorded household reference pair enriches each round where that
+household exists; this does not establish visit-specific physical location.
+No source-specific displacement radius or numeric offset is inferred here.
+
+| logical round | own-round households | clusters | households with a pair | selected clusters with a pair |
+|---------------+----------------------+----------+------------------------+-------------------------------|
+| 2023Q3 PP     |                 5067 |      911 |                   4883 |                           886 |
+| 2024Q1 PH     |                 4771 |      900 |                   4771 |                           900 |
+
+PP has 184 households without a source pair and 25 clusters without one.
+All 112 geovariable households outside the PH cover remain excluded there;
+none is manufactured by an outer join. All 31 rule-qualified PH same-location
+identity repairs are preserved and have source coordinates.
+
+*The old disagreement counts reconcile without changing the cluster key.*
+Among PP groups with a pair, 112/708 raw =(zone,state,lga,ea)= groups disagree:
+34/510 real-EA groups plus 78/198 =ea=0= pseudo-groups. The latter are NOT
+sampling clusters; canonical =moved-{hhid}= singletons separate them. Canonical
+PP therefore has 34 multi-pair real clusters. PH has 24 under its raw nonzero
+EA keys and 31 under the approved same-location-refined keys. These are
+separate populations, not an invitation to average or re-key. Disagreement
+between anonymized household reference pairs alone does not establish a move.
+
+The household-grain left join preserves all non-coordinate fields, sample
+rows, raw weights, and own-round/refined identities exactly. The unchanged
+Site 2 =most_complete_row= selector reports disagreement and keeps a complete
+observed household row, never a centroid or per-column composite. Adding
+coordinates changes the selected household in 14 PP clusters and zero PH
+clusters. In these sources no selected Region/District/Rural/Derivation cell
+changes; the PH cluster-selected derivation remains present on six rows.
+That selected provenance is still not a census of all 31 repaired households.
+
+These figures come from the existing helpers and Site 2 compared to exact
+public =188adf03=, with independent recorded-round/whole-pair checks. The
+scientific assertions completed; the conventional guard's terminal exit1
+separately records one refused import-time urllib3 IPv6 socket-construction
+probe, not a clean zero-denial actor. Earlier diagnostic failures are retained.
+An additive receipt verifies raw MD5 against all five explicit =hash: md5=
+sidecars and records actual SHA256/size; no data decoding was repeated for
+that identity check. No full Country/Make/Feature/warm-cache or other-wave
+cohort is claimed. Evidence: =slurm_logs/isa_recovery_2026-10-29/Nigeria/978-w5geo-v1/=.
+
+*Historical W2--W4 collapse evidence (unchanged).* Measured 2026-10-14
 on the cover page + geovariables of W2 / W3 / W4, per column, over the real
 (non-=moved=) composite clusters: =zone= / =state= / =sector= take more than
 one value in *0* clusters in every wave, while =Latitude= / =Longitude= do in
@@ -717,13 +760,14 @@ report different coordinates (NOT the =ea == 0= movers, which are singletons
 and cannot disagree with anyone).  The audit's larger "conflicting tuples"
 counts (70 / 78 / 129) include households with NO coordinate beside ones
 with one, which a whole-row comparison counts as a disagreement.  So the only
-columns that ever made this collapse lossy are exactly the two W5 lacks.
+columns that made that older collapse lossy were the two W5 then lacked.
+W5 now also has the coordinate disagreements measured above.
 
 GH #592 re-check (2026-10-23): unchanged.  The catalog search now returns
 =NGA_2023_GHSP-W5_v02_M= for entry 6410, and its file list includes
 =nga_householdgeovariables_y5= (4,883 cases, 55 variables, coordinates
 =lat_mod= / =lon_mod=); we still hold v01 (/superseded the same day:/ v02 is
-now held, see above; W5 stays 0/911 until the file is wired).  Cold on =development=
+now held, see above; the 0/911 figure below is the historical pre-wiring build).  Cold on =development=
 =9a0ed5f3c=, clusters with coordinates: W1 500/500 (both rounds), W2
 645/647, W3 784/792, W4 671/685, W5 0/911.  The six W1-W4 rounds GH #592
 listed at zero are all populated now (the casing / =merge_on: [i]= fixes
@@ -1500,7 +1544,7 @@ not always 100%: three clusters (2 in 2013Q1, 1 in 2016Q1; 87 price rows)
 appear in the community file with no household-side cluster.  The 2024Q1 row
 used to read =0 (0%)= in the =cluster_features= column because the table was
 not declared for W5 at all; it is since GH #841 (declared without
-coordinates, see [[*Wave 5 ships NO household geovariables file (GH #841)]]),
+coordinates, see [[*Wave 5 geovariables: acquired v02 household reference coordinates (GH #841 / #978)]]),
 and all 27,318 2024Q1 price rows now join a =Region= / =District= / =Rural=.
 
 ** Item labels (j) -- the community-price arm of label unification

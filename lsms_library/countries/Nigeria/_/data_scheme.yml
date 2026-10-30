@@ -56,7 +56,10 @@ Data Scheme:
     # centroid this comment used to describe was retired 2026-07-13) and
     # reports the conflict as a GrainCollapseWarning.  Measured spread: 5 / 24
     # / 50 clusters in W2 / W3 / W4 span more than one coordinate.  W1 is
-    # clean (0 of 500 groups disagree).
+    # clean (0 of 500 groups disagree). Acquired W5 v02 household reference
+    # coordinates are anonymized:34PP /31refinedPH real clusters have multiple
+    # pairs (#978, CONTENTS.org). Keep the same audited observed-row selector;
+    # neither a centroid nor a physical-movement inference follows.
     index: (t, v)
     Region: str
     District: str
