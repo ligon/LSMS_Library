@@ -1,0 +1,5 @@
+outs:
+- md5: 2665e18a16dd24260d72c0ac430af25b
+  size: 6635
+  hash: md5
+  path: ehcvm_ponderations_bfa2021.dta

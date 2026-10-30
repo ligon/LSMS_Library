@@ -2,8 +2,9 @@
 """Burkina Faso 2014 (EMC) months_food_inadequate -- 12-month provisioning.
 
 Source: ``emc2014_p3_securitealimentaire_27022015.dta`` (Part 3 "Sécurité
-alimentaire").  HOUSEHOLD-level (one row per HH, index i = each wave's roster i
-= format_id(zd) + format_id(menage, zeropadding=3), e.g. zd=1, menage=1 -> '1001').
+alimentaire").  HOUSEHOLD-level (one row per HH, index i = the wave's roster i,
+``burkina_faso.emc_i``: 'EMC_' + zd + menage.zfill(3), e.g. zd=1, menage=1 ->
+'EMC_1001'; the prefix namespaces the EMC sample apart from EHCVM, GH #1244).
 
     SA4        "Au cours des 12 derniers mois, avez-vous fait face à une
                situation où vous n'aviez pas assez de nourriture [...]" (Oui/Non).
@@ -23,9 +24,16 @@ count of "Oui" months per the brief):
 ``t`` = '2014'.  ``v`` is NOT baked in -- the framework joins it from
 ``sample()`` at API time.
 """
+from pathlib import Path
+
 import pandas as pd
 
-from lsms_library.local_tools import get_dataframe, to_parquet, format_id
+from lsms_library.local_tools import get_dataframe, to_parquet, get_formatting_functions
+
+# Standalone and runpy callers must use this script's selected config tree.
+emc_i = get_formatting_functions(
+    Path(__file__).resolve().parents[2] / '_' / 'burkina_faso.py',
+    '_burkina_emc_namespace')['emc_i']
 
 df = get_dataframe('../Data/emc2014_p3_securitealimentaire_27022015.dta')
 
@@ -44,8 +52,7 @@ months = oui_months.where(faced != False, other=0)
 months = months.where(faced.notna(), other=pd.NA)
 
 out = pd.DataFrame(index=df.index)
-out['i'] = (df['zd'].apply(format_id)
-            + df['menage'].apply(lambda m: format_id(m, zeropadding=3)))
+out['i'] = [emc_i(z, m) for z, m in zip(df['zd'], df['menage'])]
 out['t'] = '2014'
 out['MonthsInadequate'] = pd.to_numeric(months, errors='coerce').astype('Int64')
 out['AnyInadequate'] = (out['MonthsInadequate'] > 0).astype('boolean')

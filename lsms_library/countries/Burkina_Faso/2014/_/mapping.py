@@ -11,16 +11,40 @@ canonical long form on the ``s`` (acquisition-source) axis — matching the
 kg derivation (0% resolved).
 """
 
+from pathlib import Path as _Path
+
 import pandas as pd
 
 from lsms_library.build_transforms import add_visit_level
-from lsms_library.local_tools import format_id
+from lsms_library.local_tools import format_id, get_formatting_functions as _get_formatting_functions
 from lsms_library.transformations import (
     food_acquired_to_canonical as _food_acquired_canonical)
+
+# Bind the helper to this config tree, including when another checkout's bare
+# burkina_faso module is already cached. Reuse the framework's exact-path loader.
+_emc_i = _get_formatting_functions(
+    _Path(__file__).resolve().parents[2] / '_' / 'burkina_faso.py',
+    '_burkina_emc_namespace')['emc_i']
 
 
 def strata(x):
     return format_id(x)
+
+
+def i(value):
+    """2014 household id, NAMESPACED: ``'EMC_' + zd + menage.zfill(3)``.
+
+    GH #1244 (@ligon's ruling): the EMC 2014 sample is independent of the
+    EHCVM waves, yet its ids used to collide with 2018-19's -- ``zd +
+    menage.zfill(3)`` here and ``grappe + '0' + menage.zfill(2)`` there spell
+    the same string for a two-digit menage whenever the cluster serials agree:
+    583 shared ids, whose clusters' Region agreed for 80.  See
+    ``burkina_faso.EMC_PREFIX`` for the prefix and why.  Overrides the country
+    ``i`` for every 2014 table; ``value`` is the row of ``[zd, menage]`` (or
+    ``[grappe, menage]`` in emc2014_welfare.dta, which spells the ZD
+    ``grappe``).
+    """
+    return _emc_i(value.iloc[0], value.iloc[1])
 
 
 # ---------------------------------------------------------------------------

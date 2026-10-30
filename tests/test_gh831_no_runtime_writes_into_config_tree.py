@@ -113,6 +113,30 @@ def test_a_readonly_config_tree_does_not_break_a_read(tmp_path, monkeypatch):
         fake_countries.chmod(0o755)
 
 
+def _config_tree_offenders(src):
+    # Only this exact read-only assignment is admitted; a write or a call
+    # chained onto it still fails. read_provenance reads SOURCE.org and parses it.
+    provenance_read = "prov = read_provenance(_COUNTRIES_DIR, country, wave)"
+    return [
+        line.strip() for line in src.splitlines()
+        if "_COUNTRIES_DIR" in line
+        and "intree_path" not in line
+        and "data_dir" not in line
+        and line.strip() != provenance_read
+    ]
+
+
+@pytest.mark.parametrize('line, allowed', [
+    ('prov = read_provenance(_COUNTRIES_DIR, country, wave)', True),
+    ('sink = _COUNTRIES_DIR / path', False),
+    ('write_provenance(_COUNTRIES_DIR, country, wave)', False),
+    ('read_provenance(_COUNTRIES_DIR, country, wave).write_text(payload)', False),
+    ('sink = _COUNTRIES_DIR / path  # read_provenance', False),
+])
+def test_provenance_read_allowance_does_not_admit_config_write_sites(line, allowed):
+    assert (not _config_tree_offenders(line)) is allowed
+
+
 def test_no_write_site_in_get_data_file_targets_the_config_tree():
     """Static guard: the read path must not name ``_COUNTRIES_DIR`` as a sink.
 
@@ -123,16 +147,11 @@ def test_no_write_site_in_get_data_file_targets_the_config_tree():
     import inspect
 
     src = inspect.getsource(data_access.get_data_file)
-    # The only permitted mention is the read-side candidate and the
-    # acquisition-only data_dir, both commented as such.
-    offenders = [
-        line.strip() for line in src.splitlines()
-        if "_COUNTRIES_DIR" in line
-        and "intree_path" not in line
-        and "data_dir" not in line
-    ]
+    # The read-side candidate, acquisition-only data_dir, and exact read-only
+    # provenance lookup are allowed; no additional config-tree sink is admitted.
+    offenders = _config_tree_offenders(src)
     assert not offenders, (
-        "get_data_file names the config tree outside the two sanctioned "
+        "get_data_file names the config tree outside the sanctioned "
         f"sites; route it through _fetch_destination instead:\n  " +
         "\n  ".join(offenders)
     )
