@@ -28,10 +28,43 @@ A known code with missing quarter curation is reported by =FoodItemDecodeWarning
 Unknown raw codes and NaN item keys keep the existing raw/missing contract.
 An absent quarter, including W5's =2023Q3=/=2024Q1=, raises explicitly; this change adds no W5 food feature.
 
-*Inherited specificity questions, not settled here.*
+*Inherited specificity questions left open by #1144.*
 The W4-PH codebook says =Maize (On the cob)= for code 20 while its curated Preferred name adds =unshelled=, and =Milk tinned= for code 113 while its curated name adds =unsweetened=.
-Those later-wave curation choices need their own instrument check; this correction preserves them and makes no claim that every inherited qualifier is proven.
+That correction preserved these choices pending an instrument check; the #1177 checkpoint below supplies grounding for these two qualifiers only.
 The raw measurements and source rows remain the survey's answers; kilograms and prices still come from the existing transforms, whose label-pooled inference can move other waves after an item rename.
+
+* W4-PH qualifiers confirmed in the published instrument (GH #1177, 2026-10-30)
+
+The [[https://microdata.worldbank.org/catalog/3557/download/47671][official W4 post-harvest household questionnaire]] explicitly prints:
+- Section 10B, printed page 45 (PDF index 44): code 20 =Maize (Unshelled/On the cob)=.
+- Section 10B, printed page 49 (PDF index 48): code 113 =Milk tinned (unsweetened)=.
+
+Independent review visually confirmed both aligned item-code rows and their
+surrounding categories.  This supports retaining the existing qualifiers as
+published questionnaire wording.  The shorter held Stata labels above remain
+valid source evidence; they are not rewritten to match the questionnaire.
+Historical 20/340 retained-source-row counts were not remeasured.
+
+The [[https://microdata.worldbank.org/catalog/3557/download/47668][post-planting questionnaire]] independently agrees for these two labels
+(Section 7B, printed pages 28 and 32).  The maize tables are still different:
+PH includes code 21 =Maize (Shelled/On the cob)=; PP's printed table goes from
+20 to 22.  Do not transfer other quarter definitions by inference.
+
+Both questionnaires match their tracked PDF sidecar MD5 and size: PH
+=61ce32c4fe52cb7dc8753e651957e6c3= / 612850 bytes; PP
+=da641e8c226502f32b80183b1de59a7b= / 485720 bytes.  Catalog 3557 is the GHS
+Wave 4 instrument; the superseded 3827 is NGA_2018_LSS.  PH/PP interviewer
+manuals were also read; inspected food instructions add no item-specific
+shell/sugar definition.  No condensed/evaporated equivalence is inferred.
+
+No mapping, Preferred/Aggregate label, row, quantity, expenditure, conversion
+or API behavior changed.  This establishes published category wording, not
+respondent-level purchase contents or every fielded CAPI version.  #1178's
+implementation evidence and unrelated recall/unit questions remain separate.
+Independent review SHA256
+=50ba69fadfe8a0754d4935f6b1ddb3ee7d55261ba89246bafae622e86256c1f8=;
+report SHA256 =edace7af40a578385e08147c596875c65feaef7cf79c436048835360d477e73b=,
+dispatch =d7a0b6cb4e9744b1a9a271581c2cc6be=.
 
 * food_acquired acquisition sources (GH #591)
 
@@ -2496,6 +2529,12 @@ for years looking like scaffolding for a non-food aggregation; it was pointing
 at the wrong file entirely and has been removed rather than revived.
 
 ** WAITING Recall windows are POOLED, and no column records it
+
+The #1177 instrument review found an additional published contradiction:
+[[https://microdata.worldbank.org/catalog/3557/download/47675][W4 PP interviewer manual]], printed page 49 (PDF index 48), describes a
+"12 months reference period" while instructions on that same page say
+"PAST 6 MONTHS".  Both were visually confirmed; this does not settle the
+sub-module windows or authorize a recall-policy change.
 
 =sect8a..e= and =sect11a..e= are separate sub-modules asking over *different
 recall windows* -- the wave scripts' own comments say "past 7 days" for
