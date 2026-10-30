@@ -62,3 +62,19 @@ absent acquisition is made for that failed attempt; no data/private artifacts
 are included in this extraction. Its process was terminal and the failed run
 was preserved separately. Shared transform/fingerprint PR1372 remains intact;
 runtime evidence is source-pin-bound and current caches may rewarm.
+
+## CI fixture contract correction (run41143545278)
+
+Configured unit CI found seven failures in the synthetic sale-suppression and
+sale-condition tests of `test_malawi_shipped_factors.py`. All seven enter
+`_consolidate_harvest` before the unchanged `_attach_sales` ladder and fail
+because three direct harvest fixtures omit the new native `production_obs`
+column. `pytest.warns` masks that KeyError in the warning cases. These fixtures
+already declare seasonal `_crop_code`1 or11; `_harvest_block` constructs their
+identity as `reported:G:1` or `reported:G:11`. Extend those fixture declarations
+and assert the output coordinate, retaining every sale/quantity/condition,
+warning and tally assertion. No fallback identity or production change.
+Validate the entire affected module's explicitly non-source-gated selection
+under the existing synthetic raw/build/acquisition guards; do not repeat the
+previous full-file source-selection error. Scientific actual evidence above
+remains source-bound and separate from this CI fixture correction.
