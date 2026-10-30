@@ -4452,3 +4452,24 @@ ruling and verification of the selected alternative. The
 private dispatch evidence is =ad30c7b83dc24ab8b01696180964b318/evidence/REPORT.md=;
 it contains aggregate counts, parser tests, a candidate diff and explicit
 verification limits. No household identifiers are included in that evidence.
+
+* 2026-10-30 -- plot_inputs restricted-reader cached-byte route (#1287/#1288)
+
+The 2016 cross-sectional Module D restricted reader previously called
+=DVCFS.open= after =_ensure_dvc_pulled= even when its sidecar-addressed blob
+was already in L1. A bounded direct-Make arm sampled it constructing DVC's
+repository-wide storage index; the arm was interrupted at 486 seconds without
+a 2016 native writer return or country compiler execution. Its partial shutdown
+counts show the restricted decoder and cross-sectional G/H had subsequently
+run. This is not a completed direct-Make result or a pure uninstrumented timing.
+
+The reader now reuses =_dvc_cache_path= (the existing =get_dataframe= fast
+path), retaining DVC fallback, identical temporary bytes, usecols,
+=apply_value_formats=False= and cleanup. No source observation, reducer,
+quantity, unit, ownership, eligibility or namespace rule changes. Four invented
+cached/fallback success/failure controls pass. The normal four-wave Country
+build completed with the change; singleton Feature and fresh-process warm
+frames agree exactly, including order after documented canonical alignment.
+Direct country-compiler acceptance remains open: the failed Make arm was not
+retried. The analogous plot_features/plot_labor readers were not changed or built.
+Evidence: private dispatch =0c1ccc4d7aef4198ac3c1d845e5fc64c/evidence/REPORT.md=.
