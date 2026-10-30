@@ -31,4 +31,4 @@ Existing #1287/#1206 full-index qualifications, #1288 failure/freshness scope, T
 
 ### Phase 3 — verification
 
-Pending documentation diff review; no data/test replay is needed for prose.
+Both appended CONTENTS entries — OK (anchored on §2–§5): exact accepted source/receipt scopes and retained failures; no new symbol or science. Documentation-only diff checked; no data/test replay performed. Root final review pending.
