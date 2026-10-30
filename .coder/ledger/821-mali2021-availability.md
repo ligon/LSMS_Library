@@ -47,4 +47,3 @@ the closed SHA256SUMS manifest. The current five community sidecars match the
 old declared MD5/size bindings. OK (§3/§4): s03 land/labor values explicitly
 remain distinct; unsure/C4-notrun and all runtime/source boundaries are retained.
 Whole-diff whitespace and exactly-one-coverage-row checks passed. No tests/data.
-
