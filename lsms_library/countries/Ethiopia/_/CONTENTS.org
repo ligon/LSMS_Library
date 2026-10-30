@@ -3361,3 +3361,35 @@ supervisor 74 and Slurm FAILED 74:0. Git publication completed at =6c3d8033=;
 ordinary evidence publication hit its 256 MiB ceiling (120 size-limit errors).
 The independently hashed shared private witnesses remain durable; this is not
 a fully successful dispatch publication or evidence of pre-emption.
+
+* GH #1171 -- country food household ID walk (2026-10-30)
+
+Canonical food uses =(t, i, j, u, s)=: =i= is household and =j= is food.
+The old country compiler's private loop called =ethiopia.change_id=, whose
+older convention treated =j= as household. This was a real axis mismatch,
+not a reason to reinterpret food labels or construct household IDs.
+The compiler now obtains the current committed maps through =Country.updated_ids=
+and uses the shared =local_tools.id_walk= on each native contribution with
+=state='raw'=, matching framework stage 2. Frames explicitly marked
+=id_converted= are skipped; chained maps use one substitution, not transitive
+closure. Declaration selection, physical-folder deduplication, squeeze,
+concat, food labels, source channels, units, quantities and writer remain.
+One-column contributions retain the existing DataFrame writer shape.
+
+Saved-input verification covers all five declared native food operands.
+Both baseline/compiler and framework have 326,456 rows, but the old compiler
+differs on 75,367 observed household keys (W2: 30,463; W3: 44,904), while
+payloads match by unchanged row position. The repaired compiler CALL matches
+the saved framework pre-final RETURN exactly, including complete index
+dictionaries, dtypes, attrs, missing masks and numeric arrays. Its writer
+RETURN also matches sanctioned-reader storage. Six immutable-input checks
+and source/input byte closure pass. No raw cover, source parser, native
+builder, normal API, Make or FDC call was repeated for this verification.
+
+This is saved-input pre-final acceptance, not normal served-food/nutrient
+parity or recipe retirement. Earlier failed setup/parity and historical
+country-cache custody remain qualified. #1171 and the separate #771 FCT
+reproducibility scope remain open. The settled
+[[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 exclusion of anonymous household-keyed observations]] is unchanged;
+no orphan or inferred household identity is introduced. See
+=slurm_logs/isa_backlog_2026-10-30/Ethiopia/1171-household-walk/REPORT.md=.
