@@ -334,3 +334,18 @@ Data Scheme:
     Industry: {type: str, optional: true}
     working_age: bool
     materialize: make
+
+  community_prices:
+    #2018-19 PRICE instrument only; two FCFA quotes per selected native
+    # unit-size. No household i/sample join. variety is the CONSTRUCTED
+    # product+unit-code coordinate, not a reported physical variety.
+    # Quantity1 is a registered quoted-native-unit count, NOT measured
+    # physical quantity/mass; raw seven-field inputs remain retrievable.
+    index: (t, v, j, u, variety, visit, obs)
+    Price: float
+    Quantity: float
+    Description: {type: str, optional: true}
+    SourceProductCode: {type: str, optional: true}
+    SourceUnitCode: {type: str, optional: true}
+    SourceRow: {type: int, optional: true}
+    materialize: make

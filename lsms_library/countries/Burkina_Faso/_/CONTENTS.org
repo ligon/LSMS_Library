@@ -2042,3 +2042,94 @@ report-only private result =7c5a6515aa300d1668a72475a904b2a3dd02abde=.
 Independent review SHA256:
 =8fafa48f93b2776bc69904d843b58daa359e57469ea0184d7358e8e21a47ff85=.
 This documentation changes no build input or scientific definition.
+
+* 2026-10-30 -- PRICE versus FOCUS instruments and native quote identity (GH #1226)
+
+The held 2018-19 =s05_co_bfa2018.dta= has seven fields and two explicitly
+price-labelled exports, =s05q03=/=s05q04=; it has no quantity field or third
+reading. The community XLS workbooks linked by WB4290 are FOCUS forms with
+three quantity/price pairs. The official regional catalogue separately lists
+the own PRICE CAPI forms, =Qx_EHCVM_PRIX_BF= and =Qx_EHCVM_PRIX_BF_V2=:
+[[https://phmecv.uemoa.int/nada/index.php/catalog/43/download/104][v1 PDF]] and
+[[https://phmecv.uemoa.int/nada/index.php/catalog/43/download/105][v2 PDF]].
+Their generated per-selected-unit-size roster has two integer FCFA price
+entries (v1p10/v2p9); the rendered page geometry confirms no quantity entry.
+The two instruments must not be silently substituted for each other.
+
+The new 2018-19 builder retains both slots and every source record, including
+repeated or missing-price records. =variety= is a constructed priced-line
+coordinate containing the full native product AND unit-size codes, not a
+reported physical variety. This protects identity when harmonized product or
+unit labels coalesce. =SourceProductCode=, =SourceUnitCode= and original
+=SourceRow= remain available. Complete unit-size labels survive; no digit
+split, inferred kg factor or size collapse supplies a missing unit label.
+Own CAPI attestations supply only exact missing-dictionary labels for
+products140/141/143 (v2p6/p15) and unit1161 (v2p17). Unattested1001 stays an
+opaque source-qualified code; Demi/Entier are not assumed to be kg.
+
+=Quantity=1= is explicitly the registered construction
+=Burkina_Faso::community_prices::quoted-native-unit-count=: one quoted native
+unit, not a measured quantity, weight or conversion factor. Every row carries
+=Derivation=; =derivation_inputs= exposes all original seven fields, without a
+quantity answer. This follows the own PRICE instrument and the explicit
+Niger quoted-unit precedent, not a universal rule for absent quantities.
+Mali's absent reported kg Quantity remains unchanged. See =derivations.yml=
+for the instrument evidence and modelling assumption.
+
+=v= is the native cluster; =visit= keeps the source vague. No household ID,
+weight or sample membership is inferred. The food module's =visit=1= and the
+French-ZD versus English-household sample-split tension above remain distinct.
+GH #1357 option1 continues excluding anonymous households from household-keyed
+tables; this intrinsically cluster-level table is not an orphan-household
+representation. Other waves, #1148 exposure and #1276 CS coverage stay open.
+
+The source/invented-input boundary was followed by the separate saved-source
+runtime checkpoint below; no fresh source decoder/acquisition, other-wave
+or standalone Make/compiler acceptance follows. The earlier diagnostic int-versus-string unit lookup error is not
+source missingness: its corrected metadata lookup resolves87/89 base probes,
+with only254/255 unresolved in the shared household map. That observation
+neither establishes digit-decomposition policy nor replaces full unit-size
+identity. Ledger: =.coder/ledger/1226-burkina-native-community-prices.md=.
+
+** Accepted saved-source native and API checkpoint
+
+At source =c8f8bcc976482f32d5a5a412855cdd1f4a6e00ab=, the reviewed
+implementation uses three authenticated, closed diagnostic operands
+(3,343,245 bytes): numeric S05 and the S05/household-food dictionaries.
+These are reused evidence, not a fresh source decode or historical native
+parquet recovery. The independent source-row oracle and actual native script
+retain both slots of all 69,267 source rows: 138,534 distinct quote keys.
+The actual writer/production-reader storage matches an independently
+serialized expectation. Normal cold Country/Feature full and 2018-only
+requests, followed by those four arms in a separate warm process, pass all
+12 mandatory matching-stage predicates. Exact checks include full index
+domains/codes/typed attrs plus ExtensionArray and nonmissing NumPy equality;
+cache/finalizer and Feature composition are identified as framework
+composition, not additional independent instrument evidence.
+
+One direct native RETURN/storage comparison remains strictly failed:
+=visit= changes from pandas nullable =Int64= to NumPy =int64=. A separate
+read of only the two authenticated closed operands confirms identical
+observed ordered keys, level values/codes and all seven payload columns,
+masks, attrs and flags. Actual frames were not cast or normalized to turn
+that failure into a pass. Both direct cold/warm transports pass.
+
+Native and cold each use three injected saved-reader roles; warm uses none
+and has zero native-script/helper/writer/decoder events. There is no new raw
+acquisition, sample build or standalone Make/compiler proof. Two private
+cache files retain exact bytes and epochs through warm requests. Original
+and private input bytes, all 262 source bindings and descendant closure
+pass. All 78 files (1,039,252,730 bytes) were exported only after closure;
+archive manifest SHA256
+=9121f73ca665488d32981cbc8808c595530c7a52e61e092fbb60138548cc0f38=.
+The single data/export invocation completed in 126.144 seconds. The earlier
+pre-data short/full Python-version mismatch and Poetry-absent skill-audit
+failure are retained; the corrected exact metadata binding and direct
+approved-interpreter skill audit do not replay any data stage.
+
+Dispatch =15ee0b1166d047bfba43216c23d66f7d=, job =40671455=. This scope
+adds only 2018-19; other waves, the existing Niger/Mali policies, #1148
+exposure and #1276 CS coverage remain unchanged. Shared helper migration
+for existing countries is not completed by this extraction. The 22 distinct
+literal tests have staged passing receipts, not a final full-22 rerun; both
+original control failures remain historical evidence.

@@ -114,6 +114,27 @@ import unicodedata
 import numpy as np
 import pandas as pd
 
+
+def community_price_slots(base, codes, columns, rank):
+    """Expand named price slots with ``obs = slot + len(columns) * rank``.
+
+    Only shared EHCVM mechanics (#1226): callers supply their own source-row
+    rank and key/label frame. No eligibility, duplicate removal, quantity,
+    unit decoding or aggregation policy lives here. Every supplied row and
+    slot survives, including missing prices and equal-valued repeats.
+    """
+    if not (base.index.equals(codes.index) and base.index.equals(rank.index)):
+        raise ValueError('community price base, codes and rank must align')
+    if not columns or len(set(columns)) != len(columns):
+        raise ValueError('community price slots must be distinct named columns')
+    pieces = []
+    for slot, column in enumerate(columns, 1):
+        piece = base.copy()
+        piece['obs'] = slot + len(columns) * rank
+        piece['Price'] = pd.to_numeric(codes[column], errors='raise').astype('Float64')
+        pieces.append(piece)
+    return pd.concat(pieces, ignore_index=True)
+
 from .build_transforms import food_acquired_to_canonical
 from .derivations import COLUMN as DERIVATION_COLUMN
 
