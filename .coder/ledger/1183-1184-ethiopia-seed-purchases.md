@@ -46,3 +46,26 @@ Does a missing section5 purchase answer encode a defined skip/No, or an unknown
 answer? For records whose purchase fields are the sole payload, what source rule
 settles retention? Independently establish whether a missing amount on an explicit
 Yes answer is genuinely unreported before implementing the narrow #1184 sum fix.
+
+### Source diagnosis and chosen implementation boundary
+The cached W2 post-planting form (MD5 5ce83f65b3ec26bee1e03e4708816ebd),
+section 5 Q3, routes explicit No to Q13. Q5 asks total purchased/credit quantity;
+the zero-if-nothing instruction is on Q10 up-front payment, not Q5. This was
+inspected as literal text-drawing strings in local PDF streams 56 and 58, not a
+full PDF/CMap/page reconstruction. Official WB dictionary entries independently
+confirm Q3 and Q5 meanings:
+https://microdata.worldbank.org/catalog/2247/variable/F113/V5189?name=pp_s5q03
+https://microdata.worldbank.org/catalog/2247/variable/F113/V5192?name=pp_s5q05_a
+
+Two normal cached section5 reads find 287 explicit W2 Yes rows with both amount
+components missing, versus 49 explicit Yes rows reporting both zero. These are
+different source states; a grouping-only missing-preserving sum is justified for
+#1184. Keep the decoder/caller and row-retention predicates exact. The measured
+265/187 post-caller grouping/output counts remain to be remeasured.
+
+#1183 remains separate: all 4,433 / 90 missing flags have missing purchase
+quantity components, but one W2 missing flag carries a positive purchase value
+and financing answer; 20 W1 missing flags carry a financing answer. Missing Q3
+cannot universally mean a documented No. Source evidence does not settle what to
+do with the 371 purchase-only W1 records once their fabricated False/zero payload
+is removed. No decoder, flag, eligibility or row deletion is implemented.
