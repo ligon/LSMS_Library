@@ -6,6 +6,8 @@ its independent key/weight oracle are recorded separately in the task report.
 """
 import importlib.util
 import runpy
+import sys
+import types
 
 import pandas as pd
 import pytest
@@ -111,3 +113,21 @@ def test_population_record_discloses_the_two_component_sample():
     assert rec.universe_tag == 'mixed-national+panel'
     assert 'sample and household_roster' in rec['survey']
     assert 'other tables still cover the panel only' in rec['survey']
+
+
+@pytest.mark.parametrize('consumer', ['sample', 'food_coping', 'months_food_inadequate'])
+def test_emc_helpers_bind_selected_config_not_cached_bare_module(monkeypatch, raw_reader, consumer):
+    """A previously loaded country from another config root is not this source."""
+    stale = types.ModuleType('burkina_faso')
+    stale.__file__ = '/another-config-root/Burkina_Faso/_/burkina_faso.py'
+
+    def wrong_helper(*args):
+        raise AssertionError('used another config root country module')
+
+    stale.emc_i = wrong_helper
+    monkeypatch.setitem(sys.modules, 'burkina_faso', stale)
+    if consumer == 'sample':
+        frame = Country('Burkina_Faso')['2014'].grab_data('sample').reset_index()
+        assert frame.i.tolist() == ['EMC_2001']
+    else:
+        test_emc_script_consumers_share_sample_namespace(monkeypatch, consumer)

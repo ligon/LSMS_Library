@@ -11,21 +11,20 @@ canonical long form on the ``s`` (acquisition-source) axis — matching the
 kg derivation (0% resolved).
 """
 
-import sys as _sys
 from pathlib import Path as _Path
 
 import pandas as pd
 
 from lsms_library.build_transforms import add_visit_level
-from lsms_library.local_tools import format_id
+from lsms_library.local_tools import format_id, get_formatting_functions as _get_formatting_functions
 from lsms_library.transformations import (
     food_acquired_to_canonical as _food_acquired_canonical)
 
-# The country module, imported the way Niger 2021-22's mapping.py imports
-# niger.py: the framework loads this file by path, so the country `_/` is put
-# on sys.path explicitly.
-_sys.path.append(str(_Path(__file__).resolve().parents[2] / '_'))
-from burkina_faso import emc_i as _emc_i  # noqa: E402
+# Bind the helper to this config tree, including when another checkout's bare
+# burkina_faso module is already cached. Reuse the framework's exact-path loader.
+_emc_i = _get_formatting_functions(
+    _Path(__file__).resolve().parents[2] / '_' / 'burkina_faso.py',
+    '_burkina_emc_namespace')['emc_i']
 
 
 def strata(x):

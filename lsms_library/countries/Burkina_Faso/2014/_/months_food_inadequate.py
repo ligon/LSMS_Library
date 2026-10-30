@@ -24,14 +24,16 @@ count of "Oui" months per the brief):
 ``t`` = '2014'.  ``v`` is NOT baked in -- the framework joins it from
 ``sample()`` at API time.
 """
-import sys
+from pathlib import Path
 
 import pandas as pd
 
-from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library.local_tools import get_dataframe, to_parquet, get_formatting_functions
 
-sys.path.append('../../_/')
-from burkina_faso import emc_i  # noqa: E402  (GH #1244 namespace)
+# Standalone and runpy callers must use this script's selected config tree.
+emc_i = get_formatting_functions(
+    Path(__file__).resolve().parents[2] / '_' / 'burkina_faso.py',
+    '_burkina_emc_namespace')['emc_i']
 
 df = get_dataframe('../Data/emc2014_p3_securitealimentaire_27022015.dta')
 
