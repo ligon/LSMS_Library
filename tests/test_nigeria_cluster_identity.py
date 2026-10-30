@@ -27,7 +27,9 @@ destroyed by groupby().first(), in each of the wave's two quarters), but no
 change to Nigeria's config can fix it; see the KNOWN OPEN DEFECT note in
 Nigeria/_/data_scheme.yml for the two core edits that would.
 """
+import importlib.util
 import os
+from functools import lru_cache
 import warnings
 from pathlib import Path
 
@@ -35,6 +37,16 @@ import pandas as pd
 import pytest
 
 from lsms_library.country import Country
+
+
+@lru_cache(maxsize=1)
+def _round_oracle():
+    """Load the sibling oracle without requiring tests/ on PYTHONPATH."""
+    spec = importlib.util.spec_from_file_location(
+        "_nigeria_round_oracle", Path(__file__).with_name("nigeria_round_oracle.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def _aws_creds_available() -> bool:
@@ -220,7 +232,7 @@ def test_moved_sentinel_does_not_fire_in_the_baseline_wave(sample):
 # in the dispatch evidence (9 failures / 2 passes) before reconciliation.
 @pytest.mark.parametrize('pp,ph', ROUNDS)
 def test_v_matches_each_rounds_recorded_location(sample, pp, ph):
-    from nigeria_round_oracle import recorded_round
+    recorded_round = _round_oracle().recorded_round
     for t in (pp, ph):
         actual = sample.xs(t, level='t')
         expected = recorded_round(t)
@@ -231,7 +243,7 @@ def test_v_matches_each_rounds_recorded_location(sample, pp, ph):
 
 @pytest.mark.parametrize('pp,ph', CF_ROUNDS)
 def test_cluster_features_matches_each_rounds_recorded_geography(cf, pp, ph):
-    from nigeria_round_oracle import recorded_geo
+    recorded_geo = _round_oracle().recorded_geo
     for t in (pp, ph):
         actual = cf.xs(t, level='t')
         expected = recorded_geo(t)
@@ -248,7 +260,8 @@ def test_cluster_features_matches_each_rounds_recorded_geography(cf, pp, ph):
 
 
 def test_sample_is_one_row_per_household_per_round(sample):
-    from nigeria_round_oracle import recorded_round, assert_numeric_exact
+    recorded_round = _round_oracle().recorded_round
+    assert_numeric_exact = _round_oracle().assert_numeric_exact
     assert set(sample.index.names) == {'i', 't'}
     assert sample.index.is_unique
     for pp, ph in ROUNDS:
