@@ -177,11 +177,12 @@ class TestRouting:
         got = r.set_index(['t', 'i'])['Latitude']
         assert got[('2013Q1', 'd')] == 2.0 and pd.isna(got[('2012Q3', 'c')])
 
-    def test_w5_has_no_geo_and_serves_na_coordinates(self, ng, monkeypatch):
+    def test_w5_joins_acquired_geo_left_and_preserves_round_identity(self, ng, monkeypatch):
+        import lsms_library.local_tools as lt
         spec = ng.ROUND_COVERS['2023-24']
-        assert spec['geo'] is None
+        assert spec['geo'] == ('nga_householdgeovariables_y5.dta', 'lat_mod', 'lon_mod')
         covers = {spec['pp']: _cover(['a'], ['1/1/1'], [1.0]),
-                  spec['ph']: _cover(['a'], ['1/1/1'], [1.0])}
+                  spec['ph']: _cover(['a'], ['1/1/2'], [2.0])}
         monkeypatch.setattr(ng, '_cover_frame',
                             lambda fn, spec_, weights=True: covers[fn.split('/Data/', 1)[1]].copy())
         monkeypatch.setattr(ng, '_roster_locator',
@@ -189,12 +190,22 @@ class TestRouting:
         # This routing test supplies a nonzero PH EA; actual labelled/raw
         # extraction and its zero-EA rule are tested in same_location.py.
         monkeypatch.setattr(ng, '_ph_same_location_answers', lambda folder: pd.DataFrame({
-            'hhid': ['a'], 'state': [1], 'lga': [1], 'ea': [1],
+            'hhid': ['a'], 'state': [1], 'lga': [1], 'ea': [2],
             'hh_moved': [2], 'hh_moved_label': ['2. NO, IN ORIGINAL DWELLING'],
             'pp_hhid': ['a'], 'pp_state': [1], 'pp_lga': [1], 'pp_ea': [1],
         }, index=pd.Index(['a'], name='i')), raising=False)
+        geo = pd.DataFrame({'Latitude': [1.5, 9.0], 'Longitude': [4.5, 9.0]},
+                           index=pd.Index(['a', 'outside'], name='i'))
+        def fake_geo(fn, idxvars, **columns):
+            assert fn.endswith('/Data/nga_householdgeovariables_y5.dta')
+            assert idxvars == {'i': 'hhid'}
+            assert columns == {'Latitude': 'lat_mod', 'Longitude': 'lon_mod'}
+            return geo.copy()
+        monkeypatch.setattr(lt, 'df_data_grabber', fake_geo)
         cf = ng.cluster_features_for_wave('2023-24')
-        assert cf['Latitude'].isna().all() and cf['Longitude'].isna().all()
+        assert set(cf.index.get_level_values('i')) == {'a'}
+        assert set(cf.index) == {('2023Q3', 'a', '1/1/1'), ('2024Q1', 'a', '1/1/2')}
+        assert cf['Latitude'].eq(1.5).all() and cf['Longitude'].eq(4.5).all()
 
 
 class TestRosterLocator:
