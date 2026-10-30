@@ -34,11 +34,13 @@ Nigeria::sample::ph-same-location: &ph_same_location
       evidence: >-
         Owner ruling GH1120 comment6380186741, 2026-10-24. Named label evidence
         is recorded in framework1135-Nigeria-counts/DIAGNOSIS.md (historical
-        source review); fresh held-source measurement remains pending.
+        source review); independently rechecked on the cached PH sources
+        in the 2026-10-29 public-base extraction.
   validated_against: >-
-    Actual-helper synthetic counterfactuals are prepared, not executed.
-    No fresh source-backed count or complete Country/Feature acceptance is
-    claimed. Inputs retain named PH answers and pp_-namespaced original PP
+    Actual-helper synthetic counterfactuals pass. Fresh cached-source checks
+    on 2026-10-29 verify 20 W4 and 31 W5 repaired PH sample identities,
+    unchanged PH weights/payload and selected-row geo provenance. Independent
+    root acceptance remains pending. Inputs retain named PH answers and pp_-namespaced original PP
     operands at (t,i), finer than selected cluster grain. Source storage
     dtypes are recorded separately; missing PP matches never coerce IDs to float.
   contents: Nigeria/_/CONTENTS.org, "Labelled same-location PH answers"

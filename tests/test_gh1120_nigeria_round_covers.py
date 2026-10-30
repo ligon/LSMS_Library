@@ -256,4 +256,3 @@ class TestRosterLocator:
         spec = ng.ROUND_COVERS[folder]
         assert 'sect1_planting' in spec['pp_roster']
         assert 'sect1_harvest' in spec['ph_roster']
-

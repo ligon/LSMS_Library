@@ -3,8 +3,8 @@ Wave: 2010-11
 
 # sample and cluster_features are NOT declared here (GH #1120 D1, @ligon
 # 2026-10-23).  This file is read once per ROUND (both quarters of the folder
-# map to it), so a YAML block can only read one cover page for both rounds --
-# which is what tagged the post-harvest round with the post-planting cover's
+# map to it). The former blocks named the PP cover for both rounds,
+# which tagged the post-harvest round with the post-planting cover's
 # households and clusters.  Each round now reads its OWN cover: see
 # _/sample.py and _/cluster_features.py in this folder, nigeria.round_covers,
 # and the "Sampling Design" section of ../../_/CONTENTS.org (the composite

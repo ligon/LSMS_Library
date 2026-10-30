@@ -66,6 +66,10 @@ wave_folder_map = {
 # path does this with `converted_categoricals:` on the sub-df) and the
 # composite is assembled from the raw numeric codes.
 #
+# The PH same-location refinement below is an explicit exception: ea=0
+# alone is not proof of physical relocation. Nonzero EAs may also accompany
+# recorded dwelling moves; this helper formats keys, not movement events.
+#
 # THE `Moved` SENTINEL.  From W2 on, a tracked household that left its
 # original EA is recorded with ea == 0 -- surfacing as the label 'Moved'
 # (W2), '0. Moved' (W3), or a bare 0 (W4).  It is a MISSING-VALUE

@@ -8,7 +8,8 @@ Data Scheme:
     # cover (secta_harvest{wN}), each with that cover's weights.  Until
     # 2026-10-23 one YAML block read the PP cover for BOTH rounds.  So a
     # household's `v` is a per-ROUND fact: a household that moved between the
-    # two visits is `moved-{hhid}` in the PH round (17 / 41 / 66 / 64 in W2-W5),
+    # two visits can have a different PH key. Labelled W4/W5 same-location
+    # answers reuse a complete known own-PP identity only for PH ea=0;
     # and the round's household set is the cover's (W2's PH cover adds 44
     # households the PP cover lacks; every wave's PH cover drops PP households
     # it did not revisit).  W2's PP round also takes the 21 households the PP
@@ -43,7 +44,9 @@ Data Scheme:
     # (890/5000 W1 households got the wrong District).  With the composite key,
     # Region/District/Rural are constant within the group BY CONSTRUCTION
     # (state and lga are IN the key; zone and sector are functions of them), so
-    # the collapse is provably lossless for them.
+    # ordinary raw-composite groups agree on these attributes. The explicit
+    # PH same-location repair keeps PH payload with a PP identity; Site 2
+    # still audits any resulting disagreement rather than assuming agreement.
     #
     # Latitude/Longitude are the exception and are NOT invariant from W2 on:
     # the panel follows households that move while keeping their ORIGINAL ea in
