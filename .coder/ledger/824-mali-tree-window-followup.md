@@ -48,3 +48,23 @@ from already-tested stacked composition; report that limit until checked.
 No provider acquisition, shared cache mutation, new science decision, jobs or
 public write. All new checks use1CPU42/8GiB/thread1/private roots and approved
 image. Parent root owns independent review/PR/CI/integration.
+
+## Phase3 — final focused regression/integration result
+
+Public source f312a97e:34 distinct no-data cases passed in0.86s, exit0,
+JUnit34 exact unique/0skip/error/failure; core42/8GiB/thread1/serialn0/offline,
+120+5s. This includes13new cases plus existing1267Declared/Derive and824Declared/
+Finalize. Existing raw synthetic DataFrame fixtures are AST-identical; harvest
+assertions retained. Obsolete sold-xmonths assertions now check recorded raw
+answers/registry split. No tests are removed/skipped/xfail or fixtures repinned.
+
+Data-dependent expectations/oracles are updated honestly for the revised rule:
+raw harvest/sale inputs are positionally reunited after exact key/shared-field
+checks (no duplicate-key Cartesian merge), sales use recorded masks, price
+ratios use NumPy exact equality. Revised known source metrics come from owned
+native frames independently verified against raw rosters:2014tree priced196/
+unit194/both188/disagree40, sold-quantityNA2/valueNA156; cashewKg n13/median300.
+Other pins/harvests/field metrics stay unchanged. Credentialed TestServed cases
+were not executed in this extraction; ordinary actual source/API evidence is
+separate and preserved. A prior new13-only pass at391e9f672 is not added again
+to the34 distinct-case count. This final ledger-only commit needs no replay.
