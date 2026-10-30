@@ -2779,3 +2779,49 @@ optional in native PERCENT for Nigeria and Ethiopia. No Nigeria value, join,
 key, dtype or round assignment changes; no inverse conversion or range-based
 unit inference was used. The post-planting-only design and W5 questionnaire
 renumbering remain in force. The rejected degree conversion is not shipped.
+
+* 2026-10-30 -- Two more actual compiler cells and legacy CSV hashes (GH #1287)
+
+At exact source =73c5d955e782c9a335d9e4dda96456c3c207cb53=, actual GNU
+Make ran the three =food_coping= natives and compiler (43,204 + 41,353 +
+41,282 = 125,839 rows), and five =housing= natives and compiler (4,899 +
+4,756 + 4,589 + 5,047 + 4,715 = 24,006 rows). The four-target task remains
+incomplete: plot_features and community_prices stopped at source-verifier
+refusals before their country compilers. No accepted roster cell was replayed.
+
+All nine coping writer/compiler/storage predicates pass. Housing passes ten
+of thirteen: three native CALL/RETURN complete-axis comparisons remain failed.
+Unused household-index domains shrink 4,929 -> 4,899, 4,789 -> 4,756 and
+4,611 -> 4,589 through the existing reset/set-index writer preparation.
+Observed ordered index values, typed attrs, dtypes, masks and numeric payload
+agree; RETURN/storage and policy-read native concat/compiler CALL are exact.
+The failed full-metadata predicates were not normalized away or relabelled.
+
+Each completed table passes seven cold and six fresh-process warm predicates:
+full/first/last Country and aligned singleton Feature (=currency=None=), using
+matching wave stages and raw-cache subset restriction before finalization.
+ExtensionArray and independent exact nonmissing NumPy checks supplement pandas
+frame equality. These are production-composition checks, not independent
+survey-science or linkage oracles. Both 60-file warm snapshots preserve exact
+bytes, sizes, modes and mtimes; observed warm raw/build/write activity is zero.
+The one current sample prerequisite is reused across the completed targets.
+
+The five source refusals are independently explained by legacy DVC text hashes,
+not evidence of corrupted data: W1-W3 plot-geovariable CSVs and W1-W2 C8 CSVs
+have no modern =hash:= field. The installed DVC selects =md5-dos2unix= while
+reading their =md5= metadata. Their original byte MD5s differ, but both full
+CRLF-to-LF hashing and the installed text-classified chunk algorithm equal the
+sidecars; declared sizes and original raw SHA256 identities are recorded.
+Only hashing transforms line endings: source bytes are not rewritten or
+substituted. Explicit modern =hash: md5= still means byte hashing. The failed
+actors remain failed; this diagnosis is not plot/community runtime acceptance.
+
+Dispatch =497ed9dda8ac446991ed220dd4497119=, job =40652865=; final private
+result =08646447a3a1f92b3881b36d2d623f6e898867e8=. Independent two-cell review
+SHA256 =4ce7627e871031058914375adb79e999df50df667d3b2afccdf183138049bc01=;
+legacy-hash review =f67d359eb602a0df32cd186d5a447f707f96bdf5920e1d3be85b74c460ddefb4=.
+Original staging, dangling-config-link and absent-Poetry failures remain
+recorded; 34 observed processes closed before witness export. The separate
+successor is limited to the two unexecuted targets with compatible saved sample
+prerequisites. No broader #1287/#1288, #1095 retention, source-grain or pooled
+recall-window acceptance follows, and no production rule changes here.
