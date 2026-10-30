@@ -22,18 +22,27 @@ and joins households via ``sample()`` at query time.
 """
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
-from ethiopia import Waves
 
 
+country = Country('Ethiopia', preload_panel_ids=False)
 pieces = []
-for t in Waves.keys():
-    fn = f'../{t}/_/community_prices.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not yet built / parquet absent (DVC raises PathMissingError).
+seen_folders = set()
+for t in country.waves:
+    wave = country[t]
+    folder = wave.wave_folder
+    if folder in seen_folders:
         continue
+    seen_folders.add(folder)
+    # A wave can legitimately omit this table. Use its actual script/YAML
+    # declarations, rather than treating a failed declared read as absence.
+    if 'community_prices' not in wave.data_scheme:
+        continue
+    fn = f'../{folder}/_/community_prices.parquet'
+    # Declared failures must stop before publishing an incomplete country table
+    # (ledger ethiopia-1287-community-declarations.md §§2–5).
+    df = get_dataframe(fn)
     pieces.append(df)
 
 assert pieces, "community_prices: no wave-level parquets found"

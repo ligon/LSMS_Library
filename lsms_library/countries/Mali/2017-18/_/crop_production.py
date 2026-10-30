@@ -31,9 +31,8 @@ Variable map (Stata labels; WB MLI_EACI2.do for the field/parcel keys):
              sold_qty PER HARVEST MONTH=s11fq14a SOLD UNIT=s11fq14b
              sold_value=s11fq15 (printed "montant total de cette vente";
                                     Stata label "mensuelle moyenne")
-             (served: Quantity = s11fq11a x s11fq10, Quantity_sold =
-             s11fq14a x s11fq10, Value_sold = s11fq15 x s11fq10 -- 12-month
-             totals)
+             (served: Quantity = s11fq11a x s11fq10, the 12-month harvest;
+             Quantity_sold = s11fq14a and Value_sold = s11fq15 AS RECORDED)
   cultivation: field=s11cq01 parcel=s11cq02 crop=s11cq03 plant_month=s11cq14b
 
 The sold unit (GH #824).  s7gq21b / s11fq14b, decoded from THEIR OWN value
@@ -50,13 +49,19 @@ The tree rows (GH #1267 check).  11F asks the harvest and the quantity sold
 as an average per harvest month (11F.11 / 11F.14), beside the month count
 11F.10, and then 11F.15, printed -- word for word 3B.14 -- "Quel a ete le
 montant total de cette vente ?" (French p1 pp. 44-45; English pp. 42-43,
-"What is the total amount of this sale?"), although the Stata label of
-s11fq15 reads "Montant de la vente mensuelle moyenne".  Served (rulings
-@ligon 2026-10-23 on PR #1272, rounds 1 and 3): all three answers x
-s11fq10 -- the value on the same footing as the per-month quantity, as the
-label and the data have it -- the 2014-15 rule, one registry key,
-mali.DERIVATION_TREES.  The WB MLI_EACI2.do:242/313/353 forms the same
-three products; the evidence is in Mali/_/CONTENTS.org.
+"What is the total amount of this sale?"), and the enumerator manual
+(WB catalog 3409, PDF p. 76) says "demander a l'enquete la valeur en F CFA
+de la quantite totale vendue", although the Stata label of s11fq15 reads
+"Montant de la vente mensuelle moyenne" and the price levels put the value
+on the per-month quantity's footing.  Served (rulings @ligon 2026-10-23 on
+PR #1272, the sale revised after the document search, following the
+Ethiopia #1257 precedent) -- the 2014-15 rule: Quantity = s11fq11a x
+s11fq10, the 12-month harvest (mali.DERIVATION_TREES, every tree row);
+Quantity_sold = s11fq14a and Value_sold = s11fq15 AS RECORDED, keyed
+mali.DERIVATION_TREE_SALES on tree rows with a positive sale.  The WB
+MLI_EACI2.do:242/313/353 multiplies the harvest and sold kg equivalents
+(s11fq11c, s11fq14c) and the value by s11fq10; the evidence is in
+Mali/_/CONTENTS.org.
 
 Unanswered sales (ruling @ligon 2026-10-23, PR #1272).  The s7g sale is
 summed with sum(min_count=1), so a sale whose quantity or value was not
@@ -72,7 +77,7 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
 from mali import (i as mali_i, crop_production_finalize, producing_trees,
-                  tree_crop_rows, DERIVATION_TREES)
+                  tree_crop_rows, stamp_tree_derivations)
 
 WAVE = '2017-18'
 
@@ -172,11 +177,11 @@ key2 = 'exploitation' if 'exploitation' in s11f.columns else 'ménage'
 s11f['exploitation'] = s11f[key2]
 s11f['i'] = _hhid(s11f)
 # The measured columns come from mali.tree_crop_rows, which calls the
-# registered derivation mali.derive_tree_twelve_month_total: Quantity =
-# s11fq11a x s11fq10, Quantity_sold = s11fq14a x s11fq10 (per-month answers
-# times months harvested), Value_sold = s11fq15 x s11fq10;
-# months_harvested = s11fq10 (labelled '1 mois' .. '12 mois',
-# 0 = 'Aucune récolte').
+# registered derivations mali.derive_tree_twelve_month_total and
+# mali.derive_tree_sale_window: Quantity = s11fq11a x s11fq10 (the
+# per-month harvest times months harvested), Quantity_sold = s11fq14a and
+# Value_sold = s11fq15 as recorded; months_harvested = s11fq10 (labelled
+# '1 mois' .. '12 mois', 0 = 'Aucune récolte').
 perennial = pd.DataFrame({
     't': WAVE,
     'i': s11f['i'],
@@ -190,9 +195,10 @@ perennial = pd.DataFrame({
 
 df = pd.concat([seasonal, perennial], ignore_index=True)
 df = crop_production_finalize(df)
-# Stamp AFTER the collapse (CLAUDE.md "Derived Values", registering step 3).
-df['Derivation'] = pd.Series(pd.NA, index=df.index, dtype='string')
-df.loc[df['perennial'].fillna(False).astype(bool), 'Derivation'] = DERIVATION_TREES
+# Stamp AFTER the collapse (CLAUDE.md "Derived Values", registering step 3):
+# the harvest key on every tree row, the sale-window key beside it on a tree
+# row with a positive sale.
+df['Derivation'] = stamp_tree_derivations(df)
 
 assert len(df) > 0, "crop_production 2017-18 produced no rows"
 assert df.index.is_unique, "Non-unique (t, i, plot, crop) in crop_production 2017-18"

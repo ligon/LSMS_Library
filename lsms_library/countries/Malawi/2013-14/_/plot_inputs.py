@@ -21,17 +21,21 @@ import sys
 
 sys.path.append('../../_/')
 import pandas as pd
+import numpy as np
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
-                    _seed_block, _seed_purchase_block, assemble_plot_inputs)
+                    _seed_block, _seed_purchase_block, assemble_plot_inputs,
+                    _seed_source_reference)
 
 
 WAVE = '2013-14'
+G_SOURCE = '../Data/AG_MOD_G_13.dta'
 
 d = get_dataframe('../Data/AG_MOD_D_13.dta', convert_categoricals=False)
-g = get_dataframe('../Data/AG_MOD_G_13.dta', convert_categoricals=False)
+g = get_dataframe(G_SOURCE, convert_categoricals=False)
 h = get_dataframe('../Data/AG_MOD_H_13.dta', convert_categoricals=False)
+g_rows = np.arange(len(g))
 
 d['hhid'] = d['y2_hhid'].apply(format_id)
 d['plotkey'] = d['ag_d00'].apply(format_id)
@@ -60,19 +64,21 @@ pieces = [
                      slots=[('ag_d41a', 'ag_d41b', 'ag_d41c'),
                             ('ag_d41d', 'ag_d41e', 'ag_d41f')], t=WAVE),
     _seed_block(g, hhid='hhid', plotkey='plotkey', cropcode='ag_g0b',
-                qty='ag_g04a', unit='ag_g04b', improved=None, t=WAVE),
+                qty='ag_g04a', unit='ag_g04b', improved=None, t=WAVE,
+                source_ref=_seed_source_reference(G_SOURCE, script_path=__file__),
+                source_half='single', row_positions=g_rows),
 ]
 
 seed_purchase = [
     _seed_purchase_block(h, hhid='hhid', cropcode='ag_h0c',
                          qty_cols=['ag_h16a', 'ag_h26a'],
                          unit_cols=['ag_h16b', 'ag_h26b'],
-                         value_cols=['ag_h19', 'ag_h29']),
+                         value_cols=['ag_h19', 'ag_h29'], source_half='single'),
 ]
 
 df = assemble_plot_inputs(WAVE, pieces, seed_purchase)
 
-assert df.index.is_unique, f"Non-unique (t,i,plot,input,crop,u) in plot_inputs {WAVE}"
+assert df.index.is_unique, f"Non-unique source-observation grain in plot_inputs {WAVE}"
 assert len(df) > 0, f"plot_inputs {WAVE} produced no rows"
 
 to_parquet(df, 'plot_inputs.parquet')

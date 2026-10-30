@@ -24,18 +24,25 @@ import json
 
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, id_walk, to_parquet
-from ethiopia import Waves
 
 
+country = Country('Ethiopia', preload_panel_ids=False)
 pieces = []
-for t in Waves.keys():
-    fn = f'../{t}/_/anthropometry.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not yet built / parquet absent (DVC raises PathMissingError).
+seen_folders = set()
+for t in country.waves:
+    wave = country[t]
+    folder = wave.wave_folder
+    if folder in seen_folders:
         continue
+    seen_folders.add(folder)
+    if 'anthropometry' not in wave.data_scheme:
+        continue
+    # Actual native/YAML declarations govern retirement, not output presence
+    # (ledger ethiopia-1287-retirement-continuation.md §§2–5).
+    fn = f'../{folder}/_/anthropometry.parquet'
+    df = get_dataframe(fn)
     pieces.append(df)
 
 assert pieces, "anthropometry: no wave-level parquets found"

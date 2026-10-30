@@ -93,19 +93,19 @@ $(VAR_DIR)/household_roster.parquet: household_roster.py $(household_roster_parq
 	python household_roster.py
 
 ../2010-11/_/household_roster.parquet: ../2010-11/_/household_roster.py
-	(cd ../2010-11/_; python household_roster.py)
+	(cd ../2010-11/_ && python household_roster.py)
 
 ../2012-13/_/household_roster.parquet: ../2012-13/_/household_roster.py
-	(cd ../2012-13/_; python household_roster.py)
+	(cd ../2012-13/_ && python household_roster.py)
 
 ../2015-16/_/household_roster.parquet: ../2015-16/_/household_roster.py
-	(cd ../2015-16/_; python household_roster.py)
+	(cd ../2015-16/_ && python household_roster.py)
 
 ../2018-19/_/household_roster.parquet: ../2018-19/_/household_roster.py
-	(cd ../2018-19/_; python household_roster.py)
+	(cd ../2018-19/_ && python household_roster.py)
 
 ../2023-24/_/household_roster.parquet: ../2023-24/_/household_roster.py
-	(cd ../2023-24/_; python household_roster.py)
+	(cd ../2023-24/_ && python household_roster.py)
 
 food_quantities = $(shell find $(rounds) -name food_expenditures.py)
 food_quantities_parquet := $(food_quantities:.py=.parquet)
@@ -162,6 +162,17 @@ plot_features_parquet := $(plot_features:.py=.parquet)
 $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
 	python plot_features.py
 
+# sample / cluster_features (GH #1120 D1).  Each wave script reads BOTH of its
+# folder's cover pages -- the post-planting cover for the PP quarter, the
+# post-harvest cover for the PH quarter -- and writes one wave parquet holding
+# both rounds; the framework keeps the requested round.  No country-level
+# rule: the framework concatenates the waves.
+../%/_/sample.parquet: ../%/_/sample.py
+	(cd $(@D) && python sample.py)
+
+../%/_/cluster_features.parquet: ../%/_/cluster_features.py
+	(cd $(@D) && python cluster_features.py)
+
 # food_coping (#332, Family B).  Post-planting GHS section-9 coping
 # day-count battery (W1-W3).  The framework's grab_data calls
 # `make ../<wave>/_/food_coping.parquet` from this `_/` dir for each
@@ -205,16 +216,16 @@ $(VAR_DIR)/community_prices.parquet: community_prices.py $(community_prices_parq
 	python community_prices.py
 
 ../2010-11/_/housing.parquet: ../2010-11/_/housing.py
-	(cd ../2010-11/_; python housing.py)
+	(cd ../2010-11/_ && python housing.py)
 
 ../2012-13/_/housing.parquet: ../2012-13/_/housing.py
-	(cd ../2012-13/_; python housing.py)
+	(cd ../2012-13/_ && python housing.py)
 
 ../2015-16/_/housing.parquet: ../2015-16/_/housing.py
-	(cd ../2015-16/_; python housing.py)
+	(cd ../2015-16/_ && python housing.py)
 
 ../2018-19/_/housing.parquet: ../2018-19/_/housing.py
-	(cd ../2018-19/_; python housing.py)
+	(cd ../2018-19/_ && python housing.py)
 
 ../2023-24/_/housing.parquet: ../2023-24/_/housing.py
-	(cd ../2023-24/_; python housing.py)
+	(cd ../2023-24/_ && python housing.py)

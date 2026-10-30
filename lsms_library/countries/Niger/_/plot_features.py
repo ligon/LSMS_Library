@@ -8,29 +8,29 @@ instrument and are deferred to a separate recipe).  ``v`` is NOT baked
 in — the framework joins it from ``sample()`` at API time.
 
 As in the Mali reference (PR #284), this does NOT apply ``id_walk``
-here.  Cached parquets store pre-transformation data; the framework runs
-``id_walk`` in ``_finalize_result`` on every read.  Baking id_walk at
-cache-write time risks colliding "moved" panel households onto identical
-``(t, i, plot_id)`` tuples; leaving the index pre-walk keeps it globally
-unique and lets the framework's idempotent id_walk handle the panel
-remap consistently with every other Niger table.
+here. The framework owns the exactly-once panel remap; this compiler keeps
+the wave outputs' native identifiers and attrs unchanged.
+
+Country/Wave metadata determines declarations: native drivers and YAML keys
+both declare a table. Only an undeclared wave is skipped. A declared read
+failure must propagate before any country write (GH #1287).
 """
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
 
 
-WAVES = ['2011-12', '2014-15', '2018-19', '2021-22']
-
+country = Country('Niger')
 pieces = []
-for t in WAVES:
-    fn = f'../{t}/_/plot_features.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not wired for plot_features (no .py script / no parquet).
-        # DVC raises PathMissingError here, not FileNotFoundError.
+for t in country.waves:
+    wave = country[t]
+    # Reuse the actual script/YAML union and logical-to-physical folder map
+    # (ledger 1287-niger-declaration-implementation §§2-4).
+    if 'plot_features' not in wave.data_scheme:
         continue
+    fn = f'../{wave.wave_folder}/_/plot_features.parquet'
+    df = get_dataframe(fn)
     pieces.append(df)
 
 assert pieces, "plot_features: no wave-level parquets found"

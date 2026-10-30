@@ -19,21 +19,17 @@ twice on one key (2011-12: 73 lines, 2014-15: 45), and the framework keeps
 one observed row with a GrainCollapseWarning.  That is an open defect, not
 the design; see ``_/CONTENTS.org``.
 
-EVERY wave in WAVES has a ``plot_inputs.py`` script, so a missing wave
-parquet means that script failed or was never run -- never "not wired".  It
-is refused, not skipped (GH #1123): under ``LSMS_BUILD_BACKEND=make`` this
-script is also the fallback the framework runs after a failed ``make``, and
-skipping the absent wave there served the other three waves with no Python
-warning.  The refusal is ``niger.concat_wave_parquets``, shared with the
-four sibling concatenators (crop_production, livestock, plot_labor,
-people_last7days).
+``niger.concat_wave_parquets`` discovers registered logical waves and checks
+their actual native-script/YAML declarations before output access (GH #1287).
+Undeclared waves skip; declared missing/unreadable outputs fail before a
+country write (GH #1123). Make-producer routing is a separate boundary; see
+the helper's docstring and the country ledger.
 """
 from lsms_library.local_tools import to_parquet
 from niger import concat_wave_parquets
 
 
-WAVES = ['2011-12', '2014-15', '2018-19', '2021-22']
 
-p = concat_wave_parquets('plot_inputs', WAVES)
+p = concat_wave_parquets('plot_inputs')
 
 to_parquet(p, '../var/plot_inputs.parquet')

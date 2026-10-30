@@ -20,28 +20,35 @@ index level to i and collapses the table.
 """
 import pandas as pd
 
+from lsms_library import Country
+
 from lsms_library.local_tools import get_dataframe, to_parquet
 
 # Year folders, each contributing exactly its post-harvest quarter.
 WAVE_FOLDERS = ['2010-11', '2012-13', '2015-16', '2018-19', '2023-24']
 
+country = Country('Nigeria', preload_panel_ids=False)
+declared_folders = set()
+for quarter in country.waves:
+    wave = country[quarter]
+    if 'community_prices' in wave.data_scheme:
+        declared_folders.add(wave.wave_folder)
+
 pieces = []
 for w in WAVE_FOLDERS:
-    fn = f'../{w}/_/community_prices.parquet'
-    try:
-        pieces.append(get_dataframe(fn))
-    except Exception:
-        # Wave-level parquet not built yet; skip (the framework wave path
-        # builds it on demand, but a direct country build may run first).
+    if w not in declared_folders:
         continue
+    fn = f'../{w}/_/community_prices.parquet'
+    pieces.append(get_dataframe(fn))
 
 assert pieces, "community_prices: no wave-level parquets found"
 
 df = pd.concat(pieces, axis=0).sort_index()
 # A food item may be priced under more than one base unit in a cluster, but
-# (t, v, j, u, obs) must be unique; the wave builder guarantees it per wave.
+# (t, v, j, u, variety, obs) must be unique; the wave builder guarantees it
+# per wave.
 # Guard against any cross-wave overlap (there is none -- each wave owns a
 # distinct PH quarter).
-assert df.index.is_unique, "community_prices: (t,v,j,u,obs) not unique after concat"
+assert df.index.is_unique, "community_prices: (t,v,j,u,variety,obs) not unique after concat"
 
 to_parquet(df, '../var/community_prices.parquet')

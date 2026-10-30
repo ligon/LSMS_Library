@@ -2968,3 +2968,24 @@ Both waves carry device-clock dates well outside fieldwork: W4 15 rows
 2015-01-09; one 2018-10-09) against fieldwork May-Sep 2019; W5 18 rows
 (2014-01 9, 2014-04 2, 2014-07 7) against Mar-Jul 2022.  Not adjudicated
 and not nulled here.
+
+* Nine country concatenators use actual declarations (GH #1287, 2026-10-29)
+
+The community_prices, food_coping, plot_labor, plot_features, plot_inputs,
+crop_production, anthropometry, people_last7days and livestock country
+concatenators now select inputs through Country.waves, its logical-to-physical
+wave resolution and the actual Wave.data_scheme native-script/YAML union.
+A genuinely unwired table is skipped before reading; a failed declared input
+propagates before any country output is written. Shared physical folders are
+read once. In particular, food_coping remains legitimately absent in W4/W5,
+whose instruments ask different batteries.
+
+Existing concat, empty-output, native identifiers, values/nulls/zeros, dtypes,
+order, attrs and household id_walk behavior are retained. This narrow
+extraction excludes the food_acquired compiler, scientific helpers, all wave
+drivers, panel generators/maps and schema/derivation changes. Food's prior
+timeout and later pre-pytest import refusal do not establish a candidate pass.
+The nine extracted compilers still require guarded candidate-composition
+verification; current-source Make/API/cache, per-country re-warm and scientific
+acceptance are separate gates. See the consolidated ledger
+=.coder/ledger/1287-ethiopia-nine-public-extraction.md=.
