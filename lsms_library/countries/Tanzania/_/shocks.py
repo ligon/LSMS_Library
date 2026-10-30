@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from lsms_library import Country
 from lsms_library.local_tools import to_parquet
 from lsms_library.local_tools import get_dataframe
 from lsms_library.paths import data_root
@@ -11,11 +12,20 @@ sys.path.append('../../_/')
 import pandas as pd
 import numpy as np
 from tanzania import Waves, id_walk, waves
-import warnings
 import json
+
+# GH #1287: declarations belong to logical waves; readers use physical folders.
+country = Country('Tanzania', preload_panel_ids=False)
+declared_folders = {
+    wave.wave_folder
+    for wave in (country[year] for year in country.waves)
+    if 'shocks' in wave.data_scheme
+}
 
 s = {}
 for t in Waves.keys():
+    if t not in declared_folders:
+        continue
     # Try data_root first (where _resolve_data_path writes), then in-tree fallback
     candidates = [
         str(data_root('Tanzania') / t / '_' / 'shocks.parquet'),
@@ -27,10 +37,14 @@ for t in Waves.keys():
             s[t] = get_dataframe(path)
             loaded = True
             break
-        except (FileNotFoundError, Exception):
+        except Exception as exc:
+            load_error = exc
             continue
     if not loaded:
-        warnings.warn(f'Could not load shocks for {t}')
+        # Both existing paths failed for a declared producer (ledger #1287 §4).
+        raise RuntimeError(
+            f'Tanzania/shocks: could not load declared folder {t}; tried {candidates}'
+        ) from load_error
 
 if not s:
     raise RuntimeError('No shocks data found for any wave.')

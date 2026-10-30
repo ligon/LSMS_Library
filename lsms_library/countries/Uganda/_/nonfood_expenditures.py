@@ -33,15 +33,20 @@ import json
 
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
-from uganda import Waves, id_walk
+from uganda import id_walk
 
 
 p = []
-for t in Waves.keys():
+country = Country('Uganda')
+for t in country.waves:
+    wave = country[t]
+    if 'nonfood_expenditures' not in wave.data_scheme:
+        continue
     # Wave parquet already has canonical index [t, i, j] and the single
     # column [Expenditure] from uganda.nonfood_expenditures().
-    p.append(get_dataframe('../' + t + '/_/nonfood_expenditures.parquet'))
+    p.append(get_dataframe('../' + wave.wave_folder + '/_/nonfood_expenditures.parquet'))
 
 p = pd.concat(p)
 

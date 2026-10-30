@@ -614,7 +614,7 @@ def test_unnamed_index_is_left_alone():
 # other seven (676,635 rows), measured warm 2026-10-19.
 
 PLOT_LABOR = ["t", "v", "i", "plot_id", "stage", "source", "worker", "season"]
-PLOT_INPUTS = ["t", "v", "i", "plot_id", "input", "j", "u", "season"]
+PLOT_INPUTS = ["t", "v", "i", "plot_id", "input", "j", "u", "season", "input_obs"]
 
 # The real per-country index shapes, as `Country(c).<table>()` serves them
 # (measured warm on the corpus, 2026-10-19).  Countries listed together share a
@@ -669,7 +669,7 @@ class TestPlotTableDeclarations:
             "season": "unknown_season"}
         assert _missing_level_sentinels("plot_inputs") == {
             "plot_id": "Farm-level", "u": "Unknown",
-            "season": "unknown_season"}
+            "season": "unknown_season", "input_obs": "unresolved_observation"}
 
     def test_shared_axes_share_one_sentinel_spelling(self):
         """`season` and `u` are the same axes crop_production carries; a

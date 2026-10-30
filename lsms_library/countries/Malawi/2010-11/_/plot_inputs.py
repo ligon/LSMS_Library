@@ -21,18 +21,20 @@ import sys
 
 sys.path.append('../../_/')
 import pandas as pd
+import numpy as np
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
                     _seed_block, _seed_purchase_block, assemble_plot_inputs,
-                    drop_repeated_records)
+                    drop_repeated_records, _seed_source_reference)
 
 
 WAVE = '2010-11'
 BASE = '../Data/Full_Sample/Agriculture/'
+G_SOURCE = '../Data/Full_Sample/Agriculture/ag_mod_g.dta'
 
 d = get_dataframe(BASE + 'ag_mod_d.dta', convert_categoricals=False)
-g = get_dataframe(BASE + 'ag_mod_g.dta', convert_categoricals=False)
+g = get_dataframe(G_SOURCE, convert_categoricals=False)
 h = get_dataframe(BASE + 'ag_mod_h.dta', convert_categoricals=False)
 
 # IHS3 ships exact repeat RECORDS (every column equal): G 9 (the same records
@@ -40,6 +42,9 @@ h = get_dataframe(BASE + 'ag_mod_h.dta', convert_categoricals=False)
 # duplicate entry, not a second planting or purchase, so it is dropped on the
 # full raw record before any block projects it (GH #637 tail;
 # malawi.drop_repeated_records).
+# Capture release positions before the full-record policy, without adding a
+# unique column that would defeat it. Never use retained DataFrame labels.
+g_rows = np.arange(len(g))[~g.duplicated().to_numpy()]
 d, g, h = (drop_repeated_records(df) for df in (d, g, h))
 
 d['hhid'] = d['case_id'].apply(format_id)
@@ -65,19 +70,21 @@ pieces = [
                      slots=[('ag_d41a', 'ag_d41b', 'ag_d41c'),
                             ('ag_d41d', 'ag_d41e', 'ag_d41f')], t=WAVE),
     _seed_block(g, hhid='hhid', plotkey='plotkey', cropcode='ag_g0d',
-                qty='ag_g04a', unit='ag_g04b', improved=None, t=WAVE),
+                qty='ag_g04a', unit='ag_g04b', improved=None, t=WAVE,
+                source_ref=_seed_source_reference(G_SOURCE, script_path=__file__),
+                source_half='Full_Sample', row_positions=g_rows),
 ]
 
 seed_purchase = [
     _seed_purchase_block(h, hhid='hhid', cropcode='ag_h0b',
                          qty_cols=['ag_h16a', 'ag_h26a'],
                          unit_cols=['ag_h16b', 'ag_h26b'],
-                         value_cols=['ag_h19', 'ag_h29']),
+                         value_cols=['ag_h19', 'ag_h29'], source_half='Full_Sample'),
 ]
 
 df = assemble_plot_inputs(WAVE, pieces, seed_purchase)
 
-assert df.index.is_unique, f"Non-unique (t,i,plot,input,crop,u) in plot_inputs {WAVE}"
+assert df.index.is_unique, f"Non-unique source-observation grain in plot_inputs {WAVE}"
 assert len(df) > 0, f"plot_inputs {WAVE} produced no rows"
 
 to_parquet(df, 'plot_inputs.parquet')
