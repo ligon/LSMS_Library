@@ -4271,3 +4271,30 @@ Fresh exact-candidate verification remains pending. Real source, Make/cache,
 Country/Feature, rewarm and scientific acceptance are separate; no source
 acquisition or fixture update is implied. Ledger:
 =.coder/ledger/1287-uganda-public-compiler-composition.md=.
+
+
+* 2026-10-30 -- other-table float-string ID check (GH #1291)
+
+After merged #1325, a fixed-public source audit covers all 28 declared/derived
+objects, with new normal API checks on ten surfaces. Complete per-index-value
+checks find no integer-float strings matching =-?\d+\.0= in assets, shocks,
+earnings, enterprise income, sample and the food-acquisition family across all
+eight waves, or months_food_inadequate across its five declared waves. This
+extends the existing diagnostic's sampled majority check; it is not a claim
+that all 28 objects received fresh API builds.
+
+A plausible native cast risk was refuted: GSEC17 (2009-10) and GSEC17A (2010-11)
+=HHID= are already strings, unlike the numeric GSEC15C =hh= responsible for
+#1325. Their direct string casts introduce no =.0= suffix and =format_id=
+changes none of those source IDs. YAML idxvars, agricultural/anthropometry
+formatters, interview-date formatting and inherited-ID paths are recorded
+separately from actual API observations. The other entries retain explicit
+source-only or prior-acceptance status; stale shared/retained caches were not
+accepted as current evidence.
+
+No producer, mapping, quantity, unit, ownership or eligibility change follows.
+The repaired 54,027 nonfood IDs remain distinct from the genuine 244 target
+plus 21 other-wave unlocated rows. The #1290 nine unsupported keys, #1297 parcel
+question and #689 parish/EA disclosure are unchanged. Exact table/wave/source
+coverage and preserved preflight failures are in the recovery report
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1291-other-table-final-v1/REPORT.md=.
