@@ -62,7 +62,8 @@ def seed(crops, **kw):
 
 
 def build(s, f=None):
-    return ug.plot_inputs_for_wave('2011-12', f, None, s, CM)
+    return ug.plot_inputs_for_wave('2011-12', f, None, s, CM,
+                                   source_refs={'A': 'synthetic:3A', 'seed': 'synthetic:4A'})
 
 
 def test_branch_identity_and_seed_labels():
@@ -96,13 +97,18 @@ def test_eligibility_frozen_before_classification():
     assert d.Purchased.iloc[2] == False
 
 
-def test_null_plot_and_duplicate_policy_unchanged():
+def test_missing_plot_retained_and_known_duplicate_policy_unchanged():
     code=next(iter(ug._crop_label_map()))
     single=build(seed([code],plot=[np.nan]))
-    assert len(single)==1 and single.index.get_level_values('plot_id').isna().all()
+    assert len(single)==1
+    assert single.index.get_level_values('plot_id').tolist()==['unknown_plot']
+    assert single.index.get_level_values('input_obs').tolist()==['row:synthetic:4A:0']
     d=build(seed([code,code,code],plot=[1,1,np.nan],q=[2.,3.,7.]))
-    assert len(d)==1
-    assert d.Quantity.iloc[0]==5.0  # pre-existing reducer and null-key loss
+    assert len(d)==2
+    known=d.loc[d.index.get_level_values('plot_id')!='unknown_plot']
+    missing=d.loc[d.index.get_level_values('plot_id')=='unknown_plot']
+    assert known.Quantity.iloc[0]==5.0  # existing known-key reducer retained
+    assert missing.Quantity.iloc[0]==7.0
 
 
 def test_raw_fraction_does_not_alias_mapped_integral():
@@ -148,12 +154,28 @@ def test_duplicate_missing_crop_keeps_existing_sum():
     assert d.index.get_level_values('j').tolist()==['unknown_crop']
 
 
-def test_conflicting_null_group_follows_existing_exclusion():
+def test_distinct_missing_plot_crop_records_are_preserved():
     code=next(iter(ug._crop_label_map()))
     d=build(seed([98765,98766,code],plot=[np.nan,np.nan,1],q=[2.,3.,7.]))
-    assert len(d)==1 and d.Quantity.iloc[0]==7.
-    assert d.index.get_level_values('j').tolist()==[ug._crop_label_map()[code]]
+    assert len(d)==3 and d.index.is_unique
+    np.testing.assert_array_equal(d.Quantity.to_numpy(float),[2.,3.,7.])
+    assert d.index.get_level_values('j').tolist()==['98765','98766',ug._crop_label_map()[code]]
 
 
 def test_entirely_empty_seed_payload_still_excluded():
     assert len(build(seed([None],q=[np.nan])))==0
+
+
+def test_missing_plot_rows_never_pool_and_keep_typed_payloads():
+    code=next(iter(ug._crop_label_map()))
+    s=seed([code, 0, 98765.25], plot=[np.nan]*3, q=[2., 0., np.nan])
+    s['buy']=[1,2,1]
+    got=build(s)
+    assert len(got)==3 and got.index.is_unique
+    assert got.index.get_level_values('input_obs').tolist()==[
+        'row:synthetic:4A:0','row:synthetic:4A:1','row:synthetic:4A:2']
+    assert got.index.get_level_values('j').tolist()[1:]==['unknown_crop','98765.25']
+    pd.testing.assert_extension_array_equal(got.Quantity.array,pd.array([2.,0.,None],dtype='Float64'))
+    np.testing.assert_array_equal(got.Quantity.dropna().to_numpy(float),[2.,0.])
+    with pytest.raises(ValueError, match='verified source reference'):
+        ug.plot_inputs_for_wave('2011-12',None,None,s,CM)

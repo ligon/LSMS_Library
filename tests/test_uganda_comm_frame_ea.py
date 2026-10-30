@@ -160,7 +160,7 @@ class TestFunction:
 def _v_mapping(uga, wave, table):
     w = uga[wave]
     info = w.resources[table]
-    info = info.get("df_main", info)
+    info = info.get("locating_cover", info.get("df_main", info))
     cm = w.column_mapping(table, info)
     (file_map,) = [m for k, m in cm.items() if isinstance(m, dict) and "myvars" in m]
     return file_map["idxvars"].get("v") or file_map["myvars"].get("v")

@@ -255,14 +255,21 @@ def cluster_features(df):
     averaging it would smear two places into one and hide the evidence -- the
     same argument that retired core's ``.mean()`` on 2026-07-13.
 
-    Rows whose ``v`` is missing are dropped HERE, with a count, rather than
-    disappearing inside a ``groupby(dropna=True)`` further downstream (GH #323
-    Site 3: delete and report, decision D2).  A cluster with no identifier cannot
-    be addressed by any consumer.
+    Explicit cover/frame membership receives the D2 household singleton before
+    projection. Geo-only rows without membership remain excluded: in 2005-06
+    the later geovar contains split-offs outside that wave's sample. No location
+    or membership is inferred from non-null geographic attributes.
     """
     from lsms_library.build_transforms import reduce_to_agreed
 
     flat = df.reset_index()
+    markers = [c for c in ('_cover', '_frame', '_ag_member') if c in flat]
+    member = (flat[markers].notna().any(axis=1) if markers
+              else pd.Series(False, index=flat.index))
+    flat = _adopt_alternate_cover(flat, table='cluster_features')
+    if 'i' in flat and 'v' in flat:
+        flat['v'] = _with_singletons(flat['v'], flat['i'], where=member)
+        flat = _mark_unlocated(flat, 'cluster_features')
     # The household level has no place in a cluster-grain table, and leaving it
     # in would make every multi-household cluster look like a conflict (`i` is
     # distinct by construction).  Drop it whether it arrived as an index level
@@ -286,6 +293,251 @@ def cluster_features(df):
         )
         flat = flat[flat['v'].notna()]
     return reduce_to_agreed(flat.set_index(['t', 'v']), on_conflict='na')
+
+
+SINGLETON_V_PREFIX = 'unlocated'
+
+#: Marker myvar of a wave's PRIMARY cover sub-df in a ``sample`` /
+#: ``cluster_features`` ``dfs:`` block that also reads an alternate cover.
+_COVER_MARKER = '_cover'
+#: Prefix of the columns an ALTERNATE cover supplies (D1).
+_ALT_COVER_PREFIX = '_ag_'
+#: Marker myvar of a frame-extension sub-df: it contributes households only.
+_FRAME_MARKER = '_frame'
+#: Columns that only a cover page supplies, on ``cluster_features``.
+_COVER_ATTRIBUTES = ('Region', 'Rural', 'District')
+
+
+def locating_cover(df):
+    """Validate a declared cover before joining; identical repeats are lossless.
+
+    Conflicting source records require diagnosis even when HH precedence would
+    later hide the secondary answer. No column-wise first/sum is permitted.
+    """
+    flat = df.reset_index().drop_duplicates()
+    if flat.duplicated(['t', 'i']).any():
+        raise ValueError('Uganda locating cover: conflicting duplicate household records')
+    if flat['i'].isna().any():
+        raise ValueError('Uganda locating cover: missing household identity')
+    return flat.set_index(list(df.index.names))
+
+
+locating_ag = locating_cover
+
+
+def locating_frame(df):
+    """Membership-only projection: distinct households, no geographic inference."""
+    return locating_cover(df)
+
+
+def singleton_v(hhid):
+    """``unlocated-{hhid}``: a cluster id that can hold exactly one household.
+
+    Built as ``Nigeria/_/nigeria.py``'s ``cluster_id`` builds its mover id --
+    the prefix, a hyphen, and the household id through ``format_id`` -- and
+    ``None`` when there is no household id.  ``format_id`` leaves the result
+    unchanged, so the v-join's own ``format_id`` pass does not alter it.
+    """
+    hh = format_id(hhid)
+    return f'{SINGLETON_V_PREFIX}-{hh}' if hh is not None else None
+
+
+def derive_unlocated_identity(inputs):
+    """D2 identity, not geography: one singleton per recorded household."""
+    ids = inputs.index.get_level_values('i')
+    return pd.Series([singleton_v(i) for i in ids], index=inputs.index, name='v')
+
+
+def inputs_unlocated_identity(wave):
+    """Original membership answers for households with no usable location.
+
+    Check the finite, own-wave locating sources, never another wave's panel
+    links. For 2009-10 the already-declared modified-GPS bin is usable only
+    with both coordinates. Preserve each membership source's original ID name.
+    """
+    from lsms_library.paths import countries_root
+    specs = {
+        '2005-06': ('GSEC1.dta', 'HHID', ['comm'], []),
+        '2009-10': ('GSEC1.dta', 'HHID', ['comm'], ['AGSEC3B.dta', 'GSEC12.dta']),
+        '2010-11': ('GSEC1.dta', 'HHID', ['comm'], []),
+        '2011-12': ('GSEC1.dta', 'HHID', ['comm'], ['AGSEC1.dta']),
+        '2013-14': ('GSEC1.dta', 'HHID', ['h1aq4a'], []),
+        '2015-16': ('gsec1.dta', 'HHID', ['parish_code'], ['AGSEC1.dta']),
+        '2018-19': ('GSEC1.dta', 'hhid', ['distirct_name', 'parish_name'], ['AGSEC1.dta']),
+        '2019-20': ('HH/gsec1.dta', 'hhid', ['district', 's1aq04a'], []),
+    }
+    main, idcol, location, extensions = specs[wave]
+    base = countries_root() / 'Uganda' / wave / 'Data'
+    cover = get_dataframe(str(base / main), convert_categoricals=False)
+    covered = cover[idcol].map(format_id)
+    located = set(covered.loc[cover[location].map(format_id).notna().all(axis=1)])
+    pieces = []
+    for name in [main] + extensions:
+        raw = cover if name == main else get_dataframe(str(base / name), convert_categoricals=False)
+        ids = raw[idcol].map(format_id)
+        if wave == '2015-16' and name == 'AGSEC1.dta':
+            eligible = ~ids.isin(covered) & raw.parish_code.map(format_id).notna()
+            located.update(ids.loc[eligible])
+        cols = [idcol] + [c for c in location if c in raw and c != idcol]
+        piece = raw[cols].copy()
+        piece['i'] = ids
+        piece['_source'] = name
+        piece['_source_row'] = np.arange(len(raw))
+        pieces.append(piece)
+    if wave == '2009-10':
+        geo = get_dataframe(str(base / 'UNPS_Geovars_0910.dta'), convert_categoricals=False)
+        located.update(geo.loc[geo[['lat_mod', 'lon_mod']].notna().all(axis=1), 'HHID'].map(format_id))
+    out = pd.concat(pieces, ignore_index=True, sort=False)
+    out = out.loc[out.i.notna() & ~out.i.isin(located)].copy()
+    return out.assign(t=wave).set_index(['t', 'i'])
+
+
+def _mark_unlocated(flat, table):
+    """Disclose synthetic identity, including rows with no measured attributes."""
+    mask = flat['v'].astype('string').str.startswith('unlocated-', na=False)
+    if mask.any():
+        if 'Derivation' not in flat:
+            flat['Derivation'] = pd.Series(pd.NA, index=flat.index, dtype='string')
+        flat.loc[mask, 'Derivation'] = f'Uganda::{table}::unlocated-identity'
+    return flat
+
+
+def _with_singletons(v, i, where=None):
+    """``v`` with each missing (NA or blank) entry replaced by ``singleton_v(i)``.
+
+    ``where`` (boolean, aligned) restricts which rows are eligible.
+    """
+    blank = v.isna() | (v.astype('string').str.strip().fillna('') == '')
+    if where is not None:
+        blank = blank & where.astype(bool)
+    if not blank.any():
+        return v
+    out = v.astype('object').copy()
+    operands = pd.DataFrame(index=pd.Index(i.loc[blank], name='i'))
+    out.loc[blank] = derive_unlocated_identity(operands).to_numpy()
+    return out
+
+
+def derive_agriculture_cover_v(inputs):
+    """D1 recorded AGSEC1 parish, with the ordinary country ID formatter."""
+    return inputs['parish_code'].map(format_id).rename('v')
+
+
+def inputs_agriculture_cover(wave):
+    """Original AGSEC1 answers for households absent from the HH cover.
+
+    The source rule is membership in AGSEC1 minus gsec1, not absence of an HH
+    weight or location. Keep original names and diagnose source duplicates.
+    """
+    from lsms_library.paths import countries_root
+    if wave != '2015-16':
+        raise ValueError('Uganda agriculture-cover derivation is 2015-16 only')
+    base = countries_root() / 'Uganda' / wave / 'Data'
+    hh = get_dataframe(str(base / 'gsec1.dta'), convert_categoricals=False)
+    ag = get_dataframe(str(base / 'AGSEC1.dta'), convert_categoricals=False)
+    fields = ['HHID', 'parish_code', 'hwgt_W5', 'sregion', 'urban', 'region', 'district']
+    out = ag[fields].copy()
+    out['i'] = out['HHID'].map(format_id)
+    out['t'] = wave
+    out = locating_cover(out.set_index(['t', 'i']))
+    return out.loc[~out.index.get_level_values('i').isin(hh.HHID.map(format_id))]
+
+
+def _adopt_alternate_cover(flat, table='sample'):
+    """Give rows the PRIMARY cover lacks the ALTERNATE cover's columns (D1).
+
+    A ``dfs:`` block marks its primary-cover sub-df with ``_cover`` and names
+    the alternate cover's columns ``_ag_<column>``.  A row with no ``_cover``
+    was recorded only by the alternate cover; it takes ``<column>`` from
+    ``_ag_<column>``.  A row the primary cover has keeps every primary value,
+    even a missing one -- the alternate cover's weight is a different vintage
+    (2015-16: AGSEC1's ``hwgt_W5`` agrees with gsec1's on none of the 1,458
+    households both weight positively), so it must not fill gsec1's gaps.
+
+    The temporary columns are dropped.  A frame without them is returned
+    unchanged (every wave but 2015-16).
+    """
+    alt = [c for c in flat.columns if str(c).startswith(_ALT_COVER_PREFIX)
+           and c != '_ag_member']
+    if _COVER_MARKER in flat.columns and alt:
+        only_alt = flat[_COVER_MARKER].isna()
+        if '_ag_v' in flat and 'v' in flat:
+            primary = flat['v'].map(format_id)
+            secondary = flat['_ag_v'].map(format_id)
+            conflict = (~only_alt & primary.notna() & secondary.notna()
+                        & primary.ne(secondary))
+            if conflict.any():
+                warnings.warn(
+                    f'Uganda locating covers disagree on v for {int(conflict.sum())} '
+                    'households; retaining HH cover location (GH #1120 D1)',
+                    stacklevel=2)
+        for c in alt:
+            target = c[len(_ALT_COVER_PREFIX):]
+            src = flat[c].loc[only_alt]
+            if target == 'v':
+                src = derive_agriculture_cover_v(src.to_frame('parish_code'))
+            if target == 'District':
+                # The primary cover's `v` and `District` pass through this
+                # module's `v` / `District` formatters (= format_id); an `_ag_`
+                # myvar passes through none.  Without the same canonical form
+                # an unlabelled district code (2015-16 '229') is the int 229 on
+                # one side and the string '229' on the other, and
+                # reduce_to_agreed blanks a District nobody disagrees about.
+                src = src.map(format_id)
+            if target not in flat.columns:
+                flat[target] = pd.NA
+            col = flat[target]
+            # Keep the column's own type: a weight stays numeric (an object
+            # cast here is written to the parquet as STRING), and a label
+            # column leaves Categorical so it can take a new value.
+            if isinstance(col.dtype, pd.CategoricalDtype):
+                col = col.astype('object')
+            if pd.api.types.is_numeric_dtype(col.dtype):
+                src = pd.to_numeric(src, errors='coerce')
+            elif isinstance(src.dtype, pd.CategoricalDtype):
+                src = src.astype('object')
+            col = col.copy()
+            col.loc[only_alt] = src
+            flat[target] = col
+        if only_alt.any():
+            flat['Derivation'] = pd.Series(pd.NA, index=flat.index, dtype='string')
+            flat.loc[only_alt & flat['_ag_member'].notna(), 'Derivation'] = (
+                f'Uganda::{table}::agriculture-cover')
+    temps = [c for c in flat.columns
+             if c in (_COVER_MARKER, _FRAME_MARKER)
+             or str(c).startswith(_ALT_COVER_PREFIX)]
+    return flat.drop(columns=temps)
+
+
+def sample(df):
+    """Country-level ``df_edit`` hook for ``sample`` (every Uganda wave).
+
+    1. Adopt the alternate cover for households only it records (D1).
+    2. Collapse the repeats a frame-extension sub-df brings in.  A sub-df read
+       at plot or person grain repeats a household once per source row; it
+       contributes ``i`` only, so the repeats are identical rows.  That is
+       PROVED before they are dropped -- a household whose repeats differ
+       raises rather than letting a reducer pick one.
+    3. Give every household with no ``v`` its singleton (D2).
+    """
+    idx = [n for n in df.index.names if n is not None]
+    flat = _adopt_alternate_cover(df.reset_index())
+    key = [k for k in ('t', 'i') if k in flat.columns]
+    if key:
+        rep = flat.duplicated(key, keep=False)
+        if rep.any():
+            distinct = flat[rep].drop_duplicates()
+            n_bad = int(distinct.duplicated(key).sum())
+            if n_bad:
+                raise ValueError(
+                    f"Uganda/sample: {n_bad} household(s) appear more than once "
+                    f"with DIFFERENT values after the frame extension.  A "
+                    f"frame-extension sub-df must contribute `i` only (GH #1120).")
+            flat = flat.drop_duplicates(key)
+    if 'v' in flat.columns and 'i' in flat.columns:
+        flat['v'] = _with_singletons(flat['v'], flat['i'])
+        flat = _mark_unlocated(flat, 'sample')
+    return flat.set_index(idx) if idx else flat
 
 
 def _format_agsec_hhid(s, t):
@@ -325,6 +577,17 @@ def _format_agsec_hhid(s, t):
         return xs
 
     return out.apply(_decode)
+
+
+def _plot_key(hh, parcel, plot):
+    """D3: a missing source component is unknown, never a structural farm key.
+
+    The existing production_obs coordinate preserves distinct source answers.
+    Empty plot suffixes in parcel-only waves remain the established keys.
+    No parcel inference (#1297) or known-plot reducer change is performed.
+    """
+    key = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+    return key.mask(hh.notna() & (parcel.isna() | plot.isna()), 'unknown_plot')
 
 
 # Data to link household ids across waves
@@ -1494,7 +1757,7 @@ def crop_production_for_wave(t, df5a, df5b, df4a, colmap, df4b=None,
         parcel = _require(df5, cm['parcel'], w, 'parcel id').apply(format_id)
         plot = (_require(df5, cm['plot'], w, 'plot id').apply(format_id)
                 if cm.get('plot') else pd.Series(['']*len(df5), index=df5.index))
-        plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+        plot_id = _plot_key(hh, parcel, plot)
         crop_code = _to_int_code(_require(df5, cm['crop'], w, 'crop code'))
         j = crop_code.map(lambda c: crop_map.get(int(c), pd.NA) if pd.notna(c) else pd.NA)
 
@@ -2206,7 +2469,24 @@ def _input_seed_crop_labels(raw, crop_map):
     return raw.map(label)
 
 
-def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
+def _missing_plot_observations(raw, plot_id, source_ref):
+    """Release-qualified original positions for D3; never invented plot IDs.
+
+    Reuse the GH1198 physical-row convention and canonical input_obs axis.
+    Known keys keep unresolved_observation and their existing reducers.
+    """
+    out = pd.Series('unresolved_observation', index=raw.index, dtype='string')
+    missing = plot_id.eq('unknown_plot')
+    if missing.any():
+        if (not isinstance(source_ref, str) or not source_ref.strip()
+                or source_ref.startswith('missing:')):
+            raise ValueError('Uganda missing-plot inputs require a verified source reference')
+        positions = pd.Series(np.arange(len(raw)), index=raw.index, dtype='string')
+        out.loc[missing] = ('row:' + source_ref + ':' + positions).loc[missing]
+    return out
+
+
+def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap, *, source_refs=None):
     """Build canonical ``plot_inputs`` for one Uganda UNPS wave.
 
     Parameters
@@ -2288,7 +2568,9 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
         plot = (df3[cm['plot']].apply(format_id)
                 if cm.get('plot') and cm['plot'] in df3.columns
                 else pd.Series([''] * len(df3), index=df3.index))
-        plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+        plot_id = _plot_key(hh, parcel, plot)
+        observation = _missing_plot_observations(
+            df3, plot_id, (source_refs or {}).get(season))
 
         for block in ('organic', 'inorganic', 'pesticide'):
             b = cm.get(block)
@@ -2339,6 +2621,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
                 't': t,
                 'i': hh.values,
                 'plot_id': plot_id.values,
+                'input_obs': observation.array,
                 'input': input_label.values,
                 'season': season,
                 'Quantity': qty.values,
@@ -2360,7 +2643,9 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
         plot = (df4a[sc['plot']].apply(format_id)
                 if sc.get('plot') and sc['plot'] in df4a.columns
                 else pd.Series([''] * len(df4a), index=df4a.index))
-        plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+        plot_id = _plot_key(hh, parcel, plot)
+        observation = _missing_plot_observations(
+            df4a, plot_id, (source_refs or {}).get('seed'))
 
         raw_crop = (df4a[sc['crop']].copy()
                     if sc.get('crop') and sc['crop'] in df4a.columns
@@ -2402,6 +2687,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
             't': t,
             'i': hh.values,
             'plot_id': plot_id.values,
+                'input_obs': observation.array,
             'input': seed_label,
             # AGSEC4A is the FIRST-season plot-crop roster (AGSEC4B, the
             # second-season roster, is not read) -> every seed row is season A.
@@ -2443,7 +2729,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
     # order can move payloads even when no legacy group splits.
     df['j'] = df['j'].astype('object').where(df['j'].notna(), 'n/a')
     labels = df.pop('_crop_label')
-    df = df.set_index(['t', 'i', 'plot_id', 'input', 'j', 'season'])
+    df = df.set_index(['t', 'i', 'plot_id', 'input', 'j', 'season', 'input_obs'])
     labels.index = df.index
     if not labels.index.is_unique:
         # Mirror the existing reducer's null-key exclusion as well.

@@ -54,27 +54,34 @@ housing:
         Floor: h9q6
 
 sample:
-    file: ../Data/GSEC1.dta
-    idxvars:
-        i: HHID
-    myvars:
-        v: h1aq4a
-        weight: wgt_X  # cross-sectional weight (covers both panel and refreshment sample)
-        panel_weight: wgt  # longitudinal weight (zero for non-sample, NaN for refreshment)
-        strata: sregion
-        Rural: urban
-        Region: region
+    dfs: [locating_cover]
+    locating_cover:
+        file: ../Data/GSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _cover: HHID
+            v: h1aq4a
+            weight: wgt_X  # cross-sectional weight (covers both panel and refreshment sample)
+            panel_weight: wgt  # longitudinal weight (zero for non-sample, NaN for refreshment)
+            strata: sregion
+            Rural: urban
+            Region: region
+
+    merge_on: [i]
+    final_index: [t, i]
 
 cluster_features:
     dfs:
-        - df_main
+        - locating_cover
         - df_geo
-    df_main:
+    locating_cover:
         file: ../Data/GSEC1.dta
         idxvars:
             i: HHID
             v: h1aq4a # Docs identify this as "Parish"?
         myvars:
+            _cover: HHID
             Region: region
             Rural: urban
             District: h1aq1a  # TODO: 3 digit numeric code; map to string?

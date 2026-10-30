@@ -40,27 +40,47 @@ housing:
         Floor: h9q6
 
 sample:
-    file: ../Data/GSEC1.dta
-    idxvars:
-        i: HHID
-    myvars:
-        v: comm
-        weight: mult
-        panel_weight: mult  # pre-refreshment — same as cross-sectional
-        strata: sregion
-        Rural: urban
-        Region: region
+    # GH #1120 D2: AGSEC1 contributes membership only. It records no
+    # geography for the HH-cover-absent households; weights stay missing.
+    dfs:
+        - locating_cover
+        - locating_ag
+    locating_cover:
+        file: ../Data/GSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _cover: HHID
+            v: comm
+            weight: mult
+            panel_weight: mult  # pre-refreshment — same as cross-sectional
+            strata: sregion
+            Rural: urban
+            Region: region
+    locating_ag:
+        file: ../Data/AGSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _frame: HHID
+    merge_on:
+        - i
+    final_index:
+        - t
+        - i
 
 cluster_features:
     dfs:
-        - df_main
+        - locating_cover
         - df_geo
-    df_main:
+        - locating_frame
+    locating_cover:
         file: ../Data/GSEC1.dta
         idxvars:
             i: HHID
             v: comm
         myvars:
+            _cover: HHID
             Region: region
             Rural: urban
             District: h1aq1
@@ -71,6 +91,12 @@ cluster_features:
         myvars:
             Latitude: lat_mod
             Longitude: lon_mod
+    locating_frame:
+        file: ../Data/AGSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _frame: HHID
     merge_on:
         - i
     final_index:

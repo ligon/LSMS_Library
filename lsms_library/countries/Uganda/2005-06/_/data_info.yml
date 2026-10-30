@@ -45,48 +45,55 @@ housing:
         Floor: h11q6a
 
 sample:
-    file: GSEC1.dta
-    idxvars:
-        i: HHID
-    myvars:
-        v: comm
-        weight: hmult
-        panel_weight: hmult  # baseline wave — same as cross-sectional
-        strata: stratum
-        Rural:
-            - urban
-            - # The raw `urban` column is object-dtype but MIXED-typed: rural
-              # households carry the python int 0 (2,263 rows), urban ones the
-              # str 'urban' (860).  The key must therefore be the INT 0 -- a
-              # '0' string key never matches, the value passes through
-              # untouched, and it reaches the user as the literal string '0',
-              # so `df[df.Rural == 'Rural']` returns ZERO rows.  That is exactly
-              # what GH #163 item 3's fix did; it sat silently broken for three
-              # months until GH #602.  The `Region` stanza below already uses an
-              # int key for the same reason.  Verify with:
-              #   get_dataframe('../Data/GSEC1.dta')['urban'].map(type).value_counts()
-                0: Rural
-                urban: Urban
-        # HH-level Region — the same column cluster_features reads, exposed
-        # here so consumers can get Region for every HH regardless of cluster
-        # membership (relevant when v is a synthetic @lat,lon label in 2009-10).
-        # The raw 'region' column uses string codes in 2005-06: '0' is the
-        # Kampala-area sentinel (matches the Rural '0' convention above);
-        # fold it into Central following the cluster_features convention.
-        Region:
-            - region
-            - 0: "Central"
+    dfs: [locating_cover]
+    locating_cover:
+        file: GSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _cover: HHID
+            v: comm
+            weight: hmult
+            panel_weight: hmult  # baseline wave — same as cross-sectional
+            strata: stratum
+            Rural:
+                - urban
+                - # The raw `urban` column is object-dtype but MIXED-typed: rural
+                  # households carry the python int 0 (2,263 rows), urban ones the
+                  # str 'urban' (860).  The key must therefore be the INT 0 -- a
+                  # '0' string key never matches, the value passes through
+                  # untouched, and it reaches the user as the literal string '0',
+                  # so `df[df.Rural == 'Rural']` returns ZERO rows.  That is exactly
+                  # what GH #163 item 3's fix did; it sat silently broken for three
+                  # months until GH #602.  The `Region` stanza below already uses an
+                  # int key for the same reason.  Verify with:
+                  #   get_dataframe('../Data/GSEC1.dta')['urban'].map(type).value_counts()
+                    0: Rural
+                    urban: Urban
+            # HH-level Region — the same column cluster_features reads, exposed
+            # here so consumers can get Region for every HH regardless of cluster
+            # membership (relevant when v is a synthetic @lat,lon label in 2009-10).
+            # The raw 'region' column uses string codes in 2005-06: '0' is the
+            # Kampala-area sentinel (matches the Rural '0' convention above);
+            # fold it into Central following the cluster_features convention.
+            Region:
+                - region
+                - 0: "Central"
+
+    merge_on: [i]
+    final_index: [t, i]
 
 cluster_features:
     dfs:
-        - df_main
+        - locating_cover
         - df_geo
-    df_main:
+    locating_cover:
         file: GSEC1.dta
         idxvars:
             i: HHID
             v: comm
         myvars:
+            _cover: HHID
 
             Region:
                 # Some "Central" households have region coded as 0?  These seem to be households in one of the 34

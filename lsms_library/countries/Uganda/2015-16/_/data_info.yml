@@ -54,22 +54,49 @@ housing:
     final_index: [t, i]
 
 sample:
-    file: gsec1.dta
-    idxvars:
-        i: HHID
-    myvars:
-        v: parish_code
-        weight: h_xwgt_W5  # cross-sectional weight (covers both panel and refreshment sample)
-        panel_weight: hwgt_W5  # longitudinal weight (zero for refreshment sample)
-        strata: sregion
-        Rural: urban
-        Region: region
+    # GH #1120 D1: AGSEC1-only households use their own recorded parish
+    # and cover attributes. hwgt_W5 is PANEL weight only; weight stays NA.
+    # HH-covered households keep every HH answer, including missing values.
+    # The two covers have different weight vintages; never coalesce them.
+    dfs:
+        - locating_cover
+        - locating_ag
+    locating_cover:
+        file: gsec1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            v: parish_code
+            weight: h_xwgt_W5  # cross-sectional weight (covers both panel and refreshment sample)
+            panel_weight: hwgt_W5  # longitudinal weight (zero for refreshment sample)
+            strata: sregion
+            Rural: urban
+            Region: region
+            _cover: HHID
+    locating_ag:
+        file: AGSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _ag_member: HHID
+            _ag_v: parish_code
+            _ag_panel_weight: hwgt_W5
+            _ag_strata: sregion
+            _ag_Rural: urban
+            _ag_Region: region
+    merge_on:
+        - i
+    final_index:
+        - t
+        - i
 
 cluster_features:
+    # Same locating-cover membership/precedence as sample (GH #1120 D1).
     dfs:
-        - df_main
+        - locating_cover
         - df_geo
-    df_main:
+        - locating_ag
+    locating_cover:
         file: gsec1.dta
         idxvars:
             i: HHID
@@ -78,6 +105,7 @@ cluster_features:
             Region: region
             Rural: urban
             District: district
+            _cover: HHID
     # GPS from the public geovar (modified/offset coordinates), joined on
     # household id then collapsed to cluster grain by final_index (GH #161).
     df_geo:
@@ -87,6 +115,16 @@ cluster_features:
         myvars:
             Latitude: pub_lat_mod
             Longitude: pub_lon_mod
+    locating_ag:
+        file: AGSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _ag_member: HHID
+            _ag_v: parish_code
+            _ag_Region: region
+            _ag_Rural: urban
+            _ag_District: district
     merge_on:
         - i
     final_index:
