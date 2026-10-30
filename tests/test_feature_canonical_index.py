@@ -613,7 +613,7 @@ def test_unnamed_index_is_left_alone():
 # Feature('plot_inputs') kept only the seven EHCVM countries and excluded the
 # other seven (676,635 rows), measured warm 2026-10-19.
 
-PLOT_LABOR = ["t", "v", "i", "plot_id", "stage", "source", "worker", "season"]
+PLOT_LABOR = ["t", "v", "i", "plot_id", "stage", "source", "worker", "season", "labor_obs"]
 PLOT_INPUTS = ["t", "v", "i", "plot_id", "input", "j", "u", "season", "input_obs"]
 
 # The real per-country index shapes, as `Country(c).<table>()` serves them
@@ -626,7 +626,7 @@ LABOR_SHAPES = {
     "Benin":    ["i", "t", "v", "plot_id", "source"],
     "GhanaLSS": ["i", "t", "v", "plot_id", "stage", "source", "worker"],
     "GhanaSPS": ["i", "t", "v", "plot_id", "season", "stage", "source"],
-    "Uganda":   ["i", "t", "v", "plot_id", "source", "season"],
+    "Uganda":   ["i", "t", "v", "plot_id", "source", "season", "labor_obs"],
 }
 INPUT_SHAPES = {
     # the seven EHCVM countries: no plot level at all
@@ -666,7 +666,7 @@ class TestPlotTableDeclarations:
     def test_sentinels(self):
         assert _missing_level_sentinels("plot_labor") == {
             "stage": "Farm-level", "worker": "Farm-level",
-            "season": "unknown_season"}
+            "season": "unknown_season", "labor_obs": "unresolved_observation"}
         assert _missing_level_sentinels("plot_inputs") == {
             "plot_id": "Farm-level", "u": "Unknown",
             "season": "unknown_season", "input_obs": "unresolved_observation"}
@@ -729,6 +729,7 @@ class TestPlotLaborHarmonize:
         (LABOR_SHAPES["GhanaLSS"], "worker", ("male", "female")),
         # Uganda: two rows differing only on season
         (LABOR_SHAPES["Uganda"], "season", ("A", "B")),
+        (LABOR_SHAPES["Uganda"], "labor_obs", ("row:source:0", "row:source:1")),
     ])
     def test_rows_differing_only_on_a_kept_level_are_not_collapsed(
             self, names, level, values):

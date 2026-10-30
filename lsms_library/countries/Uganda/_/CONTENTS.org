@@ -4521,3 +4521,57 @@ restamping claim follows. Literal-only credential-transcript redaction is a
 separate containment action, and historical transcript hashes can differ.
 The four existing all-conflict real-cluster exclusions, labor source-observation
 follow-up, #1290/#1297 and umbrella #1120 remain separate.
+
+
+** 2026-10-30: D3 labor source observations and qualified runtime checkpoint
+
+The historical statement above that labor remains unchanged is superseded for
+=plot_labor=. Eligible source-missing parcel/plot records now use =unknown_plot=
+and a =labor_obs= coordinate after =season=: literal declared source, matching
+DVC sidecar SHA256 and original zero-based raw row position. It identifies an
+observation, never a plot, worker or persistent panel entity. All seven native
+drivers bind their exact loader paths; missing/ambiguous sidecar authority is
+refused. Source, season and labor category remain distinct.
+
+Known plots use =unresolved_observation= and the prior max reducer. Structural
+parcel-only suffixes remain known. GH1250 flag/zero/wage-only eligibility and
+nullable payloads remain; no seed, crop/input, D1/D2, sample, panel, #647 or
+#1297 rule changes. The canonical Feature axis uses =unresolved_observation=
+for countries without a native =labor_obs= axis. Shared schema support does
+not imply new raw verification in those countries.
+
+Independent source review supports implementation =f916eba15285=. Original
+targeted tests recorded 32 passed, 9 credential-skipped, 4 deselected. The
+first actual actor failed after four 2009-10 reads: writer instrumentation
+changed caller inference and sent its parquet to the owned source tree. The
+saved operands and misdirected storage were closed; that failure remains.
+The continuation (=550d103d3f26=, final =da3d9bc08e08=) reuses and compares
+those 2009 artifacts, places/stamps verified storage under private L2, and
+performs only the eight remaining independent/native reads for 2011/2013.
+This is composed 2009 reuse, not a repaired fresh 2009 native path execution.
+New waves use targeted profiling of the original writer; same-process runpy
+requires a private resolver cache clear at each boundary. Native interpreters
+were not separate processes. The authenticated full eight-wave pre-finalized
+sample is reused with an explicit private stamp, not rebuilt here.
+
+Across those three waves, missing-plot keys 95 become 141 observations and
+native rows 88,732 become 88,778; the 88,637 known-plot rows retain their
+observed axes, typed payloads and downstream values. Existing transformations
+recover 577 reported days and 305,000 reported hired wages, without asserting
+distinct plots. Full native source-position/CALL/RETURN/storage comparisons,
+key-bound composed Country/Feature, strict Country and fresh-process saved
+Country/Feature exact order/dtype/mask/nonmissing-value/typed-attrs checks pass.
+Four L1 plus five L2 selected files retain bytes/mode/nsmtime/coverage; named
+Python reader/build/writer/audit entrypoints observe zero warm operations.
+This is neither a directory snapshot nor universal native/C-level IO coverage.
+
+The continuation actor returned 0 in 126.141 seconds with closed descendants.
+All 60 ordinary files, 12 operator sources and 73 closed private files were
+independently authenticated without deserialization or replay. A later
+source-only declaration regex assertion failed because it assumed unindented
+YAML; the failed assertion and operands remain. Direct source diff supports
+only the approved labor comments/index change; the automatic check is not
+claimed green. Physical 2009 blank/flag counters were not durably retained.
+Three-wave composed evidence and seven-driver source support do not establish
+all-seven-native or clean-cold Country closure. Independent reviews:
+=95ad63dd80b6= (source/failed arm), =b437ddf69f27= (continuation).
