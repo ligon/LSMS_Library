@@ -104,3 +104,43 @@ cache snapshots. A real source miss stays a source miss; do not force historical
 #829WAITING, unknown recall,2015sourcebridge and all weight/panel caveats stay.
 Any accepted code is the same two calls to format_id before existing uniqueness
 assertions and writer; no alternative household linkage or expenditure arithmetic.
+
+### Current cached-source and API verification,2026-10-30
+
+- Four declared cached sources prove finite/integral/exact-range `hh`, canonical
+  bijection and independent cover membership for all29,235+24,792 native rows.
+  Actual scripts/helper/writer equal independent raw arithmetic/item/order,
+  dtype/null/attrs oracles, with explicit exact NumPy nonmissing comparisons.
+  Tiny and nextafter nullable-Float64 controls reject before source diagnosis.
+- Preserve failed `native-v1`: a single-process harness changed cwd between
+  waves and reused filename-keyed `_resolve_data_path` LRU state. The second
+  output was absent; a blocked-network reader fallback failed. This is not a
+  candidate product failure. Corrected `native-v2` uses one fresh process per
+  wave and asserts the output exists before reading it; both pass. No generic
+  cache/helper repair belongs to this issue, and no failure is deleted.
+- Actual public-d65 and candidate standard Country/Feature/default/subset builds
+  each return251,588 rows. Independent fresh-process warm reads preserve full
+  frames/attrs/exact numeric values plus all data-cache bytes/modes/mtimes.
+  Complete `sample` and197,561 other-wave nonfood rows are exact across heads.
+  Target i normalization followed by unchanged declared panel map (zero further
+  row changes here) and sample.v join explains every changed key; payload,
+  order, dtypes, masks and attrs remain exact. No row sort or tolerance.
+- Missing v in the target waves decreases54,027→244. All244 belong to21
+  2009sample households with real cover/sample membership but missing sample.v.
+  Strict two-wave read remains a `NullIndexKeyError` for244rows; it is not full
+  sampling completeness. Pre-existing2013five/2019sixteen misses remain.
+- Fresh candidate targeted regression+formatter run:43passed,0failed,0skipped,
+  one google-api-core future-version warning; pytest-n0/loadfile, core34,
+  one thread,8GiB, timeout120+5s. Historical negative-parent8/2cohort not replayed.
+- All actual execution uses pinned image/package/config identity and private
+  roots/DVC_SITE_CACHE_DIR, no shared mutation, network namespace disconnected.
+  Seventeen verified L1 objects42,450,844B cover eight nonfood+eight sample
+  household covers+one geovar; no housing table/source or broad acquisition.
+- Full receipt/report export is under root recovery/Uganda/nonfood1291-public-v1;
+  raw/keyed frames and household-code maxima stay private. Source/native/API
+  scope is nonfood here; no claim of unrelated table scientific validation.
+- Metadata-only fingerprint census: all 28 country-table hashes change, as do
+  56 wave-table hashes (28 each in 2009-10/2010-11). Other 168 wave-table hashes
+  remain exact. Existing hashing includes every module in an edited wave, so
+  this is an expected one-time rewarm cost, not a new cache policy or proof of
+  other-table scientific correctness. Both finite metadata-only probes pass.

@@ -3647,8 +3647,31 @@ household whose sampling cluster is genuinely absent.
 Synthetic tests execute both scripts and check household joins, exact payload
 and attrs preservation, leading-zero strings, missing IDs, the existing
 formatter's fractional-number policy, and refusal on a rekey collision.
-Held-source integrality, key correspondence and complete-frame verification
-remain pending; no new real-data counts are claimed here.
+The original synthetic-only acceptance qualification is retained in the task
+ledger. Resumed cached-source verification (2026-10-30, public =d65e8b136=)
+found both =hh= sources finite, integral and within binary64's exact integer range,
+with a bijection after formatting. All 29,235 retained 2009-10 rows and 24,792
+2010-11 rows match their independent =GSEC1.HHID= covers; native amounts,
+items, order, dtypes, masks and attrs equal an independent source oracle.
+
+Fresh private-cache baseline/candidate standard Country/Feature builds each
+serve 251,588 rows over eight waves, followed by exact fresh-process warm
+readbacks with unchanged cache bytes, modes and mtimes. The other six waves
+(197,561 rows) and the complete =sample= frame remain exact. Only the two
+early waves' household rendering and consequent =sample.v= joins change:
+54,027 formerly unmatched rows become canonical; 53,783 obtain =v=.
+The remaining 244 rows are 21 households with a real =sample= row but missing
+=sample.v= in 2009-10, consistent with the documented unlocated-household
+design caveat. They are served by the default API; =LSMS_READ_STRICT= still
+refuses those null index keys. No cluster, location or eligibility is invented.
+The pre-existing five 2013-14 and sixteen 2019-20 null-=v= rows remain.
+Current targeted tests: 43 passed. Numeric verification checks masks and exact
+nonmissing NumPy values, with tiny/nextafter rejection controls, rather than
+relying solely on pandas' nullable-Float64 frame predicate (GH #1206).
+The existing conservative module fingerprint changes all 28 country-table
+hashes and 28 wave-table hashes in each edited wave (56 total); the other
+168 wave-table hashes remain unchanged. This can cause a one-time rewarm of
+other Uganda tables and is not evidence that those tables were validated.
 
 ** WAITING No =RecallWindow=, and the window is ITEM-SPECIFIC -- a real gap
 
