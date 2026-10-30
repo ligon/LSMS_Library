@@ -2743,7 +2743,9 @@ def plot_inputs_for_wave(t, plot_roster, planting, seeds, colmap, labels=None):
                 pagg = pagg.dropna(subset=['_holder', '_code'])
                 pa2 = pagg.groupby(['_holder', '_code'], as_index=False).agg(
                     _purch_any=('_purch_any', 'max'),
-                    Quantity_purchased=('Quantity_purchased', 'sum'),
+                    # GH #1184: an explicit Yes with no reported amount is
+                    # missing, not a fabricated zero. Preserve recorded zeros.
+                    Quantity_purchased=('Quantity_purchased', lambda x: x.sum(min_count=1)),
                 )
                 nplots = (seed_df.dropna(subset=['_code'])
                           .groupby(['_holder', '_code'])['plot_id'].nunique()
