@@ -95,9 +95,8 @@ $(VAR_DIR)/people_last7days.parquet: people_last7days.py ../2014-15/_/people_las
 
 # community_prices: the framework aggregates the native wave parquets (#788,
 # #1091); there is no country-level script or var rule.  Retain this wave
-# target for the 2014-15 EACI questionnaire (EACIS04 p1/p2).  The 2017-18 wave
-# has no module wired; 2018-19's grappe-grain s05 module remains unwired (#821),
-# while 2021-22's price file has region x milieu grain and no grappe key.
+# target for EAC-I 2014-15 and EHCVM 2018-19 (both s05 quotes, GH #821).
+# 2017-18 and 2021-22 have no cluster-price module wired.
 ../%/_/community_prices.parquet: ../%/_/community_prices.py
 	(cd $(@D) && python community_prices.py)
 

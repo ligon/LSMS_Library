@@ -129,11 +129,11 @@ def test_obs_is_a_native_form_slot(mali, obs):
 @pytest.mark.requires_s3
 def test_public_country_and_feature_carry_native_readings():
     import lsms_library as ll
-    out = ll.Country('Mali', preload_panel_ids=False).community_prices()
+    out = ll.Country('Mali', preload_panel_ids=False).community_prices(waves=['2014-15'])
     assert list(out.index.names) == ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
     assert out.index.is_unique and len(out) == 155931
     assert out.groupby(level='obs').size().to_dict() == {1: 66699, 2: 49014, 3: 40218}
     assert pd.api.types.is_integer_dtype(out.index.get_level_values('obs'))
-    feature = ll.Feature('community_prices')(['Mali'], currency=None)
+    feature = ll.Feature('community_prices')(['Mali'], waves=['2014-15'], currency=None)
     pd.testing.assert_frame_equal(feature.droplevel('country').sort_index(), out.sort_index())
     assert 'canonical_alignment' not in feature.attrs
