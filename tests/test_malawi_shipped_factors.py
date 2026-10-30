@@ -558,6 +558,8 @@ class TestSaleSuppressionIsCounted:
             'plot_id': ['R1'] * 2,
             'crop': ['Maize'] * 2,
             '_crop_code': _pd.array([1, 1], dtype='Int64'),
+            # This fixture is _harvest_block output for seasonal raw code 1.
+            'production_obs': _pd.array(['reported:G:1'] * 2, dtype='string'),
             'u': _pd.array(['50 kg Bag'] * 2, dtype='string'),
             'condition': _pd.array(['shelled', 'unshelled'], dtype='string'),
             'crop_variety': _pd.array(['Maize Local'] * 2, dtype='string'),
@@ -576,6 +578,7 @@ class TestSaleSuppressionIsCounted:
         })
         with pytest.warns(malawi_mod.SaleAttachmentWarning, match='2,500 MWK'):
             out = malawi_mod.assemble_crop_production('2010-11', [harv], [sale])
+        assert out['production_obs'].tolist() == ['reported:G:1'] * 2
         tally = out.attrs['sale_suppressed']
         assert tally == {'wave': '2010-11', 'sales': 1, 'rows': 2,
                          'value': 2500.0}
@@ -588,6 +591,8 @@ class TestSaleSuppressionIsCounted:
         harv = _pd.DataFrame({
             't': ['2010-11'], 'i': ['h1'], 'plot_id': ['R1'], 'crop': ['Maize'],
             '_crop_code': _pd.array([1], dtype='Int64'),
+            # Seasonal code 1 has the native identity minted by _harvest_block.
+            'production_obs': _pd.array(['reported:G:1'], dtype='string'),
             'u': _pd.array(['50 kg Bag'], dtype='string'),
             'condition': _pd.array(['shelled'], dtype='string'),
             'crop_variety': _pd.array(['Maize Local'], dtype='string'),
@@ -606,6 +611,7 @@ class TestSaleSuppressionIsCounted:
         with warnings.catch_warnings():
             warnings.simplefilter('error', malawi_mod.SaleAttachmentWarning)
             out = malawi_mod.assemble_crop_production('2010-11', [harv], [sale])
+        assert out['production_obs'].tolist() == ['reported:G:1']
         assert out['Value_sold'].iloc[0] == 2500.0
         assert out.attrs['sale_suppressed']['sales'] == 0
 
@@ -660,6 +666,8 @@ class TestSaleConditionIsRead:
             't': ['2010-11'] * n, 'i': ['h1'] * n, 'plot_id': ['R1'] * n,
             'crop': ['Groundnut'] * n,
             '_crop_code': _pd.array([11] * n, dtype='Int64'),
+            # A condition split retains the SAME seasonal raw-code identity.
+            'production_obs': _pd.array(['reported:G:11'] * n, dtype='string'),
             'u': _pd.array(['Kilogramme'] * n, dtype='string'),
             'condition': _pd.array(list(conditions), dtype='string'),
             'crop_variety': _pd.array(['Groundnut Chalimbana'] * n,
@@ -713,6 +721,7 @@ class TestSaleConditionIsRead:
             out = malawi_mod.assemble_crop_production(
                 '2010-11', [self._harv(['shelled', 'unshelled'])],
                 [self._sale('unshelled')])
+        assert out['production_obs'].tolist() == ['reported:G:11'] * 2
         by_cond = out.set_index('condition')['Value_sold']
         assert by_cond['unshelled'] == 2500.0
         assert pd.isna(by_cond['shelled'])

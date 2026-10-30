@@ -247,13 +247,16 @@ Data Scheme:
     # issue (malawi.crop_conversion_factors) key their kg factors ON this
     # axis, so without it their shelled and unshelled factors are ambiguous
     # and `harvest_kg(shipped_factors=...)` refuses the table outright.
-    index: (t, i, plot_id, crop, u, condition)
+    # GH #637 ruling: reported:G/P:<native instrument code> keeps codes
+    # with the same harmonized crop separate; no new sale/factor rule.
+    index: (t, i, plot_id, crop, u, condition, production_obs)
     Quantity: float
     # crop_variety (GH #854) is the crop at its NATIVE grain -- the Module G/P
     # value label for the same code `crop` was collapsed from ('Maize Hybrid',
     # 'Rice Faya', 'Groundnut CG7'; `harmonize_crop_variety` in
     # categorical_mapping.org).  A COLUMN, not a level: it is functionally
-    # determined by the crop code, so it splits no key.  It exists because the
+    # determined by the crop code now retained by production_obs. It exists
+    # because the
     # shipped IHS5 conversion tables key their kg factors on the variety and
     # the varieties genuinely differ -- unshelled paddy in a 50 kg bag is
     # 29.04 kg for RICE LOCAL against 49.00 for eight improved varieties.

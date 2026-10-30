@@ -243,15 +243,13 @@ class TestScripts:
         for key in (*KEYS, DEL):
             assert f"'{key}'" in src, key
 
-    def test_label_is_stamped_after_the_collapse(self):
-        """The registry key is written AFTER the declared-grain groupby."""
+    def test_label_is_stamped_after_native_coordinate_validation(self):
+        """The unchanged branch is stamped only after full-grain refusal."""
         src = _source()
-        i_collapse = src.index("harv.groupby(_grain, as_index=False, dropna=False)")
+        i_guard = src.index("if harv.duplicated(_grain).any():")
         i_stamp = src.index("harv['Derivation'] = pd.array(")
-        assert i_stamp > i_collapse
-        # and the collapse carries the branch through, so the stamp cannot
-        # land on a row the collapse assembled from two
-        assert "'_branch':        'first'" in src
+        assert i_stamp > i_guard
+        assert "harv.groupby(_grain, as_index=False, dropna=False)" not in src
 
     def test_the_unresolved_warning_names_the_three_grounds(self):
         """Review item 6: the deletion's warning used to say the sale
@@ -265,7 +263,7 @@ class TestScripts:
     @pytest.mark.parametrize('wave', WAVES)
     def test_wave_script_asserts_uniqueness_on_the_declared_grain(self, wave):
         src = (ROOT / wave / '_' / 'crop_production.py').read_text()
-        assert "_GRAIN = ['t', 'i', 'plot_id', 'crop', 'u', 'condition']" in src
+        assert "_GRAIN = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs']" in src
         assert 'assert not df.reset_index().duplicated(_GRAIN).any()' in src
 
     @pytest.mark.parametrize('wave', ['2010-11', '2013-14'])
@@ -418,6 +416,7 @@ def _harv(rows):
         'i': [r[0] for r in rows], 'plot_id': [r[1] for r in rows],
         'crop': [r[2] for r in rows],
         '_crop_code': pd.array([r[3] for r in rows], dtype='Int64'),
+        'production_obs': pd.array([f'reported:G:{r[3]}' for r in rows], dtype='string'),
         'u': pd.array([r[4] for r in rows], dtype='string'),
         'condition': pd.array([r[5] for r in rows], dtype='string'),
         'crop_variety': pd.array(['x'] * n, dtype='string'),
