@@ -404,7 +404,10 @@ Data Scheme:
     # those halves carry no `other` rows (reported, not faked).  2004-05
     # (IHS2) is DEFERRED (household-level aggregated ag file, no plot-labor
     # roster).  See _/malawi.py:_plot_labor_block / assemble_plot_labor.
-    index: (t, i, plot_id, source)
+    # Known plots retain their sum/first reducer. Source-missing plots carry
+    # unknown_plot plus sidecar-qualified original-row labor_obs; never join
+    # those observations as one physical plot. Current eligibility is unchanged.
+    index: (t, i, plot_id, source, labor_obs)
     PersonDays: float
     Wage: float
     materialize: make

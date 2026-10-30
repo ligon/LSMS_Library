@@ -621,12 +621,14 @@ PLOT_INPUTS = ["t", "v", "i", "plot_id", "input", "j", "u", "season", "input_obs
 # shape.  `u_column` marks the six plot_inputs countries that carry `u` as a
 # COLUMN, which the assembly promotes.
 LABOR_SHAPES = {
-    # Benin, Burkina_Faso, CotedIvoire, Ethiopia, Guinea-Bissau, Malawi, Mali,
+    # Benin, Burkina_Faso, CotedIvoire, Ethiopia, Guinea-Bissau, Mali,
     # Niger, Nigeria, Senegal, Tanzania, Togo
     "Benin":    ["i", "t", "v", "plot_id", "source"],
     "GhanaLSS": ["i", "t", "v", "plot_id", "stage", "source", "worker"],
     "GhanaSPS": ["i", "t", "v", "plot_id", "season", "stage", "source"],
     "Uganda":   ["i", "t", "v", "plot_id", "source", "season", "labor_obs"],
+    # GH1120 source successor; no new actual native census is claimed here.
+    "Malawi":   ["i", "t", "v", "plot_id", "source", "labor_obs"],
 }
 INPUT_SHAPES = {
     # the seven EHCVM countries: no plot level at all
@@ -730,6 +732,7 @@ class TestPlotLaborHarmonize:
         # Uganda: two rows differing only on season
         (LABOR_SHAPES["Uganda"], "season", ("A", "B")),
         (LABOR_SHAPES["Uganda"], "labor_obs", ("row:source:0", "row:source:1")),
+        (LABOR_SHAPES["Malawi"], "labor_obs", ("row:CS:0", "row:Panel:0")),
     ])
     def test_rows_differing_only_on_a_kept_level_are_not_collapsed(
             self, names, level, values):

@@ -4106,8 +4106,20 @@ def _family_labor_pairs(df):
     return pairs
 
 
+def _labor_source_reference(data_path, *, script_path=None):
+    """Reuse the sidecar-only identity for driver- or countries-relative paths."""
+    from pathlib import Path
+    from lsms_library.paths import countries_root
+
+    path = Path(data_path)
+    # The existing restricted 2016 reader takes a countries-relative literal.
+    if not path.is_absolute() and path.parts and path.parts[0] == 'Malawi':
+        path = countries_root() / path
+    return _seed_source_reference(path, script_path=script_path)
+
+
 def _plot_labor_block(df, *, hhid, plotkey, t, hired_suffix,
-                      include_other=True):
+                      include_other=True, source_ref=None, row_positions=None):
     """Build one wave-half's reported (i, plot, source) plot-labor block.
 
     ``df`` is a raw Module D frame that already carries an ``hhid`` string
@@ -4117,13 +4129,17 @@ def _plot_labor_block(df, *, hhid, plotkey, t, hired_suffix,
     ``include_other`` is False for the IHS4/IHS5 Cross_Sectional halves that
     drop the ag_d52*/ag_d54* "other" columns.
 
-    Returns a long DataFrame at grain (t, i, plot, source) with the reported
-    item columns PersonDays and Wage (Wage non-null only for source=hired).
-    NO across-source sum, NO per-plot HH rollup.
+    Returns reported PersonDays and Wage at (t, i, plot_id, source, labor_obs).
+    Missing plots retain source-qualified original positions; known plots use
+    unresolved_observation. No plot or worker identity is inferred. Source
+    reference/positions are required only for eligible missing-plot records.
     """
+    # GH1120: reuse the existing plot sentinel and physical source-row doctrine.
+    # Caller positions refer to the complete raw source before eligibility.
     work = pd.DataFrame({
         'i':    df[hhid].astype('string').values,
-        'plot_id': df[plotkey].astype('string').values,
+        'plot_id': _plot_ids(df[plotkey]).values,
+        '_labor_row': np.arange(len(df)),
     }, index=df.index)
 
     rows = []
@@ -4172,28 +4188,57 @@ def _plot_labor_block(df, *, hhid, plotkey, t, hired_suffix,
     # Drop rows with no reported person-days for that source on that plot
     # (the survey did not record that source -> not a real item row).
     out = out[out['PersonDays'].notna() & (out['PersonDays'] > 0)
-              | (out['source'] == 'hired') & out['Wage'].notna()]
-    return out
+              | (out['source'] == 'hired') & out['Wage'].notna()].copy()
+    out['labor_obs'] = pd.Series('unresolved_observation', index=out.index,
+                                 dtype='string')
+    unknown = _is_unknown_plot(out['plot_id'])
+    if unknown.any():
+        if not isinstance(source_ref, str) or not source_ref.strip() or row_positions is None:
+            raise ValueError('Malawi missing-plot labor requires source and original positions')
+        positions = pd.Series(row_positions, dtype='Int64').reset_index(drop=True)
+        if (len(positions) != len(df) or positions.isna().any()
+                or positions.lt(0).any() or positions.duplicated().any()
+                or any(isinstance(v, (bool, np.bool_)) for v in row_positions)):
+            raise ValueError('Labor observations require unique original row positions')
+        retained = positions.iloc[out.loc[unknown, '_labor_row'].to_numpy()]
+        out.loc[unknown, 'labor_obs'] = (
+            'row:' + source_ref + ':' + retained.astype('string')).array
+    return out.drop(columns='_labor_row')
 
 
 def assemble_plot_labor(t, pieces):
     """Combine per-half plot-labor blocks (_plot_labor_block) into the
     canonical plot_labor DataFrame for wave ``t``.
 
-    Returns a DataFrame indexed (t, i, plot, source) with columns PersonDays
-    and Wage.  A (plot, source) reached on two source rows (e.g. the same
-    plot reported across CS/Panel overlap, which should not happen but is
-    guarded) sums PersonDays (additive) and takes the first reported Wage.
+    Known plots retain the prior PersonDays sum and first reported Wage at
+    (t, i, plot_id, source, unresolved_observation). Missing plot observations
+    retain their own source-qualified labor_obs and payload/nulls, without
+    pooling or borrowed wages. This does not identify distinct physical plots.
     """
     cat = pd.concat(pieces, ignore_index=True)
     cat['t'] = t
-    grp = cat.groupby(['t', 'i', 'plot_id', 'source'], as_index=False,
-                      dropna=False).agg({
+    unknown = _is_unknown_plot(cat['plot_id'])
+    if 'labor_obs' not in cat.columns:
+        cat['labor_obs'] = pd.Series('unresolved_observation', index=cat.index,
+                                     dtype='string')
+    if (cat.loc[~unknown, 'labor_obs'].ne('unresolved_observation').any()
+            or cat.loc[~unknown, 'labor_obs'].isna().any()):
+        raise ValueError('Known Malawi labor plots require unresolved_observation')
+    obs = cat.loc[unknown, 'labor_obs']
+    if (obs.isna().any() or not obs.str.startswith('row:').all()):
+        raise ValueError('Missing Malawi labor plots require source observations')
+    keys = ['t', 'i', 'plot_id', 'source', 'labor_obs']
+    native = cat.loc[unknown].set_index(keys)[['PersonDays', 'Wage']]
+    if not native.index.is_unique:
+        raise ValueError('Malawi labor source observation grain is not unique')
+    # Known plots keep the exact prior sum/first; source observations retain
+    # their own nulls (including hired wage-only missing days), like input_obs.
+    grp = cat.loc[~unknown].groupby(keys, as_index=False, dropna=False).agg({
         'PersonDays': 'sum',
         'Wage':       'first',
-    })
-    out = grp.set_index(['t', 'i', 'plot_id', 'source'])
-    assert out.index.is_unique, f"Non-unique (t,i,plot,source) in plot_labor {t}"
+    }).set_index(keys)
+    out = pd.concat([grp, native])
+    assert out.index.is_unique, f"Non-unique (t,i,plot,source,labor_obs) in plot_labor {t}"
     return out
 
 
