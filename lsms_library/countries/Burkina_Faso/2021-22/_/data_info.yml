@@ -6,7 +6,13 @@ sample:
         - df_cover
         - df_weights
     df_cover:
-        file: s00_me_bfa2021.dta
+        file:
+            - s00_me_bfa2021.dta
+            - Cross_Section/s00_me_bfa2021.dta:
+                i:
+                    - grappe
+                    - menage
+                    - mapping: cs_i
         idxvars:
             v: grappe
             i:
@@ -23,7 +29,29 @@ sample:
                     urbain: Urban
                     URBAIN: Urban
     df_weights:
-        file: ehcvm_panel_ponderations_bfa2021.dta
+        # Each component's OWN weight in `weight` (@ligon, GH #1276 ruling 3;
+        # the Malawi precedent): the panel's cross-sectional `hhweight2021`,
+        # the cross-section's `hhweight`.  `panel_weight` is the panel's
+        # `hhweight_panel` and is NaN for every cross-section household: the
+        # cross-section's file has no such column, and missing_ok fills it.
+        # Both weight files are one row per grappe, and the components'
+        # grappes are disjoint, so the merge on `v` stays many-to-one.
+        #
+        # EACH COMPONENT IS WEIGHTED TO THE NATIONAL TOTAL ON ITS OWN (raw
+        # sums over households, measured 2026-10-23: hhweight2021 3,084,993
+        # on 3,227 panel households; hhweight 3,233,016 on 7,176
+        # cross-section households).  So a pooled 2021-22 weighted mean
+        # BLENDS TWO FRAMES, each counted as if it were the whole country --
+        # 48.8% / 51.2% in weight, however unequal their household counts (a
+        # panel household weighs about 2.1 cross-section ones).  Analyse one
+        # component (`v` <= 585 is the panel, >= 586 the cross-section) or
+        # rescale before pooling.  `_normalise_sample_weights` divides each
+        # wave's weights by their mean, which rescales both components by the
+        # same constant and does not change this.
+        file:
+            - ehcvm_panel_ponderations_bfa2021.dta
+            - Cross_Section/ehcvm_ponderations_bfa2021.dta:
+                weight: hhweight
         idxvars:
             v: grappe
         myvars:
@@ -40,7 +68,13 @@ household_roster:
         - df_main
         - df_cover
     df_main:
-        file: s01_me_bfa2021.dta
+        file:
+            - s01_me_bfa2021.dta
+            - Cross_Section/s01_me_bfa2021.dta:
+                i:
+                    - grappe
+                    - menage
+                    - mapping: cs_i
         idxvars:
             v: grappe
             i:
@@ -61,7 +95,13 @@ household_roster:
                     Oui: 12
                     Non: 0
     df_cover:
-        file: s00_me_bfa2021.dta
+        file:
+            - s00_me_bfa2021.dta
+            - Cross_Section/s00_me_bfa2021.dta:
+                i:
+                    - grappe
+                    - menage
+                    - mapping: cs_i
         idxvars:
             v: grappe
             i:

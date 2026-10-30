@@ -17,12 +17,16 @@
 # emc2014_welfare.dta); EHCVM-1 numbers its own 585 ZD 1-585 (`grappe`).  Two
 # independent draws whose id spaces OVERLAP -- unlike GhanaLSS 1991-92, whose
 # disjoint 3xxx keyspace is what makes grouping across an unlinked boundary
-# correct there.  EHCVM-2 (2021-22) is a sub-sample of EHCVM-1's households,
-# tracked within their EA, and keeps EHCVM-1's `grappe`.
+# correct there.  EHCVM-2 (2021-22) has two components (GH #1276): a panel
+# sub-sample of EHCVM-1's households, tracked within their EA, which keeps
+# EHCVM-1's `grappe`; and a new cross-section whose 600 grappes are numbered
+# 586-1185, disjoint from EHCVM-1's 1-585.
 #
-# Do NOT measure the 2014 boundary by shared `i`: both waves build `i` from
-# the cluster serial, so 583 ids coincide and all 583 "keep" `v` -- an id
+# Do NOT measure the 2014 boundary by shared `i`: both waves built `i` from
+# the cluster serial, so 583 ids coincided and all 583 "kept" `v` -- an id
 # collision, not 583 households (see the 2018-19 note and CONTENTS.org).
+# Since GH #1244 the 2014 ids carry an 'EMC_' prefix and 0 are shared, which
+# is evidence about nothing.
 
 Sampling:
 
@@ -51,7 +55,10 @@ Sampling:
         loosely); `wave-scoped` would claim a crosswalk is meaningful, and
         none is (GH #1243).  District is compared case- and accent-folded,
         Koulpelgo = Koulpelogo (measured before GH #1059's spelling table,
-        PR #1242, landed); unfolded it differed for all 585.
+        PR #1242, landed); unfolded it differed for all 585.  Since GH #1244
+        the 2014 ids are namespaced 'EMC_' (burkina_faso.emc_i), so 0 `i`
+        are shared across this boundary by construction -- which says
+        nothing about `v`, exactly as Niger's 'E_' does not.
       source_type: derived-from-data
       confidence: high
       source_file: null
@@ -59,22 +66,27 @@ Sampling:
 
   '2021-22':
     panel:
-      household_continuity: panel
+      household_continuity: rotating-panel
       cluster_id_continuity: stable
       cluster_id_note: |-
-        `grappe` both waves, and EHCVM-2 tracked households within their EA
-        of origin (bid_bfa_ehcvm2.pdf, page 4).  Measured on the raw cover:
-        grappe == grappe_EHCVM1 for 3,227 of 3,227 panel households, in 550
-        grappes, all among 2018-19's 585.  Region agrees 550/550.  District
-        names a different province on 3 grappes (Seno/Yagha, Poni/Noumbiel,
-        Kompienga/Gourma; GH #1059) and Rural differs on 7: attribute
-        recodes on a grappe the households were tracked within, not a
-        renumbering.  Through the API, 3,155 `i` are shared and all 3,155
-        keep `v`, since the panel crosswalk was fixed (GH #1240, PR #1249;
-        before it only 2,053 were shared, a linkage defect, not a cluster
-        fact).  80 households remain unlinkable under id_walk's chain guard
-        (GH #1245).  The raw count is the measurement.
+        `grappe` both waves.  2021-22 is ONE round in TWO catalog entries (GH
+        #1276): the panel component (WB 6224, Data/) re-interviewed
+        3,227 EHCVM-1 households tracked within their EA of origin
+        (bid_bfa_ehcvm2.pdf, page 4), and grappe == grappe_EHCVM1 for all
+        3,227, in 550 grappes, all among 2018-19's 585 (Region agrees 550/550;
+        District names a different province on 3 grappes, Seno/Yagha,
+        Poni/Noumbiel, Kompienga/Gourma, GH #1059, and Rural differs on 7:
+        attribute recodes on a grappe the households were tracked within, not
+        a renumbering).  The cross-section component (WB 6277,
+        Data/Cross_Section/) is 7,176 households in 600 grappes numbered
+        586-1185, above 2018-19's maximum of 585, so the added keyspace is
+        DISJOINT and no new id names an old cluster (why `stable`, not
+        `mixed`; the Niger 2021-22 precedent, whose new grappes are 900-996).
+        `rotating-panel` (part retained, part replaced), not `panel`: 7,176 of
+        10,403 households are a new draw from the 2019 census frame, with no
+        2018-19 antecedent -- a judgement call, as for Niger 2021-22, which
+        does not change whether this boundary warns.
       source_type: derived-from-data
       confidence: high
       source_file: 'lsms_library/countries/Burkina_Faso/2021-22/Data/s00_me_bfa2021.dta'
-      locator: 'grappe vs grappe_EHCVM1 in that file, read via get_dataframe 2026-10-23; design: bid_bfa_ehcvm2.pdf p. 4 (quoted in CONTENTS.org, "THE THING TO KNOW"); re-measured through Country("Burkina_Faso").sample() and .cluster_features() at development 9a0ed5f3c'
+      locator: 'grappe vs grappe_EHCVM1 in that file, and grappe in Data/Cross_Section/s00_me_bfa2021.dta, read via get_dataframe 2026-10-23; design: bid_bfa_ehcvm2.pdf p. 4 (quoted in CONTENTS.org, "THE THING TO KNOW") and the WB 6277 catalog entry (sampling_procedure; quoted in CONTENTS.org, GH #1276 section)'

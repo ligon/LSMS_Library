@@ -2,7 +2,7 @@ SOURCE
 
 https://microdata.worldbank.org/index.php/catalog/6224
 
-#+CATALOG_ID: 6224
+#+CATALOG_ID: 6224, 6277
 #+CATALOG_IDNO: BFA_2021_EHCVM-P_v04_M
 #+CATALOG_TITLE: Enquête Harmonisée sur le Conditions de Vie des Ménages, Panel Survey 2021-2022
 #+CATALOG_YEARS: 2021-2022
@@ -11,3 +11,19 @@ https://microdata.worldbank.org/index.php/catalog/6224
 #+PROVENANCE_SOURCE: worldbank
 #+PROVENANCE_METHOD: source-url
 #+PROVENANCE_RECORDED: 2026-07-12
+
+* Partial cross-section declarations (GH #1276, 2026-10-29)
+
+Catalog 6277 (EHCVM-2) supplies the three =Data/Cross_Section/= sidecars
+for =s00_me_bfa2021.dta=, =s01_me_bfa2021.dta= and
+=ehcvm_ponderations_bfa2021.dta=. They are recovered unchanged from product
+source =94d12f2f93dd2e55c7da0158db0a76e69b2f4396=, and matching cached
+blobs were verified through the standard reader in the private receiving job.
+Only =sample= and =household_roster= currently read that component.
+
+This is a partial declaration/read verification, not a complete acquisition
+or push receipt. No secondary =CATALOG_HELD= release is asserted. Catalog
+6224's primary release fields above are preserved. Its existing flat =Data/=
+paths remain; migrating the full panel layout and recording =CATALOG_SUBDIR=
+routing is still required before a confined re-acquisition of either component.
+No re-acquisition was performed.
