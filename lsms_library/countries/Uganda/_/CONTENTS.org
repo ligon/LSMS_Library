@@ -4392,3 +4392,27 @@ recorded CAPI/version/row relationship resolves the 5 No and 38 missing
 follow-up cases. An analyst total requires that relationship to be explicit.
 No quantity, sale, condition, observation token or eligibility rule changes.
 The #1290 nine unsupported keys and #1297 parcel question remain separate.
+
+* Crop-axis vocabulary for native plot inputs (GH #1119)
+
+AGSEC3A/B fertilizer and pesticide records carry =(not crop-specific)=;
+AGSEC4A seed records keep mapped native crops, use =unknown_crop= when the
+crop answer is absent, and pass recorded unmapped codes/labels through.
+Canonical =data_info.yml= explicitly treats Uganda code zero with no value
+label as an unrecorded crop, so it becomes =unknown_crop=. Fractional
+codes are not truncated. Literal source labels are retained. The first-season
+AGSEC4A coverage and the old seed eligibility test are unchanged: a newly
+nonmissing marker does not admit an otherwise excluded empty seed row.
+
+Classification is assigned AFTER the legacy duplicate reduction, using labels
+captured from the original raw answers. This preserves both membership and
+order: relabeling an unmapped numeric code before the sorted reducer can move its
+payload relative to other crops on the same plot even when the non-crop index
+projection is identical (covered by a synthetic regression). A legacy group containing distinct new crop labels
+now raises an explicit conflict instead of guessing a label for summed values
+or silently changing the grouping policy. Such a conflict needs the separate
+source-observation/grain decision; no =input_obs= axis is added here.
+
+The existing conditional null-key loss, reducers, units, plot construction,
+weights and second-season seed coverage gap remain. This does not resolve
+#829 WAITING, #647 PART-harvest additivity or the 2019 panel-weight questions.
