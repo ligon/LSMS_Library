@@ -2422,3 +2422,48 @@ stronger unmeasured instrumentation predicates. Existing-production composition/
 is not an independent scientific oracle for IDs or population. This accepts
 one of twelve compiler runtime cells, not whole #1287, panel/grain policy or
 country closure. Back-casting, Extended/Refresh and WAITING #114 remain live.
+
+* 2026-10-30 -- Four actual agriculture compiler cells (GH #1287)
+
+At exact runtime source =64dd533394e27bd9c0d4ea7bada042a9a43b6eca=,
+actual Make ran both declared modern native scripts and each unchanged country
+compiler for =plot_features=, =plot_inputs=, =plot_labor= and =crop_production=.
+Compiler rows are respectively 8,865 / 9,709 / 8,627 / 16,069. The four early
+UPD logical rounds do not declare these tables; no old-round rows are invented.
+Native storage concatenation plus existing =id_walk= matches compiler CALL;
+all twelve writer RETURN/storage comparisons pass. These are production
+composition predicates, not independent scientific or crosswalk oracles.
+
+Full Country, each modern-wave subset, and aligned singleton Feature
+(=currency=None=) pass at matching stages. Subsets restrict the raw API cache
+before finalization, preserving unused levels. Fresh warm processes repeat all
+requests against closed cold operands. Both corresponding 35-file snapshots
+are exact in bytes, sizes, modes and mtimes; observed warm source/script/write
+calls are zero. Sample prerequisites cover all six logical waves separately
+from the two modern agriculture contributors. Strong extension-array and exact
+nonmissing NumPy checks supplement pandas frame assertions.
+
+Two strict native =plot_inputs= CALL/RETURN metadata comparisons remain failed:
+the crop dictionary loses its NA level member, with 407 / 2,423 rows represented
+by code -1 instead. Ordered observed keys, typed payload/masks and attrs agree;
+the existing writer's reset-index/set-index preparation explains the change.
+RETURN/storage and native-read/compiler comparisons are exact. Only previously
+skipped API/warm work continued under the original deadline; no Make retry or
+actual-frame normalization followed. The missing-Poetry audit failure and
+relative imported-helper filename observation gap remain explicit; script,
+reader and writer boundaries establish the actual route, not helper counts.
+
+The 19 held sources total 30,981,359 bytes. Observed source calls are 22 Make,
+22 API and three shared sample reads; no broad acquisition. Nineteen supervised
+phases total 587.679 seconds, with owned groups closed before exporting 219
+derived/log witnesses. Runtime source/config bindings remain unchanged.
+Dispatch =635374f6512c4b749da85a1af8fb3baa=, job =40651649=; final private
+result =5edda1f7131ab43482395b467a27a103a8b81317=; ordinary REPORT SHA256
+=48f4f3251e2040c651a95a44491973ad5eef420e7b0e71cb8a5f2f14556a43f7=.
+Independent review SHA256
+=842bdddd02fb6ee13437960cd1c4a5b57503ad4cfbc3d42ff3d79306608cbeed=.
+
+This accepts four bounded transport/API cells. The seven other compiler
+entries, #905 held optimizers, #114 back-casting/grain and all scientific
+caveats remain separate. The two failed complete-metadata predicates remain
+failed; whole #1287/#1288 is not closed.
