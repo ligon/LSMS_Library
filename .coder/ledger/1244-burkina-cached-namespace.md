@@ -40,7 +40,25 @@ from retained private source if accessible, never adopt the broad private branch
 No B-sample7 admission framework or historical control replay.
 
 ## §6 Open dependencies
-Old v6 checkout is absent on receiving node. Request ordinary retained product
-source location while advancing cached EMC subcase. CS declaration/blob absence
-will be reported exactly, never filled by acquiring files. Historical failed
+Old v6 checkout is absent on receiving node. Ordinary retained results.git
+contains94d12f2f93dd2e55c7da0158db0a76e69b2f4396; recovered minimum product
+fragments and3 CS sidecars. All selected12 blobs exist and match their declared
+MD5. No acquisition is needed. Source provenance is in recovered-source.json. Historical failed
 receipts remain failed/unverified. Root owns integration and external actions.
+
+## Verification and metadata dependency
+
+OK (§2–§5): actual sample keys and raw/normalized weights match an independent
+source oracle; 2014/2018 sample overlap583→0, roster604→0; 2021 sample3227→10403
+with7176 CS households and missing CS panel_weight. All existing roster payload
+and membership preserved. Single-pass JSON unchanged; warm/Feature checks pass.
+The two live EMC script consumers preserve actual-source payloads exactly.
+
+The recovered source also contains the needed population/sampling definitions.
+Reuse its existing mixed-national+panel/rotating-panel descriptions, qualified
+to the sample/roster scope and public flat panel layout. Canonical population
+source and its generator histogram move together; regenerate only Burkina via
+the existing renderer. This is necessary disclosure of the served components,
+not a new scientific definition or a test-baseline relaxation. SOURCE records
+partial secondary declarations, never an acquisition-complete held release.
+Full other-module and acquisition-layout migration remains root integration work.
