@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from tests.test_gh905_tanzania_vectorised_sums import SOURCE, load_helper, stub_maps, source_case
+from tests.tanzania_crop_marker_oracle import restore_original_function, relabel_expected
 
 KINDS = ['plot_inputs', 'livestock', 'plot_labor']
 POPULATIONS = ['signed_cancellation', 'nonnegative_mixed', 'nullable', 'all_na']
@@ -37,12 +38,14 @@ def load_old():
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         return module
-    # CI has no private old-helper file. Reverse only the livestock optimization;
+    # CI has no private old-helper file. Restore the frozen pre-#1119 function
+    # and reverse only the livestock optimization. The historical digest is
+    # UNCHANGED: marker work must not repin the numerical reference.
     # the complete digest proves this is the exact independently attested public
     # source, rather than an approximation or a second full helper fixture.
     current = SOURCE.read_text(encoding='utf-8')
     assert current.count(VECTORIZED_LIVESTOCK) == 1
-    public = current.replace(VECTORIZED_LIVESTOCK, LEGACY_LIVESTOCK, 1)
+    public = restore_original_function(current).replace(VECTORIZED_LIVESTOCK, LEGACY_LIVESTOCK, 1)
     assert hashlib.sha256(public.encode('utf-8')).hexdigest() == OLD_PUBLIC_SHA256
     module = ModuleType('_tz905_actual_old_public')
     module.__file__ = str(SOURCE)
@@ -89,6 +92,13 @@ def test_actual_helpers_preserve_adverse_population(monkeypatch, tmp_path, kind,
     args = operands(kind, population)
     before = getattr(old, kind + '_for_wave')(*args)
     after = getattr(new, kind + '_for_wave')(*args)
+    if kind == 'plot_inputs':
+        # Only the structural crop-NA expectation is superseded by the ruling
+        # #1119 comment6368100317 / data_info.yml:250–265. All seed crops in
+        # this cohort are mapped; keep legacy payload/order and other domains.
+        before = relabel_expected(before, [
+            '(not crop-specific)' if pd.isna(crop) else crop
+            for crop in before.index.get_level_values('crop')])
     assert before.index.equals(after.index)
     assert list(before.columns) == list(after.columns)
     assert before.dtypes.equals(after.dtypes)
@@ -110,6 +120,8 @@ def test_actual_helpers_preserve_adverse_population(monkeypatch, tmp_path, kind,
                'new': {c: b.tolist() for c, a, b in comparisons},
                'old_new_index_order_dtypes_attrs_NA_exact': True,
                'source_clamps_unchanged': True}
+    receipt['crop_axis_oracle'] = ('GH1119 structural marker only' if kind == 'plot_inputs'
+                                  else 'unchanged')
     evidence = Path(os.environ.get('TZ905_EVIDENCE', str(tmp_path)))
     with (evidence/'adverse-observations.jsonl').open('a') as stream:
         stream.write(json.dumps(receipt) + '\n')

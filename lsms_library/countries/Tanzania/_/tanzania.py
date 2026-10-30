@@ -1449,6 +1449,10 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
     pd.DataFrame indexed by PLOT_INPUTS_INDEX = (t, i, plot_id, input, crop,
     u) with columns PLOT_INPUTS_COLUMNS.  ``u`` is a key (GH #637): a seed
     crop label recorded in two units is two rows, never one summed quantity.
+    Crop markers follow GH #1119: plot-level inputs are ``(not crop-specific)``;
+    retained seeds with an unrecorded crop are ``unknown_crop``. Recorded
+    unmapped identities pass through. Legacy keys govern eligibility and
+    reduction before relabelling (ledger 1119-tanzania-crop-markers §§3–4).
     """
     c = colmap
     fert_type_map = _plot_harmonized_codes('harmonize_input')
@@ -1504,6 +1508,15 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
         })
         # A seed row is real only if a quantity OR a crop label is present.
         seed = seed[seed['Quantity'].notna() | seed['crop'].notna()]
+        # Classify only retained records, independently of the LEGACY crop key.
+        # Keep the existing Int64 conversion/refusals above; unlike Uganda's
+        # 2011-12 ruling, Tanzania has no authority treating zero as missing.
+        native = sec4a[c['crop']].reset_index(drop=True).reindex(seed.index)
+        numeric = code.reset_index(drop=True).reindex(seed.index)
+        passthrough = numeric.map(lambda x: str(int(x)) if pd.notna(x) else pd.NA)
+        literal = native.astype('string').str.strip().replace('', pd.NA)
+        seed['_crop_label'] = (seed['crop'].fillna(passthrough.astype('string'))
+                               .fillna(literal).fillna('unknown_crop'))
         # crop unresolved -> keep raw code as crop_<code> (do not drop).
         seed['crop'] = seed['crop'].where(
             seed['crop'].notna(),
@@ -1511,7 +1524,7 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
                 .astype('string').reindex(seed.index).values)
         rows.append(seed)
 
-    # --- AG_SEC_3A: plot-level inputs (crop = NA) -----------------------
+    # --- AG_SEC_3A: plot-level inputs (LEGACY crop = NA) ----------------
     hh3, plot3 = _ids(sec3a)
 
     def _liquid_unit(col):
@@ -1523,6 +1536,7 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
     org = pd.DataFrame({
         'i': hh3.values, 'plot_id': plot3.values, 'input': 'Organic Fertilizer',
         'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+        '_crop_label': '(not crop-specific)',
         'Quantity': pd.to_numeric(sec3a['ag3a_42'], errors='coerce').astype('Float64').values,
         'u': 'kg',
         'Purchased': _yn_true(sec3a['ag3a_43']).values,
@@ -1546,6 +1560,7 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
             'i': hh3.values, 'plot_id': plot3.values,
             'input': label.where(label.notna(), 'Other Fertilizer').values,
             'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+            '_crop_label': '(not crop-specific)',
             'Quantity': pd.to_numeric(sec3a[qty_col], errors='coerce').astype('Float64').values,
             'u': 'kg',
             # Inorganic fert records a purchased VALUE (TSH), not a separate
@@ -1566,6 +1581,7 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
     herb = pd.DataFrame({
         'i': hh3.values, 'plot_id': plot3.values, 'input': 'Herbicide',
         'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+        '_crop_label': '(not crop-specific)',
         'Quantity': pd.to_numeric(sec3a['ag3a_62_1'], errors='coerce').astype('Float64').values,
         'u': _liquid_unit('ag3a_62_2').values,
         'Purchased': (valh.fillna(0) > 0).astype('boolean').values,
@@ -1581,6 +1597,7 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
     pest = pd.DataFrame({
         'i': hh3.values, 'plot_id': plot3.values, 'input': 'Pesticide',
         'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+        '_crop_label': '(not crop-specific)',
         'Quantity': pd.to_numeric(sec3a['ag3a_65b_1'], errors='coerce').astype('Float64').values,
         'u': _liquid_unit('ag3a_65b_2').values,
         'Purchased': (valp.fillna(0) > 0).astype('boolean').values,
@@ -1604,7 +1621,18 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
     df['u'] = df['u'].astype('string')
 
     df['t'] = t
+    labels = df.pop('_crop_label')
     df = df.set_index(PLOT_INPUTS_INDEX)
+    labels.index = df.index
+    if not labels.index.is_unique:
+        groups = labels.groupby(level=PLOT_INPUTS_INDEX, dropna=False, sort=False)
+        conflicts = groups.nunique(dropna=False).gt(1)
+        if conflicts.any():
+            raise ValueError(
+                f'plot_inputs {t}: legacy crop aggregation conflates distinct '
+                f'desired crop identities at {conflicts[conflicts].index[0]!r}; '
+                'cannot relabel losslessly (GH #1119)')
+        labels = groups.first()
     # ``u`` is part of the GRAIN (GH #637), as in the canonical
     # ``plot_inputs`` index and in Malawi's and the EHCVM countries' builders:
     # rows recorded in different units stay separate rows.  The remaining
@@ -1658,6 +1686,18 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
         })
         df['Unit_purchased'] = df['Unit_purchased'].astype('string')
     df = df[PLOT_INPUTS_COLUMNS]
+    # Replace only the crop axis AFTER the unchanged conditional reducer. Do
+    # not re-sort or rebuild other level dictionaries (including unused values).
+    levels, codes = list(df.index.levels), list(df.index.codes)
+    pos = df.index.names.index('crop')
+    codes[pos], levels[pos] = pd.factorize(labels.reindex(df.index), sort=True)
+    relabelled = pd.MultiIndex(levels=levels, codes=codes, names=df.index.names)
+    if not relabelled.is_unique:
+        key = relabelled[relabelled.duplicated(keep=False)][0]
+        raise ValueError(
+            f'plot_inputs {t}: crop relabelling creates colliding output '
+            f'identities at {key!r}; cannot reduce again (GH #1119)')
+    df.index = relabelled
     return df
 
 
