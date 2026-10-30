@@ -3086,3 +3086,46 @@ The newW1 raw build warned about10purchased positive-quantity rows without a uni
 where the older screen table above records9. The two attributed observations are
 retained rather than silently reconciling their counts. See the per-task ledger
 =1287-ethiopia-food-country-selector.md= for exact scopes and retained failures.
+
+
+** #1183 official seed-instrument evidence; retention remains unresolved (2026-10-30)
+
+The official W1/W2 post-planting questionnaires and manuals now have exact
+byte/page bindings and independent visual review. This records instrument
+idiosyncrasies; it makes no flag recode, quantity imputation, retention or join
+change. The existing #1183 caveats above remain live.
+
+- W1 form PDF p16 Q3 No points to Q13, but manual PDF p72 says Q14. Both
+  routes bypass purchase quantity Q5; neither instructs leaving Q3 blank for No.
+  W2 form p20 and manual p75 agree on No to Q13. Traditional seed Q1 goes
+  to Q2, bypassing variety detail rather than the purchase question Q3.
+- W1 manual p71 seed-type Q1 code3 means permanent crop/not planted this
+  season, although the W1 form prints only codes1/2. W2 seed-type code3
+  means improved recycled/saved. Do not transfer the meaning between waves.
+  W2 section4 p18 Q11 code3 explicitly bypasses applied quantity Q11b;
+  that is not a section5 Q3 skip. Financing Q9 code3 is a separate question.
+- W2 manual p75 lists Parcel ID and Field ID, while the section5 form p20
+  has neither column and selected DDI metadata has neither variable. Preserve
+  the documented W1 field/crop versus W2 holder/crop attachment restriction;
+  do not fan holder quantities out to plots. The same W2 form also visibly
+  prints an anomalous household-member question in Q1a, whereas its manual
+  and DDI describe improved-variety name. Neither discrepancy is silently
+  corrected here.
+- The explicit zero instruction on form Q10 concerns up-front payment, not
+  purchase quantity Q5. Free and leftover seed routes also show that No
+  purchase is not equivalent to no seed use.
+
+Same-country =_yesno_bool_col= and #1250/#1253 already distinguish unknown
+from No. The seed decoder and its purchase-zero caller require separate
+missing-safe treatment; #1184's =sum(min_count=1)= and unique-plot attachment
+remain unchanged. The forms do not determine which otherwise hollow seed
+observations should remain after removing manufactured payload. No blanket
+crop-label retention or deletion is selected. Routine bounded source attribution
+can investigate that question; an inconclusive scientific choice still needs
+explicit adjudication. #1183 remains open.
+
+Exact official URLs, document hashes, eight visually inspected PDF pages,
+source/code precedents, historical-count qualifications and the independent
+review are recorded in
+=slurm_logs/isa_backlog_2026-10-30/Ethiopia/1183-instrument-evidence/REPORT.md=.
+No survey source or API was replayed for this checkpoint.
