@@ -256,6 +256,10 @@ Data Scheme:
     TenureSystem: str
     SoilType: str
     Irrigated: bool
+    # WB srtmslp_nga is percent (GH #1150 source-label reconciliation).
+    PlotSlope:
+      type: float
+      optional: true
     materialize: make
 
   crop_production:

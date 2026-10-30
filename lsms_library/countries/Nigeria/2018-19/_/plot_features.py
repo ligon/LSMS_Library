@@ -6,7 +6,7 @@ plot detail (sect11b1) on (hhid, plotid).
 TRAP (recon): in W4 the AREA NUMBER is s11aq4aa.  s11aq4a is a GPS
 yes/no FLAG (1/2), NOT the area -- do not use it.
 
-PlotSlope from the plot-geovariables file (srtmslp_nga, degrees), joined
+PlotSlope from the plot-geovariables file (srtmslp_nga, percent), joined
 on (hhid, plotid).
 """
 import sys

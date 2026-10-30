@@ -1132,8 +1132,9 @@ in v03, 0 are revised, 1 is new and 1 is no longer shipped.
   STRING with 16 literal ="NA"= values -- cast it, do not trust its dtype.
   Against =sect3_pp_w5= (=holder_id + parcel_id + field_id=, 14,878 fields):
   14,311 plots match, 88 are in the geovariables only, 567 roster fields have
-  no geovariables.  *Not wired*: serving it in =plot_features= as declared
-  optional columns is GH #1150 (@ligon's option A on #1127, 2026-10-20).
+  no geovariables. *At acquisition, not wired*: serving it in =plot_features=
+  as optional columns was deferred to GH #1150 (@ligon's option A on #1127,
+  2026-10-20); see the dated GH #1150 implementation disclosure below.
 
 ** Area and the local-unit gap
 
@@ -3179,3 +3180,68 @@ partitions are retained at
 =slurm_logs/isa_backlog_2026-10-30/Ethiopia/1183-performance-actual/REPORT.md=
 in its private result branch. No raw identifiers or witness values are
 published here.
+
+* GH #1150 WB plot covariates (2026-10-30)
+
+The 2026-10-20 option A ruling supersedes the earlier GAP 6 exclusion of
+raster attributes ONLY for elevation, slope, potential wetness and distance
+to the household. The historical rationale above remains recorded; soil
+quality, PCA and aggregate fields remain outside this decision. These are
+WB-computed geospatial attributes, not survey answers. Plot GPS remains
+confidential; no coordinates are inferred or emitted.
+
+The verified W4 =ETH_PlotGeovariables_Y4.dta= and genuine v03 W5
+=Pub_ETH_PlotGeovariables_Y5.dta= attach to the existing FIELD roster by
+=(holder_id, household_id, parcel_id, field_id)=, renaming W5's
+=parcelroster_id/fieldroster_id= for this join. All base fields remain,
+unmatched fields have missing covariates, geo-only rows create no plots,
+and duplicate source keys raise rather than selecting a value.
+
+=PlotElevation= is =plot_srtm= in metres; =PlotWetnessIndex= is the
+WB's dimensionless =plot_twi=. =PlotDistanceToHousehold= is
+=dist_household= in kilometres: text =NA= and blank strings become missing.
+Direct inspection found 4 literal =NA= in W4 and 16 in W5 (no empty strings),
+contrary to the issue's shorthand "blanks". The respective maxima 503.3 and
+396.8 km are retained without a plausibility filter.
+
+=PlotSlope= is the WB's native PERCENT rise/run, served unchanged. All five
+source labels say "Plot Slope (percent)". The initial #1150 degree-conversion
+proposal relied on uncited Nigeria degree comments. Final inspection of
+Nigeria W4 and independent per-wave official dictionary review contradicted
+that premise: Nigeria W1-W4 also label =srtmslp_nga= percent. The coordinator
+therefore approved a common native-percent column (2026-10-30). No angular
+conversion, library derivation or =Derivation= marker is needed; WB geospatial
+provenance remains in the canonical declarations and country documentation.
+The rejected shared-degree draft and subsequent unit-separated workaround
+were not adopted. Zero and missing remain zero and missing.
+
+W1-W3 were subsequently retrieved as the three exact already-declared blobs
+from the held DVC remote into private storage, with sidecar MD5/size verified.
+All three labels independently confirm the same units as W4/W5. W1/W2
+=Pub_ETH_PlotGeovariables_Y1/Y2= and W3 =ETH_PlotGeovariables_Y3= are now
+wired with the same full native join; W2/W3 still EMIT =household_id2= while
+the join uses =household_id=. The Y38 sibling is not substituted for Y3.
+W1-W3 distance is already numeric and is not round-tripped through text.
+Source maxima are 8338.9, 436.5 and 775.7 km, retained as shipped. Missing
+slope/elevation/wetness values in W1/W2 remain missing, not zero. Other
+countries without a source retain absent optional columns; no all-NA
+columns are manufactured by these declarations.
+
+Current-source conservation measurement (2026-10-30): every one of the
+132,694 base field rows, its key/order and nine existing payload columns
+was exactly preserved across the native constructors and Country API.
+The full native-key attachment gives:
+
+| Wave    | Base fields | Matched fields | Unmatched fields | Geo-only excluded | Nonmissing slope | Nonmissing distance |
+|---------+-------------+----------------+------------------+-------------------+------------------+---------------------|
+| 2011-12 |       32025 |          24953 |             7072 |                 1 |            24941 |               24953 |
+| 2013-14 |       33147 |          33147 |                0 |                 0 |            31074 |               31074 |
+| 2015-16 |       33305 |          32141 |             1164 |                 0 |            32141 |               32141 |
+| 2018-19 |       19339 |          17791 |             1548 |                 0 |            17791 |               17787 |
+| 2021-22 |       14878 |          14311 |              567 |                88 |            14311 |               14295 |
+
+Elevation/wetness nonmissing counts equal slope counts. W2's 2,073 matched
+but missing-source covariate rows show why a match must not imply a value.
+W2/W3 geovariable =household_id2= agrees with the base field identity on
+every match, although the join uses =household_id=. These are measurements
+of this release, not hardcoded future-release row-count assertions.

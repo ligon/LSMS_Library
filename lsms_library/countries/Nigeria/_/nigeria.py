@@ -1893,7 +1893,7 @@ def plot_features_for_wave(t, area, detail, colmap, geovar=None):
             fallow                         (in `detail`; -> Fallow, code 1=fallow)
             fallow_cultivated              (in `detail`; W1 only override:
                                             value 1 forces Fallow=False)
-            slope                          (in `geovar`; -> PlotSlope, degrees)
+            slope                          (in `geovar`; -> PlotSlope, percent)
         Omitted / absent columns yield NaN for the corresponding output.
     geovar : pd.DataFrame | None
         Raw plot-geovariables frame (``nga_plotgeovariables_y*``), loaded
@@ -1910,7 +1910,7 @@ def plot_features_for_wave(t, area, detail, colmap, geovar=None):
         boolean: holds a land-ownership certificate), ``ErosionProtection``
         (nullable boolean: erosion-control measure present), ``Fallow``
         (nullable boolean: plot left fallow this season) and ``PlotSlope``
-        (float, SRTM-derived slope in degrees).  Latitude / Longitude are
+        (float, SRTM-derived slope in percent).  Latitude / Longitude are
         deferred (Nigeria has no decimal-degree parcel coordinates;
         only GPS area in m^2).  ``PlotCertificate`` / ``ErosionProtection``
         / ``Fallow`` are the *reported* per-plot item flags; the HH-level

@@ -41,7 +41,8 @@ colmap = dict(
     # soil_type: not asked in W1 -> SoilType NaN
 )
 
-df = plot_features_for_wave('2011-12', sect2, sect3, colmap)
+geovar = get_dataframe('../Data/Pub_ETH_PlotGeovariables_Y1.dta', convert_categoricals=False)
+df = plot_features_for_wave('2011-12', sect2, sect3, colmap, geovar=geovar)
 
 assert df.index.is_unique, "Non-unique (t, i, plot_id) index in plot_features 2011-12"
 assert len(df) > 0, "plot_features 2011-12 produced no rows"

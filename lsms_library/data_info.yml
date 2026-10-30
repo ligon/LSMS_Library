@@ -514,6 +514,27 @@ Columns:
     # crop-share %) belongs in a future plot_cultivation table.  See
     # slurm_logs/DESIGN_erhs_plot_features_2026-05-20.org for the design
     # rationale; Uganda is the Phase-1 pilot.
+    PlotSlope:
+      type: float
+      optional: true
+      note: >-
+        WB geospatial/raster plot slope in percent rise/run, not degrees and
+        not survey-reported. Ethiopia plot_srtmslp and Nigeria srtmslp_nga
+        are served in their native percent unit without conversion.
+    PlotElevation:
+      type: float
+      optional: true
+      note: WB SRTM plot elevation in metres; not survey-reported.
+    PlotWetnessIndex:
+      type: float
+      optional: true
+      note: WB plot Potential Wetness Index (dimensionless); not survey-reported.
+    PlotDistanceToHousehold:
+      type: float
+      optional: true
+      note: >-
+        WB geospatial plot-to-household distance in kilometres. Text NA/blanks
+        become missing; values including the long distance tail are not clipped.
     Area:
       type: float
       required: true

@@ -7,7 +7,7 @@ certificate, or erosion-protection question; SoilType / Irrigated /
 TenureSystem / PlotCertificate / ErosionProtection are NaN this wave.
 Fallow comes from s11bq17 ("left fallow"), with s11bq16 ("cultivated?")
 forcing not-fallow.  PlotSlope from the plot-geovariables file
-(srtmslp_nga, degrees), joined on (hhid, plotid).
+(srtmslp_nga, percent), joined on (hhid, plotid).
 """
 import sys
 

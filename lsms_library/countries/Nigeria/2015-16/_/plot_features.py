@@ -4,7 +4,7 @@ Post-planting only -> single t = 2015Q3.  Area (sect11a1) joined onto
 plot detail (sect11b1) on (hhid, plotid).  W3 acquire scheme has 6 codes
 (adds family inheritance = 5, sharecropped = 6).  Erosion protection
 (s11b1q49) first appears this wave.  PlotSlope from the plot-geovariables
-file (srtmslp_nga, degrees), joined on (hhid, plotid).
+file (srtmslp_nga, percent), joined on (hhid, plotid).
 """
 import sys
 
