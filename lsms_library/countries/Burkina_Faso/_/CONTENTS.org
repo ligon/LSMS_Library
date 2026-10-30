@@ -2026,10 +2026,15 @@ cache hash or a full-country re-warm.
 All prior failed/partial attempts retain their original states. In particular,
 v7 failed on unused roster-index metadata and has no saved warm operand for
 retrospective complete-record acceptance. V8 is fresh evidence, not a relabelled
-pass for that attempt. The existing residence-duration tension also remains:
-the EMC prose calls months of presence continuous, whereas the released YAML
-describes a six-month binary deliberately mapped to 12/0. No policy is chosen.
-The #1148 warning that a food-row count cannot count interviews, broader census
+pass for that attempt. The older EMC prose calls months of presence continuous;
+that documentary inconsistency does not reopen the operational mapping. Ethan
+explicitly settled B3A at 12/0 in commit
+=c3fbdfeee3c06a2d5bec030c68d8d2bd45562789= (2026-07-12), with the rationale
+above =MonthsSpent= in the 2014 YAML, the residence-filter regression test, and
+=roster-characteristics-wave-deletion.md= section 6: zero encodes nonmembership
+under the six-month rule, not a claim of zero months lived. This checkpoint
+preserves that ruling. Separately, #1148's warning that a food-row count cannot
+count interviews, broader census
 scope, and #1276's other CS modules/geography/provider integration remain open.
 
 Evidence: dispatch =623617a1355f49a59c42c9272f2df870=, job =40651140=,
