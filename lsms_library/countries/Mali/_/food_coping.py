@@ -14,19 +14,23 @@ parquets store pre-transformation data).
 """
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
 
-WAVES = ['2014-15', '2017-18', '2018-19', '2021-22']
-
+# Reuse Country/Wave declarations and folders (ledger #1287 §2/4).
+country = Country('Mali', preload_panel_ids=False)
 pieces = []
-for t in WAVES:
-    fn = f'../{t}/_/food_coping.parquet'
+for t in country.waves:
+    wave = country[t]
+    if 'food_coping' not in wave.data_scheme:
+        continue
+    fn = f'../{wave.wave_folder}/_/food_coping.parquet'
     try:
         df = get_dataframe(fn)
-    except Exception:
-        # Wave not wired for food_coping (no .py script / no parquet).
-        # DVC raises PathMissingError here, not FileNotFoundError.
-        continue
+    except Exception as exc:
+        raise RuntimeError(
+            f'Mali/{t}/food_coping: declared wave parquet could not be read: {fn}'
+        ) from exc
     pieces.append(df)
 
 assert pieces, "food_coping: no wave-level parquets found"
