@@ -14,20 +14,17 @@ records), and collapsing them would be a sum — forbidden by the
 item-level / reported-values discipline.  Duplicate rate stays well under
 the diagnostics tolerance.
 
-EVERY wave in WAVES has a ``crop_production.py`` script, so a missing wave
-parquet means that script failed or was never run -- never "not wired". It
-is refused, not skipped (``niger.concat_wave_parquets``, GH #1123, extended
-from plot_inputs on 2026-10-23): under ``LSMS_BUILD_BACKEND=make`` this
-script is also the fallback the framework runs after a failed ``make``, and
-skipping the absent wave there would serve the other waves with no Python
-warning.
+``niger.concat_wave_parquets`` discovers registered logical waves and checks
+their actual native-script/YAML declarations before output access (GH #1287).
+Undeclared waves skip; declared missing/unreadable outputs fail before a
+country write (GH #1123). Make-producer routing is a separate boundary; see
+the helper's docstring and the country ledger.
 """
 from lsms_library.local_tools import to_parquet
 from niger import concat_wave_parquets
 
 
-WAVES = ['2011-12', '2014-15', '2018-19', '2021-22']
 
-p = concat_wave_parquets('crop_production', WAVES)
+p = concat_wave_parquets('crop_production')
 
 to_parquet(p, '../var/crop_production.parquet')

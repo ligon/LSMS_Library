@@ -2078,3 +2078,31 @@ the five =_/*.py= in every Niger wave hash: all 23 Niger country hashes and
 all 92 Niger wave hashes move (one Niger re-warm); no other country, and 0
 of 40 build fingerprints.
 
+* 2026-10-29 -- six country compilers consult actual declarations (GH #1287)
+
+The five =concat_wave_parquets= callers and =_/plot_features.py= now discover
+registered logical waves through =Country.waves= and resolve physical folders
+through =Country.__getitem__=. Actual =Wave.data_scheme= membership, the union
+of native scripts and YAML keys, governs output access. Genuinely undeclared
+waves skip before output checks/reads; declared missing or unreadable inputs
+propagate before a partial country write. A null YAML entry does not retire
+a remaining native script, and a stray existing output declares no table.
+
+Native frame grain, duplicate rows, keys/order/dtypes/NA/zero/attrs, typed
+empties and writer locations are unchanged. None of these compilers applied
+=id_walk= before this change; framework panel handling remains authoritative.
+Only =concat_wave_parquets= changes in =niger.py=; no native-slot proposal,
+scientific helper, source driver, schema, crosswalk or unit rule is adopted.
+
+This is a source-compiler correction, not complete Make producer routing.
+The five country recipes still hardcode four native-script prerequisites and
+commands: retirement/new YAML-only declarations may fail or not be produced
+before compilation. Existing-output freshness, real-source/default/Make/API,
+cache re-warm and scientific acceptance remain separate gates. Country-module
+edits can invalidate Niger build hashes; no new hash census was run here.
+
+The crop compiler's older "intentionally NON-unique" description and the
+declared-grain doctrine remain in tension. This change preserves those native
+duplicates and takes no missing-axis/reducer decision. See the public-extraction
+ledger for retained failed/partial tests and finite candidate-only verification.
+
