@@ -41,3 +41,17 @@ Native script cache bypass and valid scriptless Make, actual Make/parser/recipes
 Source/AST/hash/Git preparation only, no tests/project imports/actors/data/Make/API,
 public writes or shared source mutation. Root/another agent independently reviews
 this new authored packet; predecessor independent review is not self-approval.
+
+## Verification — source only
+
+Own producer/new test AST parsed; source-derived5profiles x5tables =25 NEW cases,
+not collected or executed. Compared produce AST after replacing only grain_audit
+and datetime_audit value nodes: every other node, including logical drop flatten,
+is exact93dd. All other predecessor producer top-level ASTs are exact, plus one
+new helper. Original195 carrier/niger.py/Makefile/CONTENTS byte exact. No lossy
+merge or semantic conflict was chosen: differing full reports remain distinct,
+first-seen whole equality only. Test profiles seed actual private ledger globals
+and use actual accessors, observe writer kwargs, and preserve typed rows/drops and
+ledger operands. Empty versus missing, collisions, structural duplicates and
+legacy physical/cold/unrelated/replayed filtering are explicit. No actual formatter,
+parser or writer is run. Root/another agent must review the complete new packet.
