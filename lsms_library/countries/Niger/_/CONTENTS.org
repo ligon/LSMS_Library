@@ -2127,3 +2127,63 @@ missing data or retirement; custom Make routing is not implemented or accepted.
 Native-script cache bypass, stale outputs/#1288, actual-source/default/Make/API
 equality, cache census/re-warm and scientific definitions remain separate gates.
 See ledger 1287-niger-producer-compiler-integration and its unexecuted new tests.
+
+* 2026-10-30 -- ECVMA recorded input slots (GH #1123, candidate for review)
+
+The two ECVMA producers now retain =input_obs= on the declared index
+=(t, i, input, crop, u, input_obs)=, reusing the canonical axis added for
+Malawi (#1323). This supersedes the earlier "NOT fixed, a design question"
+paragraph for this candidate; public integration requires independent review.
+No input/crop label changes, no reducer replacement, and no EXTENSION or
+panel-crosswalk changes are part of this candidate.
+
+A token is =slot:<country-relative source path>@dvc:<filename>:<SHA256 of
+sidecar bytes>:<native slot column>=<integer slot>=. The final equals sign
+here closes Org markup: the actual token ends in the slot number. Columns
+are =as02cq02= (2011-12) and =AS02CQ02= (2014-15). The token is scoped by
+=i=: households legitimately share slot 11. The pair =(i, input_obs)=,
+not =input_obs= alone, maps injectively to an applied native source line.
+The helper refuses null/noninteger slots and repeated household/slot pairs.
+It uses the recorded slot, not file order, and requires a declared sidecar.
+This follows Malawi's release-reference format while using ECVMA's recorded
+coordinate instead of Malawi's constructed physical row position.
+
+All ECVMA input types carry their recorded slots, including slots 1-10.
+EHCVM carries =unresolved_observation= and retains its existing uniqueness
+guards. No label is qualified to manufacture apparent uniqueness. Equal
+quantities on separate seed slots remain separate observations.
+
+Fresh bounded diagnosis on d96a8152b sources (not the historical cohort):
+2011-12 has 40,464 source rows, 8,538 applied, 6,793 seeds; 2014-15 has
+36,890 source rows, 8,179 applied, 6,141 seeds. On the old harmonized key,
+67 / 39 groups collide (48 / 29 unequal payloads, 19 / 10 equal); excess
+lines are 73 / 45. Every collision repeats the native crop and unit and
+varies the seed slot within 11-17. No native household/slot key is repeated.
+The fresh counts happen to reproduce the earlier measurements; they were
+not acceptance constants. The unchanged application gate is code 1 on
+=as02cq03= / =AS02CQ03=.
+
+The candidate's actual producer, cold/warm Country and normal Feature
+routes retain all 8,538 / 8,179 lines, including 16 / 15 zero quantities.
+No applied Quantity is missing in these two releases; synthetic producer
+cases separately verify missing quantities and purchased flags without
+changing the existing all-payload-NA API finalizer policy. Original native
+frames equal the candidate projected off input_obs, with exact masks,
+dtypes, axes and nonmissing numeric values. Source payloads, public payloads,
+and Feature payloads conserve every line under the injective key. Existing
+#871 observed-row selection is unchanged and its tests pass.
+
+Consumer implications: positional index unpacking must accept the extra
+axis; consumers needing one household/crop/unit line must make an explicit
+aggregation decision. =seed_kg= already sums applied seed rows by household
+and therefore includes the recovered metric-unit quantities. =nitrogen_kg=
+is exactly unchanged. No generic Feature schema change was needed: its
+existing =input_obs= level and legacy sentinel transport the new axis.
+The unchanged ECVMA quantity-999 uncertainty, EHCVM gift/purchase bindings,
+and #1288 existing-output freshness remain separate.
+
+Hash impact follows existing whole-file inputs: edits to =niger.py= and
+=data_scheme.yml= invalidate Niger's table hashes, not just plot_inputs;
+the two native scripts also enter their wave hashes. No global config,
+framework read gate, crosswalk or other country is edited. This is a
+structural hash-scope statement, not a new corpus-wide hash census.

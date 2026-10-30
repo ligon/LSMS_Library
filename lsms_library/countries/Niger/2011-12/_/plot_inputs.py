@@ -16,7 +16,7 @@ as02cq03==2`, `keep if ... & as02cq03==1`).  i = str(int(hid)); hid
 already equals grappe*100+menage (the canonical 2011-12 household id),
 matching crop_production / sample.  No plot column in this roster (Niger
 inputs are reported at the household level), so the grain is
-(t, i, input, crop, u); see niger.py:_finish_plot_inputs.
+(t, i, input, crop, u, input_obs); see niger.py:_finish_plot_inputs.
 """
 import sys
 
@@ -25,7 +25,7 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
 from niger import (i as niger_i, _input_maps, _input_labels,
-                   _unit_labels, _finish_plot_inputs)
+                   _unit_labels, _finish_plot_inputs, _ecvma_input_observations)
 
 
 src = get_dataframe(
@@ -50,7 +50,12 @@ hh = srcn['hid'].apply(lambda x: niger_i(x) if pd.notna(x) else pd.NA)
 # purchased: as02cq07 1 = Oui -> True, 2 = Non -> False (9 Manquant -> NA)
 purchased = srcn['as02cq07'].map({1: True, 2: False})
 
+# Recorded slot, not label or payload, distinguishes repeated seed reports.
+input_obs = _ecvma_input_observations(
+    hh, srcn['as02cq02'], '../Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaas2c_p1.dta', script_path=__file__)
+
 df = pd.DataFrame({
+    'input_obs':          input_obs.values,
     'i':                  hh.values,
     'input':              _input_labels(src['as02cq02'], input_map).values,
     'crop':               _crop_labels(srcn['as02cq04'], src['as02cq04'], crop_map).values,
@@ -62,5 +67,6 @@ df = pd.DataFrame({
 
 df = _finish_plot_inputs(df, '2011-12')
 
+assert df.index.is_unique, 'plot_inputs has repeated native input observations'
 assert len(df) > 0, 'plot_inputs 2011-12 produced no rows'
 to_parquet(df, 'plot_inputs.parquet')
