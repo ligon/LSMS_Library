@@ -60,3 +60,25 @@ Its questionnaire/manual sidecars exist but neither object was found in checked
 local L1 layouts. The public catalog confirms both documents; the web PDF reader
 refuses the octet-stream response. No harvest inclusion/exclusion rule is guessed,
 and source counts or labels alone are not promoted to instrument authority.
+
+## Verification
+
+- OK (§3/§4): the schema change consists only of comments. The actual project
+  YAML loader returns the identical parsed object for public-base and candidate
+  data_scheme.yml. No columns, optional flags, indexes or build routes changed.
+- OK (§4): one finite metadata-only probe passed on the exact checkout using the
+  approved image, core34/1CPU/8GiB/thread1/private roots, timeout60+5s, disconnected
+  network namespace. Outer20.418s; no data files created and no table/source/API
+  call or historical test cohort. The public-d65 baseline hash census is reused
+  from the completed #1291 metadata packet, rather than recomputed.
+- Measured cost:28/28 Uganda L2-country hashes change because the whole schema
+  text is hashed; all224 Uganda wave input hashes remain identical. This is
+  conservative invalidation for prose, not a claim of data changes or measured
+  rebuild cost. CONTENTS and this ledger are not build inputs. Other countries'
+  source/config are unchanged.
+- OK (§2/§5): no formatter, reducer, metadata vocabulary or source-search result
+  was invented. No tests were added for comments; parsed equivalence and diff
+  cleanliness verify the change. Root reviewed the181a0d4f3 disclosure diff.
+- Root separately posted the #1297 evidence update as issue comment6515080238;
+  no publication or issue write was performed by this owner. The earlier
+  zero-comment readback remains a timestamped pre-update snapshot.
