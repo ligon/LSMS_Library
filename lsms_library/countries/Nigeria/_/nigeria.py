@@ -236,7 +236,9 @@ _W5_STRATA = {1: 'North Central', 2: 'North East', 3: 'North West',
 # round's household roster (the D1 locator of last resort), the weight
 # variables (identical names on both covers), the strata source, an optional
 # PP supplement cover, and the household geovariables file (file,
-# latitude, longitude; None for W5 -- GH #841 / #978).  The coordinate
+# latitude, longitude). W5's acquired v02 file lives at the Data/ root and
+# supplies anonymized household reference fixes, not an EA centroid (#978).
+# The coordinate
 # columns' CASING differs by wave (W1/W4 lowercase, W2/W3 uppercase); a wrong
 # name raises a KeyError here.  Under the old YAML it was the GH #515 soft drop
 # of the whole geo sub-frame, which is how W2-W4 once lost their coordinates.
@@ -272,7 +274,8 @@ ROUND_COVERS = {
         pp_roster='Post Planting Wave 5/Household/sect1_plantingw5.dta',
         ph_roster='Post Harvest Wave 5/Household/sect1_harvestw5.dta',
         weight='wt_cross_wave5', panel_weight='wt_longpanel_wave5',
-        strata=('strata', _W5_STRATA), geo=None),
+        strata=('strata', _W5_STRATA),
+        geo=('nga_householdgeovariables_y5.dta', 'lat_mod', 'lon_mod')),
 }
 
 
@@ -540,8 +543,9 @@ def cluster_features_for_wave(folder):
     Longitude.  ``Wave.cluster_features`` projects it onto ``(t, v)``
     through the audited Site 2 collapse.  The geovariables are household
     level, so they join on ``i`` -- LEFT, onto the round's cover (#1261:
-    the cover says which households the round holds; see above). W5's held
-    geovariables remain unwired (GH #978): Latitude / Longitude are NA.
+    the cover says which households the round holds; see above). W5's v02
+    anonymized reference coordinates use this same household join (#978).
+    Site 2 retains an observed household row; no coordinate averaging occurs.
     """
     from lsms_library.local_tools import df_data_grabber
     spec = ROUND_COVERS[folder]

@@ -88,12 +88,10 @@ ROUNDS = [
 # Every wave declares cluster_features (W5 since GH #841).
 CF_ROUNDS = ROUNDS
 CF_QUARTERS = [q for pair in CF_ROUNDS for q in pair]
-# Waves with acquired and wired household geovariables. W5 is still the
-# v01 extract: WB v02 supplies NGA_HouseholdGeovariables_Y5.dta, queued for
-# acquisition and wiring under GH #978. Its coordinates remain missing here.
-GEO_ROUNDS = ROUNDS[:4]
+# All waves have acquired and wired household geovariables. W5's root-level
+# v02 file supplies anonymized lat_mod/lon_mod household reference fixes (#978).
+GEO_ROUNDS = ROUNDS
 GEO_QUARTERS = [q for pair in GEO_ROUNDS for q in pair]
-NO_GEO_QUARTERS = [q for pair in ROUNDS[4:] for q in pair]
 
 # community_prices comes from the COMMUNITY questionnaire's Section C8, which is
 # administered in the post-harvest round only.  Verified structurally: across all
@@ -158,19 +156,15 @@ def test_every_wave_has_coordinates_in_every_round(cf, t):
     assert wave['Longitude'].notna().any(), f'{t}: no Longitude at all'
 
 
-@pytest.mark.parametrize('t', NO_GEO_QUARTERS)
-def test_w5_has_geography_but_no_coordinates_in_either_round(cf, t):
-    """GH #841: W5 declares cluster_features from the cover page alone.  Wave 5
-    v01 lacks the geovariables file supplied in WB v02 (GH #978), so
-    Latitude/Longitude remain all-NaN while Region/District/Rural are
-    populated. Retire this assertion and extend GEO_QUARTERS when the v02
-    file is acquired and wired as df_geo on hhid, as W4 does."""
+@pytest.mark.parametrize('t', ROUNDS[4])
+def test_w5_coordinates_enrich_existing_geography_in_either_round(cf, t):
+    """The acquired v02 fixes enrich each own-round household cover (#978)."""
     wave = cf.loc[t]
     assert len(wave) > 0, f'{t} missing from cluster_features'
     for col in ['Region', 'District', 'Rural']:
         assert wave[col].notna().all(), f'{t}: {col} has nulls'
-    assert wave['Latitude'].isna().all(), f'{t}: unexpected Latitude -- W5 geovars acquired?'
-    assert wave['Longitude'].isna().all(), f'{t}: unexpected Longitude -- W5 geovars acquired?'
+    assert wave['Latitude'].notna().any(), f'{t}: W5 Latitude not wired'
+    assert wave['Longitude'].notna().any(), f'{t}: W5 Longitude not wired'
 
 
 @pytest.mark.parametrize('t', ['2010Q3', '2011Q1'])
