@@ -57,4 +57,32 @@ policies and prior scientific/unit/eligibility issues remain outside this fix.
 
 ### Phase 3 — verification
 
-Pending implementation and exact fixed-source validation.
+- `fertilizer_rate` — OK (§§3–5): country-bound literal keys fix the documented
+  asymmetry; numerator, unit/area arithmetic, existing group grain and warnings
+  remain unchanged. Legacy output level `parcel` does not assert coarser
+  geographical parcel aggregation. `yield_kg` is unchanged.
+- New literal regressions — OK (§4): first 17 cases on public baseline gave
+  8 expected failures/9 passes; final 19 cases pass. A 169-case focused suite
+  passes (includes 17 of the new cases, not 169 additional cases). The first
+  candidate's two empty-key dtype regressions are preserved and repaired.
+- Actual normal Country operands — OK (§§3–5), fixed product `1db0001ed`:
+  Ethiopia 2021–22 PI 17,638/PF 14,878 yields 2,941 rates; Malawi 2019–20
+  PI 64,835/PF 23,259 yields 11,346. Both nutrient/product bases agree exactly
+  with explicit plot mode and a separate complete-key area lookup. Original
+  baseline yields zero rates for these selected waves. Fresh-process warm
+  payloads and private cache bytes/mtimes agree exactly. These are two selected
+  waves, not all-wave acceptance or a new coarser parcel estimator.
+- Failed arms retained: Ethiopia 2013–14 fails before the rate in an unstaged
+  area-conversion dependency; its final DVC fallback path is duplicated, but a
+  general cached-reader path defect is not proven. Malawi's first independent
+  oracle rejected a StringDtype missing-sentinel representation difference;
+  v2 explicitly matches the transform's str-key representation. No numeric
+  value cast or product change was used to pass that comparison. Malawi v2
+  is readback from the partially built private cache, not an empty-cache claim.
+- Independent Ethiopia review: eight additional adversarial checks pass;
+  scalar attrs choose vocabulary only and never establish country identity.
+  Partial unmatched keys retain existing silent omission; Uganda's walked-ID
+  fallback limitation remains outside this Ethiopia/Malawi repair.
+- `make api-audit` passes; approved image interpreter adapter avoids Poetry
+  installation. Full receipts and exact pins are in the isolated operator
+  packet `fertilizer1110-public-v1`, exported under recovery/Uganda.

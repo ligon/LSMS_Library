@@ -6866,10 +6866,10 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
     volume_as_mass : bool, default True
         Forwarded to the unit->kg conversion.
     on : {'parcel', 'plot'}, default 'parcel'
-        Land grain to join the two features on.  **The default matches
-        :func:`yield_kg`'s**, and that agreement is deliberate: the two
-        transforms bridge the same two plot vocabularies, and a pair of
-        sibling functions that default differently is a trap.  It was one --
+        Land-key mode to join the two features on. The default mode NAME
+        matches :func:`yield_kg` for compatibility with the original Uganda
+        bridge. The Ethiopia/Malawi native-key dispatch below is specific to
+        ``fertilizer_rate``; it does not change ``yield_kg``. Originally,
         with ``on='plot'`` as the default, ``fertilizer_rate(Uganda)``
         returned an EMPTY frame and said nothing (see
         :class:`PlotGrainMismatchWarning`).
