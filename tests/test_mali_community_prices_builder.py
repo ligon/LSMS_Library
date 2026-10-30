@@ -15,8 +15,7 @@ from lsms_library.paths import countries_root, data_root
 
 TABLE = 'community_prices'
 INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
-UNSUPPORTED = [['2017-18'], ['2018-19'], ['2021-22'],
-               ['2017-18', '2018-19', '2021-22']]
+UNSUPPORTED = [['2017-18'], ['2021-22'], ['2017-18', '2021-22']]
 needs_make = pytest.mark.skipif(shutil.which('make') is None,
                                 reason='GNU make not on PATH')
 
@@ -64,10 +63,10 @@ def private_route(tmp_path, monkeypatch, native):
     calls = []
 
     def read_wave(wave, request):
-        assert wave.country.name == 'Mali' and wave.year == '2014-15'
+        assert wave.country.name == 'Mali' and wave.year in ('2014-15', '2018-19')
         assert request == TABLE, 'an unsupported wave/source was built'
         calls.append((wave.year, request))
-        return native.copy()
+        return native.rename(index={'2014-15': wave.year}, level='t')
 
     monkeypatch.setattr(C.Wave, 'grab_data', read_wave)
     original_run = subprocess.run
@@ -138,13 +137,16 @@ def test_supported_requests_use_the_real_wave_grain(private_route, native,
     country, calls = private_route
     monkeypatch.setenv('LSMS_BUILD_BACKEND', backend)
     out = country.community_prices(waves=waves)
-    _equal(out, _authoritative(country, native))
+    expected = native if waves else pd.concat([
+        native, native.rename(index={'2014-15': '2018-19'}, level='t')])
+    _equal(out, _authoritative(country, expected))
+    n_waves = 1 if waves else 2
     assert out.attrs['id_converted'] is True
-    assert list(out.index.names) == INDEX and len(out) == 6
-    assert calls == [('2014-15', TABLE)]
-    assert out.groupby(level='obs').size().to_dict() == {1: 2, 2: 2, 3: 2}
-    assert out['Quantity'].isna().sum() == 2
-    assert (out['Quantity'] == 0).sum() == 2
+    assert list(out.index.names) == INDEX and len(out) == 6 * n_waves
+    assert calls == [(w, TABLE) for w in ('2014-15', '2018-19')[:n_waves]]
+    assert out.groupby(level='obs').size().to_dict() == {1: 2*n_waves, 2: 2*n_waves, 3: 2*n_waves}
+    assert out['Quantity'].isna().sum() == 2 * n_waves
+    assert (out['Quantity'] == 0).sum() == 2 * n_waves
     assert (data_root() / 'Mali' / 'var' / 'community_prices.parquet').exists() \
         is (backend == 'dvc')
 
@@ -191,6 +193,6 @@ def test_cli_forwards_repeated_unsupported_waves(private_route, monkeypatch, bac
     from lsms_library.cli import _load_table
     _country, calls = private_route
     monkeypatch.setenv('LSMS_BUILD_BACKEND', backend)
-    out = _load_table('Mali', TABLE, ['2017-18', '2018-19', '2021-22'])
+    out = _load_table('Mali', TABLE, ['2017-18', '2021-22'])
     assert out.empty and list(out.index.names) == INDEX
     assert calls == []

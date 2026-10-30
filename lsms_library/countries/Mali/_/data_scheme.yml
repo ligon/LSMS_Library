@@ -394,14 +394,17 @@ Data Scheme:
     # the framework's _join_v_from_sample only augments tables that carry i,
     # so it does not fire here.
     #
-    # The community price module lives in the 2014-15 EACI wave ONLY
-    # (EACIS04_p1 post-planting + EACIS04_p2 post-harvest, rec_type 8,
-    # grappe-level).  The 2017-18 EACI wave dropped the community
-    # questionnaire.  2021-22 collects prices only at the region x milieu IHPC
-    # grain (ehcvm_prix).  2018-19 is NOT region-grain: it ships a grappe-grain
-    # s05_co_mli2018.dta, unwired -- a `todo` (CONTENTS.org, "The EHCVM waves
-    # DO ship a price file").
+    # EAC-I 2014-15: EACIS04 p1/p2. EHCVM 2018-19: s05_co_mli2018
+    # (GH #821), both FCFA quote slots. The s05 source has NO quantity or
+    # weight: Quantity is NA, never NumberOfUnits or a fabricated one.
+    # Its product code is variety (retaining finer identity under j mapping),
+    # vague is visit; obs=1/2, then 3/4 for a repeated source key. Sized unit
+    # labels are retained verbatim. No rows or missing-price slots are dropped.
+    # 2017-18 has no community module wired. In the held 2021-22 release,
+    # no s05 sidecar exists and ehcvm_prix has region/milieu, not grappe;
+    # no cluster-grain declaration is made for that distinct source.
     #
+    # The following source fields/eligibility apply to EAC-I 2014-15:
     # j       = harmonize_food Preferred Label, decoded from item label s04q01
     #           (food items REUSE the consumed-food label so community_prices.j
     #           joins food_acquired.j / crop_production.j).
@@ -425,11 +428,12 @@ Data Scheme:
     # Missing unit value labels on passage-2 q03/q06 are restored from the
     # common COMMUNITY dictionary. Unresolved units remain excluded as before.
     #
-    # The wave/var parquets carry a redundant i==v level positioned before j
+    # The 2014-15 wave/var parquets carry a legacy i==v level before j
     # (see mali.community_prices_finalize): the framework's map_index swaps
     # j -> i on every read when j is present without i, so an i level keeps j
     # intact; _normalize_dataframe_index then drops the undeclared i, surfacing
-    # this declared grain.  Same shim Tanzania/Malawi community_prices use.
+    # this declared grain. Current map_index recognizes cluster j without i;
+    # the new 2018-19 loader therefore needs no synthetic household level.
     index: (t, v, j, u, variety, visit, obs)
     Price: float
     Quantity: float

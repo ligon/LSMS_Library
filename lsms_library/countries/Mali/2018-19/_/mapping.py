@@ -229,3 +229,51 @@ def food_security(df):
     df = df.copy()
     df['FIES_score'] = score.astype('Int64')
     return df
+
+
+def community_prices_s05(codes, labels):
+    """Both reported EHCVM price slots, without selection (GH #821).
+
+    Unlike EAC-I, this file records NO quantity or weight. Quantity is NA,
+    never a count of one and never inferred from the unit label. See ledger
+    821 §2-5 and CONTENTS.org. No per-kg price is computed.
+
+    The s05 product code retains the source's finer product/variety identity
+    when harmonize_food maps several labels to one j. Unit-size labels stay
+    intact. A repeated public source key gets obs 3/4, then 5/6, in file order
+    (Niger's slot + 2*rank convention), including identical repeats. Missing
+    or nonpositive prices remain observations; no EAC-I eligibility filter or
+    weight-sentinel rule applies to this different instrument.
+    """
+    if not codes.index.equals(labels.index) or len(codes) != len(labels):
+        raise ValueError('s05 codes and labels must have the same row index')
+    codes, labels = codes.reset_index(drop=True), labels.reset_index(drop=True)
+    description = labels['s05q01'].astype('string').str.strip()
+    item_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Code',
+        **{'Preferred Label': 'Preferred Label'})
+    base = pd.DataFrame({
+        't': '2018-19',
+        'v': codes['grappe'].map(tools.format_id).astype('string'),
+        'j': description.map(item_map).fillna(description),
+        'u': labels['s05q02'].astype('string').str.strip(),
+        'variety': codes['s05q01'].map(tools.format_id).astype('string'),
+        'visit': pd.to_numeric(codes['vague']).astype('Int64'),
+        'Description': description,
+    })
+    keys = ['t', 'v', 'j', 'u', 'variety', 'visit']
+    if base[keys].isna().any().any():
+        raise ValueError('s05 has a missing observation key; cannot silently discard it')
+    rank = base.groupby(keys, sort=False, dropna=False).cumcount()
+    pieces = []
+    for slot, column in enumerate(('s05q03', 's05q04'), 1):
+        piece = base.copy()
+        piece['obs'] = slot + 2 * rank
+        piece['Price'] = pd.to_numeric(codes[column], errors='raise').astype('Float64')
+        piece['Quantity'] = pd.Series(pd.NA, index=piece.index, dtype='Float64')
+        pieces.append(piece)
+    out = pd.concat(pieces, ignore_index=True)
+    # Current map_index recognizes cluster tables (v and j without i).
+    # No household identifier or household-ID walk belongs to this source.
+    return out.set_index(['t', 'v', 'j', 'u', 'variety', 'visit', 'obs'])[
+        ['Price', 'Quantity', 'Description']].sort_index()

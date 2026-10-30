@@ -1783,3 +1783,86 @@ Result source: =5519baad6fd964c96f88a6a81992ce1cc8274fea=;
 operator: =745f33eb26f5048a4e1b89c9d8281519b9da2d85=.
 Independent result-review SHA256:
 =7168be026088f43ef195ef7c14b79386c8598f682a5d1acc8798e454f44a35a2=.
+
+* 2026-10-30 -- EHCVM 2018-19 community quotes wired (GH #821)
+
+The earlier price sweep and =b42c1c80= correctly identified the unwired
+=s05_co_mli2018.dta=. That commit is an available, merged documentation
+correction, not a loader. GH #822 and #1091 already restored EAC-I's three
+readings and retired the country concatenator; neither implemented this wave.
+The historical summary's "community (market) price | 2014-15 ONLY" no longer
+states current coverage: 2018-19 now uses the same canonical observation index.
+
+** Source, quantity, and observation identity
+
+The exact held source (DVC MD5 =458c323792c9d7d05e36ad7c6686774f=,
+880,931 bytes) has SEVEN columns: =grappe=, =vague=, =Existe=, =s05q01=,
+=s05q02=, =s05q03=, =s05q04=. There is NO weight or quantity field. The issue's
+proposal borrowed the EAC-I =Poids (KG)= premise; it does not describe this
+EHCVM file. The two labelled fields are "5.03. Releve 1-Prix (en FCFA)" and
+"5.04. Releve 2-Prix (en FCFA)" (accents omitted in this prose).
+
+=Price= is the raw reported FCFA quote, unchanged. =Quantity= is NA on every
+row, never =NumberOfUnits=, never one, and never inferred from a unit label.
+No per-kg price is computed, and there is no numeric derivation to register.
+Niger's separately grounded one-item derivation is not Mali evidence.
+EAC-I's quantity sentinels and positive-price eligibility remain EAC-I-only.
+The required country-wide Quantity declaration is retained because EAC-I
+reports it: a 2018-19-only Country call emits =NullReadWarning= (strict reads
+raise). Existing Feature assembly drops an entirely missing column, so the
+2018-19-only Feature returns Price and Description without Quantity.
+
+=s05q01='s product CODE is =variety=, preserving the source's finer identity
+when the existing =harmonize_food= table maps multiple source products to the
+same =j= (maize in ears/grain, modern/traditional bread, two smoked fish,
+sweetened/unsweetened concentrated milk, fresh/dry okra, three groundnut forms).
+The source label remains =Description=; unmapped product labels remain intact.
+This is not an assertion of a separate unrecorded variety field.
+=s05q02='s full unit-size label is retained by the native loader. Existing
+public categorical mapping changes =Seau (5 Kg )= to =Seau (5 Kg)=; no small,
+medium, large or fixed-mass distinction is removed. =visit= is =vague=,
+=v= is =format_id(grappe)=, and =obs=1/2= identifies the two quote slots.
+If a key repeats, successive source rows receive obs 3/4, 5/6, etc. in file
+order, including identical repeats; no row or slot is selected or averaged.
+Missing/nonpositive prices are retained. A missing observation key raises
+rather than silently discarding a row. An unavailable selected source raises;
+there is no substitute source or synthetic price table.
+
+Fresh measurements (observations, not fixed row-count test oracles): 54,669
+source rows, no duplicate source keys or identical rows, both quotes positive
+and nonmissing, 109,338 native/Country/Feature observations. All 549 price
+clusters occur in the actual 2018-19 =sample().v= column (551 clusters total);
+no crosswalk is constructed. There are 84 served unit-size labels and 55
+harmonized item labels from 57 observed product codes. The full dictionary
+has six many-to-one j groups; only bread and okra have multiple members in
+the held observations. Of 54,669 source rows, 53,479 item labels map and
+1,190 pass through uncurated (1,021 Oeufs, 169 Farine de Mais). Both quote
+slots of all of these rows survive. 43,939 source rows have equal quote pairs;
+equality does not justify deleting a slot. Each grappe has exactly one vague,
+so visit identifies its fielding period, not a claim of repeat cluster visits.
+Raw source values are compared independently through
+pyreadstat and exact NumPy nonmissing-value comparisons; the production
+reshape is not its own source-value oracle.
+
+** 2021-22 availability remains unresolved at cluster grain
+
+The earlier note says "2021-22 has no equivalent: its community files stop at
+s04_co_mli2021.dta (no section 5)". The current sidecar inventory agrees about
+filenames: s00 through s04, no s05. But filenames alone do not establish that
+no equivalent price block exists under another name. Those five community
+blobs and the DDI PDF were not held in the inspected L1 location, and no
+provider acquisition was performed. Their labels were therefore not verified.
+The held =ehcvm_prix_mli2021.dta= (MD5
+=05537b8d116b67df8315b331c0fe7520=) was checked: 175,352 rows, with region,
+milieu, year/month/week, product, variety, releve, poids, unite, prix, typeprix;
+no grappe. It cannot supply this cluster-price contract without a separate
+design. No 2021-22 wave declaration or lossy crosswalk is introduced. The
+coverage verdict is =unsure=, with the incomplete checks stated, not a claim
+that prices were not asked. The now-implemented 2018-19 cell needs no absent
+verdict (none existed).
+
+Ledger: =.coder/ledger/821-mali-community-prices.md=. Focused controls:
+=tests/test_gh821_mali_s05_community_prices.py=. The private dispatch evidence
+contains source/schema summaries, exact verification results and a report;
+derived row-level witnesses remain outside Git. Root independent acceptance
+and correction of the issue's weight premise remain separate from this build.
