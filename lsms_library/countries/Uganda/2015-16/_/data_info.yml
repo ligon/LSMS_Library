@@ -32,12 +32,26 @@ individual_education:
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 housing:
-    file: ../Data/gsec9.dta
-    idxvars:
-        i: hhid
-    myvars:
-        Roof: h9q4
-        Floor: h9q6
+    # GH #1290: gsec9.hhid uses gsec1.hh, not the sample's HHID.
+    # Both sources are declared for hashing; mapping.py validates the bridge
+    # before this left join and preserves unresolved recorded housing keys.
+    dfs: [housing_payload, housing_ids]
+    housing_payload:
+        file: gsec9.dta
+        idxvars:
+            i: hhid
+        myvars:
+            Roof: h9q4
+            Floor: h9q6
+    housing_ids:
+        file: gsec1.dta
+        idxvars:
+            i: hh
+        myvars:
+            _housing_HHID: HHID
+    merge_on: [i]
+    merge_how: left
+    final_index: [t, i]
 
 sample:
     file: gsec1.dta
