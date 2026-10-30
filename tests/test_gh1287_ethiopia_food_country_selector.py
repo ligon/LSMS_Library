@@ -320,7 +320,11 @@ def test_food_selector_preserves_public_single_row_squeeze_failure(sandbox):
     # resulting local-walker failure as part of the selector change.
     with pytest.raises(KeyError, match='j') as caught:
         sandbox.run()
-    assert caught.value.__cause__ is None
+    assert caught.value.args == ('j',)
+    # pandas chains the missing-column engine KeyError; the compiler must
+    # retain that public KeyError rather than wrap this walker failure.
+    assert isinstance(caught.value.__cause__, KeyError)
+    assert caught.value.__cause__.args == ('j',)
     assert sandbox.writes == []
 
 
