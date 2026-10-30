@@ -1866,3 +1866,37 @@ Ledger: =.coder/ledger/821-mali-community-prices.md=. Focused controls:
 contains source/schema summaries, exact verification results and a report;
 derived row-level witnesses remain outside Git. Root independent acceptance
 and correction of the issue's weight premise remain separate from this build.
+
+
+* 2026-10-30 -- 2021 price availability: published dictionaries checked (GH #821)
+
+PR #1356 already implements the 2018-19 source; no second loader repair is
+needed there. For 2021-22, the earlier statement that labels were unchecked
+because raw community blobs were not held is now supplemented by the official
+[[https://microdata.worldbank.org/catalog/6275/data-dictionary][World Bank catalog 6275 dictionary]]. Its complete published variable lists cover:
+
+| community file | variables | content                         |
+|----------------+-----------+---------------------------------|
+| s00            |        23 | respondents                     |
+| s01            |        55 | general community characteristics |
+| s02            |        19 | service availability/access      |
+| s03            |        74 | agriculture                     |
+| s04            |        36 | community participation          |
+
+These dictionaries identify no food/product-by-unit market quote block like
+2018's s05. This is a published-schema finding, not a new raw-byte inspection
+or proof that such questions were never fielded. In particular, s03 DOES
+report land rent/sale amounts and agricultural wage rates (q23/q25/q26-q31);
+those are different observations, not substitutes for the missing food quotes.
+The [[https://microdata.worldbank.org/catalog/6275/data-dictionary/F48?file_name=ehcvm_prix_mli2021][regional price dictionary]] lists the same twelve region/milieu/time/product
+fields as the earlier held-file inspection and no grappe. No crosswalk follows.
+
+The release currently establishes a source-availability/instrument gap, not a
+concrete unwritten cluster-price loader. Keep the coverage verdict =unsure=:
+C1 has published-schema support, while C4 remains unperformed for the relevant
+community/market instrument. The catalog's related materials list household
+questionnaires and basic information documents, not that instrument. The bounded
+next action is exact instrument/provider clarification of whether a cluster-price
+module was fielded and released. Rebuilding 2018, fabricating cluster keys or
+acquiring all five raw modules merely to rediscover these labels is unnecessary.
+No source/cache/API execution or new scientific choice is part of this update.
