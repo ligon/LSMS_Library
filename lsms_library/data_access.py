@@ -3139,6 +3139,28 @@ def get_data_file(path: str | Path,
         logger.warning("No permissions available to fetch %s", path)
         return None
 
+    # Ordinary reads have no catalog-aware secondary download route: the URL
+    # below is the wave's primary, and ZIP extraction matches only a basename.
+    # Preserve local/DVC hits above, but never serve a same-named primary file
+    # under an explicitly declared secondary component (GH #1276).
+    if not populate_cache and _source_url is None:
+        prov = read_provenance(_COUNTRIES_DIR, country, wave)
+        routes = _subdir_mapping(country, wave, prov)
+        component = parts[3] if len(parts) > 3 and parts[2].casefold() == "data" else None
+        secondary = next((cid for cid, folder in routes.items()
+                          if component is not None
+                          and component.casefold() == folder.casefold()
+                          and cid != prov.catalog_id), None)
+        if secondary is not None:
+            logger.warning(
+                "%s/%s: refusing World Bank fallback for Data/%s/: this "
+                "component belongs to secondary catalog %s, while ordinary "
+                "fallback uses primary %s and matches filenames only. Restore "
+                "the declared DVC blob, or complete the confined acquisition "
+                "layout before explicitly acquiring the secondary entry.",
+                country, wave, component, secondary, prov.catalog_id)
+            return None
+
     api_key = config.microdata_api_key()
     if not api_key:
         logger.warning("No MICRODATA_API_KEY set; cannot fetch from "

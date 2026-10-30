@@ -3,6 +3,7 @@ SOURCE
 https://microdata.worldbank.org/index.php/catalog/6224
 
 #+CATALOG_ID: 6224, 6277
+#+CATALOG_SUBDIR: 6277 Cross_Section
 #+CATALOG_IDNO: BFA_2021_EHCVM-P_v04_M
 #+CATALOG_TITLE: Enquête Harmonisée sur le Conditions de Vie des Ménages, Panel Survey 2021-2022
 #+CATALOG_YEARS: 2021-2022
@@ -24,6 +25,8 @@ Only =sample= and =household_roster= currently read that component.
 This is a partial declaration/read verification, not a complete acquisition
 or push receipt. No secondary =CATALOG_HELD= release is asserted. Catalog
 6224's primary release fields above are preserved. Its existing flat =Data/=
-paths remain; migrating the full panel layout and recording =CATALOG_SUBDIR=
-routing is still required before a confined re-acquisition of either component.
+paths remain; the explicit secondary mapping makes ordinary missing-DVC reads
+refuse before using the primary catalog by basename. Migrating the full panel
+layout and recording the primary =CATALOG_SUBDIR= route are still required
+before a confined re-acquisition of either component.
 No re-acquisition was performed.
