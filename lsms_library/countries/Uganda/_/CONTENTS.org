@@ -4172,3 +4172,50 @@ wage-only follow-up moves the same set again: =uganda.py= and
 =90fc1e18d=, and 0/40.  Evidence:
 =slurm_logs/isa_backlog_2026-10-21/1250-uganda-labor-flag/= (follow-up:
 =r2/=); ledger =.coder/ledger/1250-uganda-labor-flag.md=.
+
+* Country plot-feature compiler refuses declared-wave read failures (GH #1287, 2026-10-28)
+
+All eight registered Uganda waves declare =plot_features= through their native
+=_/plot_features.py= scripts. The country compiler formerly caught EVERY
+reader exception and continued, so a missing or malformed declared wave could
+be silently omitted while the remaining waves were written as a country table.
+The compiler now checks the existing =Wave.data_scheme= declaration API first
+and raises with wave/table context and the original cause on a declared read
+failure, before the ID walk or writer. A genuinely undeclared wave may skip.
+The parcel =_A= / =_B= conventions, area values, null payloads, concatenation
+order and existing household walk are unchanged.
+
+This is a source/synthetic refusal repair, not a measured real-data rebuild.
+The actual shipped compiler has finite invented-reader controls: the original
+source silently accepts four failure types, while the candidate refuses them;
+the healthy eight-wave output is identical. Other broad catch/continue sites
+in =anthropometry=, =livestock=, =plot_inputs= and =plot_labor=, and the narrower
+=FileNotFoundError= skip in =interview_date=, remain separate #1287 work.
+No source acquisition, cache content, native database or baseline was accessed.
+Ledger: =.coder/ledger/1287-uganda-concatenator-refusal.md=.
+
+* Public compiler composition and declaration folders (GH #1287, 2026-10-29)
+
+The eleven active country compilers for =assets=, =shocks=,
+=months_food_inadequate=, =nonfood_expenditures=, =anthropometry=, =livestock=,
+=plot_inputs=, =plot_labor=, =interview_date=, =food_acquired= and
+=plot_features= select registered logical waves through =Country.waves=,
+resolve physical folders through =Country.__getitem__=, and check
+=Wave.data_scheme='s native-script/YAML union before reader access. A genuinely
+undeclared table skips even when an old output is offered; a failed declared
+read propagates before any household walk or country write. Food preserves
+DataFrames instead of squeezing singleton or one-column frames.
+
+This isolated public-base candidate extracts only compiler wiring and tests;
+scientific helpers, wave sources, sample/cluster policy, IDs, schema and
+fixtures keep public bytes. Existing concat/casts/date filtering, duplicate
+nonfood-key refusal, parcel A/B vocabulary and exactly one local ID walk stay
+unchanged. All-empty inputs retain the existing walker/concat failures.
+
+The private ten-compiler208case evidence is retained history, not verification
+of this public composition. Its additional23case plot carrier had not run
+before the crash; the profile observer now chains the prior guard callback.
+Fresh exact-candidate verification remains pending. Real source, Make/cache,
+Country/Feature, rewarm and scientific acceptance are separate; no source
+acquisition or fixture update is implied. Ledger:
+=.coder/ledger/1287-uganda-public-compiler-composition.md=.
