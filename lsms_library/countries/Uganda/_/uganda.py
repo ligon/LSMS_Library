@@ -2176,6 +2176,36 @@ def _recode_yes(series):
     return out
 
 
+def _input_seed_crop_labels(raw, crop_map):
+    """Crop-specific identity from original answers (GH #1119 ledger §3/§5).
+
+    Only exact integral codes are looked up. Preserve literal labels and
+    fractional/unmapped numeric identities. Canonical data_info.yml explicitly
+    identifies Uganda code zero (no value label) as an unrecorded crop.
+    """
+    from decimal import Decimal, InvalidOperation
+
+    def label(value):
+        if pd.isna(value) or (isinstance(value, str) and not value.strip()):
+            return 'unknown_crop'
+        try:
+            number = Decimal(str(value))
+        except InvalidOperation:
+            return value
+        if not number.is_finite():
+            return str(value)
+        if number == 0:
+            return 'unknown_crop'
+        if number == number.to_integral_value() and int(number) in crop_map:
+            return crop_map[int(number)]
+        # Same numeric-token convention as Malawi._seed_crop_identity;
+        # never truncate a fractional code or stringify through format_id.
+        rendered = format(number, 'f')
+        return rendered.rstrip('0').rstrip('.') if '.' in rendered else rendered
+
+    return raw.map(label)
+
+
 def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
     """Build canonical ``plot_inputs`` for one Uganda UNPS wave.
 
@@ -2317,6 +2347,7 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
                 'Quantity_purchased': qpur.values,
                 'Improved': pd.Series([pd.NA] * len(df3), dtype='boolean').values,
                 'j': pd.Series([pd.NA] * len(df3), dtype='object').values,
+                '_crop_label': '(not crop-specific)',
             })
             piece = piece[applied.values]
             pieces.append(piece)
@@ -2331,11 +2362,15 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
                 else pd.Series([''] * len(df4a), index=df4a.index))
         plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
 
-        crop_code = (_to_int_code(df4a[sc['crop']])
-                     if sc.get('crop') and sc['crop'] in df4a.columns
-                     else pd.Series([pd.NA] * len(df4a), index=df4a.index, dtype='Int64'))
+        raw_crop = (df4a[sc['crop']].copy()
+                    if sc.get('crop') and sc['crop'] in df4a.columns
+                    else pd.Series(pd.NA, index=df4a.index, dtype='object'))
+        # Preserve the existing mapped-crop eligibility independently of the
+        # new vocabulary. Fractional codes have no integral lookup identity.
+        numeric_crop = pd.to_numeric(raw_crop, errors='coerce')
+        crop_code = numeric_crop.where(numeric_crop.mod(1).eq(0))
         j = crop_code.map(lambda c: crop_map.get(int(c), pd.NA)
-                          if pd.notna(c) else pd.NA)
+                         if pd.notna(c) else pd.NA)
 
         qty = (pd.to_numeric(df4a[sc['qty']], errors='coerce')
                if sc.get('qty') and sc['qty'] in df4a.columns
@@ -2382,6 +2417,9 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
         # purchased, or a crop label) — a plot-crop with a recorded seed.
         keep = (piece['Quantity'].notna() | piece['Improved'].notna()
                 | piece['Purchased'].notna() | piece['j'].notna())
+        # Classify only after freezing eligibility: a marker or a newly
+        # preserved unmapped code must not admit an otherwise empty row.
+        piece['_crop_label'] = _input_seed_crop_labels(raw_crop, crop_map).values
         pieces.append(piece[keep.values])
 
     cols = ['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']
@@ -2398,15 +2436,24 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
     # u may be NaN (a reported pesticide with no unit label); sentinel so it
     # is not an issue for downstream code that strings the column.
     df['u'] = df['u'].astype('object').where(df['u'].notna(), 'Unknown')
-    # j is the seed's crop (on harmonize_crop labels) for seed rows, and a
-    # 'n/a' sentinel for fertilizer/pesticide rows (no crop linkage).  It is
-    # an INDEX level so per-crop seed rows on a multi-crop plot stay distinct
-    # (the maintainer's "plot-crop seed grain") rather than collapsing —
-    # 37.9% of seeded plots in 2011-12 carry >1 crop.  The sentinel keeps the
-    # level non-null so it is a valid index level.
+    # Both branches classified j from source provenance before concatenation:
+    # AGSEC3A/B has no crop allocation; AGSEC4A is always crop-specific.
+    # Never infer structural status from a failed seed lookup.
+    # Retain legacy keys THROUGH the existing reducer: changing their sort
+    # order can move payloads even when no legacy group splits.
     df['j'] = df['j'].astype('object').where(df['j'].notna(), 'n/a')
-
+    labels = df.pop('_crop_label')
     df = df.set_index(['t', 'i', 'plot_id', 'input', 'j', 'season'])
+    labels.index = df.index
+    if not labels.index.is_unique:
+        # Mirror the existing reducer's null-key exclusion as well.
+        groups = labels.groupby(level=df.index.names, sort=False)
+        if groups.nunique(dropna=False).gt(1).any():
+            raise ValueError(
+                'Uganda plot_inputs: legacy crop aggregation conflates distinct '
+                'raw crop identities; cannot relabel losslessly (GH #1119)')
+        labels = groups.first()
+
     # Collapse only EXACT-duplicate (t,i,plot,input,j,season) tuples — the same
     # input identity reported twice WITHIN one plot-season (e.g. a seed row
     # repeated in AGSEC4A).  This is de-duplication of the index grain, NOT
@@ -2465,6 +2512,11 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap):
         us = df[['u']].groupby(level=df.index.names).first()
         df = num.join(flags).join(us)
         df = df[cols]
+    # Relabel only after the legacy membership, reductions and ordering are
+    # settled. No source row is admitted, split or reordered by a new marker.
+    axes = df.index.to_frame(index=False)
+    axes['j'] = labels.reindex(df.index).to_numpy(dtype=object)
+    df.index = pd.MultiIndex.from_frame(axes)
     return df
 
 
