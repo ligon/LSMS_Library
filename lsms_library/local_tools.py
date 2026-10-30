@@ -2177,9 +2177,14 @@ def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categ
                         # s is a single column name (string) or single-element list
                         col = s if isinstance(s, str) else s[0]
                         return df[col].map(lambda x: f.get(x, x))
-            elif isinstance(f, tuple):
-                for i in f:
-                    return grabber(df, (s, i))
+            elif isinstance(f, tuple) and f:
+                # The first stage may consume several source columns. Every
+                # later stage consumes the preceding Series, not the raw input.
+                for step in f:
+                    result = grabber(df, (s, step))
+                    df = result.to_frame(name="__mapped_value__")
+                    s = "__mapped_value__"
+                return result
 
         raise ValueError(df_data_grabber.__doc__)
 
