@@ -20,20 +20,23 @@ index by the wave scripts.
 """
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
 
 
-WAVES = ['2010-11', '2013-14', '2019-20']
+country = Country('Malawi')
+assert 'community_prices' in country.data_scheme, "community_prices: not declared for Malawi"
 
 pieces = []
-for t in WAVES:
-    fn = f'../{t}/_/community_prices.parquet'
-    try:
-        df = get_dataframe(fn)
-    except Exception:
-        # Wave not yet wired / parquet not built (DVC raises
-        # PathMissingError here, not FileNotFoundError).
+# Reuse actual table discovery, including native scripts and YAML declarations.
+# Ledger: malawi-compiler-declarations-20261028.md §§2–5.
+for t in country.waves:
+    wave = country[t]
+    if 'community_prices' not in wave.data_scheme:
         continue
+    fn = f'../{wave.wave_folder}/_/community_prices.parquet'
+    # A declared output that cannot be read is a failed build, not absence.
+    df = get_dataframe(fn)
     pieces.append(df)
 
 assert pieces, "community_prices: no wave-level parquets found"
