@@ -4314,7 +4314,7 @@ renames =crop= to =j= and reorders levels. On the 2010/2013 single-wave calls it
 also drops the entirely null =Improved= column; that documented difference is
 accounted for explicitly, not mistaken for numerical loss. Exact nonmissing NumPy
 comparisons accompany extension-array, dtype, null-mask and axis checks; warm
-serving preserves attrs and writes no parquet. No producer, unit mapping,
+serving preserves attrs and leaves parquet mtimes unchanged. No producer, unit mapping,
 quantity, ownership, eligibility or framework code changed for this census.
 
 The earlier 28,724 and #1251's 6,075 counts are historical populations, not targets

@@ -8,7 +8,7 @@ waves at public d96a8152. Repair only a demonstrated residual covered by #1041.
 Reuse local_tools.map_index and Country._finalize_result (#1251), which already
 normalize string/pd.NA units. Reuse ordinary cached-source Country and Feature
 builds, _seed_block/assemble_plot_inputs and the six original G source identities
-(#1323). Tests test_gh1234_map_index_unit and test_gh1298_malawi_bounded_observations
+(#1323). Tests test_1234_map_index_unit_sentinel and test_gh1298_malawi_bounded_observations
 pin the respective boundaries. Mali's post-reduction fill and Tanzania/Ethiopia
 #1118 tests are precedents, not authority to change Malawi reducers.
 
