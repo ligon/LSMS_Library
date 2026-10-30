@@ -6874,17 +6874,21 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
         returned an EMPTY frame and said nothing (see
         :class:`PlotGrainMismatchWarning`).
 
-        - ``'parcel'`` (default): reconcile the two plot vocabularies to
-          their common parcel key first, exactly as :func:`yield_kg` does
-          (``_parcel_from_crop_plot`` / ``_parcel_from_feature_plot``, both
-          no-ops on a vocabulary that carries no ``{hhid}-`` prefix or
-          ``_suffix``).  Uganda needs it: ``{hhid}-{parcel}-{plot}`` on the
+        - ``'parcel'`` (default): reconcile the two plot vocabularies using
+          the existing parcel helpers. Uganda needs this bridge:
+          ``{hhid}-{parcel}-{plot}`` on the
           ag modules vs. ``{parcel}_{suffix}`` on ``plot_features``, which
           share no literal key at all -- 0 rows on ``'plot'``, 509 on
-          ``'parcel'``.  Measured no-op on Malawi, whose two features
-          already share the literal key (66,298 of 66,368 distinct
-          ``(t, i, plot_id)`` keys match, 99.9%, identically under either
-          setting).
+          ``'parcel'`` (historical counts). Ethiopia and Malawi already
+          share literal field/plot keys, respectively ``holder_parcel_field``
+          and ``garden_plot``. For these countries this mode preserves the
+          FULL key on both sides, retaining each field/plot's own area;
+          it does not aggregate to holder, parcel or garden. The output level
+          remains named ``parcel`` for compatibility. Country labels on both
+          frames select this vocabulary per row; without labels, matching
+          scalar ``attrs['country']`` on both operands select it. Missing or
+          conflicting scalar metadata retains the legacy parcel-helper policy.
+          Attrs never override labelled countries or supply country identity.
         - ``'plot'``: join the literal plot key verbatim.  Use where the two
           features are known to share a vocabulary and the parcel
           extraction would be wrong.
@@ -6981,13 +6985,31 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
             if k in num.columns and k in pf.columns]
 
     if on == 'parcel':
+        # GH #1110 / ledger §§3–4: these countries' producers already
+        # share a complete field/plot identity. An underscore is part of
+        # that identity, not evidence for a coarser join. Explicit row labels
+        # take precedence over scalar metadata (GH #1160).
+        literal_countries = {'Ethiopia', 'Malawi'}
+        native_country = plot_inputs.attrs.get('country')
+        feature_country = plot_features.attrs.get('country')
+        if (not isinstance(native_country, str)
+                or not isinstance(feature_country, str)
+                or native_country != feature_country):
+            native_country = None
+        num_countries = (num['country'] if input_country is not None
+                         else [native_country] * len(num))
+        area_countries = (pf['country'] if area_country is not None
+                          else [native_country] * len(pf))
         num['_land'] = [
-            _parcel_from_crop_plot(p, i)
-            for p, i in zip(num[num_key],
-                            num['i'] if 'i' in num.columns
-                            else [''] * len(num))
+            str(p) if country in literal_countries else _parcel_from_crop_plot(p, i)
+            for p, i, country in zip(num[num_key],
+                                    num['i'] if 'i' in num.columns
+                                    else [''] * len(num), num_countries)
         ]
-        pf['_land'] = pf[plot_key].map(_parcel_from_feature_plot)
+        pf['_land'] = pd.Series([
+            str(p) if country in literal_countries else _parcel_from_feature_plot(p)
+            for p, country in zip(pf[plot_key], area_countries)
+        ], index=pf.index, dtype=str)
     else:
         num['_land'] = num[num_key].astype(str)
         pf['_land'] = pf[plot_key].astype(str)
