@@ -17,6 +17,17 @@ Data Scheme:
     Rural: str
 
   cluster_features:
+    # Uganda's v is not uniformly the survey's sampling EA (GH #689).
+    # Through 2011-12 it carries origin-EA identity, with separate synthetic
+    # GPS-bin/unlocated cases in 2009-10. From 2013-14 it is a PARISH key;
+    # 2018-19/2019-20 use district/parish name composites. A parish can span
+    # several EAs with different Rural status and coordinates: v counts are
+    # not the design's EA counts, and this key change is not a PSU redesign.
+    # The existing projection keeps agreed attributes and reports conflicting
+    # cells as NA; it neither selects a household nor averages GPS fixes.
+    # For household-level Rural use sample().Rural. Keep the honest nulls;
+    # see CONTENTS.org "cluster_features is a PROJECTION" and sampling.yml
+    # for the separate documented design and its per-wave qualifications.
     index: (t,v)
     Region: str
     Rural: str
