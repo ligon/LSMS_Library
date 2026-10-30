@@ -62,3 +62,32 @@ the existing renderer. This is necessary disclosure of the served components,
 not a new scientific definition or a test-baseline relaxation. SOURCE records
 partial secondary declarations, never an acquisition-complete held release.
 Full other-module and acquisition-layout migration remains root integration work.
+
+
+## Independent source review corrections
+
+The frozen1e8cb8c source/evidence remains unchanged. Review found a concrete
+config-root binding defect: 2014 mapping and two script consumers import a bare
+burkina_faso module after sys.path append, although the framework loads country
+formatters from an exact path without registering/clearing that bare module.
+A cached module from another root can therefore supply the wrong helper or lack
+emc_i entirely. Reuse existing get_formatting_functions at each source-relative
+country path; add poisoned-bare-module regression cases. No namespace/science
+formula changes are needed. Original source-based API evidence does not cover
+this corrected import binding; targeted corrected-source tests must be separate.
+
+The supported get_data_file path also has a concrete secondary-source hazard
+when local/DVC data are missing: its ordinary WB fallback uses the primary6224
+SOURCE URL and selects ZIP members by basename, which could place the primary
+panel cover at a requested Cross_Section destination. get_dataframe's existing
+sidecar branch does not itself take this fallback. Adding CATALOG_ID alone does
+not select6277. Full-release acquisition currently refuses duplicate sidecars
+before Data writes; do not claim that an overwrite was observed.
+
+Add a truthful partial CATALOG_SUBDIR6277Cross_Section declaration, and fail closed
+before WB credential/provider access for ordinary reads of explicitly mapped
+secondary subtrees, reusing read_provenance/_subdir_mapping. Preserve local and
+DVC hits and primary fallback. No secondary download or full acquisition layout
+is enabled. Mocked misses/basename collision, primary compatibility and early
+local/DVC hit controls must verify this narrow shared-file boundary. Full Panel
+relocation/acquisition and missing-secondary healing remain separate residuals.
