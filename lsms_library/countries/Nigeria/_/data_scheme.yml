@@ -2,15 +2,38 @@ Country: Nigeria
 
 Data Scheme:
   sample:
+    # ONE COVER PAGE PER ROUND (GH #1120 D1, ruling @ligon 2026-10-23): the
+    # post-planting quarter's rows come from the post-planting household cover
+    # (secta_planting{wN}), the post-harvest quarter's from the post-harvest
+    # cover (secta_harvest{wN}), each with that cover's weights.  Until
+    # 2026-10-23 one YAML block read the PP cover for BOTH rounds.  So a
+    # household's `v` is a per-ROUND fact: a household that moved between the
+    # two visits is `moved-{hhid}` in the PH round (17 / 41 / 66 / 64 in W2-W5),
+    # and the round's household set is the cover's (W2's PH cover adds 44
+    # households the PP cover lacks; every wave's PH cover drops PP households
+    # it did not revisit).  W2's PP round also takes the 21 households the PP
+    # AGRICULTURE cover lists and the PP household cover does not (weights
+    # NA), and any round takes a household its own ROSTER records with a
+    # location and no cover lists (2016Q1: 2; weights NA) -- both GH #1120 D1.
+    # A household no file locates would get the D2 singleton
+    # `unlocated-{hhid}` (fires on none today).  Built by <wave>/_/sample.py
+    # -> nigeria.sample_for_wave: two
+    # source files per folder, each with its own `t` -> materialize: make.
+    # See CONTENTS.org, "Sampling Design".
     index: (i, t)
     v: str
     weight: float
     panel_weight: float
     strata: str
     Rural: str
+    materialize: make
 
   cluster_features:
-    # Built from the HOUSEHOLD cover page (one row per household), so the frame
+    # Built from each ROUND's household cover page (GH #1120 D1, the same
+    # covers as `sample`, so the two share one keyspace in every round) by
+    # <wave>/_/cluster_features.py -> nigeria.cluster_features_for_wave, with
+    # the household geovariables joined LEFT onto the cover (GH #1261).  One
+    # row per household, so the frame
     # arrives at household grain and Wave.cluster_features() collapses it to
     # the (t, v) cluster grain.  What makes that collapse SOUND is the key:
     # `v` is the composite cluster id (state/lga/ea -- see the GH #323 note in
@@ -25,18 +48,19 @@ Data Scheme:
     # Latitude/Longitude are the exception and are NOT invariant from W2 on:
     # the panel follows households that move while keeping their ORIGINAL ea in
     # the sampling frame, so a mover's current coordinates differ from its
-    # cluster's.  Core reduces these with .mean() (the cluster centroid).  That
-    # is the historical behaviour and it is retained here deliberately: core
-    # does not aggregate on declaration (GH #323 D1), and auditing this
-    # household->cluster collapse is Site 2, owned centrally rather than
-    # per-country.  Measured spread: 5 / 24 / 50 clusters in W2 / W3 / W4 span
-    # more than one coordinate.  W1 is clean (0 of 500 groups disagree).
+    # cluster's.  Core does not aggregate them: the audited Site 2 collapse
+    # SELECTS the group's most complete household row (GH #871; the .mean()
+    # centroid this comment used to describe was retired 2026-07-13) and
+    # reports the conflict as a GrainCollapseWarning.  Measured spread: 5 / 24
+    # / 50 clusters in W2 / W3 / W4 span more than one coordinate.  W1 is
+    # clean (0 of 500 groups disagree).
     index: (t, v)
     Region: str
     District: str
     Rural: str
     Latitude: float
     Longitude: float
+    materialize: make
 
   shocks:
     index: (t, i, Shock)

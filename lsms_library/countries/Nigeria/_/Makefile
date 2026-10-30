@@ -162,6 +162,17 @@ plot_features_parquet := $(plot_features:.py=.parquet)
 $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
 	python plot_features.py
 
+# sample / cluster_features (GH #1120 D1).  Each wave script reads BOTH of its
+# folder's cover pages -- the post-planting cover for the PP quarter, the
+# post-harvest cover for the PH quarter -- and writes one wave parquet holding
+# both rounds; the framework keeps the requested round.  No country-level
+# rule: the framework concatenates the waves.
+../%/_/sample.parquet: ../%/_/sample.py
+	(cd $(@D) && python sample.py)
+
+../%/_/cluster_features.parquet: ../%/_/cluster_features.py
+	(cd $(@D) && python cluster_features.py)
+
 # food_coping (#332, Family B).  Post-planting GHS section-9 coping
 # day-count battery (W1-W3).  The framework's grab_data calls
 # `make ../<wave>/_/food_coping.parquet` from this `_/` dir for each
