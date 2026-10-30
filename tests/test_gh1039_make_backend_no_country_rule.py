@@ -299,12 +299,15 @@ def test_full_request_with_no_wave_rows_still_fails_loudly(fakeland2):
 
 
 @needs_make
-def test_barren_subset_with_a_country_builder_keeps_the_legacy_fallback(fakeland2):
-    """Only the NO-builder route is cut off from the country fallback.  A
-    country script still answers a barren subset exactly as before (whether
-    it should is #1039-a's business)."""
+def test_barren_subset_with_a_country_builder_filters_its_result(fakeland2):
+    """The builder still runs, but its other-wave rows are not the answer.
+
+    GH1039 intentionally left this direct-builder subset defect for follow-up;
+    the wave-subset fix now applies the existing restriction to its result.
+    """
     c = fakeland2.build(country_script=_COUNTRY_SCRIPT)
-    assert _x(_barren(c)) == COUNTRY_X
+    _assert_empty_and_shaped(_barren(c))
+    assert _x(pd.read_parquet(fakeland2.var)) == COUNTRY_X
 
 
 @pytest.mark.parametrize("backend", ["dvc", "make"])

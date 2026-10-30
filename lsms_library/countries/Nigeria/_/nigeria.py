@@ -66,6 +66,10 @@ wave_folder_map = {
 # path does this with `converted_categoricals:` on the sub-df) and the
 # composite is assembled from the raw numeric codes.
 #
+# The PH same-location refinement below is an explicit exception: ea=0
+# alone is not proof of physical relocation. Nonzero EAs may also accompany
+# recorded dwelling moves; this helper formats keys, not movement events.
+#
 # THE `Moved` SENTINEL.  From W2 on, a tracked household that left its
 # original EA is recorded with ea == 0 -- surfacing as the label 'Moved'
 # (W2), '0. Moved' (W3), or a bare 0 (W4).  It is a MISSING-VALUE
@@ -135,6 +139,434 @@ def v(row):
     """
     return cluster_id(row.get('state'), row.get('lga'), row.get('ea'),
                       row.get('hhid'))
+
+
+# ---------------------------------------------------------------------
+# sample / cluster_features -- ONE COVER PAGE PER ROUND (GH #1120 D1)
+# ---------------------------------------------------------------------
+#
+# Every wave folder holds two rounds, and each round ships its OWN household
+# cover page: secta_planting{wN} (post-planting, t = PP_QUARTER) and
+# secta_harvest{wN} (post-harvest, t = PH_QUARTER).  Until 2026-10-23 the
+# wave YAML read the PP cover for BOTH rounds (one data_info.yml per folder,
+# so both Wave(t)s ran the same block), which tagged a PH round with the PP
+# round's households and clusters.  Measured on the raw covers:
+#
+#   wave     PP hh  PH hh  PP-only  PH-only  v differs (common hh)
+#   2010-11  5,000  4,939      61        0       0
+#   2012-13  4,859  4,854      49       44      17
+#   2015-16  4,696  4,592     104        0      41
+#   2018-19  5,263  5,025     238        0      66
+#   2023-24  5,067  4,771     296        0      64
+#
+# Weights are identical on every common household (weight and panel_weight,
+# all five waves).  These are historical pre-refinement counts: ea == 0
+# alone does not establish relocation. Owner comment6380186741 rules that
+# W4/W5's labelled same-location answer reuses the complete own PP identity
+# (registered below); W3 stays sentinel. W2 also has 2 the other way:
+# moved at PP, a real EA at PH. The
+# 44 W2 PH-only households carry state/lga/ea and NULL weights; served under
+# the PP cover they had no 2013Q1 `v` at all, which is the 108 NaN-`v`
+# plot_labor rows of GH #1120 and the 39 geo-only households of GH #1261.
+#
+# RULING (@ligon, 2026-10-23, GH #1120 D1): per round, sample() takes
+# households from THAT ROUND's own cover, with that cover's weight -- the PP
+# cover for Q3 rows, the PH cover for Q1 rows.  A household's cluster is a
+# per-ROUND fact (Tanzania 2008-15/_/sample.py says the same of its four
+# rounds).  cluster_features follows the same covers so that sample.v and
+# cluster_features.v stay one keyspace in every round.
+#
+# The ruling's general form ("households the survey recorded in another
+# cover come from that cover, with that cover's weight"; Ethiopia: the
+# agriculture cover) also reaches one more W2 file: the PP AGRICULTURE cover
+# (Post Planting Wave 2/Agriculture/secta_plantingw2.dta) lists 21 of the 44
+# PH-only households -- the post-planting agriculture module was fielded for
+# them although the PP household cover does not list them.  plot_inputs
+# (t = PP_QUARTER) serves 63 rows for 20 of them, which no PH cover can give a
+# 2012Q3 `v`.  They are added to 2012Q3 from that cover (`pp_supplement`),
+# households already on the PP household cover winning; it has no weight
+# columns, so their weight / panel_weight are NA.  Its state/lga/ea agree
+# with the PH cover's on all 21.
+#
+# A household the ROUND'S OWN ROSTER (sect1_{planting,harvest}{wN}, the file
+# household_roster reads) records but no cover lists is located by that
+# roster: every member row carries the household's zone/state/lga/sector/ea.
+# Measured: the roster's location is constant within every household and
+# agrees with the round's cover on every shared household (one W1 PH household
+# excepted, 4,916 of 4,917; the cover wins), and only one round has roster
+# households absent from its covers -- 2016Q1, two households, 39 served rows
+# (roster, education, anthropometry, non-food) that had no `v`.  One is on the
+# 2015-16 PP cover (refused at PP) and the PH roster records it with ea == 0,
+# so it is `moved-{hhid}` there; the other is on neither cover and its PH
+# roster gives a real EA.  Both come from the roster (D1), with NA weights.
+#
+# GH #1120 D2 (@ligon, 2026-10-23): a household that no file locates gets a
+# SINGLETON `v` per household, never a shared sentinel.  It is spelled
+# `unlocated-{hhid}`, NOT `moved-{hhid}`: `moved-` is the survey's own
+# ea == 0 Moved sentinel (see the note above cluster_id), a recorded fact
+# that the sampling.yml / CONTENTS.org mover counts rely on; a D2 household
+# has no recorded location at all, so reusing `moved-` would assert a move
+# nobody recorded.  Both spellings are singletons and can never be pooled.
+# In these data D2 fires on NO household: every roster household is located
+# by a cover or by its own roster.  (The 2015Q3 individual_education row
+# with no `v` is not a D2 case -- see CONTENTS.org: it is a post-harvest
+# record that the individual_education YAML stamps onto the PP quarter too.)
+#
+# #1261: the geovariables join is a LEFT join onto the round's cover.  Under
+# the old outer YAML merge, 39 geo-only W2 households arrived with a null `v`
+# and the cluster-grain collapse deleted them; all 39 are on the PH cover, so
+# 2013Q1 now serves them with a real `v`, and leaving them out of 2012Q3 (the
+# 18 that no PP cover lists) hides nothing.  The one W3 geo-only household is
+# on neither cover and has no `ea`.
+
+# `sector` label -> Rural, the union of the per-wave YAML mappings it
+# replaces (W1/W2 spell rural/RURAL, W3-W5 '1. URBAN' / '2. Rural').
+_COVER_RURAL = {
+    '1. URBAN': 'Urban', '2. RURAL': 'Rural',
+    '1. Urban': 'Urban', '2. Rural': 'Rural',
+    'rural': 'Rural', 'Rural': 'Rural', 'RURAL': 'Rural',
+    'urban': 'Urban', 'Urban': 'Urban', 'URBAN': 'Urban',
+}
+
+# W5's `strata` is an unlabelled 1-6 code: the zone it names.
+_W5_STRATA = {1: 'North Central', 2: 'North East', 3: 'North West',
+              4: 'South East', 5: 'South South', 6: 'South West'}
+
+# Per wave folder: each round's cover (relative to the folder's Data/), each
+# round's household roster (the D1 locator of last resort), the weight
+# variables (identical names on both covers), the strata source, an optional
+# PP supplement cover, and the household geovariables file (file,
+# latitude, longitude; None for W5 -- GH #841 / #978).  The coordinate
+# columns' CASING differs by wave (W1/W4 lowercase, W2/W3 uppercase); a wrong
+# name raises a KeyError here.  Under the old YAML it was the GH #515 soft drop
+# of the whole geo sub-frame, which is how W2-W4 once lost their coordinates.
+ROUND_COVERS = {
+    '2010-11': dict(
+        pp='Post Planting Wave 1/Household/secta_plantingw1.dta',
+        ph='Post Harvest Wave 1/Household/secta_harvestw1.dta',
+        pp_roster='Post Planting Wave 1/Household/sect1_plantingw1.dta',
+        ph_roster='Post Harvest Wave 1/Household/sect1_harvestw1.dta',
+        weight='wt_wave1', panel_weight='wt_wave1', strata='zone',
+        geo=('nga_householdgeovariables_y1.csv', 'lat_dd_mod', 'lon_dd_mod')),
+    '2012-13': dict(
+        pp='Post Planting Wave 2/Household/secta_plantingw2.dta',
+        ph='Post Harvest Wave 2/Household/secta_harvestw2.dta',
+        pp_supplement='Post Planting Wave 2/Agriculture/secta_plantingw2.dta',
+        pp_roster='Post Planting Wave 2/Household/sect1_plantingw2.dta',
+        ph_roster='Post Harvest Wave 2/Household/sect1_harvestw2.dta',
+        weight='wt_wave2', panel_weight='wt_combined', strata='zone',
+        geo=('nga_householdgeovars_y2.csv', 'LAT_DD_MOD', 'LON_DD_MOD')),
+    '2015-16': dict(
+        pp='secta_plantingw3.dta', ph='secta_harvestw3.dta',
+        pp_roster='sect1_plantingw3.dta', ph_roster='sect1_harvestw3.dta',
+        weight='wt_wave3', panel_weight='wt_w1_w2_w3', strata='zone',
+        geo=('NGA_HouseholdGeovars_Y3.dta', 'LAT_DD_MOD', 'LON_DD_MOD')),
+    '2018-19': dict(
+        pp='secta_plantingw4.dta', ph='secta_harvestw4.dta',
+        pp_roster='sect1_plantingw4.dta', ph_roster='sect1_harvestw4.dta',
+        weight='wt_wave4', panel_weight='wt_longpanel', strata='strata',
+        geo=('nga_householdgeovars_y4.dta', 'lat_dd_mod', 'lon_dd_mod')),
+    '2023-24': dict(
+        pp='Post Planting Wave 5/Household/secta_plantingw5.dta',
+        ph='Post Harvest Wave 5/Household/secta_harvestw5.dta',
+        pp_roster='Post Planting Wave 5/Household/sect1_plantingw5.dta',
+        ph_roster='Post Harvest Wave 5/Household/sect1_harvestw5.dta',
+        weight='wt_cross_wave5', panel_weight='wt_longpanel_wave5',
+        strata=('strata', _W5_STRATA), geo=None),
+}
+
+
+def _data_path(folder, fn):
+    from lsms_library.paths import countries_root
+    return str(countries_root() / 'Nigeria' / folder / 'Data' / fn)
+
+
+def _cover_frame(fn, spec, *, weights=True):
+    """One cover page at household grain (index ``i``).
+
+    Read exactly as the pre-#1120 YAML blocks read it: ``v`` from the raw
+    CODES (``convert_categoricals=False``; see the keyspace note above), the
+    rest from the decoded labels.  Columns: v, weight, panel_weight, strata,
+    Rural, Region (= zone), District (= state).  ``weights=False`` (a cover
+    with no weight columns) serves weight / panel_weight as NA.
+    """
+    from lsms_library.local_tools import df_data_grabber
+    key = df_data_grabber(fn, {'i': 'hhid'}, convert_categoricals=False,
+                          v=(['state', 'lga', 'ea', 'hhid'], v))
+    strata = spec['strata']
+    strata = (strata if isinstance(strata, str)
+              else ([strata[0]], strata[1]))
+    myvars = dict(strata=strata, Rural=('sector', _COVER_RURAL),
+                  Region='zone', District='state')
+    if weights:
+        myvars.update(weight=spec['weight'], panel_weight=spec['panel_weight'])
+    main = df_data_grabber(fn, {'i': 'hhid'}, **myvars)
+    if not weights:
+        main['weight'] = np.nan
+        main['panel_weight'] = np.nan
+    assert key.index.is_unique and main.index.is_unique, \
+        f'{fn}: a cover page lists a household twice'
+    out = key.join(main, how='outer')
+    assert out['v'].notna().all(), f'{fn}: a cover row with no cluster'
+    return out
+
+
+_PH_SAME_LOCATION = {
+    '2018-19': ('hhsmlc', '1', {'YES', '1. YES'}),
+    '2023-24': ('hh_moved', '2', {'NO, IN ORIGINAL DWELLING',
+                                 '2. NO, IN ORIGINAL DWELLING'}),
+}
+_PH_SAME_LOCATION_KEY = 'Nigeria::sample::ph-same-location'
+
+
+def derive_ph_same_location_v(inputs):
+    """Ruled PH identity from original named PP/PH answers (ledger sections 3-4).
+
+    Only PH ea=0 plus the approved *labelled* movement answer reuses a known
+    own-PP composite. Raw numeric answers, wrong labels/codes and unknown PP
+    remain sentinels. PH state/lga never supply components of the PP identity.
+    """
+    if inputs.empty:
+        return pd.Series(index=inputs.index, name='v', dtype=object)
+    fields = [f for f in ('hhsmlc', 'hh_moved') if f in inputs]
+    assert len(fields) == 1, 'PH derivation needs one named movement answer'
+    field = fields[0]
+    code, labels = next((code, labels) for name, code, labels in
+                        _PH_SAME_LOCATION.values() if name == field)
+    out = inputs.apply(lambda r: cluster_id(r['state'], r['lga'], r['ea'],
+                                           r['hhid']), axis=1).rename('v')
+    pp = inputs.apply(lambda r: cluster_id(r['pp_state'], r['pp_lga'],
+                                          r['pp_ea'], r['pp_hhid']), axis=1)
+    label = inputs[field + '_label'].map(
+        lambda x: ' '.join(str(x).upper().split()) if pd.notna(x) else '')
+    take = (inputs['ea'].map(_geo_code).eq('0')
+            & inputs[field].map(_geo_code).eq(code) & label.isin(labels)
+            & pp.notna() & ~pp.str.startswith(('moved-', UNLOCATED_PREFIX), na=False))
+    out.loc[take] = pp.loc[take]
+    return out
+
+
+def _ph_same_location_answers(folder):
+    """Exact PH fields plus namespaced PP operands; never read another wave.
+
+    PP names retain their original suffix (pp_state is PP's state). Boxing PP
+    scalars before a missing-match join avoids float rounding of integer IDs;
+    source storage dtypes are recorded separately, not claimed as output dtypes.
+    """
+    from lsms_library.local_tools import get_dataframe
+    spec = ROUND_COVERS[folder]
+    field = _PH_SAME_LOCATION[folder][0]
+    pp = get_dataframe(_data_path(folder, spec['pp']), convert_categoricals=False)
+    ph = get_dataframe(_data_path(folder, spec['ph']), convert_categoricals=False)
+    labelled = get_dataframe(_data_path(folder, spec['ph']), convert_categoricals=True)
+    assert ph.index.equals(labelled.index) and ph['hhid'].equals(labelled['hhid']), \
+        'PH numeric/labelled household order differs'
+    cols = ['hhid', 'state', 'lga', 'ea']
+    left = ph[cols + [field]].copy()
+    left[field + '_label'] = labelled[field].astype(object)
+    left.index = pd.Index(ph['hhid'].map(format_id), name='i')
+    right = pp[cols].astype(object).copy()
+    right.index = pd.Index(pp['hhid'].map(format_id), name='i')
+    assert left.index.is_unique and right.index.is_unique, \
+        'PH derivation cover lists a household twice'
+    out = left.join(right.rename(columns=lambda c: 'pp_' + c), how='left')
+    out.attrs['source_dtypes'] = {
+        'PP': {c: str(pp[c].dtype) for c in cols},
+        'PH': {c: str(ph[c].dtype) for c in cols + [field]},
+    }
+    return out
+
+
+def inputs_ph_same_location(wave):
+    """Original named operands for repaired cover rows, at (t,i) input grain.
+
+    This is finer than cluster_features' selected cluster grain; existing Site
+    2 keeps only the selected household's provenance. No builder/API is called.
+    """
+    folder = wave_folder_map.get(wave, wave)
+    inputs = _ph_same_location_answers(folder)
+    repaired = derive_ph_same_location_v(inputs)
+    take = inputs['ea'].map(_geo_code).eq('0') & repaired.notna() \
+        & ~repaired.str.startswith(('moved-', UNLOCATED_PREFIX), na=False)
+    out = inputs.loc[take].copy()
+    out = out.assign(t=PH_QUARTER[folder]).set_index('t', append=True)
+    return out.reorder_levels(['t', 'i'])
+
+
+UNLOCATED_PREFIX = 'unlocated-'   # GH #1120 D2 singleton -- see the note above
+
+
+def unlocated_id(hhid):
+    """The D2 singleton `v` of a household no file locates."""
+    hh = format_id(hhid)
+    return f'{UNLOCATED_PREFIX}{hh}' if hh is not None else None
+
+
+def _roster_locator(fn, spec, cover_fn):
+    """Household-grain location of every household a ROSTER records.
+
+    Same columns as ``_cover_frame``: ``v`` from the raw codes through
+    ``cluster_id`` (so ea == 0 is ``moved-{hhid}``) and NA weights (a roster
+    carries none).  Region / District / strata / Rural are the round's COVER
+    labels for the roster's codes (*cover_fn*): the two files spell the same
+    code differently (W3 roster '32. Rivers' / '5. SOUTH SOUTH', cover
+    'rivers' / 'south south'), and a cluster must not hold two spellings.  A
+    code the cover never uses keeps the roster's own label.  A roster that
+    lacks a required real-EA component (2015Q3's has no ``state``), or a
+    household whose location is blank, gets ``unlocated-{hhid}``; recorded
+    ea=0 still uses cluster_id's mover branch even without state/lga. Every
+    column must be constant within a household; a roster that disagrees with
+    itself raises rather than picking a row.
+    """
+    from lsms_library.local_tools import get_dataframe
+    raw = get_dataframe(fn, convert_categoricals=False)
+    dec = get_dataframe(fn, convert_categoricals=True)
+    craw = get_dataframe(cover_fn, convert_categoricals=False)
+    cdec = get_dataframe(cover_fn, convert_categoricals=True)
+
+    def cover_label(col):
+        """The roster's `col` as the cover spells it (NA if absent)."""
+        if col not in raw.columns:
+            return pd.Series(pd.NA, index=raw.index, dtype='object')
+        own = dec[col].astype(object)
+        if col not in craw.columns:
+            return own
+        pairs = pd.DataFrame({'c': craw[col].map(_geo_code),
+                              'l': cdec[col].astype(object)}).dropna()
+        assert (pairs.groupby('c')['l'].nunique() <= 1).all(), \
+            f'{cover_fn}: {col} code with two labels'
+        cmap = pairs.drop_duplicates('c').set_index('c')['l']
+        mapped = raw[col].map(_geo_code).map(cmap)
+        return mapped.where(mapped.notna(), own).astype(object)
+
+    i = raw['hhid'].map(format_id)
+    # Reuse cluster_id's ea=0-first semantics, even if another component is
+    # absent. A real EA still needs state and lga (ledger sections 2-4).
+    vv = [cluster_id(st, lg, e, h) for st, lg, e, h in zip(
+        raw.get('state', [None] * len(raw)),
+        raw.get('lga', [None] * len(raw)),
+        raw.get('ea', [None] * len(raw)), raw['hhid'])]
+    strata = spec['strata']
+    if isinstance(strata, str):
+        strata_s = cover_label(strata)
+    else:
+        strata_s = cover_label(strata[0]).map(lambda x: strata[1].get(x, x))
+    df = pd.DataFrame({
+        'i': i.values, 'v': vv,
+        'strata': strata_s.astype(object).values,
+        'Rural': cover_label('sector').map(
+            lambda x: _COVER_RURAL.get(x, x)).astype(object).values,
+        'Region': cover_label('zone').values,
+        'District': cover_label('state').values,
+    })
+    df = df[df['i'].notna()]
+    # Every column is the household's, stamped on each member row: require
+    # it constant (NA included), so the selection below picks identical rows
+    # rather than composing one (GH #871).
+    n_val = df.groupby('i').nunique(dropna=False)
+    n_bad = int((n_val > 1).any(axis=1).sum())
+    assert n_bad == 0, f'{fn}: {n_bad} household(s) with two locations'
+    out = df.groupby('i', sort=True).head(1).set_index('i').sort_index()
+    blank = out['v'].isna()
+    out.loc[blank, 'v'] = [unlocated_id(h) for h in out.index[blank]]
+    out['weight'] = np.nan
+    out['panel_weight'] = np.nan
+    return out
+
+
+def round_covers(folder):
+    """``{t: household-grain cover frame}`` for the two rounds of *folder*.
+
+    The PP round reads the PP household cover (plus ``pp_supplement``'s
+    households that cover does not list); the PH round reads the PH
+    household cover.  Then, for either round, a household the round's own
+    roster records and no cover lists is located by that roster (D1, NA
+    weights), or gets the D2 singleton ``unlocated-{hhid}`` where the roster
+    records no location.  Precedence: cover, supplement cover, roster.
+    GH #1120 D1 / D2 -- see the section note above. The labelled W4/W5
+    same-location refinement changes only qualifying PH household-cover v.
+    """
+    spec = ROUND_COVERS[folder]
+    out = {}
+    for rnd, t in (('pp', PP_QUARTER[folder]), ('ph', PH_QUARTER[folder])):
+        df = _cover_frame(_data_path(folder, spec[rnd]), spec)
+        if rnd == 'ph' and folder in _PH_SAME_LOCATION:
+            answers = _ph_same_location_answers(folder)
+            repaired = derive_ph_same_location_v(answers).reindex(df.index)
+            take = (answers['ea'].map(_geo_code).eq('0').reindex(df.index)
+                    & df['v'].ne(repaired) & repaired.notna())
+            if take.any():
+                df.loc[take, 'v'] = repaired.loc[take]
+                df['Derivation'] = pd.Series(pd.NA, index=df.index, dtype='string')
+                df.loc[take, 'Derivation'] = _PH_SAME_LOCATION_KEY
+        sup = spec.get(rnd + '_supplement')
+        if sup:
+            extra = _cover_frame(_data_path(folder, sup), spec, weights=False)
+            extra = extra[~extra.index.isin(df.index)]
+            if not extra.empty:
+                df = pd.concat([df, extra])
+        ros = spec.get(rnd + '_roster')
+        if ros:
+            loc = _roster_locator(_data_path(folder, ros), spec,
+                                  _data_path(folder, spec[rnd]))
+            loc = loc[~loc.index.isin(df.index)]
+            # Zero rows must not widen the cover's native dtypes (ledger 4).
+            if not loc.empty:
+                df = pd.concat([df, loc.reindex(columns=df.columns)])
+        out[t] = df
+    return out
+
+
+def sample_for_wave(folder):
+    """``sample`` for one wave folder: both rounds, each from its own cover.
+
+    Index ``(t, i)``; columns v, weight, panel_weight, strata, Rural and a
+    sparse Derivation column only where the labelled PH rule repairs rows.
+    """
+    cols = ['v', 'weight', 'panel_weight', 'strata', 'Rural']
+    parts = []
+    for t, df in round_covers(folder).items():
+        keep = cols + (['Derivation'] if 'Derivation' in df else [])
+        parts.append(df[keep].assign(t=t).set_index('t', append=True))
+    out = pd.concat(parts).reorder_levels(['t', 'i']).sort_index()
+    assert out.index.is_unique, f'sample {folder}: (t, i) not unique'
+    return out
+
+
+def cluster_features_for_wave(folder):
+    """``cluster_features`` for one wave folder at HOUSEHOLD grain.
+
+    Index ``(t, i, v)``; columns Region, District, Rural, Latitude,
+    Longitude.  ``Wave.cluster_features`` projects it onto ``(t, v)``
+    through the audited Site 2 collapse.  The geovariables are household
+    level, so they join on ``i`` -- LEFT, onto the round's cover (#1261:
+    the cover says which households the round holds; see above). W5's held
+    geovariables remain unwired (GH #978): Latitude / Longitude are NA.
+    """
+    from lsms_library.local_tools import df_data_grabber
+    spec = ROUND_COVERS[folder]
+    geo = None
+    if spec['geo'] is not None:
+        fn, lat, lon = spec['geo']
+        geo = df_data_grabber(_data_path(folder, fn), {'i': 'hhid'},
+                              Latitude=lat, Longitude=lon)
+        assert geo.index.is_unique, f'{fn}: a household has two fixes'
+    cols = ['v', 'Region', 'District', 'Rural']
+    parts = []
+    for t, df in round_covers(folder).items():
+        keep = cols + (['Derivation'] if 'Derivation' in df else [])
+        df = df[keep].copy()
+        if 'Derivation' in df:
+            df['Derivation'] = df['Derivation'].replace({
+                _PH_SAME_LOCATION_KEY: 'Nigeria::cluster_features::ph-same-location'})
+        if geo is not None:
+            df = df.join(geo, how='left')
+        else:
+            df = df.assign(Latitude=np.nan, Longitude=np.nan)
+        parts.append(df.assign(t=t).set_index(['t', 'v'], append=True))
+    out = pd.concat(parts).reorder_levels(['t', 'i', 'v']).sort_index()
+    assert out.index.is_unique, f'cluster_features {folder}: (t, i) not unique'
+    return out
 
 
 # ---------------------------------------------------------------------

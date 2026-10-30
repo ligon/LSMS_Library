@@ -1514,7 +1514,11 @@ FCFA)".  (=s3bq14='s label is the neutral "Montant de la vente".)  The WB
 =MLI_EACI2.do:353= follows the 2017-18 label
 (=harvest_sold_value_per = s11fq10 * s11fq15=).
 
-*Served (rulings @ligon 2026-10-23, PR #1272, rounds 1 and 3)*:
+*Historical served rule (PR #1272 rounds 1-3; SUPERSEDED for sales)*:
+
+The sale multipliers and sale-month edge claims below are retained as history.
+The revised ruling linked in "Revised ruling: tree sales as recorded" supersedes
+those Quantity_sold/Value_sold claims; the harvest multiplier remains current.
 - =Quantity= = harvest per month x =months_harvested=, =Quantity_sold= =
   quantity sold per month x =months_harvested=, and (round 3) =Value_sold= =
   sale value x =months_harvested=, in both waves: the 12-month totals a
@@ -1580,7 +1584,7 @@ losing a 2014-15 tree value that is now NA).  Site Q gains one 2014-15 offender:
 of 2,005 =Panier= per month over 3 months, served 6,015.  =harvest_kg= /
 =yield_kg= still drop the tree rows (their =plot_id= is NA).
 
-*** Decision: the sale value is on the per-month footing (ruling @ligon 2026-10-23, PR #1272 round 3)
+*** Historical decision: sale value multiplied by months (round 3; superseded)
 
 *The conflict, unresolved by any document here.*  The printed form asks the
 value as a total -- "Quel a ete le montant total de cette vente ? (En FCFA)",
@@ -1694,3 +1698,44 @@ explicit =Non=.
 Evidence (aggregates and scripts): =slurm_logs/isa_backlog_2026-10-21/824-mali-unit-sold/=.
 Ledger: =.coder/ledger/824-mali-unit-sold.md=.
 Tests: =tests/test_gh824_mali_unit_sold.py=, =tests/test_gh1267_mali_tree_quantity.py=.
+
+
+* Revised ruling: tree sales as recorded (GH #824, PR #1272 follow-up)
+
+The [[https://github.com/ligon/LSMS_Library/pull/1272#issuecomment-6375506358][revised owner ruling]] supersedes rounds 1-3's tree SALE multipliers:
+=Quantity_sold= and =Value_sold= are served as recorded in both EAC-I waves.
+The harvest remains =Quantity = harvest per month x months_harvested=, with its
+existing zero/missing-month rules. A sale beside zero or missing harvest months
+is retained; those months do not establish the sale window.
+
+The printed-total versus monthly Stata-label conflict above remains evidence,
+not a resolved instrument interpretation. The =tree-sale-window= identity
+records the unsettled window on positive-sale tree rows; the harvest key now
+names only =Quantity=. Raw harvest and sale inputs remain separately recoverable.
+The row mixes windows: =Quantity_sold / Quantity= is not automatically a campaign
+sold share. No framework valuation or revenue rule is changed here.
+
+Quantity codes 99 / 9999 / 9999.9 retain their existing masks. The baseline
+TREE value mask is only 999999: the recorded 999998 tree value and field values
+are not newly masked. The 2017-18 Leger yes-sale missing amounts remain NA.
+Pre-id_walk compiler keys and the existing duplicate fold are unchanged.
+
+Fresh ordinary cached-source verification at science source =9d4b401a= used the
+seven declared crop sources, plus eight sample dependencies for normal Country
+joins, in private roots without provider acquisition. Both actual native
+producers retain 10,341 / 24,719 rows. The corrected independent oracle covers
+358 / 270 pre-fold tree rows, reduced by the existing fold to 357 / 270; every
+numeric/membership check passes and all 34,433 field rows/harvests are exact.
+The initial oracle's invalid unique-raw-key assumption failed and is preserved.
+Sales change on 137 / 100 quantity rows and 131 / 99 value rows; 331 final rows
+carry the sale key. No fixture or source answer was repinned to obtain these.
+
+Normal Country has 35,060 rows and an unchanged 24,939-row sample. Private cold,
+warm and fresh-process warm comparisons pass; explicit extension-array and
+nonmissing NumPy exact checks also pass on pandas 3.0.6 and reject a one-ULP
+nullable-Float64 mutation. Only the expected derivation metadata changes.
+That API comparison stacked the science bytes on PR #1317; this public follow-up
+is compiler-independent on d65. Standalone-d65 compiler/Make composition, Feature,
+cache census/rewarm and the remaining #824 factors/consumer/audit work are
+separate gates. Historical StageB/custody and the failed POST after the old231
+compiler tests are not replayed or reclassified by these ordinary checks.
