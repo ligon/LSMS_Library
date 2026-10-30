@@ -3245,3 +3245,8 @@ but missing-source covariate rows show why a match must not imply a value.
 W2/W3 geovariable =household_id2= agrees with the base field identity on
 every match, although the join uses =household_id=. These are measurements
 of this release, not hardcoded future-release row-count assertions.
+
+Final native-percent attachments were checked against closed original source
+operands. Earlier native/API/fresh-warm comparisons used the rejected degree
+candidate; only valid unchanged payload/join predicates are reused. A final
+full cold/warm rebuild was not repeated after the unit correction.
