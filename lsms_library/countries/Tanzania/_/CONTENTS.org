@@ -1,6 +1,35 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
+* Section J reported food-price / own-consumption-value capability (GH #846)
+:PROPERTIES:
+:CUSTOM_ID: food-price-capability-846
+:END:
+
+The retained C4 quotation in =slurm_logs/price_sources/Tanzania/REPORT.org=,
+§1 “The questionnaire, quoted”, explicitly names the *2019-20 NPS-SDD*
+household instrument =nps_sdd_household_qx_final_english_.pdf=, Section J
+qq2-6. That module asks no separate purchase unit price, and q5 asks
+own-production consumption *quantity*, not monetary value. Record these two
+source concepts as =not-asked= for *2019-20 Section J only*, =checks_run=C4=;
+do not transfer the claim to an unsearched wave or claim a fresh API run.
+
+Q4 spending is explicitly paired with q3 purchased quantity: their ratio is
+a genuine purchased-food unit value. Section F's market value of unpurchased
+food *outside the household* concerns a different universe/grain. Neither
+fact licenses declaring the whole =food_prices= / =food_acquired= table
+absent, and an imputed own-consumption value remains a separate #585 choice.
+
+See =_/food_price_capability.md= for exact retained evidence and scope, and
+=_/capabilities/food_price_absent_verdicts.csv= for the country-local two-row record in
+the existing verdict CSV schema. Its =feature= values are price-study source
+concepts, not canonical features. The live coverage matrix does *not* load
+this staged record. Shared concept/wave-scoped integration belongs to the
+coordinator; the current =SeriesCapability= registry is whole-feature/series
+and automatically reports =C1;C4=, which this retained evidence cannot claim.
+Other waves remain unadjudicated. No questionnaire or microdata was newly
+read for this source-only recording (Sue / Codex).
+
 * Survey design --- read before touching ANY 2008-15 table
 :PROPERTIES:
 :CUSTOM_ID: uphi-backcasting
@@ -2299,3 +2328,29 @@ Both dated accounts remain; this retirement changes neither that crosswalk nor t
 The Extended/Refresh split, split-off back-casting and live WAITING #114 caveats remain unchanged.
 The separate reviewed 408 plot-input unit replacements (86 plus 322) are preserved by exact source/test identity; no agriculture sources or plot-input outputs were rebuilt here.
 Changing the shared country Makefile moves all 25 enumerated Tanzania API cache hashes; other tables were not rebuilt for this check.
+
+* 2026-10-28 -- Country concatenators consult declarations before reading (GH #1287)
+
+The twelve country concatenators consult the existing =Country= / =Wave.data_scheme=
+declaration API before attempting an enumerated folder. Logical waves are mapped
+to physical folders through =Wave.wave_folder=; the four UPD logical waves share
+=2008-15=. A folder with no declaration is a legitimate skip, before either reader.
+A declaration on any logical wave mapped to a folder retains that output.
+
+Seven scripts still enumerate the two modern folders. Anthropometry,
+individual_education, food_coping, life_satisfaction and shocks still enumerate
+all three physical folders and preserve both existing read candidates. A declared
+folder whose reads fail raises with table/folder context and the original cause;
+a successful relative fallback and readable-empty output remain allowed.
+
+The prior all-current-producer refusal and its 99-case synthetic evidence remain
+valid for the current configuration; the new declaration-retirement controls are
+prepared separately and have not been run at this source checkpoint.
+Private metadata fixtures use the actual Country/Wave declaration API, while
+invented readers/writers supply frames. No compiler or id_walk is stubbed.
+This is not real-source, public Country/Feature routing or scientific acceptance.
+
+Availability is distinct from logical-round completeness: food_coping's UPD
+declaration still omits round 1, without inventing a required row. The existing
+folder order, household walks, reducers, back-casting, Extended/Refresh split and
+live WAITING #114 caveats remain unchanged. No #905 or #846 change is included.

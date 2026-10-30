@@ -1881,3 +1881,45 @@ This change does not alter either count.
 Cache: =panel_ids.py= and both JSON files are build inputs, so every Burkina Faso hash moves and no other country's does.
 Ledger: =.coder/ledger/1240-burkina-panel-ids.md=.
 Aggregate evidence: =slurm_logs/isa_backlog_2026-10-21/1240-burkina-panel-ids/=.
+
+* 2026-10-28 -- country =plot_features= refuses a missing declared output (GH #1287)
+
+The country concatenator lists the two EHCVM wave scripts (2018-19 and
+2021-22); the different 2014 EMC instrument has no plot builder and remains
+outside that list. Previously it caught every reader exception and continued,
+so a missing, corrupt or unreadable EHCVM output could become a country table
+containing only the other wave.
+
+The concatenator now verifies that each listed wave has a script, reads its
+output under =data_root()= and refuses an absent output before writing.
+Other reader errors propagate. The existing uniqueness assertion remains.
+It does not walk household ids: each wave's native formatter and the 2021-22
+Panel/Cross_Section namespaces remain the inputs to the framework's
+exactly-once rename. An existing parquet's freshness is not established by
+this absence check.
+
+Verification is synthetic only: 11 targeted cases pass; the original script
+fails seven and passes four with the same fabricated frames and stubbed
+reader/writer leaves. Healthy row order, typed values, NA masks, native keys
+and attrs are exact. No real Country/Feature, provider, cold/warm or Make
+build was run, and no acquisition or scientific baseline changed.
+The script is a country build input, so the change is expected to invalidate
+Burkina country and wave caches; no runtime hash census was performed.
+Ledger: =.coder/ledger/1287-burkina-plot-concatenator.md=.
+
+** Correction: actual table declarations, retirement and YAML (GH #1287, 2026-10-28)
+
+The preceding "verifies that each listed wave has a script" records the first repair.
+A native-script-only predicate wrongly refused legitimate table retirement and YAML-only declarations.
+The compiler now uses actual =Country.waves= and =Wave.data_scheme=, including native scripts and YAML keys.
+Undeclared tables skip before output checks or readers, even with a stale output present.
+Declared outputs use the actual =wave.wave_folder= beneath =data_root()=; absence and reader errors remain loud.
+All-retired keeps the existing no-pieces refusal with no read/write, and declared-empty frames remain concat inputs.
+No producer, native household formatter, panel map, framework rename, population or scientific policy changes.
+This extraction includes no additional survey component, namespace or factor repair.
+
+Author metadata/invented-IO evidence on its recorded framework source: new candidate19PASS versus prior script10FAIL/9PASS.
+These are bounded historical observations with actual product/test prehashes, not exact extracted-head test results.
+The adapted prior test and an additional genuine =id_walk= boundary check await finite independent verification on the extracted source.
+The old missing-builder CONFIGERROR expectation and original results remain historical, not current retirement policy.
+See =.coder/ledger/1287-burkina-plot-concatenator.md= for source pins, scope and verification limits.

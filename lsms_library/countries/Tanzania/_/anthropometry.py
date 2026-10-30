@@ -22,13 +22,23 @@ import json
 
 import pandas as pd
 
+from lsms_library import Country
 from lsms_library.local_tools import get_dataframe, to_parquet
 from lsms_library.paths import data_root
 from tanzania import Waves, id_walk
-import warnings
+
+# GH #1287: declarations belong to logical waves; readers use physical folders.
+country = Country('Tanzania', preload_panel_ids=False)
+declared_folders = {
+    wave.wave_folder
+    for wave in (country[year] for year in country.waves)
+    if 'anthropometry' in wave.data_scheme
+}
 
 pieces = {}
 for t in Waves.keys():
+    if t not in declared_folders:
+        continue
     candidates = [
         str(data_root('Tanzania') / t / '_' / 'anthropometry.parquet'),
         '../' + t + '/_/anthropometry.parquet',
@@ -37,10 +47,14 @@ for t in Waves.keys():
         try:
             pieces[t] = get_dataframe(path)
             break
-        except (FileNotFoundError, Exception):
+        except Exception as exc:
+            load_error = exc
             continue
     if t not in pieces:
-        warnings.warn(f'Could not load anthropometry for {t}')
+        # Both existing paths failed for a declared producer (ledger #1287 §4).
+        raise RuntimeError(
+            f'Tanzania/anthropometry: could not load declared folder {t}; tried {candidates}'
+        ) from load_error
 
 assert pieces, "anthropometry: no wave-level parquets found"
 
