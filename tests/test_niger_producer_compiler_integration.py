@@ -62,131 +62,137 @@ def literal_frame(year):
 
 @pytest.fixture(params=TABLES)
 def actor(request, tmp_path, monkeypatch):
-    table = request.param
-    config, data = tmp_path / 'countries', tmp_path / 'data'
-    build = config / 'Niger/_'
-    build.mkdir(parents=True)
-    data.mkdir()
-    monkeypatch.setenv('LSMS_COUNTRIES_ROOT', str(config))
-    monkeypatch.setenv('LSMS_DATA_DIR', str(data))
-    countries_root.cache_clear()
-    data_root.cache_clear()
-    assert countries_root().resolve() == config.resolve()
-    assert data_root().resolve() == data.resolve()
-    assert Path(sys.modules['lsms_library'].__file__).resolve().is_relative_to(SOURCE)
-    for name in ('get_dataframe', 'to_parquet', 'df_data_grabber', '_ensure_dvc_pulled',
-                 '_warm_dvc_cache_for_feature'):
-        monkeypatch.setattr(local_tools, name, denied)
-    monkeypatch.setattr(Country, 'load_dataframe_with_dvc', denied)
-    monkeypatch.setattr(Wave, 'grab_data', denied)
-    monkeypatch.setattr(subprocess, 'run', denied)
-    monkeypatch.setattr(subprocess, 'Popen', denied)
-
-    def module(name, source):
-        spec = importlib.util.spec_from_file_location(name, source)
-        value = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(value)
-        assert Path(value.__file__).resolve() == source.resolve()
-        return value
-
-    producer = module('new_niger_producer_composition', NIGER / 'wave_producers.py')
-    compiler = module('new_niger_compiler_composition', NIGER / 'niger.py')
-    monkeypatch.setitem(sys.modules, 'niger', compiler)
-    monkeypatch.setattr(producer, '_build_wave_script_target', denied)
-    frames = {year: literal_frame(year) for year in YEARS + ['2024-25']}
-    store, events, outputs = {}, [], []
-
-    def marker(folder):
-        path = data / 'Niger' / folder / '_' / (table + '.parquet')
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.touch()
-        assert path.stat().st_size == 0
-        return path
-
-    def install(*, mechanism='yaml', folders=None, years=YEARS, retire=()):
-        folders = folders or {}
-        # Country's real module registration/mapping takes precedence; this
-        # exact inert declaration module performs no survey/scientific work.
-        (build / 'niger.py').write_text('Waves = ' + repr({y: () for y in years})
-                                      + '\nwave_folder_map = ' + repr(folders) + '\n')
-        (build / 'data_scheme.yml').write_text(yaml.safe_dump({
-            'Country': 'Niger', 'Data Scheme': {table: {'index': '(t, i)'}}}))
-        for year in years:
-            folder = folders.get(year, year)
-            directory = config / 'Niger' / folder / '_'
-            directory.mkdir(parents=True, exist_ok=True)
-            if year in retire:
-                continue
-            if mechanism == 'native':
-                (directory / (table + '.py')).write_text('raise AssertionError("metadata only")\n')
-            else:
-                (directory / 'data_info.yml').write_text(yaml.safe_dump({
-                    table: {'file': 'invented-never-read.dta', 'idxvars': {'i': 'id'}}}))
-        country = Country('Niger')
-        assert country.waves == sorted(years)
-        return country
-
-    def native(make_dir, target, *, force):
-        assert make_dir == build and force is True
-        folder = target.parts[0]
-        events.append(('native', folder, os.environ.get('LSMS_NO_CACHE')))
-        country = Country('Niger')
-        members = [year for year in country.waves
-                   if country[year].wave_folder == folder]
-        store[folder] = pd.concat([frames[year] for year in members])
-        marker(folder)
-
-    def grab(wave, name):
-        assert name == table and os.environ['LSMS_NO_CACHE'] == '1'
-        # Exercise the actual cache read gate against invented marker paths;
-        # it must return before reading/hash-stamping any serialized payload.
-        logical_cache = data / 'Niger' / wave.year / '_' / (table + '.parquet')
-        assert Wave._read_l2_wave_cache(wave, name, logical_cache) is None
-        events.append(('yaml', wave.year, os.environ.get('LSMS_NO_CACHE')))
-        return frames[wave.year]
-
-    def reader(path):
-        folder = Path(path).parts[-3]
-        assert Path(path) == data / 'Niger' / folder / '_' / (table + '.parquet')
-        assert Path(path).stat().st_size == 0
-        events.append(('read', folder))
-        return store[folder].copy(deep=True)
-
-    def writer(frame, path, **kwargs):
-        if str(path) == '../var/' + table + '.parquet':
-            outputs.append(frame.copy(deep=True))
-            events.append(('country-write', table))
-        else:
-            folder = Path(path).parts[-3]
-            assert Path(path) == data / 'Niger' / folder / '_' / (table + '.parquet')
-            assert kwargs['absolute_path'] is True
-            store[folder] = frame.copy(deep=True)
-            marker(folder)
-            events.append(('physical-write', folder, os.environ.get('LSMS_NO_CACHE')))
-        return frame
-
-    monkeypatch.setattr(producer, '_build_wave_script_target', native)
-    monkeypatch.setattr(Wave, 'grab_data', grab)
-    monkeypatch.setattr(local_tools, 'get_dataframe', reader)
-    monkeypatch.setattr(local_tools, 'to_parquet', writer)
-
-    def execute(*, compile=True):
-        before = snapshot(config)
-        originals = {year: frame.copy(deep=True) for year, frame in frames.items()}
-        prior = dict(os.environ)
-        try:
-            producer.produce(table)
-            if compile:
-                runpy.run_path(str(NIGER / (table + '.py')), run_name='__new_invented_composition__')
-        finally:
-            assert snapshot(config) == before
-            assert dict(os.environ) == prior
-            for year in frames:
-                exact(frames[year], originals[year])
-            assert all(p.stat().st_size == 0 for p in data.rglob('*.parquet'))
-
     try:
-        yield table, producer, compiler, config, build, data, frames, store, events, outputs, install, execute
+        with monkeypatch.context() as scoped:
+            # Fixture env/bytecode undo must precede unconditional path-cache
+            # cleanup, including failures before this fixture can yield.
+            scoped.setattr(sys, 'dont_write_bytecode', True)
+            # Keep actor/test attrs/items on their shared outer patch stack:
+            # child undo followed by test undo could otherwise revive a stub.
+            table = request.param
+            config, data = tmp_path / 'countries', tmp_path / 'data'
+            build = config / 'Niger/_'
+            build.mkdir(parents=True)
+            data.mkdir()
+            scoped.setenv('LSMS_COUNTRIES_ROOT', str(config))
+            scoped.setenv('LSMS_DATA_DIR', str(data))
+            countries_root.cache_clear()
+            data_root.cache_clear()
+            assert countries_root().resolve() == config.resolve()
+            assert data_root().resolve() == data.resolve()
+            assert Path(sys.modules['lsms_library'].__file__).resolve().is_relative_to(SOURCE)
+            for name in ('get_dataframe', 'to_parquet', 'df_data_grabber', '_ensure_dvc_pulled',
+                         '_warm_dvc_cache_for_feature'):
+                monkeypatch.setattr(local_tools, name, denied)
+            monkeypatch.setattr(Country, 'load_dataframe_with_dvc', denied)
+            monkeypatch.setattr(Wave, 'grab_data', denied)
+            monkeypatch.setattr(subprocess, 'run', denied)
+            monkeypatch.setattr(subprocess, 'Popen', denied)
+
+            def module(name, source):
+                spec = importlib.util.spec_from_file_location(name, source)
+                value = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(value)
+                assert Path(value.__file__).resolve() == source.resolve()
+                return value
+
+            producer = module('new_niger_producer_composition', NIGER / 'wave_producers.py')
+            compiler = module('new_niger_compiler_composition', NIGER / 'niger.py')
+            monkeypatch.setitem(sys.modules, 'niger', compiler)
+            monkeypatch.setattr(producer, '_build_wave_script_target', denied)
+            frames = {year: literal_frame(year) for year in YEARS + ['2024-25']}
+            store, events, outputs = {}, [], []
+
+            def marker(folder):
+                path = data / 'Niger' / folder / '_' / (table + '.parquet')
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.touch()
+                assert path.stat().st_size == 0
+                return path
+
+            def install(*, mechanism='yaml', folders=None, years=YEARS, retire=()):
+                folders = folders or {}
+                # Country's real module registration/mapping takes precedence; this
+                # exact inert declaration module performs no survey/scientific work.
+                (build / 'niger.py').write_text('Waves = ' + repr({y: () for y in years})
+                                              + '\nwave_folder_map = ' + repr(folders) + '\n')
+                (build / 'data_scheme.yml').write_text(yaml.safe_dump({
+                    'Country': 'Niger', 'Data Scheme': {table: {'index': '(t, i)'}}}))
+                for year in years:
+                    folder = folders.get(year, year)
+                    directory = config / 'Niger' / folder / '_'
+                    directory.mkdir(parents=True, exist_ok=True)
+                    if year in retire:
+                        continue
+                    if mechanism == 'native':
+                        (directory / (table + '.py')).write_text('raise AssertionError("metadata only")\n')
+                    else:
+                        (directory / 'data_info.yml').write_text(yaml.safe_dump({
+                            table: {'file': 'invented-never-read.dta', 'idxvars': {'i': 'id'}}}))
+                country = Country('Niger')
+                assert country.waves == sorted(years)
+                return country
+
+            def native(make_dir, target, *, force):
+                assert make_dir == build and force is True
+                folder = target.parts[0]
+                events.append(('native', folder, os.environ.get('LSMS_NO_CACHE')))
+                country = Country('Niger')
+                members = [year for year in country.waves
+                           if country[year].wave_folder == folder]
+                store[folder] = pd.concat([frames[year] for year in members])
+                marker(folder)
+
+            def grab(wave, name):
+                assert name == table and os.environ['LSMS_NO_CACHE'] == '1'
+                # Exercise the actual cache read gate against invented marker paths;
+                # it must return before reading/hash-stamping any serialized payload.
+                logical_cache = data / 'Niger' / wave.year / '_' / (table + '.parquet')
+                assert Wave._read_l2_wave_cache(wave, name, logical_cache) is None
+                events.append(('yaml', wave.year, os.environ.get('LSMS_NO_CACHE')))
+                return frames[wave.year]
+
+            def reader(path):
+                folder = Path(path).parts[-3]
+                assert Path(path) == data / 'Niger' / folder / '_' / (table + '.parquet')
+                assert Path(path).stat().st_size == 0
+                events.append(('read', folder))
+                return store[folder].copy(deep=True)
+
+            def writer(frame, path, **kwargs):
+                if str(path) == '../var/' + table + '.parquet':
+                    outputs.append(frame.copy(deep=True))
+                    events.append(('country-write', table))
+                else:
+                    folder = Path(path).parts[-3]
+                    assert Path(path) == data / 'Niger' / folder / '_' / (table + '.parquet')
+                    assert kwargs['absolute_path'] is True
+                    store[folder] = frame.copy(deep=True)
+                    marker(folder)
+                    events.append(('physical-write', folder, os.environ.get('LSMS_NO_CACHE')))
+                return frame
+
+            monkeypatch.setattr(producer, '_build_wave_script_target', native)
+            monkeypatch.setattr(Wave, 'grab_data', grab)
+            monkeypatch.setattr(local_tools, 'get_dataframe', reader)
+            monkeypatch.setattr(local_tools, 'to_parquet', writer)
+
+            def execute(*, compile=True):
+                before = snapshot(config)
+                originals = {year: frame.copy(deep=True) for year, frame in frames.items()}
+                prior = dict(os.environ)
+                try:
+                    producer.produce(table)
+                    if compile:
+                        runpy.run_path(str(NIGER / (table + '.py')), run_name='__new_invented_composition__')
+                finally:
+                    assert snapshot(config) == before
+                    assert dict(os.environ) == prior
+                    for year in frames:
+                        exact(frames[year], originals[year])
+                    assert all(p.stat().st_size == 0 for p in data.rglob('*.parquet'))
+
+            yield table, producer, compiler, config, build, data, frames, store, events, outputs, install, execute
     finally:
         countries_root.cache_clear()
         data_root.cache_clear()
