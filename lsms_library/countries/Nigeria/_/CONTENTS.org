@@ -2717,3 +2717,36 @@ remaining shared #1309 dependency, not acceptance of Country empty behavior.
 and actual PH Wave extraction using locally cached data only. It skips when
 that declared blob is absent and never acquires it. No new eligibility,
 attainment, sample-link or PP carry-forward rule is introduced here.
+
+* 2026-10-30 -- Household roster actual runtime checkpoint (GH #1287)
+
+At source =96d9b3970341bfe9f53a0848fbdafe90422e3d74=, dispatch
+=99162779e3dd4730ac6b11674b6a5aed= (job 40647990) executed five native
+producers and the country compiler through GNU Make. Independent selected-source
+keys/order and Sex/Relationship checks account for 301,343 raw roster rows,
+13,713 all-selected-fields-empty exclusions and 287,630 native rows across ten
+PP/PH quarters. Saved-native concatenation exactly matches the compiler;
+normal Country and singleton Feature match production-composed expectations,
+with explicit exact numeric checks as well as axes, dtypes, masks and attrs.
+These composition expectations reuse production mapping/finalization: they do
+not independently validate age/DOB, kinship, panel linkage or sample geography.
+Canonical Age is float despite the local int declaration and the older
+integer-rounding guidance; this checkpoint preserves that contradiction.
+
+The second fresh warm process explicitly records full Country and Feature
+exact passes. Twelve owned parquets retain exact hashes, sizes, modes and
+nanosecond mtimes; no warm raw return, decoder, native/Make call or sanctioned
+write is observed. Both optional-subset actors remain failed overall. Separate
+saved-operand diagnosis supports the 53,250-row W1-PP/W5-PH cache-filter-then-
+finalize composition, while preserving pruned unused index domains, scoped
+attrs and an all-null W2-only =in_housing= column absent from standalone
+native-subset composition. Standalone subset schema/index-metadata equality
+is not accepted.
+
+Initial staging/premature-Make failures, partial early decoder instrumentation
+and the overwritten first subset traceback remain limitations. The first warm
+actor lacks explicit per-comparison pass receipts; acceptance relies on the
+second recorded full-warm passes. Own-round membership, composite sample =v=,
+native source EA and existing panel/recall-window caveats remain distinct.
+This accepts one roster runtime cell, leaving plot_features, community_prices,
+food_coping and housing runtime cells, #1288 failure paths and whole #1287 open.
