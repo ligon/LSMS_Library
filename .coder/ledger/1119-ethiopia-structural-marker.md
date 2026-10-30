@@ -79,3 +79,18 @@ Sample map.py and country sample.py are absent at both heads; failed proposed
 source-read checks were corrected without data access. Actual admission remains
 pending root review of saved-operand plan; no baseline finalized frame substitutes
 for raw inputs or current public expectation.
+
+
+## Qualified actual result and public extraction
+
+Completed dispatch b6e9e49702364b2c9b61a3c00623e9eb uses source f180929e.
+All 20 matching-stage native/compiler/Country/Feature marker predicates pass:
+180,900 rows, 69,024 structural changes, 111,876 nonstructural rows unchanged.
+Both typed Feature compositions, candidate strict Country and fresh-process warm
+pass. All 14 transport failures and original/import/accessor failures remain
+failed. Saved numeric source/sample operands and private source-compatible
+stamps mean composed verification, not a clean raw cold build or fresh sample,
+cache or scientific acceptance. Root accepted sealed independent review
+bd2d229b; the report is under the country recovery path named above. Public
+extraction starts from 1302cec2, preserves the #1364 canonical schema and all
+other work; no test or data replay. Refs #1119 only; no umbrella auto-close.
