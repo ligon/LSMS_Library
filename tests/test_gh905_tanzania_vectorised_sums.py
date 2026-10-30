@@ -129,11 +129,12 @@ def test_plot_input_rows_flags_units_and_na_survive(helper):
     assert seed.xs('2', level='plot_id')['Quantity'].isna().all()
     assert seed.xs('2', level='plot_id')['Quantity_purchased'].isna().all()
     assert seed.xs('3', level='plot_id')['Quantity'].tolist() == [7]
-    # Signed #637 fertilizer-slot sum; crop NA keys stay present.
+    # Signed #637 fertilizer-slot sum stays present; #1119 comment6368100317
+    # supersedes only the old crop-NA spelling (data_info.yml:250–265).
     fert = out.xs('Urea', level='input')
     assert fert['Quantity'].tolist() == [150]
     assert fert['Quantity_purchased'].isna().all()
-    assert fert.index.get_level_values('crop').isna().all()
+    assert fert.index.get_level_values('crop').tolist() == ['(not crop-specific)']
 
 
 def test_livestock_values_all_na_and_owned_filter_survive(helper):

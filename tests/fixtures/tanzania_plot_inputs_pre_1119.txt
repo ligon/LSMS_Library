@@ -1,0 +1,239 @@
+def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
+    """Build canonical ``plot_inputs`` for one Tanzania NPS wave.
+
+    Item-level inputs at grain (t, i, plot_id, input, crop, u) from two
+    modules:
+      sec3a -- AG_SEC_3A plot detail: organic fertilizer (ag3a_41/42/43/44),
+               inorganic fertilizer type 1 (ag3a_47/48/49/51) and type 2
+               (ag3a_54/55/56/58), herbicide (ag3a_60/62_1/62_2/63), pesticide
+               (ag3a_65a/65b_1/65b_2/65c).  One row per (plot, input).
+      sec4a -- AG_SEC_4A seasonal-crop seed: ag4a_08 improved flag, ag4a_10_1/2
+               total seed qty+unit, ag4a_10c_1/2 purchased seed qty+unit,
+               ag4a_12 amount paid.  One SEED row per (plot, crop).
+
+    STORES REPORTED VALUES ONLY.  seed_kg / nitrogen_kg / inorganic_fertilizer
+    any-use flags are transformations over these rows, NOT columns here.
+
+    Parameters
+    ----------
+    t : str            wave id ('2019-20' or '2020-21'); the ``t`` value.
+    sec3a, sec4a : pd.DataFrame
+        raw AG_SEC_3A / AG_SEC_4A frames (convert_categoricals=False).
+    colmap : dict with keys hhid, plot, crop (the id columns, which differ
+        across waves: sdd_hhid/plotnum/cropid vs y5_hhid/plot_id/cropid).
+
+    Returns
+    -------
+    pd.DataFrame indexed by PLOT_INPUTS_INDEX = (t, i, plot_id, input, crop,
+    u) with columns PLOT_INPUTS_COLUMNS.  ``u`` is a key (GH #637): a seed
+    crop label recorded in two units is two rows, never one summed quantity.
+    """
+    c = colmap
+    fert_type_map = _plot_harmonized_codes('harmonize_input')
+    crop_map = _crop_labels()
+    preferred = _unit_preferred_labels()
+
+    def canonical_unit(label, recorded):
+        """A tidy unit label -> its served ``u`` Preferred Label.  A unit
+        code that was recorded but is OTHER (SPECIFY) is ``U_UNKNOWN``, as on
+        ``u``; an unrecorded one stays NA ("not asked" is not a unit)."""
+        if pd.isna(label):
+            return U_UNKNOWN if recorded else pd.NA
+        return preferred.get(label, label)
+
+    na_unit = pd.array([pd.NA] * len(sec3a), dtype='string')
+
+    def _ids(df):
+        return (df[c['hhid']].apply(format_id), df[c['plot']].apply(format_id))
+
+    rows = []
+
+    # --- AG_SEC_4A: SEED (one row per plot-crop) ------------------------
+    if sec4a is not None and len(sec4a):
+        hh, plot = _ids(sec4a)
+        code = pd.to_numeric(sec4a[c['crop']], errors='coerce').astype('Int64')
+        qty = pd.to_numeric(sec4a['ag4a_10_1'], errors='coerce').astype('Float64')
+        unit = pd.to_numeric(sec4a['ag4a_10_2'], errors='coerce').astype('Int64')
+        pqty = pd.to_numeric(sec4a['ag4a_10c_1'], errors='coerce').astype('Float64')
+        # The purchased quantity's OWN unit (GH #637 ruling on decision 3).
+        # Its Stata dictionary is the total unit's (KG / 20 LITER BUCKET /
+        # SMALL CUP / LARGE CUP / OTHER (SPECIFY)) in both held extracts, but
+        # the recorded code is read from ag4a_10c_2 itself: equal codes on
+        # two variables do not make one unit (#1188).
+        punit = (pd.to_numeric(sec4a['ag4a_10c_2'], errors='coerce').astype('Int64')
+                 .map(lambda x: pd.NA if pd.isna(x)
+                      else canonical_unit(_SEED_UNIT_LABELS.get(int(x), pd.NA),
+                                          recorded=True))
+                 .astype('string'))
+        paid = pd.to_numeric(sec4a['ag4a_12'], errors='coerce').astype('Float64')
+        seedtype = pd.to_numeric(sec4a['ag4a_08'], errors='coerce').astype('Int64')
+        seed = pd.DataFrame({
+            'i': hh.values, 'plot_id': plot.values,
+            'input': 'Seed',
+            'crop': code.map(crop_map).astype('string').values,
+            'Quantity': qty.values,
+            'u': unit.map(_SEED_UNIT_LABELS).astype('string').values,
+            # Purchased if a purchased quantity OR an amount paid is recorded.
+            'Purchased': ((pqty.fillna(0) > 0) | (paid.fillna(0) > 0)).values,
+            'Quantity_purchased': pqty.values,
+            'Unit_purchased': punit.values,
+            'Improved': seedtype.map({1: True, 2: False, 3: True})
+                        .astype('boolean').values,
+        })
+        # A seed row is real only if a quantity OR a crop label is present.
+        seed = seed[seed['Quantity'].notna() | seed['crop'].notna()]
+        # crop unresolved -> keep raw code as crop_<code> (do not drop).
+        seed['crop'] = seed['crop'].where(
+            seed['crop'].notna(),
+            code.map(lambda x: f'crop_{int(x)}' if pd.notna(x) else pd.NA)
+                .astype('string').reindex(seed.index).values)
+        rows.append(seed)
+
+    # --- AG_SEC_3A: plot-level inputs (crop = NA) -----------------------
+    hh3, plot3 = _ids(sec3a)
+
+    def _liquid_unit(col):
+        return (pd.to_numeric(sec3a[col], errors='coerce').astype('Int64')
+                .map(_LIQUID_UNIT_LABELS).astype('string'))
+
+    # organic fertilizer
+    used = _yn_true(sec3a['ag3a_41'])
+    org = pd.DataFrame({
+        'i': hh3.values, 'plot_id': plot3.values, 'input': 'Organic Fertilizer',
+        'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+        'Quantity': pd.to_numeric(sec3a['ag3a_42'], errors='coerce').astype('Float64').values,
+        'u': 'kg',
+        'Purchased': _yn_true(sec3a['ag3a_43']).values,
+        'Quantity_purchased': pd.to_numeric(sec3a['ag3a_44'], errors='coerce').astype('Float64').values,
+        'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
+    })
+    # ag3a_44 is asked in KG by the question itself ("How much was
+    # purchased? (KG)"), as ag3a_42 is, hence u = 'kg' above.
+    org['Unit_purchased'] = (
+        pd.Series(canonical_unit('kg', recorded=True), index=org.index, dtype='string')
+        .where(org['Quantity_purchased'].notna(), pd.NA))
+    org = org[used.fillna(False).values]
+
+    # inorganic fertilizer, first and second type
+    def _inorg(used_col, type_col, qty_col, val_col):
+        u = _yn_true(sec3a[used_col])
+        typ = pd.to_numeric(sec3a[type_col], errors='coerce').astype('Int64')
+        label = typ.map(fert_type_map).astype('string')
+        val = pd.to_numeric(sec3a[val_col], errors='coerce').astype('Float64')
+        d = pd.DataFrame({
+            'i': hh3.values, 'plot_id': plot3.values,
+            'input': label.where(label.notna(), 'Other Fertilizer').values,
+            'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+            'Quantity': pd.to_numeric(sec3a[qty_col], errors='coerce').astype('Float64').values,
+            'u': 'kg',
+            # Inorganic fert records a purchased VALUE (TSH), not a separate
+            # purchased qty -> Purchased = value>0; Quantity_purchased NaN.
+            'Purchased': (val.fillna(0) > 0).astype('boolean').values,
+            'Quantity_purchased': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+            'Unit_purchased': na_unit,
+            'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
+        })
+        return d[u.fillna(False).values]
+
+    inorg1 = _inorg('ag3a_47', 'ag3a_48', 'ag3a_49', 'ag3a_51')
+    inorg2 = _inorg('ag3a_54', 'ag3a_55', 'ag3a_56', 'ag3a_58')
+
+    # herbicide
+    uh = _yn_true(sec3a['ag3a_60'])
+    valh = pd.to_numeric(sec3a['ag3a_63'], errors='coerce').astype('Float64')
+    herb = pd.DataFrame({
+        'i': hh3.values, 'plot_id': plot3.values, 'input': 'Herbicide',
+        'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+        'Quantity': pd.to_numeric(sec3a['ag3a_62_1'], errors='coerce').astype('Float64').values,
+        'u': _liquid_unit('ag3a_62_2').values,
+        'Purchased': (valh.fillna(0) > 0).astype('boolean').values,
+        'Quantity_purchased': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+        'Unit_purchased': na_unit,
+        'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
+    })
+    herb = herb[uh.fillna(False).values]
+
+    # pesticide
+    up = _yn_true(sec3a['ag3a_65a'])
+    valp = pd.to_numeric(sec3a['ag3a_65c'], errors='coerce').astype('Float64')
+    pest = pd.DataFrame({
+        'i': hh3.values, 'plot_id': plot3.values, 'input': 'Pesticide',
+        'crop': pd.array([pd.NA] * len(sec3a), dtype='string'),
+        'Quantity': pd.to_numeric(sec3a['ag3a_65b_1'], errors='coerce').astype('Float64').values,
+        'u': _liquid_unit('ag3a_65b_2').values,
+        'Purchased': (valp.fillna(0) > 0).astype('boolean').values,
+        'Quantity_purchased': pd.array([pd.NA] * len(sec3a), dtype='Float64'),
+        'Unit_purchased': na_unit,
+        'Improved': pd.array([pd.NA] * len(sec3a), dtype='boolean'),
+    })
+    pest = pest[up.fillna(False).values]
+
+    rows += [org, inorg1, inorg2, herb, pest]
+    df = pd.concat([r for r in rows if r is not None and len(r)], ignore_index=True)
+
+    # An absent or whitespace-only unit is U_UNKNOWN, with or without a
+    # quantity (#1041 / #1118); a recorded unit is kept verbatim even where no
+    # quantity is recorded.  This runs BEFORE the index is set because ``u`` is
+    # an index level (GH #637, below): a NaN key would be deleted by the first
+    # ``groupby(dropna=True)`` downstream (CLAUDE.md, Site I).
+    missing_u = (df['u'].isna()
+                 | df['u'].astype('string').str.strip().eq('').fillna(False))
+    df.loc[missing_u, 'u'] = U_UNKNOWN
+    df['u'] = df['u'].astype('string')
+
+    df['t'] = t
+    df = df.set_index(PLOT_INPUTS_INDEX)
+    # ``u`` is part of the GRAIN (GH #637), as in the canonical
+    # ``plot_inputs`` index and in Malawi's and the EHCVM countries' builders:
+    # rows recorded in different units stay separate rows.  The remaining
+    # duplicates of the 6-level key are summed (reported quantities; OR the
+    # purchased / improved flags): a plot naming the same inorganic-fertilizer
+    # product as both type 1 and type 2 (kg + kg), or two raw crop codes that
+    # share a canonical Seed crop label (e.g. Beans + Cowpeas -> Pulses)
+    # recorded in the SAME unit.  One known exception is NOT commensurable:
+    # two codes that BOTH recorded OTHER (SPECIFY) are summed into one
+    # ``Unknown`` row although two "other" units are not known to be the same
+    # unit (2 groups per wave in the held sources; residual, see CONTENTS.org).  Before GH #637 ``u`` was
+    # a column reduced with 'first', so a group in two units was served as the
+    # sum of incommensurable quantities under the first unit: in the held
+    # 2020-21 sources 6 Seed/Pulses groups in two recorded units (bucket/kg,
+    # bucket/small cup, kg/large cup, kg/small cup) and 4 more where a
+    # quantity in OTHER (SPECIFY), i.e. ``Unknown``, was summed into a kg or
+    # large-cup quantity; 2019-20 had 1 of the latter kind.  ``min_count=1``
+    # so an all-NA group stays NA (a plain ``sum`` would zero the all-NA
+    # Quantity_purchased of fertilizer rows, which record only a purchased
+    # VALUE, not a purchased quantity).  ``dropna=False`` keeps the NA-crop
+    # (plot-level input) rows.
+    # The type-1 / type-2 fertilizer pairs stay summed by ruling (@ligon,
+    # 2026-10-23: the form asks two slots, read as two applications); the
+    # identical-quantity pairs are recorded in CONTENTS.org as possible
+    # double entry.
+    #   Unit_purchased -- Quantity_purchased is summed only where every
+    # purchased quantity in the group is in ONE recorded purchase unit; a
+    # group whose purchase units disagree would be an incommensurable sum,
+    # so it is raised, never reduced (none in the held sources: 0 of the
+    # 11 / 86 lumped Seed groups).  Rows without a recorded purchase unit
+    # carry no purchased quantity to add (the unit is asked only when one is
+    # recorded), so they do not disagree.
+    if not df.index.is_unique:
+        def _sum1(s):
+            return s.sum(min_count=1)
+
+        def _agreed_unit(s):
+            units = s.dropna().unique()
+            if len(units) > 1:
+                raise ValueError(
+                    f"plot_inputs {t}: purchased quantities in different "
+                    f"units {sorted(map(str, units))} share one key "
+                    f"{s.index[0]!r}; Quantity_purchased cannot be summed")
+            return units[0] if len(units) else pd.NA
+
+        df = df.groupby(level=PLOT_INPUTS_INDEX, dropna=False).agg({
+            'Quantity': _sum1,
+            'Purchased': 'max', 'Quantity_purchased': _sum1,
+            'Unit_purchased': _agreed_unit,
+            'Improved': 'max',
+        })
+        df['Unit_purchased'] = df['Unit_purchased'].astype('string')
+    df = df[PLOT_INPUTS_COLUMNS]
+    return df

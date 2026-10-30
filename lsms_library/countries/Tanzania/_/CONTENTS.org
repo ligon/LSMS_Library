@@ -1938,6 +1938,43 @@ On those rows =Quantity_purchased= and =Quantity= are in different units; no con
 Where the 6-level collapse sums two lumped codes' purchased quantities, it requires their purchase units to agree and raises otherwise.  No group in either wave disagrees (0 of 11 / 86 lumped Seed groups).
 Served rows are unchanged otherwise: index identical and every other column frame-equal to =5239daecd=.
 
+** Crop markers (GH #1119, source implementation 2026-10-30)
+
+The preceding statement, "non-seed inputs deliberately have no crop value",
+records the exact pre-migration behavior. The approved
+[[https://github.com/ligon/LSMS_Library/issues/1119#issuecomment-6368100317][#1119 marker ruling]] supersedes that representation: branch-proven
+plot-level organic/inorganic fertilizer, herbicide and pesticide rows use
+=(not crop-specific)=. A retained seed row whose crop is unrecorded uses
+=unknown_crop=; recorded unmapped integers and supported literal identities
+pass through. This crop marker is distinct from =plot_id=Farm-level= and
+=unknown_plot=. Tanzania has no ruling treating crop zero as unrecorded;
+an unmapped zero passes through as =0=. Existing fractional/unsupported
+numeric conversion refusals remain in force.
+
+The original Quantity-or-mapped-crop seed gate still runs before any fallback
+or marker, so labels cannot admit blank stubs, purchase-only or flag-only rows.
+The existing =crop_<integer>=/NA legacy keys govern the unchanged conditional
+reduction and its sort order; only afterward is the crop axis replaced.
+Conflicting desired identities within a legacy group, or new output-identity
+collisions after relabelling, raise instead of splitting or reducing again.
+The native source's nondefault-index fallback behavior is preserved too;
+ambiguity exposed by it refuses rather than silently changing membership.
+
+Synthetic tests call the current and exact frozen pre-migration production
+functions on invented frames for both modern colmaps. They compare complete
+axes/domains, EA masks, exact nonmissing NumPy values, dtypes, order and typed
+attrs. This is source-stage evidence only: no native sources/Make, actual
+Country/Feature, retained survey/cache witnesses or fresh-warm validation ran.
+The historical native CALL/RETURN NA-domain failures (407 / 2,423 rows) remain
+failed evidence, not newly normalized or accepted results.
+
+The four logical UPD rounds sharing =2008-15=, UPHI/r_hhid back-casting,
+Extended/Refresh split and urban booster, live WAITING #114, unit-key/Unknown
+residual, signed two-slot sums and Improved-OR caveat remain separate.
+Neither #1120 observation policy nor the held #905 agriculture optimizer is
+changed. See =.coder/ledger/1119-tanzania-crop-markers.md= and the bounded
+dispatch report for verification results and follow-on limits.
+
 * crop_production: the collapse and the "did not harvest" zeros (GH #637, 2026-10-23)
 
 =crop_production_for_wave= stacks =AG_SEC_4A= (seasonal), =6A= (fruit trees) and =6B= (other perennials) at =(t, i, plot_id, j)= and collapses duplicate keys.
@@ -2533,3 +2570,55 @@ Dispatch =b6778c4acbf941eaa93bd1a1061aa881=, job =40653376=; private result
 =e2204963b483dea889ade6999d35d14baec5ae0e=. Independent review SHA256
 =ed305697cb7cac14bd4b1b1aa9a9f1e713494ae56440030db460ea8d8151f5e4=;
 [[https://github.com/ligon/LSMS_Library/issues/1287#issuecomment-6527690457][accepted bounded checkpoint]].
+
+* 2026-10-30 -- Crop-marker actual checkpoint (GH #1119)
+
+The source-stage record above now has qualified actual product support at
+=7e2b4e4487ca372bad2e2d6a7517b8d6821177de=. Four authenticated held sources
+(7,252,726 bytes) yielded untouched captured frames; subsequent source reads
+returned independent copies. The unchanged native helper/reducer and an
+independently derived source-branch marker oracle agree at matching stages.
+Rows remain 1,775 / 7,934 (9,709 total); structural output labels are
+407 / 2,423. All actual retained seeds are mapped: missing/unmapped/literal
+and stub cases remain source/synthetic coverage, not newly observed cases.
+
+Original Make completed both native producers, then failed at a compiler read
+because the observer shifted stack-based data-path resolution. That stopped
+167.209-second/exit-one unit remains failed. A separately root-reviewed and
+released 600+5 continuation reused the closed native prerequisites via explicit
+=make -o=, executed the actual compiler, then FIRST normal cold Country/Feature
+routing and fresh-process warm. The normal cold route legitimately rebuilt
+two natives from four captured-frame copies; no new raw capture occurred.
+Continuation closed in 164.613 seconds with unchanged source/operator and no
+owned descendants. No production routing, compiler or finalizer was stubbed.
+
+Matching native/compiler/API writer CALL, prepared RETURN and sanctioned-reader
+storage comparisons pass. Full and both modern-wave subset Country and aligned
+singleton Feature (=currency=None=) pass; all six fresh-warm requests are exact.
+Comparisons include complete axes/domains/codes, row order, dtypes, EA masks,
+exact nonmissing NumPy values and typed attrs. Seven L1/target paths and
+captured files stay exact; warm raw/saved-source/helper/script/target-writer
+observations are zero. The sole qualified dependency is a source-compatible
+1,701,051-byte finalized sample provider, not a fresh normal sample cache,
+restamp or new sample-source build.
+
+The worker task remains *unfinished for the original exact decoder-count
+requirement*: the observer recorded zero events while missing the real
+=from_dta=/=StataReader.read= identities. Four successful captures are not
+retrospectively a proven four decoder calls. Corrected continuation observation
+proves zero new decoder/raw entries, without replay to repair old evidence.
+All eight original strict transport failures and five continuation
+RETURN/bare-reader failures remain failed. Sanctioned-reader matching stages
+pass; no actual frame was normalized to turn failures green. Private DVC tmp
+metadata was explicitly authorized and closed with only zero-byte =btime=;
+the original tracked-capability-CSV scan false positive remains recorded.
+Directory/exhaustive-syscall/hostile-escape/memory-peak proof is not claimed.
+
+Dispatch =b43e2115aed84ad0a1fd58f5c23ffd4d= (job 40655396); original94-file
+manifest =9248f59b989e3802f0e4e977766575a60981b5ecba8334981b5125ad282f4aff=,
+continuation181-file manifest
+=d1b911403af341f0b29d96602aa866f402f64bd8f1f817dd3a5889eea4d1dea5=.
+Independent review =9e5d6b0abc60ca8ea6179744d75b5cb3157c545a12c23d5e1af661de92f8aaaf=
+supports this narrow marker boundary while retaining unmet instrumentation.
+Unknown-unit/Improved-OR, legacy-group conflict/grain, panel/UPHI and WAITING114
+remain separate. No umbrella #1119/#1120/#1287/#1288 closure is claimed.
