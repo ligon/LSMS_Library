@@ -98,3 +98,48 @@ sources can supply normal once-only walking; no crosswalk regeneration is needed
 Public/private weight/refresh/GPS/WAITING829 caveats and9unresolved rows remain.
 No new user approval is required by internal preparation fields: user already
 authorized this investigation; root reviews concrete technical scopes/resources.
+
+
+## Phase4 decoded Wave and normal API results — distinct finite executions
+
+The earlier source-preparation and remaining-gate sections above are historical
+records, superseded only for these measured scopes. Root ran one normal decoded
+2015-16 Wave.housing/sample observation on the same two MD5-verified sources:
+three convert_categoricals=True reads,3312housing/3305native-sample rows,
+3303native-v matches and9missing. Full decoded Roof/Floor payload/order/dtypes,
+source frames/attrs and file metadata remained exact. One expected unresolved-key
+warning was retained. This observation did not itself run Country/Feature.
+
+At public candidate e7fd7224701ad6020c85eccbc8aeebcab6ba401a (product/test033883f0f
+unchanged), root then ran the frozen normal API script once per process: private
+seeded-cache rebuild followed by fresh-process warm, each core32/8GiB/120+5s.
+Ten MD5-verified L1 objects(5,014,704B) and ten parquet seeds(931,169B) were copied
+into an isolated data root. Country housing seed was omitted to avoid an all-wave
+housing coverage union. This was a seeded rebuild, not blank-cold validation.
+No assume-fresh or hash rewrite was used; normal invalidation rebuilt sample
+across all eight waves, requiring11decoded source reads on10unique objects.
+Country.housing(waves=['2015-16']) and Feature('housing')(['Uganda'],
+waves=['2015-16'],currency=None) returned exact equal frames:3312rows,
+3303nonnull-v and9missing-v. Exactly one effective2015housing walk occurred.
+Both strict sanctioned-oracle roundtrip comparisons passed.
+
+Fresh-process warm passed exact complete-frame/dtype/categorical/attrs checks,
+with zero raw reads and zero walker calls. All21 private cache entries retained
+exact SHA256/size/mode/mtime snapshots; all10 L1 objects were unchanged through
+cold as well. The15 selected product/carrier/sidecar/crosswalk hashes agreed
+before/after both processes. Both outer exits were0 (13.20s cold,7.01s warm;
+script intervals12.54s/6.43s). Saved-result independent review used ordinary
+receipts/source only, with no payload/oracle re-open or actor replay.
+Cold result SHA256:1c1ed7bab6dd680c0063b6a45be67264785ef2a2151d77666e0c1f04cb3b7060.
+Warm result SHA256:c9ba6ba24b80465a930e03981104b74343247804ff669b409ad7d7c2a0417cde.
+
+Limits: nine unresolved recorded housing keys remain, without approximate
+linkage or eligibility inference; AGSEC1 was never read or used. The cold sample
+rebuild emitted existing Stata label-table warnings for h1bq1/h1bq3.
+ligonlibrary.dataframes.from_dta warns when a referenced value-label dictionary
+is absent and retains that raw column; the message-only warning collector does
+not identify which source/call emitted each warning. No label repair or broader
+sample scientific acceptance follows. The public/private weight, refresh/DDI,
+2019LOGBOOK, GPS TODO and WAITING829 caveats remain. Other housing waves and Make
+were not verified here. Exact public-head configured CI remains independently
+reviewed by root. No additional raw-source or API execution budget is inferred.
