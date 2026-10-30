@@ -35,3 +35,14 @@ there is an actual served residual. No blanket shared NaN conversion.
 ## §6 Open decisions
 Purchase measurement representation (#1190) and use/eligibility (#1174) remain
 human-review issues. They are not decided by this unit census.
+
+## §7 Verification outcome
+OK (§2–§5): fresh cached-source Country/Feature calls on all four waves serve
+179,917 rows, 240 Unknown units and no null, float-NaN, blank or stringified
+missing unit. No production patch is warranted. Saved #1190 operands were rejected
+as current API evidence because country.py differed; current builds have their own
+source MD5/SHA256, config/code and private-witness bindings. Fifty target tests pass
+(17 requires_s3 deselected). The report preserves the initial Feature all-null-column
+comparison failure and Arrow receipt-count failure; neither is a production fix.
+No REINVENTION or contract CONTRADICTION: #1251 is reused, #1323/#1190 boundaries
+remain exact. Documentation-only changes add no cache invalidation cost.
