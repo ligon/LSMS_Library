@@ -95,6 +95,25 @@ def _uncached_yaml_loads():
             os.environ.pop('LSMS_NO_CACHE', None)
 
 
+
+def _yaml_diagnostic_union(accessor, table, members):
+    """Preserve complete cold reports for logical members and physical legacy.
+
+    Wave.grab_data files its reports under member.year, even when its output
+    folder is mapped/shared. The existing physical selector remains last for
+    explicitly tagged legacy reports. Match the ledgers' append-unless-whole-
+    dict-equal rule: never sum counts, overwrite by identifiers or retag reports.
+    """
+    selectors = dict.fromkeys([member.year for member in members]
+                              + [members[0].wave_folder])
+    reports = []
+    for selector in selectors:
+        for report in accessor('Niger', table, selector) or ():
+            if report not in reports:
+                reports.append(report)
+    return reports or None
+
+
 def produce(table):
     """Build every declared input in order; propagate errors before compilation."""
     country, waves, _ = discover(table)
@@ -127,8 +146,8 @@ def produce(table):
             destination.parent.mkdir(parents=True, exist_ok=True)
             tools.to_parquet(
                 frame, destination, absolute_path=True,
-                grain_audit=_wave_grain_audit('Niger', table, wave.wave_folder),
-                datetime_audit=wave_datetime_audit('Niger', table, wave.wave_folder),
+                grain_audit=_yaml_diagnostic_union(_wave_grain_audit, table, members),
+                datetime_audit=_yaml_diagnostic_union(wave_datetime_audit, table, members),
                 build_drops=[record for member in members for record in
                              (_wave_build_drops('Niger', table, member.year) or [])]
                             or None,
