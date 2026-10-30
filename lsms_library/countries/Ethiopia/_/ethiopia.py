@@ -2599,8 +2599,8 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
 # fills its `u` level the same way).  We tag those rows with a reserved,
 # clearly-non-crop label so the index stays clean and the crop axis is never
 # silently corrupted; downstream code selects crop-specific inputs with
-# `j != 'Whole Plot'`.
-WHOLE_PLOT_SENTINEL = 'Whole Plot'
+# `j != '(not crop-specific)'` (GH #1119; task ledger §§3–4).
+WHOLE_PLOT_SENTINEL = '(not crop-specific)'
 
 # Reported nitrogen-fertilizer types whose kg is recorded per plot in §3.
 # (N-content factors live in transformations, NEVER here.)
