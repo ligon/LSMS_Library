@@ -4332,3 +4332,68 @@ Documentation and ledger only: no build input or cache hash changes, no re-warm
 cost introduced. Reviewable receipts and scripts are in dispatch
 =95c34db5277843d2b00fa5a597b6eda5/evidence/REPORT.md=; private operands are excluded
 from the evidence bundle and repository.
+
+* GH #1278: two unsubstantiated string-based longitudinal matches (decision open)
+
+At =10ad99d62=, the seven =function: cs_i= declarations in 2019-20
+=data_info.yml= are ignored by =Wave.column_mapping=. The actual formatter
+syntax is =mapping:=. The investigation checked ten YAML tables and two
+script tables (=food_coping=, =plot_features=). Their household-grain outputs
+or merge inputs use bare IHS5 =case_id= and join the 2019-20 sample; the served
+=cluster_features= table itself is cluster-grain. This is a namespace
+observation, not acceptance of every table or of longitudinal matching.
+
+*New idiosyncrasy, source-backed on 2026-10-30:* all 11,434 IHS5
+cross-sectional identifiers are unique and nonmissing and share no value
+with the 3,178 raw or canonical 2019 IHPS identifiers. They also share no
+key or value with any of the three committed =updated_ids= maps. However,
+*two* are equal to identifiers in the 12,271-household IHS3 2010-11 sample.
+These are two unsubstantiated string-based longitudinal matches: equality does
+not establish that they name the same physical households, and independent
+redraws could sample a household again, so different physical households are
+not proved either.
+The =local_tools.panel_attrition= helper intersects identifier sets; on the
+actual 2010/2019 *sample spine*, its transition count is 1,454. A counterfactual
+that prefixes only the 11,434 IHS5 identifiers makes it 1,452, with all sample
+rows, native payloads and 3,178 panel identifiers unchanged. This is NOT a
+run of =Country.panel_attrition= on an all-wave roster.
+
+The documentation is in tension: the GH #637 entry calls the bare-2019
+asymmetry "a deliberate, already-recorded decision", whereas the GH #1260
+entry says the =cs_i= comments "describe intent, not behaviour". Neither
+statement establishes that the two cross-sample coincidences are links.
+The GH #894 / PR #1265 crosswalk remains exact: rebuilding its frame from
+its three declared cover sources reproduces the committed maps; it does not
+link the independent IHS5 half.
+
+*No namespace repair is selected here.* Retaining bare identifiers and
+removing dead declarations preserves existing within-wave joins, but leaves
+the longitudinal coincidence. A =cs-19-= migration must update the seven
+blocks AND the four other bare-ID YAML tables (=subjective_well_being=,
+=food_security=, =shocks=, =assets=), plus all ten household script producers
+(=food_acquired=, =crop_production=, =plot_inputs=, =plot_labor=,
+=plot_features=, =livestock=, =anthropometry=, =people_last7days=,
+=food_coping=, =months_food_inadequate=). =community_prices= is cluster-grain.
+The panel overrides, original source identifiers, split suffixes and committed
+crosswalks must remain unchanged. A seven-key replacement alone is unsafe.
+
+The bounded candidate experiment removed only the seven dead declarations,
+then restored the original YAML byte for byte. Native payload comparisons
+use dtype equality, missing masks and exact nonmissing arrays (tiny and
+nextafter negative controls), not pandas' approximate float comparison.
+Two full-frame comparison failures are retained: the initial partial sample
+cache omitted 2004-05, preventing the framework's all-wave =v= join; after
+that source was staged, frames acquired =v=. The plot frame also changed
+its household index dtype from nullable =string= to =str= on that route.
+Those observations do not establish full API-frame equality. They do not
+alter the measured household string sets or the two coincidences.
+
+Independent source/receipt review supports this qualified diagnosis; it does
+not select a namespace policy. Niger also prefixes EHCVM identifiers to prevent
+matching its separate ECVMA panel, and Malawi already uses =cs-17-= in 2016.
+These are precedents for an atomic migration, not proof that activating only
+seven mappings is safe. GH #1278 remains open for a maintainer namespace
+ruling and verification of the selected alternative. The
+private dispatch evidence is =ad30c7b83dc24ab8b01696180964b318/evidence/REPORT.md=;
+it contains aggregate counts, parser tests, a candidate diff and explicit
+verification limits. No household identifiers are included in that evidence.
