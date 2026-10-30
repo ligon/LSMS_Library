@@ -23,8 +23,11 @@ individual_education:
     # carries the labelled "NN. LEVEL" attainment string here too.  Raw
     # labels mapped onto the canonical ordinal vocabulary via the
     # row-additive harmonize_education table.
-    file: Post Harvest Wave 5/Household/sect2_harvestw5.dta
+    file:
+        - Post Harvest Wave 5/Household/sect2_harvestw5.dta:
+            t: '2024Q1'
     idxvars:
+        t: hhid
         i: hhid
         pid: indiv
     myvars:

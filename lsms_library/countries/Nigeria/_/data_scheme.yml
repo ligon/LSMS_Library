@@ -121,18 +121,21 @@ Data Scheme:
   individual_education:
     # Highest education level completed per household member (GH #171).
     # Wired on the YAML path (per-wave _/data_info.yml block), mirroring
-    # Uganda -- one post-harvest section-2 file per wave, no script.  Like
-    # the other Nigeria YAML-path tables (shocks, assets), each wave is
-    # tagged on BOTH of its quarter t values (PP + PH), so the section-2
-    # rows appear under both 2010Q3/2011Q1, 2012Q3/2013Q1, etc.
+    # Uganda -- the selected post-harvest section-2 series is dated only
+    # to each wave's PH visit, not duplicated at PP. Earlier W1/W2 PP
+    # attainment questions are separate sources and remain unwired here.
+    # Quarter t values label logical visits; PH fieldwork can extend
+    # beyond calendar Q1.
     # Educational Attainment = highest level completed: s2aq9 in W1-W4
     # post-harvest (sect2a_harvestw1/w2, sect2_harvestw3/w4), s2q9 in W5
     # (sect2_harvestw5).  Raw "NN. LEVEL" / cased labels are harmonized
     # onto the canonical ordinal vocabulary via the row-additive
     # harmonize_education table (global base + Nigeria delta in
-    # _/categorical_mapping.org).  W1/W2 coverage is low (~640/310 rows):
-    # those post-harvest sections recorded the level only for members
-    # who had left school.
+    # _/categorical_mapping.org). W1 coverage is low (~640 rows); the
+    # held W2 file has 313 answers from new members aged 5+ who ever
+    # attended school, including 175 current students (CONTENTS.org, #1292).
+    # This contradicts the W2 left-school-only explanation. W1 and the
+    # exact printed W2 skip sequence remain unverified.
     index: (t, i, pid)
     Educational Attainment: str
 

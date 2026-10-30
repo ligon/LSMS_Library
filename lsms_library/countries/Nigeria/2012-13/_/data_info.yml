@@ -56,12 +56,16 @@ panel_ids:
 
 individual_education:
     # GH #171: highest education level completed per household member.
-    # Post-harvest section 2 (sect2a_harvestw2) records s2aq9 only for
-    # members who had LEFT school -> low coverage (~310 rows) in W2.
+    # Post-harvest section 2A records s2aq9 for new members aged 5+
+    # who ever attended school (313 held-source answers, including 175
+    # current students). See CONTENTS.org; not a left-school-only series.
     # Raw labels mapped onto the canonical ordinal vocabulary via the
     # row-additive harmonize_education table.
-    file: Post Harvest Wave 2/Household/sect2a_harvestw2.dta
+    file:
+        - Post Harvest Wave 2/Household/sect2a_harvestw2.dta:
+            t: '2013Q1'
     idxvars:
+        t: hhid
         i: hhid
         pid: indiv
     myvars:

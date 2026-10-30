@@ -2535,3 +2535,55 @@ source/config, sample/cluster, education and scientific changes. Invented extra
 price axes in tests check opaque transport; they do not add native production
 semantics to this baseline. Previous qualified community timeout/traceback
 observations remain distinct from new extracted-candidate verification.
+
+* W2 individual_education: new members, including current students (GH #1292)
+
+Fresh cached-source diagnosis, 2026-10-29, on public =d65e8b136= and the
+W2 timing block of draft PR #1318 (=c951c6a2a=). The selected source is
+=2012-13/Data/Post Harvest Wave 2/Household/sect2a_harvestw2.dta=,
+sidecar md5 =6dc65a2e5cea1ccf92a480b2bd27c581= (verify against the sidecar).
+
+The earlier W2 comment, "members who had LEFT school", is contradicted by
+this source. Its own variable labels identify =s2aq1= as new household
+membership, =s2aq2= as age five or older, =s2aq6= as ever attended school,
+=s2aq9= as highest educational level completed, and =s2aq13= as currently
+in school in 2012-2013. Of 26,305 unique =(hhid, indiv)= rows:
+
+- 520 answer YES to new membership; 390 of those answer YES to age five or
+  older; 313 of those answer YES to ever attended school.
+- Those 313 are EXACTLY the rows with non-null =s2aq9=. Of them, 175 are
+  currently in school and 138 are not. There are 25,992 null attainment
+  cells; this file is not a full-population attainment series.
+- This establishes the observed routing pattern, not every printed skip
+  instruction: the W2 household questionnaire blobs were unavailable in
+  the selected cache. The W1 left-school explanation is not adjudicated.
+
+The currently selected PH series and the separate PP education measurement
+must remain distinct. Both declared W2 PP education blobs (Stata and CSV)
+were unavailable in this cache, so this diagnosis neither reconstructs PP
+attainment nor concludes that PP had none. The draft's PH-only selection
+corrects the date of the selected source, not its population coverage.
+
+The 313 answers join uniquely to the PH household cover page. Its recorded
+visit dates range from 2013-02-02 through 2013-07-11: February 73, March 226,
+April 7, June 4, July 3; none is missing. Thus 14 are outside calendar Q1.
+These are recorded cover-page dates, not independently verified interview
+completion dates. =2013Q1= labels the logical PH visit, not a recall window
+or a guarantee of an interview during calendar Q1.
+
+The ordinary Wave comparison preserves all 26,305 PH rows, keys/order,
+values, 25,992 nulls and dtypes exactly under the draft W2 timing block;
+its PP result is schema-preserving empty. Baseline Country serves 313
+non-null answers under EACH round (626 total). With fresh private caches,
+the draft W2 block serves 313 PH-only rows through Country; these match
+baseline PH exactly, including the sample-joined cluster keys. The all-round
+49,770-row sample is unchanged, and warm mixed-round reads equal cold reads.
+A PP-only Country request is cache-dependent: warm after the mixed-round
+build it returns zero rows, but cold it attempts Make fallbacks and raises
+"no wave-level build succeeded". That is actual-source evidence for the
+remaining shared #1309 dependency, not acceptance of Country empty behavior.
+
+=tests/test_nigeria_w2_education_source.py= checks the source routing pattern
+and actual PH Wave extraction using locally cached data only. It skips when
+that declared blob is absent and never acquires it. No new eligibility,
+attainment, sample-link or PP carry-forward rule is introduced here.
