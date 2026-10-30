@@ -98,3 +98,23 @@ needed. Test plan: the existing country-local metadata controls, updated to
 verify twelve exact keys, uncertain tier behavior, unchanged default/series
 dispatch and closed-verdict evidence gate. Approved mounted Python, private
 paths, core36/thread1, bounded runtime; no microdata or Country/Feature actors.
+
+### Verification against the ledger
+
+OK (anchored on §§2–5): seven country-local metadata tests passed in0.34s
+at source36d96dcdd2a404dc23587ea488efbea7d609ca41. Exact source/config/package
+identity was asserted, all selected file hashes remained identical, no forbidden
+operation occurred, and the private data tree remained empty. The bounded
+runner used core36, all native/build threads1, 8GiB and120+5s; whole process
+4.72s. Twelve exact keys stay open under absent/undeclared/dropped semantics,
+default loading and series registries are untouched, and unsupported future
+evidence-free closes remain rejected. No broad suite or API measurement.
+
+Three earlier runner starts stopped before pytest on ordinary import discovery:
+first ldconfig, then its second magic-compatibility invocation, then fc-list.
+All refusals and exact source closure were preserved. The successful fresh
+runner allowed only the two exact pinned read-only ldconfig probes and exact
+fc-list help/format probes during imports; data/network/database and other
+subprocess traps remained active. No source or test change followed those
+environment observations. The current final commit adds only this ledger
+verification to the tested source. C1/C3 and live integration remain open.
