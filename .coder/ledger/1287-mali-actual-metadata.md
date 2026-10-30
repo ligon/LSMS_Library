@@ -77,3 +77,25 @@ corrupt invented answers must preserve exception cause and refuse partial writes
 - HELD (§6): new actual metadata carrier needs root-reviewed project-import /
   pytest/runtime/owned-write containment; v1guard cannot admit it. Both cohorts
   remain unexecuted and real data/API/Make/custody budgets remain held.
+
+## Recovery result, 2026-10-29
+
+The exact ac2 carrier completed 231 unique cases, 693 passing setup/call/teardown
+stages and 231 closed compiler metadata epochs (33 per table). Independent
+Ethiopia review authenticated the saved protocol/JUnit and all 1690 copied
+ordinary evidence members. The original whole actor failed after tests: a
+POST source-hash read of test_gh1001_no_intree_credential_write.py was refused
+by the credential-name filter. Actor exit1/accepted0 and outer publication
+exit124 remain recorded; final runtime/data/operator acceptance and transaction
+completion are missing. This is qualified passing test-phase evidence, not a
+clean whole-guard result. No cases were replayed for extraction.
+
+The public composition retains exact seven compiler and actual-carrier bytes
+from ac2b6ab7f26ccc891e9471a8446e64ac5faae035, with the three source ledgers.
+The excluded stub carrier and private review tooling are not import dependencies.
+This ledger result note changes no executable source or test assertion.
+
+Evidence: slurm_logs/isa_recovery_2026-10-29/Mali/
+independent-Ethiopia-compiler-v3-result-review.md and ROOT-ATTEMPT-operator-v3.json
+in the recovery checkout. Real-source, Make, Country/Feature, cache re-warm,
+shared-folder semantics and scientific acceptance remain incomplete.
