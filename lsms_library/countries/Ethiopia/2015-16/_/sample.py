@@ -11,6 +11,8 @@ import sys
 sys.path.append('../../../_/')
 from lsms_library.local_tools import get_dataframe, format_id, to_parquet
 import pandas as pd
+sys.path.append('../../_/')
+from ethiopia import with_agriculture_cover_households, ea_id2_crosswalk
 
 df = get_dataframe('../Data/sect_cover_hh_w3.dta')
 
@@ -47,6 +49,15 @@ sample['strata'] = sample['strata'].str.strip()
 sample['panel_weight'] = sample['weight']
 
 sample['t'] = '2015-16'
+
+# D1: append recorded agriculture-only households; HH rows retain precedence.
+hh_codes = get_dataframe('../Data/sect_cover_hh_w3.dta', convert_categoricals=False)
+pp = get_dataframe('../Data/sect_cover_pp_w3.dta', convert_categoricals=False)
+xw = ea_id2_crosswalk(hh_codes, get_dataframe(
+    '../../2013-14/Data/sect_cover_hh_w2.dta', convert_categoricals=False))
+sample = with_agriculture_cover_households(
+    sample, '2015-16', hh_codes, df, pp,
+    {'hhid': 'household_id2', 'ea': 'ea_id2', 'weight': 'pw_w3', 'rural': 'rural', 'pp_ea': 'ea_id'}, rural_map, ea_crosswalk=xw)
 sample = sample.set_index(['i', 't'])
 
 to_parquet(sample, 'sample.parquet')
