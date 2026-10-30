@@ -62,9 +62,31 @@ metadata. One bounded local1CPU/8GiB verification in the existing normal-QoS
 Slurm40561868 is sufficient unless evidence requires a separate normal job.
 Use private data/config/L1 pointers and thread limits1; no shared cache writes.
 
-## §6 Remaining gates
-Independent red-team interpretation after diagnosis; root arranges Ethiopia
-review. Any unresolved round/displacement interpretation stays explicit on
-the issue, with a proposed comment for root (no public write here). Root owns
-publication/merge. First prepare and surface this ledger, then implement only
-the smallest justified change; no source helper or coordinate-policy invention.
+## §6 Verification and remaining gates
+W5-only source diagnosis verifies4883 uniquehhid/55columns, all paired coords;
+PP112/708 raw groups decompose into real34/510 plus ea0pseudo78/198. PH raw
+real24multifix becomes31under existing approved refined identities; all31
+repairedHH have fixes. No key or coordinate policy changes.
+
+One genuinely new candidate comparison against exact public188adf03 preserves
+sample/HH payload/weights. Existing Site2 produces PP911/886pairs, PH900/900;
+selectedHH changes14/0 and selected Region/District/Rural/Derivation changes0.
+Every complete selected pair equals its actual selected sourceHH. The current
+guard refused one import-time urllib3._has_ipv6 socket constructor and exits1
+after scientific assertions/results; keep this distinct from clean acceptance
+and earlier unknown-caller diagnosis. No replay to clear a guard badge.
+
+Eight scoped invented-source tests pass (zero raw/source-cache reads); peer's
+five independent boundaries pass on productd07. The obsolete W5 no-geo routing
+case is corrected by test-onlyee7013, without product changes or peer replay.
+An additive SOURCE-IDENTITY receipt hashes the same five blobs after comparison:
+all explicit hash:md5 rawMD5s match, with actualSHA256/size; original path/size
+qualifications remain historically true. No decoding/build rerun for hashing.
+
+Root/peer final ordinary review and publication remain. No external writes or
+merge, API/Make/Feature/warm-cache/all-wave replay, acquisition, country-specific
+stayer filter, averaging or claim of visit-specific physical location. Physical
+EA-location interpretation remains an explicit #161/#841/#978 limit, not a new
+unapproved representative policy. Source arrays/IDs are not exported publicly. Module/schema whole-file hashes
+can invalidate other Nigeria table caches; no fingerprint census, cache clear
+or rewarm is performed for that implementation cost.
