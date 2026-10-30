@@ -4283,7 +4283,7 @@ country compiler performs one local ID walk and one write, matching the
 walked concatenation and stored output exactly.
 
 Direct GNU Make target execution and the ordinary default Country API both
-completed.  This is not a =Country(..., backend='make')= or Feature test.
+completed.  The ~LSMS_BUILD_BACKEND=make~ route and Feature were not tested.
 The API serves 251,588 rows with 265 null-v rows.  The documented 244 target
 plus 21 other-wave partition is retained prior evidence, not a fresh partition
 measurement.  The 2015-16 =gsec1.hh -> HHID= bridge and historical helper's
