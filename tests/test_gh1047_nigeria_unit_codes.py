@@ -26,9 +26,9 @@ greppable unit value):
    ``21. TRACTORS``), now placed by ``_canon_input_unit``.  Of the other
    5,724, the 178 that record an amount (164 positive, 14 zero) and no unit
    are ``U_UNKNOWN``, filled once AFTER the per-channel collapse; the 5,546
-   that record NO quantity in any channel keep ``u = NA`` (dispatcher
-   decision 2026-10-19 -- ``u`` is a column here, and ``Unknown`` would
-   claim an amount).
+   that record NO quantity in any channel now also receive ``U_UNKNOWN``
+   under #1118/#1041. The earlier dispatcher NA policy is superseded;
+   retained population and channel collapse are unchanged.
 
 Folding an unplaceable recorded LABEL into ``Unknown`` silently would be the
 same loss under the ruling's name, so ``_canon_units`` REPORTS it
@@ -204,11 +204,9 @@ def _seed_frames(rows):
     return df, dec
 
 
-def test_plot_inputs_unit_is_nan_only_without_an_amount_and_is_filled_after_the_collapse():
-    """An AMOUNT with no unit is ``U_UNKNOWN`` (the #1041 ruling); a row that
-    records no quantity in any channel keeps ``u = NA`` (dispatcher decision
-    2026-10-19: ``u`` is a column here, and ``Unknown`` would claim an
-    amount the row does not have)."""
+def test_plot_inputs_missing_unit_is_filled_after_the_collapse():
+    """#1118: every retained missing unit is Unknown, even without an amount.
+    Recorded units on quantity-missing channels must survive the fill."""
     nigeria = _nigeria_module()
     df, dec = _seed_frames([
         (2.0, '1. KILOGRAMS', np.nan, np.nan),     # one channel, Kg
@@ -225,11 +223,10 @@ def test_plot_inputs_unit_is_nan_only_without_an_amount_and_is_filled_after_the_
     out = nigeria.assemble_plot_inputs('2018Q3', [seeds])
     u = out.reset_index().set_index('i')['u']
     q = out.reset_index().set_index('i')['Quantity']
-    # NA only where there is no amount; never where there is one
-    assert out.loc[out['u'].isna(), 'Quantity'].isna().all(), out.to_dict()
+    assert out['u'].notna().all()
     assert u['1'] == 'Kg'
     assert u['2'] == U_UNKNOWN
-    assert pd.isna(q['3']) and pd.isna(u['3']), (q['3'], u['3'])
+    assert pd.isna(q['3']) and u['3'] == U_UNKNOWN
     # a per-CHANNEL fill would hand row 4 channel 0's 'Unknown' instead; a
     # recorded unit on a row with no amount is kept as recorded
     assert u['4'] == 'Kg'
@@ -299,23 +296,11 @@ def test_no_crop_row_has_a_nan_unit(crop_production):
 @pytest.mark.requires_s3
 @pytest.mark.filterwarnings('ignore::UserWarning')
 def test_no_plot_input_has_a_nan_unit(plot_inputs):
-    """``u`` is NA only on a row with no quantity (dispatcher decision
-    2026-10-19); a row with an amount and no unit is ``U_UNKNOWN``."""
+    """#1118: retained missing units are Unknown, independent of quantity."""
     u = plot_inputs['u']
-    q = plot_inputs['Quantity']
-    # NA only where Quantity is NA -- an amount always carries a unit value
-    assert q[u.isna()].isna().all(), int((u.isna() & q.notna()).sum())
-    # and a row with no amount is never given Unknown
-    assert not ((u == U_UNKNOWN) & q.isna()).any(), int(
-        ((u == U_UNKNOWN) & q.isna()).sum())
-    # 5,546 no-quantity seed rows on the 2026-10-19 build; floor and ceiling
-    # catch a fill that over-fires (0) or a new class of NaN unit.
-    assert 5000 < u.isna().sum() < 6000, int(u.isna().sum())
+    assert u.notna().all()
+    assert not u.astype('string').str.strip().eq('').any()
+    assert not u.isin(['nan', '<NA>']).any()
     assert not u.astype(str).str.fullmatch(r'[\d.]+').any()
     # The input-only units are placed, not folded into Unknown.
-    served = set(u.dropna())
-    assert {'Stem', 'Metric Cup', 'Seedling/Plant', 'Tractor'} <= served, served
-    # 178 on the 2026-10-19 build (164 with a quantity, 14 with a zero).  The
-    # ceiling is what catches the four labels above falling back to Unknown
-    # (1,018 more rows).
-    assert 100 < (u == U_UNKNOWN).sum() < 300, int((u == U_UNKNOWN).sum())
+    assert {'Stem', 'Metric Cup', 'Seedling/Plant', 'Tractor'} <= set(u)

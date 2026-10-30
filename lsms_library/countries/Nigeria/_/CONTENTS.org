@@ -1952,6 +1952,53 @@ builder now maps through =_canon_units=, which raises an
 (the row is still served =Unknown=).  No crop label triggers it today;
 =plot_inputs= had 1,018 rows that would have (next section).
 
+* plot_inputs retained missing units: Country and Feature agree (GH #1118)
+
+The earlier dispatcher decision below, "Country() serves them u = NA, not
+Unknown", conflicted with the subsequent #1041 ruling and Feature's canonical
+unit rule. =assemble_plot_inputs= now fills every retained missing unit with
+=U_UNKNOWN=, after channel reduction. This applies to missing amounts and zero
+amounts too. Blank strings and the existing =map_index= string markers =nan=
+and =<NA>= are normalized; genuine nonblank units are preserved.
+
+The fill must also preserve the existing finalizer's hollow-row boundary.
+Before normalizing =u=, assembly records whether any of its exact returned
+payload (=Quantity, u, Purchased, Quantity_purchased, Improved=) is nonmissing.
+Only those records receive =Unknown=; an entirely missing payload stays hollow
+for the existing =dropna(how='all')=. Observed False, zero and literal blank
+or string-marker units still count as existing payload. Keys or an ignored
+extra source column do not. The keep-first dedup remains before that finalizer
+drop, so a hollow first duplicate does not expose a later observed duplicate.
+This is an additive source/synthetic eligibility repair, not another real-data
+rebuild or a decision to remove the retained no-channel/tree-crop population.
+
+This is NOT a decision that the retained no-channel seed/tree-crop rows are
+valid input records. They remain in place, and the existing mixed-channel
+reducer remains unchanged. In particular, fill must stay AFTER channel
+collapse, or a missing channel becomes a second unit and changes quantities.
+A recorded unit with no quantity must still win over an earlier empty channel.
+
+Fresh private-source diagnosis at public =10ad99d62a5e= (2026-10-30) reproduced
+96,620 rows, Country 5,546 null units / 178 Unknown versus Feature 0 null /
+5,724 Unknown; 90 no-quantity rows carried recorded units. The historical
+counts below are retained as history, not acceptance constants. The original
+source-row eligibility caveat and seven mixed-channel cases remain unresolved.
+
+The candidate rebuild preserves all 96,620 rows, identities, payloads, dtypes,
+and Country attrs; only the 5,546 missing unit cells change to Unknown. The
+90 no-quantity recorded units remain exact. =seed_kg= (4,888 rows) and
+=nitrogen_kg= (4,359 rows) are exact before/after and between the aligned APIs.
+Feature values remain exact; its alignment report now says zero unit nulls
+filled rather than 5,546. =season= and =input_obs= are Feature-added axes.
+Cold baseline and hash-triggered rebuild took 167 / 182 seconds including
+sample support and checks; a 17-second warm check changed no parquet mtimes.
+The shared country module moves all 24 measured Nigeria country-table hashes,
+not just plot_inputs; unbuilt tables will need their own re-warm. Independent
+review remains with the coordinator. This is no claim about non-ISA #1118.
+
+The following #1047 account describes the earlier policy; its Country NA
+exception is superseded only for retained unit normalization by #1118.
+
 * plot_inputs: =u= is NaN only where no amount is recorded, and four units only the input modules use (GH #1047)
 
 =plot_inputs= carries =u= as a column (index =(t, i, plot_id, input, crop)=)

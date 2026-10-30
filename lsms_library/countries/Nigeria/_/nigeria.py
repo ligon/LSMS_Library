@@ -1529,8 +1529,8 @@ def assemble_plot_inputs(t, parts):
     """Concatenate the per-module row frames for one wave, attach `t`,
     drop empties, set the (t, i, plot, input, crop) index and dedup."""
     parts = [p for p in parts if p is not None and len(p)]
-    cols = ['i', 'plot_id', 'input', 'crop', 'Quantity', 'u', 'Purchased',
-            'Quantity_purchased', 'Improved']
+    payload = ['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']
+    cols = ['i', 'plot_id', 'input', 'crop'] + payload
     if not parts:
         return pd.DataFrame(columns=cols).set_index(
             ['i', 'plot_id', 'input', 'crop'])
@@ -1541,28 +1541,27 @@ def assemble_plot_inputs(t, parts):
     out['t'] = t
     out['crop'] = out['crop'].fillna(NO_CROP).astype('string')
     out['input'] = out['input'].astype('string')
-    # A row that records an AMOUNT and no unit is U_UNKNOWN (GH #1047, the
-    # #1041 ruling): 178 served rows, 164 with a quantity (a blank code, or
-    # a code with no value label) and 14 with a zero.  A row that records NO
-    # quantity in any channel keeps u = NA (dispatcher decision 2026-10-19):
-    # `u` is a COLUMN here, so no groupby can delete the row, and NA says
-    # "no amount, so no unit" where `Unknown` would claim an amount.  5,546
-    # seed rows (W1-W3 "no seed used on this plot" or no channel answered;
-    # W4/W5 tree crops, whose planting quantity is not asked).  Filled HERE,
-    # after every per-channel collapse, never per channel: `_pick_channel` /
-    # `fert_rows_long_typed` decide "one unit -> sum, mixed -> keep the
-    # largest" on the NA-aware units, and a per-channel fill would turn a
-    # blank channel into a second "unit".  See CONTENTS.org.
+    # Preserve the existing finalizer's all-payload-NA boundary: a sentinel
+    # must not make an otherwise hollow record eligible (ledger #1118 §8).
+    # False/zero and recorded unit strings remain observed payloads.
+    retained_payload = out[payload].notna().any(axis=1)
+    # Every RETAINED missing unit is U_UNKNOWN (#1041/#1118), including
+    # no-channel/tree-crop rows. This does not decide their eligibility.
+    # Fill only after channel collapse: a per-channel sentinel would change
+    # "one unit -> sum, mixed -> keep the largest". Keep recorded units even
+    # when their channel has no quantity (see CONTENTS.org).
     from lsms_library.transformations import U_UNKNOWN
     out['u'] = out['u'].astype('string')
-    out.loc[out['u'].isna() & out['Quantity'].notna(), 'u'] = U_UNKNOWN
+    missing_u = (out['u'].isna() | out['u'].str.strip().eq('')
+                 | out['u'].isin(['nan', '<NA>']))  # map_index's string markers
+    out['u'] = out['u'].mask(missing_u & retained_payload, U_UNKNOWN)
     # Dedup on the index grain (defensive: a handful of duplicate
     # (i, plot, input, crop) rows can survive the per-module collapse).
     out = out.sort_values(['i', 'plot_id', 'input', 'crop'])
     out = out.drop_duplicates(subset=['t', 'i', 'plot_id', 'input', 'crop'],
                               keep='first')
     out = out.set_index(['t', 'i', 'plot_id', 'input', 'crop']).sort_index()
-    return out[['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']]
+    return out[payload]
 
 
 # ---------------------------------------------------------------------
