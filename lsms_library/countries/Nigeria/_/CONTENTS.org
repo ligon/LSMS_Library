@@ -469,14 +469,76 @@ geopolitical zones serve as strata; within each zone, enumeration areas
 drawn within EAs.
 
 Each wave collects data in two rounds: post-planting (PP, ~Q3) and
-post-harvest (PH, ~Q1 of the following year).  The same households are
-visited in both rounds.  The library uses the post-planting cover page
-(=secta_plantingw{N}.dta=) as the sample frame because it comes first
-and defines the household universe for the wave.
+post-harvest (PH, ~Q1 of the following year). Each round's =sample= and
+=cluster_features= now use its own cover, with that cover's weights
+(GH #1120 D1 / #1261; approved retained repair extracted 2026-10-29).
+
+/Superseded behavior, preserved as a contradiction of record:/ "The same
+households are visited in both rounds. The library uses the post-planting
+cover page (=secta_plantingw{N}.dta=) as the sample frame because it comes
+first and defines the household universe for the wave." The per-round source
+counts below disprove identical membership; D1 supersedes the PP-for-both
+choice. Older counts elsewhere in this file describe that former build,
+including the #592 null-key description, not the repaired per-round outputs.
 
 Starting with wave 4 (2018-19), a refreshment sample of new households
 was drawn alongside the continuing panel.  Wave 5 (2023-24) continues
 this rotating panel design.
+
+** Each round's cover and labelled same-location PH answers (GH #1120 / #1261)
+
+Source-reviewed extraction of retained =16636094f= / =9cd98fabf= /
+=57b99d3de= over public =d65e8b136=. Only the cover/cluster repair is included;
+#1119, #637, education #1318 and successful-empty #1309 remain separate.
+
+Fresh cached-source checks (2026-10-29) use all 25 declared cover, roster and
+wired geo files, through the ordinary reader and Make/Country APIs, on a
+private root. Independent raw membership, composite keys, exact raw and
+normalized weights, and household geo pairs agree in all ten rounds.
+The per-round sample rows are:
+
+| wave | PP household cover | PH household cover | served PP | served PH |
+|------+--------------------+--------------------+-----------+-----------|
+| 2010-11 | 5000 | 4939 | 5000 | 4939 |
+| 2012-13 | 4859 | 4854 | 4880 | 4854 |
+| 2015-16 | 4696 | 4592 | 4696 | 4594 |
+| 2018-19 | 5263 | 5025 | 5263 | 5025 |
+| 2023-24 | 5067 | 4771 | 5067 | 4771 |
+
+Precedence is household cover, then supplement cover, then own-round roster.
+W2's PP agriculture cover supplies 21 additional households with NA weights;
+W3's PH roster supplies two with NA weights. The roster must agree on each
+household's location across its member rows. No missing weight is filled with
+zero, and no missing location is inferred from another household.
+
+*W2's geo-only rows are real PH households.* There are 44 PH-only households
+relative to the PP household cover; 39 have geo records. Those 39 include two
+EAs with no household on the PP household cover. The repaired PH sample serves
+all 44 with real keys; its cluster table uses the same membership. Only then
+is the geo join LEFT onto the round's cover. Left join alone would suppress
+the old live-gap signal without repairing membership. W2 has 497 real EAs in
+each round (plus 152 PP / 165 PH moved singletons).
+
+*Labelled same-location PH answers.* For PH =ea=0= only, W4 =hhsmlc=1=
+labelled =1. YES= or W5 =hh_moved=2= labelled =2. NO, IN ORIGINAL DWELLING=
+permits the COMPLETE known own-PP =state/lga/ea= identity. It never mixes PP
+and PH components. All PH attributes and weights stay PH. Numeric-only,
+missing or wrong labels, actual movement answers, missing/moved PP identities
+and unlabelled W3 do not authorize reuse. This is an explicit derived identity,
+registered separately for =sample= and =cluster_features=; it does not assert
+physical movement completeness or national-population equivalence.
+
+Fresh measurement gives 20 W4 and 31 W5 reused PH identities. Historical
+54/66/64 and boundary-diagnostic populations are not interchangeable with
+these rule-qualified rows. =ea=0= is a source sentinel, not a complete census
+of dwelling moves; a nonzero EA can accompany a movement answer too.
+
+D2 =unlocated-{hhid}= remains a different singleton from recorded =ea=0=
+=moved-{hhid}=. No source household requires D2 in these builds. W5's held geo
+file remains unwired (#978); its coordinates remain missing. Site 2 continues
+to select the most complete observed household row and report disagreements;
+it never averages geo fixes, and only the selected row's derivation survives.
+The panel crosswalk remains its committed source (#1264), unchanged here.
 
 ** Panel crosswalk: =_/panel_ids.py= and the committed JSON (GH #894, 2026-10-23)
 
@@ -1293,6 +1355,17 @@ W3 25% / W4 56% / W5 49%).
 - No id_walk applied at the country level: GHS-Panel hhids are stable
   across waves (panel_ids maps previous_i = hhid), so there is no
   per-wave remapping dict (mirrors Nigeria food_acquired).
+
+** Country concatenator requires every declared folder (GH #1287, 2026-10-28)
+
+All five folders in =nigeria.Waves= ship a =_/plot_features.py= script.
+The country concatenator previously caught every reader exception and wrote
+whatever folders succeeded, provided at least one did. It now propagates a
+failed declared-folder read before writing a partial country table.
+The folder order and each source frame's PP-quarter =t= values are unchanged.
+Invented reader/writer regression checks conserve healthy rows, nulls and
+dtypes and refuse a missing, unreadable or malformed middle-wave input;
+no native payload, cache, or public API acceptance is asserted here.
 
 * community_prices (GAP C -- OURS-ONLY, maintainer priority)
 
@@ -2413,3 +2486,52 @@ development served.  Nothing served moves: =individual_education= reads
 =s2aq9= of this file, never =s2aq10=.  To recover the text, a consumer can
 =s.encode('latin-1').decode('utf-8', errors='ignore')= -- which yields
 =... /  ‘O LEVEL=, the closing quote being genuinely gone.
+
+** Declaration membership supplement (GH #1287)
+
+
+*Declaration qualification (continuation, 2026-10-28).* The five physical
+=Waves= and today's five producer scripts do not themselves establish
+per-table membership after a retirement. The compiler now obtains each logical
+PP/PH quarter through the actual =Country('Nigeria')[quarter]= lookup and
+=Wave.data_scheme=, which includes native scripts AND YAML declarations.
+Both quarters map to one physical folder through =wave_folder_map=; the
+compiler reads each declared folder once in its original order. A folder
+without either declaration skips before any reader, even if an output is
+available. Declared reader errors retain their original exception before any
+country write. No source-column mapping, round selection or metadata API is
+substituted. All-retired inputs still fail without writing; successful declared
+empty frames remain valid, including when every declared frame is empty.
+
+The separate new 27-case private-metadata/invented-IO cohort records the old
+compiler's 13 declaration failures and 14 healthy passes, then 27 passes after
+this correction. It preserves native PP keys, repeated indices, nulls, dtypes,
+order, source frames and the existing agreeing/disagreeing-attrs concat rule.
+The original four controls remain historical evidence for current wiring.
+Neither cohort establishes real source/Make/cache/API or scientific acceptance.
+
+* 2026-10-28 -- four country compilers use actual table declarations (GH #1287)
+
+=community_prices=, =food_coping=, =household_roster= and =housing= now collect
+eligible physical folders through actual logical-quarter =Country= lookup and
+=Wave.data_scheme=. Native script stems and YAML keys form the existing union;
+a null YAML key does not disable a retained native declaration. A physical
+folder is read once, in its existing enumeration order. Unwired/unregistered
+folders skip before offered outputs, and malformed metadata propagates.
+Declared reader errors stop before the country writer, preserving the original
+exception. Successful typed-empty inputs remain valid; all-retired inputs keep
+the existing no-input error. This does not establish native-producer emptiness.
+
+The compilers preserve source quarters, concat/sort/uniqueness behavior, native
+IDs and opaque payload/axes; they add no ID walk or new schema. Housing's current
+script quarters remain PH/PH/PP/PP/PH, while roster has both rounds and C8 is
+PH-only. These are source bindings, not fresh instrument/data measurements.
+Ten roster/housing wave recipes change only =cd ...; python ...= to
+=cd ... && python ...=, so a failed directory change cannot execute in the
+wrong directory. No Make execution or freshness claim follows from that syntax.
+
+The narrow public-421 extraction excludes the author's inherited module,
+source/config, sample/cluster, education and scientific changes. Invented extra
+price axes in tests check opaque transport; they do not add native production
+semantics to this baseline. Previous qualified community timeout/traceback
+observations remain distinct from new extracted-candidate verification.

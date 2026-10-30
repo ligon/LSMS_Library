@@ -32,6 +32,7 @@ Single Index:
   # unresolved_observation means a served row does not resolve this axis; it
   # does not assert one native observation or a particular reducer.
   production_obs: native crop observation or explicitly unresolved coordinate
+  input_obs: source-release-qualified original input row or unresolved coordinate
   # `visit` -- recall occasion.  An INTEGER ordinal of the enumerator call the
   # observation was collected at, for the surveys that revisit a household
   # several times within one wave (GhanaLSS food_acquired; EHCVM
@@ -175,7 +176,7 @@ Index Info:
     # wave categorical_mapping, file or directory spelling); a `?` label
     # written inline in a script (GhanaLSS writes its `input` labels as
     # constants in its plot_inputs.py) or read from any other table escapes it.
-    plot_inputs: (t, v, i, plot_id, input, j, u, season)
+    plot_inputs: (t, v, i, plot_id, input, j, u, season, input_obs)
     # GH #840.  ONE ROW PER SURVEY-RECORDED PRICE.  A community price form
     # prices a (product, VARIETY) pair, in a field VISIT, as one of several
     # within-form OBSERVATIONS; `(t, v, j, u)` names none of the three, so
@@ -350,6 +351,7 @@ Index Info:
       plot_id: Farm-level
       u: Unknown
       season: unknown_season
+      input_obs: unresolved_observation
     community_prices:
       variety: unknown_variety
       visit: 1

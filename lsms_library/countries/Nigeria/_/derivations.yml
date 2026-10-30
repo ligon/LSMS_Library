@@ -6,6 +6,48 @@
 #
 # Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
 
+# GH1120 comment6380186741: a derived identity, not a new survey answer.
+# Both builders use the same rule; Site 2 keeps the selected household's own
+# provenance without changing which household is selected.
+Nigeria::sample::ph-same-location: &ph_same_location
+  waves: ['2018-19', '2023-24']
+  columns: [v]
+  rows: {t: ['2019Q1', '2024Q1']}
+  rule: >-
+    Only where the PH cover records ea=0 AND its own labelled answer says
+    same/original location, reuse the complete known composite state/lga/ea
+    from this household's PP cover in the SAME wave. W4 requires hhsmlc=1
+    labelled YES; W5 requires hh_moved=2 labelled NO, IN ORIGINAL DWELLING.
+    Never combine PP and PH geographic components. Keep the PH attributes
+    and both PH weights unchanged. A missing/moved PP identity, actual move,
+    numeric-only or wrong answer, and unlabelled W3 retain their sentinels.
+  function: lsms_library.countries.Nigeria._.nigeria:derive_ph_same_location_v
+  inputs: lsms_library.countries.Nigeria._.nigeria:inputs_ph_same_location
+  raw_variables: [hhid, state, lga, ea, hhsmlc, hh_moved]
+  assumptions:
+    - text: >-
+        The approved labelled PH same-location answer permits reuse of this
+        household's known PP EA, including its PP state/lga components even
+        where PH's state/lga differ. The answer alone cannot supply a missing
+        PP identity. Raw codes without their labelled meaning do not qualify.
+      basis: modelling-choice
+      evidence: >-
+        Owner ruling GH1120 comment6380186741, 2026-10-24. Named label evidence
+        is recorded in framework1135-Nigeria-counts/DIAGNOSIS.md (historical
+        source review); independently rechecked on the cached PH sources
+        in the 2026-10-29 public-base extraction.
+  validated_against: >-
+    Actual-helper synthetic counterfactuals pass. Fresh cached-source checks
+    on 2026-10-29 verify 20 W4 and 31 W5 repaired PH sample identities,
+    unchanged PH weights/payload and selected-row geo provenance. Independent
+    root acceptance remains pending. Inputs retain named PH answers and pp_-namespaced original PP
+    operands at (t,i), finer than selected cluster grain. Source storage
+    dtypes are recorded separately; missing PP matches never coerce IDs to float.
+  contents: Nigeria/_/CONTENTS.org, "Labelled same-location PH answers"
+  since: '2026-10-25'
+
+Nigeria::cluster_features::ph-same-location: *ph_same_location
+
 Nigeria::community_prices::c8-metric-size:
   waves: ['2015-16', '2018-19', '2023-24']
   columns: [Price]

@@ -24,6 +24,7 @@ import numpy as np
 import re
 import sys
 import warnings
+from decimal import Decimal, InvalidOperation
 sys.path.append('../../../_/')
 from lsms_library.local_tools import conversion_table_matching_global, format_id, melt_visit_intervals
 
@@ -3348,13 +3349,87 @@ def _pesticide_block(df, *, hhid, plotkey, gate, slots, t):
     return pd.concat(pieces, ignore_index=True)
 
 
+PLOT_UNKNOWN = 'unknown_plot'
+NOT_CROP_SPECIFIC = '(not crop-specific)'
+
+
+def _plot_ids(series):
+    """Plot keys as served: a key missing in the source -> ``PLOT_UNKNOWN``."""
+    s = series.astype('string')
+    return s.where(s.notna(), PLOT_UNKNOWN)
+
+
+def _is_unknown_plot(series):
+    """Boolean numpy mask of ``PLOT_UNKNOWN`` rows (NA-safe)."""
+    return series.astype('string').eq(PLOT_UNKNOWN).fillna(False).to_numpy(dtype=bool)
+
+
+def _seed_crop_identity(series):
+    """Seed-only crop labels and lossless native join tokens (ledger GH1298).
+
+    Unlike format_id/_int_codes, a recorded fractional answer is neither
+    truncated nor rounded. Only known integral codes are harmonized; every
+    other recorded identity passes through, distinct from a missing crop.
+    """
+    def token(value):
+        if pd.isna(value):
+            return pd.NA
+        text = str(value).strip()
+        if not text:
+            return pd.NA
+        try:
+            number = Decimal(text)
+        except InvalidOperation:
+            return text
+        if not number.is_finite():
+            return text
+        if number == 0:
+            return '0'
+        rendered = format(number, 'f')
+        return rendered.rstrip('0').rstrip('.') if '.' in rendered else rendered
+
+    native = series.map(token).astype('string')
+    cmap = {str(k): v for k, v in _malawi_code_map('harmonize_crop').items()}
+    label = native.map(cmap).astype('string').fillna(native).fillna('unknown_crop')
+    return label, native
+
+
+def _seed_source_reference(data_path, *, script_path=None):
+    """Bind release identity to the same literal source the driver reads.
+
+    Sidecar only: source_fingerprint's raw-byte fallback is not permitted for
+    constructed seed identity. The logical namespace is stable across jobs.
+    """
+    from pathlib import Path
+    from lsms_library.paths import countries_root
+    from lsms_library.local_tools import cached_file_hash
+
+    path = Path(data_path)
+    if not path.is_absolute():
+        if script_path is None:
+            raise ValueError('Malawi relative seed source requires its driver path')
+        path = Path(script_path).resolve().parent / path
+    path = path.resolve()
+    try:
+        relative = path.relative_to(countries_root().resolve()).as_posix()
+    except ValueError as exc:
+        raise ValueError('Malawi seed source is outside countries_root') from exc
+    # Same declared-sidecar hash as source_fingerprint, without its raw-byte
+    # fallback if the sidecar is absent/unreadable (including a raced removal).
+    sidecar_hash = cached_file_hash(path.with_name(path.name + '.dvc'))
+    if sidecar_hash is None:
+        raise ValueError('Malawi seed source requires its declared sidecar')
+    reference = f'dvc:{path.name}:{sidecar_hash}'
+    return relative + '@' + reference
+
+
 def _seed_block(df, *, hhid, plotkey, cropcode, qty, unit, improved=None,
-                t=None):
+                t=None, source_ref=None, source_half=None, row_positions=None):
     """Reshape Module G's seed-planted columns to canonical long rows --
-    one per (plot, crop) seed.  ``cropcode`` is the harmonize_crop code
+    one per source seed row (including missing crop).  ``cropcode`` is the harmonize_crop code
     column (mapped to the shared crop/food label).  Returns (i, plot,
     _input_code=SEED, crop, Quantity, u, Improved)."""
-    crop_label, _crop_code = _crop_codes(df[cropcode], perennial=False)
+    crop_label, _crop_code = _seed_crop_identity(df[cropcode])
     q = (pd.to_numeric(df[qty], errors='coerce').astype('Float64')
          if qty and qty in df.columns
          else pd.Series(pd.NA, index=df.index, dtype='Float64'))
@@ -3373,28 +3448,44 @@ def _seed_block(df, *, hhid, plotkey, cropcode, qty, unit, improved=None,
         imp = pd.Series(pd.NA, index=df.index, dtype='boolean')
     out = pd.DataFrame({
         'i':           df['hhid'].astype('string').values,
-        'plot_id':        df['plotkey'].astype('string').values,
+        'plot_id':        _plot_ids(df['plotkey']).values,
         '_input_code': _MWI_INPUT_SEED,
         'crop':        crop_label.values,
         'Quantity':    q.values,
         'u':           u.values,
         'Improved':    imp.values,
     })
-    # Keep a seed row only where a crop identity is present (the seed item
-    # is meaningless without the crop it seeds).
-    out = out[crop_label.notna().values]
+    if source_ref is not None:
+        if not isinstance(source_ref, str) or not source_ref.strip():
+            raise ValueError('Seed source reference must be nonempty')
+        # Identity precedes public payload/crop eligibility (ledger GH1298 §4).
+        if not source_half or row_positions is None:
+            raise ValueError('Seed source observations require half and original positions')
+        positions = pd.Series(row_positions, dtype='Int64').reset_index(drop=True)
+        if (len(positions) != len(df) or positions.isna().any()
+                or positions.lt(0).any() or positions.duplicated().any()
+                or any(isinstance(v, (bool, np.bool_)) for v in row_positions)):
+            raise ValueError('Seed observations require unique original row positions')
+        out['input_obs'] = ('row:' + source_ref + ':' + positions.astype('string')).array
+        out['_crop_code'] = _crop_code.array
+        out['_source_half'] = source_half
+    # GH1119: missing crop is epistemic; recorded unmapped identities pass
+    # through. This preserves all G observations, including all-NA payloads.
     return out
 
 
 def _seed_purchase_block(df, *, hhid, cropcode, qty_cols, unit_cols,
-                         value_cols):
+                         value_cols, source_half=None):
     """Reshape Module H purchased-seed columns to (i, crop) reported
     purchase totals.  ``qty_cols``/``unit_cols``/``value_cols`` are lists
     of the per-source raw column names (two purchase sources: ag_h16*,
     ag_h26*).  A purchased amount is counted only where the corresponding
     value column is non-zero (WB rule).  Returns (i, _crop_code,
     Quantity_purchased) -- household-crop grain, no plot."""
-    crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=False)
+    if source_half is None:
+        crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=False)
+    else:
+        crop_label, crop_code_int = _seed_crop_identity(df[cropcode])
     cols = []
     for qcol, vcol in zip(qty_cols, value_cols):
         if qcol not in df.columns:
@@ -3421,6 +3512,8 @@ def _seed_purchase_block(df, *, hhid, cropcode, qty_cols, unit_cols,
         {'Quantity_purchased': lambda s: s.sum(min_count=1)})
     # Drop the (i, crop) rows where no purchase was recorded.
     grp = grp[grp['Quantity_purchased'].notna()]
+    if source_half is not None:
+        grp['_source_half'] = source_half
     return grp
 
 
@@ -3436,28 +3529,47 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
         each carrying (i, plot, _input_code, crop, Quantity, u, Improved).
     seed_purchase_pieces : list[pd.DataFrame] | None -- outputs of
         _seed_purchase_block (i, _crop_code, Quantity_purchased) at the
-        household-crop grain; attached to the single-plot seed row of that
-        (i, crop), like crop_production's sale (no plot fabrication).
+        household-crop grain; source-aware results attach only to one known
+        observation of the same native code and half (no plot fabrication).
 
     Returns
     -------
-    pd.DataFrame indexed (t, i, plot, input) with columns Quantity, u,
-    Purchased, Quantity_purchased, Improved, Applied, crop.  Item-level reported
-    values only.
+    pd.DataFrame indexed (t, i, plot_id, input, crop, u, input_obs).
+    Source-aware drivers retain G coordinates; other rows explicitly carry
+    unresolved_observation. Existing payload eligibility/reducers remain.
     """
     df = pd.concat([p for p in input_pieces if p is not None and len(p)],
                    ignore_index=True)
 
+    source_observations = 'input_obs' in df.columns
+    if source_observations:
+        seeds = df.loc[df['_input_code'].eq(_MWI_INPUT_SEED)]
+        required = ['input_obs', '_source_half', '_crop_code']
+        if any(c not in seeds for c in required):
+            raise ValueError('Seed observation lacks native identity')
+        if (seeds['input_obs'].isna().any()
+                or seeds['input_obs'].duplicated().any()
+                or seeds['_source_half'].isna().any()):
+            raise ValueError('Seed observation has missing/repeated identity')
+    if not source_observations:
+        df['input_obs'] = 'unresolved_observation'
+    else:
+        df['input_obs'] = df['input_obs'].astype('string').fillna('unresolved_observation')
+
     df['input'] = _input_labels(df['_input_code'])
     # An input row needs a resolved input label to land on the index.
     df = df[df['input'].notna()]
+    # GH1119: Module D is structurally crop-free; G's missing crop is unknown.
+    df['crop'] = df['crop'].astype('string').mask(
+        df['input'].ne('Seed') & df['crop'].isna(), NOT_CROP_SPECIFIC)
+    df['plot_id'] = _plot_ids(df['plot_id'])
     if 'Applied' not in df.columns:
         df['Applied'] = pd.array([pd.NA] * len(df), dtype='boolean')
     df['Applied'] = df['Applied'].astype('boolean')
 
     # Seed-purchase merge (household-crop grain -> single-plot seed rows).
     df['Quantity_purchased'] = pd.array([pd.NA] * len(df), dtype='Float64')
-    if seed_purchase_pieces:
+    if seed_purchase_pieces and not source_observations:
         sp = pd.concat([p for p in seed_purchase_pieces if p is not None
                         and len(p)], ignore_index=True)
         if len(sp):
@@ -3496,6 +3608,31 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
                 ~take, df['_qp'])
             df = df.drop(columns=['_qp'])
 
+    if seed_purchase_pieces and source_observations:
+        purchases = [p for p in seed_purchase_pieces if p is not None and len(p)]
+        if purchases:
+            sp = pd.concat(purchases, ignore_index=True)
+            key = ['i', '_source_half', '_crop_code']
+            if '_source_half' not in sp or sp['_source_half'].isna().any():
+                raise ValueError('Source-observation purchase requires its source half')
+            if sp.duplicated(key).any():
+                raise ValueError('Repeated native seed purchase result')
+            seeds = df.loc[df['input'].eq('Seed')]
+            # Count every seed record before plot ownership gating: even an
+            # all-payload-NA unknown plot sibling vetoes attachment. A plot
+            # count would broadcast to multiple observations.
+            counts = seeds.groupby(key, dropna=True).size().rename('_nobs')
+            known = seeds.loc[~_is_unknown_plot(seeds['plot_id'])]
+            candidates = known.merge(counts.reset_index(), on=key, how='left')
+            eligible = candidates.loc[candidates['_nobs'].eq(1), key]
+            attach = sp.merge(eligible, on=key, how='inner', validate='one_to_one')
+            attach = attach[key + ['Quantity_purchased']].rename(
+                columns={'Quantity_purchased': '_qp'})
+            df = df.merge(attach, on=key, how='left', validate='many_to_one')
+            take = df['input'].eq('Seed') & df['_qp'].notna()
+            df['Quantity_purchased'] = df['Quantity_purchased'].where(~take, df['_qp'])
+            df = df.drop(columns='_qp')
+
     # Purchased flag: True where a purchased quantity is attached (seed),
     # else NA (Module D fertilizer/pesticide applied-on-plot rows do not
     # record a purchase split at the plot grain).
@@ -3505,6 +3642,9 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     df = df.drop(columns=['_input_code'])
     df['t'] = t
 
+    # Every G driver supplies original source coordinates, so seed
+    # observations cannot fold together. Module D remains unresolved; its
+    # reductions remain intact. Source G payloads bypass every reducer.
     # Consolidate exact-duplicate reported lines: same (i, plot, input,
     # crop, u) summed on Quantity (a plot may record the same fertilizer
     # in two slots with the same unit); first-wins on the flag columns.
@@ -3513,7 +3653,15 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
     # NaN) are not silently dropped.
     df['crop'] = df['crop'].astype('string')
     df['u'] = df['u'].astype('string')
-    keys = ['t', 'i', 'plot_id', 'input', 'crop', 'u']
+    keys = ['t', 'i', 'plot_id', 'input', 'crop', 'u', 'input_obs']
+    # GH1298 (ledger §7): physical G observations carry their own payload
+    # and nulls. Do not turn a singleton missing amount into a measured zero.
+    # The existing framework all-payload-NA eligibility gate remains separate.
+    seed = df['input'].eq('Seed') & source_observations
+    native = df.loc[seed].set_index(keys)
+    if not native.index.is_unique:
+        raise ValueError('Malawi seed observation grain is not unique')
+    df = df.loc[~seed].copy()
     grp = df.groupby(keys, as_index=False, dropna=False).agg({
         'Quantity':           'sum',
         'Quantity_purchased': 'first',
@@ -3540,7 +3688,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
                       .sum(min_count=1))
         target = grp.index.get_level_values('input') == 'Organic Fertilizer'
         grp.loc[target, 'Quantity'] = quantities.reindex(grp.index[target]).array
-    return grp
+    return pd.concat([grp, native[list(grp.columns)]])
 
 
 # --- livestock (GAP 4) --------------------------------------------------
