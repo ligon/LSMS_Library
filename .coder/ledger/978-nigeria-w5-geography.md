@@ -43,7 +43,10 @@ The nonfood RecallWindow WAITING caveat remains unrelated and unchanged.
 ## §4 Invariants
 Only wire verified `hhid`, `lat_mod`, `lon_mod` from root Data/v02 file.
 Preserve sample rows/weights/strata, physical/logical visit mapping, all
-non-coordinate fields, round membership and identity/provenance rules. LEFT
+household-grain non-coordinate fields, round membership and identity/provenance
+rules. Cluster projection may select a different observed household when
+coordinates improve completeness; measure every selected non-coordinate and
+Derivation change rather than assume invariance. LEFT
 join may not introduce geo-only households. Keep Site2 disagreement reporting
 and the selected observed row; do not average, round or silently discard fixes.
 No optional:true bypass or broad cache clear/rebuild. New W5-only verification
