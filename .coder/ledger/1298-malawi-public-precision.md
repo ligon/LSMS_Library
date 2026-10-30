@@ -1,39 +1,66 @@
-# Malawi #1298 public extraction and numeric proof
+# Malawi #1298: source-observation identity and exact numeric verification
 
 ## §1 Task
-Extract reviewed all-six-G/four-wave observation identity onto public d65e8b1,
-and replace the unproved pandas nullable numeric equality claims with calibrated
-explicit nonmissing-array equality. Prior ordinary operands were job-local;
-new builds are new evidence, never recovered historical state.
+Preserve every retained Module G source observation across four Malawi waves,
+with public Country/Feature alignment, and verify numerical conservation with
+explicit nonmissing-array equality rather than pandas nullable tolerances.
 
 ## §2 Existing machinery (git/ripgrep floor)
-Reuse all-waves/public-d65-product.patch, check_wave.py, serve_wave.py,
-known_crop_totals.py and prepare.py. Reuse standard Country/Feature/get_dataframe.
-The prior 50-test selection covers source coordinates, ownership and alignment.
-1206-object-v3-root.py documents corrected comparator SHA 68be90fa; inspect only,
-not historical cohorts. Narrow NumPy comparisons are allowed if unavailable.
+- `Malawi/_/malawi.py:_seed_source_reference`: country-relative declared-sidecar
+  reference; never a download or raw-byte fallback for constructed identity.
+- `_seed_block`, `_seed_crop_identity`, `_plot_ids`, `_is_unknown_plot`: retain
+  original G payload and native crop identity, distinguish unknown plots.
+- `_seed_purchase_block`, `assemble_plot_inputs`: existing H value gates and
+  arithmetic; attach only to one known native-code/same-half G observation.
+- Four `Malawi/{wave}/_/plot_inputs.py` drivers capture positions before any
+  selection; 2010 removes full-raw repeats without adding a unique field first.
+- Standard `get_dataframe`, Country finalizer/sample v-join and Feature canonical
+  alignment are reused, not replaced. Tests: `test_gh1298_malawi_bounded_observations`,
+  non-S3 `test_gh637_malawi_tail`, canonical `TestPlotTableDeclarations` and
+  `TestPlotInputsHarmonize`.
 
 ## §3 Definitions
 Inherit STANDING.md, CLAUDE.md, canonical data_info.yml and Malawi CONTENTS.
-G positions precede nine full-record repeats in 2010. Unknown crops/plots follow
-settled #1119/#1120 policy. Module D stays unresolved_observation. H ownership
-requires exactly one known observation, counting unknown/all-NA siblings.
+Settled #1119/#1120: missing G crop is unknown_crop; recorded unmapped identities
+pass through, including fractional codes and zero. D's structural crop absence
+is (not crop-specific). Missing/partial plot keys are unknown_plot.
 
 ## §4 Invariants
-Preserve original G nullable quantities; no fixture repins or policy changes.
-Keep H arithmetic and D reducers unchanged. #1174 finalizer excludes 185 2013
-all-payload-NA records; #1190 purchase units remain separately unresolved.
-Explicit equality must check dtype, masks, ordered indexes, attrs, and actual
-nonmissing numerical arrays, rejecting tiny deltas and nextafter changes.
-Prior baseline 0f28 is partial-2013, not public d65. Disclose representation
-normalizations. One CPU/8GiB, approved image, private caches, no data network.
+Positions precede the nine 2010 full-record repeats. All unknown/all-NA G siblings
+count against purchase uniqueness. H ownership does not establish unit agreement.
+Module D remains unresolved_observation with its previous reducers. No new
+eligibility, conversion, quantity-use or nitrogen rule is introduced.
+The finalizer still excludes 185 all-payload-NA 2013 records, including the 184
+blank crop/plot records; source identity must not manufacture payload to retain them.
 
-## §5 Decisions
-Reuse product patch and existing source/H oracle and API normalization.
-Extend only verification with durable private operands and exact comparisons.
-New narrow comparator justified by pandas 3 nullable check_exact weakness.
-Reconstruct isolated d65 and prove file identity; rerun targeted tests there.
+## §5 Reuse decisions
+Reuse the existing seed helpers, source-qualified input_obs axis and canonical
+legacy sentinel. Extend their production callers to all six G sources. Reuse
+normal APIs and independent raw H group arithmetic for validation. The exact
+numeric verifier is analysis-only: separate dtype/null-mask/index/order checks
+plus NumPy equality of original nonmissing values, with no floating coercion or
+tolerance. No reader-admission framework or compiler change is needed.
 
-## §6 Open questions
-No product defect reported by independent Uganda review; precision remains the
-concrete gap. Coordinator retains review/publication; no external writes here.
+## §6 Remaining decisions
+#1190 purchase-unit representation and #1174 reported-use/eligibility/Module D
+uncertainty remain separate unresolved work. Neither blocks representing G
+observations correctly. Publication and issue disposition require maintainer review.
+
+## §7 G payload boundary
+Each uniquely identified G observation carries its own Quantity, unit, Improved
+and missingness: no G sum, first selection or projected-payload deduplication.
+This seed-only boundary does not change D reductions or H arithmetic.
+
+## §8 Verification
+All six sources/four waves pass explicit numerical source-to-wave-to-Country
+checks, independently recomputed H ownership/arithmetic, nonseed conservation,
+and cold/warm Country/Feature comparisons. Known-crop quantities reconcile
+exactly at the previous grain; only zero-total old groups disappear under the
+unchanged eligibility rule. Feature adds the documented canonical_alignment
+record for unknown_season, in addition to preserving Country attrs.
+Calibration rejects tiny-delta and nextafter changes on nullable Float64 and
+NumPy float64, plus dtype/mask/index/order/attrs mutations. Targeted tests at the
+clean public extraction: 50 passed, 17 requires_s3 deselected.
+These are new ordinary cached-source measurements. The comparison baseline is
+0f28c7ce (partial 2013), not public d65. Product/config/test bytes match the
+reviewed implementation; whole private and public trees/history do not.
