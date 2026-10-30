@@ -1985,3 +1985,55 @@ rows with null =v=) and missing EHCVM strata remain visible and unchanged.
 Private receiving evidence contains source/cache hashes, exact API commands,
 raw witnesses and the aggregate report. No raw IDs are published here.
 This is scoped API acceptance, not a full Burkina re-warm or #1307 plot acceptance.
+
+* 2026-10-30 -- independently reviewed sample/roster runtime checkpoint (GH #1244)
+
+The closed v8 verification at source
+=0b88881e9bd7e8b8838552fb4b2d4e7cabab5268= supports the bounded sample/roster
+scope above. Independent keyed, typed cold expectations match =sample=
+(10,411 / 7,010 / 10,403 rows; 27,824 total) and =household_roster=
+(78,543 / 45,612 / 69,452; 193,607 total). The 2021 sample components remain
+3,227 panel and 7,176 CS households; all CS =panel_weight= values stay missing.
+The source roster has 197,768 rows; the existing typed-all-payload-NA finalizer
+excludes 4,161 panel records. This measures current eligibility, not a new rule.
+The 1,506 EMC person rows with null =v= and missing EHCVM strata remain.
+
+Cold comparisons are independent by key, using sorted comparison projections;
+they do not independently establish raw iteration order. Exact numeric checks
+include ExtensionArray and nonmissing NumPy equality, beyond pandas frame
+assertions. Raw-cache weights and whole-wave normalized API weights are checked
+at their respective stages; actual frames are not cast to force agreement.
+
+All six fresh-process warm arms pass: full Country sample/roster, 2021-only
+Country sample/roster, and full singleton Feature sample/roster. They preserve
+accepted cold values and order; full warm arms also preserve typed metadata.
+For subsets, all observed
+records match the cold projection, while complete index/attrs metadata matches
+explicit =map_index=, pre-finalize restriction and finalization on newly owned
+raw-cache operands. That second predicate is route composition, not independent
+scientific evidence. The 2021 roster has smaller unused index dictionaries than
+the full cold projection; neither row loss nor trimming actual metadata follows.
+
+Exactly 11 held objects (50,286,875 bytes) were staged; cold used 11 independent
+and 14 production logical source calls. Warm source/native calls are zero.
+The eight named L2 parquets retain exact bytes, modes and mtimes. Committed maps
+remain read-only; ordinary map/config reads are measured without arbitrary caps.
+Fourteen exact witnesses and eight L2 files were exported only after child
+closure. One invocation completed in 206.752 seconds, with no retry, historical
+control-cohort replay or production change. This is not a new measurement of every current
+cache hash or a full-country re-warm.
+
+All prior failed/partial attempts retain their original states. In particular,
+v7 failed on unused roster-index metadata and has no saved warm operand for
+retrospective complete-record acceptance. V8 is fresh evidence, not a relabelled
+pass for that attempt. The existing residence-duration tension also remains:
+the EMC prose calls months of presence continuous, whereas the released YAML
+describes a six-month binary deliberately mapped to 12/0. No policy is chosen.
+The #1148 warning that a food-row count cannot count interviews, broader census
+scope, and #1276's other CS modules/geography/provider integration remain open.
+
+Evidence: dispatch =623617a1355f49a59c42c9272f2df870=, job =40651140=,
+report-only private result =7c5a6515aa300d1668a72475a904b2a3dd02abde=.
+Independent review SHA256:
+=8fafa48f93b2776bc69904d843b58daa359e57469ea0184d7358e8e21a47ff85=.
+This documentation changes no build input or scientific definition.
