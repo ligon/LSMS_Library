@@ -80,3 +80,33 @@ fourteen-country #1287 and scientific acceptance remain separately held gates.
 
 Pending candidate source and finite data-free tests. This ledger is committed
 before product edits; final anchored verification will be a separate commit.
+
+### Phase 3a — first finite actor and test-premise correction
+
+The frozen a7525f166 cohort actually collected 66 cases: 65 passed, and the
+singleton public-squeeze test failed only at its `__cause__ is None` assertion.
+All 66 compiler epochs closed, with zero guard denials and all recorded source,
+runtime, configuration, metadata, profile and no-data closure gates true. The
+one-shot transaction remains STOPPED / accepted 0; no automatic retry occurred.
+Its durable inventory is
+`ffa877b0bfe704d52990b4f9f58e8e44f25ab395f71cfe88fcd47919ef89770e`
+(269 ordinary copies, seven font-cache files inventory-only).
+
+The outer `KeyError` matching `j` was observed, as was a non-None cause. The
+receipt does not serialize the inner exception's type or args. Source explains
+the mistaken premise: unchanged `.squeeze()` produces a Series for one row;
+unchanged `change_id` resets it then accesses `x['j']` (`ethiopia.py:491–495`).
+Installed pandas `DataFrame.__getitem__` calls `columns.get_loc` (`frame.py:4378`),
+which explicitly raises `KeyError(key) from err` (`indexes/base.py:3640–3648`).
+This failure is outside the new reader-only RuntimeError boundary. Public d65
+has the same squeeze and walker path; no baseline actor was replayed.
+
+The separately isolated successor changes only this new test's chaining
+premise: retain the required `KeyError('j')` and no-writer behavior, and require
+the expected pandas `KeyError('j')` cause instead of requiring no cause. Exact
+inner details are source-supported expectations awaiting a separately released
+measurement. Product/helper bytes and every other test remain unchanged; the
+singleton shape failure itself and the local j-versus-i walker limitation remain.
+No successor test execution, raw data, Make/API/cache work or scientific
+acceptance is implied. Original native exit143/publication-incomplete/
+preservation-unverified provenance and original finite 65/1 failure are retained.
