@@ -3129,3 +3129,53 @@ source/code precedents, historical-count qualifications and the independent
 review are recorded in
 =slurm_logs/isa_backlog_2026-10-30/Ethiopia/1183-instrument-evidence/REPORT.md=.
 No survey source or API was replayed for this checkpoint.
+
+
+** #1183 source-key attribution; retention still needs adjudication (2026-10-30)
+
+A completed six-source W1/W2 diagnostic preserves missing purchase answers at
+both the seed decoder and its zeroing caller, leaving native retention gates
+unchanged. That counterfactual loses 371 W1 and 3 W2 output keys. It gains none
+and replaces no shared-key source survivor, even where labels collide. This
+measures the consequence of those expressions; it does not authorize deletion
+or blanket crop-label retention. No production decoder, caller, quantity,
+join, retention or scientific policy changed.
+
+W1 has 4,433 missing-Q3 source records and 4,426 selected affected records;
+371 disappear and 4,055 survive with Purchased False to missing and purchased
+quantity zero to missing. The 371 losses include 243 land-use-labelled records
+and 128 other crop-labelled records. Of the 371, 341 match a section4 crop key
+and 367 match the section3 plot roster. They are not a uniform class of blank
+source records: seed type, free-seed, reason and leftover responses vary.
+The six W1 type3 records retain that wave's permanent/not-planted meaning.
+
+W2's 90 missing-Q3 source records partition into 4 unmatched, 24 withheld
+because of multiple plots, and 62 members of unique-plot joins. Grouped
+membership differs from output effects: 60 seed rows are affected, of which
+3 disappear and 57 survive. The three losses are Garlic, Sorghum and Teff.
+Two feeding section5 records report positive holder/crop total-used kg, while
+native applied Quantity comes from section4 and is absent. That is evidence
+of source context, not authority to transfer a holder quantity to a plot.
+The unique-plot attachment rule and #1184's =sum(min_count=1)= remain intact.
+
+Both native-versus-instrumented full-frame equality and six-frame raw
+immutability passed. Complete observed nonseed keys, payloads, types, masks,
+order and attrs are exact; full nonseed index-metadata equality is false in
+both waves because unused domains/codes differ. These are separate predicates.
+The 11 W1 and 5 W2 full-output label-collision keys are also distinct from raw
+join-key duplicates; no shared-key survivor replacement was observed.
+
+The actor and supervisor completed with closed descendants in 78.8703 seconds
+using six normal source reads and six metadata-only passes. This diagnostic
+is not a Country/Feature or cache acceptance run. The preceding 600-second
+attempt remains failed; its interrupted instruction was not observed.
+Same-country missing-aware boolean helpers and #1250/#1253 remain precedents
+for distinguishing missing from No, while the instrument contradictions and
+heterogeneous source observations above leave eligibility unresolved in #1183.
+
+Evidence: dispatch =8d718fce028c4a45bd46c173620669ce=, source
+=578602440b51e98a15aa46cdb2ba2ceccca0cc91=; complete report and aggregate
+partitions are retained at
+=slurm_logs/isa_backlog_2026-10-30/Ethiopia/1183-performance-actual/REPORT.md=
+in its private result branch. No raw identifiers or witness values are
+published here.
