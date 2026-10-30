@@ -4289,3 +4289,46 @@ canonical index and supplies =unresolved_observation= for legacy countries.
 Consumers addressing index levels positionally must accommodate this axis.
 2016 cross-sectional IDs retain the deliberate =cs-17-= prefix, while 2019
 uses bare case_id. None of these identifiers establishes purchase units.
+
+* 2026-10-30 -- plot_inputs missing-unit remainder: no served residual (GH #1118)
+
+A fresh census at public =d96a8152b35e2abd3f3f6fd1f9d68b37d0587f81=,
+after #1251, the completed #1111 totals correction and #1323, finds:
+
+| wave    | served rows | Unknown | other nonblank units | missing/blank |
+|---------+-------------+---------+----------------------+---------------|
+| 2010-11 |      46,605 |     158 |               46,447 |             0 |
+| 2013-14 |      16,209 |      12 |               16,197 |             0 |
+| 2016-17 |      52,268 |      57 |               52,211 |             0 |
+| 2019-20 |      64,835 |      13 |               64,822 |             0 |
+| total   |     179,917 |     240 |              179,677 |             0 |
+
+Country and Feature agree, cold and fresh-process warm, using normal cached-source
+builds under a private data root. Nulls (including plain float NaN), empty/whitespace
+strings and stringified missing values were counted separately: every count is zero.
+The unit index uses pandas nullable string policy. =Other (Specify)= and the
+source-qualified organic unit codes remain distinct from =Unknown=.
+
+Feature's existing canonical alignment adds =country= and =unknown_season=,
+renames =crop= to =j= and reorders levels. On the 2010/2013 single-wave calls it
+also drops the entirely null =Improved= column; that documented difference is
+accounted for explicitly, not mistaken for numerical loss. Exact nonmissing NumPy
+comparisons accompany extension-array, dtype, null-mask and axis checks; warm
+serving preserves attrs and leaves parquet mtimes unchanged. No producer, unit mapping,
+quantity, ownership, eligibility or framework code changed for this census.
+
+The earlier 28,724 and #1251's 6,075 counts are historical populations, not targets
+for a new patch. In particular the 2026-10-23 #1111 entry above already records
+that timing codes in 2013/2016 no longer label the enumerator kilogram totals.
+The source-observation contract remains #1323's: G observations retain =input_obs=;
+D retains its reducers. This result concerns only =plot_inputs= on these four
+supported waves, not other Malawi tables or countries.
+
+#1190 remains separate. Its later source diagnosis identifies cross-sectional
+H09/H40 as transport, H10 as purchase value and H38 as free receipts; it does not
+authorize a unit-normalization task to change the purchase representation,
+components or ownership. #1174 eligibility likewise remains unresolved.
+Documentation and ledger only: no build input or cache hash changes, no re-warm
+cost introduced. Reviewable receipts and scripts are in dispatch
+=95c34db5277843d2b00fa5a597b6eda5/evidence/REPORT.md=; private operands are excluded
+from the evidence bundle and repository.
