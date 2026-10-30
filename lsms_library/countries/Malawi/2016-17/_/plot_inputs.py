@@ -30,7 +30,8 @@ import pyreadstat
 
 from lsms_library.local_tools import (get_dataframe, to_parquet, format_id,
                                        DVCFS, _ensure_dvc_pulled,
-                                       _dvc_working_directory, _COUNTRIES_DIR)
+                                       _dvc_working_directory, _COUNTRIES_DIR,
+                                       _dvc_cache_path)
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
                     _seed_block, _seed_purchase_block, assemble_plot_inputs,
                     _seed_source_reference)
@@ -54,9 +55,17 @@ def _read_usecols(countries_rel, usecols):
     """Read only ``usecols`` from a DVC-tracked .dta that a full read
     cannot decode (latin-1 bad byte in an unused column)."""
     _ensure_dvc_pulled(countries_rel)
-    with _dvc_working_directory(_COUNTRIES_DIR):
-        with DVCFS.open(countries_rel) as f:
+    # Reuse get_dataframe's sidecar-resolved L1 fast path. DVCFS.open builds
+    # the repository-wide storage index even when this blob is already held.
+    # Keep the restricted decoder and its temporary-file lifetime unchanged.
+    cache_path = _dvc_cache_path(countries_rel)
+    if cache_path is not None:
+        with open(cache_path, 'rb') as f:
             data = f.read()
+    else:
+        with _dvc_working_directory(_COUNTRIES_DIR):
+            with DVCFS.open(countries_rel) as f:
+                data = f.read()
     with tempfile.NamedTemporaryFile(suffix='.dta', delete=False) as tmp:
         tmp.write(data)
         tmp_path = tmp.name
