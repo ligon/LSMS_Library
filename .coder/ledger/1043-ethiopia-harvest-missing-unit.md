@@ -75,3 +75,31 @@ under `/local/job40561868/ethiopia1043-harvest-unit-v1/`; API grain remains a
 separate next validation scope. Synthetic118pass/16deselected is also retained;
 the unit-column-absent branch test was renamed because its synthetic time is
 2013-14, whereas the actual native W1 observation separately verifies W1Kg.
+
+## §8 Canonical API result and retained measurement failure
+Normal public-base and candidate builds each return 86,403 Country rows. Served
+Unknown counts become 0 / 379 / 79 / 168 / 277 in chronological wave order
+(903 total), versus 904 at native-builder grain. Genuine reported Other remains
+0 / 4,321 / 111 / 666 / 381; all other served unit counts stay unchanged. The
+missing-unit class retains 11 positive-Quantity rows and 884 sale-value-only rows.
+Every non-u key and payload, dtype and missing mask matches as a full row multiset
+using explicit ExtensionArray and nonmissing NumPy equality on owned saved
+operands. This does not assert order across renamed unit index keys.
+
+Normal declared unit masses give unchanged API factor layers: default metric
+40,525 / none 45,878; shipped 62,705 / metric 7,821 / none 15,877, with declared
+13,977 in either mode. Harvest_kg has 36,648 rows and sum 8,799,669.50962 by default,
+versus 66,645 rows and sum 12,696,657.323532056 with shipped factors. Before/after
+accountings match exactly. This fixes missingness classification, not conversion
+coverage; it never invents a factor for an unrecorded unit.
+
+The first baseline actor failed its measurement oracle after completed builds:
+Feature adds documented constant condition / season / production_obs axes. Its
+failure remains in api-baseline-v1. Additive readback copied the completed private
+cache without producer replay, checked the three configured sentinel values, and
+projected them by name before comparing Country/Feature payloads. Candidate cold
+passed in 59.83 s; fresh-process warm passed in 10.83 s with identical private
+cache bytes/size/mode/mtime and no parent Make or id_walk. Both comparisons use
+strict EA/NumPy payload checks. No shared cache mutation, acquisition, nutrition
+lookup, new scientific rule, full-suite/CI result or historical cohort replay is
+claimed.
