@@ -3306,3 +3306,52 @@ separate earlier/warm closed Feature pickle byte equality is an export fact,
 not an executed fully typed Country-to-Feature metadata assertion. Independent
 Burkina source/receipt review supports this bounded D1/panel extraction; #1120
 and its other country/eligibility scopes remain open.
+
+* GH #1119 -- structural crop marker (2026-10-30)
+
+The existing plot-level fertilizer/organic branches now emit
+=j = '(not crop-specific)'= under the [[https://github.com/ligon/LSMS_Library/issues/1119#issuecomment-6368100317][GH #1119 ruling]]. This supersedes only
+the earlier =Whole Plot= spelling in "Source grains" above. It does not name
+a crop or alter the separate =plot_id= axis.
+
+The Seed/Pesticide crop mapping and existing unresolved-label exclusions stay
+unchanged; no missing/unmapped raw crop row is newly admitted. No Uganda-specific
+zero-code rule is imported. All five colmaps, field/holder/household identity,
+unique holder/crop purchase joins, eligibility, payloads, units, reducers and
+order remain. The #1183 retention question and [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 missing-household exclusion]]
+are separate and unchanged. Focused invented checks/source review support this
+narrow code boundary; actual source/Country/Feature accounting remains pending.
+
+* GH #1119 -- composed five-wave marker verification (2026-10-30)
+
+The source-preparation “actual accounting remains pending” checkpoint above
+is superseded by qualified saved-source verification, not a clean cold rebuild.
+At exact candidate =f180929ee1a5e4ce64c196883ea20c7fb1f0ef42=, all 20
+matching-stage comparisons pass across five native CALL/RETURN/policy-storage
+triples, compiler triple, Country and singleton Feature. Each API returns
+180,900 rows: 69,024 structural fertilizer/organic rows change only =j=;
+111,876 Seed/Pesticide rows remain exact, including all non-j keys, payload,
+missing masks, nullable types and recursively typed attrs. No crop-specific
+literal Whole Plot occurred in these actual operands; its preservation is
+covered by the inherited focused invented test.
+
+Both compiler-finalization and named-axis/full-attrs Feature compositions,
+candidate strict Country, and fresh-process warm checks pass. Seven selected
+caches retain exact bytes, identities, modes, nanosecond times and coverage.
+Warm observes four sanctioned readers and eight aggregation hooks, with zero
+named raw/parser/native/Wave-build/writer entrypoints; it is not universal zero I/O.
+
+All 14 cross-stage failures remain failed: 12 RETURN/bare-pandas NA-policy
+comparisons and both compiler CALL/RETURN comparisons. All 12 RETURN/original
+production-policy storage comparisons pass. Original bare-reader, missing-env
+and list-accessor harness failures remain preserved; the final continuation
+reuses authentic completed stages, including the baseline Country return.
+
+Fifteen closed numeric source operands and a saved sample are the inputs.
+Private sample/native hash adaptations make this composed verification,
+not fresh sample/cache/weight or actual GNU Make acceptance. Existing eligibility,
+units, reducers, #1183 retention and the settled #1357 anonymous-row exclusion
+are unchanged. Independent review SHA256
+=bd2d229ba8ed6e318b2e5f05dcf51fe67fbf5974f7ade3f3c0ca4ecb12c1bc7b=;
+dispatch =b6e9e49702364b2c9b61a3c00623e9eb=. The qualified report lives at
+=slurm_logs/isa_backlog_2026-10-30/Ethiopia/1119-marker/REPORT.md=.
