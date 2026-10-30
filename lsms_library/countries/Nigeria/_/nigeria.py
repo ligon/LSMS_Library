@@ -1177,12 +1177,13 @@ def crop_production_for_wave(t, frames, crop_labels):
 # Tractor-Machinery) carried on the harmonize_input categorical table.
 # A `crop` index level (harmonize_food labels) disambiguates the multiple
 # seed rows a plot can carry (one per crop); non-seed inputs are not
-# crop-specific and carry crop = 'n/a' (a non-null sentinel so the index
-# stays unique and free of null index levels).
+# crop-specific and carry crop = '(not crop-specific)' (GH #1119).
+# A private legacy key is retained until the existing dedup finishes so the index
+# stays unique and free of null index levels.
 #
 # Stores REPORTED item-level fields ONLY:
 #   input               harmonized input-type label (index)
-#   crop                seed's crop (index; 'n/a' for non-seed inputs)
+#   crop                seed's crop (index; structural marker for non-seed inputs)
 #   Quantity, u         reported quantity + native unit
 #   Purchased           bool: any of this input acquired by purchase
 #   Quantity_purchased  reported purchased quantity (where recorded)
@@ -1211,7 +1212,8 @@ INPUT_HERBICIDE = 'Herbicide'
 INPUT_ANIMAL = 'Animal Traction'
 INPUT_TRACTOR = 'Tractor/Machinery'
 
-NO_CROP = 'n/a'      # crop-level sentinel for non-seed (crop-agnostic) rows
+NO_CROP = '(not crop-specific)'
+_LEGACY_NO_CROP = 'n/a'  # old sort/dedup key, never the new structural label
 
 
 def _seed_unit_label(unit_series, unit_dec, where=''):
@@ -1348,6 +1350,9 @@ def seed_rows_for_wave(df, dec, hhid, plot, crop, channels, crop_labels,
         out['Improved'] = pd.Series(pd.NA, index=out.index, dtype='boolean')
     # Keep only rows with a household, a plot, and a resolved crop.
     out = out[out['i'].notna() & out['plot_id'].notna() & out['crop'].notna()]
+    # Crop-specific provenance is attached only AFTER the old eligibility gate.
+    # Missing/unmapped lookups are not made eligible by a nonmissing marker.
+    out['_crop_label'] = out['crop']
     return out
 
 
@@ -1415,7 +1420,8 @@ def fert_rows_long_typed(df, dec, hhid, plot, channels, type_map):
         pqsum = pq.sum() if len(pq) else pd.NA
         purchased = (pd.NA if (pqsum is pd.NA or pd.isna(pqsum))
                      else (True if pqsum > 0 else False))
-        recs.append({'i': i_, 'plot_id': p_, 'input': typ, 'crop': NO_CROP,
+        recs.append({'i': i_, 'plot_id': p_, 'input': typ,
+                     'crop': _LEGACY_NO_CROP, '_crop_label': NO_CROP,
                      'Quantity': qty, 'u': uu, 'Purchased': purchased,
                      'Quantity_purchased': pqsum, 'Improved': pd.NA})
     out = pd.DataFrame.from_records(recs)
@@ -1450,7 +1456,8 @@ def fert_rows_wide_typed(df, dec, hhid, plot, specs):
              else pd.Series('Kg', index=df.index, dtype='string'))
         piece = pd.DataFrame({
             'i': i.values, 'plot_id': plot_id.values, 'input': sp['input'],
-            'crop': NO_CROP, 'Quantity': q.values, 'u': u.values,
+            'crop': _LEGACY_NO_CROP, '_crop_label': NO_CROP,
+            'Quantity': q.values, 'u': u.values,
             'Purchased': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
             'Quantity_purchased': pd.Series(pd.NA, index=df.index, dtype='Float64').values,
             'Improved': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
@@ -1509,7 +1516,8 @@ def chem_rows(df, dec, hhid, plot, specs):
         emit = (q.fillna(0) > 0)
         piece = pd.DataFrame({
             'i': i.values, 'plot_id': plot_id.values, 'input': sp['input'],
-            'crop': NO_CROP, 'Quantity': q.values, 'u': u.values,
+            'crop': _LEGACY_NO_CROP, '_crop_label': NO_CROP,
+            'Quantity': q.values, 'u': u.values,
             'Purchased': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
             'Quantity_purchased': pd.Series(pd.NA, index=df.index, dtype='Float64').values,
             'Improved': pd.Series(pd.NA, index=df.index, dtype='boolean').values,
@@ -1527,19 +1535,41 @@ def chem_rows(df, dec, hhid, plot, specs):
 
 def assemble_plot_inputs(t, parts):
     """Concatenate the per-module row frames for one wave, attach `t`,
-    drop empties, set the (t, i, plot, input, crop) index and dedup."""
+    drop empties, set the (t, i, plot, input, crop) index and dedup.
+
+    Constructors carry `_crop_label` separately from their legacy crop key.
+    Explicit nonnull labels from direct callers remain supported; an untagged
+    missing/legacy marker cannot identify structural versus crop-specific data.
+    """
     parts = [p for p in parts if p is not None and len(p)]
     payload = ['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved']
     cols = ['i', 'plot_id', 'input', 'crop'] + payload
     if not parts:
         return pd.DataFrame(columns=cols).set_index(
             ['i', 'plot_id', 'input', 'crop'])
-    out = pd.concat(parts, ignore_index=True)
+    classified = []
+    for part in parts:
+        part = part.copy()
+        if '_crop_label' not in part:
+            crop = (part['crop'] if 'crop' in part else
+                    pd.Series(pd.NA, index=part.index, dtype='string'))
+            if (crop.isna() | crop.eq(_LEGACY_NO_CROP)).any():
+                raise ValueError(
+                    f'Nigeria plot_inputs {t}: missing/legacy crop label needs '
+                    'explicit source provenance in _crop_label (GH #1119)')
+            part['_crop_label'] = crop
+        if part['_crop_label'].isna().any():
+            raise ValueError(
+                f'Nigeria plot_inputs {t}: _crop_label must identify the '
+                'source crop or an explicit crop marker (GH #1119)')
+        classified.append(part)
+    out = pd.concat(classified, ignore_index=True)
     for c in cols:
         if c not in out.columns:
             out[c] = pd.NA
     out['t'] = t
-    out['crop'] = out['crop'].fillna(NO_CROP).astype('string')
+    out['crop'] = out['crop'].fillna(_LEGACY_NO_CROP).astype('string')
+    out['_crop_label'] = out['_crop_label'].astype('string')
     out['input'] = out['input'].astype('string')
     # Preserve the existing finalizer's all-payload-NA boundary: a sentinel
     # must not make an otherwise hollow record eligible (ledger #1118 §8).
@@ -1557,10 +1587,31 @@ def assemble_plot_inputs(t, parts):
     out['u'] = out['u'].mask(missing_u & retained_payload, U_UNKNOWN)
     # Dedup on the index grain (defensive: a handful of duplicate
     # (i, plot, input, crop) rows can survive the per-module collapse).
+    keys = ['t', 'i', 'plot_id', 'input', 'crop']
+    identities = out.groupby(keys, dropna=False, sort=False)['_crop_label']
+    if identities.nunique(dropna=False).gt(1).any():
+        raise ValueError(
+            f'Nigeria plot_inputs {t}: legacy crop dedup conflates distinct '
+            'source crop identities; cannot relabel losslessly (GH #1119/#1120)')
     out = out.sort_values(['i', 'plot_id', 'input', 'crop'])
     out = out.drop_duplicates(subset=['t', 'i', 'plot_id', 'input', 'crop'],
                               keep='first')
     out = out.set_index(['t', 'i', 'plot_id', 'input', 'crop']).sort_index()
+    # Relabel only AFTER the original ordering and keep-first winner settle.
+    # Replace only crop's dictionary/codes; preserve every other full axis.
+    labels = out.pop('_crop_label')
+    position = out.index.names.index('crop')
+    codes, levels = pd.factorize(labels, sort=True)
+    all_levels = list(out.index.levels)
+    all_codes = list(out.index.codes)
+    all_levels[position] = pd.Index(levels, name='crop')
+    all_codes[position] = codes
+    out.index = pd.MultiIndex(levels=all_levels, codes=all_codes,
+                             names=out.index.names, verify_integrity=True)
+    if not out.index.is_unique:
+        raise ValueError(
+            f'Nigeria plot_inputs {t}: crop relabel creates duplicate source '
+            'identities; cannot merge them (GH #1119/#1120)')
     return out[payload]
 
 
