@@ -46,3 +46,23 @@ framework, no acquisitions, no historical control replay.
 Independent root review/publication. Source availability and fresh API results
 are measured in evidence/REPORT.md; historical source-only receipts remain
 qualified. Missing caches block only their declared dependent checks.
+
+## §7 Fresh verification and dispositions (2026-10-29)
+All 25 selected declared blobs were available and MD5-verified in private L1;
+no acquisition or shared-cache write. Independent raw-source oracles passed
+all five waves: W2 44 PH-only / 39 geolocated, two EAs absent PP household
+cover; W4/W5 labelled own-PP reuse 20/31. All ten rounds have nonnull sample v.
+Source PH weights and labelled payload remain exact; normalizations checked
+with extension-array and nonmissing NumPy equality, including tiny/nextafter
+negative calibration. Final full sample has 49,089 rows; clusters have 7,128.
+60 focused helper tests passed. Root explicitly authorized D1 reconciliation
+of three obsolete PP-equality functions: 29 selected genuine API tests passed
+with unchanged fixtures/unrelated assertions. Original 9-failure/2-pass receipt
+is preserved. No full-country-suite or separate #1318/#1309 composition claim.
+
+Evidence REPORT.md, scripts, JSON and JUnit live in this dispatch's private
+campaign evidence directory; raw frames/source witnesses remain separately in
+mode700 private-witnesses/f7eccd39e595453b852556e71fbf9977. Root retains review,
+integration and external publication. #1264 panel links, #978 W5 geo wiring,
+Site2 geo disagreements and incomplete cluster-selected provenance remain
+explicit residuals; this product makes no national-population equivalence claim.
