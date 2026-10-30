@@ -17,25 +17,31 @@ source; the across-source sum + median-wage valuation are transformations.
 See lsms_library/countries/Malawi/_/malawi.py:_plot_labor_block.
 """
 import sys
+import numpy as np
 
 sys.path.append('../../_/')
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
-from malawi import _plot_labor_block, assemble_plot_labor
+from malawi import (_plot_labor_block, assemble_plot_labor,
+                    _labor_source_reference)
 
 
 WAVE = '2010-11'
 BASE = '../Data/Full_Sample/Agriculture/'
 
 d = get_dataframe(BASE + 'ag_mod_d.dta', convert_categoricals=False)
+d_labor_positions = np.arange(len(d), dtype=np.int64)
 d['hhid'] = d['case_id'].apply(format_id)
 d['plotkey'] = d['ag_d00'].apply(format_id)
 
 piece = _plot_labor_block(d, hhid='hhid', plotkey='plotkey', t=WAVE,
-                          hired_suffix='', include_other=True)
+                          hired_suffix='', include_other=True,
+                          source_ref=_labor_source_reference(
+                              BASE + 'ag_mod_d.dta', script_path=__file__),
+                          row_positions=d_labor_positions)
 
 df = assemble_plot_labor(WAVE, [piece])
 
-assert df.index.is_unique, f"Non-unique (t,i,plot,source) in plot_labor {WAVE}"
+assert df.index.is_unique, f"Non-unique (t,i,plot,source,labor_obs) in plot_labor {WAVE}"
 assert len(df) > 0, f"plot_labor {WAVE} produced no rows"
 
 to_parquet(df, 'plot_labor.parquet')

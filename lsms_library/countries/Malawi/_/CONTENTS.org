@@ -4507,3 +4507,73 @@ audit failure are not erased. Other nine compiler targets, #1174 eligibility,
 Dispatch =20faef1c81544b93a4572160c9a26b2e=, job =40651872=; final private
 result =7863c3adbc5bd5c3c51196c6f7d607b124736a03=; ordinary REPORT SHA256
 =8a674e6dde13ad0af4a444758825d4c98b25c20c0c42abb85a3ab5b82bb7458f=.
+
+
+* 2026-10-30 -- missing-plot labor source observations (GH #1120)
+
+The compiler entry above claimed “Plot labor keeps recorded days on
+=unknown_plot= stubs.” Source review at =1302cec2= found that the native labor
+helper still cast nullable =plotkey= directly, and its =sum(PersonDays) /
+first(Wage)= reduction pooled missing-plot rows. The earlier compiler-only
+repair did not implement that native claim. This contradiction is retained
+explicitly; the historical 40 rows / 32 households diagnosis is not a new count.
+
+The source successor uses the existing =unknown_plot= and canonical
+=labor_obs= contracts. Each eligible missing-plot record carries its literal
+source/declared-sidecar SHA/original pre-selection row position. CS/Panel
+halves stay separate. The coordinate identifies an observation, not a plot,
+worker or panel household. Known plots retain =unresolved_observation= and
+the exact previous sum/first reducer, eligibility and arithmetic.
+
+Missing-plot observations preserve their own reported days/wage and missing
+masks. A hired wage-only observation keeps absent days absent, rather than a
+singleton grouped sum inventing zero; this follows the Malawi source gate and
+the maintainer's wage-only rule cited by Uganda #1364. Known-plot legacy sums
+are unchanged. No wage is borrowed from a sibling unknown plot. The four
+native drivers bind all six D sources, capturing positions before derived
+fields/eligibility; the restricted 2016 reader and composite garden_plot
+construction are unchanged. Source identity reuses the declared-sidecar-only
+input observation helper, with explicit countries-relative handling for that
+restricted reader's existing path literal.
+
+Seventeen focused invented source/axis controls passed once in 4.31 seconds;
+independent source review supports the wage-only missing-day boundary. The
+reviewed scientific product is =83fd21ad244de670ccc66f8a8dd31b5fd5d1c763=.
+
+Bounded, staged verification then covered all four declared native waves:
+
+| wave    | native rows |
+|---------+-------------|
+| 2010-11 |      21,016 |
+| 2013-14 |       9,197 |
+| 2016-17 |      22,627 |
+| 2019-20 |      27,157 |
+| total   |      79,997 |
+
+Six Module D sources were decoded once. Eight reconstructed native invocations
+(baseline/candidate) consumed those saved numeric frames, retaining the unchanged
+2016 restricted-reader path. Both country compilers, 16 scientific predicates
+and 22 transport predicates passed. The 40 unknown source observations in this
+selected run are observations, not a count of physical plots or a retention-gain
+target. Known-plot observed keys, order, dtypes, masks and payload matched; the
+2010-11 full unused-index-domain diagnostic failed and remains failed.
+
+Baseline Country matched the composed expectation. A later continuation accepted
+saved candidate Country versus that expectation, strict versus cold Country,
+the first genuine Feature call's canonical alignment and typed carried attrs,
+and exact fresh-process warm Country and Feature equality over 79,997 rows.
+The five retained cache files and committed maps stayed unchanged; nine closed
+prerequisites were authenticated before and after. Final Feature continuation
+=77f1007a91a84800b2086a64d6eea6ee= (job =40659566=) completed in 67.713 seconds;
+its final publication completed at =44e2097c8136af16eb5d28a5cc04f166d19d38ec=.
+Independent source and closed-result reviews support this qualified checkpoint.
+
+This is composed verification, using a source-compatible saved finalized sample-v
+provider and retained native/cache stages. It does not establish fresh normal
+sample/cache/weight validation or a single uninterrupted raw-to-Feature build.
+The import-root, absent-fingerprint, private DVC-tmp-root and Feature-binding
+harness failures remain recorded separately; completed source/native stages were
+reused rather than replayed. Named guards and reviewed read routes support the
+finite no-replay claim, not universal kernel IO measurement. #1174 eligibility,
+#1190 units, #1278 namespace, other compiler/reader caveats and whole #1120
+closure remain separate.
