@@ -4273,6 +4273,45 @@ acquisition or fixture update is implied. Ledger:
 =.coder/ledger/1287-uganda-public-compiler-composition.md=.
 
 
+* Nonfood compiler, direct Make and API verification (GH #1287, 2026-10-30)
+
+Independent review accepts the bounded =nonfood_expenditures= runtime cell.
+Eight native wave contributions total 251,588 rows.  Native helper outputs
+match an independent literal selection/grouping expectation; writer CALL
+matches that native frame and writer RETURN matches stored readback.  The
+country compiler performs one local ID walk and one write, matching the
+walked concatenation and stored output exactly.
+
+Direct GNU Make target execution and the ordinary default Country API both
+completed.  This is not a =Country(..., backend='make')= or Feature test.
+The API serves 251,588 rows with 265 null-v rows.  The documented 244 target
+plus 21 other-wave partition is retained prior evidence, not a fresh partition
+measurement.  The 2015-16 =gsec1.hh -> HHID= bridge and historical helper's
+=j= household / =i= item convention remain explicit.
+
+API stage-2 and finalizer comparisons establish composition using existing
+production transforms; they are not independent scientific oracles for those
+transforms.  Strict checks include typed attrs, complete axes, ExtensionArray
+values, masks and exact nonmissing NumPy values.  Tiny/nextafter controls
+remain distinct from scientific evidence; no tolerance or normalization was
+introduced to pass a comparison.
+
+Seventeen source objects (42,450,844 bytes) were authenticated and privately
+copied.  Make used nine raw reads/decodes; API used eighteen; the fresh warm
+process used none and preserved the full cold row order and values.  All 35
+tracked data-root files retained bytes, mode and mtime.  Five phases exited
+0 with no timeout and closed descendant trees; total 344.655 seconds.  Prior
+observer and launcher failures remain failed history, not successful checks.
+
+Executed source =3ea9e97f7e207486ac1ec6ce3246cccf16075b76= has production bytes
+identical to =0b88881e9bd7e8b8838552fb4b2d4e7cabab5268=; dispatch
+=ac78fc566dc84a37b2213dea08d3e9ff=.  Independent review authenticated 23 ordinary
+files, 53 production bindings, nine operator files and 193 private witness/log
+hashes without deserialization or data replay.  Review SHA256:
+=1b1d9d1f3b93c744ef7c93848f8b07b4455bd59f73e53b5201303654cc9f2b1e=.
+Other compilers, #1288, the recall contradiction and broader scientific
+acceptance remain separate; this does not close the fourteen-country #1287.
+
 * 2026-10-30 -- other-table float-string ID check (GH #1291)
 
 After merged #1325, a fixed-public source audit covers all 28 declared/derived
