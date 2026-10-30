@@ -44,12 +44,8 @@ def _frame(wave, *, empty=False, one_column=False):
 
 
 def _equal(actual, expected):
-    if isinstance(expected, pd.Series):
-        pd.testing.assert_series_equal(actual, expected, check_exact=True)
-        columns = [(actual, expected)]
-    else:
-        pd.testing.assert_frame_equal(actual, expected, check_exact=True)
-        columns = [(actual[c], expected[c]) for c in expected]
+    pd.testing.assert_frame_equal(actual, expected, check_exact=True)
+    columns = [(actual[c], expected[c]) for c in expected]
     # GH #1206: frame/series equality alone can miss nullable numeric changes.
     for x, y in columns:
         pd.testing.assert_extension_array_equal(x.array, y.array, check_exact=True,
@@ -334,9 +330,9 @@ def test_food_selector_empty_and_squeezed_contributions(sandbox, one_column, emp
                            for w, f in zip((first, second), frames)})
     sandbox.run()
     assert sandbox.reads == [f'../{w}/_/food_acquired.parquet' for w in (first, second)]
-    # Preserve the existing squeeze: a one-column contribution is a Series.
-    expected = pd.concat([f.squeeze() for f in frames])
-    _equal(sandbox.writes[0][0], _renamed(expected))
+    # The old walk restored a DataFrame after squeeze. Preserve the actual
+    # table/writer shape, including empty and one-column native inputs.
+    _equal(sandbox.writes[0][0], _renamed(pd.concat(frames)))
 
 
 def test_food_selector_preserves_public_single_row_squeeze_failure(sandbox):

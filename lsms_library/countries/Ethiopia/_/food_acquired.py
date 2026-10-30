@@ -73,6 +73,11 @@ for t in country.waves:
     if ('i' in df.index.names and not df.attrs.get('id_converted')
             and updated_ids is not None):
         df = id_walk(df, updated_ids, state='raw')
+    # The old reset_index/set_index walk returned a DataFrame even when
+    # the unchanged squeeze above yielded a one-column native Series.
+    # Preserve that table/writer shape without changing its keys or values.
+    if isinstance(df, pd.Series) and 'i' in df.index.names:
+        df = df.to_frame()
     p.append(df)
 
 p = pd.concat(p)
