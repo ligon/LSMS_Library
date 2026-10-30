@@ -670,10 +670,42 @@ def _seed_crop_labels(source_labels, seed_crop_map):
 CROP_NA = '(not crop-specific)'
 
 
+def _ecvma_input_observations(households, slots, source_path, *, script_path):
+    """Recorded roster slots, scoped to a declared source release (GH #1123).
+
+    Together with the unchanged household key, each token identifies exactly
+    one applied source line. Equal payloads in different slots are NOT repeats.
+    Reuse Malawi's sidecar-only release reference (#1323), but use ECVMA's
+    recorded slot rather than a constructed physical row number.
+    """
+    from pathlib import Path
+    from lsms_library.paths import countries_root
+    from lsms_library.local_tools import cached_file_hash
+
+    path = Path(source_path)
+    if not path.is_absolute():
+        path = Path(script_path).resolve().parent / path
+    path = path.resolve()
+    relative = path.relative_to(countries_root().resolve()).as_posix()
+    sidecar_hash = cached_file_hash(path.with_name(path.name + '.dvc'))
+    if sidecar_hash is None:
+        raise ValueError('Niger input observations require a declared sidecar')
+    numeric = pd.to_numeric(slots, errors='coerce')
+    if (households.isna().any() or numeric.isna().any()
+            or not ((numeric > 0) & (numeric % 1 == 0)).all()):
+        raise ValueError('Niger input observations require household and integer slot')
+    keys = pd.DataFrame({'i': households.to_numpy(), 'slot': numeric.to_numpy()})
+    if keys.duplicated().any():
+        raise ValueError('Niger input observations repeat a native household/slot')
+    reference = f'{relative}@dvc:{path.name}:{sidecar_hash}'
+    return ('slot:' + reference + ':' + str(slots.name) + '='
+            + numeric.astype('Int64').astype('string'))
+
+
 def _finish_plot_inputs(df, t):
     """Common tail for the wave-level plot_inputs scripts: coerce numeric
     columns, guarantee the full schema column set, build the
-    (t, i, input, crop, u) index.  Mirrors _finish_crop_production.
+    (t, i, input, crop, u, input_obs) index. Mirrors _finish_crop_production.
 
     Drops rows with no input identity (input NA) — a roster placeholder
     line, not a reported input.  The `crop` index level is filled with the
@@ -700,10 +732,15 @@ def _finish_plot_inputs(df, t):
     # `Manquant`, which is the spelling that was retired -- see U_NA.
     df = fill_missing_u(df)
     df = df[df['input'].notna()]
-    keep = ['t', 'i', 'input', 'crop', 'u',
+    # EHCVM keeps its existing grain and uniqueness guards. Only ECVMA has
+    # recorded slot tokens; never invent a row ordinal for other inputs.
+    if 'input_obs' not in df.columns:
+        df['input_obs'] = 'unresolved_observation'
+    df['input_obs'] = df['input_obs'].astype('string')
+    keep = ['t', 'i', 'input', 'crop', 'u', 'input_obs',
             'Quantity', 'Purchased', 'Quantity_purchased']
     df = df[[c for c in keep if c in df.columns]]
-    df = df.set_index(['t', 'i', 'input', 'crop', 'u'])
+    df = df.set_index(['t', 'i', 'input', 'crop', 'u', 'input_obs'])
     return df
 
 

@@ -240,7 +240,9 @@ Data Scheme:
     # same non-null reason (GH #842 -- 'Unknown' is the corpus-canonical
     # missing-unit label, shared by every Niger table with a `u` level; it
     # used to be the French 'Manquant').
-    index: (t, i, input, crop, u)
+    # input_obs preserves ECVMA recorded slots, qualified by source release.
+    # EHCVM retains unresolved_observation and its existing native grain.
+    index: (t, i, input, crop, u, input_obs)
     Quantity: float
     Purchased: bool
     Quantity_purchased: float

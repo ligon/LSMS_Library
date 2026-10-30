@@ -14,7 +14,7 @@ Only the rows the household actually applied are reported inputs, so we
 keep AS02CQ03==1.  i is built from (GRAPPE, MENAGE, EXTENSION) via niger.i
 -- the full ECVMA2 household key, matching this wave's sample / roster /
 crop_production idxvars (GH #679).  No plot column; grain is
-(t, i, input, crop, u).
+(t, i, input, crop, u, input_obs).
 """
 import sys
 
@@ -23,7 +23,7 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
 from niger import (i as niger_i, _input_maps, _input_labels,
-                   _unit_labels, _finish_plot_inputs, _crop_maps, _crop_labels)
+                   _unit_labels, _finish_plot_inputs, _ecvma_input_observations, _crop_maps, _crop_labels)
 
 
 base = '../Data/NER_2014_ECVMA-II_v02_M_STATA8/'
@@ -44,7 +44,12 @@ hh = src.apply(lambda r: niger_i(pd.Series([r['GRAPPE'], r['MENAGE'], r['EXTENSI
 # purchased: AS02CQ07 1 = Oui -> True, 2 = Non -> False (9 Manquant -> NA)
 purchased = srcn['AS02CQ07'].map({1: True, 2: False})
 
+# Recorded slot, not label or payload, distinguishes repeated seed reports.
+input_obs = _ecvma_input_observations(
+    hh, srcn['AS02CQ02'], '../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS02CP1.dta', script_path=__file__)
+
 df = pd.DataFrame({
+    'input_obs':          input_obs.values,
     'i':                  hh.values,
     'input':              _input_labels(src['AS02CQ02'], input_map).values,
     'crop':               _crop_labels(srcn['AS02CQ04'], src['AS02CQ04'], crop_map).values,
@@ -56,5 +61,6 @@ df = pd.DataFrame({
 
 df = _finish_plot_inputs(df, '2014-15')
 
+assert df.index.is_unique, 'plot_inputs has repeated native input observations'
 assert len(df) > 0, 'plot_inputs 2014-15 produced no rows'
 to_parquet(df, 'plot_inputs.parquet')
