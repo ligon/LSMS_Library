@@ -2211,3 +2211,55 @@ corrected Make preserves that original root too. Import socket probes were
 denied, not absent. This accepts only the measured livestock D1 cell, not
 stale-output #1288, every #1287 cell, Feature/CLI or new declaration cases.
 See [[file:../../../../slurm_logs/isa_backlog_2026-10-30/Niger/livestock-D1/REPORT.md][the reviewed stage evidence and preserved failures]].
+
+* 2026-10-30 -- remaining five compiler runtime checkpoint (GH #1287; #1360)
+
+Bounded verification at =373af66f= covers =crop_production=, =plot_inputs=,
+=plot_labor=, =people_last7days= and =plot_features=; product bytes did not
+change. Four country Make targets produced 16 native outputs before their
+compilers. =plot_features= used its two EHCVM native pattern targets followed
+by its compiler script: this is not a country-var Make rule or CLI claim.
+All 51 matching-stage native/compiler CALL, prepared RETURN and storage checks
+pass. All five default Country and singleton Feature expectations pass
+(=currency=None=); four strict Make/default pairs pass. Expectations reuse
+existing finalization/alignment; source checks cover selected keys and payloads,
+not every scientific transform.
+
+| Table             | Native/compiler rows | Public rows |
+|-------------------+----------------------+-------------|
+| crop_production   |                48163 |       46376 |
+| plot_inputs       |                42557 |       42553 |
+| plot_labor        |                53041 |       53041 |
+| people_last7days  |               131430 |      125294 |
+| plot_features     |                12414 |       12413 |
+
+The Make API reused existing compiler outputs; the separate default API
+rebuilt 18 selected native waves. These are distinct route observations.
+*Crop strict Make/default equality remains FAILED* ([[https://github.com/ligon/LSMS_Library/issues/1360][#1360]]): both have 46,376
+unique keys, six exactly key-aligned payload arrays/masks and typed attrs,
+but 22,516 positions differ. Complete index equality fails; unused-domain
+representation was not isolated from order. Keyed equality is not a strict
+backend pass, and no actual frame was sorted or cast to manufacture one.
+
+A fresh process compared all ten saved Country/Feature outputs exactly in
+77.88 s. All 57 owned files retained SHA256, size, mode and nsmtime; observed
+warm source, Python decoder, native/compiler and writer calls were zero.
+C-level decoder entrypoints, directories, atime and other runtime caches were
+not independently measured. Full labor/Wage arithmetic, crop-sales allocation,
+hours/industry/age eligibility and every plot attribute were not revalidated.
+
+New source observation: =2021-22/Data/s04a_me_ner2021.dta= has 44,619 rows;
+299 lack =membres__id= after existing =format_id=, with no missing household
+keys. Existing =_finish_people_last7days= excludes null =i/pid=, leaving
+44,320 unique native keys whose three participation booleans/masks match.
+The initial saved-source adapter omitted that selection and failed; its
+failure remains beside the corrected saved-only check. No native retry,
+missing-ID explanation or eligibility change was introduced.
+
+Preflight failures remain recorded. The already-produced full 20,231-row
+pre-finalized sample was retained for separate #1244 work; no census-only
+build ran. This is qualified transport/runtime evidence, not #1288 freshness
+injection, optional subset coverage, full scientific or whole-#1287 acceptance.
+Existing EXTENSION, disjoint-programme, duplicates, units and quantity-999
+caveats remain. See ledger =1287-niger-remaining-runtime-checkpoint= for pins,
+independent review and custody limits; accepted livestock #1342 is separate.
