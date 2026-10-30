@@ -1051,17 +1051,18 @@ Columns:
         ~70x, an error in the opposite direction from the one this column
         exists to prevent.
 
-        SO: a consumer forming a per-unit or per-kg price must treat
-        `Unit_sold != u` rows as AMBIGUOUS -- exclude them, or resolve them
-        with further evidence (a reported per-row sold kg factor, where the
-        survey has one) -- and must REPORT how many were excluded.  An
-        earlier version of this note said "a price per ONE `Unit_sold` --
-        NEVER per `u`"; that instruction was measured to be wrong on the
-        majority of exactly the rows it governed, and canonical-schema prose
-        is the worst place for such a rule.  Where `Unit_sold` is NA the
-        survey recorded no unit for that sale and the ratio has no
-        denominator you can name; that is not licence to substitute `u`
-        either.
+        APPROVED CONSUMER DEFAULT (GH #824, owner ruling 2026-10-23):
+        https://github.com/ligon/LSMS_Library/issues/824#issuecomment-6367367289
+        median_price_valuation converts Quantity_sold with its OWN Unit_sold
+        or a valid supplied KgFactor_sold (kg per sold unit). Only an NA sold
+        label or absent Unit_sold column permits harvest-u fallback. A recorded
+        unconvertible label does not. This supersedes the former instruction
+        to exclude every disagreement and never substitute u for an absent
+        sold label. Disagreement remains a quality flag, not proof that either
+        answer is true. The consumer reports fallback and disagreement counts
+        in attrs['sold_quantity_conversion']; its docstring defines the counted
+        populations, factor screening and explicit-kg_qty bypass. Survey factor
+        wiring and the scientific interpretation of disagreements remain open.
 
         HOW OFTEN IT MATTERS is a per-country fact and must be measured, not
         assumed: sold and harvest unit agree on 95-97% of Nigeria's sale

@@ -7304,6 +7304,68 @@ def _weighted_median(values, weights, keys):
                      index=values.index)
 
 
+def _sold_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
+    """Adapt sold units to the existing resolver without changing input axes.
+
+    GH #824; ledger 824-sold-unit-consumer §§2–4. Only actual NA licenses
+    harvest fallback. Reported factors are screened against the SOLD label,
+    before fallback, and never borrowed from the harvest's ``KgFactor``.
+    """
+    harvest = _level_or_column(df, 'u')
+    sold = _level_or_column(df, 'Unit_sold')
+    if harvest is None and sold is None and 'KgFactor_sold' not in df.columns:
+        raise ValueError("expected a 'u' unit level or column")
+    if harvest is None:
+        harvest = np.full(len(df), None)
+    if sold is None:
+        sold = np.full(len(df), None)
+    absent = pd.isna(sold)
+
+    # Drop only the temporary view's harvest unit level: the resolver reads
+    # index levels before columns. All other grouping keys/attrs stay intact.
+    work = df.copy()
+    if 'u' in (work.index.names or []):
+        work = work.reset_index('u', drop=True)
+    work['u'] = sold
+    sold_known = ~_unit_sentinel_mask(work)
+    reported = np.full(len(df), np.nan)
+    rejected = np.zeros(len(df), dtype=bool)
+    invalid = np.zeros(len(df), dtype=bool)
+    if 'KgFactor_sold' in df.columns:
+        offered = df['KgFactor_sold']
+        invalid = offered.notna().to_numpy() & np.isnan(_valid_factor(offered))
+        reported, rejected = _screen_reported_factors(work, offered)
+    supplied = ~np.isnan(reported)
+
+    work['u'] = harvest
+    harvest_known = ~_unit_sentinel_mask(work)
+    known_pairs = sold_known & harvest_known
+    sold_text = pd.Series(sold).astype(str).str.strip().str.casefold()
+    harvest_text = pd.Series(harvest).astype(str).str.strip().str.casefold()
+    disagree = known_pairs & (sold_text != harvest_text).to_numpy()
+
+    work['u'] = np.where(absent, harvest, sold)
+    inferred = _kg_factor_series_with_declared(
+        work, volume_as_mass=volume_as_mass, unit_kg=unit_kg).to_numpy()
+    factor = np.where(supplied, reported, inferred)
+    resolved = np.isfinite(factor) & (factor > 0)
+    fallback = absent & ~supplied
+    counts = {
+        'mode': 'units',
+        'rows': len(df),
+        'supplied_factor': int(supplied.sum()),
+        'sold_unit': int((~supplied & ~absent & resolved).sum()),
+        'harvest_fallback': int((fallback & resolved).sum()),
+        'unresolved': int((~resolved).sum()),
+        'harvest_fallback_attempted': int(fallback.sum()),
+        'known_unit_pairs': int(known_pairs.sum()),
+        'unit_disagreement': int(disagree.sum()),
+        'supplied_factor_invalid': int(invalid.sum()),
+        'supplied_factor_rejected': int(rejected.sum()),
+    }
+    return pd.Series(factor, index=df.index, dtype='float64'), counts
+
+
 def median_price_valuation(item_df, geo_levels, *,
                            value_col='Value_sold',
                            qty_col='Quantity_sold',
@@ -7375,7 +7437,8 @@ def median_price_valuation(item_df, geo_levels, *,
     value_col : str, default 'Value_sold'
         Sale-value column (numerator of the observed unit price).
     qty_col : str, default 'Quantity_sold'
-        Sold-quantity column, in the row's native unit ``u``.  Used only when
+        Sold-quantity column, in ``Unit_sold`` (falling back to harvest ``u``
+        only where the sold label is NA or its column is absent). Used only when
         ``kg_qty`` is not supplied: the sold quantity is converted to kg via
         the shared unit machinery so the unit price is per-kg and comparable
         across rows reported in different containers.
@@ -7384,7 +7447,10 @@ def median_price_valuation(item_df, geo_levels, *,
         Supply this when the caller has already converted (or when the price
         basis is not per-kg — e.g. wages per labor-day, where you pass the
         days Series and leave ``quantity_col`` as the days column).  When
-        omitted, ``qty_col`` is converted to kg via :func:`_kg_factor_series`.
+        omitted, ``qty_col`` is converted using its own sold-unit factor. A
+        supplied ``KgFactor_sold`` is kg per ONE sold unit, screened with
+        the existing reported-factor rules and preferred over label conversion.
+        It can resolve a missing label. Harvest ``KgFactor`` is never used.
     quantity_col : str, default 'Quantity'
         The physical quantity each row is valued at in step 3 (harvest kg,
         seed kg, fertilizer kg, labor days).  Must already be in the SAME unit
@@ -7454,6 +7520,24 @@ def median_price_valuation(item_df, geo_levels, *,
         for ``harvest_value_LCU``).  Rows whose ``quantity_col`` is missing get
         a missing ``out_col``.
 
+        ``attrs['sold_quantity_conversion']`` records conversion diagnostics.
+        In ``mode='units'`` all counts cover ALL input rows, including zero or
+        missing quantities/values, before price/weight eligibility. The four
+        counts ``supplied_factor``, ``sold_unit``, ``harvest_fallback`` and
+        ``unresolved`` partition those rows by the selected factor's source
+        (or lack of a finite positive factor). ``harvest_fallback_attempted``
+        counts NA sold labels without a valid supplied factor, including failed
+        conversions; ``harvest_fallback`` counts only successful conversions.
+        ``known_unit_pairs`` counts rows with both non-NA, non-sentinel labels;
+        ``unit_disagreement`` counts differing stripped, case-insensitive labels
+        within that population, regardless of convertibility or factor use.
+        Disagreement is a quality flag, not an exclusion or proof of truth.
+        ``supplied_factor_invalid`` counts non-NA supplied factors rejected by
+        finite-positive validation; ``supplied_factor_rejected`` counts valid
+        numbers rejected by the existing reported-factor plausibility screen.
+        In ``mode='explicit'`` only ``rows`` is reported: unit conversion and
+        its diagnostics are bypassed. No counts imply sale-price eligibility.
+
     Notes
     -----
     Prior art (convergence, and the deltas).  Three teams reached the same
@@ -7507,13 +7591,15 @@ def median_price_valuation(item_df, geo_levels, *,
     # Observed sold quantity in kg (the price denominator).
     if kg_qty is not None:
         sold_kg = pd.to_numeric(kg_qty, errors='coerce').reindex(df.index)
+        conversion = {'mode': 'explicit', 'rows': len(df)}
     else:
         if qty_col not in df.columns:
             raise ValueError(f"item_df must have a {qty_col!r} column "
                              "(or pass kg_qty)")
         sold_native = pd.to_numeric(df[qty_col], errors='coerce')
-        sold_kg = sold_native * _kg_factor_series_with_declared(
+        factor, conversion = _sold_kg_factors(
             df, volume_as_mass=volume_as_mass, unit_kg=unit_kg)
+        sold_kg = sold_native * factor
 
     # Step 1: observed unit price; zero/inf priced rows excluded from the pool.
     with np.errstate(divide='ignore', invalid='ignore'):
@@ -7580,6 +7666,7 @@ def median_price_valuation(item_df, geo_levels, *,
     out = pd.DataFrame(index=df.index)
     out[price_col] = imputed
     out[out_col] = imputed * quantity
+    out.attrs['sold_quantity_conversion'] = conversion
     return out
 
 
