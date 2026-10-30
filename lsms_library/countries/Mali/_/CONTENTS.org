@@ -1739,3 +1739,46 @@ is compiler-independent on d65. Standalone-d65 compiler/Make composition, Featur
 cache census/rewarm and the remaining #824 factors/consumer/audit work are
 separate gates. Historical StageB/custody and the failed POST after the old231
 compiler tests are not replayed or reclassified by these ordinary checks.
+
+
+* Actual EACI crop compiler composition (GH #1287 D2, 2026-10-30)
+
+A bounded run at public =5a4b2ac623d55bb31b8908260ad54efb34070cd6=
+executed the explicit country Make target, both EACI native producers and the
+country compiler, then the normal Country API and a fresh-process warm call.
+The 2014-15 / 2017-18 native outputs have 10,341 / 24,719 rows. The compiler
+and API each have 35,060 rows; the sample dependency has 24,939 rows.
+This closes the actual composition measurement for this cell, not all #1287.
+
+Each native prepared writer RETURN equals its stored frame exactly. The two
+compiler readbacks equal native storage; their concatenation equals compiler
+CALL, and compiler prepared RETURN equals country storage. Native CALL and
+prepared RETURN are not strictly identical. A separate bounded inspection of
+the four current exported operands found exact payload values/dtypes/masks,
+typed attrs and ordered row-key values. Only plot_id MultiIndex representation
+differs: 357 / 270 missing tree keys move from a level member to missing codes,
+with level sizes 73->72 / 102->101. The writer's reset_index/set_index explains
+that change. Current operand hashes were bound before/after this inspection;
+no original export-time hash receipt exists, so this is explicitly present
+exported-operand evidence, not a retroactive custody claim.
+The API comparison applies existing per-wave normalization, raw id_walk,
+sample augmentation and finalization to the captured inputs. It checks their
+composition, not an independent scientific interpretation of the transforms.
+
+The run authenticated 15 existing cached objects (44,776,015 bytes), used
+seven Make and fifteen API raw requests/decodes, and made no provider fetch.
+Fresh-process warm has no raw, producer or writer events, with all 23 files
+under its private data root unchanged by hash, size, mtime and mode. Strict
+nullable-number controls rejected nextafter/tiny changes. Make/warm/outer
+statuses were zero and process-tree closure was recorded. Separate native
+PID exit receipts were not captured; the non-ignored Make recipes, enclosing
+zero exit and complete ordered producer/writer pairs support execution.
+
+Earlier placement and startup-timeout attempts remain failed evidence. This
+run does not resolve the sale-window contradiction, EHCVM crop wiring, the
+remaining factors/consumer work, Feature assembly or other country compilers.
+The nine 2021 EHCVM plot_features collisions are outside this EACI crop unit.
+Result source: =5519baad6fd964c96f88a6a81992ce1cc8274fea=;
+operator: =745f33eb26f5048a4e1b89c9d8281519b9da2d85=.
+Independent result-review SHA256:
+=7168be026088f43ef195ef7c14b79386c8598f682a5d1acc8798e454f44a35a2=.
