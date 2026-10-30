@@ -43,5 +43,15 @@ sum/first. No scientific implementation redesign or new data execution is needed
 None for this settled narrow design. Whole-issue closure remains separate.
 
 ### Phase 3 — verification
-Pending extraction: compare all eight code/test blobs to reviewed83fd21ad; preserve
-source-based sample provider and staged execution limits in the country checkpoint.
+OK (§2/§5): all eight code/test blobs are byte-exact reviewed83fd21ad. The
+Country/Feature/local_tools/paths core, canonical data_info schema and Malawi
+updated_ids map are also byte-exact that reviewed scientific source. AST parsing
+passed for the changed Python files; whole-diff whitespace check passed.
+OK (§3/§4): source masks, known reducers, six source references/original positions,
+namespace and source-observation distinctions are unchanged. CONTENTS retains the
+contradiction and the failed 2010 unused-index-domain diagnostic.
+OK (§4/§5): accepted staged evidence covers 79,997 rows, including independently
+accepted saved candidate/strict, genuine Feature and fresh-process warm predicates.
+The sample-v prerequisite is composed; no fresh normal sample/weight validation is
+claimed. Existing 17 synthetic passes and actual evidence were authenticated and
+reused; no source/API/control cohort was replayed for this public extraction.
