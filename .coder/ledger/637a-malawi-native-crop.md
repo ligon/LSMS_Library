@@ -25,7 +25,7 @@ definitions, merged labor and G/H work remain exact. No global schema/core edit.
 ## Validation and qualifications
 Nine production/test files are extracted byte-exact from reviewed/tested f4e40f.
 That source's bounded synthetic selection passed58,35 data-gated deselected;
-no cohort is replayed for publication. Current base retains all Malawi source
+the original 58-case cohort is not replayed for publication. Current base retains all Malawi source
 and target tests from104655, and Country/Feature/paths/schema/runtime-lock bytes are exact. The public
 local_tools.py retains its separately merged tuple-transform chain fix in
 df_data_grabber; this extraction does not edit it.
@@ -52,3 +52,13 @@ Eight native RETURN/storage full typed comparisons stay false: qualified saved
 attribution found attrs JSON representation differences, strict axes/dtypes and
 separately equal payload/masks; it is not a full typed-frame pass. Whole #637,
 #1120 missing-plot representation and other country residuals remain separate.
+
+Current-public affected synthetic sale-basis selection passed 37 tests, with
+18 source-gated cases explicitly deselected (1.467s); raw/build/acquisition
+routes were refused and recorded no denials. A superseded full-file selection
+omitted that exclusion, attempted source-gated work and timed out at120s; it
+created private data artifacts and is excluded from validation. No claim of
+absent acquisition is made for that failed attempt; no data/private artifacts
+are included in this extraction. Its process was terminal and the failed run
+was preserved separately. Shared transform/fingerprint PR1372 remains intact;
+runtime evidence is source-pin-bound and current caches may rewarm.
