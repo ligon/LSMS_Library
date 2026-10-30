@@ -265,29 +265,17 @@ NIGER_INPUT_WAVES = ['2011-12', '2014-15', '2018-19', '2021-22']
 
 @pytest.mark.parametrize('failing', ['2011-12', '2018-19'])
 def test_niger_make_recipe_stops_when_any_wave_script_fails(tmp_path, failing):
-    """Run the real recipe with a `python` shim that fails in one wave."""
-    import os
-    import shutil
-    import subprocess
-    if shutil.which('make') is None:                          # pragma: no cover
-        pytest.skip('make not available')
-    shim = tmp_path / 'bin' / 'python'
-    shim.parent.mkdir()
-    log = tmp_path / 'ran.log'
-    shim.write_text('#!/bin/sh\n'
-                    f'echo "$PWD" >> {log}\n'
-                    f'case "$PWD" in */{failing}/_) exit 1;; esac\n'
-                    'exit 0\n')
-    shim.chmod(0o755)
-    env = dict(os.environ, PATH=f'{shim.parent}:{os.environ["PATH"]}')
-    target = tmp_path / 'var' / 'plot_inputs.parquet'
-    proc = subprocess.run(['make', '-s', str(target), f'VAR_DIR={target.parent}'],
-                          cwd=countries_root() / 'Niger' / '_', env=env,
-                          capture_output=True, text=True)
+    """Real recipe with private producer/native command contract."""
+    from tests._niger_make_fixture import NigerMake
+
+    harness = NigerMake(tmp_path, 'plot_inputs', countries_root() / 'Niger/_/Makefile')
+    harness.fail = failing
+    proc = harness.run()
     assert proc.returncode != 0, 'a failed wave script must fail the country recipe'
-    ran = log.read_text().split()
+    ran = (tmp_path / 'ran.log').read_text().split()
     assert ran[-1].endswith(f'/{failing}/_'), 'nothing may run after the failed wave'
     assert not any(r.endswith('/Niger/_') for r in ran), 'the concatenator must not run'
+    assert not harness.target.exists(), 'a failed wave must not write the country target'
 
 
 def _run_niger_concatenator(monkeypatch, tmp_path, waves_present):

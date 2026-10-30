@@ -72,27 +72,19 @@ def _frame(table, wave, n=1):
 @pytest.mark.parametrize('failing', ['2011-12', '2018-19'])
 @pytest.mark.parametrize('table', NAMES)
 def test_make_recipe_stops_when_any_wave_script_fails(tmp_path, table, failing):
-    """Run the real recipe with a `python` shim that fails in one wave."""
-    if shutil.which('make') is None:                          # pragma: no cover
-        pytest.skip('make not available')
-    shim = tmp_path / 'bin' / 'python'
-    shim.parent.mkdir()
-    log = tmp_path / 'ran.log'
-    shim.write_text('#!/bin/sh\n'
-                    f'echo "$PWD" >> {log}\n'
-                    f'case "$PWD" in */{failing}/_) exit 1;; esac\n'
-                    'exit 0\n')
-    shim.chmod(0o755)
-    env = dict(os.environ, PATH=f'{shim.parent}:{os.environ["PATH"]}')
-    target = tmp_path / 'var' / f'{table}.parquet'
-    proc = subprocess.run(['make', '-s', str(target), f'VAR_DIR={target.parent}'],
-                          cwd=SOURCE / '_', env=env, capture_output=True, text=True)
+    """Real recipe, private new producer CLI, first/late native failure."""
+    from tests._niger_make_fixture import NigerMake
+
+    harness = NigerMake(tmp_path, table, SOURCE / '_' / 'Makefile')
+    harness.fail = failing
+    proc = harness.run()
     rc = proc.returncode
     assert rc != 0, f'{table}: a failed {failing} wave script must fail the recipe'
-    ran = log.read_text().split()
+    ran = (tmp_path / 'ran.log').read_text().split()
     assert ran[-1].endswith(f'/{failing}/_'), f'{table}: something ran after the failed wave'
     n_concat = sum(r.endswith('/Niger/_') for r in ran)
     assert n_concat == 0, f'{table}: the concatenator ran {n_concat} time(s)'
+    assert not harness.target.exists(), 'a failed wave must not write the country target'
 
 
 # ---------------------------------------------------------------------------
@@ -245,7 +237,7 @@ def niger_tree(tmp_path, monkeypatch):
     root = tmp_path / 'countries'
     build = root / 'Niger' / '_'
     build.mkdir(parents=True)
-    for name in ['Makefile', 'niger.py', 'categorical_mapping.org',
+    for name in ['Makefile', 'niger.py', 'wave_producers.py', 'categorical_mapping.org',
                  'panel_ids.json', 'updated_ids.json']:
         shutil.copy2(SOURCE / '_' / name, build / name)
     for w in WAVES:

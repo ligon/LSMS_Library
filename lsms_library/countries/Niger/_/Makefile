@@ -33,49 +33,61 @@ panel-ids:
 
 # Five native country compilers consume the declared wave producers (#1287).
 # Discovery uses Country/Wave registration, declarations and physical folders;
-# no four-wave list and no prerequisite for an absent native script. Secondary
-# expansion supplies declaration metadata as prerequisites. The phony failure
+# no four-wave list and no prerequisite for an absent native script. Deferred
+# implicit-rule expansion supplies declaration metadata only for a matching
+# country target, including transitive requests. Explicit secondary expansion
+# can eagerly inspect unrelated tables on older GNU make, contaminating a clean
+# missing-target probe. The stem is VAR_DIR's final directory component; only
+# its exact directory is eligible. Native pattern rules remain unchanged.
+# The phony failure
 # prerequisite makes a discovery error terminal despite $(shell)'s exit policy.
 # See .coder/ledger/1287-niger-producer-routing.md, sections 2-5.
 PYTHON ?= python
 .SECONDEXPANSION:
-niger_wave_dependencies = $(shell $(PYTHON) wave_producers.py --dependencies $(1) || printf '%s\n' __niger_producer_discovery_failed__)
+NIGER_VAR_DIR = $(patsubst %/,%,$(VAR_DIR))
+NIGER_VAR_PARENT = $(patsubst ./,,$(dir $(NIGER_VAR_DIR)))
+niger_wave_dependencies = $(if $(filter $(abspath $(VAR_DIR)),$(abspath $(@D))),$(shell $(PYTHON) wave_producers.py --dependencies $(1) || printf '%s\n' __niger_producer_discovery_failed__),__niger_outside_var_directory__)
 
 .PHONY: __niger_producer_discovery_failed__
 __niger_producer_discovery_failed__:
 	@echo "Niger producer discovery failed; refusing country compilation" >&2
 	@false
 
-$(VAR_DIR)/crop_production.parquet: crop_production.py niger.py categorical_mapping.org wave_producers.py data_scheme.yml \
+$(NIGER_VAR_PARENT)%/crop_production.parquet: crop_production.py niger.py categorical_mapping.org wave_producers.py data_scheme.yml \
 		$$(call niger_wave_dependencies,crop_production)
+	@test "$(abspath $(@D))" = "$(abspath $(VAR_DIR))"
 	$(PYTHON) wave_producers.py crop_production && $(PYTHON) crop_production.py
 
 ../%/_/crop_production.parquet: ../%/_/crop_production.py niger.py categorical_mapping.org
 	(cd $(@D) && python crop_production.py)
 
-$(VAR_DIR)/plot_inputs.parquet: plot_inputs.py niger.py categorical_mapping.org wave_producers.py data_scheme.yml \
+$(NIGER_VAR_PARENT)%/plot_inputs.parquet: plot_inputs.py niger.py categorical_mapping.org wave_producers.py data_scheme.yml \
 		$$(call niger_wave_dependencies,plot_inputs)
+	@test "$(abspath $(@D))" = "$(abspath $(VAR_DIR))"
 	$(PYTHON) wave_producers.py plot_inputs && $(PYTHON) plot_inputs.py
 
 ../%/_/plot_inputs.parquet: ../%/_/plot_inputs.py niger.py categorical_mapping.org
 	(cd $(@D) && python plot_inputs.py)
 
-$(VAR_DIR)/livestock.parquet: livestock.py niger.py categorical_mapping.org wave_producers.py data_scheme.yml \
+$(NIGER_VAR_PARENT)%/livestock.parquet: livestock.py niger.py categorical_mapping.org wave_producers.py data_scheme.yml \
 		$$(call niger_wave_dependencies,livestock)
+	@test "$(abspath $(@D))" = "$(abspath $(VAR_DIR))"
 	$(PYTHON) wave_producers.py livestock && $(PYTHON) livestock.py
 
 ../%/_/livestock.parquet: ../%/_/livestock.py niger.py categorical_mapping.org
 	(cd $(@D) && python livestock.py)
 
-$(VAR_DIR)/plot_labor.parquet: plot_labor.py niger.py wave_producers.py data_scheme.yml \
+$(NIGER_VAR_PARENT)%/plot_labor.parquet: plot_labor.py niger.py wave_producers.py data_scheme.yml \
 		$$(call niger_wave_dependencies,plot_labor)
+	@test "$(abspath $(@D))" = "$(abspath $(VAR_DIR))"
 	$(PYTHON) wave_producers.py plot_labor && $(PYTHON) plot_labor.py
 
 ../%/_/plot_labor.parquet: ../%/_/plot_labor.py niger.py
 	(cd $(@D) && python plot_labor.py)
 
-$(VAR_DIR)/people_last7days.parquet: people_last7days.py niger.py wave_producers.py data_scheme.yml \
+$(NIGER_VAR_PARENT)%/people_last7days.parquet: people_last7days.py niger.py wave_producers.py data_scheme.yml \
 		$$(call niger_wave_dependencies,people_last7days)
+	@test "$(abspath $(@D))" = "$(abspath $(VAR_DIR))"
 	$(PYTHON) wave_producers.py people_last7days && $(PYTHON) people_last7days.py
 
 ../%/_/people_last7days.parquet: ../%/_/people_last7days.py niger.py

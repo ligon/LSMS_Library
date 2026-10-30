@@ -84,7 +84,7 @@ def actor(request, tmp_path, monkeypatch):
             for name in ('get_dataframe', 'to_parquet', 'df_data_grabber', '_ensure_dvc_pulled',
                          '_warm_dvc_cache_for_feature'):
                 monkeypatch.setattr(local_tools, name, denied)
-            monkeypatch.setattr(Country, 'load_dataframe_with_dvc', denied)
+            monkeypatch.setattr(Country, '_aggregate_wave_data', denied)
             monkeypatch.setattr(Wave, 'grab_data', denied)
             monkeypatch.setattr(subprocess, 'run', denied)
             monkeypatch.setattr(subprocess, 'Popen', denied)
