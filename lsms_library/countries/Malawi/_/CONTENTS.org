@@ -801,6 +801,61 @@ a G-D plot join), not filed yet.  Until it lands, read a seasonal (Module G)
 =crop = 'Other'= as "cowpea in about half the rows whose text we hold" (it is
 not cowpea on the perennial side).
 
+** TODO Cowpea identity diagnostic checkpoint (GH #1228, 2026-10-30)
+
+The historical #856 screen above is not the current acceptance population.
+An independently reviewed diagnostic completed 27 ordinary source reads,
+one restricted 2016 XS Module D decode, twelve G/I metadata reads and four
+unchanged native drivers.  No crop mapping, sale assignment or quantity changed.
+
+| G half | Literal COWPEAS / COW PEAS candidates |
+|--------+-------------------------------------|
+| 2010-11 full | 157 |
+| 2013-14 panel | 0 |
+| 2016-17 XS | 238 |
+| 2016-17 panel | 64 |
+| 2019-20 XS | 584 |
+| 2019-20 panel | 113 |
+
+Total 1,156 after the existing full-record repeat policy.  Excluding newly
+readable 2016 XS gives 918, versus the historical 919; the one-row difference
+has not been causally attributed.  The restricted D read does not repair or
+establish unrestricted =get_dataframe= readability.
+
+The earlier statement that D "names every G code-48 row it can read" needs
+qualification: ambiguous/missing D identities remain for 2 / 1 / 27 / 3 G rows
+in 2016 XS / panel and 2019 XS / panel.  In 2019 XS, 27 D rows have one Other
+code slot but two nonblank specify texts.  The screen requires a complete key,
+one matching D row, one code-48 slot and one text; it does not establish D/G
+reference-period compatibility or text-slot meaning.  2013 still has 167 G
+code-48 rows with no held name text.
+
+*New source-label idiosyncrasy:* 2019 I =crop_code= is labelled "Id in
+ag_H_seed_roster", while G says "Crop ID".  In 2016 both say "Consistent CC
+across Modules".  Interpret these labels before assigning household-crop
+sales from plot-crop harvests.  2010 I has its own =ag_i0b_os= "Crop Code
+(Other Specify)": 138 raw code-48 literal matches are an identity lead, not
+138 accepted or deduplicated sale assignments.  I retains its own unit and
+condition; the existing sale reducer is unchanged.
+
+Food labels attest =khobwe= as cowpea, not an independent equivalence for
+=NKHOBWE=.  NKHOBWE, NSEULA and MSEWULA remain unassigned.  No synthetic crop
+code is reserved: absence from a label dictionary is not absence from raw
+codes or factor keys.  D identity/reference period, I routing, local names
+and namespace choices remain human-review questions on #1228.
+
+Evidence: executed =98621f68f499824dcdc0a7597d8d5cd3aa85a155=;
+private result =a2392bbb6098fd2cea4dc1e5c666d668c8e625de=;
+dispatch =910977c682de4b57a8fb661ed188204f=.  Closed report SHA256
+=03d39d496a1c71bd14f913bcdd44a08d45ffb353c6e0536d6d8fb8af720d481c=;
+independent aggregate/source review SHA256
+=78b000331c62f96eb63ce15219753210b0dc4bc5521ff2902197814658c31eb6=.
+The child/wrapper completed in 122.872 s with source unchanged and descendants
+closed.  Outer dispatch exit 74 remains a required-report-path failure:
+the nested report and all 18 published files authenticate, but root REPORT.md
+was missing.  This is diagnostic evidence, not full dispatch success,
+production acceptance, API/cache verification or a scientific recoding decision.
+
 ** DONE The 90 kg bag / dengu recovery (GH #856, 2026-10-22)
 
 =malawi._UNIT_TEXT_RECODE= recodes a 13 OTHER (SPECIFY) row whose OWN unit
