@@ -2187,3 +2187,27 @@ Hash impact follows existing whole-file inputs: edits to =niger.py= and
 the two native scripts also enter their wave hashes. No global config,
 framework read gate, crosswalk or other country is edited. This is a
 structural hash-scope statement, not a new corpus-wide hash census.
+
+* 2026-10-30 -- actual livestock producer/compiler/API evidence (GH #1287 D1)
+
+Bounded verification at public =5a4b2ac623d55bb31b8908260ad54efb34070cd6=
+retains 30,230 livestock rows: 6,614 / 5,018 / 9,764 / 8,834 across the four
+waves. Actual native writers and storage, declared country compilation,
+normal Country API and fresh-process warm output compare at their matching
+stages, including complete index levels, nullable numeric values and typed
+attrs. Livestock still has no sample join. No production/scientific rule changes.
+
+The original direct Make attempts failed (import-cache observer, then inherited
+=PYTHONSAFEPATH= after four native completions). Separately authorized corrected
+Make, with that flag removed and a separate private root, completes all four
+native producers before compiler read/write in 144.25s. Three source cohorts
+use the same four authenticated cached files: twelve total decodes, no new
+source acquisition. The original failed attempts remain failed.
+The API's post-save harness TypeError and whole-frame-finalizer unused-level
+failure also remain explicit; the corrected saved-operand oracle follows
+per-wave household walking/normalization before concat and finalization.
+Warm equality preserves all nine original L1/L2 files in bytes, mode and mtime;
+corrected Make preserves that original root too. Import socket probes were
+denied, not absent. This accepts only the measured livestock D1 cell, not
+stale-output #1288, every #1287 cell, Feature/CLI or new declaration cases.
+See [[file:../../../../slurm_logs/isa_backlog_2026-10-30/Niger/livestock-D1/REPORT.md][the reviewed stage evidence and preserved failures]].
