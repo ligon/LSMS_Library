@@ -2,7 +2,7 @@
 """plot_labor for Uganda UNPS 2019-20 (GAP 3 item-level build).
 
 Reads AGSEC3A (season 1) + AGSEC3B (season 2) plot-input modules via
-get_dataframe and emits a canonical (t,i,plot,source,season) parquet of
+get_dataframe and emits a canonical (t,i,plot_id,source,season,labor_obs) parquet of
 REPORTED plot-labor person-days (PersonDays) and the reported hired wage
 (Wage).  Source axis in {family, hired, other}.  See uganda.LABOR_COLMAPS
 for the per-wave column map.  Only REPORTED person-days are kept -- the WB
@@ -25,7 +25,8 @@ def _try(path):
 df3a = _try('../Data/Agric/agsec3a.dta')
 df3b = _try('../Data/Agric/agsec3b.dta')
 
-df = plot_labor_for_wave(t, df3a, df3b, LABOR_COLMAPS[t])
+df = plot_labor_for_wave(t, df3a, df3b, LABOR_COLMAPS[t],
+                         source_refs={'A': '../Data/Agric/agsec3a.dta', 'B': '../Data/Agric/agsec3b.dta'})
 assert len(df) > 0, f"plot_labor produced no rows for {t}"
 assert df.index.is_unique, f"Non-unique plot_labor index for {t}"
 to_parquet(df, 'plot_labor.parquet')

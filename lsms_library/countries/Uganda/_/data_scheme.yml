@@ -448,7 +448,7 @@ Data Scheme:
     # construct, and those sums / the wage valuation are TRANSFORMATIONS,
     # never stored here.
     #
-    # Grain (t, i, plot_id, source, season):
+    # Grain (t, i, plot_id, source, season, labor_obs):
     #   plot   — hhid-parcel-plot, mirroring the WB harmonised plot_id and
     #            the crop_production / plot_inputs / plot_features plot key
     #            (join on (t, i, plot_id)); its parcel component is the parcel
@@ -465,6 +465,14 @@ Data Scheme:
     #            labor question is per plot-season; collapsing the two seasons
     #            into one (plot, source) row would require summing across
     #            seasons (a transformation).
+    #
+    #   labor_obs — unresolved_observation on known plots (old max retained).
+    #            Eligible source-missing plots use unknown_plot and a unique
+    #            row:<declared source+sidecarSHA>:<original zero-based position>.
+    #            This is an observation, not a plot or worker; never join two
+    #            unknown_plot rows as one plot. Structural parcel-only suffixes
+    #            are not missing plots. Existing total_* transforms may increase
+    #            when formerly max-hidden observations are recovered.
     #
     # Columns are REPORTED values only (missing-in-wave -> NaN):
     #   PersonDays — reported person-days of that source on the plot-season.
@@ -495,7 +503,7 @@ Data Scheme:
     # No v level baked in: v auto-joins from sample() at API time (plot_labor
     # is NOT in the framework _no_v_join set).  2005-06 is excluded (no
     # plot-input/labor module; the UNPS panel starts at 2009-10).
-    index: (t, i, plot_id, source, season)
+    index: (t, i, plot_id, source, season, labor_obs)
     PersonDays: float
     Wage: float
     materialize: make

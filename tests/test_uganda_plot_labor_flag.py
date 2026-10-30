@@ -117,7 +117,12 @@ def _agsec3a_2009_10():
 def test_builder_serves_no_fabricated_zero(uganda_module):
     u = uganda_module
     df = u.plot_labor_for_wave("2009-10", _agsec3a_2009_10(), None,
-                               u.LABOR_COLMAPS["2009-10"])
+                               u.LABOR_COLMAPS["2009-10"],
+                               source_refs={"A": countries_root()/"Uganda/2009-10/Data/AGSEC3A.dta"})
+    assert df.index.names[-1] == "labor_obs"
+    unknown = df.index.get_level_values("plot_id") == "unknown_plot"
+    assert df.index.get_level_values("labor_obs")[unknown].str.endswith(":5").all()
+    df = df.droplevel("labor_obs")
     got = {k: v for k, v in df["PersonDays"].astype("float64").items()}
     hh1, hh2 = "1013000101", "1013000102"
     expected = {
@@ -129,9 +134,9 @@ def test_builder_serves_no_fabricated_zero(uganda_module):
         ("2009-10", hh1, f"{hh1}-1-4", "hired", "A"): 3.0,
     }
     # The plot-less "No" row is a genuine reported zero and is still served
-    # (its NaN plot_id is GH #1120 D3, unchanged here); the two stubs are not.
-    nan_plot = {k: v for k, v in got.items() if pd.isna(k[2])}
-    clean = {k: v for k, v in got.items() if not pd.isna(k[2])}
+    # (GH #1120 identifies its original row); the two stubs are not.
+    nan_plot = {k: v for k, v in got.items() if k[2] == "unknown_plot"}
+    clean = {k: v for k, v in got.items() if k[2] != "unknown_plot"}
     assert clean == expected
     assert sorted((k[1], k[3], v) for k, v in nan_plot.items()) == [
         (hh2, "family", 0.0), (hh2, "hired", 0.0)]
@@ -174,6 +179,8 @@ def test_wage_only_hired_rows_are_served(uganda_module):
     u = uganda_module
     df = u.plot_labor_for_wave("2009-10", _agsec3a_2009_10_wages(), None,
                                u.LABOR_COLMAPS["2009-10"])
+    assert set(df.index.get_level_values("labor_obs")) == {"unresolved_observation"}
+    df = df.droplevel("labor_obs")
     hh = "1013000201"
 
     def row(plot, source):
@@ -220,7 +227,8 @@ def test_every_served_zero_is_justified_by_the_source(uganda_module, t):
     raw = {}
     for season, fn in (("A", "AGSEC3A.dta"), ("B", "AGSEC3B.dta")):
         raw[season] = get_dataframe(str(wave / fn), convert_categoricals=False)
-    served = u.plot_labor_for_wave(t, raw["A"], raw["B"], u.LABOR_COLMAPS[t])
+    served = u.plot_labor_for_wave(t, raw["A"], raw["B"], u.LABOR_COLMAPS[t],
+                                  source_refs={s: wave/f"AGSEC3{s}.dta" for s in raw})
 
     justified = set()
     for season, df in raw.items():
@@ -239,7 +247,7 @@ def test_every_served_zero_is_justified_by_the_source(uganda_module, t):
 
     zeros = served[served["PersonDays"] == 0].index
     unjustified = [k for k in zeros
-                   if (k[0], k[1], None if pd.isna(k[2]) else k[2], k[3], k[4])
+                   if (k[0], k[1], None if pd.isna(k[2]) or k[2] == "unknown_plot" else k[2], k[3], k[4])
                    not in justified]
     assert len(zeros) > 1000, "expected thousands of genuine 'No' zeros"
     assert unjustified == [], (
@@ -273,14 +281,15 @@ def test_every_reported_hired_wage_is_served(uganda_module, t):
     raw = {s: get_dataframe(str(countries_root() / "Uganda" / t / files[s]),
                             convert_categoricals=False)
            for s in colmap}
-    served = u.plot_labor_for_wave(t, raw.get("A"), raw.get("B"), colmap)
+    served = u.plot_labor_for_wave(t, raw.get("A"), raw.get("B"), colmap,
+                                  source_refs={s: countries_root()/"Uganda"/t/files[s] for s in raw})
     hired = served.xs("hired", level="source")
 
     def norm(p):
-        return None if pd.isna(p) else p
+        return None if pd.isna(p) or p == "unknown_plot" else p
 
-    got_wage = {(k[1], norm(k[2]), k[3]): w for k, w in hired["Wage"].items()}
-    got_nan_days = {(k[1], norm(k[2]), k[3])
+    got_wage = {(k[1], norm(k[2]), k[3], k[4]): w for k, w in hired["Wage"].items()}
+    got_nan_days = {(k[1], norm(k[2]), k[3], k[4])
                     for k in hired.index[hired["PersonDays"].isna()]}
 
     # Independent of _labor_persondays: raw float flag, raw day cells, raw wage.
@@ -293,9 +302,15 @@ def test_every_reported_hired_wage_is_served(uganda_module, t):
         wage = pd.to_numeric(df[cm["wage"]], errors="coerce")
         flag = pd.to_numeric(df[cm["hired_flag"]], errors="coerce")
         days = df[cm["hired"]].apply(lambda s: pd.to_numeric(s, errors="coerce"))
-        for i, p, w, f, has_days in zip(hh, pid, wage, flag,
-                                        days.notna().any(axis=1)):
-            key = (i, norm(p), season)
+        import hashlib
+        source = countries_root()/"Uganda"/t/files[season]
+        declared = source.relative_to(countries_root()).as_posix()
+        sha = hashlib.sha256(source.with_name(source.name + ".dvc").read_bytes()).hexdigest()
+        ref = f"{declared}@dvc:{source.name}:{sha}"
+        for pos, (i, p, w, f, has_days) in enumerate(zip(hh, pid, wage, flag,
+                                        days.notna().any(axis=1))):
+            obs = f"row:{ref}:{pos}" if pd.isna(p) and pd.notna(i) else "unresolved_observation"
+            key = (i, norm(p), season, obs)
             raw_rows.setdefault(key, []).append((f, bool(has_days), w))
             if pd.notna(w):
                 expected_wage[key] = max(w, expected_wage.get(key, -np.inf))

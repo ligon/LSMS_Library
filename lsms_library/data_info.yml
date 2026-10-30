@@ -33,6 +33,7 @@ Single Index:
   # does not assert one native observation or a particular reducer.
   production_obs: native crop observation or explicitly unresolved coordinate
   input_obs: source-release-qualified original input row or unresolved coordinate
+  labor_obs: source-release-qualified original labor row or unresolved coordinate
   # `visit` -- recall occasion.  An INTEGER ordinal of the enumerator call the
   # observation was collected at, for the surveys that revisit a household
   # several times within one wave (GhanaLSS food_acquired; EHCVM
@@ -145,7 +146,7 @@ Index Info:
     # crop_production above: plot_labor is household-grain and is v-joined
     # today, so a `v`-less registration would strip `v` from every
     # Country(...).plot_labor() frame.
-    plot_labor: (t, v, i, plot_id, stage, source, worker, season)
+    plot_labor: (t, v, i, plot_id, stage, source, worker, season, labor_obs)
     # GH #569 (same ruling): "The seven EHCVM `plot_inputs` tables with no plot
     # level are registered with a household-grain sentinel on `plot_id`
     # through `missing_level_sentinels`, not excluded."  Benin, Burkina_Faso,
@@ -344,6 +345,7 @@ Index Info:
       condition: unknown_condition
       season: unknown_season
     plot_labor:
+      labor_obs: unresolved_observation
       stage: Farm-level
       worker: Farm-level
       season: unknown_season

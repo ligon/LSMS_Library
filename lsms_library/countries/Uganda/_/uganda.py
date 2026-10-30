@@ -3549,7 +3549,41 @@ def _labor_persondays(df, cols, flag_col=None, flag_zero_code=None):
     return out
 
 
-def plot_labor_for_wave(t, df3a, df3b, colmap):
+def _labor_source_reference(source_path, wave):
+    """Bind a loader's literal path to one declared sidecar, never raw bytes.
+
+    The generic source_fingerprint permits raw fallback. Constructed labor
+    observations instead require a single matching DVC output (ledger §5).
+    """
+    from pathlib import Path
+    import hashlib
+    import re
+    import yaml
+    from lsms_library.paths import countries_root
+
+    if not isinstance(source_path, (str, Path)) or not str(source_path).strip():
+        raise ValueError('Uganda missing-plot labor requires an explicit source path')
+    path = Path(source_path).resolve()
+    try:
+        declared = path.relative_to(countries_root().resolve()).as_posix()
+    except ValueError as error:
+        raise ValueError('Uganda labor source must be in the declared countries tree') from error
+    if not declared.startswith(f'Uganda/{wave}/Data/'):
+        raise ValueError('Uganda labor source path does not match the wave')
+    sidecar = path.with_name(path.name + '.dvc')
+    try:
+        content = sidecar.read_bytes()
+        metadata = yaml.safe_load(content)
+        outs = metadata['outs']
+        if (len(outs) != 1 or outs[0]['path'] != path.name
+                or not re.fullmatch(r'[0-9a-f]{32}', outs[0]['md5'])):
+            raise ValueError('ambiguous or invalid DVC output')
+    except (OSError, KeyError, TypeError, ValueError, yaml.YAMLError) as error:
+        raise ValueError('Uganda missing-plot labor requires one matching DVC sidecar') from error
+    return f'{declared}@dvc:{path.name}:{hashlib.sha256(content).hexdigest()}'
+
+
+def plot_labor_for_wave(t, df3a, df3b, colmap, *, source_refs=None):
     """Build canonical ``plot_labor`` for one Uganda UNPS wave.
 
     Parameters
@@ -3563,13 +3597,21 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
     colmap : dict
         Per-wave column map; see ``LABOR_COLMAPS``.
 
+    source_refs : dict, optional
+        Literal source paths keyed by season, exactly as passed to the loader.
+        Only eligible source-missing-plot records require a unique DVC sidecar.
+        Their labor_obs is a release-qualified original zero-based row position;
+        known plots keep unresolved_observation and the legacy max reducer.
+
     Returns
     -------
-    pd.DataFrame indexed by ``(t, i, plot, source, season)`` with REPORTED
+    pd.DataFrame indexed by ``(t, i, plot_id, source, season, labor_obs)`` with REPORTED
     columns ``PersonDays`` (Float64) and ``Wage`` (Float64, hired rows only;
-    NaN for family/other).  One row per (plot, source, season) with a non-NaN
-    reported PersonDays value, and also one per HIRED (plot, season) whose
-    PersonDays is NaN but whose ``Wage`` was reported (zero included).  Such a
+    NaN for family/other). Known plots retain one max-reduced row per
+    (plot, source, season), with ``labor_obs=unresolved_observation``. Eligible
+    source-missing plots retain each original source observation in ``labor_obs``.
+    Eligibility requires reported PersonDays or, for HIRED rows, a reported
+    ``Wage`` (zero included) even when PersonDays is NaN. Such a
     wage-only row is served with ``PersonDays`` NaN, not 0 (@ligon, 2026-10-23,
     GH #1250 follow-up), following Malawi's ``_plot_labor_block``
     (``Malawi/_/malawi.py:3766-3767``), which keeps a hired row on its wage
@@ -3588,7 +3630,7 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
         plot = (df3[cm['plot']].apply(format_id)
                 if cm.get('plot') and cm['plot'] in df3.columns
                 else pd.Series([''] * len(df3), index=df3.index))
-        plot_id = hh.astype(str) + '-' + parcel.astype(str) + '-' + plot.astype(str)
+        plot_id = _plot_key(hh, parcel, plot)
 
         # Reported person-days per source (one Series each, aligned to df3).
         source_days = {}
@@ -3608,12 +3650,23 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
                 else pd.Series([np.nan] * len(df3), index=df3.index))
 
         for source, days in source_days.items():
+            # Ledger GH1120 §§2–4: the gate stays GH1250's. Capture the row
+            # coordinate on the full raw frame, before selecting eligible rows.
+            eligible = days.notna()
+            if source == 'hired':
+                eligible = eligible | wage.notna()
+            missing = plot_id.eq('unknown_plot') & eligible
+            ref = (_labor_source_reference((source_refs or {}).get(season), t)
+                   if missing.any() else None)
+            observation = _missing_plot_observations(
+                df3, plot_id.where(eligible, 'unresolved_plot'), ref)
             piece = pd.DataFrame({
                 't': t,
                 'i': hh.values,
                 'plot_id': plot_id.values,
                 'source': source,
                 'season': season,
+                'labor_obs': observation.values,
                 'PersonDays': days.values,
                 'Wage': (wage.values if source == 'hired'
                          else np.full(len(df3), np.nan)),
@@ -3636,19 +3689,14 @@ def plot_labor_for_wave(t, df3a, df3b, colmap):
         return pd.DataFrame(
             columns=['PersonDays', 'Wage'],
             index=pd.MultiIndex.from_arrays(
-                [[]] * 5, names=['t', 'i', 'plot_id', 'source', 'season']))
+                [[]] * 6, names=['t', 'i', 'plot_id', 'source', 'season', 'labor_obs']))
 
     out = pd.concat(pieces, ignore_index=True)
     out['PersonDays'] = out['PersonDays'].astype('Float64')
     out['Wage'] = out['Wage'].astype('Float64')
-    # Collapse exact-duplicate (plot, source, season) keys that can arise when
-    # a wave repeats a plot row; keep the max reported days / wage so the index
-    # is unique without summing distinct reported observations.
-    # NOT only exact duplicates (GH #1250, measured): with dropna=False every
-    # plot-less row of a household-season-source shares one NaN key, so the max
-    # also folds DISTINCT plot-less source rows (2009-10: 70 positive rows ->
-    # 45 keys).  Keeping them apart needs a plot_id sentinel or a row ordinal,
-    # which is GH #1120 decision D3; left as is until that is decided.
-    out = (out.groupby(['t', 'i', 'plot_id', 'source', 'season'], dropna=False)
+    # Known plots retain EXACTLY the legacy max policy and sorted key order.
+    # Missing plots are source observations, not one shared plot: labor_obs
+    # keeps them distinct without asserting a worker or additive plot identity.
+    out = (out.groupby(['t', 'i', 'plot_id', 'source', 'season', 'labor_obs'], dropna=False)
               .agg({'PersonDays': 'max', 'Wage': 'max'}))
     return out
