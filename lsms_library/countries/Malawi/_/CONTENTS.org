@@ -4186,3 +4186,32 @@ Every wave named in a =*_waves= list must carry its script.
 
 The Makefile is hashed into every Malawi table, so this is one Malawi re-warm.
 Measurements are in =slurm_logs/isa_backlog_2026-10-21/1237-malawi-make-prereqs/=.
+
+* plot_inputs: Module G source-observation identity (GH #1298)
+
+All six G sources in 2010-11, 2013-14, 2016-17 and 2019-20 carry
+=input_obs=, qualified by country-relative source path, declared sidecar hash,
+and original zero-based physical position. Positions precede the nine 2010
+full-raw-record repeat removals. G quantities, units, Improved and nulls stay
+with their observation; no G sum/first or projected-payload deduplication.
+Module D retains its reducers and =unresolved_observation=.
+
+The settled #1119/#1120 policy distinguishes missing G crop (=unknown_crop=),
+recorded unmapped crop (passed through, including fractional codes and zero),
+and D's structural absence (=(not crop-specific)=). Missing or partial plot
+identifiers become =unknown_plot=. The older statement "No epistemic j sentinel
+... stay dropped" is superseded by this policy, not silently assumed stale.
+
+H purchases attach only to exactly one G observation of the same native crop
+code and source half with a known plot. Unknown-plot siblings count against
+uniqueness even with all payload missing. H value gates, arithmetic and its
+ignored purchase units remain unchanged (#1190); ownership is not unit
+compatibility. The all-payload-NA finalizer remains unchanged (#1174).
+In 2013-14, 10,169 G observations reach wave grain and 185 are excluded there
+at API finalization (184 blank crop/plot records and one known-crop blank).
+
+Country appends =input_obs= to its plot-input index; Feature appends it to the
+canonical index and supplies =unresolved_observation= for legacy countries.
+Consumers addressing index levels positionally must accommodate this axis.
+2016 cross-sectional IDs retain the deliberate =cs-17-= prefix, while 2019
+uses bare case_id. None of these identifiers establishes purchase units.
