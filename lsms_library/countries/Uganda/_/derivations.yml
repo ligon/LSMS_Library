@@ -1,0 +1,43 @@
+Uganda::sample::agriculture-cover: &agriculture_cover
+  waves: ['2015-16']
+  columns: [v]
+  rows: {}
+  rule: >-
+    A household recorded in AGSEC1 and absent from gsec1 takes its recorded
+    AGSEC1 parish_code, formatted by the existing country format_id rule.
+    HH-covered households retain every HH-cover answer, including nulls.
+    AGSEC1 hwgt_W5 supplies panel_weight only; cross-sectional weight is absent.
+    No geographic component is inferred or carried from another wave.
+  function: lsms_library.countries.Uganda._.uganda:derive_agriculture_cover_v
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_agriculture_cover
+  raw_variables: [HHID, parish_code, hwgt_W5, sregion, urban, region, district]
+  assumptions:
+    - text: The agriculture cover records eligible households even without a completed household questionnaire.
+      basis: modelling-choice
+      evidence: Owner rulings GH1120 comments 6367256988 and 6380186741 (2026-10-23/24).
+  validated_against: Focused helper tests; bounded source verification recorded in dispatch evidence. Independent root acceptance pending.
+  contents: Uganda/_/CONTENTS.org, GH1120 locating covers and singletons
+  since: '2026-10-30'
+Uganda::cluster_features::agriculture-cover: *agriculture_cover
+
+Uganda::sample::unlocated-identity: &unlocated_identity
+  waves: all
+  columns: [v]
+  rows: {}
+  rule: >-
+    A household in the declared own-wave membership sources without a usable
+    cover location (or the already-declared 2009-10 GPS bin) receives
+    unlocated-{formatted household id}. This is an identity marker, not a
+    measured cluster or a geographic inference. Preserve existing real and
+    moved identifiers. Unrelated households never share this singleton.
+  function: lsms_library.countries.Uganda._.uganda:derive_unlocated_identity
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_unlocated_identity
+  raw_variables: [HHID, hhid, comm, h1aq4a, parish_code, distirct_name, parish_name, district, s1aq04a, lat_mod, lon_mod]
+  assumptions:
+    - text: The declared membership sources establish a household observation despite missing geography.
+      basis: modelling-choice
+      evidence: Owner ruling GH1120 comment6380186741, D2 spelling (2026-10-24).
+  validated_against: Helper tests and bounded source union; independent root review pending.
+  contents: Uganda/_/CONTENTS.org, GH1120 locating covers and singletons
+  since: '2026-10-30'
+Uganda::cluster_features::unlocated-identity: *unlocated_identity

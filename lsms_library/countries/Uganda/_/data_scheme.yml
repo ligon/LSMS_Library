@@ -339,7 +339,7 @@ Data Scheme:
     # wave -> NaN.  Improved is non-null only on seed rows (1=Improved seed
     # type, 0=Traditional).  Quantity is NaN on 2009-10/2010-11 seed rows
     # (those waves record no seed quantity, only purchased y/n + seed type).
-    index: (t, i, plot_id, input, j, season)
+    index: (t, i, plot_id, input, j, season, input_obs)
     Quantity: float
     u: str
     Purchased: bool

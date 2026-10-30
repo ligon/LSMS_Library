@@ -270,3 +270,19 @@ def test_canonical_axis_has_honest_unresolved_sentinel():
     info = yaml.safe_load(path.read_text())['Index Info']
     assert info['index_info']['crop_production'].endswith('season, production_obs)')
     assert info['missing_level_sentinels']['crop_production']['production_obs'] == 'unresolved_observation'
+
+
+def test_missing_plot_preserves_each_production_observation(ug):
+    raw = source(3)
+    raw.loc[:1, 'plot'] = np.nan
+    raw['qty'] = [2., 0., 5.]
+    got = build(ug, raw)
+    missing = got.index.get_level_values('plot_id') == 'unknown_plot'
+    assert missing.sum() == 2
+    assert got.index.is_unique
+    assert got.index.get_level_values('production_obs').nunique() == 3
+    np.testing.assert_array_equal(got.Quantity.to_numpy(float), [2., 0., 5.])
+    np.testing.assert_array_equal(got.Quantity.isna().to_numpy(), [False] * 3)
+    pd.testing.assert_extension_array_equal(
+        got.Quantity.array, pd.array([2., 0., 5.], dtype='Float64'))
+    assert got.index.get_level_values('plot_id')[-1] == 'H-1-1'

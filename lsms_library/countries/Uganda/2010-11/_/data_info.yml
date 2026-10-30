@@ -40,30 +40,36 @@ housing:
         Floor: h9q6
 
 sample:
-    file: ../Data/GSEC1.dta
-    idxvars:
-        i: HHID
-    myvars:
-        # GH #1133: the 7-character comm (2010/11 district definitions for 50
-        # EAs) is served as the 8-digit frame EA through the reviewed
-        # `comm_frame_ea` table, as 2005-06 / 2011-12 write it.
-        v:
-            - comm
-            - mappings: comm_frame_ea
-        weight: wgt10
-        panel_weight: wgt10  # pre-refreshment — same as cross-sectional
-        strata: stratum
-        Rural: urban
-        Region:
-            - region
-            - # Kampala is Central (matches cluster_features convention)
-              Kampala: Central
+    dfs: [locating_cover]
+    locating_cover:
+        file: ../Data/GSEC1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            _cover: HHID
+            # GH #1133: the 7-character comm (2010/11 district definitions for 50
+            # EAs) is served as the 8-digit frame EA through the reviewed
+            # `comm_frame_ea` table, as 2005-06 / 2011-12 write it.
+            v:
+                - comm
+                - mappings: comm_frame_ea
+            weight: wgt10
+            panel_weight: wgt10  # pre-refreshment — same as cross-sectional
+            strata: stratum
+            Rural: urban
+            Region:
+                - region
+                - # Kampala is Central (matches cluster_features convention)
+                  Kampala: Central
+
+    merge_on: [i]
+    final_index: [t, i]
 
 cluster_features:
     dfs:
-        - df_main
+        - locating_cover
         - df_geo
-    df_main:
+    locating_cover:
         file: ../Data/GSEC1.dta
         idxvars:
             i: HHID
@@ -74,6 +80,7 @@ cluster_features:
                 - comm
                 - mappings: comm_frame_ea
         myvars:
+            _cover: HHID
             Region:
                 - region
                 - # Kampala is Central

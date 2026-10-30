@@ -4416,3 +4416,108 @@ source-observation/grain decision; no =input_obs= axis is added here.
 The existing conditional null-key loss, reducers, units, plot construction,
 weights and second-season seed coverage gap remain. This does not resolve
 #829 WAITING, #647 PART-harvest additivity or the 2019 panel-weight questions.
+
+* GH1120 locating covers and singletons (2026-10-30, independent review pending)
+
+The approved D1/D2 rules supersede the historical statement above that the
+24 2009-10 no-community/no-GPS households "keep =v = <NA>= and are dropped".
+They now receive distinct =unlocated-{hhid}= identity markers. These are not
+measured clusters, inferred geography, or evidence of movement. Existing
+=comm_frame_ea= mappings, modified-GPS bins, parish composites and panel maps
+remain unchanged. =moved-= remains reserved for actual movers. The 2019-20
+asked-not-distributed GPS finding and the 2005-06 geo-only split-off exclusion
+remain in force; no coordinate source was added.
+
+Both =sample= and =cluster_features= declare the same own-wave membership
+extensions: 2009-10 AGSEC3B plus GSEC12, 2011-12 AGSEC1, 2015-16 AGSEC1 and
+2018-19 AGSEC1. Dedicated sub-frame hooks check duplicate cover answers
+before joining. Identical projected repeats are lossless; conflicting repeats
+raise. The 2015-16 HH cover wins for every HH-covered household, including
+its missing answers. A disagreement between recorded parish codes is warned,
+not resolved by a formatter or a column-wise first-value reducer.
+
+2015-16 AGSEC1's =hwgt_W5= is PANEL weight only. AGSEC1-only households get
+its recorded parish, region, urban status and strata, and =panel_weight=;
+=weight= stays missing. The two covers have different weight vintages and
+must not be coalesced. The rule and raw operands are registered in
+=_/derivations.yml=. D2 singleton identities are registered too, and carry
+=Derivation= even if no geographic attribute was recorded. This matters:
+otherwise the API's all-null-row filter deletes a legitimate singleton row.
+
+A bounded owned-source check on the dispatch base =e2b972e7= read a declared
+union of 37 sidecar-identified blobs. Current measurements (not acceptance
+constants): 3,305 HH-cover households, 2,694 AG-cover households, 72 AG-only,
+64 AG-only parishes including eight not in the HH cover; 33 AG-only panel
+weights are zero. Raw sample grows to 3,377 households / 883 parish keys;
+AG-only panel weights total 173,873.12353515625, cross-sectional weights are
+all missing. All original HH-cover weights and nonmissing locations compare
+exactly, including null masks and zeroes. All-wave sample has 24,561 rows.
+Singleton counts by wave are 28 / 57 / 1 / 66 / 1 for 2009-10 / 2011-12 /
+2013-14 / 2018-19 / 2019-20. Sample/cluster agreement holds for these added
+identities. Four pre-existing 2010-11 real keys still vanish at API time:
+=reduce_to_agreed= blanks all conflicting attributes and the universal
+all-null-row filter then deletes the row. This is the documented exception in "cluster_features is a PROJECTION":
+"42 households
+therefore reference a =v= with no =cluster_features= row. That is the
+honest outcome". The existing decision is preserved,
+not a new D2 policy question; no geography or dummy data was added.
+
+** D3: source-missing plots, with observation identity
+
+=crop_production= now uses =unknown_plot= where a source parcel/plot component
+is genuinely missing, retaining its existing =production_obs= coordinate.
+=plot_inputs= uses the same plot marker and the existing canonical =input_obs=
+axis: missing-plot observations carry release-qualified original source-row
+positions, while known-plot rows carry =unresolved_observation= and retain
+exactly their prior reducers. All seven native input scripts pass fingerprints
+of the files they actually read; the country concatenator preserves the axis.
+The #1350 crop distinctions, eligibility gate and loud refusal of conflicting
+known-plot legacy crop groups remain intact. =unknown_plot= is not a plot and
+must never be joined as one; it is distinct from structural =Farm-level=.
+
+Independent raw accounting in 2009-10 / 2011-12 / 2013-14 finds 360 / 43 / 0
+eligible missing-plot production observations and 130 / 5 / 1 input
+observations. The outputs preserve these counts, numeric null masks, zeroes
+and nonmissing values. Known-plot columns and ordering compare exactly to the
+baseline, with no new parcel inference or change to #647 harvest policy.
+The production null-key branch formerly deleted the 403 production rows;
+input null-key reduction deleted 135 rows (the single 2013-14 row survived).
+
+The constructor inventory also includes parcel-grain =plot_features= and
+=plot_labor=. Parcel inference and unsupported keys remain with #1297/#1290;
+no parcel eligibility or joins were changed. Labor is explicitly UNCHANGED
+pending independent observation-axis review: 128 / 8 / 5 eligible missing-plot
+labor source observations still become 85 / 5 / 5 max-reduced keys. Renaming
+the null plot alone would conceal this loss. A =labor_obs= prototype was
+retained as review evidence only, not merged into the shared schema or source.
+
+Bounded Country/Feature checks cover all-wave sample and clusters and the
+three plot waves above. Sample and plot_inputs pass =LSMS_READ_STRICT=.
+Cluster features still refuse strict reads because 2019-20 Latitude is
+unreleased; crop production still refuses because 2009-10 harvest_month is
+all-null. These are not missing-index failures, and no assertion or schema
+requirement was weakened. Warm reads used zero source reads. No unrelated
+country was rebuilt, and #1120 is not closed by this work.
+
+** Retained-scope independent review qualifications
+
+The retained implementation has independent source/ordinary-evidence support;
+public extraction imports no labor prototype or operator archives. The 135-pass,
+35-skipped focused run is retained evidence, not replayed for extraction.
+API/Feature checks establish the reported row counts and nonmissing indexes,
+not Country-versus-Feature full-frame equality. The 2.352-second warm check uses
+new Country objects in the same process, with pandas frame equality and zero
+observed guarded source reads. It is not fresh-process or explicit EA/NumPy
+zero-tolerance warm verification, nor a cache-byte/mtime immutability census.
+Native known-row/source comparisons retain their stronger exact numeric scope;
+original sample conservation is value/mask exact with permitted dtype widening.
+
+Per-stage timeouts do not establish a single global 2400-second supervisor;
+main-process guards are not inherited by Make children. Two failed intermediate
+sample/cluster frames were overwritten before final sealing, so surviving
+witnesses do not authenticate those intermediates. The final YAML blank-line
+cleanup changes expected hashes after cache build; no current-fresh-cache or
+restamping claim follows. Literal-only credential-transcript redaction is a
+separate containment action, and historical transcript hashes can differ.
+The four existing all-conflict real-cluster exclusions, labor source-observation
+follow-up, #1290/#1297 and umbrella #1120 remain separate.
