@@ -78,3 +78,11 @@ Validate the entire affected module's explicitly non-source-gated selection
 under the existing synthetic raw/build/acquisition guards; do not repeat the
 previous full-file source-selection error. Scientific actual evidence above
 remains source-bound and separate from this CI fixture correction.
+
+The corrected synthetic affected-module selection passes14 tests with30
+source-gated tests deselected (1.05s), no warning/tally/scientific assertion
+removed, and no recorded raw/build/acquisition guard denials. Three explicit
+output-coordinate assertions supplement the literal fixture fields. All six
+validated production files remain byte-identical to the accepted f4 product.
+The original configured-CI failure remains preserved separately; configured CI
+must run on the new exact PR head before integration.
