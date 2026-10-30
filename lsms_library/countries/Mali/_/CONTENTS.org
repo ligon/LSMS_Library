@@ -1479,8 +1479,9 @@ drop and duplicate collapse (572 / 191).  The 2014-15 tree row was 198 / 196 /
 quantity and value 12-month totals: NA on the 6 priced rows whose month count
 is 0 or missing, and on 2 whose value is the 999999 code (section below).  A disagreement is a FLAG, not an
 identification (canonical =data_info.yml=, =Unit_sold= note).
-=median_price_valuation= does not read =Unit_sold= yet (a decision, for every
-country carrying the column).
+=median_price_valuation= now reads =Unit_sold= under the
+[[https://github.com/ligon/LSMS_Library/issues/824#issuecomment-6367367289][approved consumer ruling]]: absent sold labels permit harvest-unit fallback;
+disagreements remain counted quality flags, not exclusions or proof of truth.
 
 Not served: a =KgFactor_sold=.  The survey's sold kg factor is present on 572
 of 577 raw priced 2014-15 field rows and on 647 of 647 2017-18 =s7g= rows, and
