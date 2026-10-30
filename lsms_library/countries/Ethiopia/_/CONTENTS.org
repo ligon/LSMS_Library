@@ -3061,3 +3061,28 @@ that receipt remains failed, and its completed cache was read back without
 producer replay. See =.coder/ledger/1043-ethiopia-harvest-missing-unit.md= for
 precise scopes and retained limitations. Crop reference windows, recorded units,
 sale grain, household walks and scientific assertions are unchanged.
+
+* Food country selector: retained local-walk caveat (GH #1287, 2026-10-29)
+
+The country compiler selects actual =Country.waves= and actual Wave declarations,
+with one read per physical folder and a contextual refusal for a declared input
+that cannot be read. Its existing =squeeze=, local walk and food-label tail remain.
+The earlier household-ID discussion above calls this a local =change_id=-based
+walk. Exact public =ethiopia.change_id= instead maps =j= and preserves =i=;
+the reviewed actual cached compiler also preserves =i=. This discrepancy is
+recorded without rewriting historical evidence or changing panel linkage.
+The local loop still traverses W2/W3 covers while processing W4/W5; that behavior
+does not establish linkage across the two panels. The normal framework owns the
+canonical household walk before the sample =v= join.
+
+Finite validation serves326456food rows across five waves, with =v= present on
+all rows through Country and Feature. A retained first normalAPI check failed on
+its positional-index comparison premise: Feature intentionally reorders named
+levels. Separate corrected named-axis readback and fresh-process warm passed,
+with unchanged22private cache entries and no further producer runs. This is
+composed evidence, not a clean repeated cold run. All quantitative/unit/cluster/
+population warnings remain; no singleton shape or scientific behavior was fixed.
+The newW1 raw build warned about10purchased positive-quantity rows without a unit,
+where the older screen table above records9. The two attributed observations are
+retained rather than silently reconciling their counts. See the per-task ledger
+=1287-ethiopia-food-country-selector.md= for exact scopes and retained failures.

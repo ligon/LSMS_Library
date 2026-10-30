@@ -1,0 +1,198 @@
+# Prior-Art Ledger — #1287 Ethiopia food country selector
+
+**Search tier used:** ripgrep + Git + Python AST floor; GitNexus tools are
+unavailable. Base: `d65e8b13683409ab0005f1a5590208cd7d94ae62`. Recovery
+`9cac9ffc` is evidence only; draft #1315's nine compilers are not replayed.
+
+## §1 Task, restated
+
+Change only Ethiopia's country `_/food_acquired.py` selection to use
+`Country('Ethiopia', preload_panel_ids=False).waves`, each actual Wave's
+native-script/YAML/null declaration union, and physical `wave_folder`.
+Read a declared folder once, skip only unwired contributions, and refuse a
+declared unreadable input with contextual exception chaining before writing.
+Keep the public squeeze, local walker, concat, food rename and writer semantics.
+
+## §2 Existing machinery (this task's area)
+
+| symbol | path:line | what it does | tested? | decision |
+|---|---|---|---|---|
+| `Country.waves` | `lsms_library/country.py:2802` | authoritative logical waves; module, YAML or documentary discovery; folder map | existing Country tests; new focused metadata tests | reuse |
+| `Country.__getitem__` | `lsms_library/country.py:3103` | constructs actual Wave with mapped physical folder | same | reuse |
+| `Wave.data_scheme` | `lsms_library/country.py:1262` | unions native script stems and YAML keys, including null | same | reuse |
+| country food assembly | `lsms_library/countries/Ethiopia/_/food_acquired.py:54` | historical `Waves` loop, squeeze, local walk, concat and rename | new focused invented-frame tests | extend selection only |
+| `id_walk`, `fix_food_labels` | same file:30,44 | historical ordered walk and union-map rename | new focused metadata/invented-leaf tests | preserve byte-for-byte |
+| `change_id` | `lsms_library/countries/Ethiopia/_/ethiopia.py:482` | normalizes/maps **j**, not i | existing scientific tests; not run here | preserve, replace only IO leaf in new tests |
+| `harmonized_food_labels` | same file:42 | reads org food-label mapping | existing food tests; not run here | preserve, invented label leaf in new tests |
+| food Make target | `lsms_library/countries/Ethiopia/_/Makefile:50` | runs the country compiler after wave prerequisites | no actual Make build permitted | preserve |
+
+Call-site sweep: the local `id_walk` and `fix_food_labels` are used only by
+this script; Make invokes it at country scope. Other Ethiopia tables/helpers
+and shared library APIs are outside the patch. Risk: selector changes which
+contributions reach existing science; no schema, unit, panel or label redesign.
+
+## §3 Definitions & conventions in force
+
+- Inherit `.coder/ledger/STANDING.md` §§3–4, `CLAUDE.md` and
+  `lsms_library/data_info.yml`; no shared-schema changes.
+- `CONTENTS.org`, food sources (§ food_acquired reads Q3/Q5/Q6): reported
+  purchased/produced/inkind quantities; produced/inkind expenditure stays NA.
+- `CONTENTS.org:848`: “2011-12 / 2013-14 / 2015-16 form one panel and
+  2018-19 / 2021-22 form another.” Preserve panel boundaries.
+- Aggregate-labels skill: Ethiopia has no Aggregate column; `labels=` behavior
+  remains unchanged. PP/PH skill: physical folders and logical t are distinct.
+
+## §4 Invariants & assumptions
+
+- Public functions and postselection statements remain AST-identical; keep
+  `.squeeze()` (including its existing Series behavior), no added normalization,
+  aggregation, deduplication of rows, filtering of t, or household walking.
+- Deduplicate physical input folders, preserving authoritative wave order.
+  A stale output's existence is never a declaration. YAML null is a declaration.
+- The local walk still receives logical t and the historical `Waves` mapping.
+  New waves unsupported by that mapping are a separate scientific dependency,
+  not authorization to redesign the walk.
+- Preserve the documented/source discrepancy: `CONTENTS.org:2453` says “only
+  a local =change_id=-based walk” in a household-ID discussion, but the public
+  helper maps `j`. Report it, do not repair it here.
+- Runtime/profile: private config/data/L1/L2 only; all threads 1; no actual
+  raw/parsed payload, crosswalk JSON, decoder, provider, Country/Feature table
+  build, Make or helper child. Newly authored finite tests only, <=600s/cohort,
+  denied or invented IO leaves, exact source/JUnit and zero-real-data accounting.
+- Do not modify existing fixtures/assertions/goldens/locks/dependencies. New
+  test-local private metadata and invented frames are expressly authorized.
+
+## §5 Reuse decision
+
+| quantity | decision | reason |
+|---|---|---|
+| declared contributions and physical folders | reuse Country/Wave | same authoritative selection as draft #1315; no independent scanner |
+| contextual failure | extend local read boundary | prevent partial writer; retain original exception as cause |
+| scientific/concat/normalization/walker tail | reuse exact public source | no scientific or source-policy changes authorized |
+| tests | new narrow file | omitted food selector is absent from draft #1315; use actual discovery and invented IO |
+
+## §6 Open questions for the human
+
+None blocks this narrow assignment. Actual-source, Make/API/cache/freshness,
+fourteen-country #1287 and scientific acceptance remain separately held gates.
+
+### Phase 3 — verification
+
+Pending candidate source and finite data-free tests. This ledger is committed
+before product edits; final anchored verification will be a separate commit.
+
+### Phase 3a — first finite actor and test-premise correction
+
+The frozen a7525f166 cohort actually collected 66 cases: 65 passed, and the
+singleton public-squeeze test failed only at its `__cause__ is None` assertion.
+All 66 compiler epochs closed, with zero guard denials and all recorded source,
+runtime, configuration, metadata, profile and no-data closure gates true. The
+one-shot transaction remains STOPPED / accepted 0; no automatic retry occurred.
+Its durable inventory is
+`ffa877b0bfe704d52990b4f9f58e8e44f25ab395f71cfe88fcd47919ef89770e`
+(269 ordinary copies, seven font-cache files inventory-only).
+
+The outer `KeyError` matching `j` was observed, as was a non-None cause. The
+receipt does not serialize the inner exception's type or args. Source explains
+the mistaken premise: unchanged `.squeeze()` produces a Series for one row;
+unchanged `change_id` resets it then accesses `x['j']` (`ethiopia.py:491–495`).
+Installed pandas `DataFrame.__getitem__` calls `columns.get_loc` (`frame.py:4378`),
+which explicitly raises `KeyError(key) from err` (`indexes/base.py:3640–3648`).
+This failure is outside the new reader-only RuntimeError boundary. Public d65
+has the same squeeze and walker path; no baseline actor was replayed.
+
+The separately isolated successor changes only this new test's chaining
+premise: retain the required `KeyError('j')` and no-writer behavior, and require
+the expected pandas `KeyError('j')` cause instead of requiring no cause. Exact
+inner details are source-supported expectations awaiting a separately released
+measurement. Product/helper bytes and every other test remain unchanged; the
+singleton shape failure itself and the local j-versus-i walker limitation remain.
+No successor test execution, raw data, Make/API/cache work or scientific
+acceptance is implied. Original native exit143/publication-incomplete/
+preservation-unverified provenance and original finite 65/1 failure are retained.
+
+### Phase 3b — separately verified corrected singleton and integration
+
+Root released exactly the corrected singleton at source5316a495585681fd2091204dbb59c5b6bbdf4f59,
+not the other65 cases. It passed: one actual collected case, three PASS stages,
+one closed compiler epoch, zero denials, exit0 and complete source/config/index/
+runtime/operator/profile/metadata/no-data closure, in43.2696810499765seconds.
+The expected outer `KeyError('j')`, pandas `KeyError('j')` cause and no-writer
+assertions are now measured for this synthetic operand. The original public
+singleton squeeze failure itself remains; no scientific behavior was repaired.
+
+Root independently verified29 ordinary durable exports and exact protocol/JUnit.
+Singleton inventory:
+`660436d5ee4f5fc20cd2d1f34ba53f2ed40738a4955a0c027243729fc04632df`.
+Root result report SHA256:
+`a3cac1221bebcadb4925bc24d83138d1fb4cc081e0a78ff945365c20d37afc19`
+(`slurm_logs/isa_recovery_2026-10-29/Ethiopia/ROOT-RESULT-singleton-v2.json`).
+Its nested launcher `result.accepted_cases` retains its initial0; the outer
+transaction accepted1, exact singleton protocol/JUnit and complete closure
+establish the accepted one-case scope. This reporting inconsistency is retained,
+not silently rewritten. Seven native font-cache files are inventory-only.
+
+These are two separate measurements: original65PASS/1FAIL at a7525f166, then
+corrected1PASS at5316a4955. There was no complete corrected66-case replay and no
+replay of the historical333. The other65 test bodies/parametrizations and all
+product/helper bytes are exact across the test-only successor. This integration
+adds only this qualified ledger note; compiler, helper and carrier retain the
+verified5316a4955 bytes. Normal configured CI remains a separate validation gate.
+
+Actual survey data/crosswalk JSON, source acquisition/providers/decoders,
+Make/Country/Feature table builds, cache freshness, new-wave scientific support,
+panel/label/unit decisions and scientific acceptance remain unverified and held.
+The helper mapsj/keepsi documentation discrepancy, split PanelI/PanelII, original
+native143 provenance and original STOPPED/accepted0 transaction retain their
+existing meaning. Root owns any public PR integration; no further tests or
+public writes are performed by this source-only preparation.
+
+
+### Phase4 — real cached compiler and composed normal API validation
+
+The earlier synthetic-only holds are historical. Under resumed scoped authority,
+one real cached country compiler run on543481ba passed:326456rows from the five
+native wave parquets(1,458,512B), plus seven decoded cover reads on twoMD5-verified
+W2/W3 blobs(4,088,105B). Full reader frames/attrs, output payload/t/i/u/s, seven
+input files(bytes/modes/mtimes) and11source bindings remained exact; the sanctioned
+writer reread matched. Outer8.61s, core32/8GiB/120+5. Localjwalker/label behavior
+was preserved; this is not new household linkage or raw-food science acceptance.
+
+A separate seeded private normalAPI process used ten declaredMD5-verifiedL1
+objects(369,754,673B) and twelveL2seeds(3,585,960B), current hash invalidation,
+committed crosswalkJSONs and normalMake/Python producers, core32/8GiB/600+5.
+It ran five food and five sample Make targets, then FAILED at89.73s because the
+review script incorrectly compared Country/Feature MultiIndex levels positionally.
+Feature._harmonize_country_frame(feature.py732–737) explicitly reorders named
+levels; both actualframes held326456rows. That failed actor remains failed,
+with its source/command/log/receipt preserved; no clean coldPASS is claimed.
+Parent observers did not measure raw reader calls inside producer children.
+
+A new source-only verification successor corrected only the expected named-axis
+projection: require identical level-name sets and compare Feature's country
+slice to Country.reorder_levels(Feature-level-names), retaining exact values,
+row order/dtypes/categorical assertions and original operands. It copied the
+already-produced private cache, reverified ten rawMD5s and exact copied cache
+hash/size/mode/mtime snapshots; no native producers were replayed.
+Readback then a fresh-process warm both passed(17.13s/13.15s outer), each bounded
+120+5s oncore32/8GiB. Both required zeroMake, zero parentraw reads and zero walks;
+all22private cache entries and37source bindings remained exact. Each route's
+sanctioned oracle completeframe/dtype/attrs checks passed. This is composed
+failed-rebuild plus successful readback/warm evidence, not a repeated cleancold.
+
+Country and Feature serve326456rows withv on every row, wave rows:
+30815/44304/67209/99541/84587 forW1–W5. Q3/Q5/Q6 and source-specific units,
+Expenditure NA where unasked, original singleton squeeze and the localj-versus-i
+walker discrepancy remain unchanged. Quantity warnings59/25/32/8/2 perwave,
+the cluster code-space boundary and three population universes are retained;
+these quantities are not clipped or scientifically adjudicated. RawW1 warning
+purchased positive quantity/no unit count10 contradicts the existingCONTENTS9;
+both attributed measurements remain. W3 source decoding emitted the existing
+UTF-8→Latin-1 warning; no encoding or label repair is claimed.
+
+Original65PASS1FAIL/STOPPEDaccepted0 and corrected singleton1PASS remain separate,
+as does configured publicCI at543481ba(unit+Windows success;data jobs skipped).
+No full66 or historical333 was replayed. This documentation successor changes
+no production/helper/test bytes. Exact public-headCI/root publication are separate;
+no kilogram/price/factor repair, new-wave scientific support or resolution of
+sampling/panel/doc contradictions follows from this finite validation.
