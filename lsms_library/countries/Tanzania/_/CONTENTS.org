@@ -1,6 +1,35 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
+* Section J reported food-price / own-consumption-value capability (GH #846)
+:PROPERTIES:
+:CUSTOM_ID: food-price-capability-846
+:END:
+
+The retained C4 quotation in =slurm_logs/price_sources/Tanzania/REPORT.org=,
+§1 “The questionnaire, quoted”, explicitly names the *2019-20 NPS-SDD*
+household instrument =nps_sdd_household_qx_final_english_.pdf=, Section J
+qq2-6. That module asks no separate purchase unit price, and q5 asks
+own-production consumption *quantity*, not monetary value. Record these two
+source concepts as =not-asked= for *2019-20 Section J only*, =checks_run=C4=;
+do not transfer the claim to an unsearched wave or claim a fresh API run.
+
+Q4 spending is explicitly paired with q3 purchased quantity: their ratio is
+a genuine purchased-food unit value. Section F's market value of unpurchased
+food *outside the household* concerns a different universe/grain. Neither
+fact licenses declaring the whole =food_prices= / =food_acquired= table
+absent, and an imputed own-consumption value remains a separate #585 choice.
+
+See =_/food_price_capability.md= for exact retained evidence and scope, and
+=_/capabilities/food_price_absent_verdicts.csv= for the country-local two-row record in
+the existing verdict CSV schema. Its =feature= values are price-study source
+concepts, not canonical features. The live coverage matrix does *not* load
+this staged record. Shared concept/wave-scoped integration belongs to the
+coordinator; the current =SeriesCapability= registry is whole-feature/series
+and automatically reports =C1;C4=, which this retained evidence cannot claim.
+Other waves remain unadjudicated. No questionnaire or microdata was newly
+read for this source-only recording (Sue / Codex).
+
 * Survey design --- read before touching ANY 2008-15 table
 :PROPERTIES:
 :CUSTOM_ID: uphi-backcasting
