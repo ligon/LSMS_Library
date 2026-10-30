@@ -4473,3 +4473,37 @@ frames agree exactly, including order after documented canonical alignment.
 Direct country-compiler acceptance remains open: the failed Make arm was not
 retried. The analogous plot_features/plot_labor readers were not changed or built.
 Evidence: private dispatch =0c1ccc4d7aef4198ac3c1d845e5fc64c/evidence/REPORT.md=.
+
+* 2026-10-30 -- Actual plot_inputs compiler with reused natives (GH #1287)
+
+At reader-patch source =d0d634fbe88ab21b1e969182a4254b5d1a4281ef= (PR #1351),
+four specifically authenticated, closed native parquets were copied into a new
+private root; the country target was absent. Actual GNU Make used four explicit
+=-o= native prerequisites and ran the unchanged country compiler once. This is
+compiler-with-reused-inputs, not a fresh native rewarm or cold-source build.
+
+The four policy-read contributions have 47,098 / 16,394 / 52,947 / 64,874 rows;
+their ordered concat equals untouched writer CALL, CALL equals RETURN, and
+RETURN equals policy-aware storage: 181,313 rows. Arrow values/schema and pandas
+metadata also agree. Numeric checks include exact nonmissing NumPy arrays and
+extension arrays, typed attrs, masks, axes and row order. This verifies transport
+of admitted inputs, not independent science for their source observations.
+
+Make took 8.725 seconds, matching-stage checking 6.926 seconds, whole payload
+21.180 seconds; no native/raw/provider replay. Source/config/map bindings and
+original/staged native hashes remain unchanged. Seven derived witnesses were
+exported only after owned actors closed. The observer's original physical-script
+existence lookup omitted =/_/=; its false flags remain, with a separate source
+path correction. Actual declarations and four ordered compiler reads were right.
+
+The optional saved API composition diagnosis was not executed. The prior bare
+raw-concat/finalizer index/attrs mismatch remains unresolved, and earlier
+Country/Feature/warm passes retain their own scope. Original direct Make's
+486-second interruption never reached the compiler and remains failed; prior
+reader/string-policy/inspection/launcher qualifications and missing-Poetry
+audit failure are not erased. Other nine compiler targets, #1174 eligibility,
+#1190 representation, #1228 identity and whole #1287/#1288 remain separate.
+
+Dispatch =20faef1c81544b93a4572160c9a26b2e=, job =40651872=; final private
+result =7863c3adbc5bd5c3c51196c6f7d607b124736a03=; ordinary REPORT SHA256
+=8a674e6dde13ad0af4a444758825d4c98b25c20c0c42abb85a3ab5b82bb7458f=.
