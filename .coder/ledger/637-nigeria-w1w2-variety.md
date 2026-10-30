@@ -69,3 +69,32 @@ full-key duplicates/malformed retained codes, if discovered, must be reported,
 not silently assigned an ordinal. Future actual admission still needs exact
 current source custody/read matrix/operator and root release. No actual/data
 work is authorized by this source plan.
+
+## §7 Source/synthetic verification
+
+Root and independent Uganda plan review accepted the coordinate, including
+post-eligibility new refusals and preservation of existing source refusals.
+The synthetic selection passed101 tests, with4 source-gated cases deselected,
+0 skips/failures/errors (5.63s), under raw/build/acquisition/blob/reader guards
+with no recorded denials. This is invented-source and real Feature assembly
+via a private invented-frame Country provider; no real Country/data build ran.
+
+Verbatim pre-change helper fixture SHA5e8c2023435f05f2917d4de0a0a04b44f5d71462d90492363d059e90c3f6d9c8
+is authenticated against public26803b81. Tests compare complete typed W3–W5
+frames, including EA classes/masks/nonmissing values, axis domains/codes/order,
+empty outputs and duplicate/nondefault raw indexes. Real Feature calls preserve
+full W3 location/payload identities and carried attrs; only the explicitly
+expected fabricated-variety provenance entry changes, with visit1 retained.
+Tiny/nextafter actual nullable Float64 mutations are refused by reused GH1196
+strict comparison. Literal full-code1511/1512 and lumped3/4 survive equal Price;
+full native duplicates refuse after eligibility; excluded malformed/duplicate
+junk does not gain admission or a new identity error. Existing nonfinite name
+resolver refusal remains unchanged.
+
+Source AST:63 named definitions before/after; only community_prices_for_wave
+changes,62 unchanged, none added/removed. One canonical sentinel constant is
+added; three driver/compiler edits are documentation/assertion-message only.
+No shared framework/schema or other-country change. The existing source-gated
+TestBuilt shape assertions are updated but unrun; W1/W2 count expectations
+30,628/31,239 are forecasts from1192's authenticated eligible-pre-first report,
+not new native/API measurements. Future actual/custody/read matrix still held.
