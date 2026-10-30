@@ -91,3 +91,33 @@ DVC hits and primary fallback. No secondary download or full acquisition layout
 is enabled. Mocked misses/basename collision, primary compatibility and early
 local/DVC hit controls must verify this narrow shared-file boundary. Full Panel
 relocation/acquisition and missing-secondary healing remain separate residuals.
+
+
+## Corrected-source verification
+
+The three poisoned-bare-module controls first failed on original product1e8cb8c
+(3failed,4.65s), proving the config-root issue without raw reads. The exact-path
+three-site correction is f4b769084. A first combined15-case attempt retained
+14PASS/1FAIL: the new acquisition test's fake _fetch_destination lacked the
+existing populate_cache keyword. That fixture-signature error and full receipt
+remain; no product behavior or expected assertion was changed to resolve it.
+The corrected fake implements the existing normal/acquisition destination split.
+
+The frozen corrected source then passed191uniqueJUnit cases, zero fail/error/skip:
+the8namespace controls,7new secondary-read controls and existing wholly mocked
+GH1276/GH1283 acquisition/provenance suites. Pytest5.02s; core32/thread1/n0,
+8GiB address-space/120CPU/120+5wall cap, mounted approved Python, private config,
+data/tmp/DVC and exact checkout imports. Seven selected corrected source/test
+hashes were unchanged. No raw-source or actual API cohort was repeated. The
+negative3case baseline used a wall/CPU-placement bound but no address-space
+limit; that qualification is retained rather than rerunning it.
+
+Original1e8 actual-source evidence remains scoped to its exact product. The
+corrections bind the same unchanged namespace helpers by exact path and add a
+fail-closed missing-secondary branch; they do not alter the source/weight/index
+formulas or cached-data read behavior. Both actual cached-source scopes and
+new191synthetic compatibility cases are disclosed separately. Full Panel layout
+migration, complete per-entry held-release/acquisition receipts, other2021module
+coverage, CS cluster_features/market lookup and missing-secondary provider healing
+remain open. The gate returnsNone with an actionable warning; it enables no new
+secondary download and does not assert an acquisition-complete holding.
