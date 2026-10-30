@@ -6,7 +6,7 @@ Walks a Uganda build tree, reads each parquet into a DataFrame, and records
 a deterministic fingerprint (shape, columns, index names, dtypes, content hash).
 
 Usage:
-    python tests/generate_baseline.py /path/to/countries/Uganda
+    PYTHONPATH=. python tests/generate_baseline.py /path/to/countries/Uganda
 
 Writes the manifest to tests/fixtures/uganda_baseline.json.
 """
@@ -17,6 +17,10 @@ import sys
 from pathlib import Path
 
 import pandas as pd
+
+
+class IncompleteCoverageError(RuntimeError):
+    """A known partial country cache cannot become a full-wave baseline."""
 
 
 def fingerprint(df: pd.DataFrame) -> dict:
@@ -49,30 +53,60 @@ def build_manifest(uganda_root: Path, data_root_path: Path | None = None) -> dic
     For each unique relative path, the in-tree version takes precedence.
     """
     manifest = {}
+    expected_waves = None
+
+    def require_coverage(pq, rel):
+        nonlocal expected_waves
+        if Path(rel).parts[0] != "var":
+            return
+        from lsms_library import Country
+        from lsms_library.local_tools import read_parquet_cache_waves
+
+        if expected_waves is None:
+            expected_waves = [str(w) for w in Country("Uganda").waves]
+        coverage = read_parquet_cache_waves(pq)
+        # Preserve GH #1113's manifest-absent legacy/Make behavior. Coverage
+        # cannot be inferred from observed t values (a built wave may be empty).
+        if coverage is None:
+            return
+        missing = sorted(set(expected_waves) - set(coverage))
+        if missing:
+            raise IncompleteCoverageError(
+                f"{rel}: refusing partial baseline; lsms_cache_waves lacks "
+                f"{missing} from Uganda's declared waves {sorted(expected_waves)}"
+            )
 
     # First pass: in-tree parquets (take precedence)
     import pyarrow.lib as _pa_lib
     _parquet_errors = (OSError, ValueError, _pa_lib.ArrowInvalid)
     for pq in sorted(uganda_root.rglob("*.parquet")):
         rel = str(pq.relative_to(uganda_root))
+        require_coverage(pq, rel)
         try:
             df = pd.read_parquet(pq, engine="pyarrow")
-            manifest[rel] = fingerprint(df)
         except _parquet_errors as e:
             print(f"WARNING: Could not read {rel}: {e}", file=sys.stderr)
             manifest[rel] = {"error": str(e)}
+        else:
+            # Atomic cache replacement may occur during the payload read.
+            # Deliberate coverage refusal stays outside the read-error catch.
+            require_coverage(pq, rel)
+            manifest[rel] = fingerprint(df)
 
     # Second pass: data_root parquets (only for paths not already in manifest)
     if data_root_path and data_root_path.is_dir():
         for pq in sorted(data_root_path.rglob("*.parquet")):
             rel = str(pq.relative_to(data_root_path))
             if rel not in manifest:
+                require_coverage(pq, rel)
                 try:
                     df = pd.read_parquet(pq, engine="pyarrow")
-                    manifest[rel] = fingerprint(df)
                 except _parquet_errors as e:
                     print(f"WARNING: Could not read {rel}: {e}", file=sys.stderr)
                     manifest[rel] = {"error": str(e)}
+                else:
+                    require_coverage(pq, rel)
+                    manifest[rel] = fingerprint(df)
 
     return manifest
 
