@@ -4575,3 +4575,19 @@ claimed green. Physical 2009 blank/flag counters were not durably retained.
 Three-wave composed evidence and seven-driver source support do not establish
 all-seven-native or clean-cold Country closure. Independent reviews:
 =95ad63dd80b6= (source/failed arm), =b437ddf69f27= (continuation).
+
+* GH #771 -- ordinary nutrition requires the versioned FCT component (2026-10-30)
+
+Normal =nutrition.py= reads the existing =fct_usda.csv= and raises an
+explicit error naming =scripts/refresh_fct.py --country Uganda= if absent,
+before any Country/food work. The implicit live-provider fallback and
+tracked key literal are removed. Explicit refresh uses existing
+=FDC_API_KEY=/config lookup; no key rotation or Uganda acquisition occurred.
+
+Uganda's committed snapshot parsing, nutrient arithmetic and requested
+=fct= versus =nutrition= output routing are unchanged. Invented actual-source
+routing/refresh tests cover failure-before-food and offline operation;
+no new Uganda actual nutrition or scientific-density acceptance is claimed.
+The approved #967 direction and separate #1000 source/density concerns
+remain as documented above. This does not repair every legacy metadata or
+Make/cache interaction.

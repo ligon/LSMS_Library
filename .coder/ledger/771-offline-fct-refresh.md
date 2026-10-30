@@ -23,3 +23,13 @@ Meaningful invented tests must prove no network or food call on missing/corrupt 
 ## Public extraction
 
 Prepared on development0b1effb2 after accepted deliberate acquisition and actual-source offline consumer. Product bytes are selected explicitly from tested sourceb6c6456d; no private operator or ancestor is included. Ordinary public/runtime qualifications follow below before final review.
+
+## Closed validation and limitations
+
+The source selection is byte-exact b6c6456d. Reviewed synthetic source66e421 passed28 tests (25 new plus3 existing routing); later9 metadata/setup checks and1 request-start journal check have separate receipts, not a final whole-suite replay. Original initial4pass/1fail from inherited parser cache is retained; explicit refresh bypasses only that cached parser alias in a scoped finally and keeps an owned distinct-ID response memo. Request identity/error/atomicity/cache-restoration/one-ULP controls preserve the existing harmonizer, not a new nutrient completeness policy.
+
+Deliberate acquisition used exactly10 distinct FDC requests, no automatic retry; all responses returned200 with exact requested integerfdcId. Snapshot10x21/1652B SHAedaaa57a5d51b50e6c4be09e176dedd049bdd17b3df9e23382940cf04cc76a74 is authenticated against retained raw public responses; same existing key was privately migrated if absent, never rotated or printed. Existing country CSV build-input hashing suffices; coarse country-wide invalidation is expected.
+
+Actual-source offline consumer: sourceb6c6456d, correctedoperator8224e150, command955ff837; actor0/35.6058s outer0/36.4406s, ECHILDclosed. All5 strict mandatory food/served/nutrition/transport predicates and7 input immutability checks pass; no network/parser/observer denials. Closed private22files83,490,658B manifest59b852f5b466bb7214298e3fb409c71434e9ae6521c1422b81f8b20dac223a66. Original failed consumer preserved: falsely memory-origin saved parquet replies caused compatibility aggregation, changed masks/values and reversed columns; not an ordering-only failure. Source-bound independent review accepted the one-token provenance correction. This validates default cold country over saved native/sample prerequisites and authentic offline nutrient arithmetic, not native cold/Make/Feature/all-wave nutrition API freshness or whole1171 retirement. Uganda actual acquisition/runtime was not repeated.
+
+The settled1357 ruling continues excluding anonymous rows from household-keyed tables; no inferred IDs/orphans or eligibility change. Ref771/1171; root owns scope reconciliation.

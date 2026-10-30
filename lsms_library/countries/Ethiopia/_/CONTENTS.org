@@ -3393,3 +3393,38 @@ reproducibility scope remain open. The settled
 [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 exclusion of anonymous household-keyed observations]] is unchanged;
 no orphan or inferred household identity is introduced. See
 =slurm_logs/isa_backlog_2026-10-30/Ethiopia/1171-household-walk/REPORT.md=.
+
+* GH #771 -- deliberate USDA refresh; ordinary nutrition is offline (2026-10-30)
+
+The [[https://github.com/ligon/LSMS_Library/issues/771#issuecomment-6368101158][maintainer ruling]] authorizes one deliberate Ethiopia FDC refresh, the existing
+config/environment key lookup, no key rotation, and a committed snapshot.
+Normal =nutrition.py= now reads =fct_usda.csv= and raises an actionable error
+naming =scripts/refresh_fct.py --country Ethiopia= before Country/food work if
+it is absent. It cannot silently fall back to a provider. The unchanged
+harmonizer supplies per-kg densities; the CSV is not multiplied by ten again.
+
+The authorized run returned ten responses for ten distinct curated FDC IDs;
+all response identities and retained bytes were authenticated. The committed
+10 x 21 CSV is 1,652 bytes, SHA256
+=edaaa57a5d51b50e6c4be09e176dedd049bdd17b3df9e23382940cf04cc76a74=.
+This is the curated USDA component, not independent complete coverage of all
+81 curation rows. The older TODO115 missing-component prose is superseded
+for this snapshot; broader FCT source/density questions remain separate.
+
+An actual-source offline consumer over five authenticated saved native
+parquet replies and a composed sample-v prerequisite returned 326,456 food
+rows and 326,082 food-quantity rows. Raw food/reference, served/reference,
+both writer RETURN/storage predicates and the labelled nutrient matrix
+passed strict typed and numeric checks. Nutrition was 25,644 x 21. The
+first consumer failed because the adapter mislabelled parquet replies as
+memory and triggered legitimate compatibility aggregation; it is preserved.
+The corrected run changes only that provenance label, with no product or
+actual-frame normalization. Actor/outer exit 0, closed descendants, no
+network/parser denials and source/input immutability were recorded.
+
+This is a cold default country route over saved native/sample boundaries,
+not native-cold, Make, Feature or nutrition-cache freshness acceptance.
+The direct nutrition script output remains hashless/without wave coverage.
+#1171 recipe/native-cold acceptance remains open. The CSV participates in
+existing country-wide build-input hashing, so unrelated Ethiopia caches may
+rewarm. The settled [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 anonymous-household exclusion]] is unchanged.

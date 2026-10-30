@@ -8,7 +8,7 @@ import sys
 sys.path.append('../../_/')
 import lsms_library as ll
 from lsms_library.local_tools import df_from_orgfile
-from fct_tools import nutrient_df, harmonize_nutrient, fct_filter
+from fct_tools import fct_filter
 import pandas as pd
 import numpy as np
 
@@ -28,11 +28,15 @@ fct = fct_filter(food, n_labels, fct_origin)
 
 
 ##--Part 2: process foods that are non-existent in the given Tanzania fct 
-apikey = "hAkb5LsLAS1capOD60K6ILrZDkC29eK6ZmqCumXB"
 #create and restructure fct for fdc food items; 
-fct_add = food[["Preferred Label", "FDC ID"]]
-fct_add = nutrient_df(fct_add, apikey)
-fct_add = harmonize_nutrient(fct_add, n_labels)
+# Stored densities are already per kg: do not harmonize/scale twice.
+try:
+    fct_add = pd.read_csv('fct_usda.csv', index_col=0, float_precision='round_trip')
+except FileNotFoundError as exc:
+    raise FileNotFoundError(
+        'Missing versioned Ethiopia FCT snapshot; run '
+        'python scripts/refresh_fct.py --country Ethiopia explicitly'
+    ) from exc
 #combine two fcts 
 final_fct = pd.concat([fct, fct_add]).sort_index().T
 
