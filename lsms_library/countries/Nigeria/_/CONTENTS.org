@@ -1294,6 +1294,17 @@ W3 25% / W4 56% / W5 49%).
   across waves (panel_ids maps previous_i = hhid), so there is no
   per-wave remapping dict (mirrors Nigeria food_acquired).
 
+** Country concatenator requires every declared folder (GH #1287, 2026-10-28)
+
+All five folders in =nigeria.Waves= ship a =_/plot_features.py= script.
+The country concatenator previously caught every reader exception and wrote
+whatever folders succeeded, provided at least one did. It now propagates a
+failed declared-folder read before writing a partial country table.
+The folder order and each source frame's PP-quarter =t= values are unchanged.
+Invented reader/writer regression checks conserve healthy rows, nulls and
+dtypes and refuse a missing, unreadable or malformed middle-wave input;
+no native payload, cache, or public API acceptance is asserted here.
+
 * community_prices (GAP C -- OURS-ONLY, maintainer priority)
 
 Item-level REPORTED community food prices at natural grain (t, v, j, u):
@@ -2413,3 +2424,52 @@ development served.  Nothing served moves: =individual_education= reads
 =s2aq9= of this file, never =s2aq10=.  To recover the text, a consumer can
 =s.encode('latin-1').decode('utf-8', errors='ignore')= -- which yields
 =... /  ‘O LEVEL=, the closing quote being genuinely gone.
+
+** Declaration membership supplement (GH #1287)
+
+
+*Declaration qualification (continuation, 2026-10-28).* The five physical
+=Waves= and today's five producer scripts do not themselves establish
+per-table membership after a retirement. The compiler now obtains each logical
+PP/PH quarter through the actual =Country('Nigeria')[quarter]= lookup and
+=Wave.data_scheme=, which includes native scripts AND YAML declarations.
+Both quarters map to one physical folder through =wave_folder_map=; the
+compiler reads each declared folder once in its original order. A folder
+without either declaration skips before any reader, even if an output is
+available. Declared reader errors retain their original exception before any
+country write. No source-column mapping, round selection or metadata API is
+substituted. All-retired inputs still fail without writing; successful declared
+empty frames remain valid, including when every declared frame is empty.
+
+The separate new 27-case private-metadata/invented-IO cohort records the old
+compiler's 13 declaration failures and 14 healthy passes, then 27 passes after
+this correction. It preserves native PP keys, repeated indices, nulls, dtypes,
+order, source frames and the existing agreeing/disagreeing-attrs concat rule.
+The original four controls remain historical evidence for current wiring.
+Neither cohort establishes real source/Make/cache/API or scientific acceptance.
+
+* 2026-10-28 -- four country compilers use actual table declarations (GH #1287)
+
+=community_prices=, =food_coping=, =household_roster= and =housing= now collect
+eligible physical folders through actual logical-quarter =Country= lookup and
+=Wave.data_scheme=. Native script stems and YAML keys form the existing union;
+a null YAML key does not disable a retained native declaration. A physical
+folder is read once, in its existing enumeration order. Unwired/unregistered
+folders skip before offered outputs, and malformed metadata propagates.
+Declared reader errors stop before the country writer, preserving the original
+exception. Successful typed-empty inputs remain valid; all-retired inputs keep
+the existing no-input error. This does not establish native-producer emptiness.
+
+The compilers preserve source quarters, concat/sort/uniqueness behavior, native
+IDs and opaque payload/axes; they add no ID walk or new schema. Housing's current
+script quarters remain PH/PH/PP/PP/PH, while roster has both rounds and C8 is
+PH-only. These are source bindings, not fresh instrument/data measurements.
+Ten roster/housing wave recipes change only =cd ...; python ...= to
+=cd ... && python ...=, so a failed directory change cannot execute in the
+wrong directory. No Make execution or freshness claim follows from that syntax.
+
+The narrow public-421 extraction excludes the author's inherited module,
+source/config, sample/cluster, education and scientific changes. Invented extra
+price axes in tests check opaque transport; they do not add native production
+semantics to this baseline. Previous qualified community timeout/traceback
+observations remain distinct from new extracted-candidate verification.

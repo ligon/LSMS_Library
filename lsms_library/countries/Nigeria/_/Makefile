@@ -93,19 +93,19 @@ $(VAR_DIR)/household_roster.parquet: household_roster.py $(household_roster_parq
 	python household_roster.py
 
 ../2010-11/_/household_roster.parquet: ../2010-11/_/household_roster.py
-	(cd ../2010-11/_; python household_roster.py)
+	(cd ../2010-11/_ && python household_roster.py)
 
 ../2012-13/_/household_roster.parquet: ../2012-13/_/household_roster.py
-	(cd ../2012-13/_; python household_roster.py)
+	(cd ../2012-13/_ && python household_roster.py)
 
 ../2015-16/_/household_roster.parquet: ../2015-16/_/household_roster.py
-	(cd ../2015-16/_; python household_roster.py)
+	(cd ../2015-16/_ && python household_roster.py)
 
 ../2018-19/_/household_roster.parquet: ../2018-19/_/household_roster.py
-	(cd ../2018-19/_; python household_roster.py)
+	(cd ../2018-19/_ && python household_roster.py)
 
 ../2023-24/_/household_roster.parquet: ../2023-24/_/household_roster.py
-	(cd ../2023-24/_; python household_roster.py)
+	(cd ../2023-24/_ && python household_roster.py)
 
 food_quantities = $(shell find $(rounds) -name food_expenditures.py)
 food_quantities_parquet := $(food_quantities:.py=.parquet)
@@ -205,16 +205,16 @@ $(VAR_DIR)/community_prices.parquet: community_prices.py $(community_prices_parq
 	python community_prices.py
 
 ../2010-11/_/housing.parquet: ../2010-11/_/housing.py
-	(cd ../2010-11/_; python housing.py)
+	(cd ../2010-11/_ && python housing.py)
 
 ../2012-13/_/housing.parquet: ../2012-13/_/housing.py
-	(cd ../2012-13/_; python housing.py)
+	(cd ../2012-13/_ && python housing.py)
 
 ../2015-16/_/housing.parquet: ../2015-16/_/housing.py
-	(cd ../2015-16/_; python housing.py)
+	(cd ../2015-16/_ && python housing.py)
 
 ../2018-19/_/housing.parquet: ../2018-19/_/housing.py
-	(cd ../2018-19/_; python housing.py)
+	(cd ../2018-19/_ && python housing.py)
 
 ../2023-24/_/housing.parquet: ../2023-24/_/housing.py
-	(cd ../2023-24/_; python housing.py)
+	(cd ../2023-24/_ && python housing.py)
