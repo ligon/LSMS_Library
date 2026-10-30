@@ -1,0 +1,269 @@
+def community_prices_for_wave(t, frames, mode, crop_labels=None):
+    """Assemble item-level community_prices for one Nigeria GHS-Panel wave.
+
+    Parameters
+    ----------
+    t : str
+        PH-quarter wave id (e.g. '2011Q1'), used as the `t` index.
+    frames : list of dict
+        Each dict describes one source price frame:
+            df     raw DataFrame (convert_categoricals=False)
+            dec    decoded-label DataFrame (for unit / item decode)
+            ea     EA id column name (-> v = cluster_id(state, lga, ea))
+            state  state column name (default 'state')
+            lga    LGA column name   (default 'lga')
+            item   item_cd column name
+            price  reported-price column name
+            unit   unit column name (W3-W5; None for W1/W2)
+            size   coded size column (W4 c8q2c, W5 c8aq2_c; None otherwise)
+            size_text  free-text size column (W3 c8q2b; None otherwise)
+            obs    the form's reading slot this frame records (default 1).
+                   W3 is the one wave whose C8 has TWO slots: sectc8a is
+                   "C8a: FOOD PRICES - 1ST LOCATION" (obs 1) and sectc8b
+                   "C8b: FOOD PRICES - 2ND LOCATION" (obs 2) --
+                   PH_W3_Community_Quest.pdf, SECTIONS list "8 Food Prices /
+                   a. First location 18 / b. Second location 24"; each
+                   section opens with its own location type, name,
+                   description, collection date and GPS over the same item
+                   list (GH #637 defect C; the GH #840 `obs` contract,
+                   lsms_library/data_info.yml Index Info).
+    mode : {'codes', 'names'}
+        'codes' -> item_cd is the consumption-module scheme already in
+                   harmonize_food (W3-W5): resolve via crop_labels (Code).
+        'names' -> item_cd is the community questionnaire's own scheme
+                   (W1/W2): resolve via _resolve_w1w2_price_item.
+    crop_labels : dict, required for mode='codes'
+        {int code: Preferred Label} from harmonize_food.
+
+    The C8 form prices "a quantity of ONE (1) [ITEM]" in a stated UNIT and
+    SIZE (GH #834): for a coded size carrying a metric quantity (W4/W5 '34.
+    250 GRAMS', '24. 75 CL'; W5 also has the c8aq2_a number + c8aq2_cvn kg/l
+    factor agreeing with the code), the reported Naira figure is the price
+    of THAT PACKAGE, so Price is divided by the decoded quantity and the
+    row's unit becomes the metric base unit -- 'g' or 'cl' -- making the
+    served number the per-unit price data_scheme.yml documents.  Such rows
+    carry the `Derivation` key `Nigeria::community_prices::c8-metric-size`.
+    A metric-unit row whose package size is UNRECORDED -- all of W3's
+    13,768 g/cl rows bar one (c8q2b is free text, blank on the rest), all
+    3,433 of W3's Kg/l rows (the same blank free text, caught only when the
+    deletion entry's inputs were written), and W5's 133 rows on '2. GRAMS
+    (G)' (c8aq2_c blank) -- is DROPPED: its price is of an unrecorded
+    package and per-unit normalization is impossible; serving it under the
+    base unit would misprice by the package size (~189x/~42x measured).
+    The drop is registered as the deletion entry
+    `Nigeria::community_prices::c8-unrecorded-size-drop` (rows: 0 -- a
+    dropped row has nowhere to carry a key; `derivation_inputs` returns the
+    dropped source rows).  W4 drops NOTHING under this rule: the 1,191 rows
+    on raw unit code 1 ('KILOGRAMS (KG)') carry a blank c8q2c, but a blank
+    size beside KILOGRAMS is the unremarkable "one kilogram" reading --
+    pre-#834 prose that described those rows as a dropped 'Grams(g)' unit
+    does not match this read of sectc8_harvestw4.dta.  Ordinal sizes
+    (SMALL/MEDIUM/LARGE, '99.
+    ONE SIZE ONLY') carry no metric content: those rows stay under the base
+    unit (the size axis remains lost there -- the reported size-specific
+    frame is the fix sketched in CONTENTS.org, not adopted).  W1/W2 print
+    one unit per item and carry no size columns: unchanged.
+
+    Returns
+    -------
+    DataFrame indexed by (t, v, j, u, obs) with the `Price` column and,
+    where any row was derived, a `Derivation` column (registry key on
+    derived rows, NA elsewhere).  `obs` is each frame's reading slot, so
+    W3's two locations are two rows, never one selected from the pair
+    (GH #637 defect C: until 2026-10-23 the collapse below kept location 1
+    in all 2,591 W3 cells both locations priced -- 983 of them at a
+    different price -- and served the 3,218 location-2-only rows
+    indistinguishable from location 1).
+
+    In 'codes' mode (W3-W5) the key is asserted UNIQUE before the collapse:
+    each C8 file is (ea, item_cd)-unique, so a collision would be a broken
+    key, not a cell to select from (GH #840).  The Niger duplicate-entry
+    drop (a SECOND source record of the same slot that repeats a served
+    row) has nothing to act on here -- no W3-W5 file carries a second
+    record -- and a W3 location-2 price equal to location 1's is a second
+    slot, not a repeat: it is served (Niger's content key includes the
+    slot; GhanaLSS serves equal vendor prices).
+
+    'names' mode (W1/W2) still collapses (t, v, j, u, obs=1) duplicates to
+    the FIRST price.  That is NOT a dedup of the same surveyed quantity:
+    the groups are size variants of one base item (base*10+size codes) and
+    distinct items the name map lumps under one label (Maize, Beer, Fish--
+    fresh, Butter/Margarine), and most disagree on Price (GH #637 tail
+    diagnosis, 2026-10-23: 2,303 of 2,568 W1 groups, 2,605 of 2,951 W2).
+    Kept as-is pending a maintainer ruling (a `variety` level, as #840 did
+    for Tanzania); see CONTENTS.org.
+    """
+    DERIVATION_KEY = 'Nigeria::community_prices::c8-metric-size'
+    pieces = []
+    for fr in frames:
+        df = fr['df']
+        dec = fr['dec']
+        # v must land in the SAME keyspace as sample().v, or a cluster's prices
+        # join no households at all.  That means the COMPOSITE (state/lga/ea)
+        # id, not the bare `ea` serial (GH #323), and it means building it from
+        # raw CODES: `df` here is read with convert_categoricals=False, and the
+        # community questionnaire carries no value labels on state/lga anyway,
+        # so a label-built key would not match the household side (measured: 0%
+        # overlap in W2, 100% on codes).  A community record with no usable EA
+        # yields v = None and is dropped by the notna() filter below.
+        state_col = fr.get('state', 'state')
+        lga_col = fr.get('lga', 'lga')
+        v = df.apply(
+            lambda r: cluster_id(r.get(state_col), r.get(lga_col), r[fr['ea']]),
+            axis=1)
+        code = pd.to_numeric(df[fr['item']], errors='coerce')
+        price = pd.to_numeric(df[fr['price']], errors='coerce')
+        unit_labels = None
+
+        if mode == 'codes':
+            j = code.astype('Int64').map(crop_labels).astype('string')
+            if fr.get('unit') and fr['unit'] in dec.columns:
+                unit_labels = dec[fr['unit']]
+                u = unit_labels.map(_canon_community_unit).astype('string')
+                initially_unplaced = u.isna()
+            else:
+                u = pd.Series(pd.NA, index=df.index, dtype='string')
+        else:  # names (W1/W2)
+            labs, units = [], []
+            for c in code:
+                if pd.isna(c):
+                    labs.append(pd.NA)
+                    units.append(pd.NA)
+                    continue
+                lab, un = _resolve_w1w2_price_item(c)
+                labs.append(lab if lab is not None else pd.NA)
+                units.append(un if un is not None else pd.NA)
+            j = pd.Series(labs, index=df.index, dtype='string')
+            u = pd.Series(units, index=df.index, dtype='string')
+
+        piece = pd.DataFrame({
+            'v': v.values,
+            'j': j.values,
+            'u': u.values,
+            'obs': int(fr.get('obs', 1)),
+            # float64 up-front: the size division below writes non-integer
+            # per-unit prices, and a raw int16 price column would refuse
+            # them (pandas 3 raises on the silent downcast).
+            'Price': price.astype('float64').values,
+            'Derivation': pd.Series(pd.NA, index=df.index,
+                                    dtype='string').values,
+        }, index=df.index)
+
+        # GH #834 -- the C8 SIZE field.  A coded size carrying a metric
+        # quantity means the row's Price is of that PACKAGE, not of one
+        # unit: divide through and re-unit to the metric base unit.  A
+        # metric-UNIT row whose package size is unrecorded is dropped
+        # below (u set to NA here).
+        size_col = fr.get('size')
+        if size_col and size_col in dec.columns:
+            size_lab = dec[size_col].astype('string')
+            qty = size_lab.map(_c8_size_metric_grams).astype('Float64')
+            is_metric_size = qty.notna()
+            # u -> 'g' for gram-coded sizes, 'cl' for cl/litre-coded ones
+            is_litre = size_lab.str.contains(r'(?i)\bCL\b|LITRE', na=False)
+            metric_u = pd.Series(pd.NA, index=df.index, dtype='string')
+            metric_u[is_metric_size & ~is_litre] = 'g'
+            metric_u[is_metric_size & is_litre] = 'cl'
+            take = is_metric_size & piece['Price'].notna() & (qty > 0)
+            piece.loc[take, 'Price'] = piece.loc[take, 'Price'] / qty[take]
+            piece.loc[take, 'u'] = metric_u[take]
+            piece.loc[take, 'Derivation'] = DERIVATION_KEY
+            # A row whose coded unit is metric AND whose size code states a
+            # metric quantity has just been re-united to g/cl and divided;
+            # it never matches here (its size is recorded).  What remains
+            # on g/cl with no size: nothing in W4 (its g/cl unit labels
+            # carry a coded size on every row or none -- see
+            # _/derivations.yml, c8-unrecorded-size-drop), and in W5 the
+            # 133 rows on '2. GRAMS (G)' with a BLANK c8aq2_c.  Exempt the
+            # questionnaire's own '99. ONE SIZE ONLY' code.
+            one_size = size_lab.str.match(_C8_SIZE_ONE_SIZE_ONLY,
+                                          na=False)
+            unrecorded = (piece['u'].isin(['g', 'cl'])
+                          & size_lab.isna() & ~one_size)
+            piece.loc[unrecorded, 'u'] = pd.NA
+
+        size_text_col = fr.get('size_text')
+        if size_text_col and size_text_col in df.columns:
+            # W3: c8q2b is free text and blank on the whole metric-unit
+            # block -- 13,767 of the 13,768 g/cl rows (the 13,768th parses
+            # '50cl') and every Kg/l row (2,597 + 836).  Parse the handful
+            # that state a quantity ('300gram', 'one 75cl bottle'); the
+            # blank remainder is dropped just below.
+            txt = df[size_text_col]
+            qty = pd.Series(
+                [_c8_w3_size_text(x, uu) for x, uu in zip(txt, piece['u'])],
+                index=df.index, dtype='Float64')
+            take = (piece['u'].isin(['g', 'cl']) & qty.notna()
+                    & piece['Price'].notna() & (qty > 0))
+            piece.loc[take, 'Price'] = piece.loc[take, 'Price'] / qty[take]
+            piece.loc[take, 'Derivation'] = DERIVATION_KEY
+            unrecorded = (piece['u'].isin(['g', 'cl', 'Kg', 'l'])
+                          & qty.isna())
+            piece.loc[unrecorded, 'u'] = pd.NA
+
+        if unit_labels is not None:
+            # Report only labels still unplaced AFTER the existing metric
+            # rescue.  Reporting up-front falsely counts rescued g/cl rows;
+            # known metric units dropped for unrecorded sizes are separate.
+            # Retention/fallback remains the explicit #1095 design residual.
+            report = (initially_unplaced & piece['u'].isna()
+                      & piece['v'].notna() & piece['j'].notna()
+                      & piece['Price'].notna() & (piece['Price'] > 0))
+            _canon_units(unit_labels[report], canon=_canon_community_unit,
+                         where=f'community_prices {t}',
+                         disposition='dropped after metric-size rescue')
+
+        pieces.append(piece)
+
+    out = pd.concat(pieces, ignore_index=True)
+    out['t'] = t
+
+
+    # Keep only rows with a resolved cluster, item, unit and a positive
+    # price (price 0 / NaN = item not available / not priced; a NA `u`
+    # after the size step above is a metric-unit row with an unrecorded
+    # package size -- dropped, not served mis-scaled).
+    out = out[out['v'].notna() & out['j'].notna() & out['u'].notna()
+              & out['Price'].notna() & (out['Price'] > 0)]
+
+    # `obs` is in the key, so W3's two locations are two rows (GH #637
+    # defect C).  W3-W5 ('codes') must arrive collision-free: each C8 file is
+    # (ea, item_cd)-unique, so a duplicate (t, v, j, u, obs) is a broken key,
+    # and the collapse below must not select from it (GH #840).
+    key = ['t', 'v', 'j', 'u', 'obs']
+    if mode == 'codes':
+        dup = out.duplicated(key, keep=False)
+        assert not dup.any(), (
+            f"community_prices {t}: {int(dup.sum())} rows share a "
+            f"{tuple(key)} key -- a broken key, not a cell to select from "
+            "(GH #840 / #637)")
+    # W1/W2 ('names') only: collapse (t, v, j, u, obs=1) duplicates to the
+    # FIRST reported price.  The groups are size variants of one base item
+    # and distinct items lumped under one label (see the docstring) -- a
+    # SELECTION, kept pending a maintainer ruling, never a cross-cluster
+    # aggregate.  `Derivation` is all-NA there (W1/W2 carry no size column),
+    # so its `first` is exact; in 'codes' mode every group is one row.
+    out = (out.groupby(key, as_index=False)
+              .agg({'Price': 'first', 'Derivation': 'first'}))
+    if out['Derivation'].isna().all():
+        out = out.drop(columns='Derivation')
+
+    # community_prices is a CLUSTER table -- there is no household i, the
+    # natural grain is (t, v, j, u, obs).  But the framework's
+    # local_tools.map_index() (run on EVERY read path) unconditionally swaps
+    # j -> i whenever a `j` index level is present and an `i` level is NOT.
+    # That swap would rename our item level `j` to `i`, drop `j`, and collapse
+    # the table to (t, v, u).  To keep `j` intact WITHOUT touching the
+    # framework, carry a redundant `i` level (set equal to the cluster v)
+    # positioned BEFORE `j`: map_index then sees i present and j after i, so it
+    # does NOT swap, and the framework's _normalize_dataframe_index drops the
+    # undeclared `i` level (data_scheme declares (t, v, j, u, obs)), leaving
+    # the declared (t, v, j, u, obs) grain.  v already in the index means
+    # _join_v_from_sample is skipped; the spurious i==v never reaches the API.
+    # (Same framework-compatibility shim Tanzania/Malawi/Ethiopia/Mali
+    # community_prices use.)
+    out['obs'] = out['obs'].astype('int64')
+    out['i'] = out['v']
+    out = out.set_index(['t', 'v', 'i', 'j', 'u', 'obs']).sort_index()
+    value_cols = ['Price'] + (['Derivation'] if 'Derivation' in out else [])
+    return out[value_cols]

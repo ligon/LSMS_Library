@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """community_prices for Nigeria GHS-Panel 2012-13 (W2) -- GAP C.
 
-Item-level reported community food prices at grain (t, v, j, u) from the
+Item-level reported community food prices at grain (t, v, j, u, variety, obs) from the
 post-harvest COMMUNITY questionnaire's food-price module (Section C8,
 sectc8_harvestw2.csv).  CLUSTER-level (no household i); v = cluster_id(state, lga, ea).
 W2 shares W1's community item-code scheme (mapped by name to canonical
@@ -22,6 +22,7 @@ df = community_prices_for_wave(t, [dict(
     df=raw, dec=raw, ea='ea', item='item_cd', price='c8q2', unit=None)],
     mode='names')
 
-assert df.index.is_unique, "community_prices W2: (t,v,j,u) not unique"
+# Native variety is the original item/size code; obs is the single C8 slot.
+assert df.index.is_unique, "community_prices W2: (t,v,j,u,variety,obs) not unique"
 assert len(df) > 0
 to_parquet(df, 'community_prices.parquet')

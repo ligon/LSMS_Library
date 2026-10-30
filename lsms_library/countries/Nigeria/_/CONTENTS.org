@@ -2946,3 +2946,50 @@ infrastructure0/0 with task/publication complete; final private result
 No whole #1119/#1120/#1287 closure or decision on remaining source retention,
 units, conflicts or recall follows. The shared helper changes build fingerprints;
 validation used private caches, not a no-rewarm or full cache-census claim.
+
+
+* W1/W2 community prices retain native item/size variety (GH #637)
+
+The earlier paragraph "Still open -- W1/W2 (a maintainer decision, not changed
+here)" and helper/registry wording "pending a ruling" describe the previous
+implementation. They conflict with the later settled
+[[https://github.com/ligon/LSMS_Library/issues/637#issuecomment-6368100768][2026-10-23 maintainer ruling]]:
+set =variety= to the source item code, following Tanzania #840. The original
+W1/W2 =item_cd= is now carried as a string, including the size digit: =1511=
+and =1512= remain separate under Milk powder/tin, as do codes =3= and =4=
+under Maize/Kg. Equal prices do not make different surveyed identities copies.
+The existing j/u resolution still tries the full code then code divided by10;
+that lookup does not replace the native identity with its base item.
+
+The declared country grain is =(t,v,j,u,variety,obs)=. Nigeria is PP/PH, but C8
+remains PH-only (2011Q1/2013Q1/2016Q1/2019Q1/2024Q1) and cluster-level, using
+the composite state/lga/EA =v=. No household key is introduced: =i==v= remains
+an internal map_index compatibility shim that is removed before the public
+Country result. W1/W2 =obs= remains1. W3's two physical locations keep =obs=1/2.
+
+W3--W5 carry the canonical =unknown_variety= that Feature previously supplied,
+following Niger's mixed-wave s05 precedent. Their source item codes are not
+new varieties. This uniform axis avoids mixed-depth wave concatenation and
+preserves their already aligned identities. Feature still supplies =visit=1;
+its =canonical_alignment= record truthfully ceases claiming it fabricated
+variety, while all other metadata remains governed by the existing carrier
+contract. No new shared schema or derivation is required.
+
+The existing resolved-cluster/item/unit, positive-price filters and all
+metric-size normalization/deletion rules run unchanged. Only admitted W1/W2
+rows must have an integral native code; excluded junk is not promoted into a
+new key or a new refusal. A duplicate full native key refuses, even if prices
+agree; no row ordinal, new dedup rule or first-price selection is invented.
+No unit fallback, factor, eligibility, native source or other table changes.
+The older1095 unit fix intentionally preserved the W1/W2 collapse;1268 fixed
+W3 locations only;1370 changed plot-input markers, so none already implemented
+this coordinate. See =.coder/ledger/637-nigeria-w1w2-variety.md=.
+
+This section records source implementation and the intended test boundaries.
+Actual source/native/Country/Feature/fresh-warm acceptance is still pending;
+source-gated W1/W2 counts30,628/31,239 are forecasts from the authenticated1095
+eligible-pre-first report, not newly executed measurements. The older served
+counts27,104/27,079 describe first-selected rows. Synthetic comparison evidence
+is reported separately after its bounded run. Existing unknown-unit fallback
+and WAITING pooled recall questions remain separate. #1357's anonymous-household
+exclusion is unchanged and supplies no reason to invent or delete C8 identities.
