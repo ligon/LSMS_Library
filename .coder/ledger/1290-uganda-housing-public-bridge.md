@@ -67,3 +67,34 @@ with explicit finite reads/outputs. Parser/source bytes and current canonical
 sample correspondence remain unadmitted. No full all-wave/API/cache build follows
 from three-source diagnostic. Root must review exact finite next inputs/operations
 before execution; no current actual-source budget exists.
+
+## Phase3 measured results at033883f0f — separate scopes
+
+Fresh root-delegated publiccandidate31synthetic cases passed once:31unique JUnit
+cases/0failure/error/skip, selected mapping/YAML/carrier hashes exact, private data
+empty and real source/acquisition sentinels0. Pytest12.50seconds; wrapper16.430449s,
+core32/8GiB/120+5/thread1/n0. This validates actual framework routing with invented
+source/sample leaves, not real dataset/API/coldwarm behavior. Historical carrier
+and earlier18/12 receipts remain distinct and are not replay authority.
+
+Root separately ran exact two normal get_dataframe calls on the declared local
+DVC blobs after MD5 verification, convert_categoricals=False/encodingNone/
+categories_onlyFalse: gsec9(369884B) and gsec1(624943B), total994827input bytes.
+It measured3312housing rows,3305cover rows and3305unique bridge pairs, zero
+ambiguous source keys/target collisions. Exactly3303proposed housing keys join
+native HHID versus0on the original route;9remain unresolved and none already
+matches native HHID. All3312Roof/Floor payloads, original order/dtypes and full
+source frames/attrs were conserved. Unresolved recorded keys remain with warning;
+no AGSEC1 read, approximate linkage or eligibility inference occurred.
+Raw result SHA256: c3e3d779208881a08cbdf25f24263403f20b88975c565a014ce3e08612026e0f.
+
+Independent saved-receipt review confirms the completed exact script/exit/counts,
+source-size/MD5 records and private9record inventory without another data read.
+This is a raw-key/code observation, not category-decoded realWave/Country/Feature/
+sample/finalizer/coldwarm/scientific acceptance. Normal decoded2015Wave/native
+sample verification is next; full API v join calls sample() across waves unless
+an existing validated warm sample cache is used. Committed panel/updated JSON
+sources can supply normal once-only walking; no crosswalk regeneration is needed.
+Public/private weight/refresh/GPS/WAITING829 caveats and9unresolved rows remain.
+No new user approval is required by internal preparation fields: user already
+authorized this investigation; root reviews concrete technical scopes/resources.
