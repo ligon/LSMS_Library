@@ -4298,3 +4298,58 @@ plus 21 other-wave unlocated rows. The #1290 nine unsupported keys, #1297 parcel
 question and #689 parish/EA disclosure are unchanged. Exact table/wave/source
 coverage and preserved preflight failures are in the recovery report
 =slurm_logs/isa_recovery_2026-10-29/Uganda/1291-other-table-final-v1/REPORT.md=.
+
+* 2026-10-30 -- PART harvest is separate from condition, but its additivity is unresolved (GH #647)
+
+The exact declared 2019-20 agriculture questionnaire (MD5
+=cef8ef24c8c1c27241b907d46eb09b35=), pp. 13 and 16--18, asks for amounts
+already harvested and sold from crops planted in the second season of 2018.
+Its ordinary 5A page distinguishes fully/partially/not harvested at Q5.3;
+Q6 separately asks quantity, unit and physical condition. The separate 5A1
+PART page repeats the same planting-season reference. PART is therefore not
+a fresh/dry condition, and the form does not support dismissing its quantities
+as merely prospective output. This does not establish that they are additive.
+
+The agriculture manual (MD5 =3162ca349c56b7c0c1b12ade21bc1364=), printed
+pp. 2,22--25 (PDF pp. 4,24--27), specifies visit/reference periods and separate
+condition records but gives no specific 5A1 incremental-versus-cumulative rule.
+The public DDI labels the ordinary flag =harvest= as full harvest, yet its
+codes include partially harvested; =harvest1= is labelled 5A1 and carries
+Yes/No codes, unlike the repeated three-way paper prompt. That difference
+must remain explicit; the printed form alone is not the exact CAPI routing.
+
+A bounded cached-source diagnostic of the declared 2019-20 AGSEC5A release
+(MD5 =d097f036f8b1e3f8b1b9a42209f828d5=) finds 97 source rows with PART
+quantity: 97 slot-11 and 3 slot-21 reports, not 100 distinct source rows.
+All 97 already carry ordinary-family quantity and have the initial
+=harvest == 2= (partially harvested), =s5aq05_2 == 2= (not immature).
+Their follow-up =harvest1= is Yes on 92 and No on 5. Of 138 initial partial
+rows, 100 have a follow-up flag (95 Yes/5 No), while 38 have none.
+PART end years are predominantly 2019/2020 whereas ordinary end years are
+predominantly 2018. These marginal distributions are not a per-row chronology
+or a proof of nonoverlapping intervals, and cannot decide additivity.
+The ordinary family is consequently not confined to fully harvested crops.
+No =_11= / =_21= or =harvest1= family is present in the exact declared
+2019-20 B or 2018-19 A/B source columns; this is checked coverage, not an
+assumption that sibling forms or releases are identical.
+
+The earlier "not wired; no verdict" entries remain accurate. Simple append
+is not yet justified: GH1198 can preserve source observations, whereas the
+existing =harvest_kg= transform sums converted records across
+=production_obs= and would also combine cumulative reports if that were the
+5A1 meaning. Nor is replacement of ordinary quantities, treating missing
+follow-up as zero, or exclusion by the follow-up Yes/No flag justified.
+Reported-factor median pools could also change other records before the sum.
+Any family selection must therefore precede BOTH factor-pool construction and
+aggregation; filtering afterward does not preserve the current default.
+Distinct source observations can be preserved with their relationship exposed
+without asserting that they are additive components. No access or default
+aggregation policy is selected here.
+
+The precise remaining question on 647 is whether 5A1 Q6 reports additional
+harvest since ordinary 5A or a revised/cumulative amount including it, whether
+the same relationship holds for Q7 sales quantity and Q8 sale value, and which
+recorded CAPI/version/row relationship resolves the 5 No and 38 missing
+follow-up cases. An analyst total requires that relationship to be explicit.
+No quantity, sale, condition, observation token or eligibility rule changes.
+The #1290 nine unsupported keys and #1297 parcel question remain separate.
