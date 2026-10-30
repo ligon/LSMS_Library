@@ -110,3 +110,39 @@ singleton shape failure itself and the local j-versus-i walker limitation remain
 No successor test execution, raw data, Make/API/cache work or scientific
 acceptance is implied. Original native exit143/publication-incomplete/
 preservation-unverified provenance and original finite 65/1 failure are retained.
+
+### Phase 3b — separately verified corrected singleton and integration
+
+Root released exactly the corrected singleton at source5316a495585681fd2091204dbb59c5b6bbdf4f59,
+not the other65 cases. It passed: one actual collected case, three PASS stages,
+one closed compiler epoch, zero denials, exit0 and complete source/config/index/
+runtime/operator/profile/metadata/no-data closure, in43.2696810499765seconds.
+The expected outer `KeyError('j')`, pandas `KeyError('j')` cause and no-writer
+assertions are now measured for this synthetic operand. The original public
+singleton squeeze failure itself remains; no scientific behavior was repaired.
+
+Root independently verified29 ordinary durable exports and exact protocol/JUnit.
+Singleton inventory:
+`660436d5ee4f5fc20cd2d1f34ba53f2ed40738a4955a0c027243729fc04632df`.
+Root result report SHA256:
+`a3cac1221bebcadb4925bc24d83138d1fb4cc081e0a78ff945365c20d37afc19`
+(`slurm_logs/isa_recovery_2026-10-29/Ethiopia/ROOT-RESULT-singleton-v2.json`).
+Its nested launcher `result.accepted_cases` retains its initial0; the outer
+transaction accepted1, exact singleton protocol/JUnit and complete closure
+establish the accepted one-case scope. This reporting inconsistency is retained,
+not silently rewritten. Seven native font-cache files are inventory-only.
+
+These are two separate measurements: original65PASS/1FAIL at a7525f166, then
+corrected1PASS at5316a4955. There was no complete corrected66-case replay and no
+replay of the historical333. The other65 test bodies/parametrizations and all
+product/helper bytes are exact across the test-only successor. This integration
+adds only this qualified ledger note; compiler, helper and carrier retain the
+verified5316a4955 bytes. Normal configured CI remains a separate validation gate.
+
+Actual survey data/crosswalk JSON, source acquisition/providers/decoders,
+Make/Country/Feature table builds, cache freshness, new-wave scientific support,
+panel/label/unit decisions and scientific acceptance remain unverified and held.
+The helper mapsj/keepsi documentation discrepancy, split PanelI/PanelII, original
+native143 provenance and original STOPPED/accepted0 transaction retain their
+existing meaning. Root owns any public PR integration; no further tests or
+public writes are performed by this source-only preparation.
