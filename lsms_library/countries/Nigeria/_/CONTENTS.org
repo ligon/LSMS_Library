@@ -2878,3 +2878,71 @@ snapshot =a2838b6ae4bca3a7bd25eaf24e6de6f5c988f712=. Additive report SHA256
 =d8785ea5a5108a649ff401af20a4db3939a2319c4514442fe1c0287a0b922035=;
 independent review =d7945f156d033adbfd9f42a89e556d341dee5e63248b2534d1040ee577fbc6d2=;
 [[https://github.com/ligon/LSMS_Library/issues/1287#issuecomment-6527830265][accepted bounded checkpoint]].
+
+
+* 2026-10-30 -- Source-derived input crop markers (GH #1119)
+
+Structural fertilizer/chemical rows now carry =(not crop-specific)= separately
+from their legacy =n/a= crop key. Seed rows carry their resolved crop label only
+AFTER the unchanged household/plot/crop lookup gate. Assembly retains the old
+keys through sorting and keep-first dedup, then replaces only the crop axis.
+Private provenance is discarded. No global =n/a= replacement or failed-lookup
+inference occurs. Quantities, units, channels, five-payload hollow eligibility,
+no-channel/tree-crop retention, noncrop axes and native/API grain are unchanged.
+
+Explicit nonnull direct assembler labels remain supported, including recorded
+=n/a= with explicit provenance. Untagged null/legacy-marker calls refuse even
+when hollow: provenance validation precedes the existing hollow filter. All
+production constructors tag their outputs. Conflicting desired identities in
+one legacy group, or a post-relabel key collision, refuse rather than split,
+merge or allocate measurements; broader observation/grain work remains #1120.
+
+The existing seed gate still excludes missing/unmapped lookup results and can
+refuse fractional numeric codes. No new =unknown_crop= population or universal
+zero rule is introduced. The source still retains no-quantity/tree-crop seed
+rows despite the older reported-quantity prose; existing =Purchased=False=
+with absent purchase amounts remains unadjudicated. #1118/#1041 retained-unit,
+#867 share, mixed-channel and WAITING recall caveats are separate.
+
+Seventy-six focused invented cases passed at =283cbe44= (35 marker plus 41
+retained-unit cases), including injected-sample finalization, canonical Feature
+alignment, legacy winner/order and collision refusals. The first incorrect
+hollow-row test expectation remains recorded; only that expectation changed.
+This extraction reuses those exact product/test bytes without replaying them.
+
+Actual source/native conservation covers 96,620 rows: 34,641 structural and
+61,979 seed rows. Seed-gate exclusions remain nine in 2010 and fourteen in 2023;
+no row becomes newly eligible. The initial eleven constructor-marker oracle
+failures remain: a forced nullable-string =pd.NA= expectation was used before
+assembly, where scalar construction uses =np.nan= policy. A finite read of only
+those eleven closed outputs confirmed every scalar label and source-faithful
+expected Series, without coercing actual frames/attrs or changing production.
+A late-detection/zero-exit harness error was corrected separately; verification
+operators and private archives are not product changes.
+
+The completed normal API and fresh-process warm unit passed all 26 mandatory
+and 10 transport predicates for full/five-PP-subset Country and singleton
+Feature. Full Country/Feature each have 96,620 rows. Exact complete axes/domains,
+codes, string policy, masks, extension-array/nonmissing NumPy values and typed
+attrs accompany counts. API574.222s, warm83.642s, whole controller/export692.284s.
+All 94 source getters close (26 input, 68 sample); warm named raw/build/script/
+serializer/parser calls are zero, including aggregate counters before refusals.
+Source, inherited RETURN, all new cache bytes/identities and owned children close.
+These are production composition checks, not independent population/ID/unit science.
+
+Original 300-second baseline timeout, clone128/publisher74 and interrupted
+partial API remain failed history. The intermediate node-local archive lost two
+parquets (925,631 bytes); deterministic recovery found neither. They were NOT
+reconstructed. The final normal API built NEW caches and compared its script
+RETURN with the authenticated surviving native RETURN. Its absolute shared
+private archive has 241 verified members / 386,477,750 bytes; manifest
+=6ff0780adece779c714b9ec791a0ba035dc6951f960fef0231c786c6fd14020c=.
+Getter history is 20 + 36 + 94 = 150, including necessary partial-read repeats.
+
+Final dispatch =141c99de9d5e434889ac5f6be90c5945=, job =40659774= completed
+infrastructure0/0 with task/publication complete; final private result
+=ee01226f3cead787a0755818ad6f293665f8af1e=. Ordinary REPORT SHA256
+=0313377a60b1c0571105427f8eee59d9af23642d153904f32bbfbc0652316a91=.
+No whole #1119/#1120/#1287 closure or decision on remaining source retention,
+units, conflicts or recall follows. The shared helper changes build fingerprints;
+validation used private caches, not a no-rewarm or full cache-census claim.
