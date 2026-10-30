@@ -3355,3 +3355,9 @@ are unchanged. Independent review SHA256
 =bd2d229ba8ed6e318b2e5f05dcf51fe67fbf5974f7ade3f3c0ca4ecb12c1bc7b=;
 dispatch =b6e9e49702364b2c9b61a3c00623e9eb=. The qualified report lives at
 =slurm_logs/isa_backlog_2026-10-30/Ethiopia/1119-marker/REPORT.md=.
+
+Late publication qualification: native exit 0 / task completed differs from
+supervisor 74 and Slurm FAILED 74:0. Git publication completed at =6c3d8033=;
+ordinary evidence publication hit its 256 MiB ceiling (120 size-limit errors).
+The independently hashed shared private witnesses remain durable; this is not
+a fully successful dispatch publication or evidence of pre-emption.

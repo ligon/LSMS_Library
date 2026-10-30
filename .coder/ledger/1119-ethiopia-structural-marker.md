@@ -94,3 +94,8 @@ cache or scientific acceptance. Root accepted sealed independent review
 bd2d229b; the report is under the country recovery path named above. Public
 extraction starts from 1302cec2, preserves the #1364 canonical schema and all
 other work; no test or data replay. Refs #1119 only; no umbrella auto-close.
+
+Late terminal publication: task completed/native 0, supervisor and Slurm 74.
+Git publication is complete at 6c3d8033, while ordinary evidence publication
+has 120 size-cap errors; directly authenticated shared witnesses remain durable.
+The independent review has an immutable publication addendum, with no replay.

@@ -31,3 +31,11 @@ The original inherited synthetic result is 28 passes / 5 fixture failures follow
 Recommend a minimal public constant/comment/test/documentation extraction with this qualified result, retaining every historical failure. No further source/data replay is needed for that extraction.
 
 Author report SHA256: `8a6151ee80633b8e040ee014c832237d9a190a488e019964a8e93c3cb72c72ec`. Independent review SHA256: `bd2d229ba8ed6e318b2e5f05dcf51fe67fbf5974f7ade3f3c0ca4ecb12c1bc7b`. No test or data replay occurred during public extraction.
+
+Late publication addendum: structured task status is completed and native exit
+is 0, while supervisor/Slurm exit is 74. Git workspace publication completed at
+`6c3d8033a6c3c48d95221f06299a369a29c1b067`; ordinary evidence publication
+has 120 size-cap errors at the 256 MiB ceiling. Both directly authenticated
+shared private witness sets remain durable. This is qualified actual evidence,
+not a fully successful infrastructure publication or proof of pre-emption.
+No data replay was performed to address this publication failure.
