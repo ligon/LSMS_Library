@@ -32,3 +32,15 @@ skip-before-API. No actual source/cache/API build or old cohort replay.
 
 §6 No unresolved scientific decision. Root requested this scoped engineering
 preparation and independent review; no new user permission or cold rebuild.
+
+
+## Verification
+
+Root independently reviewed the complete 9fb45746 source/test diff and accepted
+its #1113 semantics. One bounded selection of only the new invented footer tests
+passed: 21 tests, no failures/errors/skips, 4.07 seconds pytest / 6.377 seconds
+outer. Approved image, exact source/countries roots, private data/config/DVC
+site cache, core38 / 8GiB / thread1 / 120+5; source unchanged and group closed.
+No survey read, country/API/cache build, old cohort or baseline regeneration
+occurred. JUnit and source/command/log bindings are preserved by the author.
+Optional issue item3 remains #1113's existing skip; no cold rebuild was added.
