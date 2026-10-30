@@ -104,10 +104,11 @@ Data Scheme:
     # (sect2_harvestw5).  Raw "NN. LEVEL" / cased labels are harmonized
     # onto the canonical ordinal vocabulary via the row-additive
     # harmonize_education table (global base + Nigeria delta in
-    # _/categorical_mapping.org). W1/W2 coverage is low (~640/310 rows).
-    # W2 file metadata (World Bank catalog1952/F69) calls its module
-    # "Section 2A (Education - New Household Members)". Exact routing
-    # versus the earlier left-school-only explanation remains unresolved.
+    # _/categorical_mapping.org). W1 coverage is low (~640 rows); the
+    # held W2 file has 313 answers from new members aged 5+ who ever
+    # attended school, including 175 current students (CONTENTS.org, #1292).
+    # This contradicts the W2 left-school-only explanation. W1 and the
+    # exact printed W2 skip sequence remain unverified.
     index: (t, i, pid)
     Educational Attainment: str
 
