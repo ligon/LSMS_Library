@@ -3725,3 +3725,64 @@ the qualified actual/export and separate recovered delivery after reviews
 =49cb5d0c= / =490b9df5=; no public cell credit until reviewed integration and
 root #1287 reconciliation. Pins/limits:
 =slurm_logs/isa_recovery_2026-10-29/Ethiopia/1287-livestock-runtime-receipt-v1/REPORT.md=.
+
+
+* 2026-10-31 -- Fixed-STORAGE food_coping runtime checkpoint (GH #1287, DRAFT)
+
+This is a documentation review draft, pending independent result review and root
+acceptance. It is not a public accepted compiler receipt or inventory credit.
+At scientific source =f952a32e= / toolkit =007f409a=, ordinary closed receipts
+report the actual three-input VAR Make compiler, default Country, simultaneous
+read/grain strict, first real singleton Feature and fresh warm Country/Feature.
+All 19 comparisons report PASS: 17 mandatory plus two diagnostic transport;
+compiler and consumers each report 111,080 rows. No new actor is run for this text.
+
+Only W1/W2/W3 declare this eight-strategy 0--7 Days/seven-day response battery.
+W4's different coping battery and W5's FIES/food_security remain distinct;
+three native contributions differ from all five requested coverage keys.
+W1 household_id and W2/W3 household_id2, rural/Panel I--II/frame/weight/Tigray
+and household-versus-holder caveats remain. The historical FCT TODO #115 is
+qualified by later curated work, not a new complete FCT or food-security score.
+
+The three historical native STORAGE operands total 222,725 bytes; native counts
+29,523 / 41,926 / 39,631 are observations, not new fixed thresholds. The same
+qualified finalized D1 sample (26,130 rows) is a fixed =v= lookup, not current
+sample/weights/membership/location truth. No raw/source/native/sample recipe,
+manual native stamp, flag reset, forced second walk or scientific repair ran.
+Original image/decoder/IO/maps/full historical epochs remain unestablished.
+
+The original compiler reads absolute native paths, concatenates ordered returns
+then applies one postconcat ID walk. Default API keeps the original Wave reader,
+parquet origin/replay/map/t-filter around the disclosed freshness-selector-only
+leaf. Metadata original/provider/restored country/all-five hashes agree; original
+selector restores before strict/Feature while the identity-checked observer stays
+through those stages. Food_coping has no global canonical index registration:
+real Feature keeps its current carrier behavior, with no registration/repair.
+Original Days/Strategy missingness and grain remain; currency=None is explicit.
+This is not original full script-cache freshness, Make-backend/incremental Make,
+current raw-native science or an independent new source arithmetic oracle.
+
+Both strict levers report PASS. Actual NULL/index/grain 0/0/0 precede expected
+finalization; raw grain None is absent stamp, not universal losslessness. Actual
+=i= is present/nonmissing before acceptance and on warm. The existing
+[[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 exclusion]] stays binding: no inferred/shared unknown household or orphan
+identity; known household missing =v=/plot and raw eligible loss remain distinct.
+All six API slots start absent; one country cache/all-five coverage survives and
+five wave slots remain absent. Warm records two selected getters and zero named
+source/decoder/native/build/Wave/writer/original-sample/raw-map entries; no atime/universal
+IO claim follows. Full typed operands and independent closures are retained.
+
+Supervisor actual 229.514 seconds and export 13.234 seconds are separate from
+OWN publication 10.586 seconds AFTER receiver/export+descendant cleanup through
+remote verification (inner actual-exit-to-remote separately 25.190 seconds).
+Archive receipt: 146 members / 62,627,822 bytes, manifest =28b80415=;
+private published head =fe9fcff=. Platform success does not establish acceptance.
+Root archive authentication/peer acceptance remain pending in this draft.
+
+Docsbase =d0acdf61= matches 487/489 executed source bindings; Ethiopia CONTENTS
+appends and #1254's transformations median_price_valuation account for the two
+differences. No complete product identity or later-base runtime/hash pass is
+claimed. This draft preserves all earlier CONTENTS bytes and supplements the
+dated nine-concatenator source-only entry without erasing its historical limits.
+See =.coder/ledger/1287-ethiopia-food-coping-runtime-checkpoint.md= and
+=Ethiopia/1287-food-coping-public-checkpoint/REPORT.md=. Other cells and #1287 remain open.
