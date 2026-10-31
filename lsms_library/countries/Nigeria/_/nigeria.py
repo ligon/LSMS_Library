@@ -2684,7 +2684,8 @@ def people_last7days_from_s4aq(t, df, hhid='hhid', indiv='indiv'):
 # community_prices (GAP C) -- item-level reported community food prices
 # ---------------------------------------------------------------------
 #
-# Natural grain (t, v, j, u): one row per (cluster/EA x food-item x unit)
+# Natural grain (t, v, j, u, variety, obs): native item/size identities
+# in W1/W2; existing unknown_variety in W3-W5, plus physical reading slot
 # from the post-harvest COMMUNITY questionnaire's food-price module
 # (Section C8 "Food Prices", file sectc8_harvest{wN}; W3 splits it across
 # sectc8a / sectc8b; W5 lives under Post Harvest Wave 5/Community/).  This
@@ -2814,6 +2815,11 @@ def _resolve_w1w2_price_item(code):
     return None, None
 
 
+# W3-W5 have no finer variety than their priced item; preserve the canonical
+# sentinel already supplied by Feature (Niger S05_VARIETY precedent).
+C8_NO_VARIETY = 'unknown_variety'
+
+
 def community_prices_for_wave(t, frames, mode, crop_labels=None):
     """Assemble item-level community_prices for one Nigeria GHS-Panel wave.
 
@@ -2882,7 +2888,7 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
 
     Returns
     -------
-    DataFrame indexed by (t, v, j, u, obs) with the `Price` column and,
+    DataFrame indexed by (t, v, j, u, variety, obs) with the `Price` column and,
     where any row was derived, a `Derivation` column (registry key on
     derived rows, NA elsewhere).  `obs` is each frame's reading slot, so
     W3's two locations are two rows, never one selected from the pair
@@ -2900,14 +2906,13 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     slot, not a repeat: it is served (Niger's content key includes the
     slot; GhanaLSS serves equal vendor prices).
 
-    'names' mode (W1/W2) still collapses (t, v, j, u, obs=1) duplicates to
-    the FIRST price.  That is NOT a dedup of the same surveyed quantity:
-    the groups are size variants of one base item (base*10+size codes) and
-    distinct items the name map lumps under one label (Maize, Beer, Fish--
-    fresh, Butter/Margarine), and most disagree on Price (GH #637 tail
-    diagnosis, 2026-10-23: 2,303 of 2,568 W1 groups, 2,605 of 2,951 W2).
-    Kept as-is pending a maintainer ruling (a `variety` level, as #840 did
-    for Tanzania); see CONTENTS.org.
+    In 'names' mode (W1/W2), `variety` is the FULL source item code,
+    including the size digit (GH #637, @ligon 2026-10-23). Distinct items
+    sharing j/u and size variants such as 1511/1512 remain separate even
+    when prices agree. No row is selected. W3-W5 retain their existing
+    canonical `unknown_variety` identity and physical location `obs`;
+    adding the constant variety axis changes no source answer there.
+    A duplicate complete source key is an error in either mode.
     """
     DERIVATION_KEY = 'Nigeria::community_prices::c8-metric-size'
     pieces = []
@@ -2957,6 +2962,9 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             'j': j.values,
             'u': u.values,
             'obs': int(fr.get('obs', 1)),
+            # Retain the original code, not code//10 used to resolve j/u.
+            # Validate only after the unchanged eligibility filter below.
+            'variety': code.values if mode == 'names' else C8_NO_VARIETY,
             # float64 up-front: the size division below writes non-integer
             # per-unit prices, and a raw int16 price column would refuse
             # them (pandas 3 raises on the silent downcast).
@@ -3042,23 +3050,29 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     out = out[out['v'].notna() & out['j'].notna() & out['u'].notna()
               & out['Price'].notna() & (out['Price'] > 0)]
 
-    # `obs` is in the key, so W3's two locations are two rows (GH #637
-    # defect C).  W3-W5 ('codes') must arrive collision-free: each C8 file is
-    # (ea, item_cd)-unique, so a duplicate (t, v, j, u, obs) is a broken key,
-    # and the collapse below must not select from it (GH #840).
-    key = ['t', 'v', 'j', 'u', 'obs']
-    if mode == 'codes':
-        dup = out.duplicated(key, keep=False)
-        assert not dup.any(), (
-            f"community_prices {t}: {int(dup.sum())} rows share a "
-            f"{tuple(key)} key -- a broken key, not a cell to select from "
-            "(GH #840 / #637)")
-    # W1/W2 ('names') only: collapse (t, v, j, u, obs=1) duplicates to the
-    # FIRST reported price.  The groups are size variants of one base item
-    # and distinct items lumped under one label (see the docstring) -- a
-    # SELECTION, kept pending a maintainer ruling, never a cross-cluster
-    # aggregate.  `Derivation` is all-NA there (W1/W2 carry no size column),
-    # so its `first` is exact; in 'codes' mode every group is one row.
+    if mode == 'names':
+        # Only admitted source rows require a valid native identity. A junk
+        # code on an already-excluded row must not create a new failure.
+        try:
+            out['variety'] = out['variety'].astype('Int64').astype('string')
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ValueError(
+                f"community_prices {t}: retained W1/W2 item codes must be "
+                "finite integers for native variety (GH #637)") from exc
+    # Codes-mode scalar construction keeps the same dtype as Feature's
+    # existing constant fabrication; do not coerce its missing-value policy.
+
+    # Native item/size code distinguishes W1/W2's lumped j/u; obs keeps W3's
+    # two physical locations. Full-key repeats, even equal prices, are a key
+    # defect rather than permission to select one (Tanzania #840 precedent).
+    key = ['t', 'v', 'j', 'u', 'variety', 'obs']
+    dup = out.duplicated(key, keep=False)
+    assert not dup.any(), (
+        f"community_prices {t}: {int(dup.sum())} rows share a "
+        f"{tuple(key)} key -- a broken key, not a cell to select from "
+        "(GH #840 / #637)")
+    # All groups are singletons after the source-key assertion. Retain the
+    # existing grouping's dtype and ordering behavior, with no row selection.
     out = (out.groupby(key, as_index=False)
               .agg({'Price': 'first', 'Derivation': 'first'}))
     if out['Derivation'].isna().all():
@@ -3073,14 +3087,14 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     # framework, carry a redundant `i` level (set equal to the cluster v)
     # positioned BEFORE `j`: map_index then sees i present and j after i, so it
     # does NOT swap, and the framework's _normalize_dataframe_index drops the
-    # undeclared `i` level (data_scheme declares (t, v, j, u, obs)), leaving
-    # the declared (t, v, j, u, obs) grain.  v already in the index means
+    # undeclared `i` level (data_scheme declares variety/obs too), leaving
+    # the declared (t, v, j, u, variety, obs) grain.  v already in the index means
     # _join_v_from_sample is skipped; the spurious i==v never reaches the API.
     # (Same framework-compatibility shim Tanzania/Malawi/Ethiopia/Mali
     # community_prices use.)
     out['obs'] = out['obs'].astype('int64')
     out['i'] = out['v']
-    out = out.set_index(['t', 'v', 'i', 'j', 'u', 'obs']).sort_index()
+    out = out.set_index(['t', 'v', 'i', 'j', 'u', 'variety', 'obs']).sort_index()
     value_cols = ['Price'] + (['Derivation'] if 'Derivation' in out else [])
     return out[value_cols]
 

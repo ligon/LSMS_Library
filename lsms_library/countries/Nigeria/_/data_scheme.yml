@@ -614,11 +614,11 @@ Data Scheme:
     # 2,591 location-2 prices dropped (983 of them different), and 3,218
     # location-2-only rows served as if from location 1.  Every other wave
     # prices one location: obs = 1, native (not the Feature sentinel).  No
-    # `variety` / `visit` level: W3-W5 build collision-free on
-    # (t, v, j, u, obs) (asserted in nigeria.community_prices_for_wave), and
-    # W1/W2's size variants and lumped items still collapse to the first
-    # price pending a ruling (CONTENTS.org).
-    index: (t, v, j, u, obs)
+    # `visit` level: Feature supplies its canonical single-visit sentinel.
+    # W1/W2 variety is the FULL source item/size code, per GH #637 ruling
+    # 2026-10-23; W3-W5 carry their existing unknown_variety sentinel.
+    # Every complete native key is asserted unique; no first-kept price.
+    index: (t, v, j, u, variety, obs)
     Price: float
     materialize: make
 

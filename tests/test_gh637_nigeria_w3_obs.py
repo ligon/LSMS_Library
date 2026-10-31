@@ -16,8 +16,8 @@ Info): ``obs`` is the form's reading slot, 1 for C8a and 2 for C8b, 1 in every
 other wave.  Niger's duplicate-entry drop (a SECOND source record of the same
 slot that repeats a served row) has nothing to act on -- each C8 file is
 ``(ea, item_cd)``-unique -- so a location-2 price equal to location 1's is a
-second slot and is served.  W1/W2's own ``first`` collapse (size variants and
-lumped items) is out of scope and pinned unchanged here.
+second slot and is served.  W1/W2's own collapse was out of scope for that fix; the later native-variety
+ruling now supersedes its historical first-price pin.
 
 Every test here fails on development ``9a0ed5f3c``: the builder ignores
 ``obs`` and the declared index is ``(t, v, j, u)``.
@@ -72,7 +72,7 @@ class TestDeclaration:
         scheme = load_yaml(countries_root() / 'Nigeria' / '_' / 'data_scheme.yml')
         spec = scheme['Data Scheme']['community_prices']['index']
         assert [t.strip() for t in spec.strip('() ').split(',')] == \
-            ['t', 'v', 'j', 'u', 'obs']
+            ['t', 'v', 'j', 'u', 'variety', 'obs']
 
     def test_w3_script_passes_one_slot_per_location(self):
         src = (countries_root() / 'Nigeria' / '2015-16' / '_'
@@ -91,7 +91,7 @@ class TestBuilder:
         loc1 = _frame([(1, 11, 100.0), (1, 12, 80.0)], obs=1)
         loc2 = _frame([(1, 11, 125.0), (1, 12, 80.0)], obs=2)
         out = _w3(nigeria_module, [loc1, loc2])
-        assert list(out.index.names) == ['t', 'v', 'i', 'j', 'u', 'obs']
+        assert list(out.index.names) == ['t', 'v', 'i', 'j', 'u', 'variety', 'obs']
         got = out.reset_index().set_index(['j', 'obs'])['Price']
         # A differing location-2 price is served, not dropped ...
         assert got[('Millet', 1)] == 100.0 and got[('Millet', 2)] == 125.0
@@ -117,10 +117,9 @@ class TestBuilder:
         with pytest.raises(AssertionError, match='broken key'):
             _w3(nigeria_module, [_frame([(1, 11, 100.0), (1, 11, 90.0)], obs=1)])
 
-    def test_w1_w2_names_mode_still_collapses_to_first(self, nigeria_module):
-        # OUT OF SCOPE for #637 defect C: W1/W2's size variants of one base
-        # item (base*10+size) still collapse to the first price at obs 1.
-        # Pinned so a change there is a deliberate one.
+    def test_w1_w2_names_mode_keeps_native_size_varieties(self, nigeria_module):
+        # The later GH637 ruling6368100768 supersedes the old out-of-scope
+        # first-price pin: both source item/size codes are now native variety.
         raw = pd.DataFrame({'state': [1, 1], 'lga': [101, 101], 'ea': [1, 1],
                             'item_cd': [1511, 1512], 'sc8q2': [50, 90]})
         fr = dict(df=raw, dec=raw, ea='ea', item='item_cd', price='sc8q2')
@@ -128,9 +127,10 @@ class TestBuilder:
             warnings.simplefilter('ignore')
             out = nigeria_module.community_prices_for_wave('2011Q1', [fr], 'names')
         # 1511 / 1512 both resolve to base item 151 ('Milk powder', 'tin').
-        assert len(out) == 1
-        assert out.index.get_level_values('obs').tolist() == [1]
-        assert out['Price'].iloc[0] == 50
+        assert len(out) == 2
+        assert out.index.get_level_values('obs').tolist() == [1, 1]
+        assert out.index.get_level_values('variety').tolist() == ['1511', '1512']
+        assert out['Price'].tolist() == [50., 90.]
 
 
 def _aws_creds_available() -> bool:
@@ -144,7 +144,10 @@ def _aws_creds_available() -> bool:
 # Served rows per post-harvest round, measured on cold builds 2026-10-23.
 # 2016Q1: 17,344 location-1 + 5,809 location-2 rows (development served
 # 20,562: every location-1 row plus the 3,218 location-2-only rows).
-EXPECTED = {'2011Q1': {1: 27104}, '2013Q1': {1: 27079},
+# W1/W2 are the authenticated1095 report's eligible PRE-first source counts
+# (30,628/31,239), not new measurements from this source-only implementation.
+# Full native-key uniqueness must now admit all those eligible source rows.
+EXPECTED = {'2011Q1': {1: 30628}, '2013Q1': {1: 31239},
             '2016Q1': {1: 17344, 2: 5809},
             '2019Q1': {1: 31757}, '2024Q1': {1: 30064}}
 
@@ -162,7 +165,7 @@ class TestBuilt:
             return Country('Nigeria').community_prices()
 
     def test_index_carries_obs(self, cp):
-        assert list(cp.index.names) == ['t', 'v', 'j', 'u', 'obs']
+        assert list(cp.index.names) == ['t', 'v', 'j', 'u', 'variety', 'obs']
         assert cp.index.is_unique
         assert pd.api.types.is_integer_dtype(cp.index.get_level_values('obs'))
 
