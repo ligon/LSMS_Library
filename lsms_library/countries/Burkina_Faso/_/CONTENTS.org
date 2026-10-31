@@ -2133,3 +2133,65 @@ exposure and #1276 CS coverage remain unchanged. Shared helper migration
 for existing countries is not completed by this extraction. The 22 distinct
 literal tests have staged passing receipts, not a final full-22 rerun; both
 original control failures remain historical evidence.
+
+* 2026-10-31 -- Actual plot compiler and composed API checkpoint (GH #1287)
+
+At source =db47b5b2=, two existing native =plot_features= producers and the
+country compiler ran through real GNU Make. The exact numeric sources were
+=s16a_me_bfa2018.dta= and =s16a_me_bfa2021.dta=, two held objects totaling
+19,197,288 bytes; no acquisition occurred. Their sanctioned getters returned
+12,441 x 286 and 8,467 x 288 raw rows/columns. These are source-frame counts,
+not native output counts. Current 2014 exclusion is a declaration fact, not
+whole-instrument absence. The selected root s16a files do not establish plot
+coverage of the separately stored 2021 cross-section sample.
+
+The three generic relative targets really executed, in order:
+=../2018-19/_/plot_features.parquet=,
+=../2021-22/_/plot_features.parquet= and =plot_features.parquet=. Each wrote
+to its checked owned data-root destination. The absent explicit absolute VAR
+plot target was neither executed nor repaired. Both native stages completed
+before compiler entry; its untouched CALL matched the ordered two sanctioned
+native policy reads exactly, with no compiler ID walk.
+
+All eleven recorded comparisons passed: seven mandatory and four separate
+prepared RETURN/storage diagnostics. Full default Country, strict Country
+(both =LSMS_READ_STRICT= and =LSMS_GRAIN_STRICT=) and real singleton Feature
+returned 19,784 rows. A fresh process matched the full Country/Feature cold
+returns with exact axes/domains/order/dtypes/EA/masks/nonmissing arrays and
+typed attrs. This is source-composition/runtime evidence, not an independent
+scientific oracle for the area screen, units, eligibility or panel mapping.
+
+Cold API reused the untouched native policy operands with truthful parquet
+origin and the original Wave map/t-filter tail. Its expected writer CALL was
+independently composed from those native inputs using the current production
+walk/augmentation/normalization/concat stages. Country finalization and real
+Feature then ran normally. The accepted v8 already-finalized sample supplied
+only the household-to-v lookup; it was not rebuilt, walked again or restamped.
+The relevant current/v8 sample/core functions and ID maps match. No fresh
+sample/weight/cache acceptance follows from this composition.
+
+The compiler's country parquet was hashless. Default API rebuilt it naturally,
+without a manual stamp or assumed-fresh override, and evicted the two mutable
+wave cache copies. Immutable native/compiler snapshots remain archived. Warm
+restored the original wave loader without entering it, and served the one
+surviving country parquet: its
+bytes/identity/size/mtime/ctime stayed unchanged; mode and atime were not
+explicit snapshot fields. There was no named raw/native/parser/Make/
+writer fallback or saved-native leaf events. This is not =backend=make= API
+acceptance, three-cache warm preservation or a universal kernel IO census.
+
+Two numeric getter returns involved two full StataReader reads and three
+initializations/value-label calls. The extra 2018 lifecycle is the existing
+cp1252 label-only reread; it is not an extra full source decode. Decoder,
+getter and writer observations remain separate. Source/input/map/operator
+closure passed, all child/actual/export groups closed to ECHILD, and no
+network attempt, timeout or termination signal was recorded. Controller time
+was 100.076 seconds, outer actual 100.933, export 3.902; exits were zero.
+
+Closed private custody comprises 54 files / 81,726,051 bytes. The archived
+OUTER is the pre-export snapshot; the final ordinary OUTER establishes export
+closure. Inert setup issues (absent Poetry and a Python 3.6 metadata-command
+keyword) consumed no target invocation and remain attributed. No data or tests
+were replayed for this documentation. WAITING #1148, namespace/component
+science and the wider #1287/#1288 scope remain separate. Exact receipts:
+=slurm_logs/isa_recovery_2026-10-29/Burkina_Faso/1287-plot-runtime-receipt-v1/REPORT.md=.
