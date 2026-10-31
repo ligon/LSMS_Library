@@ -2165,3 +2165,69 @@ processes closed and the private archive was authenticated. Publication within
 its 180-second allowance is unproven; available timestamps suggest an overrun.
 These execution limits do not redefine the FIELD factor or tree interpretation.
 Other waves/countries and the remaining #824 audit work remain separate.
+
+* 2026-10-31 -- Fixed-native livestock compiler checkpoint (GH #1287)
+
+At scientific source =b06abb5d= and toolkit =20bae1ee=, two authenticated
+historical promoted native STORAGE operands fed the ORIGINAL current VAR Make
+compiler, followed by full default Country, simultaneous read/grain strict,
+first real singleton Feature and separate fresh-process warm Country/Feature.
+This is a composed current-consumer measurement, not new raw/native production.
+The two EAC-I operands contain 9,939 and 30,757 rows; compiler and every measured
+Country/Feature result contain 40,696. All thirteen comparisons pass: eleven
+mandatory and two prepared RETURN/storage transport diagnostics. Four requested
+coverage keys include two undeclared EHCVM noncontributors, not four natives.
+
+The real compiler reads both operands in order and concatenates WITHOUT an ID
+walk. Cold rebuild then uses two disclosed truthful-parquet native leaves,
+original map/check-t/filter tail, current framework raw-once walk, aggregation,
+writer and finalizer. Matching-stage writer CALL composition, finalization and
+transport are checked separately with the full exact typed comparator.
+Canonical =(t,i,animal)= uses the original no-v join contract: NO sample input,
+lookup, provider or rebuild. Every Country/Feature call uses =currency=None=.
+=SalesValue= stays gross twelve-month sales flow, not herd wealth or unit price.
+
+Historical native STORAGE is not original untouched CALL/RETURN, a current raw
+build, or an independent native-science oracle. Old image/decoder/full-epoch
+continuity remains unestablished; current copies receive independently checked
+bytes/full identities/attrs. Source compatibility does not erase changed shared
+core/current-compiler behavior. Recorded missingness remains: =SalesValue= has
+8,527 NULLs in 2014-15 and 30,169 in 2017-18; 2017 =HeadAcquired=/=HeadSold=
+have 22,141/22,143. No completeness, eligible-row conservation or repair follows.
+
+Actual Country NULL/grain reports captured before the oracle are empty; raw
+grain footer is =None=, not an empty stamped audit or universal losslessness.
+Both strict levers PASS together. Actual household =i= is present/nonmissing.
+The [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 ruling]]
+continues excluding genuinely anonymous household-keyed records, without
+invented/shared unknown identity or orphan representation; known household
+keys missing plot/v remain distinct. Native counts are not raw eligible-loss
+counts. Later Feature NULL reports are cumulative after expected-finalizer work.
+
+Cold naturally evicted the two mutable wave copies, rejected and rebuilt the
+hashless compiler country output; immutable operands/snapshots survive. Fresh warm restores the original
+Wave loader WITHOUT entering it, observes exactly two selected cache getters,
+and preserves ONE country cache's full SHA/dev/inode/size/0600 mode/uid/nlink/
+mtime/ctime, current hash and all-four coverage. Atime is not measured. Named
+source/decoder/native/Make/Wave/writer/sample/map-constructor entries are zero;
+these Python observations are not a universal kernel IO census. Original script
+freshness selection, normal raw/native cold, Make-backend API and existing-target
+incremental Make remain untested.
+
+A direct OS exec of the unchanged non-executable wrapper failed126 before any
+receiver entered; Bash then entered it once, with no receiver/actual/producer/
+compiler replay. Actual175.449846s and separate export9.137540s closed, with no
+timeout/signals, ECHILD and source/input/cache closure. Root authenticated109
+closed files/45,427,486B. Archived OUTER is a pre-export snapshot; final ordinary
+receipts establish completed export/descendant closure. Explicit observed actual
+leader exit BEFORE cleanup/
+export through push and exact remote-ref verification measures15.895427s within
+the SAME180-second publication clock; no export-end reset or mtime proxy.
+Private publication is =f7f2c363dd2c1576a52c49e439ab11fab0fea90a=;
+Slurm40692810 completed0:0/9:23. Platform/publication success is separate from
+scientific acceptance. Root accepted this qualified result after independent
+review =62fa1bd1=; platform succeeded0/publication complete was separately
+authenticated. This checkpoint changes no public inventory before reviewed
+integration or umbrella disposition. Other cells, including =people_last7days=,
+remain outside its scope. Pins and qualifications:
+=slurm_logs/isa_recovery_2026-10-29/Mali/1287-livestock-runtime-receipt-v1/REPORT.md=.
