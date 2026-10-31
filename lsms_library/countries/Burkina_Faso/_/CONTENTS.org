@@ -2173,7 +2173,8 @@ sample/weight/cache acceptance follows from this composition.
 The compiler's country parquet was hashless. Default API rebuilt it naturally,
 without a manual stamp or assumed-fresh override, and evicted the two mutable
 wave cache copies. Immutable native/compiler snapshots remain archived. Warm
-used the original wave loader and the one surviving country parquet: its
+restored the original wave loader without entering it, and served the one
+surviving country parquet: its
 bytes/identity/size/mtime/ctime stayed unchanged; mode and atime were not
 explicit snapshot fields. There was no named raw/native/parser/Make/
 writer fallback or saved-native leaf events. This is not =backend=make= API
