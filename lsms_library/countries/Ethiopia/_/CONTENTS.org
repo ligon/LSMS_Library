@@ -3510,3 +3510,63 @@ completed and native/supervisor exit zero; Slurm 40681693 completed 0:0 in
 public =Ethiopia/1287-plot-features-public-checkpoint/REPORT.md=. Other seven
 Ethiopia compiler cells and the fourteen-country issue remain outside this
 checkpoint.
+
+* GH #1287 plot_labor: five-wave compiler and consumer checkpoint (2026-10-31)
+
+The five-wave labor compiler has qualified actual evidence from ten closed full
+numeric reader RETURNs, five NEW original native/writer stages, verified owned
+wave constructions, actual five-input VAR Make, and normal default/strict/real
+Feature/fresh warm consumers. No new raw parsing or historical five-native
+STORAGE reuse occurred. Same qualified 26,130 finalized D1 sample supplies only a
+fixed instance v lookup; earlier sample/weight/membership/source/freshness limits
+remain. Toolkit =360dcdde= executed scientific =0260ae34=; all 526 source/config
+bindings match public =003e55f6=, whose only later changes are Mali documentation.
+
+Recorded 71 comparisons all PASS: 64 mandatory + 7 RETURN/STORAGE transport, broken down
+native 50+5, compiler 6+1, default/strict/Feature 6+1 and warm 2 mandatory. Native rows
+are 62,672/68,494/70,312/39,984/31,463; compiler/default/strict/genuine Feature/warm
+serve 272,925 rows. Full typed axes/domains/order/payload/masks/EAs/attrs remain.
+
+An ordering deviation is retained: literal task prose asked all-wave source/CALL
+checks before ANY stamp, but reviewed frozen code saved all five native operands
+first and then checked/stamped each wave sequentially. Earlier private stamps
+preceded later-wave checks. Each stamp followed its own mandatory prestamp
+checks; mandatory poststamp frame/grain/hash/coverage checks preceded the next
+construction. Transport was diagnostic and passed here. A later mandatory or procedural failure could
+not be accepted as whole-unit completion. This is a task/source review miss,
+not a worker source edit or a retrospectively satisfied global barrier.
+
+Native grain/coverage footer None remain unchanged by verified current wave hash
+construction; country cache has original current hash/all-five coverage. No country
+restamp/assume-fresh/native-provider bypass or existing-target Make freshness
+claim. Actual null-content/index/grain 0/0/0 and raw grain None/stamp absent were
+captured before expected finalization. One both-levers strict call genuinely
+PASSED and exact-matched default; no negative or disabled-lever replay. An absent
+footer is not all-science/no-loss proof.
+
+PersonDays remains required; Wage optional. Both columns stayed in Country and
+Feature, so optional all-null adapter dropping was not exercised. Native four axes,
+Country (i,t,v,plot_id,source) and current nine canonical Feature axes plus country are
+distinct. Feature adds stage/worker=Farm-level, season=unknown_season and
+labor_obs=unresolved_observation with provenance, not a native observation ID.
+
+The [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 option 1 exclusion]] is unchanged: no inferred/shared unknown household
+or orphan representation; known household missing plot/v is distinct. Raw
+household missing counts are 0 across all ten sources; W3 PH formatted-HH missing 1 but missing-HH+reported-days 0
+for each source; native i-null counts are 0. All plot-component missing counts are 0, so neither
+productive anonymous-HH exclusion nor missing-component stringification is a new
+boundary test. Source row counts are not useful eligible-payload loss counts.
+
+Fresh warm records 2 selected-country-cache getters and 0 source/decoder/native/
+build/Wave/writer events; six caches and 11 original/receiving inputs close by
+bytes/new epochs/source/manifest. Named guards are not universal IO/atime proof.
+Application 217.159 s includes inline export, outer 218 s; publication took 174.350 s against 180 s.
+Manifest =e2ec1a2d= has 205 members / 855,823,646 bytes authenticated by root. Final
+publication =2bf95e95= completed native/supervisor 0/task completed; Slurm 40686320
+COMPLETED 0:0 is separate from the scientific gates and ordering deviation.
+
+Independent result review =332d2178= and root accept the qualified result,
+including the ordering deviation. This extraction is documentation only;
+publication follows exact docs review and inventory credit follows docs merge.
+See =.coder/ledger/1287-ethiopia-labor-runtime-checkpoint.md= and
+=Ethiopia/1287-labor-runtime-receipt-v1/REPORT.md=. Other cells/#1287 stay separate.
