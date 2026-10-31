@@ -23,11 +23,23 @@ Many LSMS-ISA countries have waves from **different survey programs** that canno
 |---------|------------|----------------|-----|
 | Malawi | IHS3 2010-11 → IHPS 2013-14 → IHS4 2016-17 → IHS5 2019-20 | IHS2 2004-05 | Different survey instrument |
 | Ethiopia | ESS W1-W3 (2011-12 → 2015-16) | ESS W4 (2018-19) | New sample drawn |
-| Nigeria | GHS W1-W3 (2010-11 → 2015-16) | NLSS 2018-19 | Different survey (cross-sectional) |
+| Nigeria | GHS W1-W5 (2010-11 → 2023-24); W4 partial refresh, continued in W5 | NLSS 2018-19 (separate program) | GHS long-panel and refresh cohorts differ; NLSS is a different, cross-sectional survey |
 | Niger | ECVMA 2011-12 → 2014-15 | EHCVM 2018-19 | Different program |
 | Mali | — | EACI 2014-15, 2017-18 | Not longitudinal |
 | Mali | EHCVM 2018-19 → 2021-22 | — | Only within EHCVM |
 | Burkina Faso | EHCVM 2018-19 → 2021-22 | EMC 2014 | Different program |
+
+Nigeria's repository folder `2018-19/` is **GHS-Panel Wave 4**, not the
+separate same-year NLSS. Its [recorded provenance](../../../../lsms_library/countries/Nigeria/2018-19/Documentation/SOURCE.org)
+identifies [catalog 3557](https://microdata.worldbank.org/index.php/catalog/3557);
+`2023-24/` is [GHS-Panel Wave 5, catalog 6410](https://microdata.worldbank.org/index.php/catalog/6410).
+W4 combines continuing long-panel households with a newly drawn refresh
+cohort; W5 continues both cohorts. Refresh households form a new panel baseline,
+not a non-panel survey. See the country's [sampling and panel-crosswalk notes](../../../../lsms_library/countries/Nigeria/_/CONTENTS.org).
+The committed crosswalk currently covers only W2/W3 declarations. Adding
+W1/W4/W5 links, choosing target-round membership, and changing PH-to-PP links
+remain [GH #1264](https://github.com/ligon/LSMS_Library/issues/1264); survey-program
+membership or overlapping numeric IDs alone does not authorize those links.
 
 **Always check the World Bank catalog** for each wave to determine if it's part of a panel.
 
@@ -35,7 +47,7 @@ Many LSMS-ISA countries have waves from **different survey programs** that canno
 
 Three patterns for how household IDs work across waves:
 
-1. **Stable IDs** (simplest): The same `hhid` persists across waves. Nigeria GHS-Panel works this way. Panel_ids is an identity mapping.
+1. **Stable IDs** (simplest): The same recorded household ID persists across waves. Nigeria's current W2/W3 `previous_i: hhid` declarations produce identity maps; this implementation fact does not establish links for W4 refresh households or extend the committed crosswalk to W1/W4/W5.
 
 2. **New IDs with backward link** (most common): Each wave assigns new IDs but includes a variable linking to the previous wave's ID. Examples:
    - Malawi: `y4_hhid` (current) → `y3_hhid` (previous) in the cover sheet
