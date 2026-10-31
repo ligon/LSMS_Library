@@ -4847,3 +4847,78 @@ All 11 phases exit zero with closed descendants; actual plus inline export is
 accepts this qualified cell, without inventory or umbrella closure. See
 =.coder/ledger/1287-uganda-months-runtime-checkpoint.md= and
 =slurm_logs/isa_recovery_2026-10-29/Uganda/1287-months-runtime-receipt-v1/REPORT.md=.
+
+
+* GH #1287 assets: eight-wave fixed-STORAGE compiler checkpoint (2026-10-31)
+
+Independent result review 0f169d62 and root accept this qualified completed
+result. Exact documentation review precedes publication; compiler-inventory
+credit follows reviewed docs merge and root reconciliation.
+
+Eight authenticated historical native assets STORAGE inputs reached the actual
+unchanged eight-input country VAR Make compiler, composed default Country,
+strict, first genuine Feature and fresh-process original Country/Feature warm.
+These are historically promoted native STORAGE, not current raw/native outputs
+or untouched constructor CALLs/RETURNs. Historical full epochs/mode/image and
+current decoder/#805/IO/map/schema equivalence remain unestablished. No raw
+parses/native writers/manual stamps/source acquisition ran. The same finalized
+24,561-row D1 sample supplies only a fixed complete (t,i) lookup with v, not
+current sample/weights/membership/eligibility/cluster/raw truth or a second walk.
+
+All 25 recorded comparisons PASS: 23 mandatory + 2 RETURN/STORAGE transport,
+broken down admission 8, compiler 9+1, cold/strict/Feature 4+1 and warm 2.
+Compiler, default Country, strict, real Feature and warm Country/Feature each
+record 116,808 rows. Old 116,808/4,237 historical counts were not acceptance
+thresholds; this unit does not newly census that historical duplicate claim.
+Full exact typed values/masks/axes/order/extension types/recursive attrs were
+compared at matching stages, not independent new raw asset science.
+
+Only the disclosed fixed-native Wave.grab_data leaf was replaced for cold,
+truthfully returning parquet origin while retaining original policy read,
+wave-footer replay/map/check_adding_t/logical filtering. Actual original Country
+aggregation/maps/writer/hash/finalizer remained. Normal/provider/restored
+registry+country+all-eight-wave hashes matched before payload with fresh memo
+clears; original Wave/profile restored. Strict and Feature ran after restoration.
+This does not test original script-cache freshness selection, current raw-native
+equivalence, Make-backend API or existing-target incremental Make freshness.
+
+Both original strict levers returned normally once and strict full-exact-matched
+default on (t,i,j). No strict negative or disabled-lever retry occurred. Actual
+pre-oracle NULL/grain counts were 0/0 and raw footer None/stamp absent; missing
+audit metadata is not an empty report or proof of no collapse/all science.
+Expected-finalizer cumulative reports are not pure Feature attribution. Assets
+remains reported owned-stock Value, distinct from unwired 365-day Part D flow.
+The dated 2026-10-15 correction already supersedes the older claim that assets
+still disagreed with its script; this entry preserves that historical chronology.
+
+All three failed parents remain failed: V1 bootstrap prefix under -S, V2
+unavailable author-local ordinary authority locators, and V3 fatal metadata guard
+before payload. V3's exact runtime path was unlogged; source proved the eight
+missing absent-parquet fingerprint probes. V4 permits only direct original
+cached_file_hash readonly/genuine-ENOENT probes and bounded fatal telemetry;
+present payloads/other callers/writes remain fatal. Positive metadata events
+are distinct from denials. No completed raw/native cohort was replayed.
+
+Fresh warm records two selected-country-cache getters and zero named source,
+decoder/native/build/Wave/writer entries. One selected cache survives among nine
+slots; original current hash/all-eight coverage/bytes/epochs close, along with
+nine original/receiving inputs, source/runtime/ordinary authorities and children.
+Named observers are not universal IO/atime proof. #1357 option 1 continues
+excluding genuinely anonymous household-keyed rows: no invented/shared unknown
+identity or orphan representation. Known household missing v/plot is distinct;
+saved-STORAGE comparisons are not raw eligible-loss or new boundary tests.
+
+Actual took 158.557 s; separate export 12.943 s; outer launch 172.901 s. Archive
+526ad284 binds 179 members / 50,746,731 bytes. The publication interval starts 40 ms after
+the whole ACTUAL-LAUNCH supervisor closed, including separate export; it is not
+elapsed from inner actual exit. The terminal receipt records 81.338 s to exact
+push+remote-ref verification, final 1a3971a8. That precise publication baseline and platform outcome were independently
+reviewed and accepted by root, separately from comparison results. A publication-summary list
+handling error was corrected without project/payload replay; its failure remains.
+
+Executed toolkit ac61cad5 used scientific 003e55f6. Public docs base b06abb5d
+matches 997/998 bound source/config files before this addition; the only drift is
+global data_info.yml adding optional crop KgFactor_sold for Mali #824. No Uganda
+producer/core source changed, and no later-base runtime/hash pass is claimed.
+See =.coder/ledger/1287-uganda-assets-runtime-checkpoint.md= and
+=Uganda/1287-assets-public-checkpoint/REPORT.md=. Other cells/#1287 remain separate.
