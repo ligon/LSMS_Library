@@ -3453,3 +3453,60 @@ prerequisite tracking is introduced. Final Makefile hashing moves country
 fingerprints; the retained measured outputs were not restamped for it.
 The settled [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 anonymous-household exclusion]] is unchanged. See
 =slurm_logs/isa_backlog_2026-10-30/Ethiopia/1171-nutrition-make/REPORT.md=.
+
+* GH #1287 plot_features: staged compiler and consumer checkpoint (2026-10-31)
+
+The five-wave country compiler now has qualified actual runtime evidence:
+source-faithful writer construction/admission from the retained final-percent
+attachment-helper returns, the unchanged five-input VAR Make compiler, full
+composed cold Country, first real Feature and fresh-process Country/Feature
+warm. The original helper returns are NOT historical whole-driver/native
+STORAGE outputs; this is not a fresh raw/native rebuild. Current panel maps
+were applied through the original once-only routes. The same accepted D1
+finalized sample supplies a fixed v lookup, preserving its original
+composition, stamp, weight and freshness limitations.
+
+Keep the stages separate: the first failed application supplied one W1
+transport pass; the next supplied eleven new comparisons (seven mandatory,
+four transport); the next supplied three cold comparisons (two mandatory,
+one transport); the final finisher supplied three new mandatory consumer
+comparisons. The first three application failures remain recorded: caller-path
+resolver-cache misdirection, Python3.12/3.11 AST-metadata incompatibility, and
+the genuine W1 SoilType strict failure. Successful platform publications do
+not turn those applications into successful full runs.
+
+First Feature and warm Feature each record 132,694 rows. Warm Country equals
+the accepted saved cold return by full typed comparison; no independent new
+Country row counter was emitted by the finisher. Full values, masks, axes,
+order, extension types and recursive attrs were compared. Both consumer
+phases served the single copied country cache under the unmodified executed
+source hash and all-five-wave coverage; bytes, mode and recorded identities
+were unchanged. Original Wave was retained but not entered; no new writer or
+source/native/Make fallback ran in the finisher. No atime claim.
+
+The documented statement "W1 (2011-12) does NOT ask soil type" is confirmed
+by the actual read-strict NullReadError, not repaired by optionality or a fill.
+SoilType remains required, that outcome remains NEGATIVE rather than PASS,
+and grain-strict completion remains unestablished. Empty process grain
+reports and an absent footer stamp do not establish all science or no loss.
+The [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][GH #1357 option 1 ruling]] keeps genuinely anonymous household-keyed
+records excluded; known household keys missing plot/v are distinct. Source
+row counts are not eligible-payload loss counts. No inferred/shared unknown
+household or orphan representation, identity or row-policy change.
+
+This dated checkpoint supplements the older statement that a "final full
+cold/warm rebuild was not repeated after the unit correction" with measured
+composed compiler/consumer evidence; it does not claim a new full raw rebuild
+or erase the rejected degree candidate. Native-percent/genuine W5v03/source
+distance/partial-area policies remain as documented. Actual absent-target
+Make evidence does not establish existing-target incremental freshness.
+
+Final independent result review =b9eb0c1f= accepts the bounded chain. Final
+archive =c3c37ab8= has 34 members / 110,774,114 bytes; final actual/export
+closed with exit zero. Separately, publication =a082b6b0= succeeded with task
+completed and native/supervisor exit zero; Slurm 40681693 completed 0:0 in
+6:07. Full scope, failures and custody pins are in
+=.coder/ledger/1287-ethiopia-plot-features-runtime-checkpoint.md= and the
+public =Ethiopia/1287-plot-features-public-checkpoint/REPORT.md=. Other seven
+Ethiopia compiler cells and the fourteen-country issue remain outside this
+checkpoint.
