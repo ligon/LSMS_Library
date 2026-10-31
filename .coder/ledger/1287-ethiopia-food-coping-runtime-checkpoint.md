@@ -1,9 +1,11 @@
-# Ethiopia #1287 food_coping: fixed-STORAGE runtime checkpoint draft
+# Ethiopia #1287 food_coping: fixed-STORAGE runtime checkpoint
 
 ## §1 Task and state
 
-Documentation-only DRAFT from closed dispatch 583d25c03ea24df5bf4fa8bf0627b8b5.
-Independent peer/root acceptance remains pending. No public push, PR, merge or
+Documentation-only checkpoint from closed dispatch 583d25c03ea24df5bf4fa8bf0627b8b5.
+Qualified independent result review 017af3c262c56d7fb10591455dc2fa7edd8898e4bb7aedf700ddc4d83f625aad
+and root acceptance bc5039c757231450457eddc85051edcec3c6cf65371f9a863b722ba0b0da6c7c
+are complete; exact docs/publication gates remain. No public push, PR, merge or
 inventory update; no new frame read, import, test, native build or actor.
 
 ## §2 Reused machinery
@@ -35,7 +37,8 @@ All 6 API slots absent before cold→one country/five absent wave slots; warm 2
 selected getters / zero named producer fallback. Read accounting is 14 policy +
 3 original-Wave policy + 15 pickle loads.
 Independent full typed/cache/source/authority/input closures are reported; root
-archive byte authentication is complete; peer result/root acceptance remain PENDING.
+archive byte authentication, independent result review and qualified root acceptance
+are complete.
 
 ## §5 Delivery and source boundary
 
@@ -50,8 +53,8 @@ whole-instrument and broader backlog caveats remain; no alternate mappings.
 
 ## §6 Outstanding gates
 
-Await independent peer/root result acceptance, then minimal accepted-status edit,
-exact docs/body/source-equivalence review and explicitly assigned publication.
-Do not credit a cell or close #1287 from this pending draft. See public-checkpoint
+Qualified peer/root result acceptance is complete. Await exact
+docs/body/source-equivalence review and explicitly assigned publication.
+Do not credit a cell or close #1287 before reviewed merge. See public-checkpoint
 REPORT for readable evidence/scope; exact source and ordinary pins retained beside
 this isolated checkout. No tests needed for these three documentation-only paths.

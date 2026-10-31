@@ -3727,10 +3727,11 @@ root #1287 reconciliation. Pins/limits:
 =slurm_logs/isa_recovery_2026-10-29/Ethiopia/1287-livestock-runtime-receipt-v1/REPORT.md=.
 
 
-* 2026-10-31 -- Fixed-STORAGE food_coping runtime checkpoint (GH #1287, DRAFT)
+* 2026-10-31 -- Fixed-STORAGE food_coping runtime checkpoint (GH #1287)
 
-This is a documentation review draft, pending independent result review and root
-acceptance. It is not a public accepted compiler receipt or inventory credit.
+Independent review and root accept this bounded fixed-STORAGE result with the
+qualifications below. Exact docs review/publication and inventory credit remain
+pending until reviewed merge; no broader scientific acceptance is inferred.
 At scientific source =f952a32e= / toolkit =007f409a=, ordinary closed receipts
 report the actual three-input VAR Make compiler, default Country, simultaneous
 read/grain strict, first real singleton Feature and fresh warm Country/Feature.
@@ -3777,13 +3778,14 @@ OWN publication 10.586 seconds AFTER receiver/export+descendant cleanup through
 remote verification (inner actual-exit-to-remote separately 25.190 seconds).
 Archive receipt: 146 members / 62,627,822 bytes, manifest =28b80415=;
 private published head =fe9fcff=. Platform success does not establish acceptance.
-Root archive authentication is complete; peer/root result acceptance remains
-pending in this draft.
+Root archive authentication and qualified peer/root result acceptance are complete:
+review SHA256 =017af3c262c56d7fb10591455dc2fa7edd8898e4bb7aedf700ddc4d83f625aad=;
+root acceptance =bc5039c757231450457eddc85051edcec3c6cf65371f9a863b722ba0b0da6c7c=.
 
 Docsbase =d0acdf61= matches 487/489 executed source bindings; Ethiopia CONTENTS
 appends and #1254's transformations median_price_valuation account for the two
 differences. No complete product identity or later-base runtime/hash pass is
-claimed. This draft preserves all earlier CONTENTS bytes and supplements the
+claimed. This checkpoint preserves all earlier CONTENTS bytes and supplements the
 dated nine-concatenator source-only entry without erasing its historical limits.
 See =.coder/ledger/1287-ethiopia-food-coping-runtime-checkpoint.md= and
 =slurm_logs/isa_recovery_2026-10-29/Ethiopia/1287-food-coping-public-checkpoint/REPORT.md=.

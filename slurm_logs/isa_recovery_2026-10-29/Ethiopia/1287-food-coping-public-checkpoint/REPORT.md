@@ -1,8 +1,10 @@
-# Ethiopia food_coping: closed runtime checkpoint — review draft
+# Ethiopia food_coping: qualified fixed-STORAGE runtime checkpoint
 
-Status: DRAFT, pending independent result review and root acceptance. No public
-publication, inventory credit or merged checkpoint is implied. This text records
-ordinary closed receipts without a new data read, build or scientific replay.
+Status: qualified result acceptance by independent peer and root. Publication,
+merge and inventory credit remain pending. This text records ordinary closed
+receipts without a new data read, build or scientific replay.
+Independent review SHA256 017af3c262c56d7fb10591455dc2fa7edd8898e4bb7aedf700ddc4d83f625aad;
+root acceptance SHA256 bc5039c757231450457eddc85051edcec3c6cf65371f9a863b722ba0b0da6c7c.
 
 Dispatch 583d25c03ea24df5bf4fa8bf0627b8b5 / Slurm 40699973 used toolkit
 007f409a94348e5e9e61b8b081c19789c70c8d21 at scientific source
@@ -103,8 +105,8 @@ internal byte/footer/schema operations and derived witnesses remain separate.
 Five actual phases return zero with closed descendants/ECHILD, no timeout or signal.
 Controller time is 229.142 seconds; the actual supervisor is 229.514 seconds and
 separate export 13.234 seconds. Source/input/compiler/cache/authority/receipt
-closures report true with no closure errors. Root byte authentication is complete (receipt 57ae844b7); independent result
-review and root acceptance remain PENDING for this draft.
+closures report true with no closure errors. Root byte authentication is complete (receipt 57ae844b7); independent review
+and root accept this bounded result with the stated qualifications.
 
 Released OWN publication starts AFTER receiver actual-plus-separate-export and
 descendant cleanup. Push and exact remote-ref verification report 10.586 seconds
@@ -129,9 +131,10 @@ The two disclosed differences are an appended Ethiopia CONTENTS note and the
 #1254 median_price_valuation change in transformations.py. This is source-only
 provenance, not a runtime/hash pass on d0ac or a claim that the complete product
 is unchanged. The measured scientific source remains f952 and toolkit 007f.
-The historical country-document prefix is preserved byte-for-byte by this draft.
+The historical country-document prefix is preserved byte-for-byte by this checkpoint.
 
-Result/root acceptance, exact docs review, publication/merge and any #1287 inventory
-credit remain pending. Broader Ethiopia source/science/backlog work, other countries
+Result/root acceptance is qualified as recorded above. Exact docs review,
+publication/merge and any #1287 inventory credit remain pending. Broader Ethiopia
+source/science/backlog work, other countries
 and the umbrella remain open. No raw/native/sample replay or new scientific policy
 is proposed by this three-document checkpoint.
