@@ -2985,11 +2985,40 @@ The older1095 unit fix intentionally preserved the W1/W2 collapse;1268 fixed
 W3 locations only;1370 changed plot-input markers, so none already implemented
 this coordinate. See =.coder/ledger/637-nigeria-w1w2-variety.md=.
 
-This section records source implementation and the intended test boundaries.
-Actual source/native/Country/Feature/fresh-warm acceptance is still pending;
-source-gated W1/W2 counts30,628/31,239 are forecasts from the authenticated1095
-eligible-pre-first report, not newly executed measurements. The older served
-counts27,104/27,079 describe first-selected rows. Synthetic comparison evidence
-is reported separately after its bounded run. Existing unknown-unit fallback
-and WAITING pooled recall questions remain separate. #1357's anonymous-household
-exclusion is unchanged and supplies no reason to invent or delete C8 identities.
+Guarded invented-source/real-Feature checks passed 101 tests, with four
+source-gated cases deliberately unrun. Independent raw-source expectations and
+two actual W1/W2 native writer CALL checks establish 30,628/31,239 rows; the
+older 27,104/27,079 served counts describe first-selected rows. W3--W5 reuse
+authenticated, source-compatible helper RETURN/storage witnesses through an
+explicit constant-axis lift, not new raw builds. The compiler and composed
+Country/strict/full and both PH-subset Feature checks pass at 146,841 total rows.
+No scientific source/size/unit/eligibility rule was changed.
+
+Runtime acceptance is staged. Preserve the failed combined-oracle 120-second
+timeout, shared PP/PH-wave hash Make refusal, provider-context country-hash warm
+refusal, and later normal-warm 120-second timeout. Metadata-only attribution
+proved that temporary live method identity changed the build fingerprint.
+A NEW unmodified production writer construction from the accepted pre-finalize
+API CALL matches its original CALL/RETURN/storage stages exactly and uses the
+normal original hash, complete recorded coverage and official audit/drop
+metadata. The old cache is immutable; this does not establish original
+cold-to-warm byte continuity or unmodified cold script-cache/Make acceptance.
+
+Two full normal-warm comparison returns are supported by the interrupted run's
+control flow. A later saved PH2011 Country comparison and only the three missing
+PH getter results complete the remaining four full typed predicates, with
+per-check durable completion. Six cache copies and eleven immutable inputs
+close unchanged in that finisher; no observed named source/parser/helper/script/
+writer activity occurred in the finishing stage. Its receipt does not recreate
+the interrupted old warm's missing terminal/event totals; the previous first-PH
+Feature may have been in flight without a saved return. No completed source,
+native/compiler, bridge or full getter is replayed to finish these checks.
+Independent final result review: =5f2a4c3452a20c113070bb1c573540cefddca43f152e785b415bfb98e008d948=.
+
+This is qualified staged evidence, not an uninterrupted original six-check warm
+run or a country-wide cache census. Existing unknown-unit fallback and WAITING
+pooled recall questions remain separate. The public extraction preserves all
+relevant Nigeria/core bytes of the validated source; the sole bound-source drift
+is an unused EHCVM slot helper. #1357 continues excluding genuinely anonymous
+households from household-keyed tables; it supplies no inferred C8 household or
+orphan identity. Tanzania's remaining #637 seed decision is unchanged.

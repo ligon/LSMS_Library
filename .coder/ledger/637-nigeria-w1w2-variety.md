@@ -1,7 +1,8 @@
 # Prior-Art Ledger — GH637 Nigeria W1/W2 native price variety
 
 Search tier: git/ripgrep + source AST floor. Source-plan baseline development
-26803b81050df527add7ed5908db6c827a65eed6. No product/data/test execution yet.
+26803b81050df527add7ed5908db6c827a65eed6. This opening records the initial
+planning state; the later verification sections supersede that initial status.
 
 ## §1 Task
 Implement maintainer comment6368100768: W1/W2 community price `variety` is the
@@ -98,3 +99,42 @@ No shared framework/schema or other-country change. The existing source-gated
 TestBuilt shape assertions are updated but unrun; W1/W2 count expectations
 30,628/31,239 are forecasts from1192's authenticated eligible-pre-first report,
 not new native/API measurements. Future actual/custody/read matrix still held.
+
+
+## §8 Staged actual evidence and public extraction
+
+The earlier §6/§7 hold/forecast statements record their original source-plan
+stage. W1/W2 independent expectations and actual native CALL checks subsequently
+measured 30,628/31,239 rows. W3–W5 use authenticated compatible helper RETURN and
+storage witnesses with an exact canonical constant-variety lift. Compiler and
+composed full/strict/both-PH Country/Feature comparisons pass 146,841 rows;
+scientific source/Price/unit/eligibility/namespace policies remain unchanged.
+The four source-gated test cases themselves were not run by this validation.
+
+Retain f341 combined-oracle 120 failure, 2436 shared-folder PH-hash/API failure,
+2e7809 provider-context country-hash fresh-warm failure and 0112 normal-warm 120
+timeout. Exact metadata-only diagnosis found the normal/ad9c versus temporary
+provider/a06b fingerprint difference. A NEW normal production writer uses the
+saved prefinalize API CALL with current original hash/coverage and carried
+metadata, with seven strict matching-stage CALL/RETURN/storage proofs. This is
+explicit construction, not an old-cache footer edit or original cold→warm proof.
+
+0112 control flow supports only its completed fullCountry/fullFeature warm
+comparisons; no terminal/event totals survive for that interrupted old stage.
+ba00821a finishes the saved first-PH Country comparison and ONLY missing
+Feature2011Q1/Country2013Q1/Feature2013Q1 returns, all full typed-exact, with durable
+per-check records. New finishing events/raw/denials are empty; six cache copies,
+eleven immutable inputs, source/maps and descendants close. No old event totals
+are reconstructed; first-PH Feature may previously have been in flight. The
+finisher preserves its explicit constructed-cache/source stages and does not
+rerun completed source/native/compiler/bridge/full getters. Manifest ce3319f7:
+83 members / 12,651,269 bytes, closed/complete/actual_completed true. Final independent
+result review 5f2a4c3452a20c113070bb1c573540cefddca43f152e785b415bfb98e008d948; qualified product integration is accepted subject to exact-head CI/conflict gates.
+
+Public extraction base c7666ca3 preserves the accepted product 4c2b48d24, tests and
+all relevant Nigeria/core bindings. Of 1112 conservative bound source files, 1111
+are exact; ehcvm.py differs only by an unused, untagged community_price_slots
+helper, with its nine existing named definitions unchanged and no Nigeria
+reference. No source/data/old synthetic cohort was rerun for extraction.
+Configured PR CI will be reported separately. No blanket #637/ISA/country closure,
+Tanzania seed decision, #1357 identity policy or scientific re-curation follows.
