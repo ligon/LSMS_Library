@@ -33,9 +33,9 @@ individual_education:
 
 housing:
     # GH #1290: gsec9.hhid uses gsec1.hh, not the sample's HHID.
-    # Both sources are declared for hashing; mapping.py validates the bridge
+    # All three sources are declared for hashing; mapping.py validates the bridges
     # before this left join and preserves unresolved recorded housing keys.
-    dfs: [housing_payload, housing_ids]
+    dfs: [housing_payload, housing_ids, housing_ag_ids]
     housing_payload:
         file: gsec9.dta
         idxvars:
@@ -49,6 +49,14 @@ housing:
             i: hh
         myvars:
             _housing_HHID: HHID
+    # GH1290: fallback identity only, from exact recorded hh/HHID pairs.
+    # Sample membership/location/weights remain owned by sample below.
+    housing_ag_ids:
+        file: AGSEC1.dta
+        idxvars:
+            i: hh
+        myvars:
+            _housing_AG_HHID: HHID
     merge_on: [i]
     merge_how: left
     final_index: [t, i]

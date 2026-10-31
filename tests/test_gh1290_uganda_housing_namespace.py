@@ -26,14 +26,21 @@ def route(monkeypatch):
                               formatting_functions={})
     calls = []
 
-    def build(housing, cover):
+    def build(housing, cover, agriculture=None):
+        if agriculture is None:
+            agriculture = _cover(('ag-only',), ('native-ag',))
+
         def reader(path, **kwargs):
             name = Path(path).name
-            assert name in {'gsec9.dta', 'gsec1.dta'}, 'unexpected source request'
+            assert name in {'gsec9.dta', 'gsec1.dta', 'AGSEC1.dta'}, 'unexpected source request'
             calls.append(name)
             if name == 'gsec1.dta' and isinstance(cover, Exception):
                 raise cover
-            return (housing if name == 'gsec9.dta' else cover).copy(deep=True)
+            frame = {'gsec9.dta': housing, 'gsec1.dta': cover,
+                     'AGSEC1.dta': agriculture}[name]
+            if isinstance(frame, Exception):
+                raise frame
+            return frame.copy(deep=True)
 
         monkeypatch.setattr(local_tools, 'get_dataframe', reader)
         return Wave('2015-16', '2015-16', country).grab_data('housing')
@@ -60,7 +67,7 @@ def test_shipped_route_rekeys_and_preserves_full_payload(route):
     assert list(out.index) == [('2015-16', 'new-a'), ('2015-16', 'new-b')]
     expected = raw[['h9q4', 'h9q6']].rename(columns={'h9q4': 'Roof', 'h9q6': 'Floor'})
     pd.testing.assert_frame_equal(out.reset_index(drop=True), expected)
-    assert route.calls == ['gsec9.dta', 'gsec1.dta']
+    assert route.calls == ['gsec9.dta', 'gsec1.dta', 'AGSEC1.dta']
     assert list(out.index.names) == ['t', 'i']
     assert 'v' not in out.columns
 
@@ -151,13 +158,16 @@ def actual_carrier(monkeypatch):
     invented_housing = _housing()
     invented_housing['h9q4'] = ['Grass', 'Iron Sheets']
     state = SimpleNamespace(housing=invented_housing, cover=_cover(
-        targets=('native-a', 'native-b')), reads=[], walks=[], samples=[])
+        targets=('native-a', 'native-b')),
+                            agriculture=_cover(('ag-only',), ('native-ag',)),
+                            reads=[], walks=[], samples=[])
 
     def reader(path, **kwargs):
         p = Path(path)
-        if '2015-16' in p.parts and p.name in {'gsec9.dta', 'gsec1.dta'}:
+        if '2015-16' in p.parts and p.name in {'gsec9.dta', 'gsec1.dta', 'AGSEC1.dta'}:
             state.reads.append(('2015-16', p.name))
-            return (state.housing if p.name == 'gsec9.dta' else state.cover).copy(deep=True)
+            return {'gsec9.dta': state.housing, 'gsec1.dta': state.cover,
+                    'AGSEC1.dta': state.agriculture}[p.name].copy(deep=True)
         if '2013-14' in p.parts and p.name == 'GSEC9_1.dta':
             state.reads.append(('2013-14', p.name))
             return pd.DataFrame({'HHID': ['older-native'], 'h9q4': ['Thatch'],
@@ -167,9 +177,9 @@ def actual_carrier(monkeypatch):
     def sample():
         state.samples.append('served sample leaf')
         return pd.DataFrame({
-            'i': ['served-a', 'native-b', 'unmatched', 'do-not-borrow', 'older-served'],
-            't': ['2015-16'] * 4 + ['2013-14'],
-            'v': ['cluster-a', 'cluster-b', 'cluster-u', 'forbidden-cluster', 'cluster-old'],
+            'i': ['served-a', 'native-b', 'unmatched', 'do-not-borrow', 'native-ag', 'older-served'],
+            't': ['2015-16'] * 5 + ['2013-14'],
+            'v': ['cluster-a', 'cluster-b', 'cluster-u', 'forbidden-cluster', 'cluster-ag', 'cluster-old'],
         }).set_index(['i', 't'])
 
     real_walk = C.id_walk
@@ -215,7 +225,8 @@ def test_actual_carrier_rekeys_walks_once_and_preserves_payload(actual_carrier, 
     assert len(s.walks) == 1 and s.walks[0][1] == {'state': 'raw'}
     assert s.walks[0][0].i.tolist() == ['native-a', 'native-b']
     assert s.samples == ['served sample leaf']
-    assert s.reads == [('2015-16', 'gsec9.dta'), ('2015-16', 'gsec1.dta')]
+    assert s.reads == [('2015-16', 'gsec9.dta'), ('2015-16', 'gsec1.dta'),
+                       ('2015-16', 'AGSEC1.dta')]
     assert ('country' in out.index.names) == (kind == 'feature')
     if kind == 'country':
         assert out.attrs['id_converted'] is True
@@ -287,3 +298,80 @@ def test_actual_carrier_identity_bridge_is_a_healthy_original_control(actual_car
     assert out.Roof.tolist() == ['Grass', 'Iron Sheets']
     assert out.Floor.iloc[0] == 'Mud' and pd.isna(out.Floor.iloc[1])
     assert len(s.walks) == 1
+
+
+def test_recorded_ag_pair_fills_only_missing_primary_and_keeps_order(route):
+    raw = _housing(('ag-old', 'old-a'))
+    raw['h9q4'] = pd.Categorical(raw['h9q4'])
+    out = route(raw, _cover(('old-a',), ('new-a',)),
+                _cover(('unused-ag', 'ag-old', 'old-a'),
+                       ('native-unused', 'native-ag', 'new-a')))
+    assert out.index.get_level_values('i').tolist() == ['native-ag', 'new-a']
+    pd.testing.assert_frame_equal(out.reset_index(drop=True),
+                                 raw[['h9q4', 'h9q6']].set_axis(['Roof', 'Floor'], axis=1))
+    assert len(out) == len(raw) and list(out.columns) == ['Roof', 'Floor']
+
+
+def test_recorded_ag_pair_does_not_invent_missing_or_unsupported_keys(route):
+    raw = _housing(('unsupported', None))
+    with pytest.warns(UserWarning, match=r'2 of 2 housing rows \(1 missing source IDs\)'):
+        out = route(raw, _cover(('cover-only',), ('native-hh',)),
+                    _cover((None, 'ag-only'), ('not-for-null', 'native-ag')))
+    assert out.index.get_level_values('i')[0] == 'unsupported'
+    assert pd.isna(out.index.get_level_values('i')[1])
+    pd.testing.assert_frame_equal(out.reset_index(drop=True),
+                                 raw[['h9q4', 'h9q6']].set_axis(['Roof', 'Floor'], axis=1))
+
+
+def test_recorded_ag_pairs_collapse_only_agreeing_formatted_repeats(route):
+    out = route(_housing(('ag-old',)), _cover(('cover-only',), ('native-hh',)),
+                _cover(('ag-old', 'ag-old'), (10.0, '10')))
+    assert out.index.get_level_values('i').tolist() == ['10']
+
+
+def test_recorded_ag_ambiguity_refuses_before_join(route):
+    with pytest.raises(ValueError, match='ambiguous hh/HHID bridge'):
+        route(_housing(('ag-old',)), _cover(('cover-only',), ('native-hh',)),
+              _cover(('ag-old', 'ag-old'), ('native-ag', 'different')))
+
+
+def test_recorded_cross_cover_identity_disagreement_refuses(route):
+    with pytest.raises(ValueError, match='conflicting household/agriculture'):
+        route(_housing(), _cover(), _cover(('old-a',), ('different',)))
+
+
+@pytest.mark.parametrize('agriculture', [
+    FileNotFoundError('synthetic missing agriculture identity'),
+    pd.DataFrame({'hh': ['ag-old']}),
+    _cover((None,), ('native-ag',)),
+])
+def test_recorded_ag_projection_unavailable_refuses(route, agriculture):
+    with pytest.raises(ValueError, match='bridge (unavailable|pairs)'):
+        route(_housing(), _cover(), agriculture)
+
+
+@pytest.mark.parametrize('housing,cover,agriculture', [
+    (_housing(('old-a', 'ag-old')), _cover(('old-a',), ('same',)),
+     _cover(('ag-old',), ('same',))),
+    (_housing(('ag-old', 'native-ag')), _cover(('cover-only',), ('native-hh',)),
+     _cover(('ag-old',), ('native-ag',))),
+])
+def test_recorded_ag_target_collision_refuses(route, housing, cover, agriculture):
+    with pytest.raises(ValueError, match='duplicate household keys'):
+        route(housing, cover, agriculture)
+
+
+@pytest.mark.parametrize('kind', ['country', 'feature'])
+def test_recorded_ag_identity_uses_existing_sample_and_single_walk(actual_carrier, kind):
+    s = actual_carrier
+    s.housing = _housing(('old-a', 'ag-old'))
+    s.housing['h9q4'] = ['Grass', 'Iron Sheets']
+    s.agriculture = _cover(('ag-old',), ('native-ag',))
+    flat = s.build(kind).reset_index()
+    assert flat.i.tolist() == ['served-a', 'native-ag']
+    assert flat.v.tolist() == ['cluster-a', 'cluster-ag']
+    assert flat.Roof.tolist() == ['Grass', 'Iron Sheets']
+    assert flat.Floor.iloc[0] == 'Mud' and pd.isna(flat.Floor.iloc[1])
+    assert len(s.walks) == 1 and s.walks[0][1] == {'state': 'raw'}
+    assert s.walks[0][0].i.tolist() == ['native-a', 'native-ag']
+    assert s.samples == ['served sample leaf']
