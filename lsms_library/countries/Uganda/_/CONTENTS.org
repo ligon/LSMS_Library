@@ -4851,8 +4851,9 @@ accepts this qualified cell, without inventory or umbrella closure. See
 
 * GH #1287 assets: eight-wave fixed-STORAGE compiler checkpoint (2026-10-31)
 
-Draft only: independent result review and root acceptance remain pending. This
-entry does not authorize publication, merge or compiler-inventory credit.
+Independent result review 0f169d62 and root accept this qualified completed
+result. Exact documentation review precedes publication; compiler-inventory
+credit follows reviewed docs merge and root reconciliation.
 
 Eight authenticated historical native assets STORAGE inputs reached the actual
 unchanged eight-input country VAR Make compiler, composed default Country,
@@ -4911,8 +4912,8 @@ Actual took 158.557 s; separate export 12.943 s; outer launch 172.901 s. Archive
 526ad284 binds 179 members / 50,746,731 bytes. The publication interval starts 40 ms after
 the whole ACTUAL-LAUNCH supervisor closed, including separate export; it is not
 elapsed from inner actual exit. The terminal receipt records 81.338 s to exact
-push+remote-ref verification, final 1a3971a8. Independent timing/platform acceptance
-is pending and is separate from comparison results. A publication-summary list
+push+remote-ref verification, final 1a3971a8. That precise publication baseline and platform outcome were independently
+reviewed and accepted by root, separately from comparison results. A publication-summary list
 handling error was corrected without project/payload replay; its failure remains.
 
 Executed toolkit ac61cad5 used scientific 003e55f6. Public docs base b06abb5d

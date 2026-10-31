@@ -1,8 +1,9 @@
 # Uganda assets eight-wave fixed-STORAGE compiler checkpoint (#1287)
 
-DRAFT: independent result and root acceptance pending. Three documentation paths
-only; no publication/inventory credit or product/test/operator/private operand
-extraction. Public base b06abb5d; no data/import/test/actor replay for docs.
+Independent result review and root accept this qualified completed result. Three
+documentation paths only; no product/test/operator/private operand extraction.
+Public base b06abb5d; no data/import/test/actor replay for docs. Exact docs review
+precedes publication; inventory credit follows reviewed docs merge.
 
 Eight historical promoted native STORAGE files plus the same finalized 24,561-row
 D1 sample passed finite admission. They are not current raw/native outputs or
@@ -45,9 +46,13 @@ nine inputs, source/runtime/ordinary authority/children. No universal IO/atime o
 independent raw-science claim. Root-authenticated archive 526ad284 has 179 members /
 50,746,731 bytes. Actual 158.557 s, export 12.943 s, outer 172.901 s. Publication
 records 81.338 s / 180 s, START 40 ms after whole ACTUAL-LAUNCH closure including separate export, through exact push+ls-remote ref 1a3971a8.
-It is not measured from inner actual exit. Independent timing/platform gate remains
-pending. Preserved publication-summary list failure required no actor replay.
+It is not measured from inner actual exit. That exact baseline/platform outcome
+was independently reviewed and accepted by root. Preserved publication-summary list failure required no actor replay.
 
 Current docs base 997/998 matches executed bindings; sole global-schema drift is
 optional crop KgFactor_sold from Mali #824. All Uganda producer/core bytes match;
 no later-base runtime/hash acceptance. See .coder/ledger/1287-uganda-assets-runtime-checkpoint.md for precise scope/failure/custody pins. Other compiler cells remain.
+
+Independent result review 0f169d62/BINDINGS d862256d and root acceptance retain
+all these limits. Slurm 40690729 completed 0:0 in 6:43; successful platform/task
+publication is separate from comparison and scientific acceptance.

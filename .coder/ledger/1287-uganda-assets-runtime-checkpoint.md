@@ -1,7 +1,8 @@
 # Uganda assets: eight-wave fixed-STORAGE compiler checkpoint (#1287)
 
-DRAFT: independent result review/root acceptance pending; no publication, merge or
-inventory credit. Documentation only on public b06abb5d. Inherit STANDING.md,
+Independent result review and root accept the qualified completed result. Exact
+documentation review precedes publication; inventory credit follows reviewed docs
+merge and root reconciliation. Documentation only on public b06abb5d. Inherit STANDING.md,
 CLAUDE.md and data_info.yml. Operators/private operands are excluded from this
 public extraction. No product, test, import, data or actor replay for these docs.
 
@@ -91,7 +92,8 @@ Actual 158.557 s, separate export 12.943 s, outer 172.901 s. Terminal publicatio
 81.338 s / 180 s from an explicit START 40 ms after the entire ACTUAL-LAUNCH
 supervisor (including separate export) closed, through exact push+ls-remote
 verification of private ref 1a3971a8b927327ad9156c04e1866a696b4e36df. This is not
-timing from inner actual exit. Independent timing/platform acceptance is pending.
+timing from inner actual exit. Root accepts this exact publication baseline and
+platform outcome after full independent review, separately from comparisons.
 Ordinary list-handling summary failure was corrected without actor replay and remains preserved.
 
 ## Source compatibility and integration
@@ -99,6 +101,11 @@ Ordinary list-handling summary failure was corrected without actor replay and re
 Executed ac61cad5/scientific 003e55f6 versus docs b06abb5d matches 997/998 bound
 source/config bytes before this append. Only global data_info.yml adds optional
 crop KgFactor_sold via Mali #824; all Uganda producer/core sources remain exact.
-No later-base runtime or hash pass is claimed. Independent result/root acceptance
-and exact docs review precede publication; configured CI/conflict gate precedes
+No later-base runtime or hash pass is claimed. Exact docs review precedes
+publication; configured CI/conflict gate precedes
 merge, and root alone reconciles #1287 inventory afterward. Whole backlog remains.
+
+Independent result REVIEW 0f169d62ee463ab7f07574f37b6cd36f898235fdf3ede4851069446aa846aff1 and BINDINGS d862256dcaf0b64ab191c2f586bd334c961609cdfd60510fe8fe6adeb01a3726
+authenticate the qualified scope. Root read and hash-verified both and explicitly
+accepted the result/publication baseline. Slurm 40690729 completed 0:0 in 6:43;
+platform publication succeeded/task completed, separate from scientific comparisons.
