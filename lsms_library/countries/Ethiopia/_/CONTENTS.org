@@ -1961,6 +1961,13 @@ W4/W5 valuations by -19.0% / -18.2% (independent review, GH #820 round 2)
 although every W4/W5 row is byte-identical -- the W1-W3 §12 prices enter
 W4/W5's ladder.  Filed as GH #1254.
 
+*2026-10-31, GH #1254 correction.*  The public default now includes =t= in
+all geographic and national groupings whenever the frame carries it.
+=pool_waves=True= opts into the former pooling by disabling automatic =t=;
+an explicitly requested =t= item key still groups by wave.  The preceding
+-19.0% / -18.2% figures describe the historical old-default measurement and
+are retained unchanged; this correction does not remeasure those data.
+
 *W1 is the odd wave, and most of its §12 is NOT served.*  W1 §9 EXCLUDES
 tree/root crops, so 6,134 of W1's 6,999 coded §12 pairs (1,679 positive
 sales, 1.83M Birr) have no §9 row to attach to.  W1's tree-crop *harvest*
