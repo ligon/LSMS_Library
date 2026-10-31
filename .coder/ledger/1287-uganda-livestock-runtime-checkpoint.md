@@ -1,15 +1,16 @@
-# Uganda #1287: fixed-native livestock checkpoint draft
+# Uganda #1287: fixed-native livestock checkpoint
 
-**Status: DRAFT — independent result review and root acceptance pending.**
+**Status: qualified result accepted; public integration/inventory pending.**
 **Search tier:** exact Git/source and closed ordinary JSON receipts only.
 
 ## §1 Task, restated
 
 Record dispatch `d33e00aa183a4df081ae15e494cda3c9` / job 40694230, toolkit
 `1806c9ee12cc807b31f82a97c2ddce385ee9bf41` and scientific
-`b06abb5d5d2f8778bf28d03638ab6ed351aa78c6`. This isolated three-document draft
-starts at public `c2ed89b311fc76d375a6d5e9b28ec996b5c4ad2b`. It creates no
-acceptance, inventory increment, public PR or #1287 closure; no actor is replayed.
+`b06abb5d5d2f8778bf28d03638ab6ed351aa78c6`. This isolated three-document extraction
+starts at public `c2ed89b311fc76d375a6d5e9b28ec996b5c4ad2b`. Independent peer
+review 88bf20a1 and root acceptance 068bd6fc support this bounded result. This extraction creates no inventory increment or #1287 closure; no actor
+is replayed.
 
 ## §2 Prior art reused
 
@@ -47,7 +48,7 @@ shared unknowns or orphan representation. Saved native key diagnostics and actua
 i-completeness pass; they do not measure eligible raw loss or newly exercise the
 exclusion boundary. Known missing v/plot remains separate.
 
-## §5 Recorded result; acceptance pending
+## §5 Qualified recorded result
 
 23 full typed comparisons pass: 21 mandatory and 2 prepared RETURN/storage
 transport diagnostics. Seven native-copy and seven compiler-reader assertions
@@ -77,13 +78,22 @@ close without reported closure errors. Archive 173 files / 33,762,441 B manifest
 `f4ec47c337c755e714e3557315fa4fd104c75dcfb665faba36c9118c7cb417c8` is
 root byte/size/full stable destination-epoch authenticated without deserialization.
 Private ref `3b52590fa35d4eb867cc25a1d00b4cd1ec16aad1` is verified; scheduler
-COMPLETED 0:0 / 9:32 is distinct from scientific acceptance. OWN 6.077 s measures
+COMPLETED 0:0 / 9:32 is distinct from comparison evidence. OWN 6.077 s measures
 postreceiver/export wait-return to push+remote-ref verification, NOT inner actual
 exit. No other timing baseline is silently substituted.
 
 ### Verification against the ledger
 
-Draft checked against root archive/ordinary/cache-strict/terminal authentication,
+Checked against root archive/ordinary/cache-strict/terminal authentication,
 closed child JSON and exact frozen source. Historical CONTENTS prefix is unchanged;
-all 998 executed scientific bindings match docs base. Result peer/root acceptance,
-exact-doc review and public integration remain pending. Other cells remain separate.
+all 998 executed scientific bindings match docs base. Independent result review
+`88bf20a111a52d479baf40735a380680fa791ce4c686b7f3c82066a904c24af6` and root acceptance
+`068bd6fc3b739ccaadfa68555621eb72bcf33600eed7eeaff3367f6284664ce4` retain these bounds.
+Exact-doc review, public integration and inventory reconciliation remain pending.
+Other cells remain separate.
+
+Archived OUTER is a pre-export snapshot; final ordinary OUTER establishes export
+completion. Private committed RECEIVER precedes publisher completion, while final
+ordinary RECEIVER closes all four phases. The later expanded worker report is
+evidence-only outside the original publication commit/clock. Root authenticated
+29 declared ordinary files / 183,037 B and platform succeeded/finished/exit 0.

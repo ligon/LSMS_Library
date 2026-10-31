@@ -4923,11 +4923,12 @@ producer/core source changed, and no later-base runtime/hash pass is claimed.
 See =.coder/ledger/1287-uganda-assets-runtime-checkpoint.md= and
 =Uganda/1287-assets-public-checkpoint/REPORT.md=. Other cells/#1287 remain separate.
 
-* DRAFT fixed-native livestock compiler and consumers (GH #1287, 2026-10-31)
+* Qualified fixed-native livestock compiler and consumers (GH #1287, 2026-10-31)
 
-Independent result review and root scientific acceptance remain PENDING. This
-local documentation draft records closed receipts, not accepted inventory credit,
-a public extraction or closure of #1287. No source/native/API actor was replayed.
+Independent result review 88bf20a1 and root acceptance 068bd6fc accept this
+qualified fixed-native compiler/consumer result. Public documentation review,
+integration and inventory credit remain pending; this entry does not close
+#1287. No source/native/API actor was replayed.
 
 Seven historical native STORAGE operands (322,215 bytes) feed the unchanged
 actual country Make compiler, ordinary Country, simultaneous read/grain strict,
@@ -4992,7 +4993,7 @@ all SHA/size/full stable destination epochs without deserialization. OWN
 publication 6.077 s runs from observed postreceiver/export wait return through
 push AND exact remote-ref verification; it is NOT elapsed from inner actual
 exit. Private ref 3b52590f is verified; Slurm completed 0:0 in 9:32. These delivery
-facts remain separate from the pending scientific acceptance. Toolkit 1806c9ee
+facts remain separate from the qualified scientific acceptance. Toolkit 1806c9ee
 used scientific b06abb5d; all 998 bound scientific files match public docs base
 c2ed89b3. No later-base runtime/hash claim or inventory increment follows.
 See =.coder/ledger/1287-uganda-livestock-runtime-checkpoint.md= and

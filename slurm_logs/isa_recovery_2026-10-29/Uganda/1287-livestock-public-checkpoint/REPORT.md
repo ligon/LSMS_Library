@@ -1,8 +1,9 @@
-# DRAFT Uganda livestock fixed-native compiler and consumers
+# Uganda livestock fixed-native compiler and consumers
 
-Independent closed-result review and root scientific acceptance are PENDING.
-This local three-document extraction is not a public acceptance or inventory
-change. No payload was opened/deserialized, no project imported and no actor,
+Independent closed-result review 88bf20a1 and root acceptance 068bd6fc accept
+the qualified result. This three-document extraction still requires exact public
+documentation/integration review and creates no inventory change. No payload
+was opened/deserialized, no project imported and no actor,
 native producer, compiler or consumer replayed to prepare these documents.
 
 ## Recorded scope
@@ -88,7 +89,14 @@ OWN publication 6.077005935 s is measured with same-job/boot monotonic anchor fr
 observed actual-and-export receiver wait return to git push AND remote-ref
 verification, within its 180 s boundary. It is NOT elapsed from inner actual exit.
 Slurm COMPLETED 0:0 / 9:32 and delivery completion remain separate from scientific
-acceptance, currently pending.
+acceptance. Root separately authenticated platform succeeded/finished/exit 0 and
+29 declared ordinary evidence files / 183,037 B.
+
+Archived OUTER is the pre-export snapshot; final ordinary OUTER reports export
+completion/closure. Private committed RECEIVER is its pre-publisher-completion
+snapshot; final ordinary RECEIVER closes all four phases. The later expanded
+worker report is evidence-only outside the original publication commit/clock;
+this does not introduce another scientific or publication actor.
 
 ## Authority and source attribution
 
@@ -100,7 +108,12 @@ CACHE-STRICT-REVIEW,ORDINARY-REF-AUTH}.json and SLURM-TERMINAL.txt.
 Archive: private-witnesses/d33e00aa183a4df081ae15e494cda3c9/
 Uganda1287-eight-wave-livestock-v1/MANIFEST.json (historical archive label retained).
 All 998 executed scientific bindings match public docs base c2ed89b3; later-base
-runtime/hash execution is not inferred. See matching ledger and CONTENTS draft.
+runtime/hash execution is not inferred. See matching ledger and CONTENTS entry.
 Docs base c2ed89b3 adds only the separately reviewed Ethiopia livestock
 documentation over cb27; the Uganda historical prefix is byte-exact.
-Peer/root result acceptance and exact public integration remain pending.
+Independent result review:
+`88bf20a111a52d479baf40735a380680fa791ce4c686b7f3c82066a904c24af6`.
+Root acceptance:
+`068bd6fc3b739ccaadfa68555621eb72bcf33600eed7eeaff3367f6284664ce4`.
+Exact public documentation review, integration and inventory reconciliation remain
+pending. Other cells and broader scientific claims retain their existing limits.
