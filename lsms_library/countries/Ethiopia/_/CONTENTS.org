@@ -3790,3 +3790,28 @@ dated nine-concatenator source-only entry without erasing its historical limits.
 See =.coder/ledger/1287-ethiopia-food-coping-runtime-checkpoint.md= and
 =slurm_logs/isa_recovery_2026-10-29/Ethiopia/1287-food-coping-public-checkpoint/REPORT.md=.
 Other cells and #1287 remain open.
+
+* Five-wave community-prices compiler checkpoint (GH #1287, 2026-10-31)
+
+Qualified independent result review and root acceptance support this checkpoint,
+pending reviewed documentation merge. Five historical native STORAGE
+contributions reached the original plain-concat compiler, composed
+Country, both strict levers, genuine Feature and fresh warm: 45,257 rows,
+22 mandatory comparisons (including five raw-footer metadata comparisons) and
+two transport diagnostics passed. Served cluster
+keys =(t,v,j,u)= retain complete =v= and no household =i=; no sample is supplied.
+Canonical Feature sentinels remain interface carriers, not recovered observations.
+Reported total Birr/quantity and primary W1 Marketplace scope remain unchanged.
+
+Cold rejects the hashless compiler country output and rebuilds; warm preserves
+current hash, all-five coverage and cache identities with zero Wave/writer fallback.
+Historical STORAGE does not establish current raw/native science, original full
+script freshness or Make-backend API. Empty audits/absent grain metadata do not
+prove universal losslessness. #1357 does not impose a household key on this
+cluster table. Panel/frame/EA/weight and outlet caveats remain.
+
+See =.coder/ledger/1287-ethiopia-community-prices-runtime-checkpoint.md= and
+=slurm_logs/isa_recovery_2026-10-29/Ethiopia/1287-community-prices-public-checkpoint/REPORT.md=.
+Peer review =149d1dc3= and root acceptance =da70b031= retain the source/science
+limits in the linked report. No inventory increment precedes documentation
+integration, and other cells and the umbrella remain open.
