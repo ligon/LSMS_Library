@@ -43,9 +43,9 @@ Original canonical(t,i,animal)/no-v policy means zero sample inputs/providers/
 lookups. All Country/Feature calls explicitly currency=None, no valuation target.
 
 #1357 excludes genuinely anonymous household-keyed outputs, no invented/shared
-unknown identity/orphan representation. Native i/animal counts are zero and actual-i
-completeness are adopted-stage observations, not raw absence/eligible-loss or a
-new anonymous-exclusion boundary test. Known household missing v/plot differs.
+unknown identity/orphan representation. Native missing-i/missing-animal counts are zero, and actual-i
+completeness passed. These are adopted-stage observations, not raw absence or
+eligible-loss counts or a new anonymous-exclusion boundary test. Known household missing v/plot differs.
 
 ## §5 Reuse decision and measured predicates
 
@@ -69,7 +69,7 @@ overrun and no inner-controller-exit claim. The separately source-reviewed
 metadata-only recovery uses four actual stage dictionaries, preserves all 26
 metadata originals/checks/progress and never replays science or resets old clock.
 It delivers exact private 126c576e719a11d0400e820839f81813a456670d in 9.39737 seconds,
-outer 9.8374 seconds/0/closed/ECHILD, while original task/platform remains unfinished is retained.
+outer 9.8374 seconds/0/closed/ECHILD; the original task/platform remains unfinished.
 
 Archived RESULT pre-export (130.095063 seconds) differs from terminal receiver actual
 140.015626 seconds and worker-reconciled controller 139.564968 seconds including inline export.
