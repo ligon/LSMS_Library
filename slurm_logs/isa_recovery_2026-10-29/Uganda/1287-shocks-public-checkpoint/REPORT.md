@@ -1,0 +1,51 @@
+# Uganda shocks compiler and consumer checkpoint
+
+The fixed-STORAGE contribution unit is independently and root-qualified accepted. Eight historical native contributions were supplied to the original compiler and pinned framework; no raw source, native producer, sample or original script-cache freshness was rebuilt or independently validated. The compiler, default Country, first genuine Feature and fresh original warm each report **14,457 rows**. With both original strict levers enabled, the call raised an attributed **NullIndexKeyError negative**. This is not strict PASS; later grain-strict completion remains unestablished.
+
+This public extraction contains documentation only, with no private operands or operators. The original issue #1287 and broader scientific/backlog scope remain open. Integration and inventory credit are separate root-owned actions after review and merge.
+
+## Evidence and scope
+
+- Scientific source: `f952a32e646bcebe94b4c400ea30edef02b172bb`; final toolkit: `ba671ab3b6ff455b74ed29dda2f2e167979aec5b`.
+- Successful dispatch: `ccedb9a3226145e9aa8e4d50428cd220`, Slurm job `40704963`; authenticated private result `be006e6639c67ad7caba3410af55eec41ec8dc1e`.
+- Independent result review: `a0468d756006900e57d0134dd686adbbb2cade09996258bfd3f5922aab57f96e`; bindings `0b9c0ccc533c99653a04f0aea131c950459c4e4311d5c8ae333d45608991a476`.
+- Root acceptance: `a81272117b29fd5ab5d24c51676e2c2772c578fecb3612d8b8d427d10f74b61e`.
+- Closed archive: `98ba987262a63fd7467d863b826f33950f5cb361dcd6ad3cf7e2e7dc31b3bd89`, 252 members / 53,654,762 bytes. Root authenticated every SHA, size and stable full declared destination epoch without frame deserialization. Byte custody is distinct from scientific predicates.
+
+There are **22 NEW recorded passing comparisons: 20 mandatory and two separately labelled prepared-RETURN/storage transport diagnostics**, plus **two unchanged inherited comparisons** from the first failed actor. These are stage/custody/composition assertions, not 24 new independent native-science oracles. Six new original/receiving native policy pairs were compared; the original two completed pairs were not repeated. Raw footer assertions and observer receipts are not additional recorded frame-pair counts.
+
+The two completed 2005–06 and 2009–10 native files and 22 exact saved witnesses were byte-adopted from the original closed archive without unpickling/repeating their completed pair comparisons. Six other native files came from exactly named, source-bound later-bundle records. Eight fixed native operands total 274,328 bytes. No fallback cache search, raw acquisition, native reconstruction, hash stamp or identity-flag reset was admitted. Historical native image/decoder/full epoch provenance and current raw/native science remain qualified.
+
+The #805 documentary chain names four corrected native outputs and a country output. The selected later native SHA identities are explicit; the old country output was not reused as compiler/API truth. Script/helper equality and metadata custody are not a claim that the current mutable-cache bytes, original historical runtime or current raw arithmetic were independently validated. Source-specific shock, coping, missingness and recall semantics remain intact rather than being made comparable by this checkpoint.
+
+## Matching stages and consumers
+
+The actual original Make compiler read all eight declared native contributions in order. Its writer expectation is ordered concat followed by Uganda's LOCAL ID walk once, then `(i,t)` with `Shock` as a column. The framework instead retains the original whole Wave reader/policy/replay/maps/filter, performs its per-wave raw-state generic walk/current finalization, and returns canonical `(t,i,Shock)`. Full comparisons use the matching stage; the compiler is not forced equal to the API by changing axes. Currency is explicitly `None` throughout.
+
+The source country entry is bare `shocks: !make`, whose required-column list is empty. That does not discard any of the ten native fields or invent requiredness from global metadata. The canonical shocks declaration omits village, so no sample input, sample provider or village extrapolation is used. The disclosed selector-only fixed leaf preserves original Wave machinery; the original selector is restored before strict and first Feature, while the identity-checked observer remains until final removal. This does not test the original full freshness gate or a Make-backend API build.
+
+All nine API cache slots were absent before cold. Cold created one country cache; all eight wave slots remained absent. This is an absent-before build, not an eviction claim. All eight requested/registered coverage keys, current frozen-source hash and full cache byte/epoch identity close through the fresh-process Country and Feature warm returns. Warm recorded two selected cache getters and zero named source/decoder/native/build/Wave/writer/sample/raw-panel-map fallback entries. The explicit completed actor read matrix is 30 policy, eight original-Wave policy and 16 pickle reads; compiler/cache getters and internal attrs/schema/byte IO are separate. Named counters do not establish universal kernel/native IO or atime coverage.
+
+## Strict disposition and household identity
+
+Untouched actual frames/full attrs and immediate pure actual audit reports were saved before the expected finalizer. Ordinary actual metadata reports zero required-column null reports, one index report, zero process grain reports and absent raw grain footer. Footer absence is not losslessness proof. The inherited 2005 native witness records one missing `Shock`; it was preserved rather than filled or silently removed.
+
+With both original strict levers enabled, the original unique index emitter raised `NullIndexKeyError`. Saved pure-actual index audit and original formatter/traceback attribution matched. This is a recorded strict NEGATIVE, not PASS or a generic exception waiver. Later grain-strict completion is not independently established after that exception; no disabled-lever rerun or source policy repair was performed. First real Feature and warm remain separately measured passing consumers.
+
+Actual Country household `i` is present and nonmissing in both cold and warm. #1357 option 1 continues excluding genuinely anonymous household-keyed records: no inferred holder-prefix identity, shared unknown household or orphan representation is introduced. Native missing-i evidence-stage gates are distinct from raw-source eligibility or lost eligible observations. Known households missing village/plot and a missing shock category are separate questions. This fixed-input cell does not newly exercise anonymous raw-source exclusion or settle #1120 verification.
+
+## Preserved failures, bounds and delivery
+
+The original dispatch `8d0a852b3b1e4960a0fe8dafc05fbb47` failed at the third original-size predicate before that native was copied/decoded. Its two completed comparisons and immutable witnesses remain preserved; the failure did not prove native science invalid. The first continuation `054c2e407f694c70a31d3e43e9950827` failed before any native read or inherited-witness copy because a guard incorrectly required a global identity user map. Its zero-new-read failure is retained. Neither is preemption evidence, nor was a completed producer replayed merely to obtain green status.
+
+The corrected guard proves only the exact recorded-owner point `0→43292→43292` under the bound managed-wrapper/exporter protocol. It preserves the original manifest owner values and every other epoch field, and stops on unsupported or ambiguous maps. It does not assert global/initial namespace identity or waive arbitrary UID differences. A worker's earlier inner/external SOURCE-FREEZE whole-equality setup mistake was corrected as source-only schema authentication; it was not another scientific actor. The two freeze schemas remain distinct and the inner file is authenticated by its external binding.
+
+Both failed actual charges, 46.101189854 s and 6.120920013 s, remain charged. Successful actual supervisor time is 276.472331578 s (controller 276.079199464 s); cumulative actual is 328.694441445 s. The final new cap was 547 s, with cumulative bound 599.222109867 s and separate cleanup within the original 600+5 ceiling. All four owners use absolute launch/wait/shared ends rather than resetting a full wait after Popen. Separate export completed in 20.104767279 s. Children closed with ECHILD, without recorded timeout or termination signals; source, authority, immutable input, cache and receipt closures passed.
+
+OWN publication **7.665245443 s** runs from observed successful receiver descendant cleanup AFTER actual/export through push and exact remote-ref verification. Earlier actual-child/leader clocks remain separate; this is not elapsed from inner actual exit. The original shared postsetup deadline is not reset and the 180-second OWN bound was met. Frozen published/pre-export/prepublisher snapshots are distinct from final ordinary receipts and later worker supplements. Scheduler `COMPLETED 0:0` in 9:42 and platform succeeded/exit 0 corroborate delivery; they do not replace the qualified scientific result.
+
+## Source and remaining limits
+
+All 999 executed selected source bindings match the public documentation base `c4928898baee35714a52f49e2469c90e7ae0790b`. The deliberate scientific base remains f952. The later unbound library difference is the #1254 `median_price_valuation` wave-grouping/opt-in change; the selected shocks route has no valuation/item-quantity ladder and uses currency `None`. This is a static scoped source interpretation, not a new later-base runtime/hash test or proof of every possible dynamic dependency.
+
+This checkpoint establishes fixed historical STORAGE contribution → original compiler/pinned composed consumers, strict disposition, cache/coverage and bounded closure/delivery. It does not establish fresh raw/native/sample science, original freshness, independent recall/causal/panel comparability or population/eligibility truth. Existing EA/parish/refresh, 2019 weights/GPS, #647/#1297, #829 WAITING and broader Uganda/ISA caveats remain. Public integration does not close #1287 or the country backlog.
