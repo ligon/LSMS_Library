@@ -2231,3 +2231,73 @@ authenticated. This checkpoint changes no public inventory before reviewed
 integration or umbrella disposition. Other cells, including =people_last7days=,
 remain outside its scope. Pins and qualifications:
 =slurm_logs/isa_recovery_2026-10-29/Mali/1287-livestock-runtime-receipt-v1/REPORT.md=.
+
+* 2026-10-31 -- Fixed-native people_last7days checkpoint (GH #1287; REVIEW DRAFT)
+
+*Review draft only*: the closed ordinary evidence below is being reconciled.
+Independent final-result and root acceptance remain pending; this text creates
+no public inventory credit, publication authorization or umbrella completion.
+At scientific source =cb27e8a8= and toolkit =4cf266d0=, two historical native
+STORAGE operands feed the original current country VAR Make compiler. Compiler,
+default Country, simultaneous read/grain strict, first real singleton Feature
+and fresh-process Country/Feature warm report 131,246 rows. Sixteen named
+comparisons pass in the ordinary receipts: fourteen mandatory and two prepared
+RETURN/storage transport diagnostics. This is current composed-consumer
+measurement, not two new native producers or an independent raw-science oracle.
+
+The two EAC-I natives contain 37,175 and 94,071 rows; four requested coverage
+keys include two undeclared EHCVM noncontributors. No whole-instrument absence
+is established. Original compiler concat has NO ID walk or sample join; API
+uses the original per-wave raw-once framework walk and finalizer. The disclosed
+selector-only saved-parquet leaf retains the original Wave policy reader,
+audit replay, mapping/check-t/filter tail and true parquet origin. Normal script
+freshness selection, current raw-native equivalence, normal sample API,
+Make-backend API and existing-target incremental Make remain untested.
+
+Mali's survey distinctions remain: EAC-I 2014/2017 versus EHCVM 2018/2021;
+2014 rural agricultural holdings differ from urban households. The 2017 rural
+Lourd/Leger split and dated geographic/security exclusions remain. Here seven-
+day activity flags differ from annualized average-week hours constructed as
+months times days times hours divided by 52. Zero hours does not prove an
+observed No: the current missing-dummy caller uses =fillna(False)=. Native
+=_dummy= implements only code1=True/code2=False/other=NA despite its quoted
+else=1 summary. Finalizer prose says any/first, while actual code uses boolean
+max, hours =sum(min_count=1)= and Industry.first. Those original source
+contradictions are preserved, not scientifically resolved by this checkpoint.
+
+All three fixed inputs total 2,591,727 B, including the 24,939-row finalized
+sample used ONLY as v lookup. Original Country instances receive immutable
+=sample[['v']].copy()= through =_sample_v_cache=; no sample method/build, second
+walk, stamp, reweighting or inferred membership. Original historical sample
+export hash, old image/decoder/full epochs, current sample/weight truth and raw
+freshness remain unestablished. Policy-read operands/attrs/footers and original/
+receiving byte identities were retained before predicates and closed afterward.
+
+Actual i/pid missing counts are zero in admitted natives; actual returned i is
+present/nonmissing. #1357 keeps genuinely anonymous household-keyed records
+excluded without invented/shared unknown IDs or orphan representation. Known
+household keys missing v/plot remain distinct; native counts are not a raw
+eligible-loss census. Both strict levers PASS together; actual pre-oracle
+null/index/grain reports are empty, while raw grain footer is =None=. This is
+not universal losslessness. Later process reports include expected-finalizer
+work and do not establish pure actual Feature attribution.
+
+Before cold, two mutable native caches AND hashless compiler country output
+exist. Cold evicts the two wave copies and rebuilds the rejected country output;
+one current-hash country cache with all-four coverage survives unchanged through
+fresh warm. The two EHCVM wave slots were absent throughout, not observed
+removals. Warm sees exactly two selected cache getters, with zero named source/
+decoder/native/build/Wave/writer/sample/raw-map entries. Full byte/identity/mode/
+mtime/ctime closure is measured; atime and universal kernel IO are not.
+
+Dispatch =d6b3f31d18a445fda802c4fd65a6347a= records actual 231.688721 s,
+separate export 12.786199 s and closed descendants without timeout/signals.
+Publication push plus exact remote-ref verification is 19.659032 s from observed
+actual leader exit BEFORE cleanup/export, on the SAME 180-second clock.
+Private head =6a8bcf6f298229f4fda8d5724c091369170e2b17= and 130-file archive
+were separately root-authenticated; Slurm40696277 completed0:0/8:28. The expanded
+worker report is supplemental outside the original publication clock. Archived
+pre-export OUTER/committed pre-publication RECEIVER do not replace final ordinary
+closure. Prior held packages remained unexecuted. Final scientific acceptance
+and reviewed public integration are still pending. Exact scope and references:
+=slurm_logs/isa_recovery_2026-10-29/Mali/1287-people-runtime-receipt-v1/REPORT.md=.
