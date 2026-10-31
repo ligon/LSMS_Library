@@ -1,9 +1,9 @@
-# Uganda interview_date compiler/consumer checkpoint — DRAFT
+# Uganda interview_date compiler/consumer checkpoint
 
-DRAFT: independent closed-result review and root scientific acceptance are
-pending. The following is a source-bound summary of completed ordinary receipts
-and root byte/delivery authentication, not an accepted public checkpoint. No
-inventory count, public issue, PR, push or merge follows from this document.
+The bounded result is independently and root-qualified accepted, preserving the
+limits below. Final exact documentation review, publication and inventory credit
+remain pending. Scientific acceptance is separate from root byte/delivery
+authentication and does not extend to broader Uganda work.
 
 Executed harness source `a81490bdca01d4cf80f90453a2a40eea519d7ed6` uses deliberate
 scientific base `a7e1f606`. Dispatch `2821fd196e524070aa7f77116d6f7ffa`, Slurm
@@ -11,7 +11,7 @@ scientific base `a7e1f606`. Dispatch `2821fd196e524070aa7f77116d6f7ffa`, Slurm
 `ebb2691f7e74dc811dbac849c4c1148682bdd95a`. Root records scheduler completion
 0:0 / 7:42 and platform succeeded with exit 0 separately from scientific acceptance.
 
-## Whole eight-wave scope and preliminary comparisons
+## Whole eight-wave scope and qualified comparisons
 
 All eight historical native STORAGE contributors and the same qualified 1376
 finalized sample were admitted, with immutable receiving copies and independent
@@ -45,7 +45,8 @@ and compiler versus API finalization remain separate operands.
 
 Both original strict levers passed once. Bare !make required_columns is still
 empty; dates were not made newly required and strict PASS is not a complete-visit
-or source-date validity claim. Pure actual reports saved before the oracle are
+or source-date validity claim. The Country index audit checks only levels present;
+it does not validate the absent visit axis or constitute a strict Feature call. Pure actual reports saved before the oracle are
 null=0/index=0/grain=0, with raw grain footer absent. Country does not invent visit;
 original Feature #506 adds visit=pd.NA to align(t,v,i,visit), never visit=1 or
 reconstructed visit order. Missing visit is a disclosed original assembly policy,
@@ -77,6 +78,9 @@ runtime claim. Cold/warm/cache-closure snapshots and full typed outputs agree;
 fresh warm records two selected cache getters and zero named Wave/writer/source/
 decoder/build/sample/raw-panel-map fallbacks. Four cold and two warm
 ClusterIdentityWarnings remain, rather than being suppressed or reclassified.
+Allowed positive guard telemetry records 417 tracked-config CSV fingerprint reads
+and 112 exact absent-parquet probes; these are not guard faults or CSV payload
+parsing, and guard_events is not empty.
 The role/stage matrix is 34 explicit policy reads, eight observed original Wave
 policy reads and 20 pickle reads, separate from internal cache/byte/footer IO.
 
@@ -119,15 +123,15 @@ stable destination epochs without frame deserialization. Archived OUTER is the
 preexport snapshot, so its export-pending state does not replace the final
 ordinary OUTER's closed export. The 21-file private publication includes its
 prepublisher running/three-phase RECEIVER; final ordinary RECEIVER is completed/
-four phases. Exact final delivery and OWN timing remain separate from pending
-scientific acceptance.
+four phases. Exact final delivery and OWN timing remain separate from the qualified
+scientific scope.
 
 ## Source projection and limits
 
-This draft is based on public 885ad00c. All 1,023 selected non-CONTENTS scientific
+This checkpoint is based on public 885ad00c. All 1,023 selected non-CONTENTS scientific
 bindings match the executed source. The sole selected CONTENTS difference is the
 preserved private plan note versus later public chronology; both retain the
-311,426-byte a7e1 prefix, and this draft preserves the complete 316,549-byte public
+311,426-byte a7e1 prefix, and this checkpoint preserves the complete 316,549-byte public
 prefix before its dated appendix. CONTENTS is excluded from build fingerprints.
 No later whole-product/runtime/hash equality is asserted.
 
@@ -140,6 +144,10 @@ truth follows. Calendar/visit policies are unchanged. EA/parish/refresh, 2019
 weights/GPS, #647/#1297/#829 WAITING and broader Uganda work remain separate.
 
 Root evidence: Uganda/1287-interview-date-root-result-v4/{ARCHIVE-AUTH,
-TERMINAL-PUBLICATION}.json. Independent result and root scientific acceptance:
-PENDING. This is a three-document draft only; no payloads, operators, scientific
-code, fixture, tests or runtime replay are included.
+TERMINAL-PUBLICATION}.json. Independent result: Uganda/1287-interview-date-result-independent-Burkina-v4/
+REVIEW.md (67c851adc86b0542afb96cd374307789ca296c953657e7929da50c0b75930e18).
+Root acceptance: Uganda/1287-interview-date-root-result-v4/ACCEPTANCE.json
+(49ab5f9a6bbab5ed29239061ddd3f6f889bd905295fe6f459f088db22cdadb3f).
+Final exact docs review/publication/inventory remain pending. This extraction
+contains three documents only; no payloads, operators, scientific code, fixtures,
+tests or runtime replay are included.

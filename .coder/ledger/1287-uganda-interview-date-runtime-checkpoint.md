@@ -1,12 +1,12 @@
-# Uganda interview_date fixed-STORAGE checkpoint — DRAFT
+# Uganda interview_date fixed-STORAGE checkpoint
 
 ## 1. Status and scope
 
-DRAFT pending independent closed-result review and root scientific acceptance.
-Root has authenticated archive/delivery and terminal scheduler evidence. Neither
-that custody nor this draft authorizes publication, inventory credit or broader
-Uganda acceptance. This extraction adds three documents only, with no private
-operands/operators or product/test changes.
+The bounded result is independently and root-qualified accepted. Final exact
+documentation review, publication and inventory credit remain pending. Root
+authenticated archive/delivery and terminal scheduler evidence separately from
+science. No broader Uganda acceptance follows. This extraction adds three
+documents only, with no private operands/operators or product/test changes.
 
 Executed source `a81490bdca01d4cf80f90453a2a40eea519d7ed6` deliberately binds
 scientific `a7e1f606`. Dispatch `2821fd196e524070aa7f77116d6f7ffa`, Slurm
@@ -36,7 +36,7 @@ separate from current raw/native arithmetic, decoder/image or script-cache
 freshness. The later private-copy header 976fc is a copy checkout, not an
 independently proved native producer for the selected rewarm bundle.
 
-## 3. Preliminary closed ordinary evidence
+## 3. Qualified closed ordinary evidence
 
 Receipts report 26 passing comparisons: 24 mandatory and two prepared-RETURN /
 STORAGE transport diagnostics. These are custody and matching-stage composition
@@ -49,7 +49,8 @@ The original API writer has 24,362 rows before current API finalization yields
 Both original strict levers passed once. Bare !make required_columns remains
 `[]`; this does not create a required-date or complete-visit guarantee. Pure
 actual reports before the oracle are null=0/index=0/grain=0, raw grain footer
-absent. First genuine Feature preserves the original missing visit policy.
+absent. First genuine Feature preserves the original missing visit policy; Country audit checks only
+levels present, so strict PASS does not validate absent visit or a strict Feature.
 Cold/warm actual i and v are complete. #1357 excludes genuinely anonymous
 household-keyed output without inferred/shared unknown identity or orphan
 representation; native diagnostics do not measure raw eligible loss or exercise
@@ -63,6 +64,8 @@ not observed evictions. Fresh warm recorded two selected cache getters and zero
 named Wave/writer/source/decoder/build/sample/raw-panel-map fallbacks. Exact
 source hash/coverage/full cache snapshots and typed cold/warm equality are
 reported closed. Four cold and two warm ClusterIdentityWarnings are retained.
+Allowed guard telemetry contains 417 tracked-config CSV fingerprint reads and
+112 exact absent-parquet probes, not guard faults or CSV payload parsing.
 Read counts are 34 explicit policy, eight original Wave policy and 20 pickle;
 these are declared role/stage reads, not a count of every internal byte read.
 
@@ -90,15 +93,16 @@ AFTER actual/export, through commit/push and exact remote-ref verification. It
 is not inner actual-exit elapsed, a precleanup leader event or an mtime proxy.
 Root records archive 8d4bb479 (226 members / 32,803,525 bytes), full byte/epoch
 custody without deserialization, plus Slurm COMPLETED0:0 / platform success.
-These remain distinct from pending scientific acceptance. Archived OUTER is a
+These remain distinct from the qualified scientific scope. Archived OUTER is a
 preexport snapshot; final ordinary OUTER supplies export closure. Committed
 RECEIVER is running/three phases before publication; final ordinary RECEIVER is
 completed/four phases. No snapshot is silently substituted for the other.
 
 ## 5. Remaining gate
 
-Independent result review and root acceptance remain PENDING. Keep all source,
-visit/missingness, household/sample/custody/freshness and broader country limits.
-No public push, PR, merge, issue mutation or inventory credit from this draft.
-See the matching public-report draft under
+Independent result REVIEW67c851ad and root ACCEPTANCE49ab5f9a accept this bounded
+result. Final exact documentation review, publication and inventory credit remain
+pending. Keep all source, visit/missingness, household/sample/custody/freshness and
+broader country limits. No public push, PR, merge or issue mutation by this author.
+See the matching public report under
 `slurm_logs/isa_recovery_2026-10-29/Uganda/1287-interview-date-public-checkpoint/REPORT.md`.
