@@ -4660,9 +4660,9 @@ source-carrier comparison; a fresh process passes exact Country and Feature
 warm comparisons on all 3,312 rows. Original expected/footer hash and requested
 wave coverage agree. Both caches retain bytes, mode and nanosecond mtime;
 all five originals/copies, source/manifest bindings and descendant closure pass.
-Targeted named Python reader/native/writer hooks record zero such operations in
-these remaining stages; permitted tracked FCT-CSV fingerprint reads are ordinary
-metadata, not source parses. This is not a directory snapshot or universal
+All seven source/parser/native/Wave/writer counters remain zero; the selected
+country-cache getter runs once in Feature and twice in warm. Permitted tracked
+FCT-CSV fingerprint reads are ordinary metadata, not source parses. This is not a directory snapshot or universal
 native/C-level IO proof. The finisher actor closes in 64.421 seconds without
 replaying the six-source cohort, first Country or strict getter.
 
