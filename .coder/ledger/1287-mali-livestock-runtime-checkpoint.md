@@ -8,8 +8,9 @@ Document the completed finite livestock compiler/default/strict/Feature/fresh-wa
 unit from dispatch `577baaa42d6d46dd9cb6945dbcf78a3c`, toolkit
 `20bae1ee0f82507d440b0d72d70412b2a0af65b0`, scientific `b06abb5d5d2f8778bf28d03638ab6ed351aa78c6`.
 This isolated three-document extraction starts at current public `c53624711b9269ed09c978d3ccd5e7ac3a810c60`.
-Runtime acceptance and public publication are pending coordinator review; this
-ledger does not increment inventory or close #1287. No data/test replay occurs.
+Root accepted the qualified result after independent review62fa1bd1. Public
+publication/integration remain separately reviewed; this ledger does not increment
+inventory or close #1287. No data/test replay occurs.
 
 ## §2 Existing machinery
 
@@ -78,3 +79,11 @@ Private publication exact `f7f2c363dd2c1576a52c49e439ab11fab0fea90a` is separate
 acceptance. Initial direct wrapper exec126 preceded receiver entry; Bash ran the
 unchanged wrapper once, without actual/producer/compiler replay. Historical
 CONTENTS bytes and final documentation-only scope are verified at freeze.
+
+Independent result review `62fa1bd10b46b24e34a23886a865eec42ba9eb096c7109bd98f418472e5d77ee`
+and root acceptance `aad480f178fb3a22d26779a22d37a04d4a365aff4d090659a3e81b4306ec48af`
+retain these exact bounds. Archived OUTER is a pre-export snapshot; final ordinary
+OUTER/receiver/export establish terminal closure. Final platform succeeded0 with
+publication complete; root authenticated27ordinary files/85,297B separately.
+Current public49qualified/13remaining stays unchanged until reviewed integration;
+the qualified projected transition is50/12 with Mali people_last7days remaining.
