@@ -3570,3 +3570,75 @@ including the ordering deviation. This extraction is documentation only;
 publication follows exact docs review and inventory credit follows docs merge.
 See =.coder/ledger/1287-ethiopia-labor-runtime-checkpoint.md= and
 =Ethiopia/1287-labor-runtime-receipt-v1/REPORT.md=. Other cells/#1287 stay separate.
+
+
+* GH #1287 crop_production: five-wave fixed-STORAGE compiler checkpoint (2026-10-31)
+
+Independent result review =03dca73f= and root accept this qualified result.
+Inventory credit follows exact documentation review, configured CI and merge;
+this entry does not itself advance the compiler inventory.
+
+The actual five-input VAR Make compiler ran from five authenticated historical
+native STORAGE contributions, with zero new raw parses/native builds/manual
+stamps. These are writer-prepared STORAGE, not untouched constructor RETURNs;
+historical runtime identity/full epochs and current raw/native freshness
+remain unestablished; old mode 0644 is documented, not private custody. The prior byte-only custody transfer supplies current
+independent receiving identities without upgrading that history. Same qualified
+26,130-row finalized D1 sample supplies only a fixed nullable-v lookup, not new
+sample/weight/membership/cluster truth or a second household walk.
+
+Recorded comparisons all PASS: 25 mandatory + 2 diagnostic RETURN/STORAGE,
+broken down admission 10, compiler 6+1, cold/strict-attribution/Feature 7+1 and
+fresh warm 2. Compiler CALL/RETURN/storage have 87,045 rows; composed default
+Country, real Feature and fresh warm Country/Feature each have 86,403. Full
+matching-stage typed axes/domains/order/values/masks/extension types/attrs were
+compared; these are not independent new crop arithmetic or eligible-loss tests.
+
+The disclosed _fresh_script_parquet selector substitutes only freshness selection
+of the five admitted paths. Original candidate declaration/interface checks,
+Wave policy reader/parquet origin/footer replay/map/t-filter, current Country
+aggregation/maps/writer/hash/finalizer remain. Metadata-only original/provider/
+restored registry+country+wave hashes matched before payload; selector restored
+before strict/Feature, and absent candidates could not fall back to Make. This
+is composed API evidence, not the original full script-cache freshness gate,
+Make-backend API, existing-target incremental Make or current raw-build proof.
+
+Both strict levers were requested once. Strict is NEGATIVE, not PASS: original
+GrainCollapseError matched the FIRST reachable cached grain report/formatter,
+traceback and ledger. The complete footer stayed unchanged; remaining footer
+replay and later NULL/index checks were unreached. Actual pre-oracle NULL/index
+reports were empty, grain reports numbered four, and country grain stamp was
+present. These facts do not prove all science or no loss. Feature reports after
+the expected-Country prepass are labelled cumulative rather than pure attribution.
+
+Native five axes, Country with v, and nine canonical Feature axes plus country
+remain different interfaces; condition/season/production_obs sentinels carry
+adapter provenance, not recovered source observations. Unknown versus recorded
+Other, existing section12 sales/window/unit/factor/quantity and panel/plot policies
+remain unchanged. The [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 option 1 exclusion]] remains binding: actual i is present
+and missing-i=0; no inferred/shared unknown household or orphan representation.
+Known household missing plot/v is distinct. Composite plot strings do not prove
+component completeness; this saved-STORAGE unit is not a new raw eligibility test.
+
+Fresh warm records two selected-country-cache getters and zero named source,
+decoder/native/build/Wave/writer entries. One country cache survives among six
+API slots; its original hash/all-five coverage/bytes/epochs close independently,
+as do six source/receiving inputs and the separate hashless compiler chain.
+Named observers are not universal IO/atime guarantees. Application including
+inline export took 146.631 s. Publisher records 9.589 s from receiver-receipt
+mtime to push; no in-interval remote-ref verification was recorded. Eventual
+delivery a1f6d127 was verified later. The 180 s actual-exit-to-remote-verification
+contract is UNESTABLISHED; neither compliance nor an overrun is inferred.
+Archive dbfb2946 contains 129 members / 211,042,211 bytes; closure/publication is
+separate from scientific acceptance. A worker-only atime authentication mistake
+was corrected before project/payload entry; V1's held executable-contract gap
+was fixed before this one V2 dispatch, not a failed scientific rerun.
+
+Executed toolkit 2be4694b used scientific c2e9a3a6. Public docs base b06abb5d
+matches 526/527 bound source/config files before this addition; the sole drift
+is global data_info.yml's optional KgFactor_sold definition from Mali #824.
+No Ethiopia producer/core source changed, and no later-base runtime/hash pass
+is claimed. This dated entry supplements the older nine-concatenator statement
+that guarded composition remained required, without claiming fresh raw replay.
+See =.coder/ledger/1287-ethiopia-crop-runtime-checkpoint.md= and
+=Ethiopia/1287-crop-public-checkpoint/REPORT.md=. Other cells/#1287 remain separate.
