@@ -55,6 +55,7 @@ sys.path.append('../../_/')
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library.country import grain_reports
 from mali import (i as mali_i, crop_production_finalize, producing_trees,
                   tree_crop_rows, stamp_tree_derivations)
 
@@ -83,6 +84,8 @@ seasonal = pd.DataFrame({
     'Quantity': s3a['s3aq08a'],
     'Quantity_sold': s3a['s3aq23a'],
     'Unit_sold': s3a['s3aq23b'],
+    # FIELD kg per sold unit, not the tree module's sometimes-total kg.
+    'KgFactor_sold': pd.to_numeric(s3a['s3aq23c'], errors='coerce'),
     # Preserve the baseline recorded field value. Additional value masks
     # are a separate decision, outside this window correction (task ledger).
     'Value_sold': s3a['s3aq24'],
@@ -97,6 +100,7 @@ seasonal.loc[not_sold, ['Quantity_sold', 'Value_sold']] = 0
 # ...and a 0 filled in has no unit: Unit_sold stays NA there (the raw s3aq23b
 # is already NA on every one of those rows; stated, not assumed).
 seasonal.loc[not_sold, 'Unit_sold'] = pd.NA
+seasonal.loc[not_sold, 'KgFactor_sold'] = pd.NA
 
 # --- planting month + intercrop from cultivation roster (s1c) ---
 s1c = get_dataframe('../Data/EACICULTURE_p1.dta').copy()
@@ -150,4 +154,5 @@ df['Derivation'] = stamp_tree_derivations(df)
 assert len(df) > 0, "crop_production 2014-15 produced no rows"
 assert df.index.is_unique, "Non-unique (t, i, plot, crop) in crop_production 2014-15"
 
-to_parquet(df, 'crop_production.parquet')
+to_parquet(df, 'crop_production.parquet',
+           grain_audit=grain_reports('Mali', 'crop_production'))

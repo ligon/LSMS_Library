@@ -201,6 +201,12 @@ Data Scheme:
     Unit_sold:
       type: str
       optional: true
+    KgFactor_sold:
+      type: float
+      optional: true
+      # EACI FIELD kg per sold unit, s3aq23c / s7gq21d; no tree equivalent.
+      # Exact factor agreement only; conflicts incl missingness are NA with
+      # persistent grain audit. Existing sale attribution gates still apply.
     Value_sold: float
     months_harvested:
       type: int
