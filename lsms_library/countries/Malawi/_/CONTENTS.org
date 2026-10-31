@@ -4646,3 +4646,19 @@ from household-keyed tables. Its ruling does not authorize deleting known
 households' observations merely because plot identity is missing. Missing-plot
 representation, other #1120/#637 scope and #1228/#1190/#1174/#1278 caveats remain
 separate; this checkpoint does not close the whole backlog.
+
+* 2016 plot_features restricted reader uses held cached bytes (GH #1287)
+
+The source-level fix from #1351 is now reused by =plot_features=: after
+=_ensure_dvc_pulled=, a sidecar-addressed L1 blob is streamed directly when
+available; the existing DVCFS fallback remains. The exact numeric restricted
+column list, temporary bytes, =apply_value_formats=False= and finally-unlink
+are unchanged. In particular, =ag_d02= is still respondent identity rather
+than tenure; no 2016 tenure value or new plot identity is invented.
+
+Four new invented cached/fallback and decoder-success/failure cases pass.
+The helper's executable AST matches the accepted =plot_inputs= path; the
+remaining driver AST is unchanged apart from the import. This is source and
+inert-control verification, not a new survey/native/API result or a measured
+speedup. The old DVC index overhead diagnosis remains attributed to its
+original =plot_inputs= run. Current seven-compiler acceptance is separate.

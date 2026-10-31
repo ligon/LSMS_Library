@@ -7,20 +7,21 @@ from types import SimpleNamespace
 
 import pytest
 
-SCRIPT = Path(__file__).resolve().parents[1] / 'lsms_library/countries/Malawi/2016-17/_/plot_inputs.py'
+SCRIPTS = Path(__file__).resolve().parents[1] / 'lsms_library/countries/Malawi/2016-17/_'
 
 
-def reader(namespace):
+def reader(namespace, script):
     # Isolate the real helper from this executable script's top-level raw builds.
-    tree = ast.parse(SCRIPT.read_text())
+    tree = ast.parse(script.read_text())
     node = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == '_read_usecols')
-    exec(compile(ast.Module(body=[node], type_ignores=[]), str(SCRIPT), 'exec'), namespace)
+    exec(compile(ast.Module(body=[node], type_ignores=[]), str(script), 'exec'), namespace)
     return namespace['_read_usecols']
 
 
+@pytest.mark.parametrize('script_name', ['plot_inputs', 'plot_features'])
 @pytest.mark.parametrize('cached', [True, False])
 @pytest.mark.parametrize('decoder_failure', [False, True])
-def test_restricted_reader_bytes_options_and_cleanup(tmp_path, cached, decoder_failure):
+def test_restricted_reader_bytes_options_and_cleanup(tmp_path, cached, decoder_failure, script_name):
     import os
     import tempfile
     payload = b'invented source bytes, including \xff'
@@ -28,7 +29,7 @@ def test_restricted_reader_bytes_options_and_cleanup(tmp_path, cached, decoder_f
     blob.write_bytes(payload)
     calls = []
     temporary = []
-    columns = ['case_id', 'ag_d39d']
+    columns = ['case_id', 'ag_d21'] if script_name == 'plot_features' else ['case_id', 'ag_d39d']
     expected = object()
     failure = ValueError('invented decoder failure')
 
@@ -56,7 +57,7 @@ def test_restricted_reader_bytes_options_and_cleanup(tmp_path, cached, decoder_f
                      _dvc_cache_path=resolve, _COUNTRIES_DIR=tmp_path,
                      _dvc_working_directory=lambda _: nullcontext(),
                      DVCFS=SimpleNamespace(open=dvc_open),
-                     pyreadstat=SimpleNamespace(read_dta=decode)))
+                     pyreadstat=SimpleNamespace(read_dta=decode)), SCRIPTS / (script_name + '.py'))
     if decoder_failure:
         with pytest.raises(ValueError) as exc:
             fn('Malawi/2016-17/Data/Cross_Sectional/ag_mod_d.dta', columns)
