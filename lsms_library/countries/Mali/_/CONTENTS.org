@@ -2204,8 +2204,8 @@ invented/shared unknown identity or orphan representation; known household
 keys missing plot/v remain distinct. Native counts are not raw eligible-loss
 counts. Later Feature NULL reports are cumulative after expected-finalizer work.
 
-Cold naturally evicted the two mutable wave copies and rebuilt hashless country
-output; immutable operands/snapshots survive. Fresh warm restores the original
+Cold naturally evicted the two mutable wave copies, rejected and rebuilt the
+hashless compiler country output; immutable operands/snapshots survive. Fresh warm restores the original
 Wave loader WITHOUT entering it, observes exactly two selected cache getters,
 and preserves ONE country cache's full SHA/dev/inode/size/0600 mode/uid/nlink/
 mtime/ctime, current hash and all-four coverage. Atime is not measured. Named
