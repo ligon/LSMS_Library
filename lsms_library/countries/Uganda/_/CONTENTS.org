@@ -4722,3 +4722,63 @@ residuals; no full #1290, other-wave housing, sample, Make/backend or country
 closure follows. #1357 continues to exclude genuinely anonymous households from
 household-keyed tables; it supplies no new ID and does not equate those records
 with known-key housing observations lacking a validated link.
+
+* Seven-wave plot-input compiler runtime checkpoint (GH #1287, 2026-10-31)
+
+The unchanged =plot_inputs= country compiler ran through its actual Make target
+with seven verified receiving wave parquets. Normal Country, simultaneous
+read/grain strict, real Feature and fresh-process warm comparisons pass on
+84,351 rows. All 55 recorded typed predicates pass (43 mandatory, 12 diagnostic).
+Three old-constructor CALL and three RETURN/storage comparisons occur twice;
+excluding those six repeats leaves 49 distinct comparisons (40 mandatory,
+9 diagnostic), not 49 independent scientific oracles.
+
+Three 2009/2011/2013 inputs are historical direct constructor RETURNs, newly
+transported by the exact original source-anchored writer statement in THREE
+separate fresh processes. They are not old native STORAGE or three new native
+builds. Four original Make recipe interpreters for 2010/2015/2018/2019 each
+complete three full source-return roles despite =_try=: two saved numeric AG3A/B
+reader RETURNs and one new AG4A seed parse. Thus 12 successful roles comprise
+eight saved leaves and four new parses. No accepted source/sample cohort is
+replayed. Old source/custody and historical failed-actor/writer/resolver
+qualifications remain; no 2019 source-path repair was needed.
+
+Current finite source/sidecar/runtime compatibility and full typed before/after
+proof support seven owned receiving wave-footer constructions, not historical
+raw-build freshness. The actual compiler uses seven explicit =--old-file=
+prerequisites; original ordered policy STORAGE plus one Uganda local ID walk
+matches its CALL. Separate RETURN/storage comparisons pass. Immutable hashless
+compiler bytes survive before the normal API rebuild and are never manually
+country-stamped. Only instance sample lookup is supplied: the authenticated
+finalized 24,561-row sample is a fixed =v= lookup, not fresh sample, weight,
+cluster, membership or population acceptance. Existing-transform API/finalizer
+expectations establish composition; no new independent native scientific
+oracle or policy change is claimed.
+
+Actual grain evidence is captured before strict/Feature: process reports zero,
+raw footer =None=. The ordinary count zero / stamp-present false preserves that
+missing metadata; it is not an empty-list substitution or proof of no collapse.
+Strict returns normally with both original levers; no negative was suppressed.
+Fresh warm makes two selected country-cache getter calls and zero observed
+source/decoder/native/build/Wave/writer attempts. Eight physical cache snapshots,
+16 original/receiving inputs and source/manifest bindings close unchanged.
+Country footer hash and seven-wave coverage are checked separately; this is
+named-entrypoint/selected-file evidence, not universal IO or a directory census.
+
+All 13 phases exit zero with closed descendants; actual including inline export
+is 196.577 seconds. Final remote publication verification takes 197.655 seconds
+against its separate 180-second allowance: this deviation remains, even though
+final custody/publication completes. Commit time 165.333 seconds is not proof
+of push completion. No bound was widened and no actor retried. Slurm 40680991
+completes 0:0 / 9:29; final publication is =0993020d25cb31f8ca5a356793f1e432398c2268=.
+
+Executed =cdac4cc1e2d61a1b9671b644a6388e0b945732a3= has unchanged product bytes
+from =324b09384488da742c387a8a696e9ff963ccef9a=; dispatch
+=3b8b039d8ec742faacb5798c32494412=. Independent result review SHA256
+=392f6bd81c2817600cd15f229dde5375f25f126394efdf0bdc3795eeb160e90a=
+accepts the qualified cell. #1357's genuinely anonymous-household exclusion,
+the distinct recorded-household missing-plot/=v= boundary, selected-agriculture
+weights, EA/parish/refresh contradictions, #647/#1297 and #829 WAITING remain.
+No compiler inventory increment, other-cell or umbrella closure follows. See
+=.coder/ledger/1287-uganda-inputs-runtime-checkpoint.md= and
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1287-inputs-runtime-receipt-v1/REPORT.md=.
