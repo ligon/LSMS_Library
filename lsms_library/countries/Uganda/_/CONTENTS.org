@@ -4576,6 +4576,53 @@ Three-wave composed evidence and seven-driver source support do not establish
 all-seven-native or clean-cold Country closure. Independent reviews:
 =95ad63dd80b6= (source/failed arm), =b437ddf69f27= (continuation).
 
+* Seven-wave labor compiler runtime checkpoint (GH #1287, 2026-10-31)
+
+The unchanged country =plot_labor= compiler ran through its actual Make
+target with seven verified native prerequisites, serving 164,823 rows through
+normal Country, simultaneous read/grain strict mode, real Feature and fresh
+process warm Country/Feature. All 40 mandatory and six separately recorded
+RETURN/storage predicates passed, including full typed axes/unused levels,
+row order, nullable masks, ExtensionArray/nonmissing values and attrs.
+
+Only 2010-11, 2015-16, 2018-19 and 2019-20 ran new native scripts, in separate
+original Make recipe interpreters: eight numeric source returns/decodes, reused
+for the independent reported-cell/flag/position oracle. The other three native
+inputs retain the historical qualifications above: composed misdirected 2009
+storage, and prior same-process 2011/2013 execution. Seven explicit Make
+=--old-file= prerequisites prevent their replay. This is an actual seven-input
+compiler, not seven fresh native builds. Eligibility, known-plot max,
+=unknown_plot=/=labor_obs= and wage-only missing days remain unchanged.
+
+The finalized sample is an authenticated fixed =v= lookup, not a new sample or
+weight validation. Seven owned wave copies passed current source/sidecar/runtime
+compatibility and full typed before/after sanctioned footer construction;
+historical originals remained immutable. The hashless compiler parquet was
+saved before the normal API rebuild and was never stamped. Original Wave,
+aggregation, finalizer and country cache gates ran; only instance sample lookup
+was supplied. API/finalizer expectations establish existing-transform
+composition, not independent scientific validation of those transforms.
+
+Fresh warm made two selected country-cache getter calls with zero observed
+source/decoder/native/build/Wave/writer attempts. Eight selected caches and all
+12 original/receiving inputs preserved their closed identities. This is named
+Python-entrypoint/selected-file evidence, not a directory snapshot or universal
+IO measurement. All phases exited zero and descendants closed; actual plus
+inline export took 178.073 seconds. Earlier actor and source-assertion failures
+remain historical failures. #1357's anonymous-household exclusion, the distinct
+recorded-household missing-plot boundary, #647/#1297, #829 WAITING, sample/frame
+and 2019 weight/GPS caveats remain unchanged. The four new contributions contain
+zero eligible missing-household or missing-plot rows: this unit does not newly
+exercise either boundary; the earlier retained-wave evidence remains separate.
+
+Executed source =7d71ebaa12279c7f7371d5714b2bc159d85a2c06= has unchanged
+product bytes from =a54fc6d8eb699ca5a334635a3ae4f5827c144cff=; dispatch
+=4a55e14aecbd438395fde9ab2db5079b=. Independent result review SHA256
+=1b1112e8d395946f9e2be77047fe77a241c23e7b4c21430e64bb499e8a485c9d=
+accepts this qualified cell; no inventory count or umbrella closure follows. See
+=.coder/ledger/1287-uganda-labor-runtime-checkpoint.md= and the ordinary
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1287-labor-runtime-receipt-v1/REPORT.md=.
+
 * GH #771 -- ordinary nutrition requires the versioned FCT component (2026-10-30)
 
 Normal =nutrition.py= reads the existing =fct_usda.csv= and raises an
