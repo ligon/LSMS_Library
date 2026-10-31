@@ -5062,3 +5062,76 @@ population truth remain qualified. EA/parish/refresh, 2019 weights/GPS,
 #647/#1297/#829 WAITING and broader country/compiler work stay open.
 See =.coder/ledger/1287-uganda-shocks-runtime-checkpoint.md= and
 =slurm_logs/isa_recovery_2026-10-29/Uganda/1287-shocks-public-checkpoint/REPORT.md=.
+
+* 2026-10-31 -- Anthropometry fixed-STORAGE compiler/consumer checkpoint (GH #1287)
+
+The bounded seven-contributor unit is independently and root-qualified accepted.
+The original compiler, pinned default Country, first genuine Feature and fresh
+original warm each returned 29,553 rows. There are 23 passing comparisons:
+21 mandatory and two separately labelled prepared-RETURN/storage transport
+checks. These are custody/matching-stage composition checks, not independent
+raw/native body-measurement science or 23 native-science oracles.
+
+Seven historical native STORAGE files (484,139 bytes) and the same previously
+accepted 1376 finalized sample (2,452,938 bytes) were admitted and independently
+closed. The 24,561-row sample supplies only its fixed present-byte v lookup;
+no new sample production, weights, membership, frame, population or EA/parish
+truth follows. No raw/native/sample producer or original script-cache freshness
+was tested. All eight registered/requested wave hash and coverage keys remain;
+2005 has no declared native contribution, not a failed read or a new claim that
+the linked baseline instrument had no anthropometry content.
+
+Compiler ordered concat/Uganda-local ID walk once preserves =(t,i,pid)= and four
+fields. The framework instead follows original per-wave policy/replay/map/filter,
+generic raw walk/current finalization and the disclosed original-class fixed-v
+memo. The original enclosing Wave survives the selector-only fixed STORAGE seam.
+Anthropometry has no global canonical registration but still requires the original
+sample-v join. Matching compiler and finalized API stages are compared separately.
+Native and Country retain Weight/Height/MUAC/Age_months; only the original Feature
+adapter drops wholly missing MUAC. No actual frame is projected to conceal this.
+
+With both strict levers enabled once, the original required-column emitter raised
+an attributed =NullReadError= NEGATIVE, not strict PASS. Immediate actual reports
+were null=1/index=0/grain=0 and raw grain footer=None. Required Age_months remains
+all-missing in 2018/2019, not optionalized or filled; the earlier 2009 native also
+has one missing value, whose raw cause is not inferred here. Grain strict and
+later index completion remain unestablished after the first exception. Footer
+absence and matching frames are not universal losslessness or clinical validity.
+
+The existing =_anthro_num= masks all nonpositive values, including Age_months;
+its physical-measure rationale alone does not settle reported zero-month age.
+The helper prefers lying height and the most nonmissing duplicate, with unresolved
+ties; its Weight/Height-only keep prose differs from the literal MUAC-inclusive
+predicate (all current MUAC maps are None). Preserve these source rules. #1401
+remains open; no WHO/zscore/BMI, roster age/sex fill or new threshold is introduced.
+#1357 option 1 excludes genuinely anonymous household-keyed output without inferred
+holder-prefix/shared unknown IDs or orphan representation. Actual cold/warm i/v
+are complete; native diagnostics do not measure raw eligible loss or exercise an
+anonymous-source negative boundary. Known-HH missing village/plot is distinct.
+#1120 is closed for its approved scope; this checkpoint does not extend it.
+
+Predata proof installed but did not invoke the payload-dependent original-class
+sample factory; original/provider/restored registry/country/all-eight hashes agree.
+Each admitted genuine-instance hash was checked before target entry. All nine API
+cache slots were absent before cold; one current country cache was created and
+eight wave slots remained absent, not observed evictions. Fresh warm used two
+selected cache getters and zero named Wave/writer/source/build/sample fallbacks.
+Full cache bytes/epochs, current frozen-source hash and eight coverage keys close.
+
+V1's incorrect metadata receipt summary was held/unexecuted; V2 corrected only the
+reported required-column list before this one actor. Actual supervisor 276.580 s,
+separate export 28.748 s and OWN publication 8.064 s passed their bounded clocks.
+OWN begins observed successful receiver cleanup AFTER actual/export, through push
+and exact remote-ref verification, not inner actual exit. Root/peer authenticated
+archive =3105110a= (200 files / 51,371,299 bytes), full SHA/size/stable destination
+epochs without frame deserialization. Private =737b29fe=, scheduler completion
+and final platform success remain separately verified delivery facts.
+
+Scientific =d0acdf61= is deliberate. The 1,009 non-CONTENTS selected bindings match
+public =a7e1f606=; the sole selected CONTENTS difference is the preserved private
+plan note versus later public chronology, excluded from build fingerprints.
+No later-whole-code runtime/hash, historical decoder/image/full-epoch, freshness,
+source arithmetic, causal/panel/population or broader Uganda acceptance follows.
+EA/parish/refresh, 2019 weights/GPS, #647/#1297/#829 WAITING and #1401 remain.
+See =.coder/ledger/1287-uganda-anthropometry-runtime-checkpoint.md= and
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1287-anthropometry-public-checkpoint/REPORT.md=.
