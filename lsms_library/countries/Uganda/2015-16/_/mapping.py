@@ -52,16 +52,37 @@ def housing_ids(df):
     return pairs.set_index(['t', 'i'])
 
 
+def housing_ag_ids(df):
+    """Validate the recorded AG identity with the same primary-pair rules.
+
+    Ledger GH1290 §§2–4: this is an identity projection only. D1 independently
+    supplies sample membership; no agricultural location or weight is read here.
+    """
+    pairs = housing_ids(df.rename(columns={'_housing_AG_HHID': '_housing_HHID'}))
+    return pairs.rename(columns={'_housing_HHID': '_housing_AG_HHID'})
+
+
 def housing(df):
     """Re-key housing without changing payloads or guessing unmatched IDs.
 
-    The helper column is mandatory: a dropped secondary source must never
-    silently serve the former namespace. No sample/cluster inference here.
+    Both identity helper columns are mandatory: a dropped declared source
+    must never silently serve an incomplete bridge. No sample/cluster inference
+    here; conflicting recorded targets refuse before any fallback.
     """
-    if '_housing_HHID' not in df.columns:
+    if not {'_housing_HHID', '_housing_AG_HHID'} <= set(df.columns):
         raise ValueError('Uganda/2015-16 housing: required hh/HHID bridge unavailable')
     flat = df.reset_index()
     target = flat.pop('_housing_HHID')
+    alternate = flat.pop('_housing_AG_HHID')
+    # Ledger GH1290 §4: never override a recorded primary identity. Two
+    # conflicting recorded answers are not authority for choosing either one.
+    conflict = (target.notna() & alternate.notna()
+                & target.ne(alternate).fillna(False))
+    if conflict.any():
+        raise ValueError(
+            'Uganda/2015-16 housing: conflicting household/agriculture '
+            f'hh/HHID bridge ({int(conflict.sum())} rows)')
+    target = target.where(target.notna(), alternate)
     unresolved = target.isna()
     flat['i'] = flat['i'].where(unresolved, target)
     duplicate = flat.duplicated(['t', 'i'], keep=False)

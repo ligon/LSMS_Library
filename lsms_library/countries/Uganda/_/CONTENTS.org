@@ -4591,3 +4591,87 @@ no new Uganda actual nutrition or scientific-density acceptance is claimed.
 The approved #967 direction and separate #1000 source/density concerns
 remain as documented above. This does not repair every legacy metadata or
 Make/cache interaction.
+
+
+* 2015-16 housing: recorded agriculture identity fallback (GH #1290)
+
+Merged #1321 repaired =gsec9.hhid= through the household cover's =hh -> HHID=
+relation: 3,303 of 3,312 recorded housing rows found a unique cover identity.
+The retained nine-record diagnostic later found six exact =AGSEC1.hh -> HHID=
+pairs, each with one recorded target absent from =gsec1.HHID=; three keys occur
+in neither inspected AG identity column. All nine carry recorded keys and
+housing payloads. These are historical observations, not new acceptance counts.
+
+The earlier diagnostic's "No production AGSEC1 bridge, new sample membership"
+conclusion described its bounded scope. Later merged #1358 independently admits
+AGSEC1-only households to =sample= / =cluster_features= using their own recorded
+attributes and panel weight, with cross-sectional weight missing. That membership
+rule does not by itself establish a housing link: the recorded =hh/HHID= pair is
+the separate identity evidence. Agriculture remains a selected instrument subset.
+
+The housing declaration adds AGSEC1's =hh/HHID= projection as a third housing
+source. The household-cover target stays primary; an agreeing agricultural pair
+is harmless, while conflicting recorded targets refuse. Only a missing primary
+target can use the validated AG target. Both bridge projections must be present;
+ambiguous pairs and final key collisions refuse. No agricultural location or
+weight enters housing, no household is inserted, and Roof/Floor/order remain
+owned by the housing source. Unsupported recorded keys retain their warning and
+missing =v=; no approximate, prefix, neighbour or shared-unknown identity is made.
+
+Forty-three guarded invented-input checks passed on the unchanged product,
+including real Wave/Country/Feature machinery with invented source/sample
+leaves. A separate nullable-key control passed once; neither cohort was replayed
+for public extraction.
+
+The bounded actual source oracle now checks every household/AG relation:
+2,622 overlapping source keys and 2,620 overlapping housing rows have zero
+recorded-target disagreements. All 3,312 housing rows retain their payload and
+order; 3,303 use the primary bridge, six use the recorded AG fallback, and
+three keep unsupported recorded keys. Complete relation ambiguity/collision
+and source immutability gates passed. These are observed results, not fixed
+thresholds or an inference from six positive witnesses.
+
+Three mandatory full typed comparisons passed: independent source versus
+native writer CALL, prepared-wave composition versus country writer CALL,
+and source-bound prepared composition versus public Country. Both native
+and country RETURN/storage exact diagnostics also passed. YAML consumes the
+prepared writer RETURN; the public composition checks do not independently
+revalidate unchanged finalizer or cluster policy. Exactly six sanctioned
+source parses completed (three independent, three production), with matching
+reader-init/full-read/same-reader-label counts. No acquisition or sample rebuild
+was needed: the authenticated all-wave finalized sample from merged1358 is an
+explicit instance-only composed prerequisite, not a new sample-cache proof.
+
+The original actor then failed its blanket all-axis null assertion after
+saving a normal strict return. That failure is retained. A saved-output-only
+comparison subsequently establishes full typed equality of Country and strict
+return: both have zero nulls on declared =(t,i)= and three nulls on extra =v=.
+Housing has no canonical index entry, so its existing strict audit checks the
+declared axes rather than every carried axis. No null key was filled, household
+dropped or strict rule changed. Two diagnostic startup failures (an unrelated
+=!make= registry tag and missing genuine metadata-class imports) are retained
+separately from that eventual saved comparison.
+
+A separately reviewed finisher reuses five immutable saved inputs, including
+the exact two L2 files, with new receiving epochs and an explicitly NEW cache
+snapshot. It writes no cache, stamp or synthetic footer. The first genuine
+Feature call (including its normal internal Country read) passes the full typed
+source-carrier comparison; a fresh process passes exact Country and Feature
+warm comparisons on all 3,312 rows. Original expected/footer hash and requested
+wave coverage agree. Both caches retain bytes, mode and nanosecond mtime;
+all five originals/copies, source/manifest bindings and descendant closure pass.
+All seven source/parser/native/Wave/writer counters remain zero; the selected
+country-cache getter runs once in Feature and twice in warm. Permitted tracked
+FCT-CSV fingerprint reads are ordinary metadata, not source parses. This is not a directory snapshot or universal
+native/C-level IO proof. The finisher actor closes in 64.421 seconds without
+replaying the six-source cohort, first Country or strict getter.
+
+Independent source and saved-attribution reviews are =b37abd0db53b= and
+=2210285c12ba=; final finisher result review is 92cf30f63df1.
+Final publication is complete at =b4371cb3e829= (Slurm 40679579,
+COMPLETED 0:0 in 6:56). Original failed stages and the receiving-cache/sample
+composition remain part of the evidence. The three unsupported recorded keys remain producer-provenance
+residuals; no full #1290, other-wave housing, sample, Make/backend or country
+closure follows. #1357 continues to exclude genuinely anonymous households from
+household-keyed tables; it supplies no new ID and does not equate those records
+with known-key housing observations lacking a validated link.
