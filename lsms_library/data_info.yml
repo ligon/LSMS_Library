@@ -1008,6 +1008,19 @@ Columns:
         reading it as a harvest is a category error; the only sanctioned
         use is `Quantity * KgFactor` on the SAME row, which is what
         `harvest_kg` does.
+    KgFactor_sold:
+      type: float
+      optional: true
+      note: |
+        Reported kilograms per ONE sold unit on this row, distinct from the
+        harvest KgFactor and from a total sold kilogram amount. Never sum,
+        average or infer it from sale quantities or values. A producer that
+        folds rows must state its agreement policy. Mali's field-sale folds
+        require all reports to agree, including missingness; conflicting
+        factor cells remain NA with persistent audit, retaining quantity rows.
+        Tree total-equivalent fields are not per-unit factors. The existing
+        sold-quantity consumer screens supplied factors and retains its
+        Unit_sold/fallback/disagreement policy; wiring does not change it.
     Unit_sold:
       type: str
       optional: true

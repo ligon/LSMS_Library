@@ -81,7 +81,8 @@ def actor(request, tmp_path, monkeypatch):
     data = root / 'empty-data'
     data.mkdir()
     frames = {w: native_frame(table, w, n) for n, w in enumerate(CURRENT, 1)}
-    state = {'reads': [], 'writes': [], 'country': None, 'folders': {}, 'epochs': [], 'offered': {}}
+    state = {'reads': [], 'writes': [], 'grain_audits': [], 'country': None,
+             'folders': {}, 'epochs': [], 'offered': {}}
     monkeypatch.setenv('LSMS_COUNTRIES_ROOT', str(config))
     monkeypatch.setenv('LSMS_DATA_DIR', str(data))
     countries_root.cache_clear()
@@ -152,8 +153,9 @@ def actor(request, tmp_path, monkeypatch):
             raise value
         return value.copy(deep=True)
 
-    def writer(frame, target):
+    def writer(frame, target, *, grain_audit=None):
         state['writes'].append((frame.copy(deep=True), target))
+        state['grain_audits'].append(copy.deepcopy(grain_audit))
 
     monkeypatch.setattr(local_tools, 'get_dataframe', reader)
     monkeypatch.setattr(local_tools, 'to_parquet', writer)
@@ -194,6 +196,9 @@ def result(ctx, expected):
     country = state['country']
     assert state['reads'] == [country[w].wave_folder for w in expected]
     assert len(state['writes']) == 1
+    # Invented offered frames have no physical footer. The crop compiler still
+    # explicitly relays its empty audit; other compilers omit the argument.
+    assert state['grain_audits'] == ([[]] if table == 'crop_production' else [None])
     actual, target = state['writes'][0]
     reference = pd.concat([frames[w] for w in expected])
     assert_frame_equal(actual, reference, check_exact=True)

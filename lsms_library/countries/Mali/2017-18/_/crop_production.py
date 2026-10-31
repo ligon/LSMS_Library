@@ -76,6 +76,8 @@ sys.path.append('../../_/')
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library.build_transforms import reduce_to_agreed
+from lsms_library.country import grain_reports
 from mali import (i as mali_i, crop_production_finalize, producing_trees,
                   tree_crop_rows, stamp_tree_derivations)
 
@@ -122,11 +124,14 @@ sold = pd.DataFrame({
     'Quantity_sold': pd.to_numeric(s7g['s7gq21a'], errors='coerce'),
     # The SOLD unit, decoded from s7gq21b's own labels (GH #824).
     'Unit_sold': s7g['s7gq21b'].astype('string'),
+    # FIELD kg per sold unit; do not map the tree total-equivalent field.
+    'KgFactor_sold': pd.to_numeric(s7g['s7gq21d'], errors='coerce'),
     'Value_sold': pd.to_numeric(s7g['s7gq22'], errors='coerce'),
 })
 not_sold = s7g['s7gq20'].astype('string').str.strip().eq('Non')
 sold.loc[not_sold, ['Quantity_sold', 'Value_sold']] = 0
 sold.loc[not_sold, 'Unit_sold'] = pd.NA   # a filled-in 0 has no unit
+sold.loc[not_sold, 'KgFactor_sold'] = pd.NA
 # One sale record per (household, crop, SOLD UNIT) -- never a sum across
 # units (Niger 2021-22).  dropna=False keeps an unrecorded unit as its own
 # key.  sum(min_count=1), vectorised (no per-group callable: pandas
@@ -134,8 +139,16 @@ sold.loc[not_sold, 'Unit_sold'] = pd.NA   # a filled-in 0 has no unit
 # stays NA rather than becoming 0 -- the 0 above is filled only on an
 # explicit s7gq20 == 'Non' (ruling 2026-10-23; #1250 / #1253 / #1263).
 # s7g has one row per (household, crop), so each group is one row.
+# Reuse the explicit factor-only agreement policy (ledger #824 §2/4).
+# A missing report conflicts with a populated one; keep existing amounts.
+agreed_factor = reduce_to_agreed(
+    sold.set_index(['i', 'crop', 'Unit_sold'])[['KgFactor_sold']],
+    on_conflict='na', na_is_conflict=True,
+    country='Mali', table='crop_production', wave=WAVE)
 sold = (sold.groupby(['i', 'crop', 'Unit_sold'], dropna=False)
-        [['Quantity_sold', 'Value_sold']].sum(min_count=1).reset_index())
+        [['Quantity_sold', 'Value_sold']].sum(min_count=1))
+sold['KgFactor_sold'] = agreed_factor['KgFactor_sold'].reindex(sold.index)
+sold = sold.reset_index()
 # ...and attributed only to a (household, crop) sold in ONE unit (a second
 # unit would duplicate the plot-crop row).  Measured: none sells in two.
 units_per = sold.groupby(['i', 'crop']).size()
@@ -150,7 +163,7 @@ seasonal = seasonal.drop(columns=['Quantity_sold', 'Unit_sold', 'Value_sold']).m
     sold, on=['i', 'crop'], how='left')
 # blank out sold where the crop spans >1 plot (cannot place at plot grain)
 multi = seasonal['nplots'].fillna(0) > 1
-seasonal.loc[multi, ['Quantity_sold', 'Unit_sold', 'Value_sold']] = pd.NA
+seasonal.loc[multi, ['Quantity_sold', 'Unit_sold', 'KgFactor_sold', 'Value_sold']] = pd.NA
 seasonal = seasonal.drop(columns=['nplots'])
 
 # --- planting month from cultivation roster (s11c) ---
@@ -203,4 +216,5 @@ df['Derivation'] = stamp_tree_derivations(df)
 assert len(df) > 0, "crop_production 2017-18 produced no rows"
 assert df.index.is_unique, "Non-unique (t, i, plot, crop) in crop_production 2017-18"
 
-to_parquet(df, 'crop_production.parquet')
+to_parquet(df, 'crop_production.parquet',
+           grain_audit=grain_reports('Mali', 'crop_production'))

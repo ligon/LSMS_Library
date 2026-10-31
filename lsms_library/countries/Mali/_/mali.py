@@ -5,6 +5,7 @@ import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.transformations import U_UNKNOWN
 from lsms_library.derivations import MULTI_SEP
+from lsms_library.build_transforms import reduce_to_agreed
 from collections import defaultdict
 
 def i(value):
@@ -683,7 +684,8 @@ def crop_production_finalize(df):
     Expects raw columns already assembled:
         t, i, plot, crop (decoded), u (decoded), Quantity, Quantity_sold,
         Value_sold, planting_month, harvest_month, intercropped, perennial,
-    and optionally Unit_sold (decoded sold unit) and months_harvested.
+    and optionally Unit_sold (decoded sold unit), KgFactor_sold (reported
+    FIELD kg per sold unit) and months_harvested.
     Maps crop/unit labels -- the sold unit through the SAME ``u`` table as
     the harvest unit (GH #824) -- coerces dtypes, sets the (t, i, plot, crop)
     index, and collapses exact-duplicate index rows (a crop reported on the
@@ -704,6 +706,9 @@ def crop_production_finalize(df):
     if 'Unit_sold' not in df.columns:
         df['Unit_sold'] = pd.NA
     df['Unit_sold'] = _unit_labels(df['Unit_sold'])
+    if 'KgFactor_sold' not in df.columns:
+        df['KgFactor_sold'] = pd.NA
+    df['KgFactor_sold'] = pd.to_numeric(df['KgFactor_sold'], errors='coerce')
     if 'months_harvested' not in df.columns:
         df['months_harvested'] = pd.NA
     df['months_harvested'] = pd.to_numeric(
@@ -749,6 +754,13 @@ def crop_production_finalize(df):
     # Positional (same groupby, same order): a NaN plot_id key makes label
     # alignment of the two results fragile.
     mixed_sold_unit = (g['Unit_sold'].nunique() > 1).to_numpy()
+    # Factor-only exact agreement at the existing grain; never sum, weight,
+    # choose a non-null winner or discard quantity rows (ledger #824 §2/4).
+    # The original reducer infers this native wave from the single t index.
+    agreed_factor = reduce_to_agreed(
+        df.set_index(keys)[['KgFactor_sold']],
+        on_conflict='na', na_is_conflict=True,
+        country='Mali', table='crop_production')
     out = pd.DataFrame({
         'Quantity':       g['Quantity'].sum(min_count=1),
         'Quantity_sold':  g['Quantity_sold'].sum(min_count=1).mask(mixed_sold_unit),
@@ -762,7 +774,9 @@ def crop_production_finalize(df):
         'perennial':      g['perennial'].max(),
     })
     out['Unit_sold'] = out['Unit_sold'].astype('string')
-    out = out[['Quantity', 'u', 'Quantity_sold', 'Unit_sold', 'Value_sold',
+    out['KgFactor_sold'] = (agreed_factor['KgFactor_sold'].reindex(out.index)
+                            .mask(mixed_sold_unit))
+    out = out[['Quantity', 'u', 'Quantity_sold', 'Unit_sold', 'KgFactor_sold', 'Value_sold',
                'months_harvested', 'planting_month', 'harvest_month',
                'intercropped', 'perennial']]
     return out.sort_index()
