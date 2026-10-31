@@ -2069,3 +2069,65 @@ independent result review SHA256
 changes no product, test or compiler inventory. Ordinary pins and limits:
 =slurm_logs/isa_recovery_2026-10-29/Mali/1287-labor-runtime-receipt-v1/REPORT.md=;
 ledger =.coder/ledger/1287-mali-labor-runtime-checkpoint.md=.
+
+* 2026-10-31 -- Actual plot_inputs compiler checkpoint (GH #1287)
+
+At product =5c98f643=, the existing full VAR Make chain ran two unchanged
+EAC-I native producers and the country compiler. Six default-labelled logical
+getter roles comprise five fresh parses and one admitted saved 2017 full
+labelled reader RETURN. Five new source objects total 27,760,678 bytes.
+The compiler reads both native policy outputs in order and concatenates them
+without a compiler ID walk. Parser dimensions are not native output counts
+or eligible-payload loss measurements.
+
+Eleven pipeline comparisons pass: seven mandatory and four RETURN/storage
+diagnostics. A separate mandatory saved-template immutability check also passes;
+it is custody evidence, not an independent scientific native oracle. Full
+Country, simultaneous read/grain strict, real Feature and fresh-process warm
+Country/Feature each measure 179,817 rows. Four requested-wave coverage keys
+include two undeclared EHCVM noncontributors, not four native productions.
+
+Cold uses a disclosed truthful-parquet native policy leaf preserving the exact
+Wave map/check-t/filter tail, current raw-once walk, aggregation and finalizer.
+Independent writer-CALL composition and complete typed comparisons cover axes,
+order, dtypes, extension values, missing masks, exact nonmissing values and attrs.
+The same finalized sample is only a fixed authenticated present-byte v lookup;
+its original export hash is unavailable. No sample/weight rebuild, truth,
+historical freshness/custody upgrade or inferred v follows. The saved reader's
+individual completion does not upgrade its failed/incomplete parent baseline.
+
+Actual Country null/grain reports are empty before expected composition, while
+the raw grain footer is absent (=None=), not an empty stamped audit. Later
+Feature null reports are explicitly cumulative after an expected-finalizer
+prepass. Strict PASS and empty reports do not establish universal losslessness,
+source-row conservation or independent validity of unchanged native reducers.
+Required =Applied=, recorded zeros and separate Oui/Non question rows, Unknown
+units, nonseed marker and recorded seed labels remain unchanged. The earlier
+open zero-row question is resolved by the explicit dated decision above.
+The [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 ruling]]
+continues excluding genuinely anonymous households; recorded household keys
+missing plot/v are distinct, and raw counts are not eligible-loss counts.
+
+Cold naturally rebuilt hashless country output and evicted the two mutable
+wave copies; immutable snapshots survive. Fresh warm restored the original
+Wave loader without entering it and preserved ONE country cache's SHA,
+dev/inode/size/mtime/ctime and 0600 mode, current hash and all-four-wave coverage.
+Atime and a warm getter scalar were not measured. Named raw/native/Make/writer
+refusals and empty denial reports are not universal kernel IO observations.
+Normal raw/sample and Make-backend API/incremental freshness remain untested.
+
+The V2 attempt failed before setup/project/payload on missing runtime metadata;
+its failure and reviewer miss remain recorded. V3 admitted the complete approved
+runtime contract and 3.11 AST protocol before project/payload. Actual and export
+closed successfully: outer 238.323 seconds and export 5.809, no timeout/signals,
+ECHILD, source/input closure true. Root authenticated 85 closed files /
+197,609,563 bytes. Separate platform delivery succeeded with task completed,
+native/supervisor zero and publication complete without errors; the named Git
+ref remains =5c98f643= because no worker source/evidence commit was made.
+Slurm 40683300 completed 0:0 / 8:40. Compliance with the separate 180-second
+publication elapsed bound is UNESTABLISHED, not PASS or a measured overrun.
+No replay is justified to manufacture the missing timing receipt.
+
+Other Mali cells and the fourteen-country #1287 scope remain open. Exact pins,
+stage counts and accepted limits are in
+=slurm_logs/isa_recovery_2026-10-29/Mali/1287-plot-inputs-runtime-receipt-v1/REPORT.md=.
