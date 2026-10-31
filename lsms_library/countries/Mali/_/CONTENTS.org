@@ -2218,12 +2218,16 @@ A direct OS exec of the unchanged non-executable wrapper failed126 before any
 receiver entered; Bash then entered it once, with no receiver/actual/producer/
 compiler replay. Actual175.449846s and separate export9.137540s closed, with no
 timeout/signals, ECHILD and source/input/cache closure. Root authenticated109
-closed files/45,427,486B. Explicit observed actual leader exit BEFORE cleanup/
+closed files/45,427,486B. Archived OUTER is a pre-export snapshot; final ordinary
+receipts establish completed export/descendant closure. Explicit observed actual
+leader exit BEFORE cleanup/
 export through push and exact remote-ref verification measures15.895427s within
 the SAME180-second publication clock; no export-end reset or mtime proxy.
 Private publication is =f7f2c363dd2c1576a52c49e439ab11fab0fea90a=;
 Slurm40692810 completed0:0/9:23. Platform/publication success is separate from
-scientific acceptance. This draft awaits coordinator result acceptance and
-changes no public inventory or umbrella disposition. Other cells, including
-=people_last7days=, remain outside its scope. Pins and qualifications:
+scientific acceptance. Root accepted this qualified result after independent
+review =62fa1bd1=; platform succeeded0/publication complete was separately
+authenticated. This checkpoint changes no public inventory before reviewed
+integration or umbrella disposition. Other cells, including =people_last7days=,
+remain outside its scope. Pins and qualifications:
 =slurm_logs/isa_recovery_2026-10-29/Mali/1287-livestock-runtime-receipt-v1/REPORT.md=.

@@ -1,6 +1,6 @@
 # Mali livestock compiler/current-consumer checkpoint
 
-Draft pending coordinator acceptance of the independent result review. This
+Root accepted the bounded result after the independent review cited below. This
 three-document extraction on public `c53624711b9269ed09c978d3ccd5e7ac3a810c60` changes no product,
 parser, schema, test, payload or public inventory. No data or actor was replayed.
 It records scientific source `b06abb5d5d2f8778bf28d03638ab6ed351aa78c6`, exact toolkit
@@ -91,6 +91,9 @@ replayed and no operator mode/source was changed. The worker's longer metadata
 REPORT supplements the frozen publisher's brief text after publication; it is
 outside the final private commit/archive, and was not manually republished.
 The committed earlier receiver snapshot is not the terminal receiver authority.
+Archived OUTER likewise records the pre-export state; final ordinary OUTER and
+receiver show completed export0/closed/ECHILD and manifest promotion. These are
+ordered snapshots, not evidence that a child was left live.
 
 Admission had 1,619.915 conservative scheduler seconds remaining against 640 required.
 Controller actual 175.449846 seconds; outer actual 175.796757 seconds within 360+5; separate export
@@ -106,10 +109,19 @@ export plus ALL publisher work through exact push/remote-ref verification consum
 not an after-export reset or reconstructed receiptmtime. Published private head
 `f7f2c363dd2c1576a52c49e439ab11fab0fea90a` matches the named result ref; native/
 supervisor/receiver/publisher return 0 and task completes. Root separately reports
-Slurm 40692810 COMPLETED 0:0 / 9:23. Delivery/platform success does not itself establish
-scientific acceptance.
+Slurm 40692810 COMPLETED 0:0 / 9:23. Final platform state succeeded with exit0
+and publication complete; root authenticated27ordinary files/85,297B separately.
+Delivery/platform success does not itself establish scientific acceptance.
 
 Other cells including people_last7days and all fourteen countries of #1287 remain
 separate. Existing public planning inventory 49 qualified / 13 remaining is not changed
-by this draft; root owns qualified narrowing after acceptance/integration. No
+by this checkpoint before reviewed integration; root owns qualified narrowing.
+Projected qualified integration is50/12 with Mali people_last7days remaining,
+not the current public state. No
 umbrella closure, universal losslessness or native science claim follows.
+
+Independent result review SHA:
+`62fa1bd10b46b24e34a23886a865eec42ba9eb096c7109bd98f418472e5d77ee`;
+root qualified acceptance SHA:
+`aad480f178fb3a22d26779a22d37a04d4a365aff4d090659a3e81b4306ec48af`.
+Both preserve all source/native/strict/cache/timing qualifications above.
