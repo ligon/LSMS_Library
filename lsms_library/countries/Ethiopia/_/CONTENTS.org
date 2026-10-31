@@ -3815,3 +3815,49 @@ See =.coder/ledger/1287-ethiopia-community-prices-runtime-checkpoint.md= and
 Peer review =149d1dc3= and root acceptance =da70b031= retain the source/science
 limits in the linked report. No inventory increment precedes documentation
 integration, and other cells and the umbrella remain open.
+
+* Five-wave people-last7days compiler checkpoint (GH #1287, 2026-10-31)
+
+Independent qualified result review and root acceptance support this bounded
+checkpoint; reviewed documentation integration is pending. Five historical native
+STORAGE contributions reached the actual original compiler, default Country,
+one simultaneous read/grain-strict Country call, first genuine canonical Feature
+and fresh original Country/Feature warm:118,233 rows in each matching-stage
+comparison. All23 mandatory comparisons (including five raw-footer comparisons
+and one fixed-sample custody comparison) and two transport diagnostics passed.
+This does not validate current raw/native/sample arithmetic or original freshness.
+
+The original CONFIG-relative compiler performs one DEFAULT-state postconcat
+ID walk. The composed API retains original per-wave RAW-state Wave policy,
+map/filter/replay, with only script-freshness selection supplied; the original
+selector is restored before strict and first Feature. The compiler docstring's
+"id_walk is idempotent" remains in tension with the current helper's explicit
+"A single-pass rename is NOT idempotent when a map has such chains". These
+matching-stage routes are kept distinct, with no flag reset or forced second walk.
+
+The same full finalized D1 sample (26,130 rows) is supplied through a disclosed
+original-class no-argument full-frame-copy callback for =v= lookup only. It is
+not a sample producer, membership/weight/population oracle or fresh lookup claim.
+All eight declared native payloads remain. Missing hours/industry and original
+activity/industry/working-age/first-duplicate semantics remain; both strict levers
+passing does not imply every value is nonmissing or general losslessness.
+
+All six API cache slots were absent before cold; cold creates only the country
+slot and five wave slots remain absent. No wave eviction is claimed. Fresh warm
+uses exactly two country-cache getters, zero Wave/writer/build/source fallback,
+and preserves the full country snapshot/current hash/all-five coverage. Actual
+null/index/grain audits were empty before the oracle; raw grain footer is =None=,
+not an asserted empty list or universal no-loss proof. Existing cluster-identity
+and population-heterogeneity warnings remain.
+
+Panel I versus II, urban refresh/frame/EA/weight/Tigray and W2/W3
+=household_id2=/=individual_id2= caveats remain. Actual household =i= has zero
+missing values under the #1357 exclusion ruling; this is not an anonymous-source
+boundary or eligible-loss census. No invented/shared-unknown household or orphan
+representation is added; known households missing village/plot remain distinct.
+#1120's separately completed approved scope is not extended.
+
+See =.coder/ledger/1287-ethiopia-people-runtime-checkpoint.md= and
+=slurm_logs/isa_recovery_2026-10-29/Ethiopia/1287-people-public-checkpoint/REPORT.md=.
+No inventory credit precedes reviewed merge. Other cells
+and the #1287 umbrella remain open.
