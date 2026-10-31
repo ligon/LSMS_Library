@@ -4662,3 +4662,77 @@ remaining driver AST is unchanged apart from the import. This is source and
 inert-control verification, not a new survey/native/API result or a measured
 speedup. The old DVC index overhead diagnosis remains attributed to its
 original =plot_inputs= run. Current seven-compiler acceptance is separate.
+
+* 2026-10-31 -- Remaining seven compiler runtime checkpoints (GH #1287)
+
+At executed source =c7666ca3=, all 27 selected native producers and the seven
+country compilers completed across closed, non-repeated stages: =livestock=,
+=months_food_inadequate=, =food_coping=, =anthropometry=,
+=people_last7days=, =plot_features= and =community_prices=. Each real compiler
+read every declared contribution in order; untouched writer CALL matched their
+ordered policy-read concat, and prepared RETURN matched sanctioned storage.
+The earlier =plot_inputs=, =plot_labor= and =crop_production= checkpoints retain
+their own scope. No producer, reducer, eligibility, namespace, factor or unit
+policy changes in this documentation.
+
+The raw boundary is explicit: 43 new reader/kwargs roles, five closed full
+numeric Module D replies, and four same-role household-H memo returns supplied
+52 logical requests. The 2016 cross-sectional D2 labor capture was rejected:
+six requested fields, including four plot payload fields, were absent from its
+87 returned columns. The current nine-column restricted reader ran instead.
+Native =ag_d02= still denotes respondent identity, not 2016 tenure. No source
+acquisition or reparse of completed roles was used to finish later stages.
+
+| table                  | Finalized Country and Feature rows |
+|------------------------+------------------------------------|
+| livestock              |                             39,126 |
+| months_food_inadequate  |                             40,152 |
+| food_coping            |                            200,738 |
+| anthropometry          |                             31,038 |
+| people_last7days       |                            207,713 |
+| plot_features          |                             68,339 |
+| community_prices       |                             82,635 |
+
+These are table rows, not population or physical-entity counts. All seven
+Country/real singleton Feature pairs and all seven full fresh-process warm
+pairs now have strict typed axes/order/payload/masks/attrs evidence. The last
+finish evaluated 34 new comparisons: 29 mandatory and five strict transport
+predicates. Its child receipts, not the empty parent =checks[]= field, are the
+authority. Seven copied prior API checks are inherited; the saved-only months
+Feature comparison is separate, not a new real Feature call.
+
+Two harness failures remain failed. The initial absolute =plot_features=
+data-root Make target had no rule after 20 completed natives. Existing relative
+=../<wave>/_/plot_features.parquet= and country =plot_features.parquet= generic
+rules subsequently ran the seven pending producers and compiler; the missing
+explicit data-root/VAR rules were not repaired. Later an expected-Feature helper
+unconditionally assigned canonical names although unregistered tables return an
+empty canonical list. The actual Feature was already saved. The helper adopted
+production's depth-equality condition, and its strict saved comparison passed
+40,152 rows. Neither actual data nor global schema was reshaped to pass.
+
+API validation is default-country composition over immutable native policy/
+footer witnesses and a source-compatible, already-finalized sample-v lookup.
+Actual aggregation, writes, finalization and Feature execute; it is not fresh
+normal raw/native/sample/weight acceptance or =LSMS_BUILD_BACKEND=make= API
+proof. Cold uses a truthful parquet-origin leaf with the original wave map/t
+filter. A separate metadata-only probe found original/leaf/restored hashes equal
+for all seven tables. Warm leaves the original wave loader untouched, refuses
+native/raw fallback and writer entry, and permits only the selected country
+cache read. All seven warm cache byte/epoch snapshots remained unchanged.
+
+Original compiler parquets began hashless. The five pending receiving copies
+rebuilt naturally in the final finish; livestock and months receiving caches
+were already stamped by their earlier accepted cold pairs. No manual stamp or
+assumed-fresh override was used. All 95 retained
+inputs closed unchanged. The final actual took 444.117 seconds (outer 445.060),
+export 16.621 seconds; both closed to ECHILD without timeout/signals. Its closed
+private archive has 192 files / 335,406,475 bytes, including immutable original
+var snapshots and completed returns. The native/compiler stages and original
+failures were preserved without replay.
+
+This advances the seven Malawi runtime cells, not independent scientific
+validation or whole #1287/#1288 closure. The 2004 and 2016 community skips are
+current declaration facts, not whole-instrument absence findings. #1278, #1190,
+#1228 and #1174 remain separate. Evidence and precise source/publication pins:
+=slurm_logs/isa_recovery_2026-10-29/Malawi/1287-seven-runtime-receipt-v1/REPORT.md=.
