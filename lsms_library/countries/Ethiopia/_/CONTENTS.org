@@ -3861,3 +3861,49 @@ See =.coder/ledger/1287-ethiopia-people-runtime-checkpoint.md= and
 =slurm_logs/isa_recovery_2026-10-29/Ethiopia/1287-people-public-checkpoint/REPORT.md=.
 No inventory credit precedes reviewed merge. Other cells
 and the #1287 umbrella remain open.
+
+* Five-wave anthropometry compiler checkpoint (GH #1287, 2026-10-31)
+
+Independent qualified result review and root acceptance support this bounded
+checkpoint, pending reviewed documentation integration. Ordinary receipts report five
+historical native STORAGE contributions through the real original compiler,
+default Country, one simultaneous strict call, first genuine no-canonical Feature
+and fresh original Country/Feature warm: 18,764 rows, 23 mandatory comparisons
+and two transport diagnostics passed. This does not establish raw/native/sample
+arithmetic, original freshness or clinical/population eligibility.
+
+The compiler performs one DEFAULT-state postconcat ID walk; original API Wave
+policy/replay/RAW-state maps/filtering remain, with only the script-freshness
+selection leaf supplied and restored before strict/Feature. The same full
+finalized D1 sample (26,130 lookup rows) supplies required v via an original-class
+no-argument deep-copy callback, without a v-memo shortcut or sample truth claim.
+Country keeps Weight, Height, MUAC, Age_months and Sex. MUAC is optional/all missing
+in these adopted natives; original Feature may drop that all-missing column.
+No canonical registration, filled measure, WHO/z-score or clinical transform is added.
+
+Original height masking, missing-years-only month fallback, zero/nonpositive ages
+and first-duplicate choices remain. W3 nonunderscore age fields and W4/W5 current
+body-measure versus older fertilizer-field hazards remain distinct. No Uganda
+#1401 ruling transfers. Both strict levers report PASS at declared t,i,pid;
+this is not an actual-v completeness gate. Actual i missing count is zero, under
+existing #1357 genuine missing-HH exclusion, not an anonymous-source or eligible
+loss test. No invented/shared unknown household or orphan representation is added.
+
+All six API slots start absent; cold creates only country and five wave slots
+remain absent, with no observed wave evictions. Warm records two selected getters,
+zero named fallback and unchanged cache snapshots/current hash/all-five coverage.
+Actual audits are empty before expected finalization; raw grain metadata is None,
+not proof of universal losslessness. Cluster, UserWarning and population warnings
+remain. Panel I/II, W2/W3 keys, frame/EA/Tigray/weight and #1120 boundaries remain.
+
+Held V1 and the intermediate source never ran; V2 independently closes reached
+original/copy input and receiving-metadata pairs without hashing/promoting partials.
+Actual controller 223.281 seconds and export 28.172 seconds are distinct from OWN
+publication 12.272 seconds after receiver/export descendant cleanup to remote
+verification. Archive 182 files / 56,182,359 bytes, manifest ad124f0c; private
+published head 11ee423d. Scheduler/platform success does not establish acceptance.
+See =.coder/ledger/1287-ethiopia-anthropometry-runtime-checkpoint.md= and
+=slurm_logs/isa_recovery_2026-10-29/Ethiopia/1287-anthropometry-public-checkpoint/REPORT.md=.
+Result review =1c2a8ac6= and root acceptance =cf21eec6= retain the linked scope
+and limitations. No inventory credit precedes reviewed docs merge; other country
+cells and #1287 remain open. All earlier CONTENTS bytes are retained.
