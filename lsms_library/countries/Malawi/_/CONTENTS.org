@@ -4721,8 +4721,10 @@ for all seven tables. Warm leaves the original wave loader untouched, refuses
 native/raw fallback and writer entry, and permits only the selected country
 cache read. All seven warm cache byte/epoch snapshots remained unchanged.
 
-Original compiler parquets began hashless and rebuilt naturally through the
-default API; no manual stamp or assumed-fresh override was used. All 95 retained
+Original compiler parquets began hashless. The five pending receiving copies
+rebuilt naturally in the final finish; livestock and months receiving caches
+were already stamped by their earlier accepted cold pairs. No manual stamp or
+assumed-fresh override was used. All 95 retained
 inputs closed unchanged. The final actual took 444.117 seconds (outer 445.060),
 export 16.621 seconds; both closed to ECHILD without timeout/signals. Its closed
 private archive has 192 files / 335,406,475 bytes, including immutable original
