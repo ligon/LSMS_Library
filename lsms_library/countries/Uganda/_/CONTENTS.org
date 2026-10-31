@@ -5033,7 +5033,8 @@ Actual household =i= is complete in cold/warm. #1357 option 1 still excludes
 truly anonymous household-keyed records: no inferred holder-prefix/shared unknown
 household or orphan representation. Native stage diagnostics do not measure raw
 eligible loss; known-HH missing village/plot and missing shock category remain
-distinct. This does not settle #1120 or newly test raw anonymous-source exclusion.
+distinct. GH #1120 is closed for its separately completed approved scope; this checkpoint
+does not extend that scope or newly test raw anonymous-source exclusion.
 
 Both prior failures remain preserved: original third-size gate before copying
 that native, and first continuation's overstrong global UID-map guard before any
