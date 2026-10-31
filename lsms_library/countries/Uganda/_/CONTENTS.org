@@ -4782,3 +4782,68 @@ weights, EA/parish/refresh contradictions, #647/#1297 and #829 WAITING remain.
 No compiler inventory increment, other-cell or umbrella closure follows. See
 =.coder/ledger/1287-uganda-inputs-runtime-checkpoint.md= and
 =slurm_logs/isa_recovery_2026-10-29/Uganda/1287-inputs-runtime-receipt-v1/REPORT.md=.
+
+* Five-contributor food-inadequacy compiler checkpoint (GH #1287, 2026-10-31)
+
+The unchanged =months_food_inadequate= country compiler ran through its actual
+Make target over five native contributions. Normal Country, real Feature and
+fresh-process Country/Feature warm each explicitly serve 14,796 rows from
+2009-10, 2010-11, 2011-12, 2013-14 and 2015-16. These are five declared
+contributors among eight registered waves, not eight observed contributions.
+All 33 labelled full typed comparisons pass: 26 mandatory and seven separate
+RETURN/storage diagnostics. They are stage/source/custody/composition checks,
+not 33 independent scientific oracles; the strict negative below is not a pass.
+
+Five separate original Make-native interpreters complete eight full categorical
+source-reader RETURNs, with eight full Stata read/init/label lifecycles, eight
+cp1252 hook calls and no extra initialization or fallback. Captured replies
+support the independent literal source oracle without a second raw cohort.
+2009 counts distinct per-character A-L and applies No => 0; 2010 retains Int64
+=NA= even for No, because only the binary item is wired. Later waves sum Yes
+ROWS, not distinct month names, retaining original all-missing sum/fill-zero and
+No => 0. Existing binary-answer eligibility and literal native household-ID
+rendering remain. #1291's earlier ID-only API evidence is retained history,
+not a native reconstruction or a hard-coded row threshold.
+
+Actual Country and immediate actual null/grain reports precede expected
+finalization: the grain ledger resets per load, but the null-content ledger
+does not. Pure current audit/source/original-message attribution establishes
+one required-column =MonthsInadequate= all-null report for 2010-11. The ONE
+getter with both strict levers raises =NullReadError=, saved before attribution:
+=strict_passed=False=. Grain strict remains unestablished and index completion
+is not promoted from that negative. No optionality, fill/drop, warning or schema
+suppression, invented duration or extra disabled-lever getter was used. Actual
+grain reports are zero and raw grain footer is =None=; missing metadata is not
+an empty-list substitution or proof of no collapse.
+
+The finalized 24,561-row sample is only the disclosed fixed =v= lookup, not new
+sample/weight/eligibility/cluster truth. Five NEW owned wave constructions have
+source/CALL/storage and full typed before/after current-hash proof; this is not
+historical cache freshness. The actual compiler uses five =--old-file=
+prerequisites, ordered policy storage, one local ID walk and original casts.
+Hashless pre-API compiler bytes remain preserved and never manually stamped.
+Existing-transform public/Feature expectations prove composition, not independent
+finalizer science. The Make-backend API route remains separate from direct Make.
+
+Fresh warm makes two selected country-cache getter calls and zero observed
+source/parser/native/build/Wave/writer attempts. Six physical caches, all nine
+original/receiving inputs and source/manifest bindings close unchanged. Current
+country hash and five-wave coverage are checked separately; these are named
+entrypoints/selected files, not a universal IO or directory census. Every new
+binary-source cohort has zero eligible raw/formatted missing household IDs:
+#1357's anonymous-household exclusion is not newly exercised by this zero count.
+Known household keys missing =v=/plot remain distinct; no identity or eligibility
+is inferred. EA/parish, refresh/2019 weights/GPS, #647/#1297 and #829 WAITING
+qualifications remain.
+
+All 11 phases exit zero with closed descendants; actual plus inline export is
+150.555 seconds. Remote publication verifies in 79.681 seconds within its
+180-second allowance. Slurm 40682422 completes 0:0 / 7:30; final publication is
+=d6f8de7e43caf92e14539d3bbdc124a298f3d3b6=. Executed source
+=d1f4662e8c6444fed58dc09593c8b5f36fa8642e= preserves product
+=0bfca3e9f8e8c2e5cc1548d566e5dd423cf69cd2=; dispatch
+=c83db82b676d4a2cb338fe3a937a1ee0=. Independent result review SHA256
+=2bca6fcdd8c5445aaa95e32fd49a5ef65079cb4e518c488beadb999af8be59d3=
+accepts this qualified cell, without inventory or umbrella closure. See
+=.coder/ledger/1287-uganda-months-runtime-checkpoint.md= and
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1287-months-runtime-receipt-v1/REPORT.md=.
