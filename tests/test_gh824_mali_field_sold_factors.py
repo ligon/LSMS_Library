@@ -25,6 +25,22 @@ COUNTRY = Path(M.__file__).resolve().parents[1]
 KEY = ('Mali', 'crop_production')
 
 
+def assert_exact_legacy_frame(actual, expected):
+    """Check pandas metadata plus exact masks and nonmissing scalar values.
+
+    pandas' frame check alone is not a universal float-exactness oracle. The
+    object conversion here preserves scalar integers/floats, including EAs;
+    masks are checked separately before any missing value is excluded.
+    """
+    pd.testing.assert_frame_equal(actual, expected, check_exact=True)
+    for column in actual.columns:
+        left, right = actual[column], expected[column]
+        left_na, right_na = left.isna().to_numpy(), right.isna().to_numpy()
+        assert np.array_equal(left_na, right_na), column
+        assert np.array_equal(left.to_numpy(dtype=object)[~left_na],
+                              right.to_numpy(dtype=object)[~right_na]), column
+
+
 @pytest.fixture(autouse=True)
 def invented_only(monkeypatch):
     repo = Path(__file__).resolve().parents[1]
@@ -72,9 +88,9 @@ def test_final_fold_blanks_only_conflicted_factor(factors, expected, conflict, p
         result = M.crop_production_finalize(operand)
     reports = copy.deepcopy(C.grain_reports(*KEY))
     baseline = M.crop_production_finalize(operand.drop(columns='KgFactor_sold'))
-    pd.testing.assert_frame_equal(result.drop(columns='KgFactor_sold'),
-                                  baseline.drop(columns='KgFactor_sold'), check_exact=True)
-    pd.testing.assert_frame_equal(operand, before, check_exact=True)
+    assert_exact_legacy_frame(result.drop(columns='KgFactor_sold'),
+                              baseline.drop(columns='KgFactor_sold'))
+    assert_exact_legacy_frame(operand, before)
     assert len(result) == 1 and result.Quantity.iloc[0] == 30
     assert result.Quantity_sold.iloc[0] == 5 and result.Value_sold.iloc[0] == 300
     if pd.isna(expected):
@@ -91,7 +107,7 @@ def test_final_fold_blanks_only_conflicted_factor(factors, expected, conflict, p
         assert report['wave'] == '2014-15'
 
 
-def sold_fragment(sales, *, plots=('1_1',)):
+def sold_fragment(sales, *, plots=('1_1',), seasonal_rows=None):
     path = COUNTRY / '2017-18/_/crop_production.py'
     body = ast.parse(path.read_text()).body
     def assigns(node, name):
@@ -102,6 +118,8 @@ def sold_fragment(sales, *, plots=('1_1',)):
     seasonal = pd.DataFrame({'i': 'h', 'crop': 'Invented maize', 'plot_id': list(plots),
                              'Quantity': 10., 'u': 'Kg', 'Quantity_sold': pd.NA,
                              'Unit_sold': pd.NA, 'Value_sold': pd.NA})
+    if seasonal_rows is not None:
+        seasonal = seasonal_rows.copy(deep=True)
     scope = {'pd': pd, 'WAVE': '2017-18', 's7g': sales,
              'seasonal': seasonal, 'reduce_to_agreed': reduce_to_agreed}
     exec(compile(module, str(path), 'exec'), scope)
@@ -143,6 +161,105 @@ def test_existing_sale_gates_apply_to_new_factor_without_changing_quantities():
     assert missing[['Quantity_sold','Value_sold','KgFactor_sold']].isna().all().all()
 
 
+def test_equal_factors_do_not_bypass_early_mixed_sold_unit_gate():
+    sales = sale_rows([25., 25.], unit=['Bag', 'Basket'])
+    before = sales.copy(deep=True)
+    result = sold_fragment(sales)
+    baseline = sold_fragment(sales.assign(s7gq21d=np.nan))
+    assert_exact_legacy_frame(result.drop(columns='KgFactor_sold'),
+                              baseline.drop(columns='KgFactor_sold'))
+    assert len(result) == 1 and result.Quantity.iloc[0] == 10
+    assert result[['Quantity_sold', 'Unit_sold', 'Value_sold', 'KgFactor_sold']].isna().all().all()
+    assert not C.grain_reports(*KEY)
+    assert_exact_legacy_frame(sales, before)
+
+
+@pytest.mark.parametrize('plot', ['1_1', pd.NA])
+def test_equal_factors_do_not_bypass_final_mixed_sold_unit_gate(plot):
+    operand = rows([25., 25.], plot=plot)
+    operand['Unit_sold'] = ['Bag', 'Basket']
+    before = operand.copy(deep=True)
+    result = M.crop_production_finalize(operand)
+    baseline = M.crop_production_finalize(operand.drop(columns='KgFactor_sold'))
+    assert_exact_legacy_frame(result.drop(columns='KgFactor_sold'),
+                              baseline.drop(columns='KgFactor_sold'))
+    assert_exact_legacy_frame(operand, before)
+    assert len(result) == 1 and result.Quantity.iloc[0] == 30
+    assert result.Value_sold.iloc[0] == 300
+    assert result[['Quantity_sold', 'Unit_sold', 'KgFactor_sold']].isna().all().all()
+    assert not C.grain_reports(*KEY)
+
+
+def test_early_missing_unit_is_a_group_key_and_distinct_from_observed_unit():
+    missing_only = sold_fragment(sale_rows([25., 25.], unit=pd.NA))
+    assert len(missing_only) == 1 and missing_only.Quantity.iloc[0] == 10
+    assert missing_only.Quantity_sold.iloc[0] == 5
+    assert missing_only.Value_sold.iloc[0] == 300
+    assert missing_only.Unit_sold.isna().all()
+    assert missing_only.KgFactor_sold.iloc[0] == 25
+    mixed = sold_fragment(sale_rows([25., 25.], unit=[pd.NA, 'Bag']))
+    assert len(mixed) == 1 and mixed.Quantity.iloc[0] == 10
+    assert mixed[['Quantity_sold', 'Unit_sold', 'Value_sold', 'KgFactor_sold']].isna().all().all()
+    assert not C.grain_reports(*KEY)
+
+
+def test_final_factor_alignment_across_permuted_unique_duplicate_nullable_keys():
+    groups = [rows([11.5, 11.5], plot='9_1').assign(i='z-recorded'),
+              rows([82., 82.], plot=pd.NA).assign(i='a-recorded'),
+              rows([99.25, 99.25], plot='1_1').assign(i='m-recorded').iloc[:1]]
+    operand = pd.concat(groups, ignore_index=True).iloc[[4, 2, 0, 3, 1]].copy()
+    before = operand.copy(deep=True)
+    result = M.crop_production_finalize(operand)
+    baseline = M.crop_production_finalize(operand.drop(columns='KgFactor_sold'))
+    assert_exact_legacy_frame(result.drop(columns='KgFactor_sold'),
+                              baseline.drop(columns='KgFactor_sold'))
+    assert_exact_legacy_frame(operand, before)
+    assert len(result) == 3 and not C.grain_reports(*KEY)
+    for household, factor, quantity, sold, value in [
+            ('z-recorded', 11.5, 30., 5., 300.),
+            ('a-recorded', 82., 30., 5., 300.),
+            ('m-recorded', 99.25, 10., 2., 100.)]:
+        selected = result.xs(household, level='i')
+        assert len(selected) == 1
+        assert selected.KgFactor_sold.iloc[0] == factor
+        assert selected.Quantity.iloc[0] == quantity
+        assert selected.Quantity_sold.iloc[0] == sold
+        assert selected.Value_sold.iloc[0] == value
+    assert result.xs('a-recorded', level='i').index.get_level_values('plot_id').isna().all()
+
+
+def test_early_factor_alignment_across_permuted_unique_duplicate_nullable_keys():
+    groups = [sale_rows([11.5, 11.5], unit='Bag').assign(i='z-recorded'),
+              sale_rows([82., 82.], unit=pd.NA).assign(i='a-recorded'),
+              sale_rows([99.25, 99.25], unit='Basket').assign(i='m-recorded').iloc[:1]]
+    sales = pd.concat(groups, ignore_index=True).iloc[[4, 2, 0, 3, 1]].copy()
+    before = sales.copy(deep=True)
+    seasonal = pd.DataFrame({'i': ['m-recorded', 'z-recorded', 'a-recorded'],
+        'crop': 'Invented maize', 'plot_id': ['3_1', '9_1', '1_1'],
+        'Quantity': [7., 10., 12.], 'u': 'Kg', 'Quantity_sold': pd.NA,
+        'Unit_sold': pd.NA, 'Value_sold': pd.NA})
+    result = sold_fragment(sales, seasonal_rows=seasonal)
+    baseline = sold_fragment(sales.assign(s7gq21d=np.nan), seasonal_rows=seasonal)
+    assert_exact_legacy_frame(result.drop(columns='KgFactor_sold'),
+                              baseline.drop(columns='KgFactor_sold'))
+    assert_exact_legacy_frame(sales, before)
+    assert len(result) == 3 and not C.grain_reports(*KEY)
+    for household, factor, quantity, sold, value, unit in [
+            ('z-recorded', 11.5, 10., 5., 300., 'Bag'),
+            ('a-recorded', 82., 12., 5., 300., None),
+            ('m-recorded', 99.25, 7., 2., 100., 'Basket')]:
+        selected = result.loc[result.i.eq(household)]
+        assert len(selected) == 1
+        assert selected.KgFactor_sold.iloc[0] == factor
+        assert selected.Quantity.iloc[0] == quantity
+        assert selected.Quantity_sold.iloc[0] == sold
+        assert selected.Value_sold.iloc[0] == value
+        if unit is None:
+            assert pd.isna(selected.Unit_sold.iloc[0])
+        else:
+            assert selected.Unit_sold.iloc[0] == unit
+
+
 def test_compiler_relays_real_native_footers_once_and_replay_survives_empty_ledger(tmp_path, monkeypatch):
     data = tmp_path / 'data'
     monkeypatch.setenv('LSMS_DATA_DIR', str(data))
@@ -182,7 +299,7 @@ def test_compiler_relays_real_native_footers_once_and_replay_survives_empty_ledg
         reports = L.read_parquet_grain_audit(target)
         assert reports == [factor_report, existing]
         expected = pd.concat([owned_get(p) for p in native_paths])
-        pd.testing.assert_frame_equal(owned_get(target), expected, check_exact=True)
+        assert_exact_legacy_frame(owned_get(target), expected)
         before = hashlib.sha256(target.read_bytes()).hexdigest()
         C._GRAIN_LEDGER.pop(KEY, None)
         with pytest.warns(C.GrainCollapseWarning):

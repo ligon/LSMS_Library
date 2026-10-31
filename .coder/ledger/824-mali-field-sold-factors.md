@@ -46,3 +46,21 @@ Tree-factor interpretation and other-country/unwired-wave #824 scope remain sepa
 OK (§2–4): the two calls reuse the shipped reducer with missingness conflicts and only factor payload. All ten original finalizer payload reducer expressions are AST-identical;32 other top-level Mali function definitions and both waves' native helper definitions are unchanged, including tree-window/derivation functions. Existing country concat/source declarations and quantity reducers remain, with only new factor attribution and footer transport. No source positivity screen, weighted factor or tree mapping. Native footer writer is the existing Uganda/GH868 pattern; compiler original reports are retained once in first-seen order, independent from attrs, with direct caller resolver stack_depth1.
 
 New17 invented cases and bounded serialization/compiler/replay plan are prepared, NOT executed. No project import/test/data actor or source measurement occurred. Static Python syntax and documentation diff check passed. Source proof is not typed output/scientific validation; those gates remain pending exact source/red-team review and root release. No fresh factor coverage, missingness/duplicate count, source or cache-freshness claim.
+
+### Additive regression review response (2026-10-31)
+
+Preserve original candidate a2cb6dd4 and independent source review e4d46a97.
+The successor changes tests/plan only; production/configuration bytes remain
+exact. Six additional invented cases (23 total, still unexecuted) cover equal
+populated factors across both mixed-unit gates; distinct factors across
+permuted unique/duplicate groups with known-household nullable plot or missing
+sold-unit keys; and early missing-only versus missing-plus-observed unit groups.
+Existing harvest/amount columns have explicit expectations and a separate
+legacy-column comparator checking metadata, masks and exact nonmissing scalars
+in addition to pandas check_exact. No scientific expectation or gate changes.
+
+The normal fresh country compiler's direct resolver depth1 footer route is
+source-supported. Caller-blind resolver caching and a separate footer open are
+known limits: this source/invented plan does not claim arbitrary stale-process
+resolution or concurrent replacement safety. The original fresh compiler
+metadata replay fixture stays narrow; no production carrier workaround is added.
