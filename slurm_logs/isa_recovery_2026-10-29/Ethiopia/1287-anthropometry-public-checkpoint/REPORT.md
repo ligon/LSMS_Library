@@ -1,9 +1,9 @@
-# Ethiopia anthropometry — bounded compiler/consumer checkpoint draft
+# Ethiopia anthropometry — bounded compiler/consumer checkpoint
 
-PREPARATION DRAFT. Execution and delivery receipts are complete, but independent
-closed-result review and root scientific acceptance are pending. No public
-publication, merge or inventory credit is authorized by this draft. This is a
-three-document extraction with no product, test, source policy or payload change.
+Qualified independent closed-result review and root acceptance support this
+bounded checkpoint. Exact reviewed documentation integration remains pending;
+no inventory credit precedes reviewed merge. This is a three-document extraction
+with no product, test, source policy or payload change.
 
 Executed source c2c2f5c5f3b35f291bd9067a77a637615d8135fe (tree
 e85b244fa13f5bd81c25d70f7227b86475b89d1a) deliberately uses scientific base
@@ -141,17 +141,23 @@ The supplement and expanded report are not moved inside the original delivery
 interval. Worker make api-audit stopped because Poetry was absent; its Python
 audit never ran and was not retried. This is a setup-tool limitation, not a
 product/test PASS or a scientific retry. Platform succeeded/finished exit 0 and
-Slurm job40709268 COMPLETED0:0/9:30 are separate from pending scientific acceptance.
+Slurm job40709268 COMPLETED0:0/9:30 (extern 9:31) are separate from scientific
+acceptance. Final publisher-phase cleanup closes at 12.664319 seconds after the
+same OWN event; it is distinct from remote verification at 12.272138 seconds.
 
-## Ordinary evidence and pending gate
+## Ordinary evidence and integration gate
 
 Dispatch 26d50b47293a42cbadbd87e28c27f6f3; source c2c2f5c5; shared context V2
 manifest 2e36ea7c; COMMAND 1148929a; TASK 0a509253. Existing v1 work/archive
 basenames are intentional; superseded V1 was held, not a second actor.
 Root archive/terminal receipts are under
 slurm_logs/isa_recovery_2026-10-29/Ethiopia/1287-anthropometry-root-result-v2.
-Independent result review and root acceptance are pending before this draft may
-claim qualified acceptance. No private frame, row, household/person identifier,
+Independent result REVIEW SHA256
+1c2a8ac60c72eaaa0ce4140fe3cabf229cb79cf2b006bcb71b74b406fc6a4ded and
+BINDINGS 14525353a311c1a061ffeaaf40e83f036cbf1921c0b7d0e0a3f54433c71903a9
+are under Ethiopia/1287-anthropometry-result-independent-Mali-v2. Root acceptance
+SHA256 cf21eec64742251d69a80b3684a71992ebdbb880322c53f13ce2dbe7a6eecda3
+binds this qualified result. No private frame, row, household/person identifier,
 operator or source operand is included in this public extraction. No inventory
 credit precedes independent/root gates and reviewed documentation merge; other
 countries/cells and the #1287 umbrella remain open.

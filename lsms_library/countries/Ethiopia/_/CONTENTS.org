@@ -3862,10 +3862,10 @@ See =.coder/ledger/1287-ethiopia-people-runtime-checkpoint.md= and
 No inventory credit precedes reviewed merge. Other cells
 and the #1287 umbrella remain open.
 
-* Five-wave anthropometry compiler checkpoint DRAFT (GH #1287, 2026-10-31)
+* Five-wave anthropometry compiler checkpoint (GH #1287, 2026-10-31)
 
-Preparation draft only: independent closed-result review and root scientific
-acceptance are pending. Ordinary execution/delivery receipts report five
+Independent qualified result review and root acceptance support this bounded
+checkpoint, pending reviewed documentation integration. Ordinary receipts report five
 historical native STORAGE contributions through the real original compiler,
 default Country, one simultaneous strict call, first genuine no-canonical Feature
 and fresh original Country/Feature warm: 18,764 rows, 23 mandatory comparisons
@@ -3904,5 +3904,6 @@ verification. Archive 182 files / 56,182,359 bytes, manifest ad124f0c; private
 published head 11ee423d. Scheduler/platform success does not establish acceptance.
 See =.coder/ledger/1287-ethiopia-anthropometry-runtime-checkpoint.md= and
 =slurm_logs/isa_recovery_2026-10-29/Ethiopia/1287-anthropometry-public-checkpoint/REPORT.md=.
-No public integration or inventory credit precedes result/docs acceptance and merge;
-other country cells and #1287 remain open. All earlier CONTENTS bytes are retained.
+Result review =1c2a8ac6= and root acceptance =cf21eec6= retain the linked scope
+and limitations. No inventory credit precedes reviewed docs merge; other country
+cells and #1287 remain open. All earlier CONTENTS bytes are retained.

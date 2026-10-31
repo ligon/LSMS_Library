@@ -1,7 +1,8 @@
-# Ethiopia anthropometry runtime checkpoint draft (#1287)
+# Ethiopia anthropometry runtime checkpoint (#1287)
 
-PREPARATION DRAFT: independent closed-result review and root scientific acceptance
-remain pending; no publication or inventory credit is authorized by this draft.
+Qualified independent result review and root acceptance support this checkpoint;
+exact reviewed documentation integration remains pending. No inventory credit
+precedes reviewed merge.
 
 Reuse STANDING.md, CLAUDE.md, data_info.yml, CONTENTS, whole-cell source plan
 0fa8e729 and qualified independent plan320fa63b. Historical STORAGE/current
@@ -37,4 +38,7 @@ input/receiving-metadata closure; partials stay metadata-only/unestablished and
 cannot be promoted. Complete scientific operands/policies/budgets are unchanged.
 See slurm_logs/isa_recovery_2026-10-29/Ethiopia/1287-anthropometry-public-checkpoint/REPORT.md
 for full counts, source projection, original preparation failures, closure and
-clock qualifications. Await exact independent result/root acceptance and docs review.
+clock qualifications. Independent result REVIEW
+1c2a8ac60c72eaaa0ce4140fe3cabf229cb79cf2b006bcb71b74b406fc6a4ded and root
+ACCEPTANCE cf21eec64742251d69a80b3684a71992ebdbb880322c53f13ce2dbe7a6eecda3
+bind the qualified result; exact documentation review/integration remain.
