@@ -103,8 +103,8 @@ internal byte/footer/schema operations and derived witnesses remain separate.
 Five actual phases return zero with closed descendants/ECHILD, no timeout or signal.
 Controller time is 229.142 seconds; the actual supervisor is 229.514 seconds and
 separate export 13.234 seconds. Source/input/compiler/cache/authority/receipt
-closures report true with no closure errors. Root byte authentication and
-independent result acceptance remain PENDING for this draft.
+closures report true with no closure errors. Root byte authentication is complete (receipt 57ae844b7); independent result
+review and root acceptance remain PENDING for this draft.
 
 Released OWN publication starts AFTER receiver actual-plus-separate-export and
 descendant cleanup. Push and exact remote-ref verification report 10.586 seconds

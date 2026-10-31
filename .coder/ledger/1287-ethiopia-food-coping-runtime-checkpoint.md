@@ -35,7 +35,7 @@ All 6 API slots absent before cold→one country/five absent wave slots; warm 2
 selected getters / zero named producer fallback. Read accounting is 14 policy +
 3 original-Wave policy + 15 pickle loads.
 Independent full typed/cache/source/authority/input closures are reported; root
-archive byte authentication and peer result review remain PENDING.
+archive byte authentication is complete; peer result/root acceptance remain PENDING.
 
 ## §5 Delivery and source boundary
 

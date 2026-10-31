@@ -3777,7 +3777,8 @@ OWN publication 10.586 seconds AFTER receiver/export+descendant cleanup through
 remote verification (inner actual-exit-to-remote separately 25.190 seconds).
 Archive receipt: 146 members / 62,627,822 bytes, manifest =28b80415=;
 private published head =fe9fcff=. Platform success does not establish acceptance.
-Root archive authentication/peer acceptance remain pending in this draft.
+Root archive authentication is complete; peer/root result acceptance remains
+pending in this draft.
 
 Docsbase =d0acdf61= matches 487/489 executed source bindings; Ethiopia CONTENTS
 appends and #1254's transformations median_price_valuation account for the two
@@ -3785,4 +3786,5 @@ differences. No complete product identity or later-base runtime/hash pass is
 claimed. This draft preserves all earlier CONTENTS bytes and supplements the
 dated nine-concatenator source-only entry without erasing its historical limits.
 See =.coder/ledger/1287-ethiopia-food-coping-runtime-checkpoint.md= and
-=Ethiopia/1287-food-coping-public-checkpoint/REPORT.md=. Other cells and #1287 remain open.
+=slurm_logs/isa_recovery_2026-10-29/Ethiopia/1287-food-coping-public-checkpoint/REPORT.md=.
+Other cells and #1287 remain open.
