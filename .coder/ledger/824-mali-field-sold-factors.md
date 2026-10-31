@@ -31,7 +31,7 @@ Carrier finding: current Mali native writers pass no grain_audit, and country co
 
 Two existing folds are scientifically different: household-crop-sold-unit sale in2017 and final plot-crop duplicate fold. Factor agreement uses all contributors including NA; no first/non-null completion, mean, quantity weighting or added key. Factor conflict cannot remove previously served quantity rows. Existing Non→0/no-unit, one-unit, single-plot, mixed-unit, crop-label and tree-window gates remain. No tree factor, new source, map, sample, identity or unit relabel. #1357 excludes anonymous household-keyed records; known household missing plot/v is distinct.
 
-Native out-of-process reducers explicitly name Mali/crop_production/wave. Footer relay uses actual original reader path, no atime/freshness claim. Preserve preexisting reports once, not only new factor reports. Warm strict may refuse recorded conflicts under existing grain strict policy; ordinary factor-only NA remains loud. Fold audit counts describe that fold's source contributors, not eligible final-row losses.
+Native out-of-process reducers explicitly name Mali/crop_production; the early fold passes WAVE and final fold reuses the reducer's original single-t index inference. Footer relay uses actual original reader path, no atime/freshness claim. Preserve preexisting reports once, not only new factor reports. Warm strict may refuse recorded conflicts under existing grain strict policy; ordinary factor-only NA remains loud. Fold audit counts describe that fold's source contributors, not eligible final-row losses.
 
 ## §5 Reuse decisions
 
@@ -40,3 +40,9 @@ Reuse reducer/ledger/writer/footer/default replay and existing sold consumer ver
 ## §6 Open scope and verification
 
 Tree-factor interpretation and other-country/unwired-wave #824 scope remain separate; they do not block FIELD wiring. No new human scientific ruling requested. Source candidate and serialization/replay regression design go to independent red-team before any data actor. Proposed invented tests cover exact/NA conflict at both folds, old-column invariance, current field-only source routing and native→compiler footer→fresh warm replay; no survey fixture or raw/cold corpus build. Test execution and actual source validation are not claimed here.
+
+## Phase 3 source-only anchored check
+
+OK (§2–4): the two calls reuse the shipped reducer with missingness conflicts and only factor payload. All ten original finalizer payload reducer expressions are AST-identical;32 other top-level Mali function definitions and both waves' native helper definitions are unchanged, including tree-window/derivation functions. Existing country concat/source declarations and quantity reducers remain, with only new factor attribution and footer transport. No source positivity screen, weighted factor or tree mapping. Native footer writer is the existing Uganda/GH868 pattern; compiler original reports are retained once in first-seen order, independent from attrs, with direct caller resolver stack_depth1.
+
+New17 invented cases and bounded serialization/compiler/replay plan are prepared, NOT executed. No project import/test/data actor or source measurement occurred. Static Python syntax and documentation diff check passed. Source proof is not typed output/scientific validation; those gates remain pending exact source/red-team review and root release. No fresh factor coverage, missingness/duplicate count, source or cache-freshness claim.
