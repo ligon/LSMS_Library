@@ -65,7 +65,7 @@ scalars/recursiveattrs. Transport remains separately diagnostic.
 
 Fresh warm records exactly 2 selected country-cache getters and zero original
 Wave/writer/raw/decoder/native/build/sample entries. One country cache survives
-among 6 slots; all 5 wave slots are naturally absent. Cold-after=warm-before/after/
+among 6 slots; all 5 API wave slots were absent before cold and remain absent. Cold-after=warm-before/after/
 finally and controller-final full SHA/dev/inode/size/mode 0600/uid/nlink/mtime/ctime
 match; current hash/all-five coverage are unchanged. Separate compiler product,
 immutable originals/receiving copies/source/runtime/config/authorities close.

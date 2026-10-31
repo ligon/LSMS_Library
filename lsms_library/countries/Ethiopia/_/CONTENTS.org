@@ -3692,7 +3692,7 @@ reports after the oracle are explicitly cumulative. Warm records exactly two
 selected country-cache getters, zero Wave/writer/raw/decoder/native/build/sample
 entries, full exact Country/Feature equality and immutable current hash/all-five
 coverage. ONE country cache survives among six slots; all five wave slots are
-absent after normal eviction. SHA/full mode 0600/uid/nlink/dev/inode/size/mtime/
+absent before cold and remain absent. SHA/full mode 0600/uid/nlink/dev/inode/size/mtime/
 ctime, source/runtime/config/authority/input/compiler closures pass; no atime
 or universal kernel IO census is claimed.
 
