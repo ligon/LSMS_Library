@@ -4998,3 +4998,67 @@ used scientific b06abb5d; all 998 bound scientific files match public docs base
 c2ed89b3. No later-base runtime/hash claim or inventory increment follows.
 See =.coder/ledger/1287-uganda-livestock-runtime-checkpoint.md= and
 =Uganda/1287-livestock-public-checkpoint/REPORT.md=.
+
+* 2026-10-31 -- Shocks fixed-STORAGE compiler/consumer checkpoint (GH #1287)
+
+The bounded contribution unit is independently and root-qualified accepted.
+Eight historical native contributions fed the original compiler, pinned default
+Country, first genuine Feature and fresh original warm, each with 14,457 rows.
+There are 22 NEW passing comparisons (20 mandatory and two separately labelled
+prepared RETURN/storage transport diagnostics), plus two unchanged inherited
+comparisons from the first failed actor. These are stage/custody/composition
+checks, not 24 new independent native-science oracles.
+
+Two completed 2005--06/2009--10 custody inputs and 22 exact witnesses were adopted
+as bytes without repeating their completed policy pairs. Six named later-bundle
+natives were newly admitted; all eight total 274,328 bytes. The #805 four-native
+coping-label identity changes remain explicit; the old country output was not
+reused as truth. No raw source/native/sample producer, native stamp, attrs reset,
+automatic cache fallback or original freshness validation occurred.
+
+Compiler LOCAL ID walk once after concat emits =(i,t)= with =Shock= a column;
+framework per-wave raw walk/current finalization emits =(t,i,Shock)=. Matching
+stages are compared separately. Bare =shocks: !make= supplies no required columns,
+but all ten native fields survive. The original no-v contract needs no sample.
+Source-specific shock, coping, recall and missingness meanings are unchanged.
+
+The original strict index emitter produced an attributed =NullIndexKeyError=
+NEGATIVE, not PASS. Pure actual metadata had one index report, no required-null
+or process-grain reports and absent raw grain footer; absence is not losslessness.
+The inherited 2005 native missing-Shock observation was retained. Later grain
+strict completion remains unestablished; no disabled-lever retry, imputation or
+row deletion was used to make strict green. First Feature and warm pass separately.
+
+Actual household =i= is complete in cold/warm. #1357 option 1 still excludes
+truly anonymous household-keyed records: no inferred holder-prefix/shared unknown
+household or orphan representation. Native stage diagnostics do not measure raw
+eligible loss; known-HH missing village/plot and missing shock category remain
+distinct. GH #1120 is closed for its separately completed approved scope; this checkpoint
+does not extend that scope or newly test raw anonymous-source exclusion.
+
+Both prior failures remain preserved: original third-size gate before copying
+that native, and first continuation's overstrong global UID-map guard before any
+new native read. The correction proves only the recorded-owner point
+=0 -> 43292 -> 43292=, with original UID/other epochs unchanged, not global/initial
+namespace identity. No completed producer or pair comparison was replayed.
+Prior actual 52.222 s plus successful actual 276.472 s totals 328.694 s; the new
+cap 547 / cumulative 599.222 plus cleanup remains within original 600+5. Absolute
+owner/shared deadlines and complete child/source/input/cache closure apply.
+
+All nine API slots were absent before cold; only one country cache was created,
+with all eight coverage keys. Wave slots remain absent; this is not an eviction
+claim. Warm used two selected cache getters and no named fallback. Root verified
+archive =98ba9872= (252 files / 53,654,762 bytes), full SHA/size/declared stable
+epochs without deserialization. Separate export was 20.105 s. OWN publication
+7.665 s is postreceiver actual/export AND descendant cleanup through push plus
+exact remote ref, not elapsed from inner actual exit. Private =be006e66= and
+Slurm completed 0:0 / platform success are verified separately from science.
+
+Scientific =f952a32e= remains pinned; all 999 selected bindings equal public
+=c4928898=. The later unbound #1254 price-valuation change is a scoped static
+qualification, not a new later-base runtime/hash claim. Historical raw/native
+science, decoder/image/full epochs, freshness, recall/causal comparability and
+population truth remain qualified. EA/parish/refresh, 2019 weights/GPS,
+#647/#1297/#829 WAITING and broader country/compiler work stay open.
+See =.coder/ledger/1287-uganda-shocks-runtime-checkpoint.md= and
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1287-shocks-public-checkpoint/REPORT.md=.
