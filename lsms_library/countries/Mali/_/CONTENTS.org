@@ -1960,3 +1960,63 @@ observed-key census authority is not converted into a new sampling claim.
 Five other Mali compilers and the issue's six non-ISA countries remain separate.
 Detailed pins and scope:
 =slurm_logs/isa_recovery_2026-10-29/Mali/1287-food-coping-runtime-receipt-v1/REPORT.md=.
+
+* 2026-10-31 -- Actual plot_features compiler checkpoint (GH #1287)
+
+At source =899d62e1=, the two EHCVM native =plot_features= producers ran
+through their existing relative wave GNU Make targets. The unchanged country
+compiler then ran directly, the entry used by production's script fallback.
+Its ordered native policy concat matched exactly; no compiler v or ID walk
+was added. Mali has neither an explicit country VAR target nor a generic
+country Make alias for this table. This run does not execute or repair that
+missing country Make route, or exercise =backend=make= API acceptance.
+
+Exactly two sanctioned numeric getters used the held =s16a_me_mli2018.dta=
+and =s16a_me_mli2021.dta= objects, 9,104,371 declared bytes, with
+=convert_categoricals=False= and no column restriction. Raw replies were
+7,323 x 240 and 9,924 x 299; these are source-frame dimensions, not separate
+native output counts. Each had one installed StataReader init/read/labels
+lifecycle; 2018 also used the existing cp1252 helper without another reader.
+No acquisition or accepted crop/coping producer replay occurred.
+
+All eleven exact recorded comparisons pass: seven mandatory and four separate
+prepared RETURN/storage diagnostics. Full Country, strict Country with both
+read/grain levers, real singleton Feature and fresh-process warm return 13,961
+rows. API expected CALL is independently composed from immutable native policy
+inputs through the current raw-once walk, augmentation, normalization and concat,
+then current finalization/Feature. This measures source composition, not an
+independent scientific oracle for parcel eligibility, areas, tenure or identity.
+
+Actual process grain reports captured before expected composition, cache footer
+audits and cold/warm closure reports are empty in this run; strict Country
+passes. This does not explain or retire the earlier documented nine mapped
+2021 collisions or authorize a different row policy. Existing helper eligibility
+requires both field and parcel numbers; historical placeholder prose does not
+establish that every excluded row has all attributes blank. Partial document-based
+TenureSystem, unclipped reported areas, no parcel coordinates and EACI/EHCVM
+distinctions remain. No inferred household/plot ID or orphan representation.
+
+Cold API uses truthful saved-native parquet origin plus the exact Wave map/t-filter
+tail. The same already-finalized sample serves only as a fixed authenticated
+present-byte v lookup, with selected-wave interface/unique-key checks before raw
+admission. Its original export hash remains unavailable; no historical/current
+sample truth, retrospective custody, weight or cache-freshness upgrade follows.
+No sample rebuild, second walk, restamp or missing-v imputation occurred.
+
+Normal cold descent rebuilt hashless country output and evicted mutable wave
+copies; immutable native/compiler snapshots survive. Fresh warm restored the
+original wave loader without entering it and served one country cache. Its
+SHA/dev/inode/size/mtime/ctime and measured 0600 mode remained exact; atime was
+not measured. Full axes/domains/codes/order/dtypes/EA/masks/exact nonmissing NumPy
+values and typed attrs match cold Country/Feature. No named raw/native/parser/
+Make/writer fallback, observer or network denial occurred.
+
+Actual/source/input and export closure passed, all children ECHILD with no
+signals/timeouts. Controller took 102.023 seconds, outer actual 102.906 and
+export 4.554. The complete closed private archive has 56 files / 65,192,309 bytes.
+Separately, task completed; native/supervisor exited zero and publication completed without
+errors at private result =32fca257a23f8708c8cbd8eefb9e9733f9f2a215=;
+Slurm 40679773 completed 0:0 in 7:32. No data replay was needed for this checkpoint.
+Four other Mali compiler cells and the original fourteen-country #1287 scope
+remain. Pins and independent review are recorded in
+=slurm_logs/isa_recovery_2026-10-29/Mali/1287-plot-features-runtime-receipt-v1/REPORT.md=.
