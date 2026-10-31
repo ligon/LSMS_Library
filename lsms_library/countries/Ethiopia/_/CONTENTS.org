@@ -3642,3 +3642,79 @@ is claimed. This dated entry supplements the older nine-concatenator statement
 that guarded composition remained required, without claiming fresh raw replay.
 See =.coder/ledger/1287-ethiopia-crop-runtime-checkpoint.md= and
 =Ethiopia/1287-crop-public-checkpoint/REPORT.md=. Other cells/#1287 remain separate.
+
+* 2026-10-31 -- Five-wave fixed-STORAGE livestock compiler checkpoint (GH #1287)
+
+At scientific source =b06abb5d= and toolkit =ddc8f8ab=, five authenticated
+historical native STORAGE operands fed the actual current five-input country
+VAR Make compiler, full default Country, simultaneous read/grain strict, first
+real singleton Feature and fresh-process Country/Feature warm. All 26 recorded
+comparisons PASS: 24 mandatory and two prepared RETURN/storage diagnostics.
+Ten mandatory checks are native-copy frame/footer custody checks; these are not
+26 independent raw/native scientific oracles. Native rows in wave order are
+7,566/8,601/9,239/6,866/4,907; compiler and every measured consumer have 37,179.
+All five declared waves contribute and all-five country coverage is recorded.
+
+Compiler readers preserve the exact original source order; the CALL expectation
+is ordered concat then current =local_tools.id_walk= ONCE post-concat. The API
+uses a distinct source-faithful per-wave framework raw-state walk, aggregation
+and finalizer. A disclosed =_fresh_script_parquet= selector chooses immutable
+admitted STORAGE while original Wave reader/parquet origin/stamp replay/map/
+check-t/filter and enclosing Country writer remain. The original selector is
+restored before strict/Feature; no native/script/Make fallback or manual stamp.
+This does not test original script-cache freshness selection, current raw-native
+science, Make-backend API or existing-target incremental Make.
+
+Canonical =(t,i,animal)= invokes the original no-v contract: NO sample input,
+lookup, provider, factory or sample build. Every Country and Feature call uses
+=currency=None=. =SalesValue= remains gross Birr livestock SALES over twelve
+months, additive over animal, not herd wealth, TLU or a per-head price. Panel I
+versus Panel II, W2/W3 household_id2/ea_id2, holder-versus-household cover and
+rural/frame/weight/Tigray caveats remain. The individual-education ORDER-DEPENDENT
+entry and blanket compiler idempotence comment are not livestock truth or a
+license to link across panels. No historical prose is replaced by this entry.
+
+Historical promoted STORAGE is not untouched native CALL/RETURN or a new raw
+build. Old image/decoder/full-epoch continuity and current raw-native arithmetic
+remain unestablished. Receiving verifies recorded SHA/size plus new independent
+full identities, full current-policy frames/attrs/raw footers and unconverted
+native stage; no flag reset, forced extra walk, historical chmod or restamp.
+Native i/animal NULL counts are zero; actual i is present/nonmissing before
+strict acceptance and on warm. The [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 ruling]] continues excluding genuinely
+anonymous household-keyed records without invented/shared unknown identities
+or orphans. These adopted-stage counts do NOT newly exercise raw exclusion or
+prove raw eligible-row conservation; known household missing v/plot is distinct.
+
+Both strict levers PASS together with complete typed default equality. Actual
+NULL/index/grain reports captured BEFORE expected work are empty; raw grain
+footer is =None=, not an empty audit or universal losslessness. Feature NULL
+reports after the oracle are explicitly cumulative. Warm records exactly two
+selected country-cache getters, zero Wave/writer/raw/decoder/native/build/sample
+entries, full exact Country/Feature equality and immutable current hash/all-five
+coverage. ONE country cache survives among six slots; all five wave slots are
+absent after normal eviction. SHA/full mode 0600/uid/nlink/dev/inode/size/mtime/
+ctime, source/runtime/config/authority/input/compiler closures pass; no atime
+or universal kernel IO census is claimed.
+
+Actual/export completed, but the ORIGINAL publisher FAILED after 0.397744s:
+checks-progress.json is a list and the summary called =receipt.get=. No Git
+stage ran (=steps=[]=). The author and complete source review missed this
+consumer-shape contract; original failed source, receipt, attempt and OWN clock
+remain intact. Original OWN 180-second interval through remote verification remains UNESTABLISHED,
+not PASS and not a measured overrun. No inner-controller-exit clock is claimed.
+A separately reviewed ordinary-metadata-only recovery later delivered the same
+closed evidence in 9.39737s (outer 9.8374s, closed/ECHILD). It did NOT replay any
+scientific stage or reset the original clock. Its exact private ref is
+=126c576e719a11d0400e820839f81813a456670d=; 26 original metadata files close and
+match recovered Git blobs. Original platform/task =unfinished= stays distinct.
+
+Archived RESULT is a completed pre-export snapshot (130.095063s); terminal
+receiver actual 140.015626 seconds / closed 0 plus complete manifest establish later inline
+export closure. Worker final reconciliation reports controller 139.564968 seconds;
+these are different observations, not reconstructed timestamps. Root authenticates
+137 closed members/48,681,178B, manifest =88f6d7144546be493c294967387f85c2d8e3a2ebd4c15ffa95b8768362e8333d=.
+Slurm 40693155 completed0:0/6:58 does not erase the publisher failure. Root accepts
+the qualified actual/export and separate recovered delivery after reviews
+=49cb5d0c= / =490b9df5=; no public cell credit until reviewed integration and
+root #1287 reconciliation. Pins/limits:
+=slurm_logs/isa_recovery_2026-10-29/Ethiopia/1287-livestock-runtime-receipt-v1/REPORT.md=.
