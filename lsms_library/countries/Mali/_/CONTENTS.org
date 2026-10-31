@@ -2020,3 +2020,52 @@ Slurm 40679773 completed 0:0 in 7:32. No data replay was needed for this checkpo
 Four other Mali compiler cells and the original fourteen-country #1287 scope
 remain. Pins and independent review are recorded in
 =slurm_logs/isa_recovery_2026-10-29/Mali/1287-plot-features-runtime-receipt-v1/REPORT.md=.
+
+* 2026-10-31 -- Actual plot_labor compiler checkpoint (GH #1287)
+
+The existing full VAR Make chain ran once at product =5c98f643=: two EAC-I
+native producers followed by the unchanged country compiler. Four original
+default-categorical source roles used 16,857,343 declared bytes; each recorded
+one full installed Stata init/read/labels lifecycle, with no fallback or extra
+cp1252 reader. The compiler reads the two native policy outputs in order,
+without a compiler v join or ID walk. Individual native PID exits were not
+separately captured; zero enclosing Make exit, non-ignored recipes and complete
+unique child writer observations support their execution.
+
+All eleven exact comparisons passed: seven mandatory compiler/API composition
+checks and four separate prepared RETURN/storage diagnostics. Full Country,
+simultaneous read/grain strict, real Feature and fresh-process warm each return
+52,057 observed rows. Actual grain reports captured before expected composition,
+cache footer reports and cold/warm closure reports are empty. No normalization,
+deduplication, missing-key fill or strict-negative waiver was used. This is not
+a new independent scientific oracle for native person-count times days,
+demographic eligibility, passage aggregation or reported remuneration.
+
+Cold uses a disclosed saved-native parquet-origin leaf with the exact original
+Wave map/t-filter tail and current aggregation/finalizer. The finalized sample
+is only a fixed authenticated present-byte v lookup; its original export hash
+is unavailable. No sample/weight build, second walk, stamp, inferred v,
+historical custody or scientific truth upgrade follows. Hashless compiler
+output was rebuilt and mutable wave copies evicted; immutable snapshots remain.
+Fresh warm uses the original restored Wave loader without entering it and
+preserves one country cache's bytes/mode/identity/hash/coverage. Four requested
+wave keys include two legitimately undeclared noncontributors, not four native
+productions. Normal raw/sample and Make-backend API/freshness remain untested.
+
+EAC-I 2014 rural agricultural holdings and 2017 exploitation keys are distinct
+from EHCVM household conventions. Only EAC-I declarations contribute here;
+this establishes no whole-instrument EHCVM absence. Lower-case fixed labor
+blocks, the 2017 child =c1*c2= days calculation and existing eligibility remain
+unchanged. Twelve old archive1 products are finalized public references, not
+native/raw prerequisites, and were not reopened or reverse-engineered. #1357
+and the country's survey/identity/source caveats remain binding.
+
+Controller 112.453 seconds, outer actual 113.365 and separate export 4.611 all
+closed without timeout; source/input closure passed. Root authenticated 58
+closed files / 49,395,062 bytes. Dispatch =d7721203ebcc42fb8855b56224f44a78=;
+independent result review SHA256
+=06dfdd97a43976d666e7eb810f2c20737e8e68f5044a2ecb88fc4bc61e3be14a=; final platform publication
+=a359d29f8ddaf90170fae85fec162fe419c1183e=, Slurm 0:0 / 8:49. This checkpoint
+changes no product, test or compiler inventory. Ordinary pins and limits:
+=slurm_logs/isa_recovery_2026-10-29/Mali/1287-labor-runtime-receipt-v1/REPORT.md=;
+ledger =.coder/ledger/1287-mali-labor-runtime-checkpoint.md=.
