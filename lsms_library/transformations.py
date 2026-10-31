@@ -7372,6 +7372,7 @@ def median_price_valuation(item_df, geo_levels, *,
                            kg_qty=None,
                            quantity_col='Quantity',
                            item_keys=('j',),
+                           pool_waves=False,
                            threshold=10,
                            weight_col=None,
                            volume_as_mass=True,
@@ -7461,7 +7462,14 @@ def median_price_valuation(item_df, geo_levels, *,
     item_keys : sequence of str, default ('j',)
         Item identity keys the median is stratified by (the WB ``cropvar``;
         for seeds the WB adds ``improved`` — pass ``('j', 'improved')``).
-        Resolve to index levels or columns.
+        Resolve to index levels or columns.  Unless ``pool_waves=True``, a
+        carried ``t`` is also a key at EVERY rung, including the national
+        fallback, even when custom item keys omit it.
+    pool_waves : bool, default False
+        Explicitly allow prices from different waves to share a median by
+        disabling automatic ``t`` grouping.  A ``t`` named in ``item_keys``
+        is still respected: this option never removes a requested key.
+        With no ``t`` index level or column, the existing keys are unchanged.
     threshold : int, default 10
         Minimum count of priced observations for a cell's median to be
         adopted (the WB ``ten_obs`` ≥ 10).
@@ -7571,6 +7579,8 @@ def median_price_valuation(item_df, geo_levels, *,
     is a separate step the WB does downstream (CPI × Atlas FX) and is out of
     scope here.
     """
+    if not isinstance(pool_waves, bool):
+        raise TypeError("pool_waves must be a boolean")
     df = item_df.copy()
 
     def _series(name):
@@ -7607,7 +7617,14 @@ def median_price_valuation(item_df, geo_levels, *,
     price = price.replace([np.inf, -np.inf], np.nan)
     price = price.where(price > 0)
 
-    item_key_series = [_series(k).astype(str) for k in item_keys]
+    # GH #1254: local currency prices from different survey years must not
+    # mix by default, at either a geographic rung or the national fallback.
+    # Keep explicit caller keys intact, including t under the pooling opt-in.
+    effective_item_keys = list(item_keys)
+    if (not pool_waves and 't' not in effective_item_keys
+            and ('t' in (df.index.names or []) or 't' in df.columns)):
+        effective_item_keys.insert(0, 't')
+    item_key_series = [_series(k).astype(str) for k in effective_item_keys]
 
     # Optional survey weight (EPAR's ``[aw=weight]``).  A priced row whose
     # weight is missing or non-positive cannot speak for its cell, so it is

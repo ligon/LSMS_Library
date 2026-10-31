@@ -470,6 +470,8 @@ def test_no_transformations_symbol_reaches_any_fingerprint():
         "lsms_library.transformations._EXPLICIT_METRIC_PATTERNS",
         "lsms_library.transformations.FOOD_KG_MIN_BASELINE",
         "lsms_library.transformations.FOOD_KG_TIGHT_TOLERANCE",
+        # GH #1254: analysis-time wave pooling must not rebuild native caches.
+        "lsms_library.transformations.median_price_valuation",
     }
     joined = "\x1f".join(_all_parts())
     reached = sorted(s for s in kg_symbols if s in seen)
