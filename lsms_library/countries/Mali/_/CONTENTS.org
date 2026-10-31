@@ -1483,7 +1483,9 @@ identification (canonical =data_info.yml=, =Unit_sold= note).
 [[https://github.com/ligon/LSMS_Library/issues/824#issuecomment-6367367289][approved consumer ruling]]: absent sold labels permit harvest-unit fallback;
 disagreements remain counted quality flags, not exclusions or proof of truth.
 
-Not served: a =KgFactor_sold=.  The survey's sold kg factor is present on 572
+[Updated 2026-10-31, GH #824: the former "Not served" statement is superseded
+by the FIELD-only wiring and validation checkpoint below. The historical raw
+counts and tree interpretation remain unchanged.] The survey's sold kg factor is present on 572
 of 577 raw priced 2014-15 field rows and on 647 of 647 2017-18 =s7g= rows, and
 there it is a per-unit factor (=1= on 77 of 83 / 95 of 95 rows sold in Kg).  The
 tree factors are not: on rows sold in Kg, =s3bq13c= is 1 on 18 of 39 and equals
@@ -2131,3 +2133,35 @@ No replay is justified to manufacture the missing timing receipt.
 Other Mali cells and the fourteen-country #1287 scope remain open. Exact pins,
 stage counts and accepted limits are in
 =slurm_logs/isa_recovery_2026-10-29/Mali/1287-plot-inputs-runtime-receipt-v1/REPORT.md=.
+
+* FIELD sold-unit factors (GH #824, 2026-10-31)
+
+=KgFactor_sold= now carries reported kg per sold unit from FIELD =s3aq23c=
+(2014-15) and =s7gq21d= (2017-18). Tree =s3bq13c= / =s11fq14c= remain
+unwired because their equivalents can be totals. The existing sold-unit
+consumer, quantity/value rules and one-unit/single-plot/mixed-unit gates remain.
+At each existing sale fold, =reduce_to_agreed= requires exact agreement including
+missingness; disagreements blank only the factor and retain quantity rows with
+a structured grain audit. Native writers persist the audit; the country
+compiler relays original footer reports once in first-seen order.
+
+The bounded validation of candidate =b9bbcb3c6= (dispatch =55745f63=) admitted
+seven saved full labelled reader results before two new native recipes and the
+original compiler. It used the same finalized sample only as a fixed location
+lookup. All 23 mandatory comparisons and four diagnostic transport comparisons
+passed; default Country, real Feature and fresh warm each had 35,060 rows.
+This establishes the disclosed saved-reader/compiler/composed-API boundary,
+not fresh raw-source equivalence, historical parent acceptance or sample truth.
+The synthetic evidence comprises 48 earlier passes plus one corrected fixture,
+not a newly run 49-test cohort; earlier failed attempts remain recorded.
+
+No factor conflicts occurred in this actual run. Nonempty conflict persistence
+is covered by the separate synthetic fixture, not measured here. Native and
+served household keys were complete; this did not exercise anonymous-household
+exclusion. Strict reading reached the existing required, all-missing 2017-18
+=intercropped= error; later grain-strict completion remains unestablished.
+No column was made optional or row dropped to obtain a pass. Actor/export
+processes closed and the private archive was authenticated. Publication within
+its 180-second allowance is unproven; available timestamps suggest an overrun.
+These execution limits do not redefine the FIELD factor or tree interpretation.
+Other waves/countries and the remaining #824 audit work remain separate.

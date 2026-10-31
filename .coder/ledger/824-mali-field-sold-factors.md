@@ -64,3 +64,23 @@ source-supported. Caller-blind resolver caching and a separate footer open are
 known limits: this source/invented plan does not claim arbitrary stale-process
 resolution or concurrent replacement safety. The original fresh compiler
 metadata replay fixture stays narrow; no production carrier workaround is added.
+
+### Completed bounded validation and integration (2026-10-31)
+
+The earlier unexecuted statements describe their preparation stage. Candidate
+b9bbcb3c6 completed dispatch55745f63: seven saved full reader interfaces, two
+new native recipes, original compiler, composed default/strict/real Feature and
+fresh warm. Independent result review and root custody/publication verification
+are recorded in the campaign handoff. Recorded comparisons:23 mandatory and4
+transport passed; Country/Feature/warm35060 rows. Actual factor-conflict groups
+were zero, so the synthetic conflict/footer fixture remains separate evidence.
+Synthetic coverage is48 earlier passes plus1 corrected fixture, not49 fresh
+cohort passes. Prior failed attempts are preserved.
+
+Strict reached the original required2017 intercropped NullReadError; later grain
+strict remains unestablished. No actual missing household i occurred. Fixed
+sample/saved-reader historical qualifications remain; this is not fresh raw
+source/sample truth. Closed archive142files267637088B authenticated; publication
+within180s is unestablished (timestamp proxy suggests overrun). No replay follows.
+Integration onto developmentc2e9a3a6 preserves all tested product/test bytes;
+only this ledger and CONTENTS receive the completion qualifications.
