@@ -47,7 +47,7 @@ EA/parish/refresh/weights/GPS, WAITING #829 and #647/#1297 remain separate.
 All 11 phases exit zero/closed. Actual plus inline export 150.555s; remote
 publication 79.681s is within 180. Closed manifest
 `664a95fffabc1128dee187a7c57249400d5332b481eea29971496ef2f87eabe4`
-binds 149 private files / 13,608,387 bytes; no private operands/operators are included.
+binds 149 private files / 13,608,387 bytes; this public extraction includes no private operands/operators.
 Final publication `d6f8de7e43caf92e14539d3bbdc124a298f3d3b6`, 60 ordinary files /
 259,291 bytes, Slurm 40682422 COMPLETED 0:0 / 7:30. Independent result review
 `2bca6fcdd8c5445aaa95e32fd49a5ef65079cb4e518c488beadb999af8be59d3`
