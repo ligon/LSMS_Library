@@ -4922,3 +4922,78 @@ global data_info.yml adding optional crop KgFactor_sold for Mali #824. No Uganda
 producer/core source changed, and no later-base runtime/hash pass is claimed.
 See =.coder/ledger/1287-uganda-assets-runtime-checkpoint.md= and
 =Uganda/1287-assets-public-checkpoint/REPORT.md=. Other cells/#1287 remain separate.
+
+* DRAFT fixed-native livestock compiler and consumers (GH #1287, 2026-10-31)
+
+Independent result review and root scientific acceptance remain PENDING. This
+local documentation draft records closed receipts, not accepted inventory credit,
+a public extraction or closure of #1287. No source/native/API actor was replayed.
+
+Seven historical native STORAGE operands (322,215 bytes) feed the unchanged
+actual country Make compiler, ordinary Country, simultaneous read/grain strict,
+first genuine Feature and separate-process original warm Country/Feature.
+All report 27,073 rows. Eight requested/registered coverage keys include the
+unwired 2005-06 wave; the seven contributors are 2009-10, 2010-11, 2011-12,
+2013-14, 2015-16, 2018-19 and 2019-20. This establishes a fixed historical
+STORAGE contribution boundary, not current raw/native arithmetic equivalence.
+Historical image/decoder and full historical epochs remain unestablished.
+
+Uganda's =ValuePerAnimal= is a nonadditive reported per-head value: sell-one-today
+reservation value in 2009-10/2010-11, average value per head SOLD from 2011-12.
+The coverage difference survives; this is not additive SalesValue, herd wealth,
+TLU or an engaged binary. Existing positive-head eligibility, head-count sums,
+head-weighted value/plain-mean fallback and missingness are unchanged. The
+2010-11 6B species overrides remain 17/21 Goats and 19/20 Sheep; string/code
+routes retain their original wave-specific meanings.
+
+The actual compiler applies local =uganda.id_walk= once AFTER ordered concat.
+The default framework instead retains its original per-wave mapping/t-filter,
+raw-once framework walk and finalization. Only the disclosed original Wave
+script-parquet selector chooses the seven admitted leaves for cold; original
+policy readers, Wave tail, compiler, aggregation, writer and finalizer remain.
+Normal/provider/restored registry, country and ALL EIGHT wave hashes match with
+fresh memos before payload; the original selector is restored before strict,
+first Feature and fresh warm. All calls use =currency=None=. This original
+=(t,i,animal)= contract needs no village/sample lookup or sample payload.
+
+All 23 labelled full typed comparisons pass: 21 mandatory stage/custody/
+composition checks and two separate prepared RETURN/storage transport diagnostics.
+They include seven native policy-copy and seven original compiler-reader
+comparisons; they are not 23 independent native science oracles. Both original
+strict levers return normally and strict matches saved default. Immediate actual
+NULL/grain report counts are 0/0; raw grain footer is None/stamp absent, not an
+empty stamped audit or universal no-loss proof.
+
+All nine selected API slots are absent before cold. Exactly one country cache
+is created with current hash/all-eight coverage; all eight wave slots remain
+absent. Fresh warm records two selected-cache getters and zero named source,
+decoder/native/build/Wave/writer/sample/raw-panel-map entries. Surviving cache,
+compiler products, immutable originals/receiving copies, source/authorities and
+children close. These named counters do not establish universal IO or atime.
+
+#1357 option 1 continues excluding genuinely anonymous household-keyed output:
+no inferred/shared unknown identity or orphan representation. Native missing-i
+and missing-animal diagnostics are zero; actual household i is complete. This
+native evidence-stage gate is distinct from source eligibility and does not
+newly exercise anonymous-household exclusion. Known households missing v/plot
+remain distinct. EA/parish, refresh/2019 weights/GPS, #647/#1297 and #829 WAITING
+caveats retain their separate meanings.
+
+Held V1 was unexecuted. Its descriptor kind/wave, independent failed-admission
+recovery, immediate conservative OWN allocation gate and executable supervised
+preflight defects were corrected before the single V2 actor. The reviewed d218
+predecessor and draft lifecycle findings remain preserved; the final launch
+rechecks remaining time after receipt fsync, and actual-exit evidence is archived.
+No failure was turned into a scientific pass by replaying a completed producer.
+
+Actual controller elapsed 239.511 s, actual supervisor 239.843 s and separate
+export 14.050 s. Archive f4ec47c3 binds 173 files / 33,762,441 bytes; root verified
+all SHA/size/full stable destination epochs without deserialization. OWN
+publication 6.077 s runs from observed postreceiver/export wait return through
+push AND exact remote-ref verification; it is NOT elapsed from inner actual
+exit. Private ref 3b52590f is verified; Slurm completed 0:0 in 9:32. These delivery
+facts remain separate from the pending scientific acceptance. Toolkit 1806c9ee
+used scientific b06abb5d; all 998 bound scientific files match public docs base
+c2ed89b3. No later-base runtime/hash claim or inventory increment follows.
+See =.coder/ledger/1287-uganda-livestock-runtime-checkpoint.md= and
+=Uganda/1287-livestock-public-checkpoint/REPORT.md=.
