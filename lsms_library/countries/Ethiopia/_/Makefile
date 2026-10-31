@@ -16,7 +16,7 @@ VAR_DIR ?= $(LSMS_DATA_ROOT)/$(COUNTRY)/var
 # schema and shadowed the runtime derivation with a stale parquet.
 # household_characteristics is auto-derived too (_ROSTER_DERIVED, GH #260).
 var = \
-      $(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet \
+      $(VAR_DIR)/nutrition.parquet \
       $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/crop_production.parquet \
       $(VAR_DIR)/plot_inputs.parquet $(VAR_DIR)/livestock.parquet \
       $(VAR_DIR)/anthropometry.parquet $(VAR_DIR)/plot_labor.parquet \
@@ -184,7 +184,10 @@ community_prices_parquet := $(community_prices:.py=.parquet)
 $(VAR_DIR)/community_prices.parquet: community_prices.py $(community_prices_parquet)
 	python community_prices.py
 
-$(VAR_DIR)/fct.parquet $(VAR_DIR)/nutrition.parquet: nutrition.py categorical_mapping.org $(VAR_DIR)/food_acquired.parquet
+# nutrition.py obtains food quantities through the Country API. A separate
+# hashless food compiler prerequisite is redundant (GH #1171). Ethiopia
+# declares no fct table and nutrition.py writes only nutrition.
+$(VAR_DIR)/nutrition.parquet: nutrition.py categorical_mapping.org
 	python nutrition.py
 
 

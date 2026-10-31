@@ -3428,3 +3428,28 @@ The direct nutrition script output remains hashless/without wave coverage.
 #1171 recipe/native-cold acceptance remains open. The CSV participates in
 existing country-wide build-input hashing, so unrelated Ethiopia caches may
 rewarm. The settled [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 anonymous-household exclusion]] is unchanged.
+
+* GH #1171 -- retire redundant nutrition Make dependency (2026-10-30)
+
+The nutrition recipe obtains quantities from the Country API. Two actual
+GNU Make requests, with and without the legacy food prerequisite, passed
+12 strict raw/served/nutrient and RETURN/storage comparisons using retained
+native outputs and the qualified sample-v boundary. Original Make first
+wrote hashless food; nutrition's real default route rebuilt the naturally
+stamped five-wave food cache. The prerequisite-free branch produced the
+same food and nutrient bytes. No FDC or raw/native build was repeated.
+
+The Make rule now requests nutrition only and no longer independently
+builds food. The explicit country food builder is retained. The unused
+=fct= target is removed from the var list and shared rule: the country
+declares no fct table and this script writes nutrition only. Four focused
+GNU Make/inert-command tests pass; fct cleanup is source/routing evidence,
+not a third scientific actual arm. Nutrition remains hashless without a
+wave manifest, as measured; no new FCT output or factor policy is added.
+
+These actual requests began with absent nutrition targets. Existing-target
+and incremental Make freshness are not proved, and no new source/FCT
+prerequisite tracking is introduced. Final Makefile hashing moves country
+fingerprints; the retained measured outputs were not restamped for it.
+The settled [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 anonymous-household exclusion]] is unchanged. See
+=slurm_logs/isa_backlog_2026-10-30/Ethiopia/1171-nutrition-make/REPORT.md=.

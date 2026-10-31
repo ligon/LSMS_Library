@@ -1,0 +1,9 @@
+# Ethiopia #1171: nutrition Make retirement
+
+Prepared on development 82362dce after a ledger-first commit. Reuse STANDING, CLAUDE, canonical data_info and Ethiopia CONTENTS including LOGBOOK/WAITING. The #771 snapshot supersedes the older missing-USDA-component prose, without establishing complete independent all-food FCT coverage. The #1357 anonymous-household exclusion is settled and unchanged.
+
+The accepted actual experiment compared the original nutrition rule with a copy removing only the legacy food prerequisite. Both use authenticated retained native outputs and the qualified sample-v boundary. All 12 strict matching-stage/raw/served/nutrient predicates passed; final sibling bytes match each other and the accepted default consumer. Actor/outer exit 0, closed children and all 14 input/source bindings unchanged. The original rule adds a hashless food compiler write which the real default nutrition route replaces with a naturally stamped five-wave food cache. No raw/native source rebuild or new FDC request occurred.
+
+Only the redundant food prerequisite and undeclared fct target are removed. The country food builder, nutrition target, arithmetic and existing explicit source prerequisites remain. Four real GNU Make tests with inert leaves pass; no invented values establish scientific acceptance. FCT-target cleanup is source plus invented routing evidence, not a third actual scientific arm. The actual experiments cover absent nutrition targets only: incremental/existing-target freshness and new dependency tracking are not claimed. Final Makefile hashing changes coarse country fingerprints; existing measured outputs are not restamped.
+
+See the public report for closed custody, original failures, source pins and all qualifications. Root owns issue disposition; no scientific policy or anonymous-household change.
