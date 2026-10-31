@@ -2014,7 +2014,7 @@ Make/writer fallback, observer or network denial occurred.
 Actual/source/input and export closure passed, all children ECHILD with no
 signals/timeouts. Controller took 102.023 seconds, outer actual 102.906 and
 export 4.554. The complete closed private archive has 56 files / 65,192,309 bytes.
-Separately, task/native/supervisor exited zero and publication completed without
+Separately, task completed; native/supervisor exited zero and publication completed without
 errors at private result =32fca257a23f8708c8cbd8eefb9e9733f9f2a215=;
 Slurm 40679773 completed 0:0 in 7:32. No data replay was needed for this checkpoint.
 Four other Mali compiler cells and the original fourteen-country #1287 scope
