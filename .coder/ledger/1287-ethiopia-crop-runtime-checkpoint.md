@@ -1,7 +1,8 @@
 # Ethiopia crop_production: five-wave fixed-STORAGE compiler checkpoint (#1287)
 
-DRAFT: independent result review and root acceptance pending. No inventory credit,
-publication or merge is authorized by this draft. Documentation only on public
+Independent result review03dca73f and root accept the qualified result below.
+Inventory credit follows reviewed documentation merge; exact-doc review and
+configured CI remain integration gates. Documentation only on public
 b06abb5d5d2f8778bf28d03638ab6ed351aa78c6; no product/test/source-policy changes.
 Inherit STANDING.md, CLAUDE.md and data_info.yml.
 
@@ -57,7 +58,7 @@ Dispatch 7491edd187264994b9fd865a836f5646 / job 40690394 recorded 25 mandatory +
 transport PASS: admission 10; compiler 6+1; cold/strict attribution/Feature 7+1;
 warm 2. Native storage rows 7,746/27,126/26,003/14,270/11,900; original compiler
 CALL/RETURN/storage 87,045; composed Country/real Feature/warm each 86,403. Full
-strict typed comparison includes unused axes/codes/order, scalars/nullable masks,
+exact typed comparisons include unused axes/codes/order, scalars/nullable masks,
 extension types and recursive attrs. These are matching-stage comparisons, not a
 new source arithmetic/old untouched CALL oracle or eligible-loss census.
 
@@ -105,5 +106,7 @@ in one of 527 bound source/config files: global data_info.yml adds optional
 KgFactor_sold for Mali #824. The other 526 (including all Ethiopia producer/core
 sources) match; docs addition changes CONTENTS afterward. This is explicit base
 compatibility/drift evidence, not a later-base runtime or hash claim.
-Independent result/root acceptance are pending, followed by exact documentation
-review/configured CI. Root alone updates inventory after reviewed docs merge.
+Independent result REVIEW03dca73f93cbed8f69cc49845381bc8e02ed663d287a0bb9c2f5813253822333
+and BINDINGSb7d2b15d68dae7bb29861c6a2c368d2da4f2d8a74ef33a6396a40bd9f2b09880
+are root-accepted with the qualifications above. Exact documentation review and
+configured CI remain integration gates. Root alone updates inventory after merge.

@@ -3574,8 +3574,9 @@ See =.coder/ledger/1287-ethiopia-labor-runtime-checkpoint.md= and
 
 * GH #1287 crop_production: five-wave fixed-STORAGE compiler checkpoint (2026-10-31)
 
-Draft documentation: independent result review and root acceptance remain pending;
-this entry does not credit the compiler inventory or authorize publication.
+Independent result review =03dca73f= and root accept this qualified result.
+Inventory credit follows exact documentation review, configured CI and merge;
+this entry does not itself advance the compiler inventory.
 
 The actual five-input VAR Make compiler ran from five authenticated historical
 native STORAGE contributions, with zero new raw parses/native builds/manual

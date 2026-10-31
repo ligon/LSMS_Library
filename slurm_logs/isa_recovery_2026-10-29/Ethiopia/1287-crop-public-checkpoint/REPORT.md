@@ -1,8 +1,9 @@
 # Ethiopia crop_production fixed-STORAGE compiler checkpoint (#1287)
 
-DRAFT: independent result/root acceptance pending; no inventory credit or public
-publication until those gates and exact docs review. Three documentation paths
-only, based on public b06abb5d; no product/tests/operators/private operands added.
+Independent result REVIEW03dca73f and BINDINGSb7d2b15d are root-accepted with
+the qualifications below. Inventory credit follows reviewed documentation merge.
+Three documentation paths only, based on public b06abb5d; no product/tests/
+operators/private operands added. Exact-doc review and configured CI remain gates.
 
 The actual five-input VAR Make compiler ran from five closed historical native
 STORAGE contributions. Those are writer-prepared storage, not untouched native
