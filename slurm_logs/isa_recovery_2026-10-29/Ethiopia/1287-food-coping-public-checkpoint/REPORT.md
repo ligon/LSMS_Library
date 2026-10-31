@@ -105,8 +105,9 @@ internal byte/footer/schema operations and derived witnesses remain separate.
 Five actual phases return zero with closed descendants/ECHILD, no timeout or signal.
 Controller time is 229.142 seconds; the actual supervisor is 229.514 seconds and
 separate export 13.234 seconds. Source/input/compiler/cache/authority/receipt
-closures report true with no closure errors. Root byte authentication is complete (receipt 57ae844b7); independent review
-and root accept this bounded result with the stated qualifications.
+closures report true with no closure errors. Root byte authentication is complete
+(receipt 57ae844b7); independent review and root accept this bounded result with
+the stated qualifications.
 
 Released OWN publication starts AFTER receiver actual-plus-separate-export and
 descendant cleanup. Push and exact remote-ref verification report 10.586 seconds
@@ -135,6 +136,5 @@ The historical country-document prefix is preserved byte-for-byte by this checkp
 
 Result/root acceptance is qualified as recorded above. Exact docs review,
 publication/merge and any #1287 inventory credit remain pending. Broader Ethiopia
-source/science/backlog work, other countries
-and the umbrella remain open. No raw/native/sample replay or new scientific policy
+source/science/backlog work, other countries and the umbrella remain open. No raw/native/sample replay or new scientific policy
 is proposed by this three-document checkpoint.
