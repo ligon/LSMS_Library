@@ -5135,3 +5135,76 @@ source arithmetic, causal/panel/population or broader Uganda acceptance follows.
 EA/parish/refresh, 2019 weights/GPS, #647/#1297/#829 WAITING and #1401 remain.
 See =.coder/ledger/1287-uganda-anthropometry-runtime-checkpoint.md= and
 =slurm_logs/isa_recovery_2026-10-29/Uganda/1287-anthropometry-public-checkpoint/REPORT.md=.
+
+* 2026-10-31 -- Interview-date compiler/consumer checkpoint (GH #1287)
+
+The bounded result is independently and root-qualified accepted. Final exact
+documentation review/publication and inventory credit remain pending. Root
+byte/delivery authentication remains separate; broader country acceptance does
+not follow.
+
+Ordinary receipts report 26 passing comparisons: 24 mandatory and two separately
+labelled prepared-RETURN/storage transport checks. These are custody and
+matching-stage composition checks, not 26 new independent raw/native science
+oracles. Eight historical native STORAGE operands total 24,362 rows and retain
+legacy =(j,t)= plus =Int_t:datetime64[us]=. The actual original compiler returns
+24,264 rows: ordered native reads/concat, Uganda-local ID walk once, reset/rename
+and its existing =dropna= remove 98 missing dates. The current API writer has
+24,362 rows before its original finalizer yields 24,264 Country/Feature/warm rows.
+Those stages are compared separately; no extra filtering policy is introduced.
+
+The same qualified 1376 finalized sample supplies its fixed 24,561-row v lookup,
+not new sample weights, membership, frame, eligibility, EA/parish or population
+truth. All eight native contributors and requested/hash/coverage keys remain.
+The genuine original Wave body survives selector-only historical leaf admission;
+API per-wave generic walk/finalization/sample-v remains distinct from the
+compiler's local post-concat walk. There is no current raw/native/sample producer
+or original script/cache freshness test.
+
+Both original strict levers passed once; bare =!make= required columns remain
+empty. This does not establish a newly required date or complete visit identity.
+Country audits only present levels; its PASS does not validate absent visit or
+constitute a strict Feature call.
+Pure actual reports before oracle are null=0/index=0/grain=0, raw grain footer
+absent. Country does not infer a visit; original Feature #506 adds
+=visit=pd.NA=, never visit=1. The overview's two annual survey visits does not
+supply per-record visit order in these native scripts. #1357 option 1 excludes
+genuinely anonymous household-keyed output with no inferred holder prefix,
+shared unknown ID or orphan representation. Actual cold/warm i/v are complete;
+native diagnostics are not source eligible-loss counts. #1120 is closed within
+its separately approved scope, which this checkpoint does not extend.
+
+All nine API slots were absent before cold; only one country cache was created,
+with all eight coverage keys, and wave slots remained absent rather than being
+observed evicted. Fresh warm recorded two selected cache getters and no named
+Wave/writer/source/decoder/build/sample/raw-panel-map fallbacks. Four cold and
+two warm ClusterIdentityWarnings remain. Read counts are 34 explicit policy,
+eight observed original Wave policy and 20 pickle reads, not every internal
+byte read. Full typed equality/cache closure is accepted within the fixed-STORAGE scope.
+Allowed positive telemetry records 417 tracked-config CSV fingerprint reads and
+112 exact absent-parquet probes, not guard faults or CSV payload parsing.
+
+Original V1 failed before payload admission at the unchanged 60-second metadata
+subcap; its actual 74.410539 s remains charged. Held 4a/731 corrections were
+unexecuted. V4 uses preflight full proof plus fresh actual-root recheck, the same
+literal unshare-rn entry and durable/independently closed receiving metadata.
+No UID waiver, epoch reset, source cohort or scientific policy change occurred.
+New actual 174.622202 s plus failed actual totals 249.032741 s; controller
+174.200662 s, separate export 29.897104 s and combined receiver phase 206.442796 s
+are distinct clocks. OWN publication 8.498806 s starts successful receiver
+actual/export descendant cleanup through push and exact remote ref, not inner
+actual exit or a precleanup/mtime proxy. Root records all 226 archive members /
+32,803,525 bytes authenticated without frame deserialization, final ordinary
+closure, scheduler COMPLETED 0:0 and platform success separately from science.
+
+Scientific =a7e1f606= is deliberate. The 1,023 selected non-CONTENTS bindings
+match public =885ad00c=; the sole selected CONTENTS difference is the preserved
+private plan note versus later public chronology, excluded from fingerprints.
+This checkpoint preserves the entire previous public CONTENTS prefix. The later
+copy-header checkout 976fc is not independently proved native production for
+the selected bundle. Historical decoder/image/full epochs, source arithmetic,
+script freshness, calendar/visit validity and population truth remain qualified.
+Independent result REVIEW =67c851ad= and root ACCEPTANCE =49ab5f9a= retain these
+limits; no inventory is credited before reviewed merge. EA/parish/refresh, 2019
+weights/GPS, #647/#1297/#829 WAITING and broader country work remain. See =.coder/ledger/1287-uganda-interview-date-runtime-checkpoint.md=
+and =slurm_logs/isa_recovery_2026-10-29/Uganda/1287-interview-date-public-checkpoint/REPORT.md=.
