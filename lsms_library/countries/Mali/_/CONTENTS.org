@@ -2232,11 +2232,11 @@ integration or umbrella disposition. Other cells, including =people_last7days=,
 remain outside its scope. Pins and qualifications:
 =slurm_logs/isa_recovery_2026-10-29/Mali/1287-livestock-runtime-receipt-v1/REPORT.md=.
 
-* 2026-10-31 -- Fixed-native people_last7days checkpoint (GH #1287; REVIEW DRAFT)
+* 2026-10-31 -- Fixed-native people_last7days checkpoint (GH #1287)
 
-*Review draft only*: the closed ordinary evidence below is being reconciled.
-Independent final-result and root acceptance remain pending; this text creates
-no public inventory credit, publication authorization or umbrella completion.
+*Qualified result accepted*: independent review =b5169463= and root
+acceptance =75e7152d= support the exact bounded unit below. Public documentation
+integration and inventory credit remain pending; no umbrella completion follows.
 At scientific source =cb27e8a8= and toolkit =4cf266d0=, two historical native
 STORAGE operands feed the original current country VAR Make compiler. Compiler,
 default Country, simultaneous read/grain strict, first real singleton Feature
@@ -2273,6 +2273,9 @@ export hash, old image/decoder/full epochs, current sample/weight truth and raw
 freshness remain unestablished. Policy-read operands/attrs/footers and original/
 receiving byte identities were retained before predicates and closed afterward.
 
+Payload missingness remains: activity-flag missing counts are 7,691 / 21,291,
+Industry missing counts 35,226 / 89,521, and 2017 working_age has one missing.
+Strict PASS does not mean complete payloads or fresh native-science acceptance.
 Actual i/pid missing counts are zero in admitted natives; actual returned i is
 present/nonmissing. #1357 keeps genuinely anonymous household-keyed records
 excluded without invented/shared unknown IDs or orphan representation. Known
@@ -2298,6 +2301,6 @@ Private head =6a8bcf6f298229f4fda8d5724c091369170e2b17= and 130-file archive
 were separately root-authenticated; Slurm40696277 completed0:0/8:28. The expanded
 worker report is supplemental outside the original publication clock. Archived
 pre-export OUTER/committed pre-publication RECEIVER do not replace final ordinary
-closure. Prior held packages remained unexecuted. Final scientific acceptance
-and reviewed public integration are still pending. Exact scope and references:
+closure. Prior held packages remained unexecuted. Root accepted the qualified result after the full independent seal; reviewed
+public integration and inventory reconciliation remain pending. Exact scope and references:
 =slurm_logs/isa_recovery_2026-10-29/Mali/1287-people-runtime-receipt-v1/REPORT.md=.
