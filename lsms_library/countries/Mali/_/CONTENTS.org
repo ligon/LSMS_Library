@@ -1900,3 +1900,63 @@ next action is exact instrument/provider clarification of whether a cluster-pric
 module was fielded and released. Rebuilding 2018, fabricating cluster keys or
 acquiring all five raw modules merely to rediscover these labels is unnecessary.
 No source/cache/API execution or new scientific choice is part of this update.
+
+* 2026-10-31 -- Actual food_coping compiler checkpoint (GH #1287)
+
+At source =3dfef588=, the existing explicit owned
+=var/food_coping.parquet= GNU Make target ran its single 2014-15 native
+prerequisite and country compiler. The one numeric
+=get_dataframe(convert_categoricals=False)= source was =EACIMEN_p2.dta=,
+526,681 held bytes; its raw return was 3,804 x 99 rows/columns, not a native
+output count. No acquisition occurred. Current declaration union selects only
+2014-15; EHCVM FIES =food_security= is distinct, and this is not a
+whole-instrument absence finding for the other waves.
+
+Native strategies, 0--7 Days, code-9/missing/out-of-range treatment, household
+formatter, sort/uniqueness checks and compiler ordered concat remain unchanged.
+The compiler does not bake v or apply an ID walk. Source's EACI/EHCVM and rural
+observation-unit caveats remain; no new eligibility, namespace, unit or recall
+policy is inferred. The dated Overview correction above remains historical.
+
+All ten exact recorded comparisons pass: seven mandatory and three separate
+prepared RETURN/storage diagnostics. Full Country, strict Country (both read
+and grain strict levers) and real singleton Feature return 18,261 rows. The
+actual compiler CALL matches its one native policy contribution; default API's
+expected CALL is independently composed through the current raw-once walk,
+augmentation, normalization and concat, then current finalization/Feature.
+This is source-composition/runtime evidence, not an independent scientific
+oracle for the source's day-count rules or membership.
+
+API uses truthful saved-native parquet origin and the exact Wave map/t-filter
+tail. The already-finalized recovered sample is a *fixed authenticated
+present-byte v lookup only*: its original export hash was unavailable, and
+neither historical nor current sample truth/custody/freshness is upgraded.
+Key/interface validation preceded raw admission: unique named i/t keys, one v
+column, selected-wave nonmissing household keys, with nullable v preserved.
+The same immutable lookup serves cold/warm; no sample/weight build, second walk
+or restamp. Matching-stage compiler proof does not depend on this lookup.
+
+The country compiler wrote hashless output; default API rebuilt naturally,
+without an assumed-fresh or manual stamp. Immutable native/compiler snapshots
+survive. Fresh warm restored the original wave loader without entering it and
+served one country cache; bytes, identity, size, mtime/ctime and measured 0600
+mode remained exact. Atime was not measured. Complete typed axes/domains/order,
+dtypes/EA/masks/nonmissing NumPy values and attrs match cold Country/Feature.
+No named raw/native/parser/Make/writer fallback or network denial occurred.
+This is neither =backend=make= API nor normal raw/sample API acceptance.
+
+One installed StataReader init/read/value-label lifecycle occurred; the existing
+cp1252 helper caused no additional reader. Getter and decoder counts are
+separate. Full Make exit zero and its checked recipes/child observations support
+the native-to-compiler chain; no separate native child-exit receipt is claimed.
+Source/input closure and actual/export ECHILD pass, with no timeout/signals.
+Controller took 72.251 seconds, outer actual 73.052, export 3.001. The closed
+archive has 45 files / 9,531,121 bytes. Earlier source-only permission-literal
+correction happened before any actor; it is not a failed data run or replay.
+
+This advances one of the six remaining Mali compiler execution cells, not
+whole #1287/#1288 or scientific acceptance. The recovered sample's prior
+observed-key census authority is not converted into a new sampling claim.
+Five other Mali compilers and the issue's six non-ISA countries remain separate.
+Detailed pins and scope:
+=slurm_logs/isa_recovery_2026-10-29/Mali/1287-food-coping-runtime-receipt-v1/REPORT.md=.
