@@ -10,3 +10,6 @@ Current plot_features unconditionally uses DVCFS.open after ensure. This repeats
 
 ## Invariants and boundaries
 Bytes, columns, restricted numeric decoding, fallback and temporary cleanup must be identical. No acquisition, broad DVC index, raw parse or data actor is performed during preparation. Real seven-cell compiler/runtime planning is separate, including whether already-closed D frames actually contain these fields. The isolated source diff goes to independent review before publication or any data run.
+
+## Source and invented validation
+The executable helper AST (excluding its docstring) exactly matches the accepted plot_inputs fast path. All other plot_features driver AST, including its nine selected columns and all scientific calls, is unchanged except importing _dvc_cache_path. The shared test carrier retains every original assertion. Only four new plot_features cases ran: cached/fallback crossed with decoder success/failure, 4 passed and 4 original plot_inputs cases deselected. Runtime 0.10 seconds (outer 5.3654 seconds), core 38, one CPU, 8 GiB, threads one, network namespace, 120+5 bound. Source hashes remained unchanged. No survey data, real parser, native script, API or performance measurement occurred.
