@@ -5258,3 +5258,64 @@ archived pre-export OUTER and committed running3 phase RECEIVER differ from fina
 closed receipts. Result review=b6574c5c=, rootacceptance=RESULT-ACCEPTANCE.json=
 in =1287-plot-features-root-result-v6=. See the matching public report and ledger.
 No count 61 precedes reviewed merge; broader #1287/fourteen-country scope stays open.
+
+
+* 2026-11-01 UTC -- Food-acquired compiler/consumer checkpoint (GH #1287)
+
+The bounded result is independently and root-qualified accepted. Executed =e17008c57= pins scientific =2f0494ec=;
+dispatch =15e3e159= / Slurm 40714272. All 26 comparisons passed: 24 mandatory
+and two separately labelled transport checks, not 26 independent native science
+oracles. All eight native contributions and requested/coverage keys remain;
+compiler, Country, strict, first genuine Feature and fresh-process warm each
+return 355,571 rows. Full 34 policy + eight original Wave-policy + 20 pickle
+read roles were recorded.
+
+The original compiler's ordered concat/local ID walk once remains distinct from
+API original decorated food/getter bodies, per-wave generic raw walk/finalizer
+and same qualified 1376 finalized 24,561-row sample-v lookup. This is present-byte
+lookup custody, not sample/frame/weights/membership/EA-parish/population truth.
+The three-field inventory does not impose alphabetic storage order.
+
+One original Country invocation with both strict flags actually PASSED; all
+Quantity/Expenditure/Price requiredness remains. Generic publisher negative
+wording is a conditional branch, not this outcome. Pure actual audit reports
+are null=0/index=0/grain=0, raw footer=None; not pointwise completeness or
+losslessness. Historical natives retain 27 Quantity, 34 Expenditure and 29,755
+Price null cells. Actual cold/warm i/v are complete under #1357's exclusion
+of genuinely anonymous household-keyed output: no inferred/shared unknown ID
+or orphan representation. Source rows are not new eligible-loss evidence;
+#1120's separately completed approved scope is not extended.
+
+Pure actual warnings are three QuantityImplausible plus one ClusterIdentity per
+process; cumulative lists 16 cold/eight warm include expected/strict/Feature work.
+All nine API slots began absent; only country appears and eight wave slots remain
+absent, not evicted. Fresh warm records exactly two selected cache getters, zero
+named fallbacks and unchanged full cache/hash/all-eight coverage. Full typed
+matching-stage comparisons retain original order/nulls/dtypes/attrs.
+
+Preserve failed actual 43.511507 s and 265.285382 s, the withdrawn normalized
+metadata-as-stored-order claim, and killed-child closure limits. V3 freshly
+revalidates all nine inputs; exact observer prebinding retains genuine discovery
+and has no independently measured speedup. Revised actual 900 + 5 / target 840 / closure 60,
+cold 360 / warm 120 / shared 1,260 explicitly supersede historical 600; new actual 334.493207 s
+plus prior 308.796889 s totals 643.290096 s within revised 1,208.796889. Controller
+334.067779 s/export24.033564 s/receiver360.076746 s are separate. OWN 7.057387 s
+starts successful receiver/export descendant cleanup through verified remote ref,
+not inner actual exit/mtime. Root authenticated 253 files/435,778,817 B without
+frame decoding; archived pre-export OUTER and prepublisher RECEIVER remain distinct
+from final closed ordinary receipts. Scheduler COMPLETED0:0/platform success
+are separate terminal facts.
+
+All 1,023 selected non-CONTENTS source bindings match public 049677e3; executed
+CONTENTS and the full previous public prefix are preserved, without a later
+whole-code runtime/hash claim. Historical STORAGE/current composition does not
+establish original producer/decoder/image/runtime continuity, current raw/native/
+sample arithmetic, script/cache freshness, unit/category eligibility, FCT/nutrition
+or derived-food products. Copier 976fc is not proven native production. Seven-day
+one-ask recall versus two agricultural visits, Kgs removal, Value/Unknown, off-map
+unit deletion, UBOS Price provenance, EA/parish/refresh/weights/GPS and WAITING
+caveats remain. Independent REVIEW=152e2912=/BINDINGS=6afae736= and root result
+ACCEPTANCE govern the scope. Original fourteen-country #1287/#1288 and broader
+backlog remain open.
+See =.coder/ledger/1287-uganda-food-acquired-runtime-checkpoint.md= and
+=slurm_logs/isa_recovery_2026-10-29/Uganda/1287-food-acquired-public-checkpoint/REPORT.md=.
