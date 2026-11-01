@@ -2,7 +2,7 @@
 
 ## 1. Scope and status
 
-Independent and root-qualified accepted bounded result. Execute source e17008c57, scientific 2f0494ec, dispatch15e3e159/job40714272; public docs base 049677e3. No product/test/science change.
+Independent and root-qualified accepted bounded result. Executed source e17008c57, scientific 2f0494ec, dispatch15e3e159/job40714272; public docs base 049677e3. No product/test/science change.
 
 ## 2. Prior art and matching stages
 
