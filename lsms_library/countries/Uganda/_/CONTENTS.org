@@ -5208,3 +5208,53 @@ Independent result REVIEW =67c851ad= and root ACCEPTANCE =49ab5f9a= retain these
 limits; no inventory is credited before reviewed merge. EA/parish/refresh, 2019
 weights/GPS, #647/#1297/#829 WAITING and broader country work remain. See =.coder/ledger/1287-uganda-interview-date-runtime-checkpoint.md=
 and =slurm_logs/isa_recovery_2026-10-29/Uganda/1287-interview-date-public-checkpoint/REPORT.md=.
+
+
+* Uganda plot_features: qualified fixed-STORAGE compiler/consumer checkpoint
+
+The bounded result is independently and root-qualified accepted; exact public
+review/integration and inventory credit remain pending. Executed source =1c78ff3a=
+(scientific =885ad00c=), dispatch =2da0f37b=, Slurm40711205. All 25 comparisons
+passed (23 mandatory including native/sample custody,2 transport), not25 independent
+native science oracles. Eight historical native contributions sum42,841rows;
+original compiler, Country, first genuine Feature and fresh-process warm return
+42,841. Full34 policy+8 originalWave-policy+20 pickle matrix is recorded.
+
+The one simultaneous read/grain-strict Country call produced the attributed
+original required-null =NullReadError= NEGATIVE, NOT a strict pass. Grain-strict
+and later index acceptance remain unestablished. All ten country fields remain
+required, with original observed order preserved rather than an alphabetical
+storage assumption. Native 2005 SoilType/Irrigated/PlotCertificate/ErosionProtection,
+2011 Irrigated and2019 SoilType are entirely missing; other partial missingness
+remains. Actual pre-oracle reports are4 null/0 index/0 grain, raw footer=None; this
+neither certifies completeness nor universal losslessness.
+
+Parcel_A/B lasting owned/use-rights land-unit identities differ from crop parcel/
+plot/crop-season vocabulary. GPS-first/farmer fallback, original area mask/hectare
+conversion and source-acre AreaUnit remain. Compiler local post-concat walk and
+API per-wave generic walk/current finalizer are compared at separate stages.
+The same qualified 1376 finalized24,561-row sample supplies present-byte v only,
+not sample production/frame/weights/membership/population truth. Actual i/v are
+complete under [[https://github.com/ligon/LSMS_Library/issues/1357#issuecomment-6526192658][#1357 anonymous-household exclusion]]; no inferred/shared unknown
+identity or orphan representation, and no new raw-eligibility/loss test. #1120
+remains separately closed for its approved scope.
+
+All 9 API slots start absent; only country appears and8 wave slots remain absent,
+not evicted. Fresh warm records2 selected cache getters,0 namedfallbacks and exact
+cache identity/hash/all 8coverage. Eight pure-actual warnings per process remain
+(NullRead/QuantityImplausible/ClusterIdentity); final24 cold/16 warm are cumulative.
+Fixed STORAGE/current-source composition does not establish raw/native arithmetic,
+historical decoder/runtime continuity, original script freshness, Make-backend
+API or area/tenure/GPS scientific validity. Private frame/report/exception operands
+remain opaque to the independent result reviewer; inference uses executed frozen
+checks plus authenticated closed receipts/archive bytes.
+
+Preserve three failed preflights and the V5 artificial alphabetic-interface
+failure, including its26.213760 s actual charge; no prefix is promoted. V6 fresh
+revalidates all 9inputs. Controller251.872s/outer actual252.225s,export27.469s and
+OWN publication7.547272 s after receiver/export descendant cleanup are separate.
+Root authenticated229 archive files/115,287,186B and terminal scheduler/platform;
+archived pre-export OUTER and committed running3 phase RECEIVER differ from final
+closed receipts. Result review=b6574c5c=, rootacceptance=RESULT-ACCEPTANCE.json=
+in =1287-plot-features-root-result-v6=. See the matching public report and ledger.
+No count 61 precedes reviewed merge; broader #1287/fourteen-country scope stays open.
