@@ -2329,3 +2329,40 @@ of 2026-10-21 above is unchanged.  New:
 
 Nothing in the held data says what these codes mean.  Eligibility is unchanged;
 the open question is still producer instructions or a released correction.
+
+* 2026-11-03 -- EHCVM crop sources: what a wiring would read, and why 2021-22 is sparse (GH #824)
+
+Source facts for the unwired EHCVM =crop_production= (measured from the held
+=.dta=, read-only, at development =3a33f2869=).  No wiring is done here.
+
+- *2018-19 =s16c_me_mli2018.dta= is one plot-crop file with harvest AND sale*,
+  like Niger 2018-19: 7,992 rows, unique on (grappe, menage, field, parcel,
+  crop).  Harvest =s16cq12a/b= (7,383 / 7,385 non-null); sold? =s16cq15=; sold
+  quantity / unit =s16cq16a/b= (2,102 / 2,111); value =s16cq17= (2,110); 2,101
+  rows with quantity and value both positive.  =s16cq12c= / =s16cq16c= are "Etat
+  du produit", not a kg factor; 2018-19 ships no kg conversion.  *The sold unit
+  equals the harvest unit label on only 705 of the 2,101 priced rows*, so a
+  wiring must carry =Unit_sold=.  The harvest units are a new vocabulary for the
+  =u= table (=Sacs de 100 kg= 3,894, =Charretée asine= 864, =Kg= 807, =Sacs de
+  50 kg= 622, =Baignoire= 252, =Tonne= 216, ...).
+- *2021-22 splits the module and its harvest quantity is routed away from
+  finished harvests.*  =s16c_me_mli2021.dta= (7,247 plot-crop rows) fills
+  =s16cq16a= ("Quantite deja recoltee") on 309 rows: 287 of the 2,010 whose
+  harvest is unfinished (=s16cq11= Non) and 22 of the 5,237 finished ones.
+  Burkina Faso 2021-22 has the same routing (179 of 813 unfinished, 0 of 7,663
+  finished); Niger 2021-22 does not (11,910 of 11,910 finished filled).  So for
+  most finished Mali 2021-22 harvests no harvest quantity exists in the file.
+  Whether that is the CAPI routing as fielded is an instrument question (not
+  checked).
+- =s16d_me_mli2021.dta= is crop-level (no plot): 5,068 household x crop rows, no
+  exact or key duplicates (unlike Niger's replicated s16d), covering 5,068 of the
+  6,362 household-crop pairs in s16c.  It records consumed / gifted / sold /
+  stocked quantities; 1,140 sales, 1,139 with a value.  =s16dq05c= / =s16cq16c=
+  are "Estimation Quantite totale UML en kg" -- a TOTAL in kg, the same shape that
+  keeps the EAC-I tree equivalents (=s3bq13c=, =s11fq14c=) unwired.  5,724 of the
+  6,362 s16c household-crop pairs are single-plot, the only ones a crop-level
+  sale can attach to without an invented split.
+
+The tree-equivalent evidence above ("crop_production: the sold unit") was
+re-measured at the same commit and holds exactly (18 / 10 of 39 in 2014-15;
+11 / 20 of 45 in 2017-18).
