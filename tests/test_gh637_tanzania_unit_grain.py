@@ -58,6 +58,18 @@ ROUND 3 -- the maintainer's rulings (@ligon, 2026-10-23, PR #1263)
        control).
     The ``crop_production`` collapse is gone: a repeated native record raises.
 
+ROUND 4 -- seed grain (@ligon, 2026-11-03, approving option (a))
+    ``plot_inputs`` seed rows keep each native AG_SEC_4A ``(household, plot,
+    cropid)`` report through the canonical ``input_obs`` level,
+    ``reported:4A:<cropid>``.  Each report keeps its own quantity, unit,
+    purchase and ``Improved`` answer.  The tests that pinned the round-2
+    behaviour (lumped codes in one unit summed with their flags OR'd, and two
+    OTHER (SPECIFY) quantities summed into one ``Unknown`` row) are REVERSED
+    for that reason.  AG_SEC_3A plot-level inputs, and a seed record with no
+    crop code, are ``unresolved_observation`` and keep the existing reduction
+    (the signed fertilizer-slot sum is the control).  A repeated native record
+    raises.
+
 INSTRUMENT NOTE (the issue's three traps).  Never assert post-collapse index
 uniqueness -- it holds by construction with the bug present ("zero duplicates
 is not soundness").  These tests assert the ROWS and the per-unit quantities
@@ -84,6 +96,8 @@ from lsms_library.transformations import U_UNKNOWN
 TZ = countries_root() / 'Tanzania'
 KEY5 = ['t', 'i', 'plot_id', 'input', 'crop']
 KEY6 = KEY5 + ['u']
+KEY7 = KEY6 + ['input_obs']          # served index since the round-4 ruling
+UNRESOLVED = 'unresolved_observation'
 
 
 def _load_module(name='_tanzania_637'):
@@ -133,10 +147,44 @@ def _by_unit(out):
 
 def test_u_is_an_index_level_not_a_column(tanzania):
     out = _inputs(tanzania, *_input_sources([dict()]))
-    assert list(out.index.names) == KEY6
-    assert 'u' not in out.columns
+    assert list(out.index.names) == KEY7
+    assert 'u' not in out.columns and 'input_obs' not in out.columns
     assert list(out.columns) == tanzania.PLOT_INPUTS_COLUMNS
+    # The module constant is the legacy 6-level key the helper extends with
+    # input_obs (kept so the #905 frozen-helper digest still verifies).
     assert tanzania.PLOT_INPUTS_INDEX == KEY6
+
+
+def _input_obs(out):
+    return list(out.index.get_level_values('input_obs'))
+
+
+def test_input_obs_is_the_native_crop_code(tanzania):
+    """Round 4: ``reported:4A:<cropid>`` -- crop_production's grammar."""
+    sec3, sec4 = _input_sources([dict(crop=1), dict(crop=3, plot=2)],
+                                sec3_rows=[dict(hhid=1, plot=1, ag3a_41=1, ag3a_42=10)])
+    out = _inputs(tanzania, sec3, sec4)
+    flat = out.reset_index().set_index('input')
+    assert sorted(flat.loc['Seed', 'input_obs']) == ['reported:4A:1', 'reported:4A:3']
+    assert flat.loc['Organic Fertilizer', 'input_obs'] == UNRESOLVED
+    assert str(out.index.get_level_values('input_obs').dtype) == 'string'
+
+
+def test_a_seed_record_without_a_crop_code_is_unresolved(tanzania):
+    sec3, sec4 = _input_sources([dict(crop=pd.NA, ag4a_10_1=4)])
+    out = _inputs(tanzania, sec3, sec4)
+    assert _input_obs(out) == [UNRESOLVED]
+    assert out['Quantity'].tolist() == [4]
+
+
+def test_a_repeated_native_seed_record_raises_rather_than_sums(tanzania):
+    """Two rows with one (household, plot, cropid): the source is unique on
+    that key in both held waves, so a repeat is refused, never reduced --
+    even in different units (the check precedes ``u``)."""
+    sec3, sec4 = _input_sources([dict(crop=1, ag4a_10_2=1),
+                                 dict(crop=1, ag4a_10_2=2)])
+    with pytest.raises(ValueError, match='repeat a native'):
+        _inputs(tanzania, sec3, sec4)
 
 
 @pytest.mark.parametrize('units,labels', [
@@ -164,29 +212,37 @@ def test_other_unit_quantity_is_not_summed_into_a_recorded_unit(tanzania):
     assert _by_unit(out) == {U_UNKNOWN: 10, 'kg': 4}
 
 
-def test_same_unit_group_is_still_summed_and_flags_ored(tanzania):
-    """Commensurable: Beans + Cowpeas seed, both in kg, one Pulses row.  The
-    payloads are identical on purpose -- two distinct source records, so the
-    sum (6) is right and a de-duplication (3) would be wrong."""
+def test_lumped_codes_in_one_unit_keep_their_own_rows_and_flags(tanzania):
+    """REVERSED by the round-4 ruling.  Round 2 summed Beans + Cowpeas seed in
+    one unit into one Pulses row (6 kg) and OR'd its flags.  Each native
+    report now keeps its own row: 3 kg improved and unpurchased, 3 kg not
+    improved and purchased.  The payloads are identical on purpose -- two
+    distinct source records stay two rows, never a de-duplicated one."""
     sec3, sec4 = _input_sources([dict(crop=1, ag4a_10_1=3, ag4a_10_2=1, ag4a_08=1),
                                  dict(crop=2, ag4a_10_1=3, ag4a_10_2=1, ag4a_12=500)])
     out = _inputs(tanzania, sec3, sec4)
-    assert len(out) == 1
-    row = out.reset_index().iloc[0]
-    assert (row['u'], row['Quantity']) == ('kg', 6)
-    assert bool(row['Purchased']) and bool(row['Improved'])
+    assert len(out) == 2
+    flat = out.reset_index().set_index('input_obs')
+    assert set(flat['crop']) == {'Pulses'} and set(flat['u']) == {'kg'}
+    assert flat['Quantity'].to_dict() == {'reported:4A:1': 3, 'reported:4A:2': 3}
+    assert flat['Improved'].astype(bool).to_dict() == {'reported:4A:1': True,
+                                                       'reported:4A:2': False}
+    assert flat['Purchased'].astype(bool).to_dict() == {'reported:4A:1': False,
+                                                        'reported:4A:2': True}
 
 
-def test_two_other_units_remain_one_unknown_row_known_residual(tanzania):
-    """A KNOWN RESIDUAL (GH #637 round 2), pinned so it stays visible, not
-    because it is right: two lumped codes both in OTHER (SPECIFY) are summed
-    into one ``Unknown`` row.  Two OTHER units are not known to be one unit
-    (#1041), but ``u`` cannot tell them apart.  Splitting them needs a row
-    ordinal; when that lands, this test should change."""
+def test_two_other_units_are_two_unknown_rows(tanzania):
+    """REVERSED by the round-4 ruling: the round-2 residual is gone.  Two
+    lumped codes both in OTHER (SPECIFY) used to be summed into one
+    ``Unknown`` row (52); two OTHER units are not known to be one unit
+    (#1041), and ``input_obs`` now tells the two records apart."""
     sec3, sec4 = _input_sources([dict(crop=1, ag4a_10_1=2, ag4a_10_2=5),
                                  dict(crop=2, ag4a_10_1=50, ag4a_10_2=5)])
     out = _inputs(tanzania, sec3, sec4)
-    assert _by_unit(out) == {U_UNKNOWN: 52}
+    flat = out.reset_index()
+    assert set(flat['u']) == {U_UNKNOWN}
+    assert dict(zip(flat['input_obs'], flat['Quantity'])) == {
+        'reported:4A:1': 2, 'reported:4A:2': 50}
 
 
 def test_same_fertilizer_in_both_inorganic_slots_is_still_summed(tanzania):
@@ -194,6 +250,7 @@ def test_same_fertilizer_in_both_inorganic_slots_is_still_summed(tanzania):
                                                 ag3a_54=1, ag3a_55=1, ag3a_56=100)])
     out = _inputs(tanzania, sec3, sec4.iloc[:0])
     assert _by_unit(out) == {'kg': 150}
+    assert _input_obs(out) == [UNRESOLVED]      # plot-level input, existing reducer
 
 
 def test_missing_unit_never_reaches_the_index_as_null(tanzania):
@@ -213,7 +270,7 @@ def test_declared_index_carries_u():
     scheme = load_yaml(TZ / '_' / 'data_scheme.yml')['Data Scheme']
     pi = scheme['plot_inputs']
     levels = [x.strip() for x in pi['index'].strip('()').split(',')]
-    assert levels == KEY5[:] + ['u']
+    assert levels == KEY7
     assert 'u' not in pi, "u is an index level; it must not also be declared a column"
     # crop_production: u stays a (constant 'kg') column; its grain is the
     # NATIVE record since the round-3 rulings (production_obs, GH #1198 level)
@@ -283,25 +340,43 @@ def test_organic_fertilizer_purchase_is_in_kg_where_recorded(tanzania):
     assert pd.isna(out.loc['2', 'Unit_purchased'])
 
 
-def test_purchases_in_two_units_under_one_key_raise_rather_than_sum(tanzania):
-    """Same total unit (one 6-level key), purchase units that disagree: the
-    Quantity_purchased sum would be incommensurable.  None in the held
-    sources (0 of 11 / 86 lumped Seed groups)."""
+def test_lumped_codes_keep_their_own_purchase_units(tanzania):
+    """REVERSED by the round-4 ruling: two lumped codes in one total unit
+    whose purchase units disagree used to share one key and raise.  Each
+    native report is now its own row with its own purchase unit."""
     sec3, sec4 = _input_sources([dict(crop=1, ag4a_10_1=3, ag4a_10c_1=1, ag4a_10c_2=1),
                                  dict(crop=2, ag4a_10_1=3, ag4a_10c_1=1, ag4a_10c_2=3)])
+    flat = _inputs(tanzania, sec3, sec4).reset_index().set_index('input_obs')
+    assert flat['Unit_purchased'].to_dict() == {'reported:4A:1': 'Kg',
+                                                'reported:4A:2': 'Small Cup'}
+
+
+def test_unresolved_seeds_in_two_purchase_units_still_raise(tanzania):
+    """The refusal survives where the reducer still runs: seed records with
+    no crop code share ``unresolved_observation`` (none in the held sources)."""
+    sec3, sec4 = _input_sources([dict(crop=pd.NA, ag4a_10_1=3, ag4a_10c_1=1, ag4a_10c_2=1),
+                                 dict(crop=pd.NA, ag4a_10_1=3, ag4a_10c_1=1, ag4a_10c_2=3)])
     with pytest.raises(ValueError, match='Quantity_purchased cannot be summed'):
         _inputs(tanzania, sec3, sec4)
 
 
-def test_agreeing_purchase_units_under_one_key_are_summed(tanzania):
+def test_lumped_purchases_are_not_summed_but_unresolved_ones_are(tanzania):
+    """REVERSED by the round-4 ruling for coded records (each keeps its own
+    purchased quantity); the agreeing-unit sum survives for unresolved ones."""
     sec3, sec4 = _input_sources([dict(crop=1, ag4a_10_1=3, ag4a_10c_1=1, ag4a_10c_2=1),
                                  dict(crop=2, ag4a_10_1=3, ag4a_10c_1=2, ag4a_10c_2=1),
                                  dict(crop=1, plot=2, ag4a_10_1=3, ag4a_10c_1=0),
-                                 dict(crop=2, plot=2, ag4a_10_1=3, ag4a_10c_1=2, ag4a_10c_2=4)])
-    out = _inputs(tanzania, sec3, sec4).reset_index().set_index('plot_id')
-    assert (out.loc['1', 'Quantity_purchased'], out.loc['1', 'Unit_purchased']) == (3, 'Kg')
-    # a zero purchase (no unit asked) does not disagree with a recorded one
-    assert (out.loc['2', 'Quantity_purchased'], out.loc['2', 'Unit_purchased']) == (2, 'Large Cup')
+                                 dict(crop=2, plot=2, ag4a_10_1=3, ag4a_10c_1=2, ag4a_10c_2=4),
+                                 dict(crop=pd.NA, plot=3, ag4a_10_1=3, ag4a_10c_1=1, ag4a_10c_2=1),
+                                 dict(crop=pd.NA, plot=3, ag4a_10_1=3, ag4a_10c_1=2, ag4a_10c_2=1)])
+    flat = _inputs(tanzania, sec3, sec4).reset_index().set_index(['plot_id', 'input_obs'])
+    assert flat.loc[('1', 'reported:4A:1'), ['Quantity_purchased', 'Unit_purchased']].tolist() == [1, 'Kg']
+    assert flat.loc[('1', 'reported:4A:2'), ['Quantity_purchased', 'Unit_purchased']].tolist() == [2, 'Kg']
+    # a zero purchase keeps its own (unasked, NA) unit; it is not merged
+    assert flat.loc[('2', 'reported:4A:1'), 'Quantity_purchased'] == 0
+    assert pd.isna(flat.loc[('2', 'reported:4A:1'), 'Unit_purchased'])
+    assert flat.loc[('2', 'reported:4A:2'), ['Quantity_purchased', 'Unit_purchased']].tolist() == [2, 'Large Cup']
+    assert flat.loc[('3', UNRESOLVED), ['Quantity_purchased', 'Unit_purchased']].tolist() == [3, 'Kg']
 
 
 # --------------------------------------------------------------------------
@@ -540,8 +615,12 @@ class TestHeldSources:
         return out
 
     @pytest.mark.parametrize('wave,rows,mixed,two_recorded', [
-        ('2019-20', 1775, 1, 0),     # was 1,774: one OTHER+kg group separated
-        ('2020-21', 7934, 10, 6),    # was 7,924: 6 recorded-unit + 4 OTHER groups
+        # 1,774 -> 1,775 (round 2: one OTHER+kg group separated) -> 1,786
+        # (round 4: 11 lumped Seed groups at the 6-level key are 22 rows)
+        ('2019-20', 1786, 1, 0),
+        # 7,924 -> 7,934 (round 2: 6 recorded-unit + 4 OTHER groups) -> 8,029
+        # (round 4: 86 lumped Seed groups are 181 rows)
+        ('2020-21', 8029, 10, 6),
     ])
     def test_plot_inputs_rows_and_separated_unit_groups(self, built, wave, rows, mixed,
                                                         two_recorded):
@@ -553,6 +632,43 @@ class TestHeldSources:
         assert len(multi) == mixed
         assert sum(U_UNKNOWN not in us for us in multi) == two_recorded
         assert pd.Series(pi.index.get_level_values('u')).notna().all()
+
+    @pytest.mark.parametrize('wave,source_rows,groups,grouped_rows,unknown_pairs,improved_split', [
+        ('2019-20', 1379, 11, 22, 2, 1),
+        ('2020-21', 5606, 86, 181, 2, 6),
+    ])
+    def test_every_seed_row_is_one_native_record(self, built, wave, source_rows, groups,
+                                                 grouped_rows, unknown_pairs, improved_split):
+        """Round 4: one served seed row per AG_SEC_4A record, nothing summed
+        or OR'd.  ``groups`` / ``grouped_rows`` are the old 6-level groups that
+        are now separate; ``unknown_pairs`` the round-2 residual (two OTHER
+        quantities summed as one ``Unknown``) now split; ``improved_split``
+        the old groups whose records disagree on ``Improved``."""
+        pi, _, d = built[wave]
+        assert pi.index.is_unique
+        flat = pi.reset_index()
+        seed = flat[flat['input'] == 'Seed']
+        assert len(d['4a']) == len(seed) == source_rows
+        assert seed['input_obs'].str.fullmatch(r'reported:4A:\d+').all()
+        assert (flat.loc[flat['input'] != 'Seed', 'input_obs'] == UNRESOLVED).all()
+        g = seed.groupby(KEY6, dropna=False)
+        sizes = g.size()
+        assert (int((sizes > 1).sum()), int(sizes[sizes > 1].sum())) == (groups, grouped_rows)
+        unk = sizes[(sizes > 1) & (sizes.index.get_level_values('u') == U_UNKNOWN)]
+        assert len(unk) == unknown_pairs
+        assert int((g['Improved'].nunique(dropna=True) > 1).sum()) == improved_split
+        # each row's Improved is its own record's ag4a_08 answer
+        hh = 'sdd_hhid' if wave == '2019-20' else 'y5_hhid'
+        plot = 'plotnum' if wave == '2019-20' else 'plot_id'
+        from lsms_library.local_tools import format_id
+        src = pd.DataFrame({
+            'i': d['4a'][hh].map(format_id), 'plot_id': d['4a'][plot].map(format_id),
+            'input_obs': 'reported:4A:' + pd.to_numeric(d['4a']['cropid']).astype('Int64').astype(str),
+            'own': pd.to_numeric(d['4a']['ag4a_08'], errors='coerce')
+                     .map({1: True, 2: False, 3: True}).astype('boolean')})
+        m = seed.merge(src, on=['i', 'plot_id', 'input_obs'], how='left', validate='1:1')
+        served, own = m['Improved'].astype('boolean'), m['own']
+        assert ((served == own).fillna(False) | (served.isna() & own.isna())).all()
 
     def test_the_six_recorded_unit_conflicts_are_seed_pulses(self, built):
         flat = built['2020-21'][0].reset_index()

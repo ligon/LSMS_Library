@@ -62,9 +62,19 @@ def operands(kind, population):
     }[population]
     args = list(source_case(kind, wave='2020-21'))
     if kind == 'plot_inputs':
-        raw = pd.concat([args[2].iloc[[0]]] * 4, ignore_index=True)
-        raw['ag4a_10_1'] = pd.array(values, dtype='Float64')
-        args[2] = raw
+        # GH #637 round 4 (@ligon 2026-11-03): four records of one coded
+        # (household, plot, cropid) now raise as a repeat (see
+        # test_repeated_coded_record_raises), so the populations are aimed at
+        # the reducer that still runs: four copies of one AG_SEC_3A row whose
+        # type-1 fertilizer quantity (ag3a_49) carries the operands, type 2
+        # unused, and no seed rows.  Uncoded seeds would not do: the seed gate
+        # (Quantity or crop present) drops NA operands before the reducer
+        # (red team on 91b175324).
+        raw = pd.concat([args[1].iloc[[0]]] * 4, ignore_index=True)
+        raw['ag3a_49'] = pd.array(values, dtype='Float64')
+        raw['ag3a_54'] = 2
+        args[1] = raw
+        args[2] = args[2].iloc[:0]
     elif kind == 'livestock':
         raw = pd.concat([args[1].iloc[[0]]] * 4, ignore_index=True)
         raw['indigenous'] = pd.array(values, dtype='Float64')
@@ -90,15 +100,42 @@ def test_actual_helpers_preserve_adverse_population(monkeypatch, tmp_path, kind,
     stub_maps(old, monkeypatch)
     stub_maps(new, monkeypatch)
     args = operands(kind, population)
+    reduced = []
+    if kind == 'plot_inputs':
+        original_sum = pd.Series.sum
+
+        def spy(series, *a, **k):
+            if k.get('min_count') == 1 and series.name == 'Quantity':
+                reduced.append((len(series), int(series.isna().sum())))
+            return original_sum(series, *a, **k)
+        monkeypatch.setattr(pd.Series, 'sum', spy)
     before = getattr(old, kind + '_for_wave')(*args)
     after = getattr(new, kind + '_for_wave')(*args)
+    if kind == 'plot_inputs':
+        # Every population reaches the Quantity reducer with all 4 operands,
+        # NA operands included, in both helpers.
+        expected_na = int(pd.isna(pd.Series(args[1]['ag3a_49'])).sum())
+        assert reduced.count((4, expected_na)) == 2, reduced
     if kind == 'plot_inputs':
         # Only the structural crop-NA expectation is superseded by the ruling
         # #1119 comment6368100317 / data_info.yml:250–265. All seed crops in
         # this cohort are mapped; keep legacy payload/order and other domains.
+        # GH #637 round 4: compare without the new input_obs level, which
+        # is unresolved on every row here; an uncoded seed is unknown_crop.
+        assert set(after.index.get_level_values('input_obs')) == {'unresolved_observation'}
+        after = after.droplevel('input_obs')
         before = relabel_expected(before, [
-            '(not crop-specific)' if pd.isna(crop) else crop
-            for crop in before.index.get_level_values('crop')])
+            crop if pd.notna(crop) else
+            ('unknown_crop' if inp == 'Seed' else '(not crop-specific)')
+            for inp, crop in zip(before.index.get_level_values('input'),
+                                 before.index.get_level_values('crop'))])
+        if 'Seed' not in set(before.index.get_level_values('input')):
+            # The operands carry no seed rows, so both helpers build the crop
+            # axis from plain str labels; the oracle's 'string' relabel dtype
+            # does not apply to that axis.
+            pos = before.index.names.index('crop')
+            before.index = before.index.set_levels(
+                before.index.levels[pos].astype(after.index.levels[pos].dtype), level='crop')
     assert before.index.equals(after.index)
     assert list(before.columns) == list(after.columns)
     assert before.dtypes.equals(after.dtypes)
@@ -127,3 +164,18 @@ def test_actual_helpers_preserve_adverse_population(monkeypatch, tmp_path, kind,
         stream.write(json.dumps(receipt) + '\n')
     for col, a, b in comparisons:
         np.testing.assert_array_max_ulp(a, b, maxulp=4)
+
+
+def test_repeated_coded_record_raises(monkeypatch):
+    """GH #637 round 4: the old public helper summed four records of one
+    coded (household, plot, cropid); the current one refuses the repeat."""
+    old, new = load_old(), load_helper()
+    stub_maps(old, monkeypatch)
+    stub_maps(new, monkeypatch)
+    args = list(source_case('plot_inputs', wave='2020-21'))
+    raw = pd.concat([args[2].iloc[[0]]] * 4, ignore_index=True)
+    raw['ag4a_10_1'] = pd.array([1e16, 1., 1., -1e16], dtype='Float64')
+    args[2] = raw
+    assert len(old.plot_inputs_for_wave(*args).xs('Seed', level='input')) == 1
+    with pytest.raises(ValueError, match='repeat a native'):
+        new.plot_inputs_for_wave(*args)

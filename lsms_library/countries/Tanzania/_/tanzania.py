@@ -1431,7 +1431,8 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
                (ag3a_65a/65b_1/65b_2/65c).  One row per (plot, input).
       sec4a -- AG_SEC_4A seasonal-crop seed: ag4a_08 improved flag, ag4a_10_1/2
                total seed qty+unit, ag4a_10c_1/2 purchased seed qty+unit,
-               ag4a_12 amount paid.  One SEED row per (plot, crop).
+               ag4a_12 amount paid.  One SEED row per native record
+               (household, plot, cropid) -- see ``input_obs`` below.
 
     STORES REPORTED VALUES ONLY.  seed_kg / nitrogen_kg / inorganic_fertilizer
     any-use flags are transformations over these rows, NOT columns here.
@@ -1446,15 +1447,32 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
 
     Returns
     -------
-    pd.DataFrame indexed by PLOT_INPUTS_INDEX = (t, i, plot_id, input, crop,
-    u) with columns PLOT_INPUTS_COLUMNS.  ``u`` is a key (GH #637): a seed
-    crop label recorded in two units is two rows, never one summed quantity.
+    pd.DataFrame indexed by PLOT_INPUTS_INDEX + ['input_obs'] = (t, i,
+    plot_id, input, crop, u, input_obs) with columns PLOT_INPUTS_COLUMNS.
+    ``u`` is a key (GH #637): a seed crop label recorded in two units is two
+    rows, never one summed quantity.
+    ``input_obs`` is the canonical native-observation level (GH #637 ruling,
+    @ligon 2026-11-03).  A seed row is ``reported:4A:<cropid>``, the
+    instrument's own crop code in AG_SEC_4A.  The token follows Tanzania's
+    ``crop_production.production_obs`` grammar, not Malawi / Niger / Uganda,
+    which share the level but serve release-qualified ``row:`` / ``slot:``
+    values.  A native code needs no release qualifier: unlike a constructed
+    row number it cannot shift between source releases.  So two codes that
+    ``harmonize_crop`` lumps under one label (Beans + Cowpeas -> Pulses) are
+    two rows, each with its own quantity, unit, purchase and ``Improved``
+    answer, and are never summed or OR'd.  A repeated native record raises.
+    A seed record without an integer crop code, and every AG_SEC_3A
+    plot-level input, is ``unresolved_observation`` and keeps the existing
+    reduction (Malawi Module D precedent).  The signed type-1 / type-2
+    fertilizer sum is one such reduction.
     Crop markers follow GH #1119: plot-level inputs are ``(not crop-specific)``;
     retained seeds with an unrecorded crop are ``unknown_crop``. Recorded
     unmapped identities pass through. Legacy keys govern eligibility and
     reduction before relabelling (ledger 1119-tanzania-crop-markers §§3–4).
     """
     c = colmap
+    unresolved = 'unresolved_observation'
+    index = PLOT_INPUTS_INDEX + ['input_obs']
     fert_type_map = _plot_harmonized_codes('harmonize_input')
     crop_map = _crop_labels()
     preferred = _unit_preferred_labels()
@@ -1522,6 +1540,21 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
             seed['crop'].notna(),
             code.map(lambda x: f'crop_{int(x)}' if pd.notna(x) else pd.NA)
                 .astype('string').reindex(seed.index).values)
+        # GH #637 ruling (@ligon 2026-11-03): each native AG_SEC_4A report
+        # keeps its own row.  The native crop code names it.  ``numeric`` is
+        # aligned by position, as the passthrough labels are.
+        seed['input_obs'] = numeric.map(
+            lambda x: (f"reported:{_CROP_MODULES['seasonal']}:{int(x)}"
+                       if pd.notna(x) else unresolved)).astype('string')
+        named = seed['input_obs'].ne(unresolved)
+        repeated = seed[named].duplicated(['i', 'plot_id', 'input_obs'], keep=False)
+        if repeated.any():
+            first = seed[named][repeated].iloc[0]
+            raise ValueError(
+                f"plot_inputs {t}: {int(repeated.sum())} AG_SEC_4A rows repeat a "
+                f"native (household, plot, cropid) seed record, e.g. "
+                f"{first['plot_id']!r} / {first['input_obs']!r}; a repeat is "
+                "raised, never reduced (GH #637)")
         rows.append(seed)
 
     # --- AG_SEC_3A: plot-level inputs (LEGACY crop = NA) ----------------
@@ -1619,13 +1652,17 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
                  | df['u'].astype('string').str.strip().eq('').fillna(False))
     df.loc[missing_u, 'u'] = U_UNKNOWN
     df['u'] = df['u'].astype('string')
+    # AG_SEC_3A plot-level inputs carry no native observation coordinate.
+    if 'input_obs' not in df.columns:
+        df['input_obs'] = unresolved
+    df['input_obs'] = df['input_obs'].astype('string').fillna(unresolved)
 
     df['t'] = t
     labels = df.pop('_crop_label')
-    df = df.set_index(PLOT_INPUTS_INDEX)
+    df = df.set_index(index)
     labels.index = df.index
     if not labels.index.is_unique:
-        groups = labels.groupby(level=PLOT_INPUTS_INDEX, dropna=False, sort=False)
+        groups = labels.groupby(level=index, dropna=False, sort=False)
         conflicts = groups.nunique(dropna=False).gt(1)
         if conflicts.any():
             raise ValueError(
@@ -1633,36 +1670,28 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
                 f'desired crop identities at {conflicts[conflicts].index[0]!r}; '
                 'cannot relabel losslessly (GH #1119)')
         labels = groups.first()
-    # ``u`` is part of the GRAIN (GH #637), as in the canonical
-    # ``plot_inputs`` index and in Malawi's and the EHCVM countries' builders:
-    # rows recorded in different units stay separate rows.  The remaining
-    # duplicates of the 6-level key are summed (reported quantities; OR the
-    # purchased / improved flags): a plot naming the same inorganic-fertilizer
-    # product as both type 1 and type 2 (kg + kg), or two raw crop codes that
-    # share a canonical Seed crop label (e.g. Beans + Cowpeas -> Pulses)
-    # recorded in the SAME unit.  One known exception is NOT commensurable:
-    # two codes that BOTH recorded OTHER (SPECIFY) are summed into one
-    # ``Unknown`` row although two "other" units are not known to be the same
-    # unit (2 groups per wave in the held sources; residual, see CONTENTS.org).  Before GH #637 ``u`` was
-    # a column reduced with 'first', so a group in two units was served as the
-    # sum of incommensurable quantities under the first unit: in the held
-    # 2020-21 sources 6 Seed/Pulses groups in two recorded units (bucket/kg,
-    # bucket/small cup, kg/large cup, kg/small cup) and 4 more where a
-    # quantity in OTHER (SPECIFY), i.e. ``Unknown``, was summed into a kg or
-    # large-cup quantity; 2019-20 had 1 of the latter kind.  ``min_count=1``
-    # so an all-NA group stays NA (a plain ``sum`` would zero the all-NA
-    # Quantity_purchased of fertilizer rows, which record only a purchased
-    # VALUE, not a purchased quantity).  ``dropna=False`` keeps the NA-crop
-    # (plot-level input) rows.
-    # The type-1 / type-2 fertilizer pairs stay summed by ruling (@ligon,
-    # 2026-10-23: the form asks two slots, read as two applications); the
-    # identical-quantity pairs are recorded in CONTENTS.org as possible
-    # double entry.
+    # ``u`` and ``input_obs`` are part of the GRAIN (GH #637).  Rows recorded
+    # in different units, and seed rows of different native crop codes, stay
+    # separate rows.  Since the 2026-11-03 ruling a coded seed row is unique
+    # by construction (repeats raise above), so it never reaches this reducer.
+    # Before the ruling the 6-level key summed lumped codes in one unit and
+    # OR'd their flags: 11 / 86 Seed groups in the held 2019-20 / 2020-21
+    # sources, 2 + 2 of them two OTHER (SPECIFY) quantities served as one
+    # ``Unknown`` row.  What is still summed here (reported quantities; OR the
+    # purchased / improved flags) are the ``unresolved_observation`` rows:
+    #   * a plot naming the same inorganic-fertilizer product as type 1 and
+    #     type 2 (kg + kg), summed by ruling (@ligon, 2026-10-23: the form
+    #     asks two slots, read as two applications).  The identical-quantity
+    #     pairs are recorded in CONTENTS.org as possible double entry;
+    #   * seed records with no integer crop code (none in the held sources).
+    # ``min_count=1`` so an all-NA group stays NA (a plain ``sum`` would zero
+    # the all-NA Quantity_purchased of fertilizer rows, which record only a
+    # purchased VALUE, not a purchased quantity).  ``dropna=False`` keeps the
+    # NA-crop (plot-level input) rows.
     #   Unit_purchased -- Quantity_purchased is summed only where every
     # purchased quantity in the group is in ONE recorded purchase unit; a
     # group whose purchase units disagree would be an incommensurable sum,
-    # so it is raised, never reduced (none in the held sources: 0 of the
-    # 11 / 86 lumped Seed groups).  Rows without a recorded purchase unit
+    # so it is raised, never reduced.  Rows without a recorded purchase unit
     # carry no purchased quantity to add (the unit is asked only when one is
     # recorded), so they do not disagree.
     if not df.index.is_unique:
@@ -1678,7 +1707,7 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
                     f"{s.index[0]!r}; Quantity_purchased cannot be summed")
             return units[0] if len(units) else pd.NA
 
-        df = df.groupby(level=PLOT_INPUTS_INDEX, dropna=False).agg({
+        df = df.groupby(level=index, dropna=False).agg({
             'Quantity': _sum1,
             'Purchased': 'max', 'Quantity_purchased': _sum1,
             'Unit_purchased': _agreed_unit,

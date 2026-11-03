@@ -3,6 +3,14 @@
 Vocabulary oracle: issue1119 comment6368100317 / data_info.yml:250–265.
 Payload oracle: exact frozen pre-migration production function, never a
 second implementation. Native colmaps and categorical tables are read as code.
+
+GH #637 ruling (@ligon 2026-11-03): seed rows keep each native AG_SEC_4A
+report via ``input_obs`` = ``reported:4A:<cropid>``.  Where the frozen
+function did not reduce, its rows are compared after dropping that level.
+Where it summed coded seed records, or OR'd their flags, the expectation is
+REVERSED here for that stated reason: the records stay separate, and a
+repeated native record raises.  Unresolved records (no crop code, and every
+plot-level input) keep the frozen reduction and are compared as before.
 """
 import ast
 from collections import defaultdict
@@ -21,6 +29,16 @@ from tests.tanzania_crop_marker_oracle import (
 
 STRUCTURAL = '(not crop-specific)'
 UNKNOWN = 'unknown_crop'
+UNRESOLVED = 'unresolved_observation'
+
+
+def legacy(after):
+    """The served frame without the round-4 ``input_obs`` level."""
+    return after.droplevel('input_obs')
+
+
+def obs(after):
+    return after.index.get_level_values('input_obs').tolist()
 COLS3 = ('ag3a_41', 'ag3a_42', 'ag3a_43', 'ag3a_44', 'ag3a_47', 'ag3a_48',
          'ag3a_49', 'ag3a_51', 'ag3a_54', 'ag3a_55', 'ag3a_56', 'ag3a_58',
          'ag3a_60', 'ag3a_62_1', 'ag3a_62_2', 'ag3a_63', 'ag3a_65a',
@@ -97,7 +115,10 @@ def test_source_branches_numeric_literal_reserved_and_plot_axes(helpers):
     assert after.index.get_level_values('crop').tolist() == expected + [STRUCTURAL] * 3
     assert after.index.get_level_values('plot_id').tolist()[-3:] == [
         'Farm-level', 'Farm-level', 'unknown_plot']
-    assert_strict(after, relabel_expected(before, expected + [STRUCTURAL] * 3))
+    assert_strict(legacy(after), relabel_expected(before, expected + [STRUCTURAL] * 3))
+    # Only an integer crop code names a native record; the rest are unresolved.
+    assert obs(after) == ([f'reported:4A:{code}'] + ['reported:4A:98765'] * 3
+                          + [UNRESOLVED] * 7 + ['reported:4A:0'] + [UNRESOLVED] * 3)
 
 
 def test_legacy_eligibility_precedes_markers_and_passthrough(helpers):
@@ -118,33 +139,47 @@ def test_legacy_eligibility_precedes_markers_and_passthrough(helpers):
         row[cm['plot']] = j + 1
     before, after = run(helpers, seeds, [{'ag3a_41': 1}])
     assert after.index.get_level_values('plot_id').tolist() == ['6', '7', '1']
-    assert_strict(after, relabel_expected(before, [UNKNOWN, label, STRUCTURAL]))
+    assert_strict(legacy(after), relabel_expected(before, [UNKNOWN, label, STRUCTURAL]))
+    assert obs(after) == [UNRESOLVED, f'reported:4A:{code}', UNRESOLVED]
     assert after.Quantity.iloc[0] == 0.
     assert pd.isna(after.Quantity.iloc[1])
 
 
-def test_mapped_duplicates_signed_sum_flags_and_legacy_sorted_order(helpers):
+def test_mapped_lumped_codes_keep_their_own_rows_and_flags(helpers):
+    """REVERSED (GH #637 round 4).  The frozen function summed the lumped codes
+    ``a`` and ``b`` under one label and OR'd their flags; each native record
+    is now its own row with its own payload."""
     cm = helpers[3]
     (a, b), label = lump(helpers)
     seeds = [
         {cm['crop']: a, 'ag4a_10_1': 1e16},
         {cm['crop']: b, 'ag4a_10_1': 1., 'ag4a_10c_1': 1.,
          'ag4a_10c_2': 1, 'ag4a_08': 1},
-        {cm['crop']: a, 'ag4a_10_1': 1., 'ag4a_10c_1': 2.,
-         'ag4a_10c_2': 1, 'ag4a_08': 2},
-        {cm['crop']: b, 'ag4a_10_1': -1e16},
         {cm['crop']: 98765, 'ag4a_10_1': 7.},
     ]
     before, after = run(helpers, seeds)
-    # Old mapped label sorts before crop_98765. New '98765' would sort FIRST;
-    # sorting after replacement would move payloads and violate the ruling.
     assert before.index.get_level_values('crop').tolist() == [label, 'crop_98765']
-    assert after.index.get_level_values('crop').tolist() == [label, '98765']
-    assert after.Quantity.tolist() == [0., 7.]
-    assert after.Quantity_purchased.iloc[0] == 3.
-    assert after.Unit_purchased.iloc[0] == 'Kg'
-    assert bool(after.Purchased.iloc[0]) and bool(after.Improved.iloc[0])
-    assert_strict(after, relabel_expected(before, [label, '98765']))
+    assert before.Quantity.tolist() == [1e16 + 1., 7.]
+    assert after.index.get_level_values('crop').tolist() == [label, label, '98765']
+    assert obs(after) == [f'reported:4A:{a}', f'reported:4A:{b}', 'reported:4A:98765']
+    assert after.Quantity.tolist() == [1e16, 1., 7.]
+    assert pd.isna(after.Quantity_purchased.iloc[0])
+    assert after.Quantity_purchased.iloc[1] == 1.
+    assert after.Unit_purchased.iloc[1] == 'Kg'
+    assert after.Purchased.tolist() == [False, True, False]
+    assert pd.isna(after.Improved.iloc[0]) and bool(after.Improved.iloc[1])
+
+
+def test_a_repeated_native_seed_record_refuses(helpers):
+    """The frozen function summed two records of one code; one (household,
+    plot, cropid) is now one record, so a repeat raises instead."""
+    old, new, wave, cm = helpers
+    (a, _), _ = lump(helpers)
+    sec3, sec4 = sources(cm, [{cm['crop']: a, 'ag4a_10_1': 1.},
+                              {cm['crop']: a, 'ag4a_10_1': 2.}])
+    assert old.plot_inputs_for_wave(wave, sec3, sec4, cm).Quantity.tolist() == [3.]
+    with pytest.raises(ValueError, match='repeat a native'):
+        new.plot_inputs_for_wave(wave, sec3, sec4, cm)
 
 
 def test_absent_and_blank_crop_keep_old_duplicate_sum(helpers):
@@ -152,7 +187,8 @@ def test_absent_and_blank_crop_keep_old_duplicate_sum(helpers):
     before, after = run(helpers, [{cm['crop']: None, 'ag4a_10_1': 2.},
                                   {cm['crop']: ' ', 'ag4a_10_1': 3.}])
     assert after.Quantity.tolist() == [5.]
-    assert_strict(after, relabel_expected(before, [UNKNOWN]))
+    assert obs(after) == [UNRESOLVED]
+    assert_strict(legacy(after), relabel_expected(before, [UNKNOWN]))
 
 
 @pytest.mark.parametrize('crops', [('Crop A', 'Crop B'), (None, STRUCTURAL),
@@ -184,7 +220,10 @@ def test_structural_and_seed_provenance_conflict_is_not_blanket_fill(helpers, mo
 
 
 @pytest.mark.parametrize('reduced', [False, True])
-def test_new_output_collision_refuses_without_second_reduction(helpers, reduced):
+def test_coded_and_literal_records_of_one_label_stay_distinct(helpers, reduced):
+    """REVERSED (GH #637 round 4).  A coded record and a literal one that
+    relabel to the same crop used to collide and refuse; ``input_obs`` now
+    tells them apart.  Repeating the coded record raises as a repeat."""
     old, new, wave, cm = helpers
     code, label = known(helpers)
     seeds = [{cm['crop']: code}, {cm['crop']: label}]
@@ -192,8 +231,13 @@ def test_new_output_collision_refuses_without_second_reduction(helpers, reduced)
         seeds.append({cm['crop']: code})
     sec3, sec4 = sources(cm, seeds)
     assert len(old.plot_inputs_for_wave(wave, sec3, sec4, cm)) == 2
-    with pytest.raises(ValueError, match='crop relabelling creates colliding output identities'):
-        new.plot_inputs_for_wave(wave, sec3, sec4, cm)
+    if reduced:
+        with pytest.raises(ValueError, match='repeat a native'):
+            new.plot_inputs_for_wave(wave, sec3, sec4, cm)
+        return
+    out = new.plot_inputs_for_wave(wave, sec3, sec4, cm)
+    assert out.index.get_level_values('crop').tolist() == [label, label]
+    assert obs(out) == [f'reported:4A:{code}', UNRESOLVED]
 
 
 def test_two_units_unknown_residual_and_both_fertilizer_slots(helpers):
@@ -208,22 +252,42 @@ def test_two_units_unknown_residual_and_both_fertilizer_slots(helpers):
     before, after = run(helpers, seeds, [{
         'ag3a_47': 1, 'ag3a_48': urea, 'ag3a_49': 50., 'ag3a_51': 100.,
         'ag3a_54': 1, 'ag3a_55': urea, 'ag3a_56': 100., 'ag3a_58': 200.}])
-    assert_strict(after, relabel_expected(before, [label] * 3 + [STRUCTURAL]))
-    assert after.Quantity.tolist() == [52., 5., 3., 150.]
-    assert after.index.get_level_values('u').tolist() == [
-        'Unknown', '20 liter bucket', 'kg', 'kg']
+    # Frozen: the two OTHER (SPECIFY) quantities were one Unknown row (52).
+    assert before.Quantity.tolist() == [52., 5., 3., 150.]
+    # REVERSED (GH #637 round 4): two records, two rows; the signed
+    # fertilizer-slot sum (unresolved) is unchanged.
+    flat = after.reset_index()
+    got = {(p, o): (u, q) for p, o, u, q in
+           zip(flat['plot_id'], flat['input_obs'], flat['u'], flat['Quantity'])}
+    assert got == {('1', f'reported:4A:{a}'): ('Unknown', 2.),
+                   ('1', f'reported:4A:{b}'): ('Unknown', 50.),
+                   ('2', f'reported:4A:{a}'): ('kg', 3.),
+                   ('2', f'reported:4A:{b}'): ('20 liter bucket', 5.),
+                   ('1', UNRESOLVED): ('kg', 150.)}
+    assert set(flat.loc[flat['input'] == 'Seed', 'crop']) == {label}
     assert after.Quantity_purchased.isna().all()  # min_count=1
 
 
 def test_purchased_unit_disagreement_refusal_survives(helpers):
+    """For unresolved records, which still reduce, both functions refuse.
+    REVERSED for coded records (GH #637 round 4): two lumped codes no longer
+    share a key, so each keeps its own purchase unit instead of refusing."""
     old, new, wave, cm = helpers
     (a, b), _ = lump(helpers)
     sec3, sec4 = sources(cm, [
-        {cm['crop']: a, 'ag4a_10c_1': 2., 'ag4a_10c_2': 1},
-        {cm['crop']: b, 'ag4a_10c_1': 3., 'ag4a_10c_2': 3}])
+        {cm['crop']: None, 'ag4a_10c_1': 2., 'ag4a_10c_2': 1},
+        {cm['crop']: None, 'ag4a_10c_1': 3., 'ag4a_10c_2': 3}])
     for module in (old, new):
         with pytest.raises(ValueError, match='Quantity_purchased cannot be summed'):
             module.plot_inputs_for_wave(wave, sec3, sec4, cm)
+    sec3, sec4 = sources(cm, [
+        {cm['crop']: a, 'ag4a_10c_1': 2., 'ag4a_10c_2': 1},
+        {cm['crop']: b, 'ag4a_10c_1': 3., 'ag4a_10c_2': 3}])
+    with pytest.raises(ValueError, match='Quantity_purchased cannot be summed'):
+        old.plot_inputs_for_wave(wave, sec3, sec4, cm)
+    out = new.plot_inputs_for_wave(wave, sec3, sec4, cm)
+    assert out.Unit_purchased.tolist() == ['Kg', 'Small Cup']
+    assert out.Quantity_purchased.tolist() == [2., 3.]
 
 
 @pytest.mark.parametrize('crop', [98765.25, Decimal('98765.25'), np.inf,
@@ -239,15 +303,19 @@ def test_unsupported_numeric_types_retain_original_refusal(helpers, crop):
     assert failures[0] == failures[1]
 
 
-def test_native_nondefault_source_index_does_not_repair_old_grouping(helpers):
+def test_native_nondefault_source_index_keeps_each_native_record(helpers):
+    """REVERSED (GH #637 round 4).  The legacy fallback reindexes the source
+    code on the constructed frame's index, so with a nondefault source index
+    both records lost their code and pooled (the #1119 helper refused that
+    ambiguity).  ``input_obs`` is aligned by position, like the passthrough
+    labels, so each native record keeps its own row and crop."""
     old, new, wave, cm = helpers
     sec3, sec4 = sources(cm, [{cm['crop']: 98765}, {cm['crop']: 98766}])
     sec4.index = [10, 20]
-    # Legacy fallback reindexed source code on the constructed frame's index.
-    # Preserve that existing grouping, refuse its ambiguity; don't split it.
     assert len(old.plot_inputs_for_wave(wave, sec3, sec4, cm)) == 1
-    with pytest.raises(ValueError, match='legacy crop aggregation conflates distinct'):
-        new.plot_inputs_for_wave(wave, sec3, sec4, cm)
+    out = new.plot_inputs_for_wave(wave, sec3, sec4, cm)
+    assert out.index.get_level_values('crop').tolist() == ['98765', '98766']
+    assert obs(out) == ['reported:4A:98765', 'reported:4A:98766']
 
 
 @pytest.mark.parametrize('reduced', [False, True])
@@ -262,7 +330,10 @@ def test_attrs_survive_actual_reducer_and_relabel(helpers, monkeypatch, reduced)
         return frame
 
     monkeypatch.setattr(pd, 'concat', with_attrs)
-    before, after = run(helpers, [{cm['crop']: code}] * (2 if reduced else 1))
+    # GH #637 round 4: a repeated coded record raises, so the reducer is
+    # exercised by two records without a crop code (unresolved).
+    seeds = [{cm['crop']: None}] * 2 if reduced else [{cm['crop']: code}]
+    before, after = run(helpers, seeds)
     # The exact frozen production function (and pandas' existing dict-agg
     # path) drops attrs when it reduces. Preserve that behavior; marker work
     # must not silently repair it. The unique path retains the typed value.
@@ -270,7 +341,7 @@ def test_attrs_survive_actual_reducer_and_relabel(helpers, monkeypatch, reduced)
         assert before.attrs == {}
     else:
         assert before.attrs['nested'][0]['flag'] is True
-    assert_strict(after, relabel_expected(before, [label]))
+    assert_strict(legacy(after), relabel_expected(before, [UNKNOWN if reduced else label]))
 
 
 @pytest.mark.parametrize('value', [np.nextafter(1., 2.), 1. + 1e-12, -1e-300])
