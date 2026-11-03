@@ -92,25 +92,31 @@ def test_duplicate_missing_unit_and_later_known_unit_stay_separate(tanzania):
     assert flat.loc[U_UNKNOWN, 'Quantity'] == 2
     assert pd.isna(flat.loc['kg', 'Quantity'])
     assert flat['Quantity_purchased'].isna().all()
-    assert list(out.index.names) == ['t', 'i', 'plot_id', 'input', 'crop', 'u']
+    assert list(out.index.names) == ['t', 'i', 'plot_id', 'input', 'crop', 'u',
+                                     'input_obs']
     assert list(out.columns) == tanzania.PLOT_INPUTS_COLUMNS
 
 
-def test_all_missing_duplicate_units_reduce_to_one_unknown_row(tanzania):
-    # Renamed for GH #637: normalization now PRECEDES the reduction (``u`` is
-    # a key, so a NaN unit must be Unknown before grouping); the result is
-    # the same single Unknown row.
+def test_all_missing_units_of_two_codes_are_two_unknown_rows(tanzania):
+    # REVERSED by the GH #637 round-4 ruling (@ligon 2026-11-03): each native
+    # seed record keeps its own row (input_obs = reported:4A:<cropid>).  The
+    # two lumped codes used to reduce to ONE Unknown row with Purchased and
+    # Improved OR'd; now each keeps its own answers.  Normalization still
+    # PRECEDES any reduction, so no NaN unit reaches the index.
     sec3, sec4 = sources([
         dict(crop=1, ag4a_10_1=pd.NA, ag4a_10_2=pd.NA, ag4a_08=1),
         dict(crop=2, ag4a_10_1=pd.NA, ag4a_10_2=5, ag4a_12=12),
     ])
     out = build(tanzania, sec3, sec4)
-    assert len(out) == 1
-    assert served_unit(out) == U_UNKNOWN
-    assert pd.isna(out.iloc[0]['Quantity'])
-    assert pd.isna(out.iloc[0]['Quantity_purchased'])
-    assert out.iloc[0]['Purchased']
-    assert out.iloc[0]['Improved']
+    assert len(out) == 2
+    assert [served_unit(out, r) for r in (0, 1)] == [U_UNKNOWN, U_UNKNOWN]
+    assert out['Quantity'].isna().all()
+    assert out['Quantity_purchased'].isna().all()
+    flat = out.reset_index().set_index('input_obs')
+    assert flat['Purchased'].astype(bool).to_dict() == {'reported:4A:1': False,
+                                                        'reported:4A:2': True}
+    assert flat['Improved'].astype(bool).to_dict() == {'reported:4A:1': True,
+                                                       'reported:4A:2': False}
 
 
 def test_no_amount_source_use_keeps_every_input_and_its_recorded_unit(tanzania):

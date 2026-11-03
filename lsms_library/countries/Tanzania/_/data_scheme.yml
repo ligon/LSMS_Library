@@ -225,6 +225,14 @@ Data Scheme:
     #           crop codes sharing one label (Beans + Cowpeas -> Pulses) in two
     #           different units are two rows, never one incommensurable sum
     #           (2020-21: 10 such groups; 2019-20: 1).
+    #   input_obs : the canonical native-observation level (GH #637 ruling,
+    #           @ligon 2026-11-03).  Seed rows are reported:4A:<cropid>, the
+    #           AG_SEC_4A crop code, so lumped codes keep their own row,
+    #           quantity, unit and Improved answer (no sum, no OR); a repeated
+    #           native record raises.  AG_SEC_3A plot-level inputs (and a
+    #           seed record without a crop code) are unresolved_observation
+    #           and keep the existing reduction, e.g. the signed type-1 /
+    #           type-2 fertilizer sum.  Malawi / Niger / Uganda precedent.
     # Only 2019-20 and 2020-21 are buildable; 2008-15 has no agriculture source
     # on disk (same as plot_features / crop_production, GH #167).
     # SEASON SCOPE: long-rainy-season modules (AG_SEC_3A / AG_SEC_4A) only,
@@ -235,7 +243,7 @@ Data Scheme:
     # seasons as separate plot-season rows.
     # STORES REPORTED VALUES ONLY -- seed_kg / nitrogen_kg / any-use flags /
     # fertilizer totals are transformations over these rows, NOT columns here.
-    index: (t, i, plot_id, input, crop, u)
+    index: (t, i, plot_id, input, crop, u, input_obs)
     Quantity: float
     Purchased: bool
     Quantity_purchased: float

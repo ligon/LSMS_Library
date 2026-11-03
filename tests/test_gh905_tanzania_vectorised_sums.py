@@ -117,15 +117,20 @@ def test_duplicate_helpers_match_declared_numeric_sum_scope(helper, monkeypatch,
 def test_plot_input_rows_flags_units_and_na_survive(helper):
     out = build(helper, 'plot_inputs')
     assert list(out.columns) == helper.PLOT_INPUTS_COLUMNS
-    assert list(out.index.names) == helper.PLOT_INPUTS_INDEX
+    assert list(out.index.names) == helper.PLOT_INPUTS_INDEX + ['input_obs']
     assert all(str(out[c].dtype) == 'Float64' for c in ('Quantity', 'Quantity_purchased'))
     assert str(out['Unit_purchased'].dtype) == 'string'
     seed = out.xs('Seed', level='input')
-    first = seed.xs('1', level='plot_id').iloc[0]
-    np.testing.assert_array_max_ulp([first['Quantity']], [0.3], maxulp=4)
-    assert first['Quantity_purchased'] == 0.1
-    assert bool(first['Purchased']) and bool(first['Improved'])
-    assert first['Unit_purchased'] == 'Kg'
+    # GH #637 round 4 (@ligon 2026-11-03): the two lumped codes on plot 1 are
+    # two native records, no longer one summed row (0.3) with OR'd flags.
+    plot1 = seed.xs('1', level='plot_id').reset_index().set_index('input_obs')
+    assert plot1['Quantity'].to_dict() == {'reported:4A:1': 0.1, 'reported:4A:2': 0.2}
+    assert pd.isna(plot1.loc['reported:4A:1', 'Quantity_purchased'])
+    assert plot1.loc['reported:4A:2', 'Quantity_purchased'] == 0.1
+    assert plot1.loc['reported:4A:2', 'Unit_purchased'] == 'Kg'
+    assert plot1['Purchased'].astype(bool).tolist() == [False, True]
+    assert plot1['Improved'].astype(bool).tolist() == [False, True]
+    assert len(seed.xs('2', level='plot_id')) == 2
     assert seed.xs('2', level='plot_id')['Quantity'].isna().all()
     assert seed.xs('2', level='plot_id')['Quantity_purchased'].isna().all()
     assert seed.xs('3', level='plot_id')['Quantity'].tolist() == [7]

@@ -1917,6 +1917,27 @@ The downstream effect is nil today because =Unknown= receives no kg factor.
 The 2019-20 60 + 100 group also recorded both *purchased* quantities in OTHER (=ag4a_10c_2= = 5), so its =Quantity_purchased= 160 is the same residual under =Unit_purchased= ='Unknown'= (the only such group in either wave).
 One further kind deserves a maintainer's look, not a change:
 - *=Improved= OR'd across lumped crop codes* (1 / 6 groups at the 6-level key disagree; 1 / 8 at the old key): one code's seed recorded improved and the other's not is served as improved.
+(Superseded for seed rows by the 2026-11-03 ruling below: lumped codes are no longer summed or OR'd, and the Unknown residual is gone.)
+
+** Native seed records: =input_obs= (GH #637 ruling, 2026-11-03)
+
+*Ruling (@ligon, 2026-11-03, option (a)).*  Modern =AG_SEC_4A= seed rows keep each native =(household, plot, cropid)= report with its own quantity, unit, purchase and =Improved= answer.
+They do so through the canonical =input_obs= level, set to the native crop code (the Malawi / Niger / Uganda precedent).
+The declared index is now =(t, i, plot_id, input, crop, u, input_obs)=.
+- Seed :: =reported:4A:<cropid>=, the grammar of =crop_production.production_obs=.  The source is unique on =(hhid, plot, cropid)= in both held waves (1,379 / 5,606 rows, no repeat, no null id), so every coded seed row is unique.  A repeat raises before =u= joins the key; it is never reduced.  The code is aligned by position, like the passthrough crop labels.
+- Unresolved :: =unresolved_observation= for every =AG_SEC_3A= plot-level input and for a seed record without an integer crop code (none in the held sources).  These keep the existing reduction, so the signed type-1 / type-2 fertilizer sum below is unchanged.
+- =PLOT_INPUTS_INDEX= in =tanzania.py= is still the 6-level key; the helper appends =input_obs=.  Every edit is inside =plot_inputs_for_wave=, so the #905 frozen-helper digest still verifies.
+
+Measured on the held sources, against the development helper at =7c2b5ed01=:
+| wave    | rows before | rows after | lumped 6-key Seed groups -> rows | Unknown-unit sums split | =Improved= groups that disagreed |
+|---------+-------------+------------+----------------------------------+-------------------------+----------------------------------|
+| 2019-20 |       1,775 |      1,786 | 11 -> 22                         | 2 -> 4 rows             | 1                                |
+| 2020-21 |       7,934 |      8,029 | 86 -> 181                        | 2 -> 4 rows             | 6                                |
+- Non-seed rows (407 / 2,423) are frame-identical.  Seed rows that were alone at the 6-level key are identical.
+- Summing the new seed rows back to the 6-level key reproduces the old =Quantity= and =Quantity_purchased=.  Each row's =Improved= now equals its own record's =ag4a_08= answer.
+- =seed_kg= is frame-identical (857 / 3,522 plots; 25,425.51 / 500,941.37 kg), because it sums per plot and =Unknown= gets no kg factor.  =nitrogen_kg= is identical too.
+- Cold private-root =Country('Tanzania').plot_inputs()= serves 9,815 unique rows: 6,985 =reported:4A:= and 2,830 unresolved.  =Feature('plot_inputs')(['Tanzania'])= is unique on the canonical index; no grain report.
+- Cost: =tanzania.py= and =data_scheme.yml= are inputs of every Tanzania table, so this is a Tanzania-wide re-warm.
 
 ** Fertilizer type-1 / type-2 pairs: summed, possibly double entry (GH #637 ruling, 2026-10-23)
 
