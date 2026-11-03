@@ -2954,7 +2954,9 @@ Only W4 and W5 declare =interview_date=; W1-W3 have no entry.
 timestamp.  It is in the source =.dta= files, not introduced by the build,
 and it used to be cached as a string that the declared-datetime cast
 rejected on every read (=DatetimeCoercionWarning=, 115 values, GH #798).
-Each wave's =data_info.yml= now maps it to null where the column is read.
+Each wave's =data_info.yml= now maps it to null where the column is read
+(since GH #1056, 2026-11-03: as a declared =sentinels:= entry of the GH #1045
+build-time parser -- still served NaT, now also counted, =sentinel= 8 / 112).
 
 | wave    | source                                  | rows  | =##N/A##= rows (households) |
 |---------+-----------------------------------------+-------+-----------------------------|
@@ -3038,7 +3040,54 @@ Both waves carry device-clock dates well outside fieldwork: W4 15 rows
 (13 in 2014-01, in EAs =030519088801304= and =031201088800105=; one
 2015-01-09; one 2018-10-09) against fieldwork May-Sep 2019; W5 18 rows
 (2014-01 9, 2014-04 2, 2014-07 7) against Mar-Jul 2022.  Not adjudicated
-and not nulled here.
+and not nulled here.  (Corrected 2026-11-03: "device-clock" is not
+established for all of them -- 7 W5 rows may be Ethiopian-calendar dates;
+see the last bullet below.)
+
+*Counted since GH #1056 (2026-11-03).*  Both waves are parsed at build time
+by the GH #1045 parser (=datetime:= spec in each wave's =data_info.yml=), with
+a fieldwork =window:= -- so the 15 / 18 are now the parser's
+=outside_window= count, warned as =DatetimeParseWarning= on every read
+(stamped =lsms_datetime_audit=, replayed warm), fatal under
+=LSMS_DATE_STRICT=1=, and still served as recorded.  This implements
+#1056's option (b), a parser screen; option (a), null-with-count, was not
+taken -- a screen counts and keeps, as Site Q does.  Served rows and values
+are unchanged (=assert_frame_equal= against the pre-change frame, 8,237
+rows); the column is now =timestamp[us]= in the wave and country parquets
+(was =large_string=, cast at read time).
+
+- *Calendar: Gregorian, cited.*  The #1045 inventory left these two columns
+  =unknown= ("open per charter §5",
+  =.coder/ledger/1045-calendar-inventory.org=).  The WB catalog DDIs (3823,
+  6161: =study_desc.method.data_collection=) name Survey Solutions CAPI as the
+  mode and give fieldwork in Gregorian months; the timestamps are the CAPI
+  device clock in ISO 8601.  The modal months of the data (W4 2019-06: 5,069;
+  W5 2022-04: 1,162) agree.
+- *Window: the DDI's months for the event each wave dates, widened by one
+  month each side.*  W4: household questionnaire "between June and August
+  2019" (rural third visit and urban single visit) -> window
+  2019-05-01..2019-09-30.  W5: post-harvest questionnaire 2022-04-01 to
+  2022-06-30 (=coll_dates=) -> 2022-03-01..2022-07-31.  The shoulder is
+  deliberate: the DDI months literally would also count fieldwork overrun
+  (W4 2019-05 7 + 2019-09 82 served rows; W5 2022-03 10 + 2022-07 1), burying
+  the dates years outside fieldwork (104 / 29 instead of 15 / 18).
+- *The W5 count is holder-grain*: the report counts 18 of 1,596 PH-cover rows;
+  18 of the 1,475 served household rows remain outside after the collapse.
+  The two counts are equal only because no out-of-window holder row is lost
+  in the collapse; they are different quantities.
+- *Not all of these are settled as device-clock errors* (red-team review,
+  re-measured 2026-11-03 with =lsms_library.calendars.ethiopian_to_gregorian=).
+  The 7 W5 rows dated 2014-07-10 are in Harar, all in ONE EA whose 9 dated
+  rows include none in 2022; read as an Ethiopian-calendar date, 2014-07-10
+  (Megabit 10, 2014 EC) is 2022-03-19 -- inside the post-harvest fieldwork
+  window.  The same EA's other 2 rows (2014-04-18) read as Ethiopian would
+  be 2021-12-27, the post-planting visit period, not post-harvest.  W5's 9
+  Amhara 2014-01 rows (one EA, 1 of its 10 rows in 2022) would be Sep-Oct
+  2021, likewise the post-planting period.  W4's 2014-01 cluster *cannot* be
+  Ethiopian-calendar: read that way it is Sep 2021, two years after W4's
+  fieldwork.  Nothing is converted: every row is parsed as Gregorian and
+  counted =outside_window= as before; whether the Harar EA was keyed in the
+  Ethiopian calendar is not adjudicated.
 
 * Nine country concatenators use actual declarations (GH #1287, 2026-10-29)
 
