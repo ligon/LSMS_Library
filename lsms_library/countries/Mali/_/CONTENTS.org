@@ -2366,3 +2366,37 @@ Source facts for the unwired EHCVM =crop_production= (measured from the held
 The tree-equivalent evidence above ("crop_production: the sold unit") was
 re-measured at the same commit and holds exactly (18 / 10 of 39 in 2014-15;
 11 / 20 of 45 in 2017-18).
+
+* 2026-11-03 -- EHCVM unit SIZE: dropped from =food_acquired.u=, and the s05 code bridge (GH #1224)
+
+Measured at development =3a33f2869= (raw =s07b= files and the served tables;
+nothing changed here).  The fix is framework work in =lsms_library/ehcvm.py=
+for all eight EHCVM countries at once; a Mali-only =u= change would split the
+shared vocabulary.
+
+- *Household side.*  Consumed rows (=s07bq03a > 0=) whose =s07bq03c= is not the
+  size-free code: 2018-19 114,692 of 159,968; 2021-22 104,849 of 146,360 (both
+  0.72, as #1224 reports).  Mali uses only Petit / Moyen / Grand plus the
+  size-free label, spelled =Unité de taille unique= (2018-19) and =Taille unique=
+  (2021-22); Quart / Demi / Entier are defined but unused.  =Tas=, =Unité=,
+  =Boite=, =Paquet= and =Boule= are sized on 100% of their rows and =Sachet= on
+  99.8%, so the served bare label always hides a size.  No consumed row sizes a
+  fixed-mass unit (=Seau (5 Kg)=, =Sac (25 Kg)=).  Serving =<unit> (<Size>)=
+  would take the served =u= vocabulary from 32 / 31 labels to 78 / 75, and the
+  (j, u) cells from 433 / 412 to 910 / 835.  The size reaches the #876
+  derivation through the =ConsumptionUnitSize= column, not through =u=, so
+  Expenditure does not depend on the index label.
+- *Community side (2018-19 s05).*  =s05q02= is exactly =10 * s07bq03b +
+  s07bq03c= on all 84 codes used, and each label's size word agrees with its
+  digit (84 / 84) -- the same bridge as Niger's =_s05_unit_label=.  The served
+  =u= is still the verbatim =s05q02= label (=Tas - Petit=, =Alvéoole - Moyen=,
+  =Morceau- Grand=, =Avec os au kg=), so even size-free community units do not
+  equal the household label (=Avec os au kg= vs =Kg=).
+- *Why the Niger form is not a mechanical copy here.*  Mali's =u= table folds
+  =Avec os au Kg= / =Sans os au Kg= / =Filet au Kg= / =kg= into =Kg=, the two meat
+  heaps and =Tas= into =Tas=, and three tins into =Boite=.  Composed through it,
+  the 84 s05 codes become 69 labels, and 418 (grappe, product, vague) keys -- 925
+  source rows -- would carry two source units under one served =u=.  Composing
+  from the raw household label instead does not help: the read-time =u=
+  auto-apply re-folds the size-free bases.  So the community spelling is a
+  decision to take together with the household side of #1224.
