@@ -6,7 +6,7 @@ and 2021-22 (846 groups, 1,856 rows).  The framework used to collapse each
 group to one observed row (916 rows destroyed, GH #323), and because only a
 non-unique index is collapsed AND key-sorted, the default route (per-wave
 collapse) and the Make route (one collapse over the concatenated waves)
-served the same 46,376 rows in different orders (22,518 positions differ,
+served the same 46,376 rows in different orders (22,516 positions differ,
 measured at 3a33f2869).  The canonical ``production_obs`` axis
 (``lsms_library/data_info.yml``, GH #1198) is the missing level:
 

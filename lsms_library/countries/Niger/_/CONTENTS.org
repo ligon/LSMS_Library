@@ -2275,7 +2275,7 @@ group to one observed row (GrainCollapseWarning: 19 + 897 rows destroyed).
 That collapse is also the whole of GH #1360: only a NON-UNIQUE index is
 collapsed and key-sorted, so the default route (per-wave collapse, then
 concat) and the Make route (one collapse over the concatenated waves) served
-the same 46,376 keyed-equal rows with 22,518 positions in a different order.
+the same 46,376 keyed-equal rows with 22,516 positions in a different order.
 
 *What tells the lines apart.*
 - 2011-12 =ecvmaas2e_p2.as02eq0= ("numero d'ordre", 1-20) is the module's own
