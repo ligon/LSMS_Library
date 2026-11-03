@@ -1492,6 +1492,31 @@ Those diagnostics are not a new replay or authorization to remove records.
 Keep the existing issue open for raw-key attribution and a source-backed
 retention rule; no new scientific decision, flag recode or row deletion is made.
 
+*** 2026-11-03 -- Resolved: a missing seed-purchase answer stays missing (GH #1183)
+
+Ruling (@ligon, 2026-11-03, option 2 of the #1183 memo): a blank section5 Q3
+is not an observed No.  Supersedes the "remains open" status above and in
+the two 2026-10-30 #1183 checkpoints below.  =plot_inputs_for_wave= now
+decodes the purchase flag with the missing-preserving =_yesno_bool_col=
+(1 = Yes / 2 = No) instead of =_yesno_bool= (whose =Series.mask= turned a
+<NA> code into False), and its caller zeroes =Quantity_purchased= only on an
+EXPLICIT No (=(purch == False).fillna(False)=).  =_yesno_bool= itself is
+unchanged -- its fertilizer / pesticide callers are not part of the ruling.
+The retention rule is unchanged, so a seed row kept only by the fabricated
+False / 0 payload is now empty and is dropped like any other.
+
+Measured (native builders before/after, and =Country('Ethiopia').plot_inputs()=
+shared-cache before vs a cold private root after): rows 180,900 -> 180,526
+(W1 45,149 -> 44,778, the 371 of the 10-30 diagnostic: =Other Land Use= 149,
+=Grazing Land= 57, =Fallow Land= 27, ...; W2 47,416 -> 47,413: Garlic, Sorghum,
+Teff).  Surviving seed rows: W1 =Purchased= False 25,244 -> 20,818, NA 0 ->
+4,055; W2 False 6,315 -> 6,255, NA 21,256 -> 21,313; =Quantity_purchased= 0 ->
+NA on the same 4,055 + 57 rows and on nothing else.  =seed_kg= per wave is
+unchanged (the dropped rows carried no =Quantity=).  W3-W5 are exact (no
+missing Q3 in those files).  An unrecognised code (neither 1 nor 2) already
+decoded to NA but was zeroed by the caller's <NA>-masking; none occurs in the
+held files.  Tests: =tests/test_1183_ethiopia_missing_seed_purchase.py=.
+
 ** 2026-10-19 -- =transformations.nitrogen_kg= credits NPS at 0.19 (GH #867)
 
 Ruling (@ligon, 2026-10-18): NPS gets a CITED share; organic inputs a
