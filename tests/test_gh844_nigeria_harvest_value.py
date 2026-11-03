@@ -19,7 +19,9 @@ transaction, so it is a column DISTINCT from ``Value_sold``.  Pinned here:
    wave's valuation column, and the scheme declares it REQUIRED;
 3. the identification (data-gated): each named column's Stata variable label
    is the valuation question, not a neighbour;
-4. the built table (data-gated, warm cache only): populated in every wave.
+4. the built table (data-gated, warm cache only): per wave, every raw
+   valuation is served, or on a row with no crop label, or on a row the
+   pre-existing keep-first dedup drops.
 """
 from __future__ import annotations
 
@@ -57,12 +59,9 @@ VALUATION_COLUMNS = {
 PH_T = {"2010-11": "2011Q1", "2012-13": "2013Q1", "2015-16": "2016Q1",
         "2018-19": "2019Q1", "2023-24": "2024Q1"}
 
-#: Served non-null counts, private cold build at 3a33f2869 + this change
-#: (2026-11-03).  Raw non-null 9,857 / 9,868 / 10,233 / 11,739 / 8,627; the
-#: differences are 3 / 0 / 0 / 13 / 8 rows with no crop label and 201 / 155 /
-#: 121 / 139 / 102 rows discarded by the pre-existing keep-first dedup.
-EXPECTED_SERVED = {"2011Q1": 9653, "2013Q1": 9713, "2016Q1": 10112,
-                   "2019Q1": 11587, "2024Q1": 8517}
+#: The crop-code column of each wave's harvest files (W1 names it sa3q2).
+CROP_COL = {"2010-11": "sa3q2", "2012-13": "cropcode", "2015-16": "cropcode",
+            "2018-19": "cropcode", "2023-24": "cropcode"}
 
 
 def _load_nigeria_module():
@@ -188,7 +187,39 @@ def test_named_column_is_the_valuation_question(wave):
 # 4. the built table (data-gated; warm cache only, never cold-builds)
 # --------------------------------------------------------------------------
 
-def test_api_frame_serves_valuation_in_every_wave():
+def _raw_accounting(ng, wave):
+    """``(raw, no_label, dedup_dropped)`` valuation counts for one wave, from
+    the raw files alone: every non-null valuation, those on a row with no
+    resolved crop label or household (``crop_production_for_wave``'s filter),
+    and those on a row its keep-first dedup at ``(t, i, plot_id, crop)``
+    discards (stable sort on ``(i, plot_id, crop)``, frames in script order)."""
+    from lsms_library.local_tools import get_dataframe
+    labels = ng._crop_labels()
+    parts = []
+    for rel, col, _ in VALUATION_COLUMNS[wave]:
+        d = get_dataframe(str(NIGERIA / wave / rel), convert_categoricals=False)
+        parts.append(pd.DataFrame({
+            "i": d["hhid"].apply(ng.format_id).values,
+            "plot_id": d["plotid"].apply(ng.format_id).values,
+            "crop": pd.to_numeric(d[CROP_COL[wave]], errors="coerce")
+                      .astype("Int64").map(labels).astype("string").values,
+            "val": pd.to_numeric(d[col], errors="coerce").values,
+        }))
+    raw = pd.concat(parts, ignore_index=True)
+    valued = raw["val"].notna()
+    labelled = raw["i"].notna() & raw["crop"].notna()
+    kept = raw[labelled].sort_values(["i", "plot_id", "crop"], kind="stable")
+    dropped = kept.duplicated(subset=["i", "plot_id", "crop"], keep="first")
+    return (int(valued.sum()), int((valued & ~labelled).sum()),
+            int((dropped & kept["val"].notna()).sum()))
+
+
+@pytest.mark.requires_s3
+def test_api_frame_accounts_for_every_raw_valuation(ng_in_country_dir):
+    """Per wave: served + no-crop-label + dedup-dropped == raw non-null.
+
+    An identity rather than pinned counts, so a future change to the
+    (pre-existing) keep-first dedup moves the terms, not the test."""
     from lsms_library.local_tools import data_root, read_parquet_cache_waves
     path = data_root() / "Nigeria" / "var" / f"{TABLE}.parquet"
     try:
@@ -198,13 +229,24 @@ def test_api_frame_serves_valuation_in_every_wave():
     if COL not in cols:
         pytest.skip("warm Nigeria crop_production parquet predates GH #844 (re-warm needed)")
     coverage = read_parquet_cache_waves(path)
-    if coverage is not None and set(EXPECTED_SERVED) - set(coverage):
-        pytest.skip(f"partial warm cache: lacks {sorted(set(EXPECTED_SERVED) - set(coverage))}")
+    if coverage is not None and set(PH_T.values()) - set(coverage):
+        pytest.skip(f"partial warm cache: lacks {sorted(set(PH_T.values()) - set(coverage))}")
     import lsms_library as ll
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         df = ll.Country("Nigeria", assume_cache_fresh=True).crop_production()
     assert COL in df.columns and COL not in df.index.names
     assert str(df[COL].dtype) in ("float64", "Float64"), df[COL].dtype
-    nonnull = df[COL].notna().groupby(np.asarray(df.index.get_level_values("t"))).sum()
-    assert nonnull.to_dict() == EXPECTED_SERVED
+    served = df[COL].notna().groupby(np.asarray(df.index.get_level_values("t"))).sum()
+    for wave, t in PH_T.items():
+        raw, no_label, dedup = _raw_accounting(ng_in_country_dir, wave)
+        assert served.get(t, 0) > 0, (t, "valuation absent from a wave that asks it")
+        assert served.get(t, 0) + no_label + dedup == raw, (t, served.get(t, 0), no_label, dedup, raw)
+
+
+@pytest.fixture
+def ng_in_country_dir(monkeypatch):
+    """The Nigeria module, with cwd where its country scripts run (its crop
+    label lookup resolves categorical tables relative to cwd)."""
+    monkeypatch.chdir(NIGERIA / "_")
+    return _load_nigeria_module()
