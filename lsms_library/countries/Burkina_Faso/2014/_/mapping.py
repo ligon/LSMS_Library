@@ -100,9 +100,13 @@ def visit_p4(_row):
 # `Unknown` is the corpus-canonical spelling (lsms_library/data_info.yml `u`;
 # Niger `niger.py::U_NA`, Uganda `crop_production`).
 #
-# CONSUMER RULE: `u == 'Unknown'` is NOT a unit.  These rows carry an
-# Expenditure and no physical quantity; exclude them before any per-unit price
-# or kg conversion, and report how many you excluded.
+# CONSUMER RULE: `u == 'Unknown'` is NOT a unit.  Almost all of these rows
+# carry an Expenditure and no physical quantity (the money-only passages and
+# items).  The exceptions are 56 passage-1 produced / inkind rows (41 + 15)
+# whose quantity was recorded without its unit (GH #864); several of those
+# quantities look like CFA amounts keyed into the quantity box.  Exclude
+# `Unknown` rows before any per-unit price or kg conversion, and report how
+# many you excluded.
 U_NA = 'Unknown'
 
 

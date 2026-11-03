@@ -470,8 +470,11 @@ fills a null quantity with 0 before computing the purchased quantity, so
 every passage-2/3/4 purchased row (405,127) and 44,125 passage-1 rows were
 SERVED with =Quantity = 0=. Of the passage-1 zeros, 43,906 replaced
 missing source quantities; 219 came from the existing subtraction/clipping
-rule. The latter remain zero after this correction.  =2014/_/mapping.py::_restore_missing_quantity= now puts the
-NaN back wherever the source quantity was null.  Produced rows for passages
+rule. The latter remained zero after this correction (/no longer: since
+2026-11-03 C04 is served as reported and none is zero -- see "section C served
+block by block" below/).  =2014/_/mapping.py::_restore_missing_quantity= put the
+NaN back wherever the source quantity was null (/retired 2026-11-03: the
+block-by-block reshape never fills a NaN/).  Produced rows for passages
 2--4 do not exist (=qautocons= is a passage-1 variable; the p2--p4
 =autocons= VALUE is still unread, see the 2026-10-14 section at the end).
 
@@ -1232,8 +1235,10 @@ pre-fix config).
 - *p1's =autocons= / =cadeau= (auto-consumption VALUE and gift value) and
   p2-p4's =autocons= / =cadeau= are not read.*  Only =achat= reaches
   =Expenditure=.  So the served figure is *purchases*, plus p1's
-  own-production QUANTITY via =qautocons=; the value of own production and of
-  gifts in p2-p4 is on the floor.  Sizing this is open work.
+  own-production QUANTITY via =qautocons= and (since 2026-11-03, GH #864) p1's
+  gift QUANTITY via =qcadeau= on =s = 'inkind'= rows; the value of own
+  production and of gifts is on the floor in every passage.  Sizing this is
+  open work.
 
 * 2026-09-12 -- =food_acquired=: one row, two windows (GH #876)
 
@@ -1485,19 +1490,61 @@ against the change:
   likewise have no =ucadeau=.
 - 2018-19 and 2021-22 =food_acquired= are frame-equal.  Their *kilograms* in
   =food_quantities= move slightly (8,627 and 4,628 rows; -0.07% and -0.05%)
-  because the kg-factor inference pools across waves: the delivered factor
-  has no =t= axis, and the =unit= / item rungs now see 2014's
-  unit-bearing produced and inkind rows.
+  because the kg-factor inference pools across waves (the delivered factor
+  has no =t= axis) and its price-ratio estimate now sees the 264 changed 2014
+  PURCHASED quantities -- 219 of them former =Expenditure / 0= rows that now
+  give a finite unit value.  Produced and inkind rows carry no Expenditure and
+  cannot enter that estimate.  Red-team check (2026-11-03): candidate
+  purchased + base produced (no inkind) reproduces the new 206,557.1 /
+  98,682.9 kg exactly; base purchased + candidate produced / inkind
+  reproduces the old 206,709.1 / 98,735.8.  /(An earlier version of this
+  bullet blamed the produced and inkind rows; that was wrong.)/
 - 2014's =food_quantities= kg rises 62% mainly because 11,378 of the 11,419
   produced rows (was 295 of 11,418) and 1,453 of the 1,468 inkind rows now
-  carry a unit the kg ladder can try; much of that kilogram figure is the
-  ladder's price-ratio inference, not a measurement.
+  carry a unit the kg ladder can CONVERT with factors estimated from purchased
+  rows; much of that kilogram figure is the ladder's price-ratio inference,
+  not a measurement.
+
+*Residual rows, described* (red-team classification, 2026-11-03; counts
+re-measured on the raw p1 file).
+- The 19 new purchased rows (=qachat > 0=, =qautocons >= qachat=, no
+  =achat=): 9 repeat the C05 answer in C04's quantity box (=qachat ==
+  qautocons=); 8 sit next to a =qautocons= that reads as a CFA amount; 2 are
+  ambiguous.
+- The 41 produced rows left =u = 'Unknown'= (a =qautocons= but no
+  =uautocons=): 15 have no =autocons=, and 14 of those carry 200-750 in
+  =qautocons= -- 4 exactly equal to =achat= -- i.e. a value keyed into the
+  quantity box.
+- The 15 inkind rows left =Unknown= (no =ucadeau=): 3 have =qcadeau == achat=
+  and about 6 more look like CFA amounts (10 of the 15 are >= 100).
+- Site Q (=quantity_audit=) flags for 2014 drop from 7 to 3 (red-team
+  measurement, not re-run here): four of the old flags (=EMC_367001=,
+  =EMC_669013=, =EMC_316009=, =EMC_157007=) are these mis-keyed values,
+  which moved from the purchase unit to =Unknown= and are still served in
+  the produced =Quantity=.
 
 Cache: the wave =data_info.yml= and =mapping.py= are build inputs -- every
 Burkina country hash and the 2014 wave hashes move.  Pinned by
 =tests/test_burkina_faso_2014_passages.py= (counts re-pinned for this reason;
 =test_the_hook_serves_each_section_c_block_in_its_own_unit= fails against the
 previous hook).
+
+** 2026-11-03 -- WAITING one answer keyed into two blocks? (GH #864, open question)
+
+Recorded for the maintainer; behaviour is NOT changed.  Measured on the raw
+p1 file: of the 283 rows carrying both a C04 and a C05 quantity, *189 have
+=qachat == qautocons=* (173 also in the same unit; 149 also =achat ==
+autocons=); of the 228 rows carrying both a C04 and a C06 quantity, *54 have
+=qcadeau == qachat=* (33 also =achat == cadeau=).  That rate looks like one
+answer keyed into two blocks rather than two acquisitions.  Under the
+2026-11-03 ruling each block is served on its own =s= row, so such an answer
+is now counted twice -- once as purchased, once as produced (or inkind).
+The old =(qachat - qautocons).clip(0)= had zeroed 180 of the 189 equal C04/C05
+rows (the other 9 had no =achat= and were dropped).  Size: the 264 changed
+purchased rows add 2,154 native units, about 0.05% of 2014 purchased
+quantity; Expenditure is untouched.  Whether to treat equal C04/C05 (or
+C04/C06) answers as a duplicate entry is a decision, not a measurement.
+
 
 ** GH #794: 47,137 + 16,610 leaked rows, and why "the keys do not match" was the wrong question
 
