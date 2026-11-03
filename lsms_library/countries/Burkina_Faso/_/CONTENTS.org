@@ -1392,6 +1392,52 @@ is excluded from both sides of the loss fraction and named in the message.
 The residual 15.9% is p1's nine items above plus 219 clipped zeros, and it
 is reported, not suppressed.
 
+** 2026-11-03 -- WAITING the held questionnaire answers both open questions (GH #864)
+
+Read from =2014/Documentation/Questionnaire_EMC_2014_Passage_1.pdf= (via
+=get_data_file= into a private data root; text layer extracted with PyMuPDF
+from the cluster Python 3.10 module, the venv has no PDF reader) and the
+variable labels of =emc2014_p1_conso7jours_16032015.dta=.  Nothing is
+rewired here; the decision is #864's.
+
+*Section C has three DISJOINT blocks, each with its own quantity, unit and
+value* (PDF pp. 15-18, headers repeated on each page; verbatim): « C04. Quelles sont la quantité totale et la valeur
+des achats consommés et prélèvement de stocks achetés consommé du [PRODUIT]
+par le ménage au cours des 7 derniers jours »; « C05. [...] consommé par le
+ménage qui ont été prélevées de sa propre production »; « C06. [...] reçues
+en cadeau, en contrepartie d'un travail ou en troc ».  A separate « C02.
+Combien le Ménage a-t-il dépensé pour des achats du [PRODUIT] au cours des 7
+derniers jours ? » precedes them.  The file labels bind them: =qachat= /
+=uachat= / =achat= = « Quantité / Unité / Montant en fcfa C04 »;
+=qautocons= / =uautocons= / =autocons= = C05; =qcadeau= / =ucadeau= /
+=cadeau= = C06; =mtt_dep= = C02.
+
+So *=qachat= is the PURCHASED quantity consumed, not a total*, and the
+reshape's =purchased = (qachat - qautocons).clip(0)= subtracts a disjoint
+block.  Measured on p1 (171,236 rows): 283 rows have both =qachat > 0= and
+=qautocons > 0=; on 238 of them =qautocons >= qachat=, so the purchased
+quantity is clipped to 0 (the 219 served zeros), and on 45 the two blocks are
+in DIFFERENT units.  And the own-production rows are served in the wrong
+unit: =Produced= rides the =u= index, which is bound to =uachat=, so 11,123
+of the 11,418 served 2014 produced rows carry =u = 'Unknown'= although 11,108
+of the 11,136 source rows with production but no purchase record their own
+unit =uautocons= (measured on the shared warm parquet at =3a33f2869=).
+
+*The nine null-quantity items are not asked a quantity.*  In the printed grid
+the QUANTITE / UNITE boxes are absent for Beurre de Karité, Pâte d'arachide,
+Gombo, Kapok, Oignons, Feuilles, Fruits, Haricot and Soumbala in all three
+blocks (only MONTANT), and for Sel in C04 / C05 (a C06 quantity only).  A
+layout count over the text layer finds 37 of the 59 items with fewer than
+three quantity grids (20 with none; most of the rest have no C05 grid --
+flours, bread, sugar, drinks).  This is C4 evidence that their missing
+=qachat= is by design, i.e. the =money_only= pattern at item grain.
+
+*Still unread* (p1): =qcadeau= > 0 on 1,468 rows and =cadeau= > 0 on 3,263
+(2,505,140 CFA); =autocons= > 0 on 27,313 (43,472,367 CFA); and =mtt_dep=
+(C02) sums to 106,129,109 CFA against =achat= (C04 value) 93,383,167 -- equal
+on 108,028 of the 144,439 rows carrying either.  Which of C02 and C04 is the
+=Expenditure= is a decision too.
+
 ** GH #794: 47,137 + 16,610 leaked rows, and why "the keys do not match" was the wrong question
 
 *Before* (warm cache, 2026-10-14) the served =j= carried:
