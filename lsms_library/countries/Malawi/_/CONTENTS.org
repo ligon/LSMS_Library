@@ -4770,3 +4770,37 @@ still in the purchase unit, which is not recorded, while =u= is the planted
 unit; the two H components (Panel / earlier waves) are still summed without
 their units.  The third purchase source =ag_h36a= has no value column and is
 still unread.
+
+* 2026-11-03 -- plot_inputs: Module D use answers; a missing amount is not 0 (GH #1174, D half)
+
+Module D asks use before amount: =ag_d36= organic, =ag_d38= "Did you use any
+inorganic fertilizer on this [PLOT]?", =ag_d40= agrochemicals.  The non-organic
+reducer summed with =min_count=0=, so a (plot, type) whose every selected
+amount was blank was served =Quantity = 0=.  Now every Module D row carries its
+own use answer in =Applied= (fertilizer: True / False / NA exactly as
+=ag_d38= answers -- the gate does not filter rows; pesticide rows exist only
+under =ag_d40= Yes) and the reducer sums with =min_count=1=.
+
+*Idiosyncrasy: =ag_d38= and the type slots disagree on a few plots.*  Of the
+type-coded fertilizer slots, 20 / 5 / 24 / 0 (2010-11 .. 2019-20) answer
+=ag_d38= = No, and 13 / 3 / 0 / 0 have no answer.  Served as answered: 49
+rows carry =Applied = False= with a positive total kg.  Also 19 of the
+all-blank groups (2010-11 9, 2013-14 10) have a positive NATIVE quantity
+(=ag_d39b/g=) while the enumerator TOTAL KGs is blank; per #1111 the native
+pair is not substituted, so they are served NA.
+
+Measured (private cold builds, before = the #1190 commit):  rows 179,957 ->
+179,956 -- the one all-blank group with no =ag_d38= answer (2010-11, DAP) is
+now all-NA payload and is not served.  44 rows 0 -> NA (2010-11 13, 2013-14 15,
+2016-17 16; NPK 22, Urea 11, DAP 5, Herbicide 4, Insecticide 1, Fungicide 1),
+all =Applied= True.  The 38 recorded zeros stay 0.  =Applied= on Module D rows:
+True 67,489, False 49, NA 15 (was True only on the 11,075 organic rows).  No
+other column moves.  =nitrogen_kg= total unchanged (832,835.0 kg N); its rows
+37,100 -> 37,076 (plots whose only inorganic records had no amount were served
+0 kg N).
+
+*Seed half not changed.*  The issue's 390 Seed records predate #1323: G seed
+observations bypass the reducer since then, so none is summed to 0; one with
+no amount, unit or Improved answer is excluded at finalization as all-NA
+payload.  Whether a planted-crop roster line with no seed answer is "seed not
+used" or "amount unknown" is a separate question (residual).

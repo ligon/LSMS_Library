@@ -100,7 +100,7 @@ def _half(d, g, h, hh_of, seed_qty, seed_unit, seed_value, source_ref, source_ha
     fertilizer = _fertilizer_block(
         d, hhid='hhid', plotkey='plotkey',
         type1='ag_d39a', qty1='ag_d39d', unit1=None,
-        type2='ag_d39g', qty2='ag_d39j', unit2=None, t=WAVE)
+        type2='ag_d39g', qty2='ag_d39j', unit2=None, t=WAVE, gate='ag_d38')
     fertilizer['u'] = pd.Series('Kilogramme', index=fertilizer.index,
                                 dtype='string')
     pieces = [

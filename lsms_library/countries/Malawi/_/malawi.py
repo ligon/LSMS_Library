@@ -3197,17 +3197,28 @@ def _input_labels(code_series):
     return out.astype('string').where(out.notna(), pd.NA)
 
 
+def _use_answer(df, gate):
+    """The survey's own yes/no use answer as a nullable bool (1 -> True,
+    2 -> False, anything else -> NA); all NA when ``gate`` is not held."""
+    if gate is None or gate not in df.columns:
+        return pd.Series(pd.NA, index=df.index, dtype='boolean')
+    return _int_codes(df[gate]).map({1: True, 2: False}).astype('boolean')
+
+
 def _fertilizer_block(df, *, hhid, plotkey, type1, qty1, unit1,
-                      type2, qty2, unit2, t):
+                      type2, qty2, unit2, t, gate=None):
     """Reshape Module D's two inorganic-fertilizer slots to canonical
     long rows -- one per (plot, fertilizer-type) applied.
 
     All keyword args are RAW column names in ``df`` (or None when a slot
     is absent for that wave).  ``df`` must already carry an ``hhid`` string
-    column and a ``plotkey`` string column.  Returns a long DataFrame with
-    (i, plot, _input_code, Quantity, u) and the perennial/seed columns set
-    to NA.  NO aggregation, NO kg conversion.
+    column and a ``plotkey`` string column.  ``gate`` is ag_d38 ("Did you
+    use any inorganic fertilizer on this [PLOT]?"), carried as ``Applied``
+    exactly as answered (GH #1174); it does not filter rows.  Returns a long
+    DataFrame with (i, plot, _input_code, Quantity, u, Applied) and the
+    perennial/seed columns set to NA.  NO aggregation, NO kg conversion.
     """
+    applied = _use_answer(df, gate)
     pieces = []
     for tcol, qcol, ucol in ((type1, qty1, unit1), (type2, qty2, unit2)):
         if tcol is None or tcol not in df.columns:
@@ -3231,11 +3242,12 @@ def _fertilizer_block(df, *, hhid, plotkey, type1, qty1, unit1,
             'Quantity':    q.values,
             'u':           u.values,
             'Improved':    pd.array([pd.NA] * len(df), dtype='boolean'),
+            'Applied':     applied.values,
         })
         pieces.append(piece[keep.values])
     if not pieces:
         return pd.DataFrame(columns=['i', 'plot_id', '_input_code', 'crop',
-                                     'Quantity', 'u', 'Improved'])
+                                     'Quantity', 'u', 'Improved', 'Applied'])
     return pd.concat(pieces, ignore_index=True)
 
 
@@ -3281,7 +3293,9 @@ def _pesticide_block(df, *, hhid, plotkey, gate, slots, t):
     """Reshape Module D's agrochemical slots to canonical long rows -- one
     per (plot, pesticide-type).  ``slots`` is a list of (type, qty, unit)
     raw-column-name triples (qty/unit may be None).  ``gate`` is ag_d40
-    (any agrochemical used? 1/2); rows are dropped where gate != Yes."""
+    (any agrochemical used? 1/2); rows are dropped where gate != Yes, so a
+    kept row carries ``Applied`` True (GH #1174)."""
+    applied = _use_answer(df, gate)
     if gate is not None and gate in df.columns:
         gated = _int_codes(df[gate]) == 1
     else:
@@ -3314,11 +3328,12 @@ def _pesticide_block(df, *, hhid, plotkey, gate, slots, t):
             'Quantity':    q.values,
             'u':           u.values,
             'Improved':    pd.array([pd.NA] * len(df), dtype='boolean'),
+            'Applied':     applied.values,
         })
         pieces.append(piece[keep.values])
     if not pieces:
         return pd.DataFrame(columns=['i', 'plot_id', '_input_code', 'crop',
-                                     'Quantity', 'u', 'Improved'])
+                                     'Quantity', 'u', 'Improved', 'Applied'])
     return pd.concat(pieces, ignore_index=True)
 
 
@@ -3716,7 +3731,8 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
     if not native.index.is_unique:
         raise ValueError('Malawi seed observation grain is not unique')
     df = df.loc[~seed].copy()
-    grp = df.groupby(keys, as_index=False, dropna=False).agg({
+    grouped = df.groupby(keys, as_index=False, dropna=False)
+    grp = grouped.agg({
         'Quantity':           'sum',
         'Quantity_purchased': 'first',
         'Purchased':          'first',
@@ -3733,17 +3749,17 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
     # index to keep it unique; both are NaN for the inputs that don't carry
     # them (fertilizer/pesticide have NaN crop; organic-fertilizer rows have
     # NaN u as well).  dropna=False above keeps those NaN-keyed rows.
+    # GH #1109 / #1174: a Module D record whose every amount is missing is a
+    # missing amount, not a measured zero.  Use is carried separately, in
+    # Applied (organic ag_d36, inorganic ag_d38, agrochemical ag_d40), so a
+    # reported use with no amount survives finalization while a recorded
+    # zero stays 0.  Same groupby object, so the same groups in the same order.
+    if len(df):
+        quantities = grouped['Quantity'].sum(min_count=1)
+        if not quantities[keys].equals(grp[keys]):
+            raise ValueError('Malawi plot_inputs reducer groups disagree')
+        grp['Quantity'] = quantities['Quantity'].array
     grp = grp.set_index(keys)
-    # GH #1109 (ledger sections 2-4): organic use is reported in Applied,
-    # not as a measured zero quantity.  Keep its missingness without changing
-    # the existing nonorganic reducer; those all-missing records need their
-    # own source-presence review.  Align on every key, including null crop/u.
-    organic = df['input'].eq('Organic Fertilizer')
-    if organic.any():
-        quantities = (df.loc[organic].groupby(keys, dropna=False)['Quantity']
-                      .sum(min_count=1))
-        target = grp.index.get_level_values('input') == 'Organic Fertilizer'
-        grp.loc[target, 'Quantity'] = quantities.reindex(grp.index[target]).array
     return pd.concat([grp, native[list(grp.columns)]])
 
 

@@ -300,8 +300,11 @@ Data Scheme:
     # several seed crops or a fertilizer in several units.  Reported item
     # columns only: Quantity, native u, Purchased (bool, True where a
     # purchased seed quantity is attached), Quantity_purchased, Improved
-    # (bool, seed rows).  Applied is the reported organic-use flag (ag_d36),
-    # True on organic rows and missing for other input types.
+    # (bool, seed rows).  Applied is Module D's own use answer (GH #1174):
+    # organic ag_d36 (rows exist only where Yes), inorganic fertilizer ag_d38
+    # (True / False as answered, NA where unanswered), agrochemical ag_d40
+    # (rows exist only where Yes); NA on seed rows.  A use with no recorded
+    # amount keeps Quantity NA, never 0.
     # Aggregates (seed_kg, nitrogen_kg,
     # household inorganic/organic/pesticide any-flags) are transformations, NOT
     # stored columns.  2004-05 (IHS2) deferred: household-level aggregated
