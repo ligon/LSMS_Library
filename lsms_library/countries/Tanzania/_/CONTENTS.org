@@ -2205,6 +2205,54 @@ Bagamoyo, Kibiti out of Rufiji, Ubungo out of Kinondoni.  These are
 label-harmonisation problems (a =harmonize_district= table would close most of
 them); they are not evidence that =v= is ambiguous.
 
+*Correction (GH #837, measured 2026-11-03 at development =3a33f2869=).*  The
+paragraph above says the 118 are "overwhelmingly two names for one place" and
+that "a =harmonize_district= table would close most of them".  Measured on the
+household-grain =cluster_features= wave parquets (the frame that reaches the
+projection), that is not so.  The count is still 118 (2012-13 34, 2014-15 17,
+2019-20 35, 2020-21 32), and they decompose:
+
+| kind of disagreement within one =(t, v)=                              | cells |
+|------------------------------------------------------------------------+-------|
+| case / punctuation only (=normalize_place= makes them equal)           |     0 |
+| a certain misspelling or abbreviation of one name                      |     5 |
+| a named post-baseline split pair (=KINONDONI= / =UBUNGO= alone is 12)  |    19 |
+| one name with and without a qualifier, or two councils of one town     |    27 |
+| distinct district names                                                |    67 |
+
+- The 5 are =NEWALA=/=NEWARA=, =NEWALA=/=NGWALA=, =LUDEWA=/=LUDEKIA=,
+  =SONGEA VIJIJINI=/=SONGEA (V)=, =ULANGA=/=MAHENGE/ULANGA=/=ULANGA/MAHENGE=,
+  all 2012-13 / 2014-15 free text (=ha_02_2=).  =MBINGA(NYASA)= /
+  =MBINGA NYASA=, =IRINGA MJINI1= and =MFINDI= are variant spellings too, but
+  each shares its cell with a different district.  17 household rows in all
+  carry one of these variant spellings, so a spelling table closes 5 cells, not
+  "most".
+- The qualifier kind (=BUKOBA RURAL= / =BUKOBA URBAN=, =SUMBAWANGA= /
+  =SUMBAWANGA RURAL=, =MOROGORO MJINI= / =MOROGORO VIJIJINI=) is two local
+  councils, or a bare name that could be either.  Folding them is a choice of
+  district-versus-council grain, not a spelling fix.
+- The split pairs and much of the last row (=MBOZI= / =SONGWE=, =BUTIAMA= /
+  =MUSOMA MJINI=, ...) need a boundary-vintage decision: which year's districts
+  is =District=?  The rest of the last row is households in one sampling
+  cluster naming unrelated districts (=ILALA= / =TEMEKE=, =MAGU= / =MISUNGWI=,
+  Zanzibar =MAGHARIBI= / =MJINI= x4); 29 of the 67 are 2019-20.
+- A district-code residency tier, as 2008-15 uses, does not transfer to
+  2019-20.  =t0_district= is a national code (region x 10 + index: 11, 64,
+  254) and its last digit matches the =sdd= geocode's district digit for only
+  87.3% of frame households found at their original location (679 rows).  The
+  =t0_*= codes and the geocode may use different district vintages; not
+  verified.  Applying the tier would drop the other 12.7% on a coding
+  difference.
+- The 818 null =District= cells in 2008-09 / 2010-11 are a source gap.  The UPD
+  ships only the within-region code =ha_02_1= (9 distinct values) for rounds
+  1-2; =ha_02_2= is blank (see the 2008-15 script's docstring).
+
+So the District residue is mostly a district-identity decision (vintage and
+council grain), which #837 leaves to the maintainer.  It is not a spelling
+backlog.  Reproduce by reading
+={data_root}/Tanzania/{2008-15,2019-20,2020-21}/_/cluster_features.parquet=
+with =pd.read_parquet= and grouping =District= by =(t, v)=.
+
 *Rural (264).*  EAs whose households are not all classified alike.  =urb_rur= /
 =sdd_rural= / =y5_rural= are recorded per HOUSEHOLD, and an EA on a town
 boundary genuinely contains both; modal share within a contested cluster is
