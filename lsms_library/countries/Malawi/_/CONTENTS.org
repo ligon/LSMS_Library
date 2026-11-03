@@ -1884,8 +1884,9 @@ alive in the last 12 months, =ag_r16=), =ValuePerAnimal= (REPORTED per-head
 current value, =ag_r04= -- "if you sold one today, how much would you
 receive?"; this line called the column =Value= until 2026-10-23, but the
 build, =data_scheme.yml= and =data_info.yml= all name it =ValuePerAnimal=,
-and it is NOT a herd value -- GH #637 tail).  One reported row per
-(household, species owned).
+and it is NOT a herd value -- GH #637 tail), =HeadCount12MonthsAgo= (head
+owned exactly 12 months ago, =ag_r07= -- a second stock, not a flow; GH
+#855, 2026-11-03).  One reported row per (household, species owned).
 
 Source: Module R livestock roster (=ag_mod_r1_{10,13,16,19}.dta=) -- the
 SAME file the World Bank cleaning code reads then *collapses to a single
@@ -4736,3 +4737,30 @@ validation or whole #1287/#1288 closure. The 2004 and 2016 community skips are
 current declaration facts, not whole-instrument absence findings. #1278, #1190,
 #1228 and #1174 remain separate. Evidence and precise source/publication pins:
 =slurm_logs/isa_recovery_2026-10-29/Malawi/1287-seven-runtime-receipt-v1/REPORT.md=.
+
+* 2026-11-03 -- livestock: the 12-months-ago stock ag_r07 (GH #855)
+
+=ag_r07= "How many [LIVESTOCK] did your household own exactly 12 months ago?"
+is in all four Module R waves under the same name, and is now served as
+=HeadCount12MonthsAgo=: a second STOCK, carried as answered -- never a
+fallback for =HeadCount=, never differenced into a flow (the survey asks
+purchases =ag_r10= and sales =ag_r16= directly).
+
+*The population question of 2026-10-31 is moot, measured.*  Across all six
+Module R files the drivers read (2010-11, 2013-14, both halves of 2016-17 and
+2019-20), *no* row has =ag_r07 > 0= without already meeting the keep-filter
+(=ag_r01= Yes or a positive =ag_r02/r10/r16=); =ag_r07= is answered only on
+rows the filter keeps.  So the column is added on the existing row universe
+and the filter is unchanged.
+
+Measured (private cold builds, base 3a33f2869 vs this change): rows 39,126 ->
+39,126, index identical, every existing column identical.  Non-null
+=HeadCount12MonthsAgo= 11,317 / 4,089 / 11,443 / 12,249 (positive 9,873 /
+3,536 / 10,478 / 10,776); NA 12 / 10 / 2 / 4.  2,848 rows hold 0 now and had
+some a year ago; 4,290 the reverse.
+
+*Found while measuring, NOT changed here:* =assemble_livestock= has no
+duplicate (i, animal) group in any wave, so its =sum= reducer only ever turns
+a blank into 0: 14 =HeadCount=, 38 =HeadAcquired= and 46 =HeadSold= cells are
+served 0 where the source is blank (2010-11 8 / 19 / 33, 2013-14 3 / 15 / 9,
+2016-17 2 / 2 / 2, 2019-20 1 / 2 / 2).  The new column uses =min_count=1=.

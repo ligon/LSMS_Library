@@ -3712,15 +3712,25 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
 
 def _livestock_block(df, *, hhid, animalcode, owned_flag='ag_r01',
                      headcount='ag_r02', acquired='ag_r10', sold='ag_r16',
-                     value='ag_r04', t=None):
+                     value='ag_r04', prior_headcount='ag_r07', t=None):
     """Reshape one wave's Module R livestock roster to canonical long rows.
 
     All keyword args are RAW column names in ``df`` (or None when a wave
     lacks that field).  ``df`` must already carry an ``hhid`` string column.
     Returns a long DataFrame at grain (t, i, animal) with the reported item
-    columns (HeadCount, HeadAcquired, HeadSold, ValuePerAnimal) and an
-    internal ``_animal_code`` used for the keep-filter / dedup.  NO
-    aggregation.
+    columns (HeadCount, HeadAcquired, HeadSold, ValuePerAnimal,
+    HeadCount12MonthsAgo) and an internal ``_animal_code`` used for the
+    keep-filter / dedup.  NO aggregation.
+
+    ``prior_headcount`` is ag_r07, "How many [LIVESTOCK] did your household
+    own exactly 12 months ago?" -- same name in all four waves (GH #855).  A
+    second STOCK, never a fallback for HeadCount and never differenced into
+    a flow.  It does not enter the keep-filter: measured 2026-11-03, no
+    source row in any wave or half has ag_r07 > 0 without already meeting it
+    (ag_r07 follows the ag_r01 gate -- IHS3 "During the last 12 months,
+    have you or any member of your HH raised or owned any [LIVESTOCK]",
+    IHS5 "Did you own [LIVESTOCK]?" -- and is answered only on rows the
+    filter keeps, kept rows holding 0 now included).
     """
     species_map = _malawi_code_map('harmonize_species')
     code = pd.to_numeric(df[animalcode], errors='coerce').astype('Int64')
@@ -3736,6 +3746,7 @@ def _livestock_block(df, *, hhid, animalcode, owned_flag='ag_r01',
     acq = _num(acquired)
     sold_n = _num(sold)
     val = _num(value)
+    prior = _num(prior_headcount)
 
     # Per-species ownership gate (ag_r01 == 1 "Yes").  NaN where the wave
     # lacks the column (then the count-based keep below carries the row).
@@ -3753,6 +3764,7 @@ def _livestock_block(df, *, hhid, animalcode, owned_flag='ag_r01',
         'HeadAcquired': acq.values,
         'HeadSold':     sold_n.values,
         'ValuePerAnimal': val.values,
+        'HeadCount12MonthsAgo': prior.values,
         '_owns':        owns.values,
     })
     # Keep a roster row when the household genuinely holds the species:
@@ -3780,7 +3792,8 @@ def assemble_livestock(t, pieces):
     Returns
     -------
     pd.DataFrame indexed (t, i, animal) with columns HeadCount,
-    HeadAcquired, HeadSold, ValuePerAnimal.  Item-level reported values only.
+    HeadAcquired, HeadSold, ValuePerAnimal, HeadCount12MonthsAgo.  Item-level
+    reported values only.
     """
     cat = pd.concat(pieces, ignore_index=True)
 
@@ -3796,13 +3809,22 @@ def assemble_livestock(t, pieces):
     # HeadAcquired / HeadSold are additive counts of the same herd) and take
     # the first reported ValuePerAnimal (a per-head price is not additive).
     cat['t'] = t
-    grp = cat.groupby(['t', 'i', 'animal'], as_index=False, dropna=False).agg({
+    keys = ['t', 'i', 'animal']
+    grouped = cat.groupby(keys, as_index=False, dropna=False)
+    grp = grouped.agg({
         'HeadCount':    'sum',
         'HeadAcquired': 'sum',
         'HeadSold':     'sum',
         'ValuePerAnimal': 'first',
     })
-    out = grp.set_index(['t', 'i', 'animal'])
+    # GH #855: the 12-months-ago stock is added like HeadCount over two
+    # lines of one species, but a blank stays blank (min_count=1).
+    if 'HeadCount12MonthsAgo' in cat.columns:
+        prior = grouped['HeadCount12MonthsAgo'].sum(min_count=1)
+        if not prior[keys].equals(grp[keys]):
+            raise ValueError('Malawi livestock reducer groups disagree')
+        grp['HeadCount12MonthsAgo'] = prior['HeadCount12MonthsAgo'].array
+    out = grp.set_index(keys)
     assert out.index.is_unique, f"Non-unique (t,i,animal) in livestock {t}"
     return out
 
