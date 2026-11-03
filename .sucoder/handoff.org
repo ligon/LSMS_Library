@@ -1,5 +1,30 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
+* Current -- 2026-11-03, Sue / Claude Opus 5.5, job 40825266 (n0035.savio4)
+
+Fresh restart of the ISA backlog sweep, at the user's direction: the plain
+skill loop (fix -> test -> red-team -> PR), *without* the previous campaign's
+custody/release/manifest bookkeeping, which nearly stalled it.  Read this
+section and the tracker; everything below it is historical.
+
+- Base: GitHub development 3a33f2869 (2026-11-01, #1409).  Mirror development
+  was fast-forwarded to it.  No open PRs at start; 146 open issues, ~55 ISA.
+- Workers: eight =sucoder dispatch= headless Claude workers, one per ISA
+  country, 4 CPU/32G/8h each on co_carleton, with data access (S3 reader + L1
+  projection; the old profiles had none).  Records, frozen briefs, results.git
+  and REPORT.md per worker under
+  /global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/ -- see TRACKER.org there.
+- Coordinator integrates: fetch results.git, red-team (fresh reviewer), cherry-pick
+  onto fix/<n>-<country>-<slug>-20261103 from development, push to GitHub
+  (remote =github=, HTTPS via gh credential helper; SSH port 22 is blocked), open PR.
+  Merges are the human's unless they re-authorize.
+- Parked: #1287 runtime-checkpoint lane; acquisitions ruled "acquire" 10-23
+  (#816, #1275, #1276, #449) need WB key + S3 write, so not in dispatch workers.
+- Next: collect round-1 REPORTs, red-team fixes, open PRs, send decision memos
+  to the human as one digest.
+
+* Historical -- everything below predates 2026-11-03 and is superseded
+
 * Current task -- 2026-10-22T22:03:17.321841+00:00
 
 LATEST USER AUTHORIZATION OVERRIDES OLDER HUMAN-ONLY MERGE RULES: user said "Let's delegate to an agent the job of checking for consistency of the outstanding PRs and merging those", then clarified "merging to development, that is". Do not ask again for merge permission. Dedicated malawi_1209 assigned actual live32 implementation PR consistency/integration/merge job, own NEW W/isa-pr-integration-20261022 and C/isa-pr-merge-20261022. Read all exact liveheads/bases/dependencies/CI, acceptance qualifications and applicable country CONTENTS, isolate integration from actual GitHub development. Test meaningful offline unit/portability/affectedregressions in privateguarded mountedruntime,≤8loadfileworkers/BLASOMP_MKL_BUILD1/exactidentities, no genuine acquisition/sharedcacheflags/builds without bounded plan. Direct dependency-ordered GitHub merge commits with expected_head_sha authorized; preserve ancestry, retarget child todevelopment onlyafterprerequisitecontent/freshdiff. No squash/rebase/forcepush/branchdelete/unattendedautomerge. Routine additive mechanical conflict resolution+meaningfultests/freshCI authorized; semanticconflicts/failingchecks stayopenwithreasons. Tracker1170 docsbranch remains ROOT-OWNED/LIVE: leaveopen untilrootfreezescheckpoint. Rootcampaignbranch untouchedbymerger. Agent will record exact mergeSHA/readback/currentdevelopmenttip and report progress. Tracker1170 latest authorization prepend exactreadback. Do not apply historical "never merge" restrictions to these newly authorized merges.
