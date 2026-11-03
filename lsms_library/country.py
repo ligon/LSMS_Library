@@ -3389,8 +3389,10 @@ class Country:
         A row that gets no label from either source is **kept, with ``m``
         NA** -- the shape ``groupby(..., dropna=False)`` would give -- and
         reported by :meth:`_report_unlabelled_markets`.  It used to be deleted
-        here with no signal (``dropna(subset=['m'])``): Burkina Faso 2021-22
-        ``sample(market='Region')`` lost 7,176 of 10,403 households.
+        here with no signal (``dropna(subset=['m'])``): measured at
+        ``3a33f2869``, Albania 2012 ``sample(market='Region')`` lost 6,671
+        of 6,671 households and Tanzania ``market='District'`` every
+        household of 2008-09 and 2010-11.
 
         Returns *df* with ``m`` added and ``v`` removed from the index.
         """
@@ -3549,7 +3551,7 @@ class Country:
             f"{self.name}/{tname}(market={column!r}): {n_rows:,} of "
             f"{len(flat):,} row(s) have no {column!r} label in sample() or in "
             f"cluster_features() for their (t, v) -- {per_wave}. They are KEPT "
-            f"with m=NA (until now they were silently dropped). Any groupby on "
+            f"with m=NA. Any groupby on "
             f"'m' with pandas' default dropna=True -- yours, or cfe's -- will "
             f"still drop them; pass dropna=False to keep them. The fix is "
             f"country-level wiring: give these households a {column!r} in "
@@ -3559,8 +3561,20 @@ class Country:
             f"this fatal."
         )
         if _null_index_strict():
+            # NullIndexKeyError subclasses RuntimeError.  That is safe ONLY
+            # because all three _add_market_index call sites in the generated
+            # table method sit OUTSIDE the derived-path
+            # ``except (FileNotFoundError, KeyError, ValueError, RuntimeError)``
+            # blocks; moved inside one, a strict raise would be swallowed into
+            # the legacy fallback (CLAUDE.md, Site C).
             raise NullIndexKeyError(msg)
-        warnings.warn(msg, NullIndexKeyWarning, stacklevel=3)
+        # Point the warning at the first frame outside lsms_library (the
+        # user's Country/Feature call), not at the generated method.
+        level, frame = 1, sys._getframe(0)
+        pkg = os.path.dirname(os.path.abspath(__file__)) + os.sep
+        while frame is not None and frame.f_code.co_filename.startswith(pkg):
+            frame, level = frame.f_back, level + 1
+        warnings.warn(msg, NullIndexKeyWarning, stacklevel=level)
 
     def _location_lookup(self) -> pd.DataFrame:
         """

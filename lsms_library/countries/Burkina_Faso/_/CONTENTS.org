@@ -2282,8 +2282,11 @@ science and the wider #1287/#1288 scope remain separate. Exact receipts:
 components (#1322), but =cluster_features= read only the panel cover, so the
 600 cross-section grappes (586-1185) had no cluster row.  Burkina's =sample()=
 carries no =Region=, so =_add_market_index= falls back to =cluster_features=,
-and a household with no market label is dropped from a =market== frame
-without a warning.  Measured on the warm cache at development =3a33f2869=:
+and -- under the framework as it then stood -- a household with no market
+label was dropped from a =market== frame without a warning.  (Pre-fix
+behaviour: since the 2026-11-03 framework change such a household is kept
+with =m= NA and reported by a =NullIndexKeyWarning=, =site='market-index'=.)
+Measured on the warm cache at development =3a33f2869=:
 =household_roster(market='Region')= served 22,362 of 69,452 2021-22 rows
 (every one of the 47,090 cross-section persons gone) and
 =sample(market='Region')= 3,227 of 10,403 households.

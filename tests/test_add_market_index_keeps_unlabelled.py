@@ -3,10 +3,11 @@
 ``Country._add_market_index`` (every ``market=`` call) labels each row from
 ``sample()[column]`` at household level, then from ``cluster_features`` on
 ``(t, v)``.  A row neither source could label used to be deleted by
-``flat.dropna(subset=['m'])``, with no warning: Burkina Faso 2021-22
-``sample(market='Region')`` lost 7,176 of 10,403 households, Albania 2008 and
-2012 lost every household, Tanzania 2008-09 / 2010-11 ``market='District'``
-likewise.  The row is now KEPT with ``m`` NA and reported through Site I's
+``flat.dropna(subset=['m'])``, with no warning.  Measured at ``3a33f2869``:
+Albania 2008 and 2012 ``sample(market='Region')`` lost every household
+(3,599 and 6,671), Tanzania 2008-09 / 2010-11 ``market='District'`` likewise,
+and Burkina Faso 2021-22 7,176 of 10,403 (until #1276 wired its
+cross-section).  The row is now KEPT with ``m`` NA and reported through Site I's
 family (``NullIndexKeyWarning``, ``LSMS_READ_STRICT``, filed in
 ``null_index_reports`` with ``site='market-index'``).
 
@@ -111,6 +112,8 @@ def test_one_warning_with_rows_and_households_per_wave():
     assert "2000: 3 row(s) / 1 household(s)" in msg
     assert "2001: 1 row(s) / 1 household(s)" in msg
     assert "dropna=True" in msg and "LSMS_READ_STRICT" in msg
+    # Attributed to the caller (this file), not to a frame inside the library.
+    assert warned[0].filename == __file__
 
 
 def test_report_is_filed_in_the_site_i_ledger():
