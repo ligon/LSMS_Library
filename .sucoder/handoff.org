@@ -9,11 +9,15 @@ section and the tracker; everything below it is historical.
 
 - Base: GitHub development 3a33f2869 (2026-11-01, #1409).  Mirror development
   was fast-forwarded to it.  No open PRs at start; 146 open issues, ~55 ISA.
-- Workers: eight =sucoder dispatch= headless Claude workers, one per ISA
-  country, 4 CPU/32G/8h each on co_carleton, with data access (S3 reader + L1
-  projection; the old profiles had none).  Records, frozen briefs, results.git
-  and REPORT.md per worker under
+- Workers: eight in-process Claude subagents, one per ISA country, in worktrees
+  /local/job40825266/worktrees/<C> on branches isa/<c>-20261103 (published to the
+  mirror on commit).  Briefs, reports and burst logs under
   /global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/ -- see TRACKER.org there.
+  Heavy builds go to separate Slurm jobs via submit.sh/burst.sh in that directory.
+- =sucoder dispatch= was tried first and is PARKED: after four setup fixes the
+  supervisor still refuses ("cannot inspect owned child file descriptors",
+  errno 13 -- the same refusal as the 2026-10-28 bulletin).  Failure table and a
+  running diagnostic are in TRACKER.org.
 - Coordinator integrates: fetch results.git, red-team (fresh reviewer), cherry-pick
   onto fix/<n>-<country>-<slug>-20261103 from development, push to GitHub
   (remote =github=, HTTPS via gh credential helper; SSH port 22 is blocked), open PR.
