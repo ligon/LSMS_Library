@@ -14,7 +14,11 @@ from lsms_library.paths import countries_root
 
 
 ROOT = countries_root() / 'Burkina_Faso'
-UNKNOWN_21 = 'Unknown [Burkina_Faso 2018-19 s16bq01=21]'
+# GH #1187 ruling (@ligon, 2026-11-03): the unlabelled 2018-19 slot 21 is
+# groundnut seed, a DATA-VALIDATED reading (593 of its 602 households
+# harvested Arachide).  It replaces the source-qualified unknown
+# 'Unknown [Burkina_Faso 2018-19 s16bq01=21]' that GH #1123 had served.
+CODE_21_CROP = 'Arachide'
 TARGETS = [('Semences de maïs', 'Maïs'),
            ('Semences de haricots/niébé', 'Niébé')]
 
@@ -55,6 +59,19 @@ def test_real_resolvers_agree_on_seed_and_native_crop(source, target):
     assert got_seed.tolist() == [target]
 
 
+def test_code_21_seed_joins_the_native_groundnut_crop():
+    """GH #1187: slot 21 arrives as the literal '21' (no value label); its seed
+    crop must be the label crop_production serves for groundnut."""
+    seed = _helper('plot_inputs.py', '_seed_crop_labels')
+    crop = _helper('crop_production.py', '_crop_labels')
+    food = _table('harmonize_food').set_index(
+        'Original Label')['Preferred Label'].to_dict()
+    got_seed = seed(pd.Series(['21'], dtype='string'), _seed_map())
+    got_crop = crop(pd.Series([CODE_21_CROP], dtype='string'), food)
+    pd.testing.assert_series_equal(got_seed, got_crop, check_exact=True)
+    assert got_seed.tolist() == [CODE_21_CROP]
+
+
 def test_all_other_seed_cells_and_original_keys_are_preserved():
     expected = {
         'Semences de petit mil': 'Mil', 'Semences de sorgho': 'Sorgho',
@@ -62,7 +79,7 @@ def test_all_other_seed_cells_and_original_keys_are_preserved():
         'Semences de sésame': 'Sésame', 'Semences de césame': 'Sésame',
         "Semences d'autres céréales": 'Autre céréale',
         'Plants/boutures de tubercules': 'Autre tubercule',
-        'Autres semences': 'Autre crop', '20': 'Autre crop', '21': UNKNOWN_21,
+        'Autres semences': 'Autre crop', '20': 'Autre crop', '21': CODE_21_CROP,
     }
     expected.update(TARGETS)
     assert _seed_map() == expected
@@ -77,7 +94,7 @@ def test_distinct_present_native_slots_remain_injective():
               'Plants/boutures de tubercules', 'Autres semences', '21']
     targets = [_seed_map()[label] for label in source]
     assert len(targets) == len(set(targets)) == 11
-    assert targets[-1] == UNKNOWN_21
+    assert targets[-1] == CODE_21_CROP
 
 
 def test_nonseed_and_unknown_labels_do_not_gain_crop_classifications():
@@ -98,6 +115,7 @@ def test_harmonize_food_keeps_its_distinct_food_categories():
 def test_unlabelled_slot_and_input_classification_stay_visible():
     inputs = _table('harmonize_input').set_index(
         'Original Label')['Preferred Label'].to_dict()
-    assert inputs['21'] == 'Seed'  # Unverified legacy classification, GH1187.
-    assert _seed_map()['21'] == UNKNOWN_21
-    assert _seed_map()['Autres semences'] != UNKNOWN_21
+    assert inputs['21'] == 'Seed'  # Data-validated groundnut seed, GH #1187.
+    assert _seed_map()['21'] == CODE_21_CROP
+    # Vague 1 has no slot 21: its groundnut seed stays under 'Autres semences'.
+    assert _seed_map()['Autres semences'] == 'Autre crop' != CODE_21_CROP

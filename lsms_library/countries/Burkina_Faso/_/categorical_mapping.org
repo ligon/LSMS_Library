@@ -772,12 +772,15 @@ Burkina_Faso cache hash.
 # cereal/tuber categories follow the existing Benin/Togo split.
 #
 # In the held 2018 source, code 20 is 'Autres semences'; code 21 has no
-# value label and occurs on 602 applied rows.  Its source-qualified unknown
-# below preserves that native identity without inventing a physical crop.
-# The existing harmonize_input 21 -> Seed classification is UNVERIFIED
-# legacy curation, not established by this identity repair.  Do not borrow
-# 2021's different code-21 meaning or reuse this 2018-qualified fallback
-# for a future wave.  Only the 2018-19 plot_inputs builder uses this table.
+# value label and occurs on 602 applied rows, all in vague 2.  Neither held
+# 2018 questionnaire workbook lists a code 21.  It is served as groundnut
+# seed -- crop 'Arachide', input 'Seed' -- as a DATA-VALIDATED reading, not a
+# source binding (@ligon's ruling on GH #1187, 2026-11-03): 593 of its 602
+# households harvested Arachide in s16c, against 28% of all vague-2 input
+# households.  Vague 1 has no such slot, so its groundnut seed stays under
+# 20 'Autres semences' -> 'Autre crop'.  See _/CONTENTS.org.  Do not borrow
+# 2021's different code-21 meaning (rubber/teak plants) for a future wave.
+# Only the 2018-19 plot_inputs builder uses this table.
 
 #+NAME: harmonize_seed_crop
 | Original Label                | Preferred Label     |
@@ -794,7 +797,7 @@ Burkina_Faso cache hash.
 | Plants/boutures de tubercules | Autre tubercule     |
 | Autres semences               | Autre crop          |
 | 20                            | Autre crop          |
-| 21                            | Unknown [Burkina_Faso 2018-19 s16bq01=21] |
+| 21                            | Arachide            |
 
 # harmonize_species_ehcvm — s17q02 livestock species CODE (1-11) ->
 # canonical species Preferred Label.  Code-keyed (load s17 with
