@@ -89,7 +89,10 @@ EXPECTED_ROWS = {
 }
 EXPECTED_CELLS = {
     "Mali": {"2014-15": 39245},
-    "Niger": {"2011-12": 8923, "2014-15": 6500, "2018-19": 42087},
+    # GH #1090: 8,923 / 6,500 before CS07 rice variety 7031 moved from
+    # `Autre Riz local` to `Riz importé non parfumé`; the +56 / +16 are exactly
+    # the (t, v, u) rice cells that priced BOTH 7031 and 7032 and now split.
+    "Niger": {"2011-12": 8979, "2014-15": 6516, "2018-19": 42087},
     "Tanzania": {"2019-20": 2769, "2020-21": 13062},
 }
 

@@ -1498,6 +1498,23 @@ _COMMUNITY_MISSING_UNITS = {U_NA}
 _COMMUNITY_PRICE_CONTENT = ['v', 'j', 'u', 'variety', 'visit', 'slot',
                             'Price', 'Quantity', 'Description']
 
+# CS07 varieties whose `j` is set by VARIETY CODE, overriding the cs07q01
+# product label (GH #1090).  HARMONISATION CHOICE, ruled by @ligon 2026-11-03,
+# not instrument evidence.  CS07 product "Riz" (cs07q01) maps through
+# harmonize_food to `Autre Riz local` for BOTH its varieties, which served
+# imported rice as local:
+#   7031 "Riz thailandais vendu en vrac au kilo" -> `Riz importé non parfumé`,
+#        the household EHCVM label for imported non-scented rice (96-99% of
+#        household imported-rice rows: 3,646 of 3,719 in 2018-19, 5,064 of
+#        5,095 in 2021-22).  The variety label does not say scented or not;
+#        non-scented is the choice, so the price joins the modal household
+#        imported-rice item on (j, u).
+#   7032 "Riz local vendu en vrac au kilo" keeps `Autre Riz local` (no entry
+#        here): the label does not decide Riz du Niger versus Autre Riz local.
+# Keyed on the cs07q02 CODE, which is identical in all three CS07 files (the
+# labels are not).  `variety` and `Description` are unchanged.
+_CS07_VARIETY_J = {'7031': 'Riz importé non parfumé'}
+
 
 def _community_price_triples(df, item_map, unit_map, triples, passage=1,
                              codes=None):
@@ -1573,6 +1590,8 @@ def _community_price_triples(df, item_map, unit_map, triples, passage=1,
     v = df['grappe'].apply(tools.format_id).astype('string')
     j = _item_labels(df['cs07q01'].astype(str).str.strip(), item_map)
     variety = pd.to_numeric(codes['cs07q02']).astype('Int64').astype('string')
+    # A variety-code override wins over the product label (GH #1090).
+    j = variety.map(_CS07_VARIETY_J).astype('string').fillna(j)
     description = df['cs07q02'].astype('string').str.strip()
     pieces = []
     for slot, (pcol, qcol, ucol) in enumerate(triples, start=1):

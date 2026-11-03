@@ -1530,6 +1530,20 @@ residual of #840.
   "Riz thailandais vendu en vrac au kilo" (=7031=) and "Riz local vendu en vrac
   au kilo" (=7032=).  The =variety= level now tells them apart; the =j= label
   itself is a =harmonize_food= decision, not touched.
+  *RESOLVED 2026-11-03 (GH #1090, harmonisation choice ruled by @ligon):*
+  =j= is set by the variety CODE for 7031, which now serves =Riz importé non
+  parfumé= -- the household EHCVM label for imported non-scented rice, 96-99%
+  of household imported-rice rows (3,646 of 3,719 in 2018-19, 5,064 of 5,095
+  in 2021-22).  The variety label does not say scented or not; non-scented is
+  the CHOICE, made so the price joins the modal household imported-rice item
+  on (j, u).  7032 keeps =Autre Riz local=: its label does not decide =Riz du
+  Niger= versus =Autre Riz local=.  Mechanism: =niger._CS07_VARIETY_J=, applied
+  in =_community_price_triples= after the product-label map (CS07 only;
+  2018-19 s05 maps by =produitID= and is untouched).  Measured, cold private
+  roots: 683 rows move (2011-12 461, 2014-15 222); 130,487 rows before and
+  after, every other value identical.  Pinned by
+  =tests/test_niger_cs07_rice_variety.py=.  Cache: =niger.py= moves every
+  Niger hash (one Niger re-warm).
 
 The measurement table under "What changed, measured (cold rebuild,
 2026-09-09)" above keeps its 15,423 -- it is the #842 measurement and stands as
