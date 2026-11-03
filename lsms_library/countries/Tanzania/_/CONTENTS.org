@@ -45,6 +45,27 @@ is added; =SeriesCapability='s whole-series/feature scope and automatic C1;C4
 cannot represent this partial evidence. The original #846 live integration
 requirement remains open. No microdata, table or current API replay occurred.
 
+*Live API observation (2026-11-03, development =3a33f2869=, warm read).*
+- =Country('Tanzania').food_acquired()= serves 251,730 rows at
+  =(i, t, v, j, u, s)= with columns =Quantity= and =Expenditure= only.  It has
+  no =Price=.
+- =s='produced'= rows: 40,437, all with a =Quantity= and none with an
+  =Expenditure=.  =s='inkind'= is the same, 14,878 and 0.
+- =food_prices(units='unitprice')= and =units='kgprice'= now RAISE
+  =UnitsUnavailableError= ("needs ['Price'] on food_acquired, which Tanzania
+  does not carry").  The issue's "returns *0 rows*" is superseded: the absence
+  is loud at the API.  =units='kgvalue'= / ='unitvalue'= serve 196,280 rows
+  over all six waves.
+- *The coverage matrix has no cell for either concept.*
+  =coverage_matrix.feature_vocabulary()= lists 24 features, none of them a
+  price basis or an own-consumption value, and the derived food tables grade
+  =sane= in all six waves of the committed snapshot (=.coder/coverage/latest.csv=).
+  So moving the twelve rows into
+  =.coder/coverage/absent_verdicts.csv= would close or open nothing: the loader
+  keys rows on =(country, feature, wave)=, and no such cell exists.  The
+  "live integration" the issue asks for needs a framework decision on
+  sub-feature (price-basis) cells first.
+
 * Survey design --- read before touching ANY 2008-15 table
 :PROPERTIES:
 :CUSTOM_ID: uphi-backcasting
