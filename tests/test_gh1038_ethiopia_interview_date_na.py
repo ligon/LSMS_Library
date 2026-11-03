@@ -19,7 +19,8 @@ holder-grain cover pick a *dated* holder row over a placeholder one: household
 GH #1056 moved both waves onto the GH #1045 build-time parser: the
 placeholder is now a declared ``sentinels:`` entry (still served NaT, now
 counted), and a cited fieldwork ``window:`` COUNTS -- and keeps -- the
-device-clock dates years outside fieldwork (W4 15 rows, W5 18 holder rows),
+dates years outside fieldwork (W4 15 rows, W5 18 holder rows; 7 of the W5
+rows may be Ethiopian-calendar dates, see CONTENTS.org),
 which used to be served with nothing anywhere noticing them.  Served values
 are unchanged.
 """
@@ -44,9 +45,15 @@ WAVES = {'2018-19': ('sect_cover_hh_w4.dta', 'InterviewStart'),
 WINDOWS = {'2018-19': ('2019-05-01', '2019-09-30'),
            '2021-22': ('2022-03-01', '2022-07-31')}
 IN_WINDOW = {'2018-19': '2019-06-19T09:15:28', '2021-22': '2022-04-18T14:27:53'}
-# Measured at development 3a33f2869 (cold private root), per wave report:
+# Measured on this branch (base 3a33f2869; cold private root), per wave
+# build-time report -- SOURCE-row grain (W5: holder rows of the PH cover):
 # (n, parsed, sentinel, outside_window).
 REPORTS = {'2018-19': (6770, 6762, 8, 15), '2021-22': (1596, 1484, 112, 18)}
+# Served household rows outside WINDOWS, after the (t, i) collapse.  A
+# different quantity from REPORTS' outside_window: W5's 18 of 1,475 served
+# households equals the 18 of 1,596 holder rows only because no out-of-window
+# holder row is lost in the collapse.
+SERVED_OUTSIDE = {'2018-19': 15, '2021-22': 18}
 
 
 def _record(fn, *args, **kwargs):
@@ -75,7 +82,7 @@ def test_wave_config_declares_the_placeholder_a_sentinel(ethiopia, wave):
     assert spec['calendar'] == 'gregorian'
     assert spec['format'] == '%Y-%m-%dT%H:%M:%S'
     assert spec['sentinels'] == [PLACEHOLDER]
-    # GH #1056: a fieldwork window, so device-clock dates are counted.
+    # GH #1056: a fieldwork window, so dates years outside it are counted.
     assert [pd.Timestamp(x) for x in spec['window']] == \
         [pd.Timestamp(x) for x in WINDOWS[wave]]
     # No resolution: the served value keeps its time of day, as before.
@@ -89,7 +96,7 @@ def test_wired_spec_parses_without_a_placeholder_and_counts_the_window(
         ethiopia, wave, tmp_path):
     """Run the wave's own resolved mapping through ``df_data_grabber`` and the
     build-time parser on a synthetic cover file: the placeholder is NaT (a
-    counted sentinel), an in-window date parses, and a 2014 device-clock date
+    counted sentinel), an in-window date parses, and a 2014 date
     is counted ``outside_window`` and KEPT (GH #1056)."""
     fn, col = WAVES[wave]
     info = ethiopia[wave].resources['interview_date']
@@ -137,14 +144,14 @@ def test_warm_interview_date_has_no_placeholder(ethiopia):
     recovered = df.xs(('060105088801701096', '2021-22'), level=['i', 't'])
     assert list(recovered['Int_t']) == [pd.Timestamp('2022-04-18 14:27:53')]
 
-    # GH #1056: the device-clock dates are served as recorded AND counted --
+    # GH #1056: the out-of-window dates are served as recorded AND counted --
     # by the build-time report (replayed from the parquet stamp when warm).
     t = df.index.get_level_values('t')
     for wave, (lo, hi) in WINDOWS.items():
         x = df.loc[t == wave, 'Int_t']
         served_out = int(((x < pd.Timestamp(lo)) |
                           (x >= pd.Timestamp(hi) + pd.Timedelta(days=1))).sum())
-        assert served_out == REPORTS[wave][3], (wave, served_out)
+        assert served_out == SERVED_OUTSIDE[wave], (wave, served_out)
         assert int((x.dt.year == 2014).sum()) >= 13
         reps = [r for r in datetime_reports('Ethiopia', 'interview_date')
                 if r['wave'] == wave]

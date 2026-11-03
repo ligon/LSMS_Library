@@ -211,11 +211,12 @@ housing:
 # catalog DDI (WB 6161, study_desc.study_info.coll_dates) dates the
 # post-harvest questionnaire 2022-04-01 to 2022-06-30 (Gregorian).  window:
 # those months widened by one month each side, so the parser's
-# `outside_window` count isolates the device-clock errors (18 holder rows:
-# 2014-01 x9, 2014-04 x2, 2014-07 x7) from fieldwork overrun (2022-03: 10,
-# 2022-07: 1 served rows, inside the window).  Out-of-window dates are
-# COUNTED, WARNED and KEPT (served as recorded); nulling them is the open half
-# of GH #1056.
+# `outside_window` count isolates the dates years outside fieldwork (18
+# holder rows: 2014-01 x9, 2014-04 x2, 2014-07 x7) from fieldwork overrun
+# (2022-03: 10, 2022-07: 1 served rows, inside the window).  7 W5 rows may be
+# Ethiopian-calendar dates, see CONTENTS.org.  Out-of-window dates are
+# COUNTED, WARNED and KEPT (served as recorded): this implements GH #1056's
+# option (b), a parser screen; option (a), null-with-count, was not taken.
 interview_date:
     file: sect_cover_ph_w5.dta
     idxvars:

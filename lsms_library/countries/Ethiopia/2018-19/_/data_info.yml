@@ -201,10 +201,11 @@ housing:
 # Gregorian months -- household questionnaire "between June and August 2019"
 # (rural third visit; urban single visit).  window: those months widened by
 # one month each side, so the parser's `outside_window` count isolates the
-# device-clock errors (15 rows: 2014-01 x13, 2015-01-09, 2018-10-09) from
-# fieldwork overrun (2019-05: 7, 2019-09: 82, inside the window).  Out-of-
-# window dates are COUNTED, WARNED and KEPT (served as recorded); nulling them
-# is the open half of GH #1056.
+# dates years outside fieldwork (15 rows: 2014-01 x13, 2015-01-09,
+# 2018-10-09) from fieldwork overrun (2019-05: 7, 2019-09: 82, inside the
+# window).  Out-of-window dates are COUNTED, WARNED and KEPT (served as
+# recorded): this implements GH #1056's option (b), a parser screen; option
+# (a), null-with-count, was not taken.  See CONTENTS.org.
 interview_date:
     file: sect_cover_hh_w4.dta
     idxvars:
