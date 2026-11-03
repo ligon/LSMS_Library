@@ -1392,6 +1392,52 @@ is excluded from both sides of the loss fraction and named in the message.
 The residual 15.9% is p1's nine items above plus 219 clipped zeros, and it
 is reported, not suppressed.
 
+** 2026-11-03 -- WAITING the held questionnaire answers both open questions (GH #864)
+
+Read from =2014/Documentation/Questionnaire_EMC_2014_Passage_1.pdf= (via
+=get_data_file= into a private data root; text layer extracted with PyMuPDF
+from the cluster Python 3.10 module, the venv has no PDF reader) and the
+variable labels of =emc2014_p1_conso7jours_16032015.dta=.  Nothing is
+rewired here; the decision is #864's.
+
+*Section C has three DISJOINT blocks, each with its own quantity, unit and
+value* (PDF pp. 15-18, headers repeated on each page; verbatim): « C04. Quelles sont la quantité totale et la valeur
+des achats consommés et prélèvement de stocks achetés consommé du [PRODUIT]
+par le ménage au cours des 7 derniers jours »; « C05. [...] consommé par le
+ménage qui ont été prélevées de sa propre production »; « C06. [...] reçues
+en cadeau, en contrepartie d'un travail ou en troc ».  A separate « C02.
+Combien le Ménage a-t-il dépensé pour des achats du [PRODUIT] au cours des 7
+derniers jours ? » precedes them.  The file labels bind them: =qachat= /
+=uachat= / =achat= = « Quantité / Unité / Montant en fcfa C04 »;
+=qautocons= / =uautocons= / =autocons= = C05; =qcadeau= / =ucadeau= /
+=cadeau= = C06; =mtt_dep= = C02.
+
+So *=qachat= is the PURCHASED quantity consumed, not a total*, and the
+reshape's =purchased = (qachat - qautocons).clip(0)= subtracts a disjoint
+block.  Measured on p1 (171,236 rows): 283 rows have both =qachat > 0= and
+=qautocons > 0=; on 238 of them =qautocons >= qachat=, so the purchased
+quantity is clipped to 0 (the 219 served zeros), and on 45 the two blocks are
+in DIFFERENT units.  And the own-production rows are served in the wrong
+unit: =Produced= rides the =u= index, which is bound to =uachat=, so 11,123
+of the 11,418 served 2014 produced rows carry =u = 'Unknown'= although 11,108
+of the 11,136 source rows with production but no purchase record their own
+unit =uautocons= (measured on the shared warm parquet at =3a33f2869=).
+
+*The nine null-quantity items are not asked a quantity.*  In the printed grid
+the QUANTITE / UNITE boxes are absent for Beurre de Karité, Pâte d'arachide,
+Gombo, Kapok, Oignons, Feuilles, Fruits, Haricot and Soumbala in all three
+blocks (only MONTANT), and for Sel in C04 / C05 (a C06 quantity only).  A
+layout count over the text layer finds 37 of the 59 items with fewer than
+three quantity grids (20 with none; most of the rest have no C05 grid --
+flours, bread, sugar, drinks).  This is C4 evidence that their missing
+=qachat= is by design, i.e. the =money_only= pattern at item grain.
+
+*Still unread* (p1): =qcadeau= > 0 on 1,468 rows and =cadeau= > 0 on 3,263
+(2,505,140 CFA); =autocons= > 0 on 27,313 (43,472,367 CFA); and =mtt_dep=
+(C02) sums to 106,129,109 CFA against =achat= (C04 value) 93,383,167 -- equal
+on 108,028 of the 144,439 rows carrying either.  Which of C02 and C04 is the
+=Expenditure= is a decision too.
+
 ** GH #794: 47,137 + 16,610 leaked rows, and why "the keys do not match" was the wrong question
 
 *Before* (warm cache, 2026-10-14) the served =j= carried:
@@ -1534,7 +1580,40 @@ without printing source keys.  The Org edit invalidates all 24 Burkina
 table hashes; other countries and shared framework fingerprints are unchanged.
 The separate #1119 named-crop vocabulary mismatch is not changed here.
 
-* 2026-10-21 -- =plot_inputs= gift/donation fields served under purchase names (GH #1188)
+** 2026-11-03 -- WAITING code 21: the held 2018 questionnaire has no such code, and it occurs in vague 2 only (GH #1187)
+
+The two household questionnaire workbooks are now held
+(=2018-19/Documentation/Questionnaire/bfa_ehcvm1_qnr_household_excel_vague{1,2}.xls=,
+read through =get_data_file= into a private data root; the venv has no
+=xlrd=, so they were parsed with the cluster module Python 3.10's =xlrd 2.0.1=).
+Sheet =S16b_Agri=, column (16B.01) « Type d'intrants », lists codes 1-20 in
+BOTH vagues, ending at 20 « Autres semences »; *there is no code 21 in either
+workbook*.  So the instrument the repo holds is silent on code 21 -- a C4
+check that finds nothing, not one that settles the meaning.  The nomenclature
+PDFs (=bfa_ehcvm1_nomenclature_vague{1,2}.pdf=) are still not held.
+
+Measured on =s16b_me_bfa2018.dta=:
+- *All 602 code-21 rows are vague 2* (0 in vague 1), against 11,425 / 11,452
+  applied rows per vague; 2,251 / 2,258 households.  So 21 is a slot the
+  vague-2 CAPI added, not part of the printed list.
+- When it appears, code 20 « Autres semences » falls from 649 rows (vague 1)
+  to 234 (vague 2); 105 households report both 20 and 21 in vague 2.
+- 591 of the 602 are in unit code 2 (Kilogramme).
+- Cross-check against =s16c= (harvest): *593 of the 602 code-21 households
+  (98.5%) harvested Arachide*, against 637 of 2,258 (28%) vague-2 input
+  households, 113 of 234 (48%) vague-2 code-20 households and 490 of 649
+  (75%) vague-1 code-20 households.
+
+That is strong *data* evidence that vague-2 code 21 is groundnut seed (EHCVM-2
+2021 adds « Semences d'arachide » as its own code 19), and that vague 1 records
+the same seed under 20 « Autres semences ».  It is inference, not a source
+binding, so nothing is changed: =harmonize_input= keeps 21 -> =Seed= (which
+this evidence supports) and =harmonize_seed_crop= keeps the source-qualified
+=Unknown [Burkina_Faso 2018-19 s16bq01=21]=.  Naming the crop =Arachide= on
+this evidence is a decision for #1187.  A cross-vague comparison of seed by
+crop is affected either way: vague 1's groundnut seed sits in « Autres
+semences ».
+
 
 Independent review of the identity repair at =3848778d0e8676c798883c11ea3e33fc88e8a591=
 found a separate source-binding contradiction in =2018-19/_/plot_inputs.py=.
@@ -1966,7 +2045,8 @@ own nationally scaled weights; pooled estimates still need that distinction.
 Current scope is deliberately partial: only three Cross_Section sidecars and
 the sample/roster bindings are recovered. Other 2021 tables still serve the
 panel component only, including =cluster_features=; CS region/market lookup
-coverage is not established here. The panel sidecars remain at their public
+coverage is not established here. (/=cluster_features= and =interview_date= now read
+both covers -- see the two 2026-11-03 sections at the end of this file./) The panel sidecars remain at their public
 flat =Data/= paths. Full Panel relocation, acquisition routing, other module
 wiring and complete held-release receipts remain #1276 integration work.
 =SOURCE.org= records partial declarations without claiming a secondary held
@@ -2195,3 +2275,86 @@ keyword) consumed no target invocation and remain attributed. No data or tests
 were replayed for this documentation. WAITING #1148, namespace/component
 science and the wider #1287/#1288 scope remain separate. Exact receipts:
 =slurm_logs/isa_recovery_2026-10-29/Burkina_Faso/1287-plot-runtime-receipt-v1/REPORT.md=.
+
+* 2026-11-03 -- 2021-22 =cluster_features= reads the cross-section cover too (GH #1276)
+
+*What was wrong.*  =sample()= and =household_roster()= serve both 2021-22
+components (#1322), but =cluster_features= read only the panel cover, so the
+600 cross-section grappes (586-1185) had no cluster row.  Burkina's =sample()=
+carries no =Region=, so =_add_market_index= falls back to =cluster_features=,
+and a household with no market label is dropped from a =market== frame
+without a warning.  Measured on the warm cache at development =3a33f2869=:
+=household_roster(market='Region')= served 22,362 of 69,452 2021-22 rows
+(every one of the 47,090 cross-section persons gone) and
+=sample(market='Region')= 3,227 of 10,403 households.
+
+*Fix.*  =2021-22/_/data_info.yml= =cluster_features= reads
+=[s00_me_bfa2021.dta, Cross_Section/s00_me_bfa2021.dta]= with the same
+=s00q01= / =s00q02= / =s00q04= columns.  No per-file =cs_i= override: =i= is
+projected away at the =(t, v)= collapse, and the grappe ranges are disjoint.
+Measured on the held cross-section cover (7,176 rows, 600 grappes, unique on
+=(grappe, menage)=): Region, District and Rural are constant within every
+grappe, as they are in the panel cover, so the projection is lossless and
+emits no grain report.  Region spells =Boucle du Mouhoum= as the panel cover
+does; the existing =Region= / =District= tables absorb every cross-section
+spelling (pooled District stays 45, Region 13).
+
+*After* (cold build, private data root):
+
+|                                         | before (warm) | after (cold) |
+|-----------------------------------------+---------------+--------------|
+| =cluster_features= 2021-22 rows          |           550 |        1,150 |
+| 2021-22 =sample().v= with no cluster row |           600 |            0 |
+| =sample(market='Region')= 2021-22 hh     |         3,227 |       10,403 |
+| =household_roster(market='Region')= 2021-22 rows | 22,362 |     69,452 |
+
+The 2,035 pre-existing rows (all of 2014 and 2018-19, and the 550 panel
+grappes) are value- and dtype-equal to the shared warm parquet; 2014's grain
+report (1,034 of 10,800 rows, 94 zd, GH #1060) is unchanged.  Latitude and
+Longitude stay NaN for all 1,150 2021-22 grappes.
+
+*New idiosyncrasy: the cross-section cover carries HOUSEHOLD GPS.*
+=Cross_Section/s00_me_bfa2021.dta= =GPS__Latitude= / =GPS__Longitude= are
+populated for 7,128 of 7,176 households (the panel cover: 0 of 3,227), and
+they differ within 578 of the 600 grappes (median 6 distinct positions per
+grappe; within-grappe latitude range median ~0.8 km, max ~190 km).  They are
+household positions, so they are NOT mapped into =cluster_features=: the
+=(t, v)= projection would select one household's point and call it the
+cluster's.  Serving a cluster location from them (a centroid, say) would be a
+registered derivation and a decision; it bears on GH #1057.
+
+*Population record.*  =population.yml='s 2021-22 =survey= / =notes= now name
+=cluster_features= and =interview_date= beside =sample= and =household_roster=
+(edited in =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org= and regenerated
+with =scripts/promote_population_records.py=; no tag, source type or
+confidence changed, and =.yml= is not a build input, so no hash moves).
+Other 2021 tables whose cross-section source is not held (=s07b= food, =s11=
+housing, =s12= assets, =s14b= shocks, =s08a=, =s20a=, individu, =s16*=) still
+serve the panel only.
+
+Cache: the wave =data_info.yml= is a build input -- all 24 Burkina country
+hashes and the 24 2021-22 wave hashes move; 2014 / 2018-19 wave hashes do not.
+Pinned by =tests/test_burkina_faso_cs_cluster_features.py=.
+
+* 2026-11-03 -- 2021-22 =interview_date= reads the cross-section cover too (GH #1276)
+
+=interview_date= read only the panel cover, so the 7,176 cross-section
+households =sample()= serves had no interview date.  The held
+=Cross_Section/s00_me_bfa2021.dta= asks the same per-visit timestamps
+(=s00q23a/b=, =s00q24a/b=, =s00q25a/b=), so the wave now reads both covers,
+the cross-section entry through the same =cs_i= per-file override as
+=sample= and =household_roster= (ids =CS_= + grappe + menage.zfill(3)).
+
+Measured, warm shared cache at =3a33f2869= (before) and a cold private data
+root (after): 2021-22 rows 9,681 -> 31,206; households 3,227 -> 10,403
+(7,176 =CS_=); every 2021-22 =sample()= household now has a date; 0 NaT
+starts in either component.  The cross-section has 7,173 visit-3 rows, not
+7,176: =melt_visit_intervals= drops a visit whose start and end are both
+missing, and three cross-section households have both visit-3 stamps
+blank (empty strings in the source).  The 30,709 pre-existing
+rows (2018-19 and the panel) are value- and dtype-equal to the warm parquet.
+No date is parsed differently; nothing is imputed.
+
+Cache: the wave =data_info.yml= is a build input -- all 24 Burkina country
+hashes and the 24 2021-22 wave hashes move.  Pinned by
+=tests/test_burkina_faso_cs_interview_date.py=.

@@ -1644,7 +1644,7 @@ sums, one of which contains a bare 24-hours-a-day over-report.  A
 plausibility screen on reported schedules is a separate decision from
 honouring the survey's own missing codes, and is not taken here.
 
-** REPORTED, NOT FIXED: 2011-12 asks no 7-day participation question at all
+** 2011-12 asks no 7-day participation question at all (wage_work RESOLVED by GH #882, 2026-11-03)
 
 The script docstring called =ms04q03= / =ms04q05= / =ms04q02= "last 7 days"
 dummies.  The labels and the questionnaire say otherwise:
@@ -1669,6 +1669,25 @@ Options left open on #877: (a) keep as served and document (what is done
 here); (b) re-point =wage_work= to =ms04q01= so the 2011-12 triple is
 uniformly 30-day; (c) serve NA for 2011-12's dummies.  *Served values are
 unchanged.*
+
+*RESOLVED 2026-11-03 (GH #882, option B, ruling @ligon): =wage_work= reads
+=ms04q01=.*  The table above understated the defect: =ms04q02= is not a
+parallel 12-month question but a FOLLOW-UP asked only when =ms04q01= = No.
+Measured on =ecvmaind_p1p2= (=convert_categoricals=False=): =ms04q02= is NA
+for all 1,174 =ms04q01= = Yes rows and all 5,153 =ms04q01=-missing rows, and
+no row is yes on both.  So the served =wage_work= (=ms04q02=) was NA for
+every current wage worker, and its 269 True were people who did wage work in
+the year but NOT in the last 30 days.  This is a DELIBERATE departure from WB
+parity: =NER_ECVMA1.do:1378= (=recode ms04q02 ... gen( wage_work)=)
+reproduces the skip-pattern error.  Now all three 2011-12 dummies are the
+last 30 days and share one universe (=ms04q01/q03/q05= are NA on the same
+5,153 rows).  Measured, cold private roots: 2011-12 =wage_work= True / False
+/ NA 269 / 18,529 / 6,327 -> 1,174 / 18,798 / 5,153; every other column and
+every other wave frame-equal (125,294 rows either way).  The cross-wave
+reference-period mix remains: 2011-12 is 30-day, 2014-15 and EHCVM 7-day.
+Pinned by =tests/test_niger_2011_12_wage_work.py=.  Cache: the wave script,
+=niger.py= and =data_scheme.yml= comments move every Niger hash (one Niger
+re-warm).
 
 ** Also open on #877, and wider than Niger
 
@@ -2263,3 +2282,63 @@ injection, optional subset coverage, full scientific or whole-#1287 acceptance.
 Existing EXTENSION, disjoint-programme, duplicates, units and quantity-999
 caveats remain. See ledger =1287-niger-remaining-runtime-checkpoint= for pins,
 independent review and custody limits; accepted livestock #1342 is separate.
+
+* 2026-11-03 -- crop_production carries =production_obs=; the index is unique (GH #1360)
+
+*Idiosyncrasy.*  =(t, i, plot_id, crop, u)= is not a harvest line in two
+waves: one (plot, crop, unit) carries several reported lines.  Measured on
+the held sources at development =3a33f2869=: 2011-12 27 key groups / 57 rows
+(19 conflicting, 8 equal-payload), 2021-22 846 groups / 1,856 rows (740
+conflicting); 2014-15 and 2018-19 are unique.  The framework collapsed each
+group to one observed row (GrainCollapseWarning: 19 + 897 rows destroyed).
+That collapse is also the whole of GH #1360: only a NON-UNIQUE index is
+collapsed and key-sorted, so the default route (per-wave collapse, then
+concat) and the Make route (one collapse over the concatenated waves) served
+the same 46,376 keyed-equal rows with 22,516 positions in a different order.
+
+*What tells the lines apart.*
+- 2011-12 =ecvmaas2e_p2.as02eq0= ("numero d'ordre", 1-20) is the module's own
+  line number, unique within =hid= on all 12,091 rows (=passage= is 2 on every
+  row).  Served as =reported:<n>=.
+- 2021-22 =s16c_me_ner2021= records NO line number (24 columns; the repeats
+  differ in parcel name =s16cq03b=, respondent =s16cq06=, quantities).  Served
+  as the CONSTRUCTED =row:<source_fingerprint>:<n>=, the zero-based row of
+  the held release (16,468 rows) taken before any filter -- the Uganda GH #1198
+  form, bound to the sidecar.  Not a survey id; a re-release renumbers it.
+- 2014-15 / 2018-19 carry =unresolved_observation= (the plot_inputs EHCVM
+  precedent): unique without a coordinate.
+- =s16cq16d= ("Etat du produit": =épis/coques= 6,120, =Grains= 5,780, NaN
+  991, =na= 42) is a 2021-22 product-state field on the harvest line -- the
+  canonical =condition= axis.  NOT served; it separates only a minority of the
+  repeats (1,856 -> 1,817 duplicated rows on the key plus it).  Open.
+- *38 s16c rows are byte-identical to another row on all 24 columns* (35
+  groups, not contiguous: 3 to 884 rows apart; 69 of the 73 carry a positive
+  quantity).  Both copies are served, as the canonical axis's contract says
+  (retain every eligible record); whether they are double entries, like the
+  s16d repeats, is NOT adjudicated -- no multiplicity test like s16d's was
+  found for them.
+
+*The crop-level sale moved with the grain.*  2014-15 / 2021-22 attribute the
+crop-level sale to an (i, crop) only when it has ONE harvest line (was: one
+plot).  With repeated lines served, the old plot rule would put one sale on
+every line of a single-plot crop (2021-22: 326 rows for 144 pairs, 10,305,550
+FCFA against 4,577,925 once per pair); it already did so for 16 pairs whose
+lines differ in unit (served twice before this change).  2014-15: no change
+(564 pairs, no multi-line sale pair).
+
+*Served, cold, private roots, default backend* (before = development
+=3a33f2869=): rows 46,376 -> 47,416 (2011-12 11,937 -> 11,967; 2014-15
+8,799; 2018-19 13,717; 2021-22 11,923 -> 12,933); grain warnings 2 -> 0;
+every pre-fix =(t, i, plot_id, crop, u)= key still served (46,376), and
+46,216 pre-fix rows reappear with identical payload -- the other 160 are all
+2021-22 multi-line pairs and differ only in the three sale columns.
+=u = 'Unknown'= rows 4,909 -> 4,950 (2011-12 +10, 2021-22 +31).  2021-22
+sale pairs 1,409 -> 1,265, =Value_sold= 73,631,120 (73,206,995 once per
+pair) -> 68,629,070.  =harvest_kg= totals: 2011-12 +331 kg, 2021-22
++21,850 kg.  *Default and Make (=LSMS_BUILD_BACKEND=make=) are now strictly
+equal* (=assert_frame_equal=, attrs included), and their raw MultiIndex
+level domains are equal too -- the unused-domain question GH #1360 left open.
+Pinned by =tests/test_niger_crop_production_observations.py=.
+
+*Cache.*  =niger.py= and =data_scheme.yml= are in every Niger table's hash:
+one Niger re-warm (no census run).

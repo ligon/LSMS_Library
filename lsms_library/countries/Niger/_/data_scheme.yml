@@ -182,7 +182,13 @@ Data Scheme:
     # harvest_month is recorded only in 2014-15 (AS02EQ06A); intercropped
     # only in the EHCVM waves (s16cq07).  Both are present in >=1 wave so
     # they are carried (NaN in the waves that lack them).
-    index: (t, i, plot_id, crop, u)
+    # production_obs (GH #1360) is the canonical native crop-observation
+    # coordinate (data_info.yml, GH #1198): one (plot, crop, u) can carry
+    # several reported harvest lines in 2011-12 and 2021-22.  2011-12 serves
+    # the module's line number (`reported:<as02eq0>`); 2021-22 records none,
+    # so it serves the CONSTRUCTED `row:<source_fingerprint>:<n>`; 2014-15 and
+    # 2018-19 are unique without it and carry `unresolved_observation`.
+    index: (t, i, plot_id, crop, u, production_obs)
     Quantity: float
     Quantity_sold: float
     Value_sold: float
@@ -195,7 +201,8 @@ Data Scheme:
     # count.  NA-bearing, never sentinel-filled -- a column has no NaN-key
     # hazard, and NA means "no sale, or no sold unit recorded".  In 2014-15
     # and 2021-22 the sale block is crop-level; the sale is attributed only to
-    # a crop grown on ONE plot and sold in ONE unit.  `optional` because a
+    # a crop reported on ONE harvest line (hence one plot) and sold in ONE
+    # unit, so it lands on one served row (GH #1360).  `optional` because a
     # row with no sale has no sold unit.
     Unit_sold:
       type: str
@@ -358,10 +365,11 @@ Data Scheme:
     #       NOT UNIFORM ACROSS WAVES (GH #877, confirmed from the Stata
     #       labels + questionnaires): 2014-15 (MS04Q01-03) and the EHCVM
     #       waves ask about the last 7 DAYS; 2011-12 asks no 7-day question
-    #       at all -- farm_work (ms04q03) and SOB_work (ms04q05) are the
-    #       last 30 DAYS, wage_work (ms04q02) the last 12 MONTHS.  Whether
-    #       to re-point 2011-12 or serve NA is open on #877; the values
-    #       served today are unchanged and match the WB do-file.
+    #       at all -- farm_work (ms04q03), SOB_work (ms04q05) and
+    #       wage_work (ms04q01) are all the last 30 DAYS.  wage_work used to
+    #       read ms04q02 as the WB do-file does; that is a 12-month follow-up
+    #       asked only when ms04q01 = No, so it served NA for every current
+    #       wage worker (GH #882, option B, @ligon 2026-11-03).
     #   farm_hrs / SB_hrs / wage_hrs     -- ANNUAL-AVERAGE weekly hours in
     #       each activity (allocated by the job's occupation code, summed
     #       across jobs; ECVMA waves only).  NOT hours in the last 7 days,

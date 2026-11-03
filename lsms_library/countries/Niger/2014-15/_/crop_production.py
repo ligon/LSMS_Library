@@ -11,14 +11,18 @@ Two source files, as the instrument splits harvest from sale:
 i is built from (GRAPPE, MENAGE, EXTENSION) via niger.i -- the full
 ECVMA2 household key, matching this wave's sample / roster idxvars
 (GH #679; EXTENSION 2 is a split-off household).  As in 2021-22 the
-crop-level sale is attributed only to (i, crop) pairs grown on a single
-plot; multi-plot crops keep Quantity_sold / Value_sold NaN (no fabricated
-split).  ``harvest_month`` = AS02EQ06A (month-of-harvest-start, 1-12);
+crop-level sale is attributed only to (i, crop) pairs with a single harvest
+LINE (hence a single plot); other pairs keep Quantity_sold / Value_sold NaN
+(no fabricated split).  Measured: no 2014-15 sale-bearing pair has two
+harvest lines, so the line rule serves exactly what the old plot rule did
+(GH #1360).  ``harvest_month`` = AS02EQ06A (month-of-harvest-start, 1-12);
 ``planting_month`` is not in this module (NaN).  The modules' unlabelled
 "don't know" codes (9999 on the quantities, 9999999 on the sale value) are
 mapped to NA, exact value only (GH #865).
 
-plot = "{AS02EQ01}_{AS02EQ03}".  Index = (t, i, plot, crop, u).
+plot = "{AS02EQ01}_{AS02EQ03}".  Index = (t, i, plot_id, crop, u,
+production_obs); the index is unique without a line coordinate, so
+``production_obs`` is the ``unresolved_observation`` sentinel (GH #1360).
 """
 import sys
 
@@ -86,11 +90,13 @@ sold_df = pd.DataFrame({
 sold_one = (sold_df.groupby(['i', 'crop', 'Unit_sold'], as_index=False, dropna=False)
             [['Quantity_sold', 'Value_sold']].sum(min_count=1))
 
-# Attribute ONLY to (i, crop) pairs grown on a single plot (no fabricated
-# split across plots) AND sold in a single unit (no fabricated conversion
-# across units -- a second unit would duplicate the harvest row).
-plots_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop'])['plot_id'].nunique()
-single = plots_per[plots_per == 1].index
+# Attribute ONLY to (i, crop) pairs with a single harvest LINE -- one plot,
+# one line, so the sale lands on exactly one served row (no fabricated split
+# across plots or lines; GH #1360) -- AND sold in a single unit (no
+# fabricated conversion across units -- a second unit would duplicate the
+# harvest row).
+lines_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop']).size()
+single = lines_per[lines_per == 1].index
 units_per = sold_one.groupby(['i', 'crop']).size()
 one_unit = units_per[units_per == 1].index
 sold_one = sold_one[sold_one.set_index(['i', 'crop']).index.isin(single)
@@ -100,5 +106,6 @@ df = df.merge(sold_one, on=['i', 'crop'], how='left')
 
 df = _finish_crop_production(df, '2014-15')
 
+assert df.index.is_unique, 'crop_production 2014-15 repeats a native harvest line'
 assert len(df) > 0, 'crop_production 2014-15 produced no rows'
 to_parquet(df, 'crop_production.parquet')

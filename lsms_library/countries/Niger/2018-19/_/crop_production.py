@@ -7,8 +7,10 @@ unit (s16cq12a / s16cq12b), sold qty + unit (s16cq16a / s16cq16b -> the
 value (s16cq17), and the intercrop flag (s16cq07) are ALL recorded at this
 plot-crop grain in 2018-19, so no cross-file join is needed.
 
-Index = (t, i, plot, crop, u); plot = "{s16cq02}_{s16cq03}" aligns with
-plot_features' plot_id.  See niger.py:_finish_crop_production for the shared
+Index = (t, i, plot_id, crop, u, production_obs); plot = "{s16cq02}_{s16cq03}"
+aligns with plot_features' plot_id.  The index is unique without a line
+coordinate, so ``production_obs`` is the ``unresolved_observation`` sentinel
+(GH #1360).  See niger.py:_finish_crop_production for the shared
 schema tail and the GAP-1 design note.
 """
 import sys
@@ -53,5 +55,6 @@ df = pd.DataFrame({
 
 df = _finish_crop_production(df, '2018-19')
 
+assert df.index.is_unique, 'crop_production 2018-19 repeats a native harvest line'
 assert len(df) > 0, 'crop_production 2018-19 produced no rows'
 to_parquet(df, 'crop_production.parquet')

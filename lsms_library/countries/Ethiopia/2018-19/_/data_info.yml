@@ -191,14 +191,29 @@ housing:
 # interview_date (GH #1038).  '##N/A##' is the Survey Solutions export
 # placeholder for an unrecorded timestamp, not a date: 8 of 6,770 households
 # carry it.  Each is fully interviewed (present in sample, household_roster,
-# food_acquired, ...); only the timestamp is missing, so it is null here
-# rather than a string the datetime cast has to reject (GH #798).
+# food_acquired, ...); only the timestamp is missing, so it is a declared
+# sentinel (served NaT, counted) rather than a string the datetime cast has
+# to reject (GH #798).
+#
+# GH #1056: parsed at BUILD time by the GH #1045 parser.  calendar: the
+# timestamp is the Survey Solutions CAPI device clock (ISO 8601), and the
+# catalog DDI (WB 3823, study_desc.method.data_collection) gives fieldwork in
+# Gregorian months -- household questionnaire "between June and August 2019"
+# (rural third visit; urban single visit).  window: those months widened by
+# one month each side, so the parser's `outside_window` count isolates the
+# dates years outside fieldwork (15 rows: 2014-01 x13, 2015-01-09,
+# 2018-10-09) from fieldwork overrun (2019-05: 7, 2019-09: 82, inside the
+# window).  Out-of-window dates are COUNTED, WARNED and KEPT (served as
+# recorded): this implements GH #1056's option (b), a parser screen; option
+# (a), null-with-count, was not taken.  See CONTENTS.org.
 interview_date:
     file: sect_cover_hh_w4.dta
     idxvars:
         i: household_id
     myvars:
         int_t:
-            - InterviewStart
-            - mapping:
-                '##N/A##': null
+            datetime: InterviewStart
+            format: '%Y-%m-%dT%H:%M:%S'
+            calendar: gregorian
+            sentinels: ['##N/A##']
+            window: [2019-05-01, 2019-09-30]

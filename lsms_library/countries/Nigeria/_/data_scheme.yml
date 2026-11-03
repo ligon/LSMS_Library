@@ -338,6 +338,22 @@ Data Scheme:
     KgFactor:
       type: float
       optional: true
+    # The household's own Naira VALUATION of the harvest this row's
+    # `Quantity` measures (GH #844).  A hypothetical value, NEVER a
+    # transaction: what the household says the harvest is worth, not what it
+    # received -- so it is a column distinct from `Value_sold` and the two
+    # must not be pooled.  Asked on the same plot-crop row in every wave
+    # (populated on 73-86% of source rows), read positionally, stored as
+    # recorded.  The wording differs by wave:
+    #   W1/W2  sa3q18    "If you had sold all [CROP] harvested since the
+    #                    last visit, what would be the total value?"
+    #   W3     sa3iq6a   "What is the estimated value of the [CROP]
+    #                    harvested during this agricultural (rainy) season?"
+    #   W4/W5  sa3iq6a / sa3iq10 (annual), sa3iiiq14 / sa3iiiq24 (tree /
+    #          permanent): "What is the estimated value of the [CROP]
+    #          harvested from [PLOT] during ...?"
+    # Required (not optional): every wave carries it.  See _/CONTENTS.org.
+    Value_harvested: float
     materialize: make
 
   plot_inputs:

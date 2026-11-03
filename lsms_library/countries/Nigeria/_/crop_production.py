@@ -52,6 +52,18 @@ Quantity_sold / Value_sold are NaN: the sale sits in secta3ii at hh-crop
 grain with no plot linkage (GH #843), so `Unit_sold` is legitimately all-NA
 there (hence `optional: true`).  No sold-CONDITION column exists in W1/W2 A3.
 
+Value_harvested (GH #844): the household's own Naira VALUATION of the
+harvest the row's Quantity measures, asked on the same plot-crop row in every
+wave -- never a transaction, so distinct from Value_sold.  The wording differs:
+
+  W1/W2  sa3q18     "If you had sold all [CROP] harvested since the last
+                    visit, what would be the total value?" (sale block)
+  W3     sa3iq6a    "What is the estimated value of the [CROP] harvested
+                    during this agricultural (rainy) season?"
+  W4     sa3iq6a    (secta3i) / sa3iiiq14 (secta3iii) "What is the estimated
+                    value of the [CROP] harvested from [PLOT] ...?"
+  W5     sa3iq10    (secta3i) / sa3iiiq24 (secta3iii), same wording as W4.
+
 crop labels (j): cropcode -> Preferred Label via harmonize_food (shared
 with food_acquired; reused food labels where the crop is a consumed food).
 units (u): native production-unit label normalized to a base Preferred
@@ -130,6 +142,7 @@ pieces.append(crop_production_for_wave(t, [dict(
     df=raw, dec=dec, hhid='hhid', plot='plotid', crop='sa3q2',
     qty='sa3q6a', unit='sa3q6b',
     qty_sold='sa3q11a', unit_sold='sa3q11b', value_sold='sa3q12', sold_on='plot',
+    value_harvested='sa3q18',
     intercropped=inter, perennial=False)], crop_labels))
 
 # ----------------------------- W2 2012-13 -----------------------------
@@ -144,6 +157,7 @@ pieces.append(crop_production_for_wave(t, [dict(
     df=raw, dec=dec, hhid='hhid', plot='plotid', crop='cropcode',
     qty='sa3q6a1', unit='sa3q6a2',
     qty_sold='sa3q11a', unit_sold='sa3q11b', value_sold='sa3q12', sold_on='plot',
+    value_harvested='sa3q18',
     intercropped=inter, perennial=False)], crop_labels))
 
 # ----------------------------- W3 2015-16 -----------------------------
@@ -158,7 +172,7 @@ inter = _align_intercropped(
     '../2015-16/Data/sect11f_plantingw3.dta')
 pieces.append(crop_production_for_wave(t, [dict(
     df=raw, dec=dec, hhid='hhid', plot='plotid', crop='cropcode',
-    qty='sa3iq6i', unit='sa3iq6ii',
+    qty='sa3iq6i', unit='sa3iq6ii', value_harvested='sa3iq6a',
     harv_m='sa3iq6c1', harv_y='sa3iq6c2',
     intercropped=inter, perennial=False)], crop_labels))
 
@@ -175,6 +189,7 @@ inter_a = _align_intercropped(
 frames.append(dict(
     df=raw_a, dec=dec_a, hhid='hhid', plot='plotid', crop='cropcode',
     qty='sa3iq6i', unit='sa3iq6ii', kg_factor='sa3iq6_conv',
+    value_harvested='sa3iq6a',
     plant_m='sa3iq4a1', plant_y='sa3iq4a2',
     harv_m='sa3iq6c1', harv_y='sa3iq6c2',
     intercropped=inter_a, perennial=False))
@@ -184,6 +199,7 @@ dec_p = get_dataframe(fp, convert_categoricals=True)
 frames.append(dict(
     df=raw_p, dec=dec_p, hhid='hhid', plot='plotid', crop='cropcode',
     qty='sa3iiiq13a', unit='sa3iiiq13c', kg_factor='sa3iiiq13_conv',
+    value_harvested='sa3iiiq14',
     plant_m='sa3iiiq8a', plant_y='sa3iiiq8b',
     harv_m='sa3iiiq12a', harv_y='sa3iiiq12b',
     perennial=True))
@@ -198,6 +214,7 @@ dec_a = get_dataframe(fa, convert_categoricals=True)
 frames.append(dict(
     df=raw_a, dec=dec_a, hhid='hhid', plot='plotid', crop='cropcode',
     qty='sa3iq9a', unit='sa3iq9b', kg_factor='sa3iq9_conv',
+    value_harvested='sa3iq10',
     plant_m='sa3iq5a', plant_y='sa3iq5b',
     harv_m='sa3iq14a', harv_y='sa3iq14b',
     perennial=False))
@@ -207,6 +224,7 @@ dec_p = get_dataframe(fp, convert_categoricals=True)
 frames.append(dict(
     df=raw_p, dec=dec_p, hhid='hhid', plot='plotid', crop='cropcode',
     qty='sa3iiiq23a', unit='sa3iiiq23b', kg_factor='sa3iiiq23_conv',
+    value_harvested='sa3iiiq24',
     plant_m='sa3iiiq18a', plant_y='sa3iiiq18b',
     harv_m='sa3iiiq22a', harv_y='sa3iiiq22b',
     perennial=True))
@@ -221,5 +239,8 @@ df['KgFactor'] = pd.to_numeric(df['KgFactor'], errors='coerce').astype('float64'
 # Same pin for Unit_sold: W3-W5 deliver an all-NA column, and the parquet
 # must store a string column, not object.
 df['Unit_sold'] = df['Unit_sold'].astype('string')
+# And for Value_harvested (GH #844), present in every wave but pinned anyway.
+df['Value_harvested'] = pd.to_numeric(df['Value_harvested'],
+                                      errors='coerce').astype('float64')
 
 to_parquet(df, '../var/crop_production.parquet')

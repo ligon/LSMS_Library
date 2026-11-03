@@ -756,6 +756,16 @@ Columns:
       note: |
         Head SOLD alive during the recall window.  A flow, and the
         denominator that turns SalesValue into a per-animal sale price.
+    HeadCount12MonthsAgo:
+      type: float
+      note: |
+        Head of this animal the household owned EXACTLY 12 months before
+        interview (Malawi Module R ag_r07, GH #855).  A STOCK at a second
+        point in time, not a flow.  Never a fallback for a missing
+        HeadCount, and never differenced against HeadCount into an
+        acquisition or loss: the surveys that ask it also ask the flows
+        (HeadAcquired, HeadSold, births, gifts) directly, and the two
+        routes disagree.
     ValuePerAnimal:
       type: float
       monetary: true

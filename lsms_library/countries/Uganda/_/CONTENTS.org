@@ -1051,6 +1051,34 @@ The residual few percent in 2009-10 / 2011-12 is not the home/away fold
 (GH #845: among differing rows only 0.2-0.8% have both legs populated) and
 has not been explained.
 
+*That residual, characterised (GH #845 item c, raw files, 2026-11-03).*  The
+1,461 (2009-10) and 1,357 (2011-12) differing purchased rows:
+
+- are not rounding: =|price - value/qty| <= 0.5= UGX on 0.4% of them; most
+  differ by 5-100%, symmetrically (median price / unit value 0.997 / 0.990,
+  price the larger on 49%);
+- carry ROUND prices: 98.2% / 98.7% are multiples of 50 UGX, against 63.0% /
+  74.7% of the same rows' unit values; every 2009-10 price and all but one
+  2011-12 price are integers;
+- are diffuse: 1,008 of 2,860 households and 286 of 318 EAs (2009-10), 885 of
+  2,771 and 295 of 320 (2011-12); the top items are staples bought in small lots
+  (salt, maize flour, sugar, cooking oil);
+- over-represent fractional quantities (non-integer on 51% / 40%, against 21% /
+  16% of all priced rows).  In 2009-10, 408 of them record a quantity that is
+  not a multiple of 0.25 (0.9% of agreeing rows do), and for 70% of those
+  =value / price= is such a multiple: consistent with a quantity edited after
+  the price was set, for at most about a fifth of that wave's residual.
+
+Ruled out: the all-source unit value over all four legs (0.1% / 0.0% match);
+2011-12 =h15bq15 / h15bq14= (total consumption value / quantity, 0.0%); value
+over the rounded, floored or ceiled quantity (at most 15%); the median unit
+value of the same EA, item and unit (7% / 10%; 35% / 22% equal SOME other
+household's unit value there); the unit code (4-7% differing in every unit with
+200+ rows).  The mechanism is still unknown, and why these two waves run at ~5%
+against 1-2% elsewhere is not explained by their fractional-quantity share
+(similar in every wave).  Read the residual as a mixture of keying edits and,
+possibly, a minority of recorded round prices; not as an independent source.
+
 *How to use it.*  Treat =unitprice= as a copy of =unitvalue= for Uganda.
 Where the two DO differ, the difference is the interesting thing (a keying
 slip in one of three fields), not a second opinion on the price.
@@ -1158,6 +1186,40 @@ block also states this grain distinction so a reader does not mistake its
 the conflict nulls remain the honest output. Whether a source-backed EA
 identifier can be obtained elsewhere is a separate source-search question;
 this note neither reconstructs one nor claims every shipped source lacks it.
+
+*The cover does ship an EA key in 2013-14 and 2015-16 (GH #689 item 3,
+measured 2026-11-03, raw files).* =GSEC1.ea= (2013-14, labelled "Enumeration
+area") and =gsec1.ea= (2015-16; also on both waves' =AGSEC1=) are int16,
+non-null for all 3,119 / 3,305 households, 317 / 316 distinct, median 10
+households each.  It is the design PSU *of origin*, not a current-location
+cluster, so it is no cleaner than the parish:
+
+| groups that mix ...  | 2013-14 =ea= | 2013-14 parish | 2015-16 =ea= | 2015-16 parish |
+|----------------------+--------------+----------------+--------------+----------------|
+| (number of groups)   |          317 |            706 |          316 |            875 |
+| =urban=              |          128 |             70 |          153 |             65 |
+| district             |          104 |              0 |          155 |              0 |
+| =region=             |           27 |              0 |           35 |              0 |
+
+- Panel households (=rotate= "Covered in wave 2011/12") carry =ea= 1-322.  For
+  the 1,717 linked by =HHID_old= to 2011-12 =GSEC1.HHID=, the 212 2011-12 =comm=
+  values and the 212 =ea= values pair one-to-one: =ea= renumbers the 2005-06
+  frame EA and carries it with movers, exactly like =comm= (cause 1 above).
+- Refresh households ("rotated in 2013/14") carry =ea= 324-430, 105 EAs from
+  the 2013 frame: nearly clean in 2013-14 (21 =urban=-mixed, 7 multi-parish, 3
+  multi-district) and already dispersed by 2015-16 (36 / 57 / 30).
+- 2018-19 / 2019-20: no household or agriculture =.dta= has a column named
+  =ea=, =EA_code=, =comm= or =comcod=.  =EA_code= / =t0_EA_code= (2018-19, 305
+  communities) and =Final_EA_code= (2019-20, 307) exist only in the community
+  files, which carry no household key.  2018-19 =GSEC1.t0_hhid= matches a
+  2015-16 =HHID= for 2,978 of 3,176 households (2019-20 not probed).
+
+/Contradicts/ the 2013-14 =cluster_id_note= in =sampling.yml=, "A parish is
+not an EA, so no crosswalk can exist": true of the served parish =v=, but the
+survey's own =ea= pairs one-to-one with 2011-12 =comm= on all 212 linked EAs.
+Nothing is rewired here.  Whether =v= (or a separate design-PSU column) should
+use =ea= is #689's open decision; as =v= it would give MORE =Rural= conflicts
+than the parish (128 vs 70 groups in 2013-14), not fewer.
 
 *GPS is not averaged.*  Where the within-cluster coordinates vary at all
 they vary by a MEDIAN of 4.6--42.9 km and by up to 584 km (measured, all
@@ -4723,6 +4785,16 @@ closure follows. #1357 continues to exclude genuinely anonymous households from
 household-keyed tables; it supplies no new ID and does not equate those records
 with known-key housing observations lacking a validated link.
 
+*The three keys are absent from every link the release ships (2026-11-03).*
+Every column whose name contains =hh= or =id= in all 119 2015-16 =.dta= files
+was searched for them.  They occur in three files, all in the =gsec1.hh=
+namespace and none beside an =HHID=: =gsec9.hhid= (housing), =GSEC16= (shocks:
+its one ID column is NAMED =HHID= but holds =hh= values -- 3,305 of its 3,428
+keys are =gsec1.hh= values, none is a =gsec1.HHID=) and =gsec15bb_3.hhid= (10
+rows, =DynID= missing on all).  They are among the 51 =GSEC16= keys in neither
+=gsec1.hh= nor =AGSEC1.hh=.  So no recorded link to a sample household exists
+in this release; closing them needs producer correspondence, not more search.
+
 * Seven-wave plot-input compiler runtime checkpoint (GH #1287, 2026-10-31)
 
 The unchanged =plot_inputs= country compiler ran through its actual Make target
@@ -5109,6 +5181,16 @@ holder-prefix/shared unknown IDs or orphan representation. Actual cold/warm i/v
 are complete; native diagnostics do not measure raw eligible loss or exercise an
 anonymous-source negative boundary. Known-HH missing village/plot is distinct.
 #1120 is closed for its approved scope; this checkpoint does not extend it.
+
+*Both #1401 rules are inert on the shipped files (raw GSEC6 modules,
+2026-11-03).*  Reported zero-month ages exist -- 43 (2010-11), 26 (2011-12)
+and 43 (2013-14) rows, plus a 999 in 2010-11 -- but every one is on a row with
+no Weight and no Height, which the measure filter drops whatever the age mask
+does; the 8,468 measured rows that carry an in-module age (2009-10 .. 2015-16)
+have ages 2-60 months, with one missing (2009-10).  No wave has a repeated
+=(hhid, pid)= in its raw module, so the most-complete-row selection never
+chooses (0 duplicate keys over 29,553 measured rows).  The served table is
+therefore the same under any zero-age or tie rule; the choice is prospective.
 
 Predata proof installed but did not invoke the payload-dependent original-class
 sample factory; original/provider/restored registry/country/all-eight hashes agree.

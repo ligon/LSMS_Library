@@ -108,10 +108,16 @@ def test_emc_script_consumers_share_sample_namespace(monkeypatch, script):
 
 
 def test_population_record_discloses_the_two_component_sample():
-    """Do not describe the newly included cross-section as panel households."""
+    """Do not describe the newly included cross-section as panel households.
+
+    The survey text names every table that reads the cross-section: since
+    2026-11-03 (GH #1276) cluster_features and interview_date read both
+    covers as well as sample and household_roster.
+    """
     rec = Country('Burkina_Faso').population['2021-22']
     assert rec.universe_tag == 'mixed-national+panel'
-    assert 'sample and household_roster' in rec['survey']
+    assert ('sample, household_roster, cluster_features and interview_date'
+            in rec['survey'])
     assert 'other tables still cover the panel only' in rec['survey']
 
 

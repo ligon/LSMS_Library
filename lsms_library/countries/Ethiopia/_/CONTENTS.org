@@ -2954,7 +2954,9 @@ Only W4 and W5 declare =interview_date=; W1-W3 have no entry.
 timestamp.  It is in the source =.dta= files, not introduced by the build,
 and it used to be cached as a string that the declared-datetime cast
 rejected on every read (=DatetimeCoercionWarning=, 115 values, GH #798).
-Each wave's =data_info.yml= now maps it to null where the column is read.
+Each wave's =data_info.yml= now maps it to null where the column is read
+(since GH #1056, 2026-11-03: as a declared =sentinels:= entry of the GH #1045
+build-time parser -- still served NaT, now also counted, =sentinel= 8 / 112).
 
 | wave    | source                                  | rows  | =##N/A##= rows (households) |
 |---------+-----------------------------------------+-------+-----------------------------|
@@ -2998,6 +3000,27 @@ no parquet census can find.
 
 ** W5 dates the POST-HARVEST visit, for a third of the households
 
+*Addendum 2026-11-03 (GH #1055): the PH visit IS the household-questionnaire
+visit in W5, but not in W4.*  The WB catalog DDI for ESPS-5 (6161,
+=study_desc.method.data_collection.coll_situation=): "ESPS-5 was conducted
+in two visits ... In the second visit, between April and June 2022, the
+post-harvest agriculture, household, and community questionnaires were
+administered.  For urban households, there was a single visit, between April
+and June 2022, to administer the household and community questionnaires."
+ESS4 (3823) instead had three rural visits -- post-harvest "between February
+and March 2019", household and community "between June and August 2019".  So
+W5's PH-cover date dates the *visit* at which the household questionnaire
+was administered (same-day is not documented and cannot be checked: the
+household cover's timestamps are redacted); W4's would not have.  What does
+differ is *coverage*, measured against =sample()= (which carries the #1359
+agriculture-cover households): W5 dates 1,475 of 2,325 Rural and *0 of 2,674
+Urban* households; W4 dates 3,109 / 3,239 Rural and 3,653 / 3,655 Urban.  A
+metadata-only scan of the 30 W5 =.dta= files present in L1 found no other
+household-module date (=sect_cover_hh_w5= carries only =interview__key= /
+=interview__id= and the redacted =saq19__Timestamp=); 38 W5 files (the
+community sections, =sect12*-15*_hh=, =sect3b/5*/6b*/6c/7*_hh=, =cons_agg=,
+=food_cf=, two livestock files) were not in L1 and were not scanned.
+
 =sect_cover_hh_w5.dta= (the household cover, 4,959 households) ships *no*
 interview date: its =saq19__Timestamp= is =**CONFIDENTIAL**= (4,926 rows)
 or blank (33), its =saq21= is =**CONFIDENTIAL**= on all 4,959, and the
@@ -3017,7 +3040,54 @@ Both waves carry device-clock dates well outside fieldwork: W4 15 rows
 (13 in 2014-01, in EAs =030519088801304= and =031201088800105=; one
 2015-01-09; one 2018-10-09) against fieldwork May-Sep 2019; W5 18 rows
 (2014-01 9, 2014-04 2, 2014-07 7) against Mar-Jul 2022.  Not adjudicated
-and not nulled here.
+and not nulled here.  (Corrected 2026-11-03: "device-clock" is not
+established for all of them -- 7 W5 rows may be Ethiopian-calendar dates;
+see the last bullet below.)
+
+*Counted since GH #1056 (2026-11-03).*  Both waves are parsed at build time
+by the GH #1045 parser (=datetime:= spec in each wave's =data_info.yml=), with
+a fieldwork =window:= -- so the 15 / 18 are now the parser's
+=outside_window= count, warned as =DatetimeParseWarning= on every read
+(stamped =lsms_datetime_audit=, replayed warm), fatal under
+=LSMS_DATE_STRICT=1=, and still served as recorded.  This implements
+#1056's option (b), a parser screen; option (a), null-with-count, was not
+taken -- a screen counts and keeps, as Site Q does.  Served rows and values
+are unchanged (=assert_frame_equal= against the pre-change frame, 8,237
+rows); the column is now =timestamp[us]= in the wave and country parquets
+(was =large_string=, cast at read time).
+
+- *Calendar: Gregorian, cited.*  The #1045 inventory left these two columns
+  =unknown= ("open per charter §5",
+  =.coder/ledger/1045-calendar-inventory.org=).  The WB catalog DDIs (3823,
+  6161: =study_desc.method.data_collection=) name Survey Solutions CAPI as the
+  mode and give fieldwork in Gregorian months; the timestamps are the CAPI
+  device clock in ISO 8601.  The modal months of the data (W4 2019-06: 5,069;
+  W5 2022-04: 1,162) agree.
+- *Window: the DDI's months for the event each wave dates, widened by one
+  month each side.*  W4: household questionnaire "between June and August
+  2019" (rural third visit and urban single visit) -> window
+  2019-05-01..2019-09-30.  W5: post-harvest questionnaire 2022-04-01 to
+  2022-06-30 (=coll_dates=) -> 2022-03-01..2022-07-31.  The shoulder is
+  deliberate: the DDI months literally would also count fieldwork overrun
+  (W4 2019-05 7 + 2019-09 82 served rows; W5 2022-03 10 + 2022-07 1), burying
+  the dates years outside fieldwork (104 / 29 instead of 15 / 18).
+- *The W5 count is holder-grain*: the report counts 18 of 1,596 PH-cover rows;
+  18 of the 1,475 served household rows remain outside after the collapse.
+  The two counts are equal only because no out-of-window holder row is lost
+  in the collapse; they are different quantities.
+- *Not all of these are settled as device-clock errors* (red-team review,
+  re-measured 2026-11-03 with =lsms_library.calendars.ethiopian_to_gregorian=).
+  The 7 W5 rows dated 2014-07-10 are in Harar, all in ONE EA whose 9 dated
+  rows include none in 2022; read as an Ethiopian-calendar date, 2014-07-10
+  (Megabit 10, 2014 EC) is 2022-03-19 -- inside the post-harvest fieldwork
+  window.  The same EA's other 2 rows (2014-04-18) read as Ethiopian would
+  be 2021-12-27, the post-planting visit period, not post-harvest.  W5's 9
+  Amhara 2014-01 rows (one EA, 1 of its 10 rows in 2022) would be Sep-Oct
+  2021, likewise the post-planting period.  W4's 2014-01 cluster *cannot* be
+  Ethiopian-calendar: read that way it is Sep 2021, two years after W4's
+  fieldwork.  Nothing is converted: every row is parsed as Gregorian and
+  counted =outside_window= as before; whether the Harar EA was keyed in the
+  Ethiopian calendar is not adjudicated.
 
 * Nine country concatenators use actual declarations (GH #1287, 2026-10-29)
 
@@ -3313,6 +3383,38 @@ separate earlier/warm closed Feature pickle byte equality is an export fact,
 not an executed fully typed Country-to-Feature metadata assertion. Independent
 Burkina source/receipt review supports this bounded D1/panel extraction; #1120
 and its other country/eligibility scopes remain open.
+
+** 2026-11-03 -- Why agriculture-only households exist: the BIDs say fieldwork (GH #660)
+
+#660 asked whether the households present in the agriculture covers but
+absent from the household cover are (a) a frame/module mismatch in the
+release, (b) dropped during anonymisation, or (c) the wrong cover file
+((c) was ruled out on #660, 2026-10-23).  The two Panel II Basic
+Information Documents -- not in this repo; read from the WB catalog's
+Related Materials -- answer it for W4 and W5: *fieldwork*, not anonymisation.
+
+- *ESS4 BID* (https://microdata.worldbank.org/catalog/3823/download/49208,
+  "ESS Panel II 2018/2019 Refreshed Sample: Baseline", PDF p13, §3): "A total
+  of 6770 households from 535 EAs were interviewed for both the agriculture
+  and household module.  However, there are additional eight EAs and 124
+  households from rural areas who were only administered during the
+  agriculture survey."  PDF p26 lists the causes: five EAs "have all
+  agriculture modules but household questionnaire is not administered due to
+  ethnic or political unrest"; two EAs were not visited at the HH and PH
+  visits ("only PP and Livestock data"); "About 62 households have moved out
+  from their original EA between PP and HH visit".  124 is exactly the W4
+  household count #1359 adds to =sample= (6,770 + 124 = 6,894).
+- *ESPS-5 BID* (https://microdata.worldbank.org/catalog/6161/download/78630,
+  PDF p22, §7): "11 households left their locations after the PP visit and 29
+  were in EAs that were not accessible during the second visit for a variety
+  of reasons.  For these 40 households only PP and livestock data are
+  available."  40 is exactly #660's 2021-22 count and #1359's W5 addition
+  (4,959 + 40 = 4,999 = PDF p13 Table 3.3's total).  The same section: 248
+  rural households "were not accessible during the PP visit but were
+  interviewed during the PH and HH visit" (the reverse case: thin PP data).
+- *Not established here*: the cause of W2's 25 and W3's 27 additions (the
+  ESS2/ESS3 BIDs were not read), and an EA-by-EA reconciliation of the ESS4
+  BID's "eight EAs" against the 6 EAs #1359's cluster closure adds.
 
 * GH #1119 -- structural crop marker (2026-10-30)
 

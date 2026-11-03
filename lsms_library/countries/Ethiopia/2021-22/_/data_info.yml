@@ -200,20 +200,34 @@ housing:
 
 # interview_date (GH #1038).  '##N/A##' is the Survey Solutions export
 # placeholder for an unrecorded timestamp, not a date: 112 of 1,596 rows
-# (107 households) carry it.  Mapped to null here rather than left as a
-# string the datetime cast has to reject (GH #798).  Note the source: the
-# HOUSEHOLD cover (sect_cover_hh_w5.dta) ships no interview date in this
-# wave, so this reads the POST-HARVEST agriculture cover -- holder-grain,
-# 1,581 of 4,959 households; see CONTENTS.org.
+# (107 households) carry it.  A declared sentinel (served NaT, counted)
+# rather than a string the datetime cast has to reject (GH #798).  Note the
+# source: the HOUSEHOLD cover (sect_cover_hh_w5.dta) ships no interview date
+# in this wave, so this reads the POST-HARVEST agriculture cover --
+# holder-grain, 1,581 of 4,959 households; see CONTENTS.org.
+#
+# GH #1056: parsed at BUILD time by the GH #1045 parser.  calendar: the
+# timestamp is the Survey Solutions CAPI device clock (ISO 8601), and the
+# catalog DDI (WB 6161, study_desc.study_info.coll_dates) dates the
+# post-harvest questionnaire 2022-04-01 to 2022-06-30 (Gregorian).  window:
+# those months widened by one month each side, so the parser's
+# `outside_window` count isolates the dates years outside fieldwork (18
+# holder rows: 2014-01 x9, 2014-04 x2, 2014-07 x7) from fieldwork overrun
+# (2022-03: 10, 2022-07: 1 served rows, inside the window).  7 W5 rows may be
+# Ethiopian-calendar dates, see CONTENTS.org.  Out-of-window dates are
+# COUNTED, WARNED and KEPT (served as recorded): this implements GH #1056's
+# option (b), a parser screen; option (a), null-with-count, was not taken.
 interview_date:
     file: sect_cover_ph_w5.dta
     idxvars:
         i: household_id
     myvars:
         int_t:
-            - InterviewDate
-            - mapping:
-                '##N/A##': null
+            datetime: InterviewDate
+            format: '%Y-%m-%dT%H:%M:%S'
+            calendar: gregorian
+            sentinels: ['##N/A##']
+            window: [2022-03-01, 2022-07-31]
 
 food_security:
     # FAO FIES 8-item experience scale.  ESS §8 file sect8_hh_w5.dta
