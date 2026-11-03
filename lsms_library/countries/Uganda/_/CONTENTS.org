@@ -1058,7 +1058,8 @@ has not been explained.
   differ by 5-100%, symmetrically (median price / unit value 0.997 / 0.990,
   price the larger on 49%);
 - carry ROUND prices: 98.2% / 98.7% are multiples of 50 UGX, against 63.0% /
-  74.7% of the same rows' unit values; every price in both waves is an integer;
+  74.7% of the same rows' unit values; every 2009-10 price and all but one
+  2011-12 price are integers;
 - are diffuse: 1,008 of 2,860 households and 286 of 318 EAs (2009-10), 885 of
   2,771 and 295 of 320 (2011-12); the top items are staples bought in small lots
   (salt, maize flour, sugar, cooking oil);
