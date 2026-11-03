@@ -17,12 +17,16 @@ from lsms_library import Country, local_tools
 from lsms_library.paths import countries_root
 
 
-UNKNOWN_21 = 'Unknown [Burkina_Faso 2018-19 s16bq01=21]'
+# GH #1187 ruling (@ligon, 2026-11-03): the unlabelled 2018-19 slot 21 is
+# groundnut seed, a DATA-VALIDATED reading (593 of its 602 households
+# harvested Arachide).  It replaces the source-qualified unknown
+# 'Unknown [Burkina_Faso 2018-19 s16bq01=21]' that GH #1123 had served.
+CODE_21_CROP = 'Arachide'
 CROP_BY_CODE = {
     11: 'Mil', 12: 'Sorgho', 13: 'Maïs', 14: 'Riz Paddy',
     15: 'Autre céréale', 16: 'Coton', 17: 'Sésame',
     18: 'Niébé', 19: 'Autre tubercule',
-    20: 'Autre crop', 21: UNKNOWN_21,
+    20: 'Autre crop', 21: CODE_21_CROP,
 }
 INPUT_BY_CODE = {
     1: 'Organic manure', 2: 'Organic compost', 3: 'Urea', 4: 'Phosphate',
@@ -102,7 +106,7 @@ def test_existing_map_separates_all_four_present_native_slots():
     assert [mapping[k] for k in ("Semences d'autres céréales",
                                 'Plants/boutures de tubercules',
                                 'Autres semences', '21')] == [
-        'Autre céréale', 'Autre tubercule', 'Autre crop', UNKNOWN_21]
+        'Autre céréale', 'Autre tubercule', 'Autre crop', CODE_21_CROP]
     # Aliases not involved in this repair remain intact.
     assert mapping['20'] == 'Autre crop'
     assert mapping['Semences de césame'] == mapping['Semences de sésame']
@@ -113,7 +117,7 @@ def test_equal_payloads_on_distinct_native_slots_all_survive(monkeypatch, purcha
     result = _run_script(monkeypatch, [15, 19, 20, 21], purchased=purchased)
     assert len(result) == 4
     assert set(result.index.get_level_values('crop')) == {
-        'Autre céréale', 'Autre tubercule', 'Autre crop', UNKNOWN_21}
+        'Autre céréale', 'Autre tubercule', 'Autre crop', CODE_21_CROP}
     assert set(result.index.get_level_values('input')) == {'Seed'}
     assert result['Quantity'].tolist() == [1.25] * 4
     assert result['Purchased'].tolist() == [purchased] * 4
@@ -205,7 +209,7 @@ def test_source21_is_unlabelled_and_qualified_only_in_its_current_wave(actual_co
         _root() / '2018-19' / 'Data' / 's16b_me_bfa2018.dta', categories_only=True)
     assert 21 not in cats['s16bq01'] and cats['s16bq01'][20] == 'Autres semences'
     result = actual_country.plot_inputs()
-    selected = result.index.get_level_values('crop') == UNKNOWN_21
+    selected = result.index.get_level_values('crop') == CODE_21_CROP
     assert int(np.count_nonzero(selected)) == 602
     assert set(result.index.get_level_values('t')[selected]) == {'2018-19'}
     assert set(result.index.get_level_values('input')[selected]) == {'Seed'}

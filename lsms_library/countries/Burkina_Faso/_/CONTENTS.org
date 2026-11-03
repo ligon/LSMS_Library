@@ -1580,7 +1580,7 @@ without printing source keys.  The Org edit invalidates all 24 Burkina
 table hashes; other countries and shared framework fingerprints are unchanged.
 The separate #1119 named-crop vocabulary mismatch is not changed here.
 
-** 2026-11-03 -- WAITING code 21: the held 2018 questionnaire has no such code, and it occurs in vague 2 only (GH #1187)
+** 2026-11-03 -- DONE code 21: the held 2018 questionnaire has no such code, and it occurs in vague 2 only (GH #1187)
 
 The two household questionnaire workbooks are now held
 (=2018-19/Documentation/Questionnaire/bfa_ehcvm1_qnr_household_excel_vague{1,2}.xls=,
@@ -1613,6 +1613,21 @@ this evidence supports) and =harmonize_seed_crop= keeps the source-qualified
 this evidence is a decision for #1187.  A cross-vague comparison of seed by
 crop is affected either way: vague 1's groundnut seed sits in « Autres
 semences ».
+
+*Ruled and served, 2026-11-03.*  @ligon accepted option (a) on #1187: code 21
+is groundnut seed, *data-validated* (the evidence above), not source-bound.
+=harmonize_seed_crop= now maps =21 -> Arachide= -- the label =crop_production=
+serves for groundnut -- and =harmonize_input= keeps =21 -> Seed=.  Vague 1's
+groundnut seed stays under 20 « Autres semences » -> =Autre crop=: there is no
+slot to separate it.  Measured on cold builds in private data roots: the 602
+=plot_inputs= rows that carried =Unknown [Burkina_Faso 2018-19 s16bq01=21]=
+now carry =crop = 'Arachide'= and nothing else moves -- the other 22,275 rows,
+every payload column and dtype are equal, =seed_kg= is frame-equal (4,229
+rows), and =crop_production= is unchanged (15,587 rows).  At the household
+=(t, i, crop)= projection, 593 of the 602 groundnut-seed households also report
+an Arachide harvest.  Cache: =_/categorical_mapping.org= is a build input, so
+every Burkina hash moves.  Pinned by =tests/test_burkina_faso_seed_crop_labels.py=
+and =tests/test_burkina_faso_plot_inputs_identity.py=.
 
 
 Independent review of the identity repair at =3848778d0e8676c798883c11ea3e33fc88e8a591=
