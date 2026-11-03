@@ -1000,6 +1000,13 @@ def crop_production_for_wave(t, frames, crop_labels):
                                              #824), decoded via `dec` and
                                              canonicalised with _canon_unit
                                              exactly as `unit` is
+            value_harvested                  the respondent's own Naira
+                                             VALUATION of the harvest `qty`
+                                             measures, asked on the same
+                                             plot-crop row (GH #844; W1/W2
+                                             sa3q18, W3/W4 sa3iq6a, W4
+                                             sa3iiiq14, W5 sa3iq10 /
+                                             sa3iiiq24).  Not a transaction.
             plant_m, plant_y                 planting/harvest-start month/yr
             harv_m, harv_y                   harvest-end month/yr (optional)
             intercropped                     bool Series aligned to df (opt)
@@ -1087,6 +1094,22 @@ def crop_production_for_wave(t, frames, crop_labels):
         else:
             piece['KgFactor'] = np.nan
 
+        # The household's own Naira VALUATION of the harvest this row's `qty`
+        # measures (GH #844), read positionally off the SAME plot-crop row --
+        # no join, no allocation.  W1/W2 ask it in the sale block ("If you had
+        # sold all [CROP] harvested since the last visit, what would be the
+        # total value?", sa3q18); W3-W5 ask it beside the harvest quantity
+        # ("What is the estimated value of the [CROP] harvested ...?").  Both
+        # are a hypothetical valuation of the whole harvest, never a
+        # transaction, so it is a column distinct from `Value_sold`.
+        # REPORTED, stored as recorded: no clip, no sentinel strip (none
+        # measured; see _/CONTENTS.org for the one W5 outlier).
+        if fr.get('value_harvested') in df.columns:
+            piece['Value_harvested'] = pd.to_numeric(
+                df[fr['value_harvested']], errors='coerce').astype('float64').values
+        else:
+            piece['Value_harvested'] = np.nan
+
         # Reported sale at plot-crop grain (W1/W2); hh-crop sales merged
         # separately below.
         if fr.get('sold_on') == 'plot':
@@ -1145,6 +1168,12 @@ def crop_production_for_wave(t, frames, crop_labels):
     if 'KgFactor' not in out.columns:
         out['KgFactor'] = np.nan
     out['KgFactor'] = pd.to_numeric(out['KgFactor'], errors='coerce').astype('float64')
+    # Same float pin for Value_harvested (GH #844): a frame naming no
+    # valuation column delivers all-NaN FLOAT, not object.
+    if 'Value_harvested' not in out.columns:
+        out['Value_harvested'] = np.nan
+    out['Value_harvested'] = pd.to_numeric(
+        out['Value_harvested'], errors='coerce').astype('float64')
 
     # Drop rows with no crop label resolved (free-text junk codes) and no
     # household.  Keep rows with a crop even if Quantity is NaN (the
@@ -1162,7 +1191,7 @@ def crop_production_for_wave(t, frames, crop_labels):
     out = out.set_index(['t', 'i', 'plot_id', 'crop']).sort_index()
     out = out[['Quantity', 'u', 'Quantity_sold', 'Value_sold', 'Unit_sold',
                'planting_month', 'harvest_month', 'intercropped', 'perennial',
-               'KgFactor']]
+               'KgFactor', 'Value_harvested']]
     return out
 
 

@@ -1949,6 +1949,58 @@ rows* and both the "reported purchase price" and "own-consumption
 valuation" sources are empty for this country.  Wiring =sa3q18= (as, say,
 =Value_if_sold=) would give Nigeria a farmgate valuation on ~2.8x more rows
 than its sales data, and is recorded here as a gap rather than guessed at.
+
+*** DONE Wired as =Value_harvested=, in every wave (GH #844, 2026-11-03)
+
+The "check the later waves" item came back positive: every wave asks a Naira
+valuation of the harvest ON THE SAME PLOT-CROP ROW as the harvest quantity,
+so there is no household-crop fan-out (contrast the W3-W5 sales, GH #843).
+The wording is not the same sentence in every wave:
+
+| wave | file (PH agriculture) | column | Stata label / questionnaire wording |
+|-+-+-+-|
+| W1 | =secta3_harvestw1= | =sa3q18= | "Total sale value of [CROP] if all had been sold since last visit" |
+| W2 | =secta3_harvestw2= | =sa3q18= | "TOTAL VALUE IF YOU HAD SOLD ALL [CROP] HARVESTED SINCE LAST VISIT (NAIRA)" |
+| W3 | =secta3i_harvestw3= | =sa3iq6a= | q6a "What is the estimated value of the [CROP] harvested during this agricultural (rainy) season?" |
+| W4 | =secta3i= / =secta3iii_harvestw4= | =sa3iq6a= / =sa3iiiq14= | "What is the estimated value of the [CROP] harvested from [PLOT] during 2018/2019 ..." / "... during the past 12 months?" |
+| W5 | =secta3i= / =secta3iii_harvestw5= | =sa3iq10= / =sa3iiiq24= | same wording as W4 (2023/2024 season / past 12 months) |
+
+(W3-W5 wording read from the text layer of =PH_W3_Agriculture_Quest.pdf=,
+=ph_w4_agriculture_quest.pdf= p. 15/17 and
+=ghs_panel_w5_ph_agriculture_questionnaire.pdf=; W1/W2 from the Stata
+labels and the W1 form quoted above.)  W1/W2 frame it as a SALE value, W3-W5
+as an estimated value; both are the household's own valuation of the whole
+harvest the row's =Quantity= measures, and neither is a transaction.  One
+column, =Value_harvested= (Naira), with the wave wording recorded here and in
+=data_scheme.yml=; never pooled with =Value_sold=.  Declared REQUIRED (every
+wave carries it).  Not a derivation: read positionally off the row, stored as
+recorded.
+
+Measured on a private cold build (base =3a33f2869= vs this change):
+every pre-existing column of the 62,844-row API frame is
+=assert_frame_equal=-identical; =Value_harvested= non-null per =t=:
+
+| =t= | raw non-null | dropped, no crop label | dropped by keep-first dedup | served |
+|-+-+-+-+-|
+| 2011Q1 | 9,857 | 3 | 201 | 9,653 |
+| 2013Q1 | 9,868 | 0 | 155 | 9,713 |
+| 2016Q1 | 10,233 | 0 | 121 | 10,112 |
+| 2019Q1 | 11,739 (10,966 + 773) | 13 | 139 | 11,587 |
+| 2024Q1 | 8,627 (8,252 + 375) | 8 | 102 | 8,517 |
+| total | 50,324 | 24 | 718 | 49,582 |
+
+The dedup losses are the pre-existing =drop_duplicates(keep='first')= at
+=(t, i, plot_id, crop)= (the Unit_sold note above); it now also discards
+718 valuations and is still not changed here.  Zeros: 254 / 41 / 51 / 0 / 0
+served rows.  No sentinel (no 9999-type value in any wave).  *One W5 outlier*:
+a single 2024Q1 row of N1,950,000,000 (the next largest in the wave is
+N11,440,000) -- about half of the wave's N3.81e9 served total.  Kept as
+recorded; Site Q screens =Quantity= only.  On the W1/W2 rows that also carry
+a positive =Value_sold= (3,480 / 3,423), =Value_harvested / Value_sold= has
+median 1.63 / 1.50, as expected when only part of the harvest is sold.
+
+Cost: =nigeria.py= and =data_scheme.yml= move every Nigeria table's cache
+hash (a country re-warm); only =crop_production= gains a column.
 * crop_production: a unit =_canon_unit= cannot place is =Unknown= (GH #1047)
 
 =u= is a *column* here (the declared index is =(t, i, plot_id, crop)=), and
