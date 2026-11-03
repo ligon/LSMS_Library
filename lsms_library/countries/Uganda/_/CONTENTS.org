@@ -1159,6 +1159,40 @@ the conflict nulls remain the honest output. Whether a source-backed EA
 identifier can be obtained elsewhere is a separate source-search question;
 this note neither reconstructs one nor claims every shipped source lacks it.
 
+*The cover does ship an EA key in 2013-14 and 2015-16 (GH #689 item 3,
+measured 2026-11-03, raw files).* =GSEC1.ea= (2013-14, labelled "Enumeration
+area") and =gsec1.ea= (2015-16; also on both waves' =AGSEC1=) are int16,
+non-null for all 3,119 / 3,305 households, 317 / 316 distinct, median 10
+households each.  It is the design PSU *of origin*, not a current-location
+cluster, so it is no cleaner than the parish:
+
+| groups that mix ...  | 2013-14 =ea= | 2013-14 parish | 2015-16 =ea= | 2015-16 parish |
+|----------------------+--------------+----------------+--------------+----------------|
+| (number of groups)   |          317 |            706 |          316 |            875 |
+| =urban=              |          128 |             70 |          153 |             65 |
+| district             |          104 |              0 |          155 |              0 |
+| =region=             |           27 |              0 |           35 |              0 |
+
+- Panel households (=rotate= "Covered in wave 2011/12") carry =ea= 1-322.  For
+  the 1,717 linked by =HHID_old= to 2011-12 =GSEC1.HHID=, the 212 2011-12 =comm=
+  values and the 212 =ea= values pair one-to-one: =ea= renumbers the 2005-06
+  frame EA and carries it with movers, exactly like =comm= (cause 1 above).
+- Refresh households ("rotated in 2013/14") carry =ea= 324-430, 105 EAs from
+  the 2013 frame: nearly clean in 2013-14 (21 =urban=-mixed, 7 multi-parish, 3
+  multi-district) and already dispersed by 2015-16 (36 / 57 / 30).
+- 2018-19 / 2019-20: no household or agriculture =.dta= has a column named
+  =ea=, =EA_code=, =comm= or =comcod=.  =EA_code= / =t0_EA_code= (2018-19, 305
+  communities) and =Final_EA_code= (2019-20, 307) exist only in the community
+  files, which carry no household key.  2018-19 =GSEC1.t0_hhid= matches a
+  2015-16 =HHID= for 2,978 of 3,176 households (2019-20 not probed).
+
+/Contradicts/ the 2013-14 =cluster_id_note= in =sampling.yml=, "A parish is
+not an EA, so no crosswalk can exist": true of the served parish =v=, but the
+survey's own =ea= pairs one-to-one with 2011-12 =comm= on all 212 linked EAs.
+Nothing is rewired here.  Whether =v= (or a separate design-PSU column) should
+use =ea= is #689's open decision; as =v= it would give MORE =Rural= conflicts
+than the parish (128 vs 70 groups in 2013-14), not fewer.
+
 *GPS is not averaged.*  Where the within-cluster coordinates vary at all
 they vary by a MEDIAN of 4.6--42.9 km and by up to 584 km (measured, all
 waves) — that is a broken cluster key, not a scatter about a centroid,
