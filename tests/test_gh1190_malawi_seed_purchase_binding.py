@@ -56,6 +56,25 @@ def test_cross_sectional_purchase_is_bound_to_its_value(wave):
         assert 'ag_h38a' not in c['seed_qty']
 
 
+def _purchase_block_calls(wave):
+    tree = ast.parse((MALAWI / wave / '_' / 'plot_inputs.py').read_text())
+    out = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call) and getattr(node.func, 'id', None) == '_seed_purchase_block':
+            out.append({k.arg: ast.literal_eval(k.value) for k in node.keywords
+                        if k.arg in ('qty_cols', 'unit_cols', 'value_cols')})
+    return out
+
+
+def test_2010_11_reads_both_blocks_of_its_one_module_h_file():
+    # IHS3 keeps the cross-sectional (ag_h05 = 1: ag_h07a/b, value ag_h10)
+    # and panel (ag_h05 = 2: ag_h16/h19, ag_h26/h29) blocks in ONE file
+    calls = _purchase_block_calls('2010-11')
+    assert calls == [{'qty_cols': ['ag_h07a', 'ag_h16a', 'ag_h26a'],
+                      'unit_cols': ['ag_h07b', 'ag_h16b', 'ag_h26b'],
+                      'value_cols': ['ag_h10', 'ag_h19', 'ag_h29']}]
+
+
 @pytest.mark.parametrize('wave', ['2010-11', '2013-14', '2016-17', '2019-20'])
 def test_every_driver_serves_free_seed(wave):
     text = (MALAWI / wave / '_' / 'plot_inputs.py').read_text()
@@ -84,6 +103,7 @@ def test_gift_is_its_own_measurement_with_its_own_unit(malawi):
     h = _h({'hhid': ['1', '2'], 'crop_code': [1, 1],
             'ag_h07a': [5.0, pd.NA], 'ag_h07b': [2, pd.NA],
             'ag_h09': [0.0, pd.NA], 'ag_h10': [900.0, pd.NA],
+            'ag_h37': [1, 2],
             'ag_h38a': [2.0, 7.0], 'ag_h38b': [8, pd.NA]})
     purchase = malawi._seed_purchase_block(
         h, hhid='hhid', cropcode='crop_code', qty_cols=['ag_h07a'],
@@ -103,6 +123,22 @@ def test_gift_is_its_own_measurement_with_its_own_unit(malawi):
     assert by_i.loc['2', 'Quantity_received_as_gift'] == 7.0
     assert by_i.loc['2', 'Unit_received_as_gift'] == 'Unknown'
     assert out['Quantity_received_as_gift'].dtype == pd.Float64Dtype()
+    # the gate is carried as answered: a quantity under "No" stays visible
+    assert bool(by_i.loc['1', 'Received_as_gift']) is True
+    assert bool(by_i.loc['2', 'Received_as_gift']) is False
+    assert out['Received_as_gift'].dtype == pd.BooleanDtype()
+
+
+def test_received_as_gift_is_na_where_a_crop_s_rows_disagree(malawi):
+    h = _h({'hhid': ['1', '1', '2'], 'crop_code': [1, 1, 1],
+            'ag_h37': [1, 2, pd.NA], 'ag_h38a': [2.0, 3.0, 4.0],
+            'ag_h38b': [2, 2, 2]})
+    gift = malawi._seed_gift_block(h, hhid='hhid', cropcode='crop_code',
+                                   source_half='single')
+    by_i = gift.set_index('i')
+    assert by_i.loc['1', 'Quantity_received_as_gift'] == 5.0
+    assert pd.isna(by_i.loc['1', 'Received_as_gift'])
+    assert pd.isna(by_i.loc['2', 'Received_as_gift'])
 
 
 def test_gift_is_not_summed_across_two_units(malawi):

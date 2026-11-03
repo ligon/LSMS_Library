@@ -10,9 +10,12 @@ applied to a plot.  Sources (Full_Sample/Agriculture):
     crop_production's ag_g0b).
   * ag_mod_g -- seasonal plot-crop roster: seed planted ag_g04a/ag_g04b
     per (plot=ag_g0b, crop=ag_g0d).  No improved-seed flag in IHS3.
-  * ag_mod_h -- purchased seed (hh, crop): ag_h16a/b + ag_h19 (source 1),
-    ag_h26a/b + ag_h29 (source 2); crop=ag_h0b.  Seed received for free
-    ag_h38a/b, in its own columns (GH #1190).  Attached to the single seed
+  * ag_mod_h -- purchased seed (hh, crop); crop=ag_h0b.  ONE file holds
+    two blocks split by ag_h05 ("IS THIS A CROSS-SECTIONAL HOUSEHOLD?"):
+    cross-sectional households answer ag_h07a/b with value ag_h10 (ag_h09
+    is the transport payment), panel households ag_h16a/b + ag_h19 and
+    ag_h26a/b + ag_h29; no row answers both (GH #1190).  Seed received for
+    free ag_h38a/b (gate ag_h37), in its own columns.  Attached to the single seed
     observation of that crop only (no plot in the module).
 
 i = format_id(case_id), aligning with plot_features / crop_production.
@@ -78,10 +81,13 @@ pieces = [
 ]
 
 seed_purchase = [
+    # Cross-sectional block (ag_h05 = 1) and panel block (ag_h05 = 2) are
+    # disjoint rows of one file, so the per-row sum never mixes them.
     _seed_purchase_block(h, hhid='hhid', cropcode='ag_h0b',
-                         qty_cols=['ag_h16a', 'ag_h26a'],
-                         unit_cols=['ag_h16b', 'ag_h26b'],
-                         value_cols=['ag_h19', 'ag_h29'], source_half='Full_Sample'),
+                         qty_cols=['ag_h07a', 'ag_h16a', 'ag_h26a'],
+                         unit_cols=['ag_h07b', 'ag_h16b', 'ag_h26b'],
+                         value_cols=['ag_h10', 'ag_h19', 'ag_h29'],
+                         source_half='Full_Sample'),
 ]
 seed_gift = [_seed_gift_block(h, hhid='hhid', cropcode='ag_h0b',
                               source_half='Full_Sample')]

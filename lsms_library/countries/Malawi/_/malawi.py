@@ -3506,7 +3506,7 @@ def _seed_purchase_block(df, *, hhid, cropcode, qty_cols, unit_cols,
 
 
 def _seed_gift_block(df, *, hhid, cropcode, source_half,
-                     qty='ag_h38a', unit='ag_h38b'):
+                     qty='ag_h38a', unit='ag_h38b', flag='ag_h37'):
     """Module H seed RECEIVED FOR FREE (H37/H38) at household-crop grain.
 
     Every held Module H file asks it with the same names in both halves
@@ -3520,13 +3520,19 @@ def _seed_gift_block(df, *, hhid, cropcode, source_half,
     receipts carry two different unit codes (2010-11 and 2013-14 repeat a
     crop in Module H) is not summed across units and is not attached; the
     count is in ``attrs['mixed_unit_groups']``.  A recorded quantity with
-    no unit code is ``Unknown``.  Returns (i, _crop_code, _source_half,
-    Quantity_received_as_gift, Unit_received_as_gift).
+    no unit code is ``Unknown``.  ``flag`` is ag_h37 ("Did you receive any
+    of the [SEED] for free during the [RS]?"), carried as answered in
+    ``Received_as_gift`` beside the quantity it gates -- True / False / NA,
+    so a quantity recorded under a No or a blank stays visible; NA where a
+    household-crop's rows disagree.  Rows with no free quantity are not
+    returned (a bare No is not attached).  Returns (i, _crop_code,
+    _source_half, Quantity_received_as_gift, Unit_received_as_gift,
+    Received_as_gift).
     """
     from lsms_library.transformations import U_UNKNOWN
 
     cols = ['i', '_crop_code', '_source_half', 'Quantity_received_as_gift',
-            'Unit_received_as_gift']
+            'Unit_received_as_gift', 'Received_as_gift']
     if qty not in df.columns:
         return pd.DataFrame(columns=cols)
     _, crop_code = _seed_crop_identity(df[cropcode])
@@ -3542,15 +3548,21 @@ def _seed_gift_block(df, *, hhid, cropcode, source_half,
         '_crop_code': crop_code.values,
         'Quantity_received_as_gift': q.values,
         'Unit_received_as_gift': u.fillna(U_UNKNOWN).values,
+        'Received_as_gift': _use_answer(df, flag).values,
     })
     out = out[out['_crop_code'].notna() & out['Quantity_received_as_gift'].notna()]
     key = ['i', '_crop_code']
     nunits = out.groupby(key)['Unit_received_as_gift'].transform('nunique')
     mixed = int(out.loc[nunits.gt(1), key].drop_duplicates().shape[0])
     out = out[nunits.eq(1)]
-    grp = out.groupby(key, as_index=False).agg(
+    grouped = out.groupby(key, as_index=False)
+    grp = grouped.agg(
         Quantity_received_as_gift=('Quantity_received_as_gift', 'sum'),
-        Unit_received_as_gift=('Unit_received_as_gift', 'first'))
+        Unit_received_as_gift=('Unit_received_as_gift', 'first'),
+        Received_as_gift=('Received_as_gift', 'first'))
+    agree = grouped['Received_as_gift'].nunique(dropna=False)['Received_as_gift'].eq(1)
+    grp['Received_as_gift'] = grp['Received_as_gift'].astype('boolean').where(
+        agree.to_numpy(), pd.NA)
     grp['_source_half'] = source_half
     grp.attrs['mixed_unit_groups'] = mixed
     return grp[cols]
@@ -3695,12 +3707,14 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
     # its own unit, never a purchase.
     df['Quantity_received_as_gift'] = pd.array([pd.NA] * len(df), dtype='Float64')
     df['Unit_received_as_gift'] = pd.array([pd.NA] * len(df), dtype='string')
+    df['Received_as_gift'] = pd.array([pd.NA] * len(df), dtype='boolean')
     if seed_gift_pieces:
         if not source_observations:
             raise ValueError('Seed gift results require seed source observations')
         df = _attach_to_single_seed_observation(
             df, seed_gift_pieces,
-            ['Quantity_received_as_gift', 'Unit_received_as_gift'], 'gift')
+            ['Quantity_received_as_gift', 'Unit_received_as_gift',
+             'Received_as_gift'], 'gift')
 
     # Purchased flag: True where a purchased quantity is attached (seed),
     # else NA (Module D fertilizer/pesticide applied-on-plot rows do not
@@ -3740,6 +3754,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
         'Applied':            'max',
         'Quantity_received_as_gift': 'first',
         'Unit_received_as_gift':     'first',
+        'Received_as_gift':          'first',
     })
 
     # The natural per-input-line grain is (t, i, plot, input, crop, u): a

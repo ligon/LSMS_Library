@@ -94,7 +94,12 @@ def drive(monkeypatch):
                 **ids, 'ag_h0b': [1], 'ag_h0c': [1], 'crop_code': [1],
                 'ag_h16a': [5.0], 'ag_h16b': [4], 'ag_h19': [10.0],
                 'ag_h26a': [pd.NA], 'ag_h26b': [pd.NA],
-                'ag_h29': [pd.NA], 'ag_h07a': [5.0], 'ag_h07b': [4],
+                # IHS3 keeps the cross-sectional (ag_h07*) and panel
+                # (ag_h16*) blocks in one file on disjoint rows (ag_h05),
+                # so the 2010-11 synthetic row is a panel household.
+                'ag_h29': [pd.NA],
+                'ag_h07a': [pd.NA] if wave == '2010-11' else [5.0],
+                'ag_h07b': [4],
                 'ag_h09': [pd.NA], 'ag_h10': [10.0], 'ag_h38a': [pd.NA],
                 'ag_h38b': [pd.NA], 'ag_h40': [pd.NA],
             })

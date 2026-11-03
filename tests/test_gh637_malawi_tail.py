@@ -247,8 +247,10 @@ SEED_SUM = {'2010-11': 831_034.9, '2013-14': 324_288.5,
 #: 74,366.0 / 94,731.8 (the #1298 single-observation attach; the 2026-10-23
 #: pins were stale).  GH #1190 then bound the Cross_Sectional halves to the
 #: purchase VALUE ag_h10 instead of the transport payment ag_h09 and stopped
-#: adding free seed (ag_h38a): 2016-17 -> 233,479.0, 2019-20 -> 208,669.5.
-PURCHASED_SUM = {'2010-11': 33_334.0, '2013-14': 51_953.7,
+#: adding free seed (ag_h38a): 2016-17 -> 233,479.0, 2019-20 -> 208,669.5;
+#: and read 2010-11's cross-sectional block (ag_h05 = 1: ag_h07a gated by
+#: ag_h10), which the driver had never read: 2010-11 -> 125,468.05.
+PURCHASED_SUM = {'2010-11': 125_468.05, '2013-14': 51_953.7,
                  '2016-17': 233_479.0, '2019-20': 208_669.5}
 #: Quantity_received_as_gift per wave (GH #1190, private cold build).
 GIFT_SUM = {'2010-11': 89_598.95, '2013-14': 53_489.0,
@@ -454,7 +456,9 @@ _HALVES = {
                      h='2010-11/Data/Full_Sample/Agriculture/ag_mod_h.dta',
                      hh=_fid('case_id'), plot=_fid('ag_g0b'), pplot=_fid('ag_p0b'),
                      gcrop='ag_g0d', pcrop='ag_p0d', hcrop='ag_h0b',
-                     q=['ag_h16a', 'ag_h26a'], v=['ag_h19', 'ag_h29'])],
+                     # one file, two disjoint blocks split by ag_h05 (#1190)
+                     q=['ag_h07a', 'ag_h16a', 'ag_h26a'],
+                     v=['ag_h10', 'ag_h19', 'ag_h29'])],
     '2013-14': [dict(g='2013-14/Data/AG_MOD_G_13.dta', p='2013-14/Data/AG_MOD_P_13.dta',
                      h='2013-14/Data/AG_MOD_H_13.dta',
                      hh=_fid('y2_hhid'), plot=_fid('ag_g00'), pplot=_fid('ag_p00'),

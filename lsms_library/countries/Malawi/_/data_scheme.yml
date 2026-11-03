@@ -327,6 +327,12 @@ Data Scheme:
     Unit_received_as_gift:
       type: str
       optional: true
+    # ag_h37 "Did you receive any of the [SEED] for free?", carried as
+    # answered beside the free quantity it gates (rows with no free
+    # quantity carry NA), so a quantity recorded under a No is visible.
+    Received_as_gift:
+      type: bool
+      optional: true
     materialize: make
   livestock:
     # Item-level (t, i, animal) livestock-roster feature for the four

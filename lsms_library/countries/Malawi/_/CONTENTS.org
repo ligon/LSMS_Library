@@ -4743,13 +4743,23 @@ current declaration facts, not whole-instrument absence findings. #1278, #1190,
 differently.*  Cross_Sectional keeps the IHS4 names -- purchase =ag_h07a/b=,
 transport =ag_h09=, VALUE =ag_h10=, free seed =ag_h37= / =ag_h38a/b=, its
 transport =ag_h40= (labels read from the held 2016-17 and 2019-20 headers);
-Panel uses the harmonized =ag_h16*/ag_h19= + =ag_h26*/ag_h29=.  Every held
-Module H file, both halves of every wave, asks free seed as =ag_h38a/b= on the
-seed unit dictionary (1 gram ... 8 50 kg bag, 9 OTHER (SPECIFY)).
+Panel uses the harmonized =ag_h16*/ag_h19= + =ag_h26*/ag_h29=.  *IHS3
+(2010-11) holds BOTH blocks in ONE file*, split by =ag_h05= ("IS THIS A
+CROSS-SECTIONAL HOUSEHOLD?"): 4,791 value-backed =ag_h07a/ag_h10= rows are
+all =ag_h05= = 1 (112,357.25 native units, after the repeat-record drop);
+1,752 value-backed =ag_h16a/ag_h26a= rows are all =ag_h05= = 2; no row
+answers both.  2013-14 (IHPS) has only the panel block.  Every held Module H
+file, both halves of every wave, asks free seed as =ag_h38a/b= (gate
+=ag_h37=) on the seed unit dictionary (1 gram ... 8 50 kg bag, 9 OTHER
+(SPECIFY)).
 
 The Cross_Sectional drivers gated the purchase on =ag_h09= (transport) and
 added =ag_h38a= (free seed, gated on its transport =ag_h40=).  They now gate
-=ag_h07a= on =ag_h10=, as Panel and 2010-11 / 2013-14 gate on =ag_h19/29=.
+=ag_h07a= on =ag_h10=, as Panel and 2013-14 gate on =ag_h19/29=.  *The
+2010-11 driver had the same defect in another form* (red team, 2026-11-03):
+it read only the panel block, so no 2010-11 cross-sectional seed purchase
+was ever served.  It now reads =ag_h07a/b= + =ag_h10= beside =ag_h16/h19= and
+=ag_h26/h29=; the blocks are disjoint rows, so the per-row sum mixes nothing.
 Free seed is served in its own columns, =Quantity_received_as_gift= /
 =Unit_received_as_gift= (Burkina Faso's names), in all four waves, attached by
 the existing #1298 single-observation rule; a household-crop whose free seed
@@ -4764,6 +4774,17 @@ lose 92 / 94 (47 / 56 free-seed-only rows, which now carry the gift; 45 / 38
 with a transport payment but no purchase value); one 2016-17 row 5 -> 4 (1 was
 free).  =Purchased= rows 1,862 -> 6,748 and 2,369 -> 7,966.  Gift rows attached
 2,678 / 1,420 / 3,747 / 4,702.  Quantity, Improved, Applied unchanged.
+2010-11 (the follow-up): =Quantity_purchased= rows 1,445 -> 5,442, wave sum
+33,334.0 -> 125,468.05; one more seed observation with no planted amount is
+served (179,956 -> 179,957 after the #1174 change); no other wave moves.
+
+*Free seed recorded under "No".*  =Received_as_gift= carries =ag_h37= as
+answered, beside the free quantity it gates (NA on rows with no free
+quantity: a bare No is not attached, so the row universe does not grow).  Raw
+=ag_h38a= values under =ag_h37= = No: 2016-17 Panel 80 (all with a source in
+=ag_h39a=, so probably a mis-keyed Yes), 2010-11 1, 2013-14 2; under a blank
+=ag_h37=: 4.  Served on attached rows: False 49 (2010-11 1, 2016-17 48), NA 3
+(2010-11 2, 2016-17 1), True 12,495.  The quantities are served as recorded.
 
 Not changed (#1190's representation half, a decision): =Quantity_purchased= is
 still in the purchase unit, which is not recorded, while =u= is the planted
