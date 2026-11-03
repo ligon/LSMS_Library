@@ -3335,6 +3335,38 @@ not an executed fully typed Country-to-Feature metadata assertion. Independent
 Burkina source/receipt review supports this bounded D1/panel extraction; #1120
 and its other country/eligibility scopes remain open.
 
+** 2026-11-03 -- Why agriculture-only households exist: the BIDs say fieldwork (GH #660)
+
+#660 asked whether the households present in the agriculture covers but
+absent from the household cover are (a) a frame/module mismatch in the
+release, (b) dropped during anonymisation, or (c) the wrong cover file
+((c) was ruled out on #660, 2026-10-23).  The two Panel II Basic
+Information Documents -- not in this repo; read from the WB catalog's
+Related Materials -- answer it for W4 and W5: *fieldwork*, not anonymisation.
+
+- *ESS4 BID* (https://microdata.worldbank.org/catalog/3823/download/49208,
+  "ESS Panel II 2018/2019 Refreshed Sample: Baseline", PDF p13, §3): "A total
+  of 6770 households from 535 EAs were interviewed for both the agriculture
+  and household module.  However, there are additional eight EAs and 124
+  households from rural areas who were only administered during the
+  agriculture survey."  PDF p26 lists the causes: five EAs "have all
+  agriculture modules but household questionnaire is not administered due to
+  ethnic or political unrest"; two EAs were not visited at the HH and PH
+  visits ("only PP and Livestock data"); "About 62 households have moved out
+  from their original EA between PP and HH visit".  124 is exactly the W4
+  household count #1359 adds to =sample= (6,770 + 124 = 6,894).
+- *ESPS-5 BID* (https://microdata.worldbank.org/catalog/6161/download/78630,
+  PDF p22, §7): "11 households left their locations after the PP visit and 29
+  were in EAs that were not accessible during the second visit for a variety
+  of reasons.  For these 40 households only PP and livestock data are
+  available."  40 is exactly #660's 2021-22 count and #1359's W5 addition
+  (4,959 + 40 = 4,999 = PDF p13 Table 3.3's total).  The same section: 248
+  rural households "were not accessible during the PP visit but were
+  interviewed during the PH and HH visit" (the reverse case: thin PP data).
+- *Not established here*: the cause of W2's 25 and W3's 27 additions (the
+  ESS2/ESS3 BIDs were not read), and an EA-by-EA reconciliation of the ESS4
+  BID's "eight EAs" against the 6 EAs #1359's cluster closure adds.
+
 * GH #1119 -- structural crop marker (2026-10-30)
 
 The existing plot-level fertilizer/organic branches now emit
