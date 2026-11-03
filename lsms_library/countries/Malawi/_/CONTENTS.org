@@ -3981,6 +3981,20 @@ row's kilograms move.  2016-17 has no =Unknown= row with a shipped factor.
 rows where =23A=/=23B= may mean TINA (2013-14, own-produced Chicken and
 Other poultry; served =Unknown= as OTHER (SPECIFY) with no text) stay as
 they are, recorded as a residual.
+*Superseded for the suffixed codes (@ligon, 2026-11-03, GH #1075):* they fall
+under the standing "code on no instrument list -> =Unknown=" rule, with no
+decoding by analogy with the base code; =_IHS3_UNLISTED_CODES= in
+=2010-11/_/food_acquired.py= (none of the 25 raw lines carries specify text).
+IHS3 ships many suffixed SIZE sub-codes the =u= table does decode (=10C=,
+=9B=, =6A=, ...), so "not 1-23" is not the rule -- only these six reach the
+API undecoded.  The IHS2 =90 kg bag= stays as is (ruling of the same day).
+Private cold builds (before = the #1074 change, otherwise development
+7c2b5ed01): the 13 rows =u= -> =Unknown=, 2010-11 =Unknown= 119 -> 132; 10
+of them =KgFactorSource= =unit= -> =none= (8.17 kg -> 0; the other 3 were
+=none=); =food_quantities(units='kgs')= 2,567,838.62 -> 2,567,830.45 kg;
+=kg_factor_sources= unit 69,312 -> 69,302, none 2,837 -> 2,847, every other
+layer unchanged; =food_prices()= (kgvalue) rows 680,378 -> 680,372; rows,
+Quantity, Expenditure and Quantity_kg unchanged; no other row re-priced.
 
 * 2026-10-19 -- plot_inputs: fertilizer nitrogen shares (GH #867)
 
