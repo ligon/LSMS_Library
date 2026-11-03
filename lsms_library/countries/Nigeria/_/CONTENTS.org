@@ -574,6 +574,53 @@ to select the most complete observed household row and report disagreements;
 it never averages geo fixes, and only the selected row's derivation survives.
 The panel crosswalk remains its committed source (#1264), unchanged here.
 
+*** The W3 household on the geovariables file but on neither W3 cover (GH #1261, 2026-11-03)
+
+=NGA_HouseholdGeovars_Y3.dta= has 4,613 households; exactly one is on
+neither W3 household cover: hhid =320201=.  Its geovariables row carries a
+coordinate and the geo-derived attributes but *blank* =zone/state/lga/ea=.
+Its provenance, from the survey's own files:
+
+- =HHTrack.dta= (W3; also W2 =HHTrack.csv=): a W1/W2 panel household in
+  Rivers / Bonny / EA 1464 (rural), "1. Interviewed" in all four W1/W2
+  visits, *"3. Not found"* in BOTH W3 visits, every W3 weight NA.
+- =sect1_harvestw3.dta= (PH roster) nevertheless lists it: two members, the
+  former head (=s1q3b= "FORMER HEAD (DEAD)", =s1q28= 14 DEAD) and a new
+  32-year-old female head, located at state 32 / lga 3207 / ea 1464 -- its
+  original EA.  The PP roster has no row for it.
+- Its W3 coordinate is the EA's: all 9 households of =32/3207/1464= on the
+  W3 geovariables file carry one identical pair (the published fix is the
+  EA's displaced point stamped on each household).
+
+So "no recorded EA" holds for the geovariables row only; the PH roster and
+=HHTrack= both record EA 1464.  At =3a33f2869= the household is *already
+served*: the GH #1120 D1 roster supplement puts it in 2016Q1 =sample= with
+=v = 32/3207/1464= and NA weights, and the LEFT geo join gives its
+=cluster_features= row the EA's coordinate (measured with
+=nigeria.sample_for_wave= / =cluster_features_for_wave('2015-16')=: 4,594
+PH rows, the 4,592 cover households + =320201= + =30082=).  No row is
+invented: weights stay NA, the location is the roster's own.
+
+=30082= is the same shape the other way round: =HHTrack= says *"2. Refused"*
+in both W3 visits, yet it is on the PP cover (=3/318/1136=, weights NA) and
+its PH roster lists four members at =ea = 0= in a different LGA (served
+=moved-30082=).
+
+*The contradiction is of record, not resolved here*: =HHTrack='s W3 status
+says neither household was interviewed; the PH roster says someone answered.
+The D1 rule (cover, then supplement cover, then own-round roster) admits a
+household on roster evidence alone; whether =HHTrack= status should gate that
+admission is a decision, not taken here.
+
+*=HHTrack= is read by no table.*  It is the panel's per-visit disposition
+record (=hhstatus_w{1,2,3}v{1,2}=: 1 interviewed, 2 refused, 3 not found,
+4 dead, 5 tracked and interviewed, 6 moved away not tracked, 7 crisis area;
+W2's CSV also carries an unlabelled code 91), with =tracking_*=, =moved_*=
+and per-visit weights.  It explains the GH #1264 roster-less crosswalk ids:
+the 85 2015Q3 PP-cover households with no PP roster rows are EXACTLY the
+PP-cover households =HHTrack= records as not interviewed at W3 visit 1
+(30 dead, 29 refused, 15 moved away, 11 not found).
+
 ** Panel crosswalk: =_/panel_ids.py= and the committed JSON (GH #894, 2026-10-23)
 
 The household panel crosswalk is a COMMITTED SOURCE ("design A", the
