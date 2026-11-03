@@ -14,7 +14,10 @@ str()s it.  No intercrop / perennial / date variables in this module
 plot = "{as02eq01}_{as02eq03}".  The pre-EHCVM waves have no plot_features
 recipe yet, so this plot id is internal to crop_production (it still
 aligns by construction with any future ECVMA plot_features build).
-Index = (t, i, plot, crop, u).
+Index = (t, i, plot_id, crop, u, production_obs).  ``production_obs`` is
+``reported:<as02eq0>``, the module's own harvest-line number ("numero
+d'ordre"): one (plot, crop, unit) can carry several reported lines (27 key
+groups, 57 rows), and the line number is what tells them apart (GH #1360).
 """
 import sys
 
@@ -23,7 +26,8 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
-                   _finish_crop_production, _na_exact)
+                   _finish_crop_production, _na_exact,
+                   _crop_reported_observations)
 
 # "Don't know" codes of this module, unlabelled in the .dta (GH #865).  Exact
 # values only.  Raw counts, ecvmaas2e_p2.dta (12,091 rows): as02eq07a ==
@@ -51,6 +55,8 @@ plot = field.astype(str) + '_' + parcel.astype(str)
 df = pd.DataFrame({
     'i':             hh.values,
     'plot_id':          plot.values,
+    # The recorded harvest-line number, unique within hid (GH #1360).
+    'production_obs': _crop_reported_observations(hh, srcn['as02eq0']).values,
     'crop':          _crop_labels(srcn['as02eq06'], src['as02eq06'], crop_map).values,
     'u':             _unit_labels(src['as02eq07b'], unit_map).values,
     'Quantity':      _na_exact(srcn['as02eq07a'], QTY_SENTINELS).values,
@@ -63,5 +69,6 @@ df = pd.DataFrame({
 
 df = _finish_crop_production(df, '2011-12')
 
+assert df.index.is_unique, 'crop_production 2011-12 repeats a native harvest line'
 assert len(df) > 0, 'crop_production 2011-12 produced no rows'
 to_parquet(df, 'crop_production.parquet')

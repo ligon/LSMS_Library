@@ -10,13 +10,20 @@ The 2021-22 instrument SPLITS the crop module that 2018-19 kept together:
     dropped before the sale is attributed (see the comment in the sale block).
 
 Because the sale block has no plot dimension, its qty/value can only be
-attributed to a plot-crop row when the household grows that crop on a
-SINGLE plot (a 1:1 (i, crop) -> plot).  Where the crop spans several plots
-the sale cannot be split without inventing an allocation, so Quantity_sold
-/ Value_sold are left NaN for those rows (reported-only discipline — no
-fabricated split).
+attributed to a plot-crop row when the household reports that crop on a
+SINGLE harvest line (a 1:1 (i, crop) -> served row).  Where the crop spans
+several plots, or several harvest lines of one plot, the sale cannot be split
+without inventing an allocation, so Quantity_sold / Value_sold are left NaN
+for those rows (reported-only discipline -- no fabricated split).  Until
+GH #1360 the rule asked for a single PLOT; the extra lines of a single plot
+were then either collapsed away by the framework or served carrying the same
+sale twice.
 
-Index = (t, i, plot, crop, u); plot = "{s16cq02}_{s16cq03}".
+Index = (t, i, plot_id, crop, u, production_obs); plot = "{s16cq02}_{s16cq03}".
+s16c records no harvest-line number and one (plot, crop, unit) can carry
+several lines (846 key groups, 1,856 rows), so ``production_obs`` is the
+CONSTRUCTED ``row:<source_fingerprint>:<n>`` -- the zero-based row of the held
+s16c release, taken before any filter (GH #1360).
 """
 import sys
 
@@ -25,7 +32,7 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
-                   _finish_crop_production)
+                   _finish_crop_production, _crop_row_observations)
 
 
 crop_map, unit_map = _crop_maps()
@@ -44,6 +51,9 @@ intercropped = src['s16cq07'].map({'Association de cultures': True, 'Pure': Fals
 df = pd.DataFrame({
     'i':            hh.values,
     'plot_id':         plot.values,
+    # Zero-based row of the held release, before any filter (GH #1360).
+    'production_obs': _crop_row_observations(
+        len(srcn), '../Data/s16c_me_ner2021.dta', script_path=__file__).values,
     'crop':         _crop_labels(srcn['s16cq04'], src['s16cq04'], crop_map).values,
     'u':            _unit_labels(src['s16cq16b'], unit_map).values,
     'Quantity':     src['s16cq16a'].values,
@@ -93,12 +103,13 @@ sold_df = sold_df.dropna(subset=['i', 'crop'])
 sold_one = (sold_df.groupby(['i', 'crop', 'Unit_sold'], as_index=False, dropna=False)
             [['Quantity_sold', 'Value_sold']].sum(min_count=1))
 
-# Attribute ONLY to (i, crop) pairs grown on exactly one plot in the harvest
-# block (no fabricated split across plots) AND sold in a single unit (no
-# fabricated conversion across units -- a second unit would duplicate the
-# harvest row).  Measured: no pair sells in two units.
-plots_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop'])['plot_id'].nunique()
-single = plots_per[plots_per == 1].index
+# Attribute ONLY to (i, crop) pairs with exactly one harvest LINE in the
+# harvest block -- one plot, one line, so the sale lands on one served row
+# (no fabricated split across plots or lines; GH #1360) -- AND sold in a
+# single unit (no fabricated conversion across units -- a second unit would
+# duplicate the harvest row).  Measured: no pair sells in two units.
+lines_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop']).size()
+single = lines_per[lines_per == 1].index
 units_per = sold_one.groupby(['i', 'crop']).size()
 one_unit = units_per[units_per == 1].index
 sold_one = sold_one[sold_one.set_index(['i', 'crop']).index.isin(single)
@@ -108,5 +119,6 @@ df = df.merge(sold_one, on=['i', 'crop'], how='left')
 
 df = _finish_crop_production(df, '2021-22')
 
+assert df.index.is_unique, 'crop_production 2021-22 repeats a native harvest line'
 assert len(df) > 0, 'crop_production 2021-22 produced no rows'
 to_parquet(df, 'crop_production.parquet')
