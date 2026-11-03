@@ -1,14 +1,15 @@
 """Formatting functions for Burkina Faso 2014 (EMC).
 
-food_acquired canonical reshape (GH #169 / #107): the wave's
-``data_info.yml`` extracts the wide form (Quantity-total, Produced-subset,
-Expenditure); the ``food_acquired`` post-processor below wraps
-``food_acquired_to_canonical``, so grab_data reshapes the wide form into the
-canonical long form on the ``s`` (acquisition-source) axis — matching the
-2018-19 / 2021-22 waves.  Before this, 2014 emitted the legacy wide shape (a
-``Produced`` column, no ``s``), which leaked into
-``Country('Burkina_Faso').food_acquired()`` and broke the ``food_quantities``
-kg derivation (0% resolved).
+food_acquired canonical reshape (GH #169 / #107, #864): the wave's
+``data_info.yml`` extracts one wide row per (household, item, passage) carrying
+the questionnaire's three DISJOINT section-C blocks -- C04 purchases consumed,
+C05 own production, C06 gifts / in-kind / barter -- each with its own quantity
+and unit.  The ``food_acquired`` post-processor below serves each block on its
+own ``s`` row (``purchased`` / ``produced`` / ``inkind``) in its own unit, the
+canonical long form of the 2018-19 / 2021-22 waves.  It deliberately does NOT
+use ``food_acquired_to_canonical``: that helper reads ``Quantity`` as a TOTAL
+and subtracts ``Produced`` from it, which is wrong for this instrument (see
+:func:`_section_c_to_canonical`).
 """
 
 from pathlib import Path as _Path
@@ -17,8 +18,6 @@ import pandas as pd
 
 from lsms_library.build_transforms import add_visit_level
 from lsms_library.local_tools import format_id, get_formatting_functions as _get_formatting_functions
-from lsms_library.transformations import (
-    food_acquired_to_canonical as _food_acquired_canonical)
 
 # Bind the helper to this config tree, including when another checkout's bare
 # burkina_faso module is already cached. Reuse the framework's exact-path loader.
@@ -124,55 +123,96 @@ def _fill_missing_u(df):
 
 
 # ---------------------------------------------------------------------------
-# Quantity is NaN where the survey asked for none (GH #864)
+# Section C: three disjoint blocks, each in its own unit (GH #864)
 # ---------------------------------------------------------------------------
 #
-# `food_acquired_to_canonical` computes the purchased quantity as
-# `(Quantity.fillna(0) - Produced.fillna(0)).clip(lower=0)`, so a source row
-# with NO quantity answer is served as a purchased quantity of ZERO -- and 0
-# means "bought none", not "not asked".  In this wave the not-asked case is
-# the RULE, not the exception: passages 2-4 field no quantity grid at all
-# (`qachat` does not exist in their files, 405,127 served rows), and in
-# passage 1 `qachat` is null on 43,906 of the 140,908 rows with `achat > 0`,
-# concentrated on items for which the grid was evidently not administered
-# (Sel 10,244 of 10,259; Oignons 7,668 of 7,672; Soumbala 7,138 of 7,190;
-# Feuilles, Gombo, Pate d'arachide, Haricot, Beurre de Karite, Fruits all at
-# >= 99%).  `qachat` is NEVER 0 where `achat > 0` (0 of 140,908), so a served
-# purchased 0 beside an expenditure can only be a filled NaN or a clipped
-# `Produced >= Quantity` row.
+# Questionnaire_EMC_2014_Passage_1.pdf, section C (PDF pp. 15-18), asks for each
+# item C04 « la quantite totale et la valeur des achats consommes [...] », C05
+# the same for own production and C06 for gifts / in-kind / barter -- each block
+# with its OWN quantity, unit and value boxes.  The file's labels bind them:
+# qachat/uachat/achat = C04, qautocons/uautocons/autocons = C05,
+# qcadeau/ucadeau/cadeau = C06.  So:
 #
-# `_restore_missing_quantity` puts the NaN back on purchased rows whose
-# SOURCE quantity was null, keyed on the wide frame's own index, so the rule
-# is "NaN in, NaN out" for every passage rather than a per-passage special
-# case.  Expenditure is untouched; no row is added or removed; the wave's
-# Quantity total is unchanged (a NaN and a 0 sum alike).  Downstream,
-# `food_prices` sees `Expenditure / NaN` instead of `Expenditure / 0` and
-# can tell a money-only recall occasion from the GH #591 zero-quantity
-# defect (`transformations._money_only_rows`).  The corpus-wide `fillna(0)`
-# in `build_transforms` is deliberately NOT changed here: it is
-# `@build_transform`-tagged and every reshaped country would re-warm.
-def _restore_missing_quantity(wide, canonical):
-    """Set purchased ``Quantity`` back to NaN where ``wide``'s own Quantity
-    was null, after :func:`food_acquired_to_canonical` filled it with 0.
+# * ``qachat`` is the PURCHASED quantity.  The shared
+#   ``food_acquired_to_canonical`` read it as a total and served
+#   ``(qachat - qautocons).clip(0)``: 283 passage-1 rows carry both, 238 of
+#   them clipped to 0 (the 219 served zeros) and 45 subtracted across units.
+# * own production is served in ``uautocons``, not in the purchase unit
+#   ``uachat``: on the old shape 11,123 of 11,418 produced rows carried
+#   ``u = 'Unknown'`` although their own unit was recorded.
+# * the C06 gift quantity ``qcadeau`` (1,468 rows > 0) is served as
+#   ``s = 'inkind'`` in ``ucadeau``.
+#
+# @ligon's ruling, 2026-11-03.  Every served number is a direct survey answer
+# (C04 quantity and value, C05 quantity, C06 quantity), so nothing here is a
+# registered derivation.  ``Expenditure`` is C04's ``achat`` and is NaN on the
+# produced / inkind rows, as in the EHCVM waves; the C05 / C06 VALUES
+# (``autocons`` / ``cadeau``) and C02 ``mtt_dep`` stay unread.
+#
+# A quantity the survey did not ask for stays NaN: passages 2-4 have no
+# quantity grid, and the printed passage-1 grid has no quantity boxes for nine
+# items (Sel, Oignons, Soumbala, Feuilles, Gombo, Pate d'arachide, Haricot,
+# Beurre de Karite, Fruits).  Nothing is filled with 0, so no NaN has to be
+# restored afterwards.
+_BLOCKS = (
+    # s,           quantity column, unit column (None = the index's `u`), value
+    ('purchased', 'Quantity',      None,           'Expenditure'),
+    ('produced',  'Produced',      'ProducedUnit', None),
+    ('inkind',    'GiftQuantity',  'GiftUnit',     None),
+)
 
-    ``wide`` is one passage's wide frame (index ``(t, v, i, j, u)``, columns
-    ``Quantity`` / ``Produced`` / ``Expenditure``); ``canonical`` is its
-    reshaped long form (``s`` appended to the index).  Only a purchased row
-    that is exactly 0 and shares its key with a null-quantity source row is
-    touched -- a reported positive quantity on the same key (a genuine
-    within-passage duplicate) is left alone.
+
+def _unit_label(value):
+    """The block's unit label, formatted as the ``u`` idxvar is (``format_id``
+    strips surrounding whitespace); missing stays missing."""
+    if value is None or (not isinstance(value, str) and pd.isna(value)):
+        return None
+    return format_id(value)
+
+
+def _section_c_to_canonical(part):
+    """One passage's wide frame -> canonical long form on ``s``.
+
+    ``part`` is indexed ``(t, v, i, j, u[, visit])`` with ``u`` = ``uachat``
+    and columns ``Quantity`` / ``Expenditure`` (C04), ``Produced`` /
+    ``ProducedUnit`` (C05), ``GiftQuantity`` / ``GiftUnit`` (C06).  A block's
+    columns may be absent (a test frame, or a passage file that lacks them);
+    they are then treated as all-NaN.  Returns a frame indexed
+    ``(t, v, i, j, u, s)`` with ``Quantity`` / ``Expenditure``:
+
+    * ``purchased`` -- kept where ``Quantity > 0`` or ``Expenditure > 0``,
+      ``Quantity`` exactly as reported (NaN where not asked);
+    * ``produced`` / ``inkind`` -- kept where their quantity is ``> 0``, in
+      their own unit, ``Expenditure`` NaN.
+
+    A missing unit is left NaN here; the caller's :func:`_fill_missing_u`
+    turns it into the ``Unknown`` sentinel.
     """
-    src_null = wide.index[wide['Quantity'].isna()]
-    if len(src_null) == 0:
-        return canonical
-    s = canonical.index.get_level_values('s')
-    key = canonical.index.droplevel('s')
-    q = pd.to_numeric(canonical['Quantity'], errors='coerce')
-    mask = (s == 'purchased') & (q == 0) & key.isin(src_null)
-    if mask.any():
-        canonical = canonical.copy()
-        canonical.loc[mask, 'Quantity'] = float('nan')
-    return canonical
+    work = part.reset_index()
+    if 'visit' in work.columns:
+        work = work.drop(columns=['visit'])
+    keys = ['t', 'v', 'i', 'j']
+    pieces = []
+    for source, qcol, ucol, xcol in _BLOCKS:
+        qty = pd.to_numeric(work[qcol], errors='coerce') if qcol in work \
+            else pd.Series(float('nan'), index=work.index)
+        value = pd.to_numeric(work[xcol], errors='coerce') if xcol and xcol in work \
+            else pd.Series(float('nan'), index=work.index)
+        if ucol is None:
+            unit = work['u']
+        elif ucol in work:
+            unit = work[ucol].astype(object).map(_unit_label)
+        else:
+            unit = pd.Series(None, index=work.index, dtype=object)
+        keep = (qty > 0) | (value > 0)
+        block = work.loc[keep, keys].copy()
+        block['u'] = unit[keep].values
+        block['s'] = source
+        block['Quantity'] = qty[keep].values
+        block['Expenditure'] = value[keep].values
+        pieces.append(block)
+    out = pd.concat(pieces, ignore_index=True)
+    return out.set_index(keys + ['u', 's'])
 
 
 # ---------------------------------------------------------------------------
@@ -262,16 +302,14 @@ def food_acquired(df):
     ``visit`` is an int 1-4 matching the passage number in the source
     filename.
 
-    Two further steps, both value-only (no row is added or removed):
-
-    * :func:`_restore_missing_quantity` -- a purchased ``Quantity`` is NaN
-      where the source quantity was null (GH #864): all of passages 2-4,
-      and the passage-1 items the grid was not administered for.  The
-      ``Unknown`` ``u`` fill is taken BEFORE the reshape so the wide and
-      long frames share one key.
-    * :func:`_repair_index_labels` -- the GH #794 safety net on ``j`` / ``u``
-      (a UTF-8 double encoding; the cp1252 class is repaired by the reader
-      since GH #805), after the build-time crosswalk.
+    Each passage is reshaped by :func:`_section_c_to_canonical` (GH #864):
+    C04 / C05 / C06 become ``purchased`` / ``produced`` / ``inkind`` rows, each
+    in its own unit, with a quantity that was not asked left NaN.  Then two
+    value-only steps (no row is added or removed): a missing ``u`` becomes the
+    ``Unknown`` sentinel (:func:`_fill_missing_u`), and
+    :func:`_repair_index_labels` applies the GH #794 safety net on ``j`` /
+    ``u`` (a UTF-8 double encoding; the cp1252 class is repaired by the reader
+    since GH #805), after the build-time crosswalk.
     """
     if 'visit' not in df.columns:
         # Defensive: a caller (or a future config edit) that does not stamp the
@@ -297,9 +335,7 @@ def food_acquired(df):
 
     out = []
     for passage, part in df.groupby('visit', sort=True):
-        part = _fill_missing_u(part)                  # one key for both tiers
-        canonical = _food_acquired_canonical(part)   # drops the visit column
-        canonical = _restore_missing_quantity(part, canonical)
+        canonical = _section_c_to_canonical(part)    # drops the visit column
         out.append(add_visit_level(canonical, visit=int(passage)))
     result = _fill_missing_u(pd.concat(out))
     return _repair_index_labels(result)

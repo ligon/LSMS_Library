@@ -230,9 +230,25 @@ food_acquired:
             - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
         u: uachat
     myvars:
+        # THREE DISJOINT BLOCKS, EACH WITH ITS OWN QUANTITY AND UNIT (GH #864;
+        # Questionnaire_EMC_2014_Passage_1.pdf section C, and the file's own
+        # variable labels "Quantite / Unite / Montant en fcfa C04 | C05 | C06"):
+        #   C04 purchases consumed      qachat    / uachat    / achat
+        #   C05 own production          qautocons / uautocons / autocons
+        #   C06 gift / in-kind / barter qcadeau   / ucadeau   / cadeau
+        # `Quantity` is C04's purchased quantity, NOT a total: 2014/_/mapping.py
+        # serves each block on its own `s` row in its own unit, and never
+        # subtracts one block from another (@ligon ruling, 2026-11-03).
+        # `Expenditure` is C04's `achat` (ruling iv); the C02 `mtt_dep` and
+        # the C05 / C06 values (`autocons`, `cadeau`) are not read.  Only
+        # passage 1 fields the quantity grid; in passages 2-4 these columns
+        # do not exist and arrive NaN.
         Quantity: qachat
         Expenditure: achat
         Produced: qautocons
+        ProducedUnit: uautocons
+        GiftQuantity: qcadeau
+        GiftUnit: ucadeau
         # Passage 1 (the un-overridden default; see the `file:` list below).
         visit:
             - zd

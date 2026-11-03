@@ -1392,7 +1392,9 @@ is excluded from both sides of the loss fraction and named in the message.
 The residual 15.9% is p1's nine items above plus 219 clipped zeros, and it
 is reported, not suppressed.
 
-** 2026-11-03 -- WAITING the held questionnaire answers both open questions (GH #864)
+** 2026-11-03 -- DONE the held questionnaire answers both open questions (GH #864)
+
+/Ruled and implemented the same day -- see "Section C served block by block" below./
 
 Read from =2014/Documentation/Questionnaire_EMC_2014_Passage_1.pdf= (via
 =get_data_file= into a private data root; text layer extracted with PyMuPDF
@@ -1437,6 +1439,65 @@ flours, bread, sugar, drinks).  This is C4 evidence that their missing
 (C02) sums to 106,129,109 CFA against =achat= (C04 value) 93,383,167 -- equal
 on 108,028 of the 144,439 rows carrying either.  Which of C02 and C04 is the
 =Expenditure= is a decision too.
+
+** 2026-11-03 -- DONE section C served block by block, each in its own unit (GH #864)
+
+@ligon's ruling (2026-11-03) on the evidence above: (i) stop subtracting C05
+from C04; (ii) serve own production in its own unit =uautocons=; (iii) read
+the C06 gift quantity =qcadeau= as =s = 'inkind'= (in =ucadeau=); (iv) keep
+=achat= (C04) as =Expenditure=.
+
+=2014/_/data_info.yml= now also reads =uautocons=, =qcadeau= and =ucadeau=;
+=2014/_/mapping.py::_section_c_to_canonical= replaces the shared
+=food_acquired_to_canonical= (which reads =Quantity= as a total) and the
+=_restore_missing_quantity= step it needed.  Every served number is a direct
+answer -- C04 quantity and value, C05 quantity, C06 quantity -- so nothing is
+registered as a derivation.  =Expenditure= is NaN on produced and inkind rows,
+as in the EHCVM waves; =autocons=, =cadeau= and =mtt_dep= stay unread.  A
+quantity the survey did not ask for stays NaN, as before.
+
+Measured on cold builds in private data roots, development =7c2b5ed01=
+against the change:
+
+|                                           | before      | after       |
+|-------------------------------------------+-------------+-------------|
+| 2014 rows: purchased / produced / inkind  | 546,274 / 11,418 / 0 | 546,293 / 11,419 / 1,468 |
+| 2014 purchased =Quantity == 0=            | 219         | 0           |
+| 2014 purchased =Quantity= NaN             | 449,033     | 449,033     |
+| 2014 purchased Quantity total             | 4,115,710.6 | 4,117,864.6 |
+| 2014 produced rows with =u = 'Unknown'=   | 11,123      | 41          |
+| 2014 inkind Quantity total                | --          | 10,394      |
+| Expenditure 2014 / 2018-19 / 2021-22 (CFA) | 342,110,515 / 52,466,280.38 / 27,888,221.36 | same |
+| =food_expenditures= rows; totals          | 377,563; as above | same (frame-equal) |
+| =food_quantities(units='kgs')= rows       | 316,441     | 318,146     |
+| ... kg 2014 / 2018-19 / 2021-22           | 206,184 / 206,709 / 98,736 | 334,742 / 206,557 / 98,683 |
+| ... 2014 rows not in kg                   | 11,334      | 270         |
+| =food_prices()= rows                      | 234,282     | 234,501     |
+| =food_prices(units='unitvalue')= =inf=    | 219         | 0           |
+
+- 264 existing purchased rows change Quantity (the 219 zeros and 45 that had
+  a smaller C05 quantity subtracted); 19 purchased rows appear (a positive C04
+  quantity zeroed by the clip and then dropped, having no =achat=).  Every
+  existing purchased row keeps its Expenditure.
+- 2014 produced quantity is unchanged in total (93,027); one pair of produced
+  rows that collided on =u = 'Unknown'= now has two units.  The 41 that stay
+  =Unknown= have a quantity and no =uautocons=; 15 of the 1,468 inkind rows
+  likewise have no =ucadeau=.
+- 2018-19 and 2021-22 =food_acquired= are frame-equal.  Their *kilograms* in
+  =food_quantities= move slightly (8,627 and 4,628 rows; -0.07% and -0.05%)
+  because the kg-factor inference pools across waves: the delivered factor
+  has no =t= axis, and the =unit= / item rungs now see 2014's
+  unit-bearing produced and inkind rows.
+- 2014's =food_quantities= kg rises 62% mainly because 11,378 of the 11,419
+  produced rows (was 295 of 11,418) and 1,453 of the 1,468 inkind rows now
+  carry a unit the kg ladder can try; much of that kilogram figure is the
+  ladder's price-ratio inference, not a measurement.
+
+Cache: the wave =data_info.yml= and =mapping.py= are build inputs -- every
+Burkina country hash and the 2014 wave hashes move.  Pinned by
+=tests/test_burkina_faso_2014_passages.py= (counts re-pinned for this reason;
+=test_the_hook_serves_each_section_c_block_in_its_own_unit= fails against the
+previous hook).
 
 ** GH #794: 47,137 + 16,610 leaked rows, and why "the keys do not match" was the wrong question
 
