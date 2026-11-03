@@ -33,6 +33,14 @@ asymmetry this leaves: the purchased row is a 30-day most-recent purchase
 while produced / in-kind are 7-day consumption.  Imputing a 7-day
 purchased value (q5a x price) was rejected -- it would fabricate a number
 no respondent reported.  See nigeria.food_acquired_for_wave.
+
+GH #881 (ruling @ligon 2026-11-03, option A): that asymmetry is now ON THE
+ROW.  Every s='purchased' row of both rounds carries
+Derivation = Nigeria::food_acquired::w4-last-purchase-30d, a registered
+IDENTITY derivation (Nigeria/_/derivations.yml) that labels the 30-day
+most-recent-purchase window; Quantity / Expenditure / Quantity_kg are
+unchanged.  The stamp is applied after food_acquired_for_wave's duplicate-key
+collapse (mapping.stamp_w4_last_purchase_window).
 """
 import sys
 
@@ -41,6 +49,12 @@ import pandas as pd
 sys.path.append('../../_/')
 from lsms_library.local_tools import to_parquet
 from nigeria import food_acquired_for_wave
+from mapping import stamp_w4_last_purchase_window
+
+# Source paths and variables stay LITERALS here (the cache hash fingerprints
+# string-literal sources); mapping.W4_FOOD / w4_food_sources repeat them for
+# the GH #881 inputs callable, and tests/test_gh881_nigeria_w4_purchase_window
+# holds the two equal.
 
 # --- Harvest (2019Q1) ---
 harvest = food_acquired_for_wave(
@@ -68,6 +82,7 @@ planting = food_acquired_for_wave(
     },
     expenditure='s7bq10')
 
-df = pd.concat([harvest, planting]).sort_index()
+# GH #881: label every purchased row's 30-day window, after the collapse.
+df = stamp_w4_last_purchase_window(pd.concat([harvest, planting]).sort_index())
 
 to_parquet(df, 'food_acquired.parquet')

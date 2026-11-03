@@ -269,11 +269,13 @@ def test_the_stamp_is_on_exactly_the_derived_rows(food_acquired):
     in-kind; 4,740.73 kg), all 2011Q1."""
     d = food_acquired['Derivation']
     t = food_acquired.index.get_level_values('t').astype(str)
-    assert (d.dropna() == KEY).all()
-    assert d.notna().sum() > 0
-    assert set(t[d.notna().to_numpy()]) == {'2011Q1'}
+    mine = (d == KEY).fillna(False).to_numpy()
+    assert mine.sum() > 0
+    assert set(t[mine]) == {'2011Q1'}
+    # 2011Q1 carries no other key (GH #881's stamp is on W4 rows only).
     q11 = t == '2011Q1'
-    assert (d.notna().to_numpy()[q11]
+    assert (d.notna().to_numpy()[q11] == mine[q11]).all()
+    assert (mine[q11]
             == food_acquired['Quantity_kg'].notna().to_numpy()[q11]).all()
     summ = food_acquired.attrs['derivations'][COUNTRY][KEY]
     assert summ['in'] == 'food_acquired'
