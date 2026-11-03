@@ -331,6 +331,11 @@ Data Scheme:
     #                 (ValuePerAnimal x HeadCount) and a TLU rollup are
     #                 transformations, NOT stored columns.  See
     #                 `Columns: livestock` in lsms_library/data_info.yml.
+    #   HeadCount12MonthsAgo (ag_r07, "How many [LIVESTOCK] did your
+    #                 household own exactly 12 months ago?", all four waves;
+    #                 GH #855).  A second STOCK, not a flow: never a fallback
+    #                 for HeadCount, never differenced into acquisitions or
+    #                 losses (the survey asks those flows directly).
     # `animal` is the harmonize_species Preferred Label (the wave scripts
     # reconcile 2010-11's fine 301-318 code scheme with the later coarse
     # scheme -- Ox=3304, Donkey/Horse=3305, Chicken=3310,
@@ -344,6 +349,7 @@ Data Scheme:
     HeadAcquired: float
     HeadSold: float
     ValuePerAnimal: float
+    HeadCount12MonthsAgo: float
     materialize: make
   anthropometry:
     # Item-level (t, i, pid) body-measurement feature for the four IHS3+/
