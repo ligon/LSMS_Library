@@ -534,10 +534,71 @@ def _crop_maps():
     return crop_map, unit_map
 
 
+# ---------------------------------------------------------------------------
+# production_obs: the native crop-observation coordinate (GH #1360)
+# ---------------------------------------------------------------------------
+#
+# `(t, i, plot_id, crop, u)` is NOT a harvest line in two waves: one (plot,
+# crop, unit) can carry several reported lines.  Measured on the held sources
+# (development 3a33f2869): 2011-12 27 key groups / 57 rows (19 conflicting),
+# 2021-22 846 groups / 1,856 rows (740 conflicting); 2014-15 and 2018-19 are
+# unique.  The framework collapsed each group to one observed row (GH #323 /
+# #871), destroying 916 rows, and because only a non-unique index is collapsed
+# AND key-sorted, the default route (per-wave collapse) and the Make route
+# (combined collapse) served the same rows in different orders (GH #1360).
+# The missing level is the canonical `production_obs` axis
+# (`lsms_library/data_info.yml`, GH #1198 -- Uganda, Malawi, Tanzania):
+#   2011-12  `reported:<as02eq0>` -- the module's own line number ("numero
+#            d'ordre"), unique within `hid` on every row of ecvmaas2e_p2.
+#   2021-22  `row:<source_fingerprint>:<n>` -- s16c records no line number, so
+#            the zero-based row of the held release, bound to its sidecar.
+#            CONSTRUCTED, not a survey id.
+#   2014-15, 2018-19  `unresolved_observation` -- unique without it (the
+#            plot_inputs EHCVM precedent); the sentinel does not assert that a
+#            row is one native observation.
+CROP_OBS_NA = 'unresolved_observation'
+
+
+def _crop_reported_observations(households, line):
+    """Recorded harvest-line numbers as ``reported:<n>`` tokens (2011-12).
+
+    Refuses a missing household or line number and a repeated
+    (household, line) pair rather than inventing an ordinal.
+    """
+    numeric = pd.to_numeric(line, errors='coerce')
+    if (pd.isna(households).any() or numeric.isna().any()
+            or not ((numeric > 0) & (numeric % 1 == 0)).all()):
+        raise ValueError('Niger crop observations require household and integer line number')
+    keys = pd.DataFrame({'i': np.asarray(households), 'line': numeric.to_numpy()})
+    if keys.duplicated().any():
+        raise ValueError('Niger crop observations repeat a native household/line number')
+    return 'reported:' + numeric.astype('Int64').astype('string')
+
+
+def _crop_row_observations(n_rows, source_path, *, script_path):
+    """Constructed ``row:<fingerprint>:<n>`` tokens for a source with no line id.
+
+    ``n`` is the zero-based row position in the file as read, BEFORE any
+    filter, so a token names one physical line of one held release.  The
+    fingerprint is ``local_tools.source_fingerprint`` of the same literal path
+    the script reads; a source without a DVC sidecar is refused.
+    """
+    from lsms_library.local_tools import source_fingerprint
+
+    path = Path(source_path)
+    if not path.is_absolute():
+        path = Path(script_path).resolve().parent / path
+    reference = source_fingerprint(path.resolve())
+    if not reference.startswith('dvc:'):
+        raise ValueError('Niger constructed crop observations require a declared sidecar')
+    return 'row:' + reference + ':' + pd.Series(np.arange(n_rows)).astype('string')
+
+
 def _finish_crop_production(df, t):
-    """Common tail: tag t, build the (t, i, plot, crop, u) index, coerce
-    numeric columns, and guarantee the full schema column set (including the
-    NA-bearing ``Unit_sold`` column, GH #824)."""
+    """Common tail: tag t, build the (t, i, plot_id, crop, u, production_obs)
+    index, coerce numeric columns, and guarantee the full schema column set
+    (including the NA-bearing ``Unit_sold`` column, GH #824).  A wave that
+    passes no ``production_obs`` gets :data:`CROP_OBS_NA`."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
     # harvest_month: only 2014-15 records it; NaN elsewhere (still carried
@@ -576,11 +637,14 @@ def _finish_crop_production(df, t):
     # row it touches was already being served, with a NaN key that the next
     # groupby would have deleted.
     df = fill_missing_u(df)
-    keep = ['t', 'i', 'plot_id', 'crop', 'u', 'Quantity',
+    if 'production_obs' not in df.columns:
+        df['production_obs'] = CROP_OBS_NA
+    df['production_obs'] = df['production_obs'].astype('string')
+    keep = ['t', 'i', 'plot_id', 'crop', 'u', 'production_obs', 'Quantity',
             'Quantity_sold', 'Value_sold', 'Unit_sold', 'harvest_month',
             'intercropped']
     df = df[[c for c in keep if c in df.columns]]
-    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u'])
+    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'production_obs'])
     return df
 
 
