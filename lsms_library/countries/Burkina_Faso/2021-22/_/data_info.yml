@@ -136,7 +136,25 @@ individual_education:
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 cluster_features:
-    file: s00_me_bfa2021.dta
+    # BOTH COMPONENTS (GH #1276).  The panel cover (WB 6224, grappes 2-585) and
+    # the cross-section cover (WB 6277, Data/Cross_Section/, grappes 586-1185)
+    # carry the same s00q01 / s00q02 / s00q04.  Before this, only the panel
+    # cover was read, so the 600 cross-section grappes `sample()` serves had no
+    # cluster row and every `market=` lookup silently dropped their 7,176
+    # households (household_roster(market='Region') served 22,362 of 69,452
+    # 2021-22 rows).  The two grappe ranges are disjoint, and Region / District
+    # / Rural are constant within every grappe of both files (measured
+    # 2026-11-03), so the household -> (t, v) projection stays lossless.  `i` is
+    # projected away there, so no per-file `cs_i` override is needed.
+    #
+    # NOT MAPPED: the cross-section cover's GPS__Latitude / GPS__Longitude
+    # (« Coordonnées GPS du ménage »), populated for 7,128 of 7,176 households
+    # but HOUSEHOLD positions -- they differ within 578 of the 600 grappes -- so
+    # they are not a cluster attribute (the panel cover's are 0 of 3,227
+    # populated).  See _/CONTENTS.org and GH #1057.
+    file:
+        - s00_me_bfa2021.dta
+        - Cross_Section/s00_me_bfa2021.dta
     idxvars:
         i: menage
         v: grappe
