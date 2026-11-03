@@ -1534,7 +1534,40 @@ without printing source keys.  The Org edit invalidates all 24 Burkina
 table hashes; other countries and shared framework fingerprints are unchanged.
 The separate #1119 named-crop vocabulary mismatch is not changed here.
 
-* 2026-10-21 -- =plot_inputs= gift/donation fields served under purchase names (GH #1188)
+** 2026-11-03 -- WAITING code 21: the held 2018 questionnaire has no such code, and it occurs in vague 2 only (GH #1187)
+
+The two household questionnaire workbooks are now held
+(=2018-19/Documentation/Questionnaire/bfa_ehcvm1_qnr_household_excel_vague{1,2}.xls=,
+read through =get_data_file= into a private data root; the venv has no
+=xlrd=, so they were parsed with the cluster module Python 3.10's =xlrd 2.0.1=).
+Sheet =S16b_Agri=, column (16B.01) « Type d'intrants », lists codes 1-20 in
+BOTH vagues, ending at 20 « Autres semences »; *there is no code 21 in either
+workbook*.  So the instrument the repo holds is silent on code 21 -- a C4
+check that finds nothing, not one that settles the meaning.  The nomenclature
+PDFs (=bfa_ehcvm1_nomenclature_vague{1,2}.pdf=) are still not held.
+
+Measured on =s16b_me_bfa2018.dta=:
+- *All 602 code-21 rows are vague 2* (0 in vague 1), against 11,425 / 11,452
+  applied rows per vague; 2,251 / 2,258 households.  So 21 is a slot the
+  vague-2 CAPI added, not part of the printed list.
+- When it appears, code 20 « Autres semences » falls from 649 rows (vague 1)
+  to 234 (vague 2); 105 households report both 20 and 21 in vague 2.
+- 591 of the 602 are in unit code 2 (Kilogramme).
+- Cross-check against =s16c= (harvest): *593 of the 602 code-21 households
+  (98.5%) harvested Arachide*, against 637 of 2,258 (28%) vague-2 input
+  households, 113 of 234 (48%) vague-2 code-20 households and 490 of 649
+  (75%) vague-1 code-20 households.
+
+That is strong *data* evidence that vague-2 code 21 is groundnut seed (EHCVM-2
+2021 adds « Semences d'arachide » as its own code 19), and that vague 1 records
+the same seed under 20 « Autres semences ».  It is inference, not a source
+binding, so nothing is changed: =harmonize_input= keeps 21 -> =Seed= (which
+this evidence supports) and =harmonize_seed_crop= keeps the source-qualified
+=Unknown [Burkina_Faso 2018-19 s16bq01=21]=.  Naming the crop =Arachide= on
+this evidence is a decision for #1187.  A cross-vague comparison of seed by
+crop is affected either way: vague 1's groundnut seed sits in « Autres
+semences ».
+
 
 Independent review of the identity repair at =3848778d0e8676c798883c11ea3e33fc88e8a591=
 found a separate source-binding contradiction in =2018-19/_/plot_inputs.py=.
