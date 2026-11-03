@@ -5181,6 +5181,16 @@ are complete; native diagnostics do not measure raw eligible loss or exercise an
 anonymous-source negative boundary. Known-HH missing village/plot is distinct.
 #1120 is closed for its approved scope; this checkpoint does not extend it.
 
+*Both #1401 rules are inert on the shipped files (raw GSEC6 modules,
+2026-11-03).*  Reported zero-month ages exist -- 43 (2010-11), 26 (2011-12)
+and 43 (2013-14) rows, plus a 999 in 2010-11 -- but every one is on a row with
+no Weight and no Height, which the measure filter drops whatever the age mask
+does; the 8,468 measured rows that carry an in-module age (2009-10 .. 2015-16)
+have ages 2-60 months, with one missing (2009-10).  No wave has a repeated
+=(hhid, pid)= in its raw module, so the most-complete-row selection never
+chooses (0 duplicate keys over 29,553 measured rows).  The served table is
+therefore the same under any zero-age or tie rule; the choice is prospective.
+
 Predata proof installed but did not invoke the payload-dependent original-class
 sample factory; original/provider/restored registry/country/all-eight hashes agree.
 Each admitted genuine-instance hash was checked before target entry. All nine API
