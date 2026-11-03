@@ -321,7 +321,17 @@ housing:
                 Autre: Other
 
 interview_date:
-    file: s00_me_bfa2021.dta
+    # BOTH COMPONENTS (GH #1276): the panel cover and the cross-section cover
+    # (Data/Cross_Section/, WB 6277) ask the same s00q23-25 visit timestamps.
+    # The cross-section households get their `CS_` id through the same
+    # per-file override as `sample` and `household_roster`.
+    file:
+        - s00_me_bfa2021.dta
+        - Cross_Section/s00_me_bfa2021.dta:
+            i:
+                - grappe
+                - menage
+                - mapping: cs_i
     idxvars:
         i:
             - grappe

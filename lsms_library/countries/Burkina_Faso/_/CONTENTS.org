@@ -2044,6 +2044,29 @@ Independent review SHA256:
 =8fafa48f93b2776bc69904d843b58daa359e57469ea0184d7358e8e21a47ff85=.
 This documentation changes no build input or scientific definition.
 
+* 2026-11-03 -- 2021-22 =interview_date= reads the cross-section cover too (GH #1276)
+
+=interview_date= read only the panel cover, so the 7,176 cross-section
+households =sample()= serves had no interview date.  The held
+=Cross_Section/s00_me_bfa2021.dta= asks the same per-visit timestamps
+(=s00q23a/b=, =s00q24a/b=, =s00q25a/b=), so the wave now reads both covers,
+the cross-section entry through the same =cs_i= per-file override as
+=sample= and =household_roster= (ids =CS_= + grappe + menage.zfill(3)).
+
+Measured, warm shared cache at =3a33f2869= (before) and a cold private data
+root (after): 2021-22 rows 9,681 -> 31,206; households 3,227 -> 10,403
+(7,176 =CS_=); every 2021-22 =sample()= household now has a date; 0 NaT
+starts in either component.  The cross-section has 7,173 visit-3 rows, not
+7,176: =melt_visit_intervals= drops a visit whose start and end are both
+missing, and three cross-section households have both visit-3 stamps
+blank (empty strings in the source).  The 30,709 pre-existing
+rows (2018-19 and the panel) are value- and dtype-equal to the warm parquet.
+No date is parsed differently; nothing is imputed.
+
+Cache: the wave =data_info.yml= is a build input -- all 24 Burkina country
+hashes and the 24 2021-22 wave hashes move.  Pinned by
+=tests/test_burkina_faso_cs_interview_date.py=.
+
 * 2026-10-30 -- PRICE versus FOCUS instruments and native quote identity (GH #1226)
 
 The held 2018-19 =s05_co_bfa2018.dta= has seven fields and two explicitly
