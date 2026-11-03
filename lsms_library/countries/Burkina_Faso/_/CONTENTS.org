@@ -2045,7 +2045,8 @@ own nationally scaled weights; pooled estimates still need that distinction.
 Current scope is deliberately partial: only three Cross_Section sidecars and
 the sample/roster bindings are recovered. Other 2021 tables still serve the
 panel component only, including =cluster_features=; CS region/market lookup
-coverage is not established here. The panel sidecars remain at their public
+coverage is not established here. (/=cluster_features= and =interview_date= now read
+both covers -- see the two 2026-11-03 sections at the end of this file./) The panel sidecars remain at their public
 flat =Data/= paths. Full Panel relocation, acquisition routing, other module
 wiring and complete held-release receipts remain #1276 integration work.
 =SOURCE.org= records partial declarations without claiming a secondary held
@@ -2274,3 +2275,86 @@ keyword) consumed no target invocation and remain attributed. No data or tests
 were replayed for this documentation. WAITING #1148, namespace/component
 science and the wider #1287/#1288 scope remain separate. Exact receipts:
 =slurm_logs/isa_recovery_2026-10-29/Burkina_Faso/1287-plot-runtime-receipt-v1/REPORT.md=.
+
+* 2026-11-03 -- 2021-22 =cluster_features= reads the cross-section cover too (GH #1276)
+
+*What was wrong.*  =sample()= and =household_roster()= serve both 2021-22
+components (#1322), but =cluster_features= read only the panel cover, so the
+600 cross-section grappes (586-1185) had no cluster row.  Burkina's =sample()=
+carries no =Region=, so =_add_market_index= falls back to =cluster_features=,
+and a household with no market label is dropped from a =market== frame
+without a warning.  Measured on the warm cache at development =3a33f2869=:
+=household_roster(market='Region')= served 22,362 of 69,452 2021-22 rows
+(every one of the 47,090 cross-section persons gone) and
+=sample(market='Region')= 3,227 of 10,403 households.
+
+*Fix.*  =2021-22/_/data_info.yml= =cluster_features= reads
+=[s00_me_bfa2021.dta, Cross_Section/s00_me_bfa2021.dta]= with the same
+=s00q01= / =s00q02= / =s00q04= columns.  No per-file =cs_i= override: =i= is
+projected away at the =(t, v)= collapse, and the grappe ranges are disjoint.
+Measured on the held cross-section cover (7,176 rows, 600 grappes, unique on
+=(grappe, menage)=): Region, District and Rural are constant within every
+grappe, as they are in the panel cover, so the projection is lossless and
+emits no grain report.  Region spells =Boucle du Mouhoum= as the panel cover
+does; the existing =Region= / =District= tables absorb every cross-section
+spelling (pooled District stays 45, Region 13).
+
+*After* (cold build, private data root):
+
+|                                         | before (warm) | after (cold) |
+|-----------------------------------------+---------------+--------------|
+| =cluster_features= 2021-22 rows          |           550 |        1,150 |
+| 2021-22 =sample().v= with no cluster row |           600 |            0 |
+| =sample(market='Region')= 2021-22 hh     |         3,227 |       10,403 |
+| =household_roster(market='Region')= 2021-22 rows | 22,362 |     69,452 |
+
+The 2,035 pre-existing rows (all of 2014 and 2018-19, and the 550 panel
+grappes) are value- and dtype-equal to the shared warm parquet; 2014's grain
+report (1,034 of 10,800 rows, 94 zd, GH #1060) is unchanged.  Latitude and
+Longitude stay NaN for all 1,150 2021-22 grappes.
+
+*New idiosyncrasy: the cross-section cover carries HOUSEHOLD GPS.*
+=Cross_Section/s00_me_bfa2021.dta= =GPS__Latitude= / =GPS__Longitude= are
+populated for 7,128 of 7,176 households (the panel cover: 0 of 3,227), and
+they differ within 578 of the 600 grappes (median 6 distinct positions per
+grappe; within-grappe latitude range median ~0.8 km, max ~190 km).  They are
+household positions, so they are NOT mapped into =cluster_features=: the
+=(t, v)= projection would select one household's point and call it the
+cluster's.  Serving a cluster location from them (a centroid, say) would be a
+registered derivation and a decision; it bears on GH #1057.
+
+*Population record.*  =population.yml='s 2021-22 =survey= / =notes= now name
+=cluster_features= and =interview_date= beside =sample= and =household_roster=
+(edited in =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org= and regenerated
+with =scripts/promote_population_records.py=; no tag, source type or
+confidence changed, and =.yml= is not a build input, so no hash moves).
+Other 2021 tables whose cross-section source is not held (=s07b= food, =s11=
+housing, =s12= assets, =s14b= shocks, =s08a=, =s20a=, individu, =s16*=) still
+serve the panel only.
+
+Cache: the wave =data_info.yml= is a build input -- all 24 Burkina country
+hashes and the 24 2021-22 wave hashes move; 2014 / 2018-19 wave hashes do not.
+Pinned by =tests/test_burkina_faso_cs_cluster_features.py=.
+
+* 2026-11-03 -- 2021-22 =interview_date= reads the cross-section cover too (GH #1276)
+
+=interview_date= read only the panel cover, so the 7,176 cross-section
+households =sample()= serves had no interview date.  The held
+=Cross_Section/s00_me_bfa2021.dta= asks the same per-visit timestamps
+(=s00q23a/b=, =s00q24a/b=, =s00q25a/b=), so the wave now reads both covers,
+the cross-section entry through the same =cs_i= per-file override as
+=sample= and =household_roster= (ids =CS_= + grappe + menage.zfill(3)).
+
+Measured, warm shared cache at =3a33f2869= (before) and a cold private data
+root (after): 2021-22 rows 9,681 -> 31,206; households 3,227 -> 10,403
+(7,176 =CS_=); every 2021-22 =sample()= household now has a date; 0 NaT
+starts in either component.  The cross-section has 7,173 visit-3 rows, not
+7,176: =melt_visit_intervals= drops a visit whose start and end are both
+missing, and three cross-section households have both visit-3 stamps
+blank (empty strings in the source).  The 30,709 pre-existing
+rows (2018-19 and the panel) are value- and dtype-equal to the warm parquet.
+No date is parsed differently; nothing is imputed.
+
+Cache: the wave =data_info.yml= is a build input -- all 24 Burkina country
+hashes and the 24 2021-22 wave hashes move.  Pinned by
+=tests/test_burkina_faso_cs_interview_date.py=.
