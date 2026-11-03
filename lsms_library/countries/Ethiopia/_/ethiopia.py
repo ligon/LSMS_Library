@@ -2768,7 +2768,15 @@ def plot_inputs_for_wave(t, plot_roster, planting, seeds, colmap, labels=None):
             ps = seeds.copy()
             p_holder = ps[c['p_holder_id']].apply(format_id)
             p_code = pd.to_numeric(ps[c['p_crop_code']], errors='coerce').astype('Int64')
-            purch = _yesno_bool(ps[c['p_purch_flag']])
+            # GH #1183 (@ligon ruling, 2026-11-03): a MISSING Q3 answer stays
+            # missing.  ``_yesno_bool`` maps a <NA> code to False (Series.mask
+            # treats a <NA> condition as masking); the missing-preserving
+            # ``_yesno_bool_col`` keeps it <NA>.  1 = Yes / 2 = No.  The
+            # explicit check keeps a KeyError for a mis-named colmap (the
+            # helper would otherwise return an all-<NA> column).
+            if c['p_purch_flag'] not in ps.columns:
+                raise KeyError(c['p_purch_flag'])
+            purch = _yesno_bool_col(ps, c['p_purch_flag'], yes=1, no=2)
             if c.get('p_purch_qty') and c['p_purch_qty'] in ps.columns:
                 pqty = pd.to_numeric(ps[c['p_purch_qty']], errors='coerce').astype('Float64')
             elif c.get('p_purch_a') and c['p_purch_a'] in ps.columns:
@@ -2781,7 +2789,9 @@ def plot_inputs_for_wave(t, plot_roster, planting, seeds, colmap, labels=None):
             else:
                 pqty = pd.Series(pd.NA, index=ps.index, dtype='Float64')
             # purchased flag No -> 0 purchased quantity (mirrors the .do).
-            pqty = pqty.mask(purch == False, 0.0)
+            # Only an EXPLICIT No: ``fillna(False)`` keeps a missing answer
+            # from being masked to a fabricated zero (GH #1183).
+            pqty = pqty.mask((purch == False).fillna(False), 0.0)
 
             if c.get('p_field_id') and c['p_field_id'] in ps.columns:
                 # W1: §5 carries field_id -> direct plot-crop join.
