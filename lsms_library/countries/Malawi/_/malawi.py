@@ -3727,7 +3727,10 @@ def _livestock_block(df, *, hhid, animalcode, owned_flag='ag_r01',
     second STOCK, never a fallback for HeadCount and never differenced into
     a flow.  It does not enter the keep-filter: measured 2026-11-03, no
     source row in any wave or half has ag_r07 > 0 without already meeting it
-    (the question is asked only of species the household holds).
+    (ag_r07 follows the ag_r01 gate -- IHS3 "During the last 12 months,
+    have you or any member of your HH raised or owned any [LIVESTOCK]",
+    IHS5 "Did you own [LIVESTOCK]?" -- and is answered only on rows the
+    filter keeps, kept rows holding 0 now included).
     """
     species_map = _malawi_code_map('harmonize_species')
     code = pd.to_numeric(df[animalcode], errors='coerce').astype('Int64')

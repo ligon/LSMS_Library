@@ -1884,8 +1884,9 @@ alive in the last 12 months, =ag_r16=), =ValuePerAnimal= (REPORTED per-head
 current value, =ag_r04= -- "if you sold one today, how much would you
 receive?"; this line called the column =Value= until 2026-10-23, but the
 build, =data_scheme.yml= and =data_info.yml= all name it =ValuePerAnimal=,
-and it is NOT a herd value -- GH #637 tail).  One reported row per
-(household, species owned).
+and it is NOT a herd value -- GH #637 tail), =HeadCount12MonthsAgo= (head
+owned exactly 12 months ago, =ag_r07= -- a second stock, not a flow; GH
+#855, 2026-11-03).  One reported row per (household, species owned).
 
 Source: Module R livestock roster (=ag_mod_r1_{10,13,16,19}.dta=) -- the
 SAME file the World Bank cleaning code reads then *collapses to a single
