@@ -1,31 +1,28 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current -- 2026-11-03, Sue / Claude Opus 5.5, job 40825266 (n0035.savio4)
+* Current -- 2026-11-03 (evening), Sue / Claude Opus 5.5, job 40825266 (n0035.savio4)
 
-Fresh restart of the ISA backlog sweep, at the user's direction: the plain
-skill loop (fix -> test -> red-team -> PR), *without* the previous campaign's
-custody/release/manifest bookkeeping, which nearly stalled it.  Read this
-section and the tracker; everything below it is historical.
+Plain loop (reconcile -> fix -> test -> red-team -> PR), per the user; no custody/manifest
+bookkeeping.  Process is written up in PR #1423 (=.claude/skills/backlog-workflow/savio-sweep.md=
++ =sweep/= scripts) -- left OPEN for the user to read.  Live state: TRACKER.org and DECISIONS.org in
+/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/.
 
-- Base: GitHub development 3a33f2869 (2026-11-01, #1409).  Mirror development
-  was fast-forwarded to it.  No open PRs at start; 146 open issues, ~55 ISA.
-- Workers: eight in-process Claude subagents, one per ISA country, in worktrees
-  /local/job40825266/worktrees/<C> on branches isa/<c>-20261103 (published to the
-  mirror on commit).  Briefs, reports and burst logs under
-  /global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/ -- see TRACKER.org there.
-  Heavy builds go to separate Slurm jobs via submit.sh/burst.sh in that directory.
-- =sucoder dispatch= was tried first and is PARKED: after four setup fixes the
-  supervisor still refuses ("cannot inspect owned child file descriptors",
-  errno 13 -- the same refusal as the 2026-10-28 bulletin).  Failure table and a
-  running diagnostic are in TRACKER.org.
-- Coordinator integrates: fetch results.git, red-team (fresh reviewer), cherry-pick
-  onto fix/<n>-<country>-<slug>-20261103 from development, push to GitHub
-  (remote =github=, HTTPS via gh credential helper; SSH port 22 is blocked), open PR.
-  Merges are the human's unless they re-authorize.
-- Parked: #1287 runtime-checkpoint lane; acquisitions ruled "acquire" 10-23
-  (#816, #1275, #1276, #449) need WB key + S3 write, so not in dispatch workers.
-- Next: collect round-1 REPORTs, red-team fixes, open PRs, send decision memos
-  to the human as one digest.
+- Merge authority: user said "merge the reviewed PRs to development on green"; applied to every
+  PR from this sweep that passed independent review (or, for small ruled changes, a coordinator
+  diff read + cold test re-run).  Merge commits pinned to head; no squash/rebase/force.
+- Merged today (development now 55b558ef2; mirror synced): #1410-#1422, #1424-#1430.
+  Fixes: ETH #1056, BF #1276 #1187, NGA #844 #1261 #881, NER #1360 #882 #1090, MWI #855 #1190/#1174
+  #1074/#1075, ETH #1183, TZA #637, framework market-label keep-and-warn (#1424).
+- HELD: #1431 Burkina #864 (double-entry pattern C04/C05 needs the user's call: a merge as ruled /
+  b collapse exact matches / c hold).  #1423 runbook (user to read).
+- Waiting on user: B-list decisions one at a time; B1 = #1224 (EHCVM unit size) presented.
+- Issues: closed 16 today (resolved or ruled), narrowed 6, filed 13 new (#1432-#1444).
+- Agents: eight in-process country agents (context large; resume by SendMessage); round-2
+  worktrees /local/job40825266/worktrees/<C>-r2 from 7c2b5ed01.  Framework lane agent idle.
+- sucoder dispatch: blocked by installed version predating sucoder #79 fix (zombie fd race);
+  upgrade or run from upstream main -- user's call (other sessions share the install).
+- Next: user's B rulings -> country/framework agents; acquisitions lane (#816 #1275 #1276 #449)
+  only if user says start; market-label work list #1441.
 
 * Historical -- everything below predates 2026-11-03 and is superseded
 
