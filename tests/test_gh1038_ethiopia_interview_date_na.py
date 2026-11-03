@@ -15,6 +15,13 @@ missing.  Mapping it to null also lets the grain collapse of 2021-22's
 holder-grain cover pick a *dated* holder row over a placeholder one: household
 ``060105088801701096`` was served nothing before and is now dated
 2022-04-18 14:27:53.
+
+GH #1056 moved both waves onto the GH #1045 build-time parser: the
+placeholder is now a declared ``sentinels:`` entry (still served NaT, now
+counted), and a cited fieldwork ``window:`` COUNTS -- and keeps -- the
+device-clock dates years outside fieldwork (W4 15 rows, W5 18 holder rows),
+which used to be served with nothing anywhere noticing them.  Served values
+are unchanged.
 """
 from __future__ import annotations
 
@@ -24,11 +31,22 @@ import pandas as pd
 import pytest
 
 from lsms_library.country import DatetimeCoercionWarning, _coerce_datetime_column
+from lsms_library.datetime_parse import (DatetimeParseWarning,
+                                         apply_datetime_specs, datetime_reports)
 from lsms_library.local_tools import df_data_grabber
 
 PLACEHOLDER = '##N/A##'
 WAVES = {'2018-19': ('sect_cover_hh_w4.dta', 'InterviewStart'),
          '2021-22': ('sect_cover_ph_w5.dta', 'InterviewDate')}
+# GH #1056: the DDI's fieldwork months for the event each wave dates (W4
+# household questionnaire Jun-Aug 2019; W5 post-harvest Apr-Jun 2022), widened
+# by one month each side.  Pinned: a change to the window changes the count.
+WINDOWS = {'2018-19': ('2019-05-01', '2019-09-30'),
+           '2021-22': ('2022-03-01', '2022-07-31')}
+IN_WINDOW = {'2018-19': '2019-06-19T09:15:28', '2021-22': '2022-04-18T14:27:53'}
+# Measured at development 3a33f2869 (cold private root), per wave report:
+# (n, parsed, sentinel, outside_window).
+REPORTS = {'2018-19': (6770, 6762, 8, 15), '2021-22': (1596, 1484, 112, 18)}
 
 
 def _record(fn, *args, **kwargs):
@@ -48,28 +66,55 @@ def ethiopia():
 # --- config tier: no data needed ---------------------------------------------
 
 @pytest.mark.parametrize('wave', sorted(WAVES))
-def test_wave_config_maps_the_placeholder_to_null(ethiopia, wave):
+def test_wave_config_declares_the_placeholder_a_sentinel(ethiopia, wave):
     fn, col = WAVES[wave]
     info = ethiopia[wave].resources['interview_date']
     assert info['file'] == fn
-    mapping = ethiopia[wave].column_mapping('interview_date', info)[fn]
-    assert mapping['myvars']['int_t'] == ([col], {PLACEHOLDER: None})
+    spec = info['myvars']['int_t']
+    assert spec['datetime'] == col
+    assert spec['calendar'] == 'gregorian'
+    assert spec['format'] == '%Y-%m-%dT%H:%M:%S'
+    assert spec['sentinels'] == [PLACEHOLDER]
+    # GH #1056: a fieldwork window, so device-clock dates are counted.
+    assert [pd.Timestamp(x) for x in spec['window']] == \
+        [pd.Timestamp(x) for x in WINDOWS[wave]]
+    # No resolution: the served value keeps its time of day, as before.
+    assert 'resolution' not in spec
+    mapping = ethiopia[wave].column_mapping('interview_date', info)
+    assert mapping['datetime_specs'] == {'int_t': spec}
 
 
 @pytest.mark.parametrize('wave', sorted(WAVES))
-def test_wired_mapping_reaches_the_cast_without_a_placeholder(ethiopia, wave,
-                                                             tmp_path):
-    """Run the wave's own resolved mapping through ``df_data_grabber`` on a
-    synthetic cover file, then through the declared-datetime cast."""
+def test_wired_spec_parses_without_a_placeholder_and_counts_the_window(
+        ethiopia, wave, tmp_path):
+    """Run the wave's own resolved mapping through ``df_data_grabber`` and the
+    build-time parser on a synthetic cover file: the placeholder is NaT (a
+    counted sentinel), an in-window date parses, and a 2014 device-clock date
+    is counted ``outside_window`` and KEPT (GH #1056)."""
     fn, col = WAVES[wave]
     info = ethiopia[wave].resources['interview_date']
-    mapping = ethiopia[wave].column_mapping('interview_date', info)[fn]
+    mapping = ethiopia[wave].column_mapping('interview_date', info)
     src = tmp_path / 'cover.csv'
     pd.DataFrame({'household_id': ['a', 'b', 'c'],
-                  col: ['2019-06-19T09:15:28', PLACEHOLDER,
-                        '2019-06-18T15:20:10']}).to_csv(src, index=False)
-    df = df_data_grabber(src, mapping['idxvars'], **mapping['myvars'])
+                  col: [IN_WINDOW[wave], PLACEHOLDER,
+                        '2014-01-02T10:04:03']}).to_csv(src, index=False)
+    fm = mapping[fn]
+    df = df_data_grabber(src, fm['idxvars'], **fm['myvars'])
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        df = apply_datetime_specs(df, mapping['datetime_specs'],
+                                  country='Ethiopia-test-1056',
+                                  table='interview_date', wave=wave)
+    assert str(df['int_t'].dtype) == 'datetime64[us]'
+    assert df.loc['a', 'int_t'] == pd.Timestamp(IN_WINDOW[wave])
     assert pd.isna(df.loc['b', 'int_t'])
+    assert df.loc['c', 'int_t'] == pd.Timestamp('2014-01-02 10:04:03')
+    (rep,) = [r for r in datetime_reports('Ethiopia-test-1056', 'interview_date')
+              if r['wave'] == wave]
+    assert (rep['parsed'], rep['sentinel'], rep['outside_window'],
+            rep['unparsed']) == (2, 1, 1, 0)
+    assert any(isinstance(x.message, DatetimeParseWarning) for x in w)
+    # The read-time cast has nothing left to coerce.
     out, warned = _record(_coerce_datetime_column, df['int_t'],
                           country='Ethiopia', table='interview_date',
                           column='Int_t')
@@ -91,6 +136,22 @@ def test_warm_interview_date_has_no_placeholder(ethiopia):
         {'2018-19': 6762, '2021-22': 1475}
     recovered = df.xs(('060105088801701096', '2021-22'), level=['i', 't'])
     assert list(recovered['Int_t']) == [pd.Timestamp('2022-04-18 14:27:53')]
+
+    # GH #1056: the device-clock dates are served as recorded AND counted --
+    # by the build-time report (replayed from the parquet stamp when warm).
+    t = df.index.get_level_values('t')
+    for wave, (lo, hi) in WINDOWS.items():
+        x = df.loc[t == wave, 'Int_t']
+        served_out = int(((x < pd.Timestamp(lo)) |
+                          (x >= pd.Timestamp(hi) + pd.Timedelta(days=1))).sum())
+        assert served_out == REPORTS[wave][3], (wave, served_out)
+        assert int((x.dt.year == 2014).sum()) >= 13
+        reps = [r for r in datetime_reports('Ethiopia', 'interview_date')
+                if r['wave'] == wave]
+        assert reps, wave
+        rep = reps[-1]
+        assert (rep['n'], rep['parsed'], rep['sentinel'],
+                rep['outside_window']) == REPORTS[wave], (wave, rep)
 
     # The cache tiers hold pre-cast data: the string must not be there either.
     paths = [data_root() / 'Ethiopia' / 'var' / 'interview_date.parquet']
