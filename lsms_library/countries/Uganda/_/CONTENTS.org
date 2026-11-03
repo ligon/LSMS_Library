@@ -4784,6 +4784,16 @@ closure follows. #1357 continues to exclude genuinely anonymous households from
 household-keyed tables; it supplies no new ID and does not equate those records
 with known-key housing observations lacking a validated link.
 
+*The three keys are absent from every link the release ships (2026-11-03).*
+Every column whose name contains =hh= or =id= in all 119 2015-16 =.dta= files
+was searched for them.  They occur in three files, all in the =gsec1.hh=
+namespace and none beside an =HHID=: =gsec9.hhid= (housing), =GSEC16= (shocks:
+its one ID column is NAMED =HHID= but holds =hh= values -- 3,305 of its 3,428
+keys are =gsec1.hh= values, none is a =gsec1.HHID=) and =gsec15bb_3.hhid= (10
+rows, =DynID= missing on all).  They are among the 51 =GSEC16= keys in neither
+=gsec1.hh= nor =AGSEC1.hh=.  So no recorded link to a sample household exists
+in this release; closing them needs producer correspondence, not more search.
+
 * Seven-wave plot-input compiler runtime checkpoint (GH #1287, 2026-10-31)
 
 The unchanged =plot_inputs= country compiler ran through its actual Make target
