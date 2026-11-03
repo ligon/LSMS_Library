@@ -1051,6 +1051,33 @@ The residual few percent in 2009-10 / 2011-12 is not the home/away fold
 (GH #845: among differing rows only 0.2-0.8% have both legs populated) and
 has not been explained.
 
+*That residual, characterised (GH #845 item c, raw files, 2026-11-03).*  The
+1,461 (2009-10) and 1,357 (2011-12) differing purchased rows:
+
+- are not rounding: =|price - value/qty| <= 0.5= UGX on 0.4% of them; most
+  differ by 5-100%, symmetrically (median price / unit value 0.997 / 0.990,
+  price the larger on 49%);
+- carry ROUND prices: 98.2% / 98.7% are multiples of 50 UGX, against 63.0% /
+  74.7% of the same rows' unit values; every price in both waves is an integer;
+- are diffuse: 1,008 of 2,860 households and 286 of 318 EAs (2009-10), 885 of
+  2,771 and 295 of 320 (2011-12); the top items are staples bought in small lots
+  (salt, maize flour, sugar, cooking oil);
+- over-represent fractional quantities (non-integer on 51% / 40%, against 21% /
+  16% of all priced rows).  In 2009-10, 408 of them record a quantity that is
+  not a multiple of 0.25 (0.9% of agreeing rows do), and for 70% of those
+  =value / price= is such a multiple: consistent with a quantity edited after
+  the price was set, for at most about a fifth of that wave's residual.
+
+Ruled out: the all-source unit value over all four legs (0.1% / 0.0% match);
+2011-12 =h15bq15 / h15bq14= (total consumption value / quantity, 0.0%); value
+over the rounded, floored or ceiled quantity (at most 15%); the median unit
+value of the same EA, item and unit (7% / 10%; 35% / 22% equal SOME other
+household's unit value there); the unit code (4-7% differing in every unit with
+200+ rows).  The mechanism is still unknown, and why these two waves run at ~5%
+against 1-2% elsewhere is not explained by their fractional-quantity share
+(similar in every wave).  Read the residual as a mixture of keying edits and,
+possibly, a minority of recorded round prices; not as an independent source.
+
 *How to use it.*  Treat =unitprice= as a copy of =unitvalue= for Uganda.
 Where the two DO differ, the difference is the interesting thing (a keying
 slip in one of three fields), not a second opinion on the price.
