@@ -12,7 +12,8 @@ Sources (flat Data/):
   * AG_MOD_G_13 -- seasonal plot-crop roster; plot ag_g00, crop ag_g0b,
     seed ag_g04a/ag_g04b.
   * AG_MOD_H_13 -- purchased seed (hh, crop): ag_h16a/b + ag_h19,
-    ag_h26a/b + ag_h29; crop ag_h0c.
+    ag_h26a/b + ag_h29; crop ag_h0c.  Seed received for free ag_h38a/b,
+    in its own columns (GH #1190).
 
 i = format_id(y2_hhid), aligning with plot_features / crop_production.
 See lsms_library/countries/Malawi/_/malawi.py.
@@ -25,8 +26,8 @@ import numpy as np
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
-                    _seed_block, _seed_purchase_block, assemble_plot_inputs,
-                    _seed_source_reference)
+                    _seed_block, _seed_purchase_block, _seed_gift_block,
+                    assemble_plot_inputs, _seed_source_reference)
 
 
 WAVE = '2013-14'
@@ -53,7 +54,7 @@ h['hhid'] = h['y2_hhid'].apply(format_id)
 fertilizer = _fertilizer_block(
     d, hhid='hhid', plotkey='plotkey',
     type1='ag_d39a', qty1='ag_d39d', unit1=None,
-    type2='ag_d39f', qty2='ag_d39i', unit2=None, t=WAVE)
+    type2='ag_d39f', qty2='ag_d39i', unit2=None, t=WAVE, gate='ag_d38')
 fertilizer['u'] = pd.Series('Kilogramme', index=fertilizer.index,
                             dtype='string')
 
@@ -75,8 +76,10 @@ seed_purchase = [
                          unit_cols=['ag_h16b', 'ag_h26b'],
                          value_cols=['ag_h19', 'ag_h29'], source_half='single'),
 ]
+seed_gift = [_seed_gift_block(h, hhid='hhid', cropcode='ag_h0c',
+                              source_half='single')]
 
-df = assemble_plot_inputs(WAVE, pieces, seed_purchase)
+df = assemble_plot_inputs(WAVE, pieces, seed_purchase, seed_gift)
 
 assert df.index.is_unique, f"Non-unique source-observation grain in plot_inputs {WAVE}"
 assert len(df) > 0, f"plot_inputs {WAVE} produced no rows"

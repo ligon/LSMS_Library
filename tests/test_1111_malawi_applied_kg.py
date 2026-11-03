@@ -40,9 +40,9 @@ def drive(monkeypatch):
             captures['blocks'].append((kwargs, result))
             return result
 
-        def capture_assembly(t, pieces, purchases):
+        def capture_assembly(t, pieces, *rest):
             captures['pieces'] = [p.copy(deep=True) for p in pieces]
-            return assemble(t, pieces, purchases)
+            return assemble(t, pieces, *rest)
 
         monkeypatch.setattr(malawi, '_fertilizer_block', capture_block)
         monkeypatch.setattr(malawi, 'assemble_plot_inputs', capture_assembly)
@@ -94,8 +94,13 @@ def drive(monkeypatch):
                 **ids, 'ag_h0b': [1], 'ag_h0c': [1], 'crop_code': [1],
                 'ag_h16a': [5.0], 'ag_h16b': [4], 'ag_h19': [10.0],
                 'ag_h26a': [pd.NA], 'ag_h26b': [pd.NA],
-                'ag_h29': [pd.NA], 'ag_h07a': [5.0], 'ag_h07b': [4],
-                'ag_h09': [10.0], 'ag_h38a': [pd.NA],
+                # IHS3 keeps the cross-sectional (ag_h07*) and panel
+                # (ag_h16*) blocks in one file on disjoint rows (ag_h05),
+                # so the 2010-11 synthetic row is a panel household.
+                'ag_h29': [pd.NA],
+                'ag_h07a': [pd.NA] if wave == '2010-11' else [5.0],
+                'ag_h07b': [4],
+                'ag_h09': [pd.NA], 'ag_h10': [10.0], 'ag_h38a': [pd.NA],
                 'ag_h38b': [pd.NA], 'ag_h40': [pd.NA],
             })
 
@@ -119,6 +124,10 @@ def drive(monkeypatch):
         monkeypatch.setattr(local_tools, '_dvc_working_directory',
                             lambda *args, **kwargs: contextlib.nullcontext())
         monkeypatch.setattr(local_tools, 'DVCFS', _DVCFS)
+        # Since #1351 the reader prefers the held L1 blob; report none so it
+        # takes the DVCFS fallback this mock serves.
+        monkeypatch.setattr(local_tools, '_dvc_cache_path',
+                            lambda *args, **kwargs: None)
         monkeypatch.setattr(pyreadstat, 'read_dta', read_dta)
         monkeypatch.setattr(local_tools, 'to_parquet',
                             lambda df, path: captures['writes'].append(df))

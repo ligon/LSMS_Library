@@ -44,7 +44,8 @@ def test_organic_use_keeps_missing_quantity_after_assembly(malawi, copies):
 
 
 @pytest.mark.parametrize('amounts, expected', [
-    ([pd.NA, pd.NA], 0.0),
+    # GH #1174: every amount missing is a missing amount, not 0.
+    ([pd.NA, pd.NA], pd.NA),
     ([0.0, pd.NA], 0.0),
     ([0.0, 0.0], 0.0),
     ([2.0, pd.NA, 3.0], 5.0),
@@ -88,7 +89,7 @@ def test_only_affirmative_organic_use_is_carried(malawi):
     assert organic['Applied'].tolist() == [True]
 
 
-def test_other_missing_input_records_keep_their_existing_payload(malawi):
+def test_other_missing_input_records_keep_missing_amounts(malawi):
     organic_source = pd.DataFrame({'hhid': ['1'], 'plotkey': ['p1'],
                                   'ag_d36': [1]})
     organic = malawi._organic_block(
@@ -106,7 +107,10 @@ def test_other_missing_input_records_keep_their_existing_payload(malawi):
     assert len(assembled) == 3
     assert assembled.index.is_unique
     other = assembled.index.get_level_values('input') != 'Organic Fertilizer'
-    assert assembled.loc[other, 'Quantity'].tolist() == [0.0, 3.0]
+    # GH #1174: the missing amount stays missing; with no ag_d38 gate passed
+    # the use answer is unknown (NA).
+    quantities = assembled.loc[other, 'Quantity']
+    assert pd.isna(quantities.iloc[0]) and quantities.iloc[1] == 3.0
     assert assembled.loc[other, 'Applied'].isna().all()
     assert assembled.loc[~other, 'Applied'].tolist() == [True]
     assert assembled.loc[~other, 'Quantity'].isna().all()

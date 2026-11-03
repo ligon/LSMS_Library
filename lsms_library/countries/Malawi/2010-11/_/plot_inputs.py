@@ -10,9 +10,13 @@ applied to a plot.  Sources (Full_Sample/Agriculture):
     crop_production's ag_g0b).
   * ag_mod_g -- seasonal plot-crop roster: seed planted ag_g04a/ag_g04b
     per (plot=ag_g0b, crop=ag_g0d).  No improved-seed flag in IHS3.
-  * ag_mod_h -- purchased seed (hh, crop): ag_h16a/b + ag_h19 (source 1),
-    ag_h26a/b + ag_h29 (source 2); crop=ag_h0b.  Attached to single-plot
-    seed rows only (no plot in the module).
+  * ag_mod_h -- purchased seed (hh, crop); crop=ag_h0b.  ONE file holds
+    two blocks split by ag_h05 ("IS THIS A CROSS-SECTIONAL HOUSEHOLD?"):
+    cross-sectional households answer ag_h07a/b with value ag_h10 (ag_h09
+    is the transport payment), panel households ag_h16a/b + ag_h19 and
+    ag_h26a/b + ag_h29; no row answers both (GH #1190).  Seed received for
+    free ag_h38a/b (gate ag_h37), in its own columns.  Attached to the single seed
+    observation of that crop only (no plot in the module).
 
 i = format_id(case_id), aligning with plot_features / crop_production.
 See lsms_library/countries/Malawi/_/malawi.py.
@@ -25,8 +29,9 @@ import numpy as np
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
-                    _seed_block, _seed_purchase_block, assemble_plot_inputs,
-                    drop_repeated_records, _seed_source_reference)
+                    _seed_block, _seed_purchase_block, _seed_gift_block,
+                    assemble_plot_inputs, drop_repeated_records,
+                    _seed_source_reference)
 
 
 WAVE = '2010-11'
@@ -59,7 +64,7 @@ h['hhid'] = h['case_id'].apply(format_id)
 fertilizer = _fertilizer_block(
     d, hhid='hhid', plotkey='plotkey',
     type1='ag_d39a', qty1='ag_d39d', unit1=None,
-    type2='ag_d39f', qty2='ag_d39i', unit2=None, t=WAVE)
+    type2='ag_d39f', qty2='ag_d39i', unit2=None, t=WAVE, gate='ag_d38')
 fertilizer['u'] = pd.Series('Kilogramme', index=fertilizer.index,
                             dtype='string')
 
@@ -76,13 +81,18 @@ pieces = [
 ]
 
 seed_purchase = [
+    # Cross-sectional block (ag_h05 = 1) and panel block (ag_h05 = 2) are
+    # disjoint rows of one file, so the per-row sum never mixes them.
     _seed_purchase_block(h, hhid='hhid', cropcode='ag_h0b',
-                         qty_cols=['ag_h16a', 'ag_h26a'],
-                         unit_cols=['ag_h16b', 'ag_h26b'],
-                         value_cols=['ag_h19', 'ag_h29'], source_half='Full_Sample'),
+                         qty_cols=['ag_h07a', 'ag_h16a', 'ag_h26a'],
+                         unit_cols=['ag_h07b', 'ag_h16b', 'ag_h26b'],
+                         value_cols=['ag_h10', 'ag_h19', 'ag_h29'],
+                         source_half='Full_Sample'),
 ]
+seed_gift = [_seed_gift_block(h, hhid='hhid', cropcode='ag_h0b',
+                              source_half='Full_Sample')]
 
-df = assemble_plot_inputs(WAVE, pieces, seed_purchase)
+df = assemble_plot_inputs(WAVE, pieces, seed_purchase, seed_gift)
 
 assert df.index.is_unique, f"Non-unique source-observation grain in plot_inputs {WAVE}"
 assert len(df) > 0, f"plot_inputs {WAVE} produced no rows"

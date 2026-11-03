@@ -4738,6 +4738,95 @@ current declaration facts, not whole-instrument absence findings. #1278, #1190,
 #1228 and #1174 remain separate. Evidence and precise source/publication pins:
 =slurm_logs/isa_recovery_2026-10-29/Malawi/1287-seven-runtime-receipt-v1/REPORT.md=.
 
+* 2026-11-03 -- plot_inputs: Module H purchase VALUE and free seed (GH #1190, binding half)
+
+*Idiosyncrasy: the two halves of IHS4/IHS5 Module H name the same questions
+differently.*  Cross_Sectional keeps the IHS4 names -- purchase =ag_h07a/b=,
+transport =ag_h09=, VALUE =ag_h10=, free seed =ag_h37= / =ag_h38a/b=, its
+transport =ag_h40= (labels read from the held 2016-17 and 2019-20 headers);
+Panel uses the harmonized =ag_h16*/ag_h19= + =ag_h26*/ag_h29=.  *IHS3
+(2010-11) holds BOTH blocks in ONE file*, split by =ag_h05= ("IS THIS A
+CROSS-SECTIONAL HOUSEHOLD?"): 4,791 value-backed =ag_h07a/ag_h10= rows are
+all =ag_h05= = 1 (112,357.25 native units, after the repeat-record drop);
+1,752 value-backed =ag_h16a/ag_h26a= rows are all =ag_h05= = 2; no row
+answers both.  2013-14 (IHPS) has only the panel block.  Every held Module H
+file, both halves of every wave, asks free seed as =ag_h38a/b= (gate
+=ag_h37=) on the seed unit dictionary (1 gram ... 8 50 kg bag, 9 OTHER
+(SPECIFY)).
+
+The Cross_Sectional drivers gated the purchase on =ag_h09= (transport) and
+added =ag_h38a= (free seed, gated on its transport =ag_h40=).  They now gate
+=ag_h07a= on =ag_h10=, as Panel and 2013-14 gate on =ag_h19/29=.  *The
+2010-11 driver had the same defect in another form* (red team, 2026-11-03):
+it read only the panel block, so no 2010-11 cross-sectional seed purchase
+was ever served.  It now reads =ag_h07a/b= + =ag_h10= beside =ag_h16/h19= and
+=ag_h26/h29=; the blocks are disjoint rows, so the per-row sum mixes nothing.
+Free seed is served in its own columns, =Quantity_received_as_gift= /
+=Unit_received_as_gift= (Burkina Faso's names), in all four waves, attached by
+the existing #1298 single-observation rule; a household-crop whose free seed
+carries two unit codes is not summed (2010-11 3, 2013-14 2 groups).
+
+Measured, private cold builds, base 3a33f2869 vs this change: rows 179,917 ->
+179,957 (+40 G seed observations with no planted amount, previously dropped as
+all-NA payload, now carrying a free-seed answer; 39 gift, 1 purchase).
+=Quantity_purchased= is unchanged in 2010-11, 2013-14 and both Panel halves;
+Cross_Sectional 2016-17 / 2019-20 gain 4,977 / 5,691 value-backed purchases and
+lose 92 / 94 (47 / 56 free-seed-only rows, which now carry the gift; 45 / 38
+with a transport payment but no purchase value); one 2016-17 row 5 -> 4 (1 was
+free).  =Purchased= rows 1,862 -> 6,748 and 2,369 -> 7,966.  Gift rows attached
+2,678 / 1,420 / 3,747 / 4,702.  Quantity, Improved, Applied unchanged.
+2010-11 (the follow-up): =Quantity_purchased= rows 1,445 -> 5,442, wave sum
+33,334.0 -> 125,468.05; one more seed observation with no planted amount is
+served (179,956 -> 179,957 after the #1174 change); no other wave moves.
+
+*Free seed recorded under "No".*  =Received_as_gift= carries =ag_h37= as
+answered, beside the free quantity it gates (NA on rows with no free
+quantity: a bare No is not attached, so the row universe does not grow).  Raw
+=ag_h38a= values under =ag_h37= = No: 2016-17 Panel 80 (all with a source in
+=ag_h39a=, so probably a mis-keyed Yes), 2010-11 1, 2013-14 2; under a blank
+=ag_h37=: 4.  Served on attached rows: False 49 (2010-11 1, 2016-17 48), NA 3
+(2010-11 2, 2016-17 1), True 12,495.  The quantities are served as recorded.
+
+Not changed (#1190's representation half, a decision): =Quantity_purchased= is
+still in the purchase unit, which is not recorded, while =u= is the planted
+unit; the two H components (Panel / earlier waves) are still summed without
+their units.  The third purchase source =ag_h36a= has no value column and is
+still unread.
+
+* 2026-11-03 -- plot_inputs: Module D use answers; a missing amount is not 0 (GH #1174, D half)
+
+Module D asks use before amount: =ag_d36= organic, =ag_d38= "Did you use any
+inorganic fertilizer on this [PLOT]?", =ag_d40= agrochemicals.  The non-organic
+reducer summed with =min_count=0=, so a (plot, type) whose every selected
+amount was blank was served =Quantity = 0=.  Now every Module D row carries its
+own use answer in =Applied= (fertilizer: True / False / NA exactly as
+=ag_d38= answers -- the gate does not filter rows; pesticide rows exist only
+under =ag_d40= Yes) and the reducer sums with =min_count=1=.
+
+*Idiosyncrasy: =ag_d38= and the type slots disagree on a few plots.*  Of the
+type-coded fertilizer slots, 20 / 5 / 24 / 0 (2010-11 .. 2019-20) answer
+=ag_d38= = No, and 13 / 3 / 0 / 0 have no answer.  Served as answered: 49
+rows carry =Applied = False= with a positive total kg.  Also 19 of the
+all-blank groups (2010-11 9, 2013-14 10) have a positive NATIVE quantity
+(=ag_d39b/g=) while the enumerator TOTAL KGs is blank; per #1111 the native
+pair is not substituted, so they are served NA.
+
+Measured (private cold builds, before = the #1190 commit):  rows 179,957 ->
+179,956 -- the one all-blank group with no =ag_d38= answer (2010-11, DAP) is
+now all-NA payload and is not served.  44 rows 0 -> NA (2010-11 13, 2013-14 15,
+2016-17 16; NPK 22, Urea 11, DAP 5, Herbicide 4, Insecticide 1, Fungicide 1),
+all =Applied= True.  The 38 recorded zeros stay 0.  =Applied= on Module D rows:
+True 67,489, False 49, NA 15 (was True only on the 11,075 organic rows).  No
+other column moves.  =nitrogen_kg= total unchanged (832,835.0 kg N); its rows
+37,100 -> 37,076 (plots whose only inorganic records had no amount were served
+0 kg N).
+
+*Seed half not changed.*  The issue's 390 Seed records predate #1323: G seed
+observations bypass the reducer since then, so none is summed to 0; one with
+no amount, unit or Improved answer is excluded at finalization as all-NA
+payload.  Whether a planted-crop roster line with no seed answer is "seed not
+used" or "amount unknown" is a separate question (residual).
+
 * 2026-11-03 -- livestock: the 12-months-ago stock ag_r07 (GH #855)
 
 =ag_r07= "How many [LIVESTOCK] did your household own exactly 12 months ago?"

@@ -284,7 +284,9 @@ Data Scheme:
     # by ag_d40; Module G (ag_mod_g) -- seed planted per plot-crop
     # (ag_g04a/b) with the improved-seed flag ag_g0f in IHS4/IHS5; Module H
     # (ag_mod_h) -- purchased seed (household-crop grain) attached to the
-    # single known observation of that native crop code and source half.
+    # single known observation of that native crop code and source half;
+    # seed received for free (H37/H38, every wave and half) attached by the
+    # same rule in its own columns with its own unit (GH #1190).
     # `input` is the shared harmonize_input Preferred Label
     # (NPK/DAP/CAN/Urea/D-Compound/Other fertilizer, Organic Fertilizer,
     # Insecticide/Herbicide/Fungicide/Fumigant/Other Pesticide, Seed).
@@ -298,8 +300,11 @@ Data Scheme:
     # several seed crops or a fertilizer in several units.  Reported item
     # columns only: Quantity, native u, Purchased (bool, True where a
     # purchased seed quantity is attached), Quantity_purchased, Improved
-    # (bool, seed rows).  Applied is the reported organic-use flag (ag_d36),
-    # True on organic rows and missing for other input types.
+    # (bool, seed rows).  Applied is Module D's own use answer (GH #1174):
+    # organic ag_d36 (rows exist only where Yes), inorganic fertilizer ag_d38
+    # (True / False as answered, NA where unanswered), agrochemical ag_d40
+    # (rows exist only where Yes); NA on seed rows.  A use with no recorded
+    # amount keeps Quantity NA, never 0.
     # Aggregates (seed_kg, nitrogen_kg,
     # household inorganic/organic/pesticide any-flags) are transformations, NOT
     # stored columns.  2004-05 (IHS2) deferred: household-level aggregated
@@ -310,6 +315,22 @@ Data Scheme:
     Quantity_purchased: float
     Improved: bool
     Applied:
+      type: bool
+      optional: true
+    # GH #1190: Module H seed received FOR FREE (ag_h38a/b), never a
+    # purchase.  Unit_received_as_gift is that answer's own unit on the
+    # seed dictionary (Unknown where no unit code is recorded); it implies
+    # no conversion to u.  Names follow Burkina Faso's plot_inputs.
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
+      optional: true
+    # ag_h37 "Did you receive any of the [SEED] for free?", carried as
+    # answered beside the free quantity it gates (rows with no free
+    # quantity carry NA), so a quantity recorded under a No is visible.
+    Received_as_gift:
       type: bool
       optional: true
     materialize: make

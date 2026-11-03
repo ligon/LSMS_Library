@@ -11,9 +11,12 @@ ag_d39a / enumerator-total kg ag_d39d; slot-2 type ag_d39g /
 enumerator-total kg ag_d39j. Native quantity/unit pairs b/c and h/i
 are separate from these selected totals; ag_d39e records timing.
 Module G: harmonized crop_code, seed ag_g04a/ag_g04b, improved flag
-ag_g0f (2 = improved).  Module H purchased seed naming differs by half:
-Cross_Sectional uses ag_h07*/ag_h09 + ag_h38*/ag_h40; Panel uses the
-harmonized ag_h16*/ag_h19 + ag_h26*/ag_h29.
+ag_g0f (2 = improved).  Module H naming differs by half (GH #1190):
+Cross_Sectional purchase is ag_h07a/b with value ag_h10 (ag_h09 is the
+TRANSPORT payment); Panel uses the harmonized ag_h16*/ag_h19 +
+ag_h26*/ag_h29.  Seed received for free is ag_h38a/b in both halves
+(ag_h40 is its transport payment) and is served in its own columns,
+never as a purchase.
 
 Neither IHS5 ag_mod_d ships with the latin-1 bad byte that the IHS4
 cross-section had, so a plain get_dataframe read suffices.
@@ -27,8 +30,8 @@ import numpy as np
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
-                    _seed_block, _seed_purchase_block, assemble_plot_inputs,
-                    _seed_source_reference)
+                    _seed_block, _seed_purchase_block, _seed_gift_block,
+                    assemble_plot_inputs, _seed_source_reference)
 
 
 WAVE = '2019-20'
@@ -53,7 +56,7 @@ def _half(d, g, h, hh_of, seed_qty, seed_unit, seed_value, source_ref, source_ha
     fertilizer = _fertilizer_block(
         d, hhid='hhid', plotkey='plotkey',
         type1='ag_d39a', qty1='ag_d39d', unit1=None,
-        type2='ag_d39g', qty2='ag_d39j', unit2=None, t=WAVE)
+        type2='ag_d39g', qty2='ag_d39j', unit2=None, t=WAVE, gate='ag_d38')
     fertilizer['u'] = pd.Series('Kilogramme', index=fertilizer.index,
                                 dtype='string')
     pieces = [
@@ -76,29 +79,32 @@ def _half(d, g, h, hh_of, seed_qty, seed_unit, seed_value, source_ref, source_ha
                              qty_cols=seed_qty, unit_cols=seed_unit,
                              value_cols=seed_value, source_half=source_half),
     ]
-    return pieces, seed_purchase
+    seed_gift = [_seed_gift_block(h, hhid='hhid', cropcode='crop_code',
+                                  source_half=source_half)]
+    return pieces, seed_purchase, seed_gift
 
 
-all_pieces, all_seed_purchase = [], []
+all_pieces, all_seed_purchase, all_seed_gift = [], [], []
 
 # --- Cross-sectional half (bare case_id) ---
 d_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_d.dta', convert_categoricals=False)
 g_xs = get_dataframe(G_XS_SOURCE, convert_categoricals=False)
 h_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_h.dta', convert_categoricals=False)
-p, s = _half(d_xs, g_xs, h_xs, lambda df: df['case_id'].apply(format_id),
-             seed_qty=['ag_h07a', 'ag_h38a'],
-             seed_unit=['ag_h07b', 'ag_h38b'],
-             seed_value=['ag_h09', 'ag_h40'],
+p, s, gft = _half(d_xs, g_xs, h_xs, lambda df: df['case_id'].apply(format_id),
+             seed_qty=['ag_h07a'],
+             seed_unit=['ag_h07b'],
+             seed_value=['ag_h10'],
              source_ref=_seed_source_reference(G_XS_SOURCE, script_path=__file__),
              source_half='Cross_Sectional')
 all_pieces += p
 all_seed_purchase += s
+all_seed_gift += gft
 
 # --- Panel half (y4_hhid) ---
 d_pn = get_dataframe('../Data/Panel/ag_mod_d_19.dta', convert_categoricals=False)
 g_pn = get_dataframe(G_PANEL_SOURCE, convert_categoricals=False)
 h_pn = get_dataframe('../Data/Panel/ag_mod_h_19.dta', convert_categoricals=False)
-p, s = _half(d_pn, g_pn, h_pn, lambda df: df['y4_hhid'].apply(format_id),
+p, s, gft = _half(d_pn, g_pn, h_pn, lambda df: df['y4_hhid'].apply(format_id),
              seed_qty=['ag_h16a', 'ag_h26a'],
              seed_unit=['ag_h16b', 'ag_h26b'],
              seed_value=['ag_h19', 'ag_h29'],
@@ -106,8 +112,9 @@ p, s = _half(d_pn, g_pn, h_pn, lambda df: df['y4_hhid'].apply(format_id),
              source_half='Panel')
 all_pieces += p
 all_seed_purchase += s
+all_seed_gift += gft
 
-df = assemble_plot_inputs(WAVE, all_pieces, all_seed_purchase)
+df = assemble_plot_inputs(WAVE, all_pieces, all_seed_purchase, all_seed_gift)
 
 assert df.index.is_unique, f"Non-unique source-observation grain in plot_inputs {WAVE}"
 assert len(df) > 0, f"plot_inputs {WAVE} produced no rows"
