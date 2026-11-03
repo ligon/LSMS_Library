@@ -125,6 +125,29 @@ does --- was rejected here because it fabricates a number no respondent
 reported and would silently move =food_expenditures=.  Worth revisiting as its
 own issue.
 
+**** DONE The window is on the row: a registered identity derivation (GH #881, 2026-11-03)
+
+Ruling @ligon 2026-11-03, option A.  Every =s='purchased'= row of both W4
+rounds carries =Derivation = Nigeria::food_acquired::w4-last-purchase-30d=
+(=_/derivations.yml=), stamped by =2018-19/_/mapping.py:
+stamp_w4_last_purchase_window= after =food_acquired_for_wave='s duplicate-key
+collapse.  The function is the IDENTITY: =Quantity= / =Expenditure= /
+=Quantity_kg= are q9a / q10 / q9a x q9_cvn exactly as before; what is
+registered is the 30-day most-recent-purchase window.  The =recall.yml=
+=within_wave_variation: by-s= record said this at wave grain and dies with
+=attrs=; the column survives concat, cache and =Feature()=.
+=Country('Nigeria').derivation_inputs(key)= returns the raw purchase block
+(q8, q9a/q9b/q9_cvn, q10) plus q5a / q2b / q2_cvn at the served
+=(t, i, j, u, s)= grain, so a user can re-derive a 7-day value.
+
+Option B (a constructed 7-day =Expenditure = q5a x q10/q9a=, the #876 EHCVM
+pattern) was declined.  Measured on the raw W4 CSVs for the record: q5a is
+in the consumption unit q2b and q9a in the purchase unit q9b, which differ
+on 9.5% (2018Q3) / 13.1% (2019Q1) of priced rows, so B is only defined
+through the q2_cvn / q9_cvn kg factors; kg-reconciled it totals 29.4M /
+23.6M Naira against 40.0M / 33.4M of q10 on the same rows (median row ratio
+1.0), and the unreconciled product 117.7M / 163.4M.
+
 *** Stray unit codes in the per-source unit columns
 
 Carrying each source's own unit exposes three junk values the consumption unit

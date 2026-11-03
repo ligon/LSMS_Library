@@ -254,3 +254,75 @@ Nigeria::food_acquired::w1-card-weight:
     Nigeria/_/CONTENTS.org, "W1 post-harvest units: the stated container
     weight serves a fraction of a container only" (GH #1035)
   since: '2026-10-19'
+
+# GH #881 (ruling @ligon 2026-11-03, option A).  An IDENTITY derivation: the
+# W4 purchased row's numbers are the survey's own and are served unchanged;
+# what is registered is the WINDOW they describe, so it is visible on the row
+# (CLAUDE.md "Derived Values": "a value served under a name implying a
+# different window -- the function is the identity and the registry is the
+# point"; the Ethiopia section-12 / permanent-crop precedents).
+Nigeria::food_acquired::w4-last-purchase-30d:
+  waves: ['2018-19']
+  columns: [Quantity, Expenditure, Quantity_kg]
+  rows: {t: ['2018Q3', '2019Q1'], s: purchased}
+  rule: >-
+    THE IDENTITY, on every W4 (2018Q3 post-planting, 2019Q1 post-harvest)
+    food_acquired row with s = 'purchased': Quantity = q9a, its unit u = q9b,
+    Quantity_kg = q9a x q9_cvn and Expenditure = q10, exactly as recorded.
+    What is derived is the WINDOW: W4 asks no 7-day purchase value.  Its
+    purchase block asks whether the household bought the item in the past
+    30 days (q8) and, if so, the quantity, unit and cost of the MOST RECENT
+    purchase (q9a / q9b / q10).  So this row is one purchase event within the
+    last 30 days, while the produced (q6a) and in-kind (q7a) rows beside it
+    -- and the purchased row of W1-W3 -- are 7-day consumption.  Quantity
+    summed across s is not a 7-day total for W4; Expenditure is not a 7-day
+    outlay.
+  function: lsms_library.countries.Nigeria.2018-19._.mapping:derive_w4_last_purchase_30d
+  inputs: lsms_library.countries.Nigeria.2018-19._.mapping:inputs_food_acquired_w4_last_purchase
+  raw_variables: [hhid, item_cd, s7bq8, s7bq9a, s7bq9b, s7bq9_cvn, s7bq10,
+                  s7bq5a, s7bq2b, s7bq2_cvn, s10bq8, s10bq9a, s10bq9b,
+                  s10bq9_cvn, s10bq10, s10bq5a, s10bq2b, s10bq2_cvn]
+  assumptions:
+    - text: >-
+        q9a / q9b / q10 describe the household's most recent purchase of the
+        item within the last 30 days (q8 "did the household purchase any
+        [ITEM] in the past 30 days?"), not purchases over the 7-day
+        consumption window that q2a and its decomposition q5a / q6a / q7a
+        cover.
+      basis: variable-label
+      evidence: >-
+        sect7b_plantingw4 / sect10b_harvestw4 Stata variable labels for q8,
+        q9a/q9b/q9_cvn and q10 (Nigeria/_/CONTENTS.org, "food_acquired
+        acquisition sources (GH #591)", table row q8-q10); the W4
+        questionnaire's renumbering is recorded in
+        2018-19/_/food_acquired.py.
+    - text: >-
+        the 30-day purchase is served as recorded and LABELLED, not
+        converted.  Pairing q10 with q9a is what makes Expenditure /
+        Quantity a real price (median survey / community unit-value ratio
+        0.95 on matched (t, j, u) cells, 2019Q1).  The alternative -- a
+        constructed 7-day Expenditure = q5a x (q10 / q9a), the #876 EHCVM
+        pattern -- was declined by ruling; it is reproducible from this
+        entry's inputs, but q5a is in the consumption unit q2b and q9a in
+        the purchase unit q9b, which differ on 9.5% (2018Q3) / 13.1%
+        (2019Q1) of priced rows, so it needs the q2_cvn / q9_cvn kg factors.
+      basis: modelling-choice
+      evidence: >-
+        GH #881, ruling @ligon 2026-11-03 (option A); measured 2026-11-03 on
+        the raw W4 CSVs: kg-reconciled option B would total 29.4M / 23.6M
+        Naira against 40.0M / 33.4M of q10 on the same rows (median ratio
+        1.0); the unreconciled product 117.7M / 163.4M.
+  validated_against: >-
+    Nothing is rescaled, so there is no target: the stamp is checked, not
+    calibrated.  On a private cold build (base 7c2b5ed01 vs this change) the
+    595,725-row food_acquired frame has identical index, Quantity,
+    Expenditure and Quantity_kg; Derivation carries this key on exactly the
+    W4 s = 'purchased' rows and nowhere else.  derivation_inputs joins 1:1 to
+    those rows and its q9a / q10 reproduce their Quantity / Expenditure.  The
+    recall record (recall.yml, within_wave_variation: by-s) says the same
+    thing at wave grain; this entry puts it on the row, where it survives
+    Feature().
+  contents: >-
+    Nigeria/_/CONTENTS.org, "Reference-period caveat -- W4 (2018Q3 / 2019Q1)
+    only" (GH #881)
+  since: '2026-11-03'
