@@ -82,6 +82,10 @@ from .datetime_parse import (
     replay_datetime_audit, spec_source_vars, wave_datetime_audit,
 )
 from .null_index_audit import check_index_levels
+# Site I's family, reused by _add_market_index for the `m` level it mints.
+from .null_index_audit import (NullIndexKeyError, NullIndexKeyWarning,
+                               _NULL_INDEX_LEDGER,
+                               _read_strict as _null_index_strict)
 from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
@@ -3365,7 +3369,8 @@ class Country:
                 ValuationLadderWarning, stacklevel=2)
         return geo
 
-    def _add_market_index(self, df: pd.DataFrame, column: str = 'Region') -> pd.DataFrame:
+    def _add_market_index(self, df: pd.DataFrame, column: str = 'Region',
+                          *, table: str | None = None) -> pd.DataFrame:
         """Join a market identifier ``m`` onto *df*, preferring the HH-level
         source.
 
@@ -3380,6 +3385,14 @@ class Country:
         ``cluster_features`` is retained as a fallback so countries whose
         ``sample()`` doesn't expose ``column`` still get a market label
         (via the historical cluster-level path).
+
+        A row that gets no label from either source is **kept, with ``m``
+        NA** -- the shape ``groupby(..., dropna=False)`` would give -- and
+        reported by :meth:`_report_unlabelled_markets`.  It used to be deleted
+        here with no signal (``dropna(subset=['m'])``): measured at
+        ``3a33f2869``, Albania 2012 ``sample(market='Region')`` lost 6,671
+        of 6,671 households and Tanzania ``market='District'`` every
+        household of 2008-09 and 2010-11.
 
         Returns *df* with ``m`` added and ``v`` removed from the index.
         """
@@ -3464,7 +3477,13 @@ class Country:
                 flat['m'] = flat['m'].fillna(flat['m_cluster'])
                 flat = flat.drop(columns=['m_cluster'])
 
-        flat = flat.dropna(subset=['m'])
+        # KEEP the rows no source could label (m stays NA) and say so.  This
+        # used to be ``flat.dropna(subset=['m'])`` -- a silent deletion on
+        # every market= call; see _report_unlabelled_markets.
+        unlabelled = flat['m'].isna()
+        if unlabelled.any():
+            self._report_unlabelled_markets(flat, unlabelled, column=column,
+                                            table=table)
 
         # Drop village/cluster index (v) since m supersedes it
         if 'v' in idx_names:
@@ -3487,6 +3506,75 @@ class Country:
         # double-walk the moment this grows a second input.
         result.attrs = dict(df.attrs)
         return result
+
+    def _report_unlabelled_markets(self, flat: pd.DataFrame,
+                                   unlabelled: pd.Series, *, column: str,
+                                   table: str | None) -> None:
+        """Report the rows ``_add_market_index`` kept with ``m`` NA.
+
+        Reuses Site I's family (``null_index_audit``, GH #847) rather than
+        minting a fourth lever: an NA ``m`` is a NaN key on an index level --
+        the level this call just minted -- and Site I cannot see it, because
+        it runs in ``_finalize_result`` *before* ``market=`` is applied.  So:
+        ``NullIndexKeyWarning`` by default, ``NullIndexKeyError`` under
+        ``LSMS_READ_STRICT``, and the report is filed in the Site I ledger
+        with ``site='market-index'``, read back through
+        ``null_index_reports(country=, table=)``.  One report per call; the
+        per-wave counts are rows and distinct ``(i, t)`` households.
+        """
+        t = flat.loc[unlabelled, 't'].astype(str)
+        rows_by_wave = {str(w): int(n) for w, n in t.value_counts().sort_index().items()}
+        hh_by_wave = None
+        if 'i' in flat.columns:
+            hh = flat.loc[unlabelled, ['i']].assign(t=t).drop_duplicates()
+            hh_by_wave = {str(w): int(n)
+                          for w, n in hh['t'].value_counts().sort_index().items()}
+        n_rows = int(unlabelled.sum())
+        tname = table or '?'
+        report = {
+            'site': 'market-index',
+            'country': self.name,
+            'table': tname,
+            'column': column,
+            'rows': int(len(flat)),
+            'findings': [{'level': 'm', 'n_nan': n_rows, 'waves': rows_by_wave,
+                          'households': hh_by_wave}],
+        }
+        existing = _NULL_INDEX_LEDGER.setdefault((self.name, tname), [])
+        if report not in existing:
+            existing.append(report)
+        per_wave = '; '.join(
+            f"{w}: {rows_by_wave[w]:,} row(s)"
+            + (f" / {hh_by_wave.get(w, 0):,} household(s)" if hh_by_wave else '')
+            for w in rows_by_wave)
+        msg = (
+            f"{self.name}/{tname}(market={column!r}): {n_rows:,} of "
+            f"{len(flat):,} row(s) have no {column!r} label in sample() or in "
+            f"cluster_features() for their (t, v) -- {per_wave}. They are KEPT "
+            f"with m=NA. Any groupby on "
+            f"'m' with pandas' default dropna=True -- yours, or cfe's -- will "
+            f"still drop them; pass dropna=False to keep them. The fix is "
+            f"country-level wiring: give these households a {column!r} in "
+            f"sample() or their cluster a cluster_features row. Reports: "
+            f"lsms_library.null_index_audit.null_index_reports(country=, "
+            f"table=), site='market-index'. Set LSMS_READ_STRICT=1 to make "
+            f"this fatal."
+        )
+        if _null_index_strict():
+            # NullIndexKeyError subclasses RuntimeError.  That is safe ONLY
+            # because all three _add_market_index call sites in the generated
+            # table method sit OUTSIDE the derived-path
+            # ``except (FileNotFoundError, KeyError, ValueError, RuntimeError)``
+            # blocks; moved inside one, a strict raise would be swallowed into
+            # the legacy fallback (CLAUDE.md, Site C).
+            raise NullIndexKeyError(msg)
+        # Point the warning at the first frame outside lsms_library (the
+        # user's Country/Feature call), not at the generated method.
+        level, frame = 1, sys._getframe(0)
+        pkg = os.path.dirname(os.path.abspath(__file__)) + os.sep
+        while frame is not None and frame.f_code.co_filename.startswith(pkg):
+            frame, level = frame.f_back, level + 1
+        warnings.warn(msg, NullIndexKeyWarning, stacklevel=level)
 
     def _location_lookup(self) -> pd.DataFrame:
         """
@@ -6663,7 +6751,7 @@ class Country:
                         reagg = name in {'food_expenditures', 'food_quantities'}
                         derived = self._relabel_j(derived, j_labels, reaggregate=reagg)
                         if market is not None:
-                            derived = self._add_market_index(derived, column=market)
+                            derived = self._add_market_index(derived, column=market, table=name)
                         if numeraire is not None:
                             from .conversion import convert as _convert
                             derived = _convert(derived, to=numeraire, country=self.name)
@@ -6717,7 +6805,7 @@ class Country:
                         # materialize" error (GH #518).  Mirrors the food-derived
                         # path above.
                         if market is not None:
-                            derived = self._add_market_index(derived, column=market)
+                            derived = self._add_market_index(derived, column=market, table=name)
                         return derived
 
                 # The selection is carried to _finalize_result out of band (see
@@ -6734,7 +6822,7 @@ class Country:
                     reagg = name in {'food_expenditures', 'food_quantities'}
                     result = self._relabel_j(result, j_labels, reaggregate=reagg)
                 if market is not None and isinstance(result, pd.DataFrame) and not result.empty:
-                    result = self._add_market_index(result, column=market)
+                    result = self._add_market_index(result, column=market, table=name)
                 if numeraire is not None and isinstance(result, pd.DataFrame) and not result.empty:
                     from .conversion import convert as _convert
                     result = _convert(result, to=numeraire, country=self.name)

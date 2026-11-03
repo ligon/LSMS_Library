@@ -74,9 +74,15 @@ column names, add entries to the `_COLUMN_ALIASES` dict.
 - **Empty food_expenditures**: Check that `food_acquired` is listed in
   `data_scheme.yml`.  Without it, the `_FOOD_DERIVED` fallback is
   bypassed.
-- **Missing market index**: The `market=` join drops households not
-  found in `cluster_features`.  Row counts will be lower than without
-  `market=`.
+- **Missing market index**: A household that `market=` cannot label
+  (no `column` in `sample()` and no `cluster_features` row for its
+  `(t, v)`) is KEPT with `m` NA and reported by a `NullIndexKeyWarning`
+  (`null_index_reports(..., site='market-index')`; fatal under
+  `LSMS_READ_STRICT=1`).  Row counts match the call without `market=`.
+  Until 2026-11-03 such rows were silently dropped.  `cfe`'s
+  `prepare_data` drops NA-`m` rows itself, as does any `groupby('m')`
+  with pandas' default `dropna=True`; the fix is wiring the label in
+  the country config, not filtering.
 - **`roster_to_characteristics` index error**: The `final_index`
   defaults to `['t', 'v', 'i']`.  When called via the Country API's
   `_ROSTER_DERIVED` path, the final_index is inferred from the

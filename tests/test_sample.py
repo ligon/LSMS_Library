@@ -600,6 +600,13 @@ class TestUgandaRegionOnSample:
 # _add_market_index: HH-level fallback for synthetic-v rows
 # ---------------------------------------------------------------------------
 
+def _labelled_households(df, wave):
+    """Distinct households in *wave* whose market label ``m`` is not NA."""
+    sub = df.xs(wave, level="t")
+    labelled = sub.index.get_level_values("m").notna()
+    return sub.index.get_level_values("i")[labelled].nunique()
+
+
 class TestUganda2009MarketFallback:
     """When `cluster_features.Region` has no row for a HH's v (e.g.
     synthetic `@lat,lon` in 2009-10), `_add_market_index` should fall back
@@ -651,7 +658,10 @@ class TestUganda2009MarketFallback:
             )
         if "2009-10" not in fe.index.get_level_values("t").unique():
             pytest.skip("no 2009-10 wave")
-        hh09 = fe.xs("2009-10", level="t").index.get_level_values("i").nunique()
+        # Count households that GOT a market label.  _add_market_index now
+        # keeps an unlabelled household with m NA instead of dropping it, so
+        # a bare nunique would count them too and stop testing the fallback.
+        hh09 = _labelled_households(fe, "2009-10")
         # Sample-level HH count in 2009-10 is 2 975 (full roster).  22 HH have
         # no food-expenditure records and drop out for that reason, not because
         # of a NaN Region.  Another 24 are dropped by the MonthsSpent filter
@@ -687,7 +697,8 @@ class TestUganda2009MarketFallback:
         """
         if "2009-10" not in hc.index.get_level_values("t").unique():
             pytest.skip("no 2009-10 wave")
-        hh09 = hc.xs("2009-10", level="t").index.get_level_values("i").nunique()
+        # Households that GOT a market label (see the fe test above for why).
+        hh09 = _labelled_households(hc, "2009-10")
         assert hh09 == 2975, (
             f"household_characteristics(market='Region') retained {hh09} HH "
             f"in 2009-10 — expected exactly 2975 (full sample including "
@@ -695,9 +706,25 @@ class TestUganda2009MarketFallback:
             f"direction is meaningful: investigate before re-pinning."
         )
 
-    def test_no_nan_m_after_fallback(self, fe):
-        """After the fallback, no row in food_expenditures(market='Region')
-        for Uganda 2009-10 should have a NaN m."""
-        m_vals = fe.index.get_level_values("m").astype("string")
-        nan_count = m_vals.isna().sum()
-        assert nan_count == 0, f"{nan_count} rows have NaN m after fallback"
+    def test_nan_m_after_fallback_is_the_measured_residual(self, fe):
+        """After the fallback, Uganda 2009-10 households with a NaN m are
+        only the residual neither source can label.
+
+        This used to assert ``nan_count == 0`` across all waves, which was
+        vacuous: ``_add_market_index`` DELETED every unlabelled row, so no
+        NaN m could ever reach the test.  It now keeps them (m NA, with a
+        ``NullIndexKeyWarning``), so the assertion is scoped to the wave the
+        fallback is about, and pinned to the census of 2026-11-03: 4 of
+        2,979 sample households in 2009-10 have no Region in sample() and
+        none in cluster_features for their (t, v).  A broken HH-level
+        fallback would show ~700 (the pre-fallback coverage was ~2,240)."""
+        if "2009-10" not in fe.index.get_level_values("t").unique():
+            pytest.skip("no 2009-10 wave")
+        sub = fe.xs("2009-10", level="t")
+        m_vals = sub.index.get_level_values("m")
+        assert not m_vals.astype("string").isin(["nan", "<NA>", "None"]).any(), (
+            "a missing market label must be NA, not a stringified NA")
+        nan_hh = sub.index.get_level_values("i")[m_vals.isna()].nunique()
+        assert nan_hh <= 4, (
+            f"{nan_hh} Uganda 2009-10 households have NaN m after the "
+            f"HH-level fallback; the measured residual is 4.")
