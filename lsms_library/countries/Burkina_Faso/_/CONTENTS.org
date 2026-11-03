@@ -1966,8 +1966,8 @@ own nationally scaled weights; pooled estimates still need that distinction.
 Current scope is deliberately partial: only three Cross_Section sidecars and
 the sample/roster bindings are recovered. Other 2021 tables still serve the
 panel component only, including =cluster_features=; CS region/market lookup
-coverage is not established here. (/=cluster_features= now reads both covers
--- see the 2026-11-03 section at the end of this file./) The panel sidecars remain at their public
+coverage is not established here. (/=cluster_features= and =interview_date= now read
+both covers -- see the two 2026-11-03 sections at the end of this file./) The panel sidecars remain at their public
 flat =Data/= paths. Full Panel relocation, acquisition routing, other module
 wiring and complete held-release receipts remain #1276 integration work.
 =SOURCE.org= records partial declarations without claiming a secondary held
@@ -2043,29 +2043,6 @@ report-only private result =7c5a6515aa300d1668a72475a904b2a3dd02abde=.
 Independent review SHA256:
 =8fafa48f93b2776bc69904d843b58daa359e57469ea0184d7358e8e21a47ff85=.
 This documentation changes no build input or scientific definition.
-
-* 2026-11-03 -- 2021-22 =interview_date= reads the cross-section cover too (GH #1276)
-
-=interview_date= read only the panel cover, so the 7,176 cross-section
-households =sample()= serves had no interview date.  The held
-=Cross_Section/s00_me_bfa2021.dta= asks the same per-visit timestamps
-(=s00q23a/b=, =s00q24a/b=, =s00q25a/b=), so the wave now reads both covers,
-the cross-section entry through the same =cs_i= per-file override as
-=sample= and =household_roster= (ids =CS_= + grappe + menage.zfill(3)).
-
-Measured, warm shared cache at =3a33f2869= (before) and a cold private data
-root (after): 2021-22 rows 9,681 -> 31,206; households 3,227 -> 10,403
-(7,176 =CS_=); every 2021-22 =sample()= household now has a date; 0 NaT
-starts in either component.  The cross-section has 7,173 visit-3 rows, not
-7,176: =melt_visit_intervals= drops a visit whose start and end are both
-missing, and three cross-section households have both visit-3 stamps
-blank (empty strings in the source).  The 30,709 pre-existing
-rows (2018-19 and the panel) are value- and dtype-equal to the warm parquet.
-No date is parsed differently; nothing is imputed.
-
-Cache: the wave =data_info.yml= is a build input -- all 24 Burkina country
-hashes and the 24 2021-22 wave hashes move.  Pinned by
-=tests/test_burkina_faso_cs_interview_date.py=.
 
 * 2026-10-30 -- PRICE versus FOCUS instruments and native quote identity (GH #1226)
 
@@ -2267,9 +2244,11 @@ household positions, so they are NOT mapped into =cluster_features=: the
 cluster's.  Serving a cluster location from them (a centroid, say) would be a
 registered derivation and a decision; it bears on GH #1057.
 
-*Not changed.*  =population.yml='s 2021-22 =survey= text still says only
-=sample= and =household_roster= read the cross-section; it is generated from
-=slurm_logs/POPULATION_STATEMENTS_2026-07-21.org= and needs regenerating there.
+*Population record.*  =population.yml='s 2021-22 =survey= / =notes= now name
+=cluster_features= and =interview_date= beside =sample= and =household_roster=
+(edited in =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org= and regenerated
+with =scripts/promote_population_records.py=; no tag, source type or
+confidence changed, and =.yml= is not a build input, so no hash moves).
 Other 2021 tables whose cross-section source is not held (=s07b= food, =s11=
 housing, =s12= assets, =s14b= shocks, =s08a=, =s20a=, individu, =s16*=) still
 serve the panel only.
@@ -2277,3 +2256,26 @@ serve the panel only.
 Cache: the wave =data_info.yml= is a build input -- all 24 Burkina country
 hashes and the 24 2021-22 wave hashes move; 2014 / 2018-19 wave hashes do not.
 Pinned by =tests/test_burkina_faso_cs_cluster_features.py=.
+
+* 2026-11-03 -- 2021-22 =interview_date= reads the cross-section cover too (GH #1276)
+
+=interview_date= read only the panel cover, so the 7,176 cross-section
+households =sample()= serves had no interview date.  The held
+=Cross_Section/s00_me_bfa2021.dta= asks the same per-visit timestamps
+(=s00q23a/b=, =s00q24a/b=, =s00q25a/b=), so the wave now reads both covers,
+the cross-section entry through the same =cs_i= per-file override as
+=sample= and =household_roster= (ids =CS_= + grappe + menage.zfill(3)).
+
+Measured, warm shared cache at =3a33f2869= (before) and a cold private data
+root (after): 2021-22 rows 9,681 -> 31,206; households 3,227 -> 10,403
+(7,176 =CS_=); every 2021-22 =sample()= household now has a date; 0 NaT
+starts in either component.  The cross-section has 7,173 visit-3 rows, not
+7,176: =melt_visit_intervals= drops a visit whose start and end are both
+missing, and three cross-section households have both visit-3 stamps
+blank (empty strings in the source).  The 30,709 pre-existing
+rows (2018-19 and the panel) are value- and dtype-equal to the warm parquet.
+No date is parsed differently; nothing is imputed.
+
+Cache: the wave =data_info.yml= is a build input -- all 24 Burkina country
+hashes and the 24 2021-22 wave hashes move.  Pinned by
+=tests/test_burkina_faso_cs_interview_date.py=.
