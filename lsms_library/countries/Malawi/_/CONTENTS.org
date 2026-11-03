@@ -4736,3 +4736,37 @@ validation or whole #1287/#1288 closure. The 2004 and 2016 community skips are
 current declaration facts, not whole-instrument absence findings. #1278, #1190,
 #1228 and #1174 remain separate. Evidence and precise source/publication pins:
 =slurm_logs/isa_recovery_2026-10-29/Malawi/1287-seven-runtime-receipt-v1/REPORT.md=.
+
+* 2026-11-03 -- plot_inputs: Module H purchase VALUE and free seed (GH #1190, binding half)
+
+*Idiosyncrasy: the two halves of IHS4/IHS5 Module H name the same questions
+differently.*  Cross_Sectional keeps the IHS4 names -- purchase =ag_h07a/b=,
+transport =ag_h09=, VALUE =ag_h10=, free seed =ag_h37= / =ag_h38a/b=, its
+transport =ag_h40= (labels read from the held 2016-17 and 2019-20 headers);
+Panel uses the harmonized =ag_h16*/ag_h19= + =ag_h26*/ag_h29=.  Every held
+Module H file, both halves of every wave, asks free seed as =ag_h38a/b= on the
+seed unit dictionary (1 gram ... 8 50 kg bag, 9 OTHER (SPECIFY)).
+
+The Cross_Sectional drivers gated the purchase on =ag_h09= (transport) and
+added =ag_h38a= (free seed, gated on its transport =ag_h40=).  They now gate
+=ag_h07a= on =ag_h10=, as Panel and 2010-11 / 2013-14 gate on =ag_h19/29=.
+Free seed is served in its own columns, =Quantity_received_as_gift= /
+=Unit_received_as_gift= (Burkina Faso's names), in all four waves, attached by
+the existing #1298 single-observation rule; a household-crop whose free seed
+carries two unit codes is not summed (2010-11 3, 2013-14 2 groups).
+
+Measured, private cold builds, base 3a33f2869 vs this change: rows 179,917 ->
+179,957 (+40 G seed observations with no planted amount, previously dropped as
+all-NA payload, now carrying a free-seed answer; 39 gift, 1 purchase).
+=Quantity_purchased= is unchanged in 2010-11, 2013-14 and both Panel halves;
+Cross_Sectional 2016-17 / 2019-20 gain 4,977 / 5,691 value-backed purchases and
+lose 92 / 94 (47 / 56 free-seed-only rows, which now carry the gift; 45 / 38
+with a transport payment but no purchase value); one 2016-17 row 5 -> 4 (1 was
+free).  =Purchased= rows 1,862 -> 6,748 and 2,369 -> 7,966.  Gift rows attached
+2,678 / 1,420 / 3,747 / 4,702.  Quantity, Improved, Applied unchanged.
+
+Not changed (#1190's representation half, a decision): =Quantity_purchased= is
+still in the purchase unit, which is not recorded, while =u= is the planted
+unit; the two H components (Panel / earlier waves) are still summed without
+their units.  The third purchase source =ag_h36a= has no value column and is
+still unread.

@@ -3490,7 +3490,95 @@ def _seed_purchase_block(df, *, hhid, cropcode, qty_cols, unit_cols,
     return grp
 
 
-def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
+def _seed_gift_block(df, *, hhid, cropcode, source_half,
+                     qty='ag_h38a', unit='ag_h38b'):
+    """Module H seed RECEIVED FOR FREE (H37/H38) at household-crop grain.
+
+    Every held Module H file asks it with the same names in both halves
+    of every wave: ``ag_h38a`` "How much of [SEED] did you receive in
+    total for free during [RS]?" (QUANTITY) and ``ag_h38b`` (UNIT), on the
+    seed unit dictionary (1 gram ... 8 50 kg bag, 9 OTHER (SPECIFY)).  A
+    free receipt is not a purchase, so it is served in its own pair of
+    columns, never added to ``Quantity_purchased`` (GH #1190).
+
+    The unit travels with its quantity: a (household, crop) whose free
+    receipts carry two different unit codes (2010-11 and 2013-14 repeat a
+    crop in Module H) is not summed across units and is not attached; the
+    count is in ``attrs['mixed_unit_groups']``.  A recorded quantity with
+    no unit code is ``Unknown``.  Returns (i, _crop_code, _source_half,
+    Quantity_received_as_gift, Unit_received_as_gift).
+    """
+    from lsms_library.transformations import U_UNKNOWN
+
+    cols = ['i', '_crop_code', '_source_half', 'Quantity_received_as_gift',
+            'Unit_received_as_gift']
+    if qty not in df.columns:
+        return pd.DataFrame(columns=cols)
+    _, crop_code = _seed_crop_identity(df[cropcode])
+    q = pd.to_numeric(df[qty], errors='coerce').astype('Float64')
+    if unit in df.columns:
+        codes = _int_codes(df[unit])
+        u = codes.map(_MWI_SEED_UNIT_LABELS).astype('string')
+        u = u.fillna('Seed unit code ' + codes.astype('string'))
+    else:
+        u = pd.Series(pd.NA, index=df.index, dtype='string')
+    out = pd.DataFrame({
+        'i': df['hhid'].astype('string').values,
+        '_crop_code': crop_code.values,
+        'Quantity_received_as_gift': q.values,
+        'Unit_received_as_gift': u.fillna(U_UNKNOWN).values,
+    })
+    out = out[out['_crop_code'].notna() & out['Quantity_received_as_gift'].notna()]
+    key = ['i', '_crop_code']
+    nunits = out.groupby(key)['Unit_received_as_gift'].transform('nunique')
+    mixed = int(out.loc[nunits.gt(1), key].drop_duplicates().shape[0])
+    out = out[nunits.eq(1)]
+    grp = out.groupby(key, as_index=False).agg(
+        Quantity_received_as_gift=('Quantity_received_as_gift', 'sum'),
+        Unit_received_as_gift=('Unit_received_as_gift', 'first'))
+    grp['_source_half'] = source_half
+    grp.attrs['mixed_unit_groups'] = mixed
+    return grp[cols]
+
+
+def _attach_to_single_seed_observation(df, pieces, columns, what):
+    """Attach household-crop Module H results to exactly one seed observation.
+
+    The rule is the one purchases already used (GH #1298): the result
+    attaches only to the single known-plot G observation of the same native
+    crop code and source half; any second observation -- even an
+    all-payload-NA unknown-plot sibling -- vetoes it.  ``columns`` are
+    copied onto that row; every other row keeps what it had.
+    """
+    pieces = [p for p in pieces if p is not None and len(p)]
+    if not pieces:
+        return df
+    sp = pd.concat(pieces, ignore_index=True)
+    key = ['i', '_source_half', '_crop_code']
+    if '_source_half' not in sp or sp['_source_half'].isna().any():
+        raise ValueError(f'Source-observation {what} requires its source half')
+    if sp.duplicated(key).any():
+        raise ValueError(f'Repeated native seed {what} result')
+    seeds = df.loc[df['input'].eq('Seed')]
+    # Count every seed record before plot ownership gating: even an
+    # all-payload-NA unknown plot sibling vetoes attachment. A plot
+    # count would broadcast to multiple observations.
+    counts = seeds.groupby(key, dropna=True).size().rename('_nobs')
+    known = seeds.loc[~_is_unknown_plot(seeds['plot_id'])]
+    candidates = known.merge(counts.reset_index(), on=key, how='left')
+    eligible = candidates.loc[candidates['_nobs'].eq(1), key]
+    attach = sp.merge(eligible, on=key, how='inner', validate='one_to_one')
+    tmp = {c: f'_attach_{c}' for c in columns}
+    attach = attach[key + list(columns)].rename(columns=tmp)
+    df = df.merge(attach, on=key, how='left', validate='many_to_one')
+    take = df['input'].eq('Seed') & df[tmp[columns[0]]].notna()
+    for c in columns:
+        df[c] = df[c].where(~take, df[tmp[c]])
+    return df.drop(columns=list(tmp.values()))
+
+
+def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
+                         seed_gift_pieces=None):
     """Combine reshaped input pieces into the canonical plot_inputs
     DataFrame for wave ``t``.
 
@@ -3504,6 +3592,9 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
         _seed_purchase_block (i, _crop_code, Quantity_purchased) at the
         household-crop grain; source-aware results attach only to one known
         observation of the same native code and half (no plot fabrication).
+    seed_gift_pieces : list[pd.DataFrame] | None -- outputs of
+        _seed_gift_block (seed received for free, with its own unit), attached
+        by the same single-observation rule; never added to the purchase.
 
     Returns
     -------
@@ -3582,29 +3673,19 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
             df = df.drop(columns=['_qp'])
 
     if seed_purchase_pieces and source_observations:
-        purchases = [p for p in seed_purchase_pieces if p is not None and len(p)]
-        if purchases:
-            sp = pd.concat(purchases, ignore_index=True)
-            key = ['i', '_source_half', '_crop_code']
-            if '_source_half' not in sp or sp['_source_half'].isna().any():
-                raise ValueError('Source-observation purchase requires its source half')
-            if sp.duplicated(key).any():
-                raise ValueError('Repeated native seed purchase result')
-            seeds = df.loc[df['input'].eq('Seed')]
-            # Count every seed record before plot ownership gating: even an
-            # all-payload-NA unknown plot sibling vetoes attachment. A plot
-            # count would broadcast to multiple observations.
-            counts = seeds.groupby(key, dropna=True).size().rename('_nobs')
-            known = seeds.loc[~_is_unknown_plot(seeds['plot_id'])]
-            candidates = known.merge(counts.reset_index(), on=key, how='left')
-            eligible = candidates.loc[candidates['_nobs'].eq(1), key]
-            attach = sp.merge(eligible, on=key, how='inner', validate='one_to_one')
-            attach = attach[key + ['Quantity_purchased']].rename(
-                columns={'Quantity_purchased': '_qp'})
-            df = df.merge(attach, on=key, how='left', validate='many_to_one')
-            take = df['input'].eq('Seed') & df['_qp'].notna()
-            df['Quantity_purchased'] = df['Quantity_purchased'].where(~take, df['_qp'])
-            df = df.drop(columns='_qp')
+        df = _attach_to_single_seed_observation(
+            df, seed_purchase_pieces, ['Quantity_purchased'], 'purchase')
+
+    # GH #1190: seed received for free (H37/H38) is its own measurement in
+    # its own unit, never a purchase.
+    df['Quantity_received_as_gift'] = pd.array([pd.NA] * len(df), dtype='Float64')
+    df['Unit_received_as_gift'] = pd.array([pd.NA] * len(df), dtype='string')
+    if seed_gift_pieces:
+        if not source_observations:
+            raise ValueError('Seed gift results require seed source observations')
+        df = _attach_to_single_seed_observation(
+            df, seed_gift_pieces,
+            ['Quantity_received_as_gift', 'Unit_received_as_gift'], 'gift')
 
     # Purchased flag: True where a purchased quantity is attached (seed),
     # else NA (Module D fertilizer/pesticide applied-on-plot rows do not
@@ -3641,6 +3722,8 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None):
         'Purchased':          'first',
         'Improved':           'first',
         'Applied':            'max',
+        'Quantity_received_as_gift': 'first',
+        'Unit_received_as_gift':     'first',
     })
 
     # The natural per-input-line grain is (t, i, plot, input, crop, u): a

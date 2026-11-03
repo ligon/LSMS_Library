@@ -11,8 +11,9 @@ applied to a plot.  Sources (Full_Sample/Agriculture):
   * ag_mod_g -- seasonal plot-crop roster: seed planted ag_g04a/ag_g04b
     per (plot=ag_g0b, crop=ag_g0d).  No improved-seed flag in IHS3.
   * ag_mod_h -- purchased seed (hh, crop): ag_h16a/b + ag_h19 (source 1),
-    ag_h26a/b + ag_h29 (source 2); crop=ag_h0b.  Attached to single-plot
-    seed rows only (no plot in the module).
+    ag_h26a/b + ag_h29 (source 2); crop=ag_h0b.  Seed received for free
+    ag_h38a/b, in its own columns (GH #1190).  Attached to the single seed
+    observation of that crop only (no plot in the module).
 
 i = format_id(case_id), aligning with plot_features / crop_production.
 See lsms_library/countries/Malawi/_/malawi.py.
@@ -25,8 +26,9 @@ import numpy as np
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
-                    _seed_block, _seed_purchase_block, assemble_plot_inputs,
-                    drop_repeated_records, _seed_source_reference)
+                    _seed_block, _seed_purchase_block, _seed_gift_block,
+                    assemble_plot_inputs, drop_repeated_records,
+                    _seed_source_reference)
 
 
 WAVE = '2010-11'
@@ -81,8 +83,10 @@ seed_purchase = [
                          unit_cols=['ag_h16b', 'ag_h26b'],
                          value_cols=['ag_h19', 'ag_h29'], source_half='Full_Sample'),
 ]
+seed_gift = [_seed_gift_block(h, hhid='hhid', cropcode='ag_h0b',
+                              source_half='Full_Sample')]
 
-df = assemble_plot_inputs(WAVE, pieces, seed_purchase)
+df = assemble_plot_inputs(WAVE, pieces, seed_purchase, seed_gift)
 
 assert df.index.is_unique, f"Non-unique source-observation grain in plot_inputs {WAVE}"
 assert len(df) > 0, f"plot_inputs {WAVE} produced no rows"

@@ -284,7 +284,9 @@ Data Scheme:
     # by ag_d40; Module G (ag_mod_g) -- seed planted per plot-crop
     # (ag_g04a/b) with the improved-seed flag ag_g0f in IHS4/IHS5; Module H
     # (ag_mod_h) -- purchased seed (household-crop grain) attached to the
-    # single known observation of that native crop code and source half.
+    # single known observation of that native crop code and source half;
+    # seed received for free (H37/H38, every wave and half) attached by the
+    # same rule in its own columns with its own unit (GH #1190).
     # `input` is the shared harmonize_input Preferred Label
     # (NPK/DAP/CAN/Urea/D-Compound/Other fertilizer, Organic Fertilizer,
     # Insecticide/Herbicide/Fungicide/Fumigant/Other Pesticide, Seed).
@@ -311,6 +313,16 @@ Data Scheme:
     Improved: bool
     Applied:
       type: bool
+      optional: true
+    # GH #1190: Module H seed received FOR FREE (ag_h38a/b), never a
+    # purchase.  Unit_received_as_gift is that answer's own unit on the
+    # seed dictionary (Unknown where no unit code is recorded); it implies
+    # no conversion to u.  Names follow Burkina Faso's plot_inputs.
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
       optional: true
     materialize: make
   livestock:

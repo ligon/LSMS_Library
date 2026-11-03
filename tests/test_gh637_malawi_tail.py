@@ -236,13 +236,23 @@ HARVEST_ZERO = {'2010-11': 1255, '2013-14': 310, '2016-17': 3723, '2019-20': 334
 #: 2010-11 fell by 67 = 42 (Module G repeats) + 25 (the Module P repeat).
 HARVEST_SUM = {'2010-11': 970_088.8, '2013-14': 257_839.0,
                '2016-17': 1_871_058.4, '2019-20': 1_260_873.9}
-#: Seed rows are unchanged in number; their Quantity fell by 8+548 / 9 / 145 /
-#: 123 (defect B; 548 = the 2010-11 Module G repeats' ag_g04a).
-SEED_SUM = {'2010-11': 830_067.4, '2013-14': 324_288.5,
-            '2016-17': 827_722.99, '2019-20': 1_134_377.2}
-#: Quantity_purchased rose by 58 / 4 / 157 / 81: the (i, crop) total, not one code's.
-PURCHASED_SUM = {'2010-11': 31_797.0, '2013-14': 50_382.7,
-                 '2016-17': 68_627.0, '2019-20': 93_688.8}
+#: Seed Quantity per wave.  At #637-tail time (2026-10-23) these were
+#: 830,067.4 / 324,288.5 / 827,722.99 / 1,134,377.2; #1323 (GH #1298) serves
+#: every G observation, recorded-but-unmapped crop codes included, so the
+#: 2010-11 and 2019-20 values were already stale at development 3a33f2869.
+#: Re-measured there, private cold build, 2026-11-03.
+SEED_SUM = {'2010-11': 831_034.9, '2013-14': 324_288.5,
+            '2016-17': 827_722.99, '2019-20': 1_139_793.05}
+#: Quantity_purchased per wave.  3a33f2869 served 33,334.0 / 51,953.7 /
+#: 74,366.0 / 94,731.8 (the #1298 single-observation attach; the 2026-10-23
+#: pins were stale).  GH #1190 then bound the Cross_Sectional halves to the
+#: purchase VALUE ag_h10 instead of the transport payment ag_h09 and stopped
+#: adding free seed (ag_h38a): 2016-17 -> 233,479.0, 2019-20 -> 208,669.5.
+PURCHASED_SUM = {'2010-11': 33_334.0, '2013-14': 51_953.7,
+                 '2016-17': 233_479.0, '2019-20': 208_669.5}
+#: Quantity_received_as_gift per wave (GH #1190, private cold build).
+GIFT_SUM = {'2010-11': 89_598.95, '2013-14': 53_489.0,
+            '2016-17': 156_607.0, '2019-20': 133_481.9}
 
 #: Exact repeat records per raw module (every column equal).
 REPEATS_2010 = {'ag_mod_g.dta': 9, 'ag_mod_p.dta': 1, 'ag_mod_i.dta': 61,
@@ -300,8 +310,11 @@ class TestDelivered:
         seed = x[x.index.get_level_values('input') == 'Seed']
         assert float(seed['Quantity'].sum()) == pytest.approx(SEED_SUM[wave], abs=1e-6)
         assert float(x['Quantity_purchased'].sum()) == pytest.approx(PURCHASED_SUM[wave], abs=1e-6)
-        # a purchase sits only on seed rows
-        assert x.loc[x.index.get_level_values('input') != 'Seed', 'Quantity_purchased'].isna().all()
+        assert float(x['Quantity_received_as_gift'].sum()) == pytest.approx(GIFT_SUM[wave], abs=1e-6)
+        # a purchase or a free receipt sits only on seed rows
+        nonseed = x[x.index.get_level_values('input') != 'Seed']
+        assert nonseed['Quantity_purchased'].isna().all()
+        assert nonseed['Quantity_received_as_gift'].isna().all()
 
 
 @pytest.mark.requires_s3
@@ -320,41 +333,62 @@ class TestRawOracle:
 
     @pytest.mark.parametrize('wave', WAVES)
     def test_seed_totals_from_raw_modules(self, plot_inputs, wave):
+        """Purchases and free receipts against the raw H/G modules.
+
+        The attach rule is GH #1298's: a household-crop H result lands on the
+        single G observation of the same native crop code in the same source
+        half, and only when that observation's plot is known; a second G
+        observation of the code (even one with no plot) vetoes it.  Purchase =
+        value-backed H quantity (GH #1190: Cross_Sectional ag_h07a gated by
+        the VALUE ag_h10, never the transport payment ag_h09; Panel and the
+        earlier waves ag_h16a/ag_h19 + ag_h26a/ag_h29).  Free seed (ag_h38a)
+        is never a purchase; it is served on its own and is not summed
+        across two unit codes.
+        """
         from lsms_library.local_tools import format_id
-        crop = _org_codes('harmonize_crop')
-        seed_rows, purchases = [], []
+        seed_q, purchases, gifts, counts = [], [], [], []
         for half in _HALVES[wave]:
             g = _raw(half['g'])
             h = _raw(half['h'])
             if wave == '2010-11':
                 g, h = g[~g.duplicated()], h[~h.duplicated()]
+            hk = half['h']
+            gcode = pd.to_numeric(g[half['gcrop']], errors='coerce')
             plot = half['plot'](g, format_id)
-            s = pd.DataFrame({'i': half['hh'](g, format_id), 'plot_id': plot,
-                              'crop': pd.to_numeric(g[half['gcrop']], errors='coerce').map(crop),
-                              'Quantity': pd.to_numeric(g['ag_g04a'], errors='coerce')})
-            seed_rows.append(s[s['crop'].notna()])
+            seed_q.append(pd.to_numeric(g['ag_g04a'], errors='coerce'))
+            gk = pd.DataFrame({'i': half['hh'](g, format_id).astype(str), 'half': hk,
+                               'code': gcode, 'known': plot.notna() & plot.astype(str).ne('')})
+            gk = gk[gk['code'].notna()]
+            counts.append(gk.groupby(['i', 'half', 'code']).agg(
+                n=('known', 'size'), known=('known', 'all')))
+            hcode = pd.to_numeric(h[half['hcrop']], errors='coerce')
+            hi = half['hh'](h, format_id).astype(str)
             qp = pd.concat([pd.to_numeric(h[q], errors='coerce').where(
                 pd.to_numeric(h[v], errors='coerce').fillna(0) != 0)
                 for q, v in zip(half['q'], half['v'])], axis=1).sum(axis=1, min_count=1)
-            p = pd.DataFrame({'i': half['hh'](h, format_id),
-                              'crop': pd.to_numeric(h[half['hcrop']], errors='coerce').map(crop),
-                              'qp': qp})
-            purchases.append(p[p['crop'].notna()])
-        S = pd.concat(seed_rows, ignore_index=True)
-        P = pd.concat(purchases, ignore_index=True).groupby(['i', 'crop'])['qp'].sum(min_count=1).dropna()
-        nplots = S[S['plot_id'].notna()].groupby(['i', 'crop'])['plot_id'].nunique()
-        single = P[P.index.isin(nplots[nplots == 1].index)]
+            purchases.append(pd.DataFrame({'i': hi, 'half': hk, 'code': hcode, 'qp': qp}))
+            gifts.append(pd.DataFrame({'i': hi, 'half': hk, 'code': hcode,
+                                       'qg': pd.to_numeric(h['ag_h38a'], errors='coerce'),
+                                       'ug': pd.to_numeric(h['ag_h38b'], errors='coerce').fillna(-1)}))
+        C = pd.concat(counts)
+        eligible = C[(C['n'] == 1) & C['known']].index
+        key = ['i', 'half', 'code']
+        P = (pd.concat(purchases).dropna(subset=['code'])
+             .groupby(key)['qp'].sum(min_count=1).dropna())
+        G = pd.concat(gifts).dropna(subset=['code', 'qg'])
+        one_unit = G.groupby(key)['ug'].transform('nunique').eq(1)
+        G = G[one_unit].groupby(key)['qg'].sum()
+        P, G = P[P.index.isin(eligible)], G[G.index.isin(eligible)]
         x = plot_inputs.xs(wave, level='t')
         seed = x[x.index.get_level_values('input') == 'Seed']
-        # seed planted: every raw record counted once (the bare sum of the
-        # additive grouping, all-blank groups included as 0.0 -- #1174)
-        assert float(seed['Quantity'].sum()) == pytest.approx(float(S['Quantity'].sum()), abs=1e-6)
-        # each single-plot (i, crop) carries ITS total once per seed row, so
-        # the max over its rows is that total; summed, the oracle's total
-        served = seed['Quantity_purchased'].groupby(
-            [seed.index.get_level_values('i'), seed.index.get_level_values('crop')]).max()
-        assert int(served.notna().sum()) == len(single)
-        assert float(served.sum()) == pytest.approx(float(single.sum()), abs=1e-6)
+        # seed planted: every G observation's own amount (all-NA ones are
+        # dropped at finalization, which cannot move a sum)
+        assert float(seed['Quantity'].sum()) == pytest.approx(
+            float(pd.concat(seed_q).sum()), abs=1e-6)
+        assert int(seed['Quantity_purchased'].notna().sum()) == len(P)
+        assert float(seed['Quantity_purchased'].sum()) == pytest.approx(float(P.sum()), abs=1e-6)
+        assert int(seed['Quantity_received_as_gift'].notna().sum()) == len(G)
+        assert float(seed['Quantity_received_as_gift'].sum()) == pytest.approx(float(G.sum()), abs=1e-6)
 
     @pytest.mark.parametrize('wave', WAVES)
     def test_harvest_blanks_from_raw_modules(self, crop_production, wave):
@@ -431,7 +465,7 @@ _HALVES = {
                      h='2016-17/Data/Cross_Sectional/ag_mod_h.dta',
                      hh=lambda df, fid: 'cs-17-' + df['case_id'].apply(fid),
                      plot=_garden, pplot=_garden, gcrop='crop_code', hcrop='crop_code',
-                     q=['ag_h07a', 'ag_h38a'], v=['ag_h09', 'ag_h40']),
+                     q=['ag_h07a'], v=['ag_h10']),
                 dict(g='2016-17/Data/Panel/ag_mod_g_16.dta', p='2016-17/Data/Panel/ag_mod_p_16.dta',
                      h='2016-17/Data/Panel/ag_mod_h_16.dta',
                      hh=_fid('y3_hhid'), plot=_garden, pplot=_garden,
@@ -442,7 +476,7 @@ _HALVES = {
                      h='2019-20/Data/Cross_Sectional/ag_mod_h.dta',
                      hh=_fid('case_id'), plot=_garden, pplot=_garden,
                      gcrop='crop_code', hcrop='crop_code',
-                     q=['ag_h07a', 'ag_h38a'], v=['ag_h09', 'ag_h40']),
+                     q=['ag_h07a'], v=['ag_h10']),
                 dict(g='2019-20/Data/Panel/ag_mod_g_19.dta', p='2019-20/Data/Panel/ag_mod_p_19.dta',
                      h='2019-20/Data/Panel/ag_mod_h_19.dta',
                      hh=_fid('y4_hhid'), plot=_garden, pplot=_garden,

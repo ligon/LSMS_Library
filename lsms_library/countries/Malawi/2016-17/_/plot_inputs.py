@@ -11,8 +11,13 @@ enumerator-total kg ag_d39j. Native quantity/unit pairs b/c and h/i
 are separate from these selected totals; ag_d39e records timing.
 Module G carries a harmonized `crop_code`, the seed columns
 ag_g04a/ag_g04b, and the improved-seed flag ag_g0f (2 = improved).
-Module H purchased seed: ag_h16a/b + ag_h19, ag_h26a/b + ag_h29;
-crop_code.
+Module H names differ by half (GH #1190).  Cross_Sectional keeps the
+IHS4 names: purchase ag_h07a/b with value ag_h10 (ag_h09 is the TRANSPORT
+payment); seed received for free ag_h38a/b (ag_h40 is its transport
+payment).  Panel uses the harmonized purchase ag_h16a/b + ag_h19 (source
+1) and ag_h26a/b + ag_h29 (source 2), and the same ag_h38a/b for free
+seed.  Free seed is served in its own columns, never as a purchase.
+crop_code in both.
 
 The Cross_Sectional ag_mod_d.dta has a latin-1 bad byte in an unused
 free-text column that breaks a full read; we read only the columns we
@@ -33,8 +38,8 @@ from lsms_library.local_tools import (get_dataframe, to_parquet, format_id,
                                        _dvc_working_directory, _COUNTRIES_DIR,
                                        _dvc_cache_path)
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
-                    _seed_block, _seed_purchase_block, assemble_plot_inputs,
-                    _seed_source_reference)
+                    _seed_block, _seed_purchase_block, _seed_gift_block,
+                    assemble_plot_inputs, _seed_source_reference)
 
 
 WAVE = '2016-17'
@@ -110,19 +115,21 @@ def _half(d, g, h, hh_of, seed_qty, seed_unit, seed_value, source_ref, source_ha
                     source_ref=source_ref, source_half=source_half,
                     row_positions=g_rows),
     ]
-    # Seed purchase column naming differs by half: the Cross_Sectional file
-    # keeps the original IHS4 names (ag_h07*/ag_h09 source 1, ag_h38*/ag_h40
-    # source 2); the Panel file uses the harmonized ag_h16*/ag_h19,
-    # ag_h26*/ag_h29 that the WB code reads.
+    # Seed purchase column naming differs by half (GH #1190): the
+    # Cross_Sectional file keeps the original IHS4 names (ag_h07a/b, value
+    # ag_h10); the Panel file uses the harmonized ag_h16*/ag_h19,
+    # ag_h26*/ag_h29 that the WB code reads.  Free seed is ag_h38a/b in both.
     seed_purchase = [
         _seed_purchase_block(h, hhid='hhid', cropcode='crop_code',
                              qty_cols=seed_qty, unit_cols=seed_unit,
                              value_cols=seed_value, source_half=source_half),
     ]
-    return pieces, seed_purchase
+    seed_gift = [_seed_gift_block(h, hhid='hhid', cropcode='crop_code',
+                                  source_half=source_half)]
+    return pieces, seed_purchase, seed_gift
 
 
-all_pieces, all_seed_purchase = [], []
+all_pieces, all_seed_purchase, all_seed_gift = [], [], []
 
 # --- Cross-sectional half (cs-17 prefix) ---
 d_xs = _read_usecols('Malawi/2016-17/Data/Cross_Sectional/ag_mod_d.dta',
@@ -131,21 +138,22 @@ g_xs = get_dataframe(G_XS_SOURCE,
                      convert_categoricals=False)
 h_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_h.dta',
                      convert_categoricals=False)
-p, s = _half(d_xs, g_xs, h_xs,
+p, s, gft = _half(d_xs, g_xs, h_xs,
              lambda df: 'cs-17-' + df['case_id'].apply(format_id),
-             seed_qty=['ag_h07a', 'ag_h38a'],
-             seed_unit=['ag_h07b', 'ag_h38b'],
-             seed_value=['ag_h09', 'ag_h40'],
+             seed_qty=['ag_h07a'],
+             seed_unit=['ag_h07b'],
+             seed_value=['ag_h10'],
              source_ref=_seed_source_reference(G_XS_SOURCE, script_path=__file__),
              source_half='Cross_Sectional')
 all_pieces += p
 all_seed_purchase += s
+all_seed_gift += gft
 
 # --- Panel half (bare y3_hhid) ---
 d_pn = get_dataframe('../Data/Panel/ag_mod_d_16.dta', convert_categoricals=False)
 g_pn = get_dataframe(G_PANEL_SOURCE, convert_categoricals=False)
 h_pn = get_dataframe('../Data/Panel/ag_mod_h_16.dta', convert_categoricals=False)
-p, s = _half(d_pn, g_pn, h_pn, lambda df: df['y3_hhid'].apply(format_id),
+p, s, gft = _half(d_pn, g_pn, h_pn, lambda df: df['y3_hhid'].apply(format_id),
              seed_qty=['ag_h16a', 'ag_h26a'],
              seed_unit=['ag_h16b', 'ag_h26b'],
              seed_value=['ag_h19', 'ag_h29'],
@@ -153,8 +161,9 @@ p, s = _half(d_pn, g_pn, h_pn, lambda df: df['y3_hhid'].apply(format_id),
              source_half='Panel')
 all_pieces += p
 all_seed_purchase += s
+all_seed_gift += gft
 
-df = assemble_plot_inputs(WAVE, all_pieces, all_seed_purchase)
+df = assemble_plot_inputs(WAVE, all_pieces, all_seed_purchase, all_seed_gift)
 
 assert df.index.is_unique, f"Non-unique source-observation grain in plot_inputs {WAVE}"
 assert len(df) > 0, f"plot_inputs {WAVE} produced no rows"
