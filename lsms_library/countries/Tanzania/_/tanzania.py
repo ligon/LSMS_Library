@@ -1453,8 +1453,11 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
     rows, never one summed quantity.
     ``input_obs`` is the canonical native-observation level (GH #637 ruling,
     @ligon 2026-11-03).  A seed row is ``reported:4A:<cropid>``, the
-    instrument's own crop code in AG_SEC_4A (the grammar of
-    ``crop_production.production_obs``).  So two codes that
+    instrument's own crop code in AG_SEC_4A.  The token follows Tanzania's
+    ``crop_production.production_obs`` grammar, not Malawi / Niger / Uganda,
+    which share the level but serve release-qualified ``row:`` / ``slot:``
+    values.  A native code needs no release qualifier: unlike a constructed
+    row number it cannot shift between source releases.  So two codes that
     ``harmonize_crop`` lumps under one label (Beans + Cowpeas -> Pulses) are
     two rows, each with its own quantity, unit, purchase and ``Improved``
     answer, and are never summed or OR'd.  A repeated native record raises.

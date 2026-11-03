@@ -31,6 +31,9 @@ Single Index:
   # EVERY occurrence with /row:... . These are not persistent panel entities.
   # unresolved_observation means a served row does not resolve this axis; it
   # does not assert one native observation or a particular reducer.
+  # input_obs may also be reported:<module>:<native code>, e.g. Tanzania
+  # AG_SEC_4A seed reported:4A:<cropid> (GH #637): an instrument ID, which,
+  # unlike a constructed row ordinal, does not shift between source releases.
   production_obs: native crop observation or explicitly unresolved coordinate
   input_obs: source-release-qualified original input row or unresolved coordinate
   labor_obs: source-release-qualified original labor row or unresolved coordinate

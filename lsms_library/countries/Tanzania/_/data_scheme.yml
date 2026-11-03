@@ -232,7 +232,13 @@ Data Scheme:
     #           native record raises.  AG_SEC_3A plot-level inputs (and a
     #           seed record without a crop code) are unresolved_observation
     #           and keep the existing reduction, e.g. the signed type-1 /
-    #           type-2 fertilizer sum.  Malawi / Niger / Uganda precedent.
+    #           type-2 fertilizer sum.  The LEVEL follows Malawi / Niger /
+    #           Uganda; the TOKEN follows Tanzania's own
+    #           crop_production.production_obs grammar (those countries serve
+    #           release-qualified row:/slot: values, none set from a crop code).
+    #           A native crop code is an instrument ID: unlike a constructed
+    #           row number it cannot shift between source releases, so it
+    #           needs no release qualifier.
     # Only 2019-20 and 2020-21 are buildable; 2008-15 has no agriculture source
     # on disk (same as plot_features / crop_production, GH #167).
     # SEASON SCOPE: long-rainy-season modules (AG_SEC_3A / AG_SEC_4A) only,
