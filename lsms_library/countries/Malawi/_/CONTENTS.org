@@ -3964,6 +3964,17 @@ figure for an unnamed unit.  Not a regression (served kg did not change
 under ruling 5).  Measured at this head: 49 =Unknown= rows carry a
 =survey_kg= factor, 7,143.49 kg (the other 19 -- Buns/Scones 15, Maize ufa
 2, Eggs 1, Chicken 1, all 2019-20 -- were =Unknown= before ruling 5).
+*Decided (@ligon, 2026-11-03, GH #1074): a row served =Unknown= does not keep
+the code-23 factor.*  =2019-20/_/food_acquired.py= masks =cfactor_*= after
+=handling_unusual_units= where =u= is =Unknown= and the raw code is 23 (a
+code-23 text that names a unit keeps its factor).  Private cold builds, base
+7c2b5ed01 vs the change: the 49 rows go =survey_kg= -> =none= (Mango 29 /
+7,088.55 kg, Buns-Scones 15 / 34.44, Eggs 12.60, Maize ufa 2 / 4.12, Guinea
+fowl 2.52, Chicken 1.26); =food_quantities(units='kgs')= 2,574,982.10 ->
+2,567,838.62 kg (-7,143.49); =kg_factor_sources= survey_kg 419,998 -> 419,949,
+none 2,788 -> 2,837, every other layer unchanged; =food_prices()= (kgvalue)
+rows 680,400 -> 680,378; rows, Quantity and Expenditure unchanged.  No other
+row's kilograms move.  2016-17 has no =Unknown= row with a shipped factor.
 
 *Ruling 4 -- left as they are.*  The 13 rows under raw suffixed codes
 (2010-11 =16b= 5, =16a= 2, =12a= 2, =21b= 2, =12b= 1, =03a= 1) and the 2
