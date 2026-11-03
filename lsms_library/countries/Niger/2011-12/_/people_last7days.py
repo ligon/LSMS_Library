@@ -14,13 +14,22 @@ Reported fields:
              in the last 30 DAYS (questionnaire 4.03), NOT the last 7 days.
   SOB_work   ms04q05 -- worked >=1h in own/household business in the last
              30 DAYS (questionnaire 4.05).
-  wage_work  ms04q02 -- worked >=1h for an enterprise / the state / an
-             employer in the last 12 MONTHS (questionnaire 4.02).  The
-             30-day analogue is ms04q01 (4.01); the WB uses q02 and so do
-             we, for parity.  2011-12 asks NO 7-day participation question
-             at all (2014-15's MS04Q01-03 do use 7 days).  Reference periods
-             confirmed from the Stata labels + questionnaire, GH #877; the
-             choice of what to serve is left open there.
+  wage_work  ms04q01 -- worked >=1h for an enterprise / the state / an
+             employer in the last 30 DAYS (questionnaire 4.01), so all
+             three dummies share one reference period and one universe
+             (ms04q01/q03/q05 are each NA on the same 5,153 rows).  NOT
+             ms04q02: that is a follow-up asked ONLY when ms04q01 = No
+             ("in the last 12 MONTHS?"), so it is NA for every one of the
+             1,174 people who did wage work in the last 30 days, and its
+             269 yes are people who did wage work in the year but NOT in
+             the last 30 days (measured: q01 x q02 crosstab, no row is yes
+             on both).  DELIBERATE departure from WB parity:
+             NER_ECVMA1.do:1378 recodes ms04q02 into wage_work, which
+             reproduces the skip-pattern error.  Ruling @ligon 2026-11-03
+             (GH #882 option B).  2011-12 asks NO 7-day participation
+             question at all (2014-15's MS04Q01-03 do use 7 days);
+             reference periods confirmed from the Stata labels +
+             questionnaire, GH #877.
   working_age ms01q06a (age) >= 6  (the survey's working-age threshold)
   Industry   ms04q24 activity-section code -> broad industry label
              (Agriculture/Fishing/Mining/Manufacturing/Construction/Services)
@@ -103,7 +112,9 @@ working_age = (age >= 6)
 
 farm_work = _yn_bool(src['ms04q03'])
 SOB_work = _yn_bool(src['ms04q05'])
-wage_work = _yn_bool(src['ms04q02'])
+# ms04q01, the 30-day question -- NOT the WB's ms04q02, a follow-up asked only
+# when ms04q01 = No (GH #882; see the docstring).
+wage_work = _yn_bool(src['ms04q01'])
 
 industry = _industry_label(src['ms04q24'])
 # Self-employment / not-worked filter the WB applies before keeping industry.

@@ -1065,7 +1065,7 @@ def _finish_plot_labor(df, t):
 #   wage_work  — worked for a wage / employer (bool)
 #              REFERENCE PERIOD VARIES BY WAVE (GH #877): 7 days in 2014-15
 #              and the EHCVM waves; 2011-12 asks no 7-day question -- its
-#              farm_work/SOB_work are 30-day and wage_work is 12-month.
+#              three dummies are all 30-day (wage_work ms04q01, GH #882).
 #   farm_hrs   — annual-average weekly hours on farm work (float; ECVMA only)
 #   SB_hrs     — annual-average weekly hours in own business (float; ECVMA)
 #   wage_hrs   — annual-average weekly hours in wage work (float; ECVMA)

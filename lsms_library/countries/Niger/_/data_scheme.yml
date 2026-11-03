@@ -358,10 +358,11 @@ Data Scheme:
     #       NOT UNIFORM ACROSS WAVES (GH #877, confirmed from the Stata
     #       labels + questionnaires): 2014-15 (MS04Q01-03) and the EHCVM
     #       waves ask about the last 7 DAYS; 2011-12 asks no 7-day question
-    #       at all -- farm_work (ms04q03) and SOB_work (ms04q05) are the
-    #       last 30 DAYS, wage_work (ms04q02) the last 12 MONTHS.  Whether
-    #       to re-point 2011-12 or serve NA is open on #877; the values
-    #       served today are unchanged and match the WB do-file.
+    #       at all -- farm_work (ms04q03), SOB_work (ms04q05) and
+    #       wage_work (ms04q01) are all the last 30 DAYS.  wage_work used to
+    #       read ms04q02 as the WB do-file does; that is a 12-month follow-up
+    #       asked only when ms04q01 = No, so it served NA for every current
+    #       wage worker (GH #882, option B, @ligon 2026-11-03).
     #   farm_hrs / SB_hrs / wage_hrs     -- ANNUAL-AVERAGE weekly hours in
     #       each activity (allocated by the job's occupation code, summed
     #       across jobs; ECVMA waves only).  NOT hours in the last 7 days,

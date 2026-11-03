@@ -1644,7 +1644,7 @@ sums, one of which contains a bare 24-hours-a-day over-report.  A
 plausibility screen on reported schedules is a separate decision from
 honouring the survey's own missing codes, and is not taken here.
 
-** REPORTED, NOT FIXED: 2011-12 asks no 7-day participation question at all
+** 2011-12 asks no 7-day participation question at all (wage_work RESOLVED by GH #882, 2026-11-03)
 
 The script docstring called =ms04q03= / =ms04q05= / =ms04q02= "last 7 days"
 dummies.  The labels and the questionnaire say otherwise:
@@ -1669,6 +1669,25 @@ Options left open on #877: (a) keep as served and document (what is done
 here); (b) re-point =wage_work= to =ms04q01= so the 2011-12 triple is
 uniformly 30-day; (c) serve NA for 2011-12's dummies.  *Served values are
 unchanged.*
+
+*RESOLVED 2026-11-03 (GH #882, option B, ruling @ligon): =wage_work= reads
+=ms04q01=.*  The table above understated the defect: =ms04q02= is not a
+parallel 12-month question but a FOLLOW-UP asked only when =ms04q01= = No.
+Measured on =ecvmaind_p1p2= (=convert_categoricals=False=): =ms04q02= is NA
+for all 1,174 =ms04q01= = Yes rows and all 5,153 =ms04q01=-missing rows, and
+no row is yes on both.  So the served =wage_work= (=ms04q02=) was NA for
+every current wage worker, and its 269 True were people who did wage work in
+the year but NOT in the last 30 days.  This is a DELIBERATE departure from WB
+parity: =NER_ECVMA1.do:1378= (=recode ms04q02 ... gen( wage_work)=)
+reproduces the skip-pattern error.  Now all three 2011-12 dummies are the
+last 30 days and share one universe (=ms04q01/q03/q05= are NA on the same
+5,153 rows).  Measured, cold private roots: 2011-12 =wage_work= True / False
+/ NA 269 / 18,529 / 6,327 -> 1,174 / 18,798 / 5,153; every other column and
+every other wave frame-equal (125,294 rows either way).  The cross-wave
+reference-period mix remains: 2011-12 is 30-day, 2014-15 and EHCVM 7-day.
+Pinned by =tests/test_niger_2011_12_wage_work.py=.  Cache: the wave script,
+=niger.py= and =data_scheme.yml= comments move every Niger hash (one Niger
+re-warm).
 
 ** Also open on #877, and wider than Niger
 
