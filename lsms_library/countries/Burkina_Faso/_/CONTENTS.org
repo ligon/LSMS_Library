@@ -1392,6 +1392,52 @@ is excluded from both sides of the loss fraction and named in the message.
 The residual 15.9% is p1's nine items above plus 219 clipped zeros, and it
 is reported, not suppressed.
 
+** 2026-11-03 -- WAITING the held questionnaire answers both open questions (GH #864)
+
+Read from =2014/Documentation/Questionnaire_EMC_2014_Passage_1.pdf= (via
+=get_data_file= into a private data root; text layer extracted with PyMuPDF
+from the cluster Python 3.10 module, the venv has no PDF reader) and the
+variable labels of =emc2014_p1_conso7jours_16032015.dta=.  Nothing is
+rewired here; the decision is #864's.
+
+*Section C has three DISJOINT blocks, each with its own quantity, unit and
+value* (PDF pp. 15-18, headers repeated on each page; verbatim): « C04. Quelles sont la quantité totale et la valeur
+des achats consommés et prélèvement de stocks achetés consommé du [PRODUIT]
+par le ménage au cours des 7 derniers jours »; « C05. [...] consommé par le
+ménage qui ont été prélevées de sa propre production »; « C06. [...] reçues
+en cadeau, en contrepartie d'un travail ou en troc ».  A separate « C02.
+Combien le Ménage a-t-il dépensé pour des achats du [PRODUIT] au cours des 7
+derniers jours ? » precedes them.  The file labels bind them: =qachat= /
+=uachat= / =achat= = « Quantité / Unité / Montant en fcfa C04 »;
+=qautocons= / =uautocons= / =autocons= = C05; =qcadeau= / =ucadeau= /
+=cadeau= = C06; =mtt_dep= = C02.
+
+So *=qachat= is the PURCHASED quantity consumed, not a total*, and the
+reshape's =purchased = (qachat - qautocons).clip(0)= subtracts a disjoint
+block.  Measured on p1 (171,236 rows): 283 rows have both =qachat > 0= and
+=qautocons > 0=; on 238 of them =qautocons >= qachat=, so the purchased
+quantity is clipped to 0 (the 219 served zeros), and on 45 the two blocks are
+in DIFFERENT units.  And the own-production rows are served in the wrong
+unit: =Produced= rides the =u= index, which is bound to =uachat=, so 11,123
+of the 11,418 served 2014 produced rows carry =u = 'Unknown'= although 11,108
+of the 11,136 source rows with production but no purchase record their own
+unit =uautocons= (measured on the shared warm parquet at =3a33f2869=).
+
+*The nine null-quantity items are not asked a quantity.*  In the printed grid
+the QUANTITE / UNITE boxes are absent for Beurre de Karité, Pâte d'arachide,
+Gombo, Kapok, Oignons, Feuilles, Fruits, Haricot and Soumbala in all three
+blocks (only MONTANT), and for Sel in C04 / C05 (a C06 quantity only).  A
+layout count over the text layer finds 37 of the 59 items with fewer than
+three quantity grids (20 with none; most of the rest have no C05 grid --
+flours, bread, sugar, drinks).  This is C4 evidence that their missing
+=qachat= is by design, i.e. the =money_only= pattern at item grain.
+
+*Still unread* (p1): =qcadeau= > 0 on 1,468 rows and =cadeau= > 0 on 3,263
+(2,505,140 CFA); =autocons= > 0 on 27,313 (43,472,367 CFA); and =mtt_dep=
+(C02) sums to 106,129,109 CFA against =achat= (C04 value) 93,383,167 -- equal
+on 108,028 of the 144,439 rows carrying either.  Which of C02 and C04 is the
+=Expenditure= is a decision too.
+
 ** GH #794: 47,137 + 16,610 leaked rows, and why "the keys do not match" was the wrong question
 
 *Before* (warm cache, 2026-10-14) the served =j= carried:
@@ -1534,7 +1580,40 @@ without printing source keys.  The Org edit invalidates all 24 Burkina
 table hashes; other countries and shared framework fingerprints are unchanged.
 The separate #1119 named-crop vocabulary mismatch is not changed here.
 
-* 2026-10-21 -- =plot_inputs= gift/donation fields served under purchase names (GH #1188)
+** 2026-11-03 -- WAITING code 21: the held 2018 questionnaire has no such code, and it occurs in vague 2 only (GH #1187)
+
+The two household questionnaire workbooks are now held
+(=2018-19/Documentation/Questionnaire/bfa_ehcvm1_qnr_household_excel_vague{1,2}.xls=,
+read through =get_data_file= into a private data root; the venv has no
+=xlrd=, so they were parsed with the cluster module Python 3.10's =xlrd 2.0.1=).
+Sheet =S16b_Agri=, column (16B.01) « Type d'intrants », lists codes 1-20 in
+BOTH vagues, ending at 20 « Autres semences »; *there is no code 21 in either
+workbook*.  So the instrument the repo holds is silent on code 21 -- a C4
+check that finds nothing, not one that settles the meaning.  The nomenclature
+PDFs (=bfa_ehcvm1_nomenclature_vague{1,2}.pdf=) are still not held.
+
+Measured on =s16b_me_bfa2018.dta=:
+- *All 602 code-21 rows are vague 2* (0 in vague 1), against 11,425 / 11,452
+  applied rows per vague; 2,251 / 2,258 households.  So 21 is a slot the
+  vague-2 CAPI added, not part of the printed list.
+- When it appears, code 20 « Autres semences » falls from 649 rows (vague 1)
+  to 234 (vague 2); 105 households report both 20 and 21 in vague 2.
+- 591 of the 602 are in unit code 2 (Kilogramme).
+- Cross-check against =s16c= (harvest): *593 of the 602 code-21 households
+  (98.5%) harvested Arachide*, against 637 of 2,258 (28%) vague-2 input
+  households, 113 of 234 (48%) vague-2 code-20 households and 490 of 649
+  (75%) vague-1 code-20 households.
+
+That is strong *data* evidence that vague-2 code 21 is groundnut seed (EHCVM-2
+2021 adds « Semences d'arachide » as its own code 19), and that vague 1 records
+the same seed under 20 « Autres semences ».  It is inference, not a source
+binding, so nothing is changed: =harmonize_input= keeps 21 -> =Seed= (which
+this evidence supports) and =harmonize_seed_crop= keeps the source-qualified
+=Unknown [Burkina_Faso 2018-19 s16bq01=21]=.  Naming the crop =Arachide= on
+this evidence is a decision for #1187.  A cross-vague comparison of seed by
+crop is affected either way: vague 1's groundnut seed sits in « Autres
+semences ».
+
 
 Independent review of the identity repair at =3848778d0e8676c798883c11ea3e33fc88e8a591=
 found a separate source-binding contradiction in =2018-19/_/plot_inputs.py=.
