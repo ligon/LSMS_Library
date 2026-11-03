@@ -2304,3 +2304,28 @@ pre-export OUTER/committed pre-publication RECEIVER do not replace final ordinar
 closure. Prior held packages remained unexecuted. Root accepted the qualified result after the full independent seal; reviewed
 public integration and inventory reconciliation remain pending. Exact scope and references:
 =slurm_logs/isa_recovery_2026-10-29/Mali/1287-people-runtime-receipt-v1/REPORT.md=.
+
+* 2026-11-03 -- EAC-I community prices: the 129 unresolved unit codes, re-measured (GH #1179)
+
+Re-measured at development =3a33f2869= by rebuilding the 2014-15 wave script's
+per-reading frame (=mali._crop_labels= / =_unit_labels=, read-only): still 129
+positive-price entries with a resolvable item and an unresolved unit -- 49 code
+99, 19 code 0, 58 other integers, 3 fractional; weights 79 positive / 22 zero /
+15 sentinel 999 / 13 missing; 43 / 67 / 19 in readings 1 / 2 / 3.  The section
+of 2026-10-21 above is unchanged.  New:
+
+- The 58 "other integer" codes take only round values: 100 (22), 40 (11), 50 (9),
+  30 (4), 60 (3), 90 (3), 80 (2), 15 / 20 / 33 / 70 (1 each).  One of 58 equals
+  its own reading's weight and none equals its price, so they are NOT a simple
+  weight- or price-into-unit-field swap.  All 15 sentinel-999 weights are in this
+  group.
+- Code 0 occurs only in passage 1 (19 entries).  Code 99 is 42 passage-1 and 7
+  passage-2 (reading 1) entries.
+- The 129 sit on 84 source rows in 34 clusters -- concentrated, not diffuse.
+- Only 43 have any resolved positive-price reading on the SAME source row, and 4
+  of those match it on both price and weight (7 on price alone).  Adjacent
+  readings therefore cannot carry a recovery rule, and using them would be the
+  unit inference #1179 forbids.
+
+Nothing in the held data says what these codes mean.  Eligibility is unchanged;
+the open question is still producer instructions or a released correction.
