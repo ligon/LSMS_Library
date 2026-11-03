@@ -8,7 +8,9 @@ import pandas as pd
 import numpy as np
 import json
 from malawi import (handling_unusual_units, conversion_table_matching,
-                    food_acquired_to_canonical, normalize_food_label)
+                    food_acquired_to_canonical, normalize_food_label,
+                    is_other_specify_code)
+from lsms_library.transformations import U_UNKNOWN
 
 wave = '2019-20'
 
@@ -70,6 +72,17 @@ df = df.merge(conversions, how='left',
 
 df = df.set_index(['j', 'i'])
 df = handling_unusual_units(df, suffixes=['consumed','bought','produced','gifted'])
+
+# GH #1074 ruling (@ligon 2026-11-03): a row served u = 'Unknown' ("no unit
+# recorded") does NOT keep the conversion table's code-23 OTHER (SPECIFY)
+# factor.  The factor was merged above on the RAW code, so a code-23 row
+# whose specify text is absent, 'N/A' or names a food (handling_unusual_units)
+# still carried that table's factor for an unnamed unit -- e.g. 10.99 kg per
+# mango.  Code-23 rows whose text names a unit keep their factor.
+for s in ['consumed', 'bought', 'produced', 'gifted']:
+    no_unit = (df[f'u_{s}'].eq(U_UNKNOWN).fillna(False).to_numpy()
+               & is_other_specify_code(df[f'unitcode_{s}']).to_numpy())
+    df[f'cfactor_{s}'] = df[f'cfactor_{s}'].mask(no_unit)
 
 df['t'] = wave
 df = df.reset_index()
