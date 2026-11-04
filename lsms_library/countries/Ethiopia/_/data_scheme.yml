@@ -164,8 +164,8 @@ Data Scheme:
     materialize: make
 
   crop_production:
-    # GAP 1 — item-level crop harvest at (t, i, plot_id, j, u).  One row
-    # per (plot, crop) from ESS §9 post-harvest (sect9_ph), carrying only
+    # GAP 1 — item-level crop harvest at (t, i, plot_id, j, u, production_obs).
+    # One row per harvest line of ESS §9 post-harvest (sect9_ph), carrying only
     # REPORTED fields: harvest Quantity in its native unit u, Quantity_sold
     # / Value_sold from §11 (attached at the unambiguous holder-crop join,
     # see ethiopia.crop_production_for_wave SALES GRAIN CAVEAT) and, in
@@ -188,7 +188,13 @@ Data Scheme:
     # crop_production.j joins food_acquired.j.  Multi-file joins (§9+§4+§11,
     # + §12 in W1-W3, + §3 for W1 intercrop) + code->label harmonization
     # => script.
-    index: (t, i, plot_id, j, u)
+    #
+    # production_obs (GH #1461) is the canonical native crop-observation
+    # coordinate: (t, i, plot_id, j, u) repeats where crop codes fold onto one
+    # label, and in W4/W5 where one code is on two roster lines.
+    # reported:crop_code:<n> in W1-W3 (no line id is shipped; the code is unique
+    # within a plot), reported:crop_id:<n> in W4/W5 ("Unique Crop Identifier").
+    index: (t, i, plot_id, j, u, production_obs)
     Quantity: float
     Quantity_sold: float
     Value_sold: float

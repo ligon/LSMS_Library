@@ -1248,16 +1248,37 @@ def food_coping_for_wave(t, df, hhid):
 # crop_production (GAP 1 — item-level harvest at (t, i, plot, crop))
 # ---------------------------------------------------------------------
 #
-# ESS post-harvest §9 (sect9_ph) records ONE ROW PER (plot, crop): the
-# crop the farmer grew on a field, the REPORTED harvest quantity, and the
-# native reporting unit.  This is the clean item-level source.  We emit
-# exactly those reported fields — NO unit->kg conversion, NO yield, NO
+# ESS post-harvest §9 (sect9_ph) records one row per HARVEST LINE of a field
+# roster: the crop the farmer grew on a field, the REPORTED harvest quantity,
+# and the native reporting unit.  This is the clean item-level source.  We
+# emit exactly those reported fields — NO unit->kg conversion, NO yield, NO
 # main-crop / value-share rollups (those are transformations, per the
 # parity-loop hard rule).
 #
 # Grain / IDs: plot_id == format_id(holder_id)_format_id(parcel_id)_
 # format_id(field_id) and i == format_id(household_id[2]), IDENTICAL to
 # plot_features (so crop_production joins plot_features on (t, i, plot)).
+#
+# production_obs (GH #1461): (t, i, plot_id, j, u) does not identify a line.
+# A plot can hold two crop CODES `harmonize_crop` folds onto one label (KALE /
+# CABBAGE / SPINACH -> 'Leafy Greens') in every wave, and in W4/W5 two roster
+# lines of one code.  The canonical `production_obs` level names the line:
+#   W1-W3  `reported:crop_code:<n>` -- the §9 line's own crop code, unique
+#          within a plot once the W2 repeat records below are gone.  These
+#          files ship no line id: W2's ph_s9q00 / q0a / q0c / q0d only echo
+#          parcel, field, crop code and crop name; W3's `obs` has no variable
+#          label, 251 nulls and repeats within a plot.
+#   W4/W5  `reported:crop_id:<n>` -- "Unique Crop Identifier", the instrument's
+#          line id, unique within a plot on every row.
+#
+# §9 REPEAT RECORDS (GH #1461): W2 ships 605 records twice, identical on all 43
+# columns.  They are one record listed twice, not a second harvest: every pair
+# is adjacent in the file, no record appears three times, the §4 roster lists
+# each of the 605 (plot, crop) keys exactly once (and no key twice anywhere),
+# and §9's sibling files §10 / §11 / §12 repeat nothing.  The builder drops the
+# repeat on the full raw record before anything is projected (the Malawi IHS3
+# 2010-11 rule, `malawi.drop_repeated_records`) and warns the count.  W1, W3,
+# W4 and W5 ship none.
 #
 # Columns (all REPORTED, item-level):
 #   Quantity        reported harvest quantity (native unit)
@@ -1281,11 +1302,11 @@ def food_coping_for_wave(t, df, hhid):
 # crop) — NOT (plot, crop).  A holder who grows one crop on several plots
 # reports a single sale figure that cannot be split across plots without
 # fabricating an allocation.  We therefore attach Quantity_sold /
-# Value_sold ONLY where the (holder, crop) maps to exactly ONE plot-crop
-# harvest row (unambiguous).  Where the crop is grown on multiple plots
-# the sale columns stay NaN — we never duplicate or arbitrarily split a
-# reported value.  (Cross-wave aggregate harvest_sold lives in
-# transformations, not here.)
+# Value_sold ONLY where the (holder, crop) maps to exactly ONE §9 harvest
+# line (unambiguous).  Where the crop is on several lines -- several plots,
+# or (W4/W5, GH #1461) several roster lines of one plot -- the sale columns
+# stay NaN — we never duplicate or arbitrarily split a reported value.
+# (Cross-wave aggregate harvest_sold lives in transformations, not here.)
 #
 # §12 -- THE SECOND SALE MODULE (W1-W3 only; GH #820).  In ESS1-ESS3 §11 is
 # headed "CROP DISPOSITION -- EXCLUDE TREE/FRUIT/VEGETABLE/ROOT CROPS"
@@ -1740,6 +1761,14 @@ class Sect12SaleWarning(UserWarning):
     for script-path waves -- clear the Ethiopia cache instead)."""
 
 
+class Sect9RepeatRecordWarning(UserWarning):
+    """§9 records dropped because they repeat an earlier record in every
+    column of the file (GH #1461; W2 only, 605 records).
+
+    Raised at BUILD time, like :class:`Sect12SaleWarning`, so a warm read does
+    not show it.  The durable record is ``Ethiopia/_/CONTENTS.org``."""
+
+
 #: The registry key stamped on ``crop_production.Derivation`` for every row
 #: whose ``Quantity_sold`` / ``Value_sold`` came from §12 (GH #820).  Entry:
 #: ``Ethiopia/_/derivations.yml``.  What is derived is the WINDOW: §12 Q6-Q8
@@ -1976,6 +2005,19 @@ def inputs_permanent_crop_window(wave):
     return pd.concat([a, b])
 
 
+def _s9_lines_per_holder_crop(out):
+    """§9 lines per (holder, crop): ``_holder``, ``_code``, ``_nlines``.
+
+    The denominator of the SALES GRAIN CAVEAT, for §11 and §12 alike.  It counts
+    LINES, not plots (GH #1461): with ``production_obs`` both lines of a crop
+    listed twice on one plot are served, so a plot count would put the holder's
+    one sale on both rows.
+    """
+    return (out.dropna(subset=['_code'])
+               .groupby(['_holder', '_code']).size()
+               .rename('_nlines').reset_index())
+
+
 def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
                          sale=None):
     """Fill §9 rows' empty sale columns from ESS §12 (GH #820).
@@ -1990,8 +2032,8 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
     means the instrument fixes the unit at KG (W1/W2 Q7, "(KG)").  ``sale``
     is the raw §11 file, used only to find (holder, crop) collisions.
 
-    Every §12 line lands in exactly ONE of these classes (the partition is
-    asserted in :func:`_report_sect12_sales`), and every class but the last
+    Every §12 line lands in exactly ONE of these seven classes (the partition
+    is asserted in :func:`_report_sect12_sales`), and every class but the last
     is COUNTED and warned (:class:`Sect12SaleWarning`), never silently
     dropped:
 
@@ -2009,14 +2051,9 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
     4. *no §9 row* -- no harvest row of that crop for that holder (the W1
        case: W1 §9 EXCLUDES tree/root crops).  Nothing to attach to.
     5. *several §9 plots* -- the SALES GRAIN CAVEAT: a holder-level sale is
-       never split across plots.
-    6. *folded key* -- the one §9 row shares its declared key
-       (i, plot_id, j, u) with a row of another crop code that
-       ``harmonize_crop`` folds onto the same label (KALE / SPINACH ->
-       'Leafy Greens').  The core collapse picks the more complete of the
-       two, so a fill would change which row is served for a key that is
-       already a GrainCollapseWarning.
-    7. *attached, then dropped* -- the line attached to its plot, but every
+       never split across §9 lines.  W1-W3's §9 holds one line per (plot,
+       crop) (GH #1461), so its several lines are several plots.
+    6. *attached, then dropped* -- the line attached to its plot, but every
        §9 row it attached to is then removed by the build's empty-row filter
        in :func:`crop_production_for_wave` (``u`` missing and nothing to
        serve).  Since the 2026-10-23 ruling that filter keeps any row with a
@@ -2024,7 +2061,7 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
        here (asserted in :func:`_report_sect12_sales`); only a line that
        filled nothing (Q6 not No, Q7 and Q8 blank) can, on a row that is
        genuinely empty.  Counted there, after the filter.
-    8. *attached and served* -- exactly one §9 plot: ``Value_sold`` is
+    7. *attached and served* -- exactly one §9 line: ``Value_sold`` is
        filled, and ``Quantity_sold`` where the sale unit equals the row's
        harvest ``u`` (as for §11; a §12 sale with no recorded unit attaches
        no quantity, it is NOT assumed to be Kg).
@@ -2041,8 +2078,6 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
     ``'_attached'`` frame of the attached (holder, crop) pairs, which
     :func:`_report_sect12_sales` consumes.
     """
-    from lsms_library.transformations import U_UNKNOWN
-
     c = colmap
     s = sale12
     n0 = len(out)
@@ -2097,40 +2132,22 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
     rep['collides_s11'] = _sect12_tally(f[coll])
     f = f[~coll].copy()
 
-    # 4./5. plot linkage through the §9 rows (the SALES GRAIN CAVEAT)
-    nplots = (out.dropna(subset=['_code'])
-                 .groupby(['_holder', '_code'])['plot_id'].nunique()
-                 .rename('_nplots').reset_index())
-    nplots['_holder'] = nplots['_holder'].astype('string')
-    f = f.merge(nplots, on=['_holder', '_code'], how='left')
-    f['_nplots'] = f['_nplots'].fillna(0)
-    rep['no_s9_row'] = _sect12_tally(f[f['_nplots'] == 0])
-    rep['several_s9_plots'] = _sect12_tally(f[f['_nplots'] > 1])
-    f = f[f['_nplots'] == 1]
+    # 4./5. linkage through the §9 lines (the SALES GRAIN CAVEAT)
+    #
+    # A folded key -- the §9 row shares (i, plot_id, j, u) with a row of a
+    # DIFFERENT crop code harmonize_crop folds onto one label -- needs no class
+    # of its own any more (GH #1461): production_obs keeps both rows, and each
+    # code has its own line to attach to.  It used to be counted and not
+    # attached, because the core collapse then chose between the two rows.
+    nlines = _s9_lines_per_holder_crop(out)
+    nlines['_holder'] = nlines['_holder'].astype('string')
+    f = f.merge(nlines, on=['_holder', '_code'], how='left')
+    f['_nlines'] = f['_nlines'].fillna(0)
+    rep['no_s9_row'] = _sect12_tally(f[f['_nlines'] == 0])
+    rep['several_s9_plots'] = _sect12_tally(f[f['_nlines'] > 1])
+    f = f[f['_nlines'] == 1]
 
-    # 6. a FOLDED key: the target row shares its declared key
-    # (i, plot_id, j, u) with a row of a DIFFERENT crop code, because
-    # harmonize_crop folds both codes onto one label (KALE 56 / SPINACH 69
-    # -> 'Leafy Greens').  The core grain collapse then serves whichever of
-    # the two rows is more complete, so filling one of them would change
-    # which row -- and which harvest_month, planting_month ... -- the table
-    # serves for a key it already reports as a GrainCollapseWarning.  The
-    # sale is not attributable to the served row either way: counted, not
-    # attached.
-    key = pd.DataFrame({
-        'i': out['i'].astype('string'), 'plot_id': out['plot_id'].astype('string'),
-        'j': out['j'].astype('string'),
-        'u': out['u'].astype('string').fillna(U_UNKNOWN),
-        '_holder': out['_holder'].astype('string'), '_code': out['_code'],
-    }).dropna(subset=['i', 'plot_id', 'j', '_code'])
-    ncodes = key.groupby(['i', 'plot_id', 'j', 'u'])['_code'].transform('nunique')
-    folded = key.loc[ncodes > 1, ['_holder', '_code']].drop_duplicates()
-    fold = pd.MultiIndex.from_frame(f[['_holder', '_code']]).isin(
-        pd.MultiIndex.from_frame(folded)) if len(folded) else np.zeros(len(f), dtype=bool)
-    rep['folded_key'] = _sect12_tally(f[fold])
-    f = f[~fold]
-
-    # 7./8. attach.  Unique on (holder, crop) by construction (step 2) --
+    # 6./7. attach.  Unique on (holder, crop) by construction (step 2) --
     # asserted, because a fan-out here would silently duplicate a sale.
     assert not f.duplicated(['_holder', '_code']).any(), \
         f"{t}: §12 attach frame not unique on (holder, crop)"
@@ -2189,8 +2206,8 @@ def _report_sect12_sales(t, rep, kept):
 
     ``kept`` is the post-filter frame of :func:`crop_production_for_wave`,
     still carrying ``_holder`` / ``_code``.  An attached pair none of whose
-    target rows survived is class 7, *attached then dropped*; the rest are
-    class 8, *attached and served*.  Asserts the eight classes partition the
+    target rows survived is class 6, *attached then dropped*; the rest are
+    class 7, *attached and served*.  Asserts the seven classes partition the
     lines read.  Returns the report (without its private frame).
     """
     att = rep.pop('_attached')
@@ -2200,7 +2217,7 @@ def _report_sect12_sales(t, rep, kept):
     rep['attached_then_dropped'] = _sect12_tally(att[~survived])
     rep['attached'] = _sect12_tally(att[survived])
     # A row carrying a sale value is never dropped (ruling 2026-10-23): no
-    # line that brought a Value_sold may be in class 7.
+    # line that brought a Value_sold may be in class 6.
     assert att.loc[~survived, 'Value_sold'].isna().all(), \
         f"{t}: §12 lines with a sale value were dropped by the empty-row filter"
     stamped = kept['Derivation'] == SECT12_SALE_DERIVATION if 'Derivation' in kept else None
@@ -2209,8 +2226,7 @@ def _report_sect12_sales(t, rep, kept):
         (stamped.fillna(False) & (kept['Value_sold'] > 0).fillna(False)).sum()
     ) if stamped is not None else 0
     classes = ('placeholder', 'repeated', 'collides_s11', 'no_s9_row',
-               'several_s9_plots', 'folded_key', 'attached_then_dropped',
-               'attached')
+               'several_s9_plots', 'attached_then_dropped', 'attached')
     assert sum(rep[k]['lines'] for k in classes) == rep['read']['lines'], \
         f"{t}: §12 classes do not partition the {rep['read']['lines']} lines read"
     lost = classes[:-1]
@@ -2259,6 +2275,9 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
             crop_code                              — §9 crop code column
             quantity                               — §9 reported harvest qty
         Optional keys (NaN where omitted):
+            production_id   — §9 line id column (W4/W5 ``crop_id``, "Unique
+                              Crop Identifier"); omitted => the line's crop
+                              code, which W1-W3 key on (GH #1461)
             unit            — §9 native harvest-unit code col (None => Kg,
                               W1 reports kilos directly)
             harvest_month   — §9 harvest-END month code col
@@ -2287,7 +2306,8 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
 
     Returns
     -------
-    pd.DataFrame indexed by ``(t, i, plot_id, j, u)`` with columns
+    pd.DataFrame indexed by ``(t, i, plot_id, j, u, production_obs)``, unique
+    (a repeat raises), with columns
         Quantity (float), Quantity_sold (float), Value_sold (float),
         planting_month (Int64), harvest_month (Int64),
         intercropped (boolean), perennial (boolean), and -- only when
@@ -2301,7 +2321,20 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
     c = colmap
     crop_map = _eth_crop_label_map_for_wave(t)   # GH #1252: codes drift by wave
 
-    h = harvest.copy()
+    # §9 repeat records (GH #1461): a record identical to an earlier one in
+    # EVERY column of the file is that record listed twice, not a second
+    # harvest.  Judged on the full raw frame, before anything is projected.
+    repeat = harvest.duplicated(keep='first').to_numpy()
+    if repeat.any():
+        warnings.warn(
+            f"Ethiopia/crop_production {t}: dropped {int(repeat.sum())} §9 "
+            f"records that repeat an earlier record in every column.  See "
+            f"ethiopia.py, '§9 REPEAT RECORDS'.  Build-time only: a warm read "
+            f"does not repeat this.",
+            Sect9RepeatRecordWarning, stacklevel=2)
+    h = harvest[~repeat].copy()
+    if unit_labels is not None:
+        unit_labels = unit_labels[~repeat]
     # plot_id identical to plot_features.
     plot_id = (h[c['holder_id']].apply(format_id).astype(str) + '_'
                + h[c['parcel_id']].apply(format_id).astype(str) + '_'
@@ -2317,6 +2350,11 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         'j':       code.map(crop_map).astype('string').values,
         'Quantity': pd.to_numeric(h[c['quantity']], errors='coerce').astype('Float64').values,
     })
+    # The native line coordinate (GH #1461): see "production_obs" above.
+    line_id = c.get('production_id') or 'crop_code'
+    line = pd.to_numeric(h[c.get('production_id') or c['crop_code']],
+                         errors='coerce').astype('Int64')
+    out['production_obs'] = (f'reported:{line_id}:' + line.astype('string')).values
 
     # Native harvest unit (Preferred Label).  W1 reports kilos directly.
     if unit_labels is not None:
@@ -2479,11 +2517,9 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         qagg = (sdf.dropna(subset=['_sunit'])
                    .groupby(['_holder', '_code', '_sunit'], as_index=False)['Quantity_sold']
                    .sum(min_count=1))
-        # Count plot-crop harvest rows per (holder, crop); attach only when 1.
-        nplots = (out.dropna(subset=['_code'])
-                     .groupby(['_holder', '_code'])['plot_id'].nunique()
-                     .rename('_nplots').reset_index())
-        keep = nplots[nplots['_nplots'] == 1][['_holder', '_code']]
+        # Count §9 lines per (holder, crop); attach only when 1.
+        nlines = _s9_lines_per_holder_crop(out)
+        keep = nlines[nlines['_nlines'] == 1][['_holder', '_code']]
         vagg = vagg.merge(keep, on=['_holder', '_code'], how='inner')
         qagg = qagg.merge(keep, on=['_holder', '_code'], how='inner')
         out = out.drop(columns=['Quantity_sold', 'Value_sold'])
@@ -2542,7 +2578,15 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         out = out.drop(columns=['_permanent'])
     out = out.drop(columns=['_holder', '_code'])
     out['u'] = out['u'].fillna(U_UNKNOWN)
-    out = out.set_index(['t', 'i', 'plot_id', 'j', 'u'])
+    # production_obs names every line, so a repeat is a source defect: raise,
+    # never reduce (GH #1461; the Tanzania GH #637 / Niger GH #1360 rule).
+    if out['production_obs'].isna().any():
+        raise ValueError(f"crop_production {t}: a served §9 line has no line id")
+    out = out.set_index(['t', 'i', 'plot_id', 'j', 'u', 'production_obs'])
+    if not out.index.is_unique:
+        raise ValueError(
+            f"crop_production {t}: production_obs does not identify every §9 "
+            f"line ({int(out.index.duplicated().sum())} repeated)")
     # Stable column order.  `Derivation` exists only where §12 was read
     # (W1-W3: its registry key on the rows §12 filled) or the §4 permanent
     # flag was (W4/W5: the window key on permanent-crop rows); NA elsewhere.

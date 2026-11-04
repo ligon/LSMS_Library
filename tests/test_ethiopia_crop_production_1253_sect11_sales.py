@@ -272,14 +272,17 @@ def test_served_zero_sale_counts_per_wave(cp):
     where every remaining "No" has no sale unit).  No row added or dropped by
     GH #1253 itself; the later empty-row-filter ruling (2026-10-23) keeps the
     rows that carry a sale value, among them 338 / 70 / 141 / 245 W2-W5 rows
-    whose "No" serves Value_sold 0 -- hence the Value_sold counts below and
-    86,403 rows."""
+    whose "No" serves Value_sold 0 -- hence the Value_sold counts below.
+    GH #1461 moves them again: the 2 W1 and 6 W3 zeros are folded-key lines that
+    now attach (the W1 two on Kg rows, so Quantity_sold 0 as well); the W4 / W5
+    falls are zeros of a crop on several lines, which no longer attach; 86,403
+    -> 86,437 rows (37 lines back, 3 rows left empty)."""
     t = cp.index.get_level_values("t")
     waves = sorted(set(t))
     v0 = {w: int(((cp["Value_sold"] == 0).fillna(False) & (t == w)).sum()) for w in waves}
     q0 = {w: int(((cp["Quantity_sold"] == 0).fillna(False) & (t == w)).sum()) for w in waves}
-    assert v0 == {"2011-12": 3141, "2013-14": 7734, "2015-16": 7045,
-                  "2018-19": 4513, "2021-22": 2964}, v0
-    assert q0 == {"2011-12": 3142, "2013-14": 2581, "2015-16": 0,
+    assert v0 == {"2011-12": 3143, "2013-14": 7734, "2015-16": 7051,
+                  "2018-19": 4512, "2021-22": 2961}, v0
+    assert q0 == {"2011-12": 3144, "2013-14": 2581, "2015-16": 0,
                   "2018-19": 0, "2021-22": 0}, q0
-    assert len(cp) == 86403
+    assert len(cp) == 86437

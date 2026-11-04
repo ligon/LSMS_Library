@@ -21,9 +21,8 @@ Ethiopia::crop_production::sect12-sale-period:
     (holder, crop) -- THE IDENTITY -- except that Q6 = 2 (No) with Q7 and Q8
     both blank is a sale of 0, as section 11 reads it.  Attached only where
     the (holder, crop) is on ONE section-12 line, is not in section 11
-    (section 11 wins and the two are never summed), is grown on exactly one
-    section-9 plot (the SALES GRAIN CAVEAT) and that plot's key is not
-    shared with another crop code harmonize_crop folds onto the same label;
+    (section 11 wins and the two are never summed) and is on exactly one
+    section-9 line (the SALES GRAIN CAVEAT);
     Quantity_sold only where Q7's unit (KG in W1/W2 by the instrument;
     ph_s12q0b in W3) equals the row's harvest u.  What is derived is the
     WINDOW, not the number: section 12 asks about the crop COLLECTED in the
@@ -73,8 +72,8 @@ Ethiopia::crop_production::sect12-sale-period:
         different window -- the function is the identity and the registry
         is the point")
     - text: >-
-        a holder-level sale belongs to the crop's only section-9 plot (and to
-        no row where the crop is on several plots); the section-12 file is
+        a holder-level sale belongs to the crop's only section-9 line (and to
+        no row where the crop is on several); the section-12 file is
         keyed (household, holder, crop) with no parcel or field, the grain of
         section 11
       basis: config-comment

@@ -403,11 +403,16 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     they have no kg: ``none`` rises by exactly 884 in all four splits
     (44,994 -> 45,878; 14,993 -> 15,877; 58,971 -> 59,855; 15,046 -> 15,930)
     and every other count and every ``Harvest_kg`` total is unchanged.
+
+    2026-11-04, GH #1461: 86,403 -> 86,437 rows.  ``production_obs`` serves 37
+    lines the core collapse used to drop, and 3 no-unit W5 rows leave with the
+    sale they carried.  The kg rungs and totals below move by those lines only:
+    ``Harvest_kg`` +1,550 kg bare, +1,932.35 kg with the shipped table.
     """
     import lsms_library as ll
 
     cp = ll.Country("Ethiopia").crop_production()
-    assert len(cp) == 86_403
+    assert len(cp) == 86_437
     # Ethiopia asks NO per-row conversion factor, so `reported` is
     # structurally empty and `reported_vs_shipped` can never be populated.
     assert "KgFactor" not in cp.columns
@@ -420,8 +425,8 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     b, a = before.attrs["kg_factor_sources"], after.attrs["kg_factor_sources"]
     assert before.attrs["kg_factor_declared_from"] == "attrs"
     assert b["shipped"] == 0 and b["shipped_matched"] == 0
-    assert b["metric"] == 40_525 and b["none"] == 45_878
-    assert b["declared"] == a["declared"] == 13_977
+    assert b["metric"] == 40_544 and b["none"] == 45_893
+    assert b["declared"] == a["declared"] == 13_979
     # 2026-09-18, GH #832: `shipped` / `shipped_matched` 62,164 -> 62,705 and
     # `none` 15,587 -> 15,046, both by the SAME 541 rows.  Those are 2015-16
     # Zorba/Akara harvest rows whose unit label carried the double-encoded
@@ -432,8 +437,9 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     # move -- nothing about the metric seeds changed.  Harvest_kg total
     # 12,680,617.28 -> 12,685,707.32; the ratio asserted below rises
     # 6.654 -> 6.657, so `> 6 *` still holds as written.
-    assert a["shipped"] == 62_705 and a["shipped_matched"] == 62_705
-    assert a["metric"] == 7_821 and a["none"] == 15_877
+    # (62,705 / 7,821 / 15,877 before GH #1461, in the docstring.)
+    assert a["shipped"] == 62_727 and a["shipped_matched"] == 62_727
+    assert a["metric"] == 7_823 and a["none"] == 15_887
     # Ethiopia's crop units are ALL read off a label, never guessed.  Pinned
     # as its own assertion rather than folded into the counts above: if the
     # price-ratio inference ever starts serving this country, that is a fact
@@ -448,9 +454,9 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     at = after.groupby(level="t")["Harvest_kg"].sum()
     assert float(bt["2011-12"]) == pytest.approx(float(at["2011-12"]))
     assert float(bt["2011-12"]) == pytest.approx(653_661.0)
-    assert float(bt.sum()) == pytest.approx(8_799_669.50962, rel=1e-9)
-    assert float(at.sum()) == pytest.approx(12_696_657.323532, rel=1e-9)
-    assert float(at.sum()) / float(bt.sum()) == pytest.approx(1.4429, abs=1e-4)
+    assert float(bt.sum()) == pytest.approx(8_801_219.50962, rel=1e-9)
+    assert float(at.sum()) == pytest.approx(12_698_589.673543, rel=1e-9)
+    assert float(at.sum()) / float(bt.sum()) == pytest.approx(1.4428, abs=1e-4)
 
     # The declaration switched OFF reproduces every pre-#931 number, so the
     # move above is the declared layer and nothing else.
@@ -458,13 +464,13 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     blind_a = harvest_kg(cp, shipped_factors=shipped, unit_kg={})
     ob, oa = (blind_b.attrs["kg_factor_sources"],
               blind_a.attrs["kg_factor_sources"])
-    assert ob["metric"] == 26_548 and ob["none"] == 59_855
-    assert oa["metric"] == 7_768 and oa["none"] == 15_930
+    assert ob["metric"] == 26_565 and ob["none"] == 59_872
+    assert oa["metric"] == 7_770 and oa["none"] == 15_940
     assert ob["declared"] == oa["declared"] == 0
     assert float(blind_b["Harvest_kg"].sum()) == pytest.approx(
-        1_905_712.50962, rel=1e-9)
+        1_906_062.50962, rel=1e-9)
     assert float(blind_a["Harvest_kg"].sum()) == pytest.approx(
-        12_685_707.323532, rel=1e-9)
+        12_687_639.673543, rel=1e-9)
     assert float(blind_a["Harvest_kg"].sum()) > 6 * float(
         blind_b["Harvest_kg"].sum())
 
@@ -527,11 +533,11 @@ def test_shipped_quintal_matches_the_external_answer_key(ethiopia):
     t = fa.index.get_level_values("t")
     quintal = u == "Quintal"
     # Arrow-backed index comparisons need pandas' reduction interface.
-    assert int(pd.Series(quintal).sum()) == 13_977
+    assert int(pd.Series(quintal).sum()) == 13_979   # 13,977 before GH #1461
 
     # (a) the WB table, against the key: every Quintal row it serves.
     shipped_q = quintal & fa["kg_shipped"].notna()
-    assert int(shipped_q.sum()) == 13_924
+    assert int(shipped_q.sum()) == 13_926
     assert set(fa.loc[shipped_q, "kg_shipped"].astype(float)) == {QUINTAL_KG}
     assert set(fa.loc[shipped_q, "KgFactorSource"]) == {"shipped"}
     assert set(fa.loc[shipped_q, "kg_per_unit"].astype(float)) == {QUINTAL_KG}
@@ -548,7 +554,7 @@ def test_shipped_quintal_matches_the_external_answer_key(ethiopia):
     # quintal has left it, which is exactly why it is no longer the check.
     newly = (fa["kg_shipped"].notna() & fa["kg_metric"].isna()
              & fa["kg_inferred"].isna())
-    assert int(newly.sum()) == 30_001
+    assert int(newly.sum()) == 30_006   # 30,001 before GH #1461
     assert "Quintal" not in set(u[newly])
     overlap = fa["kg_shipped"].notna() & fa["kg_inferred"].notna()
     assert set(pd.Series(u[overlap]).unique()) == {"Kg", "Gram", "Quintal"}

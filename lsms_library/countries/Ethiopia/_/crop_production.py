@@ -2,8 +2,8 @@
 """Concatenate wave-level crop_production data for Ethiopia (GAP 1).
 
 Each wave's ``Ethiopia/<wave>/_/crop_production.py`` produces a parquet
-with index ``(t, i, plot_id, j, u)`` and the canonical crop_production
-columns (Quantity, Quantity_sold, Value_sold, planting_month,
+with index ``(t, i, plot_id, j, u, production_obs)`` and the canonical
+crop_production columns (Quantity, Quantity_sold, Value_sold, planting_month,
 harvest_month, intercropped, perennial).  This script concatenates them
 across the five ESS waves and applies the cross-wave ``id_walk`` so the
 household index uses the panel canonical id scheme (the same conversion
