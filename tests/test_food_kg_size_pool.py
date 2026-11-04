@@ -359,14 +359,88 @@ class TestTheGatesKeepTheirMeaning:
         assert not bare['kg_size_pooled'].any()
         assert f.attrs['kg_factor_declared_none']['rows_refused'] == len(bare)
 
-    def test_a_case_variant_of_the_base_reads_the_pool(self):
-        """The item arm joins on the lower-cased label, so the mask must too."""
-        rows = kg('T1', 'A') + units('T1', 'A', 'tas', 6, 80.0) \
-            + units('T1', 'A', 'Tas (Petit)', 6, 50.0, start=200)
-        df = frame(rows)
-        got = rows_of(food_kg_factors(df), u='tas')
+    @staticmethod
+    def _variant_frame(bare, *, sized=('Tas (Petit)', 'Tas (Grand)')):
+        """The pool's median (0.8) is neither the sized reports' (1.4) nor the
+        bare reports' own (0.2), so the factor says which cell a row read."""
+        return frame(kg('T1', 'A')
+                     + units('T1', 'A', bare, 6, 20.0)
+                     + units('T1', 'A', sized[0], 5, 200.0, start=200)
+                     + units('T1', 'A', sized[1], 5, 80.0, start=300))
+
+    @pytest.mark.parametrize('variant', ['tas', 'TAS', 'Tas ', ' Tas'])
+    def test_a_case_or_padding_variant_reads_the_pool(self, variant):
+        """The factor, not only the mark: the mark must never claim a pool the
+        row did not read."""
+        want = rows_of(food_kg_factors(self._variant_frame('Tas')), u='Tas')
+        got = rows_of(food_kg_factors(self._variant_frame(variant)), u=variant)
+        assert want['kg_per_unit'].iloc[0] == pytest.approx(0.8)
+        assert len(got) == 6
+        np.testing.assert_allclose(got['kg_per_unit'], want['kg_per_unit'])
         assert got['kg_size_pooled'].all()
-        assert set(got['KgFactorSource']) == {'item_unit'}
+        assert set(got['KgFactorSource']) == set(want['KgFactorSource']) == {'item_unit'}
+
+    @pytest.mark.parametrize('variant', ['tas', 'Tas '])
+    def test_a_variant_reads_the_u_pooled_rung_too(self, variant):
+        """B has no kg-labelled row, so only the `unit` rung can serve it.  The
+        pool's households give 0.5 and 2.0, so its median is 1.25."""
+        rows = []
+        for k in range(10):
+            rows += [('T1', f'h{k}', 'A', 'Kg', 1.0, 100.0),
+                     ('T1', f'h{k}', 'B', 'Tas (Petit)', 1.0, 50.0),
+                     ('T1', f'x{k}', 'A', 'Kg', 1.0, 100.0),
+                     ('T1', f'x{k}', 'B', variant, 1.0, 200.0)]
+        got = rows_of(food_kg_factors(frame(rows)), u=variant)
+        assert set(got['KgFactorSource']) == {'unit'}
+        assert got['kg_per_unit'].iloc[0] == pytest.approx(1.25)
+        assert got['kg_size_pooled'].all()
+
+    def test_two_spellings_of_a_base_are_one_family(self):
+        """No built country has this; it must still read one cell, not whichever
+        spelling the join happened to keep."""
+        same = rows_of(food_kg_factors(self._variant_frame('Tas')), u='Tas')
+        two = rows_of(food_kg_factors(self._variant_frame(
+            'Tas', sized=('Tas (Petit)', 'tas (Grand)'))), u='Tas')
+        np.testing.assert_allclose(two['kg_per_unit'], same['kg_per_unit'])
+
+    def test_the_gate_ledger_reads_the_pool(self):
+        """Four bare reports could not clear `min_reports` alone, so with their
+        own cell these rows would never have had a factor for the gate to cost.
+        In the pool they do, so the gate is what cost it."""
+        rows = kg('T1', 'A', 4) + [('T1', 'hx', 'A', 'Kg', 1.0, 12500.0)]     # refused
+        rows += units('T1', 'A', 'Tas', 4, 80.0) \
+            + units('T1', 'A', 'Tas (Petit)', 6, 50.0, start=200)
+        rows += kg('T1', 'B', 10, start=300) \
+            + units('T1', 'B', 'Tas (Grand)', 6, 200.0, start=400)
+        df = frame(rows)
+        f = food_kg_factors(df)
+        bare = rows_of(f, u='Tas', j='A')
+        assert bare['baseline_refused_spread'].all()
+        assert bare['kg_item_unit'].isna().all()
+        want = food_kg_factors(strip_sizes(df))
+        is_bare = df.index.get_level_values('u') == 'Tas'
+        np.testing.assert_array_equal(f.loc[is_bare, 'baseline_refused_spread'],
+                                      want.loc[is_bare, 'baseline_refused_spread'])
+        gate = f.attrs['kg_factor_baseline_gate']
+        assert gate['rows_refused'] == gate['refused_to_unit'] + gate['refused_to_none']
+
+    def test_tightness_reads_the_pool(self):
+        """T1's baseline is the 3-report tight exception, T2's is strict.  The
+        bare label's own cell rests on T1 alone, but its pool has a strict
+        baseline, so it is not thinner evidence and must not say it is."""
+        df = frame(kg('T1', 'A', 3) + units('T1', 'A', 'Tas', 6, 80.0)
+                   + kg('T2', 'A', 10) + units('T2', 'A', 'Tas (Petit)', 6, 50.0))
+        f = food_kg_factors(df)
+        bare = rows_of(f, u='Tas')
+        assert set(bare['KgFactorSource']) == {'item_unit'}
+        assert bare['kg_per_unit'].iloc[0] == pytest.approx(0.65)   # median of 0.8, 0.5
+
+    def test_a_pool_resting_only_on_a_tight_baseline_says_so(self):
+        df = frame(kg('T1', 'A', 3) + units('T1', 'A', 'Tas', 3, 80.0)
+                   + units('T1', 'A', 'Tas (Petit)', 3, 80.0, start=200))
+        f = food_kg_factors(df)
+        assert set(rows_of(f, u='Tas')['KgFactorSource']) == {'item_unit_tight'}
+        assert f.attrs['kg_factor_size_pool']['served_by_item_rung'] == 3
 
 
 class TestTheDerivedTablesCarryTheReport:

@@ -1803,13 +1803,15 @@ def _seeded_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
             factors.pop(u, None)
 
     # GH #919: DECLARED factors outrank KNOWN_METRIC, and are the only layer a
-    # country can override.  `unit_kg` arrives already keyed on the RAW `u`
-    # label, composed by `Country._unit_kg_factors` from the country's merged
-    # `u` (raw -> Preferred Label) and `u_kg` (Preferred Label -> kg) tables.
-    # It is composed THERE rather than here because the kg factor is computed
-    # before the categorical mapping is applied -- `conversion_to_kgs` sees the
-    # raw `u` (GH #770) -- so this function must never assume harmonisation has
-    # run.  A `volume_as_mass=False` caller still drops the fluid spellings
+    # country can override.  `unit_kg` arrives keyed on both the raw `u` label
+    # and the Preferred Label, composed by `Country._unit_kg_factors` from the
+    # country's merged `u` (raw -> Preferred Label) and `u_kg` (Preferred Label ->
+    # kg) tables.  It is composed THERE rather than here because this function
+    # must not assume either spelling: on the Country path `_aggregate_wave_data`
+    # has already run `_finalize_result`, so the ladder sees SERVED labels (Niger
+    # 2021-22 `Kg`, not `100. Kg`; this comment used to say otherwise), while a
+    # direct call on `var/food_acquired.parquet` sees raw ones.  A
+    # `volume_as_mass=False` caller still drops the fluid spellings
     # above; a declared row for a fluid unit is the country's own statement and
     # is left alone.
     #
@@ -2057,9 +2059,11 @@ def _declared_no_kg_mask(df, no_kg, item_col='j'):
 #: ``f6ed07ae9`` summed them into one (strip and sum the labels, and the base code
 #: reproduces ``f6ed07ae9`` on every row of all 8 countries).
 #:
-#: WHY A SIZE-FREE ROW IN AN EHCVM WAVE POOLS TOO.  ``Tas`` is one label whichever
-#: wave it is in, and a delivered factor is one number per ``(j, u)``: gating on
-#: the wave would add the ``t`` axis the factor deliberately lacks.  It returns
+#: WHY A SIZE-FREE ROW IN AN EHCVM WAVE POOLS TOO.  Such a row did record something:
+#: the instrument's size-free code, on 417,989 consumption rows against 5 with a
+#: missing size.  It pools anyway because ``Tas`` is one label whichever wave it is
+#: in, and a delivered factor is one number per ``(j, u)``: gating on the wave would
+#: add the ``t`` axis the factor deliberately lacks.  It returns
 #: those rows to their ``f6ed07ae9`` factors (the largest group is Togo's
 #: ``Unité``: 8,599 rows, 2.03x).
 #: Against ``ehcvm_nsu``, held for Niger, Senegal, Burkina and Mali, the evidence
@@ -2147,13 +2151,29 @@ def _unit_size_base(label):
 
 
 def _size_pooled_frame(df):
-    """*df* with each sized ``u`` relabelled to its base, and the rows that read it.
+    """*df* with every report of a sized family under one label, and who reads it.
 
     Returns ``(frame, rows)``: the relabelled frame, for the estimators to run
-    on, and the boolean mask of rows whose own label is UNSIZED and is the base
-    of a sized label in *df* (matched on :func:`_normalise_join_key`'s spelling,
-    as the item arm joins).  ``(None, all-False)`` when no row qualifies, which
+    on, and the boolean mask of rows whose own label is UNSIZED and names the base
+    of a sized label in *df*.  ``(None, all-False)`` when no row qualifies, which
     is every frame with no size vocabulary in its ``u``.
+
+    A family is matched on the stripped, lower-cased spelling the item arm joins
+    on, and all of it is relabelled to ONE spelling of the base: the estimators
+    group on the label as written, so a ``tas`` or ``Tas `` left alone would be a
+    cell of its own beside the pool, and the mask would claim a pool it did not
+    read.  No built country has such a variant or two spellings of one base; this
+    is what keeps the mask true if one appears.
+
+    RELIES ON SERVED LABELS.  A sized label carries the base as the country serves
+    it, mapped at build time (``ehcvm.carry_unit_size``), while a bare label in a
+    parquet keeps its raw spelling until ``_finalize_result`` maps it.  On the
+    Country path ``_aggregate_wave_data`` has already done that, so stripping
+    ``Sachet (Petit)`` gives the ``Sachet`` beside it.  A direct call on
+    ``var/food_acquired.parquet`` finds ``139. Sachet`` there instead, which is no
+    family's base and reads its own cell, so such a call pools fewer rows (red team
+    on #1450: 1,254 against 10,885 in Senegal, 2,807 against 6,119 in Niger, 49,139
+    against 56,953 in Burkina).  Nothing in the repository makes that call.
     """
     n = len(df)
     nothing = (None, np.zeros(n, dtype=bool))
@@ -2163,19 +2183,24 @@ def _size_pooled_frame(df):
     codes, labels = pd.factorize(raw)
     labels = np.asarray(labels, dtype=object)
     bases = [_unit_size_base(lab) for lab in labels]
-    family = {b.strip().lower() for b in bases if b is not None}
+    # Sorted, so the spelling a family serves under does not depend on row order.
+    family = {}
+    for b in sorted(b for b in bases if b is not None):
+        family.setdefault(b.strip().lower(), b)
     if not family:
         return nothing
-    reads_pool = np.fromiter(
-        (b is None and str(lab).strip().lower() in family
-         for lab, b in zip(labels, bases)), dtype=bool, count=len(labels))
+    keys = [str(lab).strip().lower() for lab in labels]
+    reads_pool = np.fromiter((b is None and k in family
+                              for k, b in zip(keys, bases)),
+                             dtype=bool, count=len(labels))
     if not reads_pool.any():
         return nothing
     known = codes >= 0
     rows = np.zeros(n, dtype=bool)
     rows[known] = reads_pool[codes[known]]
-    pooled = np.array([lab if b is None else b for lab, b in zip(labels, bases)],
-                      dtype=object)
+    pooled = np.array(
+        [family[b.strip().lower()] if b is not None else family.get(k, lab)
+         for lab, b, k in zip(labels, bases, keys)], dtype=object)
     new_u = np.full(n, np.nan, dtype=object)
     new_u[known] = pooled[codes[known]]
     frame = df.set_axis(pd.MultiIndex.from_arrays(
@@ -2357,9 +2382,10 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         stated metric content (``metric``) serve them, exactly as for a
         missing-unit sentinel.  ``unit=None`` declares every unit of the
         item.  Matched on stripped, lower-cased labels as this function sees
-        them (the frame BEFORE ``_finalize_result``'s categorical mapping,
-        GH #770).  The declared rows still enter the estimators as evidence:
-        this refuses to SERVE a factor, it does not re-estimate anyone
+        them, which on the Country path are the served ones (see
+        :func:`_size_pooled_frame`).  The declared rows still enter the
+        estimators as evidence: this refuses to SERVE a factor, it does not
+        re-estimate anyone
         else's.  A country declares its cells in ``_/no_kg_factor.yml``
         (read at read time by ``Country._no_kg_factor_cells``).  A declared
         cell that matches no row emits :class:`UnmatchedNoKgCellWarning`
@@ -2393,10 +2419,14 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
     (``Tas (Petit)``, :func:`_unit_size_base`) reads that size alone, because a
     size is what the survey recorded.  An unsized label with sized siblings in
     the frame (``Tas``) reads the same two rungs on the frame with those sizes
-    stripped, because it recorded no size to pick one by: that is what it read
-    before #1224 split the labels.  It stays one number per ``(j, u)``, with no
-    wave condition, so a size-free row in an EHCVM wave pools too.  Every other
-    label is its own cell and no second estimate is made.
+    stripped, which is what it read before #1224 split the labels.  That label
+    means different things by wave.  An older wave (Burkina 2014, Mali 2014-15)
+    records no size at all.  An EHCVM wave does: a bare row there is the
+    instrument's size-free code, on 417,989 consumption rows against 5 with a
+    missing size (all Senegal 2018-19; red team on #1450).  Both pool, because a
+    factor is one number per ``(j, u)`` with no wave condition, not because the
+    EHCVM row lacks a size; :data:`_UNIT_SIZE_WORDS` has the measurement.  Every
+    other label is its own cell and no second estimate is made.
 
     WHAT THIS DOES NOT FIX, stated where a user will meet it.  The only
     external answer key the corpus has for a food unit is Mali's own
