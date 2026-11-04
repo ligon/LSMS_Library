@@ -49,12 +49,14 @@ SAMPLE_COUNTRIES = _countries_with_sample()
 NO_WEIGHT_COUNTRIES = {"China", "Kazakhstan", "Pakistan", "Peru"}
 
 # Acquired rounds with no sample wiring yet: Peru's three, and new waves that
-# are registered ahead of their tables (Malawi 2024-25, GH #1275).
+# are registered ahead of their tables (Malawi 2024-25, GH #1275; the four
+# EHCVM-2 waves, GH #552).
 # Do not infer exemptions from directory shape: multi-round countries use
 # wave_folder_map for valid rounds without their own _/ directories.
 PARTIALLY_WIRED_SAMPLE = {
     "Peru": {"1985", "1990", "1991"},
     "Malawi": {"2024-25"},
+    "Benin": {"2021-22"},
 }
 
 # ---------------------------------------------------------------------------

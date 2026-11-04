@@ -184,6 +184,7 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 | Azerbaijan            | 1995      | wb-catalog          | high       | region-excluded          |
 | Benin                 | 2018-19   | local-documentation | high       | national-all-households  |
 | Benin                 | 2018-2019 | local-documentation | medium     | national-all-households  |
+| Benin                 | 2021-22   | not-found           | high       | not-stated               |
 | Burkina_Faso          | 2014      | local-documentation | high       | national-all-households  |
 | Burkina_Faso          | 2018-19   | local-documentation | high       | national-all-households  |
 | Burkina_Faso          | 2021-22   | local-documentation | high       | mixed-national+panel     |
@@ -295,13 +296,13 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 | national-claimed         |    28 |
 | region-excluded          |    18 |
 | subnational-area         |    11 |
-| not-stated               |     7 |
+| not-stated               |     8 |
 | panel-inherited          |     4 |
 | mixed-national+panel     |     4 |
 | rural-and-small-town     |     1 |
 | specialized              |     1 |
 | agricultural-households  |     1 |
-| TOTAL                    |   115 |
+| TOTAL                    |   116 |
 
 *** Source and confidence counts
 
@@ -309,11 +310,11 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 |------------------------+-------|
 | local-documentation    |    67 |
 | wb-catalog             |    41 |
-| not-found              |     7 |
+| not-found              |     8 |
 
 | confidence             | waves |
 |------------------------+-------|
-| high                   |    89 |
+| high                   |    90 |
 | medium                 |    24 |
 | low                    |     2 |
 
@@ -722,6 +723,34 @@ Extractor's notes (editorial prose about the evidence, not survey text):
 
 #+begin_quote
 The quote is carried over from the 2018-19 wave directory's DDI, NOT read from anything under 2018-2019/. This is a stated inference, and here is exactly the evidence for it, so a reader can falsify it: (1) all 52 .dvc sidecars in Benin/2018-2019/Data/ are byte-identical to those in Benin/2018-19/Data/ (verified with md5sum over the sidecar files; `diff` of the two md5 lists is empty), so both directories point at exactly the same DVC blobs — the same survey extract, file for file; (2) every data filename carries the ben2018 suffix (s01_me_ben2018.dta, ehcvm_menage_ben2018.dta, …), i.e. the EHCVM 2018 Benin extract; (3) Benin/_/CONTENTS.org states verbatim: "A second directory =Benin/2018-2019/= contains a =Data/= sub-directory only — appears to be a duplicate-wave staging area.  The configured wave is =2018-19=; the =2018-2019= folder is not referenced by any extractor and may be safely ignored or removed by a future cleanup pass."  Confidence is 'medium' rather than 'high' solely because no document under 2018-2019/ asserts anything; the universe statement is inherited on the strength of blob identity. If GH #603 wants a strictly per-directory answer, the honest answer for 2018-2019/ alone is NOT FOUND (no documentation present).  Operational note: this directory is already staged for deletion in the working tree (git status shows the 2018-2019/Data/*.dvc sidecars as D), so it is likely to disappear and need no population record of its own.
+#+end_quote
+
+*** Benin 2021-22
+
+- Survey :: Enquête Harmonisée sur le Conditions de Vie des Ménages 2021-2022 (EHCVM 2021/22), WB catalog id 6272 (BEN_2021_EHCVM-2_v01_M)
+- Source type :: not-found
+- Confidence (as recorded by the extractor) :: high
+- Universe tag (EDITORIAL, not a quote) :: not-stated
+- Language of the quoted source :: (not recorded)
+- Source file :: Searched (both local, neither states a universe): lsms_library/countries/Benin/2021-22/Documentation/ben_ehcvm2_information_de_base_eng.pdf ; lsms_library/countries/Benin/2021-22/Documentation/ben_ehcvm2_information_de_base.pdf ; World Bank catalog DDI export for study 6272 (https://microdata.worldbank.org/metadata/export/6272/json, fetched 2026-11-04)
+- Locator :: English BID: Section 4 'Sampling' / 4.1 'Household and Community Components' (PDF p. 14 onward); price component, section 3.3 (PDF p. 13) and section 4.3 (PDF p. 16). French BID: section 4 'Volets ménage et communautaire' (PDF p. 13). WB catalog 6272 DDI export: study_desc.study_info, study_desc.method.data_collection.sampling_procedure. Text extracted with pdfminer.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND — no universe / target-population statement exists in any Benin 2021-22 documentation examined. Positive evidence of absence: the catalog 6272 DDI export has universe null in study_desc.study_info, with geographic coverage given only as "National coverage"; neither the English nor the French Basic Information Document contains a universe, 'population cible' or 'champ de l'enquête' statement (searched by keyword, and section 4 read). The nearest verbatim material is Sampling-Procedure text, given in exclusions_verbatim and notes; it is NOT a universe declaration and must not be quoted as one.
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+(Sampling Procedure, WB catalog 6272 — NOT a universe statement): "The sampling frame for the 2018/19 survey was based on the fourth general population and housing census (RGPH4) of 2013. In 2021/22, an enumeration was conducted in the same clusters and the  sampling plan is based on that of the 2018/19 survey. The 2018/19 survey sample was drawn according to a two-stage stratified sampling plan. The stratum is the combination of department/residence area. In each stratum, clusters (primary sampling units) were chosen at the first stage with a probability proportional to their size in terms of the number of households. At the second stage, 12 households were chosen with equal probability within each cluster. This frame contains 10032 enumeration areas, is nationally representative, and covers all regions with urban and rural areas surveyed in all regions apart from Littoral, a purely urban region. In Benin, the survey design decided on the sample size using the poverty rate - obtained from the 2011 Integrated Modular Survey on living conditions of households - as a variable of interest. Then the survey design split the decided sample size among regions considering the number of households in the region and the necessity to minimize the relative error. The survey design also defined the domains as country, urban and rural areas, and each of the 12 regions. Taking this into account, 23 explicit sample strata were selected. Upon deciding on the s..."
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #552) and NOT YET WIRED: no table of this wave is served.  2021-22 is a panel revisit of the 2018/19 clusters, so its documentation describes the 2018/19 design rather than declaring its own universe. Local English BID, section 4.1, VERBATIM: "The 2021/22 survey is a panel survey by cluster, and its sampling plan is based on that of the 2018/19 survey."  Same section: "In 2021/22, the strategy is to revisit the same clusters."  The 2018-19 universe statement is the natural candidate to inherit; that inheritance is an INFERENCE, not a documented claim, and needs a human decision.
 #+end_quote
 
 ** Burkina_Faso
