@@ -67,7 +67,9 @@ class TestUnit:
         (1471, 'Unité (Petit)'),           # the household's word, not the form's long one
         (10010, 'Demi walatt'),            # 10 * a four-digit unit, not 100 * unit + 10
         (1111, 'Boule (Petit)'),           # no s05 label: the code alone is enough
-        (10000, 'Bouteille de 20l'),       # the form's 20 L, not the household's 19 L
+        # Re-pinned from the form's `Bouteille de 20l`: 19 and 20 label one container
+        # (unit 1000 is `20 litres` in 2021-22's s07bq03b, `19 litre` in its s07bq07b).
+        (10000, 'Bouteille de 19 L'),
     ])
     def test_label_by_code(self, mapping, code, label):
         assert mapping._s05_u_by_code([code], COMMUNITY, HOUSEHOLD) == {code: label}
@@ -161,9 +163,6 @@ class TestDerivation:
 # Against the held file.  The oracle reads the raw source and imports nothing
 # from countries/.
 # ---------------------------------------------------------------------------
-#: What the printed form says for the code whose digits disagree with it.
-FORM_BASE = {10000: 'Bouteille de 20l'}
-
 
 def _labels(categories, name):
     return {int(k): str(v).strip() for k, v in categories[name].items()
@@ -190,8 +189,7 @@ class TestHeldFile:
         unit, size = divmod(code, 10)
         if unit not in units:
             unit, size = divmod(code, 100)
-        base = FORM_BASE.get(code) or served_unit_labels(COUNTRY, [units[unit]])[0]
-        return sized_unit(base, sizes[size])
+        return sized_unit(served_unit_labels(COUNTRY, [units[unit]])[0], sizes[size])
 
     def test_every_recorded_price_is_served_under_its_unit(self, raw, served):
         codes, household = raw
@@ -229,8 +227,6 @@ class TestHeldFile:
         used = set(map(tuple, hh[['s07bq03b', 's07bq03c']].dropna().astype(int).values))
         units, sizes = _labels(household, 's07bq03b'), _labels(household, 's07bq03c')
         for code in codes['s05q02'].astype(int).unique():
-            if code in FORM_BASE:
-                continue
             unit, size = divmod(code, 10)
             if unit not in units:
                 unit, size = divmod(code, 100)

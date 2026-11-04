@@ -217,14 +217,6 @@ _S05_SOURCE = 's05_co_sen2018.dta'
 _S05_HOUSEHOLD = 's07b_me_sen2018.dta'
 _S05_INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
 
-#: The one code whose form label names a different container from the household
-#: label its digits select.  Senegal's CAPI price form (UEMOA catalogue 49,
-#: /download/217) prints `10000: Bouteille de 20l`, and its 308 rows are all
-#: cooking oil; household unit 1000 is `Bouteille de 19L`, and 42 of its 45
-#: consumed rows are bottled water.  The stated capacities differ, so the
-#: price is served in the form's own unit and does not meet the 19 L rows.
-_S05_FORM_BASE = {10000: 'Bouteille de 20l'}
-
 
 def _s05_labels(categories, name):
     return {int(code): str(label).strip() for code, label in categories.get(name, {}).items()
@@ -254,7 +246,9 @@ def _s05_u_by_code(unit_codes, community, household):
     (the read-time ``u`` table, keyed on the household's own mojibake, then
     ``ehcvm.sized_unit``), so a price joins the household row in the same unit
     and size.  By CODE, because the s05 labels are not the household's strings,
-    and eight used codes have no s05 label at all.  No two units or sizes may
+    and eight used codes have no s05 label at all.  So 10000 is
+    `Bouteille de 19 L` although the form prints `Bouteille de 20l`: 19 and 20
+    are label variants of unit 1000 (CONTENTS.org).  No two units or sizes may
     share a label: that would be a fold, and it raises.
     """
     hh_units = _s05_labels(household, 's07bq03b')
@@ -264,8 +258,7 @@ def _s05_u_by_code(unit_codes, community, household):
     served = dict(zip(raw, _served_unit_labels('Senegal', raw)))
     out, source = {}, {}
     for code, (unit, size) in parts.items():
-        base = _S05_FORM_BASE.get(code, served[hh_units[unit]])
-        label = _sized_unit(base, hh_sizes[size])
+        label = _sized_unit(served[hh_units[unit]], hh_sizes[size])
         if label in source:
             raise UnitSizeLabelError(f"Senegal s05: codes {source[label]} and {code} "
                                      f"would both be served {label!r}")
