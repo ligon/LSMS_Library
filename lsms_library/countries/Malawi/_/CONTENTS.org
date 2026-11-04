@@ -4983,3 +4983,38 @@ Cost: =malawi.py= is in every Malawi table's hash, so one full Malawi re-warm
 (22 of 22 table hashes, 110 of 110 wave hashes; Uganda and Niger 0 of 43 and 0
 of 268; 0 of 28 =build_transforms_fingerprint=).  The next coverage regrade moves
 the four row counts in =.coder/coverage/latest.csv=.
+
+* 2026-11-04 -- 2024-25 held and registered, not wired (GH #1275)
+
+Acquired whole by =add_wave(subdir=)=: IHS6 (8507, =MWI_2024-2025_IHS-VI_v01_M=)
+in =Data/Cross_Sectional/=, 81 files, 2.47 GB; IHPS 2024 (8520,
+=MWI_2024_IHPS-V_v01_M=) in =Data/Panel/=, 82 files, 484 MB.  No table of this
+wave is served: =_/data_info.yml= declares nothing.  Each new table is its own
+piece of work.  Idiosyncrasies the wiring has to carry:
+
+- *The two entries overlap, unlike 2016-17 and 2019-20.*  8520 is two samples
+  of 51 EAs each.  The refreshment EAs are a subsample of IHS6's second-quarter
+  EAs (=ihps_bid.pdf= section 3.1.2, PDF p. 17), and their households are the
+  same interviews.  Measured on the two cover files: 51 of 8520's 102 EAs are
+  IHS6 EAs; all 815 refreshment households have a =case_id= in =hh_mod_a_filt=,
+  with the same EA, interview date and household size, all in quarter 2.
+  Stacking the two covers as 2019-20 does would count 815 households twice.
+- *The panel half links on 51 EAs.*  1,948 retained households link back (BID
+  section 8.2); =y4_hhid= is blank and =HHID= null on the other 815.  The other
+  51 EAs of the 2019 panel were retired.
+- *Weights.*  In =hh_mod_a_filt_24=, =hh_wgt= and =panelweight_2019= are null on
+  the 815.  =wt_cross= is populated on all 2,763 and =wt_long= on the 1,948.
+  Which serves as =weight= and =panel_weight= is not decided here.
+- *New sample parts.*  IHS6 includes 386 households in Dzaleka camp, from a
+  separate frame (=camp= in the cover; report Box 1.1).  Likoma is a stand-alone
+  domain in IHS6 and still outside the IHPS tracking universe.
+- *No geovariables.*  Neither entry lists one (0 of 163 files), so
+  =cluster_features= has no coordinates for this wave.  Compare GH #1260.
+- *Documents.*  8507 lists no BID although its DDI cites one.  8520's
+  =ihps_bid.pdf= is catalogued as "Fifth Integrated Household Survey 2024"; its
+  text says IHPS5.
+
+Registration moves every Malawi =Country._table_cache_hash=, because the wave
+set is folded into the hash, and no existing wave's =Wave._input_hash=.  When
+=food_acquired= is wired for 2024-25, pooled kg factors change for every Malawi
+wave at read time (GH #1487).

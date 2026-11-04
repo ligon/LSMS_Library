@@ -1,0 +1,5 @@
+outs:
+- md5: b8f6bf0b7a2353106cf855aab88c3c06
+  size: 504362
+  hash: md5
+  path: fs_mod_c.dta

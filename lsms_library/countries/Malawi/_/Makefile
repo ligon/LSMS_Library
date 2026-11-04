@@ -26,7 +26,9 @@ all: $(parquet) food_acquired $(VAR_DIR)/food_coping.parquet $(VAR_DIR)/months_f
 # stem, so a wave with no script answers "No rule to make target" rather
 # than running a recipe that cannot work: every wave named in a *_waves
 # list below must carry the script (tests/test_gh1237_malawi_make_prereqs.py).
-food_acquired_parquet := $(foreach r,$(rounds),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(notdir $(r))/_/food_acquired.parquet)
+# A wave without the script is not asked for: 2024-25 is held and registered
+# ahead of its tables (GH #1275), and naming it here failed the whole target.
+food_acquired_parquet := $(foreach r,$(rounds),$(if $(wildcard $(r)/_/food_acquired.py),$(LSMS_DATA_ROOT)/$(COUNTRY)/$(notdir $(r))/_/food_acquired.parquet))
 
 # GH #1209: build the native waves here; Country assembles them through the
 # existing no-country-builder route (ledger 1209-malawi-food-builder, section 2).

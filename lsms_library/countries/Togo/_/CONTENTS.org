@@ -759,3 +759,37 @@ It maps to =NPK= (0.17 N) and is 44.4% of =nitrogen_kg=; 3 =Tonne= rows are 23.8
 kilograms.  The =npk 15/15= rows of =harmonize_input= came with the Niger template and
 match no label here.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 3,420 positive), which the
 =data_scheme.yml= grain note says it does not.
+
+* 2026-11-04 -- 2021-22 held and registered, not wired (GH #552)
+
+Acquired whole by =add_wave=: EHCVM-2 (6279, =TGO_2021_EHCVM-2_v01_M=) in =2021-22/Data/=, 57
+files, 105 MB, with the BIDs and both household questionnaires in
+=Documentation/=.  No table of this wave is served: =_/data_info.yml= declares
+nothing.  Each new table is its own piece of work; the 2021-22 waves of Niger,
+Mali and Senegal are the template.  For the wiring:
+
+- *A panel by cluster.*  The BID's strategy is to revisit the same clusters.
+  Measured: all 540 grappes recur from =2018=, and 5,441 of 6,462
+  =(grappe, menage)= keys do.  Whether a recurring key is the same household is
+  not checked here: =s00_me= has a =PanelHH= column, and Burkina renumbers its
+  households (GH #1245).
+- *Layout.*  The wave is flat with =tgo2021= names; =2018/Data/= is =Data1/= plus
+  the =_forEthan= extracts.  The wave label =2021-22= is the catalog's, beside
+  the older =2018=.
+- *Documents.*  The catalog lists =tgo_ehcvm2_qnr_men_excel_vague2.pdf= as "Wave 1"
+  and =..._vague1.pdf= as "Wave 2".  Read the wave from the file name, and check
+  it against the PDF before citing.
+- *GPS.*  =s00_me= carries =GPS__Latitude= / =GPS__Longitude= on all 6,462
+  households, and =ehcvm_prix= has =latitude= / =longitude= for points of sale.
+  Whether they are displaced is not known; read GH #791 first.
+- *Prices.*  =ehcvm_prix= comes from a separate sample of markets (BID section
+  3.3), and the community files are =s00_co= to =s04_co= only, with no =s05_co=.
+  =s02_co= and =s04_co= are wide here (540 rows, 331 and 569 columns), unlike
+  the long files of the other EHCVM-2 countries.
+- *Size.*  Of the 18 source files the =2018= config names that have a 2021
+  analogue, 87% of columns keep their name; =s11= and =s16c= move most.
+
+Registration moves every Togo =Country._table_cache_hash=, because the wave set
+is folded into the hash, and no existing wave's =Wave._input_hash=.  When
+=food_acquired= is wired for 2021-22, pooled kg factors change for every
+Togo wave at read time (GH #1487).

@@ -1,0 +1,5 @@
+outs:
+- md5: 47a18e293017b472a10dc385b534c123
+  size: 307323
+  hash: md5
+  path: com_meta.dta

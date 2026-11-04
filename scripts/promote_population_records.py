@@ -22,9 +22,11 @@ What it checks before writing (any failure aborts)
 2. Every entry's ``source_type`` / ``confidence`` / ``universe_tag`` agrees with
    the independent summary table in section 2.
 3. The resulting tag / source_type / confidence histograms equal the counts the
-   document itself publishes (40/28/18/11/7/4/3/1/1/1, 66/41/7, 88/24/2;
+   document itself publishes (40/28/18/11/11/4/4/1/1/1, 67/41/11, 93/24/2;
    111 waves in the 2026-07-21 sweep plus GhanaAHIES 2022/2023/2024, whose
-   three year rows expand to twelve quarter labels via wave_folder_map).
+   three year rows expand to twelve quarter labels via wave_folder_map, plus
+   the five waves registered on 2026-11-04: Malawi 2024-25 and the EHCVM-2
+   2021-22 waves of Benin, Cote d'Ivoire, Guinea-Bissau and Togo).
 4. Every wave in ``Country.waves``, for every configured country, receives
    exactly one record -- and every doc row that receives none is reported.
 
@@ -74,19 +76,19 @@ EXPECTED_TAGS = {
     "national-claimed": 28,
     "region-excluded": 18,
     "subnational-area": 11,
-    "not-stated": 7,
+    "not-stated": 11,
     "panel-inherited": 4,
-    "mixed-national+panel": 3,
+    "mixed-national+panel": 4,
     "rural-and-small-town": 1,
     "specialized": 1,
     "agricultural-households": 1,
 }
-EXPECTED_SOURCE_TYPES = {"local-documentation": 66, "wb-catalog": 41, "not-found": 7}
+EXPECTED_SOURCE_TYPES = {"local-documentation": 67, "wb-catalog": 41, "not-found": 11}
 # 2026-09-06: GhanaLSS 2016-17 moved medium -> high when the GLSS7 Main
 # Report was acquired (84/25 -> 85/24).  These constants MIRROR the tables
 # section 2 of the source document publishes about itself -- move both, or
 # the guard is checking the document against a stale copy of itself.
-EXPECTED_CONFIDENCE = {"high": 88, "medium": 24, "low": 2}
+EXPECTED_CONFIDENCE = {"high": 93, "medium": 24, "low": 2}
 
 FIELD_KEYS = {
     "Survey": "survey",
@@ -306,10 +308,10 @@ def build(countries_dir: Path) -> tuple[dict[str, list[dict]], list[str]]:
     table = parse_summary_table(text)
     entries = parse_entries(text)
 
-    if len(entries) != 114:
-        raise SystemExit(f"expected 114 entries in section 3, parsed {len(entries)}")
-    if len(table) != 114:
-        raise SystemExit(f"expected 114 summary rows, parsed {len(table)}")
+    if len(entries) != 119:
+        raise SystemExit(f"expected 119 entries in section 3, parsed {len(entries)}")
+    if len(table) != 119:
+        raise SystemExit(f"expected 119 summary rows, parsed {len(table)}")
 
     by_key = {(e["country"], e["wave"]): e for e in entries}
     for row in table:

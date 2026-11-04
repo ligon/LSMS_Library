@@ -637,6 +637,33 @@ Measured, nothing changed.  Code 5 of =s16bq01= is =Adubos inorg√¢nicos - NPK/F√
 either.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 60 positive), which the
 =data_scheme.yml= grain note says it does not.
 
+* 2026-11-04 -- 2021-22 held and registered, not wired (GH #552)
+
+Acquired whole by =add_wave=: EHCVM-2 (6274, =GNB_2021_EHCVM-2_v01_M=) in =2021-22/Data/=, 60
+files, 178 MB, with the BIDs and both household questionnaires in
+=Documentation/=.  No table of this wave is served: =_/data_info.yml= declares
+nothing.  Each new table is its own piece of work; the 2021-22 waves of Niger,
+Mali and Senegal are the template.  For the wiring:
+
+- *A panel by cluster.*  BID section 4: "The survey is a panel survey by cluster".
+  Measured: all 450 grappes recur from 2018-19, and 4,893 of 5,351
+  =(grappe, menage)= keys do.  Whether a recurring key is the same household is
+  not checked here: =s00_me= has a =PanelHH= column, and Burkina renumbers its
+  households (GH #1245).
+- *GPS.*  =s00_me= names its coordinates =GPS__Latitude_m= / =GPS__Longitude_m=,
+  populated on all 5,351 households; the other EHCVM-2 covers measured here have
+  no =_m=.  What the suffix means, and whether they are displaced, is not known;
+  read GH #791 first.
+- *Prices.*  =ehcvm_prix= comes from a separate sample of markets (BID section
+  3.3), and the community files are =s00_co= to =s04_co= only, with no =s05_co=.
+  So there is no grappe-grain price file for =community_prices=.
+- *Size.*  Of the 12 source files the 2018-19 config names that have a 2021
+  analogue, 83% of columns keep their name; =s11= and =s16c= move most.
+
+Registration moves every Guinea-Bissau =Country._table_cache_hash=, because the wave set
+is folded into the hash, and no existing wave's =Wave._input_hash=.  When
+=food_acquired= is wired for 2021-22, pooled kg factors change for every
+Guinea-Bissau wave at read time (GH #1487).
 * 2018-19 community prices are wired (GH #1226, 2026-11-04)
 
 =community_prices= was declared nowhere for Guinea-Bissau although =2018-19/Data/s05_co_gnb2018.dta= holds section 5 of the community questionnaire.  Now built by =2018-19/_/community_prices.py= on Niger's template (rulings D1-D6, =Niger/_/CONTENTS.org=, "2018-19 community prices are wired"), with the household's sized unit form and no folding (#1453 ruling, @ligon 2026-11-04).  Helpers and registry callables are in =2018-19/_/mapping.py=.

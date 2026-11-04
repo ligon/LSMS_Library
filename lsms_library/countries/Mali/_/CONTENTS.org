@@ -2693,3 +2693,52 @@ shared unit equals the harvest exactly on 91.1%, within 10% on 92.2%, median rat
 4,815 household-crop pairs with a finished row, 3,419 have a positive sum in one unit (3,149 on a single
 s16c row, 270 on several), 1,194 span units and cannot be summed without a factor, 199 record no
 disposition and 3 have no =s16d= row.  Not derived here: GH #1437 is waiting on a ruling.
+* 2026-11-04 -- EAC-I enumerator manuals held; 2021-22 price source read from the BID (GH #1179, #821)
+
+*Held now, 2014-15/Documentation/.*  =bid_eaci14.pdf= and =EACI_MANUEL_P2_V3.pdf=
+(WB 2583; byte-identical to FAO's copies), and =EACI_MANUEL_P1_V5_Redacted.pdf=, the
+first-passage manual, which WB 2583 does not list.  It came from FAO's catalog entry
+=MLI_2014_IAS_v01_EN_M_v01_A_OCS=,
+https://microdata.fao.org/index.php/catalog/1463/download/5647 (public, no login;
+md5 =e4453a9b68b5b9d15957e36442365fcb=).  IHSN 5974 lists it too.
+
+*A finding that contradicts this file.*  "=community_prices.Quantity= is a WEIGHT IN
+KG" above rests on the column head "Poids (KG)".  Both manuals' section on the price
+grid (P1 PDF pp. 103-104, P2 PDF p. 88) say otherwise, verbatim: "Le poids et l'unité
+correspondante sont liés."  Their worked example is a banana the agent weighs at
+"2,250 kilogramme", entered Poids 2250, Unité 2 (2 = Gramme in the questionnaire's
+code list); and a plantain the agent cannot weigh, entered Poids 1, Unité 1.  The data
+follow the manual in passage 1 and only partly in passage 2.  Priced entries with a
+usable weight, all three readings:
+
+| passage | unit        | entries | median weight | share >= 5 |
+|---------+-------------+---------+---------------+------------|
+| 1       | 2 Gramme    |   1,054 |            60 |       0.86 |
+| 1       | 4 Centilitre|   1,102 |            33 |       0.97 |
+| 2       | 2 Gramme    |   1,891 |          0.75 |       0.33 |
+| 2       | 4 Centilitre|   1,781 |          0.33 |       0.27 |
+
+So =Price / Quantity= is not a per-kg price on those rows.  Reported, not changed:
+the served table and the note above stand until someone rules.
+
+*GH #1179.*  The manuals add one rule for the 129 unresolved entries: "Si une variété
+est absente, il faut laisser la ligne à blanc".  Neither manual's price section
+mentions code 99, a unit code of 0, or a fractional code, and neither gives a
+recovery rule.  So the
+residual stands: no producer text recovers those entries.
+
+*GH #821, 2021-22.*  The wave's own BID, held since before this entry, answers the
+question for this release.  =mli_ehcvm2_information_de_base_eng.pdf= PDF p. 6: "The
+survey has four questionnaires: a household questionnaire, a community questionnaire,
+a price questionnaire, and a questionnaire on non-standard units."  PDF p. 8, on the
+community questionnaire: "It contains four main sections".  PDF p. 9: "The price
+component is designed to collect price data from a sample of markets. Data collection
+is carried out monthly at sales points in selected localities. In each region, at
+least two localities are selected (one urban and one rural)."  That fits the released
+=s00_co= to =s04_co= and =ehcvm_prix_mli2021='s region-by-milieu grain.  All 8 EHCVM-2
+releases stop at =s04_co=.  Two things cut the other way and stay open: the DDI's
+sentence that the community questionnaire solicits "local retail price information",
+and Burkina's printed community questionnaire, which still has "SECTION 5. RELEVE DES
+PRIX A LA CONSOMMATION".  Mali's own community questionnaire is on neither WB 6275 nor
+IHSN 12257.  UEMOA's =MLI-EHCVM-V2.0= lists =Fichiers_Communautaire.rar=, which could
+not be read without its licence.

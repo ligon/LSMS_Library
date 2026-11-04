@@ -1,0 +1,5 @@
+outs:
+- md5: 40fdf4da6421061168807d17e269a146
+  size: 1100485
+  hash: md5
+  path: ner_ehcvm2_qnr_men_excel_vague2.pdf
