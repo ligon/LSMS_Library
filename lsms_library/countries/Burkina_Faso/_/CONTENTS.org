@@ -2730,3 +2730,46 @@ finished rows and 179 of 813 unfinished.  =crop_production= does not serve 2021-
 is affected until it is wired.  Of 6,444 household-crop pairs with a finished row, 3,983 have a positive
 =s16d= disposition sum in one unit, 2,289 span units and 172 record none.  The measurement of that sum
 against a real harvest is in =Mali/_/CONTENTS.org=, same date.
+
+* 2026-11-04 -- what the World Bank states about 6224's versions; the held release is v01 by content (GH #1276)
+
+The catalog's version notes, verbatim (DDI export of 6224, =study_desc.version_statement=,
+fetched 2026-11-04; IHSN 12009 repeats them):
+
+#+begin_quote
+Version 02: Two datasets (s00_co_bfa2021.dta and s00_co_bfa2021.dta) updated.
+Version 03: One dataset updated (s16a_me_bfa2021.dta).
+Version 04: Two datasets (calorie_conversion_wa_2021.dta and ehcvm_prix_bfa2021.dta) have been added
+Version 05: "s10b_me_bfa2021.dta" has been updated.
+#+end_quote
+
+The same record says "Version 04: Edited and anonymous data for public distribution."
+and, in =doc_desc=, "Version 05 (October 2026)."
+
+*So the parcel coordinates left in v03, not v05, and no reason is stated.*  That
+sentence is the whole of what the record says about =s16a=.  The four current BIDs
+(6224 and 6277, English and French) contain neither "GPS" nor "anonym"; the current DDI
+simply no longer lists =s16aq46__*=, =s16a01a= or =s16aq03b=.
+
+*We do not hold v04, whatever =SOURCE.org= says.*  Compared with the current zip, the
+files that differ are exactly the files those notes name: =s00_co= and =s00_me= (v02, the
+note names =s00_co= twice), =s16a= (v03), and =s10b= (v05); the two we lack are the two v04
+added.  The held =ddi-documentation-english_microdata-6224.pdf= reads "SURVEY ID NUMBER
+BFA_2021_EHCVM-P_v01_M" and "Version 01: Edited and anonymous data for public
+distribution.", and lists =GPS__LATITUDE= with 3,227 invalid.  =#+CATALOG_IDNO: ..._v04_M=
+was stamped from the catalog in =6bd1f3180= (2026-07-12), onto sidecars dating from
+2025.  Not changed here: a held release moves only on evidence a person reviews, and v01's
+zip is not available to compare bytes.  Any earlier note that "v05 is not cosmetic" is
+corrected by this: v05 alone changes one file; we are four releases behind.
+
+*What the removal looks like, measured.*  On the 281 columns =s16a= keeps, the rows are
+re-sorted and no cell differs.  The only change is that seven columns went: the five
+=s16aq46__*= and the free-text roster labels =s16a01a= / =s16aq03b= (6,278 and 7,211 of 8,467
+rows are not a generic parcel label; values not quoted).  That is a removal, not a
+correction.  Catalog 6277, the cross-section of the same round, has never carried any of the
+seven in =s16a=.  The held coordinates carry device fields: 4,180 distinct pairs on 1,234
+households in 292 grappes, median stated accuracy 9 m (p10 4.6, p90 24), with altitude and
+timestamp.  Nothing in the file or the documents says they are displaced.
+
+*A reason is an inference; none is stated.*  =plot_features= still serves these positions
+(GH #1058).  Whether it should is a maintainer ruling, not taken here.
