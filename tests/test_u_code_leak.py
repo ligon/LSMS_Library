@@ -84,6 +84,8 @@ _KNOWN_CLEAN = ["Mali", "Niger", "CotedIvoire", "Guinea-Bissau"]
 # Tracked dirty (driven down by Layer 2 / #347 / #348). Progress:
 #   Ethiopia  45 -> 0  (prefix strip, #370)
 #   Togo      25 -> 4  (EHCVM codebook; residual 114/659/660/662 ACCEPTED*)
+#                      GH #1224: those four codes now carry a size, so the audit
+#                      returns 11 labels (`662 (Moyen)`, `662 (98)`, ...), still 4 codes.
 #   Burkina   22 -> 2  (EHCVM codebook; residual 254/255 ACCEPTED*)
 #   Nigeria   32 -> 3  (WB .dta labels; residual 131/151/152 ACCEPTED*)
 #   Senegal    1 -> 0  (code '1' data-entry anomaly, 2 rows -> u='NA')

@@ -158,7 +158,7 @@ from .derivations import COLUMN as DERIVATION_COLUMN
 
 __all__ = [
     "EHCVM_COUNTRIES", "DERIVATION_NAME", "RAW_VARIABLES",
-    "MYVARS", "carry_unit_size", "derivation_key",
+    "MYVARS", "UnitSizeLabelError", "carry_unit_size", "derivation_key",
     "derive_ehcvm_purchase_value", "food_acquired_ehcvm",
     "inputs_last_purchase", "served_unit_labels", "size_label", "sized_unit",
 ]
@@ -305,6 +305,19 @@ _MISSING_UNIT_LABELS = frozenset({"unknown", "manquant"})
 _SIZE_CODE_PREFIX = re.compile(r"^\d+\s*[.\-]\s*")
 
 
+class UnitSizeLabelError(Exception):
+    """A sized ``u`` label could not be built so that it is served as written.
+
+    Subclasses ``Exception``, not ``RuntimeError`` / ``ValueError`` /
+    ``KeyError``: the derived-table paths in ``Country.__getattr__`` catch those
+    and fall back to another build, so ``food_prices()`` would report "Could not
+    materialize" and lose this instruction (the ``IdWalkError`` /
+    ``ClusterIdentityError`` rule).  Raised inside a ``make`` subprocess it still
+    reaches the parent as ``CalledProcessError``; the message is then in the
+    subprocess's stderr, which ``run_make_target`` passes through.
+    """
+
+
 def size_label(value):
     """The served spelling of one ``s07bq03c`` size, or ``None``.
 
@@ -392,15 +405,20 @@ def carry_unit_size(frame: pd.DataFrame, sizes, country: str,
     _EXACT_METRIC_LABELS`, e.g. ``Kg`` or ``Litre`` with a size: 185 rows in
     the twelve waves), which a suffix would hide from the kg ladder.
 
-    Invariant, checked here and raising ``ValueError`` if broken: on every
+    Invariant, checked here and raising :class:`UnitSizeLabelError` if broken: on every
     sized row, stripping the trailing `` (<Size>)`` gives exactly the ``u``
     the row was served before -- the read-time table maps no sized label, and
     ``decode`` leaves every sized label unchanged.  Quantities, values and
     row counts are not touched here; two items whose sizes differ simply no
     longer share a key in the later additive collapse.
+
+    Because the mapped base is written into the parquet, a sized row does not
+    follow a later change to ``Country._apply_categorical_mappings`` the way a
+    bare row does.  The ``u`` tables are hashed; that function is outside the
+    fingerprint, so a semantic edit to it needs an ``LSMS_CACHE_SCHEMA`` bump.
     """
     if "u" not in (frame.index.names or []):
-        raise KeyError("carry_unit_size: frame has no `u` index level")
+        raise UnitSizeLabelError("carry_unit_size: frame has no `u` index level")
     u = pd.Series(np.asarray(frame.index.get_level_values("u"), dtype=object))
     labels = pd.Series(np.asarray(sizes, dtype=object)).map(size_label)
     has_unit = u.map(lambda x: isinstance(x, str) and bool(x.strip()))
@@ -414,7 +432,7 @@ def carry_unit_size(frame: pd.DataFrame, sizes, country: str,
     served = dict(zip(uniq, served_unit_labels(country, uniq)))
     bad = [b for b, s in served.items() if not isinstance(s, str) or not s.strip()]
     if bad:
-        raise ValueError(f"{country}: the u table serves no label for {bad[:5]}")
+        raise UnitSizeLabelError(f"{country}: the u table serves no label for {bad[:5]}")
     served_base = base.map(served)
     keep_bare = served_base.map(lambda s: s.strip().lower() in _EXACT_METRIC_LABELS
                                 or s.strip().lower() in _MISSING_UNIT_LABELS)
@@ -425,13 +443,15 @@ def carry_unit_size(frame: pd.DataFrame, sizes, country: str,
     remapped = served_unit_labels(country, minted)
     moved = [(a, b) for a, b in zip(minted, remapped) if a != b]
     if moved:
-        raise ValueError(f"{country}: the read-time u table would relabel sized "
-                         f"units {moved[:5]}; map them in the hook instead")
+        raise UnitSizeLabelError(
+            f"{country}: the read-time u table would relabel sized units "
+            f"{moved[:5]}; map them in the hook instead")
     if decode is not None:
         changed = [m for m in minted if decode(m) != m]
         if changed:
-            raise ValueError(f"{country}: the wave's decode would rewrite sized "
-                             f"units {changed[:5]}")
+            raise UnitSizeLabelError(
+                f"{country}: the wave's decode would rewrite sized units "
+                f"{changed[:5]}")
 
     out_u = u.copy()
     out_u[sized] = new.to_numpy()

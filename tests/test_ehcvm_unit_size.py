@@ -7,8 +7,9 @@ the country serves, mapped BEFORE the suffix, because every read-time mapper is
 keyed on the bare label and would pass a sized one through unmapped.
 
 Config-only: real ``u`` tables from the tree, synthetic frames, no microdata.
-What a cold build does per cell is measured in the PR, and pinned where it is
-data-gated in ``tests/test_ehcvm_7day.py``.
+The rule on delivered data, all twelve cells, is
+``tests/test_ehcvm_7day.py::TestDelivered::test_every_size_suffix_is_the_countrys_own``;
+what a cold build does to the counts is measured in the PR, not pinned.
 """
 from __future__ import annotations
 
@@ -18,8 +19,8 @@ import pytest
 
 from lsms_library import ehcvm
 from lsms_library.ehcvm import (
-    carry_unit_size, derivation_key, food_acquired_ehcvm, served_unit_labels,
-    size_label, sized_unit, unit_match,
+    UnitSizeLabelError, carry_unit_size, derivation_key, food_acquired_ehcvm,
+    served_unit_labels, size_label, sized_unit, unit_match,
 )
 from lsms_library.paths import countries_root
 
@@ -201,12 +202,58 @@ class TestCarryUnitSize:
             return np.asarray([{'Tas (Petit)': 'Tas'}.get(v, v)
                                for v in real(country, values)], dtype=object)
         monkeypatch.setattr(ehcvm, 'served_unit_labels', moved)
-        with pytest.raises(ValueError, match='would relabel'):
+        with pytest.raises(UnitSizeLabelError, match='would relabel'):
             _carry('Togo', [('Tas', 'Petit')])
 
     def test_a_decode_that_rewrites_a_sized_label_is_refused(self):
-        with pytest.raises(ValueError, match='would rewrite'):
+        with pytest.raises(UnitSizeLabelError, match='would rewrite'):
             _carry('Togo', [('Tas', 'Petit')], decode=str.upper)
+
+    def test_a_base_the_u_table_serves_no_label_for_is_refused(self, monkeypatch):
+        monkeypatch.setattr(ehcvm, 'served_unit_labels',
+                            lambda country, values: np.asarray([None] * len(values), dtype=object))
+        with pytest.raises(UnitSizeLabelError, match='serves no label'):
+            _carry('Togo', [('Tas', 'Petit')])
+
+
+class TestGuardReachesTheCaller:
+    """The derived-table paths catch ValueError / KeyError / RuntimeError and fall
+    back to another build, which turns the guard's instruction into "Could not
+    materialize".  The delivered path is tested in test_ehcvm_7day.py."""
+
+    def test_it_is_none_of_what_those_paths_catch(self):
+        caught = (FileNotFoundError, KeyError, ValueError, RuntimeError)
+        assert issubclass(UnitSizeLabelError, Exception)
+        assert not issubclass(UnitSizeLabelError, caught)
+
+    @pytest.mark.parametrize('table', ['food_prices', 'food_quantities', 'food_expenditures'])
+    def test_the_derived_path_does_not_catch_it(self, monkeypatch, table):
+        from lsms_library.country import Country
+        calls = []
+
+        def boom(self, waves=None, method_name=None, **kw):
+            calls.append(method_name)
+            raise UnitSizeLabelError('the instruction')
+        monkeypatch.setattr(Country, '_aggregate_wave_data', boom)
+        with pytest.raises(UnitSizeLabelError, match='the instruction'):
+            getattr(Country('Togo'), table)()
+        assert calls == ['food_acquired'], calls   # no fallback build was tried
+
+    @pytest.mark.parametrize('table', ['food_prices', 'food_quantities', 'food_expenditures'])
+    def test_a_valueerror_there_would_have_been_caught(self, monkeypatch, table):
+        """The control: this is the behaviour the subclass exists to avoid."""
+        from lsms_library.country import Country
+        calls = []
+
+        def boom(self, waves=None, method_name=None, **kw):
+            calls.append(method_name)
+            if method_name == 'food_acquired':
+                raise ValueError('the instruction')
+            raise RuntimeError('fallback reached')
+        monkeypatch.setattr(Country, '_aggregate_wave_data', boom)
+        with pytest.raises(RuntimeError, match='fallback reached'):
+            getattr(Country('Togo'), table)()
+        assert calls[0] == 'food_acquired' and len(calls) > 1, calls
 
 
 class TestHook:

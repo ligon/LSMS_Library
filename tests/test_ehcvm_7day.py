@@ -95,6 +95,25 @@ AFTER = {
     ('CotedIvoire', '2018-19'): (105_011_084.65, 35_289),
 }
 
+#: The unit sizes each country may serve in `u` (GH #1224): each instrument's own
+#: labels, case normalised.  Togo's `98` is a code its files and questionnaires
+#: never label (`Togo/_/CONTENTS.org`).  Guinea-Bissau's are Portuguese.
+SIZES = {
+    'Benin': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Sans brassée',
+              'Avec 1 brassée', 'Avec 2 brassées', 'A 2 doigts', 'A 3 doigts',
+              'A 5 doigts', 'Autre taille'},
+    'Burkina_Faso': {'Petit', 'Moyen', 'Grand'},
+    'CotedIvoire': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier'},
+    'Guinea-Bissau': {'Pequeno', 'Medio', 'Grande'},
+    'Mali': {'Petit', 'Moyen', 'Grand'},
+    'Niger': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier'},
+    'Senegal': {'Petit', 'Moyen', 'Grand', 'Très petit', 'Très petite'},
+    'Togo': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier', '98'},
+}
+#: A trailing parenthesis that belongs to the unit itself, not to its size: a
+#: stated quantity (`Sac (50 Kg)`, `Paquet (250 g)`), or one of two named units.
+_UNITS_OWN_PARENTHESIS = re.compile(r'^(\d[\d,.]*\s*(kg|g)|Kantou|30)$', re.IGNORECASE)
+
 #: Waves of these countries that are NOT EHCVM 2018+ and must carry no key.
 NON_EHCVM_WAVES = {
     'Mali': ['2014-15'],
@@ -340,6 +359,38 @@ class TestDelivered:
         assert len(produced) > 0
         assert produced['Expenditure'].isna().all()
         assert produced['Derivation'].isna().all()
+
+    @pytest.mark.parametrize('country,wave', CELLS)
+    def test_every_size_suffix_is_the_countrys_own(self, built, country, wave):
+        """GH #1224: sized rows exist in every cell, and a served `u` never ends
+        in a parenthesis that is neither a size of this instrument nor part of
+        the unit's own name.  The rule, not a count."""
+        x = built(country).xs(wave, level='t', drop_level=False)
+        labels = pd.Series(x.index.get_level_values('u')).dropna().astype(str).unique()
+        ends = {lab: m.group(1) for lab in labels
+                if (m := re.search(r' \(([^()]*)\)$', lab))}
+        sized = {lab for lab, inner in ends.items() if inner in SIZES[country]}
+        stray = {lab for lab, inner in ends.items()
+                 if lab not in sized and not _UNITS_OWN_PARENTHESIS.match(inner)}
+        assert not stray, sorted(stray)
+        assert sized, f'{country} {wave} serves no sized unit'
+
+    def test_a_guard_raised_in_the_build_reaches_the_caller(self, monkeypatch):
+        """GH #1224: the guard's instruction must survive the derived path, which
+        catches ValueError and would report "Could not materialize" instead.
+        LSMS_NO_CACHE makes the build run, so the hook is really reached."""
+        import lsms_library as ll
+        from lsms_library import ehcvm
+        real = ehcvm.served_unit_labels
+
+        def moved(country, values):
+            return np.asarray([{'Tas (Petit)': 'Tas'}.get(v, v)
+                               for v in real(country, values)], dtype=object)
+        monkeypatch.setattr(ehcvm, 'served_unit_labels', moved)
+        monkeypatch.setenv('LSMS_NO_CACHE', '1')
+        for table in ('food_acquired', 'food_prices', 'food_quantities', 'food_expenditures'):
+            with pytest.raises(ehcvm.UnitSizeLabelError, match='would relabel'):
+                getattr(ll.Country('Togo'), table)()
 
     @pytest.mark.parametrize('country,wave', CELLS)
     def test_inputs_join_to_the_served_rows(self, built, country, wave):

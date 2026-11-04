@@ -443,6 +443,11 @@ def inputs_food_acquired(wave):
     return _inputs_last_purchase('{Country}', wave)
 ```
 
+A wave whose hook sweeps mojibake AFTER this call must pass its repair too --
+`_food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION, decode=_decode_mojibake)` --
+because the hook also builds `u` as `<unit> (<Size>)` (GH #1224), and the base
+unit has to be repaired before the `u` table can map it.
+
 and the country gets a `_/derivations.yml` entry registering
 `{Country}::food_acquired::7day-purchase-at-last-purchase-unit-value` (copy a
 sibling's; `lsms_library/derivations.py` documents the fields).  Every served

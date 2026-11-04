@@ -1369,7 +1369,7 @@ not committed.
   =Filet au Kg=, =Kg=, =Litre=, =Moudou=, =Paquet=, =Plaquette=,
   =Sac (10 Kg)=, =Sac (100 Kg)=, =Sac (25 Kg)=, =Sac (5 kg)=,
   =Sac (50 Kg)=, =Sans os au Kg=, =Tiya=, =Tongolo=.  The 55 sized labels
-  (66,057 rows; none is a =food_acquired.u=, which drops =s07bq03c=):
+  (66,057 rows; none was a =food_acquired.u= until GH #1224 carried =s07bq03c=):
   =Avec os au tas=, =Bidon=, =Boîte=, =Boîte de tomate=, =Bouquet=,
   =Bouteille=, =Calebasse=, =Cueillère=, =Louche=, =Morceau=, =Paquet=,
   =Sachet=, =Sans os au tas=, =Seau=, =Tas=, =Tongolo=, =Unité= each with
@@ -1417,9 +1417,8 @@ was already declared optional for =community_prices= (Nigeria #834).
 
 *Still not done.*  The coverage snapshot =.coder/coverage/latest.csv= still
 grades 2018-19 =absent= until the next =make matrix=.  =food_acquired.u=
-still drops =s07bq03c=, so the sized community rows join household rows only
-by rebuilding the household (unit, size) pair from =derivation_inputs= /
-the source.
+carries =s07bq03c= since GH #1224 (2026-11-03), so sized community rows join
+household rows directly: 339 of 936 household (t, j, u) cells, up from 41 of 448.
 
 ** CS07's =Quantity= is a WEIGHT, and sometimes in the wrong unit
 
