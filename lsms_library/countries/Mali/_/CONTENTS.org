@@ -2664,14 +2664,22 @@ Every other column of every row is digest-equal in all four waves, and =crop_div
 =gross_crop_revenue= and =yield_kg(on='plot')= are unchanged.  =harvest_kg='s total now
 equals the rows' own kilograms in every wave.
 
-- *The location is still unwired.*  135 of the 270 2017-18 rows record a block and parcel
-  (=s11fq05c=, =s11fq05d=), which might join =plot_features=.  Not measured; serving them
-  there would be a wiring decision, and =Farm-level= says no more than that the roster has
-  no grid.
-- *=Farm-level= now means two things here*: a tree row carries a harvest; a 2021-22 sale row
-  (above) carries none.  So =crop_diversity(weight='count')=, under the rule in
-  =isa/framework-1460= (GH #1469, not merged here), will drop a tree row where the household
-  has a plot row of that crop.
+- *2017-18 records where half the trees stand, and that stays unwired.*  =s11fq04= splits the 270
+  producing rows exactly: 135 =Verger= (an orchard, with its own area =s11fq06= and no location) and
+  135 =Eparpillé=, "éparpillés dans une parcelle", which name a block and parcel (=s11fq05c/d=).  128
+  of those 135 name a plot the household reports in =s7f=, and 0 have the same crop on it.  The kg
+  carried is 120,229 (=Verger=, 31 rows) and 57,650 (=Eparpillé=, 17 rows).  =Farm-level= is the served
+  grain because the roster has one line per species and asks one location, so the parcel is an attribute
+  of the line; the canonical wording "has no plot" is strained for those 135.  Serving them on the parcel
+  is the alternative, a choice left open (GH #1476 memo): it changes no 2017-18 yield today, because
+  =plot_features= serves no EAC-I wave, but it would put tree kilograms over a seasonal plot's area once
+  it does.  2014-15 =s3b= has =s3bq04= (scattered / plantation) and an area; no block or parcel seen, not
+  read in full.
+- *=Farm-level= now means two things here*: a tree row carries a harvest; a 2021-22 sale row (above)
+  carries none.  =crop_diversity(weight='count')= drops a =Farm-level= row where the household has a
+  plot row of that crop (GH #1469, a rule written for sale rows).  None of the 627 tree rows has one,
+  so it moves no household in any wave (measured on development =c8a6c560e= with the rows relabelled).
+  Under the same rule =harvest_kg= gains 66 rows and exactly 185,908 kg (16,905,908 -> 17,091,816).
 - *Site I* no longer reports this table's =plot_id=.
 
 * 2026-11-04 -- the 2021-22 harvest quantity: the instrument asks what the file lacks (GH #1437)
