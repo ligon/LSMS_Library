@@ -298,8 +298,8 @@ Data Scheme:
     # identities (Organic unit code N). crop / u are in
     # the index because a plot may carry
     # several seed crops or a fertilizer in several units.  Reported item
-    # columns only: Quantity, native u, Purchased (bool, True where a
-    # purchased seed quantity is attached), Quantity_purchased, Improved
+    # columns only: Quantity, native u, Purchased (bool, True where a seed
+    # purchase is attached), Quantity_purchased, Unit_purchased, Improved
     # (bool, seed rows).  Applied is Module D's own use answer (GH #1174):
     # organic ag_d36 (rows exist only where Yes), inorganic fertilizer ag_d38
     # (True / False as answered, NA where unanswered), agrochemical ag_d40
@@ -313,6 +313,15 @@ Data Scheme:
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    # GH #1190: the unit Quantity_purchased is recorded in, on the seed
+    # dictionary (ag_h07b / ag_h16b / ag_h26b), Unknown where no unit code is
+    # recorded.  u describes the amount planted (Module G); no conversion
+    # between the two is implied.  Names follow Tanzania and Burkina Faso.  A
+    # household-crop whose purchase components are in unlike units is not
+    # summed: Purchased True, with Quantity_purchased and Unit_purchased NA.
+    Unit_purchased:
+      type: str
+      optional: true
     Improved: bool
     Applied:
       type: bool

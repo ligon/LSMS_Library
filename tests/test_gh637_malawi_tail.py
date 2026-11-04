@@ -254,7 +254,8 @@ SEED_SUM = {'2010-11': 831_034.9, '2013-14': 324_288.5,
 #: adding free seed (ag_h38a): 2016-17 -> 233,479.0, 2019-20 -> 208,669.5;
 #: and read 2010-11's cross-sectional block (ag_h05 = 1: ag_h07a gated by
 #: ag_h10), which the driver had never read: 2010-11 -> 125,468.05.
-PURCHASED_SUM = {'2010-11': 125_468.05, '2013-14': 51_953.7,
+# GH #1190: 3 served groups recorded in unlike units are no longer summed (-14, -11).
+PURCHASED_SUM = {'2010-11': 125_454.05, '2013-14': 51_942.7,
                  '2016-17': 233_479.0, '2019-20': 208_669.5}
 #: Quantity_received_as_gift per wave (GH #1190, private cold build).
 GIFT_SUM = {'2010-11': 89_598.95, '2013-14': 53_489.0,
@@ -369,21 +370,30 @@ class TestRawOracle:
                 n=('known', 'size'), known=('known', 'all')))
             hcode = pd.to_numeric(h[half['hcrop']], errors='coerce')
             hi = half['hh'](h, format_id).astype(str)
-            qp = pd.concat([pd.to_numeric(h[q], errors='coerce').where(
-                pd.to_numeric(h[v], errors='coerce').fillna(0) != 0)
-                for q, v in zip(half['q'], half['v'])], axis=1).sum(axis=1, min_count=1)
-            purchases.append(pd.DataFrame({'i': hi, 'half': hk, 'code': hcode, 'qp': qp}))
+            # One row per value-backed component, unit alongside (GH #1190).
+            for q, v in zip(half['q'], half['v']):
+                u = q[:-1] + 'b'
+                purchases.append(pd.DataFrame({
+                    'i': hi, 'half': hk, 'code': hcode,
+                    'qp': pd.to_numeric(h[q], errors='coerce').where(
+                        pd.to_numeric(h[v], errors='coerce').fillna(0) != 0),
+                    'up': pd.to_numeric(h[u], errors='coerce').fillna(-1)}))
             gifts.append(pd.DataFrame({'i': hi, 'half': hk, 'code': hcode,
                                        'qg': pd.to_numeric(h['ag_h38a'], errors='coerce'),
                                        'ug': pd.to_numeric(h['ag_h38b'], errors='coerce').fillna(-1)}))
         C = pd.concat(counts)
         eligible = C[(C['n'] == 1) & C['known']].index
         key = ['i', 'half', 'code']
-        P = (pd.concat(purchases).dropna(subset=['code'])
-             .groupby(key)['qp'].sum(min_count=1).dropna())
+        P = pd.concat(purchases).dropna(subset=['code', 'qp'])
+        # Components in unlike units are refused; a recorded 0 cannot disagree.
+        speaks = P[P['qp'].ne(0)].groupby(key)['up'].nunique()
+        refused = speaks[speaks.gt(1)].index
+        P = P.groupby(key)['qp'].sum(min_count=1)
+        P = P[~P.index.isin(refused)]
         G = pd.concat(gifts).dropna(subset=['code', 'qg'])
         one_unit = G.groupby(key)['ug'].transform('nunique').eq(1)
         G = G[one_unit].groupby(key)['qg'].sum()
+        refused = refused[refused.isin(eligible)]
         P, G = P[P.index.isin(eligible)], G[G.index.isin(eligible)]
         x = plot_inputs.xs(wave, level='t')
         seed = x[x.index.get_level_values('input') == 'Seed']
@@ -393,6 +403,8 @@ class TestRawOracle:
             float(pd.concat(seed_q).sum()), abs=1e-6)
         assert int(seed['Quantity_purchased'].notna().sum()) == len(P)
         assert float(seed['Quantity_purchased'].sum()) == pytest.approx(float(P.sum()), abs=1e-6)
+        # Purchased also marks a refused group: it did buy, only the sum is refused.
+        assert int(seed['Purchased'].fillna(False).astype(bool).sum()) == len(P) + len(refused)
         assert int(seed['Quantity_received_as_gift'].notna().sum()) == len(G)
         assert float(seed['Quantity_received_as_gift'].sum()) == pytest.approx(float(G.sum()), abs=1e-6)
 

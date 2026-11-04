@@ -4874,11 +4874,49 @@ quantity: a bare No is not attached, so the row universe does not grow).  Raw
 =ag_h37=: 4.  Served on attached rows: False 49 (2010-11 1, 2016-17 48), NA 3
 (2010-11 2, 2016-17 1), True 12,495.  The quantities are served as recorded.
 
-Not changed (#1190's representation half, a decision): =Quantity_purchased= is
-still in the purchase unit, which is not recorded, while =u= is the planted
-unit; the two H components (Panel / earlier waves) are still summed without
-their units.  The third purchase source =ag_h36a= has no value column and is
-still unread.
+/Representation half: done 2026-11-04, see "plot_inputs: the purchase's own unit"
+below./  The third purchase source =ag_h36a= has no value column and is still
+unread.
+
+* 2026-11-04 -- plot_inputs: the purchase's own unit (GH #1190, units half)
+
+=Unit_purchased= is the unit =Quantity_purchased= is recorded in (=ag_h07b=,
+=ag_h16b=, =ag_h26b=, on the seed dictionary), following Tanzania and Burkina
+Faso.  =u= describes the amount planted (Module G), and no conversion between
+the two is implied.  They differ on 1,907 of the 21,942 purchases with an amount
+(969 / 219 / 452 / 267 by wave).  A recorded amount with no unit code is =Unknown=
+(98 rows, all but 2 of them a recorded 0).  The 863 =Other (Specify)= purchases
+carry a text this does not read.
+
+*What a refused group serves.*  Components in unlike units are not summed.  The
+seed row keeps its planted answer as recorded, with =Purchased= True, because the
+household did buy, and =Quantity_purchased= and =Unit_purchased= blank.  Neither
+component is chosen over the other, and the amounts stay in Module H.  The builder
+warns with the count, and =attrs['seed_purchase_mixed_units']= carries it on the
+wave frame.  A recorded 0 adds nothing, so it cannot disagree: 2019-20 Panel's one
+2 Kilogramme + 0 with no unit stays 2 Kilogramme.  A positive amount with no unit
+would disagree with a named one (none occurs).
+
+*The ruling said 7 groups; there are 10.*  7 is 2010-11 alone (5 panel, 2
+cross-sectional), and 2013-14 has 2 and 2016-17 Panel 1.  Only 3 of the 10 reach a
+served row (2010-11 2, 2013-14 1; Maize, Nkwani, Groundnut), because a purchase
+attaches only to the single G observation of its code (GH #1298).
+
+Measured, private cold builds, #1278's commit vs this change: rows 179,957 ->
+179,957, index identical.  =Quantity_purchased= moves on those 3 rows only, value
+-> NA (the wave sums lose 25 native units in all, 619,570.25 -> 619,545.25), and
+=Purchased= not at all.  =seed_kg= and =nitrogen_kg= are digest-identical.
+
+*Also on the =u= axis: =Unit_received_as_gift=.*  The API maps a column only when
+its name matches a table, so =u= is served =Kilogramme= while a column named
+otherwise keeps the raw =Kilogram=.  Both unit columns are therefore written
+canonical at build time, the Tanzania precedent (GH #637).  That moves the
+spelling of the free-seed unit on 8,729 rows (#1190's binding half had added it as
+=Kilogram=), and no other value.
+
+Still open on #1190: =ag_h36a= (the third purchase source, no value column) is
+unread, and the 5 free-seed groups with two units are not served and counted only
+on the block's =attrs=.
 
 * 2026-11-03 -- plot_inputs: Module D use answers; a missing amount is not 0 (GH #1174, D half)
 

@@ -3183,9 +3183,12 @@ _MWI_SEED_UNIT_LABELS = {
 }
 
 # Module H / Module F PURCHASE unit codes (ag_h{n}6b / ag_f{n}6b) -> label.
-# Same coding as the seed unit set for Module H; carried with the reported
-# purchased quantity.
-_MWI_PURCH_UNIT_LABELS = dict(_MWI_SEED_UNIT_LABELS)
+# Same coding as the seed unit set for Module H; served as Unit_purchased beside
+# the reported purchased quantity, and as Unit_received_as_gift (GH #1190).  On
+# the `u` Preferred Label axis at BUILD time, because the API maps a column only
+# when its name matches a table: `u` is served 'Kilogramme', and these two would
+# otherwise keep the raw 'Kilogram' (the Tanzania precedent, GH #637).
+_MWI_PURCH_UNIT_LABELS = {**_MWI_SEED_UNIT_LABELS, 2: 'Kilogramme'}
 
 
 def _int_codes(series):
@@ -3473,44 +3476,96 @@ def _seed_block(df, *, hhid, plotkey, cropcode, qty, unit, improved=None,
     return out
 
 
+def _agree_purchase_units(rows, key):
+    """Reduce purchase components to one row per ``key``, summing only like units.
+
+    ``rows`` holds ``key`` + ``Quantity_purchased`` + ``Unit_purchased`` (no blank
+    unit: a recorded amount with no unit code arrives as ``Unknown``).  Where every
+    component is in one unit, the quantities add and the unit is served.  Where two
+    components disagree the sum would mean nothing, so the group is REFUSED (GH
+    #1190): ``Quantity_purchased`` and ``Unit_purchased`` are NA and ``Purchased``
+    stays True, because the household did buy.  No component is chosen over
+    another; the amounts stay in Module H.
+
+    A recorded 0 adds nothing, so its unit cannot disagree (2019-20 Panel: 2
+    Kilogram + 0 with no unit is 2 Kilogram).  A row whose quantity is already NA
+    was refused below and keeps the whole group refused.  ``attrs['mixed_unit_groups']``
+    counts the refusals.  Vectorised, as ``_sum_reported`` is, because pandas deep-copies
+    ``attrs`` once per group for a Python callable.
+    """
+    from lsms_library.transformations import U_UNKNOWN
+
+    q = rows['Quantity_purchased']
+    speaks = rows.loc[q.notna() & q.ne(0), key + ['Unit_purchased']].drop_duplicates()
+    refused = pd.concat([speaks.loc[speaks.duplicated(key, keep=False), key],
+                         rows.loc[q.isna(), key]]).drop_duplicates()
+    # The unit that speaks for a group: a nonzero component, else a named zero.
+    rank = np.select([q.notna() & q.ne(0), rows['Unit_purchased'].ne(U_UNKNOWN)], [0, 1], 2)
+    unit = (rows.assign(_rank=rank).sort_values('_rank', kind='stable')
+            .groupby(key, as_index=False)['Unit_purchased'].first())
+    out = rows.groupby(key, as_index=False)['Quantity_purchased'].sum(min_count=1)
+    out = out.merge(unit, on=key, validate='one_to_one')
+    out = out.merge(refused.assign(_refused=True), on=key, how='left',
+                    validate='one_to_one')
+    no = out['_refused'].fillna(False).astype(bool).to_numpy()
+    out['Quantity_purchased'] = out['Quantity_purchased'].astype('Float64').mask(no)
+    out['Unit_purchased'] = out['Unit_purchased'].astype('string').mask(no)
+    out['Purchased'] = pd.array([True] * len(out), dtype='boolean')
+    out = out.drop(columns='_refused')
+    out.attrs['mixed_unit_groups'] = int(no.sum())
+    return out
+
+
 def _seed_purchase_block(df, *, hhid, cropcode, qty_cols, unit_cols,
                          value_cols, source_half=None):
-    """Reshape Module H purchased-seed columns to (i, crop) reported
-    purchase totals.  ``qty_cols``/``unit_cols``/``value_cols`` are lists
-    of the per-source raw column names (two purchase sources: ag_h16*,
-    ag_h26*).  A purchased amount is counted only where the corresponding
-    value column is non-zero (WB rule).  Returns (i, _crop_code,
-    Quantity_purchased) -- household-crop grain, no plot."""
+    """Reshape Module H purchased-seed columns to household-crop purchases.
+
+    ``qty_cols`` / ``unit_cols`` / ``value_cols`` are lists of the per-source raw
+    column names (Panel and the earlier waves: two purchase sources, ag_h16*,
+    ag_h26*; Cross_Sectional: ag_h07*).  A purchased amount is counted only where
+    the corresponding value column is non-zero (WB rule).  The unit travels with
+    its quantity, on the seed dictionary (GH #1190): it is the purchase's own unit,
+    not ``u``, which describes the amount planted (Module G), and no conversion
+    between the two is implied.  A recorded amount with no unit code is ``Unknown``.
+
+    Returns (i, _crop_code, Quantity_purchased, Unit_purchased, Purchased) --
+    household-crop grain, no plot -- one row per household-crop with a value-backed
+    purchase.  Components in unlike units are not summed: see
+    ``_agree_purchase_units``, which also says what such a group serves.
+    """
+    from lsms_library.transformations import U_UNKNOWN
+
     if source_half is None:
         crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=False)
     else:
         crop_label, crop_code_int = _seed_crop_identity(df[cropcode])
-    cols = []
-    for qcol, vcol in zip(qty_cols, value_cols):
+    components = []
+    for qcol, ucol, vcol in zip(qty_cols, unit_cols, value_cols):
         if qcol not in df.columns:
             continue
         q = pd.to_numeric(df[qcol], errors='coerce').astype('Float64')
         if vcol and vcol in df.columns:
             v = pd.to_numeric(df[vcol], errors='coerce').astype('Float64')
             q = q.where(v.notna() & (v != 0), pd.NA)
-        cols.append(q)
-    if cols:
-        # Sum the per-source purchased amounts; the row total stays NA when
-        # NO source recorded a (value-backed) purchase -- so a household
-        # that did not buy seed of that crop gets NA, never a spurious 0.
-        total = pd.concat(cols, axis=1).sum(axis=1, min_count=1).astype('Float64')
-    else:
-        total = pd.Series(pd.NA, index=df.index, dtype='Float64')
-    out = pd.DataFrame({
-        'i':            df['hhid'].astype('string').values,
-        '_crop_code':   crop_code_int.values,
-        'Quantity_purchased': total.values,
-    })
-    out = out[out['_crop_code'].notna()]
-    grp = out.groupby(['i', '_crop_code'], as_index=False).agg(
-        {'Quantity_purchased': lambda s: s.sum(min_count=1)})
-    # Drop the (i, crop) rows where no purchase was recorded.
-    grp = grp[grp['Quantity_purchased'].notna()]
+        if ucol in df.columns:
+            codes = _int_codes(df[ucol])
+            unit = codes.map(_MWI_PURCH_UNIT_LABELS).astype('string')
+            unit = unit.fillna('Seed unit code ' + codes.astype('string'))
+        else:
+            unit = pd.Series(pd.NA, index=df.index, dtype='string')
+        components.append(pd.DataFrame({
+            'i': df['hhid'].astype('string').values,
+            '_crop_code': crop_code_int.values,
+            'Quantity_purchased': q.values,
+            'Unit_purchased': unit.fillna(U_UNKNOWN).values,
+        }))
+    key = ['i', '_crop_code']
+    columns = key + ['Quantity_purchased', 'Unit_purchased']
+    rows = (pd.concat(components, ignore_index=True) if components
+            else pd.DataFrame(columns=columns))
+    # A household that did not buy seed of that crop gets no row, never a 0.
+    rows = rows[rows['_crop_code'].notna() & rows['Quantity_purchased'].notna()]
+    grp = _agree_purchase_units(rows, key)
     if source_half is not None:
         grp['_source_half'] = source_half
     return grp
@@ -3550,7 +3605,7 @@ def _seed_gift_block(df, *, hhid, cropcode, source_half,
     q = pd.to_numeric(df[qty], errors='coerce').astype('Float64')
     if unit in df.columns:
         codes = _int_codes(df[unit])
-        u = codes.map(_MWI_SEED_UNIT_LABELS).astype('string')
+        u = codes.map(_MWI_PURCH_UNIT_LABELS).astype('string')
         u = u.fillna('Seed unit code ' + codes.astype('string'))
     else:
         u = pd.Series(pd.NA, index=df.index, dtype='string')
@@ -3627,9 +3682,10 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
         (_fertilizer_block, _organic_block, _pesticide_block, _seed_block),
         each carrying (i, plot, _input_code, crop, Quantity, u, Improved).
     seed_purchase_pieces : list[pd.DataFrame] | None -- outputs of
-        _seed_purchase_block (i, _crop_code, Quantity_purchased) at the
-        household-crop grain; source-aware results attach only to one known
-        observation of the same native code and half (no plot fabrication).
+        _seed_purchase_block (i, _crop_code, Quantity_purchased, Unit_purchased,
+        Purchased) at the household-crop grain; source-aware results attach only
+        to one known observation of the same native code and half (no plot
+        fabrication).
     seed_gift_pieces : list[pd.DataFrame] | None -- outputs of
         _seed_gift_block (seed received for free, with its own unit), attached
         by the same single-observation rule; never added to the purchase.
@@ -3670,7 +3726,22 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
     df['Applied'] = df['Applied'].astype('boolean')
 
     # Seed-purchase merge (household-crop grain -> single-plot seed rows).
+    # GH #1190: Purchased is True where a purchase is attached, including one
+    # whose components are in unlike units: there the household did buy and only
+    # the sum is refused, so Quantity_purchased and Unit_purchased stay NA.  NA
+    # elsewhere (Module D applied-on-plot rows record no purchase split).
     df['Quantity_purchased'] = pd.array([pd.NA] * len(df), dtype='Float64')
+    df['Unit_purchased'] = pd.array([pd.NA] * len(df), dtype='string')
+    df['Purchased'] = pd.array([pd.NA] * len(df), dtype='boolean')
+    refused_purchases = sum(p.attrs.get('mixed_unit_groups', 0)
+                            for p in (seed_purchase_pieces or []) if p is not None)
+    if refused_purchases:
+        warnings.warn(
+            f"Malawi/plot_inputs {t}: {refused_purchases} household-crop seed "
+            f"purchase(s) recorded in unlike units were not summed; where "
+            f"attached they serve Purchased True with no Quantity_purchased or "
+            f"Unit_purchased.  The amounts stay in Module H.  GH #1190.",
+            stacklevel=2)
     if seed_purchase_pieces and not source_observations:
         sp = pd.concat([p for p in seed_purchase_pieces if p is not None
                         and len(p)], ignore_index=True)
@@ -3691,8 +3762,9 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
             # 123 native units by wave), and 'first' kept ONE code's purchase.
             # GH #637 tail, defect B.  `min_count=1`: a crop with no
             # value-backed purchase stays NA (none reach here today).
-            sp = sp.groupby(['i', 'crop'], as_index=False)[
-                'Quantity_purchased'].sum(min_count=1)
+            # GH #1190: unlike units are not summed across codes either.
+            sp = _agree_purchase_units(sp[['i', 'crop', 'Quantity_purchased',
+                                           'Unit_purchased']], ['i', 'crop'])
             seed = df['input'] == 'Seed'
             # Count plots per (i, crop) among seed rows; attach only when a
             # crop's seed is on exactly one plot (unambiguous).
@@ -3701,18 +3773,22 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
                       .nunique().rename('_nplots').reset_index())
             attach = sp.merge(nplots, on=['i', 'crop'], how='inner')
             attach = attach[attach['_nplots'] == 1][
-                ['i', 'crop', 'Quantity_purchased']]
-            attach = attach.rename(
-                columns={'Quantity_purchased': '_qp'})
+                ['i', 'crop', 'Quantity_purchased', 'Unit_purchased', 'Purchased']]
+            attach = attach.rename(columns={'Quantity_purchased': '_qp',
+                                            'Unit_purchased': '_up',
+                                            'Purchased': '_pp'})
             df = df.merge(attach, on=['i', 'crop'], how='left')
-            take = seed & df['_qp'].notna()
+            take = seed & df['_pp'].notna()
             df['Quantity_purchased'] = df['Quantity_purchased'].where(
                 ~take, df['_qp'])
-            df = df.drop(columns=['_qp'])
+            df['Unit_purchased'] = df['Unit_purchased'].where(~take, df['_up'])
+            df['Purchased'] = df['Purchased'].where(~take, df['_pp'])
+            df = df.drop(columns=['_qp', '_up', '_pp'])
 
     if seed_purchase_pieces and source_observations:
         df = _attach_to_single_seed_observation(
-            df, seed_purchase_pieces, ['Quantity_purchased'], 'purchase')
+            df, seed_purchase_pieces,
+            ['Purchased', 'Quantity_purchased', 'Unit_purchased'], 'purchase')
 
     # GH #1190: seed received for free (H37/H38) is its own measurement in
     # its own unit, never a purchase.
@@ -3726,12 +3802,6 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
             df, seed_gift_pieces,
             ['Quantity_received_as_gift', 'Unit_received_as_gift',
              'Received_as_gift'], 'gift')
-
-    # Purchased flag: True where a purchased quantity is attached (seed),
-    # else NA (Module D fertilizer/pesticide applied-on-plot rows do not
-    # record a purchase split at the plot grain).
-    df['Purchased'] = pd.array([pd.NA] * len(df), dtype='boolean')
-    df.loc[df['Quantity_purchased'].notna(), 'Purchased'] = True
 
     df = df.drop(columns=['_input_code'])
     df['t'] = t
@@ -3760,6 +3830,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
     grp = grouped.agg({
         'Quantity':           'sum',
         'Quantity_purchased': 'first',
+        'Unit_purchased':     'first',
         'Purchased':          'first',
         'Improved':           'first',
         'Applied':            'max',
@@ -3786,7 +3857,10 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
             raise ValueError('Malawi plot_inputs reducer groups disagree')
         grp['Quantity'] = quantities['Quantity'].array
     grp = grp.set_index(keys)
-    return pd.concat([grp, native[list(grp.columns)]])
+    out = pd.concat([grp, native[list(grp.columns)]])
+    # Readable by a test; the warning above is what a build log sees.
+    out.attrs['seed_purchase_mixed_units'] = int(refused_purchases)
+    return out
 
 
 # --- livestock (GAP 4) --------------------------------------------------
