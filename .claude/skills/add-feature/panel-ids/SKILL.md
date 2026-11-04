@@ -36,10 +36,11 @@ identifies [catalog 3557](https://microdata.worldbank.org/index.php/catalog/3557
 W4 combines continuing long-panel households with a newly drawn refresh
 cohort; W5 continues both cohorts. Refresh households form a new panel baseline,
 not a non-panel survey. See the country's [sampling and panel-crosswalk notes](../../../../lsms_library/countries/Nigeria/_/CONTENTS.org).
-The committed crosswalk currently covers only W2/W3 declarations. Adding
-W1/W4/W5 links, choosing target-round membership, and changing PH-to-PP links
-remain [GH #1264](https://github.com/ligon/LSMS_Library/issues/1264); survey-program
-membership or overlapping numeric IDs alone does not authorize those links.
+The committed crosswalk spans all ten rounds and links only households recorded
+as interviewed at both ends, each round from its own cover
+([GH #1264](https://github.com/ligon/LSMS_Library/issues/1264)). `old_new`, not
+survey-program membership or overlapping numeric IDs, is what authorizes a W4/W5
+link: refresh households start their own chain at `2018Q3`.
 
 **Always check the World Bank catalog** for each wave to determine if it's part of a panel.
 
@@ -47,7 +48,7 @@ membership or overlapping numeric IDs alone does not authorize those links.
 
 Three patterns for how household IDs work across waves:
 
-1. **Stable IDs** (simplest): The same recorded household ID persists across waves. Nigeria's current W2/W3 `previous_i: hhid` declarations produce identity maps; this implementation fact does not establish links for W4 refresh households or extend the committed crosswalk to W1/W4/W5.
+1. **Stable IDs** (simplest): The same recorded household ID persists across waves. Nigeria's `hhid` is stable, so every link and `updated_ids` map is an identity; a stable id alone still does not establish a link, which also needs `old_new` (W4/W5) and an interview at both ends (`countries/Nigeria/_/panel_ids.py`, GH #1264).
 
 2. **New IDs with backward link** (most common): Each wave assigns new IDs but includes a variable linking to the previous wave's ID. Examples:
    - Malawi: `y4_hhid` (current) → `y3_hhid` (previous) in the cover sheet
@@ -174,11 +175,15 @@ Tanzania, Uganda.
 Malawi and Nigeria were design **B** (per-wave `data_info.yml` wiring, cache
 parquet only) until #894. `Country._compute_panel_ids` still branches on which
 it got -- A returns a `dict`, B a `DataFrame` that `panel_ids(df)` converts --
-and `LSMS_BUILD_BACKEND=make` still takes the B route from the YAML blocks.
-Their `panel_ids.py` reads the same per-wave `panel_ids:` blocks (Pattern 1
-above), builds the frame exactly as the YAML path did (`format_id` on both ids,
-source-file row order, which decides who keeps the bare id in a split), and
-calls `panel_ids(df)`; the dicts were verified equal to design B's.
+and for a country whose waves declare blocks, `LSMS_BUILD_BACKEND=make` still
+takes the B route from them. Malawi's `panel_ids.py` reads the same per-wave
+`panel_ids:` blocks (Pattern 1 above), builds the frame exactly as the YAML path
+did (`format_id` on both ids, source-file row order, which decides who keeps the
+bare id in a split), and calls `panel_ids(df)`; the dicts were verified equal to
+design B's. Nigeria's did too until #1264, which needed each round's own cover
+and an interview gate on a second file. A block can express neither, so Nigeria's
+blocks are gone and its script (Pattern 3) holds the wiring; leaving them would
+have made the make backend serve a different crosswalk from the committed one.
 `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` is now empty, so a
 *twelfth* country cannot pick a design by accident.
 

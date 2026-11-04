@@ -55,8 +55,9 @@ import pytest
 from lsms_library.paths import countries_root
 
 # The countries that persist the crosswalk as committed JSON (design A).
-# Malawi and Nigeria joined in GH #894; their panel_ids.py reads the same
-# per-wave `panel_ids:` blocks in data_info.yml that design B read at run time.
+# Malawi and Nigeria joined in GH #894.  Malawi's panel_ids.py reads the same
+# per-wave `panel_ids:` blocks in data_info.yml that design B read at run time;
+# Nigeria's has held its own wiring since GH #1264 (own covers, interview gate).
 DESIGN_A = [
     "Burkina_Faso", "Ethiopia", "EthiopiaRHS", "GhanaLSS", "Malawi", "Mali",
     "Niger", "Nigeria", "Senegal", "Tanzania", "Uganda",
