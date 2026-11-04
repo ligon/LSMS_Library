@@ -60,27 +60,27 @@ DEL = 'Malawi::crop_production::sale-basis-unresolved'
 KEYS = (W, P, OV, N, NR, CS, CH)
 SINCE = {OV: '2026-09-25', NR: '2026-09-25'}
 
-#: Delivered ROWS carrying each key, per wave -- measured on the cold build
-#: of 2026-09-25 (fix/malawi-derivations @ 95449ffb9 -> this branch).  Rows
-#: are BELOW the attached sales on the wildcard (949 / 357 / 450 / 1,046
-#: sales) for TWO reasons, neither of them this ladder: the GH #869
-#: unmapped-crop drop (13 rows, all 2013-14) and the defensive collapse at
-#: the declared grain in `assemble_crop_production` (`_grain`, `Value_sold:
-#: 'first'`), which merges two same-label VARIETIES of one plot-crop
-#: (Citrus 1005/1010/1011, Groundnut 11/12/16, Maize 1/3) into one row and
-#: keeps one variety's sale -- 2 / 3 / 1 / 5 keyed wildcard sales, and 27
-#: sales / 373,600 MWK in all (6 / 3 / 1 / 17 per wave), a pre-existing
-#: composition the ladder does not touch (issue text in
-#: slurm_logs/backlog_fix_2026-09-24/issues_to_file.org).  Unsold Module I/Q
+#: Delivered ROWS carrying each key, per wave -- first measured on the cold
+#: build of 2026-09-25 (fix/malawi-derivations @ 95449ffb9 -> this branch).
+#: Re-pinned 2026-11-03 (GH #1432, cold development 98c6069d2): #1373
+#: (0377b733b) removed the defensive collapse at the declared grain in
+#: `assemble_crop_production`, which merged two same-label VARIETIES of one
+#: plot-crop (Citrus 1005/1010/1011, Groundnut 11/12/16, Maize 1/3) into one
+#: row and kept one variety's sale.  This comment had counted what that cost,
+#: and exactly that came back: 2 / 3 / 1 / 5 keyed wildcard sales (W was 947 /
+#: 341 / 520 / 1,137; no other key moved), and 373,600 MWK in all (the
+#: VALUE_SOLD_AFTER move below).  Rows now fall below the attached sales only
+#: through the GH #869 unmapped-crop drop (13 rows, all 2013-14), which
+#: `test_every_attached_sale_reaches_a_served_row` accounts for.  Unsold Module I/Q
 #: lines summed to 0/0 by `_sale_block` (901 / 225 / 2,433 / 2,185) attach on
 #: the wildcard as 0.0, as they always did, and carry NO key.
 #: Before 2026-09-25 the not-applicable key carried N + NR (122 / 11 / 79 /
 #: 198) and the from-price key's harvest side refused what OV now carries.
 ROWS = {
-    '2010-11': {W: 947, P: 1, OV: 0, N: 5, NR: 117, CS: 67, CH: 19},
-    '2013-14': {W: 341, P: 0, OV: 0, N: 0, NR: 11, CS: 18, CH: 9},
-    '2016-17': {W: 520, P: 8, OV: 2, N: 42, NR: 37, CS: 46, CH: 23},
-    '2019-20': {W: 1137, P: 29, OV: 2, N: 67, NR: 131, CS: 84, CH: 51},
+    '2010-11': {W: 949, P: 1, OV: 0, N: 5, NR: 117, CS: 67, CH: 19},
+    '2013-14': {W: 344, P: 0, OV: 0, N: 0, NR: 11, CS: 18, CH: 9},
+    '2016-17': {W: 521, P: 8, OV: 2, N: 42, NR: 37, CS: 46, CH: 23},
+    '2019-20': {W: 1142, P: 29, OV: 2, N: 67, NR: 131, CS: 84, CH: 51},
 }
 #: GH #856 (2026-10-22) moved the two IHS4/IHS5 waves: recovering 90 KG BAG /
 #: BASKET (DENGU) from the unit specify text on BOTH sides attached 71 / 97
@@ -98,8 +98,10 @@ ROWS = {
 #: 409,090,925) and 2019-20 by +120,000 (527,653,548 -> 527,773,548).
 VALUE_SOLD_BEFORE = {'2010-11': 126_816_048.0, '2013-14': 94_338_845.0,
                      '2016-17': 394_826_755.0, '2019-20': 496_063_698.0}
-VALUE_SOLD_AFTER = {'2010-11': 130_650_105.0, '2013-14': 94_992_745.0,
-                    '2016-17': 409_967_725.0, '2019-20': 529_435_948.0}
+VALUE_SOLD_AFTER = {'2010-11': 130_679_005.0, '2013-14': 95_010_945.0,
+                    '2016-17': 410_017_725.0, '2019-20': 529_712_448.0}
+#: #1373 (see ROWS) moved these by +28,900 / +18,200 / +50,000 / +276,500 =
+#: +373,600 MWK from 130,650,105 / 94,992,745 / 409,967,725 / 529,435,948.
 #: GH #856 moved 2016-17 by +876,800 (409,090,925 -> 409,967,725) and 2019-20
 #: by +1,662,400 (527,773,548 -> 529,435,948): 3,601,200 MWK newly attached,
 #: 1,062,000 detached (see the ROWS comment above and CONTENTS.org, GH #856).
@@ -132,7 +134,9 @@ UNRESOLVED_GROUNDS = {'contradiction_no_separation': 271,
                       'na_sale_price_undecided': 6,
                       'na_harvest_price_undecided': 7,
                       'claimed_by_tier_a': 0}
-TOTAL_ROWS = {'2010-11': 33_420, '2013-14': 12_616, '2016-17': 37_170, '2019-20': 51_872}
+#: One row per native crop code since #1373 (0377b733b); was 33,420 / 12,616 /
+#: 37,170 / 51,872.  `test_gh637_malawi_tail.py`'s raw oracle derives these.
+TOTAL_ROWS = {'2010-11': 33_549, '2013-14': 12_671, '2016-17': 37_177, '2019-20': 51_973}
 
 
 @pytest.fixture(scope='module')
@@ -666,6 +670,35 @@ class TestDelivered:
         x = delivered.xs(wave, level='t', drop_level=False)
         assert x['Value_sold'].sum() == pytest.approx(VALUE_SOLD_AFTER[wave], rel=1e-9)
         assert VALUE_SOLD_AFTER[wave] > VALUE_SOLD_BEFORE[wave]
+
+    @pytest.mark.parametrize('wave', WAVES)
+    def test_every_attached_sale_reaches_a_served_row(self, malawi_mod, delivered, wave):
+        """The rule #1373 restored: nothing after the ladder loses a sale.
+
+        Replayed from sources: each rung's positive sales are its served
+        rows, and the ladder's attached value is the served value, up to the
+        rows the GH #869 unmapped-crop filter drops (reported loudly there).
+        The collapse this replaces failed both, by 27 sales / 373,600 MWK.
+        """
+        try:
+            harvest, sale, _ = malawi_mod._crop_pieces(wave)
+        except Exception as e:                # pragma: no cover - no microdata
+            pytest.skip(f'{COUNTRY} {wave} sources not available here: {e}')
+        harv = malawi_mod._consolidate_harvest(harvest)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            attached, _, tallies = malawi_mod._attach_sales(
+                wave, harv, pd.concat(sale, ignore_index=True))
+        ladder = tallies['sale_basis_ladder']
+        dropped = attached[attached['crop'].isna()]
+        served = delivered.xs(wave, level='t', drop_level=False)
+        got = served['Derivation'].value_counts()
+        for key in KEYS:
+            positive = ladder[key]['sales'] - ladder[key]['zero_quantity']
+            assert int(got.get(key, 0)) == positive - int((dropped['_branch'] == key).sum()), key
+        value = sum(ladder[name]['value'] for name in (malawi_mod.SALE_EXACT, *KEYS))
+        assert served['Value_sold'].sum() == pytest.approx(
+            value - dropped['Value_sold'].sum(), rel=1e-9)
 
     def test_a_key_marks_a_sale_and_only_a_sale(self, delivered):
         keyed = delivered[delivered['Derivation'].notna()]

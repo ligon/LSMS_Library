@@ -403,9 +403,14 @@ class TestAgainstCropProduction:
         assert set(per['condition']) == {'unknown_condition'}
 
     def test_the_declared_grain_is_unique(self, cp):
+        """The grain is read from the declaration: #1373 (0377b733b) added
+        `production_obs`, and two codes of one label now legitimately share
+        the rest of the key."""
+        spec = yaml.safe_load((MALAWI_ / 'data_scheme.yml').read_text())
+        index = spec['Data Scheme']['crop_production']['index']
+        keys = [k.strip() for k in index.strip('() ').split(',')]
+        assert 'production_obs' in keys
         f = cp.reset_index()
-        keys = [k for k in ['t', 'i', 'plot_id', 'crop', 'u', 'condition']
-                if k in f.columns]
         assert not f.duplicated(keys).any()
 
     def test_with_region_resolves_the_lower_case_key(self, malawi_mod, cp):
@@ -492,9 +497,10 @@ class TestAgainstCropProduction:
             '(86,657 vs 36,915 on the collapsed crop key, 2026-09-09)')
 
     def test_crop_variety_is_a_column_not_a_level(self, cp):
-        """A function of the crop code splits no key, so it is not a level.
+        """A function of the crop code, so it is not a level.
 
-        Putting it in the grain would only widen the index -- and widen the
+        `production_obs` carries the code in the grain since #1373; putting
+        the variety there as well would only widen the index -- and widen the
         index-shape divergence that already costs Malawi its place in
         `Feature('crop_production')` (see the class below).
         """
