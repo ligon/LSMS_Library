@@ -312,3 +312,39 @@ class TestNothingElseMoves:
     def test_weights_still_normalise_to_mean_one(self, sample):
         means = sample.groupby(level="t")["weight"].mean()
         assert ((means - 1).abs() < 1e-9).all(), means
+
+
+@pytest.mark.requires_s3
+class TestALostSourceCostsEaAlone:
+    """Why ``origin_ea`` is a sub-df: an unavailable file must not cost ``v``."""
+
+    @pytest.mark.parametrize("wave, rows", [("2018-19", 3242), ("2019-20", 3098)])
+    def test_the_wave_still_builds(self, tmp_path, monkeypatch, wave, rows):
+        import lsms_library.country as C
+        import lsms_library.local_tools as LT
+        import lsms_library.paths as P
+
+        blobs = P.data_root() / "dvc-cache"
+        (tmp_path / "dvc-cache").symlink_to(blobs)
+        monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path))
+        P.data_root.cache_clear()
+        real = LT.get_dataframe
+
+        def unavailable(fn, *a, **k):
+            if "2015-16/Data/gsec1.dta" in str(fn):
+                raise FileNotFoundError(f"simulated fetch failure: {fn}")
+            return real(fn, *a, **k)
+
+        monkeypatch.setattr(LT, "get_dataframe", unavailable)
+        try:
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter("always")
+                frame = C.Country("Uganda", preload_panel_ids=False)[wave].grab_data("sample")
+        finally:
+            P.data_root.cache_clear()
+        assert any("origin_ea" in str(w.message) for w in caught)
+        assert len(frame) == rows
+        assert frame["v"].notna().all()
+        assert "ea" not in frame.columns
+        assert not frame["Derivation"].astype("string").str.contains(
+            KEY, regex=False).fillna(False).any()

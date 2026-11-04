@@ -144,6 +144,47 @@ drop rather than costing =v= for every table of the wave.  =Derivation= stays on
 =sample=: =_join_v_from_sample= carries =v= alone, and the =ea= column reaches no
 other table.
 
+*Measured, cold =98c6069d2= vs cold =6db7bf0d5=, 2026-11-03.*  Every declared Uganda
+table, =Feature('sample')= over Uganda, Albania and Malawi, and
+=household_characteristics=, =food_expenditures= and =sample= under
+=market='Region'= are frame-equal (=check_exact=), 31 of 31, once =ea= and this key
+are set aside; warning counts match table by table, and =updated_ids= and
+=check_panel_consistency= are identical.  A fresh-process warm read equals the cold
+build.  =Feature('sample')= keeps a unique index, =ea= is NA for the other two
+countries (12,225 Uganda values), and =derivation_inputs= joins 5,801 of 5,801
+stamped rows with equal values.  The cost is one Uganda re-warm: 28 of 28 Uganda
+country hashes and 224 of 224 Uganda wave hashes move, none elsewhere, and no build
+fingerprint.  The canonical =data_info.yml= declaration alone moves nothing.
+
+Standard error of a weighted mean, clustered on =ea= over clustered on =v=, on the
+same households (315-317 EAs, 702-864 parishes):
+
+| outcome              | 2013-14 | 2015-16 | 2018-19 | 2019-20 |
+|----------------------+---------+---------+---------+---------|
+| household size       |    0.98 |    1.01 |    1.00 |    0.99 |
+| log food expenditure |    1.00 |    1.01 |    1.14 |    1.11 |
+
+So the column matters for some statistics and not others: clustering on the parish
+understates the food standard error by about a tenth in the two inherited waves, and
+changes nothing visible in the two direct ones.  This is one small check on two
+means, not a general claim about the size of the design effect.
+
+=market='ea'= raises =KeyError= from =cluster_features=.  It was not asked for, and a
+market is a place, which =ea= is not.
+
+**** TODO Decisions the ruling leaves open
+
+1. /One label across all eight waves./  =ea= is NA through 2011-12, where =v= is the
+   EA under =comm= labels.  =ea= pairs one-to-one with 2011-12 =comm= on all 212
+   linked EAs, which is the start of a crosswalk (a filed follow-up of the ruling).
+2. /=AGSEC1= as a second source./  Accepting =AGSEC1.ea= for households only it
+   records adds 72 in 2015-16 (3,377 of 3,377), 49 in 2018-19 (3,027) and 45 in
+   2019-20 (2,868), with =GSEC1= keys only.  Following =AGSEC1.t0_hhid= as well for
+   households only 2018-19 =AGSEC1= records takes 2018-19 to 3,086 and 2019-20 to
+   2,907, at the price of a key that disagrees with =GSEC1= where both exist.
+3. /The 73 + 76 of 2018-19./  A wave 6 household file would settle what those ids
+   name.  Until then they stay NA; parsing the id is the alternative already declined.
+
 *** =v= across waves: three different defects (GH #942)
 
 =v= is not one identifier across Uganda's waves, and the reasons differ by
