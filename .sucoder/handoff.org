@@ -6,10 +6,11 @@
 (/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/).  Do not act on them without a ruling.*
 
 - Merged overnight: #1465 (BF #1060, #1057), #1470 (ETH #1447), #1472 (UGA #689 =ea=), #1466 (MLI #824),
-  #1474 (#1450 kg fix; development 56085be48).  Mirror synced.  Only reviewed PRs go to development on green; nothing to master.
+  #1474 (#1450 kg fix), #1477 (ETH #1461), #1478 (UGA #1434, #1441), #1479 (test debt #1432; development 66b23df57).
+  Mirror synced.  A usage limit paused the session from after 03:07 until about 08:00.  Only reviewed PRs go to development on green; nothing to master.
 - HELD for a ruling, not to merge: #1473 (NGA #843), #1471 (NER #1436).  #1423 runbook also waits for the maintainer.
 - Running, each with a report to save as reports/<lane>/REPORT.md, then red-team, PR, merge on green:
-  malawi-1435, tanzania-1441, ethiopia-1461, uganda-1434, framework-1460; reviewer of tests-1432.
+  malawi-1435, tanzania-1441, ehcvm-docs; baseline-refresh (a HELD PR); reviewer of framework-1460 (three PRs after it).
 - Next once those land: NGA #1433 and #1448 (after #843 merges); #1454 small items; coverage regrade #1438 at the end;
   shared-cache re-warm by =rewarm_all.sh <countries>= for anything merged since (Mali, Burkina done at 659b2479a).
 - Lane briefs: tasks/overnight_common.md + tasks/<lane>.md.  New tests that need data must carry =requires_s3=: CI has none.
