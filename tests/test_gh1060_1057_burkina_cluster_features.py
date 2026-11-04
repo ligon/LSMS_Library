@@ -10,8 +10,9 @@ report, because their rows still disagree.
 GH #1057 (ruling @ligon 2026-11-03, option b, tightened).  2021-22 ships no cluster
 GPS.  A panel grappe's row carries its 2018-19 fix and the key
 ``Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19``.  Grappes 19, 365
-and 549 name a different province in the two waves and stay NA; the cross-section
-(586-1185) has no antecedent and stays NA.
+and 549 name a different province in the two waves and stay NA; by the ruling of
+2026-11-04 so do 103, 104, 226, 229, 237 and 240, whose fix lies more than 25 km from
+their own 2021-22 parcels; the cross-section (586-1185) has no antecedent and stays NA.
 
 The ``TestOracle*`` classes are the point.  They read the source files directly and
 import nothing from ``Burkina_Faso/_/``, so a bug in the hook cannot agree with itself.
@@ -54,7 +55,9 @@ COUNTRY = "Burkina_Faso"
 ROOT = countries_root() / COUNTRY
 MODAL_KEY = "Burkina_Faso::cluster_features::zd-modal-province"
 GPS_KEY = "Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19"
-EXCLUDED = {"19", "365", "549"}
+PROVINCE_CHANGED = {"19", "365", "549"}
+FAR_FROM_PARCELS = {"103", "104", "226", "229", "237", "240"}
+EXCLUDED = PROVINCE_CHANGED | FAR_FROM_PARCELS
 LOGEMENT = "emc2014_p1_logement_27022015.dta"
 GPS_FILE = "grappe_gps_bfa2018.dta"
 LAT, LON = "coordonnes_gps__Latitude", "coordonnes_gps__Longitude"
@@ -187,10 +190,10 @@ class TestRules:
     def _gps_frame(self):
         frame = pd.DataFrame({
             "t": "2021-22",
-            "v": ["2", "2", "19", "365", "549", "83", "586"],
+            "v": ["2", "2", "19", "365", "549", "83", "586", "103", "229"],
             "Region": "R",
-            "Latitude": [12.5, 12.5, 13.0, 10.0, np.nan, np.nan, np.nan],
-            "Longitude": [-1.5, -1.5, 0.5, -3.0, np.nan, np.nan, np.nan]})
+            "Latitude": [12.5, 12.5, 13.0, 10.0, np.nan, np.nan, np.nan, 12.3, 11.2],
+            "Longitude": [-1.5, -1.5, 0.5, -3.0, np.nan, np.nan, np.nan, -1.5, -1.1]})
         return frame.set_index(["t", "v"])
 
     def test_gps_is_kept_and_stamped_on_a_carried_grappe_only(self):
@@ -198,7 +201,7 @@ class TestRules:
         carried = out.loc["2"]
         assert carried["Latitude"].tolist() == [12.5, 12.5]
         assert carried["Derivation"].tolist() == [GPS_KEY, GPS_KEY]
-        for v in ("19", "365", "549", "83", "586"):
+        for v in ("19", "365", "549", "83", "586", "103", "229"):
             assert pd.isna(out.loc[v, "Latitude"]) and pd.isna(out.loc[v, "Longitude"]), v
             assert pd.isna(out.loc[v, "Derivation"]), v
 
@@ -431,13 +434,30 @@ class TestOracleCarriedGps:
         assert (a.map(len) == 1).all() and (b.map(len) == 1).all()
         shared = a.index.intersection(b.index)
         differ = {str(int(g)) for g in shared if a[g] != b[g]}
-        assert differ == EXCLUDED
+        assert differ == PROVINCE_CHANGED
+
+    def test_the_withheld_six_are_exactly_the_panel_fixes_over_25_km_from_their_parcels(self, sources):
+        """The rule behind the hard-coded six, from the parcels themselves.  Reads the held
+        v04 s16a; the provider's v05 removes these coordinates, so a move to v05 fails here."""
+        gps, panel, _ = sources
+        parcels = _read("2021-22", "s16a_me_bfa2021.dta").dropna(
+            subset=["s16aq46__latitude", "s16aq46__longitude"])
+        medians = parcels.groupby(parcels["grappe"].astype(int).astype(str))[
+            ["s16aq46__latitude", "s16aq46__longitude"]].median()
+        shared = sorted((set(medians.index) & set(gps[gps[LAT].notna()].index)
+                         & set(panel["grappe"].astype(int).astype(str))) - PROVINCE_CHANGED)
+        lat1, lon1 = np.radians(gps.loc[shared, LAT].astype(float)), np.radians(gps.loc[shared, LON].astype(float))
+        lat2, lon2 = (np.radians(medians.loc[shared, "s16aq46__latitude"].astype(float)),
+                      np.radians(medians.loc[shared, "s16aq46__longitude"].astype(float)))
+        km = 6371.0088 * 2 * np.arcsin(np.sqrt(np.sin((lat2 - lat1) / 2) ** 2
+                                               + np.cos(lat1) * np.cos(lat2) * np.sin((lon2 - lon1) / 2) ** 2))
+        assert set(km[km > 25].index) == FAR_FROM_PARCELS
 
     def test_a_carried_row_equals_the_prior_waves_fix_exactly(self, sources, served):
         gps, panel, _ = sources
         expect = (set(panel["grappe"].astype(int).astype(str))
                   & set(gps[gps[LAT].notna()].index)) - EXCLUDED
-        assert len(expect) == 525
+        assert len(expect) == 519   # 525 until the six were withheld (ruling of 2026-11-04)
         w = served[served["t"] == "2021-22"].set_index("v")
         carried = w[w["Latitude"].notna() | w["Longitude"].notna()]
         assert set(carried.index) == expect
@@ -453,7 +473,7 @@ class TestOracleCarriedGps:
         for v, row in w[w["Latitude"].notna()].iterrows():
             assert float(row["Latitude"]) == float(gps.loc[v, LAT]), v
 
-    def test_the_three_grappes_stay_na_with_no_key(self, served):
+    def test_the_excluded_grappes_stay_na_with_no_key(self, served):
         w = served[served["t"] == "2021-22"].set_index("v")
         for v in EXCLUDED:
             assert pd.isna(w.loc[v, "Latitude"]) and pd.isna(w.loc[v, "Longitude"]), v
@@ -472,7 +492,7 @@ class TestOracleCarriedGps:
         w = served[served["t"] == "2021-22"]
         assert set(w["Derivation"].dropna()) == {GPS_KEY}
         assert (w["Derivation"].notna() == w["Latitude"].notna()).all()
-        assert w["Derivation"].notna().sum() == 525
+        assert w["Derivation"].notna().sum() == 519
 
     def test_the_inputs_are_the_fix_behind_each_keyed_row(self, sources, served):
         gps, _, _ = sources
@@ -512,7 +532,7 @@ class TestConsumers:
         other = flat[flat["country"] != COUNTRY]
         assert len(other) and other["Derivation"].isna().all()
         mine = flat[flat["country"] == COUNTRY]
-        assert mine["Derivation"].value_counts().to_dict() == {GPS_KEY: 525, MODAL_KEY: 92}
+        assert mine["Derivation"].value_counts().to_dict() == {GPS_KEY: 519, MODAL_KEY: 92}
         summary = frame.attrs["derivations"][COUNTRY]
-        assert summary[MODAL_KEY]["rows"] == 92 and summary[GPS_KEY]["rows"] == 525
+        assert summary[MODAL_KEY]["rows"] == 92 and summary[GPS_KEY]["rows"] == 519
         json.dumps(summary)

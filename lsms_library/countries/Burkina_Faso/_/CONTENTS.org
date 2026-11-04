@@ -657,8 +657,8 @@ Measured:
   within their EA; see "THE THING TO KNOW" above); Region agrees 550/550, and
   527 of them have a 2018-19 fix.  Serving that fix for 2021-22 would be a
   cross-wave construction -- a registered derivation, not a config mapping --
-  and is not done.  /Done 2026-11-03, for 525 of the 527: see "2021-22 GPS
-  carried from 2018-19 (GH #1057)" at the end of this file./
+  and is not done.  /Done 2026-11-03, for 525 of the 527 (519 since 2026-11-04): see
+  "2021-22 GPS carried from 2018-19 (GH #1057)" at the end of this file./
 - =s16a_me_bfa2021.dta= DOES carry parcel coordinates (=s16aq46__latitude= /
   =__longitude=, 4,180 of 8,467 parcels, inside the country).  Parcel grain,
   not a cluster location; see the correction under =plot_features=.
@@ -2449,7 +2449,7 @@ spelling (pooled District stays 45, Region 13).
 The 2,035 pre-existing rows (all of 2014 and 2018-19, and the 550 panel
 grappes) are value- and dtype-equal to the shared warm parquet; 2014's grain
 report (1,034 of 10,800 rows, 94 zd, GH #1060) is unchanged.  Latitude and
-Longitude stay NaN for all 1,150 2021-22 grappes.  /Since GH #1057, 525 panel
+Longitude stay NaN for all 1,150 2021-22 grappes.  /Since GH #1057, 525 (since 2026-11-04, 519) panel
 grappes carry the 2018-19 fix; the 600 cross-section grappes stay NaN./
 
 *New idiosyncrasy: the cross-section cover carries HOUSEHOLD GPS.*
@@ -2628,6 +2628,10 @@ Two config lines matter, and they bear different things:
 Of the 550 panel grappes: 525 carried; 22 with no 2018-19 fix (and not excluded);
 3 excluded.  =sampling.yml= is unchanged: the 2018-19 -> 2021-22 boundary was
 already =stable= and does not warn.
+
+/Superseded 2026-11-04: the six below are now withheld too, so 519 are carried and the
+table above is the state before that.  See "Six carried GPS fixes withheld" at the end
+of this file./
 
 *An independent check, and six fixes it doubts.*  =s16a_me_bfa2021.dta= records
 parcel positions in 2021-22 (=s16aq46__latitude= / =__longitude=), which owe
@@ -2839,3 +2843,54 @@ Wired by PR #1374 (2026-10-30), before #1224 gave =food_acquired.u= its size, th
 *Instrument, unchanged.*  The held =bfa_ehcvm1_qnr_community_excel_vague{1,2}.xls= are the FOCUS forms, with three relevés of Quantité + Prix; the PRICE forms with two integer prices and no quantity are on the UEMOA catalogue (entry 43).  Both noted above.
 
 *Cost.*  =2018-19/_/mapping.py= is in every 2018-19 table's input hash, and the country hash folds every wave: one Burkina re-warm.
+
+* 2026-11-04 -- Six carried GPS fixes withheld; what is wrong with the 2018-19 fixes (GH #1057)
+
+*Ruling (@ligon, 2026-11-04).*  Withhold the 2021-22 carry on grappes 103, 104, 240,
+237, 229 and 226, whose 2018-19 fix lies more than 25 km from the median of their own
+2021-22 parcels, on the same reasoning as the province-change exclusions.  They stay NA
+with no key; their 2018-19 rows are untouched.  =2021-22/_/mapping.py= lists them
+literally, so a build never reads =s16a=; the test recomputes the list from the parcels.
+=s16a= here is the held v04; the provider's v05 removes parcel coordinates, so this
+check can only be made on v04.
+
+*Measured*, cold, against development =115b6ab71=: 2021-22 rows 1,150 either way;
+non-null =Latitude= / =Longitude= and the key 525 -> 519; carried fixes still equal the
+2018-19 fix; 2018-19 unchanged.  Of the 550 panel grappes: 519 carried, 22 with no 2018-19
+fix, 9 excluded.  On the 271 carried grappes with a parcel coordinate the median distance
+is 1.57 km, p90 4.92, maximum 21.8; 4 exceed 10 km (116 21.8, 111 21.6, 532 14.4, 289 11.3).
+The other 248 carried grappes have no parcel coordinate, so nothing tests them.
+
+*New: every low-precision fix in the file is a rounded copy of another grappe's
+reading.*  =grappe_gps_bfa2018.dta= holds seven fixes at one or two decimals, all in vague 2.
+Each shares its =Timestamp= to the second and its =Altitude= with another grappe in the same
+province; its =Accuracy= differs from that grappe's only by rounding, and that grappe's
+full-precision position rounds to it:
+
+| copied fix | reading it copies | same province | km to its own parcels | km from the source reading | served in 2021-22 |
+|------------+-------------------+---------------+-----------------------+----------------------------+-------------------|
+| 237, 240   | 232 (1.4 km to own parcels) | yes | 44.5, 51.4 | 0.42 | withheld |
+| 226        | 223 (2.6 km to own parcels) | yes | 28.8       | 0.12 | withheld |
+| 365        | 369 (not in the panel)      | yes | 85.1       | 0.49 | withheld (province) |
+| 350        | 351 (2.9 km to own parcels) | yes | 6.4        | 0.69 | *carried* |
+| 216        | 217 (no parcels)            | yes | none       | 0.34 | *carried* |
+| 218        | 219 (no parcels)            | yes | none       | 0.46 | *carried* |
+
+So these are not readings of their own grappe, which the GH #1050 entry above could not see:
+it called them imprecise, and it asked whether 237/240 were one reading entered for two
+grappes.  It is one reading for three, with 232 the source.  444, at 4 decimals, shares no
+timestamp.  229 is the different case: its fix is 1.4 km from the median fix of its province
+and 0.9 km from grappe 236, and it is its parcels that lie 28 km from that median, so its
+withholding says the two disagree, not that the fix is the wrong one.
+
+*103 and 104 carry a point in Kadiogo, Ouagadougou's province.*  Their fixes are 6 m apart,
+both Namentenga, 109 km from that province's median fix and 6 km from Kadiogo's, while their
+parcels are 15 and 17 km from Namentenga's.  They lie within 30 m of two Kadiogo grappes, 89
+and 136.  All four are stamped 2019-07-23 within about two hours, and 103, 104 and 136 share
+one =Accuracy= value (6.068).  This is the only place in the file where fixes of different
+provinces meet within 500 m, apart from one pair (6 and 11, Oudalan and Séno, 468 m).  89 and
+136 have no parcels, so nothing says whether their own fixes are readings of those grappes or
+of the place the others were read.
+
+*Nothing in 2018-19 is changed.*  The 2018-19 rows still serve all of the above as recorded,
+pending a ruling.

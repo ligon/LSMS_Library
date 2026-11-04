@@ -204,11 +204,13 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
   columns: [Latitude, Longitude]
   rule: >-
     Latitude, Longitude = the 2018-19 cluster fix of the same grappe
-    (grappe_gps_bfa2018.dta), on the 2021-22 row of a panel grappe: 525 of the
+    (grappe_gps_bfa2018.dta), on the 2021-22 row of a panel grappe: 519 of the
     550 panel grappes.  NA, with no key, for the 22 panel grappes other than 549
-    that have no 2018-19 fix, for grappes 19, 365 and 549 (excluded), and for all
-    600 cross-section grappes.  The values are carried as recorded, low-precision
-    and duplicated fixes included (CONTENTS.org, "GPS by wave").
+    that have no 2018-19 fix, for grappes 19, 365 and 549 (province changed), for
+    grappes 103, 104, 226, 229, 237 and 240 (fix more than 25 km from the grappe's
+    own 2021-22 parcels), and for all 600 cross-section grappes.  The other values
+    are carried as recorded, low-precision fixes included (CONTENTS.org, "GPS by
+    wave").
   function: lsms_library.countries.Burkina_Faso.2021-22._.mapping:derive_panel_grappe_gps
   inputs: lsms_library.countries.Burkina_Faso.2021-22._.mapping:inputs_cluster_features
   raw_variables: [grappe, grappe_EHCVM1, coordonnes_gps__Latitude, coordonnes_gps__Longitude]
@@ -244,6 +246,18 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
         its wave.  365's fix lies 85 km from the median of its own 2021-22 parcel
         coordinates, which supports the exclusion; 19 has no parcel coordinates.
     - text: >-
+        Grappes 103, 104, 226, 229, 237 and 240 are NOT carried.  Each one's fix lies
+        more than 25 km from the median of its own 2021-22 parcel coordinates, which
+        puts the same-location assumption in doubt for them, and they stay NA.  25 km
+        is a line drawn in a gap, not a law: 111 and 116 (21.6 and 21.8 km) sit just
+        below it and are carried.
+      basis: modelling-choice
+      evidence: >-
+        GH #1057, ruling by @ligon 2026-11-04.  s16a_me_bfa2021.dta, s16aq46__latitude /
+        __longitude, median parcel to fix: 103 104.7 km (17 parcels), 104 103.7 (29),
+        240 51.4 (26), 237 44.5 (14), 229 29.3 (17), 226 28.8 (15).  The parcels of each
+        lie within a few km of their own median.
+    - text: >-
         The cross-section (grappes 586-1185) gets no fix.  It is a new draw from
         the 2019 census frame with no 2018-19 antecedent, and its cover's GPS__*
         are household positions (they differ within 578 of its 600 grappes).  A
@@ -252,12 +266,12 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
       evidence: GH #1057, ruling by @ligon 2026-11-03; GH #1276.
   validated_against: >-
     s16a_me_bfa2021.dta, s16aq46__latitude / __longitude, parcel positions recorded
-    in 2021-22 and independent of the fix: on the 277 carried grappes that have one,
+    in 2021-22 and independent of the fix: on the 271 carried grappes that have one,
     the median parcel position lies a median of 1.6 km from the carried fix (p90
-    5.2 km), against 213 km for a fix paired with another grappe's parcels.  6 of
-    the 277 are beyond 25 km, and those fixes are served as recorded because the
-    ruling excludes on province only: 103 and 104 (about 104 km), 240 and 237 (51
-    and 44 km; the two grappes that share one identical fix), 229 and 226 (29 km).
-    The other 248 carried grappes have no parcel coordinate to compare.
+    4.9 km, maximum 21.8 km), against 213 km for a fix paired with another grappe's
+    parcels.  The six grappes beyond 25 km are withheld (see the assumptions).  The
+    other 248 carried grappes have no parcel coordinate to compare.  The check reads
+    the held v04 release of catalog 6224; the provider's v05 removes these parcel
+    coordinates, so it holds only for v04.
   contents: 'Burkina_Faso/_/CONTENTS.org, "2021-22 GPS carried from 2018-19 (GH #1057)"'
   since: '2026-11-03'
