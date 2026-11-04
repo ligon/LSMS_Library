@@ -2746,8 +2746,9 @@ Version 05: "s10b_me_bfa2021.dta" has been updated.
 The same record says "Version 04: Edited and anonymous data for public distribution."
 and, in =doc_desc=, "Version 05 (October 2026)."
 
-*So the parcel coordinates left in v03, not v05, and no reason is stated.*  That
-sentence is the whole of what the record says about =s16a=.  The four current BIDs
+*So by these notes the parcel coordinates left in v03, not v05, and no reason is stated.*
+No v03 zip is available to confirm the release; what is measured is that the current =s16a=
+lacks them.  That sentence is the whole of what the record says about =s16a=.  The four current BIDs
 (6224 and 6277, English and French) contain neither "GPS" nor "anonym"; the current DDI
 simply no longer lists =s16aq46__*=, =s16a01a= or =s16aq03b=.
 
