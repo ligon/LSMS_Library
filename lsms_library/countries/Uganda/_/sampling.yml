@@ -321,9 +321,8 @@ Sampling:
         `h1aq4a` from 2013-14 (CONTENTS.org, "Cluster (PSU) identifier").  A parish
         is not an EA, so `v` has no crosswalk across this boundary, but the EA is not
         lost: `sample()`'s `ea` serves the design PSU from this wave (GH #689), and
-        `GSEC1.ea` pairs one-to-one with 2011-12 `comm` on all 212 linked EAs.  This
-        note used to say "no crosswalk can exist", which was true of `v` only
-        (corrected 2026-11-03).  Measured: 0 of 1,717 linked households keep `v`.
+        `GSEC1.ea` pairs one-to-one with 2011-12 `comm` on all 212 linked EAs.
+        Measured: 0 of 1,717 linked households keep `v`.
       source_type: derived-from-data
       confidence: high
       source_file: null

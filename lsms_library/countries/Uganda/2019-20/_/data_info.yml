@@ -84,8 +84,9 @@ sample:
     # hook `origin_ea` re-keys this 2015-16 frame to this wave's `hhid` through
     # gsec1.hhidold -> 2018-19 GSEC1.hhid -> t0_hhid, the survey's own tracking
     # keys; a household they do not reach stays NA.  Declared here so the file's
-    # sidecar is in this wave's input hash, and so that losing it costs `ea`
-    # alone (GH #515/#675).
+    # sidecar is in this wave's input hash, and so that a loss the GH #515 handler
+    # catches costs `ea`, not `v`.  An unreachable remote is not caught: `sample`
+    # raises here, where it used to need only this wave's cover (GH #1463).
     origin_ea:
         file: ../../2015-16/Data/gsec1.dta
         idxvars:

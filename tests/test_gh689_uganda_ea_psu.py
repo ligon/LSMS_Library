@@ -97,6 +97,21 @@ class TestDeclarations:
         assert {"hhid", "t0_hhid", "hhidold", "HHID", "ea"} <= set(rec.raw_variables)
 
 
+class TestAddDerivation:
+    """No row carries two keys today, so the data cannot exercise this branch."""
+
+    def test_a_row_already_carrying_a_key_carries_both(self):
+        import lsms_library as ll
+        add = ll.Country("Uganda", preload_panel_ids=False)["2018-19"] \
+            .formatting_functions["_add_derivation"]
+        flat = pd.DataFrame({"Derivation": pd.array(["x::y::z", pd.NA, "x::y::z"],
+                                                    dtype="string")})
+        got = add(flat, pd.Series([True, True, False]), KEY)["Derivation"]
+        assert got[0] == f"{KEY}+x::y::z"
+        assert got[1] == KEY
+        assert got[2] == "x::y::z"
+
+
 # ------------------------------------------------------------------ the oracle --
 
 @pytest.fixture(scope="module")
@@ -164,11 +179,16 @@ def _ids(wave):
     return _cover(wave, name)[col].map(format_id).tolist()
 
 
-# ---------------------------------------------------- the condition it rests on --
+# --------------------------------------------------------- UBOS's id encoding --
 
 @pytest.mark.requires_s3
-class TestEaIsAStableOriginLabel:
-    """If this fails, the inheritance has no basis and must not be served."""
+class TestUbosWritesEaIntoItsIds:
+    """A pin of the encoding, and NOT evidence for the inheritance.
+
+    Characters 2-4 of the id are ``ea`` and the link is string identity between
+    ids, so linked households share ``ea`` by construction: a wrong label or a
+    wrong tracking key would pass.  ``TestEvidenceOutsideTheId`` is the evidence.
+    """
 
     def test_every_linked_household_keeps_its_ea(self, covers):
         """2015-16 ``hh`` is the 2013-14 ``HHID`` with its wave token moved on."""
@@ -183,9 +203,33 @@ class TestEaIsAStableOriginLabel:
 
     @pytest.mark.parametrize("wave, col", [("2013-14", "HHID"), ("2015-16", "HHID")])
     def test_the_household_id_itself_embeds_ea(self, covers, wave, col):
-        """Why the label is stable: it is part of the survey's own id."""
         frame = covers[wave]
         assert (frame[col].str[1:4].astype(int) == frame["ea"]).all()
+
+
+@pytest.mark.requires_s3
+class TestEvidenceOutsideTheId:
+    """Checks that do not read the id's digits, so a wrong key could fail them."""
+
+    def test_ea_pairs_one_to_one_with_the_2011_12_frame_ea(self, covers):
+        """``comm`` is another wave's column in another numbering."""
+        old = _cover("2011-12", "GSEC1.dta")
+        new = covers["2013-14"]
+        linked = new.assign(key=new["HHID_old"].map(format_id)).dropna(subset=["key"]) \
+            .merge(old.assign(key=old["HHID"].map(format_id))[["key", "comm"]], on="key")
+        assert len(linked) == 1717
+        assert len(linked[["ea", "comm"]].drop_duplicates()) == 212
+        assert (linked.groupby("ea")["comm"].nunique() == 1).all()
+        assert (linked.groupby("comm")["ea"].nunique() == 1).all()
+
+    def test_t0_hhid_names_a_household_in_the_same_district(self, covers):
+        """The key the rule follows, against geography the 2018-19 id does not hold."""
+        linked = covers["2018-19"].merge(covers["2015-16"][["HHID", "district_name"]],
+                                         left_on="t0_hhid", right_on="HHID")
+        child = linked["distirct_name"].astype(str).str.strip().str.upper()
+        parent = linked["district_name"].astype(str).str.strip().str.upper()
+        assert len(linked) == 2978
+        assert (child == parent).sum() == 2729
 
 
 # ------------------------------------------------------------------ the column --
@@ -227,6 +271,11 @@ class TestServedAgainstTheSourceFiles:
         twins = routed.loc[routed["t0_hhid"].duplicated(keep=False), "hhid"].map(format_id)
         assert len(twins) == 10
         assert served["2018-19"].loc[twins, "ea"].notna().all()
+
+    def test_the_served_columns_are_exactly_the_declared_ones(self, sample):
+        """``origin_ea``'s marker is build plumbing and must not be served."""
+        assert set(sample.columns) == {"v", "weight", "panel_weight", "strata", "Rural",
+                                       "Region", "Derivation", "ea"}
 
     def test_no_float_spelling(self, sample):
         assert isinstance(sample["ea"].dtype, pd.StringDtype)
@@ -315,8 +364,13 @@ class TestNothingElseMoves:
 
 
 @pytest.mark.requires_s3
-class TestALostSourceCostsEaAlone:
-    """Why ``origin_ea`` is a sub-df: an unavailable file must not cost ``v``."""
+class TestADropTheHandlerCatchesCostsEaAlone:
+    """Why ``origin_ea`` is a sub-df: a ``FileNotFoundError`` does not cost ``v``.
+
+    That holds only for what the GH #515 handler catches.  With the remote
+    unreachable ``EndpointConnectionError`` escapes and ``sample`` raises, ``v``
+    included (GH #1463), which this simulation does not exercise.
+    """
 
     @pytest.mark.parametrize("wave, rows", [("2018-19", 3242), ("2019-20", 3098)])
     def test_the_wave_still_builds(self, tmp_path, monkeypatch, wave, rows):

@@ -68,10 +68,16 @@ Uganda::sample::ea-tracking-key:
     - text: ea is a label of origin, so a tracked household's EA is the EA of the 2015-16 household it descends from, wherever it now lives.
       basis: modelling-choice
       evidence: >-
-        No document states it; measured on the two waves that ship ea. All 2,872
-        households linked 2013-14 -> 2015-16 keep ea, 316 labels one-to-one, and
-        characters 2-4 of the survey's own household id are ea on 3,119/3,119
-        and 3,305/3,305 cover rows (2,978/2,978 of the t0_hhid the rule follows).
+        No document states it, and ea being unchanged 2013-14 -> 2015-16 is not
+        evidence: characters 2-4 of the household id are ea and the link is string
+        identity between ids, so that result pins UBOS's encoding. Independent of
+        the id's digits: ea pairs one-to-one with 2011-12 comm (212 pairs over 1,717
+        households linked by HHID_old); t0_hhid child and parent share a district
+        for 2,729 of 2,978 and hhidold for 2,977 of 2,986; for persons linked by
+        pid_unps, sex agrees for 11,203 of 11,296 and the age gap is 1-5 years for
+        99.8%, and the person's 2015-16 household is the one t0_hhid names for 13,166
+        of 13,298. A split-off inherits its parent's EA, so the value is the PSU
+        through which the lineage entered the sample.
   validated_against: >-
     tests/test_gh689_uganda_ea_psu.py recomputes the chain from the raw covers
     without importing this module; CONTENTS.org records the before/after.

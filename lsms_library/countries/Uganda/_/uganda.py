@@ -590,9 +590,12 @@ def origin_ea(df):
     no route is simply absent and stays NA: nothing is read from ``v`` or parsed
     out of an id.
 
-    A sub-df and not a read inside ``sample``, so that an unavailable 2015-16
-    file costs the column through the GH #515 drop (and the GH #675 degraded
-    grade) rather than costing ``v`` for every table of the wave.
+    A sub-df and not a read inside ``sample``, so that a loss the GH #515 handler
+    catches costs the column and not ``v``.  That handler catches
+    ``FileNotFoundError``, ``PathMissingError``, ``DvcException`` and ``KeyError``
+    only.  With the remote unreachable, ``EndpointConnectionError`` escapes and
+    the wave's ``sample`` raises, ``v`` included (GH #1463).  ``CONTENTS.org``
+    has the measured cost of each loss.
     """
     flat = df.reset_index()
     wave = flat['t'].iloc[0]
@@ -606,11 +609,11 @@ def origin_ea(df):
 
 def _add_derivation(flat, mask, key):
     """Stamp ``key`` on ``mask``; a row already carrying a key carries both."""
+    from lsms_library.derivations import union_keys
     if 'Derivation' not in flat:
         flat['Derivation'] = pd.Series(pd.NA, index=flat.index, dtype='string')
     held = flat.loc[mask, 'Derivation'].astype('string')
-    flat.loc[mask, 'Derivation'] = [
-        key if pd.isna(k) else '+'.join(sorted({*k.split('+'), key})) for k in held]
+    flat.loc[mask, 'Derivation'] = [union_keys([k, key]) for k in held]
     return flat
 
 

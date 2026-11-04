@@ -84,17 +84,45 @@ standard error on =ea=; locate a household with =v=.
 The two inherited waves carry =Derivation= =Uganda::sample::ea-tracking-key=, on
 exactly the rows that received a value.  2005-06 to 2011-12 stay NA here: =v= is
 already the EA there, under =comm= labels, and a single label across all eight
-waves is a filed follow-up.
+waves is GH #1459.
 
-*Why inheriting is sound: =ea= is part of the survey's own household id.*  All
-2,872 households linked 2013-14 -> 2015-16 keep =ea=, 316 labels one-to-one.  The
-link is =gsec1.hh= with its wave token moved back (=-05-= -> =-04-=, the =Waves=
-table in =uganda.py=); 2015-16 has no =HHID_old=.  The 100% is not suspicious:
-characters 2-4 of the 12-character =HHID= (2013-14) and 8-character =HHID=
-(2015-16) ARE =ea=, on 3,119 of 3,119 and 3,305 of 3,305 rows, and =DynID= // 100
-is too.  The same holds of the =t0_hhid= the rule follows, 2,978 of 2,978.  That
-encoding is evidence and *not a route*: parsing =t0_hhid= would give the 198
-households below an answer for 168, and the ruling is that no route means NA.
+*What the inheritance does NOT rest on: =ea= being unchanged across waves.*  All
+2,872 households linked 2013-14 -> 2015-16 keep =ea=, 316 labels one-to-one, but
+that cannot come out otherwise.  Characters 2-4 of the household id ARE =ea= (2013-14
+=HHID= 3,119 of 3,119; 2015-16 =hh= and =HHID= 3,305 of 3,305; =DynID= // 100 too),
+and the link is string identity between those ids: =gsec1.hh= with its wave token
+moved back (=-05-= -> =-04-=, the =Waves= table in =uganda.py=; 2015-16 has no
+=HHID_old=).  So that result pins UBOS's encoding and says nothing about whether the
+label or the tracking key is right.  The encoding is also *not a route*: parsing
+=t0_hhid= would give the 198 households below an answer for 168, and the ruling is
+that no route means NA.
+
+*What it does rest on.*  Checks that do not read the id's digits, on the raw files;
+"shuffled" permutes one side of the comparison.  No document states the rule.
+
+| check                                                             | result                | shuffled    |
+|-------------------------------------------------------------------+-----------------------+-------------|
+| =ea= vs 2011-12 =comm=, 1,717 households linked by =HHID_old=     | 212 pairs, one-to-one | 1,684 pairs |
+| =t0_hhid= child and parent in the same district                   | 2,729 of 2,978        | 30          |
+| =hhidold= child and parent in the same district                   | 2,977 of 2,986        | 50          |
+| persons linked by =pid_unps=: same sex                            | 11,203 of 11,296      | 5,687       |
+| persons linked by =pid_unps=: age gap of 1-5 years (median 3)     | 99.8% of 10,684       | 10.6%       |
+| person's 2015-16 household is the one =t0_hhid= names             | 13,166 of 13,298      |             |
+
+*What the value means, and how it misleads.*
+
+- /Split-offs inherit the parent's EA./  5 2015-16 households each have two 2018-19
+  households naming them (=t0_hhid= repeats), and all 10 carry the parent's =ea=.
+  So the value is the PSU through which the lineage entered the sample, not where
+  the household lives or where it was itself drawn.  That is right for a design-based
+  standard error and wrong as a location.
+- /=groupby('ea')= silently drops the NA rows./  =ea= is NA for 5.7% of wave weight in
+  2018-19 and 8.9% in 2019-20, and =groupby= drops a null key by default.  Those
+  households are not missing at random: they are the no-route households below.
+- /=ea= does not nest in =strata=./  52 of 317 EAs in 2013-14 and 81 of 316 in 2015-16
+  span more than one =sregion=; 61 of 315 and 64 of 315 span more than one =subreg= in
+  the two inherited waves.  A variance estimator that nests PSUs in strata cannot take
+  the column as it stands.
 
 *The keys are RAW source ids*, never the walked =i=, which is a canonical id from
 another wave.  All are clean strings: no float, whitespace or =.0= on any of the
@@ -105,9 +133,8 @@ consumer as ='12.0'= across the outer merge.
 - /A blank is not a link./  69 households in 2019-20 have =hhidold= == =''=; it
   formats to =None=, and =_follow_key= drops it first because =pd.merge= matches
   null keys to each other.
-- /Two children, one parent./  5 2015-16 households each have two 2018-19
-  households naming them (=t0_hhid= repeats); both children inherit.  The join is
-  validated =many_to_one=, so a repeated target would raise.
+- /A repeated target would raise./  The join is validated =many_to_one=: two children
+  may name one parent, but one key may not name two households.
 
 *The 198 + 66 of 2018-19 with no =ea=*, by what the source says about them:
 
@@ -136,13 +163,21 @@ files hold, and on those 86 its value (1-3 or 7 characters) is never a 2015-16
 
 *Mechanics.*  =origin_ea= is a real =dfs:= sub-df with the 2015-16 =gsec1= as its
 =file:=, and its country-level hook re-keys that frame to the current wave's =hhid=.
-Two reasons, both load-bearing: the file's sidecar is then in the wave's
-=_input_hash= (2019-20 also declares its bridge, 2018-19 =GSEC1=, under a key that
-is not in =dfs:=, which =_collect_file_paths_from_block= hashes and =grab_data=
-never reads), and an unavailable 2015-16 file costs =ea= through the GH #515 / #675
-drop rather than costing =v= for every table of the wave.  =Derivation= stays on
-=sample=: =_join_v_from_sample= carries =v= alone, and the =ea= column reaches no
-other table.
+Two reasons: the file's sidecar is then in the wave's =_input_hash= (2019-20 also
+declares its bridge, 2018-19 =GSEC1=, under a key that is not in =dfs:=, which
+=_collect_file_paths_from_block= hashes and =grab_data= never reads), and a loss the
+GH #515 handler catches costs =ea= and not =v=.  =Derivation= stays on =sample=:
+=_join_v_from_sample= carries =v= alone, and the =ea= column reaches no other table.
+
+*What losing a source costs.*  =sample= for 2018-19 and 2019-20 now reads other waves'
+covers, and that protection is partial.  Measured in the review of this change,
+2026-11-03, with a private L1 under =unshare -rn=:
+
+| lost                                 | result                                                                                                                                   |
+|--------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------|
+| 2015-16 =gsec1=, remote unreachable  | =EndpointConnectionError= is outside the #515 handler's tuple, so =sample= for both waves raises after about 90 s and =v= is lost too (GH #1463). 2019-20, which needed only its own cover, built in 1.5 s on base and raises at 89 s now. |
+| 2015-16 =gsec1=, =FileNotFoundError= | soft: =ea= is absent, every row and =v= survive (simulated; =tests/test_gh689_uganda_ea_psu.py=).                                         |
+| 2018-19 =GSEC1=, 2019-20's bridge    | =ea= drops and =v= survives, but the drop record names the readable 2015-16 file (the sub-df's one =file:=), so the #675 probe returns True.  Every fresh process rebuilds (about 70 s offline), =DegradedCacheWarning= never fires, and #675's "one probe per process" breaks through its one-source-per-sub-df assumption.  It heals when the blob returns. |
 
 *Measured, cold =98c6069d2= vs cold =6db7bf0d5=, 2026-11-03.*  Every declared Uganda
 table, =Feature('sample')= over Uganda, Albania and Malawi, and
@@ -166,17 +201,18 @@ same households (315-317 EAs, 702-864 parishes):
 
 So the column matters for some statistics and not others: clustering on the parish
 understates the food standard error by about a tenth in the two inherited waves, and
-changes nothing visible in the two direct ones.  This is one small check on two
-means, not a general claim about the size of the design effect.
+changes nothing visible in the two direct ones.  Why the ratio rises in those waves is
+not established.  This is one small check on two means, not a general claim about the
+size of the design effect, and it does not show that the inheritance is correct.
 
 =market='ea'= raises =KeyError= from =cluster_features=.  It was not asked for, and a
 market is a place, which =ea= is not.
 
 **** TODO Decisions the ruling leaves open
 
-1. /One label across all eight waves./  =ea= is NA through 2011-12, where =v= is the
-   EA under =comm= labels.  =ea= pairs one-to-one with 2011-12 =comm= on all 212
-   linked EAs, which is the start of a crosswalk (a filed follow-up of the ruling).
+1. /One label across all eight waves (GH #1459)./  =ea= is NA through 2011-12, where
+   =v= is the EA under =comm= labels.  =ea= pairs one-to-one with 2011-12 =comm= on all
+   212 linked EAs, which is the start of a crosswalk.
 2. /=AGSEC1= as a second source./  Accepting =AGSEC1.ea= for households only it
    records adds 72 in 2015-16 (3,377 of 3,377), 49 in 2018-19 (3,027) and 45 in
    2019-20 (2,868), with =GSEC1= keys only.  Following =AGSEC1.t0_hhid= as well for
