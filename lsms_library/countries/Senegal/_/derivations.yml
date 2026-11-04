@@ -101,3 +101,49 @@ Senegal::food_acquired::7day-purchase-at-last-purchase-unit-value:
     labels), so the reading carries by inference, not by measurement here.
   contents: 'Senegal/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
+
+Senegal::community_prices::one-item-per-price:
+  waves: ['2018-19']
+  columns: [Quantity]
+  rule: >-
+    Quantity = 1 on every served community_prices row, in the row's own
+    unit-size `u`.  s05_co_sen2018.dta records, per (grappe, product s05q01,
+    unit-size s05q02), two prices -- s05q03 -> obs 1 and s05q04 -> obs 2 -- and
+    NO quantity.  The form prices one item of the selected unit-size, so the
+    quantity a price was recorded for is one `u` by construction of the form,
+    not by any answer.  Price is served as recorded; nothing is divided,
+    rescaled or converted, and no size is collapsed.
+  function: lsms_library.countries.Senegal.2018-19._.mapping:derive_s05_one_item_per_price
+  inputs: lsms_library.countries.Senegal.2018-19._.mapping:inputs_community_prices
+  raw_variables: [grappe, vague, Existe, s05q01, s05q02, s05q03, s05q04]
+  assumptions:
+    - text: >-
+        each recorded price is the price of ONE item of the selected unit-size.
+        The held community workbooks, whose cover is REPUBLIQUE DU SENEGAL /
+        AGENCE NATIONALE DE LA STATISTIQUE ET DE LA DEMOGRAPHIE, list in sheet
+        SEC5_PRIX per product up to five `unité` rows with the columns "Relevé 1
+        Prix" and "Relevé 2 Prix" and no quantity column.  Senegal's CAPI price
+        form has, per product present in the market, a multiple choice of
+        unit-sizes (5.02, a warning at six) and, per selected unit-size, "5.03.
+        Relevé 1 Prix (en FCFA)" and 5.04, both NUMERIC: INTEGER, validated as
+        multiples of 5 and above 0.  There is no quantity question.
+      basis: questionnaire
+      evidence: >-
+        Held 2018-19/Documentation/sen_ehcvm1_qnr_community_excel_vague{1,2}.xls,
+        sheet SEC5_PRIX.  UEMOA regional catalogue entry 49,
+        https://phmecv.uemoa.int/nada/index.php/catalog/49/download/217 (not
+        held; /download/218, listed as vague 2, is the identical file).
+    - text: >-
+        the distributed prices are served as recorded, including the 249 s05q03
+        and 293 s05q04 values that are not integers and the values below 1 FCFA.
+        The instrument accepted only integers that are multiples of 5, so those
+        values were produced after collection, by a mechanism no held document
+        describes; they are taken to be per one item like the rest and are
+        neither reversed nor flagged.
+      basis: modelling-choice
+      evidence: Senegal/_/CONTENTS.org, "2018-19 community prices are wired (GH #1226)"
+  validated_against: >-
+    the instrument only.  No held file records the quantity behind a price, so
+    the one-item reading cannot be checked against data.
+  contents: 'Senegal/_/CONTENTS.org, "2018-19 community prices are wired (GH #1226)"'
+  since: '2026-11-04'

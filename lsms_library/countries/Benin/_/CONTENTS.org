@@ -711,3 +711,27 @@ Registration moves every Benin =Country._table_cache_hash=, because the wave set
 is folded into the hash, and no existing wave's =Wave._input_hash=.  When
 =food_acquired= is wired for 2021-22, pooled kg factors change for every
 Benin wave at read time (GH #1487).
+* 2018-19 community prices are wired (GH #1226, 2026-11-04)
+
+=community_prices= was declared nowhere for Benin although =2018-19/Data/s05_co_ben2018.dta= holds section 5 of the community questionnaire.  Now built by =2018-19/_/community_prices.py= on Niger's template (rulings D1-D6, =Niger/_/CONTENTS.org=, "2018-19 community prices are wired"), with the household's sized unit form and no folding (#1453 ruling, @ligon 2026-11-04).  Helpers and registry callables are in =2018-19/_/mapping.py=.
+
+*Served, cold private root:* 222,296 rows = both readings of all 111,148 source records; 670 grappes, 98 =j=, 188 =u=.  =visit= 1: 101,646, 2: 120,650.  =obs= 1 and 2: 111,148 each.
+
+*The file.*  One row per (grappe, =s05q01= product, =s05q02= unit-size) with two prices.  0 repeated keys, 0 byte-identical rows, =Existe= constant 1.  No price is NA, zero, negative or a sentinel; 5 to 86,000 FCFA.  19 =s05q03= and 12 =s05q04= values are not integers, and the two readings agree in 63.4% of records.  Niger's 0.85 pattern is absent: 42 and 83 records at that exact ratio, against 1,394 at 0.8.  670 of 670 =sample().v=; each grappe's =vague= equals the cover page's.
+
+*The instrument.*  The held =Documentation/ben_ehcvm1_qnr_community_excel_vague{1,2}.xls= are Benin's own (cover REPUBLIQUE DU BENIN / INSAE), unlike the Chad files shipped under Niger's name.  Sheet =SEC5_PRIX= has one row per (product, unit, size) with =Relevé 1 Prix= and =Relevé 2 Prix= and no quantity.  The CAPI form on the UEMOA catalogue (entry 44, =/download/123=, =/124=; not held) has at most six unit-sizes per product (5.02) and two integer prices, multiple of 5, above 0.  So =Quantity= = 1 is =Benin::community_prices::one-item-per-price=.
+
+*How Benin differs from Niger.*
+
+- *=harmonize_food= lumps priced products.*  Ten of the 103 priced codes fall into five =j=: 1, 2 =Autre Riz local=; 3, 4 =Riz importé non parfumé=; 36, 38 =Autres poissons frais=; 39, 40 =Autres poissons fumés=; 87, 88 =Autres légumes en feuilles=.  5,858 records in 2,929 pairs would share a served key, and they are not repeats: =Riz local parfumé= and =Riz local Nérica= are two products.  Those ten codes carry their product code as =variety=, the canonical definition of the level (=data_info.yml=, GH #840; Tanzania's item codes), and 21,478 rows differ from the =unknown_variety= of the other 93 codes.  Rule D5 (obs 3 / 4) is for a repeated SOURCE key, and fires on none here.
+- *The unit-size code has two forms.*  =10 x unit + size=, but the sizes 98 and 99 (=Autre taille=) make it =100 x unit + size=: =13198= is Pot, size 98.  31 codes, 1,548 records.
+- *The code bridge holds except where the form says otherwise.*  =1050= is Bassine by its digits, but the form prints =1050: Bidon-Unité de taille unique= and all 44 records are vinegar, so it is served =Bidon=.  =1330= is a bare Sac by its digits, but the form prints =Sac (10 Kg)= (10 records, all salt, median 2,750 FCFA), so it is served =Sac (10 Kg)= with =1340=, which the form prints under both spellings.  The other label differences are spellings of one unit (=Parsoire= / =passoire=, =Quartier (cuisse, tête...)= / =cuisse=).
+- *Sizes run past Petit / Moyen / Grand:* =Tohoungolo (Sans brassée)=, =Otoka/Fihanfingban (Avec 1 brassée)=, =Bassine (Quart)=, =Pot (Autre taille 2)=.  Size 99 is not in the household labels, so it takes the form's word.
+- *=Litre (Quart)= keeps its size* (31 records, code 1014): a quarter litre is not a litre, and in the 4 same-market pairs it prices at a median 0.20 of =Litre=.  The household side serves its 8 such rows as bare =Litre=, for the kg ladder, so these prices do not meet them.
+- *Those 8 household rows, all =Jus de fruits=, meet the bare =Litre= price until #1451 lands*, which is about five times a quarter litre.
+
+*The join.*  Household (t, j, u) cells with a community price: 931 of 1,342, covering 168,882 of 188,349 =food_acquired= rows.  212,046 of the 222,296 community rows find a household cell.  All 98 =j= occur in the household table.  18 =u= do not.
+
+*Recorded, not repaired.*  Prices are served as recorded, including the non-integer ones.  =j= is the household's label by code, so products named more narrowly by the form take the household's label and keep theirs in =Description= (code 37 is =Marquereau congelé= on the form and =Marquereau frais (Saloumon)= in the household file).
+
+*Cost.*  =data_scheme.yml= and a new wave script move every Benin hash: one Benin re-warm.  =.coder/coverage/latest.csv= grades the cell =absent= until the next =make matrix=.

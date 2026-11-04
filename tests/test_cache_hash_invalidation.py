@@ -20,6 +20,7 @@ import pandas as pd
 import pytest
 
 from lsms_library import local_tools as lt
+from lsms_library.country import _no_cache
 
 
 # --------------------------------------------------------------------------
@@ -220,7 +221,7 @@ def test_schema_version_is_a_real_lever(temp_data_dir, monkeypatch):
 
 @pytest.mark.requires_s3
 @pytest.mark.skipif(
-    os.environ.get("LSMS_NO_CACHE", "").lower() in {"1", "true", "yes"},
+    _no_cache(),
     reason="the trust-once read of a hashless parquet is exactly what "
            "LSMS_NO_CACHE (set by --rebuild-caches) bypasses; the test's "
            "premise does not exist under a cold gate",

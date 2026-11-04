@@ -859,3 +859,25 @@ PDF p. 36, Section 7B; 2018-19 =sen_ehcvm1_qnr_household_excel_vague1.xls= sheet
 =S7b_Conso_Al=, r6.  The 2021-22 BID's sampling text, already quoted in the population
 evidence from the catalog, is now held locally.  Its price component is a separate
 sample of markets, and the community files stop at =s04_co=.
+* 2018-19 community prices are wired (GH #1226, 2026-11-04)
+
+=community_prices= was declared nowhere for Senegal although =2018-19/Data/s05_co_sen2018.dta= holds section 5 of the community questionnaire.  Now built by =2018-19/_/community_prices.py= on Niger's template (rulings D1-D6, =Niger/_/CONTENTS.org=, "2018-19 community prices are wired"), with the household's sized unit form and no folding (#1453 ruling, @ligon 2026-11-04).  Helpers and registry callables are in =2018-19/_/mapping.py=.  2021-22 has no community price file: =s05_me_sen2021= is a household module and =ehcvm_prix_sen2021= has no grappe, so that wave has no script and serves no row.
+
+*Served, cold private root:* 126,624 rows = both readings of all 63,312 source records; 595 grappes, 63 =j=, 114 =u=.  =visit= 1: 57,964, 2: 68,660.  =obs= 1 and 2: 63,312 each.
+
+*The file.*  One row per (grappe, =s05q01= product, =s05q02= unit-size) with two prices.  0 repeated keys, 0 byte-identical rows, =Existe= constant 1.  No price is NA, zero, negative or a sentinel.  249 =s05q03= and 293 =s05q04= values are not integers, and the two readings agree in 82.5% of records.  Values run from 0.25 to 160,000 FCFA, and 5 and 4 values are below 5 FCFA, which the form could not have accepted; served as recorded.  Niger's 0.85 pattern is absent: 3 and 3 records at that exact ratio.  595 of the 598 =sample().v=, every s05 grappe among them; each grappe's =vague= equals the cover page's.
+
+*The instrument.*  The held =Documentation/sen_ehcvm1_qnr_community_excel_vague{1,2}.xls= are Senegal's own (cover REPUBLIQUE DU SENEGAL / ANSD).  Sheet =SEC5_PRIX= has up to five =unité= rows per product with =Relevé 1 Prix= and =Relevé 2 Prix= and no quantity.  The CAPI form on the UEMOA catalogue (entry 49, =/download/217=; =/218=, listed as vague 2, is the identical file; not held) has unit-sizes (5.02, a warning at six) and two integer prices, multiple of 5, above 0.  So =Quantity= = 1 is =Senegal::community_prices::one-item-per-price=.
+
+*How Senegal differs from Niger.*
+
+- *The crosswalks are keyed on mojibake, and that stays load-bearing* (the WARNING section above).  =j= and =u= take the household's RAW label by code and let =harmonize_food= and the =u= table repair it; nothing decodes, and the s05 labels, mostly clean UTF-8, are never keys.  =Description= keeps the s05 label as recorded.
+- *Four-digit household units.*  Units run to 1003, so =10010= is =10 x 1001 + 0=, not =100 x 100 + 10=.  The two-digit size 98 is in the household labels and no price uses it.
+- *Eight used codes have no s05 label* (=1111=, =1112=, =1113=, =1117=, =1133=, =1290=, =1330=, =5642=; 278 records).  The code alone resolves them: =Boule (Petit)=, ...
+- *=10000= is household unit 1000, served =Bouteille de 19 L=.*  The price form prints =Bouteille de 20l= and the 2018-19 household file =Bouteille de 19L=, but they are one container.  At purchase, 500 of the 539 household rows with a value in unit 1000 are cooking oil, at medians within 2% of the community's 308 oil records: 16,000 / 15,000 / 14,750 / 15,000 FCFA against 16,000 / 14,750 / 14,500 / 14,750.  The consumption rows in that unit (42 of 45 bottled water) point the other way, and the first version of this wiring served the form's spelling on them; review corrected it.
+- *Unit 1000's label changes between waves, and within 2021-22.*  =s07bq03b= prints =Bouteille de 19L= in 2018-19 and =1000. Bouteille de 20 litres= in 2021-22, while 2021-22's =s07bq07b= prints =1000. Bouteille de 19 litre= for the same code, where 439 of 455 purchase rows are again oil.  So =food_acquired= serves =Bouteille de 19 L= in 2018-19 (45 rows) and =Bouteille de 20 L= in 2021-22 (23 rows).  A cross-wave statistic by =u= splits one container, and =transformations._parse_explicit_metric= reads 19 and 20 from those labels.  Recorded, not changed: the household =u= table is outside this wiring.
+- *=Très petit= is a size here:* =Sachet (Très petit)=, =Tas (Très petit)=, the household's repaired label.
+
+*The join.*  Household (t, j, u) cells with a 2018-19 community price: 614 of 1,263, covering 171,894 of 215,660 =food_acquired= rows.  122,462 of the 126,624 community rows find a household cell.  All 63 =j= occur in the household table.  7 =u= do not.
+
+*Cost.*  =data_scheme.yml= and a new wave script move every Senegal hash: one re-warm.  =.coder/coverage/latest.csv= grades the cell =absent= until the next =make matrix=.

@@ -4124,6 +4124,9 @@ The content-producing food method is versioned so corrupt current-hash
 country caches can rebuild normally.  The =grab_data= plumbing also moves
 the existing all-table build fingerprint, a broad cache invalidation cost.
 
+*2026-11-04 (GH #1455, ruling @ligon)*: the legacy reducer named above is gone.
+In-memory output is now the frame a successful write stores.
+
 The controlled reproductions on f8 and reviewed #1062 match the exact
 historical nine-cell signature.  The original historical full-suite
 writer and interleaving remain unidentified.  #1062's requested-output

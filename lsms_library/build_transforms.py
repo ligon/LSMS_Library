@@ -61,10 +61,8 @@ def food_acquired_to_canonical(df: pd.DataFrame, drop_columns=('visit',)) -> pd.
 
         * ``s='purchased'``: ``Quantity = (Total - Produced)`` clipped at 0;
           ``Expenditure`` as observed.
-        * ``s='produced'``: ``Quantity = Produced``; ``Expenditure = NaN``
-          (note: the wave-level groupby in ``Wave.food_acquired`` may
-          coerce all-NaN sums to 0.0 — semantically equivalent for produced
-          rows).
+        * ``s='produced'``: ``Quantity = Produced``; ``Expenditure = NaN``,
+          and it stays NaN on every route (GH #1455).
 
       - Rows with no measurements after the split are dropped.
       - Index columns named in ``drop_columns`` are removed before the

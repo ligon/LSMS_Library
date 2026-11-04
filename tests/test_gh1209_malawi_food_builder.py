@@ -70,8 +70,7 @@ def test_native_wave_assembly_preserves_requested_food(tmp_path, monkeypatch,
             "Quantity": [0.0, 2.5], "Expenditure": [0.0, float("nan")],
             "Quantity_kg": [0.0, 2.5],
         }).set_index(["t", "i", "j", "u", "s"])
-        # Model the native script-parquet producer, whose explicit provenance
-        # tells Wave.food_acquired to keep already-canonical columns.
+        # Model the native script-parquet producer.
         out = data_root("Malawi") / self.year / "_" / "food_acquired.parquet"
         out.parent.mkdir(parents=True, exist_ok=True)
         frame.to_parquet(out)
