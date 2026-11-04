@@ -5,6 +5,7 @@ Tests that sample() returns a well-formed DataFrame with cluster (v),
 weight, strata, and Rural columns, indexed by (i, t).
 """
 
+import importlib.util
 import os
 import pytest
 import pandas as pd
@@ -582,6 +583,10 @@ class TestUganda2009HybridV:
 # Uganda: HH-level Region exposed on sample() (not just cluster-level).
 # ---------------------------------------------------------------------------
 
+UGANDA_WAVES = ["2005-06", "2009-10", "2010-11", "2011-12",
+                "2013-14", "2015-16", "2018-19", "2019-20"]
+
+
 class TestUgandaRegionOnSample:
     """`sample()[['Region']]` should be populated per-HH for every Uganda
     wave, mapping to the canonical 4-region set used by cluster_features.
@@ -614,10 +619,12 @@ class TestUgandaRegionOnSample:
         """Every wave's LOCATED households should have ≥99% populated Region.
         2019-20 has a handful of NA in the refreshment tail.
 
-        `unlocated-` identities are excluded: #1358 (GH #1120 D2) added them
-        as membership, with no geography to report (next test).  Counted, all
-        households would read 2,850 of 2,907 in 2011-12, 3,176 of 3,242 in
-        2018-19."""
+        `unlocated-` identities (#1358, GH #1120 D2) are excluded because they
+        have no cluster key: 128 of the 153 have no Region either, and 25 do
+        (24 in 2009-10, 1 in 2013-14).  Counted, all households would read
+        2,850 of 2,907 in 2011-12, 3,176 of 3,242 in 2018-19.  Judged on located
+        households alone this test cannot see a household that loses both `v`
+        and Region, so the singleton test below pins who the excluded ones are."""
         v = uga_sample["v"].astype("string")
         located = uga_sample[~v.str.startswith("unlocated-").fillna(False)]
         for wave, sub in located.groupby("t"):
@@ -631,8 +638,11 @@ class TestUgandaRegionOnSample:
     @pytest.mark.parametrize("wave, n", [("2011-12", 57), ("2018-19", 66)])
     def test_agsec1_only_households_have_no_region_in_their_own_source(
             self, uga_sample, wave, n):
-        """Their missing Region is the source's, not a lost join: the only file
-        that lists them has no `region` (2011-12) or leaves it blank (2018-19)."""
+        """Their missing Region is the source's, not a lost join: AGSEC1, which
+        gives them membership, has no `region` (2011-12) or leaves it blank
+        (2018-19).  They are also listed in other files (21 in 2011-12, 53 in
+        2018-19), none with a region or district for them (red-team sweep by
+        column name, 2026-11-04; this test reads AGSEC1 only)."""
         import pyreadstat
         from lsms_library.data_access import get_data_file
         from lsms_library.local_tools import format_id
@@ -648,6 +658,26 @@ class TestUgandaRegionOnSample:
         sub = uga_sample.xs(wave, level="t")
         singletons = sub[sub["v"].astype("string").str.startswith("unlocated-").fillna(False)]
         assert len(singletons) == n and singletons["Region"].isna().all()
+
+    @pytest.mark.parametrize("wave", UGANDA_WAVES)
+    def test_singletons_are_the_households_with_no_location_in_their_sources(
+            self, uga_sample, wave):
+        """A located household must not become `unlocated-` (#1120 D2).
+
+        The rule is read from each wave's locating sources, through the input
+        function registered for the identity.  Region coverage cannot catch this:
+        a household losing `v` and Region together leaves its denominator.
+        """
+        spec = importlib.util.spec_from_file_location(
+            "uganda_singletons", countries_root() / "Uganda" / "_" / "uganda.py")
+        ug = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(ug)
+        v = uga_sample.xs(wave, level="t")["v"].astype("string")
+        served = set(v[v.str.startswith("unlocated-").fillna(False)].str.removeprefix("unlocated-"))
+        assert served == set(ug.inputs_unlocated_identity(wave).index.get_level_values("i"))
+
+    def test_every_wave_gets_the_singleton_check(self, uga_sample):
+        assert sorted(uga_sample.index.get_level_values("t").unique()) == UGANDA_WAVES
 
 
 # ---------------------------------------------------------------------------
@@ -731,7 +761,9 @@ class TestUganda2009MarketFallback:
 
     def test_household_characteristics_retains_hybrid_v_HH(self, hc):
         """household_characteristics(market='Region') should cover every
-        HH in sample (2975 for Uganda 2009-10).
+        household in the 2009-10 GSEC1 cover: 2,975.  `sample()` has 2,979 since
+        #1358, but the 4 it added (known only from AGSEC3B/GSEC12) are not in
+        this table.
 
         Pin history:
 
