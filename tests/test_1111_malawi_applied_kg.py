@@ -86,6 +86,8 @@ def drive(monkeypatch):
                              if wave == '2013-14' else {'ag_g0b': ['R1']})
                 return pd.DataFrame({
                     **ids, **plot_crop, 'ag_g0d': [1], 'crop_code': [1],
+                    # GH #1228: the 2010-11 driver reads the crop specify text.
+                    'ag_g0d_os': [pd.NA],
                     'gardenid': ['RG01'], 'plotid': ['R1'],
                     'ag_g04a': [3.0], 'ag_g04b': [1], 'ag_g0f': [2],
                 })

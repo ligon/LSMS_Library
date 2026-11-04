@@ -77,7 +77,8 @@ pieces = [
     _seed_block(g, hhid='hhid', plotkey='plotkey', cropcode='ag_g0d',
                 qty='ag_g04a', unit='ag_g04b', improved=None, t=WAVE,
                 source_ref=_seed_source_reference(G_SOURCE, script_path=__file__),
-                source_half='Full_Sample', row_positions=g_rows),
+                source_half='Full_Sample', row_positions=g_rows,
+                crop_text='ag_g0d_os'),
 ]
 
 seed_purchase = [

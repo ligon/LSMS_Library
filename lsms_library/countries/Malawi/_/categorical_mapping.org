@@ -604,6 +604,11 @@
 # (Maize as a grain crop, Wheat, Cassava, Sweet Potato, Beans, Soyabean,
 # Cotton, Sunflower, Paprika, Pea, Tobacco varieties, Tea, Coffee,
 # Macadamia, the citrus/stone-tree perennials).
+#
+# GH #1228: one served crop label is not in this table, because no code carries
+# it.  The instrument has no cowpea code, so 2010-11 code 48 lines whose own
+# specify text says COWPEAS are served harmonize_food's `Cowpea (Khobwe)` by
+# `malawi._CROP_TEXT_RECODE`.
 #+name: harmonize_crop
 | Code | Preferred Label      |
 |------+----------------------|

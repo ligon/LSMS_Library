@@ -796,7 +796,48 @@ codes and cowpea.  No general free-text cleaner.  The UNIT half is done (next
 entry); the cowpea half is drafted as its own issue (a new Preferred Label and
 a G-D plot join), not filed yet.  Until it lands, read a seasonal (Module G)
 =crop = 'Other'= as "cowpea in about half the rows whose text we hold" (it is
-not cowpea on the perennial side).
+not cowpea on the perennial side).  /GH #1228, 2026-11-04:/ 2010-11's own-text
+lines are now named, next entry; this reading still holds for 2016-17 and 2019-20.
+
+** DONE 2010-11: the lines whose own text says cowpea (GH #1228, ruling 2026-11-04)
+
+The ruling is the smallest step.  Of 2010-11's 328 code-48 G lines, 157 say exactly
+=COWPEAS= in =ag_g0d_os= (=malawi._CROP_TEXT_RECODE=; no other spelling occurs on
+code 48 in that wave), and they are served =crop = 'Cowpea (Khobwe)'=.  Everything
+else stays =Other=: the other 171 in 2010-11 (=NSEULA= 77 and =MSEWULA= 8 among
+them, which no source names), 2013-14 (no text held), and 2016-17 and 2019-20, whose
+names are only in Module D.
+
+*No crop code is reserved.*  The instrument has none, and the #1228 diagnostic says
+absence from a label table is not absence from the namespace, so only the LABEL
+moves.  =_crop_code=, =crop_variety= (=Other=) and =production_obs= (=reported:G:48=)
+stay what was recorded, which is also how a row shows where its label came from.
+A synthetic code would have detached sales, because the attach keys on the code.
+
+*Where it joins.*  =Cowpea (Khobwe)= is =harmonize_food='s Preferred Label, and
+=food_acquired.j= carries it in all five waves (1,295 / 1,526 / 812 / 1,375 / 1,440
+rows, 2004-05 on).  It is not in =harmonize_crop=, because no code carries it; a note
+above that table says so.
+
+*The sale side did not move.*  Cold builds, previous commit vs this one, 2010-11:
+33,549 rows either way, and =Quantity=, =Quantity_sold=, =Value_sold= and every rung of
+the sale-basis ladder are unchanged.  23 of the 157 rows carry a sale cell, 17 of them
+positive (51,820 MWK), attached by code 48 as before, and none carries a =Derivation=
+key.  *One residual:* Module I has its own =ag_i0b_os=, and on those 17 it says =COWPEAS=
+16 times and =MPHODZA= once, so one row labelled cowpea carries a sale the household
+named differently.  Module I's text is not read here (deferred with the rest).
+
+*The same line carries one label in both tables.*  Module G is also where
+=plot_inputs= reads seed, so the seed rows of those lines are relabelled too (155
+served, 153 with a planted amount); otherwise =crop= would join the two tables on
+everything but these.  Module H is untouched: a purchase attaches by code, and the 27
+purchases and 29 free receipts on those rows did not move.
+
+Measured, cold builds: =crop_production= 135,370 rows and =plot_inputs= 179,957, with
+only =crop= moving on 157 and 155 rows.  =Other= is now 206 rows in 2010-11 (171 of them
+Module G), and the other waves' are unchanged.  =harvest_kg=, =seed_kg= and =nitrogen_kg=
+are digest-identical, because they do not key on =crop=; =harvest_kg_factors= assigns the
+same per-wave factor totals.  Site Q's warnings read the same.
 
 ** TODO Cowpea identity diagnostic checkpoint (GH #1228, 2026-10-30)
 

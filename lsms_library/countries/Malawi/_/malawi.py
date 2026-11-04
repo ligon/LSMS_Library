@@ -1293,6 +1293,35 @@ def _normalise_unit_text(series):
     return s.where(s.notna() & (s != ''), pd.NA)
 
 
+#: GH #1228: seasonal code 48 is OTHER (SPECIFY).  A crop name its own Module G
+#: specify text states, in the form `_normalise_unit_text` writes, and the label
+#: that line is served.  Exact strings from a measured list, never a pattern.
+#: The label is `harmonize_food`'s, so it is the same string food_acquired.j
+#: carries in every wave.  No crop code is reserved for it: the instrument has
+#: none, so `_crop_code` and `production_obs` stay the recorded 48 and the sale
+#: attach, which keys on the code, does not move.
+_CROP_OTHER_SPECIFY = 48
+_CROP_TEXT_RECODE = {'COWPEAS': 'Cowpea (Khobwe)'}
+
+
+def _crop_text_labels(label, df, cropcode, crop_text):
+    """Relabel the code-48 lines whose own specify text is in `_CROP_TEXT_RECODE`.
+
+    Returns ``(label, named)``: the labels, and a boolean array of the lines
+    relabelled.  ``crop_text`` is None for a wave whose G file holds no crop
+    specify text on the row (every wave but 2010-11, CONTENTS.org, GH #856).
+    """
+    if crop_text is None:
+        return label, np.zeros(len(df), dtype=bool)
+    text = _normalise_unit_text(df[crop_text])
+    code = pd.to_numeric(df[cropcode], errors='coerce')
+    named = (code.eq(_CROP_OTHER_SPECIFY).fillna(False).to_numpy(dtype=bool)
+             & text.isin(list(_CROP_TEXT_RECODE)).fillna(False).to_numpy(dtype=bool))
+    out = label.astype('string').copy()
+    out[named] = text[named].map(_CROP_TEXT_RECODE).astype('string').array
+    return out, named
+
+
 def _recover_unit_code(code, text):
     """Recode OTHER (SPECIFY) unit rows whose text restates code 3 or 11.
 
@@ -1341,7 +1370,7 @@ def _recovered_counts(recovered_to):
 
 def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
                    plant_m=None, plant_y=None, harv_m=None, intercrop=None,
-                   perennial=False, t=None, unit_text=None):
+                   perennial=False, t=None, unit_text=None, crop_text=None):
     """Reshape one harvest module (G or P) to canonical long rows.
 
     All keyword args are RAW column names in ``df`` (or None when the
@@ -1366,10 +1395,16 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     (BASKET (DENGU)) -- the two codes the IHS4/IHS5 lists dropped -- is
     served that code's label (GH #856, ``_UNIT_TEXT_RECODE``); the count
     rides on ``attrs['unit_text_recovered']``.  ``Quantity`` never moves.
+
+    ``crop_text`` is the row's own crop specify-text column (2010-11 Module G:
+    ``ag_g0d_os``).  A code-48 line whose text is in ``_CROP_TEXT_RECODE`` is
+    served that label (GH #1228); its code, variety and ``production_obs`` stay
+    what was recorded.  The count rides on ``attrs['crop_text_recovered']``.
     """
     unit_map = _malawi_code_map('harmonize_crop_unit')
 
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
+    crop_label, crop_named = _crop_text_labels(crop_label, df, cropcode, crop_text)
     # A blank key is `unknown_plot`, never NaN (GH #1476): these modules are
     # asked per plot, so this is a plot-grain answer with no identifier, and a
     # NaN on a declared index level is deleted by the next groupby.  The sentinel
@@ -1448,6 +1483,7 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     out = out[keep]
     out.attrs['unit_text_recovered'] = _recovered_counts(
         recovered_to[keep])
+    out.attrs['crop_text_recovered'] = int(crop_named[keep].sum())
     return out
 
 
@@ -2285,6 +2321,8 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     out.attrs['sale_basis_mismatch'] = mismatch
     out.attrs['sale_basis_ladder'] = tallies['sale_basis_ladder']
     out.attrs['unit_text_recovered'] = recovered
+    out.attrs['crop_text_recovered'] = sum(
+        piece.attrs.get('crop_text_recovered', 0) for piece in harvest_pieces)
     return out
 
 
@@ -2309,7 +2347,7 @@ _CROP_SALE_SOURCES = {
                      g='ag_mod_g.dta', p='ag_mod_p.dta', i='ag_mod_i.dta', q='ag_mod_q.dta',
                      hhid='case_id', prefix='', plot='named',
                      gplot='ag_g0b', gcrop='ag_g0d', pplot='ag_p0b', pcrop='ag_p0d',
-                     icrop='ag_i0b', qcrop='ag_q0b')],
+                     icrop='ag_i0b', qcrop='ag_q0b', gcrop_text='ag_g0d_os')],
     '2013-14': [dict(half='full', dir='Data',
                      g='AG_MOD_G_13.dta', p='AG_MOD_P_13.dta', i='AG_MOD_I_13.dta', q='AG_MOD_Q_13.dta',
                      hhid='y2_hhid', prefix='', plot='named',
@@ -2377,7 +2415,7 @@ def _crop_pieces(wave):
                            qty='ag_g13a', unit='ag_g13b', condition='ag_g13c',
                            plant_m='ag_g05a', plant_y='ag_g05b', harv_m='ag_g12b',
                            intercrop='ag_g01', perennial=False, t=wave,
-                           unit_text=h.get('gtext')),
+                           unit_text=h.get('gtext'), crop_text=h.get('gcrop_text')),
             _harvest_block(p, hhid='hhid', plotkey=h['pplot'], cropcode=pcrop,
                            qty='ag_p09a', unit='ag_p09b', plant_y='ag_p04',
                            harv_m='ag_p06c', perennial=True, t=wave,
@@ -3426,12 +3464,16 @@ def _seed_source_reference(data_path, *, script_path=None):
 
 
 def _seed_block(df, *, hhid, plotkey, cropcode, qty, unit, improved=None,
-                t=None, source_ref=None, source_half=None, row_positions=None):
+                t=None, source_ref=None, source_half=None, row_positions=None,
+                crop_text=None):
     """Reshape Module G's seed-planted columns to canonical long rows --
     one per source seed row (including missing crop).  ``cropcode`` is the harmonize_crop code
-    column (mapped to the shared crop/food label).  Returns (i, plot,
-    _input_code=SEED, crop, Quantity, u, Improved)."""
+    column (mapped to the shared crop/food label).  ``crop_text`` is as in
+    ``_harvest_block``: the same Module G line carries one crop label in both
+    tables (GH #1228).  Returns (i, plot, _input_code=SEED, crop, Quantity, u,
+    Improved)."""
     crop_label, _crop_code = _seed_crop_identity(df[cropcode])
+    crop_label, _ = _crop_text_labels(crop_label, df, cropcode, crop_text)
     q = (pd.to_numeric(df[qty], errors='coerce').astype('Float64')
          if qty and qty in df.columns
          else pd.Series(pd.NA, index=df.index, dtype='Float64'))
