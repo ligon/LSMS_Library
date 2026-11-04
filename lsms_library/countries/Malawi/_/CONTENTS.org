@@ -826,6 +826,11 @@ positive (51,820 MWK), attached by code 48 as before, and none carries a =Deriva
 key.  *One residual:* Module I has its own =ag_i0b_os=, and on those 17 it says =COWPEAS=
 16 times and =MPHODZA= once, so one row labelled cowpea carries a sale the household
 named differently.  Module I's text is not read here (deferred with the rest).
+*A second, latent:* =derivation_inputs= labels a raw Module I / Q line from its code
+(=_crop_pieces=), so it would say =Other= where a relabelled harvest row says cowpea,
+and would not join that row on =(t, i, crop, u)=.  None of the 157 carries a =Derivation=
+key today, so nothing is broken, but a sale reaching one on a registered rung would be.
+The =MPHODZA= line is why Module I's text cannot simply be reused for this.
 
 *The same line carries one label in both tables.*  Module G is also where
 =plot_inputs= reads seed, so the seed rows of those lines are relabelled too (155
