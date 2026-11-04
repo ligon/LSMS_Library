@@ -6733,8 +6733,9 @@ class Country:
                         # explicit units= / labels= dict / valuation= cannot
                         # be honoured by the legacy path, so it re-raises.
                         # Only a bare call (all three defaulted) keeps the
-                        # pre-#828 legacy fall-through.
-                        if units is not None or map_labels or valuation is not None:
+                        # pre-#828 legacy fall-through, and not on a kilogram
+                        # subset (GH #1487, see below).
+                        if units is not None or map_labels or valuation is not None or subset_kg:
                             raise exc.for_country(self.name) from exc
                         logger.info(
                             "Deriving %s from food_acquired failed (%s); "
@@ -6744,7 +6745,14 @@ class Country:
                             CategoricalKeyDeclarationError):
                         raise
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
-                        if units is not None or map_labels or valuation is not None:
+                        if units is not None or map_labels or valuation is not None or subset_kg:
+                            # GH #1487: a kilogram subset also raises when it was
+                            # a default call, whichever wave failed.  Its waves
+                            # declare no `food_quantities`, so the legacy path
+                            # reads the failure as proven absence and serves 0
+                            # rows with no error (Mali, 2018-19 with 2014-15
+                            # broken: 162,032 rows on base).
+                            #
                             # Caller explicitly asked for canonical units= /
                             # labels= / valuation= behaviour; the legacy
                             # fall-through path can't honour any of them, so

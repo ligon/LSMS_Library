@@ -245,6 +245,11 @@ def native_food(tmp_path, monkeypatch):
         data_root.cache_clear()
 
 
+def food_waves(c):
+    """The waves that build ``food_acquired``; a country's newest may not yet."""
+    return [w for w in c.waves if 'food_acquired' in c[w].data_scheme]
+
+
 def spy_on_reads(monkeypatch):
     seen = []
     real = C.Country._aggregate_wave_data
@@ -309,7 +314,7 @@ class TestTheDispatch:
 
     def test_a_multi_wave_subset_is_a_slice(self, native_food):
         c, _, _ = native_food
-        s = [c.waves[0], c.waves[-1]]
+        s = [food_waves(c)[0], food_waves(c)[-1]]
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             everything = c.food_quantities()
@@ -322,7 +327,7 @@ class TestTheDispatch:
             warnings.simplefilter('ignore')
             c.food_quantities(waves=[c.waves[1]])
         assert sorted(read_parquet_cache_waves(root / 'Malawi/var/food_acquired.parquet')) == sorted(c.waves)
-        assert sorted(built) == sorted(c.waves)
+        assert sorted(built) == sorted(food_waves(c))
 
     def test_assume_cache_fresh_serves_the_same_slice(self, native_food):
         c, _, _ = native_food
@@ -350,7 +355,7 @@ class TestTheDispatch:
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             fa = c.food_acquired()
-            w = c.waves[-1]
+            w = food_waves(c)[-1]
             alone = food_kg_factors(of_wave(fa, w))
             pooled = food_kg_factors(fa, serve_waves=[w])
         tin = alone.index.get_level_values('u') == 'Tin'
@@ -366,7 +371,7 @@ class TestLsmsNoCache:
             built.clear()
             monkeypatch.setenv('LSMS_NO_CACHE', '1')
             got = c.food_quantities(waves=[c.waves[1]])
-        assert sorted(built) == sorted(c.waves)
+        assert sorted(built) == sorted(food_waves(c))
         pd.testing.assert_frame_equal(got, of_wave(everything, c.waves[1]), check_exact=True)
 
     def test_it_leaves_full_coverage(self, native_food, monkeypatch):
@@ -461,7 +466,7 @@ class TestTheAuditsDescribeTheServedWaves:
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             c.food_quantities()
-        assert seen == [set(c.waves)]
+        assert seen == [set(food_waves(c))]
 
     def test_the_scope_ends_with_the_read(self, native_food):
         c, _, _ = native_food
@@ -469,6 +474,79 @@ class TestTheAuditsDescribeTheServedWaves:
             warnings.simplefilter('ignore')
             c.food_quantities(waves=[c.waves[1]])
         assert C._READ_AUDIT_WAVES.get() is None
+
+
+@pytest.fixture(params=[(FileNotFoundError, FileNotFoundError), (KeyError, RuntimeError)],
+                ids=['unavailable', 'declared-keyerror'])
+def another_wave_broken(tmp_path, monkeypatch, request):
+    """The first wave cannot be built; the request is for the second.
+
+    ``KeyError`` is the GH #1281 route: ``build_wave`` raises it as ``RuntimeError``.
+    """
+    root = tmp_path / 'data'
+    monkeypatch.setenv('LSMS_DATA_DIR', str(root))
+    monkeypatch.setenv('LSMS_BUILD_BACKEND', 'dvc')
+    monkeypatch.setenv('LSMS_BUILD_WORKERS', '1')
+    monkeypatch.delenv('LSMS_NO_CACHE', raising=False)
+    data_root.cache_clear()
+    c = C.Country('Malawi', preload_panel_ids=False)
+    c._panel_ids_attempted = True
+    c._updated_ids_cache = {}
+    bad = c.waves[0]
+    raised, surfaced = request.param
+
+    def grab(wave, table, *, _with_origin=False):
+        y = wave.year
+        if y == bad:
+            raise raised(f'source of {y} unavailable')
+        rows = [(y, f'{y}h{k}', 'Rice', 'Tin', 'purchased', 1.0, 150.0) for k in range(8)]
+        rows += [(y, f'{y}k{k}', 'Rice', 'Kg', 'purchased', 1.0, 100.0) for k in range(10)]
+        out = pd.DataFrame(rows, columns=['t', 'i', 'j', 'u', 's', 'Quantity', 'Expenditure'])
+        out = out.set_index(['t', 'i', 'j', 'u', 's'])
+        path = root / 'Malawi' / y / '_' / 'food_acquired.parquet'
+        path.parent.mkdir(parents=True, exist_ok=True)
+        to_parquet(out, path, absolute_path=True)
+        return (out, 'parquet') if _with_origin else out
+
+    monkeypatch.setattr(C.Wave, 'grab_data', grab)
+    monkeypatch.setattr(C.Country, '_join_v_from_sample', lambda self, df, *a, **k: df)
+    try:
+        yield c, c.waves[1], surfaced
+    finally:
+        data_root.cache_clear()
+
+
+class TestAFailureInAnotherWave:
+    """The estimate reads that wave, so the subset cannot be served without it.
+
+    A default call used to fall through to the legacy path, which read the
+    failure as proven absence and served an empty frame with no error.
+    """
+
+    @pytest.mark.parametrize('table,kw', KG_CALLS)
+    def test_a_kg_subset_raises(self, another_wave_broken, table, kw):
+        c, good, surfaced = another_wave_broken
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            with pytest.raises(surfaced):
+                getattr(c, table)(waves=[good], **kw)
+
+    def test_assume_cache_fresh_cannot_hide_it(self, another_wave_broken):
+        """A parquet of the requested wave alone does not cover the estimate."""
+        c, good, surfaced = another_wave_broken
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            assert len(c.food_acquired(waves=[good]))
+            c.assume_cache_fresh = True
+            with pytest.raises(surfaced):
+                c.food_quantities(waves=[good])
+
+    @pytest.mark.parametrize('table,kw', NON_KG_CALLS)
+    def test_a_mode_with_no_factor_still_serves(self, another_wave_broken, table, kw):
+        c, good, _ = another_wave_broken
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            assert len(getattr(c, table)(waves=[good], **kw))
 
 
 def _slice_of(table, country, waves, **kw):
