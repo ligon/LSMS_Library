@@ -2938,3 +2938,19 @@ W1 and W2 name the coordinates =lat_modified= / =lon_modified=, W3 =lat_dd_mod= 
 =lon_dd_mod=.  Which of the two W2 household files a =geovariables= table reads (3,917
 against 3,924 rows, 50 against 43 columns) is a wiring decision.  76's zip is named
 =TZA_2008_NPS1_v02_M= under the idno =..._v03_M=.
+
+* 2026-11-04 -- WB 3455, the NPS Wave 4 Extended Panel release, is held and not registered
+
+=2014-15-EXT/= holds =TZA_2014_NPS-R4_v03_M_v03_A_EXT=: 72 files, 16 MB, with the BID,
+questionnaires and report.  The catalog's years run 2013-2016, which would label it =2013-16=,
+and its round is =2014-15=, already a logical wave of =2008-15/=.  So the directory is named for
+the subtitle, "Wave 4 - Extended Panel".
+
+It is 989 households, and all 989 =y4_hhid= are =r_hhid= in =upd4_hh_a= round 4 (see the
+Extended / Refresh split in =.claude/skills/tanzania-panel-design.md=).  So it adds no
+households to the UPD.  Its one named addition is =consumptionnps4_extended_panel= (988 rows).
+What else differs from the UPD's round 4 is not measured.
+
+Not in =Country.waves=: =tanzania.py= fixes the list and is byte-pinned by
+=tests/test_gh905_tanzania_signed_sums.py=, and registering it would count these households
+twice in 2014-15.
