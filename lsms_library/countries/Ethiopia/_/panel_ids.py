@@ -18,6 +18,18 @@ gives correct linkage for all three categories:
   - W2 refreshment (in W2+W3 only): keeps household_id2 as canonical
   - W3-only new HH: keeps household_id2 as canonical
 
+W3 households that W2's map does not hold (GH #1467, ruling 2026-11-04)
+are the one place W3 reaches W1 without W2.  The ESS3 BID counts ESS1
+households through its own rural plus small-town total: "the total number
+of ESS1 households with complete interviews in ESS3 is 3,699" (PDF p16).
+So a rural or small-town W3 household off W2's map is linked to W1 by
+rule: its W1 id is ``household_id2`` less characters 7-10, which is W3's
+own ``household_id`` and is the target of every W3 link through W2.  Large
+towns entered at ESS2 and are never linked this way, including the three
+whose truncated id happens to be a W1 household.  This rests on the BID's
+accounting, NOT on the rosters, which only weakly agree: see
+``CONTENTS.org``, "W3 households the survey counts as ESS1".
+
 W4 (2018-19) and W5 (2021-22) draw entirely new samples with no
 backward link.
 """
@@ -32,6 +44,15 @@ sys.path.append(str(_Path(__file__).resolve().parent))
 from lsms_library.local_tools import format_id, get_dataframe, panel_ids
 
 from ethiopia import _agriculture_only_households, ea_id2_crosswalk
+
+# W3's `rural`: 1 RURAL, 2 SMALL TOWN, 3 "Meduim and large town" (sic).
+ESS1_LOCALITIES = (1, 2)
+
+
+def w1_id(household_id2):
+    """A Panel I household's W1 id: ``household_id2`` less characters 7-10."""
+    return household_id2[:6] + household_id2[10:]
+
 
 # D1: HH remains primary; selected holder rows must agree before reduction.
 # W3 PP household_id is deliberately not linkage authority (ledger §4).
@@ -72,16 +93,42 @@ if a2 is not None:
 df2['t'] = '2013-14'
 df2 = df2.set_index(['t', 'i'])[['previous_i']]
 
-df3 = pd.DataFrame({'i': hh3.household_id2.map(format_id)})
+w2 = df2.previous_i.droplevel('t').dropna().to_dict()
+
+# W3's locality and W1-space EA, one row per household: the household cover,
+# then the agriculture cover for the households only it holds.
+w3_source = pd.DataFrame({'i': hh3.household_id2.map(format_id).values,
+                          'rural': hh3.rural.values,
+                          'ea_id': hh3.ea_id.map(format_id).values})
 if a3 is not None:
-    df3 = pd.concat([df3, a3[['i']]], ignore_index=True)
+    holders = pd.DataFrame({'i': pp3.household_id2.map(format_id).values,
+                            'rural': pp3.rural.values,
+                            'ea_id': pp3.ea_id.map(format_id).values})
+    holders = holders[holders.i.isin(a3.i)]
+    if holders.groupby('i')[['rural', 'ea_id']].nunique(dropna=False).gt(1).any(axis=None):
+        raise ValueError('W3 agriculture-only holder rows disagree on locality or EA')
+    w3_source = pd.concat([w3_source, holders.drop_duplicates('i')], ignore_index=True)
+if w3_source.rural.isna().any():
+    raise ValueError('W3 household without a locality; the ESS1 rule cannot place it')
+
+# The rule rests on this: a W3 household on W2's map has its truncated id as target.
+on_w2 = w3_source.i.isin(w2)
+if not w3_source.i[on_w2].map(lambda i: w2[i] == w1_id(i)).all():
+    raise ValueError('W3 link through W2 is not the truncated id; the ESS1 rule fails')
+
+ess1 = w3_source[~on_w2 & w3_source.rural.isin(ESS1_LOCALITIES)]
+for row in ess1.itertuples():
+    if baseline.get(w1_id(row.i)) != row.ea_id:
+        raise ValueError('ESS1 rule target is not a W1 household of the recorded EA')
+ess1_target = {i: w1_id(i) for i in ess1.i}
+
+df3 = pd.DataFrame({'i': w3_source.i})
 df3['t'] = '2015-16'
-df3['previous_i'] = df3['i']
+df3['previous_i'] = df3['i'].map(lambda i: ess1_target.get(i, i))
 df3 = df3.set_index(['t', 'i'])[['previous_i']]
 
 # Refuse collisions before the general resolver can choose a split suffix.
-w2 = df2.previous_i.droplevel('t').dropna().to_dict()
-w3 = {i: w2.get(i, i) for i in df3.index.get_level_values('i')}
+w3 = {i: w2.get(p, p) for i, p in df3.previous_i.droplevel('t').items()}
 for frame, mapping in ((df2, w2), (df3, w3)):
     ids = frame.index.get_level_values('i')
     if not ids.is_unique or ids.isna().any() or (ids == '').any():
@@ -111,9 +158,11 @@ D, updated_ids = panel_ids(panel_ids_df)
 # rather than scattering copies.
 _HERE = _Path(__file__).resolve().parent
 
-with open(_HERE / 'panel_ids.json', 'w') as f:
-    json_ready = {','.join(k): ','.join(v) for k, v in D.data.items()}
-    json.dump(json_ready, f)
+# Under a name other than __main__ (the regeneration test) nothing is written.
+if __name__ == '__main__':
+    with open(_HERE / 'panel_ids.json', 'w') as f:
+        json_ready = {','.join(k): ','.join(v) for k, v in D.data.items()}
+        json.dump(json_ready, f)
 
-with open(_HERE / 'updated_ids.json', 'w') as f:
-    json.dump(updated_ids, f)
+    with open(_HERE / 'updated_ids.json', 'w') as f:
+        json.dump(updated_ids, f)

@@ -1779,7 +1779,46 @@ nor the PP cover, each with a W1 baseline no other household claims; 1 reaches
 W3.  GH #1120's oracle read HH, PP and PH, so =sample()= and the crosswalk agree
 in leaving them out.  Part of the open question below.
 
-** Open: 48 W3 households the survey counts as ESS1 and the crosswalk does not
+** W3 households the survey counts as ESS1: linked by rule (GH #1467, ruled 2026-11-04)
+
+*The ruling* (option (b) of GH #1467): link all 48 and the 1 PP-only, following the
+survey's accounting.  =_/panel_ids.py= does it by a rule, not a list: a rural or
+small-town W3 household off W2's map has =household_id2= less characters 7-10 as its
+W1 id.  49 =updated_ids['2015-16']= values change, each from an identity to that id,
+and nothing else in the file moves.  W3's map then has 3,726 moving ids (3,699 on the
+HH cover, 27 PP-only) and 1,255 identities, the three figures of the ESS3 BID (PDF p16).
+
+- *This rests on the BID, not on the rosters.*  "the total number of ESS1 households
+  with complete interviews in ESS3 is 3,699", and 3,726 at post-planting.  3,699 is also
+  W3's rural plus small-town total (3,272 + 427, BID p19), so 3,651 + 48 partitions that
+  total; it is the survey's accounting, not separate confirmation of these 48.
+- *The rosters neither confirm nor refute it.*  16 of the 48 share no person with their
+  W1 household, against 11.5% of linked households and 78.9% of another household in the
+  same EA.  The closer control is the 201 W3 households also off W2's livestock cover,
+  at 24.9% (P about 0.12 for 16 of 48 against it).  That fits mostly true links plus some
+  replaced households.  Nothing here says which, so a roster-confirmed subset would be
+  our judgement, and no list of them is kept.
+- *Why a rule can do it.*  The target is the truncated id on all 3,677 W3 links through
+  W2, and =panel_ids.py= refuses to run if one stops being so.  The only rural or
+  small-town households off W2's map are these 49.  Each target is a W1 household of the
+  EA W3 records, claimed by no other W3 household.  Large towns entered at ESS2 and are
+  excluded: the 3 whose truncated id happens to be a W1 household stay unlinked (each
+  is the other half of a rural household's id, see "individual_education" above).
+- *The =panel_ids.json= entry says 2013-14.*  =local_tools.panel_ids= records the wave
+  before in its frame, so the 49 read =(2015-16, X) -> (2013-14, T)= although W2 holds T
+  for only one of them.  It did so before too, as =(2015-16, X) -> (2013-14, X)=, and it
+  still does for the 7 large-town W3 households on no W2 cover.  =updated_ids= is what
+  moves served =i=.
+- *One target has three waves.*  One of the 49 has a W1 id that W2's map also targets,
+  from a W2 PP-only household on a different EA code (their ids differ in characters
+  8-10).  W3 does not hold that W2 id, so this is no rename onto an occupied target: =i=
+  is simply one household's id in W1, W2 and W3.
+- *One household loses a W2-W3 link in =livestock=.*  W2's livestock cover holds 3
+  households on neither its HH nor its PP cover (option (d) of the issue, not taken).  1
+  of them is among the 49, so its W3 rows move to T while its W2 =livestock= rows keep
+  the native id, which was all that joined them.
+
+/The evidence as the ruling read it, kept as written:/
 
 W3's =household_id= is not independent evidence: it is =household_id2= with four
 characters dropped, on every row, which is why =_/panel_ids.py= chains through W2
@@ -1804,7 +1843,7 @@ they do not link to W1.
   not hold.
 
 Whether to link them changes served =i= for about 49 W3 households in every table
-and needs a ruling.  Left unchanged.
+and needs a ruling.  (Ruled above.)
 
 ** Panel II in the crosswalk
 
