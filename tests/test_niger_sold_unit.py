@@ -76,7 +76,8 @@ AS2E2_ROWS = 5226
 #: one-harvest-LINE attribution leaves the sale NaN on 144 multi-line pairs
 #: (was 1,425 rows / 1,409 pairs / 73,206,995 FCFA / 32,420.5 per pair, with
 #: 16 pairs served on two rows).
-UNIT_SOLD_ROWS = {"2011-12": 1294, "2014-15": 564, "2018-19": 3226, "2021-22": 1265}
+#: 2011-12 was 1,294 before GH #1462 served section 3E's 424 lines with a sold unit.
+UNIT_SOLD_ROWS = {"2011-12": 1718, "2014-15": 564, "2018-19": 3226, "2021-22": 1265}
 W2021_SALE_PAIRS = 1265
 W2021_VALUE_SOLD_PER_PAIR = 68_629_070
 W2021_QUANTITY_SOLD_PER_PAIR = 28_845.5
@@ -167,7 +168,8 @@ class TestDeclared:
     @pytest.mark.parametrize("wave", CROP_LEVEL_WAVES)
     def test_crop_level_sale_is_keyed_on_the_sold_unit(self, wave):
         src = _script(wave)
-        assert "groupby(['i', 'crop', 'Unit_sold']" in src, (
+        # 2021-22's key also names the sold state since GH #1462: never a sum across states.
+        assert "groupby(['i', 'crop', 'Unit_sold'" in src, (
             f"{wave}: the crop-level sale must be summed per (i, crop, Unit_sold), never across units")
         assert "one_unit" in src and "single" in src, f"{wave}: single-plot AND single-unit attribution"
 
@@ -176,7 +178,7 @@ class TestDeclared:
         ``duplicated(`` must precede the ``groupby`` that sums the sale."""
         src = _script("2021-22")
         i_dedup = src.index("duplicated(keep='first')")
-        i_sum = src.index("groupby(['i', 'crop', 'Unit_sold']")
+        i_sum = src.index("groupby(['i', 'crop', 'Unit_sold'")  # no ']': the key grew in GH #1462
         assert i_dedup < i_sum, "de-duplication must run before the sale is summed"
         assert "sold[~_dup]" in src and "soldn[~_dup]" in src, (
             "the labelled and the coded frame must be de-duplicated with the SAME mask")

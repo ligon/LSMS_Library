@@ -2671,6 +2671,9 @@ and =Botte=, which have no factor.  So 3E adds 689,743 kg to the wave's 595,825.
 564,700 kg, of which =Poivron frais= and =Oignon frais= hold most, and the survey's own kilograms say
 less: on 187 =Sac de 100 kg= rows the nominal weight gives 489,100 kg a cycle and =as03eq09c= 271,054.
 Nothing is trimmed; the row is what was recorded, and the sack's weight is the =metric= rung's reading.
+=Value_sold= moves as far: 42,683,590 -> 132,213,940 FCFA, so 3E holds two thirds of the wave's sale
+value.  =crop_diversity(weight='count')= goes from 2,252 households, mean 0.916, to 2,274, mean 0.964:
+the 22 new ones are in 3E and not in the rainy module.  Cold, base =b95e927f3=.
 
 *=Condition_sold= (2018-19 =s16cq16c=, 2021-22 =s16dq05d=).*  The state of what was sold, a separate
 answer from =condition=, read through the same =harmonize_crop_condition_*= tables.  Column, so NA on
@@ -2723,8 +2726,7 @@ second entry and 22 carry the flag.  The 23rd is 2011-12 passage 2, variety 7311
 its first entry holds the 99999 price sentinel, so it has no served row, and its
 second entry holds a price.  That was the record's only price, so it is no longer
 served and no row says so; the deletion entry is the disclosure.  The 5 (t, v, j, u)
-cells that vanish were held only by a second entry, 12 of whose slots conflict on
-the unit code alone.
+cells that vanish were held only by a second entry.
 
 * 2026-11-04 -- plot_inputs: ECVMA's NPK is NPK 15-15-15 (GH #1445)
 

@@ -716,12 +716,6 @@ def _finish_crop_production(df, t):
 FARM_LEVEL = 'Farm-level'
 DRY_SEASON_TOTAL = 'Niger::crop_production::dry-season-cycle-total'
 DRY_SEASON_SALE = 'Niger::crop_production::dry-season-sale-window'
-#: 3E's own "don't know" codes, unlabelled in the .dta: a different width from the
-#: rainy module's 999999 on quantities.  Exact values only.  as03eq09a == 99999 on
-#: 1 row of 576 (its sibling kg columns as03eq09c / as03eq11c carry it on 42 / 39);
-#: as03eq12 == 9999999 on 1.
-DRY_QTY_SENTINELS = (99999,)
-DRY_VALUE_SENTINELS = (9999999,)
 _DRY_SEASON_SOURCE = 'NER_2011_ECVMA_v01_M_Stata8/ecvmaas3e_p1.dta'
 
 
@@ -1549,9 +1543,9 @@ def _finish_people_last7days(df, t):
 #              record carry `second_entry_disagrees` = True.  See
 #              derive_cs07_first_entry.  2018-19 s05 is a different mechanism
 #              and keeps obs 3 / 4.
-# NO SECOND READING IS SELECTED AWAY.  Until GH #840 one row per (t, v, j, u)
-# was kept -- post-harvest passage first, then questionnaire order -- and this
-# comment's own `obs` sentence below was not true of the code.
+# Within a first entry nothing is selected.  Until GH #840 one row per
+# (t, v, j, u) was kept -- post-harvest passage first, then questionnaire order
+# -- and this comment's own `obs` sentence below was not true of the code.
 #
 # WAVE COVERAGE: three of the four waves carry a GRAPPE-level community price
 # module -- the two ECVMA waves (CS07) and EHCVM 2018-19 (section 5 of the

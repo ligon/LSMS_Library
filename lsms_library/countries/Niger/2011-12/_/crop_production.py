@@ -36,9 +36,9 @@ import pandas as pd
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
                    _finish_crop_production, _na_exact,
-                   _crop_reported_observations, FARM_LEVEL, DRY_QTY_SENTINELS,
-                   DRY_VALUE_SENTINELS, derive_dry_season_cycle_total,
-                   derive_dry_season_sale_window, stamp_dry_season_derivations)
+                   _crop_reported_observations, FARM_LEVEL,
+                   derive_dry_season_cycle_total, derive_dry_season_sale_window,
+                   stamp_dry_season_derivations)
 
 # "Don't know" codes of this module, unlabelled in the .dta (GH #865).  Exact
 # values only.  Raw counts, ecvmaas2e_p2.dta (12,091 rows): as02eq07a ==
@@ -47,6 +47,10 @@ from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
 # 9999999 on 2 (both hid 20607, which carries all three codes).
 QTY_SENTINELS = (999999,)
 VALUE_SENTINELS = (9999999,)
+# Section 3E's quantity code, a different width (GH #1462).  ecvmaas3e_p1.dta (576
+# rows): as03eq09a == 99999 on 1, and its sibling kg columns as03eq09c / as03eq11c
+# on 42 / 39.  Its value code is the rainy one: as03eq12 == 9999999 on 1.
+DRY_QTY_SENTINELS = (99999,)
 
 
 src = get_dataframe(
@@ -97,7 +101,7 @@ dry, dryn = dry[~_dup], dryn[~_dup]
 
 dry_hh = dryn['hid'].apply(lambda x: niger_i(x) if pd.notna(x) else pd.NA)
 dry_sale = derive_dry_season_sale_window(_na_exact(dryn['as03eq11a'], DRY_QTY_SENTINELS),
-                                         _na_exact(dryn['as03eq12'], DRY_VALUE_SENTINELS))
+                                         _na_exact(dryn['as03eq12'], VALUE_SENTINELS))
 dry_df = pd.DataFrame({
     'i':             dry_hh.values,
     'plot_id':       FARM_LEVEL,
