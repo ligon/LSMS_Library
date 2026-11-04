@@ -49,35 +49,53 @@ def test_a_blank_key_is_the_sentinel_and_a_recorded_key_is_kept(mw):
     assert got['plot_id'].tolist() == ['R1', SENTINEL, SENTINEL]
 
 
-def _sale_frames(mw, plots):
+def _sale_frames(plots, units=None, sale_unit='Kilogramme'):
+    """One household and crop: a harvest row per plot, and one sale."""
+    units = units or ['Kilogramme'] * len(plots)
     harv = pd.DataFrame({
         'i': ['h'] * len(plots), 'plot_id': pd.array(plots, dtype='string'),
         'crop': ['Mango'] * len(plots), '_crop_code': [1005] * len(plots),
         'production_obs': [f'reported:P:{k}' for k in range(len(plots))],
         'Quantity': pd.array([3.0] * len(plots), dtype='Float64'),
-        'u': pd.array(['Kilogramme'] * len(plots), dtype='string'),
+        'u': pd.array(units, dtype='string'),
         'condition': pd.array(['unknown_condition'] * len(plots), dtype='string'),
     })
     sale = pd.DataFrame({'i': ['h'], '_crop_code': [1005],
-                         'u': pd.array(['Kilogramme'], dtype='string'),
+                         'u': pd.array([sale_unit], dtype='string'),
                          'condition_sold': pd.array(['unknown_condition'], dtype='string'),
                          'Quantity_sold': [1.0], 'Value_sold': [100.0]})
     return harv, sale
 
 
-def test_a_sale_does_not_attach_to_a_crop_whose_only_row_has_no_plot(mw):
-    harv, sale = _sale_frames(mw, [SENTINEL])
-    out, _, _ = mw._attach_sales('2016-17', harv, sale)
-    assert out['Value_sold'].isna().all()
+def _sold(mw, *frames):
+    out, _, _ = mw._attach_sales('2016-17', *frames)
+    return out.loc[out['Value_sold'].notna(), 'plot_id'].tolist()
 
 
-def test_the_null_and_the_sentinel_decide_the_same_sale(mw):
-    """The counting rule is the one the null had: unknown_plot is skipped."""
-    for plots in (['R1'], ['R1', SENTINEL], ['R1', 'R2'], ['R1', 'R2', SENTINEL]):
-        as_sentinel, _, _ = mw._attach_sales('2016-17', *_sale_frames(mw, plots))
-        nulls = [None if p == SENTINEL else p for p in plots]
-        as_null, _, _ = mw._attach_sales('2016-17', *_sale_frames(mw, nulls))
-        pd.testing.assert_series_equal(as_sentinel['Value_sold'], as_null['Value_sold'])
+def test_a_sale_attaches_to_a_single_known_plot(mw):
+    assert _sold(mw, *_sale_frames(['R1'])) == ['R1']
+
+
+@pytest.mark.parametrize('case', [
+    dict(plots=[SENTINEL]),
+    dict(plots=[SENTINEL, SENTINEL], units=['Kilogramme', 'Bag']),
+    # A known plot beside a sentinel: the crop is not single-plot, whichever row
+    # shares the sale's unit, and the sale never lands on the sentinel.
+    dict(plots=['R1', SENTINEL]),
+    dict(plots=['R1', SENTINEL], units=['Bag', 'Kilogramme']),
+    dict(plots=['R1', SENTINEL], units=['Kilogramme', 'Bag']),
+], ids=['only', 'only-two-units', 'beside-a-plot-same-unit',
+        'beside-a-plot-in-the-sentinels-unit', 'beside-a-plot-in-the-plots-unit'])
+def test_no_sale_reaches_a_sentinel_row(mw, case):
+    assert _sold(mw, *_sale_frames(**case)) == []
+
+
+def test_a_null_key_is_no_more_a_plot_than_the_sentinel(mw):
+    """`_harvest_block` no longer emits a null; a caller's frame may."""
+    for plots in ([SENTINEL], ['R1', SENTINEL], ['R1', 'R2'], ['R1', 'R2', SENTINEL]):
+        as_sentinel = _sold(mw, *_sale_frames(plots))
+        as_null = _sold(mw, *_sale_frames([None if p == SENTINEL else p for p in plots]))
+        assert as_sentinel == as_null == []
 
 
 @pytest.mark.requires_s3
@@ -98,5 +116,4 @@ def test_served_sentinel_rows_are_the_source_blank_keys():
     unknown = flat[flat['plot_id'].astype('string').eq(SENTINEL)]
     assert set(unknown['t'].astype(str)) == {'2016-17'}
     assert unknown['perennial'].astype('boolean').fillna(False).all()
-    # Crop codes harmonize_crop does not name are dropped with their warning.
-    assert 0 < len(unknown) <= n
+    assert len(unknown) == n > 0

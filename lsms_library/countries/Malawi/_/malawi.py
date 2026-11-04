@@ -1889,19 +1889,22 @@ def _attach_sales(t, harv, sale):
         {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
     sale['_srow'] = range(len(sale))
 
-    # `unknown_plot` is not a plot (GH #1476), so it does not count as one: a
-    # household whose only row of a crop has no plot key is not a single-plot
-    # crop, and the sale stays unattached.
+    # A sale does not reach an `unknown_plot` row (GH #1476, @ligon).  Its rows
+    # count here as one more place the crop grew, so a known plot beside them is
+    # not a single-plot crop; the filter below keeps a sale off a crop whose only
+    # rows are the sentinel.
     nplots = (harv.assign(_known_plot=harv['plot_id'].astype('string').mask(_is_unknown_plot(harv['plot_id'])))
               .groupby(['i', '_crop_code'])['_known_plot']
-              .nunique().rename('_nplots').reset_index())
+              .nunique(dropna=False).rename('_nplots').reset_index())
     harv = harv.merge(nplots, on=['i', '_crop_code'], how='left')
     n_harv = len(harv)
     harv['_hrow'] = range(n_harv)
-    pairs = harv[['_hrow', 'i', '_crop_code', 'crop', 'u', 'condition', '_nplots']] \
+    pairs = harv[['_hrow', 'i', '_crop_code', 'crop', 'u', 'condition', '_nplots', 'plot_id']] \
         .merge(sale, on=['i', '_crop_code', 'u'], how='inner')
-    # Only single-plot crops are ever candidates (unchanged since GAP 1).
-    pairs = pairs[pairs['_nplots'] == 1].copy()
+    # Only single-plot crops are ever candidates (unchanged since GAP 1), and
+    # neither a sentinel row nor a null key is a plot.
+    pairs = pairs[(pairs['_nplots'] == 1) & pairs['plot_id'].notna()
+                  & ~_is_unknown_plot(pairs['plot_id'])].drop(columns='plot_id').copy()
     pairs['condition'] = pairs['condition'].astype(object)
     pairs['condition_sold'] = pairs['condition_sold'].astype(object)
 
