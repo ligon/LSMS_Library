@@ -1681,6 +1681,82 @@ _PRICE_QTY_SENTINELS = {999, 9999}
 
 COMMUNITY_PRICES_INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
 
+#: Registry key on a row whose recorded Poids was in the row's own gram or centilitre.
+DERIVATION_POIDS = 'Mali::community_prices::gram-centilitre-poids'
+
+#: (served unit, passage) -> what divides a Poids in that unit into kg (litres for
+#: a volume).  Written per passage because the two passages behave differently and
+#: each cell below was measured on its own (CONTENTS.org, GH #1179 memo).
+_POIDS_DIVISOR = {('Gramme', 1): 1000.0, ('Gramme', 2): 1000.0,
+                  ('Centilitre', 1): 100.0, ('Centilitre', 2): 100.0}
+#: At or above this a Poids on such a row is in the row's own unit.  Below 1 it is
+#: already kg or litres, and from 1 up to here neither reading fits.
+_POIDS_NATIVE_FLOOR = 5.0
+#: The two passage files' three readings: unit, weight, price.
+_COMMUNITY_READINGS = (('s04q03', 's04q04', 's04q05'),
+                       ('s04q06', 's04q07', 's04q08'),
+                       ('s04q09', 's04q10', 's04q11'))
+
+
+def derive_poids_base_unit(poids, unit, visit):
+    """``Quantity`` from the recorded ``Poids``, in kg (litres for a volume).
+
+    The column is headed "Poids (KG)", and both enumerator manuals say "Le poids et
+    l'unite correspondante sont lies": their worked example is 2.25 kg entered Poids
+    2250, Unite 2, Gramme.  So on a ``Gramme`` or ``Centilitre`` row a Poids of 5 or
+    more is in that unit, and is divided here, in either passage.  Every other value
+    stays as recorded: below 1 it is already kg or litres (a 33 cl bottle at 0.33), and
+    from 1 up to 5 no reading fits, so it is counted rather than decided.  Rows on any
+    other unit stay as recorded.  Registered as
+    ``Mali::community_prices::gram-centilitre-poids``.
+    """
+    poids = pd.to_numeric(poids, errors='coerce')
+    divisor = pd.Series([_POIDS_DIVISOR.get(cell) for cell in zip(unit, visit)],
+                        index=poids.index, dtype='float64')
+    native = poids.ge(_POIDS_NATIVE_FLOOR).fillna(False) & divisor.notna()
+    return poids.where(~native, poids / divisor)
+
+
+def inputs_gram_centilitre_poids(wave):
+    """The answers behind one wave's keyed rows, at the served community index.
+
+    The registry ``inputs`` callable for ``gram-centilitre-poids``: the item, the
+    variety and all three unit / weight / price triples of the source row, as recorded;
+    ``obs`` says which triple the served row read.  Unit codes 2 and 4 are Gramme and
+    Centilitre in both passages, where passage 2 omits two of the label sets.
+    """
+    from pathlib import Path
+    from lsms_library.paths import countries_root
+    data = Path(countries_root()) / 'Mali' / wave / 'Data'
+    crop_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Code',
+        dirs=[f'{data.parent / "_"}/', f'{data.parent.parent / "_"}/'],
+        **{'Preferred Label': 'Preferred Label'})
+    units = {2: 'Gramme', 4: 'Centilitre'}
+    raw = ['s04q01', 's04q02'] + [var for triple in _COMMUNITY_READINGS for var in triple]
+    pieces = []
+    for visit in (1, 2):
+        path = str(data / f'EACIS04_p{visit}.dta')
+        codes = tools.get_dataframe(path, convert_categoricals=False)
+        labels = tools.get_dataframe(path)
+        for obs, (unit, weight, price) in enumerate(_COMMUNITY_READINGS, 1):
+            keep = (pd.to_numeric(codes[unit], errors='coerce').isin(units)
+                    & pd.to_numeric(codes[price], errors='coerce').gt(0)
+                    & pd.to_numeric(codes[weight], errors='coerce').ge(_POIDS_NATIVE_FLOOR)
+                    & ~pd.to_numeric(codes[weight], errors='coerce').isin(_PRICE_QTY_SENTINELS))
+            out = codes.loc[keep, raw].copy()
+            out['s04q01'] = labels.loc[keep, 's04q01'].astype('string').str.strip()
+            out['s04q02'] = labels.loc[keep, 's04q02'].astype('string').str.strip()
+            out['t'] = wave
+            out['v'] = codes.loc[keep, 'grappe'].astype('Int64').astype('string')
+            out['j'] = out['s04q01'].map(crop_map).astype('string')
+            out['u'] = pd.to_numeric(codes.loc[keep, unit]).map(units).astype('string')
+            out['variety'] = pd.to_numeric(codes.loc[keep, 's04q02']).astype('Int64').astype('string')
+            out['visit'] = visit
+            out['obs'] = obs
+            pieces.append(out[out['j'].notna()])
+    return pd.concat(pieces, ignore_index=True).set_index(COMMUNITY_PRICES_INDEX)
+
 
 def community_prices_finalize(df):
     """Post-process a community_prices wave DataFrame.
@@ -1691,7 +1767,8 @@ def community_prices_finalize(df):
         s04q02 label), Price, Quantity.
     Maps j/u labels via harmonize_food / u, drops unmapped item/unit rows and
     rows with no positive price, coerces the Price/Quantity dtypes and the
-    999 Quantity sentinel, and indexes the result by
+    999 Quantity sentinel, reads a gram or centilitre Poids into kg or litres
+    (:func:`derive_poids_base_unit`), and indexes the result by
     (t, v, j, u, variety, visit, obs) -- one row per reported reading. No row
     is selected; a duplicate key is an error (GH #840).
     """
@@ -1710,8 +1787,12 @@ def community_prices_finalize(df):
     df['obs'] = obs.astype('int64')
     df['Description'] = df['Description'].astype('string').str.strip()
     # Keep only resolvable, genuinely-priced item-unit rows.
-    df = df[df['j'].notna() & df['u'].notna() & df['Price'].notna() & (df['Price'] > 0)]
+    df = df[df['j'].notna() & df['u'].notna() & df['Price'].notna() & (df['Price'] > 0)].copy()
     assert df['variety'].notna().all(), "community_prices: a priced row has no s04q02 code"
+    poids = df['Quantity']
+    df['Quantity'] = derive_poids_base_unit(poids, df['u'], df['visit'])
+    df['Derivation'] = pd.Series(pd.NA, index=df.index, dtype='string')
+    df.loc[poids.notna() & df['Quantity'].ne(poids), 'Derivation'] = DERIVATION_POIDS
 
     dup = df.duplicated(COMMUNITY_PRICES_INDEX, keep=False)
     assert not dup.any(), (
@@ -1732,6 +1813,6 @@ def community_prices_finalize(df):
     # community_prices_for_wave.)
     df['i'] = df['v']
     out = (df.set_index(['t', 'v', 'i', 'j', 'u', 'variety', 'visit', 'obs'])
-             [['Price', 'Quantity', 'Description']]
+             [['Price', 'Quantity', 'Description', 'Derivation']]
              .sort_index())
     return out

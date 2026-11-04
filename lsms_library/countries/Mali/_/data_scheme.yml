@@ -443,8 +443,11 @@ Data Scheme:
     #           post-harvest (EACIS04_p2).
     # obs     = the questionnaire reading slot, 1/2/3 (GH #822).
     # Price    = s04q05/q08/q11, surveyed FCFA for a Quantity-sized lot.
-    # Quantity = s04q04/q07/q10, lot WEIGHT in kg ("Poids (KG)"; CONTENTS.org);
-    #            the 999 loose-retail sentinel is coerced to NA.
+    # Quantity = s04q04/q07/q10, the lot's weight in kg, litres for a volume.  The
+    #            weight is tied to the row's unit (both manuals), so a gram or
+    #            centilitre weight of 5 or more is divided, keyed gram-centilitre-poids
+    #            in Derivation (CONTENTS.org, GH #1179 memo).  Other rows are as
+    #            recorded; the 999 loose-retail sentinel is coerced to NA.
     # NO ROW IS SELECTED (GH #840, @ligon 2026-10-18).  Until #840 the grain
     # was (t, v, j, u) and one reported price per cell was kept (post-harvest
     # passage first, then questionnaire order): 23,646 of 40,218 priced rows,

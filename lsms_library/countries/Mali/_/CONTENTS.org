@@ -2852,6 +2852,70 @@ trees; =yield_kg= does not, since no plot has that id; =crop_diversity(weight='c
 each repeating a crop on a plot row.  So summing kg by plot under-reads a 2021-22 household whose crop is on
 two plots, and summing by household does not.
 
+* 2026-11-04 -- community_prices.Quantity is kilograms by rule (GH #1179 memo)
+
+Ruling @ligon 2026-11-04.  *This corrects "=community_prices.Quantity= is a WEIGHT IN KG" above*, and the
+=Gramme= line of the table under it, which rested on the column head "Poids (KG)".  Both enumerator manuals
+(=EACI_MANUEL_P1_V5_Redacted.pdf= PDF pp. 103-104, =EACI_MANUEL_P2_V3.pdf= PDF p. 88, held from WB 2583 and
+FAO 1463 by the acquisitions lane; their sidecars are not on this branch) say: "Le poids et l'unité
+correspondante sont liés", and a banana the agent finds "fait 2,250 kilogramme" is entered Poids 2250,
+Unité 2, and 2 is Gramme.
+
+*The rule*, =mali.derive_poids_base_unit=, key =Mali::community_prices::gram-centilitre-poids=.  =u= stays
+the recorded unit, =Price= does not move, and =Quantity= is kg (litres for a volume):
+
+| recorded Poids, on a =Gramme= or =Centilitre= row | served      | key | why                  |
+|---------------------------------------------------+-------------+-----+----------------------|
+| 5 or more                                         | / 1000, / 100 | yes | in the row's own unit, as the manual says |
+| above 0, below 1                                  | as recorded | no  | already kg or litres |
+| 1 up to, not including, 5                         | as recorded | no  | no reading fits; counted |
+| 0, or the 999 sentinel (NA)                       | as before   | no  | no usable weight     |
+
+*The rule is written per passage and is the same in both.*  The ruling asked for a unit-and-passage rule, and
+a rule on the passage alone is the one thing the data refuse: passage 1 also holds a 33 cl bottle at 0.33, and
+dividing it would serve 3.3 ml.  Stated-size varieties (tea "environ 20g", the 60 g and 220 g tins, the two
+loaves, the 30 cl and 33 cl bottles) are an oracle the rule does not read.  Share of rows within 2x of the
+stated size, as recorded / divided:
+
+| unit, passage  | Poids >= 5          | 1 <= Poids < 5 | Poids < 1           |
+|----------------+---------------------+----------------+---------------------|
+| Gramme, 1      | 0.00 / 0.92 (n=255) | 0.00 / 0.00 (6) | 0.76 / 0.00 (29)   |
+| Gramme, 2      | 0.00 / 0.88 (227)   | 0.00 / 0.00 (63) | 0.86 / 0.00 (175) |
+| Centilitre, 1  | 0.00 / 1.00 (949)   | 0.00 / 0.00 (5) | 0.56 / 0.00 (25)   |
+| Centilitre, 2  | 0.00 / 0.89 (445)   | 0.00 / 0.00 (39) | 0.91 / 0.00 (980) |
+
+And the per-unit price now agrees across sizes of one product, median FCFA per kg or litre: the 60 g tin
+1,667 and the 220 g tin 1,591 (2.1 and 1,000 before); the 33 cl bottle 857 and the 30 cl bottle 909 (8.6 and
+909 before).
+
+*What passage 2 does.*  Passage 1 follows the manual on 86% of =Gramme= and 97% of =Centilitre= entries.  Passage
+2 follows it on 33% and 27%: most of the rest are entered in kg or litres, as the column head says, and 608
+rows hold the 999 sentinel, which passage 1 never uses (it writes 0, 594 rows).  Served rows:
+
+| unit, passage  | converted | below 1, as recorded | 1 to 5, not covered | 0  | NA  |
+|----------------+-----------+----------------------+---------------------+-----+-----|
+| Gramme, 1      |       909 |                  122 |                  23 | 312 |   7 |
+| Gramme, 2      |       624 |                1,086 |                 181 |   0 | 349 |
+| Centilitre, 1  |     1,071 |                   25 |                   6 | 282 |   7 |
+| Centilitre, 2  |       486 |                1,210 |                  85 |   0 | 259 |
+| all            |     3,090 |                2,443 |                 295 | 594 | 622 |
+
+3,090 of the table's 155,931 rows move, and those are exactly the keyed rows; every other =Quantity=, every
+=Price= and every =Description= is unchanged.
+
+*Rows no rule covers, as recorded and counted.*
+
+- The 295 above.
+- Other units at 5 or more, 5,147 rows (979 in passage 1, 4,168 in passage 2): =Kg= 2,370, =Boite= 1,129, =Tas= 467,
+  =Litre= 342, =Sachet= 276, =Unité= 248, =Bidon= 130, =Paquet= 113, =Verre= 72.  Some are plainly grams, as the 60 g tin
+  at =Boite= 60; others plainly are not (a 20 L =Bidon=).  =Unit= alone cannot say, and passage 2's recurring 25, 20
+  and 90 (=Litre= 90 on 216 rows, =Kg= 25 on 1,116, mostly coarse salt) look like an interviewer convention.  No rule
+  was written for them.
+- =Kg= at exactly 1 is also the manual's own "could not weigh" entry: its second example is a plantain "pas en mesure
+  de peser", entered Poids 1, Unité 1.  47,116 of the 54,848 =Kg= rows sit there, and nothing separates a weighed
+  kilogram from an unweighed lot.  So =Price / Quantity= on =u = 'Kg'= is per kg only as far as that entry is honest.
+  The advice above, to compare across tables only on sized units, stands.
+
 * 2026-11-04 -- EAC-I enumerator manuals held; 2021-22 price source read from the BID (GH #1179, #821)
 
 *Held now, 2014-15/Documentation/.*  =bid_eaci14.pdf= and =EACI_MANUEL_P2_V3.pdf=

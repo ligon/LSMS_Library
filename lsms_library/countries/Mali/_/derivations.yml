@@ -363,3 +363,55 @@ Mali::crop_production::harvest-from-dispositions:
     against an external total: no document here reports one.
   contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the 2021-22 harvest total, and the window key (GH #1437)"'
   since: '2026-11-04'
+
+Mali::community_prices::gram-centilitre-poids:
+  waves: ['2014-15']
+  columns: [Quantity]
+  rows: {u: [Gramme, Centilitre]}
+  rule: >-
+    On a Gramme row a recorded Poids of 5 or more is divided by 1,000, and on a Centilitre
+    row by 100, in either passage, so Quantity is the lot in kg or litres, as on the Kg and
+    Litre rows.  u stays the recorded unit and Price is untouched.  On these rows a Poids
+    below 1 is already kg or litres and from 1 up to 5 no reading fits: both stay as
+    recorded, carry no key and are counted in CONTENTS.org.  So does every other unit: a
+    Boite, Sachet, Tas, Unite, Paquet, Verre, Bidon, Kg or Litre row is served as recorded,
+    whatever it holds.
+  function: lsms_library.countries.Mali._.mali:derive_poids_base_unit
+  inputs: lsms_library.countries.Mali._.mali:inputs_gram_centilitre_poids
+  raw_variables: [s04q01, s04q02, s04q03, s04q04, s04q05, s04q06, s04q07, s04q08,
+                  s04q09, s04q10, s04q11]
+  assumptions:
+    - text: >-
+        the weight column is in the unit entered beside it, whatever its head says.
+      basis: questionnaire
+      evidence: >-
+        EACI_MANUEL_P1_V5_Redacted.pdf PDF pp. 103-104 and EACI_MANUEL_P2_V3.pdf PDF p. 88,
+        both "Attention. Le poids et l'unite correspondante sont lies", with a banana the agent
+        finds "fait 2,250 kilogramme" entered Poids 2250, Unite 2, code 2 being Gramme in the
+        community questionnaire's list.  Against it, the column head "Poids (KG)" of
+        EACI2014_COM_P2_11082014.pdf, which this file used to follow.
+    - text: >-
+        5 is where the readings separate, and it is the same in both passages.  Against the
+        size a variety's own label states (tea "environ 20g", the 60 g and 220 g tins, the
+        50-100 g and 200-250 g loaves, the 30 cl and 33 cl bottles), the share of rows within
+        2x of that size, recorded / divided.  Poids >= 5: Gramme p1 0.00 / 0.92 (n=255), p2 0.00
+        / 0.88 (227); Centilitre p1 0.00 / 1.00 (949), p2 0.00 / 0.89 (445).  Poids < 1:
+        Gramme p1 0.76 / 0.00 (29), p2 0.86 / 0.00 (175); Centilitre p1 0.56 / 0.00 (25), p2
+        0.91 / 0.00 (980).  1 <= Poids < 5: 0.00 / 0.00 in all four cells (6, 63, 5, 39).
+      basis: modelling-choice
+      evidence: >-
+        measured 2026-11-04 on EACIS04_p1.dta and EACIS04_p2.dta; a passage-only rule fails this
+        test: dividing all of passage 1 leaves its Poids < 1 rows 100x to 1000x too small, and
+        leaving passage 2 alone misses 1,110 rows.
+    - text: >-
+        passage 2 follows the manual only in part, and that is why the rule reads the value:
+        passage 1 holds 909 of 1,054 Gramme and 1,071 of 1,102 Centilitre rows at 5 or more;
+        passage 2 holds 624 of 1,891 and 486 of 1,781, the rest mostly already in kg or
+        litres, and 608 entries of 999.
+      basis: modelling-choice
+      evidence: Mali/_/CONTENTS.org table, cold build of the served rows
+  validated_against: >-
+    tests/test_gh1179_mali_community_quantity.py, whose oracle reads EACIS04_p1/p2 directly.  The
+    per-kg price on a stated-size variety is not validated against any external price.
+  contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- community_prices.Quantity is kilograms by rule (GH #1179 memo)"'
+  since: '2026-11-04'
