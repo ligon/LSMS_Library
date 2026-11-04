@@ -1927,7 +1927,8 @@ receive?"; this line called the column =Value= until 2026-10-23, but the
 build, =data_scheme.yml= and =data_info.yml= all name it =ValuePerAnimal=,
 and it is NOT a herd value -- GH #637 tail), =HeadCount12MonthsAgo= (head
 owned exactly 12 months ago, =ag_r07= -- a second stock, not a flow; GH
-#855, 2026-11-03).  One reported row per (household, species owned).
+#855, 2026-11-03), =Owned= (the species gate =ag_r01= as answered; GH #1435,
+2026-11-04).  One reported row per (household, species owned).
 
 Source: Module R livestock roster (=ag_mod_r1_{10,13,16,19}.dta=) -- the
 SAME file the World Bank cleaning code reads then *collapses to a single
@@ -1935,9 +1936,9 @@ HH "engaged-in-livestock" binary* (=MWI_IHPS{1-4}.do=: =recode ag_r00 ...
 gen(livestock)= then =collapse (max) livestock, by(<hhid>)=).  We keep
 the *pre-collapse* roster, which is strictly richer.  Their binary is
 only approximately =livestock().groupby(['t','i']).size() > 0=: measured
-2026-11-04 against raw =ag_r00=, 38 / 2 / 34 / 31 households by wave answer Yes
-with no served row (one of the 34 since GH #1435), and 2 / 0 / 1 / 0 served
-households do not answer Yes.  Read =ag_r00= for the exact binary.  A TLU rollup
+2026-11-04 against raw =ag_r00=, 38 / 2 / 33 / 31 households by wave answer Yes
+with no served row, and 2 / 0 / 1 / 0 served households do not answer Yes.  Read
+=ag_r00= for the exact binary.  A TLU rollup
 =Sigma(head x species-TLU-factor)= is a =transformations= concern, NOT a
 stored column.
 
@@ -1974,14 +1975,14 @@ the species -- per-species ownership flag =ag_r01= == Yes, OR any
 positive reported =HeadCount= / =HeadSold= / =HeadAcquired=.  Rows for
 species the HH was merely asked about and does not own are dropped, so
 the feature is the household's actual herd, not the full species
-checklist.  (A row kept on =ag_r01= alone, with every served column blank,
-reaches the wave parquet but is not served: GH #1435, 2026-11-03.)
+checklist.  (A row kept on =ag_r01= alone, with its five questions blank, is
+served with =Owned= True: GH #1435.)
 
 Coverage cross-check (distinct livestock-owning HH per wave): the feature
 matches the raw Module-R =ag_r00= == Yes universe within ~0.5% every wave
-(2010-11: 5674 vs 5710; 2013-14: 1886 vs 1888; 2016-17: 6177 vs 6210;
-2019-20: 6544 vs 6575; corrected 2026-11-04: 2016-17 moved from 6178 under
-GH #1435, and 2019-20 had been stale at 6534).  The WB =Plot_dataset= livestock binary is much
+(2010-11: 5674 vs 5710; 2013-14: 1886 vs 1888; 2016-17: 6178 vs 6210;
+2019-20: 6544 vs 6575; corrected 2026-11-04: 2019-20 had been stale at 6534).
+The WB =Plot_dataset= livestock binary is much
 smaller (1484 / 1835 / 1119 / 1249) because it is joined onto the
 *plot-cultivating subsample* only -- so the item feature both is richer
 AND spans the correct, broader livestock-keeping universe.
@@ -5068,45 +5069,37 @@ Neither kind is a recorded 0.  8 of the 14 blank =HeadCount= cells sit beside a
 positive purchase or sale, so serving them as "0 head now" was a claim the survey
 did not make.
 
-| wave    | =HeadCount= blank | =HeadAcquired= blank | =HeadSold= blank | rows served       |
-|---------+-------------------+----------------------+------------------+-------------------|
-| 2010-11 |                 8 |                   19 |               33 | 11,329 -> 11,328  |
-| 2013-14 |                 3 |                   15 |                9 | 4,099 -> 4,098    |
-| 2016-17 |                 2 |                    2 |                2 | 11,445 -> 11,443  |
-| 2019-20 |                 1 |                    2 |                2 | 12,253 -> 12,252  |
-| total   |                14 |                   38 |               46 | 39,126 -> 39,121  |
+| wave    | =HeadCount= blank | =HeadAcquired= blank | =HeadSold= blank | rows served |
+|---------+-------------------+----------------------+------------------+-------------|
+| 2010-11 |                 8 |                   19 |               33 |      11,329 |
+| 2013-14 |                 3 |                   15 |                9 |       4,099 |
+| 2016-17 |                 2 |                    2 |                2 |      11,445 |
+| 2019-20 |                 1 |                    2 |                2 |      12,253 |
+| total   |                14 |                   38 |               46 |      39,126 |
 
-Those cells were all served 0.  Cold builds, base 98c6069d2 vs this change: the
-API now serves 9 / 33 / 41 of them as NA, and the other 5 of each are the 5 rows
-below.  No other cell moves: on the 39,121 common rows no value changes, and
-=ValuePerAnimal=, =HeadCount12MonthsAgo=, the recorded zeros and every column
-total are the same.  The other 24 public Malawi tables, derived ones included,
-are digest-identical.
+Those cells were all served 0, and are all NA now.  No other cell moves:
+=ValuePerAnimal=, =HeadCount12MonthsAgo=, the recorded zeros and every column total
+are the same.  The other 24 public Malawi tables, derived ones included, were
+digest-identical (cold builds, base 98c6069d2 vs the reducer fix).
 
 *Idiosyncrasy: =ag_r01= Yes with none of the five served questions answered.*
 5 rows (1 / 1 / 2 / 1 by wave: Local Cock, Duck, Local Hen, Pig, Goat), all on
 households answering =ag_r00= Yes: recorded holdings, not hollow rows.  Beyond
 those two gates, one 2016-17 Panel row answers =ag_r01_1a= / =ag_r01_1b= (purposes
 for owning or keeping), and two carry only enumerator fields (=ag_r20=, =ag_r0c=).
-They stay in the wave parquets (39,126 rows, unchanged), but with the zeros gone
-they have no served column, so =_finalize_result='s =dropna(how='all')= stops
-serving them.  One 2016-17 household has no other livestock row, so that wave's
-owning households go 6,178 -> 6,177.  The loss is registered as the deletion
-=Malawi::livestock::owned-species-no-payload= (=rows: 0=);
-=derivation_inputs= returns the rows.  *This is not the #1174 outcome*, as this
-entry first said: there, answered rows kept their answer in =Applied= and only the
-group with no answer went.  Here the answer has no column to go in.  Whether to
-serve =ag_r01= as one is queued for the maintainer; no 0 is minted to keep a row.
+With the zeros gone they had nothing to serve, so for a day they were not served,
+registered as a deletion.  The next entry serves the answer instead; no 0 is minted
+to keep a row.
 
 *Consumers* (=rg= for the three names; only these read them):
 - =transformations.livestock_sales_value= drops a row with no =HeadSold=, as its
   docstring says: 36,118 -> 36,078 rows (-31 / -8 / 0 / -1), all of them rows
   that were valued at 0; totals identical by wave.
-- =transformations.livestock_engaged=: 20,282 -> 20,281 (the household above).
+- =transformations.livestock_engaged=: 20,282, unmoved once the next entry landed.
 - =transformations.tlu=: 391 rows and identical totals, but only because of a
   separate gap: =_TLU_FACTORS= knows 2 of Malawi's 22 =animal= labels (=Chicken=,
-  =Sheep=; 392 of 39,121 rows), so a cow, goat or local hen adds nothing and
-  nothing warns.  2010-11 totals 20.4 TLU.  Drafted as a framework issue.
+  =Sheep=; 392 of 39,126 rows), so a cow, goat or local hen adds nothing and nothing warns.
+  2010-11 totals 20.4 TLU.  Drafted as a framework issue.
 - The =ValuePerAnimal= given =HeadSold= table in =data_info.yml= (92.1 / 91.4)
   is unmoved: 92.08 / 91.45 either side.
 
@@ -5222,3 +5215,43 @@ This answers the section above (GH #1476), which says this questionnaire is not 
 is now, and "homestead" is not in the extracted text of its 98 pages either, so the word
 is on no page of the three held forms.  Why those 41 rows carry Module P answers is still
 unknown.
+of 268; 0 of 28 =build_transforms_fingerprint=).
+
+* 2026-11-04 -- livestock: =ag_r01= is served as =Owned= (GH #1435, ruling (b))
+
+The maintainer's ruling on the question the previous entry queued: serve the answer,
+keeping all 39,126 rows.  =Owned= is =ag_r01= as answered: True 39,114, False 12 (7 in
+2010-11, 5 in 2013-14, each kept for a positive count elsewhere on the row), no NA.
+The deletion =Malawi::livestock::owned-species-no-payload= and its callables are gone.
+
+*The name is loose, and it does NOT mean "owns one now".*  The question is about the
+last 12 months: 2,990 rows answer True beside =HeadCount= 0 (295 / 249 / 1,246 / 1,200
+by wave), and those are answers, not conflicts.
+
+*Idiosyncrasy: the wording differs by source, and not the way the Stata labels suggest.*
+Read from the questionnaires as well as the labels (this entry's ruling and the review
+before it had the labels only):
+
+| wave    | Stata label of =ag_r01=                         | questionnaire prints           |
+|---------+-------------------------------------------------+--------------------------------|
+| 2010-11 | "During the last 12 months, have you or any member of your HH raised or owned any" (truncated) | "raised or owned any [LIVESTOCK]?", 12 months |
+| 2013-14 | same, "household"                               | same                           |
+| 2016-17 | "Did you own [LIVESTOCK]?" (so does the DDI)    | no agriculture questionnaire held |
+| 2019-20 | "Did you own [LIVESTOCK]?"                      | "raised or owned any [LIVESTOCK]?", 12 months |
+
+So the label's "Did you own" is not evidence that the 2019-20 question changed: its own
+instrument prints the old wording.  2016-17 cannot be settled from what we hold.  The
+canonical =data_info.yml= declaration says this; do not read the column as ownership at
+interview in any wave.
+
+Measured, cold builds, previous commit vs this one: rows 39,121 -> 39,126 (+1 / +1 / +2
+/ +1, the five rows above).  Nothing else moves on the common rows, and the blank head
+cells stay NA (14 / 38 / 46).  =livestock_engaged= 20,281 -> 20,282, so the 2016-17
+household is back (owning households 5,674 / 1,886 / 6,178 / 6,544).
+=livestock_sales_value= 36,078 and =tlu= 391 rows are digest-identical.  The four row
+counts in =.coder/coverage/latest.csv= end where they started, so a regrade does not
+move them.
+
+Cost: canonical =data_info.yml= moves no other country's hash (Uganda, Niger 0; 0 of 28
+=build_transforms_fingerprint=), and =malawi.py= is one more Malawi re-warm, shared with
+the rest of this bundle.
