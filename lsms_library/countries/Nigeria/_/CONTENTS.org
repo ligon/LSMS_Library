@@ -3578,3 +3578,24 @@ relevant Nigeria/core bytes of the validated source; the sole bound-source drift
 is an unused EHCVM slot helper. #1357 continues excluding genuinely anonymous
 households from household-keyed tables; it supplies no inferred C8 household or
 orphan identity. Tanzania's remaining #637 seed decision is unchanged.
+
+* 2026-11-04 -- the NLSS 2018-19 is held beside the panel, not registered
+
+=2018-19-NLSS/= holds WB 3827 =NGA_2018_LSS_v01_M=: 47 files, 1.70 GB, in =Data/Household/= and
+=Data/Community/=, with the BID, questionnaires, manuals and report.
+
+*Why this directory name.*  =2018-19/= is GHS-Panel W4 (3557) over the same years, and both
+entries derive the label =2018-19= from the catalog.  They are different surveys: the NLSS is an
+NBS cross-section of 22,587 households, representative by state, whose file names
+(=sect1_roster=, =secta_cover=) share nothing with the panel's.  =discover_waves= matches on
+the catalog id, so 3827 reads =yes= here and 3557 =yes= there.
+
+*Why it is not in =Country.waves=.*  =nigeria.py= fixes the list, and that module is in every
+Nigeria wave's input hash, so registering costs a cold Nigeria re-warm for no served row.
+Do it with the wiring, and decide then whether the NLSS is a wave of this country or a country
+of its own (=GhanaLSS= / =GhanaSPS= is the precedent).  That choice also decides whether its
+units pool into the panel's kg factors (GH #1487).
+
+*Borno.*  BID Box 1, PDF p. 11: the Borno sample has a different frame and weights and "is not
+representative of the state and must be treated separately from the data of the other states."
+No =population.yml= row was added: the wave has no API label yet.

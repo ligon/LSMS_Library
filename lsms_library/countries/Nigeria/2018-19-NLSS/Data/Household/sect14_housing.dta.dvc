@@ -1,0 +1,5 @@
+outs:
+- md5: 0643b1a351082aa22b79ae25bea52fbd
+  size: 25892322
+  hash: md5
+  path: sect14_housing.dta

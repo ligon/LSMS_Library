@@ -1,0 +1,5 @@
+outs:
+- md5: 88a6a55964814a369c513417c81b4d8b
+  size: 14977404
+  hash: md5
+  path: sect13_income.dta

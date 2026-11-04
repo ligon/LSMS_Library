@@ -1,0 +1,5 @@
+outs:
+- md5: 9b988e8036df280915acaca98c1f92b2
+  size: 66803651
+  hash: md5
+  path: sect3_health.dta

@@ -1,0 +1,5 @@
+outs:
+- md5: 671cb8513f926c52a1e9aeeefbbb267a
+  size: 61567651
+  hash: md5
+  path: sect5_remittances.dta

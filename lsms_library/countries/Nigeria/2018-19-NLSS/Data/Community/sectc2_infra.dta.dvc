@@ -1,0 +1,5 @@
+outs:
+- md5: 5b56b8a85661223fb7ce28a630e17305
+  size: 2210144
+  hash: md5
+  path: sectc2_infra.dta

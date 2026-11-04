@@ -1,0 +1,5 @@
+outs:
+- md5: 55af09b2f1d4f059e951c27c9507a15e
+  size: 32039481
+  hash: md5
+  path: sect1_roster.dta
