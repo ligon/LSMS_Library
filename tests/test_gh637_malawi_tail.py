@@ -17,7 +17,8 @@ evidence and what it leaves alone are in ``Malawi/_/CONTENTS.org`` ("the GH
   instrument has no "did you harvest at all?" answer to preserve (G07 asks
   only whether the harvest is COMPLETE), so ``min_count=1`` (PR #1263's
   Tanzania precedent) -- also at the defensive collapse, which would re-mint
-  the zero when two codes of one label are both blank (1 row, 2013-14).
+  the zero when two codes of one label are both blank (1 row, 2013-14; #1373
+  has since removed that collapse, so those two codes keep separate rows).
 * **IHS3 2010-11 ships exact repeat records.**  A record equal to an earlier
   one in EVERY column is a duplicate entry (the #840 / #651 rule), dropped on
   the full raw record before any block projects it.
@@ -228,11 +229,14 @@ class TestRepeatedRecords:
 # data-gated: pins on the delivered tables, and a raw-source oracle
 # ---------------------------------------------------------------------------
 
-#: Served crop_production.Quantity per wave (cold build, 2026-10-23).  NA was
-#: 0 / 0 / 0 / 0 on development; 2013-14 has 284 blank consolidation groups,
-#: two of which are codes of one label merged at the declared grain -> 283.
-HARVEST_NA = {'2010-11': 32, '2013-14': 283, '2016-17': 200, '2019-20': 276}
-HARVEST_ZERO = {'2010-11': 1255, '2013-14': 310, '2016-17': 3723, '2019-20': 3343}
+#: Served crop_production.Quantity per wave.  NA was 0 / 0 / 0 / 0 before the
+#: #637 tail.  Re-pinned 2026-11-03 (GH #1432, cold development 98c6069d2):
+#: #1373 (0377b733b) keeps each native crop code on its own row, so a blank or
+#: a zero is no longer absorbed by a sibling code of the same label.  NA
+#: 2013-14 283 -> 284 (the two blank codes of one label noted on 2026-10-23);
+#: zeros 2010-11 1,255 -> 1,258, 2019-20 3,343 -> 3,349; HARVEST_SUM unchanged.
+HARVEST_NA = {'2010-11': 32, '2013-14': 284, '2016-17': 200, '2019-20': 276}
+HARVEST_ZERO = {'2010-11': 1258, '2013-14': 310, '2016-17': 3723, '2019-20': 3349}
 #: 2010-11 fell by 67 = 42 (Module G repeats) + 25 (the Module P repeat).
 HARVEST_SUM = {'2010-11': 970_088.8, '2013-14': 257_839.0,
                '2016-17': 1_871_058.4, '2019-20': 1_260_873.9}
@@ -405,7 +409,8 @@ class TestRawOracle:
                     df = df[~df.duplicated()]
                 col = half['gcrop'] if mod == 'g' else (
                     half.get('pcrop') or ('ag_p0c' if 'ag_p0c' in df.columns else 'crop_code'))
-                code = pd.to_numeric(df[col], errors='coerce')
+                native = pd.to_numeric(df[col], errors='coerce')
+                code = native
                 if perennial:
                     code = (code + 1000).replace({1100: 1001, 1021: 1018})
                 c = (pd.to_numeric(df['ag_g13c'], errors='coerce').map(cond).fillna(UNK)
@@ -415,16 +420,27 @@ class TestRawOracle:
                     'i': half['hh'](df, format_id),
                     'plot_id': half['plot' if mod == 'g' else 'pplot'](df, format_id),
                     'crop': code.map(crop), 'u': u.fillna('<NA>'), 'condition': c,
+                    # The module and its code before the perennial offset (#1373).
+                    'production_obs': f'reported:{mod.upper()}:' + native.astype('Int64').astype('string'),
                     'Quantity': pd.to_numeric(df['ag_g13a' if mod == 'g' else 'ag_p09a'],
                                               errors='coerce')}))
         R = pd.concat(parts, ignore_index=True)
         R = R[R['crop'].notna()]
         R['plot_id'] = R['plot_id'].fillna('<NA>')
-        exp = R.groupby(['i', 'plot_id', 'crop', 'u', 'condition'])['Quantity'].sum(min_count=1)
+        exp = R.groupby(['i', 'plot_id', 'crop', 'u', 'condition', 'production_obs'])[
+            'Quantity'].sum(min_count=1)
         q = crop_production.xs(wave, level='t')['Quantity']
         assert len(exp) == len(q)
         assert int(exp.isna().sum()) == int(q.isna().sum()) == HARVEST_NA[wave]
+        assert int((exp == 0).sum()) == int((q == 0).sum()) == HARVEST_ZERO[wave]
         assert float(exp.sum()) == pytest.approx(float(q.sum()), abs=1e-6)
+        # Each native code keeps its own harvest: nothing moves between codes
+        # that share a preferred label.  (Keyed on the code, not on `i`: the
+        # served `i` has been through id_walk and the raw one has not.)
+        by_code = exp.groupby(level='production_obs').sum()
+        served = q.groupby(level='production_obs').sum()
+        pd.testing.assert_series_equal(by_code.sort_index(), served.sort_index().astype(float),
+                                       check_names=False, check_index_type=False, atol=1e-6)
 
 
 def _org_codes(name):

@@ -117,12 +117,14 @@ class TestSilentHHDropWarns:
     """``household_characteristics()`` must warn when groupby drops NaN-v
     roster rows, naming the per-wave row count."""
 
-    def test_warning_emitted_with_per_wave_breakdown(self, uga_hc_warnings):
-        # Some Uganda waves have NaN-v roster rows (panel-refresh movers,
-        # 2018-19 parish-name gaps).  Since GH #268 these rows are no
-        # longer silently dropped -- they are retained under a 'Mover'
-        # sentinel and the warning reports the per-wave count.  The
-        # warning must still fire and name the affected waves.
+    def test_warning_emitted_with_per_wave_breakdown(self, uga, uga_hc_warnings):
+        # The warning fires exactly when the roster has NaN-v rows.  Since
+        # GH #268 such rows are no longer silently dropped -- they are
+        # retained under a 'Mover' sentinel and the warning reports the
+        # per-wave count.  Since #1358 (GH #1120 D2) Uganda has none: a
+        # household with no location is its own `unlocated-{hhid}` cluster, so
+        # no warning and no 'Mover' bucket.  The warning itself is pinned on a
+        # synthetic roster in test_roster_to_characteristics_movers.py.
         # ``uga_hc_warnings`` is the captured list from the module-scoped
         # fixture (skips on no-DVC environments).
         relevant = [
@@ -130,6 +132,12 @@ class TestSilentHHDropWarns:
             if 'household_characteristics' in str(w.message)
             and 'sentinel' in str(w.message)
         ]
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            nan_v = uga.household_roster().index.get_level_values('v').isna()
+        if not nan_v.any():
+            assert not relevant, [str(w.message)[:120] for w in relevant]
+            return
         assert relevant, (
             "Expected a UserWarning naming the sentinel-'Mover' roster rows; "
             f"got: {[str(w.message)[:80] for w in uga_hc_warnings]}"

@@ -353,13 +353,19 @@ def test_2009_10_no_99999_quantity_sentinel_remains(uganda_module, in_2009_10_wa
     # post-fix 967,662.84, now the same order of magnitude as 2010-11
     # (708,149.50) and 2011-12 (1,128,560.35).
     # GH1198 (2026-10-22): 141 formerly coalesced native records are retained.
-    # Sentinel eligibility, 360 existing null-key exclusions and all quantities
-    # remain the same; the preceding historical count describes the old grain.
-    assert len(df) == 22549, (
-        f"row count changed: {len(df)} (expected 22,549 native observations)"
+    # Sentinel eligibility and all quantities remain the same; the preceding
+    # historical count describes the old grain.
+    # #1358 (GH #1120 D3): the 360 null-key exclusions are served now, under
+    # `plot_id == 'unknown_plot'`.  The 22,549 known-plot records are unchanged.
+    unknown = df.index.get_level_values('plot_id') == 'unknown_plot'
+    assert (len(df), int(unknown.sum())) == (22909, 360), (
+        f"row count changed: {len(df)}, {int(unknown.sum())} on unknown_plot "
+        f"(expected 22,549 native observations + 360)"
     )
     hh = df.index.get_level_values('i')
-    assert hh.nunique() == 2323, f"household count changed: {hh.nunique()} (expected 2,323)"
+    assert (hh.nunique(), hh[~unknown].nunique()) == (2327, 2323), (
+        f"household count changed: {hh.nunique()}, {hh[~unknown].nunique()} on "
+        f"known plots (expected 2,327 and 2,323)")
     total = df["Quantity"].sum()
     assert 0 < total < 5_000_000, (
         f"Quantity sum {total} is not in the corrected order of magnitude "

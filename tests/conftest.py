@@ -29,6 +29,7 @@ guard is deliberately conditioned on the environment rather than on the
 exception alone.
 """
 import os
+import sys
 import warnings
 from pathlib import Path
 
@@ -134,6 +135,34 @@ _SKIP_REASON = (
     "needs S3 credentials to build country data; the unit-tests job is "
     "deliberately data-free (see the data-tests job for the credentialed run)"
 )
+
+
+def _clear_root_caches():
+    paths = sys.modules.get("lsms_library.paths")
+    if paths is None:       # not imported yet, so nothing is cached
+        return
+    for name in ("data_root", "countries_root"):
+        clear = getattr(getattr(paths, name, None), "cache_clear", None)
+        if clear is not None:
+            clear()
+
+
+@pytest.fixture(autouse=True)
+def _root_caches_do_not_cross_tests():
+    """``data_root()`` and ``countries_root()`` are ``lru_cache``d, so neither
+    outlives its environment unless something clears it.
+
+    A test that ``monkeypatch.setenv``s ``LSMS_DATA_DIR`` and calls the library
+    leaves its private path cached after the variable is restored; later tests
+    on that xdist worker then read and write there, so they pass or fail with
+    worker scheduling (``test_gh1447`` -> ``test_ethiopia_food_sources``, #1432).
+    The reverse also bites: if the path was cached first, that ``setenv`` is
+    silently ignored.  Autouse fixtures are set up first and torn down last, so
+    this clears after a test's own ``monkeypatch`` has been undone.
+    """
+    _clear_root_caches()
+    yield
+    _clear_root_caches()
 
 
 def pytest_configure(config):
