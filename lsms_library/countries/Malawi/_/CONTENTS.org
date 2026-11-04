@@ -830,7 +830,11 @@ named differently.  Module I's text is not read here (deferred with the rest).
 (=_crop_pieces=), so it would say =Other= where a relabelled harvest row says cowpea,
 and would not join that row on =(t, i, crop, u)=.  None of the 157 carries a =Derivation=
 key today, so nothing is broken, but a sale reaching one on a registered rung would be.
-The =MPHODZA= line is why Module I's text cannot simply be reused for this.
+The =MPHODZA= line is why Module I's text cannot simply be reused for this: PFAF (a plant
+database, not a Chichewa dictionary) lists Mphodza as =Vigna radiata=, mung bean, so it is
+probably not cowpea.  That household's own G line says =COWPEAS=, so the label is right for
+the harvest, and the one sale is the residual.  =MPHOZA=, probably the same word, is on 4 G
+and 3 I lines and stays =Other=.
 
 *The same line carries one label in both tables.*  Module G is also where
 =plot_inputs= reads seed, so the seed rows of those lines are relabelled too (155
@@ -840,9 +844,25 @@ purchases and 29 free receipts on those rows did not move.
 
 Measured, cold builds: =crop_production= 135,370 rows and =plot_inputs= 179,957, with
 only =crop= moving on 157 and 155 rows.  =Other= is now 206 rows in 2010-11 (171 of them
-Module G), and the other waves' are unchanged.  =harvest_kg=, =seed_kg= and =nitrogen_kg=
-are digest-identical, because they do not key on =crop=; =harvest_kg_factors= assigns the
-same per-wave factor totals.  Site Q's warnings read the same.
+Module G), and the other waves' are unchanged.  =seed_kg= and =nitrogen_kg= are
+digest-identical, because they do not key on =crop=; =harvest_kg_factors= assigns the same
+per-wave factor totals.  Site Q's warnings read the same.
+
+*Two consumers do key on =crop= (cold builds, development 4646a0fd2 vs this bundle merged
+onto it).*  =harvest_kg= has kept the crop level since GH #1460 (PR #1492), so the label
+moves there: rows 92,745 -> 92,746, because 131 keys leave =Other= and 132 appear (one plot
+holds both kinds of line).  In 2010-11 =Other= goes 20,808.5 -> 9,387.0 kg with 11,421.5
+under the new label; wave totals are unchanged, and 2013-14 and 2016-17 do not move.
+=crop_diversity= on its count basis rises on 8 2010-11 households (by 0.116 to 0.277): they
+now grow one more named crop.
+
+*A wave break on =crop=.*  The label exists only in 2010-11, while later waves' =Other= is
+still mostly cowpea (above), so a cowpea series cannot be read across waves until the
+Module D halves land.
+
+*Lines left out.*  6 more 2010-11 G lines say exactly =COWPEAS= on codes 1, 5, 11, 21 and 42
+(42 twice).  They keep their code's label: a text on a coded crop is a different decision
+from naming a residue.
 
 ** TODO Cowpea identity diagnostic checkpoint (GH #1228, 2026-10-30)
 

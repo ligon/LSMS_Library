@@ -179,4 +179,5 @@ def test_the_label_joins_food_acquired_in_every_wave():
     from lsms_library.country import Country
     fa = Country('Malawi').food_acquired().reset_index()
     waves = set(fa.loc[fa['j'].astype(str).eq(LABEL), 't'].astype(str))
-    assert {'2010-11'} <= waves
+    assert waves == set(fa['t'].astype(str))
+    assert len(waves) == 5
