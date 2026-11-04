@@ -37,6 +37,8 @@ Extend only the community-specific label path; keep shared `_canon_unit` unchang
 
 ## 6. Approved partial scope and residual
 
+> **Residual closed 2026-11-04.**  The retention decision below is no longer open.  Ruling (@ligon, 2026-11-04): a future unplaced label keeps the recorded label as `u`, verbatim, with no factor and no shared `Unknown` bucket, and warns.  Implemented in `community_prices_for_wave` (commit `b0dc24fa4`, the Nigeria bundle PR); see `Nigeria/_/CONTENTS.org`, GH #1095.  This section records the scope of the earlier ten-label fix.  Sections 5 and 7's "existing NA/drop" and "existing-drop disposition" describe that state too.
+
 Root approved the ten community-only aliases and reporting AFTER metric rescue with default-preserving `_canon_units` disposition. Future genuinely unplaced labels retain the existing NA/drop policy, now reported accurately. No observed positive recorded residual remains in held W3-W5 after aliases. This is PARTIAL work on #1095: its literal "instead of dropping" intent remains a Tier C retention/fallback design residual. No fallback, new unit meaning or global unit expansion is authorized.
 
 The retention/fallback decision remains a future Tier C residual, explicitly preserving the original issue's literal retention intent.

@@ -37,8 +37,10 @@ def test_direct_make_food_target_builds_native_waves_only(tmp_path):
     )
     lines = [line for line in result.stdout.splitlines()
              if "python food_acquired.py" in line]
-    assert len(lines) == len(c.waves)
-    for wave in c.waves:
+    # Registered waves with no food script yet are not asked for (GH #1275).
+    declared = [w for w in c.waves if "food_acquired" in c[w].data_scheme]
+    assert len(lines) == len(declared)
+    for wave in declared:
         assert f"../{wave}/_/" in result.stdout
     assert "var/food_acquired.parquet" not in result.stdout
     assert not root.exists(), "a dry-run Make probe wrote data"
@@ -68,8 +70,7 @@ def test_native_wave_assembly_preserves_requested_food(tmp_path, monkeypatch,
             "Quantity": [0.0, 2.5], "Expenditure": [0.0, float("nan")],
             "Quantity_kg": [0.0, 2.5],
         }).set_index(["t", "i", "j", "u", "s"])
-        # Model the native script-parquet producer, whose explicit provenance
-        # tells Wave.food_acquired to keep already-canonical columns.
+        # Model the native script-parquet producer.
         out = data_root("Malawi") / self.year / "_" / "food_acquired.parquet"
         out.parent.mkdir(parents=True, exist_ok=True)
         frame.to_parquet(out)
@@ -89,7 +90,9 @@ def test_native_wave_assembly_preserves_requested_food(tmp_path, monkeypatch,
     monkeypatch.setattr(C.subprocess, "run", probe_only)
     try:
         result = c.food_acquired(waves=waves, currency=None)
-        requested = c.waves if waves is None else waves
+        # A registered wave with no food script contributes nothing (GH #1275).
+        requested = ([w for w in c.waves if "food_acquired" in c[w].data_scheme]
+                     if waves is None else waves)
         assert seen == requested
         assert len(result) == 2 * len(requested)
         # Country._finalize_result orders household i before wave t.

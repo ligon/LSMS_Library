@@ -67,14 +67,17 @@ def test_community_aliases_do_not_expand_harvest_units(nigeria, unit):
 @pytest.mark.parametrize('unit', [
     '200. LOAFY', 'wrong loaf', '240.. BOTTLE/CAN', '999. CALABASH',
 ])
-def test_unplaced_recorded_label_is_reported_then_dropped(nigeria, unit):
+def test_unplaced_recorded_label_is_reported_and_kept(nigeria, unit):
+    # GH #1095 (ruling 2026-11-04) moved this pin: the row used to be dropped.
     with pytest.warns(nigeria.UnplacedUnitLabelWarning) as caught:
         out = _call(nigeria, unit)
-    assert out.empty
+    assert out.index.get_level_values('u').tolist() == [unit]
+    assert out.Price.tolist() == [500]
+    assert 'Derivation' not in out
     assert len(caught) == 1
     message = str(caught[0].message)
     assert repr(unit) in message and ': 1' in message
-    assert 'dropped after metric-size rescue' in message
+    assert 'served under the recorded label, with no factor' in message
     assert 'served as Unknown' not in message
 
 
@@ -130,6 +133,82 @@ def test_otherwise_ineligible_unknown_does_not_inflate_report(nigeria, kwargs):
     with warnings.catch_warnings():
         warnings.simplefilter('error', nigeria.UnplacedUnitLabelWarning)
         assert _call(nigeria, '999. CALABASH', **kwargs).empty
+
+
+def _call_rows(nigeria, rows):
+    """``rows``: (ea, item, unit label, size label or None, price, obs)."""
+    raw = pd.DataFrame({
+        'state': 1, 'lga': 101, 'ea': [r[0] for r in rows],
+        'item_cd': [r[1] for r in rows], 'unit': 1,
+        'price': [r[4] for r in rows], 'size': np.nan,
+    })
+    decoded = raw.copy()
+    decoded['unit'] = pd.Series([r[2] for r in rows], dtype='string')
+    decoded['size'] = pd.Series([r[3] for r in rows], dtype='string')
+    frame = dict(df=raw, dec=decoded, ea='ea', item='item_cd',
+                 unit='unit', price='price', size='size')
+    return nigeria.community_prices_for_wave(
+        '2019Q1', [frame], 'codes', {1: 'Synthetic item', 2: 'Other item'})
+
+
+def test_two_unknown_labels_at_one_cluster_item_stay_two_units(nigeria):
+    """A shared Unknown bucket would collapse these onto one key."""
+    with pytest.warns(nigeria.UnplacedUnitLabelWarning) as caught:
+        out = _call_rows(nigeria, [(1, 1, '999. CALABASH', None, 500, 1),
+                                   (1, 1, '998. GOURD', None, 300, 1)])
+    assert sorted(out.index.get_level_values('u')) == ['998. GOURD', '999. CALABASH']
+    assert out.xs('999. CALABASH', level='u').Price.tolist() == [500]
+    assert out.xs('998. GOURD', level='u').Price.tolist() == [300]
+    assert "'999. CALABASH': 1" in str(caught[0].message)
+    assert "'998. GOURD': 1" in str(caught[0].message)
+    assert 'Unknown' not in set(out.index.get_level_values('u'))
+
+
+def test_labels_differing_only_in_their_code_stay_two_units(nigeria):
+    with pytest.warns(nigeria.UnplacedUnitLabelWarning):
+        out = _call_rows(nigeria, [(1, 1, '999. CALABASH', None, 500, 1),
+                                   (1, 1, '998. CALABASH', None, 300, 1)])
+    assert len(out) == 2
+
+
+@pytest.mark.parametrize('second_price', [500, 300])
+def test_a_repeated_key_on_a_kept_label_is_refused(nigeria, second_price):
+    """Equal or conflicting, a duplicate source key is a broken key (#840, #637)."""
+    with pytest.warns(nigeria.UnplacedUnitLabelWarning):
+        with pytest.raises(AssertionError, match='broken key'):
+            _call_rows(nigeria, [(1, 1, '999. CALABASH', None, 500, 1),
+                                 (1, 1, '999. CALABASH', None, second_price, 1)])
+
+
+def test_an_ordinal_size_does_not_change_a_kept_label_or_its_price(nigeria):
+    """No factor from an ordinal size: not a metric rescue, not part of the label."""
+    with pytest.warns(nigeria.UnplacedUnitLabelWarning):
+        out = _call(nigeria, '999. CALABASH', '0. SMALL')
+    assert out.index.get_level_values('u').tolist() == ['999. CALABASH']
+    assert out.Price.tolist() == [500]
+    assert 'Derivation' not in out
+
+
+@pytest.mark.parametrize('unit', ['999. 500 ML BOTTLE', '999. TIN OF 2 KG', '999. 50 KG GOURD'])
+def test_a_quantity_in_a_kept_label_infers_nothing(nigeria, unit):
+    """The label stays text: no re-unit to g/cl, no division, no kg column."""
+    with pytest.warns(nigeria.UnplacedUnitLabelWarning):
+        out = _call(nigeria, unit)
+    assert out.index.get_level_values('u').tolist() == [unit]
+    assert out.Price.tolist() == [500]
+    assert list(out.columns) == ['Price']
+
+
+def test_a_kept_label_leaves_placed_rows_alone(nigeria):
+    with pytest.warns(nigeria.UnplacedUnitLabelWarning) as caught:
+        out = _call_rows(nigeria, [(1, 1, '200. LOAF', None, 100, 1),
+                                   (1, 2, '999. CALABASH', None, 300, 1),
+                                   (2, 1, '240', None, 900, 1),
+                                   (2, 2, '2. GRAMS (G)', None, 900, 1)])
+    u = out.index.get_level_values('u').tolist()
+    # The bare code and the unrecorded-size gram row stay excluded.
+    assert sorted(u) == ['999. CALABASH', 'Loaf']
+    assert "{'999. CALABASH': 1}" in str(caught[0].message)
 
 
 def test_existing_reporter_default_is_unchanged(nigeria):

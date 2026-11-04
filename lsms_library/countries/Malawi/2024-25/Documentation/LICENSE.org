@@ -1,0 +1,100 @@
+LICENSE (MWI_2024-2025_IHS-VI_v01_M)
+
+https://microdata.worldbank.org/index.php/catalog/8507/study-description#metadata-data_access
+
+1. Access policy
+CONTACTS
+
+Kanyanda Shelton, Commissioner of Statistics	National Statistical Office - Malawi	commissioner@nso.gov.mw	
+LSMS Data Manager	The World Bank	lsms@worldbank.org	
+
+ACCESS CONDITIONS
+In receiving these data, it is recognized that the data are supplied for use within my organization, and I agree to the following stipulations as conditions for the use of the data:
+1. The data are supplied solely for the use described in this form and will not be made available to other organizations or individuals. Other organizations or individuals may request the data directly.
+2. Three copies of all publications, conference papers, or other research reports based entirely or in part upon the requested data will be supplied to:
+Commissioner Shelton Kanyanda
+National Statistical Office
+Chimbiya Road
+P.O. Box 333
+Zomba, Malawi
+Tel: +265 (0) 1 524 377/111
+Fax: +265 (0) 1 525 130
+e-mail: commissioner@nso.gov.mw
+web site: http://www.nsomalawi.mw
+
+3. The researcher will refer to the Malawi 2019-2020 IHS5 Survey as the source of the information in all publications, conference papers, and manuscripts. At the same time, the World Bank is not responsible for the estimations reported by the analyst(s).
+4. Users will not use the location information to reveal the identity of survey respondents.
+5. Users will not publish results (map or other form) that would allow communities or individuals to be identified.
+6. Users who download the data may not pass the data to third parties.
+7. The database cannot be used for commercial ends, nor can it be sold.
+Citation requirements
+Use of the dataset must be acknowledged using a citation which would include:
+• the Identification of the Primary Investigator
+• the title of the survey (including country, acronym and year of implementation)
+• the survey reference number
+• the source and date of download.
+
+
+CITATION REQUIREMENT
+Use of the dataset must be acknowledged using a citation which would include:
+• the Identification of the Primary Investigator
+• the title of the survey (including country, acronym and year of implementation)
+• the survey reference number
+• the source and date of download.
+
+Example:
+National Statistical Office of Malawi. Malawi - Sixth Integrated Household Survey 2024-2025 (IHS-VI 2024-25). Ref: MWI_2024-2025_IHS-VI_v01_M. Downloaded from [uri] on [date].
+
+
+DISCLAIMER
+The user of the data acknowledges that the original collector of the data, the authorized distributor of the data, and the relevant funding agency bear no responsibility for use of the data or for interpretations or inferences based upon such uses.
+
+
+(Text copied from the World Bank catalog DDI export, https://microdata.worldbank.org/metadata/export/8507/json, 2026-11-04.)
+
+
+LICENSE (MWI_2024_IHPS-V_v01_M)
+
+https://microdata.worldbank.org/index.php/catalog/8520/study-description#metadata-data_access
+
+1. Access policy
+CONTACTS
+
+Kanyanda Shelton, Commissioner of Statistics	National Statistical Office - Malawi	commissioner@nso.gov.mw	
+LSMS Data Manager	The World Bank	lsms@worldbank.org	
+
+ACCESS CONDITIONS
+In receiving these data, it is recognized that the data are supplied for use within my organization, and I agree to the following stipulations as conditions for the use of the data:
+1. The data are supplied solely for the use described in this form and will not be made available to other organizations or individuals. Other organizations or individuals may request the data directly.
+2. Three copies of all publications, conference papers, or other research reports based entirely or in part upon the requested data will be supplied to:
+Commissioner Shelton Kanyanda
+National Statistical Office
+Chimbiya Road
+P.O. Box 333
+Zomba, Malawi
+Tel: +265 (0) 1 524 377/111
+Fax: +265 (0) 1 525 130
+e-mail: commissioner@nso.gov.mw
+web site: http://www.nsomalawi.mw
+3. The researcher will refer to the Malawi 2024 IHPS Survey as the source of the information in all publications, conference papers, and manuscripts. At the same time, the World Bank is not responsible for the estimations reported by the analyst(s).
+4. Users will not use the location information to reveal the identity of survey respondents.
+5. Users will not publish results (map or other form) that would allow communities or individuals to be identified.
+6. Users who download the data may not pass the data to third parties.
+7. The database cannot be used for commercial ends, nor can it be sold.
+
+
+CITATION REQUIREMENT
+Citation requirements
+Use of the dataset must be acknowledged using a citation which would include:
+• the Identification of the Primary Investigator
+• the title of the survey (including country, acronym and year of implementation)
+• the survey reference number
+• the source and date of download.
+
+
+DISCLAIMER
+The user of the data acknowledges that the original collector of the data, the authorized distributor of the data, and the relevant funding agency bear no responsibility for use of the data or for interpretations or inferences based upon such uses.
+
+
+(Text copied from the World Bank catalog DDI export, https://microdata.worldbank.org/metadata/export/8520/json, 2026-11-04.)
+

@@ -2630,3 +2630,12 @@ l'agriculture" (=AS03Q01= "Type d'équipement"; 45,570 rows).  =ecvma2_quest_agr
 2A-2C and 3 and no dry-season production; =ecvma2_as2dp2.dta= asks only contre-saison costs
 (=AS02DQ03=, =AS02DQ05=).  So no 2014-15 dry-season harvest exists in the held files or the held
 instruments, and =crop_production= 2014-15 is not missing one.
+* 2026-11-04 -- 2021-22 documents held; recall read from the instrument (GH #1084, #1483, #650)
+
+=2021-22/Documentation/= held only =SOURCE.org=.  It now holds both BIDs and both
+household questionnaires from WB 6276, and =LICENSE.org=.  The food recall is
+now questionnaire grade: =ner_ehcvm2_qnr_men_excel_vague1.pdf= PDF p. 37, Section
+7B, "Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours
+des 7 derniers jours?".  The BID's price component is a separate sample of markets
+(section 3.3), and the community files stop at =s04_co=.  No community questionnaire
+is listed on WB 6276, IHSN 12263 or INS Niger ANADO 173/191.

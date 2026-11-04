@@ -1,0 +1,5 @@
+outs:
+- md5: 8f83ea35d0002c8c15d39422cf1b24a5
+  size: 38441
+  hash: md5
+  path: com_ca.dta

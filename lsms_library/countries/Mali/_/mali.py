@@ -286,9 +286,10 @@ def plot_features_for_wave(t, source, colmap):
 #
 # Grain: one row per (t, i, plot, crop), where
 #   - i     = Mali composite household id (grappe, menage/exploitation),
-#   - plot  = "{field_no}_{parcel_no}" for seasonal crops; NaN for perennial
-#             trees (the perennial roster s3b/s11f is not on the field grid);
-#             'Farm-level' for a 2021-22 sale with no single harvest row,
+#   - plot  = "{field_no}_{parcel_no}" for seasonal crops; 'Farm-level' for
+#             perennial trees (the perennial roster s3b/s11f is not on the
+#             field grid, GH #1476) and for a 2021-22 sale with no single
+#             harvest row,
 #   - crop  = harmonize_food Preferred Label (food crops REUSE the consumed-
 #             food label so crop_production.j joins food_acquired.j).
 #
@@ -636,7 +637,7 @@ def _tree_roster_inputs(wave, columns):
     names as columns, as recorded, indexed by the served ``t``, ``i``
     (pre-``id_walk``; ``Country.derivation_inputs`` re-keys it) and ``crop``
     (the served harmonize_food label) -- so it joins the served perennial
-    rows, whose ``plot_id`` is NA.
+    rows, whose ``plot_id`` is ``'Farm-level'``.
     """
     from pathlib import Path
     from lsms_library.paths import countries_root
@@ -742,14 +743,15 @@ def crop_production_finalize(df):
     df['intercropped'] = df['intercropped'].astype('boolean')
     df['perennial'] = df['perennial'].astype('boolean')
 
-    # plot may be NA (perennial); fill index with <NA> string so the level is
-    # not silently dropped, but keep it as a real pandas NA-able string.
+    # The wave scripts serve no null plot since GH #1476 (a tree row is
+    # 'Farm-level'); dropna=False below stays, so a null that does arrive is
+    # kept and reported by Site I rather than deleted.
     df['plot_id'] = df['plot_id'].astype('string')
 
     keys = ['t', 'i', 'plot_id', 'crop']
     # Aggregate any exact (t,i,plot,crop) duplicates: sum reported amounts,
-    # first non-null for flags/dates/unit.  Use dropna=False so perennial
-    # rows with plot=<NA> are not discarded by groupby.  min_count=1 on the
+    # first non-null for flags/dates/unit.  dropna=False so a row with a
+    # null key is not discarded by groupby.  min_count=1 on the
     # sums keeps an all-NA group as NA (not a spurious 0) — important for the
     # 2017-18 multi-plot crops whose sold qty/value is deliberately NaN.
     g = df.groupby(keys, dropna=False, as_index=True)
@@ -822,7 +824,10 @@ def crop_production_finalize(df):
 
 #: The canonical structural sentinel for `plot_id`: the record has no plot by
 #: design (lsms_library/data_info.yml, top of file).  It is not `unknown_plot`,
-#: which says a plot exists and its identifier is missing.
+#: which says a plot exists and its identifier is missing.  Two kinds of Mali
+#: row carry it: an EAC-I tree row, from a roster with no field grid, which has
+#: a harvest Quantity (GH #1476); and a 2021-22 household-crop sale, which has
+#: none.
 FARM_LEVEL = 'Farm-level'
 
 #: Registry key (Mali/_/derivations.yml) on a 2021-22 row that holds a sale which

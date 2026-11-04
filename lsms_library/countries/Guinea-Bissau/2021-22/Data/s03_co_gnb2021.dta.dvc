@@ -1,0 +1,5 @@
+outs:
+- md5: a0a93740b1b60b080f646e4d052f8fe2
+  size: 123897
+  hash: md5
+  path: s03_co_gnb2021.dta

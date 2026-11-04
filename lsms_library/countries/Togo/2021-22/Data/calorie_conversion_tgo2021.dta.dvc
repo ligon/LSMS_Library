@@ -1,0 +1,5 @@
+outs:
+- md5: 5ebaa09e41907f30232e1f6230c4d4d0
+  size: 11618
+  hash: md5
+  path: calorie_conversion_tgo2021.dta

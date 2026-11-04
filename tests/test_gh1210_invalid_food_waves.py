@@ -30,6 +30,12 @@ def _physical_tree(root):
     return rows
 
 
+def _food_waves(c):
+    """The waves declaring the table.  A wave can be registered ahead of its
+    tables (Malawi 2024-25, GH #1275); those have nothing to build."""
+    return [w for w in c.waves if 'food_acquired' in c[w].data_scheme]
+
+
 @pytest.fixture
 def native_food(tmp_path, monkeypatch):
     root = tmp_path / 'data'
@@ -144,7 +150,7 @@ def test_valid_warm_selections_keep_values_and_physical_state(native_food, selec
         expected = full[full.index.get_level_values('t') == waves[2]]
     pd.testing.assert_frame_equal(result, expected, check_exact=True)
     assert _physical_tree(root) == before
-    assert state['built'] == waves
+    assert state['built'] == _food_waves(c)
 
 
 @pytest.mark.parametrize('country_cache', ['absent', 'stale'])
@@ -161,14 +167,14 @@ def test_valid_rebuild_still_evicts_hashless_waves(native_food, monkeypatch, cou
         monkeypatch.setattr(C.Country, '_table_cache_hash',
                             lambda self, table, waves: compute(self, table, waves) + '-changed')
     result = c.food_acquired()
-    assert state['built'] == c.waves
+    assert state['built'] == _food_waves(c)
     assert (result['Quantity'] == 7.0).all()
     assert (result['Quantity_kg'] == 7.0).all()
 
 
 def test_valid_subset_coverage_grows_then_serves_without_writes(native_food):
     c, root, state = native_food
-    a, b = c.waves[2], c.waves[-1]
+    a, b = c.waves[2], _food_waves(c)[-1]
     c.food_acquired(waves=[a])
     country_path = root / 'Malawi/var/food_acquired.parquet'
     assert read_parquet_cache_waves(country_path) == [a]

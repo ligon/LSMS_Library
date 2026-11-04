@@ -1,0 +1,5 @@
+outs:
+- md5: 1dc447512a0ec8607f6bf13541b73058
+  size: 2435336
+  hash: md5
+  path: com_ci.dta

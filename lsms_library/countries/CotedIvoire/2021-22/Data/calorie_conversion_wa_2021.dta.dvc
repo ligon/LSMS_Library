@@ -1,0 +1,5 @@
+outs:
+- md5: c1382e931a969ffc391dbc105026cb04
+  size: 13052
+  hash: md5
+  path: calorie_conversion_wa_2021.dta

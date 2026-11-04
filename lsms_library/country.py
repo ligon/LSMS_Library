@@ -1800,12 +1800,10 @@ class Wave:
 
         Differs from the country gate on purpose: a hashless parquet grades
         ``legacy`` and is trusted once and STAMPED here (GH #809 changed the
-        country tier only).  Differs as FOUND, not by ruling: ``LSMS_NO_CACHE``
-        is read by truthiness here (``"0"`` bypasses) but as ``{1,true,yes}``
-        at the country gate -- pinned in tests/test_gh1040_wave_read_gates.py
-        and left for a decision, not harmonised by #1040.
+        country tier only).  ``LSMS_NO_CACHE`` reads the same at both gates
+        (:func:`_no_cache`, GH #1455): ``"0"`` does not bypass this one.
         """
-        if cache_path.exists() and not os.environ.get('LSMS_NO_CACHE'):
+        if cache_path.exists() and not _no_cache():
             # v0.8.0 content-hash staleness for the YAML-path L2-wave
             # parquet (same classification as L2-country; see
             # Country._read_l2_country_cache).  Stale -> miss: the caller
@@ -2431,38 +2429,21 @@ class Wave:
             df = df.rename(columns = {'m':'Region'})
         return (df, origin) if _with_origin else df
     
-    # Food acquired method is explicitly defined because potentially categorical mapping is required after calling grab_data.
-    # GH #1078: this content-producing compatibility route must invalidate
-    # already-corrupt current-hash country caches as well as prevent new ones.
+    # GH #1455 (ruling @ligon, 2026-11-04): no reducer here, on any route.  A
+    # frame built in memory -- `LSMS_NO_CACHE` set to any non-empty string, or an
+    # L2-wave write that failed -- used to go through a `groupby(index).agg` that lost every column it did
+    # not name (`Derivation`), turned NaN into 0 (`sum`, min_count=0) and deleted
+    # NaN keys, and the country tier then wrote that frame stamped with the
+    # current hash, so it graded `fresh` and every later read served it.  A
+    # duplicate key is `_normalize_dataframe_index`'s to audit, as it is for a
+    # materialized frame.  Kept as a tagged method so that removing the reducer
+    # moves the `food_acquired` fingerprint, which is what heals a degraded parquet
+    # already on disk (GH #1078).
     @build_transform(tables=['food_acquired'])
     def food_acquired(self, *, _with_origin: bool = False) -> pd.DataFrame | tuple[pd.DataFrame, str]:
-        df, origin = self.grab_data('food_acquired', _with_origin=True)
-        if df.empty:
-            return (df, origin) if _with_origin else df
-        # Use the actual producer, not a later existence check: a concurrent
-        # normal rebuild may already have evicted the script cache we read.
-        # Successful YAML materialization also supplied a completed frame;
-        # failed/disabled writes remain memory producers (ledger section 4).
-        if origin in ('parquet', 'materialized'):
-            return (df, origin) if _with_origin else df
-        #Customed
-        agg_functions = {'Expenditure': 'sum', 'Quantity': 'sum', 'Produced': 'sum', 'Price': 'first'}
-        index = df.index.names
-        variable = df.columns
-        df = df.reset_index()
-        agg_func = {key: value for key, value in agg_functions.items() if key in variable}
-        #replace not float value in Quantity, Expenditure, Produced with np.nan
-        for col in ['Quantity', 'Expenditure', 'Produced']:
-            if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce')
-        df = df.groupby(index).agg(agg_func)
-        return (df, origin) if _with_origin else df
+        return self.grab_data('food_acquired', _with_origin=_with_origin)
 
 
-    
-
-    
-    
 class Country:
     """Primary interface to a single country's LSMS survey data.
 
@@ -4768,7 +4749,7 @@ class Country:
         # `_join_v_from_sample` augmentation still apply.
         if not cache_exists:
             return None, None, "no parquet"
-        if os.environ.get("LSMS_NO_CACHE", "").lower() in {"1", "true", "yes"}:
+        if _no_cache():
             return None, None, "LSMS_NO_CACHE"
 
         cache_expected_hash = self._table_cache_hash(method_name, waves)
@@ -7969,6 +7950,19 @@ class GrainCollapseWarning(RuntimeWarning):
     Its own class (rather than a bare ``RuntimeWarning``) so callers and CI can
     target it precisely: ``warnings.simplefilter("error", GrainCollapseWarning)``.
     """
+
+
+def _no_cache() -> bool:
+    """Whether ``LSMS_NO_CACHE`` is on: ``1``, ``true`` or ``yes``, in any case.
+
+    How both L2 read gates read this flag (GH #1455, @ligon 2026-11-04), spelled
+    as :func:`_grain_strict` spells its lever.  ``0``, ``false``, ``no``, an empty
+    string and anything else leave it off.  The L2-wave WRITE gate in
+    :meth:`Wave.grab_data` does not read it through here yet: it still tests the
+    string's truthiness, because any edit to ``grab_data`` moves every table's
+    fingerprint (GH #1501).  Route every new read through this.
+    """
+    return os.environ.get("LSMS_NO_CACHE", "").lower() in {"1", "true", "yes"}
 
 
 def _grain_strict() -> bool:

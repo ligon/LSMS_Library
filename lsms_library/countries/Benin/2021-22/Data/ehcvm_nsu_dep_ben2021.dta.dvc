@@ -1,0 +1,5 @@
+outs:
+- md5: 5c98a29f306cbc2f75f09f3b3f40427d
+  size: 80913
+  hash: md5
+  path: ehcvm_nsu_dep_ben2021.dta

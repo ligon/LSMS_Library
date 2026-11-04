@@ -16,9 +16,9 @@ in round ``t0``, the round before it.
 * (b) Interviewed, as each round records it (below).  Both ends must qualify.
 * (c) Each round's links come from that round's own cover.
 
-This changes the crosswalk only.  Who is served in any table is GH #1444's
-question: a household with a roster and no recorded interview (320201, 30082
-in 2016Q1) stays served and is simply not linked.
+This changes the crosswalk only.  Interview status gates no table's rows (GH
+#1444, ruled 2026-11-04): a household with a roster and no recorded interview
+(320201, 30082 in 2016Q1) stays served and is simply not linked.
 
 The chain
 ---------

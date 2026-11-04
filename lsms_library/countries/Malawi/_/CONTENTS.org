@@ -452,7 +452,9 @@ this survey and not of the wiring:
   =nplots = ...['plot_id'].nunique()= is 0 for a homestead tree with no
   numbered garden/plot (the 40 2016-17 Module P rows above), so
   =pairs[_nplots == 1]= drops its sale silently.  Measured: 1 sale (2016-17
-  Mango, 50 kg Bag, 3,600 MWK).  Not fixed here.
+  Mango, 50 kg Bag, 3,600 MWK).  Not fixed here.  (Superseded, GH #1476: these
+  rows are =unknown_plot= now, "homestead" is not established, and the sale
+  stays unattached; see the section dated 2026-11-04.)
 
 * crop_production: the sale-basis LADDER -- registered derivations (2026-09-24)
 
@@ -680,7 +682,8 @@ instrument gives no meaning for, like Tobacco.
   tally), i.e. the fine =(crop, u)= rung does nearly all the work.
 - The NULL-plot perennial sale the probe found (1 sale, 2016-17 Mango,
   3,600 MWK, excluded by =nunique() == 0=) is NOT fixed by the ladder; it
-  is still counted in neither tally.
+  is still counted in neither tally.  (GH #1476 changes the reason, not the
+  outcome; see the section dated 2026-11-04.)
 
 * crop_production: the IHS4/IHS5 perennial crop-code RECODE (GH #869, fixed 2026-09-13)
 
@@ -1109,7 +1112,8 @@ that entry, and this change moves only 2019-20, by +2.
   the old =groupby(level=...)= was deleting on a NaN key, =dropna=True= being
   the default.  They are the whole of the +90.0 Quantity move.  They are now
   served, with a NULL =plot= in the index, exactly as the ~8.5k rows with a
-  NULL =u= always have been.
+  NULL =u= always have been.  (Superseded, GH #1476: 41 rows now, =unknown_plot=,
+  and "homestead" is not established; see the section dated 2026-11-04.)
 
 ** The two shipped files: raw grain, and three things that are not what they look like
 
@@ -4984,6 +4988,88 @@ Cost: =malawi.py= is in every Malawi table's hash, so one full Malawi re-warm
 of 268; 0 of 28 =build_transforms_fingerprint=).  The next coverage regrade moves
 the four row counts in =.coder/coverage/latest.csv=.
 
+* 2026-11-04 -- 2024-25 held and registered, not wired (GH #1275)
+
+Acquired whole by =add_wave(subdir=)=: IHS6 (8507, =MWI_2024-2025_IHS-VI_v01_M=)
+in =Data/Cross_Sectional/=, 81 files, 2.47 GB; IHPS 2024 (8520,
+=MWI_2024_IHPS-V_v01_M=) in =Data/Panel/=, 82 files, 484 MB.  No table of this
+wave is served: =_/data_info.yml= declares nothing.  Each new table is its own
+piece of work.  Idiosyncrasies the wiring has to carry:
+
+- *The two entries overlap, unlike 2016-17 and 2019-20.*  8520 is two samples
+  of 51 EAs each.  The refreshment EAs are a subsample of IHS6's second-quarter
+  EAs (=ihps_bid.pdf= section 3.1.2, PDF p. 17), and their households are the
+  same interviews.  Measured on the two cover files: 51 of 8520's 102 EAs are
+  IHS6 EAs; all 815 refreshment households have a =case_id= in =hh_mod_a_filt=,
+  with the same EA, interview date and household size, all in quarter 2.
+  Stacking the two covers as 2019-20 does would count 815 households twice.
+- *The panel half links on 51 EAs.*  1,948 retained households link back (BID
+  section 8.2); =y4_hhid= is blank and =HHID= null on the other 815.  The other
+  51 EAs of the 2019 panel were retired.
+- *Weights.*  In =hh_mod_a_filt_24=, =hh_wgt= and =panelweight_2019= are null on
+  the 815.  =wt_cross= is populated on all 2,763 and =wt_long= on the 1,948.
+  Which serves as =weight= and =panel_weight= is not decided here.
+- *New sample parts.*  IHS6 includes 386 households in Dzaleka camp, from a
+  separate frame (=camp= in the cover; report Box 1.1).  Likoma is a stand-alone
+  domain in IHS6 and still outside the IHPS tracking universe.
+- *No geovariables.*  Neither entry lists one (0 of 163 files), so
+  =cluster_features= has no coordinates for this wave.  Compare GH #1260.
+- *Documents.*  8507 lists no BID although its DDI cites one.  8520's
+  =ihps_bid.pdf= is catalogued as "Fifth Integrated Household Survey 2024"; its
+  text says IHPS5.
+
+Registration moves every Malawi =Country._table_cache_hash=, because the wave
+set is folded into the hash, and no existing wave's =Wave._input_hash=.  When
+=food_acquired= is wired for 2024-25, pooled kg factors change for every Malawi
+wave at read time (GH #1487).
+* 2026-11-04 -- a blank harvest plot key is =unknown_plot= (GH #1476)
+
+The note "Existing missing plots: current 41 versus historical 40" left this open; this
+closes it.  Modules G and P are asked per plot, so a blank key is a plot-grain answer with no
+identifier: the canonical epistemic sentinel, through =_plot_ids=, as =plot_inputs= and
+=plot_labor= already do.  The null was deleted by =harvest_kg='s =groupby=.
+
+Module P 2016-17 is the only place it occurs: 130 rows have a blank =plotid= (81
+cross-section, 49 panel), 41 of them name a crop, and those are the rows served.
+
+*Whether these plots exist is not established.*  The 41 rows are 25 households (10
+cross-section, 15 panel).  All 25 answered =ag_o01 = 2= in O2, no tree crops, and none has an O2
+row with a plot id.  Yet their Module P rows name crops, and every one with a plantation answer
+(39 of 41, =ag_p01=) says scattered.  12 name a garden with a blank plot; 5 have a tree-plot code
+typed in the crops text (=ag_p0_crops=).  Why they carry these rows is unknown.
+
+Cold builds, development =4ea95a0aa= against this change:
+
+| 2016-17                          |    before |     after |
+|----------------------------------+-----------+-----------|
+| =plot_id= null / =unknown_plot=  |   41 / 0  |   0 / 41  |
+| with a =Quantity= / convertible  |   33 / 17 |   33 / 17 |
+| =harvest_kg= rows                |    18,054 |    18,066 |
+| =harvest_kg= total, kg           | 8,168,581 | 8,171,321 |
+
+Those =harvest_kg= rows were measured before GH #1460 kept its crop axis; with it, all waves,
+92,745 -> 92,762 rows, and the kg gained is the same 2,740.
+
+Every other column of every row is digest-equal in all four waves; =crop_diversity=,
+=gross_crop_revenue=, =yield_kg(on='plot')= and the sale-basis ladder are unchanged.
+
+*A sale does not reach a sentinel row* (review of GH #1476, 2026-11-04).  =_attach_sales= counted plots with
+=nunique()=, which skipped the null.  It now counts a crop's sentinel rows as one more place the crop
+grew (=nunique(dropna=False)=), so a known plot beside them is not a single-plot crop, and its pair
+filter keeps a sale off a crop whose only rows are the sentinel.  Replayed on all four waves against
+development =4646a0fd2=: all 113,585 decisions and the tallies are byte-equal, because none of the 41
+rows holds a sale and no sentinel row shares a household-crop with a known plot.
+
+=harvest_kg= would pool a
+household's =unknown_plot= rows of one crop, as it does Uganda's (GH #1460), but it pools 0 here:
+the 41 rows are 41 distinct household-crops.
+
+This supersedes three older passages, which stay as written above: the "NULL-plot perennial
+sale" note in the ladder's findings (its =nunique() == 0= reason), its echo under the ladder's
+open items, and "40 of those 162".  The first and third call these rows "homestead trees";
+"homestead" is on no page of the held 2013-14 or 2019-20 questionnaires, and the 2016-17
+agriculture questionnaire is not held.  The 3,600 MWK sale they name stays unattached.
+
 * 2026-11-04 -- the IHS4 agriculture questionnaire is held; =ag_r01= asks "raised or owned"
 
 =2016-17/Documentation/fourth_integrated_household_survey_2016_2017_agriculture_questionnaire.pdf=
@@ -4992,3 +5078,8 @@ have you or any member of your household raised or owned any [LIVESTOCK]?".  The
 prints the same words on the same page.  The Stata label of =ag_r01= is "Did you own
 [LIVESTOCK]?" in both waves and both 2016-17 files, so the label is a shortening, not a
 different question.  No table changes.
+
+This answers the section above (GH #1476), which says this questionnaire is not held.  It
+is now, and "homestead" is not in the extracted text of its 98 pages either, so the word
+is on no page of the three held forms.  Why those 41 rows carry Module P answers is still
+unknown.

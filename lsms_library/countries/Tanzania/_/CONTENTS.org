@@ -2923,7 +2923,33 @@ Improved-OR and the legacy-group conflict/collision refusals no longer arise,
 since each native record is its own =input_obs= row; see "Native seed
 records: =input_obs=".)
 
+* 2026-11-04 -- the W1-W3 geovariables, measured and not yet placed (GH #449)
+
+Each round's Stata zip was downloaded to private storage and only its geovariables
+members read.  Nothing was placed in the tree: where they go is a ruling (below).  The
+#449 table above under-counts; each zip ships more than its file roster implies.
+
+| entry | zip md5 (prefix) | member                              | rows  | key       | keys in =upd4_hh_a.r_hhid= (same round) |
+|-------+------------------+-------------------------------------+-------+-----------+----------------------------------------|
+|    76 | =94a30fe9=       | =HH.Geovariables_Y1=                | 2,990 | =hhid=    | 2,990 of 2,990                         |
+|    76 |                  | =Plot.Geovariables_Y1_revised2=     |   862 | =hhid=, =plotnum= | 418 of 418                     |
+|  1050 | =a3e68f9a=       | =HH.Geovariables_Y2=                | 3,917 | =y2_hhid= | 3,917 of 3,917                         |
+|  1050 |                  | =Plot.Geovariables_Y2=              | 4,724 | =y2_hhid=, =plotnum= | 2,309 of 2,309              |
+|  1050 |                  | =TZY2.HH.Geovariables=              | 3,924 | =y2_hhid= | 3,924 of 3,924                         |
+|  1050 |                  | =TZY2.PlotGeovaribales=             | 4,724 | =y2_hhid=, =plotnum= | 2,309 of 2,309              |
+|  2252 | =a5b3d117=       | =HouseholdGeovars_Y3=               | 4,988 | =y3_hhid= | 4,986 of 4,988                         |
+|  2252 |                  | =PlotGeovars_Y3=                    | 5,453 | =y3_hhid=, =plotnum= | 2,689 of 2,690              |
+
+So the household files link to the panel on =r_hhid= almost whole.  76's zip is named
+=TZA_2008_NPS1_v02_M_STATA_English_labels.zip= under the idno =..._v03_M=.
+=add_wave(subdir=)= is refused on this wave, because 42 UPD sidecars sit loose in
+=Data/=.  W1 and W2 name the coordinates =lat_modified= / =lon_modified=, W3
+=lat_dd_mod= / =lon_dd_mod=.
+
 * 2026-11-04 -- the W1-W3 geovariables are held, not wired (GH #449)
+
+This supersedes the section above ("measured and not yet placed"): the members are placed,
+and its table stands as the measurement.
 
 =2008-15/Data/NPS-R1/=, =NPS-R2/= and =NPS-R3/= hold the geovariables members of entries 76,
 1050 and 2252, taken from each entry's own Stata zip and published with
@@ -2932,7 +2958,7 @@ because 42 UPD sidecars sit loose in =Data/=.  =#+CATALOG_COVERS:= is unchanged:
 three rounds stay covered, not held, apart from these 8 files.  There are no
 =#+CATALOG_SUBDIR:= lines, so re-acquiring 3814 is not refused.
 
-The zips ship more than the table above lists.  =Plot.Geovariables_Y1_revised2=,
+The zips ship more than the #449 table lists, as the section above measures.  =Plot.Geovariables_Y1_revised2=,
 =TZY2.HH.Geovariables= and =TZY2.PlotGeovaribales= are in the zips and not in the catalog's
 file rosters.  Household files link to =upd4_hh_a.r_hhid= in the same round: =hhid= 2,990
 of 2,990; =y2_hhid= 3,917 of 3,917 (=TZY2.HH= 3,924 of 3,924); =y3_hhid= 4,986 of 4,988.

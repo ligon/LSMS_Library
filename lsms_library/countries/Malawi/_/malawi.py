@@ -1370,7 +1370,11 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     unit_map = _malawi_code_map('harmonize_crop_unit')
 
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
-    plot = df[plotkey].apply(format_id).astype('string')
+    # A blank key is `unknown_plot`, never NaN (GH #1476): these modules are
+    # asked per plot, so this is a plot-grain answer with no identifier, and a
+    # NaN on a declared index level is deleted by the next groupby.  The sentinel
+    # does not establish that a plot exists: see CONTENTS.org.
+    plot = _plot_ids(df[plotkey].apply(format_id))
     # Native instrument code before perennial offset/recode; canonical axis
     # and G/P qualification follow the GH #637 ruling (ledger 637a §2-3).
     raw_code = df[cropcode].apply(format_id).astype('string')
@@ -1885,15 +1889,22 @@ def _attach_sales(t, harv, sale):
         {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
     sale['_srow'] = range(len(sale))
 
-    nplots = (harv.groupby(['i', '_crop_code'])['plot_id']
-              .nunique().rename('_nplots').reset_index())
+    # A sale does not reach an `unknown_plot` row (GH #1476).  Its rows
+    # count here as one more place the crop grew, so a known plot beside them is
+    # not a single-plot crop; the filter below keeps a sale off a crop whose only
+    # rows are the sentinel.
+    nplots = (harv.assign(_known_plot=harv['plot_id'].astype('string').mask(_is_unknown_plot(harv['plot_id'])))
+              .groupby(['i', '_crop_code'])['_known_plot']
+              .nunique(dropna=False).rename('_nplots').reset_index())
     harv = harv.merge(nplots, on=['i', '_crop_code'], how='left')
     n_harv = len(harv)
     harv['_hrow'] = range(n_harv)
-    pairs = harv[['_hrow', 'i', '_crop_code', 'crop', 'u', 'condition', '_nplots']] \
+    pairs = harv[['_hrow', 'i', '_crop_code', 'crop', 'u', 'condition', '_nplots', 'plot_id']] \
         .merge(sale, on=['i', '_crop_code', 'u'], how='inner')
-    # Only single-plot crops are ever candidates (unchanged since GAP 1).
-    pairs = pairs[pairs['_nplots'] == 1].copy()
+    # Only single-plot crops are ever candidates (unchanged since GAP 1), and
+    # neither a sentinel row nor a null key is a plot.
+    pairs = pairs[(pairs['_nplots'] == 1) & pairs['plot_id'].notna()
+                  & ~_is_unknown_plot(pairs['plot_id'])].drop(columns='plot_id').copy()
     pairs['condition'] = pairs['condition'].astype(object)
     pairs['condition_sold'] = pairs['condition_sold'].astype(object)
 

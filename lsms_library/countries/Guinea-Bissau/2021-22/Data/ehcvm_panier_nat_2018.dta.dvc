@@ -1,0 +1,5 @@
+outs:
+- md5: be2715013029ee6132760842e1bdb299
+  size: 14154
+  hash: md5
+  path: ehcvm_panier_nat_2018.dta
