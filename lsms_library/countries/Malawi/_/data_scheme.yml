@@ -341,8 +341,9 @@ Data Scheme:
     # (ag_mod_r1) -- the SAME roster the World Bank cleaning code reads then
     # collapses to a single HH "engaged-in-livestock" binary (MWI_IHPS{1-4}
     # .do: recode ag_r00 -> collapse (max) livestock by hhid).  We keep the
-    # PRE-collapse rows, which are strictly richer: their binary =
-    # livestock().groupby(['t','i']).size() > 0.  Reported item columns:
+    # PRE-collapse rows, which are strictly richer; their binary is only
+    # approximately livestock().groupby(['t','i']).size() > 0 (see
+    # CONTENTS.org).  Reported item columns:
     #   HeadCount    (ag_r02, head owned now),
     #   HeadAcquired (ag_r10, head bought to raise in last 12 months),
     #   HeadSold     (ag_r16, head sold alive in last 12 months),
