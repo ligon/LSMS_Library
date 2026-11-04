@@ -149,7 +149,10 @@ def food_acquired(df):
     This wave serves 0 NaN-``u`` rows today (the 12 #842 counted are in
     2021-22); the fill is here so the two EHCVM waves cannot drift apart.
     """
-    df = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+    # GH #1224: `decode` -- the served base unit of a sized row is read
+    # through the same repair the sweep below applies to every other row.
+    df = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION,
+                              decode=_decode_mojibake)
     df = _decode_mojibake_in_df(df)
     # Fill a missing unit with the `Unknown` sentinel, AFTER the mojibake
     # sweep so the two never fight over the same value.

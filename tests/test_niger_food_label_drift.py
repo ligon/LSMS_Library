@@ -58,12 +58,14 @@ RETIRED = ("Choux", "Sucre poudre", "Sucre morceaux", "Aubergine,")
 #: Served rows per (label, wave), measured on the 2026-09-24 cold rebuild.
 #: 2021-22 sugar is 5,537, not 5,462 + 80 = 5,542: five households bought
 #: both forms in the same unit, and the fold merges those rows at the
-#: (t, v, i, j, u, s) grain (an additive, lossless sum).
+#: (t, v, i, j, u, s) grain (an additive, lossless sum).  5,537 -> 5,538 in
+#: GH #1224: one of the five bought the two forms in different unit SIZES,
+#: which `u` now keeps apart, so four merge.  Quantity is unchanged.
 SERVED = {
     ("Chou", "2018-19"): 628,
     ("Chou", "2021-22"): 973,
     ("Sucre (poudre ou morceaux)", "2018-19"): 4883,
-    ("Sucre (poudre ou morceaux)", "2021-22"): 5537,
+    ("Sucre (poudre ou morceaux)", "2021-22"): 5538,
     ("Aubergine, Courge/Courgette", "2018-19"): 1156,
     ("Aubergine, Courge/Courgette", "2021-22"): 0,
     ("Aubergine", "2018-19"): 0,
@@ -184,7 +186,8 @@ class TestServedLabels:
         rows = food_acquired[j == "166"]
         assert len(rows) == CODE_166_ROWS
         u = rows.index.get_level_values("u").astype(str)
-        assert int((u == "Sachet").sum()) == CODE_166_SACHET_ROWS
+        # Re-pinned GH #1224: these sachets are sized, and served `Sachet (Moyen)`.
+        assert int(u.str.fullmatch(r"Sachet( \(.+\))?").sum()) == CODE_166_SACHET_ROWS
 
     def test_crop_rows_follow_the_eggplant_label(self, country):
         crop = country.crop_production().index.get_level_values("crop").astype(str)

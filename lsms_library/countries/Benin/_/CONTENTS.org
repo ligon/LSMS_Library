@@ -669,6 +669,7 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - The served =u= index still carries only =s07bq03b=, not the unit SIZE
   =s07bq03c=, so two rows differing only in container size collapse onto one
   =u=.  The derivation does distinguish them; the index does not.
+- [2026-11-03, GH #1224: no longer true.  =u= is now =<unit> (<Size>)= where =s07bq03c= names a size, base mapped through this country's =u= table first.  Cold 2018-19: rows 187,930 -> 188,349 (419 keys of the residual buckets, e.g. =Autres légumes en feuilles= / =Tas=, stop summing across sizes), =u= 79 -> 216, (j, u) 644 -> 1,342.  This instrument's sizes run past Petit/Moyen/Grand: =Sans brassée=, =Avec 1 brassée=, =Avec 2 brassées=, =A 2/3/5 doigts=, =Autre taille=, =Demi=, =Quart=.  8 =Litre= / =Quart= rows keep the bare =Litre= so the kg ladder still reads them; =lsms_library/ehcvm.py=.]
 - The price still comes from a purchase up to 30 days old.  That is what the
   instrument asked; the assumption is recorded rather than hidden.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
