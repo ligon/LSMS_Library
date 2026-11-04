@@ -1,0 +1,18 @@
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/8507
+
+#+CATALOG_ID: 8507, 8520
+#+CATALOG_SUBDIR: 8507 Cross_Sectional
+#+CATALOG_SUBDIR: 8520 Panel
+#+CATALOG_HELD: 8520 MWI_2024_IHPS-V_v01_M
+#+CATALOG_IDNO: MWI_2024-2025_IHS-VI_v01_M
+#+CATALOG_TITLE: Sixth Integrated Household Survey 2024-2025
+#+CATALOG_YEARS: 2024-2025
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/8507
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: add-wave
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-11-04
+#+PROVENANCE_NOTE: TWO catalog entries live in this one directory (GH #600, #1275). Data/Cross_Sectional/ is the Sixth Integrated Household Survey, id 8507 (all 81 of the 81 data files in 8507's WB datafile list). Data/Panel/ is the Integrated Household Panel Survey 2024, id 8520 (all 82 of 82). The other CATALOG_* keys above describe the primary entry (8507). Both were acquired whole on 2026-11-04 by add_wave(subdir=), and every file was pushed. The entries are NOT disjoint: the 815 refreshment households of 8520 are also in 8507 (see Malawi/_/CONTENTS.org). Neither entry lists a geovariables file. 8507 lists no Basic Information Document although its DDI cites one; ihps_bid.pdf is 8520's.

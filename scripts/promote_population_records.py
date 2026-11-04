@@ -76,17 +76,17 @@ EXPECTED_TAGS = {
     "subnational-area": 11,
     "not-stated": 7,
     "panel-inherited": 4,
-    "mixed-national+panel": 3,
+    "mixed-national+panel": 4,
     "rural-and-small-town": 1,
     "specialized": 1,
     "agricultural-households": 1,
 }
-EXPECTED_SOURCE_TYPES = {"local-documentation": 66, "wb-catalog": 41, "not-found": 7}
+EXPECTED_SOURCE_TYPES = {"local-documentation": 67, "wb-catalog": 41, "not-found": 7}
 # 2026-09-06: GhanaLSS 2016-17 moved medium -> high when the GLSS7 Main
 # Report was acquired (84/25 -> 85/24).  These constants MIRROR the tables
 # section 2 of the source document publishes about itself -- move both, or
 # the guard is checking the document against a stale copy of itself.
-EXPECTED_CONFIDENCE = {"high": 88, "medium": 24, "low": 2}
+EXPECTED_CONFIDENCE = {"high": 89, "medium": 24, "low": 2}
 
 FIELD_KEYS = {
     "Survey": "survey",
@@ -306,10 +306,10 @@ def build(countries_dir: Path) -> tuple[dict[str, list[dict]], list[str]]:
     table = parse_summary_table(text)
     entries = parse_entries(text)
 
-    if len(entries) != 114:
-        raise SystemExit(f"expected 114 entries in section 3, parsed {len(entries)}")
-    if len(table) != 114:
-        raise SystemExit(f"expected 114 summary rows, parsed {len(table)}")
+    if len(entries) != 115:
+        raise SystemExit(f"expected 115 entries in section 3, parsed {len(entries)}")
+    if len(table) != 115:
+        raise SystemExit(f"expected 115 summary rows, parsed {len(table)}")
 
     by_key = {(e["country"], e["wave"]): e for e in entries}
     for row in table:

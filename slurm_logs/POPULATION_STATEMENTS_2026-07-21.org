@@ -234,6 +234,7 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 | Malawi                | 2013-14   | wb-catalog          | high       | panel-inherited          |
 | Malawi                | 2016-17   | local-documentation | high       | mixed-national+panel     |
 | Malawi                | 2019-20   | local-documentation | high       | mixed-national+panel     |
+| Malawi                | 2024-25   | local-documentation | high       | mixed-national+panel     |
 | Mali                  | 2014-15   | wb-catalog          | high       | region-excluded          |
 | Mali                  | 2017-18   | local-documentation | high       | region-excluded          |
 | Mali                  | 2018-19   | local-documentation | high       | region-excluded          |
@@ -296,23 +297,23 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 | subnational-area         |    11 |
 | not-stated               |     7 |
 | panel-inherited          |     4 |
-| mixed-national+panel     |     3 |
+| mixed-national+panel     |     4 |
 | rural-and-small-town     |     1 |
 | specialized              |     1 |
 | agricultural-households  |     1 |
-| TOTAL                    |   114 |
+| TOTAL                    |   115 |
 
 *** Source and confidence counts
 
 | source_type            | waves |
 |------------------------+-------|
-| local-documentation    |    66 |
+| local-documentation    |    67 |
 | wb-catalog             |    41 |
 | not-found              |     7 |
 
 | confidence             | waves |
 |------------------------+-------|
-| high                   |    88 |
+| high                   |    89 |
 | medium                 |    24 |
 | low                    |     2 |
 
@@ -2229,6 +2230,34 @@ Extractor's notes (editorial prose about the evidence, not survey text):
 
 #+begin_quote
 THIS WAVE ALSO MIXES TWO UNIVERSES: the library's 2019-20 config reads BOTH ../Data/Cross_Sectional/ (IHS5, 21 references) and ../Data/Panel/ (IHPS 2019, 18 references). Note that the WB catalog record for IHS5 (3818) has an EMPTY <universe> element — the universe statement comes from the local Basic Information Document, not the catalog. The IHPS 2019 catalog id (3819) is NOT recorded in this wave's SOURCE.org (which lists only 3818); it was identified by probing catalog ids adjacent to 3818 and confirmed by the catalog page title 'Malawi - Integrated Household Panel Survey 2010-2013-2016-2019 (Long-Term Panel, 102 EAs)'. The IHPS 2019 <universe> text as published by the World Bank is verbatim as quoted but is internally odd: it says '2016 and 2019 attempted to track all IHPS 2013 households ... that moved away from the 2013 dwellings between 2013 and 2016' — i.e. the 2016 wording was extended in place rather than rewritten for 2019. The local 2019 panel report describes the 2019 operation as: 'The IHPS4 (2019), attempted to track households and individuals that moved away from the dwellings they were living during IHPS 2016.' (p. 20). Panel analysis domains: 'The areas of analysis were limited to the national, urban and rural areas since the number of EAs was halved during IHPS3 (2016).' (p. 20). Sample-design detail (not the universe): IHS5 stratified two-stage, PSU = 2018 census EA (avg. ~215 households), 768 EAs / 12,288 households, 32 districts as estimation domains with Likoma combined with Nkhata Bay for stratification; nationally representative subsample enumerated each quarter to capture seasonality. PDF text extraction inserted spurious intra-word spaces; every quote above was cross-checked against a second extractor (pdfminer) and is character-for-character as printed.
+#+end_quote
+
+*** Malawi 2024-25
+
+- Survey :: Sixth Integrated Household Survey 2024-2025 (IHS6), WB catalog id 8507 (MWI_2024-2025_IHS-VI_v01_M) — PLUS Integrated Household Panel Survey 2024 (Long-Term Panel and Sample Refresh, 51 EAs each), i.e. IHPS 2024, WB catalog id 8520 (MWI_2024_IHPS-V_v01_M)
+- Source type :: local-documentation
+- Confidence (as recorded by the extractor) :: high
+- Universe tag (EDITORIAL, not a quote) :: mixed-national+panel
+- Language of the quoted source :: English
+- Source file :: lsms_library/countries/Malawi/2024-25/Documentation/ihs6_cross_section_report.pdf ; lsms_library/countries/Malawi/2024-25/Documentation/ihps_bid.pdf ; World Bank catalog DDI exports for studies 8507 and 8520 (https://microdata.worldbank.org/metadata/export/8507/json, .../8520/json, fetched 2026-11-04)
+- Locator :: [A] ihs6_cross_section_report.pdf, Box 1.1 'Sample Design', PDF p. 24 (printed p. 2); WB catalog 8507 DDI export, study_desc.study_info.universe. [B] WB catalog 8520 DDI export, study_desc.study_info.universe; ihps_bid.pdf, Chapter 1 'Introduction', PDF p. 5, and section '3.1.2 Design and selection of the refreshment sample', PDF pp. 17-18 (printed p. 13-14). Text extracted with pdfminer.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+[A] IHS6 cross-section, Main Report, Box 1.1: "The sampling frame for the IHS6 is based on the 2018 Malawi Census frame. The target universe for the IHS6 includes all households and persons living in these households within all the districts of Malawi, including the small island district of Likoma, which had also been included in IHS4 and IHS5, but not in the previous surveys. The sampling frame excludes the population living in institutions, such as school dormitories, hospitals, prisons and military barracks."  [B] IHPS 2024, WB catalog 8520 <universe>: "The 2024 round comprised two sample components. The retained component followed all individuals from the 2019 households associated with the 51 EAs that were carried forward from previous rounds, applying the same tracking rules as prior rounds, including following split-off individuals who formed or joined new households, as long as they were neither servants nor guests at the time of the IHPS 2019, were projected to be at least 12 years of age, and were known to be residing in mainland Malawi but excluding those in Likoma Island and in institutions, including prisons, police compounds, and army barracks. The refreshed component introduced households drawn from the 51 newly selected EAs that replaced the retired ones."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+[A] IHS6 -- "The sampling frame excludes the population living in institutions, such as school dormitories, hospitals, prisons and military barracks." (Main Report, Box 1.1).  An ADDITION to the frame, same box: "Unlike previous rounds of the IHS, the IHS6 also interviewed households in Dzaleka camp. A separate sampling frame and sampling approach was followed for this sample which is independent of the general population cross-sectional sample."  WB catalog 8507 <universe>, verbatim: "Members of the following households are not eligible for inclusion in the survey: • All people who live outside the selected EAs, whether in urban or rural areas. • All residents of dwellings other than private dwellings, such as prisons, hospitals and army barracks. • Members of the Malawian armed forces who reside within a military base. (If such individuals reside in private dwellings off the base, however, they should be included among the households eligible for random selection for the survey.) • Non-Malawian diplomats, diplomatic staff, and members of their households. (However, note that non-Malawian residents who are not diplomats or diplomatic staff and are resident in private dwellings are eligible for inclusion in the survey. The survey is not restricted to Malawian citizens alone.) • Non-Malawian tourists and others on vacation in Malawi."  [B] IHPS 2024, retained component -- "...residing in mainland Malawi but excluding those in Likoma Island and in institutions, including prisons, police compounds, and army barracks." (WB catalog 8520 <universe>).
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+THIS WAVE HOLDS TWO UNIVERSES, like 2016-17 and 2019-20: Data/Cross_Sectional/ (IHS6, 8507, 12,888 households, 806 EAs) and Data/Panel/ (IHPS 2024, 8520, 2,763 households, 102 EAs). Registered 2026-11-04 (GH #1275) and NOT YET WIRED: no table of this wave is served, so the tag describes the holding, not a built frame.  THE TWO ARE NOT DISJOINT, which is new in kind for Malawi.  BID section 3.1.2, verbatim: "To preserve full integration between the IHPS2024 and IHS6 surveys, the 51 EAs to be included in the IHPS2024 refreshment sample (see Table 3.1) were randomly selected as a subsample of the first-stage component of the IHS6 sample. More specifically, owing to time constraints and logistical considerations, the decision was made to use as the sampling frame the subset of IHS6 EAs allocated to the second quarter of data collection (Q2)."  Measured on the two cover files: 51 of the 102 IHPS EAs are IHS6 EAs, and the 815 refreshment households have case_id values that are all in hh_mod_a_filt (same EA, same interview date, same household size, all in quarter 2) -- the same interviews released twice, so pooling the two directories counts 815 households twice.  In the panel cover those 815 have null HHID, y4_hhid blank, and null hh_wgt and panelweight_2019; wt_cross is populated on all 2,763 households and wt_long on the 1,948 retained ones, and which of these serves as weight and panel_weight is a wiring decision not taken here.  The retained component is 1,948 households in 51 EAs (BID section 8.2: "each of the 1,948 IHPS 2024 households can be mapped to the 2010, 2013, 2016 and 2019 household counterparts").  The BID says the other half of the 102 EAs was retired, so a 2019-to-2024 panel sits on 51 EAs.  DOCUMENT GAPS: 8507's DDI cites a 'Sixth Integrated Household Survey 2024-2025, Basic Information Document' that its resource list does not carry (10 resources, no BID, checked 2026-11-04); the IHS6 statement above therefore comes from the Main Report.  8520's BID is catalogued under the slip 'Fifth Integrated Household Survey 2024, Basic Information Document'; its text says IHPS5.  Likoma: IHS6 makes it a stand-alone domain (Box 1.1), while the IHPS tracking universe still excludes it.
 #+end_quote
 
 ** Mali
