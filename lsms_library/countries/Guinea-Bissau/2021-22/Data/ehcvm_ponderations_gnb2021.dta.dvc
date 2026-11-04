@@ -1,0 +1,5 @@
+outs:
+- md5: 535939d98e3736f77b5b52e5fa71af22
+  size: 97282
+  hash: md5
+  path: ehcvm_ponderations_gnb2021.dta
