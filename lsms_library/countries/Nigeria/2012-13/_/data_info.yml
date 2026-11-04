@@ -47,13 +47,6 @@ shocks:
         HowCoped1: s15aq5b
         HowCoped2: s15aq5c
 
-panel_ids:
-    file: Post Planting Wave 2/Household/secta_plantingw2.dta
-    idxvars:
-        i: hhid
-    myvars:
-        previous_i: hhid
-
 individual_education:
     # GH #171: highest education level completed per household member.
     # Post-harvest section 2A records s2aq9 for new members aged 5+

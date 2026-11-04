@@ -595,7 +595,8 @@ file unwired; #978 subsequently adds its reference coordinates as documented
 above. Site 2 continues
 to select the most complete observed household row and report disagreements;
 it never averages geo fixes, and only the selected row's derivation survives.
-The panel crosswalk remains its committed source (#1264), unchanged here.
+The panel crosswalk remained its committed source, unchanged here (rebuilt by
+#1264, below).
 
 *** The W3 household on the geovariables file but on neither W3 cover (GH #1261, 2026-11-03)
 
@@ -637,14 +638,143 @@ admission is a decision, not taken here.
 
 *=HHTrack= is read by no table.*  It is the panel's per-visit disposition
 record (=hhstatus_w{1,2,3}v{1,2}=: 1 interviewed, 2 refused, 3 not found,
-4 dead, 5 tracked and interviewed, 6 moved away not tracked, 7 crisis area;
-W2's CSV also carries an unlabelled code 91), with =tracking_*=, =moved_*=
-and per-visit weights.  It explains the GH #1264 roster-less crosswalk ids:
+4 dead, 5 tracked and interviewed, 6 moved away not tracked, 7 crisis area,
+91 not interviewed for unknown reason -- unlabelled in W2's CSV, labelled in
+W3's =.dta=), with =tracking_*=, =moved_*= and per-visit weights.  Both files
+carry the W1 visits too, and agree on every W1 and W2 status cell.  It explains the GH #1264 roster-less crosswalk ids:
 the 85 2015Q3 PP-cover households with no PP roster rows are EXACTLY the
 PP-cover households =HHTrack= records as not interviewed at W3 visit 1
 (30 dead, 29 refused, 15 moved away, 11 not found).
 
+** Panel crosswalk rebuilt: all rounds, interviewed households, own covers (GH #1264, 2026-11-03)
+
+@ligon's ruling, approved together: (a) identity links for W1, W4-old and W5,
+using =old_new=; (b) link only households recorded as interviewed; (c) build
+each round's links from that round's own cover.  This changes the crosswalk
+only.  Whether interview status should gate ROSTER admission is #1444, still
+open, so no table's membership changes and =id_walk= stays an identity.
+
+*The chain.*  =2010Q3 <- 2011Q1 <- 2012Q3 <- 2013Q1 <- 2015Q3 <- 2016Q1 <- 2018Q3
+<- 2019Q1 <- 2023Q3 <- 2024Q1=: PH to the PP of the same visit, PP to the PH of
+the wave before.  Each round is a node because each round is its own =t=.  It is
+one chain because that is what =local_tools.panel_ids= builds (each wave to the
+wave sorted before it), what =_check_panel_attrition_monotonic= walks (one
+predecessor per wave), and what =sampling.yml= declares its boundaries over.
+Every link is an identity on =hhid=, so nothing here can move a household
+between clusters: =v= comes from each round's own cover.  =2010Q3= has nothing to
+point at, so its =updated_ids= map is empty, the convention for a baseline.
+
+*What counts as interviewed.*  Both ends of a link must qualify.
+
+| rounds | source | interviewed | not interviewed |
+|--------+--------+-------------+-----------------|
+| W1 | own cover =saq22a= / =sq1= | completed, partially completed | refused, not at home, moved away, other (specify) |
+| W2, W3 | =HHTrack= =hhstatus_w{2,3}v{1,2}= | 1 interviewed, 5 tracked (and interviewed) | 2 refused, 3 not found, 4 dead, 6 moved away, 7 crisis area, 91 unknown reason |
+| W4, W5 | own cover =interview_result= | 1 complete, 2 and 3 partially complete | 4 unable to identify, 5 moved away, 6 unavailable, 7 refused, 8 all deceased |
+
+- *Code 91 is settled.*  W3's =HHTrack.dta= labels it "91. Not interviewed for
+  unknown reason"; W2's CSV has the same 5,000 values with no labels.
+- *W1 does have =HHTrack= columns* (=hhstatus_w1v{1,2}=, in W2's and W3's files),
+  though no W1 file.  The W1 cover's own result field is used, and the two name
+  exactly the same households (4,997 and 4,917).
+- *A partial interview is an interview.*  W4's own manuals define both partial
+  codes, for interviews given consent, as "started an interview" that "will
+  contain unanswered questions":
+  [[https://microdata.worldbank.org/catalog/3557/download/47675][PP interviewer manual]] p. 90 and
+  [[https://microdata.worldbank.org/catalog/3557/download/47677][PH interviewer manual]] p. 98 (printed and PDF page agree in both; neither
+  manual is held here).  The W5 PP interviewer manual (held, PDF p. 112) defines
+  them the same way.  W4's held questionnaires list the codes:
+  =pp_w4_household_quest.pdf= (PDF p. 2) prints 1--7, and
+  =ph_w4_household_quest.pdf= (PDF p. 3) prints 1--6, both partial codes among
+  them; PH's code 7 is on the data's labels only.  And all 42 "partially
+  completed" households on the W1--W3 covers are =HHTrack= 1 or 5.  The BID's
+  headline 4,976 (W4) and 4,715 (W5) are code 1 at PH alone.  Partial households
+  counted here: 9 (2018Q3), 4 (2019Q1), 2 (2024Q1).
+- A status value outside these tables makes =panel_ids.py= refuse, not guess.
+- *=old_new= decides the sample.*  The W4 refresh and the original sample overlap
+  in hhid RANGE (19001--379155 against 10001--370040) and share no id.
+  =panel_ids.py= refuses any hhid that changes sample, or that first appears in a
+  round not drawing its sample (only 2010Q3 and 2018Q3 draw one).
+
+*Counts* (cover rows are not all interviews):
+
+| round | cover | interviewed | roster | interviewed, no roster | roster, not interviewed |
+|-------+-------+-------------+--------+------------------------+-------------------------|
+| 2010Q3 | 5000 | 4997 | 4997 | 0 | 0 |
+| 2011Q1 | 4939 | 4917 | 4917 | 0 | 0 |
+| 2012Q3 | 4859 | 4749 | 4746 | 3 | 0 |
+| 2013Q1 | 4854 | 4770 | 4770 | 0 | 0 |
+| 2015Q3 | 4696 | 4611 | 4611 | 0 | 0 |
+| 2016Q1 | 4592 | 4582 | 4582 | 2 | 2 |
+| 2018Q3 | 5263 | 5053 | 5051 | 2 | 0 |
+| 2019Q1 | 5025 | 4980 | 4980 | 0 | 0 |
+| 2023Q3 | 5067 | 4771 | 4771 | 0 | 0 |
+| 2024Q1 | 4771 | 4717 | 4716 | 1 | 0 |
+
+*Links* (39,326, was 14,251; 13,821 kept, 25,505 added, 430 removed).  "Dropped"
+counts households interviewed in the current round, in the sample the link needs,
+whose target round did not interview them.
+
+| link | before | after | dropped | the target round says |
+|------+--------+-------+---------+-----------------------|
+| 2011Q1 -> 2010Q3 | 0 | 4916 | 1 | 1 refused |
+| 2012Q3 -> 2011Q1 | 0 | 4702 | 47 | 37 unknown reason, 7 not found, 3 refused |
+| 2013Q1 -> 2012Q3 | 4859 | 4716 | 54 | 28 crisis area, 17 unknown reason, 6 not found, 3 moved |
+| 2015Q3 -> 2013Q1 | 4696 | 4523 | 88 | 31 unknown reason, 24 moved, 15 refused, 13 not found, 5 dead |
+| 2016Q1 -> 2015Q3 | 4696 | 4582 | 0 | |
+| 2018Q3 -> 2016Q1 | 0 | 1454 | 0 | (of 1,493 W4 old; the other 39 were not interviewed at W4) |
+| 2019Q1 -> 2018Q3 | 0 | 4980 | 0 | |
+| 2023Q3 -> 2019Q1 | 0 | 4736 | 35 | 13 not on the W4 PH cover, 9 unable to identify, 9 refused, 4 unavailable |
+| 2024Q1 -> 2023Q3 | 0 | 4717 | 0 | |
+
+W5 links carry 1,369 old and 3,367 new households, each nested in its W4 sample.
+
+Of the 430 removed: 143 / 173 / 114 in the three pairs that existed, of which 105
+fail at the current round only, 103 at the target only and 222 at both.  Of the 99
+=2015Q3 -> 2013Q1= links that used to target an hhid off the W2 PP cover, the 58
+on neither W2 cover are gone, and 38 of the 41 on the PH cover stay, now because
+that cover says so.
+
+*A household that misses a round has no link across the gap* (224 of the 225
+dropped above; the other, at 2011Q1, has no earlier round to bridge to).  Its =i=
+is unchanged on both sides, so it is still followed by =i=.  The crosswalk records
+adjacent rounds, not every revisit.
+
+*Residuals, deliberately not filtered on the roster.*
+- 8 household-rounds are recorded as interviewed and have no roster: =2012Q3= 3
+  (=HHTrack= 5, cover "other"), =2016Q1= 2 (=HHTrack= 5, cover "refused"),
+  =2018Q3= 2 and =2024Q1= 1 (partial).  6 of them are link sources, so
+  =panel_ids_targets_exist= still reports 6 of 39,326 current-round endpoints.
+  It warns where it used to fail.
+- 2 household-rounds have a roster and no recorded interview: =320201= and =30082=
+  in =2016Q1=.  They stay served (the #1120 D1 rule) and are not linked.  #1444.
+- Served by =sample()= with no recorded interview: 3 / 22 / 131 / 84 / 85 / 12 /
+  210 / 45 / 296 / 54 household-rounds, 2010Q3 through 2024Q1.  =2012Q3='s 131
+  includes the 21 households only the W2 agriculture cover lists (=HHTrack=: 19
+  crisis area, 2 unknown reason), which =plot_inputs= reports on.  #1444.
+
+*=sampling.yml= counts a different population.*  Its "N of M linked households"
+are hhid overlaps of covers, most of them measured while =sample()= still stamped
+the PP cover on both rounds.  Its declared continuities hold over the new links:
+no real EA changes =v= across any boundary declared =stable=, and 10 households
+across 2018Q3 (1 EA) and 88 across 2023Q3 (10 of the 12 EAs) do change it, whole
+EAs with only the LGA code moving, as declared =wave-scoped=.  But it now reads, for example, "4,859 of 4,859" keep =v= at 2013Q1, where the
+links show 4,699 of 4,716 (17 PH movers).  Not edited here.
+
+*Why not YAML.*  A =panel_ids:= block reads one file and is stamped with every
+round of its directory, so it expresses neither own covers nor a gate on a second
+file.  The two blocks are removed rather than left to disagree with the JSON;
+=LSMS_BUILD_BACKEND=make= used to derive the old dicts from them, and now serves
+the committed ones, as Uganda does.
+
+*Cost:* a cold re-warm of Nigeria at both tiers, L2-wave included: 24 of 24
+=Country._table_cache_hash= values move, and 148 of 148 =Wave._input_hash= values
+(the latter measured in review).  No other country's hash moves (0 of 126 probed
+across five countries), nor any =build_transforms_fingerprint= (0 of 36).
+
 ** Panel crosswalk: =_/panel_ids.py= and the committed JSON (GH #894, 2026-10-23)
+
+/Superseded by the #1264 entry above; kept as the record of what #894 reproduced./
 
 The household panel crosswalk is a COMMITTED SOURCE ("design A", the
 convention in =CLAUDE.md=): =_/panel_ids.json= and =_/updated_ids.json=,
@@ -686,10 +816,12 @@ What it encodes, reproduced as found -- *not* fixed by #894:
   point at an =hhid= that is not on the W2 cover at all (not in 2013Q1
   =sample()=).
 
-Proposed follow-up (one issue): decide whether the crosswalk should (a) span
-W1 and W4/W5, (b) link only households the target round actually observed,
-and (c) stop linking a PH round to its own PP round.  Any of these changes
-the committed JSON, so each shows up as a reviewable diff.
+Proposed follow-up (one issue, #1264): decide whether the crosswalk should (a)
+span W1 and W4/W5, (b) link only households the target round actually observed,
+and (c) stop linking a PH round to its own PP round.  Any of these changes the
+committed JSON, so each shows up as a reviewable diff.  /Decided 2026-11-03: (a)
+and (b) yes; (c) as each round's links coming from its own cover, the PH -> PP
+chain kept./
 
 ** Cluster (PSU) identifier
 

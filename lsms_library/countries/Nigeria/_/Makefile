@@ -26,7 +26,7 @@ all: $(var)
 #
 #     make panel-ids
 #
-# panel_ids.py reads each wave's `panel_ids:` block in data_info.yml.
+# panel_ids.py reads each round's own cover and interview status (GH #1264).
 .PHONY: panel-ids
 panel-ids:
 	python panel_ids.py

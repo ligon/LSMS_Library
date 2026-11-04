@@ -30,13 +30,6 @@ shocks:
         HowCoped1: s15aq5b
         HowCoped2: s15aq5c
 
-panel_ids:
-    file: secta_plantingw3.dta
-    idxvars:
-        i: hhid
-    myvars:
-        previous_i: hhid
-
 individual_education:
     # GH #171: highest education level completed per household member.
     # Post-harvest section 2 (sect2_harvestw3) s2aq9, full coverage.
