@@ -834,11 +834,12 @@ result), so it belongs where a change shows up as a reviewable diff.
 Regenerate with `make -C lsms_library/countries/{C}/_ panel-ids` and review the
 diff. Malawi and Nigeria were design B (per-wave `data_info.yml` wiring, cache
 parquet only) until #894. Malawi's `panel_ids.py` reads those same YAML blocks,
-which stay in place; Nigeria's has held its own wiring since #1264 and its
-blocks are gone. Ethiopia also keeps `panel_ids:` blocks beside its committed
-JSON, but its `panel_ids.py` does not read them, and `LSMS_BUILD_BACKEND=make`
-builds from them: 9,913 `panel_ids` entries against the committed 4,981
-(measured 2026-11-03; Malawi's two agree entry for entry).
+which stay in place and agree with its JSON entry for entry (measured
+2026-11-03); Nigeria's has held its own wiring since #1264 and its blocks are
+gone. Ethiopia's are gone too (#1447): its `panel_ids.py` never read them, and
+`LSMS_BUILD_BACKEND=make` built from them a different crosswalk, 9,913
+`panel_ids` entries against the committed 4,981, with blank baselines minted
+into household ids. That backend now serves the committed dicts.
 `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` is now empty, so a
 twelfth country cannot pick a design by accident.
 
