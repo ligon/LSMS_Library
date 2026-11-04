@@ -701,7 +701,8 @@ match no label here.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 2,568 posi
 - *The unit-size code has two forms.*  =10 x unit + size=, but the sizes 98 and 99 (=Autre taille=) make it =100 x unit + size=: =13198= is Pot, size 98.  31 codes, 1,548 records.
 - *The code bridge holds except where the form says otherwise.*  =1050= is Bassine by its digits, but the form prints =1050: Bidon-Unité de taille unique= and all 44 records are vinegar, so it is served =Bidon=.  =1330= is a bare Sac by its digits, but the form prints =Sac (10 Kg)= (10 records, all salt, median 2,750 FCFA), so it is served =Sac (10 Kg)= with =1340=, which the form prints under both spellings.  The other label differences are spellings of one unit (=Parsoire= / =passoire=, =Quartier (cuisse, tête...)= / =cuisse=).
 - *Sizes run past Petit / Moyen / Grand:* =Tohoungolo (Sans brassée)=, =Otoka/Fihanfingban (Avec 1 brassée)=, =Bassine (Quart)=, =Pot (Autre taille 2)=.  Size 99 is not in the household labels, so it takes the form's word.
-- *=Litre (Quart)= keeps its size* (31 records, code 1014): a quarter litre is not a litre.  The household side serves its 8 such rows as bare =Litre=, for the kg ladder, so these prices do not meet them.
+- *=Litre (Quart)= keeps its size* (31 records, code 1014): a quarter litre is not a litre, and in the 4 same-market pairs it prices at a median 0.20 of =Litre=.  The household side serves its 8 such rows as bare =Litre=, for the kg ladder, so these prices do not meet them.
+- *Those 8 household rows, all =Jus de fruits=, meet the bare =Litre= price until #1451 lands*, which is about five times a quarter litre.
 
 *The join.*  Household (t, j, u) cells with a community price: 931 of 1,342, covering 168,882 of 188,349 =food_acquired= rows.  212,046 of the 222,296 community rows find a household cell.  All 98 =j= occur in the household table.  18 =u= do not.
 
