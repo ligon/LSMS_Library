@@ -3802,6 +3802,19 @@ W3 are fieldwork too.
   at most 3 each.  Those 2 EAs are the nearest candidates for the BID's other two, but
   nothing confirms it, and "about 62" movers fits the 60 outside the 6 EAs better.
 
+/Updated 2026-11-04 (GH #1443)./  The three BIDs above that this section reads from the
+catalog are now held: sidecars in each wave's =Documentation/= from acquisitions commit
+=f203adf39= (=ESS2_Basic_Information_Document.pdf=, "Basic Information Document, Ethiopia
+Socioeconomic Survey 2018-19 V2.pdf", =ess5_basic_information_document_final.pdf=).  Every
+citation in this section was re-checked against the held copies, by pypdf text extraction:
+ESS2 p28, ESS3 p16, p23 and p31, ESS4 p13, p25 and p26, ESPS-5 p13 and p22.  All stand.
+
+- *The ESS4 "eight EAs" stays open, and no held document settles it.*  The ESPS-5 BID has
+  an eight of its own, and they are different EAs: "8 new EAs" (PDF p32), selected for
+  ESPS-4 but "not surveyed in 2018/19 for safety and security reasons" (PDF p30).  7 are on
+  no W4 cover; the 8th is on W4's HH cover with 12 households, none of them on W5's.  None
+  of #1359's 6 W4 agriculture-only EAs appears in W5 at all.
+
 * GH #1119 -- structural crop marker (2026-10-30)
 
 The existing plot-level fertilizer/organic branches now emit
