@@ -151,10 +151,14 @@ class TestEmptyYieldWarns:
     def test_rounds_that_share_no_wave_say_so(self):
         """The Nigeria shape: harvest on the post-harvest quarter, area on the
         post-planting one."""
-        with pytest.warns(PlotGrainMismatchWarning, match="share no wave"):
-            out = yield_kg(self._crop(plot="1", t="2011Q1"),
-                           self._area(plot="1", t="2010Q3"), on="plot")
-        assert out.empty
+        for on in ("plot", "parcel"):
+            with pytest.warns(PlotGrainMismatchWarning,
+                              match="share no wave") as caught:
+                out = yield_kg(self._crop(plot="1", t="2011Q1"),
+                               self._area(plot="1", t="2010Q3"), on=on)
+            assert out.empty
+            # Both grains return nothing here, so neither may point at the other.
+            assert "Try on=" not in str(caught[0].message)
 
     def test_a_join_that_finds_something_does_not_warn(self):
         with warnings.catch_warnings():

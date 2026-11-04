@@ -5306,9 +5306,10 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     merged = harvest.merge(area, on=keys, how='inner')
     if len(merged) == 0 and len(harvest) and len(area):
         # The silent emptiness fertilizer_rate's guard exists for, in its twin.
-        waves = ''
+        # With no wave in common the other grain cannot help, so don't offer it.
+        hint = f" Try on={'plot' if on == 'parcel' else 'parcel'!r}."
         if 't' in keys and not set(harvest['t']) & set(area['t']):
-            waves = (
+            hint = (
                 " The two features share no wave at all: harvest "
                 f"{sorted(map(str, harvest['t'].unique()))[:3]}, area "
                 f"{sorted(map(str, area['t'].unique()))[:3]}; a post-planting / "
@@ -5318,8 +5319,7 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
             f"the {len(area):,} area land key(s) have NO value in common, so "
             "the result is empty. Examples -- harvest: "
             f"{sorted(map(str, harvest['_land'].unique()))[:3]}; area: "
-            f"{sorted(map(str, area['_land'].unique()))[:3]}.{waves} Try "
-            f"on={'plot' if on == 'parcel' else 'parcel'!r}.",
+            f"{sorted(map(str, area['_land'].unique()))[:3]}.{hint}",
             PlotGrainMismatchWarning, stacklevel=2)
     with np.errstate(divide='ignore', invalid='ignore'):
         merged['Yield_kg'] = merged['Harvest_kg'] / merged['_Area']
