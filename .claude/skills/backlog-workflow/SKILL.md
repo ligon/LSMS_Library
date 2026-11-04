@@ -133,6 +133,14 @@ them.**
   by-design / already-fixed / enhancement. The win is often *closing* and
   *reconciling*, not patching.
 
+## Running a multi-country sweep on Savio
+The operational recipe (coordinator + one in-process agent per country + a fresh red-team
+reviewer per fix; worktrees; shared-cache-before-edit / private-root-after data policy; burst
+jobs for heavy work; cherry-pick onto fresh `development`; merge-on-green only on explicit
+authorization) is in [savio-sweep.md](savio-sweep.md), with working scripts and brief templates
+in `sweep/`.  Read it before dispatching more than one or two agents; its "failures already paid
+for" table lists the traps that cost the 2026-11-03 sweep an hour each.
+
 ## Reuse
 - `bench/feature_audit/scan.py` — the regression net (re-run after a fix to confirm
   no new collapse / loss across countries).
