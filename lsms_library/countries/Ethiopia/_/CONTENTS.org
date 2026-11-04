@@ -1632,12 +1632,16 @@ the wave-native =household_id2= / =individual_id2=.
 
     /Corrected 2026-11-03 (GH #1447): these are not split-offs, and =8888=
     marks no such thing./  In W3's household cover =household_id= equals
-    =household_id2= with characters 7-10 dropped on all 4,954 rows, and those
-    characters are =0888= on all 3,272 rural households.  So a rural household
-    and a large-town household that differ only there get the same
-    =household_id=.  The cover holds 3 such pairs, each one rural and one large
-    town.  The rosters do not match (age gap median +20 years on 6 matched
-    lines), so they are different households, as the fix below assumed.
+    =household_id2= with characters 7-10 dropped on all 4,954 rows.  Those
+    characters are =0888= on all 3,272 rural households, on 72 of 427 small-town
+    and on 0 of 1,255 large-town (W2: all 3,323, 78 of 453, 0 of 1,486).  So a
+    rural household and a large-town household that differ only there get the
+    same =household_id=.  The cover holds 3 such pairs, each one rural and one
+    large town, and they are different households, as the fix below assumed.
+    Matched by roster line: the large-town household against the W1 household of
+    its truncated id has a median age gap of +20 years on 6 lines, where the
+    rural one against the same W1 household has +4.5 on 6; the two members of a
+    pair against each other have a median absolute gap of 16.5 on 11 lines.
 
 It also made education UNJOINABLE to the roster: *0* of the built
 =(i, pid)= pairs matched a =household_roster= row in W2 and W3, against

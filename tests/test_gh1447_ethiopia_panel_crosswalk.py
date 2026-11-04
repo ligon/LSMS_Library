@@ -87,9 +87,14 @@ def test_no_household_id_is_minted_from_a_blank_baseline(updated_ids):
 
 
 def test_w3_links_chain_through_w2(updated_ids):
-    """A W3 household keeps its W2 canonical id, whatever W3's ``household_id`` says."""
-    w2 = updated_ids["2013-14"]
-    assert {k: w2.get(k, k) for k in updated_ids["2015-16"]} == updated_ids["2015-16"]
+    """A W3 household on the W2 map keeps its W2 canonical id, whatever W3's ``household_id`` says.
+
+    Keys absent from the W2 map are left out, so this does not pin the 48 either way.
+    """
+    w2, w3 = updated_ids["2013-14"], updated_ids["2015-16"]
+    on_w2_map = {k: v for k, v in w3.items() if k in w2}
+    assert on_w2_map
+    assert on_w2_map == {k: w2[k] for k in on_w2_map}
 
 
 def test_the_maps_are_collision_free(updated_ids):
