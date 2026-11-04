@@ -250,6 +250,70 @@ def _track_codes(df, column, script):
     return df[column].astype(object).map(script._code)
 
 
+# Spelled out here on purpose: an oracle for ruling (c) must not come from the
+# code it checks, so nothing below reads ``Nigeria/_/``.
+_OWN_COVERS = {
+    "2010Q3": "2010-11/Data/Post Planting Wave 1/Household/secta_plantingw1.dta",
+    "2011Q1": "2010-11/Data/Post Harvest Wave 1/Household/secta_harvestw1.dta",
+    "2012Q3": "2012-13/Data/Post Planting Wave 2/Household/secta_plantingw2.dta",
+    "2013Q1": "2012-13/Data/Post Harvest Wave 2/Household/secta_harvestw2.dta",
+    "2015Q3": "2015-16/Data/secta_plantingw3.dta",
+    "2016Q1": "2015-16/Data/secta_harvestw3.dta",
+    "2018Q3": "2018-19/Data/secta_plantingw4.dta",
+    "2019Q1": "2018-19/Data/secta_harvestw4.dta",
+    "2023Q3": "2023-24/Data/Post Planting Wave 5/Household/secta_plantingw5.dta",
+    "2024Q1": "2023-24/Data/Post Harvest Wave 5/Household/secta_harvestw5.dta",
+}
+
+
+@pytest.fixture(scope="module")
+def own_covers():
+    return {rnd: _read(path) for rnd, path in _OWN_COVERS.items()}
+
+
+def _result_interviewed(cover):
+    """Households whose ``interview_result`` is complete or partially complete."""
+    codes = cover["interview_result"].astype(str).str.extract(r"^(\d+)", expand=False).astype(int)
+    return set(codes.index[codes.isin([1, 2, 3])])
+
+
+@_requires_data
+@pytest.mark.parametrize("pp, ph", [("2010Q3", "2011Q1"), ("2012Q3", "2013Q1"), ("2015Q3", "2016Q1"),
+                                    ("2018Q3", "2019Q1"), ("2023Q3", "2024Q1")])
+def test_a_waves_two_covers_differ(own_covers, pp, ph):
+    """Otherwise reading the wrong one could not be detected below."""
+    assert set(own_covers[pp].index) != set(own_covers[ph].index)
+
+
+@_requires_data
+@pytest.mark.parametrize("rnd", list(_OWN_COVERS))
+def test_each_round_is_built_from_its_own_cover(tables, own_covers, rnd):
+    assert set(tables[rnd].index) == set(own_covers[rnd].index)
+
+
+@_requires_data
+@pytest.mark.parametrize("rnd", ["2018Q3", "2019Q1", "2023Q3", "2024Q1"])
+def test_w4_w5_interviewed_is_the_own_covers_result(tables, own_covers, rnd):
+    assert _interviewed(tables, rnd) == _result_interviewed(own_covers[rnd])
+
+
+@_requires_data
+@pytest.mark.parametrize("rnd, before", [("2019Q1", "2018Q3"), ("2023Q3", "2019Q1"), ("2024Q1", "2023Q3")])
+def test_committed_w4_w5_links_match_the_own_covers(links, own_covers, rnd, before):
+    """The committed JSON against the source files, with no script in the oracle."""
+    expected = _result_interviewed(own_covers[rnd]) & _result_interviewed(own_covers[before])
+    assert {i for t, i in links if t == rnd} == expected
+
+
+@_requires_data
+def test_committed_w4_old_links_match_the_own_cover_and_hhtrack(links, own_covers):
+    w4 = own_covers["2018Q3"]
+    old = set(w4.index[w4["old_new"].astype(str).str.startswith("1")])
+    status = _read("2015-16/Data/HHTrack.dta")["hhstatus_w3v2"].astype(str)
+    w3 = set(status.index[status.str.match(r"^[15]\.")])
+    assert {i for t, i in links if t == "2018Q3"} == _result_interviewed(w4) & old & w3
+
+
 @_requires_data
 def test_the_committed_json_is_what_the_script_builds(script, tables, links, updated_ids):
     D, updated = panel_ids(script.build_frame(tables))

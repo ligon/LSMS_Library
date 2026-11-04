@@ -54,9 +54,11 @@ W4, W5    own cover, ``interview_result``     1 complete, 2 and 3 partially
 * ``HHTrack`` code 91, unlabelled in W2's CSV, is labelled by W3's ``.dta``:
   "91. Not interviewed for unknown reason".  The two files agree on every W1
   and W2 status cell.
-* A partial interview is an interview.  The W5 interviewer manual (Section R)
-  defines both partial codes as "started an interview", and on the W1--W3
-  covers every "partially completed" household is ``HHTrack`` 1 or 5.
+* A partial interview is an interview.  W4's own interviewer manuals define
+  both partial codes as "started an interview" (WB catalog 3557, downloads
+  47675 p. 90 and 47677 p. 98; not held here), the held W5 PP manual does the
+  same (Section R, PDF p. 112), W4's held questionnaires list the codes, and on
+  the W1--W3 covers every "partially completed" household is ``HHTrack`` 1 or 5.
 * W1 is not in a W1 ``HHTrack`` (there is none), but W2's and W3's files do
   carry ``hhstatus_w1v*``, and they name exactly the same households as the
   own-cover reading used here.

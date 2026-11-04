@@ -677,11 +677,19 @@ point at, so its =updated_ids= map is empty, the convention for a baseline.
 - *W1 does have =HHTrack= columns* (=hhstatus_w1v{1,2}=, in W2's and W3's files),
   though no W1 file.  The W1 cover's own result field is used, and the two name
   exactly the same households (4,997 and 4,917).
-- *A partial interview is an interview.*  The W5 PP interviewer manual (PDF
-  p. 112) defines both partial codes as "started an interview", with consent;
-  and all 42 "partially completed" households on the W1--W3 covers are =HHTrack=
-  1 or 5.  The BID's headline 4,976 (W4) and 4,715 (W5) are code 1 at PH alone.
-  Partial households counted here: 9 (2018Q3), 4 (2019Q1), 2 (2024Q1).
+- *A partial interview is an interview.*  W4's own manuals define both partial
+  codes, for interviews given consent, as "started an interview" that "will
+  contain unanswered questions":
+  [[https://microdata.worldbank.org/catalog/3557/download/47675][PP interviewer manual]] p. 90 and
+  [[https://microdata.worldbank.org/catalog/3557/download/47677][PH interviewer manual]] p. 98 (printed and PDF page agree in both; neither
+  manual is held here).  The W5 PP interviewer manual (held, PDF p. 112) defines
+  them the same way.  W4's held questionnaires list the codes:
+  =pp_w4_household_quest.pdf= (PDF p. 2) prints 1--7, and
+  =ph_w4_household_quest.pdf= (PDF p. 3) prints 1--6, both partial codes among
+  them; PH's code 7 is on the data's labels only.  And all 42 "partially
+  completed" households on the W1--W3 covers are =HHTrack= 1 or 5.  The BID's
+  headline 4,976 (W4) and 4,715 (W5) are code 1 at PH alone.  Partial households
+  counted here: 9 (2018Q3), 4 (2019Q1), 2 (2024Q1).
 - A status value outside these tables makes =panel_ids.py= refuse, not guess.
 - *=old_new= decides the sample.*  The W4 refresh and the original sample overlap
   in hhid RANGE (19001--379155 against 10001--370040) and share no id.
@@ -759,7 +767,10 @@ file.  The two blocks are removed rather than left to disagree with the JSON;
 =LSMS_BUILD_BACKEND=make= used to derive the old dicts from them, and now serves
 the committed ones, as Uganda does.
 
-*Cost:* every Nigeria table's cache hash, and no other country's.
+*Cost:* a cold re-warm of Nigeria at both tiers, L2-wave included: 24 of 24
+=Country._table_cache_hash= values move, and 148 of 148 =Wave._input_hash= values
+(the latter measured in review).  No other country's hash moves (0 of 126 probed
+across five countries), nor any =build_transforms_fingerprint= (0 of 36).
 
 ** Panel crosswalk: =_/panel_ids.py= and the committed JSON (GH #894, 2026-10-23)
 
