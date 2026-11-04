@@ -4792,6 +4792,35 @@ therefore reference a =v= with no =cluster_features= row. That is the
 honest outcome". The existing decision is preserved,
 not a new D2 policy question; no geography or dummy data was added.
 
+** What =unlocated-= means, as built (ruling @ligon, 2026-11-04)
+
+GH #1120 D2 was ruled for "households that no file locates".  What is built is
+narrower, and the ruling keeps the label and rewords D2 to match it:
+=unlocated-{hhid}= marks a household with *no value in this wave's cluster-key
+column* (=comm= and, in 2009-10, its GPS bin; the parish code; the district and
+parish pair).  It says nothing about what the wave's other files hold, and some of
+them do hold a location.  Read it as "this wave's key is blank", not as "nothing
+locates this household".
+
+| wave    | households | what else the release records for them (raw files, 2026-11-04)                                                  |
+|---------+------------+-----------------------------------------------------------------------------------------------------------------|
+| 2009-10 |         28 | 24 on =GSEC1= with a blank =comm= and no GPS fix: all 24 have =region= and 23 a district code.  4 are on =AGSEC3B= or =GSEC12= only. |
+| 2011-12 |         57 | on =AGSEC1= and other modules, not on =GSEC1=.  26 have a parcel GPS reading inside Uganda in =AGSEC2A= / =AGSEC2B=. |
+| 2013-14 |          1 | blank =h1aq4a=.  Its cover has =ea=, =region= and =h1aq1a=, and =unps_geovars_2013_14= has a fix.                   |
+| 2018-19 |         66 | on =AGSEC1= and not on =GSEC1=; =AGSEC1='s =region= is blank for all 66.  Other files not swept for a location.     |
+| 2019-20 |          1 | blank =district=.                                                                                               |
+
+None of this is used to fill =v=: parcel GPS is where a parcel is and 2013-14's =ea= is a
+PSU of origin, and neither is a value of this wave's key.
+
+*Site C stays silent on these, because a singleton is not a cluster.*  =sampling.yml=
+declares 2010-11 -> 2011-12 =stable=, and 30 linked households go from an EA in 2010-11
+to a singleton in 2011-12, since 2011-12 has them on =AGSEC1= only.  That does not make
+the boundary incomparable.  A singleton names one household and no place, so it cannot
+show that a cluster's key changed; the 2,510 of 2,510 in that note counts located
+households.  =tests/test_sampling.py::test_uganda_comm_rendering_boundary_is_silent_once_harmonised=
+pins the silence and the 30.
+
 ** D3: source-missing plots, with observation identity
 
 =crop_production= now uses =unknown_plot= where a source parcel/plot component
