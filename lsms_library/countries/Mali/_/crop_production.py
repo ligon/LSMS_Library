@@ -6,10 +6,9 @@ columns (Quantity, u, Quantity_sold, Value_sold, planting_month,
 harvest_month, intercropped, perennial; since GH #824 / #1267 also
 Unit_sold, field-only KgFactor_sold, months_harvested and, on tree rows,
 Derivation). Native grain footers are relayed independently from attrs.
-Only the EAC-I
-waves (2014-15 EACI14, 2017-18 EACI17) are wired; the EHCVM waves (2018-19,
-2021-22) ship a harvest and sale block (s16c / s16d) that is not wired, so
-they contribute nothing.
+All four waves contribute: EAC-I 2014-15 (EACI14) and 2017-18 (EACI17), and,
+since GH #824, EHCVM 2018-19 (s16c) and 2021-22 (s16c + s16d, with household-crop
+sales on a single harvest row or on a plot_id = 'Farm-level' row).
 
 ``v`` is NOT baked in — the framework joins it from ``sample()`` at API
 time.  ``id_walk`` is left to ``_finalize_result`` (cached parquets store

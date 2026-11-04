@@ -278,16 +278,17 @@ def plot_features_for_wave(t, source, colmap):
 # crop_production (GAP 1; parity loop) — item-level (t, i, plot, crop)
 # ---------------------------------------------------------------------------
 #
-# Wired for the two EAC-I waves only (2014-15 EACI14, 2017-18 EACI17) --
-# exactly the two waves the WB MLI_EACI*.do crop sections cover.  The EHCVM
-# waves (2018-19, 2021-22) DO ship a harvest-and-sale block (s16c / s16d,
-# GH #824 audit 2026-10-23); it is UNWIRED, which is a decision, not an
-# absence.
+# All four waves are wired.  The two EAC-I waves (2014-15 EACI14, 2017-18
+# EACI17) go through crop_production_finalize below.  The two EHCVM waves
+# (2018-19 s16c; 2021-22 s16c + s16d) were left unwired by an earlier decision,
+# which the rulings of @ligon 2026-11-03 reverse (GH #824); they go through
+# finish_ehcvm_crop_production -- see the section after crop_production_finalize.
 #
 # Grain: one row per (t, i, plot, crop), where
 #   - i     = Mali composite household id (grappe, menage/exploitation),
 #   - plot  = "{field_no}_{parcel_no}" for seasonal crops; NaN for perennial
-#             trees (the perennial roster s3b/s11f is not on the field grid),
+#             trees (the perennial roster s3b/s11f is not on the field grid);
+#             'Farm-level' for a 2021-22 sale with no single harvest row,
 #   - crop  = harmonize_food Preferred Label (food crops REUSE the consumed-
 #             food label so crop_production.j joins food_acquired.j).
 #
@@ -297,7 +298,8 @@ def plot_features_for_wave(t, source, colmap):
 #   planting_month, harvest_month, intercropped, perennial
 # plus `Derivation` on the perennial (tree) rows -- see
 # derive_tree_twelve_month_total, derive_tree_sale_window and
-# stamp_tree_derivations below.
+# stamp_tree_derivations below -- and on the 2021-22 rows that hold a
+# household-crop sale (derive_hh_crop_sale_attachment).
 #
 # Crop names and units arrive as DECODED Stata labels (strings), so the
 # harmonize_food / u tables key on the decoded label (Code column).  The
@@ -782,14 +784,227 @@ def crop_production_finalize(df):
     return out.sort_index()
 
 
+# --- crop_production: the EHCVM waves (GH #824; rulings @ligon 2026-11-03) ----
+#
+# 2018-19  s16c_me_mli2018.dta  one plot-by-crop file, harvest AND sale on the
+#                               line (Niger/2018-19/_/crop_production.py).
+# 2021-22  s16c_me_mli2021.dta  plot-by-crop, harvest only (s16cq16a is filled
+#                               on 309 of 7,247 rows: GH #1437; no harvest total
+#                               is derived here);
+#          s16d_me_mli2021.dta  household-by-crop dispositions, one row per
+#                               (household, crop), no plot.
+#
+# A 2021-22 sale goes on the household's single harvest ROW for that crop where
+# there is exactly one (the Niger 2021-22 rule after GH #1360: one served row,
+# not merely one plot), and otherwise on ONE row of that household and crop with
+# plot_id = 'Farm-level', which carries no harvest Quantity.  Nothing is dropped
+# and nothing is split: derive_hh_crop_sale_attachment.
+#
+# Why these waves do not go through crop_production_finalize:
+#   - it masks 99 and 9999 as the EACI "Manquant" codes.  s16cq12a carries no
+#     such label, and 2018-19 records 99 on three rows as a quantity;
+#   - it folds duplicates, and there are none: both s16c files are unique on
+#     (grappe, menage, field, parcel, crop) under the crop labels served here,
+#     so the index needs no production_obs and nothing here reduces anything;
+#   - it silently drops a crop harmonize_food does not name.  Here that raises:
+#     1,441 + 1,380 rows of 'Riz Paddy' would otherwise have vanished.
+#
+# REPORTED ONLY.  Quantity_sold / Value_sold are NA on a line the survey did not
+# record them on, 'Non' included: unlike 2017-18, nothing is filled with 0 here
+# (Niger's rule).  KgFactor_sold is NA throughout: s16cq16c / s16dq05c, "Estimation
+# Quantite totale UML en kg", are TOTALS (s16dq05c == s16dq05a on 495 of 495 rows
+# sold in Kg, and == 100 x s16dq05a on 299 of 465 sold in 100 kg sacks), the
+# shape that keeps the EAC-I tree equivalents unwired.  planting_month,
+# harvest_month, months_harvested and perennial are NA: s16c asks none of them,
+# and it lists tree crops (Manguier, Anacarde) on the field grid without saying
+# which are perennial.  The Stata "Etat du produit" variables (s16cq12c, s16cq16c
+# in 2018-19; s16cq16d, s16dq05d in 2021-22) are not served.
+
+#: The canonical structural sentinel for `plot_id`: the record has no plot by
+#: design (lsms_library/data_info.yml, top of file).  It is not `unknown_plot`,
+#: which says a plot exists and its identifier is missing.
+FARM_LEVEL = 'Farm-level'
+
+#: Registry key (Mali/_/derivations.yml) on a 2021-22 row that holds a sale which
+#: s16d recorded for the household and crop rather than for the plot.
+DERIVATION_HH_CROP_SALE = (
+    'Mali::crop_production::hh-crop-sale-single-row')
+
+_SALE_KEYS = ['i', 'crop']
+_SALE_COLUMNS = ['Quantity_sold', 'Unit_sold', 'Value_sold']
+_EHCVM_INTERCROP = {'Association de cultures': True, 'Pure': False}
+
+
+def _label_or_refuse(raw, mapped, where):
+    """``mapped``, after refusing a recorded label ``where`` does not name."""
+    raw = raw.astype('string').str.strip()
+    lost = raw[raw.notna() & mapped.isna()]
+    if len(lost):
+        raise ValueError(f'crop_production: {sorted(set(lost))} are recorded in '
+                         f'the source and not in {where}')
+    return mapped
+
+
+def ehcvm_crop_labels(series):
+    """s16cq04 / s16dq01 labels -> harmonize_food Preferred Label; refuses a gap."""
+    return _label_or_refuse(series, _crop_labels(series),
+                            'the harmonize_food table').astype('string')
+
+
+def ehcvm_unit_labels(series):
+    """s16c / s16d unit labels -> ``u`` Preferred Label; refuses a gap.
+
+    NA stays NA: ``u`` is a COLUMN in this table, as in the EAC-I waves, so a
+    row with no recorded unit serves NA here and ``Unknown`` through Feature()'s
+    promotion.  Writing a literal ``Unknown`` beside the EAC-I nulls is the
+    state ``feature._align_to_canonical_levels`` warns about.
+    """
+    return _label_or_refuse(series, _unit_labels(series),
+                            'the u table').astype('string')
+
+
+def ehcvm_intercropped(series):
+    """s16cq07 -> True (Association de cultures) / False (Pure) / NA."""
+    raw = series.astype('string').str.strip()
+    mapped = raw.map(_EHCVM_INTERCROP)
+    return _label_or_refuse(raw, mapped, 'the s16cq07 labels').astype('boolean')
+
+
+def ehcvm_household_ids(src):
+    """The served household id of each row of an EHCVM (grappe, menage) file."""
+    return src.apply(lambda r: i(pd.Series([r['grappe'], r['menage']])), axis=1)
+
+
+def ehcvm_plot_ids(src):
+    """``{s16cq02}_{s16cq03}``: the spelling of plot_features' ``plot_id``."""
+    field = src['s16cq02'].apply(tools.format_id).astype('string')
+    parcel = src['s16cq03'].apply(tools.format_id).astype('string')
+    return field + '_' + parcel
+
+
+def ehcvm_is_sale(quantity, value):
+    """A sale is a record with a positive sold quantity or a positive value."""
+    return (pd.to_numeric(quantity, errors='coerce').gt(0)
+            | pd.to_numeric(value, errors='coerce').gt(0))
+
+
+def derive_hh_crop_sale_attachment(harvest, sales):
+    """Place each household-crop sale on the served rows of a wave (GH #824).
+
+    ``harvest`` holds one row per plot-crop harvest record, with columns
+    ``i``, ``crop`` and ``plot_id``.  ``sales`` holds one row per sale, with
+    columns ``i``, ``crop``, ``Quantity_sold``, ``Unit_sold`` and ``Value_sold``;
+    a second sale of one (i, crop) is refused rather than summed.
+
+    A sale of an (i, crop) with EXACTLY ONE harvest row goes on that row, in its
+    own ``Unit_sold``, and that row alone carries the key in ``Derivation``.  Any
+    other sale -- two or more rows, or none -- becomes ONE new row of that
+    (i, crop) with ``plot_id = FARM_LEVEL``, its other columns NA.  The index
+    value discloses those, so they carry no key (CLAUDE.md, "exempt by rule").
+
+    No sold quantity or value is split, summed or scaled.  Registered as
+    ``Mali::crop_production::hh-crop-sale-single-row``.
+    """
+    if sales.duplicated(_SALE_KEYS).any():
+        raise ValueError('crop_production: more than one sale for a (i, crop)')
+    lines = harvest.groupby(_SALE_KEYS).size().rename('_lines').reset_index()
+    n = sales[_SALE_KEYS].merge(lines, on=_SALE_KEYS, how='left')['_lines']
+    single = n.fillna(0).eq(1).to_numpy()
+    served = harvest.merge(sales.loc[single, _SALE_KEYS + _SALE_COLUMNS],
+                           on=_SALE_KEYS, how='left', validate='many_to_one',
+                           indicator='_attached')
+    derivation = pd.Series(pd.NA, index=served.index, dtype='string')
+    derivation[served.pop('_attached').eq('both')] = DERIVATION_HH_CROP_SALE
+    served['Derivation'] = derivation
+    farm = sales.loc[~single, _SALE_KEYS + _SALE_COLUMNS].copy()
+    farm['plot_id'] = FARM_LEVEL
+    return pd.concat([served, farm], ignore_index=True)
+
+
+def finish_ehcvm_crop_production(df, wave):
+    """The served frame of an EHCVM wave, indexed (t, i, plot_id, crop).
+
+    The same columns and dtypes as ``crop_production_finalize``, so the country
+    concat changes no EAC-I value.  Reduces nothing: a repeated key raises.
+    """
+    out = df.copy()
+    out['t'] = wave
+    for col in ('Quantity', 'Quantity_sold', 'Value_sold', 'KgFactor_sold'):
+        if col not in out.columns:
+            out[col] = pd.NA
+        out[col] = pd.to_numeric(out[col], errors='coerce').astype('float64')
+    for col in ('months_harvested', 'planting_month', 'harvest_month'):
+        out[col] = pd.array([pd.NA] * len(out), dtype='Int64')
+    out['perennial'] = pd.array([pd.NA] * len(out), dtype='boolean')
+    out['intercropped'] = out['intercropped'].astype('boolean')
+    for col in ('u', 'Unit_sold', 'Derivation'):
+        if col not in out.columns:
+            out[col] = pd.NA
+        out[col] = out[col].astype('string')
+    for col in ('i', 'plot_id', 'crop'):
+        out[col] = out[col].astype('string')
+    if out[['i', 'plot_id', 'crop']].isna().any(axis=None):
+        raise ValueError(f'crop_production {wave}: a NA household, plot or crop')
+    out = out.set_index(['t', 'i', 'plot_id', 'crop'])
+    if not out.index.is_unique:
+        raise ValueError(f'crop_production {wave}: a repeated (i, plot_id, crop)')
+    return out[['Quantity', 'u', 'Quantity_sold', 'Unit_sold', 'KgFactor_sold',
+                'Value_sold', 'months_harvested', 'planting_month',
+                'harvest_month', 'intercropped', 'perennial',
+                'Derivation']].sort_index()
+
+
+def inputs_hh_crop_sale_single_row(wave):
+    """Raw answers behind one wave's keyed rows, at (t, i, crop).
+
+    The registry ``inputs`` callable for
+    ``hh-crop-sale-single-row``: the s16d sale as recorded,
+    with the field and parcel of the single s16c row it went on, one row per
+    keyed served row.
+    """
+    from pathlib import Path
+    from lsms_library.paths import countries_root
+    root = Path(countries_root()) / 'Mali'
+    data = root / wave / 'Data'
+    year = {'2021-22': '2021'}[wave]
+    harvest = tools.get_dataframe(str(data / f's16c_me_mli{year}.dta'),
+                                  convert_categoricals=True)
+    sold = tools.get_dataframe(str(data / f's16d_me_mli{year}.dta'),
+                               convert_categoricals=True)
+    # Named rungs, as in _tree_roster_inputs: this runs from any cwd.
+    crop_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Code',
+        dirs=[f'{root / wave / "_"}/', f'{root / "_"}/'],
+        **{'Preferred Label': 'Preferred Label'})
+
+    def keyed(src, crop):
+        out = src.copy()
+        out['t'] = wave
+        out['i'] = ehcvm_household_ids(src).astype('string')
+        out['crop'] = (src[crop].astype('string').str.strip().map(crop_map)
+                       .astype('string'))
+        return out
+
+    harvest, sold = keyed(harvest, 's16cq04'), keyed(sold, 's16dq01')
+    sold = sold[ehcvm_is_sale(sold['s16dq05a'], sold['s16dq06'])]
+    lines = harvest.groupby(_SALE_KEYS).size()
+    single = lines[lines == 1].index
+    harvest = harvest[harvest.set_index(_SALE_KEYS).index.isin(single)]
+    out = sold[['t', 'i', 'crop', 's16dq01', 's16dq04', 's16dq05a', 's16dq05b',
+                's16dq06']].merge(
+        harvest[_SALE_KEYS + ['s16cq02', 's16cq03']], on=_SALE_KEYS, how='inner',
+        validate='one_to_one')
+    return out.set_index(['t', 'i', 'crop'])
+
+
 # ---------------------------------------------------------------------------
 # plot_inputs (GAP 2; parity loop) — item-level (t, i, plot, input)
 # ---------------------------------------------------------------------------
 #
 # One row per input APPLIED to a plot.  The crop/input modules live in the
 # EACI waves only (2014-15 EACI14, 2017-18 EACI17); the EHCVM waves
-# (2018-19, 2021-22) carry no agriculture-input block (the same wave split as
-# crop_production), so plot_inputs is wired for the two EACI waves only.
+# (2018-19, 2021-22) carry no agriculture-input block, so plot_inputs is wired
+# for the two EACI waves only.
 #
 # Grain: one row per (t, i, plot, input), where
 #   - i     = Mali composite household id (grappe, menage/exploitation),

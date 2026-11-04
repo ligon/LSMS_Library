@@ -3785,8 +3785,11 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
 # reads then collapses to a single HH "engaged in livestock" binary
 # (MWI_IHPS{1-4}.do: `recode ag_r00 ... gen(livestock)` then
 # `collapse (max) livestock, by(<hhid>)`).  We keep the PRE-collapse roster
-# at its natural grain, which is strictly richer than their binary (their
-# binary = our `livestock().groupby(['t','i']).size() > 0`).
+# at its natural grain, which is strictly richer than their binary.  That
+# binary is only APPROXIMATELY `livestock().groupby(['t','i']).size() > 0`:
+# 38 / 2 / 34 / 31 households by wave answer ag_r00 Yes with no served row
+# (one of the 34 since GH #1435), and 2 / 0 / 1 / 0 served households do not
+# answer Yes.  Read ag_r00 for the exact binary; see CONTENTS.org.
 #
 # One row per (household, species).  Reported item columns (only those the
 # survey records; missing-in-wave -> NaN):
@@ -3918,29 +3921,86 @@ def assemble_livestock(t, pieces):
 
     # Collapse any duplicate (i, animal) rows.  A canonical species is
     # reached from a SINGLE code within any wave (the harmonize_species map
-    # is 1:1 per wave), so a duplicate here means the household reported the
-    # same species on two roster lines: sum the head movements (HeadCount /
-    # HeadAcquired / HeadSold are additive counts of the same herd) and take
-    # the first reported ValuePerAnimal (a per-head price is not additive).
+    # is 1:1 per wave), so a duplicate would mean the household reported the
+    # same species on two roster lines.  None does, in any wave or half
+    # (measured on Module R, GH #1435).  The rule, should one appear: the
+    # head columns add over the lines and a BLANK STAYS BLANK (min_count=1),
+    # so a recorded 0 and an unanswered cell stay different things; the
+    # per-head ValuePerAnimal is not additive and takes the first reported.
     cat['t'] = t
     keys = ['t', 'i', 'animal']
     grouped = cat.groupby(keys, as_index=False, dropna=False)
-    grp = grouped.agg({
-        'HeadCount':    'sum',
-        'HeadAcquired': 'sum',
-        'HeadSold':     'sum',
-        'ValuePerAnimal': 'first',
-    })
-    # GH #855: the 12-months-ago stock is added like HeadCount over two
-    # lines of one species, but a blank stays blank (min_count=1).
-    if 'HeadCount12MonthsAgo' in cat.columns:
-        prior = grouped['HeadCount12MonthsAgo'].sum(min_count=1)
-        if not prior[keys].equals(grp[keys]):
-            raise ValueError('Malawi livestock reducer groups disagree')
-        grp['HeadCount12MonthsAgo'] = prior['HeadCount12MonthsAgo'].array
-    out = grp.set_index(keys)
+    head = [c for c in ('HeadCount', 'HeadAcquired', 'HeadSold',
+                        'HeadCount12MonthsAgo') if c in cat.columns]
+    grp = grouped[head].sum(min_count=1)
+    value = grouped['ValuePerAnimal'].first()
+    if not value[keys].equals(grp[keys]):
+        raise ValueError('Malawi livestock reducer groups disagree')
+    grp['ValuePerAnimal'] = value['ValuePerAnimal'].array
+    columns = [c for c in ('HeadCount', 'HeadAcquired', 'HeadSold',
+                           'ValuePerAnimal', 'HeadCount12MonthsAgo')
+               if c in grp.columns]
+    out = grp.set_index(keys)[columns]
     assert out.index.is_unique, f"Non-unique (t,i,animal) in livestock {t}"
     return out
+
+
+#: Registry key of the deletion below (``_/derivations.yml``, GH #1435).
+LIVESTOCK_NO_PAYLOAD = 'Malawi::livestock::owned-species-no-payload'
+
+#: The columns a livestock row serves: a row with none of them has no payload.
+_LIVESTOCK_SERVED = ['HeadCount', 'HeadAcquired', 'HeadSold', 'ValuePerAnimal',
+                     'HeadCount12MonthsAgo']
+
+#: Module R as the wave scripts read it: (source under the wave, household id
+#: column, id prefix).
+_MODULE_R_SOURCES = {
+    '2010-11': [('Data/Full_Sample/Agriculture/ag_mod_r1.dta', 'case_id', '')],
+    '2013-14': [('Data/AG_MOD_R1_13.dta', 'y2_hhid', '')],
+    '2016-17': [('Data/Cross_Sectional/ag_mod_r1.dta', 'case_id', 'cs-17-'),
+                ('Data/Panel/ag_mod_r1_16.dta', 'y3_hhid', '')],
+    '2019-20': [('Data/Cross_Sectional/ag_mod_r1.dta', 'case_id', ''),
+                ('Data/Panel/ag_mod_r1_19.dta', 'y4_hhid', '')],
+}
+
+
+def derive_livestock_no_payload(livestock):
+    """True where an assembled livestock row has no served answer.
+
+    Such a row was kept on ``ag_r01`` Yes alone.  ``_finalize_result``'s
+    ``dropna(how='all')`` removes it, so it is registered as a deletion.  A
+    recorded 0 is an answer, so a row holding one is not selected.
+    """
+    return livestock[_LIVESTOCK_SERVED].isna().all(axis=1)
+
+
+def inputs_livestock_no_payload(wave):
+    """The Module R lines behind the deletion (``rows: 0``), at ``(t, i, animal)``.
+
+    Every column of the source line under its original name, plus ``source``.
+    Re-reads the files through ``get_dataframe``; nothing is cached.
+    """
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    if wave not in _MODULE_R_SOURCES:
+        raise ValueError(f'livestock is built for {sorted(_MODULE_R_SOURCES)}, not {wave!r}')
+    root = countries_root() / 'Malawi' / wave
+    species = _malawi_code_map('harmonize_species')
+    raws, blocks = [], []
+    for source, hhid, prefix in _MODULE_R_SOURCES[wave]:
+        raw = get_dataframe(str(root / source), convert_categoricals=False)
+        raw['hhid'] = prefix + raw[hhid].apply(format_id)
+        blocks.append(_livestock_block(raw, hhid='hhid', animalcode='ag_r0a', t=wave))
+        code = pd.to_numeric(raw['ag_r0a'], errors='coerce').astype('Int64')
+        raws.append(raw.assign(t=wave, i=raw['hhid'].astype(str),
+                               animal=code.map(species).astype(object),
+                               source=source))
+    assembled = assemble_livestock(wave, blocks)
+    gone = assembled[derive_livestock_no_payload(assembled)].reset_index()
+    gone = gone[['t', 'i', 'animal']].astype(object)
+    lines = pd.concat(raws, ignore_index=True).drop(columns='hhid')
+    lines = lines.merge(gone.assign(i=gone['i'].astype(str)), on=['t', 'i', 'animal'])
+    return lines.set_index(['t', 'i', 'animal'])
 
 
 # --- anthropometry (GAP 5) ------------------------------------------------

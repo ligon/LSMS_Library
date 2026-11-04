@@ -356,6 +356,10 @@ class TestClusterFeatures:
     def test_v_is_the_district_parish_composite(self, built, wave):
         cf = built['cluster_features'].reset_index()
         vals = cf.loc[cf['t'] == wave, 'v'].dropna().astype(str)
+        # #1358 (GH #1120 D2): a household with no location is its own
+        # `unlocated-{hhid}` identity (66 / 1), which is not a parish.
+        vals = vals[~vals.str.startswith('unlocated-')]
+        assert len(vals) > 700
         assert (vals.str.count('/') == 1).all(), (
             f"{wave}: v is not a DISTRICT/PARISH composite: "
             f"{sorted(vals[vals.str.count('/') != 1])[:5]}")

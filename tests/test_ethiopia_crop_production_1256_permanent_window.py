@@ -173,13 +173,14 @@ def cp():
 def test_the_stamp_rides_to_the_served_table(cp):
     """Measured cold 2026-10-23: 3,796 W4 and 3,875 W5 rows (607 / 554 with a
     positive Value_sold); none in W1-W3.  (3,713 / 3,723 before the same
-    day's ruling that a row carrying a sale value is never dropped.)  The
-    attrs summary counts them."""
+    day's ruling that a row carrying a sale value is never dropped; 3,799 /
+    3,881 since GH #1461 serves a permanent crop's second line.)  The attrs
+    summary counts them."""
     t = np.asarray(cp.index.get_level_values("t"), dtype=object)
     d = (cp["Derivation"] == KEY).fillna(False).to_numpy(dtype=bool)
     got = {w: int((d & (t == w)).sum()) for w in sorted(set(t))}
     assert got == {"2011-12": 0, "2013-14": 0, "2015-16": 0,
-                   "2018-19": 3796, "2021-22": 3875}, got
+                   "2018-19": 3799, "2021-22": 3881}, got
     assert cp.loc[d, ["Quantity", "Quantity_sold", "Value_sold"]].notna().any(axis=1).all()
     summ = cp.attrs["derivations"]["Ethiopia"][KEY]
     assert summ["rows"] == int(d.sum())

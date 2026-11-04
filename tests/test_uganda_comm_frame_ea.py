@@ -286,28 +286,39 @@ def _keep(s, a, b):
     return int((j.a == j.b).fillna(False).sum()), len(j)
 
 
+def _is_singleton(v):
+    """#1358 (GH #1120 D2): an `unlocated-{hhid}` identity, not a frame EA."""
+    return v.str.startswith("unlocated-").fillna(False)
+
+
 @pytest.mark.requires_s3
 class TestServed:
 
     def test_seven_char_waves_serve_the_frame_ea(self, served):
         for wave in SEVEN_CHAR_WAVES:
             v = served[served.t == wave].v.dropna()
-            real = v[~v.str.startswith("@")]
+            real = v[~v.str.startswith("@") & ~_is_singleton(v)]
             assert set(real[real.str.len() != 8]) <= {UNMAPPED}, wave
 
     def test_2009_10_bins_and_gaps_untouched(self, served):
+        """The bins are untouched; the 24 gaps are identities since #1358."""
         v = served[served.t == "2009-10"].v
         bins = v[v.str.startswith("@").fillna(False)]
-        assert (len(bins), bins.nunique(), int(v.isna().sum())) == (541, 339, 24)
+        assert (len(bins), bins.nunique(), int(v.isna().sum())) == (541, 339, 0)
+        assert int(_is_singleton(v).sum()) == 28       # 24 gaps + 4 frame-only
 
     def test_2010_11_to_2011_12_keeps_every_linked_household(self, served):
+        """Every linked household LOCATED in both waves.  #1358 added 30 that
+        2011-12 knows only from AGSEC1, which have an identity and no EA."""
         kept, linked = _keep(served, "2010-11", "2011-12")
+        assert (kept, linked) == (2510, 2540)
+        kept, linked = _keep(served[~_is_singleton(served.v)], "2010-11", "2011-12")
         assert kept == linked == 2510
 
     def test_2005_06_to_2009_10_keeps_every_real_ea(self, served):
         kept, linked = _keep(served, "2005-06", "2009-10")
         v09 = served[served.t == "2009-10"].set_index("i").v
-        real = v09[~v09.str.startswith("@").fillna(True)]
+        real = v09[~v09.str.startswith("@").fillna(True) & ~_is_singleton(v09)]
         assert kept == len(real.index.intersection(
             served[served.t == "2005-06"].set_index("i").index))
         assert (kept, linked) == (2410, 2607)

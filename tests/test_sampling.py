@@ -853,7 +853,9 @@ class TestTheReproduction:
         `unobservable`; it then warned once while `wave-scoped`.  GH #1133
         serves both waves the 8-digit frame EA, so every linked household keeps
         `v` and the call is silent.  A boundary that is still incomparable
-        (2005-06 -> 2009-10, `mixed`: synthetic GPS bins) still warns."""
+        (2005-06 -> 2009-10, `mixed`: synthetic GPS bins) still warns.  #1358
+        (GH #1120 D2) added 30 linked households that 2011-12 knows only from
+        AGSEC1, as `unlocated-` identities: not clusters, so not compared."""
         S._clear_sampling_reports()
         s, caught = warns(lambda: self._fresh("Uganda").sample(
             waves=["2010-11", "2011-12"]))
@@ -861,7 +863,10 @@ class TestTheReproduction:
         idx = s.reset_index()[["i", "t", "v"]].dropna()
         wide = idx.pivot_table(index="i", columns="t", values="v",
                                aggfunc="first").dropna()
-        assert (wide["2010-11"] == wide["2011-12"]).sum() == len(wide) == 2510
+        assert not wide["2010-11"].str.startswith("unlocated-").any()
+        located = wide[~wide["2011-12"].str.startswith("unlocated-")]
+        assert len(wide) - len(located) == 30
+        assert (located["2010-11"] == located["2011-12"]).sum() == len(located) == 2510
         S._clear_sampling_reports()
         _, caught = warns(lambda: self._fresh("Uganda").sample(
             waves=["2005-06", "2009-10"]))

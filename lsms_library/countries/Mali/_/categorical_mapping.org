@@ -35,6 +35,17 @@
 # cannot collide: the two spellings are disjoint in `t`.
 # (x = present, --- = absent).  food_acquired waves: 2014-15 (EACI s13),
 # 2018-19 and 2021-22 (EHCVM s07b).  2017-18 has no food_acquired module.
+#
+# The last block is crop_production's EHCVM units (s16cq12b / s16cq16b /
+# s16dq05b, GH #824); there, x says the label occurs in a crop module, not in
+# food_acquired.  2018-19's sold variable spells the same codes differently from
+# its harvest variable (`Sacs de 100 kg` / `Sac-100 Kg`), which is why each has
+# two rows.  A sack keeps the weight its label states, because the kg ladder reads
+# `Sac (100 Kg)` and has nothing to read in `Sac large`; the form is the one
+# `Sac (25 Kg)` above and Burkina Faso's table already use.  None of these keys
+# occurs as a raw label in s07b, s05 or any EAC-I unit variable, so no served food
+# label moves.  These units take no #1224 size suffix: s16c and s16d have no size
+# variable, and their "Etat du produit" variables are a condition, not a size.
 
 #+name: u
 | Code                         | Preferred Label | 2014-15 | 2018-19 | 2021-22 |
@@ -117,6 +128,21 @@
 | Sac moyen (50 kg)            | Sac moyen       | x       | ---     | ---     |
 | Sac large (100 kg)           | Sac large       | x       | ---     | ---     |
 | Sac petit (25 kg)            | Sac petit       | x       | ---     | ---     |
+|------------------------------+-----------------+---------+---------+---------|
+| Sacs de 100 kg               | Sac (100 Kg)    | ---     | x       | x       |
+| Sac-100 Kg                   | Sac (100 Kg)    | ---     | x       | ---     |
+| Sacs de 50 kg                | Sac (50 Kg)     | ---     | x       | x       |
+| Sac-50kG                     | Sac (50 Kg)     | ---     | x       | ---     |
+| Sacs de 25 kg                | Sac (25 Kg)     | ---     | x       | x       |
+| Sac-25kg                     | Sac (25 Kg)     | ---     | x       | ---     |
+| Charretée asine              | Cart (donkey)   | ---     | x       | x       |
+| Charettée asine              | Cart (donkey)   | ---     | x       | ---     |
+| Charretée bovine             | Cart (ox)       | ---     | x       | x       |
+| Charettée bovine             | Cart (ox)       | ---     | x       | ---     |
+| Baignoire                    | Baignoire       | ---     | x       | x       |
+| Gerbes                       | Gerbe           | ---     | x       | x       |
+| Botte                        | Botte           | ---     | x       | x       |
+| Autres (à préciser)          | Autre           | ---     | x       | x       |
 
 #+name: harmonize_food
 | Code                                                                                                 | Preferred Label                              | 2014-15 | 2018-19 | 2021-22 |
@@ -441,6 +467,16 @@
 | Palmier à huile                                                                                      | Palmier à huile                              | x       | ---     | ---     |
 | Pomme canelle                                                                                        | Pomme cannelle                               | x       | ---     | ---     |
 | Autres                                                                                               | Autres cultures                              | x       | ---     | ---     |
+| Riz Paddy                                                                                            | Riz                                          | ---     | x       | x       |
+| Autre (à préciser)                                                                                   | Autres cultures                              | ---     | x       | x       |
+| Chou                                                                                                 | Chou                                         | ---     | x       | x       |
+| Oseille                                                                                              | Oseille                                      | ---     | x       | x       |
+| Calebassier                                                                                          | Calebasse                                    | ---     | x       | x       |
+| Souchet                                                                                              | Souchet                                      | ---     | x       | ---     |
+| Persil                                                                                               | Persil                                       | ---     | x       | ---     |
+| Céleri                                                                                               | Céleri                                       | ---     | x       | x       |
+| Radis                                                                                                | Radis                                        | ---     | x       | ---     |
+| Pomme à pin                                                                                          | Pomme à pin                                  | ---     | ---     | x       |
 |------------------------------------------------------------------------------------------------------+----------------------------------------------+---------+---------+---------+---------|
 | # community_prices items (EACI 2014-15 s04q01) — price-questionnaire item labels not already covered by the food_acquired/crop_production codes above; each REUSES the consumed-food Preferred Label so community_prices.j joins food_acquired.j / crop_production.j |                                              |         |         |         |
 | Cube alimentaire (Maggi)                                                                             | Cube alimentaire                             | x       | ---     | ---     |

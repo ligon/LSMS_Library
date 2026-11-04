@@ -65,6 +65,162 @@ of the library's =v=, not evidence that the survey redesigned its sampling
 PSU as a parish (GH #689). The separate =sampling.yml= record continues to
 describe enumeration-area PSUs, with its per-wave documentation qualifications.
 
+*** The design PSU =ea= (GH #689)
+
+/Ruling @ligon, 2026-11-03, option (C) extended./  From 2013-14 =v= is a parish,
+not the unit the survey sampled.  =v= and =cluster_features= stay exactly as they
+are, and =sample()= gains a column, =ea=: the enumeration area a household was
+SAMPLED in, carried with it when it moves.  That is what makes it a design PSU and
+a poor location key, and why it is a =sample()= column and not =v=.  Cluster a
+standard error on =ea=; locate a household with =v=.
+
+| wave    | source of =ea=                                         | non-null / rows | distinct |
+|---------+--------------------------------------------------------+-----------------+----------|
+| 2013-14 | =GSEC1.ea=, direct                                     | 3,119 / 3,119   |      317 |
+| 2015-16 | =gsec1.ea=, direct                                     | 3,305 / 3,377   |      316 |
+| 2018-19 | =GSEC1.t0_hhid= -> 2015-16 =HHID= -> =ea=              | 2,978 / 3,242   |      315 |
+| 2019-20 | =hhidold= -> 2018-19 =hhid= -> =t0_hhid= -> ... -> =ea= | 2,823 / 3,098   |      315 |
+
+The two inherited waves carry =Derivation= =Uganda::sample::ea-tracking-key=, on
+exactly the rows that received a value.  2005-06 to 2011-12 stay NA here: =v= is
+already the EA there, under =comm= labels, and a single label across all eight
+waves is GH #1459.
+
+*What the inheritance does NOT rest on: =ea= being unchanged across waves.*  All
+2,872 households linked 2013-14 -> 2015-16 keep =ea=, 316 labels one-to-one, but
+that cannot come out otherwise.  Characters 2-4 of the household id ARE =ea= (2013-14
+=HHID= 3,119 of 3,119; 2015-16 =hh= and =HHID= 3,305 of 3,305; =DynID= // 100 too),
+and the link is string identity between those ids: =gsec1.hh= with its wave token
+moved back (=-05-= -> =-04-=, the =Waves= table in =uganda.py=; 2015-16 has no
+=HHID_old=).  So that result pins UBOS's encoding and says nothing about whether the
+label or the tracking key is right.  The encoding is also *not a route*: parsing
+=t0_hhid= would give the 198 households below an answer for 168, and the ruling is
+that no route means NA.
+
+*What it does rest on.*  Checks that do not read the id's digits, on the raw files;
+"shuffled" permutes one side of the comparison.  No document states the rule.
+
+| check                                                             | result                | shuffled    |
+|-------------------------------------------------------------------+-----------------------+-------------|
+| =ea= vs 2011-12 =comm=, 1,717 households linked by =HHID_old=     | 212 pairs, one-to-one | 1,684 pairs |
+| =t0_hhid= child and parent in the same district                   | 2,729 of 2,978        | 30          |
+| =hhidold= child and parent in the same district                   | 2,977 of 2,986        | 50          |
+| persons linked by =pid_unps=: same sex                            | 11,203 of 11,296      | 5,687       |
+| persons linked by =pid_unps=: age gap of 1-5 years (median 3)     | 99.8% of 10,684       | 10.6%       |
+| person's 2015-16 household is the one =t0_hhid= names             | 13,166 of 13,298      |             |
+
+*What the value means, and how it misleads.*
+
+- /Split-offs inherit the parent's EA./  5 2015-16 households each have two 2018-19
+  households naming them (=t0_hhid= repeats), and all 10 carry the parent's =ea=.
+  So the value is the PSU through which the lineage entered the sample, not where
+  the household lives or where it was itself drawn.  That is right for a design-based
+  standard error and wrong as a location.
+- /=groupby('ea')= silently drops the NA rows./  =ea= is NA for 5.7% of wave weight in
+  2018-19 and 8.9% in 2019-20, and =groupby= drops a null key by default.  Those
+  households are not missing at random: they are the no-route households below.
+- /=ea= does not nest in =strata=./  52 of 317 EAs in 2013-14 and 81 of 316 in 2015-16
+  span more than one =sregion=; 61 of 315 and 64 of 315 span more than one =subreg= in
+  the two inherited waves.  A variance estimator that nests PSUs in strata cannot take
+  the column as it stands.
+
+*The keys are RAW source ids*, never the walked =i=, which is a canonical id from
+another wave.  All are clean strings: no float, whitespace or =.0= on any of the
+five key columns, and =format_id= changes none but the one trap below.  =ea= is
+int16 in the source, and the country-level =ea= formatter keeps it from reaching a
+consumer as ='12.0'= across the outer merge.
+
+- /A blank is not a link./  69 households in 2019-20 have =hhidold= == =''=; it
+  formats to =None=, and =_follow_key= drops it first because =pd.merge= matches
+  null keys to each other.
+- /A repeated target would raise./  The join is validated =many_to_one=: two children
+  may name one parent, but one key may not name two households.
+
+*The 198 + 66 of 2018-19 with no =ea=*, by what the source says about them:
+
+| households | =t0_hhid=                 | what it is                                                                                                                   |
+|------------+---------------------------+------------------------------------------------------------------------------------------------------------------------------|
+|         49 | 8 characters              | a real 2015-16 =HHID=, but of a household only =AGSEC1= records (D1 below).  Its =AGSEC1.ea= exists.                         |
+|         73 | 8 characters              | the form of a 2015-16 =HHID=; in no column of any of the 119 2015-16 =.dta=.                                                 |
+|         76 | 5 characters (=H= + 4)    | in no 2015-16 file; 46 would parse to a 2015-16 EA and 30 would not, so these are not truncated ids.                          |
+|         66 | (not in =GSEC1=)          | households only 2018-19 =AGSEC1= records, the =unlocated-= singletons of GH #1120 D2.                                        |
+
+The variable's label is "Full wave5 UNPS household ID or wave6 split-off Parent
+Household ID", and the library holds no wave 6, which is the likely home of the 73
+and the 76; that is an inference and nothing here depends on it.  All 198 are
+=response_status= 1 in =GSEC1=.  In 2019-20 the 275 with no =ea= are 69 blank
+=hhidold=, 43 naming a 2018-19 household only =AGSEC1= records, and 163 descending
+from the 198.
+
+*Why =AGSEC1= is not a route, as ruled.*  The ruling names =GSEC1=.  It would be a
+short step: =AGSEC1.ea= is non-null for the 72 households only =AGSEC1= records in
+2015-16 and equals =gsec1.ea= on all 2,622 households both covers hold, which would
+add 72 direct and 49 inherited values.  It is left for a ruling so that the column
+has one source.  =AGSEC1.t0_hhid= in 2018-19 is a different matter and is not a
+clean key: it disagrees with =GSEC1.t0_hhid= on 86 of the 3,176 households both
+files hold, and on those 86 its value (1-3 or 7 characters) is never a 2015-16
+=HHID=.
+
+*Mechanics.*  =origin_ea= is a real =dfs:= sub-df with the 2015-16 =gsec1= as its
+=file:=, and its country-level hook re-keys that frame to the current wave's =hhid=.
+Two reasons: the file's sidecar is then in the wave's =_input_hash= (2019-20 also
+declares its bridge, 2018-19 =GSEC1=, under a key that is not in =dfs:=, which
+=_collect_file_paths_from_block= hashes and =grab_data= never reads), and a loss the
+GH #515 handler catches costs =ea= and not =v=.  =Derivation= stays on =sample=:
+=_join_v_from_sample= carries =v= alone, and the =ea= column reaches no other table.
+
+*What losing a source costs.*  =sample= for 2018-19 and 2019-20 now reads other waves'
+covers, and that protection is partial.  Measured in the review of this change,
+2026-11-03, with a private L1 under =unshare -rn=:
+
+| lost                                 | result                                                                                                                                   |
+|--------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------|
+| 2015-16 =gsec1=, remote unreachable  | =EndpointConnectionError= is outside the #515 handler's tuple, so =sample= for both waves raises after about 90 s and =v= is lost too (GH #1463). 2019-20, which needed only its own cover, built in 1.5 s on base and raises at 89 s now. |
+| 2015-16 =gsec1=, =FileNotFoundError= | soft: =ea= is absent, every row and =v= survive (simulated; =tests/test_gh689_uganda_ea_psu.py=).                                         |
+| 2018-19 =GSEC1=, 2019-20's bridge    | =ea= drops and =v= survives, but the drop record names the readable 2015-16 file (the sub-df's one =file:=), so the #675 probe returns True.  Every fresh process rebuilds (about 70 s offline), =DegradedCacheWarning= never fires, and #675's "one probe per process" breaks through its one-source-per-sub-df assumption.  It heals when the blob returns. |
+
+*Measured, cold =98c6069d2= vs cold =6db7bf0d5=, 2026-11-03.*  Every declared Uganda
+table, =Feature('sample')= over Uganda, Albania and Malawi, and
+=household_characteristics=, =food_expenditures= and =sample= under
+=market='Region'= are frame-equal (=check_exact=), 31 of 31, once =ea= and this key
+are set aside; warning counts match table by table, and =updated_ids= and
+=check_panel_consistency= are identical.  A fresh-process warm read equals the cold
+build.  =Feature('sample')= keeps a unique index, =ea= is NA for the other two
+countries (12,225 Uganda values), and =derivation_inputs= joins 5,801 of 5,801
+stamped rows with equal values.  The cost is one Uganda re-warm: 28 of 28 Uganda
+country hashes and 224 of 224 Uganda wave hashes move, none elsewhere, and no build
+fingerprint.  The canonical =data_info.yml= declaration alone moves nothing.
+
+Standard error of a weighted mean, clustered on =ea= over clustered on =v=, on the
+same households (315-317 EAs, 702-864 parishes):
+
+| outcome              | 2013-14 | 2015-16 | 2018-19 | 2019-20 |
+|----------------------+---------+---------+---------+---------|
+| household size       |    0.98 |    1.01 |    1.00 |    0.99 |
+| log food expenditure |    1.00 |    1.01 |    1.14 |    1.11 |
+
+So the column matters for some statistics and not others: clustering on the parish
+understates the food standard error by about a tenth in the two inherited waves, and
+changes nothing visible in the two direct ones.  Why the ratio rises in those waves is
+not established.  This is one small check on two means, not a general claim about the
+size of the design effect, and it does not show that the inheritance is correct.
+
+=market='ea'= raises =KeyError= from =cluster_features=.  It was not asked for, and a
+market is a place, which =ea= is not.
+
+**** TODO Decisions the ruling leaves open
+
+1. /One label across all eight waves (GH #1459)./  =ea= is NA through 2011-12, where
+   =v= is the EA under =comm= labels.  =ea= pairs one-to-one with 2011-12 =comm= on all
+   212 linked EAs, which is the start of a crosswalk.
+2. /=AGSEC1= as a second source./  Accepting =AGSEC1.ea= for households only it
+   records adds 72 in 2015-16 (3,377 of 3,377), 49 in 2018-19 (3,027) and 45 in
+   2019-20 (2,868), with =GSEC1= keys only.  Following =AGSEC1.t0_hhid= as well for
+   households only 2018-19 =AGSEC1= records takes 2018-19 to 3,086 and 2019-20 to
+   2,907, at the price of a key that disagrees with =GSEC1= where both exist.
+3. /The 73 + 76 of 2018-19./  A wave 6 household file would settle what those ids
+   name.  Until then they stay NA; parsing the id is the alternative already declined.
+
 *** =v= across waves: three different defects (GH #942)
 
 =v= is not one identifier across Uganda's waves, and the reasons differ by
@@ -88,6 +244,10 @@ frame carrying =v= across them:
    | 2005-06 -> 2009-10    | 0 / 2,607       | 2,410 / 2,607 (92.4%)  |
    | 2009-10 -> 2010-11    | 1,819 / 2,647   | 2,207 / 2,647 (83.4%)  |
    | 2010-11 -> 2011-12    | 0 / 2,510       | 2,510 / 2,510 (100%)   |
+
+   (/Measured cold 2026-11-04/: the first two rows stand, and the last is now
+   2,510 / 2,540.  The other 30 are on 2011-12's =AGSEC1= only and carry the
+   =unlocated-= singleton of GH #1120 D2, which is no change of cluster.)
 
    Every remaining non-keeper is a 2009-10 =@lat,lon= bin or no-=v= household
    (defect 2).  Served distinct =v=: 2009-10 656 -> 656 (317 EAs now 8-digit,
@@ -150,7 +310,9 @@ frame carrying =v= across them:
    339 of that wave's 656 =v= are 0.05-degree GPS bins, not clusters, so its
    two boundaries are declared =mixed=.
 3. *A change of KIND*: EA (=comm=) -> parish code (2013-14) -> =DISTRICT/PARISH=
-   name composite (2018-19).  Declared =redefined=; no crosswalk can exist.
+   name composite (2018-19).  Declared =redefined=; no crosswalk can exist for
+   =v=.  (/2026-11-03/: the EA itself is not lost.  It is served as =ea=, above,
+   GH #689.)
 
 *** Why 2018-19 / 2019-20 =v= is a =DISTRICT/PARISH= composite (GH #323)
 
@@ -319,10 +481,11 @@ household-level column for every Uganda wave (it reads the same
 → Central fold in 2009-10 and 2010-11 where applicable).
 
 Practical consequence: =Country('Uganda').sample()[['v','Region']]=
-is complete for every household; joining =Region= from =sample()=
-— rather than =cluster_features()= — avoids dropping the 565
-movers/split-offs from any =(i, t, m)=-keyed regression where =m=
-is derived from Region.  Recommended pattern:
+holds =Region= for every household a cover records it for; joining it from
+=sample()= — rather than =cluster_features()= — keeps the 565
+movers/split-offs in any =(i, t, m)=-keyed regression where =m=
+is derived from Region.  It is not complete: 130 of 24,561 rows have none
+(next subsection, and the audit caveat below).  Recommended pattern:
 
 #+begin_src python
 uga = ll.Country('Uganda')
@@ -337,11 +500,91 @@ cluster-level view (e.g., summarising EAs); use =sample()[['Region']]=
 when you want every surveyed household covered.
 
 Audit caveat (2026-09-16): =sample(waves=['2019-20'])= returns 3,098
-households, of which three have missing =Region=. Thus the blanket
-completeness statement above does not hold for every source record, even
+households, of which three have missing =Region=. (Since GH #1120 D2 so do 4 in
+2009-10, 57 in 2011-12 and 66 in 2018-19, the =unlocated-= households on no
+cover.)  Thus no blanket completeness statement holds for every source record, even
 when the household-level join avoids the known mover problem. The
 [[file:../../../../SkunkWorks/aggregation/evaluation.org::*Uganda observation patterns][food aggregation simulation]] reports these three explicitly and uses the
 remaining 3,095 households; it doesn't infer their Region from a cluster.
+
+*** HH-level =District= on =sample()= (GH #1441, 2026-11-04)
+
+=market='District'= reads =sample()= first and =cluster_features()= second, and
+=sample= had no =District=.  So the only source was the cluster table, where
+=reduce_to_agreed= blanks a cluster whose households disagree.  They do, because
+=comm= is the EA of origin and the label is the household's own (2011-12 is qualified
+below): one mover, or one carved-out district (=LIRA= / =ALEBTONG=), blanked the label
+for every household on that EA, though each carried its own.  =sample= now carries the
+column =cluster_features= reads, through the same formatter.
+
+| wave    | cover column     | no label, before | after | what is left                                 |
+|---------+------------------+------------------+-------+----------------------------------------------|
+| 2005-06 | =h1aq1= names    |                0 |     0 |                                              |
+| 2009-10 | =h1aq1= codes    |               71 |     6 | 4 on no cover (=AGSEC3B= / =GSEC12= only), 2 blank |
+| 2010-11 | =h1aq1= names    |              898 |    12 | blank, on an EA whose households disagree    |
+| 2011-12 | =h1aq1= mixed case |          1,172 |   131 | 57 on =AGSEC1= only, 74 blank on such an EA  |
+| 2013-14 | =h1aq1a= codes   |                0 |     0 |                                              |
+| 2015-16 | =district= names |                0 |     0 |                                              |
+| 2018-19 | =distirct_name=  |               66 |    66 | on =AGSEC1= only, whose =region= is blank for all 66 |
+| 2019-20 | =district= names |                1 |     1 | blank                                        |
+
+- /Disagreement, not absence, was the cause./  92 EAs in 2010-11 and 106 in 2011-12
+  disagree.  9 of the 106 (95 households) differ only by case, =KAMPALA= / =kampala=,
+  125 spellings of 106 names, and =2011-12/_/mapping.py= folds that, so their
+  =cluster_features.District= is back.  The other 97 stay =<NA>= there, correctly.
+- /The two tables agree./  Where both have a value they are equal, 22,341 of 22,341
+  households (=Region=: 23,956 of 23,956), and =m= is the household's own label wherever
+  it has one.  107 households with a blank of their own (=Region=: 1) still take an
+  agreeing cluster's label; that is =_add_market_index='s existing fallback, unchanged.
+- /What the label says it is./  =h1aq1= is "District Code as of 2009/10" in 2009-10 and
+  "District Name as in 2010/11" in 2010-11; =h1aq1a= is "District of residence in
+  2013/14"; =district= is "District where hh is interviewed" in 2015-16.  The 2010-11 BID
+  (PDF p. 4): "The locations of the households at the time of the 2010/11 interview were
+  therefore recorded" against the Ministry's August 2010 list.  On 2010-11's disagreeing
+  EAs, households off the EA's modal label sit nearer their own label's centroid: 70 of
+  88, median 14.0 km against 40.6 km.
+- /2011-12 is effectively 2010-11's label carried forward, not where the household is
+  now./  Its =h1aq1= is labelled only "District", and its BID (PDF p. 8) says Section 1A
+  "was distributed by the Headquarters staff to the field teams before starting data
+  collection".  Of 2,510 households linked to 2010-11, 2,488 keep the label, 20 are blank
+  in both, 1 is blank in 2011-12, and 1 changes, with no GPS in either wave.  All 12
+  labelled households whose GPS moved over 5 km kept their label, 2 of them over 50 km.
+  141 of its 164 blanks have =wave= ("Wave when household was created/split off") 3,
+  which is what a carried-forward field predicts.  So 2,488 of 2,489 is largely circular:
+  it does not show the label is right, and a 2011-12 label can lag a move.
+- /Not a cross-wave vocabulary, so a cross-wave =m= is not comparable./  Codes in 2009-10
+  and 2013-14; Title case in 2005-06 and 2015-16; UPPER in 2010-11, 2011-12, 2018-19 and
+  2019-20.  Title and UPPER waves share at most one exact string, =NTOROKO=, which
+  2015-16 writes in upper case.  Spelling and carve-outs split it further: 2015-16 writes
+  =Ntugamo= where the others write =NTUNGAMO= (56 linked households), and the six name
+  waves hold 141 names even with case folded.  The =districts= table in
+  =categorical_mapping.org=
+  (=Miyana= -> =Mityana=, =Kalanga= -> =Kalangala=, ...) is read by nothing, and not all
+  of it is a spelling: =Bugweri= -> =Bugiri= folds what 2018-19 records as two districts.
+  =MIYANA= (2010-11) and =KALANGA= (2011-12) are one household each, on EAs that
+  disagree anyway, so they blank nothing and are left as recorded.
+
+=Region= (129 households, unchanged): 127 are on no household cover (2009-10 4, 2011-12
+57, 2018-19 66), and 2 are blank on the 2019-20 cover, whose =regurb= holds =0.0= or =0.1=
+for those rows.  A sweep of every =.dta= in those waves, by column name, finds no geography with a
+value for them.  What could fill them, and =District='s 216, is a construction, so:
+
+**** TODO Decision: fill the 129 and the 216 from a household's other waves?
+
+Memo in the #1441 report.  =District='s residual is not evenly spread: 131 households in
+2011-12 hold 10.3% of that wave's weight and 12 in 2010-11 hold 1.1%; elsewhere 0.1% or
+less.  The 74 cover blanks of 2011-12 are mostly new split-offs (60 with =wave= 3), mean
+weight 4.3 against 0.8.  The same household's label in an adjacent wave, in the same form
+(code or name), reaches 77 of the 129 =Region= and 74 of the 216 =District=, but recovers
+only 0.02% of 2011-12's weight; its 2013-14 code would reach 3.2% and needs a code-to-name
+map.  Agreement between name waves is 79.5%, 87.3% and 99.7% on the three =District=
+pairs other than the circular one (above), and 99.4% or better for =Region= on all seven
+boundaries.  A cluster mate's
+modal label matches 740 of 886 and 784 of 946 on the EAs concerned, and is not offered.
+
+Separately, =_add_market_index='s existing fallback is not "own label": 90 households in
+2011-12, 81 of them =wave= 3, take an agreeing origin EA's label and hold 12.4% of that
+wave's weight, and 22 of the 60 with GPS are over 5 km from their EA-mates.
 
 ** Rotating panel and refreshment sample
 
@@ -1159,8 +1402,13 @@ cells.  Measured on the returned table:
 
 | Wave    | =District= | =Region= | =Rural= | =Latitude= / =Longitude= |
 |---------+------------+----------+---------+--------------------------|
-| 2010-11 | 27.8%      | 5.0%     | 4.4%    | 41.2%                    |
-| 2011-12 | 33.0%      | 7.8%     | 0.0%    | 49.8%                    |
+| 2010-11 | 27.7%      | 5.0%     | 4.4%    | 41.5%                    |
+| 2011-12 | 40.7%      | 21.7%    | 15.1%   | 57.4%                    |
+
+(Cold, 2026-11-04.  2011-12 now counts the 57 =unlocated-= singletons of GH #1120 D2,
+empty in every column.  On its other 321 clusters: =District= 30.2%, =Region= 7.8%,
+=Rural= 0.0%, GPS 49.8%.  Its =District= was 33.0% on those 321, and 43.1% on all 378,
+before the GH #1441 case fold.)
 
 That is the point: the old value was an arbitrary pick, or a composite,
 among disagreeing households.  Two causes of disagreement remain, and
@@ -1169,8 +1417,9 @@ neither is a bug we can configure away:
 1. /Panel dispersal/ — =comm= (2005-06 … 2011-12) is the *2005-06 EA of
    origin*, which the panel carries forward when it tracks a mover.  A
    household that moved district still reports its origin EA, so its
-   =District= / =Region= legitimately differ from its EA-mates'.  93
-   clusters in 2010-11, 106 in 2011-12.
+   =District= / =Region= legitimately differ from its EA-mates'.  92
+   clusters in 2010-11, 97 in 2011-12 (93 before GH #1133 merged two
+   codes, and 106 before GH #1441 folded 2011-12's case).
 2. /Sub-cluster variation/ — =v= is a PARISH from 2013-14 on, and a
    parish contains several enumeration areas, some urban and some rural,
    each with its own geovar fix.  =Rural= and the GPS are therefore not
@@ -1178,7 +1427,8 @@ neither is a bug we can configure away:
    in 2015-16 / 2018-19 / 2019-20 (70 in 2013-14).
 
 For a per-household answer use =sample()=, which carries exact
-household-level =Rural= and =Region= for every household.
+household-level =Rural=, =Region= and (GH #1441) =District= for every household
+whose cover records them.
 
 *Parish disclosure (GH #689).* The =data_scheme.yml= =cluster_features=
 block also states this grain distinction so a reader does not mistake its
@@ -1212,14 +1462,17 @@ cluster, so it is no cleaner than the parish:
   =ea=, =EA_code=, =comm= or =comcod=.  =EA_code= / =t0_EA_code= (2018-19, 305
   communities) and =Final_EA_code= (2019-20, 307) exist only in the community
   files, which carry no household key.  2018-19 =GSEC1.t0_hhid= matches a
-  2015-16 =HHID= for 2,978 of 3,176 households (2019-20 not probed).
+  2015-16 =HHID= for 2,978 of 3,176 households.  (/2026-11-03/: 2019-20 =hhidold=
+  matches a 2018-19 =GSEC1.hhid= for 2,986 of 3,098, and the chain reaches =ea=
+  for 2,823; see "The design PSU =ea=" under Sampling Design.)
 
 /Contradicts/ the 2013-14 =cluster_id_note= in =sampling.yml=, "A parish is
 not an EA, so no crosswalk can exist": true of the served parish =v=, but the
 survey's own =ea= pairs one-to-one with 2011-12 =comm= on all 212 linked EAs.
-Nothing is rewired here.  Whether =v= (or a separate design-PSU column) should
-use =ea= is #689's open decision; as =v= it would give MORE =Rural= conflicts
-than the parish (128 vs 70 groups in 2013-14), not fewer.
+(/2026-11-03, #689 decided/: =v= stays the parish, and =ea= is a separate column
+on =sample()=, because as =v= it would give MORE =Rural= conflicts than the parish
+(128 vs 70 groups in 2013-14), not fewer.  See "The design PSU =ea=" under Sampling
+Design; the 2013-14 =cluster_id_note= is corrected.)
 
 *GPS is not averaged.*  Where the within-cluster coordinates vary at all
 they vary by a MEDIAN of 4.6--42.9 km and by up to 584 km (measured, all
@@ -4479,6 +4732,18 @@ The existing conditional null-key loss, reducers, units, plot construction,
 weights and second-season seed coverage gap remain. This does not resolve
 #829 WAITING, #647 PART-harvest additivity or the 2019 panel-weight questions.
 
+* =unknown_plot= and =harvest_kg=: GH #1460 (noted 2026-11-04, not fixed here)
+
+=transformations.harvest_kg= groups at =(t, i, plot_id, j)=, so it pools a household's
+=unknown_plot= rows of one crop as if they were one plot, which the canonical
+=data_info.yml= consumer rule says they are not.  It also sums across =condition=.
+Measured at this branch: 403 =crop_production= rows are =unknown_plot= (2009-10 360,
+2011-12 43), 75 household-wave-crops hold more than one, and they reduce to 227
+=Harvest_kg= rows, 70,277 of 42.1M kg (0.17%).  Uganda's crop level is named =j=, so
+#1460's first defect, summing across crops, does not reach this country; the
+=condition= sum and this pooling do.  =plot_inputs= holds 136 =unknown_plot= rows and
+=plot_labor= 141.
+
 * GH1120 locating covers and singletons (2026-10-30, independent review pending)
 
 The approved D1/D2 rules supersede the historical statement above that the
@@ -4794,6 +5059,19 @@ keys are =gsec1.hh= values, none is a =gsec1.HHID=) and =gsec15bb_3.hhid= (10
 rows, =DynID= missing on all).  They are among the 51 =GSEC16= keys in neither
 =gsec1.hh= nor =AGSEC1.hh=.  So no recorded link to a sample household exists
 in this release; closing them needs producer correspondence, not more search.
+
+*2015-16 =shocks= had the same hole (GH #1434, 2026-11-04).*  =shocks.py= reaches
+the sample's =HHID= and its interview month through =gsec1.hh=, and an inner merge
+deleted the 2 valid shock rows (of 1,023) of 2 households only =AGSEC1= records.
+They now use =AGSEC1='s =hh -> HHID= pair and its own date, on the housing rules
+above; 0 valid rows are in neither cover, so the 51 keys above carry no shock.
+=interview= is labelled "Hh with food consumption", and =nonresp= is "Interview result" on
+=gsec1=.  Both read "Not done" for all 72 households =AGSEC1= holds and =gsec1= lacks.  All
+72 have a =GSEC16= grid, but only 6 answered the full 20-row module; those same 6 are the
+only ones with an =AGSEC1= interview date, and 2 of the 120 answers report a shock.  On
+the 2,622 households both covers hold, =AGSEC1='s date equals =gsec1='s on all 2,619 where
+both record one.  Both =Onset= values are under 12 months.  /The 2 kept rows carry NaN
+=weight= and zero =panel_weight=/ (=hwgt_W5=), so no weighted statistic moves.
 
 * Seven-wave plot-input compiler runtime checkpoint (GH #1287, 2026-10-31)
 

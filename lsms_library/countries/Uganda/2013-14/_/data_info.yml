@@ -62,11 +62,15 @@ sample:
         myvars:
             _cover: HHID
             v: h1aq4a
+            ea: ea  # the design PSU of origin, not `v`, which is a parish (GH #689)
             weight: wgt_X  # cross-sectional weight (covers both panel and refreshment sample)
             panel_weight: wgt  # longitudinal weight (zero for non-sample, NaN for refreshment)
             strata: sregion
             Rural: urban
             Region: region
+            # The household's OWN recorded district, the column `cluster_features` reads, so
+            # `market='District'` labels a household its cluster's mates disagree about (GH #1441).
+            District: h1aq1a  # 3-digit code in this wave
 
     merge_on: [i]
     final_index: [t, i]

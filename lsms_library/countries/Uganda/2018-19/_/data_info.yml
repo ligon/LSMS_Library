@@ -75,6 +75,7 @@ sample:
     dfs:
         - locating_cover
         - locating_ag
+        - origin_ea
     locating_cover:
         file: GSEC1.dta
         idxvars:
@@ -96,12 +97,27 @@ sample:
             strata: subreg
             Rural: urban
             Region: region
+            # The household's OWN recorded district, the column `cluster_features` reads, so
+            # `market='District'` labels a household its cluster's mates disagree about (GH #1441).
+            District: distirct_name  # sic
     locating_ag:
         file: AGSEC1.dta
         idxvars:
             i: hhid
         myvars:
             _frame: hhid
+    # GH #689: the design PSU, which no file of this wave ships.  The country
+    # hook `origin_ea` re-keys this 2015-16 frame to this wave's `hhid` through
+    # GSEC1.t0_hhid, the survey's own tracking key; a household it does not
+    # reach stays NA.  Declared here so the file's sidecar is in this wave's
+    # input hash, and so that a loss the GH #515 handler catches costs `ea`, not
+    # `v`.  An unreachable remote is not caught: `sample` raises here (GH #1463).
+    origin_ea:
+        file: ../../2015-16/Data/gsec1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            ea: ea
     merge_on:
         - i
     final_index:

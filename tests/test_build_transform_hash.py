@@ -470,6 +470,11 @@ def test_no_transformations_symbol_reaches_any_fingerprint():
         "lsms_library.transformations._EXPLICIT_METRIC_PATTERNS",
         "lsms_library.transformations.FOOD_KG_MIN_BASELINE",
         "lsms_library.transformations.FOOD_KG_TIGHT_TOLERANCE",
+        # GH #1450: the size pool behind both inferred rungs is read-path too.
+        "lsms_library.transformations._UNIT_SIZE_WORDS",
+        "lsms_library.transformations._unit_size_base",
+        "lsms_library.transformations._size_pooled_frame",
+        "lsms_library.transformations._inferred_kg_rungs",
         # GH #1254: analysis-time wave pooling must not rebuild native caches.
         "lsms_library.transformations.median_price_valuation",
     }

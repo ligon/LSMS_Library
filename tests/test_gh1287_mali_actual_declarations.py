@@ -32,7 +32,8 @@ INDEXES = {
     'plot_features': ['t', 'i', 'plot_id'],
 }
 CURRENT_DECLARED = {table: (CURRENT[:1] if table == 'food_coping' else
-                           CURRENT[2:] if table == 'plot_features' else CURRENT[:2])
+                           CURRENT[2:] if table == 'plot_features' else
+                           CURRENT if table == 'crop_production' else CURRENT[:2])
                     for table in INDEXES}
 
 

@@ -42,14 +42,15 @@ panel-ids:
 $(VAR_DIR)/food_coping.parquet: food_coping.py ../2014-15/_/food_coping.parquet
 	python food_coping.py
 
-# crop_production (item-level harvest, GAP 1 / parity loop).  The crop
-# module lives in the EACI waves only (2014-15, 2017-18).  The wave
-# pattern rule materializes each wave parquet; the country-level
-# concatenator (crop_production.py) aggregates into var/crop_production.parquet.
+# crop_production (item-level harvest, GAP 1 / parity loop).  All four waves
+# carry a crop module: EACI 2014-15 and 2017-18, EHCVM 2018-19 and 2021-22
+# (s16c / s16d, GH #824).  The wave pattern rule materializes each wave parquet;
+# the country-level concatenator (crop_production.py) aggregates into
+# var/crop_production.parquet.
 ../%/_/crop_production.parquet: ../%/_/crop_production.py
 	(cd $(@D) && python crop_production.py)
 
-$(VAR_DIR)/crop_production.parquet: crop_production.py ../2014-15/_/crop_production.parquet ../2017-18/_/crop_production.parquet
+$(VAR_DIR)/crop_production.parquet: crop_production.py ../2014-15/_/crop_production.parquet ../2017-18/_/crop_production.parquet ../2018-19/_/crop_production.parquet ../2021-22/_/crop_production.parquet
 	python crop_production.py
 
 # plot_inputs (item-level ag inputs, GAP 2 / parity loop).  The input

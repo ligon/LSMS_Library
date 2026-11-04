@@ -675,3 +675,12 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
   served as rows of their own; they are inputs to the unit value, retrievable
   through =derivation_inputs=.
+
+* 2026-11-04 -- the NPK slot states no grade (GH #1445)
+
+Measured, nothing changed.  Code 5 of =s16bq01= is =Engrais inorganiques -
+NPK/Formule unique= in the file and the questionnaire (1,720 applied rows); no grade.
+It maps to =NPK= (0.17 N) and is 24.3% of =nitrogen_kg=; 31 =Tonne= rows are 30.2% of the slot's
+kilograms.  The =npk 15/15= rows of =harmonize_input= came with the Niger template and
+match no label here.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 2,568 positive), which the
+=data_scheme.yml= grain note says it does not.

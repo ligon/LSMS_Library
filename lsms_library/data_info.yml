@@ -21,6 +21,14 @@ Single Index:
   # plot_features row (no area, no GPS), so exclude it from any per-plot
   # quantity and REPORT how many rows you excluded.  Two `unknown_plot` rows of
   # one household are not one plot.
+  # `plot_id == 'Farm-level'` is not a plot either, so a count of plots drops
+  # every such row.  On `crop_production` such a row holds a sale no plot can own
+  # (Mali 2021-22; Nigeria W3-W5, GH #843 / #824).  In a count of crop occurrences,
+  # drop it where the household has a plot row of that crop and keep it where it
+  # has none, because it is then the only record of the crop (GH #1469;
+  # `transformations.crop_diversity(weight='count')`).  All 37,280 rows of GhanaLSS
+  # 1987-88 / 1988-89 are Farm-level, so a blanket filter there deletes every crop
+  # record.  A value sum keeps every such row; the sale is there.
   plot_id: plot id
   int_t: interview date
   # Opaque crop-observation coordinate within the full native key (GH1198).
@@ -483,6 +491,21 @@ Columns:
         # stratum is entirely metro=1), so there is no evidence they are urban.
         # Kept as a distinct, VISIBLE value rather than guessed away.  GH #602.
         Informal: []
+    ea:
+      # The design PSU where a country's `v` is not one (GH #689; Uganda only
+      # today).  It is the enumeration area a household was SAMPLED in, carried
+      # with it when it moves, so it says how the sample was drawn and is a
+      # poor location key.  It is NOT `v`, is not joined onto other tables, and
+      # is NA where the survey offers no route to it: never filled from `v`.
+      type: str
+      optional: true
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        As under `food_acquired.Derivation`: the registry key of a constructed
+        field on this household's row (its `columns` entry names which one).
+        Stays on `sample`: `_join_v_from_sample` carries `v` alone.
   cluster_features:
     Region:
       type: str
@@ -1112,7 +1135,8 @@ Columns:
         rows, 63-99% of Niger's by wave, and 96.1% of Uganda's (measured
         2026-09-10 over the 40,083 rows with a positive `Quantity_sold` that
         know both units, GH #824; 41,162 rows and the same 96.1% since GH
-        #848, 2026-09-24).  Tanzania records every sale in kilograms
+        #848, 2026-09-24; 41,340 rows and the same 96.1% measured 2026-11-04).
+        Tanzania records every sale in kilograms
         and needs no such column.
 
         NA-BEARING, NEVER SENTINEL-FILLED.  `u` carries the string

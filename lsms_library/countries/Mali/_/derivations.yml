@@ -215,3 +215,61 @@ Mali::crop_production::tree-sale-window:
     the task ledger; this entry supplies no whole-issue acceptance.
   contents: 'Mali/_/CONTENTS.org, "Revised ruling: tree sales as recorded"'
   since: '2026-10-23'
+
+Mali::crop_production::hh-crop-sale-single-row:
+  waves: ['2021-22']
+  columns: [Quantity_sold, Unit_sold, Value_sold]
+  rule: >-
+    s16d records a sale for the household and crop, with no plot.  A sale is a
+    record with a positive s16dq05a or s16dq06.  Where the household has exactly
+    one s16c row for the crop -- one served row, not merely one plot -- the sale
+    is served on that row: Quantity_sold = s16dq05a, Unit_sold = s16dq05b,
+    Value_sold = s16dq06, as recorded, and that row carries this key.  What is
+    derived is the ATTACHMENT, not the numbers.  Any other sale is served on one
+    row of that household and crop with plot_id = 'Farm-level', no harvest
+    Quantity and no key, because its index value already discloses it.  No sale
+    is split, summed, scaled or dropped, and a record that is not a sale serves
+    nothing: no zero is written.
+  function: lsms_library.countries.Mali._.mali:derive_hh_crop_sale_attachment
+  inputs: lsms_library.countries.Mali._.mali:inputs_hh_crop_sale_single_row
+  raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b,
+                  s16dq06]
+  assumptions:
+    - text: >-
+        s16d asks the sale once per crop, with no plot, and s16c records no sale.
+        Where the household has one harvest row for the crop, no other row can
+        hold the sale, so the row is its only candidate.  The sale is NOT thereby
+        a share of that row's Quantity: s16cq16a is empty on most of these rows.
+      basis: variable-label
+      evidence: >-
+        s16d_me_mli2021.dta has no field or parcel variable; s16dq05a "16D.05a.
+        Quelle est la quantite de ce produit qui a deja ete vendue ?"; s16dq06
+        "16D.06. Quel a ete le montant tire de la vente de ce produit?".
+        s16c_me_mli2021.dta carries s16cq02 / s16cq03 and no sale variable.
+    - text: >-
+        a sale of a crop on two or more rows is not allocated among them, since
+        any split would be invented.  It stays with the household and crop on a
+        Farm-level row, where gross_crop_revenue and median_price_valuation can
+        read it, and where harvest_kg and yield_kg do not, because it has no
+        Quantity.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-03, option (d), GH #824; the rule of Niger 2021-22
+        after GH #1360 for the single row; the Farm-level convention in
+        lsms_library/data_info.yml, top of file.
+    - text: >-
+        s16dq05c, "Estimation Quantite totale UML en kg", is not served.  It is a
+        total (it equals s16dq05a on 495 of 495 rows sold in Kg, and 100 x
+        s16dq05a on 299 of 465 sold in 100 kg sacks), not kg per sold unit.
+      basis: variable-label
+      evidence: >-
+        the Stata label of s16dq05c; the same shape as the EAC-I tree equivalents,
+        Mali/_/CONTENTS.org, "crop_production: the sold unit".
+  validated_against: >-
+    tests/test_gh824_mali_ehcvm_crop_production.py, whose oracle reads s16c and s16d
+    directly.  Cold build of 2021-22: 1,070 keyed rows and 70 Farm-level rows (58 of
+    crops on two rows, 12 on three or more, 0 on none) hold the 1,140 sale records, no
+    sale on two rows; Value_sold 394,396,600 + 24,301,375 = 418,697,975 FCFA, the raw sum.
+    Not validated against an external total: no document here reports one.
+  contents: 'Mali/_/CONTENTS.org, "2026-11-03 -- EHCVM crop_production wired (GH #824)"'
+  since: '2026-11-03'

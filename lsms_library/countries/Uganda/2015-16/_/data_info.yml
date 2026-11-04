@@ -75,11 +75,17 @@ sample:
             i: HHID
         myvars:
             v: parish_code
+            # The design PSU of origin, not `v`, which is a parish (GH #689).
+            # GSEC1 only, as ruled: the 72 AGSEC1-only households stay NA here.
+            ea: ea
             weight: h_xwgt_W5  # cross-sectional weight (covers both panel and refreshment sample)
             panel_weight: hwgt_W5  # longitudinal weight (zero for refreshment sample)
             strata: sregion
             Rural: urban
             Region: region
+            # The household's OWN recorded district, the column `cluster_features` reads, so
+            # `market='District'` labels a household its cluster's mates disagree about (GH #1441).
+            District: district
             _cover: HHID
     locating_ag:
         file: AGSEC1.dta
@@ -92,6 +98,7 @@ sample:
             _ag_strata: sregion
             _ag_Rural: urban
             _ag_Region: region
+            _ag_District: district
     merge_on:
         - i
     final_index:

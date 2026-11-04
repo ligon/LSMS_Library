@@ -54,6 +54,16 @@ def v(x):
     return format_id(x)
 
 
+def ea(x):
+    """Canonical ``ea`` for a ``myvar`` (GH #689): ``format_id``, as for ``v``.
+
+    ``GSEC1.ea`` is int16 and ``format_id`` is not auto-applied to ``myvars``,
+    so an outer merge that widens the column to float would otherwise reach a
+    consumer as ``'12.0'``.  See ``origin_ea`` for what the column means.
+    """
+    return format_id(x)
+
+
 @functools.lru_cache(maxsize=None)
 def _comm_frame_ea_map():
     """``{7-character comm: 8-digit frame EA}`` from the reviewed table (GH #1133).
@@ -238,7 +248,7 @@ def cluster_features(df):
     1. ``comm`` (2005-06 .. 2011-12) is the *2005-06 EA of origin*, which the
        panel carries forward when it tracks a mover.  A household that moved
        district still reports its origin EA, so its District/Region legitimately
-       differ from its EA-mates'.  93 clusters in 2010-11, 106 in 2011-12.
+       differ from its EA-mates'.  92 clusters in 2010-11, 97 in 2011-12.
     2. ``v`` is a PARISH from 2013-14 on, and a parish contains several
        enumeration areas -- some urban, some rural, each with its own geovar
        fix.  ``Rural`` and the GPS are therefore not parish attributes at all
@@ -247,7 +257,7 @@ def cluster_features(df):
 
     Neither can be resolved from this table, and picking a winner is the bug.
     ``<NA>`` + a warning is the honest answer; per-household ``Rural`` / ``Region``
-    remain exact in ``sample()``, which is their proper home.
+    / ``District`` remain exact in ``sample()``, which is their proper home.
 
     NOT reduced with an average.  Where the within-cluster GPS varies at all it
     varies by a MEDIAN of 4.6-42.9 km and by up to 584 km (measured, all waves):
@@ -509,6 +519,104 @@ def _adopt_alternate_cover(flat, table='sample'):
     return flat.drop(columns=temps)
 
 
+#: The registry key on a row whose ``ea`` was inherited (GH #689).
+_EA_INHERITED_KEY = 'Uganda::sample::ea-tracking-key'
+#: Marker column ``origin_ea`` hands to ``sample``; never served.
+_EA_INHERITED_MARKER = '_ea_inherited'
+
+
+def _uganda_cover(relative):
+    """A raw cover under ``countries_root()``, values as stored."""
+    from lsms_library.paths import countries_root
+    path = countries_root() / 'Uganda' / relative
+    return get_dataframe(str(path), convert_categoricals=False)
+
+
+def _follow_key(left, key, right, target):
+    """``left`` rows whose ``key`` names a ``right`` row through ``target``.
+
+    Compares ``format_id`` of both sides.  A blank key (2019-20 ``hhidold``, 69
+    households) formats to ``None`` and is dropped first: ``pd.merge`` matches
+    null keys to each other, and a blank is not a link.  ``many_to_one`` because
+    two 2018-19 households may share a parent (5 parents do), and because a
+    repeated target would be a key that does not name one household.
+    """
+    lhs = left.assign(_key=left[key].map(format_id)).dropna(subset=['_key'])
+    rhs = right.assign(_key=right[target].map(format_id)).dropna(subset=['_key'])
+    return (lhs.merge(rhs, on='_key', validate='many_to_one', suffixes=('', '_parent'))
+            .drop(columns='_key'))
+
+
+def _tracking_links(wave):
+    """This wave's households with a route to 2015-16: ``hhid`` ... ``t0_hhid``.
+
+    2018-19: ``GSEC1.t0_hhid`` is the link itself.  2019-20: ``gsec1.hhidold``
+    names a 2018-19 ``GSEC1.hhid``, whose ``t0_hhid`` is the link.  RAW source
+    ids: never the walked ``i``, which is a canonical id from another wave.
+    """
+    parent = _uganda_cover('2018-19/Data/GSEC1.dta')[['hhid', 't0_hhid']]
+    if wave == '2018-19':
+        return parent
+    if wave == '2019-20':
+        own = _uganda_cover('2019-20/Data/HH/gsec1.dta')[['hhid', 'hhidold']]
+        return _follow_key(own, 'hhidold', parent, 'hhid')
+    raise ValueError(f'Uganda ea-tracking-key: {wave} inherits no ea (GH #689)')
+
+
+def derive_inherited_ea(inputs):
+    """The 2015-16 ``ea`` of the household the tracking key names (GH #689)."""
+    return inputs['ea'].map(format_id).rename('ea')
+
+
+def inputs_inherited_ea(wave):
+    """Raw answers behind each inherited ``ea``, by their original names.
+
+    One row per household holding a route; a household without one has nothing
+    to show, because nothing was computed for it.
+    """
+    origin = _uganda_cover('2015-16/Data/gsec1.dta')[['HHID', 'ea']]
+    out = _follow_key(_tracking_links(wave), 't0_hhid', origin, 'HHID')
+    return out.assign(t=wave, i=out['hhid'].map(format_id)).set_index(['t', 'i'])
+
+
+def origin_ea(df):
+    """``df_edit`` hook of the ``origin_ea`` sub-df (2018-19, 2019-20; GH #689).
+
+    ``ea`` is the design PSU: the enumeration area a household was SAMPLED in,
+    carried with it when it moves.  From 2018-19 no household file ships it, so
+    a household takes the ``ea`` of the 2015-16 household its own tracking key
+    names.  ``df`` is the declared 2015-16 ``gsec1`` frame, keyed on that wave's
+    ``HHID``; this re-keys it to the current wave's household.  A household with
+    no route is simply absent and stays NA: nothing is read from ``v`` or parsed
+    out of an id.
+
+    A sub-df and not a read inside ``sample``, so that a loss the GH #515 handler
+    catches costs the column and not ``v``.  That handler catches
+    ``FileNotFoundError``, ``PathMissingError``, ``DvcException`` and ``KeyError``
+    only.  With the remote unreachable, ``EndpointConnectionError`` escapes and
+    the wave's ``sample`` raises, ``v`` included (GH #1463).  ``CONTENTS.org``
+    has the measured cost of each loss.
+    """
+    flat = df.reset_index()
+    wave = flat['t'].iloc[0]
+    origin = flat[['i', 'ea']].rename(columns={'i': 'HHID'})
+    linked = _follow_key(_tracking_links(wave), 't0_hhid', origin, 'HHID')
+    out = pd.DataFrame({'t': wave, 'i': linked['hhid'].map(format_id),
+                        'ea': derive_inherited_ea(linked),
+                        _EA_INHERITED_MARKER: True})
+    return out.set_index(['t', 'i'])
+
+
+def _add_derivation(flat, mask, key):
+    """Stamp ``key`` on ``mask``; a row already carrying a key carries both."""
+    from lsms_library.derivations import union_keys
+    if 'Derivation' not in flat:
+        flat['Derivation'] = pd.Series(pd.NA, index=flat.index, dtype='string')
+    held = flat.loc[mask, 'Derivation'].astype('string')
+    flat.loc[mask, 'Derivation'] = [union_keys([k, key]) for k in held]
+    return flat
+
+
 def sample(df):
     """Country-level ``df_edit`` hook for ``sample`` (every Uganda wave).
 
@@ -519,6 +627,7 @@ def sample(df):
        PROVED before they are dropped -- a household whose repeats differ
        raises rather than letting a reducer pick one.
     3. Give every household with no ``v`` its singleton (D2).
+    4. Disclose an inherited ``ea`` on the rows that received one (GH #689).
     """
     idx = [n for n in df.index.names if n is not None]
     flat = _adopt_alternate_cover(df.reset_index())
@@ -537,6 +646,9 @@ def sample(df):
     if 'v' in flat.columns and 'i' in flat.columns:
         flat['v'] = _with_singletons(flat['v'], flat['i'])
         flat = _mark_unlocated(flat, 'sample')
+    if _EA_INHERITED_MARKER in flat.columns:
+        inherited = flat.pop(_EA_INHERITED_MARKER).notna()
+        flat = _add_derivation(flat, inherited, _EA_INHERITED_KEY)
     return flat.set_index(idx) if idx else flat
 
 
@@ -2767,11 +2879,12 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap, *, source_refs=None):
     #   2019-20   10,137    10,134          3                   0            3
     #   total     84,489    84,216        273                 135          138
     #
-    # The index is unique in only 2 of the 7 waves (2013-14, 2015-16); this
-    # collapse still runs in the other five and still discards 273 reported
-    # line-items.  Of those, 135 are not merged at all -- `groupby(dropna=True)`
-    # DELETES them outright because `plot` is NaN (130 in 2009-10, 5 in
-    # 2011-12) -- and 138 are merged away by collapsing 135 duplicate groups.
+    # That table is 2026-07-21.  The 135 rows it counts as deleted, because
+    # `plot` was NaN, are kept since GH #1120 D3 as `plot_id='unknown_plot'`, so
+    # `returned` is now 14,123 in 2009-10, 12,358 in 2011-12 and 84,351 in all
+    # (measured cold 2026-11-04).  The index is unique in only 2 of the 7 waves
+    # (2013-14, 2015-16); this collapse still runs in the other five and merges
+    # away 138 reported line-items by collapsing 135 duplicate groups.
     # This residual is PRE-EXISTING and much smaller than before (pre-fix the
     # same 84,489 rows returned 83,019, losing 1,470).
     #

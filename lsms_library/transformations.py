@@ -924,10 +924,14 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid',
 # and ``dinar`` here, was proposed and REJECTED.
 #
 # The rename must land where the label is minted, NOT in an API-time
-# categorical mapping: the derived-food dispatch is
-# ``_aggregate_wave_data`` -> ``transform_fn`` -> ``_finalize_result``
-# (``country.py:4155-4161``), so ``conversion_to_kgs`` below sees the RAW
-# ``u`` and an API-time rename would fire after the factor was inferred.
+# categorical mapping, because the two ways into ``conversion_to_kgs`` below
+# see different spellings.  The derived-food dispatch is
+# ``_aggregate_wave_data`` -> ``transform_fn`` -> ``_finalize_result``, and
+# ``_aggregate_wave_data`` has already finalized ``food_acquired``, so on the
+# Country path the ladder sees the SERVED ``u`` and an API-time rename does
+# reach it (this comment used to say otherwise).  A direct call on
+# ``var/food_acquired.parquet`` sees the label as written, and a table row never
+# reaches that call.  Only a label minted at the source reads the same on both.
 #
 # Why a set at all, rather than a detector?  The obvious detector
 # (``Quantity == Expenditure``) tests the SYMPTOM rather than the cause, and
@@ -1803,13 +1807,15 @@ def _seeded_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
             factors.pop(u, None)
 
     # GH #919: DECLARED factors outrank KNOWN_METRIC, and are the only layer a
-    # country can override.  `unit_kg` arrives already keyed on the RAW `u`
-    # label, composed by `Country._unit_kg_factors` from the country's merged
-    # `u` (raw -> Preferred Label) and `u_kg` (Preferred Label -> kg) tables.
-    # It is composed THERE rather than here because the kg factor is computed
-    # before the categorical mapping is applied -- `conversion_to_kgs` sees the
-    # raw `u` (GH #770) -- so this function must never assume harmonisation has
-    # run.  A `volume_as_mass=False` caller still drops the fluid spellings
+    # country can override.  `unit_kg` arrives keyed on both the raw `u` label
+    # and the Preferred Label, composed by `Country._unit_kg_factors` from the
+    # country's merged `u` (raw -> Preferred Label) and `u_kg` (Preferred Label ->
+    # kg) tables.  It is composed THERE rather than here because this function
+    # must not assume either spelling: on the Country path `_aggregate_wave_data`
+    # has already run `_finalize_result`, so the ladder sees SERVED labels (Niger
+    # 2021-22 `Kg`, not `100. Kg`; this comment used to say otherwise), while a
+    # direct call on `var/food_acquired.parquet` sees raw ones.  A
+    # `volume_as_mass=False` caller still drops the fluid spellings
     # above; a declared row for a fluid unit is the country's own statement and
     # is left alone.
     #
@@ -1984,13 +1990,16 @@ def _get_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
 #: - ``metric``     -- the LABEL states the kilograms: :data:`KNOWN_METRIC`,
 #:   or :func:`_parse_explicit_metric` reading "50 kg Bag" off the label.
 #: - ``item_unit``  -- the price-ratio inference for this row's OWN
-#:   ``(item, unit)`` cell.
+#:   ``(item, unit)`` cell.  A sized label's cell is that size alone; an unsized
+#:   label's cell reads every report of its base unit, whatever the size
+#:   (:data:`_UNIT_SIZE_WORDS`, GH #1450).
 #: - ``item_unit_tight`` -- the same, but the cell exists only because of the
 #:   dispersion-gated baseline exception (:data:`FOOD_KG_TIGHT_TOLERANCE`).
 #:   Separated because it is thinner evidence and a consumer is entitled to
 #:   drop it without dropping the rung.
 #: - ``unit``       -- the fallback: the u-keyed inference, pooled over every
-#:   item sharing the label.  This is what the library served for EVERY row
+#:   item sharing the label (and, for an unsized label, over every size of it,
+#:   as the rung above).  This is what the library served for EVERY row
 #:   before GH #850, and between a fifth and a half of the inferred rows still
 #:   land here, which is the argument for reporting it.
 #: - ``none``       -- no factor.
@@ -2027,6 +2036,311 @@ def _declared_no_kg_mask(df, no_kg, item_col='j'):
         cells[(item, unit)] = m
         mask |= m
     return mask, cells
+
+
+#: The size words of the EHCVM instrument, spelled as ``food_acquired.u`` serves
+#: them: ``Tas (Petit)``, the ``'{base} ({size})'`` of ``ehcvm.sized_unit``
+#: (GH #1224).  Read by :func:`_unit_size_base`.
+#:
+#: WHY UNSIZED ROWS NEED THIS AT ALL (GH #1450).  A delivered factor has no
+#: ``t`` axis, so an older wave that records no size (Burkina 2014, Mali
+#: 2014-15) used to borrow an ``(item, unit)`` estimate from EHCVM's bare
+#: labels.  #1224 moved those reports to ``Tas (Petit)`` and its siblings, which
+#: left the older wave's ``Tas`` nearly alone in its cell.  A coarser FALLBACK
+#: would not return it: the cross-wave median had changed for rows that kept
+#: their rung (Mali 2014-15: 9,942 of 25,083 such ``item_unit`` rows and 33,144
+#: of 40,307 ``unit`` rows), so the repair is to the POOL behind both inferred
+#: arms, not a new layer.  An unsized label's step 2 reads every report of its
+#: base, whatever the size; a sized label reads only itself.
+#:
+#: WHAT IT RESTORES, MEASURED COLD.  Mali 2014-15 and Burkina 2014 return to the
+#: ``KgFactorSource`` partition they had at ``f6ed07ae9``, the last development
+#: before #1224, and against EHCVM's own ``ehcvm_nsu`` weights Mali's median
+#: ``|log error|`` goes 0.461 -> 0.752 -> 0.461 and Burkina's within-2x 76 -> 56 ->
+#: 76%.  Burkina's kilograms return exactly; Mali 2014-15's differ by 681 of 12.56M
+#: because 8,383 ``Tas`` rows on the ``unit`` rung differ by 0.24%, and that is
+#: fully explained: #1224 keeps a household's two sizes as two reports where
+#: ``f6ed07ae9`` summed them into one (strip and sum the labels, and the base code
+#: reproduces ``f6ed07ae9`` on every row of all 8 countries).
+#:
+#: WHY A SIZE-FREE ROW IN AN EHCVM WAVE POOLS TOO.  Such a row did record something:
+#: the instrument's size-free code, on 417,989 consumption rows against 5 with a
+#: missing size.  It pools anyway because ``Tas`` is one label whichever wave it is
+#: in, and a delivered factor is one number per ``(j, u)``: gating on the wave would
+#: add the ``t`` axis the factor deliberately lacks.  It returns
+#: those rows to their ``f6ed07ae9`` factors (the largest group is Togo's
+#: ``Unité``: 8,599 rows, 2.03x).
+#: Against ``ehcvm_nsu``, held for Niger, Senegal, Burkina and Mali, the evidence
+#: is mixed and small: median error unchanged in five of the six cells that move
+#: and 0.024 worse in the sixth, within-1.5x up in four cells and unchanged in two,
+#: and more rows worse than better in four of the six (Niger 2021-22: 503 against
+#: 80).  The repository holds no such weights for Togo, Benin, Guinea-Bissau or
+#: CotedIvoire, so their rows, Togo's among them, are unscored.
+#:
+#: WHY A VOCABULARY AND NOT THE SHAPE OF THE LABEL.  A trailing parenthesis is
+#: not a size, and no test on the shape separates the two in this corpus: it
+#: states a quantity (``Sac (50 Kg)``, ``Paquet (250 g)``, Malawi's ``Loaf
+#: (600G)``), glosses a name (``Motte (boule)``, ``Tin (Debe)``, ``carton
+#: (brique)``), names a content (Ethiopia's ``Whole Animal (Sheep)``), counts
+#: (Senegal's ``Tablette (30)``, Malawi's ``Grass Hoppers (25)``) or says
+#: nothing (``Other (Specify)``).  Requiring two distinct suffixes on one base
+#: would admit ``Whole Animal`` and make a label's meaning depend on which waves
+#: were requested.
+#:
+#: WHY THESE WORDS AND NOT ``Small`` / ``Medium`` / ``Large``.  Uganda's and
+#: Malawi's ``Heap (Small)`` predate #1224 and were never pooled, so #1224 took
+#: nothing from them and restoring it moves nothing there: every label outside
+#: this vocabulary stays its own cell, exactly as before.  Whether Malawi's bare
+#: ``Heap`` should pool its sizes is a separate question with its own
+#: measurement, not a side effect of this one.
+#:
+#: IT CANNOT DRIFT FROM ``ehcvm.py`` UNSEEN, by a chain of two tests.  ``ehcvm.py``
+#: holds no closed set to import: ``size_label`` serves whatever value label a
+#: file carries.  The closed list is ``SIZES`` in ``tests/test_ehcvm_7day.py``, and
+#: ``test_every_size_suffix_is_the_countrys_own`` fails on any suffix a delivered
+#: cell serves outside it.  ``tests/test_food_kg_size_pool.py`` fails unless this
+#: set is the union of ``SIZES`` and ``ehcvm.size_label`` leaves each word alone.
+#: Nothing in ``ehcvm.py`` imports this: ``tests/test_ehcvm_unit_size.py`` pins that
+#: no kg symbol reaches that closure.  A word missing here costs a pool, not a
+#: fabricated factor: the label stays its own cell, as it is on the base code.
+_UNIT_SIZE_WORDS = frozenset({
+    'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier',
+    'Très petit', 'Très petite', 'Autre taille',
+    'Sans brassée', 'Avec 1 brassée', 'Avec 2 brassées',
+    'A 2 doigts', 'A 3 doigts', 'A 5 doigts',
+    'Pequeno', 'Medio', 'Grande',
+    '98',       # Togo 2018's size code with no value label (GH #1224)
+})
+_UNIT_SIZE_SUFFIX = re.compile(r'^(.+) \(([^()]*)\)$')
+
+
+def _unit_size_base(label):
+    """The unit a sized ``u`` label is a size OF, else ``None`` (GH #1450).
+
+    >>> _unit_size_base('Tas (Petit)')
+    'Tas'
+    >>> _unit_size_base('Sac (50 Kg) (Moyen)')
+    'Sac (50 Kg)'
+    >>> _unit_size_base('662 (Moyen)')
+    '662'
+    >>> _unit_size_base('Bouquet (98)')
+    'Bouquet'
+
+    Not a size: a stated quantity, another country's own suffix, a count, or a
+    gloss.
+
+    >>> _unit_size_base('Sac (50 Kg)') is None
+    True
+    >>> _unit_size_base('Heap (Small)') is None
+    True
+    >>> _unit_size_base('Tablette (30)') is None
+    True
+    >>> _unit_size_base('Motte (boule)') is None
+    True
+
+    A metric base is refused too.  ``ehcvm.carry_unit_size`` never mints one, and
+    refusing it is what keeps the price-per-kg baseline out of the pool: a ``Kg
+    (Petit)`` stripped to ``Kg`` would otherwise enter it.
+
+    >>> _unit_size_base('Kg (Grand)') is None
+    True
+    """
+    if not isinstance(label, str):
+        return None
+    m = _UNIT_SIZE_SUFFIX.match(label)
+    if m is None or m.group(2) not in _UNIT_SIZE_WORDS:
+        return None
+    base = m.group(1)
+    return None if base.strip().lower() in KNOWN_METRIC else base
+
+
+def _size_pooled_frame(df):
+    """*df* with every report of a sized family under one label, and who reads it.
+
+    Returns ``(frame, rows)``: the relabelled frame, for the estimators to run
+    on, and the boolean mask of rows whose own label is UNSIZED and names the base
+    of a sized label in *df*.  ``(None, all-False)`` when no row qualifies, which
+    is every frame with no size vocabulary in its ``u``.
+
+    A family is matched on the stripped, lower-cased spelling the item arm joins
+    on, and all of it is relabelled to ONE spelling of the base: the estimators
+    group on the label as written, so a ``tas`` or ``Tas `` left alone would be a
+    cell of its own beside the pool, and the mask would claim a pool it did not
+    read.  No built country has such a variant or two spellings of one base; this
+    is what keeps the mask true if one appears.
+
+    RELIES ON SERVED LABELS.  A sized label carries the base as the country serves
+    it, mapped at build time (``ehcvm.carry_unit_size``), while a bare label in a
+    parquet keeps its raw spelling until ``_finalize_result`` maps it.  On the
+    Country path ``_aggregate_wave_data`` has already done that, so stripping
+    ``Sachet (Petit)`` gives the ``Sachet`` beside it.  A direct call on
+    ``var/food_acquired.parquet`` finds ``139. Sachet`` there instead, which is no
+    family's base and reads its own cell, so such a call pools fewer rows (red team
+    on #1450: 1,254 against 10,885 in Senegal, 2,807 against 6,119 in Niger, 49,139
+    against 56,953 in Burkina).  Nothing in the repository makes that call.
+    """
+    n = len(df)
+    nothing = (None, np.zeros(n, dtype=bool))
+    if not isinstance(df.index, pd.MultiIndex) or 'u' not in df.index.names:
+        return nothing
+    raw = df.index.get_level_values('u')
+    codes, labels = pd.factorize(raw)
+    labels = np.asarray(labels, dtype=object)
+    bases = [_unit_size_base(lab) for lab in labels]
+    # Sorted, so the spelling a family serves under does not depend on row order.
+    family = {}
+    for b in sorted(b for b in bases if b is not None):
+        family.setdefault(b.strip().lower(), b)
+    if not family:
+        return nothing
+    keys = [str(lab).strip().lower() for lab in labels]
+    reads_pool = np.fromiter((b is None and k in family
+                              for k, b in zip(keys, bases)),
+                             dtype=bool, count=len(labels))
+    if not reads_pool.any():
+        return nothing
+    known = codes >= 0
+    rows = np.zeros(n, dtype=bool)
+    rows[known] = reads_pool[codes[known]]
+    pooled = np.array(
+        [family[b.strip().lower()] if b is not None else family.get(k, lab)
+         for lab, b, k in zip(labels, bases, keys)], dtype=object)
+    new_u = np.full(n, np.nan, dtype=object)
+    new_u[known] = pooled[codes[known]]
+    frame = df.set_axis(pd.MultiIndex.from_arrays(
+        [new_u if name == 'u' else df.index.get_level_values(name)
+         for name in df.index.names], names=df.index.names))
+    return frame, rows
+
+
+#: What :func:`_inferred_kg_rungs` estimates per row.  The size pool (GH #1450)
+#: takes all of them together, so a row's factor, its wave provenance and its
+#: ``baseline_refused_spread`` come from one estimate.
+_KG_RUNG_ARRAYS = ('kg_item', 'kg_tight', 'kg_waves', 'kg_wave_spread',
+                   'refused', 'kg_unit')
+
+
+def _inferred_kg_rungs(df, units, seeded, group_levels, item_col, gates, infer):
+    """The ``item_unit`` and ``unit`` candidates for every row of *df*.
+
+    Split out of :func:`food_kg_factors` for GH #1450, so the labels as served
+    and the labels with sizes pooled go through one estimator.  *units* is the
+    lower-cased ``u`` of *df*, *gates* the floors of :func:`conversion_to_kgs`.
+    With ``infer`` false every candidate is empty.
+    """
+    n = len(df)
+    idx_names = list(df.index.names or [])
+    kg_item = np.full(n, np.nan)
+    kg_tight = np.zeros(n, dtype=bool)
+    kg_waves = np.full(n, np.nan)
+    kg_wave_spread = np.full(n, np.nan)
+    refused = np.zeros(n, dtype=bool)
+    kg_unit = np.full(n, np.nan)
+    contradicting = {}
+    item_contradicting = None
+    if infer:
+        try:
+            per_u = conversion_to_kgs(df, index=group_levels)
+        except (ValueError, ZeroDivisionError, KeyError):
+            per_u = {}
+        # The u rung is keyed on the RAW label, exactly as
+        # ``_get_kg_factors`` consumes it; lower-case here so a case
+        # variant does not silently miss.
+        lowered = {}
+        for lbl, f in per_u.items():
+            if np.isfinite(f) and f > 0:
+                lowered.setdefault(str(lbl).lower(), float(f))
+        # GH #838: the ladder already serves the seeded factor (the
+        # ``metric`` rung outranks ``item_unit``/``unit``); what was
+        # missing is the REPORT that the inference contradicted the
+        # label's own stated size.  Same comparison as the
+        # ``_get_kg_factors`` twin.
+        contradicting.update({
+            k: (seeded[k], f) for k, f in lowered.items()
+            if k in seeded and seeded[k] > 0
+            and max(f / seeded[k], seeded[k] / f)
+            > STATED_VS_INFERRED_TOLERANCE})
+        kg_unit = _valid_factor(pd.Series(np.asarray(units)).map(lowered))
+
+        if item_col in idx_names or item_col in df.columns:
+            try:
+                detail = conversion_to_kgs(
+                    df, index=group_levels, item_col=item_col, **gates,
+                    _detail=True)
+                # GH #838, item arm: a ``(j, u)`` inference that
+                # contradicts the label's own stated size.  Counted but
+                # not warned here -- the u-rung merge below reports the
+                # label ONCE, and this detail frame only adds which ITEMS
+                # the contradiction came from.
+                if detail is not None and len(detail):
+                    us = detail.index.get_level_values('u').astype(
+                        str).str.lower()
+                    stated = pd.Series(us).map(seeded).to_numpy()
+                    inf = detail['kg_per_unit'].to_numpy()
+                    bad = (np.isfinite(stated) & (stated > 0)
+                           & np.isfinite(inf) & (inf > 0)
+                           & (np.maximum(inf / stated, stated / inf)
+                              > STATED_VS_INFERRED_TOLERANCE))
+                    if bad.any():
+                        item_contradicting = int(bad.sum())
+            except (ValueError, ZeroDivisionError, KeyError):
+                detail = None
+            if detail is not None and len(detail):
+                items = (df.index.get_level_values(item_col)
+                         if item_col in idx_names else df[item_col])
+                raw_u = (df.index.get_level_values('u')
+                         if 'u' in idx_names else df['u'])
+                key = pd.MultiIndex.from_arrays(
+                    [_normalise_join_key(items),
+                     _normalise_join_key(raw_u)])
+                ref = detail.copy()
+                ref.index = pd.MultiIndex.from_arrays(
+                    [_normalise_join_key(
+                        ref.index.get_level_values(item_col)),
+                     _normalise_join_key(ref.index.get_level_values('u'))])
+                # Two raw labels differing only in case normalise onto one
+                # key; keep the first, exactly as the lower-cased lookup
+                # in ``_get_kg_factors`` does (which already reports the
+                # clash -- see :class:`UnitLabelCollisionWarning`; a
+                # second warning here would be the same news twice).
+                ref = ref[~ref.index.duplicated()]
+                hit = ref.reindex(key)
+                kg_item = _valid_factor(hit['kg_per_unit'])
+                kg_tight = (hit['baseline_tight'] == True).to_numpy(  # noqa: E712
+                    dtype=bool)
+                kg_waves = _as_float(hit['n_waves'])
+                kg_wave_spread = _as_float(hit['wave_spread'])
+                if gates['baseline_max_spread'] is not None:
+                    # Which rows the GATE cost their item factor, as
+                    # opposed to which rows never had one.  The honest
+                    # answer is a counterfactual -- "would this row have
+                    # been served by its own (j, u) cell with the gate
+                    # off?" -- so the ungated map is estimated once more
+                    # and differenced.  A cell surviving on some OTHER
+                    # wave's baseline is therefore NOT counted: the gate
+                    # did not cost that row anything.
+                    try:
+                        ungated = conversion_to_kgs(
+                            df, index=group_levels, item_col=item_col,
+                            **{**gates, 'baseline_max_spread': None},
+                            _detail=True)
+                    except (ValueError, ZeroDivisionError, KeyError):
+                        ungated = None
+                    if ungated is not None and len(ungated):
+                        uref = ungated.copy()
+                        uref.index = pd.MultiIndex.from_arrays(
+                            [_normalise_join_key(
+                                uref.index.get_level_values(item_col)),
+                             _normalise_join_key(
+                                 uref.index.get_level_values('u'))])
+                        uref = uref[~uref.index.duplicated()]
+                        would_have = _valid_factor(
+                            uref.reindex(key)['kg_per_unit'])
+                        refused = np.isnan(kg_item) & ~np.isnan(would_have)
+    return {'kg_item': kg_item, 'kg_tight': kg_tight, 'kg_waves': kg_waves,
+            'kg_wave_spread': kg_wave_spread, 'refused': refused,
+            'kg_unit': kg_unit, 'contradicting': contradicting,
+            'item_contradicting': item_contradicting}
 
 
 def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
@@ -2072,9 +2386,10 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         stated metric content (``metric``) serve them, exactly as for a
         missing-unit sentinel.  ``unit=None`` declares every unit of the
         item.  Matched on stripped, lower-cased labels as this function sees
-        them (the frame BEFORE ``_finalize_result``'s categorical mapping,
-        GH #770).  The declared rows still enter the estimators as evidence:
-        this refuses to SERVE a factor, it does not re-estimate anyone
+        them, which on the Country path are the served ones (see
+        :func:`_size_pooled_frame`).  The declared rows still enter the
+        estimators as evidence: this refuses to SERVE a factor, it does not
+        re-estimate anyone
         else's.  A country declares its cells in ``_/no_kg_factor.yml``
         (read at read time by ``Country._no_kg_factor_cells``).  A declared
         cell that matches no row emits :class:`UnmatchedNoKgCellWarning`
@@ -2085,7 +2400,8 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
     pandas.DataFrame
         Indexed like *df*, with columns ``kg_per_unit``, ``KgFactorSource``,
         ``kg_survey``, ``kg_metric``, ``kg_item_unit``, ``kg_item_n_waves``,
-        ``kg_item_wave_spread``, ``baseline_refused_spread`` and ``kg_unit``.
+        ``kg_item_wave_spread``, ``baseline_refused_spread``, ``kg_size_pooled``
+        and ``kg_unit``.
         ``attrs['kg_factor_sources']`` maps each layer to its row count;
         ``attrs['kg_factor_wave_spread']`` reports how far the pooled waves
         disagreed; ``attrs['kg_factor_baseline_gate']`` reports how many rows
@@ -2096,9 +2412,26 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         ``rows_matched`` (rows on a declared cell) and ``rows_refused`` (of
         those, rows an inferred rung WOULD have served and that are now
         ``none``), per cell in ``cells``.
+        ``attrs['kg_factor_size_pool']`` reports the rows ``kg_size_pooled``
+        marks: an unsized label served by an inferred rung whose estimate pooled
+        the sizes of its base (GH #1450).  ``rows_served ==
+        served_by_item_rung + served_by_unit_rung``; ``labels`` names them.
 
     Notes
     -----
+    WHICH CELL A ROW READS.  A label carrying a size of the EHCVM instrument
+    (``Tas (Petit)``, :func:`_unit_size_base`) reads that size alone, because a
+    size is what the survey recorded.  An unsized label with sized siblings in
+    the frame (``Tas``) reads the same two rungs on the frame with those sizes
+    stripped, which is what it read before #1224 split the labels.  That label
+    means different things by wave.  An older wave (Burkina 2014, Mali 2014-15)
+    records no size at all.  An EHCVM wave does: a bare row there is the
+    instrument's size-free code, on 417,989 consumption rows against 5 with a
+    missing size (all Senegal 2018-19; red team on #1450).  Both pool, because a
+    factor is one number per ``(j, u)`` with no wave condition, not because the
+    EHCVM row lacks a size; :data:`_UNIT_SIZE_WORDS` has the measurement.  Every
+    other label is its own cell and no second estimate is made.
+
     WHAT THIS DOES NOT FIX, stated where a user will meet it.  The only
     external answer key the corpus has for a food unit is Mali's own
     questionnaire, and against it the corrected inference is BETTER and still
@@ -2131,127 +2464,39 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         raise ValueError("food_kg_factors: expected a 'u' unit level or column")
     kg_metric = _valid_factor(pd.Series(np.asarray(units)).map(seeded))
 
-    kg_item = np.full(len(df), np.nan)
-    kg_tight = np.zeros(len(df), dtype=bool)
-    kg_waves = np.full(len(df), np.nan)
-    kg_wave_spread = np.full(len(df), np.nan)
-    refused = np.zeros(len(df), dtype=bool)
-    kg_unit = np.full(len(df), np.nan)
     have_price = ('Expenditure' in df.columns and 'Quantity' in df.columns)
-    contradicting = {}
+    group_levels = [n for n in ('t', 'm', 'i') if n in idx_names]
+    gates = dict(min_reports=min_reports, min_baseline=min_baseline,
+                 min_baseline_tight=min_baseline_tight,
+                 tight_tolerance=tight_tolerance,
+                 baseline_max_spread=baseline_max_spread)
+    infer = have_price and bool(group_levels)
+    rungs = _inferred_kg_rungs(df, units, seeded, group_levels, item_col,
+                               gates, infer)
+    # GH #1450: an UNSIZED label reads the cell of its base unit pooled over
+    # every size.  Sized rows keep the rungs just computed, so they cannot
+    # move; a frame with no sized sibling for any bare label gets no pool, so
+    # nothing else can.  See :data:`_UNIT_SIZE_WORDS`.
+    pool_frame, size_pool_rows = _size_pooled_frame(df)
+    if infer and pool_frame is not None:
+        pool_units = pool_frame.index.get_level_values('u').astype(
+            str).str.lower()
+        pooled = _inferred_kg_rungs(pool_frame, pool_units, seeded,
+                                    group_levels, item_col, gates, infer)
+        for name in _KG_RUNG_ARRAYS:
+            rungs[name] = np.where(size_pool_rows, pooled[name], rungs[name])
+    kg_item = rungs['kg_item']
+    kg_tight = rungs['kg_tight']
+    kg_waves = rungs['kg_waves']
+    kg_wave_spread = rungs['kg_wave_spread']
+    refused = rungs['refused']
+    kg_unit = rungs['kg_unit']
+    contradicting = rungs['contradicting']
     # Reported below, once it is known whether the item arm ran -- a second
     # ``conversion_to_kgs`` call can raise the warning the u-rung merge
     # already emitted, and a warning raised inside the ``try`` would be
     # swallowed by the guard meant for the estimator's numeric failures.
-    item_contradicting = None
-    if have_price:
-        group_levels = [n for n in ('t', 'm', 'i') if n in idx_names]
-        if group_levels:
-            try:
-                per_u = conversion_to_kgs(df, index=group_levels)
-            except (ValueError, ZeroDivisionError, KeyError):
-                per_u = {}
-            # The u rung is keyed on the RAW label, exactly as
-            # ``_get_kg_factors`` consumes it; lower-case here so a case
-            # variant does not silently miss.
-            lowered = {}
-            for lbl, f in per_u.items():
-                if np.isfinite(f) and f > 0:
-                    lowered.setdefault(str(lbl).lower(), float(f))
-            # GH #838: the ladder already serves the seeded factor (the
-            # ``metric`` rung outranks ``item_unit``/``unit``); what was
-            # missing is the REPORT that the inference contradicted the
-            # label's own stated size.  Same comparison as the
-            # ``_get_kg_factors`` twin.
-            contradicting.update({
-                k: (seeded[k], f) for k, f in lowered.items()
-                if k in seeded and seeded[k] > 0
-                and max(f / seeded[k], seeded[k] / f)
-                > STATED_VS_INFERRED_TOLERANCE})
-            kg_unit = _valid_factor(pd.Series(np.asarray(units)).map(lowered))
-
-            if item_col in idx_names or item_col in df.columns:
-                try:
-                    detail = conversion_to_kgs(
-                        df, index=group_levels, item_col=item_col,
-                        min_reports=min_reports, min_baseline=min_baseline,
-                        min_baseline_tight=min_baseline_tight,
-                        tight_tolerance=tight_tolerance,
-                        baseline_max_spread=baseline_max_spread,
-                        _detail=True)
-                    # GH #838, item arm: a ``(j, u)`` inference that
-                    # contradicts the label's own stated size.  Counted but
-                    # not warned here -- the u-rung merge below reports the
-                    # label ONCE, and this detail frame only adds which ITEMS
-                    # the contradiction came from.
-                    if detail is not None and len(detail):
-                        us = detail.index.get_level_values('u').astype(
-                            str).str.lower()
-                        stated = pd.Series(us).map(seeded).to_numpy()
-                        inf = detail['kg_per_unit'].to_numpy()
-                        bad = (np.isfinite(stated) & (stated > 0)
-                               & np.isfinite(inf) & (inf > 0)
-                               & (np.maximum(inf / stated, stated / inf)
-                                  > STATED_VS_INFERRED_TOLERANCE))
-                        if bad.any():
-                            item_contradicting = int(bad.sum())
-                except (ValueError, ZeroDivisionError, KeyError):
-                    detail = None
-                if detail is not None and len(detail):
-                    items = (df.index.get_level_values(item_col)
-                             if item_col in idx_names else df[item_col])
-                    raw_u = (df.index.get_level_values('u')
-                             if 'u' in idx_names else df['u'])
-                    key = pd.MultiIndex.from_arrays(
-                        [_normalise_join_key(items),
-                         _normalise_join_key(raw_u)])
-                    ref = detail.copy()
-                    ref.index = pd.MultiIndex.from_arrays(
-                        [_normalise_join_key(
-                            ref.index.get_level_values(item_col)),
-                         _normalise_join_key(ref.index.get_level_values('u'))])
-                    # Two raw labels differing only in case normalise onto one
-                    # key; keep the first, exactly as the lower-cased lookup
-                    # in ``_get_kg_factors`` does (which already reports the
-                    # clash -- see :class:`UnitLabelCollisionWarning`; a
-                    # second warning here would be the same news twice).
-                    ref = ref[~ref.index.duplicated()]
-                    hit = ref.reindex(key)
-                    kg_item = _valid_factor(hit['kg_per_unit'])
-                    kg_tight = (hit['baseline_tight'] == True).to_numpy(  # noqa: E712
-                        dtype=bool)
-                    kg_waves = _as_float(hit['n_waves'])
-                    kg_wave_spread = _as_float(hit['wave_spread'])
-                    if baseline_max_spread is not None:
-                        # Which rows the GATE cost their item factor, as
-                        # opposed to which rows never had one.  The honest
-                        # answer is a counterfactual -- "would this row have
-                        # been served by its own (j, u) cell with the gate
-                        # off?" -- so the ungated map is estimated once more
-                        # and differenced.  A cell surviving on some OTHER
-                        # wave's baseline is therefore NOT counted: the gate
-                        # did not cost that row anything.
-                        try:
-                            ungated = conversion_to_kgs(
-                                df, index=group_levels, item_col=item_col,
-                                min_reports=min_reports,
-                                min_baseline=min_baseline,
-                                min_baseline_tight=min_baseline_tight,
-                                tight_tolerance=tight_tolerance,
-                                baseline_max_spread=None, _detail=True)
-                        except (ValueError, ZeroDivisionError, KeyError):
-                            ungated = None
-                        if ungated is not None and len(ungated):
-                            uref = ungated.copy()
-                            uref.index = pd.MultiIndex.from_arrays(
-                                [_normalise_join_key(
-                                    uref.index.get_level_values(item_col)),
-                                 _normalise_join_key(
-                                     uref.index.get_level_values('u'))])
-                            uref = uref[~uref.index.duplicated()]
-                            would_have = _valid_factor(
-                                uref.reindex(key)['kg_per_unit'])
-                            refused = np.isnan(kg_item) & ~np.isnan(would_have)
+    item_contradicting = rungs['item_contradicting']
 
     # GH #838: the ladder already serves the seeded factor (the ``metric``
     # rung outranks ``item_unit``/``unit``); what was missing is the REPORT
@@ -2367,6 +2612,8 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                         'kg_item_n_waves': kg_waves,
                         'kg_item_wave_spread': kg_wave_spread,
                         'baseline_refused_spread': refused,
+                        'kg_size_pooled': (size_pool_rows & np.isin(
+                            source, ('item_unit', 'item_unit_tight', 'unit'))),
                         'kg_unit': kg_unit},
                        index=df.index)
     out.attrs['kg_factor_sources'] = {
@@ -2411,6 +2658,21 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                 'rows_matched': int(m.sum()),
                 'rows_refused': int((m & declared_refused).sum())}
             for (item, unit), m in declared_cells.items()},
+    }
+    # GH #1450.  A diagnostic beside the partition, like the gate's ledger: the
+    # rows are counted in ``item_unit`` / ``item_unit_tight`` / ``unit`` above.
+    # A row a higher rung serves, or that no rung serves, read no pooled cell
+    # that matters, so it is not counted.
+    pooled_served = out['kg_size_pooled'].to_numpy()
+    out.attrs['kg_factor_size_pool'] = {
+        'rows_served': int(pooled_served.sum()),
+        'served_by_item_rung': int(
+            (pooled_served & np.isin(source, ('item_unit', 'item_unit_tight'))
+             ).sum()),
+        'served_by_unit_rung': int((pooled_served & (source == 'unit')).sum()),
+        'labels': sorted(
+            {str(u) for u in (df.index.get_level_values('u')[pooled_served]
+                              if pooled_served.any() else ())}),
     }
     out.attrs['kg_factor_baseline_gate'] = {
         'baseline_max_spread': baseline_max_spread,
@@ -3201,6 +3463,7 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
         kgf.attrs['kg_factor_baseline_gate'])
     out.attrs['kg_factor_declared_none'] = dict(
         kgf.attrs['kg_factor_declared_none'])
+    out.attrs['kg_factor_size_pool'] = dict(kgf.attrs['kg_factor_size_pool'])
     return out
 
 
@@ -3407,6 +3670,7 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
             kgf.attrs['kg_factor_baseline_gate'])
         v.attrs['kg_factor_declared_none'] = dict(
             kgf.attrs['kg_factor_declared_none'])
+        v.attrs['kg_factor_size_pool'] = dict(kgf.attrs['kg_factor_size_pool'])
     return v
 
 
@@ -3559,6 +3823,10 @@ _PLOT_LEVELS = ('plot_id', 'plot')
 #: The canonical plot-axis level name -- what every transform in this module
 #: puts on its output index regardless of which spelling it was handed.
 _PLOT_CANONICAL = _PLOT_LEVELS[0]
+
+#: The STRUCTURAL ``plot_id`` sentinel: the record is household-grain and has no
+#: plot (``lsms_library/data_info.yml``, ``plot_id`` under ``Single Index``).
+_PLOT_FARM_LEVEL = 'Farm-level'
 
 
 def _canonicalise_plot_level(res, plot_level):
@@ -4732,7 +5000,9 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         The ``crop_production`` item feature, indexed by
         ``(t, i, plot_id, j, u, season)`` (``v`` may also be present — it is
         ignored for the reduction and dropped from the output grain) with a
-        reported ``Quantity`` column in native unit ``u``.
+        reported ``Quantity`` column in native unit ``u``.  The crop level may
+        be spelled ``j`` or ``crop`` (:func:`_resolve_crop_level`), and the plot
+        level ``plot_id`` or ``plot`` (:func:`_resolve_plot_level`).
     volume_as_mass : bool, default True
         Forwarded to :func:`_get_kg_factors`; treat ``1 litre = 1 kg`` for
         fluid units (juice/beer harvest rows) when True.
@@ -4771,7 +5041,11 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     -------
     pd.DataFrame
         One ``Harvest_kg`` column indexed by ``(t, i, plot_id, j)`` (whichever
-        of those levels are present), summed over native units and season.
+        of those levels are present), summed over native units, ``condition``
+        and season.  The output levels are always spelled ``plot_id`` and ``j``,
+        so a ``Country`` frame whose crop level is ``crop`` and a ``Feature``
+        frame of the same country give the same rows (GH #1460).  A ``country``
+        level on a pooled frame is NOT carried and is not a grouping key.
 
         ``result.attrs['kg_factor_sources']`` is ``{layer: n_rows}`` over the
         INPUT rows and sums to ``len(crop_production)``.  It counts rows by
@@ -4785,6 +5059,15 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
 
     Notes
     -----
+    **A sum across ``condition`` mixes states.**  ``data_info.yml`` says
+    quantities in different states are not commensurable, and this reduction
+    still sums them.  Uganda has 13,728 of 88,950 plot-crops with kilograms in
+    two or more recorded states, 5.32M of their 41.9M kg, and Malawi 8 plot-crops
+    (3,725 kg); no other country records a state (measured 2026-11-04, GH #1460).
+    Read such a row as mass as harvested, not as a dry weight.
+    :func:`harvest_kg_factors` gives the row-level factors for a caller who keeps
+    the states apart.
+
     Divergence from WB: the WB Uganda code applies survey-provided
     conversion tables that cover bespoke local containers ("Sack (100 kgs)",
     "Basket (Unspecified)", regional "Heap"/"Bunch" sizes).  Our shared
@@ -4840,13 +5123,15 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     out = pd.DataFrame({'Harvest_kg': kg})
     out = out.replace(0, np.nan).dropna()
     plot_level = _resolve_plot_level(out.index.names)
-    group_by = [n for n in ['t', 'i', plot_level, 'j']
+    crop_level = _resolve_crop_level(out.index.names)
+    group_by = [n for n in ['t', 'i', plot_level, crop_level]
                 if n is not None and n in out.index.names]
     res = out.groupby(group_by).sum()
-    # Normalise the plot level name to the canonical 'plot_id' so downstream
-    # (yield_kg) and cross-country callers see one schema regardless of source
-    # naming.
+    # Normalise the plot and crop level names to the canonical 'plot_id' and
+    # 'j' so downstream (yield_kg) and cross-country callers see one schema
+    # regardless of source naming.
     res = _canonicalise_plot_level(res, plot_level)
+    res = _canonicalise_crop_level(res, crop_level)
     # ``groupby`` drops ``attrs``, so the tallies are re-stashed here -- the
     # same idiom ``food_prices`` uses for ``price_rows_dropped``.
     res.attrs['kg_factor_sources'] = factors.attrs['kg_factor_sources']
@@ -4943,7 +5228,12 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
           ``i``; the existing ``attrs['country']='Uganda'`` enables its native
           constructor inverse for Country operands.  Coverage also requires
           convertible harvest and a matching positive area; neither missing
-          nor nonpositive area is filled.
+          nor nonpositive area is filled.  **This is Uganda's decoding.**  The
+          area key is cut at its first ``_`` in every country, and the crop key
+          only loses a ``{hhid}-`` prefix, so where both features already share
+          a ``{field}_{parcel}`` key (Ethiopia and the EHCVM countries, Malawi's
+          later waves) no key matches at this grain.  Use ``'plot'`` there.
+          An empty result warns ``PlotGrainMismatchWarning``.
         - ``'plot'``: join on the literal ``plot`` value verbatim.  Use only
           where the two features already share a plot vocabulary; on Uganda
           the literal ids never match and the result is empty.
@@ -5018,6 +5308,23 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     area = pf.groupby(keys, dropna=False)['_Area'].sum().reset_index()
 
     merged = harvest.merge(area, on=keys, how='inner')
+    if len(merged) == 0 and len(harvest) and len(area):
+        # The silent emptiness fertilizer_rate's guard exists for, in its twin.
+        # With no wave in common the other grain cannot help, so don't offer it.
+        hint = f" Try on={'plot' if on == 'parcel' else 'parcel'!r}."
+        if 't' in keys and not set(harvest['t']) & set(area['t']):
+            hint = (
+                " The two features share no wave at all: harvest "
+                f"{sorted(map(str, harvest['t'].unique()))[:3]}, area "
+                f"{sorted(map(str, area['t'].unique()))[:3]}; a post-planting / "
+                "post-harvest country may serve them on different rounds.")
+        warnings.warn(
+            f"yield_kg(on={on!r}): the {len(harvest):,} harvest land key(s) and "
+            f"the {len(area):,} area land key(s) have NO value in common, so "
+            "the result is empty. Examples -- harvest: "
+            f"{sorted(map(str, harvest['_land'].unique()))[:3]}; area: "
+            f"{sorted(map(str, area['_land'].unique()))[:3]}.{hint}",
+            PlotGrainMismatchWarning, stacklevel=2)
     with np.errstate(divide='ignore', invalid='ignore'):
         merged['Yield_kg'] = merged['Harvest_kg'] / merged['_Area']
     merged = merged.replace([np.inf, -np.inf], np.nan).dropna(subset=['Yield_kg'])
@@ -6149,13 +6456,30 @@ def nb_plots(plot_features):
 # ---------------------------------------------------------------------------
 
 # Crop-identity level names emitted by the various countries' crop features.
-# ``j`` is the canonical (Uganda, Niger, Togo) name; ``crop`` is Malawi's.
-# The two vocabularies are the same axis (both the harmonize_crop ->
-# harmonize_food Preferred Label), which is why ``data_info.yml``'s
-# ``index_info`` does not yet register the plot-level ag features: "their
-# per-country index NAMES diverge (plot vs plot_id, crop vs j)".  Twin of
+# ``j`` is the canonical name; Uganda, Ethiopia, Tanzania, GhanaLSS, GhanaSPS and
+# EthiopiaRHS declare it.  ``crop`` is the other ten: Malawi, Nigeria, Niger,
+# Mali, Togo, Benin, Senegal, Burkina Faso, Guinea-Bissau and CotedIvoire
+# (measured 2026-11-04, GH #1460).  The two vocabularies are the same axis (both
+# the harmonize_crop -> harmonize_food Preferred Label), and ``data_info.yml``'s
+# ``level_aliases`` maps ``crop`` onto ``j`` for the ``Feature`` path.  Twin of
 # :data:`_PLOT_LEVELS`.
 _CROP_LEVELS = ('j', 'crop')
+
+#: The canonical crop-axis level name, ``level_aliases``' target for
+#: ``crop_production`` in ``lsms_library/data_info.yml``.  What a transform that
+#: promises a ``j`` level puts on its output whichever spelling it was handed.
+_CROP_CANONICAL = _CROP_LEVELS[0]
+
+
+def _canonicalise_crop_level(res, crop_level):
+    """Rename ``crop_level`` on ``res``'s index to :data:`_CROP_CANONICAL`.
+
+    Twin of :func:`_canonicalise_plot_level`.  A no-op when the level is
+    already canonical or absent.
+    """
+    if crop_level and crop_level != _CROP_CANONICAL:
+        res.index = res.index.rename({crop_level: _CROP_CANONICAL})
+    return res
 
 
 def _resolve_crop_level(names):
@@ -7071,6 +7395,26 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
     return out.set_index(base + [land_name])[[out_col]].sort_index()
 
 
+def _without_redundant_farm_level(flat, crop_level, plot_level):
+    """Drop each ``Farm-level`` row whose household has a plot row of that crop.
+
+    ``flat`` is a reset-index ``crop_production``.  Multi-plot sales are served
+    on ``plot_id = 'Farm-level'`` (Mali 2021-22; Nigeria W3-W5, GH #843), so such
+    a row repeats a crop the household already reports on a plot and is not a
+    further occurrence of it.  A ``Farm-level`` row with no plot row of its crop
+    is kept, because it is the only record of that crop: all of GhanaLSS
+    1987-88/1988-89, and the few Nigeria sales whose crop has no plot row.  A
+    row with a null ``plot_id`` is not ``Farm-level`` and counts as a plot row.
+    """
+    keys = [n for n in ['country', 't', 'i', crop_level] if n in flat.columns]
+    farm = flat[plot_level].astype('object').eq(_PLOT_FARM_LEVEL).to_numpy(dtype=bool)
+    if not farm.any():
+        return flat
+    plotted = pd.MultiIndex.from_frame(flat.loc[~farm, keys])
+    redundant = pd.MultiIndex.from_frame(flat[keys]).isin(plotted)
+    return flat[~(farm & redundant)]
+
+
 def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     """Shannon crop-diversity index per household (EPAR ``sdi``).
 
@@ -7094,7 +7438,9 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
           the table has neither.  De-duplicating to that grain is
           load-bearing, not tidiness: ``crop_production`` carries one row
           per ``(u, condition)`` as well, so counting raw rows would score
-          a maize crop reported in two conditions as twice the maize.
+          a maize crop reported in two conditions as twice the maize.  A
+          ``plot_id = 'Farm-level'`` row counts only where the household has
+          no plot row of that crop (see Notes).
         - ``'value'`` -- ``p_c`` is crop ``c``'s share of the household's
           reported ``Value_sold``.  **Covers SOLD output only**, so a
           household that sold one crop and ate three scores ``H = 0``:
@@ -7153,6 +7499,17 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     ``tests/test_863_transforms.py::
     test_crop_diversity_count_separates_plots_and_seasons``.
 
+    **A ``Farm-level`` row is not a further occurrence of a crop the household
+    reports on a plot (GH #1469).**  It holds a sale no plot can own: 70 rows in
+    Mali 2021-22 and, with GH #843, 2,514 in Nigeria W3-W5, none with a harvest
+    ``Quantity``.  Counted as a land unit, they move 50 of 2,857 Mali households
+    (mean 0.6435 against 0.6448) and 1,678 Nigeria households, so the
+    ``'count'`` basis drops one wherever the household has a plot row of that
+    crop in that wave.  It keeps one where it has none, because then the row is
+    the only record of the crop: 10 of Nigeria's, and all 37,280 rows of GhanaLSS
+    1987-88 and 1988-89, which a blanket filter would delete.  The ``'value'``
+    basis keeps every such row: that is where the sale value is.
+
     **Not comparable across countries on the ``'count'`` basis.**  The
     occurrence key uses whichever of the land and season levels the
     country's ``crop_production`` carries -- ``(plot, season)`` for Uganda,
@@ -7200,6 +7557,8 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
                                dropna=False)['_w'].sum(min_count=1)
     else:
         plot_level = _resolve_plot_level(names)
+        if plot_level is not None:
+            flat = _without_redundant_farm_level(flat, crop_level, plot_level)
         occurrence = [n for n in [plot_level, 'season']
                       if n is not None and n in flat.columns]
         if occurrence:

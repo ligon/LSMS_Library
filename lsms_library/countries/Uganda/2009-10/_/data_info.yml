@@ -73,6 +73,9 @@ sample:
             panel_weight: wgt09  # pre-refreshment — same as cross-sectional
             strata: stratum
             Rural: urban
+            # The household's OWN recorded district, the column `cluster_features` reads, so
+            # `market='District'` labels a household its cluster's mates disagree about (GH #1441).
+            District: h1aq1  # numeric codes in this wave; a blank stays NA
             # HH-level Region — populated in GSEC1 for every household
             # (including the 565 movers/split-offs whose comm is blank),
             # so Region is always available regardless of whether v ended

@@ -130,10 +130,26 @@ class TestDelivered:
             assert got == n, f'{wave} tree classes: got {got}, expected {n}'
 
     def test_old_waves_gain_nothing(self, cp):
-        """The recode is a no-op pre-IHS4: total rows must not move."""
+        """The recode is a no-op pre-IHS4: total rows must not move.
+
+        33,420 / 12,616 until #1373 (0377b733b) kept each native crop code on
+        its own row, which added rows to every wave and is not this recode.
+        """
         tot = cp.reset_index().groupby('t').size()
-        assert int(tot['2010-11']) == 33420
-        assert int(tot['2013-14']) == 12616
+        assert int(tot['2010-11']) == 33549
+        assert int(tot['2013-14']) == 12671
+
+    def test_recoded_native_codes_occur_only_in_ihs4_ihs5(self, cp):
+        """The rule itself, on the native code `production_obs` now serves."""
+        f = cp.reset_index()
+        codes = {t: set(x) for t, x in f.groupby('t')['production_obs']}
+        recoded = {f'reported:P:{c}' for c in (100, 21)}
+        for wave in ('2010-11', '2013-14'):
+            assert not codes[wave] & recoded, wave
+            assert 'reported:P:1' in codes[wave], wave
+        for wave in ('2016-17', '2019-20'):
+            assert recoded <= codes[wave], wave
+            assert 'reported:P:1' not in codes[wave], wave
 
     def test_no_unmapped_codes_warn_or_survive(self, cp):
         """No delivered row may carry a crop label outside harmonize_crop's
