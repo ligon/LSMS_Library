@@ -2057,17 +2057,18 @@ column, never an index level, never sentinel-filled.  Pinned by
   it sits in the country script, upstream of every core audit, so
   =grain_reports()= cannot see it.  Reported for its own issue, not fixed.
   Non-null =Unit_sold= on the built table:
-  2011Q1 3,486, 2013Q1 3,430, W3-W5 0.  The top served disagreement cells
+  2011Q1 3,486, 2013Q1 3,430 (W3-W5 were 0 until GH #843; now 3,771 / 3,775 /
+  3,707).  The top served disagreement cells
   are =l= -> =Kg= (10) and =Kg= <-> =Sack/Bag= (14) in 2011Q1, and =Kg= ->
   =Tiya= / =Mudu= (24) in 2013Q1: a kilogram harvest sold by the measure.
 - *The consumer rule is the canonical one*: where the two disagree the row
   is a data-quality FLAG, not an identification of which unit prices the
   sale (measured on Uganda, =Unit_sold= is the closer denominator only ~40%
   of the time).  Exclude or resolve those rows, and report how many.
-- *W3-W5 are all-NA by design, not a gap.*  Their sale block is =secta3ii=
-  at hh-crop grain with no plot linkage (GH #843), the same reason their
-  =Quantity_sold= / =Value_sold= are NaN; hence =optional: true=.  =Olodo=
-  appears in =Unit_sold= (W2 sold vocabulary) but never in =u=.
+- /Superseded 2026-11-03 (GH #843): see [[*crop_production W3-W5 sales: on the household's one row that states a harvest, else on a Farm-level row (GH #843, 2026-11-03/04)][the W3-W5 sales section]]./  *W3-W5 were
+  all-NA by design.*  Their sale block is =secta3ii= at hh-crop grain with no
+  plot linkage.  =Olodo= appears in =Unit_sold= (W2 sold vocabulary) but never
+  in =u=.
 - *Every pre-existing column is byte-identical* before and after (62,844
   rows, isolated cold build compared column-by-column).
 - *The served (API) frame reproduces the parquet counts exactly* -- both
@@ -2103,10 +2104,11 @@ column, never an index level, never sentinel-filled.  Pinned by
   TestOtherInorganicSpelling= now pins that =Other Inorganic Fertilizer=,
   =Other inorganic= and =other (specify)= resolve to NOTHING.  Any share
   for them lands on #867 with its own disclosure and a signature.
-- *Unit_sold NA has three causes*, not two: no sold-unit column (W3-W5),
-  no sale on the row, or a sale whose unit was simply not recorded -- 41
-  positive-sale rows in 2011Q1, 6 in 2013Q1 (and 1 / 5 rows carry a
-  =Unit_sold= with no positive sale).
+- *Unit_sold NA has three causes*: no sale on the row; a sale whose unit was
+  simply not recorded -- 41 positive-sale rows in 2011Q1, 6 in 2013Q1 (and 1 / 5
+  rows carry a =Unit_sold= with no positive sale); or, since GH #843, a
+  household-crop sold in two units.  Until #843 a third cause was "no sold-unit
+  column (W3-W5)", which is no longer true.
 - *Not read, pre-existing scope*: =Quantity_sold= / =Value_sold= /
   =Unit_sold= are the MAIN buyer only.  The W1/W2 A3 files also carry
   =sa3q16a/b= (quantity + unit sold to OTHER buyers) and =sa3q17= (their
@@ -2124,7 +2126,8 @@ column, never an index level, never sentinel-filled.  Pinned by
   wave concat's dtype; both were already string before this change).  The
   API read coerces them to =Float64= via =_enforce_canonical_dtypes=, so
   nothing served is wrong, but =pd.read_parquet(cache_path)= needs
-  =pd.to_numeric= on them.
+  =pd.to_numeric= on them.  /Fixed 2026-11-03 (GH #843): the script pins both to
+  =float64=; no served value moved./
 
 ** =sa3q18= is an unwired farmgate valuation of the WHOLE harvest
 
@@ -2241,6 +2244,264 @@ this check covers W1/W2 only.  Scripts and logs:
 
 Cost: =nigeria.py= and =data_scheme.yml= move every Nigeria table's cache
 hash (a country re-warm); only =crop_production= gains a column.
+* crop_production W3-W5 sales: on the household's one row that states a harvest, else on a Farm-level row (GH #843, 2026-11-03/04)
+
+=Quantity_sold= / =Value_sold= were 100% empty in 2016Q1, 2019Q1 and 2024Q1: from
+W3 the sale is in A3.ii (=secta3ii=), per household and crop, with no plot.
+*Rulings* (@ligon).  2026-11-03, option d: a sale with one harvest row goes on it, in
+its own =Unit_sold=; otherwise on ONE =plot_id='Farm-level'= row with no harvest
+=Quantity=.  No invented split, no double count, nothing dropped.  A separate
+=crop_sales= table is not what was ruled.  2026-11-04, "Yes, take all four on #843":
+- A: the sale attaches to the one row that STATES a harvest, even when the
+  household-crop's other rows are explicit "did not harvest".  Farm-level only where
+  zero rows, or two or more, state one.
+- B: a sale in two units sums the value, with quantity and unit NA.
+- C: the five W4 crop codes with no =harmonize_food= label keep their raw label.
+- D: W3's =median_price_valuation= is served, and disclosed.
+W1/W2 record the sale on the plot-crop row and do not move.
+
+*What "states a harvest" means.*  A served row states a harvest when its harvest
+=Quantity= is positive.  A blank does not: no quantity was recorded.  A zero does not:
+a recorded zero is not a harvest, even under a YES.  An explicit "did not harvest" does
+not, and needs no separate read, because every such line has a blank quantity:
+
+| source line says | W3 | W4 annual / tree | W5 annual / tree |
+|-+-+-+-|
+| NO, quantity blank | 1,678 | 3,230 / 289 | 1,819 / 108 |
+| NO, quantity positive | 0 | 0 / 0 | 0 / 0 |
+| YES, quantity positive | 10,260 | 10,966 / 773 | 8,252 / 375 |
+| YES, quantity zero | 6 | 0 / 0 | 0 / 0 |
+| YES, quantity blank | 12 | 0 / 0 | 0 / 0 |
+| no answer, quantity blank | 0 | 1 / 0 | 0 / 0 |
+
+The screeners are W3-W5 =sa3iq3=, W4 =sa3iiiq7=, W5 =sa3iiiq17=.  So the only readings
+that could differ are a YES with a zero and a YES with a blank.  On sale pairs that is
+one household-crop (W3, N48,000): a YES with 0 beside a positive row, which attaches.
+A YES with a blank decides nothing, because no sale pair turns on one.
+
+It is judged on the SERVED row, the line the keep-first dedup kept.  In W4 two
+household-crops (N6,500) go Farm-level because the kept line of their one plot says no
+while a discarded twin, another code under the same label, states a harvest.  That is
+#1433's to change; 8 W4 and 3 W5 served rows have this shape, and only those 2 hold a
+sale.
+
+*The form.*  A3.ii is a crop roster.  W5 p. 19: "CAPI WILL MAKE A LIST OF ALL
+HARVESTED CROPS FROM FLAP D. IT WILL NOT LIST CROPS MORE THAN ONCE. IF THE
+RESPONDENTS HARVESTED MAIZE FROM 2 DIFFERENT PLOTS, CAPI WILL LIST MAIZE ONCE."
+W5's value column also says "ESTIMATE THE VALUE OF IN-KIND PAYMENTS", so a W5
+=Value_sold= can include an estimated in-kind part.
+
+*The sale's unit differs by wave, and this is not obvious from the file.*
+
+| round | quantity | unit | value | how the form states the unit |
+|-+-+-+-+-|
+| 2016Q1 | =sa3iiq5a= | =sa3iiq5b= | =sa3iiq6= | Q5 has its own PROD. UNIT CODE; the code embeds the size (131 sack medium) |
+| 2019Q1 | =sa3iiq5a= | =sa3iiq1c= | =sa3iiq6= | Q5 prints only QUANTITY: "Of the [QTY] [UNIT] [CONDITION] of [CROP] harvested, how much of it did your household sell?" |
+| 2024Q1 | =sa3iiq6= | =sa3iiq3b= | =sa3iiq7= | same wording, W5 p. 19 |
+
+So =Unit_sold= in W4/W5 is the unit of the household's total harvest (asked just
+before, with its size =sa3iiq1d= / =sa3iiq3c= and condition =sa3iiq1b= /
+=sa3iiq3d=), through the same size-agnostic =_canon_unit= as =u=; size and
+condition are not carried.  The W5 interviewer manual says so (p. 99): "the
+respondent MUST provide the quantity of unprocessed CROP NAME sold in the SAME UNIT
+AS THE QUANTITY HARVESTED".  EPAR reads W4 the same way
+(=EPAR_UW_Nigeria_GHS_W4.do:690-694=).  Three checks support that reading.  The sold quantity
+is at most the stated total on 3,820 of 3,825 (W4) and 3,747 of 3,747 (W5) sales,
+median share 0.67 / 0.63.  On one-record attached sales the unit equals the row's
+=u= on 2,798 of 2,800 (W4) and 3,062 of 3,063 (W5), against 2,926 of 3,041 for W3,
+which asks its own.  And all three unit columns carry the harvest unit's value
+labels, W3 exactly (60 labels), W4/W5 but for splitting '40. DERICA/TIN' in two.
+
+*What is a sale.*  A record with a positive quantity or a positive value.
+
+| | 2016Q1 | 2019Q1 | 2024Q1 |
+|-+-+-+-|
+| rows in the file | 8,544 | 8,839 | 7,184 |
+| sold = NO | 4,681 | 5,014 | 3,437 |
+| sold = YES, both answers blank (not a sale) | 2 | 0 | 0 |
+| sold blank, both answers blank (not a sale) | 1 | 0 | 0 |
+| quantity 0 and value 0 (not a sale) | 1 | 0 | 0 |
+| *sale records* | *3,859* | *3,825* | *3,747* |
+| of which quantity > 0, value > 0 | 3,838 | 3,825 | 3,747 |
+| quantity > 0, value 0 (served as the recorded 0) | 14 | 0 | 0 |
+| quantity > 0, value blank (served blank) | 5 | 0 | 0 |
+| value > 0, quantity blank (served blank, =Unit_sold= NA) | 2 | 0 | 0 |
+
+A non-sale adds no row and states no zero: a harvest row whose crop was not sold
+stays NaN, it does not become 0.
+
+*Grain.*  One record per crop code in W4/W5.  W3's roster can repeat a code
+(12 =(hhid, cropcode)= pairs, 24 rows), which is why =crop_number= is its line.
+No file has an exact-duplicate record (Niger's s16d does, so this was checked, not
+assumed).  But =harmonize_food= gives several codes one label (Yam--roots is
+1120-1124, Fresh Pepper 2141/2142, Orange/tangerine 3150/3170, Avocado pear
+3220/3221), and the index holds one row per =(t, i, plot_id, crop)=, so one
+household and served crop can hold two records.
+
+| household-crops | 2016Q1 | 2019Q1 | 2024Q1 |
+|-+-+-+-|
+| with a sale | 3,786 | 3,789 | 3,714 |
+| *on the one row that states a harvest* | *3,090* | *2,814* | *3,082* |
+| *Farm-level, two or more state a harvest* | *694* | *966* | *629* |
+| *Farm-level, rows but none states one* | *2* | *2* | *0* |
+| *Farm-level, no served row* | *0* | *7* | *3* |
+| two records, one unit: quantity and value summed | 60 | 22 | 26 |
+| two records, two units: value summed, quantity withheld | 13 | 14 | 7 |
+
+The partition is per SERVED row, after the keep-first dedup; the sweep's earlier
+figures (749 / 1,050 / 683 on two or more plots) were per raw plot.  Against the first
+build, which counted served rows whatever they stated, ruling A moves 64 / 94 / 57
+household-crops (N1.5M / N3.4M / N8.8M, 1.2% of value) onto their one harvesting row,
+and 2 / 2 / 0 (N45,000 / N6,500) off a lone row that states none.  The other rows
+beside those 215 are explicit "did not harvest" on 63 of 64, 75 of 94 and 57 of 57; the
+rest have no answer or, in W3, a YES with 0.
+
+*Two records, two units.*  The two quantities cannot be two rows (one index key)
+and cannot be one number, so =Value_sold= is the sum, since Naira add, and
+=Quantity_sold= / =Unit_sold= are NA.  "Two units" means the raw unit code, size
+or condition differ, because =_canon_unit= would serve 'Sack/Bag' for a 50 kg and
+a 100 kg sack alike; 4 / 11 / 4 of them differ in the canonical label too.  34
+household-crops, about N3.7M of N1.14 billion.  Ruled 2026-11-04 (B).  Nothing is
+lost: =derivation_inputs= returns each record's own quantity and unit.
+
+*Three derivation keys*, one function (=derive_hh_crop_sale_attachment=, a key per
+path): =hh-crop-sale-single-row= on an attached row,
+=hh-crop-sale-records-summed= and =hh-crop-sale-two-units= on a row that combines
+records, whichever row it landed on.  A Farm-level row holding one record carries
+*no* key: it is a survey answer at its own grain and the index value discloses
+that.  =Derivation= is declared in the canonical schema, never in =data_scheme.yml=.
+
+*What a row with a sentinel means.*
+- =plot_id = 'Farm-level'= is the canonical STRUCTURAL sentinel: not a plot.  It
+  joins no =plot_features= row.  Filter it before counting plots.  A count of crop
+  occurrences drops it only where the household has a plot row of that crop (the
+  CONSUMER RULE in =data_info.yml=, GH #1469).
+- =u = 'Unknown'= beside a real =Unit_sold= on that row is *correct* (#1047): =u=
+  describes the harvest =Quantity=, which the row does not have.  Do not read it
+  as the =Unit_sold != u= data-quality flag, and do not "fix" it.
+- =perennial= is NA there: the row has no annual/perennial answer.
+- =KgFactor= stays the HARVEST factor on an attached row; it never rates the sale.
+  =KgFactor_sold= does: see below.
+- A lone-record W4/W5 Farm-level row (953 + 618 = 1,571) carries no key, and its
+  =Unit_sold= and =KgFactor_sold= are the household total's, inherited as the form
+  states.  That reading is recorded on the =hh-crop-sale-single-row= entry only; the
+  frame alone cannot tell these rows from W3's own-unit answers.
+
+*Five crops appear only on Farm-level rows.*  W4 codes 9001/9002/9006/9007/9008
+(=BAKA=, =LOCUST BEANS=, =YELLOW PEPPER=, =SHEA BUTTER=, =SWEET MELON=, 7 sales,
+N378,000) have no =harmonize_food= label.  Base drops their harvest rows as
+unlabelled (still does).  The sale keeps its own label instead of being dropped,
+as an unmapped crop does elsewhere in the corpus, so the =2019Q1= no-served-row
+count is these 7: they have raw harvest rows.  The 3 =2024Q1= ones (Yam--roots ×2,
+Cassava--roots) have none.  Ruled 2026-11-04 (C).  The labels are raw uppercase, and
+=labels== never touches this level.  Extending =harmonize_food= would move harvest
+rows and is a separate decision.
+
+*Keep-first dedup (#1433) is not touched and cannot strand a sale.*  Sales are
+placed after it, on rows that survived, so a discarded twin can neither receive a
+sale nor count as stating a harvest.  Each household-crop lands on exactly
+one row by construction, and =crop_production_for_wave= asserts the index stays
+unique.  What the dedup still does: on an attached row whose crop had two raw lines
+on one plot, =Quantity= is the kept line's and the sale is the household's.
+
+*What else is out of scope.*  Processed-crop sales (W3 q19-21, W4 =sa3iiq18aa= /
+q20-21, W5 q21-24) are a different good in different units and are not read,
+as the W1/W2 other-buyer block is not.
+
+*Sale above harvest.*  On attached one-record rows in one unit, the sold quantity
+exceeds the row's harvest =Quantity= on 43 (W3), 3 (W4) and 0 (W5) rows.  Reported,
+not clipped.  W3 is the wave whose form does not tie the sale to the harvest unit.
+
+*The price is what validates the placement.*  On attached rows in one unit, the
+household's own valuation per harvest unit (=Value_harvested / Quantity=) over its
+sale price (=Value_sold / Quantity_sold=) has median 1.00, within 2x on 90% (2,932
+rows), 93% (2,805) and 92% (3,079) in W3, W4, W5.  Those counts include summed rows;
+one-record rows alone are 2,895 / 2,798 / 3,062 at the same rates.  W1/W2, which
+record the sale on the row, are 83% and 88%.  So the attachment and the W4/W5 unit
+reading are at least as coherent as the data they join.  In the 19 crop-by-unit
+cells with 30 sales on each side, Farm-level over attached median price is 1.00
+(p10 0.52, p90 1.13).  A sale value exceeds the valuation on 210 / 186 / 217 attached
+rows, 6-7%; not corrected.
+
+*Measured, cold, development =4ea95a0aa= against this branch merged with it.*
+- Conservation: =Value_sold= equals the raw sum in each round (N196,085,180 /
+  N226,761,273 / N716,443,945), and =Quantity_sold= by =Unit_sold= equals the raw sum
+  in all 63 round-by-unit cells, the withheld two-unit quantities apart.  No sale is on
+  two rows; every attached row has a positive =Quantity=; no Farm-level row has one.
+- Nothing else moves: 62,844 pre-existing rows keep their keys, =v=, =Quantity=, =u=,
+  months, flags, =KgFactor= and =Value_harvested=; the 25,529 W1/W2 rows are wholly
+  identical; the other 18 tables built are frame-equal.  Rows +696 / +975 / +632, 2,303
+  in all.
+- Site B's =Quantity_sold= and =Value_sold= warnings are gone (5 -> 3); Site I and the
+  grain audit report nothing either side; Site Q names the same five rows.
+- =gross_crop_revenue= (=by=None= and =by='j'=) now equals the source total in each
+  round.  =harvest_kg=, =yield_kg= (both =on=, joined on the PH quarter, because as
+  served it joins nothing: =plot_features= is on the PP quarter), =fertilizer_rate=,
+  =nitrogen_kg=, =seed_kg= and valued =food_expenditures= are identical.
+- Cost: every Nigeria table and wave hash moves (20 of 20, 200 of 200): a country
+  re-warm.  Uganda, GhanaLSS, Malawi and every =build_transforms_fingerprint= do not.
+
+*Two consumers.  =crop_diversity= is fixed (GH #1469); =median_price_valuation= is not
+(=transformations.py= is not this country's).*
+- =crop_diversity(weight='count')= counted a Farm-level row as one more occurrence of
+  the crop until GH #1469.  Against the pre-#843 frame, 454 / 695 / 429 households moved
+  and 2 were added, mean H 1.0595 -> 1.0518, 0.9452 -> 0.9370, 0.7747 -> 0.7681.  It now
+  drops such a row where the household has a plot row of that crop, 2,293 of 2,303, and
+  the means are 1.0595, 0.9456, 0.7747.  Against the pre-#843 frame 7 households then
+  differ and 2 are new, all from the 10 rows kept (0 / 7 / 3 by wave), whose crop has no
+  plot row on the served frame.  Of the rows dropped, 4 have a plot row of the crop that
+  states no harvest.
+- =median_price_valuation=: see below.
+
+*=KgFactor_sold=: the sale's own factor (GH #843 red team, 2026-11-04).*  W4/W5
+=sa3iiq1_conv= is served as =KgFactor_sold=, kg per ONE sold unit (canonical
+=lsms_library/data_info.yml=), because the form states the sale in the unit it rates.
+The World Bank does the same (=NGA_GHS4.do:281=, =sa3iiq5a * sa3iiq1_conv=).  W1-W3
+ship no factor, so the column is float NaN there.  A non-positive value would read as
+not recorded; none occurs.  Positive on 3,721 of 3,825 and 3,626 of 3,747 sale records.
+
+*Agreement policy, which the canonical note requires a folding producer to state.*
+Never summed and never chosen between.  A one-record row carries its record's factor.
+A summed row carries it only where every record reports the same factor, missingness
+included, as Mali's does; otherwise NA with the quantity kept (3 pairs in W4, 1 in W5,
+all four being two different factors).  A two-unit row's is NA.  Unlike Mali this files
+no grain report: the row already carries =hh-crop-sale-records-summed=, and
+=derivation_inputs= returns each record's factor.
+
+*Why it had to be wired.*  =median_price_valuation= needs kilograms per sold unit, and
+without this factor it could convert only sales in a metric unit, so serving the W3-W5
+sales alone made it return wrong numbers where it used to return NaN.  Against the
+household's own =Value_harvested=, cold build of =8b0c1b398= (no factor) and of
+=08532bf15= (factor):
+
+| | W1 | W2 | W3 | W4 | W5 |
+|-+-+-+-+-+-|
+| no factor: sum ratio | 0.82 | 1.48 | 2.25 | 14.80 | 6.09 (18.29 without the N1.95B valuation) |
+| no factor: row median / within 2x | 0.91 / 68% | 1.00 / 72% | 1.14 / 63% | 1.40 / 47% | 7.55 / 23% |
+| no factor: sales in the price pool | 2,249 | 991 | 171 | 43 | 41 |
+| no factor: value from a crop price of under 10 sales | 2.5% | 2.7% | 20.0% | 99.3% | 99.2% |
+| *factor: sum ratio* | same | same | same | *1.09* | *0.51 (1.06 without that row)* |
+| *factor: row median / within 2x* | same | same | same | *1.00 / 80%* | *1.00 / 79%* |
+| *factor: sales in the price pool* | same | same | same | *3,669* | *3,588* |
+| factor: value from a crop price of under 10 sales | same | same | same | 0.7% | 0.4% |
+| factor: rows valued | 6,590 | 4,446 | 524 | 11,508 | 8,412 |
+
+W5 maize goes N4,150 -> N423 per kg and W4 millet N8,000 -> N90.  No other column of any
+row moved, the other 18 tables are frame-equal, and every other consumer is identical.
+Ruling A changes none of this table: it moves where a sale sits, not which sales price.
+
+*W3 is not fixed.*  It ships no factor, so its valuation stays at 2.25x from a pool of
+171 metric-unit sales, with 20% of its value resting on a crop price from under 10 sales.
+Ruled 2026-11-04 (D): served, and disclosed here.  Do not sum =median_price_valuation=
+over W3.  W1/W2, also with no factor, have far more
+metric sales (2,249 and 991).
+
+*Coverage and residuals.*  =KgFactor_sold= is on 3,669 of 3,789 (W4) and 3,585 of 3,714
+(W5) sale rows.  The 249 without: 224 lone records whose factor is blank, 21 two-unit
+rows, 4 summed rows whose factors disagree.  One =Kg= row reports a factor other than 1;
+it is served as reported and the consumer's screen rejects it
+(=supplied_factor_rejected=: 1).
+
 * crop_production: a unit =_canon_unit= cannot place is =Unknown= (GH #1047)
 
 =u= is a *column* here (the declared index is =(t, i, plot_id, crop)=), and
@@ -2470,17 +2731,17 @@ every wave).  *Only waves 4 and 5 ship one at all.*
 | 2015-16 | secta3ii_harvestw3   |  8 544 | *none*           | ---           | ---                         | n/a    |
 | 2018-19 | secta3i_harvestw4    | 14 197 | =sa3iq6_conv=    | 10 845 (76.4%) | =sa3iq6i= / =sa3iq6ii=        | *yes*    |
 | 2018-19 | secta3i_harvestw4    |        | =sa3iq6d_conv=   |  3 410 (24.0%) | =sa3iq6d1= / =sa3iq6d2=       | no     |
-| 2018-19 | secta3ii_harvestw4   |  8 839 | =sa3iiq1_conv=   |  8 669 (98.1%) | =sa3iiq1a= / =sa3iiq1c=       | no     |
+| 2018-19 | secta3ii_harvestw4   |  8 839 | =sa3iiq1_conv=   |  8 669 (98.1%) | =sa3iiq1a= / =sa3iiq1c=       | as =KgFactor_sold= (GH #843) |
 | 2018-19 | secta3iii_harvestw4  |  1 062 | =sa3iiiq13_conv= |    695 (65.4%) | =sa3iiiq13a= / =sa3iiiq13c=   | *yes*    |
 | 2023-24 | secta3i_harvestw5    | 10 071 | =sa3iq9_conv=    |  8 092 (80.3%) | =sa3iq9a= / =sa3iq9b=         | *yes*    |
 | 2023-24 | secta3i_harvestw5    |        | =sa3iq15_conv=   |  1 169 (11.6%) | =sa3iq15a= / =sa3iq15b=       | no     |
-| 2023-24 | secta3ii_harvestw5   |  7 184 | =sa3iiq1_conv=   |  6 962 (96.9%) | =sa3iiq1a= / =sa3iiq1c=       | no     |
+| 2023-24 | secta3ii_harvestw5   |  7 184 | =sa3iiq1_conv=   |  6 962 (96.9%) | =sa3iiq1a= / =sa3iiq1c=       | as =KgFactor_sold= (GH #843) |
 | 2023-24 | secta3iii_harvestw5  |    483 | =sa3iiiq23_conv= |    295 (61.1%) | =sa3iiiq23a= / =sa3iiiq23b=   | *yes*    |
 
 Every one of them carries the Stata label "Kg/L conversion factor"; the label
 does not distinguish them.  Only the *neighbouring question* does.
 
-** Why three of them are NOT wired --- and must not be
+** Why three of them are NOT wired as =KgFactor= --- and must not be
 
 *A factor belongs to the quantity block it was asked beside.*
 
@@ -2492,9 +2753,12 @@ does not distinguish them.  Only the *neighbouring question* does.
   q6d/q15 factor to it would multiply one container's rate by another
   container's quantity.
 - =sa3iiq1_conv= (=secta3ii=, both waves) is the *household*-crop total
-  harvest, with no plot linkage --- the same reason =crop_production.py=
-  already leaves W3--W5 =Quantity_sold= / =Value_sold= NaN (see the
-  [[*crop_production: two reported price fields the build does not carry][price-fields section]] above).  =secta3ii= is not read by this build at all.
+  harvest, with no plot linkage, so it rates no plot row's quantity and is not
+  =KgFactor=.  This note used to end there, and the factor went unread, because
+  =secta3ii= was hh-crop grain and nothing served sat at that grain.  /Changed
+  2026-11-04 (GH #843)/: the W4/W5 sale now does, and the form states it in that
+  total's unit, so the same number is the sale's =KgFactor_sold=.  The rule above
+  is what decides it: a factor belongs to the quantity block it was asked beside.
 
 GH #859 quoted EPAR's W4 =.do= (:575--592) as evidence of "FOUR columns".  It
 is four columns *for EPAR's purpose*, which is different: EPAR runs a *lockstep

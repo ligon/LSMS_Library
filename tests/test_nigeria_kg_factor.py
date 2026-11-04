@@ -16,8 +16,11 @@ Two things are pinned here, and they fail differently:
    only a ``*_conv`` that pairs with the quantity/unit that frame stores.
    ``sa3iq6d_conv`` / ``sa3iq15_conv`` sit in the *"how much MORE does HH
    expect to harvest"* block with their own unit columns, and
-   ``sa3iiq1_conv`` is ``secta3ii`` at hh-crop grain -- wiring any of them
-   would attach one container's factor to another container's quantity.
+   ``sa3iiq1_conv`` rates the ``secta3ii`` household total -- wiring any of
+   them as ``KgFactor`` would attach one container's factor to another
+   container's quantity.  ``sa3iiq1_conv`` is the W4/W5 sale's own
+   ``KgFactor_sold`` instead (GH #843), pinned in
+   ``test_gh843_nigeria_household_crop_sales.py``.
 3. **The counts** (data-gated): per-``t`` non-null ``KgFactor`` on the built
    table.  Skips cleanly where no build is available.
 

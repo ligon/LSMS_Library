@@ -275,11 +275,24 @@ Data Scheme:
     # conversion, yield, main_crop, or value shares (transformations).
     # crop (j) on the shared harmonize_food Preferred Label so it joins
     # food_acquired.j; u normalized to the shared `u` table base labels.
-    # Quantity_sold / Value_sold populated only where the survey records
-    # sales at the plot-crop grain (W1/W2); W3-W5 record sales at
-    # hh-crop grain (no plot linkage) -> NaN.  intercropped derived from
+    # Quantity_sold / Value_sold: W1/W2 record them on the plot-crop row.
+    # W3-W5 record them at hh-crop grain (secta3ii, no plot), so the sale goes
+    # on the household's one row for that crop that states a harvest (positive
+    # Quantity; a registered derivation, _/derivations.yml) and otherwise on ONE
+    # row with plot_id='Farm-level' and no harvest Quantity (GH #843, @ligon
+    # 2026-11-03, 2026-11-04).
+    # No split, no double count, nothing dropped.  `Farm-level` is the canonical
+    # structural sentinel: NOT a plot, so filter `plot_id != 'Farm-level'` before
+    # counting plots; a count of crop occurrences drops it only where the household
+    # has a plot row of that crop (GH #1469).  On such a row `u` is 'Unknown' beside a real Unit_sold, which
+    # is correct (GH #1047): `u` describes the harvest Quantity the row does not
+    # have, so do not read it as a Unit_sold != u flag.  See _/CONTENTS.org.
+    # W5's value column prints "ESTIMATE THE VALUE OF IN-KIND PAYMENTS", so a W5
+    # Value_sold can include an estimated in-kind part; no column flags it.
+    # intercropped derived from
     # the PP planting roster (sect11f s11fq2) where present (W1-W3);
-    # perennial = True for tree/permanent-crop rows (W4/W5 secta3iii).
+    # perennial = True for tree/permanent-crop rows (W4/W5 secta3iii), NA on a
+    # Farm-level row.
     index: (t, i, plot_id, crop)
     Quantity: float
     u: str
@@ -302,15 +315,26 @@ Data Scheme:
     # the column was worse: Value_sold / Quantity_sold was filed under the
     # harvest unit by assumption on every row.
     #
+    # W3 asks the sale its own unit (sa3iiq5b).  W4/W5 ask only a quantity, "Of
+    # the [QTY] [UNIT] [CONDITION] of [CROP] harvested, how much of it did your
+    # household sell?", so the sale is in the unit of the household's total
+    # harvest (sa3iiq1c / sa3iiq3b); its size and condition are not carried.
+    #
     # A plain NA-bearing string column, never an index level and never
-    # sentinel-filled.  `optional` for two reasons: only W1/W2 record a
-    # plot-grain sale at all (W3-W5's sale block is secta3ii at hh-crop
-    # grain with no plot linkage, GH #843, so Quantity_sold / Value_sold /
-    # Unit_sold are all legitimately NaN there); and a row with no sale has
-    # no sold unit, so the column is never fully populated.  No sold
-    # CONDITION column exists in the W1/W2 A3 files.
+    # sentinel-filled.  `optional` because a row with no sale has no sold unit,
+    # so the column is never fully populated, and a household-crop sold in two
+    # units has no single unit to serve (GH #843).  No sold CONDITION column
+    # exists in the W1/W2 A3 files.
     Unit_sold:
       type: str
+      optional: true
+    # Survey-reported kg per ONE sold unit (GH #843): W4/W5 `sa3iiq1_conv`, the
+    # form's Kg/L factor for the total-harvest unit the sale is stated in.  W1-W3
+    # ship none, so `optional`.  A column apart from KgFactor, which rates the
+    # harvest `u`.  A summed row carries it only where every record reports the
+    # same factor, missingness included; a two-unit row's is NA.
+    KgFactor_sold:
+      type: float
       optional: true
     planting_month: str
     harvest_month: str
@@ -334,7 +358,8 @@ Data Scheme:
     # sa3iiiq23_conv.  The other `*_conv` columns are NOT wired and must not
     # be: sa3iq6d_conv (W4) / sa3iq15_conv (W5) belong to the "expect to
     # harvest MORE" block with its own unit columns, and sa3iiq1_conv
-    # (secta3ii) is hh-crop grain with no plot linkage.  See _/CONTENTS.org.
+    # (secta3ii) rates the household total, so it is the sale's KgFactor_sold
+    # above and never a plot row's KgFactor.  See _/CONTENTS.org.
     KgFactor:
       type: float
       optional: true
