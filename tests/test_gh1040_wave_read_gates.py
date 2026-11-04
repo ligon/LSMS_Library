@@ -143,18 +143,19 @@ def test_site1_no_cache_bypasses_a_fresh_parquet(yaml_wave, monkeypatch):
         w.grab_data(YAML_TABLE)
 
 
-def test_site1_no_cache_is_read_by_truthiness(yaml_wave, monkeypatch):
-    """The WAVE gate reads ``LSMS_NO_CACHE`` by truthiness -- ``"0"`` bypasses
-    it -- where the COUNTRY gate accepts only ``{1,true,yes}``.  Pinned as
-    found, so an extraction cannot "harmonise" it silently; changing it is a
-    decision, not a refactor."""
+def test_site1_no_cache_is_on_only_for_1_true_yes(yaml_wave, monkeypatch):
+    """Re-pinned by the GH #1455 ruling (@ligon, 2026-11-04): this gate used to
+    read the flag by truthiness, so ``"0"`` bypassed it; both gates now read it
+    through ``country._no_cache``."""
     w, path, expected, frame = yaml_wave
     _plant(path, frame, cache_hash=expected)
-    monkeypatch.setenv("LSMS_NO_CACHE", "0")
-    with pytest.raises(_Rebuilt):
-        w.grab_data(YAML_TABLE)
-    monkeypatch.setenv("LSMS_NO_CACHE", "")
-    assert list(w.grab_data(YAML_TABLE)["Sex"]) == ["SENTINEL"]
+    for off in ("0", "false", "no", ""):
+        monkeypatch.setenv("LSMS_NO_CACHE", off)
+        assert list(w.grab_data(YAML_TABLE)["Sex"]) == ["SENTINEL"]
+    for on in ("1", "true", "YES"):
+        monkeypatch.setenv("LSMS_NO_CACHE", on)
+        with pytest.raises(_Rebuilt):
+            w.grab_data(YAML_TABLE)
 
 
 def test_site1_stale_rebuilds_and_keeps_its_hash(yaml_wave):

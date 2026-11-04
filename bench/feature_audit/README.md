@@ -34,10 +34,13 @@ This depends on **GH #508** (`Feature.__call__` forwards per-feature kwargs —
 python bench/feature_audit/scan.py --features food_prices --countries Uganda \
   --out /tmp/fa_smoke.jsonl
 
-# full deterministic sweep (heavy). Cold = authoritative; run from a neutral CWD
-# (the .pth pins lsms_library to the main checkout — see CLAUDE.md / REALBUILD).
-LSMS_NO_CACHE=1 python /abs/path/bench/feature_audit/scan.py --features canonical \
-  --out bench/feature_audit/results/$(date +%F)/results.jsonl
+# full deterministic sweep (heavy). Cold = authoritative, and cold means an empty
+# private data root.  LSMS_NO_CACHE=1 alone is soft: script-path wave parquets are
+# still read, and each table it builds rewrites var/ in whichever root is set, so
+# never run it against a shared root.  PYTHONPATH must name your checkout (CLAUDE.md,
+# scrum-master addendum 3).
+LSMS_DATA_DIR=$(mktemp -d) PYTHONPATH=/abs/path python /abs/path/bench/feature_audit/scan.py \
+  --features canonical --out bench/feature_audit/results/$(date +%F)/results.jsonl
 ```
 
 Flags: `--features canonical|all|<names…>`, `--countries <names…>`,
@@ -74,7 +77,8 @@ warn/fail/error subset is the candidate-finding list.
   `currency='index'`; `m` under `market`) and `market` drops `v`. We check only
   unnamed levels and missing canonical core levels.
 - Warm vs cold cache: warm sweep is fast but a stale L2 parquet could mask/fake a
-  finding. Red-team reproduces survivors **cold** (`LSMS_NO_CACHE=1`) from `/tmp`.
+  finding. Red-team reproduces survivors **cold**, in an empty private `LSMS_DATA_DIR`,
+  from `/tmp`.
 
 ## cluster.py — collapse findings to root-cause patterns
 

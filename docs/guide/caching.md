@@ -128,7 +128,10 @@ still forces a full rebuild.
 
 You can still invalidate manually:
 
-- Set `LSMS_NO_CACHE=1` for the session to force a rebuild from source.
+- Set `LSMS_NO_CACHE=1` for the session to force a rebuild from source. Only
+  `1`, `true` or `yes` turn it on; any other value, `0` included, leaves it off.
+  The rebuild rewrites the L2-country parquet in the data root you are pointed
+  at, with the frame an ordinary build would write.
 - Run `lsms-library cache clear --country {Country}` (optionally with
   `--method {table}`) to evict the affected L2-country and L2-wave
   parquets before the next call.
