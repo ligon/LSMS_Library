@@ -41,3 +41,39 @@ Uganda::sample::unlocated-identity: &unlocated_identity
   contents: Uganda/_/CONTENTS.org, GH1120 locating covers and singletons
   since: '2026-10-30'
 Uganda::cluster_features::unlocated-identity: *unlocated_identity
+
+Uganda::sample::ea-tracking-key:
+  waves: ['2018-19', '2019-20']
+  columns: [ea]
+  rows: {}
+  rule: >-
+    A household with no ea of its own takes the gsec1.ea of the 2015-16
+    household its tracking key names. 2018-19: GSEC1.t0_hhid -> 2015-16
+    gsec1.HHID. 2019-20: gsec1.hhidold -> 2018-19 GSEC1.hhid -> t0_hhid ->
+    2015-16 gsec1.HHID. Raw source ids through format_id, never the walked
+    household id. A household the chain does not reach stays NA: a blank
+    hhidold is not a link, and nothing is read from the parish or parsed out
+    of an id. v is not involved and does not change.
+  function: lsms_library.countries.Uganda._.uganda:derive_inherited_ea
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_inherited_ea
+  raw_variables: [hhid, t0_hhid, hhidold, HHID, ea]
+  assumptions:
+    - text: t0_hhid names the 2015-16 household this household descends from, and hhidold names its 2018-19 record.
+      basis: variable-label
+      evidence: >-
+        2018-19 GSEC1.t0_hhid, "Full wave5 UNPS household ID or wave6 split-off
+        Parent Household ID"; 2019-20 gsec1.hhidold, "Unique hh indentifier for
+        wave7 :SUSO". The library's panel crosswalk reads the same two keys
+        (Waves in uganda.py).
+    - text: ea is a label of origin, so a tracked household's EA is the EA of the 2015-16 household it descends from, wherever it now lives.
+      basis: modelling-choice
+      evidence: >-
+        No document states it; measured on the two waves that ship ea. All 2,872
+        households linked 2013-14 -> 2015-16 keep ea, 316 labels one-to-one, and
+        characters 2-4 of the survey's own household id are ea on 3,119/3,119
+        and 3,305/3,305 cover rows (2,978/2,978 of the t0_hhid the rule follows).
+  validated_against: >-
+    tests/test_gh689_uganda_ea_psu.py recomputes the chain from the raw covers
+    without importing this module; CONTENTS.org records the before/after.
+  contents: Uganda/_/CONTENTS.org, "The design PSU ea (GH #689)"
+  since: '2026-11-03'

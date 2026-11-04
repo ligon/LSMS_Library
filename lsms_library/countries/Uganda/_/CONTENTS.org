@@ -65,6 +65,85 @@ of the library's =v=, not evidence that the survey redesigned its sampling
 PSU as a parish (GH #689). The separate =sampling.yml= record continues to
 describe enumeration-area PSUs, with its per-wave documentation qualifications.
 
+*** The design PSU =ea= (GH #689)
+
+/Ruling @ligon, 2026-11-03, option (C) extended./  From 2013-14 =v= is a parish,
+not the unit the survey sampled.  =v= and =cluster_features= stay exactly as they
+are, and =sample()= gains a column, =ea=: the enumeration area a household was
+SAMPLED in, carried with it when it moves.  That is what makes it a design PSU and
+a poor location key, and why it is a =sample()= column and not =v=.  Cluster a
+standard error on =ea=; locate a household with =v=.
+
+| wave    | source of =ea=                                         | non-null / rows | distinct |
+|---------+--------------------------------------------------------+-----------------+----------|
+| 2013-14 | =GSEC1.ea=, direct                                     | 3,119 / 3,119   |      317 |
+| 2015-16 | =gsec1.ea=, direct                                     | 3,305 / 3,377   |      316 |
+| 2018-19 | =GSEC1.t0_hhid= -> 2015-16 =HHID= -> =ea=              | 2,978 / 3,242   |      315 |
+| 2019-20 | =hhidold= -> 2018-19 =hhid= -> =t0_hhid= -> ... -> =ea= | 2,823 / 3,098   |      315 |
+
+The two inherited waves carry =Derivation= =Uganda::sample::ea-tracking-key=, on
+exactly the rows that received a value.  2005-06 to 2011-12 stay NA here: =v= is
+already the EA there, under =comm= labels, and a single label across all eight
+waves is a filed follow-up.
+
+*Why inheriting is sound: =ea= is part of the survey's own household id.*  All
+2,872 households linked 2013-14 -> 2015-16 keep =ea=, 316 labels one-to-one.  The
+link is =gsec1.hh= with its wave token moved back (=-05-= -> =-04-=, the =Waves=
+table in =uganda.py=); 2015-16 has no =HHID_old=.  The 100% is not suspicious:
+characters 2-4 of the 12-character =HHID= (2013-14) and 8-character =HHID=
+(2015-16) ARE =ea=, on 3,119 of 3,119 and 3,305 of 3,305 rows, and =DynID= // 100
+is too.  The same holds of the =t0_hhid= the rule follows, 2,978 of 2,978.  That
+encoding is evidence and *not a route*: parsing =t0_hhid= would give the 198
+households below an answer for 168, and the ruling is that no route means NA.
+
+*The keys are RAW source ids*, never the walked =i=, which is a canonical id from
+another wave.  All are clean strings: no float, whitespace or =.0= on any of the
+five key columns, and =format_id= changes none but the one trap below.  =ea= is
+int16 in the source, and the country-level =ea= formatter keeps it from reaching a
+consumer as ='12.0'= across the outer merge.
+
+- /A blank is not a link./  69 households in 2019-20 have =hhidold= == =''=; it
+  formats to =None=, and =_follow_key= drops it first because =pd.merge= matches
+  null keys to each other.
+- /Two children, one parent./  5 2015-16 households each have two 2018-19
+  households naming them (=t0_hhid= repeats); both children inherit.  The join is
+  validated =many_to_one=, so a repeated target would raise.
+
+*The 198 + 66 of 2018-19 with no =ea=*, by what the source says about them:
+
+| households | =t0_hhid=                 | what it is                                                                                                                   |
+|------------+---------------------------+------------------------------------------------------------------------------------------------------------------------------|
+|         49 | 8 characters              | a real 2015-16 =HHID=, but of a household only =AGSEC1= records (D1 below).  Its =AGSEC1.ea= exists.                         |
+|         73 | 8 characters              | the form of a 2015-16 =HHID=; in no column of any of the 119 2015-16 =.dta=.                                                 |
+|         76 | 5 characters (=H= + 4)    | in no 2015-16 file; 46 would parse to a 2015-16 EA and 30 would not, so these are not truncated ids.                          |
+|         66 | (not in =GSEC1=)          | households only 2018-19 =AGSEC1= records, the =unlocated-= singletons of GH #1120 D2.                                        |
+
+The variable's label is "Full wave5 UNPS household ID or wave6 split-off Parent
+Household ID", and the library holds no wave 6, which is the likely home of the 73
+and the 76; that is an inference and nothing here depends on it.  All 198 are
+=response_status= 1 in =GSEC1=.  In 2019-20 the 275 with no =ea= are 69 blank
+=hhidold=, 43 naming a 2018-19 household only =AGSEC1= records, and 163 descending
+from the 198.
+
+*Why =AGSEC1= is not a route, as ruled.*  The ruling names =GSEC1=.  It would be a
+short step: =AGSEC1.ea= is non-null for the 72 households only =AGSEC1= records in
+2015-16 and equals =gsec1.ea= on all 2,622 households both covers hold, which would
+add 72 direct and 49 inherited values.  It is left for a ruling so that the column
+has one source.  =AGSEC1.t0_hhid= in 2018-19 is a different matter and is not a
+clean key: it disagrees with =GSEC1.t0_hhid= on 86 of the 3,176 households both
+files hold, and on those 86 its value (1-3 or 7 characters) is never a 2015-16
+=HHID=.
+
+*Mechanics.*  =origin_ea= is a real =dfs:= sub-df with the 2015-16 =gsec1= as its
+=file:=, and its country-level hook re-keys that frame to the current wave's =hhid=.
+Two reasons, both load-bearing: the file's sidecar is then in the wave's
+=_input_hash= (2019-20 also declares its bridge, 2018-19 =GSEC1=, under a key that
+is not in =dfs:=, which =_collect_file_paths_from_block= hashes and =grab_data=
+never reads), and an unavailable 2015-16 file costs =ea= through the GH #515 / #675
+drop rather than costing =v= for every table of the wave.  =Derivation= stays on
+=sample=: =_join_v_from_sample= carries =v= alone, and the =ea= column reaches no
+other table.
+
 *** =v= across waves: three different defects (GH #942)
 
 =v= is not one identifier across Uganda's waves, and the reasons differ by
@@ -150,7 +229,9 @@ frame carrying =v= across them:
    339 of that wave's 656 =v= are 0.05-degree GPS bins, not clusters, so its
    two boundaries are declared =mixed=.
 3. *A change of KIND*: EA (=comm=) -> parish code (2013-14) -> =DISTRICT/PARISH=
-   name composite (2018-19).  Declared =redefined=; no crosswalk can exist.
+   name composite (2018-19).  Declared =redefined=; no crosswalk can exist for
+   =v=.  (/2026-11-03/: the EA itself is not lost.  It is served as =ea=, above,
+   GH #689.)
 
 *** Why 2018-19 / 2019-20 =v= is a =DISTRICT/PARISH= composite (GH #323)
 
@@ -1212,14 +1293,17 @@ cluster, so it is no cleaner than the parish:
   =ea=, =EA_code=, =comm= or =comcod=.  =EA_code= / =t0_EA_code= (2018-19, 305
   communities) and =Final_EA_code= (2019-20, 307) exist only in the community
   files, which carry no household key.  2018-19 =GSEC1.t0_hhid= matches a
-  2015-16 =HHID= for 2,978 of 3,176 households (2019-20 not probed).
+  2015-16 =HHID= for 2,978 of 3,176 households.  (/2026-11-03/: 2019-20 =hhidold=
+  matches a 2018-19 =GSEC1.hhid= for 2,986 of 3,098, and the chain reaches =ea=
+  for 2,823; see "The design PSU =ea=" under Sampling Design.)
 
 /Contradicts/ the 2013-14 =cluster_id_note= in =sampling.yml=, "A parish is
 not an EA, so no crosswalk can exist": true of the served parish =v=, but the
 survey's own =ea= pairs one-to-one with 2011-12 =comm= on all 212 linked EAs.
-Nothing is rewired here.  Whether =v= (or a separate design-PSU column) should
-use =ea= is #689's open decision; as =v= it would give MORE =Rural= conflicts
-than the parish (128 vs 70 groups in 2013-14), not fewer.
+(/2026-11-03, #689 decided/: =v= stays the parish, and =ea= is a separate column
+on =sample()=, because as =v= it would give MORE =Rural= conflicts than the parish
+(128 vs 70 groups in 2013-14), not fewer.  See "The design PSU =ea=" under Sampling
+Design; the 2013-14 =cluster_id_note= is corrected.)
 
 *GPS is not averaged.*  Where the within-cluster coordinates vary at all
 they vary by a MEDIAN of 4.6--42.9 km and by up to 584 km (measured, all

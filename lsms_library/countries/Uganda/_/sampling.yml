@@ -319,8 +319,11 @@ Sampling:
       cluster_id_note: |-
         `v` changes KIND here: the EA code `comm` through 2011-12, the parish code
         `h1aq4a` from 2013-14 (CONTENTS.org, "Cluster (PSU) identifier").  A parish
-        is not an EA, so no crosswalk can exist.  Measured: 0 of 1,717 linked
-        households keep `v`.
+        is not an EA, so `v` has no crosswalk across this boundary, but the EA is not
+        lost: `sample()`'s `ea` serves the design PSU from this wave (GH #689), and
+        `GSEC1.ea` pairs one-to-one with 2011-12 `comm` on all 212 linked EAs.  This
+        note used to say "no crosswalk can exist", which was true of `v` only
+        (corrected 2026-11-03).  Measured: 0 of 1,717 linked households keep `v`.
       source_type: derived-from-data
       confidence: high
       source_file: null
@@ -343,6 +346,8 @@ Sampling:
       selected from the 783 EAs of UNHS 2005/06" -- the 2009-10 design, not
       this wave's sample.  Treat the household/EA counts in that sentence as
       boilerplate.  The rotation above IS wave-specific and begins here.
+      The `psu` above is served as `sample()`'s `ea`, direct from `GSEC1.ea`;
+      `v` is a parish from this wave (GH #689).
     record_source: 'CONTENTS.org "Sampling Design" > "Rotating panel and refreshment sample" + oversamples'
 
   '2015-16':
@@ -389,7 +394,11 @@ Sampling:
     design_statement: |-
       However, the probabilities of selection for the rural portions of ten districts that had been oversampled by the UNHS 2005/06 were adjusted accordingly.
     documentation_status: carried-forward
-    notes: 'population.yml notes repeat the 2009-10 "3,123 households over 322 EAs" boilerplate.'
+    notes: |-
+      population.yml notes repeat the 2009-10 "3,123 households over 322 EAs"
+      boilerplate.  The `psu` above is served as `sample()`'s `ea`, direct from
+      `gsec1.ea`, and is NA for the 72 households only AGSEC1 records; `v` is a
+      parish (GH #689).
     record_source: 'CONTENTS.org "Sampling Design" > oversamples'
 
   '2018-19':
@@ -440,7 +449,10 @@ Sampling:
       CONTENTS.org records that this wave's universe statement exists ONLY in
       WB catalog metadata and that the library holds no copy of the claim; the
       design entry here is inherited from the panel design, not read off a
-      wave-specific document.
+      wave-specific document.  No household file of this wave ships an EA:
+      `sample()`'s `ea` is the 2015-16 `ea` of the household `GSEC1.t0_hhid`
+      names, for 2,978 of 3,242 households and NA for the rest (GH #689,
+      derivation `Uganda::sample::ea-tracking-key`).
     record_source: 'CONTENTS.org "Sampling Design"'
 
   '2019-20':
@@ -490,5 +502,8 @@ Sampling:
       Households whose last interview was Wave 0 or Wave 1 are out of scope for
       this wave (CONTENTS.org, "Exclusions").  CONTENTS.org also records an
       open TODO: this wave provides only a single `wgt` variable and appears
-      panel-only, so `wgt` is used for both weight columns.
+      panel-only, so `wgt` is used for both weight columns.  No household file
+      of this wave ships an EA: `sample()`'s `ea` follows `gsec1.hhidold` to
+      2018-19 and `t0_hhid` to the 2015-16 `ea`, for 2,823 of 3,098 households
+      and NA for the rest (GH #689, derivation `Uganda::sample::ea-tracking-key`).
     record_source: 'CONTENTS.org "Sampling Design"'

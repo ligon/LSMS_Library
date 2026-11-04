@@ -483,6 +483,21 @@ Columns:
         # stratum is entirely metro=1), so there is no evidence they are urban.
         # Kept as a distinct, VISIBLE value rather than guessed away.  GH #602.
         Informal: []
+    ea:
+      # The design PSU where a country's `v` is not one (GH #689; Uganda only
+      # today).  It is the enumeration area a household was SAMPLED in, carried
+      # with it when it moves, so it says how the sample was drawn and is a
+      # poor location key.  It is NOT `v`, is not joined onto other tables, and
+      # is NA where the survey offers no route to it: never filled from `v`.
+      type: str
+      optional: true
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        As under `food_acquired.Derivation`: the registry key of a constructed
+        field on this household's row (its `columns` entry names which one).
+        Stays on `sample`: `_join_v_from_sample` carries `v` alone.
   cluster_features:
     Region:
       type: str
