@@ -57,6 +57,9 @@ sample:
             panel_weight: wgt10  # pre-refreshment — same as cross-sectional
             strata: stratum
             Rural: urban
+            # The household's OWN recorded district, the column `cluster_features` reads, so
+            # `market='District'` labels a household its cluster's mates disagree about (GH #1441).
+            District: h1aq1
             Region:
                 - region
                 - # Kampala is Central (matches cluster_features convention)
@@ -86,7 +89,7 @@ cluster_features:
                 - # Kampala is Central
                   Kampala: Central
             Rural: urban
-            District: h1aq1  # TODO: Needs string regularization
+            District: h1aq1  # no case or whitespace variant in this wave (GH #1441)
     df_geo:
         file: ../Data/UNPS_Geovars_1011.dta
         idxvars:

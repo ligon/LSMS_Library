@@ -256,8 +256,10 @@ Sampling:
       cluster_id_continuity: stable
       cluster_id_note: |-
         Same EA code both sides once harmonised: 2,510 of 2,510 linked households
-        (100%) keep `v` across 2010-11 -> 2011-12.  The raw files render `comm` as an
-        int32 8-digit code here (and in 2005-06) and as a 7-character string in
+        with a located `v` in 2011-12 (100%) keep `v` across 2010-11 -> 2011-12.
+        2,540 link in all; the other 30 are on 2011-12's AGSEC1 only, which records
+        no location, so they carry an `unlocated-` singleton (GH #1120 D2).  The raw
+        files render `comm` as an int32 8-digit code here (and in 2005-06) and as a 7-character string in
         2009-10/2010-11; since GH #1133 the 7-character waves are served the 8-digit
         frame EA through the reviewed `comm_frame_ea` table
         (categorical_mapping.org).  That is a 370-pair table from household

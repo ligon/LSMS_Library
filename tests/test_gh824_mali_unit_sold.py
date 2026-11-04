@@ -379,7 +379,9 @@ class TestServed:
         upd = ll.Country(COUNTRY).updated_ids
         exp = pd.concat([e14[["t", "i", "plot_id", "crop", "exp"]], e17])
         exp = id_walk(exp.set_index(["t", "i"]), upd).reset_index()
-        field = flat[flat.kind == "field"]
+        # The EAC-I waves; the EHCVM rows have their own raw oracle
+        # (tests/test_gh824_mali_ehcvm_crop_production.py).
+        field = flat[(flat.kind == "field") & flat.t.isin(["2014-15", "2017-18"])]
         j = field.merge(exp, on=["t", "i", "plot_id", "crop"], how="inner")
         assert len(j) == len(field)
         ok = ((j.Unit_sold == j.exp) | (j.Unit_sold.isna() & j.exp.isna())).fillna(False)

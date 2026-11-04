@@ -797,3 +797,34 @@ order effect of the relabel).
 *Cache.*  =_/categorical_mapping.org= is a build input of every Senegal
 table: all 22 Senegal country hashes move (one Senegal re-warm).  Evidence:
 =slurm_logs/isa_backlog_2026-10-21/1123-ehcvm-identity/=.
+
+* 2026-11-04 -- strata and allocation by wave (GH #812); the NPK slot (GH #1445)
+
+Read-only measurement: nothing is wired and no served value moved.
+
+*Documented.*  The 2021-22 BID (catalog 6278, resource 100388, p.12; not held in
+this repository) gives the stratum (already quoted above from the French) and
+Table 1a, clusters by region, residence and wave.
+
+*Measured.*  =ehcvm_welfare_sen2018.dta=: region x milieu is 28 cells, constant
+within a grappe, and all 28 cluster counts equal Table 1a (Dakar urban 76, Dakar
+rural 10, the rest 16-26).  2021-22 is the same less the two dropped DRs (Dakar
+urban 75, Ziguinchor rural 17).  Cluster share over weight share runs 0.45 (Dakar
+urban) to 9.62 (Kedougou urban) in 2018-19.  Share of var(log cluster weight)
+between region / region x milieu: 58.8% / 90.8% (2018-19), 58.6% / 88.7% (2021-22).
+No variable in either wave's files is named or labelled a stratum.  =domaine= in =ehcvm_individu_sen2018.dta=
+("Domaine étude") is 12 values, zone x =vague= (=Capitale V1= ...), and spans regions:
+not the stratum.
+
+*Settles a tension flagged above.*  "Sub-sample structure" recorded the DDI's "each
+enumeration area" split against the library's one-=vague=-per-=grappe= convention,
+"not adjudicated".  0 of 598 (2018-19) and 0 of 596 (2021-22) grappes appear in
+both =vague=s, 299/299 and 297/299.  The convention holds; the DDI sentence is
+wrong for this file.
+
+*NPK.*  Code 5 of =s16bq01= is =Engrais inorganiques - NPK/Formule unique= in both
+waves and in the questionnaire; no grade.  It maps to =NPK= (0.17 N).  The
+=npk 15/15= rows of =harmonize_input= came with the Niger template and match no
+Senegal label.  =s16b_me_sen2021.dta= holds 763 applied NPK rows and =plot_inputs=
+does not read it.  =s16a_me_sen2018.dta= asks fertilizer per parcel (=s16aq29c1=,
+1,431 positive), which the =data_scheme.yml= grain note says no wave does.

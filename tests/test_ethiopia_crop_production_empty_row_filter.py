@@ -123,7 +123,9 @@ def test_served_rows_whose_only_number_is_a_sale_value(cp):
     serving as 0 (still empty, still dropped); W5's 277 wave rows serve as 276
     (two identical-sale rows on one key, differing only in ``intercropped``:
     the core collapse keeps one, +1 GrainCollapseWarning row).  §12: 29
-    positive lines / 11,339 Birr, all now served."""
+    positive lines / 11,339 Birr, all now served.  GH #1461: W5 276 -> 274, a
+    Gishita and a Pumpkin (holder, crop) on several §9 lines of one plot, whose
+    no-unit rows carried only a sale the rule no longer attaches."""
     t = np.asarray(cp.index.get_level_values("t"), dtype=object)
     u = np.asarray(cp.index.get_level_values("u"), dtype=object)
     only_value = ((u == "Unknown")
@@ -132,7 +134,7 @@ def test_served_rows_whose_only_number_is_a_sale_value(cp):
     got = {w: int((only_value & cp["Value_sold"].notna().to_numpy() & (t == w)).sum())
            for w in sorted(set(t))}
     assert got == {"2011-12": 0, "2013-14": 361, "2015-16": 79,
-                   "2018-19": 168, "2021-22": 276}, got
+                   "2018-19": 168, "2021-22": 274}, got
     # and the filter still drops the genuinely empty rows
     assert not (only_value & cp["Value_sold"].isna().to_numpy()).any()
-    assert len(cp) == 86403
+    assert len(cp) == 86437   # GH #1461, from 86,403: 37 lines back, 3 rows left empty

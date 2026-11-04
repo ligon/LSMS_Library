@@ -28,14 +28,16 @@ constructs 84,489 rows.  Pre-fix it returned 83,019 of them; post-fix it
 returns 84,216.  Of the 1,342 colliding tuples on the old 5-level key, 1,196
 (89%) were season-A/season-B pairs.
 
-WHAT THESE TESTS DO NOT CLAIM.  84,216 is NOT "every reported line-item".  The
-builder's de-dup step still discards 273 of the 84,489 rows it constructs --
+WHAT THESE TESTS DO NOT CLAIM.  The total is NOT "every reported line-item".  At
+84,216 the builder's de-dup step discarded 273 of the 84,489 rows it constructs:
 135 deleted outright by ``groupby(dropna=True)`` because ``plot`` is NaN, and
 138 merged away across 135 same-season duplicate groups, every one of them an
-``input='Seed'`` pair from AGSEC4A.  That residual is pre-existing (pre-fix it
-was 1,470), is documented with per-wave counts in
-``uganda.plot_inputs_for_wave``, and is tracked on GH #637.  The numbers below
-are POST-COLLAPSE row counts, and they are pinned so that residual cannot grow
+``input='Seed'`` pair from AGSEC4A.  #1358 (91ceff359, GH #1120 D3) stopped the
+deletion: those 135 are now served under ``plot_id='unknown_plot'``, kept apart
+by the new ``input_obs`` level, for a total of 84,351.  The 138 are the residual
+(pre-fix it was 1,470), documented with per-wave counts in
+``uganda.plot_inputs_for_wave`` and tracked on GH #637.  The numbers below are
+POST-COLLAPSE row counts, and they are pinned so that residual cannot grow
 unnoticed.
 
 INSTRUMENT NOTE (inherited from the #323 tests -- do not undo it).  Do NOT
@@ -74,18 +76,24 @@ pytestmark = requires_s3
 
 # Rows the API returns per wave, POST-collapse (see the module docstring: this
 # is not the same as the number of reported line-items).  Pre-fix the API
-# returned the sum of these MINUS 1,197 (230/179/157/113/92/172/254
-# respectively).
+# returned the sum of these MINUS 1,332: the 1,197 of the season merge
+# (230/179/157/113/92/172/254 respectively) and the 135 that #1358 stopped
+# deleting (the 2009-10 and 2011-12 counts in UNKNOWN_PLOT_ROWS_BY_WAVE; those
+# waves were 13,993 and 12,353).
 EXPECTED_ROWS_BY_WAVE = {
-    '2009-10': 13993,
+    '2009-10': 14123,
     '2010-11': 13554,
-    '2011-12': 12353,
+    '2011-12': 12358,
     '2013-14': 11834,
     '2015-16': 11981,
     '2018-19': 10367,
     '2019-20': 10134,
 }
-EXPECTED_ROWS = sum(EXPECTED_ROWS_BY_WAVE.values())          # 84_216
+EXPECTED_ROWS = sum(EXPECTED_ROWS_BY_WAVE.values())          # 84_351
+
+# Rows whose source plot is missing (#1358, GH #1120 D3).  2013-14's one row was
+# already served, with a NaN plot; see test_2013_14_nan_plot_seed_row_survives.
+UNKNOWN_PLOT_ROWS_BY_WAVE = {'2009-10': 130, '2011-12': 5, '2013-14': 1}
 
 
 @pytest.fixture(scope='module')
@@ -126,11 +134,11 @@ def test_both_seasons_are_present(plot_inputs):
 def test_total_row_count(plot_inputs):
     """Pin the total row count the API returns.
 
-    NOT "every reported line-item survives" -- 273 of the 84,489 constructed
+    NOT "every reported line-item survives" -- 138 of the 84,489 constructed
     rows are still discarded by the builder's de-dup step (see the module
     docstring).  This pins the post-collapse total so that residual cannot
     grow: pre-fix this number was 83,019, and the 1,197-row gap was the
-    season-A/season-B merge.  This is one of the two tests that actually
+    season-A/season-B merge; the other 135 are #1358's.  This is one of the two tests that actually
     discriminate the fix; the other is ``test_per_wave_row_counts``.
     """
     assert len(plot_inputs) == EXPECTED_ROWS, (
@@ -148,6 +156,19 @@ def test_per_wave_row_counts(plot_inputs):
         f'per-wave plot_inputs row counts changed: {got} != '
         f'{EXPECTED_ROWS_BY_WAVE}'
     )
+
+
+def test_a_source_missing_plot_is_the_sentinel_and_never_null(plot_inputs):
+    """#1358 (GH #1120 D3).  Each source record keeps its own row and its own
+    ``input_obs``, because ``unknown_plot`` does not identify a plot."""
+    flat = plot_inputs.reset_index()
+    assert not flat['plot_id'].isna().any()
+    missing = flat[flat['plot_id'] == 'unknown_plot']
+    assert missing.groupby('t').size().to_dict() == UNKNOWN_PLOT_ROWS_BY_WAVE
+    assert missing['input_obs'].str.startswith('row:').all()
+    assert (flat.loc[flat['plot_id'] != 'unknown_plot', 'input_obs']
+            == 'unresolved_observation').all()
+    assert plot_inputs.index.is_unique
 
 
 def test_kilograms_are_not_summed_with_litres(plot_inputs):
@@ -194,13 +215,14 @@ def test_2013_14_nan_plot_seed_row_survives(plot_inputs):
     Every other wave's total is unchanged, which is why "Quantity totals are
     unchanged" is not a true statement about this change.
 
-    Fails pre-fix: the row is not in the output at all.
+    Fails pre-fix: the row is not in the output at all.  Since #1358 (GH #1120
+    D3) its missing plot is served as ``unknown_plot``, not NaN.
     """
     flat = plot_inputs.reset_index()
-    row = flat[(flat['t'] == '2013-14') & flat['plot_id'].isna()
+    row = flat[(flat['t'] == '2013-14') & (flat['plot_id'] == 'unknown_plot')
                & (flat['input'] == 'Seed') & (flat['j'] == 'Cassava')]
     assert len(row) == 1, (
-        f'expected exactly one 2013-14 NaN-`plot_id` Seed/Cassava row (household '
+        f'expected exactly one 2013-14 unknown-plot Seed/Cassava row (household '
         f'2113000606, Quantity 3.0, "Sack (100 kgs)"); got {len(row)}.  '
         f'Pre-fix it was deleted by `groupby(dropna=True)` inside the de-dup '
         f'collapse (GH #637).'
@@ -228,11 +250,17 @@ def test_no_row_merges_two_seasons_of_the_same_input(plot_inputs):
     the 5-key duplicate set and trips the ``both.empty`` branch below.
 
     The tests that actually discriminate the fix are ``test_total_row_count``
-    and ``test_per_wave_row_counts`` (exact counts, 84,216 vs the pre-fix
+    and ``test_per_wave_row_counts`` (exact counts, 84,351 vs the pre-fix
     83,019) and ``test_kilograms_are_not_summed_with_litres`` (the specific
     merged rows).
+
+    Known plots only: since #1358 two records with no plot can share
+    ``unknown_plot`` in one season (11 groups, all 2009-10 Seed), which is not a
+    merge; ``input_obs`` keeps them apart
+    (``test_a_source_missing_plot_is_the_sentinel_and_never_null``).
     """
     flat = plot_inputs.reset_index()
+    flat = flat[flat['plot_id'] != 'unknown_plot']
     key = ['t', 'i', 'plot_id', 'input', 'j']
     both = flat[flat.duplicated(key, keep=False)]
     if both.empty:                                             # pragma: no cover

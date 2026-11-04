@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 """Build crop_production for Ethiopia ESS 2021-22 (Wave 5; GAP 1).
 
-Item-level harvest at (t, i, plot_id, j, u) from §9 (sect9_ph_w5), with
-planting month from §4 (sect4_pp_w5) and reported sale qty/value from §11
+Item-level harvest at (t, i, plot_id, j, u, production_obs) from §9
+(sect9_ph_w5), with planting month from §4 (sect4_pp_w5) and reported sale
+qty/value from §11
 (sect11_ph_w5).
 
 W5 specifics: crop code in s9q00b (§9), s4q01b (§4), s11q01 (§11).
@@ -18,6 +19,9 @@ sales on a fixed 12 months, not the season (W4 §9 Q4) -- is taken to hold.
 The rows whose crop the §4 roster flags permanent (s4q15, variable label
 "IS THIS CROP A Permanent/TREE CROP?"; colmap ``pl_permanent``) are stamped
 ``Derivation = 'Ethiopia::crop_production::permanent-crop-12-month-window'``.
+
+production_obs (GH #1461): reported:crop_id:<n>, §9's "Unique Crop
+Identifier".  A plot can list one crop code on two crop_id lines.
 """
 import sys
 
@@ -37,6 +41,7 @@ colmap = dict(
     hhid='household_id', holder_id='holder_id',
     parcel_id='parcel_id', field_id='field_id',
     crop_code='s9q00b',
+    production_id='crop_id',       # "Unique Crop Identifier" (GH #1461)
     quantity='s9q05a', unit='s9q05b',
     harvest_month='s9q08b',
     intercrop='s9q02',

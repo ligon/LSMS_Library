@@ -5,8 +5,7 @@ Each EACI wave's ``Mali/<wave>/_/plot_labor.py`` writes a parquet indexed by
 Wage).  The plot-labor module lives in the EACI waves only (2014-15
 EACIMAINOUVRE_p1 + EACIS2F_p2, 2017-18 eaci17_s11ep1 + eaci17_s7ep2).  The
 EHCVM waves (2018-19, 2021-22) carry no plot-labor roster, so they
-contribute nothing — the same wave split as crop_production / plot_inputs /
-livestock.
+contribute nothing — the same wave split as plot_inputs / livestock.
 
 ``v`` is NOT baked in — the framework joins it from ``sample()`` at API
 time (plot_labor is household-linked and is NOT in the framework

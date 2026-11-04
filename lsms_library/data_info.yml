@@ -21,6 +21,14 @@ Single Index:
   # plot_features row (no area, no GPS), so exclude it from any per-plot
   # quantity and REPORT how many rows you excluded.  Two `unknown_plot` rows of
   # one household are not one plot.
+  # `plot_id == 'Farm-level'` is not a plot either, so a count of plots drops
+  # every such row.  On `crop_production` such a row holds a sale no plot can own
+  # (Mali 2021-22; Nigeria W3-W5, GH #843 / #824).  In a count of crop occurrences,
+  # drop it where the household has a plot row of that crop and keep it where it
+  # has none, because it is then the only record of the crop (GH #1469;
+  # `transformations.crop_diversity(weight='count')`).  All 37,280 rows of GhanaLSS
+  # 1987-88 / 1988-89 are Farm-level, so a blanket filter there deletes every crop
+  # record.  A value sum keeps every such row; the sale is there.
   plot_id: plot id
   int_t: interview date
   # Opaque crop-observation coordinate within the full native key (GH1198).
@@ -962,6 +970,28 @@ Columns:
         shell_not_applicable: []
         other_condition: []
         unknown_condition: []
+    condition_native:
+      type: str
+      optional: true
+      note: |
+        The state of the crop as the survey recorded it, in the survey's own
+        words, where the `condition` level folds several answers onto one token.
+        Ruling @ligon 2026-11-04 (GH #1436): the EHCVM list has five answers
+        (Epis, Grain, Décortiqué, Non-décortiqué, Non concerné) and the level
+        serves three tokens, so this column keeps the recorded answer in the API.
+        It is the `crop_variety` shape: a COLUMN named for the level it refines,
+        at the native grain, never an index level.  Filtering or grouping on
+        states belongs on `condition`; this is for reading what was answered.
+
+        NA where the survey recorded no state, and in a wave whose answers the
+        level serves one to one, because nothing was folded there (Niger's and
+        Senegal's three-answer 2021-22 list).  Never a sentinel: a column has no
+        NaN-key hazard.
+
+        DELIBERATELY NO `spellings:` BLOCK.  The labels are the survey's, and
+        they differ by country (Guinea-Bissau's are Portuguese), so they are not
+        a vocabulary.  `diagnostics._check_declared_spellings` reads a block as
+        CLOSED and would fail them, the reasoning of the `u` and `season` notes.
     season:
       type: str
       note: |
@@ -1127,7 +1157,8 @@ Columns:
         rows, 63-99% of Niger's by wave, and 96.1% of Uganda's (measured
         2026-09-10 over the 40,083 rows with a positive `Quantity_sold` that
         know both units, GH #824; 41,162 rows and the same 96.1% since GH
-        #848, 2026-09-24).  Tanzania records every sale in kilograms
+        #848, 2026-09-24; 41,340 rows and the same 96.1% measured 2026-11-04).
+        Tanzania records every sale in kilograms
         and needs no such column.
 
         NA-BEARING, NEVER SENTINEL-FILLED.  `u` carries the string

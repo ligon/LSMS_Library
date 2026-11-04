@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Build crop_production for Ethiopia ESS 2011-12 (Wave 1; GAP 1).
 
-Item-level harvest at (t, i, plot_id, j, u) from §9 post-harvest
+Item-level harvest at (t, i, plot_id, j, u, production_obs) from §9 post-harvest
 (sect9_ph_w1), with planting month from §4 (sect4_pp_w1), the plot-level
 mixed-stand flag from §3 (sect3_pp_w1), and reported sale qty/value from
 §11 (sect11_ph_w1), plus the §12 tree/fruit/root-crop sale module
@@ -18,6 +18,9 @@ per the W1 questionnaire header and variable label), Q8 value ph_s12q08
 (Birr).  W1 §9 EXCLUDES tree/root crops by its own header, so most §12
 pairs have no §9 row to attach to; those are counted, not served -- see
 ethiopia._attach_sect12_sales and Ethiopia/_/CONTENTS.org.
+
+production_obs (GH #1461): reported:crop_code:<n>; §9 ships no documented line
+id.
 """
 import sys
 

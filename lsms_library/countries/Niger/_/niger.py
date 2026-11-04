@@ -594,11 +594,46 @@ def _crop_row_observations(n_rows, source_path, *, script_path):
     return 'row:' + reference + ':' + pd.Series(np.arange(n_rows)).astype('string')
 
 
+# ---------------------------------------------------------------------------
+# condition: the physical state of the reported harvest (GH #1436)
+# ---------------------------------------------------------------------------
+#
+# Canonical index level (lsms_library/data_info.yml): a Tiya of millet on the
+# ear and a Tiya of millet grain are two facts, not one.  EHCVM asks it ("Etat
+# du produit": 2018-19 s16cq12c, 2021-22 s16cq16d); the ECVMA harvest modules do
+# not, so 2011-12 and 2014-15 pass nothing and carry the sentinel.  The tables
+# and the named decision behind them are in categorical_mapping.org.
+CONDITION_NA = 'unknown_condition'
+
+
+def _crop_conditions(codes, table):
+    """Map raw state CODES (``convert_categoricals=False``) through a
+    ``harmonize_crop_condition_*`` table.  A blank or off-scheme code becomes
+    :data:`CONDITION_NA` -- a real value, never NA, because a null index key is
+    deleted by the next ``groupby`` (GH #323 3b)."""
+    mapped = _map_codes(pd.to_numeric(codes, errors='coerce'), _harmonized_codes(table))
+    return mapped.fillna(CONDITION_NA)
+
+
+def _crop_condition_labels(labels):
+    """The state as the survey recorded it, for the ``condition_native`` column.
+
+    *labels* is the state column read with ``convert_categoricals=True``, in
+    whatever language the survey labelled it.  A blank stays NA, never a sentinel:
+    a column has no NaN-key hazard, and NA says no state was recorded.  Only
+    surrounding whitespace is touched.  Ruling @ligon 2026-11-04 (GH #1436).
+    """
+    out = pd.Series(labels).astype('string').str.strip()
+    return out.where(out != '', pd.NA)
+
+
 def _finish_crop_production(df, t):
-    """Common tail: tag t, build the (t, i, plot_id, crop, u, production_obs)
-    index, coerce numeric columns, and guarantee the full schema column set
-    (including the NA-bearing ``Unit_sold`` column, GH #824).  A wave that
-    passes no ``production_obs`` gets :data:`CROP_OBS_NA`."""
+    """Common tail: tag t, build the (t, i, plot_id, crop, u, condition,
+    production_obs) index, coerce numeric columns, and guarantee the full schema
+    column set (including the NA-bearing ``Unit_sold`` column, GH #824).  A wave
+    that passes no ``condition`` gets :data:`CONDITION_NA`; one that passes no
+    ``production_obs`` gets :data:`CROP_OBS_NA`; one that passes no
+    ``condition_native`` carries NA there."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
     # harvest_month: only 2014-15 records it; NaN elsewhere (still carried
@@ -637,14 +672,20 @@ def _finish_crop_production(df, t):
     # row it touches was already being served, with a NaN key that the next
     # groupby would have deleted.
     df = fill_missing_u(df)
+    if 'condition' not in df.columns:
+        df['condition'] = CONDITION_NA
+    df['condition'] = df['condition'].astype('string').fillna(CONDITION_NA)
+    if 'condition_native' not in df.columns:
+        df['condition_native'] = pd.NA
+    df['condition_native'] = df['condition_native'].astype('string')
     if 'production_obs' not in df.columns:
         df['production_obs'] = CROP_OBS_NA
     df['production_obs'] = df['production_obs'].astype('string')
-    keep = ['t', 'i', 'plot_id', 'crop', 'u', 'production_obs', 'Quantity',
-            'Quantity_sold', 'Value_sold', 'Unit_sold', 'harvest_month',
-            'intercropped']
+    keep = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs',
+            'Quantity', 'Quantity_sold', 'Value_sold', 'Unit_sold',
+            'harvest_month', 'intercropped', 'condition_native']
     df = df[[c for c in keep if c in df.columns]]
-    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'production_obs'])
+    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs'])
     return df
 
 

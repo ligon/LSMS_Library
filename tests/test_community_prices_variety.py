@@ -82,13 +82,15 @@ BUILDERS = {
 # Measured served rows by wave (see the module docstring), and the (t, v, j, u)
 # cell counts after the source-accounted fixes (Mali expanded again in #822).
 EXPECTED_ROWS = {
-    "Mali": {"2014-15": 155931},
+    # 2018-19 since #1356 (a06b7a62f): two quotes per s05 source row, 2 x 54,669;
+    # `test_mali_2018_19_serves_both_quotes_of_every_source_row` reads the source.
+    "Mali": {"2014-15": 155931, "2018-19": 109338},
     # 32,369 / 13,808 before the r1 duplicate-entry drop (-17 / -117).
     "Niger": {"2011-12": 32352, "2014-15": 13691, "2018-19": 84444},
     "Tanzania": {"2019-20": 3076, "2020-21": 14623},
 }
 EXPECTED_CELLS = {
-    "Mali": {"2014-15": 39245},
+    "Mali": {"2014-15": 39245, "2018-19": 54205},
     # GH #1090: 8,923 / 6,500 before CS07 rice variety 7031 moved from
     # `Autre Riz local` to `Riz importé non parfumé`; the +56 / +16 are exactly
     # the (t, v, u) rice cells that priced BOTH 7031 and 7032 and now split.
@@ -456,6 +458,22 @@ class TestBuilt:
         assert med["5452"] > 3 * med["5451"]   # 220 g tin vs 60 g tin
         varieties = x.reset_index().groupby(["t", "v", "visit"])["variety"].nunique()
         assert (varieties == 3).any()
+
+    def test_mali_2018_19_serves_both_quotes_of_every_source_row(self):
+        # #1356, against the raw file: s05 has one row per (grappe, product, unit)
+        # and two price readings, no weight (Mali/_/CONTENTS.org, GH #821).
+        import pyreadstat
+        from lsms_library.data_access import get_data_file
+        raw, _ = pyreadstat.read_dta(
+            str(get_data_file("Mali/2018-19/Data/s05_co_mli2018.dta")),
+            apply_value_formats=False)
+        df = _build("Mali").xs("2018-19", level="t")
+        assert len(df) == 2 * len(raw)
+        assert set(df.index.get_level_values("obs")) == {1, 2}
+        assert df["Price"].sum() == pytest.approx(raw["s05q03"].sum() + raw["s05q04"].sum())
+        assert df["Quantity"].isna().all()
+        assert df.index.get_level_values("v").nunique() == raw["grappe"].nunique()
+        assert df.index.get_level_values("variety").nunique() == raw["s05q01"].nunique()
 
     def test_mali_carries_both_passages(self):
         visits = set(_build("Mali").index.get_level_values("visit"))

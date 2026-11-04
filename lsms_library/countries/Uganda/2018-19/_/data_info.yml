@@ -97,6 +97,9 @@ sample:
             strata: subreg
             Rural: urban
             Region: region
+            # The household's OWN recorded district, the column `cluster_features` reads, so
+            # `market='District'` labels a household its cluster's mates disagree about (GH #1441).
+            District: distirct_name  # sic
     locating_ag:
         file: AGSEC1.dta
         idxvars:

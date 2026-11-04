@@ -247,6 +247,21 @@ def _missing_level_sentinels(table_name: str) -> dict[str, str]:
     return {str(k): v for k, v in spec.items()}
 
 
+def _empty_assembly(canonical_levels: list[str]) -> pd.DataFrame:
+    """The frame of an assembly no country survived (GH #1456).
+
+    Zero rows on the index a kept country would have had: ``country`` plus the
+    table's canonical levels, or ``country`` alone for an unregistered table.
+    A caller's ``groupby('country')`` then finds its level instead of raising
+    ``KeyError``.  It has no columns, because no country built any to take them
+    from.  Contract B degrades rather than raises, so this stays a return value,
+    and the dropped countries stay in ``attrs``.
+    """
+    names = ["country", *canonical_levels]
+    return pd.DataFrame(
+        index=pd.MultiIndex.from_arrays([[] for _ in names], names=names))
+
+
 def _rename_index_levels(df: pd.DataFrame, aliases: dict[str, str],
                          country: str, table_name: str) -> pd.DataFrame:
     """Rename this country's index levels to their canonical names (GH #569).
@@ -980,7 +995,10 @@ class Feature:
         Returns
         -------
         pd.DataFrame
-            DataFrame with a ``country`` index level prepended.
+            DataFrame with a ``country`` index level prepended.  A call no
+            country survives returns zero rows and no columns on the same
+            index (GH #1456), so ``groupby('country')`` still works; ``attrs``
+            names the countries a ``labels=`` or ``units=`` request dropped.
         """
         from . import Country
 
@@ -1157,7 +1175,7 @@ class Feature:
                 _mark_labels_unavailable(result, n_kept), n_kept)
 
         if not frames:
-            return _mark_unavailable(pd.DataFrame(), 0)
+            return _mark_unavailable(_empty_assembly(canonical_levels), 0)
 
         # pandas cannot stack frames whose index DEPTH/NAMES differ into a named
         # MultiIndex -- it falls back to an unnamed object index, collapsing the
