@@ -2460,9 +2460,9 @@ decision of GH #837.  =m= is a name, not a fixed geography: following the same
 clusters, 5 of 409 change label between 2008-09 and 2012-13 (Mufindi to Mafinga,
 Njombe to Njombe Urban, Mtwara Urban to Mtwara Mikindani twice, Nyamagana to
 Ilemela, the only real conflict).  =m= carries no =Derivation= key, the same as
-Burkina's =zd-modal-province=.  =food_acquired(market='District')= rows with =m= NA
-before the two digit clusters: 44,969 -> 0 in 2008-09, 54,775 -> 356 in 2010-11;
-rows, expenditure and later rounds are unchanged.  The Site B =NullReadWarning= on =District= for these two
+Burkina's =zd-modal-province=.  =food_acquired(market='District')= rows with =m= NA:
+44,969 -> 0 in 2008-09, 54,775 -> 356 -> 138 in 2010-11 (the last step is the two
+digit clusters); rows, expenditure and later rounds are unchanged.  The Site B =NullReadWarning= on =District= for these two
 waves goes away.
 
 *One served number moves as a result.*  =food_expenditures(basis='total',
@@ -2472,7 +2472,8 @@ prices in these two rounds come from the district rather than the region.  Total
 rise 0.05% in 2008-09 and 0.06% in 2010-11, which hides real row moves: 3,819 of
 251,580 rows change, 2,617 produced and 1,202 in-kind, none purchased.  The median
 ratio is 0.99, the 1st to 99th percentile 0.55 to 1.80, the extremes 0.225 and 10
-(red team, 2026-11-04).  Later rounds are unchanged.
+(red team, 2026-11-04).  Later rounds are unchanged.  The two digit clusters move 5
+more rows in 2010-11 (total -0.0002%).
 
 ** Region 2014-15 (59) and 2019-20 (281 -> 43): a missing =v=, not a missing label
 
@@ -2503,6 +2504,18 @@ Neither is a defect of =cluster_features=.
   change.  For 31 it is their frame sibling's own cluster, so they are labelled as
   any tracked household is.  The other 14 have no sibling, so that label rests on the
   id alone.  Own region agrees with the served label for 29 of the 45.
+- *Measured cold against the same code without the two follow-ups:* exactly 238 =v=
+  change in =sample=, all 2019-20, and no other column or household.  17 other tables
+  carry the new =v= and are otherwise frame-equal, 5 have no =v= and are equal, and
+  =cluster_features= gains no row.  =sample(market='Region')= households with =m= NA
+  in 2019-20: 281 -> 43.  =check_panel_consistency=, grain reports and the
+  =ClusterIdentityWarning= text do not change.
+- *One served number moves.*  =food_expenditures(basis='total',
+  valuation='median_price')= starts its ladder at =v=, so moving 238 households moves
+  the cluster medians around them too.  898 rows change in 2019-20 (503 produced, 395
+  in-kind, none purchased), 667 of them on households that keep their =v=.  The median
+  ratio is 0.97, the 1st to 99th percentile 0.51 to 1.75, the extremes 0.46 and 2.29,
+  and the wave total falls 0.57%.
 - The only route that would label the remaining 102 (59 + 43) without a new =v= is a
   household-grain =Region= on =sample=, and =_add_market_index= prefers that column
   for EVERY household, so populating it fully moves 1,366 labels (245 / 565 / 162 /
