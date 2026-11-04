@@ -5018,3 +5018,29 @@ Registration moves every Malawi =Country._table_cache_hash=, because the wave
 set is folded into the hash, and no existing wave's =Wave._input_hash=.  When
 =food_acquired= is wired for 2024-25, pooled kg factors change for every Malawi
 wave at read time (GH #1487).
+* 2026-11-04 -- a blank harvest plot key is =unknown_plot= (GH #1476)
+
+The note "Existing missing plots: current 41 versus historical 40" left this open; this
+closes it.  Modules G and P are plot-grain, so a blank key means a plot whose identifier is
+missing: the canonical epistemic sentinel, through =_plot_ids=, as =plot_inputs= and
+=plot_labor= already do.  The null was deleted by =harvest_kg='s =groupby=.
+
+Module P 2016-17 is the only place it occurs: 130 rows have a blank =plotid= (81
+cross-section, 49 panel), 41 of them name a crop, and those are the rows served.  None of
+those households has another Module P row with a plot.  Cold builds, development
+=4ea95a0aa= against this change:
+
+| 2016-17                          |    before |     after |
+|----------------------------------+-----------+-----------|
+| =plot_id= null / =unknown_plot=  |   41 / 0  |   0 / 41  |
+| with a =Quantity= / convertible  |   33 / 17 |   33 / 17 |
+| =harvest_kg= rows                |    18,054 |    18,066 |
+| =harvest_kg= total, kg           | 8,168,581 | 8,171,321 |
+
+Every other column of every row is digest-equal in all four waves; =crop_diversity=,
+=gross_crop_revenue=, =yield_kg(on='plot')= and the sale-basis ladder are unchanged.
+
+=_attach_sales= counted plots with =nunique()=, which skipped the null and would count the
+sentinel, so a sale could have newly attached to a row with no plot.  It counts known plots
+only, so every decision is what it was.  None of the 41 rows holds a sale.
+=harvest_kg= pools a household's =unknown_plot= rows of one crop, as it does Uganda's (GH #1460).
