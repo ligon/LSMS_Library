@@ -372,6 +372,39 @@ def _label_selection(method_name: str | None, labels: dict | None):
         _LABEL_SELECTION.reset(token)
 
 
+# ---------------------------------------------------------------------------
+# GH #1487: which waves the read-time audits of ONE table describe.
+#
+# A kg-using food request for a subset of waves reads `food_acquired` for every
+# wave, because the kg factors are estimated from all of them, and serves the
+# subset.  The frame the caller receives holds the subset, so `_finalize_result`
+# audits that table on the subset: a 2019-20 request is not told (or, under a
+# strict lever, failed) about a 2008-09 defect, and a one-wave request does not
+# report `v` crossing a wave boundary.  Out of band for the reason given above
+# for `_LABEL_SELECTION`, and keyed on the table for the same re-entry reason.
+# ---------------------------------------------------------------------------
+_READ_AUDIT_WAVES: ContextVar = ContextVar("lsms_read_audit_waves", default=None)
+
+#: The ``units=`` values of the derived food tables that read the kg ladder,
+#: ``None`` being each table's default.  A subset request in these modes is
+#: estimated from all waves (GH #1487); every other mode stays on the waves
+#: requested, because nothing in it reads another wave.
+_KG_FACTOR_MODES = {
+    'food_quantities': frozenset({None, 'kgs'}),
+    'food_prices': frozenset({None, 'kgvalue', 'kgprice'}),
+}
+
+
+@contextmanager
+def _read_audit_waves(method_name: str, waves: list[str]):
+    """Scope the read-time audits of *method_name* to *waves*."""
+    token = _READ_AUDIT_WAVES.set((method_name, list(waves)))
+    try:
+        yield
+    finally:
+        _READ_AUDIT_WAVES.reset(token)
+
+
 def _split_labels_arg(labels) -> tuple:
     """Split the public ``labels=`` argument into its two faces.
 
@@ -4342,6 +4375,12 @@ class Country:
             # script that made the derivation, never here.
             attach_derivations(df, self.name, method_name)
 
+            # GH #1487: the four audits below describe the waves being served.
+            audit_scope = _READ_AUDIT_WAVES.get()
+            audited = (self._restrict_to_waves(df, audit_scope[1])
+                       if audit_scope is not None and audit_scope[0] == method_name
+                       else df)
+
             # SITE B of the null-content audit.  Every other guard on this
             # table checks that a required declared column is PRESENT; this one
             # checks it holds something.  Niger 2014-15's `Latitude` is present,
@@ -4358,7 +4397,7 @@ class Country:
             #       as read-path code, so adding this costs no cache
             #       invalidation.  MEASURED, not assumed.
             check_declared_columns(
-                df, _required_scheme_columns(scheme_entry),
+                audited, _required_scheme_columns(scheme_entry),
                 country=self.name, table=str(method_name or "?"))
 
             # SITE Q of the content audit (GH #857).  Site B asks whether a
@@ -4376,7 +4415,7 @@ class Country:
             # this costs no cache invalidation.  MEASURED, not assumed: 0 of 12
             # probed table hashes and 0 of 5 build fingerprints moved.
             check_quantities(
-                df, country=self.name, table=str(method_name or "?"))
+                audited, country=self.name, table=str(method_name or "?"))
 
             # SITE I (GH #847): a NaN on a DECLARED INDEX LEVEL.  Site B asks
             # whether a declared column holds anything; this asks the same of
@@ -4415,7 +4454,7 @@ class Country:
                     if a not in _index_levels:
                         _index_levels.append(a)
             check_index_levels(
-                df, _index_levels,
+                audited, _index_levels,
                 country=self.name, table=str(method_name or "?"))
 
             # Is `v` the same cluster across the waves in this frame (GH #942)?
@@ -4429,7 +4468,7 @@ class Country:
             # `sampling.outermost_call`.
             if sampling_records(self.name):
                 check_cluster_identity(
-                    df, country=self.name, table=str(method_name or "?"),
+                    audited, country=self.name, table=str(method_name or "?"),
                     waves=self.waves)
 
         return df
@@ -6662,9 +6701,23 @@ class Country:
                     if name == 'food_expenditures' and valuation is not None:
                         transform_kwargs['valuation'] = valuation
                         transform_kwargs['geo'] = self._valuation_geo(waves)
+                    # GH #1487: kilograms estimated from a wave subset depend
+                    # on the subset.  A kg-using subset request reads every wave
+                    # and the transform serves the subset, so it is a slice of
+                    # the all-waves result.  A request naming every wave is that
+                    # result, and takes the line it always took.
+                    subset_kg = (waves is not None
+                                 and units in _KG_FACTOR_MODES.get(name, ())
+                                 and {str(w) for w in waves} < {str(w) for w in self.waves})
+                    if subset_kg:
+                        transform_kwargs['serve_waves'] = waves
                     derived = None
                     try:
-                        fa = self._aggregate_wave_data(waves, 'food_acquired')
+                        if subset_kg:
+                            with _read_audit_waves('food_acquired', waves):
+                                fa = self._aggregate_wave_data(None, 'food_acquired')
+                        else:
+                            fa = self._aggregate_wave_data(waves, 'food_acquired')
                         if isinstance(fa, pd.DataFrame) and not fa.empty:
                             derived = transform_fn(fa, **transform_kwargs)
                             scheme_entry = self._materialization_entry(name)
@@ -6680,8 +6733,9 @@ class Country:
                         # explicit units= / labels= dict / valuation= cannot
                         # be honoured by the legacy path, so it re-raises.
                         # Only a bare call (all three defaulted) keeps the
-                        # pre-#828 legacy fall-through.
-                        if units is not None or map_labels or valuation is not None:
+                        # pre-#828 legacy fall-through, and not on a kilogram
+                        # subset (GH #1487, see below).
+                        if units is not None or map_labels or valuation is not None or subset_kg:
                             raise exc.for_country(self.name) from exc
                         logger.info(
                             "Deriving %s from food_acquired failed (%s); "
@@ -6691,7 +6745,14 @@ class Country:
                             CategoricalKeyDeclarationError):
                         raise
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
-                        if units is not None or map_labels or valuation is not None:
+                        if units is not None or map_labels or valuation is not None or subset_kg:
+                            # GH #1487: a kilogram subset also raises when it was
+                            # a default call, whichever wave failed.  Its waves
+                            # declare no `food_quantities`, so the legacy path
+                            # reads the failure as proven absence and serves 0
+                            # rows with no error (Mali, 2018-19 with 2014-15
+                            # broken: 162,032 rows on base).
+                            #
                             # Caller explicitly asked for canonical units= /
                             # labels= / valuation= behaviour; the legacy
                             # fall-through path can't honour any of them, so
@@ -6903,6 +6964,14 @@ class Country:
                     "    factor map and from the explicit-metric label parser;\n"
                     "    their kg conversion (if any) then comes purely from\n"
                     "    data-driven price-ratio inference.  See GH #231.\n"
+                )
+                doc_parts.insert(
+                    doc_parts.index("waves : list of str, optional\n") + 2,
+                    "    In a kilogram mode, *waves* selects what is served, not\n"
+                    "    what the factors are estimated from: they read every\n"
+                    "    wave, so the result is the all-waves result restricted\n"
+                    "    to *waves*, and a cold call builds every wave of\n"
+                    "    ``food_acquired`` (GH #1487).\n"
                 )
             if name in self._ROSTER_DERIVED:
                 doc_parts.append(
