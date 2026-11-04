@@ -569,9 +569,16 @@ column =cluster_features= reads, through the same formatter.
 for those rows.  A sweep of every =.dta= in those waves, by column name, finds no geography with a
 value for them.  What could fill them, and =District='s 216, is a construction, so:
 
-**** TODO Decision: fill the 129 and the 216 from a household's other waves?
+**** DONE Decision: fill the 129 and the 216 from a household's other waves?
 
-Memo in the #1441 report.  =District='s residual is not evenly spread: 131 households in
+/Ruled @ligon, 2026-11-04: they stay NA./  Nothing cheap recovers the weight that matters.
+Inheriting a label from the same household's adjacent wave recovers 0.02% of 2011-12's
+weight, of the 10.3% that has no =District=.  Its 2013-14 code reaches 3.2%, and needs a
+code-to-name map that does not exist yet (=h1aq1a= is a 3-digit code and 2011-12 writes
+names).  That map is the one useful next step if =District= matters for 2011-12; it is
+not built.  The measurements behind the ruling:
+
+=District='s residual is not evenly spread: 131 households in
 2011-12 hold 10.3% of that wave's weight and 12 in 2010-11 hold 1.1%; elsewhere 0.1% or
 less.  The 74 cover blanks of 2011-12 are mostly new split-offs (60 with =wave= 3), mean
 weight 4.3 against 0.8.  The same household's label in an adjacent wave, in the same form
