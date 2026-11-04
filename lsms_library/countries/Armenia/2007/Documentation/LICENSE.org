@@ -1,0 +1,26 @@
+LICENSE (ARM_2007_ILCS_v02_M)
+
+https://microdata.worldbank.org/index.php/catalog/2956/study-description#metadata-data_access
+
+1. Access policy
+CONTACTS
+
+
+CITATION REQUIREMENT
+The use of the datasets must be acknowledged using a citation which would include:
+- the identification of the Primary Investigator (including country name)
+- the full title of the survey and its acronym (when available), and the year(s) of implementation
+- the survey reference number
+- the source and date of download (for datasets disseminated online).
+
+Example:
+
+National Statistical Service of the Republic of Armenia, World Bank. Armenia Integrated Living Conditions Survey (ILCS) 2007, Ref. ARM_2007_ILCS_v02_M. Dataset downloaded from [URL] on [date].
+
+
+DISCLAIMER
+The user of the data acknowledges that the original collector of the data, the authorized distributor of the data, and the relevant funding agency bear no responsibility for use of the data or for interpretations or inferences based upon such uses.
+
+
+(Text copied from the World Bank catalog DDI export, https://microdata.worldbank.org/metadata/export/2956/json, 2026-11-04.)
+

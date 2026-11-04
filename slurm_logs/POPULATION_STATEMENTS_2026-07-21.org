@@ -181,6 +181,23 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 | Albania               | 2008      | not-found           | high       | not-stated               |
 | Albania               | 2012      | local-documentation | low        | national-claimed         |
 | Armenia               | 1996      | wb-catalog          | high       | national-all-households  |
+| Armenia               | 2001      | not-found           | high       | not-stated               |
+| Armenia               | 2002      | not-found           | high       | not-stated               |
+| Armenia               | 2003      | not-found           | high       | not-stated               |
+| Armenia               | 2004      | wb-catalog          | medium     | national-claimed         |
+| Armenia               | 2005      | wb-catalog          | medium     | national-claimed         |
+| Armenia               | 2006      | wb-catalog          | medium     | national-claimed         |
+| Armenia               | 2007      | wb-catalog          | medium     | national-claimed         |
+| Armenia               | 2008      | wb-catalog          | medium     | national-claimed         |
+| Armenia               | 2009      | wb-catalog          | medium     | national-claimed         |
+| Armenia               | 2010      | wb-catalog          | medium     | national-claimed         |
+| Armenia               | 2011      | wb-catalog          | medium     | national-claimed         |
+| Armenia               | 2012      | wb-catalog          | medium     | national-claimed         |
+| Armenia               | 2013      | wb-catalog          | medium     | national-claimed         |
+| Armenia               | 2014      | wb-catalog          | medium     | national-claimed         |
+| Armenia               | 2015      | wb-catalog          | medium     | national-claimed         |
+| Armenia               | 2016      | wb-catalog          | medium     | national-claimed         |
+| Armenia               | 2017      | not-found           | high       | not-stated               |
 | Azerbaijan            | 1995      | wb-catalog          | high       | region-excluded          |
 | Benin                 | 2018-19   | local-documentation | high       | national-all-households  |
 | Benin                 | 2018-2019 | local-documentation | medium     | national-all-households  |
@@ -293,29 +310,29 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 | universe tag             | waves |
 |--------------------------+-------|
 | national-all-households  |    42 |
-| national-claimed         |    28 |
+| national-claimed         |    41 |
 | region-excluded          |    18 |
 | subnational-area         |    11 |
-| not-stated               |     7 |
+| not-stated               |     11 |
 | panel-inherited          |     4 |
 | mixed-national+panel     |     3 |
 | rural-and-small-town     |     1 |
 | specialized              |     1 |
 | agricultural-households  |     1 |
-| TOTAL                    |   116 |
+| TOTAL                    |   133 |
 
 *** Source and confidence counts
 
 | source_type            | waves |
 |------------------------+-------|
 | local-documentation    |    68 |
-| wb-catalog             |    41 |
-| not-found              |     7 |
+| wb-catalog             |    54 |
+| not-found              |     11 |
 
 | confidence             | waves |
 |------------------------+-------|
-| high                   |    90 |
-| medium                 |    24 |
+| high                   |    94 |
+| medium                 |    37 |
 | low                    |     2 |
 
 * 3. The verbatim record, by country and wave
@@ -635,6 +652,482 @@ Extractor's notes (editorial prose about the evidence, not survey text):
 
 #+begin_quote
 There is exactly one wave directory for Armenia (1996); `_` and `var` excluded. The wave has NO local microdata (CLAUDE.md lists Armenia under "Countries Without Microdata": "No data files downloaded"), and no local BID/report — hence the catalog fallback.  The WB catalog DDI for study 2324 has NO <universe> element. Its <sumDscr> records only <geogCover>National</geogCover>, <nation abbr="ARM">Armenia</nation>, and <anlyUnit>- Households\n- Individuals</anlyUnit>. The nearest catalog-level universe-like claim is in the abstract: "The Armenian Household Budget Survey (HBS) 1996 was designed to be a nationally representative survey capable of measuring the standard of living in the Republic of Armenia (ROA) ... The survey was conducted in November - December 1996, on the whole territory of the republic by the State Department of Statistics (SDS) of ROA with technical and financial assistance from the World Bank." The identical sentences open §1 Introduction of ar96binf.pdf, p. 3, with "(AHBS 96)" in place of "(HBS) 1996".  Unit of analysis, verbatim, ar96binf.pdf §1 Introduction, p. 3: "The unit of study in the survey was the household, defined as a group of co-resident individuals with a common living budget."  SAMPLE DESIGN (not the universe; recorded for context). ar96binf.pdf §3.5 Sample design, p. 11 (identical text is the catalog's <sampProc>): "The State Department of Statistics specified 3 domains of interest for this study. These are Yerevan (the capital of ROA), Other Urban areas and Rural areas." and "A self-weighting sample was derived by selecting Primary Sampling Units (PSUs) with probability proportional to their size (where size is defined as the number of households) and then taking a constant number of households from each selected. The sample, therefore, was designed to be self-weighted and representative at the administrative regions (Marzes) level, for urban and rural areas, and within urban areas by the size of cities,  and in rural areas by elevation. The number of households to be selected in each PSU was 20, so 250 PSUs were required to make up 5000 households."  SAMPLING FRAME (§3.2 Sampling Frames, pp. 9-10), which bears on coverage: "Accurate sampling frames for AHBS 96 were available at all levels down to the individual as lists are frequently updated in the Marzes, Zheks and Villages of the ROA5." and "Current lists of households and dwellings were available covering the whole Republic of Armenia. Only in case ( iv ) above  - i.e. urban public housing at the Zhek level - was it possible to select apartments which could contain more than one household. This was most likely to occur in Yerevan."  NO statement about institutional / collective / homeless / nomadic population was found anywhere in ar96binf.pdf or in the catalog metadata — the only stated exclusion is the territorial one in footnote 3. Do not read the silence as an assertion that such populations were in scope.  Quotes were extracted with pdfminer.six from the PDF; pdfminer inserts a blank line at each PDF line break, which I removed to reconstitute the running paragraph. Double spaces inside the quotes ("households  (i.e.", "cities,  and") are present in the extracted text and are preserved verbatim. Curly apostrophes in ‘Urban Dwellers’ are as in the source.  Working copies of the extracted text: /tmp/claude-43292/-global-scratch-fsa-fc-jevons-ligon-mirrors-LSMS-Library/25acb4c7-829d-4815-b875-abb430c22b9c/scratchpad/arm/ (ar96binf.txt, projcomp.txt, ddi.xml, stdydscr.xml). Note: running data_access.get_data_file() materialized the four gitignored PDFs into lsms_library/countries/Armenia/1996/Documentation/; no tracked file was modified.
+#+end_quote
+
+*** Armenia 2001
+
+- Survey :: Integrated Survey of Living Standards 2001, WB catalog id 2950 (ARM_2001_ILCS_v02_M)
+- Source type :: not-found
+- Confidence (as recorded by the extractor) :: high
+- Universe tag (EDITORIAL, not a quote) :: not-stated
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2950 (https://microdata.worldbank.org/metadata/export/2950/json, fetched 2026-11-04)
+- Locator :: WB catalog 2950 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2001/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- no universe or population statement in the DDI export: the universe field is empty.  The nearest text is the geographic coverage, "Urban and rural communities", which is not a universe declaration.
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The export's sampling text says of these years only that a two-stage random sample selected settlements and then households, and its all-households frame starts in 2004.
+#+end_quote
+
+*** Armenia 2002
+
+- Survey :: Integrated Survey of Living Standards 2002, WB catalog id 2951 (ARM_2002_ILCS_v02_M)
+- Source type :: not-found
+- Confidence (as recorded by the extractor) :: high
+- Universe tag (EDITORIAL, not a quote) :: not-stated
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2951 (https://microdata.worldbank.org/metadata/export/2951/json, fetched 2026-11-04)
+- Locator :: WB catalog 2951 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2002/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- no universe or population statement in the DDI export: the universe field is empty.  The nearest text is the geographic coverage, "Urban and rural communities", which is not a universe declaration.
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The export's sampling text says of these years only that a two-stage random sample selected settlements and then households, and its all-households frame starts in 2004.
+#+end_quote
+
+*** Armenia 2003
+
+- Survey :: Integrated Survey of Living Standards 2003, WB catalog id 2952 (ARM_2003_ILCS_v02_M)
+- Source type :: not-found
+- Confidence (as recorded by the extractor) :: high
+- Universe tag (EDITORIAL, not a quote) :: not-stated
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2952 (https://microdata.worldbank.org/metadata/export/2952/json, fetched 2026-11-04)
+- Locator :: WB catalog 2952 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2003/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- no universe or population statement in the DDI export: the universe field is empty.  The nearest text is the geographic coverage, "Urban and rural communities", which is not a universe declaration.
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The export's sampling text says of these years only that a two-stage random sample selected settlements and then households, and its all-households frame starts in 2004.
+#+end_quote
+
+*** Armenia 2004
+
+- Survey :: Integrated Living Conditions Survey 2004, WB catalog id 2953 (ARM_2004_ILCS_v02_M)
+- Source type :: wb-catalog
+- Confidence (as recorded by the extractor) :: medium
+- Universe tag (EDITORIAL, not a quote) :: national-claimed
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2953 (https://microdata.worldbank.org/metadata/export/2953/json, fetched 2026-11-04)
+- Locator :: WB catalog 2953 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2004/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+Geographic coverage: "Urban and rural communities".  Sampling procedure: "The database of addresses of all households in Armenia was divided into 48 strata including 12 communities of Yerevan city."  "All marzes, as well as all urban and rural settlements were included in the sample population according to the share of population residing in those settlements as percent to the total population in the country."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The universe field is empty, so this is a coverage reading of the sampling text, not a universe declaration.
+#+end_quote
+
+*** Armenia 2005
+
+- Survey :: Integrated Living Conditions Survey 2005, WB catalog id 2954 (ARM_2005_ILCS_v02_M)
+- Source type :: wb-catalog
+- Confidence (as recorded by the extractor) :: medium
+- Universe tag (EDITORIAL, not a quote) :: national-claimed
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2954 (https://microdata.worldbank.org/metadata/export/2954/json, fetched 2026-11-04)
+- Locator :: WB catalog 2954 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2005/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+Geographic coverage: "Urban and rural communities".  Sampling procedure: "The database of addresses of all households in Armenia was divided into 48 strata including 12 communities of Yerevan city."  "All marzes, as well as all urban and rural settlements were included in the sample population according to the share of population residing in those settlements as percent to the total population in the country."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The universe field is empty, so this is a coverage reading of the sampling text, not a universe declaration.
+#+end_quote
+
+*** Armenia 2006
+
+- Survey :: Integrated Living Conditions Survey 2006, WB catalog id 2955 (ARM_2006_ILCS_v01_M)
+- Source type :: wb-catalog
+- Confidence (as recorded by the extractor) :: medium
+- Universe tag (EDITORIAL, not a quote) :: national-claimed
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2955 (https://microdata.worldbank.org/metadata/export/2955/json, fetched 2026-11-04)
+- Locator :: WB catalog 2955 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2006/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+Geographic coverage: "Urban and rural communities".  Sampling procedure: "The database of addresses of all households in Armenia was divided into 32 strata including 12 communities of Yerevan city."  "All marzes, as well as all urban and rural settlements were included in the sample population according to the share of households residing in those settlements as percent to the total households in the country."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The universe field is empty, so this is a coverage reading of the sampling text, not a universe declaration.
+#+end_quote
+
+*** Armenia 2007
+
+- Survey :: Integrated Living Conditions Survey 2007, WB catalog id 2956 (ARM_2007_ILCS_v02_M)
+- Source type :: wb-catalog
+- Confidence (as recorded by the extractor) :: medium
+- Universe tag (EDITORIAL, not a quote) :: national-claimed
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2956 (https://microdata.worldbank.org/metadata/export/2956/json, fetched 2026-11-04)
+- Locator :: WB catalog 2956 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2007/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+Geographic coverage: "Urban and rural communities".  Sampling procedure: "The database of addresses of all households in Armenia was divided into 48 strata including 12 communities of Yerevan city."  "All marzes, as well as all urban and rural settlements were included in the sample population according to the share of population residing in those settlements as percent to the total population in the country."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The universe field is empty, so this is a coverage reading of the sampling text, not a universe declaration.
+#+end_quote
+
+*** Armenia 2008
+
+- Survey :: Integrated Living Conditions Survey 2008, WB catalog id 2957 (ARM_2008_ILCS_v02_M)
+- Source type :: wb-catalog
+- Confidence (as recorded by the extractor) :: medium
+- Universe tag (EDITORIAL, not a quote) :: national-claimed
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2957 (https://microdata.worldbank.org/metadata/export/2957/json, fetched 2026-11-04)
+- Locator :: WB catalog 2957 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2008/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+Geographic coverage: "Urban and rural communities".  Sampling procedure: "The database of addresses of all households in Armenia was divided into 48 strata including 12 communities of Yerevan city."  "All marzes, as well as all urban and rural settlements were included in the sample population according to the share of population residing in those settlements as percent to the total population in the country."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The universe field is empty, so this is a coverage reading of the sampling text, not a universe declaration.
+#+end_quote
+
+*** Armenia 2009
+
+- Survey :: Integrated Living Conditions Survey 2009, WB catalog id 2958 (ARM_2009_ILCS_v02_M)
+- Source type :: wb-catalog
+- Confidence (as recorded by the extractor) :: medium
+- Universe tag (EDITORIAL, not a quote) :: national-claimed
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2958 (https://microdata.worldbank.org/metadata/export/2958/json, fetched 2026-11-04)
+- Locator :: WB catalog 2958 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2009/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+Geographic coverage: "Urban and rural communities".  Sampling procedure: "1) For the creation of core sample, the sample frame (database of addresses of all households in Armenia) was divided into 48 strata including 12 communities of Yerevan city."  "All marzes, as well as all urban and rural settlements were included in the sample population according to the share of households residing in those settlements as percent to the total households in the country."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The universe field is empty, so this is a coverage reading of the sampling text, not a universe declaration.
+#+end_quote
+
+*** Armenia 2010
+
+- Survey :: Integrated Living Conditions Survey 2010, WB catalog id 2959 (ARM_2010_ILCS_v02_M)
+- Source type :: wb-catalog
+- Confidence (as recorded by the extractor) :: medium
+- Universe tag (EDITORIAL, not a quote) :: national-claimed
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2959 (https://microdata.worldbank.org/metadata/export/2959/json, fetched 2026-11-04)
+- Locator :: WB catalog 2959 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2010/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+Geographic coverage: "Urban and rural communities".  Sampling procedure: "The database of addresses of all households in Armenia was divided into 48 strata including 12 communities of Yerevan city."  "All marzes, as well as all urban and rural settlements were included in the sample population according to the share of population residing in those settlements as percent to the total population in the country."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The universe field is empty, so this is a coverage reading of the sampling text, not a universe declaration.
+#+end_quote
+
+*** Armenia 2011
+
+- Survey :: Integrated Living Conditions Survey 2011, WB catalog id 2960 (ARM_2011_ILCS_v02_M)
+- Source type :: wb-catalog
+- Confidence (as recorded by the extractor) :: medium
+- Universe tag (EDITORIAL, not a quote) :: national-claimed
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2960 (https://microdata.worldbank.org/metadata/export/2960/json, fetched 2026-11-04)
+- Locator :: WB catalog 2960 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2011/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+Geographic coverage: "Urban and rural communities".  Sampling procedure: "The database of addresses of all households in Armenia was divided into 48 strata including 12 communities of Yerevan city."  "All marzes, as well as all urban and rural settlements were included in the sample population according to the share of population residing in those settlements as percent to the total population in the country."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The universe field is empty, so this is a coverage reading of the sampling text, not a universe declaration.
+#+end_quote
+
+*** Armenia 2012
+
+- Survey :: Integrated Living Conditions Survey 2012, WB catalog id 2961 (ARM_2012_ILCS_v02_M)
+- Source type :: wb-catalog
+- Confidence (as recorded by the extractor) :: medium
+- Universe tag (EDITORIAL, not a quote) :: national-claimed
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2961 (https://microdata.worldbank.org/metadata/export/2961/json, fetched 2026-11-04)
+- Locator :: WB catalog 2961 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2012/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+Geographic coverage: "Urban and rural communities".  Sampling procedure: "The database of addresses of all households in Armenia was divided into 48 strata including 12 communities of Yerevan city."  "All marzes, as well as all urban and rural settlements were included in the sample population according to the share of population residing in those settlements as percent to the total population in the country."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The universe field is empty, so this is a coverage reading of the sampling text, not a universe declaration.
+#+end_quote
+
+*** Armenia 2013
+
+- Survey :: Integrated Living Conditions Survey 2013, WB catalog id 2962 (ARM_2013_ILCS_v02_M)
+- Source type :: wb-catalog
+- Confidence (as recorded by the extractor) :: medium
+- Universe tag (EDITORIAL, not a quote) :: national-claimed
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2962 (https://microdata.worldbank.org/metadata/export/2962/json, fetched 2026-11-04)
+- Locator :: WB catalog 2962 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2013/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+Geographic coverage: "Urban and rural communities".  Sampling procedure: "The database of addresses of all households in Armenia was divided into 48 strata including 12 communities of Yerevan city."  "All marzes, as well as all urban and rural settlements were included in the sample population according to the share of population residing in those settlements as percent to the total population in the country."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The universe field is empty, so this is a coverage reading of the sampling text, not a universe declaration.
+#+end_quote
+
+*** Armenia 2014
+
+- Survey :: Integrated Living Conditions Survey 2014, WB catalog id 2963 (ARM_2014_ILCS_v02_M)
+- Source type :: wb-catalog
+- Confidence (as recorded by the extractor) :: medium
+- Universe tag (EDITORIAL, not a quote) :: national-claimed
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2963 (https://microdata.worldbank.org/metadata/export/2963/json, fetched 2026-11-04)
+- Locator :: WB catalog 2963 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2014/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+Geographic coverage: "Urban and rural communities".  Sampling procedure: "The database of addresses of all households in Armenia was divided into 48 strata including 12 communities of Yerevan city."  "All marzes, as well as all urban and rural settlements were included in the sample population according to the share of population residing in those settlements as percent to the total population in the country."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The universe field is empty, so this is a coverage reading of the sampling text, not a universe declaration.
+#+end_quote
+
+*** Armenia 2015
+
+- Survey :: Integrated Living Conditions Survey 2015, WB catalog id 2964 (ARM_2015_ILCS_v02_M)
+- Source type :: wb-catalog
+- Confidence (as recorded by the extractor) :: medium
+- Universe tag (EDITORIAL, not a quote) :: national-claimed
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2964 (https://microdata.worldbank.org/metadata/export/2964/json, fetched 2026-11-04)
+- Locator :: WB catalog 2964 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2015/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+Geographic coverage: "Urban and rural communities".  Sampling procedure: "The database of addresses of all households in Armenia was divided into 48 strata including 12 communities of Yerevan city."  "All marzes, as well as all urban and rural settlements were included in the sample population according to the share of population residing in those settlements as percent to the total population in the country."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The universe field is empty, so this is a coverage reading of the sampling text, not a universe declaration.
+#+end_quote
+
+*** Armenia 2016
+
+- Survey :: Integrated Living Conditions Survey 2016, WB catalog id 2966 (ARM_2016_ILCS_v02_M)
+- Source type :: wb-catalog
+- Confidence (as recorded by the extractor) :: medium
+- Universe tag (EDITORIAL, not a quote) :: national-claimed
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 2966 (https://microdata.worldbank.org/metadata/export/2966/json, fetched 2026-11-04)
+- Locator :: WB catalog 2966 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2016/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+Geographic coverage: "Urban and rural communities".  Sampling procedure: "The database of addresses of all households in Armenia was divided into 48 strata including 12 communities of Yerevan city."  "All marzes, as well as all urban and rural settlements were included in the sample population according to the share of population residing in those settlements as percent to the total population in the country."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The universe field is empty, so this is a coverage reading of the sampling text, not a universe declaration.
+#+end_quote
+
+*** Armenia 2017
+
+- Survey :: Integrated Living Conditions Survey 2017, WB catalog id 3591 (ARM_2017_ILCS_v01_M)
+- Source type :: not-found
+- Confidence (as recorded by the extractor) :: high
+- Universe tag (EDITORIAL, not a quote) :: not-stated
+- Language of the quoted source :: English
+- Source file :: World Bank catalog DDI export for study 3591 (https://microdata.worldbank.org/metadata/export/3591/json, fetched 2026-11-04)
+- Locator :: WB catalog 3591 DDI export: study_desc.study_info.universe (empty) and geog_coverage; study_desc.method.data_collection.sampling_procedure. The wave's PDFs in lsms_library/countries/Armenia/2017/Documentation/ were not read for this entry.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- no universe or population statement in the DDI export: the universe field is empty.  The nearest text is the geographic coverage, "Urban and rural communities", which is not a universe declaration.
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND -- the export states no exclusion.
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #597) and NOT YET WIRED: no table of this wave is served.  The export has no sampling text at all.  The title and idno say 2017 and the DDI's collection dates say 2018; the wave label follows the title, because WB 3617 is the 2018 entry.
 #+end_quote
 
 ** Azerbaijan

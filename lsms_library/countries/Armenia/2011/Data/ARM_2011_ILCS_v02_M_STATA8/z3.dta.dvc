@@ -1,0 +1,5 @@
+outs:
+- md5: cc0f9790ac58afeb51192d72c578aaf4
+  size: 5387136
+  hash: md5
+  path: z3.dta

@@ -1,0 +1,5 @@
+outs:
+- md5: d478d6c0a4115d8bdfef77751ca4ae14
+  size: 52280
+  hash: md5
+  path: weight.dta
