@@ -674,7 +674,10 @@ class TestUgandaRegionOnSample:
         spec.loader.exec_module(ug)
         v = uga_sample.xs(wave, level="t")["v"].astype("string")
         served = set(v[v.str.startswith("unlocated-").fillna(False)].str.removeprefix("unlocated-"))
-        assert served == set(ug.inputs_unlocated_identity(wave).index.get_level_values("i"))
+        rule = set(ug.inputs_unlocated_identity(wave).index.get_level_values("i"))
+        # Counts, so a failure prints no household ids.
+        assert (len(served - rule), len(rule - served)) == (0, 0), (
+            f"{wave}: {len(served)} served, {len(rule)} with no location in source")
 
     def test_every_wave_gets_the_singleton_check(self, uga_sample):
         assert sorted(uga_sample.index.get_level_values("t").unique()) == UGANDA_WAVES
