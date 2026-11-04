@@ -2847,8 +2847,8 @@ The two harvest keys never meet: one needs a recorded quantity on an unfinished 
 crop with none.  A consumer asking "is this =Quantity= derived?" must test for containment, not equality.
 A =Farm-level= row carries a key only for its total; the sale on it is still disclosed by the index.
 
-*Farm-level now holds harvests in EHCVM too.*  =harvest_kg= reads these 221 rows, as it reads the EAC-I
-trees; =yield_kg= does not, since no plot has that id; =crop_diversity(weight='count')= drops all of them,
+*Farm-level now holds harvests in EHCVM too.*  =harvest_kg= reads the 173 of these 221 rows in a metric unit,
+as it reads the EAC-I trees; =yield_kg= does not, since no plot has that id; =crop_diversity(weight='count')= drops all of them,
 each repeating a crop on a plot row.  So summing kg by plot under-reads a 2021-22 household whose crop is on
 two plots, and summing by household does not.
 
