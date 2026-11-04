@@ -2422,7 +2422,37 @@ all four being two different factors).  A two-unit row's is NA.  Unlike Mali thi
 no grain report: the row already carries =hh-crop-sale-records-summed=, and
 =derivation_inputs= returns each record's factor.
 
-Measured effect on =median_price_valuation=: recorded in the next commit, from the cold build of this one.
+*Why it had to be wired.*  =median_price_valuation= needs kilograms per sold unit, and
+without this factor it could convert only sales in a metric unit, so serving the W3-W5
+sales alone made it return wrong numbers where it used to return NaN.  Against the
+household's own =Value_harvested=, cold build of =8b0c1b398= (no factor) and of
+=08532bf15= (factor):
+
+| | W1 | W2 | W3 | W4 | W5 |
+|-+-+-+-+-+-|
+| no factor: sum ratio | 0.82 | 1.48 | 2.25 | 14.80 | 6.09 (18.29 without the N1.95B valuation) |
+| no factor: row median / within 2x | 0.91 / 68% | 1.00 / 72% | 1.14 / 63% | 1.40 / 47% | 7.55 / 23% |
+| no factor: sales in the price pool | 2,249 | 991 | 171 | 43 | 41 |
+| no factor: value from a crop price of under 10 sales | 2.5% | 2.7% | 20.0% | 99.3% | 99.2% |
+| *factor: sum ratio* | same | same | same | *1.09* | *0.51 (1.06 without that row)* |
+| *factor: row median / within 2x* | same | same | same | *1.00 / 80%* | *1.00 / 79%* |
+| *factor: sales in the price pool* | same | same | same | *3,669* | *3,588* |
+| factor: value from a crop price of under 10 sales | same | same | same | 0.7% | 0.4% |
+| factor: rows valued | 6,590 | 4,446 | 524 | 11,508 | 8,412 |
+
+W5 maize goes N4,150 -> N423 per kg and W4 millet N8,000 -> N90.  No other column of any
+row moved, the other 18 tables are frame-equal, and every other consumer is identical.
+
+*W3 is not fixed.*  It ships no factor, so its valuation stays at 2.25x from a pool of
+171 metric-unit sales, with 20% of its value resting on a crop price from under 10 sales.
+Do not sum =median_price_valuation= over W3.  W1/W2, also with no factor, have far more
+metric sales (2,249 and 991).
+
+*Coverage and residuals.*  =KgFactor_sold= is on 3,669 of 3,789 (W4) and 3,585 of 3,714
+(W5) sale rows.  The 249 without: 224 lone records whose factor is blank, 21 two-unit
+rows, 4 summed rows whose factors disagree.  One =Kg= row reports a factor other than 1;
+it is served as reported and the consumer's screen rejects it
+(=supplied_factor_rejected=: 1).
 
 * crop_production: a unit =_canon_unit= cannot place is =Unknown= (GH #1047)
 
