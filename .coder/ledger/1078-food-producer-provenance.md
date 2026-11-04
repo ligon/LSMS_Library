@@ -1,5 +1,7 @@
 # Prior-Art Ledger -- GH #1078 food producer provenance
 
+**Correction, 2026-11-04 (GH #1455, ruling @ligon).** This ledger says to "preserve the exact legitimate non-parquet reducer" and calls the memory route's reducer legitimate. The ruling overrides that: the reducer is removed, so memory output equals materialized. It lost `Derivation`, turned NaN into 0 and deleted NaN keys, and the country tier stamped that frame with the current hash, so one `LSMS_NO_CACHE` build or failed L2-wave write served it from then on. Measured on all 9 YAML-path `food_acquired` countries; see #1455. The per-result producer origin and the food-scoped tag below still stand. The text below is kept as written.
+
 **Search tier used:** ripgrep + Git + direct source/AST inspection. This ledger inherits `STANDING.md`; line anchors below are the initial f8 baseline.
 
 ## §1 Task, restated

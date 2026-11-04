@@ -1,4 +1,5 @@
-"""Actual producer routes, not cache-path observations, choose food handling."""
+"""``grab_data`` reports the route that actually produced a frame, not what the
+cache path looks like.  Since GH #1455 no route changes how food is handled."""
 from __future__ import annotations
 
 import inspect
@@ -162,7 +163,9 @@ def test_actual_producer_survives_real_post_load_unlink(producer, monkeypatch, r
 
 @pytest.mark.parametrize('reason', ['disabled', 'write_failure'])
 @pytest.mark.parametrize('old_file', [False, True])
-def test_real_memory_route_keeps_legitimate_legacy_reducer(producer, monkeypatch, reason, old_file):
+def test_real_memory_route_serves_the_frame_it_built(producer, monkeypatch, reason, old_file):
+    # Re-pinned by the GH #1455 ruling (@ligon, 2026-11-04): this used to pin the
+    # reducer, which zero-filled NaN and dropped columns; the origin still holds.
     wave = producer.yaml()
     if old_file:
         producer.external.parent.mkdir(parents=True)
@@ -189,13 +192,10 @@ def test_real_memory_route_keeps_legitimate_legacy_reducer(producer, monkeypatch
             actual = wave.food_acquired()
     else:
         actual = wave.food_acquired()
-    assert actual.index.names == ['t', 'i', 'j', 'u', 's']
-    assert list(actual.columns) == ['Expenditure', 'Quantity', 'Produced', 'Price']
-    assert len(actual) == 3 and actual.index.is_unique
-    assert actual['Expenditure'].tolist() == [13.0, 7.0, 0.0]
-    assert actual['Quantity'].tolist() == [2.0, 0.0, 4.0]
-    assert actual['Produced'].tolist() == [4.0, 0.0, 1.0]
-    assert actual['Price'].tolist() == [raw['Price'].iloc[n] for n in (0, 2, 3)]
+    pd.testing.assert_frame_equal(actual, raw)
+    assert 'Extra' in actual.columns and len(actual) == 4
+    assert actual['Expenditure'].isna().sum() == 1
+    assert actual['Quantity'].isna().sum() == 1
     assert producer.external.exists() == old_file
     assert not any('origin' in str(key) for key in actual.attrs)
 
