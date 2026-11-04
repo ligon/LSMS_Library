@@ -1812,11 +1812,56 @@ HH cover, 27 PP-only) and 1,255 identities, the three figures of the ESS3 BID (P
 - *One target has three waves.*  One of the 49 has a W1 id that W2's map also targets,
   from a W2 PP-only household on a different EA code (their ids differ in characters
   8-10).  W3 does not hold that W2 id, so this is no rename onto an occupied target: =i=
-  is simply one household's id in W1, W2 and W3.
+  is simply one household's id in W1, W2 and W3.  It is why W2 -> W3 goes from 4,925 of
+  4,925 linked households keeping =v= through =sample()= to 4,925 of 4,926, the one
+  exception to =sampling.yml='s =stable= at that boundary.
 - *One household loses a W2-W3 link in =livestock=.*  W2's livestock cover holds 3
   households on neither its HH nor its PP cover (option (d) of the issue, not taken).  1
-  of them is among the 49, so its W3 rows move to T while its W2 =livestock= rows keep
-  the native id, which was all that joined them.
+  of them is among the 49, so its W3 rows move to T while its one W2 =livestock= row keeps
+  the native id, which was all that joined them: W2 and W3 share 2,887 =i= in =livestock=
+  before and 2,886 after.  No other table has a W2 row under a moved id.
+
+*What moved, measured on cold builds* (=115b6ab71= against =6fe6fea4a=, each in its own
+empty root).  Every table has the same rows and values once the 49 are mapped: 24 tables,
+a fresh-instance =individual_education=, and =Feature= over Ethiopia, Malawi and Tanzania
+for =household_roster= and =sample=.  No duplicate index, and no new warning text in any
+of them.  The derived tables come back in a new row order, because they sort on =i=.
+
+| table                     |    rows | W3 rows moved | households |
+|---------------------------+---------+---------------+------------|
+| sample                    |  26,130 |            49 |         49 |
+| household_roster          | 126,376 |           222 |         48 |
+| shocks                    |  21,781 |            51 |         27 |
+| housing                   |  25,855 |            48 |         48 |
+| assets                    | 567,887 |         1,680 |         48 |
+| individual_education      |  63,181 |            91 |         38 |
+| food_acquired             | 326,456 |           524 |         47 |
+| food_coping               | 111,080 |           384 |         48 |
+| plot_features             | 132,694 |           119 |         34 |
+| crop_production           |  86,437 |            68 |         19 |
+| plot_inputs               | 180,526 |           141 |         19 |
+| plot_labor                | 272,925 |           207 |         19 |
+| livestock                 |  37,179 |            63 |         25 |
+| anthropometry             |  18,764 |            49 |         29 |
+| people_last7days          | 118,233 |           199 |         48 |
+| nutrition                 |  25,644 |            47 |         47 |
+| household_characteristics |  25,528 |            48 |         48 |
+| food_expenditures         | 264,091 |           412 |         46 |
+| food_prices               | 263,627 |           412 |         46 |
+| food_quantities           | 326,082 |           524 |         47 |
+
+=interview_date= and =food_security= have no W3 rows, and =cluster_features= and
+=community_prices= have no =i=, so those four are exact.  Attrition moves only here:
+W1 -> W3 3,677 -> 3,726 in =sample= (the BID's figure), 3,630 -> 3,677 in
+=household_roster=, 3,600 -> 3,645 in =food_acquired=, 3,372 -> 3,408 in
+=household_characteristics=; W2 -> W3 4,925 -> 4,926 in =sample=.
+
+=check_panel_consistency= passes on both sides.  =updated_ids_cover_waves= goes from warn
+to pass, because the baselines are now inferred as W1 and W4.  =panel_ids_targets_exist=
+stays a warning, 27+69 of 4,981 to 92+86 of 13,688: on the current side the 25, 27 and 40
+PP-only households of W2, W3 and W5, which have no roster; on the previous side the 69
+as before (the 49 and the 7 below among them) and the 17 W5 households on W4's PP cover
+only.  =attrition_monotonic= now walks both chains.
 
 /The evidence as the ruling read it, kept as written:/
 
@@ -1873,6 +1918,31 @@ cover ids are on W4's.
 *A string collision, not a link*: served =i= has 1 id in common between W2 and W4
 and 1 between W2 and W5, unrelated large-town households in the same character
 format.  =sampling.yml='s "0 shared =i=" at 2018-19 is about W3 and stands.
+
+/Measured 2026-11-04./  It is one id, shared by W2, W4 and W5, and W3 does not hold it.
+On the W2 side it is a large-town household with a blank W1 baseline, so nothing walks it;
+on the Panel II side it is one household, linked W4 -> W5.  =v= and Region agree because
+the EA code does: 3 EA codes are on both the W2/W3 and the W4/W5 covers, so ESS4's draw
+reached those EAs again, and in this one the region-to-kebele codes agree too.  The
+household is not the same.  The id's last three characters are a serial from each draw's
+own listing: in this EA W2's 15 are every 11th number and W4's every 12th, so the two
+series meet once by arithmetic.  The rosters do not agree either: W2 lists fewer people than
+W4, and no member matches on sex and an age gap of 3-7.  One more raw string coincides,
+in a rural EA, but its W2 household walks to its W1 id, so served =i= does not show it.
+Reported, not changed: =independent= stands, =groupby('i')= across the panels pools these
+two households, and =unobservable= keeps Site C silent about =v= in those 3 EAs.
+
+** Open: 7 W3 large-town households one digit from a W2 household W3 does not hold
+
+Found 2026-11-04 while reviewing what the #1467 rule leaves out; outside that ruling, so
+not linked.  7 W3 large-town households are on no W2 cover and keep an id that links to
+nothing, yet the ESS3 BID says W3's 1,255 urban households "were re-interviewed" (PDF p16).
+Each is in an EA W2 holds, and its id is one serial digit from a different W2 large-town
+household that W3 does not hold (7 of 7).  By roster line, W2 to W3 with sex equal and an age
+gap of 0-4: 6 of the 7 pairs have an agreeing line, and 0.591 of lines agree, against 0.794
+and 95.5% for the 1,248 large-town households with the same id in both waves, and 0.070 and
+15.9% for another household of the same EA.  This looks like mis-keyed ids.  One digit alone
+is weak evidence, since 581 of those 1,248 have another W2 household one digit away.
 
 * Food prices: what the ESS asks, and three defects (2026-09-08)
 
