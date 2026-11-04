@@ -2363,6 +2363,50 @@ as the W1/W2 other-buyer block is not.
 exceeds the row's harvest =Quantity= on 42 (W3), 3 (W4) and 0 (W5) rows.  Reported,
 not clipped.  W3 is the wave whose form does not tie the sale to the harvest unit.
 
+*The price is what validates the placement.*  On attached one-record rows in one
+unit, the household's own valuation per harvest unit (=Value_harvested / Quantity=)
+over its sale price (=Value_sold / Quantity_sold=) has median 1.00, within 2x on
+90% (2,872 rows), 93% (2,711) and 92% (3,022) in W3, W4, W5.  W1/W2, which record
+the sale on the row, are 83% and 88%.  So the single-row attachment and the W4/W5
+unit reading are at least as coherent as the data they join.  In the 19 crop-by-unit
+cells with 30 sales on each side, Farm-level over attached median price is 1.00
+(p10 0.52, p90 1.13).  A sale value exceeds the valuation on 206 / 178 / 213 attached
+rows, 6-7%; not corrected.
+
+*Measured, cold =3067c0352= against =8b0c1b398=.*
+- Conservation: =Value_sold= equals the raw sum in each round (N196,085,180 /
+  N226,761,273 / N716,443,945), and =Quantity_sold= by =Unit_sold= equals the raw sum
+  in all 63 round-by-unit cells, the withheld two-unit quantities apart.
+- Nothing else moves: 62,844 pre-existing rows keep their keys, =v=, =Quantity=, =u=,
+  months, flags, =KgFactor= and =Value_harvested=; the 25,529 W1/W2 rows are wholly
+  identical; the other 18 tables built are frame-equal.  Rows +758 / +1,067 / +689.
+- Site B's =Quantity_sold= and =Value_sold= warnings are gone (5 -> 3); Site I and the
+  grain audit report nothing either side; Site Q names the same five rows.
+- =gross_crop_revenue= (=by=None= and =by='j'=) now equals the source total in each
+  round.  =harvest_kg=, =yield_kg= (both =on=, joined on the PH quarter, because as
+  served it joins nothing: =plot_features= is on the PP quarter), =fertilizer_rate=,
+  =nitrogen_kg=, =seed_kg= and valued =food_expenditures= are identical.
+- Cost: every Nigeria table and wave hash moves (20 of 20, 200 of 200): a country
+  re-warm.  Uganda, GhanaLSS, Malawi and every =build_transforms_fingerprint= do not.
+
+*Two consumers need care, and neither is fixed here (=transformations.py= is not
+this country's).*
+- =crop_diversity(weight='count')= counts a Farm-level row as one more occurrence of
+  the crop.  Moves 489 / 749 / 448 households, mean H 1.0595 -> 1.0508, 0.9452 -> 0.9360,
+  0.7747 -> 0.7676, and adds 2 households.  Filter =plot_id != 'Farm-level'= first and
+  it equals the old result exactly.
+- =median_price_valuation= now prices W3-W5, which it could not at all, but W4/W5 price
+  per kg from the thin set of sales it can convert: those sold in a metric unit, 43
+  and 41 of about 3,700 rows (W1/W2 have 2,218 and 989), because nothing else carries
+  a sold-unit factor.  Against the household's own valuation its sum runs 14.8x (W4)
+  and 6.1x (W5), against 0.8x / 1.5x in W1/W2; W5 maize is N4,150/kg, from 2 sales,
+  where sacks imply N400.  =sa3iiq1_conv=, the form's factor for the unit W4/W5 sales
+  inherit, is on 3,721 and 3,626 of those sales and is not wired as =KgFactor_sold=.
+  In a scratch run supplying it, per-row median against the valuation is 1.00 in both
+  waves, within 2x on 80% / 79%, rows valued rise to 11,508 / 8,412, the sums are 1.09x
+  and 0.51x (W5's includes the N1.95 billion valuation noted above), and maize is
+  N100 / N423.  Do not sum this valuation in W4/W5 until that is wired.
+
 * crop_production: a unit =_canon_unit= cannot place is =Unknown= (GH #1047)
 
 =u= is a *column* here (the declared index is =(t, i, plot_id, crop)=), and
