@@ -6,6 +6,7 @@ sys.path.append('../../_/')
 sys.path.append('../../../_/')
 from lsms_library.local_tools import df_data_grabber, to_parquet
 import tanzania
+import _upd_district
 
 round_match = {1: '2008-09', 2: '2010-11', 3: '2012-13', 4: '2014-15'}
 
@@ -96,7 +97,7 @@ df = tanzania.keep_cluster_residents(df, region='Region',
 # Name the code from the table in `categorical_mapping.org` here, and stamp the
 # registered key `Tanzania::cluster_features::upd-district-name-from-round-3` on
 # the rows filled.  Later rounds are untouched.
-df = tanzania.derive_upd_district_name(df)
+df = _upd_district.derive_upd_district_name(df)
 df = df.drop(columns='_district_code')
 
 to_parquet(df, 'cluster_features.parquet')

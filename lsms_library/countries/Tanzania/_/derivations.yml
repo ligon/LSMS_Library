@@ -17,8 +17,8 @@ Tanzania::cluster_features::upd-district-name-from-round-3:
     household whose reported region and code match the cluster's own geocode: 409
     of 409 clusters in 2008-09, 406 of 409 in 2010-11.  The other three have no
     such household, stay NA and carry no key.
-  function: lsms_library.countries.Tanzania._.tanzania:derive_upd_district_name
-  inputs: lsms_library.countries.Tanzania._.tanzania:inputs_upd_district_name
+  function: lsms_library.countries.Tanzania._._upd_district:derive_upd_district_name
+  inputs: lsms_library.countries.Tanzania._._upd_district:inputs_upd_district_name
   raw_variables: [r_hhid, round, clusterid, ha_01_1, ha_02_1, ha_02_2]
   assumptions:
     - text: Rounds 1-3 number districts alike, so a (region, code) cell of round 3 is the cell of rounds 1-2.

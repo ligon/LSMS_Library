@@ -2387,6 +2387,10 @@ and stamped in =Derivation= on the rows filled, following #1060, #1057 and Ugand
 twelve =URBAN= clusters.  Labels are stored as round 3 writes them and take the
 same read path through that table (hence =Dodoma Rural=).
 
+The code is =_/_upd_district.py=, not =tanzania.py=:
+=tests/test_gh905_tanzania_signed_sums.py= pins the digest of the whole of that
+file, so any edit to it outside the frozen function fails 13 tests.
+
 *Are the codes stable across rounds?  Rounds 1-3 yes, round 4 no.*
 - Rounds 1-3 share one numbering, the geocode's.  The district digit of
   =clusterid= equals =ha_02_1= for all 3,265 round-1 households, which shows only

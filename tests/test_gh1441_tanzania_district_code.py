@@ -52,6 +52,16 @@ def tzmod():
     return module
 
 
+@pytest.fixture(scope="module")
+def district():
+    """`_/_upd_district.py`, loaded from its path as `derivations.yml` does."""
+    path = countries_root() / "Tanzania" / "_" / "_upd_district.py"
+    spec = importlib.util.spec_from_file_location("_tz_gh1441_district", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 # --------------------------------------------------------------------------
 # Config tier
 # --------------------------------------------------------------------------
@@ -94,13 +104,13 @@ def _frame(rows):
         ("DODOMA", "9.0", "1914002", pd.NA),            # a cell the table lacks
     ],
 )
-def test_labels_only_a_report_its_own_cluster_id_confirms(tzmod, region, code, v, expected):
+def test_labels_only_a_report_its_own_cluster_id_confirms(district, region, code, v, expected):
     df = _frame([("a", "2008-09", v, region, code)])
-    got = tzmod.upd_district_labels(df, codes={11: "KONDOA", 532: "URBAN"}).iloc[0]
+    got = district.upd_district_labels(df, codes={11: "KONDOA", 532: "URBAN"}).iloc[0]
     assert (pd.isna(got) and pd.isna(expected)) or got == expected
 
 
-def test_derive_stamps_exactly_what_it_fills(tzmod):
+def test_derive_stamps_exactly_what_it_fills(district):
     rows = [
         ("filled", "2008-09", "1114002", "DODOMA", "1.0", pd.NA),
         ("unconfirmed", "2010-11", "1114002", "DODOMA", "2.0", pd.NA),
@@ -109,8 +119,8 @@ def test_derive_stamps_exactly_what_it_fills(tzmod):
         ("later_blank", "2012-13", "1114002", "DODOMA", "1.0", pd.NA),
     ]
     df = pd.DataFrame(rows, columns=["i", "t", "v", "Region", "_district_code", "District"])
-    out = tzmod.derive_upd_district_name(df.set_index(["i", "t", "v"]),
-                                         codes={11: "KONDOA"}).reset_index().set_index("i")
+    out = district.derive_upd_district_name(df.set_index(["i", "t", "v"]),
+                                            codes={11: "KONDOA"}).reset_index().set_index("i")
     assert out.loc["filled", "District"] == "KONDOA"
     assert out.loc["recorded", "District"] == "OWN ANSWER"
     assert out.loc["later_answer", "District"] == "KONGWA"
@@ -221,10 +231,10 @@ def test_every_early_cluster_has_a_row(table, upd):
 
 
 @pytest.mark.requires_s3
-def test_round_4_is_a_different_vintage(table, upd, tzmod):
+def test_round_4_is_a_different_vintage(table, upd, tzmod, district):
     """Why the table stops at round 3: the same number names another district."""
     r4 = upd[upd["round"] == 4].copy()
-    own = r4["region"].map(lambda r: tzmod._REGION_CODE_BY_NAME[tzmod.normalize_place(r)])
+    own = r4["region"].map(lambda r: district._REGION_CODE_BY_NAME[tzmod.normalize_place(r)])
     r4["own_cell"] = own.astype(int) * 10 + r4["code"].astype(int)
     plural = r4.groupby("own_cell")["name"].agg(lambda s: s.str.upper().value_counts().index[0])
     assert table.loc[113, "District"] == "MAKETE"
