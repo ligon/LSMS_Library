@@ -165,7 +165,9 @@ Data Scheme:
     #   j      — crop, on the shared 'harmonize_crop' Preferred Labels,
     #            which REUSE the harmonize_food Aggregate Label strings
     #            for food crops (Maize, Beans, Rice, ...) so a crop j
-    #            joins food_acquired(labels='Aggregate').j.
+    #            joins food_acquired(labels='Aggregate').j.  Since GH #833 a
+    #            bare staple there is its harvest-state bucket: crop Maize meets
+    #            food Maize, which is grains, not maize flour.
     #   u      — reported native harvest unit ('harvest_units' table);
     #            'Unknown' where a wave-season records no harvest unit
     #            column.  Since GH #842 that is 2018-19 season A ONLY

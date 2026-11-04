@@ -1377,6 +1377,90 @@ possibly, a minority of recorded round prices; not as an independent source.
 Where the two DO differ, the difference is the interesting thing (a keying
 slip in one of three fields), not a second opinion on the price.
 
+* =labels='Aggregate'= keeps processing states apart (GH #833, 2026-11-04)
+
+/Ruling @ligon, 2026-11-04./  =Preferred Label= always kept states apart; only
+=labels='Aggregate'= folded them, and they do not cost the same.  =Maize=, =Millet=,
+=Cassava=, =Sweet Potatoes=, =Ground Nuts= and =Sim Sim= now keep one bucket per state in
+=harmonize_food=.  Variety still folds: white and yellow maize flour are one bucket.  This
+is a user-facing relabel.  =Preferred Label=, =Nutrition Label= and every default read are
+unchanged, and =Expenditure= and =Quantity= are conserved (below).
+
+| bucket           | what is in it now                          | moved out of the bare name                                       |
+|------------------+--------------------------------------------+------------------------------------------------------------------|
+| =Maize=          | =(grains)=, white and yellow               | =Maize (cobs)=, =Maize (flour)=, each with white and yellow      |
+| =Millet=         | =Millet=                                   | =Millet Flour= -> =Millet (flour)=                               |
+| =Cassava=        | =(fresh)=                                  | =(dry)= -> =Cassava (dry)=                                       |
+| =Sweet Potatoes= | =(fresh)=, white and orange                | =Sweet Potatoes (dry)=, =Sweet Potatoes (flour)=, each with both |
+| =Ground Nuts=    | =(in shell)=                               | =(shelled)=, =(pounded)= and =(paste)=, one bucket each          |
+| =Sim Sim=        | =Sim Sim=                                  | =Sim Sim (paste)=                                                |
+
+Twenty table rows change, and they move eighteen Preferred Labels, eleven of them served:
+=Cassava (dry)= is two rows, and the twentieth, code 182, was a defect.  =Cassava (flour)= had
+two rows with two Aggregates, =Cassava= and =Cassava (flour)=, and =_relabel_j= served the
+last, so it does not move as served.  Each Preferred Label now has one Aggregate.  The column
+goes from 80 labels to 90, and from 76 to 86 served.
+
+*The bare name is the harvest state, because =crop_production= reuses it.*
+=harmonize_crop= writes =Maize=, =Millet=, =Cassava=, =Sweet Potatoes=, =Ground Nuts= and
+=Sim Sim=, so that a crop's =j= joins =food_acquired(labels='Aggregate').j=.  Qualifying
+all six buckets would have cut those crops off that axis.  The join holds at the same
+counts, 126,432 of 134,164 crop rows and 42,957 of 46,918 sale rows.  What it means has
+narrowed: crop =Maize= meets food =Maize=, grains alone, and the crop's own state is its
+=condition= level.  Those states are also what most of these crop rows are in: =Maize=
+=dried_grain= 14,057, =Sweet Potatoes= =fresh= 9,346, =Cassava= =fresh= 7,950, =Ground
+Nuts= =dried_with_shell= 3,032.
+
+*What moved, =food_expenditures(labels='Aggregate')= (default basis), UGX, all waves, cold:*
+
+| before                    | after                                                        |
+|---------------------------+--------------------------------------------------------------|
+| =Maize= 50,913,635        | =Maize= 781,540, =(cobs)= 2,003,150, =(flour)= 48,128,945    |
+| =Millet= 5,045,440        | =Millet= 3,453,140, =(flour)= 1,592,300                      |
+| =Cassava= 14,274,785      | =Cassava= 10,319,820, =(dry)= 3,954,965                      |
+| =Sweet Potatoes= 11,192,725 | =Sweet Potatoes= 10,752,125, =(dry)= 386,200, =(flour)= 54,400 |
+| =Ground Nuts= 17,323,242  | =Ground Nuts= 838,025, =(shelled)= 2,140,585, =(pounded)= 12,184,647, =(paste)= 2,159,985 |
+| =Sim Sim= 3,435,070       | =Sim Sim= 3,248,920, =(paste)= 186,150                       |
+
+The total is 726,299,304.83 both ways, and the other 69 Aggregates are equal.  =food_expenditures=
+goes from 242,043 rows to 243,043; =food_acquired= keeps its 355,571.  *=Maize= is now 1.5%
+of what it was*, because nearly all of it was flour; a user who wants the old bucket adds three.
+
+*The evidence is purchases in kg, median UGX per kg, by wave:*
+
+|                        | 2005-06 | 2009-10 | 2010-11 | 2011-12 | 2013-14 | 2015-16 | 2018-19 | 2019-20 |
+|------------------------+---------+---------+---------+---------+---------+---------+---------+---------|
+| =Maize (grains)=       |     450 |     800 |     700 |   1,500 |   1,000 |   1,000 |     800 |   1,250 |
+| =Maize (flour)=        |     600 |   1,200 |   1,400 |   1,800 |   1,800 |   1,800 |   1,700 |   2,000 |
+| =Ground Nuts (in shell)= | 1,200 |   1,550 |   3,000 |   2,250 |   4,083 |   3,000 |   5,000 |   5,000 |
+| =Ground Nuts (pounded)= |  1,600 |   2,800 |   3,350 |   4,000 |   4,000 |   4,000 |   5,000 |   5,000 |
+| =Sim Sim=              |   1,450 |   2,400 |   2,250 |   3,000 |   4,000 |   3,000 |   4,500 |   4,000 |
+| =Sim Sim (paste)=      |         |         |         |         |         |         |   5,000 |   5,000 |
+| =Cassava (dry)=        |         |         |         |         |     950 |   1,000 |   1,000 |   1,000 |
+| =Cassava (flour)=      |         |         |         |         |   1,000 |   1,000 |   1,000 |   1,100 |
+
+The thin cells are thin: =Maize (grains)= has 5-17 rows a wave, =Ground Nuts (in shell)= 1-12,
+and =Sweet Potatoes= is hardly bought in kg (=(dry)= 1-2 rows).  Cassava dry and flour cost the
+same and still stay apart: #833's rule is that price magnitude does not license a fold.
+
+*Three things this leaves.*
+
+- /=Millet= has no wave holding both labels./  =Millet= runs through 2015-16 and =Millet
+  Flour= from 2018-19, so =labels='Aggregate'= now shows one series ending and another
+  starting.  The figures cited for the ruling (1,500 against 3,000) cross that boundary: 2,000
+  in 2015-16 and 3,000 in 2018-19, ×1.5, while rice went ×1.2, sugar ×1.33 and maize flour
+  ×0.94.  That fits a change of state and does not prove one.  The questionnaires were not
+  read for this.  Undoing it is one table cell.
+- /=Cassava (dry/flour)= stays in =Cassava (flour)=./  Through 2011-12 the survey asks one
+  line for both, and it was already there.  So =Cassava (flour)= is that line to 2011-12 and
+  flour alone after, and the continuous series is =(flour)= plus =(dry)=.
+- /Other Aggregates hold two states and were not ruled on/: =Beans= (fresh, dry), =Peas=
+  (=Peas=, dry), =Rice= (=Rice flour=), =Ginger= (fresh, powder), =Soybean= (fresh, dry).
+
+Not rerun: the CFE beta-spread test that =add-feature/food-acquired= gives for designing
+buckets.  A split cannot fail the test a fold has to pass, but a bucket this thin may fail
+=min_obs= where the old one did not.
+
 * =people_last7days= counts MEMBERS, not visitors
 
 The question ("how many people were present in the last 7 days?") is

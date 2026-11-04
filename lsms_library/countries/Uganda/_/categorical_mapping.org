@@ -16,6 +16,14 @@
 | Rukingiri            | Rukungiri       |
 | Serere (From Soroti) | Serere          |
 
+# Aggregate Label, the six staples whose labels name a processing state (GH #833,
+# ruling 2026-11-04): Maize, Millet, Cassava, Sweet Potatoes, Ground Nuts and Sim Sim
+# keep one bucket per state.  Variety still folds (white and yellow maize flour are
+# one bucket).  The BARE name is the harvest-state bucket (grains, grain, fresh, fresh,
+# in shell, seed) because harmonize_crop's labels reuse it: crop_production.j joins
+# food_acquired(labels='Aggregate').j on the bare name, and these are the states most
+# of those crop rows are in.  Other Aggregates holding two states (Beans, Peas, Rice,
+# Ginger, Soybean) were not part of the ruling.  CONTENTS.org has the before and after.
 #+name: harmonize_food
 | Code | Preferred Label                | Aggregate Label    | Nutrition Label                |
 |------+--------------------------------+--------------------+--------------------------------|
@@ -25,14 +33,14 @@
 |  103 | Matoke (heap)                  | Matoke             | Matoke                         |
 |  104 | Matoke (other)                 | Matoke             | Matoke                         |
 |  105 | Sweet Potatoes (fresh)         | Sweet Potatoes     | Sweet Potatoes (fresh)         |
-|  106 | Sweet Potatoes (dry)           | Sweet Potatoes     | Sweet Potatoes (dry)           |
+|  106 | Sweet Potatoes (dry)           | Sweet Potatoes (dry) | Sweet Potatoes (dry)           |
 |  107 | Cassava (fresh)                | Cassava            | Cassava (fresh)                |
 |  108 | Cassava (dry/flour)            | Cassava (flour)    | Cassava (dry/flour)            |
 |  109 | Irish Potatoes                 | Irish Potatoes     | Irish Potatoes                 |
 |  110 | Rice                           | Rice               | Rice                           |
 |  111 | Maize (grains)                 | Maize              | Maize (grains)                 |
-|  112 | Maize (cobs)                   | Maize              | Maize (cobs)                   |
-|  113 | Maize (flour)                  | Maize              | Maize (flour)                  |
+|  112 | Maize (cobs)                   | Maize (cobs)       | Maize (cobs)                   |
+|  113 | Maize (flour)                  | Maize (flour)      | Maize (flour)                  |
 |  114 | Bread                          | Bread              | Bread                          |
 |  115 | Millet                         | Millet             | Millet                         |
 |  116 | Sorghum                        | Sorghum            | Sorghum                        |
@@ -62,8 +70,8 @@
 |  140 | Beans (fresh)                  | Beans              | Beans (fresh)                  |
 |  141 | Beans (dry)                    | Beans              | Beans (dry)                    |
 |  142 | Ground Nuts (in shell)         | Ground Nuts        | Ground Nuts (in shell)         |
-|  143 | Ground Nuts (shelled)          | Ground Nuts        | Ground Nuts (shelled)          |
-|  144 | Ground Nuts (pounded)          | Ground Nuts        | Ground Nuts (pounded)          |
+|  143 | Ground Nuts (shelled)          | Ground Nuts (shelled) | Ground Nuts (shelled)          |
+|  144 | Ground Nuts (pounded)          | Ground Nuts (pounded) | Ground Nuts (pounded)          |
 |  145 | Peas                           | Peas               | Peas                           |
 |  146 | Sim Sim                        | Sim Sim            | Sim Sim                        |
 |  147 | Sugar                          | Sugar              | Sugar                          |
@@ -82,7 +90,7 @@
 |  160 | Other Juice                    | Other Juice        | Other Juice                    |
 |  161 | Other Foods                    | Other Foods        | Other Foods                    |
 |  162 | Peas (dry)                     | Peas               | Peas (dry)                     |
-|  163 | Ground Nuts (paste)            | Ground Nuts        | Ground Nuts (paste)            |
+|  163 | Ground Nuts (paste)            | Ground Nuts (paste) | Ground Nuts (paste)            |
 |  164 | Green Pepper                   | Other Veg.         | Green Pepper                   |
 |  165 | Pumpkins                       | Other Veg.         | Pumpkins                       |
 |  166 | Avocado                        | Other Fruits       | Avocado                        |
@@ -95,9 +103,9 @@
 |  173 | Chapati                        | Chapati            | Chapati                        |
 |  174 | Apples                         | Other Fruits       | Apples                         |
 |  175 | Water                          | Water              | Water                          |
-|  180 | Sweet Potatoes (flour)         | Sweet Potatoes     | Sweet Potatoes (flour)         |
-|  181 | Cassava (dry)                  | Cassava            | Cassava (dry)                  |
-|  182 | Cassava (flour)                | Cassava            | Cassava (flour)                |
+|  180 | Sweet Potatoes (flour)         | Sweet Potatoes (flour) | Sweet Potatoes (flour)         |
+|  181 | Cassava (dry)                  | Cassava (dry)      | Cassava (dry)                  |
+|  182 | Cassava (flour)                | Cassava (flour)    | Cassava (flour)                |
 |  190 | Bread                          | Bread              | Bread                          |
 |  191 | Bread                          | Bread              | Bread                          |
 | 1041 | Matoke (sack)                  | Matoke             | Matoke                         |
@@ -105,11 +113,11 @@
 | 1043 | Matoke (other)                 | Matoke             | Matoke                         |
 | 1051 | Sweet Potatoes (white, fresh)  | Sweet Potatoes     | Sweet Potatoes (white, fresh)  |
 | 1052 | Sweet Potatoes (orange, fresh) | Sweet Potatoes     | Sweet Potatoes (orange, fresh) |
-| 1061 | Sweet Potatoes (white, dry)    | Sweet Potatoes     | Sweet Potatoes (white, dry)    |
-| 1062 | Sweet Potatoes (orange, dry)   | Sweet Potatoes     | Sweet Potatoes (orange, dry)   |
-| 1063 | Sweet Potatoes (white, flour)  | Sweet Potatoes     | Sweet Potatoes (white, flour)  |
-| 1064 | Sweet Potatoes (orange, flour) | Sweet Potatoes     | Sweet Potatoes (orange, flour) |
-| 1081 | Cassava (dry)                  | Cassava            | Cassava (dry)                  |
+| 1061 | Sweet Potatoes (white, dry)    | Sweet Potatoes (dry) | Sweet Potatoes (white, dry)    |
+| 1062 | Sweet Potatoes (orange, dry)   | Sweet Potatoes (dry) | Sweet Potatoes (orange, dry)   |
+| 1063 | Sweet Potatoes (white, flour)  | Sweet Potatoes (flour) | Sweet Potatoes (white, flour)  |
+| 1064 | Sweet Potatoes (orange, flour) | Sweet Potatoes (flour) | Sweet Potatoes (orange, flour) |
+| 1081 | Cassava (dry)                  | Cassava (dry)      | Cassava (dry)                  |
 | 1082 | Cassava (flour)                | Cassava (flour)    | Cassava (flour)                |
 | 1083 | Kabalagala                     | Kabalagala         | Kabalagala                     |
 | 1101 | Rice (white)                   | Rice               | Rice (white)                   |
@@ -117,11 +125,11 @@
 | 1103 | Rice flour                     | Rice               | Rice flour                     |
 | 1111 | Maize (yellow;grains)          | Maize              | Maize (yellow;grains)          |
 | 1112 | Maize (white;grains)           | Maize              | Maize (white;grains)           |
-| 1121 | Maize (white;cobs)             | Maize              | Maize (white;cobs)             |
-| 1122 | Maize (yellow;cobs)            | Maize              | Maize (yellow;cobs)            |
-| 1131 | Maize (white;flour)            | Maize              | Maize (white;flour)            |
-| 1132 | Maize (yellow;flour)           | Maize              | Maize (yellow;flour)           |
-| 1151 | Millet Flour                   | Millet             | Millet Flour                   |
+| 1121 | Maize (white;cobs)             | Maize (cobs)       | Maize (white;cobs)             |
+| 1122 | Maize (yellow;cobs)            | Maize (cobs)       | Maize (yellow;cobs)            |
+| 1131 | Maize (white;flour)            | Maize (flour)      | Maize (white;flour)            |
+| 1132 | Maize (yellow;flour)           | Maize (flour)      | Maize (yellow;flour)           |
+| 1151 | Millet Flour                   | Millet (flour)     | Millet Flour                   |
 | 1171 | Beef Liver                     | Beef Liver         | Beef Liver                     |
 | 1172 | Beef Offal                     | Beef Offal         | Beef Offal                     |
 | 1173 | Beef (roasted)                 | Beef               | Beef (roasted)                 |
@@ -166,7 +174,7 @@
 | 1372 | Cabbage (green)                | Cabbages           | Cabbage (green)                |
 | 1391 | Other Spices                   | Other Spices       | Other Spices                   |
 | 1461 | Sim Sim                        | Sim Sim            | Sim Sim                        |
-| 1462 | Sim Sim (paste)                | Sim Sim            | Sim Sim (paste)                |
+| 1462 | Sim Sim (paste)                | Sim Sim (paste)    | Sim Sim (paste)                |
 | 1471 | Honey                          | Honey              | Honey                          |
 | 1472 | Jam/Marmalade                  | Jam/Marmalade      | Jam/Marmalade                  |
 | 1481 | Coffee                         | Coffee             | Coffee                         |
@@ -713,8 +721,9 @@
 # actually broke the stated contract and are fixed:
 #
 #   141  'Finger Millet' -> 'Millet'  (harmonize_food Aggregate Label of
-#        codes 115 Millet / 1151 Millet Flour; finger millet is the only
-#        millet the UNPS crop scheme records, so nothing is conflated)
+#        code 115 Millet, and of 1151 Millet Flour until GH #833 gave flour its
+#        own bucket; finger millet is the only millet the UNPS crop scheme
+#        records, so nothing is conflated)
 #   741  'Banana Food'   -> 'Matoke'  (Aggregate Label of codes 100-104,
 #        Matoke bunch/cluster/heap/other; "banana food" is the cooking
 #        banana, i.e. matooke -- code 742 'Banana Beer' is the beer variety
@@ -723,6 +732,10 @@
 # Measured effect: crop sale rows whose j joins the food Aggregate axis go
 # from 33 806 to 41 600 of 45 519 (74% -> 91%); 'Banana Food' was the
 # SECOND-largest crop by sale rows (6 793) and joined nothing.
+#
+# Since GH #833 (2026-11-04) the join is on a bucket of one state: crop 'Maize' meets
+# food 'Maize', which is grains, and no longer meets maize flour or cobs.  The crop's own
+# state is its `condition` level.
 #
 # Deliberately NOT changed: Field / Cow / Pigeon / Chick Peas would all
 # have to fold into the single food label 'Peas', and Avocado / Pineapple /
