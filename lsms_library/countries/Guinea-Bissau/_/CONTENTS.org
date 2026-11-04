@@ -657,8 +657,7 @@ Mali and Senegal are the template.  For the wiring:
   3.3), and the community files are =s00_co= to =s04_co= only, with no =s05_co=.
   So there is no grappe-grain price file for =community_prices=.
 - *Size.*  Of the 12 source files the 2018-19 config names that have a 2021
-  analogue, 83% of columns keep their name; =s11= and =s16c= move most.  The
-  empty =nitrogen_kg= of GH #1483 (no =harmonize_input=) carries over.
+  analogue, 83% of columns keep their name; =s11= and =s16c= move most.
 
 Registration moves every Guinea-Bissau =Country._table_cache_hash=, because the wave set
 is folded into the hash, and no existing wave's =Wave._input_hash=.  When

@@ -56,6 +56,7 @@ NO_WEIGHT_COUNTRIES = {"China", "Kazakhstan", "Pakistan", "Peru"}
 PARTIALLY_WIRED_SAMPLE = {
     "Peru": {"1985", "1990", "1991"},
     "Malawi": {"2024-25"},
+    "Togo": {"2021-22"},
     "Guinea-Bissau": {"2021-22"},
     "CotedIvoire": {"2021-22"},
     "Benin": {"2021-22"},
