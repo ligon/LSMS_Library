@@ -275,11 +275,21 @@ Data Scheme:
     # conversion, yield, main_crop, or value shares (transformations).
     # crop (j) on the shared harmonize_food Preferred Label so it joins
     # food_acquired.j; u normalized to the shared `u` table base labels.
-    # Quantity_sold / Value_sold populated only where the survey records
-    # sales at the plot-crop grain (W1/W2); W3-W5 record sales at
-    # hh-crop grain (no plot linkage) -> NaN.  intercropped derived from
+    # Quantity_sold / Value_sold: W1/W2 record them on the plot-crop row.
+    # W3-W5 record them at hh-crop grain (secta3ii, no plot), so the sale goes
+    # on the household's single served row for that crop (a registered
+    # derivation, _/derivations.yml) and otherwise on ONE row with
+    # plot_id='Farm-level' and no harvest Quantity (GH #843, @ligon 2026-11-03).
+    # No split, no double count, nothing dropped.  `Farm-level` is the canonical
+    # structural sentinel: NOT a plot, so filter `plot_id != 'Farm-level'` before
+    # counting plots, and note crop_diversity(weight='count') sees it as an
+    # occurrence.  On such a row `u` is 'Unknown' beside a real Unit_sold, which
+    # is correct (GH #1047): `u` describes the harvest Quantity the row does not
+    # have, so do not read it as a Unit_sold != u flag.  See _/CONTENTS.org.
+    # intercropped derived from
     # the PP planting roster (sect11f s11fq2) where present (W1-W3);
-    # perennial = True for tree/permanent-crop rows (W4/W5 secta3iii).
+    # perennial = True for tree/permanent-crop rows (W4/W5 secta3iii), NA on a
+    # Farm-level row.
     index: (t, i, plot_id, crop)
     Quantity: float
     u: str
@@ -302,13 +312,16 @@ Data Scheme:
     # the column was worse: Value_sold / Quantity_sold was filed under the
     # harvest unit by assumption on every row.
     #
+    # W3 asks the sale its own unit (sa3iiq5b).  W4/W5 ask only a quantity, "Of
+    # the [QTY] [UNIT] [CONDITION] of [CROP] harvested, how much of it did your
+    # household sell?", so the sale is in the unit of the household's total
+    # harvest (sa3iiq1c / sa3iiq3b); its size and condition are not carried.
+    #
     # A plain NA-bearing string column, never an index level and never
-    # sentinel-filled.  `optional` for two reasons: only W1/W2 record a
-    # plot-grain sale at all (W3-W5's sale block is secta3ii at hh-crop
-    # grain with no plot linkage, GH #843, so Quantity_sold / Value_sold /
-    # Unit_sold are all legitimately NaN there); and a row with no sale has
-    # no sold unit, so the column is never fully populated.  No sold
-    # CONDITION column exists in the W1/W2 A3 files.
+    # sentinel-filled.  `optional` because a row with no sale has no sold unit,
+    # so the column is never fully populated, and a household-crop sold in two
+    # units has no single unit to serve (GH #843).  No sold CONDITION column
+    # exists in the W1/W2 A3 files.
     Unit_sold:
       type: str
       optional: true

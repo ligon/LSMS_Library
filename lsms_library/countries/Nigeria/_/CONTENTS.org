@@ -2064,10 +2064,10 @@ column, never an index level, never sentinel-filled.  Pinned by
   is a data-quality FLAG, not an identification of which unit prices the
   sale (measured on Uganda, =Unit_sold= is the closer denominator only ~40%
   of the time).  Exclude or resolve those rows, and report how many.
-- *W3-W5 are all-NA by design, not a gap.*  Their sale block is =secta3ii=
-  at hh-crop grain with no plot linkage (GH #843), the same reason their
-  =Quantity_sold= / =Value_sold= are NaN; hence =optional: true=.  =Olodo=
-  appears in =Unit_sold= (W2 sold vocabulary) but never in =u=.
+- /Superseded 2026-11-03 (GH #843): see [[*crop_production W3-W5 sales: on the household's one served row, else on a Farm-level row (GH #843, 2026-11-03)][the W3-W5 sales section]]./  *W3-W5 were
+  all-NA by design.*  Their sale block is =secta3ii= at hh-crop grain with no
+  plot linkage.  =Olodo= appears in =Unit_sold= (W2 sold vocabulary) but never
+  in =u=.
 - *Every pre-existing column is byte-identical* before and after (62,844
   rows, isolated cold build compared column-by-column).
 - *The served (API) frame reproduces the parquet counts exactly* -- both
@@ -2124,7 +2124,8 @@ column, never an index level, never sentinel-filled.  Pinned by
   wave concat's dtype; both were already string before this change).  The
   API read coerces them to =Float64= via =_enforce_canonical_dtypes=, so
   nothing served is wrong, but =pd.read_parquet(cache_path)= needs
-  =pd.to_numeric= on them.
+  =pd.to_numeric= on them.  /Fixed 2026-11-03 (GH #843): the script pins both to
+  =float64=; no served value moved./
 
 ** =sa3q18= is an unwired farmgate valuation of the WHOLE harvest
 
@@ -2241,6 +2242,124 @@ this check covers W1/W2 only.  Scripts and logs:
 
 Cost: =nigeria.py= and =data_scheme.yml= move every Nigeria table's cache
 hash (a country re-warm); only =crop_production= gains a column.
+* crop_production W3-W5 sales: on the household's one served row, else on a Farm-level row (GH #843, 2026-11-03)
+
+=Quantity_sold= / =Value_sold= were 100% empty in 2016Q1, 2019Q1 and 2024Q1: from
+W3 the sale is in A3.ii (=secta3ii=), per household and crop, with no plot.
+*Ruling* (@ligon, 2026-11-03, option d): one served harvest row for that household
+and crop -> the sale goes on it, in its own =Unit_sold=; otherwise -> ONE
+=plot_id='Farm-level'= row with no harvest =Quantity=.  No invented split, no
+double count, nothing dropped.  A separate =crop_sales= table is not what was
+ruled.  W1/W2 record the sale on the plot-crop row and do not move.
+
+*The form.*  A3.ii is a crop roster.  W5 p. 19: "CAPI WILL MAKE A LIST OF ALL
+HARVESTED CROPS FROM FLAP D. IT WILL NOT LIST CROPS MORE THAN ONCE. IF THE
+RESPONDENTS HARVESTED MAIZE FROM 2 DIFFERENT PLOTS, CAPI WILL LIST MAIZE ONCE."
+W5's value column also says "ESTIMATE THE VALUE OF IN-KIND PAYMENTS", so a W5
+=Value_sold= can include an estimated in-kind part.
+
+*The sale's unit differs by wave, and this is not obvious from the file.*
+
+| round | quantity | unit | value | how the form states the unit |
+|-+-+-+-+-|
+| 2016Q1 | =sa3iiq5a= | =sa3iiq5b= | =sa3iiq6= | Q5 has its own PROD. UNIT CODE; the code embeds the size (131 sack medium) |
+| 2019Q1 | =sa3iiq5a= | =sa3iiq1c= | =sa3iiq6= | Q5 prints only QUANTITY: "Of the [QTY] [UNIT] [CONDITION] of [CROP] harvested, how much of it did your household sell?" |
+| 2024Q1 | =sa3iiq6= | =sa3iiq3b= | =sa3iiq7= | same wording, W5 p. 19 |
+
+So =Unit_sold= in W4/W5 is the unit of the household's total harvest (asked just
+before, with its size =sa3iiq1d= / =sa3iiq3c= and condition =sa3iiq1b= /
+=sa3iiq3d=), through the same size-agnostic =_canon_unit= as =u=; size and
+condition are not carried.  On one-record attached sales it equals the row's =u=
+on 2,705 of 2,709 (W4) and 3,005 of 3,006 (W5) against 2,866 of 2,979 for W3,
+which asks its own.
+
+*What is a sale.*  A record with a positive quantity or a positive value.
+
+| | 2016Q1 | 2019Q1 | 2024Q1 |
+|-+-+-+-|
+| rows in the file | 8,544 | 8,839 | 7,184 |
+| sold = NO | 4,681 | 5,014 | 3,437 |
+| sold = YES, both answers blank (not a sale) | 2 | 0 | 0 |
+| sold blank, both answers blank (not a sale) | 1 | 0 | 0 |
+| quantity 0 and value 0 (not a sale) | 1 | 0 | 0 |
+| *sale records* | *3,859* | *3,825* | *3,747* |
+| of which quantity > 0, value > 0 | 3,838 | 3,825 | 3,747 |
+| quantity > 0, value 0 (served as the recorded 0) | 14 | 0 | 0 |
+| quantity > 0, value blank (served blank) | 5 | 0 | 0 |
+| value > 0, quantity blank (served blank, =Unit_sold= NA) | 2 | 0 | 0 |
+
+A non-sale adds no row and states no zero: a harvest row whose crop was not sold
+stays NaN, it does not become 0.
+
+*Grain.*  One record per crop code in W4/W5.  W3's roster can repeat a code
+(12 =(hhid, cropcode)= pairs, 24 rows), which is why =crop_number= is its line.
+No file has an exact-duplicate record (Niger's s16d does, so this was checked, not
+assumed).  But =harmonize_food= gives several codes one label (Yam--roots is
+1120-1124, Fresh Pepper 2141/2142, Orange/tangerine 3150/3170, Avocado pear
+3220/3221), and the index holds one row per =(t, i, plot_id, crop)=, so one
+household and served crop can hold two records.
+
+| household-crops | 2016Q1 | 2019Q1 | 2024Q1 |
+|-+-+-+-|
+| with a sale | 3,786 | 3,789 | 3,714 |
+| *on the one served row* | *3,028* | *2,722* | *3,025* |
+| *Farm-level, several served rows* | *758* | *1,060* | *686* |
+| *Farm-level, no served row* | *0* | *7* | *3* |
+| two records, one unit: quantity and value summed | 60 | 22 | 26 |
+| two records, two units: value summed, quantity withheld | 13 | 14 | 7 |
+
+The partition is per SERVED row, after the keep-first dedup; the sweep's earlier
+figures (749 / 1,050 / 683 on two or more plots) were per raw plot.
+
+*Two records, two units.*  The two quantities cannot be two rows (one index key)
+and cannot be one number, so =Value_sold= is the sum, since Naira add, and
+=Quantity_sold= / =Unit_sold= are NA.  "Two units" means the raw unit code, size
+or condition differ, because =_canon_unit= would serve 'Sack/Bag' for a 50 kg and
+a 100 kg sack alike; 4 / 11 / 4 of them differ in the canonical label too.  34
+household-crops, about N3.7M of N1.14 billion.  This is a choice no ruling names.
+Nothing is lost: =derivation_inputs= returns each record's own quantity and unit.
+
+*Three derivation keys*, one function (=derive_hh_crop_sale_attachment=, a key per
+path): =hh-crop-sale-single-row= on an attached row,
+=hh-crop-sale-records-summed= and =hh-crop-sale-two-units= on a row that combines
+records, whichever row it landed on.  A Farm-level row holding one record carries
+*no* key: it is a survey answer at its own grain and the index value discloses
+that.  =Derivation= is declared in the canonical schema, never in =data_scheme.yml=.
+
+*What a row with a sentinel means.*
+- =plot_id = 'Farm-level'= is the canonical STRUCTURAL sentinel: not a plot.  It
+  joins no =plot_features= row.  Filter it before counting plots.
+- =u = 'Unknown'= beside a real =Unit_sold= on that row is *correct* (#1047): =u=
+  describes the harvest =Quantity=, which the row does not have.  Do not read it
+  as the =Unit_sold != u= data-quality flag, and do not "fix" it.
+- =perennial= is NA there: the row has no annual/perennial answer.
+- =KgFactor= stays the HARVEST factor on an attached row; it never rates the sale.
+  =sa3iiq1_conv= rates the household total and is still not wired.
+
+*Five crops appear only on Farm-level rows.*  W4 codes 9001/9002/9006/9007/9008
+(=BAKA=, =LOCUST BEANS=, =YELLOW PEPPER=, =SHEA BUTTER=, =SWEET MELON=, 7 sales,
+N378,000) have no =harmonize_food= label.  Base drops their harvest rows as
+unlabelled (still does).  The sale keeps its own label instead of being dropped,
+as an unmapped crop does elsewhere in the corpus, so the =2019Q1= no-served-row
+count is these 7: they have raw harvest rows.  The 3 =2024Q1= ones (Yam--roots ×2,
+Cassava--roots) have none.  Extending =harmonize_food= would move harvest rows and
+is a separate decision.
+
+*Keep-first dedup (#1433) is not touched and cannot strand a sale.*  Sales are
+placed after it, on rows that survived, so a discarded twin can neither receive a
+sale nor make a one-row crop look like two.  Each household-crop lands on exactly
+one row by construction, and =crop_production_for_wave= asserts the index stays
+unique.  What the dedup still does: on an attached row whose crop had two raw lines
+on one plot, =Quantity= is the kept line's and the sale is the household's.
+
+*What else is out of scope.*  Processed-crop sales (W3 q19-21, W4 =sa3iiq18aa= /
+q20-21, W5 q21-24) are a different good in different units and are not read,
+as the W1/W2 other-buyer block is not.
+
+*Sale above harvest.*  On attached one-record rows in one unit, the sold quantity
+exceeds the row's harvest =Quantity= on 42 (W3), 3 (W4) and 0 (W5) rows.  Reported,
+not clipped.  W3 is the wave whose form does not tie the sale to the harvest unit.
+
 * crop_production: a unit =_canon_unit= cannot place is =Unknown= (GH #1047)
 
 =u= is a *column* here (the declared index is =(t, i, plot_id, crop)=), and
@@ -2492,9 +2611,9 @@ does not distinguish them.  Only the *neighbouring question* does.
   q6d/q15 factor to it would multiply one container's rate by another
   container's quantity.
 - =sa3iiq1_conv= (=secta3ii=, both waves) is the *household*-crop total
-  harvest, with no plot linkage --- the same reason =crop_production.py=
-  already leaves W3--W5 =Quantity_sold= / =Value_sold= NaN (see the
-  [[*crop_production: two reported price fields the build does not carry][price-fields section]] above).  =secta3ii= is not read by this build at all.
+  harvest, with no plot linkage, so it rates no plot row's quantity.  Since
+  GH #843 this build reads =secta3ii= for the sale, and still not this factor
+  nor the household total it belongs to.
 
 GH #859 quoted EPAR's W4 =.do= (:575--592) as evidence of "FOUR columns".  It
 is four columns *for EPAR's purpose*, which is different: EPAR runs a *lockstep
