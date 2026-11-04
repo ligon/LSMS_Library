@@ -15,6 +15,7 @@ from lsms_library.feature import _missing_level_sentinels
 from lsms_library.transformations import (
     _PLOT_FARM_LEVEL,
     _resolve_crop_level,
+    _without_redundant_farm_level,
     crop_diversity,
     gross_crop_revenue,
 )
@@ -75,6 +76,21 @@ def test_the_rule_is_per_household_and_per_wave():
                  ("w2", "h1", "p1", "Beans", None)])
     assert _h(df, "h2") == pytest.approx(math.log(2))
     assert _h(df, "h1", "w2") == pytest.approx(math.log(2))
+
+
+def test_the_rule_is_per_country_on_a_pooled_frame():
+    """Two countries reuse one `(t, i, crop)`.  Niger's plot row says nothing
+    about Mali's household, so Mali's Farm-level row is its only record of the
+    crop.  Tested on the rule itself: `crop_diversity` groups on `(t, i)` alone,
+    a pooled-frame question of its own."""
+    flat = pd.DataFrame(
+        [("Niger", "w1", "h1", "p1", "Maize"),
+         ("Niger", "w1", "h1", FARM, "Maize"),
+         ("Mali", "w1", "h1", FARM, "Maize")],
+        columns=["country", "t", "i", "plot_id", "j"])
+    kept = _without_redundant_farm_level(flat, "j", "plot_id")
+    assert kept.values.tolist() == [["Niger", "w1", "h1", "p1", "Maize"],
+                                    ["Mali", "w1", "h1", FARM, "Maize"]]
 
 
 def test_a_frame_with_no_farm_rows_is_untouched():

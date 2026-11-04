@@ -2438,8 +2438,10 @@ harvest row for the crop where there is exactly one, keyed
 |--------------------------+--------------+------------------|
 | all                      |        1,140 |      418,697,975 |
 
-A CONSUMER counting plots or occurrences must drop =plot_id == 'Farm-level'=; one summing
-sales must keep it.  =crop_diversity(weight='count')= does not drop it (below).
+A CONSUMER counting plots must drop =plot_id == 'Farm-level'=; one summing sales must keep it.
+One counting crop occurrences drops such a row where the household has a plot row of that crop
+and keeps it where it has none (the CONSUMER RULE in =data_info.yml=, GH #1469).
+=crop_diversity(weight='count')= does this, and here it drops all 70.
 
 ** What counts as a sale, and what is not written
 
@@ -2587,9 +2589,10 @@ Mali cache hash.
   =perennial=, 100% null in both waves.  *Site I*: no new finding; the 627 EAC-I tree rows are as
   before.  *Grain*: no collapse.  =Feature('crop_production')= over Mali, Niger and Burkina Faso:
   113,372 rows, unique index, 9,523 null =u= promoted to =Unknown= with no collision.
-- *=crop_diversity(weight='count')= counts a Farm-level row as an occurrence*: 50 of 2,857
-  households move in 2021-22, mean 0.6435 against 0.6448 with those rows dropped.  That is in
-  =transformations.py= and is not changed here.  =median_price_valuation= is right about them:
+- *=crop_diversity(weight='count')= counted a Farm-level row as an occurrence until GH #1469*: 50
+  of 2,857 households moved in 2021-22, mean 0.6435 against 0.6448 with those rows dropped.  All
+  70 repeat a crop the household reports on a plot, so it now drops all 70 and gives the 0.6448.
+  =median_price_valuation= is right about them:
   their 70 prices enter the medians (2021-22 Value 59.8M against 62.7M without) and none receives
   a Value.  =harvest_kg= and =yield_kg= never see them.
 - *Crops against food.*  =crop= stays on =harmonize_food= labels, but the same-wave join is partial:
