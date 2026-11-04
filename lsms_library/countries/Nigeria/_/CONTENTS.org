@@ -385,6 +385,25 @@ inferred kilograms: row by row, 35,856 of the 425,547 W1-W3 rows of
 a round.  Most by a sliver (2015Q3 p10 / p50 / p90 0.94 / 0.999 / 1.009); 577 rows
 move by more than 10% and 53 by more than 25%.
 
+*The correction in a served table: W4's per-kg prices on inferred rows.*  Only rows
+with no =*_cvn= are affected: a factor changes on 357 (2018Q3) and 146 (2019Q1) of
+W4's 169,506 rows.  A medium or large row used to get the =small= cell's factor.
+Now it gets its own, so its kilograms rise and its =food_prices()= (kgvalue) falls:
+
+| size | rows, 2018Q3 / 2019Q1 | kg, 2018Q3 | kg, 2019Q1 | median price after / before, priced rows |
+|-+-+-+-+-|
+| small | 90 / 60 | 88.8 -> 90.2 | 18.7 -> 20.4 | 1.03 / 1.00 |
+| medium | 103 / 58 | 49.8 -> 89.5 | 38.1 -> 109.5 | 0.32 / 0.46 |
+| large | 30 / 28 | 29.8 -> 28.1 | 16.9 -> 30.9 | 0.38 / 0.55 |
+| size-less or other | 134 / 0 | 73.7 -> 92.7 | | 0.99 / |
+
+Summed over those priced rows, kgvalue falls 1,563,507 -> 406,544 (2018Q3) and
+164,648 -> 49,862 (2019Q1), which is the whole of the table's move in those rounds.
+Thin cells cut both ways: 6 2019Q1 =medium derica/tin= rows now find no factor and
+are served =none= (0.96 kg before), because that spelling is PH's alone.  Carrying a
+native quantity, they make =food_quantities(units='kgs')= read +95.14 for 2019Q1 where
+the kg column above reads +87.14.
+
 *Not changed*: other W4 codes that carry a size keep their plain label, because W3
 has no sized form to map them onto.  Ordinal sizes, rows 2018Q3 / 2019Q1: =Loaf=
 3,215 / 3,340, =Tuber= 556 / 2,552, =Wrap= 25 / 2,897, =Sachet= 297 / 0, =Packet=
