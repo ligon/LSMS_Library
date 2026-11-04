@@ -4946,11 +4946,39 @@ other column moves.  =nitrogen_kg= total unchanged (832,835.0 kg N); its rows
 37,100 -> 37,076 (plots whose only inorganic records had no amount were served
 0 kg N).
 
-*Seed half not changed.*  The issue's 390 Seed records predate #1323: G seed
-observations bypass the reducer since then, so none is summed to 0; one with
-no amount, unit or Improved answer is excluded at finalization as all-NA
-payload.  Whether a planted-crop roster line with no seed answer is "seed not
-used" or "amount unknown" is a separate question (residual).
+*Seed half: left excluded, counted below (GH #1174, ruling 2026-11-04).*  The
+issue's 390 Seed records predate #1323: G seed observations bypass the reducer
+since then, so none is summed to 0; one with no amount or Improved answer is
+excluded at finalization as all-NA payload.  (2 of them, both 2010-11, do record a
+unit; =u= is an index level, so a unit alone is not a payload.)  Whether such a
+line is "seed not used" or "amount unknown" is not settled by the instrument, so
+nothing is served for it.
+
+*The seed half, counted.*  Module G lines minus served Seed rows, cold build of
+e92ae6b0f, by each line's position in its own file (=input_obs=):
+
+| wave    | G lines | served | excluded | no crop code | crop code | ... with a harvest amount | ... positive |
+|---------+---------+--------+----------+--------------+-----------+---------------------------+--------------|
+| 2010-11 |  28,134 | 27,675 |      459 |          271 |       188 |                       188 |          186 |
+| 2013-14 |  10,169 |  9,984 |      185 |          184 |         1 |                         1 |            1 |
+| 2016-17 |  32,795 | 32,123 |      672 |          531 |       141 |                         8 |            7 |
+| 2019-20 |  42,661 | 42,622 |       39 |           32 |         7 |                         1 |            1 |
+| total   | 113,759 | 112,404 |   1,355 |        1,018 |       337 |                       198 |          195 |
+
+The ruling and the issue say 1,356 (460 in 2010-11): that was before #1422's
+2010-11 follow-up attached one more purchase.  *1,018 of the 1,355 are not seed
+questions at all:* they name no crop, nearly all no plot either (1,015), so they
+are empty roster lines.  Only the 337 that name a crop can pose the question, and
+the 188 of 2010-11, every one with a harvest amount, are the ones that read most
+like an unrecorded amount rather than no seed.  None of it is served, and no 0 is
+minted.  This is the same framework rule as the rows #1435 registered for a time;
+it is not registered as a deletion here (the ruling asks for a count), which is
+the consistent follow-up if the maintainer wants it.
+
+*The 19 fertilizer groups stay NA (ruling 2026-11-04).*  A blank enumerator total
+with a positive native quantity (2010-11 9, 2013-14 10): recovering them would be
+a registered derivation from the native pair, which #1111 chose not to substitute,
+and is worth doing only if asked.
 
 * 2026-11-03 -- livestock: the 12-months-ago stock ag_r07 (GH #855)
 
