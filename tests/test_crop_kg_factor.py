@@ -580,14 +580,21 @@ def test_uganda_harvest_kg_baseline():
     # GH849, 2026-10-22: twelve reported-factor mappings at GH1198's native
     # observation grain. The held-source row/slot and direct product/median
     # oracles preserve every other payload and the existing screens.
-    assert len(cp) == 133_761
-    assert len(res) == 88_980
-    assert res["Harvest_kg"].sum() == pytest.approx(42_026_694.99297963, rel=1e-9)
+    # #1358 (GH #1120 D3): 403 rows whose source plot is missing (360 2009-10,
+    # 43 2011-12) are served under `unknown_plot`, adding 227 harvest_kg rows
+    # and 70,277.25 kg.  Everything on a known plot stays what it was.
+    assert len(cp) == 134_164
+    assert len(res) == 89_207
+    assert res["Harvest_kg"].sum() == pytest.approx(42_096_972.24297963, rel=1e-9)
     assert res.attrs["kg_factor_sources"] == {
-        "reported": 96_747, "shipped": 0, "survey_median": 4_840,
-        "metric": 23_406, "inferred": 0, "none": 8_768,
+        "reported": 96_777, "shipped": 0, "survey_median": 4_841,
+        "metric": 23_679, "inferred": 0, "none": 8_867,
         "reported_implausible": 439, "shipped_implausible": 0,
         "shipped_matched": 0, "declared": 0}
+    assert (cp.index.get_level_values("plot_id") != "unknown_plot").sum() == 133_761
+    known = res[res.index.get_level_values("plot_id") != "unknown_plot"]
+    assert len(known) == 88_980
+    assert known["Harvest_kg"].sum() == pytest.approx(42_026_694.99297963, rel=1e-9)
     # GH #931 (2026-10-19): `declared` joins the dict and NO NUMBER MOVES.
     # Uganda's own `u` table maps nothing to a unit the merged `u_kg` declares
     # (only `Quintal`, globally), so the crop ladder now READS the declaration
