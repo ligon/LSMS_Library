@@ -5,7 +5,7 @@ by ``(t, i, plot, input, crop)`` with the reported item-level input columns
 (Quantity, u, Purchased, Quantity_purchased, Improved).  The crop/input
 module lives in the EACI waves only (2014-15 EACI14, 2017-18 EACI17); the
 EHCVM waves (2018-19, 2021-22) carry no agriculture-input block, so they
-contribute nothing — the same wave split as crop_production.
+contribute nothing.
 
 ``v`` is NOT baked in — the framework joins it from ``sample()`` at API
 time.  ``id_walk`` is left to ``_finalize_result`` (cached parquets store

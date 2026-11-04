@@ -151,13 +151,14 @@ Data Scheme:
   crop_production:
     # Item-level harvest, GAP 1 (parity loop).  One row per (t, i, plot_id,
     # crop): the REPORTED quantities the survey records, NOT aggregates.
-    # Wired for the EAC-I waves (2014-15 EACI14 s3a/s3b/s1c; 2017-18 EACI17
-    # s7f/s7g/s11f/s11c).  The EHCVM waves (2018-19, 2021-22) DO ship a
-    # harvest and sale block (s16c / s16d) that is not wired -- a decision,
-    # not an absence (GH #824 audit, 2026-10-23).
+    # Wired for all four waves: EAC-I 2014-15 (EACI14 s3a/s3b/s1c) and 2017-18
+    # (EACI17 s7f/s7g/s11f/s11c), and, since GH #824 (rulings @ligon
+    # 2026-11-03), EHCVM 2018-19 (s16c) and 2021-22 (s16c + s16d).
     #
-    # plot = "{field}_{parcel}" for seasonal crops; <NA> for perennial
-    # trees (the perennial roster is not on the seasonal field grid).
+    # plot = "{field}_{parcel}" for seasonal crops and for every EHCVM
+    # harvest row; <NA> for perennial trees (the EAC-I perennial roster is not
+    # on the seasonal field grid); 'Farm-level' for a 2021-22 sale with no
+    # single harvest row (below).
     # crop = harmonize_food Preferred Label (food crops REUSE the consumed-
     # food label so crop_production.j joins food_acquired.j; non-food crops
     # — Coton, Soja, Voandzou, Dah/Fibre, tree species — get new labels).
@@ -168,7 +169,23 @@ Data Scheme:
     # value is recorded at (household, crop) grain (module s7g), so it is
     # attached at the plot level only for single-plot crops; multi-plot
     # crops carry NaN sold (see the wave script).  intercropped is recorded
-    # in 2014-15 (s1cq05 Pure/Association) only; NaN in 2017-18.
+    # in 2014-15 (s1cq05 Pure/Association) and in both EHCVM waves (s16cq07);
+    # NaN in 2017-18.
+    #
+    # EHCVM (GH #824).  2018-19 s16c holds harvest and sale on one line, served
+    # as recorded.  2021-22 s16c holds the harvest (s16cq16a, filled on 309 of
+    # 7,247 rows; NA elsewhere, no total derived: GH #1437) and s16d, with no
+    # plot, the sales.  A sale goes on the household's single harvest ROW for
+    # the crop where there is exactly one, keyed
+    # hh-crop-sale-single-row in Derivation; otherwise on ONE
+    # row with plot_id = 'Farm-level' (the canonical structural sentinel) and
+    # no harvest Quantity, u or key.  EXCLUDE plot_id == 'Farm-level' for
+    # plot-grain work; KEEP it for household or crop sale totals.  Neither wave
+    # zero-fills a 'Non' (unlike 2017-18), and neither records planting_month,
+    # harvest_month or perennial, which are NA there and which Site B therefore
+    # reports per wave: they remain required, for the EAC-I waves.  KgFactor_sold
+    # stays NA: s16cq16c / s16dq05c are totals in kg, not per-unit factors.
+    # `u` is NA where no unit is recorded, as in the EAC-I waves.
     #
     # THE SALE HAS ITS OWN UNIT (GH #824).  `u` is the HARVEST unit; every
     # EAC-I sale block records the sold quantity in its own unit variable
@@ -221,8 +238,7 @@ Data Scheme:
     # (t, i, plot_id, input, crop): the REPORTED inputs the survey records, NOT
     # aggregates.  The input module lives in the EACI waves only (2014-15
     # EACI14 s1e/s2c, 2017-18 EACI17 s11c/s7d).  The EHCVM waves (2018-19,
-    # 2021-22) have no agriculture-input block — deferred (same split as
-    # crop_production).
+    # 2021-22) have no agriculture-input block — deferred.
     #
     # plot  = "{field}_{parcel}" — the SAME plot id as crop_production /
     #         plot_features.  crop is the seed's crop on SEED rows: the
@@ -282,7 +298,7 @@ Data Scheme:
     # over these rows).  The livestock module lives in the EACI waves only
     # (2014-15 EACIS4A_p2 / s4a; 2017-18 eaci17_s8ap2 + eaci17_s8b1p2 /
     # s8a+s8b1).  The EHCVM waves (2018-19, 2021-22) carry no livestock
-    # roster — deferred (the same split as crop_production / plot_inputs).
+    # roster — deferred (the same split as plot_inputs).
     #
     # animal = harmonize_species Preferred Label, keyed on the survey's own
     # integer species code (s4aq02 / s8aq02; identical across both EACI
@@ -324,7 +340,7 @@ Data Scheme:
     # waves only (2014-15 EACIMAINOUVRE_p1 [PP, s2b] + EACIS2F_p2 [PH, s2f];
     # 2017-18 eaci17_s11ep1 [PP, s11e] + eaci17_s7ep2 [PH, s7e]).  The EHCVM
     # waves (2018-19, 2021-22) carry no plot-labor roster — deferred (the
-    # same wave split as crop_production / plot_inputs / livestock).
+    # same wave split as plot_inputs / livestock).
     #
     # plot   = "{field}_{parcel}" — the SAME plot id as crop_production /
     #          plot_inputs / plot_features (join on (t, i, plot_id)).
