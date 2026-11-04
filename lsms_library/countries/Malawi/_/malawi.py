@@ -1370,7 +1370,10 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     unit_map = _malawi_code_map('harmonize_crop_unit')
 
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
-    plot = df[plotkey].apply(format_id).astype('string')
+    # A blank key is `unknown_plot`, never NaN (GH #1476): these modules are
+    # plot-grain, so the plot exists and its identifier is missing, and a NaN
+    # on a declared index level is deleted by the next groupby.
+    plot = _plot_ids(df[plotkey].apply(format_id))
     # Native instrument code before perennial offset/recode; canonical axis
     # and G/P qualification follow the GH #637 ruling (ledger 637a §2-3).
     raw_code = df[cropcode].apply(format_id).astype('string')
@@ -1885,7 +1888,11 @@ def _attach_sales(t, harv, sale):
         {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
     sale['_srow'] = range(len(sale))
 
-    nplots = (harv.groupby(['i', '_crop_code'])['plot_id']
+    # `unknown_plot` is not a plot (GH #1476), so it does not count as one: a
+    # household whose only row of a crop has no plot key is not a single-plot
+    # crop, and the sale stays unattached.
+    nplots = (harv.assign(_known_plot=harv['plot_id'].astype('string').mask(_is_unknown_plot(harv['plot_id'])))
+              .groupby(['i', '_crop_code'])['_known_plot']
               .nunique().rename('_nplots').reset_index())
     harv = harv.merge(nplots, on=['i', '_crop_code'], how='left')
     n_harv = len(harv)
