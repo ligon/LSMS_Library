@@ -9,8 +9,9 @@ plot-crop grain in 2018-19, so no cross-file join is needed.
 
 Index = (t, i, plot_id, crop, u, condition, production_obs); plot =
 "{s16cq02}_{s16cq03}" aligns with plot_features' plot_id.  ``condition`` is the
-harvest's own "Etat du produit" (s16cq12c, GH #1436).  The index is unique
-without a line coordinate, so ``production_obs`` is the
+harvest's own "Etat du produit" (s16cq12c, GH #1436), folded from five answers
+to three tokens; the column ``condition_native`` keeps the answer as recorded.
+The index is unique without a line coordinate, so ``production_obs`` is the
 ``unresolved_observation`` sentinel (GH #1360).  See
 niger.py:_finish_crop_production for the shared schema tail and the GAP-1
 design note.
@@ -22,7 +23,8 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
-                   _crop_conditions, _finish_crop_production)
+                   _crop_conditions, _crop_condition_labels,
+                   _finish_crop_production)
 
 
 # convert_categoricals=True so crop / unit value labels arrive as the
@@ -49,6 +51,9 @@ df = pd.DataFrame({
     # By code: the 2021-22 code list is different, see categorical_mapping.org.
     'condition':     _crop_conditions(src_codes['s16cq12c'],
                                       'harmonize_crop_condition_ehcvm1').values,
+    # What the fold above cannot show: the answer as recorded (ruling
+    # @ligon 2026-11-04).  By label, from the converted read.
+    'condition_native': _crop_condition_labels(src['s16cq12c']).values,
     'Quantity':      src['s16cq12a'].values,
     'Quantity_sold': src['s16cq16a'].values,
     'Value_sold':    src['s16cq17'].values,

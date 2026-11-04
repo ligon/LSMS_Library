@@ -14,6 +14,10 @@ The rule pinned here is the mapping, not today's counts:
 * a blank code is the ``unknown_condition`` sentinel, never a NaN key;
 * every served value is in the vocabulary ``lsms_library/data_info.yml`` declares.
 
+Ruling @ligon 2026-11-04 (option D): the fold stays on the level, and the column
+``condition_native`` keeps the 2018-19 answer as recorded.  Its oracle imports
+nothing from ``Niger/_/``.
+
 Two tiers: config/synthetic (no microdata) and ``TestServed`` (builds the real
 table; skipped when Niger is unavailable).
 """
@@ -53,27 +57,17 @@ SOURCES = {
 }
 NO_STATE_QUESTION = ("2011-12", "2014-15")
 
+#: The 2018-19 ``s16cq12c`` value labels, written out here: the oracle for
+#: ``condition_native`` must not read the helper or the table it checks.
+RECORDED_2018 = {1: "Epis", 2: "Grain", 3: "Décortiqué", 4: "Non-décortiqué",
+                 5: "Non concerné"}
+#: The ruled fold, by recorded label.
+FOLD_2018 = {"Epis": "unshelled", "Non-décortiqué": "unshelled", "Grain": "shelled",
+             "Décortiqué": "shelled", "Non concerné": "shell_not_applicable"}
+
 
 def _root() -> Path:
     return countries_root() / COUNTRY
-
-
-def _aws_creds_available() -> bool:
-    import importlib.util
-
-    spec = importlib.util.spec_from_file_location(
-        "_shared_conftest", Path(__file__).with_name("conftest.py"))
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod.aws_creds_available()
-
-
-needs_data = pytest.mark.skipif(
-    not (countries_root() / COUNTRY / "_" / "data_scheme.yml").exists()
-    or os.environ.get("LSMS_SKIP_AUTH")
-    or not _aws_creds_available(),
-    reason=f"{COUNTRY} microdata unavailable (no config or no S3 credentials)",
-)
 
 
 class _SchemeLoader(yaml.SafeLoader):
@@ -102,11 +96,33 @@ def _state_read(source: str) -> tuple[str, str, bool]:
     return column.slice.value, table.value, raw_codes
 
 
-def _canonical_vocabulary() -> set[str]:
+def _label_read(source: str) -> tuple[str, bool] | None:
+    """What a wave script's ``_crop_condition_labels(<frame>['<column>'])`` call
+    reads: (column, is <frame> the labelled read?).  None when there is no call."""
+    tree = ast.parse(source)
+    calls = [n for n in ast.walk(tree) if isinstance(n, ast.Call)
+             and getattr(n.func, "id", None) == "_crop_condition_labels"]
+    if not calls:
+        return None
+    assert len(calls) == 1, f"{len(calls)} _crop_condition_labels calls"
+    column = calls[0].args[0]
+    labelled = any(
+        isinstance(n, ast.Assign) and isinstance(n.value, ast.Call)
+        and any(isinstance(t, ast.Name) and t.id == column.value.id for t in n.targets)
+        and any(k.arg == "convert_categoricals" and getattr(k.value, "value", None) is True
+                for k in n.value.keywords)
+        for n in ast.walk(tree))
+    return column.slice.value, labelled
+
+
+def _canonical_scheme() -> dict:
     path = Path(__file__).resolve().parents[1] / "lsms_library" / "data_info.yml"
     with open(path, encoding="utf-8") as f:
-        info = yaml.load(f, Loader=_SchemeLoader)
-    return set(info["Columns"]["crop_production"]["condition"]["spellings"])
+        return yaml.load(f, Loader=_SchemeLoader)["Columns"][TABLE]
+
+
+def _canonical_vocabulary() -> set[str]:
+    return set(_canonical_scheme()["condition"]["spellings"])
 
 
 @pytest.fixture(scope="module")
@@ -198,6 +214,56 @@ class TestDeclared:
         assert out.index.get_level_values("condition").tolist() == ["shelled", SENTINEL]
 
 
+class TestNativeColumnDeclared:
+    """``condition_native``: declared, and only where a fold happened."""
+
+    def test_canonical_declaration_is_optional_and_not_a_vocabulary(self):
+        entry = _canonical_scheme()["condition_native"]
+        assert entry["type"] == "str" and entry["optional"] is True
+        # A `spellings` block is read as CLOSED; the labels are the survey's.
+        assert "spellings" not in entry
+
+    def test_niger_declares_it_optional_and_not_as_a_level(self):
+        with open(_root() / "_" / "data_scheme.yml", encoding="utf-8") as f:
+            entry = yaml.load(f, Loader=_SchemeLoader)["Data Scheme"][TABLE]
+        assert entry["condition_native"] == {"type": "str", "optional": True}
+        assert "condition_native" not in entry["index"]
+
+    @pytest.mark.parametrize("wave, expected", [
+        ("2018-19", ("s16cq12c", True)), ("2021-22", None),
+        ("2011-12", None), ("2014-15", None)])
+    def test_only_2018_19_reads_a_label_and_from_the_labelled_frame(self, wave, expected):
+        script = (_root() / wave / "_" / f"{TABLE}.py").read_text(encoding="utf-8")
+        assert _label_read(script) == expected
+
+    def test_label_read_is_not_satisfied_by_a_docstring(self):
+        script = ('"""Reads s16cq12c."""\n'
+                  'raw = get_dataframe("x.dta", convert_categoricals=False)\n'
+                  'c = _crop_condition_labels(raw["s16cq16c"])\n')
+        assert _label_read(script) == ("s16cq16c", False)
+
+    def test_helper_keeps_the_label_and_a_blank_stays_na(self, niger_module):
+        out = niger_module._crop_condition_labels(
+            pd.Series(["Non-décortiqué", " Grain ", "", None], dtype="object"))
+        assert out.iloc[0] == "Non-décortiqué" and out.iloc[1] == "Grain"
+        assert out.iloc[2:].isna().all()
+        assert str(out.dtype) == "string"
+
+    def test_helper_is_not_french_only(self, niger_module):
+        """Guinea-Bissau shares the codes under Portuguese labels."""
+        out = niger_module._crop_condition_labels(pd.Series(["Não descascado"]))
+        assert out.tolist() == ["Não descascado"]
+
+    def test_tail_serves_na_when_a_wave_passes_none_and_keeps_it_a_column(self, niger_module):
+        df = pd.DataFrame({
+            "i": ["1"], "plot_id": ["1_1"], "crop": ["Mil"], "u": ["Kg"],
+            "Quantity": [10.0], "Quantity_sold": [None], "Value_sold": [None]})
+        out = niger_module._finish_crop_production(df, "2099-00")
+        assert "condition_native" in out.columns
+        assert "condition_native" not in out.index.names
+        assert out["condition_native"].isna().all()
+
+
 # ---------------------------------------------------------------------------
 # the built table, against the source
 # ---------------------------------------------------------------------------
@@ -231,7 +297,27 @@ def _source_tuples(niger, wave):
     return Counter(map(tuple, frame.astype({"Quantity": float}).values.tolist()))
 
 
-@needs_data
+def _recorded_source_2018() -> pd.DataFrame:
+    """(plot, recorded state, quantity), straight from s16c.  Imports nothing from
+    ``Niger/_/``: the codes go through :data:`RECORDED_2018`, written out above."""
+    from lsms_library.local_tools import format_id, get_dataframe
+
+    cwd = os.getcwd()
+    os.chdir(_root() / "2018-19" / "_")
+    try:
+        raw = get_dataframe(SOURCES["2018-19"][0], convert_categoricals=False)
+    finally:
+        os.chdir(cwd)
+    return pd.DataFrame({
+        "plot_id": (raw["s16cq02"].apply(format_id).astype(str) + "_"
+                    + raw["s16cq03"].apply(format_id).astype(str)).values,
+        "condition_native": pd.to_numeric(raw["s16cq12c"], errors="coerce")
+                            .map(RECORDED_2018).values,
+        "Quantity": pd.to_numeric(raw["s16cq12a"], errors="coerce").values,
+    })
+
+
+@pytest.mark.requires_s3
 class TestServed:
 
     @pytest.fixture(scope="class")
@@ -277,3 +363,35 @@ class TestServed:
         pd.testing.assert_series_equal(g["condition"].eq(SENTINEL).astype(bool),
                                        g["u"].eq("Unknown").astype(bool),
                                        check_names=False)
+
+    def test_native_column_counts_are_the_source_codes(self, served):
+        got = served.xs("2018-19", level="t")["condition_native"].value_counts()
+        expected = _recorded_source_2018()["condition_native"].value_counts()
+        assert got.to_dict() == expected.to_dict()
+
+    def test_native_column_is_the_source_code_row_by_row(self, served):
+        g = served.xs("2018-19", level="t").reset_index()
+        g = g[g["Quantity"].fillna(0) > 0]
+        src = _recorded_source_2018()
+        src = src[src["Quantity"] > 0]
+        def tuples(frame):
+            return Counter(
+                (p, None if pd.isna(c) else c, float(q))
+                for p, c, q in zip(frame["plot_id"], frame["condition_native"], frame["Quantity"]))
+        assert tuples(g) == tuples(src)
+
+    def test_the_level_is_the_ruled_fold_of_the_column(self, served):
+        g = served.xs("2018-19", level="t").reset_index()
+        expected = g["condition_native"].astype(object).map(FOLD_2018).fillna(SENTINEL)
+        assert (g["condition"].astype(object) == expected).all()
+
+    @pytest.mark.parametrize("wave", NO_STATE_QUESTION + ("2021-22",))
+    def test_native_column_is_na_where_nothing_was_folded(self, served, wave):
+        assert served.xs(wave, level="t")["condition_native"].isna().all()
+
+    def test_native_column_is_not_a_level_and_moves_no_kilogram(self, served):
+        from lsms_library.transformations import harvest_kg
+
+        assert "condition_native" not in served.index.names
+        pd.testing.assert_frame_equal(harvest_kg(served),
+                                      harvest_kg(served.drop(columns="condition_native")))

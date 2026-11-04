@@ -1237,16 +1237,15 @@
 # `dried_grain` / `dried_with_shell`, which would assert a dryness nobody
 # recorded.
 #
-# DECISION, NAMED (GH #1436): 2018-19's five answers fold onto the three tokens
+# RULED, @ligon 2026-11-04 (GH #1436): 2018-19's five answers fold onto the three tokens
 # the way Niger's and Senegal's 2021-22 instruments folded them -- ear and
 # hull (Epis, Non-decortique) into `epis/coques`, grain and hulled (Grain,
 # Decortique) into `Grains`; Burkina Faso's and Mali's 2021-22 keep all five.
-# The fold LOSES a distinction the 2018-19 answer
-# made: `unshelled` is Epis 6,482 + Non-decortique 904 lines, `shelled` is Grain
-# 3,715 + Decortique 1,763.  It costs no index collision, because the wave's
-# (plot, crop, unit) key is unique without this level.  Keeping 2018-19's five
-# would need new bare tokens in the canonical vocabulary.  Evidence, and the
-# ruling this leaves open: CONTENTS.org, "crop_production: the condition level".
+# The level no longer separates what the 2018-19 answer did: `unshelled` is Epis
+# 6,482 + Non-decortique 904 lines, `shelled` is Grain 3,715 + Decortique 1,763.
+# The answer itself is served in the column `condition_native`, and the fold costs
+# no index collision, because the wave's (plot, crop, unit) key is unique without
+# this level.  Evidence: CONTENTS.org, "crop_production: the condition level".
 #
 # Code 5 of 2018-19: the .dta says "Non concerne", the EHCVM household
 # questionnaire template says "Entier".  Both describe the crops that actually

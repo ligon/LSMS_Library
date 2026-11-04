@@ -970,6 +970,28 @@ Columns:
         shell_not_applicable: []
         other_condition: []
         unknown_condition: []
+    condition_native:
+      type: str
+      optional: true
+      note: |
+        The state of the crop as the survey recorded it, in the survey's own
+        words, where the `condition` level folds several answers onto one token.
+        Ruling @ligon 2026-11-04 (GH #1436): the EHCVM list has five answers
+        (Epis, Grain, Décortiqué, Non-décortiqué, Non concerné) and the level
+        serves three tokens, so this column keeps the recorded answer in the API.
+        It is the `crop_variety` shape: a COLUMN named for the level it refines,
+        at the native grain, never an index level.  Filtering or grouping on
+        states belongs on `condition`; this is for reading what was answered.
+
+        NA where the survey recorded no state, and in a wave whose answers the
+        level serves one to one, because nothing was folded there (Niger's and
+        Senegal's three-answer 2021-22 list).  Never a sentinel: a column has no
+        NaN-key hazard.
+
+        DELIBERATELY NO `spellings:` BLOCK.  The labels are the survey's, and
+        they differ by country (Guinea-Bissau's are Portuguese), so they are not
+        a vocabulary.  `diagnostics._check_declared_spellings` reads a block as
+        CLOSED and would fail them, the reasoning of the `u` and `season` notes.
     season:
       type: str
       note: |

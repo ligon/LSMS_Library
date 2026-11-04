@@ -615,12 +615,25 @@ def _crop_conditions(codes, table):
     return mapped.fillna(CONDITION_NA)
 
 
+def _crop_condition_labels(labels):
+    """The state as the survey recorded it, for the ``condition_native`` column.
+
+    *labels* is the state column read with ``convert_categoricals=True``, in
+    whatever language the survey labelled it.  A blank stays NA, never a sentinel:
+    a column has no NaN-key hazard, and NA says no state was recorded.  Only
+    surrounding whitespace is touched.  Ruling @ligon 2026-11-04 (GH #1436).
+    """
+    out = pd.Series(labels).astype('string').str.strip()
+    return out.where(out != '', pd.NA)
+
+
 def _finish_crop_production(df, t):
     """Common tail: tag t, build the (t, i, plot_id, crop, u, condition,
     production_obs) index, coerce numeric columns, and guarantee the full schema
     column set (including the NA-bearing ``Unit_sold`` column, GH #824).  A wave
     that passes no ``condition`` gets :data:`CONDITION_NA`; one that passes no
-    ``production_obs`` gets :data:`CROP_OBS_NA`."""
+    ``production_obs`` gets :data:`CROP_OBS_NA`; one that passes no
+    ``condition_native`` carries NA there."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
     # harvest_month: only 2014-15 records it; NaN elsewhere (still carried
@@ -662,12 +675,15 @@ def _finish_crop_production(df, t):
     if 'condition' not in df.columns:
         df['condition'] = CONDITION_NA
     df['condition'] = df['condition'].astype('string').fillna(CONDITION_NA)
+    if 'condition_native' not in df.columns:
+        df['condition_native'] = pd.NA
+    df['condition_native'] = df['condition_native'].astype('string')
     if 'production_obs' not in df.columns:
         df['production_obs'] = CROP_OBS_NA
     df['production_obs'] = df['production_obs'].astype('string')
     keep = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs',
             'Quantity', 'Quantity_sold', 'Value_sold', 'Unit_sold',
-            'harvest_month', 'intercropped']
+            'harvest_month', 'intercropped', 'condition_native']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs'])
     return df
