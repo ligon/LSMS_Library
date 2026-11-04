@@ -3596,6 +3596,68 @@ def sized_food_unit(unit, size, unit_codes):
     return out
 
 
+# ---------------------------------------------------------------------
+# interview_date -- what the visit produced (GH #1096 / #1444)
+# ---------------------------------------------------------------------
+#
+# Every cover records the visit whether or not anyone was interviewed, so a
+# date may date an attempt.  These label the cover's own result field, read by
+# each round's interview_date.py: W1-PP / W2-PP / W3 `saq22a`, W1-PH `sq1`,
+# W2-PH `saq1`, W4 `interview_result`.  `saq22b` is the status of DATA ENTRY and
+# W3-PH's `saq22` is a yes/no on observations.  Status gates no table's rows
+# (GH #1444): the D1 rule in round_covers decides who a round's frame admits.
+
+# Recorded label, code prefix stripped and lower-cased -> what is served.  The
+# two wordings of one answer share a spelling so a filter works across waves.
+# Two answers are not folded: W4's two partials differ, and W2's "not located"
+# is not W4's "unable to identify".
+_INTERVIEW_RESULT_LABELS = {
+    'completed': 'Completed',
+    'complete': 'Completed',
+    'partially completed': 'Partially completed',
+    'partially complete (refused)': 'Partially completed (refused)',
+    'partially complete (unavailable)': 'Partially completed (unavailable)',
+    'not at home': 'Not at home',
+    'refused': 'Refused',
+    'household not located': 'Household not located',
+    'moved away': 'Moved away',
+    'household has moved away': 'Moved away',
+    'other (specify)': 'Other',
+    'unable to identify household': 'Unable to identify household',
+    'long term unavailable': 'Long-term unavailable',
+}
+
+# The W1-W3 response-status card.  W3's interview_date reads codes (GH #1037).
+# W4's codes differ (its 4 is "unable to identify", its 7 "refused"), and W4
+# reads labels, so this card is never applied to it.
+_RESPONSE_STATUS_CARD = {1: 'completed', 2: 'partially completed',
+                         3: 'not at home', 4: 'refused',
+                         5: 'household not located', 6: 'moved away',
+                         7: 'other (specify)'}
+
+
+def interview_result_label(value):
+    """The served ``InterviewResult`` for a cover's recorded result label.
+
+    A blank stays missing.  A label outside the table is refused, not guessed.
+    """
+    if pd.isna(value):
+        return pd.NA
+    body = _strip_code_prefix(value).lower()
+    if body not in _INTERVIEW_RESULT_LABELS:
+        raise ValueError(f'Nigeria: unrecognised interview result {value!r}')
+    return _INTERVIEW_RESULT_LABELS[body]
+
+
+def response_status_label(code):
+    """:func:`interview_result_label` for a W1-W3 response-status CODE."""
+    if pd.isna(code):
+        return pd.NA
+    if code not in _RESPONSE_STATUS_CARD:
+        raise ValueError(f'Nigeria: unrecognised interview result code {code!r}')
+    return interview_result_label(_RESPONSE_STATUS_CARD[code])
+
+
 def food_acquired_for_wave(fn, t, sources, expenditure,
                            item='item_cd', hhid='hhid'):
     """Canonical (t, i, j, u, s) food_acquired rows for one Nigeria round.

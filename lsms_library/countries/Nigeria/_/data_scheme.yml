@@ -229,8 +229,12 @@ Data Scheme:
     Age: float
     Value: float
   interview_date:
+    # Int_t dates the VISIT: every cover records one whether or not anyone was
+    # interviewed.  InterviewResult is what the cover says it produced (GH #1096,
+    # #1444).  Rows with no date are not served.  See CONTENTS.org.
     index: (t, i)
     Int_t: datetime
+    InterviewResult: str
     materialize: make
 
   housing:

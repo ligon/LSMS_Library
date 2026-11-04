@@ -715,8 +715,8 @@ its PH roster lists four members at =ea = 0= in a different LGA (served
 *The contradiction is of record, not resolved here*: =HHTrack='s W3 status
 says neither household was interviewed; the PH roster says someone answered.
 The D1 rule (cover, then supplement cover, then own-round roster) admits a
-household on roster evidence alone; whether =HHTrack= status should gate that
-admission is a decision, not taken here.
+household on roster evidence alone.  /Decided 2026-11-04 (GH #1444): status does
+not gate that admission; see the =InterviewResult= entry under =interview_date=./
 
 *=HHTrack= is read by no table.*  It is the panel's per-visit disposition
 record (=hhstatus_w{1,2,3}v{1,2}=: 1 interviewed, 2 refused, 3 not found,
@@ -733,8 +733,8 @@ PP-cover households =HHTrack= records as not interviewed at W3 visit 1
 @ligon's ruling, approved together: (a) identity links for W1, W4-old and W5,
 using =old_new=; (b) link only households recorded as interviewed; (c) build
 each round's links from that round's own cover.  This changes the crosswalk
-only.  Whether interview status should gate ROSTER admission is #1444, still
-open, so no table's membership changes and =id_walk= stays an identity.
+only.  Interview status does not gate ROSTER admission (#1444, ruled 2026-11-04),
+so no table's membership changes and =id_walk= stays an identity.
 
 *The chain.*  =2010Q3 <- 2011Q1 <- 2012Q3 <- 2013Q1 <- 2015Q3 <- 2016Q1 <- 2018Q3
 <- 2019Q1 <- 2023Q3 <- 2024Q1=: PH to the PP of the same visit, PP to the PH of
@@ -829,7 +829,8 @@ adjacent rounds, not every revisit.
   =panel_ids_targets_exist= still reports 6 of 39,326 current-round endpoints.
   It warns where it used to fail.
 - 2 household-rounds have a roster and no recorded interview: =320201= and =30082=
-  in =2016Q1=.  They stay served (the #1120 D1 rule) and are not linked.  #1444.
+  in =2016Q1=.  They stay served (the #1120 D1 rule) and are not linked.  #1444
+  ruled this stands: no gate.
 - Served by =sample()= with no recorded interview: 3 / 22 / 131 / 84 / 85 / 12 /
   210 / 45 / 296 / 54 household-rounds, 2010Q3 through 2024Q1.  =2012Q3='s 131
   includes the 21 households only the W2 agriculture cover lists (=HHTrack=: 19
@@ -3128,8 +3129,104 @@ refused):
 | 2019Q1 | 4: 6, 6: 12, 7: 14 | 32 |
 
 So =interview_date= is a *visit* date, not an interview date, for 419 rows
-(216 W1--W3, 203 W4).  Not filtered: whether it should be is a semantics
-decision, drafted as a residual (tier DECISION, 2026-10-19).
+(216 W1--W3, 203 W4).  Not filtered; decided below.
+
+*** DONE =InterviewResult= rides beside the date, and status gates nothing (GH #1096, #1444, 2026-11-04)
+
+/Rulings (@ligon, 2026-11-04)/: keep the dated non-interview rows and add
+=InterviewResult=; do not gate the roster on it.
+
+*Which tables carry it: =interview_date= only*, in the eight rounds that table
+serves.  The declaration is =Columns > interview_date > InterviewResult= (=str=,
+=optional=) in the canonical =data_info.yml= and =InterviewResult: str= in this
+country's =data_scheme.yml=.  =sample= and =household_roster= do not carry it.
+
+*Source: the cover's own result field*, read by each round's script:
+
+| rounds | field | not this |
+|-+-+-|
+| 2010Q3, 2012Q3, 2015Q3, 2016Q1 | =saq22a= | =saq22b= is the status of DATA ENTRY; 2016Q1's =saq22= is a yes/no on observations |
+| 2011Q1 | =sq1= | =sq2= (data entry) |
+| 2013Q1 | =saq1= | =saq2= (data entry) |
+| 2018Q3, 2019Q1 | =interview_result= | |
+
+W1--W3 share one card (1 completed ... 7 other); W3's script reads codes
+(GH #1037), so =nigeria.response_status_label= applies that card.  W4's codes
+differ (its 4 is "unable to identify", its 7 "refused") and W4 reads labels, so
+the card is never applied to it.  A value outside =_INTERVIEW_RESULT_LABELS= is
+refused.
+
+*Vocabulary.*  Code prefix stripped, one case.  =COMPLETE= and =COMPLETED= are one
+spelling, as are =MOVED AWAY= and =HOUSEHOLD HAS MOVED AWAY=.  Different answers
+stay different: W4's two partials are distinct, and W2's "not located" is not W4's
+"unable to identify".  Served rows:
+
+| =InterviewResult= | 2010Q3 | 2011Q1 | 2012Q3 | 2013Q1 | 2015Q3 | 2016Q1 | 2018Q3 | 2019Q1 |
+|-+-+-+-+-+-+-+-+-|
+| Completed | 4,942 | 4,891 | 4,718 | 4,730 | 4,601 | 4,570 | 5,044 | 4,976 |
+| Partially completed | 8 | 7 | 11 | 2 | 4 | 8 | | |
+| Partially completed (refused) | | | | | | | 7 | 4 |
+| Partially completed (unavailable) | | | | | | | 2 | |
+| Refused | 2 | 5 | 14 | 7 | 24 | 11 | 22 | 14 |
+| Not at home | 1 | 1 | 2 | 3 | 1 | | | |
+| Household not located | | | 1 | 1 | 5 | | | |
+| Moved away | | 9 | 24 | 15 | 11 | | | |
+| Other | | 2 | 39 | 11 | 26 | 1 | | |
+| Unable to identify household | | | | | | | 94 | 6 |
+| Long-term unavailable | | | | | | | 55 | 12 |
+| total | 4,953 | 4,915 | 4,809 | 4,769 | 4,672 | 4,590 | 5,224 | 5,012 |
+
+Filter =Completed= plus the three partials for "was interviewed" (the #1264 rule
+counts a partial as an interview).  =Int_t= and the row set are =assert_frame_equal=
+to base: a row with no date is still not served, and each script now drops it
+itself, because a second column would otherwise carry it past =dropna(how='all')=.
+
+*The #1444 counts reproduce exactly*, using the crosswalk's definition of
+interviewed (=panel_ids.round_table=: own cover in W1, W4, W5; =HHTrack= in W2, W3):
+2 household-rounds with a roster and no recorded interview (320201, 30082, both
+2016Q1); 8 with a recorded interview and no roster (2012Q3 3, 2016Q1 2, 2018Q3 2,
+2024Q1 1); 942 served by =sample()= with no recorded interview (3 / 22 / 131 / 84
+/ 85 / 12 / 210 / 45 / 296 / 54, 2010Q3 through 2024Q1).
+
+*The two definitions differ on 5 households*: the column is the cover's, the
+crosswalk uses =HHTrack= in W2 and W3.  The 5 are =HHTrack= 5 "tracked and
+interviewed" with a cover saying other (2012Q3, 3) or refused (2016Q1, 2).  That is
+why 419 here is 414 of the 942 plus these 5.
+
+*What the column does not reach*, of the 942:
+
+| | household-rounds |
+|-+-|
+| a row on =interview_date=, so the column says | 414 |
+| on the round's cover but undated, so no row | 155 |
+| on no cover of that round (2012Q3 21, agriculture cover only; 2016Q1 2: 320201, 30082) | 23 |
+| W5: on the cover, but =interview_date= has no W5 script | 350 |
+
+So a user can filter =interview_date= but cannot filter =sample()= with it for 528
+of the 942.  Whether =sample= should carry the column too, and whether W5 should
+have an =interview_date=, are a residual, not done here: one column on one table is
+what was ruled.
+
+*Census of the other countries' covers* (GH #1096; report only, none wired).
+Metadata sweep of every held =.dta= / =.sav= under =Data/=; 2,448 of 6,016 sidecars
+have a blob in the shared L1, so a file no table reads may be unseen, and a value
+is only what a public release ships.  Togo's =Data1/= was read by hand.  Evidence:
+=burst/isa-sm-20261103/reports/nigeria-bundle/census_interview_result.tsv=.
+- *Record non-interviews on the household cover, as Nigeria does*: Ethiopia
+  =hh_saq33_a= / =pp_saq34_a= / =ph_saq34_a= (W1--W3: moved away, not located, not
+  at home, other, refused; NA on 130--487 rows), Uganda 2015-16 =VISITOUTCME=,
+  Liberia 2018-19 =rescd=, Serbia 2007 =drugaposeta= (second visit refused), Niger
+  2014-15 =MS00Q05= (P2: 40 absent, 26 refused), Burkina Faso 2014 =A13= (P2:
+  absent, refused, abandoned).
+- *Record a result, but the release holds only completed or partial households*:
+  every EHCVM cover =s00q27= / =s00q08= (Benin, Burkina Faso, CotedIvoire,
+  Guinea-Bissau, Mali, Niger, Senegal, Togo; replacement households are counted as
+  completed), Tanzania =int_result=, Uganda =interview_result= / =result_code= /
+  =response_status=, Iraq =q0034=, Malawi =int_outcome_1=.
+- *Different in kind*: GhanaLSS 2016-17 =hhstatus= (all seven visits or not), Malawi
+  2010-11 =int_outcome_2= (second visit, 4 not complete) and 2013-14
+  =interview_status= (panel and visit pattern), Albania =OUTCOME= / =m1_q24=
+  (individuals).
 
 * nonfood_expenditures (sect8a-e / sect11a-e) -- long since GH #817
 

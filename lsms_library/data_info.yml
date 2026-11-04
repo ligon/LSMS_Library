@@ -688,6 +688,14 @@ Columns:
       type: datetime
     Interview end:
       type: datetime
+    InterviewResult:
+      type: str
+      optional: true
+      note: |
+        What the visit produced, as the household cover records it, where a
+        date may date an attempt.  Country vocabulary, not a canonical list:
+        filter on the country's own labels.  Nigeria alone serves it (GH #1096);
+        see its CONTENTS.org for the labels and for what the rows do not cover.
   individual_education:
     Educational Attainment:
       type: str
