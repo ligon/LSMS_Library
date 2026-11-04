@@ -5062,8 +5062,10 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     **A sum across ``condition`` mixes states.**  ``data_info.yml`` says
     quantities in different states are not commensurable, and this reduction
     still sums them.  Uganda has 13,728 of 88,950 plot-crops with kilograms in
-    two or more recorded states, 5.32M of their 41.9M kg, and Malawi 8 plot-crops
-    (3,725 kg); no other country records a state (measured 2026-11-04, GH #1460).
+    two or more recorded states, 5.32M of their 41.9M kg, Malawi 8 plot-crops
+    (3,725 kg) and Niger 1 (400 kg, 2021-22); no other country serves a state yet,
+    though Benin, Burkina Faso, Cote d'Ivoire, Guinea-Bissau, Mali, Senegal and Togo
+    record one (measured 2026-11-04, GH #1460, #1436).
     Read such a row as mass as harvested, not as a dry weight.
     :func:`harvest_kg_factors` gives the row-level factors for a caller who keeps
     the states apart.
