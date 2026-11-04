@@ -5288,6 +5288,8 @@ _NITROGEN_CONTENT = {
     'nps': 0.19,          # Ethiopia, 19-38-0+7S (IFDC/AFAP 2018 Table 1)
     'd compound': 0.08,   # Malawi, 8% N (IFDC proposed regs 2003;
                           # IFDC/AFAP 2018; MoA Guide 2020)
+    'npk 23:21:0+4s': 0.23,  # Malawi, Chitowe (IFDC proposed regs 2003 ex. 3;
+                             # IFDC/AFAP 2018 Table 1; FAO & GoM 2018 p. IX)
 }
 
 
@@ -5356,7 +5358,9 @@ def _normalise_input_label(label):
     (``organic`` is not a key, and the organic refusal above is deliberate,
     GH #867), while ``D Compound Fertilizer`` resolves through the strip rule
     to ``d compound`` and Ethiopia's ``NPS`` to ``nps`` -- both keyed with
-    cited shares since GH #867.  ``Super D Compound`` or ``NPSB`` would not.
+    cited shares since GH #867 -- and Malawi's ``NPK 23:21:0+4S Fertilizer``
+    to ``npk 23:21:0+4s`` (GH #1106), never to the shared ``npk``.  ``Super D
+    Compound`` or ``NPSB`` would not.
 
     Measured over the 11 warm ``plot_inputs`` tables (2026-09-09): the strip
     rule is what Malawi needs (53,210 rows across NPK / Urea / CAN / DAP
@@ -5555,10 +5559,14 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
     (0.08) carry CITED shares -- publisher, document and table are in the
     comment above :data:`_NITROGEN_CONTENT`; D Compound's 0.08 diverges
     from the WB panel's uncited 0.07 and EPAR's 0.10 (Zimbabwe's and
-    Zambia's Compound D grades).  Organic inputs (manure, compost,
-    organic fertilizer, in every corpus language) are REFUSED a share:
-    they stay unmatched, are counted on ``refused_organic_*``, and are
-    named in the warning as a refusal, not a gap.
+    Zambia's Compound D grades).  Malawi's ``NPK 23:21:0+4S Fertilizer``
+    (0.23, GH #1106) is Module D type code 1, whose source label in every
+    wave is ``23:21:0+4S/CHITOWE``; its citation is on its own map entry, and
+    the shared ``npk`` key stays NPK 17-17-17 for every other country.
+    Organic inputs (manure, compost, organic fertilizer, in every corpus
+    language) are REFUSED a share: they stay unmatched, are counted on
+    ``refused_organic_*``, and are named in the warning as a refusal, not a
+    gap.
     Divergence from WB: the WB code keys N-share off the *product* a survey
     records (urea 0.46, DAP 0.18, NPK 0.17, …).  The UNPS questionnaire (and
     therefore our ``plot_inputs.input``) records only nutrient *class*, so we
@@ -6857,10 +6865,10 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
           ``Fertilizer_kg_per_ha``.  Note this covers the INORGANIC
           vocabulary only: ``_NITROGEN_CONTENT``'s keys are the nutrient
           classes (nitrate / phosphate / potash / mixed), the product
-          names (urea, CAN, SA, DAP, NPK, TSP, SSP, MOP) and two cited
-          blends (Ethiopia NPS, Malawi D Compound; GH #867) -- manure and
-          other organic inputs are refused a key (GH #867) and contribute
-          nothing to either basis.
+          names (urea, CAN, SA, DAP, NPK, TSP, SSP, MOP) and three cited
+          blends (Ethiopia NPS, Malawi D Compound, GH #867; Malawi NPK
+          23:21:0+4S, GH #1106) -- manure and other organic inputs are
+          refused a key (GH #867) and contribute nothing to either basis.
     area_col : str, default 'Area'
         Plot-area column in ``plot_features``.
     volume_as_mass : bool, default True

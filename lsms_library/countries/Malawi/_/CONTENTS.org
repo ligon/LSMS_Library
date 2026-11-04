@@ -4057,6 +4057,9 @@ Module D's two inorganic-fertilizer slots carry type codes 1-6 (=NPK=, =DAP=,
     panel and EPAR credit code 1 at 0.23.  On 1,600,479 kg of NPK product,
     0.17 gives 272,081.4 kg N and 0.23 would give 368,110.2.  The map has no
     country axis, so this is a design decision, drafted as a new issue.
+    *Resolved 2026-11-03 (GH #1106, ruling @ligon):* code 1 is now served as =NPK 23:21:0+4S Fertilizer=, and =transformations._NITROGEN_CONTENT= keys that product at 0.23; the shared =npk= key stays 0.17 for every other country.
+    Every Module D source the build reads (six files across the four waves, both type slots), and the unread 2010-11 Panel file, labels code 1 =23:21:0+4S/CHITOWE=, so no wave needed a different label.
+    Measured after the #1111 kg corrections, on 26,602 rows and 1,381,043.4 kg of product: code-1 nitrogen 234,777.4 -> 317,640.0 kg, Malawi 832,835.0 -> 915,697.6 kg (+82,862.6, +9.9%).  The 1,600,479 kg and +96,029 kg above predate #1111.
   - *=Organic Fertilizer= (11,075 rows) is refused a share* by the same ruling, and is named in =NutrientCoverageWarning= as a refusal.
     *Source correction, 2026-10-21 (GH #1109)*: the earlier statement "Module D records no organic quantity" was false.
     All seven held Module D headers label =ag_d37a= quantity applied and =ag_d37b= unit; the library had left these fields unmaterialized, although the survey asked them.
