@@ -2575,7 +2575,8 @@ Read-only measurement: nothing is wired and no served value moved.
 - npk 15/15= (2011-12; the questionnaire asks "How much NPK(15/15)") and
 =Engrais inorganiques - NPK 15/15= (2014-15; its questionnaire prints =NPK
 (15/15/15)=).  Both EHCVM waves label code 5 =Engrais inorganiques - NPK/Formule
-unique=, with no grade.  All three map to =NPK= (0.17 N).
+unique=, with no grade.  All three map to =NPK= (0.17 N).  [Since GH #1445 the two
+ECVMA labels are =NPK 15-15-15=; see "plot_inputs: ECVMA's NPK" below.]
 
 *A finding that contradicts this file.*  "Oversamples and sub-populations" above
 says "no source consulted states whether the allocation across them was
@@ -2669,6 +2670,36 @@ second entry holds a price.  That was the record's only price, so it is no longe
 served and no row says so; the deletion entry is the disclosure.  The 5 (t, v, j, u)
 cells that vanish were held only by a second entry, 12 of whose slots conflict on
 the unit code alone.
+
+* 2026-11-04 -- plot_inputs: ECVMA's NPK is NPK 15-15-15 (GH #1445)
+
+*RULED (@ligon, 2026-11-04, option A).*  Code 5 of the two ECVMA input rosters is
+served as =NPK 15-15-15=, read at 0.15 N by a graded key in
+=transformations._NITROGEN_CONTENT=, the #1106 pattern.  The 2014-15 questionnaire
+(=ecvma2_quest_agr_p1.pdf=, PDF pp. 11, 17) prints =NPK (15/15/15)= and =NPK 15/15/15=;
+2011-12 says only =NPK(15/15)= and =NPK 15/15=, so 15-15-15 there is a reading of the
+same slot in the same programme.  EHCVM's =NPK/Formule unique= states no grade in any
+held document and stays =NPK= at the map's nominal 0.17, which is a default.
+
+*Idiosyncrasy: the =input= axis now splits across the programmes.*  A cross-wave
+filter on =input == 'NPK'= finds only 2018-19 and 2021-22 (218 and 219 rows);
+=NPK 15-15-15= only 2011-12 and 2014-15 (253 and 248).  The two labels are the same
+code 5, and may be the same product; nothing held says.
+
+*Measured, =nitrogen_kg= by wave, kg N, on one cold build:*
+
+| wave    | at 0.17 (before) | at 0.15 (with the key) |   change |     % | relabel, no key |      % |
+|---------+------------------+------------------------+----------+-------+-----------------+--------|
+| 2011-12 |        13,588.78 |              13,154.18 |  -434.60 | -3.20 |        9,894.68 | -27.18 |
+| 2014-15 |         6,988.22 |               6,841.04 |  -147.18 | -2.11 |        5,737.18 | -17.90 |
+| 2018-19 |        19,948.94 |              19,948.94 |        0 |     0 |       19,948.94 |      0 |
+| 2021-22 |        11,613.62 |              11,613.62 |        0 |     0 |       11,613.62 |      0 |
+
+*The relabel and the key go together.*  =_NITROGEN_CONTENT= matches exactly, so
+without the key the 501 rows match nothing, =nitrogen_kg= loses 247 of its 1,380
+plot rows, and the label has none of the stems =_warn_nitrogen_coverage= looks for:
+the nitrogen leaves with no warning, only a line in =attrs['nitrogen_input_match']=.
+Pinned by =tests/test_niger_npk_grade.py=.
 
 * 2026-11-04 -- 2021-22 documents held; recall read from the instrument (GH #1084, #1483, #650)
 

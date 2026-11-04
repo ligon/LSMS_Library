@@ -232,9 +232,10 @@ Data Scheme:
   plot_inputs:
     # Item-level agricultural inputs (GAP 2, parity loop 2026-06-14).  One
     # row per REPORTED input applied by a household in a wave: input
-    # identity (Seed / Urea / DAP / NPK / Phosphate / Mixed fertilizer /
-    # Organic manure / Organic compost / Pesticide / Herbicide / Fungicide
-    # / Other phytosanitary), reported quantity used + native unit,
+    # identity (Seed / Urea / DAP / NPK (EHCVM) / NPK 15-15-15 (ECVMA, GH #1445)
+    # / Phosphate / Mixed fertilizer / Organic manure / Organic compost /
+    # Pesticide / Herbicide / Fungicide / Other phytosanitary), reported
+    # quantity used + native unit,
     # purchased flag + reported purchased quantity, and (seed rows) the
     # seed's crop on the shared harmonize_food labels.  REPORTED values
     # only: seed_kg / nitrogen_kg / inorganic_fertilizer any-use flags /

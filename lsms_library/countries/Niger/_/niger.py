@@ -694,9 +694,10 @@ def _finish_crop_production(df, t):
 # ---------------------------------------------------------------------------
 #
 # One row per REPORTED agricultural input applied by a household in a wave:
-# its harmonized input identity (Seed / Urea / DAP / NPK / Phosphate / Mixed
-# fertilizer / Organic manure / Organic compost / Pesticide / Herbicide /
-# Fungicide / Other phytosanitary), reported quantity used + native unit, the
+# its harmonized input identity (Seed / Urea / DAP / NPK (EHCVM) / NPK 15-15-15
+# (ECVMA, GH #1445) / Phosphate / Mixed fertilizer / Organic manure / Organic
+# compost / Pesticide / Herbicide / Fungicide / Other phytosanitary), reported
+# quantity used + native unit, the
 # purchased flag + reported purchased quantity, and — for seed rows — the
 # seed's crop (on the shared harmonize_food labels).  No aggregation: every
 # reported input line is kept.  seed_kg, nitrogen_kg, inorganic_fertilizer
