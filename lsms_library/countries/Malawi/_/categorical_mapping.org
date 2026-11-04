@@ -849,23 +849,26 @@
 # 20 / 30 are synthetic for the two inputs the survey records without a
 # type code: organic fertilizer (ag_d36 Yes/No) and seed planted (Module
 # G ag_g04a).  Stable across the four IHS3+/IHPS waves (2010-11, 2013-14,
-# 2016-17, 2019-20), so no per-wave column is needed.
+# 2016-17, 2019-20), so no per-wave column is needed.  Code 1's source label
+# is 23:21:0+4S/CHITOWE in every wave and both slots, so the label names that
+# product rather than a generic NPK: transformations._NITROGEN_CONTENT keys it
+# at 0.23 N, not the shared 'npk' 0.17 (GH #1106; see _/CONTENTS.org).
 #+name: harmonize_input
-| Code | Preferred Label       |
-|------+-----------------------|
-|    1 | NPK Fertilizer        |
-|    2 | DAP Fertilizer        |
-|    3 | CAN Fertilizer        |
-|    4 | Urea Fertilizer       |
-|    5 | D Compound Fertilizer |
-|    6 | Other Fertilizer      |
-|    7 | Insecticide           |
-|    8 | Herbicide             |
-|    9 | Fungicide             |
-|   10 | Fumigant              |
-|   11 | Other Pesticide       |
-|   20 | Organic Fertilizer    |
-|   30 | Seed                  |
+| Code | Preferred Label           |
+|------+---------------------------|
+|    1 | NPK 23:21:0+4S Fertilizer |
+|    2 | DAP Fertilizer            |
+|    3 | CAN Fertilizer            |
+|    4 | Urea Fertilizer           |
+|    5 | D Compound Fertilizer     |
+|    6 | Other Fertilizer          |
+|    7 | Insecticide               |
+|    8 | Herbicide                 |
+|    9 | Fungicide                 |
+|   10 | Fumigant                  |
+|   11 | Other Pesticide           |
+|   20 | Organic Fertilizer        |
+|   30 | Seed                      |
 
 # harmonize_species: livestock-species identity for the livestock feature
 # (GAP 4).  Code-keyed map for the Module R livestock-roster animal code
