@@ -2062,10 +2062,12 @@ def _declared_no_kg_mask(df, no_kg, item_col='j'):
 #: the wave would add the ``t`` axis the factor deliberately lacks.  It returns
 #: those rows to their ``f6ed07ae9`` factors (the largest group is Togo's
 #: ``Unité``: 8,599 rows, 2.03x).
-#: Against ``ehcvm_nsu``, which covers Niger, Senegal, Burkina and Mali, that is
-#: close to neutral: median error unchanged in five of the six cells that move
-#: and 0.024 worse in the sixth, with within-1.5x up in four cells and unchanged
-#: in two.  Togo, Benin, Guinea-Bissau and CotedIvoire ship no such table.
+#: Against ``ehcvm_nsu``, held for Niger, Senegal, Burkina and Mali, the evidence
+#: is mixed and small: median error unchanged in five of the six cells that move
+#: and 0.024 worse in the sixth, within-1.5x up in four cells and unchanged in two,
+#: and more rows worse than better in four of the six (Niger 2021-22: 503 against
+#: 80).  The repository holds no such weights for Togo, Benin, Guinea-Bissau or
+#: CotedIvoire, so their rows, Togo's among them, are unscored.
 #:
 #: WHY A VOCABULARY AND NOT THE SHAPE OF THE LABEL.  A trailing parenthesis is
 #: not a size, and no test on the shape separates the two in this corpus: it
