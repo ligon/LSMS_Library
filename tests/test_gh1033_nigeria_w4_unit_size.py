@@ -9,7 +9,8 @@ served ``small`` whatever its size said, and SMALL is the recorded size on 42.3%
 ``SACHET``.
 
 Ruling (@ligon 2026-11-04): combine the code with the size column, onto W3's
-small / medium / large, and decode the two rounds separately.
+small / medium / large, and decode the two rounds separately.  Each round reads
+its own columns; PH's 40 and 120 land on W3's names (fold ruling, 2026-11-04).
 
 Three tiers: the table and the rule (no data), the builder on synthetic rows (no
 data), and a guardrail on the built table whose oracle reads the round's ``.dta``
@@ -30,10 +31,9 @@ from lsms_library.yaml_utils import load_yaml
 
 NIGERIA = countries_root() / 'Nigeria'
 W4 = ('2018Q3', '2019Q1')
-SIZED = {20: 'congo', 30: 'mudu', 50: 'tiya', 60: 'kobiowu', 70: 'bowl',
-         80: 'piece', 90: 'heap', 100: 'bunch', 110: 'stalk'}
-OWN_LABEL = {'2018Q3': {40: 'derica', 120: 'packet/sachet'},
-             '2019Q1': {40: 'derica/tin', 120: 'sachet'}}
+SIZED = {20: 'congo', 30: 'mudu', 40: 'derica', 50: 'tiya', 60: 'kobiowu',
+         70: 'bowl', 80: 'piece', 90: 'heap', 100: 'bunch', 110: 'stalk',
+         120: 'packet/sachet'}
 SIZE_WORD = {0: 'small', 1: 'medium', 2: 'large', 3: 'very large'}
 
 
@@ -59,7 +59,7 @@ def u_table():
 @pytest.mark.parametrize('t', W4)
 def test_no_w4_label_asserts_a_size(nigeria, t):
     labels = nigeria.food_unit_labels(t)
-    for code, base in {**SIZED, **OWN_LABEL[t]}.items():
+    for code, base in SIZED.items():
         assert labels[code] == base
 
 
@@ -73,10 +73,17 @@ def test_w3s_size_variants_are_not_w4_codes(nigeria, t):
 
 def test_w4_rounds_read_their_own_columns(nigeria):
     pp, ph = (nigeria.food_unit_labels(t) for t in W4)
-    assert pp[40] != ph[40] and pp[120] != ph[120]
     # 14, 250, 300 and 340 are on PP's value labels and not PH's.
     for code in (14, 250, 300, 340):
         assert code in pp and code not in ph
+
+
+def test_ph_names_land_on_w3s_unit(nigeria):
+    """PH's DERICA/TIN and SACHET are W3's derica and packet/sachet (fold ruling).
+    A PH spelling of its own left inferred rows in cells no other wave shares."""
+    pp, ph = (nigeria.food_unit_labels(t) for t in W4)
+    assert ph[40] == pp[40] == 'derica'
+    assert ph[120] == pp[120] == 'packet/sachet'
 
 
 def test_w3_keeps_its_sized_codes(nigeria):
@@ -86,12 +93,13 @@ def test_w3_keeps_its_sized_codes(nigeria):
             'small congo', 'large congo', 'medium derica')
 
 
-def test_composed_pp_labels_are_w3s_spelling(nigeria, u_table):
-    """Every (code, size) pair W4-PP records lands on a label of W3's column."""
+@pytest.mark.parametrize('t', W4)
+def test_composed_labels_are_w3s_spelling(nigeria, u_table, t):
+    """Every (code, size) pair W4 records lands on a label of W3's column."""
     observed = {20: (0, 2), 30: (0, 2), 40: (0, 1, 2, 3), 50: (0, 1, 2),
                 60: (0, 1, 2), 70: (0, 1, 2), 80: (0, 1, 2), 90: (0, 1, 2),
                 100: (0, 1, 2), 110: (0, 1, 2), 120: (0, 1, 2)}
-    labels = nigeria.food_unit_labels('2018Q3')
+    labels = nigeria.food_unit_labels(t)
     w3 = set(u_table['2015-16'])
     for code, sizes in observed.items():
         for size in sizes:
@@ -107,11 +115,11 @@ def test_composed_pp_labels_are_w3s_spelling(nigeria, u_table):
     (90., 1., 'medium heap'),
     (90., 0., 'small heap'),
     (20., 2., 'large congo'),
-    (40., 3., 'very large derica/tin'),
-    (120., 0., 'small sachet'),
+    (40., 3., 'very large derica'),
+    (120., 0., 'small packet/sachet'),
     (80., np.nan, 'piece'),          # the unit is recorded, its size is not
-    (120., 30., 'sachet'),           # 30. 20 GRAMS is not an ordinal size
-    (120., 55., 'sachet'),           # 55. 400 GRAMS (100 CUBES)
+    (120., 30., 'packet/sachet'),    # 30. 20 GRAMS is not an ordinal size
+    (120., 55., 'packet/sachet'),    # 55. 400 GRAMS (100 CUBES)
     (90., 99., 'heap'),              # 99. ONE SIZE ONLY
     (200., 0., 'Loaf'),              # W3 has no sized loaf
     (130., 11., 'Sack/Bag'),         # 11. 50 KG
@@ -234,11 +242,11 @@ def _oracle_counts(t):
     words = {'0. SMALL': 'small', '1. MEDIUM': 'medium', '2. LARGE': 'large',
              '3. VERY LARGE': 'very large'}
     bases = {'20. CONGO': 'congo', '30. MUDU': 'mudu', '40. DERICA': 'derica',
-             '40. DERICA/TIN': 'derica/tin', '50. TIYA': 'tiya',
+             '40. DERICA/TIN': 'derica', '50. TIYA': 'tiya',
              '60. KOBIOWU': 'kobiowu', '70. BOWL': 'bowl', '80. PIECE': 'piece',
              '90. HEAP': 'heap', '100. BUNCH/BUNDLE': 'bunch',
              '110. STALK': 'stalk', '120. PACKET/SACHET': 'packet/sachet',
-             '120. SACHET': 'sachet'}
+             '120. SACHET': 'packet/sachet'}
     counts = {}
     for s, q, unit, size in (('purchased', '9a', '9b', '9c'),
                              ('produced', '6a', '2b', '2c'),

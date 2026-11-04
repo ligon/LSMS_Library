@@ -45,9 +45,10 @@ collapse (mapping.stamp_w4_last_purchase_window).
 GH #1033: W4 asks a unit's size in its own column (q2c beside q2b, q9c beside
 q9b), where W3 printed it in the unit code.  The `size` entries below are what
 gives W3's sized units (heap, mudu, piece, ...) the size the row records; see
-nigeria.sized_food_unit.  Each round reads its own column of the `u` table,
-because their labels differ: PP 40 DERICA, 120 PACKET/SACHET; PH 40 DERICA/TIN,
-120 SACHET.
+nigeria.sized_food_unit.  Each round reads its own column of the `u` table.  Their
+value labels differ on 40 and 120 (PP DERICA, PACKET/SACHET; PH DERICA/TIN,
+SACHET), and both are served W3's name, because the survey's own factors treat
+them as one unit.  They also differ on 14, 250, 300 and 340, on PP's labels only.
 """
 import sys
 

@@ -3559,9 +3559,9 @@ def food_unit_labels(t):
     """``{raw code: label}`` for the food-module unit codes of round ``t``.
 
     Read from the ``u`` table in ``categorical_mapping.org``: the column named
-    ``t`` where the rounds of a wave have their own (W4, whose two rounds label
-    codes 40 and 120 differently, GH #1033), otherwise the column named by
-    :func:`round_wave`.  NOT from its Preferred Label column, which records
+    ``t`` where the rounds of a wave have their own (W4, whose value labels
+    differ on 14, 40, 120, 250, 300 and 340, GH #1033), otherwise the column named
+    by :func:`round_wave`.  NOT from its Preferred Label column, which records
     only the W3 meaning of a colliding code (GH #607).  Keys are registered as
     int, int-string and float-string (``4``, ``'4'``, ``'4.0'``) because the
     CSV sources arrive as floats.  Codes the column marks ``---`` are absent,
@@ -3588,10 +3588,11 @@ def food_unit_labels(t):
 # These are the W4 codes the `u` table used to label W3's `small ...`, whatever
 # the row's size said.  `food_unit_labels` gives each its size-less label, and
 # `sized_food_unit` prefixes the size the row records, in W3's own spelling (GH
-# #1033).  Every (code, size) pair W4 records among these lands on a W3 label;
-# PH's 40 and 120 keep PH's wider or narrower name.  They are not every unit W3
-# sizes: its card also has 130-132 Sack/Bag, 140-142 Basket, 150-152 Basin and
-# 160-162 Bundle, and W4's Basin and Basket keep a plain label for now (CONTENTS.org).
+# #1033).  Every (code, size) pair W4 records among these lands on a W3 label,
+# PH's 40 DERICA/TIN and 120 SACHET included: the survey's own factors treat each
+# as W3's unit.  They are not every unit W3 sizes: its card also has 130-132
+# Sack/Bag, 140-142 Basket, 150-152 Basin and 160-162 Bundle, and W4's Basin and
+# Basket keep a plain label by ruling (CONTENTS.org).
 W4_SIZED_UNIT_CODES = frozenset((20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120))
 _FOOD_UNIT_SIZES = {0: 'small', 1: 'medium', 2: 'large', 3: 'very large'}
 

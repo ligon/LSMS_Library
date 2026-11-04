@@ -350,7 +350,7 @@
 |   21 | large congo                  | Basket Small                 | ---                          | large congo                  | ---                          | ---                          |
 |   30 | small mudu                   | ---                          | ---                          | small mudu                   | mudu                         | mudu                         |
 |   31 | large mudu                   | Basin Small                  | ---                          | large mudu                   | ---                          | ---                          |
-|   40 | small derica                 | ---                          | ---                          | small derica                 | derica                       | derica/tin                   |
+|   40 | small derica                 | ---                          | ---                          | small derica                 | derica                       | derica                       |
 |   41 | medium derica                | Bunch Small                  | ---                          | medium derica                | ---                          | ---                          |
 |   42 | large derica                 | Bunch Medium                 | ---                          | large derica                 | ---                          | ---                          |
 |   43 | very large derica            | Bunch Big                    | ---                          | very large derica            | ---                          | ---                          |
@@ -375,7 +375,7 @@
 |  110 | small stalk                  | ---                          | ---                          | small stalk                  | stalk                        | stalk                        |
 |  111 | medium stalk                 | ---                          | ---                          | medium stalk                 | ---                          | ---                          |
 |  112 | large stalk                  | ---                          | ---                          | large stalk                  | ---                          | ---                          |
-|  120 | small packet/sachet          | ---                          | ---                          | small packet/sachet          | packet/sachet                | sachet                       |
+|  120 | small packet/sachet          | ---                          | ---                          | small packet/sachet          | packet/sachet                | packet/sachet                |
 |  121 | medium packet/sachet         | ---                          | ---                          | medium packet/sachet         | ---                          | ---                          |
 |  122 | large packet/sachet          | ---                          | ---                          | large packet/sachet          | ---                          | ---                          |
 |  900 | other specify                | ---                          | ---                          | other specify                | other specify                | other specify                |

@@ -327,19 +327,35 @@ and size columns.
 
 *What the code does.*  The =u= table's =2018-19= column is now =2018Q3= and
 =2019Q1=, holding size-less labels (=food_unit_labels= reads a round's own column
-where it has one).  The rounds differ on 40 (=derica=, =derica/tin=) and 120
-(=packet/sachet=, =sachet=); codes 14, 250, 300 and 340 are on PP's value labels
-only.  W3's size-variant codes (21, 41-43, ...) are =---=: W4 records none of them
-in any row.  =nigeria.sized_food_unit= prefixes the recorded size for the eleven
+where it has one).  Codes 14, 250, 300 and 340 are on PP's value labels only.  W3's
+size-variant codes (21, 41-43, ...) are =---=: W4 records none of them in any row.
+=nigeria.sized_food_unit= prefixes the recorded size for the eleven
 codes the old column labelled =small= (=W4_SIZED_UNIT_CODES=: 20, 30, 40, 50, 60,
 70, 80, 90, 100, 110, 120).  =purchased= reads q9c beside q9b; =produced= and
 =inkind= read q2c beside q2b.  W1-W3 name no size column and are untouched.
 
 Every (code, ordinal size) pair W4 records lands on a W3 label: congo and mudu
 carry only SMALL and LARGE in both waves, and only derica carries VERY LARGE.
-The exceptions are PH's own names, =small derica/tin= and =small sachet=, which
-the ruling's per-round decode is there to keep.  Code 100 is =BUNCH/BUNDLE= in
-both W4 rounds and is served W3's =bunch=, as it was.
+Code 100 is =BUNCH/BUNDLE= in both W4 rounds and is served W3's =bunch=, as it was.
+
+*PH's 40 and 120 are served W3's names (ruling @ligon, 2026-11-04).*  PH labels them
+=40. DERICA/TIN= and =120. SACHET=; PP labels them =40. DERICA= and =120.
+PACKET/SACHET=.  Both rounds serve =derica= and =packet/sachet=.  "Decode separately"
+stands: each round still reads its own code and size columns and its own =u= column.
+The survey's own factors treat each pair as one unit: on code 40 the PH / PP =cvn=
+ratio has a median of 1.000 over 78 item-size cells, 83% within 1%, and on code 120
+all 9 cells are exact, with both rounds matching W3's table.  PH spellings of its own
+isolated PH's rows with no =cvn= in cells no other wave shares.  Scored against W4's
+survey median for that size and unit, on 42 such rows (independent review, simulated):
+
+| | median log error | within 2x | no factor |
+|-+-+-+-|
+| old labels | 0.693 | 21.4% | 0 |
+| PH's own names | 1.605 | 0% | 6 |
+| W3's names | 0.681 | 83.3% | 0 |
+
+It is not uniformly better: 6 =large derica= rows in 2019Q1 get 0.32 kg against a
+survey median of 1.077, which is 3.4x under where PH's own name was 2.4x over.
 
 | recorded size on those codes | 2018Q3 | 2019Q1 | served |
 |-+-+-+-|
@@ -348,7 +364,7 @@ both W4 rounds and is served W3's =bunch=, as it was.
 | 2. LARGE | 7,802 | 8,277 | =large heap= |
 | 3. VERY LARGE (derica only) | 40 | 38 | =very large derica= |
 | blank | 1,947 | 1,448 | =heap=, the unit with no size claim; not =Unknown=, since the unit is recorded |
-| a metric size (PH 120 only: =30. 20 GRAMS= ... =55. 400 GRAMS (100 CUBES)=) | 0 | 5,399 | =sachet=; see below |
+| a metric size (PH 120 only: =30. 20 GRAMS= ... =55. 400 GRAMS (100 CUBES)=) | 0 | 5,399 | =packet/sachet=; see below |
 | total | 48,305 | 50,181 | |
 
 The survey's own factor corroborates the mapping: the median =s7bq9_cvn= /
@@ -373,13 +389,13 @@ non-purchased rows change value (net +0.9%, gross 9.4%), and 203 fall from
 |-+-+-+-+-|
 | 2010Q3 | 191,605.38 | 191,707.15 | +101.77 | 0 |
 | 2011Q1 | 245,539.34 | 245,539.34 | 0 | 0 |
-| 2012Q3 | 189,159.48 | 189,161.07 | +1.59 | 0 |
-| 2013Q1 | 147,521.76 | 147,522.91 | +1.15 | 0 |
-| 2015Q3 | 119,978.53 | 119,912.62 | -65.91 | 8 =item_unit= -> =unit= |
-| 2016Q1 | 108,084.78 | 108,061.82 | -22.96 | 7 =item_unit= -> =unit= |
-| 2018Q3 | 251,192.58 | 251,251.11 | +58.52 | 21 =unit= -> =item_unit= |
-| 2019Q1 | 214,012.17 | 214,099.30 | +87.14 | 2 =item_unit= and 4 =unit= -> =none= |
-| total | 1,467,094 | 1,467,255 | +160.2 | |
+| 2012Q3 | 189,159.48 | 189,161.44 | +1.96 | 0 |
+| 2013Q1 | 147,521.76 | 147,523.16 | +1.40 | 0 |
+| 2015Q3 | 119,978.53 | 119,918.91 | -59.62 | 8 =item_unit= -> =unit= |
+| 2016Q1 | 108,084.78 | 108,067.75 | -17.03 | 7 =item_unit= -> =unit= |
+| 2018Q3 | 251,192.58 | 251,251.19 | +58.60 | 21 =unit= -> =item_unit= |
+| 2019Q1 | 214,012.17 | 214,079.90 | +67.73 | 1 =item_unit= -> =unit= |
+| total | 1,467,094 | 1,467,249 | +154.8 | |
 
 =survey_kg= (168,441 rows, 457,808 kg) and =metric= do not move.  *W1-W3 kilograms
 move although their rows do not*: the inferred factor has no =t= axis (the same
@@ -388,14 +404,14 @@ sit in cells shared with other waves.  2010Q3's +101.77 is all =piece=, W1-PP's 
 label, which W4's blank-size pieces now share; W3's moves are in =small heap=,
 =small piece= and their neighbours, whose W4 peers have left for =medium= and
 =large=.  So "others must not move" holds for their rows and =u=, but not for their
-inferred kilograms: row by row, 35,856 of the 425,547 W1-W3 rows of
-=food_quantities(units='kgs')= change value (2010Q3 3,785, 2012Q3 156, 2013Q1 169,
-2015Q3 16,533, 2016Q1 15,213, 2011Q1 0), gross 411.86 kg of 1.02M, at most 0.14% of
-a round.  Most by a sliver (2015Q3 p10 / p50 / p90 0.94 / 0.999 / 1.009); 577 rows
-move by more than 10% and 53 by more than 25%.
+inferred kilograms: row by row, 35,928 of the 426,219 W1-W3 rows change kilograms
+(2010Q3 3,785, 2012Q3 156, 2013Q1 169, 2015Q3 16,578, 2016Q1 15,240, 2011Q1 0), gross
+408.51 kg of 1.00M, at most 0.14% of a round.  Most by a sliver (2015Q3 p10 / p50 /
+p90 0.94 / 0.999 / 1.009); 577 rows move by more than 10% and 53 by more than 25%.
 
 *That movement is a cost, not a correction.*  Scored against W3's own table on the
-30,900 moved rows with a key (independent review, 2026-11-04): median log error
+30,900 moved rows with a key (independent review, 2026-11-04, before the PH fold,
+which moves the gross by 3 kg): median log error
 1.235 -> 1.218, mean 1.297 -> 1.301, within 2x 6.7% -> 6.0%, better 48.9%, worse
 51.1%.  By size, =small= is 88% worse, =medium= 98.6% better and =large= 83% better:
 W4's medium and large rows had been pulling a too-low =small= factor up by accident.
@@ -406,37 +422,32 @@ fall a rung, and the one such cell with a key clearly worsens: Salt =small bowl=
 rows.
 
 *W4's per-kg prices on inferred rows.*  Only rows with no =*_cvn= are affected: a
-factor changes on 357 (2018Q3) and 146 (2019Q1) of W4's 169,506 rows, 276 and 78 of
+factor changes on 357 (2018Q3) and 145 (2019Q1) of W4's 169,506 rows, 276 and 77 of
 them priced purchases.  A medium or large row used to get the =small= cell's factor,
 and now gets its own size's cell, thin as that is:
 
 | size | rows, 2018Q3 / 2019Q1 | kg, 2018Q3 | kg, 2019Q1 | median price after / before, priced rows |
 |-+-+-+-+-|
-| small | 90 / 60 | 88.8 -> 90.2 | 18.7 -> 20.4 | 1.03 / 1.00 |
-| medium | 103 / 58 | 49.8 -> 89.5 | 38.1 -> 109.5 | 0.32 / 0.46 |
-| large | 30 / 28 | 29.8 -> 28.1 | 16.9 -> 30.9 | 0.38 / 0.55 |
+| small | 90 / 59 | 88.8 -> 90.2 | 18.7 -> 17.7 | 1.03 / 1.01 |
+| medium | 103 / 58 | 49.8 -> 89.5 | 38.1 -> 108.7 | 0.32 / 0.51 |
+| large | 30 / 28 | 29.8 -> 28.2 | 16.9 -> 15.0 | 0.38 / 0.55 |
 | size-less or other | 134 / 0 | 73.7 -> 92.7 | | 0.99 / |
 
 Summed kgvalue is a tail statistic, so its fall says little about a typical row.
-- 2018Q3 goes 1,563,507 -> 406,544, but the median changed row is x0.991 and the top
-  5 rows are 58% of the gross move.  12 Baby milk powder rows go 1,036,894 -> 45,609,
+- 2018Q3 goes 1,563,507 -> 405,545, but the median changed row is x0.991 and the top
+  5 rows are 58% of the gross move.  12 Baby milk powder rows go 1,036,894 -> 45,437,
   which is 86% of the net fall: their factor goes 0.011 -> 0.293 kg, where W3's milk
   powder table reads 0.012 / 0.4 / 0.9.  Without that cell the sum goes 526,613 ->
-  360,935.  Rows above N50,000/kg go 8 -> 0.
-- 2019Q1 goes 164,648 -> 49,862, with a median changed row of x0.552 and the top 5
-  rows 55% of the gross move.  Much of that fall comes from PH's thin own-name cells.
+  360,108.  Rows above N50,000/kg go 8 -> 0.
+- 2019Q1 goes 162,773 -> 109,325, with a median changed row of x1.012 and the top 5
+  rows 51% of the gross move.
 - Against each label's W4 survey median, a weak key because it ignores the item
-  (independent review): 2018Q3 median log error 0.644 -> 0.575, over 5x 21.8% ->
-  5.4%; 2019Q1 0.845 -> 0.981, within 2x 31.0% -> 15.8%.  So 2019Q1 gets worse as
-  built.
+  (independent review, simulated): 2018Q3 median log error 0.644 -> 0.575, over 5x
+  21.8% -> 5.4%; 2019Q1 0.845 -> 0.773, within 2x 31.0% -> 35.7%, over 5x 1.8%.
 
-6 2019Q1 =medium derica/tin= rows find no factor and are served =none= (0.96 kg
-before), because that spelling is PH's alone.  Carrying a native quantity, they make
-=food_quantities(units='kgs')= read +95.14 for 2019Q1 where the kg column above reads
-+87.14.
-
-*Not changed*: other W4 codes that carry a size keep their plain label.  They were
-never served a false size, which is the defect the ruling addressed.  Ordinal sizes,
+*Not changed, by ruling (@ligon, 2026-11-04)*: other W4 codes that carry a size keep
+their plain label, as do the 5,399 metric-size =packet/sachet= rows.  They were never
+served a false size, which is the defect the ruling addressed.  Ordinal sizes,
 rows 2018Q3 / 2019Q1: =Loaf= 3,215 / 3,340, =Tuber= 556 / 2,552, =Wrap= 25 / 2,897,
 =Sachet= 297 / 0, =Packet= 14 / 157, =Basin= 47 / 133, =other specify= 55 / 23,
 =Slice= 16 / 0, =Basket= 9 / 1, =Shot= 3 / 0.  Metric sizes: =Bottle/Can= 3,881 /
@@ -446,11 +457,11 @@ W3 has a sized form for some of these.  Its PH card (=s10bq2b=) has 130-132 Sack
 140-142 Basket, 150-152 Basin and 160-162 Bundle, and W3's rows use 131, 150, 151 and
 152.  W4's =Basin= rows carry =cvn= 12.5 / 28.0 / 46.0 by size, all served =Basin=, so
 that pool mixes three sizes.  It has no sized form for the W4-only =Loaf=, =Tuber=,
-=Wrap=, =Packet=, =Slice= or =Shot=.  All of this, and the 5,399 =sachet= rows, is one
-residual.  A metric size in a label would also feed
-=transformations._parse_explicit_metric=, which is a different decision from the one
-ruled here (compare GH #1035, where a stated weight was wrong by a median 31x on
-count rows).
+=Wrap=, =Packet=, =Slice= or =Shot=.  On a metric size the survey's factor already
+equals the stated size (p10 = p90 in every cell, bar two cube sizes), so what stays
+pooled is native-unit price, not kilograms.  A metric size in a label would also feed
+=transformations._parse_explicit_metric= (compare GH #1035, where a stated weight was
+wrong by a median 31x on count rows).
 
 ** A blank unit code is =Unknown=, not ='None'= (GH #1041, 2026-10-18)
 
