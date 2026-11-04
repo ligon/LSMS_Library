@@ -4910,12 +4910,16 @@ stays blank, a recorded 0 stays 0, two lines of one species add.
 the six Module R files directly finds 0 repeated (household, code) and 0
 repeated (household, species), raw or kept, in any wave or half.
 
-*A blank here is an unanswered cell, not a skip.*  =ag_r02=, =ag_r10= and
-=ag_r16= are asked directly ("How many ...", per the Stata labels of all four
-waves; the agriculture PDFs were not read here), and 0 is what most rows record
-(=HeadAcquired= 33,729 of 39,126, =HeadSold= 27,565).  8 of the 14 blank
-=HeadCount= cells sit beside a positive purchase or sale, so serving them as "0
-head now" was a claim the survey did not make.
+*What a blank is.*  =ag_r02=, =ag_r10= and =ag_r16= have no gate of their own
+("How many ...", per the Stata labels of all four waves; the agriculture PDFs
+were not read here), and 0 is what most rows record (=HeadAcquired= 33,729 of
+39,126, =HeadSold= 27,565).  77 of the 98 blank cells are on rows answering
+=ag_r01= Yes, so they are unanswered.  The other 21 (=HeadCount= 5, =HeadAcquired=
+9, =HeadSold= 7; all 2010-11 and 2013-14) are on rows answering No and kept for a
+positive count elsewhere, where the blank may be routing past that species.
+Neither kind is a recorded 0.  8 of the 14 blank =HeadCount= cells sit beside a
+positive purchase or sale, so serving them as "0 head now" was a claim the survey
+did not make.
 
 | wave    | =HeadCount= blank | =HeadAcquired= blank | =HeadSold= blank | rows served       |
 |---------+-------------------+----------------------+------------------+-------------------|
