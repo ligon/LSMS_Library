@@ -1691,6 +1691,41 @@ Net: ~86.6% of rows have a non-null Area; non-standard units dominate
 W1--W3 (per the refuter, convertible-unit share is W1 29% / W2 28% /
 W3 25% / W4 56% / W5 49%).
 
+*** Heaps, ridges and stands: evaluated and not wired (GH #860, 2026-11-04)
+
+/Ruling (@ligon, 2026-11-04)/: do not wire a factor; record the disagreement.
+
+EPAR (TR#335, =Nigeria GHS Wave 4/EPAR_UW_Nigeria_GHS_W4.do=, lines 355-382, commit
+=abfbdc930=; reference clone under =/global/scratch/fsa/fc_jevons/ligon/reference/epar/=)
+carries two zone-by-unit grids of hectare factors in one comment block, and applies
+the first.  W1's =.do= has the first alone.
+
+| zone | heaps BID | heaps observed | ridges BID | ridges observed | stands BID | stands observed |
+|-+-+-+-+-+-+-|
+| 1 | 0.00012 | 0.00281 | 0.0027 | 0.0059 | 0.00006 | 0.00121 |
+| 2 | 0.00016 | 0.00748 | 0.004 | 0.0052 | 0.00016 | 0.0006 |
+| 3 | 0.00011 | 0.00787 | 0.00494 | 0.0051 | 0.00004 | 0.0002 |
+| 4 | 0.00019 | 0.00003 | 0.0023 | 0.0010 | 0.00004 | 0.0003 |
+| 5 | 0.00021 | 0.00076 | 0.0023 | 0.0008 | 0.00013 | 0.009 |
+| 6 | 0.00012 | 0.00437 | 0.00001 | 0.0005 | 0.00041 | 0.002 |
+
+"BID" is EPAR's transcription of the LSMS-ISA Wave 2 Basic Information Document;
+"observed" is its own label, "ALT observed from the data", with nothing on how it
+was derived.  Observed / BID, recomputed over the 18 cells: median *4.9x*, minimum
+0.16x, maximum 71.5x.  By unit: heaps 0.16x-71.5x (median 29.9x), ridges 0.35x-50x
+(median 1.2x), stands 3.8x-69x (median 6.3x).  Neither grid has been checked against
+the survey here, and a spread that wide leaves nothing to choose between them on.
+
+*What stays unconverted.*  2,567 rows report an area in heaps, ridges or stands with
+a positive estimate and no GPS (272 / 434 / 437 / 1,172 / 252, W1--W5, from the raw
+=sect11a1= files).  They are served =Area= NaN with =AreaUnit= naming the unit, as
+are 3 more with no estimate either (2,570 served).  GPS and convertible-unit rows
+never used these units' factors and are not affected.  The native estimate is not
+served; it is in the source, not in =plot_features=.
+
+*Still open, separately*: =plots=, 396 W1--W3 rows with no GPS, which EPAR converts
+at one all-zone x0.0667 with no competing grid.  It was not part of this ruling.
+
 ** Harmonization (=categorical_mapping.org=)
 
 - =harmonize_acquire= -> Tenure.  WAVE-KEYED =(Wave, Code)=: the
