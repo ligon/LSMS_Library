@@ -13,6 +13,7 @@ synthetic frames through the real helpers.  The data-gated oracle is
 """
 import ast
 import importlib.util
+import warnings
 
 import pandas as pd
 import pytest
@@ -290,6 +291,47 @@ def test_a_component_failing_the_value_gate_has_no_vote(malawi):
 def test_an_unlisted_unit_code_is_source_qualified(malawi):
     got = _purchase(malawi, [('1', 1, 5.0, 77, 900.0, NA, NA, NA)]).iloc[0]
     assert got['Unit_purchased'] == 'Seed unit code 77'
+
+
+def _no_source_plot_inputs(malawi, purchase_rows):
+    """Seed rows with no source observation: the branch that reduces purchases a
+    second time, across the codes one crop label covers.  No wave script takes it."""
+    g = pd.DataFrame({'hhid': ['1', '1'], 'plotkey': ['p1', 'p1'], 'crop_code': [1, 3],
+                      'ag_g04a': [3.0, 4.0], 'ag_g04b': [2, 2]})
+    seed = malawi._seed_block(g, hhid='hhid', plotkey='plotkey', cropcode='crop_code',
+                              qty='ag_g04a', unit='ag_g04b', t='2010-11')
+    purchase = malawi._seed_purchase_block(
+        _panel_h(purchase_rows), hhid='hhid', cropcode='crop_code',
+        qty_cols=['ag_h16a', 'ag_h26a'], unit_cols=['ag_h16b', 'ag_h26b'],
+        value_cols=['ag_h19', 'ag_h29'])
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        return malawi.assemble_plot_inputs('2010-11', [seed], [purchase]).reset_index()
+
+
+@pytest.mark.parametrize('rows', [
+    # refused below, then reduced again beside a code in one unit
+    [('1', 1, 5.0, 2, 900.0, 1.0, 6, 100.0), ('1', 3, 2.0, 2, 100.0, NA, NA, NA)],
+    # refused below, alone in its crop
+    [('1', 1, 5.0, 2, 900.0, 1.0, 6, 100.0)],
+    # each code in one unit, but not the same one
+    [('1', 1, 5.0, 2, 900.0, NA, NA, NA), ('1', 3, 1.0, 6, 100.0, NA, NA, NA)],
+])
+def test_a_refusal_survives_the_reduction_across_codes(malawi, rows):
+    """A group refused below keeps its NA unit, so the second pass must read NA as
+    "no unit to vote" rather than fail on a non-boolean condition."""
+    out = _no_source_plot_inputs(malawi, rows)
+    assert len(out) == 1
+    assert bool(out['Purchased'].iloc[0]) is True
+    assert pd.isna(out['Quantity_purchased'].iloc[0])
+    assert pd.isna(out['Unit_purchased'].iloc[0])
+
+
+def test_codes_in_one_unit_still_add_across_the_reduction(malawi):
+    out = _no_source_plot_inputs(malawi, [('1', 1, 5.0, 2, 900.0, NA, NA, NA),
+                                          ('1', 3, 2.0, 2, 100.0, NA, NA, NA)])
+    assert out['Quantity_purchased'].tolist() == [7.0]
+    assert out['Unit_purchased'].tolist() == ['Kilogramme']
 
 
 def test_the_column_is_declared_optional():

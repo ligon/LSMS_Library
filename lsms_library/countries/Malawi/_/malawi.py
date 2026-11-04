@@ -3542,7 +3542,10 @@ def _agree_purchase_units(rows, key):
     refused = pd.concat([speaks.loc[speaks.duplicated(key, keep=False), key],
                          rows.loc[q.isna(), key]]).drop_duplicates()
     # The unit that speaks for a group: a nonzero component, else a named zero.
-    rank = np.select([q.notna() & q.ne(0), rows['Unit_purchased'].ne(U_UNKNOWN)], [0, 1], 2)
+    # to_numpy: a group refused below has an NA unit, and np.select refuses an NA.
+    rank = np.select([(q.notna() & q.ne(0)).to_numpy(dtype=bool),
+                      rows['Unit_purchased'].ne(U_UNKNOWN).fillna(False).to_numpy(dtype=bool)],
+                     [0, 1], 2)
     unit = (rows.assign(_rank=rank).sort_values('_rank', kind='stable')
             .groupby(key, as_index=False)['Unit_purchased'].first())
     out = rows.groupby(key, as_index=False)['Quantity_purchased'].sum(min_count=1)
