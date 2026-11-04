@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build panel_ids for Ethiopia ESS W1-W3.
+"""Build panel_ids for Ethiopia: Panel I (W1-W3) and Panel II (W4-W5).
 
 W2 (2013-14) cover file maps household_id2 (18-char, W2 native)
 to household_id (14-char, W1 baseline).  100% of non-empty links
@@ -30,8 +30,16 @@ whose truncated id happens to be a W1 household.  This rests on the BID's
 accounting, NOT on the rosters, which only weakly agree: see
 ``CONTENTS.org``, "W3 households the survey counts as ESS1".
 
-W4 (2018-19) and W5 (2021-22) draw entirely new samples with no
-backward link.
+W1 (2011-12) and W4 (2018-19) are the two panels' baselines: every row
+has a missing ``previous_i``, so the resolver records nothing for them and
+nothing crosses from W4 to W3.  ESS4 "is not a follow-up of the previous
+ESS waves" (WB catalog 3823).
+
+W5 (2021-22) keeps W4's ids, so its links are identities and move no served
+id (GH #1467).  A W5 household links where its id is on W4's household or
+agriculture cover: 4,906, the ESPS-5 BID's "balanced panel" (PDF p43).  The
+other 93 are the BID's "new EAs" (8 of them, PDF p32), drawn from a fresh
+listing in EAs ESPS-4 selected and could not survey (PDF p30-31).
 """
 import json
 from pathlib import Path as _Path
@@ -62,6 +70,10 @@ hh2 = get_dataframe('../2013-14/Data/sect_cover_hh_w2.dta', convert_categoricals
 pp2 = get_dataframe('../2013-14/Data/sect_cover_pp_w2.dta', convert_categoricals=False)
 hh3 = get_dataframe('../2015-16/Data/sect_cover_hh_w3.dta', convert_categoricals=False)
 pp3 = get_dataframe('../2015-16/Data/sect_cover_pp_w3.dta', convert_categoricals=False)
+hh4 = get_dataframe('../2018-19/Data/sect_cover_hh_w4.dta', convert_categoricals=False)
+pp4 = get_dataframe('../2018-19/Data/sect_cover_pp_w4.dta', convert_categoricals=False)
+hh5 = get_dataframe('../2021-22/Data/sect_cover_hh_w5.dta', convert_categoricals=False)
+pp5 = get_dataframe('../2021-22/Data/sect_cover_pp_w5.dta', convert_categoricals=False)
 xw = ea_id2_crosswalk(hh2, hh3)
 a1 = _agriculture_only_households('2011-12', hh1, pp1,
     dict(hhid='household_id', ea='ea_id'), [])
@@ -69,6 +81,10 @@ a2 = _agriculture_only_households('2013-14', hh2, pp2,
     dict(hhid='household_id2', ea='ea_id2'), [])
 a3 = _agriculture_only_households('2015-16', hh3, pp3,
     dict(hhid='household_id2', ea='ea_id2', pp_ea='ea_id'), [], ea_crosswalk=xw)
+a4 = _agriculture_only_households('2018-19', hh4, pp4,
+    dict(hhid='household_id', ea='ea_id'), [])
+a5 = _agriculture_only_households('2021-22', hh5, pp5,
+    dict(hhid='household_id', ea='ea_id'), [])
 
 baseline = dict(zip(hh1.household_id.map(format_id), hh1.ea_id.map(format_id)))
 if a1 is not None:
@@ -82,6 +98,9 @@ if a2 is not None:
                 raise ValueError('W2 selected baseline absent from HH/PP baseline union')
             if baseline[row.household_id] != row.ea_id:
                 raise ValueError('W2 selected baseline EA disagreement')
+
+df1 = pd.DataFrame({'i': list(baseline), 't': '2011-12', 'previous_i': None})
+df1 = df1.set_index(['t', 'i'])[['previous_i']]
 
 df2 = hh2[['household_id2', 'household_id']].map(format_id)
 df2 = df2.rename(columns={'household_id2': 'i', 'household_id': 'previous_i'})
@@ -127,9 +146,19 @@ df3['t'] = '2015-16'
 df3['previous_i'] = df3['i'].map(lambda i: ess1_target.get(i, i))
 df3 = df3.set_index(['t', 'i'])[['previous_i']]
 
+# Panel II: household cover, then the households only the agriculture cover holds.
+ids4 = pd.concat([hh4.household_id.map(format_id), a4.i], ignore_index=True)
+ids5 = pd.concat([hh5.household_id.map(format_id), a5.i], ignore_index=True)
+df4 = pd.DataFrame({'i': ids4, 't': '2018-19', 'previous_i': None})
+df4 = df4.set_index(['t', 'i'])[['previous_i']]
+df5 = pd.DataFrame({'i': ids5, 't': '2021-22'})
+df5['previous_i'] = df5['i'].where(df5['i'].isin(ids4))
+df5 = df5.set_index(['t', 'i'])[['previous_i']]
+
 # Refuse collisions before the general resolver can choose a split suffix.
 w3 = {i: w2.get(p, p) for i, p in df3.previous_i.droplevel('t').items()}
-for frame, mapping in ((df2, w2), (df3, w3)):
+w5 = df5.previous_i.droplevel('t').dropna().to_dict()
+for frame, mapping in ((df1, {}), (df2, w2), (df3, w3), (df4, {}), (df5, w5)):
     ids = frame.index.get_level_values('i')
     if not ids.is_unique or ids.isna().any() or (ids == '').any():
         raise ValueError('Missing or duplicate native panel household key')
@@ -148,7 +177,7 @@ if a3 is not None:
             if not old.eq(baseline[w2[row.i]]).all():
                 raise ValueError('W3 linked baseline EA disagreement')
 
-panel_ids_df = pd.concat([df2, df3], axis=0)
+panel_ids_df = pd.concat([df1, df2, df3, df4, df5], axis=0)
 D, updated_ids = panel_ids(panel_ids_df)
 
 # GH #914: write beside THIS script, never into the process's cwd.  These two

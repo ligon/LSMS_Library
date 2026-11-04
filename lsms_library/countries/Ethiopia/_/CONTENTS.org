@@ -1845,15 +1845,30 @@ they do not link to W1.
 Whether to link them changes served =i= for about 49 W3 households in every table
 and needs a ruling.  (Ruled above.)
 
-** Panel II in the crosswalk
+** Panel II and W2 -> W1 in the crosswalk (GH #1467, ruled 2026-11-04)
 
-=_/panel_ids.py='s docstring says W4 and W5 "draw entirely new samples with no
-backward link".  That is false for W5: the ESPS-5 "kept all the ESPS-4 samples except for
-those in the Tigray region and a few other places" (catalog 6161), =sampling.yml= declares =household_continuity: panel=, and 4,849
-of W5's 4,959 HH cover ids are on W4's.  No rename is needed, so served =i= links
-W4 and W5 already; only =panel_ids= is silent (Nigeria's W5 is recorded as identity
-links, GH #1264).  Likewise =panel_ids= has no W2 -> W1 keys, because the resolver
-records none for the first wave in its frame; those links are in =updated_ids=.
+=_/panel_ids.py= now puts all five waves in one frame.  W1 and W4 are baselines, every
+=previous_i= missing, so =updated_ids= holds an empty map for each and no link crosses
+from W4 to W3.  3,801 W2 -> W1 keys and 4,906 W5 -> W4 keys join =panel_ids.json=, which
+goes from 4,981 to 13,688 entries.  W2's and W3's =updated_ids= maps are dict-identical
+to before, and W5's is all identities, so no served =i= moves.
+
+*Which W5 households link*: those whose id is on W4's HH or PP cover, which is how W2's
+and W3's PP-only households are already treated.  That is 4,849 on both HH covers, 17 on
+W5's HH and W4's PP only, 40 on W5's PP and W4's HH: 4,906, exactly the ESPS-5 BID's
+"longitudinal respondent sample ... 4,906 households" (PDF p43).  The other 93 of W5's
+4,999 are the BID's "93 households selected within 8 new EAs" (PDF p32), freshly listed
+in EAs ESPS-4 selected and could not survey for security reasons (PDF p30-31).  7 of those
+8 EAs are on no W4 cover; the 8th is on W4's, and shares no household id.  The rosters
+agree, as they do not quite for the 48 above: of the 4,849 on both HH covers, 9.4% have
+no line agreeing on sex and an age gap of 1-5, against 77.5% for another W4 household of
+the same EA.  W5's cover does not ship the =pw_w5_Panel= the BID names (PDF p16).
+
+/Superseded note, kept as written:/ =_/panel_ids.py='s docstring said W4 and W5 "draw
+entirely new samples with no backward link".  That is false for W5: the ESPS-5 "kept all
+the ESPS-4 samples except for those in the Tigray region and a few other places" (catalog
+6161), =sampling.yml= declares =household_continuity: panel=, and 4,849 of W5's 4,959 HH
+cover ids are on W4's.
 
 *A string collision, not a link*: served =i= has 1 id in common between W2 and W4
 and 1 between W2 and W5, unrelated large-town households in the same character

@@ -8,6 +8,10 @@ by rule: a rural or small-town W3 household off W2's map has W3's own
 ``household_id`` as its W1 id.  The rule rests on the BID's accounting; the rosters
 do not separately confirm it (``Ethiopia/_/CONTENTS.org``).
 
+The same regeneration records the links ``panel_ids`` used to leave out: W2 -> W1,
+which were only in ``updated_ids``, and W5 -> W4, identities that move no served id.
+W1 and W4 are baselines, so nothing crosses from W4 to W3.
+
 Two tiers, as in ``test_gh1447_ethiopia_panel_crosswalk.py``: the committed JSON
 alone, and (``requires_s3``) the covers read directly, by path, with nothing from
 ``Ethiopia/_/`` in the oracle.
@@ -98,6 +102,32 @@ def test_panel_ids_and_updated_ids_agree_on_w3(links, updated_ids):
         assert links[f"2015-16,{k}"].split(",")[1] == v
 
 
+def test_w1_and_w4_are_baselines_with_nothing_recorded(links, updated_ids):
+    for wave in ("2011-12", "2018-19"):
+        assert updated_ids[wave] == {}
+        assert not any(key.startswith(f"{wave},") for key in links)
+
+
+def test_each_link_points_to_the_wave_before_it_in_its_panel(links):
+    before = {"2013-14": "2011-12", "2015-16": "2013-14", "2021-22": "2018-19"}
+    assert {(k.split(",")[0], v.split(",")[0]) for k, v in links.items()} == set(before.items())
+
+
+def test_w2_links_are_the_w2_map(links, updated_ids):
+    w2 = updated_ids["2013-14"]
+    assert w2
+    recorded = {k.split(",")[1]: v for k, v in links.items() if k.startswith("2013-14,")}
+    assert recorded == {k: f"2011-12,{v}" for k, v in w2.items()}
+
+
+def test_w5_links_are_identities(links, updated_ids):
+    w5 = updated_ids["2021-22"]
+    assert w5
+    assert all(k == v for k, v in w5.items())
+    recorded = {k.split(",")[1]: v for k, v in links.items() if k.startswith("2021-22,")}
+    assert recorded == {k: f"2018-19,{k}" for k in w5}
+
+
 # ---------------------------------------------------------------------------
 # The covers, read directly: no script in the oracle
 # ---------------------------------------------------------------------------
@@ -184,6 +214,29 @@ def test_rule_targets_are_w1_households_of_the_recorded_ea(updated_ids, w1, w3_n
     assert len(rule) > 0
     assert rule.household_id.map(w1).eq(rule.ea_id).all()
     assert rule.household_id.is_unique
+
+
+def _panel_ii_ids(wave, hh, pp):
+    ids = set(_cover(wave, hh).household_id.map(format_id))
+    return ids | (set(_cover(wave, pp).household_id.map(format_id)) - {None})
+
+
+@_requires_data
+def test_w5_links_are_the_households_on_both_waves_covers(updated_ids):
+    w4 = _panel_ii_ids("2018-19", "sect_cover_hh_w4.dta", "sect_cover_pp_w4.dta")
+    w5 = _panel_ii_ids("2021-22", "sect_cover_hh_w5.dta", "sect_cover_pp_w5.dta")
+    assert set(updated_ids["2021-22"]) == w4 & w5
+
+
+@_requires_data
+def test_w5_links_reproduce_the_bid_balanced_panel(updated_ids):
+    """ESPS-5 BID: 4,906 households in the balanced panel (PDF p43), 93 in 8 new EAs (p32)."""
+    w5 = _panel_ii_ids("2021-22", "sect_cover_hh_w5.dta", "sect_cover_pp_w5.dta")
+    linked = set(updated_ids["2021-22"])
+    assert len(linked) == 4906
+    new = w5 - linked
+    assert len(new) == 93
+    assert len({i[:15] for i in new}) == 8
 
 
 @_requires_data
