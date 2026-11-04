@@ -678,7 +678,8 @@ class TestDelivered:
         Replayed from sources: each rung's positive sales are its served
         rows, and the ladder's attached value is the served value, up to the
         rows the GH #869 unmapped-crop filter drops (reported loudly there).
-        The collapse this replaces failed both, by 27 sales / 373,600 MWK.
+        The collapse this replaces lost 19 sales worth 373,600 MWK and 8
+        zero-value "did not sell" lines.
         """
         try:
             harvest, sale, _ = malawi_mod._crop_pieces(wave)
