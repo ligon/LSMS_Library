@@ -455,10 +455,10 @@ Data Scheme:
     # in a field passage (2011-12 has two), with up to three within-
     # questionnaire price observations.  Until #840 the grain was (t, v, j, u)
     # and ONE row per cell was kept -- post-harvest first, then questionnaire
-    # order -- and 15,423 rows were served of what is now 46,043 (2011-12
+    # order -- and 15,423 rows were served of what were then 46,043 (2011-12
     # 8,923 -> 32,352, 2014-15 6,500 -> 13,691, after the lossless
-    # duplicate-entry drops below).
-    # Nothing is averaged and, now, nothing is selected.
+    # duplicate-entry drops below; 46,013 since GH #1087 serves a record's
+    # first entry).  Nothing is averaged.
     #   variety -- the cs07q02 variety CODE as a string ('7011' = product 701,
     #          variety 1).  The code, not the label: the codes agree across all
     #          three files, the labels change case and drop their product
@@ -472,8 +472,10 @@ Data Scheme:
     #          two questionnaires agree on the obs-1 Price in 67 of 67.  A slot
     #          of a second record that repeats a served row in every column
     #          but obs is dropped (134 rows; lossless).  The 30 that repeat
-    #          nothing are slot + 3, the GhanaLSS `obs` precedent -- their
-    #          representation is an open maintainer decision (CONTENTS.org).
+    #          nothing are not served either (GH #1087, ruling @ligon
+    #          2026-11-04): the first entry is served, see second_entry_disagrees
+    #          below and the deletion entry
+    #          Niger::community_prices::first-entry-of-duplicate.
     #   v   -- the community questionnaire's grappe (EA), formatted into the
     #          SAME v keyspace as sample() (`v: grappe`/`GRAPPE` there), so
     #          community_prices.v == sample().v for the same cluster and the
@@ -544,10 +546,21 @@ Data Scheme:
     #               2018-19: 1, a registered derivation (see above).
     #   Description -- the cs07q02 variety label of that file; 2018-19: the
     #               s05q01 product label as recorded.
+    #   second_entry_disagrees -- CS07 (2011-12, 2014-15): True on every served
+    #               row of a (grappe, variety, passage) entered twice whose second
+    #               entry has a slot repeating no first-entry row (GH #1087).  A
+    #               property of the record: it does not say which slot, and
+    #               derivation_inputs returns the slots.  False on every other
+    #               CS07 row.  `optional` because s05 (2018-19) serves its second
+    #               records as obs 3 / 4, so the question does not arise there and
+    #               the column is NA.
     index: (t, v, j, u, variety, visit, obs)
     Price: float
     Quantity: float
     Description:
       type: str
+      optional: true
+    second_entry_disagrees:
+      type: bool
       optional: true
     materialize: make

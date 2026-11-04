@@ -10,13 +10,14 @@ Source: comprixcs07.dta — the community price questionnaire, section CS07
   (cs07q04, cs07q05) (cs07q06, cs07q07) (cs07q08, cs07q09)
              -> the three (Price, Quantity) observation pairs, obs 1 / 2 / 3
 
-Every recorded price is served (GH #840) — none selected, none averaged.  This
-is a single-passage wave (visit = 1).  Grappe 212 carries two questionnaires
-(numquest 1 and 2) -- a duplicate ENTRY: they agree on the obs-1 Price of all
-67 varieties both price.  A slot of the second that repeats a served row is
-dropped (117 rows, lossless); the 15 that repeat nothing are obs 4-6
-(niger.py::_community_price_triples).  Rows with no
-usable price, or a missing-marker unit ('produit absent'/'manquant' ->
+Every recorded price of a record's first entry is served (GH #840) — none
+averaged.  This is a single-passage wave (visit = 1).  Grappe 212 carries two
+questionnaires (numquest 1 and 2) -- a duplicate ENTRY: they agree on the obs-1
+Price of all 67 varieties both price.  A slot of the second that repeats a served
+row is dropped (117 rows, lossless); the 15 that repeat nothing are not served
+either, and the first entry's rows of those records carry
+`second_entry_disagrees` (GH #1087; niger.py::derive_cs07_first_entry).  Rows with
+no usable price, or a missing-marker unit ('produit absent'/'manquant' ->
 'Unknown' since GH #842), are dropped.  This wave has NO price-bearing
 observation with a missing unit (measured: 0 of 13,840); the 795 that do are
 all in 2011-12.
@@ -29,8 +30,8 @@ import sys
 sys.path.append('../../_/')
 
 from lsms_library.local_tools import get_dataframe, to_parquet
-from niger import (_community_prices_maps, _community_price_triples,
-                   _finish_community_prices)
+from niger import (CS07_TRIPLES, _community_prices_maps,
+                   _community_price_triples, _finish_community_prices)
 
 
 item_map, unit_map = _community_prices_maps()
@@ -41,11 +42,7 @@ src = get_dataframe(base + 'comprixcs07.dta', convert_categoricals=True)
 codes = get_dataframe(base + 'comprixcs07.dta', convert_categoricals=False)
 
 # 2014-15: one shared unit column (cs07q03) across the three (price, qty) pairs.
-triples = [
-    ('cs07q04', 'cs07q05', 'cs07q03'),
-    ('cs07q06', 'cs07q07', 'cs07q03'),
-    ('cs07q08', 'cs07q09', 'cs07q03'),
-]
+triples = CS07_TRIPLES['2014-15']
 df = _community_price_triples(src, item_map, unit_map, triples, codes=codes)
 df = _finish_community_prices(df, '2014-15')
 

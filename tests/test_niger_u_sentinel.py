@@ -106,8 +106,9 @@ EXPECTED_ROWS = {
     # rows (below): the 795 unit-less CS07 observations are dropped, not
     # filled (CONTENTS.org).  GH #823 then wired 2018-19 (EHCVM s05): +84,444
     # rows, none of them `Unknown` (every s05 unit-size code names a unit), and
-    # the 46,043 CS07 rows unchanged.
-    "community_prices": 130487,
+    # the 46,043 CS07 rows unchanged.  GH #1087 serves a CS07 record's first
+    # entry: -30 (the obs 4-6 rows, 15 + 15), 130,487 -> 130,457.
+    "community_prices": 130457,
 }
 EXPECTED_SENTINEL = {
     "crop_production": 4950,    # 4,920 before GH #865 dropped 11 all-sentinel lines; 4,909 before GH #1360

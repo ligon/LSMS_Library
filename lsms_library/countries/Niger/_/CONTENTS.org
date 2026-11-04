@@ -1518,7 +1518,8 @@ still present by (t, v, j, u, Price, Quantity).  Served 46,177 -> 46,043
 They stay =obs= 4-6 for now -- today's representation, the GhanaLSS
 convention -- and the choice among serving them as obs 4-6, a separate
 =record= level, or a flag column is a *DECISION for @ligon*, drafted as a
-residual of #840.
+residual of #840.  [RULED 2026-11-04, GH #1087: the first entry and a flag.  See
+"community_prices: a record entered twice serves its first entry" below.]
 - *Quantity's nominal =9999.9= missing code (GH #1088, 2026-10-21).* The held 2014-15 quantity columns are Stata doubles containing exactly =9999.900390625=, equal to =float(np.float32(9999.9))=; =float32(9999.0)= is exactly =9999.0=, so the earlier wording here conflated two nominal codes.
   Their earlier precision history is unproven, and the numeric columns have no missing-code value labels.
   The relevant questionnaire PDFs are not held in the local L1 cache and were not acquired; treating nominal =9999.9= as missing follows the existing #1088 / country-documentation ruling, rather than new independent instrument confirmation.
@@ -2630,6 +2631,45 @@ l'agriculture" (=AS03Q01= "Type d'équipement"; 45,570 rows).  =ecvma2_quest_agr
 2A-2C and 3 and no dry-season production; =ecvma2_as2dp2.dta= asks only contre-saison costs
 (=AS02DQ03=, =AS02DQ05=).  So no 2014-15 dry-season harvest exists in the held files or the held
 instruments, and =crop_production= 2014-15 is not missing one.
+* 2026-11-04 -- community_prices: a record entered twice serves its first entry (GH #1087)
+
+*RULED (@ligon, 2026-11-04, option (c) of #1087).*  The ECVMA second records are
+duplicate entries of one questionnaire, so a record's FIRST entry is served
+(=niger.derive_cs07_first_entry=), and the 30 slots that used to be =obs= 4-6 are
+not.  =obs= is now 1-3 in every CS07 row.  2018-19 s05 is a different mechanism (two
+readings per key, and 140 keys with a second record whose prices differ) and keeps
+=obs= 3 / 4.
+
+*The flag.*  =second_entry_disagrees= is True on every served row of a (grappe,
+variety, passage) whose second entry has a slot repeating no first-entry row, False
+on every other CS07 row, NA on 2018-19, where the question does not arise.  It is a
+property of the RECORD, which is the grain the issue's "a disagreeing second entry
+exists" names: 45 rows are flagged, and on 19 of them the row's own slot has no
+disagreeing counterpart.  A slot-level flag has nowhere to go for the 4 slots the
+first entry left empty.  It is not canonical: =Description= is the precedent for a
+Niger-only =community_prices= column.
+
+*The rule is registered.*  =Niger::community_prices::first-entry-of-duplicate= is a
+deletion entry (=rows: 0=), and =Country.derivation_inputs(key)= returns the 30
+slots, keyed (t, v, variety, visit, slot), with the second entry's whole source row
+under its own variable names.
+
+*Measured, cold, private roots* (before = development =b95e927f3=):
+
+| wave    | rows              | (t, v, j, u) cells | flagged rows | records flagged |
+|---------+-------------------+--------------------+--------------+-----------------|
+| 2011-12 | 32,352 -> 32,337  | 8,979 -> 8,976     |           27 |              13 |
+| 2014-15 | 13,691 -> 13,676  | 6,516 -> 6,514     |           18 |               9 |
+| 2018-19 | 84,444 unchanged  | 42,087 unchanged   |           NA |              -- |
+
+*What leaves that was not a repeat of anything.*  23 records have a disagreeing
+second entry and 22 carry the flag.  The 23rd is 2011-12 passage 2, variety 7311:
+its first entry holds the 99999 price sentinel, so it has no served row, and its
+second entry holds a price.  That was the record's only price, so it is no longer
+served and no row says so; the deletion entry is the disclosure.  The 5 (t, v, j, u)
+cells that vanish were held only by a second entry, 12 of whose slots conflict on
+the unit code alone.
+
 * 2026-11-04 -- 2021-22 documents held; recall read from the instrument (GH #1084, #1483, #650)
 
 =2021-22/Documentation/= held only =SOURCE.org=.  It now holds both BIDs and both
