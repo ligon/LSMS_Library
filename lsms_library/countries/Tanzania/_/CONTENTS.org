@@ -2343,14 +2343,13 @@ region code.  These are carried through as-is rather than repaired by guesswork.
   #837 residuals. No new blanking exception was adopted. See
   =slurm_logs/release_landing_2026-10-14/cluster837.org=.
 
-- *2019-20 =sample.v= for the 326 split-off households.*  Those households are
-  still assigned the =clusterid= the file stamps on them, which is not a
-  sampling cluster --- and now that =cluster_features= no longer manufactures
-  rows for it, their =v= points at a cluster the table does not contain.
-  Blanking it would change =v= on every 2019-20 household table for 27.5% of
-  the wave; that is a semantic change that belongs in its own PR, not inside a
-  cluster-key fix.  Recorded rather than done.  (2026-11-03: this is why 281 of
-  those households have no market label; see GH #1441 below.)
+- *2019-20 =sample.v= for the 326 split-off households.*  The file stamps them with
+  a =clusterid= that is not a sampling cluster.  Fixed in part (GH #1441, ruling
+  @ligon 2026-11-04): of the 281 whose id is in no frame cluster, 238 now take
+  their parent's cluster through =y4_hhid=, under
+  =Tanzania::sample::split-off-parent-cluster=.  The other 43 keep their id, which
+  still names a cluster the table does not contain, so 32 stray ids remain in
+  =sample.v= (100 before).  Blanking was rejected.  See GH #1441 below.
 - *5 of 498 2014-15 clusters are unknown to =sample()=* (='17201000'=,
   ='21408000'=, ='52104012'=, ='53119012'=, ='53206000'=).  They ARE present in
   the wave-level =sample.parquet= (13 / 7 / 10 / 10 / 10 rows) and are lost
@@ -2475,29 +2474,42 @@ rise 0.05% in 2008-09 and 0.06% in 2010-11, which hides real row moves: 3,819 of
 ratio is 0.99, the 1st to 99th percentile 0.55 to 1.80, the extremes 0.225 and 10
 (red team, 2026-11-04).  Later rounds are unchanged.
 
-** Region 2014-15 (59) and 2019-20 (281): not a missing label, a missing =v=
+** Region 2014-15 (59) and 2019-20 (281 -> 43): a missing =v=, not a missing label
 
-Neither is a defect of =cluster_features=.  Both are recorded, not fixed: which
-treatment is right is a decision for the maintainer (memo on GH #1441).
+Neither is a defect of =cluster_features=.
 - *59 in 2014-15 are =sample='s deliberate =v= = NA* (two panel lines, two origin
-  EAs, GH #323).  In all 59 the two =clusterid= decode to one region and district
-  digit, so the cluster's label is known while =v= is not; own =ha_01_1= agrees
-  with it for 34.
-- *281 in 2019-20 are split-offs* whose stray =clusterid= (=sdd_cluster= blank) is
-  in none of the 147 frame clusters, the 100 ids GH #323 stopped pooling.  Their
-  own location =hh_a01_1= is populated for all 326 split-offs and =hh_a02_1= for
-  325 (the one blank is among the 281).  A frame household with the same =y4_hhid= gives the parent's cluster for
-  238 of the 281; the other 43 have none.
-- *The other 45 split-offs carry an id that is also a frame cluster.*  For 31 it
-  is their frame sibling's own cluster, so they are labelled as any tracked
-  household is.  The other 14 have no sibling, so that label rests on the id alone.
-  Own region agrees with the served label for 29 of the 45.  Not changed here.
-- The only route that labels these 340 without a new =v= is a household-grain
-  =Region= on =sample=, and =_add_market_index= prefers that column for EVERY
-  household, so populating it fully moves 1,366 labels (245 / 565 / 162 / 43 / 351
-  households whose own region differs from their cluster's, 2010-11 to 2020-21).
-  The 162 excludes the 59 (178 with them).  The 43 reads own region as =hh_a01_1=
-  falling back to =t0_region= (32 on =hh_a01_1= alone).
+  EAs, GH #323), and stay so.  In all 59 the two =clusterid= decode to one region
+  and district digit, so the cluster's label is known while =v= is not; own
+  =ha_01_1= agrees with it for 34.
+- *281 in 2019-20 were split-offs* whose stray =clusterid= (=sdd_cluster= blank) is
+  in none of the 147 frame clusters, the 100 ids GH #323 stopped pooling.  Ruling
+  (@ligon, 2026-11-04): 238 now take the =clusterid= of the one frame household on
+  their =y4_hhid=, stamped =Tanzania::sample::split-off-parent-cluster=.  Each has
+  exactly one such household, and every one of those clusters is in
+  =cluster_features=.  The other 43 have none, keep the =v= they had and stay
+  unlabelled; they are not blanked.
+- *What the rekey does and does not say.*  =v= now says where the household's
+  family was sampled, as it does for a tracked mover, not where it lives: 177 of
+  the 238 are in the region of the cluster they take.  =strata=, =Rural= and the
+  weights stay the household's own: 146 have their frame household's =strata=, so
+  the other 92 sit in a cluster of another stratum.  That is not new.  =v= spanning
+  more than one =strata= goes from 116 of 247 ids to 103 of 179, because the stray
+  ids pooled strata too.
+- *The Stata labels name the two ids differently from how they are used.*
+  =clusterid= reads "Unique ID for sampling strata" and =sdd_cluster= "Unique ID for
+  first-stage sampling unit".  In the frame they pair one-to-one over 147 clusters,
+  so =v= = =clusterid= names the PSU there.  =sdd_cluster= is blank on every split-off.
+- *The other 45 split-offs carry an id that is also a frame cluster*, and do not
+  change.  For 31 it is their frame sibling's own cluster, so they are labelled as
+  any tracked household is.  The other 14 have no sibling, so that label rests on the
+  id alone.  Own region agrees with the served label for 29 of the 45.
+- The only route that would label the remaining 102 (59 + 43) without a new =v= is a
+  household-grain =Region= on =sample=, and =_add_market_index= prefers that column
+  for EVERY household, so populating it fully moves 1,366 labels (245 / 565 / 162 /
+  43 / 351 households whose own region differs from their cluster's, 2010-11 to
+  2020-21; measured before the rekey).  Not taken.  The 162 excludes the 59 (178
+  with them).  The 43 reads own region as =hh_a01_1= falling back to =t0_region= (32
+  on =hh_a01_1= alone).
 
 * Warm interview-date loss (GH #798, found 2026-10-15, FIXED 2026-10-17)
 

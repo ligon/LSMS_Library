@@ -81,3 +81,38 @@ Tanzania::cluster_features::upd-district-name-from-id-digit:
   validated_against: tests/test_tanzania_1441_followups.py reads upd4_hh_a.dta directly.
   contents: 'Tanzania/_/CONTENTS.org, "District and Region labels for market= (GH #1441)"'
   since: '2026-11-04'
+
+Tanzania::sample::split-off-parent-cluster:
+  waves: ['2019-20']
+  columns: [v]
+  rule: >-
+    A split-off household (sdd_cluster blank) carries a clusterid that is not a
+    sampling cluster.  Where that clusterid is in none of the 147 frame clusters and
+    a frame household has the same y4_hhid, v = that household's clusterid: 238 of
+    the 281 such households, each with exactly one frame household on its y4_hhid.
+    The other 43 keep their clusterid and have no market label.  The 45 split-offs
+    whose clusterid is a frame cluster, and every frame household, are unchanged.
+    strata, Rural and the weights stay the household's own.
+  function: lsms_library.countries.Tanzania.2019-20._.mapping:derive_split_off_parent_cluster
+  inputs: lsms_library.countries.Tanzania.2019-20._.mapping:inputs_split_off_parent_cluster
+  raw_variables: [sdd_hhid, y4_hhid, clusterid, sdd_cluster]
+  assumptions:
+    - text: A frame household with the same y4_hhid continues the NPS4 household this split-off left.
+      basis: variable-label
+      evidence: >-
+        HH_SEC_A.dta: y4_hhid "NPS4 HHID", sdd_hhid "Unique Household Identification
+        NPS-SDD", sdd_cluster "Unique ID for first-stage sampling unit".  sdd_hhid
+        begins with y4_hhid for all 238.
+    - text: A split-off belongs to the sampling cluster of the household it left, as a tracked mover does.
+      basis: modelling-choice
+      evidence: >-
+        No document assigns a split-off a cluster.  The NPS carries a tracked
+        household's original cluster forward, and split-offs are tracked by the same
+        rule (2019-20 BID, p. 7).  Its own location does not follow: 177 of the 238 are
+        in the region of the cluster they take, so 61 are labelled where the household
+        came from, as movers are.  Its strata does not follow either: 146 of the 238
+        have their frame household's strata, so the other 92 sit in a cluster of
+        another stratum.
+  validated_against: tests/test_tanzania_1441_followups.py reads HH_SEC_A.dta directly.
+  contents: 'Tanzania/_/CONTENTS.org, "District and Region labels for market= (GH #1441)"'
+  since: '2026-11-04'

@@ -80,8 +80,9 @@ Sampling:
         (the 2008-15 extended panel uses 8-character RR D WW EEE), so the
         tracked Extended-Panel households keep none of their `v`: 0 of 907
         linked households (849 with `v` on both sides).  NOT a bijection --
-        over the 310 cluster pairs those 849 form, 131 cluster ids map to more
-        than one id on the other side, because
+        over the 300 cluster pairs those 849 form, 130 cluster ids map to more
+        than one id on the other side (310 and 131 before 238 split-offs took
+        their parent's cluster, GH #1441), because
         tracked households genuinely moved -- so no crosswalk is recoverable
         here even in principle.
       source_type: derived-from-data

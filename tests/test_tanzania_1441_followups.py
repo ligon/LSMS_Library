@@ -5,6 +5,7 @@ The oracle reads the source files directly and imports nothing from
 
 Data-dependent tests skip cleanly when the Tanzania source files are unavailable.
 """
+import json
 import re
 import warnings
 
@@ -12,6 +13,7 @@ import pandas as pd
 import pytest
 
 import lsms_library as ll
+from lsms_library.derivations import call_inputs, records_for
 from lsms_library.local_tools import get_dataframe
 from lsms_library.paths import countries_root
 
@@ -115,3 +117,113 @@ def test_market_district_leaves_only_the_conflicting_cluster_na_in_2010_11(tz):
     expected = set(sample[(sample["t"] == "2010-11") & (sample["v"] == CONFLICT)]["i"])
     got = set(market[(market["t"] == "2010-11") & market["m"].isna()]["i"])
     assert got == expected and got
+
+
+# --------------------------------------------------------------------------
+# B.  2019-20 split-offs take the parent's cluster.
+# --------------------------------------------------------------------------
+
+SPLIT_KEY = "Tanzania::sample::split-off-parent-cluster"
+
+
+@pytest.fixture(scope="module")
+def sdd():
+    """HH_SEC_A.dta with the expected `v` worked out from the source alone."""
+    raw = _read("2019-20/Data/HH_SEC_A.dta").copy()
+    raw["own_v"] = raw["clusterid"].map(lambda x: str(int(x)))
+    raw["in_frame"] = raw["sdd_cluster"].astype("string").str.strip().replace("", pd.NA).notna()
+    frame = raw[raw["in_frame"]]
+    frame_ids = set(frame["own_v"])
+    sibling = frame.groupby("y4_hhid")["own_v"].agg(lambda s: sorted(set(s)))
+    raw["stray"] = ~raw["in_frame"] & ~raw["own_v"].isin(frame_ids)
+    raw["sibling"] = raw["y4_hhid"].map(sibling)
+    raw["rekey"] = raw["stray"] & raw["sibling"].notna()
+    raw["expected_v"] = raw["own_v"]
+    raw.loc[raw["rekey"], "expected_v"] = raw.loc[raw["rekey"], "sibling"].map(lambda s: s[0])
+    walk = json.loads((countries_root() / "Tanzania" / "_" / "updated_ids.json").read_text())["2019-20"]
+    raw["i"] = raw["sdd_hhid"].map(lambda x: walk.get(x, x))
+    return raw.set_index("i")
+
+
+@pytest.fixture(scope="module")
+def sample_2019(tz):
+    return _build(tz.sample).xs("2019-20", level="t")
+
+
+def test_each_rekeyed_household_has_one_parent_cluster(sdd):
+    assert sdd["rekey"].any()
+    assert (sdd.loc[sdd["rekey"], "sibling"].map(len) == 1).all()
+
+
+def test_no_2019_20_household_is_gained_or_lost(sdd, sample_2019):
+    assert set(sample_2019.index) == set(sdd.index)
+    assert sample_2019.index.is_unique
+
+
+def test_v_is_the_parent_cluster_exactly_where_the_source_says(sdd, sample_2019):
+    served = sample_2019["v"].astype(str)
+    assert (served.reindex(sdd.index) == sdd["expected_v"]).all()
+
+
+def test_key_is_on_exactly_the_rekeyed_households(sdd, sample_2019):
+    stamped = sample_2019["Derivation"].eq(SPLIT_KEY).fillna(False).astype(bool)
+    assert set(stamped[stamped].index) == set(sdd[sdd["rekey"]].index)
+    assert sample_2019["Derivation"].dropna().eq(SPLIT_KEY).all()
+
+
+def test_design_columns_stay_the_households_own(sdd, sample_2019):
+    s = sample_2019.reindex(sdd.index)
+    assert (s["strata"].astype(str).str.upper().str.replace(r"\W", "", regex=True)
+            == sdd["strataid"].astype(str).str.upper().str.replace(r"\W", "", regex=True)).all()
+    ratio = (s["weight"].astype(float) / sdd["sdd_weights"].astype(float))
+    assert ratio.max() - ratio.min() < 1e-9, "weight normalisation must be one constant"
+    assert (s["weight"] == s["panel_weight"]).all()
+
+
+def test_every_rekeyed_v_is_in_cluster_features(sdd, cf):
+    known = set(cf.loc[cf["t"] == "2019-20", "v"])
+    assert set(sdd.loc[sdd["rekey"], "expected_v"]) <= known
+
+
+def test_cluster_features_gains_no_stray_cluster(sdd, cf):
+    assert set(cf.loc[cf["t"] == "2019-20", "v"]) == set(sdd.loc[sdd["in_frame"], "own_v"])
+
+
+def test_only_strays_without_a_parent_stay_unlabelled(tz, sdd):
+    for col in ("Region", "District"):
+        market = _build(lambda col=col: tz.sample(market=col)).xs("2019-20", level="t").reset_index()
+        got = set(market.loc[market["m"].isna(), "i"])
+        expected = set(sdd[sdd["stray"] & ~sdd["rekey"]].index)
+        if col == "Region":
+            assert got == expected and got
+        else:
+            assert expected <= got
+
+
+def test_the_new_v_reaches_other_household_tables(tz, sdd):
+    """`_join_v_from_sample` carries it, so no other table states a second `v`."""
+    roster = _build(tz.household_roster)
+    v = roster.index.get_level_values("v")[roster.index.get_level_values("t") == "2019-20"].astype(str)
+    i = roster.index.get_level_values("i")[roster.index.get_level_values("t") == "2019-20"]
+    got = pd.Series(v, index=i).groupby(level=0).first()
+    rekeyed = sdd[sdd["rekey"]]
+    both = got.index.intersection(rekeyed.index)
+    assert len(both)
+    assert (got.reindex(both) == rekeyed["expected_v"].reindex(both)).all()
+
+
+def test_two_origin_households_of_2014_15_keep_no_v(tz, upd):
+    r4 = upd[upd["round"] == 4]
+    n = r4.groupby("r_hhid")["cid"].nunique()
+    served = _build(tz.sample).xs("2014-15", level="t")
+    assert int(served["v"].isna().sum()) == int((n > 1).sum())
+
+
+def test_registered_inputs_join_every_rekeyed_household(tz, sdd):
+    rec = records_for("Tanzania", "sample")[SPLIT_KEY]
+    assert set(rec["raw_variables"]) <= set(call_inputs(rec).columns)
+    inputs = tz.derivation_inputs(SPLIT_KEY)
+    keys = set(inputs.xs("2019-20", level="t").index)
+    assert set(sdd[sdd["rekey"]].index) <= keys
+    summary = _build(tz.sample).attrs["derivations"]["Tanzania"][SPLIT_KEY]
+    assert summary["rows"] == int(sdd["rekey"].sum())
