@@ -91,7 +91,9 @@ EXPECTED_ROWS = {
     # purchased quantity is zero and which used to survive on the raw s07bq08
     # (and the gift subtraction moves more of them to zero); s07bq05 then adds
     # 15,253 new `s='inkind'` rows across the two EHCVM waves.  Net +851.
-    "food_acquired": 239877,    # 239,882 before GH #833's sugar fold
+    # 239,877 before GH #1224: one 2021-22 household's two sugar rows differ in
+    # unit size, so the #833 fold no longer sums them.  Quantity is unchanged.
+    "food_acquired": 239878,    # 239,882 before GH #833's sugar fold
     # 42,364 before the bundle; 42,426 before GH #1123, whose seed-crop split
     # stops the catch-all collapse eating 6 (2018-19) + 3 (2021-22) native
     # input lines.  None of the nine carries u == Unknown (counts below).

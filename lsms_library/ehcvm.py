@@ -105,6 +105,24 @@ string compare), Mali 2018-19 pads ``s07bq03b`` with seven leading spaces, and
 Mali's size labels read ``'Unite de taille unique'`` against ``'Taille
 unique'``.  Where both spellings carry the EHCVM numeric prefix the key IS
 that code, which is exact.
+
+The unit SIZE in the served ``u`` (GH #1224)
+--------------------------------------------
+``s07bq03b`` is a unit and ``s07bq03c`` that unit's size, and a small and a
+large heap are different quantities, so ``food_acquired.u`` carries both:
+``Tas (Petit)``, ``Tiya (Entier)``, ``Bol (Grand)`` -- Uganda's ``Heap (Small)``
+form, decided by @ligon 2026-11-03.  :func:`carry_unit_size` rewrites the wide
+frame's ``u`` before the reshape, so the purchased, produced and in-kind rows
+all carry it, and it maps the base through the country's own read-time ``u``
+table FIRST, because every read-time mapper is keyed on the bare label and
+would pass a sized one through unmapped.  Stripping the suffix therefore gives
+exactly the ``u`` the row is served without it.  The size-free code and a
+missing size keep the bare unit byte for byte; so do a row with no recorded
+unit and a row whose served unit is an exact metric label (``Kg``, ``Litre``),
+because the suffix would cost the kg ladder its reading of that label and
+``transformations.py`` is not this module's to change.  No quantity is
+rescaled and no weight is attached to a size.  ``Expenditure`` is untouched:
+:func:`unit_match` reads the unit and size columns, not ``u``.
 """
 from __future__ import annotations
 

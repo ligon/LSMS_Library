@@ -76,15 +76,18 @@ BEFORE_SUM = {
 #: Served purchased-side ``Expenditure`` AFTER, under construction C, and the
 #: number of ``s='inkind'`` rows ``s07bq05`` now supplies.  Measured warm in the
 #: worktree, 2026-09-12.  The three candidate quantities per wave are in each
-#: country's ``_/derivations.yml`` and ``_/CONTENTS.org``.
+#: country's ``_/derivations.yml`` and ``_/CONTENTS.org``.  Three inkind counts
+#: re-pinned 2026-11-03 (GH #1224): two gifts of one bucketed item at different
+#: sizes no longer share a key (Togo +1, Benin +13, Mali 2021-22 +17); gift
+#: quantities and every Expenditure total are unchanged.
 AFTER = {
-    ('Togo', '2018'): (31_676_794.87, 10_212),
-    ('Benin', '2018-19'): (68_929_996.70, 18_632),
+    ('Togo', '2018'): (31_676_794.87, 10_213),
+    ('Benin', '2018-19'): (68_929_996.70, 18_645),
     ('Guinea-Bissau', '2018-19'): (57_552_942.85, 13_818),
     ('Senegal', '2018-19'): (147_345_570.63, 10_802),
     ('Senegal', '2021-22'): (182_628_314.17, 10_917),
     ('Mali', '2018-19'): (89_614_678.64, 16_459),
-    ('Mali', '2021-22'): (97_178_691.52, 16_869),
+    ('Mali', '2021-22'): (97_178_691.52, 16_886),
     ('Niger', '2018-19'): (53_351_991.10, 8_141),
     ('Niger', '2021-22'): (67_358_383.42, 7_112),
     ('Burkina_Faso', '2018-19'): (52_466_280.38, 9_386),

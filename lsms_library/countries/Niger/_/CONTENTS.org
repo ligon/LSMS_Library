@@ -1801,6 +1801,7 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - The served =u= index still carries only =s07bq03b=, not the unit SIZE
   =s07bq03c=, so two rows differing only in container size collapse onto one
   =u=.  The derivation does distinguish them; the index does not.
+- [2026-11-03, GH #1224: no longer true.  =u= is now =<unit> (<Size>)= where =s07bq03c= names a size, in the form 2018-19 =community_prices= serves (=Tas (Petit)=, =Tiya (Entier)=); the base goes through the =u= table first, which is what strips 2021-22's =139. Sachet= prefix.  The 8 2021-22 rows with no unit have no size either and stay =Unknown=.  Cold: 2018-19 rows unchanged at 108,333, =u= 44 -> 117; 2021-22 rows 131,544 -> 131,545, =u= 35 -> 87.  Household (t, j, u) cells finding a 2018-19 community (j, u) price rise 41 of 448 -> 339 of 936 (rows 12,518 -> 78,329 of 108,333), which closes the =food_acquired.u= gap in the "Still not done" note under "2018-19 community prices are wired"; =lsms_library/ehcvm.py=.]
 - The price still comes from a purchase up to 30 days old.  That is what the
   instrument asked; the assumption is recorded rather than hidden.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
