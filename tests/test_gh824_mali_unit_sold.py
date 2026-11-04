@@ -278,7 +278,8 @@ class TestServed:
         s7gq22 AS RECORDED (NA stays NA), single-plot rule, joined on the served
         (t, i, plot_id, crop)."""
         def hh(d, key):
-            return d.apply(lambda r: mali.i(pd.Series([r["grappe"], r[key]])), axis=1)
+            # Re-pinned for GH #1494: the EAC-I id carries the EACI_ prefix.
+            return d.apply(lambda r: mali.eaci_i(pd.Series([r["grappe"], r[key]])), axis=1)
 
         def plot(d, a, b):
             f = d[a].astype("Int64").astype("string")
@@ -341,7 +342,8 @@ class TestServed:
                 lambda v: table.get(v, pd.NA) if pd.notna(v) else pd.NA).astype("string")
 
         def hh(d, key):
-            return d.apply(lambda r: mali.i(pd.Series([r["grappe"], r[key]])), axis=1)
+            # Re-pinned for GH #1494: the EAC-I id carries the EACI_ prefix.
+            return d.apply(lambda r: mali.eaci_i(pd.Series([r["grappe"], r[key]])), axis=1)
 
         def plot(d, a, b):
             f = d[a].astype("Int64").astype("string")
