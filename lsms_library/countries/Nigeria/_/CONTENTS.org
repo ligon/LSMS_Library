@@ -379,7 +379,11 @@ sit in cells shared with other waves.  2010Q3's +101.77 is all =piece=, W1-PP's 
 label, which W4's blank-size pieces now share; W3's moves are in =small heap=,
 =small piece= and their neighbours, whose W4 peers have left for =medium= and
 =large=.  So "others must not move" holds for their rows and =u=, but not for their
-inferred kilograms, which move by at most 0.06% of a round (2015Q3).
+inferred kilograms: row by row, 35,856 of the 425,547 W1-W3 rows of
+=food_quantities(units='kgs')= change value (2010Q3 3,785, 2012Q3 156, 2013Q1 169,
+2015Q3 16,533, 2016Q1 15,213, 2011Q1 0), gross 411.86 kg of 1.02M, at most 0.14% of
+a round.  Most by a sliver (2015Q3 p10 / p50 / p90 0.94 / 0.999 / 1.009); 577 rows
+move by more than 10% and 53 by more than 25%.
 
 *Not changed*: other W4 codes that carry a size keep their plain label, because W3
 has no sized form to map them onto.  Ordinal sizes, rows 2018Q3 / 2019Q1: =Loaf=
