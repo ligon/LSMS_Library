@@ -1984,13 +1984,16 @@ def _get_kg_factors(df, *, volume_as_mass=True, unit_kg=None):
 #: - ``metric``     -- the LABEL states the kilograms: :data:`KNOWN_METRIC`,
 #:   or :func:`_parse_explicit_metric` reading "50 kg Bag" off the label.
 #: - ``item_unit``  -- the price-ratio inference for this row's OWN
-#:   ``(item, unit)`` cell.
+#:   ``(item, unit)`` cell.  A sized label's cell is that size alone; an unsized
+#:   label's cell reads every report of its base unit, whatever the size
+#:   (:data:`_UNIT_SIZE_WORDS`, GH #1450).
 #: - ``item_unit_tight`` -- the same, but the cell exists only because of the
 #:   dispersion-gated baseline exception (:data:`FOOD_KG_TIGHT_TOLERANCE`).
 #:   Separated because it is thinner evidence and a consumer is entitled to
 #:   drop it without dropping the rung.
 #: - ``unit``       -- the fallback: the u-keyed inference, pooled over every
-#:   item sharing the label.  This is what the library served for EVERY row
+#:   item sharing the label (and, for an unsized label, over every size of it,
+#:   as the rung above).  This is what the library served for EVERY row
 #:   before GH #850, and between a fifth and a half of the inferred rows still
 #:   land here, which is the argument for reporting it.
 #: - ``none``       -- no factor.
@@ -2027,6 +2030,265 @@ def _declared_no_kg_mask(df, no_kg, item_col='j'):
         cells[(item, unit)] = m
         mask |= m
     return mask, cells
+
+
+#: The size words of the EHCVM instrument, spelled as ``food_acquired.u`` serves
+#: them: ``Tas (Petit)``, the ``'{base} ({size})'`` of ``ehcvm.sized_unit``
+#: (GH #1224).  Read by :func:`_unit_size_base`.
+#:
+#: WHY UNSIZED ROWS NEED THIS AT ALL (GH #1450).  A delivered factor has no
+#: ``t`` axis, so an older wave that records no size (Burkina 2014, Mali
+#: 2014-15) used to borrow an ``(item, unit)`` estimate from EHCVM's bare
+#: labels.  #1224 moved those reports to ``Tas (Petit)`` and its siblings, which
+#: left the older wave's ``Tas`` nearly alone in its cell.  A coarser FALLBACK
+#: would not return it: the cross-wave median had changed for rows that kept
+#: their rung (Mali 2014-15: 9,942 of 25,083 such ``item_unit`` rows and 33,144
+#: of 40,307 ``unit`` rows), so the repair is to the POOL behind both inferred
+#: arms, not a new layer.  An unsized label's step 2 reads every report of its
+#: base, whatever the size; a sized label reads only itself.
+#:
+#: WHY A VOCABULARY AND NOT THE SHAPE OF THE LABEL.  A trailing parenthesis is
+#: not a size, and no test on the shape separates the two in this corpus: it
+#: states a quantity (``Sac (50 Kg)``, ``Paquet (250 g)``, Malawi's ``Loaf
+#: (600G)``), glosses a name (``Motte (boule)``, ``Tin (Debe)``, ``carton
+#: (brique)``), names a content (Ethiopia's ``Whole Animal (Sheep)``), counts
+#: (Senegal's ``Tablette (30)``, Malawi's ``Grass Hoppers (25)``) or says
+#: nothing (``Other (Specify)``).  Requiring two distinct suffixes on one base
+#: would admit ``Whole Animal`` and make a label's meaning depend on which waves
+#: were requested.
+#:
+#: WHY THESE WORDS AND NOT ``Small`` / ``Medium`` / ``Large``.  Uganda's and
+#: Malawi's ``Heap (Small)`` predate #1224 and were never pooled, so #1224 took
+#: nothing from them and restoring it moves nothing there: every label outside
+#: this vocabulary stays its own cell, exactly as before.  Whether Malawi's bare
+#: ``Heap`` should pool its sizes is a separate question with its own
+#: measurement, not a side effect of this one.
+#:
+#: IT CANNOT DRIFT FROM ``ehcvm.py`` UNSEEN, by a chain of two tests.
+#: ``tests/test_ehcvm_7day.py::test_every_size_suffix_is_the_countrys_own`` fails
+#: on any suffix a delivered EHCVM cell serves outside its ``SIZES``, and
+#: ``tests/test_food_kg_size_pool.py`` fails unless the union of ``SIZES`` is this
+#: set and ``ehcvm.size_label`` leaves each word alone.  It is a copy rather than
+#: an import for the reason ``ehcvm._EXACT_METRIC_LABELS`` is: the two modules do
+#: not depend on each other, so no kg symbol reaches a build fingerprint.  A word
+#: missing here costs a pool, never a wrong factor: the label stays its own cell.
+_UNIT_SIZE_WORDS = frozenset({
+    'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier',
+    'Très petit', 'Très petite', 'Autre taille',
+    'Sans brassée', 'Avec 1 brassée', 'Avec 2 brassées',
+    'A 2 doigts', 'A 3 doigts', 'A 5 doigts',
+    'Pequeno', 'Medio', 'Grande',
+    '98',       # Togo 2018's size code with no value label (GH #1224)
+})
+_UNIT_SIZE_SUFFIX = re.compile(r'^(.+) \(([^()]*)\)$')
+
+
+def _unit_size_base(label):
+    """The unit a sized ``u`` label is a size OF, else ``None`` (GH #1450).
+
+    >>> _unit_size_base('Tas (Petit)')
+    'Tas'
+    >>> _unit_size_base('Sac (50 Kg) (Moyen)')
+    'Sac (50 Kg)'
+    >>> _unit_size_base('662 (Moyen)')
+    '662'
+    >>> _unit_size_base('Bouquet (98)')
+    'Bouquet'
+
+    Not a size: a stated quantity, another country's own suffix, a count, or a
+    gloss.
+
+    >>> _unit_size_base('Sac (50 Kg)') is None
+    True
+    >>> _unit_size_base('Heap (Small)') is None
+    True
+    >>> _unit_size_base('Tablette (30)') is None
+    True
+    >>> _unit_size_base('Motte (boule)') is None
+    True
+
+    A metric base is refused too.  ``ehcvm.carry_unit_size`` never mints one, and
+    refusing it is what keeps the price-per-kg baseline out of the pool: a ``Kg
+    (Petit)`` stripped to ``Kg`` would otherwise enter it.
+
+    >>> _unit_size_base('Kg (Grand)') is None
+    True
+    """
+    if not isinstance(label, str):
+        return None
+    m = _UNIT_SIZE_SUFFIX.match(label)
+    if m is None or m.group(2) not in _UNIT_SIZE_WORDS:
+        return None
+    base = m.group(1)
+    return None if base.strip().lower() in KNOWN_METRIC else base
+
+
+def _size_pooled_frame(df):
+    """*df* with each sized ``u`` relabelled to its base, and the rows that read it.
+
+    Returns ``(frame, rows)``: the relabelled frame, for the estimators to run
+    on, and the boolean mask of rows whose own label is UNSIZED and is the base
+    of a sized label in *df* (matched on :func:`_normalise_join_key`'s spelling,
+    as the item arm joins).  ``(None, all-False)`` when no row qualifies, which
+    is every frame with no size vocabulary in its ``u``.
+    """
+    n = len(df)
+    nothing = (None, np.zeros(n, dtype=bool))
+    if not isinstance(df.index, pd.MultiIndex) or 'u' not in df.index.names:
+        return nothing
+    raw = df.index.get_level_values('u')
+    codes, labels = pd.factorize(raw)
+    labels = np.asarray(labels, dtype=object)
+    bases = [_unit_size_base(lab) for lab in labels]
+    family = {b.strip().lower() for b in bases if b is not None}
+    if not family:
+        return nothing
+    reads_pool = np.fromiter(
+        (b is None and str(lab).strip().lower() in family
+         for lab, b in zip(labels, bases)), dtype=bool, count=len(labels))
+    if not reads_pool.any():
+        return nothing
+    known = codes >= 0
+    rows = np.zeros(n, dtype=bool)
+    rows[known] = reads_pool[codes[known]]
+    pooled = np.array([lab if b is None else b for lab, b in zip(labels, bases)],
+                      dtype=object)
+    new_u = np.full(n, np.nan, dtype=object)
+    new_u[known] = pooled[codes[known]]
+    frame = df.set_axis(pd.MultiIndex.from_arrays(
+        [new_u if name == 'u' else df.index.get_level_values(name)
+         for name in df.index.names], names=df.index.names))
+    return frame, rows
+
+
+#: What :func:`_inferred_kg_rungs` estimates per row.  The size pool (GH #1450)
+#: takes all of them together, so a row's factor, its wave provenance and its
+#: ``baseline_refused_spread`` come from one estimate.
+_KG_RUNG_ARRAYS = ('kg_item', 'kg_tight', 'kg_waves', 'kg_wave_spread',
+                   'refused', 'kg_unit')
+
+
+def _inferred_kg_rungs(df, units, seeded, group_levels, item_col, gates, infer):
+    """The ``item_unit`` and ``unit`` candidates for every row of *df*.
+
+    Split out of :func:`food_kg_factors` for GH #1450, so the labels as served
+    and the labels with sizes pooled go through one estimator.  *units* is the
+    lower-cased ``u`` of *df*, *gates* the floors of :func:`conversion_to_kgs`.
+    With ``infer`` false every candidate is empty.
+    """
+    n = len(df)
+    idx_names = list(df.index.names or [])
+    kg_item = np.full(n, np.nan)
+    kg_tight = np.zeros(n, dtype=bool)
+    kg_waves = np.full(n, np.nan)
+    kg_wave_spread = np.full(n, np.nan)
+    refused = np.zeros(n, dtype=bool)
+    kg_unit = np.full(n, np.nan)
+    contradicting = {}
+    item_contradicting = None
+    if infer:
+        try:
+            per_u = conversion_to_kgs(df, index=group_levels)
+        except (ValueError, ZeroDivisionError, KeyError):
+            per_u = {}
+        # The u rung is keyed on the RAW label, exactly as
+        # ``_get_kg_factors`` consumes it; lower-case here so a case
+        # variant does not silently miss.
+        lowered = {}
+        for lbl, f in per_u.items():
+            if np.isfinite(f) and f > 0:
+                lowered.setdefault(str(lbl).lower(), float(f))
+        # GH #838: the ladder already serves the seeded factor (the
+        # ``metric`` rung outranks ``item_unit``/``unit``); what was
+        # missing is the REPORT that the inference contradicted the
+        # label's own stated size.  Same comparison as the
+        # ``_get_kg_factors`` twin.
+        contradicting.update({
+            k: (seeded[k], f) for k, f in lowered.items()
+            if k in seeded and seeded[k] > 0
+            and max(f / seeded[k], seeded[k] / f)
+            > STATED_VS_INFERRED_TOLERANCE})
+        kg_unit = _valid_factor(pd.Series(np.asarray(units)).map(lowered))
+
+        if item_col in idx_names or item_col in df.columns:
+            try:
+                detail = conversion_to_kgs(
+                    df, index=group_levels, item_col=item_col, **gates,
+                    _detail=True)
+                # GH #838, item arm: a ``(j, u)`` inference that
+                # contradicts the label's own stated size.  Counted but
+                # not warned here -- the u-rung merge below reports the
+                # label ONCE, and this detail frame only adds which ITEMS
+                # the contradiction came from.
+                if detail is not None and len(detail):
+                    us = detail.index.get_level_values('u').astype(
+                        str).str.lower()
+                    stated = pd.Series(us).map(seeded).to_numpy()
+                    inf = detail['kg_per_unit'].to_numpy()
+                    bad = (np.isfinite(stated) & (stated > 0)
+                           & np.isfinite(inf) & (inf > 0)
+                           & (np.maximum(inf / stated, stated / inf)
+                              > STATED_VS_INFERRED_TOLERANCE))
+                    if bad.any():
+                        item_contradicting = int(bad.sum())
+            except (ValueError, ZeroDivisionError, KeyError):
+                detail = None
+            if detail is not None and len(detail):
+                items = (df.index.get_level_values(item_col)
+                         if item_col in idx_names else df[item_col])
+                raw_u = (df.index.get_level_values('u')
+                         if 'u' in idx_names else df['u'])
+                key = pd.MultiIndex.from_arrays(
+                    [_normalise_join_key(items),
+                     _normalise_join_key(raw_u)])
+                ref = detail.copy()
+                ref.index = pd.MultiIndex.from_arrays(
+                    [_normalise_join_key(
+                        ref.index.get_level_values(item_col)),
+                     _normalise_join_key(ref.index.get_level_values('u'))])
+                # Two raw labels differing only in case normalise onto one
+                # key; keep the first, exactly as the lower-cased lookup
+                # in ``_get_kg_factors`` does (which already reports the
+                # clash -- see :class:`UnitLabelCollisionWarning`; a
+                # second warning here would be the same news twice).
+                ref = ref[~ref.index.duplicated()]
+                hit = ref.reindex(key)
+                kg_item = _valid_factor(hit['kg_per_unit'])
+                kg_tight = (hit['baseline_tight'] == True).to_numpy(  # noqa: E712
+                    dtype=bool)
+                kg_waves = _as_float(hit['n_waves'])
+                kg_wave_spread = _as_float(hit['wave_spread'])
+                if gates['baseline_max_spread'] is not None:
+                    # Which rows the GATE cost their item factor, as
+                    # opposed to which rows never had one.  The honest
+                    # answer is a counterfactual -- "would this row have
+                    # been served by its own (j, u) cell with the gate
+                    # off?" -- so the ungated map is estimated once more
+                    # and differenced.  A cell surviving on some OTHER
+                    # wave's baseline is therefore NOT counted: the gate
+                    # did not cost that row anything.
+                    try:
+                        ungated = conversion_to_kgs(
+                            df, index=group_levels, item_col=item_col,
+                            **{**gates, 'baseline_max_spread': None},
+                            _detail=True)
+                    except (ValueError, ZeroDivisionError, KeyError):
+                        ungated = None
+                    if ungated is not None and len(ungated):
+                        uref = ungated.copy()
+                        uref.index = pd.MultiIndex.from_arrays(
+                            [_normalise_join_key(
+                                uref.index.get_level_values(item_col)),
+                             _normalise_join_key(
+                                 uref.index.get_level_values('u'))])
+                        uref = uref[~uref.index.duplicated()]
+                        would_have = _valid_factor(
+                            uref.reindex(key)['kg_per_unit'])
+                        refused = np.isnan(kg_item) & ~np.isnan(would_have)
+    return {'kg_item': kg_item, 'kg_tight': kg_tight, 'kg_waves': kg_waves,
+            'kg_wave_spread': kg_wave_spread, 'refused': refused,
+            'kg_unit': kg_unit, 'contradicting': contradicting,
+            'item_contradicting': item_contradicting}
 
 
 def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
@@ -2085,7 +2347,8 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
     pandas.DataFrame
         Indexed like *df*, with columns ``kg_per_unit``, ``KgFactorSource``,
         ``kg_survey``, ``kg_metric``, ``kg_item_unit``, ``kg_item_n_waves``,
-        ``kg_item_wave_spread``, ``baseline_refused_spread`` and ``kg_unit``.
+        ``kg_item_wave_spread``, ``baseline_refused_spread``, ``kg_size_pooled``
+        and ``kg_unit``.
         ``attrs['kg_factor_sources']`` maps each layer to its row count;
         ``attrs['kg_factor_wave_spread']`` reports how far the pooled waves
         disagreed; ``attrs['kg_factor_baseline_gate']`` reports how many rows
@@ -2096,9 +2359,22 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         ``rows_matched`` (rows on a declared cell) and ``rows_refused`` (of
         those, rows an inferred rung WOULD have served and that are now
         ``none``), per cell in ``cells``.
+        ``attrs['kg_factor_size_pool']`` reports the rows ``kg_size_pooled``
+        marks: an unsized label served by an inferred rung whose estimate pooled
+        the sizes of its base (GH #1450).  ``rows_served ==
+        served_by_item_rung + served_by_unit_rung``; ``labels`` names them.
 
     Notes
     -----
+    WHICH CELL A ROW READS.  A label carrying a size of the EHCVM instrument
+    (``Tas (Petit)``, :func:`_unit_size_base`) reads that size alone, because a
+    size is what the survey recorded.  An unsized label with sized siblings in
+    the frame (``Tas``) reads the same two rungs on the frame with those sizes
+    stripped, because it recorded no size to pick one by: that is what it read
+    before #1224 split the labels.  It stays one number per ``(j, u)``, with no
+    wave condition, so a size-free row in an EHCVM wave pools too.  Every other
+    label is its own cell and no second estimate is made.
+
     WHAT THIS DOES NOT FIX, stated where a user will meet it.  The only
     external answer key the corpus has for a food unit is Mali's own
     questionnaire, and against it the corrected inference is BETTER and still
@@ -2131,127 +2407,39 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         raise ValueError("food_kg_factors: expected a 'u' unit level or column")
     kg_metric = _valid_factor(pd.Series(np.asarray(units)).map(seeded))
 
-    kg_item = np.full(len(df), np.nan)
-    kg_tight = np.zeros(len(df), dtype=bool)
-    kg_waves = np.full(len(df), np.nan)
-    kg_wave_spread = np.full(len(df), np.nan)
-    refused = np.zeros(len(df), dtype=bool)
-    kg_unit = np.full(len(df), np.nan)
     have_price = ('Expenditure' in df.columns and 'Quantity' in df.columns)
-    contradicting = {}
+    group_levels = [n for n in ('t', 'm', 'i') if n in idx_names]
+    gates = dict(min_reports=min_reports, min_baseline=min_baseline,
+                 min_baseline_tight=min_baseline_tight,
+                 tight_tolerance=tight_tolerance,
+                 baseline_max_spread=baseline_max_spread)
+    infer = have_price and bool(group_levels)
+    rungs = _inferred_kg_rungs(df, units, seeded, group_levels, item_col,
+                               gates, infer)
+    # GH #1450: an UNSIZED label reads the cell of its base unit pooled over
+    # every size.  Sized rows keep the rungs just computed, so they cannot
+    # move; a frame with no sized sibling for any bare label gets no pool, so
+    # nothing else can.  See :data:`_UNIT_SIZE_WORDS`.
+    pool_frame, size_pool_rows = _size_pooled_frame(df)
+    if infer and pool_frame is not None:
+        pool_units = pool_frame.index.get_level_values('u').astype(
+            str).str.lower()
+        pooled = _inferred_kg_rungs(pool_frame, pool_units, seeded,
+                                    group_levels, item_col, gates, infer)
+        for name in _KG_RUNG_ARRAYS:
+            rungs[name] = np.where(size_pool_rows, pooled[name], rungs[name])
+    kg_item = rungs['kg_item']
+    kg_tight = rungs['kg_tight']
+    kg_waves = rungs['kg_waves']
+    kg_wave_spread = rungs['kg_wave_spread']
+    refused = rungs['refused']
+    kg_unit = rungs['kg_unit']
+    contradicting = rungs['contradicting']
     # Reported below, once it is known whether the item arm ran -- a second
     # ``conversion_to_kgs`` call can raise the warning the u-rung merge
     # already emitted, and a warning raised inside the ``try`` would be
     # swallowed by the guard meant for the estimator's numeric failures.
-    item_contradicting = None
-    if have_price:
-        group_levels = [n for n in ('t', 'm', 'i') if n in idx_names]
-        if group_levels:
-            try:
-                per_u = conversion_to_kgs(df, index=group_levels)
-            except (ValueError, ZeroDivisionError, KeyError):
-                per_u = {}
-            # The u rung is keyed on the RAW label, exactly as
-            # ``_get_kg_factors`` consumes it; lower-case here so a case
-            # variant does not silently miss.
-            lowered = {}
-            for lbl, f in per_u.items():
-                if np.isfinite(f) and f > 0:
-                    lowered.setdefault(str(lbl).lower(), float(f))
-            # GH #838: the ladder already serves the seeded factor (the
-            # ``metric`` rung outranks ``item_unit``/``unit``); what was
-            # missing is the REPORT that the inference contradicted the
-            # label's own stated size.  Same comparison as the
-            # ``_get_kg_factors`` twin.
-            contradicting.update({
-                k: (seeded[k], f) for k, f in lowered.items()
-                if k in seeded and seeded[k] > 0
-                and max(f / seeded[k], seeded[k] / f)
-                > STATED_VS_INFERRED_TOLERANCE})
-            kg_unit = _valid_factor(pd.Series(np.asarray(units)).map(lowered))
-
-            if item_col in idx_names or item_col in df.columns:
-                try:
-                    detail = conversion_to_kgs(
-                        df, index=group_levels, item_col=item_col,
-                        min_reports=min_reports, min_baseline=min_baseline,
-                        min_baseline_tight=min_baseline_tight,
-                        tight_tolerance=tight_tolerance,
-                        baseline_max_spread=baseline_max_spread,
-                        _detail=True)
-                    # GH #838, item arm: a ``(j, u)`` inference that
-                    # contradicts the label's own stated size.  Counted but
-                    # not warned here -- the u-rung merge below reports the
-                    # label ONCE, and this detail frame only adds which ITEMS
-                    # the contradiction came from.
-                    if detail is not None and len(detail):
-                        us = detail.index.get_level_values('u').astype(
-                            str).str.lower()
-                        stated = pd.Series(us).map(seeded).to_numpy()
-                        inf = detail['kg_per_unit'].to_numpy()
-                        bad = (np.isfinite(stated) & (stated > 0)
-                               & np.isfinite(inf) & (inf > 0)
-                               & (np.maximum(inf / stated, stated / inf)
-                                  > STATED_VS_INFERRED_TOLERANCE))
-                        if bad.any():
-                            item_contradicting = int(bad.sum())
-                except (ValueError, ZeroDivisionError, KeyError):
-                    detail = None
-                if detail is not None and len(detail):
-                    items = (df.index.get_level_values(item_col)
-                             if item_col in idx_names else df[item_col])
-                    raw_u = (df.index.get_level_values('u')
-                             if 'u' in idx_names else df['u'])
-                    key = pd.MultiIndex.from_arrays(
-                        [_normalise_join_key(items),
-                         _normalise_join_key(raw_u)])
-                    ref = detail.copy()
-                    ref.index = pd.MultiIndex.from_arrays(
-                        [_normalise_join_key(
-                            ref.index.get_level_values(item_col)),
-                         _normalise_join_key(ref.index.get_level_values('u'))])
-                    # Two raw labels differing only in case normalise onto one
-                    # key; keep the first, exactly as the lower-cased lookup
-                    # in ``_get_kg_factors`` does (which already reports the
-                    # clash -- see :class:`UnitLabelCollisionWarning`; a
-                    # second warning here would be the same news twice).
-                    ref = ref[~ref.index.duplicated()]
-                    hit = ref.reindex(key)
-                    kg_item = _valid_factor(hit['kg_per_unit'])
-                    kg_tight = (hit['baseline_tight'] == True).to_numpy(  # noqa: E712
-                        dtype=bool)
-                    kg_waves = _as_float(hit['n_waves'])
-                    kg_wave_spread = _as_float(hit['wave_spread'])
-                    if baseline_max_spread is not None:
-                        # Which rows the GATE cost their item factor, as
-                        # opposed to which rows never had one.  The honest
-                        # answer is a counterfactual -- "would this row have
-                        # been served by its own (j, u) cell with the gate
-                        # off?" -- so the ungated map is estimated once more
-                        # and differenced.  A cell surviving on some OTHER
-                        # wave's baseline is therefore NOT counted: the gate
-                        # did not cost that row anything.
-                        try:
-                            ungated = conversion_to_kgs(
-                                df, index=group_levels, item_col=item_col,
-                                min_reports=min_reports,
-                                min_baseline=min_baseline,
-                                min_baseline_tight=min_baseline_tight,
-                                tight_tolerance=tight_tolerance,
-                                baseline_max_spread=None, _detail=True)
-                        except (ValueError, ZeroDivisionError, KeyError):
-                            ungated = None
-                        if ungated is not None and len(ungated):
-                            uref = ungated.copy()
-                            uref.index = pd.MultiIndex.from_arrays(
-                                [_normalise_join_key(
-                                    uref.index.get_level_values(item_col)),
-                                 _normalise_join_key(
-                                     uref.index.get_level_values('u'))])
-                            uref = uref[~uref.index.duplicated()]
-                            would_have = _valid_factor(
-                                uref.reindex(key)['kg_per_unit'])
-                            refused = np.isnan(kg_item) & ~np.isnan(would_have)
+    item_contradicting = rungs['item_contradicting']
 
     # GH #838: the ladder already serves the seeded factor (the ``metric``
     # rung outranks ``item_unit``/``unit``); what was missing is the REPORT
@@ -2367,6 +2555,8 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                         'kg_item_n_waves': kg_waves,
                         'kg_item_wave_spread': kg_wave_spread,
                         'baseline_refused_spread': refused,
+                        'kg_size_pooled': (size_pool_rows & np.isin(
+                            source, ('item_unit', 'item_unit_tight', 'unit'))),
                         'kg_unit': kg_unit},
                        index=df.index)
     out.attrs['kg_factor_sources'] = {
@@ -2411,6 +2601,21 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                 'rows_matched': int(m.sum()),
                 'rows_refused': int((m & declared_refused).sum())}
             for (item, unit), m in declared_cells.items()},
+    }
+    # GH #1450.  A diagnostic beside the partition, like the gate's ledger: the
+    # rows are counted in ``item_unit`` / ``item_unit_tight`` / ``unit`` above.
+    # A row a higher rung serves, or that no rung serves, read no pooled cell
+    # that matters, so it is not counted.
+    pooled_served = out['kg_size_pooled'].to_numpy()
+    out.attrs['kg_factor_size_pool'] = {
+        'rows_served': int(pooled_served.sum()),
+        'served_by_item_rung': int(
+            (pooled_served & np.isin(source, ('item_unit', 'item_unit_tight'))
+             ).sum()),
+        'served_by_unit_rung': int((pooled_served & (source == 'unit')).sum()),
+        'labels': sorted(
+            {str(u) for u in (df.index.get_level_values('u')[pooled_served]
+                              if pooled_served.any() else ())}),
     }
     out.attrs['kg_factor_baseline_gate'] = {
         'baseline_max_spread': baseline_max_spread,
@@ -3201,6 +3406,7 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
         kgf.attrs['kg_factor_baseline_gate'])
     out.attrs['kg_factor_declared_none'] = dict(
         kgf.attrs['kg_factor_declared_none'])
+    out.attrs['kg_factor_size_pool'] = dict(kgf.attrs['kg_factor_size_pool'])
     return out
 
 
@@ -3407,6 +3613,7 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
             kgf.attrs['kg_factor_baseline_gate'])
         v.attrs['kg_factor_declared_none'] = dict(
             kgf.attrs['kg_factor_declared_none'])
+        v.attrs['kg_factor_size_pool'] = dict(kgf.attrs['kg_factor_size_pool'])
     return v
 
 
