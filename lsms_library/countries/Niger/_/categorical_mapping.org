@@ -1238,9 +1238,10 @@
 # recorded.
 #
 # DECISION, NAMED (GH #1436): 2018-19's five answers fold onto the three tokens
-# the way the same programme's own 2021-22 instrument folded them -- ear and
+# the way Niger's and Senegal's 2021-22 instruments folded them -- ear and
 # hull (Epis, Non-decortique) into `epis/coques`, grain and hulled (Grain,
-# Decortique) into `Grains`.  The fold LOSES a distinction the 2018-19 answer
+# Decortique) into `Grains`; Burkina Faso's and Mali's 2021-22 keep all five.
+# The fold LOSES a distinction the 2018-19 answer
 # made: `unshelled` is Epis 6,482 + Non-decortique 904 lines, `shelled` is Grain
 # 3,715 + Decortique 1,763.  It costs no index collision, because the wave's
 # (plot, crop, unit) key is unique without this level.  Keeping 2018-19's five

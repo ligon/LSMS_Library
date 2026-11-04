@@ -2384,7 +2384,8 @@ harvest =Quantity= was measured.
   =.xls= is the unadapted regional template ("REPUBLIQUE [NOM DU PAYS]"), so the
   =.dta= is the better witness for Niger.  Both describe the crops carrying the
   code (Oignon 101, Gombo 71, Oseille 57, Autre 36, Tomate 31, Manioc 18), and
-  both land on =shell_not_applicable=.  2021-22's =na= is the same crops.
+  both land on =shell_not_applicable=.  34 of 2021-22's 42 =na= rows are the same
+  crops (Gombo 19, Oseille 12, Oignon 3).
 - *The state is blank exactly where the unit is*, in both EHCVM files: 443 rows
   in 2018-19 (the DDI splits them 439 system-missing, 4 =.A=; 2 carry no measure
   at all and =_finalize_result= drops them) and 991 of the lines naming a crop in
@@ -2402,22 +2403,34 @@ Décortiqué -> =shelled=, Non-décortiqué -> =unshelled= and code 5 ->
 the vocabulary's bare form tokens are Malawi's, and =*_in_cob= / =*_grain= assert
 a dryness this instrument never asks.  They are served as =unshelled= (Epis) and
 =shelled= (Grain) because:
-- the programme's own 2021-22 instrument folds exactly so: harvest =épis/coques= |
-  =Grains= | =na=, and on the sale side =épis/coques/panicules= | =grains= | =na=.
-  That answer cannot be split back, so a 2021-22 row has no other home;
+- Niger's and Senegal's 2021-22 instruments fold exactly so: Niger's harvest
+  =épis/coques= | =Grains= | =na=, its sale side =épis/coques/panicules= | =grains=
+  | =na=, Senegal's =Epis/coques= | =Grains= | =NA=.  This is not the whole
+  programme: Burkina Faso and Mali 2021-22 still label =s16cq16d= with all five
+  answers and use all five (7 / 56 / 10 / 47 / 53 and 22 / 111 / 24 / 63 / 89, most
+  of their harvest grid unfilled).  Niger's answer cannot be split back, so a
+  2021-22 row has no other home;
 - the crops line up across the fold (share of the two-way class that is
   =unshelled=, 2018-19 / 2021-22): Mil 85% / 76%, Sorgho 79% / 64%, Arachide 81%
   / 78%, Riz Paddy 82% / 78%, Niébé 7% / 5%, Sésame 3% / 4%;
 - within a crop the two =unshelled= answers barely overlap (Mil 4,405 Epis, 12
   Non-décortiqué; Arachide 2 and 518);
-- 2018-19 sale prices treat Grain and Décortiqué as one state for most cells
-  (median FCFA per Tia: Niébé 600 and 600, n 586 / 543; Sésame 972 and 971; per
-  Gros sac: Mil 20,000 and 20,000, Niébé 26,250 and 25,000), while
-  Non-décortiqué sells at about half (Arachide per Tia 400, against Décortiqué
-  816 and Grain 946).  2021-22 sells =grains= above =épis/coques/panicules= per
-  kilogram: Arachide 400 / 188, Riz Paddy 296 / 193, Mil 240 / 200, Niébé 320 / 267.
-Not every cell agrees: Niébé per =Sac Moyen= is Décortiqué 13,000, Grain 17,000
-(n 64 / 69), Arachide per =Gros sac= 20,000 and 10,000 (n 15 / 15).
+- 2018-19 sale prices put Grain and Décortiqué within 10% of each other in about
+  half the crop-unit cells that can be compared: 3 of 5 with n >= 15 on both sides,
+  4 of 8 with n >= 10, and those 4 hold 87% of the priced rows in the 8.  The 4
+  (median FCFA, Grain and Décortiqué): Niébé per Tia 600 and 600 (n 586 / 543),
+  Sésame per Tia 972 and 971 (165 / 60), Niébé per Gros sac 26,250 and 25,000 (85 /
+  158), Sésame per Gros sac 38,400 and 39,600 (21 / 13).  Mil per Gros sac is also
+  20,000 and 20,000, but Décortiqué has n 6, too thin to count.  Non-décortiqué
+  sells at about half (Arachide per Tia 400, against Décortiqué 816 and Grain 946).
+  2021-22 sells =grains= above =épis/coques/panicules= per kilogram: Arachide 400 /
+  188 (n 106 / 278), Riz Paddy 296 / 193 (16 / 29), Mil 240 / 200 (91 / 89), Niébé
+  320 / 267 (916 / 11, the 267 is thin).
+The other 4 cells disagree (Grain and Décortiqué): Niébé per =Sac Moyen= 17,000 and
+13,000 (n 69 / 64), Arachide per Tia 946 and 816 (12 / 38), Oseille per Tia 389 and
+200 (11 / 11), Arachide per =Gros sac= 10,000 and 20,000 (15 / 15).  That last Grain
+median sits on Non-décortiqué's 10,500 (n 274), so Arachide "Grain" in a sack prices
+like the in-shell answer.
 
 What the fold loses: the 2018-19 answer's distinction, on all 12,864 lines that
 answer it.  It costs no collision, because the wave's (plot, crop, unit) key is
@@ -2447,12 +2460,21 @@ fill all 47,416 Niger rows with the sentinel; it now carries 22,198
 =shell_not_applicable=.
 
 *Serving the level does not stop =harvest_kg= summing across it, and the issue's
-wording suggested it might.*  =transformations.harvest_kg= groups to
-=(t, i, plot_id, j)= and sums every other level, =condition= included, in every
-country.  Niger's exposure at that grain is small: 53 plot-crops hold two states,
-all in 2021-22, 3,120 of 814,859 kg.  A household-crop holds two states 145 times
-in 2018-19 and 104 in 2021-22, and the wave total is what really mixes them:
-2021-22 serves 444,917 kg =shelled= + 358,142 =unshelled= + 11,800 not applicable.
+wording suggested it might.*  =transformations.harvest_kg= sums every level outside
+=(t, i, plot_id, j)=, =condition= included, and the grain it reaches depends on the
+frame.  =Country('Niger')= names its crop level =crop=, which that list does not
+know, so the transform groups to =(t, i, plot_id)= and also sums ACROSS CROPS (3,800
+rows).  Only a =Feature= frame, where the level is =j=, reaches =(t, i, plot_id, j)=
+(5,054 rows).  Both total 2,268,347.565 kg.  Within a crop the sum across =condition=
+is close to nil, all in 2021-22: 53 plot-crops hold two states among positive-quantity
+rows (3,120 kg), but only the rows with a factor carry kilograms, and just 1
+plot-crop, 400 kg, has kilograms in two states.  On the =Country= frame 72 plots
+hold kilograms in two states, 66,884 kg, 8.2% of 2021-22.  That is not a pure
+condition figure: on 71 of the 72 the two states sit on different crops (443 plots
+in 2021-22 hold two or more crops with kilograms, 936 over all waves).  Among
+positive-quantity rows a household-crop holds two states 145 times in 2018-19 and
+104 in 2021-22, and the wave total mixes them outright: 2021-22 serves 444,917 kg
+=shelled= + 358,142 =unshelled= + 11,800 not applicable.
 The ladder is unmoved because its only condition-aware rungs are =survey_median=
 (no =KgFactor= to take a median of) and =shipped= (no table); Site Q's cells are
 =(t,u,j)= -> =(t,u)= -> =(t)=.  =metric= reads a 100 kg sack as 100 kg in either
@@ -2490,8 +2512,8 @@ rarely does (=Sac de 50 kg= 125 vs 7 / 184 vs 8 / 433 vs 6; =Sac de 100 kg= 64 v
 (=KG_FACTOR_LAYERS=) has =reported=, which reads =KgFactor=, and the canonical note
 says of that column "REPORTED, NEVER CONSTRUCTED ... Only a number the instrument
 wrote down ON THIS ROW", and "A FACTOR HERE, A PRODUCT IN =food_acquired=".
-Niger's instrument has the food shape.  The choice is a contract question, filed
-as a decision memo on the issue.
+Niger's instrument has the food shape.  The choice is a contract question; the
+memo is in the sweep's decision queue, and the coordinator will post it with the PR.
 
 *What wiring would do (read-only simulation, =KgFactor = kg / Quantity=, on the cold
 =f36c91a00= frame; nothing is served).*

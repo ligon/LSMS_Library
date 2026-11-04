@@ -19,6 +19,7 @@ table; skipped when Niger is unavailable).
 """
 from __future__ import annotations
 
+import ast
 import os
 import sys
 import warnings
@@ -80,6 +81,25 @@ class _SchemeLoader(yaml.SafeLoader):
 
 
 _SchemeLoader.add_constructor("!make", lambda loader, node: {"__make__": True})
+
+
+def _state_read(source: str) -> tuple[str, str, bool]:
+    """What a wave script's one ``_crop_conditions(<frame>['<column>'], '<table>')``
+    call actually reads: (column, table, is <frame> raw codes?).  Parsed, so a
+    docstring or comment naming the right column cannot satisfy it."""
+    tree = ast.parse(source)
+    calls = [n for n in ast.walk(tree) if isinstance(n, ast.Call)
+             and getattr(n.func, "id", None) == "_crop_conditions"]
+    assert len(calls) == 1, f"{len(calls)} _crop_conditions calls"
+    column, table = calls[0].args
+    assert isinstance(column, ast.Subscript) and isinstance(column.value, ast.Name)
+    raw_codes = any(
+        isinstance(n, ast.Assign) and isinstance(n.value, ast.Call)
+        and any(isinstance(t, ast.Name) and t.id == column.value.id for t in n.targets)
+        and any(k.arg == "convert_categoricals" and getattr(k.value, "value", None) is False
+                for k in n.value.keywords)
+        for n in ast.walk(tree))
+    return column.slice.value, table.value, raw_codes
 
 
 def _canonical_vocabulary() -> set[str]:
@@ -144,7 +164,14 @@ class TestDeclared:
     def test_each_ehcvm_script_reads_its_own_state_column_with_its_own_table(self, wave):
         *_, state, _codes, table = SOURCES[wave]
         script = (_root() / wave / "_" / f"{TABLE}.py").read_text(encoding="utf-8")
-        assert state in script and table in script
+        assert _state_read(script) == (state, table, True)
+
+    def test_the_state_read_is_not_satisfied_by_a_docstring(self):
+        """2018-19's sold state is s16cq16c; naming s16cq12c in prose must not pass."""
+        script = ('"""Reads s16cq12c through harmonize_crop_condition_ehcvm1."""\n'
+                  'src = get_dataframe("x.dta", convert_categoricals=True)\n'
+                  'c = _crop_conditions(src["s16cq16c"], "harmonize_crop_condition_ehcvm1")\n')
+        assert _state_read(script) == ("s16cq16c", "harmonize_crop_condition_ehcvm1", False)
 
     def test_blank_and_off_scheme_codes_are_the_sentinel(self, niger_module,
                                                          in_country_dir):
