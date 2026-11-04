@@ -5215,7 +5215,12 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
           ``i``; the existing ``attrs['country']='Uganda'`` enables its native
           constructor inverse for Country operands.  Coverage also requires
           convertible harvest and a matching positive area; neither missing
-          nor nonpositive area is filled.
+          nor nonpositive area is filled.  **This is Uganda's decoding.**  The
+          area key is cut at its first ``_`` in every country, and the crop key
+          only loses a ``{hhid}-`` prefix, so where both features already share
+          a ``{field}_{parcel}`` key (Ethiopia and the EHCVM countries, Malawi's
+          later waves) no key matches at this grain.  Use ``'plot'`` there.
+          An empty result warns ``PlotGrainMismatchWarning``.
         - ``'plot'``: join on the literal ``plot`` value verbatim.  Use only
           where the two features already share a plot vocabulary; on Uganda
           the literal ids never match and the result is empty.
@@ -5290,6 +5295,23 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     area = pf.groupby(keys, dropna=False)['_Area'].sum().reset_index()
 
     merged = harvest.merge(area, on=keys, how='inner')
+    if len(merged) == 0 and len(harvest) and len(area):
+        # The silent emptiness fertilizer_rate's guard exists for, in its twin.
+        waves = ''
+        if 't' in keys and not set(harvest['t']) & set(area['t']):
+            waves = (
+                " The two features share no wave at all: harvest "
+                f"{sorted(map(str, harvest['t'].unique()))[:3]}, area "
+                f"{sorted(map(str, area['t'].unique()))[:3]}; a post-planting / "
+                "post-harvest country may serve them on different rounds.")
+        warnings.warn(
+            f"yield_kg(on={on!r}): the {len(harvest):,} harvest land key(s) and "
+            f"the {len(area):,} area land key(s) have NO value in common, so "
+            "the result is empty. Examples -- harvest: "
+            f"{sorted(map(str, harvest['_land'].unique()))[:3]}; area: "
+            f"{sorted(map(str, area['_land'].unique()))[:3]}.{waves} Try "
+            f"on={'plot' if on == 'parcel' else 'parcel'!r}.",
+            PlotGrainMismatchWarning, stacklevel=2)
     with np.errstate(divide='ignore', invalid='ignore'):
         merged['Yield_kg'] = merged['Harvest_kg'] / merged['_Area']
     merged = merged.replace([np.inf, -np.inf], np.nan).dropna(subset=['Yield_kg'])

@@ -18,6 +18,7 @@ from lsms_library.transformations import (
     _CROP_CANONICAL,
     _CROP_LEVELS,
     _canonicalise_crop_level,
+    PlotGrainMismatchWarning,
     harvest_kg,
     harvest_kg_factors,
     yield_kg,
@@ -120,6 +121,51 @@ class TestYieldIsUnchanged:
     def test_yield_sums_the_crops_of_a_plot(self):
         out = yield_kg(_crop_production("crop"), _plot_features(), on="plot")
         assert out.loc[("w1", "h1", "p1"), "Yield_kg"] == (10.0 + 3.0) / 2.0
+
+
+class TestEmptyYieldWarns:
+    """`fertilizer_rate` warns when both sides have rows and nothing joins, and
+    its twin did not: `yield_kg`'s default returned an empty frame in silence."""
+
+    def _crop(self, plot="1_2", t="w1"):
+        index = pd.MultiIndex.from_tuples(
+            [(t, "h1", plot, "Maize", "Kg")],
+            names=["t", "i", "plot_id", "crop", "u"])
+        return pd.DataFrame({"Quantity": [10.0]}, index=index)
+
+    def _area(self, plot="1_2", t="w1"):
+        index = pd.MultiIndex.from_tuples(
+            [(t, "h1", plot)], names=["t", "i", "plot_id"])
+        return pd.DataFrame({"Area": [2.0]}, index=index)
+
+    def test_a_shared_field_parcel_key_warns_at_the_parcel_grain(self):
+        """The EHCVM shape: `{field}_{parcel}` on both sides."""
+        with pytest.warns(PlotGrainMismatchWarning, match="on='plot'"):
+            out = yield_kg(self._crop(), self._area())
+        assert out.empty
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", PlotGrainMismatchWarning)
+            assert yield_kg(self._crop(), self._area(), on="plot")[
+                "Yield_kg"].tolist() == [5.0]
+
+    def test_rounds_that_share_no_wave_say_so(self):
+        """The Nigeria shape: harvest on the post-harvest quarter, area on the
+        post-planting one."""
+        with pytest.warns(PlotGrainMismatchWarning, match="share no wave"):
+            out = yield_kg(self._crop(plot="1", t="2011Q1"),
+                           self._area(plot="1", t="2010Q3"), on="plot")
+        assert out.empty
+
+    def test_a_join_that_finds_something_does_not_warn(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", PlotGrainMismatchWarning)
+            assert len(yield_kg(self._crop(plot="1"), self._area(plot="1"))) == 1
+
+    def test_no_harvest_to_join_does_not_warn(self):
+        crop = self._crop().iloc[0:0]
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", PlotGrainMismatchWarning)
+            assert yield_kg(crop, self._area()).empty
 
 
 def test_canonicalise_is_a_noop_on_the_canonical_name_and_on_none():
