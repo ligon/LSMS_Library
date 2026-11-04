@@ -248,7 +248,7 @@ def cluster_features(df):
     1. ``comm`` (2005-06 .. 2011-12) is the *2005-06 EA of origin*, which the
        panel carries forward when it tracks a mover.  A household that moved
        district still reports its origin EA, so its District/Region legitimately
-       differ from its EA-mates'.  93 clusters in 2010-11, 106 in 2011-12.
+       differ from its EA-mates'.  92 clusters in 2010-11, 97 in 2011-12.
     2. ``v`` is a PARISH from 2013-14 on, and a parish contains several
        enumeration areas -- some urban, some rural, each with its own geovar
        fix.  ``Rural`` and the GPS are therefore not parish attributes at all

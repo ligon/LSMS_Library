@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import numbers
 import warnings
 
 import pandas as pd
@@ -38,6 +39,8 @@ COVERS = {
 }
 #: Raw 2019-20 districts ``mapping._V_ALIASES`` re-labels; see CONTENTS.org.
 ALIASED_2019_20 = {"namtumba", "mubende", "gulu"}
+#: Raw ``region`` values both tables fold into Central (2005-06, 2009-10, 2010-11).
+FOLDED_TO_CENTRAL = {"0", "kampala", "central without kampala"}
 
 
 def _info(wave):
@@ -45,15 +48,21 @@ def _info(wave):
 
 
 def _label(x):
-    """A comparable label: blank is None, a numeric code loses its ``.0``, case folds."""
+    """A comparable label: blank is None, a raw NUMBER becomes its integer, case folds.
+
+    A served ``'102.0'`` is deliberately NOT read as ``102``: it is a string, so it stays
+    unequal to the raw code, and ``test_a_code_is_served_as_a_bare_integer`` names it.
+    """
     if pd.isna(x):
         return None
-    if isinstance(x, (int, float)):
+    if isinstance(x, numbers.Number):
         return str(int(x))
-    x = " ".join(str(x).split()).casefold()
-    if x.endswith(".0") and x[:-2].isdigit():
-        x = x[:-2]
-    return x or None
+    return " ".join(str(x).split()).casefold() or None
+
+
+def _region(x):
+    x = _label(x)
+    return "central" if x in FOLDED_TO_CENTRAL else x
 
 
 def _load_mapping(wave):
@@ -110,22 +119,38 @@ def built():
     return out
 
 
+def _read(wave, name):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        return get_dataframe(str(UGANDA / wave / "Data" / name))
+
+
 @pytest.fixture(scope="module")
 def covers():
-    """Each cover read directly: ``(t, i, raw_region, raw_district)``, ``i`` walked."""
+    """Each cover read directly: ``(t, i, source, raw_region, raw_district)``, ``i`` walked.
+
+    2015-16 also reads ``AGSEC1`` for the households ``gsec1`` lacks (GH #1120 D1), which
+    ``sample`` and ``cluster_features`` serve from ``_ag_Region`` / ``_ag_District``.
+    """
     walk = json.loads((UGANDA / "_" / "updated_ids.json").read_text())
+
+    def frame(wave, raw, key, region, district, source):
+        return pd.DataFrame({
+            "t": wave,
+            "i": raw[key].map(_label_id).map(lambda x, m=walk.get(wave, {}): m.get(x, x)),
+            "source": source,
+            "raw_region": raw[region].astype(object).map(_region),
+            "raw_district": raw[district].astype(object).map(_label),
+        })
+
     frames = []
     for wave, (name, key, region, district) in COVERS.items():
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            raw = get_dataframe(str(UGANDA / wave / "Data" / name))
-        ids = raw[key].map(_label_id)
-        frames.append(pd.DataFrame({
-            "t": wave,
-            "i": ids.map(lambda x, m=walk.get(wave, {}): m.get(x, x)),
-            "raw_region": raw[region].map(_label),
-            "raw_district": raw[district].map(_label),
-        }))
+        raw = _read(wave, name)
+        frames.append(frame(wave, raw, key, region, district, "cover"))
+        if wave == "2015-16":
+            ag = _read(wave, "AGSEC1.dta")
+            frames.append(frame(wave, ag[~ag[key].isin(raw[key])], key, region, district,
+                                "AGSEC1"))
     return pd.concat(frames, ignore_index=True)
 
 
@@ -142,11 +167,33 @@ class TestServed:
                            how="left", validate="one_to_one")
         recorded = got[got["raw_district"].notna()]
         assert recorded["District"].notna().all()
-        assert got.loc[got["raw_region"].notna(), "Region"].notna().all()
 
-        differ = recorded[recorded["District"].map(_label) != recorded["raw_district"]]
+        differ = recorded[recorded["District"].astype(object).map(_label)
+                          != recorded["raw_district"]]
         assert set(differ["t"]) <= {"2019-20"}
         assert set(differ["raw_district"]) <= ALIASED_2019_20
+
+        region = got[got["raw_region"].notna()]
+        assert region["Region"].notna().all()
+        assert (region["Region"].astype(object).map(_region) == region["raw_region"]).all()
+
+    def test_a_household_only_agsec1_records_is_served_agsec1s_labels(self, built, covers):
+        only = covers[covers["source"] == "AGSEC1"]
+        assert only["raw_district"].notna().any()
+        got = only.merge(built["sample"][["t", "i", "District", "Region"]], on=["t", "i"],
+                         how="left", validate="one_to_one")
+        assert (got["District"].astype(object).map(_label) == got["raw_district"]).all()
+        assert (got["Region"].astype(object).map(_region) == got["raw_region"]).all()
+
+    def test_a_code_is_served_as_a_bare_integer(self, built):
+        """The served form itself: ``_label`` must not be what makes ``'102.0'`` pass."""
+        for name in ("sample", "cluster"):
+            frame = built[name].dropna(subset=["District"])
+            district = frame["District"].astype(str)
+            assert not district.str.fullmatch(r"\d+\.\d+").any(), name
+            for wave in ("2009-10", "2013-14"):
+                codes = district[frame["t"] == wave]
+                assert len(codes) and codes.str.fullmatch(r"\d+").all(), (name, wave)
 
     def test_a_households_own_label_is_its_market(self, built):
         for column in ("District", "Region"):
@@ -174,9 +221,7 @@ class TestServed:
             assert lost["_cluster"].isna().all()
 
     def test_a_case_only_difference_is_not_a_conflict(self, built):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            raw = get_dataframe(str(UGANDA / "2011-12" / "Data" / "GSEC1.dta"))
+        raw = _read("2011-12", "GSEC1.dta")
         labels = pd.DataFrame({"v": raw["comm"].map(_label), "d": raw["h1aq1"].map(_label)})
         distinct = labels.dropna().groupby("v")["d"].nunique()
         agreed = distinct[distinct == 1].index

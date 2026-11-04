@@ -512,9 +512,9 @@ remaining 3,095 households; it doesn't infer their Region from a cluster.
 =market='District'= reads =sample()= first and =cluster_features()= second, and
 =sample= had no =District=.  So the only source was the cluster table, where
 =reduce_to_agreed= blanks a cluster whose households disagree.  They do, because
-=comm= is the EA of origin and the label is where the household is now: one mover,
-or one carved-out district (=LIRA= / =ALEBTONG=), blanked the label for every
-household on that EA, though each had recorded its own.  =sample= now carries the
+=comm= is the EA of origin and the label is the household's own (2011-12 is qualified
+below): one mover, or one carved-out district (=LIRA= / =ALEBTONG=), blanked the label
+for every household on that EA, though each carried its own.  =sample= now carries the
 column =cluster_features= reads, through the same formatter.
 
 | wave    | cover column     | no label, before | after | what is left                                 |
@@ -536,10 +536,29 @@ column =cluster_features= reads, through the same formatter.
   households (=Region=: 23,956 of 23,956), and =m= is the household's own label wherever
   it has one.  107 households with a blank of their own (=Region=: 1) still take an
   agreeing cluster's label; that is =_add_market_index='s existing fallback, unchanged.
-- /It is stable within a household./  Same household, 2010-11 against 2011-12, case
-  folded: 2,488 of 2,489 equal, so the EA disagreements are not noise in the answers.
-- /Not a cross-wave vocabulary./  Codes in 2009-10 and 2013-14, names elsewhere, and
-  districts carved out over time.  The =districts= table in =categorical_mapping.org=
+- /What the label says it is./  =h1aq1= is "District Code as of 2009/10" in 2009-10 and
+  "District Name as in 2010/11" in 2010-11; =h1aq1a= is "District of residence in
+  2013/14"; =district= is "District where hh is interviewed" in 2015-16.  The 2010-11 BID
+  (PDF p. 4): "The locations of the households at the time of the 2010/11 interview were
+  therefore recorded" against the Ministry's August 2010 list.  On 2010-11's disagreeing
+  EAs, households off the EA's modal label sit nearer their own label's centroid: 70 of
+  88, median 14.0 km against 40.6 km.
+- /2011-12 is effectively 2010-11's label carried forward, not where the household is
+  now./  Its =h1aq1= is labelled only "District", and its BID (PDF p. 8) says Section 1A
+  "was distributed by the Headquarters staff to the field teams before starting data
+  collection".  Of 2,510 households linked to 2010-11, 2,488 keep the label, 20 are blank
+  in both, 1 is blank in 2011-12, and 1 changes, with no GPS in either wave.  All 12
+  labelled households whose GPS moved over 5 km kept their label, 2 of them over 50 km.
+  141 of its 164 blanks have =wave= ("Wave when household was created/split off") 3,
+  which is what a carried-forward field predicts.  So 2,488 of 2,489 is largely circular:
+  it does not show the label is right, and a 2011-12 label can lag a move.
+- /Not a cross-wave vocabulary, so a cross-wave =m= is not comparable./  Codes in 2009-10
+  and 2013-14; Title case in 2005-06 and 2015-16; UPPER in 2010-11, 2011-12, 2018-19 and
+  2019-20.  Title and UPPER waves share at most one exact string, =NTOROKO=, which
+  2015-16 writes in upper case.  Spelling and carve-outs split it further: 2015-16 writes
+  =Ntugamo= where the others write =NTUNGAMO= (56 linked households), and the six name
+  waves hold 141 names even with case folded.  The =districts= table in
+  =categorical_mapping.org=
   (=Miyana= -> =Mityana=, =Kalanga= -> =Kalangala=, ...) is read by nothing, and not all
   of it is a spelling: =Bugweri= -> =Bugiri= folds what 2018-19 records as two districts.
   =MIYANA= (2010-11) and =KALANGA= (2011-12) are one household each, on EAs that
@@ -552,11 +571,20 @@ value for them.  What could fill them, and =District='s 216, is a construction, 
 
 **** TODO Decision: fill the 129 and the 216 from a household's other waves?
 
-Memo in the #1441 report.  The same household's label in the adjacent wave, in the same
-form (code or name), would reach 77 of the 129 =Region= and 74 of the 216 =District=; it
-is right 2,509 of 2,510 and 2,488 of 2,489 times where it can be checked.  A cluster
-mate's modal label would be right only 740 of 886 and 784 of 946 times, on the EAs
-concerned, and is not offered.  127 of the 129 and 133 of the 216 carry no weight.
+Memo in the #1441 report.  =District='s residual is not evenly spread: 131 households in
+2011-12 hold 10.3% of that wave's weight and 12 in 2010-11 hold 1.1%; elsewhere 0.1% or
+less.  The 74 cover blanks of 2011-12 are mostly new split-offs (60 with =wave= 3), mean
+weight 4.3 against 0.8.  The same household's label in an adjacent wave, in the same form
+(code or name), reaches 77 of the 129 =Region= and 74 of the 216 =District=, but recovers
+only 0.02% of 2011-12's weight; its 2013-14 code would reach 3.2% and needs a code-to-name
+map.  Agreement between name waves is 79.5%, 87.3% and 99.7% on the three =District=
+pairs other than the circular one (above), and 99.4% or better for =Region= on all seven
+boundaries.  A cluster mate's
+modal label matches 740 of 886 and 784 of 946 on the EAs concerned, and is not offered.
+
+Separately, =_add_market_index='s existing fallback is not "own label": 90 households in
+2011-12, 81 of them =wave= 3, take an agreeing origin EA's label and hold 12.4% of that
+wave's weight, and 22 of the 60 with GPS are over 5 km from their EA-mates.
 
 ** Rotating panel and refreshment sample
 
@@ -1374,8 +1402,13 @@ cells.  Measured on the returned table:
 
 | Wave    | =District= | =Region= | =Rural= | =Latitude= / =Longitude= |
 |---------+------------+----------+---------+--------------------------|
-| 2010-11 | 27.8%      | 5.0%     | 4.4%    | 41.2%                    |
-| 2011-12 | 33.0%      | 7.8%     | 0.0%    | 49.8%                    |
+| 2010-11 | 27.7%      | 5.0%     | 4.4%    | 41.5%                    |
+| 2011-12 | 40.7%      | 21.7%    | 15.1%   | 57.4%                    |
+
+(Cold, 2026-11-04.  2011-12 now counts the 57 =unlocated-= singletons of GH #1120 D2,
+empty in every column.  On its other 321 clusters: =District= 30.2%, =Region= 7.8%,
+=Rural= 0.0%, GPS 49.8%.  Its =District= was 33.0% on those 321, and 43.1% on all 378,
+before the GH #1441 case fold.)
 
 That is the point: the old value was an arbitrary pick, or a composite,
 among disagreeing households.  Two causes of disagreement remain, and
@@ -1384,8 +1417,9 @@ neither is a bug we can configure away:
 1. /Panel dispersal/ — =comm= (2005-06 … 2011-12) is the *2005-06 EA of
    origin*, which the panel carries forward when it tracks a mover.  A
    household that moved district still reports its origin EA, so its
-   =District= / =Region= legitimately differ from its EA-mates'.  93
-   clusters in 2010-11, 106 in 2011-12.
+   =District= / =Region= legitimately differ from its EA-mates'.  92
+   clusters in 2010-11, 97 in 2011-12 (93 before GH #1133 merged two
+   codes, and 106 before GH #1441 folded 2011-12's case).
 2. /Sub-cluster variation/ — =v= is a PARISH from 2013-14 on, and a
    parish contains several enumeration areas, some urban and some rural,
    each with its own geovar fix.  =Rural= and the GPS are therefore not
@@ -5031,10 +5065,13 @@ the sample's =HHID= and its interview month through =gsec1.hh=, and an inner mer
 deleted the 2 valid shock rows (of 1,023) of 2 households only =AGSEC1= records.
 They now use =AGSEC1='s =hh -> HHID= pair and its own date, on the housing rules
 above; 0 valid rows are in neither cover, so the 51 keys above carry no shock.
-=AGSEC1.interview= reads "Not done" for all 72 of its households =gsec1= lacks, these
-two included, yet =GSEC16= holds their answers and =AGSEC1= their interview date.
-On the 2,622 households both covers hold, =AGSEC1='s date equals =gsec1='s on all
-2,619 where both record one.  Both =Onset= values are under 12 months.
+=interview= is labelled "Hh with food consumption", and =nonresp= is "Interview result" on
+=gsec1=.  Both read "Not done" for all 72 households =AGSEC1= holds and =gsec1= lacks.  All
+72 have a =GSEC16= grid, but only 6 answered the full 20-row module; those same 6 are the
+only ones with an =AGSEC1= interview date, and 2 of the 120 answers report a shock.  On
+the 2,622 households both covers hold, =AGSEC1='s date equals =gsec1='s on all 2,619 where
+both record one.  Both =Onset= values are under 12 months.  /The 2 kept rows carry NaN
+=weight= and zero =panel_weight=/ (=hwgt_W5=), so no weighted statistic moves.
 
 * Seven-wave plot-input compiler runtime checkpoint (GH #1287, 2026-10-31)
 
