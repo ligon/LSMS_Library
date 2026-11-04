@@ -156,9 +156,9 @@ Data Scheme:
     # 2026-11-03), EHCVM 2018-19 (s16c) and 2021-22 (s16c + s16d).
     #
     # plot = "{field}_{parcel}" for seasonal crops and for every EHCVM
-    # harvest row; <NA> for perennial trees (the EAC-I perennial roster is not
-    # on the seasonal field grid); 'Farm-level' for a 2021-22 sale with no
-    # single harvest row (below).
+    # harvest row; 'Farm-level' for perennial trees (the EAC-I perennial roster
+    # is not on the seasonal field grid, GH #1476) and for a 2021-22 sale with
+    # no single harvest row (below).
     # crop = harmonize_food Preferred Label (food crops REUSE the consumed-
     # food label so crop_production.j joins food_acquired.j; non-food crops
     # — Coton, Soja, Voandzou, Dah/Fibre, tree species — get new labels).
@@ -180,7 +180,8 @@ Data Scheme:
     # hh-crop-sale-single-row in Derivation; otherwise on ONE
     # row with plot_id = 'Farm-level' (the canonical structural sentinel) and
     # no harvest Quantity, u or key.  EXCLUDE plot_id == 'Farm-level' for
-    # plot-grain work; KEEP it for household or crop sale totals.  Neither wave
+    # plot-grain work; KEEP it for household or crop totals: an EAC-I tree row
+    # on it carries a harvest as well as a sale.  Neither wave
     # zero-fills a 'Non' (unlike 2017-18), and neither records planting_month,
     # harvest_month or perennial, which are NA there and which Site B therefore
     # reports per wave: they remain required, for the EAC-I waves.  KgFactor_sold

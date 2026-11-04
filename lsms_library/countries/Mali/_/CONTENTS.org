@@ -1588,7 +1588,9 @@ median FCFA/kg: cashew (=Noix de cajou=) 275 (n = 12, 2014-15) and 500 (n =
 2.332e8 in 2017-18: 175 households change, 171 up and 4 down (households
 losing a 2014-15 tree value that is now NA).  Site Q gains one 2014-15 offender: a mango row
 of 2,005 =Panier= per month over 3 months, served 6,015.  =harvest_kg= /
-=yield_kg= still drop the tree rows (their =plot_id= is NA).
+=yield_kg= still drop the tree rows (their =plot_id= is NA).  (Superseded for
+=harvest_kg= by GH #1476: the tree rows are =Farm-level= now, see the last
+section of this file.)
 
 *** Historical decision: sale value multiplied by months (round 3; superseded)
 
@@ -1691,8 +1693,8 @@ explicit =Non=.
   across two different HARVEST units and serves the first =u=.  This is
   pre-existing and unchanged.
 - 135 of the 270 2017-18 producing tree rows record where the trees stand
-  (=s11fq05c= block, =s11fq05d= parcel), but their =plot_id= is served NA.  The
-  location is unwired.
+  (=s11fq05c= block, =s11fq05d= parcel), but their =plot_id= is not that plot:
+  it was served NA, and since GH #1476 is =Farm-level=.  The location is unwired.
 - 999999 is a 2014-15 sale-value code (the six-digit field maximum; nothing
   exceeds it in =s3aq24= or =s3bq14=).  On the 3 tree rows that carry it, it
   is masked before the month product (round 3).  The 12 FIELD rows keep it as

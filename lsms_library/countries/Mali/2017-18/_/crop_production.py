@@ -8,7 +8,8 @@ Sources (post-harvest passage 2; cultivation passage 1):
   - eaci17_s11cp1.dta  cultivation roster -> planting month
 
 Grain: (t, i, plot, crop).  plot = "{field}_{parcel}" (s7fq01_s7fq02) for
-seasonal crops; <NA> for perennial trees.  i = (grappe, exploitation) —
+seasonal crops; 'Farm-level' for perennial trees (GH #1476).  i = (grappe,
+exploitation) —
 the 2017-18 household key (cf. sample/cluster_features data_info.yml).
 
 Reported, item-level columns only.  IMPORTANT: the 2017-18 sales module
@@ -79,7 +80,7 @@ from lsms_library.local_tools import get_dataframe, to_parquet
 from lsms_library.build_transforms import reduce_to_agreed
 from lsms_library.country import grain_reports
 from mali import (i as mali_i, crop_production_finalize, producing_trees,
-                  tree_crop_rows, stamp_tree_derivations)
+                  tree_crop_rows, stamp_tree_derivations, FARM_LEVEL)
 
 WAVE = '2017-18'
 
@@ -179,7 +180,10 @@ cult = pd.DataFrame({
 seasonal = seasonal.drop(columns=['planting_month']).merge(
     cult, on=['i', 'plot_id', 'crop'], how='left')
 
-# --- perennial trees (s11f): no field grid -> plot = <NA>, perennial=True ---
+# --- perennial trees (s11f): no field grid -> plot = 'Farm-level', perennial=True
+# The canonical structural sentinel (GH #1476): a NULL here is a deferred silent
+# deletion, because `groupby` drops NaN keys.  135 of the 270 rows also record
+# where the trees stand (s11fq05c block, s11fq05d parcel); that is unwired. ---
 # Like 2014-15, s11f is a FIXED tree roster (every HH gets a row per species,
 # s11fq03 == 'Non' for trees it does not have).  Keep only s11fq03 == 'Oui'
 # (currently producing) — the ~270 rows with an actual harvest; matching WB
@@ -198,7 +202,7 @@ s11f['i'] = _hhid(s11f)
 perennial = pd.DataFrame({
     't': WAVE,
     'i': s11f['i'],
-    'plot_id': pd.NA,
+    'plot_id': FARM_LEVEL,
     'crop': s11f['s11fq01'],
     'harvest_month': pd.NA,
     'planting_month': pd.NA,
