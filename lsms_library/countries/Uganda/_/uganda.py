@@ -445,7 +445,7 @@ def inputs_agriculture_cover(wave):
     base = countries_root() / 'Uganda' / wave / 'Data'
     hh = get_dataframe(str(base / 'gsec1.dta'), convert_categoricals=False)
     ag = get_dataframe(str(base / 'AGSEC1.dta'), convert_categoricals=False)
-    fields = ['HHID', 'parish_code', 'hwgt_W5', 'sregion', 'urban', 'region', 'district']
+    fields = ['HHID', 'parish_code', 'ea', 'hwgt_W5', 'sregion', 'urban', 'region', 'district']
     out = ag[fields].copy()
     out['i'] = out['HHID'].map(format_id)
     out['t'] = wave
@@ -464,6 +464,12 @@ def _adopt_alternate_cover(flat, table='sample'):
     (2015-16: AGSEC1's ``hwgt_W5`` agrees with gsec1's on none of the 1,458
     households both weight positively), so it must not fill gsec1's gaps.
 
+    ``_ag_ea`` is the exception that proves the rule: it may only fill a row the
+    primary cover lacks, like the others, but the two covers have to AGREE on
+    every household both hold (2,622 of 2,622), because that equality is why
+    ``AGSEC1.ea`` may stand as a second source at all (ruling 2026-11-04).  A
+    release where it fails raises rather than serving two EA vintages.
+
     The temporary columns are dropped.  A frame without them is returned
     unchanged (every wave but 2015-16).
     """
@@ -481,14 +487,19 @@ def _adopt_alternate_cover(flat, table='sample'):
                     f'Uganda locating covers disagree on v for {int(conflict.sum())} '
                     'households; retaining HH cover location (GH #1120 D1)',
                     stacklevel=2)
+        if '_ag_ea' in flat and 'ea' in flat:
+            own, second = flat['ea'].map(format_id), flat['_ag_ea'].map(format_id)
+            if (~only_alt & own.notna() & second.notna() & own.ne(second)).any():
+                raise ValueError('Uganda locating covers disagree on ea: AGSEC1.ea '
+                                 'can no longer stand as a second source for gsec1.ea')
         for c in alt:
             target = c[len(_ALT_COVER_PREFIX):]
             src = flat[c].loc[only_alt]
             if target == 'v':
                 src = derive_agriculture_cover_v(src.to_frame('parish_code'))
-            if target == 'District':
-                # The primary cover's `v` and `District` pass through this
-                # module's `v` / `District` formatters (= format_id); an `_ag_`
+            if target in ('District', 'ea'):
+                # The primary cover's `v`, `District` and `ea` pass through this
+                # module's formatters of those names (= format_id); an `_ag_`
                 # myvar passes through none.  Without the same canonical form
                 # an unlabelled district code (2015-16 '229') is the int 229 on
                 # one side and the string '229' on the other, and
@@ -572,9 +583,15 @@ def inputs_inherited_ea(wave):
     """Raw answers behind each inherited ``ea``, by their original names.
 
     One row per household holding a route; a household without one has nothing
-    to show, because nothing was computed for it.
+    to show, because nothing was computed for it.  ``_source`` names the 2015-16
+    cover the value came from: ``gsec1``, or ``AGSEC1`` for a household only it
+    records.
     """
-    origin = _uganda_cover('2015-16/Data/gsec1.dta')[['HHID', 'ea']]
+    gsec = _uganda_cover('2015-16/Data/gsec1.dta')[['HHID', 'ea']]
+    ag = _uganda_cover('2015-16/Data/AGSEC1.dta')[['HHID', 'ea']]
+    only_ag = ag.loc[~ag['HHID'].map(format_id).isin(gsec['HHID'].map(format_id))]
+    origin = pd.concat([gsec.assign(_source='gsec1.dta'),
+                        only_ag.assign(_source='AGSEC1.dta')], ignore_index=True)
     out = _follow_key(_tracking_links(wave), 't0_hhid', origin, 'HHID')
     return out.assign(t=wave, i=out['hhid'].map(format_id)).set_index(['t', 'i'])
 
@@ -585,10 +602,14 @@ def origin_ea(df):
     ``ea`` is the design PSU: the enumeration area a household was SAMPLED in,
     carried with it when it moves.  From 2018-19 no household file ships it, so
     a household takes the ``ea`` of the 2015-16 household its own tracking key
-    names.  ``df`` is the declared 2015-16 ``gsec1`` frame, keyed on that wave's
-    ``HHID``; this re-keys it to the current wave's household.  A household with
-    no route is simply absent and stays NA: nothing is read from ``v`` or parsed
-    out of an id.
+    names.  ``df`` is the declared 2015-16 ``gsec1`` and ``AGSEC1`` frames
+    concatenated, keyed on that wave's ``HHID``; this re-keys it to the current
+    wave's household.  A household both covers hold appears twice with one ``ea``
+    (2,622 of 2,622); if they ever differ, ``_follow_key``'s ``many_to_one``
+    raises.  A household with no route is simply absent and stays NA: nothing is
+    read from ``v`` or parsed out of an id.  The route is the current wave's
+    ``GSEC1`` tracking key only; ``AGSEC1.t0_hhid`` is not followed (it disagrees
+    with ``GSEC1.t0_hhid`` on 86 households).
 
     A sub-df and not a read inside ``sample``, so that a loss the GH #515 handler
     catches costs the column and not ``v``.  That handler catches
@@ -599,7 +620,7 @@ def origin_ea(df):
     """
     flat = df.reset_index()
     wave = flat['t'].iloc[0]
-    origin = flat[['i', 'ea']].rename(columns={'i': 'HHID'})
+    origin = flat[['i', 'ea']].rename(columns={'i': 'HHID'}).drop_duplicates()
     linked = _follow_key(_tracking_links(wave), 't0_hhid', origin, 'HHID')
     out = pd.DataFrame({'t': wave, 'i': linked['hhid'].map(format_id),
                         'ea': derive_inherited_ea(linked),

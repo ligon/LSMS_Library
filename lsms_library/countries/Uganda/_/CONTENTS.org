@@ -77,12 +77,13 @@ standard error on =ea=; locate a household with =v=.
 | wave    | source of =ea=                                         | non-null / rows | distinct |
 |---------+--------------------------------------------------------+-----------------+----------|
 | 2013-14 | =GSEC1.ea=, direct                                     | 3,119 / 3,119   |      317 |
-| 2015-16 | =gsec1.ea=, direct                                     | 3,305 / 3,377   |      316 |
-| 2018-19 | =GSEC1.t0_hhid= -> 2015-16 =HHID= -> =ea=              | 2,978 / 3,242   |      315 |
-| 2019-20 | =hhidold= -> 2018-19 =hhid= -> =t0_hhid= -> ... -> =ea= | 2,823 / 3,098   |      315 |
+| 2015-16 | =gsec1.ea=, direct; =AGSEC1.ea= for the 72 only it records | 3,377 / 3,377 |   316 |
+| 2018-19 | =GSEC1.t0_hhid= -> 2015-16 =HHID= -> =ea=              | 3,027 / 3,242   |      315 |
+| 2019-20 | =hhidold= -> 2018-19 =hhid= -> =t0_hhid= -> ... -> =ea= | 2,868 / 3,098   |      315 |
 
 The two inherited waves carry =Derivation= =Uganda::sample::ea-tracking-key=, on
-exactly the rows that received a value.  2005-06 to 2011-12 stay NA here: =v= is
+exactly the rows that received a value, and the 72 of 2015-16 carry
+=Uganda::sample::agriculture-cover=, as they did for =v=.  2005-06 to 2011-12 stay NA here: =v= is
 already the EA there, under =comm= labels, and a single label across all eight
 waves is GH #1459.
 
@@ -94,7 +95,7 @@ and the link is string identity between those ids: =gsec1.hh= with its wave toke
 moved back (=-05-= -> =-04-=, the =Waves= table in =uganda.py=; 2015-16 has no
 =HHID_old=).  So that result pins UBOS's encoding and says nothing about whether the
 label or the tracking key is right.  The encoding is also *not a route*: parsing
-=t0_hhid= would give the 198 households below an answer for 168, and the ruling is
+=t0_hhid= would give the 149 households below an answer for 119, and the ruling is
 that no route means NA.
 
 *What it does rest on.*  Checks that do not read the id's digits, on the raw files;
@@ -116,8 +117,8 @@ that no route means NA.
   So the value is the PSU through which the lineage entered the sample, not where
   the household lives or where it was itself drawn.  That is right for a design-based
   standard error and wrong as a location.
-- /=groupby('ea')= silently drops the NA rows./  =ea= is NA for 5.7% of wave weight in
-  2018-19 and 8.9% in 2019-20, and =groupby= drops a null key by default.  Those
+- /=groupby('ea')= silently drops the NA rows./  =ea= is NA for 4.25% of wave weight in
+  2018-19 and 7.66% in 2019-20, and =groupby= drops a null key by default.  Those
   households are not missing at random: they are the no-route households below.
 - /=ea= does not nest in =strata=./  52 of 317 EAs in 2013-14 and 81 of 316 in 2015-16
   span more than one =sregion=; 61 of 315 and 64 of 315 span more than one =subreg= in
@@ -136,34 +137,35 @@ consumer as ='12.0'= across the outer merge.
 - /A repeated target would raise./  The join is validated =many_to_one=: two children
   may name one parent, but one key may not name two households.
 
-*The 198 + 66 of 2018-19 with no =ea=*, by what the source says about them:
+*The 149 + 66 of 2018-19 with no =ea=*, by what the source says about them:
 
 | households | =t0_hhid=                 | what it is                                                                                                                   |
 |------------+---------------------------+------------------------------------------------------------------------------------------------------------------------------|
-|         49 | 8 characters              | a real 2015-16 =HHID=, but of a household only =AGSEC1= records (D1 below).  Its =AGSEC1.ea= exists.                         |
 |         73 | 8 characters              | the form of a 2015-16 =HHID=; in no column of any of the 119 2015-16 =.dta=.                                                 |
 |         76 | 5 characters (=H= + 4)    | in no 2015-16 file; 46 would parse to a 2015-16 EA and 30 would not, so these are not truncated ids.                          |
 |         66 | (not in =GSEC1=)          | households only 2018-19 =AGSEC1= records, the =unlocated-= singletons of GH #1120 D2.                                        |
 
 The variable's label is "Full wave5 UNPS household ID or wave6 split-off Parent
 Household ID", and the library holds no wave 6, which is the likely home of the 73
-and the 76; that is an inference and nothing here depends on it.  All 198 are
-=response_status= 1 in =GSEC1=.  In 2019-20 the 275 with no =ea= are 69 blank
-=hhidold=, 43 naming a 2018-19 household only =AGSEC1= records, and 163 descending
-from the 198.
+and the 76; that is an inference and nothing here depends on it.  All 149 are
+=response_status= 1 in =GSEC1=.  In 2019-20 the 230 with no =ea= are 69 blank
+=hhidold=, 43 naming a 2018-19 household only =AGSEC1= records, and 118 descending
+from the 149.
 
-*Why =AGSEC1= is not a route, as ruled.*  The ruling names =GSEC1=.  It would be a
-short step: =AGSEC1.ea= is non-null for the 72 households only =AGSEC1= records in
-2015-16 and equals =gsec1.ea= on all 2,622 households both covers hold, which would
-add 72 direct and 49 inherited values.  It is left for a ruling so that the column
-has one source.  =AGSEC1.t0_hhid= in 2018-19 is a different matter and is not a
-clean key: it disagrees with =GSEC1.t0_hhid= on 86 of the 3,176 households both
-files hold, and on those 86 its value (1-3 or 7 characters) is never a 2015-16
-=HHID=.
+*=AGSEC1= as a second source (ruling @ligon, 2026-11-04).*  =sample= first read
+=ea= from =GSEC1= alone, as first ruled.  =AGSEC1.ea= is the same variable on a second
+cover: it is non-null for the 72 households only =AGSEC1= records in 2015-16, its 58
+labels for them are all on =gsec1=, and it equals =gsec1.ea= on all 2,622 households
+both covers hold.  So it fills those 72 directly, and the 49 of 2018-19 and 45 of
+2019-20 whose tracking key names one of them.  Both routes raise if a release breaks
+the equality.  *The key stays =GSEC1='s.*  =AGSEC1.t0_hhid= in 2018-19 is a different
+matter and is not followed: it disagrees with =GSEC1.t0_hhid= on 86 of the 3,176
+households both files hold, and on those 86 its value (1-3 or 7 characters) is never
+a 2015-16 =HHID=.  So the 66 households only 2018-19 =AGSEC1= records stay NA.
 
-*Mechanics.*  =origin_ea= is a real =dfs:= sub-df with the 2015-16 =gsec1= as its
-=file:=, and its country-level hook re-keys that frame to the current wave's =hhid=.
-Two reasons: the file's sidecar is then in the wave's =_input_hash= (2019-20 also
+*Mechanics.*  =origin_ea= is a real =dfs:= sub-df with the 2015-16 =gsec1= and =AGSEC1=
+as its =file:= list, and its country-level hook re-keys that frame to the current wave's =hhid=.
+Two reasons: the files' sidecars are then in the wave's =_input_hash= (2019-20 also
 declares its bridge, 2018-19 =GSEC1=, under a key that is not in =dfs:=, which
 =_collect_file_paths_from_block= hashes and =grab_data= never reads), and a loss the
 GH #515 handler catches costs =ea= and not =v=.  =Derivation= stays on =sample=:
@@ -176,8 +178,8 @@ covers, and that protection is partial.  Measured in the review of this change,
 | lost                                 | result                                                                                                                                   |
 |--------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------|
 | 2015-16 =gsec1=, remote unreachable  | =EndpointConnectionError= is outside the #515 handler's tuple, so =sample= for both waves raises after about 90 s and =v= is lost too (GH #1463). 2019-20, which needed only its own cover, built in 1.5 s on base and raises at 89 s now. |
-| 2015-16 =gsec1=, =FileNotFoundError= | soft: =ea= is absent, every row and =v= survive (simulated; =tests/test_gh689_uganda_ea_psu.py=).                                         |
-| 2018-19 =GSEC1=, 2019-20's bridge    | =ea= drops and =v= survives, but the drop record names the readable 2015-16 file (the sub-df's one =file:=), so the #675 probe returns True.  Every fresh process rebuilds (about 70 s offline), =DegradedCacheWarning= never fires, and #675's "one probe per process" breaks through its one-source-per-sub-df assumption.  It heals when the blob returns. |
+| 2015-16 =gsec1= or =AGSEC1=, =FileNotFoundError= | soft: =ea= is absent, every row and =v= survive (simulated; =tests/test_gh689_uganda_ea_psu.py=).  One =file:= list, so the whole column goes rather than 49 values of it: an =ea= that survived partly would not count as a lost column, and #675 would not grade the parquet degraded. |
+| 2018-19 =GSEC1=, 2019-20's bridge    | =ea= drops and =v= survives, but the drop record names the readable 2015-16 file (the sub-df's one =file:=), so the #675 probe returns True.  Every fresh process rebuilds (about 70 s offline), =DegradedCacheWarning= never fires, and #675's "one probe per process" breaks through its one-source-per-sub-df assumption.  It heals when the blob returns.  (A lost =AGSEC1= behind a readable =gsec1= should go the same way, since =_drop_record= names the first file; reasoned from the code, not measured.) |
 
 *Measured, cold =98c6069d2= vs cold =6db7bf0d5=, 2026-11-03.*  Every declared Uganda
 table, =Feature('sample')= over Uganda, Albania and Malawi, and
@@ -213,12 +215,7 @@ market is a place, which =ea= is not.
 1. /One label across all eight waves (GH #1459)./  =ea= is NA through 2011-12, where
    =v= is the EA under =comm= labels.  =ea= pairs one-to-one with 2011-12 =comm= on all
    212 linked EAs, which is the start of a crosswalk.
-2. /=AGSEC1= as a second source./  Accepting =AGSEC1.ea= for households only it
-   records adds 72 in 2015-16 (3,377 of 3,377), 49 in 2018-19 (3,027) and 45 in
-   2019-20 (2,868), with =GSEC1= keys only.  Following =AGSEC1.t0_hhid= as well for
-   households only 2018-19 =AGSEC1= records takes 2018-19 to 3,086 and 2019-20 to
-   2,907, at the price of a key that disagrees with =GSEC1= where both exist.
-3. /The 73 + 76 of 2018-19./  A wave 6 household file would settle what those ids
+2. /The 73 + 76 of 2018-19./  A wave 6 household file would settle what those ids
    name.  Until then they stay NA; parsing the id is the alternative already declined.
 
 *** =v= across waves: three different defects (GH #942)
@@ -1471,7 +1468,8 @@ cluster, so it is no cleaner than the parish:
   files, which carry no household key.  2018-19 =GSEC1.t0_hhid= matches a
   2015-16 =HHID= for 2,978 of 3,176 households.  (/2026-11-03/: 2019-20 =hhidold=
   matches a 2018-19 =GSEC1.hhid= for 2,986 of 3,098, and the chain reaches =ea=
-  for 2,823; see "The design PSU =ea=" under Sampling Design.)
+  for 2,823; since =AGSEC1.ea= became a second source, 3,027 in 2018-19 and 2,868 in
+  2019-20.  See "The design PSU =ea=" under Sampling Design.)
 
 /Contradicts/ the 2013-14 =cluster_id_note= in =sampling.yml=, "A parish is
 not an EA, so no crosswalk can exist": true of the served parish =v=, but the

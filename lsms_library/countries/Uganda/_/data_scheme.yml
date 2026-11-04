@@ -18,9 +18,10 @@ Data Scheme:
     # The design PSU (GH #689): the EA a household was SAMPLED in, carried with
     # it when it moves.  `v` is a parish from 2013-14, so a design-based standard
     # error wants this column, and a location wants `v`.  Direct in 2013-14 and
-    # 2015-16; inherited through the survey's tracking key in 2018-19 and 2019-20
-    # (Derivation `Uganda::sample::ea-tracking-key`).  NA where there is no route,
-    # and in 2005-06 to 2011-12, where `v` is already the EA.
+    # 2015-16, with `AGSEC1.ea` for the 72 households only it records (Derivation
+    # `Uganda::sample::agriculture-cover`); inherited through the survey's tracking
+    # key in 2018-19 and 2019-20 (Derivation `Uganda::sample::ea-tracking-key`).  NA
+    # where there is no route, and in 2005-06 to 2011-12, where `v` is already the EA.
     ea:
       type: str
       optional: true
