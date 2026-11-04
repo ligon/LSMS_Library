@@ -828,3 +828,25 @@ waves and in the questionnaire; no grade.  It maps to =NPK= (0.17 N).  The
 Senegal label.  =s16b_me_sen2021.dta= holds 763 applied NPK rows and =plot_inputs=
 does not read it.  =s16a_me_sen2018.dta= asks fertilizer per parcel (=s16aq29c1=,
 1,431 positive), which the =data_scheme.yml= grain note says no wave does.
+
+* 2026-11-04 -- three 2018-19 quantities near 1e-19 behind =food_prices= of 1e22 (GH #1489)
+
+An input defect in the released file, not a factor problem.  =s07b_me_sen2018.dta= holds
+three rows, all product 132 (served =Autres tisanes et infusions=), where =s07bq03a= is 4.2e-19
+or 8.9e-19 and =s07bq07a= is 1.0e-20 or 2.2e-20, with =s07bq08= an ordinary 50 or 100 FCFA.  In
+all three the first is exactly 40 times the second.  No other positive =s07bq03a= or =s07bq07a= in
+the file is below 1e-3, and =s07b= of the other eleven EHCVM country-waves has none.
+
+The construction serves them faithfully.  =Expenditure= = =Quantity= x (=s07bq08= / =s07bq07a=)
+is a plausible 2,000 and 4,000 FCFA (the third is NA, its last purchase being in another unit),
+over a =Quantity= near 1e-19, and the kg factors are right (=metric=, 0.33 and 0.25 kg on
+=Bouteille de 33 cl= and =de 25 cl=).  So =units='kgvalue'= is 1.45e22 and 1.79e22 FCFA/kg.
+
+| 2018-19 =food_prices=  | with the two rows | without    |
+|------------------------+-------------------+------------|
+| mean                   | 2.17e17           | 1,091.84   |
+| maximum                | 1.79e22           | 330,000    |
+
+Reported, not masked: nothing in the file labels these as missing, and a stored value is not
+trimmed to look right.  Their cause is not known.  Site Q does not see them: it screens the
+upper tail of =food_acquired.Quantity= and does not screen =food_prices=.
