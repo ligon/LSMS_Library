@@ -392,6 +392,29 @@ class TestLsmsNoCache:
             c.food_quantities(waves=[c.waves[1]])
         assert not (root / 'Malawi/var/food_acquired.parquet').exists()
 
+    def test_a_parquet_only_served_stays(self, native_food, monkeypatch):
+        """``LSMS_NO_CACHE=0`` passes the read gate, so a fresh parquet is served
+        and not rewritten; it is not this read's to remove."""
+        c, root, _ = native_food
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            c.food_acquired()
+            before = (root / 'Malawi/var/food_acquired.parquet').stat().st_mtime_ns
+            monkeypatch.setenv('LSMS_NO_CACHE', '0')
+            c.food_quantities(waves=[c.waves[1]])
+        assert (root / 'Malawi/var/food_acquired.parquet').stat().st_mtime_ns == before
+
+    def test_assume_cache_fresh_keeps_what_it_served(self, native_food, monkeypatch):
+        c, root, _ = native_food
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            c.food_acquired()
+            before = (root / 'Malawi/var/food_acquired.parquet').stat().st_mtime_ns
+            monkeypatch.setenv('LSMS_NO_CACHE', '1')
+            c.assume_cache_fresh = True
+            c.food_quantities(waves=[c.waves[1]])
+        assert (root / 'Malawi/var/food_acquired.parquet').stat().st_mtime_ns == before
+
     def test_an_all_waves_read_keeps_its_parquet(self, native_food, monkeypatch):
         c, root, _ = native_food
         monkeypatch.setenv('LSMS_NO_CACHE', '1')

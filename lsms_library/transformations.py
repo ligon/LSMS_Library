@@ -2509,8 +2509,9 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
     # GH #1487: the estimators above read every row; everything below reads the
     # rows a ``serve_waves=`` request serves, so the frame, the partition, the
     # other attrs and the row-level warnings all describe those rows.  What an
-    # inference says about a label the request does not serve is not reported;
-    # a declared no-kg cell is judged against the rows the estimators read.
+    # inference says about a label the request does not serve is not reported
+    # (the warning's count of contradicting item cells still covers every cell
+    # read); a declared no-kg cell is judged against the rows the estimators read.
     keep = _served_rows(df, serve_waves)
     evidence = df
     if keep is not None:

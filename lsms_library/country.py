@@ -4677,11 +4677,20 @@ class Country:
         out.attrs = dict(df.attrs)
         return out
 
-    def _discard_no_cache_evidence(self, method_name: str) -> None:
-        """Do not keep the all-waves parquet a subset read wrote under ``LSMS_NO_CACHE``.
+    def _l2_country_stamp(self, method_name: str) -> tuple[int, int] | None:
+        """``(mtime_ns, size)`` of ``var/<table>.parquet``, or ``None`` if absent."""
+        try:
+            info = (data_root(self.name) / "var" / f"{method_name}.parquet").stat()
+        except OSError:
+            return None
+        return info.st_mtime_ns, info.st_size
+
+    def _discard_no_cache_evidence(self, method_name: str,
+                                   stamp_before: tuple[int, int] | None) -> None:
+        """Do not keep an all-waves parquet a subset read wrote under ``LSMS_NO_CACHE``.
 
         GH #1487 made a kg-using ``waves=`` subset read ``food_acquired`` for
-        every wave.  Under ``LSMS_NO_CACHE`` that read rebuilds and can write
+        every wave.  Under ``LSMS_NO_CACHE`` that read can rebuild and write
         ``var/food_acquired.parquet`` with full coverage, and such a build is
         degraded yet graded fresh (GH #1455).  Before #1487 the same request
         wrote only its own waves, so the next ordinary all-waves read missed on
@@ -4689,17 +4698,15 @@ class Country:
         read rebuilds.  An all-waves ``LSMS_NO_CACHE`` request keeps its
         parquet, as it always has.
 
-        Any non-empty value counts, ``LSMS_NO_CACHE=0`` included: that is how
-        ``Wave.grab_data`` reads the lever, so that spelling also builds the
-        degraded frame.  It is why this does not test the read gate's stricter
-        ``{1, true, yes}``, and a warm parquet that spelling would have kept
-        costs one rebuild.
-
-        The make backend writes no L2-country parquet, so what is on disk there
-        did not come from this read and stays.
+        Any non-empty value counts, ``LSMS_NO_CACHE=0`` included, because that
+        is how ``Wave.grab_data`` reads the lever.  A parquet this read only
+        served (*stamp_before* unchanged: that spelling on a warm cache, or
+        ``assume_cache_fresh``) stays.  Removal rather than not writing, because
+        the write is inside ``_aggregate_wave_data``, and any edit there moves
+        every table's build fingerprint.
         """
         if (not os.environ.get("LSMS_NO_CACHE")
-                or os.getenv("LSMS_BUILD_BACKEND", "dvc").lower() != "dvc"):
+                or self._l2_country_stamp(method_name) == stamp_before):
             return
         cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
         try:
@@ -6747,9 +6754,10 @@ class Country:
                     derived = None
                     try:
                         if subset_kg:
+                            stamp = self._l2_country_stamp('food_acquired')
                             with _read_audit_waves('food_acquired', waves):
                                 fa = self._aggregate_wave_data(None, 'food_acquired')
-                            self._discard_no_cache_evidence('food_acquired')
+                            self._discard_no_cache_evidence('food_acquired', stamp)
                         else:
                             fa = self._aggregate_wave_data(waves, 'food_acquired')
                         if isinstance(fa, pd.DataFrame) and not fa.empty:
