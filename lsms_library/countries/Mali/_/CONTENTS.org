@@ -2664,17 +2664,17 @@ Every other column of every row is digest-equal in all four waves, and =crop_div
 =gross_crop_revenue= and =yield_kg(on='plot')= are unchanged.  =harvest_kg='s total now
 equals the rows' own kilograms in every wave.
 
-- *2017-18 records where half the trees stand, and that stays unwired.*  =s11fq04= splits the 270
-  producing rows exactly: 135 =Verger= (an orchard, with its own area =s11fq06= and no location) and
-  135 =Eparpillé=, "éparpillés dans une parcelle", which name a block and parcel (=s11fq05c/d=).  128
-  of those 135 name a plot the household reports in =s7f=, and 0 have the same crop on it.  The kg
-  carried is 120,229 (=Verger=, 31 rows) and 57,650 (=Eparpillé=, 17 rows).  =Farm-level= is the served
-  grain because the roster has one line per species and asks one location, so the parcel is an attribute
-  of the line; the canonical wording "has no plot" is strained for those 135.  Serving them on the parcel
-  is the alternative, a choice left open (GH #1476 memo): it changes no 2017-18 yield today, because
-  =plot_features= serves no EAC-I wave, but it would put tree kilograms over a seasonal plot's area once
-  it does.  2014-15 =s3b= has =s3bq04= (scattered / plantation) and an area; no block or parcel seen, not
-  read in full.
+- *2017-18 records where half the trees stand; they stay =Farm-level= for now (@ligon, 2026-11-04).*
+  The instrument routes =1 = Eparpillé  2 = Verger ►(11F.06)=, so =s11fq04= splits the 270 producing
+  rows exactly: 135 =Verger= (an orchard, with its own area =s11fq06= and no location) and 135
+  =Eparpillé=, "éparpillés dans une parcelle", which name a block and parcel (=s11fq05c/d=).  128 of
+  those 135 name a plot the household reports in =s7f=, and 0 have the same crop on it.  The kg
+  carried is 120,229 (=Verger=, 31 rows) and 57,650 (=Eparpillé=, 17 rows).  The roster has one line
+  per species and asks one location, so the parcel is an attribute of the line, but the canonical
+  wording "has no plot" is strained for those 135.  Serving them on the parcel is the alternative, to
+  revisit if EAC-I =plot_features= is served: no 2017-18 yield moves today, because it serves no EAC-I
+  wave, but tree kilograms would then sit over a seasonal plot's area, and the 7 unmatched rows would
+  need a decision.  2014-15 =s3b= has no location variable.
 - *=Farm-level= now means two things here*: a tree row carries a harvest; a 2021-22 sale row (above)
   carries none.  =crop_diversity(weight='count')= drops a =Farm-level= row where the household has a
   plot row of that crop (GH #1469, a rule written for sale rows).  None of the 627 tree rows has one,
