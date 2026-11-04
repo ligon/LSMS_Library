@@ -1630,6 +1630,19 @@ the wave-native =household_id2= / =individual_id2=.
     individual =0105010010503101= is "10th Grade Complete" in one
     household and "9th Grade Complete" in the other.
 
+    /Corrected 2026-11-03 (GH #1447): these are not split-offs, and =8888=
+    marks no such thing./  In W3's household cover =household_id= equals
+    =household_id2= with characters 7-10 dropped on all 4,954 rows.  Those
+    characters are =0888= on all 3,272 rural households, on 72 of 427 small-town
+    and on 0 of 1,255 large-town (W2: all 3,323, 78 of 453, 0 of 1,486).  So a
+    rural household and a large-town household that differ only there get the
+    same =household_id=.  The cover holds 3 such pairs, each one rural and one
+    large town, and they are different households, as the fix below assumed.
+    Matched by roster line: the large-town household against the W1 household of
+    its truncated id has a median age gap of +20 years on 6 lines, where the
+    rural one against the same W1 household has +4.5 on 6; the two members of a
+    pair against each other have a median absolute gap of 16.5 on 11 lines.
+
 It also made education UNJOINABLE to the roster: *0* of the built
 =(i, pid)= pairs matched a =household_roster= row in W2 and W3, against
 100% in W1, W4 and W5 (which use the wave-native ids and were always
@@ -1663,7 +1676,11 @@ rest of the process.  Do NOT assert on this table's country-level row
 count; assert at the wave level, which is upstream of the collapse and
 deterministic.  See =.coder/ledger/323-ethiopia-config.md= §6.
 
-** Still open: the 2013-14 wave-level panel_ids: block
+** The 2013-14 wave-level panel_ids: block (closed 2026-11-03, GH #1447)
+
+/Closed: the block is confirmed wrong and removed, with the 2015-16 and 2021-22
+blocks.  See "Panel crosswalk: the YAML blocks against the committed JSON"
+below.  Kept as written:/
 
 =2013-14/_/data_info.yml= still declares =panel_ids:= against
 =sect_cover_ls_w2.dta= -- the LIVESTOCK-section cover, whose grain is
@@ -1703,6 +1720,105 @@ and *92.1%* in Malawi, where the price is asked regardless of any sale.
 Correlation with HeadCount does NOT separate these cases (neither a unit price
 nor a sales total tracks the herd size), which is why the sold-nothing
 conditional and the questionnaire wording are the tests to use.
+
+* Panel crosswalk: the YAML blocks against the committed JSON (GH #1447, 2026-11-03)
+
+=_/panel_ids.py= never read the =panel_ids:= blocks in =2013-14=, =2015-16= and
+=2021-22='s =data_info.yml=, but =LSMS_BUILD_BACKEND=make= built from them
+(=load_from_waves= takes a wave declaration before the committed JSON).  So the
+two backends served different crosswalks.  The blocks are removed; both backends
+now serve the JSON, and the JSON is unchanged (=panel_ids.py= regenerates it byte
+for byte).
+
+| wave | blocks                                                              | committed JSON                                    |
+|------+---------------------------------------------------------------------+---------------------------------------------------|
+| W2   | =sect_cover_ls_w2=: LIVESTOCK cover, holder grain, 3,670 households  | =sect_cover_hh_w2= links 3,776, plus 25 PP-only    |
+| W3   | HH cover identity, 4,954, chained through W2                        | the same, plus 27 PP-only: 4,981                  |
+| W5   | HH cover identity, 4,959, recorded as links to 2015-16              | nothing                                           |
+
+Measured against the covers, read directly:
+
+- *Entries*: 9,913 against 4,981 in =panel_ids=; 4,954 keys shared, 315 pointing
+  elsewhere.  Of the 315: 201 W3 households whose W2 HH cover link the livestock
+  cover lacks (229 such links in W2) stayed unwalked; 107 got a minted id; 6
+  PP-only households lost their link; 1 is the exception below.
+- *Minted ids*: the livestock cover carries 112 blank baselines.  A block's
+  =myvars= do not pass through =format_id=, so each stayed an empty string, and
+  =update_id= took that as one shared target and minted =''=, =_1=, ... =_111=.
+  Under the make backend those are served =i=.
+- *W5*: the resolver takes the previous wave present in the frame.  W4 has no
+  block, so every W5 household was recorded as linked to 2015-16, across the two
+  panels that "do not link".  Harmless to =i= (an identity), false in =panel_ids=.
+- *Corroboration of the JSON's W3 count*: the ESS3 BID's Table 4.2 reports 4,981
+  households interviewed, and its footnote 19 the 4,954 + 27 split (PDF p23).
+
+*What moved, measured on cold builds* (=98c6069d2= against the removal; each side
+and backend built in its own empty root; =assert_frame_equal= with attrs cleared).
+Under the default backend all seven sampled tables are exact, so nothing moves but
+hashes.  After the removal the make backend equals the default on all seven.  Before
+it, the make backend served the same rows under different =i=:
+
+| table            |    rows | W2 =i= differing | W3 =i= differing | minted W2 / W3 | rows with null =v= |
+|------------------+---------+------------------+------------------+----------------+--------------------|
+| sample           |  26,130 |              358 |              341 |      111 / 106 | (no =v= level)     |
+| household_roster | 126,376 |              341 |              315 |      111 / 106 | 0                  |
+| shocks           |  21,781 |              121 |              210 |        45 / 77 | (no =v= level)     |
+| housing          |  25,855 |              341 |              315 |      111 / 106 | 0                  |
+| food_acquired    | 326,456 |              334 |              309 |      111 / 105 | 0                  |
+| plot_features    | 132,694 |                0 |                0 |          0 / 0 | 1,525              |
+| crop_production  |  86,403 |                0 |                0 |          0 / 0 | 1,004              |
+
+"Minted" counts =_N= ids; each wave's =''= is one more where present.  The last two
+tables kept the JSON's =i= while =sample()= did not, so their =v= join missed: that
+backend disagreed with itself.  =check_panel_consistency= under make goes from fail
+(5,026 of 9,913 previous-wave targets missing) to pass.
+
+*The one key where the block links and the JSON does not*: a W3 household on W2's
+livestock cover only.  W2's livestock cover holds 3 households on neither the HH
+nor the PP cover, each with a W1 baseline no other household claims; 1 reaches
+W3.  GH #1120's oracle read HH, PP and PH, so =sample()= and the crosswalk agree
+in leaving them out.  Part of the open question below.
+
+** Open: 48 W3 households the survey counts as ESS1 and the crosswalk does not
+
+W3's =household_id= is not independent evidence: it is =household_id2= with four
+characters dropped, on every row, which is why =_/panel_ids.py= chains through W2
+instead (#1120 ledger: "HH3 baseline remains diagnostic").  That leaves 48 W3 HH
+cover households on no W2 HH or PP cover whose truncated id IS a W1 household,
+claimed by no other household.  They are served under their 18-character id, so
+they do not link to W1.
+
+- *The BID counts them.*  "the total number of ESS1 households with complete
+  interviews in ESS3 is 3,699" (ESS3 BID, PDF p16).  The JSON links 3,651 HH cover
+  households; 3,651 + 48 = 3,699.  Its "3,726 ... post planting" is that plus the
+  27 PP-only, one of which the JSON also leaves unlinked (26 linked).
+- *The rosters mostly agree*, matching W3 to W1 on roster line, sex equal and age
+  gap 2-6 years:
+  | group                                   | households | lines agreeing | line 1 agreeing | households with none |
+  |-----------------------------------------+------------+----------------+-----------------+----------------------|
+  | JSON-linked W3 households               |      3,639 |          0.520 |           0.658 |                0.115 |
+  | the 48                                  |         48 |          0.425 |           0.562 |                0.333 |
+  | another W1 household in the same EA     |      3,639 |          0.074 |           0.075 |                0.789 |
+- *W3's =ea_id2= is the W2 bridge of the W1 EA* for all 48.  41 are rural, 7 small
+  town.  One's W1 id is also the target of a different W2 household, which W3 does
+  not hold.
+
+Whether to link them changes served =i= for about 49 W3 households in every table
+and needs a ruling.  Left unchanged.
+
+** Panel II in the crosswalk
+
+=_/panel_ids.py='s docstring says W4 and W5 "draw entirely new samples with no
+backward link".  That is false for W5: the ESPS-5 "kept all the ESPS-4 samples except for
+those in the Tigray region and a few other places" (catalog 6161), =sampling.yml= declares =household_continuity: panel=, and 4,849
+of W5's 4,959 HH cover ids are on W4's.  No rename is needed, so served =i= links
+W4 and W5 already; only =panel_ids= is silent (Nigeria's W5 is recorded as identity
+links, GH #1264).  Likewise =panel_ids= has no W2 -> W1 keys, because the resolver
+records none for the first wave in its frame; those links are in =updated_ids=.
+
+*A string collision, not a link*: served =i= has 1 id in common between W2 and W4
+and 1 between W2 and W5, unrelated large-town households in the same character
+format.  =sampling.yml='s "0 shared =i=" at 2018-19 is about W3 and stands.
 
 * Food prices: what the ESS asks, and three defects (2026-09-08)
 
@@ -3113,6 +3229,25 @@ rows); the column is now =timestamp[us]= in the wave and country parquets
   fieldwork.  Nothing is converted: every row is parsed as Gregorian and
   counted =outside_window= as before; whether the Harar EA was keyed in the
   Ethiopian calendar is not adjudicated.
+- *Tested 2026-11-03 for the #1056 ruling; nothing changed.*  Against the same
+  households' livestock-cover =InterviewDate=:
+  | rows read as Ethiopian           | date read as Ethiopian   | minus own LS date, days | verdict                                  |
+  |----------------------------------+--------------------------+-------------------------+------------------------------------------|
+  | W5 Amhara EA, 9 rows in 2014-01  | Sep-Oct 2021             | -129 to -21             | impossible: before the first-visit LS    |
+  | W5 Harar EA, 2 rows in 2014-04   | 2021-12-27               | +15                     | between visits, not post-harvest         |
+  | W5 Harar EA, 7 rows in 2014-07   | 2022-03-19               | +97 to +149             | possible (in-window p5-p95: +116, +202)  |
+
+  For the 7: 2014 is the Ethiopian year of the fieldwork, and 6 of 7 gaps are
+  ordinary.  Against: all 9 LS rows of that EA are stamped in Gregorian 2021; the date
+  is before all 131 dated rows of the other 14 Harar EAs (April-June 2022) and before
+  the DDI's "between April and June 2022", inside only the one-month widening of the
+  window; and only 10 rows of the whole wave, one region on one day, are earlier.
+  "2014" alone does not point to the Ethiopian calendar: W4's 13 rows, which cannot be
+  Ethiopian, also sit in 2014-01, days 1-7, and W5's Amhara rows cluster the same way
+  (days 5-7 for 7 of 9).  No rule selects the 7 without naming the EA and the month:
+  by EA it also converts the 2, by year it also converts all 11.  Neither the BIDs nor
+  the DDIs say anything about device calendars, so a registered basis could only be
+  =modelling-choice=.  7 of 1,475 served rows.
 
 * Nine country concatenators use actual declarations (GH #1287, 2026-10-29)
 
@@ -3440,6 +3575,34 @@ Related Materials -- answer it for W4 and W5: *fieldwork*, not anonymisation.
 - *Not established here*: the cause of W2's 25 and W3's 27 additions (the
   ESS2/ESS3 BIDs were not read), and an EA-by-EA reconciliation of the ESS4
   BID's "eight EAs" against the 6 EAs #1359's cluster closure adds.
+
+/Updated 2026-11-03 (GH #1443)./  The ESS2 and ESS3 BIDs are now read, and W2 and
+W3 are fieldwork too.
+
+- *W3, 27 (ESS3 BID, held, PDF p31)*: "there were 27 households which were
+  administered the post-planting and/or livestock questionnaires but were not
+  administered the household and post-harvest questionnaires.  These 27 households
+  could not be located during the subsequent household visit but the agriculture
+  questionnaire is included in our sample".  PDF p16: "12 were in one enumeration area
+  that could not be visited for security reasons.  The remaining 15 were in different
+  places and no respondent was available".  Measured: 27 on both PP and LS and not on
+  HH, 26 matching that sentence and 1 also on PH; 10 in one EA absent from the HH
+  cover, and 17 each alone in their EA.  So 10 against the BID's 12, not reconciled.
+- *W2, 25 (ESS2 BID, not held,
+  https://microdata.worldbank.org/catalog/2247/download/40387, PDF p28)*: the same
+  sentence with 30 households, ending "and were dropped from the entire ESS2 sample".
+  Measured: 28 on PP or LS and not on HH: 24 match that sentence, 4 are also on PH,
+  and the BID's other 2 are not found.  The 28 are #1359's 25 on PP plus 3 on LS only:
+  the same class, which D1 leaves out because it reads HH and PP.  So the release
+  ships what this sentence says was dropped, and D1 keeps them.
+- *ESS4's "eight EAs" against #1359's 6: not one number, and the BID does not
+  settle it.*  565 sampled less the 24 with no data at all (ESS4 BID PDF p25) is 541,
+  and exactly 541 EAs appear on some W4 cover: 535 on the HH cover and 6 not.  So only
+  6 can be additional to the 535, and those are what #1359 adds.  The BID itself says
+  eight on PDF p13 and lists 5 + 2 = 7 on PDF p26.  The 124 split as 64 in those 6 EAs,
+  12 in 2 EAs where 6 of 10 PP households have no HH row (4 do), and 48 in 36 EAs with
+  at most 3 each.  Those 2 EAs are the nearest candidates for the BID's other two, but
+  nothing confirms it, and "about 62" movers fits the 60 outside the 6 EAs better.
 
 * GH #1119 -- structural crop marker (2026-10-30)
 

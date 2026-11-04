@@ -64,17 +64,6 @@ cluster_features:
         - v
         - i
 
-panel_ids:
-    # Built by bespoke script (materialize: make in data_scheme.yml).
-    # W3 household_id2 chains through W2 to reach W1 baseline IDs;
-    # see Ethiopia/_/panel_ids.py for details.
-    file:
-        - ../Data/sect_cover_hh_w3.dta
-    idxvars:
-        i: household_id2
-    myvars:
-        previous_i: household_id2
-
 household_roster:
     file: sect1_hh_w3.dta
     idxvars:
