@@ -266,3 +266,27 @@ Data Scheme:
     Industry: {type: str, optional: true}
     working_age: bool
     materialize: make
+
+  community_prices:
+    # Item-level community prices (GH #1226), the Niger 2018-19 template.  One
+    # row per SURVEY-RECORDED price from section 5 of the community
+    # questionnaire, s05_co_sen2018.dta (2018-19 only: 2021-22 ships no community
+    # price file; s05_me_sen2021 is a household module and ehcvm_prix_sen2021 has
+    # no grappe).  Cluster-level: no household i, and v is the native grappe, the
+    # sample() keyspace.  Script path, because a record is two readings and `u`
+    # is decoded from a code.
+    #   j -- BY CODE: the household s07bq01 label through harmonize_food.
+    #   u -- BY CODE: the household's sized form, Tas (Petit), bare units bare,
+    #        no two units folded (#1453 ruling).
+    #   variety -- the canonical unknown_variety: the form names nothing finer.
+    #   visit -- vague.  Each grappe is fielded in one vague.
+    #   obs -- s05q03 "Relevé 1" = 1, s05q04 "Relevé 2" = 2.
+    #   Quantity -- 1, the registered derivation
+    #        Senegal::community_prices::one-item-per-price: the form prices one
+    #        item of the selected unit-size and asks no quantity.
+    # Rules and measurements: CONTENTS.org.
+    index: (t, v, j, u, variety, visit, obs)
+    Price: float
+    Quantity: float
+    Description: {type: str, optional: true}
+    materialize: make
