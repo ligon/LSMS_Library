@@ -688,7 +688,8 @@ grappes) and agrees with =emc2014_p1_logement_27022015.dta= household for
 household (10,411 matched, 0 disagree), so it is not a config error.  Some of
 the provinces named lie outside the zd's region (zd 16, Boucle du Mouhoun:
 BANWA, KOSSI and LOROUM -- Loroum is in Nord), which reads as a miscoded
-province rather than an EA straddling a boundary.
+province rather than an EA straddling a boundary.  /Fixed 2026-11-03 except for
+the 2 tied zd: see "2014 zd modal province (GH #1060)" at the end of this file./
 
 *Cache*: both wave =data_info.yml= files are build inputs, so all 24
 Burkina_Faso =Country._table_cache_hash= values move; the 2021-22 wave
@@ -2491,3 +2492,65 @@ No date is parsed differently; nothing is imputed.
 Cache: the wave =data_info.yml= is a build input -- all 24 Burkina country
 hashes and the 24 2021-22 wave hashes move.  Pinned by
 =tests/test_burkina_faso_cs_interview_date.py=.
+
+* 2026-11-03 -- 2014 zd modal province (GH #1060)
+
+*The idiosyncrasy.*  EMC 2014 records =province= per household, and it varies
+within 94 of the 900 =zd= in =emc2014_p1_logement_27022015.dta= (86 name two
+provinces, 8 name three; 1,128 households; modal share median 0.92, minimum
+0.50; 169 households outside the mode).  =region= and =milieu= never vary.
+=emc2014_welfare.dta= agrees household for household (10,411 of 10,411), so it
+is the source, not the config.  Against the province-to-region pairing of the
+EHCVM-1 cover, 90 households in 67 of the 94 zd name a province outside their
+zd's region, and no household elsewhere in the file does.
+
+*Ruling (@ligon, 2026-11-03, option b).*  Serve each zd's most common province
+as =District=, as the registered derivation
+=Burkina_Faso::cluster_features::zd-modal-province=.  The tied zd stay as served.
+Raw answers stay available through =derivation_inputs=.
+
+*Where it is done.*  At the wave: =2014/_/mapping.py= =cluster_features=, a
+=df_edit= hook on the household-grain frame, makes the rows of a zd agree and
+stamps every one of them.  The =(t, v)= collapse downstream is then a lossless
+de-dup, and it carries the key on the row it selects.  No framework change:
+=most_complete_row= excludes =Derivation= from its score at both sites, and the
+audit compares it like any column, which is why stamping only SOME rows of a zd
+would itself be a disagreement.  The hook does not reorder rows, because a tied
+zd is resolved by position.
+
+*Measured*, cold base (=98c6069d2=) against cold candidate:
+
+| | base | candidate |
+|-+------+-----------|
+| 2014 rows | 900 | 900 |
+| zd carrying the key | -- | 92 (1,104 logement rows) |
+| zd whose served =District= moves | -- | 9 |
+| 2014 grain report | 1,034 of 10,800 rows, 94 groups | *22 of 10,800, 2 groups* |
+| households changing =m= under =market='District'= | -- | 105, all 2014, all in those 9 zd |
+| households changing =m= under =market='Region'= | -- | 0 |
+
+The 9 zd: 9, 334, 363, 460, 478, 589, 678, 709, 789.  A household's =m= is the
+zd's, so a moved zd moves all its households, 105 of the 108 (three logement rows
+are not in =sample()=).  =Region=, =Rural= and every other zd's =District= are
+unchanged.  District distinct stays 45.
+
+*What stays.*  zd 362 (Sissili / Ziro, 6 households each) and 727 (Séno / Yagha,
+6 each) tie.  Both pairs lie inside the zd's region.  They are served =Ziro= and
+=Yagha=, each the first household's, chosen by core's selector, exactly as before,
+and they carry no key.  Their rows still disagree, so the grain report stays,
+smaller, and =LSMS_GRAIN_STRICT=1= still refuses this table.  That is on purpose:
+a known-bad cell stays loud.
+
+*What the evidence does and does not say.*  All 92 modes and all four tied
+provinces lie inside the zd's region, which is what the rule would predict if the
+outliers are miscodes.  But the check only sees across a regional boundary: of
+the 157 households outside the mode in the 92 zd, 90 name another region's
+province, and for the other 67 the mode is uncorroborated.  No held 2014 file
+gives a zd's own province.  =derivation_inputs= returns the 1,104 raw rows of the
+92 zd; a tied zd is not there, because its value is not constructed.
+
+Cache: =2014/_/mapping.py= moves every Burkina =_table_cache_hash= and every 2014
+=Wave._input_hash=.  The canonical =Derivation= declaration alone moves nothing
+(0 of 550, 0 of 2,142, 0 of 40 =build_transforms_fingerprint=).
+Pinned by =tests/test_gh1060_1057_burkina_cluster_features.py=, whose oracle
+reads the source files and imports nothing from this directory.

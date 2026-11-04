@@ -513,6 +513,14 @@ Columns:
       type: float
     Longitude:
       type: float
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        As under `food_acquired.Derivation`.  First instance here:
+        `Burkina_Faso::cluster_features::zd-modal-province` (2014, GH #1060;
+        `province` varies within 94 of 900 zd in the source, and the served
+        District is the zd's most common one).
   plot_features:
     # Lasting plot/parcel characteristics (GH #167).  Per-season detail
     # (which crop, who farmed it this season, season-specific inputs,

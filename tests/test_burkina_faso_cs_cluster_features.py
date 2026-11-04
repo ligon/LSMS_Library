@@ -120,7 +120,7 @@ def test_cross_section_grappes_get_cluster_rows(raw_covers):
 
 @pytest.fixture(scope="module")
 def _non_strict():
-    """2014 carries a pre-existing source-property GrainCollapseWarning
+    """2014 keeps a source-property GrainCollapseWarning on 2 tied zd
     (GH #1060) that LSMS_GRAIN_STRICT=1 would turn into an abort."""
     prior = os.environ.pop("LSMS_GRAIN_STRICT", None)
     yield

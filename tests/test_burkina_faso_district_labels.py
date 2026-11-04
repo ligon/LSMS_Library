@@ -198,8 +198,8 @@ class TestTable:
 
 @pytest.fixture(scope="module")
 def _non_strict():
-    """Warn-mode grain checks.  2014 carries a pre-existing, unrelated
-    ``GrainCollapseWarning`` (GH #1060: province varies within 94 zd) that
+    """Warn-mode grain checks.  2014 carries an unrelated
+    ``GrainCollapseWarning`` (GH #1060: 2 tied zd name two provinces) that
     ``LSMS_GRAIN_STRICT=1`` would turn into an abort of the whole build."""
     prior = os.environ.pop("LSMS_GRAIN_STRICT", None)
     yield

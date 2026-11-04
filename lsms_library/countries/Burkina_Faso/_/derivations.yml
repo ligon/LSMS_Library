@@ -150,3 +150,51 @@ Burkina_Faso::community_prices::quoted-native-unit-count:
     passes without normalizing actual frames.
   contents: 'Burkina_Faso/_/CONTENTS.org, GH1226 PRICE instrument'
   since: '2026-10-30'
+
+Burkina_Faso::cluster_features::zd-modal-province:
+  waves: ['2014']
+  columns: [District]
+  rule: >-
+    District = the most common `province` among the zd's households, on every
+    row of a zd whose households name more than one province and where one of
+    them is strictly the most common: 92 of the 900 zd, 1,104 of the 10,800
+    logement rows.  The other 806 zd name one province and carry no key.  The 2
+    zd where two provinces tie (362, 727; 6 households each) are left as they
+    are, carry no key, and are served the row the (t, v) collapse selects, so
+    they keep the grain report.  The key sits on a zd whose served value was the
+    mode anyway (83 of the 92): it describes the construction, not whether it
+    moved the value.  9 zd move.
+  function: lsms_library.countries.Burkina_Faso.2014._.mapping:derive_zd_modal_province
+  inputs: lsms_library.countries.Burkina_Faso.2014._.mapping:inputs_cluster_features
+  raw_variables: [zd, menage, region, province, milieu]
+  assumptions:
+    - text: >-
+        A zd lies in one province, so the households of a zd that name several
+        are mostly recording one province and miscoding the others.  The survey
+        does not say this; it records province per household.  The zd is a frame
+        unit, and `region` and `milieu` never vary within one.
+      basis: modelling-choice
+      evidence: >-
+        GH #1060, ruling by @ligon 2026-11-03, option (b).  emc2014_p1_logement_27022015.dta,
+        province by zd: 94 of 900 zd vary (86 name two, 8 name three), 1,128
+        households, modal share median 0.92 and minimum 0.50, 169 households
+        outside the mode.  Against the province-to-region pairing of the EHCVM-1
+        cover (s00_me_bfa2018.dta), 90 households in 67 of the 94 zd name a
+        province outside their zd's region, and no household anywhere else does;
+        every one of the 92 modes, and all four provinces of the 2 ties, lie
+        inside the zd's region.
+    - text: >-
+        A tie is not broken.  Nothing in the source prefers one of two provinces
+        named by 6 households each, so no rule is added and the served value stays
+        the first household's, chosen by core's most-complete-row selector.
+      basis: modelling-choice
+      evidence: GH #1060, ruling by @ligon 2026-11-03.
+  validated_against: >-
+    emc2014_welfare.dta carries the same province for 10,411 of 10,411 matched
+    households, so it corroborates the raw variation and cannot adjudicate it.
+    No held 2014 file gives a zd's own province.  The region check in the first
+    assumption is the only outside evidence, and it can only see across a regional
+    boundary: of the 157 households outside the mode in these 92 zd, 90 name a
+    province outside the zd's region, and for the other 67 the mode is uncorroborated.
+  contents: 'Burkina_Faso/_/CONTENTS.org, "2014 zd modal province (GH #1060)"'
+  since: '2026-11-03'

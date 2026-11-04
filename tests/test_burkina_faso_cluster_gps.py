@@ -77,10 +77,10 @@ LON = (-5.6, 2.5)
 
 @pytest.fixture(scope="module", autouse=True)
 def _non_strict():
-    """Warn-mode grain checks.  2014 carries a pre-existing, unrelated
-    ``GrainCollapseWarning`` (94 zd whose households disagree on
-    Region/District/Rural) that ``LSMS_GRAIN_STRICT=1`` would turn into an
-    abort of the whole country build."""
+    """Warn-mode grain checks.  2014 carries an unrelated
+    ``GrainCollapseWarning`` (2 tied zd whose households disagree on District,
+    GH #1060) that ``LSMS_GRAIN_STRICT=1`` would turn into an abort of the
+    whole country build."""
     prior = os.environ.pop("LSMS_GRAIN_STRICT", None)
     yield
     if prior is not None:

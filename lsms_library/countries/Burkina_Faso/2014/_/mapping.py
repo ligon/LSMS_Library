@@ -367,3 +367,88 @@ def household_roster(df):
     if 'Relationship' in df.columns:
         df['Relationship'] = df['Relationship'].replace(_RELATIONSHIP_FIX)
     return df
+
+
+# ---------------------------------------------------------------------------
+# cluster_features: a zd's most common province (GH #1060)
+# ---------------------------------------------------------------------------
+#
+# EMC 2014 records `province` per household, and it varies within 94 of the 900
+# zd (`region` and `milieu` never do).  It is a source property, not a config
+# error: emc2014_welfare.dta agrees with the logement file household for
+# household.  90 households in 67 of those zd name a province outside their zd's
+# region, which reads as miscoding rather than an EA straddling a boundary.
+#
+# The hook makes the rows of a zd AGREE, and it stamps every one of them, so the
+# (t, v) collapse downstream is lossless and carries the key on the row it
+# selects.  Core does not aggregate; this is the wave doing it, by name.  Keep the
+# row order: a tied zd is resolved by the collapse, which takes its first row.
+ZD_MODAL_PROVINCE_DERIVATION = 'Burkina_Faso::cluster_features::zd-modal-province'
+
+_LOGEMENT_FILE = 'emc2014_p1_logement_27022015.dta'
+
+
+def _modal_province_by_zd(zd, province):
+    """``{zd: province}`` for each zd naming more than one province, where one
+    of them is strictly the most common.  A tied zd is absent: nothing here
+    breaks a tie (the ruling on GH #1060)."""
+    counts = (pd.DataFrame({'zd': zd, 'province': province})
+              .dropna()
+              .value_counts()
+              .rename('n')
+              .reset_index())
+    by_zd = counts.groupby('zd')
+    leaders = counts[(by_zd['province'].transform('size') > 1)
+                     & (counts['n'] == by_zd['n'].transform('max'))]
+    sole = leaders[~leaders['zd'].duplicated(keep=False)]
+    return dict(zip(sole['zd'], sole['province']))
+
+
+def derive_zd_modal_province(df):
+    """Serve the most common province of a zd whose households disagree.
+
+    Takes a household-grain frame with a ``v`` index level and a ``District``
+    column.  Every row of a zd with a strict mode gets that mode in ``District``
+    and the registry key in ``Derivation``, including a zd whose served value
+    would have been the mode anyway: the key describes the construction, not
+    whether it moved the value.  The other 806 zd and the 2 tied zd are returned
+    untouched and carry no key.  Row order is preserved.
+    """
+    out = df.copy()
+    zd = out.index.get_level_values('v').to_numpy(dtype=object)
+    target = pd.Series(zd, dtype=object).map(
+        _modal_province_by_zd(zd, out['District'].to_numpy(dtype=object))
+    ).to_numpy(dtype=object)
+    constructed = pd.notna(target)
+    district = out['District'].to_numpy(dtype=object, copy=True)
+    district[constructed] = target[constructed]
+    out['District'] = pd.Series(district, index=out.index, dtype=out['District'].dtype)
+    out['Derivation'] = pd.Series(pd.NA, index=out.index, dtype='string')
+    out.loc[constructed, 'Derivation'] = ZD_MODAL_PROVINCE_DERIVATION
+    return out
+
+
+def cluster_features(df):
+    """``cluster_features`` post-processor: see :func:`derive_zd_modal_province`."""
+    return derive_zd_modal_province(df)
+
+
+def inputs_cluster_features(wave='2014'):
+    """The registry `inputs` callable: the raw logement answers of every zd whose
+    served ``District`` is constructed, one row per household, at ``(t, v, menage)``.
+
+    ``province`` is what the survey recorded; a user who wants another reading of
+    a zd re-derives it from here.  A tied zd is not returned, because its served
+    value is not constructed: it is the row the collapse selects.
+    """
+    if wave != '2014':
+        raise ValueError(f'{ZD_MODAL_PROVINCE_DERIVATION} covers 2014 only, not {wave!r}')
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    raw = get_dataframe(countries_root() / 'Burkina_Faso' / wave / 'Data' / _LOGEMENT_FILE)
+    v = raw['zd'].map(format_id)
+    keep = v.isin(list(_modal_province_by_zd(v.to_numpy(dtype=object),
+                                             raw['province'].to_numpy(dtype=object))))
+    out = raw.loc[keep, ['zd', 'menage', 'region', 'province', 'milieu']].assign(
+        t=wave, v=v[keep])
+    return out.set_index(['t', 'v', 'menage'])
