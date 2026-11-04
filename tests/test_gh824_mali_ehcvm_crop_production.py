@@ -17,8 +17,15 @@ Three families:
 ``TestServed``
     builds the real table.  The ORACLE reads the ``.dta`` files directly and
     imports nothing from ``Mali/_/``: it spells the household id and the plot id
-    itself, decodes units from their CODES with its own table, and uses only the
-    ``harmonize_food`` table of ``categorical_mapping.org`` as data.
+    itself and decodes units from their CODES with its own table.
+
+**Where the oracle is NOT independent: crops.**  It maps a crop through the
+``harmonize_food`` table of ``categorical_mapping.org``, the table the build
+reads, so a wrong row there moves both sides and every row-level check still
+passes (``Souchet`` -> ``Mil`` and ``Radis`` -> ``Persil`` both did, in the red team
+of GH #824).  What pins a crop label is the literal list ``NEW_CROPS``, in
+``TestDeclared`` against the table and in ``TestServed`` against the source
+counts.  A crop label that was already in the table before GH #824 is not pinned.
 
 Measured on a cold build; see ``Mali/_/CONTENTS.org``, "2026-11-03 -- EHCVM
 crop_production wired (GH #824)".
@@ -61,6 +68,18 @@ WAVE_ROWS = {"2018-19": 7992, "2021-22": 7247 + 70}
 ATTACHED, FARM_TWO_ROWS, FARM_THREE_PLUS, FARM_NO_ROW = 1070, 58, 12, 0
 #: Raw totals, FCFA.
 VALUE_2018, VALUE_2021 = 623_474_428.0, 418_697_975.0
+#: The crops GH #824 added to harmonize_food: (source label, served label).
+NEW_CROPS = [("Riz Paddy", "Riz"), ("Autre (à préciser)", "Autres cultures"), ("Chou", "Chou"),
+             ("Calebassier", "Calebasse"), ("Oseille", "Oseille"), ("Souchet", "Souchet"),
+             ("Persil", "Persil"), ("Céleri", "Céleri"), ("Radis", "Radis"),
+             ("Pomme à pin", "Pomme à pin")]
+#: Source rows of the labels that occur in s16c on a few rows, counted by source label.
+NEW_CROP_ROWS = [("2018-19", "s16c_me_mli2018.dta", "Souchet", "Souchet", 7),
+                 ("2018-19", "s16c_me_mli2018.dta", "Persil", "Persil", 1),
+                 ("2018-19", "s16c_me_mli2018.dta", "Céleri", "Céleri", 1),
+                 ("2018-19", "s16c_me_mli2018.dta", "Radis", "Radis", 1),
+                 ("2021-22", "s16c_me_mli2021.dta", "Céleri", "Céleri", 1),
+                 ("2021-22", "s16c_me_mli2021.dta", "Pomme à pin", "Pomme à pin", 1)]
 
 
 def _root() -> Path:
@@ -174,10 +193,9 @@ class TestDeclared:
     def test_the_kg_ladder_reads_a_sack_rather_than_inferring_it(self, label, kg):
         assert T._parse_explicit_metric(label) == kg
 
-    @pytest.mark.parametrize("raw, served", [
-        ("Riz Paddy", "Riz"), ("Autre (à préciser)", "Autres cultures"), ("Chou", "Chou"),
-        ("Calebassier", "Calebasse"), ("Oseille", "Oseille")])
-    def test_a_crop_joins_the_label_the_eaci_waves_serve(self, raw, served):
+    @pytest.mark.parametrize("raw, served", NEW_CROPS)
+    def test_a_new_crop_has_its_literal_label(self, raw, served):
+        """Literal, because the oracle reads this table too (module docstring)."""
         assert _table("harmonize_food")[raw] == served
 
     def test_the_derivation_is_registered_and_resolves(self):
@@ -410,6 +428,13 @@ class TestServed:
     def test_a_recorded_crop_is_never_lost_and_nothing_is_unknown(self, flat, wave):
         rows = flat[flat.t == wave]
         assert rows.crop.notna().all() and not (rows.u == "Unknown").any()
+
+    @pytest.mark.parametrize("wave, name, raw, served, n", NEW_CROP_ROWS)
+    def test_a_new_crop_keeps_exactly_its_source_rows(self, flat, wave, name, raw, served, n):
+        _, labels = _raw(wave, name)
+        assert int(labels["s16cq04"].astype("string").str.strip().eq(raw).sum()) == n
+        rows = flat[(flat.t == wave) & (flat.plot_id != FARM)]
+        assert int(rows.crop.eq(served).sum()) == n
 
     def test_every_harvest_row_finds_its_plot(self, flat):
         plots = ll.Country(COUNTRY).plot_features().reset_index()
