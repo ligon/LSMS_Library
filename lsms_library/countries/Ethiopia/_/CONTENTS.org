@@ -1748,6 +1748,27 @@ Measured against the covers, read directly:
 - *Corroboration of the JSON's W3 count*: the ESS3 BID's Table 4.2 reports 4,981
   households interviewed, and its footnote 19 the 4,954 + 27 split (PDF p23).
 
+*What moved, measured on cold builds* (=98c6069d2= against the removal; each side
+and backend built in its own empty root; =assert_frame_equal= with attrs cleared).
+Under the default backend all seven sampled tables are exact, so nothing moves but
+hashes.  After the removal the make backend equals the default on all seven.  Before
+it, the make backend served the same rows under different =i=:
+
+| table            |    rows | W2 =i= differing | W3 =i= differing | minted W2 / W3 | rows with null =v= |
+|------------------+---------+------------------+------------------+----------------+--------------------|
+| sample           |  26,130 |              358 |              341 |      111 / 106 | (no =v= level)     |
+| household_roster | 126,376 |              341 |              315 |      111 / 106 | 0                  |
+| shocks           |  21,781 |              121 |              210 |        45 / 77 | (no =v= level)     |
+| housing          |  25,855 |              341 |              315 |      111 / 106 | 0                  |
+| food_acquired    | 326,456 |              334 |              309 |      111 / 105 | 0                  |
+| plot_features    | 132,694 |                0 |                0 |          0 / 0 | 1,525              |
+| crop_production  |  86,403 |                0 |                0 |          0 / 0 | 1,004              |
+
+"Minted" counts =_N= ids; each wave's =''= is one more where present.  The last two
+tables kept the JSON's =i= while =sample()= did not, so their =v= join missed: that
+backend disagreed with itself.  =check_panel_consistency= under make goes from fail
+(5,026 of 9,913 previous-wave targets missing) to pass.
+
 *The one key where the block links and the JSON does not*: a W3 household on W2's
 livestock cover only.  W2's livestock cover holds 3 households on neither the HH
 nor the PP cover, each with a W1 baseline no other household claims; 1 reaches
