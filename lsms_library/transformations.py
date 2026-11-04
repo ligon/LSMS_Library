@@ -2047,6 +2047,26 @@ def _declared_no_kg_mask(df, no_kg, item_col='j'):
 #: arms, not a new layer.  An unsized label's step 2 reads every report of its
 #: base, whatever the size; a sized label reads only itself.
 #:
+#: WHAT IT RESTORES, MEASURED COLD.  Mali 2014-15 and Burkina 2014 return to the
+#: ``KgFactorSource`` partition they had at ``f6ed07ae9``, the last development
+#: before #1224, and against EHCVM's own ``ehcvm_nsu`` weights Mali's median
+#: ``|log error|`` goes 0.461 -> 0.752 -> 0.461 and Burkina's within-2x 76 -> 56 ->
+#: 76%.  Burkina's kilograms return exactly; Mali 2014-15's differ by 681 of 12.56M
+#: because 8,383 ``Tas`` rows on the ``unit`` rung differ by 0.24%, and that is
+#: fully explained: #1224 keeps a household's two sizes as two reports where
+#: ``f6ed07ae9`` summed them into one (strip and sum the labels, and the base code
+#: reproduces ``f6ed07ae9`` on every row of all 8 countries).
+#:
+#: WHY A SIZE-FREE ROW IN AN EHCVM WAVE POOLS TOO.  ``Tas`` is one label whichever
+#: wave it is in, and a delivered factor is one number per ``(j, u)``: gating on
+#: the wave would add the ``t`` axis the factor deliberately lacks.  It returns
+#: those rows to their ``f6ed07ae9`` factors (the largest group is Togo's
+#: ``Unité``: 8,599 rows, 2.03x).
+#: Against ``ehcvm_nsu``, which covers Niger, Senegal, Burkina and Mali, that is
+#: close to neutral: median error unchanged in five of the six cells that move
+#: and 0.024 worse in the sixth, with within-1.5x up in four cells and unchanged
+#: in two.  Togo, Benin, Guinea-Bissau and CotedIvoire ship no such table.
+#:
 #: WHY A VOCABULARY AND NOT THE SHAPE OF THE LABEL.  A trailing parenthesis is
 #: not a size, and no test on the shape separates the two in this corpus: it
 #: states a quantity (``Sac (50 Kg)``, ``Paquet (250 g)``, Malawi's ``Loaf
@@ -2064,14 +2084,15 @@ def _declared_no_kg_mask(df, no_kg, item_col='j'):
 #: ``Heap`` should pool its sizes is a separate question with its own
 #: measurement, not a side effect of this one.
 #:
-#: IT CANNOT DRIFT FROM ``ehcvm.py`` UNSEEN, by a chain of two tests.
-#: ``tests/test_ehcvm_7day.py::test_every_size_suffix_is_the_countrys_own`` fails
-#: on any suffix a delivered EHCVM cell serves outside its ``SIZES``, and
-#: ``tests/test_food_kg_size_pool.py`` fails unless the union of ``SIZES`` is this
-#: set and ``ehcvm.size_label`` leaves each word alone.  It is a copy rather than
-#: an import for the reason ``ehcvm._EXACT_METRIC_LABELS`` is: the two modules do
-#: not depend on each other, so no kg symbol reaches a build fingerprint.  A word
-#: missing here costs a pool, never a wrong factor: the label stays its own cell.
+#: IT CANNOT DRIFT FROM ``ehcvm.py`` UNSEEN, by a chain of two tests.  ``ehcvm.py``
+#: holds no closed set to import: ``size_label`` serves whatever value label a
+#: file carries.  The closed list is ``SIZES`` in ``tests/test_ehcvm_7day.py``, and
+#: ``test_every_size_suffix_is_the_countrys_own`` fails on any suffix a delivered
+#: cell serves outside it.  ``tests/test_food_kg_size_pool.py`` fails unless this
+#: set is the union of ``SIZES`` and ``ehcvm.size_label`` leaves each word alone.
+#: Nothing in ``ehcvm.py`` imports this: ``tests/test_ehcvm_unit_size.py`` pins that
+#: no kg symbol reaches that closure.  A word missing here costs a pool, not a
+#: fabricated factor: the label stays its own cell, as it is on the base code.
 _UNIT_SIZE_WORDS = frozenset({
     'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier',
     'Très petit', 'Très petite', 'Autre taille',
