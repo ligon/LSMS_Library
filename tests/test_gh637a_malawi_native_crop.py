@@ -171,10 +171,10 @@ def test_module_identity_is_formed_before_perennial_offset_and_recode(mw):
 
 
 def test_unmapped_crop_and_missing_plot_eligibility_are_unchanged(mw):
-    # This unit does not import the precursor's unrelated D3 plot sentinel.
+    # Re-pinned (GH #1476): a blank plot key is served `unknown_plot`, not null.
     out = _block(mw, [('h', None, 1, 2., 1, 1),
                       ('h', 'p', None, 3., 1, 1)])
-    assert len(out) == 1 and pd.isna(out.plot_id.iloc[0])
+    assert len(out) == 1 and out.plot_id.iloc[0] == 'unknown_plot'
     assert out.production_obs.iloc[0] == 'reported:G:1'
 
 

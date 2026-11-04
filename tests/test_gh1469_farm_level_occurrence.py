@@ -1,6 +1,7 @@
 """`crop_diversity(weight='count')` and the `Farm-level` sentinel (GH #1469).
 
-A `plot_id = 'Farm-level'` row on `crop_production` holds a sale no plot can own.
+A `plot_id = 'Farm-level'` row on `crop_production` holds a sale no plot can own, or
+a harvest from a roster off the field grid (Mali's EAC-I trees, GH #1476).
 It is not a further occurrence of a crop the household reports on a plot, and it
 is the only record of a crop the household does not.  Synthetic, except the
 cold-gated real-data checks at the end.
@@ -102,8 +103,8 @@ def test_a_frame_with_no_farm_rows_is_untouched():
 
 
 def test_a_null_plot_id_is_not_the_sentinel():
-    """Mali's tree rows carry a null `plot_id`: not Farm-level, and still a
-    record of the crop on some plot."""
+    """A null `plot_id` is not Farm-level, and counts as a plot row.  (Mali's
+    tree rows were served null until GH #1476.)"""
     df = _frame([("w1", "h1", None, "Mango", None),
                  ("w1", "h1", FARM, "Mango", 5.0),
                  ("w1", "h1", "p1", "Beans", None)])

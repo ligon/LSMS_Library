@@ -6,8 +6,8 @@ Sources (post-harvest, passage 2 / cultivation, passage 1):
   - EACICULTURE_p1.dta (s1c) cultivation roster -> planting month + intercrop
 
 Grain: (t, i, plot, crop).  plot = "{field}_{parcel}" (s3aq01_s3aq02) for
-seasonal crops; <NA> for perennial trees.  Reported, item-level columns
-only — Quantity / u / Quantity_sold / Unit_sold / Value_sold /
+seasonal crops; 'Farm-level' for perennial trees (GH #1476).  Reported,
+item-level columns only — Quantity / u / Quantity_sold / Unit_sold / Value_sold /
 months_harvested / planting_month / harvest_month / intercropped /
 perennial, plus Derivation on the tree rows.  No harvest_kg / yield / share
 / main_crop (those are transformations over these rows).
@@ -57,7 +57,7 @@ import pandas as pd
 from lsms_library.local_tools import get_dataframe, to_parquet
 from lsms_library.country import grain_reports
 from mali import (i as mali_i, crop_production_finalize, producing_trees,
-                  tree_crop_rows, stamp_tree_derivations)
+                  tree_crop_rows, stamp_tree_derivations, FARM_LEVEL)
 
 WAVE = '2014-15'
 
@@ -119,7 +119,9 @@ cult = cult.drop_duplicates(subset=['i', 'plot_id', 'crop'], keep='first')
 seasonal = seasonal.drop(columns=['planting_month', 'intercropped']).merge(
     cult, on=['i', 'plot_id', 'crop'], how='left')
 
-# --- perennial trees (s3b): no field grid -> plot = <NA>, perennial=True ---
+# --- perennial trees (s3b): no field grid -> plot = 'Farm-level', perennial=True
+# The canonical structural sentinel (GH #1476): a NULL here is a deferred silent
+# deletion, because `groupby` drops NaN keys. ---
 # s3b is a FIXED tree roster: every HH gets a row per possible species, with
 # s3bq03 == 'Non' for trees it does not have/produce (3416 placeholder rows
 # with no harvest).  Keep only s3bq03 == 'Oui' (currently producing) — the
@@ -136,7 +138,7 @@ s3b['i'] = _hhid(s3b)
 perennial = pd.DataFrame({
     't': WAVE,
     'i': s3b['i'],
-    'plot_id': pd.NA,
+    'plot_id': FARM_LEVEL,
     'crop': s3b['s3bq01'],
     'harvest_month': pd.NA,
     'planting_month': pd.NA,

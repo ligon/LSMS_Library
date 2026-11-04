@@ -23,7 +23,8 @@ Single Index:
   # one household are not one plot.
   # `plot_id == 'Farm-level'` is not a plot either, so a count of plots drops
   # every such row.  On `crop_production` such a row holds a sale no plot can own
-  # (Mali 2021-22; Nigeria W3-W5, GH #843 / #824).  In a count of crop occurrences,
+  # (Mali 2021-22; Nigeria W3-W5, GH #843 / #824) or a harvest from a roster off
+  # the field grid (Mali's EAC-I trees, GH #1476).  In a count of crop occurrences,
   # drop it where the household has a plot row of that crop and keep it where it
   # has none, because it is then the only record of the crop (GH #1469;
   # `transformations.crop_diversity(weight='count')`).  All 37,280 rows of GhanaLSS
