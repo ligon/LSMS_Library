@@ -1,10 +1,12 @@
 """GH #833: Uganda's ``Aggregate`` keeps processing states apart.
 
 The ruling (@ligon, 2026-11-04) splits ``Aggregate Label`` in ``harmonize_food``
-where the state differs: Maize, Millet, Cassava, Sweet Potatoes, Ground Nuts and
-Sim Sim.  Variety still folds.  ``harmonize_crop`` reuses the bare names so that
+where the state differs: Maize, Cassava, Sweet Potatoes, Ground Nuts and Sim Sim.
+Variety still folds.  ``harmonize_crop`` reuses the bare names so that
 ``crop_production.j`` joins ``food_acquired(labels='Aggregate').j``, so the bare name
-stays, on the harvest-state bucket.  Config tests read the table and need no data.
+stays, on the harvest-state bucket.  The ruling named Millet too, and Millet is not
+split: the files label code 115 ``Millet (flour)`` from 2010-11, so the state does not
+differ.  Config tests read the table and need no data.
 """
 from __future__ import annotations
 
@@ -14,17 +16,17 @@ import warnings
 import pandas as pd
 import pytest
 
-from lsms_library.local_tools import all_dfs_from_orgfile
+from lsms_library.local_tools import all_dfs_from_orgfile, get_dataframe
 from lsms_library.paths import countries_root
 
 ORG = countries_root() / "Uganda" / "_" / "categorical_mapping.org"
-FAMILIES = ("Maize", "Millet", "Cassava", "Sweet Potatoes", "Ground Nuts", "Sim Sim")
+FAMILIES = ("Maize", "Cassava", "Sweet Potatoes", "Ground Nuts", "Sim Sim")
 #: The words of a Preferred Label that name a state, not a variety.
 STATE = re.compile(r"\b(grains|cobs|flour|dry|fresh|in shell|shelled|pounded|paste)\b", re.I)
-#: The state a family's bare Aggregate holds.  A label with no state word (``Millet``,
-#: ``Sim Sim``) is the raw commodity, which is what ``None`` stands for here.
-HARVEST_STATE = {"Maize": "grains", "Millet": None, "Cassava": "fresh",
-                 "Sweet Potatoes": "fresh", "Ground Nuts": "in shell", "Sim Sim": None}
+#: The state a family's bare Aggregate holds.  A label with no state word (``Sim Sim``)
+#: is the raw commodity, which is what ``None`` stands for here.
+HARVEST_STATE = {"Maize": "grains", "Cassava": "fresh", "Sweet Potatoes": "fresh",
+                 "Ground Nuts": "in shell", "Sim Sim": None}
 
 
 def _state(label):
@@ -83,14 +85,49 @@ class TestTheColumn:
         """They drive the FCT; the ruling is about ``Aggregate`` only."""
         flour = staples.set_index("Preferred Label")["Nutrition Label"]
         assert flour["Maize (flour)"] == "Maize (flour)"
-        assert flour["Millet Flour"] == "Millet Flour"
         assert flour["Ground Nuts (paste)"] == "Ground Nuts (paste)"
+
+
+class TestMilletIsOneBucket:
+
+    def test_both_codes_stay_on_millet(self, food):
+        agg = dict(zip(food["Preferred Label"], food["Aggregate Label"]))
+        assert agg["Millet"] == agg["Millet Flour"] == "Millet"
+
+    @pytest.mark.requires_s3
+    @pytest.mark.parametrize("wave, name, col, code, says", [
+        ("2005-06", "GSEC14A.dta", "h14aq2", 115, "millet"),
+        ("2009-10", "GSEC15b.dta", "itmcd", 115, "Millet"),
+        ("2010-11", "GSEC15b.dta", "itmcd", 115, "Millet (flour)"),
+        ("2011-12", "GSEC15B.dta", "itmcd", 115, "Millet (flour)"),
+        ("2013-14", "GSEC15B.dta", "itmcd", 115, "Millet (flour)"),
+        ("2015-16", "gsec15b.dta", "itmcd", 115, "Millet (flour)"),
+        ("2018-19", "GSEC15B.dta", "CEB01", 1151, "Millet flour"),
+        ("2019-20", "HH/gsec15b.dta", "CEB01", 1151, "Millet flour"),
+    ])
+    def test_what_the_files_call_it(self, wave, name, col, code, says):
+        """The oracle for not splitting: the value label the source file carries."""
+        path = str(countries_root() / "Uganda" / wave / "Data" / name)
+        codes = get_dataframe(path, convert_categoricals=False)[col]
+        labels = get_dataframe(path, convert_categoricals=True)[col].astype(str).str.strip()
+        assert set(labels[pd.to_numeric(codes, errors="coerce") == code]) == {says}
+
+    @pytest.mark.requires_s3
+    def test_no_wave_holds_both_codes_with_any_answer(self):
+        """So a price gap between them is a gap between waves."""
+        import lsms_library as ll
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            frame = ll.Country("Uganda").food_acquired().reset_index()
+        waves = lambda label: set(frame.loc[frame["j"] == label, "t"])
+        assert waves("Millet") and waves("Millet Flour")
+        assert not waves("Millet") & waves("Millet Flour")
 
 
 class TestTheCropJoin:
     """``harmonize_crop``'s reuse of the bare names is a documented contract."""
 
-    @pytest.mark.parametrize("family", FAMILIES)
+    @pytest.mark.parametrize("family", FAMILIES + ("Millet",))
     def test_the_crop_label_is_on_the_food_aggregate_axis(self, food, family):
         crops = set(all_dfs_from_orgfile(ORG)["harmonize_crop"]["Preferred Label"].astype(str))
         assert family in crops
@@ -135,4 +172,4 @@ class TestServed:
             warnings.simplefilter("ignore")
             crops = set(uga.crop_production().index.get_level_values("j"))
             foods = set(uga.food_acquired(labels="Aggregate").index.get_level_values("j"))
-        assert set(FAMILIES) <= crops & foods
+        assert set(FAMILIES) | {"Millet"} <= crops & foods
