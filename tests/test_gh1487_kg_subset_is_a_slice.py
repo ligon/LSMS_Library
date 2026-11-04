@@ -27,8 +27,6 @@ from lsms_library.transformations import (
     food_kg_factors, food_prices_from_acquired, food_quantities_from_acquired,
 )
 
-from tests.conftest import requires_s3
-
 IDX = ['t', 'i', 'j', 'u']
 KG_ROWS = ['kg_per_unit', 'KgFactorSource', 'kg_item_unit', 'kg_unit',
            'kg_item_n_waves', 'kg_item_wave_spread', 'baseline_refused_spread',
@@ -478,7 +476,7 @@ def _slice_of(table, country, waves, **kw):
     return getattr(c, table)(waves=waves, **kw), everything[t.isin(set(waves))]
 
 
-@requires_s3
+@pytest.mark.requires_s3
 class TestOnRealData:
     """Mali: a small panel where 2014-15 borrows from the EHCVM waves (issue table)."""
 

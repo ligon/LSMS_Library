@@ -55,6 +55,11 @@ Parameters
 ----------
 waves : list of str, optional
     Subset of waves to include.  Defaults to all available.
+    In a kilogram mode, *waves* selects what is served, not
+    what the factors are estimated from: they read every
+    wave, so the result is the all-waves result restricted
+    to *waves*, and a cold call builds every wave of
+    ``food_acquired`` (GH #1487).
 market : str, optional
     Column from cluster_features (e.g. 'Region') to add as
     an ``m`` index level for demand estimation.

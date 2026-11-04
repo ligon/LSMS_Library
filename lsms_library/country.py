@@ -6999,7 +6999,8 @@ class Country:
                     "    their kg conversion (if any) then comes purely from\n"
                     "    data-driven price-ratio inference.  See GH #231.\n"
                 )
-                doc_parts.append(
+                doc_parts.insert(
+                    doc_parts.index("waves : list of str, optional\n") + 2,
                     "    In a kilogram mode, *waves* selects what is served, not\n"
                     "    what the factors are estimated from: they read every\n"
                     "    wave, so the result is the all-waves result restricted\n"
