@@ -5,7 +5,7 @@ https://microdata.worldbank.org/index.php/catalog/8591
 #+CATALOG_ID: 8591
 #+CATALOG_IDNO: AFR_2014-2024_LSMS-HBI_v01_M
 #+CATALOG_TITLE: LSMS Household Business Indicators for Sub-Saharan Africa 2014-2024
-#+CATALOG_YEARS: 2014-2024
+#+CATALOG_YEARS: 2014-2025
 #+CATALOG_REPOSITORY: lsms
 #+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/8591
 #+PROVENANCE_SOURCE: worldbank
