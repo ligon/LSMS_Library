@@ -2722,8 +2722,9 @@ So =Price / Quantity= is not a per-kg price on those rows.  Reported, not change
 the served table and the note above stand until someone rules.
 
 *GH #1179.*  The manuals add one rule for the 129 unresolved entries: "Si une variété
-est absente, il faut laisser la ligne à blanc".  Neither manual mentions code 99, a
-unit code of 0, or a fractional code, and neither gives a recovery rule.  So the
+est absente, il faut laisser la ligne à blanc".  Neither manual's price section
+mentions code 99, a unit code of 0, or a fractional code, and neither gives a
+recovery rule.  So the
 residual stands: no producer text recovers those entries.
 
 *GH #821, 2021-22.*  The wave's own BID, held since before this entry, answers the
