@@ -472,7 +472,7 @@ class TestOnRealData:
         assert len(expected)
         pd.testing.assert_frame_equal(got, expected, check_exact=True)
 
-    @pytest.mark.parametrize('kw', [{'labels': 'Original'}, {'market': 'Region'}])
+    @pytest.mark.parametrize('kw', [{'labels': '2018-19'}, {'market': 'Region'}])
     def test_labels_and_market_keep_the_slice(self, kw):
         got, expected = _slice_of('food_quantities', 'Mali', ['2014-15'], units='kgs', **kw)
         pd.testing.assert_frame_equal(got, expected, check_exact=True)
