@@ -35,11 +35,13 @@ python bench/feature_audit/scan.py --features food_prices --countries Uganda \
   --out /tmp/fa_smoke.jsonl
 
 # full deterministic sweep (heavy). Cold = authoritative, and cold means an empty
-# private data root.  LSMS_NO_CACHE=1 alone is soft: script-path wave parquets are
+# private data root.  Link the L1 blobs into it, or the sweep fetches them all into
+# the temp directory.  LSMS_NO_CACHE=1 alone is soft: script-path wave parquets are
 # still read, and each table it builds rewrites var/ in whichever root is set, so
 # never run it against a shared root.  PYTHONPATH must name your checkout (CLAUDE.md,
 # scrum-master addendum 3).
-LSMS_DATA_DIR=$(mktemp -d) PYTHONPATH=/abs/path python /abs/path/bench/feature_audit/scan.py \
+COLD=$(mktemp -d); ln -s /your/data/root/dvc-cache "$COLD/dvc-cache"
+LSMS_DATA_DIR=$COLD PYTHONPATH=/abs/path python /abs/path/bench/feature_audit/scan.py \
   --features canonical --out bench/feature_audit/results/$(date +%F)/results.jsonl
 ```
 

@@ -2,7 +2,8 @@
 
 Ruling, @ligon 2026-11-04: remove the memory-route reducer from
 ``Wave.food_acquired``, and only ``1``, ``true`` or ``yes`` turn ``LSMS_NO_CACHE``
-on.  The reducer ran wherever the L2-wave write did not happen -- the flag set in
+on.  Both read gates do; the L2-wave write gate waits for GH #1501.  The reducer
+ran wherever the L2-wave write did not happen -- the flag set in
 any spelling, or a failed write -- and the country tier then stamped what it
 produced with the current hash, so it graded ``fresh`` and every later read
 served it: ``Derivation`` gone, ``Expenditure`` and ``Quantity`` NaN turned to 0,
@@ -32,6 +33,7 @@ COUNTRY = 'Fakeland'
 WAVE = '2001'
 TABLE = 'food_acquired'
 ON = ['1', 'true', 'TRUE', 'True', 'yes', 'YES']
+SKIPS_THE_WAVE_WRITE = ['0', 'false', 'no', 'off']
 OFF = ['0', '', 'false', 'FALSE', 'no', 'off', '2', ' 1 ']
 
 # A row with no Expenditure and one with no Quantity (the reducer's sum made both
@@ -136,9 +138,12 @@ class TestThePredicate:
             monkeypatch.setenv('LSMS_GRAIN_STRICT', value)
             assert C._no_cache() == C._grain_strict()
 
-    def test_it_is_the_only_read_in_the_library(self):
-        """Every other read of the flag in the package goes through it.  The
-        unrouted reads were how `"0"` meant on at one gate and off at another."""
+    def test_no_new_raw_read_in_a_top_level_function(self):
+        """The unrouted reads were how `"0"` meant on at one gate and off at
+        another.  Scope: `environ.get` inside functions of `lsms_library/*.py`.
+        It does not see a country module (Niger's `wave_producers` saves and
+        restores the flag), `environ[...]` or a module-level read.  `grab_data`
+        is the L2-wave write gate, held for GH #1501."""
         readers = []
         for path in Path(lsms_library.__file__).parent.glob('*.py'):
             tree = ast.parse(path.read_text(encoding='utf-8'))
@@ -224,7 +229,7 @@ class TestNoCacheEqualsOrdinary:
         _same(fakeland.read(LSMS_NO_CACHE='1'), clean)
 
 
-class TestOffSpellingsBypassNothing:
+class TestOffSpellingsBypassNoRead:
     @pytest.mark.parametrize('value', ['0', 'false', 'no', ''])
     def test_a_warm_country_parquet_is_served_not_rebuilt(self, fakeland, value):
         clean = fakeland.read()
@@ -239,6 +244,17 @@ class TestOffSpellingsBypassNothing:
         _same(fakeland.read(LSMS_NO_CACHE='0'), clean_api)
         _same(pd.read_parquet(fakeland.var), clean_parquet)
         _same(fakeland.read(), clean_api)
+
+    @pytest.mark.parametrize('value', SKIPS_THE_WAVE_WRITE)
+    def test_a_non_empty_off_spelling_still_skips_the_wave_write(self, fakeland, value):
+        """As documented, until GH #1501 routes the write gate: this pin flips
+        then.  It costs a wave parquet and no content."""
+        fakeland.read(LSMS_NO_CACHE=value)
+        assert fakeland.var.exists() and not fakeland.wave.exists()
+
+    def test_an_empty_string_writes_the_wave_parquet(self, fakeland):
+        fakeland.read(LSMS_NO_CACHE='')
+        assert fakeland.wave.exists()
 
 
 @pytest.mark.skipif(

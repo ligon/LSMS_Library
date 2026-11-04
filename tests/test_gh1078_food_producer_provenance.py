@@ -1,4 +1,5 @@
-"""Actual producer routes, not cache-path observations, choose food handling."""
+"""``grab_data`` reports the route that actually produced a frame, not what the
+cache path looks like.  Since GH #1455 no route changes how food is handled."""
 from __future__ import annotations
 
 import inspect

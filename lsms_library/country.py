@@ -2430,8 +2430,8 @@ class Wave:
         return (df, origin) if _with_origin else df
     
     # GH #1455 (ruling @ligon, 2026-11-04): no reducer here, on any route.  A
-    # frame built in memory -- `LSMS_NO_CACHE` on, or an L2-wave write that failed
-    # -- used to go through a `groupby(index).agg` that lost every column it did
+    # frame built in memory -- `LSMS_NO_CACHE` set to any non-empty string, or an
+    # L2-wave write that failed -- used to go through a `groupby(index).agg` that lost every column it did
     # not name (`Derivation`), turned NaN into 0 (`sum`, min_count=0) and deleted
     # NaN keys, and the country tier then wrote that frame stamped with the
     # current hash, so it graded `fresh` and every later read served it.  A
@@ -7955,9 +7955,12 @@ class GrainCollapseWarning(RuntimeWarning):
 def _no_cache() -> bool:
     """Whether ``LSMS_NO_CACHE`` is on: ``1``, ``true`` or ``yes``, in any case.
 
-    The one reading of this flag (GH #1455, @ligon 2026-11-04), spelled as
-    :func:`_grain_strict` spells its lever.  ``0``, ``false``, ``no``, an empty
-    string and anything else leave it off.  Route every read through this.
+    How both L2 read gates read this flag (GH #1455, @ligon 2026-11-04), spelled
+    as :func:`_grain_strict` spells its lever.  ``0``, ``false``, ``no``, an empty
+    string and anything else leave it off.  The L2-wave WRITE gate in
+    :meth:`Wave.grab_data` does not read it through here yet: it still tests the
+    string's truthiness, because any edit to ``grab_data`` moves every table's
+    fingerprint (GH #1501).  Route every new read through this.
     """
     return os.environ.get("LSMS_NO_CACHE", "").lower() in {"1", "true", "yes"}
 

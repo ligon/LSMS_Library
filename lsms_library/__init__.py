@@ -77,7 +77,8 @@ Environment variables
   direct downloads; also unlocks the S3 read cache at import time.
 - ``LSMS_DATA_DIR`` — override the parquet cache root.
 - ``LSMS_NO_CACHE`` — ``1``, ``true`` or ``yes`` disables the L2 cache reads;
-  anything else leaves it off.
+  no other value does.  Any non-empty value, ``0`` included, still skips writing
+  the L2-wave parquet during a rebuild, which changes no content.
 - ``LSMS_BUILD_BACKEND=make`` — force rebuild from source, bypassing
   both the cache and the DVC stage layer.
 - ``LSMS_SKIP_AUTH`` — suppress the import-time authentication attempt.
