@@ -342,6 +342,11 @@ class TestALostSourceCostsEaAlone:
                 frame = C.Country("Uganda", preload_panel_ids=False)[wave].grab_data("sample")
         finally:
             P.data_root.cache_clear()
+            # The simulated drop is filed in process globals; under loadfile the
+            # worker goes on to other files, which must not inherit it.
+            for ledger in (C._DEGRADED_ATTEMPTED, C._SOURCE_PROBES,
+                           C._BUILD_DROP_LEDGER, C._REBUILD_HISTORY):
+                ledger.clear()
         assert any("origin_ea" in str(w.message) for w in caught)
         assert len(frame) == rows
         assert frame["v"].notna().all()
