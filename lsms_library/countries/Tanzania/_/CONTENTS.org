@@ -2920,3 +2920,21 @@ remain separate. No umbrella #1119/#1120/#1287/#1288 closure is claimed.
 Improved-OR and the legacy-group conflict/collision refusals no longer arise,
 since each native record is its own =input_obs= row; see "Native seed
 records: =input_obs=".)
+
+* 2026-11-04 -- the W1-W3 geovariables are held, not wired (GH #449)
+
+=2008-15/Data/NPS-R1/=, =NPS-R2/= and =NPS-R3/= hold the geovariables members of entries 76,
+1050 and 2252, taken from each entry's own Stata zip and published with
+=push_to_cache_batch=, as GH #1260 did for Malawi.  =add_wave(subdir=)= is refused here
+because 42 UPD sidecars sit loose in =Data/=.  =#+CATALOG_COVERS:= is unchanged: these
+three rounds stay covered, not held, apart from these 8 files.  There are no
+=#+CATALOG_SUBDIR:= lines, so re-acquiring 3814 is not refused.
+
+The zips ship more than the table above lists.  =Plot.Geovariables_Y1_revised2=,
+=TZY2.HH.Geovariables= and =TZY2.PlotGeovaribales= are in the zips and not in the catalog's
+file rosters.  Household files link to =upd4_hh_a.r_hhid= in the same round: =hhid= 2,990
+of 2,990; =y2_hhid= 3,917 of 3,917 (=TZY2.HH= 3,924 of 3,924); =y3_hhid= 4,986 of 4,988.
+W1 and W2 name the coordinates =lat_modified= / =lon_modified=, W3 =lat_dd_mod= /
+=lon_dd_mod=.  Which of the two W2 household files a =geovariables= table reads (3,917
+against 3,924 rows, 50 against 43 columns) is a wiring decision.  76's zip is named
+=TZA_2008_NPS1_v02_M= under the idno =..._v03_M=.
