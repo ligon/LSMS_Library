@@ -1265,9 +1265,10 @@ def food_coping_for_wave(t, df, hhid):
 # lines of one code.  The canonical `production_obs` level names the line:
 #   W1-W3  `reported:crop_code:<n>` -- the §9 line's own crop code, unique
 #          within a plot once the W2 repeat records below are gone.  These
-#          files ship no line id: W2's ph_s9q00 / q0a / q0c / q0d only echo
-#          parcel, field, crop code and crop name; W3's `obs` has no variable
-#          label, 251 nulls and repeats within a plot.
+#          files ship no documented line id: W2's ph_s9q00 / q0a / q0c / q0d
+#          only echo parcel, field, crop code and crop name.  W3's `obs` looks
+#          like a roster counter and never repeats within a plot, but it has no
+#          variable label and 251 nulls, while W3's crop code is complete.
 #   W4/W5  `reported:crop_id:<n>` -- "Unique Crop Identifier", the instrument's
 #          line id, unique within a plot on every row.
 #
@@ -1952,7 +1953,7 @@ def inputs_permanent_crop_window(wave):
       ambiguous key, whose §4 lines disagree, carries <NA>);
     * ``sect11_ph`` -- EVERY §11 line (holder-crop grain;
       :data:`PERMANENT_WINDOW_S11_VARIABLES`), whose sales the build attaches
-      to a crop's single §9 plot (the SALES GRAIN CAVEAT).
+      to a crop's single §9 line (the SALES GRAIN CAVEAT).
 
     A served row's §9 line is found by ``(t, i, j)`` plus its ``plot_id``
     (``holder_parcel_field``); its §11 lines by ``(t, i, j)`` plus the
@@ -2438,7 +2439,7 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
 
     # Sales: §11 is (household, holder, crop) grain.  Attach reported
     # sold-qty / sold-value ONLY where (holder, crop) maps to exactly one
-    # plot-crop harvest row (see SALES GRAIN CAVEAT above).
+    # §9 harvest line (see SALES GRAIN CAVEAT above).
     #
     # Value_sold (Birr) is unit-free and always attachable.  Quantity_sold
     # carries the SALE unit, which need not equal the harvest `u`; since we

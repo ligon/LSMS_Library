@@ -20,7 +20,8 @@ the W2 questionnaire header and variable label), Q8 value ph_s12q08 (Birr;
 tree/root crops in W2, so §12 only fills the sale columns §11 left empty --
 see ethiopia._attach_sect12_sales.
 
-production_obs (GH #1461): reported:crop_code:<n>; §9 ships no line id.
+production_obs (GH #1461): reported:crop_code:<n>; §9 ships no documented line
+id.
 This file lists 605 records twice, identical in every column; the builder
 drops the repeats (ethiopia.py, "§9 REPEAT RECORDS").
 """

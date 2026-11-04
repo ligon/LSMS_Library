@@ -19,7 +19,8 @@ per the W1 questionnaire header and variable label), Q8 value ph_s12q08
 pairs have no §9 row to attach to; those are counted, not served -- see
 ethiopia._attach_sect12_sales and Ethiopia/_/CONTENTS.org.
 
-production_obs (GH #1461): reported:crop_code:<n>; §9 ships no line id.
+production_obs (GH #1461): reported:crop_code:<n>; §9 ships no documented line
+id.
 """
 import sys
 

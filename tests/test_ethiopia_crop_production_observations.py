@@ -189,6 +189,22 @@ def test_a_sale_attaches_only_to_a_crops_one_line(eth):
     assert d["reported:crop_id:1"] == 40.0 and pd.isna(d["reported:crop_id:2"])
 
 
+def test_a_sect12_sale_attaches_only_to_a_crops_one_line(eth):
+    """§12 counts lines too.  W1-W3 hold one line per (plot, crop), so held data
+    cannot tell lines from plots on this path; only a synthetic frame can."""
+    harvest = _harvest([("A", "1", 1, 1, 72, 1, 5.0),
+                        ("B", "2", 1, 1, 72, 1, 5.0), ("B", "2", 1, 1, 72, 2, 6.0)])
+    sale12 = pd.DataFrame([("1", 72, 1, 1.0, 10.0), ("2", 72, 1, 1.0, 20.0)],
+                          columns=["holder_id", "crop_code", "q06", "q07", "q08"])
+    colmap = dict(W45, s12_crop_code="crop_code", s12_sold_flag="q06",
+                  s12_qty="q07", s12_value="q08")
+    with pytest.warns(eth.Sect12SaleWarning, match="several_s9_plots 1/1/20"):
+        df = eth.crop_production_for_wave("2015-16", harvest, None, _sale(), colmap,
+                                          unit_labels=_units(3), sale12=sale12)
+    got = df.reset_index().groupby("i")["Value_sold"].apply(lambda v: v.dropna().tolist())
+    assert got.to_dict() == {"A": [10.0], "B": []}
+
+
 def test_lines_per_holder_crop_counts_lines_not_plots(eth):
     out = pd.DataFrame({"_holder": ["1", "1", "2", "2", "3"],
                         "_code": pd.array([7, 7, 7, 7, pd.NA], dtype="Int64"),

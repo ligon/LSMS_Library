@@ -19,8 +19,9 @@ unit), Q8 value ph_s12q08 (Birr).  §9 INCLUDES tree/root crops in W3, so
 §12 only fills the sale columns §11 left empty -- see
 ethiopia._attach_sect12_sales.
 
-production_obs (GH #1461): reported:crop_code:<n>; §9 ships no line id
-(``obs`` has no variable label, 251 nulls and repeats within a plot).
+production_obs (GH #1461): reported:crop_code:<n>; §9 ships no documented line
+id.  ``obs`` looks like a roster counter and never repeats within a plot, but it
+has no variable label and 251 nulls, while the crop code is complete.
 """
 import sys
 
