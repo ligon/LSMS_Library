@@ -2431,7 +2431,15 @@ where it now buys food: in 2010-11, 484 of 3,924 households report a different
 share a vocabulary (the 126 round 1-2 labels are all among round 3's 129); later
 rounds do not (93 of the 126 in 2014-15, 53 in 2019-20, 108 in 2020-21), so a
 district's label does not follow it across that boundary, which is the vintage
-decision of GH #837.
+decision of GH #837.  =food_acquired(market='District')= rows with =m= NA: 44,969
+-> 0 in 2008-09, 54,775 -> 356 in 2010-11; rows, expenditure and later rounds are
+unchanged.
+
+*One served number moves as a result.*  =food_expenditures(basis='total',
+valuation='median_price')= reads =cluster_features.District= as a ladder rung.
+Rows the rung could not resolve fall from 103,515 to 4,127, so own-production
+prices in these two rounds come from the district rather than the region.  Totals
+rise 0.05% in 2008-09 and 0.06% in 2010-11; later rounds are unchanged.
 
 ** Region 2014-15 (59) and 2019-20 (281): not a missing label, a missing =v=
 
