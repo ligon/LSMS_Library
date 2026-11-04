@@ -536,8 +536,8 @@ column =cluster_features= reads, through the same formatter.
   households (=Region=: 23,956 of 23,956), and =m= is the household's own label wherever
   it has one.  107 households with a blank of their own (=Region=: 1) still take an
   agreeing cluster's label; that is =_add_market_index='s existing fallback, unchanged.
-- /It is the household's own location./  Same household, 2010-11 against 2011-12, case
-  folded: 2,488 of 2,489 equal.
+- /It is stable within a household./  Same household, 2010-11 against 2011-12, case
+  folded: 2,488 of 2,489 equal, so the EA disagreements are not noise in the answers.
 - /Not a cross-wave vocabulary./  Codes in 2009-10 and 2013-14, names elsewhere, and
   districts carved out over time.  The =districts= table in =categorical_mapping.org=
   (=Miyana= -> =Mityana=, =Kalanga= -> =Kalangala=, ...) is read by nothing, and not all
@@ -552,10 +552,11 @@ value for them.  What could fill them, and =District='s 216, is a construction, 
 
 **** TODO Decision: fill the 129 and the 216 from a household's other waves?
 
-Memo in the #1441 report.  The same household's label in the adjacent wave would reach
-77 of the 129 =Region= and 103 of the 216 =District=; it is right 2,509 of 2,510 and
-2,488 of 2,489 times where it can be checked.  A cluster mate's modal label would be
-right only 740 of 886 and 784 of 946 times, on the EAs concerned, and is not offered.
+Memo in the #1441 report.  The same household's label in the adjacent wave, in the same
+form (code or name), would reach 77 of the 129 =Region= and 74 of the 216 =District=; it
+is right 2,509 of 2,510 and 2,488 of 2,489 times where it can be checked.  A cluster
+mate's modal label would be right only 740 of 886 and 784 of 946 times, on the EAs
+concerned, and is not offered.  127 of the 129 and 133 of the 216 carry no weight.
 
 ** Rotating panel and refreshment sample
 
