@@ -1,6 +1,24 @@
 #+title: Handoff -- LSMS-ISA backlog campaign
 
-* Current -- 2026-11-03 (evening), Sue / Claude Opus 5.5, job 40825266 (n0035.savio4)
+* Current -- 2026-11-03 (night), Sue / Claude Opus 5.5, job 40825266 (n0035.savio4)
+
+Everything in the section below still stands; this updates it.  Rulings are in DECISIONS.org.
+
+- Merged since: #1431 (BF #864, as ruled), #1446 (MWI #1106 Chitowe 0.23 N), #1449 (NGA #1264 crosswalk).
+- #1224 (EHCVM sized u): reviewed; branch fix/1224-ehcvm-unit-size-20261103 going to merge on green.
+  Rulings: ship with the older-wave kg regression; 185 metric rows stay bare; Togo 98 stays (98).
+- NEXT, in order:
+  1. #1450 kg fix for Mali 2014-15 / Burkina 2014: MUST land before any development -> master release.
+  2. Mali crop_production: 2018-19 on Niger's pattern, 2021-22 sales under option (d) (ruled B4, B5).
+  3. Nigeria #843 under option (d): agent running in worktrees/nigeria-843, then red-team, PR.
+  4. Shared-cache re-warm (user approved) via burst job: $B/rewarm.py <Country>, no --cold.  First pass
+     excludes Nigeria and Mali, which get it after their PRs merge.
+  5. Remaining B items, one at a time: B6 Burkina #1060/#1057, B7 Uganda #689, B8 Malawi #1278,
+     B9 Nigeria #1033/#1096, B10 low-priority.  Then Group C: acquisitions lane; sucoder upgrade; #1441.
+- Open for the user: #1423 runbook (user to read).
+- Filed tonight: #1445, #1447, #1448, #1450-#1457.
+
+* Earlier -- 2026-11-03 (evening), same session
 
 Plain loop (reconcile -> fix -> test -> red-team -> PR), per the user; no custody/manifest
 bookkeeping.  Process is written up in PR #1423 (=.claude/skills/backlog-workflow/savio-sweep.md=
