@@ -248,7 +248,7 @@ def cluster_features(df):
     1. ``comm`` (2005-06 .. 2011-12) is the *2005-06 EA of origin*, which the
        panel carries forward when it tracks a mover.  A household that moved
        district still reports its origin EA, so its District/Region legitimately
-       differ from its EA-mates'.  93 clusters in 2010-11, 106 in 2011-12.
+       differ from its EA-mates'.  92 clusters in 2010-11, 97 in 2011-12.
     2. ``v`` is a PARISH from 2013-14 on, and a parish contains several
        enumeration areas -- some urban, some rural, each with its own geovar
        fix.  ``Rural`` and the GPS are therefore not parish attributes at all
@@ -257,7 +257,7 @@ def cluster_features(df):
 
     Neither can be resolved from this table, and picking a winner is the bug.
     ``<NA>`` + a warning is the honest answer; per-household ``Rural`` / ``Region``
-    remain exact in ``sample()``, which is their proper home.
+    / ``District`` remain exact in ``sample()``, which is their proper home.
 
     NOT reduced with an average.  Where the within-cluster GPS varies at all it
     varies by a MEDIAN of 4.6-42.9 km and by up to 584 km (measured, all waves):
@@ -2879,11 +2879,12 @@ def plot_inputs_for_wave(t, df3a, df3b, df4a, colmap, *, source_refs=None):
     #   2019-20   10,137    10,134          3                   0            3
     #   total     84,489    84,216        273                 135          138
     #
-    # The index is unique in only 2 of the 7 waves (2013-14, 2015-16); this
-    # collapse still runs in the other five and still discards 273 reported
-    # line-items.  Of those, 135 are not merged at all -- `groupby(dropna=True)`
-    # DELETES them outright because `plot` is NaN (130 in 2009-10, 5 in
-    # 2011-12) -- and 138 are merged away by collapsing 135 duplicate groups.
+    # That table is 2026-07-21.  The 135 rows it counts as deleted, because
+    # `plot` was NaN, are kept since GH #1120 D3 as `plot_id='unknown_plot'`, so
+    # `returned` is now 14,123 in 2009-10, 12,358 in 2011-12 and 84,351 in all
+    # (measured cold 2026-11-04).  The index is unique in only 2 of the 7 waves
+    # (2013-14, 2015-16); this collapse still runs in the other five and merges
+    # away 138 reported line-items by collapsing 135 duplicate groups.
     # This residual is PRE-EXISTING and much smaller than before (pre-fix the
     # same 84,489 rows returned 83,019, losing 1,470).
     #

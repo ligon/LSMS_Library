@@ -70,6 +70,9 @@ sample:
                   #   get_dataframe('../Data/GSEC1.dta')['urban'].map(type).value_counts()
                     0: Rural
                     urban: Urban
+            # The household's OWN recorded district, the column `cluster_features` reads, so
+            # `market='District'` labels a household its cluster's mates disagree about (GH #1441).
+            District: h1aq1
             # HH-level Region — the same column cluster_features reads, exposed
             # here so consumers can get Region for every HH regardless of cluster
             # membership (relevant when v is a synthetic @lat,lon label in 2009-10).

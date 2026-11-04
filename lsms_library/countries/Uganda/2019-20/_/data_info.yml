@@ -80,6 +80,11 @@ sample:
             strata: subreg
             Rural: urban
             Region: region
+            # The household's OWN recorded district, the column `cluster_features` reads, so
+            # `market='District'` labels a household its cluster's mates disagree about (GH #1441).
+            District:  # row-valued, as in `cluster_features`, so mapping.District sees `_V_ALIASES`
+                - district
+                - s1aq04a
     # GH #689: the design PSU, which no file of this wave ships.  The country
     # hook `origin_ea` re-keys this 2015-16 frame to this wave's `hhid` through
     # gsec1.hhidold -> 2018-19 GSEC1.hhid -> t0_hhid, the survey's own tracking
