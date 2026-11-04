@@ -328,114 +328,114 @@
   factors are NOT stored here (that is a transformation).
 
 #+NAME: u
-| Code | Preferred Label              | 2010-11                      | 2012-13                      | 2015-16                      | 2018-19                      |
-|------+------------------------------+------------------------------+------------------------------+------------------------------+------------------------------|
-|    1 | Kg                           | Kg                           | Kg                           | Kg                           | Kg                           |
-|    2 | g                            | g                            | g                            | g                            | g                            |
-|    3 | l                            | l                            | l                            | l                            | l                            |
-|    4 | cl                           | ml                           | cl                           | cl                           | cl                           |
-|    5 | mudu                         | piece                        | mudu                         | ---                          | ---                          |
-|    6 | olodo                        | other                        | olodo                        | ---                          | ---                          |
-|    7 | congo                        | ---                          | congo                        | ---                          | ---                          |
-|    8 | paint rubber                 | ---                          | paint rubber                 | ---                          | ---                          |
-|    9 | large derica                 | ---                          | large derica                 | ---                          | ---                          |
-|   10 | bin/basket                   | ---                          | medium derica                | bin/basket                   | bin/basket                   |
-|   11 | paint rubber                 | Sack/Bag Small               | small derica                 | paint rubber                 | paint rubber                 |
-|   12 | milk cup                     | Sack/Bag Medium              | milk cup                     | milk cup                     | milk cup                     |
-|   13 | cigarette cup                | Sack/Bag Big/Large           | cigarette cup                | cigarette cup                | cigarette cup                |
-|   14 | tin                          | Sack/Bag Extra Large         | tiya                         | tin                          | tin                          |
-|   15 | kobiowu                      | ---                          | kobiowu                      | ---                          | ---                          |
-|   16 | piece                        | ---                          | piece                        | ---                          | ---                          |
-|   20 | small congo                  | ---                          | ---                          | small congo                  | small congo                  |
-|   21 | large congo                  | Basket Small                 | ---                          | large congo                  | large congo                  |
-|   30 | small mudu                   | ---                          | ---                          | small mudu                   | small mudu                   |
-|   31 | large mudu                   | Basin Small                  | ---                          | large mudu                   | large mudu                   |
-|   40 | small derica                 | ---                          | ---                          | small derica                 | small derica                 |
-|   41 | medium derica                | Bunch Small                  | ---                          | medium derica                | medium derica                |
-|   42 | large derica                 | Bunch Medium                 | ---                          | large derica                 | large derica                 |
-|   43 | very large derica            | Bunch Big                    | ---                          | very large derica            | very large derica            |
-|   50 | small tiya                   | ---                          | ---                          | small tiya                   | small tiya                   |
-|   51 | medium tiya                  | Yam Tuber Small              | ---                          | medium tiya                  | medium tiya                  |
-|   52 | large tiya                   | Yam Tuber Medium             | ---                          | large tiya                   | large tiya                   |
-|   60 | small kobiowu                | ---                          | ---                          | small kobiowu                | small kobiowu                |
-|   61 | medium kobiowu               | Bundle Small                 | ---                          | medium kobiowu               | medium kobiowu               |
-|   62 | large kobiowu                | Bundle Medium                | ---                          | large kobiowu                | large kobiowu                |
-|   70 | small bowl                   | ---                          | ---                          | small bowl                   | small bowl                   |
-|   71 | medium bowl                  | Wheelbarrow Small            | ---                          | medium bowl                  | medium bowl                  |
-|   72 | large bowl                   | Wheelbarrow Medium           | ---                          | large bowl                   | large bowl                   |
-|   80 | small piece                  | ---                          | ---                          | small piece                  | small piece                  |
-|   81 | medium piece                 | Pick-up Van Small            | ---                          | medium piece                 | medium piece                 |
-|   82 | large piece                  | Pick-up Van Medium           | ---                          | large piece                  | large piece                  |
-|   90 | small heap                   | ---                          | ---                          | small heap                   | small heap                   |
-|   91 | medium heap                  | Jerry Can Small              | ---                          | medium heap                  | medium heap                  |
-|   92 | large heap                   | Jerry Can Medium             | ---                          | large heap                   | large heap                   |
-|  100 | small bunch                  | ---                          | ---                          | small bunch                  | small bunch                  |
-|  101 | medium bunch                 | ---                          | ---                          | medium bunch                 | medium bunch                 |
-|  102 | large bunch                  | ---                          | ---                          | large bunch                  | large bunch                  |
-|  110 | small stalk                  | ---                          | ---                          | small stalk                  | small stalk                  |
-|  111 | medium stalk                 | ---                          | ---                          | medium stalk                 | medium stalk                 |
-|  112 | large stalk                  | ---                          | ---                          | large stalk                  | large stalk                  |
-|  120 | small packet/sachet          | ---                          | ---                          | small packet/sachet          | small packet/sachet          |
-|  121 | medium packet/sachet         | ---                          | ---                          | medium packet/sachet         | medium packet/sachet         |
-|  122 | large packet/sachet          | ---                          | ---                          | large packet/sachet          | large packet/sachet          |
-|  900 | other specify                | ---                          | ---                          | other specify                | other specify                |
-| 22 | Basket Medium | Basket Medium | --- | --- | --- |
-| 23 | Basket Big | Basket Big | --- | --- | --- |
-| 32 | Basin Medium | Basin Medium | --- | --- | --- |
-| 33 | Basin Big/Large | Basin Big/Large | --- | --- | --- |
-| 34 | Basin Extra Large | Basin Extra Large | --- | --- | --- |
-| 53 | Yam Tuber Big/Large | Yam Tuber Big/Large | --- | --- | --- |
-| 63 | Bundle Big | Bundle Big | --- | --- | --- |
-| 93 | Jerry Can Big | Jerry Can Big | --- | --- | --- |
-| 94 | Jerry Can Large | Jerry Can Large | --- | --- | --- |
-| 24 | Basket Extra Large | Basket Extra Large | --- | --- | --- |
-| 73 | Wheelbarrow Big/Large | Wheelbarrow Big/Large | --- | --- | --- |
-| 74 | Wheelbarrow Extra Large | Wheelbarrow Extra Large | --- | --- | --- |
-| 83 | Pick-up Van Big | Pick-up Van Big | --- | --- | --- |
-| 95 | Jerry Can Drum | Jerry Can Drum | --- | --- | --- |
-| 125 | Packet | --- | --- | --- | Packet |
-| 130 | Sack/Bag | --- | --- | --- | Sack/Bag |
-| 140 | Basket | --- | --- | --- | Basket |
-| 150 | Basin | --- | --- | --- | Basin |
-| 170 | Wheelbarrow | --- | --- | --- | Wheelbarrow |
-| 200 | Loaf | --- | --- | --- | Loaf |
-| 211 | Tuber | --- | --- | --- | Tuber |
-| 240 | Bottle/Can | --- | --- | --- | Bottle/Can |
-| 250 | Sachet | --- | --- | --- | Sachet |
-| 251 | Bag of 20 Sachets | --- | --- | --- | Bag of 20 Sachets |
-| 270 | Cube | --- | --- | --- | Cube |
-| 280 | Metric Cup | --- | --- | --- | Metric Cup |
-| 290 | Wrap | --- | --- | --- | Wrap |
-| 300 | Spoon | --- | --- | --- | Spoon |
-| 301 | Tea Spoon | --- | --- | --- | Tea Spoon |
-| 302 | Table Spoon | --- | --- | --- | Table Spoon |
-| 310 | Crate | --- | --- | --- | Crate |
-| 320 | Slice | --- | --- | --- | Slice |
-| 330 | Whole Animal | --- | --- | --- | Whole Animal |
-| 340 | Shot | --- | --- | --- | Shot |
-| 131 | other specify (131) | --- | --- | Sack/Bag Medium | --- |
-| 151 | other specify (151) | --- | --- | Basin Medium | --- |
-| 152 | other specify (152) | --- | --- | Basin Large | --- |
-| 161 | Bundle Medium | --- | --- | Bundle Medium | --- |
-| 1001 | Bowl | --- | --- | --- | --- |
-| 1002 | Bunch | --- | --- | --- | --- |
-| 1003 | Bundle | --- | --- | --- | --- |
-| 1004 | Cigarette cup | --- | --- | --- | --- |
-| 1005 | Congo | --- | --- | --- | --- |
-| 1006 | Derica | --- | --- | --- | --- |
-| 1007 | Heap | --- | --- | --- | --- |
-| 1008 | Jerry Can | --- | --- | --- | --- |
-| 1009 | Kobiowu | --- | --- | --- | --- |
-| 1010 | Milk cup | --- | --- | --- | --- |
-| 1011 | Mudu | --- | --- | --- | --- |
-| 1012 | Olodo | --- | --- | --- | --- |
-| 1013 | Packet/Sachet | --- | --- | --- | --- |
-| 1014 | Paint rubber | --- | --- | --- | --- |
-| 1015 | Pick-up | --- | --- | --- | --- |
-| 1016 | Piece | --- | --- | --- | --- |
-| 1017 | Stalk | --- | --- | --- | --- |
-| 1018 | Tiya | --- | --- | --- | --- |
-| 1019 | days | --- | --- | --- | --- |
+| Code | Preferred Label              | 2010-11                      | 2012-13                      | 2015-16                      | 2018Q3                       | 2019Q1                       |
+|------+------------------------------+------------------------------+------------------------------+------------------------------+------------------------------+------------------------------|
+|    1 | Kg                           | Kg                           | Kg                           | Kg                           | Kg                           | Kg                           |
+|    2 | g                            | g                            | g                            | g                            | g                            | g                            |
+|    3 | l                            | l                            | l                            | l                            | l                            | l                            |
+|    4 | cl                           | ml                           | cl                           | cl                           | cl                           | cl                           |
+|    5 | mudu                         | piece                        | mudu                         | ---                          | ---                          | ---                          |
+|    6 | olodo                        | other                        | olodo                        | ---                          | ---                          | ---                          |
+|    7 | congo                        | ---                          | congo                        | ---                          | ---                          | ---                          |
+|    8 | paint rubber                 | ---                          | paint rubber                 | ---                          | ---                          | ---                          |
+|    9 | large derica                 | ---                          | large derica                 | ---                          | ---                          | ---                          |
+|   10 | bin/basket                   | ---                          | medium derica                | bin/basket                   | bin/basket                   | bin/basket                   |
+|   11 | paint rubber                 | Sack/Bag Small               | small derica                 | paint rubber                 | paint rubber                 | paint rubber                 |
+|   12 | milk cup                     | Sack/Bag Medium              | milk cup                     | milk cup                     | milk cup                     | milk cup                     |
+|   13 | cigarette cup                | Sack/Bag Big/Large           | cigarette cup                | cigarette cup                | cigarette cup                | cigarette cup                |
+|   14 | tin                          | Sack/Bag Extra Large         | tiya                         | tin                          | tin                          | ---                          |
+|   15 | kobiowu                      | ---                          | kobiowu                      | ---                          | ---                          | ---                          |
+|   16 | piece                        | ---                          | piece                        | ---                          | ---                          | ---                          |
+|   20 | small congo                  | ---                          | ---                          | small congo                  | congo                        | congo                        |
+|   21 | large congo                  | Basket Small                 | ---                          | large congo                  | ---                          | ---                          |
+|   30 | small mudu                   | ---                          | ---                          | small mudu                   | mudu                         | mudu                         |
+|   31 | large mudu                   | Basin Small                  | ---                          | large mudu                   | ---                          | ---                          |
+|   40 | small derica                 | ---                          | ---                          | small derica                 | derica                       | derica                       |
+|   41 | medium derica                | Bunch Small                  | ---                          | medium derica                | ---                          | ---                          |
+|   42 | large derica                 | Bunch Medium                 | ---                          | large derica                 | ---                          | ---                          |
+|   43 | very large derica            | Bunch Big                    | ---                          | very large derica            | ---                          | ---                          |
+|   50 | small tiya                   | ---                          | ---                          | small tiya                   | tiya                         | tiya                         |
+|   51 | medium tiya                  | Yam Tuber Small              | ---                          | medium tiya                  | ---                          | ---                          |
+|   52 | large tiya                   | Yam Tuber Medium             | ---                          | large tiya                   | ---                          | ---                          |
+|   60 | small kobiowu                | ---                          | ---                          | small kobiowu                | kobiowu                      | kobiowu                      |
+|   61 | medium kobiowu               | Bundle Small                 | ---                          | medium kobiowu               | ---                          | ---                          |
+|   62 | large kobiowu                | Bundle Medium                | ---                          | large kobiowu                | ---                          | ---                          |
+|   70 | small bowl                   | ---                          | ---                          | small bowl                   | bowl                         | bowl                         |
+|   71 | medium bowl                  | Wheelbarrow Small            | ---                          | medium bowl                  | ---                          | ---                          |
+|   72 | large bowl                   | Wheelbarrow Medium           | ---                          | large bowl                   | ---                          | ---                          |
+|   80 | small piece                  | ---                          | ---                          | small piece                  | piece                        | piece                        |
+|   81 | medium piece                 | Pick-up Van Small            | ---                          | medium piece                 | ---                          | ---                          |
+|   82 | large piece                  | Pick-up Van Medium           | ---                          | large piece                  | ---                          | ---                          |
+|   90 | small heap                   | ---                          | ---                          | small heap                   | heap                         | heap                         |
+|   91 | medium heap                  | Jerry Can Small              | ---                          | medium heap                  | ---                          | ---                          |
+|   92 | large heap                   | Jerry Can Medium             | ---                          | large heap                   | ---                          | ---                          |
+|  100 | small bunch                  | ---                          | ---                          | small bunch                  | bunch                        | bunch                        |
+|  101 | medium bunch                 | ---                          | ---                          | medium bunch                 | ---                          | ---                          |
+|  102 | large bunch                  | ---                          | ---                          | large bunch                  | ---                          | ---                          |
+|  110 | small stalk                  | ---                          | ---                          | small stalk                  | stalk                        | stalk                        |
+|  111 | medium stalk                 | ---                          | ---                          | medium stalk                 | ---                          | ---                          |
+|  112 | large stalk                  | ---                          | ---                          | large stalk                  | ---                          | ---                          |
+|  120 | small packet/sachet          | ---                          | ---                          | small packet/sachet          | packet/sachet                | packet/sachet                |
+|  121 | medium packet/sachet         | ---                          | ---                          | medium packet/sachet         | ---                          | ---                          |
+|  122 | large packet/sachet          | ---                          | ---                          | large packet/sachet          | ---                          | ---                          |
+|  900 | other specify                | ---                          | ---                          | other specify                | other specify                | other specify                |
+| 22 | Basket Medium | Basket Medium | --- | --- | --- | --- |
+| 23 | Basket Big | Basket Big | --- | --- | --- | --- |
+| 32 | Basin Medium | Basin Medium | --- | --- | --- | --- |
+| 33 | Basin Big/Large | Basin Big/Large | --- | --- | --- | --- |
+| 34 | Basin Extra Large | Basin Extra Large | --- | --- | --- | --- |
+| 53 | Yam Tuber Big/Large | Yam Tuber Big/Large | --- | --- | --- | --- |
+| 63 | Bundle Big | Bundle Big | --- | --- | --- | --- |
+| 93 | Jerry Can Big | Jerry Can Big | --- | --- | --- | --- |
+| 94 | Jerry Can Large | Jerry Can Large | --- | --- | --- | --- |
+| 24 | Basket Extra Large | Basket Extra Large | --- | --- | --- | --- |
+| 73 | Wheelbarrow Big/Large | Wheelbarrow Big/Large | --- | --- | --- | --- |
+| 74 | Wheelbarrow Extra Large | Wheelbarrow Extra Large | --- | --- | --- | --- |
+| 83 | Pick-up Van Big | Pick-up Van Big | --- | --- | --- | --- |
+| 95 | Jerry Can Drum | Jerry Can Drum | --- | --- | --- | --- |
+| 125 | Packet | --- | --- | --- | Packet | Packet |
+| 130 | Sack/Bag | --- | --- | --- | Sack/Bag | Sack/Bag |
+| 140 | Basket | --- | --- | --- | Basket | Basket |
+| 150 | Basin | --- | --- | --- | Basin | Basin |
+| 170 | Wheelbarrow | --- | --- | --- | Wheelbarrow | Wheelbarrow |
+| 200 | Loaf | --- | --- | --- | Loaf | Loaf |
+| 211 | Tuber | --- | --- | --- | Tuber | Tuber |
+| 240 | Bottle/Can | --- | --- | --- | Bottle/Can | Bottle/Can |
+| 250 | Sachet | --- | --- | --- | Sachet | ---    |
+| 251 | Bag of 20 Sachets | --- | --- | --- | Bag of 20 Sachets | Bag of 20 Sachets |
+| 270 | Cube | --- | --- | --- | Cube | Cube |
+| 280 | Metric Cup | --- | --- | --- | Metric Cup | Metric Cup |
+| 290 | Wrap | --- | --- | --- | Wrap | Wrap |
+| 300 | Spoon | --- | --- | --- | Spoon | ---   |
+| 301 | Tea Spoon | --- | --- | --- | Tea Spoon | Tea Spoon |
+| 302 | Table Spoon | --- | --- | --- | Table Spoon | Table Spoon |
+| 310 | Crate | --- | --- | --- | Crate | Crate |
+| 320 | Slice | --- | --- | --- | Slice | Slice |
+| 330 | Whole Animal | --- | --- | --- | Whole Animal | Whole Animal |
+| 340 | Shot | --- | --- | --- | Shot | ---  |
+| 131 | other specify (131) | --- | --- | Sack/Bag Medium | --- | --- |
+| 151 | other specify (151) | --- | --- | Basin Medium | --- | --- |
+| 152 | other specify (152) | --- | --- | Basin Large | --- | --- |
+| 161 | Bundle Medium | --- | --- | Bundle Medium | --- | --- |
+| 1001 | Bowl | --- | --- | --- | --- | --- |
+| 1002 | Bunch | --- | --- | --- | --- | --- |
+| 1003 | Bundle | --- | --- | --- | --- | --- |
+| 1004 | Cigarette cup | --- | --- | --- | --- | --- |
+| 1005 | Congo | --- | --- | --- | --- | --- |
+| 1006 | Derica | --- | --- | --- | --- | --- |
+| 1007 | Heap | --- | --- | --- | --- | --- |
+| 1008 | Jerry Can | --- | --- | --- | --- | --- |
+| 1009 | Kobiowu | --- | --- | --- | --- | --- |
+| 1010 | Milk cup | --- | --- | --- | --- | --- |
+| 1011 | Mudu | --- | --- | --- | --- | --- |
+| 1012 | Olodo | --- | --- | --- | --- | --- |
+| 1013 | Packet/Sachet | --- | --- | --- | --- | --- |
+| 1014 | Paint rubber | --- | --- | --- | --- | --- |
+| 1015 | Pick-up | --- | --- | --- | --- | --- |
+| 1016 | Piece | --- | --- | --- | --- | --- |
+| 1017 | Stalk | --- | --- | --- | --- | --- |
+| 1018 | Tiya | --- | --- | --- | --- | --- |
+| 1019 | days | --- | --- | --- | --- | --- |
 
 * Geopolitical Zones
 

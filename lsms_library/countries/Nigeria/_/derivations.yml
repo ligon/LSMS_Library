@@ -426,7 +426,8 @@ Nigeria::food_acquired::w4-last-purchase-30d:
   rows: {t: ['2018Q3', '2019Q1'], s: purchased}
   rule: >-
     THE IDENTITY, on every W4 (2018Q3 post-planting, 2019Q1 post-harvest)
-    food_acquired row with s = 'purchased': Quantity = q9a, its unit u = q9b,
+    food_acquired row with s = 'purchased': Quantity = q9a, its unit u = q9b
+    (with its size, q9c, GH #1033),
     Quantity_kg = q9a x q9_cvn and Expenditure = q10, exactly as recorded.
     What is derived is the WINDOW: W4 asks no 7-day purchase value.  Its
     purchase block asks whether the household bought the item in the past
@@ -438,9 +439,10 @@ Nigeria::food_acquired::w4-last-purchase-30d:
     outlay.
   function: lsms_library.countries.Nigeria.2018-19._.mapping:derive_w4_last_purchase_30d
   inputs: lsms_library.countries.Nigeria.2018-19._.mapping:inputs_food_acquired_w4_last_purchase
-  raw_variables: [hhid, item_cd, s7bq8, s7bq9a, s7bq9b, s7bq9_cvn, s7bq10,
-                  s7bq5a, s7bq2b, s7bq2_cvn, s10bq8, s10bq9a, s10bq9b,
-                  s10bq9_cvn, s10bq10, s10bq5a, s10bq2b, s10bq2_cvn]
+  raw_variables: [hhid, item_cd, s7bq8, s7bq9a, s7bq9b, s7bq9c, s7bq9_cvn, s7bq10,
+                  s7bq5a, s7bq2b, s7bq2c, s7bq2_cvn, s10bq8, s10bq9a, s10bq9b,
+                  s10bq9c, s10bq9_cvn, s10bq10, s10bq5a, s10bq2b, s10bq2c,
+                  s10bq2_cvn]
   assumptions:
     - text: >-
         q9a / q9b / q10 describe the household's most recent purchase of the

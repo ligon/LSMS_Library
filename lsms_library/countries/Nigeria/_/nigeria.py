@@ -234,8 +234,9 @@ _W5_STRATA = {1: 'North Central', 2: 'North East', 3: 'North West',
 
 # Per wave folder: each round's cover (relative to the folder's Data/), each
 # round's household roster (the D1 locator of last resort), the weight
-# variables (identical names on both covers), the strata source, an optional
-# PP supplement cover, and the household geovariables file (file,
+# variables (identical names on both covers), the strata source, each round's
+# result field (GH #1444), an optional PP supplement cover, and the household
+# geovariables file (file,
 # latitude, longitude). W5's acquired v02 file lives at the Data/ root and
 # supplies anonymized household reference fixes, not an EA centroid (#978).
 # The coordinate
@@ -248,6 +249,7 @@ ROUND_COVERS = {
         ph='Post Harvest Wave 1/Household/secta_harvestw1.dta',
         pp_roster='Post Planting Wave 1/Household/sect1_plantingw1.dta',
         ph_roster='Post Harvest Wave 1/Household/sect1_harvestw1.dta',
+        pp_result='saq22a', ph_result='sq1',
         weight='wt_wave1', panel_weight='wt_wave1', strata='zone',
         geo=('nga_householdgeovariables_y1.csv', 'lat_dd_mod', 'lon_dd_mod')),
     '2012-13': dict(
@@ -256,16 +258,19 @@ ROUND_COVERS = {
         pp_supplement='Post Planting Wave 2/Agriculture/secta_plantingw2.dta',
         pp_roster='Post Planting Wave 2/Household/sect1_plantingw2.dta',
         ph_roster='Post Harvest Wave 2/Household/sect1_harvestw2.dta',
+        pp_result='saq22a', ph_result='saq1',
         weight='wt_wave2', panel_weight='wt_combined', strata='zone',
         geo=('nga_householdgeovars_y2.csv', 'LAT_DD_MOD', 'LON_DD_MOD')),
     '2015-16': dict(
         pp='secta_plantingw3.dta', ph='secta_harvestw3.dta',
         pp_roster='sect1_plantingw3.dta', ph_roster='sect1_harvestw3.dta',
+        pp_result='saq22a', ph_result='saq22a',
         weight='wt_wave3', panel_weight='wt_w1_w2_w3', strata='zone',
         geo=('NGA_HouseholdGeovars_Y3.dta', 'LAT_DD_MOD', 'LON_DD_MOD')),
     '2018-19': dict(
         pp='secta_plantingw4.dta', ph='secta_harvestw4.dta',
         pp_roster='sect1_plantingw4.dta', ph_roster='sect1_harvestw4.dta',
+        pp_result='interview_result', ph_result='interview_result',
         weight='wt_wave4', panel_weight='wt_longpanel', strata='strata',
         geo=('nga_householdgeovars_y4.dta', 'lat_dd_mod', 'lon_dd_mod')),
     '2023-24': dict(
@@ -273,6 +278,7 @@ ROUND_COVERS = {
         ph='Post Harvest Wave 5/Household/secta_harvestw5.dta',
         pp_roster='Post Planting Wave 5/Household/sect1_plantingw5.dta',
         ph_roster='Post Harvest Wave 5/Household/sect1_harvestw5.dta',
+        pp_result='interview_result', ph_result='interview_result',
         weight='wt_cross_wave5', panel_weight='wt_longpanel_wave5',
         strata=('strata', _W5_STRATA),
         geo=('nga_householdgeovariables_y5.dta', 'lat_mod', 'lon_mod')),
@@ -291,7 +297,9 @@ def _cover_frame(fn, spec, *, weights=True):
     CODES (``convert_categoricals=False``; see the keyspace note above), the
     rest from the decoded labels.  Columns: v, weight, panel_weight, strata,
     Rural, Region (= zone), District (= state).  ``weights=False`` (a cover
-    with no weight columns) serves weight / panel_weight as NA.
+    with no weight columns) serves weight / panel_weight as NA.  A round's
+    household cover also yields InterviewResult (GH #1444); the W2 agriculture
+    supplement records no such round status here, and is not asked.
     """
     from lsms_library.local_tools import df_data_grabber
     key = df_data_grabber(fn, {'i': 'hhid'}, convert_categoricals=False,
@@ -303,6 +311,10 @@ def _cover_frame(fn, spec, *, weights=True):
                   Region='zone', District='state')
     if weights:
         myvars.update(weight=spec['weight'], panel_weight=spec['panel_weight'])
+    for visit in ('pp', 'ph'):
+        result = spec.get(visit + '_result')
+        if result and str(fn).endswith('/' + spec[visit]):
+            myvars['InterviewResult'] = (result, interview_result_label)
     main = df_data_grabber(fn, {'i': 'hhid'}, **myvars)
     if not weights:
         main['weight'] = np.nan
@@ -523,13 +535,16 @@ def round_covers(folder):
 def sample_for_wave(folder):
     """``sample`` for one wave folder: both rounds, each from its own cover.
 
-    Index ``(t, i)``; columns v, weight, panel_weight, strata, Rural and a
-    sparse Derivation column only where the labelled PH rule repairs rows.
+    Index ``(t, i)``; columns v, weight, panel_weight, strata, Rural,
+    InterviewResult (what the round's own household cover records, NA for a
+    household only a supplement cover or a roster lists; it gates nothing, GH
+    #1444) and a sparse Derivation column only where the labelled PH rule repairs
+    rows.
     """
     cols = ['v', 'weight', 'panel_weight', 'strata', 'Rural']
     parts = []
     for t, df in round_covers(folder).items():
-        keep = cols + (['Derivation'] if 'Derivation' in df else [])
+        keep = cols + [c for c in ('InterviewResult', 'Derivation') if c in df]
         parts.append(df[keep].assign(t=t).set_index('t', append=True))
     out = pd.concat(parts).reorder_levels(['t', 'i']).sort_index()
     assert out.index.is_unique, f'sample {folder}: (t, i) not unique'
@@ -921,6 +936,15 @@ class UnplacedUnitLabelWarning(UserWarning):
     a unit the survey recorded."""
 
 
+def _recorded_label(labels):
+    """True where a unit cell holds a label: not blank, and not a bare numeric
+    code with no value label, either of which means no unit was recorded."""
+    text = labels.astype('string').str.strip()
+    body = text.map(lambda s: s if pd.isna(s) else _strip_code_prefix(s))
+    return (body.notna() & (body != '')
+            & ~body.str.fullmatch(r'[\d.]+').fillna(False)).astype(bool)
+
+
 def _canon_units(labels, canon=_canon_unit, where='',
                  disposition='served as Unknown'):
     """Map a decoded unit-label Series through `canon`, REPORTING what it
@@ -931,12 +955,9 @@ def _canon_units(labels, canon=_canon_unit, where='',
     caller's disposition.  The crop/input default remains ``U_UNKNOWN``."""
     import warnings
     out = labels.map(canon).astype('string')
-    text = labels.astype('string').str.strip()
-    body = text.map(lambda s: s if pd.isna(s) else _strip_code_prefix(s))
-    unplaced = (out.isna() & body.notna() & (body != '')
-                & ~body.str.fullmatch(r'[\d.]+').fillna(False))
+    unplaced = _recorded_label(labels) & out.isna()
     if unplaced.any():
-        counts = text[unplaced].value_counts().to_dict()
+        counts = labels.astype('string').str.strip()[unplaced].value_counts().to_dict()
         warnings.warn(
             f"Nigeria {where}: {int(unplaced.sum())} row(s) carry a unit label "
             f"that cannot be placed and are {disposition}: {counts}. "
@@ -3250,7 +3271,9 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     row's unit becomes the metric base unit -- 'g' or 'cl' -- making the
     served number the per-unit price data_scheme.yml documents.  Such rows
     carry the `Derivation` key `Nigeria::community_prices::c8-metric-size`.
-    A metric-unit row whose package size is UNRECORDED -- all of W3's
+    A row whose recorded unit label is still unplaced after that step keeps the
+    label as `u` and warns (GH #1095; no such label today).  A metric-unit row
+    whose package size is UNRECORDED -- all of W3's
     13,768 g/cl rows bar one (c8q2b is free text, blank on the rest), all
     3,433 of W3's Kg/l rows (the same blank free text, caught only when the
     deletion entry's inputs were written), and W5's 133 rows on '2. GRAMS
@@ -3414,13 +3437,22 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             # Report only labels still unplaced AFTER the existing metric
             # rescue.  Reporting up-front falsely counts rescued g/cl rows;
             # known metric units dropped for unrecorded sizes are separate.
-            # Retention/fallback remains the explicit #1095 design residual.
             report = (initially_unplaced & piece['u'].isna()
                       & piece['v'].notna() & piece['j'].notna()
                       & piece['Price'].notna() & (piece['Price'] > 0))
             _canon_units(unit_labels[report], canon=_canon_community_unit,
                          where=f'community_prices {t}',
-                         disposition='dropped after metric-size rescue')
+                         disposition='served under the recorded label, with no '
+                                     'factor')
+            # GH #1095 (ruling @ligon 2026-11-04): such a row keeps its recorded
+            # label as `u`, verbatim.  The code prefix is part of it: two units
+            # that differ only there stay two units, where a shared Unknown would
+            # merge them on one (v, j).  No factor is inferred from the label or
+            # from an ordinal size, and Price stays the native-unit price
+            # reported.  A blank or a bare code records no unit and is dropped
+            # below, as before.
+            keep = report & _recorded_label(unit_labels)
+            piece.loc[keep, 'u'] = unit_labels[keep].astype('string').str.strip()
 
         pieces.append(piece)
 
@@ -3541,28 +3573,128 @@ def round_wave(t):
 def food_unit_labels(t):
     """``{raw code: label}`` for the food-module unit codes of round ``t``.
 
-    Read from the per-wave column of the ``u`` table in
-    ``categorical_mapping.org`` (the column named by :func:`round_wave`),
-    NOT from its Preferred Label column, which records only the W3/W4
-    meaning of a colliding code (GH #607).  Keys are registered as int,
-    int-string and float-string (``4``, ``'4'``, ``'4.0'``) because the CSV
-    sources arrive as floats.  Codes the wave's column marks ``---`` are
-    absent, so the caller can keep their raw code.
+    Read from the ``u`` table in ``categorical_mapping.org``: the column named
+    ``t`` where the rounds of a wave have their own (W4, whose value labels
+    differ on 14, 40, 120, 250, 300 and 340, GH #1033), otherwise the column named
+    by :func:`round_wave`.  NOT from its Preferred Label column, which records
+    only the W3 meaning of a colliding code (GH #607).  Keys are registered as
+    int, int-string and float-string (``4``, ``'4'``, ``'4.0'``) because the
+    CSV sources arrive as floats.  Codes the column marks ``---`` are absent,
+    so the caller can keep their raw code.
     """
     from lsms_library.local_tools import df_from_orgfile
 
     here = os.path.dirname(os.path.abspath(__file__))
     tab = df_from_orgfile(os.path.join(here, 'categorical_mapping.org'),
                           name='u')
-    wave = round_wave(t)
+    column = t if t in tab.columns else round_wave(t)
     out = {}
-    for code, lab in zip(tab['Code'], tab[wave]):
+    for code, lab in zip(tab['Code'], tab[column]):
         if pd.isna(lab) or str(lab).strip() in ('', '---'):
             continue
         c = int(float(code))
         lab = str(lab).strip()
         out.update({c: lab, float(c): lab, str(c): lab, f'{c}.0': lab})
     return out
+
+
+# W3 prints the size in the unit code (20 CONGO SMALL, 21 CONGO LARGE); W4 asks
+# it separately (20 CONGO, then s7bq2c "CONSUMPTION SIZE" 0. SMALL / 2. LARGE).
+# These are the W4 codes the `u` table used to label W3's `small ...`, whatever
+# the row's size said.  `food_unit_labels` gives each its size-less label, and
+# `sized_food_unit` prefixes the size the row records, in W3's own spelling (GH
+# #1033).  Every (code, size) pair W4 records among these lands on a W3 label,
+# PH's 40 DERICA/TIN and 120 SACHET included: the survey's own factors treat each
+# as W3's unit.  They are not every unit W3 sizes: its card also has 130-132
+# Sack/Bag, 140-142 Basket, 150-152 Basin and 160-162 Bundle, and W4's Basin and
+# Basket keep a plain label by ruling (CONTENTS.org).
+W4_SIZED_UNIT_CODES = frozenset((20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120))
+_FOOD_UNIT_SIZES = {0: 'small', 1: 'medium', 2: 'large', 3: 'very large'}
+
+
+def sized_food_unit(unit, size, unit_codes):
+    """Decoded ``u`` for a round that records the size in its own column.
+
+    ``unit`` and ``size`` are raw code columns, ``unit_codes`` the round's
+    :func:`food_unit_labels`.  A code in :data:`W4_SIZED_UNIT_CODES` with an
+    ordinal size is ``'<size> <label>'``.  A blank size, a metric size
+    (``30. 20 GRAMS``) or ``99. ONE SIZE ONLY`` asserts no ordinal size and
+    leaves the size-less label.  Any other code keeps its plain decode whatever
+    its size says: it was never served a false size.  A code the round's column
+    does not list is NA, as for :func:`food_unit_labels`.
+    """
+    base = unit.map(unit_codes).astype(object)
+    prefix = pd.to_numeric(size, errors='coerce').map(_FOOD_UNIT_SIZES)
+    take = (pd.to_numeric(unit, errors='coerce').isin(W4_SIZED_UNIT_CODES)
+            & prefix.notna() & base.notna())
+    out = base.copy()
+    out[take] = prefix[take].astype(str) + ' ' + base[take].astype(str)
+    return out
+
+
+# ---------------------------------------------------------------------
+# interview_date -- what the visit produced (GH #1096 / #1444)
+# ---------------------------------------------------------------------
+#
+# Every cover records the visit whether or not anyone was interviewed, so a
+# date may date an attempt.  These label the cover's own result field, read by
+# each round's interview_date.py and by `sample`: W1-PP / W2-PP / W3 `saq22a`,
+# W1-PH `sq1`, W2-PH `saq1`, W4 / W5 `interview_result`.  `saq22b` is the status of
+# DATA ENTRY and W3-PH's `saq22` is a yes/no on observations.  Status gates no
+# table's rows (GH #1444): the D1 rule in round_covers decides who a round's frame
+# admits.
+
+# Recorded label, code prefix stripped and lower-cased -> what is served.  The
+# two wordings of one answer share a spelling so a filter works across waves.
+# Two answers are not folded: W4's two partials differ, and W2's "not located"
+# is not W4's "unable to identify".
+_INTERVIEW_RESULT_LABELS = {
+    'completed': 'Completed',
+    'complete': 'Completed',
+    'partially completed': 'Partially completed',
+    'partially complete (refused)': 'Partially completed (refused)',
+    'partially complete (unavailable)': 'Partially completed (unavailable)',
+    'not at home': 'Not at home',
+    'refused': 'Refused',
+    'household not located': 'Household not located',
+    'moved away': 'Moved away',
+    'household has moved away': 'Moved away',
+    'other (specify)': 'Other',
+    'unable to identify household': 'Unable to identify household',
+    'long term unavailable': 'Long-term unavailable',
+    'unavailable for interview': 'Unavailable for interview',
+    'all hh members deceased': 'All household members deceased',
+}
+
+# The W1-W3 response-status card.  W3's interview_date reads codes (GH #1037).
+# W4's codes differ (its 4 is "unable to identify", its 7 "refused"), and W4
+# reads labels, so this card is never applied to it.
+_RESPONSE_STATUS_CARD = {1: 'completed', 2: 'partially completed',
+                         3: 'not at home', 4: 'refused',
+                         5: 'household not located', 6: 'moved away',
+                         7: 'other (specify)'}
+
+
+def interview_result_label(value):
+    """The served ``InterviewResult`` for a cover's recorded result label.
+
+    A blank stays missing.  A label outside the table is refused, not guessed.
+    """
+    if pd.isna(value):
+        return pd.NA
+    body = _strip_code_prefix(value).lower()
+    if body not in _INTERVIEW_RESULT_LABELS:
+        raise ValueError(f'Nigeria: unrecognised interview result {value!r}')
+    return _INTERVIEW_RESULT_LABELS[body]
+
+
+def response_status_label(code):
+    """:func:`interview_result_label` for a W1-W3 response-status CODE."""
+    if pd.isna(code):
+        return pd.NA
+    if code not in _RESPONSE_STATUS_CARD:
+        raise ValueError(f'Nigeria: unrecognised interview result code {code!r}')
+    return interview_result_label(_RESPONSE_STATUS_CARD[code])
 
 
 def food_acquired_for_wave(fn, t, sources, expenditure,
@@ -3581,7 +3713,9 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         each acquisition source ``s`` in ``purchased`` / ``produced`` /
         ``inkind``.  ``kg_factor`` (optional) names a per-row survey-supplied
         Kg/L conversion factor (W4's ``*_cvn``); when given, the row's exact
-        ``Quantity_kg`` is carried (GH #378).
+        ``Quantity_kg`` is carried (GH #378).  ``size`` (optional) names the
+        column recording the unit's size (W4's ``*c``), read by
+        :func:`sized_food_unit` (GH #1033).
     expenditure : str
         The variable holding the cash outlay.  Attached to the
         ``s='purchased'`` row ONLY -- produced / in-kind rows carry no cash
@@ -3630,7 +3764,9 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         # missing-unit sentinel, which means "no unit recorded").  The raw
         # code is read through `format_id`: the CSV columns are float, so
         # an unlisted 65 would otherwise be served as '65.0' (GH #1047).
-        u = df[spec['unit']].map(unit_codes)
+        size = spec.get('size')
+        u = (df[spec['unit']].map(unit_codes) if size is None
+             else sized_food_unit(df[spec['unit']], df[size], unit_codes))
         u = u.where(u.notna(), df[spec['unit']].map(format_id))
         piece = pd.DataFrame({
             't': t,

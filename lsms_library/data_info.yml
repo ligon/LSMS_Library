@@ -500,6 +500,11 @@ Columns:
       # is NA where the survey offers no route to it: never filled from `v`.
       type: str
       optional: true
+    InterviewResult:
+      # As under `interview_date`: what the round's household cover records, so
+      # a user can filter.  It gates nothing.  Nigeria alone serves it (GH #1444).
+      type: str
+      optional: true
     Derivation:
       type: str
       optional: true
@@ -688,6 +693,15 @@ Columns:
       type: datetime
     Interview end:
       type: datetime
+    InterviewResult:
+      type: str
+      optional: true
+      note: |
+        What the visit produced, as the household cover records it, where a
+        date may date an attempt.  Country vocabulary, not a canonical list:
+        filter on the country's own labels.  Nigeria alone serves it (GH #1096);
+        see its CONTENTS.org for the labels and for what the rows do not cover.
+        Also under `sample`.
   individual_education:
     Educational Attainment:
       type: str

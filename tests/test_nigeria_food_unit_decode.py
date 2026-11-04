@@ -51,15 +51,17 @@ def test_round_maps_to_its_wave(nigeria, t, wave):
 
 @pytest.mark.parametrize('t', sorted(ROUNDS))
 def test_decode_reads_the_waves_own_column(nigeria, t):
-    """Each round's decode dict IS its wave column, codes '---' excluded."""
+    """Each round's decode dict IS its column, codes '---' excluded."""
     from lsms_library.local_tools import df_from_orgfile
 
     tab = df_from_orgfile(
         str(countries_root() / COUNTRY / '_' / 'categorical_mapping.org'),
         name='u')
-    wave = ROUNDS[t]
+    # GH #1033 moved this pin: W4's two rounds have a column each, because
+    # their value labels differ; every other wave's rounds share one.
+    column = t if t in tab.columns else ROUNDS[t]
     expected = {int(float(c)): str(lab).strip()
-                for c, lab in zip(tab['Code'], tab[wave])
+                for c, lab in zip(tab['Code'], tab[column])
                 if isinstance(lab, str) and lab.strip() not in ('', '---')}
     d = nigeria.food_unit_labels(t)
     assert {k: v for k, v in d.items() if isinstance(k, int)} == expected

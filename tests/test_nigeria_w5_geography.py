@@ -24,7 +24,9 @@ def w5(monkeypatch):
     spec.loader.exec_module(ng)
     config=ng.ROUND_COVERS['2023-24']
     def raw(ids,eas):
+        # GH #1444: `sample` reads the round's result field.
         return pd.DataFrame({'hhid':ids,'ea':eas,'state':1,'lga':101,'zone':1,
+                             'interview_result':'1. COMPLETE',
             'sector':2,'strata':1,'wt_cross_wave5':np.arange(len(ids),dtype=float),
             'wt_longpanel_wave5':np.nan})
     pp=raw([21,11,31,41,51,61],[3,1,1,0,5,6])
