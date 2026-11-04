@@ -1,0 +1,5 @@
+outs:
+- md5: 9dd29c3be4246d7acfb846f6456feccc
+  size: 198123
+  hash: md5
+  path: s3___ind.dta

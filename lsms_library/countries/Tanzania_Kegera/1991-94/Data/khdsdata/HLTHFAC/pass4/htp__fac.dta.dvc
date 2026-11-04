@@ -1,0 +1,5 @@
+outs:
+- md5: 31f227c1144ba964b2167b63a9befeb0
+  size: 9488
+  hash: md5
+  path: htp__fac.dta

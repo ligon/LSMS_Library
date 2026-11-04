@@ -1,0 +1,5 @@
+outs:
+- md5: 4cf78d6d85310c6c17ef068c4d7e8848
+  size: 26830
+  hash: md5
+  path: s16a_dur.dta

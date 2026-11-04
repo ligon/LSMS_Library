@@ -1,0 +1,5 @@
+outs:
+- md5: 3741c3815c94cc5a290c37b5bb3f1d47
+  size: 2668
+  hash: md5
+  path: prcvrcls.dta

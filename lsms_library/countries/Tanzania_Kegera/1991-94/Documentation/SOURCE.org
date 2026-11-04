@@ -1,0 +1,16 @@
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/359
+
+#+CATALOG_ID: 359
+#+CATALOG_IDNO: TZA_1991_KHDS_v01_M
+#+CATALOG_TITLE: Kagera Health and Development Survey 1991-1994 (Wave 1 to 4 Panel)
+#+CATALOG_YEARS: 1991-1994
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/xgeq-vy55
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/359
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: add-wave
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-11-04
+#+PROVENANCE_NOTE: Acquired whole on 2026-11-04 by add_wave: all 420 data files in TZA_1991_KHDS_v01_M_STATA.zip, each pushed, with the documents. The zip's layout is khdsdata/ and OtherKageraData/; the catalog's datafile list uses other names (367 entries such as Wave1_HH_S1___IND), so the lists were not compared one to one. One directory holds the four rounds of KHDS 1991-94, as the catalog entry does. Registered with this country's other KHDS waves, none of which is wired: Tanzania_Kegera has no data_scheme.yml, so reach it with Country('Tanzania_Kegera', allow_unregistered=True).

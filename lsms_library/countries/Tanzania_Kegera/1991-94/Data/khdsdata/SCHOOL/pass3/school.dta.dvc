@@ -1,0 +1,5 @@
+outs:
+- md5: 34c03057c8f18eeb234f27a8e8ca4b52
+  size: 35815
+  hash: md5
+  path: school.dta
