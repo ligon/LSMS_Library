@@ -229,6 +229,8 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 | Kazakhstan            | 1996      | local-documentation | medium     | national-claimed         |
 | Kosovo                | 2000      | wb-catalog          | high       | national-all-households  |
 | Liberia               | 2018-19   | wb-catalog          | high       | specialized              |
+| Liberia               | 2014-15   | local-documentation | high       | national-all-households  |
+| Liberia               | 2016-17   | local-documentation | high       | national-all-households  |
 | Malawi                | 2004-05   | local-documentation | medium     | region-excluded          |
 | Malawi                | 2010-11   | local-documentation | high       | region-excluded          |
 | Malawi                | 2013-14   | wb-catalog          | high       | panel-inherited          |
@@ -290,7 +292,7 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 
 | universe tag             | waves |
 |--------------------------+-------|
-| national-all-households  |    40 |
+| national-all-households  |    42 |
 | national-claimed         |    28 |
 | region-excluded          |    18 |
 | subnational-area         |    11 |
@@ -300,19 +302,19 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 | rural-and-small-town     |     1 |
 | specialized              |     1 |
 | agricultural-households  |     1 |
-| TOTAL                    |   114 |
+| TOTAL                    |   116 |
 
 *** Source and confidence counts
 
 | source_type            | waves |
 |------------------------+-------|
-| local-documentation    |    66 |
+| local-documentation    |    68 |
 | wb-catalog             |    41 |
 | not-found              |     7 |
 
 | confidence             | waves |
 |------------------------+-------|
-| high                   |    88 |
+| high                   |    90 |
 | medium                 |    24 |
 | low                    |     2 |
 
@@ -2087,6 +2089,62 @@ Extractor's notes (editorial prose about the evidence, not survey text):
 
 #+begin_quote
 Only one wave directory exists for Liberia. This is NOT a standard LSMS/HIES dwelling survey: it is the National Household Forest Survey, a forest-livelihoods instrument, though the catalog classifies Study type as 'Living Standards Measurement Study [hh/lsms]'. Analysis unit: 'Household; Community'. Kind of data: 'Sample survey data [ssd]'.  CRITICAL for #603: the universe is NOT national. It is deliberately restricted to forest-proximate enumeration areas (within 2.5 km of a qualifying forest) and excludes urban Montserrado (Greater Monrovia). The Policy Note abstract in the local DDI (p. 10) frames the covered population's size: 'In 2019, 47.5 percent of the Liberian households (HHs) lived in proximity to and were significantly dependent on the country's forests.' The forest qualifying rule is itself part of the universe definition: 'Forest = area with at least 30 percent tree canopy cover, with trees higher than 5 meters and at least 50 hectares in size' plus footnote 5 'In addition, any forest patch with a perimeter to area ratio more than 0.02 was excluded.'  SAMPLE DESIGN (not the universe, recorded for context): two-stage. Stage 1: 250 EAs by PPS, originally stratified by distance to forest -- S1 (<2km), S2 (2-7km), S3 (7-15km) -- allocated 90/90/70, MOS = households listed in the 2008 PHC. Stage 2: random selection of 12 households per EA from a fresh listing. Design n=3,000; 14 households missing/unusable => final 2,986 households, and 245 usable community questionnaires (of 250).  IMPORTANT WEIGHTING CAVEAT that changes the represented universe: 'Upon post-data collection analysis, it was discovered that the initial variable that was used to stratify EAs by distance to forest was incorrectly computed... This error rendered the stratification incorrect. Therefore, the stratification by distance to forest has been abandoned and the sample weighted to reflect only geographic clusters, not distance to forest.' Consequently the weights represent 'all EAs in Liberia (with the exception of urban Montserrado) that fall within 2.5 km of the nearest forest'. Weighting section: 'Sample weights are constructed to reflect the population in EAs within 2.5 kms of the forests, for three geographic clusters. The weights are also adjusted to reflect population estimates as of 2016.'  SOURCE PROVENANCE GAP worth flagging separately: Liberia/2018-19/Documentation/SOURCE.org has none of the #+CATALOG_ID / #+CATALOG_IDNO / #+PROVENANCE_SOURCE / #+PROVENANCE_VALIDATION keywords the repo convention calls for -- only the bare DOI link. The catalog id was recovered by resolving the DOI. Not modified (read-only task).  SOURCE_TYPE JUDGEMENT: marked wb-catalog rather than local-documentation because the local DDI PDF's study-description pages are blank and the BID is not among the repo's DVC-tracked Documentation files; every quote above came from the live WB catalog (study-description page) or from the BID PDF downloaded from that catalog. The local DDI PDF does list the BID as a Technical document, so the BID is the survey's own documentation, just not mirrored in-repo. Data collection dates 2018-09 to 2019-01. No .dta file was opened for this task.
+#+end_quote
+
+*** Liberia 2014-15
+
+- Survey :: Household Income and Expenditure Survey 2014-2015, WB catalog id 2563 (LBR_2014_HIES_v01_M)
+- Source type :: local-documentation
+- Confidence (as recorded by the extractor) :: high
+- Universe tag (EDITORIAL, not a quote) :: national-all-households
+- Language of the quoted source :: English
+- Source file :: lsms_library/countries/Liberia/2014-15/Documentation/LISGIS_HIES_2014_BINFO_V.2016.03.21.pdf ; World Bank catalog DDI export for study 2563 (https://microdata.worldbank.org/metadata/export/2563/json, fetched 2026-11-04)
+- Locator :: LISGIS_HIES_2014_BINFO_V.2016.03.21.pdf, section 'Sampling frame for the 2014/2015 HIES', PDF p. 7; national-replicate design, PDF p. 12. The DDI's universe field is null. Text extracted with pdfminer.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+"The sampling frame for the 2014/2015 HIES is based on the data and cartography from the 2008 Liberia Population and Housing Census. Liberia is divided administratively into 15 counties, with a total household population of 3.4 million (Table 3). This figure excludes the population living in institutions such as hospitals, schools and other public institutions."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+"This figure excludes the population living in institutions such as hospitals, schools and other public institutions." (BID, PDF p. 7).
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 and NOT YET WIRED: no table of this wave is served.  This is a different survey from Liberia 2018-19, whose frame is forest-proximate EAs (see that entry): the HIES frame is every county.  BID, PDF p. 12: "Four nationally representative replicates of 209 sample EAs each were defined".  A pooled Liberia frame would therefore span two universes.
+#+end_quote
+
+*** Liberia 2016-17
+
+- Survey :: Household Income and Expenditure Survey 2016, WB catalog id 2986 (LBR_2016_HIES_v01_M)
+- Source type :: local-documentation
+- Confidence (as recorded by the extractor) :: high
+- Universe tag (EDITORIAL, not a quote) :: national-all-households
+- Language of the quoted source :: English
+- Source file :: lsms_library/countries/Liberia/2016-17/Documentation/LISGIS_HIES_2016_BINFO_Final.pdf ; World Bank catalog DDI export for study 2986 (https://microdata.worldbank.org/metadata/export/2986/json, fetched 2026-11-04)
+- Locator :: LISGIS_HIES_2016_BINFO_Final.pdf, section 'Sampling frame for the 2016 HIES', PDF p. 8; re-run statement, PDF p. 5. The DDI's universe field is null. Text extracted with pdfminer.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+"The sampling frame for the 2016 HIES follows the same structure as the 2014 HIES, which was based on the data and cartography from the 2008 Liberia Population and Housing Census. Liberia is divided administratively into 15 counties, with a total household population of 3.4 million (Table 4). This figure excludes the population living in institutions such as hospitals, schools and other public institutions."
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+"This figure excludes the population living in institutions such as hospitals, schools and other public institutions." (BID, PDF p. 8).
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 and NOT YET WIRED: no table of this wave is served.  BID, PDF p. 5: "The re-run uses the same sample methodology and design as the 2014 survey, which allows for nationally representative data to be collected each quarter".  The catalog dates this entry 2016-2017; its title says 2016.
 #+end_quote
 
 ** Malawi

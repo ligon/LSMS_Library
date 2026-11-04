@@ -1,0 +1,15 @@
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/2563
+
+#+CATALOG_ID: 2563
+#+CATALOG_IDNO: LBR_2014_HIES_v01_M
+#+CATALOG_TITLE: Household Income and Expenditure Survey 2014-2015
+#+CATALOG_YEARS: 2014-2015
+#+CATALOG_REPOSITORY: central
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/2563
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: add-wave
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-11-04
+#+PROVENANCE_NOTE: Acquired whole on 2026-11-04 by add_wave: all 28 of the 28 data files in 2563's WB datafile list, each pushed. Registered, not wired.
