@@ -4087,6 +4087,24 @@ Module D's two inorganic-fertilizer slots carry type codes 1-6 (=NPK=, =DAP=,
     =fertilizer_rate='s docstring, which says the parcel step is a measured
     no-op on Malawi.  Measured 2026-10-19 with the #867 shares (before
     them the default gave 11,551 plots); the mismatch itself predates #867.
+    *Corrected 2026-11-03 (GH #1445): true when measured, not what the API
+    serves now.*  GH #1110 (=1db0001ed=, 2026-10-29) keeps Malawi's full
+    =garden_plot= key on BOTH sides under =on='parcel'=, selected by a =country=
+    label or by matching =attrs['country']=, which =_finalize_result= sets on
+    every =Country= frame.  Cold, development 98c6069d2, either mode: 37,010
+    rows (11,389 / 3,520 / 10,755 / 11,346 by wave), median 56.83 kg N/ha (179.06
+    product), and identical values, plot keys and households.  The other
+    figure moved separately: =on='plot'= went 33,402 -> 37,010 with the
+    numerator (=nitrogen_kg= plots 33,466 -> 37,076; the #1111 kg labelling is
+    the likely cause, not separately attributed).  The median in the note is
+    superseded the same way.
+    *Still live on a frame with no country identity* (=attrs= gone, say after
+    a merge whose inputs disagree, and no =country= level): the default falls
+    back to the legacy parcel helpers and returns 14,909 rows at median 60.89,
+    2010-11 and 2013-14 only.  2016-17 and 2019-20 vanish with no
+    =PlotGrainMismatchWarning=, because the other two waves still match.
+    =on='plot'= is unaffected (37,010).  That is the note's mechanism, still
+    reachable; framework residual, not changed here.
   - *The applied-fertilizer UNIT is probably misread -- found while
     drafting the #867 residuals, NOT changed here.*  =_MWI_FERT_UNIT_LABELS=
     (=malawi.py=) reads the applied-amount unit (=ag_d39e= / =ag_d39j=)
