@@ -3204,6 +3204,25 @@ rows); the column is now =timestamp[us]= in the wave and country parquets
   fieldwork.  Nothing is converted: every row is parsed as Gregorian and
   counted =outside_window= as before; whether the Harar EA was keyed in the
   Ethiopian calendar is not adjudicated.
+- *Tested 2026-11-03 for the #1056 ruling; nothing changed.*  Against the same
+  households' livestock-cover =InterviewDate=:
+  | rows read as Ethiopian           | date read as Ethiopian   | minus own LS date, days | verdict                                  |
+  |----------------------------------+--------------------------+-------------------------+------------------------------------------|
+  | W5 Amhara EA, 9 rows in 2014-01  | Sep-Oct 2021             | -129 to -21             | impossible: before the first-visit LS    |
+  | W5 Harar EA, 2 rows in 2014-04   | 2021-12-27               | +15                     | between visits, not post-harvest         |
+  | W5 Harar EA, 7 rows in 2014-07   | 2022-03-19               | +97 to +149             | possible (in-window p5-p95: +116, +202)  |
+
+  For the 7: 2014 is the Ethiopian year of the fieldwork, and 6 of 7 gaps are
+  ordinary.  Against: all 9 LS rows of that EA are stamped in Gregorian 2021; the date
+  is before all 131 dated rows of the other 14 Harar EAs (April-June 2022) and before
+  the DDI's "between April and June 2022", inside only the one-month widening of the
+  window; and only 10 rows of the whole wave, one region on one day, are earlier.
+  "2014" alone does not point to the Ethiopian calendar: W4's 13 rows, which cannot be
+  Ethiopian, also sit in 2014-01, days 1-7, and W5's Amhara rows cluster the same way
+  (days 5-7 for 7 of 9).  No rule selects the 7 without naming the EA and the month:
+  by EA it also converts the 2, by year it also converts all 11.  Neither the BIDs nor
+  the DDIs say anything about device calendars, so a registered basis could only be
+  =modelling-choice=.  7 of 1,475 served rows.
 
 * Nine country concatenators use actual declarations (GH #1287, 2026-10-29)
 
