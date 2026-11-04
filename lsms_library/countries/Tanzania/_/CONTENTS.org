@@ -2445,8 +2445,9 @@ matches round 3's plurality in 5 and the reported code in 3, so neither is a rul
 Ruling (@ligon, 2026-11-04): the first two take the digit, NAMED in
 =_upd_district.UPD_DISTRICT_DIGIT_CLUSTERS= under their own key
 =Tanzania::cluster_features::upd-district-name-from-id-digit=, because both
-neighbouring rounds agree and the households are the same (the 2010-11 id extends
-the 2008-09 id for 8 of 8 and 7 of 8).  =19302076= stays NA because its neighbouring
+neighbouring rounds agree and the households are the same (the 2010-11 id extends a
+2008-09 id for 8 of 8 in both; 7 of the 8 2008-09 households in =10506001= have a
+descendant).  =19302076= stays NA because its neighbouring
 rounds conflict, which leaves 9 households with =m= NA in 2010-11.
 
 *What this does to =market='District'=.*  Every household gets its CLUSTER's
@@ -2489,13 +2490,30 @@ Neither is a defect of =cluster_features=.
   exactly one such household, and every one of those clusters is in
   =cluster_features=.  The other 43 have none, keep the =v= they had and stay
   unlabelled; they are not blanked.
-- *What the rekey does and does not say.*  =v= now says where the household's
-  family was sampled, as it does for a tracked mover, not where it lives: 177 of
-  the 238 are in the region of the cluster they take.  =strata=, =Rural= and the
-  weights stay the household's own: 146 have their frame household's =strata=, so
-  the other 92 sit in a cluster of another stratum.  That is not new.  =v= spanning
-  more than one =strata= goes from 116 of 247 ids to 103 of 179, because the stray
-  ids pooled strata too.
+- *Why the frame household is the parent.*  =hh_a10= ("Is this household an original
+  household or a split-off?") reads ORIGINAL on exactly the 858 frame households and
+  SPLIT-OFF on exactly the 326; it is the direct statement of what =sdd_cluster=
+  being blank implies.  A member's =hh_b06= is found in the NPS4 roster of the
+  household's own =y4_hhid= for 350 of 350, against 198 of 350 for an unrelated
+  =y4_hhid= in the same cluster, and the stray id shares region and district with
+  the target for 238 of 238 (red team, 2026-11-04).  =sdd_hhid= beginning with
+  =y4_hhid= shows nothing: it does so for all 1,184.  Limits: the NPS4 head is with
+  the frame household for 210, in the split-off for 7, elsewhere for 4 and not found
+  for 17.  =updated_ids= links the split-off rather than the frame household for 13;
+  the lineage is the same, so =v= is unaffected.
+- *"The rule movers already follow" holds in kind, not degree.*  =v= now says where
+  the household's family was sampled, not where it lives.  61 of the 238 (25.6%)
+  live outside the region of the cluster they take, against 11 of the 858 frame
+  households (1.3%), or 9 of the 148 frame movers who report a location.  Own district
+  equals the parent's =t0_district= for 128 of 237 (frame: 167 of 216).
+- *=strataid= follows where people live, so =strata= does not follow =v=.*  Its region
+  equals own region for 300 of the 326 split-offs and for 8 of the 11 frame households
+  who left their region.  =strata=, =Rural= and the weights stay the household's own,
+  so 92 of the 238 sit in a cluster of another stratum.  Ids spanning more than one
+  =strata=, before -> after: the 147 frame clusters 67 -> 98, stray ids 49 of 100 -> 5
+  of 32, all 116 of 247 -> 103 of 179.  The total falls only because stray ids
+  disappear; among real clusters it rises.  Frame households alone span strata in 64
+  of 147 clusters, so it is not a new defect.
 - *The Stata labels name the two ids differently from how they are used.*
   =clusterid= reads "Unique ID for sampling strata" and =sdd_cluster= "Unique ID for
   first-stage sampling unit".  In the frame they pair one-to-one over 147 clusters,
@@ -2511,11 +2529,19 @@ Neither is a defect of =cluster_features=.
   in 2019-20: 281 -> 43.  =check_panel_consistency=, grain reports and the
   =ClusterIdentityWarning= text do not change.
 - *One served number moves.*  =food_expenditures(basis='total',
-  valuation='median_price')= starts its ladder at =v=, so moving 238 households moves
-  the cluster medians around them too.  898 rows change in 2019-20 (503 produced, 395
-  in-kind, none purchased), 667 of them on households that keep their =v=.  The median
-  ratio is 0.97, the 1st to 99th percentile 0.51 to 1.75, the extremes 0.46 and 2.29,
-  and the wave total falls 0.57%.
+  valuation='median_price')= reads =v= and, through it, =District= and =Region=, so
+  the 238's purchase rows enter new price cells at all three rungs.  897 rows change in
+  2019-20 (none purchased), 231 on the 238 and 666 on households that keep their =v=;
+  648 of those 666 move at the =District= or =Region= rung, not at =v=.  The median ratio
+  is 0.97, the 1st to 99th percentile 0.51 to 1.75, the extremes 0.46 and 2.29, and the
+  wave total falls 0.57% (-1.72% of imputed value, 89% of it on the 238).  8 rows fall
+  outside 0.5 to 2, all on the 238.  Pooling across places is real but bounded: had the
+  61 out-of-region households kept their old =v=, 326 rows on 203 other households
+  would not move (ratio median 1.04, range 0.76 to 1.40, +46k on a 52.2M wave).
+- *Clustered standard errors* (red team, 2026-11-04).  Clustering 2019-20 means on =v=
+  raises the SE by 2.6% to 6.8% on four outcomes, because G goes 247 -> 179.  Nothing
+  in core computes one.  =.coder/sampling/fingerprint.csv= still says 247 PSUs for
+  2019-20; nothing reads it.
 - The only route that would label the remaining 102 (59 + 43) without a new =v= is a
   household-grain =Region= on =sample=, and =_add_market_index= prefers that column
   for EVERY household, so populating it fully moves 1,366 labels (245 / 565 / 162 /
