@@ -850,3 +850,12 @@ over a =Quantity= near 1e-19, and the kg factors are right (=metric=, 0.33 and 0
 Reported, not masked: nothing in the file labels these as missing, and a stored value is not
 trimmed to look right.  Their cause is not known.  Site Q does not see them: it screens the
 upper tail of =food_acquired.Quantity= and does not screen =food_prices=.
+* 2026-11-04 -- 2021-22 documents held; recall read from the instruments (GH #1084, #1483, #650)
+
+=2021-22/Documentation/= held only =SOURCE.org=.  It now holds both BIDs and both
+household questionnaires from WB 6278, and =LICENSE.org=.  The food recall of both
+waves is now questionnaire grade, 7 days: 2021-22 =sen_ehcvm2_qnr_men_excel_vague1.pdf=
+PDF p. 36, Section 7B; 2018-19 =sen_ehcvm1_qnr_household_excel_vague1.xls= sheet
+=S7b_Conso_Al=, r6.  The 2021-22 BID's sampling text, already quoted in the population
+evidence from the catalog, is now held locally.  Its price component is a separate
+sample of markets, and the community files stop at =s04_co=.
