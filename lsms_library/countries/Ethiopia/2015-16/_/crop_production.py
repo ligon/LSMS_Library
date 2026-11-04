@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 """Build crop_production for Ethiopia ESS 2015-16 (Wave 3; GAP 1).
 
-Item-level harvest at (t, i, plot_id, j, u) from §9 (sect9_ph_w3), with
-planting month from §4 (sect4_pp_w3) and reported sale qty/value from §11
+Item-level harvest at (t, i, plot_id, j, u, production_obs) from §9
+(sect9_ph_w3), with planting month from §4 (sect4_pp_w3) and reported sale
+qty/value from §11
 (sect11_ph_w3), plus the §12 tree/fruit/vegetable/root-crop sale module
 (sect12_ph_w3; GH #820).
 
@@ -17,6 +18,10 @@ NATIVE unit (code ph_s12q0b, the same `unit_code` list as the §9 harvest
 unit), Q8 value ph_s12q08 (Birr).  §9 INCLUDES tree/root crops in W3, so
 §12 only fills the sale columns §11 left empty -- see
 ethiopia._attach_sect12_sales.
+
+production_obs (GH #1461): reported:crop_code:<n>; §9 ships no documented line
+id.  ``obs`` looks like a roster counter and never repeats within a plot, but it
+has no variable label and 251 nulls, while the crop code is complete.
 """
 import sys
 

@@ -71,8 +71,8 @@ def _harvest():
         ("HH1", "H1", 1, 2, 7, 50.0),    # teff, sold in §11
         ("HH2", "H2", 1, 1, 72, 5.0),    # coffee on two plots  -> several
         ("HH2", "H2", 1, 2, 72, 6.0),
-        ("HH3", "H3", 1, 1, 56, 2.0),    # kale + spinach fold onto ONE key
-        ("HH3", "H3", 1, 1, 69, 3.0),    #   'Leafy Greens'     -> folded
+        ("HH3", "H3", 1, 1, 56, 2.0),    # kale + spinach fold onto ONE label
+        ("HH3", "H3", 1, 1, 69, 3.0),    #   -> attached to kale's own line
         ("HH4", "H4", 1, 1, 42, 7.0),    # banana, also in §11  -> collides
         ("HH5", "H5", 1, 1, 46, 4.0),    # mango, two §12 lines -> repeated
         ("HH6", "H6", 1, 1, 74, 9.0),    # enset, Q6 No, blank  -> 0
@@ -142,8 +142,11 @@ def test_sect12_fills_only_the_unambiguous_single_plot_pair(eth):
     assert coffee["Quantity_sold"].tolist() == [3.0]        # Kg sale on a Kg row
     # several plots: the SALES GRAIN CAVEAT, never split
     assert _row(df, "H2", "Coffee")["Value_sold"].isna().all()
-    # folded key: kale/spinach -> one 'Leafy Greens' key, not attributable
-    assert _row(df, "H3", "Leafy Greens")["Value_sold"].isna().all()
+    # folded key: kale and spinach are two lines since GH #1461, so the kale
+    # sale attaches to kale's (it was left off when the collapse chose a row)
+    h3 = _row(df, "H3", "Leafy Greens")
+    assert h3.xs("reported:crop_code:56", level="production_obs")["Value_sold"].tolist() == [5.0]
+    assert h3.xs("reported:crop_code:69", level="production_obs")["Value_sold"].isna().all()
     # repeated (holder, crop) lines: ambiguous, neither picked nor summed
     assert _row(df, "H5", "Mango")["Value_sold"].isna().all()
     # Q6 = No with Q7/Q8 blank is a sale of 0; a positive Q8 next to No is KEPT
@@ -179,14 +182,15 @@ def test_sect12_adds_no_row_and_moves_no_other_cell(eth):
 
 
 def test_every_unattached_class_is_counted_in_the_warning(eth):
-    """Eight classes partition the lines read (the builder asserts it)."""
+    """Seven classes partition the lines read (the builder asserts it).  The
+    eighth, folded_key, went with the collapse it guarded (GH #1461)."""
     _, msgs = _build(eth)
     m = msgs[0]
     assert "read 11 lines" in m
-    assert "attached and served 4 lines" in m          # H1, H6, H7, H9
+    assert "attached and served 5 lines" in m          # H1, H3, H6, H7, H9
     for cls, lines in [("placeholder", 1), ("repeated", 2), ("collides_s11", 1),
                        ("no_s9_row", 1), ("several_s9_plots", 1),
-                       ("folded_key", 1), ("attached_then_dropped", 0)]:
+                       ("attached_then_dropped", 0)]:
         assert re.search(rf"\b{cls} {lines}/", m), (cls, m)
     # H9 used to be class 7 (1/1/25): its only §9 row has no unit and no
     # quantity, and the empty-row filter ignored Value_sold.  A row carrying a
@@ -228,7 +232,7 @@ def test_derivation_stamp_is_on_exactly_the_rows_sect12_filled(eth):
     assert (stamped.fillna(False).to_numpy(dtype=bool)
             == filled.to_numpy(dtype=bool)).all()
     assert set(new["Derivation"].dropna()) == {key}
-    assert int(filled.sum()) == 3                         # H1, H6, H7
+    assert int(filled.sum()) == 4                         # H1, H3, H6, H7
     # the section-11 rows carry no key
     assert _row(new, "H1", "Teff")["Derivation"].isna().all()
     assert _row(new, "H4", "Banana")["Derivation"].isna().all()
@@ -402,7 +406,8 @@ def test_the_stamp_rides_to_the_served_table(cp):
     got = {w: int(((d == key).fillna(False) & (t == w)).sum()) for w in sorted(set(t))}
     # 4,463 / 4,495 before the 2026-10-23 empty-row-filter ruling: W2's 209 and
     # W3's 62 stamped rows with no unit and no quantity are no longer dropped.
-    assert got == {"2011-12": 544, "2013-14": 4672, "2015-16": 4557,
+    # 544 / 4,557 before GH #1461: 2 W1 and 6 W3 folded-key lines now attach.
+    assert got == {"2011-12": 546, "2013-14": 4672, "2015-16": 4563,
                    "2018-19": 0, "2021-22": 0}, got
     stamped = (d == key).fillna(False).to_numpy(dtype=bool)
     assert (cp.loc[stamped, ["Quantity_sold", "Value_sold"]].notna().any(axis=1)).all()
@@ -451,5 +456,6 @@ def test_positive_sale_rows_per_wave(cp):
     # 2,737 / 2,300 / 1,368 / 1,292 before the 2026-10-23 ruling that a row
     # carrying a sale value is never dropped (+23 / +9 / +27 / +31 rows whose
     # §9 row has no unit and no quantity; GH #1253 moved no positive value).
+    # 1,323 in W5 before GH #1461: a sale no longer sits on two lines of a crop.
     assert got == {"2011-12": 854, "2013-14": 2760, "2015-16": 2309,
-                   "2018-19": 1395, "2021-22": 1323}, got
+                   "2018-19": 1395, "2021-22": 1315}, got

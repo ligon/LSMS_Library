@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 """Build crop_production for Ethiopia ESS 2013-14 (Wave 2; GAP 1).
 
-Item-level harvest at (t, i, plot_id, j, u) from §9 (sect9_ph_w2), with
-planting month from §4 (sect4_pp_w2) and reported sale qty/value from §11
+Item-level harvest at (t, i, plot_id, j, u, production_obs) from §9
+(sect9_ph_w2), with planting month from §4 (sect4_pp_w2) and reported sale
+qty/value from §11
 (sect11_ph_w2), plus the §12 tree/fruit/vegetable/root-crop sale module
 (sect12_ph_w2; GH #820).
 
@@ -18,6 +19,11 @@ the W2 questionnaire header and variable label), Q8 value ph_s12q08 (Birr;
 "IF SOLD IN-KIND, PLEASE RECORD THE CASH VALUE OF SALES").  §9 INCLUDES
 tree/root crops in W2, so §12 only fills the sale columns §11 left empty --
 see ethiopia._attach_sect12_sales.
+
+production_obs (GH #1461): reported:crop_code:<n>; §9 ships no documented line
+id.
+This file lists 605 records twice, identical in every column; the builder
+drops the repeats (ethiopia.py, "§9 REPEAT RECORDS").
 """
 import sys
 
