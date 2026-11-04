@@ -90,15 +90,17 @@ def ng():
 
 
 SPEC = dict(fn="synthetic", sold="sold", qty="q", unit="unit", size="size",
-            condition="cond", value="v")
+            condition="cond", conv="conv", value="v")
 LABELS = {1010: "Maize", 1121: "Yam--roots", 1123: "Yam--roots"}
 
 
-def _sale_file(rows):
+def _sale_file(rows, conv=None):
     """``(raw, dec)`` for one synthetic A3.ii file.  ``rows`` are tuples
-    ``(hhid, code, q, v, unit code, size, condition)``."""
+    ``(hhid, code, q, v, unit code, size, condition)``; ``conv`` is the
+    per-row reported factor, NaN if not given."""
     raw = pd.DataFrame(rows, columns=["hhid", "cropcode", "q", "v", "unit", "size", "cond"])
     raw["sold"] = 1
+    raw["conv"] = np.nan if conv is None else conv
     dec = raw.copy()
     dec["cropcode"] = raw["cropcode"].map(
         lambda c: f"{c}. YELLOW PEPPER" if c not in LABELS else f"{c}. A CROP")
@@ -117,8 +119,8 @@ def _harvest_frame(rows):
                 qty="qty", unit="unit", perennial=False)
 
 
-def _build(ng, harvest, sales):
-    raw, dec = _sale_file(sales)
+def _build(ng, harvest, sales, conv=None):
+    raw, dec = _sale_file(sales, conv)
     records = ng._hh_crop_sale_frame(raw, dec, SPEC, LABELS)
     return ng.crop_production_for_wave(
         "2016Q1", [_harvest_frame(harvest)], LABELS, hh_sales=records)
@@ -235,6 +237,78 @@ class TestSeveralRecordsOfOneCrop:
                      [("h1", 1121, 2.0, 100.0, 130, 12, 2),
                       ("h1", 1123, 3.0, 50.0, 130, 12, 2)])
         assert out.loc[("2016Q1", "h1", FARM_LEVEL, "Yam--roots"), "Derivation"] == SUMMED
+
+
+class TestKgFactorSold:
+    """Reported kg per one sold unit: carried, never summed, never chosen."""
+
+    ONE_PLOT = [("h1", "1", 1121, 9.0)]
+    TWO_PLOTS = [("h1", "1", 1121, 9.0), ("h1", "2", 1121, 9.0)]
+    SAME_UNIT = [("h1", 1121, 2.0, 100.0, 130, 12, 2), ("h1", 1123, 3.0, 50.0, 130, 12, 2)]
+
+    def _row(self, out, plot="1", crop="Yam--roots"):
+        return out.loc[("2016Q1", "h1", plot, crop)]
+
+    @pytest.mark.parametrize("harvest, plot", [(ONE_PLOT, "1"), (TWO_PLOTS, FARM_LEVEL)],
+                             ids=["attached", "farm-level"])
+    def test_one_record_carries_its_own_factor(self, ng, harvest, plot):
+        out = _build(ng, harvest, [("h1", 1121, 2.0, 100.0, 130, 12, 2)], conv=[100.0])
+        assert self._row(out, plot)["KgFactor_sold"] == 100.0
+
+    def test_summed_records_that_agree_carry_the_factor_unsummed(self, ng):
+        out = _build(ng, self.ONE_PLOT, self.SAME_UNIT, conv=[50.0, 50.0])
+        row = self._row(out)
+        assert row["KgFactor_sold"] == 50.0 and row["Quantity_sold"] == 5.0
+
+    @pytest.mark.parametrize("conv", [[50.0, 100.0], [50.0, np.nan]],
+                             ids=["disagree", "one-missing"])
+    def test_summed_records_that_disagree_blank_the_factor_only(self, ng, conv):
+        row = self._row(_build(ng, self.ONE_PLOT, self.SAME_UNIT, conv=conv))
+        assert pd.isna(row["KgFactor_sold"])
+        assert row["Quantity_sold"] == 5.0 and row["Value_sold"] == 150.0
+
+    def test_two_unit_row_has_no_factor(self, ng):
+        out = _build(ng, self.TWO_PLOTS,
+                     [("h1", 1121, 2.0, 100.0, 130, 12, 2), ("h1", 1123, 3.0, 50.0, 211, 12, 2)],
+                     conv=[50.0, 50.0])
+        assert pd.isna(self._row(out, FARM_LEVEL)["KgFactor_sold"])
+
+    def test_a_non_positive_factor_is_not_recorded(self, ng):
+        out = _build(ng, self.ONE_PLOT, [("h1", 1121, 2.0, 100.0, 130, 12, 2)], conv=[0.0])
+        assert pd.isna(self._row(out)["KgFactor_sold"])
+
+    def test_it_does_not_touch_the_harvest_factor(self, ng):
+        out = _build(ng, self.ONE_PLOT, [("h1", 1121, 2.0, 100.0, 130, 12, 2)], conv=[100.0])
+        assert pd.isna(self._row(out)["KgFactor"]), "sa3iiq1_conv never rates the harvest u"
+
+    def test_a_wave_with_no_factor_delivers_float_nan(self, ng):
+        spec = {k: v for k, v in SPEC.items() if k != "conv"}
+        raw, dec = _sale_file([("h1", 1121, 2.0, 100.0, 130, 12, 2)])
+        records = ng._hh_crop_sale_frame(raw, dec, spec, LABELS)
+        out = ng.crop_production_for_wave(
+            "2016Q1", [_harvest_frame(self.ONE_PLOT)], LABELS, hh_sales=records)
+        assert out["KgFactor_sold"].isna().all() and out["KgFactor_sold"].dtype == "float64"
+        plain = ng.crop_production_for_wave("2011Q1", [_harvest_frame(self.ONE_PLOT)], LABELS)
+        assert plain["KgFactor_sold"].isna().all() and plain["KgFactor_sold"].dtype == "float64"
+
+    def test_config(self, ng):
+        assert "conv" not in ng._HH_SALE_SOURCE["2015-16"], "W3 ships no factor"
+        for wave in ("2018-19", "2023-24"):
+            assert ng._HH_SALE_SOURCE[wave]["conv"] == "sa3iiq1_conv"
+        from lsms_library.yaml_utils import load_yaml
+        scheme = load_yaml(NIGERIA / "_" / "data_scheme.yml")["Data Scheme"][TABLE]
+        assert scheme["KgFactor_sold"] == {"type": "float", "optional": True}
+
+
+def test_script_harvest_files_match_the_sale_source_table(ng):
+    """`derivation_inputs` re-derives the served rows from `_HH_SALE_SOURCE['harvest']`,
+    so a harvest file added to the script alone would silently unjoin it."""
+    import re
+    source = (NIGERIA / "_" / "crop_production.py").read_text()
+    for wave, spec in ng._HH_SALE_SOURCE.items():
+        named = set(re.findall(
+            rf"'\.\./{wave}/(Data/[^']*secta3i+_harvestw\d\.dta)'", source))
+        assert named == set(spec["harvest"]), (wave, named)
 
 
 def test_an_unmapped_crop_code_keeps_its_own_label(ng):
@@ -438,6 +512,59 @@ class TestOracle:
         several = rows["n_records"] > 1
         assert keys[several].str.contains("records-summed|two-units").all()
         assert not keys[~several].fillna("").str.contains("records-summed|two-units").any()
+
+
+#: W4/W5: the form's factor for the unit the sale inherits.  W3 ships none.
+SOLD_FACTOR = {"2019Q1": "sa3iiq1_conv", "2024Q1": "sa3iiq1_conv"}
+
+
+@pytest.mark.requires_s3
+class TestSoldFactorOracle:
+    @pytest.mark.parametrize("t", sorted(SOLD_FACTOR))
+    def test_row_factor_is_the_source_factor_under_the_agreement_policy(self, served, t):
+        from lsms_library.local_tools import get_dataframe
+        cfg = SALE_BLOCK[t]
+        d = get_dataframe(str(NIGERIA / cfg["wave"] / cfg["file"]), convert_categoricals=False)
+        q = pd.to_numeric(d[cfg["qty"]], errors="coerce")
+        v = pd.to_numeric(d[cfg["value"]], errors="coerce")
+        src = _source_sales(t).assign(
+            k=pd.to_numeric(d[SOLD_FACTOR[t]], errors="coerce").astype("float64")[
+                ((q > 0) | (v > 0)).values].values)
+        src["k"] = src["k"].where(src["k"] > 0)
+        src["i"], src["crop"] = src["i"].astype(str), src["crop"].astype(str)
+        g = src.groupby(["i", "crop"])
+        units = src[src["q"] > 0].groupby(["i", "crop"])["unit"].nunique()
+        want = g["k"].first().where(
+            (g["k"].nunique(dropna=False) == 1) & (units.reindex(g.size().index).fillna(0) <= 1))
+        rows = served[(served["t"] == t) & _has_sale(served)].copy()
+        rows["i"], rows["crop"] = rows["i"].astype(str), rows["crop"].astype(str)
+        got = pd.to_numeric(rows.set_index(["i", "crop"])["KgFactor_sold"],
+                            errors="coerce").astype("float64").reindex(want.index)
+        assert (got.isna() == want.isna()).all()
+        assert np.allclose(got.dropna(), want.dropna())
+        assert got.notna().mean() > 0.95
+
+    @pytest.mark.parametrize("t", ["2011Q1", "2013Q1", "2016Q1"])
+    def test_w1_to_w3_ship_no_factor(self, served, t):
+        assert served.loc[served["t"] == t, "KgFactor_sold"].isna().all()
+
+    def test_no_factor_without_a_sale(self, served):
+        assert served.loc[~_has_sale(served), "KgFactor_sold"].isna().all()
+
+    @pytest.mark.parametrize("t", sorted(SOLD_FACTOR))
+    def test_valuation_agrees_with_the_household_where_a_factor_exists(self, served, t):
+        """The reason the factor is wired.  Without it the price pool is the 43 and
+        41 sales in a metric unit, and this median was 1.40 and 7.55."""
+        from lsms_library import transformations as T
+        d = served.set_index(["i", "t", "v", "plot_id", "crop"])
+        d = d.assign(Harvest_kg=pd.to_numeric(d["Quantity"], errors="coerce")
+                     * T.harvest_kg_factors(d)["kg_per_unit"])
+        out = T.median_price_valuation(d, ["v"], item_keys=("crop",), quantity_col="Harvest_kg")
+        own = pd.to_numeric(d["Value_harvested"], errors="coerce").astype("float64")
+        both = out["Value"].notna() & (own > 0) & (d.index.get_level_values("t") == t)
+        ratio = (out["Value"].astype("float64") / own)[both]
+        assert 0.8 < ratio.median() < 1.25, ratio.median()
+        assert ((ratio > 0.5) & (ratio < 2)).mean() > 0.7
 
 
 #: Each round's harvest-unit column, whose vocabulary the sale's unit must share.

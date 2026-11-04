@@ -286,6 +286,8 @@ Data Scheme:
     # occurrence.  On such a row `u` is 'Unknown' beside a real Unit_sold, which
     # is correct (GH #1047): `u` describes the harvest Quantity the row does not
     # have, so do not read it as a Unit_sold != u flag.  See _/CONTENTS.org.
+    # W5's value column prints "ESTIMATE THE VALUE OF IN-KIND PAYMENTS", so a W5
+    # Value_sold can include an estimated in-kind part; no column flags it.
     # intercropped derived from
     # the PP planting roster (sect11f s11fq2) where present (W1-W3);
     # perennial = True for tree/permanent-crop rows (W4/W5 secta3iii), NA on a
@@ -325,6 +327,14 @@ Data Scheme:
     Unit_sold:
       type: str
       optional: true
+    # Survey-reported kg per ONE sold unit (GH #843): W4/W5 `sa3iiq1_conv`, the
+    # form's Kg/L factor for the total-harvest unit the sale is stated in.  W1-W3
+    # ship none, so `optional`.  A column apart from KgFactor, which rates the
+    # harvest `u`.  A summed row carries it only where every record reports the
+    # same factor, missingness included; a two-unit row's is NA.
+    KgFactor_sold:
+      type: float
+      optional: true
     planting_month: str
     harvest_month: str
     intercropped: bool
@@ -347,7 +357,8 @@ Data Scheme:
     # sa3iiiq23_conv.  The other `*_conv` columns are NOT wired and must not
     # be: sa3iq6d_conv (W4) / sa3iq15_conv (W5) belong to the "expect to
     # harvest MORE" block with its own unit columns, and sa3iiq1_conv
-    # (secta3ii) is hh-crop grain with no plot linkage.  See _/CONTENTS.org.
+    # (secta3ii) rates the household total, so it is the sale's KgFactor_sold
+    # above and never a plot row's KgFactor.  See _/CONTENTS.org.
     KgFactor:
       type: float
       optional: true

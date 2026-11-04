@@ -52,10 +52,13 @@ Nigeria::cluster_features::ph-same-location: *ph_same_location
 # and crop (A3.ii, secta3ii), with no plot.  One function, one decision, a key
 # per path so the path taken is countable.  A `plot_id='Farm-level'` row holding
 # one source record carries NO key: it is a survey answer at its own grain, and
-# the index value discloses that.
+# the index value discloses that.  That covers 1,719 W4/W5 rows whose Unit_sold
+# and KgFactor_sold are the household total's, which the form states the sale in.
+# The frame alone cannot tell them from W3's own-unit answers; the assumptions on
+# the first entry below are the only record of that reading.
 Nigeria::crop_production::hh-crop-sale-single-row:
   waves: ['2015-16', '2018-19', '2023-24']
-  columns: [Quantity_sold, Value_sold, Unit_sold]
+  columns: [Quantity_sold, Value_sold, Unit_sold, KgFactor_sold]
   rows: {t: ['2016Q1', '2019Q1', '2024Q1']}
   rule: >-
     A household-crop sale from A3.ii is placed on the household's ONE served
@@ -70,8 +73,8 @@ Nigeria::crop_production::hh-crop-sale-single-row:
   inputs: lsms_library.countries.Nigeria._.nigeria:inputs_hh_crop_sale_single_row
   raw_variables: &hh_crop_sale_variables
     - secta3ii_harvestw3.hhid / cropcode / crop_number, sa3iiq3, sa3iiq5a, sa3iiq5b, sa3iiq6
-    - secta3ii_harvestw4.hhid / cropcode, sa3iiq3, sa3iiq5a, sa3iiq1c, sa3iiq1d, sa3iiq1b, sa3iiq6
-    - secta3ii_harvestw5.hhid / cropcode, sa3iiq4, sa3iiq6, sa3iiq3b, sa3iiq3c, sa3iiq3d, sa3iiq7
+    - secta3ii_harvestw4.hhid / cropcode, sa3iiq3, sa3iiq5a, sa3iiq1c, sa3iiq1d, sa3iiq1b, sa3iiq1_conv, sa3iiq6
+    - secta3ii_harvestw5.hhid / cropcode, sa3iiq4, sa3iiq6, sa3iiq3b, sa3iiq3c, sa3iiq3d, sa3iiq1_conv, sa3iiq7
   assumptions:
     - text: >-
         A3.ii asks the sale per crop, not per plot.  W5 form p. 19: "CAPI WILL
@@ -92,13 +95,26 @@ Nigeria::crop_production::hh-crop-sale-single-row:
         sa3iiq1b, W5 sa3iiq3b / sa3iiq3c / sa3iiq3d).
       basis: questionnaire
       evidence: >-
-        The same three pages.  Corroboration: the W4/W5 sold quantity is at most
+        The same three pages, and the W5 interviewer manual p. 99: "the
+        respondent MUST provide the quantity of unprocessed CROP NAME sold in the
+        SAME UNIT AS THE QUANTITY HARVESTED".  EPAR reads W4 the same way
+        (EPAR_UW_Nigeria_GHS_W4.do:690-694 renames sa3iiq5a qty beside sa3iiq1b/c/d).
+        Corroboration: the W4/W5 sold quantity is at most
         the total stated in that unit on 3,820 of 3,825 and 3,747 of 3,747
         sales (median share 0.67 / 0.63), and on attached one-record sales the
         W4/W5 unit equals the row's own `u` on 2,705 of 2,709 and 3,005 of
         3,006; W3, which asks its own, on 2,866 of 2,979.  All three unit
         columns carry the harvest unit's value labels (W4/W5 split its
         '40. DERICA/TIN' into two codes).
+    - text: >-
+        sa3iiq1_conv is the form's Kg/L factor for the unit, size and condition
+        of the household's total harvest, so in W4 and W5 it is kg per one sold
+        unit: KgFactor_sold.  It does not rate the row's harvest `u`.
+      basis: questionnaire
+      evidence: >-
+        Stata label "Kg/L conversion factor", beside sa3iiq1a/c/d/b; the assumption
+        above fixes the sale to that unit.  The World Bank does this:
+        NGA_GHS4.do:281, gen harvest_sold_kg_temp = sa3iiq5a * sa3iiq1_conv.
     - text: >-
         A sale by a household with one served row for that crop came from that
         row, even if the row's own Quantity is blank.  Where a crop has several
@@ -120,7 +136,7 @@ Nigeria::crop_production::hh-crop-sale-single-row:
 
 Nigeria::crop_production::hh-crop-sale-records-summed:
   waves: ['2015-16', '2018-19', '2023-24']
-  columns: [Quantity_sold, Value_sold]
+  columns: [Quantity_sold, Value_sold, KgFactor_sold]
   rows: {t: ['2016Q1', '2019Q1', '2024Q1']}
   rule: >-
     Where one household and served crop holds several A3.ii sale records whose
@@ -129,6 +145,9 @@ Nigeria::crop_production::hh-crop-sale-records-summed:
     sums.  Several records arise because harmonize_food gives several crop
     codes one label (Yam--roots is 1120-1124) and W3's roster can repeat a code
     on two lines.  The row carries this key whichever row it landed on.
+    KgFactor_sold is never summed: it is carried only where every record
+    reports the same factor, missingness included (the canonical note's policy,
+    as Mali's), and is otherwise NA with the quantity kept.
   function: lsms_library.countries.Nigeria._.nigeria:derive_hh_crop_sale_attachment
   inputs: lsms_library.countries.Nigeria._.nigeria:inputs_hh_crop_sale_records_summed
   raw_variables: *hh_crop_sale_variables
@@ -150,12 +169,12 @@ Nigeria::crop_production::hh-crop-sale-records-summed:
 
 Nigeria::crop_production::hh-crop-sale-two-units:
   waves: ['2015-16', '2018-19', '2023-24']
-  columns: [Value_sold, Quantity_sold, Unit_sold]
+  columns: [Value_sold, Quantity_sold, Unit_sold, KgFactor_sold]
   rows: {t: ['2016Q1', '2019Q1', '2024Q1']}
   rule: >-
     Where one household and served crop holds several A3.ii sale records in
     DIFFERENT units (raw unit code, size or condition differ), Value_sold is
-    their sum and Quantity_sold and Unit_sold are NA.  The declared index holds
+    their sum and Quantity_sold, Unit_sold and KgFactor_sold are NA.  The declared index holds
     one row per (t, i, plot_id, crop), so the two quantities cannot be two rows,
     and the served value of Quantity_sold has one unit, so they cannot be
     summed.  The quantities are not lost: derivation_inputs returns each

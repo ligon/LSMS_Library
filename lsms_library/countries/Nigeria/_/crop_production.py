@@ -42,6 +42,11 @@ unit/size/condition columns this build never reads -- their factor describes a
 different container; and sa3iiq1_conv (secta3ii, W4/W5) rates the household's
 TOTAL harvest, at hh-crop grain with no plot linkage, not this row's quantity.
 
+KgFactor_sold (GH #843): that same sa3iiq1_conv DOES rate the W4/W5 sale, because
+the form states the sale in the total harvest's unit (W5 interviewer manual
+p. 99: "in the SAME UNIT AS THE QUANTITY HARVESTED").  It is kg per one sold unit,
+arrives with hh_sales, and is a column apart from KgFactor.  W1-W3 ship none.
+
 Unit_sold (GH #824): the A3 sale block asks q11 "How much did you sell to
 or through this [BUYER]?" with its OWN quantity and PROD. UNIT CODE
 (sa3q11b), distinct from the harvest unit q6b that `u` carries.  W1/W2 pass
@@ -250,6 +255,8 @@ df['Quantity_sold'] = pd.to_numeric(df['Quantity_sold'],
 df['Value_sold'] = pd.to_numeric(df['Value_sold'],
                                  errors='coerce').astype('float64')
 df['Unit_sold'] = df['Unit_sold'].astype('string')
+df['KgFactor_sold'] = pd.to_numeric(df['KgFactor_sold'],
+                                    errors='coerce').astype('float64')
 df['Derivation'] = df['Derivation'].astype('string')
 # A Farm-level row has no annual/perennial answer (GH #843).
 df['perennial'] = df['perennial'].astype('boolean')

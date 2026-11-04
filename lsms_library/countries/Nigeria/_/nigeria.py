@@ -1102,7 +1102,8 @@ def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
         # KgFactor`.  Only a `*_conv` asked beside THIS frame's own
         # quantity/unit pair may be named here (GH #859): the expected-future
         # harvest blocks carry their own unit columns and their own factor,
-        # and secta3ii's factor is hh-crop grain -- see _/CONTENTS.org.
+        # and secta3ii's factor rates the household total, not this row's
+        # quantity, so it is the SALE's `KgFactor_sold` -- see _/CONTENTS.org.
         # A non-positive value is read as "not recorded" (0 kg per unit is
         # not a weight); measured no-op on every Nigeria wave -- all four
         # wired columns report positive-or-null only.
@@ -1192,6 +1193,9 @@ def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
         out['Value_harvested'] = np.nan
     out['Value_harvested'] = pd.to_numeric(
         out['Value_harvested'], errors='coerce').astype('float64')
+    # Reported kg per ONE sold unit (GH #843).  Only W4/W5's hh_sales carry it;
+    # W1-W3 ship no such factor, so the column is float NaN there.
+    out['KgFactor_sold'] = pd.Series(np.nan, index=out.index, dtype='float64')
 
     # Drop rows with no crop label resolved (free-text junk codes) and no
     # household.  Keep rows with a crop even if Quantity is NaN (the
@@ -1209,7 +1213,7 @@ def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
     out = out.set_index(['t', 'i', 'plot_id', 'crop']).sort_index()
     out = out[['Quantity', 'u', 'Quantity_sold', 'Value_sold', 'Unit_sold',
                'planting_month', 'harvest_month', 'intercropped', 'perennial',
-               'KgFactor', 'Value_harvested']]
+               'KgFactor', 'Value_harvested', 'KgFactor_sold']]
     # The registry key of a constructed sale (GH #843), NA on a reported row.
     # The canonical schema declares it; a data_scheme.yml may not.
     out['Derivation'] = pd.Series(pd.NA, index=out.index, dtype='string')
@@ -1244,7 +1248,12 @@ _HH_SALE_TWO_UNITS = 'Nigeria::crop_production::hh-crop-sale-two-units'
 # the size).  W4/W5 ask only a QUANTITY -- "Of the [QTY] [UNIT] [CONDITION] of
 # [CROP] harvested, how much of it did your household sell?" -- so the form
 # itself states the sale in the unit of the household's total harvest, which
-# is therefore the unit, size and condition named here.
+# is therefore the unit, size and condition named here.  The W5 interviewer
+# manual (p. 99) says so: "the respondent MUST provide the quantity ... sold in
+# the SAME UNIT AS THE QUANTITY HARVESTED".  So `sa3iiq1_conv`, the form's Kg/L
+# factor for that unit, rates the SALE, which is why it is `conv` here.  It
+# never rates a plot row's harvest: that is `KgFactor`, from the plot's own
+# `*_conv`.  W3 ships no factor.
 _HH_SALE_SOURCE = {
     '2015-16': dict(
         fn='Data/secta3ii_harvestw3.dta',
@@ -1254,19 +1263,19 @@ _HH_SALE_SOURCE = {
         fn='Data/secta3ii_harvestw4.dta',
         harvest=['Data/secta3i_harvestw4.dta', 'Data/secta3iii_harvestw4.dta'],
         sold='sa3iiq3', qty='sa3iiq5a', unit='sa3iiq1c', size='sa3iiq1d',
-        condition='sa3iiq1b', value='sa3iiq6'),
+        condition='sa3iiq1b', conv='sa3iiq1_conv', value='sa3iiq6'),
     '2023-24': dict(
         fn='Data/Post Harvest Wave 5/Agriculture/secta3ii_harvestw5.dta',
         harvest=['Data/Post Harvest Wave 5/Agriculture/secta3i_harvestw5.dta',
                  'Data/Post Harvest Wave 5/Agriculture/secta3iii_harvestw5.dta'],
         sold='sa3iiq4', qty='sa3iiq6', unit='sa3iiq3b', size='sa3iiq3c',
-        condition='sa3iiq3d', value='sa3iiq7'),
+        condition='sa3iiq3d', conv='sa3iiq1_conv', value='sa3iiq7'),
 }
 
 
 def _hh_sale_answer_columns(spec):
     """The ORIGINAL variable names of one wave's sale answers."""
-    return [spec[k] for k in ('sold', 'qty', 'unit', 'size', 'condition', 'value')
+    return [spec[k] for k in ('sold', 'qty', 'unit', 'size', 'condition', 'conv', 'value')
             if spec.get(k) is not None]
 
 
@@ -1302,6 +1311,13 @@ def _hh_crop_sale_frame(raw, dec, spec, crop_labels):
     for col in ('unit', 'size', 'condition'):
         if spec.get(col) is not None:
             unit_key = unit_key + '/' + raw[spec[col]].astype('string').fillna('')
+    # Reported kg per one sold unit.  A non-positive value is read as "not
+    # recorded", as for the harvest KgFactor (0 kg per unit is not a weight).
+    if spec.get('conv') is not None:
+        factor = pd.to_numeric(raw[spec['conv']], errors='coerce').astype('float64')
+        factor = factor.where(factor > 0)
+    else:
+        factor = pd.Series(np.nan, index=raw.index, dtype='float64')
     out = pd.DataFrame({
         'i': raw['hhid'].apply(format_id).astype('string').values,
         'crop': crop.values,
@@ -1312,6 +1328,7 @@ def _hh_crop_sale_frame(raw, dec, spec, crop_labels):
             dec[spec['unit']],
             where=f"crop_production {spec['fn']} {spec['unit']}",
             disposition='served with Unit_sold NA').values,
+        'KgFactor_sold': factor.values,
         '_unit_key': unit_key.values,
     }, index=raw.index)
     answers = ['cropcode'] + _hh_sale_answer_columns(spec)
@@ -1347,8 +1364,9 @@ def derive_hh_crop_sale_attachment(records, served):
     Returns
     -------
     DataFrame indexed by `(i, crop)`, one row per household and served crop:
-    `plot_id`, `Quantity_sold`, `Value_sold`, `Unit_sold`, `Derivation`,
-    `cause` ('single-row' / 'several-rows' / 'no-harvest-row'), `n_records`.
+    `plot_id`, `Quantity_sold`, `Value_sold`, `Unit_sold`, `KgFactor_sold`,
+    `Derivation`, `cause` ('single-row' / 'several-rows' / 'no-harvest-row'),
+    `n_records`.
 
     The rule, from the ruling on GH #843:
 
@@ -1365,6 +1383,11 @@ def derive_hh_crop_sale_attachment(records, served):
     * two units (raw code, size or condition differ) -> `Value_sold` is
       summed, since Naira add, and `Quantity_sold` / `Unit_sold` are NA: no sum
       across units is served.  The answers stay in `derivation_inputs`.
+
+    `KgFactor_sold` is never summed or chosen between.  A one-record row carries
+    its record's factor.  Agreement policy for a summed row, the canonical
+    note's, as Mali's: every record must report the same factor, missingness
+    included, or the row's is NA and its quantity stays.  A two-unit row's is NA.
     """
     keys = ['i', 'crop']
     grouped = records.groupby(keys, sort=True)
@@ -1378,6 +1401,9 @@ def derive_hh_crop_sale_attachment(records, served):
     out['Quantity_sold'] = quantity.where(n_units <= 1)
     out['Unit_sold'] = (stated['Unit_sold'].first().reindex(out.index)
                         .astype('string').where(n_units <= 1))
+    factors = grouped['KgFactor_sold']
+    out['KgFactor_sold'] = factors.first().where(
+        (factors.nunique(dropna=False) == 1) & (n_units <= 1)).astype('float64')
 
     served_rows = served.groupby(keys)['plot_id']
     n_rows = served_rows.size().reindex(out.index, fill_value=0)
@@ -1420,7 +1446,8 @@ def _attach_hh_crop_sales(t, out, records):
     out = out.copy()
     for col in ('Quantity_sold', 'Value_sold'):
         out[col] = pd.to_numeric(out[col], errors='coerce').astype('float64')
-    sale_cols = ['Quantity_sold', 'Value_sold', 'Unit_sold', 'Derivation']
+    sale_cols = ['Quantity_sold', 'Value_sold', 'Unit_sold', 'KgFactor_sold',
+                 'Derivation']
 
     on_row = placed[placed['cause'] == 'single-row']
     for col in sale_cols:
