@@ -382,10 +382,12 @@ def upd_district_labels(df, region='Region', district_code='_district_code',
 
     A row is labelled only where its own report is the one its cluster's geocode
     carries: reported region = the id's region and reported code = the id's
-    district digit.  Every other row stays NA, because the code then cannot be
-    verified.  Measured: 2010-11 cluster ``4115002`` reports code 2 (KOROGWE)
-    throughout, while its households in round 3 report code 2 and write LUSHOTO,
-    which is what its own id's digit 1 names.
+    district digit.  Every other row stays NA.  So a cluster stays NA only with
+    ZERO confirming households, and one household is enough to label it: the gate
+    is thin (7 labelled 2010-11 clusters have under half confirming).  Measured:
+    2010-11 cluster ``4115002`` reports code 2 (KOROGWE) throughout, while its
+    households in round 3 report code 2 and write LUSHOTO, which is what its own
+    id's digit 1 names.
 
     Args:
         df: household-grain frame with ``v`` in the index (or columns).
@@ -417,6 +419,50 @@ def upd_district_labels(df, region='Region', district_code='_district_code',
     labels = [codes.get(g, pd.NA) if (not pd.isna(g) and not pd.isna(o) and o == g)
               else pd.NA for o, g in zip(own, geo)]
     return pd.Series(labels, index=df.index, dtype=object)
+
+
+UPD_DISTRICT_DERIVATION = 'Tanzania::cluster_features::upd-district-name-from-round-3'
+
+
+def derive_upd_district_name(df, codes=None):
+    """Rounds 1-2 ``District`` from the code, with its registry key (GH #1441).
+
+    Only blank names in 2008-09 and 2010-11 are filled: rounds 3-4 carry their
+    own answers, and round 4 numbers districts differently.  ``Derivation`` is set
+    on the rows this fills and on no other.  The frame stays at household grain;
+    every row of a cluster-round carries the same value, so the framework's
+    ``(t, v)`` projection keeps it.
+
+    Args:
+        df: household-grain frame with ``t`` and ``v`` in its index, carrying
+            ``District`` and the columns :func:`upd_district_labels` reads.
+        codes: forwarded to :func:`upd_district_labels`.
+
+    Returns:
+        A copy of ``df`` with ``District`` filled and ``Derivation`` added.
+    """
+    out = df.copy()
+    no_name = (out.index.get_level_values('t').isin(['2008-09', '2010-11'])
+               & out['District'].isna().to_numpy())
+    out['District'] = out['District'].where(
+        ~no_name, upd_district_labels(out, codes=codes))
+    out['Derivation'] = pd.Series(pd.NA, index=out.index, dtype='string')
+    out.loc[no_name & out['District'].notna().to_numpy(),
+            'Derivation'] = UPD_DISTRICT_DERIVATION
+    return out
+
+
+def inputs_upd_district_name():
+    """The raw cover answers behind the name: rounds 1-3 at ``(t, v, r_hhid)``,
+    one row per ``(r_hhid, round, clusterid)``.  Takes no ``wave``, because the
+    names live in round 3 and the entry is scoped to rounds 1-2."""
+    from lsms_library.paths import countries_root
+    rounds = {1: '2008-09', 2: '2010-11', 3: '2012-13'}
+    raw = get_dataframe(countries_root() / 'Tanzania' / '2008-15' / 'Data' / 'upd4_hh_a.dta')
+    raw = raw[raw['round'].isin(rounds)].drop_duplicates(['r_hhid', 'round', 'clusterid'])
+    out = raw[['r_hhid', 'round', 'clusterid', 'ha_01_1', 'ha_02_1', 'ha_02_2']].assign(
+        t=raw['round'].map(rounds), v=raw['clusterid'].map(format_id))
+    return out.set_index(['t', 'v', 'r_hhid'])
 
 
 def harmonized_food_labels(fn='../../_/categorical_mapping.org', name='harmonize_food'):

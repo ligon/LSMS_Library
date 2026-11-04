@@ -3,28 +3,40 @@
 * District names for the codes of NPS rounds 1-3 (GH #1441)
 
 UPD rounds 1-2 ship the within-region district code =ha_02_1= but leave the
-name =ha_02_2= blank on every row.  Round 3 ships both.  This table is that
-code's label in the survey's own later answers, keyed by =Code= = region code x
-10 + =ha_02_1= (the geocode fields =RR= and =D= of =clusterid=).  It is a code ->
-label table, so nothing here is a registered derivation.  No code list was found
-in the documents held here (raw-stream scan of the UPD questionnaire, BID and DDI
-and the 2019-20 questionnaire and BID for district names, 2026-11-03; no PDF text
-extractor was available, so font-encoded text is not excluded).
+name =ha_02_2= blank on every row.  Round 3 ships both.  This table gives each
+code the name round 3 writes for it, keyed by =Code= = region code x 10 +
+=ha_02_1= (the geocode fields =RR= and =D= of =clusterid=).  =ha_02_1= has no
+Stata value label, so the name is a construction, a plurality of a later round's
+free text carried back: it is registered as
+=Tanzania::cluster_features::upd-district-name-from-round-3= in =_/derivations.yml=,
+and the rows it fills carry that key in =Derivation=.  No code list was found in
+the documents held here: text extraction of the UPD BID, questionnaire and DDI, the
+2019-20 BID and the wave 5 report (red team, 2026-11-04) finds none of three
+district names searched, and the 2019-20 questionnaires had a raw-stream scan only.
 
 *Source of every row.*  =Source= reads: of N round-3 households in
 =2008-15/Data/upd4_hh_a.dta= resident in this cell (reported region = the
 region in their own =clusterid=, reported code = its district digit, the rule of
 =tanzania.keep_cluster_residents=), n wrote this =District= in =ha_02_2=.  The
 name is the plurality; =R3 alternates= lists the rest.  =Clusters= reads: of K
-round 1-2 clusters whose lines reach a resident in round 3, k have this as the
-plurality name.  =tests/test_gh1441_tanzania_district_code.py= recomputes
-=District= and =Source= from the =.dta=.
+round 1-2 clusters whose lines reach such a resident in round 3, k have this as
+the plurality name.  That filter selects for agreement: over the table it gives 402
+of 406, and filtered on region alone 403 of 409.
+=tests/test_gh1441_tanzania_district_code.py= recomputes =District=, =Source= and
+=Clusters= from the =.dta=.
+
+*Cell 95 is fragile.*  =MTWARA URBAN= wins 19 of 43, against 22 for =MTWARA
+MIKINDANI= plus =MIKINDANI=, and it is the only plurality that deduplicating
+households flips.  All three name one council, so this affects the name, not which
+clusters pool.
 
 *This table describes rounds 1-3 only, and round 4 is a different vintage.*  In
 round 4 the same (region, code) names a different district in 8 of 119 cells
 (Iringa 3/4/5, Rukwa 1, Shinyanga 1/2/5, Mwanza 6) and 7 cells have no household:
-regions split in 2012 were renumbered.  Round 4 ships its own names, so it needs
-no table.  =Y5 label= is the Stata value label of =hh_a02_1= at the same number
+regions split in 2012 were renumbered.  Counting any change of folded name gives
+25 to 31 by the synonyms folded, and an exact comparison 39; the extra cells are
+bare versus qualified names or later names (CHAMWINO, MERU).  Round 4 ships its own
+names, so it needs no table.  =Y5 label= is the Stata value label of =hh_a02_1= at the same number
 in =2020-21/Data/hh_sec_a.dta= (identical to =t0_district= in 2019-20 apart from
 case and two mojibake labels), and =Y5 check= says how it compares: =same=;
 =qualifier= (one name is the other plus Rural/Urban); =later name=, =same

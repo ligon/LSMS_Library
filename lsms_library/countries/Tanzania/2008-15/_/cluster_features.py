@@ -93,13 +93,10 @@ df = tanzania.keep_cluster_residents(df, region='Region',
                                      scheme='nps', label='2008-15')
 
 # GH #1441 -- rounds 1-2 ship the district CODE and no name (see `blank_to_na`).
-# Label the code from the table round 3's residents support.  Only blank cells
-# in these two rounds are touched: rounds 3-4 carry their own answers, and round
-# 4 numbers districts differently, so the table does not describe it.
-# `categorical_mapping.org` here holds the source of every row.
-_no_name = (df.index.get_level_values('t').isin(['2008-09', '2010-11'])
-            & df['District'].isna().to_numpy())
-df['District'] = df['District'].where(~_no_name, tanzania.upd_district_labels(df))
+# Name the code from the table in `categorical_mapping.org` here, and stamp the
+# registered key `Tanzania::cluster_features::upd-district-name-from-round-3` on
+# the rows filled.  Later rounds are untouched.
+df = tanzania.derive_upd_district_name(df)
 df = df.drop(columns='_district_code')
 
 to_parquet(df, 'cluster_features.parquet')

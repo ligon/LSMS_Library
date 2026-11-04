@@ -1,0 +1,47 @@
+# Derivations -- served values in this country's tables that are NOT survey
+# answers but CONSTRUCTIONS from raw answers.  One entry per registry key,
+# `country::table::name`; the same key sits in the served table's `Derivation`
+# column on every row it produced.  Loader and field contract:
+# lsms_library/derivations.py.  Design: SkunkWorks/derived_values.org.
+#
+# Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
+
+Tanzania::cluster_features::upd-district-name-from-round-3:
+  waves: ['2008-09', '2010-11']
+  columns: [District]
+  rule: >-
+    UPD rounds 1-2 ship the within-region code ha_02_1 and leave the name ha_02_2
+    blank.  District = the name most round-3 households resident in the same
+    (region, code) cell write in ha_02_2 (table upd_district_code in
+    2008-15/_/categorical_mapping.org), on every cluster-round with at least one
+    household whose reported region and code match the cluster's own geocode: 409
+    of 409 clusters in 2008-09, 406 of 409 in 2010-11.  The other three have no
+    such household, stay NA and carry no key.
+  function: lsms_library.countries.Tanzania._.tanzania:derive_upd_district_name
+  inputs: lsms_library.countries.Tanzania._.tanzania:inputs_upd_district_name
+  raw_variables: [r_hhid, round, clusterid, ha_01_1, ha_02_1, ha_02_2]
+  assumptions:
+    - text: Rounds 1-3 number districts alike, so a (region, code) cell of round 3 is the cell of rounds 1-2.
+      basis: modelling-choice
+      evidence: >-
+        ha_02_1 has no Stata value label, and no held document scanned lists the
+        codes.  Following panel lines into round 3, filtered on region alone, 403
+        of 409 round 1-2 clusters have the cell's name as their plurality (402 of
+        406 when also filtered to code = digit).  Round 4 does not share the
+        numbering.
+    - text: The plurality of a free-text answer in 2012-13 names the cell in 2008-09 and 2010-11.
+      basis: modelling-choice
+      evidence: >-
+        Rounds 1-2 record no name, so this cannot be shown directly.  A district
+        later split keeps its parent's name on every cluster of the cell (all 5
+        Mbinga clusters read Mbinga, Nyasa never appears in rounds 1-2).  Cell 95
+        is fragile: MTWARA URBAN wins 19 of 43 against 22 for the two Mikindani
+        spellings of one council.
+    - text: One confirming household is enough to label a cluster.
+      basis: modelling-choice
+      evidence: >-
+        A cluster stays NA only with zero confirming households.  7 labelled
+        2010-11 clusters have under half confirming; 19225003 passes on 1 of 10.
+  validated_against: tests/test_gh1441_tanzania_district_code.py recomputes the table from upd4_hh_a.dta.
+  contents: 'Tanzania/_/CONTENTS.org, "District and Region labels for market= (GH #1441)"'
+  since: '2026-11-04'

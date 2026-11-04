@@ -3,7 +3,8 @@
 The UPD ships the within-region code `ha_02_1` in every round and leaves the name
 `ha_02_2` blank in rounds 1-2, so `market='District'` had no label for any of
 those households.  `2008-15/_/categorical_mapping.org` table `upd_district_code`
-gives each code the name round 3's residents write for it.
+gives each code the name round 3's residents write for it, and the rows filled
+carry the registered key in `Derivation`.
 
 Three tiers.  The config tier needs no data.  The source tier is the oracle: it
 reads `upd4_hh_a.dta` directly and recomputes what the table claims, so neither a
@@ -13,6 +14,7 @@ served tier checks the rule through the Country API.
 Data-dependent tests skip cleanly when the Tanzania source files are unavailable.
 """
 import importlib.util
+import inspect
 import re
 import warnings
 
@@ -20,11 +22,13 @@ import pandas as pd
 import pytest
 
 import lsms_library as ll
+from lsms_library.derivations import call_inputs, records_for, resolve_callable
 from lsms_library.local_tools import df_from_orgfile, get_dataframe
 from lsms_library.paths import countries_root
 
 EARLY = {1: "2008-09", 2: "2010-11"}
 TABLE = "upd_district_code"
+KEY = "Tanzania::cluster_features::upd-district-name-from-round-3"
 
 
 def _org_path():
@@ -96,13 +100,41 @@ def test_labels_only_a_report_its_own_cluster_id_confirms(tzmod, region, code, v
     assert (pd.isna(got) and pd.isna(expected)) or got == expected
 
 
+def test_derive_stamps_exactly_what_it_fills(tzmod):
+    rows = [
+        ("filled", "2008-09", "1114002", "DODOMA", "1.0", pd.NA),
+        ("unconfirmed", "2010-11", "1114002", "DODOMA", "2.0", pd.NA),
+        ("recorded", "2008-09", "1114002", "DODOMA", "1.0", "OWN ANSWER"),
+        ("later_answer", "2012-13", "1114002", "DODOMA", "1.0", "KONGWA"),
+        ("later_blank", "2012-13", "1114002", "DODOMA", "1.0", pd.NA),
+    ]
+    df = pd.DataFrame(rows, columns=["i", "t", "v", "Region", "_district_code", "District"])
+    out = tzmod.derive_upd_district_name(df.set_index(["i", "t", "v"]),
+                                         codes={11: "KONDOA"}).reset_index().set_index("i")
+    assert out.loc["filled", "District"] == "KONDOA"
+    assert out.loc["recorded", "District"] == "OWN ANSWER"
+    assert out.loc["later_answer", "District"] == "KONGWA"
+    assert pd.isna(out.loc["unconfirmed", "District"])
+    assert pd.isna(out.loc["later_blank", "District"])
+    assert out.loc["filled", "Derivation"] == KEY
+    assert out["Derivation"].notna().sum() == 1
+
+
+def test_derivation_is_registered_and_resolves():
+    rec = records_for("Tanzania", "cluster_features")[KEY]
+    assert list(rec["waves"]) == list(EARLY.values())
+    assert resolve_callable(rec["function"]).__name__ == "derive_upd_district_name"
+    params = inspect.signature(resolve_callable(rec["inputs"])).parameters
+    assert "wave" not in params, "the names live in round 3, outside the entry's waves"
+
+
 # --------------------------------------------------------------------------
 # Source tier: the oracle reads the .dta
 # --------------------------------------------------------------------------
 
 @pytest.fixture(scope="module")
-def upd(tzmod):
-    """`upd4_hh_a.dta` at (household, round, cluster) grain, with the geocode."""
+def upd_raw(tzmod):
+    """`upd4_hh_a.dta` as shipped (panel lines), with the geocode."""
     path = countries_root() / "Tanzania" / "2008-15" / "Data" / "upd4_hh_a.dta"
     try:
         with warnings.catch_warnings():
@@ -110,7 +142,7 @@ def upd(tzmod):
             raw = get_dataframe(path)
     except Exception as exc:  # noqa: BLE001 - any data failure -> skip
         pytest.skip(f"upd4_hh_a.dta unavailable: {exc}")
-    df = raw.drop_duplicates(["r_hhid", "round", "clusterid"]).copy()
+    df = raw.copy()
     df["round"] = df["round"].astype(int)
     df["cid"] = df["clusterid"].map(lambda x: str(int(x)))
     df["region"] = df["ha_01_1"].astype("string")
@@ -123,6 +155,12 @@ def upd(tzmod):
                       == df["geo_region"].map(tzmod.normalize_place)) & (df["code"] == df["geo_digit"])
     df["cell"] = df["geo_rc"].astype(int) * 10 + df["geo_digit"].astype(int)
     return df
+
+
+@pytest.fixture(scope="module")
+def upd(upd_raw):
+    """One row per (household, round, cluster)."""
+    return upd_raw.drop_duplicates(["r_hhid", "round", "clusterid"])
 
 
 @pytest.mark.requires_s3
@@ -150,6 +188,30 @@ def test_every_row_is_the_plurality_of_round_3_residents(table, upd):
         assert len(counts) < 2 or counts.iloc[0] > counts.iloc[1], f"{code}: tied"
         n, big_n = re.fullmatch(r"R3 ha_02_2 (\d+)/(\d+)", row["Source"]).groups()
         assert (int(n), int(big_n)) == (counts.iloc[0], counts.sum()), code
+
+
+def _fold(name, tzmod):
+    """Compare names across Swahili and English qualifiers."""
+    same = {"MJINI": "URBAN", "MANISPAA": "URBAN", "JIJI": "URBAN", "MJI": "URBAN",
+            "VIJIJINI": "RURAL", "V": "RURAL"}
+    return " ".join(same.get(w, w) for w in tzmod.normalize_place(name).split())
+
+
+@pytest.mark.requires_s3
+def test_clusters_column_follows_panel_lines_into_round_3(table, upd_raw, tzmod):
+    """`k/K`: of K clusters whose lines reach a round-3 resident, k have the
+    row's name as their plurality.  Recomputed through UPHI, not through the
+    (region, code) cell the name came from."""
+    lines = upd_raw.drop_duplicates(["UPHI", "round"])
+    early = lines.loc[lines["round"].isin(EARLY), ["UPHI", "cid", "cell"]].drop_duplicates()
+    late = lines.loc[(lines["round"] == 3) & lines["resident"], ["UPHI", "r_hhid", "name"]]
+    bridged = early.merge(late, on="UPHI").drop_duplicates(["cid", "r_hhid"])
+    plural = (bridged.groupby(["cell", "cid"])["name"]
+              .agg(lambda s: s.str.upper().value_counts().index[0]).reset_index())
+    for code, row in table.iterrows():
+        sub = plural[plural["cell"] == code]
+        k = sum(_fold(n, tzmod) == _fold(row["District"], tzmod) for n in sub["name"])
+        assert row["Clusters"] == f"{k}/{len(sub)}", code
 
 
 @pytest.mark.requires_s3
@@ -248,6 +310,31 @@ def test_later_rounds_keep_their_own_answers(cluster_features, upd, rnd, wave):
     sub = cluster_features[cluster_features["t"] == wave]
     for v, label in zip(sub["v"], sub["District"]):
         assert letters(label) in answers[v], v
+
+
+@pytest.mark.requires_s3
+def test_key_is_on_exactly_the_rows_the_fill_labels(tz, cluster_features):
+    early = cluster_features["t"].isin(EARLY.values())
+    stamped = cluster_features["Derivation"].eq(KEY).fillna(False).astype(bool)
+    assert (stamped == (early & cluster_features["District"].notna())).all()
+    assert cluster_features["Derivation"].dropna().eq(KEY).all()
+    summary = _build(tz.cluster_features).attrs["derivations"]["Tanzania"][KEY]
+    assert summary["rows"] == int(stamped.sum())
+
+
+@pytest.mark.requires_s3
+def test_inputs_join_every_stamped_row(cluster_features):
+    rec = records_for("Tanzania", "cluster_features")[KEY]
+    inputs = call_inputs(rec)
+    assert set(rec["raw_variables"]) <= set(inputs.columns) | set(inputs.index.names)
+    keys = set(zip(inputs.index.get_level_values("t").astype(str),
+                   inputs.index.get_level_values("v").astype(str)))
+    stamped = cluster_features[cluster_features["Derivation"].eq(KEY).fillna(False).astype(bool)]
+    assert len(stamped)
+    assert set(zip(stamped["t"], stamped["v"])) <= keys
+    # The names the key rests on are in the frame, in round 3.
+    round_3 = inputs.xs("2012-13", level="t")
+    assert round_3["ha_02_2"].astype("string").str.strip().ne("").any()
 
 
 @pytest.mark.requires_s3
