@@ -1,9 +1,10 @@
 """GH #1476, Malawi: a blank plot key on a harvest row is ``unknown_plot``.
 
-Modules G and P are plot-grain, so a row with a blank ``gardenid``/``plotid`` has
-a plot whose identifier is missing: the canonical EPISTEMIC sentinel, not a NULL
-the first ``groupby`` deletes.  ``unknown_plot`` is not a plot, so it does not
-make a crop "single-plot" and no household-crop sale attaches because of it.
+Modules G and P are asked per plot, so a row with a blank ``gardenid``/``plotid``
+is a plot-grain answer with no identifier: the canonical EPISTEMIC sentinel, not a
+NULL the first ``groupby`` deletes.  The sentinel does not say a plot exists (the 25
+households behind today's rows report no tree plot; see ``Malawi/_/CONTENTS.org``).
+``unknown_plot`` is not a plot, so no household-crop sale reaches such a row.
 
 The source oracle reads the module files through ``get_dataframe``.
 """

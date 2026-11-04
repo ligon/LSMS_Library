@@ -1371,8 +1371,9 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
 
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
     # A blank key is `unknown_plot`, never NaN (GH #1476): these modules are
-    # plot-grain, so the plot exists and its identifier is missing, and a NaN
-    # on a declared index level is deleted by the next groupby.
+    # asked per plot, so this is a plot-grain answer with no identifier, and a
+    # NaN on a declared index level is deleted by the next groupby.  The sentinel
+    # does not establish that a plot exists: see CONTENTS.org.
     plot = _plot_ids(df[plotkey].apply(format_id))
     # Native instrument code before perennial offset/recode; canonical axis
     # and G/P qualification follow the GH #637 ruling (ledger 637a §2-3).

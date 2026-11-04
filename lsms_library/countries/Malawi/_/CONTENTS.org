@@ -452,7 +452,9 @@ this survey and not of the wiring:
   =nplots = ...['plot_id'].nunique()= is 0 for a homestead tree with no
   numbered garden/plot (the 40 2016-17 Module P rows above), so
   =pairs[_nplots == 1]= drops its sale silently.  Measured: 1 sale (2016-17
-  Mango, 50 kg Bag, 3,600 MWK).  Not fixed here.
+  Mango, 50 kg Bag, 3,600 MWK).  Not fixed here.  (Superseded, GH #1476: these
+  rows are =unknown_plot= now, "homestead" is not established, and the sale
+  stays unattached; see the section dated 2026-11-04.)
 
 * crop_production: the sale-basis LADDER -- registered derivations (2026-09-24)
 
@@ -680,7 +682,8 @@ instrument gives no meaning for, like Tobacco.
   tally), i.e. the fine =(crop, u)= rung does nearly all the work.
 - The NULL-plot perennial sale the probe found (1 sale, 2016-17 Mango,
   3,600 MWK, excluded by =nunique() == 0=) is NOT fixed by the ladder; it
-  is still counted in neither tally.
+  is still counted in neither tally.  (GH #1476 changes the reason, not the
+  outcome; see the section dated 2026-11-04.)
 
 * crop_production: the IHS4/IHS5 perennial crop-code RECODE (GH #869, fixed 2026-09-13)
 
@@ -1109,7 +1112,8 @@ that entry, and this change moves only 2019-20, by +2.
   the old =groupby(level=...)= was deleting on a NaN key, =dropna=True= being
   the default.  They are the whole of the +90.0 Quantity move.  They are now
   served, with a NULL =plot= in the index, exactly as the ~8.5k rows with a
-  NULL =u= always have been.
+  NULL =u= always have been.  (Superseded, GH #1476: 41 rows now, =unknown_plot=,
+  and "homestead" is not established; see the section dated 2026-11-04.)
 
 ** The two shipped files: raw grain, and three things that are not what they look like
 
@@ -5021,14 +5025,20 @@ wave at read time (GH #1487).
 * 2026-11-04 -- a blank harvest plot key is =unknown_plot= (GH #1476)
 
 The note "Existing missing plots: current 41 versus historical 40" left this open; this
-closes it.  Modules G and P are plot-grain, so a blank key means a plot whose identifier is
-missing: the canonical epistemic sentinel, through =_plot_ids=, as =plot_inputs= and
+closes it.  Modules G and P are asked per plot, so a blank key is a plot-grain answer with no
+identifier: the canonical epistemic sentinel, through =_plot_ids=, as =plot_inputs= and
 =plot_labor= already do.  The null was deleted by =harvest_kg='s =groupby=.
 
 Module P 2016-17 is the only place it occurs: 130 rows have a blank =plotid= (81
-cross-section, 49 panel), 41 of them name a crop, and those are the rows served.  None of
-those households has another Module P row with a plot.  Cold builds, development
-=4ea95a0aa= against this change:
+cross-section, 49 panel), 41 of them name a crop, and those are the rows served.
+
+*Whether these plots exist is not established.*  The 41 rows are 25 households (10
+cross-section, 15 panel).  All 25 answered =ag_o01 = 2= in O2, no tree crops, and none has an O2
+row with a plot id.  Yet their Module P rows name crops, and every one with a plantation answer
+(39 of 41, =ag_p01=) says scattered.  12 name a garden with a blank plot; 5 have a tree-plot code
+typed in the crops text (=ag_p0_crops=).  Why they carry these rows is unknown.
+
+Cold builds, development =4ea95a0aa= against this change:
 
 | 2016-17                          |    before |     after |
 |----------------------------------+-----------+-----------|
@@ -5044,6 +5054,13 @@ Every other column of every row is digest-equal in all four waves; =crop_diversi
 =gross_crop_revenue=, =yield_kg(on='plot')= and the sale-basis ladder are unchanged.
 
 =_attach_sales= counted plots with =nunique()=, which skipped the null and would count the
-sentinel, so a sale could have newly attached to a row with no plot.  It counts known plots
-only, so every decision is what it was.  None of the 41 rows holds a sale.
-=harvest_kg= pools a household's =unknown_plot= rows of one crop, as it does Uganda's (GH #1460).
+sentinel, so a sale could have newly attached to a row with no plot.  None of the 41 rows holds a
+sale, and no sentinel row shares a household-crop with a known plot.  =harvest_kg= would pool a
+household's =unknown_plot= rows of one crop, as it does Uganda's (GH #1460), but it pools 0 here:
+the 41 rows are 41 distinct household-crops.
+
+This supersedes three older passages, which stay as written above: the "NULL-plot perennial
+sale" note in the ladder's findings (its =nunique() == 0= reason), its echo under the ladder's
+open items, and "40 of those 162".  The first and third call these rows "homestead trees";
+"homestead" is on no page of the held 2013-14 or 2019-20 questionnaires, and the 2016-17
+agriculture questionnaire is not held.  The 3,600 MWK sale they name stays unattached.
