@@ -8,14 +8,15 @@ on the household's single harvest ROW for the crop where there is exactly one,
 keyed ``hh-crop-sale-single-row``, and otherwise on ONE row with
 ``plot_id = 'Farm-level'`` and no harvest ``Quantity``.  Nothing is dropped.
 
-Three families:
+Four classes in three tiers (the first two need no microdata):
 
 ``TestRules``
     the rule on synthetic frames, through the registered function.
 ``TestDeclared``
     config only: the tables, the registry and the kg ladder's reading of a label.
-``TestServed``
-    builds the real table.  The ORACLE reads the ``.dta`` files directly and
+``TestServed``, ``TestFoodLabelsDoNotMove``
+    need S3 credentials (``requires_s3``): the first builds the real table and
+    the second reads the raw food files.  The ORACLE reads the ``.dta`` files directly and
     imports nothing from ``Mali/_/``: it spells the household id and the plot id
     itself and decodes units from their CODES with its own table.
 
@@ -285,6 +286,7 @@ def _same(a, b):
     assert (a[~np.isnan(a)] == b[~np.isnan(b)]).all()
 
 
+@pytest.mark.requires_s3
 class TestServed:
 
     @pytest.fixture(scope="class")
@@ -463,6 +465,7 @@ class TestServed:
         assert (rows.kg == 100.0).all()
 
 
+@pytest.mark.requires_s3
 class TestFoodLabelsDoNotMove:
     """Every new key is a label the food side never records, so the tables' new
     rows cannot reach `food_acquired`.  Identity rows would be harmless anyway."""
