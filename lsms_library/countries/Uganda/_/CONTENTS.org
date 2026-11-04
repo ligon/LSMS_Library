@@ -4956,6 +4956,16 @@ rows, =DynID= missing on all).  They are among the 51 =GSEC16= keys in neither
 =gsec1.hh= nor =AGSEC1.hh=.  So no recorded link to a sample household exists
 in this release; closing them needs producer correspondence, not more search.
 
+*2015-16 =shocks= had the same hole (GH #1434, 2026-11-04).*  =shocks.py= reaches
+the sample's =HHID= and its interview month through =gsec1.hh=, and an inner merge
+deleted the 2 valid shock rows (of 1,023) of 2 households only =AGSEC1= records.
+They now use =AGSEC1='s =hh -> HHID= pair and its own date, on the housing rules
+above; 0 valid rows are in neither cover, so the 51 keys above carry no shock.
+=AGSEC1.interview= reads "Not done" for all 72 of its households =gsec1= lacks, these
+two included, yet =GSEC16= holds their answers and =AGSEC1= their interview date.
+On the 2,622 households both covers hold, =AGSEC1='s date equals =gsec1='s on all
+2,619 where both record one.  The two =Onset= values are 10 and 1 months.
+
 * Seven-wave plot-input compiler runtime checkpoint (GH #1287, 2026-10-31)
 
 The unchanged =plot_inputs= country compiler ran through its actual Make target
