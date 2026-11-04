@@ -924,10 +924,14 @@ def roster_to_characteristics(df, age_cuts=(4, 9, 14, 19, 31, 51), drop='pid',
 # and ``dinar`` here, was proposed and REJECTED.
 #
 # The rename must land where the label is minted, NOT in an API-time
-# categorical mapping: the derived-food dispatch is
-# ``_aggregate_wave_data`` -> ``transform_fn`` -> ``_finalize_result``
-# (``country.py:4155-4161``), so ``conversion_to_kgs`` below sees the RAW
-# ``u`` and an API-time rename would fire after the factor was inferred.
+# categorical mapping, because the two ways into ``conversion_to_kgs`` below
+# see different spellings.  The derived-food dispatch is
+# ``_aggregate_wave_data`` -> ``transform_fn`` -> ``_finalize_result``, and
+# ``_aggregate_wave_data`` has already finalized ``food_acquired``, so on the
+# Country path the ladder sees the SERVED ``u`` and an API-time rename does
+# reach it (this comment used to say otherwise).  A direct call on
+# ``var/food_acquired.parquet`` sees the label as written, and a table row never
+# reaches that call.  Only a label minted at the source reads the same on both.
 #
 # Why a set at all, rather than a detector?  The obvious detector
 # (``Quantity == Expenditure``) tests the SYMPTOM rather than the cause, and

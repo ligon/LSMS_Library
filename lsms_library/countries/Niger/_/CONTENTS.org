@@ -2356,3 +2356,52 @@ Pinned by =tests/test_niger_crop_production_observations.py=.
 
 *Cache.*  =niger.py= and =data_scheme.yml= are in every Niger table's hash:
 one Niger re-warm (no census run).
+
+* 2026-11-04 -- the NPK slot's label, and strata by wave (GH #1445, #812)
+
+Read-only measurement: nothing is wired and no served value moved.
+
+*NPK.*  Only the two ECVMA waves state a grade.  Code 5 is =engrais inorganiques
+- npk 15/15= (2011-12; the questionnaire asks "How much NPK(15/15)") and
+=Engrais inorganiques - NPK 15/15= (2014-15; its questionnaire prints =NPK
+(15/15/15)=).  Both EHCVM waves label code 5 =Engrais inorganiques - NPK/Formule
+unique=, with no grade.  All three map to =NPK= (0.17 N).
+
+*A finding that contradicts this file.*  "Oversamples and sub-populations" above
+says "no source consulted states whether the allocation across them was
+proportionate or disproportionate".  A held document does:
+=2011-12/Documentation/ECVMA_Information_de_Base_V9_eng.pdf=, p.8 (extraction
+spacing collapsed): "The allocation within the domains Other Urban, Agriculture,
+Agro-pastoral et Pastoral, was done proportionally to the number of households in
+each strata in the regions according to the data of the 2001 population census".
+Counts between domains are fixed (Table 3).  Table 4 equals the 25 occupied
+=strate= cells of =ecvmamen_p1_en.dta= cell by cell; the text says 26 strata, and
+=strate= has 27 value labels.
+
+*Strata, documented.*  The 2021-22 BID (catalog 6276, resource 100374, p.9; not
+held in this repository) describes the 2018/19 plan: "a two-stage stratified
+sampling plan.  The stratum is the combination of region/locality."  Its sampling
+frame paragraph is the unfilled template this file already quotes; this sentence
+is filled.  DDI 4296 and the catalog text say only "2-stage".
+
+*Strata, measured.*  2011-12: =strate= = 10 x =region= + =zae= for 3,968 of 3,968
+households.  2014-15: the file =sample= reads (=ECVMA2014welfare_T1c.dta=) has no
+=strate=, but =ECVMA2014_P1P2_Conso.dta= does: 25 values, constant within =GRAPPE=,
+equal to the 2011 =strate= and to 10 x =region= + =zae= for 270 of 270 grappes.
+No EHCVM household file has one.  =ehcvm_nsu_ner2021.dta= (a unit table) codes
+=strate= as region x milieu, with labels such as =AgadezUrbain=; its 16 values are
+2018-19's cells.  =domaine= in =ehcvm_individu_ner2018.dta= ("Domaine étude") is
+=zae= x =vague=, not the stratum.
+2018-19: 16 region x milieu cells, Niamey rural being 2 clusters.  2021-22: 15
+cells, whose household counts equal BID Table 1 in 14 (Tillabéri urban prints 106 +
+192 = 298 against 288 here; that row's own total of 336 implies 96 for the 106).
+Both are constant
+within a grappe in the cover and welfare files;
+=ehcvm_ponderations_ner2021.dta= =milieu= is not (2 of 555).  Share of var(log
+cluster weight) between region / region x milieu: 57.1% / 58.3% (2018-19), 23.4% /
+67.3% (2021-22).  The 79 grappes new in 2021-22 are 75 urban and 4 rural, and the
+28 dropped are all rural, so urban clusters go 133 -> 211; the BID's "revisit the
+same clusters" does not say so.
+
+*Inference, not wired.*  That region x milieu is the stratum of a 2021-22 cluster
+the BID does not describe.

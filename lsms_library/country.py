@@ -2657,7 +2657,7 @@ class Country:
         return self.__dict__['_categorical_mapping_cache']
 
     def _unit_kg_factors(self) -> dict[str, float]:
-        """Raw ``u`` label -> kilograms, from this country's own tables (GH #919).
+        """``u`` label, raw or canonical -> kilograms, from this country's tables (GH #919).
 
         Composes the two categorical tables that already carry global defaults
         with per-country override (``_ADDITIVE_CATEGORICAL_TABLES``):
@@ -2674,12 +2674,14 @@ class Country:
         45.36 kg (100 lb) in its own ``u_kg``.
 
         **Why the composition happens HERE and not in ``transformations``.**
-        The kg factor is computed BEFORE the categorical mapping is applied --
-        the derived-food dispatch is ``_aggregate_wave_data`` -> ``transform_fn``
-        -> ``_finalize_result``, so ``conversion_to_kgs`` sees the RAW ``u``
-        (GH #770 rejected a fix that assumed otherwise).  Returning a
-        raw-label-keyed dict means nothing downstream has to know about label
-        harmonisation or about ordering.
+        The ladder is handed different spellings on different paths.  The
+        derived-food dispatch is ``_aggregate_wave_data`` -> ``transform_fn`` ->
+        ``_finalize_result``, and ``_aggregate_wave_data`` has already finalized
+        ``food_acquired``, so on the Country path ``conversion_to_kgs`` sees the
+        SERVED ``u`` (Niger 2021-22 ``Kg``); a direct call on
+        ``var/food_acquired.parquet`` sees the raw one (``100. Kg``).  Returning
+        a dict keyed on both spellings means nothing downstream has to know
+        about label harmonisation or about ordering.
 
         The canonical name is emitted as a key in its own right, so a country
         whose raw labels are already canonical (Ethiopia serves ``Quintal``)
@@ -6667,8 +6669,9 @@ class Country:
                     if name in {'food_prices', 'food_quantities'}:
                         transform_kwargs['volume_as_mass'] = volume_as_mass
                         # GH #919: the country's own declared unit masses, keyed
-                        # on the RAW label so the transform needs no knowledge of
-                        # label harmonisation or of dispatch order.
+                        # on both the raw label and the Preferred Label so the
+                        # transform needs no knowledge of label harmonisation or
+                        # of dispatch order.
                         transform_kwargs['unit_kg'] = self._unit_kg_factors()
                         # GH #1042: declared (item, unit) cells that get no
                         # inferred kg (``_/no_kg_factor.yml``).
