@@ -1,4 +1,4 @@
-"""Burkina Faso ``cluster_features``: a registered construction.
+"""Burkina Faso ``cluster_features``: two registered constructions.
 
 GH #1060 (ruling @ligon 2026-11-03, option b).  EMC 2014 records ``province`` per
 household and it varies within 94 of 900 ``zd``.  Each zd with a strict mode is
@@ -6,6 +6,12 @@ served that mode as ``District`` on every row, and carries
 ``Burkina_Faso::cluster_features::zd-modal-province``.  The 2 tied zd are left as
 served, the row core's collapse selects, and carry no key; they keep the grain
 report, because their rows still disagree.
+
+GH #1057 (ruling @ligon 2026-11-03, option b, tightened).  2021-22 ships no cluster
+GPS.  A panel grappe's row carries its 2018-19 fix and the key
+``Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19``.  Grappes 19, 365
+and 549 name a different province in the two waves and stay NA; the cross-section
+(586-1185) has no antecedent and stays NA.
 
 The ``TestOracle*`` classes are the point.  They read the source files directly and
 import nothing from ``Burkina_Faso/_/``, so a bug in the hook cannot agree with itself.
@@ -19,13 +25,17 @@ import unicodedata
 import warnings
 from collections import Counter
 
+import numpy as np
 import pandas as pd
 import pytest
+import yaml
 
 import lsms_library as ll
+from lsms_library import local_tools
 from lsms_library.country import _audit_index_collapse, grain_reports, most_complete_row
 from lsms_library.derivations import derivation_records, resolve_callable
-from lsms_library.local_tools import get_dataframe
+from lsms_library.local_tools import (_collect_file_paths_from_block, get_dataframe,
+                                      source_fingerprint)
 from lsms_library.paths import countries_root
 
 
@@ -43,7 +53,16 @@ requires_s3 = _tests_conftest().requires_s3
 COUNTRY = "Burkina_Faso"
 ROOT = countries_root() / COUNTRY
 MODAL_KEY = "Burkina_Faso::cluster_features::zd-modal-province"
+GPS_KEY = "Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19"
+EXCLUDED = {"19", "365", "549"}
 LOGEMENT = "emc2014_p1_logement_27022015.dta"
+GPS_FILE = "grappe_gps_bfa2018.dta"
+LAT, LON = "coordonnes_gps__Latitude", "coordonnes_gps__Longitude"
+
+
+def _spec():
+    with open(ROOT / "2021-22" / "_" / "data_info.yml", encoding="utf-8") as f:
+        return yaml.safe_load(f)["cluster_features"]
 
 
 def _fold(label):
@@ -77,12 +96,32 @@ class TestConfig:
 
     @pytest.mark.parametrize("key,wave,columns", [
         (MODAL_KEY, "2014", ["District"]),
+        (GPS_KEY, "2021-22", ["Latitude", "Longitude"]),
     ])
     def test_registered_with_its_scope_and_resolving_callables(self, key, wave, columns):
         rec = derivation_records(COUNTRY)[key]
         assert rec.waves == [wave] and rec.columns == columns
         assert callable(rec.resolve("function")) and callable(rec.resolve("inputs"))
         assert rec.assumptions
+
+    def test_the_gps_assumption_cites_the_tracking_statement(self):
+        rec = derivation_records(COUNTRY)[GPS_KEY]
+        tracked = [a for a in rec.assumptions if "bid_bfa_ehcvm2.pdf p. 4" in a.get("evidence", "")]
+        assert tracked and "Households were tracked within the EA" in tracked[0]["evidence"]
+        assert "questionnaire" in rec.bases and "modelling-choice" in rec.bases
+
+    def test_the_gps_source_is_declared_so_the_hash_covers_it(self):
+        spec = _spec()
+        wave_data = ROOT / "2021-22" / "Data"
+        declared = {os.path.normpath(wave_data / f) for f in _collect_file_paths_from_block(spec)}
+        target = str(ROOT / "2018-19" / "Data" / GPS_FILE)
+        assert target in declared
+        assert source_fingerprint(target).startswith("dvc:")
+
+    def test_the_merge_cannot_serve_a_2018_19_only_grappe(self):
+        """35 grappes of the GPS file are not in the panel; `outer` would serve them."""
+        assert _spec()["merge_how"] == "left"
+        assert _spec()["dfs"][0] == "df_main"
 
 
 # --------------------------------------------------------------------------
@@ -98,6 +137,8 @@ def _households(rows):
 class TestRules:
     derive_mode = staticmethod(lambda df: resolve_callable(
         derivation_records(COUNTRY)[MODAL_KEY].function)(df))
+    derive_gps = staticmethod(lambda df: resolve_callable(
+        derivation_records(COUNTRY)[GPS_KEY].function)(df))
 
     def test_a_strict_mode_overwrites_and_stamps_every_row(self):
         out = self.derive_mode(_households([("1", "MIN"), ("1", "MODE"), ("1", "MODE")]))
@@ -142,6 +183,53 @@ class TestRules:
         assert served.loc[("2014", "1"), "District"] == "MODE"
         assert served.loc[("2014", "2"), "District"] == "A"
         assert pd.isna(served.loc[("2014", "2"), "Derivation"])
+
+    def _gps_frame(self):
+        frame = pd.DataFrame({
+            "t": "2021-22",
+            "v": ["2", "2", "19", "365", "549", "83", "586"],
+            "Region": "R",
+            "Latitude": [12.5, 12.5, 13.0, 10.0, np.nan, np.nan, np.nan],
+            "Longitude": [-1.5, -1.5, 0.5, -3.0, np.nan, np.nan, np.nan]})
+        return frame.set_index(["t", "v"])
+
+    def test_gps_is_kept_and_stamped_on_a_carried_grappe_only(self):
+        out = self.derive_gps(self._gps_frame()).reset_index().set_index("v")
+        carried = out.loc["2"]
+        assert carried["Latitude"].tolist() == [12.5, 12.5]
+        assert carried["Derivation"].tolist() == [GPS_KEY, GPS_KEY]
+        for v in ("19", "365", "549", "83", "586"):
+            assert pd.isna(out.loc[v, "Latitude"]) and pd.isna(out.loc[v, "Longitude"]), v
+            assert pd.isna(out.loc[v, "Derivation"]), v
+
+    def test_an_unavailable_gps_source_stamps_nothing(self):
+        frame = self._gps_frame().drop(columns=["Latitude", "Longitude"])
+        out = self.derive_gps(frame)
+        assert "Derivation" not in out.columns and "Latitude" not in out.columns
+
+
+def test_an_unfetchable_gps_file_leaves_the_wave_without_gps(monkeypatch):
+    """`df_geo` is a soft sub-df (GH #515): losing the 2018-19 file costs optional
+    columns only, so the wave still builds, with no coordinate and no key."""
+    monkeypatch.setenv("LSMS_NO_CACHE", "1")
+    cover = pd.DataFrame({"grappe": [2, 2, 586], "menage": [1, 2, 1],
+                          "s00q01": ["Centre", "Centre", "Est"],
+                          "s00q02": ["Kadiogo", "Kadiogo", "Gourma"],
+                          "s00q04": ["Urbain", "Urbain", "Rural"]})
+
+    def read(path, **kwargs):
+        name = str(path).split("/Data/")[-1]
+        if name == GPS_FILE:
+            raise FileNotFoundError(name)
+        part = 586 if name.startswith("Cross_Section") else 2
+        return cover[cover["grappe"] == part].copy()
+
+    monkeypatch.setattr(local_tools, "get_dataframe", read)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        frame = ll.Country(COUNTRY)["2021-22"].cluster_features()
+    assert sorted(frame.index.get_level_values("v")) == ["2", "586"]
+    assert not {"Latitude", "Longitude", "Derivation"} & set(frame.columns)
 
 
 # --------------------------------------------------------------------------
@@ -308,9 +396,97 @@ class TestOracleModalProvince:
         assert (out["Derivation"] == MODAL_KEY).all()
 
 
+@pytest.fixture(scope="module")
+def sources():
+    gps = _read("2018-19", GPS_FILE)
+    panel = _read("2021-22", "s00_me_bfa2021.dta")
+    cs = _read("2021-22", "Cross_Section/s00_me_bfa2021.dta")
+    return gps.assign(v=gps["grappe"].astype(int).astype(str)).set_index("v"), panel, cs
+
+
+@requires_s3
+class TestOracleCarriedGps:
+    def test_the_census_the_ruling_was_given(self, sources):
+        gps, panel, cs = sources
+        panel_v = set(panel["grappe"].astype(int).astype(str))
+        assert len(panel_v) == 550 and panel_v <= set(gps.index)
+        assert (panel["grappe"] == panel["grappe_EHCVM1"]).all()
+        assert panel["GPS__Latitude"].isna().all()
+        fixed = set(gps[gps[LAT].notna()].index)
+        assert len(panel_v & fixed) == 527
+        assert {"19", "365"} <= fixed and "549" not in fixed
+        cs_v = cs["grappe"].astype(int)
+        assert cs_v.between(586, 1185).all() and cs_v.nunique() == 600
+        assert gps["grappe"].max() == 585
+        assert not set(cs_v.astype(str)) & panel_v
+
+    def test_the_excluded_grappes_are_exactly_the_ones_that_name_two_provinces(self, sources):
+        """The rule behind the hard-coded three: if a re-release moves it, this fails."""
+        _, panel, _ = sources
+        s18 = _read("2018-19", "s00_me_bfa2018.dta")
+        a = s18.groupby("grappe")["s00q02"].agg(lambda s: {_fold(x) for x in s})
+        b = panel.groupby("grappe")["s00q02"].agg(lambda s: {_fold(x) for x in s})
+        assert (a.map(len) == 1).all() and (b.map(len) == 1).all()
+        shared = a.index.intersection(b.index)
+        differ = {str(int(g)) for g in shared if a[g] != b[g]}
+        assert differ == EXCLUDED
+
+    def test_a_carried_row_equals_the_prior_waves_fix_exactly(self, sources, served):
+        gps, panel, _ = sources
+        expect = (set(panel["grappe"].astype(int).astype(str))
+                  & set(gps[gps[LAT].notna()].index)) - EXCLUDED
+        assert len(expect) == 525
+        w = served[served["t"] == "2021-22"].set_index("v")
+        carried = w[w["Latitude"].notna() | w["Longitude"].notna()]
+        assert set(carried.index) == expect
+        for v, row in carried.iterrows():
+            assert float(row["Latitude"]) == float(gps.loc[v, LAT]), v
+            assert float(row["Longitude"]) == float(gps.loc[v, LON]), v
+
+    def test_the_2018_19_row_is_the_same_fix_and_carries_no_key(self, sources, served):
+        gps, _, _ = sources
+        w = served[served["t"] == "2018-19"].set_index("v")
+        assert len(w) == 585 and w["Latitude"].notna().sum() == 555
+        assert w["Derivation"].isna().all()
+        for v, row in w[w["Latitude"].notna()].iterrows():
+            assert float(row["Latitude"]) == float(gps.loc[v, LAT]), v
+
+    def test_the_three_grappes_stay_na_with_no_key(self, served):
+        w = served[served["t"] == "2021-22"].set_index("v")
+        for v in EXCLUDED:
+            assert pd.isna(w.loc[v, "Latitude"]) and pd.isna(w.loc[v, "Longitude"]), v
+            assert pd.isna(w.loc[v, "Derivation"]), v
+
+    def test_the_cross_section_stays_na_with_no_key(self, sources, served):
+        _, _, cs = sources
+        w = served[served["t"] == "2021-22"].set_index("v")
+        assert len(w) == 1150 and w.index.is_unique
+        part = w.loc[sorted(set(cs["grappe"].astype(int).astype(str)))]
+        assert len(part) == 600
+        assert part["Latitude"].isna().all() and part["Longitude"].isna().all()
+        assert part["Derivation"].isna().all()
+
+    def test_the_key_is_exactly_on_the_rows_carrying_a_fix(self, served):
+        w = served[served["t"] == "2021-22"]
+        assert set(w["Derivation"].dropna()) == {GPS_KEY}
+        assert (w["Derivation"].notna() == w["Latitude"].notna()).all()
+        assert w["Derivation"].notna().sum() == 525
+
+    def test_the_inputs_are_the_fix_behind_each_keyed_row(self, sources, served):
+        gps, _, _ = sources
+        inputs = ll.Country(COUNTRY).derivation_inputs(GPS_KEY)
+        assert list(inputs.index.names) == ["t", "v"] and inputs.index.is_unique
+        keyed = served[served["Derivation"] == GPS_KEY].set_index(["t", "v"])
+        assert set(inputs.index) == set(keyed.index)
+        assert (inputs["grappe"] == inputs["grappe_EHCVM1"]).all()
+        for (_, v), row in inputs.iterrows():
+            assert float(row[LAT]) == float(gps.loc[v, LAT]), v
+            assert float(row[LON]) == float(gps.loc[v, LON]), v
+
+
 @requires_s3
 class TestConsumers:
-    @pytest.mark.parametrize("wave", ["2014"])
+    @pytest.mark.parametrize("wave", ["2014", "2021-22"])
     def test_market_district_is_the_served_district(self, wave, served, _non_strict):
         c = ll.Country(COUNTRY)
         with warnings.catch_warnings():
@@ -334,7 +510,7 @@ class TestConsumers:
         other = flat[flat["country"] != COUNTRY]
         assert len(other) and other["Derivation"].isna().all()
         mine = flat[flat["country"] == COUNTRY]
-        assert mine["Derivation"].value_counts().to_dict() == {MODAL_KEY: 92}
+        assert mine["Derivation"].value_counts().to_dict() == {GPS_KEY: 525, MODAL_KEY: 92}
         summary = frame.attrs["derivations"][COUNTRY]
-        assert summary[MODAL_KEY]["rows"] == 92
+        assert summary[MODAL_KEY]["rows"] == 92 and summary[GPS_KEY]["rows"] == 525
         json.dumps(summary)

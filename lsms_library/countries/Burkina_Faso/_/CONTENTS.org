@@ -657,14 +657,16 @@ Measured:
   within their EA; see "THE THING TO KNOW" above); Region agrees 550/550, and
   527 of them have a 2018-19 fix.  Serving that fix for 2021-22 would be a
   cross-wave construction -- a registered derivation, not a config mapping --
-  and is not done.
+  and is not done.  /Done 2026-11-03, for 525 of the 527: see "2021-22 GPS
+  carried from 2018-19 (GH #1057)" at the end of this file./
 - =s16a_me_bfa2021.dta= DOES carry parcel coordinates (=s16aq46__latitude= /
   =__longitude=, 4,180 of 8,467 parcels, inside the country).  Parcel grain,
   not a cluster location; see the correction under =plot_features=.
 
 *=optional: true= stays.*  Two of three waves have no cluster GPS, and the
 flag is country-grain; dropping it would make Site B report a genuine
-absence in 2014 and 2021-22 on every read.  =tests/test_burkina_faso_cluster_gps.py=
+absence in 2014 and 2021-22 on every read.  /Since GH #1057 it is one wave,
+2014; the flag stays for that one./  =tests/test_burkina_faso_cluster_gps.py=
 pins that the flag stays only while some wave maps no coordinate.
 
 *Also seen, not fixed here.*  =District= is spelled inconsistently across
@@ -762,7 +764,8 @@ the SAME grappe (EHCVM-2 is a panel sub-sample within the 2018-19 EAs; see
 province was coded differently in the two waves -- which wave is right is
 undecided.  The 2018-19 GPS fixes of grappes 19 and 365 could adjudicate
 (365's is one of the 2-decimal fixes noted above); 549 has none.  This
-bears on any carry-forward of the 2018-19 GPS to 2021-22 (GH #1050).
+bears on any carry-forward of the 2018-19 GPS to 2021-22 (GH #1050).  /It did:
+GH #1057 carries the fix and leaves these three NA./
 
 Cache: =_/categorical_mapping.org= is a build input, so every
 Burkina_Faso cache hash moves; no other country's.
@@ -2445,7 +2448,8 @@ spelling (pooled District stays 45, Region 13).
 The 2,035 pre-existing rows (all of 2014 and 2018-19, and the 550 panel
 grappes) are value- and dtype-equal to the shared warm parquet; 2014's grain
 report (1,034 of 10,800 rows, 94 zd, GH #1060) is unchanged.  Latitude and
-Longitude stay NaN for all 1,150 2021-22 grappes.
+Longitude stay NaN for all 1,150 2021-22 grappes.  /Since GH #1057, 525 panel
+grappes carry the 2018-19 fix; the 600 cross-section grappes stay NaN./
 
 *New idiosyncrasy: the cross-section cover carries HOUSEHOLD GPS.*
 =Cross_Section/s00_me_bfa2021.dta= =GPS__Latitude= / =GPS__Longitude= are
@@ -2455,7 +2459,8 @@ grappe; within-grappe latitude range median ~0.8 km, max ~190 km).  They are
 household positions, so they are NOT mapped into =cluster_features=: the
 =(t, v)= projection would select one household's point and call it the
 cluster's.  Serving a cluster location from them (a centroid, say) would be a
-registered derivation and a decision; it bears on GH #1057.
+registered derivation and a decision; it bears on GH #1057.  /Decided
+2026-11-03: no centroid./
 
 *Population record.*  =population.yml='s 2021-22 =survey= / =notes= now name
 =cluster_features= and =interview_date= beside =sample= and =household_roster=
@@ -2554,3 +2559,87 @@ Cache: =2014/_/mapping.py= moves every Burkina =_table_cache_hash= and every 201
 (0 of 550, 0 of 2,142, 0 of 40 =build_transforms_fingerprint=).
 Pinned by =tests/test_gh1060_1057_burkina_cluster_features.py=, whose oracle
 reads the source files and imports nothing from this directory.
+
+* 2026-11-03 -- 2021-22 GPS carried from 2018-19 (GH #1057)
+
+*The idiosyncrasy.*  2021-22 ships no cluster fix.  There is no =grappe_gps_*= in
+either catalog entry, and the panel cover's =GPS__*= are 0 of 3,227 populated.
+The wave is two components (see "THE THING TO KNOW", and GH #1276): a panel that
+re-interviews EHCVM-1 households "tracked within the EA" (=bid_bfa_ehcvm2.pdf=
+p. 4), with =grappe == grappe_EHCVM1= for 3,227 of 3,227, in 550 of 2018-19's
+585 grappes; and a cross-section, a new draw from the 2019 census frame, in
+grappes 586-1185.  =v= is a sample serial, but here the keyspaces are disjoint
+and the panel's serials are 2018-19's.
+
+*Ruling (@ligon, 2026-11-03, option b, tightened).*  Carry the 2018-19 fix into
+the 2021-22 row of a panel grappe, as the registered derivation
+=Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19=.  Same grappe id
+= same EA, location unchanged.
+
+*Grappes 19, 365, 549 are excluded and stay NA.*  Each names a different province
+in the two waves (table under GH #1059 above), which puts that identity in doubt.
+19 and 365 have a 2018-19 fix and 549 has none, so the exclusion withholds two
+fixes.  The 2018-19 rows of all three are unchanged.
+
+*The cross-section has no cluster fix, and stays NA.*  Its grappes have no 2018-19
+antecedent, and =grappe_gps_bfa2018.dta= stops at 585, so nothing can match.  Its
+cover's =GPS__*= are household positions (differing within 578 of 600 grappes); a
+centroid is declined.
+
+*Where it is done.*  =2021-22/_/data_info.yml= declares
+=df_geo: {file: ../../2018-19/Data/grappe_gps_bfa2018.dta}=, so the file's DVC
+sidecar is in this wave's =_input_hash=, and a new release of it rebuilds this
+wave.  =merge_how: left= is load-bearing: the 35 grappes of the file not in the
+panel would otherwise be served as 2021-22 clusters with a fix and no =Region=.
+The =cluster_features= hook in =2021-22/_/mapping.py= blanks the three and stamps
+what is left, on every household row of the grappe.  =final_index= keeps =i=, so
+the wave still reaches the Site 2 projection (=_collapse_to_cluster_grain=) as it
+did before the merge; the projection stays lossless and does not report, and it
+needs no framework change, since =most_complete_row= excludes =Derivation= from
+its score and the selected row carries its own key.
+
+*Measured*, cold base (=98c6069d2=) against cold candidate:
+
+| | base | candidate |
+|-+------+-----------|
+| 2021-22 rows | 1,150 | 1,150 |
+| non-null =Latitude= / =Longitude= | 0 / 0 | *525 / 525* |
+| equal to the same grappe's 2018-19 served fix | -- | 525 of 525 |
+| carrying the key | -- | 525, exactly those |
+| cross-section grappes with a fix or a key | 0 | 0 |
+| 2018-19 rows differing in any column | -- | 0 |
+| grain, Site B, Site I, Site C reports for =cluster_features= | none but 2014's grain, Site C on the 2014 boundary | the same |
+
+Of the 550 panel grappes: 525 carried; 22 with no 2018-19 fix (and not excluded);
+3 excluded.  =sampling.yml= is unchanged: the 2018-19 -> 2021-22 boundary was
+already =stable= and does not warn.
+
+*An independent check, and six fixes it doubts.*  =s16a_me_bfa2021.dta= records
+parcel positions in 2021-22 (=s16aq46__latitude= / =__longitude=), which owe
+nothing to the fix.  On the 277 of the 525 carried grappes that have one, the
+median parcel lies a median of 1.6 km from the carried fix (p90 5.2 km), against
+213 km when a fix is paired with another grappe's parcels.  So the identity holds
+where it can be tested.  Six are beyond 25 km and are served as recorded, because
+the ruling excludes on province only:
+
+| grappe | km to own parcels | note |
+|--------+-------------------+------|
+| 103 | 104.7 | Namentenga; the fix lies 109 km from the median fix of its province, the parcels 15 km |
+| 104 | 103.7 | Namentenga; 109 km and 17 km, the same pattern; its fix is 6 m from 103's, not equal to it |
+| 240 | 51.4 | shares its fix with 237 (the one duplicated fix, GH #1050 entry) |
+| 237 | 44.5 | same |
+| 229 | 29.3 | the fix is 1 km from its province's median, the parcels 28 km |
+| 226 | 28.8 | a 2-decimal fix |
+
+For 103, 104, 237 and 240 the 2018-19 fix looks like the outlier, so the same
+values are already served in 2018-19.  365, excluded, is 85 km from its own
+parcels, which supports the exclusion; 19 has no parcel coordinates.  Rural differs
+across the two waves on 7 panel grappes (147, 150, 153, 154, 155, 180, 182): all
+carried, all within 5 km of their parcels.  The other 248 carried grappes have no
+parcel coordinate, so for them the identity is the ruling's assumption and nothing
+more.
+
+Cache: =2021-22/_/mapping.py= and =data_info.yml= move every Burkina
+=_table_cache_hash= and every 2021-22 =Wave._input_hash=; every 2018-19 wave hash
+and every other country's are unchanged.  One Burkina re-warm.
+Pinned by =tests/test_gh1060_1057_burkina_cluster_features.py=.

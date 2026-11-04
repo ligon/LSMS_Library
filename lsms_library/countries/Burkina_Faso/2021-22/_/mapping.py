@@ -48,6 +48,74 @@ def food_acquired(df):
     """
     return add_visit_level(_food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION), visit=1)
 
+# ---------------------------------------------------------------------------
+# cluster_features: a panel grappe's 2018-19 fix (GH #1057)
+# ---------------------------------------------------------------------------
+#
+# 2021-22 ships no cluster GPS: no grappe file in either catalog entry, and the
+# panel cover's GPS__* are 0 of 3,227 populated.  The panel re-interviews
+# households "tracked within the EA" (bid_bfa_ehcvm2.pdf p. 4) and grappe ==
+# grappe_EHCVM1 for all 3,227, so a panel grappe IS a 2018-19 EA and the fix
+# carries.  Three grappes name a different province in the two waves, which puts
+# that identity in doubt for them (GH #1059), so they stay NA by ruling.  The
+# cross-section has no 2018-19 antecedent; its household GPS is not a cluster fix.
+PANEL_GPS_DERIVATION = 'Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19'
+
+# Seno/Yagha, Poni/Noumbiel, Kompienga/Gourma.  The first two have a 2018-19 fix;
+# the third has none, so its exclusion changes nothing served.
+_GPS_NOT_CARRIED_GRAPPES = ('19', '365', '549')
+
+_GPS_COLUMNS = {'Latitude': 'coordonnes_gps__Latitude',
+                'Longitude': 'coordonnes_gps__Longitude'}
+
+
+def derive_panel_grappe_gps(df):
+    """Keep a panel grappe's 2018-19 fix, and stamp the rows that carry one.
+
+    Takes the merged frame: the ``v`` index level, and ``Latitude`` / ``Longitude``
+    from ``df_geo``.  Blanks the excluded grappes, then stamps ``Derivation`` on
+    every row still carrying a coordinate.  Row order is preserved.  With neither
+    column present (``df_geo`` could not be fetched, which the GH #675 drop stamp
+    reports) there is nothing carried and nothing to stamp.
+    """
+    out = df.copy()
+    present = [c for c in _GPS_COLUMNS if c in out.columns]
+    if not present:
+        return out
+    excluded = out.index.get_level_values('v').isin(_GPS_NOT_CARRIED_GRAPPES)
+    out.loc[excluded, present] = np.nan
+    carried = out[present].notna().any(axis=1).to_numpy()
+    out['Derivation'] = pd.Series(pd.NA, index=out.index, dtype='string')
+    out.loc[carried, 'Derivation'] = PANEL_GPS_DERIVATION
+    return out
+
+
+def cluster_features(df):
+    """``cluster_features`` post-processor: see :func:`derive_panel_grappe_gps`."""
+    return derive_panel_grappe_gps(df)
+
+
+def inputs_cluster_features(wave='2021-22'):
+    """The registry `inputs` callable: the 2018-19 fix behind each row that carries
+    one, one row per grappe, at ``(t, v)`` with ``t`` the wave it is served in.
+
+    ``grappe_EHCVM1`` is the panel cover's own pointer to the 2018-19 grappe, the
+    link the construction rests on.  An excluded grappe's fix is not returned,
+    because no served row was computed from it.
+    """
+    if wave != '2021-22':
+        raise ValueError(f'{PANEL_GPS_DERIVATION} covers 2021-22 only, not {wave!r}')
+    from lsms_library.paths import countries_root
+    root = countries_root() / 'Burkina_Faso'
+    gps = tools.get_dataframe(root / '2018-19' / 'Data' / 'grappe_gps_bfa2018.dta')
+    cover = tools.get_dataframe(root / wave / 'Data' / 's00_me_bfa2021.dta')
+    out = gps[['grappe', *_GPS_COLUMNS.values()]].merge(
+        cover[['grappe', 'grappe_EHCVM1']].drop_duplicates(), on='grappe')
+    v = out['grappe'].map(tools.format_id)
+    keep = out[list(_GPS_COLUMNS.values())].notna().any(axis=1) & ~v.isin(_GPS_NOT_CARRIED_GRAPPES)
+    return out[keep].assign(t=wave, v=v[keep]).set_index(['t', 'v'])
+
+
 FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
               'AteLess', 'RanOut', 'Hungry', 'WholeDay']
 
