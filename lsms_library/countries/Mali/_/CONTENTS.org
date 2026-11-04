@@ -719,7 +719,8 @@ a sampled household).
   Uganda).  Mali's 2021-22 panel has "moved" households whose id maps to
   the same 2018-19 baseline id as another household; applying id_walk at
   cache-write time collides those onto identical =(t, i, plot_id)=
-  tuples (9 dups).  The parquet stores the pre-walk (unique) index and
+  tuples (9 dups) [Stale since GH #536: see "A stale note" in the last
+  section of this file].  The parquet stores the pre-walk (unique) index and
   lets the framework's idempotent id_walk in =_finalize_result= do the
   panel remap, consistent with every other Mali table.
 
@@ -762,7 +763,8 @@ Recorded from the cross-country food-price comparison
 | purchased unit value (Exp/Qty)      | 2014-15, 2018-19, 2021-22                   |
 | reported purchase price             | ABSENT -- no Price column in any wave       |
 | own-consumption valuation           | ABSENT IN THE INSTRUMENT (see below)        |
-| crop sale price (Value/Qty sold)    | 2014-15, 2017-18; unit axis unusable        |
+| crop sale price (Value/Qty sold)    | all four waves since GH #824 (2026-11-03);  |
+|                                     | 2014-15, 2017-18 unit axis unusable         |
 | community (market) price            | 2014-15 ONLY                                |
 
 *The own-consumption valuation is not merely unwired -- EACI 2014-15 never
@@ -1421,7 +1423,8 @@ Niger and Tanzania remain separate GH #1091 country scopes.
 
 * crop_production: the sold unit, and tree rows per harvest month (GH #824, #1267, 2026-10-23)
 
-Both EAC-I waves; the EHCVM waves are unwired.  *Correction*: earlier comments
+Both EAC-I waves; the EHCVM waves were unwired when this was written (they are
+wired since GH #824, 2026-11-03; last section of this file).  *Correction*: earlier comments
 in =mali.py=, =data_scheme.yml= and the country =crop_production.py= said the
 EHCVM waves "carry no harvest block".  They do: =s16c_me_mli2018.dta= and
 =s16c= / =s16d_me_mli2021.dta= carry harvest and sales (2018-19: 2,101 priced
@@ -2332,8 +2335,9 @@ the open question is still producer instructions or a released correction.
 
 * 2026-11-03 -- EHCVM crop sources: what a wiring would read, and why 2021-22 is sparse (GH #824)
 
-Source facts for the unwired EHCVM =crop_production= (measured from the held
-=.dta=, read-only, at development =3a33f2869=).  No wiring is done here.
+Source facts for the then-unwired EHCVM =crop_production= (measured from the held
+=.dta=, read-only, at development =3a33f2869=).  No wiring is done here; the wiring
+is the last section of this file, which also corrects the 705 below.
 
 - *2018-19 =s16c_me_mli2018.dta= is one plot-crop file with harvest AND sale*,
   like Niger 2018-19: 7,992 rows, unique on (grappe, menage, field, parcel,
@@ -2401,3 +2405,199 @@ shared vocabulary.
   auto-apply re-folds the size-free bases.  So the community spelling is a
   decision to take together with the household side of #1224.
 - *2026-11-03, household side done.*  =food_acquired.u= is now =<unit> (<Size>)=, mapped through the =u= table first, so the fold composes: =boite= + Grand and =Boite de tomate= + Grand are both served =Boite (Grand)=.  On base, 2021-22 served 10 duplicate index rows, all =Arachide= / =Boite=, because those two raw units reached the read-time fold separately; they now differ by size or sum at build, so 0 remain.  Cold: 2018-19 rows unchanged at 162,032, =u= 32 -> 78, (j, u) 433 -> 910; 2021-22 rows 146,929 -> 147,192, =u= 31 -> 75, (j, u) 380 -> 775 (the 412 -> 835 above is not reproduced on the served frame; not investigated).  The community spelling is untouched: household (t, j, u) cells finding a 2018-19 community price go 34 of 433 -> 33 of 910, rows 28,167 -> 25,392 of 162,032.  The whole drop is 2,775 =Sachet= rows, which were sized on the household side and met the community's bare =Sachet=.
+
+* 2026-11-03 -- EHCVM crop_production wired (GH #824)
+
+Rulings of @ligon, 2026-11-03: 2018-19 on Niger's pattern; 2021-22 with the harvest
+from =s16c= and sales from =s16d= under option (d).  The EAC-I rows do not move and the
+tree "Equivalent en Kg" fields stay unwired.
+
+** What is served
+
+| wave    | source                 | rows                  | Quantity, u          | Quantity_sold, Unit_sold, Value_sold |
+|---------+------------------------+-----------------------+----------------------+--------------------------------------|
+| 2018-19 | =s16c_me_mli2018=      | 7,992, one per source | =s16cq12a=, =s16cq12b= | =s16cq16a=, =s16cq16b=, =s16cq17=    |
+| 2021-22 | =s16c= + =s16d_me_mli2021= | 7,247 + 70 Farm-level | =s16cq16a=, =s16cq16b= | =s16dq05a=, =s16dq05b=, =s16dq06=    |
+
+=plot_id= is ={field}_{parcel}=, and every s16c row finds its plot in =plot_features=
+(7,992 of 7,992; 7,247 of 7,247).  The index stays =(t, i, plot_id, crop)=: both s16c
+files are unique on (grappe, menage, field, parcel, crop), under the served crop labels
+too, so =production_obs= has nothing to resolve here.
+
+*A 2021-22 sale* (=mali.derive_hh_crop_sale_attachment=) goes on the household's single
+harvest row for the crop where there is exactly one, keyed
+=Mali::crop_production::hh-crop-sale-single-row=, and otherwise on ONE row with
+=plot_id = 'Farm-level'=, with no =Quantity=, =u= or key.
+
+| cause                    | sale records | Value_sold, FCFA |
+|--------------------------+--------------+------------------|
+| one harvest row          |        1,070 |      394,396,600 |
+| two harvest rows         |           58 |       20,373,725 |
+| three or more            |           12 |        3,927,650 |
+| no harvest row           |            0 |                0 |
+|--------------------------+--------------+------------------|
+| all                      |        1,140 |      418,697,975 |
+
+A CONSUMER counting plots or occurrences must drop =plot_id == 'Farm-level'=; one summing
+sales must keep it.  =crop_diversity(weight='count')= does not drop it (below).
+
+** What counts as a sale, and what is not written
+
+A sale is a record with a positive sold quantity or value.  Nothing here is 0 unless the
+source says 0.
+
+| records                              | 2018-19 s16c | 2021-22 s16d |
+|--------------------------------------+--------------+--------------|
+| quantity and value both positive     |        2,101 |        1,139 |
+| quantity, value NA                   |            1 |            1 |
+| value, quantity NA                   |            9 |            0 |
+| a recorded 0 in either               |            0 |            0 |
+| answered =Non=, nothing recorded     |        5,275 |        3,928 |
+| unanswered (=s16cq15= NA)            |          606 |            0 |
+
+*Different from BOTH EAC-I waves on purpose*: 2014-15 =s3a= (=2014-15/_/crop_production.py=, on
+=s3aq22=) and 2017-18 =s7g= (ruling 2026-10-23, on =s7gq20=) serve 0 on an explicit =Non=, and
+these waves serve NA, as Niger does.  So =gross_crop_revenue= reports a 2018-19 or 2021-22
+non-seller as absent where it reports an EAC-I one as 0.  The 3,928 =Non= records of 2021-22
+serve nothing: 369 of them are on crops with two or more rows, and writing those would
+invent Farm-level rows for sales that did not happen.
+
+*=Recolte nulle= serves NA too.*  236 rows of 2018-19 answer =s16cq10= =Recolte nulle=, a recorded
+nil harvest, with =s16cq12a= and =s16cq15= empty on all of them.  So =Quantity= is NA there and reads
+the same as a question not asked: disclosed here, not resolved.  The answer occurs only in
+vague 2 (236 of 4,008 rows, against 0 of 3,984 in vague 1).  Neither held =.xls= questionnaire
+shows it as a string, but those were read with =strings= only.
+
+** Idiosyncrasies
+
+- *2021-22 =Quantity= is mostly MID-HARVEST.*  =s16cq16a= is "Quantite deja recoltee".  287 of its
+  309 filled rows are unfinished harvests (=s16cq11= =Non=), with a median 50% of the area still to
+  harvest (=s16cq12=).  That is 219 of the 236 rows with a metric unit, and 227,258 of 261,596 kg
+  (86.9%).  So the 2021-22 yields (217 rows, median 505 kg/ha) are partial harvests over whole-plot
+  area and do not measure a season's yield.  In 2018-19 the same share is 12.0% of kg (1,792,088 of
+  14,881,091; 265 of 7,383 filled rows, 166 of 5,615 metric, median 30% still to harvest).
+- *The 2018-19 questionnaires name different campaigns.*  The agriculture questions of the vague 1
+  household questionnaire say 2017/18, as the Stata labels of the pooled file do (=s16cq12a=,
+  "presente campagne 2017/18"); those of vague 2 say 2018/19 (its 13 mentions of 2017/18 are the
+  survey title and the school year; both =.xls= read with =strings= only).  No grappe is in both
+  vagues (s16c 188 and 207; cover 243 and 308).  *Whether =t = '2018-19'= pools two agricultural
+  years needs the enumerator manual and is not established here*; the index does not carry =vague=.
+  Median sale price per kg on metric sold units, vague 1 / vague 2: millet 150 / 125, paddy 150 /
+  120, sorghum 140 / 110, but maize 105 / 100, groundnut 112.5 / 120, cotton 250 / 250.
+- *Crop code 55 changes crop.*  It is =Autre (à préciser)= in 2018-19 (38 rows) and =Anacarde= in
+  2021-22 (7 s16c rows, 4 s16d), where =Autre (à préciser)= is code 65.  It is the only code the two
+  waves share that changes label.  These waves map crops by LABEL, which handles it; mapping by code
+  would serve cashew as =Autres cultures=.
+- *The 705 of 2,101 above is a label artefact, not a disagreement.*  =s16cq12b= and
+  =s16cq16b= share one code book and spell it two ways (code 7 =Sacs de 100 kg= /
+  =Sac-100 Kg=; code 3 =Charretée asine= / =Charettée asine=; code 10 =Gerbes= /
+  =Gerbe=; ...).  By code they agree on 1,856 of the 2,101 priced rows (88.3%), and the served
+  labels agree on exactly those.  The 245 that differ are real and =Unit_sold= is what keeps
+  them.  This is Niger's old "63%" again, and the reverse of EAC-I 2017-18, whose two sets
+  are not code-compatible at all.
+- *2021-22 harvest routing, as far as the file shows it (GH #1437; no questionnaire checked).*
+  1,291 of the 1,294 household-crop pairs with no =s16d= record have no finished harvest, and
+  no pair without an =s16d= record has a harvest quantity.  So =s16d= follows a finished or
+  partly reported harvest, and 1,082 of the 1,140 sales sit on pairs with no =Quantity= at all.
+  =Quantity_sold / Quantity= therefore does not exist for nearly any 2021-22 row.
+- *=s16cq16b_autre=, not wired.*  8 of the 11 =Autre= harvest rows of 2021-22 specify =tonnes=
+  (quantities 1 to 6), and are served =Autre= as coded.
+- *=s16cq03_autre=, not wired.*  It holds crop names (dah, courgette, bissap) behind the code
+  =Autre (à préciser)=, served =Autres cultures=.  Its Stata label is about the parcel name.
+- *=s16cq12a == 99= on 3 rows of 2018-19 is served as a quantity.*  No label calls it missing,
+  unlike the EAC-I columns, and =crop_production_finalize= is not used here for that reason.
+- *The s16c variable numbers flip between the waves.*  =s16cq16a/b= are the SOLD quantity and unit
+  in 2018-19 and the HARVEST quantity and unit in 2021-22; the 2018-19 harvest is =s16cq12a/b= and
+  the 2021-22 sale is =s16dq05a/b=.  =s16cq16c= is "Etat du produit" in 2018-19 and a kg TOTAL in
+  2021-22, where the state is =s16cq16d=.  "Finished?" and "share left" are =s16cq10= / =s16cq11= in
+  2018-19 and =s16cq11= / =s16cq12= in 2021-22.
+- *Recorded and not served*: the state of the product (Grain, Epis, Decortique, ...), which
+  is a =condition= and which Mali's index does not carry; consumed, gifted and stocked
+  quantities (=s16cq13-14=, =s16cq22=; =s16dq02-03=, =s16dq13=); residue sales (=s16dq09-10=, 80
+  records, 3,208,500 FCFA, 2021-22 only); seed quantity (=s16cq10a=, 2021-22 only).
+
+** Labels
+
+- *Units* (=u= table, last block).  Sacks keep their stated weight, =Sac (100 Kg)=, the form
+  Mali's food table and Burkina Faso already use, so the kg ladder reads them.  Carts reuse
+  =Cart (donkey)= and =Cart (ox)=, the labels =plot_inputs= already serves.  None of the keys
+  occurs as a raw label in =s07b=, =s05= or an EAC-I unit variable.  *No #1224 size suffix*:
+  these modules have no size variable.  =carry_unit_size= reads =s07bq03c=, and it has no
+  counterpart here.
+- *=u= is NA, not =Unknown=,* where no unit is recorded, 2018-19's 607 rows and 2021-22's 6,938
+  plus the Farm-level rows, as in the EAC-I waves.  Feature() promotes the column and fills
+  =Unknown=.  (Nigeria's Farm-level rows write =Unknown=, because its =u= column holds that
+  literal and no null.  They agree at Feature().)
+- *Crops* (=harmonize_food=).  =Riz Paddy= -> =Riz=, the EAC-I crop label, so one crop keeps one
+  label across the four waves (Niger serves =Riz Paddy=; a cross-country difference left
+  alone).  =Calebassier= -> =Calebasse=, =Autre (à préciser)= -> =Autres cultures=, =Chou= -> =Chou=;
+  =Oseille=, =Souchet=, =Persil=, =Céleri=, =Radis= and =Pomme à pin= are new labels.  =Oseille= is not
+  folded into =Oseille verte= or =Oseille rouge de Guinée=: the instrument does not say which.
+  An unmapped crop or unit RAISES in these waves, unlike =crop_production_finalize=, which
+  drops the row: 2,821 rows of paddy would have gone that way.
+- *=perennial= is NA, not False*: s16c lists Manguier and Anacarde on the field grid and
+  asks no such question.  So =perennial=, =planting_month= and =harvest_month= are 100% null
+  in both waves and Site B says so.  They stay required, because the EAC-I waves do record
+  them and =optional:= is country-grain.
+
+** A stale note: the "9 dups"
+
+The =plot_features= section above says: "Mali's 2021-22 panel has \"moved\" households whose id
+maps to the same 2018-19 baseline id as another household; applying id_walk at cache-write time
+collides those onto identical =(t, i, plot_id)= tuples (9 dups)".  *That is stale.*  It was written
+with the table on 2026-06-03 (=dea93ee9a=), and GH #536 (=c7ae42372=, 2026-06-19) regenerated the
+crosswalk, which has held no rename since: =updated_ids.json['2021-22']= is a 5,011-entry IDENTITY
+map (0 non-identity entries, 0 repeated targets), =id_walk= moves no s16a, s16c or s16d row, and
+=plot_features= serves 13,961 rows on a unique index.  This also answers the 2026-10-31 checkpoint,
+which left "the earlier documented nine mapped 2021 collisions" unexplained.  The same sentence
+is in the docstring of =_/plot_features.py=, left as it is because editing a =.py= here moves every
+Mali cache hash.
+
+** Measured, cold, base =98c6069d2= against =5eafac648=
+
+| wave    | rows  | Quantity set | priced | Value_sold, FCFA | harvest kg, metric rows of those with Quantity | yield rows, median kg/ha |
+|---------+-------+--------------+--------+------------------+------------------------------------------------+--------------------------|
+| 2018-19 | 7,992 |        7,383 |  2,101 |      623,474,428 | 14,881,091 kg, 5,615 of 7,383                  | 5,262, 844               |
+| 2021-22 | 7,317 |          309 |  1,139 |      418,697,975 | 261,596 kg, 236 of 309                         | 217, 505                 |
+
+- *Nothing else moved.*  =crop_production='s 35,060 EAC-I rows are frame-equal to base, row order
+  and dtypes included, and the other 22 frame tables of this country are frame-equal whole
+  (=panel_ids= is a dict: 5,011 entries on both sides).  =harvest_kg=, =gross_crop_revenue=,
+  =crop_diversity= and =median_price_valuation= do not move on an EAC-I row.  Cold equals a
+  fresh-process warm read, and a single-wave request equals its slice of the all-wave frame.
+- *Harvest kg in these waves is read, never inferred.*  Every kg comes from the =metric= layer
+  (=Kg=, =Tonne=, the three sacks).  The inferred layer serves no row of this table in any wave,
+  so a cart, =Baignoire=, =Gerbe=, =Botte=, =Grenier=, =Panier=, =Unité= or =Autre= has no factor and adds
+  no kg: 1,767 + 73 rows with a quantity.
+- *Prices corroborate the sack weight.*  Median FCFA per =Sac (100 Kg)=, over 100, against the
+  median FCFA per =Kg=, 2018-19: millet 125 / 134, maize 100 / 100, sorghum 125 / 125; cotton per
+  =Tonne= over 1,000 is 250 / 250, as in 2017-18.  Groundnut is the exception (102 / 250), and the
+  unserved state of the product is the first thing to check there.  Niger's =Gros sac=
+  prices alike (groundnut 10,750, paddy 13,000, against Mali's 10,250 and 12,500).
+- *Niger is no yield comparison, nor is Mali 2017-18.*  Only 36 of Niger's 13,717 rows of 2018-19
+  convert, because its units name no weight, and the EAC-I waves have no =plot_features=.  These are
+  the first Mali yields, and the 2021-22 ones are partial harvests (Idiosyncrasies, above).
+- *FLAGGED, NOT FIXED: the yield tail is a plot_features question.*  2018-19 runs to p99 367,800
+  and a maximum of 12,500,000 kg/ha.  The top decile's median area is 0.01 ha, against 0.6 to 2.0
+  in the rest.  All 358 plots under 0.01 ha are farmer estimates in m^2 (the median m^2 answer of
+  the wave is 50), as are 88 of 95 in 2021-22; no GPS plot of 2018-19 is that small.  Whether those were
+  answered in the wrong unit was not established.  Site Q does not see it: it screens =Quantity=.
+- *Site Q*: 3 of 7,992 in 2018-19, all cotton (=Sac (100 Kg)= 9,000, =Tonne= 1,600 and 1,400, at
+  147 to 225 x the reference), and 0 in 2021-22.  *Site B*: =planting_month=, =harvest_month= and
+  =perennial=, 100% null in both waves.  *Site I*: no new finding; the 627 EAC-I tree rows are as
+  before.  *Grain*: no collapse.  =Feature('crop_production')= over Mali, Niger and Burkina Faso:
+  113,372 rows, unique index, 9,523 null =u= promoted to =Unknown= with no collision.
+- *=crop_diversity(weight='count')= counts a Farm-level row as an occurrence*: 50 of 2,857
+  households move in 2021-22, mean 0.6435 against 0.6448 with those rows dropped.  That is in
+  =transformations.py= and is not changed here.  =median_price_valuation= is right about them:
+  their 70 prices enter the medians (2021-22 Value 59.8M against 62.7M without) and none receives
+  a Value.  =harvest_kg= and =yield_kg= never see them.
+- *Crops against food.*  =crop= stays on =harmonize_food= labels, but the same-wave join is partial:
+  3,064 of 7,992 rows in 2018-19 and 5,213 of 7,317 in 2021-22 (7,264 and 6,607 on the food labels of
+  any wave).  The rest is cotton and its like, and foods that EHCVM names by form: =Riz= has no EHCVM food row.
+- *On a 2021-22 keyed row*: 51 of 1,070 also have a harvest =Quantity=, and on 32 of those =u= and
+  =Unit_sold= agree.  68 of 2,857 crop households have a Farm-level row, and that value is mostly
+  cotton (20 of the 70 rows, 17.5M of 24.3M FCFA).
+
+Tests: =tests/test_gh824_mali_ehcvm_crop_production.py=, with an oracle that reads the =.dta=
+files and imports nothing from this directory.

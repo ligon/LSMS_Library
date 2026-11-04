@@ -6,7 +6,7 @@ columns (farm_work, SOB_work, wage_work, farm_hrs, SB_hrs, wage_hrs,
 Industry, working_age).  The individual labor/time-use module lives in the
 EACI waves only (2014-15 EACIIND_p1, 2017-18 eaci17_s04p1).  The EHCVM
 waves (2018-19, 2021-22) carry no individual labor module, so they
-contribute nothing — the same wave split as plot_labor / crop_production.
+contribute nothing — the same wave split as plot_labor.
 
 ``v`` is NOT baked in — the framework joins it from ``sample()`` at API
 time (people_last7days is household-linked and is NOT in the framework
