@@ -112,14 +112,12 @@ def test_an_owned_species_with_no_answers_reaches_the_wave_frame_blank(malawi):
 
 
 def _source(relative, id_column, prefix):
-    try:
-        raw = get_dataframe(str(MALAWI / relative), convert_categoricals=False)
-    except Exception as exc:                         # no credentials / no blob
-        pytest.skip(f'{relative} unavailable: {exc}')
+    raw = get_dataframe(str(MALAWI / relative), convert_categoricals=False)
     raw['hhid'] = prefix + raw[id_column].apply(format_id).astype('string')
     return raw
 
 
+@pytest.mark.requires_s3
 @pytest.mark.parametrize('wave', ['2010-11', '2013-14', '2016-17', '2019-20'])
 def test_served_cells_equal_the_source_cells(malawi, wave):
     """Oracle: the wave's Module R rows, keep-filtered here, one row per key, no groupby."""
