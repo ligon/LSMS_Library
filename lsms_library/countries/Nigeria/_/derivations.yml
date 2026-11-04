@@ -440,8 +440,9 @@ Nigeria::food_acquired::w4-last-purchase-30d:
   function: lsms_library.countries.Nigeria.2018-19._.mapping:derive_w4_last_purchase_30d
   inputs: lsms_library.countries.Nigeria.2018-19._.mapping:inputs_food_acquired_w4_last_purchase
   raw_variables: [hhid, item_cd, s7bq8, s7bq9a, s7bq9b, s7bq9c, s7bq9_cvn, s7bq10,
-                  s7bq5a, s7bq2b, s7bq2_cvn, s10bq8, s10bq9a, s10bq9b, s10bq9c,
-                  s10bq9_cvn, s10bq10, s10bq5a, s10bq2b, s10bq2_cvn]
+                  s7bq5a, s7bq2b, s7bq2c, s7bq2_cvn, s10bq8, s10bq9a, s10bq9b,
+                  s10bq9c, s10bq9_cvn, s10bq10, s10bq5a, s10bq2b, s10bq2c,
+                  s10bq2_cvn]
   assumptions:
     - text: >-
         q9a / q9b / q10 describe the household's most recent purchase of the

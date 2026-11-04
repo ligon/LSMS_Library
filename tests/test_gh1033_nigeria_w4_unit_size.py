@@ -26,6 +26,7 @@ import pytest
 
 from lsms_library.local_tools import df_from_orgfile
 from lsms_library.paths import countries_root
+from lsms_library.yaml_utils import load_yaml
 
 NIGERIA = countries_root() / 'Nigeria'
 W4 = ('2018Q3', '2019Q1')
@@ -207,6 +208,18 @@ def test_no_earlier_wave_names_a_size_column(folder):
     keys = [k.value for n in ast.walk(tree) if isinstance(n, ast.Dict)
             for k in n.keys if isinstance(k, ast.Constant)]
     assert 'quantity' in keys and 'size' not in keys
+
+
+def test_the_881_inputs_carry_both_size_columns():
+    """A user re-deriving from q9 or q2 needs the size beside the unit."""
+    src = (NIGERIA / '2018-19' / '_' / 'mapping.py').read_text()
+    raw = next(n.value for n in ast.walk(ast.parse(src))
+               if isinstance(n, ast.Assign)
+               and getattr(n.targets[0], 'id', None) == '_W4_RAW')
+    assert {'9c', '2c'} <= set(ast.literal_eval(raw))
+    registry = load_yaml(NIGERIA / '_' / 'derivations.yml')
+    variables = registry['Nigeria::food_acquired::w4-last-purchase-30d']['raw_variables']
+    assert {'s7bq9c', 's7bq2c', 's10bq9c', 's10bq2c'} <= set(variables)
 
 
 # --- the built table: oracle reads the .dta labels directly -----------------

@@ -3585,10 +3585,13 @@ def food_unit_labels(t):
 
 # W3 prints the size in the unit code (20 CONGO SMALL, 21 CONGO LARGE); W4 asks
 # it separately (20 CONGO, then s7bq2c "CONSUMPTION SIZE" 0. SMALL / 2. LARGE).
-# These are W4's codes for the units W3 sizes.  `food_unit_labels` gives each
-# its size-less label, and `sized_food_unit` prefixes the size the row records,
-# in W3's own spelling (GH #1033).  Every (code, size) pair W4 records among
-# these lands on a W3 label; PH's 40 and 120 keep PH's wider or narrower name.
+# These are the W4 codes the `u` table used to label W3's `small ...`, whatever
+# the row's size said.  `food_unit_labels` gives each its size-less label, and
+# `sized_food_unit` prefixes the size the row records, in W3's own spelling (GH
+# #1033).  Every (code, size) pair W4 records among these lands on a W3 label;
+# PH's 40 and 120 keep PH's wider or narrower name.  They are not every unit W3
+# sizes: its card also has 130-132 Sack/Bag, 140-142 Basket, 150-152 Basin and
+# 160-162 Bundle, and W4's Basin and Basket keep a plain label for now (CONTENTS.org).
 W4_SIZED_UNIT_CODES = frozenset((20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120))
 _FOOD_UNIT_SIZES = {0: 'small', 1: 'medium', 2: 'large', 3: 'very large'}
 
@@ -3601,8 +3604,8 @@ def sized_food_unit(unit, size, unit_codes):
     ordinal size is ``'<size> <label>'``.  A blank size, a metric size
     (``30. 20 GRAMS``) or ``99. ONE SIZE ONLY`` asserts no ordinal size and
     leaves the size-less label.  Any other code keeps its plain decode whatever
-    its size says (W3 has no sized ``Loaf``).  A code the round's column does
-    not list is NA, as for :func:`food_unit_labels`.
+    its size says: it was never served a false size.  A code the round's column
+    does not list is NA, as for :func:`food_unit_labels`.
     """
     base = unit.map(unit_codes).astype(object)
     prefix = pd.to_numeric(size, errors='coerce').map(_FOOD_UNIT_SIZES)
