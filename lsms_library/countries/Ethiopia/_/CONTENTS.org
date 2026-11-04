@@ -1923,7 +1923,9 @@ and asserts both.  §12 Q3 (harvest) is NOT read: in W2/W3 every §12
 (holder, crop) pair has a §9 field row (W2 7,399 of 7,399, W3 7,317 of
 7,317 distinct pairs), so Q3 would double-count the harvest §9 serves.
 
-Every §12 line lands in exactly one of EIGHT classes -- the builder
+Every §12 line lands in exactly one of EIGHT classes (seven since GH #1461
+retired =folded key=; see "production_obs and §9 repeat records" below; the
+class numbers in this section are the original eight) -- the builder
 asserts the partition -- counted by =Sect12SaleWarning= (lines /
 positive-value lines / Birr).  *That warning is raised in the wave
 script's =make= subprocess, at BUILD time only: a warm read of the cached
@@ -1987,7 +1989,9 @@ de-duplicates those 52 identical rows (losslessly: =GrainCollapseWarning=
 "destroyed" is 2 before and after) -> *1,390* served rows, one per positive
 class-8 line.  W3: 1,290 -> 1,290 -> 1,283 (7 dropped; no duplicates) ->
 1,283.  W1: 160 throughout.  *Since the 2026-10-23 ruling* the filter
-removes none of them: W2 1,464 -> 1,464 -> 1,412 served (one per positive
+removes none of them (and since GH #1461 the 605 repeat records are gone
+before the sale is attached, so W2's chain is 1,412 -> 1,412 -> 1,412): W2
+1,464 -> 1,464 -> 1,412 served (one per positive
 attached line), W3 1,290 -> 1,290 -> 1,290.
 
 Rules, each the conservative choice where no precedent decides it:
@@ -2027,7 +2031,9 @@ Rules, each the conservative choice where no precedent decides it:
   grain collapse serves the more complete of the two rows, so a fill would
   change WHICH row (and which =harvest_month=) is served for a key that is
   already a =GrainCollapseWarning=.  Found by the frame diff: without this
-  rule one 2015-16 row's =harvest_month= moved 2 -> 12.
+  rule one 2015-16 row's =harvest_month= moved 2 -> 12.  *Retired by GH
+  #1461*: both rows are now served, so nothing chooses between them and the
+  line attaches to its own code's row (W1 2, W3 6 lines; no positive value).
 
 *Measured, cold, development =9a0ed5f3c= -> this change*, through
 =Country('Ethiopia').crop_production()=: 85,519 rows both sides, identical
@@ -2400,7 +2406,9 @@ are genuinely empty and still dropped); W5's 277 wave-parquet rows (32
 positive, 33,482 Birr) serve as 276 (31, 33,382) because two of them are
 the same Gishita plot listed twice in §9, identical but for =intercropped=:
 the core collapse serves one (=GrainCollapseWarning= W5 +1 group, +1 row
-destroyed; the other three waves' reports unchanged).  §12: all 29
+destroyed; the other three waves' reports unchanged; *GH #1461*: those are two
+=crop_id= lines of a crop with a third line, so its sale now attaches to none
+and both no-unit rows leave).  §12: all 29
 positive lines (11,339 Birr) now served; class 7 holds no line with a
 value.  Stamps: =sect12-sale-period= W2 4,463 -> 4,672, W3 4,495 -> 4,557;
 =permanent-crop-12-month-window= W4 3,713 -> 3,796, W5 3,723 -> 3,875.
@@ -2410,6 +2418,125 @@ rows of households =sample()= does not carry; the W4 orphan rate noted under
 +15,180 / +41,442 / +33,382 Birr in W2-W5 (+30 / +7 / +24 / +45
 households); =harvest_kg= and the within-wave =median_price_valuation=
 identical (the added rows carry no quantity).
+
+** production_obs and §9 repeat records (GH #1461, 2026-11-04)
+
+=(t, i, plot_id, j, u)= was not a harvest line: it repeated in 639 groups,
+1,281 rows, and the core collapse removed 642 rows (29 reported as disagreeing;
+W2 2, W3 2, W4 7, W5 18).  The 642 are not one thing, and most of them should
+not come back.
+
+| what the group is                                 |  W1 |  W2 | W3 | W4 | W5 | collapsed rows |
+|---------------------------------------------------+-----+-----+----+----+----+----------------|
+| *the same record listed twice* (W2 =sect9_ph_w2=) |   0 | 604 |  0 |  0 |  0 |            605 |
+| *folded codes*: 52 / 56 / 69 -> 'Leafy Greens'    |   2 |   1 |  4 |  4 |  1 |             12 |
+| *one code on two =crop_id= lines*                 |   0 |   0 |  0 |  6 | 17 |             25 |
+
+(W2's one folded group also holds a repeated record, hence 605 records from 604
++ 1 groups.  A raw census finds 641 groups: 2 W4 groups of lines with no unit,
+no quantity and no sale are removed by the empty-row filter first.)
+
+*The repeats.*  =sect9_ph_w2= ships 605 records identical on all 43 columns
+(crop code 56 kale 524, sorghum 27, potato 26, cabbage 19, coffee 8, tomato 1; 116
+EAs, 434 of 3,240 holders; 4,652 native units, 2,492 kg on the shipped ladder,
+0.07% of the wave).  They are one record listed twice: every pair is adjacent in
+the file, none appears three times, =sect4_pp_w2= lists each of the 605 keys
+exactly once and repeats no key anywhere, and =sect10= / =sect11= / =sect12= /
+=sect3= / =sect7= / =sect9a= ship no whole-row repeat.  That is the multiplicity
+test Niger's s16d repeats passed (dropped) and its s16c repeats lacked (kept,
+unadjudicated); Malawi IHS3 2010-11 drops its repeats by the same rule.
+=crop_production_for_wave= drops the
+repeat on the full raw record before anything is projected, and warns
+(=Sect9RepeatRecordWarning=, build time only).  Like Malawi's and Niger's, the
+drop is not a registered derivation: nothing is constructed, and the one record
+is served.  W1, W3, W4, W5: none.  *=sect5_pp_w2= has 180 such rows; not
+touched, =plot_inputs= reads it.*
+
+*The level.*  =production_obs= is =reported:crop_code:<n>= in W1-W3, whose §9
+files ship no line id and whose crop code is unique within a plot once the
+repeats are gone: W2's =ph_s9q00= / =q0a= / =q0c= / =q0d= only echo parcel, field,
+code and name, and W3's =obs= has no variable label, 251 nulls and repeats within
+a plot (79 rows).  It is =reported:crop_id:<n>= in W4/W5, whose =crop_id= is the
+instrument's "Unique Crop Identifier", never null, unique within a plot.  The
+difference follows the instrument: ESS4 folded W1-W3's §12 tree-crop module into
+§9 and §11 and gave the crop roster a line id.  A crop code is that wave's code
+(GH #1252) and a =crop_id= is a position in that plot's roster: neither token is
+a panel entity.  The builder raises on a repeated coordinate or a served line with
+no id, it does not reduce.
+
+*W4/W5 same-code lines are kept, including the look-alikes.*  13 / 29 groups of
+one code on two or three =crop_id= lines of a plot (6 / 17 of them repeat on the
+served key; the rest differ in unit or are empty).  The §4 roster lists both lines
+in 12 of 13 W4 and 17 of 29 W5 groups, and the answers differ in all but 5 W4 pairs (mango,
+pumpkin) and 1 W5 pair (enset), which are identical on every column but
+=crop_id= (65 + 9 native units), both lines on §4.  With distinct instrument ids
+they are not exact duplicates, and they are served; *whether those 6 pairs are
+double entries is not adjudicated.*
+
+*The sale moved with the grain.*  The SALES GRAIN CAVEAT counted plots.  With two
+lines of one crop on a plot served, that puts one sale on both rows, so §11 and
+§12 now attach a (holder, crop) sale only where it has ONE §9 line
+(=_s9_lines_per_holder_crop=; the Niger GH #1360 rule).  W1-W3 are untouched by
+this: one line per (plot, crop) there.  W4 4 and W5 10 pairs are on several lines
+of one plot; 1 and 7 of them carry a positive sale, 600 + 28,610 Birr.  Base
+served 1,200 + 28,710 Birr of it, because the W4 pair's and a W5 pair's lines
+differ in =u= (or a no-unit row survived on its sale), so those sold twice.  After:
+attached nowhere, like a multi-plot sale (GH #1457's queue).  3 W5 rows with no
+unit and no quantity leave with the sale that was their only content (one Gishita
+pair, 100 Birr; one Pumpkin line, Birr 0): the 2026-10-23 ruling keeps a row
+carrying a sale value, and these no longer carry one.  This is the row the empty-
+row-filter entry above calls "the same Gishita plot listed twice": it has three
+=crop_id= lines, one with a harvest.
+
+*§12's folded-key class is retired* (W1 2, W3 6 lines, no positive value): it
+existed because the collapse chose between the two rows.  They attach to their own
+code's row, served =Value_sold= 0 and stamped =sect12-sale-period=.  W1 §12 lines
+attached and served 563 -> 565, W3 4,559 -> 4,565.
+
+*Measured cold* (private roots, base =659b2479a=, whose Ethiopia tree equals this
+branch's =fdf309523= base; =Country('Ethiopia').crop_production()=):
+
+| wave    | rows before | rows after | =Quantity= before -> after (native) | =Value_sold= before -> after |
+|---------+-------------+------------+-------------------------------------+------------------------------|
+| 2011-12 |       7,744 |      7,746 | 653,661 unchanged                   | 600,749 unchanged            |
+| 2013-14 |      26,520 |     26,521 | 788,633 -> 788,639                  | 3,000,513 unchanged          |
+| 2015-16 |      25,999 |     26,003 | 543,032.35 -> 543,042.35            | 2,490,034 unchanged          |
+| 2018-19 |      14,260 |     14,270 | 209,075.99 -> 209,168.99            | 2,605,209 -> 2,604,089       |
+| 2021-22 |      11,880 |     11,897 | 251,214 -> 251,530                  | 6,973,996.4 -> 6,945,286.4   |
+| total   |      86,403 |     86,437 | +425                                | -29,830                      |
+
+=GrainCollapseWarning= 4 -> 0; quantity reports unchanged (2 / 5 / 3 in W2 / W3 /
+W4).  Every base key is still served but 2 (those 3 W5 rows); on the 34 keys that
+now hold several lines the row base served is one of them, on every non-sale
+column; on the 86,367 one-row keys only 2 =Quantity_sold= and 4 =Value_sold= cells
+move, all in W4/W5, the sale rule above.  Default and =LSMS_BUILD_BACKEND=make= are
+strictly equal (=assert_frame_equal=, raw level domains too), and a fresh-process
+warm read is equal to the cold one, on both sides.
+
+Downstream: =harvest_kg= +70 / +1,480 kg (W4 / W5, 8,799,670 -> 8,801,220) bare and
++7.5 / +400 / +1,524 kg (W3 / W4 / W5, 12,696,657 -> 12,698,590) with the shipped
+factors, rows unchanged at 36,648 / 66,645 (it sums to =(t, i, plot_id, j)=, so
+GH #1460 does not bite here, but it now sums folded codes' lines and two
+=crop_id= lines where the collapse kept one).  =yield_kg(on='plot')= 31,632 /
+54,882 rows both, W4/W5 means +0.01% / +0.08%.  =gross_crop_revenue= W4 -1,120 and
+W5 -28,710 Birr; W5 1,410 -> 1,408 households.  Within-wave
+=median_price_valuation(['v'], item_keys=('t','j'))= of shipped kg: W1/W2
+identical, W3 +37, W4 +5,955, W5 -227,021 Birr (-0.49%); valued rows +1 / +8 / +13.
+=Feature('crop_production')(['Ethiopia','Niger','GhanaSPS'])=: Ethiopia 86,437
+(=Country='s count), Niger 47,416 and GhanaSPS 25,109 unchanged, no grain warning.
+Registered derivations join: every stamped row's =(t, i, j)= is in
+=derivation_inputs=; =sect12-sale-period= 9,773 -> 9,781, =permanent-crop-12-month-window=
+7,671 -> 7,680 (a permanent crop's second line).
+
+*Cache.*  Editing =ethiopia.py= and =data_scheme.yml= moved every Ethiopia hash
+(=_table_cache_hash= 25 of 25, =Wave._input_hash= 125): one Ethiopia re-warm.
+Niger 0 of 23, Tanzania 0 of 25, Malawi 0 of 26, EthiopiaRHS 0 of 18,
+=build_transforms_fingerprint= 0 of 39.
+
+*Open, not done here.*  =planting_month= and the §4 permanent flag still join on
+(plot, code), so a second same-code line takes the first §4 line's month; §4 lists a
+different month in 4 W5 groups.  =crop_id= does not settle it: 31 / 163 §9 lines have
+no §4 line of that =crop_id= and 65 / 91 name another code.
 
 ** Crop-side WB conversion factors: held, unwired (2026-09-09)
 
