@@ -2546,8 +2546,8 @@ from an earlier crosswalk; it was not traced.
   the first Mali yields.
 - *FLAGGED, NOT FIXED: the yield tail is a plot_features question.*  2018-19 runs to p99 367,800
   and a maximum of 12,500,000 kg/ha.  The top decile's median area is 0.01 ha, against 0.6 to 2.0
-  in the rest.  All 358 plots under 0.01 ha are farmer estimates in m^2 (median stated value 50
-  m^2), as are 88 of 95 in 2021-22; no GPS plot of 2018-19 is that small.  Whether those were
+  in the rest.  All 358 plots under 0.01 ha are farmer estimates in m^2 (the median m^2 answer of
+  the wave is 50), as are 88 of 95 in 2021-22; no GPS plot of 2018-19 is that small.  Whether those were
   answered in the wrong unit was not established.  Site Q does not see it: it screens =Quantity=.
 - *Site Q*: 3 of 7,992 in 2018-19, all cotton (=Sac (100 Kg)= 9,000, =Tonne= 1,600 and 1,400, at
   147 to 225 x the reference), and 0 in 2021-22.  *Site B*: =planting_month=, =harvest_month= and
@@ -2563,8 +2563,8 @@ from an earlier crosswalk; it was not traced.
   3,064 of 7,992 rows in 2018-19 and 5,213 of 7,317 in 2021-22 (7,264 and 6,607 on the food labels of
   any wave).  The rest is cotton and its like, and foods that EHCVM names by form: =Riz= has no EHCVM food row.
 - *On a 2021-22 keyed row*: 51 of 1,070 also have a harvest =Quantity=, and on 32 of those =u= and
-  =Unit_sold= agree.  68 of 2,857 crop households have a Farm-level row, and its value is mostly
-  cotton (20 of the 70 rows).
+  =Unit_sold= agree.  68 of 2,857 crop households have a Farm-level row, and that value is mostly
+  cotton (20 of the 70 rows, 17.5M of 24.3M FCFA).
 
 Tests: =tests/test_gh824_mali_ehcvm_crop_production.py=, with an oracle that reads the =.dta=
 files and imports nothing from this directory.
