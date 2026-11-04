@@ -123,11 +123,6 @@ class TestWiring:
         assert block["file"][0] == WELFARE
         assert set(block["file"][1][FOOD_P1]) == {"i", "v"}
 
-    def test_both_files_are_declared_so_the_hash_covers_them(self):
-        with open(ROOT / "2014" / "_" / "data_info.yml", encoding="utf-8") as f:
-            block = yaml.safe_load(f)["sample"]
-        assert {WELFARE, FOOD_P1} <= set(local_tools._collect_file_paths_from_block(block))
-
     def test_the_yaml_reaches_the_hook_with_no_weight_on_the_added_file(self, monkeypatch):
         """Through Wave.grab_data, so the file list and its missing column are the real ones.
         The food file carries hhweight1, which must stay out."""

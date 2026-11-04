@@ -2912,7 +2912,12 @@ leaves out: =v= = =zd=, =weight= NA, on Ethiopia's #1359 pattern.  Do not borrow
 after the welfare file, and the =sample= hook in =2014/_/mapping.py= keeps the welfare rows
 unchanged and first, then appends one row per household the welfare file lacks.  As in
 Ethiopia, a household's item rows must agree before they are reduced, and nothing is guessed.
-It stays on the YAML path, so the food file's sidecar is in the hash.
+
+*A gap in the hash, not fixed here.*  =local_tools._collect_file_paths_from_block= yields only
+the plain-string members of a =file:= list, so a member with a per-file override (the form the
+food file takes here, and =Cross_Section/...= in 2021-22) is not in =Wave._input_hash=.  A new
+release of the p1 food file would rebuild =food_acquired=, where it is a plain string, and not
+=sample=.  It is a framework matter, reported separately: 24 such entries in 6 wave files.
 
 *Why that file and not the logement one.*  Logement holds the same 10,800 households at
 household grain, but it has no =strate=, and the food file does.  The food file writes the
