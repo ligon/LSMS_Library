@@ -446,6 +446,12 @@ class CountryCatalog:
         return bool(re.search(self.idno_pattern, str(entry.get("idno", ""))))
 
 
+# A regional entry the catalog tags with several countries is not one country's
+# wave: LSMS-HBI (WB 8591, ``AFR_2014-2024_LSMS-HBI_v01_M``) surfaced as a missing
+# wave of Ethiopia, Malawi, Nigeria and Uganda.  It is held whole under
+# ``Harmonized_LSMS-HBI``.  Tanzania's series pin already excludes it.
+_NOT_REGIONAL = r"^(?!AFR_)"
+
 _COUNTRY_CATALOG: dict[str, CountryCatalog] = {
     "Afghanistan": CountryCatalog("AFG"),
     "Albania": CountryCatalog("ALB"),
@@ -468,7 +474,7 @@ _COUNTRY_CATALOG: dict[str, CountryCatalog] = {
     "Cambodia": CountryCatalog("KHM"),
     "China": CountryCatalog("CHN"),
     "CotedIvoire": CountryCatalog("CIV"),
-    "Ethiopia": CountryCatalog("ETH"),
+    "Ethiopia": CountryCatalog("ETH", idno_pattern=_NOT_REGIONAL),
     # GHA is shared: GLSS (Living Standards Survey) vs GSPS (Socioeconomic
     # Panel Survey).  Without the idno filter each sees the other's waves.
     "GhanaLSS": CountryCatalog("GHA", idno_pattern=r"_GLSS"),
@@ -492,12 +498,12 @@ _COUNTRY_CATALOG: dict[str, CountryCatalog] = {
     # two axes are distinct and this entry is where they visibly diverge.
     "Liberia": CountryCatalog("LBR", idno_pattern=r"_(HIES|NHFS)_",
                               repositories=("lsms", "central")),
-    "Malawi": CountryCatalog("MWI"),
+    "Malawi": CountryCatalog("MWI", idno_pattern=_NOT_REGIONAL),
     "Mali": CountryCatalog("MLI"),
     "Nepal": CountryCatalog("NPL"),
     "Nicaragua": CountryCatalog("NIC"),
     "Niger": CountryCatalog("NER"),
-    "Nigeria": CountryCatalog("NGA"),
+    "Nigeria": CountryCatalog("NGA", idno_pattern=_NOT_REGIONAL),
     "Pakistan": CountryCatalog("PAK"),
     "Panama": CountryCatalog("PAN"),
     "Peru": CountryCatalog("PER"),
@@ -535,9 +541,13 @@ _COUNTRY_CATALOG: dict[str, CountryCatalog] = {
     "Tanzania_Kegera": CountryCatalog("TZA", idno_pattern=r"_KHDS"),
     "Timor-Leste": CountryCatalog("TLS"),
     "Togo": CountryCatalog("TGO"),
-    "Uganda": CountryCatalog("UGA"),
+    "Uganda": CountryCatalog("UGA", idno_pattern=_NOT_REGIONAL),
 
     # --- Not World Bank datasets -------------------------------------------
+    # A harmonized five-country dataset derived from LSMS-ISA waves, not a wave of
+    # any one country.  The catalog has no code for the set, so it is searched
+    # through one member (MWI) and pinned by the series.
+    "Harmonized_LSMS-HBI": CountryCatalog("MWI", idno_pattern=r"_LSMS-HBI_"),
     "EthiopiaRHS": CountryCatalog(
         None, discoverable=False,
         reason="Ethiopian Rural Household Survey is an IFPRI/Addis Ababa "
