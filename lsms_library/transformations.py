@@ -2453,6 +2453,10 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
     EHCVM row lacks a size; :data:`_UNIT_SIZE_WORDS` has the measurement.  Every
     other label is its own cell and no second estimate is made.
 
+    ONE NUMBER PER ``(j, u)`` OF THE FRAME.  So it is one number per country only
+    if the frame holds the whole country, which is what ``serve_waves`` is for
+    (GH #1487): ``Country`` passes every wave and names the ones it serves.
+
     WHAT THIS DOES NOT FIX, stated where a user will meet it.  The only
     external answer key the corpus has for a food unit is Mali's own
     questionnaire, and against it the corrected inference is BETTER and still

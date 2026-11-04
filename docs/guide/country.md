@@ -50,6 +50,8 @@ Pass `waves=` to load a subset of survey rounds:
 recent = uga.food_expenditures(waves=['2018-19', '2019-20'])
 ```
 
+In a kilogram mode (`food_quantities()`, `food_prices()`, and `food_prices(units='kgprice')`) `waves=` selects what is served, not what the kg factors are estimated from: they read every wave, so the result is the all-waves result restricted to those waves. That read costs what an all-waves read costs, and on a cold cache it builds every wave of `food_acquired`.
+
 ### Adding a Market Index
 
 For demand-system estimation, add a region-level market identifier:
