@@ -209,8 +209,10 @@ class TestRules:
 
 
 def test_an_unfetchable_gps_file_leaves_the_wave_without_gps(monkeypatch):
-    """`df_geo` is a soft sub-df (GH #515): losing the 2018-19 file costs optional
-    columns only, so the wave still builds, with no coordinate and no key."""
+    """`df_geo` is a soft sub-df (GH #515) for the failures that handler catches,
+    `FileNotFoundError` among them: those cost optional columns only, so the wave
+    builds with no coordinate and no key.  This does not cover an unreachable
+    remote, which raises `EndpointConnectionError`, outside that handler."""
     monkeypatch.setenv("LSMS_NO_CACHE", "1")
     cover = pd.DataFrame({"grappe": [2, 2, 586], "menage": [1, 2, 1],
                           "s00q01": ["Centre", "Centre", "Est"],
