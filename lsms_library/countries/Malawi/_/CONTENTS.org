@@ -5037,6 +5037,9 @@ those households has another Module P row with a plot.  Cold builds, development
 | =harvest_kg= rows                |    18,054 |    18,066 |
 | =harvest_kg= total, kg           | 8,168,581 | 8,171,321 |
 
+Those =harvest_kg= rows were measured before GH #1460 kept its crop axis; with it, all waves,
+92,745 -> 92,762 rows, and the kg gained is the same 2,740.
+
 Every other column of every row is digest-equal in all four waves; =crop_diversity=,
 =gross_crop_revenue=, =yield_kg(on='plot')= and the sale-basis ladder are unchanged.
 
