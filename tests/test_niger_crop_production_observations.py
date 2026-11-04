@@ -43,7 +43,8 @@ from lsms_library.paths import countries_root
 COUNTRY = "Niger"
 TABLE = "crop_production"
 WAVES = ("2011-12", "2014-15", "2018-19", "2021-22")
-INDEX = ["t", "i", "plot_id", "crop", "u", "production_obs"]
+# `condition` added by GH #1436 (tests/test_niger_crop_production_condition.py).
+INDEX = ["t", "i", "plot_id", "crop", "u", "condition", "production_obs"]
 
 #: Served rows per wave, cold rebuild after GH #1360 (before: 11,937 / 8,799
 #: / 13,717 / 11,923 = 46,376).

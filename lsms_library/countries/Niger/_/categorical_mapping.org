@@ -1217,6 +1217,57 @@
 |   10 | Guinea Fowl     |
 |   11 | Other Poultry   |
 
+# harmonize_crop_condition_{ehcvm1,ehcvm2} (GH #1436): "Etat du produit", the
+# physical state of the crop when the reported harvest quantity was measured --
+# the canonical `condition` index level of crop_production (lsms_library/
+# data_info.yml, Columns > crop_production > condition).  EHCVM only: 2018-19
+# s16cq12c, 2021-22 s16cq16d.  Neither ECVMA harvest module asks a state
+# question (2E.7a/7b/7c are quantity, unit, kilograms), so niger.py serves
+# `unknown_condition` there, as it does for a blank or off-scheme code.
+#
+# WHY TWO CODE-KEYED TABLES (the harmonize_species_{ecvma,ehcvm} shape): the code
+# lists COLLIDE across the waves -- 3 is Decortique in 2018-19 and `na` in
+# 2021-22 -- so one code-keyed table cannot serve both, and the labels are no
+# better a key (2021-22 code 1 carries a trailing comma, and 2018-19's code 5 is
+# labelled differently by the .dta and by the questionnaire).  Source Label is
+# the .dta value label, provenance only; the readers use Code + Preferred Label.
+#
+# A FORM AXIS WITH NO DRYNESS AXIS, as in Malawi: the instrument never asks
+# whether the crop was dry, so these are the bare form tokens and NOT
+# `dried_grain` / `dried_with_shell`, which would assert a dryness nobody
+# recorded.
+#
+# RULED, @ligon 2026-11-04 (GH #1436): 2018-19's five answers fold onto the three tokens
+# the way Niger's and Senegal's 2021-22 instruments folded them -- ear and
+# hull (Epis, Non-decortique) into `epis/coques`, grain and hulled (Grain,
+# Decortique) into `Grains`; Burkina Faso's and Mali's 2021-22 keep all five.
+# The level no longer separates what the 2018-19 answer did: `unshelled` is Epis
+# 6,482 + Non-decortique 904 lines, `shelled` is Grain 3,715 + Decortique 1,763.
+# The answer itself is served in the column `condition_native`, and the fold costs
+# no index collision, because the wave's (plot, crop, unit) key is unique without
+# this level.  Evidence: CONTENTS.org, "crop_production: the condition level".
+#
+# Code 5 of 2018-19: the .dta says "Non concerne", the EHCVM household
+# questionnaire template says "Entier".  Both describe the crops that actually
+# carry it (onion, okra, roselle, tomato, cassava: a whole product with no shell
+# to speak of), so both land on `shell_not_applicable`, a survey ANSWER and not
+# the missing-data sentinel `unknown_condition`.
+#+NAME: harmonize_crop_condition_ehcvm1
+| Code | Preferred Label      | Source Label   |
+|------+----------------------+----------------|
+|    1 | unshelled            | Epis           |
+|    2 | shelled              | Grain          |
+|    3 | shelled              | Décortiqué     |
+|    4 | unshelled            | Non-décortiqué |
+|    5 | shell_not_applicable | Non concerné   |
+
+#+NAME: harmonize_crop_condition_ehcvm2
+| Code | Preferred Label      | Source Label |
+|------+----------------------+--------------|
+|    1 | unshelled            | épis/coques, |
+|    2 | shelled              | Grains       |
+|    3 | shell_not_applicable | na           |
+
 # harmonize_education (GH #171): Niger per-country delta on the global ordinal
 # base (categorical_mapping/harmonize_education.org, row-additive).  Covers BOTH
 # of Niger's education vocabularies: the EHCVM waves (2018-19, 2021-22) raw French
