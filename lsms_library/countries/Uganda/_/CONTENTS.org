@@ -245,6 +245,10 @@ frame carrying =v= across them:
    | 2009-10 -> 2010-11    | 1,819 / 2,647   | 2,207 / 2,647 (83.4%)  |
    | 2010-11 -> 2011-12    | 0 / 2,510       | 2,510 / 2,510 (100%)   |
 
+   (/Measured cold 2026-11-04/: the first two rows stand, and the last is now
+   2,510 / 2,540.  The other 30 are on 2011-12's =AGSEC1= only and carry the
+   =unlocated-= singleton of GH #1120 D2, which is no change of cluster.)
+
    Every remaining non-keeper is a 2009-10 =@lat,lon= bin or no-=v= household
    (defect 2).  Served distinct =v=: 2009-10 656 -> 656 (317 EAs now 8-digit,
    339 bins and 24 NA untouched), 2010-11 324 -> 322, 2005-06 / 2011-12
@@ -477,10 +481,11 @@ household-level column for every Uganda wave (it reads the same
 → Central fold in 2009-10 and 2010-11 where applicable).
 
 Practical consequence: =Country('Uganda').sample()[['v','Region']]=
-is complete for every household; joining =Region= from =sample()=
-— rather than =cluster_features()= — avoids dropping the 565
-movers/split-offs from any =(i, t, m)=-keyed regression where =m=
-is derived from Region.  Recommended pattern:
+holds =Region= for every household a cover records it for; joining it from
+=sample()= — rather than =cluster_features()= — keeps the 565
+movers/split-offs in any =(i, t, m)=-keyed regression where =m=
+is derived from Region.  It is not complete: 130 of 24,561 rows have none
+(next subsection, and the audit caveat below).  Recommended pattern:
 
 #+begin_src python
 uga = ll.Country('Uganda')
@@ -495,8 +500,9 @@ cluster-level view (e.g., summarising EAs); use =sample()[['Region']]=
 when you want every surveyed household covered.
 
 Audit caveat (2026-09-16): =sample(waves=['2019-20'])= returns 3,098
-households, of which three have missing =Region=. Thus the blanket
-completeness statement above does not hold for every source record, even
+households, of which three have missing =Region=. (Since GH #1120 D2 so do 4 in
+2009-10, 57 in 2011-12 and 66 in 2018-19, the =unlocated-= households on no
+cover.)  Thus no blanket completeness statement holds for every source record, even
 when the household-level join avoids the known mover problem. The
 [[file:../../../../SkunkWorks/aggregation/evaluation.org::*Uganda observation patterns][food aggregation simulation]] reports these three explicitly and uses the
 remaining 3,095 households; it doesn't infer their Region from a cluster.
@@ -1386,7 +1392,8 @@ neither is a bug we can configure away:
    in 2015-16 / 2018-19 / 2019-20 (70 in 2013-14).
 
 For a per-household answer use =sample()=, which carries exact
-household-level =Rural= and =Region= for every household.
+household-level =Rural=, =Region= and (GH #1441) =District= for every household
+whose cover records them.
 
 *Parish disclosure (GH #689).* The =data_scheme.yml= =cluster_features=
 block also states this grain distinction so a reader does not mistake its
@@ -4689,6 +4696,18 @@ source-observation/grain decision; no =input_obs= axis is added here.
 The existing conditional null-key loss, reducers, units, plot construction,
 weights and second-season seed coverage gap remain. This does not resolve
 #829 WAITING, #647 PART-harvest additivity or the 2019 panel-weight questions.
+
+* =unknown_plot= and =harvest_kg=: GH #1460 (noted 2026-11-04, not fixed here)
+
+=transformations.harvest_kg= groups at =(t, i, plot_id, j)=, so it pools a household's
+=unknown_plot= rows of one crop as if they were one plot, which the canonical
+=data_info.yml= consumer rule says they are not.  It also sums across =condition=.
+Measured at this branch: 403 =crop_production= rows are =unknown_plot= (2009-10 360,
+2011-12 43), 75 household-wave-crops hold more than one, and they reduce to 227
+=Harvest_kg= rows, 70,277 of 42.1M kg (0.17%).  Uganda's crop level is named =j=, so
+#1460's first defect, summing across crops, does not reach this country; the
+=condition= sum and this pooling do.  =plot_inputs= holds 136 =unknown_plot= rows and
+=plot_labor= 141.
 
 * GH1120 locating covers and singletons (2026-10-30, independent review pending)
 

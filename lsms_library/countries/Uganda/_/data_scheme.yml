@@ -339,11 +339,13 @@ Data Scheme:
     #            gap that the level now makes visible rather than hiding.
     #
     # This grain is still NOT complete, and saying so here is the point of the
-    # comment.  With `season` the builder returns 84,216 of the 84,489 rows it
-    # constructs; the other 273 are still discarded by its de-dup step — 135
-    # DELETED outright by `groupby(dropna=True)` because `plot_id` is NaN (130 in
-    # 2009-10, 5 in 2011-12), and 138 merged away by collapsing 135 duplicate
-    # groups.  Every one of those 135 groups is `input='Seed'`: two AGSEC4A
+    # comment.  With `season` the builder returns 84,351 of the 84,489 rows it
+    # constructs; the other 138 are merged away by its de-dup step, collapsing 135
+    # duplicate groups.  (Measured 2026-11-04.  On 2026-07-21 it returned 84,216,
+    # because 135 rows with a NaN `plot_id`, 130 in 2009-10 and 5 in 2011-12, were
+    # DELETED by `groupby(dropna=True)`; since GH #1120 D3 they are kept as
+    # `plot_id='unknown_plot'`.)  Every one of the 135 duplicate groups is
+    # `input='Seed'`: two AGSEC4A
     # plot-crop rows for the same (plot, crop), i.e. a missing "which AGSEC4A
     # row" identifier — the same defect one level down.  8 of them (all
     # 2011-12) sum two or three reported quantities.  Measured cold

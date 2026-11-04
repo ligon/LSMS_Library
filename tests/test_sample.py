@@ -691,6 +691,10 @@ class TestUganda2009MarketFallback:
           ``roster_to_characteristics``.  Sample carried a valid
           Region for those HHs all along, so they're correctly
           assignable to a market.
+        - 2026-10-30 (GH #1120 D2): the pin stands, the mechanism does not.
+          Those 24 now carry their own ``v == 'unlocated-{hhid}'``, so no Uganda
+          household reaches the ``'Mover'`` sentinel.  ``sample`` itself holds
+          2,979: the 4 it gained are on no cover and have no roster.
 
         Any further drift in either direction is meaningful: investigate
         before re-pinning.
@@ -701,8 +705,9 @@ class TestUganda2009MarketFallback:
         hh09 = _labelled_households(hc, "2009-10")
         assert hh09 == 2975, (
             f"household_characteristics(market='Region') retained {hh09} HH "
-            f"in 2009-10 — expected exactly 2975 (full sample including "
-            f"mover HHs with v='Mover'; GH #268).  Drift in either "
+            f"in 2009-10 — expected exactly 2975 (every roster household, including "
+            f"the 24 with neither comm nor GPS, whose v is 'unlocated-{{hhid}}'; "
+            f"GH #1120 D2).  Drift in either "
             f"direction is meaningful: investigate before re-pinning."
         )
 
