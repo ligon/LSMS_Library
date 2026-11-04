@@ -7,9 +7,12 @@ from lsms_library.transformations import (
     food_acquired_to_canonical as _food_acquired_canonical)
 
 from lsms_library.ehcvm import (
+    UnitSizeLabelError,
     derivation_key as _derivation_key,
     food_acquired_ehcvm as _food_acquired_ehcvm,
     inputs_last_purchase as _inputs_last_purchase,
+    served_unit_labels as _served_unit_labels,
+    sized_unit as _sized_unit,
 )
 
 # GH #876.  The wide frame's `Expenditure` used to be `s07bq08`, the value of
@@ -223,6 +226,13 @@ _PRICE_PRODUCT_LABELS = {
     '143': 'Sucre en carreaux', # v2 p15 / v1 p16
 }
 _PRICE_UNIT_LABELS = {'1161': 'Canari-petit'}  # v2 p17, BOISSONS
+#: Priced units the read-time `u` table folds onto another priced unit.  The
+#: community side keeps them apart (#1453 ruling, 2026-11-04): a tomato tin is
+#: not a tin, whatever the household table does with it.
+_PRICE_UNFOLDED_UNITS = frozenset({103, 108, 140, 141})
+#: Codes served in the form's own word: 1040's label is not unit 104's (`Avec os
+#: en tas`), and 1400 keeps the spelling the read-time `u` table does not fold.
+_PRICE_FORM_BASE = {1040: 'Avec os au kg', 1400: 'Sans os au kg'}
 COMMUNITY_PRICES_DERIVATION = 'Burkina_Faso::community_prices::quoted-native-unit-count'
 _PRICE_INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
 _PRICE_SOURCE = 's05_co_bfa2018.dta'
@@ -234,13 +244,68 @@ def _price_labels(categories, name):
             if pd.notna(label) and str(label).strip()}
 
 
+def _price_u_by_code(unit_codes, community_categories, household_categories):
+    """{code: u}, the household's sized form by code, with nothing folded.
+
+    A size-free unit is served bare and a sized one `<unit> (<Size>)`, composed
+    as ehcvm.carry_unit_size composes food_acquired.u: the household's label for
+    the unit (its value label, else the ehcvm_units codebook data_info.yml
+    decodes it with), the read-time u table, ehcvm.sized_unit. So a price joins
+    the household row in the same unit and size (#1453 ruling, 2026-11-04).
+    Three kinds of code stay out of that composition:
+    - a unit the table folds onto another priced unit keeps its own label
+      (_PRICE_UNFOLDED_UNITS);
+    - a code no label names stays opaque: 1001 is NOT inferred to be Kg (Petit);
+    - a labelled code whose unit nobody labels (2540 Demi, 2550 Entier) keeps
+      its label, which assumes no physical mass.
+    No two units or sizes may share a label: that would be a fold, and it raises.
+    Identity survives regardless in variety and SourceUnitCode.
+    """
+    from lsms_library.paths import countries_root
+    path = countries_root() / 'Burkina_Faso'
+    codebook = tools.get_categorical_mapping(
+        tablename='ehcvm_units', idxvars='Code',
+        dirs=[str(path / '2018-19' / '_'), str(path / '_')],
+        **{'Preferred Label': 'Preferred Label'})
+    s05_units = _price_labels(community_categories, 's05q02')
+    hh_units = _price_labels(household_categories, 's07bq03b')
+    hh_sizes = _price_labels(household_categories, 's07bq03c')
+
+    def raw_unit(unit):
+        return str(hh_units.get(str(unit), codebook.get(str(unit), ''))).strip() or None
+
+    codes = [str(code) for code in unit_codes]
+    raw = sorted({raw_unit(int(code) // 10) for code in codes} - {None})
+    served = dict(zip(raw, _served_unit_labels('Burkina_Faso', raw)))
+    out, source = {}, {}
+    for code in codes:
+        label = s05_units.get(code, _PRICE_UNIT_LABELS.get(code))
+        unit, size = divmod(int(code), 10)
+        base = raw_unit(unit)
+        if label is None:
+            out[code] = f'Unknown [Burkina_Faso 2018-19 s05q02={code}]'
+        elif base is None:
+            out[code] = label.strip()
+        else:
+            if int(code) in _PRICE_FORM_BASE:
+                base = _PRICE_FORM_BASE[int(code)]
+            elif unit not in _PRICE_UNFOLDED_UNITS:
+                base = served[base]
+            word = hh_sizes.get(str(size)) or (label.rsplit('-', 1)[-1] if size else None)
+            out[code] = _sized_unit(base, word)
+            if source.setdefault(out[code], (unit, size)) != (unit, size):
+                raise UnitSizeLabelError(f"Burkina_Faso s05: {source[out[code]]} and "
+                                         f"{(unit, size)} would both be served {out[code]!r}")
+    return out
+
+
 def _price_base(codes, community_categories, household_categories):
     """Native priced-line identity before slot expansion (ledger1226 §§3–5).
 
     j follows this country's household Original Label crosswalk by product
-    code. Full community unit-size labels supply u; no digit decomposition
-    or guessed kg factor is used. variety is a constructed source coordinate,
-    NOT an answer about physical variety. Raw codes remain available too.
+    code. u is the household's sized form by code (_price_u_by_code); no kg
+    factor is guessed. variety is a constructed source coordinate, NOT an
+    answer about physical variety. Raw codes remain available too.
     """
     from lsms_library.paths import countries_root
     path = countries_root() / 'Burkina_Faso'
@@ -257,7 +322,7 @@ def _price_base(codes, community_categories, household_categories):
         raise ValueError('Burkina s05 has missing native observation keys; cannot discard them')
     community_items = _price_labels(community_categories, 's05q01')
     household_items = _price_labels(household_categories, 's07bq01')
-    community_units = _price_labels(community_categories, 's05q02')
+    u_by_code = _price_u_by_code(unit.unique(), community_categories, household_categories)
 
     def description(code):
         return community_items.get(code, _PRICE_PRODUCT_LABELS.get(
@@ -267,15 +332,9 @@ def _price_base(codes, community_categories, household_categories):
         raw = household_items.get(code, description(code))
         return str(item_map.get(raw, raw)).strip()
 
-    def sized_unit(code):
-        # In particular1001 is NOT inferred to be Kg(Petit). Codes2540/2550
-        # keep their own Demi/Entier labels, not an assumed physical mass.
-        return community_units.get(code, _PRICE_UNIT_LABELS.get(
-            code, f'Unknown [Burkina_Faso 2018-19 s05q02={code}]')).strip()
-
     return pd.DataFrame({
         't': '2018-19', 'v': v, 'j': product.map(item).astype('string'),
-        'u': unit.map(sized_unit).astype('string'),
+        'u': unit.map(u_by_code).astype('string'),
         'variety': ('s05q01=' + product + ';s05q02=' + unit).astype('string'),
         'visit': visit, 'Description': product.map(description).astype('string'),
         'SourceProductCode': product, 'SourceUnitCode': unit,

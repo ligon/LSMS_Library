@@ -1,14 +1,19 @@
-"""Own Burkina PRICE instrument, literal inputs only; no source/API builds."""
+"""Own Burkina PRICE instrument: synthetic inputs, plus a `requires_s3` oracle.
+
+Community `u` is the household's sized form, with no folding (#1453 ruling).
+The `requires_s3` tests read the raw file and import nothing from `countries/`.
+"""
 import importlib.util
 import runpy
 import sys
+import warnings
 
 import numpy as np
 import pandas as pd
 import pytest
 
 from lsms_library import local_tools as tools
-from lsms_library.ehcvm import community_price_slots
+from lsms_library.ehcvm import UnitSizeLabelError, carry_unit_size, community_price_slots
 from lsms_library.paths import countries_root
 
 KEY = 'Burkina_Faso::community_prices::quoted-native-unit-count'
@@ -37,6 +42,11 @@ def source():
 COMMUNITY = {'s05q01': {5: 'Maïs en épi', 6: 'Maïs en grain'},
              's05q02': {1000: ' Kg ', 1030: 'Avec os au Kg'}}
 HOUSEHOLD = {'s07bq01': {5: 'Maïs en épi', 6: 'Maïs en grain'}}
+#: The household's unit and size value labels, as the 2018-19 file ships them:
+#: only some units are labelled, and the ehcvm_units codebook decodes the rest.
+SIZED = {**HOUSEHOLD,
+         's07bq03b': {100: 'Kg', 107: 'Boite', 108: 'Boîte de tomate', 143: 'Tas', 147: 'Unite'},
+         's07bq03c': {0: 'Taille unique', 1: 'Petit', 2: 'Moyen', 3: 'Grand'}}
 
 
 def exact_numbers(actual, values):
@@ -100,8 +110,9 @@ def test_source_product_dictionary_precedes_capi_and_uses_household_map(mapping)
     assert set(out.index.get_level_values('j')) == {'Maïs en épi'}
 
 
+# 1161 re-pinned from 'Canari-petit': the #1453 ruling respells community u.
 @pytest.mark.parametrize('code,expected', [
-    (1161, 'Canari-petit'),
+    (1161, 'Canari (Petit)'),
     (1001, 'Unknown [Burkina_Faso 2018-19 s05q02=1001]'),
     (9998, 'Unknown [Burkina_Faso 2018-19 s05q02=9998]'),
 ])
@@ -113,14 +124,53 @@ def test_unit_fallbacks_do_not_infer_digits_or_mass(mapping, code, expected):
     assert out.SourceUnitCode.tolist() == [str(code)] * 2
 
 
+# 1161 re-pinned to 2560: 116 is labelled by the codebook, so since the #1453
+# ruling it takes the household's form; only a unit nobody labels keeps its label.
 @pytest.mark.parametrize('code,label', [(2540, 'Demi'), (2550, 'Entier'),
-                                        (1161, 'Source full-size label')])
+                                        (2560, 'Source full-size label')])
 def test_reported_complete_unit_label_wins_without_base_substitution(mapping, code, label):
     codes = source().iloc[:1].copy()
     codes['s05q02'] = code
     cats = {**COMMUNITY, 's05q02': {code: label}}
     out = mapping.community_prices_s05(codes, cats, HOUSEHOLD)
     assert set(out.index.get_level_values('u')) == {label}
+
+
+@pytest.mark.parametrize('code,label,expected', [
+    (1431, 'Tas - petit', 'Tas (Petit)'),                  # the household's sized form
+    (1071, 'boite - petit', 'Boîte (Petit)'),              # through the read-time table
+    (1471, 'Unite - petit', 'Unité (Petit)'),
+    (1450, 'Tine', 'Tine'),                                # size-free: bare
+    (1061, 'Bidon - petit', 'Bidon (Petit)'),              # no household label: the codebook
+    (1131, 'B*outeille - petit', 'Bouteille (Petit)'),     # the codebook, not the form's typo
+    (1081, 'Boîte de tomate - petit', 'Boîte de tomate (Petit)'),  # not folded onto Boîte
+    (1413, 'Sans os au tas - grand', 'Sans os au tas (Grand)'),    # not folded onto Tas
+    (1040, 'Avec os au kg', 'Avec os au kg'),              # the form's word, not unit 104's
+    (1400, 'Sans os au kg', 'Sans os au kg'),              # the spelling the table leaves alone
+])
+def test_u_is_the_households_sized_form_and_nothing_is_folded(mapping, code, label, expected):
+    got = mapping._price_u_by_code([str(code)], {'s05q02': {code: label}}, SIZED)
+    assert got == {str(code): expected}
+
+
+@pytest.mark.parametrize('code,unit,size', [(1431, 'Tas', 'Petit'), (1071, 'Boite', 'Petit'),
+                                            (1471, 'Unite', 'Grand')])
+def test_u_is_what_the_household_side_serves(mapping, code, unit, size):
+    # The rule of the ruling: the same composition as food_acquired.u.  (1471 is
+    # the code's own unit; the size here is the household's word for its digit.)
+    frame = pd.DataFrame({'Quantity': [1.0]},
+                         index=pd.MultiIndex.from_tuples([('i', unit)], names=['i', 'u']))
+    household = carry_unit_size(frame, [size], 'Burkina_Faso').index.get_level_values('u')[0]
+    assert household == f"{household.split(' (')[0]} ({size})"
+    code = code if size == 'Petit' else code + 2
+    got = mapping._price_u_by_code([str(code)], {'s05q02': {code: 'x - y'}}, SIZED)
+    assert got[str(code)] == household
+
+
+def test_two_units_sharing_a_label_raise(mapping, monkeypatch):
+    monkeypatch.setattr(mapping, '_served_unit_labels', lambda c, v: ['Tas' for _ in v])
+    with pytest.raises(UnitSizeLabelError, match='would both be served'):
+        mapping._price_u_by_code(['1431', '1071'], {'s05q02': {1431: 'a', 1071: 'b'}}, SIZED)
 
 
 def test_unknown_recorded_product_remains_opaque_and_identifiable(mapping):
@@ -240,3 +290,48 @@ def test_actual_finalizer_preserves_native_coordinates_after_u_coalescence(mappi
     inputs = resolve_callable(record.inputs)()
     pd.testing.assert_frame_equal(inputs.reset_index()[list(codes)], codes)
     assert 'Quantity' not in inputs and 'i' not in inputs.index.names
+
+
+# ---------------------------------------------------------------------------
+# Against the held file.  The oracle reads the raw source and imports nothing
+# from countries/.
+# ---------------------------------------------------------------------------
+@pytest.mark.requires_s3
+class TestHeldFile:
+    @pytest.fixture(scope='class')
+    def raw(self):
+        data = countries_root() / 'Burkina_Faso' / '2018-19' / 'Data'
+        return tools.get_dataframe(data / 's05_co_bfa2018.dta', convert_categoricals=False)
+
+    @pytest.fixture(scope='class')
+    def served(self):
+        import lsms_library as ll
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            return ll.Country('Burkina_Faso').community_prices(waves=['2018-19'])
+
+    def test_every_recorded_price_is_served_under_its_code(self, raw, served):
+        long = pd.concat([raw[['s05q02', 's05q03']].rename(columns={'s05q03': 'p'}),
+                          raw[['s05q02', 's05q04']].rename(columns={'s05q04': 'p'})])
+        long['p'] = long['p'].astype('float64')
+        long['code'] = long['s05q02'].astype(int).astype(str)
+        expected = long.groupby('code')['p'].agg(['size', 'sum'])
+        got = (served.reset_index().astype({'Price': 'float64'})
+               .groupby('SourceUnitCode')['Price'].agg(['size', 'sum']))
+        assert len(served) == 2 * len(raw) and served.index.is_unique
+        pd.testing.assert_frame_equal(got.sort_index(), expected.sort_index(), check_names=False,
+                                      check_exact=False, rtol=1e-12, check_index_type=False)
+
+    def test_a_sized_label_is_never_the_forms_dash_spelling(self, served):
+        u = served.index.get_level_values('u')
+        assert not u.str.contains(' - ').any()
+
+    def test_sized_units_meet_the_household_u(self, served):
+        import lsms_library as ll
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            hh_u = set(ll.Country('Burkina_Faso').food_acquired(waves=['2018-19'])
+                       .index.get_level_values('u'))
+        u = set(served.index.get_level_values('u'))
+        for label in ('Tas (Petit)', 'Sachet (Moyen)', 'Unité (Grand)', 'Boîte (Petit)', 'Bol (Grand)'):
+            assert label in u and label in hh_u, label
