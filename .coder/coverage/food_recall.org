@@ -163,6 +163,13 @@ Per =capability.py='s logic this is a *bounded human step per series* -- one RA,
 one questionnaire -- not a per-cell research project.  Filling it is what would
 let any of the machinery debated in GH #851 have something to carry.
 
+/2026-11-04 (GH #1084)./  Six cells left this queue, read from each wave's own
+household questionnaire, all 7 days with one ask: Niger 2021-22, Senegal 2018-19 and
+2021-22, Benin 2018-19, Cote d'Ivoire 2018-19 and Guinea-Bissau 2018-19.  The file's
+rungs now count questionnaire 34, config-comment 21, not-recorded 9, variable-label 3
+(67 cells); the "Current distribution" line above predates this.  The 9 left are
+Cambodia 2019-20, EthiopiaRHS x5 and GhanaSPS x3.
+
 * Provenance
 
 Consolidated 2026-09-09 from a corpus census run as part of the GH #851 design
