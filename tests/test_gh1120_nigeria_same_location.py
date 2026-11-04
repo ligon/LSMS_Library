@@ -39,6 +39,7 @@ def sources(request, ng, monkeypatch):
                               'sector': [2]*n, 'strata': [5]*n})
         frame[spec['weight']] = [0., np.nan] + [2.]*(n-2)
         frame[spec['panel_weight']] = [4., 0.] + [np.nan]*(n-2)
+        frame['interview_result'] = '1. COMPLETE'  # GH #1444: `sample` reads it
         return frame
 
     pp = raw([1, 2, 3, 4, 5, 7, 8], [10, 20, 30, 40, 0, 70, 80])
@@ -184,7 +185,8 @@ def test_w3_remains_unlabelled_sentinel(ng, monkeypatch):
     import lsms_library.local_tools as lt
     spec = ng.ROUND_COVERS['2015-16']
     pp = pd.DataFrame({'hhid': [17], 'ea': [10], 'state': [32], 'lga': [3201],
-                       'zone': [5], 'sector': [2], 'wt_wave3': [2.], 'wt_w1_w2_w3': [3.]})
+                       'zone': [5], 'sector': [2], 'wt_wave3': [2.], 'wt_w1_w2_w3': [3.],
+                       'saq22a': ['1. COMPLETED']})  # GH #1444: `sample` reads it
     ph = pp.assign(ea=0, hhsmlc=1)
     def get(fn, convert_categoricals=True, **kwargs):
         return (ph if 'harvest' in str(fn) else pp).copy()

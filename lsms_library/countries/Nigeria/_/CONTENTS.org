@@ -3246,10 +3246,13 @@ So =interview_date= is a *visit* date, not an interview date, for 419 rows
 /Rulings (@ligon, 2026-11-04)/: keep the dated non-interview rows and add
 =InterviewResult=; do not gate the roster on it.
 
-*Which tables carry it: =interview_date= only*, in the eight rounds that table
-serves.  The declaration is =Columns > interview_date > InterviewResult= (=str=,
-=optional=) in the canonical =data_info.yml= and =InterviewResult: str= in this
-country's =data_scheme.yml=.  =sample= and =household_roster= do not carry it.
+*Which tables carry it: =interview_date= (eight rounds) and =sample= (all ten).*
+The declarations are =Columns > interview_date > InterviewResult= and =Columns >
+sample > InterviewResult= (=str=, =optional=) in the canonical =data_info.yml=, and
+=InterviewResult: str= in this country's =data_scheme.yml=.  =household_roster= does
+not carry it.  =sample= reads it in =_cover_frame=, from the same field; it is NA on
+the 23 household-rounds no household cover of that round lists.  =cluster_features=
+shares =round_covers= and does not carry it.
 
 *Source: the cover's own result field*, read by each round's script:
 
@@ -3258,7 +3261,7 @@ country's =data_scheme.yml=.  =sample= and =household_roster= do not carry it.
 | 2010Q3, 2012Q3, 2015Q3, 2016Q1 | =saq22a= | =saq22b= is the status of DATA ENTRY; 2016Q1's =saq22= is a yes/no on observations |
 | 2011Q1 | =sq1= | =sq2= (data entry) |
 | 2013Q1 | =saq1= | =saq2= (data entry) |
-| 2018Q3, 2019Q1 | =interview_result= | |
+| 2018Q3, 2019Q1, 2023Q3, 2024Q1 | =interview_result= | |
 
 W1--W3 share one card (1 completed ... 7 other); W3's script reads codes
 (GH #1037), so =nigeria.response_status_label= applies that card.  W4's codes
@@ -3312,10 +3315,27 @@ why 419 here is 414 of the 942 plus these 5.
 | on no cover of that round (2012Q3 21, agriculture cover only; 2016Q1 2: 320201, 30082) | 23 |
 | W5: on the cover, but =interview_date= has no W5 script | 350 |
 
-So a user can filter =interview_date= but cannot filter =sample()= with it for 528
-of the 942.  Whether =sample= should carry the column too, and whether W5 should
-have an =interview_date=, are a residual, not done here: one column on one table is
-what was ruled.
+That table is =interview_date=.  /Ruling (@ligon, 2026-11-04): =sample= carries the
+column too./  =sample()= reaches 919 of the 942: everything above except the 23 on no
+cover, whose =sample= row serves NA.  Whether W5 should have an =interview_date= is a
+residual.  =sample= serves every cover row, dated or not, on all 49,089 rows:
+
+| =InterviewResult= | 2010Q3 | 2011Q1 | 2012Q3 | 2013Q1 | 2015Q3 | 2016Q1 | 2018Q3 | 2019Q1 | 2023Q3 | 2024Q1 |
+|-+-+-+-+-+-+-+-+-+-+-|
+| Completed | 4,988 | 4,909 | 4,735 | 4,768 | 4,607 | 4,572 | 5,044 | 4,976 | 4,771 | 4,715 |
+| Partially completed | 9 | 8 | 11 | 2 | 4 | 8 | | | | |
+| Partially completed (refused) | | | | | | | 7 | 4 | | 1 |
+| Partially completed (unavailable) | | | | | | | 2 | | | 1 |
+| Refused | 2 | 5 | 17 | 16 | 29 | 11 | 23 | 14 | 20 | 20 |
+| Not at home | 1 | 1 | 3 | 9 | 1 | | | | | |
+| Household not located | | | 1 | 1 | 10 | | | | | |
+| Moved away | | 10 | 47 | 44 | 13 | | | | 46 | 13 |
+| Other | | 6 | 45 | 14 | 32 | 1 | | | | |
+| Unable to identify household | | | | | | | 129 | 19 | 137 | 6 |
+| Long-term unavailable | | | | | | | 58 | 12 | | |
+| Unavailable for interview | | | | | | | | | 42 | 7 |
+| All household members deceased | | | | | | | | | 51 | 8 |
+| NA (no household cover) | | | 21 | | | 2 | | | | |
 
 *Census of the other countries' covers* (GH #1096; report only, none wired).
 Metadata sweep of every held =.dta= / =.sav= under =Data/=; 2,448 of 6,016 sidecars

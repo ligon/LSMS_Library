@@ -21,12 +21,17 @@ Data Scheme:
     # -> nigeria.sample_for_wave: two
     # source files per folder, each with its own `t` -> materialize: make.
     # See CONTENTS.org, "Sampling Design".
+    #
+    # InterviewResult is what the round's own household cover records, so a user
+    # can filter (GH #1444).  It gates nothing: the rule above decides who is here.
+    # NA for a household only the supplement cover or a roster lists (23 rows).
     index: (i, t)
     v: str
     weight: float
     panel_weight: float
     strata: str
     Rural: str
+    InterviewResult: str
     materialize: make
 
   cluster_features:

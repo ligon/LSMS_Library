@@ -234,8 +234,9 @@ _W5_STRATA = {1: 'North Central', 2: 'North East', 3: 'North West',
 
 # Per wave folder: each round's cover (relative to the folder's Data/), each
 # round's household roster (the D1 locator of last resort), the weight
-# variables (identical names on both covers), the strata source, an optional
-# PP supplement cover, and the household geovariables file (file,
+# variables (identical names on both covers), the strata source, each round's
+# result field (GH #1444), an optional PP supplement cover, and the household
+# geovariables file (file,
 # latitude, longitude). W5's acquired v02 file lives at the Data/ root and
 # supplies anonymized household reference fixes, not an EA centroid (#978).
 # The coordinate
@@ -248,6 +249,7 @@ ROUND_COVERS = {
         ph='Post Harvest Wave 1/Household/secta_harvestw1.dta',
         pp_roster='Post Planting Wave 1/Household/sect1_plantingw1.dta',
         ph_roster='Post Harvest Wave 1/Household/sect1_harvestw1.dta',
+        pp_result='saq22a', ph_result='sq1',
         weight='wt_wave1', panel_weight='wt_wave1', strata='zone',
         geo=('nga_householdgeovariables_y1.csv', 'lat_dd_mod', 'lon_dd_mod')),
     '2012-13': dict(
@@ -256,16 +258,19 @@ ROUND_COVERS = {
         pp_supplement='Post Planting Wave 2/Agriculture/secta_plantingw2.dta',
         pp_roster='Post Planting Wave 2/Household/sect1_plantingw2.dta',
         ph_roster='Post Harvest Wave 2/Household/sect1_harvestw2.dta',
+        pp_result='saq22a', ph_result='saq1',
         weight='wt_wave2', panel_weight='wt_combined', strata='zone',
         geo=('nga_householdgeovars_y2.csv', 'LAT_DD_MOD', 'LON_DD_MOD')),
     '2015-16': dict(
         pp='secta_plantingw3.dta', ph='secta_harvestw3.dta',
         pp_roster='sect1_plantingw3.dta', ph_roster='sect1_harvestw3.dta',
+        pp_result='saq22a', ph_result='saq22a',
         weight='wt_wave3', panel_weight='wt_w1_w2_w3', strata='zone',
         geo=('NGA_HouseholdGeovars_Y3.dta', 'LAT_DD_MOD', 'LON_DD_MOD')),
     '2018-19': dict(
         pp='secta_plantingw4.dta', ph='secta_harvestw4.dta',
         pp_roster='sect1_plantingw4.dta', ph_roster='sect1_harvestw4.dta',
+        pp_result='interview_result', ph_result='interview_result',
         weight='wt_wave4', panel_weight='wt_longpanel', strata='strata',
         geo=('nga_householdgeovars_y4.dta', 'lat_dd_mod', 'lon_dd_mod')),
     '2023-24': dict(
@@ -273,6 +278,7 @@ ROUND_COVERS = {
         ph='Post Harvest Wave 5/Household/secta_harvestw5.dta',
         pp_roster='Post Planting Wave 5/Household/sect1_plantingw5.dta',
         ph_roster='Post Harvest Wave 5/Household/sect1_harvestw5.dta',
+        pp_result='interview_result', ph_result='interview_result',
         weight='wt_cross_wave5', panel_weight='wt_longpanel_wave5',
         strata=('strata', _W5_STRATA),
         geo=('nga_householdgeovariables_y5.dta', 'lat_mod', 'lon_mod')),
@@ -291,7 +297,9 @@ def _cover_frame(fn, spec, *, weights=True):
     CODES (``convert_categoricals=False``; see the keyspace note above), the
     rest from the decoded labels.  Columns: v, weight, panel_weight, strata,
     Rural, Region (= zone), District (= state).  ``weights=False`` (a cover
-    with no weight columns) serves weight / panel_weight as NA.
+    with no weight columns) serves weight / panel_weight as NA.  A round's
+    household cover also yields InterviewResult (GH #1444); the W2 agriculture
+    supplement records no such round status here, and is not asked.
     """
     from lsms_library.local_tools import df_data_grabber
     key = df_data_grabber(fn, {'i': 'hhid'}, convert_categoricals=False,
@@ -303,6 +311,10 @@ def _cover_frame(fn, spec, *, weights=True):
                   Region='zone', District='state')
     if weights:
         myvars.update(weight=spec['weight'], panel_weight=spec['panel_weight'])
+    for visit in ('pp', 'ph'):
+        result = spec.get(visit + '_result')
+        if result and str(fn).endswith('/' + spec[visit]):
+            myvars['InterviewResult'] = (result, interview_result_label)
     main = df_data_grabber(fn, {'i': 'hhid'}, **myvars)
     if not weights:
         main['weight'] = np.nan
@@ -523,13 +535,16 @@ def round_covers(folder):
 def sample_for_wave(folder):
     """``sample`` for one wave folder: both rounds, each from its own cover.
 
-    Index ``(t, i)``; columns v, weight, panel_weight, strata, Rural and a
-    sparse Derivation column only where the labelled PH rule repairs rows.
+    Index ``(t, i)``; columns v, weight, panel_weight, strata, Rural,
+    InterviewResult (what the round's own household cover records, NA for a
+    household only a supplement cover or a roster lists; it gates nothing, GH
+    #1444) and a sparse Derivation column only where the labelled PH rule repairs
+    rows.
     """
     cols = ['v', 'weight', 'panel_weight', 'strata', 'Rural']
     parts = []
     for t, df in round_covers(folder).items():
-        keep = cols + (['Derivation'] if 'Derivation' in df else [])
+        keep = cols + [c for c in ('InterviewResult', 'Derivation') if c in df]
         parts.append(df[keep].assign(t=t).set_index('t', append=True))
     out = pd.concat(parts).reorder_levels(['t', 'i']).sort_index()
     assert out.index.is_unique, f'sample {folder}: (t, i) not unique'
@@ -3623,10 +3638,11 @@ def sized_food_unit(unit, size, unit_codes):
 #
 # Every cover records the visit whether or not anyone was interviewed, so a
 # date may date an attempt.  These label the cover's own result field, read by
-# each round's interview_date.py: W1-PP / W2-PP / W3 `saq22a`, W1-PH `sq1`,
-# W2-PH `saq1`, W4 `interview_result`.  `saq22b` is the status of DATA ENTRY and
-# W3-PH's `saq22` is a yes/no on observations.  Status gates no table's rows
-# (GH #1444): the D1 rule in round_covers decides who a round's frame admits.
+# each round's interview_date.py and by `sample`: W1-PP / W2-PP / W3 `saq22a`,
+# W1-PH `sq1`, W2-PH `saq1`, W4 / W5 `interview_result`.  `saq22b` is the status of
+# DATA ENTRY and W3-PH's `saq22` is a yes/no on observations.  Status gates no
+# table's rows (GH #1444): the D1 rule in round_covers decides who a round's frame
+# admits.
 
 # Recorded label, code prefix stripped and lower-cased -> what is served.  The
 # two wordings of one answer share a spelling so a filter works across waves.
@@ -3646,6 +3662,8 @@ _INTERVIEW_RESULT_LABELS = {
     'other (specify)': 'Other',
     'unable to identify household': 'Unable to identify household',
     'long term unavailable': 'Long-term unavailable',
+    'unavailable for interview': 'Unavailable for interview',
+    'all hh members deceased': 'All household members deceased',
 }
 
 # The W1-W3 response-status card.  W3's interview_date reads codes (GH #1037).

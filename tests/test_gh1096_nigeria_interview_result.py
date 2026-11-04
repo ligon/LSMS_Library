@@ -1,11 +1,11 @@
-"""Nigeria ``interview_date``: the cover's interview result rides beside the date.
+"""Nigeria ``interview_date`` and ``sample``: the cover's interview result is served.
 
-GH #1096 / #1444, ruling @ligon 2026-11-04.  Every wave's cover records the visit
+GH #1096 / #1444, rulings @ligon 2026-11-04.  Every wave's cover records the visit
 whether or not anyone was interviewed, so ``Int_t`` on 419 W1-W4 rows dates an
 attempt (216 W1-W3, 203 W4).  Those rows stay, and ``InterviewResult`` says what
-the visit produced, so a user can filter.  Interview status does NOT gate who a
-round's frame admits: the #1120 D1 rule (cover, supplement cover, own-round
-roster) still decides.
+the visit produced, so a user can filter; ``sample`` carries it too, in all ten
+rounds.  Interview status does NOT gate who a round's frame admits: the #1120 D1
+rule (cover, supplement cover, own-round roster) still decides.
 
 Two tiers: the label rule and the wiring (no data), then a guardrail on the built
 table whose oracle reads each round's cover directly, with its value labels.
@@ -30,9 +30,13 @@ RESULT_COLUMN = {
     '2015Q3': 'saq22a', '2016Q1': 'saq22a',
     '2018Q3': 'interview_result', '2019Q1': 'interview_result',
 }
+#: `sample` also serves W5, which has no interview_date script.
+SAMPLE_RESULT_COLUMN = {**RESULT_COLUMN, '2023Q3': 'interview_result',
+                        '2024Q1': 'interview_result'}
 FOLDER = {'2010Q3': '2010-11', '2011Q1': '2010-11', '2012Q3': '2012-13',
           '2013Q1': '2012-13', '2015Q3': '2015-16', '2016Q1': '2015-16',
-          '2018Q3': '2018-19', '2019Q1': '2018-19'}
+          '2018Q3': '2018-19', '2019Q1': '2018-19',
+          '2023Q3': '2023-24', '2024Q1': '2023-24'}
 COMPLETED = {'Completed', 'Partially completed',
              'Partially completed (refused)', 'Partially completed (unavailable)'}
 
@@ -64,6 +68,8 @@ def nigeria():
     ('other (specify)', 'Other'),
     ('4. UNABLE TO IDENTIFY HOUSEHOLD', 'Unable to identify household'),
     ('6. LONG TERM UNAVAILABLE', 'Long-term unavailable'),
+    ('6. UNAVAILABLE FOR INTERVIEW', 'Unavailable for interview'),   # W5
+    ('8. ALL HH MEMBERS DECEASED', 'All household members deceased'),   # W5
 ])
 def test_recorded_labels_are_served_without_folding_categories(nigeria, recorded, served):
     assert nigeria.interview_result_label(recorded) == served
@@ -142,22 +148,79 @@ def test_scripts_keep_undated_rows_out(folder):
 def test_the_column_is_declared():
     scheme = load_yaml(NIGERIA / '_' / 'data_scheme.yml')['Data Scheme']['interview_date']
     assert scheme['InterviewResult'] == 'str'
-    canon = load_yaml(countries_root().parent / 'data_info.yml')['Columns']['interview_date']
-    assert canon['InterviewResult']['type'] == 'str'
-    assert canon['InterviewResult']['optional'] is True
+    assert load_yaml(NIGERIA / '_' / 'data_scheme.yml')['Data Scheme']['sample'][
+        'InterviewResult'] == 'str'
+    columns = load_yaml(countries_root().parent / 'data_info.yml')['Columns']
+    for table in ('interview_date', 'sample'):
+        assert columns[table]['InterviewResult']['type'] == 'str'
+        assert columns[table]['InterviewResult']['optional'] is True
+
+
+@pytest.mark.parametrize('folder', sorted(set(FOLDER.values())))
+def test_each_round_names_its_result_field_beside_its_cover(nigeria, folder):
+    spec = nigeria.ROUND_COVERS[folder]
+    for visit, t in (('pp', nigeria.PP_QUARTER[folder]), ('ph', nigeria.PH_QUARTER[folder])):
+        assert spec[visit + '_result'] == SAMPLE_RESULT_COLUMN[t]
+
+
+def test_sample_keeps_the_result_and_cluster_features_does_not(nigeria, monkeypatch):
+    """One read, two tables: a household column must not reach the (t, v)
+    collapse, and must not filter the frame."""
+    frame = pd.DataFrame(
+        {'v': ['1/1/1', '1/1/1'], 'weight': [1., 2.], 'panel_weight': [1., 2.],
+         'strata': 'z', 'Rural': 'Rural', 'Region': 'z', 'District': 's',
+         'InterviewResult': ['Completed', 'Refused']},
+        index=pd.Index(['a', 'b'], name='i'))
+    monkeypatch.setattr(nigeria, 'round_covers',
+                        lambda folder: {'2018Q3': frame, '2019Q1': frame})
+    out = nigeria.sample_for_wave('2018-19')
+    assert out.xs('2018Q3', level='t')['InterviewResult'].tolist() == ['Completed', 'Refused']
+    assert len(out) == 4
+    from lsms_library import local_tools
+    monkeypatch.setattr(
+        local_tools, 'df_data_grabber',
+        lambda fn, idxvars, **myvars: pd.DataFrame(
+            {n: [1., 2.] for n in myvars}, index=pd.Index(['a', 'b'], name='i')))
+    clusters = nigeria.cluster_features_for_wave('2018-19')
+    assert len(clusters) == 4
+    assert 'InterviewResult' not in clusters.columns
+
+
+def test_cover_frame_asks_only_a_rounds_household_cover(nigeria, monkeypatch):
+    """W2's agriculture supplement has the same file name as its household cover."""
+    from lsms_library import local_tools
+    asked = {}
+
+    def grabber(fn, idxvars, convert_categoricals=True, **myvars):
+        asked[fn] = set(myvars)
+        names = list(myvars) or ['x']
+        return pd.DataFrame({n: ['1/1/1'] for n in names},
+                            index=pd.Index(['a'], name='i'))
+    monkeypatch.setattr(local_tools, 'df_data_grabber', grabber)
+    spec = nigeria.ROUND_COVERS['2012-13']
+    for key, weights in (('pp', True), ('ph', True), ('pp_supplement', False)):
+        nigeria._cover_frame(nigeria._data_path('2012-13', spec[key]), spec, weights=weights)
+    keys = {fn.split('/Data/', 1)[1]: names for fn, names in asked.items()}
+    assert 'InterviewResult' in keys[spec['pp']]
+    assert 'InterviewResult' in keys[spec['ph']]
+    assert 'InterviewResult' not in keys[spec['pp_supplement']]
 
 
 def test_interview_status_does_not_gate_the_frame():
-    """#1444: the round's frame is decided by the D1 rule, not by a status."""
+    """#1444: the round's frame is decided by the D1 rule, not by a status.
+
+    Re-pinned when `sample` gained the column: the source check is now the
+    functions that decide membership; `sample_for_wave` only keeps a column, which
+    the synthetic test above and the built-table test below hold to its rows."""
     src = (NIGERIA / '_' / 'nigeria.py').read_text()
     tree = ast.parse(src)
     for fn in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)
-               and n.name in ('round_covers', 'sample_for_wave', '_roster_locator')]:
+               and n.name in ('round_covers', '_roster_locator')]:
         text = ast.get_source_segment(src, fn)
         code = '\n'.join(line for line in text.splitlines()
                          if not line.lstrip().startswith('#'))
         body = ast.get_docstring(fn) or ''
-        for needle in ('interview_result', 'saq22a', 'HHTrack', 'hhstatus'):
+        for needle in ('interview_result', 'InterviewResult', 'saq22a', 'HHTrack', 'hhstatus'):
             assert needle not in code.replace(body, ''), (fn.name, needle)
 
 
@@ -221,6 +284,27 @@ def test_rounds_keep_distinct_t(interview_date):
 
 
 @pytest.mark.requires_s3
+@pytest.mark.parametrize('t', sorted(SAMPLE_RESULT_COLUMN))
+def test_sample_result_is_the_covers_own(nigeria, t):
+    import lsms_library as ll
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        sample = ll.Country('Nigeria').sample()
+    frame = sample.xs(t, level='t')
+    frame = frame.droplevel([n for n in frame.index.names if n != 'i'])
+    cover, _ = _cover(nigeria, t)
+    served = frame['InterviewResult'].astype('string')
+    on_cover = frame.index.isin(cover.index)
+    # Every cover household is served, and status removes none of them.
+    assert set(cover.index) <= set(frame.index)
+    expected = cover.loc[frame.index[on_cover], SAMPLE_RESULT_COLUMN[t]].astype('string').map(
+        nigeria.interview_result_label)
+    assert (served[on_cover].values == expected.values).all()
+    # A household only a supplement cover or a roster lists has no result.
+    assert served[~on_cover].isna().all()
+
+
+@pytest.mark.requires_s3
 def test_roster_only_households_stay_served_with_no_result():
     """#1444's two households: a roster, no cover in that round, HHTrack says not
     interviewed.  Status gates nothing, so they stay in ``sample`` and the roster;
@@ -235,3 +319,6 @@ def test_roster_only_households_stay_served_with_no_result():
     for frame, present in ((sample, True), (roster, True), (dates, False)):
         ids = frame.xs('2016Q1', level='t').index.get_level_values('i').astype(str)
         assert ({'320201', '30082'} <= set(ids)) is present
+    rows = sample.xs('2016Q1', level='t')
+    rows = rows[rows.index.get_level_values('i').astype(str).isin(['320201', '30082'])]
+    assert rows['InterviewResult'].isna().all()
