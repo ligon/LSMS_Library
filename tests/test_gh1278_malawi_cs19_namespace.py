@@ -168,6 +168,22 @@ def test_every_panel_household_keeps_its_link(spine):
 
 
 @requires_s3
+def test_derivation_inputs_join_the_served_rows_in_2019():
+    """``derivation_inputs`` rebuilds ``i`` from ``malawi._CROP_SALE_SOURCES``, not
+    from a wave script, so a stale prefix there unjoins them with no error."""
+    from lsms_library.country import Country
+    key = 'Malawi::crop_production::sale-basis-unknown-wildcard'
+    malawi = Country('Malawi')
+    raw = malawi.derivation_inputs(key, wave='2019-20')
+    cp = malawi.crop_production().reset_index()
+    served = cp[cp['t'].astype(str).eq('2019-20') & cp['Derivation'].astype('string').eq(key)]
+    ids = set(raw.index.get_level_values('i').astype(str))
+    assert any(i.startswith(PREFIX) for i in ids)
+    assert set(served['i'].astype(str)) <= ids
+    assert ids <= set(cp.loc[cp['t'].astype(str).eq('2019-20'), 'i'].astype(str))
+
+
+@requires_s3
 @pytest.mark.parametrize('table', [
     'household_roster', 'individual_education', 'housing', 'interview_date',
     'subjective_well_being', 'food_security', 'shocks', 'assets', 'food_acquired',
