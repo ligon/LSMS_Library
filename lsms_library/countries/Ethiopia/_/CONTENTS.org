@@ -3578,19 +3578,19 @@ W3 are fieldwork too.
 - *W3, 27 (ESS3 BID, held, PDF p31)*: "there were 27 households which were
   administered the post-planting and/or livestock questionnaires but were not
   administered the household and post-harvest questionnaires.  These 27 households
-  could not be located during the subsequent household visit".  PDF p16: "12 were in
-  one enumeration area that could not be visited for security reasons.  The
-  remaining 15 were in different places and no respondent was available".  Measured:
-  27 on both PP and LS and not on HH, 1 of them on PH; 10 in one EA absent from the
-  HH cover, and 17 each alone in their EA.  So 10 against the BID's 12, not
-  reconciled.
+  could not be located during the subsequent household visit but the agriculture
+  questionnaire is included in our sample".  PDF p16: "12 were in one enumeration area
+  that could not be visited for security reasons.  The remaining 15 were in different
+  places and no respondent was available".  Measured: 27 on both PP and LS and not on
+  HH, 26 matching that sentence and 1 also on PH; 10 in one EA absent from the HH
+  cover, and 17 each alone in their EA.  So 10 against the BID's 12, not reconciled.
 - *W2, 25 (ESS2 BID, not held,
   https://microdata.worldbank.org/catalog/2247/download/40387, PDF p28)*: the same
   sentence with 30 households, ending "and were dropped from the entire ESS2 sample".
-  Measured: 28 on PP or LS and not on HH, 4 of them on PH, so 2 of the BID's 30 are
-  not found.  The 28 are #1359's 25 on PP plus 3 on LS only: the same class, which
-  D1 leaves out because it reads HH and PP.  D1 keeps what this sentence says was
-  dropped; the release ships them.
+  Measured: 28 on PP or LS and not on HH: 24 match that sentence, 4 are also on PH,
+  and the BID's other 2 are not found.  The 28 are #1359's 25 on PP plus 3 on LS only:
+  the same class, which D1 leaves out because it reads HH and PP.  So the release
+  ships what this sentence says was dropped, and D1 keeps them.
 - *ESS4's "eight EAs" against #1359's 6: not one number, and the BID does not
   settle it.*  565 sampled less the 24 with no data at all (ESS4 BID PDF p25) is 541,
   and exactly 541 EAs appear on some W4 cover: 535 on the HH cover and 6 not.  So only
