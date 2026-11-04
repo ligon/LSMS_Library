@@ -635,3 +635,30 @@ Measured, nothing changed.  Code 5 of =s16bq01= is =Adubos inorgânicos - NPK/F�
 =Quilograma= and =Grama= have no kg factor, so the 38 + 2 NPK rows in them have no mass
 either.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 60 positive), which the
 =data_scheme.yml= grain note says it does not.
+
+* 2018-19 community prices are wired (GH #1226, 2026-11-04)
+
+=community_prices= was declared nowhere for Guinea-Bissau although =2018-19/Data/s05_co_gnb2018.dta= holds section 5 of the community questionnaire.  Now built by =2018-19/_/community_prices.py= on Niger's template (rulings D1-D6, =Niger/_/CONTENTS.org=, "2018-19 community prices are wired"), with the household's sized unit form and no folding (#1453 ruling, @ligon 2026-11-04).  Helpers and registry callables are in =2018-19/_/mapping.py=.
+
+*Served, cold private root:* 80,202 rows = both readings of all 40,101 source records; 449 grappes, 80 =j=, 70 =u=.  =visit= 1: 40,876, 2: 39,326.  =obs= 1 and 2: 40,101 each.
+
+*The file.*  One row per (grappe, =s05q01= product, =s05q02= unit-size) with two prices.  0 repeated keys, 0 byte-identical rows, =Existe= constant 1.  No price is NA, zero, negative or a sentinel; 5.46 to 50,500 FCFA.  68 =s05q03= and 83 =s05q04= values are not integers, and the two readings agree in 84.7% of records.  Niger's 0.85 pattern is absent: 1 and 2 records at that exact ratio.
+
+*Coverage.*  449 of the 450 =sample().v=, every s05 grappe among them; each grappe's =vague= equals the cover page's.  20,438 records are in vague 1 and 19,663 in vague 2.  The five duplicated grappes of =grappe_gps_gnb2018.dta= and =s00a_co_gnb2018.dta= are not duplicated here.
+
+*Settles the question left open above* ("one vague per grappe, or two?").  In =s00_me_gnb2018.dta=, 0 of the 450 grappes appear in both vagues, 225 and 225.  The convention holds, and the DDI sentence is wrong for this file, as in Senegal and Benin.
+
+*The instrument.*  *No questionnaire is held for this country*; =Documentation/= has only the DDI report.  The CAPI price form is on the UEMOA catalogue (entry 46, =/download/161=, =/162=; "QUESTIONÁRIO COMUNITÁRIO- PARTE DO PREÇO", cover REPÚBLICA DA GUINÉ-BISSAU / INSTITUTO NACIONAL DE ESTATÍSTICA): at most six unit-sizes per product (5.02) and "5.03. Levantamento 1 Preços (CFAC)" / "5.04. Levantamento 2 Preços (CFAC)", integer, multiple of 5, above 0, with no quantity.  So =Quantity= = 1 is =Guinea-Bissau::community_prices::one-item-per-price=.
+
+*How Guinea-Bissau differs from Niger.*
+
+- *Every label is double-encoded.*  =j=, =u= and =Description= all go through this wave's =_decode_mojibake=, as every other table here does.  =Description= is therefore repaired, where Niger's is as recorded.
+- *Portuguese sizes, in the household's words.*  =Monte (Medio)=, =Pedaço (Grande)=.  The form says =Médio= and the household =Medio=; the form says =Inteiro= and the household =Integer=, so =Corda (Integer)= (7 records) is the household's word, carried over untranslated (#1224).
+- *The unit-size code has two forms.*  =10 x unit + size=, but sizes 98 and 99 (=Outro tamanho 1 / 2=) make it =100 x unit + size=: =41398= is Monte, size 98.  4 codes, 59 records.  The household labels list neither size, so the form's word is served.
+- *Product 94 has no household label.*  =Feijão seco= (348 records) is on the price form but not in =s07bq01=, whose nearest code is 95, =Feijão-frade, feijão seco=.  D3 bridges by code and there is no code to bridge by, so it is served under its own label and meets no household row.  Whether 94 is the household's 95 is not established here.
+
+*The join.*  Household (t, j, u) cells with a community price: 445 of 705, covering 109,331 of 126,925 =food_acquired= rows.  77,158 of the 80,202 community rows find a household cell.  78 of the 80 =j= occur in the household table.  =Feijão seco= does not, and neither does =Cube alimentaire (Maggi, Jumbo, )=, because the household file has 4,882 rows of product 121 and none with a positive quantity.
+
+*Recorded, not repaired.*  Prices are served as recorded, including the non-integer ones.  =j= is the household's label by code, so code 37, =Carapau fresco= on the form and =Bentaninha fresco= in the household file, takes the household's label and keeps its own in =Description=.
+
+*Cost.*  =data_scheme.yml= and a new wave script move every Guinea-Bissau hash: one re-warm.  =.coder/coverage/latest.csv= grades the cell =absent= until the next =make matrix=.
