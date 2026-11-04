@@ -414,6 +414,28 @@ class TestLabelsUnmatchedSurvivesAssembly:
             out = food_feature(["Liberia"], labels="Aggregate", currency=None)
         assert out.attrs["labels_unmatched"] == {"Liberia": _report(3)}
 
+    def test_every_country_dropped_is_shaped_not_bare(self, food_feature):
+        """GH #1456: the all-degraded result used to be a bare `pd.DataFrame()`
+        on a `RangeIndex`, so a caller's `groupby('country')` raised KeyError."""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = food_feature(["Togo"], labels="Aggregate", currency=None)
+        assert out.empty and out.shape == (0, 0)
+        assert out.attrs["labels_unavailable"] == ["Togo"]
+        assert list(out.index.names) == [
+            "country", *F._canonical_index_levels("food_prices")]
+        assert out.groupby("country").size().empty
+        assert list(out.index.get_level_values("country")) == []
+
+    def test_every_country_dropped_keeps_the_currency_level(self, food_feature):
+        """The default `currency='index'` widens a monetary table's index, and
+        the empty frame is that same shape."""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = food_feature(["Togo"], labels="Aggregate")
+        assert list(out.index.names) == [
+            "country", *F._canonical_index_levels("food_prices"), "currency"]
+
     def test_no_labels_no_key(self, food_feature):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -451,6 +473,14 @@ class TestUnitsUnavailableDegrades:
             out = food_feature(["Togo"], units="unitprice", currency=None)
         assert out.empty
         assert out.attrs["units_unavailable"] == ["Togo"]
+
+    def test_every_country_dropped_is_still_indexed_by_country(
+            self, food_feature):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = food_feature(["Togo"], units="unitprice", currency=None)
+        assert out.index.names[0] == "country"
+        assert out.groupby("country").size().empty
 
     def test_a_mode_whose_inputs_exist_drops_nobody(self, food_feature):
         with warnings.catch_warnings():
@@ -573,3 +603,30 @@ class TestDelivered:
         """The control: generalising the hook must not have cost the carrier it
         was generalised from."""
         assert set(assembled.attrs[P.ATTRS_KEY]) == set(self.PAIR)
+
+
+# ---------------------------------------------------------------------------
+# GH #1456: the shape of an assembly no country survived
+# ---------------------------------------------------------------------------
+
+class TestEmptyAssemblyShape:
+    def test_an_unregistered_table_is_indexed_by_country_alone(self):
+        out = F._empty_assembly([])
+        assert list(out.index.names) == ["country"]
+        assert out.groupby("country").size().empty
+
+    def test_a_registered_table_carries_its_canonical_levels(self):
+        out = F._empty_assembly(["t", "i"])
+        assert list(out.index.names) == ["country", "t", "i"]
+        assert out.shape == (0, 0)
+
+    def test_it_concatenates_onto_a_real_assembly_without_collapsing_it(self):
+        """A caller pooling several `Feature` calls must not lose the level
+        names to an empty member."""
+        real = pd.DataFrame({"x": [1.0]}, index=pd.MultiIndex.from_tuples(
+            [("Niger", "w1", "h1")], names=["country", "t", "i"]))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = pd.concat([F._empty_assembly(["t", "i"]), real])
+        assert list(out.index.names) == ["country", "t", "i"]
+        assert len(out) == 1
