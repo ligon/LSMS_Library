@@ -4499,8 +4499,13 @@ missed site is silence (an empty join reads as "this wave has no such data").
 The sites: 7 dead =function: cs_i= declarations; 4 YAML tables with a bare
 =i: case_id= (=subjective_well_being=, =food_security=, =shocks=, =assets=); 10
 household scripts; *and two the issue did not count*, the =malawi.py= tables behind
-=derivation_inputs= (=_CROP_SALE_SOURCES=, =_MODULE_R_SOURCES=), which would have
-stopped those inputs joining the served rows.  =community_prices= is cluster-grain.
+=derivation_inputs=, which would have stopped those inputs joining the served rows:
+=_CROP_SALE_SOURCES=, and =_MODULE_R_SOURCES= until #1435's ruling removed it with its
+deletion.  =community_prices= is cluster-grain.
+
+*Why the prefix is per wave.*  33 bare =case_id=s coincide between IHS4 and IHS5, so a
+shared =cs-= would have made 33 false links of its own.  (IHS3 also shares 2 with IHS5
+and 10 with IHS4; no id is in all three.)  Read from the three cover files.
 
 *The crosswalk did not move.*  =make panel-ids= reads only the Panel cover through
 =y4_hhid=, so the two JSON files regenerate byte-identical.  That empty diff is the

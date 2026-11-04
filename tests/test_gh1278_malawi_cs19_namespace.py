@@ -6,8 +6,8 @@ so its ``i`` was the bare ``case_id``.  Two of those strings equal IHS3 2010-11
 ``case_id``s, which ``panel_attrition`` and any set intersection then counted as
 panel links with no document behind them.  The fix is atomic because every table
 must agree: seven dead keys, four YAML tables with a bare ``i: case_id``, ten
-household scripts, and the two source tables in ``malawi.py`` behind
-``derivation_inputs``.
+household scripts, and ``_CROP_SALE_SOURCES`` in ``malawi.py``, which
+``derivation_inputs`` rebuilds ``i`` from.
 
 The first half needs no microdata.  The second reads the two cover files directly
 (an oracle that never enters a wave script) and is gated ``requires_s3``.
@@ -134,6 +134,14 @@ def spine():
     from lsms_library.country import Country
     fl = Country('Malawi').sample().reset_index()
     return {str(t): set(g['i'].astype(str)) for t, g in fl.groupby(fl['t'].astype(str))}
+
+
+@requires_s3
+def test_the_prefix_has_to_be_per_wave():
+    """IHS4 and IHS5 also coincide, so one shared ``cs-`` would make false links."""
+    ihs4 = _cover('2016-17/Data/Cross_Sectional/hh_mod_a_filt.dta')
+    ihs5 = _cover('2019-20/Data/Cross_Sectional/hh_mod_a_filt.dta')
+    assert ihs4 & ihs5
 
 
 @requires_s3
