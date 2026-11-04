@@ -37,8 +37,10 @@ def test_direct_make_food_target_builds_native_waves_only(tmp_path):
     )
     lines = [line for line in result.stdout.splitlines()
              if "python food_acquired.py" in line]
-    assert len(lines) == len(c.waves)
-    for wave in c.waves:
+    # Registered waves with no food script yet are not asked for (GH #1275).
+    declared = [w for w in c.waves if "food_acquired" in c[w].data_scheme]
+    assert len(lines) == len(declared)
+    for wave in declared:
         assert f"../{wave}/_/" in result.stdout
     assert "var/food_acquired.parquet" not in result.stdout
     assert not root.exists(), "a dry-run Make probe wrote data"
@@ -89,7 +91,9 @@ def test_native_wave_assembly_preserves_requested_food(tmp_path, monkeypatch,
     monkeypatch.setattr(C.subprocess, "run", probe_only)
     try:
         result = c.food_acquired(waves=waves, currency=None)
-        requested = c.waves if waves is None else waves
+        # A registered wave with no food script contributes nothing (GH #1275).
+        requested = ([w for w in c.waves if "food_acquired" in c[w].data_scheme]
+                     if waves is None else waves)
         assert seen == requested
         assert len(result) == 2 * len(requested)
         # Country._finalize_result orders household i before wave t.
