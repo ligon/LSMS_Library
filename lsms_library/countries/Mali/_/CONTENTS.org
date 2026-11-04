@@ -2916,6 +2916,82 @@ rows hold the 999 sentinel, which passage 1 never uses (it writes 0, 594 rows). 
   kilogram from an unweighed lot.  So =Price / Quantity= on =u = 'Kg'= is per kg only as far as that entry is honest.
   The advice above, to compare across tables only on sized units, stands.
 
+* 2026-11-04 -- rulings on what stays as it is: no sale, nil harvest, #821, scattered trees
+
+Rulings @ligon 2026-11-04.  Nothing here changes a served value.
+
+*"Did not sell" stays NA in the EHCVM waves.*  5,275 records of 2018-19 and 3,928 of 2021-22 answer =Non=
+and hold nothing, and they serve nothing, as Niger's do.  Both EAC-I waves zero-fill the same answer
+(2014-15 =s3aq22=, 2017-18 =s7gq20=).  So =gross_crop_revenue= is not comparable across Mali's programmes, and
+the gap is large, a choice of denominator rather than a change in sales:
+
+| wave    | households served | mean, FCFA | median | mean if =Non= were 0 |
+|---------+-------------------+------------+--------+----------------------|
+| 2014-15 |             2,289 |     33,805 |      0 | (is 0 already)       |
+| 2017-18 |             4,679 |     34,598 |      0 | (is 0 already)       |
+| 2018-19 |             1,232 |    506,067 | 196,125 |             201,056 |
+| 2021-22 |               820 |    510,607 | 195,000 |             174,385 |
+
+The last column counts every household answering =Oui= or =Non= on any crop (3,101 and 2,401).  Even so EHCVM stays
+five to six times EAC-I, which this does not explain.  Serving 0 was declined because 369 of the 2021-22 =Non= records
+sit on crops with several rows and would need =Farm-level= rows for sales that did not happen, and because an
+as-recorded NA is what Niger serves.  *A consumer comparing the two programmes must put them on one denominator
+first.*
+
+*=Recolte nulle= stays NA.*  236 rows of 2018-19, all in vague 2, answer =s16cq10= =Recolte nulle=, with =s16cq12a= and
+=s16cq15= empty.  =Quantity= reads NA, the same as a question not asked; 372 =Non= rows and 1 =Oui= row are NA too.  The answer
+is in the file for anyone who wants a zero.  2021-22's questionnaire prints the code (3) and no row answers it.
+
+*#821: the 2021-22 verdict stays =unsure=.*  =.coder/coverage/absent_verdicts.csv= is unchanged and was not touched
+here.  The wave's own BID says the community questionnaire has "four main sections" and that prices come "from a
+sample of markets" (=mli_ehcvm2_information_de_base_eng.pdf= PDF pp. 8-9), which fits the released =s00_co= to =s04_co=
+and the region-grain =ehcvm_prix_mli2021=.  Against closing it: the DDI's "local retail price information", Burkina
+Faso's printed Section 5, and, the decisive one, *Mali's own community questionnaire is on neither WB 6275 nor IHSN
+12257, so C4 is not met*, and a closing verdict needs C4.  UEMOA's =Fichiers_Communautaire.rar= could answer it and needs
+a login.  The ruling was to keep =unsure= unless the BID is accepted as C4, and it was not.
+
+*The 135 scattered tree rows of 2017-18 stay =Farm-level=.*  This answers "the location is still unwired" in the GH #1476
+section.  =s11fq04= splits the 270 rows exactly: 135 =Verger= with their own area and no location, 135 =Eparpillé= with a
+block and parcel (=s11fq05c=, =s11fq05d=).  128 of the 135 name a plot of the household's =s7f=, and 0 have the same crop on
+it.  They hold 17 convertible rows, 57,650 of the 177,879 kg.  A roster line is one species and asks one location, so
+the parcel is an attribute of the line and not of the harvest.  No 2017-18 yield moves today, because =plot_features=
+serves no EAC-I wave; served on the parcel, tree kilograms would land over a seasonal plot's area once it does.  Revisit
+with EAC-I =plot_features=; the cost then is one Mali re-warm.
+
+* 2026-11-04 -- what these four changes moved, cold (GH #1494, #1453, #1437, #1179)
+
+Cold builds in private roots, every declared table, =115b6ab71= against =0f382b5f4=.  With =EACI_= stripped from =i=,
+*22 of the 24 tables are frame-equal, row order and dtypes included*: all but =community_prices= and =crop_production=.
+=panel_ids= has 5,011 entries and =updated_ids= four waves, equal on both sides.  At the #1494 commit alone all 23 frame
+tables are equal.  EAC-I rows prefixed: =sample= 12,194, =household_roster= 131,246, =food_acquired= 122,085.
+
+| table              | moved                                                                                     |
+|--------------------+-------------------------------------------------------------------------------------------|
+| =community_prices= | 2014-15 =Quantity= on 3,090 keyed rows of 155,931, nothing else; 2018-19 =u= spelling only, every key's count and =Price= sum equal, 84 labels of the same sizes |
+| =crop_production=  | 2014-15, 2017-18 unmoved; 2018-19 gains the key on 265 rows; 2021-22 3,360 keyed totals, 181 new rows, =Quantity_sold=, =Unit_sold=, =Value_sold=, =intercropped= unmoved on all 7,317 old rows |
+
+Consumers, 2021-22, before and after #1437 (other waves unchanged):
+
+| consumer                   | before        | after           |
+|----------------------------+---------------+-----------------|
+| =harvest_kg= rows, kg      | 236, 261,596  | 3,028, 6,977,514 (173 rows, 451,983 kg =Farm-level=) |
+| =yield_kg= rows, median kg/ha | 217, 505   | 2,753, 634      |
+| =median_price_valuation= rows valued, FCFA | 233, 59.8M | 3,016, 1,293.3M |
+| =gross_crop_revenue= FCFA  | 418,697,975   | 418,697,975     |
+| =crop_diversity= (count), mean | 0.6448 | 0.6448 |
+
+2018-19's median yield is 844.  *The 2021-22 yields now mix season totals, the derived rows, with partial harvests, the window
+rows*, and the key is what tells them apart.  The tail remains the =plot_features= question flagged above (p99 17,307, maximum 22,000,000 kg/ha).  *Site Q* gains one row: a
+2021-22 total of 7,502 =Sac (100 Kg)=, 162.9 x the reference, served as summed.  Sites B and I report the same columns.
+=Feature= over Mali, Niger and Burkina Faso, each with a unique index: =sample= 72,994, =household_roster= 536,295, =community_prices=
+534,290, all as before; =crop_production= 113,372 -> 113,553, the 181 new rows.
+
+*Site C is new on every all-wave Mali frame carrying =v=*, one =ClusterIdentityWarning= per call, 2017-18 -> 2018-19.  Under
+=LSMS_CLUSTER_STRICT=1= those reads now raise and =Feature= drops Mali.
+
+*Cache.*  =build_transforms_fingerprint= 0 of 25.  =Country._table_cache_hash=: Mali 24 of 24, Niger 0 of 23, Burkina Faso 0 of 25, Uganda 0
+of 28.  =Wave._input_hash= Mali 96 of 96.  One Mali re-warm, and any ordering of these four commits costs the same one.
+
 * 2026-11-04 -- EAC-I enumerator manuals held; 2021-22 price source read from the BID (GH #1179, #821)
 
 *Held now, 2014-15/Documentation/.*  =bid_eaci14.pdf= and =EACI_MANUEL_P2_V3.pdf=
