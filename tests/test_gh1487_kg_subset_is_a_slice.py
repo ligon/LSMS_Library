@@ -369,30 +369,39 @@ class TestLsmsNoCache:
         assert sorted(built) == sorted(c.waves)
         pd.testing.assert_frame_equal(got, of_wave(everything, c.waves[1]), check_exact=True)
 
-    def test_it_leaves_no_all_waves_parquet_behind(self, native_food, monkeypatch):
-        """GH #1455: such a parquet can be degraded and yet graded fresh.  The
-        subset's rebuild used to cover only its own waves, so the next ordinary
-        all-waves read missed on coverage and healed; that must survive."""
-        c, root, _ = native_food
-        path = root / 'Malawi/var/food_acquired.parquet'
+    def test_it_leaves_full_coverage(self, native_food, monkeypatch):
+        """Re-pinned for GH #1455: this parquet was removed while such a build
+        could be degraded yet graded fresh.  That build is now correct, and the
+        next ordinary read serves it."""
+        c, root, built = native_food
+        w = c.waves[1]
         monkeypatch.setenv('LSMS_NO_CACHE', '1')
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
-            c.food_quantities(waves=[c.waves[1]])
-        assert not path.exists()
+            got = c.food_quantities(waves=[w])
+        path = root / 'Malawi/var/food_acquired.parquet'
+        assert sorted(read_parquet_cache_waves(path)) == sorted(c.waves)
+        monkeypatch.delenv('LSMS_NO_CACHE')
+        built.clear()
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            again = c.food_quantities(waves=[w])
+        assert built == []
+        pd.testing.assert_frame_equal(again, got, check_exact=True)
 
-    def test_any_spelling_of_the_lever_counts(self, native_food, monkeypatch):
-        """``Wave.grab_data`` builds the degraded frame on any non-empty value."""
+    def test_zero_is_not_the_lever(self, native_food, monkeypatch):
+        """Re-pinned for GH #1455's ruling: only 1, true or yes turn the flag on."""
         c, root, _ = native_food
         monkeypatch.setenv('LSMS_NO_CACHE', '0')
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             c.food_quantities(waves=[c.waves[1]])
-        assert not (root / 'Malawi/var/food_acquired.parquet').exists()
+        path = root / 'Malawi/var/food_acquired.parquet'
+        assert sorted(read_parquet_cache_waves(path)) == sorted(c.waves)
 
     def test_a_parquet_only_served_stays(self, native_food, monkeypatch):
         """``LSMS_NO_CACHE=0`` passes the read gate, so a fresh parquet is served
-        and not rewritten; it is not this read's to remove."""
+        and not rewritten."""
         c, root, _ = native_food
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
@@ -428,13 +437,6 @@ class TestLsmsNoCache:
             warnings.simplefilter('ignore')
             c.food_quantities(waves=[c.waves[1]], units='units')
         assert read_parquet_cache_waves(root / 'Malawi/var/food_acquired.parquet') == [c.waves[1]]
-
-    def test_without_the_lever_nothing_is_removed(self, native_food):
-        c, root, _ = native_food
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            c.food_quantities(waves=[c.waves[1]])
-        assert (root / 'Malawi/var/food_acquired.parquet').exists()
 
 
 class TestTheAuditsDescribeTheServedWaves:
