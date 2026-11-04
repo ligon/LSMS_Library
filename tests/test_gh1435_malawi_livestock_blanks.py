@@ -16,14 +16,18 @@ import importlib.util
 import pandas as pd
 import pytest
 
+import lsms_library as ll
+from lsms_library.derivations import derivation_records
 from lsms_library.local_tools import format_id, get_dataframe
-from lsms_library.paths import countries_root
+from lsms_library.paths import countries_root, data_root
 
 MALAWI = countries_root() / 'Malawi'
 HEAD_COLUMNS = {'HeadCount': 'ag_r02', 'HeadAcquired': 'ag_r10', 'HeadSold': 'ag_r16',
                 'HeadCount12MonthsAgo': 'ag_r07'}
 COLUMN_ORDER = ['HeadCount', 'HeadAcquired', 'HeadSold', 'ValuePerAnimal',
                 'HeadCount12MonthsAgo']
+WAVES = ['2010-11', '2013-14', '2016-17', '2019-20']
+DELETION = 'Malawi::livestock::owned-species-no-payload'
 
 #: What each wave script reads: (wave, source relative to Malawi/, id column, id prefix).
 MODULE_R = [
@@ -102,13 +106,31 @@ def test_blanks_do_not_decide_the_keep_filter(malawi):
 
 
 def test_an_owned_species_with_no_answers_reaches_the_wave_frame_blank(malawi):
-    # ag_r01 Yes keeps the row at wave grain.  With nothing else answered its payload
-    # is all NA, so _finalize_result's dropna(how='all') is what stops serving it; the
-    # wave script is not the place that decides that, and it must not mint a 0 to keep it.
+    # ag_r01 Yes keeps the row at wave grain.  With none of the served questions answered
+    # its payload is all NA, so _finalize_result's dropna(how='all') is what stops serving
+    # it; the wave script is not the place that decides that, and it must not mint a 0.
     out = _assemble(malawi, ag_r02=[pd.NA, 1.0], ag_r10=[pd.NA, 1.0], ag_r16=[pd.NA, 1.0],
                     ag_r04=[pd.NA, 1.0], ag_r07=[pd.NA, 1.0])
     assert sorted(out.index.get_level_values('i')) == ['1', '2']
-    assert out.xs('1', level='i').isna().all(axis=None)
+    assert out.xs('1', level='i')[list(HEAD_COLUMNS)].isna().all(axis=None)
+
+
+def test_the_deletion_predicate_is_every_served_column_blank(malawi):
+    out = _assemble(malawi, hhid=['1', '2', '3'], ag_r0a=[301] * 3, ag_r01=[1] * 3,
+                    ag_r02=[pd.NA, 0.0, pd.NA], ag_r10=[pd.NA] * 3, ag_r16=[pd.NA] * 3,
+                    ag_r04=[pd.NA, pd.NA, 5.0], ag_r07=[pd.NA] * 3)
+    picked = malawi.derive_livestock_no_payload(out)
+    # a recorded 0 is an answer, and so is a value
+    assert list(out[picked].index.get_level_values('i')) == ['1']
+
+
+def test_the_deletion_is_registered_and_resolves():
+    record = derivation_records('Malawi')[DELETION]
+    assert record['rows'] == 0
+    assert record['table'] == 'livestock'
+    assert list(record['waves']) == WAVES
+    assert callable(record.resolve('function'))
+    assert callable(record.resolve('inputs'))
 
 
 def _source(relative, id_column, prefix):
@@ -118,7 +140,48 @@ def _source(relative, id_column, prefix):
 
 
 @pytest.mark.requires_s3
-@pytest.mark.parametrize('wave', ['2010-11', '2013-14', '2016-17', '2019-20'])
+@pytest.mark.parametrize('wave', WAVES)
+def test_the_registered_inputs_are_the_source_lines_with_no_answer(malawi, wave):
+    """Oracle: keep-filtered here from the raw files, with no reducer and no predicate."""
+    species = malawi._malawi_code_map('harmonize_species')
+    expected = []
+    for w, rel, id_col, prefix in MODULE_R:
+        if w != wave:
+            continue
+        raw = _source(rel, id_col, prefix)
+        answers = raw[['ag_r02', 'ag_r10', 'ag_r16', 'ag_r04', 'ag_r07']].apply(
+            pd.to_numeric, errors='coerce')
+        animal = pd.to_numeric(raw['ag_r0a'], errors='coerce').map(species)
+        kept = (pd.to_numeric(raw['ag_r01'], errors='coerce') == 1) & animal.notna()
+        lines = kept & answers.isna().all(axis=1)
+        expected += list(zip(raw.loc[lines, 'hhid'].astype(str), animal[lines].astype(str)))
+    got = malawi.inputs_livestock_no_payload(wave)
+    assert list(got.index.names) == ['t', 'i', 'animal']
+    assert sorted((i, str(a)) for _, i, a in got.index) == sorted(expected)
+    assert (pd.to_numeric(got['ag_r01']) == 1).all()
+
+
+@pytest.mark.requires_s3
+def test_the_registered_rows_are_not_served_and_the_frame_says_so():
+    country = ll.Country('Malawi')
+    served = country.livestock()
+    assert served.attrs['derivations']['Malawi'][DELETION]['rows'] == 0
+
+    def keys(frame):
+        flat = frame.reset_index()[['t', 'i', 'animal']].astype(str)
+        return set(map(tuple, flat.to_numpy()))
+
+    # Positive control: the parquet holds them under the served id namespace, so
+    # "not served" below cannot pass just because the ids never could have matched.
+    stored = keys(pd.read_parquet(data_root() / 'Malawi' / 'var' / 'livestock.parquet'))
+    for wave in WAVES:
+        gone = keys(country.derivation_inputs(DELETION, wave=wave))
+        assert gone <= stored
+        assert gone.isdisjoint(keys(served))
+
+
+@pytest.mark.requires_s3
+@pytest.mark.parametrize('wave', WAVES)
 def test_served_cells_equal_the_source_cells(malawi, wave):
     """Oracle: the wave's Module R rows, keep-filtered here, one row per key, no groupby."""
     species = malawi._malawi_code_map('harmonize_species')
