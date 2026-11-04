@@ -265,5 +265,11 @@ Mali::crop_production::hh-crop-sale-single-row:
       evidence: >-
         the Stata label of s16dq05c; the same shape as the EAC-I tree equivalents,
         Mali/_/CONTENTS.org, "crop_production: the sold unit".
+  validated_against: >-
+    tests/test_gh824_mali_ehcvm_crop_production.py, whose oracle reads s16c and s16d
+    directly.  Cold build of 2021-22: 1,070 keyed rows and 70 Farm-level rows (58 of
+    crops on two rows, 12 on three or more, 0 on none) hold the 1,140 sale records, no
+    sale on two rows; Value_sold 394,396,600 + 24,301,375 = 418,697,975 FCFA, the raw sum.
+    Not validated against an external total: no document here reports one.
   contents: 'Mali/_/CONTENTS.org, "2026-11-03 -- EHCVM crop_production wired (GH #824)"'
   since: '2026-11-03'

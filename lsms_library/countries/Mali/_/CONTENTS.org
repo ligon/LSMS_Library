@@ -2520,5 +2520,51 @@ collides those onto identical =(t, i, plot_id)= tuples (9 dups)".  At this commi
 targets), so =id_walk= moves no s16a, s16c or s16d row and collides none.  The claim may date
 from an earlier crosswalk; it was not traced.
 
+** Measured, cold, base =98c6069d2= against =5eafac648=
+
+| wave    | rows  | Quantity set | priced | Value_sold, FCFA | harvest kg, metric rows of those with Quantity | yield rows, median kg/ha |
+|---------+-------+--------------+--------+------------------+------------------------------------------------+--------------------------|
+| 2018-19 | 7,992 |        7,383 |  2,101 |      623,474,428 | 14,881,091 kg, 5,615 of 7,383                  | 5,262, 844               |
+| 2021-22 | 7,317 |          309 |  1,139 |      418,697,975 | 261,596 kg, 236 of 309                         | 217, 505                 |
+
+- *Nothing else moved.*  =crop_production='s 35,060 EAC-I rows are frame-equal to base, row order
+  and dtypes included, and the other 22 frame tables of this country are frame-equal whole
+  (=panel_ids= is a dict: 5,011 entries on both sides).  =harvest_kg=, =gross_crop_revenue=,
+  =crop_diversity= and =median_price_valuation= do not move on an EAC-I row.  Cold equals a
+  fresh-process warm read, and a single-wave request equals its slice of the all-wave frame.
+- *Harvest kg in these waves is read, never inferred.*  Every kg comes from the =metric= layer
+  (=Kg=, =Tonne=, the three sacks).  The inferred layer serves no row of this table in any wave,
+  so a cart, =Baignoire=, =Gerbe=, =Botte=, =Grenier=, =Panier=, =Unité= or =Autre= has no factor and adds
+  no kg: 1,767 + 73 rows with a quantity.
+- *Prices corroborate the sack weight.*  Median FCFA per =Sac (100 Kg)=, over 100, against the
+  median FCFA per =Kg=, 2018-19: millet 125 / 134, maize 100 / 100, sorghum 125 / 125; cotton per
+  =Tonne= over 1,000 is 250 / 250, as in 2017-18.  Groundnut is the exception (102 / 250), and the
+  unserved state of the product is the first thing to check there.  Niger's =Gros sac=
+  prices alike (groundnut 10,750, paddy 13,000, against Mali's 10,250 and 12,500).
+- *Niger is no yield comparison, nor is Mali 2017-18.*  Only 36 of Niger's 13,717 rows of 2018-19
+  convert, because its units name no weight, and the EAC-I waves have no =plot_features=.  These are
+  the first Mali yields.
+- *FLAGGED, NOT FIXED: the yield tail is a plot_features question.*  2018-19 runs to p99 367,800
+  and a maximum of 12,500,000 kg/ha.  The top decile's median area is 0.01 ha, against 0.6 to 2.0
+  in the rest.  All 358 plots under 0.01 ha are farmer estimates in m^2 (median stated value 50
+  m^2), as are 88 of 95 in 2021-22; no GPS plot of 2018-19 is that small.  Whether those were
+  answered in the wrong unit was not established.  Site Q does not see it: it screens =Quantity=.
+- *Site Q*: 3 of 7,992 in 2018-19, all cotton (=Sac (100 Kg)= 9,000, =Tonne= 1,600 and 1,400, at
+  147 to 225 x the reference), and 0 in 2021-22.  *Site B*: =planting_month=, =harvest_month= and
+  =perennial=, 100% null in both waves.  *Site I*: no new finding; the 627 EAC-I tree rows are as
+  before.  *Grain*: no collapse.  =Feature('crop_production')= over Mali, Niger and Burkina Faso:
+  113,372 rows, unique index, 9,523 null =u= promoted to =Unknown= with no collision.
+- *=crop_diversity(weight='count')= counts a Farm-level row as an occurrence*: 50 of 2,857
+  households move in 2021-22, mean 0.6435 against 0.6448 with those rows dropped.  That is in
+  =transformations.py= and is not changed here.  =median_price_valuation= is right about them:
+  their 70 prices enter the medians (2021-22 Value 59.8M against 62.7M without) and none receives
+  a Value.  =harvest_kg= and =yield_kg= never see them.
+- *Crops against food.*  =crop= stays on =harmonize_food= labels, but the same-wave join is partial:
+  3,064 of 7,992 rows in 2018-19 and 5,213 of 7,317 in 2021-22 (7,264 and 6,607 on the food labels of
+  any wave).  The rest is cotton and its like, and foods that EHCVM names by form: =Riz= has no EHCVM food row.
+- *On a 2021-22 keyed row*: 51 of 1,070 also have a harvest =Quantity=, and on 32 of those =u= and
+  =Unit_sold= agree.  68 of 2,857 crop households have a Farm-level row, and its value is mostly
+  cotton (20 of the 70 rows).
+
 Tests: =tests/test_gh824_mali_ehcvm_crop_production.py=, with an oracle that reads the =.dta=
 files and imports nothing from this directory.

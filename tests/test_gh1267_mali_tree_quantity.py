@@ -270,7 +270,9 @@ class TestServed:
         expected = pd.Series(KEY, index=trees.index, dtype="string")
         expected.loc[positive] = "+".join(sorted([KEY, SALE_KEY]))
         assert trees["Derivation"].equals(expected.rename("Derivation"))
-        field = built[~built["perennial"].fillna(False)]
+        # The waves with a tree roster: a 2021-22 row can carry GH #824's sale key.
+        in_eaci = built.index.get_level_values("t").isin(TREE_ROWS)
+        field = built[in_eaci & ~built["perennial"].fillna(False)]
         assert field["Derivation"].isna().all()
         assert field["months_harvested"].isna().all()
         summ = built.attrs["derivations"][COUNTRY]
