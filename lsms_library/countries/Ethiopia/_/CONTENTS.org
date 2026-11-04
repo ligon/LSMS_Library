@@ -2481,7 +2481,12 @@ this: one line per (plot, crop) there.  W4 4 and W5 10 pairs are on several line
 of one plot; 1 and 7 of them carry a positive sale, 600 + 28,610 Birr.  Base
 served 1,200 + 28,710 Birr of it, because the W4 pair's and a W5 pair's lines
 differ in =u= (or a no-unit row survived on its sale), so those sold twice.  After:
-attached nowhere, like a multi-plot sale (GH #1457's queue).  3 W5 rows with no
+attached nowhere, like a multi-plot sale (GH #1457's queue).  So of the 29,910
+Birr that leaves =Value_sold=, only 700 was double-served; 29,210 was served once
+and now is not.  Attaching to the one line that records a harvest would recover
+only the 100-Birr Gishita sale, the other 29,110 being on two real harvest lines:
+not done.  Going the other way, W4 gains 80 Birr: §11 sales on folded Leafy Greens
+lines the collapse used to drop, which is why W4's net is -1,120.  3 W5 rows with no
 unit and no quantity leave with the sale that was their only content (one Gishita
 pair, 100 Birr; one Pumpkin line, Birr 0): the 2026-10-23 ruling keeps a row
 carrying a sale value, and these no longer carry one.  This is the row the empty-
