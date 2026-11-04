@@ -43,6 +43,11 @@ def raw_reader(monkeypatch):
         'emc2014_welfare.dta': pd.DataFrame({
             'grappe': [2], 'menage': [1], 'hhweight': [9.],
             'strate': [1], 'milieu': ['Rural']}),
+        # GH #1464: sample also reads the p1 food file, for the households the
+        # welfare file leaves out.  This one holds none, so 2014 stays one household.
+        'emc2014_p1_conso7jours_16032015.dta': pd.DataFrame({
+            'zd': [2, 2], 'menage': [1, 1], 'hhweight1': [5., 5.],
+            'strate': ['BM_R', 'BM_R'], 'milieu': ['RURAL', 'RURAL']}),
     }
     calls = []
 

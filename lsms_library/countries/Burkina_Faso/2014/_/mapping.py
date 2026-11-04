@@ -47,6 +47,66 @@ def i(value):
 
 
 # ---------------------------------------------------------------------------
+# sample: the households the welfare file leaves out (GH #1464)
+# ---------------------------------------------------------------------------
+def sample(df):
+    """``sample`` post-processor: extend the welfare file with the p1 households.
+
+    ``df`` is the concatenation ``data_info.yml`` asks for, at ``(t, i)``: one row
+    per welfare household (which carries ``hhweight``), then one row per food item of
+    every household of ``emc2014_p1_conso7jours`` (which has no such column, so its
+    ``weight`` and ``panel_weight`` are NaN).  Returned: the welfare rows, unchanged
+    and first, then one row for each household the welfare file does not hold, in
+    first-seen order, with ``v`` = ``zd``, ``Rural`` from ``milieu``, ``weight`` and
+    ``panel_weight`` NA.  Ethiopia's agriculture-cover households follow the same
+    rules (GH #1120, ``ethiopia.with_agriculture_cover_households``), each enforced:
+
+    * the added file is item grain, so a household's rows must agree on ``v``,
+      ``Rural`` and ``strata`` before they are reduced to one;
+    * ``strata`` is spelled as the welfare file spells it.  The food file records the
+      same stratum as a code (``BM_R``) where the welfare file has a number, so the
+      code is translated through the households both files hold, and a translation
+      that is not one-to-one, or a code it does not reach, RAISES.
+
+    Nothing is guessed, and no value here is a construction: each is the survey's own
+    answer for that household, in the welfare file's spelling.
+    """
+    names = list(df.index.names)
+    flat = df.reset_index()
+    has_weight = flat['weight'].notna()
+    welfare = flat[has_weight]
+    if welfare['i'].duplicated().any():
+        raise ValueError(
+            'Burkina_Faso/2014 sample: emc2014_welfare.dta repeats a household.')
+    added = flat[~has_weight]
+    vary = added.groupby('i')[['v', 'Rural', 'strata']].nunique(dropna=False)
+    n_vary = int((vary > 1).any(axis=1).sum())
+    if n_vary:
+        raise ValueError(
+            f'Burkina_Faso/2014 sample: {n_vary} household(s) carry more than one '
+            'zd / milieu / strate across their rows of the p1 food file; which is '
+            "the household's is not something the survey says.")
+    pairs = (welfare[['i', 'strata']]
+             .merge(added[['i', 'strata']].drop_duplicates(), on='i',
+                    suffixes=('_welfare', '_food'))
+             .dropna()[['strata_food', 'strata_welfare']].drop_duplicates())
+    if pairs['strata_food'].duplicated().any() or pairs['strata_welfare'].duplicated().any():
+        raise ValueError(
+            'Burkina_Faso/2014 sample: strate is not one-to-one between '
+            'emc2014_welfare.dta and the p1 food file.')
+    new = added[~added['i'].isin(welfare['i'])].drop_duplicates('i').copy()
+    strata = new['strata'].map(pairs.set_index('strata_food')['strata_welfare'])
+    if strata.isna().any():
+        raise ValueError(
+            f"Burkina_Faso/2014 sample: {int(strata.isna().sum())} added household(s) "
+            'carry a strate the households of both files never use.')
+    new['strata'] = strata
+    out = pd.concat([welfare, new], ignore_index=True).set_index(names)
+    out.attrs = dict(df.attrs)
+    return out
+
+
+# ---------------------------------------------------------------------------
 # The four quarterly passages (GH #851 / charter §2.7)
 # ---------------------------------------------------------------------------
 #

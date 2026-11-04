@@ -2,7 +2,20 @@ Country: Burkina Faso
 Wave: 2014
 
 sample:
-    file: emc2014_welfare.dta
+    # GH #1464.  emc2014_welfare.dta holds 10,411 of the 10,800 households of the p1
+    # roster and food files, so the other 389 had no `v` anywhere that joins from here.
+    # The p1 food file records all 10,800, at item grain, with zd, menage, milieu and
+    # strate.  It has no `hhweight`: under a file list a missing column arrives NaN, so
+    # the 389 get `weight` and `panel_weight` NA.  Its `hhweight1` is a passage weight
+    # and is deliberately NOT read (@ligon's ruling).  mapping.py's `sample` hook keeps
+    # the welfare rows as they are and first, and appends one row per added household.
+    file:
+        - emc2014_welfare.dta
+        - emc2014_p1_conso7jours_16032015.dta:
+            i:
+                - zd
+                - menage
+            v: zd
     idxvars:
         i:
             - grappe

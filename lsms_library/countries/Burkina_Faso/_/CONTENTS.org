@@ -509,7 +509,7 @@ per-native-unit unitvalue; only the kg aggregate excludes them.
 Sampling design table: cluster, weights, strata, and Rural classification.
 
 *** Waves
-- *2014 (EMC)*: Single file =emc2014_welfare.dta=.  Weight variable =hhweight= (cross-sectional); no distinct panel weight (same variable used for both).  Numeric =strate= column (1--26, Region x Milieu).  10,224 households across 900 clusters.
+- *2014 (EMC)*: =emc2014_welfare.dta=.  Weight variable =hhweight= (cross-sectional); no distinct panel weight (same variable used for both).  Numeric =strate= column (1--26, Region x Milieu).  10,224 households across 900 clusters.  /Since 2026-11-04 also the 389 households only the p1 food file holds, with no weight, 10,800 in all: see GH #1464 at the end of this file./
 - *2018-19 (EHCVM)*: Two-file merge: cover page =s00_me_bfa2018.dta= (cluster, Rural) + =ehcvm_ponderations_bfa2018.dta= (cluster-level =hhweight=, same for both weight columns).  6,961 households across 585 clusters.  No explicit strata variable.
 - *2021-22 (EHCVM)*: Two-file merge: cover page =s00_me_bfa2021.dta= + =ehcvm_panel_ponderations_bfa2021.dta=.  Distinct weights: =hhweight2021= (cross-sectional) and =hhweight_panel= (panel/longitudinal).  Both weights are cluster-level (same value for all households in a grappe).  3,218 households across 550 clusters.  No explicit strata variable.
 
@@ -2195,6 +2195,7 @@ execution of the EMC scripts preserves 51,099 food-coping rows and 10,230
 months-food-inadequate rows exactly except for the namespace prefix.
 The pre-existing 389 EMC roster households absent from sample (1,506 person
 rows with null =v=) and missing EHCVM strata remain visible and unchanged.
+/The 389 are in =sample= since 2026-11-04 (GH #1464); see the end of this file./
 
 Private receiving evidence contains source/cache hashes, exact API commands,
 raw witnesses and the aggregate report. No raw IDs are published here.
@@ -2211,6 +2212,10 @@ scope above. Independent keyed, typed cold expectations match =sample=
 The source roster has 197,768 rows; the existing typed-all-payload-NA finalizer
 excludes 4,161 panel records. This measures current eligibility, not a new rule.
 The 1,506 EMC person rows with null =v= and missing EHCVM strata remain.
+/Correction, 2026-11-04 (GH #1464): this checkpoint's =sample= counts describe the table
+before the 389 were added.  =sample= is now 10,800 / 7,010 / 10,403, 28,213 in all.  The
+roster's rows and the namespace result do not move (193,607; no =i= shared across the
+waves), and its 1,506 null =v= are 0./
 
 Cold comparisons are independent by key, using sorted comparison projections;
 they do not independently establish raw iteration order. Exact numeric checks
@@ -2696,7 +2701,10 @@ slot's kilograms.  =s16b_me_bfa2021.dta= holds 1,158 applied NPK rows and =plot_
 does not read it.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 3,684 positive in
 2018-19), which the =data_scheme.yml= grain note says it does not.
 
-* 2026-11-04 -- WAITING where 2014 =food_expenditures= loses =v= (GH #1464)
+* 2026-11-04 -- DONE where 2014 =food_expenditures= loses =v= (GH #1464)
+
+/Ruled the same day and fixed: see "2014 =sample= holds the 389" at the end of this file.
+This section is the state before that./
 
 2014's =food_acquired= reads =v= from its own files (=idxvars: v: zd=), so it carries one on every
 row.  The derived food tables do not: =food_expenditures_from_acquired= drops =v= from its
@@ -2723,7 +2731,7 @@ They are not households with no weight anywhere: every one of the 389 has =hhwei
 =hhweight4= in the p1 and p4 food files, and they thin out by passage (food rows at p1 389, p2 230,
 p3 13, p4 389).  Why =emc2014_welfare.dta= leaves them out is not documented here.
 
-WAITING a ruling, GH #1464.  Mali 2018-19 is the only other case of this shape (3 households, 27
+Mali 2018-19 is the only other case of this shape (3 households, 27
 =food_expenditures= rows, on =s07b= and not on the =s00= cover).  EthiopiaRHS, GhanaSPS 2009-10 and
 Tanzania 2014-15 also serve an NA =v=, but on =food_acquired= too.
 
@@ -2894,3 +2902,66 @@ of the place the others were read.
 
 *Nothing in 2018-19 is changed.*  The 2018-19 rows still serve all of the above as recorded,
 pending a ruling.
+
+* 2026-11-04 -- 2014 =sample= holds the 389 (GH #1464)
+
+*Ruling (@ligon, 2026-11-04).*  Extend =sample= with the 389 households the welfare file
+leaves out: =v= = =zd=, =weight= NA, on Ethiopia's #1359 pattern.  Do not borrow =hhweight1=.
+
+*Where it is done.*  =2014/_/data_info.yml= reads =emc2014_p1_conso7jours_16032015.dta=
+after the welfare file, and the =sample= hook in =2014/_/mapping.py= keeps the welfare rows
+unchanged and first, then appends one row per household the welfare file lacks.  As in
+Ethiopia, a household's item rows must agree before they are reduced, and nothing is guessed.
+It stays on the YAML path, so the food file's sidecar is in the hash.
+
+*Why that file and not the logement one.*  Logement holds the same 10,800 households at
+household grain, but it has no =strate=, and the food file does.  The food file writes the
+stratum as a code (=BM_R=) and the welfare file as a number; on the 10,410 households both
+report it, the 26 codes and the 26 numbers pair one-to-one.  So the 389 get their recorded
+stratum in the welfare file's spelling, and the hook refuses a code that pairing cannot place.
+*Ruled on =weight=, not on =strata=:* this is the one choice here the ruling did not name.
+Dropping it to NA is one line.
+
+*=hhweight1= is not this weight.*  It is on all 389 and differs from =hhweight= on all
+10,411 shared households (at 4 decimals); =hhweight= in the =emc2014_agri_*= files, on 387 of
+the 389, differs on all 10,377 shared.  Neither is read.  The 389 keep NA in =weight= and
+=panel_weight=, so a weighted estimate drops them, and =_normalise_sample_weights= divides
+by the non-null mean as before: the 10,411 weights served do not move.
+
+*Why the welfare file omits them is still undocumented.*  Measured, households present in the
+person file of each passage: passage 2 244 of the 389 against 10,374 of the 10,411 others;
+passage 3 17 against 10,212; passage 4 388 against 10,379.  On =res_entr1=, 382 of the 389 read 1.
+
+*Measured*, cold base (=115b6ab71=) against the change:
+
+|                                                       | base          | after         |
+|-------------------------------------------------------+---------------+---------------|
+| =sample= 2014 / all rows                              | 10,411 / 27,824 | 10,800 / 28,213 |
+| 2014 =weight= non-null                                | 10,411        | 10,411        |
+| =sample(market='Region')= 2014 rows, =m= null         | 10,411, 0     | 10,800, 0     |
+| 2014 NA =v=: =household_roster=                       | 1,506         | 0             |
+| ... =food_expenditures()=                             | 6,603         | 0             |
+| ... =food_expenditures(valuation=..., basis='total')= | 6,841         | 0             |
+| ... =food_prices()=                                   | 3,795         | 0             |
+| ... =food_quantities()=                               | 4,049         | 0             |
+| ... =housing=                                         | 389           | 0             |
+| ... =individual_education=                            | 1,254         | 0             |
+| ... =food_coping=                                     | 65            | 5             |
+| ... =months_food_inadequate=                          | 13            | 1             |
+
+The rows of those tables are otherwise unchanged; only =v= moves.
+=household_characteristics= had no NA =v= to clear, because =roster_to_characteristics= spells
+one =Mover=, and 379 of these households were served =v = 'Mover'=, a label that says something
+the survey does not.  They now carry their =zd=.
+
+*What stays.*  One 2014 household is in the passage-3 files and in no p1 file (=zd= 262), so it
+keeps NA =v= on =food_coping= (5 rows) and =months_food_inadequate= (1), and =shocks= also holds
+it (3 rows, no =v= level).  It has no row in =sample=.
+
+*The #1244 checkpoint's counts.*  The reviewed 10,411 / 27,824 are the state before this; the
+sections above carry a dated note.  Its namespace finding holds: the 389 ids are =EMC_= ids, and
+none is shared with another wave.
+
+Cache: =2014/_/data_info.yml= and =mapping.py= are build inputs, so every Burkina table hash and
+every 2014 wave hash moves, one Burkina re-warm.  No other country's, and no
+=build_transforms_fingerprint=.  Pinned by =tests/test_gh1464_burkina_sample_extension.py=.
