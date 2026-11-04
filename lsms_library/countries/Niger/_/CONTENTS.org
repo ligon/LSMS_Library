@@ -2614,3 +2614,19 @@ same clusters" does not say so.
 
 *Inference, not wired.*  That region x milieu is the stratum of a 2021-22 cluster
 the BID does not describe.
+
+* 2026-11-04 -- the dry season: read in 2011-12, not asked in 2014-15 (GH #1462)
+
+=ecvmaas3e_p1.dta= (2011-12) is the ECVMA agricultural questionnaire's section 3E, "Production from
+the contre-saison by type of crop" (=ECVMA_Quest_AGR_P1_V10_eng.pdf=, table of contents).  576 rows,
+271 households, read nowhere, so =crop_production= 2011-12 is the rainy season only.  Its shape
+differs from the rainy module: a crop line (=as03eq01=), no field or parcel; the quantity is "en
+moyenne pour chaque cycle" (=as03eq09a=, unit =as03eq09b= on 551, kg =as03eq09c= on 553) beside a
+cycle count =as03eq06= (=as03eq07=, the gap between cycles, is filled on 49); a sale on 457-463
+rows (=as03eq11a/b/c=, =as03eq12=).
+
+*2014-15 has no such module, and =ECVMA2_AS03P1= is not one.*  It is section 3, "Equipements pour
+l'agriculture" (=AS03Q01= "Type d'équipement"; 45,570 rows).  =ecvma2_quest_agr_p1.pdf= has sections
+2A-2C and 3 and no dry-season production; =ecvma2_as2dp2.dta= asks only contre-saison costs
+(=AS02DQ03=, =AS02DQ05=).  So no 2014-15 dry-season harvest exists in the held files or the held
+instruments, and =crop_production= 2014-15 is not missing one.

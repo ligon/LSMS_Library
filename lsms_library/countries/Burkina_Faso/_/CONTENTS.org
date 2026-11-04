@@ -2690,3 +2690,43 @@ label.  It is 58.8% of 2018-19's =nitrogen_kg=, and 7 =Tonne= rows are 69.6% of 
 slot's kilograms.  =s16b_me_bfa2021.dta= holds 1,158 applied NPK rows and =plot_inputs=
 does not read it.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 3,684 positive in
 2018-19), which the =data_scheme.yml= grain note says it does not.
+
+* 2026-11-04 -- WAITING where 2014 =food_expenditures= loses =v= (GH #1464)
+
+2014's =food_acquired= reads =v= from its own files (=idxvars: v: zd=), so it carries one on every
+row.  The derived food tables do not: =food_expenditures_from_acquired= drops =v= from its
+=groupby= on purpose (GH #246), and =_finalize_result= re-joins it from =sample()=.  =sample= reads
+=emc2014_welfare.dta=, which holds 10,411 of the 10,800 households on the p1 roster and food files
+(0 the other way).  So the 389 that are absent, in 263 zd, come back NA.  It is not the valuation path.
+
+| 2014, cold, =e92ae6b0f=               | rows    | NA =v= | households |
+|---------------------------------------+---------+--------+------------|
+| =food_acquired=                       | 559,180 |      0 |          0 |
+| =food_expenditures()=                 | 239,916 |  6,603 |        386 |
+| =food_expenditures(valuation=..., basis='total')= | 252,677 | 6,841 | 386 |
+| =food_prices()=                       |         |  3,795 |            |
+| =food_quantities()=                   |         |  4,049 |            |
+| =household_roster=                    |  78,543 |  1,506 |        389 |
+
+386 of the 389 have a food row: 9,117 rows, 6.16M of 2014's 342.11M FCFA of =Expenditure=.
+
+*They do reach the price pools.*  =food_acquired_valued= reads =v= from =food_acquired=, before the
+=groupby=, so these rows sit in their =v= cell.  Nulling =v= on them changes 1,235 valued cells
+(147 on those households, 1,088 on others), total -27,852 FCFA.  What is lost is the served key.
+
+They are not households with no weight anywhere: every one of the 389 has =hhweight1= and
+=hhweight4= in the p1 and p4 food files, and they thin out by passage (food rows at p1 389, p2 230,
+p3 13, p4 389).  Why =emc2014_welfare.dta= leaves them out is not documented here.
+
+WAITING a ruling, GH #1464.  Mali 2018-19 is the only other case of this shape (3 households, 27
+=food_expenditures= rows, on =s07b= and not on the =s00= cover).  EthiopiaRHS, GhanaSPS 2009-10 and
+Tanzania 2014-15 also serve an NA =v=, but on =food_acquired= too.
+
+* 2026-11-04 -- 2021-22 =s16cq16a=: the instrument asks what the file lacks (GH #1437)
+
+Q16C.11 routes a finished harvest TO the quantity ("Si la réponse est 1=Oui alors aller à Q16C.16",
+=manuelagent_ehcvm2_version_v2.pdf=, printed p. 124), and =s16cq16a= is filled on 0 of the 7,663
+finished rows and 179 of 813 unfinished.  =crop_production= does not serve 2021-22 yet, so nothing here
+is affected until it is wired.  Of 6,444 household-crop pairs with a finished row, 3,983 have a positive
+=s16d= disposition sum in one unit, 2,289 span units and 172 record none.  The measurement of that sum
+against a real harvest is in =Mali/_/CONTENTS.org=, same date.
