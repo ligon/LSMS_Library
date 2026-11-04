@@ -17,6 +17,16 @@ _RESIDENT_STATUS = 'HOUSEHOLD FOUND - ORIGINAL LOCATION'
 SPLIT_OFF_PARENT_DERIVATION = 'Tanzania::sample::split-off-parent-cluster'
 
 
+class SplitOffClusterError(Exception):
+    """A split-off's `y4_hhid` has frame households in more than one cluster.
+
+    Subclasses `Exception`, as `IdWalkError` does.  `_join_v_from_sample` catches
+    `ValueError`, `KeyError`, `FileNotFoundError` and `AttributeError`, and the
+    derived-table paths catch `RuntimeError` too, so any of those would serve
+    every Tanzania household table with no `v` in any wave and only a warning.
+    """
+
+
 def v(x):
     """Ensure cluster ID is a clean string (strip .0 from float)."""
     return format_id(x)
@@ -47,8 +57,9 @@ def derive_split_off_parent_cluster(df):
         added.
 
     Raises:
-        ValueError: if the frame households on a split-off's `y4_hhid` span more
-            than one cluster, so that there is no one parent cluster to take.
+        SplitOffClusterError: if the frame households on a split-off's `y4_hhid`
+            span more than one cluster, so that there is no one parent cluster
+            to take.
     """
     in_frame = _has_sdd_cluster(df['_frame']).to_numpy(dtype=bool)
     frame = df[in_frame]
@@ -57,8 +68,8 @@ def derive_split_off_parent_cluster(df):
     parents = df['_y4_hhid'].map(clusters)
     rekey = stray & parents.notna().to_numpy()
     if (parents[rekey].map(len) > 1).any():
-        raise ValueError('sample 2019-20: a split-off\'s y4_hhid has frame households '
-                         'in more than one cluster (GH #1441)')
+        raise SplitOffClusterError('sample 2019-20: a split-off\'s y4_hhid has frame '
+                                   'households in more than one cluster (GH #1441)')
     out = df.drop(columns=['_frame', '_y4_hhid'])
     out.loc[rekey, 'v'] = parents[rekey].map(lambda s: next(iter(s)))
     out['Derivation'] = pd.Series(pd.NA, index=out.index, dtype='string')

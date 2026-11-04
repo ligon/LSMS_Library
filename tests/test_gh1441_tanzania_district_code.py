@@ -11,7 +11,8 @@ reads `upd4_hh_a.dta` directly and recomputes what the table claims, so neither 
 re-release nor a hand edit can leave a row standing without its evidence.  The
 served tier checks the rule through the Country API.
 
-Data-dependent tests skip cleanly when the Tanzania source files are unavailable.
+Data-dependent tests carry `requires_s3`, so they skip without credentials.  With
+them, a build failure fails rather than skips.
 """
 import importlib.util
 import inspect
@@ -159,6 +160,74 @@ def test_derivation_is_registered_and_resolves():
     assert "wave" not in params, "the names live in round 3, outside the entry's waves"
 
 
+@pytest.fixture(scope="module")
+def mapping_2019():
+    """`2019-20/_/mapping.py`, loaded from its path as `derivations.yml` does."""
+    path = countries_root() / "Tanzania" / "2019-20" / "_" / "mapping.py"
+    spec = importlib.util.spec_from_file_location("_tz_gh1441_mapping", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _split_off_frame(rows):
+    df = pd.DataFrame(rows, columns=["i", "v", "_frame", "_y4_hhid"])
+    return df.assign(weight=1.0).set_index("i")
+
+
+def test_split_off_takes_its_parents_cluster_only_when_its_id_is_stray(mapping_2019):
+    out = mapping_2019.derive_split_off_parent_cluster(_split_off_frame([
+        ("frame", "100", "0001", "A"),
+        ("other_frame", "200", "0002", "B"),
+        ("stray_with_parent", "900", "", "A"),
+        ("stray_no_parent", "901", "", "Z"),
+        ("id_is_a_frame_cluster", "200", "", "A"),
+    ]))
+    assert list(out.columns) == ["v", "weight", "Derivation"]
+    assert out["v"].to_dict() == {"frame": "100", "other_frame": "200", "stray_with_parent": "100",
+                                  "stray_no_parent": "901", "id_is_a_frame_cluster": "200"}
+    stamped = out["Derivation"].dropna()
+    assert stamped.index.tolist() == ["stray_with_parent"]
+    assert stamped.iloc[0] == "Tanzania::sample::split-off-parent-cluster"
+
+
+def test_guard_refuses_a_split_off_with_two_parent_clusters(mapping_2019):
+    frame = _split_off_frame([
+        ("frame_1", "100", "0001", "A"),
+        ("frame_2", "200", "0002", "A"),
+        ("stray", "900", "", "A"),
+    ])
+    with pytest.raises(mapping_2019.SplitOffClusterError):
+        mapping_2019.derive_split_off_parent_cluster(frame)
+
+
+def test_guard_does_not_fire_without_a_household_to_rekey(mapping_2019):
+    out = mapping_2019.derive_split_off_parent_cluster(_split_off_frame([
+        ("frame_1", "100", "0001", "A"),
+        ("frame_2", "200", "0002", "A"),
+        ("id_is_a_frame_cluster", "100", "", "A"),
+    ]))
+    assert out["Derivation"].isna().all()
+
+
+def test_guard_error_is_none_of_the_types_the_build_paths_catch(mapping_2019):
+    """Any of these would be swallowed, and every household table served no `v`."""
+    caught = (FileNotFoundError, KeyError, ValueError, AttributeError, RuntimeError, OSError)
+    assert not issubclass(mapping_2019.SplitOffClusterError, caught)
+
+
+def test_the_v_join_does_not_swallow_the_guard(mapping_2019, monkeypatch):
+    country = ll.Country("Tanzania", preload_panel_ids=False)
+
+    def refuse(*args, **kwargs):
+        raise mapping_2019.SplitOffClusterError("two parent clusters")
+
+    monkeypatch.setattr(country, "sample", refuse, raising=False)
+    frame = pd.DataFrame({"x": [1]}, index=pd.MultiIndex.from_tuples([("a", "2019-20")], names=["i", "t"]))
+    with pytest.raises(mapping_2019.SplitOffClusterError):
+        country._join_v_from_sample(frame)
+
+
 # --------------------------------------------------------------------------
 # Source tier: the oracle reads the .dta
 # --------------------------------------------------------------------------
@@ -167,12 +236,9 @@ def test_derivation_is_registered_and_resolves():
 def upd_raw(tzmod):
     """`upd4_hh_a.dta` as shipped (panel lines), with the geocode."""
     path = countries_root() / "Tanzania" / "2008-15" / "Data" / "upd4_hh_a.dta"
-    try:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            raw = get_dataframe(path)
-    except Exception as exc:  # noqa: BLE001 - any data failure -> skip
-        pytest.skip(f"upd4_hh_a.dta unavailable: {exc}")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        raw = get_dataframe(path)
     df = raw.copy()
     df["round"] = df["round"].astype(int)
     df["cid"] = df["clusterid"].map(lambda x: str(int(x)))
@@ -266,10 +332,7 @@ def test_round_4_is_a_different_vintage(table, upd, tzmod, district):
 @pytest.mark.requires_s3
 def test_y5_column_is_the_stata_value_label(table, tzmod):
     path = countries_root() / "Tanzania" / "2020-21" / "Data" / "hh_sec_a.dta"
-    try:
-        cats = get_dataframe(path, convert_categoricals=True, categories_only=True)["hh_a02_1"]
-    except Exception as exc:  # noqa: BLE001 - any data failure -> skip
-        pytest.skip(f"hh_sec_a.dta unavailable: {exc}")
+    cats = get_dataframe(path, convert_categoricals=True, categories_only=True)["hh_a02_1"]
     labels = {int(k): str(v).strip().upper() for k, v in cats.items()}
     for code, row in table.iterrows():
         got = row["Y5 label"]
@@ -288,14 +351,11 @@ def tz():
 
 
 def _build(fn):
-    try:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            df = fn()
-    except Exception as exc:  # noqa: BLE001 - any build/data failure -> skip
-        pytest.skip(f"Tanzania table unavailable: {exc}")
-    if df is None or df.empty:
-        pytest.skip("Tanzania table empty")
+    """Lets a build failure fail: `requires_s3` already skips without data."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        df = fn()
+    assert df is not None and not df.empty
     return df
 
 

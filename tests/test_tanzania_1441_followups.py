@@ -3,7 +3,9 @@
 The oracle reads the source files directly and imports nothing from
 `Tanzania/_/`, so a mistake in the country code cannot agree with itself.
 
-Data-dependent tests skip cleanly when the Tanzania source files are unavailable.
+Every test here needs data and carries `requires_s3`, so it skips without
+credentials.  With them, a build failure fails rather than skips.  The rule for the
+guard on B is tested without data in test_gh1441_tanzania_district_code.py.
 """
 import json
 import re
@@ -29,23 +31,17 @@ def letters(x):
 
 
 def _read(path):
-    try:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            return get_dataframe(countries_root() / "Tanzania" / path)
-    except Exception as exc:  # noqa: BLE001 - any data failure -> skip
-        pytest.skip(f"{path} unavailable: {exc}")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        return get_dataframe(countries_root() / "Tanzania" / path)
 
 
 def _build(fn):
-    try:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            df = fn()
-    except Exception as exc:  # noqa: BLE001 - any build/data failure -> skip
-        pytest.skip(f"Tanzania table unavailable: {exc}")
-    if df is None or df.empty:
-        pytest.skip("Tanzania table empty")
+    """Lets a build failure fail: `requires_s3` already skips without data."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        df = fn()
+    assert df is not None and not df.empty
     return df
 
 
