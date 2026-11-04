@@ -206,3 +206,88 @@ Niger::community_prices::first-entry-of-duplicate:
     entry does not hold.
   contents: 'Niger/_/CONTENTS.org, "community_prices: a record entered twice serves its first entry (GH #1087)"'
   since: '2026-11-04'
+
+Niger::crop_production::dry-season-cycle-total:
+  waves: ['2011-12']
+  columns: [Quantity]
+  rows: {plot_id: Farm-level}
+  rule: >-
+    On a dry-season row (2011-12 section 3E, ecvmaas3e_p1), Quantity is 3E.9a
+    as03eq09a x 3E.6 as03eq06, the harvest per cycle times the cycles, in the
+    recorded unit u.  as03eq09a == 99999 is masked before the product (1 row).  A
+    zero answer is zero.  On the 526 served one-cycle rows the product is the
+    answer; it differs on the 49 multi-cycle rows, 48 of them with a harvest.
+    Quantity_sold and Value_sold are served as recorded under
+    dry-season-sale-window, not multiplied.
+  function: lsms_library.countries.Niger._.niger:derive_dry_season_cycle_total
+  inputs: lsms_library.countries.Niger._.niger:inputs_dry_season_cycle_total
+  raw_variables: [hid, as03eq01, as03eq03, as03eq06, as03eq09a, as03eq09b]
+  assumptions:
+    - text: >-
+        every cycle of a crop yields what as03eq09a records.  The sources word that
+        answer two ways.  The Stata label says an average: "quantite en uml de ce
+        produit avez-vous recolte en moyenne pour chaque cycle", and then the
+        product is the season's harvest.  The English questionnaire and the DDI's
+        English file say the first cycle: 3E.9 "How much of this produce did you
+        harvest during the first cycle of production?", "Quantity harvested during
+        the first cycle of production", and then the product extrapolates the first
+        cycle over the later ones.  No held file says which was fielded; the French
+        instrument is not held.  Ruled on the first wording, recorded with the
+        second.
+      basis: modelling-choice
+      evidence: >-
+        ecvmaas3e_p1.dta variable labels; ECVMA_Quest_AGR_P1_V10_eng.pdf, Section
+        3E, printed pp. 27-29; ddi-documentation-english_microdata-2050.pdf; ruling
+        @ligon 2026-11-04 on GH #1462.
+    - text: >-
+        as03eq09a == 99999 is a "don't know", masked before the product, never on
+        the total.  It is unlabelled, and a different width from the rainy module's
+        999999.  Its sibling kg columns as03eq09c and as03eq11c carry 99999 on 42
+        and 39 rows, and the one row has a stated kilogram and sale beside it.
+      basis: modelling-choice
+      evidence: >-
+        measured on the held file; the GH #865 reading of the rainy codes
+        (Niger/_/CONTENTS.org, "The VALUE sentinel").
+  validated_against: >-
+    the survey's own dispositions, which test the footing and not the reading: on
+    the 23 multi-cycle rows whose five disposition units equal the harvest unit, the
+    sum sold + consumed + seed + feed + gift equals as03eq09a on 18 and the product
+    on none (single-cycle rows, 130 of 227).  So the answers of 3E are all per
+    cycle; whether first or average, the file cannot say.
+  contents: 'Niger/_/CONTENTS.org, "the dry season: read in 2011-12, not asked in 2014-15 (GH #1462)"'
+  since: '2026-11-04'
+
+Niger::crop_production::dry-season-sale-window:
+  waves: ['2011-12']
+  columns: [Quantity_sold, Value_sold]
+  rule: >-
+    Identity on dry-season rows with a positive sale: Quantity_sold is as03eq11a and
+    Value_sold as03eq12, as recorded after their exact codes (as03eq12 == 9999999, 1
+    row).  Nothing is multiplied by as03eq06.  The quantity is asked per cycle, and
+    the value states no window.  Quantity remains a total over cycles, so on a
+    multi-cycle row Quantity_sold / Quantity is not a sold share.  A zero sale
+    carries no key.  Joined to dry-season-cycle-total with sorted '+'.
+  function: lsms_library.countries.Niger._.niger:derive_dry_season_sale_window
+  inputs: lsms_library.countries.Niger._.niger:inputs_dry_season_sale_window
+  raw_variables: [hid, as03eq01, as03eq03, as03eq06, as03eq10, as03eq11a, as03eq11b,
+                  as03eq12]
+  assumptions:
+    - text: >-
+        preserve the reported sale without choosing a window for the value.  Stata
+        labels as03eq11a "vendu en moyenne pour chaque cycle" and as03eq12 "montant
+        tire de la vente de ce produit"; the English instrument asks 3E.11 "during
+        the first cycle of production" and 3E.12 "the amount received from the sale
+        of this product".  Over the 19 crop-unit cells priced on both kinds of row
+        (39 multi-cycle rows, thin), the median cell's multi-cycle unit value is 1.17
+        times its one-cycle unit value, which does not look like a total over cycles
+        and does not settle it.
+      basis: modelling-choice
+      evidence: >-
+        ecvmaas3e_p1.dta variable labels; ECVMA_Quest_AGR_P1_V10_eng.pdf, Section
+        3E; the Mali::crop_production::tree-sale-window ruling, whose shape this
+        follows; measured on the held file.
+  validated_against: >-
+    the raw 3E rows, read independently of the build
+    (tests/test_gh1462_niger_dry_season.py).
+  contents: 'Niger/_/CONTENTS.org, "the dry season: read in 2011-12, not asked in 2014-15 (GH #1462)"'
+  since: '2026-11-04'

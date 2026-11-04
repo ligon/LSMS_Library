@@ -6,6 +6,7 @@ import json
 from ligonlibrary.dataframes import from_dta
 import pyreadstat
 import lsms_library.local_tools as tools
+from lsms_library.derivations import MULTI_SEP
 
 
 Waves = {'2011-12': (),
@@ -559,8 +560,10 @@ def _crop_maps():
 CROP_OBS_NA = 'unresolved_observation'
 
 
-def _crop_reported_observations(households, line):
-    """Recorded harvest-line numbers as ``reported:<n>`` tokens (2011-12).
+def _crop_reported_observations(households, line, module=None):
+    """Recorded harvest-line numbers as ``reported:<n>`` tokens (2011-12), or
+    ``reported:<module>:<n>`` for a second module of the same wave, whose line 1
+    is not the first module's (section 3E, GH #1462).
 
     Refuses a missing household or line number and a repeated
     (household, line) pair rather than inventing an ordinal.
@@ -572,7 +575,8 @@ def _crop_reported_observations(households, line):
     keys = pd.DataFrame({'i': np.asarray(households), 'line': numeric.to_numpy()})
     if keys.duplicated().any():
         raise ValueError('Niger crop observations repeat a native household/line number')
-    return 'reported:' + numeric.astype('Int64').astype('string')
+    prefix = 'reported:' if module is None else f'reported:{module}:'
+    return prefix + numeric.astype('Int64').astype('string')
 
 
 def _crop_row_observations(n_rows, source_path, *, script_path):
@@ -627,13 +631,22 @@ def _crop_condition_labels(labels):
     return out.where(out != '', pd.NA)
 
 
+def _crop_sold_conditions(codes, table):
+    """The ``Condition_sold`` column (GH #1462): raw sold-state CODES through the
+    same ``harmonize_crop_condition_*`` table as the harvest level, so the two
+    speak one fold.  Unlike :func:`_crop_conditions`, a blank stays NA and never
+    takes the sentinel: it is a column, with no NaN-key hazard, and NA says no sale
+    or no state recorded (canonical ``data_info.yml``)."""
+    return _map_codes(pd.to_numeric(codes, errors='coerce'), _harmonized_codes(table))
+
+
 def _finish_crop_production(df, t):
     """Common tail: tag t, build the (t, i, plot_id, crop, u, condition,
     production_obs) index, coerce numeric columns, and guarantee the full schema
     column set (including the NA-bearing ``Unit_sold`` column, GH #824).  A wave
     that passes no ``condition`` gets :data:`CONDITION_NA`; one that passes no
     ``production_obs`` gets :data:`CROP_OBS_NA`; one that passes no
-    ``condition_native`` carries NA there."""
+    ``condition_native`` or ``Condition_sold`` carries NA there."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
     # harvest_month: only 2014-15 records it; NaN elsewhere (still carried
@@ -678,15 +691,117 @@ def _finish_crop_production(df, t):
     if 'condition_native' not in df.columns:
         df['condition_native'] = pd.NA
     df['condition_native'] = df['condition_native'].astype('string')
+    if 'Condition_sold' not in df.columns:
+        df['Condition_sold'] = pd.NA
+    df['Condition_sold'] = df['Condition_sold'].astype('string')
     if 'production_obs' not in df.columns:
         df['production_obs'] = CROP_OBS_NA
     df['production_obs'] = df['production_obs'].astype('string')
     keep = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs',
-            'Quantity', 'Quantity_sold', 'Value_sold', 'Unit_sold',
+            'Quantity', 'Quantity_sold', 'Value_sold', 'Unit_sold', 'Condition_sold',
             'harvest_month', 'intercropped', 'condition_native']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs'])
     return df
+
+
+# ---------------------------------------------------------------------------
+# The dry season: 2011-12 section 3E, ecvmaas3e_p1 (GH #1462)
+# ---------------------------------------------------------------------------
+#
+# Section 3E asks the contre-saison harvest by crop, "all fields combined", so a
+# line has no field or parcel: `plot_id` is the structural sentinel.  The quantity
+# is per cycle beside a cycle count, and both of these columns are registered in
+# _/derivations.yml.  2014-15 has no such module: see CONTENTS.org.
+FARM_LEVEL = 'Farm-level'
+DRY_SEASON_TOTAL = 'Niger::crop_production::dry-season-cycle-total'
+DRY_SEASON_SALE = 'Niger::crop_production::dry-season-sale-window'
+#: 3E's own "don't know" codes, unlabelled in the .dta: a different width from the
+#: rainy module's 999999 on quantities.  Exact values only.  as03eq09a == 99999 on
+#: 1 row of 576 (its sibling kg columns as03eq09c / as03eq11c carry it on 42 / 39);
+#: as03eq12 == 9999999 on 1.
+DRY_QTY_SENTINELS = (99999,)
+DRY_VALUE_SENTINELS = (9999999,)
+_DRY_SEASON_SOURCE = 'NER_2011_ECVMA_v01_M_Stata8/ecvmaas3e_p1.dta'
+
+
+def derive_dry_season_cycle_total(per_cycle, cycles):
+    """A dry-season crop's harvest over its cycles: per-cycle harvest x cycles.
+
+    Registered as ``Niger::crop_production::dry-season-cycle-total``, the Mali
+    tree precedent.  ``per_cycle`` is 3E.9a ``as03eq09a``, cleared of its code by
+    the caller; ``cycles`` is 3E.6 ``as03eq06``.  A zero answer is zero; a missing
+    answer or count is NA, and so is a positive answer beside a count of zero.  On
+    the 526 one-cycle lines this is the identity.  Returns float64.
+    """
+    x = pd.to_numeric(per_cycle, errors='coerce').astype('float64')
+    n = pd.to_numeric(cycles, errors='coerce').astype('float64')
+    total = x * n
+    total = total.mask(x.eq(0), 0.0)
+    return total.mask(x.gt(0) & n.eq(0))
+
+
+def derive_dry_season_sale_window(quantity_sold, value_sold):
+    """A dry-season sale -> ``Quantity_sold`` / ``Value_sold``: THE IDENTITY.
+
+    Registered as ``Niger::crop_production::dry-season-sale-window``, the Mali
+    ``tree-sale-window`` precedent.  What the entry records is the WINDOW: 3E.11a
+    ``as03eq11a`` is asked per cycle and 3E.12 ``as03eq12`` states none, so the
+    pair is served as recorded beside a ``Quantity`` over all cycles, and on a
+    multi-cycle line ``Quantity_sold / Quantity`` is not a sold share.  Both inputs
+    are cleared of their codes by the caller.
+    """
+    return pd.DataFrame({
+        'Quantity_sold': pd.to_numeric(quantity_sold, errors='coerce').astype('float64'),
+        'Value_sold': pd.to_numeric(value_sold, errors='coerce').astype('float64'),
+    })
+
+
+def stamp_dry_season_derivations(df):
+    """The ``Derivation`` column of the finished 2011-12 frame, as a ``string``
+    Series on its index: every ``Farm-level`` row carries :data:`DRY_SEASON_TOTAL`,
+    and one with a positive sale also :data:`DRY_SEASON_SALE`, joined with
+    ``MULTI_SEP`` in sorted order.  A zero sale is zero in any window.  Rainy rows
+    are NA."""
+    dry = (df.index.get_level_values('plot_id') == FARM_LEVEL)
+    sold = ((df['Quantity_sold'] > 0) | (df['Value_sold'] > 0)).astype(
+        'boolean').fillna(False).to_numpy(dtype=bool)
+    out = pd.Series(pd.NA, index=df.index, dtype='string')
+    out[dry] = DRY_SEASON_TOTAL
+    out[dry & sold] = MULTI_SEP.join(sorted((DRY_SEASON_TOTAL, DRY_SEASON_SALE)))
+    return out
+
+
+def _dry_season_inputs(wave, columns):
+    """Section 3E's raw answers, as recorded, under their own names, keyed by the
+    served ``(t, i, plot_id, production_obs)``.  The one byte-identical row is
+    dropped as the build drops it, or the key would repeat."""
+    from lsms_library.paths import countries_root
+    src = tools.get_dataframe(
+        str(countries_root() / 'Niger' / wave / 'Data' / _DRY_SEASON_SOURCE),
+        convert_categoricals=False)
+    src = src[~src.duplicated(keep='first')]
+    households = src['hid'].map(i)
+    out = src[columns].copy()
+    out['t'] = wave
+    out['i'] = households.values
+    out['plot_id'] = FARM_LEVEL
+    out['production_obs'] = _crop_reported_observations(
+        households, src['as03eq01'], module='3E').values
+    return out.set_index(['t', 'i', 'plot_id', 'production_obs'])
+
+
+def inputs_dry_season_cycle_total(wave):
+    """The registry ``inputs`` callable of dry-season-cycle-total."""
+    return _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06',
+                                     'as03eq09a', 'as03eq09b'])
+
+
+def inputs_dry_season_sale_window(wave):
+    """The registry ``inputs`` callable of dry-season-sale-window; the cycle count
+    is there so a user can rescale the sale."""
+    return _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06',
+                                     'as03eq10', 'as03eq11a', 'as03eq11b', 'as03eq12'])
 
 
 # ---------------------------------------------------------------------------

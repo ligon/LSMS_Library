@@ -11,6 +11,8 @@ Index = (t, i, plot_id, crop, u, condition, production_obs); plot =
 "{s16cq02}_{s16cq03}" aligns with plot_features' plot_id.  ``condition`` is the
 harvest's own "Etat du produit" (s16cq12c, GH #1436), folded from five answers
 to three tokens; the column ``condition_native`` keeps the answer as recorded.
+``Condition_sold`` is the state of what was sold (s16cq16c, the same code list,
+through the same fold, GH #1462), NA on a line with no sale.
 The index is unique without a line coordinate, so ``production_obs`` is the
 ``unresolved_observation`` sentinel (GH #1360).  See
 niger.py:_finish_crop_production for the shared schema tail and the GAP-1
@@ -23,7 +25,7 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
-                   _crop_conditions, _crop_condition_labels,
+                   _crop_conditions, _crop_condition_labels, _crop_sold_conditions,
                    _finish_crop_production)
 
 
@@ -60,6 +62,9 @@ df = pd.DataFrame({
     # The SOLD unit (s16cq16b), a second unit on the same line (GH #824);
     # identical 9-label set to the harvest unit s16cq12b, same `u` table.
     'Unit_sold':     _unit_labels(src['s16cq16b'], unit_map).values,
+    # The SOLD state (s16cq16c): the harvest's code list and fold (GH #1462).
+    'Condition_sold': _crop_sold_conditions(src_codes['s16cq16c'],
+                                            'harmonize_crop_condition_ehcvm1').values,
     'intercropped':  intercropped.values,
 })
 

@@ -85,7 +85,7 @@ W2021_VALUE_SOLD_BEFORE = 78_934_620      # what summing the repeats served
 #: Sold-unit == harvest-unit share on PRICED rows (Quantity_sold > 0 and
 #: Value_sold > 0) that know both units (Unit_sold non-null, u != 'Unknown'),
 #: canonicalised through the `u` table, measured on the served table.
-AGREEMENT = {"2011-12": (0.9869, 1293), "2014-15": (0.8943, 558),
+AGREEMENT = {"2011-12": (0.9654, 1707), "2014-15": (0.8943, 558),  # 2011-12 (0.9869, 1293) before GH #1462's dry-season rows
              "2018-19": (0.9231, 3226), "2021-22": (0.8964, 1265)}  # 2021-22 (0.8904, 1423) before GH #1360
 AGREEMENT_TOL = 0.002
 

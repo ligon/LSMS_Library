@@ -590,6 +590,7 @@
 | Caramel, bonbons, confiseries, etc                                                        | Caramel, bonbons, confiseries, etc                                                   |
 | 90. Carotte                                                                               | Carotte                                                                              |
 | Carotte                                                                                   | Carotte                                                                              |
+| carotte                                                                                   | Carotte                                                                              |
 | 41. Carpes fraîches                                                                       | Carpes fraîches                                                                      |
 | Carpes fraÃ®ches                                                                          | Carpes fraîches                                                                      |
 | 36. Charcuterie (jambon, saucisson), conserves de viandes                                 | Charcuterie (jambon, saucisson), conserves de viandes                                |
@@ -1263,6 +1264,9 @@
 # carry it (onion, okra, roselle, tomato, cassava: a whole product with no shell
 # to speak of), so both land on `shell_not_applicable`, a survey ANSWER and not
 # the missing-data sentinel `unknown_condition`.
+# Condition_sold reads these two tables too (GH #1462): 2018-19 s16cq16c has this
+# code list, and 2021-22 s16dq05d has these codes under its own labels (1
+# epis/coques/panicules, 2 grains, 3 na).  A blank there stays NA.
 #+NAME: harmonize_crop_condition_ehcvm1
 | Code | Preferred Label      | Source Label   |
 |------+----------------------+----------------|

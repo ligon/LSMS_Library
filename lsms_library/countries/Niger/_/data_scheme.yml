@@ -162,6 +162,8 @@ Data Scheme:
     # transformations, never columns here.  All four waves have an
     # agriculture harvest module (script-path):
     #   2011-12 ecvmaas2e_p2          (plot-crop harvest + sold + value)
+    #           + ecvmaas3e_p1        (dry season by crop, plot_id='Farm-level',
+    #                                  GH #1462; 2014-15 asks no dry-season harvest)
     #   2014-15 ECVMA2_AS2E1 (+AS2E2)  (harvest + months; sold crop-level)
     #   2018-19 s16c                   (harvest + sold + value + intercrop)
     #   2021-22 s16c (+s16d)           (harvest + intercrop; sold crop-level)
@@ -215,6 +217,14 @@ Data Scheme:
     # unit, so it lands on one served row (GH #1360).  `optional` because a
     # row with no sale has no sold unit.
     Unit_sold:
+      type: str
+      optional: true
+    # Condition_sold (GH #1462) is the state of what was SOLD, a separate answer
+    # from `condition`: 2018-19 s16cq16c, 2021-22 s16dq05d, read through the same
+    # `harmonize_crop_condition_*` tables, so it speaks the same fold.  `optional`
+    # for the reason Unit_sold is, and because the ECVMA waves ask no state.  NA on
+    # no sale, never a sentinel: it is a column.
+    Condition_sold:
       type: str
       optional: true
     harvest_month: float

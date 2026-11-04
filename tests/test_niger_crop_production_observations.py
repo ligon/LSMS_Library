@@ -48,7 +48,8 @@ INDEX = ["t", "i", "plot_id", "crop", "u", "condition", "production_obs"]
 
 #: Served rows per wave, cold rebuild after GH #1360 (before: 11,937 / 8,799
 #: / 13,717 / 11,923 = 46,376).
-ROWS = {"2011-12": 11967, "2014-15": 8799, "2018-19": 13717, "2021-22": 12933}
+#: 2011-12 was 11,967 before GH #1462 served section 3E's 575 dry-season lines.
+ROWS = {"2011-12": 12542, "2014-15": 8799, "2018-19": 13717, "2021-22": 12933}
 #: production_obs token kind served in each wave.
 KIND = {"2011-12": "reported", "2014-15": "unresolved_observation",
         "2018-19": "unresolved_observation", "2021-22": "row"}
