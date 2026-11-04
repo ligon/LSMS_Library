@@ -945,3 +945,29 @@ NPK/Formule unique= in the file and the questionnaire (1,341 applied rows); no g
 It maps to =NPK= (0.17 N) and is 19.1% of =nitrogen_kg=; 125 =Tonne= rows are 38.2% of the slot's
 kilograms.  The =npk 15/15= rows of =harmonize_input= came with the Niger template and
 match no label here.
+
+* 2026-11-04 -- 2021-22 held and registered, not wired (GH #552)
+
+Acquired whole by =add_wave=: EHCVM-2 (6273, =CIV_2021_EHCVM-2_v01_M=) in =2021-22/Data/=, 58
+files, 703 MB, with the BIDs and both household questionnaires in
+=Documentation/=.  No table of this wave is served: =_/data_info.yml= declares
+nothing.  Each new table is its own piece of work; the 2021-22 waves of Niger,
+Mali and Senegal are the template.  For the wiring:
+
+- *A panel by cluster.*  BID section 4.1: "The survey is a cluster panel survey".
+  Measured: 1,081 of 2018-19's 1,084 grappes recur, and 12,189 of 13,693
+  =(grappe, menage)= keys do.  Whether a recurring key is the same household is
+  not checked here: =s00_me= has a =PanelHH= column, and Burkina renumbers its
+  households (GH #1245).
+- *Layout.*  2018-19 sits in =Data/Menage/= with upper-case =CIV2018= names; this
+  wave is flat with lower-case =civ2021= names.
+- *GPS.*  =s00_me= carries =GPS__Latitude= / =GPS__Longitude= on all 13,693
+  households.  Whether they are displaced is not known; read GH #791 first.
+- *Prices.*  =ehcvm_prix= (1,540,421 rows) comes from a separate sample of markets
+  (BID section 3.3), and the community files are =s00_co= to =s04_co= only, with no
+  =s05_co=.  So there is no grappe-grain price file for =community_prices=.
+
+Registration moves every Cote d'Ivoire =Country._table_cache_hash=, because the wave set
+is folded into the hash, and no existing wave's =Wave._input_hash=.  When
+=food_acquired= is wired for 2021-22, pooled kg factors change for every
+Cote d'Ivoire wave at read time (GH #1487).

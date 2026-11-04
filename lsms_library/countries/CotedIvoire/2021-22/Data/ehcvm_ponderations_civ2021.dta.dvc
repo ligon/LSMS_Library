@@ -1,0 +1,5 @@
+outs:
+- md5: 65fde306d0695a8308004abbad8bafdd
+  size: 840116
+  hash: md5
+  path: ehcvm_ponderations_civ2021.dta

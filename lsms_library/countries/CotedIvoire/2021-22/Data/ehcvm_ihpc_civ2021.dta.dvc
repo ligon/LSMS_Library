@@ -1,0 +1,5 @@
+outs:
+- md5: 92d9afa202e82999b3d1515a6902feba
+  size: 3135
+  hash: md5
+  path: ehcvm_ihpc_civ2021.dta

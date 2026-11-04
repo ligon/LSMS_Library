@@ -195,6 +195,7 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 | CotedIvoire           | 1987-88   | wb-catalog          | medium     | national-claimed         |
 | CotedIvoire           | 1988-89   | wb-catalog          | medium     | national-claimed         |
 | CotedIvoire           | 2018-19   | wb-catalog          | high       | national-all-households  |
+| CotedIvoire           | 2021-22   | not-found           | high       | not-stated               |
 | Ethiopia              | 2011-12   | local-documentation | high       | rural-and-small-town     |
 | Ethiopia              | 2013-14   | local-documentation | high       | region-excluded          |
 | Ethiopia              | 2015-16   | local-documentation | high       | region-excluded          |
@@ -296,13 +297,13 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 | national-claimed         |    28 |
 | region-excluded          |    18 |
 | subnational-area         |    11 |
-| not-stated               |     8 |
+| not-stated               |     9 |
 | panel-inherited          |     4 |
 | mixed-national+panel     |     4 |
 | rural-and-small-town     |     1 |
 | specialized              |     1 |
 | agricultural-households  |     1 |
-| TOTAL                    |   116 |
+| TOTAL                    |   117 |
 
 *** Source and confidence counts
 
@@ -310,11 +311,11 @@ scanned; it is not evidence, and where it disagrees with the wave's own
 |------------------------+-------|
 | local-documentation    |    67 |
 | wb-catalog             |    41 |
-| not-found              |     8 |
+| not-found              |     9 |
 
 | confidence             | waves |
 |------------------------+-------|
-| high                   |    90 |
+| high                   |    91 |
 | medium                 |    24 |
 | low                    |     2 |
 
@@ -1069,6 +1070,34 @@ Extractor's notes (editorial prose about the evidence, not survey text):
 
 #+begin_quote
 This is the one CotedIvoire wave with an explicit, formally labelled "Universe" field — quoted verbatim above and verified character-for-character against the raw catalog HTML, not a summariser. Sample design (not universe): 2-stage, 1084 EAs at stage 1, 12 households per EA at stage 2, total 12992 households (5275 urban, 7717 rural), split into two vagues (wave 1: 6490 HH; wave 2: 6502 HH). The BID's Sample section reproduces the same design text. Note the catalog metadata is in English even though the survey instruments are in French; no French-language universe statement was found in any accessible document.
+#+end_quote
+
+*** CotedIvoire 2021-22
+
+- Survey :: Enquête Harmonisée sur le Conditions de Vie des Ménages 2021-2022 (EHCVM 2021/22), WB catalog id 6273 (CIV_2021_EHCVM-2_v01_M)
+- Source type :: not-found
+- Confidence (as recorded by the extractor) :: high
+- Universe tag (EDITORIAL, not a quote) :: not-stated
+- Language of the quoted source :: (not recorded)
+- Source file :: Searched (both local, neither states a universe): lsms_library/countries/CotedIvoire/2021-22/Documentation/civ_ehcvm2_information_de_base_eng.pdf ; lsms_library/countries/CotedIvoire/2021-22/Documentation/civ_ehcvm2_information_de_base.pdf ; World Bank catalog DDI export for study 6273 (https://microdata.worldbank.org/metadata/export/6273/json, fetched 2026-11-04)
+- Locator :: English BID: Section 4 'Sampling' / 4.1 'Household and Community Component' (PDF pp. 10-12); price component, section 3.3 (PDF p. 9). French BID: section 4.1 'Volet ménage et communautaire' (PDF pp. 11-12). WB catalog 6273 DDI export: study_desc.study_info, study_desc.method.data_collection.sampling_procedure. Text extracted with pdfminer.
+
+Population statement, verbatim as recorded:
+
+#+begin_quote
+NOT FOUND — no universe / target-population statement exists in any Cote d'Ivoire 2021-22 documentation examined. Positive evidence of absence: the catalog 6273 DDI export has universe null in study_desc.study_info, with geographic coverage given only as "National coverage"; neither the English nor the French Basic Information Document contains a universe, 'population cible' or 'champ de l'enquête' statement (searched by keyword, and section 4 read). The nearest verbatim material is Sampling-Procedure text, given in exclusions_verbatim and notes; it is NOT a universe declaration and must not be quoted as one.
+#+end_quote
+
+Exclusions, verbatim as recorded:
+
+#+begin_quote
+(Sampling Procedure, WB catalog 6273 — NOT a universe statement): "The sampling frame for the 2018/19 survey was the 2014 General Population and Housing Census (RGPH). In 2021/2022, a new enumeration was conducted in the same clusters.  The sample for the 2018/2019 survey was drawn using a two-stage stratified sampling plan. The stratum consisted of combinations of region and type of settlement (urban/rural). Within each stratum, at the first stage, clusters (primary sampling units) were selected with probability proportional to their size in terms of the number of households. At the second stage, 12 households were selected with equal probability within each cluster. In 2021/2022, the strategy involves revisiting the same clusters. This entails either surveying the same 12 households from 2018/19 if they are relocated (after the enumeration phase), or surveying relocated households and supplementing the sample to 12 households in clusters where fewer are found during the enumeration phase (either because there were fewer than 12 households in the final 2018/19 database or because some households cannot be located). The total survey sample size is 13,693 households - 5,675 from urban areas and 8,018 from rural areas. After that, the survey design randomly divided each enumeration area into two equal groups. The survey team interrogated the first group in wave 1 and the other in wave 2. Finally, for various reasons, including availability and q..."
+#+end_quote
+
+Extractor's notes (editorial prose about the evidence, not survey text):
+
+#+begin_quote
+Registered 2026-11-04 (GH #552) and NOT YET WIRED: no table of this wave is served.  2021-22 is a panel revisit of the 2018/19 clusters, so its documentation describes the 2018/19 design rather than declaring its own universe. Local English BID, section 4.1, VERBATIM: "The survey is a cluster panel survey, and the sampling plan is based on the 2018/2019 survey." and "In 2021/2022, the strategy involves revisiting the same clusters. This entails either surveying the same 12 households from 2018/19 if they are relocated (after the enumeration phase), or surveying relocated households and supplementing the sample to 12 households in clusters where fewer are found during the enumeration phase (either because there were fewer than 12 households in the final 2018/19 database or because some households cannot be located)."  The 2018-19 universe statement is the natural candidate to inherit; that inheritance is an INFERENCE, not a documented claim, and needs a human decision.
 #+end_quote
 
 ** Ethiopia
