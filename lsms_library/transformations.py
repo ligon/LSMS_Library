@@ -5000,7 +5000,9 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         The ``crop_production`` item feature, indexed by
         ``(t, i, plot_id, j, u, season)`` (``v`` may also be present — it is
         ignored for the reduction and dropped from the output grain) with a
-        reported ``Quantity`` column in native unit ``u``.
+        reported ``Quantity`` column in native unit ``u``.  The crop level may
+        be spelled ``j`` or ``crop`` (:func:`_resolve_crop_level`), and the plot
+        level ``plot_id`` or ``plot`` (:func:`_resolve_plot_level`).
     volume_as_mass : bool, default True
         Forwarded to :func:`_get_kg_factors`; treat ``1 litre = 1 kg`` for
         fluid units (juice/beer harvest rows) when True.
@@ -5039,7 +5041,11 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     -------
     pd.DataFrame
         One ``Harvest_kg`` column indexed by ``(t, i, plot_id, j)`` (whichever
-        of those levels are present), summed over native units and season.
+        of those levels are present), summed over native units, ``condition``
+        and season.  The output levels are always spelled ``plot_id`` and ``j``,
+        so a ``Country`` frame whose crop level is ``crop`` and a ``Feature``
+        frame of the same country give the same rows (GH #1460).  A ``country``
+        level on a pooled frame is NOT carried and is not a grouping key.
 
         ``result.attrs['kg_factor_sources']`` is ``{layer: n_rows}`` over the
         INPUT rows and sums to ``len(crop_production)``.  It counts rows by
@@ -5053,6 +5059,15 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
 
     Notes
     -----
+    **A sum across ``condition`` mixes states.**  ``data_info.yml`` says
+    quantities in different states are not commensurable, and this reduction
+    still sums them.  Uganda has 13,728 of 88,950 plot-crops with kilograms in
+    two or more recorded states, 5.32M of their 41.9M kg, and Malawi 8 plot-crops
+    (3,725 kg); no other country records a state (measured 2026-11-04, GH #1460).
+    Read such a row as mass as harvested, not as a dry weight.
+    :func:`harvest_kg_factors` gives the row-level factors for a caller who keeps
+    the states apart.
+
     Divergence from WB: the WB Uganda code applies survey-provided
     conversion tables that cover bespoke local containers ("Sack (100 kgs)",
     "Basket (Unspecified)", regional "Heap"/"Bunch" sizes).  Our shared
@@ -5108,13 +5123,15 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     out = pd.DataFrame({'Harvest_kg': kg})
     out = out.replace(0, np.nan).dropna()
     plot_level = _resolve_plot_level(out.index.names)
-    group_by = [n for n in ['t', 'i', plot_level, 'j']
+    crop_level = _resolve_crop_level(out.index.names)
+    group_by = [n for n in ['t', 'i', plot_level, crop_level]
                 if n is not None and n in out.index.names]
     res = out.groupby(group_by).sum()
-    # Normalise the plot level name to the canonical 'plot_id' so downstream
-    # (yield_kg) and cross-country callers see one schema regardless of source
-    # naming.
+    # Normalise the plot and crop level names to the canonical 'plot_id' and
+    # 'j' so downstream (yield_kg) and cross-country callers see one schema
+    # regardless of source naming.
     res = _canonicalise_plot_level(res, plot_level)
+    res = _canonicalise_crop_level(res, crop_level)
     # ``groupby`` drops ``attrs``, so the tallies are re-stashed here -- the
     # same idiom ``food_prices`` uses for ``price_rows_dropped``.
     res.attrs['kg_factor_sources'] = factors.attrs['kg_factor_sources']
@@ -5211,7 +5228,12 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
           ``i``; the existing ``attrs['country']='Uganda'`` enables its native
           constructor inverse for Country operands.  Coverage also requires
           convertible harvest and a matching positive area; neither missing
-          nor nonpositive area is filled.
+          nor nonpositive area is filled.  **This is Uganda's decoding.**  The
+          area key is cut at its first ``_`` in every country, and the crop key
+          only loses a ``{hhid}-`` prefix, so where both features already share
+          a ``{field}_{parcel}`` key (Ethiopia and the EHCVM countries, Malawi's
+          later waves) no key matches at this grain.  Use ``'plot'`` there.
+          An empty result warns ``PlotGrainMismatchWarning``.
         - ``'plot'``: join on the literal ``plot`` value verbatim.  Use only
           where the two features already share a plot vocabulary; on Uganda
           the literal ids never match and the result is empty.
@@ -5286,6 +5308,23 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     area = pf.groupby(keys, dropna=False)['_Area'].sum().reset_index()
 
     merged = harvest.merge(area, on=keys, how='inner')
+    if len(merged) == 0 and len(harvest) and len(area):
+        # The silent emptiness fertilizer_rate's guard exists for, in its twin.
+        # With no wave in common the other grain cannot help, so don't offer it.
+        hint = f" Try on={'plot' if on == 'parcel' else 'parcel'!r}."
+        if 't' in keys and not set(harvest['t']) & set(area['t']):
+            hint = (
+                " The two features share no wave at all: harvest "
+                f"{sorted(map(str, harvest['t'].unique()))[:3]}, area "
+                f"{sorted(map(str, area['t'].unique()))[:3]}; a post-planting / "
+                "post-harvest country may serve them on different rounds.")
+        warnings.warn(
+            f"yield_kg(on={on!r}): the {len(harvest):,} harvest land key(s) and "
+            f"the {len(area):,} area land key(s) have NO value in common, so "
+            "the result is empty. Examples -- harvest: "
+            f"{sorted(map(str, harvest['_land'].unique()))[:3]}; area: "
+            f"{sorted(map(str, area['_land'].unique()))[:3]}.{hint}",
+            PlotGrainMismatchWarning, stacklevel=2)
     with np.errstate(divide='ignore', invalid='ignore'):
         merged['Yield_kg'] = merged['Harvest_kg'] / merged['_Area']
     merged = merged.replace([np.inf, -np.inf], np.nan).dropna(subset=['Yield_kg'])
@@ -6417,13 +6456,30 @@ def nb_plots(plot_features):
 # ---------------------------------------------------------------------------
 
 # Crop-identity level names emitted by the various countries' crop features.
-# ``j`` is the canonical (Uganda, Niger, Togo) name; ``crop`` is Malawi's.
-# The two vocabularies are the same axis (both the harmonize_crop ->
-# harmonize_food Preferred Label), which is why ``data_info.yml``'s
-# ``index_info`` does not yet register the plot-level ag features: "their
-# per-country index NAMES diverge (plot vs plot_id, crop vs j)".  Twin of
+# ``j`` is the canonical name; Uganda, Ethiopia, Tanzania, GhanaLSS, GhanaSPS and
+# EthiopiaRHS declare it.  ``crop`` is the other ten: Malawi, Nigeria, Niger,
+# Mali, Togo, Benin, Senegal, Burkina Faso, Guinea-Bissau and CotedIvoire
+# (measured 2026-11-04, GH #1460).  The two vocabularies are the same axis (both
+# the harmonize_crop -> harmonize_food Preferred Label), and ``data_info.yml``'s
+# ``level_aliases`` maps ``crop`` onto ``j`` for the ``Feature`` path.  Twin of
 # :data:`_PLOT_LEVELS`.
 _CROP_LEVELS = ('j', 'crop')
+
+#: The canonical crop-axis level name, ``level_aliases``' target for
+#: ``crop_production`` in ``lsms_library/data_info.yml``.  What a transform that
+#: promises a ``j`` level puts on its output whichever spelling it was handed.
+_CROP_CANONICAL = _CROP_LEVELS[0]
+
+
+def _canonicalise_crop_level(res, crop_level):
+    """Rename ``crop_level`` on ``res``'s index to :data:`_CROP_CANONICAL`.
+
+    Twin of :func:`_canonicalise_plot_level`.  A no-op when the level is
+    already canonical or absent.
+    """
+    if crop_level and crop_level != _CROP_CANONICAL:
+        res.index = res.index.rename({crop_level: _CROP_CANONICAL})
+    return res
 
 
 def _resolve_crop_level(names):
