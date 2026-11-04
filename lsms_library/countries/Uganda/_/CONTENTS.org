@@ -501,6 +501,56 @@ when the household-level join avoids the known mover problem. The
 [[file:../../../../SkunkWorks/aggregation/evaluation.org::*Uganda observation patterns][food aggregation simulation]] reports these three explicitly and uses the
 remaining 3,095 households; it doesn't infer their Region from a cluster.
 
+*** HH-level =District= on =sample()= (GH #1441, 2026-11-04)
+
+=market='District'= reads =sample()= first and =cluster_features()= second, and
+=sample= had no =District=.  So the only source was the cluster table, where
+=reduce_to_agreed= blanks a cluster whose households disagree.  They do, because
+=comm= is the EA of origin and the label is where the household is now: one mover,
+or one carved-out district (=LIRA= / =ALEBTONG=), blanked the label for every
+household on that EA, though each had recorded its own.  =sample= now carries the
+column =cluster_features= reads, through the same formatter.
+
+| wave    | cover column     | no label, before | after | what is left                                 |
+|---------+------------------+------------------+-------+----------------------------------------------|
+| 2005-06 | =h1aq1= names    |                0 |     0 |                                              |
+| 2009-10 | =h1aq1= codes    |               71 |     6 | 4 on no cover (=AGSEC3B= / =GSEC12= only), 2 blank |
+| 2010-11 | =h1aq1= names    |              898 |    12 | blank, on an EA whose households disagree    |
+| 2011-12 | =h1aq1= mixed case |          1,172 |   131 | 57 on =AGSEC1= only, 74 blank on such an EA  |
+| 2013-14 | =h1aq1a= codes   |                0 |     0 |                                              |
+| 2015-16 | =district= names |                0 |     0 |                                              |
+| 2018-19 | =distirct_name=  |               66 |    66 | on =AGSEC1= only, whose =region= is blank for all 66 |
+| 2019-20 | =district= names |                1 |     1 | blank                                        |
+
+- /Disagreement, not absence, was the cause./  92 EAs in 2010-11 and 106 in 2011-12
+  disagree.  9 of the 106 (95 households) differ only by case, =KAMPALA= / =kampala=,
+  125 spellings of 106 names, and =2011-12/_/mapping.py= folds that, so their
+  =cluster_features.District= is back.  The other 97 stay =<NA>= there, correctly.
+- /The two tables agree./  Where both have a value they are equal, 22,341 of 22,341
+  households (=Region=: 23,956 of 23,956), and =m= is the household's own label wherever
+  it has one.  107 households with a blank of their own (=Region=: 1) still take an
+  agreeing cluster's label; that is =_add_market_index='s existing fallback, unchanged.
+- /It is the household's own location./  Same household, 2010-11 against 2011-12, case
+  folded: 2,488 of 2,489 equal.
+- /Not a cross-wave vocabulary./  Codes in 2009-10 and 2013-14, names elsewhere, and
+  districts carved out over time.  The =districts= table in =categorical_mapping.org=
+  (=Miyana= -> =Mityana=, =Kalanga= -> =Kalangala=, ...) is read by nothing, and not all
+  of it is a spelling: =Bugweri= -> =Bugiri= folds what 2018-19 records as two districts.
+  =MIYANA= (2010-11) and =KALANGA= (2011-12) are one household each, on EAs that
+  disagree anyway, so they blank nothing and are left as recorded.
+
+=Region= (129 households, unchanged): 127 are on no household cover (2009-10 4, 2011-12
+57, 2018-19 66), and 2 are blank on the 2019-20 cover, whose =regurb= holds =0.0= or =0.1=
+for those rows.  A sweep of every =.dta= in those waves, by column name, finds no geography with a
+value for them.  What could fill them, and =District='s 216, is a construction, so:
+
+**** TODO Decision: fill the 129 and the 216 from a household's other waves?
+
+Memo in the #1441 report.  The same household's label in the adjacent wave would reach
+77 of the 129 =Region= and 103 of the 216 =District=; it is right 2,509 of 2,510 and
+2,488 of 2,489 times where it can be checked.  A cluster mate's modal label would be
+right only 740 of 886 and 784 of 946 times, on the EAs concerned, and is not offered.
+
 ** Rotating panel and refreshment sample
 
 Beginning in 2013-14, one-third of the original sample is refreshed

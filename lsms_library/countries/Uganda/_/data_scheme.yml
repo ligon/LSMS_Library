@@ -24,6 +24,12 @@ Data Scheme:
     ea:
       type: str
       optional: true
+    # The household's OWN recorded district (GH #1441), read first by
+    # `market='District'`.  `cluster_features.District` blanks a cluster whose
+    # households disagree; this column does not, and is NA only where the cover
+    # records no district for the household.  Codes in 2009-10 and 2013-14, names
+    # elsewhere: not a cross-wave vocabulary.  See CONTENTS.org.
+    District: str
 
   cluster_features:
     # Uganda's v is not uniformly the survey's sampling EA (GH #689).

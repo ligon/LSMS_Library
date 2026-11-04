@@ -274,8 +274,9 @@ class TestServedAgainstTheSourceFiles:
 
     def test_the_served_columns_are_exactly_the_declared_ones(self, sample):
         """``origin_ea``'s marker is build plumbing and must not be served."""
+        # District: the household's own recorded label, added by GH #1441.
         assert set(sample.columns) == {"v", "weight", "panel_weight", "strata", "Rural",
-                                       "Region", "Derivation", "ea"}
+                                       "Region", "District", "Derivation", "ea"}
 
     def test_no_float_spelling(self, sample):
         assert isinstance(sample["ea"].dtype, pd.StringDtype)
