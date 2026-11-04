@@ -2452,10 +2452,12 @@ treatment is right is a decision for the maintainer (memo on GH #1441).
 - *281 in 2019-20 are split-offs* whose stray =clusterid= (=sdd_cluster= blank) is
   in none of the 147 frame clusters, the 100 ids GH #323 stopped pooling.  Their
   own location =hh_a01_1= is populated for all 326 split-offs and =hh_a02_1= for
-  325.  The parent's cluster is reachable through =y4_hhid= for 269 of the 326.
-- *The other 45 split-offs are labelled through a colliding stray id*, and only 29
-  of them are in the region it names.  So 16 households carry another place's
-  =Region= with no signal.  Not fixed here.
+  325.  A frame household with the same =y4_hhid= gives the parent's cluster for
+  238 of the 281; the other 43 have none.
+- *The other 45 split-offs carry an id that is also a frame cluster.*  For 31 it
+  is their frame sibling's own cluster, so they are labelled as any tracked
+  household is.  The other 14 have no sibling, so that label rests on the id alone.
+  Own region agrees with the served label for 29 of the 45.  Not changed here.
 - The only route that labels these 340 without a new =v= is a household-grain
   =Region= on =sample=, and =_add_market_index= prefers that column for EVERY
   household, so populating it fully moves 1,366 labels (245 / 565 / 162 / 43 / 351
