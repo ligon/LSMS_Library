@@ -29,6 +29,8 @@ from lsms_library.paths import countries_root
 EARLY = {1: "2008-09", 2: "2010-11"}
 TABLE = "upd_district_code"
 KEY = "Tanzania::cluster_features::upd-district-name-from-round-3"
+DIGIT_KEY = "Tanzania::cluster_features::upd-district-name-from-id-digit"
+NAMED = {"4115002", "10506001"}
 
 
 def _org_path():
@@ -128,6 +130,25 @@ def test_derive_stamps_exactly_what_it_fills(district):
     assert pd.isna(out.loc["later_blank", "District"])
     assert out.loc["filled", "Derivation"] == KEY
     assert out["Derivation"].notna().sum() == 1
+
+
+def test_digit_fill_touches_only_the_named_clusters_in_2010_11(district):
+    rows = [
+        ("named", "2010-11", "4115002", "TANGA", "2.0", pd.NA, pd.NA),
+        ("first_round", "2008-09", "4115002", "TANGA", "1.0", "LUSHOTO", KEY),
+        ("other_na", "2010-11", "19302076", "MWANZA", "8.0", pd.NA, pd.NA),
+        ("named_answered", "2010-11", "10506001", "RUVUMA", "5.0", "OWN ANSWER", pd.NA),
+    ]
+    df = pd.DataFrame(rows, columns=["i", "t", "v", "Region", "_district_code", "District", "Derivation"])
+    out = district.derive_upd_district_from_id_digit(
+        df.set_index(["i", "t", "v"]),
+        codes={41: "LUSHOTO", 105: "NAMTUMBO", 193: "NYAMAGANA"}).reset_index().set_index("i")
+    assert out.loc["named", "District"] == "LUSHOTO"
+    assert out.loc["named", "Derivation"] == DIGIT_KEY
+    assert out.loc["first_round", "Derivation"] == KEY
+    assert pd.isna(out.loc["other_na", "District"]) and pd.isna(out.loc["other_na", "Derivation"])
+    assert out.loc["named_answered", "District"] == "OWN ANSWER"
+    assert pd.isna(out.loc["named_answered", "Derivation"])
 
 
 def test_derivation_is_registered_and_resolves():
@@ -296,13 +317,15 @@ def test_early_label_is_the_table_label_of_the_cluster_id(cluster_features, tabl
 @pytest.mark.requires_s3
 @pytest.mark.parametrize("rnd, wave", EARLY.items())
 def test_early_cluster_is_unlabelled_only_without_a_confirming_resident(cluster_features, upd, rnd, wave):
-    """A cluster with no household whose code its own id confirms stays NA; every
-    other cluster is labelled.  The oracle comes from the source, not a count."""
+    """A cluster with no household whose code its own id confirms stays NA, unless
+    it is one of the two named clusters; every other cluster is labelled.  The
+    oracle comes from the source, not a count."""
     src = upd[upd["round"] == rnd]
     confirmed = set(src.loc[src["resident"], "cid"])
     served = cluster_features[cluster_features["t"] == wave].set_index("v")["District"]
     assert set(served.index) == set(src["cid"])
-    assert set(served[served.isna()].index) == set(served.index) - confirmed
+    named = NAMED if wave == "2010-11" else set()
+    assert set(served[served.isna()].index) == set(served.index) - confirmed - named
 
 
 @pytest.mark.requires_s3
@@ -325,11 +348,16 @@ def test_later_rounds_keep_their_own_answers(cluster_features, upd, rnd, wave):
 @pytest.mark.requires_s3
 def test_key_is_on_exactly_the_rows_the_fill_labels(tz, cluster_features):
     early = cluster_features["t"].isin(EARLY.values())
+    named = cluster_features["t"].eq("2010-11") & cluster_features["v"].isin(NAMED)
     stamped = cluster_features["Derivation"].eq(KEY).fillna(False).astype(bool)
-    assert (stamped == (early & cluster_features["District"].notna())).all()
-    assert cluster_features["Derivation"].dropna().eq(KEY).all()
-    summary = _build(tz.cluster_features).attrs["derivations"]["Tanzania"][KEY]
-    assert summary["rows"] == int(stamped.sum())
+    by_digit = cluster_features["Derivation"].eq(DIGIT_KEY).fillna(False).astype(bool)
+    assert (stamped == (early & ~named & cluster_features["District"].notna())).all()
+    assert (by_digit == (named & cluster_features["District"].notna())).all()
+    assert int(by_digit.sum()) == len(NAMED)
+    assert cluster_features["Derivation"].dropna().isin([KEY, DIGIT_KEY]).all()
+    summary = _build(tz.cluster_features).attrs["derivations"]["Tanzania"]
+    assert summary[KEY]["rows"] == int(stamped.sum())
+    assert summary[DIGIT_KEY]["rows"] == int(by_digit.sum())
 
 
 @pytest.mark.requires_s3

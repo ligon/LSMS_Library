@@ -2301,7 +2301,8 @@ projection), that is not so.  The count is still 118 (2012-13 34, 2014-15 17,
 - The 818 null =District= cells in 2008-09 / 2010-11 were a source gap.  The UPD
   ships only the within-region code =ha_02_1= (8 distinct values in rounds 1-2;
   round 4 has 9); =ha_02_2= is blank (see the 2008-15 script's docstring).  (2026-11-03:
-  815 of the 818 are now labelled from that code; see GH #1441 below.)
+  817 of the 818 are now labelled, 815 from that code and 2 from the id's digit;
+  see GH #1441 below.)
 
 So the District residue is mostly a district-identity decision (vintage and
 council grain), which #837 leaves to the maintainer.  It is not a spelling
@@ -2381,8 +2382,9 @@ in the cell.  =ha_02_1= has no Stata value label and no document scanned lists t
 codes, so the name is a later round's free text carried back: a construction,
 registered as =Tanzania::cluster_features::upd-district-name-from-round-3= (=_/derivations.yml=)
 and stamped in =Derivation= on the rows filled, following #1060, #1057 and Uganda's
-=ea-tracking-key=.  Labelled clusters: 2008-09 0 -> 409 of 409, 2010-11 0 -> 406 of
-409.  =Region=, =Rural= and every later round are unchanged, apart from the new
+=ea-tracking-key=.  Labelled clusters: 2008-09 0 -> 409 of 409, 2010-11 0 -> 408 of
+409 (406 from this key, 2 from the id's digit, below).  =Region=, =Rural= and every
+later round are unchanged, apart from the new
 =URBAN= -> =Urban= row in the country =District= table, which also moves round 3's
 twelve =URBAN= clusters.  Labels are stored as round 3 writes them and take the
 same read path through that table (hence =Dodoma Rural=).
@@ -2425,12 +2427,12 @@ file, so any edit to it outside the frozen function fails 13 tests.
   of it.  The 86 mismatches run 32% in the four renumbered regions (25 of 79) and
   10% elsewhere (61 of 600).
 
-*Three 2010-11 clusters stay NA (25 households).*  A row is labelled only where the
-household's code is the digit in its own =clusterid=.  "Cannot be verified" here
-means ZERO confirming households, not weak support, and the gate is thin: one
-household is enough, and 7 labelled 2010-11 clusters have under half confirming
-(=1529002= 2 of 8, =19225003= 1 of 10).  These three are labelled in the neighbouring
-rounds:
+*Three 2010-11 clusters had no confirming household (25 households).*  A row is
+labelled from the round-3 table only where the household's code is the digit in its
+own =clusterid=.  "Cannot be verified" here means ZERO confirming households, not
+weak support, and the gate is thin: one household is enough, and 7 labelled 2010-11
+clusters have under half confirming (=1529002= 2 of 8, =19225003= 1 of 10).  These
+three are labelled in the neighbouring rounds:
 | =v=        | digit in the id    | 2010-11 reports | round 3 writes              | served 2008-09, 2010-11, 2012-13 |
 |------------+--------------------+-----------------+-----------------------------+----------------------------------|
 | =4115002=  | Tanga 1 LUSHOTO    | code 2          | code 2 and the name LUSHOTO | Lushoto, NA, Lushoto             |
@@ -2440,9 +2442,13 @@ Mapping the reported code would serve KOROGWE and SONGEA RURAL for the first two
 which their own round 3 answers contradict.  Mapping the id's digit would serve
 NYAMAGANA for the third, whose round 3 households mostly write ILEMELA.  Across the
 8 clusters whose most common 2010-11 code differs from their digit, the digit
-matches round 3's plurality in 5 and the reported code in 3, so neither is applied.
-Filling the first two from the digit is queued for the maintainer (it would leave 9
-households NA).
+matches round 3's plurality in 5 and the reported code in 3, so neither is a rule.
+Ruling (@ligon, 2026-11-04): the first two take the digit, NAMED in
+=_upd_district.UPD_DISTRICT_DIGIT_CLUSTERS= under their own key
+=Tanzania::cluster_features::upd-district-name-from-id-digit=, because both
+neighbouring rounds agree and the households are the same (the 2010-11 id extends
+the 2008-09 id for 8 of 8 and 7 of 8).  =19302076= stays NA because its neighbouring
+rounds conflict, which leaves 9 households with =m= NA in 2010-11.
 
 *What this does to =market='District'=.*  Every household gets its CLUSTER's
 district, like =Region=, so a mover is labelled where it was sampled rather than
@@ -2455,9 +2461,9 @@ decision of GH #837.  =m= is a name, not a fixed geography: following the same
 clusters, 5 of 409 change label between 2008-09 and 2012-13 (Mufindi to Mafinga,
 Njombe to Njombe Urban, Mtwara Urban to Mtwara Mikindani twice, Nyamagana to
 Ilemela, the only real conflict).  =m= carries no =Derivation= key, the same as
-Burkina's =zd-modal-province=.  =food_acquired(market='District')= rows with =m= NA:
-44,969 -> 0 in 2008-09, 54,775 -> 356 in 2010-11; rows, expenditure and later
-rounds are unchanged.  The Site B =NullReadWarning= on =District= for these two
+Burkina's =zd-modal-province=.  =food_acquired(market='District')= rows with =m= NA
+before the two digit clusters: 44,969 -> 0 in 2008-09, 54,775 -> 356 in 2010-11;
+rows, expenditure and later rounds are unchanged.  The Site B =NullReadWarning= on =District= for these two
 waves goes away.
 
 *One served number moves as a result.*  =food_expenditures(basis='total',
