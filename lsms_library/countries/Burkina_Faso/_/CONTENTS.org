@@ -2730,3 +2730,38 @@ finished rows and 179 of 813 unfinished.  =crop_production= does not serve 2021-
 is affected until it is wired.  Of 6,444 household-crop pairs with a finished row, 3,983 have a positive
 =s16d= disposition sum in one unit, 2,289 span units and 172 record none.  The measurement of that sum
 against a real harvest is in =Mali/_/CONTENTS.org=, same date.
+* 2026-11-04 -- what the two 2021-22 catalog entries now ship, measured (GH #1276, #1057)
+
+Measured against =BFA_2021_EHCVM-2_v01_M_Stata.zip= (6277, zip md5
+=e2d4fd53231b99498ddfa664917bc1f9=) and =BFA_2021_EHCVM-P_v05_M_Stata.zip= (6224, zip
+md5 =a273d2f46ebe45c1ef6013075bff97c1=), both downloaded to private storage.  Nothing
+here was placed in the tree, and no served table changes.
+
+*6277.*  55 data files, 822 MB.  The three =Data/Cross_Section/= sidecars are
+byte-identical to their members; 52 are not held.  =add_wave(subdir='Cross_Section')=
+is refused before download, because 53 of 6224's sidecars sit loose in =Data/=.  Past
+that it would be refresh-only, because the subdirectory already holds three sidecars.
+
+*6224 is at v05 and we hold v04, and v05 is not cosmetic.*  49 of the 53 held files
+are byte-identical.  The other four:
+- =s00_me=: =GPS__Latitude= / =GPS__Longitude= are populated on 3,227 of 3,227
+  households, where v04 has 0 of 3,227 (about 4 distinct fixes per grappe).  It adds
+  =hhweight= (3,227) and drops =GPS__Accuracy=, =__Altitude= and =__Timestamp=.  No
+  other column differs.
+- =s16a_me=: the parcel coordinates are GONE.  =s16aq46__latitude= / =__longitude= /
+  =__accuracy= / =__altitude= / =__timestamp=, =s16a01a= and =s16aq03b= are dropped;
+  v04 has 4,180 parcels with a position.  The rows are re-sorted; after sorting, no
+  other column differs.
+- =s10b_me=: =s10q12a= differs in 2,657 cells, with a dtype change.  Same rows.
+- =s00_co=: same values, different file.
+
+This bears on two decisions already taken here.  The 2021-22 cluster fix carried from
+2018-19 (GH #1057) rests on v04's empty =GPS__*=.  The 2021-22 =plot_features=
+coordinates read the =s16aq46= columns v05 removes, and why the World Bank removed them
+is not stated anywhere checked.  v05 cannot be acquired through =add_wave= today: the
+=#+CATALOG_SUBDIR:= line refuses an unconfined acquisition, and the loose sidecars
+refuse a confined one.  It is a ruling for the maintainer, not done here.
+
+*2018-19.*  The catalog names 4290 =BFA_2018_EHCVM_v04_M= and we hold =v03_M=, but its
+resource list carries documents and no data zip (2026-11-04), so the two could not be
+compared.
