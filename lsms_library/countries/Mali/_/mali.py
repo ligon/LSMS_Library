@@ -14,6 +14,29 @@ def i(value):
     '''
     return tools.format_id(value.iloc[0])+'0'+tools.format_id(value.iloc[1],zeropadding=2)
 
+# Household namespaces (GH #1494, ruling @ligon 2026-11-04).  2014-15 and 2017-18
+# are EAC-I; 2018-19 and 2021-22 are EHCVM, a separate programme with no household
+# link (panel_ids.py).  Both number their clusters and households from 1, so ``i``
+# above spells the same string for unrelated households: 3,613 ids shared between
+# 2017-18 and 2018-19, 1,601 between 2014-15 and 2018-19, 3,341 and 1,493 with
+# 2021-22.  A cross-wave ``groupby('i')`` merged them.  Member-level roster match
+# on those ids is at the level of two unrelated households of one grappe
+# (CONTENTS.org, GH #1494).  Letters cannot occur in the numeric ids, so a prefixed
+# id can never equal an unprefixed one, whatever the serials do.  The EHCVM ids stay
+# as they are: 2018-19 / 2021-22 are the panel lineage in panel_ids / updated_ids.
+# Burkina Faso's ``EMC_`` is the precedent (GH #1244).
+EACI_PREFIX = 'EACI_'
+
+
+def eaci_i(value):
+    '''EAC-I household id: ``'EACI_' + i(value)``, e.g. (1, 1) -> ``'EACI_1001'``.
+
+    ``value`` is the row of ``[grappe, menage]`` (2014-15) or ``[grappe,
+    exploitation]`` (2017-18).  Used by those two waves' ``mapping.py`` and scripts.
+    '''
+    return EACI_PREFIX + i(value)
+
+
 def pid(value):
     '''
     Formatting person id
@@ -647,7 +670,7 @@ def _tree_roster_inputs(wave, columns):
     src = producing_trees(src, wave)
     out = src[columns].copy()
     out['t'] = wave
-    out['i'] = src.apply(lambda r: i(pd.Series([r['grappe'], r[hh]])), axis=1)
+    out['i'] = src.apply(lambda r: eaci_i(pd.Series([r['grappe'], r[hh]])), axis=1)
     # _crop_labels resolves its table relative to the cwd of a wave script;
     # this callable runs from anywhere, so name the same two rungs (wave _/,
     # then country _/) explicitly.

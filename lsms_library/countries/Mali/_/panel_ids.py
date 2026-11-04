@@ -4,6 +4,10 @@
 Mali has four waves: 2014-15 EACI, 2017-18 EACI, 2018-19 EHCVM,
 2021-22 EHCVM. Only the two EHCVM waves are panel-linked; EACI
 and EHCVM are different survey programs with no household overlap.
+The EACI ids carry an 'EACI_' prefix (mali.eaci_i, GH #1494), so they
+share no string with the EHCVM ids this script reads.  2014-15 and
+2017-18 are not linked either: they visit the same EAs, and the 3,560
+ids they still share are not the same households (CONTENTS.org).
 
 The 2021-22 cover sheet (``s00_me_mli2021.dta``) has a mixed panel
 structure that is more heterogeneous than Niger's or Senegal's:

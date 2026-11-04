@@ -1,0 +1,93 @@
+# Sampling design record -- HOW this survey's sample was drawn (GH #793).
+#
+# PANEL-ONLY (GH #942, ruling 2026-10-18, option A): each entry carries only the
+# `panel:` block -- does `v` denote the same cluster as in the PRECEDING wave of
+# `Country('Mali').waves`?  The design fields are #793's curation and are not
+# written yet; their absence here is "not curated", not "not found".
+#
+# Read by `lsms_library/sampling.py`.  `cluster_id_continuity` in {wave-scoped,
+# redefined, mixed} makes a `Country('Mali')` frame that carries `v` across that
+# boundary warn (`ClusterIdentityWarning`); nothing is ever dropped or rewritten.
+# The first wave (2014-15) has no preceding wave and so no entry.  Vocabulary and
+# field names: see sampling.py.
+#
+# The idiosyncrasy (GH #1494): two programmes, EAC-I (2014-15, 2017-18) and EHCVM
+# (2018-19, 2021-22), each numbering its clusters from 1 and its households within
+# them from 1, so serials recur with no relation.  `v` is continuous inside each
+# programme and not across the switch.
+#
+# Do NOT measure the EAC-I -> EHCVM boundary by shared `i`: 0 is shared by
+# construction, because the EAC-I ids carry an 'EACI_' prefix (mali.eaci_i, GH
+# #1494).  That says nothing about `v`, exactly as Burkina Faso's 'EMC_' and
+# Niger's 'E_' do not.  Before the prefix, 3,613 ids were shared with 2017-18.
+
+Sampling:
+
+  '2017-18':
+    panel:
+      household_continuity: independent
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        `grappe` in both waves: "The EAC-I 2017 replicates the same sampling
+        design as the first edition, visiting the same EAs" (BID, Section 4).
+        920 ids recur, of 989 and 953, their displaced coordinates are
+        identical on all 920, and Region and Rural agree once `Tomboctou` is
+        spelled.  The 2017-18 cover and sample files carry no pointer to a
+        2014 household, and the design selects 9 households per EA, so
+        `independent`, with one thing a
+        re-measurement will trip on: both waves still spell `i` from the same
+        serials, and 3,560 `i` recur between them.  They are not households:
+        on those ids 0.214 of a household's members find a same-sex member
+        three years older in the other wave, against 0.219 for two different
+        households of one grappe; the EHCVM panel scores 0.528 against 0.172
+        on the same test (CONTENTS.org, GH #1494).
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'measured 2026-11-04 from eaci_geovariables_2014.dta, eaci_geovariables_2017.dta, EACIIND_p1.dta and eaci17_s01p1.dta through get_dataframe; design: EAC-I 2017 BID (WB 3409), Section 4, quoted in CONTENTS.org, "2017-18 -- EAC-I 2017"'
+
+  '2018-19':
+    panel:
+      household_continuity: independent
+      cluster_id_continuity: redefined
+      cluster_id_note: |-
+        EAC-I (`grappe` 1-1070) and EHCVM-1 (`grappe` 1-1256) number their
+        clusters independently, so 410 ids recur with 2017-18 and name
+        unrelated EAs: the displaced coordinates of one id lie a median 100 km
+        apart in the two waves, 5.2% of 405 within 10 km.  Two programmes and
+        two draws: EAC-I from the 2009 census, EHCVM-1 from the 6th edition of
+        the EMOP frame, 500 EAs plus 51 added in vague 2.  No household links
+        across this boundary (panel_ids.py).  On the 3,613 `i` the two waves
+        spelled alike before the 'EACI_' prefix, 0.167 of a household's members
+        find their match against 0.163 for two different households of one
+        grappe.  `redefined`, not `unobservable`: the keyspaces OVERLAP, so a
+        cross-wave groupby('v') merges 410 pairs of unrelated clusters, which is
+        the hazard the warning exists for.  The unit KIND is the same (an EA);
+        what changes is the sample list the serial indexes, as in Burkina Faso
+        2018-19 and Niger 2018-19.
+      source_type: derived-from-data
+      confidence: high
+      source_file: null
+      locator: 'measured 2026-11-04 from eaci_geovariables_2017.dta, grappe_gps_mli2018.dta, eaci17_s01p1.dta and s01_me_mli2018.dta through get_dataframe; draws quoted in CONTENTS.org, "2017-18 -- EAC-I 2017" and "2018-19 -- EHCVM-1 2018/19"; no linkage: Mali/_/panel_ids.py docstring'
+
+  '2021-22':
+    panel:
+      household_continuity: rotating-panel
+      cluster_id_continuity: stable
+      cluster_id_note: |-
+        `grappe` in both waves: all 513 of 2021-22's grappes are among
+        2018-19's 551, and their coordinates are identical on all 507 with a fix
+        on both sides.  Region differs on 36 of the 513: 23 read Menaka in
+        2018-19 and Gao in 2021-22, 13 Taoudenit and Tombouctou, a recode on an
+        unchanged EA rather than a renumbering.  The revisit found the 2018-19
+        households where it could and enumerated replacements up to 12 per
+        cluster: PanelHH is 'Oui' on 5,023 and 'Non' on 1,120.  One thing a
+        re-measurement will trip on: 1,111 of the 1,120 'Non' households spell
+        the same `i` as a 2018-19 household and are not it (0.151 of members
+        match, against 0.157 for two different households of one grappe, and
+        0.528 for the 'Oui' households).  Neither panel_ids nor updated_ids
+        links them.
+      source_type: derived-from-data
+      confidence: high
+      source_file: 'lsms_library/countries/Mali/2021-22/Data/s00_me_mli2021.dta'
+      locator: 'grappe, PanelHH, GPS__Latitude, GPS__Longitude in that file, grappe_gps_mli2018.dta and s00_me_mli2018.dta, read via get_dataframe 2026-11-04; revisit strategy quoted in CONTENTS.org, "2021-22 -- EHCVM-2 2021/22"'
