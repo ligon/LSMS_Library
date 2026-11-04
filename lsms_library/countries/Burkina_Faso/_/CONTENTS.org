@@ -1529,9 +1529,13 @@ Burkina country hash and the 2014 wave hashes move.  Pinned by
 =test_the_hook_serves_each_section_c_block_in_its_own_unit= fails against the
 previous hook).
 
-** 2026-11-03 -- WAITING one answer keyed into two blocks? (GH #864, open question)
+** 2026-11-03 -- DONE one answer keyed into two blocks? (GH #864, decided: serve as recorded)
 
-Recorded for the maintainer; behaviour is NOT changed.  Measured on the raw
+*Decision (@ligon, 2026-11-03): merge as ruled.*  Each block stays on its
+own =s= row exactly as recorded; equal C04/C05 or C04/C06 answers are NOT
+collapsed and no duplicate-entry rule is registered.  The measurement below
+is kept so a user pooling purchased with produced (or inkind) quantities can
+see the overlap.  Measured on the raw
 p1 file: of the 283 rows carrying both a C04 and a C05 quantity, *189 have
 =qachat == qautocons=* (173 also in the same unit; 149 also =achat ==
 autocons=); of the 228 rows carrying both a C04 and a C06 quantity, *54 have
@@ -1543,7 +1547,8 @@ The old =(qachat - qautocons).clip(0)= had zeroed 180 of the 189 equal C04/C05
 rows (the other 9 had no =achat= and were dropped).  Size: the 264 changed
 purchased rows add 2,154 native units, about 0.05% of 2014 purchased
 quantity; Expenditure is untouched.  Whether to treat equal C04/C05 (or
-C04/C06) answers as a duplicate entry is a decision, not a measurement.
+C04/C06) answers as a duplicate entry was a decision, not a measurement;
+it was decided as above.
 
 
 ** GH #794: 47,137 + 16,610 leaked rows, and why "the keys do not match" was the wrong question
