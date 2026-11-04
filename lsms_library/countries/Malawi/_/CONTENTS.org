@@ -5053,7 +5053,7 @@ Those =harvest_kg= rows were measured before GH #1460 kept its crop axis; with i
 Every other column of every row is digest-equal in all four waves; =crop_diversity=,
 =gross_crop_revenue=, =yield_kg(on='plot')= and the sale-basis ladder are unchanged.
 
-*A sale does not reach a sentinel row* (@ligon, 2026-11-04).  =_attach_sales= counted plots with
+*A sale does not reach a sentinel row* (review of GH #1476, 2026-11-04).  =_attach_sales= counted plots with
 =nunique()=, which skipped the null.  It now counts a crop's sentinel rows as one more place the crop
 grew (=nunique(dropna=False)=), so a known plot beside them is not a single-plot crop, and its pair
 filter keeps a sale off a crop whose only rows are the sentinel.  Replayed on all four waves against

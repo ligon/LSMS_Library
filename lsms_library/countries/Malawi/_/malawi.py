@@ -1889,7 +1889,7 @@ def _attach_sales(t, harv, sale):
         {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
     sale['_srow'] = range(len(sale))
 
-    # A sale does not reach an `unknown_plot` row (GH #1476, @ligon).  Its rows
+    # A sale does not reach an `unknown_plot` row (GH #1476).  Its rows
     # count here as one more place the crop grew, so a known plot beside them is
     # not a single-plot crop; the filter below keeps a sale off a crop whose only
     # rows are the sentinel.

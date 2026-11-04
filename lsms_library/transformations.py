@@ -7502,10 +7502,11 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     test_crop_diversity_count_separates_plots_and_seasons``.
 
     **A ``Farm-level`` row is not a further occurrence of a crop the household
-    reports on a plot (GH #1469).**  It holds a sale no plot can own: 70 rows in
-    Mali 2021-22 and, with GH #843, 2,303 in Nigeria W3-W5, none with a harvest
-    ``Quantity``.  Counted as a land unit, they move 50 of 2,857 Mali households
-    (mean 0.6435 against 0.6448) and 1,572 Nigeria households, so the
+    reports on a plot (GH #1469).**  It holds a sale no plot can own (70 rows in Mali 2021-22 and, with GH #843, 2,303
+    in Nigeria W3-W5, none with a harvest ``Quantity``) or a harvest from a roster off
+    the field grid (Mali's 627 EAC-I tree rows, GH #1476, 534 with a ``Quantity``, none
+    repeating a plotted crop).  Counted as a land unit, the sale rows move 50 of 2,857
+    Mali households (mean 0.6435 against 0.6448) and 1,572 Nigeria households, so the
     ``'count'`` basis drops one wherever the household has a plot row of that
     crop in that wave.  It keeps one where it has none, because then the row is
     the only record of the crop: 10 of Nigeria's, and all 37,280 rows of GhanaLSS
