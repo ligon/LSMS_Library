@@ -3918,27 +3918,26 @@ def assemble_livestock(t, pieces):
 
     # Collapse any duplicate (i, animal) rows.  A canonical species is
     # reached from a SINGLE code within any wave (the harmonize_species map
-    # is 1:1 per wave), so a duplicate here means the household reported the
-    # same species on two roster lines: sum the head movements (HeadCount /
-    # HeadAcquired / HeadSold are additive counts of the same herd) and take
-    # the first reported ValuePerAnimal (a per-head price is not additive).
+    # is 1:1 per wave), so a duplicate would mean the household reported the
+    # same species on two roster lines.  None does, in any wave or half
+    # (measured on Module R, GH #1435).  The rule, should one appear: the
+    # head columns add over the lines and a BLANK STAYS BLANK (min_count=1),
+    # so a recorded 0 and an unanswered cell stay different things; the
+    # per-head ValuePerAnimal is not additive and takes the first reported.
     cat['t'] = t
     keys = ['t', 'i', 'animal']
     grouped = cat.groupby(keys, as_index=False, dropna=False)
-    grp = grouped.agg({
-        'HeadCount':    'sum',
-        'HeadAcquired': 'sum',
-        'HeadSold':     'sum',
-        'ValuePerAnimal': 'first',
-    })
-    # GH #855: the 12-months-ago stock is added like HeadCount over two
-    # lines of one species, but a blank stays blank (min_count=1).
-    if 'HeadCount12MonthsAgo' in cat.columns:
-        prior = grouped['HeadCount12MonthsAgo'].sum(min_count=1)
-        if not prior[keys].equals(grp[keys]):
-            raise ValueError('Malawi livestock reducer groups disagree')
-        grp['HeadCount12MonthsAgo'] = prior['HeadCount12MonthsAgo'].array
-    out = grp.set_index(keys)
+    head = [c for c in ('HeadCount', 'HeadAcquired', 'HeadSold',
+                        'HeadCount12MonthsAgo') if c in cat.columns]
+    grp = grouped[head].sum(min_count=1)
+    value = grouped['ValuePerAnimal'].first()
+    if not value[keys].equals(grp[keys]):
+        raise ValueError('Malawi livestock reducer groups disagree')
+    grp['ValuePerAnimal'] = value['ValuePerAnimal'].array
+    columns = [c for c in ('HeadCount', 'HeadAcquired', 'HeadSold',
+                           'ValuePerAnimal', 'HeadCount12MonthsAgo')
+               if c in grp.columns]
+    out = grp.set_index(keys)[columns]
     assert out.index.is_unique, f"Non-unique (t,i,animal) in livestock {t}"
     return out
 
