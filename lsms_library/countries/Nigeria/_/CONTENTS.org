@@ -1914,7 +1914,7 @@ recorded, not missing: the =#1041= ruling's
 270, Metric Cup 280, Wrap 290, Crate 310, Slice 320, Whole Animal 330, Tea
 Spoon 301, Table Spoon 302).  Drafted as a residual.
 
-*** Recorded C8 units restored; future unplaced-label retention remains open (GH #1095)
+*** Recorded C8 units restored; a future unplaced label is kept as recorded (GH #1095)
 
 Measured from held C8 sources and normal cold builds, 2026-10-21.
 The ten labels above now use a COMMUNITY-only extension of =_canon_unit=; the shared harvest decoder, food decoding and input extension are unchanged.
@@ -1943,9 +1943,12 @@ The size table below says =c8aq2_a= and =c8aq2_cvn= "agree with it and are a cro
 They are not a complete independent cross-check of every size code.
 This work reuses the existing #834 coded-size rule and recorded questionnaire evidence; it neither acquires a new PDF nor changes that rule.
 
-This is partial work on #1095.
-A future positive-priced recorded label still unplaced AFTER size rescue raises =UnplacedUnitLabelWarning= with its label/count and the accurate disposition "dropped after metric-size rescue"; the existing NA/drop policy remains.
-The issue's literal "report anything still unplaced instead of dropping it" requires a separate retention/fallback decision, including source identity and collision handling, and is not fulfilled by warning before a drop.
+/Ruling (@ligon, 2026-11-04)/: a future positive-priced recorded label still unplaced AFTER size rescue keeps that label as =u=, with no factor and no shared =Unknown= bucket, and warns.
+=community_prices_for_wave= does this; =UnplacedUnitLabelWarning= names the label and count.  *0 rows today*, so nothing served moves and the tests are synthetic (=tests/test_nigeria_community_units.py=).
+- The label is kept verbatim, code prefix included (=999. CALABASH=), so two units that differ only in their code stay two units.  =Unknown= would merge two native units on one =(v, j)=.
+- No factor: =Price= stays the native-unit price reported.  A quantity in the label (=999. 50 KG GOURD=) is not parsed, and an ordinal size is not used.  =_c8_size_metric_grams= still rescues a coded metric SIZE first, exactly as for a known unit.  Nothing computes kilograms from =community_prices= today (=rg community_prices lsms_library/transformations.py= is empty).  If something ever does, =_parse_explicit_metric= would read such a label, so it must decline an uncurated one.
+- A repeated =(t, v, j, u, variety, obs)= still raises, equal prices or not (the #840 / #637 assertion).
+- A blank, a bare numeric code, an ineligible price, and the 14,603 W3 / 133 W5 unrecorded-size rows stay excluded, silently.  The first two record no unit; the last are registered in =c8-unrecorded-size-drop=.
 
 *** The C8 SIZE field -- READ since GH #834 (2026-09-13), and what the fix does and does not repair
 

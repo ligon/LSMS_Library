@@ -921,6 +921,15 @@ class UnplacedUnitLabelWarning(UserWarning):
     a unit the survey recorded."""
 
 
+def _recorded_label(labels):
+    """True where a unit cell holds a label: not blank, and not a bare numeric
+    code with no value label, either of which means no unit was recorded."""
+    text = labels.astype('string').str.strip()
+    body = text.map(lambda s: s if pd.isna(s) else _strip_code_prefix(s))
+    return (body.notna() & (body != '')
+            & ~body.str.fullmatch(r'[\d.]+').fillna(False)).astype(bool)
+
+
 def _canon_units(labels, canon=_canon_unit, where='',
                  disposition='served as Unknown'):
     """Map a decoded unit-label Series through `canon`, REPORTING what it
@@ -931,12 +940,9 @@ def _canon_units(labels, canon=_canon_unit, where='',
     caller's disposition.  The crop/input default remains ``U_UNKNOWN``."""
     import warnings
     out = labels.map(canon).astype('string')
-    text = labels.astype('string').str.strip()
-    body = text.map(lambda s: s if pd.isna(s) else _strip_code_prefix(s))
-    unplaced = (out.isna() & body.notna() & (body != '')
-                & ~body.str.fullmatch(r'[\d.]+').fillna(False))
+    unplaced = _recorded_label(labels) & out.isna()
     if unplaced.any():
-        counts = text[unplaced].value_counts().to_dict()
+        counts = labels.astype('string').str.strip()[unplaced].value_counts().to_dict()
         warnings.warn(
             f"Nigeria {where}: {int(unplaced.sum())} row(s) carry a unit label "
             f"that cannot be placed and are {disposition}: {counts}. "
@@ -3250,7 +3256,9 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
     row's unit becomes the metric base unit -- 'g' or 'cl' -- making the
     served number the per-unit price data_scheme.yml documents.  Such rows
     carry the `Derivation` key `Nigeria::community_prices::c8-metric-size`.
-    A metric-unit row whose package size is UNRECORDED -- all of W3's
+    A row whose recorded unit label is still unplaced after that step keeps the
+    label as `u` and warns (GH #1095; no such label today).  A metric-unit row
+    whose package size is UNRECORDED -- all of W3's
     13,768 g/cl rows bar one (c8q2b is free text, blank on the rest), all
     3,433 of W3's Kg/l rows (the same blank free text, caught only when the
     deletion entry's inputs were written), and W5's 133 rows on '2. GRAMS
@@ -3414,13 +3422,22 @@ def community_prices_for_wave(t, frames, mode, crop_labels=None):
             # Report only labels still unplaced AFTER the existing metric
             # rescue.  Reporting up-front falsely counts rescued g/cl rows;
             # known metric units dropped for unrecorded sizes are separate.
-            # Retention/fallback remains the explicit #1095 design residual.
             report = (initially_unplaced & piece['u'].isna()
                       & piece['v'].notna() & piece['j'].notna()
                       & piece['Price'].notna() & (piece['Price'] > 0))
             _canon_units(unit_labels[report], canon=_canon_community_unit,
                          where=f'community_prices {t}',
-                         disposition='dropped after metric-size rescue')
+                         disposition='served under the recorded label, with no '
+                                     'factor')
+            # GH #1095 (ruling @ligon 2026-11-04): such a row keeps its recorded
+            # label as `u`, verbatim.  The code prefix is part of it: two units
+            # that differ only there stay two units, where a shared Unknown would
+            # merge them on one (v, j).  No factor is inferred from the label or
+            # from an ordinal size, and Price stays the native-unit price
+            # reported.  A blank or a bare code records no unit and is dropped
+            # below, as before.
+            keep = report & _recorded_label(unit_labels)
+            piece.loc[keep, 'u'] = unit_labels[keep].astype('string').str.strip()
 
         pieces.append(piece)
 
