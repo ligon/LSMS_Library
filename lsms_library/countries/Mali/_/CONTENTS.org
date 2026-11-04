@@ -2641,3 +2641,55 @@ milieu: 56.2% / 72.5% (2018-19), 34.4% / 71.9% (2021-22).
 
 *Inference, not wired.*  Carrying the 2017-18 =strate= back to 2014-15 by =grappe=; it
 would leave 69 clusters empty.
+
+
+* 2026-11-04 -- the EAC-I tree rows are =plot_id = 'Farm-level'= (GH #1476)
+
+The perennial rosters (2014-15 =s3b=, 2017-18 =s11f=) are one row per household and
+species, not on the field grid, so a tree row is household-grain by design: the
+canonical structural sentinel, not =unknown_plot=, which says a plot exists and its
+identifier is missing.  They were served =plot_id= NA, and the canonical rule says
+never to leave such a row null: =harvest_kg='s =groupby= deleted all 627 in silence.
+
+Cold builds, development =4ea95a0aa= against this change:
+
+| wave    | null =plot_id= -> =Farm-level= | with a =Quantity= | convertible | kg =harvest_kg= lost, now kept | total kg |
+|---------+--------------------------------+-------------------+-------------+--------------------------------+-----------------------|
+| 2014-15 |                            357 |               350 |          18 |                          8,029 | 284,859 -> 292,888    |
+| 2017-18 |                            270 |               184 |          48 |                        177,879 | 1,478,362 -> 1,656,241 |
+
+Every other column of every row is digest-equal in all four waves, and =crop_diversity=,
+=gross_crop_revenue= and =yield_kg(on='plot')= are unchanged.  =harvest_kg='s total now
+equals the rows' own kilograms in every wave.
+
+- *The location is still unwired.*  135 of the 270 2017-18 rows record a block and parcel
+  (=s11fq05c=, =s11fq05d=), which might join =plot_features=.  Not measured; serving them
+  there would be a wiring decision, and =Farm-level= says no more than that the roster has
+  no grid.
+- *=Farm-level= now means two things here*: a tree row carries a harvest; a 2021-22 sale row
+  (above) carries none.  So =crop_diversity(weight='count')=, under the rule in
+  =isa/framework-1460= (GH #1469, not merged here), will drop a tree row where the household
+  has a plot row of that crop.
+- *Site I* no longer reports this table's =plot_id=.
+
+* 2026-11-04 -- the 2021-22 harvest quantity: the instrument asks what the file lacks (GH #1437)
+
+The entries above say "no questionnaire checked".  Now checked, and the printed instrument does
+*not* route a finished harvest away from the quantity.  =mli_ehcvm2_qnr_men_excel_vague1.pdf=, printed
+p. 86: "(16C.11) Avez vous fini la récolte de cette culture?  1 = Oui ►(16C.16)  2 = Non  3=Récolte
+nulle ►(16C.14)", and 16C.16 is "Quelle est la quantité déjà récoltée pour la présente campagne
+2021/2022?".  Burkina Faso's enumerator manual (=manuelagent_ehcvm2_version_v2.pdf=, printed pp.
+124-125) says the same: Q16C.11, "Si la réponse est 1=Oui alors aller à Q16C.16".
+
+So a finished harvest should go TO the quantity, and in the file 22 of 5,237 have one (Burkina Faso 0
+of 7,663; Niger 11,910 of 11,910).  The defect is between the instrument and the release: a fielded
+CAPI skip that differs from the paper, or a release that lost the answers.  The held documents cannot
+say which.
+
+*The dispositions could stand in, and Niger shows how well.*  =s16d= records consumed (=s16dq02a=),
+given (=s16dq03a=), sold (=s16dq05a=) and in stock (=s16dq13a=), each with its own unit, at (household,
+crop).  On Niger 2021-22, where both sides exist, their sum over the 7,686 finished pairs with one
+shared unit equals the harvest exactly on 91.1%, within 10% on 92.2%, median ratio 1.000.  On Mali, of
+4,815 household-crop pairs with a finished row, 3,419 have a positive sum in one unit (3,149 on a single
+s16c row, 270 on several), 1,194 span units and cannot be summed without a factor, 199 record no
+disposition and 3 have no =s16d= row.  Not derived here: GH #1437 is waiting on a ruling.

@@ -2721,3 +2721,12 @@ p3 13, p4 389).  Why =emc2014_welfare.dta= leaves them out is not documented her
 WAITING a ruling, GH #1464.  Mali 2018-19 is the only other case of this shape (3 households, 27
 =food_expenditures= rows, on =s07b= and not on the =s00= cover).  EthiopiaRHS, GhanaSPS 2009-10 and
 Tanzania 2014-15 also serve an NA =v=, but on =food_acquired= too.
+
+* 2026-11-04 -- 2021-22 =s16cq16a=: the instrument asks what the file lacks (GH #1437)
+
+Q16C.11 routes a finished harvest TO the quantity ("Si la réponse est 1=Oui alors aller à Q16C.16",
+=manuelagent_ehcvm2_version_v2.pdf=, printed p. 124), and =s16cq16a= is filled on 0 of the 7,663
+finished rows and 179 of 813 unfinished.  =crop_production= does not serve 2021-22 yet, so nothing here
+is affected until it is wired.  Of 6,444 household-crop pairs with a finished row, 3,983 have a positive
+=s16d= disposition sum in one unit, 2,289 span units and 172 record none.  The measurement of that sum
+against a real harvest is in =Mali/_/CONTENTS.org=, same date.
