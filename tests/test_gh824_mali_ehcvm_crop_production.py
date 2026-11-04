@@ -448,8 +448,11 @@ class TestServed:
     # -- consumers -----------------------------------------------------------
 
     def test_harvest_kg_and_yield_see_no_farm_level_row(self, built):
+        # Re-pinned to the EHCVM waves (GH #1476): an EAC-I tree row is Farm-level
+        # now and carries a harvest; a 2021-22 sale row still carries none.
         got = T.harvest_kg(built)
-        assert FARM not in got.index.get_level_values("plot_id")
+        ehcvm = got[got.index.get_level_values("t").isin(WAVE_ROWS)]
+        assert FARM not in ehcvm.index.get_level_values("plot_id")
         plots = ll.Country(COUNTRY).plot_features()
         assert FARM not in T.yield_kg(built, plots, on="plot").index.get_level_values("plot_id")
 
