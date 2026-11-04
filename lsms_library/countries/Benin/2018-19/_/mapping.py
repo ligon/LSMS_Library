@@ -2,9 +2,12 @@ import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.ehcvm import (
+    UnitSizeLabelError,
     derivation_key as _derivation_key,
     food_acquired_ehcvm as _food_acquired_ehcvm,
     inputs_last_purchase as _inputs_last_purchase,
+    served_unit_labels as _served_unit_labels,
+    sized_unit as _sized_unit,
 )
 
 # GH #876.  The wide frame's `Expenditure` used to be `s07bq08`, the value of
@@ -212,3 +215,162 @@ def shocks(df):
     df = df.drop(columns=cope_cols)
     return df
 
+
+
+# ---------------------------------------------------------------------------
+# community_prices: EHCVM section 5, s05_co_ben2018.dta (GH #1226)
+# ---------------------------------------------------------------------------
+#
+# The Niger template (rulings D1-D6, 2026-10-22; Niger/_/niger.py _s05_*), with
+# the household's sized unit form and no folding (#1453 ruling, 2026-11-04).
+# The helpers sit here because lsms_library/ehcvm.py is every EHCVM country's
+# fingerprint; moving them there is the residual #1226 names.
+COMMUNITY_PRICES_DERIVATION = 'Benin::community_prices::one-item-per-price'
+_S05_SOURCE = 's05_co_ben2018.dta'
+_S05_HOUSEHOLD = 's07b_me_ben2018.dta'
+_S05_INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
+
+#: Unit-size codes whose digits name a different household unit from the one
+#: the instrument prints for them, mapped to the unit the instrument names.
+#: Benin's CAPI price form (UEMOA catalogue 44, /download/123 and /124) prints
+#: `1050: Bidon-Unité de taille unique` although household unit 105 is Bassine,
+#: and all 44 rows of 1050 are vinegar; it prints `1330: Sac (10 Kg)-...` (and
+#: 1340 under both spellings) although household unit 133 is a bare Sac.  What
+#: the enumerator saw on the screen is the unit that was priced.
+_S05_FORM_UNIT = {1050: 106, 1330: 134}
+
+
+def _s05_labels(categories, name):
+    return {int(code): str(label).strip() for code, label in categories.get(name, {}).items()
+            if pd.notna(label) and str(label).strip()}
+
+
+def _s05_unit_size(code, hh_units):
+    """``(unit, size)`` of one ``s05q02`` unit-size code.
+
+    ``code = 10 * unit + size``, except that the two-digit sizes 98 and 99
+    (`Autre taille`) make it ``100 * unit + size``: 13198 is Pot, size 98.
+    """
+    code = int(code)
+    unit, size = divmod(code, 10)
+    if unit not in hh_units:
+        unit, size = divmod(code, 100)
+    if unit not in hh_units:
+        raise UnitSizeLabelError(f"Benin s05: unit-size code {code} names no household unit")
+    return _S05_FORM_UNIT.get(code, unit), size
+
+
+def _s05_u_by_code(unit_codes, community, household):
+    """``{code: u}``: the household's served label for the code's unit and size.
+
+    The same composition ``ehcvm.carry_unit_size`` gives ``food_acquired.u``
+    (the read-time ``u`` table, then ``ehcvm.sized_unit``), so a price joins the
+    household row in the same unit and size.  A size the household labels do not
+    list (99, `Autre taille 2`) takes the form's own word.  Unlike the household
+    side an exact metric unit keeps its size (1014 `Litre (Quart)`): a quarter
+    litre is not a litre.  No two units or sizes may share a label: that would
+    be a fold, and it raises.
+    """
+    hh_units = _s05_labels(household, 's07bq03b')
+    hh_sizes = _s05_labels(household, 's07bq03c')
+    s05_units = _s05_labels(community, 's05q02')
+    parts = {int(c): _s05_unit_size(c, hh_units) for c in unit_codes}
+    raw = sorted({hh_units[unit] for unit, _ in parts.values()})
+    served = dict(zip(raw, _served_unit_labels('Benin', raw)))
+    out, source = {}, {}
+    for code, (unit, size) in parts.items():
+        word = hh_sizes.get(size) or s05_units[code].rsplit('-', 1)[-1]
+        label = _sized_unit(served[hh_units[unit]], word)
+        if source.setdefault(label, (unit, size)) != (unit, size):
+            raise UnitSizeLabelError(f"Benin s05: {source[label]} and {(unit, size)} "
+                                     f"would both be served {label!r}")
+        out[code] = label
+    moved = [(a, b) for a, b in zip(out.values(), _served_unit_labels('Benin', list(out.values())))
+             if a != b]
+    if moved:
+        raise UnitSizeLabelError(f"Benin s05: the read-time u table would relabel {moved[:5]}")
+    return out
+
+
+def _s05_base(codes, community, household):
+    """One row per source record: its served keys and ``Description``, by CODE.
+
+    ``j`` is the household's ``s07bq01`` label of the same product code through
+    ``harmonize_food``; ``Description`` keeps the s05 label as recorded.  Where
+    ``harmonize_food`` lumps several codes into one ``j`` (Riz local parfumé and
+    Riz local Nérica into Autre Riz local) the code is the ``variety``, the
+    canonical definition of that level (``data_info.yml``, GH #840; Tanzania's
+    item codes).  Elsewhere the form names nothing finer than ``j``:
+    ``unknown_variety``, as Niger.
+    """
+    from lsms_library.paths import countries_root
+    path = countries_root() / 'Benin'
+    item_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Original Label',
+        dirs=[str(path / '2018-19' / '_'), str(path / '_')],
+        **{'Preferred Label': 'Preferred Label'})
+    hh_items = _s05_labels(household, 's07bq01')
+    s05_items = _s05_labels(community, 's05q01')
+    product = codes['s05q01'].astype(int)
+    unit = codes['s05q02'].astype(int)
+    j_by_code = {c: item_map.get(hh_items[c], hh_items[c]) for c in product.unique()}
+    lumped = pd.Series(j_by_code).value_counts()
+    u_by_code = _s05_u_by_code(unit.unique(), community, household)
+    return pd.DataFrame({
+        't': '2018-19',
+        'v': codes['grappe'].map(tools.format_id).astype('string'),
+        'j': product.map(j_by_code).astype('string'),
+        'u': unit.map(u_by_code).astype('string'),
+        'variety': product.map(lambda c: str(c) if lumped[j_by_code[c]] > 1
+                               else 'unknown_variety').astype('string'),
+        'visit': pd.to_numeric(codes['vague'], errors='raise').astype('int64'),
+        'Description': product.map(s05_items).astype('string'),
+    })
+
+
+def community_prices_s05(codes, community, household):
+    """Both recorded readings of every source record, unaltered.
+
+    ``s05q03`` -> obs 1, ``s05q04`` -> obs 2; a repeated (grappe, product,
+    unit-size) key's later record -> obs 3 / 4 (D1, D5; none in the held file).
+    Nothing is dropped, averaged or converted.  ``Quantity`` is not a source
+    field: see :func:`derive_s05_one_item_per_price`.
+    """
+    from lsms_library.ehcvm import community_price_slots
+    codes = codes.reset_index(drop=True)
+    base = _s05_base(codes, community, household)
+    rank = codes.groupby(['grappe', 's05q01', 's05q02'], sort=False).cumcount()
+    out = community_price_slots(base, codes, ('s05q03', 's05q04'), rank)
+    out = out.set_index(_S05_INDEX).sort_index()
+    if not out.index.is_unique:
+        raise ValueError('Benin s05: two recorded prices share a served key')
+    return out
+
+
+def derive_s05_one_item_per_price(df):
+    """``Quantity = 1`` on every s05 price row, stamped with the registry key.
+
+    The instrument prices ONE item of the selected unit-size and asks no
+    quantity (D2), so the 1 is a construction of the form, not an answer; see
+    ``Benin/_/derivations.yml``.  Takes the finished frame and returns a copy.
+    """
+    out = df.copy()
+    out['Quantity'] = pd.Series(1.0, index=out.index, dtype='Float64')
+    out['Derivation'] = pd.Series(COMMUNITY_PRICES_DERIVATION, index=out.index, dtype='string')
+    return out
+
+
+def inputs_community_prices(wave='2018-19'):
+    """The raw s05 answers under their own names, one row per source record,
+    keyed by the served ``(t, v, j, u, variety, visit)``.  One record is two
+    served rows, obs 1 and 2.  No quantity: the file records none."""
+    if wave != '2018-19':
+        raise ValueError('Benin community prices exist only for 2018-19')
+    from lsms_library.paths import countries_root
+    root = countries_root() / 'Benin' / wave / 'Data'
+    codes = tools.get_dataframe(root / _S05_SOURCE, convert_categoricals=False).reset_index(drop=True)
+    community = tools.get_dataframe(root / _S05_SOURCE, categories_only=True)
+    household = tools.get_dataframe(root / _S05_HOUSEHOLD, categories_only=True)
+    base = _s05_base(codes, community, household).drop(columns='Description')
+    out = pd.concat([base, codes], axis=1)
+    return out.set_index(list(base.columns))
