@@ -5053,9 +5053,14 @@ Those =harvest_kg= rows were measured before GH #1460 kept its crop axis; with i
 Every other column of every row is digest-equal in all four waves; =crop_diversity=,
 =gross_crop_revenue=, =yield_kg(on='plot')= and the sale-basis ladder are unchanged.
 
-=_attach_sales= counted plots with =nunique()=, which skipped the null and would count the
-sentinel, so a sale could have newly attached to a row with no plot.  None of the 41 rows holds a
-sale, and no sentinel row shares a household-crop with a known plot.  =harvest_kg= would pool a
+*A sale does not reach a sentinel row* (@ligon, 2026-11-04).  =_attach_sales= counted plots with
+=nunique()=, which skipped the null.  It now counts a crop's sentinel rows as one more place the crop
+grew (=nunique(dropna=False)=), so a known plot beside them is not a single-plot crop, and its pair
+filter keeps a sale off a crop whose only rows are the sentinel.  Replayed on all four waves against
+development =4646a0fd2=: all 113,585 decisions and the tallies are byte-equal, because none of the 41
+rows holds a sale and no sentinel row shares a household-crop with a known plot.
+
+=harvest_kg= would pool a
 household's =unknown_plot= rows of one crop, as it does Uganda's (GH #1460), but it pools 0 here:
 the 41 rows are 41 distinct household-crops.
 
