@@ -1117,7 +1117,9 @@ Consequences for the data:
 Source: NPS 2020/21 Basic Information Document, pp. 7--8.
 
 
-** TODO Pull WB geovariables (weather/distance/soil) for older NPS waves (#449)
+** TODO Wire WB geovariables (weather/distance/soil) for older NPS waves (#449)
+
+Held since 2026-11-04 in =2008-15/Data/NPS-R{1,2,3}/=; see that dated entry.  No table reads them.
 
 - GitHub :: [[https://github.com/ligon/LSMS_Library/issues/449][#449]]
 
