@@ -75,6 +75,9 @@ sample:
             i: HHID
         myvars:
             v: parish_code
+            # The design PSU of origin, not `v`, which is a parish (GH #689).
+            # GSEC1 only, as ruled: the 72 AGSEC1-only households stay NA here.
+            ea: ea
             weight: h_xwgt_W5  # cross-sectional weight (covers both panel and refreshment sample)
             panel_weight: hwgt_W5  # longitudinal weight (zero for refreshment sample)
             strata: sregion

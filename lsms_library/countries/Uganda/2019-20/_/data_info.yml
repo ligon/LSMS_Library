@@ -57,7 +57,7 @@ housing:
         Floor: h9q06
 
 sample:
-    dfs: [locating_cover]
+    dfs: [locating_cover, origin_ea]
     locating_cover:
         file: HH/gsec1.dta
         idxvars:
@@ -80,8 +80,29 @@ sample:
             strata: subreg
             Rural: urban
             Region: region
+    # GH #689: the design PSU, which no file of this wave ships.  The country
+    # hook `origin_ea` re-keys this 2015-16 frame to this wave's `hhid` through
+    # gsec1.hhidold -> 2018-19 GSEC1.hhid -> t0_hhid, the survey's own tracking
+    # keys; a household they do not reach stays NA.  Declared here so the file's
+    # sidecar is in this wave's input hash, and so that a loss the GH #515 handler
+    # catches costs `ea`, not `v`.  An unreachable remote is not caught: `sample`
+    # raises here, where it used to need only this wave's cover (GH #1463).
+    origin_ea:
+        file: ../../2015-16/Data/gsec1.dta
+        idxvars:
+            i: HHID
+        myvars:
+            ea: ea
+    # NOT a sub-df (it is absent from `dfs:`), so it is never read or merged.
+    # `origin_ea`'s hook reads this file for the middle of the chain, and
+    # `_collect_file_paths_from_block` hashes every `file:` in the block.
+    origin_ea_bridge:
+        file: ../../2018-19/Data/GSEC1.dta
 
     merge_on: [i]
+    # The cover alone decides which households exist; `left` also keeps this
+    # wave's row order, which an outer merge would re-sort.
+    merge_how: left
     final_index: [t, i]
 
 cluster_features:
