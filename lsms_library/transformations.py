@@ -3824,6 +3824,10 @@ _PLOT_LEVELS = ('plot_id', 'plot')
 #: puts on its output index regardless of which spelling it was handed.
 _PLOT_CANONICAL = _PLOT_LEVELS[0]
 
+#: The STRUCTURAL ``plot_id`` sentinel: the record is household-grain and has no
+#: plot (``lsms_library/data_info.yml``, ``plot_id`` under ``Single Index``).
+_PLOT_FARM_LEVEL = 'Farm-level'
+
 
 def _canonicalise_plot_level(res, plot_level):
     """Rename ``plot_level`` on ``res``'s index to :data:`_PLOT_CANONICAL`.
@@ -7335,6 +7339,26 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
     return out.set_index(base + [land_name])[[out_col]].sort_index()
 
 
+def _without_redundant_farm_level(flat, crop_level, plot_level):
+    """Drop each ``Farm-level`` row whose household has a plot row of that crop.
+
+    ``flat`` is a reset-index ``crop_production``.  Multi-plot sales are served
+    on ``plot_id = 'Farm-level'`` (Mali 2021-22; Nigeria W3-W5, GH #843), so such
+    a row repeats a crop the household already reports on a plot and is not a
+    further occurrence of it.  A ``Farm-level`` row with no plot row of its crop
+    is kept, because it is the only record of that crop: all of GhanaLSS
+    1987-88/1988-89, and the few Nigeria sales whose crop has no plot row.  A
+    row with a null ``plot_id`` is not ``Farm-level`` and counts as a plot row.
+    """
+    keys = [n for n in ['country', 't', 'i', crop_level] if n in flat.columns]
+    farm = flat[plot_level].astype('object').eq(_PLOT_FARM_LEVEL).to_numpy(dtype=bool)
+    if not farm.any():
+        return flat
+    plotted = pd.MultiIndex.from_frame(flat.loc[~farm, keys])
+    redundant = pd.MultiIndex.from_frame(flat[keys]).isin(plotted)
+    return flat[~(farm & redundant)]
+
+
 def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     """Shannon crop-diversity index per household (EPAR ``sdi``).
 
@@ -7358,7 +7382,9 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
           the table has neither.  De-duplicating to that grain is
           load-bearing, not tidiness: ``crop_production`` carries one row
           per ``(u, condition)`` as well, so counting raw rows would score
-          a maize crop reported in two conditions as twice the maize.
+          a maize crop reported in two conditions as twice the maize.  A
+          ``plot_id = 'Farm-level'`` row counts only where the household has
+          no plot row of that crop (see Notes).
         - ``'value'`` -- ``p_c`` is crop ``c``'s share of the household's
           reported ``Value_sold``.  **Covers SOLD output only**, so a
           household that sold one crop and ate three scores ``H = 0``:
@@ -7417,6 +7443,17 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     ``tests/test_863_transforms.py::
     test_crop_diversity_count_separates_plots_and_seasons``.
 
+    **A ``Farm-level`` row is not a further occurrence of a crop the household
+    reports on a plot (GH #1469).**  It holds a sale no plot can own: 70 rows in
+    Mali 2021-22 and, with GH #843, 2,514 in Nigeria W3-W5, none with a harvest
+    ``Quantity``.  Counted as a land unit, they move 50 of 2,857 Mali households
+    (mean 0.6435 against 0.6448) and 1,678 Nigeria households, so the
+    ``'count'`` basis drops one wherever the household has a plot row of that
+    crop in that wave.  It keeps one where it has none, because then the row is
+    the only record of the crop: 10 of Nigeria's, and all 37,280 rows of GhanaLSS
+    1987-88 and 1988-89, which a blanket filter would delete.  The ``'value'``
+    basis keeps every such row: that is where the sale value is.
+
     **Not comparable across countries on the ``'count'`` basis.**  The
     occurrence key uses whichever of the land and season levels the
     country's ``crop_production`` carries -- ``(plot, season)`` for Uganda,
@@ -7464,6 +7501,8 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
                                dropna=False)['_w'].sum(min_count=1)
     else:
         plot_level = _resolve_plot_level(names)
+        if plot_level is not None:
+            flat = _without_redundant_farm_level(flat, crop_level, plot_level)
         occurrence = [n for n in [plot_level, 'season']
                       if n is not None and n in flat.columns]
         if occurrence:
