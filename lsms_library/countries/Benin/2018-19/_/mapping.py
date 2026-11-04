@@ -223,8 +223,8 @@ def shocks(df):
 #
 # The Niger template (rulings D1-D6, 2026-10-22; Niger/_/niger.py _s05_*), with
 # the household's sized unit form and no folding (#1453 ruling, 2026-11-04).
-# The helpers sit here because lsms_library/ehcvm.py is every EHCVM country's
-# fingerprint; moving them there is the residual #1226 names.
+# One copy per country, so that each country's wiring can be taken alone.  #1226
+# asks for them in lsms_library/ehcvm.py; that move is the residual.
 COMMUNITY_PRICES_DERIVATION = 'Benin::community_prices::one-item-per-price'
 _S05_SOURCE = 's05_co_ben2018.dta'
 _S05_HOUSEHOLD = 's07b_me_ben2018.dta'
