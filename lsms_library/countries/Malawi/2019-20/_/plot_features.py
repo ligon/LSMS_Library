@@ -1,9 +1,9 @@
 """Build plot_features for Malawi IHS5 2019-20 (GH #167).
 
-IHS5 ships a Cross_Sectional half (keyed on bare case_id) and a Panel
-half (keyed on y4_hhid).  Unlike IHS4, sample().i for the 2019-20 wave
-is NOT cs-prefixed (the cross-sectional case_id is used verbatim), so we
-emit bare ids on both halves and let id_walk chain the panel.
+IHS5 ships a Cross_Sectional half (keyed on case_id) and a Panel half
+(keyed on y4_hhid).  As in IHS4, sample().i for the cross-sectional half is
+prefixed (cs-19-, GH #1278), so we apply the same prefix here and let id_walk
+chain the panel.
 
 Tenure: ag_d03 (acquire) is ABSENT from IHS5 ag_mod_d; ag_d02 there is
 "ID of Respondent", NOT tenure.  So Tenure / TenureSystem are NaN.
@@ -44,15 +44,15 @@ colmap = dict(
 
 pieces = []
 
-# --- Cross-sectional half (bare case_id) ---
+# --- Cross-sectional half (cs-19 prefix) ---
 c_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_c.dta',
                      convert_categoricals=False)
 d_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_d.dta',
                      convert_categoricals=False)
 
-c_xs['hhid'] = c_xs['case_id'].apply(format_id)
+c_xs['hhid'] = 'cs-19-' + c_xs['case_id'].apply(format_id)
 c_xs['plotkey'] = _plotkey(c_xs)
-d_xs['hhid'] = d_xs['case_id'].apply(format_id)
+d_xs['hhid'] = 'cs-19-' + d_xs['case_id'].apply(format_id)
 d_xs['plotkey'] = _plotkey(d_xs)
 pieces.append(plot_features_for_wave(WAVE, c_xs, d_xs, colmap))
 

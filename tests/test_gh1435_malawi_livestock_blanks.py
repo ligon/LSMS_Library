@@ -35,7 +35,7 @@ MODULE_R = [
     ('2013-14', '2013-14/Data/AG_MOD_R1_13.dta', 'y2_hhid', ''),
     ('2016-17', '2016-17/Data/Cross_Sectional/ag_mod_r1.dta', 'case_id', 'cs-17-'),
     ('2016-17', '2016-17/Data/Panel/ag_mod_r1_16.dta', 'y3_hhid', ''),
-    ('2019-20', '2019-20/Data/Cross_Sectional/ag_mod_r1.dta', 'case_id', ''),
+    ('2019-20', '2019-20/Data/Cross_Sectional/ag_mod_r1.dta', 'case_id', 'cs-19-'),
     ('2019-20', '2019-20/Data/Panel/ag_mod_r1_19.dta', 'y4_hhid', ''),
 ]
 

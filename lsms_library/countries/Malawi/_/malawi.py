@@ -2327,7 +2327,7 @@ _CROP_SALE_SOURCES = {
                      icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS)],
     '2019-20': [dict(half='xs', dir='Data/Cross_Sectional',
                      g='ag_mod_g.dta', p='ag_mod_p.dta', i='ag_mod_i.dta', q='ag_mod_q.dta',
-                     hhid='case_id', prefix='', plot='garden',
+                     hhid='case_id', prefix='cs-19-', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
                      icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS),
                 dict(half='panel', dir='Data/Panel',
@@ -3970,7 +3970,7 @@ _MODULE_R_SOURCES = {
     '2013-14': [('Data/AG_MOD_R1_13.dta', 'y2_hhid', '')],
     '2016-17': [('Data/Cross_Sectional/ag_mod_r1.dta', 'case_id', 'cs-17-'),
                 ('Data/Panel/ag_mod_r1_16.dta', 'y3_hhid', '')],
-    '2019-20': [('Data/Cross_Sectional/ag_mod_r1.dta', 'case_id', ''),
+    '2019-20': [('Data/Cross_Sectional/ag_mod_r1.dta', 'case_id', 'cs-19-'),
                 ('Data/Panel/ag_mod_r1_19.dta', 'y4_hhid', '')],
 }
 

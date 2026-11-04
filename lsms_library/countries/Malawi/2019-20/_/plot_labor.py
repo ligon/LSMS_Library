@@ -1,10 +1,9 @@
 """Build plot_labor for Malawi IHS5 / IHPS 2019-20 (GAP 3, plot grain).
 
 Item-level (t, i, plot, source) plot-labor feature.  IHS5 ships a
-Cross_Sectional half (bare case_id -- sample().i for 2019-20 is the bare
-case_id, NOT cs-prefixed) and a Panel half (y4_hhid), concatenated into the
-single 2019-20 wave -- exactly like plot_inputs / crop_production.  Plot key
-is gardenid_plotid in both halves.
+Cross_Sectional half (cs-19-prefixed case_id, GH #1278) and a Panel half
+(y4_hhid), concatenated into the single 2019-20 wave -- exactly like
+plot_inputs / crop_production.  Plot key is gardenid_plotid in both halves.
 
 Module D plot-labor layout is the IHS4/IHS5 generation:
   * family = ag_d4{2,3,4}b{n} * ag_d4{2,3,4}c{n} day*#people products;
@@ -40,11 +39,11 @@ def _plotkey(df):
 
 pieces = []
 
-# --- Cross_Sectional half (bare case_id; no "other" labor columns) ---
+# --- Cross_Sectional half (cs-19 prefix; no "other" labor columns) ---
 d_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_d.dta',
                      convert_categoricals=False)
 d_xs_labor_positions = np.arange(len(d_xs), dtype=np.int64)
-d_xs['hhid'] = d_xs['case_id'].apply(format_id)
+d_xs['hhid'] = 'cs-19-' + d_xs['case_id'].apply(format_id)
 d_xs['plotkey'] = _plotkey(d_xs)
 pieces.append(_plot_labor_block(d_xs, hhid='hhid', plotkey='plotkey', t=WAVE,
                                 hired_suffix='1/2/3', include_other=False,

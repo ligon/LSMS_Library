@@ -144,7 +144,8 @@ MODERN = {'2016-17', '2019-20'}
 # Waves concatenating a Cross_Sectional and a Panel half.
 TWO_HALVES = {'2016-17', '2019-20'}
 HHIDS = {'2010-11': {'7'}, '2013-14': {'7'}, '2016-17': {'cs-17-7', '700'},
-         '2019-20': {'7', '700'}}
+         # GH #1278: the 2019-20 cross-sectional half carries its namespace now.
+         '2019-20': {'cs-19-7', '700'}}
 
 
 @pytest.mark.parametrize('wave', WAVES)

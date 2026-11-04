@@ -1,10 +1,9 @@
 """Build plot_inputs for Malawi IHS5 2019-20 (GAP 2).
 
-IHS5 ships a Cross_Sectional half (bare case_id) and a Panel half
-(y4_hhid), concatenated into the single 2019-20 wave -- exactly like
-plot_features / crop_production (sample().i for 2019-20 is the bare
-cross-sectional case_id, NOT cs-prefixed).  Plot key is gardenid_plotid
-in both halves.
+IHS5 ships a Cross_Sectional half (cs-19-prefixed case_id, GH #1278) and a
+Panel half (y4_hhid), concatenated into the single 2019-20 wave -- exactly
+like plot_features / crop_production.  Plot key is gardenid_plotid in both
+halves.
 
 Module D layout is the IHS4/IHS5 generation: slot-1 fertilizer type
 ag_d39a / enumerator-total kg ag_d39d; slot-2 type ag_d39g /
@@ -86,11 +85,11 @@ def _half(d, g, h, hh_of, seed_qty, seed_unit, seed_value, source_ref, source_ha
 
 all_pieces, all_seed_purchase, all_seed_gift = [], [], []
 
-# --- Cross-sectional half (bare case_id) ---
+# --- Cross-sectional half (cs-19 prefix) ---
 d_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_d.dta', convert_categoricals=False)
 g_xs = get_dataframe(G_XS_SOURCE, convert_categoricals=False)
 h_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_h.dta', convert_categoricals=False)
-p, s, gft = _half(d_xs, g_xs, h_xs, lambda df: df['case_id'].apply(format_id),
+p, s, gft = _half(d_xs, g_xs, h_xs, lambda df: 'cs-19-' + df['case_id'].apply(format_id),
              seed_qty=['ag_h07a'],
              seed_unit=['ag_h07b'],
              seed_value=['ag_h10'],

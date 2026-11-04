@@ -65,24 +65,18 @@ And not vacuously: the id strings match literally (=101011000014= on
 both sides), and the row counts show no namespace inflation -- rows
 never exceed source households x strategies.
 
-This was worth running rather than waving away, because *2019-20 has
-the surface shape of a namespace split*: its =data_info.yml= runs
-=case_id= through =cs_i= (='cs-19-' + format_id=) for =sample= /
-=household_roster= / =cluster_features=, while all three wave scripts
-pass =i_prefix=''= / bare =format_id=.
-
-*That asymmetry is a deliberate, already-recorded decision, not a
-defect* -- see "plot_features (GH #167)" below: "2016-17 cross-sectional
-id is =cs-17-=-prefixed in =sample()= ...; the wave script applies the
-same prefix so XS plots are not ~100% orphaned.  *All other halves emit
-the raw wave hhid* and rely on framework id_walk / =panel_ids=
-chaining."  2019-20 is one of those other halves.  The measurement
-confirms the documented expectation rather than contradicting it: the
-=cs-19-= prefix survives to the API on *neither* side (0 of 14,612 ids
-carry it, in any table), so both sides are in the raw =case_id=
-namespace and =i= joins exactly.  2016-17 reaches the same place by the
-other route -- prefixed on both sides.  A test pins the overlap per
-wave so neither route can drift.
+This was worth running rather than waving away, because *2019-20 had
+the surface shape of a namespace split*: its =data_info.yml= named
+=cs_i= (='cs-19-' + format_id=) for =sample= / =household_roster= /
+=cluster_features=, while all three wave scripts passed =i_prefix=''= /
+bare =format_id=.  The =cs-19-= prefix survived to the API on neither
+side (0 of 14,612 ids carried it, in any table), because =function:=
+is not a key the reader knows, so both sides were in the raw =case_id=
+namespace and =i= joined exactly.  /Corrected by GH #1278:/ this entry
+called that asymmetry "a deliberate, already-recorded decision"; it was
+a dead key, and the bare ids coincide with two IHS3 households.  Both
+sides now carry =cs-19-=, the route 2016-17 already took.  A test pins
+the overlap per wave so the two sides cannot drift.
 
 =plot_features= showed 4 apparent duplicate groups (3 in 2016-17
 Cross_Sectional, 1 in its Panel half).  Every one of them consists
@@ -1828,7 +1822,7 @@ live in =categorical_mapping.org=.  Registered =materialize: make= in
 | 2010-11 | Full_Sample/Agriculture/ag_mod_c.dta            | Full_Sample/Agriculture/ag_mod_d.dta            | case_id               | ag_c00 / ag_d00    |
 | 2013-14 | AG_MOD_C_13.dta                                 | AG_MOD_D_13.dta                                 | y2_hhid               | ag_c00 / ag_d00    |
 | 2016-17 | Cross_Sectional/ag_mod_c.dta + Panel/ag_mod_c_16.dta | Cross_Sectional/ag_mod_d.dta + Panel/ag_mod_d_16.dta | case_id (cs) / y3_hhid | gardenid_plotid    |
-| 2019-20 | Cross_Sectional/ag_mod_c.dta + Panel/ag_mod_c_19.dta | Cross_Sectional/ag_mod_d.dta + Panel/ag_mod_d_19.dta | case_id / y4_hhid     | gardenid_plotid    |
+| 2019-20 | Cross_Sectional/ag_mod_c.dta + Panel/ag_mod_c_19.dta | Cross_Sectional/ag_mod_d.dta + Panel/ag_mod_d_19.dta | case_id (cs) / y4_hhid | gardenid_plotid    |
 
 Area: prefer GPS-measured =ag_c04c= (acres) x0.404686; else
 farmer-estimate =ag_c04a= converted via the =ag_c04b= unit code
@@ -1847,17 +1841,19 @@ Wave-specific notes (validated against the recon refuter pass,
   A column-restricted read (=usecols=[case_id, hhid, gardenid, plotid,
   ag_d02, ag_d21, ag_d28a]=) succeeds (15,724 rows); the wave script
   uses that path for this one file.
-- *2016-17 cross-sectional id* is =cs-17-=-prefixed in =sample()= (the
-  =cs_i= mapping the roster uses); the wave script applies the same
-  prefix so XS plots are not ~100% orphaned.  All other halves emit the
-  raw wave hhid and rely on framework id_walk / =panel_ids= chaining.
-- *2016-17 YAML-path tables must spell it =- mapping: cs_i=, NOT
-  =- function: cs_i=.*  This wave's working example is =sample= (see its
-  =idxvars.i=).  The 2019-20 wave uses =- function: cs_i= for the same job,
-  so copying that wave's block into this one *fails silently* --- the key is
-  ignored, the raw =case_id= is emitted, and the table lands in the wrong
-  namespace with no error.  Verified 2026-07-31: the =function:= spelling
-  left all four tables below at 0% overlap; =mapping:= took them to 100%.
+- *2016-17 and 2019-20 cross-sectional ids* are =cs-17-= / =cs-19-=-prefixed
+  in =sample()= (the =cs_i= mapping the roster uses; 2019-20 since GH #1278);
+  each wave script applies the same prefix so XS plots are not ~100%
+  orphaned.  All other halves emit the raw wave hhid and rely on framework
+  id_walk / =panel_ids= chaining.
+- *YAML-path tables must spell it =- mapping: cs_i=, NOT =- function: cs_i=.*
+  The =function:= spelling *fails silently*: the key is ignored, the raw
+  =case_id= is emitted, and the table lands in the wrong namespace with no
+  error.  Verified 2026-07-31 on 2016-17: the =function:= spelling left all
+  four tables below at 0% overlap; =mapping:= took them to 100%.  2019-20 used
+  =function:= in all seven of its declarations until GH #1278, so all of them
+  were dead and the whole wave was bare; =tests/test_gh1278_malawi_cs19_namespace.py=
+  refuses the spelling in any =data_info.yml=.
 - *Four tables were in that wrong namespace until 2026-07-31*:
   =food_security=, =subjective_well_being=, =shocks=, =assets= --- all four
   read =Cross_Sectional/*= and declared a bare =i: case_id=.  Measured
@@ -1918,7 +1914,7 @@ Registered =materialize: make= in =data_scheme.yml=.
 | 2010-11 | Full_Sample/Agriculture/ag_mod_r1.dta                | case_id                |
 | 2013-14 | AG_MOD_R1_13.dta                                     | y2_hhid                |
 | 2016-17 | Cross_Sectional/ag_mod_r1.dta + Panel/ag_mod_r1_16.dta | case_id (cs-17) / y3_hhid |
-| 2019-20 | Cross_Sectional/ag_mod_r1.dta + Panel/ag_mod_r1_19.dta | case_id / y4_hhid      |
+| 2019-20 | Cross_Sectional/ag_mod_r1.dta + Panel/ag_mod_r1_19.dta | case_id (cs-19) / y4_hhid |
 
 =animal= is the =harmonize_species= Preferred Label (Code-keyed table in
 =categorical_mapping.org=).  Two code namespaces are reconciled: 2010-11
@@ -2002,7 +1998,9 @@ What the crosswalk encodes, reproduced as found:
   half (the IHPS 2016 / 2019 rounds, BOTH held as catalog 3819's files --
   2016-17's are not 2939's, GH #1277) is wired: =y3_hhid ->
   y2_hhid= and =y4_hhid -> y3_hhid=.  The =Data/Cross_Sectional/= half (IHS4 /
-  IHS5, 2936 / 3818) keeps its own ids (12,447 / 11,434 households).
+  IHS5, 2936 / 3818) keeps its own ids (12,447 / 11,434 households), =cs-17-=
+  and =cs-19-=-prefixed so that they cannot match an IHS3 =case_id= (GH #1278;
+  the two JSON files did not move a byte when 2019-20 took its prefix).
 - IHPS tracks split-off households, so several current households can claim
   one previous household.  =local_tools.update_id= keeps them apart with
   =_N= suffixes: 896 / 996 / 1,726 suffixed ids in the three maps.  Row order
@@ -2781,12 +2779,10 @@ Development (=8a8278a2a=) -> this change, cold:
 - *9 IHS5 cross-sectional clusters already served coordinates outside
   Malawi's bounding box* (144 households, north of -9 and west of 32), before
   and after this change.
-- *2019-20's =function: cs_i= is not a recognised key*, so it is a no-op: the
-  IHS5 cross-sectional =i= is the bare 12-digit =case_id=, not
-  ='cs-19-'= + =case_id= (2016-17's =mapping: cs_i= does prefix).  =df_main=
-  and =df_geo= spell it identically, so the join is exact, and panel ids
-  (=NNNN-NNN=) cannot collide with it.  The comments that say "case_id
-  through =cs_i=" describe intent, not behaviour.
+- /Resolved by GH #1278:/ 2019-20's =function: cs_i= was not a recognised key,
+  so the IHS5 cross-sectional =i= was the bare 12-digit =case_id=.  =df_main=
+  and =df_geo= spelled it identically, so the join was exact, and panel ids
+  (=NNNN-NNN=) could not collide with it.  Both now spell =mapping: cs_i=.
 
 *** GH #1277: 2016-17's =Data/Panel/= is 3819's re-release of IHPS 2016, not 2939
 
@@ -4398,8 +4394,8 @@ at API finalization (184 blank crop/plot records and one known-crop blank).
 Country appends =input_obs= to its plot-input index; Feature appends it to the
 canonical index and supplies =unresolved_observation= for legacy countries.
 Consumers addressing index levels positionally must accommodate this axis.
-2016 cross-sectional IDs retain the deliberate =cs-17-= prefix, while 2019
-uses bare case_id. None of these identifiers establishes purchase units.
+2016 and 2019 cross-sectional IDs carry =cs-17-= and =cs-19-= (the latter
+since GH #1278). None of these identifiers establishes purchase units.
 
 * 2026-10-30 -- plot_inputs missing-unit remainder: no served residual (GH #1118)
 
@@ -4444,7 +4440,43 @@ cost introduced. Reviewable receipts and scripts are in dispatch
 =95c34db5277843d2b00fa5a597b6eda5/evidence/REPORT.md=; private operands are excluded
 from the evidence bundle and repository.
 
-* GH #1278: two unsubstantiated string-based longitudinal matches (decision open)
+* GH #1278: 2019-20 cross-sectional households are =cs-19-= (ruled and done 2026-11-04)
+
+*Ruling (@ligon, bulk, 2026-11-04):* an atomic =cs-19-= migration, following
+2016-17's =cs-17-=.  Everything below this block is the diagnosis of 2026-10-30
+that led to it, kept as written; its "no namespace repair is selected" no longer
+holds.
+
+*Why it is one change.*  Every Malawi table has to agree, and the symptom of a
+missed site is silence (an empty join reads as "this wave has no such data").
+The sites: 7 dead =function: cs_i= declarations; 4 YAML tables with a bare
+=i: case_id= (=subjective_well_being=, =food_security=, =shocks=, =assets=); 10
+household scripts; *and two the issue did not count*, the =malawi.py= tables behind
+=derivation_inputs= (=_CROP_SALE_SOURCES=, =_MODULE_R_SOURCES=), which would have
+stopped those inputs joining the served rows.  =community_prices= is cluster-grain.
+
+*The crosswalk did not move.*  =make panel-ids= reads only the Panel cover through
+=y4_hhid=, so the two JSON files regenerate byte-identical.  That empty diff is the
+evidence that no panel household lost its link.
+
+*Measured, cold builds, =e92ae6b0f= vs this change.*  All 25 public tables and 7
+transforms: same rows, same dtypes, per-column digests equal once =cs-19-= is
+stripped from 2019-20 ids, same warnings by class.  Every 2019-20 household
+carries the prefix or a panel id, in every household table.  The 2 false links go,
+and nothing else in the attrition matrix moves:
+
+| measure                                        | before | after |
+|------------------------------------------------+--------+-------|
+| IHS5 ids also in IHS3 (read from the covers)   |      2 |     2 |
+| ... served under an IHS3 id                    |      2 |     0 |
+| 2010-11 -> 2019-20, =Country.panel_attrition= |  1,454 | 1,452 |
+| 2010-11 -> 2019-20, on the =sample= spine      |  1,454 | 1,452 |
+| 2019-20 cross-sectional ids carrying =cs-19-=  |      0 | 11,434 |
+
+=check_panel_consistency= is unchanged, 7 pass and 1 warn.  *All 11,434 ids change
+for a downstream user*: to compare with an older extract, strip =cs-19-=.  Cost: one
+full Malawi re-warm.
+
 
 At =10ad99d62=, the seven =function: cs_i= declarations in 2019-20
 =data_info.yml= are ignored by =Wave.column_mapping=. The actual formatter
