@@ -2752,6 +2752,37 @@ the test does find a real panel.
 head-of-household age comparison on that column alone scores a real panel at 0.003; the table above
 falls back on =s01q03c=.
 
+* 2026-11-04 -- 2018-19 community units take the household's sized spelling (GH #1453)
+
+Ruling @ligon 2026-11-04, option (b): respell the community side, do not fold it, and move no
+household label.  =mapping._s05_unit_label= serves =<base> (<Size>)=, with the size from the code's
+digit (=s05q02 = 10 * s07bq03b + s07bq03c=, as in Niger) and a refusal where the word contradicts it.
+This replaces "=s05q02='s full unit-size label is retained" in the 2026-10-30 entry above.  Nothing
+else in the table moves: 109,338 rows, both quote slots, =Price=, =variety=, =visit=, =obs=.
+
+*What is a respelling and what is a fold.*  Four community bases name one household unit in another
+spelling, and take the household's: =Alvéoole= -> =Alvéole=, =Motte(boule)= -> =Boule=, =Moude (Moudé)=
+-> =Moude=, =Seau (5 Kg )= -> =Seau (5 Kg)=.  The =u= table's many-to-one rows are folds and are not
+applied: =Avec os en tas= and =Sans os en tas= stay apart from =Tas=, =Boite de tomate= and =Boite de
+lait concentrée= from =Boite=, =Avec os au kg= / =Sans os au kg= / =Filet au kg= from =Kg=.  So 84 source
+codes serve 84 labels.
+
+| of the 84 s05 codes                                                   | codes |
+|-----------------------------------------------------------------------+-------|
+| same label as the household's for that code                           |    62 |
+| the household folds the unit, so by construction no join              |    15 |
+| no consumed household row at all (=Plaquette=, =Sac (100 Kg)=, =Sac (50 Kg)=, sized =Seau=) |     7 |
+
+| 2018-19, on served frames                                  | before | #1224 | now    |
+|------------------------------------------------------------+--------+-------+--------|
+| household (j, u) cells with a community price, of 433 / 910 / 910 |     34 |    33 |    216 |
+| household rows in those cells, of 162,032                  | 28,167 | 25,392 | 68,830 |
+
+The remaining gap is mostly =j=: 450 community (j, u) cells against 910 household ones, on a
+different product list.  Same-cluster, 41,963 household rows find a (v, j, u) price.  A price on
+=Avec os en tas (Petit)= does not reach a household's =Tas (Petit)= of meat; that is the cost of
+not folding, accepted by the ruling.
+
 * 2026-11-04 -- EAC-I enumerator manuals held; 2021-22 price source read from the BID (GH #1179, #821)
 
 *Held now, 2014-15/Documentation/.*  =bid_eaci14.pdf= and =EACI_MANUEL_P2_V3.pdf=

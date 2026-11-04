@@ -51,7 +51,8 @@ def test_slots_duplicates_sizes_and_missing_prices_are_retained(mapping):
     assert out.index.names == ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
     assert set(out.index.get_level_values('v')) == {'12', '13'}
     assert 'i' not in out.index.names
-    assert set(out.index.get_level_values('u')) == {'Boite - Petit', 'Tas - Grand'}
+    # Re-pinned for GH #1453: the sized labels take the household's spelling.
+    assert set(out.index.get_level_values('u')) == {'Boite (Petit)', 'Tas (Grand)'}
     # Both source product codes survive their shared harmonized j='Maïs'.
     maize = out.xs('Maïs', level='j')
     assert set(maize.index.get_level_values('variety')) == {'5', '6'}
@@ -70,6 +71,8 @@ def test_no_weight_or_count_inferred_from_unselected_fields(mapping, unreported_
     # No such field is declared in this module. In particular, a kg unit
     # label or a hypothetical extra field must not make Quantity=1/weight.
     codes['poids'] = unreported_weight
+    # GH #1453: the unit code now has to agree with its label; 1000 is Kg's.
+    codes['s05q02'] = 1000
     labels['s05q02'] = 'Kg'
     out = mapping.community_prices_s05(codes, labels)
     assert out.Quantity.isna().all()
@@ -115,6 +118,8 @@ def test_public_transform_preserves_sizes_and_feature_omits_unknown_quantity(map
     codes, labels = sources()
     # Existing u-table spelling rule removes only this space; it must not
     # strip the fixed-mass size or collapse the small/large container labels.
+    # GH #1453: the unit code now has to agree with its label; 4660 is this Seau's.
+    codes.loc[3, 's05q02'] = 4660
     labels.loc[3, 's05q02'] = 'Seau (5 Kg )'
     native = mapping.community_prices_s05(codes, labels)
     country = Country('Mali', preload_panel_ids=False)
@@ -122,7 +127,7 @@ def test_public_transform_preserves_sizes_and_feature_omits_unknown_quantity(map
         native, country._materialization_entry('community_prices'), 'community_prices')
     assert len(public) == len(native) and public.index.is_unique
     assert public.index.names == ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
-    assert set(public.index.get_level_values('u')) == {'Boite - Petit', 'Seau (5 Kg)'}
+    assert set(public.index.get_level_values('u')) == {'Boite (Petit)', 'Seau (5 Kg)'}
     assert public.Quantity.isna().all()
     feature = _harmonize_country_frame(
         public, _canonical_index_levels('community_prices'), 'Mali', 'community_prices')

@@ -422,7 +422,8 @@ Data Scheme:
     # weight: Quantity is NA, never NumberOfUnits or a fabricated one.
     # Its product code is variety (retaining finer identity under j mapping),
     # vague is visit; obs=1/2, then 3/4 for a repeated source key. Sized unit
-    # labels are retained verbatim. No rows or missing-price slots are dropped.
+    # labels take the household's spelling, Tas (Petit), one label per source
+    # unit code and no fold (GH #1453). No rows or missing-price slots are dropped.
     # 2017-18 has no community module wired. In the held 2021-22 release,
     # no s05 sidecar exists and ehcvm_prix has region/milieu, not grappe;
     # no cluster-grain declaration is made for that distinct source.
