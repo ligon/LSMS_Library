@@ -4996,7 +4996,9 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         The ``crop_production`` item feature, indexed by
         ``(t, i, plot_id, j, u, season)`` (``v`` may also be present — it is
         ignored for the reduction and dropped from the output grain) with a
-        reported ``Quantity`` column in native unit ``u``.
+        reported ``Quantity`` column in native unit ``u``.  The crop level may
+        be spelled ``j`` or ``crop`` (:func:`_resolve_crop_level`), and the plot
+        level ``plot_id`` or ``plot`` (:func:`_resolve_plot_level`).
     volume_as_mass : bool, default True
         Forwarded to :func:`_get_kg_factors`; treat ``1 litre = 1 kg`` for
         fluid units (juice/beer harvest rows) when True.
@@ -5035,7 +5037,11 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     -------
     pd.DataFrame
         One ``Harvest_kg`` column indexed by ``(t, i, plot_id, j)`` (whichever
-        of those levels are present), summed over native units and season.
+        of those levels are present), summed over native units, ``condition``
+        and season.  The output levels are always spelled ``plot_id`` and ``j``,
+        so a ``Country`` frame whose crop level is ``crop`` and a ``Feature``
+        frame of the same country give the same rows (GH #1460).  A ``country``
+        level on a pooled frame is NOT carried and is not a grouping key.
 
         ``result.attrs['kg_factor_sources']`` is ``{layer: n_rows}`` over the
         INPUT rows and sums to ``len(crop_production)``.  It counts rows by
@@ -5104,13 +5110,15 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     out = pd.DataFrame({'Harvest_kg': kg})
     out = out.replace(0, np.nan).dropna()
     plot_level = _resolve_plot_level(out.index.names)
-    group_by = [n for n in ['t', 'i', plot_level, 'j']
+    crop_level = _resolve_crop_level(out.index.names)
+    group_by = [n for n in ['t', 'i', plot_level, crop_level]
                 if n is not None and n in out.index.names]
     res = out.groupby(group_by).sum()
-    # Normalise the plot level name to the canonical 'plot_id' so downstream
-    # (yield_kg) and cross-country callers see one schema regardless of source
-    # naming.
+    # Normalise the plot and crop level names to the canonical 'plot_id' and
+    # 'j' so downstream (yield_kg) and cross-country callers see one schema
+    # regardless of source naming.
     res = _canonicalise_plot_level(res, plot_level)
+    res = _canonicalise_crop_level(res, crop_level)
     # ``groupby`` drops ``attrs``, so the tallies are re-stashed here -- the
     # same idiom ``food_prices`` uses for ``price_rows_dropped``.
     res.attrs['kg_factor_sources'] = factors.attrs['kg_factor_sources']
@@ -6413,13 +6421,30 @@ def nb_plots(plot_features):
 # ---------------------------------------------------------------------------
 
 # Crop-identity level names emitted by the various countries' crop features.
-# ``j`` is the canonical (Uganda, Niger, Togo) name; ``crop`` is Malawi's.
-# The two vocabularies are the same axis (both the harmonize_crop ->
-# harmonize_food Preferred Label), which is why ``data_info.yml``'s
-# ``index_info`` does not yet register the plot-level ag features: "their
-# per-country index NAMES diverge (plot vs plot_id, crop vs j)".  Twin of
+# ``j`` is the canonical name; Uganda, Ethiopia, Tanzania, GhanaLSS, GhanaSPS and
+# EthiopiaRHS declare it.  ``crop`` is the other ten: Malawi, Nigeria, Niger,
+# Mali, Togo, Benin, Senegal, Burkina Faso, Guinea-Bissau and CotedIvoire
+# (measured 2026-11-04, GH #1460).  The two vocabularies are the same axis (both
+# the harmonize_crop -> harmonize_food Preferred Label), and ``data_info.yml``'s
+# ``level_aliases`` maps ``crop`` onto ``j`` for the ``Feature`` path.  Twin of
 # :data:`_PLOT_LEVELS`.
 _CROP_LEVELS = ('j', 'crop')
+
+#: The canonical crop-axis level name, ``level_aliases``' target for
+#: ``crop_production`` in ``lsms_library/data_info.yml``.  What a transform that
+#: promises a ``j`` level puts on its output whichever spelling it was handed.
+_CROP_CANONICAL = _CROP_LEVELS[0]
+
+
+def _canonicalise_crop_level(res, crop_level):
+    """Rename ``crop_level`` on ``res``'s index to :data:`_CROP_CANONICAL`.
+
+    Twin of :func:`_canonicalise_plot_level`.  A no-op when the level is
+    already canonical or absent.
+    """
+    if crop_level and crop_level != _CROP_CANONICAL:
+        res.index = res.index.rename({crop_level: _CROP_CANONICAL})
+    return res
 
 
 def _resolve_crop_level(names):
