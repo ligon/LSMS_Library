@@ -140,8 +140,9 @@ from .derivations import COLUMN as DERIVATION_COLUMN
 
 __all__ = [
     "EHCVM_COUNTRIES", "DERIVATION_NAME", "RAW_VARIABLES",
-    "MYVARS", "derivation_key", "derive_ehcvm_purchase_value",
-    "food_acquired_ehcvm", "inputs_last_purchase",
+    "MYVARS", "carry_unit_size", "derivation_key",
+    "derive_ehcvm_purchase_value", "food_acquired_ehcvm",
+    "inputs_last_purchase", "served_unit_labels", "size_label", "sized_unit",
 ]
 
 #: The eight countries whose ``food_acquired`` comes from EHCVM section 7B.
@@ -187,6 +188,14 @@ def derivation_key(country: str) -> str:
     if country not in EHCVM_COUNTRIES:
         raise ValueError(f"{country!r} is not an EHCVM country: {EHCVM_COUNTRIES}")
     return f"{country}::food_acquired::{DERIVATION_NAME}"
+
+
+def _country_of(key: str) -> str:
+    """The country slot of a :func:`derivation_key` (``'Togo::...'`` -> ``'Togo'``)."""
+    country = str(key).split("::", 1)[0]
+    if country not in EHCVM_COUNTRIES:
+        raise ValueError(f"{key!r} does not name an EHCVM country: {EHCVM_COUNTRIES}")
+    return country
 
 
 # ---------------------------------------------------------------------------
@@ -235,6 +244,185 @@ def _unit_key(value):
 
 def _keys(series) -> pd.Series:
     return pd.Series(series).map(_unit_key)
+
+
+# ---------------------------------------------------------------------------
+# the unit SIZE in the served unit label (GH #1224)
+# ---------------------------------------------------------------------------
+
+#: :func:`_unit_key` values that name the SIZE-FREE code 0 of ``s07bq03c``,
+#: as the twelve waves' own value labels spell it (measured, all twelve):
+#: ``Taille unique`` -- with ``Unite de taille unique`` (Benin, Mali 2018-19,
+#: Togo) already folded onto it by :data:`_SIZE_SYNONYMS` --, Guinea-Bissau's
+#: Portuguese ``Tamanho único``, and ``'0'`` for the code-prefixed
+#: ``'0. Taille unique'`` of Niger and Senegal 2021-22.  Code 0 carries one of
+#: these spellings in every wave and no other code does.  This is the size-free
+#: CODE spelled three ways, not a synonym: ``Entier`` is a size and stays one.
+_SIZE_FREE_KEYS = frozenset({"taille unique", "tamanho unico", "0"})
+
+#: Lower-cased labels the food kg ladder reads as metric by EXACT match
+#: (``transformations.KNOWN_METRIC``'s keys).  A size suffix would cost such a
+#: label its metric reading -- ``Kg (Grand)`` is neither an exact key nor a
+#: label with a number in it -- so a row whose served base is one of these
+#: keeps its unit bare (see :func:`carry_unit_size`).  Copied rather than
+#: imported so that no kg-inference symbol reaches a build fingerprint
+#: (``tests/test_build_transform_hash.py``); ``tests/test_ehcvm_unit_size.py``
+#: fails if the two sets drift apart.  A label with a stated quantity
+#: (``Sac (50 Kg)``, ``Bidon de 1,5 L``) keeps its size: the parser still
+#: reads the number with the suffix after it.
+_EXACT_METRIC_LABELS = frozenset({
+    "kg", "kilogram", "kilogramme", "kgs", "kilograms", "kilogrammes",
+    "kilo", "kilos", "g", "gram", "gramm", "grams", "gramme", "grammes",
+    "gm", "gms", "milligram", "milligramme", "milligrammes", "tonne",
+    "tonnes", "l", "litre", "liter", "litres", "liters", "ml", "cl",
+    "millilitre", "milliliter", "millilitres", "milliliters", "mili liter",
+    "centilitre", "centilitres", "pound", "lbs",
+})
+
+#: Lower-cased missing-unit sentinels (``transformations._U_SENTINELS``).  A
+#: size on a unit nobody recorded is not a sized unit, and ``Unknown (Petit)``
+#: would escape that closed vocabulary into the kg inference.
+_MISSING_UNIT_LABELS = frozenset({"unknown", "manquant"})
+
+_SIZE_CODE_PREFIX = re.compile(r"^\d+\s*[.\-]\s*")
+
+
+def size_label(value):
+    """The served spelling of one ``s07bq03c`` size, or ``None``.
+
+    ``None`` for a missing size and for the size-free code
+    (:data:`_SIZE_FREE_KEYS`).  Otherwise the instrument's own value label
+    with only its case normalised to an initial capital (``'Très Petite'`` ->
+    ``'Très petite'``, ``'Sans Brassée'`` -> ``'Sans brassée'``).  What is
+    removed is not label text: padding (Mali 2018-19), the Stata code prefix
+    of a numbered value label (``'1. Petit'``, Niger / Senegal 2021-22), and
+    UTF-8-read-as-Latin-1 mojibake (``'TrÃ¨s petit'``, Senegal 2018-19), so
+    the accents the instrument wrote are the ones served.  A code with no
+    value label in the file is served as its code (Togo 2018 code ``98``, 208
+    rows): the same convention as an undecodable unit code -- leave the code,
+    invent no label.
+    """
+    key = _unit_key(value)
+    if key is None or key in _SIZE_FREE_KEYS:
+        return None
+    if isinstance(value, str):
+        s = value.strip()
+        try:
+            s = s.encode("latin-1").decode("utf-8")
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            pass
+        s = _SIZE_CODE_PREFIX.sub("", s).strip() or s
+    else:                                   # a bare numeric code
+        s = key
+    s = re.sub(r"\s+", " ", s)
+    return s[:1].upper() + s[1:].lower()
+
+
+def sized_unit(base, size):
+    """``'<base> (<Size>)'`` where ``size`` names a size, else ``base``.
+
+    ``base`` must already be the unit label the country SERVES (the read-time
+    ``u`` table applied); ``size`` is a raw ``s07bq03c`` label and goes
+    through :func:`size_label`.  The Uganda form (``Heap (Small)``), and the
+    form Niger 2018-19 ``community_prices`` already serves (GH #823).
+    """
+    label = size_label(size)
+    if label is None or base is None or (not isinstance(base, str) and pd.isna(base)):
+        return base
+    return f"{base} ({label})"
+
+
+def served_unit_labels(country: str, values) -> np.ndarray:
+    """The ``u`` the Country API serves for each raw label in ``values``.
+
+    Applies ``Country._apply_categorical_mappings`` -- the read-time
+    auto-apply of the merged ``u`` table (country rows over the additive
+    global ``categorical_mapping/u.org``) -- to a one-level frame of the
+    values, so the label is exactly the one ``_finalize_result`` would serve
+    rather than a second reading of the same tables that could drift.  Labels
+    no table names pass through unchanged, as they do on the served path.
+    """
+    from .country import Country
+    vals = np.asarray(list(values), dtype=object)
+    if not len(vals):
+        return vals
+    probe = pd.DataFrame(index=pd.MultiIndex.from_arrays(
+        [pd.Index(vals, dtype=object), np.arange(len(vals))],
+        names=["u", "_row"]))
+    out = Country(country)._apply_categorical_mappings(probe)
+    return np.asarray(out.index.get_level_values("u"), dtype=object)
+
+
+def carry_unit_size(frame: pd.DataFrame, sizes, country: str,
+                    decode=None) -> pd.DataFrame:
+    """Rewrite ``frame``'s ``u`` level to carry the consumption unit SIZE.
+
+    ``frame`` is the wide ``food_acquired`` frame (one row per household x
+    item), ``sizes`` its ``s07bq03c`` labels, aligned by position.  A row whose
+    size names a size (:func:`size_label`) gets ``u = '<served unit>
+    (<Size>)'`` -- ``Tas (Petit)``, ``Tiya (Entier)`` -- where ``<served
+    unit>`` is the label the Country API serves for that row today
+    (:func:`served_unit_labels`, after ``decode``: the wave's own mojibake
+    repair, which its hook applies to the index AFTER this runs).  Composing
+    BEFORE the suffix is what keeps the label honest: the read-time ``u``
+    table is keyed on bare labels and passes a sized label through untouched,
+    so a raw ``139. Sachet (Petit)`` would be served as is.
+
+    Every other row keeps its ``u`` byte for byte: a size-free row, a row with
+    no recorded size, a row with no unit or the missing-unit sentinel, and a
+    row whose served unit is an exact metric label (:data:`
+    _EXACT_METRIC_LABELS`, e.g. ``Kg`` or ``Litre`` with a size: 185 rows in
+    the twelve waves), which a suffix would hide from the kg ladder.
+
+    Invariant, checked here and raising ``ValueError`` if broken: on every
+    sized row, stripping the trailing `` (<Size>)`` gives exactly the ``u``
+    the row was served before -- the read-time table maps no sized label, and
+    ``decode`` leaves every sized label unchanged.  Quantities, values and
+    row counts are not touched here; two items whose sizes differ simply no
+    longer share a key in the later additive collapse.
+    """
+    if "u" not in (frame.index.names or []):
+        raise KeyError("carry_unit_size: frame has no `u` index level")
+    u = pd.Series(np.asarray(frame.index.get_level_values("u"), dtype=object))
+    labels = pd.Series(np.asarray(sizes, dtype=object)).map(size_label)
+    has_unit = u.map(lambda x: isinstance(x, str) and bool(x.strip()))
+    sized = labels.notna().to_numpy() & has_unit.to_numpy()
+    if not sized.any():
+        return frame
+    base = u[sized]
+    if decode is not None:
+        base = base.map(decode)
+    uniq = pd.unique(base.to_numpy())
+    served = dict(zip(uniq, served_unit_labels(country, uniq)))
+    bad = [b for b, s in served.items() if not isinstance(s, str) or not s.strip()]
+    if bad:
+        raise ValueError(f"{country}: the u table serves no label for {bad[:5]}")
+    served_base = base.map(served)
+    keep_bare = served_base.map(lambda s: s.strip().lower() in _EXACT_METRIC_LABELS
+                                or s.strip().lower() in _MISSING_UNIT_LABELS)
+    new = served_base + " (" + labels[sized] + ")"
+    new = new.where(~keep_bare, u[sized])
+
+    minted = pd.unique(new[~keep_bare].to_numpy())
+    remapped = served_unit_labels(country, minted)
+    moved = [(a, b) for a, b in zip(minted, remapped) if a != b]
+    if moved:
+        raise ValueError(f"{country}: the read-time u table would relabel sized "
+                         f"units {moved[:5]}; map them in the hook instead")
+    if decode is not None:
+        changed = [m for m in minted if decode(m) != m]
+        if changed:
+            raise ValueError(f"{country}: the wave's decode would rewrite sized "
+                             f"units {changed[:5]}")
+
+    out_u = u.copy()
+    out_u[sized] = new.to_numpy()
+    names = list(frame.index.names)
+    arrays = [out_u.to_numpy() if n == "u" else frame.index.get_level_values(n)
+              for n in names]
+    out = frame.copy()
+    out.index = pd.MultiIndex.from_arrays(arrays, names=names)
+    return out
 
 
 def unit_match(quantity_unit, quantity_size, last_unit, last_size) -> pd.Series:
@@ -304,7 +492,7 @@ def derive_ehcvm_purchase_value(quantity, quantity_unit, quantity_size,
 # ---------------------------------------------------------------------------
 
 def food_acquired_ehcvm(df: pd.DataFrame, key: str,
-                        drop_columns=("visit",)) -> pd.DataFrame:
+                        drop_columns=("visit",), decode=None) -> pd.DataFrame:
     """``food_acquired`` df_edit hook for an EHCVM 2018+ wave.
 
     Replaces the wide frame's ``Expenditure`` -- which the YAML used to wire
@@ -327,12 +515,25 @@ def food_acquired_ehcvm(df: pd.DataFrame, key: str,
     ``food_acquired_to_canonical`` uses, so ``Expenditure / Quantity`` is the
     unit value exactly; ``tests/test_ehcvm_7day.py`` pins that identity rather
     than trusting the two expressions to stay in step.
+
+    The consumption unit's SIZE ``s07bq03c`` rides in ``u`` (GH #1224):
+    :func:`carry_unit_size` rewrites the wide frame's ``u`` before the
+    reshape, so the purchased, produced and in-kind rows -- all three in the
+    consumption unit -- carry the same ``Tas (Petit)``.  ``decode`` is the
+    wave's own scalar mojibake repair, for the three waves whose hook sweeps
+    the index after this returns (CotedIvoire, Guinea-Bissau, Niger
+    2018-19); the served base unit is read through it.
     """
     missing = [c for c in MYVARS if c not in df.columns]
     if missing:
         raise KeyError(
             f"food_acquired_ehcvm: the wave's data_info.yml must bind "
             f"{missing} (see lsms_library.ehcvm.MYVARS); got {list(df.columns)}")
+
+    # Before anything else, so every series below aligns on the one index.  The
+    # unit match behind Expenditure reads the unit and size COLUMNS, not `u`.
+    df = carry_unit_size(df, df["ConsumptionUnitSize"].to_numpy(),
+                         _country_of(key), decode=decode)
 
     gifts = df["GiftQuantity"].fillna(0)
     purchased_qty = (df["Quantity"].fillna(0)

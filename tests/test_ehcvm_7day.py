@@ -190,7 +190,10 @@ class TestConfig:
     @pytest.mark.parametrize('country,wave', CELLS)
     def test_the_hook_calls_the_shared_derivation(self, country, wave):
         m = _mapping(country, wave)
-        assert '_food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)' in m
+        # Re-pinned GH #1224: the three hooks that sweep mojibake after this
+        # call also pass their repair as `decode=` (test_ehcvm_unit_size.py).
+        assert re.search(r'_food_acquired_ehcvm\(df, FOOD_ACQUIRED_DERIVATION(,\s*'
+                         r'decode=_decode_mojibake)?\)', m)
         assert f"_derivation_key('{country}')" in m
         assert 'def inputs_food_acquired(wave):' in m
 

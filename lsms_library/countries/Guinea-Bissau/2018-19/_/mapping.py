@@ -182,7 +182,10 @@ def food_acquired(df):
     column / index level.  See ``_decode_mojibake`` for the encoding
     rationale.
     """
-    df = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+    # GH #1224: `decode` -- the served base unit of a sized row is read
+    # through the same repair the sweep below applies to every other row.
+    df = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION,
+                              decode=_decode_mojibake)
     df = _decode_mojibake_in_df(df)
     return df
 
