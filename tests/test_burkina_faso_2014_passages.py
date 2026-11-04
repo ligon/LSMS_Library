@@ -32,6 +32,7 @@ per-passage totals being recoverable, and on conservation between the two tiers.
 """
 import warnings
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -41,13 +42,20 @@ from lsms_library.yaml_utils import load_yaml
 
 
 # Measured on a cold build, 2026-09-09 (empty LSMS_DATA_DIR, dvc-cache only).
-N_WAVE_ROWS = 557_822                 # canonical rows extracted from the 4 files
-N_DELIVERED_ROWS = 557_692            # after the lossless additive de-dup
-PASSAGE_ROWS = {1: 152_589, 2: 139_834, 3: 136_948, 4: 128_451}
+# Re-pinned 2026-11-03 (GH #864 ruling): section C's three blocks are served
+# separately, each in its own unit.  Passage 1 gains the 1,468 C06 gift rows
+# (s='inkind') and 19 purchased rows whose C04 quantity the old
+# (qachat - qautocons).clip(0) had zeroed and then dropped (no achat); one
+# produced pair that collided on u='Unknown' now has distinct units, so the
+# additive de-dup merges 129 groups, not 130.  Expenditure is unchanged.
+N_WAVE_ROWS = 559_309                 # canonical rows extracted from the 4 files
+N_DELIVERED_ROWS = 559_180            # after the lossless additive de-dup
+PASSAGE_ROWS = {1: 154_076, 2: 139_834, 3: 136_948, 4: 128_451}
 PASSAGE_EXPENDITURE = {1: 93_383_167.0, 2: 82_473_394.0,
                        3: 93_328_730.0, 4: 72_925_224.0}
 WAVE_EXPENDITURE = 342_110_515.0
-WAVE_QUANTITY = 4_208_737.6
+# Sum over all three blocks (mixed units; a conservation check, not a total).
+WAVE_QUANTITY = 4_221_285.6
 
 
 # ---------------------------------------------------------------------------
@@ -229,7 +237,7 @@ def test_per_passage_expenditure_is_recoverable(delivered):
 def test_nothing_is_lost_and_nothing_is_manufactured(wave_frame, delivered):
     """Conservation between the extracted frame and the served table.
 
-    The 130-row difference is the framework's ADDITIVE de-dup of 129 genuine
+    The 129-row difference is the framework's ADDITIVE de-dup of genuine
     within-passage duplicate groups (the same household reporting the same item
     twice inside one passage) -- lossless by construction, which is exactly what
     the equality of the two totals proves."""
@@ -307,51 +315,70 @@ def test_feature_still_sums_the_passages_for_cross_country_work(burkina):
 # blaming a 0-as-missing sentinel.  The hook now restores the NaN.
 
 # Measured on the 2026-10-14 cold rebuild.  `qachat` is NEVER 0 where
-# `achat > 0` in passage 1 (0 of 140,908), so the 219 purchased zeros that
-# remain are the clipped `Produced >= Quantity` rows, not filled NaNs.
+# `achat > 0` in passage 1 (0 of 140,908).  The 219 purchased zeros that used
+# to remain were the `(qachat - qautocons).clip(0)` rows; since the GH #864
+# ruling (2026-11-03) C04 is served as reported and none remains.
 P1_PURCHASED_NULL_QUANTITY = 43_906
-P1_PURCHASED_ZERO_QUANTITY = 219
+P1_PURCHASED_ZERO_QUANTITY = 0
+P1_INKIND_ROWS = 1_468                # C06 qcadeau > 0
+P1_PRODUCED_UNKNOWN_UNIT = 41         # C05 quantity with no uautocons
 
 
-def test_the_hook_restores_nan_where_the_source_quantity_was_null():
-    """Config-only.  Two passage-1 rows with the same key: one answered, one
-    not.  The reshape fills the unanswered row's purchased quantity with 0;
-    the hook must put the NaN back and leave the answered row alone.  A
-    passage with NO quantity column (visit 2) comes back NaN throughout."""
+def test_the_hook_serves_each_section_c_block_in_its_own_unit():
+    """Config-only.  GH #864 ruling: C04 (purchases consumed), C05 (own
+    production) and C06 (gifts) are DISJOINT blocks, each with its own
+    quantity and unit, so the hook serves each on its own ``s`` row in its own
+    unit and never subtracts one from another.  A quantity the survey did not
+    ask for stays NaN (a passage-1 item with no grid; passage 2, money only)."""
     import importlib.util
 
     path = countries_root() / 'Burkina_Faso' / '2014' / '_' / 'mapping.py'
-    spec = importlib.util.spec_from_file_location('bf2014_mapping_nan', path)
+    spec = importlib.util.spec_from_file_location('bf2014_mapping_blocks', path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
 
     idx = pd.MultiIndex.from_tuples(
-        [('2014', 'v1', 'h1', 'Maize', 'Kg'),      # answered
+        [('2014', 'v1', 'h1', 'Maize', 'kg'),      # bought 2 kg, grew 0.5 tas
          ('2014', 'v1', 'h1', 'Sel', None),        # p1, grid not administered
          ('2014', 'v1', 'h1', 'Maize', None),      # p2, money only
-         ('2014', 'v1', 'h1', 'Oeufs', 'Kg')],     # p1, produced only
+         ('2014', 'v1', 'h1', 'Oeufs', None),      # p1, produced + gift only
+         ('2014', 'v1', 'h2', 'Mil', 'kg')],       # bought 1 kg, grew 3 kg
         names=['t', 'v', 'i', 'j', 'u'])
-    df = pd.DataFrame({'Quantity': [2.0, None, None, 3.0],
-                       'Produced': [0.5, None, None, 3.0],
-                       'Expenditure': [100.0, 50.0, 70.0, None],
-                       'visit': [1, 1, 2, 1]}, index=idx)
+    df = pd.DataFrame({'Quantity': [2.0, None, None, None, 1.0],
+                       'Produced': [0.5, None, None, 3.0, 3.0],
+                       'ProducedUnit': ['tas', None, None, 'unité', 'kg'],
+                       'GiftQuantity': [None, None, None, 2.0, None],
+                       'GiftUnit': [None, None, None, None, None],
+                       'Expenditure': [100.0, 50.0, 70.0, None, 40.0],
+                       'visit': [1, 1, 2, 1, 1]}, index=idx)
     out = mod.food_acquired(df)
     q = out['Quantity']
-    assert q.xs(('Maize', 'Kg', 'purchased', 1), level=('j', 'u', 's', 'visit')).iloc[0] == 1.5
-    assert q.xs(('Maize', 'Kg', 'produced', 1), level=('j', 'u', 's', 'visit')).iloc[0] == 0.5
-    assert pd.isna(q.xs(('Sel', 'Unknown', 'purchased', 1),
-                        level=('j', 'u', 's', 'visit')).iloc[0])
-    assert pd.isna(q.xs(('Maize', 'Unknown', 'purchased', 2),
-                        level=('j', 'u', 's', 'visit')).iloc[0])
-    # Expenditure untouched, no row added or removed.
-    assert out['Expenditure'].sum() == 220.0
-    assert len(out) == 5
+    lv = ('i', 'j', 'u', 's', 'visit')
+    # C04 as reported: no longer 2.0 - 0.5, and no longer (1.0 - 3.0).clip(0).
+    assert q.xs(('h1', 'Maize', 'kg', 'purchased', 1), level=lv).iloc[0] == 2.0
+    assert q.xs(('h2', 'Mil', 'kg', 'purchased', 1), level=lv).iloc[0] == 1.0
+    # C05 in its OWN unit, not the purchase unit.
+    assert q.xs(('h1', 'Maize', 'tas', 'produced', 1), level=lv).iloc[0] == 0.5
+    assert q.xs(('h1', 'Oeufs', 'unité', 'produced', 1), level=lv).iloc[0] == 3.0
+    # C06 on its own inkind row; a missing gift unit is the Unknown sentinel.
+    assert q.xs(('h1', 'Oeufs', 'Unknown', 'inkind', 1), level=lv).iloc[0] == 2.0
+    # Not asked -> NaN, never 0.
+    assert pd.isna(q.xs(('h1', 'Sel', 'Unknown', 'purchased', 1), level=lv).iloc[0])
+    assert pd.isna(q.xs(('h1', 'Maize', 'Unknown', 'purchased', 2), level=lv).iloc[0])
+    # Expenditure is C04's achat only; produced / inkind rows carry none.
+    assert out['Expenditure'].sum() == 260.0
+    s = out.index.get_level_values('s')
+    assert out.loc[s != 'purchased', 'Expenditure'].isna().all()
+    assert len(out) == 8
+    assert sorted(out.columns) == ['Expenditure', 'Quantity']
 
 
 @_data
 def test_money_only_passages_carry_nan_not_zero(delivered):
     """Passages 2-4 field no quantity grid: every purchased row is NaN, none is
-    0.  Passage 1 keeps its reported quantities and its 219 clipped zeros."""
+    0.  Passage 1 keeps its reported quantities; since GH #864's ruling none is
+    a clipped zero, its gifts are served as inkind rows, and its own-production
+    rows carry their own unit (Unknown only where uautocons is blank)."""
     wave = delivered.xs('2014', level='t')
     s = wave.index.get_level_values('s')
     visit = wave.index.get_level_values('visit')
@@ -364,6 +391,14 @@ def test_money_only_passages_carry_nan_not_zero(delivered):
     assert int(p1.isna().sum()) == P1_PURCHASED_NULL_QUANTITY
     assert int((p1 == 0).sum()) == P1_PURCHASED_ZERO_QUANTITY
     assert (q[s == 'produced'] > 0).all()
+    s_ = np.asarray(s, dtype=object)
+    v_ = np.asarray(visit)
+    u_ = np.asarray(wave.index.get_level_values('u'), dtype=object)
+    assert int(((s_ == 'inkind') & (v_ == 1)).sum()) == P1_INKIND_ROWS
+    assert not ((s_ == 'inkind') & (v_ > 1)).any()
+    assert wave.loc[s_ != 'purchased', 'Expenditure'].isna().all()
+    assert int(((s_ == 'produced') & (u_ == 'Unknown')).sum()) == \
+        P1_PRODUCED_UNKNOWN_UNIT
 
 
 @_data
@@ -377,5 +412,5 @@ def test_food_prices_tallies_the_money_only_passages_by_design(burkina):
     assert tally['money_only'] == 139_798 + 136_913 + 128_416     # 405,127
     assert tally['expected_gross'] - tally['expected'] == tally['money_only']
     assert tally['lost_fraction'] < 0.2
-    # The GH #591 class is now only the clipped zeros, not the whole wave.
+    # The GH #591 class: the clipped zeros were the last of it (GH #864).
     assert tally['inf'] == P1_PURCHASED_ZERO_QUANTITY
