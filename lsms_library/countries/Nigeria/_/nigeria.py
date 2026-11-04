@@ -623,7 +623,7 @@ PH_QUARTER = {
 # Preferred Label registered in the `u` table.
 
 
-def harmonized_food_labels(t=None, *, observed_codes=None):
+def harmonized_food_labels(t=None, *, observed_codes=None, dirs=None):
     """{int itemcode: Preferred Label} from the Code-keyed harmonize_food
     table.  This is the SAME resolver crop_production uses (see
     ``_crop_labels``), exposed for food_acquired so its ``j`` resolves to
@@ -636,13 +636,16 @@ def harmonized_food_labels(t=None, *, observed_codes=None):
     (they legitimately stay raw).
 
     With ``t``, decode the food module's own quarter instead (GH #1144).
-    The no-argument branch remains the crop/community Code contract.
+    The no-argument branch remains the crop/community Code contract.  The table
+    resolves relative to cwd, where the country scripts run, unless ``dirs``
+    names where to look.
     """
     if t is not None:
         return _food_item_labels(t, observed_codes=observed_codes)
     from lsms_library.local_tools import get_categorical_mapping
+    where = {} if dirs is None else {'dirs': dirs}
     raw = get_categorical_mapping(tablename='harmonize_food', idxvars='Code',
-                                  **{'Preferred Label': 'Preferred Label'})
+                                  **where, **{'Preferred Label': 'Preferred Label'})
     out = {}
     for k, v in raw.items():
         try:
@@ -742,10 +745,17 @@ def _food_item_labels(t, *, observed_codes=None):
     return out
 
 
-def _crop_labels():
+def _crop_labels(dirs=None):
     """{int cropcode: Preferred Label} from harmonize_food (shared with
     food_acquired)."""
-    return harmonized_food_labels()
+    return harmonized_food_labels(dirs=dirs)
+
+
+def _crop_labels_from_anywhere():
+    """`_crop_labels()` for a caller whose cwd is not a Nigeria `_/`, such as a
+    registered `inputs` callable reached through `Country.derivation_inputs`."""
+    from lsms_library.paths import countries_root
+    return _crop_labels(dirs=[f"{countries_root() / 'Nigeria' / '_'}/"])
 
 
 def _strip_code_prefix(s):
@@ -1319,7 +1329,8 @@ def hh_crop_sale_records(folder, crop_labels=None):
     raw = get_dataframe(fn, convert_categoricals=False)
     dec = get_dataframe(fn, convert_categoricals=True)
     return _hh_crop_sale_frame(
-        raw, dec, spec, _crop_labels() if crop_labels is None else crop_labels)
+        raw, dec, spec,
+        _crop_labels_from_anywhere() if crop_labels is None else crop_labels)
 
 
 def derive_hh_crop_sale_attachment(records, served):
@@ -1401,6 +1412,9 @@ def _attach_hh_crop_sales(t, out, records):
     served = out.index.to_frame(index=False)[['i', 'plot_id', 'crop']]
     placed = derive_hh_crop_sale_attachment(records, served).reset_index()
     placed['t'] = t
+    # The new rows' index levels take the served frame's dtypes, so adding them
+    # moves no pre-existing level's dtype.
+    placed = placed.astype({level: served[level].dtype for level in served.columns})
     placed = placed.set_index(['t', 'i', 'plot_id', 'crop'])
 
     out = out.copy()
@@ -1463,7 +1477,7 @@ def _inputs_hh_crop_sale(wave, key):
     Re-reads the sources; nothing is cached.
     """
     folder = wave_folder_map.get(wave, wave)
-    labels = _crop_labels()
+    labels = _crop_labels_from_anywhere()
     records = hh_crop_sale_records(folder, labels)
     placed = derive_hh_crop_sale_attachment(
         records, _served_plot_crop_keys(folder, labels))

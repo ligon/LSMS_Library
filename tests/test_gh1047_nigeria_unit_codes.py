@@ -290,7 +290,11 @@ def test_no_crop_row_has_a_nan_unit(crop_production):
     # no raw code in the label space (a bare '5' is relabelled 'mudu')
     assert not u.astype(str).str.fullmatch(r'\d+').any()
     # 13,138 on the 2026-10-18 build; a floor and a ceiling, not a pin.
-    assert 10000 < (u == U_UNKNOWN).sum() < 14000
+    # Re-pinned by GH #843: a Farm-level sale row has no harvest for `u` to
+    # describe, so it is Unknown by design and is not part of this census.
+    plots = crop_production.index.get_level_values('plot_id') != 'Farm-level'
+    assert 10000 < (u[plots] == U_UNKNOWN).sum() < 14000
+    assert (u[~plots] == U_UNKNOWN).all()
 
 
 @pytest.mark.requires_s3

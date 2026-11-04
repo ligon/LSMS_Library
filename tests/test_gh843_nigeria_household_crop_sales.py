@@ -440,6 +440,46 @@ class TestOracle:
         assert not keys[~several].fillna("").str.contains("records-summed|two-units").any()
 
 
+#: Each round's harvest-unit column, whose vocabulary the sale's unit must share.
+HARVEST_UNIT = {"2016Q1": "sa3iq6ii", "2019Q1": "sa3iq6ii", "2024Q1": "sa3iq9b"}
+#: W4/W5 only: the household's stated total harvest, in the unit the sale inherits.
+TOTAL_HARVEST = {"2019Q1": "sa3iiq1a", "2024Q1": "sa3iiq3a"}
+
+
+@pytest.mark.requires_s3
+class TestTheSaleUnitIsAUnit:
+    """The GH #824 trap: a column can merge cleanly and not be what it is named."""
+
+    @pytest.mark.parametrize("t", sorted(SALE_BLOCK))
+    def test_value_labels_are_the_harvest_units(self, t):
+        pyreadstat = pytest.importorskip("pyreadstat")
+        from lsms_library.data_access import get_data_file
+        cfg = SALE_BLOCK[t]
+        root = NIGERIA / cfg["wave"]
+        _, sale = pyreadstat.read_dta(str(get_data_file(str(root / cfg["file"]))), metadataonly=True)
+        _, harvest = pyreadstat.read_dta(
+            str(get_data_file(str(root / HARVEST_FILES[t][0]))), metadataonly=True)
+        ours = sale.value_labels[sale.variable_to_label[cfg["unit"][0]]]
+        theirs = harvest.value_labels[harvest.variable_to_label[HARVEST_UNIT[t]]]
+        # W4/W5 split the harvest list's '40. DERICA/TIN' into DERICA and TIN.
+        differ = {k for k in set(ours) | set(theirs) if ours.get(k) != theirs.get(k)}
+        assert differ <= {14, 40}, differ
+        assert len(ours) >= 28
+
+    @pytest.mark.parametrize("t", sorted(TOTAL_HARVEST))
+    def test_w4_w5_sale_fits_the_total_stated_in_the_unit_it_inherits(self, t):
+        """The form prints no sale unit: "Of the [QTY] [UNIT] [CONDITION] of [CROP]
+        harvested, how much of it did your household sell?".  If the quantity is
+        in that unit it is at most that total."""
+        from lsms_library.local_tools import get_dataframe
+        cfg = SALE_BLOCK[t]
+        d = get_dataframe(str(NIGERIA / cfg["wave"] / cfg["file"]), convert_categoricals=False)
+        sold = pd.to_numeric(d[cfg["qty"]], errors="coerce")
+        total = pd.to_numeric(d[TOTAL_HARVEST[t]], errors="coerce")
+        sale = sold > 0
+        assert (sold[sale] <= total[sale]).mean() > 0.998
+
+
 @pytest.mark.requires_s3
 @pytest.mark.parametrize("t", sorted(PLOT_GRAIN_SALES))
 class TestW1W2Untouched:

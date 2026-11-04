@@ -2269,9 +2269,12 @@ W5's value column also says "ESTIMATE THE VALUE OF IN-KIND PAYMENTS", so a W5
 So =Unit_sold= in W4/W5 is the unit of the household's total harvest (asked just
 before, with its size =sa3iiq1d= / =sa3iiq3c= and condition =sa3iiq1b= /
 =sa3iiq3d=), through the same size-agnostic =_canon_unit= as =u=; size and
-condition are not carried.  On one-record attached sales it equals the row's =u=
-on 2,705 of 2,709 (W4) and 3,005 of 3,006 (W5) against 2,866 of 2,979 for W3,
-which asks its own.
+condition are not carried.  Three checks support that reading.  The sold quantity
+is at most the stated total on 3,820 of 3,825 (W4) and 3,747 of 3,747 (W5) sales,
+median share 0.67 / 0.63.  On one-record attached sales the unit equals the row's
+=u= on 2,705 of 2,709 (W4) and 3,005 of 3,006 (W5), against 2,866 of 2,979 for W3,
+which asks its own.  And all three unit columns carry the harvest unit's value
+labels, W3 exactly (60 labels), W4/W5 but for splitting '40. DERICA/TIN' in two.
 
 *What is a sale.*  A record with a positive quantity or a positive value.
 

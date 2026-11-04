@@ -92,9 +92,13 @@ Nigeria::crop_production::hh-crop-sale-single-row:
         sa3iiq1b, W5 sa3iiq3b / sa3iiq3c / sa3iiq3d).
       basis: questionnaire
       evidence: >-
-        The same three pages.  Corroboration on attached one-record sales: the
+        The same three pages.  Corroboration: the W4/W5 sold quantity is at most
+        the total stated in that unit on 3,820 of 3,825 and 3,747 of 3,747
+        sales (median share 0.67 / 0.63), and on attached one-record sales the
         W4/W5 unit equals the row's own `u` on 2,705 of 2,709 and 3,005 of
-        3,006; W3, which asks its own, on 2,866 of 2,979.
+        3,006; W3, which asks its own, on 2,866 of 2,979.  All three unit
+        columns carry the harvest unit's value labels (W4/W5 split its
+        '40. DERICA/TIN' into two codes).
     - text: >-
         A sale by a household with one served row for that crop came from that
         row, even if the row's own Quantity is blank.  Where a crop has several

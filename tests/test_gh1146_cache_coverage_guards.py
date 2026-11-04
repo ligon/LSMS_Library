@@ -145,7 +145,7 @@ def test_nigeria_gate_skips_present_missing_required_wave(nigeria, tmp_path, cov
         nigeria._skip_partial_sold_unit_cache(path)
 
 
-@pytest.mark.parametrize("method", ["test_unit_sold_populated_only_in_w1_w2", "test_api_frame_serves_unit_sold_through_finalize"])
+@pytest.mark.parametrize("method", ["test_unit_sold_populated_in_every_wave", "test_api_frame_serves_unit_sold_through_finalize"])
 def test_nigeria_partial_skips_before_payload_or_api(nigeria, monkeypatch, tmp_path, method):
     import lsms_library as ll
     import lsms_library.local_tools as lt
@@ -158,7 +158,7 @@ def test_nigeria_partial_skips_before_payload_or_api(nigeria, monkeypatch, tmp_p
         getattr(nigeria.TestBuiltTable(), method)()
 
 
-@pytest.mark.parametrize("method", ["test_unit_sold_populated_only_in_w1_w2", "test_api_frame_serves_unit_sold_through_finalize"])
+@pytest.mark.parametrize("method", ["test_unit_sold_populated_in_every_wave", "test_api_frame_serves_unit_sold_through_finalize"])
 def test_nigeria_rechecks_footer_after_payload_read(nigeria, monkeypatch, tmp_path, method):
     import lsms_library as ll
     import lsms_library.local_tools as lt
