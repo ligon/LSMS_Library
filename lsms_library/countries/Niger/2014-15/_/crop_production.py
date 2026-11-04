@@ -20,9 +20,12 @@ harvest lines, so the line rule serves exactly what the old plot rule did
 "don't know" codes (9999 on the quantities, 9999999 on the sale value) are
 mapped to NA, exact value only (GH #865).
 
-plot = "{AS02EQ01}_{AS02EQ03}".  Index = (t, i, plot_id, crop, u,
+plot = "{AS02EQ01}_{AS02EQ03}".  Index = (t, i, plot_id, crop, u, condition,
 production_obs); the index is unique without a line coordinate, so
-``production_obs`` is the ``unresolved_observation`` sentinel (GH #1360).
+``production_obs`` is the ``unresolved_observation`` sentinel (GH #1360).  The
+module asks no product-state question (2E.7a/7b/7c/7d are quantity, unit,
+kilograms, harvest finished), so ``condition`` is the ``unknown_condition``
+sentinel (GH #1436).
 """
 import sys
 

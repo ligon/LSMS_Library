@@ -19,9 +19,11 @@ GH #1360 the rule asked for a single PLOT; the extra lines of a single plot
 were then either collapsed away by the framework or served carrying the same
 sale twice.
 
-Index = (t, i, plot_id, crop, u, production_obs); plot = "{s16cq02}_{s16cq03}".
-s16c records no harvest-line number and one (plot, crop, unit) can carry
-several lines (846 key groups, 1,856 rows), so ``production_obs`` is the
+Index = (t, i, plot_id, crop, u, condition, production_obs); plot =
+"{s16cq02}_{s16cq03}".  ``condition`` is the harvest's own "Etat du produit"
+(s16cq16d, GH #1436).  s16c records no harvest-line number and one (plot, crop,
+unit) can carry several lines (846 key groups, 1,856 rows), and the state
+separates only a minority of them (1,856 -> 1,817), so ``production_obs`` is the
 CONSTRUCTED ``row:<source_fingerprint>:<n>`` -- the zero-based row of the held
 s16c release, taken before any filter (GH #1360).
 """
@@ -32,7 +34,8 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
-                   _finish_crop_production, _crop_row_observations)
+                   _crop_conditions, _finish_crop_production,
+                   _crop_row_observations)
 
 
 crop_map, unit_map = _crop_maps()
@@ -56,6 +59,9 @@ df = pd.DataFrame({
         len(srcn), '../Data/s16c_me_ner2021.dta', script_path=__file__).values,
     'crop':         _crop_labels(srcn['s16cq04'], src['s16cq04'], crop_map).values,
     'u':            _unit_labels(src['s16cq16b'], unit_map).values,
+    # By code: the 2018-19 code list is different, see categorical_mapping.org.
+    'condition':    _crop_conditions(srcn['s16cq16d'],
+                                     'harmonize_crop_condition_ehcvm2').values,
     'Quantity':     src['s16cq16a'].values,
     'intercropped': intercropped.values,
 })

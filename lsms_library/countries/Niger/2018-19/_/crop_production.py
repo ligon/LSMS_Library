@@ -7,11 +7,13 @@ unit (s16cq12a / s16cq12b), sold qty + unit (s16cq16a / s16cq16b -> the
 value (s16cq17), and the intercrop flag (s16cq07) are ALL recorded at this
 plot-crop grain in 2018-19, so no cross-file join is needed.
 
-Index = (t, i, plot_id, crop, u, production_obs); plot = "{s16cq02}_{s16cq03}"
-aligns with plot_features' plot_id.  The index is unique without a line
-coordinate, so ``production_obs`` is the ``unresolved_observation`` sentinel
-(GH #1360).  See niger.py:_finish_crop_production for the shared
-schema tail and the GAP-1 design note.
+Index = (t, i, plot_id, crop, u, condition, production_obs); plot =
+"{s16cq02}_{s16cq03}" aligns with plot_features' plot_id.  ``condition`` is the
+harvest's own "Etat du produit" (s16cq12c, GH #1436).  The index is unique
+without a line coordinate, so ``production_obs`` is the
+``unresolved_observation`` sentinel (GH #1360).  See
+niger.py:_finish_crop_production for the shared schema tail and the GAP-1
+design note.
 """
 import sys
 
@@ -20,7 +22,7 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
-                   _finish_crop_production)
+                   _crop_conditions, _finish_crop_production)
 
 
 # convert_categoricals=True so crop / unit value labels arrive as the
@@ -44,6 +46,9 @@ df = pd.DataFrame({
     'plot_id':          plot.values,
     'crop':          _crop_labels(src_codes['s16cq04'], src['s16cq04'], crop_map).values,
     'u':             _unit_labels(src['s16cq12b'], unit_map).values,
+    # By code: the 2021-22 code list is different, see categorical_mapping.org.
+    'condition':     _crop_conditions(src_codes['s16cq12c'],
+                                      'harmonize_crop_condition_ehcvm1').values,
     'Quantity':      src['s16cq12a'].values,
     'Quantity_sold': src['s16cq16a'].values,
     'Value_sold':    src['s16cq17'].values,

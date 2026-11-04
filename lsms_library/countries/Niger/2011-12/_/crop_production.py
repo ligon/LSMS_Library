@@ -14,10 +14,12 @@ str()s it.  No intercrop / perennial / date variables in this module
 plot = "{as02eq01}_{as02eq03}".  The pre-EHCVM waves have no plot_features
 recipe yet, so this plot id is internal to crop_production (it still
 aligns by construction with any future ECVMA plot_features build).
-Index = (t, i, plot_id, crop, u, production_obs).  ``production_obs`` is
-``reported:<as02eq0>``, the module's own harvest-line number ("numero
+Index = (t, i, plot_id, crop, u, condition, production_obs).  ``production_obs``
+is ``reported:<as02eq0>``, the module's own harvest-line number ("numero
 d'ordre"): one (plot, crop, unit) can carry several reported lines (27 key
 groups, 57 rows), and the line number is what tells them apart (GH #1360).
+The module asks no product-state question (2E.7a/7b/7c are quantity, unit,
+kilograms), so ``condition`` is the ``unknown_condition`` sentinel (GH #1436).
 """
 import sys
 

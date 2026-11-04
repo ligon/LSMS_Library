@@ -188,7 +188,17 @@ Data Scheme:
     # the module's line number (`reported:<as02eq0>`); 2021-22 records none,
     # so it serves the CONSTRUCTED `row:<source_fingerprint>:<n>`; 2014-15 and
     # 2018-19 are unique without it and carry `unresolved_observation`.
-    index: (t, i, plot_id, crop, u, production_obs)
+    #
+    # condition (GH #1436) is "Etat du produit", the state of the crop when the
+    # harvest Quantity was measured: 2018-19 s16cq12c, 2021-22 s16cq16d, through
+    # the `harmonize_crop_condition_*` tables in categorical_mapping.org.  Values
+    # are the BARE FORM tokens `shelled` / `unshelled` / `shell_not_applicable`
+    # (the instrument asks the form and never the dryness, as in Malawi), plus
+    # `unknown_condition` for a blank code and for every ECVMA row (2011-12,
+    # 2014-15), whose harvest module asks no state question.  2018-19's five
+    # answers fold onto those tokens the way the 2021-22 instrument folded them;
+    # see CONTENTS.org, which says what that loses.
+    index: (t, i, plot_id, crop, u, condition, production_obs)
     Quantity: float
     Quantity_sold: float
     Value_sold: float

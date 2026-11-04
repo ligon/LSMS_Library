@@ -1,8 +1,8 @@
 """Concatenate wave-level crop_production for Niger (GAP 1, item-level).
 
 Each wave's ``Niger/<wave>/_/crop_production.py`` writes a parquet indexed
-by ``(t, i, plot_id, crop, u, production_obs)`` with the reported harvest
-columns.  This script concatenates the four waves (2011-12, 2014-15,
+by ``(t, i, plot_id, crop, u, condition, production_obs)`` with the reported
+harvest columns.  This script concatenates the four waves (2011-12, 2014-15,
 2018-19, 2021-22), each of which has a crop/harvest module.  ``v`` is NOT
 baked in — the framework joins it from ``sample()`` at API time.
 
