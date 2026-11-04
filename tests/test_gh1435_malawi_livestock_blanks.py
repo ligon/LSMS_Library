@@ -101,6 +101,16 @@ def test_blanks_do_not_decide_the_keep_filter(malawi):
     assert sorted(out.index.get_level_values('i')) == ['2']
 
 
+def test_an_owned_species_with_no_answers_reaches_the_wave_frame_blank(malawi):
+    # ag_r01 Yes keeps the row at wave grain.  With nothing else answered its payload
+    # is all NA, so _finalize_result's dropna(how='all') is what stops serving it; the
+    # wave script is not the place that decides that, and it must not mint a 0 to keep it.
+    out = _assemble(malawi, ag_r02=[pd.NA, 1.0], ag_r10=[pd.NA, 1.0], ag_r16=[pd.NA, 1.0],
+                    ag_r04=[pd.NA, 1.0], ag_r07=[pd.NA, 1.0])
+    assert sorted(out.index.get_level_values('i')) == ['1', '2']
+    assert out.xs('1', level='i').isna().all(axis=None)
+
+
 def _source(relative, id_column, prefix):
     try:
         raw = get_dataframe(str(MALAWI / relative), convert_categoricals=False)

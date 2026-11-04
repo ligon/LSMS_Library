@@ -1930,7 +1930,8 @@ the species -- per-species ownership flag =ag_r01= == Yes, OR any
 positive reported =HeadCount= / =HeadSold= / =HeadAcquired=.  Rows for
 species the HH was merely asked about and does not own are dropped, so
 the feature is the household's actual herd, not the full species
-checklist.
+checklist.  (A row kept on =ag_r01= alone, with every served column blank,
+reaches the wave parquet but is not served: GH #1435, 2026-11-03.)
 
 Coverage cross-check (distinct livestock-owning HH per wave): the feature
 matches the raw Module-R =ag_r00= == Yes universe within ~0.5% every wave
@@ -4881,3 +4882,73 @@ duplicate (i, animal) group in any wave, so its =sum= reducer only ever turns
 a blank into 0: 14 =HeadCount=, 38 =HeadAcquired= and 46 =HeadSold= cells are
 served 0 where the source is blank (2010-11 8 / 19 / 33, 2013-14 3 / 15 / 9,
 2016-17 2 / 2 / 2, 2019-20 1 / 2 / 2).  The new column uses =min_count=1=.
+*Fixed 2026-11-03: GH #1435, next entry.*
+
+* 2026-11-03 -- livestock: a blank head count stays blank (GH #1435)
+
+=assemble_livestock= now sums all four head columns with =min_count=1=: a blank
+stays blank, a recorded 0 stays 0, two lines of one species add.
+=ValuePerAnimal= keeps =first=.  The =sum= did nothing else: an oracle reading
+the six Module R files directly finds 0 repeated (household, code) and 0
+repeated (household, species), raw or kept, in any wave or half.
+
+*A blank here is an unanswered cell, not a skip.*  =ag_r02=, =ag_r10= and
+=ag_r16= are asked directly ("How many ...", per the Stata labels of all four
+waves; the agriculture PDFs were not read here), and 0 is what most rows record
+(=HeadAcquired= 33,729 of 39,126, =HeadSold= 27,565).  8 of the 14 blank
+=HeadCount= cells sit beside a positive purchase or sale, so serving them as "0
+head now" was a claim the survey did not make.
+
+| wave    | =HeadCount= blank | =HeadAcquired= blank | =HeadSold= blank | rows served       |
+|---------+-------------------+----------------------+------------------+-------------------|
+| 2010-11 |                 8 |                   19 |               33 | 11,329 -> 11,328  |
+| 2013-14 |                 3 |                   15 |                9 | 4,099 -> 4,098    |
+| 2016-17 |                 2 |                    2 |                2 | 11,445 -> 11,443  |
+| 2019-20 |                 1 |                    2 |                2 | 12,253 -> 12,252  |
+| total   |                14 |                   38 |               46 | 39,126 -> 39,121  |
+
+Those cells were all served 0.  Cold builds, base 98c6069d2 vs this change: the
+API now serves 9 / 33 / 41 of them as NA, and the other 5 of each are the 5 rows
+below.  No other cell moves: on the 39,121 common rows no value changes, and
+=ValuePerAnimal=, =HeadCount12MonthsAgo=, the recorded zeros and every column
+total are the same.  The other 24 public Malawi tables, derived ones included,
+are digest-identical.
+
+*Idiosyncrasy: =ag_r01= Yes with nothing else answered.*  5 rows (1 / 1 / 2 / 1
+by wave: Local Cock, Duck, Local Hen, Pig, Goat) say the household owned the
+species and answer nothing else.  They stay in the wave parquets (39,126 rows,
+unchanged), but with the zeros gone they have no payload, so
+=_finalize_result='s =dropna(how='all')= stops serving them -- the =plot_inputs=
+outcome of #1174.  One 2016-17 household has no other livestock row, so that
+wave's owning households go 6,178 -> 6,177.  Whether the ownership answer should
+be served in its own column is a decision (memo with the #1435 report); no 0 is
+minted to keep a row.
+
+*Consumers* (=rg= for the three names; only these read them):
+- =transformations.livestock_sales_value= drops a row with no =HeadSold=, as its
+  docstring says: 36,118 -> 36,078 rows (-31 / -8 / 0 / -1), all of them rows
+  that were valued at 0; totals identical by wave.
+- =transformations.livestock_engaged=: 20,282 -> 20,281 (the household above).
+- =transformations.tlu=: 391 rows and identical totals, but only because of a
+  separate gap: =_TLU_FACTORS= knows 2 of Malawi's 22 =animal= labels (=Chicken=,
+  =Sheep=; 392 of 39,121 rows), so a cow, goat or local hen adds nothing and
+  nothing warns.  2010-11 totals 20.4 TLU.  Drafted as a framework issue.
+- The =ValuePerAnimal= given =HeadSold= table in =data_info.yml= (92.1 / 91.4)
+  is unmoved: 92.08 / 91.45 either side.
+
+*Large head counts: reported, not changed.*  49 cells are >= 1,000 head, on 46
+rows: =HeadCount= 5, =HeadAcquired= 15, =HeadSold= 13, =HeadCount12MonthsAgo= 16
+(the issue's "16 rows" are this last column, its Chicken 100,000 and its 9999
+among them).  None in 2010-11; 2 / 13 / 31 rows in the later waves.  There is no
+9999 convention: that value occurs once across the five columns.  13 of the 49
+equal a money cell of their own row (=ValuePerAnimal= 9, the =ag_r11= purchase
+value 4), and =HeadSold= holds 1,800,000 and 750,000, so many read as kwacha
+keyed into a count.  Not all: one commercial-scale poultry row's purchase and
+sale totals both divide to exactly its own per-head value.  Livestock is not in
+=quantity_audit._SCREENED_COLUMNS=, so nothing names these; drafted as a
+framework issue.
+
+Cost: =malawi.py= is in every Malawi table's hash, so one full Malawi re-warm
+(22 of 22 table hashes, 110 of 110 wave hashes; Uganda and Niger 0 of 43 and 0
+of 268; 0 of 28 =build_transforms_fingerprint=).  The next coverage regrade moves
+the four row counts in =.coder/coverage/latest.csv=.
