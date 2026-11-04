@@ -2393,7 +2393,9 @@ No EHCVM household file has one.  =ehcvm_nsu_ner2021.dta= (a unit table) codes
 2018-19's cells.  =domaine= in =ehcvm_individu_ner2018.dta= ("Domaine étude") is
 =zae= x =vague=, not the stratum.
 2018-19: 16 region x milieu cells, Niamey rural being 2 clusters.  2021-22: 15
-cells, whose household counts equal BID Table 1 in all 15.  Both are constant
+cells, whose household counts equal BID Table 1 in 14 (Tillabéri urban prints 106 +
+192 = 298 against 288 here; that row's own total of 336 implies 96 for the 106).
+Both are constant
 within a grappe in the cover and welfare files;
 =ehcvm_ponderations_ner2021.dta= =milieu= is not (2 of 555).  Share of var(log
 cluster weight) between region / region x milieu: 57.1% / 58.3% (2018-19), 23.4% /
