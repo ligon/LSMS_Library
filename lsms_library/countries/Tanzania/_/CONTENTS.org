@@ -2954,3 +2954,15 @@ What else differs from the UPD's round 4 is not measured.
 Not in =Country.waves=: =tanzania.py= fixes the list and is byte-pinned by
 =tests/test_gh905_tanzania_signed_sums.py=, and registering it would count these households
 twice in 2014-15.
+
+* 2026-11-04 -- WB 2863, the Feed the Future supplemental survey 2016, is held and not registered
+
+=2016-FTFISS/= holds =TZA_2016_NPS-FTFISS_v01_M=: 12 files, 5.4 MB, with the BID, questionnaires and
+manual.  It re-interviews 797 NPS Wave 4 households in Dodoma, Manyara, Morogoro, Mbeya, Iringa
+and Unguja after the 2014-15 round; all 797 =y4_hhid= are =r_hhid= in =upd4_hh_a= round 4.  So it is a
+new interview of a sub-sample in six regions, on a shorter instrument (12 files), and not a
+national wave.
+
+Not in =Country.waves=: =tanzania.py= fixes the list and is byte-pinned by
+=tests/test_gh905_tanzania_signed_sums.py=.  To register it, move the list out of that module
+first, then decide whether a six-region supplement belongs on the =t= axis.

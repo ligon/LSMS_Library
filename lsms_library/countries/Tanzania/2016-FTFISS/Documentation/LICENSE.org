@@ -1,0 +1,19 @@
+LICENSE (TZA_2016_NPS-FTFISS_v01_M)
+
+https://microdata.worldbank.org/index.php/catalog/2863/study-description#metadata-data_access
+
+1. Access policy
+CONTACTS
+
+The World Bank Microdata Library			http://microdata.worldbank.org
+
+CITATION REQUIREMENT
+National Bureau of Statistics (NBS) [Tanzania]. National Panel Survey Wave 4, Feed The Future Interim Supplemental Survey (NPS-FTFISS) 2016. Ref. TZA_2016_NPS-FTFISS_v01_M. Downloaded from [URL] on [Date]
+
+
+DISCLAIMER
+The user of the data acknowledges that the original collector of the data, the authorized distributor of the data, and the relevant funding agency bear no responsibility for use of the data or for interpretations or inferences based upon such uses.
+
+
+(Text copied from the World Bank catalog DDI export, https://microdata.worldbank.org/metadata/export/2863/json, 2026-11-04.)
+
