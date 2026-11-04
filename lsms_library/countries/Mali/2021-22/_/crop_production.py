@@ -4,8 +4,7 @@ The instrument splits the module 2018-19 kept together:
 
   s16c_me_mli2021.dta  one row per (field, parcel, crop).  Quantity = s16cq16a,
                        u = s16cq16b, filled on 309 of 7,247 rows: 287 of 2,010
-                       unfinished harvests and 22 of 5,237 finished ones.  The
-                       rest are NA and no harvest total is derived (GH #1437).
+                       unfinished harvests and 22 of 5,237 finished ones.
   s16d_me_mli2021.dta  one row per (household, crop), no plot.  Quantity_sold =
                        s16dq05a, Unit_sold = s16dq05b, Value_sold = s16dq06.
                        Unlike Niger's, this file does not repeat its lines: 5,068
@@ -18,9 +17,18 @@ so they serve nothing and no zero is written.
 A sale goes on the household's single harvest row for the crop where there is
 exactly one (1,070; the Niger 2021-22 rule after GH #1360, and the key
 Mali::crop_production::hh-crop-sale-single-row).  Otherwise it
-goes on ONE row with plot_id = 'Farm-level' and no harvest Quantity (70: 58 of
-crops on two rows and 12 on three or more).  No sale is split, summed or dropped.
-s16dq05c is an equivalent TOTAL in kg, so KgFactor_sold stays NA.
+goes on ONE row with plot_id = 'Farm-level' (70: 58 of crops on two rows and 12
+on three or more).  No sale is split, summed or dropped.  s16dq05c is an equivalent
+TOTAL in kg, so KgFactor_sold stays NA.
+
+THE HARVEST (GH #1437, ruling 2026-11-04).  The instrument sends a finished harvest
+to the quantity, and the file has it on 22 of 5,237.  Where every s16c row of a
+household's crop is finished, none records a quantity, and the s16d dispositions
+(consumed, given, sold, in stock) share one unit, their sum is the harvest, keyed
+Mali::crop_production::harvest-from-dispositions, on the single row or on the crop's
+one Farm-level row.  A crop whose dispositions span units stays NA: no factor exists.
+A recorded Quantity on an unfinished row is served as recorded, keyed
+Mali::crop_production::harvest-to-date, a window and not a season.
 
 See mali.py, "crop_production: the EHCVM waves".
 """
@@ -30,10 +38,10 @@ sys.path.append('../../_/')
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
-from mali import (derive_hh_crop_sale_attachment, ehcvm_crop_labels,
-                  ehcvm_household_ids, ehcvm_intercropped, ehcvm_is_sale,
-                  ehcvm_plot_ids, ehcvm_unit_labels,
-                  finish_ehcvm_crop_production)
+from mali import (derive_hh_crop_harvest_total, derive_hh_crop_sale_attachment,
+                  ehcvm_crop_labels, ehcvm_dispositions, ehcvm_household_ids,
+                  ehcvm_intercropped, ehcvm_is_sale, ehcvm_plot_ids, ehcvm_unit_labels,
+                  finish_ehcvm_crop_production, stamp_harvest_to_date)
 
 src = get_dataframe('../Data/s16c_me_mli2021.dta', convert_categoricals=True)
 harvest = pd.DataFrame({
@@ -43,10 +51,11 @@ harvest = pd.DataFrame({
     'u':            ehcvm_unit_labels(src['s16cq16b']).values,
     'Quantity':     src['s16cq16a'].values,
     'intercropped': ehcvm_intercropped(src['s16cq07']).values,
+    'finished':     src['s16cq11'].values,
 })
 
-sold = get_dataframe('../Data/s16d_me_mli2021.dta', convert_categoricals=True)
-sold = sold[ehcvm_is_sale(sold['s16dq05a'], sold['s16dq06'])]
+records = get_dataframe('../Data/s16d_me_mli2021.dta', convert_categoricals=True)
+sold = records[ehcvm_is_sale(records['s16dq05a'], records['s16dq06'])]
 sales = pd.DataFrame({
     'i':             ehcvm_household_ids(sold).astype('string').values,
     'crop':          ehcvm_crop_labels(sold['s16dq01']).values,
@@ -62,6 +71,15 @@ on_a_row = df[df['Quantity_sold'].notna() | df['Value_sold'].notna()]
 assert len(on_a_row) == len(sales), 'crop_production 2021-22: a sale moved or doubled'
 assert on_a_row['Value_sold'].sum() == sales['Value_sold'].sum()
 assert on_a_row['Quantity_sold'].sum() == sales['Quantity_sold'].sum()
+
+recorded = pd.to_numeric(df['Quantity'], errors='coerce').astype('float64').sum()
+df = stamp_harvest_to_date(df)
+df = derive_hh_crop_harvest_total(df, ehcvm_dispositions(records))
+
+# Nothing recorded moved: every other Quantity is the file's.
+derived = df['Derivation'].astype('string').str.contains(
+    'harvest-from-dispositions', regex=False).fillna(False)
+assert df.loc[~derived, 'Quantity'].sum() == recorded, 'crop_production 2021-22: a recorded harvest moved'
 
 df = finish_ehcvm_crop_production(df, '2021-22')
 

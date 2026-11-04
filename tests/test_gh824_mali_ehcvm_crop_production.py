@@ -2,11 +2,11 @@
 
 2018-19 is one plot-by-crop file, ``s16c``, with harvest and sale on the line
 (Niger's pattern).  2021-22 splits the module: ``s16c`` holds plot-by-crop rows
-whose harvest ``s16cq16a`` is mostly skipped (GH #1437, no total derived), and
-``s16d`` holds household-by-crop sales with no plot.  Under option (d) a sale goes
-on the household's single harvest ROW for the crop where there is exactly one,
-keyed ``hh-crop-sale-single-row``, and otherwise on ONE row with
-``plot_id = 'Farm-level'`` and no harvest ``Quantity``.  Nothing is dropped.
+whose harvest ``s16cq16a`` is mostly skipped, and ``s16d`` holds household-by-crop
+sales with no plot.  Under option (d) a sale goes on the household's single harvest
+ROW for the crop where there is exactly one, keyed ``hh-crop-sale-single-row``, and
+otherwise on ONE row with ``plot_id = 'Farm-level'``.  Nothing is dropped.  The harvest
+total of GH #1437 has its own tests: ``tests/test_gh1437_mali_harvest_total.py``.
 
 Four classes in three tiers (the first two need no microdata):
 
@@ -51,6 +51,9 @@ from lsms_library.paths import countries_root
 COUNTRY = "Mali"
 TABLE = "crop_production"
 KEY = "Mali::crop_production::hh-crop-sale-single-row"
+#: GH #1437: a harvest key can share `Derivation` with KEY, joined with '+'.
+WINDOW = "Mali::crop_production::harvest-to-date"
+TOTAL = "Mali::crop_production::harvest-from-dispositions"
 FARM = "Farm-level"
 
 #: The ONE unit code book of the EHCVM crop modules, written out here so the
@@ -63,8 +66,9 @@ UNIT_BY_CODE = {1: "Kg", 2: "Unité", 3: "Cart (donkey)", 4: "Cart (ox)",
 
 #: Rows of the EAC-I waves, which this change must not move.
 EACI_ROWS = {"2014-15": 10341, "2017-18": 24719}
-#: 2018-19: the source's rows.  2021-22: the source's rows plus the Farm-level ones.
-WAVE_ROWS = {"2018-19": 7992, "2021-22": 7247 + 70}
+#: 2018-19: the source's rows.  2021-22: the source's rows plus the Farm-level ones:
+#: 70 for a sale, and since GH #1437 181 more for a derived total with no sale there.
+WAVE_ROWS = {"2018-19": 7992, "2021-22": 7247 + 70 + 181}
 #: 2021-22 sale records by where they go.
 ATTACHED, FARM_TWO_ROWS, FARM_THREE_PLUS, FARM_NO_ROW = 1070, 58, 12, 0
 #: Raw totals, FCFA.
@@ -340,8 +344,9 @@ class TestServed:
     def test_2018_value_total(self, w18):
         assert float(w18.Value_sold.sum()) == VALUE_2018
 
-    def test_2018_carries_no_derivation(self, w18):
-        assert w18.Derivation.isna().all()
+    def test_2018_carries_no_sale_derivation(self, w18):
+        # Re-pinned for GH #1437: the window key is on unfinished rows here.
+        assert set(w18.Derivation.dropna()) <= {WINDOW}
 
     # -- 2021-22 -------------------------------------------------------------
 
@@ -350,10 +355,12 @@ class TestServed:
         served = w21[w21.plot_id != FARM].set_index(["i", "plot_id", "crop"]).sort_index()
         oracle = harvest.set_index(["i", "plot_id", "crop"]).sort_index()
         assert oracle.index.is_unique and served.index.equals(oracle.index)
-        _same(served.Quantity, oracle.Quantity)
-        pd.testing.assert_series_equal(served.u.astype("string"), oracle.u.astype("string"),
-                                       check_names=False)
-        assert int(served.Quantity.notna().sum()) == 309, "GH #1437: no harvest total is derived"
+        # Re-pinned for GH #1437: what is not keyed as a derived total is as recorded.
+        recorded = ~served.Derivation.astype("string").str.contains(TOTAL, regex=False).fillna(False)
+        _same(served.Quantity[recorded], oracle.Quantity[recorded])
+        pd.testing.assert_series_equal(served.u[recorded].astype("string"),
+                                       oracle.u[recorded].astype("string"), check_names=False)
+        assert int(served.Quantity[recorded].notna().sum()) == 309
 
     def test_2021_the_partition_by_cause(self, w21):
         harvest, records = _oracle_2021()
@@ -364,7 +371,10 @@ class TestServed:
         assert int((n == 2).sum()) == FARM_TWO_ROWS
         assert int((n >= 3).sum()) == FARM_THREE_PLUS
         assert int((n == 0).sum()) == FARM_NO_ROW
-        assert int((w21.plot_id == FARM).sum()) == FARM_TWO_ROWS + FARM_THREE_PLUS + FARM_NO_ROW
+        # Re-pinned for GH #1437: a Farm-level row can also be a derived total alone.
+        farm = w21[w21.plot_id == FARM]
+        assert int((farm.Quantity_sold.notna() | farm.Value_sold.notna()).sum()) == (
+            FARM_TWO_ROWS + FARM_THREE_PLUS + FARM_NO_ROW)
 
     def test_2021_each_sale_is_on_one_row_as_recorded(self, w21):
         harvest, records = _oracle_2021()
@@ -389,22 +399,28 @@ class TestServed:
             assert float(w21[w21.Unit_sold == unit].Quantity_sold.sum()) == float(total)
 
     def test_2021_the_key_is_on_attached_rows_and_only_there(self, w21):
-        keyed = w21[w21.Derivation.notna()]
-        assert len(keyed) == ATTACHED and (keyed.Derivation == KEY).all()
+        # Re-pinned for GH #1437: KEY can share the column with a harvest key.
+        has_key = w21.Derivation.astype("string").str.contains(KEY, regex=False).fillna(False)
+        keyed = w21[has_key]
+        assert len(keyed) == ATTACHED
         assert (keyed.plot_id != FARM).all()
         assert (keyed.Quantity_sold.notna() | keyed.Value_sold.notna()).all()
-        assert not (w21.Quantity_sold.notna() & (w21.plot_id != FARM) & w21.Derivation.isna()).any()
+        assert not (w21.Quantity_sold.notna() & (w21.plot_id != FARM) & ~has_key).any()
 
-    def test_2021_a_farm_level_row_states_a_sale_and_nothing_else(self, w21):
+    def test_2021_a_farm_level_row_states_a_sale_or_a_derived_total(self, w21):
+        # Re-pinned for GH #1437: the row that holds a sale can hold the total too.
         farm = w21[w21.plot_id == FARM]
-        assert (farm.Quantity_sold.notna() | farm.Value_sold.notna()).all()
-        for col in ("Quantity", "u", "Derivation", "intercropped", "KgFactor_sold"):
+        total = farm.Derivation.astype("string").eq(TOTAL).fillna(False)
+        assert (farm.Quantity_sold.notna() | farm.Value_sold.notna() | total).all()
+        assert (farm.Quantity.notna() == total).all() and (farm.u.notna() == total).all()
+        assert farm.Derivation[~total].isna().all()
+        for col in ("intercropped", "KgFactor_sold"):
             assert farm[col].isna().all(), col
         assert not farm.duplicated(["i", "crop"]).any()
 
     def test_2021_derivation_inputs_join_the_keyed_rows(self, w21):
         inputs = ll.Country(COUNTRY).derivation_inputs(KEY, wave="2021-22").reset_index()
-        keyed = w21[w21.Derivation.notna()]
+        keyed = w21[w21.Derivation.astype("string").str.contains(KEY, regex=False).fillna(False)]
         joined = keyed.merge(inputs.astype({"i": str, "crop": str}), on=["t", "i", "crop"],
                              validate="one_to_one")
         assert len(joined) == len(keyed) == len(inputs)
@@ -447,12 +463,14 @@ class TestServed:
 
     # -- consumers -----------------------------------------------------------
 
-    def test_harvest_kg_and_yield_see_no_farm_level_row(self, built):
-        # Re-pinned to the EHCVM waves (GH #1476): an EAC-I tree row is Farm-level
-        # now and carries a harvest; a 2021-22 sale row still carries none.
-        got = T.harvest_kg(built)
-        ehcvm = got[got.index.get_level_values("t").isin(WAVE_ROWS)]
-        assert FARM not in ehcvm.index.get_level_values("plot_id")
+    def test_harvest_kg_reads_a_derived_total_and_yield_no_farm_level_row(self, built):
+        # Re-pinned for GH #1437: a Farm-level row now carries a total, as the trees do.
+        got = T.harvest_kg(built).reset_index()
+        farm = built.reset_index()
+        farm = farm[(farm.t == "2021-22") & (farm.plot_id == FARM)]
+        assert (farm.Quantity.notna() == farm.Derivation.astype("string").eq(TOTAL).fillna(False)).all()
+        assert set(got.loc[(got.t == "2021-22") & (got.plot_id == FARM), "i"]) <= set(
+            farm.loc[farm.Quantity.notna(), "i"])
         plots = ll.Country(COUNTRY).plot_features()
         assert FARM not in T.yield_kg(built, plots, on="plot").index.get_level_values("plot_id")
 

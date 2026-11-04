@@ -226,10 +226,11 @@ Mali::crop_production::hh-crop-sale-single-row:
     is served on that row: Quantity_sold = s16dq05a, Unit_sold = s16dq05b,
     Value_sold = s16dq06, as recorded, and that row carries this key.  What is
     derived is the ATTACHMENT, not the numbers.  Any other sale is served on one
-    row of that household and crop with plot_id = 'Farm-level', no harvest
-    Quantity and no key, because its index value already discloses it.  No sale
-    is split, summed, scaled or dropped, and a record that is not a sale serves
-    nothing: no zero is written.
+    row of that household and crop with plot_id = 'Farm-level' and no key for the
+    sale, because its index value already discloses it.  No sale is split, summed,
+    scaled or dropped, and a record that is not a sale serves nothing: no zero is
+    written.  This key shares a row with harvest-to-date or harvest-from-dispositions
+    through derivations.MULTI_SEP, in sorted order.
   function: lsms_library.countries.Mali._.mali:derive_hh_crop_sale_attachment
   inputs: lsms_library.countries.Mali._.mali:inputs_hh_crop_sale_single_row
   raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b,
@@ -250,8 +251,8 @@ Mali::crop_production::hh-crop-sale-single-row:
         a sale of a crop on two or more rows is not allocated among them, since
         any split would be invented.  It stays with the household and crop on a
         Farm-level row, where gross_crop_revenue and median_price_valuation can
-        read it, and where harvest_kg and yield_kg do not, because it has no
-        Quantity.
+        read it.  That row has no harvest Quantity unless harvest-from-dispositions
+        put one there, so harvest_kg reads such a row only then.
       basis: modelling-choice
       evidence: >-
         ruling @ligon 2026-11-03, option (d), GH #824; the rule of Niger 2021-22
@@ -273,3 +274,92 @@ Mali::crop_production::hh-crop-sale-single-row:
     Not validated against an external total: no document here reports one.
   contents: 'Mali/_/CONTENTS.org, "2026-11-03 -- EHCVM crop_production wired (GH #824)"'
   since: '2026-11-03'
+
+Mali::crop_production::harvest-to-date:
+  waves: ['2018-19', '2021-22']
+  columns: [Quantity]
+  rule: >-
+    Identity on a row whose harvest is not finished and which records a quantity:
+    2018-19 s16cq10 = Non with s16cq12a, 2021-22 s16cq11 = Non with s16cq16a.  The value
+    is served as recorded.  The key names its WINDOW: the question asks the quantity
+    ALREADY harvested, so the row covers a part of the season under a column that
+    otherwise means all of it.  A row with no recorded quantity carries no key.  This
+    key shares a row with hh-crop-sale-single-row through derivations.MULTI_SEP, in
+    sorted order, and never with harvest-from-dispositions, which needs a finished crop
+    and no recorded quantity.
+  function: lsms_library.countries.Mali._.mali:derive_harvest_to_date
+  inputs: lsms_library.countries.Mali._.mali:inputs_harvest_to_date
+  raw_variables: [s16cq10, s16cq11, s16cq12, s16cq12a, s16cq12b, s16cq16a, s16cq16b]
+  assumptions:
+    - text: >-
+        the recorded quantity on an unfinished row is what has been harvested so far,
+        and not the season.  2021-22: 287 rows, a median 50% of the area still to harvest.
+        2018-19: 265 rows, a median 30%.
+      basis: variable-label
+      evidence: >-
+        s16c_me_mli2021.dta s16cq16a "16C.16a. Quantite deja recoltee pour la presente
+        campagne 2021/22?", s16cq11 "16C.11. Avez vous fini la recolte de cette culture?",
+        s16cq12 "16C.12. Quel pourcentage de la superficie vous reste-t-il a recolter?";
+        s16c_me_mli2018.dta s16cq12a, s16cq10, s16cq11, the same questions under other
+        numbers.
+  validated_against: >-
+    tests/test_gh1437_mali_harvest_total.py, whose oracle reads s16c directly.  An identity
+    has nothing to validate but its rows.
+  contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the 2021-22 harvest total, and the window key (GH #1437)"'
+  since: '2026-11-04'
+
+Mali::crop_production::harvest-from-dispositions:
+  waves: ['2021-22']
+  columns: [Quantity, u]
+  rule: >-
+    Where every s16c row of a household's crop answers s16cq11 = Oui, none records
+    s16cq16a, and the positive s16d quantities s16dq02a (consumed), s16dq03a (given),
+    s16dq05a (sold) and s16dq13a (in stock) all state one unit, Quantity is their sum and
+    u that unit.  It goes on the crop's single s16c row, or for two or more rows on the
+    crop's one plot_id = 'Farm-level' row, created if no sale made it, and is never split
+    among plots.  A crop whose dispositions span units, a crop with none, a crop with a
+    recorded quantity and a crop with an unfinished row all stay as recorded.  This key
+    shares a row with hh-crop-sale-single-row through derivations.MULTI_SEP, in sorted order.
+  function: lsms_library.countries.Mali._.mali:derive_hh_crop_harvest_total
+  inputs: lsms_library.countries.Mali._.mali:inputs_harvest_from_dispositions
+  raw_variables: [s16cq04, s16cq11, s16cq16a, s16dq01, s16dq02a, s16dq02b, s16dq03a, s16dq03b,
+                  s16dq05a, s16dq05b, s16dq13a, s16dq13b]
+  assumptions:
+    - text: >-
+        a finished harvest was consumed, given, sold or stored, so the four dispositions
+        add up to it.  The instrument asks the quantity of a finished harvest and the file
+        lacks it on 5,215 of 5,237 finished rows, a fielded skip or a release loss.
+      basis: questionnaire
+      evidence: >-
+        mli_ehcvm2_qnr_men_excel_vague1.pdf, printed p. 86: "(16C.11) Avez vous fini la
+        recolte de cette culture? 1 = Oui >(16C.16)".  On Niger 2021-22, where both sides
+        exist, the sum equals the harvest exactly on 91.1% of 7,686 finished one-unit pairs,
+        within 10% on 92.2%, median ratio 1.000.  On Mali itself it can barely be tested: 10
+        pairs with a recorded quantity, a finished row and one shared unit, 4 exact, median
+        ratio 1.0.
+    - text: >-
+        not all of a harvest need appear: s16d asks no quantity for seed kept, loss after
+        harvest or animal feed, so the sum can fall short of what was cut.  Not sized.
+      basis: modelling-choice
+      evidence: Niger's 91.1% is the only available check; s16d_me_mli2021.dta variable labels
+    - text: >-
+        units are not converted: no factor exists.  1,169 finished crops span two or more
+        units and stay NA.  Quantities in one unit are added across states: 208 of the 3,360
+        derived crops state two of Grain, Epis, Decortique, Non-decortique in that unit.
+        8 are in the unit Autre, whose free text is empty, 4 of them across two or more
+        dispositions, so they may hide two units.
+      basis: modelling-choice
+      evidence: ruling @ligon 2026-11-04, MORNING.org, option (b) of GH #1437; variables s16dq02c, s16dq03c, s16dq05d, s16dq13c
+    - text: >-
+        a crop with an unfinished row is held out (76 pairs, 48 of them one-unit), because
+        its dispositions cover what is harvested so far.  A crop with a recorded quantity is
+        held out (11 of the finished one-unit pairs), because a recorded harvest is not
+        overridden and a Farm-level total beside it would count it twice.
+      basis: modelling-choice
+      evidence: GH #1437; the reconcile memo's 3,419 finished one-unit pairs are these 3,360 plus the 48 and the 11
+  validated_against: >-
+    tests/test_gh1437_mali_harvest_total.py, whose oracle reads s16c and s16d directly.  Cold build
+    of 2021-22: 3,360 keyed rows, 3,139 on the single s16c row and 221 Farm-level.  Not validated
+    against an external total: no document here reports one.
+  contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the 2021-22 harvest total, and the window key (GH #1437)"'
+  since: '2026-11-04'

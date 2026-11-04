@@ -20,6 +20,11 @@ Where Mali's file differs from Niger's: the index is (t, i, plot_id, crop), as i
 Mali's EAC-I waves, with `u` a column that is NA where no unit is recorded; Niger
 indexes `u` and fills `Unknown`.  Everything else is the same rule: served as
 recorded, nothing masked, and NA rather than 0 on a line whose s16cq15 is 'Non'.
+
+s16cq12a asks the quantity ALREADY harvested.  On a line whose s16cq10 is 'Non' it
+is served as recorded and carries the window key
+Mali::crop_production::harvest-to-date (GH #1437).
+
 See mali.py, "crop_production: the EHCVM waves".
 """
 import sys
@@ -30,7 +35,7 @@ import pandas as pd
 from lsms_library.local_tools import get_dataframe, to_parquet
 from mali import (ehcvm_crop_labels, ehcvm_household_ids, ehcvm_intercropped,
                   ehcvm_plot_ids, ehcvm_unit_labels,
-                  finish_ehcvm_crop_production)
+                  finish_ehcvm_crop_production, stamp_harvest_to_date)
 
 src = get_dataframe('../Data/s16c_me_mli2018.dta', convert_categoricals=True)
 
@@ -44,9 +49,10 @@ df = pd.DataFrame({
     'Unit_sold':     ehcvm_unit_labels(src['s16cq16b']).values,
     'Value_sold':    src['s16cq17'].values,
     'intercropped':  ehcvm_intercropped(src['s16cq07']).values,
+    'finished':      src['s16cq10'].values,
 })
 
-df = finish_ehcvm_crop_production(df, '2018-19')
+df = finish_ehcvm_crop_production(stamp_harvest_to_date(df), '2018-19')
 
 assert len(df) == len(src), 'crop_production 2018-19 lost a source row'
 to_parquet(df, 'crop_production.parquet')

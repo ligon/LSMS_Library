@@ -2783,6 +2783,75 @@ different product list.  Same-cluster, 41,963 household rows find a (v, j, u) pr
 =Avec os en tas (Petit)= does not reach a household's =Tas (Petit)= of meat; that is the cost of
 not folding, accepted by the ruling.
 
+* 2026-11-04 -- the 2021-22 harvest total, and the window key (GH #1437)
+
+Ruling @ligon 2026-11-04.  This supersedes "Not derived here" in the section above, and "no harvest
+total is derived" wherever it survives in older entries.  The keys are =harvest-from-dispositions= and
+=harvest-to-date=, in =derivations.yml=.
+
+*The total.*  For a household's crop, 2021-22: where every =s16c= row answers =s16cq11= =Oui=, none
+records =s16cq16a=, and the positive =s16d= quantities (consumed =s16dq02a=, given =s16dq03a=, sold
+=s16dq05a=, in stock =s16dq13a=) state one unit, =Quantity= is their sum and =u= that unit.  It goes where
+the sale of that crop goes: the single =s16c= row (3,139), or for two or more rows the crop's one
+=Farm-level= row (221: 40 on the row a sale already made, 181 new).  It is never split among plots.
+
+| household-crop pairs, of 6,362                        | pairs | served |
+|-------------------------------------------------------+-------+--------|
+| finished, one unit, nothing recorded                  | 3,360 | derived |
+| finished, one unit, a quantity recorded               |    11 | as recorded |
+| a finished and an unfinished row, one unit            |    48 | as recorded, or NA |
+| finished or mixed, dispositions in two or more units  | 1,194 | NA     |
+| finished or mixed, no positive disposition            |   199 | NA     |
+| finished, no =s16d= row                               |     3 | NA     |
+| no finished row                                       | 1,547 | as recorded, or NA |
+
+The memo's "3,419 one unit" is 3,360 + 11 + 48.  *Mixed pairs are held out* because their dispositions
+cover what is harvested so far, and *a recorded quantity is never overridden*, and a total beside
+one on a =Farm-level= row would count it twice.
+
+| 2021-22                 | before  | now       |
+|-------------------------+---------+-----------|
+| rows                    |   7,317 |     7,498 |
+| rows with a =Quantity=  |     309 |     3,669 |
+| kg, metric rows         | 261,596 | 6,977,513 |
+
+2,792 of the 3,360 are in a metric unit and carry 6,715,918 kg; per metric row 2,405 kg, against 2,650
+in 2018-19.  The other 568 (carts, =Baignoire=, =Gerbe=, ...) have no factor.
+
+*How good is the sum?*  On Niger 2021-22 it equals the harvest exactly on 91.1% of 7,686 pairs (section
+above).  On Mali it can barely be tested: 10 pairs with a recorded quantity, a finished row and one
+shared unit, 4 exact, median ratio 1.0; on 140 unfinished pairs, where the harvest is still running,
+52.9% exact and median 1.0.  *Disclosed, not resolved*: 208 of the 3,360 add two states of the product
+in one unit (=Grain= with =Epis=, say); 8 are in unit =Autre=, whose free text is empty, 4 of them across
+two or more dispositions, so may hide two units; and =s16d= asks nothing about seed kept or post-harvest
+loss, so the sum can fall short of what was cut.
+
+*The window key.*  =harvest-to-date= is an identity on a row with a recorded quantity and an unfinished
+harvest: 2021-22 =s16cq11= =Non=, 287 rows, a median 50% still to harvest; 2018-19 =s16cq10= =Non=, 265 rows,
+a median 30%.  The brief's "=s16cq11= = =Non=" is right for 2021-22 only: the variable numbers flip, and
+2018-19's =s16cq11= is the share left.  Its 86.9% of 2021-22 kg was the share BEFORE the total; it is now
+227,258 of 6,977,513 kg, 3.3%.  In 2018-19 it stays 12.0% (1,792,088 of 14,881,091).
+
+*How the keys share =Derivation=.*  One registered key per construction, joined in sorted order with
+=derivations.MULTI_SEP= (='+'=) on one row, as the tree keys already are:
+
+| keys on the row                                   | rows, 2021-22 |
+|---------------------------------------------------+---------------|
+| =harvest-from-dispositions=                       |         2,684 |
+| =harvest-from-dispositions+hh-crop-sale-single-row= |           676 |
+| =harvest-to-date=                                 |           237 |
+| =harvest-to-date+hh-crop-sale-single-row=         |            50 |
+| =hh-crop-sale-single-row=                         |           344 |
+
+The two harvest keys never meet: one needs a recorded quantity on an unfinished row, the other a finished
+crop with none.  A consumer asking "is this =Quantity= derived?" must test for containment, not equality.
+A =Farm-level= row carries a key only for its total; the sale on it is still disclosed by the index.
+
+*Farm-level now holds harvests in EHCVM too.*  =harvest_kg= reads these 221 rows, as it reads the EAC-I
+trees; =yield_kg= does not, since no plot has that id; =crop_diversity(weight='count')= drops all of them,
+each repeating a crop on a plot row.  So summing kg by plot under-reads a 2021-22 household whose crop is on
+two plots, and summing by household does not.
+
 * 2026-11-04 -- EAC-I enumerator manuals held; 2021-22 price source read from the BID (GH #1179, #821)
 
 *Held now, 2014-15/Documentation/.*  =bid_eaci14.pdf= and =EACI_MANUEL_P2_V3.pdf=
