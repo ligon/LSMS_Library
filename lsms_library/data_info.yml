@@ -513,6 +513,21 @@ Columns:
       type: float
     Longitude:
       type: float
+    Derivation:
+      type: str
+      optional: true
+      note: |
+        As under `food_acquired.Derivation`.  Declared here for GH #1060 and
+        GH #1057: `Burkina_Faso::cluster_features::zd-modal-province` (2014;
+        `province` varies within 94 of 900 zd in the source, and the served
+        District is the zd's most common one) and
+        `Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19`
+        (2021-22; the wave ships no cluster fix, and a panel grappe's
+        Latitude / Longitude are the 2018-19 fix of that grappe).  They are not
+        the first on this table: `Nigeria::cluster_features::ph-same-location`,
+        `Uganda::cluster_features::agriculture-cover` and
+        `Uganda::cluster_features::unlocated-identity` already served the column
+        undeclared, and this declaration covers them too.
   plot_features:
     # Lasting plot/parcel characteristics (GH #167).  Per-season detail
     # (which crop, who farmed it this season, season-specific inputs,

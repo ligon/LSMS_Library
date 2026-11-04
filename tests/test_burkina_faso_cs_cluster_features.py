@@ -13,7 +13,9 @@ at development ``3a33f2869``, ``household_roster(market='Region')`` served
 The cross-section cover carries household GPS (« Coordonnées GPS du ménage »,
 7,128 of 7,176 populated) that differs within 578 of its 600 grappes.  That is
 a household position, not a cluster attribute, so it is deliberately not
-mapped: the (t, v) projection would select one household's point.
+mapped: the (t, v) projection would select one household's point.  GH #1057
+carries a PANEL grappe's 2018-19 fix through a second sub-df; a cross-section
+grappe matches nothing in that file and stays NA.
 
 Config and invented-input tests run anywhere; the data tests are cache/S3-gated.
 """
@@ -44,12 +46,14 @@ requires_s3 = _tests_conftest().requires_s3
 COUNTRY = "Burkina_Faso"
 PANEL_COVER = "s00_me_bfa2021.dta"
 CS_COVER = "Cross_Section/s00_me_bfa2021.dta"
+GPS_2018 = "grappe_gps_bfa2018.dta"
 ROOT = countries_root() / COUNTRY
 
 
 def _cluster_spec():
+    """The covers' sub-df.  Re-pinned for GH #1057, which added df_geo beside it."""
     with open(ROOT / "2021-22" / "_" / "data_info.yml") as f:
-        return yaml.safe_load(f)["cluster_features"]
+        return yaml.safe_load(f)["cluster_features"]["df_main"]
 
 
 def _file_names(spec):
@@ -87,6 +91,11 @@ def raw_covers(monkeypatch):
             "s00q01": ["Est", "Est", "Nord"],
             "s00q02": ["Gourma", "Gourma", "Yatenga"],
             "s00q04": ["Rural", "Rural", "Urbain"]}),
+        # GH #1057: the df_geo read, one row per 2018-19 grappe.  None reaches 586.
+        GPS_2018: pd.DataFrame({
+            "grappe": [2, 3, 4],
+            "coordonnes_gps__Latitude": [12.5, float("nan"), 13.5],
+            "coordonnes_gps__Longitude": [-1.5, float("nan"), -0.5]}),
     }
     calls = []
 
@@ -102,7 +111,7 @@ def raw_covers(monkeypatch):
 
 def test_cross_section_grappes_get_cluster_rows(raw_covers):
     df = ll.Country(COUNTRY)["2021-22"].cluster_features()
-    assert sorted(raw_covers) == sorted([PANEL_COVER, CS_COVER])
+    assert sorted(raw_covers) == sorted([PANEL_COVER, CS_COVER, GPS_2018])
     flat = df.reset_index()
     flat["v"] = flat["v"].astype(str)
     assert sorted(flat["v"]) == ["2", "3", "586", "900"]
@@ -112,6 +121,9 @@ def test_cross_section_grappes_get_cluster_rows(raw_covers):
     assert flat.set_index("v")["Rural"].to_dict() == {
         "2": "Urban", "3": "Rural", "586": "Rural", "900": "Urban"}
     assert "i" not in df.index.names and "i" not in df.columns
+    # GH #1057: a left merge, so grappe 4 (not in either cover) is not served,
+    # and only the panel grappe with a fix carries one.
+    assert flat.set_index("v")["Latitude"].dropna().to_dict() == {"2": 12.5}
 
 
 # --------------------------------------------------------------------------
@@ -120,7 +132,7 @@ def test_cross_section_grappes_get_cluster_rows(raw_covers):
 
 @pytest.fixture(scope="module")
 def _non_strict():
-    """2014 carries a pre-existing source-property GrainCollapseWarning
+    """2014 keeps a source-property GrainCollapseWarning on 2 tied zd
     (GH #1060) that LSMS_GRAIN_STRICT=1 would turn into an abort."""
     prior = os.environ.pop("LSMS_GRAIN_STRICT", None)
     yield

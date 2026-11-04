@@ -150,3 +150,114 @@ Burkina_Faso::community_prices::quoted-native-unit-count:
     passes without normalizing actual frames.
   contents: 'Burkina_Faso/_/CONTENTS.org, GH1226 PRICE instrument'
   since: '2026-10-30'
+
+Burkina_Faso::cluster_features::zd-modal-province:
+  waves: ['2014']
+  columns: [District]
+  rule: >-
+    District = the most common `province` among the zd's households, on every
+    row of a zd whose households name more than one province and where one of
+    them is strictly the most common: 92 of the 900 zd, 1,104 of the 10,800
+    logement rows.  The other 806 zd name one province and carry no key.  The 2
+    zd where two provinces tie (362, 727; 6 households each) are left as they
+    are, carry no key, and are served the row the (t, v) collapse selects, so
+    they keep the grain report.  The key sits on a zd whose served value was the
+    mode anyway (83 of the 92): it describes the construction, not whether it
+    moved the value.  9 zd move.
+  function: lsms_library.countries.Burkina_Faso.2014._.mapping:derive_zd_modal_province
+  inputs: lsms_library.countries.Burkina_Faso.2014._.mapping:inputs_cluster_features
+  raw_variables: [zd, menage, region, province, milieu]
+  assumptions:
+    - text: >-
+        A zd lies in one province, so the households of a zd that name several
+        are mostly recording one province and miscoding the others.  The survey
+        does not say this; it records province per household.  The zd is a frame
+        unit, and `region` and `milieu` never vary within one.
+      basis: modelling-choice
+      evidence: >-
+        GH #1060, ruling by @ligon 2026-11-03, option (b).  emc2014_p1_logement_27022015.dta,
+        province by zd: 94 of 900 zd vary (86 name two, 8 name three), 1,128
+        households, modal share median 0.92 and minimum 0.50, 169 households
+        outside the mode.  Against the province-to-region pairing of the EHCVM-1
+        cover (s00_me_bfa2018.dta), 90 households in 67 of the 94 zd name a
+        province outside their zd's region, and no household anywhere else does;
+        every one of the 92 modes, and all four provinces of the 2 ties, lie
+        inside the zd's region.
+    - text: >-
+        A tie is not broken.  Nothing in the source prefers one of two provinces
+        named by 6 households each, so no rule is added and the served value stays
+        the first household's, chosen by core's most-complete-row selector.
+      basis: modelling-choice
+      evidence: GH #1060, ruling by @ligon 2026-11-03.
+  validated_against: >-
+    emc2014_welfare.dta carries the same province for 10,411 of 10,411 matched
+    households, so it corroborates the raw variation and cannot adjudicate it.
+    No held 2014 file gives a zd's own province.  The region check in the first
+    assumption is the only outside evidence, and it can only see across a regional
+    boundary: of the 157 households outside the mode in these 92 zd, 90 name a
+    province outside the zd's region, and for the other 67 the mode is uncorroborated.
+  contents: 'Burkina_Faso/_/CONTENTS.org, "2014 zd modal province (GH #1060)"'
+  since: '2026-11-03'
+
+Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
+  waves: ['2021-22']
+  columns: [Latitude, Longitude]
+  rule: >-
+    Latitude, Longitude = the 2018-19 cluster fix of the same grappe
+    (grappe_gps_bfa2018.dta), on the 2021-22 row of a panel grappe: 525 of the
+    550 panel grappes.  NA, with no key, for the 22 panel grappes other than 549
+    that have no 2018-19 fix, for grappes 19, 365 and 549 (excluded), and for all
+    600 cross-section grappes.  The values are carried as recorded, low-precision
+    and duplicated fixes included (CONTENTS.org, "GPS by wave").
+  function: lsms_library.countries.Burkina_Faso.2021-22._.mapping:derive_panel_grappe_gps
+  inputs: lsms_library.countries.Burkina_Faso.2021-22._.mapping:inputs_cluster_features
+  raw_variables: [grappe, grappe_EHCVM1, coordonnes_gps__Latitude, coordonnes_gps__Longitude]
+  assumptions:
+    - text: >-
+        The panel component re-interviews EHCVM-1 households inside their EA of
+        origin, so a panel grappe is a 2018-19 EA.
+      basis: questionnaire
+      evidence: >-
+        bid_bfa_ehcvm2.pdf p. 4, "Households were tracked within the EA. In other
+        words, EHCVM-1 households that have left their EA of origin were not
+        surveyed." (a survey document, not the instrument; the closest rung of
+        the ladder).  s00_me_bfa2021.dta: grappe == grappe_EHCVM1 for 3,227 of 3,227
+        households, in 550 grappes, all among 2018-19's 585; Region agrees on
+        550 of 550.
+    - text: >-
+        Same grappe id means same EA, and the EA's location did not change between
+        the waves, so the 2018-19 fix locates the 2021-22 row.  Rural differs on 7
+        panel grappes (147, 150, 153, 154, 155, 180, 182), all carried: that is an
+        attribute recode, and the ruling excludes on province only.
+      basis: modelling-choice
+      evidence: >-
+        GH #1057, ruling by @ligon 2026-11-03, option (b), tightened.
+    - text: >-
+        Grappes 19, 365 and 549 are NOT carried.  Each names a different province
+        in the two waves (Seno/Yagha, Poni/Noumbiel, Kompienga/Gourma), which puts
+        the same-EA assumption in doubt for them, and they stay NA.  549 has no
+        2018-19 fix, so its exclusion changes nothing served.
+      basis: modelling-choice
+      evidence: >-
+        GH #1057, ruling by @ligon 2026-11-03; GH #1059.  s00_me_bfa2018.dta and
+        s00_me_bfa2021.dta, s00q02: every household of each grappe agrees within
+        its wave.  365's fix lies 85 km from the median of its own 2021-22 parcel
+        coordinates, which supports the exclusion; 19 has no parcel coordinates.
+    - text: >-
+        The cross-section (grappes 586-1185) gets no fix.  It is a new draw from
+        the 2019 census frame with no 2018-19 antecedent, and its cover's GPS__*
+        are household positions (they differ within 578 of its 600 grappes).  A
+        centroid of them is declined.
+      basis: modelling-choice
+      evidence: GH #1057, ruling by @ligon 2026-11-03; GH #1276.
+  validated_against: >-
+    s16a_me_bfa2021.dta, s16aq46__latitude / __longitude, parcel positions recorded
+    in 2021-22 and independent of the fix: on the 277 carried grappes that have one,
+    the median parcel position lies a median of 1.6 km from the carried fix (p90
+    5.2 km), against 213 km for a fix paired with another grappe's parcels.  6 of
+    the 277 are beyond 25 km, and those fixes are served as recorded because the
+    ruling excludes on province only: 103 and 104 (about 104 km), 240 and 237 (51
+    and 44 km; the two grappes that share one identical fix), 229 and 226 (29 km).
+    The other 248 carried grappes have no parcel coordinate to compare.
+  contents: 'Burkina_Faso/_/CONTENTS.org, "2021-22 GPS carried from 2018-19 (GH #1057)"'
+  since: '2026-11-03'

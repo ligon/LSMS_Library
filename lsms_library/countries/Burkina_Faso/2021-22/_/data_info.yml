@@ -152,24 +152,55 @@ cluster_features:
     # but HOUSEHOLD positions -- they differ within 578 of the 600 grappes -- so
     # they are not a cluster attribute (the panel cover's are 0 of 3,227
     # populated).  See _/CONTENTS.org and GH #1057.
-    file:
-        - s00_me_bfa2021.dta
-        - Cross_Section/s00_me_bfa2021.dta
-    idxvars:
-        i: menage
-        v: grappe
-    myvars:
-        Region: s00q01
-        District: s00q02
-        Rural:
-            - s00q04
-            - mapping:
-                Rural: Rural
-                rural: Rural
-                RURAL: Rural
-                Urbain: Urban
-                urbain: Urban
-                URBAIN: Urban
+    #
+    # GPS (GH #1057): this wave ships no cluster fix, so a panel grappe carries
+    # its 2018-19 fix, a registered derivation stamped by mapping.py's
+    # `cluster_features` hook.  df_geo is a DECLARED source in the 2018-19
+    # Data/ directory, so this wave's content hash covers its sidecar.
+    # `merge_how: left` bears served values.  The file has 585 grappes and the
+    # panel 550.  Under `outer`, 28 of the other 35 would be served as 2021-22
+    # clusters with a fix and no Region (1,178 rows, not 1,150); the other 7 reach
+    # the wave frame but are not served.  A cross-section grappe (586-1185) matches
+    # nothing in the file, whose grappes stop at 585, and stays NA.  `final_index`
+    # bears routing only: keeping `i` means this wave still reaches
+    # Wave.cluster_features' household -> (t, v) projection (GH #323 Site 2), as it
+    # did before the merge.
+    dfs:
+        - df_main
+        - df_geo
+    merge_how: left
+    df_main:
+        file:
+            - s00_me_bfa2021.dta
+            - Cross_Section/s00_me_bfa2021.dta
+        idxvars:
+            i: menage
+            v: grappe
+        myvars:
+            Region: s00q01
+            District: s00q02
+            Rural:
+                - s00q04
+                - mapping:
+                    Rural: Rural
+                    rural: Rural
+                    RURAL: Rural
+                    Urbain: Urban
+                    urbain: Urban
+                    URBAIN: Urban
+    df_geo:
+        file: ../../2018-19/Data/grappe_gps_bfa2018.dta
+        idxvars:
+            v: grappe
+        myvars:
+            Latitude: coordonnes_gps__Latitude
+            Longitude: coordonnes_gps__Longitude
+    merge_on:
+        - v
+    final_index:
+        - t
+        - i
+        - v
 
 shocks:
     file: s14b_me_bfa2021.dta
