@@ -937,3 +937,11 @@ inspection).
 *Cache.*  =_/categorical_mapping.org= is a build input of every CotedIvoire
 table: all 21 country hashes move (one CotedIvoire re-warm).  Evidence:
 =slurm_logs/isa_backlog_2026-10-21/1123-ehcvm-identity/=.
+
+* 2026-11-04 -- the NPK slot states no grade (GH #1445)
+
+Measured, nothing changed.  Code 5 of =s16bq01= is =Engrais inorganiques -
+NPK/Formule unique= in the file and the questionnaire (1,341 applied rows); no grade.
+It maps to =NPK= (0.17 N) and is 19.1% of =nitrogen_kg=; 125 =Tonne= rows are 38.2% of the slot's
+kilograms.  The =npk 15/15= rows of =harmonize_input= came with the Niger template and
+match no label here.

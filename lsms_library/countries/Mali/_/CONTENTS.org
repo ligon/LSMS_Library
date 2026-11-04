@@ -2601,3 +2601,40 @@ Mali cache hash.
 
 Tests: =tests/test_gh824_mali_ehcvm_crop_production.py=, with an oracle that reads the =.dta=
 files and imports nothing from this directory.
+
+* 2026-11-04 -- the NPK slot, the EHCVM input files, and strata by wave (GH #1445, #812)
+
+Read-only measurement: nothing is wired and no served value moved.
+
+*NPK.*  The served slot is bare: =s2cq25e= "Quantité de NPK appliquée sur la
+parcelle" (2014-15), =s7dq26c1= "Qté de NPK utilisée-Qté" (2017-18).  Grades appear
+only on the household PURCHASE rosters, which are a different question:
+2017-18 =s7bq01= has =Complexe céréale= (4), =Complexe coton= (5) and =NPK 15/15/15=
+(11); 2014-15 =s2dq01= is truncated in the file and its questionnaire (=AGR_LOURD_P2=
+p.12) prints the same list as =NPK 15/15=.  Of 675 households with plot-level NPK > 0
+in 2017-18, 328 bought NPK 15/15/15, 314 bought a Complexe and 83 neither, so the
+slot cannot be read as 15-15-15.  There is no plot slot for a Complexe.
+
+*A claim in =data_scheme.yml= is false.*  "The EHCVM waves (2018-19, 2021-22) have no
+agriculture-input block".  =s16b_me_mli2018.dta= and =s16b_me_mli2021.dta= exist, with
+666 and 623 applied =NPK/Formule unique= rows, and =s16a= asks fertilizer per parcel.
+Not wired; the comment stays until =data_scheme.yml= is next edited, since that file
+is a build input.
+
+*Strata, documented.*  EAC-I: "51 explicit sample strata" (2014 and 2017 BIDs quoted
+above).  EHCVM: the held 2021-22 BID, p.10: "a two-stage stratified sampling plan.
+The stratum is the combination of region and residence area."
+
+*Strata, measured.*  2017-18 =strate= (wired): codes 1-45 nest in one region each, 50
+is "other urban" across 7 regions (79 clusters), 51 is Bamako (85); 47 of 51 codes are
+occupied.  2014-15: no variable in its 55 files is named or labelled a stratum, except
+=deflator= in =eaci2014_agregatconso.dta= ("Strata deflator"), which is one-to-one with
+region x milieu, 15 cells, not the design's 51.  920 of its 989 grappes recur in 2017-18, region
+and rural agreeing 920 of 920.  2018-19: region x milieu is 20 cells (11 regions).
+2021-22: 17 cells (9 regions), all equal to BID Table 1.  No EHCVM household file has
+=strate=; =ehcvm_nsu_mli2021.dta= (a unit table) does, labelled "Strate
+(Region*10+Milieu)", whose 20 values are 2018-19's cells.  Share of var(log cluster weight) between region / region x
+milieu: 56.2% / 72.5% (2018-19), 34.4% / 71.9% (2021-22).
+
+*Inference, not wired.*  Carrying the 2017-18 =strate= back to 2014-15 by =grappe=; it
+would leave 69 clusters empty.

@@ -625,3 +625,13 @@ is settled by =ehcvm_conso=, not by the size of the number.
 - =s07bq07a/b/c= (the last purchase's own quantity and unit) are still not
   served as rows of their own; they are inputs to the unit value, retrievable
   through =derivation_inputs=.
+
+* 2026-11-04 -- =nitrogen_kg= is empty here (GH #1445)
+
+Measured, nothing changed.  Code 5 of =s16bq01= is =Adubos inorgânicos - NPK/Fórmula
+única= (46 applied rows); no grade.  There is no
+=harmonize_input=, so every label passes through and none keys =_NITROGEN_CONTENT=:
+=nitrogen_kg= matches 0 rows and returns nothing, whatever the share.  Separately
+=Quilograma= and =Grama= have no kg factor, so the 38 + 2 NPK rows in them have no mass
+either.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 60 positive), which the
+=data_scheme.yml= grain note says it does not.

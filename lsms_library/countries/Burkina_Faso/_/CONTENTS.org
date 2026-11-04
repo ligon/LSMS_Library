@@ -2659,3 +2659,34 @@ Cache: =2021-22/_/mapping.py= and =data_info.yml= move every Burkina
 =_table_cache_hash= and every 2021-22 =Wave._input_hash=; every 2018-19 wave hash
 and every other country's are unchanged.  One Burkina re-warm.
 Pinned by =tests/test_gh1060_1057_burkina_cluster_features.py=.
+
+* 2026-11-04 -- strata by wave (GH #812); the NPK slot (GH #1445)
+
+Read-only measurement: nothing is wired and no served value moved.
+
+*Documented.*  =bid_bfa_ehcvm2.pdf= p.4: the strata "result from the combination of
+the 13 regions with the two areas of residence".  The tension for 2018-19 recorded
+above (26 against the BID's three) stands.  Catalog 6277, the cross-section, names no
+stratum.
+
+*Measured.*  2014: =strate= is one-to-one with =region= x =milieu=, 26 cells, as its
+variable label says.  2018-19, the 2021-22 panel and the 2021-22 cross-section: region
+x milieu is 26 cells each, constant within a grappe.  No household file carries
+=strate=; =ehcvm_nsu_bfa2021.dta= (a unit table) does, "Code de la strate", labelled
+=BOUCLE DU MOUHOUN Urbain= and so on, whose 26 codes equal 10 x =region= + =milieu= of
+=ehcvm_welfare_2b_bfa2021.dta= exactly.
+Share of var(log cluster weight) between region / region x milieu: 8.2% / 74.0%
+(2018-19), 13.4% / 66.8% (panel), 11.8% / 76.1% (cross-section).  Region alone, the
+sibling wiring (=strata: s00q01=), would miss nearly all of it here.
+
+*The trap in wiring it: codes.*  =s00q01= 1 is Boucle du Mouhoun in 2018-19 and
+Hauts-Bassins in 2021-22, and in 2021-22 =ehcvm_welfare_2b= =region= 9 is
+Hauts-Bassins.  Use labels, never codes.
+
+*NPK.*  Code 5 of =s16bq01= is =Engrais inorganiques - NPK/Formule unique= in both
+EHCVM waves and their questionnaires; no grade.  It maps to =NPK= (0.17 N).  The
+=npk 15/15= rows of =harmonize_input= came with the Niger template and match no Burkina
+label.  It is 58.8% of 2018-19's =nitrogen_kg=, and 7 =Tonne= rows are 69.6% of that
+slot's kilograms.  =s16b_me_bfa2021.dta= holds 1,158 applied NPK rows and =plot_inputs=
+does not read it.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 3,684 positive in
+2018-19), which the =data_scheme.yml= grain note says it does not.
