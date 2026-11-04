@@ -25,6 +25,23 @@ _REGION_CODE_BY_NAME = {tanzania.normalize_place(name): code
                         for code, name in tanzania.TZ_REGION_BY_CODE.items()}
 
 
+def _codes_or_table(codes):
+    """``{int Code: District}``; default reads the table, cwd-relative, as every
+    wave script does."""
+    if codes is None:
+        codes = get_categorical_mapping(tablename='upd_district_code',
+                                        idxvars='Code',
+                                        **{'District': 'District'})
+    return {int(k): val for k, val in codes.items()}
+
+
+def _cell(region_code, digit):
+    """The table's ``Code``; NA if either part is missing."""
+    if pd.isna(region_code) or pd.isna(digit):
+        return pd.NA
+    return int(region_code) * 10 + int(str(digit).split('.')[0])
+
+
 def upd_district_labels(df, region='Region', district_code='_district_code',
                         v='v', codes=None):
     """District NAME for rows of NPS rounds 1-2, from the district CODE (GH #1441).
@@ -54,18 +71,8 @@ def upd_district_labels(df, region='Region', district_code='_district_code',
     Returns:
         A Series on ``df.index``: the label, or NA.
     """
-    if codes is None:
-        codes = get_categorical_mapping(tablename='upd_district_code',
-                                        idxvars='Code',
-                                        **{'District': 'District'})
-    codes = {int(k): val for k, val in codes.items()}
+    codes = _codes_or_table(codes)
     flat = df.reset_index() if v not in df.columns else df
-
-    def _cell(region_code, digit):
-        if pd.isna(region_code) or pd.isna(digit):
-            return pd.NA
-        return int(region_code) * 10 + int(str(digit).split('.')[0])
-
     own = [_cell(_REGION_CODE_BY_NAME.get(tanzania.normalize_place(r), pd.NA), d)
            for r, d in zip(flat[region], flat[district_code])]
     geo = [_cell(*tanzania._geocode_fields(x, 'nps')) for x in flat[v]]
@@ -102,6 +109,43 @@ def derive_upd_district_name(df, codes=None):
     out['Derivation'] = pd.Series(pd.NA, index=out.index, dtype='string')
     out.loc[no_name & out['District'].notna().to_numpy(),
             'Derivation'] = UPD_DISTRICT_DERIVATION
+    return out
+
+
+UPD_DISTRICT_DIGIT_DERIVATION = 'Tanzania::cluster_features::upd-district-name-from-id-digit'
+
+# Two clusters, NAMED, because this is not a rule.  Of the 8 clusters whose most
+# common 2010-11 code differs from their id's digit, the digit matches round 3's
+# plurality in 5 and the reported code in 3, so a general digit rule would be
+# wrong for some.  These two are the NA clusters whose rounds 1 and 3 agree on the
+# name.  The third NA cluster, 19302076, stays NA: round 1 reports its digit
+# (NYAMAGANA) and round 3 mostly writes ILEMELA.  Ruling: @ligon, 2026-11-04.
+UPD_DISTRICT_DIGIT_CLUSTERS = ('4115002', '10506001')
+
+
+def derive_upd_district_from_id_digit(df, codes=None):
+    """2010-11 ``District`` of the two named clusters, from the id's digit (GH #1441).
+
+    Every household in these clusters reports a code other than the id's digit in
+    2010-11, so :func:`derive_upd_district_name` leaves them NA.  Their neighbouring
+    rounds agree on the name, so the id's digit names the cluster for this round.
+    Run after that function.  Only blank names are filled, and the rows filled carry
+    their own key.
+
+    Args:
+        df: the frame :func:`derive_upd_district_name` returned.
+        codes: as for :func:`upd_district_labels`.
+
+    Returns:
+        A copy of ``df`` with ``District`` and ``Derivation`` set on those rows.
+    """
+    codes = _codes_or_table(codes)
+    out = df.copy()
+    v = out.index.get_level_values('v').astype(str)
+    hit = (out.index.get_level_values('t') == '2010-11') & v.isin(UPD_DISTRICT_DIGIT_CLUSTERS) \
+        & out['District'].isna().to_numpy()
+    out.loc[hit, 'District'] = [codes[_cell(*tanzania._geocode_fields(x, 'nps'))] for x in v[hit]]
+    out.loc[hit, 'Derivation'] = UPD_DISTRICT_DIGIT_DERIVATION
     return out
 
 

@@ -96,8 +96,11 @@ df = tanzania.keep_cluster_residents(df, region='Region',
 # GH #1441 -- rounds 1-2 ship the district CODE and no name (see `blank_to_na`).
 # Name the code from the table in `categorical_mapping.org` here, and stamp the
 # registered key `Tanzania::cluster_features::upd-district-name-from-round-3` on
-# the rows filled.  Later rounds are untouched.
+# the rows filled.  Two named 2010-11 clusters whose households report no code
+# their id confirms take the id's digit, under their own key.  Later rounds are
+# untouched.
 df = _upd_district.derive_upd_district_name(df)
+df = _upd_district.derive_upd_district_from_id_digit(df)
 df = df.drop(columns='_district_code')
 
 to_parquet(df, 'cluster_features.parquet')

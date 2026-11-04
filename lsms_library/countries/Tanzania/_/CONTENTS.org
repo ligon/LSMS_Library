@@ -2301,7 +2301,8 @@ projection), that is not so.  The count is still 118 (2012-13 34, 2014-15 17,
 - The 818 null =District= cells in 2008-09 / 2010-11 were a source gap.  The UPD
   ships only the within-region code =ha_02_1= (8 distinct values in rounds 1-2;
   round 4 has 9); =ha_02_2= is blank (see the 2008-15 script's docstring).  (2026-11-03:
-  815 of the 818 are now labelled from that code; see GH #1441 below.)
+  817 of the 818 are now labelled, 815 from that code and 2 from the id's digit;
+  see GH #1441 below.)
 
 So the District residue is mostly a district-identity decision (vintage and
 council grain), which #837 leaves to the maintainer.  It is not a spelling
@@ -2342,14 +2343,13 @@ region code.  These are carried through as-is rather than repaired by guesswork.
   #837 residuals. No new blanking exception was adopted. See
   =slurm_logs/release_landing_2026-10-14/cluster837.org=.
 
-- *2019-20 =sample.v= for the 326 split-off households.*  Those households are
-  still assigned the =clusterid= the file stamps on them, which is not a
-  sampling cluster --- and now that =cluster_features= no longer manufactures
-  rows for it, their =v= points at a cluster the table does not contain.
-  Blanking it would change =v= on every 2019-20 household table for 27.5% of
-  the wave; that is a semantic change that belongs in its own PR, not inside a
-  cluster-key fix.  Recorded rather than done.  (2026-11-03: this is why 281 of
-  those households have no market label; see GH #1441 below.)
+- *2019-20 =sample.v= for the 326 split-off households.*  The file stamps them with
+  a =clusterid= that is not a sampling cluster.  Fixed in part (GH #1441, ruling
+  @ligon 2026-11-04): of the 281 whose id is in no frame cluster, 238 now take
+  their parent's cluster through =y4_hhid=, under
+  =Tanzania::sample::split-off-parent-cluster=.  The other 43 keep their id, which
+  still names a cluster the table does not contain, so 32 stray ids remain in
+  =sample.v= (100 before).  Blanking was rejected.  See GH #1441 below.
 - *5 of 498 2014-15 clusters are unknown to =sample()=* (='17201000'=,
   ='21408000'=, ='52104012'=, ='53119012'=, ='53206000'=).  They ARE present in
   the wave-level =sample.parquet= (13 / 7 / 10 / 10 / 10 rows) and are lost
@@ -2381,8 +2381,9 @@ in the cell.  =ha_02_1= has no Stata value label and no document scanned lists t
 codes, so the name is a later round's free text carried back: a construction,
 registered as =Tanzania::cluster_features::upd-district-name-from-round-3= (=_/derivations.yml=)
 and stamped in =Derivation= on the rows filled, following #1060, #1057 and Uganda's
-=ea-tracking-key=.  Labelled clusters: 2008-09 0 -> 409 of 409, 2010-11 0 -> 406 of
-409.  =Region=, =Rural= and every later round are unchanged, apart from the new
+=ea-tracking-key=.  Labelled clusters: 2008-09 0 -> 409 of 409, 2010-11 0 -> 408 of
+409 (406 from this key, 2 from the id's digit, below).  =Region=, =Rural= and every
+later round are unchanged, apart from the new
 =URBAN= -> =Urban= row in the country =District= table, which also moves round 3's
 twelve =URBAN= clusters.  Labels are stored as round 3 writes them and take the
 same read path through that table (hence =Dodoma Rural=).
@@ -2425,12 +2426,12 @@ file, so any edit to it outside the frozen function fails 13 tests.
   of it.  The 86 mismatches run 32% in the four renumbered regions (25 of 79) and
   10% elsewhere (61 of 600).
 
-*Three 2010-11 clusters stay NA (25 households).*  A row is labelled only where the
-household's code is the digit in its own =clusterid=.  "Cannot be verified" here
-means ZERO confirming households, not weak support, and the gate is thin: one
-household is enough, and 7 labelled 2010-11 clusters have under half confirming
-(=1529002= 2 of 8, =19225003= 1 of 10).  These three are labelled in the neighbouring
-rounds:
+*Three 2010-11 clusters had no confirming household (25 households).*  A row is
+labelled from the round-3 table only where the household's code is the digit in its
+own =clusterid=.  "Cannot be verified" here means ZERO confirming households, not
+weak support, and the gate is thin: one household is enough, and 7 labelled 2010-11
+clusters have under half confirming (=1529002= 2 of 8, =19225003= 1 of 10).  These
+three are labelled in the neighbouring rounds:
 | =v=        | digit in the id    | 2010-11 reports | round 3 writes              | served 2008-09, 2010-11, 2012-13 |
 |------------+--------------------+-----------------+-----------------------------+----------------------------------|
 | =4115002=  | Tanga 1 LUSHOTO    | code 2          | code 2 and the name LUSHOTO | Lushoto, NA, Lushoto             |
@@ -2440,9 +2441,14 @@ Mapping the reported code would serve KOROGWE and SONGEA RURAL for the first two
 which their own round 3 answers contradict.  Mapping the id's digit would serve
 NYAMAGANA for the third, whose round 3 households mostly write ILEMELA.  Across the
 8 clusters whose most common 2010-11 code differs from their digit, the digit
-matches round 3's plurality in 5 and the reported code in 3, so neither is applied.
-Filling the first two from the digit is queued for the maintainer (it would leave 9
-households NA).
+matches round 3's plurality in 5 and the reported code in 3, so neither is a rule.
+Ruling (@ligon, 2026-11-04): the first two take the digit, NAMED in
+=_upd_district.UPD_DISTRICT_DIGIT_CLUSTERS= under their own key
+=Tanzania::cluster_features::upd-district-name-from-id-digit=, because both
+neighbouring rounds agree and the households are the same (the 2010-11 id extends a
+2008-09 id for 8 of 8 in both; 7 of the 8 2008-09 households in =10506001= have a
+descendant).  =19302076= stays NA because its neighbouring
+rounds conflict, which leaves 9 households with =m= NA in 2010-11.
 
 *What this does to =market='District'=.*  Every household gets its CLUSTER's
 district, like =Region=, so a mover is labelled where it was sampled rather than
@@ -2456,8 +2462,8 @@ clusters, 5 of 409 change label between 2008-09 and 2012-13 (Mufindi to Mafinga,
 Njombe to Njombe Urban, Mtwara Urban to Mtwara Mikindani twice, Nyamagana to
 Ilemela, the only real conflict).  =m= carries no =Derivation= key, the same as
 Burkina's =zd-modal-province=.  =food_acquired(market='District')= rows with =m= NA:
-44,969 -> 0 in 2008-09, 54,775 -> 356 in 2010-11; rows, expenditure and later
-rounds are unchanged.  The Site B =NullReadWarning= on =District= for these two
+44,969 -> 0 in 2008-09, 54,775 -> 356 -> 138 in 2010-11 (the last step is the two
+digit clusters); rows, expenditure and later rounds are unchanged.  The Site B =NullReadWarning= on =District= for these two
 waves goes away.
 
 *One served number moves as a result.*  =food_expenditures(basis='total',
@@ -2467,31 +2473,90 @@ prices in these two rounds come from the district rather than the region.  Total
 rise 0.05% in 2008-09 and 0.06% in 2010-11, which hides real row moves: 3,819 of
 251,580 rows change, 2,617 produced and 1,202 in-kind, none purchased.  The median
 ratio is 0.99, the 1st to 99th percentile 0.55 to 1.80, the extremes 0.225 and 10
-(red team, 2026-11-04).  Later rounds are unchanged.
+(red team, 2026-11-04).  Later rounds are unchanged.  The two digit clusters move 5
+more rows in 2010-11 (total -0.0002%).
 
-** Region 2014-15 (59) and 2019-20 (281): not a missing label, a missing =v=
+** Region 2014-15 (59) and 2019-20 (281 -> 43): a missing =v=, not a missing label
 
-Neither is a defect of =cluster_features=.  Both are recorded, not fixed: which
-treatment is right is a decision for the maintainer (memo on GH #1441).
+Neither is a defect of =cluster_features=.
 - *59 in 2014-15 are =sample='s deliberate =v= = NA* (two panel lines, two origin
-  EAs, GH #323).  In all 59 the two =clusterid= decode to one region and district
-  digit, so the cluster's label is known while =v= is not; own =ha_01_1= agrees
-  with it for 34.
-- *281 in 2019-20 are split-offs* whose stray =clusterid= (=sdd_cluster= blank) is
-  in none of the 147 frame clusters, the 100 ids GH #323 stopped pooling.  Their
-  own location =hh_a01_1= is populated for all 326 split-offs and =hh_a02_1= for
-  325 (the one blank is among the 281).  A frame household with the same =y4_hhid= gives the parent's cluster for
-  238 of the 281; the other 43 have none.
-- *The other 45 split-offs carry an id that is also a frame cluster.*  For 31 it
-  is their frame sibling's own cluster, so they are labelled as any tracked
-  household is.  The other 14 have no sibling, so that label rests on the id alone.
-  Own region agrees with the served label for 29 of the 45.  Not changed here.
-- The only route that labels these 340 without a new =v= is a household-grain
-  =Region= on =sample=, and =_add_market_index= prefers that column for EVERY
-  household, so populating it fully moves 1,366 labels (245 / 565 / 162 / 43 / 351
-  households whose own region differs from their cluster's, 2010-11 to 2020-21).
-  The 162 excludes the 59 (178 with them).  The 43 reads own region as =hh_a01_1=
-  falling back to =t0_region= (32 on =hh_a01_1= alone).
+  EAs, GH #323), and stay so.  In all 59 the two =clusterid= decode to one region
+  and district digit, so the cluster's label is known while =v= is not; own
+  =ha_01_1= agrees with it for 34.
+- *281 in 2019-20 were split-offs* whose stray =clusterid= (=sdd_cluster= blank) is
+  in none of the 147 frame clusters, the 100 ids GH #323 stopped pooling.  Ruling
+  (@ligon, 2026-11-04): 238 now take the =clusterid= of the one frame household on
+  their =y4_hhid=, stamped =Tanzania::sample::split-off-parent-cluster=.  Each has
+  exactly one such household, and every one of those clusters is in
+  =cluster_features=.  The other 43 have none, keep the =v= they had and stay
+  unlabelled; they are not blanked.
+- *Why the frame household is the parent.*  =hh_a10= ("Is this household an original
+  household or a split-off?") reads ORIGINAL on exactly the 858 frame households and
+  SPLIT-OFF on exactly the 326; it is the direct statement of what =sdd_cluster=
+  being blank implies.  A member's =hh_b06= is found in the NPS4 roster of the
+  household's own =y4_hhid= for 350 of 350, against 198 of 350 for an unrelated
+  =y4_hhid= in the same cluster, and the stray id shares region and district with
+  the target for 238 of 238 (red team, 2026-11-04).  =sdd_hhid= beginning with
+  =y4_hhid= shows nothing: it does so for all 1,184.  Limits: the NPS4 head is with
+  the frame household for 210, in the split-off for 7, elsewhere for 4 and not found
+  for 17.  =updated_ids= links the split-off rather than the frame household for 13;
+  the lineage is the same, so =v= is unaffected.
+- *"The rule movers already follow" holds in kind, not degree.*  =v= now says where
+  the household's family was sampled, not where it lives.  61 of the 238 (25.6%)
+  live outside the region of the cluster they take, against 11 of the 858 frame
+  households (1.3%), or 9 of the 148 frame movers who report a location.  Own district
+  equals the parent's =t0_district= for 128 of 237 (frame: 167 of 216).
+- *=strataid= follows where people live, so =strata= does not follow =v=.*  Its region
+  equals own region for 300 of the 326 split-offs and for 8 of the 11 frame households
+  who left their region.  =strata=, =Rural= and the weights stay the household's own,
+  so 92 of the 238 sit in a cluster of another stratum.  Ids spanning more than one
+  =strata=, before -> after: the 147 frame clusters 67 -> 98, stray ids 49 of 100 -> 5
+  of 32, all 116 of 247 -> 103 of 179.  The total falls only because stray ids
+  disappear; among real clusters it rises.  Frame households alone span strata in 64
+  of 147 clusters, so it is not a new defect.
+- *The Stata labels name the two ids differently from how they are used.*
+  =clusterid= reads "Unique ID for sampling strata" and =sdd_cluster= "Unique ID for
+  first-stage sampling unit".  In the frame they pair one-to-one over 147 clusters,
+  so =v= = =clusterid= names the PSU there.  =sdd_cluster= is blank on every split-off.
+- *The other 45 split-offs carry an id that is also a frame cluster*, and do not
+  change.  For 31 it is their frame sibling's own cluster, so they are labelled as
+  any tracked household is.  The other 14 have no sibling, so that label rests on the
+  id alone.  Own region agrees with the served label for 29 of the 45.
+- *The guard.*  =derive_split_off_parent_cluster= refuses a split-off whose =y4_hhid=
+  has frame households in more than one cluster, raising =SplitOffClusterError=.  It
+  cannot fire today: 858 frame households sit on 858 distinct =y4_hhid=.  Injected in
+  a throwaway clone, nothing is served without =v=.  With =LSMS_BUILD_WORKERS=1= the
+  error reaches the caller.  With parallel workers it arrives as a =RuntimeError=
+  naming it, because a class in a by-path =mapping.py= does not pickle; the derived
+  tables then retry and end in "Could not materialize", which is loud but hides the
+  cause.  =Feature= drops the country with a warning.
+- *Measured cold against the same code without the two follow-ups:* exactly 238 =v=
+  change in =sample=, all 2019-20, and no other column or household.  17 other tables
+  carry the new =v= and are otherwise frame-equal, 5 have no =v= and are equal, and
+  =cluster_features= gains no row.  =sample(market='Region')= households with =m= NA
+  in 2019-20: 281 -> 43.  =check_panel_consistency=, grain reports and the
+  =ClusterIdentityWarning= text do not change.
+- *One served number moves.*  =food_expenditures(basis='total',
+  valuation='median_price')= reads =v= and, through it, =District= and =Region=, so
+  the 238's purchase rows enter new price cells at all three rungs.  897 rows change in
+  2019-20 (none purchased), 231 on the 238 and 666 on households that keep their =v=;
+  648 of those 666 move at the =District= or =Region= rung, not at =v=.  The median ratio
+  is 0.97, the 1st to 99th percentile 0.51 to 1.75, the extremes 0.46 and 2.29, and the
+  wave total falls 0.57% (-1.72% of imputed value, 89% of it on the 238).  8 rows fall
+  outside 0.5 to 2, all on the 238.  Pooling across places is real but bounded: had the
+  61 out-of-region households kept their old =v=, 326 rows on 203 other households
+  would not move (ratio median 1.04, range 0.76 to 1.40, +46k on a 52.2M wave).
+- *Clustered standard errors* (red team, 2026-11-04).  Clustering 2019-20 means on =v=
+  raises the SE by 2.6% to 6.8% on four outcomes, because G goes 247 -> 179.  Nothing
+  in core computes one.  =.coder/sampling/fingerprint.csv= still says 247 PSUs for
+  2019-20; nothing reads it.
+- The only route that would label the remaining 102 (59 + 43) without a new =v= is a
+  household-grain =Region= on =sample=, and =_add_market_index= prefers that column
+  for EVERY household, so populating it fully moves 1,366 labels (245 / 565 / 162 /
+  43 / 351 households whose own region differs from their cluster's, 2010-11 to
+  2020-21; measured before the rekey).  Not taken.  The 162 excludes the 59 (178
+  with them).  The 43 reads own region as =hh_a01_1= falling back to =t0_region= (32
+  on =hh_a01_1= alone).
 
 * Warm interview-date loss (GH #798, found 2026-10-15, FIXED 2026-10-17)
 

@@ -25,6 +25,11 @@ of 406, and filtered on region alone 403 of 409.
 =tests/test_gh1441_tanzania_district_code.py= recomputes =District=, =Source= and
 =Clusters= from the =.dta=.
 
+*Two 2010-11 clusters use a row through the id's digit, not a confirming household*
+(=4115002=, =10506001=), under their own key
+=Tanzania::cluster_features::upd-district-name-from-id-digit=.  See
+=_/_upd_district.py=.
+
 *Cell 95 is fragile.*  =MTWARA URBAN= wins 19 of 43, against 22 for =MTWARA
 MIKINDANI= plus =MIKINDANI=, and it is the only plurality that deduplicating
 households flips.  All three name one council, so this affects the name, not which

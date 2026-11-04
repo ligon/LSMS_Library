@@ -16,7 +16,8 @@ Tanzania::cluster_features::upd-district-name-from-round-3:
     2008-15/_/categorical_mapping.org), on every cluster-round with at least one
     household whose reported region and code match the cluster's own geocode: 409
     of 409 clusters in 2008-09, 406 of 409 in 2010-11.  The other three have no
-    such household, stay NA and carry no key.
+    such household and carry no key here; upd-district-name-from-id-digit names two
+    of them, and 19302076 stays NA.
   function: lsms_library.countries.Tanzania._._upd_district:derive_upd_district_name
   inputs: lsms_library.countries.Tanzania._._upd_district:inputs_upd_district_name
   raw_variables: [r_hhid, round, clusterid, ha_01_1, ha_02_1, ha_02_2]
@@ -43,5 +44,82 @@ Tanzania::cluster_features::upd-district-name-from-round-3:
         A cluster stays NA only with zero confirming households.  7 labelled
         2010-11 clusters have under half confirming; 19225003 passes on 1 of 10.
   validated_against: tests/test_gh1441_tanzania_district_code.py recomputes the table from upd4_hh_a.dta.
+  contents: 'Tanzania/_/CONTENTS.org, "District and Region labels for market= (GH #1441)"'
+  since: '2026-11-04'
+
+Tanzania::cluster_features::upd-district-name-from-id-digit:
+  waves: ['2010-11']
+  columns: [District]
+  rows: {v: ['4115002', '10506001']}
+  rule: >-
+    In 2010-11 every household of clusters 4115002 and 10506001 reports a district
+    code other than the digit in its own clusterid, so upd-district-name-from-round-3
+    leaves them NA.  Their District is the table upd_district_code's name for the
+    digit in the id: LUSHOTO and NAMTUMBO.  The two clusters are named, and this is
+    not a general rule: of the 8 clusters whose most common 2010-11 code differs from
+    their digit, the digit matches round 3's plurality in 5 and the reported code in
+    3.  19302076, the third NA cluster, stays NA because its neighbouring rounds
+    conflict.
+  function: lsms_library.countries.Tanzania._._upd_district:derive_upd_district_from_id_digit
+  inputs: lsms_library.countries.Tanzania._._upd_district:inputs_upd_district_name
+  raw_variables: [r_hhid, round, clusterid, ha_01_1, ha_02_1, ha_02_2]
+  assumptions:
+    - text: The reported code in 2010-11 is the error for these two clusters, not the id's digit.
+      basis: modelling-choice
+      evidence: >-
+        Both neighbouring rounds agree.  4115002: round 1 reports the digit (code 1,
+        8 of 8 households) and round 3 writes LUSHOTO for all 12 households still in
+        the region, under code 2 (round 4 writes LUSHOTO for 12 of 15, under code 1).
+        10506001: round 1 reports the digit (code 5, 8 of 8) and round 3 writes
+        NAMTUMBO for 5 of 8.  Ruling: @ligon, 2026-11-04.
+    - text: They are the same households across the rounds.
+      basis: modelling-choice
+      evidence: >-
+        The 2010-11 id is a 2008-09 id plus a two-digit suffix for 8 of 8 households in
+        both clusters (7 of the 8 2008-09 households in 10506001 have a descendant), and
+        the lines reaching round 3 stay in one cluster.
+  validated_against: tests/test_tanzania_1441_followups.py reads upd4_hh_a.dta directly.
+  contents: 'Tanzania/_/CONTENTS.org, "District and Region labels for market= (GH #1441)"'
+  since: '2026-11-04'
+
+Tanzania::sample::split-off-parent-cluster:
+  waves: ['2019-20']
+  columns: [v]
+  rule: >-
+    A split-off household (sdd_cluster blank) carries a clusterid that is not a
+    sampling cluster.  Where that clusterid is in none of the 147 frame clusters and
+    a frame household has the same y4_hhid, v = that household's clusterid: 238 of
+    the 281 such households, each with exactly one frame household on its y4_hhid.
+    The other 43 keep their clusterid and have no market label.  The 45 split-offs
+    whose clusterid is a frame cluster, and every frame household, are unchanged.
+    strata, Rural and the weights stay the household's own.
+  function: lsms_library.countries.Tanzania.2019-20._.mapping:derive_split_off_parent_cluster
+  inputs: lsms_library.countries.Tanzania.2019-20._.mapping:inputs_split_off_parent_cluster
+  raw_variables: [sdd_hhid, y4_hhid, clusterid, sdd_cluster]
+  assumptions:
+    - text: A frame household with the same y4_hhid continues the NPS4 household this split-off left.
+      basis: variable-label
+      evidence: >-
+        HH_SEC_A.dta: y4_hhid "NPS4 HHID", hh_a10 "Is this household an original
+        household or a split-off?", which reads ORIGINAL on exactly the 858 frame
+        households and SPLIT-OFF on exactly the 326.  Red team, 2026-11-04: a member's
+        hh_b06 is found in the NPS4 roster of the household's own y4_hhid for 350 of
+        350, against 198 of 350 for an unrelated y4_hhid in the same cluster; the stray
+        clusterid shares region and district with the target for 238 of 238 (a random
+        frame cluster matches 5).  Limits: the NPS4 head is with the frame household for
+        210, in the split-off for 7, elsewhere for 4 and not found for 17, and
+        updated_ids links the split-off rather than the frame household for 13.
+    - text: A split-off belongs to the sampling cluster of the household it left, as a tracked mover does.
+      basis: modelling-choice
+      evidence: >-
+        No document assigns a split-off a cluster.  The NPS carries a tracked
+        household's original cluster forward, and split-offs are tracked by the same
+        rule (2019-20 BID, p. 7).  This holds in kind, not degree: 61 of the 238 (25.6%)
+        live outside the region of the cluster they take, against 11 of the 858 frame
+        households (1.3%), and own district equals the parent's t0_district for 128 of
+        237.  strataid follows where people live, so strata does not follow v: 92 of the
+        238 sit in a cluster of another stratum, and frame clusters spanning more than
+        one strata go from 67 to 98 of 147.
+  validated_against: tests/test_tanzania_1441_followups.py reads HH_SEC_A.dta directly.
   contents: 'Tanzania/_/CONTENTS.org, "District and Region labels for market= (GH #1441)"'
   since: '2026-11-04'

@@ -99,11 +99,16 @@ assets:
         Purchase Price: hh_m03
 
 sample:
+    # GH #1441.  `_frame` and `_y4_hhid` are carried only so the df_edit hook can
+    # give a split-off with a stray `clusterid` its parent's cluster; both are
+    # dropped there.  See `derive_split_off_parent_cluster` in mapping.py.
     file: HH_SEC_A.dta
     idxvars:
         i: sdd_hhid
     myvars:
         v: clusterid
+        _frame: sdd_cluster
+        _y4_hhid: y4_hhid
         weight: sdd_weights  # panel-only wave; same variable for both
         panel_weight: sdd_weights
         strata: strataid
