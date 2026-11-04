@@ -160,9 +160,10 @@ class UnmatchedNoKgCellWarning(UserWarning):
     nothing -- so a misspelt item (``Eggs`` for ``Egg``) or unit used to be
     accepted silently, its only trace ``rows_matched: 0`` inside
     ``attrs['kg_factor_declared_none']`` (red team r3, R4).  This warning
-    names such cells.  It also fires, correctly, when the frame simply holds
-    no rows of the cell -- a call restricted to waves that lack it -- so read
-    it against the waves you asked for before editing the declaration.
+    names such cells.  It also fires, correctly, when a frame handed to the
+    transform simply holds no rows of the cell.  A ``Country`` request cannot
+    land there through ``waves=``: since GH #1487 the cell is judged against
+    every wave the estimator read, not the waves served.
 
     Carries ``country`` (from ``df.attrs``, may be ``None``) and ``cells``
     (the unmatched ``(item, unit)`` pairs, ``unit=None`` meaning every unit).
@@ -2007,6 +2008,19 @@ FOOD_KG_FACTOR_LAYERS = ('survey_kg', 'metric', 'item_unit',
                          'item_unit_tight', 'unit', 'none')
 
 
+def _served_rows(df, serve_waves):
+    """Row mask of *df* for a ``serve_waves=`` request, or ``None`` for every row.
+
+    GH #1487.  ``None`` both when nothing was asked for and when *df* has no
+    ``t`` level, which has nothing to filter on (the same pass-through as
+    ``Country._restrict_to_waves``).  Compares ``str(t)``, also as it does.
+    """
+    if serve_waves is None or 't' not in (df.index.names or []):
+        return None
+    want = {str(w) for w in serve_waves}
+    return np.asarray(df.index.get_level_values('t').astype(str).isin(want))
+
+
 def _declared_no_kg_mask(df, no_kg, item_col='j'):
     """Rows of *df* on a declared "no kg factor" cell (GH #1042).
 
@@ -2349,7 +2363,7 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                     min_baseline_tight=FOOD_KG_MIN_BASELINE_TIGHT,
                     tight_tolerance=FOOD_KG_TIGHT_TOLERANCE,
                     baseline_max_spread=FOOD_KG_BASELINE_MAX_SPREAD,
-                    no_kg=None):
+                    no_kg=None, serve_waves=None):
     """Per-ROW kg-per-unit for a ``food_acquired`` frame, with provenance.
 
     The food twin of :func:`harvest_kg_factors`, and deliberately the same
@@ -2394,11 +2408,18 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
         (read at read time by ``Country._no_kg_factor_cells``).  A declared
         cell that matches no row emits :class:`UnmatchedNoKgCellWarning`
         (a misspelt label, or a frame without such rows).
+    serve_waves : collection of wave labels, optional
+        Estimate from EVERY row of *df*, return only the rows whose ``t`` is
+        listed (GH #1487), so a request for some waves is a slice of the
+        request for all of them.  The cells and baselines read all of *df*;
+        the returned frame, its ``attrs`` and the row-level warnings describe
+        the served rows alone.  ``None`` serves every row.
 
     Returns
     -------
     pandas.DataFrame
-        Indexed like *df*, with columns ``kg_per_unit``, ``KgFactorSource``,
+        Indexed like *df* (like the served rows of *df*, under
+        ``serve_waves``), with columns ``kg_per_unit``, ``KgFactorSource``,
         ``kg_survey``, ``kg_metric``, ``kg_item_unit``, ``kg_item_n_waves``,
         ``kg_item_wave_spread``, ``baseline_refused_spread``, ``kg_size_pooled``
         and ``kg_unit``.
@@ -2431,6 +2452,10 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
     factor is one number per ``(j, u)`` with no wave condition, not because the
     EHCVM row lacks a size; :data:`_UNIT_SIZE_WORDS` has the measurement.  Every
     other label is its own cell and no second estimate is made.
+
+    ONE NUMBER PER ``(j, u)`` OF THE FRAME.  So it is one number per country only
+    if the frame holds the whole country, which is what ``serve_waves`` is for
+    (GH #1487): ``Country`` passes every wave and names the ones it serves.
 
     WHAT THIS DOES NOT FIX, stated where a user will meet it.  The only
     external answer key the corpus has for a food unit is Mali's own
@@ -2485,6 +2510,23 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                                     group_levels, item_col, gates, infer)
         for name in _KG_RUNG_ARRAYS:
             rungs[name] = np.where(size_pool_rows, pooled[name], rungs[name])
+    # GH #1487: the estimators above read every row; everything below reads the
+    # rows a ``serve_waves=`` request serves, so the frame, the partition, the
+    # other attrs and the row-level warnings all describe those rows.  What an
+    # inference says about a label the request does not serve is not reported
+    # (the warning's count of contradicting item cells still covers every cell
+    # read); a declared no-kg cell is judged against the rows the estimators read.
+    keep = _served_rows(df, serve_waves)
+    evidence = df
+    if keep is not None:
+        served_labels = set(np.asarray(units)[keep])
+        rungs['contradicting'] = {k: v for k, v in rungs['contradicting'].items()
+                                  if k in served_labels}
+        for name in _KG_RUNG_ARRAYS:
+            rungs[name] = rungs[name][keep]
+        kg_metric = kg_metric[keep]
+        size_pool_rows = size_pool_rows[keep]
+        df = df[keep]
     kg_item = rungs['kg_item']
     kg_tight = rungs['kg_tight']
     kg_waves = rungs['kg_waves']
@@ -2560,8 +2602,10 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
     # ``metric``, and loses every INFERRED candidate.
     no_kg = tuple((item, unit) for item, unit in (no_kg or ()))
     declared, declared_cells = _declared_no_kg_mask(df, no_kg, item_col)
+    read_cells = (declared_cells if keep is None
+                  else _declared_no_kg_mask(evidence, no_kg, item_col)[1])
     unmatched = [c for c in dict.fromkeys(no_kg)
-                 if c not in declared_cells or not declared_cells[c].any()]
+                 if c not in read_cells or not read_cells[c].any()]
     if unmatched:
         country = df.attrs.get('country')
         where = f"{country}: " if country else ""
@@ -3348,7 +3392,7 @@ def food_expenditures_from_acquired(df, basis='purchased', *,
 
 
 def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_kg=None,
-                                  no_kg=None):
+                                  no_kg=None, serve_waves=None):
     """Derive food quantities from food_acquired.
 
     Parameters
@@ -3371,6 +3415,10 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
           ``df.xs('kg', level='u')``.
         - ``'units'``: sum native ``Quantity`` per ``(t, v, i, j, u, s)``,
           no kg conversion attempted.
+    serve_waves : collection of wave labels, optional
+        Serve only these waves of *df* while the kg factors read all of it
+        (GH #1487; see :func:`food_kg_factors`).  ``Country.food_quantities``
+        passes it for a ``waves=`` subset, with every wave in *df*.
 
     Returns
     -------
@@ -3402,6 +3450,10 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
     df = _normalize_columns(df)
     if 'Quantity' not in df.columns:
         raise ValueError("food_acquired must have a 'Quantity' column")
+    evidence = df
+    keep = _served_rows(df, serve_waves)
+    if keep is not None:
+        df = df[keep]
 
     idx_names = list(df.index.names)
     if 'u' not in idx_names:
@@ -3423,8 +3475,8 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
         return q
 
     # units == 'kgs': carry rule
-    kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg,
-                              no_kg=no_kg)
+    kgf = food_kg_factors(evidence, volume_as_mass=volume_as_mass, unit_kg=unit_kg,
+                          no_kg=no_kg, serve_waves=serve_waves)
     v = _apply_kg_conversion(df, kgf['kg_per_unit'])
 
     # Per-row: where Quantity_kg is non-NaN, use it and tag u='kg';
@@ -3468,7 +3520,7 @@ def food_quantities_from_acquired(df, units='kgs', *, volume_as_mass=True, unit_
 
 
 def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_kg=None,
-                              no_kg=None):
+                              no_kg=None, serve_waves=None):
     """Derive food prices from food_acquired.
 
     Returned at the canonical ``(t, i, j, u, s)`` grain (``v`` is omitted
@@ -3526,6 +3578,11 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
         88.5% of comparable rows.
 
         See ``slurm_logs/DESIGN_food_prices_units_kwarg_2026-05-06.org``.
+    serve_waves : collection of wave labels, optional
+        Serve only these waves of *df* while the kg factors read all of it
+        (GH #1487; see :func:`food_kg_factors`).  ``Country.food_prices``
+        passes it for a ``waves=`` subset in the ``kg*`` modes, with every
+        wave in *df*.
 
     Raises
     ------
@@ -3591,10 +3648,15 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
             # of rows, and Feature concatenated the empties silently.
             raise UnitsUnavailableError(units=units, missing=['Price'])
 
+    evidence = df
+    keep = _served_rows(df, serve_waves)
+    if keep is not None:
+        df = df[keep]
+
     kgf = None
     if units == 'kgvalue':
-        kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg,
-                              no_kg=no_kg)
+        kgf = food_kg_factors(evidence, volume_as_mass=volume_as_mass, unit_kg=unit_kg,
+                              no_kg=no_kg, serve_waves=serve_waves)
         v = _apply_kg_conversion(df, kgf['kg_per_unit'])
         with np.errstate(divide='ignore', invalid='ignore'):
             v = v.assign(Price=v['Expenditure'] / v['Quantity_kg'])
@@ -3610,8 +3672,8 @@ def food_prices_from_acquired(df, units='kgvalue', *, volume_as_mass=True, unit_
             # (GH #850): before that, this branch mapped ``u -> factor``
             # through an independent dict, so the two branches could
             # disagree on a row.
-            kgf = food_kg_factors(df, volume_as_mass=volume_as_mass, unit_kg=unit_kg,
-                              no_kg=no_kg)
+            kgf = food_kg_factors(evidence, volume_as_mass=volume_as_mass, unit_kg=unit_kg,
+                                  no_kg=no_kg, serve_waves=serve_waves)
             kg_per_unit = pd.Series(_as_float(kgf['kg_per_unit']),
                                     index=df.index)
             with np.errstate(divide='ignore', invalid='ignore'):
