@@ -2325,6 +2325,8 @@ the same 46,376 keyed-equal rows with 22,516 positions in a different order.
   991, =na= 42) is a 2021-22 product-state field on the harvest line -- the
   canonical =condition= axis.  NOT served; it separates only a minority of the
   repeats (1,856 -> 1,817 duplicated rows on the key plus it).  Open.
+  [2026-11-03, GH #1436: now served, see "crop_production: the condition level"
+  below.  It is a level of its own and does not replace =production_obs=.]
 - *38 s16c rows are byte-identical to another row on all 24 columns* (35
   groups, not contiguous: 3 to 884 rows apart; 69 of the 73 carry a positive
   quantity).  Both copies are served, as the canonical axis's contract says
@@ -2356,3 +2358,176 @@ Pinned by =tests/test_niger_crop_production_observations.py=.
 
 *Cache.*  =niger.py= and =data_scheme.yml= are in every Niger table's hash:
 one Niger re-warm (no census run).
+
+* 2026-11-03 -- crop_production: the condition level (GH #1436)
+
+=crop_production= is now indexed =(t, i, plot_id, crop, u, condition,
+production_obs)=, Malawi's order.  =condition= is the state of the crop when the
+harvest =Quantity= was measured.
+
+| wave    | source                 | answers (rows of the source)                                                                  |
+|---------+------------------------+-----------------------------------------------------------------------------------------------|
+| 2011-12 | none                   | section 2E asks 2E.7a quantity, 2E.7b unit, 2E.7c kg; no state                                |
+| 2014-15 | none                   | section 2E asks 2E.7a-c as above and 2E.7d harvest finished; no state                         |
+| 2018-19 | =s16cq12c=             | 1 Epis 6,482; 2 Grain 3,715; 3 Décortiqué 1,763; 4 Non-décortiqué 904; 5 Non concerné 412     |
+| 2021-22 | =s16cq16d=             | 1 =épis/coques,= 6,120; 2 Grains 5,780; 3 na 42                                               |
+
+*Idiosyncrasies this rests on.*
+- *The two EHCVM code lists collide:* 3 is Décortiqué in 2018-19 and =na= in
+  2021-22.  So there are two code-keyed tables
+  (=harmonize_crop_condition_ehcvm1= / =_ehcvm2=, the =harmonize_species_*= shape),
+  and each wave script names its own.  One table would have served 2018-19's
+  hulled grain as =shell_not_applicable= with no error.
+- *Code 5 of 2018-19 has two labels.*  The =.dta= says =Non concerné=; the EHCVM
+  household questionnaire held under =2018-19/Documentation/= says =Entier=
+  ("1 = épis, 2 = grain, 3 = décortiqué, 4 = non-décortiqué, 5 = Entier").  That
+  =.xls= is the unadapted regional template ("REPUBLIQUE [NOM DU PAYS]"), so the
+  =.dta= is the better witness for Niger.  Both describe the crops carrying the
+  code (Oignon 101, Gombo 71, Oseille 57, Autre 36, Tomate 31, Manioc 18), and
+  both land on =shell_not_applicable=.  2021-22's =na= is the same crops.
+- *The state is blank exactly where the unit is*, in both EHCVM files: 443 rows
+  in 2018-19 (the DDI splits them 439 system-missing, 4 =.A=; 2 carry no measure
+  at all and =_finalize_result= drops them) and 991 of the lines naming a crop in
+  2021-22.  Those are the =unknown_condition= rows, so the sentinel adds no new
+  kind of hole; 4 of them report a positive quantity, all in 2018-19.
+- *=u= already half-encodes the state.*  =Botte= is on the ear on 5,607 of 5,666
+  rows in 2018-19 and 4,759 of 4,773 in 2021-22, =Panier= on 596 of 619 in
+  2021-22, and =Tiya= is grain on 3,874 of 4,167 and 4,115 of 4,402.  The state
+  is new information mainly for the sacks: =Gros sac= 815 =shelled= / 579
+  =unshelled= in 2018-19, =Sac de 100 kg= 803 / 428 in 2021-22.
+
+*DECISION, named, and open to a ruling: 2018-19's five answers fold to three.*
+Décortiqué -> =shelled=, Non-décortiqué -> =unshelled= and code 5 ->
+=shell_not_applicable= are direct.  Epis and Grain have no token of their own:
+the vocabulary's bare form tokens are Malawi's, and =*_in_cob= / =*_grain= assert
+a dryness this instrument never asks.  They are served as =unshelled= (Epis) and
+=shelled= (Grain) because:
+- the programme's own 2021-22 instrument folds exactly so: harvest =épis/coques= |
+  =Grains= | =na=, and on the sale side =épis/coques/panicules= | =grains= | =na=.
+  That answer cannot be split back, so a 2021-22 row has no other home;
+- the crops line up across the fold (share of the two-way class that is
+  =unshelled=, 2018-19 / 2021-22): Mil 85% / 76%, Sorgho 79% / 64%, Arachide 81%
+  / 78%, Riz Paddy 82% / 78%, Niébé 7% / 5%, Sésame 3% / 4%;
+- within a crop the two =unshelled= answers barely overlap (Mil 4,405 Epis, 12
+  Non-décortiqué; Arachide 2 and 518);
+- 2018-19 sale prices treat Grain and Décortiqué as one state for most cells
+  (median FCFA per Tia: Niébé 600 and 600, n 586 / 543; Sésame 972 and 971; per
+  Gros sac: Mil 20,000 and 20,000, Niébé 26,250 and 25,000), while
+  Non-décortiqué sells at about half (Arachide per Tia 400, against Décortiqué
+  816 and Grain 946).  2021-22 sells =grains= above =épis/coques/panicules= per
+  kilogram: Arachide 400 / 188, Riz Paddy 296 / 193, Mil 240 / 200, Niébé 320 / 267.
+Not every cell agrees: Niébé per =Sac Moyen= is Décortiqué 13,000, Grain 17,000
+(n 64 / 69), Arachide per =Gros sac= 20,000 and 10,000 (n 15 / 15).
+
+What the fold loses: the 2018-19 answer's distinction, on all 12,864 lines that
+answer it.  It costs no collision, because the wave's (plot, crop, unit) key is
+unique without this level.  The raw answer is one =s16cq12c= away.  Reversing it
+means new bare tokens in =lsms_library/data_info.yml= and two table rows here,
+one Niger re-warm.
+
+*Measured, cold, private roots, default backend* (before = development
+=98c6069d2=, after = =f36c91a00=).  Served level, rows:
+
+| wave    | =unshelled= | =shelled= | =shell_not_applicable= | =unknown_condition= |
+|---------+-------------+-----------+------------------------+---------------------|
+| 2011-12 |             |           |                        |              11,967 |
+| 2014-15 |             |           |                        |               8,799 |
+| 2018-19 |       7,386 |     5,478 |                    412 |                 441 |
+| 2021-22 |       6,120 |     5,780 |                     42 |                 991 |
+
+Nothing else moves.  The frame is identical apart from the level (47,416 rows,
+sha256 of every other column and level equal per wave); =harvest_kg= is identical
+(595,825.5 / 820,968.1 / 36,695 / 814,859 kg per wave, byte-equal output); the
+=KgFactorSource= counts are identical (=metric= 1,885 / 1,093 / 36 / 2,144,
+=none= 10,082 / 7,706 / 13,681 / 10,789); Site Q is identical (1 report, 2018-19,
+same offender); no grain warning before or after.  Default and Make are strictly
+equal, attrs and level domains included.  =Feature('crop_production')= used to
+fill all 47,416 Niger rows with the sentinel; it now carries 22,198
+=unknown_condition=, 13,506 =unshelled=, 11,258 =shelled=, 454
+=shell_not_applicable=.
+
+*Serving the level does not stop =harvest_kg= summing across it, and the issue's
+wording suggested it might.*  =transformations.harvest_kg= groups to
+=(t, i, plot_id, j)= and sums every other level, =condition= included, in every
+country.  Niger's exposure at that grain is small: 53 plot-crops hold two states,
+all in 2021-22, 3,120 of 814,859 kg.  A household-crop holds two states 145 times
+in 2018-19 and 104 in 2021-22, and the wave total is what really mixes them:
+2021-22 serves 444,917 kg =shelled= + 358,142 =unshelled= + 11,800 not applicable.
+The ladder is unmoved because its only condition-aware rungs are =survey_median=
+(no =KgFactor= to take a median of) and =shipped= (no table); Site Q's cells are
+=(t,u,j)= -> =(t,u)= -> =(t)=.  =metric= reads a 100 kg sack as 100 kg in either
+state, which the survey's own kilograms dispute; see the next section.
+
+*Not done.*  =Condition_sold= (2018-19 =s16cq16c=, 2021-22 =s16dq05d=) is a
+separate answer and stays unwired.  Burkina Faso and Mali carry the same field
+unserved.
+
+*Cache.*  =niger.py=, =data_scheme.yml= and =categorical_mapping.org= are whole-file
+inputs: all 19 probed Niger hashes move (one Niger re-warm), 0 of 22 Malawi, 0 of
+24 Uganda, 0 of 6 =build_transforms_fingerprint= values.  Pinned by
+=tests/test_niger_crop_production_condition.py=.
+
+* 2026-11-03 -- crop_production: the survey's harvest kilograms are TOTALS, and unwired (GH #1436)
+
+Three waves write the harvest in kilograms beside the native unit, and nothing
+reads it: 2011-12 =as02eq07c= ("quantité en kgs récoltée"), 2014-15 =AS02EQ07C=
+("Quantité en Kgs récoltée"), 2021-22 =s16cq16c= ("Estimation Quantité totale UML
+en kg").  2018-19 has no such column: its =s16cq16c= is the sold state.
+
+*Each is a TOTAL for the line, not a factor per unit, on every test.*  The two
+ECVMA questionnaires lay out 2E.7a quantity, 2E.7b unit, 2E.7c quantity in kg.  On
+rows in the =Kg= unit with quantity other than 1, kg equals the quantity on 1,381
+of 1,383 / 71 of 73 / 138 of 146 rows and equals 1 on none, the test that split
+Mali's tree "Equivalent en Kg" (a factor on some rows, a total on others).  For
+stated sacks at quantity >= 2, kg/q sits within 20% of the size and kg itself
+rarely does (=Sac de 50 kg= 125 vs 7 / 184 vs 8 / 433 vs 6; =Sac de 100 kg= 64 vs
+10 / 196 vs 33 / 740 vs 20; the rest match neither: 79 / 67 / 17 and 38 / 105 /
+168).  =Tiya=, =Botte= and =Panier= agree.
+
+*Why it is unwired: the slot is the wrong shape.*  The issue called this the
+=survey_kg= rung of =KgFactor=.  =survey_kg= is on the FOOD ladder
+(=FOOD_KG_FACTOR_LAYERS=) and consumes =Quantity_kg=; the crop ladder
+(=KG_FACTOR_LAYERS=) has =reported=, which reads =KgFactor=, and the canonical note
+says of that column "REPORTED, NEVER CONSTRUCTED ... Only a number the instrument
+wrote down ON THIS ROW", and "A FACTOR HERE, A PRODUCT IN =food_acquired=".
+Niger's instrument has the food shape.  The choice is a contract question, filed
+as a decision memo on the issue.
+
+*What wiring would do (read-only simulation, =KgFactor = kg / Quantity=, on the cold
+=f36c91a00= frame; nothing is served).*
+
+| wave    | rows, q > 0 | kg offered | =harvest_kg= now | simulated | =none= on q > 0, now -> simulated |
+|---------+-------------+------------+------------------+-----------+-----------------------------------|
+| 2011-12 |       8,822 |      8,822 |          595,826 | 1,576,548 | 6,937 -> 0                        |
+| 2014-15 |       8,426 |      8,325 |          820,968 | 2,469,889 | 7,333 -> 0                        |
+| 2018-19 |      13,280 |          0 |           36,695 |    36,695 | 13,244 -> 13,244                  |
+| 2021-22 |      11,942 |     11,942 |          814,859 | 2,912,192 | 9,798 -> 0                        |
+
+Today =Botte=, =Tiya= and =Panier= have no factor at all, so =harvest_kg= counts
+sacks and kilograms only: 37,312 of 42,470 positive-quantity rows contribute
+nothing.  Where both exist the survey disputes the sack's nominal weight: 1,063 of
+5,079 rows differ from =metric= by more than 10%, =Sac de 100 kg= falls 293,400 ->
+179,295 kg in 2014-15 and 672,170 -> 577,008 in 2021-22, and in 2021-22 an
+=unshelled= 100 kg sack has p10 30 kg against =shelled='s 95.
+
+*What a wiring must handle.*  The =999999= don't-know code sits on these columns
+too (11 rows 2011-12; 23 rows 2014-15, where the quantity code is 9999) and needs
+its own exact mask.  2014-15 has 101 lines with quantity > 0 and kg 0 (not recorded,
+as for Uganda's factor).  One 2014-15 =Unité= line carries 999,998 kg, not the code
+and not plausible: the existing screen rejects it (31 rows rejected over the three
+waves), and it is the main reason 2014-15's simulated total sits 977,451 kg below
+the column's sum.  =Sac de 100 kg= at exactly 25 kg per sack on 83 2014-15 rows (Niébé 60, Arachide
+18) scales with quantity, so it is a total on a light sack, not a factor.  2021-22
+is labelled an ESTIMATE and looks like a conversion rather than a weighing (=Tiya=
+is exactly 2.5 on 2,881 of 4,402 rows, 3.0 on 923).  The sibling columns are the
+same question: =AS02EQ110E= (crop total, 2014-15) and the sold kg =as02eq12c=,
+=AS02EQ12C=, =s16dq05c=.
+
+* 2026-11-03 -- plot_inputs: the ECVMA collapse is gone (GH #1360 residual)
+
+The "ECVMA recorded input slots" candidate above landed: at development
+=98c6069d2= both wave frames are unique on the declared index (8,538 / 8,179 lines,
+all =slot:= tokens) and =Country('Niger').plot_inputs()= serves 42,553 rows with no
+=GrainCollapseWarning=.  Without =input_obs= the old collisions reappear exactly
+(67 groups / 140 rows, 39 / 84).  So a level fixed it, as #323 says it should, and
+the statement on #1360 that these two cells "still collapse" is stale.
