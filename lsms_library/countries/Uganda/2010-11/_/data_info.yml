@@ -53,6 +53,10 @@ sample:
             v:
                 - comm
                 - mappings: comm_frame_ea
+            # The design PSU, on one label across all eight waves (GH #1459).
+            ea:
+                - comm
+                - mappings: comm_ea
             weight: wgt10
             panel_weight: wgt10  # pre-refreshment — same as cross-sectional
             strata: stratum

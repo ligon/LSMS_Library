@@ -9,8 +9,8 @@ carried with it when it moves:
   records takes ``AGSEC1.ea`` (ruling 2026-11-04).
 * 2018-19: the 2015-16 ``ea`` of the household ``GSEC1.t0_hhid`` names, on either cover.
 * 2019-20: the same, through ``gsec1.hhidold`` -> 2018-19 ``GSEC1.hhid``.
-* No route: NA.  ``AGSEC1.t0_hhid`` is not a route.  2005-06 to 2011-12: NA here
-  (``v`` is the EA there).
+* No route: NA.  ``AGSEC1.t0_hhid`` is not a route.  2005-06 to 2011-12: from
+  ``comm``, ``tests/test_gh1459_uganda_early_ea.py``.
 
 The oracle reads the source files directly and imports nothing from
 ``Uganda/_/``, so it cannot agree with the implementation by sharing its code.
@@ -89,8 +89,10 @@ class TestDeclarations:
         assert "'ea'" not in text
 
     @pytest.mark.parametrize("wave", EARLY_WAVES)
-    def test_early_waves_declare_no_ea(self, wave):
-        assert "'ea'" not in repr(_info(wave)["sample"])
+    def test_early_waves_read_ea_from_comm_and_no_column_named_ea(self, wave):
+        """Re-pinned for GH #1459, which fills these waves through ``comm_ea``."""
+        assert _info(wave)["sample"]["locating_cover"]["myvars"]["ea"] == [
+            "comm", {"mappings": "comm_ea"}]
 
     def test_the_alternate_cover_supplies_ea_on_sample_only(self):
         info = _info("2015-16")
@@ -287,9 +289,11 @@ class TestServedAgainstTheSourceFiles:
             ea = sample.xs(wave, level="t")["ea"]
             assert (ea.notna().sum(), ea.nunique(), len(ea)) == (filled, labels, rows), wave
 
-    @pytest.mark.parametrize("wave", EARLY_WAVES)
-    def test_early_waves_stay_na(self, sample, wave):
-        assert sample.xs(wave, level="t")["ea"].isna().all()
+    @pytest.mark.parametrize("wave, filled", [("2005-06", 3123), ("2009-10", 2410),
+                                              ("2010-11", 2715), ("2011-12", 2850)])
+    def test_early_waves_are_filled_from_comm(self, sample, wave, filled):
+        """Re-pinned for GH #1459: they stayed NA here until that ruling."""
+        assert sample.xs(wave, level="t")["ea"].notna().sum() == filled
 
     @pytest.mark.parametrize("wave", DIRECT_WAVES + INHERITED_WAVES)
     def test_served_equals_the_rule(self, served, oracle, wave):

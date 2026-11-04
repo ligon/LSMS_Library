@@ -125,6 +125,41 @@ def comm_frame_ea(value):
     return _comm_frame_ea_map().get(code, code)
 
 
+@functools.lru_cache(maxsize=None)
+def _comm_ea_map():
+    """``{8-digit frame EA: ea}`` from the reviewed ``comm_ea`` table (GH #1459)."""
+    from pathlib import Path
+    from lsms_library.local_tools import get_categorical_mapping
+
+    raw = get_categorical_mapping(tablename='comm_ea', idxvars='comm8',
+                                  dirs=[str(Path(__file__).resolve().parent)],
+                                  ea='ea')
+    return {format_id(k): format_id(e) for k, e in raw.items()}
+
+
+def comm_ea(value):
+    """An early wave's ``comm`` as the design-PSU label ``ea`` (GH #1459).
+
+    Declared in ``data_info.yml`` as ``ea: [comm, {mappings: comm_ea}]`` on
+    ``sample`` in 2005-06 to 2011-12, where ``v`` is the frame EA under ``comm``.
+
+    * A frame EA the survey later numbers (212 of 322) serves that number, through
+      the reviewed ``comm_ea`` table.
+    * A frame EA rotated out before it could be numbered (110) serves its own
+      8-digit ``comm``, which cannot collide with the labels 1-430.
+    * Anything else is ``None``: a blank ``comm`` (2009-10's movers, split-offs and
+      no-location households) and a code that is not 8 digits (2010-11's ``1530040``,
+      which ``comm_frame_ea`` serves as it stands).
+
+    Like ``comm_frame_ea`` it takes a one-column row or a scalar, and it starts from
+    ``comm_frame_ea``, because 2009-10 and 2010-11 write ``comm`` in 7 characters.
+    """
+    frame_ea = comm_frame_ea(value)
+    if frame_ea is None or len(frame_ea) != 8 or not frame_ea.isdigit():
+        return None
+    return _comm_ea_map().get(frame_ea, frame_ea)
+
+
 # ---------------------------------------------------------------------------
 # GH #323 -- country-level df_edit hooks.
 #
@@ -628,6 +663,53 @@ def origin_ea(df):
     return out.set_index(['t', 'i'])
 
 
+#: The waves whose ``ea`` comes from ``comm`` (GH #1459).
+_EA_COMM_WAVES = ('2005-06', '2009-10', '2010-11', '2011-12')
+#: A row whose ``comm`` the survey later numbers, and a row whose ``comm`` it does not.
+_EA_LINKED_KEY = 'Uganda::sample::ea-comm-link'
+_EA_OWN_COMM_KEY = 'Uganda::sample::ea-own-comm'
+
+
+def derive_comm_ea(inputs):
+    """``ea`` of an early-wave household from its raw ``comm`` (GH #1459)."""
+    return inputs['comm'].map(comm_ea).rename('ea')
+
+
+def _inputs_comm_ea(wave, linked):
+    """Raw ``HHID`` and ``comm`` of one branch of ``comm_ea``, by original names."""
+    if wave not in _EA_COMM_WAVES:
+        raise ValueError(f'Uganda comm_ea: {wave} takes no ea from comm (GH #1459)')
+    raw = _uganda_cover(f'{wave}/Data/GSEC1.dta')[['HHID', 'comm']]
+    ea = derive_comm_ea(raw)
+    on_table = ea.isin(set(_comm_ea_map().values()))
+    out = raw.loc[ea.notna() & (on_table if linked else ~on_table)]
+    return out.assign(t=wave, i=out['HHID'].map(format_id)).set_index(['t', 'i'])
+
+
+def inputs_ea_comm_link(wave):
+    """Households whose ``comm`` is one of the 212 the survey later numbers."""
+    return _inputs_comm_ea(wave, linked=True)
+
+
+def inputs_ea_own_comm(wave):
+    """Households whose ``comm`` is one of the 110 rotated out before that."""
+    return _inputs_comm_ea(wave, linked=False)
+
+
+def _mark_comm_ea(flat):
+    """Stamp each branch of an early wave's ``ea``, so the path taken is countable."""
+    if 't' not in flat.columns or 'ea' not in flat.columns:
+        return flat
+    filled = flat['t'].isin(_EA_COMM_WAVES) & flat['ea'].notna()
+    if filled.any():
+        on_table = flat['ea'].isin(set(_comm_ea_map().values()))
+        for mask, key in ((filled & on_table, _EA_LINKED_KEY),
+                          (filled & ~on_table, _EA_OWN_COMM_KEY)):
+            if mask.any():
+                flat = _add_derivation(flat, mask, key)
+    return flat
+
+
 def _add_derivation(flat, mask, key):
     """Stamp ``key`` on ``mask``; a row already carrying a key carries both."""
     from lsms_library.derivations import union_keys
@@ -648,7 +730,8 @@ def sample(df):
        PROVED before they are dropped -- a household whose repeats differ
        raises rather than letting a reducer pick one.
     3. Give every household with no ``v`` its singleton (D2).
-    4. Disclose an inherited ``ea`` on the rows that received one (GH #689).
+    4. Disclose an inherited ``ea`` on the rows that received one (GH #689), and
+       an early wave's ``ea`` by the branch that gave it (GH #1459).
     """
     idx = [n for n in df.index.names if n is not None]
     flat = _adopt_alternate_cover(df.reset_index())
@@ -670,6 +753,7 @@ def sample(df):
     if _EA_INHERITED_MARKER in flat.columns:
         inherited = flat.pop(_EA_INHERITED_MARKER).notna()
         flat = _add_derivation(flat, inherited, _EA_INHERITED_KEY)
+    flat = _mark_comm_ea(flat)
     return flat.set_index(idx) if idx else flat
 
 

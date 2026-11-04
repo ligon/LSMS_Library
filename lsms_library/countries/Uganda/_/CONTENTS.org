@@ -76,6 +76,10 @@ standard error on =ea=; locate a household with =v=.
 
 | wave    | source of =ea=                                         | non-null / rows | distinct |
 |---------+--------------------------------------------------------+-----------------+----------|
+| 2005-06 | =comm=, through =comm_ea= (GH #1459, below)            | 3,123 / 3,123   |      322 |
+| 2009-10 | the same                                               | 2,410 / 2,979   |      317 |
+| 2010-11 | the same                                               | 2,715 / 2,716   |      321 |
+| 2011-12 | the same                                               | 2,850 / 2,907   |      321 |
 | 2013-14 | =GSEC1.ea=, direct                                     | 3,119 / 3,119   |      317 |
 | 2015-16 | =gsec1.ea=, direct; =AGSEC1.ea= for the 72 only it records | 3,377 / 3,377 |   316 |
 | 2018-19 | =GSEC1.t0_hhid= -> 2015-16 =HHID= -> =ea=              | 3,027 / 3,242   |      315 |
@@ -83,9 +87,7 @@ standard error on =ea=; locate a household with =v=.
 
 The two inherited waves carry =Derivation= =Uganda::sample::ea-tracking-key=, on
 exactly the rows that received a value, and the 72 of 2015-16 carry
-=Uganda::sample::agriculture-cover=, as they did for =v=.  2005-06 to 2011-12 stay NA here: =v= is
-already the EA there, under =comm= labels, and a single label across all eight
-waves is GH #1459.
+=Uganda::sample::agriculture-cover=, as they did for =v=.
 
 *What the inheritance does NOT rest on: =ea= being unchanged across waves.*  All
 2,872 households linked 2013-14 -> 2015-16 keep =ea=, 316 labels one-to-one, but
@@ -210,12 +212,57 @@ size of the design effect, and it does not show that the inheritance is correct.
 =market='ea'= raises =KeyError= from =cluster_features=.  It was not asked for, and a
 market is a place, which =ea= is not.
 
+**** One label across all eight waves (GH #1459)
+
+/Ruling @ligon, 2026-11-04./  In 2005-06 to 2011-12 =v= already is the EA, under =comm=,
+so no one label named a PSU across the panel.  =sample.ea= now fills those waves through
+a reviewed table, =comm_ea= in =categorical_mapping.org=, read by =uganda.comm_ea=:
+
+- A =comm= one of the 212 the survey later numbers takes that number.  The pairs are
+  =GSEC1.ea= (2013-14) against =GSEC1.comm= (2011-12), linked by =HHID_old=, 1,717
+  households, one to one.  Stamped =Uganda::sample::ea-comm-link=.
+- The other 110 of the 322 frame EAs rotated out before any household could link them.
+  Each takes its own 8-digit =comm=.  Stamped =Uganda::sample::ea-own-comm=.
+- A blank =comm= stays NA, as does a code that is not 8 digits: 2009-10's 541 =@lat,lon=
+  bins and 28 =unlocated-= households, 2010-11's one =1530040=, 2011-12's 57.  A bin is
+  not an EA.
+
+A table and not a read of the 2011-12 and 2013-14 covers, for the same reason as
+=comm_frame_ea=: it adds no source to =sample= in four more waves, where a lost remote
+already raises in two (GH #1463).  =tests/test_gh1459_uganda_early_ea.py= re-derives it
+from the raw covers.
+
+| wave    | numbered rows / EAs | own =comm= rows / EAs |    NA |
+|---------+---------------------+-----------------------+-------|
+| 2005-06 | 2,066 / 212         | 1,057 / 110           |     0 |
+| 2009-10 | 1,612 / 210         |   798 / 107           |   569 |
+| 2010-11 | 1,802 / 212         |   913 / 109           |     1 |
+| 2011-12 | 1,917 / 212         |   933 / 109           |    57 |
+
+*Two kinds of label in one column, and why it is left that way.*  The ruling allowed a
+new column if mixing looked wrong on the numbers, and it does not.  Across all eight
+waves =ea= holds 427 labels: 212 panel EAs that appear both early and late, 110 that
+appear only early, and 105 refresh EAs (324-430) that appear only late.  No 8-digit label
+appears after 2011-12 and none collides with 1-430, so =groupby('ea')= gives one group
+per PSU.  Every household linked across a boundary keeps =ea= on all seven: 2,410 of
+2,410, 2,207 of 2,207, 2,510 of 2,510, 1,717 of 1,717, 2,872 of 2,872, 3,022 of 3,022 and
+2,868 of 2,868.  (Only the first three test anything.  The other four cannot come out
+otherwise: the table's construction, UBOS's encoding above, and twice a walked id and an
+inherited =ea= that follow one tracking key.)  A second column would split the one thing
+the column is for.  The column is a label: its form and its numeric order mean nothing,
+and =ea= stays a =str=.
+
+*=ea= is the rank of =comm=.*  /New, 2026-11-04./  Sort the 322 frame EAs of 2005-06 by
+=comm= and number them from 1: that number is =ea= on all 212 rows of the table, and
+the 110 numbers in 1-322 no later household carries are exactly the ranks of the other
+110.  No document states it.  It reads no household, so it is independent evidence that
+the pairing is right; =tests/test_gh1459_uganda_early_ea.py= pins it.  It also means the
+110 could carry a number and the column a single form, which the ruling did not have in
+front of it.  They are served their =comm=, as ruled; the alternative is a memo in the PR.
+
 **** TODO Decisions the ruling leaves open
 
-1. /One label across all eight waves (GH #1459)./  =ea= is NA through 2011-12, where
-   =v= is the EA under =comm= labels.  =ea= pairs one-to-one with 2011-12 =comm= on all
-   212 linked EAs, which is the start of a crosswalk.
-2. /The 73 + 76 of 2018-19./  A wave 6 household file would settle what those ids
+1. /The 73 + 76 of 2018-19./  A wave 6 household file would settle what those ids
    name.  Until then they stay NA; parsing the id is the alternative already declined.
 
 *** =v= across waves: three different defects (GH #942)

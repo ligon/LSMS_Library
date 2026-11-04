@@ -93,3 +93,51 @@ Uganda::sample::ea-tracking-key:
     without importing this module; CONTENTS.org records the before/after.
   contents: Uganda/_/CONTENTS.org, "The design PSU ea (GH #689)"
   since: '2026-11-03'
+
+Uganda::sample::ea-comm-link:
+  waves: ['2005-06', '2009-10', '2010-11', '2011-12']
+  columns: [ea]
+  rows: {}
+  rule: >-
+    An early-wave household whose frame EA is one of the 212 the survey numbers
+    from 2013-14 takes that number, through the reviewed comm_ea table. comm is
+    first served as its 8-digit frame code (comm_frame_ea). A blank comm or a
+    code that is not 8 digits stays NA. v is not involved and does not change.
+  function: lsms_library.countries.Uganda._.uganda:derive_comm_ea
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_ea_comm_link
+  raw_variables: [HHID, comm, HHID_old, ea]
+  assumptions:
+    - text: comm and ea are two labels of one frame EA, so a household on a comm in an early wave is on the paired ea.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon, 2026-11-04 (GH #1459).  No document states it.  On the 1,717
+        households linked 2011-12 -> 2013-14 by HHID_old, 212 comm and 212 ea pair
+        one-to-one (shuffled, 1,684 pairs).  ea is also the rank of comm among the 322
+        frame EAs of 2005-06, sorted, on all 212, which does not read a household.
+  validated_against: >-
+    tests/test_gh1459_uganda_early_ea.py re-derives the table from the raw covers
+    without importing this module.
+  contents: Uganda/_/CONTENTS.org, "One label across all eight waves (GH #1459)"
+  since: '2026-11-04'
+
+Uganda::sample::ea-own-comm:
+  waves: ['2005-06', '2009-10', '2010-11', '2011-12']
+  columns: [ea]
+  rows: {}
+  rule: >-
+    An early-wave household whose frame EA is one of the 110 rotated out before
+    2013-14 takes its own 8-digit comm as ea, since no household links it to a
+    number. It cannot collide with the labels 1-430. comm is first served as its
+    8-digit frame code (comm_frame_ea). v is not involved and does not change.
+  function: lsms_library.countries.Uganda._.uganda:derive_comm_ea
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_ea_own_comm
+  raw_variables: [HHID, comm]
+  assumptions:
+    - text: A label of a different form is an acceptable way to name these 110 PSUs in one column.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon, 2026-11-04 (GH #1459).  A standard error clustered on ea needs
+        only that a label names one PSU; it reads neither the label's form nor its order.
+  validated_against: tests/test_gh1459_uganda_early_ea.py
+  contents: Uganda/_/CONTENTS.org, "One label across all eight waves (GH #1459)"
+  since: '2026-11-04'
