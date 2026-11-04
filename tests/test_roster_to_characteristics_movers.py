@@ -99,6 +99,7 @@ class TestMoverSentinelDefault:
         msg = msgs[-1]
         assert 'replaced' in msg
         assert "'Mover'" in msg
+        assert 'per-wave' in msg   # GH #197; no real Uganda wave reaches this since #1358
 
 
 class TestMoverSentinelLegacyDrop:
