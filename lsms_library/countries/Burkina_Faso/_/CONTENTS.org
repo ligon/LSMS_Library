@@ -2277,6 +2277,7 @@ reported physical variety. This protects identity when harmonized product or
 unit labels coalesce. =SourceProductCode=, =SourceUnitCode= and original
 =SourceRow= remain available. Complete unit-size labels survive; no digit
 split, inferred kg factor or size collapse supplies a missing unit label.
+[2026-11-04, the #1453 ruling: =u= is no longer the verbatim label; see "community_prices u is the household's sized form" below.  No kg factor is inferred and no size collapsed.]
 Own CAPI attestations supply only exact missing-dictionary labels for
 products140/141/143 (v2p6/p15) and unit1161 (v2p17). Unattested1001 stays an
 opaque source-qualified code; Demi/Entier are not assumed to be kg.
@@ -2730,3 +2731,24 @@ finished rows and 179 of 813 unfinished.  =crop_production= does not serve 2021-
 is affected until it is wired.  Of 6,444 household-crop pairs with a finished row, 3,983 have a positive
 =s16d= disposition sum in one unit, 2,289 span units and 172 record none.  The measurement of that sum
 against a real harvest is in =Mali/_/CONTENTS.org=, same date.
+* 2026-11-04 -- =community_prices= =u= is the household's sized form (GH #1226, #1453 ruling)
+
+Wired by PR #1374 (2026-10-30), before #1224 gave =food_acquired.u= its size, this table served the s05 label verbatim: =Tas - petit= where the household serves =Tas (Petit)=.  So sized prices met no household row.  @ligon ruled on #1453 on 2026-11-04: community =u= takes the household's sized form, without folding.  Implemented in =2018-19/_/mapping.py::_price_u_by_code=.  Nothing else moves: the same 138,534 rows, =Price=, =Quantity=, =variety=, =obs= and the =Source*= columns.
+
+*Rule.*  By code, =10 x unit + size=.  The unit is the household's value label, else the =ehcvm_units= codebook its =data_info.yml= decodes the rest with, then the read-time =u= table.  The size is the household's word.  So =Bidon - petit= (a unit =s07bq03b= does not label) becomes =Bidon (Petit)=, as the household serves it, and the form's typo =B*outeille - petit= becomes =Bouteille (Petit)=.
+
+*Not folded.*  The =u= table sends =Boîte de tomate= to =Boîte=, =Sans os au tas= to =Tas=, and =Avec os au Kg= and =Sans os au Kg= to =Kg=.  The household side folds them.  The community side keeps =Boîte de tomate (Petit)= and =Sans os au tas (Moyen)=, so those prices (3,173 tomate-tin records) do not meet the household's =Boîte (Petit)=, which holds both tins.  That is the cost of the ruling here.
+
+*Kept as they were.*  1001 has no label anywhere and stays opaque, not =Kg (Petit)=.  2540 =Demi= and 2550 =Entier= have no unit label in any EHCVM source and keep their labels.  1040 is labelled =Avec os au kg=, not unit 104's =Avec os en tas=, and keeps the form's word; 1400 likewise keeps =Sans os au kg=, the spelling the table does not fold.  *One row still folds*: 1030 =Avec os au Kg=, size-free, is a key of the read-time =u= table, so it is served =Kg= as it was before.  =variety= and =SourceUnitCode= still name it.
+
+*The fold's cost in household rows.*  Independent review at =9359815f6= counted 4,010 tomato-tin household rows that have a price in their own unit and no longer meet it, and 1,309 household rows that meet a community row from a different unit only (1,206 tins, 76 =Sans os au tas=, 27 =Sans os au Kg=).  On price the fold is close to harmless: tomato tin against generic tin has a median ratio of 1.00 over 19 cells.  Whether the household =u= table should stop folding the tin is queued for the maintainer.
+
+*Five priced products meet no household row, because their =j= is not in the household table* (3,283 records): =Sorgho rouge= 1,352 (code 140), =Macoroni= 1,223 (141), =Sucre en morceaux= 704 (143), =Autres céréales= 2 (11), =Autres farines de céréales= 2 (15).  Unchanged by this respelling, and the same class as Guinea-Bissau's product 94.
+
+*Inherited label.*  =Saco= is the codebook's word for unit 133, a Portuguese label from Guinea-Bissau: the household serves =Saco (Petit)= for what the form calls =Sac - petit=, and so now does this table (178 records).  Fixing the codebook moves both sides together.  =lsms_library/categorical_mapping/ehcvm_units.org= is shared and not touched here.
+
+*The join.*  Household (t, j, u) cells with a community price: 93 of 910 before, 593 of 910 after.  =food_acquired= rows in those cells: 27,166 before, 109,750 after, of 138,429.
+
+*Instrument, unchanged.*  The held =bfa_ehcvm1_qnr_community_excel_vague{1,2}.xls= are the FOCUS forms, with three relevés of Quantité + Prix; the PRICE forms with two integer prices and no quantity are on the UEMOA catalogue (entry 43).  Both noted above.
+
+*Cost.*  =2018-19/_/mapping.py= is in every 2018-19 table's input hash, and the country hash folds every wave: one Burkina re-warm.
