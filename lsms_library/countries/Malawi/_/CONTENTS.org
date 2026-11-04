@@ -4983,3 +4983,12 @@ Cost: =malawi.py= is in every Malawi table's hash, so one full Malawi re-warm
 (22 of 22 table hashes, 110 of 110 wave hashes; Uganda and Niger 0 of 43 and 0
 of 268; 0 of 28 =build_transforms_fingerprint=).  The next coverage regrade moves
 the four row counts in =.coder/coverage/latest.csv=.
+
+* 2026-11-04 -- the IHS4 agriculture questionnaire is held; =ag_r01= asks "raised or owned"
+
+=2016-17/Documentation/fourth_integrated_household_survey_2016_2017_agriculture_questionnaire.pdf=
+(WB 2936, resource 47113) was not held.  Module R, R01, PDF p. 85: "During the last 12 months,
+have you or any member of your household raised or owned any [LIVESTOCK]?".  The 2019-20 form
+prints the same words on the same page.  The Stata label of =ag_r01= is "Did you own
+[LIVESTOCK]?" in both waves and both 2016-17 files, so the label is a shortening, not a
+different question.  No table changes.
