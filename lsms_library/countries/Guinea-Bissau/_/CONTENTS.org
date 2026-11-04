@@ -395,6 +395,7 @@ Portuguese unit names (=Kg=, =Litro=, =Sachet=, =Pacote=, =Unidade=,
 =Pedaço=, =Dúzia=, ...) -- 29 distinct values total.  No =u= table is
 wired into =_/categorical_mapping.org=; the framework's auto-discovery
 on =u= would be a no-op (the labels are already canonical).
+[2026-11-04, GH #1226: "No =u= table is wired" is wrong.  =_/categorical_mapping.org= has opened with =#+name: u= since =c7f5c33dc= (2026-06-06, GH #223): 29 rows, all identity, so the no-op part still holds.  Since GH #1224 the served count is 67 labels, not 29.]
 
 The clean labels come from a per-wave mojibake fix in
 =2018-19/_/mapping.py=:
