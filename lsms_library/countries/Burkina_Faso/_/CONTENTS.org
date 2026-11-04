@@ -2741,6 +2741,10 @@ Wired by PR #1374 (2026-10-30), before #1224 gave =food_acquired.u= its size, th
 
 *Kept as they were.*  1001 has no label anywhere and stays opaque, not =Kg (Petit)=.  2540 =Demi= and 2550 =Entier= have no unit label in any EHCVM source and keep their labels.  1040 is labelled =Avec os au kg=, not unit 104's =Avec os en tas=, and keeps the form's word; 1400 likewise keeps =Sans os au kg=, the spelling the table does not fold.  *One row still folds*: 1030 =Avec os au Kg=, size-free, is a key of the read-time =u= table, so it is served =Kg= as it was before.  =variety= and =SourceUnitCode= still name it.
 
+*The fold's cost in household rows.*  Independent review at =9359815f6= counted 4,010 tomato-tin household rows that have a price in their own unit and no longer meet it, and 1,309 household rows that meet a community row from a different unit only (1,206 tins, 76 =Sans os au tas=, 27 =Sans os au Kg=).  On price the fold is close to harmless: tomato tin against generic tin has a median ratio of 1.00 over 19 cells.  Whether the household =u= table should stop folding the tin is queued for the maintainer.
+
+*Five priced products meet no household row, because their =j= is not in the household table* (3,283 records): =Sorgho rouge= 1,352 (code 140), =Macoroni= 1,223 (141), =Sucre en morceaux= 704 (143), =Autres céréales= 2 (11), =Autres farines de céréales= 2 (15).  Unchanged by this respelling, and the same class as Guinea-Bissau's product 94.
+
 *Inherited label.*  =Saco= is the codebook's word for unit 133, a Portuguese label from Guinea-Bissau: the household serves =Saco (Petit)= for what the form calls =Sac - petit=, and so now does this table (178 records).  Fixing the codebook moves both sides together.  =lsms_library/categorical_mapping/ehcvm_units.org= is shared and not touched here.
 
 *The join.*  Household (t, j, u) cells with a community price: 93 of 910 before, 593 of 910 after.  =food_acquired= rows in those cells: 27,166 before, 109,750 after, of 138,429.
