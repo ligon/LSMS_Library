@@ -145,16 +145,19 @@ def test_no_empty_string_geography(cluster_features, col):
     assert empty == 0, f"{empty} cluster cells carry an empty-string {col}"
 
 
-def test_district_is_absent_not_blank_in_the_first_two_rounds(cluster_features):
-    """The positive half of the test above: the 818 cells are still THERE, as NA.
+def test_district_cells_survive_the_blank_names_of_the_first_two_rounds(cluster_features):
+    """The positive half of the test above: the 818 cells are still THERE.
 
-    Guards against 'fixing' the empty strings by dropping the rows.
+    Guards against 'fixing' the empty strings by dropping the rows.  Re-pinned
+    for GH #1441: these rounds are now labelled from the district code rather
+    than entirely <NA>; which cells stay <NA> is tested from source in
+    tests/test_gh1441_tanzania_district_code.py.
     """
     d = cluster_features["District"]
     for t in ["2008-09", "2010-11"]:
         sub = d[cluster_features.index.get_level_values("t") == t]
-        assert len(sub) > 0, f"{t} clusters vanished"
-        assert sub.isna().all(), f"{t}: expected District entirely <NA>, got {sub.notna().sum()} set"
+        assert len(sub) == 409, f"{t} clusters vanished"
+        assert sub.notna().any(), f"{t}: District should be labelled from the code"
     for t in ["2012-13", "2014-15"]:
         sub = d[cluster_features.index.get_level_values("t") == t]
         assert sub.notna().any(), f"{t}: District should be populated from round 3 on"

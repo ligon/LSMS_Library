@@ -367,6 +367,58 @@ def keep_cluster_residents(df, region='Region', district_code=None,
     return df[keep.to_numpy()]
 
 
+_REGION_CODE_BY_NAME = {normalize_place(name): code
+                        for code, name in TZ_REGION_BY_CODE.items()}
+
+
+def upd_district_labels(df, region='Region', district_code='_district_code',
+                        v='v', codes=None):
+    """District NAME for rows of NPS rounds 1-2, from the district CODE (GH #1441).
+
+    The UPD leaves the name ``ha_02_2`` blank in rounds 1-2 and keeps the code
+    ``ha_02_1``.  ``2008-15/_/categorical_mapping.org`` table
+    ``upd_district_code`` holds each code's label as round 3's residents write
+    it; see that file for the source of every row and why it stops at round 3.
+
+    A row is labelled only where its own report is the one its cluster's geocode
+    carries: reported region = the id's region and reported code = the id's
+    district digit.  Every other row stays NA, because the code then cannot be
+    verified.  Measured: 2010-11 cluster ``4115002`` reports code 2 (KOROGWE)
+    throughout, while its households in round 3 report code 2 and write LUSHOTO,
+    which is what its own id's digit 1 names.
+
+    Args:
+        df: household-grain frame with ``v`` in the index (or columns).
+        region: name of the reported-region column.
+        district_code: name of the reported ``ha_02_1`` column ('1.0' or 1).
+        v: name of the cluster-id level/column.
+        codes: ``{Code: District}``; default reads the table, cwd-relative, as
+            every wave script does.
+
+    Returns:
+        A Series on ``df.index``: the label, or NA.
+    """
+    if codes is None:
+        from lsms_library.local_tools import get_categorical_mapping
+        codes = get_categorical_mapping(tablename='upd_district_code',
+                                        idxvars='Code',
+                                        **{'District': 'District'})
+    codes = {int(k): val for k, val in codes.items()}
+    flat = df.reset_index() if v not in df.columns else df
+
+    def _cell(region_code, digit):
+        if pd.isna(region_code) or pd.isna(digit):
+            return pd.NA
+        return int(region_code) * 10 + int(str(digit).split('.')[0])
+
+    own = [_cell(_REGION_CODE_BY_NAME.get(normalize_place(r), pd.NA), d)
+           for r, d in zip(flat[region], flat[district_code])]
+    geo = [_cell(*_geocode_fields(x, 'nps')) for x in flat[v]]
+    labels = [codes.get(g, pd.NA) if (not pd.isna(g) and not pd.isna(o) and o == g)
+              else pd.NA for o, g in zip(own, geo)]
+    return pd.Series(labels, index=df.index, dtype=object)
+
+
 def harmonized_food_labels(fn='../../_/categorical_mapping.org', name='harmonize_food'):
     # Harmonized food labels.  Reads the canonical harmonize_food table
     # (migrated from the retired food_items.org -- Unit #0 shared label

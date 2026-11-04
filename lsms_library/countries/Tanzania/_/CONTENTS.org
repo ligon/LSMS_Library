@@ -2201,7 +2201,7 @@ Per wave:
 
 | wave    | =v=            | frame restriction                                    | Region / District           |
 |---------+----------------+------------------------------------------------------+-----------------------------|
-| 2008-15 | =clusterid=    | geocode residency (region + district code)           | =ha_01_1= / =ha_02_2=       |
+| 2008-15 | =clusterid=    | geocode residency (region + district code)           | =ha_01_1= / =ha_02_2= (rounds 1-2: =ha_02_1= by name, GH #1441) |
 | 2019-20 | =clusterid=    | =sdd_cluster= present AND found at ORIGINAL location | =t0_region= / =t0_district= |
 | 2020-21 | *=y5_cluster=* | found at ORIGINAL location, or BOOSTER               | =hh_a01_1= / =hh_a02_1=     |
 
@@ -2298,9 +2298,10 @@ projection), that is not so.  The count is still 118 (2012-13 34, 2014-15 17,
   =t0_*= codes and the geocode may use different district vintages; not
   verified.  Applying the tier would drop the other 12.7% on a coding
   difference.
-- The 818 null =District= cells in 2008-09 / 2010-11 are a source gap.  The UPD
+- The 818 null =District= cells in 2008-09 / 2010-11 were a source gap.  The UPD
   ships only the within-region code =ha_02_1= (9 distinct values) for rounds
-  1-2; =ha_02_2= is blank (see the 2008-15 script's docstring).
+  1-2; =ha_02_2= is blank (see the 2008-15 script's docstring).  (2026-11-03:
+  815 of the 818 are now labelled from that code; see GH #1441 below.)
 
 So the District residue is mostly a district-identity decision (vintage and
 council grain), which #837 leaves to the maintainer.  It is not a spelling
@@ -2347,7 +2348,8 @@ region code.  These are carried through as-is rather than repaired by guesswork.
   rows for it, their =v= points at a cluster the table does not contain.
   Blanking it would change =v= on every 2019-20 household table for 27.5% of
   the wave; that is a semantic change that belongs in its own PR, not inside a
-  cluster-key fix.  Recorded rather than done.
+  cluster-key fix.  Recorded rather than done.  (2026-11-03: this is why 281 of
+  those households have no market label; see GH #1441 below.)
 - *5 of 498 2014-15 clusters are unknown to =sample()=* (='17201000'=,
   ='21408000'=, ='52104012'=, ='53119012'=, ='53206000'=).  They ARE present in
   the wave-level =sample.parquet= (13 / 7 / 10 / 10 / 10 rows) and are lost
@@ -2366,6 +2368,90 @@ region code.  These are carried through as-is rather than repaired by guesswork.
 - =Tanzania/2020-21/_/data_info.yml= + =_/mapping.py= :: =v= = =y5_cluster=,
   original-or-booster restriction, place-name case normalisation.
 - =tests/test_gh323_tanzania_cluster_key.py= :: 28 tests.
+
+* District and Region labels for =market== (GH #1441, 2026-11-03)
+
+** District in 2008-09 and 2010-11: a code with no name
+
+The UPD ships =ha_02_1= in every round and leaves =ha_02_2= blank in rounds 1-2.
+=2008-15/_/categorical_mapping.org= table =upd_district_code= now names the 126
+(region, code) cells of those rounds' clusters, and that file states the source
+of every row: the plurality of round 3's own =ha_02_2= among households resident
+in the cell.  It is the survey's code mapped to its own label, so it is not a
+registered derivation.  No document scanned lists the codes (see that file).
+Labelled clusters: 2008-09 0 -> 409 of 409, 2010-11 0 -> 406 of 409.  =Region=,
+=Rural= and every later round are unchanged.  Labels are stored as round 3 writes
+them and take the same read path through the country =District= table (hence
+=Dodoma Rural=).
+
+*Are the codes stable across rounds?  Rounds 1-3 yes, round 4 no.*
+- Rounds 1-3 share one numbering, the geocode's: the district digit of
+  =clusterid= equals =ha_02_1= for all 3,265 round-1 households.  Of 406 clusters
+  whose lines reach a resident in round 3, 402 have the cell's name as their
+  plurality.  The other four: =1529002= (Dodoma, digit 5, DODOMA URBAN; four of
+  its five residents write DODOMA RURAL, and its households move between codes 4
+  and 5); two Mtwara clusters writing MTWARA MIKINDANI under a cell labelled
+  MTWARA URBAN (one council, and this cell's plurality is only 19 of 43, the one
+  row below 75%); =10318003= (Ruvuma, MBINGA; residents write NYASA, carved out of
+  Mbinga later).  Round 3 also adds codes no round 1-2 cluster has (Kagera 7/8,
+  Tanga 8); those have no row.
+- Round 4 renumbered.  The same (region, code) names a different district in 8 of
+  119 cells (Iringa 3/4/5, Rukwa 1, Shinyanga 1/2/5, Mwanza 6) after folding
+  Swahili and English qualifiers (=MJINI= = =URBAN=), and 7 cells have no round 4
+  household.  The 2012 region splits (Njombe, Katavi, Simiyu, Geita) are the
+  visible reason.
+  *Round 4 must not supply names for rounds 1-2*, and
+  =tests/test_gh1441_tanzania_district_code.py= pins why.
+- The Stata value labels on =hh_a02_1= (2020-21) and =t0_district= (2019-20) are a
+  published code frame on the same =region x 10 + code= numbering, of the later
+  vintage.  As a comparison only: 97 rows agree exactly, 12 name the same place
+  (7 by a Rural/Urban qualifier), 16 carry the name at another code, 1 is a
+  translation (=URBAN= / =MJINI=).  On the GH #837 note above ("may use different
+  district vintages; not verified"): vintage explains part of that 12.7%, not all
+  of it.  The 86 mismatches run 32% in the four renumbered regions (25 of 79) and
+  10% elsewhere (61 of 600).
+
+*Three 2010-11 clusters stay NA (25 households), deliberately.*  A row is labelled
+only where the household's code is the digit in its own =clusterid=; those three
+have no such household, so the mapping cannot be verified there:
+| =v=        | digit in the id | 2010-11 reports | round 3 writes                |
+|------------+-----------------+-----------------+-------------------------------|
+| =4115002=  | Tanga 1 LUSHOTO | code 2 x 8      | code 2 and the name LUSHOTO   |
+| =10506001= | Ruvuma 5 NAMTUMBO | code 2 x 8    | code 2, NAMTUMBO 5 of 8       |
+| =19302076= | Mwanza 3 NYAMAGANA | code 8 x 8, 7 x 1 | code 8, ILEMELA 7 of 13  |
+Mapping the reported code would serve KOROGWE and SONGEA RURAL for the first two,
+which their own round 3 answers contradict.  Mapping the id's digit would serve
+NYAMAGANA for the third, whose round 3 households mostly write ILEMELA.  So each
+reading fails somewhere and neither is applied.
+
+*What this does to =market='District'=.*  Every household gets its CLUSTER's
+district, like =Region=, so a mover is labelled where it was sampled rather than
+where it now buys food: in 2010-11, 484 of 3,924 households report a different
+(region, code) from their cluster's, 245 of them a different region.  Rounds 1-3
+share a vocabulary (the 126 round 1-2 labels are all among round 3's 129); later
+rounds do not (93 of the 126 in 2014-15, 53 in 2019-20, 108 in 2020-21), so a
+district's label does not follow it across that boundary, which is the vintage
+decision of GH #837.
+
+** Region 2014-15 (59) and 2019-20 (281): not a missing label, a missing =v=
+
+Neither is a defect of =cluster_features=.  Both are recorded, not fixed: which
+treatment is right is a decision for the maintainer (memo on GH #1441).
+- *59 in 2014-15 are =sample='s deliberate =v= = NA* (two panel lines, two origin
+  EAs, GH #323).  In all 59 the two =clusterid= decode to one region and district
+  digit, so the cluster's label is known while =v= is not; own =ha_01_1= agrees
+  with it for 34.
+- *281 in 2019-20 are split-offs* whose stray =clusterid= (=sdd_cluster= blank) is
+  in none of the 147 frame clusters, the 100 ids GH #323 stopped pooling.  Their
+  own location =hh_a01_1= is populated for all 326 split-offs and =hh_a02_1= for
+  325.  The parent's cluster is reachable through =y4_hhid= for 269 of the 326.
+- *The other 45 split-offs are labelled through a colliding stray id*, and only 29
+  of them are in the region it names.  So 16 households carry another place's
+  =Region= with no signal.  Not fixed here.
+- The only route that labels these 340 without a new =v= is a household-grain
+  =Region= on =sample=, and =_add_market_index= prefers that column for EVERY
+  household, so populating it fully moves 1,366 labels (245 / 565 / 162 / 43 / 351
+  households whose own region differs from their cluster's, 2010-11 to 2020-21).
 
 * Warm interview-date loss (GH #798, found 2026-10-15, FIXED 2026-10-17)
 

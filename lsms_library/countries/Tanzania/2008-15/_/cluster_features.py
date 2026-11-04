@@ -22,7 +22,8 @@ def blank_to_na(x):
 
     Coerce to pd.NA so the absence is honest and `pd.isna()` finds it.  Applied
     to Region as well as District -- Region happens to be clean in all four
-    rounds today, but nothing guarantees a future wave will be.
+    rounds today, but nothing guarantees a future wave will be.  The two blank
+    rounds are then labelled from the code `ha_02_1` below (GH #1441).
     """
     if pd.isna(x):
         return pd.NA
@@ -90,6 +91,15 @@ df = df.loc[~df.index.duplicated(keep='first')]
 df = tanzania.keep_cluster_residents(df, region='Region',
                                      district_code='_district_code',
                                      scheme='nps', label='2008-15')
+
+# GH #1441 -- rounds 1-2 ship the district CODE and no name (see `blank_to_na`).
+# Label the code from the table round 3's residents support.  Only blank cells
+# in these two rounds are touched: rounds 3-4 carry their own answers, and round
+# 4 numbers districts differently, so the table does not describe it.
+# `categorical_mapping.org` here holds the source of every row.
+_no_name = (df.index.get_level_values('t').isin(['2008-09', '2010-11'])
+            & df['District'].isna().to_numpy())
+df['District'] = df['District'].where(~_no_name, tanzania.upd_district_labels(df))
 df = df.drop(columns='_district_code')
 
 to_parquet(df, 'cluster_features.parquet')

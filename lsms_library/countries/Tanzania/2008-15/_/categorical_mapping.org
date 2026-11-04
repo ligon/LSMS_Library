@@ -1,0 +1,166 @@
+#+title: Categorical mapping, Tanzania 2008-15 (UPD rounds 1-4)
+
+* District names for the codes of NPS rounds 1-3 (GH #1441)
+
+UPD rounds 1-2 ship the within-region district code =ha_02_1= but leave the
+name =ha_02_2= blank on every row.  Round 3 ships both.  This table is that
+code's label in the survey's own later answers, keyed by =Code= = region code x
+10 + =ha_02_1= (the geocode fields =RR= and =D= of =clusterid=).  It is a code ->
+label table, so nothing here is a registered derivation.  No code list was found
+in the documents held here (raw-stream scan of the UPD questionnaire, BID and DDI
+and the 2019-20 questionnaire and BID for district names, 2026-11-03; no PDF text
+extractor was available, so font-encoded text is not excluded).
+
+*Source of every row.*  =Source= reads: of N round-3 households in
+=2008-15/Data/upd4_hh_a.dta= resident in this cell (reported region = the
+region in their own =clusterid=, reported code = its district digit, the rule of
+=tanzania.keep_cluster_residents=), n wrote this =District= in =ha_02_2=.  The
+name is the plurality; =R3 alternates= lists the rest.  =Clusters= reads: of K
+round 1-2 clusters whose lines reach a resident in round 3, k have this as the
+plurality name.  =tests/test_gh1441_tanzania_district_code.py= recomputes
+=District= and =Source= from the =.dta=.
+
+*This table describes rounds 1-3 only, and round 4 is a different vintage.*  In
+round 4 the same (region, code) names a different district in 8 of 119 cells
+(Iringa 3/4/5, Rukwa 1, Shinyanga 1/2/5, Mwanza 6) and 7 cells have no household:
+regions split in 2012 were renumbered.  Round 4 ships its own names, so it needs
+no table.  =Y5 label= is the Stata value label of =hh_a02_1= at the same number
+in =2020-21/Data/hh_sec_a.dta= (identical to =t0_district= in 2019-20 apart from
+case and two mojibake labels), and =Y5 check= says how it compares: =same=;
+=qualifier= (one name is the other plus Rural/Urban); =later name=, =same
+council=, =translation= or =spelling= (the same place); =renumbered N= (the later
+frame carries this name at N).  It is a comparison, never a source.
+
+*Do not name this table =District= and do not give it a =Preferred Label=
+column*: the read-time auto-apply matches a table name to a column name, and
+would key names against codes on every Tanzania frame.
+
+#+name: upd_district_code
+| Code | Region                 | District         | Source             | Clusters | Y5 label         | Y5 check       | R3 alternates                                              |
+|------+------------------------+------------------+--------------------+----------+------------------+----------------+------------------------------------------------------------|
+| 11   | DODOMA                 | KONDOA           | R3 ha_02_2 8/8     | 1/1      | KONDOA           | same           | ---                                                        |
+| 12   | DODOMA                 | MPWAPWA          | R3 ha_02_2 18/18   | 2/2      | MPWAPWA          | same           | ---                                                        |
+| 13   | DODOMA                 | KONGWA           | R3 ha_02_2 21/21   | 2/2      | KONGWA           | same           | ---                                                        |
+| 14   | DODOMA                 | DODOMA RURAL     | R3 ha_02_2 30/34   | 3/3      | CHAMWINO         | later name     | BAHI 2; DODOMA VIJIJINI(BAHI) 1; BAHI/DODOMA VIJIJINI 1    |
+| 15   | DODOMA                 | DODOMA URBAN     | R3 ha_02_2 19/24   | 2/3      | DODOMA URBAN     | same           | DODOMA RURAL 4; DODOMA 1                                   |
+| 21   | ARUSHA                 | MONDULI          | R3 ha_02_2 22/23   | 2/2      | MONDULI          | same           | MBULU 1                                                    |
+| 22   | ARUSHA                 | ARUMERU          | R3 ha_02_2 30/30   | 3/3      | MERU             | later name     | ---                                                        |
+| 23   | ARUSHA                 | ARUSHA           | R3 ha_02_2 24/27   | 4/4      | ARUSHA URBAN     | qualifier      | ARUSHA MJINI 3                                             |
+| 24   | ARUSHA                 | KARATU           | R3 ha_02_2 18/18   | 2/2      | KARATU           | same           | ---                                                        |
+| 25   | ARUSHA                 | NGORONGORO       | R3 ha_02_2 18/18   | 2/2      | NGORONGORO       | same           | ---                                                        |
+| 31   | KILIMANJARO            | ROMBO            | R3 ha_02_2 26/26   | 3/3      | ROMBO            | same           | ---                                                        |
+| 32   | KILIMANJARO            | MWANGA           | R3 ha_02_2 18/18   | 2/2      | MWANGA           | same           | ---                                                        |
+| 33   | KILIMANJARO            | SAME             | R3 ha_02_2 21/21   | 2/2      | SAME             | same           | ---                                                        |
+| 34   | KILIMANJARO            | MOSHI RURAL      | R3 ha_02_2 23/23   | 3/3      | MOSHI RURAL      | same           | ---                                                        |
+| 35   | KILIMANJARO            | HAI              | R3 ha_02_2 25/25   | 3/3      | HAI              | same           | ---                                                        |
+| 41   | TANGA                  | LUSHOTO          | R3 ha_02_2 6/6     | 1/1      | LUSHOTO          | same           | ---                                                        |
+| 42   | TANGA                  | KOROGWE          | R3 ha_02_2 29/29   | 3/3      | KOROGWE RURAL    | qualifier      | ---                                                        |
+| 43   | TANGA                  | MUHEZA           | R3 ha_02_2 21/21   | 2/2      | MUHEZA           | same           | ---                                                        |
+| 44   | TANGA                  | TANGA URBAN      | R3 ha_02_2 11/11   | 1/1      | TANGA URBAN      | same           | ---                                                        |
+| 45   | TANGA                  | PANGANI          | R3 ha_02_2 20/20   | 2/2      | PANGANI          | same           | ---                                                        |
+| 46   | TANGA                  | HANDENI          | R3 ha_02_2 28/28   | 3/3      | HANDENI          | same           | ---                                                        |
+| 47   | TANGA                  | KILINDI          | R3 ha_02_2 14/14   | 1/1      | KILINDI          | same           | ---                                                        |
+| 51   | MOROGORO               | KILOSA           | R3 ha_02_2 24/24   | 2/2      | KILOSA           | same           | ---                                                        |
+| 52   | MOROGORO               | MOROGORO RURAL   | R3 ha_02_2 8/8     | 1/1      | MOROGORO RURAL   | same           | ---                                                        |
+| 53   | MOROGORO               | KILOMBERO        | R3 ha_02_2 23/23   | 2/2      | KILOMBERO        | same           | ---                                                        |
+| 54   | MOROGORO               | ULANGA           | R3 ha_02_2 17/19   | 2/2      | ULANGA           | same           | MAHENGE/ULANGA 1; ULANGA/MAHENGE 1                         |
+| 55   | MOROGORO               | MOROGORO URBAN   | R3 ha_02_2 34/34   | 4/4      | MOROGORO URBAN   | same           | ---                                                        |
+| 56   | MOROGORO               | MVOMERO          | R3 ha_02_2 34/34   | 3/3      | MVOMERO          | same           | ---                                                        |
+| 61   | PWANI                  | BAGAMOYO         | R3 ha_02_2 35/35   | 2/2      | BAGAMOYO         | same           | ---                                                        |
+| 62   | PWANI                  | KIBAHA           | R3 ha_02_2 9/9     | 1/1      | KIBAHA RURAL     | qualifier      | ---                                                        |
+| 63   | PWANI                  | KISARAWE         | R3 ha_02_2 7/7     | 1/1      | KISARAWE         | same           | ---                                                        |
+| 64   | PWANI                  | MKURANGA         | R3 ha_02_2 9/9     | 1/1      | MKURANGA         | same           | ---                                                        |
+| 65   | PWANI                  | RUFIJI           | R3 ha_02_2 19/19   | 2/2      | RUFIJI           | same           | ---                                                        |
+| 66   | PWANI                  | MAFIA            | R3 ha_02_2 11/11   | 1/1      | MAFIA            | same           | ---                                                        |
+| 71   | DAR ES SALAAM          | KINONDONI        | R3 ha_02_2 281/281 | 37/37    | KINONDONI        | same           | ---                                                        |
+| 72   | DAR ES SALAAM          | ILALA            | R3 ha_02_2 70/71   | 9/9      | ILALA            | same           | TEMEKE 1                                                   |
+| 73   | DAR ES SALAAM          | TEMEKE           | R3 ha_02_2 201/201 | 24/24    | TEMEKE           | same           | ---                                                        |
+| 81   | LINDI                  | KILWA            | R3 ha_02_2 60/65   | 6/6      | KILWA            | same           | KILWA MASOKO 3; LINDI RURAL 2                              |
+| 82   | LINDI                  | LINDI RURAL      | R3 ha_02_2 27/27   | 3/3      | LINDI RURAL      | same           | ---                                                        |
+| 83   | LINDI                  | NACHINGWEA       | R3 ha_02_2 8/8     | 1/1      | NACHINGWEA       | same           | ---                                                        |
+| 84   | LINDI                  | LIWALE           | R3 ha_02_2 41/41   | 4/4      | LIWALE           | same           | ---                                                        |
+| 85   | LINDI                  | RUANGWA          | R3 ha_02_2 32/32   | 3/3      | RUANGWA          | same           | ---                                                        |
+| 86   | LINDI                  | LINDI URBAN      | R3 ha_02_2 22/22   | 2/2      | LINDI URBAN      | same           | ---                                                        |
+| 91   | MTWARA                 | MTWARA RURAL     | R3 ha_02_2 65/66   | 6/6      | MTWARA RURAL     | same           | MTWARA 1                                                   |
+| 92   | MTWARA                 | NEWALA           | R3 ha_02_2 60/63   | 6/6      | NEWALA           | same           | NEWARA 2; NGWALA 1                                         |
+| 93   | MTWARA                 | MASASI           | R3 ha_02_2 66/68   | 6/6      | MASASI RURAL     | qualifier      | MASASI-NAYUMBU 1; MTWARA URBAN 1                           |
+| 94   | MTWARA                 | TANDAHIMBA       | R3 ha_02_2 25/25   | 2/2      | TANDAHIMBA       | same           | ---                                                        |
+| 95   | MTWARA                 | MTWARA URBAN     | R3 ha_02_2 19/43   | 3/5      | MTWARA MIKINDANI | same council   | MTWARA MIKINDANI 17; MIKINDANI 5; MTWARA 1; MTWARA RURAL 1 |
+| 101  | RUVUMA                 | TUNDURU          | R3 ha_02_2 49/49   | 5/5      | TUNDURU          | same           | ---                                                        |
+| 102  | RUVUMA                 | SONGEA RURAL     | R3 ha_02_2 41/42   | 4/4      | SONGEA RURAL     | same           | SONGEA 1                                                   |
+| 103  | RUVUMA                 | MBINGA           | R3 ha_02_2 52/59   | 4/5      | MBINGA           | same           | NYASA 4; MBINGA NYASA 3                                    |
+| 105  | RUVUMA                 | NAMTUMBO         | R3 ha_02_2 18/18   | 2/2      | NAMTUMBO         | same           | ---                                                        |
+| 111  | IRINGA                 | IRINGA RURAL     | R3 ha_02_2 16/16   | 2/2      | IRINGA RURAL     | same           | ---                                                        |
+| 112  | IRINGA                 | MUFINDI          | R3 ha_02_2 38/39   | 4/4      | MUFINDI          | same           | MAFINGA 1                                                  |
+| 113  | IRINGA                 | MAKETE           | R3 ha_02_2 8/8     | 1/1      | IRINGA URBAN     | renumbered 223 | ---                                                        |
+| 114  | IRINGA                 | NJOMBE           | R3 ha_02_2 16/18   | 2/2      | KILOLO           | renumbered 224 | NJOMBE URBAN 1; NJOMBE RURAL 1                             |
+| 115  | IRINGA                 | LUDEWA           | R3 ha_02_2 23/24   | 3/3      | MAFINGA TOWN     | renumbered 225 | LUDEKIA 1                                                  |
+| 116  | IRINGA                 | IRINGA URBAN     | R3 ha_02_2 25/25   | 3/3      | ---              | renumbered 113 | ---                                                        |
+| 117  | IRINGA                 | KILOLO           | R3 ha_02_2 9/9     | 1/1      | ---              | renumbered 114 | ---                                                        |
+| 121  | MBEYA                  | CHUNYA           | R3 ha_02_2 38/38   | 4/4      | CHUNYA           | same           | ---                                                        |
+| 122  | MBEYA                  | MBEYA RURAL      | R3 ha_02_2 22/22   | 2/2      | MBEYA RURAL      | same           | ---                                                        |
+| 123  | MBEYA                  | KYELA            | R3 ha_02_2 25/25   | 2/2      | KYELA            | same           | ---                                                        |
+| 124  | MBEYA                  | RUNGWE           | R3 ha_02_2 23/23   | 3/3      | RUNGWE           | same           | ---                                                        |
+| 125  | MBEYA                  | ILEJE            | R3 ha_02_2 18/18   | 2/2      | ---              | renumbered 263 | ---                                                        |
+| 126  | MBEYA                  | MBOZI            | R3 ha_02_2 36/36   | 3/3      | ---              | renumbered 262 | ---                                                        |
+| 127  | MBEYA                  | MBARALI          | R3 ha_02_2 8/8     | 1/1      | MBALALI          | spelling       | ---                                                        |
+| 128  | MBEYA                  | MBEYA URBAN      | R3 ha_02_2 19/19   | 2/2      | MBEYA URBAN      | same           | ---                                                        |
+| 131  | SINGIDA                | IRAMBA           | R3 ha_02_2 21/22   | 2/2      | IRAMBA           | same           | SINGIDA URBAN 1                                            |
+| 132  | SINGIDA                | SINGIDA RURAL    | R3 ha_02_2 7/7     | 1/1      | SINGIDA RURAL    | same           | ---                                                        |
+| 133  | SINGIDA                | MANYONI          | R3 ha_02_2 22/22   | 2/2      | MANYONI          | same           | ---                                                        |
+| 134  | SINGIDA                | SINGIDA URBAN    | R3 ha_02_2 21/21   | 2/2      | SINGIDA URBAN    | same           | ---                                                        |
+| 141  | TABORA                 | NZEGA            | R3 ha_02_2 26/26   | 2/2      | NZEGA            | same           | ---                                                        |
+| 142  | TABORA                 | IGUNGA           | R3 ha_02_2 54/54   | 4/4      | IGUNGA           | same           | ---                                                        |
+| 143  | TABORA                 | UYUI             | R3 ha_02_2 23/24   | 2/2      | UYUI             | same           | NZEGA 1                                                    |
+| 144  | TABORA                 | URAMBO           | R3 ha_02_2 14/14   | 1/1      | URAMBO           | same           | ---                                                        |
+| 145  | TABORA                 | SIKONGE          | R3 ha_02_2 44/44   | 3/3      | SIKONGE          | same           | ---                                                        |
+| 146  | TABORA                 | TABORA URBAN     | R3 ha_02_2 22/22   | 2/2      | TABORA URBAN     | same           | ---                                                        |
+| 151  | RUKWA                  | MPANDA           | R3 ha_02_2 26/26   | 4/4      | KALAMBO          | renumbered 232 | ---                                                        |
+| 152  | RUKWA                  | SUMBAWANGA RURAL | R3 ha_02_2 24/30   | 3/3      | SUMBAWANGA RURAL | same           | SUMBAWANGA 6                                               |
+| 153  | RUKWA                  | NKASI            | R3 ha_02_2 29/29   | 3/3      | NKASI            | same           | ---                                                        |
+| 154  | RUKWA                  | SUMBAWANGA URBAN | R3 ha_02_2 10/12   | 1/1      | SUMBAWANGA URBAN | same           | SUMBAWANGA 2                                               |
+| 161  | KIGOMA                 | KIBONDO          | R3 ha_02_2 40/40   | 4/4      | KIBONDO          | same           | ---                                                        |
+| 162  | KIGOMA                 | KASULU           | R3 ha_02_2 85/85   | 6/6      | KASULU RURAL     | qualifier      | ---                                                        |
+| 163  | KIGOMA                 | KIGOMA RURAL     | R3 ha_02_2 36/36   | 3/3      | KIGOMA RURAL     | same           | ---                                                        |
+| 171  | SHINYANGA              | BARIADI          | R3 ha_02_2 14/14   | 1/1      | SHINYANGA URBAN  | renumbered 241 | ---                                                        |
+| 172  | SHINYANGA              | MASWA            | R3 ha_02_2 21/21   | 2/2      | KISHAPU          | renumbered 244 | ---                                                        |
+| 173  | SHINYANGA              | SHINYANGA RURAL  | R3 ha_02_2 25/25   | 2/2      | SHINYANGA RURAL  | same           | ---                                                        |
+| 174  | SHINYANGA              | KAHAMA           | R3 ha_02_2 53/53   | 4/4      | KAHAMA RURAL     | qualifier      | ---                                                        |
+| 175  | SHINYANGA              | BUKOMBE          | R3 ha_02_2 16/16   | 1/1      | KAHAMA TOWN      | renumbered 254 | ---                                                        |
+| 176  | SHINYANGA              | MEATU            | R3 ha_02_2 30/30   | 2/2      | USHETU           | renumbered 243 | ---                                                        |
+| 177  | SHINYANGA              | SHINYANGA URBAN  | R3 ha_02_2 25/25   | 2/2      | MSALALA          | renumbered 171 | ---                                                        |
+| 178  | SHINYANGA              | KISHAPU          | R3 ha_02_2 41/41   | 3/3      | ---              | renumbered 172 | ---                                                        |
+| 181  | KAGERA                 | KARAGWE          | R3 ha_02_2 35/35   | 3/3      | KARAGWE          | same           | ---                                                        |
+| 182  | KAGERA                 | BUKOBA RURAL     | R3 ha_02_2 31/31   | 3/3      | BUKOBA RURAL     | same           | ---                                                        |
+| 183  | KAGERA                 | MULEBA           | R3 ha_02_2 32/32   | 3/3      | MULEBA           | same           | ---                                                        |
+| 184  | KAGERA                 | BIHARAMULO       | R3 ha_02_2 17/17   | 1/1      | BIHARAMULO       | same           | ---                                                        |
+| 185  | KAGERA                 | NGARA            | R3 ha_02_2 38/38   | 3/3      | NGARA            | same           | ---                                                        |
+| 186  | KAGERA                 | BUKOBA URBAN     | R3 ha_02_2 27/27   | 2/2      | BUKOBA URBAN     | same           | ---                                                        |
+| 191  | MWANZA                 | UKEREWE          | R3 ha_02_2 10/10   | 1/1      | UKEREWE          | same           | ---                                                        |
+| 192  | MWANZA                 | MAGU             | R3 ha_02_2 49/51   | 5/5      | MAGU             | same           | BARIADI 1; KWIMBA 1                                        |
+| 193  | MWANZA                 | NYAMAGANA        | R3 ha_02_2 6/6     | 1/1      | MWANZA URBAN     | later name     | ---                                                        |
+| 194  | MWANZA                 | KWIMBA           | R3 ha_02_2 18/18   | 1/1      | KWIMBA           | same           | ---                                                        |
+| 195  | MWANZA                 | SENGEREMA        | R3 ha_02_2 19/19   | 1/1      | SENGEREMA        | same           | ---                                                        |
+| 196  | MWANZA                 | GEITA            | R3 ha_02_2 37/37   | 3/3      | ILEMELA          | renumbered 251 | ---                                                        |
+| 197  | MWANZA                 | MISUNGWI         | R3 ha_02_2 23/23   | 1/1      | MISUNGWI         | same           | ---                                                        |
+| 198  | MWANZA                 | ILEMELA          | R3 ha_02_2 20/21   | 2/2      | BUCHOSA          | renumbered 196 | NYAMAGANA 1                                                |
+| 201  | MARA                   | TARIME           | R3 ha_02_2 15/15   | 1/1      | TARIME           | same           | ---                                                        |
+| 202  | MARA                   | SERENGETI        | R3 ha_02_2 8/8     | 1/1      | SERENGETI        | same           | ---                                                        |
+| 203  | MARA                   | MUSOMA RURAL     | R3 ha_02_2 21/21   | 2/2      | MUSOMA RURAL     | same           | ---                                                        |
+| 204  | MARA                   | BUNDA            | R3 ha_02_2 21/21   | 2/2      | BUNDA            | same           | ---                                                        |
+| 205  | MARA                   | MUSOMA URBAN     | R3 ha_02_2 6/6     | 1/1      | MUSOMA URBAN     | same           | ---                                                        |
+| 211  | MANYARA                | BABATI           | R3 ha_02_2 19/19   | 2/2      | BABATI RURAL     | qualifier      | ---                                                        |
+| 212  | MANYARA                | HANANG           | R3 ha_02_2 12/12   | 1/1      | HANANG           | same           | ---                                                        |
+| 213  | MANYARA                | MBULU            | R3 ha_02_2 10/10   | 1/1      | MBULU            | same           | ---                                                        |
+| 214  | MANYARA                | SIMANJIRO        | R3 ha_02_2 45/45   | 5/5      | SIMANJIRO        | same           | ---                                                        |
+| 215  | MANYARA                | KITETO           | R3 ha_02_2 3/3     | 1/1      | KITETO           | same           | ---                                                        |
+| 511  | KASKAZINI UNGUJA       | KASKAZINI A      | R3 ha_02_2 40/40   | 4/4      | KASKAZINI A      | same           | ---                                                        |
+| 512  | KASKAZINI UNGUJA       | KASKAZINI B      | R3 ha_02_2 44/44   | 5/5      | KASKAZINI B      | same           | ---                                                        |
+| 521  | KUSINI UNGUJA          | KATI             | R3 ha_02_2 17/17   | 2/2      | KATI             | same           | ---                                                        |
+| 522  | KUSINI UNGUJA          | KUSINI           | R3 ha_02_2 23/23   | 2/2      | KUSINI           | same           | ---                                                        |
+| 531  | MJINI MAGHARIBI UNGUJA | MAGHARIBI        | R3 ha_02_2 114/114 | 14/14    | MAGHARIBI        | same           | ---                                                        |
+| 532  | MJINI MAGHARIBI UNGUJA | URBAN            | R3 ha_02_2 90/90   | 12/12    | MJINI            | translation    | ---                                                        |
+| 541  | KASKAZINI PEMBA        | WETE             | R3 ha_02_2 55/55   | 6/6      | WETE             | same           | ---                                                        |
+| 542  | KASKAZINI PEMBA        | MICHEWENI        | R3 ha_02_2 39/39   | 4/4      | MICHEWENI        | same           | ---                                                        |
+| 551  | KUSINI PEMBA           | CHAKECHAKE       | R3 ha_02_2 65/65   | 7/7      | CHAKECHAKE       | same           | ---                                                        |
+| 552  | KUSINI PEMBA           | MKOANI           | R3 ha_02_2 35/35   | 4/4      | MKOANI           | same           | ---                                                        |
