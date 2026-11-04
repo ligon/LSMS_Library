@@ -99,20 +99,21 @@ W4_FOOD = {
     '2018Q3': ('../Data/sect7b_plantingw4.csv', 's7bq'),
     '2019Q1': ('../Data/sect10b_harvestw4.csv', 's10bq'),
 }
-_W4_RAW = ('8', '9a', '9b', '9_cvn', '10', '5a', '2b', '2_cvn')
+_W4_RAW = ('8', '9a', '9b', '9c', '9_cvn', '10', '5a', '2b', '2_cvn')
 
 
 def w4_food_sources(prefix):
     """``food_acquired_for_wave`` sources for one W4 round (``s7bq`` /
     ``s10bq``): purchased from the 30-day purchase block, produced / in-kind
-    from the 7-day consumption block in the consumption unit."""
+    from the 7-day consumption block in the consumption unit, each with the
+    size column beside its unit (GH #1033)."""
     return {
         'purchased': {'quantity': f'{prefix}9a', 'unit': f'{prefix}9b',
-                      'kg_factor': f'{prefix}9_cvn'},
+                      'kg_factor': f'{prefix}9_cvn', 'size': f'{prefix}9c'},
         'produced':  {'quantity': f'{prefix}6a', 'unit': f'{prefix}2b',
-                      'kg_factor': f'{prefix}2_cvn'},
+                      'kg_factor': f'{prefix}2_cvn', 'size': f'{prefix}2c'},
         'inkind':    {'quantity': f'{prefix}7a', 'unit': f'{prefix}2b',
-                      'kg_factor': f'{prefix}2_cvn'},
+                      'kg_factor': f'{prefix}2_cvn', 'size': f'{prefix}2c'},
     }
 
 
@@ -159,10 +160,11 @@ def inputs_food_acquired_w4_last_purchase(wave='2018-19'):
     it decodes them -- with the source row's ORIGINAL variables as columns:
     ``hhid``, ``item_cd`` and, per round (``s7bq*`` post-planting,
     ``s10bq*`` post-harvest; the other round's columns are NA), q8 (bought in
-    the past 30 days?), q9a / q9b / q9_cvn (most recent purchase: quantity,
-    unit, kg factor), q10 (amount paid), and q5a / q2b / q2_cvn (7-day
-    consumption out of purchases, in the consumption unit) -- the last three
-    being what a user needs to re-derive a 7-day value under option B.
+    the past 30 days?), q9a / q9b / q9c / q9_cvn (most recent purchase:
+    quantity, unit, size, kg factor), q10 (amount paid), and q5a / q2b /
+    q2_cvn (7-day consumption out of purchases, in the consumption unit) --
+    the last three being what a user needs to re-derive a 7-day value under
+    option B.
     """
     if _folder(wave) != '2018-19':
         raise ValueError(f'{W4_LAST_PURCHASE_KEY} is a 2018-19 derivation, not {wave!r}')
@@ -181,7 +183,7 @@ def inputs_food_acquired_w4_last_purchase(wave='2018-19'):
             raw_vars = ['hhid', 'item_cd'] + [p + v for v in _W4_RAW]
             labels = nigeria.harmonized_food_labels(t)
             unit_codes = nigeria.food_unit_labels(t)
-            u = df[f'{p}9b'].map(unit_codes)
+            u = nigeria.sized_food_unit(df[f'{p}9b'], df[f'{p}9c'], unit_codes)
             u = u.where(u.notna(), df[f'{p}9b'].map(format_id)).fillna(U_UNKNOWN)
             idx = pd.MultiIndex.from_arrays(
                 [np.full(len(df), t), df['hhid'].astype(int).astype(str).values,

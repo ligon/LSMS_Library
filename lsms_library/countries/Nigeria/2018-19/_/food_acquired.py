@@ -41,6 +41,13 @@ IDENTITY derivation (Nigeria/_/derivations.yml) that labels the 30-day
 most-recent-purchase window; Quantity / Expenditure / Quantity_kg are
 unchanged.  The stamp is applied after food_acquired_for_wave's duplicate-key
 collapse (mapping.stamp_w4_last_purchase_window).
+
+GH #1033: W4 asks a unit's size in its own column (q2c beside q2b, q9c beside
+q9b), where W3 printed it in the unit code.  The `size` entries below are what
+gives W3's sized units (heap, mudu, piece, ...) the size the row records; see
+nigeria.sized_food_unit.  Each round reads its own column of the `u` table,
+because their labels differ: PP 40 DERICA, 120 PACKET/SACHET; PH 40 DERICA/TIN,
+120 SACHET.
 """
 import sys
 
@@ -61,11 +68,11 @@ harvest = food_acquired_for_wave(
     '../Data/sect10b_harvestw4.csv', '2019Q1',
     sources={
         'purchased': {'quantity': 's10bq9a', 'unit': 's10bq9b',
-                      'kg_factor': 's10bq9_cvn'},
+                      'kg_factor': 's10bq9_cvn', 'size': 's10bq9c'},
         'produced':  {'quantity': 's10bq6a', 'unit': 's10bq2b',
-                      'kg_factor': 's10bq2_cvn'},
+                      'kg_factor': 's10bq2_cvn', 'size': 's10bq2c'},
         'inkind':    {'quantity': 's10bq7a', 'unit': 's10bq2b',
-                      'kg_factor': 's10bq2_cvn'},
+                      'kg_factor': 's10bq2_cvn', 'size': 's10bq2c'},
     },
     expenditure='s10bq10')
 
@@ -74,11 +81,11 @@ planting = food_acquired_for_wave(
     '../Data/sect7b_plantingw4.csv', '2018Q3',
     sources={
         'purchased': {'quantity': 's7bq9a', 'unit': 's7bq9b',
-                      'kg_factor': 's7bq9_cvn'},
+                      'kg_factor': 's7bq9_cvn', 'size': 's7bq9c'},
         'produced':  {'quantity': 's7bq6a', 'unit': 's7bq2b',
-                      'kg_factor': 's7bq2_cvn'},
+                      'kg_factor': 's7bq2_cvn', 'size': 's7bq2c'},
         'inkind':    {'quantity': 's7bq7a', 'unit': 's7bq2b',
-                      'kg_factor': 's7bq2_cvn'},
+                      'kg_factor': 's7bq2_cvn', 'size': 's7bq2c'},
     },
     expenditure='s7bq10')
 

@@ -3541,27 +3541,58 @@ def round_wave(t):
 def food_unit_labels(t):
     """``{raw code: label}`` for the food-module unit codes of round ``t``.
 
-    Read from the per-wave column of the ``u`` table in
-    ``categorical_mapping.org`` (the column named by :func:`round_wave`),
-    NOT from its Preferred Label column, which records only the W3/W4
-    meaning of a colliding code (GH #607).  Keys are registered as int,
-    int-string and float-string (``4``, ``'4'``, ``'4.0'``) because the CSV
-    sources arrive as floats.  Codes the wave's column marks ``---`` are
-    absent, so the caller can keep their raw code.
+    Read from the ``u`` table in ``categorical_mapping.org``: the column named
+    ``t`` where the rounds of a wave have their own (W4, whose two rounds label
+    codes 40 and 120 differently, GH #1033), otherwise the column named by
+    :func:`round_wave`.  NOT from its Preferred Label column, which records
+    only the W3 meaning of a colliding code (GH #607).  Keys are registered as
+    int, int-string and float-string (``4``, ``'4'``, ``'4.0'``) because the
+    CSV sources arrive as floats.  Codes the column marks ``---`` are absent,
+    so the caller can keep their raw code.
     """
     from lsms_library.local_tools import df_from_orgfile
 
     here = os.path.dirname(os.path.abspath(__file__))
     tab = df_from_orgfile(os.path.join(here, 'categorical_mapping.org'),
                           name='u')
-    wave = round_wave(t)
+    column = t if t in tab.columns else round_wave(t)
     out = {}
-    for code, lab in zip(tab['Code'], tab[wave]):
+    for code, lab in zip(tab['Code'], tab[column]):
         if pd.isna(lab) or str(lab).strip() in ('', '---'):
             continue
         c = int(float(code))
         lab = str(lab).strip()
         out.update({c: lab, float(c): lab, str(c): lab, f'{c}.0': lab})
+    return out
+
+
+# W3 prints the size in the unit code (20 CONGO SMALL, 21 CONGO LARGE); W4 asks
+# it separately (20 CONGO, then s7bq2c "CONSUMPTION SIZE" 0. SMALL / 2. LARGE).
+# These are W4's codes for the units W3 sizes.  `food_unit_labels` gives each
+# its size-less label, and `sized_food_unit` prefixes the size the row records,
+# in W3's own spelling (GH #1033).  Every (code, size) pair W4 records among
+# these lands on a W3 label; PH's 40 and 120 keep PH's wider or narrower name.
+W4_SIZED_UNIT_CODES = frozenset((20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120))
+_FOOD_UNIT_SIZES = {0: 'small', 1: 'medium', 2: 'large', 3: 'very large'}
+
+
+def sized_food_unit(unit, size, unit_codes):
+    """Decoded ``u`` for a round that records the size in its own column.
+
+    ``unit`` and ``size`` are raw code columns, ``unit_codes`` the round's
+    :func:`food_unit_labels`.  A code in :data:`W4_SIZED_UNIT_CODES` with an
+    ordinal size is ``'<size> <label>'``.  A blank size, a metric size
+    (``30. 20 GRAMS``) or ``99. ONE SIZE ONLY`` asserts no ordinal size and
+    leaves the size-less label.  Any other code keeps its plain decode whatever
+    its size says (W3 has no sized ``Loaf``).  A code the round's column does
+    not list is NA, as for :func:`food_unit_labels`.
+    """
+    base = unit.map(unit_codes).astype(object)
+    prefix = pd.to_numeric(size, errors='coerce').map(_FOOD_UNIT_SIZES)
+    take = (pd.to_numeric(unit, errors='coerce').isin(W4_SIZED_UNIT_CODES)
+            & prefix.notna() & base.notna())
+    out = base.copy()
+    out[take] = prefix[take].astype(str) + ' ' + base[take].astype(str)
     return out
 
 
@@ -3581,7 +3612,9 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         each acquisition source ``s`` in ``purchased`` / ``produced`` /
         ``inkind``.  ``kg_factor`` (optional) names a per-row survey-supplied
         Kg/L conversion factor (W4's ``*_cvn``); when given, the row's exact
-        ``Quantity_kg`` is carried (GH #378).
+        ``Quantity_kg`` is carried (GH #378).  ``size`` (optional) names the
+        column recording the unit's size (W4's ``*c``), read by
+        :func:`sized_food_unit` (GH #1033).
     expenditure : str
         The variable holding the cash outlay.  Attached to the
         ``s='purchased'`` row ONLY -- produced / in-kind rows carry no cash
@@ -3630,7 +3663,9 @@ def food_acquired_for_wave(fn, t, sources, expenditure,
         # missing-unit sentinel, which means "no unit recorded").  The raw
         # code is read through `format_id`: the CSV columns are float, so
         # an unlisted 65 would otherwise be served as '65.0' (GH #1047).
-        u = df[spec['unit']].map(unit_codes)
+        size = spec.get('size')
+        u = (df[spec['unit']].map(unit_codes) if size is None
+             else sized_food_unit(df[spec['unit']], df[size], unit_codes))
         u = u.where(u.notna(), df[spec['unit']].map(format_id))
         piece = pd.DataFrame({
             't': t,
