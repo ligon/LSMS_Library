@@ -2,12 +2,16 @@
 
 From W3 the GHS records the crop sale in A3.ii (``secta3ii``), per household and
 crop, with no plot, and the build used to leave ``Quantity_sold`` / ``Value_sold``
-empty for three of five rounds.  Ruling (@ligon, 2026-11-03, option d):
+empty for three of five rounds.  Rulings (@ligon, 2026-11-03 option d, 2026-11-04
+choice A):
 
-* exactly one served harvest row for that household and crop -> the sale goes on
-  that row, in its own ``Unit_sold``;
-* otherwise (two or more rows, or none) -> ONE ``plot_id='Farm-level'`` row with
-  no harvest ``Quantity``.
+* exactly one row of that household and crop STATES A HARVEST -> the sale goes on
+  that row, in its own ``Unit_sold``, even beside explicit "did not harvest" rows;
+* otherwise (two or more state one, or none does, or there is no row) -> ONE
+  ``plot_id='Farm-level'`` row with no harvest ``Quantity``.
+
+A row states a harvest when its harvest quantity is positive.  A blank, a zero and
+an explicit "no" do not.
 
 No invented split, no double count, nothing dropped.
 
@@ -54,11 +58,16 @@ SALE_BLOCK = {
                    qty="sa3iiq6", value="sa3iiq7",
                    unit=["sa3iiq3b", "sa3iiq3c", "sa3iiq3d"]),
 }
+#: Each round's plot-crop files, in build order: the file, its harvest quantity,
+#: and its "did you harvest?" screener (1 YES, 2 NO).
 HARVEST_FILES = {
-    "2016Q1": ["Data/secta3i_harvestw3.dta"],
-    "2019Q1": ["Data/secta3i_harvestw4.dta", "Data/secta3iii_harvestw4.dta"],
-    "2024Q1": ["Data/Post Harvest Wave 5/Agriculture/secta3i_harvestw5.dta",
-               "Data/Post Harvest Wave 5/Agriculture/secta3iii_harvestw5.dta"],
+    "2016Q1": [("Data/secta3i_harvestw3.dta", "sa3iq6i", "sa3iq3")],
+    "2019Q1": [("Data/secta3i_harvestw4.dta", "sa3iq6i", "sa3iq3"),
+               ("Data/secta3iii_harvestw4.dta", "sa3iiiq13a", "sa3iiiq7")],
+    "2024Q1": [("Data/Post Harvest Wave 5/Agriculture/secta3i_harvestw5.dta",
+                "sa3iq9a", "sa3iq3"),
+               ("Data/Post Harvest Wave 5/Agriculture/secta3iii_harvestw5.dta",
+                "sa3iiiq23a", "sa3iiiq17")],
 }
 #: W1/W2 record the sale ON the plot-crop row, and must not move.
 PLOT_GRAIN_SALES = {
@@ -161,20 +170,27 @@ class TestPlacement:
         assert row["Unit_sold"] == "Sack/Bag" and row["u"] == "Kg"
         assert row["Derivation"] == SINGLE_ROW
 
-    def test_the_count_is_of_rows_not_of_rows_with_a_harvest(self, ng):
-        """The Niger rule: a row with a blank Quantity still counts, both ways."""
-        one_blank = _build(ng, [("h1", "1", 1010, np.nan)],
-                           [("h1", 1010, 2.0, 100.0, 1, None, None)])
-        assert one_blank.loc[("2016Q1", "h1", "1", "Maize"), "Value_sold"] == 100.0
-        two_one_blank = _build(ng, [("h1", "1", 1010, 9.0), ("h1", "2", 1010, np.nan)],
-                               [("h1", 1010, 2.0, 100.0, 1, None, None)])
-        assert two_one_blank.loc[("2016Q1", "h1", FARM_LEVEL, "Maize"), "Value_sold"] == 100.0
-        assert two_one_blank.loc[("2016Q1", "h1", "1", "Maize"), "Value_sold"] != 100.0
+    @pytest.mark.parametrize("other", [np.nan, 0.0], ids=["blank", "zero"])
+    def test_the_one_row_that_states_a_harvest_takes_it(self, ng, other):
+        """A blank or a zero beside it is not a second harvest."""
+        out = _build(ng, [("h1", "1", 1010, 9.0), ("h1", "2", 1010, other)],
+                     [("h1", 1010, 2.0, 100.0, 1, None, None)])
+        assert len(out) == 2, "no Farm-level row"
+        assert out.loc[("2016Q1", "h1", "1", "Maize"), "Value_sold"] == 100.0
+        assert pd.isna(out.loc[("2016Q1", "h1", "2", "Maize"), "Value_sold"])
+        assert out.loc[("2016Q1", "h1", "1", "Maize"), "Derivation"] == SINGLE_ROW
+
+    @pytest.mark.parametrize("only", [np.nan, 0.0], ids=["blank", "zero"])
+    def test_a_lone_row_stating_no_harvest_does_not_take_it(self, ng, only):
+        out = _build(ng, [("h1", "1", 1010, only)], [("h1", 1010, 2.0, 100.0, 1, None, None)])
+        assert out.loc[("2016Q1", "h1", FARM_LEVEL, "Maize"), "Value_sold"] == 100.0
+        assert pd.isna(out.loc[("2016Q1", "h1", "1", "Maize"), "Value_sold"])
 
     @pytest.mark.parametrize("harvest", [
-        [("h1", "1", 1010, 9.0), ("h1", "2", 1010, 4.0)],   # several rows
+        [("h1", "1", 1010, 9.0), ("h1", "2", 1010, 4.0)],   # two state a harvest
+        [("h1", "1", 1010, np.nan), ("h1", "2", 1010, 0.0)],   # none states one
         [("h9", "1", 1010, 9.0)],                           # no row for h1
-    ], ids=["several-rows", "no-harvest-row"])
+    ], ids=["several-state", "none-states", "no-served-row"])
     def test_otherwise_one_farm_level_row(self, ng, harvest):
         out = _build(ng, harvest, [("h1", 1010, 2.0, 100.0, 1, None, None)])
         farm = out.loc[("2016Q1", "h1", FARM_LEVEL, "Maize")]
@@ -197,6 +213,15 @@ class TestPlacement:
         assert len(out) == 1, "no Farm-level row: one served row"
         row = out.loc[("2016Q1", "h1", "1", "Yam--roots")]
         assert row["Quantity"] == 9.0 and row["Value_sold"] == 100.0
+
+    def test_it_is_judged_on_the_line_the_dedup_kept(self, ng):
+        """The kept line of (plot, crop) has no quantity; its discarded twin does.
+        The served row states no harvest, so it takes no sale."""
+        out = _build(ng, [("h1", "1", 1121, np.nan), ("h1", "1", 1123, 4.0)],
+                     [("h1", 1121, 2.0, 100.0, 1, None, None)])
+        assert pd.isna(out.loc[("2016Q1", "h1", "1", "Yam--roots"), "Quantity"])
+        assert pd.isna(out.loc[("2016Q1", "h1", "1", "Yam--roots"), "Value_sold"])
+        assert out.loc[("2016Q1", "h1", FARM_LEVEL, "Yam--roots"), "Value_sold"] == 100.0
 
     def test_no_sale_means_no_derivation_and_w1_w2_shape_is_unchanged(self, ng):
         out = ng.crop_production_for_wave(
@@ -302,13 +327,14 @@ class TestKgFactorSold:
 
 def test_script_harvest_files_match_the_sale_source_table(ng):
     """`derivation_inputs` re-derives the served rows from `_HH_SALE_SOURCE['harvest']`,
-    so a harvest file added to the script alone would silently unjoin it."""
+    so a harvest file or quantity changed in the script alone would silently unjoin it."""
     import re
     source = (NIGERIA / "_" / "crop_production.py").read_text()
+    sections = re.split(r"^# -+ W\d (\S+) -+$", source, flags=re.M)
+    sections = dict(zip(sections[1::2], sections[2::2]))
     for wave, spec in ng._HH_SALE_SOURCE.items():
-        named = set(re.findall(
-            rf"'\.\./{wave}/(Data/[^']*secta3i+_harvestw\d\.dta)'", source))
-        assert named == set(spec["harvest"]), (wave, named)
+        files = re.findall(rf"'\.\./{wave}/(Data/[^']*secta3i+_harvestw\d\.dta)'", sections[wave])
+        assert list(zip(files, re.findall(r"\bqty='(\w+)'", sections[wave]))) == spec["harvest"], wave
 
 
 def test_an_unmapped_crop_code_keeps_its_own_label(ng):
@@ -374,20 +400,26 @@ def _source_sales(t):
 
 
 def _source_harvest_rows(t):
-    """Distinct ``(i, plot_id, crop)`` of the raw plot-crop files, labelled crops."""
+    """The ``(i, plot_id, crop)`` rows the plot-crop files yield, labelled crops, the
+    first line of each key in build order, with what that line states."""
     from lsms_library.local_tools import get_dataframe
     labels = _crop_labels()
     parts = []
-    for rel in HARVEST_FILES[t]:
+    for rel, qty, screener in HARVEST_FILES[t]:
         d = get_dataframe(str(NIGERIA / SALE_BLOCK[t]["wave"] / rel), convert_categoricals=False)
         code = pd.to_numeric(d["cropcode"], errors="coerce").astype("Int64")
         parts.append(pd.DataFrame({
             "i": d["hhid"].map(_hh).astype("string").values,
             "plot_id": d["plotid"].map(_hh).astype("string").values,
             "crop": code.map(labels).astype("string").values,
+            "q": pd.to_numeric(d[qty], errors="coerce").values,
+            "screener": pd.to_numeric(d[screener], errors="coerce").values,
         }))
-    rows = pd.concat(parts, ignore_index=True).dropna(subset=["i", "crop"]).drop_duplicates()
-    return rows.assign(i=lambda d: _walk(t, d["i"]).values)
+    rows = pd.concat(parts, ignore_index=True).dropna(subset=["i", "crop"])
+    rows = rows.sort_values(["i", "plot_id", "crop"], kind="stable")
+    rows = rows.drop_duplicates(["i", "plot_id", "crop"], keep="first")
+    return rows.assign(i=lambda d: _walk(t, d["i"]).values,
+                       states=lambda d: (d["q"] > 0) & (d["screener"] != 2))
 
 
 @pytest.fixture(scope="module")
@@ -432,20 +464,33 @@ class TestOracle:
         got = set(map(tuple, rows[["i", "crop"]].astype(str).values))
         assert got == want
 
-    def test_attachment_only_to_a_single_served_row(self, served, t):
-        src = _source_sales(t)[["i", "crop"]].drop_duplicates()
+    def test_attachment_only_to_the_one_row_that_states_a_harvest(self, served, t):
         harvest = _source_harvest_rows(t)
-        n_rows = harvest.groupby(["i", "crop"]).size()
-        sold = served[(served["t"] == t) & _has_sale(served)].set_index(["i", "crop"])["plot_id"]
-        expected_one = 0
-        for pair, plot in sold.items():
-            if n_rows.get(pair, 0) == 1:
-                expected_one += 1
-                only = harvest[(harvest["i"] == pair[0]) & (harvest["crop"] == pair[1])]
-                assert plot == only["plot_id"].iloc[0], pair
+        stating = harvest[harvest["states"]]
+        only = (stating.drop_duplicates(["i", "crop"], keep=False)
+                .set_index(["i", "crop"])["plot_id"].to_dict())
+        sold = served[(served["t"] == t) & _has_sale(served)]
+        attached = 0
+        for pair, plot, quantity in zip(zip(sold["i"], sold["crop"]), sold["plot_id"],
+                                        sold["Quantity"]):
+            if pair in only:
+                assert plot == only[pair], pair
+                assert quantity > 0, pair
+                attached += 1
             else:
                 assert plot == FARM_LEVEL, pair
-        assert expected_one > 0 and len(sold) == len(src)
+        assert attached > 0
+
+    def test_no_line_says_it_did_not_harvest_and_states_a_quantity(self, t):
+        """Why reading the quantity alone is enough: "no" always comes with a blank,
+        and a positive quantity always comes with "yes"."""
+        from lsms_library.local_tools import get_dataframe
+        for rel, qty, screener in HARVEST_FILES[t]:
+            d = get_dataframe(str(NIGERIA / SALE_BLOCK[t]["wave"] / rel), convert_categoricals=False)
+            q = pd.to_numeric(d[qty], errors="coerce")
+            answer = pd.to_numeric(d[screener], errors="coerce")
+            assert q[answer == 2].isna().all(), rel
+            assert (answer[q > 0] == 1).all(), rel
 
     def test_farm_level_rows_state_the_sale_and_nothing_else(self, served, t):
         farm = served[(served["t"] == t) & (served["plot_id"] == FARM_LEVEL)]
@@ -585,7 +630,7 @@ class TestTheSaleUnitIsAUnit:
         root = NIGERIA / cfg["wave"]
         _, sale = pyreadstat.read_dta(str(get_data_file(str(root / cfg["file"]))), metadataonly=True)
         _, harvest = pyreadstat.read_dta(
-            str(get_data_file(str(root / HARVEST_FILES[t][0]))), metadataonly=True)
+            str(get_data_file(str(root / HARVEST_FILES[t][0][0]))), metadataonly=True)
         ours = sale.value_labels[sale.variable_to_label[cfg["unit"][0]]]
         theirs = harvest.value_labels[harvest.variable_to_label[HARVEST_UNIT[t]]]
         # W4/W5 split the harvest list's '40. DERICA/TIN' into DERICA and TIN.

@@ -48,11 +48,11 @@ Nigeria::sample::ph-same-location: &ph_same_location
 
 Nigeria::cluster_features::ph-same-location: *ph_same_location
 
-# GH #843 ruling (@ligon, 2026-11-03).  W3-W5 record the crop sale per household
+# GH #843 rulings (@ligon, 2026-11-03 and 2026-11-04).  W3-W5 record the crop sale per household
 # and crop (A3.ii, secta3ii), with no plot.  One function, one decision, a key
 # per path so the path taken is countable.  A `plot_id='Farm-level'` row holding
 # one source record carries NO key: it is a survey answer at its own grain, and
-# the index value discloses that.  That covers 1,719 W4/W5 rows whose Unit_sold
+# the index value discloses that.  That covers 1,571 W4/W5 rows whose Unit_sold
 # and KgFactor_sold are the household total's, which the form states the sale in.
 # The frame alone cannot tell them from W3's own-unit answers; the assumptions on
 # the first entry below are the only record of that reading.
@@ -61,14 +61,17 @@ Nigeria::crop_production::hh-crop-sale-single-row:
   columns: [Quantity_sold, Value_sold, Unit_sold, KgFactor_sold]
   rows: {t: ['2016Q1', '2019Q1', '2024Q1']}
   rule: >-
-    A household-crop sale from A3.ii is placed on the household's ONE served
-    harvest row for that crop.  The figures are the reported ones; what is
-    derived is the ATTACHMENT to a plot the sale block does not name.  The
-    count is of SERVED rows, after crop_production's keep-first dedup at
-    (t, i, plot_id, crop), and whatever the row's own Quantity says (the Niger
-    2021-22 rule after GH #1360).  Two or more served rows, or none, is a
-    plot_id='Farm-level' row instead.  Unit_sold is the sale's own unit and can
-    differ from the row's harvest `u`.
+    A household-crop sale from A3.ii is placed on the household's ONE row for
+    that crop that STATES A HARVEST, even where its other rows are explicit "did
+    not harvest".  The figures are the reported ones; what is derived is the
+    ATTACHMENT to a plot the sale block does not name.  A row states a harvest
+    when its harvest Quantity is positive.  A blank does not, a zero does not,
+    and an explicit "did not harvest" does not: every such line in the files has
+    a blank quantity, so the screener needs no separate read.  It is judged on the
+    SERVED row, after crop_production's keep-first dedup at (t, i, plot_id, crop).
+    Two or more rows stating a harvest, or none, is a plot_id='Farm-level' row
+    instead.  Unit_sold is the sale's own unit and can differ from the row's
+    harvest `u`.
   function: lsms_library.countries.Nigeria._.nigeria:derive_hh_crop_sale_attachment
   inputs: lsms_library.countries.Nigeria._.nigeria:inputs_hh_crop_sale_single_row
   raw_variables: &hh_crop_sale_variables
@@ -102,8 +105,8 @@ Nigeria::crop_production::hh-crop-sale-single-row:
         Corroboration: the W4/W5 sold quantity is at most
         the total stated in that unit on 3,820 of 3,825 and 3,747 of 3,747
         sales (median share 0.67 / 0.63), and on attached one-record sales the
-        W4/W5 unit equals the row's own `u` on 2,705 of 2,709 and 3,005 of
-        3,006; W3, which asks its own, on 2,866 of 2,979.  All three unit
+        W4/W5 unit equals the row's own `u` on 2,798 of 2,800 and 3,062 of
+        3,063; W3, which asks its own, on 2,926 of 3,041.  All three unit
         columns carry the harvest unit's value labels (W4/W5 split its
         '40. DERICA/TIN' into two codes).
     - text: >-
@@ -116,15 +119,20 @@ Nigeria::crop_production::hh-crop-sale-single-row:
         above fixes the sale to that unit.  The World Bank does this:
         NGA_GHS4.do:281, gen harvest_sold_kg_temp = sa3iiq5a * sa3iiq1_conv.
     - text: >-
-        A sale by a household with one served row for that crop came from that
-        row, even if the row's own Quantity is blank.  Where a crop has several
-        served rows and only one states a harvest (64 / 94 / 57 household-crops,
-        N1.5M / N3.4M / N8.8M) the sale is NOT moved to that row.
+        A sale by a household with one row for that crop that states a harvest came
+        from that row, even beside rows that state none.  That moved 64 / 94 / 57
+        household-crops (N1.5M / N3.4M / N8.8M) onto their one harvesting row, and
+        2 / 2 / 0 (N51,500) off a lone row stating none, against counting served rows
+        whatever they stated.
       basis: modelling-choice
       evidence: >-
-        Ruling on GH #843 (option d), @ligon 2026-11-03, as relayed in the sweep
-        brief: one served row, not merely one plot, same rule as
-        Niger/2021-22/_/crop_production.py after GH #1360.
+        Rulings on GH #843, @ligon: option d, 2026-11-03; choice A, 2026-11-04, "Yes,
+        take all four on #843".  Screener by quantity in every held file: 0 lines say
+        NO with a positive quantity, and every positive quantity sits under a YES.
+        The only reading the definition settles is a YES with 0 beside a positive
+        row (1 household-crop, W3, N48,000).  In W4, 2 household-crops (N6,500) go
+        Farm-level because the kept line of their one plot says no while a discarded
+        twin states a harvest: that is GH #1433's to change.
   validated_against: >-
     Cold build of Nigeria: Value_sold on attached plus Farm-level rows equals
     the raw secta3ii sum in all three rounds (N196,085,180 / N226,761,273 /
@@ -189,8 +197,7 @@ Nigeria::crop_production::hh-crop-sale-two-units:
         though both would serve Unit_sold 'Sack/Bag'.
       basis: modelling-choice
       evidence: >-
-        No maintainer ruling names this case; the GH #843 ruling asks for no
-        invented split and drops nothing.  Serving one record's quantity beside
+        Ruling on GH #843, @ligon 2026-11-04, choice B.  Serving one record's quantity beside
         the summed value would state a price of neither record.  Census
         2026-11-03: 13 / 14 / 7 pairs (W3 / W4 / W5), of which 4 / 11 / 4 differ
         in the canonical label too.

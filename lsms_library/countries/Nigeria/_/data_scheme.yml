@@ -277,13 +277,14 @@ Data Scheme:
     # food_acquired.j; u normalized to the shared `u` table base labels.
     # Quantity_sold / Value_sold: W1/W2 record them on the plot-crop row.
     # W3-W5 record them at hh-crop grain (secta3ii, no plot), so the sale goes
-    # on the household's single served row for that crop (a registered
-    # derivation, _/derivations.yml) and otherwise on ONE row with
-    # plot_id='Farm-level' and no harvest Quantity (GH #843, @ligon 2026-11-03).
+    # on the household's one row for that crop that states a harvest (positive
+    # Quantity; a registered derivation, _/derivations.yml) and otherwise on ONE
+    # row with plot_id='Farm-level' and no harvest Quantity (GH #843, @ligon
+    # 2026-11-03, 2026-11-04).
     # No split, no double count, nothing dropped.  `Farm-level` is the canonical
     # structural sentinel: NOT a plot, so filter `plot_id != 'Farm-level'` before
-    # counting plots, and note crop_diversity(weight='count') sees it as an
-    # occurrence.  On such a row `u` is 'Unknown' beside a real Unit_sold, which
+    # counting plots; a count of crop occurrences drops it only where the household
+    # has a plot row of that crop (GH #1469).  On such a row `u` is 'Unknown' beside a real Unit_sold, which
     # is correct (GH #1047): `u` describes the harvest Quantity the row does not
     # have, so do not read it as a Unit_sold != u flag.  See _/CONTENTS.org.
     # W5's value column prints "ESTIMATE THE VALUE OF IN-KIND PAYMENTS", so a W5

@@ -1029,17 +1029,17 @@ def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
     hh_sales : DataFrame, optional
         The wave's household-crop sale records (`hh_crop_sale_records`, the
         W3-W5 A3.ii block), which name NO plot.  They are placed AFTER the
-        keep-first dedup below, so "one served row" is judged on rows that
-        survive it, and a discarded row can neither carry a sale nor be
-        counted (GH #843; `_attach_hh_crop_sales`).
+        keep-first dedup below, so "the one row that states a harvest" is judged
+        on rows that survive it, and a discarded row can neither carry a sale
+        nor be counted (GH #843; `_attach_hh_crop_sales`).
 
     Returns
     -------
     DataFrame indexed by (t, i, plot, crop) with reported columns.
     W1/W2 read the sale off the plot-crop row.  W3-W5 place each household-crop
-    sale on the household's single served row for that crop, or else on ONE
-    `plot_id='Farm-level'` row with no harvest Quantity (GH #843), so a sale is
-    never on two rows and never split.
+    sale on the household's one row for that crop that states a harvest, or else
+    on ONE `plot_id='Farm-level'` row with no harvest Quantity (GH #843), so a
+    sale is never on two rows and never split.
 
     `Unit_sold` (GH #824) is the unit the SALE was reported in, a second
     unit distinct from the row's `u` (the HARVEST unit).  It is a plain
@@ -1229,11 +1229,12 @@ def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
 # From W3 the sale block is A3.ii (secta3ii): one record per crop the
 # household harvested, with no plot.  W5's form says so outright: "CAPI WILL
 # MAKE A LIST OF ALL HARVESTED CROPS FROM FLAP D ... IF THE RESPONDENTS
-# HARVESTED MAIZE FROM 2 DIFFERENT PLOTS, CAPI WILL LIST MAIZE ONCE."  Ruling
-# (@ligon, 2026-11-03): one served harvest row for that household and crop ->
-# the sale goes on it; otherwise -> ONE plot_id='Farm-level' row, no harvest
-# Quantity.  No split, no double count, nothing dropped.  _/CONTENTS.org has
-# the measured partition; _/derivations.yml has the keys.
+# HARVESTED MAIZE FROM 2 DIFFERENT PLOTS, CAPI WILL LIST MAIZE ONCE."  Rulings
+# (@ligon, 2026-11-03 and 2026-11-04): the one row of that household and crop
+# that states a harvest -> the sale goes on it, even beside explicit "did not
+# harvest" rows; zero such rows, or two or more -> ONE plot_id='Farm-level' row,
+# no harvest Quantity.  No split, no double count, nothing dropped.
+# _/CONTENTS.org has the measured partition; _/derivations.yml has the keys.
 
 #: `plot_id` of a sale the survey does not resolve to a plot.  STRUCTURAL, the
 #: canonical sentinel (lsms_library/data_info.yml, `plot_id:`).
@@ -1243,7 +1244,8 @@ _HH_SALE_SINGLE_ROW = 'Nigeria::crop_production::hh-crop-sale-single-row'
 _HH_SALE_SUMMED = 'Nigeria::crop_production::hh-crop-sale-records-summed'
 _HH_SALE_TWO_UNITS = 'Nigeria::crop_production::hh-crop-sale-two-units'
 
-# The sale block per wave folder, and the plot-crop files it is placed against.
+# The sale block per wave folder, and the plot-crop files (with their harvest
+# quantity) it is placed against.
 # W3 asks the sale's own unit (Q5 QUANTITY + PROD. UNIT CODE; the code embeds
 # the size).  W4/W5 ask only a QUANTITY -- "Of the [QTY] [UNIT] [CONDITION] of
 # [CROP] harvested, how much of it did your household sell?" -- so the form
@@ -1257,17 +1259,18 @@ _HH_SALE_TWO_UNITS = 'Nigeria::crop_production::hh-crop-sale-two-units'
 _HH_SALE_SOURCE = {
     '2015-16': dict(
         fn='Data/secta3ii_harvestw3.dta',
-        harvest=['Data/secta3i_harvestw3.dta'],
+        harvest=[('Data/secta3i_harvestw3.dta', 'sa3iq6i')],
         sold='sa3iiq3', qty='sa3iiq5a', unit='sa3iiq5b', value='sa3iiq6'),
     '2018-19': dict(
         fn='Data/secta3ii_harvestw4.dta',
-        harvest=['Data/secta3i_harvestw4.dta', 'Data/secta3iii_harvestw4.dta'],
+        harvest=[('Data/secta3i_harvestw4.dta', 'sa3iq6i'),
+                 ('Data/secta3iii_harvestw4.dta', 'sa3iiiq13a')],
         sold='sa3iiq3', qty='sa3iiq5a', unit='sa3iiq1c', size='sa3iiq1d',
         condition='sa3iiq1b', conv='sa3iiq1_conv', value='sa3iiq6'),
     '2023-24': dict(
         fn='Data/Post Harvest Wave 5/Agriculture/secta3ii_harvestw5.dta',
-        harvest=['Data/Post Harvest Wave 5/Agriculture/secta3i_harvestw5.dta',
-                 'Data/Post Harvest Wave 5/Agriculture/secta3iii_harvestw5.dta'],
+        harvest=[('Data/Post Harvest Wave 5/Agriculture/secta3i_harvestw5.dta', 'sa3iq9a'),
+                 ('Data/Post Harvest Wave 5/Agriculture/secta3iii_harvestw5.dta', 'sa3iiiq23a')],
         sold='sa3iiq4', qty='sa3iiq6', unit='sa3iiq3b', size='sa3iiq3c',
         condition='sa3iiq3d', conv='sa3iiq1_conv', value='sa3iiq7'),
 }
@@ -1358,22 +1361,33 @@ def derive_hh_crop_sale_attachment(records, served):
     records : DataFrame
         `hh_crop_sale_records`: one row per A3.ii sale record.
     served : DataFrame
-        Columns `i`, `plot_id`, `crop`, one row per SERVED harvest row of the
-        wave, i.e. after the keep-first dedup.
+        Columns `i`, `plot_id`, `crop`, `Quantity`, one row per SERVED harvest
+        row of the wave, i.e. after the keep-first dedup.
 
     Returns
     -------
     DataFrame indexed by `(i, crop)`, one row per household and served crop:
     `plot_id`, `Quantity_sold`, `Value_sold`, `Unit_sold`, `KgFactor_sold`,
-    `Derivation`, `cause` ('single-row' / 'several-rows' / 'no-harvest-row'),
-    `n_records`.
+    `Derivation`, `cause` ('one-states-harvest' / 'several-state-harvest' /
+    'none-states-harvest' / 'no-served-row'), `n_records`.
 
-    The rule, from the ruling on GH #843:
+    The rule, from the rulings on GH #843 (@ligon, 2026-11-03, 2026-11-04):
 
-    * exactly one served row for that household and crop -> that row's
-      `plot_id`, whatever the row's own Quantity says.  The count is of served
-      rows, as in Niger 2021-22 (GH #1360);
-    * otherwise (two or more, or none) -> `FARM_LEVEL`.
+    * exactly one served row of that household and crop STATES A HARVEST -> that
+      row's `plot_id`, even where its other rows are explicit "did not harvest";
+    * otherwise (two or more state one, or none does, or there is no row) ->
+      `FARM_LEVEL`.
+
+    A row states a harvest when its harvest `Quantity` is POSITIVE.  So:
+
+    * a blank does not: no harvest quantity was recorded on the row;
+    * a zero does not: a recorded zero is not a harvest, even under a YES;
+    * an explicit "did not harvest" does not.  The screener (W3-W5 sa3iq3, W4
+      sa3iiiq7, W5 sa3iiiq17) needs no separate read: every NO line in the files
+      has a blank quantity, and every positive quantity sits under a YES.
+
+    It is judged on the SERVED row, the line the keep-first dedup kept.  A
+    discarded twin's quantity does not make its kept row state a harvest.
 
     One household and crop can hold several records, because `harmonize_food`
     gives several codes one label (Yam--roots is 1120-1124) and W3's roster can
@@ -1405,18 +1419,21 @@ def derive_hh_crop_sale_attachment(records, served):
     out['KgFactor_sold'] = factors.first().where(
         (factors.nunique(dropna=False) == 1) & (n_units <= 1)).astype('float64')
 
-    served_rows = served.groupby(keys)['plot_id']
-    n_rows = served_rows.size().reindex(out.index, fill_value=0)
-    only_plot = served_rows.first().reindex(out.index).astype('string')
-    out['plot_id'] = only_plot.where(n_rows == 1, FARM_LEVEL)
-    out['cause'] = 'several-rows'
-    out.loc[n_rows == 1, 'cause'] = 'single-row'
-    out.loc[n_rows == 0, 'cause'] = 'no-harvest-row'
+    n_rows = served.groupby(keys).size().reindex(out.index, fill_value=0)
+    stating = served[pd.to_numeric(served['Quantity'], errors='coerce') > 0]
+    stating = stating.groupby(keys)['plot_id']
+    n_stating = stating.size().reindex(out.index, fill_value=0)
+    only_plot = stating.first().reindex(out.index).astype('string')
+    out['plot_id'] = only_plot.where(n_stating == 1, FARM_LEVEL)
+    out['cause'] = 'none-states-harvest'
+    out.loc[n_stating == 1, 'cause'] = 'one-states-harvest'
+    out.loc[n_stating >= 2, 'cause'] = 'several-state-harvest'
+    out.loc[n_rows == 0, 'cause'] = 'no-served-row'
 
     # A key per path.  A Farm-level row holding ONE record is a survey answer
     # at its own grain and the index discloses it, so it carries none.
     # Two keys on one row are '+'-joined in sorted order (derivations.py).
-    picks = zip(n_rows == 1,
+    picks = zip(n_stating == 1,
                 (out['n_records'] > 1) & (n_units <= 1),
                 n_units > 1)
     out['Derivation'] = pd.array(
@@ -1431,16 +1448,18 @@ def _attach_hh_crop_sales(t, out, records):
 
     `out` has already been through the keep-first dedup, so every row counted
     here is a row that is served: a discarded twin cannot receive a sale, and
-    cannot make a one-row crop look like two.  Each `(i, crop)` lands on exactly
-    one row, by construction, so no sale is on two rows.
+    cannot make a crop's one harvesting row look like two.  Each `(i, crop)` lands
+    on exactly one row, by construction, so no sale is on two rows.
     """
     from lsms_library.transformations import U_UNKNOWN
     served = out.index.to_frame(index=False)[['i', 'plot_id', 'crop']]
-    placed = derive_hh_crop_sale_attachment(records, served).reset_index()
-    placed['t'] = t
     # The new rows' index levels take the served frame's dtypes, so adding them
     # moves no pre-existing level's dtype.
-    placed = placed.astype({level: served[level].dtype for level in served.columns})
+    levels = {level: served[level].dtype for level in served.columns}
+    served['Quantity'] = out['Quantity'].to_numpy()
+    placed = derive_hh_crop_sale_attachment(records, served).reset_index()
+    placed['t'] = t
+    placed = placed.astype(levels)
     placed = placed.set_index(['t', 'i', 'plot_id', 'crop'])
 
     out = out.copy()
@@ -1449,7 +1468,7 @@ def _attach_hh_crop_sales(t, out, records):
     sale_cols = ['Quantity_sold', 'Value_sold', 'Unit_sold', 'KgFactor_sold',
                  'Derivation']
 
-    on_row = placed[placed['cause'] == 'single-row']
+    on_row = placed[placed['cause'] == 'one-states-harvest']
     for col in sale_cols:
         out.loc[on_row.index, col] = on_row[col]
 
@@ -1457,7 +1476,7 @@ def _attach_hh_crop_sales(t, out, records):
     # Farm-level row states the sale and nothing else.  `u` describes the
     # harvest Quantity, which the row does not have, so it is the missing-unit
     # sentinel; the sale's unit is in Unit_sold.
-    farm = placed.loc[placed['cause'] != 'single-row', sale_cols].copy()
+    farm = placed.loc[placed['cause'] != 'one-states-harvest', sale_cols].copy()
     for col in out.columns.difference(sale_cols):
         farm[col] = pd.Series(pd.NA, index=farm.index, dtype='object')
     farm['u'] = U_UNKNOWN
@@ -1473,25 +1492,27 @@ def _attach_hh_crop_sales(t, out, records):
 
 
 def _served_plot_crop_keys(folder, crop_labels):
-    """`(i, plot_id, crop)` of a wave's served harvest rows, from the source.
+    """`(i, plot_id, crop, Quantity)` of a wave's served harvest rows, from source.
 
-    The same keys `crop_production_for_wave` keeps: labelled crop, household
-    present, one row per key after its dedup.
+    The rows `crop_production_for_wave` keeps: labelled crop, household present,
+    one row per key, the first line of each after the same sort.
     """
     from lsms_library.local_tools import get_dataframe
     from lsms_library.paths import countries_root
     root = countries_root() / 'Nigeria' / folder
     pieces = []
-    for fn in _HH_SALE_SOURCE[folder]['harvest']:
+    for fn, qty in _HH_SALE_SOURCE[folder]['harvest']:
         raw = get_dataframe(str(root / fn), convert_categoricals=False)
         code = pd.to_numeric(raw['cropcode'], errors='coerce').astype('Int64')
         pieces.append(pd.DataFrame({
             'i': raw['hhid'].apply(format_id).astype('string').values,
             'plot_id': raw['plotid'].apply(format_id).astype('string').values,
             'crop': code.map(crop_labels).astype('string').values,
+            'Quantity': pd.to_numeric(raw[qty], errors='coerce').values,
         }))
-    keys = pd.concat(pieces, ignore_index=True)
-    return keys.dropna(subset=['i', 'crop']).drop_duplicates()
+    rows = pd.concat(pieces, ignore_index=True).dropna(subset=['i', 'crop'])
+    rows = rows.sort_values(['i', 'plot_id', 'crop'])
+    return rows.drop_duplicates(['i', 'plot_id', 'crop'], keep='first')
 
 
 def _inputs_hh_crop_sale(wave, key):

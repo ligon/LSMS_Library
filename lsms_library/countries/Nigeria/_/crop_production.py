@@ -21,9 +21,9 @@ Per-wave source structure (post-harvest round):
               secta3iii_harvestw5.dta   perennial/tree plot-crop harvest.
               (Post Harvest Wave 5/Agriculture)
   W3-W5       secta3ii_harvestw{3,4,5}  the SALE, at hh-crop grain: no plot.
-              Placed on the household's single served row for that crop, else
-              on ONE plot_id='Farm-level' row with no harvest Quantity
-              (GH #843; nigeria._attach_hh_crop_sales).
+              Placed on the household's one row for that crop that states a
+              harvest (positive Quantity), else on ONE plot_id='Farm-level' row
+              with no harvest Quantity (GH #843; nigeria._attach_hh_crop_sales).
 
 KgFactor (GH #859): the survey's own "Kg/L conversion factor" (`*_conv`),
 asked BESIDE the harvest quantity and unit, carried per row.  Only W4 and W5
