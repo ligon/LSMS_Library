@@ -118,7 +118,8 @@ class TestDeclared:
         assert entry["Condition_sold"] == {"type": "str", "optional": True}
         assert "Condition_sold" not in entry["index"]
 
-    @pytest.mark.parametrize("key, columns", [(TOTAL, ["Quantity"]),
+    # TOTAL gained Quantity_kg in GH #1436: as03eq09c is per cycle, like as03eq09a.
+    @pytest.mark.parametrize("key, columns", [(TOTAL, ["Quantity", "Quantity_kg"]),
                                               (SALE, ["Quantity_sold", "Value_sold"])])
     def test_the_keys_are_registered_for_the_one_wave(self, key, columns):
         record = records_for(COUNTRY, TABLE)[key]
@@ -214,7 +215,9 @@ class TestServed:
         dry = got["plot_id"] == "Farm-level"
         assert set(got.loc[dry, "t"]) == {WAVE}
         assert got.loc[dry, "Derivation"].str.contains(TOTAL, regex=False).all()
-        assert got.loc[~dry, "Derivation"].isna().all()
+        # This wave's only: 2021-22's Quantity_kg carries its own key since GH #1436.
+        assert got.loc[~dry & (got["t"] == WAVE), "Derivation"].isna().all()
+        assert not got.loc[~dry, "Derivation"].fillna("").str.contains(TOTAL, regex=False).any()
         sold = (got["Quantity_sold"].fillna(0) > 0) | (got["Value_sold"].fillna(0) > 0)
         carries = got["Derivation"].fillna("").str.contains(SALE, regex=False)
         assert (carries == (dry & sold)).all()

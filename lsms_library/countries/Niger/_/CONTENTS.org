@@ -2503,7 +2503,10 @@ inputs: all 19 probed Niger hashes move (one Niger re-warm), 0 of 22 Malawi, 0 o
 24 Uganda, 0 of 6 =build_transforms_fingerprint= values.  Pinned by
 =tests/test_niger_crop_production_condition.py=.
 
-* 2026-11-03 -- crop_production: the survey's harvest kilograms are TOTALS, and unwired (GH #1436)
+* 2026-11-03 -- crop_production: the survey's harvest kilograms are TOTALS (GH #1436)
+
+They were unwired when this was written; "the survey harvest kilograms are served", below,
+is what now happens.  The tests here still hold.
 
 Three waves write the harvest in kilograms beside the native unit, and nothing
 reads it: 2011-12 =as02eq07c= ("quantité en kgs récoltée"), 2014-15 =AS02EQ07C=
@@ -2673,11 +2676,10 @@ They are the wave's only =Farm-level= rows; Niger has no =season= level, so that
 - *3E's codes are not the rainy module's.*  =as03eq09a= uses 99999 (1 row; =as03eq09c= 42 and
   =as03eq11c= 39 confirm the width) where =as02eq07a= uses 999999; =as03eq12= uses 9999999 (1 row).
 - *One row is byte-identical to another*, with one (hid, line), and is dropped as the s16d repeats are.
-- *=as03eq09c= is a line total, not per-unit, and stays unwired.*  Kg equals the quantity on 5 of 7
-  =Kg= rows, and kg / quantity is a median 86.7 on a 100 kg sack (187 rows, the code masked; 90 with it
-  in) and 50 on a 50 kg sack.  The same shape as its rainy twin, so it belongs with the =Quantity_kg=
-  ruling of GH #1436, and it is per cycle too, so that wiring must multiply it by =as03eq06= like
-  =Quantity=.
+- *=as03eq09c= is a line total, not per-unit.*  Kg equals the quantity on 5 of 7 =Kg= rows, and kg /
+  quantity is a median 86.7 on a 100 kg sack (187 rows, the code masked; 90 with it in) and 50 on a 50
+  kg sack.  The same shape as its rainy twin, and per cycle too, so =Quantity_kg= is =as03eq09c= x
+  =as03eq06= under =dry-season-cycle-total= (GH #1436, below).
 - *"Zero" harvests are not the rainy module's zeros.*  25 rows record =as03eq09a = 0= with no unit:
   =Quantity= 0, =u = 'Unknown'=, as recorded.  19 of the 25 show output elsewhere on the line (a sale
   value on 9, consumption on 13, gifts on 9, seed on 5, a sold quantity on 4, feed on 4, kilograms on 2),
@@ -2691,10 +2693,32 @@ to 1,285,568.5 kg, up 115.8%, and that is mostly coverage, not production.  =Sac
 at its nominal weight, and 3E's rows are sacks where the rainy module's are mostly =Tiya= and =Botte=,
 which have no factor: =metric= reads 21% of the rainy module's positive rows (1,885 of 8,822) and 60% of
 3E's (329 of 549).  On the survey's own kilograms (=as02eq07c= 1,583,324; =as03eq09c= x cycles 532,518) 3E
-is 25.2% of the wave, a rise of 33.6%, against 53.7% as served.  By unit, =Sac de 100 kg= is 564,700 of
-3E's 689,743 kg, and the survey says less: on 187 such rows the nominal weight gives 489,100 kg a cycle and
-=as03eq09c= 271,054.  Only 2011-12 gains a dry season, so its kilograms are not comparable across waves
-until the =survey_kg= rung of GH #1436 lands.  Nothing is trimmed.
+is at least 25.2% of the wave, a rise of at least 33.6%, against 53.7% as served; see the correction below for
+why that is a floor.  By unit, =Sac de 100 kg= is 564,700 of 3E's 689,743 kg, and the survey says less: on 187
+such rows the nominal weight gives 489,100 kg a cycle and =as03eq09c= 271,054.  Nothing is trimmed.
+
+CORRECTION (2026-11-04, on PR #1527).  This entry gave 25.2% and +33.6% as the figure.  They are a floor:
+=as02eq07c= is present on all 8,822 rainy harvests, and =as03eq09c= is unusable on 116 of 549 dry-season ones (0 on
+74, 99999 on 42), so the rainy side is whole and the dry side is not.  Against the rainy 1,583,324:
+
+| 3E's kilograms                                                   |      kg |   rise | share of wave |
+|------------------------------------------------------------------+---------+--------+---------------|
+| as recorded                                                      | 532,518 | +33.6% |         25.2% |
+| *as =harvest_kg= serves it, GH #1436: the 30 at nominal, 86 none* | *584,822* | *+36.9%* |      *27.0%* |
+| + the 116 at crop-unit medians                                   | 692,256 | +43.7% |         30.4% |
+| + the 38 low-sack rows at crop-unit medians too                  | 819,147 | +51.7% |         34.1% |
+
+Only the second row is served.  The medians are an illustration from the correction on PR #1527, read-only, and
+nothing imputes them.
+
+CORRECTION (2026-11-04, GH #1436).  This entry said 2011-12's kilograms "are not comparable across waves
+until the =survey_kg= rung of GH #1436 lands".  The rung has landed and they still are not, for the other
+reason in that sentence, and for one it did not give.  The rung removes the artefact of =metric= reading 60%
+of 3E's rows and 21% of the rainy module's: 3E goes from 53.7% of the rainy kilograms to 36.9%.  It cannot add a
+dry season to the waves that never asked one.  And it does not reach 2018-19, whose =s16c= asks no kilograms at
+all, so that wave stays at 36,695 kg (GH #1555).  *The rung does not make Niger's waves comparable.*  For a same-season
+comparison use =plot_id != 'Farm-level'=: 1,583,324 kg against 2014-15's 2,455,341 and 2021-22's 2,954,597, with
+2018-19 out of any kilogram comparison.
 
 =Value_sold= goes 42,683,590 -> 132,213,940 FCFA, so 3E holds 67.7% of the wave's sale value.
 =crop_diversity(weight='count')= goes from 2,252 households, mean 0.916, to 2,274, mean 0.964: the 22 new
@@ -2806,3 +2830,82 @@ now questionnaire grade: =ner_ehcvm2_qnr_men_excel_vague1.pdf= PDF p. 37, Sectio
 des 7 derniers jours?".  The BID's price component is a separate sample of markets
 (section 3.3), and the community files stop at =s04_co=.  No community questionnaire
 is listed on WB 6276, IHSN 12263 or INS Niger ANADO 173/191.
+
+* 2026-11-04 -- crop_production: the survey harvest kilograms are served (GH #1436)
+
+*RULED (@ligon, 2026-11-04, option A).*  =Quantity_kg= is served as an optional canonical column and read
+first by the crop ladder, as =survey_kg=.  A total for the line.  =KgFactor= stays a number the instrument
+wrote per unit, and Niger has none.
+
+| wave    | source                         | codes masked            | 0 beside q > 0, masked | served, all > 0 |
+|---------+--------------------------------+-------------------------+------------------------+-----------------|
+| 2011-12 | =as02eq07c=                    | 999999 x 11             |                      0 |           8,822 |
+| 2011-12 | =as03eq09c= x =as03eq06=       | 99999 x 42              |                     74 |             436 |
+| 2014-15 | =AS02EQ07C=                    | 999999 x 23, 999998 x 1 |                    101 |           8,324 |
+| 2018-19 | none: =s16cq16c= is sold state | --                      |                     -- |               0 |
+| 2021-22 | =s16cq16c=                     | none                    |                      0 |          11,942 |
+
+*2018-19 asks no kilograms.*  None of =s16c_me_ner2018.dta='s 50 columns does: =s16cq12a/b/c= are quantity, unit and
+state, and there is no =s16d=.  Of 13,280 positive rows (=Botte= 5,666, =Tia= 4,167, =Gros sac= 1,517, =Autre= 980, =Sac
+Moyen= 885, =Kg= 36), the 36 in =Kg= convert, 36,695 kg, and the rung changes nothing (GH #1555).  The neighbouring
+waves hold 2.5M and 3.0M.  =Gros sac= and =Sac Moyen= state no size in this wave's labels.
+
+*Idiosyncrasies.*
+- *2021-22 is an estimate, and carries a key.*  The instrument prints "Estimation Quantité totale UML en kg"
+  (=ner_ehcvm2_qnr_men_excel_vague1.pdf=, PDF p. 82), a NOMBRE field; who did the sum is not stated.  Share of
+  rows at the modal kg / q:
+
+  | unit          | 2011-12       | 2014-15       | 2021-22        |
+  |---------------+---------------+---------------+----------------|
+  | =Tiya=        | 2.5 on 16.0%  | 2.5 on 14.8%  | 2.5 on 65.4%   |
+  | =Sac de 50=   | 50 on 43.3%   | 50 on 54.4%   | 50 on 92.3%    |
+  | =Sac de 100=  | 100 on 44.1%  | 100 on 44.5%  | 100 on 72.4%   |
+  | =Botte=       | 10 on 25.2%   | 10 on 11.3%   | 12.5 on 17.9%  |
+
+  The rung keeps the name =survey_kg= for all three.  It says the kilograms are the survey's, as on the food
+  ladder, whose Nigeria =s10bq2_cvn= and Malawi =cfactor= are conversions too; nothing on either ladder claims
+  a weighing.  What makes 2021-22 visible is =Niger::crop_production::survey-kg-estimate=, an identity on all
+  11,942 rows, in =Derivation= and =ll.derivations()=.  =kg_survey= in =harvest_kg_factors= is the per-row kg / q.
+- *A code inside the kilogram column, and a correction.*  The 2026-11-03 entry calls 2014-15's one 999,998 kg
+  "not the code and not plausible".  It is a code, and it is masked.  This wave's agricultural files use a "...98"
+  family beside "...99": =AS01Q20= holds 99999998 on 1,275 rows, 9999998 on 620 and 999998 on 70, =AS01Q21= 1,412,
+  650 and 62, =AS02AQ05= 999998 on 2 beside 999999 on 72.  The line is 280 =Unité= of sugar cane; the next largest
+  total in the column is 24,000 kg; and =ECVMA2_AS2E2P2= states the same household's same crop as 280 with =AS02EQ110E=
+  0 kilograms.  Served, it would be 29% of the wave.  Mali's EAC-I trees keep a 999998 by a ruling about those trees
+  (GH #1267).
+- *A 0 beside a positive quantity is NA* (3E 74 rows, 2014-15 101): no answer, not a harvest of nothing.  With 3E's 42
+  codes, 116 of its 549 harvests have no kilogram, where the rainy module has one on all 8,822.  They fall down the
+  ladder.  Sacks and =Kg= read at nominal: =metric= holds 52,304 kg of 3E (30 rows) and 8,000 of 2014-15 (15 rows).  The
+  other 86 in 3E (=Planche= 49, =Panier= 17, =Tiya= 9, ...) contribute nothing.  So 3E mixes two sources and has a hole,
+  and the rung's 584,822 kg sits between the +33.6% floor and the +43.7% a fill would give (the correction above).
+  =KgFactorSource= shows which row is which.  =derivation_inputs= still returns the recorded 0.
+- *Three 3E lines state kilograms with no quantity*: 2 beside =as03eq09a = 0=, 1 beside its 99999.  They deliver
+  9,550 kg.
+- *The column has junk of its own, and is served.*  On 3E's 299 rows with a stated mass and both answers the survey
+  says 406,931 kg against 637,439 nominal.  38 =Sac de 100 kg= rows run about 7 kg per sack: 1,451 sacks a cycle, 10,619
+  kg against 145,100 nominal (11,169 against 151,100 over all cycles), 14 of them paddy and 10 onion.  They look wrong,
+  they are read first, as ruled, and they are not trimmed; they cost the wave about 140,000 kg against nominal, 6.5%.
+  =survey_kg_vs_metric= over the rows a metric unit can speak to: 19.3% of 2,184 disagree by more than 10% in 2011-12,
+  44.1% of 1,078 in 2014-15, 17.5% of 2,144 in 2021-22.  Site Q names none of the 38 and no other =Quantity_kg= row, at
+  either tail, because it judges a total against totals and not against the row's own quantity.  Only the masked
+  999998 would have fired.
+- *Within a unit kg scales with quantity*, so it is a total: log-log slope 0.92 to 1.07 on every unit with 30 rows
+  bar =Sac de 100 kg= (0.72, 0.78, 0.91) and =Unité= (0.64).  A factor would give 0.  In 2021-22 kg / q does not
+  see the state: median 2.5 per =Tiya= and 100 per =Sac de 100kg= in both grain and on the ear.
+- *More kilograms cross a state.*  =harvest_kg= sums across =condition= (GH #1460), and with the survey's kilograms read
+  53 plot-crops in 2021-22 hold kilograms in two states, 26,469 kg of the wave's 2,954,597, where it was 1 and 400 kg.
+- *=as03eq11c=, =as02eq12c=, =AS02EQ12C=, =s16dq05c=* are the sold kilograms in the same shape, and unread.  Only
+  the harvest is ruled.
+
+*Against the simulation that went to the ruling* (=KgFactor = kg / Quantity= through =reported=).  Reproduced to
+the kilogram on this build, then the differences:
+
+| wave    | simulated | rung      | screen no longer rejects | no median fill | no quantity |
+|---------+-----------+-----------+--------------------------+----------------+-------------|
+| 2011-12 | 2,145,676 | 2,168,146 |                  +32,129 |        -19,209 |      +9,550 |
+| 2014-15 | 2,469,889 | 2,455,341 |                   +3,334 |        -17,882 |           0 |
+| 2021-22 | 2,912,192 | 2,954,597 |                  +42,405 |              0 |           0 |
+
+The issue's 1,576,548 for 2011-12 predates section 3E.  "Screen" is a kg / q above =KG_FACTOR_MAX= or a =Kg= row off 1,
+which =reported= refuses and a total need not meet.  "No median fill": an implied factor enters no =survey_median=, so
+a masked 0 or code beside a =Tiya= stays =none=.

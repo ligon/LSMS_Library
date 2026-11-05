@@ -211,19 +211,22 @@ Niger::community_prices::first-entry-of-duplicate:
 
 Niger::crop_production::dry-season-cycle-total:
   waves: ['2011-12']
-  columns: [Quantity]
+  columns: [Quantity, Quantity_kg]
   rows: {plot_id: Farm-level}
   rule: >-
     On a dry-season row (2011-12 section 3E, ecvmaas3e_p1), Quantity is 3E.9a
     as03eq09a x 3E.6 as03eq06, the harvest per cycle times the cycles, in the
-    recorded unit u.  as03eq09a == 99999 is masked before the product (1 row).  A
-    zero answer is zero.  On the 526 served one-cycle rows the product is the
-    answer; it differs on the 49 multi-cycle rows, 48 of them with a harvest.
-    Quantity_sold and Value_sold are served as recorded under
-    dry-season-sale-window, not multiplied.
+    recorded unit u, and Quantity_kg is 3E.9c as03eq09c x as03eq06, the same product
+    of the survey's kilograms (GH #1436).  as03eq09a == 99999 (1 row) and as03eq09c ==
+    99999 (42 rows) are masked before the product.  A zero answer is zero; the function
+    does that, and _finish_crop_production then masks a 0 kg beside a positive quantity
+    (74 rows), which is no answer, so Quantity_kg is NA there.  On the
+    526 served one-cycle rows the product is the answer; it differs on the 49
+    multi-cycle rows, 48 of them with a harvest.  Quantity_sold and Value_sold are
+    served as recorded under dry-season-sale-window, not multiplied.
   function: lsms_library.countries.Niger._.niger:derive_dry_season_cycle_total
   inputs: lsms_library.countries.Niger._.niger:inputs_dry_season_cycle_total
-  raw_variables: [hid, as03eq01, as03eq03, as03eq06, as03eq09a, as03eq09b]
+  raw_variables: [hid, as03eq01, as03eq03, as03eq06, as03eq09a, as03eq09b, as03eq09c]
   assumptions:
     - text: >-
         every cycle of a crop yields what as03eq09a records.  The English
@@ -295,4 +298,35 @@ Niger::crop_production::dry-season-sale-window:
     the raw 3E rows, read independently of the build
     (tests/test_gh1462_niger_dry_season.py).
   contents: 'Niger/_/CONTENTS.org, "the dry season: read in 2011-12, not asked in 2014-15 (GH #1462)"'
+  since: '2026-11-04'
+
+Niger::crop_production::survey-kg-estimate:
+  waves: ['2021-22']
+  columns: [Quantity_kg]
+  rule: >-
+    Identity on a 2021-22 row with a Quantity_kg: 16C.16c s16cq16c, served as recorded
+    and read first by the crop ladder (survey_kg).  The key says what the number is.
+    The instrument calls it an estimate, so a row's kilograms are the survey's
+    conversion of its local unit and not a weighing.  2011-12 and 2014-15 ask "quantite
+    en kgs recoltee", without that word, and carry no key.
+  function: lsms_library.countries.Niger._.niger:derive_survey_kg_estimate
+  inputs: lsms_library.countries.Niger._.niger:inputs_survey_kg_estimate
+  raw_variables: [s16cq04, s16cq16a, s16cq16b, s16cq16c, s16cq16d]
+  assumptions:
+    - text: >-
+        s16cq16c is the total for the line in kilograms, as estimated, and not a factor
+        per unit.  Within a unit it scales with s16cq16a; kg / q is exactly 2.5 on 2,881
+        of 4,402 Tiya rows, 12.5 on 853 of 4,773 Botte rows, 100 on 893 of 1,233 Sac de
+        100kg rows.  Whether the interviewer or the form did the conversion is not
+        stated.  The state of the product does not move it: the median per Tiya is 2.5
+        in grain and on the ear, and the median per 100 kg sack is 100 in both.
+      basis: questionnaire
+      evidence: >-
+        ner_ehcvm2_qnr_men_excel_vague1.pdf, PDF p. 82, section 16C, header "Estimation
+        Quantite totale UML en kg", a NOMBRE field; s16c_me_ner2021.dta s16cq16c "16C.16c.
+        Estimation Quantite totale UML en kg".
+  validated_against: >-
+    tests/test_niger_crop_survey_kg.py, whose oracle reads s16c directly.  An identity has
+    nothing to validate but its rows.
+  contents: 'Niger/_/CONTENTS.org, "2026-11-04 -- crop_production: the survey harvest kilograms are served (GH #1436)"'
   since: '2026-11-04'

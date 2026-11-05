@@ -646,9 +646,19 @@ def _finish_crop_production(df, t):
     column set (including the NA-bearing ``Unit_sold`` column, GH #824).  A wave
     that passes no ``condition`` gets :data:`CONDITION_NA`; one that passes no
     ``production_obs`` gets :data:`CROP_OBS_NA`; one that passes no
-    ``condition_native`` or ``Condition_sold`` carries NA there."""
+    ``condition_native``, ``Condition_sold`` or ``Quantity_kg`` carries NA there."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
+    # Quantity_kg (GH #1436): the survey's total for the line, where its harvest
+    # module asks one.  2018-19 does not.  A 0 beside a positive quantity is no answer,
+    # not a harvest of nothing (3E 74 rows, 2014-15 101), so it is NA and the row falls
+    # down the ladder.  A 0 beside a 0 would stay; the file has none.
+    if 'Quantity_kg' not in df.columns:
+        df['Quantity_kg'] = pd.NA
+    df['Quantity_kg'] = pd.to_numeric(df['Quantity_kg'], errors='coerce').astype('Float64')
+    no_answer = (df['Quantity_kg'].eq(0).fillna(False).astype(bool)
+                 & df['Quantity'].gt(0).fillna(False).astype(bool))
+    df['Quantity_kg'] = df['Quantity_kg'].mask(no_answer)
     # harvest_month: only 2014-15 records it; NaN elsewhere (still carried
     # because >=1 wave has it).  planting_month / perennial are omitted from
     # the schema entirely — no Niger wave records them.
@@ -698,7 +708,8 @@ def _finish_crop_production(df, t):
         df['production_obs'] = CROP_OBS_NA
     df['production_obs'] = df['production_obs'].astype('string')
     keep = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs',
-            'Quantity', 'Quantity_sold', 'Value_sold', 'Unit_sold', 'Condition_sold',
+            'Quantity', 'Quantity_kg', 'Quantity_sold', 'Value_sold', 'Unit_sold',
+            'Condition_sold',
             'harvest_month', 'intercropped', 'condition_native']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs'])
@@ -723,10 +734,11 @@ def derive_dry_season_cycle_total(per_cycle, cycles):
     """A dry-season crop's harvest over its cycles: per-cycle harvest x cycles.
 
     Registered as ``Niger::crop_production::dry-season-cycle-total``, the Mali
-    tree precedent.  ``per_cycle`` is 3E.9a ``as03eq09a``, cleared of its code by
-    the caller; ``cycles`` is 3E.6 ``as03eq06``.  A zero answer is zero; a missing
-    answer or count is NA, and so is a positive answer beside a count of zero.  On
-    the 526 one-cycle lines this is the identity.  Returns float64.
+    tree precedent.  ``per_cycle`` is 3E.9a ``as03eq09a``, or its kilograms 3E.9c
+    ``as03eq09c`` for ``Quantity_kg`` (GH #1436), cleared of its code by the caller;
+    ``cycles`` is 3E.6 ``as03eq06``.  A zero answer is zero; a missing answer or
+    count is NA, and so is a positive answer beside a count of zero.  On the 526
+    one-cycle lines this is the identity.  Returns float64.
     """
     x = pd.to_numeric(per_cycle, errors='coerce').astype('float64')
     n = pd.to_numeric(cycles, errors='coerce').astype('float64')
@@ -788,7 +800,7 @@ def _dry_season_inputs(wave, columns):
 def inputs_dry_season_cycle_total(wave):
     """The registry ``inputs`` callable of dry-season-cycle-total."""
     return _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06',
-                                     'as03eq09a', 'as03eq09b'])
+                                     'as03eq09a', 'as03eq09b', 'as03eq09c'])
 
 
 def inputs_dry_season_sale_window(wave):
@@ -796,6 +808,53 @@ def inputs_dry_season_sale_window(wave):
     is there so a user can rescale the sale."""
     return _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06',
                                      'as03eq10', 'as03eq11a', 'as03eq11b', 'as03eq12'])
+
+
+# ---------------------------------------------------------------------------
+# Quantity_kg as an estimate: 2021-22 s16cq16c (GH #1436)
+# ---------------------------------------------------------------------------
+#
+# The instrument prints "Estimation Quantite totale UML en kg", and the file is
+# exactly 2.5 per Tiya on 2,881 of 4,402 rows.  So this is the survey's conversion,
+# served under a column that reads like a measured mass, and the key says so on the
+# row.  The ECVMA modules ask "quantite en kgs recoltee", carry no such word, and
+# carry no such key.  CONTENTS.org, "the survey's harvest kilograms".
+SURVEY_KG_ESTIMATE = 'Niger::crop_production::survey-kg-estimate'
+
+
+def derive_survey_kg_estimate(kilograms):
+    """2021-22 s16cq16c -> ``Quantity_kg``: THE IDENTITY.
+
+    Registered as ``Niger::crop_production::survey-kg-estimate``.  Nothing is computed;
+    the registry says what the number is.  Returns float64.
+    """
+    return pd.to_numeric(kilograms, errors='coerce').astype('float64')
+
+
+def stamp_survey_kg_estimate(df):
+    """The ``Derivation`` column of the finished 2021-22 frame: the key wherever
+    ``Quantity_kg`` holds a value, NA elsewhere."""
+    out = pd.Series(pd.NA, index=df.index, dtype='string')
+    out[df['Quantity_kg'].notna().to_numpy(dtype=bool)] = SURVEY_KG_ESTIMATE
+    return out
+
+
+def inputs_survey_kg_estimate(wave):
+    """The registry ``inputs`` callable of survey-kg-estimate: the quantity, unit, kg
+    and state as recorded, keyed by the served ``(t, i, plot_id, production_obs)``."""
+    from lsms_library.paths import countries_root
+    path = countries_root() / 'Niger' / wave / 'Data' / 's16c_me_ner2021.dta'
+    src = tools.get_dataframe(str(path), convert_categoricals=False)
+    observations = _crop_row_observations(len(src), path, script_path=__file__)
+    keep = pd.to_numeric(src['s16cq16c'], errors='coerce').notna().to_numpy()
+    out = src[['s16cq04', 's16cq16a', 's16cq16b', 's16cq16c', 's16cq16d']].copy()
+    out['t'] = wave
+    out['i'] = src.apply(lambda r: i(pd.Series([r['grappe'], r['menage']],
+                                               index=['grappe', 'menage'])), axis=1).values
+    out['plot_id'] = (src['s16cq02'].apply(tools.format_id).astype(str) + '_'
+                      + src['s16cq03'].apply(tools.format_id).astype(str)).values
+    out['production_obs'] = observations.values
+    return out[keep].set_index(['t', 'i', 'plot_id', 'production_obs'])
 
 
 # ---------------------------------------------------------------------------
