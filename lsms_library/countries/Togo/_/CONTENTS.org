@@ -818,7 +818,7 @@ through =harmonize_crop_condition_ehcvm1=.
 
 11,565 lines, unique on (household, field, parcel, crop code, unit), so the level separates nothing and adds no row.  A blank state is a
 blank unit on all 606.  The answer describes the harvest quantity only: =s16cq16c= is the sold state, not served (GH #1462).
-2021-22 is held and not wired (GH #552), so the level reaches no 2021-22 row.  When it is wired, read its code list before reusing this table: Niger's and Senegal's 2021-22 lists have three answers, and code 3 means something else there.
+2021-22 has its own list: see "2021-22 wired".
 
 *The printed forms are not what was fielded.*  All three held Excel forms
 (=tgo_ehcvm1_qnr_household_excel_vague1.xls=, =..._vague2.xls=, =EHCVM_UEMOA_MEN_TOGO_V2.xls=, sheet
@@ -963,11 +963,28 @@ unfinished crops record a quantity and are keyed =harvest-to-date=.
   =Moyenne Bassine= 142, =Moyen Panier= 76, ...) and relabels the rest one for one.  Not
   served: it has no twin on the sale side.  A decision for the survey-kg lane.
 - =s16cq16c= and =s16dq05c= are totals in kg, as in Mali.  Not served.
-- WAITING: the state =s16cq16d= (Grain 7,790, Tubercule 1,008, Non-décortiqué 791, Non
-  concerné 649, blank 559, Epis 45, Régime 24, Décortiqué 11) waits for the =condition= level
-  of the ehcvm-condition lane (#1436), not on development when this was written.  Its eight
-  codes are not Niger 2021-22's three (code 3 is =Tubercule= here and =na= there), so this
-  wave needs its own table, and the ruled fold does not name =Tubercule= or =Régime=.
+- =condition= is =s16cq16d=, read by code through this wave's own table,
+  =harmonize_crop_condition_ehcvm2= in =2021-22/_/categorical_mapping.org=, with the answer in
+  =condition_native=.  Eight codes, where 2018's =s16cq12c= has five in the file and Niger
+  2021-22 three, and code 3 means something else in each.  Unlike 2018's, this file's crops
+  fit its labels: =Tubercule= falls on yam (540) and cassava (432), =Régime= on bananas.
+  | code | label | rows | =condition= |
+  |------+-------+------+-------------|
+  | 1 | Epis | 45 | =unshelled= |
+  | 2 | Grain | 7,790 | =shelled= |
+  | 3 | Tubercule | 1,008 | =other_condition= |
+  | 4 | Gousse | 0 | =other_condition= |
+  | 5 | Régime | 24 | =other_condition= |
+  | 6 | Décortiqué | 11 | =shelled= |
+  | 7 | Non-décortiqué | 791 | =unshelled= |
+  | 8 | Non concerné | 649 | =shell_not_applicable= |
+  | blank | | 559 | =unknown_condition=, column NA |
+  WAITING: =Tubercule=, =Gousse= and =Régime= are outside the ruled fold of #1436, and a ruling
+  is asked for.  =Farm-level= rows carry =unknown_condition=: their state is the sale's, GH #1462.
+- =Récolte nulle= (258 rows) stays NA with =u= = =Unknown=, as the maintainer ruled for Mali:
+  =s16cq16a= and =s16cq16b= are blank there, and the answer is in the file for anyone who wants
+  a zero.  So a reported nil harvest reads the same as a question not asked; disclosed, not
+  resolved.
 - =Unit_sold= is NA on 2018, whose sold unit =s16cq16b= is not read.
 - 2018's code 56 (356 rows) has no label there and =Ananas= here, with 17 rows; 2018's
   list stops at 55, so it is not assumed to be the same crop.  Left as it is.

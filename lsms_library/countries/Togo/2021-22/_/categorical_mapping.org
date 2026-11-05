@@ -140,3 +140,23 @@
 |  655 | Medical Evacuation Abroad                   |
 |  656 | Administrative Document Fees                |
 |  657 | Other Services                              |
+
+# harmonize_crop_condition_ehcvm2 (GH #1436): "Etat du produit", s16cq16d, read by code.
+# This wave has its own eight-code list: 2018's s16cq12c has five (and its code 3 is
+# Decortique, here Tubercule), and Niger 2021-22's has three.  Unlike 2018, whose file holds
+# five codes where its form prints eight, this file's crops fit its labels: Tubercule falls
+# on yam and cassava, Regime on bananas.  The ruled fold (@ligon 2026-11-04) covers Epis,
+# Grain, Decortique, Non-decortique and Non concerne.  It does not name Tubercule (1,008
+# rows), Regime (24) or Gousse (0): those serve `other_condition`, per the coordinator's
+# direction of 2026-11-04, with the answer in `condition_native`, and a ruling is asked for.
+#+NAME: harmonize_crop_condition_ehcvm2
+| Code | Preferred Label      | Source Label   |
+|------+----------------------+----------------|
+|    1 | unshelled            | Epis           |
+|    2 | shelled              | Grain          |
+|    3 | other_condition      | Tubercule      |
+|    4 | other_condition      | Gousse         |
+|    5 | other_condition      | Régime         |
+|    6 | shelled              | Décortiqué     |
+|    7 | unshelled            | Non-décortiqué |
+|    8 | shell_not_applicable | Non concerné   |

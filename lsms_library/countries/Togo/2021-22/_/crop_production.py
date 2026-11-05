@@ -20,8 +20,14 @@ keyed Togo::crop_production::harvest-to-date: a part of the season.
 
 u is s16cq16b, in the same vocabulary as the sold unit s16dq05b; a missing unit is
 `Unknown`.  s16cq16b_bis decodes the 670 `Autre à préciser` rows and is not served
-(_/CONTENTS.org).  Nor is s16cq16c or s16dq05c: each is a total in kg.  The state
-s16cq16d waits for the condition level of GH #1436 (ehcvm-condition lane).
+(_/CONTENTS.org).  Nor is s16cq16c or s16dq05c: each is a total in kg.
+
+condition is s16cq16d, read by code through this wave's own eight-code table, with the
+answer as recorded in condition_native (GH #1436).  A blank state is `unknown_condition`
+and NA, as is a Farm-level row, whose sale state is out of scope (GH #1462).
+
+`Récolte nulle` (258 rows) stays NA with u = `Unknown`, as ruled for Mali: s16cq16a and
+s16cq16b are blank there, and the answer is not written in as a zero.
 """
 import sys
 
@@ -30,11 +36,13 @@ import pandas as pd
 
 from lsms_library.ehcvm import (derive_hh_crop_sale_attachment, hh_crop_records,
                                 is_crop_sale, served_unit_labels, stamp_harvest_to_date)
+import lsms_library.local_tools as tools
 from lsms_library.local_tools import get_dataframe, to_parquet
 from mapping import (KEY_HARVEST_TO_DATE, KEY_HH_CROP_SALE, crop_labels, household_ids,
                      plot_ids)
 
 UNIT_NA = 'Unknown'
+CONDITION_NA = 'unknown_condition'
 
 
 def _units(series):
@@ -45,8 +53,21 @@ def _units(series):
     return raw.map(served).astype('string')
 
 
+def _conditions(codes):
+    """The canonical token of each s16cq16d code.  Strict: a missing table must not
+    serve every row as the sentinel."""
+    table = tools.get_categorical_mapping(
+        tablename='harmonize_crop_condition_ehcvm2', idxvars='Code', dirs=['./'],
+        **{'Preferred Label': 'Preferred Label'})
+    table = {int(code): token for code, token in table.items()}
+    assert sorted(table) == list(range(1, 9)), f'harmonize_crop_condition_ehcvm2: {table}'
+    return pd.to_numeric(codes, errors='coerce').astype('Int64').map(table).astype('string')
+
+
 src = get_dataframe('../Data/s16c_me_tgo2021.dta', convert_categoricals=True)
-src = src[src['s16cq04'].notna()]
+codes = get_dataframe('../Data/s16c_me_tgo2021.dta', convert_categoricals=False)
+keep = src['s16cq04'].notna().values
+src, codes = src[keep], codes[keep]
 assert not src[['s16cq02', 's16cq03']].isna().any(axis=None), 'a crop row with no plot'
 harvest = pd.DataFrame({
     'i': household_ids(src).astype('string').values,
@@ -57,6 +78,8 @@ harvest = pd.DataFrame({
     'intercropped': src['s16cq07'].astype('string').str.strip().map(
         {'Association de cultures': True, 'Pure': False}).astype('boolean').values,
     'finished': src['s16cq11'].astype('string').values,
+    'condition': _conditions(codes['s16cq16d']).values,
+    'condition_native': src['s16cq16d'].astype('string').str.strip().values,
 })
 
 records = hh_crop_records(get_dataframe('../Data/s16d_me_tgo2021.dta', convert_categoricals=True))
@@ -86,11 +109,12 @@ df['harvest_month'] = pd.array([pd.NA] * len(df), dtype='Float64')
 df['intercropped'] = df['intercropped'].astype('boolean')
 df['t'] = '2021-22'
 df['u'] = df['u'].astype('string').fillna(UNIT_NA)
-for col in ('crop', 'plot_id', 'Unit_sold', 'Derivation'):
+df['condition'] = df['condition'].astype('string').fillna(CONDITION_NA)
+for col in ('crop', 'plot_id', 'Unit_sold', 'Derivation', 'condition_native'):
     df[col] = df[col].astype('string')
-df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u'])[
+df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition'])[
     ['Quantity', 'Quantity_sold', 'Unit_sold', 'Value_sold', 'harvest_month',
-     'intercropped', 'Derivation']]
+     'intercropped', 'condition_native', 'Derivation']]
 
 assert df.index.is_unique, 'crop_production 2021-22 repeats a key'
 assert len(df) >= len(src), 'crop_production 2021-22 lost a source row'

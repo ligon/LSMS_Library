@@ -177,7 +177,8 @@ Data Scheme:
     # asks the form and never the dryness, so the values are the BARE FORM tokens
     # `shelled` / `unshelled` / `shell_not_applicable`, plus `unknown_condition`
     # for a blank code.  Five answers fold onto those tokens (ruled @ligon
-    # 2026-11-04); condition_native below keeps what was answered.
+    # 2026-11-04); condition_native below keeps what was answered.  2021-22 reads
+    # s16cq16d through its own eight-code table, in 2021-22/_/categorical_mapping.org.
     index: (t, i, plot_id, crop, u, condition)
     Quantity: float
     Quantity_sold: float
@@ -190,7 +191,7 @@ Data Scheme:
       optional: true
     intercropped: bool
     # condition_native (GH #1436, ruling @ligon 2026-11-04) is the state label as
-    # recorded (s16cq12c), the answer the `condition` fold cannot show.  `optional`
+    # recorded (s16cq12c; s16cq16d in 2021-22), the answer the `condition` fold cannot show.  `optional`
     # because a blank state is NA, never a sentinel.
     condition_native:
       type: str

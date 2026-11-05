@@ -40,6 +40,14 @@ def _served(table):
         return getattr(ll.Country("Togo"), table)(waves=[WAVE])
 
 
+#: The eight answers of s16cq16d, by code, written out here so a wrong table cannot
+#: agree with itself.  3, 4 and 5 are not in the ruled fold: GH #1436, memo in the PR.
+CONDITION = {1: "unshelled", 2: "shelled", 3: "other_condition", 4: "other_condition",
+             5: "other_condition", 6: "shelled", 7: "unshelled", 8: "shell_not_applicable"}
+CONDITION_LABEL = {1: "Epis", 2: "Grain", 3: "Tubercule", 4: "Gousse", 5: "Régime",
+                   6: "Décortiqué", 7: "Non-décortiqué", 8: "Non concerné"}
+
+
 class TestSaleRules:
     """The shared EHCVM-2 functions on synthetic frames, through the registry."""
 
@@ -477,3 +485,41 @@ class TestServed:
         s09d = _raw("s09d_me_tgo2021.dta")
         mask = got.xs("Washable Face Masks (COVID-19)", level="j")["Expenditure"].astype(float).sum()
         assert mask == pytest.approx(s09d.loc[s09d["s09dq01"] == 415, "s09dq03"].sum())
+
+    def _harvest_rows(self):
+        s16c = _raw("s16c_me_tgo2021.dta")
+        return s16c[s16c["s16cq04"].notna()]
+
+    def test_condition_and_the_answer_are_the_files_by_code(self):
+        s16c = self._harvest_rows()
+        cp = _served("crop_production")
+        plots = cp[cp.index.get_level_values("plot_id") != "Farm-level"]
+        got = plots.index.get_level_values("condition").to_series().value_counts()
+        want = s16c["s16cq16d"].map(CONDITION).fillna("unknown_condition").value_counts()
+        assert got.sort_index().to_dict() == want.sort_index().to_dict()
+        native = plots["condition_native"].astype("string").value_counts(dropna=False)
+        answers = s16c["s16cq16d"].map(CONDITION_LABEL).value_counts()
+        assert {k: native[k] for k in answers.index} == answers.to_dict()
+        assert plots["condition_native"].isna().sum() == s16c["s16cq16d"].isna().sum()
+
+    def test_the_two_answers_outside_the_fold_stay_visible(self):
+        cp = _served("crop_production").reset_index()
+        for answer, rows in (("Tubercule", 1008), ("Régime", 24)):
+            row = cp[cp["condition_native"].astype("string") == answer]
+            assert len(row) == rows
+            assert (row["condition"] == "other_condition").all()
+
+    def test_a_farm_level_row_has_no_state(self):
+        cp = _served("crop_production").reset_index()
+        farm = cp[cp["plot_id"] == "Farm-level"]
+        assert (farm["condition"] == "unknown_condition").all()
+        assert farm["condition_native"].isna().all()
+
+    def test_a_null_harvest_stays_na_with_an_unknown_unit(self):
+        """As ruled for Mali: `Recolte nulle` is not written in as a zero."""
+        s16c = self._harvest_rows()
+        null = s16c["s16cq11"] == 3
+        assert null.sum() == 258
+        assert s16c.loc[null, "s16cq16a"].isna().all() and s16c.loc[null, "s16cq16b"].isna().all()
+        cp = _served("crop_production")
+        assert not (pd.to_numeric(cp["Quantity"], errors="coerce") == 0).sum() > (s16c["s16cq16a"] == 0).sum()
