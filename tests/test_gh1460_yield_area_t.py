@@ -56,6 +56,30 @@ def test_a_target_already_served_is_refused():
         yield_kg(_cp(), pf, area_t=PAIR)
 
 
+def test_two_rounds_onto_one_target_are_refused():
+    """It would sum 2 and 3 and serve 2.0 where 5.0 is right."""
+    pf = _pf([('2010Q3', 'h1', '1', 2.0), ('2011Q3', 'h1', '1', 3.0)])
+    with pytest.raises(ValueError, match='more than one round'):
+        yield_kg(_cp(), pf, area_t={'2010Q3': '2011Q1', '2011Q3': '2011Q1'})
+
+
+def test_the_refusal_does_not_depend_on_what_is_served():
+    pf = _pf([('2010Q3', 'h1', '1', 2.0)])
+    with pytest.raises(ValueError, match='more than one round'):
+        yield_kg(_cp(), pf, area_t={'2010Q3': '2011Q1', '2011Q3': '2011Q1'})
+
+
+def test_a_lost_wave_is_judged_on_the_harvest_round():
+    """The area's rows are on `2013Q1` once moved, so that is the wave named."""
+    cp = pd.concat({'Nigeria': pd.concat([_cp(), _cp(t='2013Q1')])}, names=['country'])
+    pf = pd.concat({'Nigeria': _pf([('2010Q3', 'h1', '1', 2.0), ('2012Q3', 'h1', '9', 2.0)])},
+                   names=['country'])
+    pair = {'2010Q3': '2011Q1', '2012Q3': '2013Q1'}
+    with pytest.warns(PlotGrainMismatchWarning, match='Nigeria 2013Q1') as caught:
+        assert len(yield_kg(cp, pf, area_t=pair)) == 1
+    assert '2011Q1' not in str(caught[0].message)
+
+
 def test_it_leaves_the_operands_alone():
     pf = _pf([('2010Q3', 'h1', '1', 2.0)])
     before = pf.copy()

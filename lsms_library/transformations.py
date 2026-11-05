@@ -5385,11 +5385,17 @@ def pp_ph_area_t(country):
 def _area_on_harvest_rounds(pf, area_t):
     """Move a reset-index ``plot_features``'s ``t`` onto the harvest round's.
 
-    Refused where a target round is already served: its plots would be counted
-    twice, summing two rounds' areas for one plot.
+    Refused where a target round is already served, or named twice: its plots
+    would be counted twice, summing two rounds' areas for one plot.
     """
     if 't' not in pf.columns:
         raise ValueError("yield_kg area_t= needs a 't' level on plot_features")
+    targets = [str(t) for t in area_t.values()]
+    repeated = sorted({t for t in targets if targets.count(t) > 1})
+    if repeated:
+        raise ValueError(
+            f"yield_kg area_t= maps more than one round onto {repeated}, which "
+            "would sum their areas for one plot")
     held = {str(t) for t in pf['t'].dropna().unique()}
     clash = sorted(held & {str(t) for t in area_t.values()})
     if clash:
@@ -5441,8 +5447,8 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
         plots in one round and records the harvest in another (Nigeria, which
         otherwise shares no wave and returns nothing; see :func:`pp_ph_area_t`).
         A ``t`` it does not name stays as it is.  Refused where a target round
-        is already on ``plot_features``, which would sum two rounds' areas.  The
-        output carries the harvest round.
+        is already on ``plot_features`` or is named twice, either of which would
+        sum two rounds' areas.  The output carries the harvest round.
     on : {'parcel', 'plot'}, default 'parcel'
         Land grain to join on.
 
