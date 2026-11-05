@@ -96,6 +96,7 @@ __all__ = [
     "ATTRS_KEY",
     "ATTRS_RESOLUTION_KEY",
     "DESIGN_TAGS",
+    "NOT_STATED_SOURCE_TYPES",
     "SOURCE_TYPES",
     "DOCUMENTED_SOURCE_TYPES",
     "CONFIDENCE_LEVELS",
@@ -128,12 +129,23 @@ ATTRS_RESOLUTION_KEY = "sampling_resolution"
 # The frozen vocabulary (Uganda exemplar, GH #793 ruling 2026-10-18)
 # ---------------------------------------------------------------------------
 
-#: Every ``design_tag`` the exemplar uses.  An editorial reading -- no document
-#: uses either string -- so it never travels without ``source_type`` and
-#: ``confidence``.
+#: Every ``design_tag`` a shipped record uses.  An editorial reading -- no
+#: document uses these strings -- so it never travels without ``source_type`` and
+#: ``confidence``.  Widened one tag at a time, each with the first evidenced
+#: record that uses it and its reason here (GH #1134, @ligon 2026-10-19).
 DESIGN_TAGS: frozenset[str] = frozenset({
     "two-stage-stratified-cluster",                 # Uganda 2005-06 .. 2011-12
     "two-stage-stratified-cluster-rotating-panel",  # Uganda 2013-14 onward
+    # Looked, and nothing states a design: the twin of population's `not-stated`.
+    # First record: Albania 2008, whose DDI "Sampling" section reads "No content
+    # available".  Only with a source in NOT_STATED_SOURCE_TYPES.
+    "not-stated",
+})
+
+#: The ``source_type`` values ``design_tag: not-stated`` may carry.  A document
+#: that states a design has no business under that tag.
+NOT_STATED_SOURCE_TYPES: frozenset[str] = frozenset({
+    "not-found", "derived-from-data",
 })
 
 SOURCE_TYPES: frozenset[str] = frozenset({
@@ -473,6 +485,13 @@ class SamplingRecord(dict):
         _check_vocab(where, "design_tag", block["design_tag"], DESIGN_TAGS)
         _check_vocab(where, "source_type", block["source_type"], SOURCE_TYPES)
         _check_vocab(where, "confidence", block["confidence"], CONFIDENCE_LEVELS)
+        if (block["design_tag"] == "not-stated"
+                and block["source_type"] not in NOT_STATED_SOURCE_TYPES):
+            raise ValueError(
+                f"{where}: design_tag 'not-stated' says nothing states a design, "
+                f"so source_type must be one of {sorted(NOT_STATED_SOURCE_TYPES)}, "
+                f"not {block['source_type']!r} (GH #1134)."
+            )
         if block.get("documentation_status") is not None:
             _check_vocab(where, "documentation_status",
                          block["documentation_status"], DOCUMENTATION_STATUSES)
