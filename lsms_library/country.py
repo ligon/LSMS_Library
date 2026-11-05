@@ -5231,13 +5231,37 @@ class Country:
         if (not requested
                 or not requested < {str(w) for w in self.waves}
                 or method_name not in self.data_scheme
-                or method_name in JSON_CACHE_METHODS
-                or any(method_name in self[w].data_scheme for w in waves)):
+                or method_name in JSON_CACHE_METHODS):
             return False
+        return not self._legacy_can_build(method_name, waves)
+
+    def _legacy_can_build(self, method_name: str, waves: list[str] | None) -> bool:
+        """Can the legacy path build ``method_name`` for *waves*?
+
+        A requested wave declares the table, or the country level has a rule or a script
+        for it; ``True`` wherever a make rule cannot be inspected, so a table this cannot
+        answer for keeps its route.  ``False`` is the case a derived table must not fall
+        through: the legacy path could only answer 0 rows on a subset, which reads a failed
+        build as absence, or "Could not materialize", which hides the cause (GH #1516).
+        Measured on the 38 countries that have a config: no country has a legacy route for
+        ``household_characteristics``, and four have one for a food table (CotedIvoire,
+        Nigeria, Tanzania, Togo).
+        """
+        requested = self.waves if waves is None else waves
+        if any(method_name in self[w].data_scheme for w in requested):
+            return True
         if ((self.file_path / "_" / "Makefile").exists()
                 and not shutil.which("make", path=_script_subprocess_env().get("PATH"))):
-            return False
-        return not self._has_country_builder(method_name)
+            return True
+        return self._has_country_builder(method_name)
+
+    def _warn_legacy_fallback(self, table: str, source: str, exc: Exception) -> None:
+        """A derivation failed and the country's own build is about to answer for it."""
+        warnings.warn(
+            f"{self.name}/{table}: deriving it from {source} failed "
+            f"({type(exc).__name__}: {exc}), so the country's legacy build is being tried "
+            f"instead.  What it serves is not the derived table.",
+            LegacyFallbackWarning, stacklevel=4)
 
     def _has_country_builder(self, method_name: str) -> bool:
         """Can the COUNTRY level build ``method_name``?  GH #1039.
@@ -6786,12 +6810,12 @@ class Country:
                         # be honoured by the legacy path, so it re-raises.
                         # Only a bare call (all three defaulted) keeps the
                         # pre-#828 legacy fall-through, and not on a kilogram
-                        # subset (GH #1487, see below).
-                        if units is not None or map_labels or valuation is not None or subset_kg:
+                        # subset (GH #1487, see below) or where there is
+                        # nothing to fall through to (GH #1516).
+                        if (units is not None or map_labels or valuation is not None
+                                or subset_kg or not self._legacy_can_build(name, waves)):
                             raise exc.for_country(self.name) from exc
-                        logger.info(
-                            "Deriving %s from food_acquired failed (%s); "
-                            "falling back to legacy aggregation", name, exc)
+                        self._warn_legacy_fallback(name, 'food_acquired', exc)
                         derived = None
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
                         if subset_kg:
@@ -6806,7 +6830,7 @@ class Country:
                                 "units='units' or units='unitvalue'.")
                         if (units is not None or map_labels or valuation is not None
                                 or subset_kg or type(exc) not in _GENERIC_BUILD_FAILURES
-                                or self._proven_absent(name, waves)):
+                                or not self._legacy_can_build(name, waves)):
                             # GH #1532: a named class is a statement, never a
                             # failed build; see _GENERIC_BUILD_FAILURES.
                             #
@@ -6815,10 +6839,11 @@ class Country:
                             # declare no `food_quantities`, so the legacy path
                             # reads the failure as proven absence and serves 0
                             # rows with no error (Mali, 2018-19 with 2014-15
-                            # broken: 162,032 rows on base).  GH #1512: the same
-                            # for any subset the legacy path would answer that
-                            # way, `food_expenditures` with or without `basis=`
-                            # above all, whose requested wave had failed.
+                            # broken: 162,032 rows on base).  GH #1512 / #1516:
+                            # the same wherever the legacy path cannot build the
+                            # table, whose subset answer is 0 rows and whose
+                            # all-waves answer ("Could not materialize") hides
+                            # this exception.
                             #
                             # Caller explicitly asked for canonical units= /
                             # labels= / valuation= behaviour; the legacy
@@ -6832,9 +6857,7 @@ class Country:
                             # looking exactly like one that ran and changed
                             # nothing, which is the worse failure of the two.)
                             raise
-                        logger.info(
-                            "Deriving %s from food_acquired failed (%s); "
-                            "falling back to legacy aggregation", name, exc)
+                        self._warn_legacy_fallback(name, 'food_acquired', exc)
                         derived = None
                     if derived is not None:
                         # Relabel is outside the except so user-facing KeyErrors
@@ -6889,11 +6912,14 @@ class Country:
                                 rc_kwargs['age_cuts'] = tuple(age_cuts)
                             derived = roster_to_characteristics(roster, **rc_kwargs)
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
-                        if type(exc) not in _GENERIC_BUILD_FAILURES:
-                            raise   # GH #1532: see _GENERIC_BUILD_FAILURES
-                        logger.info(
-                            "Deriving %s from household_roster failed (%s); "
-                            "falling back to legacy aggregation", name, exc)
+                        # GH #1532: a named class is never a failed build.
+                        # GH #1516: no country has a legacy route for this
+                        # table, so falling through answered 0 rows on a
+                        # subset and "Could not materialize" on all waves.
+                        if (type(exc) not in _GENERIC_BUILD_FAILURES
+                                or not self._legacy_can_build(name, waves)):
+                            raise
+                        self._warn_legacy_fallback(name, 'household_roster', exc)
                         derived = None
                     if derived is not None:
                         # This path never calls _finalize_result, so a mapping-site
@@ -8036,6 +8062,14 @@ def merge_label_pass_through_reports(sources) -> dict:
         if isinstance(per_country, Mapping):
             merged.update(per_country)
     return merged
+
+
+class LegacyFallbackWarning(UserWarning):
+    """A derived table's derivation failed and the country's legacy build answered instead.
+
+    Only where a legacy route exists (``Country._legacy_can_build``); anywhere else the
+    failure itself is raised.  This used to be an INFO log line (GH #1516).
+    """
 
 
 class CacheRebuildWarning(UserWarning):
