@@ -705,6 +705,19 @@ def inputs_last_purchase(country: str, wave: str) -> pd.DataFrame:
 STRATUM_RAW_VARIABLES = ("s00q01", "s00q04")
 
 
+class StratumError(Exception):
+    """A wave's ``strata`` cannot be served: a code where a label belongs, or a
+    cluster holding two strata.
+
+    Subclasses ``Exception``, not ``ValueError``.  ``Country._join_v_from_sample``
+    catches ``ValueError`` and logs it at INFO, so a refusal in ``sample()`` would
+    be loud only on a direct call, and every household table would come back with
+    no ``v`` (measured by injection: Niger ``household_roster`` 121,956 rows, Mali
+    220,732).  Defined here rather than in a by-path ``mapping.py`` so it pickles
+    across parallel wave workers (GH #1524).
+    """
+
+
 def stratum_derivation_key(country: str) -> str:
     """The registry key for one country's region x milieu ``strata``."""
     return f"{country}::sample::region-milieu-stratum"
@@ -727,8 +740,8 @@ def derive_region_milieu_stratum(region, milieu):
         if pd.isna(value):
             return pd.NA
         if not isinstance(value, str):
-            raise ValueError(f"{name} {value!r} is not a label: a stratum is built "
-                             f"from value labels, never from codes (GH #812)")
+            raise StratumError(f"{name} {value!r} is not a label: a stratum is built "
+                               f"from value labels, never from codes (GH #812)")
         value = value.strip()
         if not value:
             return pd.NA

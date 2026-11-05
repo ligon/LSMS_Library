@@ -10,7 +10,7 @@ The classes marked ``requires_s3`` read the covers directly and import nothing f
 invented frames and config and need no data.
 """
 import importlib.util
-import pathlib
+import pickle
 import re
 import unicodedata
 import warnings
@@ -19,10 +19,11 @@ import pandas as pd
 import pytest
 
 import lsms_library as ll
-from lsms_library import data_access
+from lsms_library import data_access, local_tools
 from lsms_library.build_transforms import GrainConflict
 from lsms_library.derivations import derivation_records
 from lsms_library.ehcvm import (
+    StratumError,
     derive_region_milieu_stratum,
     stamp_region_milieu_stratum,
     strata_label,
@@ -112,7 +113,7 @@ class TestLabel:
 
     @pytest.mark.parametrize("region, milieu", [(1, "Rural"), ("Kayes", 2), (1.0, 2.0)])
     def test_a_code_is_refused(self, region, milieu):
-        with pytest.raises(ValueError, match="never from codes"):
+        with pytest.raises(StratumError, match="never from codes"):
             derive_region_milieu_stratum(region, milieu)
 
     def test_the_cell_formatter_reads_region_then_milieu(self):
@@ -208,8 +209,54 @@ class TestNigerStrateHook:
         assert out["strata"].tolist() == ["Niamey"]
 
     def test_a_grappe_with_two_strata_is_refused(self):
-        with pytest.raises(GrainConflict):
+        with pytest.raises(StratumError, match="Niger/2014-15/sample") as caught:
             self._hook()(self._frame(["Niamey", "Dosso urbain"]))
+        assert isinstance(caught.value.__cause__, GrainConflict)
+
+
+class TestARefusalIsNotSwallowed:
+    """`_join_v_from_sample` catches ValueError and logs it, and the derived-table paths
+    catch RuntimeError, ValueError and KeyError, so a refusal must be none of them."""
+
+    @staticmethod
+    def _grab(monkeypatch, tmp_path, country, wave, frames):
+        """Through Wave.grab_data, with invented frames and a private data root."""
+        monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("LSMS_NO_CACHE", "1")
+        monkeypatch.setattr(local_tools, "get_dataframe",
+                            lambda path, **kwargs: frames[str(path).split("/Data/")[-1]].copy())
+        with pytest.raises(StratumError) as caught:
+            ll.Country(country)[wave].grab_data("sample")
+        assert not isinstance(caught.value, (ValueError, KeyError, RuntimeError, AttributeError,
+                                             FileNotFoundError))
+        return caught.value
+
+    def test_a_grappe_with_two_strata_reaches_the_caller_of_the_wave_build(self, monkeypatch, tmp_path):
+        folder = "NER_2014_ECVMA-II_v02_M_STATA8/"
+        frames = {
+            folder + "ECVMA2014welfare_T1c.dta": pd.DataFrame(
+                {"GRAPPE": [2], "MENAGE": [1], "EXTENSION": [0], "hhweight": [9.0], "urbrur": ["Rural"]}),
+            folder + "ECVMA2014_P1P2_Conso.dta": pd.DataFrame(
+                {"GRAPPE": [2, 2], "strate": ["Niamey", "Dosso urbain"]}),
+        }
+        refusal = self._grab(monkeypatch, tmp_path, "Niger", "2014-15", frames)
+        assert isinstance(refusal.__cause__, GrainConflict)
+
+    def test_a_code_reaches_the_caller_of_the_wave_build(self, monkeypatch, tmp_path):
+        frames = {
+            "s00_me_mli2021.dta": pd.DataFrame(
+                {"grappe": [2], "menage": [1], "s00q01": [1], "s00q04": ["Rural"]}),
+            "ehcvm_ponderations_mli2021.dta": pd.DataFrame(
+                {"grappe": [2], "menage": [1], "hhweight": [9.0]}),
+        }
+        refusal = self._grab(monkeypatch, tmp_path, "Mali", "2021-22", frames)
+        assert "never from codes" in str(refusal)
+
+    def test_it_pickles_across_parallel_wave_workers(self):
+        """GH #1524: a class defined in a by-path mapping.py does not."""
+        assert StratumError.__module__ == "lsms_library.ehcvm"
+        back = pickle.loads(pickle.dumps(StratumError("two strata")))
+        assert type(back) is StratumError and str(back) == "two strata"
 
 
 # ---------------------------------------------------------------------------
