@@ -1777,7 +1777,8 @@ backend disagreed with itself.  =check_panel_consistency= under make goes from f
 livestock cover only.  W2's livestock cover holds 3 households on neither the HH
 nor the PP cover, each with a W1 baseline no other household claims; 1 reaches
 W3.  GH #1120's oracle read HH, PP and PH, so =sample()= and the crosswalk agree
-in leaving them out.  Part of the open question below.
+in leaving them out.  Part of the open question below.  /Since 2026-11-05 the crosswalk
+links them; =sample()= still leaves them out./
 
 ** W3 households the survey counts as ESS1: linked by rule (GH #1467, ruled 2026-11-04)
 
@@ -1840,11 +1841,16 @@ HH cover, 27 PP-only) and 1,255 identities, the three figures of the ESS3 BID (P
   W3 EA holds 9 W2 and 8 W3 households.  This is a keying difference, not a different EA
   and not a move, and it is why W2 -> W3 goes from 4,925 of 4,925 linked households keeping
   =v= through =sample()= to 4,925 of 4,926.  =sampling.yml='s =stable= stands.
-- *One household loses a W2-W3 link in =livestock=.*  W2's livestock cover holds 3
-  households on neither its HH nor its PP cover (option (d) of the issue, not taken).  1
-  of them is among the 49, so its W3 rows move to T while its one W2 =livestock= row keeps
-  the native id, which was all that joined them: W2 and W3 share 2,887 =i= in =livestock=
-  before and 2,886 after.  No other table has a W2 row under a moved id.
+- *W2's 3 livestock-only households are on W2's map too* (option (d) of the issue, ruled
+  by @ligon 2026-11-05, after the 49 had shipped in PR #1558).  They are on neither its HH
+  nor its PP cover.  Each has a baseline on the livestock cover that is a W1 household no
+  other household claims, and =panel_ids.py= refuses if holder rows disagree or the
+  baseline is not a W1 household.  1 of them is among the 49, whose W3 rows PR #1558 moved
+  to T while its W2 row kept the native id, so W2 and W3 shared 2,886 =i= in =livestock=
+  instead of 2,887.  Mapping all 3 restores that link, and 1 W1 -> W2 link.  3 W2
+  =livestock= rows move, one per household, and no other served table holds these ids in
+  W2.  =sample= still leaves them out of W2 (#1120 D1 reads HH and PP), and =livestock= has
+  no =v= level.
 
 *What moved, measured on cold builds* (=115b6ab71= against =6fe6fea4a=, each in its own
 empty root).  Every table has the same rows and values once the 49 are mapped: 24 tables,
@@ -1878,15 +1884,16 @@ of them.  The derived tables come back in a new row order, because they sort on 
 =interview_date= and =food_security= have no W3 rows, and =cluster_features= and
 =community_prices= have no =i=, so those four are exact.
 
-Attrition, every cell that moves.  W1 -> W3 in =sample= is the BID's 3,726.  W2 -> W3 moves
-only for the two households above: the three-wave one in =sample= and =plot_features=, the
-livestock-only one in =livestock=.
+Attrition, every cell that moves, from before GH #1467 to now, with W2's livestock-only
+households on the map.  W1 -> W3 in =sample= is the BID's 3,726.  W2 -> W3 moves only for
+the three-wave household above, in =sample= and =plot_features=.  W1 -> W2 moves only in
+=livestock=, for one of W2's livestock-only households.
 
 | cell     | table                                           | before | after |
 |----------+-------------------------------------------------+--------+-------|
 | W2 -> W3 | =sample=                                        |  4,925 | 4,926 |
 | W2 -> W3 | =plot_features=                                 |  3,418 | 3,419 |
-| W2 -> W3 | =livestock=                                     |  2,887 | 2,886 |
+| W1 -> W2 | =livestock=                                     |  2,489 | 2,490 |
 | W1 -> W3 | =sample=                                        |  3,677 | 3,726 |
 | W1 -> W3 | =household_roster=                              |  3,630 | 3,677 |
 | W1 -> W3 | =assets=                                        |  3,651 | 3,699 |
@@ -1908,10 +1915,10 @@ livestock-only one in =livestock=.
 
 =check_panel_consistency= passes on both sides.  =updated_ids_cover_waves= goes from warn
 to pass, because the baselines are now inferred as W1 and W4.  =panel_ids_targets_exist=
-stays a warning, 27+69 of 4,981 to 92+86 of 13,688: on the current side the 25, 27 and 40
-PP-only households of W2, W3 and W5, which have no roster; on the previous side the 69
-as before (the 49 and the 7 below among them) and the 17 W5 households on W4's PP cover
-only.  =attrition_monotonic= now walks both chains.
+stays a warning, 27+69 of 4,981 to 95+86 of 13,691: on the current side the 25, 27 and 40
+PP-only households of W2, W3 and W5 and W2's 3 livestock-only ones, which have no roster; on
+the previous side the 69 as before (the 49 and the 7 below among them) and the 17 W5
+households on W4's PP cover only.  =attrition_monotonic= now walks both chains.
 
 /The evidence as the ruling read it, kept as written:/
 
@@ -1944,8 +1951,8 @@ and needs a ruling.  (Ruled above.)
 
 =_/panel_ids.py= now puts all five waves in one frame.  W1 and W4 are baselines, every
 =previous_i= missing, so =updated_ids= holds an empty map for each and no link crosses
-from W4 to W3.  3,801 W2 -> W1 keys and 4,906 W5 -> W4 keys join =panel_ids.json=, which
-goes from 4,981 to 13,688 entries.  W2's and W3's =updated_ids= maps are dict-identical
+from W4 to W3.  3,804 W2 -> W1 keys and 4,906 W5 -> W4 keys join =panel_ids.json=, which
+goes from 4,981 to 13,691 entries.  W2's and W3's =updated_ids= maps are dict-identical
 to before, and W5's is all identities, so no served =i= moves.
 
 *Which W5 households link*: those whose id is on W4's HH or PP cover, which is how W2's

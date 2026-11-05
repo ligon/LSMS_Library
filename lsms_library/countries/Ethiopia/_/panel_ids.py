@@ -33,6 +33,11 @@ W3 link's target must be a W1 household of the same locality.  An EA check
 would add nothing: W1's and W3's ``ea_id`` are both the id's first 11
 characters.
 
+W2's 3 households on its livestock cover only (GH #1467, option (d), ruled
+2026-11-05) are on W2's map too.  #1120 D1 keeps them out of ``sample``; the
+cover names a W1 baseline for each, on W1's household cover and claimed by no
+other household.
+
 W1 (2011-12) and W4 (2018-19) are the two panels' baselines: every row
 has a missing ``previous_i``, so the resolver records nothing for them and
 nothing crosses from W4 to W3.  ESS4 "is not a follow-up of the previous
@@ -73,6 +78,7 @@ hh1 = get_dataframe('../2011-12/Data/sect_cover_hh_w1.dta', convert_categoricals
 pp1 = get_dataframe('../2011-12/Data/sect_cover_pp_w1.dta', convert_categoricals=False)
 hh2 = get_dataframe('../2013-14/Data/sect_cover_hh_w2.dta', convert_categoricals=False)
 pp2 = get_dataframe('../2013-14/Data/sect_cover_pp_w2.dta', convert_categoricals=False)
+ls2 = get_dataframe('../2013-14/Data/sect_cover_ls_w2.dta', convert_categoricals=False)
 hh3 = get_dataframe('../2015-16/Data/sect_cover_hh_w3.dta', convert_categoricals=False)
 pp3 = get_dataframe('../2015-16/Data/sect_cover_pp_w3.dta', convert_categoricals=False)
 hh4 = get_dataframe('../2018-19/Data/sect_cover_hh_w4.dta', convert_categoricals=False)
@@ -114,6 +120,16 @@ if df2.previous_i.eq('').any():
 if a2 is not None:
     extra = a2[['i', 'household_id']].rename(columns={'household_id': 'previous_i'})
     df2 = pd.concat([df2, extra], ignore_index=True)
+# Holder grain: a household's rows must agree on the baseline before reduction.
+l2 = ls2[['household_id2', 'household_id']].map(format_id)
+l2 = l2.rename(columns={'household_id2': 'i', 'household_id': 'previous_i'})
+l2 = l2[l2.i.notna() & ~l2.i.isin(df2.i)]
+if l2.groupby('i').previous_i.nunique(dropna=False).gt(1).any():
+    raise ValueError('W2 livestock-only holder rows disagree on the W1 baseline')
+l2 = l2.drop_duplicates('i')
+if not l2.previous_i.isin(baseline).all():
+    raise ValueError('W2 livestock-only baseline is not a W1 household')
+df2 = pd.concat([df2, l2], ignore_index=True)
 df2['t'] = '2013-14'
 df2 = df2.set_index(['t', 'i'])[['previous_i']]
 
