@@ -73,6 +73,12 @@ def test_the_maps_carry_the_bids_figures(updated_ids):
     assert len(w5) == 4906
 
 
+def test_the_w2_map_is_the_panel_and_its_agriculture_only_households(updated_ids):
+    """ESS1's 3,776 re-interviewed (ESS3 BID PDF p16), plus the release's 28 on an agriculture
+    cover only: 25 on post-planting and 3 on livestock (option (d), ruled 2026-11-05)."""
+    assert len(updated_ids["2013-14"]) == 3776 + 25 + 3
+
+
 def test_every_moving_w3_id_goes_to_its_truncated_id(updated_ids):
     moving = {k: v for k, v in updated_ids["2015-16"].items() if k != v}
     assert moving
@@ -229,6 +235,18 @@ def test_every_w3_target_is_a_w1_household_of_the_same_locality(updated_ids, w1,
     rule = moved[~moved.i.isin(w2)]
     assert len(rule) > 0
     assert rule.household_id.is_unique
+
+
+@_requires_data
+def test_w2_livestock_only_households_are_on_the_map(updated_ids, w1):
+    """Option (d): on the livestock cover only, with that cover's W1 baseline as the target."""
+    other = set(_cover("2013-14", "sect_cover_hh_w2.dta").household_id2.map(format_id))
+    other |= set(_cover("2013-14", "sect_cover_pp_w2.dta").household_id2.map(format_id))
+    ls = _cover("2013-14", "sect_cover_ls_w2.dta")[["household_id2", "household_id"]].map(format_id)
+    only = ls[ls.household_id2.notna() & ~ls.household_id2.isin(other)].drop_duplicates()
+    assert only.household_id2.is_unique and len(only) > 0
+    assert only.household_id.isin(w1).all()
+    assert only.set_index("household_id2").household_id.to_dict().items() <= updated_ids["2013-14"].items()
 
 
 def _panel_ii_ids(wave, hh, pp):
