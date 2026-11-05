@@ -204,14 +204,13 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
   columns: [Latitude, Longitude]
   rule: >-
     Latitude, Longitude = the 2018-19 cluster fix of the same grappe
-    (grappe_gps_bfa2018.dta), on the 2021-22 row of a panel grappe: 519 of the
+    (grappe_gps_bfa2018.dta), on the 2021-22 row of a panel grappe: 516 of the
     550 panel grappes.  NA, with no key, for the 22 panel grappes other than 549
     that have no 2018-19 fix, for grappes 19, 365 and 549 (province changed), for
     grappes 103, 104, 226, 229, 237 and 240 (fix more than 25 km from the grappe's
-    own 2021-22 parcels), and for all 600 cross-section grappes.  The other values
-    are carried as recorded.  Three of them, 216, 218 and 350, are not readings of
-    their own grappe but rounded copies of a neighbouring grappe's reading
-    (CONTENTS.org, "Six carried GPS fixes withheld").
+    own 2021-22 parcels), for grappes 216, 218 and 350 (rounded copies of another
+    grappe's reading), and for all 600 cross-section grappes.  The other values are
+    carried as recorded.
   function: lsms_library.countries.Burkina_Faso.2021-22._.mapping:derive_panel_grappe_gps
   inputs: lsms_library.countries.Burkina_Faso.2021-22._.mapping:inputs_cluster_features
   raw_variables: [grappe, grappe_EHCVM1, coordonnes_gps__Latitude, coordonnes_gps__Longitude]
@@ -231,8 +230,8 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
         Same grappe id means same EA, and the EA's location did not change between
         the waves, so the 2018-19 fix locates the 2021-22 row.  Rural differs on 7
         panel grappes (147, 150, 153, 154, 155, 180, 182), all carried: that is an
-        attribute recode, and the rulings exclude on province and on distance from the
-        grappe's own parcels, not on this.
+        attribute recode, and the rulings exclude on province, on distance from the
+        grappe's own parcels and on a copied reading, not on this.
       basis: modelling-choice
       evidence: >-
         GH #1057, ruling by @ligon 2026-11-03, option (b), tightened.
@@ -260,6 +259,16 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
         240 51.4 (26), 237 44.5 (14), 229 29.3 (17), 226 28.8 (15).  The parcels of each
         lie within a few km of their own median.
     - text: >-
+        Grappes 216, 218 and 350 are NOT carried.  Each fix is a rounded copy of a
+        neighbouring grappe's reading, so it is not a reading of this grappe, and they
+        stay NA.  They are withheld in 2018-19 too, under
+        Burkina_Faso::cluster_features::copied-grappe-gps-withheld.
+      basis: modelling-choice
+      evidence: >-
+        GH #1057, ruling by @ligon 2026-11-05.  grappe_gps_bfa2018.dta: 216 copies 217, 218
+        copies 219, 350 copies 351; same Timestamp and Altitude, and the source's position
+        rounds to the copy.  350 lies 6.4 km from its own parcels; 216 and 218 have none.
+    - text: >-
         The cross-section (grappes 586-1185) gets no fix.  It is a new draw from
         the 2019 census frame with no 2018-19 antecedent, and its cover's GPS__*
         are household positions (they differ within 578 of its 600 grappes).  A
@@ -268,16 +277,67 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
       evidence: GH #1057, ruling by @ligon 2026-11-03; GH #1276.
   validated_against: >-
     s16a_me_bfa2021.dta, s16aq46__latitude / __longitude, parcel positions recorded
-    in 2021-22 and independent of the fix: on the 271 carried grappes that have one,
+    in 2021-22 and independent of the fix: on the 270 carried grappes that have one,
     the median parcel position lies a median of 1.6 km from the carried fix (p90
-    4.9 km, maximum 21.8 km), against 213 km for a fix paired with another grappe's
+    4.7 km, maximum 21.8 km), against 213 km for a fix paired with another grappe's
     parcels.  The six grappes beyond 25 km are withheld (see the assumptions).  The
-    other 248 carried grappes have no parcel coordinate to compare.  The check reads
+    other 246 carried grappes have no parcel coordinate to compare.  The check reads
     the s16a file we hold; the current release of catalog 6224 no longer has these
     columns (CONTENTS.org, "what the World Bank states about 6224's versions"), so it
     can be repeated only on the held file.
   contents: 'Burkina_Faso/_/CONTENTS.org, "2021-22 GPS carried from 2018-19 (GH #1057)"'
   since: '2026-11-03'
+
+# A withheld value has nowhere to carry a Derivation key, so this entry is the only
+# place the withholding is disclosed: `rows: 0`, the attrs summary lists the key at 0,
+# and `derivation_inputs` returns the file's own rows for the nine.
+Burkina_Faso::cluster_features::copied-grappe-gps-withheld:
+  waves: ['2018-19']
+  columns: [Latitude, Longitude]
+  rows: 0
+  rule: >-
+    Latitude and Longitude are NA on the 2018-19 row of grappes 103, 104, 216, 218, 226,
+    237, 240, 350 and 365, whose fix in grappe_gps_bfa2018.dta is not a reading of that
+    grappe.  The rows stay, with every other column, and carry no key.  555 fixes in the
+    file, 546 served.
+  function: lsms_library.countries.Burkina_Faso.2018-19._.mapping:withhold_copied_grappe_gps
+  inputs: lsms_library.countries.Burkina_Faso.2018-19._.mapping:inputs_cluster_features
+  raw_variables: [grappe, vague, coordonnes_gps__Latitude, coordonnes_gps__Longitude,
+                  coordonnes_gps__Accuracy, coordonnes_gps__Altitude, coordonnes_gps__Timestamp]
+  assumptions:
+    - text: >-
+        A fix at one or two decimals that shares its reading with another grappe is a
+        copy of that reading, not a reading of its own grappe.  216 copies 217, 218 copies
+        219, 226 copies 223, 237 and 240 copy 232, 350 copies 351, 365 copies 369.  The file
+        does not say so; its variable label calls each the GPS position of the village or
+        quarter.
+      basis: modelling-choice
+      evidence: >-
+        GH #1057, ruling by @ligon 2026-11-05.  grappe_gps_bfa2018.dta: these seven are all
+        the fixes at two decimals or fewer, all in vague 2.  Each shares its Timestamp to
+        the second and its Altitude with its source, in the same province; its Accuracy
+        differs only by rounding, and the source's position rounds to it.  These are also
+        the only timestamps the file repeats.
+    - text: >-
+        103 and 104 hold a point in Kadiogo, not a reading of their grappes in Namentenga.
+        They copy no one reading, so this is a separate ground under the same ruling.
+      basis: modelling-choice
+      evidence: >-
+        GH #1057, ruling by @ligon 2026-11-05.  grappe_gps_bfa2018.dta and s00_me_bfa2018.dta:
+        the two fixes are 6 m apart, 109 km from Namentenga's median fix and 6 km from
+        Kadiogo's, within 30 m of Kadiogo grappes 89 and 136, and all four are stamped
+        2019-07-23 within about two hours.  No other fixes of different provinces meet within
+        100 m.
+  validated_against: >-
+    s16a_me_bfa2021.dta, s16aq46__latitude / __longitude, parcel positions recorded in
+    2021-22 and independent of the fix, where a withheld grappe has them: 365 85.1 km, 240
+    51.4, 237 44.5, 103 104.7, 104 103.7, 226 28.8, 350 6.4, against a median of 1.6 km for
+    the carried grappes.  Their sources 232 and 223 are 1.4 and 2.6 km from their own, 351
+    2.9.  216 and 218 have no parcel coordinate, so for them the copy pattern is the only
+    evidence.  The check reads the s16a file we hold; the current release of catalog 6224
+    no longer has these columns.
+  contents: 'Burkina_Faso/_/CONTENTS.org, "Copied 2018-19 fixes withheld, in both waves (GH #1057)"'
+  since: '2026-11-05'
 
 Burkina_Faso::sample::region-milieu-stratum:
   waves: ['2018-19', '2021-22']
