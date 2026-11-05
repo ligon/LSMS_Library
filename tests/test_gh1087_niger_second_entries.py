@@ -118,6 +118,29 @@ class TestRule:
         assert FLAG not in out.columns
 
 
+class TestBlindSpot:
+    """Disclosed in the docstring and CONTENTS.org: a second entry that blanks a
+    price is not a disagreement the flag can see.  2 records, 3 slots in the held
+    files.  Pinned so that extending the rule is a decision and not an accident."""
+
+    TRIPLES = [("cs07q04", "cs07q05", "cs07q03"), ("cs07q06", "cs07q07", "cs07q03"),
+               ("cs07q08", "cs07q09", "cs07q03")]
+
+    @pytest.mark.parametrize("blank", [0.0, 9999.0, 99999.0, float("nan")])
+    def test_a_blanked_price_does_not_flag(self, niger, blank):
+        nan = float("nan")
+        codes = pd.DataFrame(
+            [(1, 1, 701, 7011, 1, 100.0, 2.0, 150.0, 3.0, nan, nan),
+             (1, 2, 701, 7011, 1, 100.0, 2.0, blank, 3.0, nan, nan)],
+            columns=["grappe", "numquest", "cs07q01", "cs07q02", "cs07q03",
+                     "cs07q04", "cs07q05", "cs07q06", "cs07q07", "cs07q08", "cs07q09"])
+        labels = codes.assign(cs07q01="Mil", cs07q02="mil vendu au kilo", cs07q03="Kg")
+        out = niger._community_price_triples(labels, {"Mil": "Millet"}, {"Kg": "Kg"},
+                                             self.TRIPLES, codes=codes)
+        assert out["Price"].tolist() == [100.0, 150.0]
+        assert not out[FLAG].any()
+
+
 class TestDeclared:
     def test_the_column_is_optional_on_the_country_scheme(self):
         with open(countries_root() / COUNTRY / "_" / "data_scheme.yml",

@@ -169,8 +169,10 @@ Niger::community_prices::first-entry-of-duplicate:
     second entry that repeats a first-entry row in every served column is a copy
     (134 rows).  A slot that repeats none (30 rows: 2011-12 15, 2014-15 15) is
     not served, and every served row of that record carries
-    second_entry_disagrees = True.  2018-19 s05 records two readings per key and
-    its second records stay obs 3 / 4: a different mechanism, not this rule.
+    second_entry_disagrees = True.  A second entry that only blanks a price, with a
+    0 or a sentinel, leaves no slot and does not flag: 5 served slots, 3 of them in
+    2 records otherwise unflagged.  2018-19 s05 records two readings per key and its
+    second records stay obs 3 / 4: a different mechanism, not this rule.
   function: lsms_library.countries.Niger._.niger:derive_cs07_first_entry
   inputs: lsms_library.countries.Niger._.niger:inputs_cs07_second_entries
   raw_variables: [grappe, numquest, cs07q01, cs07q02, cs07q03, cs07q04, cs07q05,

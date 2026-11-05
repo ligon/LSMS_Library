@@ -1827,6 +1827,13 @@ def derive_cs07_first_entry(slots):
     record has no first-entry row to carry the flag: 2011-12 passage 2, variety
     7311, whose first entry holds the 99999 sentinel and whose second holds a
     price.  That price is the record's only one and is no longer served.
+
+    THE FLAG IS ONE-DIRECTIONAL, and this is a known blind spot.  It sees a second
+    entry that prices a slot differently, not one that blanks it: a 0 or a sentinel
+    never reaches *slots*.  In the held files 5 served slots have a second entry at
+    0 (4) or at a sentinel (1), and 3 of them sit in 2 records that nothing else
+    flags, so those stay False.  Disclosed, not extended: a blanked slot offers no
+    competing reading, and the first entry's price is served either way.
     """
     key = ['v', 'variety', 'visit']
     second = pd.MultiIndex.from_frame(slots.loc[slots['rank'] > 0, key])

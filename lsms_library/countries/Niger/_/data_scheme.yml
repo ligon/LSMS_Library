@@ -562,7 +562,8 @@ Data Scheme:
     #               entry has a slot repeating no first-entry row (GH #1087).  A
     #               property of the record: it does not say which slot, and
     #               derivation_inputs returns the slots.  False on every other
-    #               CS07 row.  `optional` because s05 (2018-19) serves its second
+    #               CS07 row, including a record whose second entry only blanks a
+    #               price (2 records, 3 slots).  `optional` because s05 (2018-19) serves its second
     #               records as obs 3 / 4, so the question does not arise there and
     #               the column is NA.
     index: (t, v, j, u, variety, visit, obs)

@@ -2728,6 +2728,13 @@ second entry holds a price.  That was the record's only price, so it is no longe
 served and no row says so; the deletion entry is the disclosure.  The 5 (t, v, j, u)
 cells that vanish were held only by a second entry.
 
+*The flag is one-directional.*  It sees a second entry that prices a slot differently,
+not one that blanks it, because a 0 or a sentinel never reaches the comparison.  5
+served slots have a second entry at 0 (4) or a sentinel (1), all in 2011-12; 3 of them
+sit in 2 records nothing else flags, so those stay False.  Disclosed and not extended:
+a blanked slot offers no competing reading, and the first entry's price is served
+either way.
+
 * 2026-11-04 -- plot_inputs: ECVMA's NPK is NPK 15-15-15 (GH #1445)
 
 *RULED (@ligon, 2026-11-04, option A).*  Code 5 of the two ECVMA input rosters is
