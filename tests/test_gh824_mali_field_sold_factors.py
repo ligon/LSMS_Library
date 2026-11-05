@@ -288,7 +288,7 @@ def test_compiler_relays_real_native_footers_once_and_replay_survives_empty_ledg
             native = data/'Mali'/wave/'_'/ 'crop_production.parquet'
             native.parent.mkdir(parents=True)
             frame = first.copy()
-            frame.index = pd.MultiIndex.from_arrays([[wave], ['recorded-invented-household'], ['1_1'], ['Invented maize']], names=first.index.names)
+            frame.index = pd.MultiIndex.from_arrays([[wave], ['recorded-invented-household'], ['1_1'], ['Invented maize'], ['unknown_condition']], names=first.index.names)
             audit = [factor_report, existing, existing] if wave == waves[0] else [existing]
             L.to_parquet(frame, native, absolute_path=True, grain_audit=audit)
             native_paths.append(native)

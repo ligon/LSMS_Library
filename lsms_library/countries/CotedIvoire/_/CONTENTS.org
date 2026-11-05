@@ -971,3 +971,46 @@ Registration moves every Cote d'Ivoire =Country._table_cache_hash=, because the 
 is folded into the hash, and no existing wave's =Wave._input_hash=.  When
 =food_acquired= is wired for 2021-22, pooled kg factors change for every
 Cote d'Ivoire wave at read time (GH #1487).
+
+* 2026-11-04 -- =crop_production= serves =condition= and the recorded answer (GH #1436)
+
+Ruling @ligon 2026-11-04, option (D), set on Niger in #1471: the fold stays on the
+=condition= level and the survey's own answer rides in the optional column
+=condition_native=.  =2018-19/Data/Menage/s16c_me_CIV2018.dta= records "Etat du produit" in
+=s16cq12c=, read by code through =harmonize_crop_condition_ehcvm1=.
+
+| code | label | rows | vague 1 / 2 | =condition= |
+|------+-------+------+-------------+-------------|
+| 1 | Epis | 373 | 172 / 201 | =unshelled= |
+| 2 | Grain | 5,440 | 2,464 / 2,976 | =shelled= |
+| 3 | Décortiqué | 838 | 432 / 406 | =shelled= |
+| 4 | Non-décortiqué | 2,428 | 1,065 / 1,363 | =unshelled= |
+| 5 | Non concerné | 5,452 | 3,424 / 2,028 | =shell_not_applicable= |
+| 6 | Fève (instrument, not =.dta=) | 371 | 0 / 371 | =other_condition= |
+| 7 | Autre à préciser (instrument, not =.dta=) | 956 | 0 / 956 | =other_condition= |
+| blank | | 6,365 | 3,730 / 2,635 | =unknown_condition=, column NA |
+
+*Codes 6 and 7 are named by the wave's own instrument.*  The =.dta= value label stops at 5, so
+=get_dataframe= returns them as the numbers 6.0 and 7.0.  The vague 1 CAPI questionnaire
+(=Documentation/CIV-EHCVM1-QNR-MEN-CAPI-VAGUE1.pdf=, p. 191) lists five answers at 16C.12c; the
+vague 2 one (=...-VAGUE2.pdf=, p. 197) adds =Fève= and =Autre à préciser=, with a free-text
+=s16Cq12c_autre= that the file does not ship.  The two vagues' Excel forms are one identical
+file and print the five, so the CAPI is the source.  The sold state 16C.16c keeps five in
+both vagues (p. 199).
+
+*Both stay =other_condition=, and no claim is made that =Fève= is =Grain=.*  The ruling names five
+answers, and neither of these.  =Fève= is mostly cacao (263 of 371), and it also falls on rubber (32), cotton
+(26) and yam (12).  Cacao prices cannot say which state a line is in: sold by the kilo in vague 2, the median
+is 750 FCFA under =Grain=, =Fève=, =Décortiqué= and =Non concerné= alike and 700 under =Non-décortiqué=,
+with quartiles at 700-750 throughout.  The sold state on the same line, which has no =Fève= answer, reads
+=Non concerné= 201, =Grain= 83, =Non-décortiqué= 53 of 347 stated, and on cacao 145, 75, 35 of 263.
+=Autre à préciser= is mostly yam (436) and cassava (196), crops that read =Non concerné= in vague 1, and
+its sold state reads =Non concerné= on 411 of 424.  Any other fold is one table row and one re-warm, on a
+ruling.
+
+22,223 lines, unique on (household, field, parcel, crop code, unit), so the level separates
+nothing and adds no row.  A blank state is a blank unit on all 6,365.  The answer describes the
+harvest quantity only: =s16cq16c= is the sold state, not served (GH #1462).  2021-22 is held and
+not wired (GH #552), so the level reaches no 2021-22 row.
+
+*Cost:* one CotedIvoire re-warm (=data_scheme.yml=, =categorical_mapping.org= and the wave script).

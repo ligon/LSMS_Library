@@ -349,6 +349,9 @@ Mali::crop_production::harvest-from-dispositions:
         units are not converted: no factor exists.  1,169 finished crops span two or more
         units and stay NA.  Quantities in one unit are added across states: 208 of the 3,360
         derived crops state two of Grain, Epis, Decortique, Non-decortique in that unit.
+        On 166 of the 208 the two states fold to different `condition` tokens, so those totals
+        are sums across states, 467,038 of the 6,713,380 kg on metric-named units, 7.0%.  They
+        are served under `unknown_condition`, and nothing is held out (GH #1436).
         8 are in the unit Autre, whose free text is empty, 4 of them across two or more
         dispositions, so they may hide two units.
       basis: modelling-choice

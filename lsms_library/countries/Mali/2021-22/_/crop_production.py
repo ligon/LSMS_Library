@@ -30,6 +30,12 @@ one Farm-level row.  A crop whose dispositions span units stays NA: no factor ex
 A recorded Quantity on an unfinished row is served as recorded, keyed
 Mali::crop_production::harvest-to-date, a window and not a season.
 
+THE STATE (GH #1436).  condition is s16cq16d, "Etat du produit", by code through
+harmonize_crop_condition_ehcvm1, and condition_native the answer as recorded.  The file
+states it on exactly the 309 rows with a Quantity.  Every other row carries the sentinel,
+and that includes a derived harvest: its dispositions have states of their own in s16d,
+not read here, and they fold differently on 166 of the 3,360 totals (derivations.yml).
+
 See mali.py, "crop_production: the EHCVM waves".
 """
 import sys
@@ -39,16 +45,20 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
 from mali import (derive_hh_crop_harvest_total, derive_hh_crop_sale_attachment,
+                  ehcvm_crop_condition_labels, ehcvm_crop_conditions,
                   ehcvm_crop_labels, ehcvm_dispositions, ehcvm_household_ids,
                   ehcvm_intercropped, ehcvm_is_sale, ehcvm_plot_ids, ehcvm_unit_labels,
                   finish_ehcvm_crop_production, stamp_harvest_to_date)
 
 src = get_dataframe('../Data/s16c_me_mli2021.dta', convert_categoricals=True)
+src_codes = get_dataframe('../Data/s16c_me_mli2021.dta', convert_categoricals=False)
 harvest = pd.DataFrame({
     'i':            ehcvm_household_ids(src).astype('string').values,
     'plot_id':      ehcvm_plot_ids(src).values,
     'crop':         ehcvm_crop_labels(src['s16cq04']).values,
     'u':            ehcvm_unit_labels(src['s16cq16b']).values,
+    'condition':    ehcvm_crop_conditions(src_codes['s16cq16d']).values,
+    'condition_native': ehcvm_crop_condition_labels(src['s16cq16d']).values,
     'Quantity':     src['s16cq16a'].values,
     'intercropped': ehcvm_intercropped(src['s16cq07']).values,
     'finished':     src['s16cq11'].values,
