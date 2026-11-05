@@ -262,11 +262,12 @@ class TestServed:
         pd.testing.assert_series_equal(got.sort_index(), expected.sort_index(),
                                        check_names=False, check_index_type=False)
 
-    def test_those_who_have_left_answer_nothing_and_are_not_served(self):
+    def test_those_who_have_left_say_why_and_nothing_else_and_are_not_served(self):
         s01 = _raw("s01_me_ben2021.dta")
         gone = s01[s01["s01q00aa"] == 2]
         assert len(gone) > 0
         assert gone[["s01q01", "s01q02", "s01q03c", "s01q04a", "s01q12"]].isna().all(axis=None)
+        assert gone[["s01q00b", "s01q00c"]].notna().mean().min() > 0.99
         r = _served("household_roster").reset_index()
         kept = _members(s01)
         assert len(r) == len(kept) == len(_raw("ehcvm_individu_ben2021.dta"))

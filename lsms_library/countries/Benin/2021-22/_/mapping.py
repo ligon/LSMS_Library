@@ -42,8 +42,9 @@ def household_roster(df):
     '''Members only, with Age from the stated years, else the birth date.
 
     s01 lists the 2018-19 roster again and asks of each person whether they are still a
-    member (s01q00aa).  The 6,138 who are not have every other answer blank, and
-    ehcvm_individu leaves them out, so they are not served.
+    member (s01q00aa).  The 6,138 who are not record why and when they left (s01q00b,
+    s01q00c) and no sex, relationship or age, and ehcvm_individu leaves them out, so they
+    are not served.
 
     s01q04a is filled on 42 of the 42,660 members and s01q03c on the other 42,618.  A
     birth date just after the interview gives a negative age, served NA, as 2018-19.
@@ -229,9 +230,9 @@ def plot_ids(frame, field, parcel):
 
 
 def members(frame):
-    '''A (grappe, menage, membres__id) file without the people who have left: s01 and
-    s04a list them with every answer blank (s01q00aa = non), as `household_roster` drops
-    them.'''
+    '''A (grappe, menage, membres__id) file without the people who have left (s01q00aa =
+    non).  s01 and s04a still list them, and s04a's answers are blank on all of them, as
+    `household_roster` drops them.'''
     from pathlib import Path
 
     from lsms_library.paths import countries_root

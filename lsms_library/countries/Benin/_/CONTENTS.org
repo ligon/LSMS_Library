@@ -778,25 +778,27 @@ silently, so read this before copying from either.
 =membres__id=, =numind= in =ehcvm_individu=, the same number on all 42,660 members.  =v= is the bare =grappe=.
 
 *Measured*, the head of each household against the 2018-19 head of the same key.  Sex, and sex with
-age 1 to 6 years older, on the RAW answers (=s01q01=, =s01q04a= else the birth year):
+age 1 to 6 years older, on the RAW answers (=s01q01=; =s01q04a=, else the household's interview year less =s01q03c=):
 | group                                        |     n | head sex | head sex and age |
 |----------------------------------------------+-------+----------+------------------|
 | recurring key, =PanelHH= = Panel             | 6,878 |    94.8% |            61.5% |
-| recurring key, =PanelHH= = Non panel         |   116 |    83.6% |            43.1% |
-| baseline: another household, same grappe     | 8,032 |    68.0% |             9.4% |
-| Mali's =s00q07f= link                        | 3,042 |    94.5% |            61.7% |
-| Niger's =s00q07f= link                       | 4,591 |    89.5% |            67.9% |
+| recurring key, =PanelHH= = Non panel         |   116 |    83.6% |            42.2% |
+| baseline: another household, same grappe     | 8,032 |    68.0% |             9.1% |
+| Mali's =s00q07f= link                        | 3,042 |    94.5% |            61.8% |
+| Niger's =s00q07f= link                       | 4,591 |    89.5% |            67.7% |
 So =PanelHH= = Panel is at real-link level, and unlike Togo's 1,397 the file holds no block of recurring
 keys at the baseline: the 116 sit between.  The BID (7.1) says the same thing: "only households marked
-as panel in the "PanelHH" variable will have valid values for merging".  =s00q07d= agrees with the recurrence
-exactly (6,994 Oui), so it separates nothing.  Linking would make Benin a panel country, with committed
-crosswalks under =test_panel_ids_persistence=: a decision, memo in the PR.
+as panel in the "PanelHH" variable will have valid values for merging".  =s00q07d= is 6,996 Oui, 6,994 of
+them recurring, so it separates nothing.  6,889 households are flagged Panel and 11 of them have no 2018-19 key, so any
+link is 6,878.  Linking would make Benin a panel country, with committed crosswalks under
+=test_panel_ids_persistence=: a decision, memo in the PR.
 
 *Do not run this test on =ehcvm_individu.age=.*  On 3,662 members, 3,636 of them on the 2018-19 roster, that
-variable is not the answers: it differs from the birth year by more than a year, and 99.7% of those
-sit 2 to 4 years above the same person's 2018-19 age where the raw answers do so on 0.0%.  So UEMOA set the age
-of a panel member from 2018-19 where the two disagreed.  On that variable the panel row reads 83.2%, which
-is the construction.  Togo's and Niger's =age= have no such rows.  =household_roster= serves the answers, as 2018-19 does.
+variable is not the answers: it differs from the birth year by more than a year, and of the 3,647 matched to 2018-19,
+99.7% sit 2 to 4 years above the same person's 2018-19 age.  So UEMOA set the age of a panel member from 2018-19
+where the two disagreed.  (The raw answers cannot show the same gap on these rows, because the rows are selected on
+disagreeing with them.)  On that variable the panel row reads 83.2%, which is the construction.  Togo's and Niger's =age= have
+no such rows.  =household_roster= serves the answers, as 2018-19 does.
 
 *Clusters are the same.*  All 670 grappes recur; region and milieu agree on 670 of 670, and the point on all
 670.  =strata= is region only (#812).  The record is =_/sampling.yml=.
@@ -827,9 +829,10 @@ Compare labels, never names.
 - *The files are grids where 2018-19's held the answered lines*: =s07b= 1,333,313 rows (204,206 consumed), =s12= 361,440
   (40,335 owned), =s16b= 85,459 (11,368 applied), =s17= 92,371 (6,416 owned).  Filter by the gate; a sum over the raw file
   is not wrong, but a count is.
-- *=s01= and =s04a= list 6,138 people who have left* (=s01q00aa= = non), with sex, relationship, age and every other answer
-  blank.  =ehcvm_individu= leaves them out, and so do =household_roster= and =people_last7days=: 42,660 members of 48,798
-  rows.  =s04a='s =membres__id= is labelled "Qui est le répondant", wrongly: it joins =s01= one to one.
+- *=s01= and =s04a= list 6,138 people who have left* (=s01q00aa= = non).  Sex, relationship, age and =s01q12= are blank on all of
+  them, and all of =s04a='s answers.  What is filled is why and when they left: =s01q00b= on 6,137, =s01q00c= on 6,135, free text
+  on 345; =s01q07= on 4.  703 of the reasons are deaths, which no table serves.  =ehcvm_individu= leaves them out, and so do
+  =household_roster= and =people_last7days=: 42,660 members of 48,798 rows.  =s04a='s =membres__id= is labelled "Qui est le répondant", wrongly: it joins =s01= one to one.
 - =s17q01= is the species; 2018-19's =s17q02= is gone.  Code 12 has no label and is not on the questionnaire's list; it is on
   the grid of vague 2 only and 5 households answer Oui.  Served as =12=.
 - =s16bq05= is the GIFT question in both waves; the purchase is =s16bq08=.  This wave reads both.  2018-19's script serves
@@ -856,7 +859,9 @@ and =LastPurchaseUnitCode= name them; the test compares =unit_match= to the code
 *=u=.*  17 rows in the country's =u= table put this file's spellings on 2018-19's labels (=litre=, =bassine=, =Boite=, =sachet=, =Sans os en tas=,
 =Tongolo= -> =Tohoungolo=, ...), and =102= takes =Alvéole/Plateau=.  The local units of codes 200 to 230 are NOT the same list as 2018-19's: this file
 bundles what 2018-19 named one by one (=Abotoca,Nobayirou, Otoka/Fihanfingban=, =Si, Sikpanou, Sinou, Siroba, Robaca, Blèvi=), under moved codes, so they are served
-as recorded and do not join 2018-19's.  The sizes moved too: code 7 is =Sans Brassée= there and =Très petit= here, and they are read by label.
+as recorded and do not join 2018-19's.  Two are not bundles: codes 217 and 218, =tongolo avec 1 brassée= and =2 brassées= (211 + 9 rows, all
+size-free), respell the sized forms 2018-19 serves, and take =Tohoungolo (Avec 1 brassée)= and =(Avec 2 brassées)= through the wave's YAML, because the =u=
+table may not hold a sized label.  The sizes moved too: code 7 is =Sans Brassée= there and =Très petit= here, and they are read by label.
 
 *=j=.*  The list has 166 codes against 138, and 91 labels needed rows, Niger's rule (#833): a respelling of a good 2018-19 names takes its Preferred
 Label; two goods 2018-19 bundles and this wave splits stay split.  Folded: =Sucre poudre= and =Sucre morceaux=, as 2018-19's own label says.  Respellings: code 42,
@@ -865,7 +870,8 @@ Label; two goods 2018-19 bundles and this wave splits stay split.  Folded: =Sucr
 =Gboman= and =Ademe=.  Own labels: =Fromage= as =Fromage (hors soja)= (2018-19's =Fromage local (Amon)= prices 25 per =Morceau (Petit)= like this wave's soy
 cheese, and 500 per =Unité (Moyen)= like this wave's =Fromage=; 2,084 purchased rows against 1,380 + 3,397); =Arachides décortiquées= as =Arachides décortiquées (hors
 pilées)= (215 against 217 + 70); =Piment frais= as =Piment frais (hors séché)=.  *Benin's =Piment= earns no exception, unlike Togo's*: 6,188 purchased rows against 3,985 +
-3,790, and no price separates them (=Sachet (Moyen)= 100, 100 and 100).  Split, each under its own label: =Crabes= / =Crevettes= / =Autres fruits de mer=, =Pastèque= /
+3,790, 99.0% of households against 57.8% fresh and 96.9% fresh or dried here, and no price separates them (=Sachet (Moyen)= 100, 100
+and 100).  WAITING: a ruling is asked between this and relabelling 2018-19's bundle to =Piment=, leaving this wave's two labels bare, as Senegal and Burkina's tables do.  Split, each under its own label: =Crabes= / =Crevettes= / =Autres fruits de mer=, =Pastèque= /
 =Melon=, =Aubergine,= / =Courge/Courgette=, =Gingembre=, =Café=, =Vinaigre de citron= / =Autres vinaigres= / =Moutarde=, =Huile d'arachide raffinée= / ="Segal"=.  New:
 three =semoule= rows, =Noix de palme=, =Huile de palme raffinée=, =Viande séchée=, =Poivre=, =Fruit de Kapokier=, =Poisson séché en condiment= (code 179, printed without a
 number in section 7B).  A cross-wave demand system on =j= must bundle these itself.
@@ -876,11 +882,12 @@ by the additive collapse, as core does.
 *=Expenditure=* is NA on 10.5% of purchased rows (2018-19 9.7%).  =ehcvm_conso='s =codpr= shares this file's codes, unlike 2018-19's, so the check runs: the rule x 365/7 is
 within 1% of =depan(Achat)= for 90.6% of 1,245 discriminating rows.  That validates the arithmetic, not the quantity: Togo's rescaled column passes it too.
 
-*Kilograms.*  =ehcvm_nsu_ben2021.dta= exists and is not wired (not ruled for single-wave countries).  So this wave's kilograms come from the price-ratio ladder, as 2018-19's do: =metric= 25,831 rows, =item_unit= 85,048,
-=item_unit_tight= 435, =unit= 93,610, =none= 33.  Because #1487 pools factors across a country's waves, wiring this table moved 2018-19's inferred kilograms at read time, measured cold: =food_quantities(units='kgs')= 168,465 -> 185,170 (+9.9%),
-125,699 of 187,336 rows move, median ratio 1.05, p10 0.96, p90 1.47; =food_prices= sum 158.4M -> 131.5M, 91,405 of 133,112 rows move, median ratio 0.95, p10 0.68, p90 1.07; one more row in each, as 2 rows gain a factor.  Here the rungs move too: on 2018-19
-=item_unit= 35,589 -> 64,567, =unit= 132,190 -> 102,936, =none= 155 -> 153, =metric= unchanged at 20,255, because a pair with too few reports in one wave clears the floor with two.  A single-wave request is still an exact slice.  2018-19's native =Quantity= and
-=Expenditure= do not move, and neither does =harvest_kg=.  =StatedVsInferredKgWarning= fires on 9 labels, up from 6.
+*Kilograms.*  =ehcvm_nsu_ben2021.dta= exists and is not wired (not ruled).  So this wave's kilograms come from the price-ratio ladder, as 2018-19's do: =metric= 25,831 rows, =item_unit= 85,075,
+=item_unit_tight= 435, =unit= 93,583, =none= 33.  Because #1487 pools factors across a country's waves, wiring this table moved 2018-19's inferred kilograms at read time: =food_quantities(units='kgs')= 168,465 -> 186,632
+(+10.8%), where 126,788 of 187,336 rows move, at a median of 1.22 among them (p10 0.92, p90 1.73); =food_prices= sum 158.4M -> 131.3M, where 92,147 of 133,112 rows move, at a median of 0.82 (p10 0.58, p90 1.09).  One more row
+in each, as 2 rows gain a factor.  Here the rungs move too: on 2018-19 =item_unit= 35,589 -> 65,116, =unit= 132,190 -> 102,387, =none= 155 -> 153, =metric= unchanged at 20,255, because a pair with too few reports in one wave clears
+the floor with two.  A single-wave request is still an exact slice.  2018-19's native =Quantity= and =Expenditure= do not move, and neither does =harvest_kg=.  =StatedVsInferredKgWarning= fires on 9 labels, up from 6:
+=sac (10 kg)=, =sac (100 kg)= and =sac (2,5 kg)= are new.
 
 ** =crop_production=
 
@@ -897,14 +904,29 @@ release.  646 unfinished rows have no quantity, and the form sends a crop with 1
 | finished, dispositions in two or more units          | 2,009 | NA                   |
 | finished, no positive disposition                    |   111 | NA                   |
 | a row not finished                                   |   857 | as recorded, or NA   |
-Of the 5,237, 4,982 go on the single =s16c= row and 255 on the crop's =Farm-level= row (148 a sale had made, 107 new).  =Quantity= on 381 -> 5,618 rows.  On 2018-19, whose file holds both
-sides, the sum over 2,920 finished rows with dispositions in the harvest's unit is exact on 79.1%, within 10% on 82.4%, median 1.000.
+Of the 5,237, 4,982 go on the single =s16c= row and 255 on the crop's =Farm-level= row (148 a sale had made, 107 new).  =Quantity= on 381 -> 5,618 rows.
 
-*The total is tail-sensitive; the medians are not.*  =harvest_kg= 2021-22: 84,486 kg recorded, 45,369,658 with the total, against 33,462,707 in 2018-19.  Four =Tonne= rows hold 34,250,000 of it: 20,000 and 5,800 and 2,050
-"tonnes" of cotton, whose sold lines price under 1 FCFA per kg and whose =s16dq05c= reads 2,000, 275 and 130, and 6,400 of maize.  Nothing is trimmed; Site Q names them.  Without them
-11,119,658.  2018-19's single largest row is 37.4% of its own total, so neither wave's total is a statistic.  Pure-stand medians, kg/ha, 2018-19 / 2021-22 (one crop row on the plot, area over 0.01 ha):
-maize 1,165 / 958, cotton 1,247 / 1,212, sorghum 794 / 700, yam 3,148 / 2,299, rice 1,625 / 1,722, groundnut 1,161 / 1,000, all crops 1,200 / 976: 3% to 27% below, except rice, the direction unasked seed and loss
-would push.  Quantities in one unit sum across states: 132 of the 5,237 state two, 0.3% of derived kg, served =unknown_condition=.
+*How good is the sum?*  The only test inside this wave is small: on the 19 finished pairs with a recorded quantity and dispositions in that unit, 9 are exact and 10 within 10%, median 1.0, p10 0.16, p90 2.13; on 128 unfinished pairs, which
+cover a part of the season, 67 are exact.  2018-19's file holds both sides on one row, and its unit variables use one code list in vague 1 and another in vague 2 (=s16cq22b= the other way round), with value labels for only one, so a
+comparison by label reads vague 1 alone (2,920 rows, 79.1% exact) and by code mostly vague 2 (1,738, 92.1%).  Decoding both: 5,175 finished rows with every positive disposition in the harvest's unit, 84.2% exact, 87.2% within 10%, median 1.000,
+5.8% over 1.1, 7.0% under 0.9; vague 1 79.0%, vague 2 90.9%; 0.900 in kilograms over 3,572 metric rows.  2,463 finished rows state a disposition in another unit and are not tested.
+
+*Neither wave's total is a statistic.*  =harvest_kg=: 2021-22 84,486 kg recorded, 45,369,658 with the total; 2018-19 33,462,707.  Each wave's top four rows hold 75.5% and 54.5% of its total.  Without them 11,119,658 against 15,212,707, and per row with a
+kilogram figure 2,521 kg against 2,527 kg, over 4,410 and 6,020 rows.  That per-row match is the strongest support for the rule.
+
+*2021-22's four rows are =Tonne= rows and read as kilograms.*  Nothing is trimmed; they stay as recorded, and Site Q names all four.  On the farmer's stated area:
+| row                      | as tonnes       | as kilograms                                                  |
+|--------------------------+-----------------+---------------------------------------------------------------|
+| cotton 5,800             | 0.28 FCFA/kg    | 275 FCFA/kg, 1,160 kg/ha                                      |
+| cotton 2,050             | 0.13 FCFA/kg    | 129 FCFA/kg, 512 kg/ha                                        |
+| cotton 20,000            | 0.03 FCFA/kg    | 26.5 FCFA/kg, 10,000 kg/ha; its =s16dq05c= of 2,000 is 265 FCFA/kg, about the crop's median, and 1,000 kg/ha |
+| maize 6,400, stock only  | no price        | 3,200 kg/ha                                                   |
+On the 5,800 and 2,050 rows =s16dq05c= (275, 130) is the implied price and not a weight.  =Tonne= is sound below these: 5 of the 414 sold lines are at or above 100, each under 1 FCFA/kg and one a sentinel-shaped 9,999, and the rest have a median of 260 FCFA/kg.  A
+registered correction would be its own ruling.  =Quantity_sold= serves the same slips with or without the total.
+
+Pure-stand medians, kg/ha, 2018-19 / 2021-22 (one crop row on the plot, served =Area= over 0.01 and at most 100 ha):
+maize 1,165 / 958, cotton 1,247 / 1,212, sorghum 794 / 700, yam 3,148 / 2,299, rice 1,625 / 1,722, groundnut 1,161 / 1,000, all crops 1,200 / 976.  A narrower selection moves the levels and not the direction (the review's all crops: 1,094 / 909).  Quantities in one unit sum across states: 132 of the
+5,237 state two, 0.3% of derived kg, served =unknown_condition=.
 
 *The crop is read by code.*  =s16dq01= labels codes 1-47 and 65 only: its 1,089 rows of 51-64, 919 of them Soja, have no label, and it spells 42 and 65 otherwise than =s16cq04=.  On the codes all 7,701 pairs
 of =s16d= find an =s16c= row; on the labels 1,098 do not.  =mapping.crop_labels= reads =s16cq04='s labels for both files.

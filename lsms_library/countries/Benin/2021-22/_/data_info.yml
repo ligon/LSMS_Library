@@ -7,7 +7,7 @@ Wave: 2021-22
 #     (GH #552), so the ids must not be able to meet;
 #   - variable names survive where meanings do not: compare labels, not names;
 #   - the files are full grids where 2018-19's held only the answered lines, and s01
-#     and s04a carry 6,138 members who have left, every answer blank.
+#     and s04a carry 6,138 people who have left, with only why and when they left.
 
 sample:
     dfs:
@@ -78,8 +78,9 @@ household_roster:
                 - menage
             pid: membres__id
         myvars:
-            # s01q00aa, "is [NOM] still a member of this household?": the 6,138 who are
-            # not have every other answer blank.  mapping.household_roster drops them.
+            # s01q00aa, "is [NOM] still a member of this household?": the 6,138 who are not
+            # record why and when they left, and no sex, relationship or age.
+            # mapping.household_roster drops them.
             StillMember: s01q00aa
             Sex: s01q01
             Relationship: s01q02

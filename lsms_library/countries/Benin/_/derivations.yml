@@ -262,13 +262,17 @@ Benin::crop_production::harvest-from-dispositions:
       basis: questionnaire
       evidence: >-
         ben_ehcvm2_qnr_men_excel_vague1.pdf, PDF p. 87: "(16C.11) Avez vous fini la recolte de
-        cette culture? 1 = Oui >(16C.16)", and 16C.16 on p. 88.  Benin 2018-19 holds the
-        harvest and all four dispositions on one row (s16cq12a; s16cq13a, s16cq14a, s16cq16a,
-        s16cq22a).  On its 2,920 finished rows with the dispositions in the harvest's unit the
-        sum equals the harvest exactly on 79.1%, within 10% on 82.4%, median ratio 1.000, 8.6%
-        over 1.1 and 9.0% under 0.9; over the 2,287 metric rows the kg totals differ by a ratio
-        of 0.891.  This is consistency within a row, and a respondent may anchor on the
-        harvest just stated.
+        cette culture? 1 = Oui >(16C.16)", and 16C.16 on p. 88.  Inside this wave the only test
+        is small: on the 19 finished pairs with a recorded quantity and dispositions in that unit,
+        9 are exact and 10 within 10%, median 1.0, p10 0.16, p90 2.13; on 128 unfinished pairs, 67
+        exact.  Benin 2018-19 holds the harvest and all four dispositions on one row (s16cq12a;
+        s16cq13a, s16cq14a, s16cq16a, s16cq22a).  Selection: finished rows with every positive
+        disposition in the harvest's unit, 5,175, after decoding both of the code lists its unit
+        variables use by vague (a comparison by label reads vague 1 alone, 2,920 rows, 79.1% exact;
+        by code mostly vague 2, 1,738, 92.1%).  The sum equals the harvest exactly on 84.2%, within
+        10% on 87.2%, median ratio 1.000, 5.8% over 1.1 and 7.0% under 0.9; over the 3,572 metric
+        rows the kg totals differ by a ratio of 0.900.  This is consistency within a row, and a
+        respondent may anchor on the harvest just stated.
     - text: >-
         not all of a harvest need appear: s16d asks no quantity for seed kept, loss after
         harvest or animal feed, so the sum can fall short of what was cut.  Not sized.
@@ -284,18 +288,21 @@ Benin::crop_production::harvest-from-dispositions:
       evidence: ruling @ligon 2026-11-04, option (b) of GH #1437, for Mali and Burkina Faso; variables s16dq02c, s16dq03c, s16dq05d, s16dq13c
     - text: >-
         the sum is as good as its lines, and it inherits the file's large values.  It is not
-        trimmed and no pair is held out for this.  Four `Tonne` rows carry 34,250,000 of the
-        45,285,173 derived kg, 75.6%: their sold lines hold 20,000, 5,800 and 2,050 "tonnes"
-        with s16dq05c at 2,000, 275 and 130, priced under 1 FCFA per kg against a crop median
-        near 220, so they read as kilograms or sacks keyed as tonnes.  Without those four the
-        total is 11,035,173 kg.  Site Q names five rows.  Totals are not comparable to 2018-19's
-        33,462,707 kg on this account; pure-stand medians are.
+        trimmed and no pair is held out for this, so the total is not a statistic: the top four
+        rows hold 75.5% of 2021-22's kg, as four rows hold 54.5% of 2018-19's.  2021-22's four are
+        `Tonne` rows that read as kilograms: cotton 5,800, 2,050 and 20,000, whose sold lines price
+        at 0.28, 0.13 and 0.03 FCFA per kg as tonnes, and maize 6,400, stock only.  Site Q names all
+        four.  Without each wave's top four the totals are 11,119,658 and 15,212,707 kg, 2,521 and
+        2,527 kg per row with a kilogram figure.
       basis: modelling-choice
       evidence: >-
-        measured 2026-11-04 from s16c and s16d.  Pure-stand median kg/ha, 2018-19 recorded /
-        2021-22 derived, one crop row on the plot and area over 0.01 ha: maize 1,165 / 958, cotton
-        1,247 / 1,212, sorghum 794 / 700, yam 3,148 / 2,299, rice 1,625 / 1,722, groundnut
-        1,161 / 1,000, all crops 1,200 / 976.  Any rule for these lines belongs in its own issue.
+        measured 2026-11-05 from s16c and s16d.  As kilograms the sold lines price at 275, 129 and
+        26.5 FCFA per kg, against a median of 260 on Tonne lines under 100; on the 5,800 and 2,050
+        rows s16dq05c (275, 130) is the implied price and not a weight.  Pure-stand median kg/ha,
+        2018-19 recorded / 2021-22 derived, one crop row on the plot and served Area over 0.01 and at
+        most 100 ha: maize 1,165 / 958, cotton 1,247 / 1,212, sorghum 794 / 700, yam 3,148 / 2,299,
+        rice 1,625 / 1,722, groundnut 1,161 / 1,000, all crops 1,200 / 976.  Any rule for these
+        lines belongs in its own issue.
     - text: >-
         a crop with an unfinished row is held out (857 pairs, 201 of them one-unit), because
         its dispositions cover what is harvested so far.  A crop with a recorded quantity is
