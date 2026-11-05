@@ -40,7 +40,9 @@ Sampling:
         on those ids 0.214 of a household's members find a same-sex member
         three years older in the other wave, against 0.219 for two different
         households of one grappe; the EHCVM panel scores 0.528 against 0.172
-        on the same test (CONTENTS.org, GH #1494).
+        on the same test (CONTENTS.org, GH #1494).  All 3,560 are 2017-18
+        Lourd households and none Leger, because both waves number their rural
+        households 3, 6 and 9 on that form, which is why so many recur.
       source_type: derived-from-data
       confidence: high
       source_file: null
@@ -77,9 +79,10 @@ Sampling:
       cluster_id_note: |-
         `grappe` in both waves: all 513 of 2021-22's grappes are among
         2018-19's 551, and their coordinates are identical on all 507 with a fix
-        on both sides.  Region differs on 36 of the 513: 23 read Menaka in
-        2018-19 and Gao in 2021-22, 13 Taoudenit and Tombouctou, a recode on an
-        unchanged EA rather than a renumbering.  The revisit found the 2018-19
+        on both sides.  Region differs on 36 of the 513 once Segou is spelled
+        alike (raw labels differ on 97): 23 read Menaka in 2018-19 and Gao in
+        2021-22, 13 Taoudenit and Tombouctou, a recode on an unchanged EA rather
+        than a renumbering.  The revisit found the 2018-19
         households where it could and enumerated replacements up to 12 per
         cluster: PanelHH is 'Oui' on 5,023 and 'Non' on 1,120.  One thing a
         re-measurement will trip on: 1,111 of the 1,120 'Non' households spell

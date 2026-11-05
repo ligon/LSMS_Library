@@ -2738,15 +2738,21 @@ the test does find a real panel.
 
 - *2014-15 / 2017-18: 3,560 ids survive the prefix*, because both waves carry the same one.  They
   visit the same EAs (identical coordinates on all 920 recurring grappes), with households selected
-  afresh and no pointer between the files.  Whether to separate them is a decision the ruling did
-  not take; a shared =EACI_= is what was ruled, and the digits alone decide nothing.
+  afresh and no pointer between the files.  *All 3,560 fall on 2017-18 Lourd households and none on
+  Leger*: in rural EAs 2014-15's =menage= is 3, 6 or 9, and so is 2017-18's =exploitation= on the Lourd
+  form (Leger is 1, 2, 4, 5, 7, 8), so the numbering itself makes them recur.  Roster size correlates
+  at 0.18 on those ids, against 0.69 on the real panel; the score is 0.233 / 0.232 rural and 0.181 /
+  0.192 urban (review).  Whether to separate them is a decision the ruling did not take; a shared
+  =EACI_= is what was ruled, and the digits alone decide nothing.
 - *2018-19 / 2021-22: 1,111 of the 1,120 =PanelHH= =Non= households* spell the id of a 2018-19
   household they are not.  =panel_ids= and =updated_ids= do not link them, but =i= is the same string.
 
 *Boundaries, =sampling.yml=* (notes and locators there): 2017-18 =stable= + =independent=; 2018-19
 =redefined= + =independent= (410 recurring serials a median 100 km apart, 5.2% of 405 within 10 km);
 2021-22 =stable= + =rotating-panel=.  Site C therefore warns on any frame carrying =v= across
-2017-18 / 2018-19, which is new on every all-wave Mali read.
+2017-18 / 2018-19, which is new on every all-wave Mali read that carries =v= and spans it.  It is correct:
+a cross-wave =groupby('v')= would merge unrelated EAs.  =['2014-15', '2017-18']= and =['2018-19', '2021-22']= stay
+silent, as do tables that do not span it (=plot_inputs=, =plot_labor=, =people_last7days=, =food_coping=, =plot_features=).
 
 *The =s01q04a= trap.*  In the EHCVM rosters =s01q04a= is blank where a birth date is recorded, so a
 head-of-household age comparison on that column alone scores a real panel at 0.003; the table above
@@ -3030,9 +3036,9 @@ with EAC-I =plot_features=; the cost then is one Mali re-warm.
 * 2026-11-04 -- what these four changes moved, cold (GH #1494, #1453, #1437, #1179)
 
 Cold builds in private roots, every declared table, =115b6ab71= against =0f382b5f4=.  With =EACI_= stripped from =i=,
-*22 of the 24 tables are frame-equal, row order and dtypes included*: all but =community_prices= and =crop_production=.
-=panel_ids= has 5,011 entries and =updated_ids= four waves, equal on both sides.  At the #1494 commit alone all 23 frame
-tables are equal.  EAC-I rows prefixed: =sample= 12,194, =household_roster= 131,246, =food_acquired= 122,085.
+*21 of the 23 frame tables are equal, row order and dtypes included*: all but =community_prices= and =crop_production=.
+=panel_ids= has 5,011 entries and =updated_ids= four waves, equal on both sides.  At the #1494 commit alone all 23 are
+equal.  Those two commits predate #1476 on =development=; the merge differs from them only in =plot_id= on the 627 tree rows.  EAC-I rows prefixed: =sample= 12,194, =household_roster= 131,246, =food_acquired= 122,085.
 
 | table              | moved                                                                                     |
 |--------------------+-------------------------------------------------------------------------------------------|
@@ -3055,8 +3061,12 @@ rows*, and the key is what tells them apart.  The tail remains the =plot_feature
 =Feature= over Mali, Niger and Burkina Faso, each with a unique index: =sample= 72,994, =household_roster= 536,295, =community_prices=
 534,290, all as before; =crop_production= 113,372 -> 113,553, the 181 new rows.
 
+On the merge =harvest_kg= reads these 173 EHCVM =Farm-level= rows beside the 66 EAC-I tree rows.
+
 *Site C is new on every all-wave Mali frame carrying =v=*, one =ClusterIdentityWarning= per call, 2017-18 -> 2018-19.  Under
-=LSMS_CLUSTER_STRICT=1= those reads now raise and =Feature= drops Mali.
+=LSMS_CLUSTER_STRICT=1= those reads now raise and =Feature= drops Mali.  *So =Feature= over Mali, Niger and Burkina Faso for
+=sample= or =household_roster= under that lever now returns an empty frame*, because Niger and Burkina Faso already raise; before
+this Mali was the survivor.
 
 *Cache.*  =build_transforms_fingerprint= 0 of 25.  =Country._table_cache_hash=: Mali 24 of 24, Niger 0 of 23, Burkina Faso 0 of 25, Uganda 0
 of 28.  =Wave._input_hash= Mali 96 of 96.  One Mali re-warm, and any ordering of these four commits costs the same one.
