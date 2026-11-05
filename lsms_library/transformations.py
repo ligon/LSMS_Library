@@ -4620,6 +4620,14 @@ def _kg_factor_series_with_declared(df, *, volume_as_mass=True, unit_kg=None):
                      index=df.index, dtype='float64')
 
 
+#: The two records that say what the kilograms ARE, carried from the frame to
+#: :func:`harvest_kg` and :func:`yield_kg` (GH #1436).  ``derivations`` is the frame's
+#: own ``attrs`` record, where a survey's estimate is named, and is absent when the frame
+#: has lost it.
+SURVEY_KG_BY_WAVE_ATTR = 'survey_kg_rows_by_wave'
+_KG_DISCLOSURE_ATTRS = ('derivations', SURVEY_KG_BY_WAVE_ATTR)
+
+
 def _survey_kg_totals(df):
     """``crop_production.Quantity_kg`` as ``(totals, usable, zero)`` ndarrays.
 
@@ -4635,6 +4643,28 @@ def _survey_kg_totals(df):
     usable = np.zeros(len(df), dtype=bool)
     usable[finite] = totals[finite] > 0
     return totals, usable, finite & ~usable
+
+
+def _survey_kg_rows_by_wave(df, usable):
+    """Rows the ``survey_kg`` rung serves, per wave: ``{wave: n}``, every wave in the
+    frame with 0 included, or ``{country: {wave: n}}`` on a frame with a ``country``
+    level.  Plain strings and ints, so the record survives ``df.to_parquet``.  The
+    rung's name is one string across waves that differ, so this is what lets a reader
+    see that a wave has no survey kilograms at all (Niger 2018-19).
+    """
+    waves = _level_or_column(df, 't')
+    if waves is None:
+        return {}
+    waves = pd.Series(waves).astype(str).to_numpy()
+    usable = pd.Series(np.asarray(usable, dtype=int))
+    country = _level_or_column(df, 'country')
+    if country is None:
+        return {str(w): int(n) for w, n in usable.groupby(waves).sum().items()}
+    country = pd.Series(country).astype(str).to_numpy()
+    out = {}
+    for (c, w), n in usable.groupby([country, waves]).sum().items():
+        out.setdefault(str(c), {})[str(w)] = int(n)
+    return out
 
 
 def _implied_kg_factors(df, totals):
@@ -4850,7 +4880,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
             normalises both ``None`` and ``pd.NA`` to NaN in an object
             column.
 
-        Three tallies ride on ``.attrs``:
+        Four tallies ride on ``.attrs``:
 
         ``kg_factor_sources``
             ``{layer: n_rows}`` over the INPUT rows.  The layers of
@@ -4873,6 +4903,9 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
             WHICH country reported.  Read it as a total, never as coverage;
             the per-row frame answers the real question with one
             ``groupby('country')``.
+        ``survey_kg_rows_by_wave``
+            rows ``survey_kg`` serves, per wave, 0 included: ``{wave: n}``, or
+            ``{country: {wave: n}}`` on a frame with a ``country`` level.
         ``kg_factor_declared_from``
             where the declared table came from: ``'attrs'`` (the frame's own
             ``unit_kg`` record), ``'argument'`` (*unit_kg* passed), or
@@ -5064,6 +5097,9 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     # GH #1436.  Outside too: such a row falls through to the layers below.
     counts['survey_kg_zero'] = int(survey_zero.sum())
     out.attrs['kg_factor_sources'] = counts
+    # GH #1436: `survey_kg` is one string across waves that differ, and the counts
+    # above are pooled.
+    out.attrs[SURVEY_KG_BY_WAVE_ATTR] = _survey_kg_rows_by_wave(df, from_survey)
     # Kept OUT of the counts so every value there stays an int.  It is what
     # tells "this country declares nothing for these units" ('attrs', with
     # `declared` 0) apart from "no declaration reached this call" (None) --
@@ -5212,6 +5248,14 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         ``result.attrs['kg_factor_declared_from']`` where the declared
         ``u_kg`` table came from (GH #931).
 
+        What the kilograms ARE rides beside them (GH #1436):
+        ``result.attrs['survey_kg_rows_by_wave']`` counts the rows the survey's own
+        total served, per wave, 0 included, and ``result.attrs['derivations']`` is the
+        input frame's record, which names a registered construction such as
+        ``survey-kg-estimate`` (absent if the frame lost it).  ``survey_kg`` says the
+        kilograms are the survey's; only these say whether a wave has any, and that a
+        wave's are an estimate.
+
     Notes
     -----
     **A sum across ``condition`` mixes states.**  ``data_info.yml`` says
@@ -5311,6 +5355,9 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         'kg_factor_disagreement']
     res.attrs['kg_factor_declared_from'] = factors.attrs[
         'kg_factor_declared_from']
+    res.attrs[SURVEY_KG_BY_WAVE_ATTR] = factors.attrs[SURVEY_KG_BY_WAVE_ATTR]
+    if 'derivations' in crop_production.attrs:
+        res.attrs['derivations'] = crop_production.attrs['derivations']
     res.attrs['unknown_plot_excluded'] = {
         'rows': int(unknown.sum()),
         'rows_with_kg': int(len(unknown_kg)),
@@ -5573,7 +5620,9 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
         ``Area`` is canonically hectares, so that is kg/ha.  Do not read the unit
         off ``plot_features.AreaUnit``, which names what the survey reported before
         conversion: Malawi's says ``acres`` over hectare values, and Nigeria's and
-        Ethiopia's hold native labels.
+        Ethiopia's hold native labels.  ``attrs`` carries
+        ``survey_kg_rows_by_wave`` and ``derivations`` from :func:`harvest_kg`: what the
+        kilograms are, which no ``Yield_kg`` value can say (GH #1436).
 
     Notes
     -----
@@ -5592,6 +5641,7 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
                     min_reports=min_reports,
                     shipped_factors=shipped_factors,
                     unit_kg=unit_kg).reset_index()
+    disclosure = {k: hk.attrs[k] for k in _KG_DISCLOSURE_ATTRS if k in hk.attrs}
     hk_key = _resolve_plot_level(hk.columns)
     if hk_key is None:
         raise ValueError(
@@ -5689,7 +5739,9 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     land_level = 'parcel' if on == 'parcel' else _PLOT_CANONICAL
     out = merged.rename(columns={'_land': land_level})
     idx = base + [land_level]
-    return out.set_index(idx)[['Yield_kg']].sort_index()
+    res = out.set_index(idx)[['Yield_kg']].sort_index()
+    res.attrs.update(disclosure)
+    return res
 
 
 def _labor_days_by_source(plot_labor, source=None, *,

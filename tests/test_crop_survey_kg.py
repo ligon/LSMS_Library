@@ -6,13 +6,15 @@ tests pin the rule on synthetic frames, so they run without data.  What each
 country's column holds is tested against its source in
 ``test_niger_crop_survey_kg.py`` and ``test_mali_crop_survey_kg.py``.
 """
+import json
+
 import numpy as np
 import pandas as pd
 import pytest
 
 from lsms_library import quantity_audit
 from lsms_library.transformations import (KG_FACTOR_LAYERS, harvest_kg,
-                                          harvest_kg_factors)
+                                          harvest_kg_factors, yield_kg)
 
 INDEX = ['t', 'i', 'plot_id', 'j', 'u']
 
@@ -196,6 +198,76 @@ def test_site_q_looks_at_the_column_and_changes_nothing():
                if r['column'] == 'Quantity_kg']
     assert {r['direction'] for r in reports} == {'high', 'low'}
     quantity_audit._clear_quantity_reports()
+
+
+def _record():
+    return {'Niger': {'Niger::crop_production::survey-kg-estimate':
+                      {'rows': 1, 'columns': ['Quantity_kg'], 'in': 'crop_production'}}}
+
+
+def test_the_disclosure_reaches_a_harvest_kg_reader():
+    """The rung is one string across waves, so the record has to travel."""
+    df = _frame([('a', '1_1', 'Mil', 'Tiya', 10.0, 25.0),
+                 ('b', '1_1', 'Mil', 'Tiya', 10.0, np.nan)])
+    df.attrs['derivations'] = _record()
+    res = harvest_kg(df)
+    assert res.attrs['derivations'] == _record()
+    assert res.attrs['survey_kg_rows_by_wave'] == {'2021-22': 1}
+    # Must survive a user's df.to_parquet, whose attrs go through a bare json.dumps.
+    json.dumps(res.attrs)
+
+
+def test_a_frame_that_lost_the_record_claims_none():
+    df = _frame([('a', '1_1', 'Mil', 'Tiya', 10.0, 25.0)])
+    res = harvest_kg(df)
+    assert 'derivations' not in res.attrs
+    assert res.attrs['survey_kg_rows_by_wave'] == {'2021-22': 1}
+
+
+def test_a_wave_with_no_survey_kilograms_reads_zero():
+    a = _frame([('a', '1_1', 'Mil', 'Tiya', 10.0, 25.0)]).reset_index()
+    b = _frame([('b', '1_1', 'Mil', 'Tiya', 10.0, np.nan)]).reset_index().assign(t='2018-19')
+    df = pd.concat([a, b]).set_index(INDEX)
+    assert harvest_kg_factors(df).attrs['survey_kg_rows_by_wave'] == {'2018-19': 0, '2021-22': 1}
+
+
+def test_a_pooled_frame_counts_by_country_and_wave():
+    df = _frame([('a', '1_1', 'Mil', 'Tiya', 10.0, 25.0),
+                 ('b', '1_1', 'Mil', 'Tiya', 10.0, np.nan)])
+    df = df.assign(country=['X', 'Y']).set_index('country', append=True)
+    got = harvest_kg_factors(df).attrs['survey_kg_rows_by_wave']
+    assert got == {'X': {'2021-22': 1}, 'Y': {'2021-22': 0}}
+    json.dumps(got)
+
+
+def test_a_frame_with_no_wave_has_no_count():
+    df = _frame([('a', '1_1', 'Mil', 'Tiya', 10.0, 25.0)]).droplevel('t')
+    assert harvest_kg_factors(df).attrs['survey_kg_rows_by_wave'] == {}
+
+
+def test_the_disclosure_reaches_a_yield_kg_reader():
+    df = _frame([('a', '1_1', 'Mil', 'Tiya', 10.0, 25.0)])
+    df.attrs['derivations'] = _record()
+    plots = pd.DataFrame({'Area': [2.0]}, index=pd.MultiIndex.from_tuples(
+        [('2021-22', 'a', '1_1')], names=['t', 'i', 'plot_id']))
+    res = yield_kg(df, plots, on='plot')
+    assert res['Yield_kg'].tolist() == [12.5]
+    assert res.attrs['derivations'] == _record()
+    assert res.attrs['survey_kg_rows_by_wave'] == {'2021-22': 1}
+
+
+def test_a_condition_level_is_read_and_a_total_in_each_state_sums():
+    """The canonical level: the rung is per row, and harvest_kg sums across it, as
+    it does for every layer (GH #1460).  It enters no group the rung uses."""
+    df = _frame([('a', '1_1', 'Mil', 'Tiya', 10.0, 25.0),
+                 ('a', '1_1', 'Mil', 'Tiya', 4.0, 12.0),
+                 ('b', '1_1', 'Mil', 'Sac de 100kg', 2.0, np.nan)])
+    df = df.assign(condition=['shelled', 'unshelled', 'shelled']).set_index('condition', append=True)
+    f = harvest_kg_factors(df)
+    assert f['KgFactorSource'].tolist() == ['survey_kg', 'survey_kg', 'metric']
+    assert f.index.get_level_values('condition').tolist() == ['shelled', 'unshelled', 'shelled']
+    assert _kg(df) == {('a', '1_1', 'Mil'): 37.0, ('b', '1_1', 'Mil'): 200.0}
+    assert sum(f.attrs['kg_factor_sources'][layer] for layer in KG_FACTOR_LAYERS) == len(df)
 
 
 def test_the_canonical_column_is_declared_optional_and_a_float():
