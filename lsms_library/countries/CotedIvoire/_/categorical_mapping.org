@@ -530,9 +530,9 @@
 # harmonize_crop_condition_ehcvm1 (GH #1436): "Etat du produit", s16cq12c, the
 # physical state of the crop when the reported harvest quantity was measured --
 # the canonical `condition` index level of crop_production (lsms_library/
-# data_info.yml, Columns > crop_production > condition).  Read by code; Source
-# Label is the .dta value label, provenance only.  Niger/_/categorical_mapping.org
-# carries the reasoning for the same five codes.
+# data_info.yml, Columns > crop_production > condition).  Read by code; for codes
+# 1-5 Source Label is the .dta value label, provenance only (6 and 7 are below).
+# Niger/_/categorical_mapping.org carries the reasoning for the same five codes.
 #
 # The instrument asks the form and never the dryness, so these are the bare form
 # tokens.  RULED, @ligon 2026-11-04 (GH #1436): the five answers fold onto three
