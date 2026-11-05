@@ -260,6 +260,19 @@ the pairing is right; =tests/test_gh1459_uganda_early_ea.py= pins it.  It also m
 110 could carry a number and the column a single form, which the ruling did not have in
 front of it.  They are served their =comm=, as ruled; the alternative is a memo in the PR.
 
+*Measured, cold =b95e927f3= vs cold =a7c8f8078=, one node, 2026-11-04, with the =AGSEC1=
+source and the =Aggregate= split below.*  38 calls: every declared Uganda table,
+=labels='Aggregate'= on the food tables, =market='Region'= and =market='District'=, and
+=Feature= over =sample= and =household_roster= (with Albania and Malawi) and
+=food_expenditures(labels='Aggregate')= (with Malawi and EthiopiaRHS).  30 are frame-equal
+(=check_exact=).  The other 8 are =sample= by itself, under =market='Region'= and through
+=Feature=, each equal once =ea= and =Derivation= are set aside, and the 5 =Aggregate= reads,
+each moving only the labels that CONTENTS says.  Warning counts match on all 38.  Malawi and
+EthiopiaRHS are frame-equal.  Hashes: 27 of 27 Uganda tables and 216 of 216 Uganda wave
+hashes move, 0 of the other 515 tables across 37 countries, and 0 of 38 build fingerprints.
+So the cost is one Uganda re-warm.  =var/sample= is the one entry of the 53 in
+=tests/fixtures/uganda_baseline.json= that moves.
+
 **** TODO Decisions the ruling leaves open
 
 1. /The 73 + 76 of 2018-19./  A wave 6 household file would settle what those ids
