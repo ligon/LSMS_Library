@@ -5046,9 +5046,10 @@ questions at all:* they name no crop, nearly all no plot either (1,015), so they
 are empty roster lines.  Only the 337 that name a crop can pose the question, and
 the 188 of 2010-11, every one with a harvest amount, are the ones that read most
 like an unrecorded amount rather than no seed.  None of it is served, and no 0 is
-minted.  This is the same framework rule as the rows #1435 registered for a time;
-it is not registered as a deletion here (the ruling asks for a count), which is
-the consistent follow-up if the maintainer wants it.
+minted.  Approved by the maintainer on 2026-11-05 and registered as the deletion
+=Malawi::plot_inputs::seed-line-no-payload= (=rows: 0=); =derivation_inputs= returns the
+lines.  Re-counted cold at 74e60f713, after #1523 and #1568: the table above stands, line
+for line.
 
 *The 19 fertilizer groups stay NA (ruling 2026-11-04).*  A blank enumerator total
 with a positive native quantity (2010-11 9, 2013-14 10): recovering them would be

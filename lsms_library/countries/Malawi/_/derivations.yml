@@ -617,3 +617,41 @@ Malawi::community_prices::struck-item-one-unit:
     2013-14 2,009; 2019-20 8,996) are exactly the rows that carry the key.
   contents: 'Malawi/_/CONTENTS.org, "the 38,506 unit-less rows: why, and what is served (GH #827)"'
   since: '2026-10-23'
+
+# GH #1174 (approved by the maintainer on 2026-11-05).  plot_inputs: a Module G line with no
+# seed answer has no payload, so _finalize_result's dropna(how='all') removes it.  Whether
+# such a line is "seed not used" or "amount unknown" is not settled by the instrument, so
+# nothing is served for it and the loss is registered here.
+Malawi::plot_inputs::seed-line-no-payload:
+  waves: ['2010-11', '2013-14', '2016-17', '2019-20']
+  columns: [Quantity, Quantity_purchased, Unit_purchased, Purchased, Improved, Quantity_received_as_gift, Unit_received_as_gift, Received_as_gift]
+  rows: 0
+  rule: >-
+    A DELETION.  A Module G line with no planted amount (ag_g04a), no Improved answer
+    (ag_g0f, 2016-17 on) and no purchase or free-seed answer attached to it reaches the
+    wave and var/ parquets with no payload, and _finalize_result's dropna(how='all') stops
+    serving it.  No 0 is minted.  A unit alone (ag_g04b, 2 lines in 2010-11) is not a
+    payload, because u is an index level.  The dropped lines have nowhere to carry a key;
+    derivation_inputs returns them.
+  function: lsms_library.countries.Malawi._.malawi:derive_seed_line_no_payload
+  inputs: lsms_library.countries.Malawi._.malawi:inputs_seed_line_no_payload
+  raw_variables:
+    - ag_mod_g.ag_g04a, ag_g04b, ag_g0f (2016-17+) (the seed answers, all blank here but for the 2 units)
+    - ag_mod_g crop and plot keys (blank on 1,018 of the lines)
+    - ag_mod_h.ag_h07a, ag_h16a, ag_h26a, ag_h38a (no attached purchase or free seed)
+  assumptions:
+    - text: >-
+        a line with no seed answer follows the framework's rule for a row with no payload,
+        rather than being served as "seed not used".  The instrument does not settle which
+        it is, and 1,018 of the 1,355 lines name no crop at all, so they are empty roster
+        lines and not seed questions.  Of the 337 that name a crop, 198 report a harvest
+        amount (188 in 2010-11), which reads more like an unrecorded amount.
+      basis: modelling-choice
+      evidence: >-
+        GH #1174; Malawi/_/CONTENTS.org, "The seed half, counted".
+  validated_against: >-
+    An independent read of all six Module G files, matching each served Seed row to its
+    line by position (input_obs), finds the same lines the callable returns: 1,355
+    (459 / 185 / 672 / 39 by wave, cold build of 74e60f713), none with a planted amount.
+  contents: 'Malawi/_/CONTENTS.org, "The seed half, counted"'
+  since: '2026-11-05'

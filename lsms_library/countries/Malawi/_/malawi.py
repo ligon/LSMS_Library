@@ -3825,6 +3825,100 @@ def _seed_gift_block(df, *, hhid, cropcode, source_half,
     return grp[cols]
 
 
+#: Registry key of the deletion below (``_/derivations.yml``, GH #1174).
+SEED_LINE_NO_PAYLOAD = 'Malawi::plot_inputs::seed-line-no-payload'
+
+_H_SLOTS_PANEL = dict(q=['ag_h16a', 'ag_h26a'], u=['ag_h16b', 'ag_h26b'], v=['ag_h19', 'ag_h29'])
+_H_SLOTS_XS = dict(q=['ag_h07a'], u=['ag_h07b'], v=['ag_h10'])
+
+#: Modules G and H as the four plot_inputs wave scripts read them; those scripts
+#: stay the build's source of truth, and a test checks every name here is in them.
+_SEED_LINE_SOURCES = {
+    '2010-11': [dict(half='Full_Sample', g='Data/Full_Sample/Agriculture/ag_mod_g.dta',
+                     h='Data/Full_Sample/Agriculture/ag_mod_h.dta', hhid='case_id', prefix='',
+                     gplot='ag_g0b', gcrop='ag_g0d', hcrop='ag_h0b', improved=None,
+                     crop_text='ag_g0d_os',
+                     q=['ag_h07a', 'ag_h16a', 'ag_h26a'], u=['ag_h07b', 'ag_h16b', 'ag_h26b'],
+                     v=['ag_h10', 'ag_h19', 'ag_h29'])],
+    '2013-14': [dict(half='single', g='Data/AG_MOD_G_13.dta', h='Data/AG_MOD_H_13.dta',
+                     hhid='y2_hhid', prefix='', gplot='ag_g00', gcrop='ag_g0b', hcrop='ag_h0c',
+                     improved=None, **_H_SLOTS_PANEL)],
+    '2016-17': [dict(half='Cross_Sectional', g='Data/Cross_Sectional/ag_mod_g.dta',
+                     h='Data/Cross_Sectional/ag_mod_h.dta', hhid='case_id', prefix='cs-17-',
+                     gplot=None, gcrop='crop_code', hcrop='crop_code', improved='ag_g0f',
+                     **_H_SLOTS_XS),
+                dict(half='Panel', g='Data/Panel/ag_mod_g_16.dta', h='Data/Panel/ag_mod_h_16.dta',
+                     hhid='y3_hhid', prefix='', gplot=None, gcrop='crop_code', hcrop='crop_code',
+                     improved='ag_g0f', **_H_SLOTS_PANEL)],
+    '2019-20': [dict(half='Cross_Sectional', g='Data/Cross_Sectional/ag_mod_g.dta',
+                     h='Data/Cross_Sectional/ag_mod_h.dta', hhid='case_id', prefix='cs-19-',
+                     gplot=None, gcrop='crop_code', hcrop='crop_code', improved='ag_g0f',
+                     **_H_SLOTS_XS),
+                dict(half='Panel', g='Data/Panel/ag_mod_g_19.dta', h='Data/Panel/ag_mod_h_19.dta',
+                     hhid='y4_hhid', prefix='', gplot=None, gcrop='crop_code', hcrop='crop_code',
+                     improved='ag_g0f', **_H_SLOTS_PANEL)],
+}
+
+
+def derive_seed_line_no_payload(plot_inputs):
+    """True where an assembled seed row has no served answer.
+
+    Such a line has no planted amount, no Improved answer and no attached purchase
+    or free-seed answer.  ``_finalize_result``'s ``dropna(how='all')`` removes it, so
+    it is registered as a deletion.  A recorded 0 is an answer, so a row holding one
+    is not selected; a unit alone is not (``u`` is an index level).
+    """
+    seed = plot_inputs.index.get_level_values('input') == 'Seed'
+    return pd.Series(seed, index=plot_inputs.index) & plot_inputs.isna().all(axis=1)
+
+
+def inputs_seed_line_no_payload(wave):
+    """The Module G lines behind the deletion (``rows: 0``), at ``(t, i, input_obs)``.
+
+    Every column of the source line under its original name, plus ``source``.
+    Re-reads the files through ``get_dataframe``; nothing is cached.
+    """
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    if wave not in _SEED_LINE_SOURCES:
+        raise ValueError(f'plot_inputs is built for {sorted(_SEED_LINE_SOURCES)}, not {wave!r}')
+    root = countries_root() / 'Malawi' / wave
+    seeds, purchases, gifts, lines = [], [], [], []
+    for s in _SEED_LINE_SOURCES[wave]:
+        g_path = root / s['g']
+        g = get_dataframe(str(g_path), convert_categoricals=False)
+        h = get_dataframe(str(root / s['h']), convert_categoricals=False)
+        # Release positions come before the repeat policy, as in the wave scripts.
+        # Only the 2010-11 script drops repeats; every other wave's G and H ship
+        # none, so this is the identity there (as in ``_crop_pieces``).
+        rows = np.arange(len(g))[~g.duplicated().to_numpy()]
+        g, h = drop_repeated_records(g), drop_repeated_records(h)
+        for df in (g, h):
+            df['hhid'] = s['prefix'] + df[s['hhid']].apply(format_id)
+        g['plotkey'] = (g[s['gplot']].apply(format_id) if s['gplot'] else
+                        g['gardenid'].apply(format_id) + '_' + g['plotid'].apply(format_id))
+        reference = _seed_source_reference(g_path)
+        seeds.append(_seed_block(g, hhid='hhid', plotkey='plotkey', cropcode=s['gcrop'],
+                                 qty='ag_g04a', unit='ag_g04b', improved=s['improved'], t=wave,
+                                 source_ref=reference, source_half=s['half'],
+                                 row_positions=rows, crop_text=s.get('crop_text')))
+        purchases.append(_seed_purchase_block(h, hhid='hhid', cropcode=s['hcrop'],
+                                              qty_cols=s['q'], unit_cols=s['u'],
+                                              value_cols=s['v'], source_half=s['half']))
+        gifts.append(_seed_gift_block(h, hhid='hhid', cropcode=s['hcrop'], source_half=s['half']))
+        lines.append(g.assign(t=wave, i=g['hhid'].astype(str),
+                              input_obs=[f'row:{reference}:{p}' for p in rows],
+                              source=s['g']).drop(columns=['hhid', 'plotkey']))
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')     # the refusal count belongs to the build
+        assembled = assemble_plot_inputs(wave, seeds, purchases, gifts)
+    gone = assembled[derive_seed_line_no_payload(assembled)].reset_index()
+    gone = gone[['t', 'i', 'input_obs']].astype(object)
+    out = pd.concat(lines, ignore_index=True).merge(gone.assign(i=gone['i'].astype(str)),
+                                                    on=['t', 'i', 'input_obs'])
+    return out.set_index(['t', 'i', 'input_obs'])
+
+
 def _attach_to_single_seed_observation(df, pieces, columns, what):
     """Attach household-crop Module H results to exactly one seed observation.
 
