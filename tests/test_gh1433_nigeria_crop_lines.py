@@ -218,7 +218,7 @@ def _walk(t, ids):
 
 def _lines(t):
     """Every line of a round's plot-crop files with a labelled crop, from the files."""
-    from lsms_library.local_tools import format_id, get_dataframe
+    from lsms_library.local_tools import format_id, get_dataframe, source_fingerprint
     labels = _labels()
     wave, files = SOURCES[t]
     parts = []
@@ -229,7 +229,9 @@ def _lines(t):
             token = "reported:crop_code:" + code.astype("string")
         else:
             line = pd.to_numeric(d[line_col], errors="coerce").astype("Int64")
-            token = "reported:crop_id:" + line.astype("string")
+            row = pd.Series(np.arange(len(d)), index=d.index).astype("string")
+            token = ("reported:crop_id:" + line.astype("string")).fillna(
+                "missing-id:row:" + source_fingerprint(NIGERIA / wave / rel) + ":" + row)
         conv = (pd.to_numeric(d[factor], errors="coerce") if factor else
                 pd.Series(np.nan, index=d.index))
         parts.append(pd.DataFrame({
@@ -289,10 +291,13 @@ class TestEveryLineIsServed:
         assert got.notna().sum() == want.notna().sum()
         assert got.sum() == pytest.approx(want.sum())
 
-    def test_each_named_line_holds_its_own_answers(self, served, t):
-        lines = _lines(t).dropna(subset=["production_obs"])
+    def test_each_line_holds_its_own_answers(self, served, t):
+        """Every token, the constructed W1 ones included, is rebuilt from the source."""
+        lines = _lines(t)
+        assert lines["production_obs"].notna().all()
         key = ["i", "plot_id", "crop", "production_obs"]
         want = lines.astype({k: str for k in key}).set_index(key).sort_index()
+        assert want.index.is_unique
         rows = _plain(served[served["t"] == t])
         got = rows.astype({k: str for k in key}).set_index(key).sort_index()
         got = got.loc[want.index]
@@ -301,6 +306,25 @@ class TestEveryLineIsServed:
             b = want[theirs].to_numpy()
             assert (np.isnan(a) == np.isnan(b)).all(), ours
             assert np.allclose(a[~np.isnan(a)], b[~np.isnan(b)]), ours
+
+
+@pytest.mark.requires_s3
+def test_a_constructed_w1_token_names_a_blank_line_of_the_release(served):
+    """The ordinal is a row of the file as read, and that row has no ``cropid``."""
+    from lsms_library.local_tools import format_id, get_dataframe
+    t = "2011Q1"
+    wave, ((rel, *_),) = SOURCES[t]
+    rows = served[(served["t"] == t)
+                  & served["production_obs"].astype(str).str.startswith("missing-id:row:")]
+    assert len(rows) == 6
+    ordinals = rows["production_obs"].astype(str).str.rsplit(":", n=1).str[1].astype(int)
+    d = get_dataframe(str(NIGERIA / wave / rel), convert_categoricals=False)
+    source = d.iloc[ordinals.to_numpy()]
+    assert source["cropid"].isna().all()
+    assert (source["hhid"].map(format_id).astype(str).to_numpy()
+            == rows["i"].astype(str).to_numpy()).all()
+    assert (source["plotid"].map(format_id).astype(str).to_numpy()
+            == rows["plot_id"].astype(str).to_numpy()).all()
 
 
 @pytest.mark.requires_s3

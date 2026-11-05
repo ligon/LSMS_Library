@@ -668,16 +668,19 @@ class TestW1W2OnTheRow:
     def test_every_line_keeps_its_own_sale_and_nothing_is_added(self, served, t):
         """Re-pinned by GH #1433: every labelled line is served, each with its own
         answer.  The sales W1/W2 record on the line must not move or be added to."""
-        from lsms_library.local_tools import get_dataframe
+        from lsms_library.local_tools import get_dataframe, source_fingerprint
         cfg = PLOT_GRAIN_SALES[t]
         d = get_dataframe(str(NIGERIA / cfg["wave"] / cfg["file"]), convert_categoricals=False)
         code = pd.to_numeric(d[cfg["crop"]], errors="coerce").astype("Int64")
         line = pd.to_numeric(d["cropid"], errors="coerce").astype("Int64")
+        row = pd.Series(np.arange(len(d)), index=d.index).astype("string")
+        ref = source_fingerprint(NIGERIA / cfg["wave"] / cfg["file"])
         raw = pd.DataFrame({
             "i": d["hhid"].map(_hh).astype("string").values,
             "plot_id": d["plotid"].map(_hh).astype("string").values,
             "crop": code.map(_crop_labels()).astype("string").values,
-            "production_obs": ("reported:crop_id:" + line.astype("string")).values,
+            "production_obs": ("reported:crop_id:" + line.astype("string")).fillna(
+                "missing-id:row:" + ref + ":" + row).values,
             "q": pd.to_numeric(d["sa3q11a"], errors="coerce").values,
             "v": pd.to_numeric(d["sa3q12"], errors="coerce").values,
         }).dropna(subset=["i", "crop"])
@@ -689,10 +692,9 @@ class TestW1W2OnTheRow:
         assert pd.to_numeric(rows["Value_sold"], errors="coerce").sum() == pytest.approx(
             raw["v"].sum(), abs=1e-6)
         key = ["i", "plot_id", "crop", "production_obs"]
-        named = raw.dropna(subset=["production_obs"])
         got = rows.astype({k: str for k in key}).set_index(key).sort_index()
-        want = named.astype({k: str for k in key}).set_index(key).sort_index()
-        got = got.loc[want.index]
+        want = raw.astype({k: str for k in key}).set_index(key).sort_index()
+        assert got.index.equals(want.index)
         for ours, theirs in (("Value_sold", "v"), ("Quantity_sold", "q")):
             a = pd.to_numeric(got[ours], errors="coerce").astype("float64").to_numpy()
             b = want[theirs].to_numpy()
