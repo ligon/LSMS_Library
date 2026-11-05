@@ -161,8 +161,7 @@ Data Scheme:
   plot_features:
     # Lasting parcel-level characteristics from the EHCVM agriculture
     # module s16a (GH #167; Benin is an EHCVM sibling of the Mali
-    # reference implementation).  Single EHCVM wave: 2018-19 (Benin has
-    # no 2021-22 EHCVM-II wave in this repo).  plot_id =
+    # reference implementation).  plot_id =
     # "{field_no}_{parcel_no}".  Latitude / Longitude are NOT emitted —
     # EHCVM s16a has no decimal-degree parcel GPS (s16aq47 is an area,
     # not a coordinate); deferred as in Uganda / Mali.
@@ -220,16 +219,27 @@ Data Scheme:
     # `shelled` / `unshelled` / `shell_not_applicable`, plus `unknown_condition`
     # for a blank code.  Five answers fold onto those tokens (ruled @ligon
     # 2026-11-04); condition_native below keeps what was answered.
+    #
+    # 2021-22 (GH #552) splits the module: s16c holds the harvest and s16d, with no
+    # plot, the sales.  A sale goes on the household's single harvest row for the crop,
+    # keyed hh-crop-sale-single-row, else on one row with plot_id = 'Farm-level' and
+    # u = 'Unknown' (option (d), @ligon 2026-11-03).  Unit_sold is the sold unit there;
+    # 2018-19's sold unit is not read, so it is NA on 2018-19.  A recorded harvest of an
+    # unfinished crop is keyed harvest-to-date.  condition reads s16cq16d through the
+    # wave's own three-code table, in 2021-22/_/categorical_mapping.org.
     index: (t, i, plot_id, crop, u, condition)
     Quantity: float
     Quantity_sold: float
+    Unit_sold:
+      type: str
+      optional: true
     Value_sold: float
     harvest_month:
       type: float
       optional: true
     intercropped: bool
     # condition_native (GH #1436, ruling @ligon 2026-11-04) is the state label as
-    # recorded (s16cq12c), the answer the `condition` fold cannot show.  `optional`
+    # recorded (s16cq12c; s16cq16d in 2021-22), the answer the `condition` fold cannot show.  `optional`
     # because a blank state is NA, never a sentinel.
     condition_native:
       type: str
@@ -274,10 +284,26 @@ Data Scheme:
     # and 2018-19/_/plot_inputs.py ASSERTS the declared index is unique before
     # writing, so a re-widened bucket fails the build instead of shipping
     # short.  API rows 10,534 -> 10,605 = every reported line-item.
+    #
+    # 2021-22 (GH #552) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
+    # beside it, s16bq05 / s16bq07a / s16bq07b, as Burkina Faso (GH #1188).  2018-19 still
+    # serves the GIFT question under Purchased and Quantity_purchased: _/CONTENTS.org.
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    Unit_purchased:
+      type: str
+      optional: true
+    Received_as_gift:
+      type: bool
+      optional: true
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
+      optional: true
     materialize: make
 
   plot_labor:

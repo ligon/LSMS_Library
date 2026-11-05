@@ -206,3 +206,129 @@ def inputs_food_acquired(wave):
     """The registry `inputs` callable: raw section-7B answers at (t, i, j)."""
     return _inputs_last_purchase('Benin', wave)
 
+
+# --- the wave's scripts, and the registry's raw inputs ------------------------------
+
+KEY_HH_CROP_SALE = 'Benin::crop_production::hh-crop-sale-single-row'
+KEY_HARVEST_TO_DATE = 'Benin::crop_production::harvest-to-date'
+
+
+def household_ids(frame):
+    '''The served `i` of each row of a (grappe, menage) file.'''
+    return frame.apply(lambda r: i(pd.Series([r['grappe'], r['menage']])), axis=1)
+
+
+def plot_ids(frame, field, parcel):
+    '''`{field}_{parcel}`: the spelling of plot_features' plot_id.'''
+    return (frame[field].apply(tools.format_id).astype('string') + '_'
+            + frame[parcel].apply(tools.format_id).astype('string'))
+
+
+def members(frame):
+    '''A (grappe, menage, membres__id) file without the people who have left: s01 and
+    s04a list them with every answer blank (s01q00aa = non), as `household_roster` drops
+    them.'''
+    from pathlib import Path
+
+    from lsms_library.paths import countries_root
+    roster = tools.get_dataframe(str(Path(countries_root()) / 'Benin' / '2021-22' / 'Data'
+                                     / 's01_me_ben2021.dta'), convert_categoricals=True)
+    gone = roster[roster['s01q00aa'].astype('string').str.strip().str.lower().eq('non').fillna(False)]
+    key = ['grappe', 'menage', 'membres__id']
+    out = frame.merge(gone[key].assign(_gone=True), on=key, how='left', validate='one_to_one')
+    return out[out['_gone'].isna()].drop(columns='_gone')
+
+
+def _food_table():
+    from pathlib import Path
+
+    from lsms_library.paths import countries_root
+    root = Path(countries_root()) / 'Benin'
+    return tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Original Label',
+        dirs=[f'{root / "2021-22" / "_"}/', f'{root / "_"}/'],
+        **{'Preferred Label': 'Preferred Label'})
+
+
+def crop_labels(codes):
+    '''The served crop of each crop code, read BY CODE off s16cq04's value labels.
+
+    s16dq01 labels only codes 1-47 and 65: its 1,089 rows of codes 51-64, 919 of them
+    Soja, carry no label at all, and it spells 42 and 65 otherwise than s16cq04
+    (`Amarante (Tchapata)` and `Amarante(Tchapata)`).  So a join of s16d to s16c on the
+    labels misses 1,098 of the 7,701 pairs that join on the codes.  A label the table does
+    not name passes as recorded, as in 2018-19 (Soja, Anacarde).
+    '''
+    from pathlib import Path
+
+    from lsms_library.paths import countries_root
+    names = tools.get_dataframe(str(Path(countries_root()) / 'Benin' / '2021-22' / 'Data'
+                                    / 's16c_me_ben2021.dta'), categories_only=True)['s16cq04']
+    table = _food_table()
+    served = {int(code): table.get(str(label).strip(), str(label).strip())
+              for code, label in names.items()}
+    codes = pd.to_numeric(codes, errors='coerce').astype('Int64')
+    unknown = sorted(set(codes.dropna().astype(int)) - set(served))
+    if unknown:
+        raise ValueError(f'crop codes with no s16cq04 label: {unknown}')
+    return codes.map(served).astype('string')
+
+
+def _raw_crop_file(wave, name, crop):
+    '''One crop file as recorded, with the served t, i and crop.'''
+    from pathlib import Path
+
+    from lsms_library.paths import countries_root
+    path = str(Path(countries_root()) / 'Benin' / wave / 'Data' / name)
+    src = tools.get_dataframe(path, convert_categoricals=True)
+    codes = tools.get_dataframe(path, convert_categoricals=False)
+    keep = codes[crop].notna().values
+    src, codes = src[keep].copy(), codes[keep]
+    src['t'] = wave
+    src['i'] = household_ids(codes).astype('string').values
+    src['crop'] = crop_labels(codes[crop]).values
+    src['_crop_code'] = pd.to_numeric(codes[crop], errors='coerce').astype('Int64').values
+    return src
+
+
+def sale_records(wave):
+    '''s16d, one row per (household, crop), as recorded.  The file repeats a crop's record
+    once per harvest line (627 exact repeats, compared on the codes).'''
+    from pathlib import Path
+
+    from lsms_library.ehcvm import hh_crop_records
+    from lsms_library.paths import countries_root
+    path = str(Path(countries_root()) / 'Benin' / wave / 'Data' / 's16d_me_ben2021.dta')
+    codes = tools.get_dataframe(path, convert_categoricals=False)
+    labels = tools.get_dataframe(path, convert_categoricals=True)
+    kept = hh_crop_records(codes).index
+    out = labels.loc[kept].copy()
+    out['s16dq01'] = codes.loc[kept, 's16dq01']
+    out['t'] = wave
+    out['i'] = household_ids(codes.loc[kept]).astype('string').values
+    out['crop'] = crop_labels(codes.loc[kept, 's16dq01']).values
+    return out
+
+
+def inputs_hh_crop_sale(wave):
+    '''Registry `inputs`: the s16d sale as recorded, with the field and parcel of the
+    one s16c row it went on, one row per keyed served row, at (t, i, crop).'''
+    from lsms_library.ehcvm import is_crop_sale
+    harvest = _raw_crop_file(wave, 's16c_me_ben2021.dta', 's16cq04')
+    sold = sale_records(wave)
+    sold = sold[is_crop_sale(sold['s16dq05a'], sold['s16dq06'])]
+    lines = harvest.groupby(['i', 'crop']).size()
+    single = lines[lines == 1].index
+    harvest = harvest[harvest.set_index(['i', 'crop']).index.isin(single)]
+    out = sold[['t', 'i', 'crop', 's16dq01', 's16dq04', 's16dq05a', 's16dq05b', 's16dq06']].merge(
+        harvest[['i', 'crop', 's16cq02', 's16cq03']], on=['i', 'crop'], how='inner',
+        validate='one_to_one')
+    return out.set_index(['t', 'i', 'crop'])
+
+
+def inputs_harvest_to_date(wave):
+    '''Registry `inputs`: the unfinished rows with a recorded quantity, at (t, i, crop).'''
+    src = _raw_crop_file(wave, 's16c_me_ben2021.dta', 's16cq04')
+    src = src[src['s16cq11'].astype('string').str.strip().eq('Non') & src['s16cq16a'].notna()]
+    return src[['t', 'i', 'crop', 's16cq02', 's16cq03', 's16cq11', 's16cq12', 's16cq16a',
+                's16cq16b']].set_index(['t', 'i', 'crop'])
