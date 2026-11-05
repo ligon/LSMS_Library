@@ -220,6 +220,15 @@
 | Semences de haricots/niébé                | Seed                |
 | Plants/boutures de tubercules             | Seed                |
 | Autres semences                           | Seed                |
+| Produits phytosanitaires -  Fongicides    | Fungicide           |
+| Semences d'arachide                       | Seed                |
+| Plants d'hévéa, de teck                   | Seed                |
+| Plants de café                            | Seed                |
+| Plants de cacao                           | Seed                |
+| Semences d'anacarde                       | Seed                |
+| Semences de piment                        | Seed                |
+| Semence d'aubergine                       | Seed                |
+| Semence de tomate                         | Seed                |
 | 20                                        | Seed                |
 
 # harmonize_seed_crop: KEEP DISTINCT NATIVE SLOTS DISTINCT (GH #1123).  `crop`
@@ -234,6 +243,8 @@
 # tubercules' and bare '20' occur on no row and are left unchanged (Burkina
 # kept its unused cells too); the uniqueness guard before to_parquet in
 # 2018-19/_/plot_inputs.py catches any future collision.
+# 2021-22 (GH #552) fields code 20 and new slots, so each takes its own label, on the
+# crop vocabulary of harmonize_food; no 2018-19 row reads any of them.
 
 #+NAME: harmonize_seed_crop
 | Original Label                | Preferred Label     |
@@ -247,9 +258,17 @@
 | Semences de césame            | Sésame              |
 | Semences de haricots/niébé    | Niébé/Haricots secs |
 | Semences d'autres céréales    | Autre céréale       |
-| Plants/boutures de tubercules | Autre crop          |
+| Plants/boutures de tubercules | Autre tubercule     |
 | Autres semences               | Autre crop          |
 | 20                            | Autre crop          |
+| Semences d'arachide           | Arachide            |
+| Plants d'hévéa, de teck       | Hévéa, teck         |
+| Plants de café                | Coffee              |
+| Plants de cacao               | Cocoa               |
+| Semences d'anacarde           | Cashew              |
+| Semences de piment            | Piment frais        |
+| Semence d'aubergine           | Aubergine,          |
+| Semence de tomate             | Tomate fraîche      |
 
 * Food / Crop Labels (the j and crop axes)
 
@@ -434,6 +453,8 @@
 | Viande de poulet                                                       | Viande de poulet                                                                     |
 | Vinaigre /moutarde                                                     | Vinaigre /moutarde                                                                   |
 | Œufs                                                                   | Œufs                                                                                 |
+| Cacaoo                                                                                                        | Cocoa                                                                                |
+| Autre (à préciser)                                                                                            | Autre crop                                                                           |
 
 # harmonize_education (GH #171): per-country delta on the global ordinal base
 # (categorical_mapping/harmonize_education.org, row-additive). Maps this country's

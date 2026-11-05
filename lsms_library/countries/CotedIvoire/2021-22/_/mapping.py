@@ -164,3 +164,113 @@ def interview_date(df):
     household records no start, and 167 of the 728 record an end.'''
     df = df[df['Result'].astype('string').str.strip().ne('Non rempli')].drop(columns='Result')
     return tools.melt_visit_intervals(df)
+
+
+# --- the wave's scripts, and the registry's raw inputs ------------------------------
+
+KEY_HH_CROP_SALE = 'CotedIvoire::crop_production::hh-crop-sale-single-row'
+KEY_HARVEST_TO_DATE = 'CotedIvoire::crop_production::harvest-to-date'
+KEY_HARVEST_DISPOSITIONS = 'CotedIvoire::crop_production::harvest-from-dispositions'
+
+#: The four dispositions of s16d: consumed, given, sold, in stock.
+DISPOSITIONS = ('s16dq02', 's16dq03', 's16dq05', 's16dq13')
+
+
+def household_ids(frame):
+    '''The served `i` of each row of a (grappe, menage) file.'''
+    return frame.apply(lambda r: i(pd.Series([r['grappe'], r['menage']])), axis=1)
+
+
+def plot_ids(frame, field, parcel):
+    '''`{field}_{parcel}`: the spelling of plot_features' plot_id.'''
+    return (frame[field].apply(tools.format_id).astype('string') + '_'
+            + frame[parcel].apply(tools.format_id).astype('string'))
+
+
+def _levels():
+    from pathlib import Path
+
+    from lsms_library.paths import countries_root
+    root = Path(countries_root()) / 'CotedIvoire'
+    return [f'{root / "2021-22" / "_"}/', f'{root / "_"}/']
+
+
+def crop_labels(series):
+    '''A crop label through harmonize_food.  One the table does not name passes as
+    recorded, and a code with no value label as its number: 56 to 60, 3,946 rows, whose
+    names no document gives (_/CONTENTS.org, "2021-22 wired").'''
+    table = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Original Label', dirs=_levels(),
+        **{'Preferred Label': 'Preferred Label'})
+
+    def label(value):
+        if pd.isna(value):
+            return pd.NA
+        if isinstance(value, (int, float, np.integer, np.floating)):
+            return tools.format_id(value)
+        text = str(value).strip()
+        return table.get(text, text)
+
+    return pd.Series([label(v) for v in series], index=series.index, dtype='string')
+
+
+def s16d_units(codes):
+    '''Each s16d unit by code, on the served label.  The file labels 1 to 7 here and the
+    rest are the codes of section 7B's list; harmonize_unit_s16d has them, read off this
+    file.  A code on neither stays as its number.'''
+    from lsms_library.ehcvm import served_unit_labels
+    table = tools.get_categorical_mapping(
+        tablename='harmonize_unit_s16d', idxvars='Code', dirs=_levels(),
+        **{'Preferred Label': 'Preferred Label'})
+    table = {int(code): label for code, label in table.items()}
+    numbers = pd.to_numeric(codes, errors='coerce')
+    raw = pd.Series([pd.NA if pd.isna(n) else table.get(int(n), tools.format_id(n)) for n in numbers],
+                    index=codes.index, dtype='string')
+    known = raw.dropna().unique()
+    served = dict(zip(known, served_unit_labels('CotedIvoire', known)))
+    return raw.map(served).astype('string')
+
+
+def _raw_crop_file(wave, name, crop):
+    '''One crop file as recorded, with the served t, i and crop.'''
+    from pathlib import Path
+
+    from lsms_library.paths import countries_root
+    src = tools.get_dataframe(str(Path(countries_root()) / 'CotedIvoire' / wave / 'Data' / name),
+                              convert_categoricals=True)
+    src = src[src[crop].notna()].copy()
+    src['t'] = wave
+    src['i'] = household_ids(src).astype('string').values
+    src['crop'] = crop_labels(src[crop]).values
+    return src
+
+
+def inputs_hh_crop_sale(wave):
+    '''Registry `inputs`: the s16d sale as recorded, with the field and parcel of the
+    one s16c row it went on, one row per keyed served row, at (t, i, crop).'''
+    from lsms_library.ehcvm import is_crop_sale
+    harvest = _raw_crop_file(wave, 's16c_me_civ2021.dta', 's16cq04')
+    sold = _raw_crop_file(wave, 's16d_me_civ2021.dta', 's16dq01')
+    sold = sold[is_crop_sale(sold['s16dq05a'], sold['s16dq06'])]
+    lines = harvest.groupby(['i', 'crop']).size()
+    single = lines[lines == 1].index
+    harvest = harvest[harvest.set_index(['i', 'crop']).index.isin(single)]
+    out = sold[['t', 'i', 'crop', 's16dq01', 's16dq04', 's16dq05a', 's16dq05b', 's16dq06']].merge(
+        harvest[['i', 'crop', 's16cq02', 's16cq03']], on=['i', 'crop'], how='inner',
+        validate='one_to_one')
+    return out.set_index(['t', 'i', 'crop'])
+
+
+def inputs_harvest_to_date(wave):
+    '''Registry `inputs`: the unfinished rows with a recorded quantity, at (t, i, crop).'''
+    src = _raw_crop_file(wave, 's16c_me_civ2021.dta', 's16cq04')
+    src = src[src['s16cq11'].astype('string').str.strip().eq('Non') & src['s16cq16a'].notna()]
+    return src[['t', 'i', 'crop', 's16cq02', 's16cq03', 's16cq11', 's16cq12', 's16cq16a',
+                's16cq16b']].set_index(['t', 'i', 'crop'])
+
+
+def inputs_harvest_from_dispositions(wave):
+    '''Registry `inputs`: every s16d record with its dispositions, at (t, i, crop).'''
+    src = _raw_crop_file(wave, 's16d_me_civ2021.dta', 's16dq01')
+    columns = [f'{var}{part}' for var in DISPOSITIONS for part in 'ab']
+    return src[['t', 'i', 'crop', 's16dq01'] + columns].set_index(['t', 'i', 'crop'])

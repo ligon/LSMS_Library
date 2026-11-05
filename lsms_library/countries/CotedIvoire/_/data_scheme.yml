@@ -189,9 +189,21 @@ Data Scheme:
     # 2026-11-04); condition_native below keeps what was answered.  Vague 2 added
     # two more, Fève and Autre à préciser, served `other_condition` (GH #1436; see
     # categorical_mapping.org).
+    #
+    # 2021-22 (GH #552) splits the module: s16c holds the harvest and s16d, with no
+    # plot, the dispositions.  A sale goes on the household's single harvest row for the
+    # crop, keyed hh-crop-sale-single-row, else on one row with plot_id = 'Farm-level' and
+    # u = 'Unknown' (option (d), @ligon 2026-11-03).  Unit_sold is the sold unit there;
+    # 2018-19's sold unit is not read, so it is NA on 2018-19.  s16cq16a is filled only on
+    # unfinished rows: those are keyed harvest-to-date, and a finished crop's total comes
+    # from s16d under harvest-from-dispositions (GH #1437's rule).  condition reads
+    # s16cq16d through 2021-22/_/categorical_mapping.org.
     index: (t, i, plot_id, crop, u, condition)
     Quantity: float
     Quantity_sold: float
+    Unit_sold:
+      type: str
+      optional: true
     Value_sold: float
     harvest_month:
       type: float
@@ -224,10 +236,26 @@ Data Scheme:
     # carry the sentinel '(not crop-specific)'; a missing unit carries
     # 'Manquant' — non-null index levels so no row is lost to the framework's
     # NaN-key de-dup collapse.  Same i / path quirks as plot_features.
+    #
+    # 2021-22 (GH #552) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
+    # beside it, s16bq05 / s16bq07a / s16bq07b, as Burkina Faso (GH #1188).  2018-19 still
+    # serves the GIFT question under Purchased and Quantity_purchased: _/CONTENTS.org.
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    Unit_purchased:
+      type: str
+      optional: true
+    Received_as_gift:
+      type: bool
+      optional: true
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
+      optional: true
     materialize: make
 
   plot_labor:
@@ -236,6 +264,9 @@ Data Scheme:
     # collapses to total_labor_days / total_family_labor_days /
     # total_hired_labor_days / hired_labor_value; all those sums / valuations
     # are TRANSFORMATIONS over these rows, never columns here.
+    #
+    # 2021-22 is not served: its s16a ships only the six use flags (s16aq32 .. s16aq42), not
+    # the days or the wage its instrument asks (16A.33 .. 16A.43).  GH #552.
     #
     # GRAIN (t, i, plot_id, source): source in {family, hired}.  EHCVM s16a
     # records family (member-day grids s16aq33b_/35b_/37b_) vs non-family /

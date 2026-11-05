@@ -786,6 +786,79 @@ def derive_hh_crop_sale_attachment(harvest: pd.DataFrame, sales: pd.DataFrame,
     return pd.concat([served, farm], ignore_index=True)
 
 
+#: The dispositions of s16d: consumed, given, sold, in stock.
+DISPOSITION_VARIABLES = ("s16dq02", "s16dq03", "s16dq05", "s16dq13")
+
+
+def harvest_totals(lines: pd.DataFrame, dispositions: pd.DataFrame) -> pd.DataFrame:
+    """The (i, crop) pairs whose harvest their dispositions can state, with the sum.
+
+    The rule of Mali 2021-22 (GH #1437, ruling @ligon 2026-11-04), for a wave whose s16cq16a
+    is empty on finished rows.  ``lines`` holds the s16c rows: ``i``, ``crop``, ``Quantity``
+    and ``finished``.  ``dispositions`` holds one row per (i, crop), with ``<var>a`` and
+    ``<var>b`` for each of :data:`DISPOSITION_VARIABLES`.  A pair qualifies when every
+    s16c row of it is finished, no row of it records a quantity, and its positive
+    dispositions all state one unit.  Mali's own copy is in mali.py, which does not import
+    this.
+
+    Returns ``Quantity``, ``u`` and ``lines``, indexed by (i, crop).
+    """
+    if dispositions.duplicated(_SALE_KEYS).any():
+        raise ValueError("crop_production: more than one s16d record for a (i, crop)")
+    long = pd.concat([
+        dispositions[_SALE_KEYS].assign(
+            quantity=pd.to_numeric(dispositions[f"{var}a"], errors="coerce").astype("float64"),
+            unit=dispositions[f"{var}b"].astype("string").str.strip())
+        for var in DISPOSITION_VARIABLES], ignore_index=True)
+    long = long[long["quantity"].gt(0)]
+    long["unitless"] = long["unit"].isna()
+    stated = long.groupby(_SALE_KEYS).agg(Quantity=("quantity", "sum"), u=("unit", "first"),
+                                          units=("unit", "nunique"), unitless=("unitless", "any"))
+    facts = pd.DataFrame({"i": lines["i"], "crop": lines["crop"],
+                          "open": (lines["finished"].astype("string").str.strip().ne("Oui")
+                                   .fillna(True).astype(bool)),
+                          "recorded": pd.to_numeric(lines["Quantity"], errors="coerce").notna()})
+    facts = facts.groupby(_SALE_KEYS).agg(lines=("open", "size"), open=("open", "any"),
+                                          recorded=("recorded", "any"))
+    pairs = stated.join(facts, how="inner")
+    keep = pairs["units"].eq(1) & ~pairs["unitless"] & ~pairs["open"] & ~pairs["recorded"]
+    return pairs.loc[keep, ["Quantity", "u", "lines"]]
+
+
+def derive_hh_crop_harvest_total(served: pd.DataFrame, dispositions: pd.DataFrame,
+                                 key: str) -> pd.DataFrame:
+    """A finished harvest the file lacks, from its dispositions.
+
+    ``served`` is the frame :func:`derive_hh_crop_sale_attachment` returns, with ``finished``
+    beside it.  For a pair of :func:`harvest_totals`, ``Quantity`` is the sum of consumed,
+    given, sold and in stock, and ``u`` their unit.  It goes where the sale of that pair
+    goes: on the single s16c row, or, for two or more rows, on the pair's one Farm-level
+    row, created if no sale already made it.  That row carries ``key``; nothing is split
+    among plots, and every other row keeps what it had.
+    """
+    plots = served["plot_id"].ne(FARM_LEVEL).fillna(True)
+    totals = harvest_totals(served[plots], dispositions)
+    out = served.reset_index(drop=True)
+    plots = plots.reset_index(drop=True)
+    pair = pd.MultiIndex.from_frame(out[_SALE_KEYS])
+    target = ((plots & pair.isin(totals.index[totals["lines"].eq(1)]))
+              | (~plots & pair.isin(totals.index[totals["lines"].gt(1)])))
+    placed = totals.reindex(pair[target])
+    out["Quantity"] = pd.to_numeric(out["Quantity"], errors="coerce").astype("float64")
+    out.loc[target, "Quantity"] = placed["Quantity"].to_numpy()
+    out["u"] = out["u"].astype("string")
+    out.loc[target, "u"] = pd.array(placed["u"].to_numpy(), dtype="string")
+    derivation = out[DERIVATION_COLUMN].astype("string").copy()
+    derivation[target] = pd.array([union_keys((value, key)) for value in derivation[target]],
+                                  dtype="string")
+    out[DERIVATION_COLUMN] = derivation
+    several = totals[totals["lines"].gt(1)]
+    new = several[~several.index.isin(pair[~plots])].reset_index()[_SALE_KEYS + ["Quantity", "u"]]
+    new["plot_id"] = FARM_LEVEL
+    new[DERIVATION_COLUMN] = key
+    return pd.concat([out, new], ignore_index=True)
+
+
 def derive_harvest_to_date(quantity):
     """The identity: a recorded harvest of an unfinished crop, served as recorded.
 
