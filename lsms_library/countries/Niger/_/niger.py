@@ -6,7 +6,7 @@ import json
 from ligonlibrary.dataframes import from_dta
 import pyreadstat
 import lsms_library.local_tools as tools
-from lsms_library.derivations import MULTI_SEP
+from lsms_library.derivations import MULTI_SEP, union_keys
 
 
 Waves = {'2011-12': (),
@@ -832,10 +832,15 @@ def derive_survey_kg_estimate(kilograms):
 
 
 def stamp_survey_kg_estimate(df):
-    """The ``Derivation`` column of the finished 2021-22 frame: the key wherever
-    ``Quantity_kg`` holds a value, NA elsewhere."""
-    out = pd.Series(pd.NA, index=df.index, dtype='string')
-    out[df['Quantity_kg'].notna().to_numpy(dtype=bool)] = SURVEY_KG_ESTIMATE
+    """The ``Derivation`` column of the finished 2021-22 frame, as a ``string`` Series
+    on its index.  The key is APPENDED wherever ``Quantity_kg`` holds a value, joined
+    with ``MULTI_SEP`` in sorted order to whatever the row already carries, as Mali's
+    ``_with_key`` does, so that a second key on this wave's rows loses neither."""
+    out = (df['Derivation'].astype('string').copy() if 'Derivation' in df.columns
+           else pd.Series(pd.NA, index=df.index, dtype='string'))
+    mask = df['Quantity_kg'].notna().to_numpy(dtype=bool)
+    out[mask] = pd.array([union_keys((value, SURVEY_KG_ESTIMATE)) for value in out[mask]],
+                         dtype='string')
     return out
 
 

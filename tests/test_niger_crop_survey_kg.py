@@ -14,9 +14,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from lsms_library.derivations import records_for, resolve_callable
+from lsms_library.derivations import MULTI_SEP, records_for, resolve_callable
 from lsms_library.paths import countries_root
-from lsms_library.transformations import KG_FACTOR_LAYERS, harvest_kg, harvest_kg_factors
+from lsms_library.transformations import KG_FACTOR_LAYERS, harvest_kg, harvest_kg_factors, yield_kg
 from lsms_library.yaml_utils import load_yaml
 
 COUNTRY = "Niger"
@@ -49,6 +49,16 @@ class TestRules:
         got = niger.stamp_survey_kg_estimate(frame)
         assert got.dtype == "string"
         assert got.tolist()[0] == ESTIMATE and pd.isna(got.tolist()[1]) and got.tolist()[2] == ESTIMATE
+
+    def test_the_stamp_appends_to_a_key_already_there(self, niger):
+        """Another key on this wave's rows must survive, whichever stamp runs second."""
+        other = "Niger::crop_production::another-key"
+        frame = pd.DataFrame({"Quantity_kg": pd.array([1.0, None, 2.0], dtype="Float64"),
+                              "Derivation": pd.array([other, other, pd.NA], dtype="string")})
+        got = niger.stamp_survey_kg_estimate(frame).tolist()
+        assert got[0] == MULTI_SEP.join(sorted((other, ESTIMATE)))
+        assert got[1] == other
+        assert got[2] == ESTIMATE
 
     def test_the_tail_keeps_the_column_and_supplies_it(self, niger):
         frame = pd.DataFrame({"i": ["1"], "plot_id": ["1_1"], "crop": ["Mil"], "u": ["Tiya"],
@@ -205,23 +215,36 @@ class TestServed:
 
     def test_the_low_sacks_are_served_as_recorded(self, built):
         """38 rows at about 7 kg per 100 kg sack look wrong and are not trimmed."""
+        raw = _read("2011-12", DRY_2011, convert_categoricals=True)
+        num = _read("2011-12", DRY_2011, convert_categoricals=False)
+        keep = ~num.duplicated().to_numpy()
+        raw, num = raw[keep], num[keep]
+        q, k, cycles = _numeric(num, "as03eq09a"), _numeric(num, "as03eq09c"), _numeric(num, "as03eq06")
+        sack = (raw["as03eq09b"].astype("string").str.strip().str.lower().eq("sac de 100 kg")
+                .fillna(False).to_numpy(dtype=bool))
+        source = (sack & (k > 0).to_numpy() & (k != 99999).to_numpy()
+                  & (q > 0).to_numpy() & ((k / q) < 20).to_numpy())
         got = _totals(_wave(built, "2011-12"))
         dry = got[got["plot_id"] == "Farm-level"]
         sacks = dry[dry["u"] == "Sac de 100 kg"].astype({"Quantity": "float64"})
         low = sacks[(sacks["Quantity_kg"] > 0) & (sacks["Quantity_kg"] / sacks["Quantity"] < 20)]
-        assert len(low) == 38
-        assert np.isclose(float(low["Quantity_kg"].sum()), 11169.0)
+        assert len(low) == int(source.sum()) > 0
+        assert np.isclose(float(low["Quantity_kg"].sum()), float((k * cycles).to_numpy()[source].sum()))
 
     def test_2021_22_is_s16cq16c_row_by_row(self, built):
         raw = _read("2021-22", FILE_2021, convert_categoricals=False)
         got = _totals(_wave(built, "2021-22"))
+        # Only a row of s16c has a position.  A Farm-level row would hold no kilograms.
+        lines = got["production_obs"].str.startswith("row:").fillna(False)
+        assert got.loc[~lines, "Quantity_kg"].isna().all()
+        got = got[lines]
         position = got["production_obs"].str.rsplit(":", n=1).str[-1].astype(int).to_numpy()
         want = _numeric(raw, "s16cq16c").to_numpy()[position]
         np.testing.assert_array_equal(got["Quantity_kg"].to_numpy(), want)
 
     def test_the_estimate_key_is_exactly_where_2021_22_has_a_total(self, built):
         got = _wave(built, "2021-22")
-        keyed = got["Derivation"].astype("string").eq(ESTIMATE).fillna(False)
+        keyed = got["Derivation"].astype("string").str.contains(ESTIMATE, regex=False).fillna(False)
         assert (keyed == got["Quantity_kg"].notna()).all()
         for wave in ("2011-12", "2014-15", "2018-19"):
             other = _wave(built, wave)["Derivation"].astype("string").fillna("")
@@ -236,11 +259,30 @@ class TestServed:
         assert sorted(map(tuple, raw[on].to_numpy())) == sorted(map(tuple, got[on].to_numpy()))
 
     def test_a_tiya_is_exactly_2_5_on_most_2021_22_rows(self, built):
-        """Why the key exists.  Moves with a re-release, and then the key's text does too."""
+        """Why the key exists: the file's own ratio, and the column reproduces it."""
+        raw = _read("2021-22", FILE_2021, convert_categoricals=True)
+        tiya = raw["s16cq16b"].astype("string").str.strip().eq("Tiya")
+        ratio = (_numeric(raw, "s16cq16c") / _numeric(raw, "s16cq16a"))[tiya].dropna().round(4)
+        assert (ratio == 2.5).mean() > 0.5
         got = _totals(_wave(built, "2021-22"))
-        tiya = got[(got["u"] == "Tiya") & (got["Quantity_kg"] > 0)]
-        at = ((tiya["Quantity_kg"] / tiya["Quantity"].astype("float64")).round(4) == 2.5).sum()
-        assert len(tiya) == 4402 and at == 2881
+        served = got[(got["u"] == "Tiya") & (got["Quantity_kg"] > 0)]
+        served = (served["Quantity_kg"] / served["Quantity"].astype("float64")).round(4)
+        assert len(served) == len(ratio) and int((served == 2.5).sum()) == int((ratio == 2.5).sum())
+
+    def test_a_harvest_kg_reader_can_see_the_estimate(self, built):
+        country, df = built
+        res = harvest_kg(df)
+        assert res.attrs["derivations"]["Niger"][ESTIMATE]["rows"] == int(
+            _wave(built, "2021-22")["Quantity_kg"].notna().sum())
+        by_wave = res.attrs["survey_kg_rows_by_wave"]
+        assert by_wave["2018-19"] == 0 and by_wave["2021-22"] > 0
+        assert sum(by_wave.values()) == harvest_kg_factors(df).attrs["kg_factor_sources"]["survey_kg"]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            yields = yield_kg(
+                df, country.plot_features(), on="plot")
+        assert yields.attrs["derivations"] == res.attrs["derivations"]
+        assert yields.attrs["survey_kg_rows_by_wave"] == by_wave
 
     def test_every_positive_total_is_served_by_the_rung(self, built):
         _, df = built

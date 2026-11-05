@@ -46,10 +46,11 @@ from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
 QTY_SENTINELS = (9999,)
 VALUE_SENTINELS = (9999999,)
 # The kilogram column's own codes (GH #1436).  AS02EQ07C == 999999 on the 23 rows
-# with AS02EQ07A == 9999.  999998 is one row, 280 'Unite' of sugar cane, whose
-# crop-level record in AS2E2 states 0 kg, and the next largest total here is 24,000.
-# This wave's agricultural files use a "...98" family beside "...99" (AS01Q20 holds
-# 99999998 on 1,275 rows, 9999998 on 620, 999998 on 70), so it is not 999,998 kg.
+# with AS02EQ07A == 9999.  999998 is one row, and is TREATED AS a code: the questionnaire
+# documents only 9999 and 99999.  The next largest total here is 24,000; the crop-level
+# sibling AS02EQ110E holds 9998 once beside 9999 ten times; this wave's files use a
+# "...98" family (AS01Q20 holds 99999998 on 1,275 rows, 9999998 on 620, 999998 on 70);
+# and the line's own sale would be 0.42 FCFA per kg.  One value to remove to reverse it.
 # See CONTENTS.org, "the survey harvest kilograms are served".
 KG_SENTINELS = (999999, 999998)
 

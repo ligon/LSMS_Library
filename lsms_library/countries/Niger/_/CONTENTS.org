@@ -2699,26 +2699,46 @@ such rows the nominal weight gives 489,100 kg a cycle and =as03eq09c= 271,054.  
 
 CORRECTION (2026-11-04, on PR #1527).  This entry gave 25.2% and +33.6% as the figure.  They are a floor:
 =as02eq07c= is present on all 8,822 rainy harvests, and =as03eq09c= is unusable on 116 of 549 dry-season ones (0 on
-74, 99999 on 42), so the rainy side is whole and the dry side is not.  Against the rainy 1,583,324:
+74, 99999 on 42), so the rainy side is whole and the dry side is not.  Against the rainy 1,583,324, with weights the
+API's within-wave normalised ones:
 
-| 3E's kilograms                                                   |      kg |   rise | share of wave |
-|------------------------------------------------------------------+---------+--------+---------------|
-| as recorded                                                      | 532,518 | +33.6% |         25.2% |
-| *as =harvest_kg= serves it, GH #1436: the 30 at nominal, 86 none* | *584,822* | *+36.9%* |      *27.0%* |
-| + the 116 at crop-unit medians                                   | 692,256 | +43.7% |         30.4% |
-| + the 38 low-sack rows at crop-unit medians too                  | 819,147 | +51.7% |         34.1% |
+| 3E's kilograms                                                   |      kg |    rise | share of wave | rise, weighted | share, weighted |
+|------------------------------------------------------------------+---------+---------+---------------+----------------+-----------------|
+| metric only, before GH #1436 (against the rainy 595,826)         | 689,743 | +115.8% |         53.7% |        +151.0% |           60.2% |
+| as recorded                                                      | 532,518 |  +33.6% |         25.2% |                |                 |
+| *as =harvest_kg= serves it, GH #1436: the 30 at nominal, 86 none* | *584,822* | *+36.9%* |      *27.0%* |      *+31.3%* |         *23.8%* |
+| + the 116 at crop-unit medians                                   | 692,256 |  +43.7% |         30.4% |                |                 |
+| + the 38 low-sack rows at crop-unit medians too                  | 819,147 |  +51.7% |         34.1% |                |                 |
 
-Only the second row is served.  The medians are an illustration from the correction on PR #1527, read-only, and
+Only the italic row is served.  The medians are an illustration from the correction on PR #1527, read-only, and
 nothing imputes them.
 
-CORRECTION (2026-11-04, GH #1436).  This entry said 2011-12's kilograms "are not comparable across waves
-until the =survey_kg= rung of GH #1436 lands".  The rung has landed and they still are not, for the other
-reason in that sentence, and for one it did not give.  The rung removes the artefact of =metric= reading 60%
-of 3E's rows and 21% of the rainy module's: 3E goes from 53.7% of the rainy kilograms to 36.9%.  It cannot add a
-dry season to the waves that never asked one.  And it does not reach 2018-19, whose =s16c= asks no kilograms at
-all, so that wave stays at 36,695 kg (GH #1555).  *The rung does not make Niger's waves comparable.*  For a same-season
-comparison use =plot_id != 'Farm-level'=: 1,583,324 kg against 2014-15's 2,455,341 and 2021-22's 2,954,597, with
-2018-19 out of any kilogram comparison.
+CORRECTION (2026-11-04, GH #1436).  This entry said 2011-12's kilograms "are not comparable across waves until the
+=survey_kg= rung of GH #1436 lands".  The rung has landed and *it does not make Niger's waves comparable*.
+
+*What landing does.*  It removes the artefact of =metric= reading 60% of 3E's rows and 21% of the rainy module's: 3E
+goes from 53.7% of the wave to 27.0% (weighted, 60.2% to 23.8%).  And it puts the rows of three waves on one footing:
+positive quantities with no kilogram go 7,157 -> 86, 7,333 -> 87 and 9,798 -> 0.
+
+*What it does not do.*
+- It does not reach 2018-19, whose =s16c= asks no kilograms, so that wave stays at 36,695 kg (GH #1555).
+- It cannot add a dry season to the waves that never asked one.  Filter =plot_id != 'Farm-level'= for the same season.
+- It does not make a total comparable, because a raw total is a sample sum and the samples differ.
+
+| wave            | sampled households | total, metric only -> rung | weighted kg per sampled household, metric only -> rung |
+|-----------------+--------------------+----------------------------+--------------------------------------------------------|
+| 2011-12 rainy   |              3,968 | 595,826 -> 1,583,324       | 115 -> 506                                             |
+| 2011-12 with 3E |              3,968 | 1,285,568 -> 2,168,146     | 288 -> 664                                             |
+| 2014-15         |              3,617 | 820,968 -> 2,455,341       | 136 -> 963                                             |
+| 2018-19         |              6,024 | 36,695 -> 36,695           | 2 -> 2                                                 |
+| 2021-22         |              6,622 | 814,859 -> 2,954,597       | 131 -> 617                                             |
+
+On the same season the raw totals read +55% then +20%.  Per household they read +90% then -36%.  *The cause of the
+fall from 2014-15 to 2021-22 is not established*: whether it is real or comes from the sample is not known.
+Conversions do not drive it.  At 2014-15's median crop-unit factors, 2021-22 is 2,797,583 kg against 2,954,597 served
+(-5.3%), and 814 kg per reporting household against 2014-15's 1,388, unweighted.  The other way, 2014-15 at 2021-22's
+factors is +3.0%, and 2011-12 rainy at 2014-15's is +10.9%.
+
 
 =Value_sold= goes 42,683,590 -> 132,213,940 FCFA, so 3E holds 67.7% of the wave's sale value.
 =crop_diversity(weight='count')= goes from 2,252 households, mean 0.916, to 2,274, mean 0.964: the 22 new
@@ -2852,27 +2872,35 @@ waves hold 2.5M and 3.0M.  =Gros sac= and =Sac Moyen= state no size in this wave
 
 *Idiosyncrasies.*
 - *2021-22 is an estimate, and carries a key.*  The instrument prints "Estimation Quantité totale UML en kg"
-  (=ner_ehcvm2_qnr_men_excel_vague1.pdf=, PDF p. 82), a NOMBRE field; who did the sum is not stated.  Share of
-  rows at the modal kg / q:
+  (=ner_ehcvm2_qnr_men_excel_vague1.pdf=, PDF p. 82), a NOMBRE field; who did the sum is not stated.  Share of rows at
+  the modal kg / q, by module, because 3E pulls 2011-12 down:
 
-  | unit          | 2011-12       | 2014-15       | 2021-22        |
-  |---------------+---------------+---------------+----------------|
-  | =Tiya=        | 2.5 on 16.0%  | 2.5 on 14.8%  | 2.5 on 65.4%   |
-  | =Sac de 50=   | 50 on 43.3%   | 50 on 54.4%   | 50 on 92.3%    |
-  | =Sac de 100=  | 100 on 44.1%  | 100 on 44.5%  | 100 on 72.4%   |
-  | =Botte=       | 10 on 25.2%   | 10 on 11.3%   | 12.5 on 17.9%  |
+  | unit          | 2011-12 rainy | 2011-12 3E    | 2014-15       | 2021-22        |
+  |---------------+---------------+---------------+---------------+----------------|
+  | =Tiya=        | 2.5 on 16.1%  | (22 rows)     | 2.5 on 14.8%  | 2.5 on 65.4%   |
+  | =Sac de 50=   | 50 on 45.0%   | 50 on 38.1%   | 50 on 54.4%   | 50 on 92.3%    |
+  | =Sac de 100=  | 100 on 51.9%  | 100 on 36.4%  | 100 on 44.5%  | 100 on 72.4%   |
+  | =Botte=       | 10 on 25.2%   | (5 rows)      | 10 on 11.3%   | 12.5 on 17.9%  |
 
+  The 2.5 per =Tiya= describes 13.7% of 2021-22's kilograms, and =Tiya= with the sacks 38.9%.  *=Botte= is the main
+  carrier, 54.7% of the wave's kilograms*, modal on only 17.9% of its rows, p10-p90 7.5-17.5.  So a weighed/estimated
+  split would cut through the wave, and the absence of a key on the ECVMA waves means only that their instrument does
+  not say "estimation", not that they were weighed: 2E.7c is a kilogram column beside the local unit.
   The rung keeps the name =survey_kg= for all three.  It says the kilograms are the survey's, as on the food
   ladder, whose Nigeria =s10bq2_cvn= and Malawi =cfactor= are conversions too; nothing on either ladder claims
   a weighing.  What makes 2021-22 visible is =Niger::crop_production::survey-kg-estimate=, an identity on all
-  11,942 rows, in =Derivation= and =ll.derivations()=.  =kg_survey= in =harvest_kg_factors= is the per-row kg / q.
-- *A code inside the kilogram column, and a correction.*  The 2026-11-03 entry calls 2014-15's one 999,998 kg
-  "not the code and not plausible".  It is a code, and it is masked.  This wave's agricultural files use a "...98"
-  family beside "...99": =AS01Q20= holds 99999998 on 1,275 rows, 9999998 on 620 and 999998 on 70, =AS01Q21= 1,412,
-  650 and 62, =AS02AQ05= 999998 on 2 beside 999999 on 72.  The line is 280 =Unité= of sugar cane; the next largest
-  total in the column is 24,000 kg; and =ECVMA2_AS2E2P2= states the same household's same crop as 280 with =AS02EQ110E=
-  0 kilograms.  Served, it would be 29% of the wave.  Mali's EAC-I trees keep a 999998 by a ruling about those trees
-  (GH #1267).
+  11,942 rows.  It reaches =Derivation=, =ll.derivations()=, =Feature=, and the =attrs['derivations']= of =harvest_kg= and
+  =yield_kg=, beside =attrs['survey_kg_rows_by_wave']= (9,258, 8,324, 0, 11,942).  =KgFactorSource= is one string across
+  waves, so neither of those is optional.  =kg_survey= in =harvest_kg_factors= is the per-row kg / q.
+- *A value treated as a code, and a correction.*  The 2026-11-03 entry calls 2014-15's one 999,998 kg "not the code and
+  not plausible".  It is treated as a code here and masked; no document says it is one, since the questionnaire
+  documents only 9999 and 99999.  The evidence: the next largest total in the column is 24,000 kg; the crop-level sibling
+  =AS02EQ110E= holds 9998 once beside 9999 ten times, and without those 11 totals 2,363,813 kg against these plot lines'
+  2,447,341; this wave's files use a "...98" family (=AS01Q20= holds 99999998 on 1,275 rows, 9999998 on 620, 999998 on 70);
+  and the line's own sale, 420,000 FCFA, would be 0.42 FCFA per kg.  The crop-level record's 0 kg is no evidence, under
+  the zero rule below.  The line is 280 =Unité= of crop code 48 =Autre= (sugar cane in the free text).  Served, it would be
+  29% of the wave.  Mali's EAC-I trees keep a 999998 by a ruling about those trees (GH #1267).  No other ...98 value is
+  served in any kilogram source here.
 - *A 0 beside a positive quantity is NA* (3E 74 rows, 2014-15 101): no answer, not a harvest of nothing.  With 3E's 42
   codes, 116 of its 549 harvests have no kilogram, where the rainy module has one on all 8,822.  They fall down the
   ladder.  Sacks and =Kg= read at nominal: =metric= holds 52,304 kg of 3E (30 rows) and 8,000 of 2014-15 (15 rows).  The
@@ -2881,17 +2909,42 @@ waves hold 2.5M and 3.0M.  =Gros sac= and =Sac Moyen= state no size in this wave
   =KgFactorSource= shows which row is which.  =derivation_inputs= still returns the recorded 0.
 - *Three 3E lines state kilograms with no quantity*: 2 beside =as03eq09a = 0=, 1 beside its 99999.  They deliver
   9,550 kg.
-- *The column has junk of its own, and is served.*  On 3E's 299 rows with a stated mass and both answers the survey
-  says 406,931 kg against 637,439 nominal.  38 =Sac de 100 kg= rows run about 7 kg per sack: 1,451 sacks a cycle, 10,619
-  kg against 145,100 nominal (11,169 against 151,100 over all cycles), 14 of them paddy and 10 onion.  They look wrong,
-  they are read first, as ruled, and they are not trimmed; they cost the wave about 140,000 kg against nominal, 6.5%.
-  =survey_kg_vs_metric= over the rows a metric unit can speak to: 19.3% of 2,184 disagree by more than 10% in 2011-12,
-  44.1% of 1,078 in 2014-15, 17.5% of 2,144 in 2021-22.  Site Q names none of the 38 and no other =Quantity_kg= row, at
-  either tail, because it judges a total against totals and not against the row's own quantity.  Only the masked
-  999998 would have fired.
-- *Within a unit kg scales with quantity*, so it is a total: log-log slope 0.92 to 1.07 on every unit with 30 rows
-  bar =Sac de 100 kg= (0.72, 0.78, 0.91) and =Unité= (0.64).  A factor would give 0.  In 2021-22 kg / q does not
-  see the state: median 2.5 per =Tiya= and 100 per =Sac de 100kg= in both grain and on the ear.
+- *The rung has no screen, while the simulated numbers the ruling was made on did.*  They ran through =reported='s
+  =KG_FACTOR_MAX= and its =Kg= rule; "no screen" is this implementation's reading, on which the ruling is silent.  Dropping
+  the screen adds the +32,129, +3,334 and +42,405 kg in the table below.  =KG_FACTOR_MAX= would refuse a tonne, and Site Q
+  reports only.
+- *The column has junk of its own, and is served.*  By module, on rows with a stated-mass label and both answers:
+
+  | module        | sized rows | survey / nominal  | under 0.1x label: rows, survey / nominal | over 10x label: rows, survey / nominal | under 20 kg per 100 kg sack |
+  |---------------+------------+-------------------+------------------------------------------+----------------------------------------+-----------------------------|
+  | 2011-12 rainy |      1,885 | 635,064 / 595,826 | 4, 58 / 1,400                            | 2, 3,300 / 200                         | 4 of 185                    |
+  | 2011-12 3E    |        299 | 406,931 / 637,439 | 23, 3,140 / 81,750                       | 1, 3,500 / 150                         | 38 of 187                   |
+  | 2014-15       |      1,078 | 622,557 / 812,968 | 22, 1,324 / 82,150                       | 8, 3,843 / 150                         | 44 of 528                   |
+  | 2021-22       |      2,144 | 758,373 / 814,859 | 13, 1,159 / 29,550                       | 2, 13,200 / 700                        | 19 of 1,233                 |
+
+  3E's kilogram column is also its weakest: its 38 low sacks, 1,451 sacks a cycle at about 7 kg each, say 10,619 kg
+  against 145,100 nominal (11,169 against 151,100 over all cycles), 14 of them paddy and 10 onion, and they are 20.3% of
+  its 100 kg sack rows against 2.2% in the rainy module.  They look wrong, they are read first, as ruled, and they are
+  not trimmed.  Site Q names none of these, at either tail, because it judges a total against totals and not against
+  the row's own quantity.  Only the masked 999998 would have fired.  =survey_kg_vs_metric=: 19.3% of 2,184 disagree by
+  more than 10% in 2011-12, 44.1% of 1,078 in 2014-15, 17.5% of 2,144 in 2021-22.
+- *One row can move a wave less than it could.*
+
+  | wave    | worst row against its label | share of wave | top row's share, metric only -> rung |
+  |---------+-----------------------------+---------------+--------------------------------------|
+  | 2011-12 | -15,900                     |          0.7% | 2.3% -> 1.4%                         |
+  | 2014-15 | -126,000                    |          5.1% | 18.3% -> 1.0%                        |
+  | 2021-22 | +18,000                     |          0.6% | 1.4% -> 0.7%                         |
+
+  The 2014-15 row looks like a correction, since at nominal it was 18.3% of the metric-only total.  Net of both tails
+  against the label: -3.4%, -3.1% and -0.5% of the wave.
+- *=yield_kg= 2021-22 moves more than its median says.*  219 -> 234 kg/ha is composition, 1,402 -> 5,546 rows.  On the
+  same 1,402 rows the median is 219 -> 330, p90 falls 1,580 -> 1,017 over each frame, and the 4,144 new rows have a
+  median of 202.  The maximum goes 102,000 -> 490,000 kg/ha; 11 rows exceed 20 t/ha and 2 exceed 100 t/ha.  Not trimmed.
+- *Within a unit kg scales with quantity*, so it is a total, where a factor would give a slope of 0.  Log-log slope on
+  units with 30 rows: rainy 0.91-1.05, 3E 0.63-0.89, 2014-15 0.78-1.01, 2021-22 0.91-1.07.  =Sac de 100 kg= is low in each
+  (0.91, 0.69, 0.78, 0.91).  In 2021-22 kg / q does not see the state: median 2.5 per =Tiya= and 100 per =Sac de 100kg= in
+  both grain and on the ear.
 - *More kilograms cross a state.*  =harvest_kg= sums across =condition= (GH #1460), and with the survey's kilograms read
   53 plot-crops in 2021-22 hold kilograms in two states, 26,469 kg of the wave's 2,954,597, where it was 1 and 400 kg.
 - *=as03eq11c=, =as02eq12c=, =AS02EQ12C=, =s16dq05c=* are the sold kilograms in the same shape, and unread.  Only
