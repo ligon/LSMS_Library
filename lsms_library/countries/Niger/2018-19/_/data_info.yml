@@ -22,6 +22,10 @@ sample:
                     Urbain: Urban
                     urbain: Urban
                     URBAIN: Urban
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
     df_weights:
         file: ehcvm_ponderations_ner2018.dta
         idxvars:

@@ -1,6 +1,16 @@
 # Formatting functions for Niger 2014-15 (ECVMA2)
 import pandas as pd
 
+from lsms_library.build_transforms import reduce_to_agreed
+
+
+def df_strate(df):
+    '''`sample`'s second sub-df (GH #812).  `ECVMA2014_P1P2_Conso.dta` repeats a
+    grappe's `strate` on every consumption row, and merging that on `v` against
+    household rows would be a cartesian product, so reduce it to one row per
+    grappe first.  Raises `GrainConflict` if a grappe ever holds two strata.'''
+    return reduce_to_agreed(df, country='Niger', table='sample', wave='2014-15')
+
 
 _FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
                'AteLess', 'RanOut', 'Hungry', 'WholeDay']

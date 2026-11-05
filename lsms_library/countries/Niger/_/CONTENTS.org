@@ -2576,6 +2576,7 @@ the statement on #1360 that these two cells "still collapse" is stale.
 * 2026-11-04 -- the NPK slot's label, and strata by wave (GH #1445, #812)
 
 Read-only measurement: nothing is wired and no served value moved.
+/Wired the same day: see "EHCVM strata are region x milieu labels" at the end of this file./
 
 *NPK.*  Only the two ECVMA waves state a grade.  Code 5 is =engrais inorganiques
 - npk 15/15= (2011-12; the questionnaire asks "How much NPK(15/15)") and
@@ -3014,3 +3015,43 @@ The ruling on GH #843, option (d), extended in bulk on 2026-11-04, applies: the 
 two or more lines of which only ONE is served: the others hold no quantity or month, so =_finalize_result='s =dropna(how='all')= removes them at the API.
 =niger.served_harvest_lines= no longer counts such a line unless it is the crop's only one, so these 19 sit on their row: 2014-15 is 583 sales on a line
 (78,919,660 FCFA) and 498 on Farm-level (34,249,850 FCFA), rows 9,316 -> 9,297.  2021-22 has none, because its lines carry =intercropped=, and does not move.
+* 2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)
+
+@ligon's ruling, option W2.  =sample.strata= in the EHCVM waves is ='<Region> Urbain|Rural'=,
+built from the cover's =s00q01= and =s00q04= labels by =ehcvm.derive_region_milieu_stratum=.
+No household file records a stratum, so it is a construction, registered as
+=Niger::sample::region-milieu-stratum= and stamped on every row it produced.  The new
+=strata= table in =_/categorical_mapping.org= is the =Region= table crossed with the
+two milieu labels, so the region part of =strata= is =cluster_features.Region=.
+
+| wave    | clusters | households | =strata=                                     |
+|---------+----------+------------+----------------------------------------------|
+| 2011-12 |      270 |      3,968 | =strate=, 25 recorded labels, unchanged      |
+| 2014-15 |      270 |      3,617 | =strate=, the same 25 labels (was empty)     |
+| 2018-19 |      504 |      6,024 | 16 region x milieu labels (was empty)        |
+| 2021-22 |      555 |      6,622 | 15 region x milieu labels (was empty)        |
+
+So the two programmes keep different schemes: ECVMA region x =zae=, as recorded (=Agadez
+pastorale=, =Tillaberi urbain=), and EHCVM region x milieu (=Agadez Rural=, =Tillabéri Urbain=).
+Not harmonised, because they are different stratifications.  The =strata= table's keys match no
+ECVMA label.
+
+*2014-15.*  =strate= is in =ECVMA2014_P1P2_Conso.dta=, a household x product x mode file
+(322,359 rows), constant within =GRAPPE=, on all 270 of =sample='s grappes and all 3,617
+households.  It is a recorded value, so no derivation.  =sample= became a =dfs:= block; the
+=df_strate= hook in =2014-15/_/mapping.py= reduces the sub-frame to one row per grappe through
+=reduce_to_agreed=, which refuses a grappe holding two strata, because merging the raw file on
+=v= would be a cartesian product.
+
+*The fifteenth cell.*  BID Table 1 (=ner_ehcvm2_information_de_base_eng.pdf= p.9) equals
+2021-22's households cell by cell, wave by wave, except Tillabéri urban wave 1, printed 106 where
+the file holds 96.  The print is the error: that row's own total of 336 is 96 + 240, that
+column's total of 1,177 needs 96, and the BID's second table (p.11) prints 96.  That second table
+in turn differs from the file by one household in Diffa (156/227 against 155/228) and Maradi
+(97/394 against 96/395), and Table 1 does not.
+
+*Across the EHCVM boundary.*  Each wave's label is its own cover's.  35 of the 5,055 households
+in both waves change stratum (3 clusters): Niamey Rural to Niamey Urbain 23, Diffa Rural to Diffa
+Urbain 12.  =Niamey Rural= is 2 clusters in 2018-19 and none in 2021-22.
+
+Cost: a Niger re-warm.  Other countries' =strata= hold other things: see =docs/guide/feature.md=.

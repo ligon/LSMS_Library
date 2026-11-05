@@ -18,6 +18,24 @@ from lsms_library.ehcvm import (
 # and Niger/_/derivations.yml.
 FOOD_ACQUIRED_DERIVATION = _derivation_key('Niger')
 
+# GH #812.  `strata` is the documented stratum, region x milieu, as a label.  It
+# is a construction, so `sample` carries its registry key: see
+# lsms_library/ehcvm.py and Niger/_/derivations.yml.
+from lsms_library.ehcvm import (  # noqa: E402
+    inputs_region_milieu_stratum as _inputs_region_milieu_stratum,
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
+)
+
+
+def inputs_strata(wave):
+    """The registry `inputs` callable: the cover's region and milieu at (t, i)."""
+    return _inputs_region_milieu_stratum('Niger', wave)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Niger')
+
 
 def inputs_food_acquired(wave):
     """The registry `inputs` callable: raw section-7B answers at (t, i, j).
