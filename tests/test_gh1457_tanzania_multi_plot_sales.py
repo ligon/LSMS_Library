@@ -22,7 +22,6 @@ import pytest
 import lsms_library as ll
 from lsms_library.local_tools import format_id, get_dataframe
 from lsms_library.paths import countries_root
-from tests.conftest import requires_s3
 
 TANZANIA = countries_root() / "Tanzania"
 FARM = "Farm-level"
@@ -155,7 +154,7 @@ def served():
         return ll.Country("Tanzania").crop_production().reset_index()
 
 
-@requires_s3
+@pytest.mark.requires_s3
 @pytest.mark.parametrize("wave", list(HH))
 class TestOracle:
 

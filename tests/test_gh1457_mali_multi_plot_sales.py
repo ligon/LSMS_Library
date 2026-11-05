@@ -21,7 +21,6 @@ import pytest
 import lsms_library as ll
 from lsms_library.local_tools import df_from_orgfile, get_dataframe
 from lsms_library.paths import countries_root
-from tests.conftest import requires_s3
 
 MALI = countries_root() / "Mali"
 WAVE = "2017-18"
@@ -109,7 +108,7 @@ def served():
     return df.reset_index()
 
 
-@requires_s3
+@pytest.mark.requires_s3
 class TestOracle:
 
     def test_value_equals_source(self, served, sales):
@@ -153,3 +152,11 @@ class TestOracle:
         rows = served[served.plot_id.eq(FARM)]
         assert not rows.duplicated(["i", "crop"]).any()
         assert rows[rows.perennial.eq(True)].shape[0] == 270
+
+    def test_inputs_join_the_keyed_rows(self, served):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            x = ll.Country("Mali").derivation_inputs(KEY, wave=WAVE).reset_index()
+        keyed = served[served.Derivation.eq(KEY).fillna(False)]
+        assert len(x) == len(keyed)
+        assert set(zip(x.i, x.crop)) == set(zip(keyed.i, keyed.crop))

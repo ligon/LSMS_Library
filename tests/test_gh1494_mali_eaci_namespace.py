@@ -129,7 +129,9 @@ class TestServed:
         inputs = country.derivation_inputs(
             "Mali::crop_production::tree-twelve-month-total", wave=wave)
         served = country.crop_production().reset_index()
-        served = served[(served.t == wave) & served.Derivation.notna()]
+        # GH #1457: the tree key; a 2017-18 field row can carry the sale key instead.
+        served = served[(served.t == wave) & served.Derivation.astype("string").str.contains(
+            "tree-twelve-month-total", regex=False).fillna(False)]
         assert set(inputs.index.get_level_values("i")) >= set(served.i.astype(str))
 
     def test_the_ehcvm_panel_is_untouched(self):

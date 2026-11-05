@@ -21,7 +21,6 @@ import pytest
 import lsms_library as ll
 from lsms_library.local_tools import df_from_orgfile, format_id, get_dataframe
 from lsms_library.paths import countries_root
-from tests.conftest import requires_s3
 
 NIGER = countries_root() / "Niger"
 FARM = "Farm-level"
@@ -162,7 +161,7 @@ def served():
         return ll.Country("Niger").crop_production().reset_index()
 
 
-@requires_s3
+@pytest.mark.requires_s3
 @pytest.mark.parametrize("wave", list(SOURCE))
 class TestOracle:
 
@@ -196,7 +195,7 @@ class TestOracle:
         assert g.Unit_sold.notna().mean() > 0.95
 
 
-@requires_s3
+@pytest.mark.requires_s3
 def test_inputs_join_the_keyed_rows(served):
     c = ll.Country("Niger")
     for wave in SOURCE:
