@@ -53,6 +53,10 @@ sample:
         myvars:
             _cover: HHID
             v: comm
+            # The design PSU, on one label across all eight waves (GH #1459).
+            ea:
+                - comm
+                - mappings: comm_ea
             weight: hmult
             panel_weight: hmult  # baseline wave — same as cross-sectional
             strata: stratum

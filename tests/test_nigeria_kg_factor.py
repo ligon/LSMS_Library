@@ -42,17 +42,17 @@ from lsms_library.yaml_utils import load_yaml
 
 NIGERIA = countries_root() / "Nigeria"
 
-# Non-null KgFactor delivered per t, measured on a cold isolated build
-# 2026-09-09.  Built <= raw: crop_production drops rows with no resolved crop
-# label and de-duplicates on (t, i, plot, crop).  Raw non-null in the wired
+# Non-null KgFactor delivered per t.  Re-pinned by GH #1433, which serves every
+# labelled line (cold build, 2026-11-04).  Built <= raw: crop_production drops
+# rows with no resolved crop label.  Raw non-null in the wired
 # columns is 10 845 (sa3iq6_conv) + 695 (sa3iiiq13_conv) for 2019Q1 and
 # 8 092 (sa3iq9_conv) + 295 (sa3iiiq23_conv) for 2024Q1.
 EXPECTED_KGFACTOR_NONNULL = {
     "2011Q1": 0,
     "2013Q1": 0,
     "2016Q1": 0,
-    "2019Q1": 11393,
-    "2024Q1": 8285,
+    "2019Q1": 11531,
+    "2024Q1": 8387,
 }
 
 # The columns each wave's frames may name, and the ones they may not.
@@ -131,10 +131,10 @@ def test_kgfactor_equals_its_conv_source(nigeria_mod):
     out = nigeria_mod.crop_production_for_wave(
         "2019Q1", [fr], {1080: "Maize", 2030: "Plantain"})
     assert "KgFactor" in out.columns
-    # One row per (t, i, plot, crop), and each row's factor is its OWN
-    # source value -- looked up by key, so a re-ordering cannot pass.
+    # One row per line (GH #1433 added the production_obs level), and each row's
+    # factor is its OWN source value -- looked up by key, so a re-ordering cannot pass.
     got = {(i, plot, crop): f
-           for (_, i, plot, crop), f in out["KgFactor"].items()}
+           for (_, i, plot, crop, _obs), f in out["KgFactor"].items()}
     want = {("1", "1", "Maize"): 1.0,
             ("2", "1", "Maize"): 88.5,
             ("3", "2", "Plantain"): None}

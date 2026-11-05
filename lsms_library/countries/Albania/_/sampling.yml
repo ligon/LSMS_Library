@@ -1,0 +1,35 @@
+# Sampling design record -- HOW this survey's sample was drawn.  Read by
+# `lsms_library/sampling.py`; field names and vocabulary: see that module and the
+# exemplar, Uganda/_/sampling.yml.
+#
+# Only 2008 is recorded here.  It is the first `design_tag: not-stated` record
+# (GH #1134, ruling @ligon 2026-10-19): we looked, and no document available to us
+# states a design.  The other Albania waves do have documents and have not been
+# curated yet, so they stay absent, which reads as "unrecorded", not "not stated".
+#
+# `confidence: low` follows this file's own legend, "how strongly the source
+# states a DESIGN": no source states one.  It says nothing about how hard we
+# looked; `locator` and `notes` say that.  population.yml's record for the same
+# wave reads `confidence: high` because there the extractor graded the search.
+
+Sampling:
+
+  '2008':
+    design_tag: not-stated
+    source_type: not-found
+    confidence: low
+    survey: 'Albania - Living Standards Measurement Survey 2008; WB Microdata catalog id 1933, IDNO ALB_2008_LSMS_v01_M'
+    source_file: 'lsms_library/countries/Albania/2008/Documentation/ddi-documentation-english_microdata-1933 (1).pdf'
+    locator: 'PDF p.3, heading "Sampling", whose whole body reads "No content available". WB catalog export /metadata/export/1933/json, study_desc.method.data_collection, holds only coll_mode, with no sampling_procedure field.'
+    notes: |-
+      Read on 2026-11-04: the DDI PDF in full, the catalog export, and the
+      household questionnaire workbook (FINAL LSMS08 PART 1 ENGLISH.xls) by text
+      search.  The questionnaire has fields labelled "LSMS PSU" and "Census EA
+      No.", so a primary sampling unit and a census frame are implied.  A field
+      label says nothing about strata, stages or how units were selected, so it
+      is not recorded as a design.  Albania/_/CONTENTS.org ("2008 -- NO STATEMENT
+      FOUND") lists the catalog's related materials, none of which has a sampling
+      section, and records that no Basic Information Document exists for 2008.
+      Do not fill this by adjacency from 2005 or 2012.  If a statement is needed,
+      the route is INSTAT Albania, not the WB catalog.
+    record_source: 'Albania/_/CONTENTS.org, "2008 -- NO STATEMENT FOUND", plus the reading above'

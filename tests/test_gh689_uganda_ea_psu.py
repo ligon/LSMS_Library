@@ -5,10 +5,12 @@ ruling (@ligon, 2026-11-03) keeps ``v`` and ``cluster_features`` exactly as they
 are and adds a column, ``ea``, the enumeration area a household was SAMPLED in,
 carried with it when it moves:
 
-* 2013-14, 2015-16: direct from ``GSEC1.ea``.
-* 2018-19: the 2015-16 ``ea`` of the household ``GSEC1.t0_hhid`` names.
+* 2013-14, 2015-16: direct from ``GSEC1.ea``; a household only 2015-16 ``AGSEC1``
+  records takes ``AGSEC1.ea`` (ruling 2026-11-04).
+* 2018-19: the 2015-16 ``ea`` of the household ``GSEC1.t0_hhid`` names, on either cover.
 * 2019-20: the same, through ``gsec1.hhidold`` -> 2018-19 ``GSEC1.hhid``.
-* No route: NA.  2005-06 to 2011-12: NA here (``v`` is the EA there).
+* No route: NA.  ``AGSEC1.t0_hhid`` is not a route.  2005-06 to 2011-12: from
+  ``comm``, ``tests/test_gh1459_uganda_early_ea.py``.
 
 The oracle reads the source files directly and imports nothing from
 ``Uganda/_/``, so it cannot agree with the implementation by sharing its code.
@@ -31,8 +33,8 @@ DIRECT_WAVES = ("2013-14", "2015-16")
 INHERITED_WAVES = ("2018-19", "2019-20")
 EARLY_WAVES = ("2005-06", "2009-10", "2010-11", "2011-12")
 #: Non-null ``ea``, distinct labels and rows, measured on the source files.
-SERVED = {"2013-14": (3119, 317, 3119), "2015-16": (3305, 316, 3377),
-          "2018-19": (2978, 315, 3242), "2019-20": (2823, 315, 3098)}
+SERVED = {"2013-14": (3119, 317, 3119), "2015-16": (3377, 316, 3377),
+          "2018-19": (3027, 315, 3242), "2019-20": (2868, 315, 3098)}
 
 
 def _info(wave):
@@ -59,9 +61,10 @@ class TestDeclarations:
             assert canon[col]["type"] == "str" and canon[col]["optional"] is True
 
     @pytest.mark.parametrize("wave, sources", [
-        ("2018-19", {"GSEC1.dta", "../../2015-16/Data/gsec1.dta"}),
+        ("2018-19", {"GSEC1.dta", "../../2015-16/Data/gsec1.dta",
+                     "../../2015-16/Data/AGSEC1.dta"}),
         ("2019-20", {"HH/gsec1.dta", "../../2015-16/Data/gsec1.dta",
-                     "../../2018-19/Data/GSEC1.dta"}),
+                     "../../2015-16/Data/AGSEC1.dta", "../../2018-19/Data/GSEC1.dta"}),
     ])
     def test_every_file_the_chain_reads_is_a_declared_source(self, wave, sources):
         """Or the wave's L2 parquet would not notice the source changing."""
@@ -86,8 +89,22 @@ class TestDeclarations:
         assert "'ea'" not in text
 
     @pytest.mark.parametrize("wave", EARLY_WAVES)
-    def test_early_waves_declare_no_ea(self, wave):
-        assert "'ea'" not in repr(_info(wave)["sample"])
+    def test_early_waves_read_ea_from_comm_and_no_column_named_ea(self, wave):
+        """Re-pinned for GH #1459, which fills these waves through ``comm_ea``."""
+        assert _info(wave)["sample"]["locating_cover"]["myvars"]["ea"] == [
+            "comm", {"mappings": "comm_ea"}]
+
+    def test_the_alternate_cover_supplies_ea_on_sample_only(self):
+        info = _info("2015-16")
+        assert info["sample"]["locating_ag"]["myvars"]["_ag_ea"] == "ea"
+        assert "_ag_ea" not in info["cluster_features"]["locating_ag"]["myvars"]
+
+    def test_the_agriculture_cover_record_claims_ea_on_sample_only(self):
+        from lsms_library.derivations import records_for
+        assert records_for("Uganda", "sample")[
+            "Uganda::sample::agriculture-cover"].columns == ["v", "ea"]
+        assert records_for("Uganda", "cluster_features")[
+            "Uganda::cluster_features::agriculture-cover"].columns == ["v"]
 
     def test_the_derivation_is_registered_for_the_inherited_waves_only(self):
         from lsms_library.derivations import records_for
@@ -112,12 +129,80 @@ class TestAddDerivation:
         assert got[2] == "x::y::z"
 
 
+class TestTheSecondCover:
+    """No data: ``AGSEC1.ea`` fills only what the primary cover lacks, and may not
+    disagree with it (ruling 2026-11-04)."""
+
+    @staticmethod
+    def _adopt(flat):
+        import lsms_library as ll
+        return ll.Country("Uganda", preload_panel_ids=False)["2015-16"] \
+            .formatting_functions["_adopt_alternate_cover"](flat)
+
+    @staticmethod
+    def _covers(second):
+        return pd.DataFrame({"t": ["2015-16"] * 2, "i": ["both", "ag-only"],
+                             "_cover": ["both", None], "_ag_member": ["both", "ag-only"],
+                             "v": ["11", None], "_ag_v": [11, 22],
+                             "ea": pd.array(["7", None], dtype="object"),
+                             "_ag_ea": second})
+
+    def test_a_household_only_agsec1_records_takes_its_ea_as_a_string(self):
+        got = self._adopt(self._covers([7, 12]))
+        assert got["ea"].tolist() == ["7", "12"]
+        assert "_ag_ea" not in got.columns
+
+    def test_the_covers_disagreeing_raises_the_named_error(self):
+        with pytest.raises(Exception, match="disagree on ea for 1 household") as caught:
+            self._adopt(self._covers([8, 12]))
+        assert type(caught.value).__name__ == "OriginEaError"
+
+
+class TestTheNamedError:
+    """``OriginEaError``: no data.  What it must survive, and what it must not say."""
+
+    @staticmethod
+    def _module():
+        import lsms_library as ll
+        return ll.Country("Uganda", preload_panel_ids=False)["2018-19"] \
+            .formatting_functions["_follow_key"].__globals__
+
+    def test_no_path_that_swallows_a_build_failure_catches_it(self):
+        """``_join_v_from_sample`` and the derived-table paths catch these four, and the
+        GH #515 handler catches the first two."""
+        err = self._module()["OriginEaError"]
+        assert issubclass(err, Exception)
+        for swallowed in (KeyError, FileNotFoundError, ValueError, RuntimeError):
+            assert not issubclass(err, swallowed)
+
+    def test_a_repeated_target_raises_it_with_counts_and_no_household_id(self):
+        module = self._module()
+        left = pd.DataFrame({"hhid": ["child"], "t0_hhid": ["SECRET-ID"]})
+        right = pd.DataFrame({"HHID": ["SECRET-ID", "SECRET-ID", "OTHER"], "ea": ["1", "2", "3"]})
+        with pytest.raises(module["OriginEaError"], match="1 value") as caught:
+            module["_follow_key"](left, "t0_hhid", right, "HHID")
+        assert "SECRET-ID" not in str(caught.value)
+
+    def test_it_crosses_a_process_boundary_as_an_exception_naming_itself(self):
+        """A by-path class does not pickle, and the fallback is a ``RuntimeError`` that the
+        derived-table paths catch (GH #1524)."""
+        import pickle
+        from lsms_library._parallel_waves import _pack_exception
+        err = self._module()["OriginEaError"]("Uganda sample: 1 household")
+        carried, type_name, _, _ = _pack_exception(err)
+        assert carried is err and type_name == "OriginEaError"
+        back = pickle.loads(pickle.dumps(carried))
+        assert type(back) is Exception
+        assert str(back) == "OriginEaError: Uganda sample: 1 household"
+
+
 # ------------------------------------------------------------------ the oracle --
 
 @pytest.fixture(scope="module")
 def covers():
     return {"2013-14": _cover("2013-14", "GSEC1.dta"),
             "2015-16": _cover("2015-16", "gsec1.dta"),
+            "2015-16 ag": _cover("2015-16", "AGSEC1.dta"),
             "2018-19": _cover("2018-19", "GSEC1.dta"),
             "2019-20": _cover("2019-20", "HH/gsec1.dta")}
 
@@ -130,7 +215,8 @@ def _label(x):
 @pytest.fixture(scope="module")
 def oracle(covers):
     """``{wave: {raw household id: ea}}``: the rule, from the source files."""
-    origin = dict(zip(covers["2015-16"]["HHID"], covers["2015-16"]["ea"]))
+    origin = dict(zip(covers["2015-16 ag"]["HHID"], covers["2015-16 ag"]["ea"]))
+    origin.update(zip(covers["2015-16"]["HHID"], covers["2015-16"]["ea"]))  # gsec1 wins
     t0 = dict(zip(covers["2018-19"]["hhid"], covers["2018-19"]["t0_hhid"]))
     out = {"2013-14": {h: _label(e) for h, e in zip(covers["2013-14"]["HHID"],
                                                     covers["2013-14"]["ea"])},
@@ -242,9 +328,11 @@ class TestServedAgainstTheSourceFiles:
             ea = sample.xs(wave, level="t")["ea"]
             assert (ea.notna().sum(), ea.nunique(), len(ea)) == (filled, labels, rows), wave
 
-    @pytest.mark.parametrize("wave", EARLY_WAVES)
-    def test_early_waves_stay_na(self, sample, wave):
-        assert sample.xs(wave, level="t")["ea"].isna().all()
+    @pytest.mark.parametrize("wave, filled", [("2005-06", 3123), ("2009-10", 2410),
+                                              ("2010-11", 2715), ("2011-12", 2850)])
+    def test_early_waves_are_filled_from_comm(self, sample, wave, filled):
+        """Re-pinned for GH #1459: they stayed NA here until that ruling."""
+        assert sample.xs(wave, level="t")["ea"].notna().sum() == filled
 
     @pytest.mark.parametrize("wave", DIRECT_WAVES + INHERITED_WAVES)
     def test_served_equals_the_rule(self, served, oracle, wave):
@@ -252,12 +340,46 @@ class TestServedAgainstTheSourceFiles:
         got = served[wave]["ea"].dropna().to_dict()
         assert got == oracle[wave]
 
-    def test_a_t0_hhid_in_no_gsec1_is_na_even_where_the_id_would_parse(self, served, covers):
-        """Nothing is guessed: not from the id's digits, nor from AGSEC1."""
+    def test_a_t0_hhid_on_neither_cover_is_na_even_where_the_id_would_parse(self, served, covers):
+        """Nothing is guessed from the id's digits."""
         frame = covers["2018-19"]
-        no_route = frame.loc[~frame["t0_hhid"].isin(covers["2015-16"]["HHID"]), "hhid"]
-        assert len(no_route) == 198
+        held = set(covers["2015-16"]["HHID"]) | set(covers["2015-16 ag"]["HHID"])
+        no_route = frame.loc[~frame["t0_hhid"].isin(held), "hhid"]
+        assert len(no_route) == 149
         assert served["2018-19"].loc[no_route.map(format_id), "ea"].isna().all()
+
+    def test_agsec1_t0_hhid_is_not_a_route(self, served, covers):
+        """The key disagrees with ``GSEC1``'s on 86 households, so a household only
+        2018-19 ``AGSEC1`` records has no ``ea``, though its ``t0_hhid`` may name one."""
+        ag = _cover("2018-19", "AGSEC1.dta")
+        own = ag.merge(covers["2018-19"][["hhid", "t0_hhid"]], on="hhid", suffixes=("", "_gsec"))
+        assert (own["t0_hhid"] != own["t0_hhid_gsec"]).sum() == 86
+        only = ag.loc[~ag["hhid"].isin(covers["2018-19"]["hhid"]), "hhid"].map(format_id)
+        assert len(only) == 66
+        assert served["2018-19"].loc[only, "ea"].isna().all()
+
+    def test_the_two_covers_agree_where_both_hold_a_household(self, covers):
+        both = covers["2015-16 ag"].merge(covers["2015-16"][["HHID", "ea"]], on="HHID",
+                                          suffixes=("_ag", "_gsec"))
+        assert len(both) == 2622
+        assert (both["ea_ag"] == both["ea_gsec"]).all()
+
+    def test_a_household_only_agsec1_records_takes_agsec1_ea_and_its_stamp(self, served, covers):
+        ag = covers["2015-16 ag"]
+        only = ag.loc[~ag["HHID"].isin(covers["2015-16"]["HHID"])]
+        assert len(only) == 72
+        got = served["2015-16"].loc[only["HHID"].map(format_id)]
+        assert got["ea"].tolist() == [_label(e) for e in only["ea"]]
+        assert got["Derivation"].astype("string").str.contains(
+            "Uganda::sample::agriculture-cover", regex=False).all()
+
+    def test_a_tracking_key_can_name_a_household_only_agsec1_records(self, served, covers):
+        ag = covers["2015-16 ag"]
+        only = set(ag.loc[~ag["HHID"].isin(covers["2015-16"]["HHID"]), "HHID"])
+        frame = covers["2018-19"]
+        named = frame.loc[frame["t0_hhid"].isin(only), "hhid"].map(format_id)
+        assert len(named) == 49
+        assert served["2018-19"].loc[named, "ea"].notna().all()
 
     def test_a_blank_hhidold_is_not_a_link(self, served, covers):
         frame = covers["2019-20"]
@@ -365,6 +487,50 @@ class TestNothingElseMoves:
 
 
 @pytest.mark.requires_s3
+class TestACoverDisagreementStopsTheBuild:
+    """One household's ``AGSEC1.ea`` off by one, through the real reads.  It reaches the caller
+    of ``sample`` and of a table that joins ``v`` from it, which a ``ValueError`` would not."""
+
+    @pytest.mark.parametrize("wave", ["2015-16", "2018-19", "2019-20"])
+    @pytest.mark.parametrize("table", ["sample", "household_roster"])
+    def test_it_reaches_the_caller_with_no_household_id(self, tmp_path, monkeypatch, wave, table):
+        import lsms_library as ll
+        import lsms_library.country as C
+        import lsms_library.local_tools as LT
+        import lsms_library.paths as P
+
+        (tmp_path / "dvc-cache").symlink_to(P.data_root() / "dvc-cache")
+        monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("LSMS_BUILD_WORKERS", "1")
+        P.data_root.cache_clear()
+        real = LT.get_dataframe
+        held = real(str(UGANDA / "2015-16" / "Data" / "gsec1.dta"), convert_categoricals=False)
+
+        def perturbed(fn, *a, **k):
+            frame = real(fn, *a, **k)
+            if "2015-16/Data/AGSEC1.dta" not in str(fn):
+                return frame
+            frame = frame.copy()
+            row = frame.index[frame["HHID"].isin(held["HHID"])][0]
+            frame.loc[row, "ea"] = frame.loc[row, "ea"] + 1
+            return frame
+
+        monkeypatch.setattr(LT, "get_dataframe", perturbed)
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                with pytest.raises(Exception) as caught:
+                    getattr(ll.Country("Uganda", preload_panel_ids=False), table)(waves=[wave])
+        finally:
+            P.data_root.cache_clear()
+            for ledger in (C._DEGRADED_ATTEMPTED, C._SOURCE_PROBES,
+                           C._BUILD_DROP_LEDGER, C._REBUILD_HISTORY):
+                ledger.clear()
+        assert type(caught.value).__name__ == "OriginEaError"
+        assert not set(held["HHID"]) & set(str(caught.value).split())
+
+
+@pytest.mark.requires_s3
 class TestADropTheHandlerCatchesCostsEaAlone:
     """Why ``origin_ea`` is a sub-df: a ``FileNotFoundError`` does not cost ``v``.
 
@@ -373,8 +539,9 @@ class TestADropTheHandlerCatchesCostsEaAlone:
     included (GH #1463), which this simulation does not exercise.
     """
 
+    @pytest.mark.parametrize("lost", ["2015-16/Data/gsec1.dta", "2015-16/Data/AGSEC1.dta"])
     @pytest.mark.parametrize("wave, rows", [("2018-19", 3242), ("2019-20", 3098)])
-    def test_the_wave_still_builds(self, tmp_path, monkeypatch, wave, rows):
+    def test_the_wave_still_builds(self, tmp_path, monkeypatch, wave, rows, lost):
         import lsms_library.country as C
         import lsms_library.local_tools as LT
         import lsms_library.paths as P
@@ -386,7 +553,7 @@ class TestADropTheHandlerCatchesCostsEaAlone:
         real = LT.get_dataframe
 
         def unavailable(fn, *a, **k):
-            if "2015-16/Data/gsec1.dta" in str(fn):
+            if lost in str(fn):
                 raise FileNotFoundError(f"simulated fetch failure: {fn}")
             return real(fn, *a, **k)
 

@@ -76,15 +76,18 @@ standard error on =ea=; locate a household with =v=.
 
 | wave    | source of =ea=                                         | non-null / rows | distinct |
 |---------+--------------------------------------------------------+-----------------+----------|
+| 2005-06 | =comm=, through =comm_ea= (GH #1459, below)            | 3,123 / 3,123   |      322 |
+| 2009-10 | the same                                               | 2,410 / 2,979   |      317 |
+| 2010-11 | the same                                               | 2,715 / 2,716   |      321 |
+| 2011-12 | the same                                               | 2,850 / 2,907   |      321 |
 | 2013-14 | =GSEC1.ea=, direct                                     | 3,119 / 3,119   |      317 |
-| 2015-16 | =gsec1.ea=, direct                                     | 3,305 / 3,377   |      316 |
-| 2018-19 | =GSEC1.t0_hhid= -> 2015-16 =HHID= -> =ea=              | 2,978 / 3,242   |      315 |
-| 2019-20 | =hhidold= -> 2018-19 =hhid= -> =t0_hhid= -> ... -> =ea= | 2,823 / 3,098   |      315 |
+| 2015-16 | =gsec1.ea=, direct; =AGSEC1.ea= for the 72 only it records | 3,377 / 3,377 |   316 |
+| 2018-19 | =GSEC1.t0_hhid= -> 2015-16 =HHID= -> =ea=              | 3,027 / 3,242   |      315 |
+| 2019-20 | =hhidold= -> 2018-19 =hhid= -> =t0_hhid= -> ... -> =ea= | 2,868 / 3,098   |      315 |
 
 The two inherited waves carry =Derivation= =Uganda::sample::ea-tracking-key=, on
-exactly the rows that received a value.  2005-06 to 2011-12 stay NA here: =v= is
-already the EA there, under =comm= labels, and a single label across all eight
-waves is GH #1459.
+exactly the rows that received a value, and the 72 of 2015-16 carry
+=Uganda::sample::agriculture-cover=, as they did for =v=.
 
 *What the inheritance does NOT rest on: =ea= being unchanged across waves.*  All
 2,872 households linked 2013-14 -> 2015-16 keep =ea=, 316 labels one-to-one, but
@@ -94,7 +97,7 @@ and the link is string identity between those ids: =gsec1.hh= with its wave toke
 moved back (=-05-= -> =-04-=, the =Waves= table in =uganda.py=; 2015-16 has no
 =HHID_old=).  So that result pins UBOS's encoding and says nothing about whether the
 label or the tracking key is right.  The encoding is also *not a route*: parsing
-=t0_hhid= would give the 198 households below an answer for 168, and the ruling is
+=t0_hhid= would give the 149 households below an answer for 119, and the ruling is
 that no route means NA.
 
 *What it does rest on.*  Checks that do not read the id's digits, on the raw files;
@@ -116,12 +119,14 @@ that no route means NA.
   So the value is the PSU through which the lineage entered the sample, not where
   the household lives or where it was itself drawn.  That is right for a design-based
   standard error and wrong as a location.
-- /=groupby('ea')= silently drops the NA rows./  =ea= is NA for 5.7% of wave weight in
-  2018-19 and 8.9% in 2019-20, and =groupby= drops a null key by default.  Those
-  households are not missing at random: they are the no-route households below.
+- /=groupby('ea')= silently drops the NA rows./  =ea= is NA for 29.32% of wave weight in
+  2009-10, 4.25% in 2018-19 and 7.66% in 2019-20, and =groupby= drops a null key by default.
+  Those households are not missing at random: in the two late waves they are the no-route
+  households below, and in 2009-10 mostly movers and split-offs (GH #1459, below).
 - /=ea= does not nest in =strata=./  52 of 317 EAs in 2013-14 and 81 of 316 in 2015-16
   span more than one =sregion=; 61 of 315 and 64 of 315 span more than one =subreg= in
-  the two inherited waves.  A variance estimator that nests PSUs in strata cannot take
+  the two inherited waves.  In the four early waves 0 of 322, 1 of 317, 44 of 321 and 65 of
+  321 span more than one stratum.  A variance estimator that nests PSUs in strata cannot take
   the column as it stands.
 
 *The keys are RAW source ids*, never the walked =i=, which is a canonical id from
@@ -133,37 +138,47 @@ consumer as ='12.0'= across the outer merge.
 - /A blank is not a link./  69 households in 2019-20 have =hhidold= == =''=; it
   formats to =None=, and =_follow_key= drops it first because =pd.merge= matches
   null keys to each other.
-- /A repeated target would raise./  The join is validated =many_to_one=: two children
-  may name one parent, but one key may not name two households.
+- /A repeated target raises =OriginEaError=./  Two children may name one parent, but one
+  key may not name two households, and =gsec1= and =AGSEC1= may not give one household two
+  =ea=.  The error counts and names no household.  It subclasses =Exception=, because
+  =_join_v_from_sample= catches =ValueError= (which the =MergeError= it replaces was) and would
+  have served every household table with no =v=.  One build worker raises the class itself.  Under
+  parallel workers a class in a by-path module does not pickle (GH #1524), so =__reduce__= sends
+  a plain =Exception= carrying its name and message, which the derived-table paths do not catch.
+  Measured by injecting one disagreeing household, one and two workers: =sample=, =household_roster=,
+  =household_characteristics=, =food_expenditures= and =interview_date= all raise, on a wave subset
+  and on all waves, and nothing is written.  =Feature= drops Uganda with a warning, and
+  =conversion._interview_dates= returns ={}= with a warning, its fallback for any build failure.
 
-*The 198 + 66 of 2018-19 with no =ea=*, by what the source says about them:
+*The 149 + 66 of 2018-19 with no =ea=*, by what the source says about them:
 
 | households | =t0_hhid=                 | what it is                                                                                                                   |
 |------------+---------------------------+------------------------------------------------------------------------------------------------------------------------------|
-|         49 | 8 characters              | a real 2015-16 =HHID=, but of a household only =AGSEC1= records (D1 below).  Its =AGSEC1.ea= exists.                         |
 |         73 | 8 characters              | the form of a 2015-16 =HHID=; in no column of any of the 119 2015-16 =.dta=.                                                 |
 |         76 | 5 characters (=H= + 4)    | in no 2015-16 file; 46 would parse to a 2015-16 EA and 30 would not, so these are not truncated ids.                          |
 |         66 | (not in =GSEC1=)          | households only 2018-19 =AGSEC1= records, the =unlocated-= singletons of GH #1120 D2.                                        |
 
 The variable's label is "Full wave5 UNPS household ID or wave6 split-off Parent
 Household ID", and the library holds no wave 6, which is the likely home of the 73
-and the 76; that is an inference and nothing here depends on it.  All 198 are
-=response_status= 1 in =GSEC1=.  In 2019-20 the 275 with no =ea= are 69 blank
-=hhidold=, 43 naming a 2018-19 household only =AGSEC1= records, and 163 descending
-from the 198.
+and the 76; that is an inference and nothing here depends on it.  All 149 are
+=response_status= 1 in =GSEC1=.  In 2019-20 the 230 with no =ea= are 69 blank
+=hhidold=, 43 naming a 2018-19 household only =AGSEC1= records, and 118 descending
+from the 149.
 
-*Why =AGSEC1= is not a route, as ruled.*  The ruling names =GSEC1=.  It would be a
-short step: =AGSEC1.ea= is non-null for the 72 households only =AGSEC1= records in
-2015-16 and equals =gsec1.ea= on all 2,622 households both covers hold, which would
-add 72 direct and 49 inherited values.  It is left for a ruling so that the column
-has one source.  =AGSEC1.t0_hhid= in 2018-19 is a different matter and is not a
-clean key: it disagrees with =GSEC1.t0_hhid= on 86 of the 3,176 households both
-files hold, and on those 86 its value (1-3 or 7 characters) is never a 2015-16
-=HHID=.
+*=AGSEC1= as a second source (ruling @ligon, 2026-11-04).*  =sample= first read
+=ea= from =GSEC1= alone, as first ruled.  =AGSEC1.ea= is the same variable on a second
+cover: it is non-null for the 72 households only =AGSEC1= records in 2015-16, its 58
+labels for them are all on =gsec1=, and it equals =gsec1.ea= on all 2,622 households
+both covers hold.  So it fills those 72 directly, and the 49 of 2018-19 and 45 of
+2019-20 whose tracking key names one of them.  Both routes raise if a release breaks
+the equality.  *The key stays =GSEC1='s.*  =AGSEC1.t0_hhid= in 2018-19 is a different
+matter and is not followed: it disagrees with =GSEC1.t0_hhid= on 86 of the 3,176
+households both files hold, and on those 86 its value (1-3 or 7 characters) is never
+a 2015-16 =HHID=.  So the 66 households only 2018-19 =AGSEC1= records stay NA.
 
-*Mechanics.*  =origin_ea= is a real =dfs:= sub-df with the 2015-16 =gsec1= as its
-=file:=, and its country-level hook re-keys that frame to the current wave's =hhid=.
-Two reasons: the file's sidecar is then in the wave's =_input_hash= (2019-20 also
+*Mechanics.*  =origin_ea= is a real =dfs:= sub-df with the 2015-16 =gsec1= and =AGSEC1=
+as its =file:= list, and its country-level hook re-keys that frame to the current wave's =hhid=.
+Two reasons: the files' sidecars are then in the wave's =_input_hash= (2019-20 also
 declares its bridge, 2018-19 =GSEC1=, under a key that is not in =dfs:=, which
 =_collect_file_paths_from_block= hashes and =grab_data= never reads), and a loss the
 GH #515 handler catches costs =ea= and not =v=.  =Derivation= stays on =sample=:
@@ -176,7 +191,8 @@ covers, and that protection is partial.  Measured in the review of this change,
 | lost                                 | result                                                                                                                                   |
 |--------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------|
 | 2015-16 =gsec1=, remote unreachable  | =EndpointConnectionError= is outside the #515 handler's tuple, so =sample= for both waves raises after about 90 s and =v= is lost too (GH #1463). 2019-20, which needed only its own cover, built in 1.5 s on base and raises at 89 s now. |
-| 2015-16 =gsec1=, =FileNotFoundError= | soft: =ea= is absent, every row and =v= survive (simulated; =tests/test_gh689_uganda_ea_psu.py=).                                         |
+| 2015-16 =gsec1= or =AGSEC1=, =FileNotFoundError= | soft: =ea= is absent, every row and =v= survive (simulated; =tests/test_gh689_uganda_ea_psu.py=).  One =file:= list, so the whole column goes rather than 49 values of it: an =ea= that survived partly would not count as a lost column, and #675 would not grade the parquet degraded. |
+| 2015-16 =AGSEC1= behind a readable =gsec1=, =FileNotFoundError= | measured, fresh processes: =ea= is absent on both inherited waves and =v= survives.  The stamp names =gsec1.dta=, the sub-df's first file, so the #675 probe finds it readable.  Every fresh process rebuilds with =CacheRebuildWarning=, and =DegradedCacheWarning= never fires.  It heals once the file returns. |
 | 2018-19 =GSEC1=, 2019-20's bridge    | =ea= drops and =v= survives, but the drop record names the readable 2015-16 file (the sub-df's one =file:=), so the #675 probe returns True.  Every fresh process rebuilds (about 70 s offline), =DegradedCacheWarning= never fires, and #675's "one probe per process" breaks through its one-source-per-sub-df assumption.  It heals when the blob returns. |
 
 *Measured, cold =98c6069d2= vs cold =6db7bf0d5=, 2026-11-03.*  Every declared Uganda
@@ -208,17 +224,78 @@ size of the design effect, and it does not show that the inheritance is correct.
 =market='ea'= raises =KeyError= from =cluster_features=.  It was not asked for, and a
 market is a place, which =ea= is not.
 
+**** One label across all eight waves (GH #1459)
+
+/Ruling @ligon, 2026-11-04./  In 2005-06 to 2011-12 =v= already is the EA, under =comm=,
+so no one label named a PSU across the panel.  =sample.ea= now fills those waves through
+a reviewed table, =comm_ea= in =categorical_mapping.org=, read by =uganda.comm_ea=:
+
+- A =comm= one of the 212 the survey later numbers takes that number.  The pairs are
+  =GSEC1.ea= (2013-14) against =GSEC1.comm= (2011-12), linked by =HHID_old=, 1,717
+  households, one to one.  Stamped =Uganda::sample::ea-comm-link=.
+- The other 110 of the 322 frame EAs rotated out before any household could link them.
+  Each takes its own 8-digit =comm=.  Stamped =Uganda::sample::ea-own-comm=.
+- A blank =comm= stays NA, as does a code that is not 8 digits: 2009-10's 541 =@lat,lon=
+  bins and 28 =unlocated-= households, 2010-11's one =1530040=, 2011-12's 57.  A bin is
+  not an EA.
+
+A table and not a read of the 2011-12 and 2013-14 covers, for the same reason as
+=comm_frame_ea=: it adds no source to =sample= in four more waves, where a lost remote
+already raises in two (GH #1463).  =tests/test_gh1459_uganda_early_ea.py= re-derives it
+from the raw covers.
+
+| wave    | numbered rows / EAs | own =comm= rows / EAs |    NA |
+|---------+---------------------+-----------------------+-------|
+| 2005-06 | 2,066 / 212         | 1,057 / 110           |     0 |
+| 2009-10 | 1,612 / 210         |   798 / 107           |   569 |
+| 2010-11 | 1,802 / 212         |   913 / 109           |     1 |
+| 2011-12 | 1,917 / 212         |   933 / 109           |    57 |
+
+*2009-10 stays NA where =comm= is blank, as ruled, and that is a lot of weight.*  Its 569 NA rows
+hold 29.32% of the wave's weight (mean weight 1.55, against 0.87 for the rest).  514 of them hold a
+label on the same household in another wave, so a fill would leave 3.53%.  This section defines
+=ea= as carried when a household moves, and most of these are that wave's movers and split-offs,
+so the fill would be consistent with it, and it is a construction the ruling did not ask for.  It
+is drafted as a follow-up.  For comparison, =ea= is NA for 0.12% of 2010-11's weight and 0% of
+2011-12's (its 57 have no weight).
+
+*Two kinds of label in one column, and why it is left that way.*  The ruling allowed a
+new column if mixing looked wrong on the numbers, and it does not.  Across all eight
+waves =ea= holds 427 labels: 212 panel EAs that appear both early and late, 110 that
+appear only early, and 105 refresh EAs (324-430) that appear only late.  No 8-digit label
+appears after 2011-12 and none collides with 1-430, so =groupby('ea')= gives one group
+per PSU.  Every household linked across a boundary keeps =ea= on all seven: 2,410 of
+2,410, 2,207 of 2,207, 2,510 of 2,510, 1,717 of 1,717, 2,872 of 2,872, 3,022 of 3,022 and
+2,868 of 2,868.  (Only the first three test anything.  The other four cannot come out
+otherwise: the table's construction, UBOS's encoding above, and twice a walked id and an
+inherited =ea= that follow one tracking key.)  A second column would split the one thing
+the column is for.  The column is a label: its form and its numeric order mean nothing,
+and =ea= stays a =str=.
+
+*=ea= is the rank of =comm=.*  /New, 2026-11-04./  Sort the 322 frame EAs of 2005-06 by
+=comm= and number them from 1: that number is =ea= on all 212 rows of the table, and
+the 110 numbers in 1-322 no later household carries are exactly the ranks of the other
+110.  No document states it.  It reads no household, so it is independent evidence that
+the pairing is right; =tests/test_gh1459_uganda_early_ea.py= pins it.  It also means the
+110 could carry a number and the column a single form, which the ruling did not have in
+front of it.  They are served their =comm=, as ruled; the alternative is a memo in the PR.
+
+*Measured, cold development =14c0f5790= vs cold =c63f7e700=, one node, 2026-11-04, with the
+=AGSEC1= source and the =Aggregate= split below.*  38 calls: every declared Uganda table,
+=labels='Aggregate'= on the food tables, =market='Region'= and =market='District'=, and
+=Feature= over =sample= and =household_roster= (with Albania and Malawi) and
+=food_expenditures(labels='Aggregate')= (with Nigeria, GhanaLSS, Malawi and EthiopiaRHS).  30 are
+frame-equal (=check_exact=).  The other 8 are =sample= by itself, under =market='Region'= and
+through =Feature=, each equal once =ea= and =Derivation= are set aside, and the 5 =Aggregate=
+reads, each moving only the labels that CONTENTS says.  Warning counts match on all 38.  The other
+countries are frame-equal.  Hashes: 27 of 27 Uganda tables and 216 of 216 Uganda wave hashes move,
+0 of the other 515 tables across 37 countries, and 0 of 38 build fingerprints.  So the cost is one
+Uganda re-warm.  =var/sample= is the one entry of the 53 in =tests/fixtures/uganda_baseline.json=
+that moves.
+
 **** TODO Decisions the ruling leaves open
 
-1. /One label across all eight waves (GH #1459)./  =ea= is NA through 2011-12, where
-   =v= is the EA under =comm= labels.  =ea= pairs one-to-one with 2011-12 =comm= on all
-   212 linked EAs, which is the start of a crosswalk.
-2. /=AGSEC1= as a second source./  Accepting =AGSEC1.ea= for households only it
-   records adds 72 in 2015-16 (3,377 of 3,377), 49 in 2018-19 (3,027) and 45 in
-   2019-20 (2,868), with =GSEC1= keys only.  Following =AGSEC1.t0_hhid= as well for
-   households only 2018-19 =AGSEC1= records takes 2018-19 to 3,086 and 2019-20 to
-   2,907, at the price of a key that disagrees with =GSEC1= where both exist.
-3. /The 73 + 76 of 2018-19./  A wave 6 household file would settle what those ids
+1. /The 73 + 76 of 2018-19./  A wave 6 household file would settle what those ids
    name.  Until then they stay NA; parsing the id is the alternative already declined.
 
 *** =v= across waves: three different defects (GH #942)
@@ -569,9 +646,16 @@ column =cluster_features= reads, through the same formatter.
 for those rows.  A sweep of every =.dta= in those waves, by column name, finds no geography with a
 value for them.  What could fill them, and =District='s 216, is a construction, so:
 
-**** TODO Decision: fill the 129 and the 216 from a household's other waves?
+**** DONE Decision: fill the 129 and the 216 from a household's other waves?
 
-Memo in the #1441 report.  =District='s residual is not evenly spread: 131 households in
+/Ruled @ligon, 2026-11-04: they stay NA./  Nothing cheap recovers the weight that matters.
+Inheriting a label from the same household's adjacent wave recovers 0.02% of 2011-12's
+weight, of the 10.3% that has no =District=.  Its 2013-14 code reaches 3.2%, and needs a
+code-to-name map that does not exist yet (=h1aq1a= is a 3-digit code and 2011-12 writes
+names).  That map is the one useful next step if =District= matters for 2011-12; it is
+not built.  The measurements behind the ruling:
+
+=District='s residual is not evenly spread: 131 households in
 2011-12 hold 10.3% of that wave's weight and 12 in 2010-11 hold 1.1%; elsewhere 0.1% or
 less.  The 74 cover blanks of 2011-12 are mostly new split-offs (60 with =wave= 3), mean
 weight 4.3 against 0.8.  The same household's label in an adjacent wave, in the same form
@@ -1326,6 +1410,155 @@ possibly, a minority of recorded round prices; not as an independent source.
 Where the two DO differ, the difference is the interesting thing (a keying
 slip in one of three fields), not a second opinion on the price.
 
+* =labels='Aggregate'= keeps processing states apart (GH #833, 2026-11-04)
+
+/Ruling @ligon, 2026-11-04./  =Preferred Label= always kept states apart; only
+=labels='Aggregate'= folded them, and they do not cost the same.  =Maize=, =Millet=, =Cassava=,
+=Sweet Potatoes=, =Ground Nuts= and =Sim Sim= now keep one bucket per state in
+=harmonize_food=.  Variety still folds: white and yellow maize flour are one bucket.  This
+is a user-facing relabel.  =Preferred Label=, =Nutrition Label= and every default read are
+unchanged, and =Expenditure= and =Quantity= are conserved (below).
+
+| bucket           | what is in it now                          | moved out of the bare name                                       |
+|------------------+--------------------------------------------+------------------------------------------------------------------|
+| =Maize=          | =(grains)=, white and yellow               | =Maize (cobs)=, =Maize (flour)=, each with white and yellow      |
+| =Millet=         | code 115, =Millet=                         | code 1151, =Millet Flour= -> =Millet (flour)=; see below         |
+| =Cassava=        | =(fresh)=                                  | =(dry)= -> =Cassava (dry)=                                       |
+| =Sweet Potatoes= | =(fresh)=, white and orange                | =Sweet Potatoes (dry)=, =Sweet Potatoes (flour)=, each with both |
+| =Ground Nuts=    | =(in shell)=                               | =(shelled)=, =(pounded)= and =(paste)=, one bucket each          |
+| =Sim Sim=        | =Sim Sim=                                  | =Sim Sim (paste)=                                                |
+
+Twenty table rows change, and they move eighteen Preferred Labels, eleven of them served:
+=Cassava (dry)= is two rows, and the twentieth, code 182, was a defect.  =Cassava (flour)= had
+two rows with two Aggregates, =Cassava= and =Cassava (flour)=, and =_relabel_j= served the
+last, so it does not move as served.  Each Preferred Label now has one Aggregate.  The column
+goes from 80 labels to 90, and from 76 to 86 served.
+
+*The bare name is the harvest state, because =crop_production= reuses it.*
+=harmonize_crop= writes =Maize=, =Millet=, =Cassava=, =Sweet Potatoes=, =Ground Nuts= and
+=Sim Sim=, so that a crop's =j= joins =food_acquired(labels='Aggregate').j=.  Qualifying
+all six buckets would have cut those crops off that axis.  The join holds at the same
+counts, 126,432 of 134,164 crop rows and 42,957 of 46,918 sale rows.  What it means has
+narrowed: crop =Maize= meets food =Maize=, grains alone, and the crop's own state is its
+=condition= level.  Those states are also what most of these crop rows are in: =Maize=
+=dried_grain= 14,057, =Sweet Potatoes= =fresh= 9,346, =Cassava= =fresh= 7,950, =Ground
+Nuts= =dried_with_shell= 3,032.
+
+*What moved, =food_expenditures(labels='Aggregate')= (default basis), UGX, all waves, cold:*
+
+| before                    | after                                                        |
+|---------------------------+--------------------------------------------------------------|
+| =Maize= 50,913,635        | =Maize= 781,540, =(cobs)= 2,003,150, =(flour)= 48,128,945    |
+| =Millet= 5,045,440        | =Millet= 3,453,140, =(flour)= 1,592,300                      |
+| =Cassava= 14,274,785      | =Cassava= 10,319,820, =(dry)= 3,954,965                      |
+| =Sweet Potatoes= 11,192,725 | =Sweet Potatoes= 10,752,125, =(dry)= 386,200, =(flour)= 54,400 |
+| =Ground Nuts= 17,323,242  | =Ground Nuts= 838,025, =(shelled)= 2,140,585, =(pounded)= 12,184,647, =(paste)= 2,159,985 |
+| =Sim Sim= 3,435,070       | =Sim Sim= 3,248,920, =(paste)= 186,150                       |
+
+The total is 726,299,304.83 both ways, and the other 70 served Aggregates are equal.  =food_expenditures=
+goes from 242,043 rows to 243,043; =food_acquired= keeps its 355,571.  *=Maize= is now 1.5%
+of what it was*, because nearly all of it was flour; a user who wants the old bucket adds three.
+
+*The evidence is purchases in kg, median UGX per kg, by wave:*
+
+|                        | 2005-06 | 2009-10 | 2010-11 | 2011-12 | 2013-14 | 2015-16 | 2018-19 | 2019-20 |
+|------------------------+---------+---------+---------+---------+---------+---------+---------+---------|
+| =Maize (grains)=       |     450 |     800 |     700 |   1,500 |   1,000 |   1,000 |     800 |   1,250 |
+| =Maize (flour)=        |     600 |   1,200 |   1,400 |   1,800 |   1,800 |   1,800 |   1,700 |   2,000 |
+| =Ground Nuts (in shell)= | 1,200 |   1,550 |   3,000 |   2,250 |   4,083 |   3,000 |   5,000 |   5,000 |
+| =Ground Nuts (pounded)= |  1,600 |   2,800 |   3,350 |   4,000 |   4,000 |   4,000 |   5,000 |   5,000 |
+| =Sim Sim=              |   1,450 |   2,400 |   2,250 |   3,000 |   4,000 |   3,000 |   4,500 |   4,000 |
+| =Sim Sim (paste)=      |         |         |         |         |         |         |   5,000 |   5,000 |
+| =Cassava (dry)=        |         |         |         |         |     950 |   1,000 |   1,000 |   1,000 |
+| =Cassava (flour)=      |         |         |         |         |   1,000 |   1,000 |   1,000 |   1,100 |
+
+The thin cells are thin: =Maize (grains)= has 5-17 rows a wave, =Ground Nuts (in shell)= 1-12,
+and =Sweet Potatoes= is hardly bought in kg (=(dry)= 1-2 rows).  Cassava dry and flour cost the
+same and still stay apart: #833's rule is that price magnitude does not license a fold.
+
+*=Millet=: split as ruled, and what the evidence does and does not show.*  Code 115 stays
+=Millet= and code 1151 goes to =Millet (flour)=.  What code 115 holds is not settled.  No wave
+has answers on both codes: 115 is answered through 2015-16 and 1151 from 2018-19 (2018-19 also
+holds 3,172 unlabelled code 115 rows, with no unit, quantity or value on any of them).  So the
+1,500 against 3,000 cited for the ruling crosses 2015-16 -> 2018-19 and is not a same-wave gap.
+
+| wave    | paper form            | Stata value label | UGX/kg | / maize flour | / crop sale price |
+|---------+-----------------------+-------------------+--------+---------------+-------------------|
+| 2005-06 | =Millet=              | =millet=          |    800 |          1.33 | no crop rows      |
+| 2009-10 | no household form held | =Millet=         |  1,500 |          1.25 |              1.88 |
+| 2010-11 | =Millet=              | =Millet (flour)=  |  1,500 |          1.07 |              2.14 |
+| 2011-12 | =Millet=              | =Millet (flour)=  |  2,000 |          1.11 |              2.45 |
+| 2013-14 | =Millet=              | =Millet (flour)=  |  2,000 |          1.11 |              2.00 |
+| 2015-16 | =Millet=              | =Millet (flour)=  |  2,000 |          1.11 |              2.22 |
+| 2018-19 | =Millet flour=        | =Millet flour=    |  3,000 |          1.76 |              3.00 |
+| 2019-20 | =Millet flour=        | =Millet flour=    |  3,000 |          1.50 |              3.00 |
+
+(The same ratio to crop sale price is 1.60-3.00 for maize grain and 3.00-4.67 for maize flour.
+=food_expenditure_labels= in =nutrition.org= copies the Stata value labels.)
+
+- /Against one state:/ the form renames the item only at 2018-19.  The same Stata label set is
+  wrong on code 143 in the same four waves (below).  The national ×1.50 across 2015-16 -> 2018-19
+  is the largest of 13 items with n >= 30 (median 1.11, p90 1.25).  And #833 retains states until
+  source evidence authorizes a fold, and says meaning is not established by labels or price
+  magnitude.
+- /For one state:/ the Stata value labels say flour in 2010-11 to 2015-16, and there is no price
+  step at that label change (1.00, against a median of 1.17).  The share bought in kg runs 0.63 -> 0.62 across 2015-16 -> 2018-19
+  (maize flour 0.82-0.86, grain 0.15-0.35), and the own-production share 0.58 -> 0.57.  The
+  same-household step is ×1.31 (n = 30), beside sugar 1.29, pounded nuts 1.25 and rice 1.20.
+  Regional steps run 1.00-1.54.  The 2018-19 form offers no grain line.  And files sometimes know
+  more than the form: codes 180-182 are not on the 2013-16 forms.
+- /What the split costs:/ a series break at 2018-19, since =Millet= ends at 2015-16 and =Millet
+  (flour)= starts there, and anyone following millet across it adds the two.  717 crop rows (241
+  sale rows) in 2018-19 and 2019-20 lose a same-wave food partner.  The =Millet (flour)= label
+  matches GhanaLSS's exactly.
+
+Undoing it is one table cell.
+
+*What a bucket means across waves.*  A bucket follows codes, and what the forms and files call
+those codes moves.  Read a wave's label before reading a bucket as a series.
+
+- /=Cassava (dry/flour)= stays in =Cassava (flour)=./  The forms print =Cassava (Dry/ Flour)=
+  through 2015-16, while the files split it into codes 181 and 182 from 2013-14 (neither is on
+  those forms).  So =Cassava (flour)= is that one line to 2011-12 and flour alone after, and the
+  continuous series is =(flour)= plus =(dry)=.
+- /=Sweet Potatoes=./  The forms print =Sweet Potatoes (Dry/flour)= in 2013-14 and 2015-16, while
+  the files carry code 106 for dry and code 180 for flour.
+- /Some buckets start late./  =Ground Nuts (paste)= at 2010-11, =Cassava (dry)= and =Sweet Potatoes
+  (flour)= at 2013-14, and =Sim Sim (paste)= at 2018-19.
+- /Code 143 is shelled./  Its Stata value label reads =Ground nut seeds (unshelled)= from 2010-11 to
+  2015-16.  That is a metadata slip: the forms print =Ground nuts (shelled) 143= in 2005-06,
+  2010-11, 2011-12, 2013-14 and 2015-16.
+- /=Cassava (dry)= and =(flour)= in 2019-20 are served as labelled (GH #1525)./  Codes 1081 and 1082
+  do not behave as their labels say.  2019-20's 1081 has the unit mix (kg 0.54, basin 0.19, cup
+  0.16) of 2018-19's 1082 (0.54, 0.18, 0.15), and 2019-20's 1082 is heaps (about 0.72).  Of 2018-19's
+  1082 consumers, 62% consume 1081 in 2019-20 and 5% consume 1082, against unconditional rates of
+  24% and 4%.  Served, 2018-19 -> 2019-20: =Cassava (dry)= goes from 52 to 320 purchased rows and
+  511,650 to 2,322,965 UGX, and =Cassava (flour)= from 284 to 56 rows and 2,044,400 to 182,850 UGX.
+  So in that wave the split is not a state split.  The forms do not settle it: both print =108= Dry
+  and =108_1= Flour, and 1082 does not look like 2018-19's dry basins either, so this is not a
+  clean swap.  It is pre-existing at =Preferred Label=, and nothing is swapped without a source.
+- /Other Aggregates hold two states and were not ruled on/: =Beans= (fresh, dry), =Peas=
+  (=Peas=, dry), =Rice= (=Rice flour=), =Ginger= (fresh, powder), =Soybean= (fresh, dry).
+
+*What the split costs (cold, merge of development =14c0f5790=).*
+
+- /CFE by Region, default thresholds, one build, the fine table summed through each side's
+  column./  Items kept go from 43 to 46.  =Maize= and =Ground Nuts= drop out; =Maize (cobs)=,
+  =Maize (flour)= and the three nut states enter; =Millet (flour)=, with two waves, is not kept.
+  The betas support the split: cobs 0.726 against flour 0.435, shelled 0.879 against pounded 0.611.
+  36 common betas outside the families correlate 0.997, largest move 0.043.  The kept set is
+  fragile: with =Millet= left as one bucket the same run keeps 44, with Chicken, Cigarettes, Coffee
+  and Passion Fruits out and Kabalagala and Waragi in.
+- /Thin cells./  t-m-j cells under 30 rows go from 545 of 1,762 to 691 of 1,964.  =Sweet Potatoes
+  (dry)= and =(flour)= are 100% thin, =Maize= 88%, =Sim Sim (paste)= 86%, =Ground Nuts= 78%.
+- /Kg prices on the crop join are purer and far thinner./  Food kg rows a wave go from 822-1,246
+  to 5-17 for =Maize=, 394-691 to 1-12 for =Ground Nuts=, 2-212 to 2 in 2011-12 alone for =Cassava=,
+  and 1-2 to none for =Sweet Potatoes=.  No library code joins crop to food: =median_price_valuation=
+  uses crop sales, and =food_expenditures(valuation=...)= runs before the relabel.
+- /Pooled./  In =Feature('food_expenditures')(..., labels='Aggregate')= Uganda's =Maize= goes from
+  10,197 rows to 302, beside Nigeria's 3,249 and GhanaLSS's 4,512.  That aligns better, since Nigeria
+  keeps =Maize flour= apart, and Uganda's =Millet (flour)= (421 rows) now meets GhanaLSS's (187).
+
 * =people_last7days= counts MEMBERS, not visitors
 
 The question ("how many people were present in the last 7 days?") is
@@ -1464,7 +1697,8 @@ cluster, so it is no cleaner than the parish:
   files, which carry no household key.  2018-19 =GSEC1.t0_hhid= matches a
   2015-16 =HHID= for 2,978 of 3,176 households.  (/2026-11-03/: 2019-20 =hhidold=
   matches a 2018-19 =GSEC1.hhid= for 2,986 of 3,098, and the chain reaches =ea=
-  for 2,823; see "The design PSU =ea=" under Sampling Design.)
+  for 2,823; since =AGSEC1.ea= became a second source, 3,027 in 2018-19 and 2,868 in
+  2019-20.  See "The design PSU =ea=" under Sampling Design.)
 
 /Contradicts/ the 2013-14 =cluster_id_note= in =sampling.yml=, "A parish is
 not an EA, so no crosswalk can exist": true of the served parish =v=, but the
@@ -4735,7 +4969,7 @@ The existing conditional null-key loss, reducers, units, plot construction,
 weights and second-season seed coverage gap remain. This does not resolve
 #829 WAITING, #647 PART-harvest additivity or the 2019 panel-weight questions.
 
-* =unknown_plot= and =harvest_kg=: GH #1460 (noted 2026-11-04, not fixed here)
+* =unknown_plot= and =harvest_kg=: GH #1460 (noted 2026-11-04, excluded and reported since)
 
 =transformations.harvest_kg= groups at =(t, i, plot_id, j)=, so it pools a household's
 =unknown_plot= rows of one crop as if they were one plot, which the canonical
@@ -4746,6 +4980,10 @@ Measured at this branch: 403 =crop_production= rows are =unknown_plot= (2009-10 
 #1460's first defect, summing across crops, does not reach this country; the
 =condition= sum and this pooling do.  =plot_inputs= holds 136 =unknown_plot= rows and
 =plot_labor= 141.
+
+=harvest_kg= and =crop_diversity(weight='count')= now leave these rows out, per the rule, and
+report them in =attrs['unknown_plot_excluded']=: =Harvest_kg= rows 89,207 -> 88,980, the 70,277 kg
+reported rather than served.  The =condition= sum stands.
 
 * GH1120 locating covers and singletons (2026-10-30, independent review pending)
 
@@ -4791,6 +5029,35 @@ all-null-row filter then deletes the row. This is the documented exception in "c
 therefore reference a =v= with no =cluster_features= row. That is the
 honest outcome". The existing decision is preserved,
 not a new D2 policy question; no geography or dummy data was added.
+
+** What =unlocated-= means, as built (ruling @ligon, 2026-11-04)
+
+GH #1120 D2 was ruled for "households that no file locates".  What is built is
+narrower, and the ruling keeps the label and rewords D2 to match it:
+=unlocated-{hhid}= marks a household with *no value in this wave's cluster-key
+column* (=comm= and, in 2009-10, its GPS bin; the parish code; the district and
+parish pair).  It says nothing about what the wave's other files hold, and some of
+them do hold a location.  Read it as "this wave's key is blank", not as "nothing
+locates this household".
+
+| wave    | households | what else the release records for them (raw files, 2026-11-04)                                                  |
+|---------+------------+-----------------------------------------------------------------------------------------------------------------|
+| 2009-10 |         28 | 24 on =GSEC1= with a blank =comm= and no GPS fix: all 24 have =region= and 23 a district code.  4 are on =AGSEC3B= or =GSEC12= only. |
+| 2011-12 |         57 | on =AGSEC1= and other modules, not on =GSEC1=.  26 have a parcel GPS reading inside Uganda in =AGSEC2A= / =AGSEC2B=. |
+| 2013-14 |          1 | blank =h1aq4a=.  Its cover has =ea=, =region= and =h1aq1a=, and =unps_geovars_2013_14= has a fix.                   |
+| 2018-19 |         66 | on =AGSEC1= and not on =GSEC1=; =AGSEC1='s =region= is blank for all 66.  Parcel GPS not checked.                   |
+| 2019-20 |          1 | blank =district=.                                                                                               |
+
+None of this is used to fill =v=: parcel GPS is where a parcel is and 2013-14's =ea= is a
+PSU of origin, and neither is a value of this wave's key.
+
+*Site C stays silent on these, because a singleton is not a cluster.*  =sampling.yml=
+declares 2010-11 -> 2011-12 =stable=, and 30 linked households go from an EA in 2010-11
+to a singleton in 2011-12, since 2011-12 has them on =AGSEC1= only.  That does not make
+the boundary incomparable.  A singleton names one household and no place, so it cannot
+show that a cluster's key changed; the 2,510 of 2,510 in that note counts located
+households.  =tests/test_sampling.py::test_uganda_comm_rendering_boundary_is_silent_once_harmonised=
+pins the silence and the 30.
 
 ** D3: source-missing plots, with observation identity
 

@@ -125,6 +125,41 @@ def comm_frame_ea(value):
     return _comm_frame_ea_map().get(code, code)
 
 
+@functools.lru_cache(maxsize=None)
+def _comm_ea_map():
+    """``{8-digit frame EA: ea}`` from the reviewed ``comm_ea`` table (GH #1459)."""
+    from pathlib import Path
+    from lsms_library.local_tools import get_categorical_mapping
+
+    raw = get_categorical_mapping(tablename='comm_ea', idxvars='comm8',
+                                  dirs=[str(Path(__file__).resolve().parent)],
+                                  ea='ea')
+    return {format_id(k): format_id(e) for k, e in raw.items()}
+
+
+def comm_ea(value):
+    """An early wave's ``comm`` as the design-PSU label ``ea`` (GH #1459).
+
+    Declared in ``data_info.yml`` as ``ea: [comm, {mappings: comm_ea}]`` on
+    ``sample`` in 2005-06 to 2011-12, where ``v`` is the frame EA under ``comm``.
+
+    * A frame EA the survey later numbers (212 of 322) serves that number, through
+      the reviewed ``comm_ea`` table.
+    * A frame EA rotated out before it could be numbered (110) serves its own
+      8-digit ``comm``, which cannot collide with the labels 1-430.
+    * Anything else is ``None``: a blank ``comm`` (2009-10's movers, split-offs and
+      no-location households) and a code that is not 8 digits (2010-11's ``1530040``,
+      which ``comm_frame_ea`` serves as it stands).
+
+    Like ``comm_frame_ea`` it takes a one-column row or a scalar, and it starts from
+    ``comm_frame_ea``, because 2009-10 and 2010-11 write ``comm`` in 7 characters.
+    """
+    frame_ea = comm_frame_ea(value)
+    if frame_ea is None or len(frame_ea) != 8 or not frame_ea.isdigit():
+        return None
+    return _comm_ea_map().get(frame_ea, frame_ea)
+
+
 # ---------------------------------------------------------------------------
 # GH #323 -- country-level df_edit hooks.
 #
@@ -445,7 +480,7 @@ def inputs_agriculture_cover(wave):
     base = countries_root() / 'Uganda' / wave / 'Data'
     hh = get_dataframe(str(base / 'gsec1.dta'), convert_categoricals=False)
     ag = get_dataframe(str(base / 'AGSEC1.dta'), convert_categoricals=False)
-    fields = ['HHID', 'parish_code', 'hwgt_W5', 'sregion', 'urban', 'region', 'district']
+    fields = ['HHID', 'parish_code', 'ea', 'hwgt_W5', 'sregion', 'urban', 'region', 'district']
     out = ag[fields].copy()
     out['i'] = out['HHID'].map(format_id)
     out['t'] = wave
@@ -464,6 +499,13 @@ def _adopt_alternate_cover(flat, table='sample'):
     (2015-16: AGSEC1's ``hwgt_W5`` agrees with gsec1's on none of the 1,458
     households both weight positively), so it must not fill gsec1's gaps.
 
+    ``_ag_ea`` is the exception that proves the rule: it may only fill a row the
+    primary cover lacks, like the others, but the two covers have to AGREE on
+    every household both hold (2,622 of 2,622), because that equality is why
+    ``AGSEC1.ea`` may stand as a second source at all (ruling 2026-11-04).  A
+    release where it fails raises ``OriginEaError`` rather than serving two EA
+    vintages.
+
     The temporary columns are dropped.  A frame without them is returned
     unchanged (every wave but 2015-16).
     """
@@ -481,14 +523,21 @@ def _adopt_alternate_cover(flat, table='sample'):
                     f'Uganda locating covers disagree on v for {int(conflict.sum())} '
                     'households; retaining HH cover location (GH #1120 D1)',
                     stacklevel=2)
+        if '_ag_ea' in flat and 'ea' in flat:
+            own, second = flat['ea'].map(format_id), flat['_ag_ea'].map(format_id)
+            differ = int((~only_alt & own.notna() & second.notna() & own.ne(second)).sum())
+            if differ:
+                raise OriginEaError(
+                    f'Uganda sample: gsec1 and AGSEC1 disagree on ea for {differ} household(s), '
+                    f'so AGSEC1.ea can no longer stand as a second source for gsec1.ea.')
         for c in alt:
             target = c[len(_ALT_COVER_PREFIX):]
             src = flat[c].loc[only_alt]
             if target == 'v':
                 src = derive_agriculture_cover_v(src.to_frame('parish_code'))
-            if target == 'District':
-                # The primary cover's `v` and `District` pass through this
-                # module's `v` / `District` formatters (= format_id); an `_ag_`
+            if target in ('District', 'ea'):
+                # The primary cover's `v`, `District` and `ea` pass through this
+                # module's formatters of those names (= format_id); an `_ag_`
                 # myvar passes through none.  Without the same canonical form
                 # an unlabelled district code (2015-16 '229') is the int 229 on
                 # one side and the string '229' on the other, and
@@ -519,6 +568,32 @@ def _adopt_alternate_cover(flat, table='sample'):
     return flat.drop(columns=temps)
 
 
+class OriginEaError(Exception):
+    """The sources of ``sample.ea`` no longer give one answer for one household.
+
+    Raised when ``gsec1`` and ``AGSEC1`` disagree on a household both hold, or when a
+    tracking key would name two households.  That equality is why ``AGSEC1.ea`` may stand
+    as a second source (2,622 of 2,622 today), so a release that breaks it has to stop the
+    build.  The held files give it nothing to refuse.  The message carries counts, never a
+    household id.
+
+    An ``Exception`` subclass, as ``IdWalkError``, Burkina's ``EmcSampleError`` and Tanzania's
+    ``SplitOffClusterError`` are.  ``_join_v_from_sample`` catches ``ValueError``, ``KeyError``,
+    ``FileNotFoundError`` and ``AttributeError``, and the derived-table paths catch
+    ``RuntimeError`` too, so any of those would serve every Uganda household table with no
+    ``v`` and only a warning.  ``pandas.errors.MergeError``, which this replaces, is a
+    ``ValueError``.
+
+    A class in a by-path module does not pickle, so under parallel workers it would reach the
+    parent as a ``RuntimeError``, which the derived-table paths do catch, and they would serve
+    0 rows (GH #1524).  ``__reduce__`` therefore sends a plain ``Exception`` carrying the class
+    name and the message.  One build worker raises this class; more raise that.
+    """
+
+    def __reduce__(self):
+        return (Exception, (f'{type(self).__name__}: {self}',))
+
+
 #: The registry key on a row whose ``ea`` was inherited (GH #689).
 _EA_INHERITED_KEY = 'Uganda::sample::ea-tracking-key'
 #: Marker column ``origin_ea`` hands to ``sample``; never served.
@@ -537,14 +612,20 @@ def _follow_key(left, key, right, target):
 
     Compares ``format_id`` of both sides.  A blank key (2019-20 ``hhidold``, 69
     households) formats to ``None`` and is dropped first: ``pd.merge`` matches
-    null keys to each other, and a blank is not a link.  ``many_to_one`` because
-    two 2018-19 households may share a parent (5 parents do), and because a
-    repeated target would be a key that does not name one household.
+    null keys to each other, and a blank is not a link.  Two 2018-19 households may
+    share a parent (5 parents do), but a repeated target would be a key that does not
+    name one household: ``OriginEaError``, which counts them and names none.
     """
     lhs = left.assign(_key=left[key].map(format_id)).dropna(subset=['_key'])
     rhs = right.assign(_key=right[target].map(format_id)).dropna(subset=['_key'])
-    return (lhs.merge(rhs, on='_key', validate='many_to_one', suffixes=('', '_parent'))
-            .drop(columns='_key'))
+    repeated = rhs.loc[rhs['_key'].duplicated(keep=False), '_key'].nunique()
+    if repeated:
+        raise OriginEaError(
+            f'Uganda sample: {repeated} value(s) of {target} name more than one row with '
+            f'different answers, so a tracking key would not name one household.  If these '
+            f'are gsec1 and AGSEC1, the two covers no longer agree on ea, and AGSEC1.ea '
+            f'cannot stand as a second source.')
+    return lhs.merge(rhs, on='_key', suffixes=('', '_parent')).drop(columns='_key')
 
 
 def _tracking_links(wave):
@@ -572,9 +653,15 @@ def inputs_inherited_ea(wave):
     """Raw answers behind each inherited ``ea``, by their original names.
 
     One row per household holding a route; a household without one has nothing
-    to show, because nothing was computed for it.
+    to show, because nothing was computed for it.  ``_source`` names the 2015-16
+    cover the value came from: ``gsec1``, or ``AGSEC1`` for a household only it
+    records.
     """
-    origin = _uganda_cover('2015-16/Data/gsec1.dta')[['HHID', 'ea']]
+    gsec = _uganda_cover('2015-16/Data/gsec1.dta')[['HHID', 'ea']]
+    ag = _uganda_cover('2015-16/Data/AGSEC1.dta')[['HHID', 'ea']]
+    only_ag = ag.loc[~ag['HHID'].map(format_id).isin(gsec['HHID'].map(format_id))]
+    origin = pd.concat([gsec.assign(_source='gsec1.dta'),
+                        only_ag.assign(_source='AGSEC1.dta')], ignore_index=True)
     out = _follow_key(_tracking_links(wave), 't0_hhid', origin, 'HHID')
     return out.assign(t=wave, i=out['hhid'].map(format_id)).set_index(['t', 'i'])
 
@@ -585,10 +672,14 @@ def origin_ea(df):
     ``ea`` is the design PSU: the enumeration area a household was SAMPLED in,
     carried with it when it moves.  From 2018-19 no household file ships it, so
     a household takes the ``ea`` of the 2015-16 household its own tracking key
-    names.  ``df`` is the declared 2015-16 ``gsec1`` frame, keyed on that wave's
-    ``HHID``; this re-keys it to the current wave's household.  A household with
-    no route is simply absent and stays NA: nothing is read from ``v`` or parsed
-    out of an id.
+    names.  ``df`` is the declared 2015-16 ``gsec1`` and ``AGSEC1`` frames
+    concatenated, keyed on that wave's ``HHID``; this re-keys it to the current
+    wave's household.  A household both covers hold appears twice with one ``ea``
+    (2,622 of 2,622); if they ever differ, ``_follow_key`` raises ``OriginEaError``.
+    A household with no route is simply absent and stays NA: nothing is
+    read from ``v`` or parsed out of an id.  The route is the current wave's
+    ``GSEC1`` tracking key only; ``AGSEC1.t0_hhid`` is not followed (it disagrees
+    with ``GSEC1.t0_hhid`` on 86 households).
 
     A sub-df and not a read inside ``sample``, so that a loss the GH #515 handler
     catches costs the column and not ``v``.  That handler catches
@@ -599,12 +690,59 @@ def origin_ea(df):
     """
     flat = df.reset_index()
     wave = flat['t'].iloc[0]
-    origin = flat[['i', 'ea']].rename(columns={'i': 'HHID'})
+    origin = flat[['i', 'ea']].rename(columns={'i': 'HHID'}).drop_duplicates()
     linked = _follow_key(_tracking_links(wave), 't0_hhid', origin, 'HHID')
     out = pd.DataFrame({'t': wave, 'i': linked['hhid'].map(format_id),
                         'ea': derive_inherited_ea(linked),
                         _EA_INHERITED_MARKER: True})
     return out.set_index(['t', 'i'])
+
+
+#: The waves whose ``ea`` comes from ``comm`` (GH #1459).
+_EA_COMM_WAVES = ('2005-06', '2009-10', '2010-11', '2011-12')
+#: A row whose ``comm`` the survey later numbers, and a row whose ``comm`` it does not.
+_EA_LINKED_KEY = 'Uganda::sample::ea-comm-link'
+_EA_OWN_COMM_KEY = 'Uganda::sample::ea-own-comm'
+
+
+def derive_comm_ea(inputs):
+    """``ea`` of an early-wave household from its raw ``comm`` (GH #1459)."""
+    return inputs['comm'].map(comm_ea).rename('ea')
+
+
+def _inputs_comm_ea(wave, linked):
+    """Raw ``HHID`` and ``comm`` of one branch of ``comm_ea``, by original names."""
+    if wave not in _EA_COMM_WAVES:
+        raise ValueError(f'Uganda comm_ea: {wave} takes no ea from comm (GH #1459)')
+    raw = _uganda_cover(f'{wave}/Data/GSEC1.dta')[['HHID', 'comm']]
+    ea = derive_comm_ea(raw)
+    on_table = ea.isin(set(_comm_ea_map().values()))
+    out = raw.loc[ea.notna() & (on_table if linked else ~on_table)]
+    return out.assign(t=wave, i=out['HHID'].map(format_id)).set_index(['t', 'i'])
+
+
+def inputs_ea_comm_link(wave):
+    """Households whose ``comm`` is one of the 212 the survey later numbers."""
+    return _inputs_comm_ea(wave, linked=True)
+
+
+def inputs_ea_own_comm(wave):
+    """Households whose ``comm`` is one of the 110 rotated out before that."""
+    return _inputs_comm_ea(wave, linked=False)
+
+
+def _mark_comm_ea(flat):
+    """Stamp each branch of an early wave's ``ea``, so the path taken is countable."""
+    if 't' not in flat.columns or 'ea' not in flat.columns:
+        return flat
+    filled = flat['t'].isin(_EA_COMM_WAVES) & flat['ea'].notna()
+    if filled.any():
+        on_table = flat['ea'].isin(set(_comm_ea_map().values()))
+        for mask, key in ((filled & on_table, _EA_LINKED_KEY),
+                          (filled & ~on_table, _EA_OWN_COMM_KEY)):
+            if mask.any():
+                flat = _add_derivation(flat, mask, key)
+    return flat
 
 
 def _add_derivation(flat, mask, key):
@@ -627,7 +765,8 @@ def sample(df):
        PROVED before they are dropped -- a household whose repeats differ
        raises rather than letting a reducer pick one.
     3. Give every household with no ``v`` its singleton (D2).
-    4. Disclose an inherited ``ea`` on the rows that received one (GH #689).
+    4. Disclose an inherited ``ea`` on the rows that received one (GH #689), and
+       an early wave's ``ea`` by the branch that gave it (GH #1459).
     """
     idx = [n for n in df.index.names if n is not None]
     flat = _adopt_alternate_cover(df.reset_index())
@@ -649,6 +788,7 @@ def sample(df):
     if _EA_INHERITED_MARKER in flat.columns:
         inherited = flat.pop(_EA_INHERITED_MARKER).notna()
         flat = _add_derivation(flat, inherited, _EA_INHERITED_KEY)
+    flat = _mark_comm_ea(flat)
     return flat.set_index(idx) if idx else flat
 
 

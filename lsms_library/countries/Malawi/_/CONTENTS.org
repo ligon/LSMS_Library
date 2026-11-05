@@ -5210,7 +5210,10 @@ Cold builds, development =4ea95a0aa= against this change:
 | =harvest_kg= total, kg           | 8,168,581 | 8,171,321 |
 
 Those =harvest_kg= rows were measured before GH #1460 kept its crop axis; with it, all waves,
-92,745 -> 92,762 rows, and the kg gained is the same 2,740.
+92,745 -> 92,762 rows, and the kg gained is the same 2,740.  GH #1460 then excluded =unknown_plot=
+from =harvest_kg=, which reports it in =attrs['unknown_plot_excluded']= (41 rows, 17 with kg, 2,740
+kg), so the gain is gone from the column: cold at development 997f33c8a, 92,763 -> 92,746 rows and
+38,705,916.75 -> 38,703,176.75 kg.
 
 Every other column of every row is digest-equal in all four waves; =crop_diversity=,
 =gross_crop_revenue=, =yield_kg(on='plot')= and the sale-basis ladder are unchanged.
