@@ -332,11 +332,14 @@ Mali::crop_production::harvest-from-dispositions:
       basis: questionnaire
       evidence: >-
         mli_ehcvm2_qnr_men_excel_vague1.pdf, printed p. 86: "(16C.11) Avez vous fini la
-        recolte de cette culture? 1 = Oui >(16C.16)".  On Niger 2021-22, where both sides
-        exist, the sum equals the harvest exactly on 91.1% of 7,686 finished one-unit pairs,
-        within 10% on 92.2%, median ratio 1.000.  On Mali itself it can barely be tested: 10
-        pairs with a recorded quantity, a finished row and one shared unit, 4 exact, median
-        ratio 1.0.
+        recolte de cette culture? 1 = Oui >(16C.16)".  Mali 2018-19 holds the harvest and all
+        four dispositions on one row (s16cq12a; s16cq13a, s16cq14a, s16cq16a, s16cq22a).  On its
+        5,583 finished rows with the dispositions in the harvest's unit the sum equals the
+        harvest exactly on 77.9%, within 10% on 82.1%, median ratio 1.000, 8.3% over 1.1 and 9.6%
+        under 0.9; over the 4,438 metric rows the kg totals differ by a ratio of 1.006.  This is
+        consistency within a row, and a respondent may anchor on the harvest just stated.  On
+        Niger 2021-22, where both sides exist, the sum equals the harvest exactly on 91.1% of
+        7,686 finished one-unit pairs (93.1% of 7,508 on the review's definition).
     - text: >-
         not all of a harvest need appear: s16d asks no quantity for seed kept, loss after
         harvest or animal feed, so the sum can fall short of what was cut.  Not sized.
@@ -351,6 +354,23 @@ Mali::crop_production::harvest-from-dispositions:
       basis: modelling-choice
       evidence: ruling @ligon 2026-11-04, MORNING.org, option (b) of GH #1437; variables s16dq02c, s16dq03c, s16dq05d, s16dq13c
     - text: >-
+        the sum is as good as its lines, and it inherits the file's large values.  It is not
+        trimmed and no pair is held out for this.  13 derived pairs have a sold line priced
+        under 1/10 of the crop's median over derived pairs' sold lines (14 over every metric
+        sold line), and carry 1,185,854 kg, 17.7% of derived kg.  On 4 of those the file's own
+        s16dq05c equals the sold quantity on a sack unit, so that line reads as kilograms keyed
+        as sacks: 1,136,700 kg, 16.9%, about 1.1M kg of it removed if read that way.  One of the
+        4 is the 7,502 Sac (100 Kg) row, 10.8% of the wave's kg alone and the only one Site Q
+        names.  26 pairs hold a non-sale disposition of 100 sacks or more, 820,100 kg, 12.2%,
+        with no price to test.  This is inherited from the same class in recorded data, not
+        created by the derivation: on 2018-19's recorded rows the same two tests flag 43 rows,
+        3,052,036 kg, 20.5%, and 39 rows, 549,450 kg, 3.7%.  Medians are not sensitive to it.
+      basis: modelling-choice
+      evidence: >-
+        measured 2026-11-04 from s16c and s16d of both waves.  The label of s16dq05c says a total
+        and the questionnaire says per unit; any rule for these lines belongs in its own issue
+        covering both waves.
+    - text: >-
         a crop with an unfinished row is held out (76 pairs, 48 of them one-unit), because
         its dispositions cover what is harvested so far.  A crop with a recorded quantity is
         held out (11 of the finished one-unit pairs), because a recorded harvest is not
@@ -359,8 +379,9 @@ Mali::crop_production::harvest-from-dispositions:
       evidence: GH #1437; the reconcile memo's 3,419 finished one-unit pairs are these 3,360 plus the 48 and the 11
   validated_against: >-
     tests/test_gh1437_mali_harvest_total.py, whose oracle reads s16c and s16d directly.  Cold build
-    of 2021-22: 3,360 keyed rows, 3,139 on the single s16c row and 221 Farm-level.  Not validated
-    against an external total: no document here reports one.
+    of 2021-22: 3,360 keyed rows, 3,139 on the single s16c row and 221 Farm-level.  Median pure-stand
+    yields run 1% to 18% below 2018-19's recorded ones, crop by crop (Mali/_/CONTENTS.org).  Not
+    validated against an external total: no document here reports one.
   contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the 2021-22 harvest total, and the window key (GH #1437)"'
   since: '2026-11-04'
 

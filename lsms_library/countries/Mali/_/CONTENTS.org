@@ -2818,13 +2818,58 @@ one on a =Farm-level= row would count it twice.
 2,792 of the 3,360 are in a metric unit and carry 6,715,918 kg; per metric row 2,405 kg, against 2,650
 in 2018-19.  The other 568 (carts, =Baignoire=, =Gerbe=, ...) have no factor.
 
-*How good is the sum?*  On Niger 2021-22 it equals the harvest exactly on 91.1% of 7,686 pairs (section
-above).  On Mali it can barely be tested: 10 pairs with a recorded quantity, a finished row and one
-shared unit, 4 exact, median ratio 1.0; on 140 unfinished pairs, where the harvest is still running,
-52.9% exact and median 1.0.  *Disclosed, not resolved*: 208 of the 3,360 add two states of the product
-in one unit (=Grain= with =Epis=, say); 8 are in unit =Autre=, whose free text is empty, 4 of them across
-two or more dispositions, so may hide two units; and =s16d= asks nothing about seed kept or post-harvest
-loss, so the sum can fall short of what was cut.
+*How good is the sum?*  Mali 2018-19 can test it on Mali's own file, because it holds the harvest and all four
+dispositions on one row (=s16cq12a=; =s16cq13a=, =s16cq14a=, =s16cq16a=, =s16cq22a=).  Finished rows, dispositions in the
+harvest's unit:
+
+|     n | exact | within 10% | median | over 1.1 | under 0.9 |
+|-------+-------+------------+--------+----------+-----------|
+| 5,583 | 77.9% |      82.1% |  1.000 |     8.3% |      9.6% |
+
+Over the 4,438 metric rows the kg totals differ by a ratio of 1.006, and medians are 1.0 for one to four dispositions.
+*The caveat is real*: this is consistency within a row, and a respondent may anchor on the harvest just stated.  Niger
+2021-22 gives 91.1% of 7,686 (93.1% of 7,508 on the review's definition).  Inside 2021-22 itself the overlap is small:
+10 pairs with a recorded quantity, a finished row and one shared unit, 4 exact; 140 unfinished pairs, 52.9% exact.
+*Disclosed, not resolved*: 208 of the 3,360 add two states of the product in one unit (=Grain= with =Epis=, say; on
+2018-19's two-state rows the median ratio is 1.0, mean 1.03); 8 are in unit =Autre=, whose free text is empty, 4 of them
+across two or more dispositions, so may hide two units; and =s16d= asks nothing about seed kept or post-harvest loss, so
+the sum can fall short of what was cut.
+
+*Is the scale plausible?*  Yes.  Pure-stand yields, one crop row on the plot and area over 0.01 ha, median kg/ha (n).
+2017-18 uses raw =s7c1q07= GPS hectares, because =plot_features= serves no EAC-I wave.
+
+| crop      | 2017-18     | 2018-19 recorded | 2021-22 derived | 2021-22 window |
+|-----------+-------------+------------------+-----------------+----------------|
+| Millet    |   587 (210) |        533 (826) |       438 (363) |        194 (7) |
+| Maize     | 1,342 (147) |      1,044 (744) |       856 (463) |       561 (13) |
+| Rice      |   970 (157) |    1,333 (1,067) |     1,154 (319) |       400 (53) |
+| Sorghum   |   326 (108) |        500 (523) |       476 (318) |        274 (6) |
+| Groundnut |   373 (176) |        862 (547) |       800 (328) |       397 (18) |
+| Cotton    |   822 (369) |        901 (524) |       891 (336) |       628 (65) |
+| All crops | 568 (1,438) |      800 (4,611) |     696 (2,310) |      516 (171) |
+
+Derived medians run 1% to 18% below 2018-19, which is what unasked seed and loss would do.  p90, derived / 2018-19, stays
+close: millet 1,366 / 1,446, maize 2,500 / 2,937, rice 5,256 / 6,598, sorghum 1,501 / 1,399, groundnut 2,559 / 2,733, cotton
+1,720 / 1,870.  Median kg per household-crop, 2018-19 / 2021-22: millet 1,200 / 1,100, maize 1,400 / 1,000, rice 1,400 /
+1,625, sorghum 700 / 700, groundnut 600 / 500, cotton 2,500 / 2,000.  The factor of 27 in =harvest_kg= is rows x 12.8 (236 to
+3,028) times kg per row x 2.1 (1,108 to 2,304), because the old rows were partial harvests.
+
+*The total is tail-sensitive; the medians are not.*  Nothing below is trimmed and no pair is held out; a rule belongs in its
+own issue covering both waves.  The label of =s16dq05c= says a total and the questionnaire says per unit.
+
+| class                                                                 | pairs or rows |        kg | share            |
+|-----------------------------------------------------------------------+---------------+-----------+------------------|
+| 2021-22, sold line under 1/10 of the crop's median price              |            13 | 1,185,854 | 17.7% of derived |
+| of which =s16dq05c= equals the sold quantity on a sack unit           |             4 | 1,136,700 | 16.9%            |
+| 2021-22, a non-sale disposition of 100 sacks or more (no price to test) |          26 |   820,100 | 12.2%            |
+| 2018-19 recorded, sold line under 1/10                                |            43 | 3,052,036 | 20.5% of recorded |
+| 2018-19 recorded, non-sale at 100 sacks or more                       |            39 |   549,450 | 3.7%             |
+
+The 13 use the crop's median over derived pairs' sold lines; over every metric sold line one cotton line at 0.099 makes 14,
+and the share is the same.  The 7,502 =Sac (100 Kg)= row is in the 4 and is 10.8% of the wave's kg alone (750,200 kg): its own
+sold line says 7,500 in the unit and 7,500 in =s16dq05c=, so it reads as kilograms.  Reading those 4 sold lines at the file's kg
+removes about 1.1M kg.  Site Q names that row, at 162.9 x, and no other.  *So this is inherited from the same class in recorded
+data, and not created by the derivation.*
 
 *The window key.*  =harvest-to-date= is an identity on a row with a recorded quantity and an unfinished
 harvest: 2021-22 =s16cq11= =Non=, 287 rows, a median 50% still to harvest; 2018-19 =s16cq10= =Non=, 265 rows,
