@@ -336,9 +336,10 @@ Niger::crop_production::hh-crop-sale-single-row:
   rule: >-
     2014-15 AS2E2 and 2021-22 s16d record a sale for the household and crop, with no
     plot.  A sale is a record with a positive quantity or value.  Where the crop has
-    exactly one harvest line -- one served row, not merely one plot (GH #1360) -- the
-    sale is served on it as recorded, in its own Unit_sold, and that row carries this
-    key.  What is derived is the ATTACHMENT, not the numbers.  Any other sale is served
+    exactly one served harvest line -- one served row, not merely one plot (GH #1360),
+    and a line with no quantity, month or stand does not count where another does, since
+    the API removes it -- the sale is served on it as recorded, in its own Unit_sold, and
+    that row carries this key.  What is derived is the ATTACHMENT, not the numbers.  Any other sale is served
     on ONE row of that household and crop with plot_id = 'Farm-level', u = 'Unknown',
     condition = 'unknown_condition', production_obs = 'unresolved_observation', no
     Quantity and no key, because its index value discloses it.  No sale is split, summed
@@ -364,12 +365,13 @@ Niger::crop_production::hh-crop-sale-single-row:
       basis: modelling-choice
       evidence: >-
         rulings @ligon 2026-11-03 and 2026-11-04, GH #843 option (d), GH #1457.  Nigeria's
-        further ruling A, the one row that STATES a harvest, is not extended here; 31 sales
-        (694,450 FCFA, 2014-15) and 12 (696,200 FCFA, 2021-22) sit on Farm-level under it.
+        further ruling A, the one row that STATES a harvest, is not extended here; 12 sales
+        (260,550 FCFA, 2014-15) and 12 (696,200 FCFA, 2021-22) sit on Farm-level under it,
+        with one line stating a harvest among several served lines.
   validated_against: >-
     tests/test_gh1457_niger_multi_plot_sales.py, whose oracle reads the two files directly.
-    Cold builds: 2014-15 564 keyed rows and 517 Farm-level rows hold the 1,081 sales, 78,485,760
-    + 34,683,750 = 113,169,510 FCFA; 2021-22 1,265 and 553 hold the 1,818, 68,629,070 + 36,330,475 =
+    Cold builds: 2014-15 583 keyed rows and 498 Farm-level rows hold the 1,081 sales, 78,919,660
+    + 34,249,850 = 113,169,510 FCFA; 2021-22 1,265 and 553 hold the 1,818, 68,629,070 + 36,330,475 =
     104,959,545 FCFA, each the raw sum (exact s16d repeats dropped first).  Not validated against
     an external total: no document here reports one.
   contents: 'Niger/_/CONTENTS.org, "2026-11-04 -- multi-plot sales (GH #1457)"'

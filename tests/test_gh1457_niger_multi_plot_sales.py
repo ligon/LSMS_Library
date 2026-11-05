@@ -29,10 +29,10 @@ KEY = "Niger::crop_production::hh-crop-sale-single-row"
 SOURCE = {
     "2014-15": dict(base="NER_2014_ECVMA-II_v02_M_STATA8/", harvest="ECVMA2_AS2E1P2.dta", sale="ECVMA2_AS2E2P2.dta",
                     hcrop="CULTURE", scrop="AS02EQ110B", qty="AS02EQ12A", value="AS02EQ13",
-                    qcode=9999, vcode=9999999, unit="AS02EQ12B"),
+                    qcode=9999, vcode=9999999, unit="AS02EQ12B", hqty="AS02EQ07A", hmonth="AS02EQ06A", hstand=None),
     "2021-22": dict(base="", harvest="s16c_me_ner2021.dta", sale="s16d_me_ner2021.dta",
                     hcrop="s16cq04", scrop="s16dq01", qty="s16dq05a", value="s16dq06",
-                    qcode=None, vcode=None, unit="s16dq05b"),
+                    qcode=None, vcode=None, unit="s16dq05b", hqty="s16cq16a", hmonth=None, hstand="s16cq07"),
 }
 
 
@@ -89,6 +89,12 @@ class TestRules:
         h["production_obs"] = ["row:x:1", "row:x:2"]
         got = niger.derive_hh_crop_sale_attachment(h, _records([("a", "Mil", 2.0, 300.0, "Sac")]))
         assert got[got.plot_id == FARM].production_obs.tolist() == [niger.CROP_OBS_NA]
+
+    def test_a_line_the_api_removes_does_not_count_unless_it_is_alone(self, niger):
+        df = pd.DataFrame({"i": ["a", "a", "b", "c", "c"], "crop": ["Mil"] * 5,
+                           "Quantity": [5.0, np.nan, np.nan, np.nan, np.nan],
+                           "harvest_month": [np.nan] * 5})
+        assert niger.served_harvest_lines(df).tolist() == [True, False, True, True, True]
 
     def test_the_key_needs_a_plot_and_a_positive_sale(self, niger):
         idx = pd.MultiIndex.from_tuples(
@@ -155,12 +161,25 @@ def _sales(wave, crops, walks):
 
 
 def _lines(wave, crops, walks):
+    """The SERVED lines per (i, crop): one holding a quantity, month or stand, since the API
+    removes a line holding none.  A crop with no such line counts all its lines."""
     spec = SOURCE[wave]
     code, lab = _raw(wave, "harvest")
     m = walks.get(wave, {})
+    q = pd.to_numeric(code[spec["hqty"]], errors="coerce")
+    if spec["qcode"]:
+        q = q.mask(q == spec["qcode"])
+    content = q.notna().to_numpy()
+    if spec["hmonth"]:
+        mo = pd.to_numeric(code[spec["hmonth"]], errors="coerce")
+        content = content | mo.between(1, 12).to_numpy()
+    if spec["hstand"]:
+        content = content | lab[spec["hstand"]].astype("string").isin(["Association de cultures", "Pure"]).to_numpy()
     out = pd.DataFrame({"i": _household(code, wave).map(lambda x: m.get(x, x)).values,
-                        "crop": lab[spec["hcrop"]].astype("string").str.strip().map(crops).values})
-    return out.dropna(subset=["crop"]).groupby(["i", "crop"]).size().rename("n").reset_index()
+                        "crop": lab[spec["hcrop"]].astype("string").str.strip().map(crops).values,
+                        "content": content}).dropna(subset=["crop"])
+    per = out.groupby(["i", "crop"])["content"].agg(["size", "sum"])
+    return per["sum"].where(per["sum"] > 0, per["size"]).rename("n").reset_index()
 
 
 @pytest.fixture(scope="module")

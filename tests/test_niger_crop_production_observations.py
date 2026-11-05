@@ -49,8 +49,8 @@ INDEX = ["t", "i", "plot_id", "crop", "u", "condition", "production_obs"]
 #: Served rows per wave, cold rebuild after GH #1360 (before: 11,937 / 8,799
 #: / 13,717 / 11,923 = 46,376).
 #: 2011-12 was 11,967 before GH #1462 served section 3E's 575 dry-season lines.
-#: Re-pinned for GH #1457: 2014-15 + 517 and 2021-22 + 553 Farm-level sale rows.
-ROWS = {"2011-12": 12542, "2014-15": 8799 + 517, "2018-19": 13717, "2021-22": 12933 + 553}
+#: Re-pinned for GH #1457: 2014-15 + 498 and 2021-22 + 553 Farm-level sale rows.
+ROWS = {"2011-12": 12542, "2014-15": 8799 + 498, "2018-19": 13717, "2021-22": 12933 + 553}
 #: production_obs token kind served in each wave.
 KIND = {"2011-12": "reported", "2014-15": "unresolved_observation",
         "2018-19": "unresolved_observation", "2021-22": "row"}
@@ -143,7 +143,8 @@ class TestDeclared:
     @pytest.mark.parametrize("wave", ("2014-15", "2021-22"))
     def test_crop_level_sale_needs_one_harvest_line(self, wave):
         src = _script(wave)
-        assert "lines_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop']).size()" in src
+        # Re-pinned for GH #1457: the served lines; a line the API removes does not count.
+        assert "lines_per = df[serving].dropna(subset=['i', 'crop']).groupby(['i', 'crop']).size()" in src
         assert "single = lines_per[lines_per == 1].index" in src
         assert "['plot_id'].nunique()" not in src, f"{wave}: the single-PLOT rule is back"
 

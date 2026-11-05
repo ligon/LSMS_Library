@@ -735,6 +735,25 @@ def is_crop_sale(frame):
             | pd.to_numeric(frame['Value_sold'], errors='coerce').astype('float64').gt(0))
 
 
+def served_harvest_lines(df):
+    """True on a harvest line a crop-level sale can sit on: one that will be SERVED.
+
+    A line with no quantity, month, stand or native state is all-NA on its columns, so
+    ``_finalize_result``'s ``dropna(how='all')`` removes it at the API unless a sale
+    keeps it.  So it does not count as a line of its crop, and does not take the sale,
+    where the crop has a line that does serve.  A crop with no such line keeps all of
+    its lines: one alone takes its sale, as a lone line always has, and two or more
+    mean a Farm-level row.  (GH #1457: 19 sales in 2014-15; none in 2021-22, whose
+    lines carry ``intercropped``.)
+    """
+    columns = [c for c in ('Quantity', 'harvest_month', 'intercropped', 'condition_native')
+               if c in df.columns]
+    content = df[columns].notna().any(axis=1)
+    keys = ['i', 'crop']
+    any_content = content.groupby([df[k] for k in keys], dropna=False).transform('any')
+    return (content | ~any_content).to_numpy(dtype=bool)
+
+
 def derive_hh_crop_sale_attachment(harvest, records):
     """``harvest`` with ONE new row for each sale the line rule did not attach.
 
@@ -799,6 +818,14 @@ def inputs_hh_crop_sale_single_row(wave):
         return out
 
     lines = read(spec['harvest'], spec['harvest_crop'], spec['hh']).dropna(subset=['i', 'crop'])
+    # The same count as the wave script's: the served lines.
+    lines = lines.assign(
+        Quantity=_na_exact(lines[spec['harvest_qty']], spec.get('qty_codes', ())),
+        harvest_month=(pd.to_numeric(lines[spec['harvest_month']], errors='coerce').where(
+            lambda m: m.between(1, 12)) if spec.get('harvest_month') else pd.NA),
+        intercropped=(pd.to_numeric(lines[spec['harvest_stand']], errors='coerce').where(
+            lambda v: v.isin([1, 2])) if spec.get('harvest_stand') else pd.NA))
+    lines = lines[served_harvest_lines(lines)]
     per_pair = lines.groupby(['i', 'crop']).size().rename('_lines').reset_index()
     sale = read(spec['sale'], spec['sale_crop'], spec['hh'])
     if spec.get('drop_repeats'):
@@ -818,11 +845,13 @@ _HH_SALE_SOURCE = {
     '2014-15': dict(harvest='NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E1P2.dta',
                     sale='NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E2P2.dta',
                     harvest_crop='CULTURE', sale_crop='AS02EQ110B',
+                    harvest_qty='AS02EQ07A', harvest_month='AS02EQ06A',
                     hh=['GRAPPE', 'MENAGE', 'EXTENSION'],
                     qty='AS02EQ12A', value='AS02EQ13', qty_codes=(9999,), value_codes=(9999999,),
                     raw=['AS02EQ110B', 'AS02EQ12A', 'AS02EQ12B', 'AS02EQ13']),
     '2021-22': dict(harvest='s16c_me_ner2021.dta', sale='s16d_me_ner2021.dta',
                     harvest_crop='s16cq04', sale_crop='s16dq01', hh=['grappe', 'menage'],
+                    harvest_qty='s16cq16a', harvest_stand='s16cq07',
                     qty='s16dq05a', value='s16dq06', drop_repeats=True,
                     raw=['s16dq01', 's16dq05a', 's16dq05b', 's16dq05d', 's16dq06']),
 }
