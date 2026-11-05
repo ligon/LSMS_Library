@@ -7,7 +7,7 @@
 # Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
 
 Benin::food_acquired::7day-purchase-at-last-purchase-unit-value:
-  waves: ['2018-19']
+  waves: ['2018-19', '2021-22']
   columns: [Expenditure]
   rows: {s: purchased}
   rule: >-
@@ -54,7 +54,10 @@ Benin::food_acquired::7day-purchase-at-last-purchase-unit-value:
         4,143 because the last purchase used a different unit CODE, 3,740
         because it used the same code in a different SIZE (Petit / Moyen /
         Grand / Taille unique), which is a different container and so a
-        different price per unit.
+        different price per unit.  2021-22: 16,429 of the 156,999 SERVED purchased rows
+        (10.5%).  On source rows with a purchased quantity, 16,467 of 157,826: 11,289 with
+        no last purchase, 4,037 in a different unit code, 1,141 in the same code at a
+        different size.
       basis: variable-label
       evidence: >-
         no EHCVM wave distributes a unit-conversion table;
@@ -68,6 +71,7 @@ Benin::food_acquired::7day-purchase-at-last-purchase-unit-value:
         7-day consumption s07bq03a (which would put the value of own-produced
         and gifted food into Expenditure) and B = net of own production only.
         2018-19: A 75,023,618, B 73,221,530, C (served) 68,929,997 FCFA, against a raw s07bq08 total of 87,287,927.
+        2021-22: A 94,742,444, B 92,634,171, C (served) 82,870,829 FCFA, against a raw s07bq08 total of 111,687,482.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
     - text: >-
@@ -79,6 +83,7 @@ Benin::food_acquired::7day-purchase-at-last-purchase-unit-value:
         it is checked and not served.  Own production keeps the identical
         treatment it already had (s = 'produced' from s07bq04, Expenditure NA).
         2018-19: 18,632 inkind rows carrying 53,318 units, 0 with an Expenditure.
+        2021-22: 27,522 inkind rows carrying 77,695 units, 0 with an Expenditure.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
   validated_against: >-
@@ -93,6 +98,14 @@ Benin::food_acquired::7day-purchase-at-last-purchase-unit-value:
     rows are served with Expenditure NA rather than with that imputation.  The
     instrument is the same in all twelve waves (identical s07bq0* Stata
     labels), so the reading carries by inference, not by measurement here.
+    2021-22, ehcvm_conso_ben2021.dta, whose codpr does share s07bq01's codes: on the 1,245
+    (household, product) rows where the candidates differ and an Achat row exists, the rule
+    x 365/7 is within 1% of depan(Achat) for 90.6%, against 22.6% for the own-production-only
+    residual and 0.3% for the gross quantity; s07bq05 * uv is within 1% of depan(Don) for
+    90.6% of 14,014 rows; median ratio over all 141,359 joined rows 1.0.  THIS VALIDATES THE
+    ARITHMETIC, NOT THE QUANTITY: a rescaled s07bq03a would pass it, as Togo 2021-22's does.
+    What says this quantity is not rescaled is its own grid and q3/q4 mode, in
+    _/CONTENTS.org, "2021-22 wired".
   contents: 'Benin/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
 

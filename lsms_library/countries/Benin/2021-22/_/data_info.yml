@@ -338,3 +338,34 @@ food_security:
                 Non: False
                 Ne sait pas: null
                 Refus: null
+
+food_acquired:
+    # A full grid: 1,333,313 rows, 204,206 consumed (s07bq02 = Oui), where 2018-19's
+    # file holds the 187,672 consumed lines only.  The rest record nothing and the
+    # reshape drops them.
+    file: s07b_me_ben2021.dta
+    idxvars:
+        v: grappe
+        visit: vague
+        i:
+            - grappe
+            - menage
+        j:
+            - s07bq01
+            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+        u: s07bq03b
+    myvars:
+        Quantity: s07bq03a
+        Produced: s07bq04
+        # GH #876.  Expenditure is derived by mapping.food_acquired, as in 2018-19; these
+        # raw inputs feed that hook and are dropped by the reshape.
+        GiftQuantity: s07bq05
+        # Read through mapping.ConsumptionUnitCode and mapping.LastPurchaseUnitCode: each
+        # of the file's two unit variables lacks a label the other has, and unit_match
+        # reads labels.
+        ConsumptionUnitCode: s07bq03b
+        ConsumptionUnitSize: s07bq03c
+        LastPurchaseQuantity: s07bq07a
+        LastPurchaseUnitCode: s07bq07b
+        LastPurchaseUnitSize: s07bq07c
+        LastPurchaseValue: s07bq08

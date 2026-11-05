@@ -44,7 +44,7 @@ from lsms_library.paths import countries_root
 #: The EHCVM 2018+ waves, country -> waves.
 WAVES = {
     'Togo': ['2018', '2021-22'],
-    'Benin': ['2018-19'],
+    'Benin': ['2018-19', '2021-22'],
     'Guinea-Bissau': ['2018-19'],
     'Senegal': ['2018-19', '2021-22'],
     'Mali': ['2018-19', '2021-22'],
@@ -62,6 +62,7 @@ BEFORE_SUM = {
     ('Togo', '2018'): 44_452_024.0,
     ('Togo', '2021-22'): 45_908_210.33,
     ('Benin', '2018-19'): 87_287_926.96,
+    ('Benin', '2021-22'): 111_687_481.85,
     ('Guinea-Bissau', '2018-19'): 91_353_379.75,
     ('Senegal', '2018-19'): 171_946_367.74,
     ('Senegal', '2021-22'): 185_854_824.98,
@@ -85,6 +86,7 @@ AFTER = {
     ('Togo', '2018'): (31_676_794.87, 10_213),
     ('Togo', '2021-22'): (34_464_072.25, 10_579),
     ('Benin', '2018-19'): (68_929_996.70, 18_645),
+    ('Benin', '2021-22'): (82_870_829.43, 27_522),
     ('Guinea-Bissau', '2018-19'): (57_552_942.85, 13_818),
     ('Senegal', '2018-19'): (147_345_570.63, 10_802),
     ('Senegal', '2021-22'): (182_628_314.17, 10_917),
@@ -103,7 +105,8 @@ AFTER = {
 SIZES = {
     'Benin': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Sans brassée',
               'Avec 1 brassée', 'Avec 2 brassées', 'A 2 doigts', 'A 3 doigts',
-              'A 5 doigts', 'Autre taille'},
+              'A 5 doigts', 'Autre taille', 'Très petit', 'Très grand', 'Entier',
+              'Huitième'},
     'Burkina_Faso': {'Petit', 'Moyen', 'Grand'},
     'CotedIvoire': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier'},
     'Guinea-Bissau': {'Pequeno', 'Medio', 'Grande'},

@@ -4,6 +4,12 @@ import pandas as pd
 
 import lsms_library.local_tools as tools
 
+from lsms_library.ehcvm import (
+    derivation_key as _derivation_key,
+    food_acquired_ehcvm as _food_acquired_ehcvm,
+    inputs_last_purchase as _inputs_last_purchase,
+)
+
 #: `i` of this wave.  6,994 of the 8,032 (grappe, menage) keys also occur in 2018-19.
 #: No link is served (GH #552), so the ids must not be able to meet.
 ID_PREFIX = 'E2_'
@@ -160,4 +166,43 @@ def food_security(df):
     df = df.copy()
     df['FIES_score'] = score.astype('Int64')
     return df
+
+
+FOOD_ACQUIRED_DERIVATION = _derivation_key('Benin')
+
+#: s07bq03b and s07bq07b label one code book twice, and each lacks a code the other has:
+#: 102 has no label in s07bq03b (47 rows) and is `Alvéole` in s07bq07b (126); 207 is
+#: `Chaîne en bois` in s07bq03b (41) and has none in s07bq07b (13).  The questionnaire's
+#: unit list prints both (PDF pp. 113-115).  A code with no label arrives as a number, so
+#: unit_match would read it as another unit and the row would serve Expenditure NA.  The
+#: other five differences fold under `_unit_key`: Kg/kg, Boite/Boîte, Bol/bol,
+#: Morceau/morceau, Tongolo/tongolo.
+_CONSUMPTION_UNIT_WITHOUT_LABEL = {102: 'Alvéole'}
+_PURCHASE_UNIT_WITHOUT_LABEL = {207: 'Chaîne en bois'}
+
+
+def _named_code(value, names):
+    if isinstance(value, (int, float, np.integer, np.floating)) and pd.notna(value):
+        return names.get(int(value), value)
+    return value
+
+
+def ConsumptionUnitCode(value):
+    '''s07bq03b, with the label this variable lacks.'''
+    return _named_code(value, _CONSUMPTION_UNIT_WITHOUT_LABEL)
+
+
+def LastPurchaseUnitCode(value):
+    '''s07bq07b, with the label this variable lacks.'''
+    return _named_code(value, _PURCHASE_UNIT_WITHOUT_LABEL)
+
+
+def food_acquired(df):
+    '''GH #876: purchased Quantity x s07bq08 / s07bq07a, keyed; size in u (GH #1224).'''
+    return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+
+
+def inputs_food_acquired(wave):
+    """The registry `inputs` callable: raw section-7B answers at (t, i, j)."""
+    return _inputs_last_purchase('Benin', wave)
 
