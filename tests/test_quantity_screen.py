@@ -552,7 +552,9 @@ def test_a_broken_audit_never_breaks_a_read(monkeypatch):
 #: A string that appears in ``quantity_audit``'s SOURCE and nowhere else in
 #: the library, so "did the fingerprint walk reach this module" can be answered
 #: by searching the fingerprint parts rather than by trusting a name.
-_SOURCE_TOKEN = "QUANTITY_REFERENCE_FLOOR"
+# GH #1493: the ladder now takes its floors as arguments, so this names the
+# constant its body still reads.
+_SOURCE_TOKEN = "QUANTITY_MIN_CELL"
 
 _EXCLUDED_ENTRY_POINTS = (
     "lsms_library.quantity_audit.check_quantities",

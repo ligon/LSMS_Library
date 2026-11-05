@@ -86,7 +86,7 @@ from .null_index_audit import check_index_levels
 from .null_index_audit import (NullIndexKeyError, NullIndexKeyWarning,
                                _NULL_INDEX_LEDGER,
                                _read_strict as _null_index_strict)
-from .quantity_audit import check_quantities
+from .quantity_audit import QuantityImplausibleError, check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
 from .sampling import (attach as attach_sampling, check_cluster_identity,
@@ -6789,7 +6789,10 @@ class Country:
                             "falling back to legacy aggregation", name, exc)
                         derived = None
                     except (EmptyCategoricalTableError, CategoricalMappingConflictError,
-                            CategoricalKeyDeclarationError):
+                            CategoricalKeyDeclarationError, QuantityImplausibleError):
+                        # GH #1493: the strict screen is a RuntimeError, and the
+                        # legacy path would report it as "no wave-level build
+                        # succeeded", after rebuilding what it could.
                         raise
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
                         if subset_kg:
