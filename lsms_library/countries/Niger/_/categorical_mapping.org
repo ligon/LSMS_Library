@@ -590,6 +590,7 @@
 | Caramel, bonbons, confiseries, etc                                                        | Caramel, bonbons, confiseries, etc                                                   |
 | 90. Carotte                                                                               | Carotte                                                                              |
 | Carotte                                                                                   | Carotte                                                                              |
+| carotte                                                                                   | Carotte                                                                              |
 | 41. Carpes fraîches                                                                       | Carpes fraîches                                                                      |
 | Carpes fraÃ®ches                                                                          | Carpes fraîches                                                                      |
 | 36. Charcuterie (jambon, saucisson), conserves de viandes                                 | Charcuterie (jambon, saucisson), conserves de viandes                                |
@@ -1009,7 +1010,7 @@
 #
 # TAXONOMY (the Preferred Labels, a sensible shared input vocabulary):
 #   Organic manure / Organic compost   (organic fertilizers)
-#   Urea / DAP / NPK / Phosphate / Mixed fertilizer  (inorganic fertilizers)
+#   Urea / DAP / NPK / NPK 15-15-15 / Phosphate / Mixed fertilizer  (inorganic)
 #   Pesticide / Herbicide / Fungicide / Other phytosanitary  (phytosanitary)
 #   Seed                                 (all seed slots collapse to Seed;
 #                                         the seed's crop is carried in the
@@ -1021,6 +1022,17 @@
 # Seed here and its crop is resolved by the companion harmonize_seed_crop
 # table below.  ECVMA code 6 'Mélange' (an unspecified inorganic blend)
 # -> Mixed fertilizer; EHCVM has no such code (it splits DAP/phosphate).
+#
+# THE NPK SLOT IS TWO LABELS, ONE PER PROGRAMME (GH #1445, ruling @ligon
+# 2026-11-04).  Only ECVMA states a grade: code 5 is "npk 15/15" (2011-12, whose
+# questionnaire asks "How much NPK(15/15)") and "NPK 15/15" (2014-15, whose
+# questionnaire prints "NPK (15/15/15)" and "NPK 15/15/15"), so it is served as
+# `NPK 15-15-15`, which transformations._NITROGEN_CONTENT keys at 0.15 N (the
+# Malawi `NPK 23:21:0+4S Fertilizer` pattern, GH #1106).  EHCVM's code 5 says
+# "NPK/Formule unique" and NO held document gives its grade, so it keeps the
+# bare `NPK` and the map's nominal 0.17 (NPK 17-17-17), which is a default and
+# not a reading.  Niger's `input` axis therefore splits across the programmes:
+# compare the two labels knowingly.  Evidence: CONTENTS.org.
 #
 # Referenced from the wave-level _/plot_inputs.py via
 #   tools.get_categorical_mapping('harmonize_input','Original Label','Preferred Label').
@@ -1039,8 +1051,8 @@
 | engrais inorganiques - dap                | DAP                 |
 | Engrais inorganiques - DAP                | DAP                 |
 | DAP et autres engrais inorganiques        | DAP                 |
-| engrais inorganiques - npk 15/15          | NPK                 |
-| Engrais inorganiques - NPK 15/15          | NPK                 |
+| engrais inorganiques - npk 15/15          | NPK 15-15-15        |
+| Engrais inorganiques - NPK 15/15          | NPK 15-15-15        |
 | Engrais inorganiques - NPK/Formule unique | NPK                 |
 | Engrais inorganiques - Phosphates         | Phosphate           |
 | engrais inorganiques - mélange            | Mixed fertilizer    |
@@ -1252,6 +1264,9 @@
 # carry it (onion, okra, roselle, tomato, cassava: a whole product with no shell
 # to speak of), so both land on `shell_not_applicable`, a survey ANSWER and not
 # the missing-data sentinel `unknown_condition`.
+# Condition_sold reads these two tables too (GH #1462): 2018-19 s16cq16c has this
+# code list, and 2021-22 s16dq05d has these codes under its own labels (1
+# epis/coques/panicules, 2 grains, 3 na).  A blank there stays NA.
 #+NAME: harmonize_crop_condition_ehcvm1
 | Code | Preferred Label      | Source Label   |
 |------+----------------------+----------------|

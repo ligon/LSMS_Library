@@ -86,7 +86,8 @@ EXPECTED_ROWS = {
     # 46,341 before the 2026-09-24 Niger bundle; 46,376 before GH #1360, whose
     # production_obs level stops the collapse destroying repeated harvest lines
     # (2011-12 +30, 2021-22 +1,010).
-    "crop_production": 47416,
+    # 47,416 before GH #1462 served section 3E's 575 dry-season lines.
+    "crop_production": 47991,
     # 239,031 before GH #876.  The derived purchase value drops rows whose
     # purchased quantity is zero and which used to survive on the raw s07bq08
     # (and the gift subtraction moves more of them to zero); s07bq05 then adds
@@ -106,11 +107,12 @@ EXPECTED_ROWS = {
     # rows (below): the 795 unit-less CS07 observations are dropped, not
     # filled (CONTENTS.org).  GH #823 then wired 2018-19 (EHCVM s05): +84,444
     # rows, none of them `Unknown` (every s05 unit-size code names a unit), and
-    # the 46,043 CS07 rows unchanged.
-    "community_prices": 130487,
+    # the 46,043 CS07 rows unchanged.  GH #1087 serves a CS07 record's first
+    # entry: -30 (the obs 4-6 rows, 15 + 15), 130,487 -> 130,457.
+    "community_prices": 130457,
 }
 EXPECTED_SENTINEL = {
-    "crop_production": 4950,    # 4,920 before GH #865 dropped 11 all-sentinel lines; 4,909 before GH #1360
+    "crop_production": 4976,    # 4,920 before GH #865 dropped 11 all-sentinel lines; 4,909 before GH #1360; 4,950 before GH #1462 (+26: 3E's no-unit lines)
     "food_acquired": 8,      # 12 before GH #876; one of the 8 is an inkind row
     "plot_inputs": 74,          # 75 before GH #865 dropped the one 9999 line
     "community_prices": 0,
@@ -118,7 +120,7 @@ EXPECTED_SENTINEL = {
 # Per-wave sentinel counts, so a wave-script regression cannot hide inside a
 # country total that happens to add up.
 EXPECTED_SENTINEL_BY_WAVE = {
-    "crop_production": {"2011-12": 3145, "2014-15": 373, "2018-19": 441, "2021-22": 991},  # 2011-12 3,146 before GH #865; 3,135 / 960 before GH #1360
+    "crop_production": {"2011-12": 3171, "2014-15": 373, "2018-19": 441, "2021-22": 991},  # 2011-12 3,146 before GH #865; 3,135 / 960 before GH #1360; 3,145 before GH #1462
     "food_acquired": {"2018-19": 0, "2021-22": 8},   # 12 before GH #876
     "plot_inputs": {"2011-12": 44, "2014-15": 15, "2018-19": 2, "2021-22": 13},   # 2021-22 14 before GH #865
     "community_prices": {"2011-12": 0, "2014-15": 0, "2018-19": 0},  # 2018-19: GH #823

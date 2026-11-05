@@ -34,8 +34,11 @@ Niger's second source records are duplicate ENTRIES of one questionnaire
 ``numquest``), not second readings.  The first cut enumerated every one of
 their slots as ``obs`` 4-6, so 134 served rows (2011-12 17, 2014-15 117)
 repeated an already-served row in every column but ``obs`` (red team r1);
-``_community_price_triples`` now drops those, and the 30 slots that repeat
-nothing stay as ``obs`` 4-6.
+``_community_price_triples`` now drops those.  The 30 slots that repeat nothing
+were ``obs`` 4-6 until GH #1087 (ruling @ligon 2026-11-04): a record's first
+entry is served, and ``second_entry_disagrees`` marks a record whose second entry
+disagrees; ``tests/test_gh1087_niger_second_entries.py`` pins that against the
+raw grids.  Niger's rows and cells below are after it.
 
 GH #840 kept the number of (t, v, j, u) CELLS unchanged. GH #822 restores
 Mali readings 1/2 and expands those cells 23,646 -> 39,245 while retaining
@@ -85,8 +88,9 @@ EXPECTED_ROWS = {
     # 2018-19 since #1356 (a06b7a62f): two quotes per s05 source row, 2 x 54,669;
     # `test_mali_2018_19_serves_both_quotes_of_every_source_row` reads the source.
     "Mali": {"2014-15": 155931, "2018-19": 109338},
-    # 32,369 / 13,808 before the r1 duplicate-entry drop (-17 / -117).
-    "Niger": {"2011-12": 32352, "2014-15": 13691, "2018-19": 84444},
+    # 32,369 / 13,808 before the r1 duplicate-entry drop (-17 / -117); 32,352 /
+    # 13,691 before GH #1087 served a record's first entry only (-15 / -15).
+    "Niger": {"2011-12": 32337, "2014-15": 13676, "2018-19": 84444},
     "Tanzania": {"2019-20": 3076, "2020-21": 14623},
 }
 EXPECTED_CELLS = {
@@ -94,7 +98,8 @@ EXPECTED_CELLS = {
     # GH #1090: 8,923 / 6,500 before CS07 rice variety 7031 moved from
     # `Autre Riz local` to `Riz importé non parfumé`; the +56 / +16 are exactly
     # the (t, v, u) rice cells that priced BOTH 7031 and 7032 and now split.
-    "Niger": {"2011-12": 8979, "2014-15": 6516, "2018-19": 42087},
+    # 8,979 / 6,516 before GH #1087: -3 / -2 cells held only by a second entry.
+    "Niger": {"2011-12": 8976, "2014-15": 6514, "2018-19": 42087},
     "Tanzania": {"2019-20": 2769, "2020-21": 13062},
 }
 
@@ -229,7 +234,8 @@ class TestNigerDuplicateEntries:
 
     A second source record for one (grappe, variety) is a duplicate ENTRY of
     the questionnaire (red team r1): a slot of it that repeats a served row is
-    dropped, a slot that repeats nothing is served as ``obs = slot + 3``."""
+    dropped.  A slot that repeats nothing was served as ``obs = slot + 3`` until
+    GH #1087; it is now not served, and it flags the first entry's rows."""
 
     TRIPLES = [("cs07q04", "cs07q05", "cs07q03"),
                ("cs07q06", "cs07q07", "cs07q03"),
@@ -251,9 +257,11 @@ class TestNigerDuplicateEntries:
         out = niger._community_price_triples(
             labels, {"Mil": "Millet"}, {"Kg": "Kg", "Gramme": "Gramme"},
             self.TRIPLES, codes=codes)
-        return out.set_index("obs")[["u", "Price", "Quantity"]]
+        return out.set_index("obs")[["u", "Price", "Quantity",
+                                     "second_entry_disagrees"]]
 
-    def test_a_repeated_slot_is_dropped_and_a_new_one_kept(self, niger_module):
+    def test_a_repeated_slot_is_dropped_and_a_new_one_flags(self, niger_module):
+        # Re-pinned for GH #1087: slots 5, 6 were served as obs 5, 6.
         nan = float("nan")
         out = self._triples(niger_module, [
             # numquest 1: slots 1, 2 priced, slot 3 empty
@@ -261,30 +269,37 @@ class TestNigerDuplicateEntries:
             # numquest 2: slot 1 repeats, slot 2 disagrees, slot 3 is new
             (212, 2, 701, 7011, 1, 100.0, 2.0, 175.0, 3.0, 200.0, 4.0),
         ])
-        assert sorted(out.index) == [1, 2, 5, 6]
-        assert out.loc[5, "Price"] == 175.0 and out.loc[6, "Price"] == 200.0
+        assert sorted(out.index) == [1, 2]
+        assert out["Price"].tolist() == [100.0, 150.0]
+        assert out["second_entry_disagrees"].tolist() == [True, True]
 
     def test_a_conflicting_unit_is_not_a_repeat(self, niger_module):
         # Same Price and Quantity under another unit code: one of the two is a
-        # keying error and nothing here can say which, so both are served.
+        # keying error and nothing here can say which, so it is not a copy.
+        # Re-pinned for GH #1087: both were served; the first entry now is.
         nan = float("nan")
         out = self._triples(niger_module, [
             (61, 1, 701, 7011, 2, 250.0, 192.0, nan, nan, nan, nan),
             (61, 2, 701, 7011, 1, 250.0, 192.0, nan, nan, nan, nan),
         ])
-        assert out["u"].to_dict() == {1: "Gramme", 4: "Kg"}
+        assert out["u"].to_dict() == {1: "Gramme"}
+        assert out["second_entry_disagrees"].tolist() == [True]
 
     def test_a_byte_identical_row_does_not_count_as_a_record(self, niger_module):
         # 2011-12 p2 re-ships whole grappe blocks.  The byte-identical copy is
         # dropped before ranking, so a genuinely different record after it is
-        # the SECOND record (obs 4-6), not the third (obs 7-9).
+        # the SECOND record, not the third: the rank that decides what is served
+        # (was obs 4-6 against 7-9, before GH #1087).
         nan = float("nan")
-        out = self._triples(niger_module, [
+        labels, codes = self._grids([
             (53, 1, 701, 7011, 1, 100.0, 2.0, nan, nan, nan, nan),
             (53, 1, 701, 7011, 1, 100.0, 2.0, nan, nan, nan, nan),
             (53, 1, 701, 7011, 1, 125.0, 2.0, nan, nan, nan, nan),
         ])
-        assert sorted(out.index) == [1, 4]
+        slots = niger_module._community_price_slots(
+            labels, {"Mil": "Millet"}, {"Kg": "Kg"}, self.TRIPLES, codes=codes)
+        assert slots["rank"].tolist() == [0, 1]
+        assert slots["source_row"].tolist() == [0, 2]
 
     def test_the_tail_accepts_the_result(self, niger_module):
         nan = float("nan")
@@ -295,7 +310,7 @@ class TestNigerDuplicateEntries:
         long = niger_module._community_price_triples(
             labels, {"Mil": "Millet"}, {"Kg": "Kg"}, self.TRIPLES, codes=codes)
         out = niger_module._finish_community_prices(long, "2014-15")
-        assert out.index.is_unique and len(out) == 4
+        assert out.index.is_unique and len(out) == 2   # 4 before GH #1087
         assert "slot" not in out.columns
 
 
@@ -372,12 +387,12 @@ class TestNigerQuantitySentinels:
         assert out.loc[1, "Price"] == price
         assert out.loc[1, "Quantity"] == 1.0
 
-    @pytest.mark.parametrize("second_quantity, expected_obs", [
-        (1.0, [1, 4]),  # The held-source tail: a reported weight is distinct.
-        (9999.9, [1]),  # Exact normalized content repeats are still copies.
+    @pytest.mark.parametrize("second_quantity, disagrees", [
+        (1.0, True),  # The held-source tail: a reported weight is distinct.
+        (9999.9, False),  # Exact normalized content repeats are still copies.
     ])
     def test_second_record_uses_existing_content_equality(
-            self, niger_module, second_quantity, expected_obs):
+            self, niger_module, second_quantity, disagrees):
         nan = float("nan")
         labels, codes = TestNigerDuplicateEntries._grids([
             (1, 1, 701, 7011, 1, 100.0, 9999.900390625, nan, nan, nan, nan),
@@ -386,11 +401,11 @@ class TestNigerQuantitySentinels:
         out = niger_module._community_price_triples(
             labels, {"Mil": "Millet"}, {"Kg": "Kg"},
             TestNigerDuplicateEntries.TRIPLES, codes=codes).set_index("obs")
-        assert out.index.tolist() == expected_obs
+        # Re-pinned for GH #1087: the distinct weight was served as obs 4.
+        assert out.index.tolist() == [1]
         assert out["Price"].eq(100.0).all()
         assert pd.isna(out.loc[1, "Quantity"])
-        if second_quantity == 1.0:
-            assert out.loc[4, "Quantity"] == 1.0
+        assert out.loc[1, "second_entry_disagrees"] == disagrees
 
 
 # The CS07 waves (three slots per record); 2018-19 is s05 (two slots).
@@ -485,17 +500,16 @@ class TestBuilt:
         cell = df.loc[("2020-21", "01-06-47-85", "Millet & Sorghum (grain)", "Kg")]
         assert cell["Price"].to_dict() == {"6": 2000.0, "7": 16000.0}
 
-    def test_niger_second_records_are_slots_four_to_six(self):
+    def test_niger_second_records_are_not_observations(self):
+        # Re-pinned for GH #1087, which moved these rows off the table: obs 4-6
+        # held {2011-12: 32, 2014-15: 132} before the r1 duplicate-entry drop
+        # and {15, 15} after it.  Their record's first entry now carries a flag.
         df = _build("Niger")
         df = df[df.index.get_level_values("t").isin(NIGER_CS07)]
-        obs = df.index.get_level_values("obs")
-        assert set(obs) <= {1, 2, 3, 4, 5, 6}
-        late = df[obs > 3]
-        # {2011-12: 32, 2014-15: 132} before the r1 duplicate-entry drop: 134
-        # of those 164 rows repeated a served row (the test below).
-        assert late.groupby(level="t").size().to_dict() == {"2011-12": 15, "2014-15": 15}
+        assert set(df.index.get_level_values("obs")) <= {1, 2, 3}
+        flagged = df[df["second_entry_disagrees"].astype("boolean").fillna(False)]
         # 2014-15's second records are one grappe's second questionnaire.
-        assert set(late.xs("2014-15", level="t").index.get_level_values("v")) == {"212"}
+        assert set(flagged.xs("2014-15", level="t").index.get_level_values("v")) == {"212"}
 
     def test_niger_no_second_record_repeats_a_served_row(self):
         # Red team r1: a second source record is a duplicate ENTRY, so a slot

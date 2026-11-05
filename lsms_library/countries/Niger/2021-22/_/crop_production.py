@@ -5,7 +5,8 @@ The 2021-22 instrument SPLITS the crop module that 2018-19 kept together:
     s16cq16b) and the intercrop flag (s16cq07).  One row per reported
     (field, parcel, crop) harvest line.
   - s16d_me_ner2021.dta : CROP level (no plot) — sold qty + unit (s16dq05a /
-    s16dq05b -> the ``Unit_sold`` column, GH #824) and sale value (s16dq06).
+    s16dq05b -> the ``Unit_sold`` column, GH #824), sold state (s16dq05d -> the
+    ``Condition_sold`` column, GH #1462) and sale value (s16dq06).
     Its crop-level lines are REPLICATED once per plot; exact duplicates are
     dropped before the sale is attributed (see the comment in the sale block).
 
@@ -34,8 +35,8 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
-                   _crop_conditions, _finish_crop_production,
-                   _crop_row_observations)
+                   _crop_conditions, _crop_sold_conditions,
+                   _finish_crop_production, _crop_row_observations)
 
 
 crop_map, unit_map = _crop_maps()
@@ -101,19 +102,24 @@ sold_df = pd.DataFrame({
     # the harvest unit s16cq16b ('tiya', 'sac de 100kg', 'panier', ...); the
     # `u` table carries both spellings -- GH #824.  Part of the KEY below.
     'Unit_sold':     _unit_labels(sold['s16dq05b'], unit_map).values,
+    # The SOLD state (s16dq05d).  Its labels are not the harvest's
+    # ('epis/coques/panicules' against 'epis/coques,'), its codes are (GH #1462).
+    'Condition_sold': _crop_sold_conditions(soldn['s16dq05d'],
+                                            'harmonize_crop_condition_ehcvm2').values,
 })
-# One sale record per (household, crop, SOLD UNIT) -- never a sum across
-# units.  After the de-duplication above every sale-bearing pair is one
-# row, so the sum only merges a pair's unsold placeholder lines.
+# One sale record per (household, crop, SOLD UNIT, SOLD STATE) -- never a sum
+# across units or states.  After the de-duplication above every sale-bearing
+# pair is one row, so the sum only merges a pair's unsold placeholder lines.
 sold_df = sold_df.dropna(subset=['i', 'crop'])
-sold_one = (sold_df.groupby(['i', 'crop', 'Unit_sold'], as_index=False, dropna=False)
+sold_one = (sold_df.groupby(['i', 'crop', 'Unit_sold', 'Condition_sold'],
+                            as_index=False, dropna=False)
             [['Quantity_sold', 'Value_sold']].sum(min_count=1))
 
 # Attribute ONLY to (i, crop) pairs with exactly one harvest LINE in the
 # harvest block -- one plot, one line, so the sale lands on one served row
 # (no fabricated split across plots or lines; GH #1360) -- AND sold in a
-# single unit (no fabricated conversion across units -- a second unit would
-# duplicate the harvest row).  Measured: no pair sells in two units.
+# single unit and state (no fabricated conversion -- a second one would
+# duplicate the harvest row).  Measured: no pair sells in two units or states.
 lines_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop']).size()
 single = lines_per[lines_per == 1].index
 units_per = sold_one.groupby(['i', 'crop']).size()

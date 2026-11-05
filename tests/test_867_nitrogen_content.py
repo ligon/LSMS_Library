@@ -41,7 +41,8 @@ The citations, repeated here because the ruling asks for them in the test:
   FAO & GoM, *Soil nutrient loss assessment in Malawi* (2018), p. IX:
   "23:21:0+4S (also known as Chitowe)".  The WB panel (``MWI_IHPS1.do:776``,
   ``NPK_kg * 0.23``) and EPAR (``0.23*(itemcode==1)``) credit code 1 the same.
-  The shared ``npk`` key stays NPK 17-17-17 for every other country.
+  The shared ``npk`` key stays NPK 17-17-17 for every other label (Niger's ECVMA
+  ``NPK 15-15-15`` has its own key, GH #1445, ``tests/test_niger_npk_grade.py``).
 * **Organic: no share.**  Refused, by ruling; the measured reasons are in
   the comment above ``_NITROGEN_CONTENT``.
 

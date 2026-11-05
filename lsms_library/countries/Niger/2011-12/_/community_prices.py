@@ -10,14 +10,15 @@ observations is a (price, quantity, UNIT) triple with its OWN unit column:
   (cs07q06, cs07q07, cs07q08)  observation 2
   (cs07q09, cs07q10, cs07q11)  observation 3
 
-Both passages are read, and every recorded price is served (GH #840) —
-none selected, none averaged: `variety` is the cs07q02 variety code, `visit`
+Both passages are read, and every recorded price of a record's first entry is
+served (GH #840) — none averaged: `variety` is the cs07q02 variety code, `visit`
 the passage (p1 = 1, p2 = 2), `obs` the observation slot 1 / 2 / 3.
 Passage 2 re-ships 150 of its 232 grappes as a second block -- a duplicate
 ENTRY, not a second reading: 13,478 of its 13,500 rows are byte-identical and
 dropped, and of the 22 that differ, every melted slot that repeats a served
 row is dropped too (17 rows; both drops lossless).  The 15 slots that repeat
-nothing are served as obs 4-6 (niger.py::_community_price_triples).  Rows with no usable price, or a missing-marker unit ('produit
+nothing are not served either, and the first entry's rows of those records carry
+`second_entry_disagrees` (GH #1087; niger.py::derive_cs07_first_entry).  Rows with no usable price, or a missing-marker unit ('produit
 absent' / 'manquant' -> 'Unknown' since GH #842), are dropped.  Measured: 795 price-bearing
 observations in this wave (218 passage 1, 577 passage 2) carry no unit value
 at all, and none of them carries a usable Quantity either -- neither a unit
@@ -33,8 +34,8 @@ sys.path.append('../../_/')
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
-from niger import (_community_prices_maps, _community_price_triples,
-                   _finish_community_prices)
+from niger import (CS07_TRIPLES, _community_prices_maps,
+                   _community_price_triples, _finish_community_prices)
 
 
 item_map, unit_map = _community_prices_maps()
@@ -42,11 +43,7 @@ item_map, unit_map = _community_prices_maps()
 base = '../Data/NER_2011_ECVMA_v01_M_Stata8/'
 
 # 2011-12: each observation carries its own unit column.
-triples = [
-    ('cs07q03', 'cs07q04', 'cs07q05'),
-    ('cs07q06', 'cs07q07', 'cs07q08'),
-    ('cs07q09', 'cs07q10', 'cs07q11'),
-]
+triples = CS07_TRIPLES['2011-12']
 
 pieces = []
 for fn, passage in [('ecvmacoms07_p1.dta', 1), ('ecvmacoms07_p2.dta', 2)]:

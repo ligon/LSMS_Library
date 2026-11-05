@@ -6,6 +6,7 @@ import json
 from ligonlibrary.dataframes import from_dta
 import pyreadstat
 import lsms_library.local_tools as tools
+from lsms_library.derivations import MULTI_SEP
 
 
 Waves = {'2011-12': (),
@@ -559,8 +560,10 @@ def _crop_maps():
 CROP_OBS_NA = 'unresolved_observation'
 
 
-def _crop_reported_observations(households, line):
-    """Recorded harvest-line numbers as ``reported:<n>`` tokens (2011-12).
+def _crop_reported_observations(households, line, module=None):
+    """Recorded harvest-line numbers as ``reported:<n>`` tokens (2011-12), or
+    ``reported:<module>:<n>`` for a second module of the same wave, whose line 1
+    is not the first module's (section 3E, GH #1462).
 
     Refuses a missing household or line number and a repeated
     (household, line) pair rather than inventing an ordinal.
@@ -572,7 +575,8 @@ def _crop_reported_observations(households, line):
     keys = pd.DataFrame({'i': np.asarray(households), 'line': numeric.to_numpy()})
     if keys.duplicated().any():
         raise ValueError('Niger crop observations repeat a native household/line number')
-    return 'reported:' + numeric.astype('Int64').astype('string')
+    prefix = 'reported:' if module is None else f'reported:{module}:'
+    return prefix + numeric.astype('Int64').astype('string')
 
 
 def _crop_row_observations(n_rows, source_path, *, script_path):
@@ -627,13 +631,22 @@ def _crop_condition_labels(labels):
     return out.where(out != '', pd.NA)
 
 
+def _crop_sold_conditions(codes, table):
+    """The ``Condition_sold`` column (GH #1462): raw sold-state CODES through the
+    same ``harmonize_crop_condition_*`` table as the harvest level, so the two
+    speak one fold.  Unlike :func:`_crop_conditions`, a blank stays NA and never
+    takes the sentinel: it is a column, with no NaN-key hazard, and NA says no sale
+    or no state recorded (canonical ``data_info.yml``)."""
+    return _map_codes(pd.to_numeric(codes, errors='coerce'), _harmonized_codes(table))
+
+
 def _finish_crop_production(df, t):
     """Common tail: tag t, build the (t, i, plot_id, crop, u, condition,
     production_obs) index, coerce numeric columns, and guarantee the full schema
     column set (including the NA-bearing ``Unit_sold`` column, GH #824).  A wave
     that passes no ``condition`` gets :data:`CONDITION_NA`; one that passes no
     ``production_obs`` gets :data:`CROP_OBS_NA`; one that passes no
-    ``condition_native`` carries NA there."""
+    ``condition_native`` or ``Condition_sold`` carries NA there."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
     # harvest_month: only 2014-15 records it; NaN elsewhere (still carried
@@ -678,11 +691,14 @@ def _finish_crop_production(df, t):
     if 'condition_native' not in df.columns:
         df['condition_native'] = pd.NA
     df['condition_native'] = df['condition_native'].astype('string')
+    if 'Condition_sold' not in df.columns:
+        df['Condition_sold'] = pd.NA
+    df['Condition_sold'] = df['Condition_sold'].astype('string')
     if 'production_obs' not in df.columns:
         df['production_obs'] = CROP_OBS_NA
     df['production_obs'] = df['production_obs'].astype('string')
     keep = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs',
-            'Quantity', 'Quantity_sold', 'Value_sold', 'Unit_sold',
+            'Quantity', 'Quantity_sold', 'Value_sold', 'Unit_sold', 'Condition_sold',
             'harvest_month', 'intercropped', 'condition_native']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs'])
@@ -690,13 +706,107 @@ def _finish_crop_production(df, t):
 
 
 # ---------------------------------------------------------------------------
+# The dry season: 2011-12 section 3E, ecvmaas3e_p1 (GH #1462)
+# ---------------------------------------------------------------------------
+#
+# Section 3E asks the contre-saison harvest by crop, "all fields combined", so a
+# line has no field or parcel: `plot_id` is the structural sentinel.  The quantity
+# is per cycle beside a cycle count, and both of these columns are registered in
+# _/derivations.yml.  2014-15 has no such module: see CONTENTS.org.
+FARM_LEVEL = 'Farm-level'
+DRY_SEASON_TOTAL = 'Niger::crop_production::dry-season-cycle-total'
+DRY_SEASON_SALE = 'Niger::crop_production::dry-season-sale-window'
+_DRY_SEASON_SOURCE = 'NER_2011_ECVMA_v01_M_Stata8/ecvmaas3e_p1.dta'
+
+
+def derive_dry_season_cycle_total(per_cycle, cycles):
+    """A dry-season crop's harvest over its cycles: per-cycle harvest x cycles.
+
+    Registered as ``Niger::crop_production::dry-season-cycle-total``, the Mali
+    tree precedent.  ``per_cycle`` is 3E.9a ``as03eq09a``, cleared of its code by
+    the caller; ``cycles`` is 3E.6 ``as03eq06``.  A zero answer is zero; a missing
+    answer or count is NA, and so is a positive answer beside a count of zero.  On
+    the 526 one-cycle lines this is the identity.  Returns float64.
+    """
+    x = pd.to_numeric(per_cycle, errors='coerce').astype('float64')
+    n = pd.to_numeric(cycles, errors='coerce').astype('float64')
+    total = x * n
+    total = total.mask(x.eq(0), 0.0)
+    return total.mask(x.gt(0) & n.eq(0))
+
+
+def derive_dry_season_sale_window(quantity_sold, value_sold):
+    """A dry-season sale -> ``Quantity_sold`` / ``Value_sold``: THE IDENTITY.
+
+    Registered as ``Niger::crop_production::dry-season-sale-window``, the Mali
+    ``tree-sale-window`` precedent.  What the entry records is the WINDOW: 3E.11a
+    ``as03eq11a`` is asked per cycle and 3E.12 ``as03eq12`` states none, so the
+    pair is served as recorded beside a ``Quantity`` over all cycles, and on a
+    multi-cycle line ``Quantity_sold / Quantity`` is not a sold share.  Both inputs
+    are cleared of their codes by the caller.
+    """
+    return pd.DataFrame({
+        'Quantity_sold': pd.to_numeric(quantity_sold, errors='coerce').astype('float64'),
+        'Value_sold': pd.to_numeric(value_sold, errors='coerce').astype('float64'),
+    })
+
+
+def stamp_dry_season_derivations(df):
+    """The ``Derivation`` column of the finished 2011-12 frame, as a ``string``
+    Series on its index: every ``Farm-level`` row carries :data:`DRY_SEASON_TOTAL`,
+    and one with a positive sale also :data:`DRY_SEASON_SALE`, joined with
+    ``MULTI_SEP`` in sorted order.  A zero sale is zero in any window.  Rainy rows
+    are NA."""
+    dry = (df.index.get_level_values('plot_id') == FARM_LEVEL)
+    sold = ((df['Quantity_sold'] > 0) | (df['Value_sold'] > 0)).astype(
+        'boolean').fillna(False).to_numpy(dtype=bool)
+    out = pd.Series(pd.NA, index=df.index, dtype='string')
+    out[dry] = DRY_SEASON_TOTAL
+    out[dry & sold] = MULTI_SEP.join(sorted((DRY_SEASON_TOTAL, DRY_SEASON_SALE)))
+    return out
+
+
+def _dry_season_inputs(wave, columns):
+    """Section 3E's raw answers, as recorded, under their own names, keyed by the
+    served ``(t, i, plot_id, production_obs)``.  The one byte-identical row is
+    dropped as the build drops it, or the key would repeat."""
+    from lsms_library.paths import countries_root
+    src = tools.get_dataframe(
+        str(countries_root() / 'Niger' / wave / 'Data' / _DRY_SEASON_SOURCE),
+        convert_categoricals=False)
+    src = src[~src.duplicated(keep='first')]
+    households = src['hid'].map(i)
+    out = src[columns].copy()
+    out['t'] = wave
+    out['i'] = households.values
+    out['plot_id'] = FARM_LEVEL
+    out['production_obs'] = _crop_reported_observations(
+        households, src['as03eq01'], module='3E').values
+    return out.set_index(['t', 'i', 'plot_id', 'production_obs'])
+
+
+def inputs_dry_season_cycle_total(wave):
+    """The registry ``inputs`` callable of dry-season-cycle-total."""
+    return _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06',
+                                     'as03eq09a', 'as03eq09b'])
+
+
+def inputs_dry_season_sale_window(wave):
+    """The registry ``inputs`` callable of dry-season-sale-window; the cycle count
+    is there so a user can rescale the sale."""
+    return _dry_season_inputs(wave, ['hid', 'as03eq01', 'as03eq03', 'as03eq06',
+                                     'as03eq10', 'as03eq11a', 'as03eq11b', 'as03eq12'])
+
+
+# ---------------------------------------------------------------------------
 # plot_inputs (GAP 2 — item-level agricultural inputs)
 # ---------------------------------------------------------------------------
 #
 # One row per REPORTED agricultural input applied by a household in a wave:
-# its harmonized input identity (Seed / Urea / DAP / NPK / Phosphate / Mixed
-# fertilizer / Organic manure / Organic compost / Pesticide / Herbicide /
-# Fungicide / Other phytosanitary), reported quantity used + native unit, the
+# its harmonized input identity (Seed / Urea / DAP / NPK (EHCVM) / NPK 15-15-15
+# (ECVMA, GH #1445) / Phosphate / Mixed fertilizer / Organic manure / Organic
+# compost / Pesticide / Herbicide / Fungicide / Other phytosanitary), reported
+# quantity used + native unit, the
 # purchased flag + reported purchased quantity, and — for seed rows — the
 # seed's crop (on the shared harmonize_food labels).  No aggregation: every
 # reported input line is kept.  seed_kg, nitrogen_kg, inorganic_fertilizer
@@ -1426,13 +1536,16 @@ def _finish_people_last7days(df, t):
 #              questionnaire, not second readings: 2011-12 passage 2 ships
 #              150 of its 232 grappes twice, and 2014-15 grappe 212 has two
 #              questionnaires (numquest 1, 2) that agree on the obs-1 Price
-#              of all 67 varieties both price.  A second record's slot that
-#              repeats a served row is dropped (lossless); the 30 slots
-#              that repeat no served row are kept as slot + 3, the
-#              GhanaLSS `obs` precedent (see _community_price_triples).
-# NOTHING IS SELECTED.  Until GH #840 one row per (t, v, j, u) was kept --
-# post-harvest passage first, then questionnaire order -- and this comment's
-# own `obs` sentence below was not true of the code.
+#              of all 67 varieties both price.  The FIRST entry is served
+#              (GH #1087, ruling @ligon 2026-11-04).  A second entry's slot
+#              that repeats a first-entry row is a copy; the 30 that repeat
+#              nothing are not served, and the first entry's rows of that
+#              record carry `second_entry_disagrees` = True.  See
+#              derive_cs07_first_entry.  2018-19 s05 is a different mechanism
+#              and keeps obs 3 / 4.
+# Within a first entry nothing is selected.  Until GH #840 one row per
+# (t, v, j, u) was kept -- post-harvest passage first, then questionnaire order
+# -- and this comment's own `obs` sentence below was not true of the code.
 #
 # WAVE COVERAGE: three of the four waves carry a GRAPPE-level community price
 # module -- the two ECVMA waves (CS07) and EHCVM 2018-19 (section 5 of the
@@ -1480,6 +1593,8 @@ def _finish_people_last7days(df, t):
 # 'produit absent' / 'manquant' missing-marker, carry no surveyed price and are
 # dropped.  `obs` (1/2/3) keeps the multiple within-cluster observations as
 # distinct rows without summing.
+#   second_entry_disagrees -- CS07 only: True on a first-entry row whose record
+#              has a second entry that disagrees (GH #1087); NA on 2018-19 s05.
 
 
 def _community_prices_maps(dirs=None):
@@ -1557,12 +1672,37 @@ _COMMUNITY_PRICE_CONTENT = ['v', 'j', 'u', 'variety', 'visit', 'slot',
 _CS07_VARIETY_J = {'7031': 'Riz importé non parfumé'}
 
 
-def _community_price_triples(df, item_map, unit_map, triples, passage=1,
-                             codes=None):
-    """Reshape a wide CS07 community-price frame into long (v, j, u, variety,
-    visit, obs, Description, Price, Quantity) rows -- one per recorded price.
+#: The (price, quantity, unit) columns of each CS07 observation slot.  2011-12
+#: gives each slot its own unit column; 2014-15 shares one across the three.
+CS07_TRIPLES = {
+    '2011-12': (('cs07q03', 'cs07q04', 'cs07q05'),
+                ('cs07q06', 'cs07q07', 'cs07q08'),
+                ('cs07q09', 'cs07q10', 'cs07q11')),
+    '2014-15': (('cs07q04', 'cs07q05', 'cs07q03'),
+                ('cs07q06', 'cs07q07', 'cs07q03'),
+                ('cs07q08', 'cs07q09', 'cs07q03')),
+}
+#: Each wave's CS07 files (under its ``Data/``) and the passage each one is.
+#: Read by the registry ``inputs`` callable below; the wave scripts keep their
+#: own literal paths, which is how the content hash finds the DVC sidecars.
+_CS07_FILES = {
+    '2011-12': (('NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p1.dta', 1),
+                ('NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p2.dta', 2)),
+    '2014-15': (('NER_2014_ECVMA-II_v02_M_STATA8/comprixcs07.dta', 1),),
+}
+#: Column on the served CS07 rows, GH #1087.  See derive_cs07_first_entry.
+SECOND_ENTRY_FLAG = 'second_entry_disagrees'
 
-    `triples` is a list of (price_col, qty_col, unit_col) — the unit_col may be
+
+def _community_price_slots(df, item_map, unit_map, triples, passage=1,
+                           codes=None):
+    """Reshape a wide CS07 community-price frame into one long row per recorded
+    price of every record, first entry and second, under the two lossless drops
+    below.  Columns: ``v, j, u, variety, visit, obs, Description, Price,
+    Quantity`` plus the bookkeeping ``rank`` (0 for a record's first entry),
+    ``slot`` and ``source_row`` (zero-based row of the file as read).
+
+    `triples` is a list of (price_col, qty_col, unit_col) -- the unit_col may be
     a single shared column repeated across triples (2014-15) or per-triple
     (2011-12).  The instrument records up to three within-questionnaire price
     observations; the k-th triple is observation slot `obs = k`.  `codes` is
@@ -1600,21 +1740,16 @@ def _community_price_triples(df, item_map, unit_map, triples, passage=1,
        de-dup class, not a selection: the dropped row is a copy, and which
        copy keeps the lower `obs` is fixed (the first record's).
 
-    What remains of a second record is the 30 slots that repeat NO served
-    row -- served as observation slots 4-6 (`obs = slot + 3 *
-    rank`, rank in (numquest, file order)), the GhanaLSS convention for a
-    second source record of one cell.  How those 30 should be represented is
-    an open maintainer decision (CONTENTS.org).  This drop is deliberately
-    HERE and not in _finish_community_prices: that tail is the builder GH
-    #840 says selects nothing, and a test greps it for `drop_duplicates`.
+    What remains with ``rank > 0`` is the 30 slots that repeat NO first-entry
+    row.  derive_cs07_first_entry decides what happens to them (GH #1087).
 
     Rows with no usable price (NA / 0 / sentinel) or a missing-marker unit are
     dropped here so they never reach the index."""
     if codes is None:
-        raise ValueError("_community_price_triples: pass `codes`, the same CS07 "
+        raise ValueError("_community_price_slots: pass `codes`, the same CS07 "
                          "file read with convert_categoricals=False (GH #840)")
     if len(codes) != len(df):
-        raise ValueError("_community_price_triples: `codes` and `df` differ in "
+        raise ValueError("_community_price_slots: `codes` and `df` differ in "
                          "length; they must be the same file in the same order")
     df = df.reset_index(drop=True)
     codes = codes.reset_index(drop=True)
@@ -1647,7 +1782,8 @@ def _community_price_triples(df, item_map, unit_map, triples, passage=1,
         piece = pd.DataFrame({
             'v': v.values, 'j': j.values, 'u': u.values,
             'variety': variety.values, 'visit': passage,
-            'obs': (slot + 3 * rank).values, 'slot': slot,
+            'obs': (slot + 3 * rank).values, 'slot': slot, 'rank': rank.values,
+            'source_row': df.index.values,
             'Description': description.values,
             'Price': price.values, 'Quantity': qty.values,
         })
@@ -1665,9 +1801,89 @@ def _community_price_triples(df, item_map, unit_map, triples, passage=1,
     # that stays.
     out = (out.sort_values('obs', kind='stable')
               .drop_duplicates(_COMMUNITY_PRICE_CONTENT, keep='first')
-              .drop(columns='slot')
               .sort_index())
     return out
+
+
+def derive_cs07_first_entry(slots):
+    """Serve a CS07 record's FIRST entry, and say where a second one disagrees.
+
+    Registered as ``Niger::community_prices::first-entry-of-duplicate``, a
+    deletion entry (``rows: 0``): the rows it removes have nowhere to carry a
+    key, so the registry is their disclosure and
+    ``Country.derivation_inputs(key)`` returns them.  Ruling @ligon 2026-11-04
+    (GH #1087): the second entries are duplicate entries of one questionnaire
+    (see _community_price_slots), so a slot of one is not a further reading.
+
+    *slots* is the frame _community_price_slots returns.  THE RULE: every row of
+    ``rank`` 0 is served as ``obs = slot``, no row of a higher rank is served,
+    and :data:`SECOND_ENTRY_FLAG` is True on every served row of a (grappe,
+    variety, passage) with a higher-rank row left, False on every other.
+
+    It is a property of the RECORD, because "a disagreeing second entry exists"
+    is: it does not say which slot disagrees, and a flagged row's own slot may
+    agree with the second entry.  ``derivation_inputs`` has the slot.  Measured
+    (held files): 30 slots leave (2011-12 15, 2014-15 15), 23 records.  One
+    record has no first-entry row to carry the flag: 2011-12 passage 2, variety
+    7311, whose first entry holds the 99999 sentinel and whose second holds a
+    price.  That price is the record's only one and is no longer served.
+
+    THE FLAG IS ONE-DIRECTIONAL, and this is a known blind spot.  It sees a second
+    entry that prices a slot differently, not one that blanks it: a 0 or a sentinel
+    never reaches *slots*.  In the held files 5 served slots have a second entry at
+    0 (4) or at a sentinel (1), and 3 of them sit in 2 records that nothing else
+    flags, so those stay False.  Disclosed, not extended: a blanked slot offers no
+    competing reading, and the first entry's price is served either way.
+    """
+    key = ['v', 'variety', 'visit']
+    second = pd.MultiIndex.from_frame(slots.loc[slots['rank'] > 0, key])
+    out = slots[slots['rank'] == 0].copy()
+    out['obs'] = out['slot']
+    out[SECOND_ENTRY_FLAG] = pd.array(
+        pd.MultiIndex.from_frame(out[key]).isin(second), dtype='boolean')
+    return out.drop(columns=['rank', 'slot', 'source_row'])
+
+
+def _community_price_triples(df, item_map, unit_map, triples, passage=1,
+                             codes=None):
+    """Long (v, j, u, variety, visit, obs, Description, Price, Quantity,
+    second_entry_disagrees) rows of a wide CS07 frame, one per recorded price of
+    each record's first entry: _community_price_slots, then
+    derive_cs07_first_entry.  This selection is deliberately HERE and not in
+    _finish_community_prices: that tail is the builder GH #840 says selects
+    nothing, and a test greps it for `drop_duplicates`."""
+    return derive_cs07_first_entry(_community_price_slots(
+        df, item_map, unit_map, triples, passage=passage, codes=codes))
+
+
+def inputs_cs07_second_entries(wave):
+    """The registry ``inputs`` callable of first-entry-of-duplicate: one row per
+    slot derive_cs07_first_entry does not serve, keyed ``(t, v, variety, visit,
+    slot)``.  The columns are the second entry's whole source row, under its own
+    variable names, so a slot's price, quantity and unit are in the
+    :data:`CS07_TRIPLES` columns of ``slot``; ``source_row`` is its zero-based
+    row in the file (2011-12 passage 2's two blocks share one ``numquest``)."""
+    from lsms_library.paths import countries_root
+    root = countries_root() / 'Niger'
+    item_map, unit_map = _community_prices_maps(dirs=[root / wave / '_', root / '_'])
+    frames = []
+    for name, passage in _CS07_FILES[wave]:
+        src = str(root / wave / 'Data' / name)
+        labels = tools.get_dataframe(src, convert_categoricals=True)
+        codes = tools.get_dataframe(src, convert_categoricals=False).reset_index(drop=True)
+        slots = _community_price_slots(labels, item_map, unit_map,
+                                       CS07_TRIPLES[wave], passage=passage,
+                                       codes=codes)
+        slots = slots[slots['rank'] > 0]
+        frame = codes.loc[slots['source_row'].values].reset_index(drop=True)
+        frame = frame.assign(t=wave, v=slots['v'].values,
+                             variety=slots['variety'].values,
+                             visit=slots['visit'].values,
+                             slot=slots['slot'].values,
+                             source_row=slots['source_row'].values)
+        frames.append(frame)
+    return pd.concat(frames, ignore_index=True).set_index(
+        ['t', 'v', 'variety', 'visit', 'slot'])
 
 
 COMMUNITY_PRICES_INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
@@ -1679,14 +1895,16 @@ def _finish_community_prices(df, t):
     (t, v, j, u, variety, visit, obs) index -- one row per survey-recorded
     price.
 
-    NO ROW IS SELECTED (GH #840; @ligon 2026-10-18).  Until #840 this kept ONE
-    observation per (t, v, j, u) -- post-harvest (passage 2) before
+    NO ROW IS SELECTED HERE (GH #840; @ligon 2026-10-18).  Until #840 this kept
+    ONE observation per (t, v, j, u) -- post-harvest (passage 2) before
     post-planting (passage 1), then questionnaire order -- and so discarded
     other varieties, other passages and other observation slots of the same
     cell, by row order.  A duplicate key is now an error: the instrument
     records one price per (cluster, variety, passage, slot), and
-    _community_price_triples has already dropped a second source record's
-    repeats and enumerated what remains of it as obs 4-6."""
+    _community_price_triples has already served a CS07 record's first entry
+    only (GH #1087).  :data:`SECOND_ENTRY_FLAG` is passed through; a wave that
+    does not set it (2018-19 s05, whose second records stay obs 3 / 4) carries
+    NA."""
     df = df.copy()
     for col in ['Price', 'Quantity']:
         if col not in df.columns:
@@ -1700,6 +1918,9 @@ def _finish_community_prices(df, t):
     df['visit'] = pd.to_numeric(df['visit']).astype('int64')
     df['obs'] = pd.to_numeric(df['obs']).astype('int64')
     df['Description'] = df['Description'].astype('string')
+    if SECOND_ENTRY_FLAG not in df.columns:
+        df[SECOND_ENTRY_FLAG] = pd.NA
+    df[SECOND_ENTRY_FLAG] = df[SECOND_ENTRY_FLAG].astype('boolean')
     # Every index level must be non-null (the framework drops NaN-key rows).
     #
     # DELIBERATELY A DROP, NOT A `fill_missing_u` (GH #842).  Measured on the
@@ -1726,7 +1947,7 @@ def _finish_community_prices(df, t):
     # Mali/Malawi/Tanzania/Ethiopia community_prices shim.
     df['i'] = df['v']
     keep = ['t', 'v', 'i', 'j', 'u', 'variety', 'visit', 'obs',
-            'Price', 'Quantity', 'Description']
+            'Price', 'Quantity', 'Description', SECOND_ENTRY_FLAG]
     df = df[keep]
     df = df.set_index(['t', 'v', 'i', 'j', 'u', 'variety', 'visit', 'obs']).sort_index()
     return df
