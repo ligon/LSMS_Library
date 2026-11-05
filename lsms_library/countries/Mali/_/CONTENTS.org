@@ -3148,8 +3148,9 @@ and all 251 =Farm-level= rows, which have no =s16c= line behind them.
 *The harvest totals of GH #1437 sum across states.*  Their =s16d= dispositions state their own
 condition (=s16dq02c=, =s16dq03c=, =s16dq05d=, =s16dq13c=), and =derive_hh_crop_harvest_total= gates on one
 unit, not one state.  Of the 3,360 totals, 3,152 state one condition and 208 two, and on 166 of those
-the two fold differently (122 of the 166 in =Sac (100 Kg)=).  The level's own note says such
-quantities are not commensurable.  Served as summed, under =unknown_condition=, and not changed here.
+the two fold differently (122 of the 166 in =Sac (100 Kg)=).  On metric-named units those 166 hold 467,038 of
+6,713,380 derived kg, 7.0%.  The level's own note says such quantities are not commensurable.  Served as
+summed, under =unknown_condition=, disclosed in =derivations.yml=; nothing is held out.
 
 *2017-18 records a state, and it is not read.*  The three 2014-15 files this table reads (=EACIS3A=,
 =EACIS3B=, =EACICULTURE=) hold no state variable; the "Etat du produit" of that wave's manual

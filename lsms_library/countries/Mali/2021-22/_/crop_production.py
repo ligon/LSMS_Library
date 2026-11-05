@@ -34,7 +34,7 @@ THE STATE (GH #1436).  condition is s16cq16d, "Etat du produit", by code through
 harmonize_crop_condition_ehcvm1, and condition_native the answer as recorded.  The file
 states it on exactly the 309 rows with a Quantity.  Every other row carries the sentinel,
 and that includes a derived harvest: its dispositions have states of their own in s16d,
-not read here, and they fold differently on 166 of the 3,360 totals (CONTENTS.org).
+not read here, and they fold differently on 166 of the 3,360 totals (derivations.yml).
 
 See mali.py, "crop_production: the EHCVM waves".
 """
