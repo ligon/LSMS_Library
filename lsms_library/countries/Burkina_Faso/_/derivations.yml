@@ -271,7 +271,8 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
     4.9 km, maximum 21.8 km), against 213 km for a fix paired with another grappe's
     parcels.  The six grappes beyond 25 km are withheld (see the assumptions).  The
     other 248 carried grappes have no parcel coordinate to compare.  The check reads
-    the held v04 release of catalog 6224; the provider's v05 removes these parcel
-    coordinates, so it holds only for v04.
+    the s16a file we hold; the current release of catalog 6224 no longer has these
+    columns (CONTENTS.org, "what the World Bank states about 6224's versions"), so it
+    can be repeated only on the held file.
   contents: 'Burkina_Faso/_/CONTENTS.org, "2021-22 GPS carried from 2018-19 (GH #1057)"'
   since: '2026-11-03'

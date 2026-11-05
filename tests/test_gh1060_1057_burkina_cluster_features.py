@@ -437,8 +437,9 @@ class TestOracleCarriedGps:
         assert differ == PROVINCE_CHANGED
 
     def test_the_withheld_six_are_exactly_the_panel_fixes_over_25_km_from_their_parcels(self, sources):
-        """The rule behind the hard-coded six, from the parcels themselves.  Reads the held
-        v04 s16a; the provider's v05 removes these coordinates, so a move to v05 fails here."""
+        """The rule behind the hard-coded six, from the parcels themselves.  Reads the s16a we
+        hold; the current release of 6224 no longer has these columns, so acquiring it fails
+        here (Burkina_Faso/_/CONTENTS.org, "what the World Bank states about 6224's versions")."""
         gps, panel, _ = sources
         parcels = _read("2021-22", "s16a_me_bfa2021.dta").dropna(
             subset=["s16aq46__latitude", "s16aq46__longitude"])

@@ -2859,8 +2859,9 @@ Wired by PR #1374 (2026-10-30), before #1224 gave =food_acquired.u= its size, th
 2021-22 parcels, on the same reasoning as the province-change exclusions.  They stay NA
 with no key; their 2018-19 rows are untouched.  =2021-22/_/mapping.py= lists them
 literally, so a build never reads =s16a=; the test recomputes the list from the parcels.
-=s16a= here is the held v04; the provider's v05 removes parcel coordinates, so this
-check can only be made on v04.
+=s16a= here is the file we hold.  The current release of 6224 no longer has these columns, and
+which release we hold is settled in the section "what the World Bank states about 6224's versions"
+above, not here, so this check can be repeated only on the held file.
 
 *Measured*, cold, against development =115b6ab71=: 2021-22 rows 1,150 either way;
 non-null =Latitude= / =Longitude= and the key 525 -> 519; carried fixes still equal the
