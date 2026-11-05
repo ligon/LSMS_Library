@@ -209,8 +209,9 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
     that have no 2018-19 fix, for grappes 19, 365 and 549 (province changed), for
     grappes 103, 104, 226, 229, 237 and 240 (fix more than 25 km from the grappe's
     own 2021-22 parcels), and for all 600 cross-section grappes.  The other values
-    are carried as recorded, low-precision fixes included (CONTENTS.org, "GPS by
-    wave").
+    are carried as recorded.  Three of them, 216, 218 and 350, are not readings of
+    their own grappe but rounded copies of a neighbouring grappe's reading
+    (CONTENTS.org, "Six carried GPS fixes withheld").
   function: lsms_library.countries.Burkina_Faso.2021-22._.mapping:derive_panel_grappe_gps
   inputs: lsms_library.countries.Burkina_Faso.2021-22._.mapping:inputs_cluster_features
   raw_variables: [grappe, grappe_EHCVM1, coordonnes_gps__Latitude, coordonnes_gps__Longitude]
@@ -230,7 +231,8 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
         Same grappe id means same EA, and the EA's location did not change between
         the waves, so the 2018-19 fix locates the 2021-22 row.  Rural differs on 7
         panel grappes (147, 150, 153, 154, 155, 180, 182), all carried: that is an
-        attribute recode, and the ruling excludes on province only.
+        attribute recode, and the rulings exclude on province and on distance from the
+        grappe's own parcels, not on this.
       basis: modelling-choice
       evidence: >-
         GH #1057, ruling by @ligon 2026-11-03, option (b), tightened.
