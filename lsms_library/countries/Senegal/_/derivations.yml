@@ -182,7 +182,9 @@ Senegal::sample::region-milieu-stratum:
       evidence: Senegal/_/CONTENTS.org, GH #812 ruling option W2, 2026-11-04.
   validated_against: >-
     BID Table 1a, clusters by region and residence: all 28 cells equal 2018-19 (598
-    clusters; tests/test_gh812_ehcvm_strata.py transcribes the table).  2021-22 is the
+    clusters; tests/test_gh812_ehcvm_strata.py transcribes the table).  It is a real
+    allocation: 299 + 299 clusters, and Table 1b's 7,176 planned households against 7,156
+    held.  2021-22 is the
     same less the two dropped DRs, Dakar urban 75 and Ziguinchor rural 17.  Share of
     var(log cluster weight) between these cells 90.8% (2018-19) and 88.7% (2021-22),
     against 58.8% and 58.6% between regions alone.

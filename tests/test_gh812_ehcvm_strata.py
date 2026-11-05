@@ -361,6 +361,11 @@ class TestOracle:
 
 @pytest.mark.requires_s3
 class TestAllocationEqualsTheDocuments:
+    """Senegal's Table 1a is an allocation: 7,176 households planned, 7,156 held.  Mali's and
+    Niger's tables are titled "initial sample" but total to the delivered file, so they tabulate
+    the same two cover variables: they check this reading of the cover, and do not corroborate
+    that the cells are strata."""
+
     @staticmethod
     def _expected(table):
         return {(region, m): n for region, pair in table.items()

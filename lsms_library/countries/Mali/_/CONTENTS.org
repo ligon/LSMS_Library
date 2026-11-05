@@ -3285,14 +3285,18 @@ So =strata= holds three things across this country's waves, and they are not com
 nothing, EAC-I's design codes and EHCVM's labels.  Site B now warns for 2014-15 alone.
 
 BID Table 1 (p.10) equals 2021-22 in all 17 cells; =tests/test_gh812_ehcvm_strata.py=
-transcribes it.  No held table states 2018-19's 20 cells.
+transcribes it.  That checks this reading of the cover and does not corroborate that the cells are
+strata: Tables 1 and 2 are titled "initial sample" but total to the delivered file (513 clusters,
+6,143 households), so they tabulate the same two variables.  The BID's sentence is what names the
+stratum.  No held table states 2018-19's 20 cells.
 
 *Why 20 then 17.*  The 2018-19 cover has 11 regions and the 2021-22 cover 9: Menaka and
 Taoudenit, the regions the 51 EAs added in vague 2 were drawn to cover (see "Supplementary
 sample inside the wave"), are written under Gao and Tombouctou in 2021-22.  Each wave's label is
 its own cover's, so 429 of the 6,133 households in both waves change stratum (36 clusters):
 Menaka Rural to Gao Rural 204, Taoudenit Rural to Tombouctou Rural 155, Menaka Urbain to Gao
-Urbain 70.
+Urbain 70.  All 513 clusters of 2021-22 are 2018-19 clusters, so 20 and 17 are a change of label, not
+of design: =ehcvm_nsu_mli2021.dta= keeps the 20 codes.
 
 *=Taoudénit=.*  The 2018-19 cover writes =Taoudénit= and =ehcvm_conso_mli2018.dta=, which
 =cluster_features= reads, writes =Taoudenit=.  The =strata= table folds to the served =Region=

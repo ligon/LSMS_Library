@@ -3051,6 +3051,10 @@ column's total of 1,177 needs 96, and the BID's second table (p.11) prints 96.  
 in turn differs from the file by one household in Diffa (156/227 against 155/228) and Maradi
 (97/394 against 96/395), and Table 1 does not.
 
+*What 15 of 15 proves.*  Table 1 is titled "initial sample" but totals to the delivered file (6,622),
+so it tabulates the same two cover variables.  The match checks this reading of the cover and does
+not corroborate that the cells are strata.  The BID's sentence is what names the stratum.
+
 *Across the EHCVM boundary.*  Each wave's label is its own cover's.  35 of the 5,055 households
 in both waves change stratum (3 clusters): Niamey Rural to Niamey Urbain 23, Diffa Rural to Diffa
 Urbain 12.  =Niamey Rural= is 2 clusters in 2018-19 and none in 2021-22.

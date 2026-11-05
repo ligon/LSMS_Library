@@ -533,9 +533,12 @@ Mali::sample::region-milieu-stratum:
       basis: modelling-choice
       evidence: Mali/_/CONTENTS.org, GH #812 ruling option W2, 2026-11-04.
   validated_against: >-
-    BID Table 1, clusters by region and residence: all 17 cells equal 2021-22 (513
-    clusters; tests/test_gh812_ehcvm_strata.py transcribes the table).  No held table
-    states 2018-19's allocation.  Share of var(log cluster weight) between these cells
-    72.5% (2018-19) and 71.9% (2021-22), against 56.2% and 34.4% between regions alone.
+    the BID's sentence above and the weights: share of var(log cluster weight) between
+    these cells 72.5% (2018-19) and 71.9% (2021-22), against 56.2% and 34.4% between
+    regions alone.  BID Tables 1 and 2 equal 2021-22 in all 17 cells
+    (tests/test_gh812_ehcvm_strata.py transcribes Table 1), but they do not corroborate
+    that the cells are strata: titled "initial sample", they total to the delivered file
+    (513 clusters, 6,143 households), so they tabulate the same two cover variables.  The
+    match checks this reading of the cover.  No held table states 2018-19's allocation.
   contents: 'Mali/_/CONTENTS.org, "EHCVM strata are region x milieu labels (GH #812)"'
   since: '2026-11-04'
