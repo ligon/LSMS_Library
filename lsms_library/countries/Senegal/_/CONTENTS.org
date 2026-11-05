@@ -31,6 +31,8 @@ matches Senegal as it does the other EHCVM countries.  Cosmetic.
 Senegal's =sample= carries NO =strata= column (its two-file merge is
 cover page + weights), so the Guinea-Bissau "Region == strata" check has
 no analogue here.  The inline =SAINT-LOUIS= mapping is left in place.
+/Since 2026-11-04 it does carry one (GH #812, end of this file), and the check
+holds: 0 of 1,194 clusters disagree./
 
 Served, read path: 14 -> 14 labels, 1,194 rows, per-wave counts
 unchanged.  Cache: =_/categorical_mapping.org= is a build input, so the
@@ -801,6 +803,8 @@ table: all 22 Senegal country hashes move (one Senegal re-warm).  Evidence:
 * 2026-11-04 -- strata and allocation by wave (GH #812); the NPK slot (GH #1445)
 
 Read-only measurement: nothing is wired and no served value moved.
+/Wired the same day: see "EHCVM strata are region x milieu labels" at the end of this
+file./
 
 *Documented.*  The 2021-22 BID (catalog 6278, resource 100388, p.12; not held in
 this repository) gives the stratum (already quoted above from the French) and
@@ -922,3 +926,27 @@ blanked both would not show.
 
 The table serves 4,182 of the 8,717 reported shocks: the rest carry no follow-up, are all-NA
 and are dropped.  That is with the maintainer, and unchanged here.
+* 2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)
+
+@ligon's ruling, option W2.  =sample.strata= in the EHCVM waves is ='<Region> Urbain|Rural'=,
+built from the cover's =s00q01= and =s00q04= labels by =ehcvm.derive_region_milieu_stratum=.
+No household file records a stratum, so it is a construction, registered as
+=Senegal::sample::region-milieu-stratum= and stamped on every row it produced.  The new
+=strata= table in =_/categorical_mapping.org= is the =Region= table crossed with the
+two milieu labels, so the region part of =strata= is =cluster_features.Region=.
+
+| wave    | clusters | households | =strata= cells | before |
+|---------+----------+------------+----------------+-----------|
+| 2018-19 |      598 |      7,156 |             28 | no column |
+| 2021-22 |      596 |      7,120 |             28 | no column |
+
+BID Table 1a (held since GH #1084, =sen_ehcvm2_information_de_base_eng.pdf= p.12) equals
+2018-19 in all 28 cells; =tests/test_gh812_ehcvm_strata.py= transcribes it.  0 of the 6,432
+households in both waves change stratum.  The source's =thies=, =kedougou= and =sedhiou= stay
+unaccented, as =Region= does.
+
+=strata= is no longer =optional: true= in =data_scheme.yml=: every wave now carries it, and
+leaving the flag would disarm Site B for it.  The ruling did not name this; it is one line.
+
+Cost: a Senegal re-warm.  Other countries' =strata= hold other things: see
+=docs/guide/feature.md=, "=strata= Is Not One Vocabulary".
