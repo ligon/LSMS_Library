@@ -975,3 +975,18 @@ hook now serves =d= in vague 1 and =e= in vague 2, and raises =ShockLayoutError=
 release stops showing this layout.  True share 0.539 -> 0.613; 840 of 6,131 rows change, all in
 vague 2.  So =AffectedConsumption= is comparable across vagues and with 2021-22 only
 from this change on.
+
+* 2026-11-05 -- Interview dates as a conversion key (GH #1585)
+
+=numeraire== now dates each household by its first dated =Interview start= row,
+which is visit 1 (=s00q23a=) for every household in both waves.  Measured cold at
+=e5dd343d4= plus the fix: every =food_expenditures= household has a date, and every
+visit-1 date lies in its own =vague='s window in the World Bank catalog (4297:
+2018-09 to 12 and 2019-04 to 07; 6278: 2021-11 to 2022-01 and 2022-04 to 09).
+
+The later visits are less clean.  In 2021-22, 154 of 7,120 households have a later
+visit starting before visit 1, six of them in another calendar year.  Nine
+later-visit rows (five households) predate fieldwork: eight in August 2021 and one
+in January 2018.  The 2018-19 =data_info.yml= comment calls the other
+EHCVM waves "cleanly sequential"; for 2021-22 that holds for visit 1, not for every
+visit.  A rule taking a household's earliest visit would pick those stamps.
