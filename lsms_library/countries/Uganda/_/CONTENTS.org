@@ -1393,26 +1393,26 @@ slip in one of three fields), not a second opinion on the price.
 * =labels='Aggregate'= keeps processing states apart (GH #833, 2026-11-04)
 
 /Ruling @ligon, 2026-11-04./  =Preferred Label= always kept states apart; only
-=labels='Aggregate'= folded them, and they do not cost the same.  =Maize=, =Cassava=,
+=labels='Aggregate'= folded them, and they do not cost the same.  =Maize=, =Millet=, =Cassava=,
 =Sweet Potatoes=, =Ground Nuts= and =Sim Sim= now keep one bucket per state in
-=harmonize_food=.  *=Millet= was in the ruling and is not split*, because the survey's own
-labels say its two codes are one state (below).  Variety still folds: white and yellow maize flour are one bucket.  This
+=harmonize_food=.  Variety still folds: white and yellow maize flour are one bucket.  This
 is a user-facing relabel.  =Preferred Label=, =Nutrition Label= and every default read are
 unchanged, and =Expenditure= and =Quantity= are conserved (below).
 
 | bucket           | what is in it now                          | moved out of the bare name                                       |
 |------------------+--------------------------------------------+------------------------------------------------------------------|
 | =Maize=          | =(grains)=, white and yellow               | =Maize (cobs)=, =Maize (flour)=, each with white and yellow      |
+| =Millet=         | code 115, =Millet=                         | code 1151, =Millet Flour= -> =Millet (flour)=; see below         |
 | =Cassava=        | =(fresh)=                                  | =(dry)= -> =Cassava (dry)=                                       |
 | =Sweet Potatoes= | =(fresh)=, white and orange                | =Sweet Potatoes (dry)=, =Sweet Potatoes (flour)=, each with both |
 | =Ground Nuts=    | =(in shell)=                               | =(shelled)=, =(pounded)= and =(paste)=, one bucket each          |
 | =Sim Sim=        | =Sim Sim=                                  | =Sim Sim (paste)=                                                |
 
-Nineteen table rows change, and they move seventeen Preferred Labels, ten of them served:
-=Cassava (dry)= is two rows, and the nineteenth, code 182, was a defect.  =Cassava (flour)= had
+Twenty table rows change, and they move eighteen Preferred Labels, eleven of them served:
+=Cassava (dry)= is two rows, and the twentieth, code 182, was a defect.  =Cassava (flour)= had
 two rows with two Aggregates, =Cassava= and =Cassava (flour)=, and =_relabel_j= served the
 last, so it does not move as served.  Each Preferred Label now has one Aggregate.  The column
-goes from 80 labels to 89, and from 76 to 85 served.
+goes from 80 labels to 90, and from 76 to 86 served.
 
 *The bare name is the harvest state, because =crop_production= reuses it.*
 =harmonize_crop= writes =Maize=, =Millet=, =Cassava=, =Sweet Potatoes=, =Ground Nuts= and
@@ -1429,12 +1429,13 @@ Nuts= =dried_with_shell= 3,032.
 | before                    | after                                                        |
 |---------------------------+--------------------------------------------------------------|
 | =Maize= 50,913,635        | =Maize= 781,540, =(cobs)= 2,003,150, =(flour)= 48,128,945    |
+| =Millet= 5,045,440        | =Millet= 3,453,140, =(flour)= 1,592,300                      |
 | =Cassava= 14,274,785      | =Cassava= 10,319,820, =(dry)= 3,954,965                      |
 | =Sweet Potatoes= 11,192,725 | =Sweet Potatoes= 10,752,125, =(dry)= 386,200, =(flour)= 54,400 |
 | =Ground Nuts= 17,323,242  | =Ground Nuts= 838,025, =(shelled)= 2,140,585, =(pounded)= 12,184,647, =(paste)= 2,159,985 |
 | =Sim Sim= 3,435,070       | =Sim Sim= 3,248,920, =(paste)= 186,150                       |
 
-The total is 726,299,304.83 both ways, and the other 71 served Aggregates are equal.  =food_expenditures=
+The total is 726,299,304.83 both ways, and the other 70 served Aggregates are equal.  =food_expenditures=
 goes from 242,043 rows to 243,043; =food_acquired= keeps its 355,571.  *=Maize= is now 1.5%
 of what it was*, because nearly all of it was flour; a user who wants the old bucket adds three.
 
@@ -1455,26 +1456,43 @@ The thin cells are thin: =Maize (grains)= has 5-17 rows a wave, =Ground Nuts (in
 and =Sweet Potatoes= is hardly bought in kg (=(dry)= 1-2 rows).  Cassava dry and flour cost the
 same and still stay apart: #833's rule is that price magnitude does not license a fold.
 
-*Why =Millet= is one bucket.*  The ruling asks for a split where the state differs, and cited
-1,500 against 3,000 UGX per kg.  No wave holds both codes, so that comparison crosses 2015-16
--> 2018-19, and the labels the files themselves carry say the state is the same:
+*=Millet=: split as ruled, and what the evidence does and does not show.*  Code 115 stays
+=Millet= and code 1151 goes to =Millet (flour)=.  What code 115 holds is not settled.  No wave
+has answers on both codes: 115 is answered through 2015-16 and 1151 from 2018-19 (2018-19 also
+holds 3,172 unlabelled code 115 rows, with no unit, quantity or value on any of them).  So the
+1,500 against 3,000 cited for the ruling crosses 2015-16 -> 2018-19 and is not a same-wave gap.
 
-| wave                       | code | value label in the file, food module |
-|----------------------------+------+--------------------------------------|
-| 2005-06                    |  115 | =millet=                             |
-| 2009-10                    |  115 | =Millet=                             |
-| 2010-11, 2011-12, 2013-14, 2015-16 | 115 | =Millet (flour)=             |
-| 2018-19, 2019-20           | 1151 | =Millet flour=                       |
+| wave    | paper form            | Stata value label | UGX/kg | / maize flour | / crop sale price |
+|---------+-----------------------+-------------------+--------+---------------+-------------------|
+| 2005-06 | =Millet=              | =millet=          |    800 |          1.33 | no crop rows      |
+| 2009-10 | no household form held | =Millet=         |  1,500 |          1.25 |              1.88 |
+| 2010-11 | =Millet=              | =Millet (flour)=  |  1,500 |          1.07 |              2.14 |
+| 2011-12 | =Millet=              | =Millet (flour)=  |  2,000 |          1.11 |              2.45 |
+| 2013-14 | =Millet=              | =Millet (flour)=  |  2,000 |          1.11 |              2.00 |
+| 2015-16 | =Millet=              | =Millet (flour)=  |  2,000 |          1.11 |              2.22 |
+| 2018-19 | =Millet flour=        | =Millet flour=    |  3,000 |          1.76 |              3.00 |
+| 2019-20 | =Millet flour=        | =Millet flour=    |  3,000 |          1.50 |              3.00 |
 
-(=food_expenditure_labels= in =nutrition.org= records the same.)  So splitting
-would serve a distinction the survey denies, and would end one series at 2015-16 and start
-another at 2018-19 under names that say grain and flour.  Set against other prices the step is
-small: flour at 2,000 in 2015-16 and 3,000 in 2018-19, ×1.5, while rice went ×1.2, sugar ×1.33
-and maize flour ×0.94.  =Millet= therefore stays as it was, on both codes and across all eight
-waves.  Two things follow and neither is changed here.  The =Preferred Label= =Millet= of code
-115 hides a state from 2010-11 on, and what 2005-06 and 2009-10 mean by =millet= is not stated.
-And crop =Millet= (=dried_grain= 2,055 rows) joins a food bucket that is flour.  A memo on this
-went with the PR, and whichever way it goes the change is one table cell.
+(The same ratio to crop sale price is 1.60-3.00 for maize grain and 3.00-4.67 for maize flour.
+=food_expenditure_labels= in =nutrition.org= copies the Stata value labels.)
+
+- /Against one state:/ the form renames the item only at 2018-19.  The same Stata label set is
+  wrong on code 143 in the same four waves (below).  The national ×1.50 across 2015-16 -> 2018-19
+  is the largest of 13 items with n >= 30 (median 1.11, p90 1.25).  And #833 retains states until
+  source evidence authorizes a fold, and says meaning is not established by labels or price
+  magnitude.
+- /For one state:/ the Stata value labels say flour in 2010-11 to 2015-16, and there is no price
+  step at that label change (1.00, against a median of 1.17).  The share bought in kg runs 0.63 -> 0.62 across 2015-16 -> 2018-19
+  (maize flour 0.82-0.86, grain 0.15-0.35), and the own-production share 0.58 -> 0.57.  The
+  same-household step is ×1.31 (n = 30), beside sugar 1.29, pounded nuts 1.25 and rice 1.20.
+  Regional steps run 1.00-1.54.  The 2018-19 form offers no grain line.  And files sometimes know
+  more than the form: codes 180-182 are not on the 2013-16 forms.
+- /What the split costs:/ a series break at 2018-19, since =Millet= ends at 2015-16 and =Millet
+  (flour)= starts there, and anyone following millet across it adds the two.  717 crop rows (241
+  sale rows) in 2018-19 and 2019-20 lose a same-wave food partner.  The =Millet (flour)= label
+  matches GhanaLSS's exactly.
+
+Undoing it is one table cell.
 
 *Three things this leaves.*
 

@@ -17,15 +17,16 @@
 | Serere (From Soroti) | Serere          |
 
 # Aggregate Label, the staples whose labels name a processing state (GH #833, ruling
-# 2026-11-04): Maize, Cassava, Sweet Potatoes, Ground Nuts and Sim Sim keep one bucket
-# per state.  Variety still folds (white and yellow maize flour are one bucket).  The
-# BARE name is the harvest-state bucket (grains, fresh, fresh, in shell, seed) because
-# harmonize_crop's labels reuse it: crop_production.j joins
+# 2026-11-04): Maize, Millet, Cassava, Sweet Potatoes, Ground Nuts and Sim Sim keep one
+# bucket per state.  Variety still folds (white and yellow maize flour are one bucket).
+# The BARE name is the harvest-state bucket (grains, fresh, fresh, in shell, seed)
+# because harmonize_crop's labels reuse it: crop_production.j joins
 # food_acquired(labels='Aggregate').j on the bare name, and these are the states most
-# of those crop rows are in.  Millet was in the ruling and stays one bucket: code 115
-# is itself labelled "Millet (flour)" from 2010-11, so 115 and 1151 are one state
-# wherever the files name one.  Other Aggregates holding two states (Beans, Peas, Rice,
-# Ginger, Soybean) were not part of the ruling.  CONTENTS.org has the before and after.
+# of those crop rows are in.  Millet is as ruled, code 115 on Millet and code 1151 on
+# Millet (flour), and what code 115 holds is not settled: the forms print "Millet"
+# until 2018-19, while the Stata value labels say "Millet (flour)" in 2010-11 to
+# 2015-16.  Other Aggregates holding two states (Beans, Peas, Rice, Ginger, Soybean)
+# were not part of the ruling.  CONTENTS.org has the before and after.
 #+name: harmonize_food
 | Code | Preferred Label                | Aggregate Label    | Nutrition Label                |
 |------+--------------------------------+--------------------+--------------------------------|
@@ -131,7 +132,7 @@
 | 1122 | Maize (yellow;cobs)            | Maize (cobs)       | Maize (yellow;cobs)            |
 | 1131 | Maize (white;flour)            | Maize (flour)      | Maize (white;flour)            |
 | 1132 | Maize (yellow;flour)           | Maize (flour)      | Maize (yellow;flour)           |
-| 1151 | Millet Flour                   | Millet             | Millet Flour                   |
+| 1151 | Millet Flour                   | Millet (flour)     | Millet Flour                   |
 | 1171 | Beef Liver                     | Beef Liver         | Beef Liver                     |
 | 1172 | Beef Offal                     | Beef Offal         | Beef Offal                     |
 | 1173 | Beef (roasted)                 | Beef               | Beef (roasted)                 |
@@ -723,8 +724,9 @@
 # actually broke the stated contract and are fixed:
 #
 #   141  'Finger Millet' -> 'Millet'  (harmonize_food Aggregate Label of
-#        codes 115 Millet / 1151 Millet Flour; finger millet is the only
-#        millet the UNPS crop scheme records, so nothing is conflated)
+#        code 115 Millet, and of 1151 Millet Flour until GH #833; finger millet
+#        is the only millet the UNPS crop scheme records, so nothing is
+#        conflated)
 #   741  'Banana Food'   -> 'Matoke'  (Aggregate Label of codes 100-104,
 #        Matoke bunch/cluster/heap/other; "banana food" is the cooking
 #        banana, i.e. matooke -- code 742 'Banana Beer' is the beer variety
