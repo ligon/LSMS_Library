@@ -2215,7 +2215,7 @@ def _production_obs_of_sale(sale):
     return token.where(n.eq(1), token + '/row:' + nth).astype('string')
 
 
-def _farm_level_sales(t, decisions):
+def _farm_level_sales(t, decisions, harv=None):
     """One row per sale that reached no harvest row, on ``plot_id = FARM_LEVEL``.
 
     The ruling on GH #843, option (d), extended in bulk on 2026-11-04 (GH #1457).
@@ -2228,8 +2228,11 @@ def _farm_level_sales(t, decisions):
     not have, so they are the sentinels.  One row per ``_sale_block`` record: no sale is
     split, or summed further.
 
-    ``decisions`` is the second return value of :func:`_attach_sales`.  Returns the
-    frame in the columns of the harvest frame it joins, and its tally.
+    ``decisions`` is the second return value of :func:`_attach_sales`; ``harv`` the
+    harvest frame it returned.  A household's own harvest rows name the crop where they
+    agree, so a sale of code 48 beside lines whose text says cowpea (GH #1228) is
+    ``Cowpea (Khobwe)`` as they are, and not a second crop.  Returns the frame in the
+    columns of the harvest frame it joins, and its tally.
     """
     from lsms_library.transformations import U_UNKNOWN
     crop_map = _malawi_code_map('harmonize_crop')
@@ -2240,6 +2243,14 @@ def _farm_level_sales(t, decisions):
     sale = decisions[(no_row | dropped_row).to_numpy() & _sold_answers(decisions).to_numpy()].copy()
     code = pd.to_numeric(sale['_crop_code'], errors='coerce').astype('Int64')
     crop = code.map(crop_map)
+    in_table = crop.notna()
+    if harv is not None:
+        named = harv[['i', '_crop_code', 'crop']].dropna(subset=['crop']).drop_duplicates()
+        named = named[~named.duplicated(['i', '_crop_code'], keep=False)].astype(
+            {'i': 'string', '_crop_code': 'Int64', 'crop': 'string'})
+        own = pd.DataFrame({'i': sale['i'].astype('string').values, '_crop_code': code.values}).merge(
+            named, on=['i', '_crop_code'], how='left')['crop']
+        crop = own.set_axis(sale.index).where(own.notna().to_numpy(), crop)
     native = code.where(code.lt(1000).fillna(True), code - 1000)
     out = pd.DataFrame({
         'i': sale['i'].astype('string'),
@@ -2265,7 +2276,7 @@ def _farm_level_sales(t, decisions):
         '_branch': pd.Series(pd.NA, index=sale.index, dtype='string'),
     }).reset_index(drop=True)
     by_cause = sale['outcome'].astype(object).where(sale['outcome'].notna(), 'no_candidate_row')
-    by_cause = by_cause.where(crop.notna(), 'crop_code_in_no_table')
+    by_cause = by_cause.where(in_table, 'crop_code_in_no_table')
     value = pd.to_numeric(sale['Value_sold'], errors='coerce').astype('float64')
     tally = {'wave': t, 'sales': int(len(sale)), 'value': float(value.sum()),
              'by_cause': {str(k): {'sales': int((by_cause == k).sum()),
@@ -2342,7 +2353,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         harv['Unit_sold'] = harv['u'].astype('string').where(holds_sale, pd.NA)
         harv['Condition_sold'] = harv['condition_sold'].astype('string').where(holds_sale, pd.NA)
         harv = harv.drop(columns='condition_sold')
-        farm, farm_tally = _farm_level_sales(t, _decisions)
+        farm, farm_tally = _farm_level_sales(t, _decisions, harv)
         # "Attach nothing and COUNT IT" -- and the counting has to be code,
         # not a number frozen in CONTENTS.org that will not move when the
         # data does (GH #854 red-team item 6).

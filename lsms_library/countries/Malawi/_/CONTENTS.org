@@ -5321,5 +5321,7 @@ and filled on every row holding a sale: on a harvest row =Unit_sold= is =u=, by 
 - *Code 39 in Modules P and Q is sugar cane (corrected on review).*  2013-14 P and Q carry it unlabelled, but =harmonize_crop= has 39 = =Sugar Cane=, 2013-14 Module I labels 39
   =SUGAR CANE=, perennial "Other" is mostly sugar cane (above), and 12 of the 13 sales are by the ox-cart.  =_PERENNIAL_RECODE= now folds 1039 -> 39, which restores 23 + 1 harvest rows
   (2013-14, 2010-11) the =crop= filter used to drop and labels the 13 sales (329,000 MWK), which the ladder then places.  Not checked against Module P's printed code list.
+- *A household's own rows name the crop.*  9 Farm-level rows of 2010-11 (39,470 MWK) are code 48 beside the household's =Cowpea (Khobwe)= lines (GH #1228), so they say
+  =Cowpea (Khobwe)= and not =Other=, which would add a crop to =crop_diversity='s count.  Where a household's code carries two labels the row keeps the table's.
 - *No two-line trap.*  A crop on one plot in two rows goes through the ladder; =0= sales in any wave have 2+ rows stating a harvest on ONE plot and reach Farm-level.
   115 records (3.21M MWK) on 2+ plots have one row stating a harvest; Nigeria's ruling A was not extended to them.

@@ -188,3 +188,21 @@ class TestOracle:
     def test_no_sentinel_row_holds_a_sale(self, served, wave):
         g = served[(served.t == wave) & (served.plot_id == "unknown_plot")]
         assert not (g.Value_sold.astype(float) > 0).any()
+
+
+class TestReview:
+    """F3 and F4 of the #1457 review."""
+
+    def test_a_sale_takes_its_households_label_for_the_code(self, malawi):
+        """Code 48 beside lines whose text says cowpea is not a second crop (GH #1228)."""
+        cowpea = "Cowpea (Khobwe)"
+        out = _assemble(malawi, [("h", "R1", cowpea, 48, KG, "unknown_condition", 5.0),
+                                 ("h", "R2", cowpea, 48, KG, "unknown_condition", 5.0)],
+                        [("h", 48, KG, "unknown_condition", 1.0, 10.0)])
+        assert out.xs(FARM, level="plot_id").index.get_level_values("crop").tolist() == [cowpea]
+
+    def test_two_labels_on_a_households_code_fall_back_to_the_table(self, malawi):
+        out = _assemble(malawi, [("h", "R1", "Cowpea (Khobwe)", 48, KG, "unknown_condition", 5.0),
+                                 ("h", "R2", "Other", 48, KG, "unknown_condition", 5.0)],
+                        [("h", 48, KG, "unknown_condition", 1.0, 10.0)])
+        assert out.xs(FARM, level="plot_id").index.get_level_values("crop").tolist() == ["Other"]
