@@ -48,8 +48,9 @@ Mali::food_acquired::7day-purchase-at-last-purchase-unit-value:
         denominator -- purchased rows of the delivered table, after the
         canonical reshape and the (t, v, i, j, u, s) collapse -- because that
         is the number a user sees; the source-row counts are smaller and were
-        what an earlier version of this entry quoted. 2018-19: 25,667 of the
-        129,598 SERVED purchased rows (19.8%) -- 10,771 because no last
+        what an earlier version of this entry quoted. 2018-19: 25,572 of the
+        129,085 SERVED purchased rows (19.8%), since GH #1513 folded its food labels;
+        before that 25,667 of 129,598 -- 10,771 because no last
         purchase was reported at all (s07bq08 or s07bq07a missing / not
         positive), 6,731 because the last purchase used a different unit CODE,
         8,165 because it used the same code in a different SIZE (Petit / Moyen
@@ -83,7 +84,7 @@ Mali::food_acquired::7day-purchase-at-last-purchase-unit-value:
         people who built the aggregate rather than an answer anybody gave -- so
         it is checked and not served.  Own production keeps the identical
         treatment it already had (s = 'produced' from s07bq04, Expenditure NA).
-        2018-19: 16,459 inkind rows carrying 58,639 units, 0 with an Expenditure.  2021-22: 16,869 inkind rows carrying 59,567 units, 0 with an Expenditure.
+        2018-19: 16,413 inkind rows carrying 58,639 units, 0 with an Expenditure.  2021-22: 16,869 inkind rows carrying 59,567 units, 0 with an Expenditure.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
   validated_against: >-
