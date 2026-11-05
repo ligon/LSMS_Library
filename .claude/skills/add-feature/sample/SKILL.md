@@ -88,7 +88,8 @@ Strata are often implicit (Region x Urban/Rural) rather than explicit.
 | **Tanzania** | `strataid` | 53 region x urban/rural pairs | Explicit in all waves |
 | **Ethiopia** | *none explicit* | Construct from `saq01` x `saq14` | Region x Urban/Rural |
 | **Malawi** | *none explicit* | Use `district` (32 strata) | |
-| **EHCVM** | *none explicit* | Construct from `s00q01` x `s00q04` | Region x Milieu |
+| **EHCVM: Senegal, Mali, Niger, Burkina Faso** | *none explicit* | `strata: [s00q01, s00q04, {mapping: strata_label}]` | Region x Milieu as a label, registered as a derivation (GH #812). The `strata` table is the `Region` table x {Urbain, Rural} |
+| **EHCVM: Benin, Togo, Guinea-Bissau, Cote d'Ivoire** | *none explicit* | `s00q01` | Region alone; not moved by GH #812, their BIDs not checked |
 
 ### Cluster (PSU) variable names
 

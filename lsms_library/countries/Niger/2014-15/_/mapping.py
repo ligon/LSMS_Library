@@ -1,6 +1,21 @@
 # Formatting functions for Niger 2014-15 (ECVMA2)
 import pandas as pd
 
+from lsms_library.build_transforms import GrainConflict, reduce_to_agreed
+from lsms_library.ehcvm import StratumError
+
+
+def df_strate(df):
+    '''`sample`'s second sub-df (GH #812).  `ECVMA2014_P1P2_Conso.dta` repeats a
+    grappe's `strate` on every consumption row, and merging that on `v` against
+    household rows would be a cartesian product, so reduce it to one row per
+    grappe first.  A grappe holding two strata raises `StratumError`: `GrainConflict`
+    is a `ValueError`, which `_join_v_from_sample` swallows.'''
+    try:
+        return reduce_to_agreed(df, country='Niger', table='sample', wave='2014-15')
+    except GrainConflict as exc:
+        raise StratumError(f'Niger/2014-15/sample: {exc}') from exc
+
 
 _FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
                'AteLess', 'RanOut', 'Hungry', 'WholeDay']

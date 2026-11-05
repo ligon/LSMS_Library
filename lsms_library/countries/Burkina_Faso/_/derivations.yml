@@ -278,3 +278,68 @@ Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19:
     can be repeated only on the held file.
   contents: 'Burkina_Faso/_/CONTENTS.org, "2021-22 GPS carried from 2018-19 (GH #1057)"'
   since: '2026-11-03'
+
+Burkina_Faso::sample::region-milieu-stratum:
+  waves: ['2018-19', '2021-22']
+  columns: [strata]
+  rows: {}
+  rule: >-
+    strata = '<s00q01 label> <s00q04 label>', the region and area of residence the
+    household cover page records, for example 'Cascades Urbain'.  Labels and never
+    codes.  NA where either is missing.  No household file of these waves records a
+    stratum.  The region part is then spelled through this country's `strata` table
+    in categorical_mapping.org, at read time, which is the `Region` table crossed
+    with the two milieu labels.
+  function: lsms_library.ehcvm:derive_region_milieu_stratum
+  inputs: lsms_library.countries.Burkina_Faso.2018-19._.mapping:inputs_strata
+  raw_variables: [s00q01, s00q04]
+  assumptions:
+    - text: >-
+        the strata of the panel design are the 13 regions crossed with the two areas
+        of residence.
+      basis: questionnaire
+      evidence: >-
+        bid_bfa_ehcvm2.pdf (held, 2021-22/Documentation), p.4: "The different strata
+        result from the combination of the 13 regions with the two areas of residence
+        (urban, rural)."  A Basic Information Document, not the instrument.
+    - text: >-
+        2018-19 has the same 26 strata.  Three documents give three stratifications, and
+        only bid_bfa_ehcvm2.pdf, p.4, of the later wave, states 13 x 2.  The French report
+        on 2018-19 (ehcvm_2018_rapport_general.pdf, section 1.3.1, printed p.16) says "La
+        stratification est faite avant le tirage des unités primaires et basée sur
+        l'urbanisation des agglomérations (urbain, rural)", and its Tableaux 1.1 and 1.2
+        allocate by region and by milieu separately.  basicinformationdocument_bfa.pdf,
+        p.10, says "representative for the strata of Ouagadougou, other urban areas and
+        rural areas".  Share of var(log cluster weight) between these 26 cells is 74.0%,
+        against 22.7% between urban and rural and 8.2% between regions.  The report plans
+        252 urban and 333 rural clusters where the cover has 263 and 322, so the cover
+        differs from the plan by 11 clusters on milieu even in the base wave.
+      basis: modelling-choice
+      evidence: >-
+        @ligon's ruling on GH #812, 2026-11-04, resting on the panel BID, the survey's 26
+        unit-table codes and the weights.  The memo ruled on said the report gives 26; it
+        does not.  Burkina_Faso/_/CONTENTS.org quotes the three documents.
+    - text: >-
+        the 2021-22 cross-section is stratified the same way.  Catalog 6277 names no
+        stratum; 76.1% of var(log cluster weight) lies between these cells.
+      basis: modelling-choice
+      evidence: Burkina_Faso/_/CONTENTS.org, "strata by wave" (GH #812).
+    - text: >-
+        the survey's own coding is the same cross.
+      basis: variable-label
+      evidence: >-
+        ehcvm_nsu_bfa2021.dta, a unit table: `strate`, "Code de la strate", labelled
+        BOUCLE DU MOUHOUN Urbain and so on; its 26 codes equal 10 x region + milieu of
+        ehcvm_welfare_2b_bfa2021.dta.
+    - text: >-
+        a cluster takes the cover page's label in each wave rather than carrying a
+        2018-19 label forward.  Of 3,227 households in both waves 42 (7 clusters)
+        change stratum: Plateau-Central Urbain to Rural, Nord Urbain to Rural.
+      basis: modelling-choice
+      evidence: Burkina_Faso/_/CONTENTS.org, GH #812 ruling option W2, 2026-11-04.
+  validated_against: >-
+    tests/test_gh812_ehcvm_strata.py, whose oracle reads the covers directly: 26 cells
+    in 2018-19 and in each 2021-22 component.  No held table states Burkina's allocation
+    by stratum.
+  contents: 'Burkina_Faso/_/CONTENTS.org, "EHCVM strata are region x milieu labels (GH #812)"'
+  since: '2026-11-04'

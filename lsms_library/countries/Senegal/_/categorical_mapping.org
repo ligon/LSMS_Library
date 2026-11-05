@@ -506,6 +506,75 @@ unchanged.
 | SAINT-LOUIS | Saint-Louis |
 | Saint-Louis | Saint-Louis |
 
+GH #812, 2026-11-04.  EHCVM =sample.strata= is region x milieu, as a label
+(=lsms_library/ehcvm.py=, =derive_region_milieu_stratum=).  This table is the
+=Region= table above crossed with the cover's two =s00q04= labels, row for row, so
+the region part of =strata= is =cluster_features.Region=.  No new judgement;
+=tests/test_gh812_ehcvm_strata.py= pins the identity.  Labels of any other wave's
+scheme match no key and pass through unchanged.
+
+#+name: strata
+| Alternate Spelling | Preferred Label    |
+|--------------------+--------------------|
+| dakar Urbain       | Dakar Urbain       |
+| dakar Rural        | Dakar Rural        |
+| Dakar Urbain       | Dakar Urbain       |
+| Dakar Rural        | Dakar Rural        |
+| diourbel Urbain    | Diourbel Urbain    |
+| diourbel Rural     | Diourbel Rural     |
+| Diourbel Urbain    | Diourbel Urbain    |
+| Diourbel Rural     | Diourbel Rural     |
+| fatick Urbain      | Fatick Urbain      |
+| fatick Rural       | Fatick Rural       |
+| Fatick Urbain      | Fatick Urbain      |
+| Fatick Rural       | Fatick Rural       |
+| kaffrine Urbain    | Kaffrine Urbain    |
+| kaffrine Rural     | Kaffrine Rural     |
+| Kaffrine Urbain    | Kaffrine Urbain    |
+| Kaffrine Rural     | Kaffrine Rural     |
+| kaolack Urbain     | Kaolack Urbain     |
+| kaolack Rural      | Kaolack Rural      |
+| Kaolack Urbain     | Kaolack Urbain     |
+| Kaolack Rural      | Kaolack Rural      |
+| kedougou Urbain    | Kedougou Urbain    |
+| kedougou Rural     | Kedougou Rural     |
+| Kedougou Urbain    | Kedougou Urbain    |
+| Kedougou Rural     | Kedougou Rural     |
+| kolda Urbain       | Kolda Urbain       |
+| kolda Rural        | Kolda Rural        |
+| Kolda Urbain       | Kolda Urbain       |
+| Kolda Rural        | Kolda Rural        |
+| louga Urbain       | Louga Urbain       |
+| louga Rural        | Louga Rural        |
+| Louga Urbain       | Louga Urbain       |
+| Louga Rural        | Louga Rural        |
+| matam Urbain       | Matam Urbain       |
+| matam Rural        | Matam Rural        |
+| Matam Urbain       | Matam Urbain       |
+| Matam Rural        | Matam Rural        |
+| sedhiou Urbain     | Sedhiou Urbain     |
+| sedhiou Rural      | Sedhiou Rural      |
+| Sedhiou Urbain     | Sedhiou Urbain     |
+| Sedhiou Rural      | Sedhiou Rural      |
+| tambacounda Urbain | Tambacounda Urbain |
+| tambacounda Rural  | Tambacounda Rural  |
+| Tambacounda Urbain | Tambacounda Urbain |
+| Tambacounda Rural  | Tambacounda Rural  |
+| thies Urbain       | Thies Urbain       |
+| thies Rural        | Thies Rural        |
+| Thies Urbain       | Thies Urbain       |
+| Thies Rural        | Thies Rural        |
+| ziguinchor Urbain  | Ziguinchor Urbain  |
+| ziguinchor Rural   | Ziguinchor Rural   |
+| Ziguinchor Urbain  | Ziguinchor Urbain  |
+| Ziguinchor Rural   | Ziguinchor Rural   |
+| saint-louis Urbain | Saint-Louis Urbain |
+| saint-louis Rural  | Saint-Louis Rural  |
+| SAINT-LOUIS Urbain | Saint-Louis Urbain |
+| SAINT-LOUIS Rural  | Saint-Louis Rural  |
+| Saint-Louis Urbain | Saint-Louis Urbain |
+| Saint-Louis Rural  | Saint-Louis Rural  |
+
 #+NAME: Roof
 | Alternate Spelling | Preferred Label |
 |--------------------+-----------------|

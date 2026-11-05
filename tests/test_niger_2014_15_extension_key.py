@@ -111,6 +111,9 @@ class TestKeyIsDeclared:
     def test_every_i_in_the_wave_yaml_carries_all_three_columns(self, data_info):
         blocks = {k: v for k, v in data_info.items()
                   if isinstance(v, dict) and "idxvars" in v}
+        # GH #812: `sample` became a dfs: block, so `i` sits in sample.df_welfare.
+        blocks.update({f"{k}.{sub}": v[sub] for k, v in data_info.items()
+                       if isinstance(v, dict) and "dfs" in v for sub in v["dfs"]})
         assert blocks, "no idxvars blocks found in 2014-15 data_info.yml"
         seen = 0
         for table, spec in blocks.items():

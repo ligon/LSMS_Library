@@ -275,7 +275,9 @@ Savanes), Benin 31.4% between 12 (0.65x Zou to 1.77x Donga, where the DDI
 *does* state a disproportionate allocation), CotedIvoire 36.5% between 33
 (0.33x Abidjan to 6.17x Folon).  Senegal, Mali, Niger and Burkina Faso's
 EHCVM waves (2018-19 and 2021-22) wire no =strata= key at all, so the check
-cannot run there -- a gap of its own.
+cannot run there -- a gap of its own.  /Closed 2026-11-04 (GH #812): those four now
+serve region x milieu, not the region alone as here; their =CONTENTS.org= give the
+shares./
 
 ** 2018-19 -- where the statement lives
 

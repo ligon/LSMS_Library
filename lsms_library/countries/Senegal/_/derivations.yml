@@ -147,3 +147,46 @@ Senegal::community_prices::one-item-per-price:
     the one-item reading cannot be checked against data.
   contents: 'Senegal/_/CONTENTS.org, "2018-19 community prices are wired (GH #1226)"'
   since: '2026-11-04'
+
+Senegal::sample::region-milieu-stratum:
+  waves: ['2018-19', '2021-22']
+  columns: [strata]
+  rows: {}
+  rule: >-
+    strata = '<s00q01 label> <s00q04 label>', the region and area of residence the
+    household cover page records, for example 'Kaolack Urbain'.  Labels and never
+    codes.  NA where either is missing.  No household file of these waves records a
+    stratum.  The region part is then spelled through this country's `strata` table
+    in categorical_mapping.org, at read time, which is the `Region` table crossed
+    with the two milieu labels.
+  function: lsms_library.ehcvm:derive_region_milieu_stratum
+  inputs: lsms_library.countries.Senegal.2018-19._.mapping:inputs_strata
+  raw_variables: [s00q01, s00q04]
+  assumptions:
+    - text: >-
+        the stratum of the design is the combination of region and area of
+        residence, and 2021-22 keeps the 2018-19 plan.
+      basis: questionnaire
+      evidence: >-
+        sen_ehcvm2_information_de_base_eng.pdf (held, 2021-22/Documentation), section
+        4.1, p.12: "The second edition is a cluster panel survey, and the sampling
+        plan builds upon that of the 2018/2019 survey ... The stratum is the
+        combination of region/residential area."  The basis is a Basic Information
+        Document, not the instrument; it is the survey's own statement.  No held
+        2018-19 document states it.
+    - text: >-
+        a cluster takes the cover page's label in each wave rather than carrying a
+        2018-19 label forward.  In Senegal the choice moves nothing: 0 of the 6,432
+        households in both waves change stratum.
+      basis: modelling-choice
+      evidence: Senegal/_/CONTENTS.org, GH #812 ruling option W2, 2026-11-04.
+  validated_against: >-
+    BID Table 1a, clusters by region and residence: all 28 cells equal 2018-19 (598
+    clusters; tests/test_gh812_ehcvm_strata.py transcribes the table).  It is a real
+    allocation: 299 + 299 clusters, and Table 1b's 7,176 planned households against 7,156
+    held.  2021-22 is the
+    same less the two dropped DRs, Dakar urban 75 and Ziguinchor rural 17.  Share of
+    var(log cluster weight) between these cells 90.8% (2018-19) and 88.7% (2021-22),
+    against 58.8% and 58.6% between regions alone.
+  contents: 'Senegal/_/CONTENTS.org, "EHCVM strata are region x milieu labels (GH #812)"'
+  since: '2026-11-04'

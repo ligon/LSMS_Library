@@ -259,6 +259,55 @@
 | Zinder                         | Zinder                         |
 | zinder                         | Zinder                         |
 
+GH #812, 2026-11-04.  EHCVM =sample.strata= is region x milieu, as a label
+(=lsms_library/ehcvm.py=, =derive_region_milieu_stratum=).  This table is the
+=Region= table above crossed with the cover's two =s00q04= labels, row for row, so
+the region part of =strata= is =cluster_features.Region=.  No new judgement;
+=tests/test_gh812_ehcvm_strata.py= pins the identity.  Labels of any other wave's
+scheme match no key and pass through unchanged.
+
+#+name: strata
+| Original Label                      | Preferred Label  |
+|-------------------------------------+------------------|
+| Agadez Urbain                       | Agadez Urbain    |
+| Agadez Rural                        | Agadez Rural     |
+| agadez Urbain                       | Agadez Urbain    |
+| agadez Rural                        | Agadez Rural     |
+| gadez Urbain                        | Agadez Urbain    |
+| gadez Rural                         | Agadez Rural     |
+| Communauté urbaine de Niamey Urbain | Niamey Urbain    |
+| Communauté urbaine de Niamey Rural  | Niamey Rural     |
+| Niamey Urbain                       | Niamey Urbain    |
+| Niamey Rural                        | Niamey Rural     |
+| niamey Urbain                       | Niamey Urbain    |
+| niamey Rural                        | Niamey Rural     |
+| Diffa Urbain                        | Diffa Urbain     |
+| Diffa Rural                         | Diffa Rural      |
+| diffa Urbain                        | Diffa Urbain     |
+| diffa Rural                         | Diffa Rural      |
+| Dosso Urbain                        | Dosso Urbain     |
+| Dosso Rural                         | Dosso Rural      |
+| dosso Urbain                        | Dosso Urbain     |
+| dosso Rural                         | Dosso Rural      |
+| Maradi Urbain                       | Maradi Urbain    |
+| Maradi Rural                        | Maradi Rural     |
+| maradi Urbain                       | Maradi Urbain    |
+| maradi Rural                        | Maradi Rural     |
+| Tahoua Urbain                       | Tahoua Urbain    |
+| Tahoua Rural                        | Tahoua Rural     |
+| tahoua Urbain                       | Tahoua Urbain    |
+| tahoua Rural                        | Tahoua Rural     |
+| Tillabéri Urbain                    | Tillabéri Urbain |
+| Tillabéri Rural                     | Tillabéri Rural  |
+| Tillaberi Urbain                    | Tillabéri Urbain |
+| Tillaberi Rural                     | Tillabéri Rural  |
+| tillaberi Urbain                    | Tillabéri Urbain |
+| tillaberi Rural                     | Tillabéri Rural  |
+| Zinder Urbain                       | Zinder Urbain    |
+| Zinder Rural                        | Zinder Rural     |
+| zinder Urbain                       | Zinder Urbain    |
+| zinder Rural                        | Zinder Rural     |
+
 #+NAME: District
 | Original Label                 | Preferred Label                |
 |--------------------------------+--------------------------------|

@@ -28,6 +28,10 @@ sample:
                     Urbain: Urban
                     urbain: Urban
                     URBAIN: Urban
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
     df_weights:
         # Each component's OWN weight in `weight` (@ligon, GH #1276 ruling 3;
         # the Malawi precedent): the panel's cross-sectional `hhweight2021`,
