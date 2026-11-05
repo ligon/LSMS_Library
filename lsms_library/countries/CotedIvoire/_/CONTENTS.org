@@ -1206,24 +1206,35 @@ row for this wave; the verdict is =asked-not-distributed=, =.coder/coverage/abse
 
 ** =food_acquired= and =s07bq03a= (WAITING: with the maintainer)
 
-*The file re-expresses about 15% of its consumption rows in another unit, and no document says so.*  Not Togo's defect, and the checks
-written for Togo pass: =s07bq03a/s07bq04= on never-purchased own-production rows has mode 1.0 in all 33 regions (19,413 of 19,717 rows),
-and 401 of 28,703 =Jamais= rows keep a residual (1,231 of 43,380 in 2018-19).  But =s07bq03a= is on the quarter grid on 84.7% of positive rows, against 99.0% in
-2018-19, and it is not alone: =s07bq04= 73.8% (99.8%), =s07bq05= 76.4% (99.3%), while =s07bq07a= is 99.8% (99.9%).  The review read this as decimals.  It is not:
-- on rows with =0 < q4 < q3=, both off the grid, =q3/q4= is 2, 1.5, 1.33, 4, 3: the three columns move together, by a row's own factor;
-- 31.5% of off-grid values of 1 or more repeat exactly inside their (region, milieu, item, unit, size) cell (2.8% under a +-15% jitter);
-- the repeated values are ratios of =ehcvm_nsu= weights.  Mango =Unité (Moyen)= holds 152.13 on 168 rows, 76.07 and 304.27 besides: 82,000 g / 539 g, a code 105 size 4 expressed
-  in mangoes.  Honey in =Litre= is 0.0175 x 1 to 7 and 0.0095 x 2 to 7, the two =Cuillère= weights.  Salt in =Sachet (Petit)= in Abidjan is 0.13 and 0.26, 15 g / 115 g, the spoon.
-  My test that every off-grid row is such a ratio does not discriminate (34.6% against 31.8% on jittered values), so the mechanism is shown on these
-  cells and not on all 46,291.
-The household's own unit is not in the file, and =s07bq03b= names the unit after conversion.  The last purchase =s07bq07a/b/c= is not converted, nor is =s07bq08=.  It is row-level, in all regions and both vagues
-(15.4%, 15.1% off the grid), most on rows bought longest ago (=Jamais= 28.0%, =Hier= 10.5%).
+*15.2% of the positive =s07bq03a= rows are off the quarter grid, and they are two different things, both inferred: no document says either.*  The BID mentions imputation only for the analysis files.
+2018-19 is 99.0% on the grid, with no row of 4 or more decimals off it.  Not Togo's defect, and Togo's checks pass: =s07bq03a/s07bq04= on never-purchased own-production rows has mode 1.0 in all 33 regions (19,413 of 19,717 rows),
+and 401 of 28,703 =Jamais= rows keep a residual (1,231 of 43,380 in 2018-19).  But that mode cannot see an adjustment made to both columns, and =q3= = =q4= on 97.4% of own-production rows.  =s07bq07a= and =s07bq08= are clean, 99.8% on the grid.
+| positive =s07bq03a= rows                                            | on grid        | H: 4+ decimals, off grid | L: up to 3 decimals, off grid |
+|---------------------------------------------------------------------+----------------+--------------------------+-------------------------------|
+| rows                                                                | 257,031, 84.75% | 20,239, 6.67%           | 26,004, 8.57%                 |
+| same unit and size as the last purchase                             | 88.6%          | 88.3%                    | 44.5%                         |
+| own production on the row                                           | 12.5%          | 13.2%                    | 33.5%                         |
+| last bought over 30 days ago, or never                              | 21.2%          | 25.4%                    | 62.2%                         |
+| slope of log =q3= on log =eqadu1=, inside (item, unit, size, region), residual sd | 0.33, 0.52 | *0.94, 0.19*           | 0.70, 0.83                    |
+| =Expenditure= share                                                 | 95.6%          | 2.5%                     | 2.0%                          |
 
-*What it does to the table.*  =(u, Quantity)= stays a self-consistent pair, and =Expenditure= reads a unit value only where the units match, so there is no false regional level and few
-phantoms: 601 purchased rows under 0.02, against 133 in 2018-19.  Off-grid rows are 28,126 of 233,016 purchased source rows and 4.4% of =Expenditure=, and their unit value equals the
-on-grid rows' at the median of 875 (item, unit, size) cells (10%-90%: 0.40, 1.43).  What it costs: =u= is not always what the household said, values can be absurd where a large unit met a small one (the mangoes), and
-=food_quantities(units='kgs')= rests on the converted figure.  UEMOA's =depan= is built on it: the rule reproduces =depan(Achat)= within 1% on 90.5% of 912 discriminating rows (28.7% net of own production only, 1.0% gross), and on
-92.6% of off-grid rows.  That shows the arithmetic, not that the column is raw.  Served as filed.  Memo in the PR.
+*H reads as high per-adult-equivalent reports replaced by a typical amount, so the household's answer is gone, not re-labelled.*  =q3= follows =reference x eqadu1 / unit weight=: =q3/eqadu1= repeats 3 or more times at (item, unit, size) on 53.4% of H rows (3.8% under a +-15% jitter; 11.6% on =hhsize=, 7.7% on =eqadu2=).  The H
+share falls with household size, from 22.4% of rows with one member to 1.6% at 13 or more.  On purchase-only rows bought in the last 7 days in the same unit, =q3/q7= is 1 on 54.7% of on-grid rows and on 0.0% of H rows.  The reference cell is unknown.
+
+*L looks at least partly converted through =ehcvm_nsu= weights, and its size is an upper bound on that.*  Mango =Unité (Moyen)= holds 152.13 on 168 rows, 76.07 and 304.27 besides: 82,000 g / 539 g, a code 105 size 4 expressed in mangoes.  Honey in
+=Litre= is 0.0175 x 1 to 7 and 0.0095 x 2 to 7, the two =Cuillère= weights.  Salt in =Sachet (Petit)= in Abidjan is 0.13 and 0.26, 15 g / 115 g, the spoon.  The review finds the 229 off-grid values of 50 or more exact NSU ratios on 83.8% (jitter 1.3%), and
+below that the test has little power: stratified by size and decimals, the excess over the null is 2,119 rows, 4.6% of off-grid.  My own test does not discriminate (34.6% against 31.8%).  =s07bq03b= names the unit as filed, and any earlier unit is not in the file.  A row with both =q3= and =q4=
+off the grid and =q3 > q4= has =q3/q4= of 2, 1.5, 1.33, 4, 3, but that is 77 of 1,148 such rows: true and thin.
+
+Ruled out, by the review: a Togo-style multiplier by file, vague, milieu, region, department, unit, size or item (best hit 4.0-5.0%); a few enumerators (grappe off-grid share 8.5%, 15%, 22.4% at p10, p50, p90); per-capita or per-week scaling of =q3= itself; conversion to the purchase unit (off-grid rows match it less often, not more).
+
+*A wave break follows.*  2018-19 has no H rows.  Over the 164 (item, unit, size) cells with 100 rows in each wave, 2021-22 over 2018-19 per-capita =q3= is 0.90 at the median, 0.75 at p90, 0.57 at p99: the top of the distribution looks cut in one wave only.
+On-grid rows alone give 1.00, 0.76, 0.60.  So quantities and values built on =s07bq03a= are not comparable across these waves at the top.
+
+*What the tables serve.*  =food_prices(units='unitvalue')= and the kg ladder read =s07bq08/s07bq07a=, so prices and factors are clean: off-grid over on-grid unit value is 1.0 at the median of 875 (item, unit, size) cells (10%-90%: 0.40, 1.43), though the row set shifts.  =food_acquired.Quantity=,
+=food_expenditures= and =food_quantities= carry the producer's figure.  *=(u, Quantity)= is not a safe pair on H rows*: the quantity is not what the household said.  Off-grid rows are 28,091 of 233,016 purchased source rows and 4.4% of =Expenditure=, and that is a symptom and no reassurance: within (item, unit, size) their
+purchased quantity is 0.34 x on-grid and their =Expenditure= 0.25 x.  601 purchased rows sit under 0.02, against 133 in 2018-19, and values can be absurd where a large unit met a small one (the mangoes).  UEMOA's =depan= is built on these figures: the rule reproduces =depan(Achat)= within 1% on 90.5% of 912 discriminating rows (28.7% net of own production only, 1.0% gross), and on
+92.6% of off-grid rows.  That shows the arithmetic, not that the column is raw.  Served as filed, since it cannot be inverted.  Options in the PR; a per-row key on H rows is a tested patch.
 
 *The rest of the table.*  305,482 rows: 232,969 purchased, 43,463 produced, 29,050 =inkind=.  =Expenditure= 121,393,491 FCFA, NA on 17.5% of purchased rows (16.2% in 2018-19), raw =s07bq08= 170,793,500.
 Here =s07bq03b= and =s07bq07b= carry one label set (Togo's two differ), so no formatter is needed.  =s07b= is a grid of 173 items on every household, 2,242,945 rows, 303,274 with a quantity.

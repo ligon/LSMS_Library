@@ -100,9 +100,11 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
     on the 912 (household, product) rows where the candidates differ, the rule x 365/7 is
     within 1% of depan(Achat) for 90.5%, against 28.7% for the own-production-only residual
     and 1.0% for the gross quantity; median ratio over 192,160 joined rows 1.00000.  This
-    shows the arithmetic was carried out, not that s07bq03a is what the household said: the
-    file re-expresses about 15% of its consumption rows in another unit, and depan is built
-    on the re-expressed quantity (_/CONTENTS.org, "2021-22 wired").
+    shows the arithmetic was carried out, not that s07bq03a is what the household said: 6.7%
+    of its positive rows read as high reports replaced by a typical amount per adult
+    equivalent and 8.6% look at least partly converted to another unit, inferred, with no
+    document saying so, and depan is built on those figures (_/CONTENTS.org, "2021-22 wired").
+    The unit value s07bq08 / s07bq07a is clean; the quantity it multiplies is not, on those rows.
   contents: 'CotedIvoire/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
 
