@@ -57,13 +57,23 @@ def food_acquired(df):
 # households "tracked within the EA" (bid_bfa_ehcvm2.pdf p. 4) and grappe ==
 # grappe_EHCVM1 for all 3,227, so a panel grappe IS a 2018-19 EA and the fix
 # carries.  Three grappes name a different province in the two waves, which puts
-# that identity in doubt for them (GH #1059), so they stay NA by ruling.  The
-# cross-section has no 2018-19 antecedent; its household GPS is not a cluster fix.
+# that identity in doubt for them (GH #1059), and six carry a fix far from their own
+# parcels, so all nine stay NA by ruling.  The cross-section has no 2018-19
+# antecedent; its household GPS is not a cluster fix.
 PANEL_GPS_DERIVATION = 'Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19'
 
 # Seno/Yagha, Poni/Noumbiel, Kompienga/Gourma.  The first two have a 2018-19 fix;
 # the third has none, so its exclusion changes nothing served.
-_GPS_NOT_CARRIED_GRAPPES = ('19', '365', '549')
+_GPS_PROVINCE_CHANGED_GRAPPES = ('19', '365', '549')
+
+# The fix lies more than 25 km from the median of the grappe's own 2021-22 parcels
+# (s16aq46; km 104.7, 103.7, 51.4, 44.5, 29.3, 28.8), where the median carried grappe
+# is 1.6 km away.  Ruling of 2026-11-04.  The list is literal so that a build never
+# reads s16a; tests/test_gh1060_1057_burkina_cluster_features.py recomputes it from
+# the parcels.
+_GPS_FAR_FROM_PARCELS_GRAPPES = ('103', '104', '240', '237', '229', '226')
+
+_GPS_NOT_CARRIED_GRAPPES = _GPS_PROVINCE_CHANGED_GRAPPES + _GPS_FAR_FROM_PARCELS_GRAPPES
 
 _GPS_COLUMNS = {'Latitude': 'coordonnes_gps__Latitude',
                 'Longitude': 'coordonnes_gps__Longitude'}

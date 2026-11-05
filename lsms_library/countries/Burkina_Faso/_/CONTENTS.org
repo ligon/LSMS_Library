@@ -116,8 +116,8 @@ Method: 900 ZD drawn with probability proportional to size at the first stage,
 
 - The catalog DDI's =sampling_procedure= instead gives 905 EAs / ~10 860
   households.  Recorded as a design-figure discrepancy; *not adjudicated*.
-- The realized counts recorded in the =sample= section of this file (10,224
-  households, 900 clusters) are data-side counts, a different kind of fact from
+- The realized counts recorded in the =sample= section of this file (10,411 in the
+  welfare file, 10,800 since GH #1464; 900 clusters) are data-side counts, a different kind of fact from
   these design figures.  No claim is made here about which is "right".
 
 *** Sub-samples / oversamples
@@ -509,7 +509,7 @@ per-native-unit unitvalue; only the kg aggregate excludes them.
 Sampling design table: cluster, weights, strata, and Rural classification.
 
 *** Waves
-- *2014 (EMC)*: Single file =emc2014_welfare.dta=.  Weight variable =hhweight= (cross-sectional); no distinct panel weight (same variable used for both).  Numeric =strate= column (1--26, Region x Milieu).  10,224 households across 900 clusters.
+- *2014 (EMC)*: =emc2014_welfare.dta=.  Weight variable =hhweight= (cross-sectional); no distinct panel weight (same variable used for both).  Numeric =strate= column (1--26, Region x Milieu).  10,411 households across 900 clusters (this said 10,224 until 2026-11-04, which matches no count of this file).  /Since 2026-11-04 also the 389 households only the p1 food file holds, with no weight, 10,800 in all: see GH #1464 at the end of this file./
 - *2018-19 (EHCVM)*: Two-file merge: cover page =s00_me_bfa2018.dta= (cluster, Rural) + =ehcvm_ponderations_bfa2018.dta= (cluster-level =hhweight=, same for both weight columns).  6,961 households across 585 clusters.  No explicit strata variable.
 - *2021-22 (EHCVM)*: Two-file merge: cover page =s00_me_bfa2021.dta= + =ehcvm_panel_ponderations_bfa2021.dta=.  Distinct weights: =hhweight2021= (cross-sectional) and =hhweight_panel= (panel/longitudinal).  Both weights are cluster-level (same value for all households in a grappe).  3,218 households across 550 clusters.  No explicit strata variable.
 
@@ -657,8 +657,8 @@ Measured:
   within their EA; see "THE THING TO KNOW" above); Region agrees 550/550, and
   527 of them have a 2018-19 fix.  Serving that fix for 2021-22 would be a
   cross-wave construction -- a registered derivation, not a config mapping --
-  and is not done.  /Done 2026-11-03, for 525 of the 527: see "2021-22 GPS
-  carried from 2018-19 (GH #1057)" at the end of this file./
+  and is not done.  /Done 2026-11-03, for 525 of the 527 (519 since 2026-11-04): see
+  "2021-22 GPS carried from 2018-19 (GH #1057)" at the end of this file./
 - =s16a_me_bfa2021.dta= DOES carry parcel coordinates (=s16aq46__latitude= /
   =__longitude=, 4,180 of 8,467 parcels, inside the country).  Parcel grain,
   not a cluster location; see the correction under =plot_features=.
@@ -2028,7 +2028,7 @@ Burkina Faso cache hash moves) and changes served 2021-22 =i=.
 
 *Also measured, not reconciled*: =sample()= serves 10,411 / 7,010 / 3,227
 households for 2014 / 2018-19 / 2021-22; the "DONE sample" section above
-records 10,224 / 6,961 / 3,218.
+records 10,224 / 6,961 / 3,218.  /Its 10,224 was corrected to 10,411 on 2026-11-04./
 
 *Cache*: none.  =sampling.yml= is not a build input (=.yml= is outside
 =_BUILD_INPUT_SUFFIXES=) and =CONTENTS.org= is excluded as documentation.
@@ -2195,6 +2195,7 @@ execution of the EMC scripts preserves 51,099 food-coping rows and 10,230
 months-food-inadequate rows exactly except for the namespace prefix.
 The pre-existing 389 EMC roster households absent from sample (1,506 person
 rows with null =v=) and missing EHCVM strata remain visible and unchanged.
+/The 389 are in =sample= since 2026-11-04 (GH #1464); see the end of this file./
 
 Private receiving evidence contains source/cache hashes, exact API commands,
 raw witnesses and the aggregate report. No raw IDs are published here.
@@ -2211,6 +2212,10 @@ scope above. Independent keyed, typed cold expectations match =sample=
 The source roster has 197,768 rows; the existing typed-all-payload-NA finalizer
 excludes 4,161 panel records. This measures current eligibility, not a new rule.
 The 1,506 EMC person rows with null =v= and missing EHCVM strata remain.
+/Correction, 2026-11-04 (GH #1464): this checkpoint's =sample= counts describe the table
+before the 389 were added.  =sample= is now 10,800 / 7,010 / 10,403, 28,213 in all.  The
+roster's rows and the namespace result do not move (193,607; no =i= shared across the
+waves), and its 1,506 null =v= are 0./
 
 Cold comparisons are independent by key, using sorted comparison projections;
 they do not independently establish raw iteration order. Exact numeric checks
@@ -2449,7 +2454,7 @@ spelling (pooled District stays 45, Region 13).
 The 2,035 pre-existing rows (all of 2014 and 2018-19, and the 550 panel
 grappes) are value- and dtype-equal to the shared warm parquet; 2014's grain
 report (1,034 of 10,800 rows, 94 zd, GH #1060) is unchanged.  Latitude and
-Longitude stay NaN for all 1,150 2021-22 grappes.  /Since GH #1057, 525 panel
+Longitude stay NaN for all 1,150 2021-22 grappes.  /Since GH #1057, 525 (since 2026-11-04, 519) panel
 grappes carry the 2018-19 fix; the 600 cross-section grappes stay NaN./
 
 *New idiosyncrasy: the cross-section cover carries HOUSEHOLD GPS.*
@@ -2629,6 +2634,10 @@ Of the 550 panel grappes: 525 carried; 22 with no 2018-19 fix (and not excluded)
 3 excluded.  =sampling.yml= is unchanged: the 2018-19 -> 2021-22 boundary was
 already =stable= and does not warn.
 
+/Superseded 2026-11-04: the six below are now withheld too, so 519 are carried and the
+table above is the state before that.  See "Six carried GPS fixes withheld" at the end
+of this file./
+
 *An independent check, and six fixes it doubts.*  =s16a_me_bfa2021.dta= records
 parcel positions in 2021-22 (=s16aq46__latitude= / =__longitude=), which owe
 nothing to the fix.  On the 277 of the 525 carried grappes that have one, the
@@ -2692,7 +2701,10 @@ slot's kilograms.  =s16b_me_bfa2021.dta= holds 1,158 applied NPK rows and =plot_
 does not read it.  =s16a= asks fertilizer per parcel (=s16aq29c1=, 3,684 positive in
 2018-19), which the =data_scheme.yml= grain note says it does not.
 
-* 2026-11-04 -- WAITING where 2014 =food_expenditures= loses =v= (GH #1464)
+* 2026-11-04 -- DONE where 2014 =food_expenditures= loses =v= (GH #1464)
+
+/Ruled the same day and fixed: see "2014 =sample= holds the 389" at the end of this file.
+This section is the state before that./
 
 2014's =food_acquired= reads =v= from its own files (=idxvars: v: zd=), so it carries one on every
 row.  The derived food tables do not: =food_expenditures_from_acquired= drops =v= from its
@@ -2719,7 +2731,7 @@ They are not households with no weight anywhere: every one of the 389 has =hhwei
 =hhweight4= in the p1 and p4 food files, and they thin out by passage (food rows at p1 389, p2 230,
 p3 13, p4 389).  Why =emc2014_welfare.dta= leaves them out is not documented here.
 
-WAITING a ruling, GH #1464.  Mali 2018-19 is the only other case of this shape (3 households, 27
+Mali 2018-19 is the only other case of this shape (3 households, 27
 =food_expenditures= rows, on =s07b= and not on the =s00= cover).  EthiopiaRHS, GhanaSPS 2009-10 and
 Tanzania 2014-15 also serve an NA =v=, but on =food_acquired= too.
 
@@ -2839,3 +2851,194 @@ Wired by PR #1374 (2026-10-30), before #1224 gave =food_acquired.u= its size, th
 *Instrument, unchanged.*  The held =bfa_ehcvm1_qnr_community_excel_vague{1,2}.xls= are the FOCUS forms, with three relevés of Quantité + Prix; the PRICE forms with two integer prices and no quantity are on the UEMOA catalogue (entry 43).  Both noted above.
 
 *Cost.*  =2018-19/_/mapping.py= is in every 2018-19 table's input hash, and the country hash folds every wave: one Burkina re-warm.
+
+* 2026-11-04 -- Six carried GPS fixes withheld; what is wrong with the 2018-19 fixes (GH #1057)
+
+*Ruling (@ligon, 2026-11-04).*  Withhold the 2021-22 carry on grappes 103, 104, 240,
+237, 229 and 226, whose 2018-19 fix lies more than 25 km from the median of their own
+2021-22 parcels, on the same reasoning as the province-change exclusions.  They stay NA
+with no key; their 2018-19 rows are untouched.  =2021-22/_/mapping.py= lists them
+literally, so a build never reads =s16a=; the test recomputes the list from the parcels.
+=s16a= here is the file we hold.  The current release of 6224 no longer has these columns, and
+which release we hold is settled in the section "what the World Bank states about 6224's versions"
+above, not here, so this check can be repeated only on the held file.
+
+*Measured*, cold, against development =115b6ab71=: 2021-22 rows 1,150 either way;
+non-null =Latitude= / =Longitude= and the key 525 -> 519; carried fixes still equal the
+2018-19 fix; 2018-19 unchanged.  Of the 550 panel grappes: 519 carried, 22 with no 2018-19
+fix, 9 excluded.  On the 271 carried grappes with a parcel coordinate the median distance
+is 1.57 km, p90 4.92, maximum 21.8; 4 exceed 10 km (116 21.8, 111 21.6, 532 14.4, 289 11.3).
+The other 248 carried grappes have no parcel coordinate, so nothing tests them.
+
+*New: every low-precision fix in the file is a rounded copy of another grappe's
+reading.*  =grappe_gps_bfa2018.dta= holds seven fixes at one or two decimals, all in vague 2.
+Each shares its =Timestamp= to the second and its =Altitude= with another grappe in the same
+province; its =Accuracy= differs from that grappe's only by rounding, and that grappe's
+full-precision position rounds to it:
+
+| copied fix | reading it copies | same province | km to its own parcels | km from the source reading | served in 2021-22 |
+|------------+-------------------+---------------+-----------------------+----------------------------+-------------------|
+| 237, 240   | 232 (1.4 km to own parcels) | yes | 44.5, 51.4 | 0.42 | withheld |
+| 226        | 223 (2.6 km to own parcels) | yes | 28.8       | 0.12 | withheld |
+| 365        | 369 (not in the panel)      | yes | 85.1       | 0.49 | withheld (province) |
+| 350        | 351 (2.9 km to own parcels) | yes | 6.4        | 0.69 | *carried* |
+| 216        | 217 (no parcels)            | yes | none       | 0.34 | *carried* |
+| 218        | 219 (no parcels)            | yes | none       | 0.46 | *carried* |
+
+So these are not readings of their own grappe, which the GH #1050 entry above could not see:
+it called them imprecise, and it asked whether 237/240 were one reading entered for two
+grappes.  It is one reading for three, with 232 the source.  444, at 4 decimals, shares no
+timestamp.  229 is the different case: its fix is 1.4 km from the median fix of its province
+and 0.9 km from grappe 236, and it is its parcels that lie 28 km from that median, so its
+withholding says the two disagree, not that the fix is the wrong one.
+
+*103 and 104 carry a point in Kadiogo, Ouagadougou's province.*  Their fixes are 6 m apart,
+both Namentenga, 109 km from that province's median fix and 6 km from Kadiogo's, while their
+parcels are 15 and 17 km from Namentenga's.  They lie within 30 m of two Kadiogo grappes, 89
+and 136.  All four are stamped 2019-07-23 within about two hours, and 103, 104 and 136 share
+one =Accuracy= value (6.068).  This is the only place in the file where fixes of different
+provinces meet within 500 m, apart from one pair (6 and 11, Oudalan and Séno, 468 m).  89 and
+136 have no parcels, so nothing says whether their own fixes are readings of those grappes or
+of the place the others were read.
+
+*Nothing in 2018-19 is changed.*  The 2018-19 rows still serve all of the above as recorded,
+pending a ruling.
+
+* 2026-11-04 -- 2014 =sample= holds the 389 (GH #1464)
+
+*Ruling (@ligon, 2026-11-04).*  Extend =sample= with the 389 households the welfare file
+leaves out: =v= = =zd=, =weight= NA, on Ethiopia's #1359 pattern.  Do not borrow =hhweight1=.
+
+*Where it is done.*  =2014/_/data_info.yml= reads =emc2014_p1_conso7jours_16032015.dta=
+after the welfare file, and the =sample= hook in =2014/_/mapping.py= keeps the welfare rows
+unchanged and first, then appends one row per household the welfare file lacks.  As in
+Ethiopia, a household's item rows must agree before they are reduced, and nothing is guessed.
+
+*A gap in the hash, not fixed here.*  =local_tools._collect_file_paths_from_block= yields only
+the plain-string members of a =file:= list, so a member with a per-file override (the form the
+food file takes here, and =Cross_Section/...= in 2021-22) is not in =Wave._input_hash=.  A new
+release of the p1 food file would rebuild =food_acquired=, where it is a plain string, and not
+=sample=.  It is a framework matter, filed as GH #1510: 28 such entries in 9 wave files.
+
+*Why that file and not the logement one.*  Logement holds the same 10,800 households at
+household grain, but it has no =strate=, and the food file does.  The food file writes the
+stratum as a code (=BM_R=) and the welfare file as a number; on the 10,410 households both
+report it, the 26 codes and the 26 numbers pair one-to-one.  So the 389 get their recorded
+stratum in the welfare file's spelling, and the hook refuses a code that pairing cannot place.
+*Ruled on =weight=, not on =strata=:* this is the one choice here the ruling did not name.
+Dropping it to NA is one line.
+
+*=hhweight1= is not this weight.*  It is on all 389 and differs from =hhweight= on all
+10,411 shared households (at 4 decimals); =hhweight= in the =emc2014_agri_*= files, on 387 of
+the 389, differs on all 10,377 shared.  Neither is read.  The 389 keep NA in =weight= and
+=panel_weight=, so a weighted estimate drops them, and =_normalise_sample_weights= divides
+by the non-null mean as before: the 10,411 weights served do not move.
+
+*Why the welfare file omits them is still undocumented.*  Measured, households present in the
+person file of each passage: passage 2 244 of the 389 against 10,374 of the 10,411 others;
+passage 3 17 against 10,212; passage 4 388 against 10,379.  On =res_entr1=, 382 of the 389 read 1.
+Passage presence does not settle it (independent review, 2026-11-04): all 133 households in p1 and
+p4 only are missing from the welfare file, but of those in p1, p2 and p4, 238 are missing and 198
+kept, and 5 of the 389 appear in all four passages.  66% of the 389 are urban, against 38% of the
+welfare file.
+
+*Measured*, cold base (=115b6ab71=) against the change:
+
+|                                                       | base          | after         |
+|-------------------------------------------------------+---------------+---------------|
+| =sample= 2014 / all rows                              | 10,411 / 27,824 | 10,800 / 28,213 |
+| 2014 =weight= non-null                                | 10,411        | 10,411        |
+| =sample(market='Region')= 2014 rows, =m= null         | 10,411, 0     | 10,800, 0     |
+| 2014 NA =v=: =household_roster=                       | 1,506         | 0             |
+| ... =food_expenditures()=                             | 6,603         | 0             |
+| ... =food_expenditures(valuation=..., basis='total')= | 6,841         | 0             |
+| ... =food_prices()=                                   | 3,795         | 0             |
+| ... =food_quantities()=                               | 4,049         | 0             |
+| ... =housing=                                         | 389           | 0             |
+| ... =individual_education=                            | 1,254         | 0             |
+| ... =food_coping=                                     | 65            | 5             |
+| ... =months_food_inadequate=                          | 13            | 1             |
+
+The rows of those tables are otherwise unchanged; only =v= moves.
+=household_characteristics= had no NA =v= to clear, because =roster_to_characteristics= spells
+one =Mover=, and 379 of these households were served =v = 'Mover'=, a label that says something
+the survey does not.  They now carry their =zd=.  The other 10 of the 389 have no row there on either
+side: all 18 of their roster rows have =MonthsSpent= 0, so the residence filter drops them.
+
+*What stays.*  One 2014 household is in the passage-3 files and in no p1 file (=zd= 262), so it
+keeps NA =v= on =food_coping= (5 rows) and =months_food_inadequate= (1), and =shocks= also holds
+it (3 rows, no =v= level).  It has no row in =sample=.  The p2-p4 person files hold 31 households not
+in p1, and it is the only one of them that reaches a served table (independent review).
+
+*If the hook refuses.*  It cannot on the held files: no household's item rows disagree and the
+strate pairing is one-to-one.  It raises =EmcSampleError=, which subclasses =Exception= as Tanzania's
+=SplitOffClusterError= does, because =_join_v_from_sample= swallows =ValueError= and would serve
+every 2014 table with no =v=.  Measured by injecting one disagreeing row into the real p1 food read,
+in a private cold root:
+
+| call | one build worker | two build workers |
+|------+------------------+-------------------|
+| =sample()= | =EmcSampleError= | =RuntimeError= naming it |
+| =household_roster(waves=['2014'])= | =EmcSampleError= | =RuntimeError= naming it |
+| =household_characteristics(waves=['2014'])= | =EmcSampleError= | *0 rows, no warning* |
+| =food_expenditures(waves=['2014'])= | not run | *0 rows, no warning about it* |
+| =household_characteristics()= | not run | "Could not materialize", which hides the cause |
+| =Feature('sample')([Burkina_Faso, Togo])= | Togo only, country dropped | the same |
+
+The difference is pickling: a class in a by-path =mapping.py= does not pickle, so a worker's error
+arrives as a =RuntimeError=, which the derived-table paths catch and retry.  The 0-row answers are
+that framework path, not this hook, and would need an importable exception class to close.
+
+*The #1244 checkpoint's counts.*  The reviewed 10,411 / 27,824 are the state before this; the
+sections above carry a dated note.  Its namespace finding holds: the 389 ids are =EMC_= ids, and
+none is shared with another wave.
+
+Cache: =2014/_/data_info.yml= and =mapping.py= are build inputs, so every Burkina table hash and
+every 2014 wave hash moves, one Burkina re-warm.  No other country's, and no
+=build_transforms_fingerprint=.  Pinned by =tests/test_gh1464_burkina_sample_extension.py=.
+
+* 2026-11-04 -- WAITING the tomato tin stays folded: the kg measurement (GH #1226)
+
+The ruling said to stop folding =Boîte de tomate= onto =Boîte= in the =u= table, measuring the kg
+factors first and stopping if they got materially worse.  They do, on a line fixed before looking, so
+the table is unchanged.  Measured on cold builds with the edit in a private clone.  A second pair of builds also served the
+C05 / C06 values of GH #1442, which is held and not on development; the two agree except where noted.
+
+*Which rows are tomato tins differs by wave.*  2018-19 has both codes, and 5,314 of its 9,187 served
+tin rows are code 108.  2021-22 fields code 107 only (5,302 source rows), so nothing there says what a
+tin held.  In 2014 the only tin is =grosse boite de tomate=: all 5,423 served =Boîte= rows.  So the fold
+has two rows in the table, not one, and the second is 2014's.  =ehcvm_nsu_bfa2021.dta= weighs the two
+apart, median kg by size Petit / Moyen / Grand: tomato tin 0.83 / 1.41 / 1.84, =Boîte= 0.40 / 0.46 / 0.80.
+
+*What unfolding buys.*  2018-19 household rows meeting a community price in their own unit, of 138,429:
+at =(j, u)= 109,750 -> 113,800, at =(v, j, u)= 66,350 -> 69,637.  Of the 5,314 tomato rows, 4,083 match at
+=(j, u)= only once unfolded, and 1,212 match under the fold only because a generic =Boîte= price exists.
+On price it hardly matters: same-market community tomato tin against =Boîte=, median 1.0 over 43 cells.
+(The review's 4,010 and 1,206 use a slightly different row set.  This join is measured on development
+=df8faa75f=, where GH #1226 spells community =u= in the household's sized form; at =115b6ab71= it did not.)
+
+*What it costs.*  V1 unfolds =Boîte de tomate= only, V2 also folds =grosse boite de tomate= onto it.
+Against the unit weights, each row scored against the unit the survey recorded, median absolute log
+error and share within 2x, as built -> V1 -> V2:
+
+| rows | as built | V1 | V2 |
+|------+----------+----+----|
+| tomato tin, all | 0.166, 97.6% | 0.181, 80.4% | 0.181, 94.8% |
+| ... 2014 | 0.186, 98.8% | 0.293, 54.2% | 0.186, 98.8% |
+| ... 2018-19 | 0.104, 97.0% | 0.090, 92.9% | 0.090, 92.9% |
+| generic tin, all | 0.388, 77.2% | 0.446, 70.6% | 0.446, 70.6% |
+| ... 2018-19 | 0.446, 66.2% | 0.455, 66.9% | 0.455, 66.9% |
+| ... 2021-22 | 0.236, 86.2% | 0.363, 73.5% | 0.363, 73.5% |
+
+With those values served, the generic rows are the same and 2014's tomato rows hold 98.7% within 2x under
+all three (median log error 0.170 / 0.256 / 0.170).  kg by wave, 2014 / 2018-19 / 2021-22: V1 -2.43% / -0.83% /
+-0.54% (2014 -1.11% with those values served), V2 -0.01% / -0.83% / -0.54%.  462 of 20,151 tin rows fall from the item rung
+to =unit= under either, none rises.  No non-tin row's factor moves.
+
+The line: more than 5 points of within-2x or 0.05 of median log error on either kind of tin, more than 5%
+of tin rows falling a rung, or more than 2% of a wave's kg.  V1 crosses the first and the third.  V2 crosses
+the first on generic tins, through 2021-22, and that wave's rows are the least certain to be generic,
+since 2021-22 has no tomato code.  WAITING a ruling, GH #1226.  It should be re-measured once the unit-weight
+tables are wired (GH #1452), because those rows then read a survey weight rather than this inference.
+
+Cache: none.  This section is documentation; the =u= table is unchanged.
