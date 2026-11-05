@@ -438,11 +438,13 @@
 | Armoires et autres meubles                     | Furniture       |
 | Aspirateur                                     | Appliances      |
 | Bicyclette                                     | Bicycle         |
+| Bicyclette, vélo de course                     | Bicycle         |
 | Bonbonne de gaz                                | Gas Cylinder    |
 | Camescope                                      | Camera          |
 | Caméra Vidéo                                   | Camera          |
 | Chaîne Hi Fi                                   | DVD/CD Player   |
 | Climatiseurs/splits                            | Air Conditioner |
+| Climatiseurs/Splits amovibles                  | Air Conditioner |
 | Congélateur                                    | Freezer         |
 | Cuisinière à gaz ou électrique                 | Cooker          |
 | Cyclomoteur/Vélomoteur, motocyclette           | Motorcycle      |
