@@ -401,6 +401,29 @@ class TestOracleModalProvince:
         assert (out["Derivation"] == MODAL_KEY).all()
 
 
+PARCEL_COLUMNS = ["s16aq46__latitude", "s16aq46__longitude"]
+
+
+def _parcel_positions(frame):
+    """The parcels with a position, or a failure that says why there can be none."""
+    missing = [c for c in PARCEL_COLUMNS if c not in frame.columns]
+    if missing:
+        pytest.fail(
+            f"s16a_me_bfa2021.dta has no {missing}: this file is not the release the six "
+            "withheld distances were measured on.  The current release of catalog 6224 "
+            "drops the parcel coordinates (Burkina_Faso/_/CONTENTS.org, \"what the World "
+            "Bank states about 6224's versions\"), so this check cannot be repeated on it, "
+            "and the carry's premise needs a fresh look.",
+            pytrace=False)
+    return frame.dropna(subset=PARCEL_COLUMNS)
+
+
+def test_the_parcel_oracle_says_why_when_the_coordinates_are_gone():
+    frame = pd.DataFrame({"grappe": [1], "s16aq45": ["Oui"]})
+    with pytest.raises(pytest.fail.Exception, match="not the release"):
+        _parcel_positions(frame)
+
+
 @pytest.fixture(scope="module")
 def sources():
     gps = _read("2018-19", GPS_FILE)
@@ -441,8 +464,7 @@ class TestOracleCarriedGps:
         hold; the current release of 6224 no longer has these columns, so acquiring it fails
         here (Burkina_Faso/_/CONTENTS.org, "what the World Bank states about 6224's versions")."""
         gps, panel, _ = sources
-        parcels = _read("2021-22", "s16a_me_bfa2021.dta").dropna(
-            subset=["s16aq46__latitude", "s16aq46__longitude"])
+        parcels = _parcel_positions(_read("2021-22", "s16a_me_bfa2021.dta"))
         medians = parcels.groupby(parcels["grappe"].astype(int).astype(str))[
             ["s16aq46__latitude", "s16aq46__longitude"]].median()
         shared = sorted((set(medians.index) & set(gps[gps[LAT].notna()].index)
