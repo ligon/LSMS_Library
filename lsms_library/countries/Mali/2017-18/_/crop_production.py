@@ -78,7 +78,7 @@ import pandas as pd
 from lsms_library.local_tools import get_dataframe, to_parquet
 from lsms_library.build_transforms import reduce_to_agreed
 from lsms_library.country import grain_reports
-from mali import (eaci_i as mali_i, crop_production_finalize, producing_trees,
+from mali import (eaci17_i as mali_i, crop_production_finalize, producing_trees,
                   tree_crop_rows, stamp_tree_derivations, FARM_LEVEL,
                   derive_hh_crop_sale_attachment, ehcvm_is_sale,
                   stamp_hh_crop_sale, _is_quantity_sentinel)
