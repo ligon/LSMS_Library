@@ -4,7 +4,7 @@
 
 * Survey Overview
 
-Côte d'Ivoire has five survey waves in the LSMS Library spanning 1985–2019:
+Côte d'Ivoire has six survey waves in the LSMS Library spanning 1985–2022:
 
 | Wave    | Survey Program                  | Catalog ID | Format   | Status                                  |
 |---------+---------------------------------+------------+----------+-----------------------------------------|
@@ -13,6 +13,7 @@ Côte d'Ivoire has five survey waves in the LSMS Library spanning 1985–2019:
 | 1987-88 | CILSS / EPAM (LSMS wave 3)      | 85         | DAT/DCT  | sample, cluster_features, roster        |
 | 1988-89 | CILSS / EPAM (LSMS wave 4)      | 82         | DAT/DCT  | sample, cluster_features, roster        |
 | 2018-19 | EHCVM (Enquête Harmonisée)      | 4292       | Stata DTA| Fully integrated                        |
+| 2021-22 | EHCVM-2                         | 6273       | Stata DTA| Wired 2026-11-04, see the last heading  |
 
 * 2018-19 Wave (EHCVM)
 
@@ -946,7 +947,9 @@ It maps to =NPK= (0.17 N) and is 19.1% of =nitrogen_kg=; 125 =Tonne= rows are 38
 kilograms.  The =npk 15/15= rows of =harmonize_input= came with the Niger template and
 match no label here.
 
-* 2026-11-04 -- 2021-22 held and registered, not wired (GH #552)
+* 2026-11-04 -- 2021-22 held and registered (GH #552)
+
+Superseded on the wiring by "2021-22 wired", below.
 
 Acquired whole by =add_wave=: EHCVM-2 (6273, =CIV_2021_EHCVM-2_v01_M=) in =2021-22/Data/=, 58
 files, 703 MB, with the BIDs and both household questionnaires in
@@ -1010,7 +1013,170 @@ ruling.
 
 22,223 lines, unique on (household, field, parcel, crop code, unit), so the level separates
 nothing and adds no row.  A blank state is a blank unit on all 6,365.  The answer describes the
-harvest quantity only: =s16cq16c= is the sold state, not served (GH #1462).  2021-22 is held and
-not wired (GH #552), so the level reaches no 2021-22 row.
+harvest quantity only: =s16cq16c= is the sold state, not served (GH #1462).  2021-22 has its own
+code list and table: see "2021-22 wired".
 
 *Cost:* one CotedIvoire re-warm (=data_scheme.yml=, =categorical_mapping.org= and the wave script).
+
+* 2026-11-04 -- 2021-22 wired (GH #552)
+
+Every table 2018-19 serves, but =plot_labor=, whose days and wages the file does not ship.
+Togo 2021-22 is the template; each check below was run on this file, and several came out
+otherwise.
+
+** Ids: no link is served, and the ids cannot meet
+
+=i= is =E2_<grappe><menage, three digits>=, by =2021-22/_/mapping.py:i=, which the wave's
+scripts import.  =pid= is the file's member number.  =v= is the bare =grappe=: the clusters
+are the same (below), the households are not.
+
+The BID says only households flagged in =PanelHH= "will have a valid value for merging with
+the previous wave".  Measured, 2026-11-04, against each key's 2018-19 household: the roster on
+(sex, birth year +-1), and the head (=ehcvm_individu=: same sex; age 1 to 6 years older):
+| group                                  |       n | median share of roster | roster >= half | head sex | head sex and age |
+|----------------------------------------+---------+------------------------+----------------+----------+------------------|
+| recurring key, =PanelHH= 1, =panel= 1  |   8,397 |                   0.00 |          12.3% |    75.8% |            16.1% |
+| recurring key, =PanelHH= 0, =panel= 0  |   3,192 |                   0.00 |           6.1% |    71.0% |             8.6% |
+| baseline: another household's head in the grappe | 127,366 pairs | | |    74.3% |            14.1% |
+| real link: Togo =panel= 1, Mali, Niger |         |                        |                | 96.1, 94.5, 89.5% | 61.3, 61.9, 67.8% |
+So the flagged keys sit at the baseline, where Togo's sit at real-link level.  The flags agree
+with each other here (=PanelHH= = =panel= on all 12,965), =s00q07d= "interviewed in 2018/19"
+adds 240, and 457 of the 8,854 flagged keys do not occur in 2018-19 at all.  This file has no
+=s00q07f1=/=f2=, and section 21, which the BID says matches members across waves, is not among
+the 58 files.  Whatever links these households, it is not the key the BID names.  11,589 of the
+12,965 keys recur, so a link by identity would join households that are not the same: no link.
+
+*Clusters are the same.*  1,081 of 2018-19's 1,084 grappes recur and none is new; region agrees on
+all and milieu on 99.9%.  =_/sampling.yml= has the record.  =strata= is region only (#812).
+The file labels 22 of the 33 regions in lower case (=poro=, =gÔh=) on the same codes; upper-casing
+gives 2018-19's label on all 33, so =strata= and =Region= do not split a region across waves.
+
+*Weights.*  =poids= equals =ehcvm_welfare.hhweight= on all 12,965 and takes two values in 973 of
+1,081 grappes, one in each (grappe, panel).  No longitudinal weight is shipped, so =panel_weight= is
+=poids=, as Togo's.  Do not read it as a panel weight; a family ruling is pending.
+
+** The cover holds 728 households that were not interviewed
+
+=s00_me= has 13,693 rows, the BID's household count, and 728 answer =s00q08= = =Non rempli=: no
+record in any section, no weight, no start date (167 do have an end date).  The 64,491 people are
+on the other 12,965, 12,169 selected and 796 replacements.  =sample= therefore takes the weights file
+as its primary, and every sub-frame merging the cover is =merge_how: left=.  2018-19's cover ships no such
+row.  =s08a= also has 728 rows with no grappe and no menage, empty, which its hook drops.
+
+** GPS: a cluster point, not stated to be displaced or not
+
+The BID says the cover records "the GPS coordinates of the household".  The data say otherwise:
+one distinct point per grappe on all 13,693 rows, and it equals 2018-19's fix to the last digit
+on all 965 grappes with one (=grappe_gps_CIV2018.dta=).  116 grappes with no 2018-19 fix have one here.
+No document held says whether it is displaced.  So =cluster_features= reads it as a cluster
+attribute, and its =Latitude= is full here, where 2018-19's is null on 117 grappes.
+
+** Names and codes survive where meanings do not
+
+- =s11=: roof and floor are =s11q19=, =s11q20= here and =s11q20=, =s11q21= in 2018-19, where =s11q19= is the
+  walls.  =Plastique= is a new roof, 178 households, served =Plastic=.
+- =s14= is two files: =s14a= the COVID-19 module, =s14b= what 2018-19 called =s14=.  See below.
+- =s17q01= is the species code here, =s17q02= its label; in 2018-19 =s17q02= is the code.  =s17q03= has no
+  value label and reads 0 or 1, and 2 on two rows with no head: =1= is the gate in both waves.
+- =s16bq02= is =0 non=, =1 oui= here and =1 Oui=, =2 Non= in 2018-19.  =s16b= holds 28 labels, where 2018-19's
+  code 19 is =Autres semences= and this file's is =Semences d'arachide=.
+- =s16cq16a/b= is the sold quantity and unit in 2018-19 and the harvest here; the sale is =s16dq05a/b=.
+- =s07bq03b= labels carry the code here (=139. Sachet=), and the code list moved: 302 is =Cope= there and
+  =Gramme (g)= here, 304 =Sac (22,5 kg)= and =Papier/feuille d'emballage=.  =s07bq03c= moved too: =2= is =Moyen=
+  there and =Petit= here, and this file adds =Très petit=, =Très grand= and =Huitième=.  Everything reads labels.
+- =s07bq01= has its own list, 177 codes with 2018-19's 138, 119 without a label (3 rows, served =119=).
+- Section 9's codes moved as Togo's did (=415= is a mask here and =Parfums= there; 49 labels of part F differ).
+  Nothing reads them: this country declares no =nonfood_expenditures=.
+- =numind= differs from =membres__id= on 86 members, the head of 86 households with no member 1: =numind= is
+  1, =membres__id= 2 to 11.  So 86 =individual_education= rows do not join the roster on =pid=; not repaired.
+
+** =shocks=: this file's keys are damaged
+
+=s14b= has 306,812 rows, 13,946 x 22, for 12,965 households.  =s14bq02= is 0 or 1 with no labels and
+21,230 NaN.  15,473 rows report a shock, 7,588 have follow-ups, because the instrument asks them only of the last 12
+months; the framework drops the rest, and the hook drops them first so the grain audit counts real collisions.  2018-19
+serves 13,778 of its 15,762 reported shocks, so a cross-wave incidence reads as a false fall.  With the maintainer.
+| of the 7,588 follow-up rows                                              | rows | what happens |
+|--------------------------------------------------------------------------+------+--------------|
+| no =menage=                                                              |   38 | no household, deleted by core's audited collapse |
+| =vague= is NaN                                                           |  345 | =vague= is not read: served |
+| =vague= is 3, 4, 7, 8, 107 or 343                                        |   21 | =vague= is not read: served |
+| =vague= is 1 or 2 and contradicts the cover                              |   66 | served |
+| (grappe, menage) not on the cover (53), or a =Non rempli= household (3)  |   56 | served; those =i= have no =sample= row |
+| one (household, shock) twice or more                                     |   42 | 20 keys; core's audited collapse keeps the most complete row |
+Served: 7,528.  168 households have the 22-row block two or more times.  Each read warns
+=GrainCollapseWarning=, on purpose: no document says which row is right.
+- =AffectedConsumption= reads =s14bq04e=, the food stock, 2018-19's =s14q04d=.  =s14bq04d= is the herd here.
+- =Non-concerné= is code 4 in all five columns.  2018-19 also stores it as Stata =.d=, read as NaN (6,463 rows of
+  =s14q04d=); this file has none.  2018-19 is not changed here.
+- Column 25, =Autre stratégie=, has the Oui/Non label set where the other 25 hold ranks.  All 15 of its rows name no
+  other strategy, so it takes the first rank.  46 rows name no strategy at all (=HowCoped0= NA).
+
+** =crop_production=
+
+=s16c= holds the harvest, =s16d= with no plot the dispositions.  *This wave is Mali's shape, not Togo's.*
+=s16cq16a= is filled on 3,595 of 21,737 crop rows, all unfinished, none of the 12,263 finished rows.  So:
+- the 3,595 are served as recorded, keyed =harvest-to-date=;
+- a finished crop takes the sum of its dispositions where they state one unit, keyed =harvest-from-dispositions=, on its
+  single row or its one =Farm-level= row: the rule ruled for Mali (#1437).  The ruling names Mali and Burkina Faso;
+  this wave applies it because without it 2021-22 serves no finished harvest at all.
+| household-crop pairs, of 19,704                 | pairs | served |
+|-------------------------------------------------+-------+--------|
+| finished, one unit, nothing recorded            | 8,932 | derived: 8,376 on the row, 556 =Farm-level= |
+| finished, two or more units                     | 1,468 | NA |
+| finished, no positive disposition               |   392 | NA |
+| finished, no =s16d= record                      |   343 | NA |
+| a finished and an unfinished row                |   298 | as recorded, or NA |
+| no finished row                                 | 8,271 | as recorded, or NA |
+2018-19 can test the sum, because it holds the harvest and all four dispositions on one row: on 10,822 finished rows with
+dispositions in the harvest's unit it is exact on 82.7%, within 10% on 85.7%, median ratio 1.000.  Pure-stand kg/ha,
+2018-19 recorded against 2021-22 derived (n): cocoa 245 (912), 250 (717); rubber 583 (229), 612 (226); rice 819 (134),
+813 (94); cotton 901 (204), 822 (155); coffee 331 (71), 292 (84); yam 1,852 (162), 1,250 (77); oil palm 1,872 (63), 833 (55);
+cassava 1,361 (10), 730 (23).  =harvest_kg=: 2018-19 12,131,426, 2021-22 13,268,515.  The dispositions hold 9999 on 9
+records, with no label calling it missing: they enter the sum as recorded, and Site Q names the rows.
+
+=s16d= has no exact repeats, unlike Togo's: 14,171 records on 14,171 keys.  Sales, option (d): 8,467, 7,675 on their single
+row, keyed =hh-crop-sale-single-row=; 792 on one =Farm-level= row each.
+- =s16dq05b= labels codes 1 to 7 and holds 20 others from section 7B's list with no label, 183 sales.  They read through this
+  file's =s07bq03b= labels, =harmonize_unit_s16d=: cocoa sold in code 339 prices at 825,000 FCFA against 825 per kilo, and
+  =s16dq05c/s16dq05a= is 1,000, so 339 is the =Tonne= the list says.  =Autres= (200 sales) has free text and is served =Autres=.
+- *Crop codes 56 to 60 have no label*, 3,946 rows, and are served as their numbers.  56 has 3,239: 95% perennial, sold at a median 340 FCFA
+  per kilo, in the cashew regions, on fields the household itself names =CHAMP D'ANACARDE= on over half its rows, with 281 kg/ha against
+  2018-19's cashew 247 and no cashew row otherwise, because 55, =Anacarde= in 2018-19 and in the printed list, is =Autre (à préciser)= here.
+  The printed list numbers both 55.  So 56 is very likely =Anacarde=, which no document says.  One table row, on a ruling.  57 is
+  677 rows on cocoa and banana fields, sold by the sack at 240 FCFA per kilo; not named.
+- =condition= is =s16cq16d=, read by code through this wave's own table, =2021-22/_/categorical_mapping.org=, with the
+  answer in =condition_native=: 1 =Epis=, 2 =Grain=, 3 =Décortiqué=, 4 =Non-décortiqué=, 5 =Non concerné=.  No answer falls outside the ruled fold.  The file
+  states it on 3,578 of the 3,595 recorded rows, so a derived total carries =unknown_condition=: its dispositions have states of
+  their own, not read here.
+- =s16cq16c= and =s16dq05c= are totals in kg, and =s16cq16b_autre= free text.  Not served.  Reading the kg totals is the survey-kg
+  lane's: they would give every sale a kilogram, sack sizes included (=Sac moyen= 50, =Sac gros= 100 at the median on the sold side;
+  25 and 80 on the harvest side).
+
+** =plot_inputs=
+
+This wave reads the purchase (=s16bq08=, =s16bq09a=, =s16bq09b=) and the gift (=s16bq05=, =s16bq07a=, =s16bq07b=), each with its own
+unit, as Burkina (#1188).  WAITING: 2018-19's script serves =s16bq05= and =s16bq07a= under =Purchased= and =Quantity_purchased=, the
+same defect, recorded and not changed here, so those two columns mean different things across this country's waves until it is
+corrected.  =350= is not the modal quantity here (82 of 14,704 rows, against 39.5% in 2018-19, see the #1123 entry).
+*38 households have lost their input codes.*  Each has 24 rows carrying 2 distinct =s16bq01= codes, mostly 20, where the other 7,531
+have 24 distinct ones.  Their applied rows collide on the key, 88 rows on 32 keys, and differ in value.  The script writes them as filed and
+core's audited collapse keeps the most complete row of each: 14,704 applied, 14,648 served, a =GrainCollapseWarning= on each read.
+
+** =plot_features=
+
+15,220 parcels: 5,396 rows of =s16a= are households with no field (=s16aq02= = 0) and 2 have no parcel number.  The rules are 2018-19's.
+*=s16aq47= mixes units.*  The form says hectares (p. 85), and 1,900 of the 10,697 GPS measures exceed 1,000, at a median 10,000 times the
+farmer's estimate: square metres.  2018-19 has 183 of 9,828.  2018-19's rule serves such a row =Area= NA and keeps =AreaSelfReported=, so 1,917 parcels
+have no =Area= here (12.6%).  About 130 between 100 and 1,000 are likely square metres too and are served as hectares: Site Q names 32.
+Median =Area= is 1.5 ha, 1.245 in 2018-19; mean 7.0, 3.4.  Not divided: no document says which rows.
+
+** =plot_labor= is not served
+
+The instrument asks family days per member and hired workers, days and wage (16A.33 to 16A.43, pp. 80-85).  =s16a= ships 84 columns,
+Togo's 260, and only the six use flags of those questions (=s16aq32= .. =s16aq42=).  No file of the 58 holds the rest.  So the table has no
+row for this wave; the verdict is =asked-not-distributed=, =.coder/coverage/absent_verdicts.csv=.
+
+** Not wired
+
+=ehcvm_nsu=, =ehcvm_prix=, =s00_co=..=s04_co=, as 2018-19 declares no community table; section 9, as above.
