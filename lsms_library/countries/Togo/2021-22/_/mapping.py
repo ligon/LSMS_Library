@@ -17,7 +17,7 @@ from lsms_library.transformations import (
 )
 
 #: `i` of this wave.  5,441 of the 6,462 (grappe, menage) keys also occur in 2018,
-#: and at least 966 of those are a different household (GH #552; Mali's #1494 is
+#: and 1,397 of those are at the wrong-household baseline (GH #552; Mali's #1494 is
 #: the same trap).  No link is served, so the ids must not be able to meet.
 ID_PREFIX = 'E2_'
 

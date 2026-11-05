@@ -57,9 +57,11 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
         different price per unit.  2021-22: 38,092 of the 107,841 SERVED purchased
         rows (35.3%).  On source rows with a purchased quantity, 38,182 of 108,057:
         34,510 with no last purchase, 1,303 in a different unit code, 2,369 in the
-        same code at a different size.  The share is higher than 2018's because this
-        file fills s07bq07a only where s07bq06 is within 30 days: 36,328 rows answer
-        Plus de 30 jours or Jamais.
+        same code at a different size.  The share is higher than 2018's because
+        s07bq03a is rescaled by region in this file, which leaves a phantom purchased
+        residual on rows with no purchase (11,952 of 12,963 Jamais rows; 166 in 2018);
+        it is not the fill rule, which 2018 shares.  See _/CONTENTS.org, "s07bq03a is
+        rescaled by region".
       basis: variable-label
       evidence: >-
         no EHCVM wave distributes a unit-conversion table;
@@ -105,7 +107,10 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
     exists, the rule x 365/7 is within 1% of depan(Achat) for 90.8%, against 13.5%
     for the own-production-only residual and 0.0% for the gross quantity; s07bq05 *
     uv is within 1% of depan(Don) for 91.0% of 1,914 rows.  Median ratio over all
-    69,875 joined rows 1.00000.
+    69,875 joined rows 1.00000.  THIS VALIDATES THE ARITHMETIC AND NOT THE 2021-22
+    QUANTITY: ehcvm_conso carries the same regional scaling as s07bq03a (Achat on 91.6%
+    of Jamais rows; its Achat/Autoconso equals residual/s07bq04), so the agreement could
+    not have revealed it.  See _/CONTENTS.org, "s07bq03a is rescaled by region".
   contents: 'Togo/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
 

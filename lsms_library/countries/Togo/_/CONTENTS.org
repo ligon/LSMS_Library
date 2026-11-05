@@ -855,7 +855,10 @@ against its 2018 head (=ehcvm_individu=: same sex; age 1 to 6 years older):
 (=panel= = 2) that sit at the baseline: different households under a recurring number (the
 Mali #1494 trap).  The file carries three flags that disagree: =PanelHH= (4,377), the
 weights file's =panel= (4,044), =s00q07d= "interviewed in 2018/19" (3,938).  =panel= is
-the one that separates; =PanelHH= alone would admit the 431.  The BID's merge variables =s00q07f1=/=f2= are filled on only 1,941,
+the one that separates; =PanelHH= alone would admit the 431.  Its 96.1% is at real-link
+level (the =s00q07f= links of Mali and Niger give 94.5% and 89.5%); the 61% on sex and age
+is noise in reported age, not a weak link.  The BID's merge variables =s00q07f1=/=f2= are filled in vague 2 only, on 1,941 households
+(0 of 3,236 in vague 1),
 and on the 55 where they differ from the current key their overlap sits at the baseline
 while the current key's does not, so they do not rescue a link.  Linking is a decision:
 memo in the PR of this change.  It would make Togo a panel country, with committed
@@ -891,10 +894,16 @@ titles are swapped.  Section 7B is on PDF p. 37 of each.
 
 87% of the names survive, and that number hides these.  Compare labels, never names.
 - =s11=: roof and floor are =s11q19=, =s11q20= here, =s11q20=, =s11q21= in 2018.
-- =s20aq05= replaces =s20q05=, and its codes run the other way (1 = Riche); the mapping
-  is keyed on the labels, so the served step is unchanged.
+- =s20aq05= replaces =s20q05=, on the same code list (1 = Riche).  The mapping is keyed on
+  the labels, and the served step runs the other way from the codes.
 - =s14= is two files: =s14a= the COVID-19 module, =s14b= what 2018 called =s14=.
-  =s14bq05__N= holds a rank label or =Non=, where =s14q05__N= held an indicator.
+  =s14bq05__N= holds a rank label or =Non=, where =s14q05__N= held an indicator, except
+  column 25, =Autre stratégie=, whose label set is Oui/Non: its 26 rows name no other
+  strategy and it takes the first slot.  =s14bq04d= is the herd here, so
+  =AffectedConsumption= reads =s14bq04e=, the food stock, 2018's =s14q04d=.
+- =shocks= serves 2,666 of 7,229 reported shocks.  The instrument asks follow-ups only for
+  the last 12 months, and the framework drops the rows with none; 2018 serves all 7,230.
+  So a cross-wave incidence on this table reads as a false 63% fall.  With the maintainer.
 - =s12= ships owned items only (33,619 rows, all =Oui=); 2018 ships the grid (277,695).
 - =s17q01= is the species; 2018's =s17q02= is gone.
 - =s04a= has one row per member, 3,939 of them with no answer, where 2018's =s04= has
@@ -930,15 +939,67 @@ and =Sucre morceaux=, as 2018's own label says.  NOT folded, each under its own 
 =Melon=; =Aubergine,= / =Courge/Courgette=; =Piment séché= / =Piment frais=; =Gingembre
 frais= / =moulu=; =Café en poudre= / =soluble=; =Vinaigre de citron= / =Moutarde=; =Huile
 d'arachide raffinée= / ="Segal"=; =Arachides décortiquées= / =pilées=; =Pommes=, =Papaye=,
-=Néré=, =Fruit de baobab= (2018's =Autres fruits=).  New goods: three =semoule= rows,
+=Néré=, =Fruit de baobab= (2018's =Autres fruits=).  Under the same rule =Fromage= serves as
+=Fromage (hors soja)= and =Arachides décortiquées= as =Arachides décortiquées (hors pilées)=:
+2018's =Fromage local= is 25 FCFA per =Unité (Petit)=, this wave's =Fromage= 500 and its =Fromage
+à base de soja= 25; 2018's =décortiquées ou pilées= has 233 purchased rows against 105 + 85
+here.  =Piment frais= is a recorded exception: 2018's =Piment= prices as this wave's fresh
+chilli (1.00 on the five largest cells, weighted 0.996; 3,564 purchased rows against 3,280),
+while dried chilli adds 2,582 and departs in two cells.  New goods: three =semoule= rows,
 =Noix de palme=, =Huile de soja=, =Fromage à base de soja=, =Viande séchée=, =Poivre=.  A
 cross-wave demand system on =j= must bundle these itself.
 
-*=Expenditure=* is NA on 35.3% of purchased rows, against 19.0% in 2018: this file fills
-the last purchase only within 30 days (=s07bq06=, 36,328 rows are older or never).
+*=Expenditure=* is NA on 35.3% of purchased rows, against 19.0% in 2018 and 11-16% in the
+siblings.  An earlier version of this file blamed the last purchase being filled only
+within 30 days.  That is wrong: 2018 fills the same way (0 fills on =Jamais= or =Plus de 30
+jours=).  The difference is the rescaling below.
+
+** =s07bq03a= is rescaled by region (WAITING: with the maintainer)
+
+The consumption quantity carries an undocumented factor, and only that column does.  The
+values are the file's: no document held explains them, and a direct read agrees.  On the
+quarter grid, positive values: =s07bq03a= 14.7% here and 98.7% in 2018; =s07bq04= 98.9%,
+=s07bq05= 96.4%, =s07bq07a= 98.4%.
+
+| region     | factor | =q3/q4= at the mode, never-purchased own-production rows | 2021/2018 median =q3=, same unit and size |
+|------------+--------+----------------------------------------------------------+-------------------------------------------|
+| Centrale   | 1.6725 | 1,435 of 1,556                                           |                                     1.672 |
+| Savanes    |  1.338 | 2,341 of 2,494                                           |                                     1.338 |
+| Plateaux   | 1.2265 | 1,946 of 2,235                                           |                                     1.227 |
+| Kara       | 1.0035 | 1,400 of 1,594                                           |                                     1.004 |
+| Maritime   | 1.0035 | 983 of 1,292                                             |                                     1.004 |
+| Grand Lomé | 0.9143 and 1.2, by row (below) | 1.2 on 64 of 69                | 0.914 |
+
+=unité= rows are not scaled (99.99% on the grid outside Grand Lomé); =Kg= and =Litre= rows
+are.  After dividing, 93-99% of a region's non-=unité= rows are on the quarter grid and
+98-99.9% on the 0.01 grid, so the rows off the quarter grid are scaled too (0.12, 0.15).
+
+*Grand Lomé is two factors, split by row.*  A row reporting no own production and no gift
+carries 0.9143 (92.2% on the quarter grid, 98.8% on the 0.01 grid, 17,425 non-=unité= rows;
+its =unité= rows are unscaled).  A row reporting either carries 1.2 (84.8% and 92.8% of
+1,830 rows, and 88.1% of 564 =unité= rows).  No household or cluster splits them, and
+1.2 is why the =q3/q4= mode there differs from the purchased rows' median.  =Jamais=
+rows with a residual go 438 -> 60 under this reading.
+
+*What it does.*  The purchased quantity is a residual, =q3 - q4 - q5=, so a scaled =q3=
+leaves a phantom purchase where none occurred: 11,952 of 12,963 =Jamais= rows have a
+positive residual here, 166 in 2018.  =Expenditure= is that quantity at a unit value, so it
+carries the factor too, and a phantom row with no last purchase serves NA, which is the
+35.3%.  Pooled kg factors read =s07bq08/s07bq07a= and are not contaminated.
+=food_quantities(units='kgs')= and =food_expenditures= of this wave are, by region.
+
+*The UEMOA check proves nothing here, and the claim is withdrawn.*  =ehcvm_conso= carries
+the same scaling: =Achat= appears on 91.6% of =Jamais= rows and its =Achat/Autoconso= equals
+=residual/q4=.  So the 90.8% agreement recorded in =_/derivations.yml= shows the arithmetic
+was carried out, not that the column is what the household said.  Do not cite a =depan= match
+as proof that a quantity is raw.
+
+*As served, the wave is as filed*, so purchased =Quantity= and =Expenditure= of 2021-22 are
+not comparable across regions or waves.  Options with measured patches: in the PR.
 
 *Kilograms.*  =ehcvm_nsu_tgo2021.dta= exists and is not wired (not ruled for single-wave
-countries).  So this wave's kilograms come from the price-ratio ladder, as 2018's do:
+countries).  So this wave's kilograms come from the price-ratio ladder, as 2018's do, on the
+scaled quantity above:
 =metric= 11,559 rows, =item_unit= 16,474, =unit= 108,174, =none= 7.  Because #1487 pools
 factors across a country's waves, wiring this table moved 2018's inferred kilograms at
 read time, measured cold on the same code: =food_quantities(units='kgs')= 2018 63,624 ->
@@ -1010,4 +1071,11 @@ country's waves until it is corrected.  =s16bq01= has two slots 2018's tables di
 - Run these checks first, because each can pass silently: value labels of =s07bq03b= against
   =s07bq07b= by code; =s09?q01= codes against the country's =nonfood_items= by label;
   =s16bq05= and =s16bq08= labels; =s16cq16a= fill (Togo's shape or Mali's); exact repeats in
-  =s16d=; roster agreement by each of the three panel flags.
+  =s16d=; roster agreement by each of the three panel flags, against a real-link benchmark;
+  =Jamais= rows with a positive residual (Togo 11,952; siblings 6 to about 400); the quarter-grid
+  share of =s07bq03a= against =s07bq04= and =s07bq05=, and the =q3/q4= mode by region and by
+  whether the row reports own production or a gift.
+- Wire =AffectedConsumption= to =s14bq04e=, not =s14bq04d=; do not copy the YAML line from a
+  2021-22 sibling.  Read all 26 =s14bq05__N= label sets: code 25 may be Oui/Non.
+- Do not cite a =depan= match as proof a quantity is raw.  Disclose the shock rows with no
+  follow-up.  Read =s16cq16d= off the file before reusing a condition table.

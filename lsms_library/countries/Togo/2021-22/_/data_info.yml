@@ -361,7 +361,8 @@ food_acquired:
         Quantity: s07bq03a
         Produced: s07bq04
         # GH #876.  Expenditure is derived by mapping.food_acquired, as in 2018;
-        # these raw inputs feed that hook and are dropped by the reshape.
+        # these raw inputs feed that hook and are dropped by the reshape.  s07bq03a is
+        # rescaled by region in this file: _/CONTENTS.org, with the maintainer.
         GiftQuantity: s07bq05
         ConsumptionUnitCode: s07bq03b
         ConsumptionUnitSize: s07bq03c
