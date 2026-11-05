@@ -2778,10 +2778,17 @@ codes serve 84 labels.
 | household (j, u) cells with a community price, of 433 / 910 / 910 |     34 |    33 |    216 |
 | household rows in those cells, of 162,032                  | 28,167 | 25,392 | 68,830 |
 
-The remaining gap is mostly =j=: 450 community (j, u) cells against 910 household ones, on a
-different product list.  Same-cluster, 41,963 household rows find a (v, j, u) price.  A price on
-=Avec os en tas (Petit)= does not reach a household's =Tas (Petit)= of meat; that is the cost of
-not folding, accepted by the ruling.
+*216 of 910 is not the limit of the join.*  The remaining gap is on =j=, and only part of it is a different product list.  21
+of the 57 priced products share a source code with the household and carry a different =j=, because every =s07bq01= label of
+this wave carries seven leading spaces and so never reaches =harmonize_food=: those products pair at 98.4% on raw codes, and hold
+42,753 of the 117,453 code-level hits.  41,556 consumption rows are on products the form does not list.  That is a defect of its
+own, predating this change, and fixing it moves household labels, which this ruling excluded: GH #1513.  It would take the join to
+294 of 835 cells and 103,747 rows if the label is stripped before mapping, or 342 of 910 and 109,838 if community =j= is bridged by
+product code.
+
+The joins pair the same units.  On the served label, 167 cells with a household unit value: median ratio 1.00, 94.6% in [0.5, 2],
+and Grand against Petit as a placebo gives 2.55 and 0.38.  Same-cluster, 41,963 household rows find a (v, j, u) price.  A price on
+=Avec os en tas (Petit)= does not reach a household's =Tas (Petit)= of meat; that is the cost of not folding, accepted by the ruling.
 
 * 2026-11-04 -- the 2021-22 harvest total, and the window key (GH #1437)
 
