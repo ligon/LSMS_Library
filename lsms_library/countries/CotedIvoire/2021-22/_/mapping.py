@@ -44,7 +44,7 @@ def _upper(value):
 
 
 def strata(value):
-    '''s00q01, on 2018-19's spelling.  This file labels 22 of the 33 regions in lower case
+    '''s00q01, on 2018-19's spelling.  This file labels 23 of the 33 regions in lower case
     (`poro`, `gÔh`), on the same codes; upper-casing gives 2018-19's label on all 33.'''
     return _upper(value)
 

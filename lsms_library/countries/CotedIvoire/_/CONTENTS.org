@@ -1049,7 +1049,7 @@ does not ship them, where Togo's does; nor is section 21, which the BID says mat
 
 *Clusters are the same.*  1,081 of 2018-19's 1,084 grappes recur and none is new; region agrees on
 all and milieu on 99.9%.  =_/sampling.yml= has the record.  =strata= is region only (#812).
-The file labels 22 of the 33 regions in lower case (=poro=, =gÔh=) on the same codes; upper-casing
+The file labels 23 of the 33 regions in lower case (=poro=, =gÔh=) on the same codes; upper-casing
 gives 2018-19's label on all 33, so =strata= and =Region= do not split a region across waves.
 
 *Weights.*  =poids= equals =ehcvm_welfare.hhweight= on all 12,965 and takes two values in 973 of
@@ -1107,8 +1107,17 @@ serves 13,778 of its 15,762 reported shocks, so a cross-wave incidence reads as 
 | one (household, shock) twice or more                                     |   42 | 20 keys; core's audited collapse keeps the most complete row |
 Served: 7,528.  168 households have the 22-row block two or more times.  Each read warns
 =GrainCollapseWarning=, on purpose: no document says which row is right.
-- =AffectedConsumption= reads =s14bq04e=, the food stock, 2018-19's =s14q04d=.  =s14bq04d= is the herd here.
-- =Non-concerné= is code 4 in all five columns.  2018-19 also stores it as Stata =.d=, read as NaN (6,463 rows of
+- =AffectedConsumption= reads =s14bq04e=, the food stock by this file's label and by its behaviour.  =s14bq04d= is the herd here.
+  *WAITING: the column is not the same variable across the waves.*  2018-19's label calls =s14q04d= the stock, and the data contradict it: it behaves as this
+  wave's herd.  Measured, changed share of answers / =Non-concerné= share / changed among the concerned under animal disease and under drought:
+  | column | 2018-19 | 2021-22 |
+  |--------+---------+---------|
+  | =q04d= | 0.187 / 64.2% / 0.867, 0.582 | 0.162 / 65.7% / 0.881, 0.509 |
+  | =q04e= | 0.769 / 7.4% / 0.568, 0.909 | 0.641 / 15.6% / 0.445, 0.899 |
+  | =q04f= | 0.821 / 4.0% / 0.663, 0.876 | 0.698 / 11.1% / 0.522, 0.849 |
+  So 2018-19's served column reads as the herd and this wave's as the stock, and served =AffectedConsumption= goes 0.187 to 0.641, a false jump.  Not changed here: the fix
+  is with the maintainer, with the family (Togo's record repeats the label).
+- =Non-concerné= is code 4 in all five columns read here.  2018-19 also stores it as Stata =.d=, read as NaN (6,463 rows of
   =s14q04d=); this file has none.  2018-19 is not changed here.
 - Column 25, =Autre stratégie=, has the Oui/Non label set where the other 25 hold ranks.  All 15 of its rows name no
   other strategy, so it takes the first rank.  46 rows name no strategy at all (=HowCoped0= NA).
@@ -1134,7 +1143,13 @@ sends a finished crop to that question (16C.11: 1 = Oui goes to 16C.16, PDF p. 8
 dispositions in the harvest's unit it is exact on 82.7%, within 10% on 85.7%, median ratio 1.000.  Pure-stand kg/ha,
 2018-19 recorded against 2021-22 derived (n): cocoa 245 (912), 250 (717); rubber 583 (229), 612 (226); rice 819 (134),
 813 (94); cotton 901 (204), 822 (155); coffee 331 (71), 292 (84); yam 1,852 (162), 1,250 (77); oil palm 1,872 (63), 833 (55);
-cassava 1,361 (10), 730 (23).  =harvest_kg=: 2018-19 12,131,426, 2021-22 13,268,515.  The dispositions hold 9999 on 9
+cassava 1,361 (10), 730 (23).  Inside this wave, on 1,875 unfinished single-row crops with a recorded harvest and dispositions in one matching unit, the sum equals the record on 61.3%, median 1.000, 10%-90% 0.73, 2.0.
+
+*Do not set =harvest_kg= 2018-19 12,131,426 beside 2021-22 13,268,515.*  One recorded row is 37.7% of the second: 5,000 =Tonne= of rubber on 1.65 ha with half still to harvest, whose own =s16cq16c=, the
+total in kg, is 5,000.  It reads as kilograms entered under the wrong unit.  Served as recorded (derived 6,783,563 kg; window 6,484,952 kg, of which that row 5,000,000); correcting it is its own ruling, and Site Q names it.
+Nor is either a wave total: only =Kg= and =Tonne= rows reach =harvest_kg=, 4,892 of 22,676 rows here and 4,213 of 22,216 in 2018-19.
+
+The dispositions hold 9999 on 9
 records, with no label calling it missing: they enter the sum as recorded, and Site Q names the rows.  171 derived totals are in =Autres=, whose free text
 (=tonnes=, =tricycle=, =régimes=) may hide two units, as Mali's disclosed.
 
@@ -1143,11 +1158,15 @@ row, keyed =hh-crop-sale-single-row=; 792 on one =Farm-level= row each.
 - =s16dq05b= labels codes 1 to 7 and holds 20 others from section 7B's list with no label, 183 sales.  They read through this
   file's =s07bq03b= labels, =harmonize_unit_s16d=: cocoa sold in code 339 prices at 825,000 FCFA against 825 per kilo, and
   =s16dq05c/s16dq05a= is 1,000, so 339 is the =Tonne= the list says.  =Autres= (200 sales) has free text and is served =Autres=.
-- *Crop codes 56 to 60 have no label*, 3,946 rows, and are served as their numbers.  56 has 3,239: 95% perennial, sold at a median 340 FCFA
-  per kilo, on fields the household itself names =CHAMP D'ANACARDE= on over half its rows, with 281 kg/ha against 2018-19's cashew 247 and a
-  regional share correlating 0.96 with it.  This wave has no cashew row otherwise, because 55, =Anacarde= in 2018-19, is =Autre (à préciser)= here,
-  and the printed list numbers both 55.  So 56 is very likely =Anacarde=, which no document says.  One table row, on a ruling.  57 has
-  677 rows, on cocoa and banana fields, its regional share correlating 0.73 with 2018-19's =Autre=; not named.
+- *Crop codes 56 to 60 have no label*, 3,946 rows, and are served as their numbers.  Do not read them off the family list: Togo, Benin, Mali, Senegal and
+  Guinea-Bissau 2021-22 label 55 cashew, 56 =Ananas= and 57 =Banane plantain=, and this file's data refute that.  The form (PDF p. 116) prints =55 Anacarde= and =55 Autre (à spécifier)=, and the
+  file's list stops at 55 =Autre (à préciser)=, so cashew needs another code.
+  *56 is very likely cashew:* 3,239 rows, 95% perennial, 340 FCFA per kilo (quartiles 300, 350).  1,696 of the 3,299 crop rows on fields named =ANACARD*= are 56 (1,954 of 3,802 with the misspellings), and the one field named
+  =ANANAS= carries 55.  281 kg/ha against 2018-19's cashew 247.  Its regional share correlates 0.92-0.96 with 2018-19's cashew, weak support since cocoa's correlates 0.99 with itself.  =s16aq08=
+  uses the same code on 2,953 parcels, and free text appears only on 55 (=SOJA=, =TECK=, =COCO=).
+  *57 is very likely banana or plantain:* 677 rows, 28 of the 42 =Régime= harvest rows and 48 of the 61 =Régime= disposition rows, 92% intercropped, the modal code on fields named =BANAN*= (93 of 247), and a regional share correlating
+  0.73 with 2018-19's =Autre=, a wave with no banana code.  58 to 60 (30 rows) have nothing to go on.  No document says any of this.  The label on a ruling is =Cashew=, the crop 2018-19 serves (=Anacarde= would split it across the
+  waves), and =Banane ou plantain=: a tested patch, one wave table and one CotedIvoire re-warm.
 - =condition= is =s16cq16d=, read by code through this wave's own table, =2021-22/_/categorical_mapping.org=, with the
   answer in =condition_native=: 1 =Epis=, 2 =Grain=, 3 =Décortiqué=, 4 =Non-décortiqué=, 5 =Non concerné=.  No answer falls outside the ruled fold.  The file
   states it on 3,578 of the 3,595 recorded rows, so a derived total carries =unknown_condition=: its dispositions have states of
@@ -1164,7 +1183,8 @@ same defect, recorded and not changed here, so those two columns mean different 
 corrected.  =350= is not the modal quantity here (82 of 14,704 rows, against 39.5% in 2018-19, see the #1123 entry).
 *38 households have lost their input codes.*  Each has 24 rows carrying 2 distinct =s16bq01= codes, mostly 20, where the other 7,531
 have 24 distinct ones.  Their applied rows collide on the key, 88 rows on 32 keys, and differ in value.  The script writes them as filed and
-core's audited collapse keeps the most complete row of each: 14,704 applied, 14,648 served, a =GrainCollapseWarning= on each read.
+core's audited collapse keeps the most complete row of each: 14,704 applied, 14,648 served, a =GrainCollapseWarning= on each read.  The warning covers the collision, not the
+label: those households' 66 served rows are all =Seed=, 53 of them =Autre tubercule=, on input codes the file has lost.
 
 ** =plot_features=
 

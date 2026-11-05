@@ -34,7 +34,7 @@ sample:
                 - grappe
                 - menage
         myvars:
-            # GH #812: region only, as 2018-19.  mapping.strata spells 22 of the 33
+            # GH #812: region only, as 2018-19.  mapping.strata spells 23 of the 33
             # labels as 2018-19 does; the codes are the same.
             strata: s00q01
             Rural:
@@ -190,9 +190,11 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
-        # s14bq04d is the herd ("l'Effectif du cheptel") in this wave.  2018-19's s14q04d,
-        # "Stock Produit Alimentaire", is s14bq04e here.  Non-concerné is code 4 in all
-        # five columns of this file, where 2018-19 also stores it as Stata .d.
+        # s14bq04e is the food stock, by label and by behaviour; s14bq04d is the herd.
+        # NOT 2018-19's s14q04d, which that file labels the stock and which behaves as the
+        # herd, so this column jumps 0.187 to 0.641 across the waves, falsely: _/CONTENTS.org,
+        # with the maintainer.  Non-concerné is code 4 in all five columns of this file,
+        # where 2018-19 also stores it as Stata .d.
         AffectedConsumption:
             - s14bq04e
             - mapping:

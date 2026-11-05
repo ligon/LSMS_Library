@@ -220,13 +220,16 @@ CotedIvoire::crop_production::harvest-from-dispositions:
       evidence: measured 2026-11-04 on s16c_me_CIV2018.dta
     - text: >-
         s16dq0?a holds 9999 on 9 records with no label calling it missing, and it enters
-        the sum as recorded: Site Q names the rows.
+        the sum as recorded: 8 served rows sit at exactly 9999, 2 of them derived, and Site Q
+        names the rows.
       basis: variable-label
       evidence: measured 2026-11-04; value labels of s16d_me_civ2021.dta
   validated_against: >-
     tests/test_civ_2021_wave.py, whose oracle reads s16c and s16d directly.  Pure-stand
     kg/ha, 2018-19 recorded against 2021-22 derived (n): cocoa 245 (912), 250 (717); rubber
     583 (229), 612 (226); rice 819 (134), 813 (94); cotton 901 (204), 822 (155); coffee 331
-    (71), 292 (84); yam 1,852 (162), 1,250 (77); oil palm 1,872 (63), 833 (55).
+    (71), 292 (84); yam 1,852 (162), 1,250 (77); oil palm 1,872 (63), 833 (55).  Inside
+    2021-22, on 1,875 unfinished single-row crops with a recorded harvest and dispositions in
+    one matching unit, the sum equals the record on 61.3%, median 1.000, 10%-90% 0.73, 2.0.
   contents: 'CotedIvoire/_/CONTENTS.org, "2021-22 wired"'
   since: '2026-11-04'
