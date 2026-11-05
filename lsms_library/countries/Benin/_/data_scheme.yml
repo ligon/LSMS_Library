@@ -225,8 +225,10 @@ Data Scheme:
     # keyed hh-crop-sale-single-row, else on one row with plot_id = 'Farm-level' and
     # u = 'Unknown' (option (d), @ligon 2026-11-03).  Unit_sold is the sold unit there;
     # 2018-19's sold unit is not read, so it is NA on 2018-19.  A recorded harvest of an
-    # unfinished crop is keyed harvest-to-date.  condition reads s16cq16d through the
-    # wave's own three-code table, in 2021-22/_/categorical_mapping.org.
+    # unfinished crop is keyed harvest-to-date, and a finished harvest the file lacks is
+    # the sum of its dispositions in one unit, keyed harvest-from-dispositions (GH #1437).
+    # condition reads s16cq16d through the wave's own three-code table, in
+    # 2021-22/_/categorical_mapping.org.
     index: (t, i, plot_id, crop, u, condition)
     Quantity: float
     Quantity_sold: float

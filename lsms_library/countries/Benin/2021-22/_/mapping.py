@@ -211,6 +211,7 @@ def inputs_food_acquired(wave):
 
 KEY_HH_CROP_SALE = 'Benin::crop_production::hh-crop-sale-single-row'
 KEY_HARVEST_TO_DATE = 'Benin::crop_production::harvest-to-date'
+KEY_HARVEST_DISPOSITIONS = 'Benin::crop_production::harvest-from-dispositions'
 
 
 def household_ids(frame):
@@ -310,6 +311,25 @@ def sale_records(wave):
     return out
 
 
+def unit_labels(series):
+    '''Each unit label as the API serves it; NA stays NA.'''
+    from lsms_library.ehcvm import served_unit_labels
+    raw = series.astype('string').str.strip()
+    known = raw.dropna().unique()
+    served = dict(zip(known, served_unit_labels('Benin', known)))
+    return raw.map(served).astype('string')
+
+
+def dispositions(records):
+    '''s16d, one row per (i, crop), with its dispositions on the served unit labels.'''
+    from lsms_library.ehcvm import DISPOSITIONS
+    out = pd.DataFrame({'i': records['i'].values, 'crop': records['crop'].values})
+    for var in DISPOSITIONS:
+        out[f'{var}a'] = pd.to_numeric(records[f'{var}a'], errors='coerce').values
+        out[f'{var}b'] = unit_labels(records[f'{var}b']).values
+    return out
+
+
 def inputs_hh_crop_sale(wave):
     '''Registry `inputs`: the s16d sale as recorded, with the field and parcel of the
     one s16c row it went on, one row per keyed served row, at (t, i, crop).'''
@@ -332,3 +352,16 @@ def inputs_harvest_to_date(wave):
     src = src[src['s16cq11'].astype('string').str.strip().eq('Non') & src['s16cq16a'].notna()]
     return src[['t', 'i', 'crop', 's16cq02', 's16cq03', 's16cq11', 's16cq12', 's16cq16a',
                 's16cq16b']].set_index(['t', 'i', 'crop'])
+
+
+def inputs_harvest_from_dispositions(wave):
+    '''Registry `inputs`: the s16d answers behind the derived totals, at (t, i, crop), the
+    four quantities and their units as recorded, one row per keyed served row.'''
+    from lsms_library.ehcvm import DISPOSITIONS, harvest_totals
+    harvest = _raw_crop_file(wave, 's16c_me_ben2021.dta', 's16cq04')
+    records = sale_records(wave)
+    lines = harvest.assign(Quantity=harvest['s16cq16a'], finished=harvest['s16cq11'])
+    totals = harvest_totals(lines, dispositions(records))
+    raw = [f'{var}{part}' for var in DISPOSITIONS for part in 'ab']
+    out = records[records.set_index(['i', 'crop']).index.isin(totals.index)]
+    return out[['t', 'i', 'crop', 's16dq01'] + raw].set_index(['t', 'i', 'crop'])

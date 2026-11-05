@@ -237,3 +237,75 @@ Benin::crop_production::harvest-to-date:
     nothing to validate but its rows.
   contents: 'Benin/_/CONTENTS.org, "2021-22 wired"'
   since: '2026-11-04'
+
+Benin::crop_production::harvest-from-dispositions:
+  waves: ['2021-22']
+  columns: [Quantity, u]
+  rule: >-
+    Where every s16c row of a household's crop answers s16cq11 = Oui, none records
+    s16cq16a, and the positive s16d quantities s16dq02a (consumed), s16dq03a (given),
+    s16dq05a (sold) and s16dq13a (in stock) all state one unit, Quantity is their sum and
+    u that unit.  It goes on the crop's single s16c row, or for two or more rows on the
+    crop's one plot_id = 'Farm-level' row, created if no sale made it, and is never split
+    among plots.  A crop whose dispositions span units, a crop with none, a crop with a
+    recorded quantity and a crop with an unfinished row all stay as recorded.  This key
+    shares a row with hh-crop-sale-single-row through derivations.MULTI_SEP, in sorted order.
+  function: lsms_library.ehcvm:derive_hh_crop_harvest_total
+  inputs: lsms_library.countries.Benin.2021-22._.mapping:inputs_harvest_from_dispositions
+  raw_variables: [s16cq04, s16cq11, s16cq16a, s16dq01, s16dq02a, s16dq02b, s16dq03a, s16dq03b,
+                  s16dq05a, s16dq05b, s16dq13a, s16dq13b]
+  assumptions:
+    - text: >-
+        a finished harvest was consumed, given, sold or stored, so the four dispositions
+        add up to it.  The instrument asks the quantity of a finished harvest and the file
+        lacks it on 7,907 of 7,964 finished rows, a fielded skip or a release loss.
+      basis: questionnaire
+      evidence: >-
+        ben_ehcvm2_qnr_men_excel_vague1.pdf, PDF p. 87: "(16C.11) Avez vous fini la recolte de
+        cette culture? 1 = Oui >(16C.16)", and 16C.16 on p. 88.  Benin 2018-19 holds the
+        harvest and all four dispositions on one row (s16cq12a; s16cq13a, s16cq14a, s16cq16a,
+        s16cq22a).  On its 2,920 finished rows with the dispositions in the harvest's unit the
+        sum equals the harvest exactly on 79.1%, within 10% on 82.4%, median ratio 1.000, 8.6%
+        over 1.1 and 9.0% under 0.9; over the 2,287 metric rows the kg totals differ by a ratio
+        of 0.891.  This is consistency within a row, and a respondent may anchor on the
+        harvest just stated.
+    - text: >-
+        not all of a harvest need appear: s16d asks no quantity for seed kept, loss after
+        harvest or animal feed, so the sum can fall short of what was cut.  Not sized.
+      basis: modelling-choice
+      evidence: s16d_me_ben2021.dta variable labels
+    - text: >-
+        units are not converted: no factor exists.  2,009 finished crops span two or more
+        units and stay NA.  Quantities in one unit are added across states: 132 of the 5,237
+        derived crops state two of Grain, Epis/Panicules/coques and N/A in that unit, and those
+        fold to different `condition` tokens, 130,580 of the 45,285,173 kg on metric-named units,
+        0.3%.  They are served under `unknown_condition`, and nothing is held out.
+      basis: modelling-choice
+      evidence: ruling @ligon 2026-11-04, option (b) of GH #1437, for Mali and Burkina Faso; variables s16dq02c, s16dq03c, s16dq05d, s16dq13c
+    - text: >-
+        the sum is as good as its lines, and it inherits the file's large values.  It is not
+        trimmed and no pair is held out for this.  Four `Tonne` rows carry 34,250,000 of the
+        45,285,173 derived kg, 75.6%: their sold lines hold 20,000, 5,800 and 2,050 "tonnes"
+        with s16dq05c at 2,000, 275 and 130, priced under 1 FCFA per kg against a crop median
+        near 220, so they read as kilograms or sacks keyed as tonnes.  Without those four the
+        total is 11,035,173 kg.  Site Q names five rows.  Totals are not comparable to 2018-19's
+        33,462,707 kg on this account; pure-stand medians are.
+      basis: modelling-choice
+      evidence: >-
+        measured 2026-11-04 from s16c and s16d.  Pure-stand median kg/ha, 2018-19 recorded /
+        2021-22 derived, one crop row on the plot and area over 0.01 ha: maize 1,165 / 958, cotton
+        1,247 / 1,212, sorghum 794 / 700, yam 3,148 / 2,299, rice 1,625 / 1,722, groundnut
+        1,161 / 1,000, all crops 1,200 / 976.  Any rule for these lines belongs in its own issue.
+    - text: >-
+        a crop with an unfinished row is held out (857 pairs, 201 of them one-unit), because
+        its dispositions cover what is harvested so far.  A crop with a recorded quantity is
+        held out (29 of the finished one-unit pairs), because a recorded harvest is not
+        overridden and a Farm-level total beside it would count it twice.
+      basis: modelling-choice
+      evidence: GH #1437
+  validated_against: >-
+    tests/test_benin_2021_wave.py, whose oracle reads s16c and s16d directly.  Cold build of
+    2021-22: 5,237 keyed rows, 4,982 on the single s16c row and 255 Farm-level.  Not validated
+    against an external total: no document here reports one.
+  contents: 'Benin/_/CONTENTS.org, "2021-22 wired"'
+  since: '2026-11-04'

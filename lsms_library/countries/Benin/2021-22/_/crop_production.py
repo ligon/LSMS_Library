@@ -12,6 +12,14 @@ The instrument splits the module 2018-19 kept together:
 So Benin has Mali's shape (GH #1437) and not Togo's: the instrument sends a finished
 harvest to the quantity (16C.11, PDF p. 87), and the file has it on 57 of 7,964.
 
+THE HARVEST, on the ruling for that shape (GH #1437, @ligon 2026-11-04).  Where every s16c
+row of a household's crop is finished, none records a quantity, and the s16d dispositions
+(consumed, given, sold, in stock) share one unit, their sum is the harvest, keyed
+Benin::crop_production::harvest-from-dispositions, on the single row or on the crop's one
+Farm-level row.  A crop whose dispositions span units stays NA: no factor exists.  The
+ruling names Mali and Burkina Faso; that it reaches Benin is flagged for confirmation in
+the PR, and this step is one commit.
+
 SALES take option (d), as ruled for Mali 2021-22 (GH #824, @ligon 2026-11-03).  One harvest
 row for the crop: the sale goes on it, keyed Benin::crop_production::hh-crop-sale-single-row.
 More: one row with plot_id = 'Farm-level', u = 'Unknown'.  No sale is split, summed or
@@ -35,24 +43,17 @@ import sys
 sys.path.append('../../_/')
 import pandas as pd
 
-from lsms_library.ehcvm import (derive_hh_crop_sale_attachment, is_crop_sale,
-                                served_unit_labels, stamp_harvest_to_date)
+from lsms_library.ehcvm import (derive_hh_crop_harvest_total, derive_hh_crop_sale_attachment,
+                                is_crop_sale, stamp_harvest_to_date)
 import lsms_library.local_tools as tools
 from lsms_library.local_tools import get_dataframe, to_parquet
-from mapping import (KEY_HARVEST_TO_DATE, KEY_HH_CROP_SALE, crop_labels, household_ids,
-                     plot_ids, sale_records)
+from mapping import (KEY_HARVEST_DISPOSITIONS, KEY_HARVEST_TO_DATE, KEY_HH_CROP_SALE,
+                     crop_labels, dispositions, household_ids, plot_ids, sale_records,
+                     unit_labels)
 
 UNIT_NA = 'Unknown'
 CONDITION_NA = 'unknown_condition'
 WAVE = '2021-22'
-
-
-def _units(series):
-    """Each unit label as the API serves it; NA stays NA."""
-    raw = series.astype('string').str.strip()
-    known = raw.dropna().unique()
-    served = dict(zip(known, served_unit_labels('Benin', known)))
-    return raw.map(served).astype('string')
 
 
 def _conditions(codes):
@@ -75,7 +76,7 @@ harvest = pd.DataFrame({
     'i': household_ids(codes).astype('string').values,
     'plot_id': plot_ids(codes, 's16cq02', 's16cq03').values,
     'crop': crop_labels(codes['s16cq04']).values,
-    'u': _units(src['s16cq16b']).values,
+    'u': unit_labels(src['s16cq16b']).values,
     'Quantity': pd.to_numeric(codes['s16cq16a'], errors='coerce').values,
     'intercropped': src['s16cq07'].astype('string').str.strip().map(
         {'Association de cultures': True, 'Pure': False}).astype('boolean').values,
@@ -90,20 +91,24 @@ sales = pd.DataFrame({
     'i': sold['i'].values,
     'crop': sold['crop'].values,
     'Quantity_sold': pd.to_numeric(sold['s16dq05a'], errors='coerce').values,
-    'Unit_sold': _units(sold['s16dq05b']).values,
+    'Unit_sold': unit_labels(sold['s16dq05b']).values,
     'Value_sold': pd.to_numeric(sold['s16dq06'], errors='coerce').values,
 })
 
 df = derive_hh_crop_sale_attachment(harvest, sales, KEY_HH_CROP_SALE)
-recorded = df['Quantity'].sum()
-df = stamp_harvest_to_date(df, KEY_HARVEST_TO_DATE).drop(columns='finished')
+recorded = pd.to_numeric(df['Quantity'], errors='coerce').astype('float64').sum()
+df = stamp_harvest_to_date(df, KEY_HARVEST_TO_DATE)
+df = derive_hh_crop_harvest_total(df, dispositions(records), KEY_HARVEST_DISPOSITIONS)
+df = df.drop(columns='finished')
 
 # Conservation: every sale is on exactly one served row, unchanged, and no harvest moved.
 on_a_row = df[df['Quantity_sold'].notna() | df['Value_sold'].notna()]
 assert len(on_a_row) == len(sales), 'crop_production 2021-22: a sale moved or doubled'
 assert on_a_row['Value_sold'].sum() == sales['Value_sold'].sum()
 assert on_a_row['Quantity_sold'].sum() == sales['Quantity_sold'].sum()
-assert df['Quantity'].sum() == recorded, 'crop_production 2021-22: a harvest moved'
+derived = df['Derivation'].astype('string').str.contains(
+    'harvest-from-dispositions', regex=False).fillna(False)
+assert df.loc[~derived, 'Quantity'].sum() == recorded, 'crop_production 2021-22: a recorded harvest moved'
 
 for col in ('Quantity', 'Quantity_sold', 'Value_sold'):
     df[col] = pd.to_numeric(df[col], errors='coerce').astype('Float64')
