@@ -138,8 +138,9 @@ def _cover(wave, name):
 
 @pytest.fixture(scope="module")
 def w1():
+    """W1 household -> locality in W3's codes.  W1 labels small towns 0; W3 labels them 2."""
     hh = _cover("2011-12", "sect_cover_hh_w1.dta")
-    return dict(zip(hh.household_id.map(format_id), hh.ea_id.map(format_id)))
+    return dict(zip(hh.household_id.map(format_id), hh.rural.map({1: 1, 0: 2})))
 
 
 @pytest.fixture(scope="module")
@@ -154,14 +155,13 @@ def w2_links():
 
 @pytest.fixture(scope="module")
 def w3_nodes():
-    """``i``, ``rural``, W3's own ``household_id`` and W1-space EA, one row per household."""
-    cols = ["household_id2", "household_id", "rural", "ea_id"]
+    """``i``, ``rural`` and W3's own ``household_id``, one row per household."""
+    cols = ["household_id2", "household_id", "rural"]
     hh = _cover("2015-16", "sect_cover_hh_w3.dta")[cols]
     pp = _cover("2015-16", "sect_cover_pp_w3.dta")[cols]
     hh, pp = (pd.DataFrame({"i": frame.household_id2.map(format_id).values,
                             "household_id": frame.household_id.map(format_id).values,
                             "rural": frame.rural.values,
-                            "ea_id": frame.ea_id.map(format_id).values,
                             "cover": cover})
               for frame, cover in ((hh, "hh"), (pp, "pp")))
     pp = pp.dropna(subset=["i"])
@@ -208,11 +208,13 @@ def test_w3_household_id_is_the_truncated_id(w3_nodes):
 
 
 @_requires_data
-def test_rule_targets_are_w1_households_of_the_recorded_ea(updated_ids, w1, w3_nodes):
+def test_every_w3_target_is_a_w1_household_of_the_same_locality(updated_ids, w1, w3_nodes):
+    """W1 and W3 record locality separately; their ``ea_id`` are both the id's own prefix."""
     w2, w3 = updated_ids["2013-14"], updated_ids["2015-16"]
-    rule = w3_nodes[[(i not in w2 and w3[i] != i) for i in w3_nodes.i]]
+    moved = w3_nodes[[w3[i] != i for i in w3_nodes.i]]
+    assert moved.i.map(w3).map(w1).eq(moved.rural).all()
+    rule = moved[~moved.i.isin(w2)]
     assert len(rule) > 0
-    assert rule.household_id.map(w1).eq(rule.ea_id).all()
     assert rule.household_id.is_unique
 
 

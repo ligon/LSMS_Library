@@ -27,8 +27,11 @@ rule: its W1 id is ``household_id2`` less characters 7-10, which is W3's
 own ``household_id`` and is the target of every W3 link through W2.  Large
 towns entered at ESS2 and are never linked this way, including the three
 whose truncated id happens to be a W1 household.  This rests on the BID's
-accounting, NOT on the rosters, which only weakly agree: see
-``CONTENTS.org``, "W3 households the survey counts as ESS1".
+accounting, NOT on the rosters, whose evidence supports it without settling
+it: see ``CONTENTS.org``, "W3 households the survey counts as ESS1".  Every
+W3 link's target must be a W1 household of the same locality.  An EA check
+would add nothing: W1's and W3's ``ea_id`` are both the id's first 11
+characters.
 
 W1 (2011-12) and W4 (2018-19) are the two panels' baselines: every row
 has a missing ``previous_i``, so the resolver records nothing for them and
@@ -55,6 +58,8 @@ from ethiopia import _agriculture_only_households, ea_id2_crosswalk
 
 # W3's `rural`: 1 RURAL, 2 SMALL TOWN, 3 "Meduim and large town" (sic).
 ESS1_LOCALITIES = (1, 2)
+# W1's `rural` labels the same two localities 1 and 0.
+W1_LOCALITY_AS_W3 = {1: 1, 0: 2}
 
 
 def w1_id(household_id2):
@@ -114,18 +119,16 @@ df2 = df2.set_index(['t', 'i'])[['previous_i']]
 
 w2 = df2.previous_i.droplevel('t').dropna().to_dict()
 
-# W3's locality and W1-space EA, one row per household: the household cover,
-# then the agriculture cover for the households only it holds.
+# W3's locality, one row per household: the household cover, then the
+# agriculture cover for the households only it holds.
 w3_source = pd.DataFrame({'i': hh3.household_id2.map(format_id).values,
-                          'rural': hh3.rural.values,
-                          'ea_id': hh3.ea_id.map(format_id).values})
+                          'rural': hh3.rural.values})
 if a3 is not None:
     holders = pd.DataFrame({'i': pp3.household_id2.map(format_id).values,
-                            'rural': pp3.rural.values,
-                            'ea_id': pp3.ea_id.map(format_id).values})
+                            'rural': pp3.rural.values})
     holders = holders[holders.i.isin(a3.i)]
-    if holders.groupby('i')[['rural', 'ea_id']].nunique(dropna=False).gt(1).any(axis=None):
-        raise ValueError('W3 agriculture-only holder rows disagree on locality or EA')
+    if holders.groupby('i').rural.nunique(dropna=False).gt(1).any():
+        raise ValueError('W3 agriculture-only holder rows disagree on locality')
     w3_source = pd.concat([w3_source, holders.drop_duplicates('i')], ignore_index=True)
 if w3_source.rural.isna().any():
     raise ValueError('W3 household without a locality; the ESS1 rule cannot place it')
@@ -135,11 +138,17 @@ on_w2 = w3_source.i.isin(w2)
 if not w3_source.i[on_w2].map(lambda i: w2[i] == w1_id(i)).all():
     raise ValueError('W3 link through W2 is not the truncated id; the ESS1 rule fails')
 
-ess1 = w3_source[~on_w2 & w3_source.rural.isin(ESS1_LOCALITIES)]
-for row in ess1.itertuples():
-    if baseline.get(w1_id(row.i)) != row.ea_id:
-        raise ValueError('ESS1 rule target is not a W1 household of the recorded EA')
-ess1_target = {i: w1_id(i) for i in ess1.i}
+off_w2 = ~on_w2 & w3_source.rural.isin(ESS1_LOCALITIES)
+ess1_target = {i: w1_id(i) for i in w3_source.i[off_w2]}
+
+# W1 and W3 record locality separately, so this can fail; an EA check cannot.
+w1_locality = dict(zip(hh1.household_id.map(format_id), hh1.rural.map(W1_LOCALITY_AS_W3)))
+for row in w3_source[on_w2 | off_w2].itertuples():
+    target = w2.get(row.i, ess1_target.get(row.i))
+    if target not in baseline:
+        raise ValueError('W3 link target is not a W1 household')
+    if w1_locality.get(target) != row.rural:
+        raise ValueError('W3 link target has a different locality in W1')
 
 df3 = pd.DataFrame({'i': w3_source.i})
 df3['t'] = '2015-16'

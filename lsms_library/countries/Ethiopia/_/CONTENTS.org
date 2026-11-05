@@ -1800,10 +1800,17 @@ HH cover, 27 PP-only) and 1,255 identities, the three figures of the ESS3 BID (P
   our judgement, and no list of them is kept.
 - *Why a rule can do it.*  The target is the truncated id on all 3,677 W3 links through
   W2, and =panel_ids.py= refuses to run if one stops being so.  The only rural or
-  small-town households off W2's map are these 49.  Each target is a W1 household of the
-  EA W3 records, claimed by no other W3 household.  Large towns entered at ESS2 and are
-  excluded: the 3 whose truncated id happens to be a W1 household stay unlinked (each
-  is the other half of a rural household's id, see "individual_education" above).
+  small-town households off W2's map are these 49.  Each target is a W1 household claimed
+  by no other W3 household.  Large towns entered at ESS2 and are excluded: the 3 whose
+  truncated id happens to be a W1 household stay unlinked (each is the other half of a
+  rural household's id, see "individual_education" above).
+- *The one check that can fail is locality.*  W1 and W3 record it separately (W1 labels
+  small towns 0, W3 labels them 2), and they agree on all 49 and on all 3,677 links
+  through W2; =panel_ids.py= refuses otherwise.  An EA check adds nothing.  W1's =ea_id=
+  is the id's first 11 characters (3,969 of 3,969), and so is W3's =ea_id= of the
+  truncated id (4,954 of 4,954).  W2's =ea_id2= to =ea_id= is the same truncation (335 of
+  335), so the "W2 bridge" line in the evidence below is not independent either.  What an
+  id cannot show is a replacement household at the same serial.
 - *The =panel_ids.json= entry says 2013-14.*  =local_tools.panel_ids= records the wave
   before in its frame, so the 49 read =(2015-16, X) -> (2013-14, T)= although W2 holds T
   for only one of them.  It did so before too, as =(2015-16, X) -> (2013-14, X)=, and it
