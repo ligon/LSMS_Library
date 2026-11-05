@@ -12,7 +12,8 @@ Index = (t, i, plot_id, crop, u, condition, production_obs); plot =
 harvest's own "Etat du produit" (s16cq12c, GH #1436), folded from five answers
 to three tokens; the column ``condition_native`` keeps the answer as recorded.
 ``Condition_sold`` is the state of what was sold (s16cq16c, the same code list,
-through the same fold, GH #1462), NA on a line with no sale.
+through the same fold, GH #1462), NA on a line with no sale, and
+``condition_sold_native`` keeps that answer as recorded.
 The index is unique without a line coordinate, so ``production_obs`` is the
 ``unresolved_observation`` sentinel (GH #1360).  See
 niger.py:_finish_crop_production for the shared schema tail and the GAP-1
@@ -65,6 +66,9 @@ df = pd.DataFrame({
     # The SOLD state (s16cq16c): the harvest's code list and fold (GH #1462).
     'Condition_sold': _crop_sold_conditions(src_codes['s16cq16c'],
                                             'harmonize_crop_condition_ehcvm1').values,
+    # What that fold cannot show, the sold-side twin of condition_native (ruling
+    # @ligon 2026-11-05).
+    'condition_sold_native': _crop_condition_labels(src['s16cq16c']).values,
     'intercropped':  intercropped.values,
 })
 

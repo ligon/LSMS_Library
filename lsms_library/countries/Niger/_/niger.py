@@ -646,7 +646,8 @@ def _finish_crop_production(df, t):
     column set (including the NA-bearing ``Unit_sold`` column, GH #824).  A wave
     that passes no ``condition`` gets :data:`CONDITION_NA`; one that passes no
     ``production_obs`` gets :data:`CROP_OBS_NA`; one that passes no
-    ``condition_native``, ``Condition_sold`` or ``Quantity_kg`` carries NA there."""
+    ``condition_native``, ``Condition_sold``, ``condition_sold_native`` or
+    ``Quantity_kg`` carries NA there."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
         df[col] = pd.to_numeric(df.get(col), errors='coerce').astype('Float64')
     # Quantity_kg (GH #1436): the survey's total for the line, where its harvest
@@ -704,13 +705,16 @@ def _finish_crop_production(df, t):
     if 'Condition_sold' not in df.columns:
         df['Condition_sold'] = pd.NA
     df['Condition_sold'] = df['Condition_sold'].astype('string')
+    if 'condition_sold_native' not in df.columns:
+        df['condition_sold_native'] = pd.NA
+    df['condition_sold_native'] = df['condition_sold_native'].astype('string')
     if 'production_obs' not in df.columns:
         df['production_obs'] = CROP_OBS_NA
     df['production_obs'] = df['production_obs'].astype('string')
     keep = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs',
             'Quantity', 'Quantity_kg', 'Quantity_sold', 'Value_sold', 'Unit_sold',
             'Condition_sold',
-            'harvest_month', 'intercropped', 'condition_native']
+            'harvest_month', 'intercropped', 'condition_native', 'condition_sold_native']
     df = df[[c for c in keep if c in df.columns]]
     df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'production_obs'])
     return df

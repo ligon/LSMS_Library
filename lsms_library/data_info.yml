@@ -1275,6 +1275,17 @@ Columns:
         NA-bearing for the same reason `Unit_sold` is, and unlike the
         `condition` INDEX level, which must carry `unknown_condition`.
       spellings: *crop_condition_vocabulary
+    condition_sold_native:
+      type: str
+      optional: true
+      note: |
+        The state of what was sold as the survey recorded it, where
+        `Condition_sold` folds several answers onto one token.  Ruling @ligon
+        2026-11-05: the sold-side twin of `condition_native`, for the same
+        reason.  A COLUMN, at the native
+        grain, in the survey's own words, with no `spellings` block because the
+        labels are not a vocabulary.  NA on a row with no sale, and where nothing
+        was folded.  First instance: Niger 2018-19 `s16cq16c`.
   food_acquired:
     # Acquisition source 's' is an INDEX level (see Index Info above),
     # not a column.  Canonical values: purchased, produced, inkind,

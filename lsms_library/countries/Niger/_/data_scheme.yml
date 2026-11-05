@@ -252,6 +252,12 @@ Data Scheme:
     condition_native:
       type: str
       optional: true
+    # condition_sold_native (ruling @ligon 2026-11-05) is the 2018-19 sold state as
+    # recorded (s16cq16c), the answer the Condition_sold fold cannot show.  `optional` for the reason
+    # condition_native is; NA on no sale, never a sentinel.
+    condition_sold_native:
+      type: str
+      optional: true
     materialize: make
 
   plot_inputs:

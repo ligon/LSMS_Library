@@ -14,6 +14,7 @@ reads the sources through ``get_dataframe`` and imports nothing from ``Niger/_/`
 from __future__ import annotations
 
 import warnings
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -33,6 +34,10 @@ DRY = "NER_2011_ECVMA_v01_M_Stata8/ecvmaas3e_p1.dta"
 EHCVM1 = {1: "unshelled", 2: "shelled", 3: "shelled", 4: "unshelled",
           5: "shell_not_applicable"}
 EHCVM2 = {1: "unshelled", 2: "shelled", 3: "shell_not_applicable"}
+#: The 2018-19 `s16cq16c` value labels, written out likewise: `condition_sold_native`
+#: (ruling @ligon 2026-11-05) must not read the helper it checks.
+RECORDED_2018 = {1: "Epis", 2: "Grain", 3: "Décortiqué", 4: "Non-décortiqué",
+                 5: "Non concerné"}
 #: 3E's unit codes, from the questionnaire's own list, and the 99 'manquant'.
 UNITS = {1: "Kg", 3: "Cope", 4: "Botte", 5: "Tiya", 6: "Tongolo", 7: "Sac de 50 kg",
          8: "Sac de 100 kg", 9: "Panier", 10: "Unité", 11: "Planche", 99: "Unknown"}
@@ -117,6 +122,15 @@ class TestDeclared:
             entry = yaml.safe_load(f.read().replace("!make", "make"))["Data Scheme"][TABLE]
         assert entry["Condition_sold"] == {"type": "str", "optional": True}
         assert "Condition_sold" not in entry["index"]
+
+    def test_condition_sold_native_is_declared_and_has_no_vocabulary(self):
+        with open(countries_root() / COUNTRY / "_" / "data_scheme.yml", encoding="utf-8") as f:
+            entry = yaml.safe_load(f.read().replace("!make", "make"))["Data Scheme"][TABLE]
+        assert entry["condition_sold_native"] == {"type": "str", "optional": True}
+        path = Path(__file__).resolve().parents[1] / "lsms_library" / "data_info.yml"
+        with open(path, encoding="utf-8") as f:
+            canonical = yaml.safe_load(f)["Columns"][TABLE]["condition_sold_native"]
+        assert canonical["optional"] is True and "spellings" not in canonical
 
     # TOTAL gained Quantity_kg in GH #1436: as03eq09c is per cycle, like as03eq09a.
     @pytest.mark.parametrize("key, columns", [(TOTAL, ["Quantity", "Quantity_kg"]),
@@ -281,6 +295,32 @@ class TestServed:
         _, df = built
         for wave in ("2011-12", "2014-15"):
             assert df.xs(wave, level="t")["Condition_sold"].isna().all()
+
+    def test_condition_sold_native_is_the_recorded_answer(self, built):
+        _, df = built
+        got = df.xs("2018-19", level="t").reset_index()
+        raw = _read("2018-19", "s16c_me_ner2018.dta", convert_categoricals=False)
+        want = pd.to_numeric(raw["s16cq16c"], errors="coerce").map(RECORDED_2018)
+        assert got["condition_sold_native"].value_counts().to_dict() == want.value_counts().to_dict()
+
+    def test_condition_sold_is_the_fold_of_the_native_answer(self, built):
+        _, df = built
+        got = df.xs("2018-19", level="t").reset_index()
+        fold = {RECORDED_2018[c]: EHCVM1[c] for c in RECORDED_2018}
+        native = got["condition_sold_native"].astype(object).map(fold)
+        assert (native.fillna("-") == got["Condition_sold"].astype(object).fillna("-")).all()
+
+    @pytest.mark.parametrize("wave", ["2011-12", "2014-15", "2021-22"])
+    def test_condition_sold_native_is_na_where_nothing_was_folded(self, built, wave):
+        _, df = built
+        assert df.xs(wave, level="t")["condition_sold_native"].isna().all()
+
+    def test_condition_sold_native_is_a_column_and_moves_no_kilogram(self, built):
+        from lsms_library.transformations import harvest_kg
+        _, df = built
+        assert "condition_sold_native" not in df.index.names
+        pd.testing.assert_frame_equal(harvest_kg(df),
+                                      harvest_kg(df.drop(columns="condition_sold_native")))
 
     def test_declared_spellings_check_passes(self, built):
         from lsms_library.diagnostics import _check_declared_spellings

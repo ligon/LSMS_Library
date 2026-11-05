@@ -2765,8 +2765,10 @@ harvest's under other labels (=épis/coques/panicules=, =grains=, =na=).  Served
 =unshelled= -> =shelled=, 18 the reverse).  2021-22's sale is crop-level
 and reaches a row only where the pair has one harvest line (GH #1360), so its state does too; no pair
 sells in two states, so the sale attribution does not move.  2018-19's five answers fold to three here
-as on the level (ruling GH #1436), and no native sold column is served.  Burkina Faso and Mali carry
-the field unserved.
+as on the level (ruling GH #1436), and =condition_sold_native= (ruling @ligon, 2026-11-05) keeps the answer as recorded (Grain 1,195,
+Décortiqué 990, Non-décortiqué 478, Non concerné 319, Epis 244).  It is the same case as =condition_native=:
+199 sold answers differ from the harvest's, and 38 of those differences vanish in the fold.  2021-22 stays
+NA, because its three answers map one to one.  Burkina Faso and Mali carry the field unserved.
 * 2026-11-04 -- community_prices: a record entered twice serves its first entry (GH #1087)
 
 *RULED (@ligon, 2026-11-04, option (c) of #1087).*  The ECVMA second records are

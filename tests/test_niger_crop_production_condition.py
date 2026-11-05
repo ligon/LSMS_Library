@@ -101,7 +101,9 @@ def _label_read(source: str) -> tuple[str, bool] | None:
     reads: (column, is <frame> the labelled read?).  None when there is no call."""
     tree = ast.parse(source)
     calls = [n for n in ast.walk(tree) if isinstance(n, ast.Call)
-             and getattr(n.func, "id", None) == "_crop_condition_labels"]
+             and getattr(n.func, "id", None) == "_crop_condition_labels"
+             # condition_sold_native reads the SOLD state through the same helper (GH #1462).
+             and getattr(getattr(n.args[0], "slice", None), "value", None) != "s16cq16c"]
     if not calls:
         return None
     assert len(calls) == 1, f"{len(calls)} _crop_condition_labels calls"
@@ -239,8 +241,8 @@ class TestNativeColumnDeclared:
     def test_label_read_is_not_satisfied_by_a_docstring(self):
         script = ('"""Reads s16cq12c."""\n'
                   'raw = get_dataframe("x.dta", convert_categoricals=False)\n'
-                  'c = _crop_condition_labels(raw["s16cq16c"])\n')
-        assert _label_read(script) == ("s16cq16c", False)
+                  'c = _crop_condition_labels(raw["s16cq07"])\n')  # any other column; s16cq16c is now the sold state's
+        assert _label_read(script) == ("s16cq07", False)
 
     def test_helper_keeps_the_label_and_a_blank_stays_na(self, niger_module):
         out = niger_module._crop_condition_labels(
