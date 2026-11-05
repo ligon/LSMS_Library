@@ -180,6 +180,14 @@ class TestWiring:
         assert scheme["strata"] == "str"
 
     @pytest.mark.parametrize("country", COUNTRIES)
+    def test_the_registry_file_holds_the_entry_once(self, country):
+        """A duplicate YAML key raises nothing and the last one wins, so a union merge of
+        derivations.yml can leave a stale copy serving as the record."""
+        text = (ROOT / country / "_" / "derivations.yml").read_text(encoding="utf-8")
+        key = stratum_derivation_key(country)
+        assert len(re.findall(rf"^{re.escape(key)}:", text, flags=re.M)) == 1
+
+    @pytest.mark.parametrize("country", COUNTRIES)
     def test_the_registry_entry_names_the_function_and_the_cover(self, country):
         rec = derivation_records(country)[stratum_derivation_key(country)]
         assert rec.resolve() is derive_region_milieu_stratum
