@@ -3070,3 +3070,13 @@ answers: 1 épis, 2 grain, 3 décortiqué, 4 non-décortiqué.  The file has fiv
 =.dta= list is what was fielded, and it is the one this table reads.
 
 *Cost:* one Burkina_Faso re-warm (=data_scheme.yml=, =categorical_mapping.org= and the wave script).
+* 2026-11-04 -- =shocks= 2021-22: =s14bq04d= is the livestock (GH #1556)
+
+By the file's labels and the questionnaire's column heads (=bfa_ehcvm2_vague1.pdf= p. 69),
+=s14bq04a..f= are revenu, avoirs, production agricole, effectif du cheptel, stock de
+produits alimentaires, achats.  =AffectedConsumption= read =d=, the livestock.  It now
+reads =e=, the stock.
+True share 0.390 -> 0.691; 2,139 of 4,475 rows change.
+
+The table serves 4,475 of the 7,701 reported shocks: the rest carry no follow-up, are all-NA
+and are dropped.  That is with the maintainer, and unchanged here.
