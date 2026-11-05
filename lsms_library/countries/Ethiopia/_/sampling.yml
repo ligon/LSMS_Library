@@ -38,8 +38,9 @@ Sampling:
       cluster_id_note: |-
         `ea_id2` both waves.  Measured: 4,887 of 4,887 linked households keep
         `v` on the roster (432 cluster pairs, all one-to-one).  Through `sample()`,
-        4,925 of 4,926: the exception is a household on W2's post-planting cover
-        only, under an EA code W2's household cover does not carry (GH #1467).
+        4,925 of 4,926: the exception is a keying difference on W2's post-planting
+        cover, where one small-town household's id carries the rural placeholder
+        `888`.  It is not a different EA (GH #1467).
       source_type: derived-from-data
       confidence: high
       source_file: null

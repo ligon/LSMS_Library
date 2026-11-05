@@ -1792,12 +1792,24 @@ HH cover, 27 PP-only) and 1,255 identities, the three figures of the ESS3 BID (P
   with complete interviews in ESS3 is 3,699", and 3,726 at post-planting.  3,699 is also
   W3's rural plus small-town total (3,272 + 427, BID p19), so 3,651 + 48 partitions that
   total; it is the survey's accounting, not separate confirmation of these 48.
-- *The rosters neither confirm nor refute it.*  16 of the 48 share no person with their
-  W1 household, against 11.5% of linked households and 78.9% of another household in the
-  same EA.  The closer control is the 201 W3 households also off W2's livestock cover,
-  at 24.9% (P about 0.12 for 16 of 48 against it).  That fits mostly true links plus some
-  replaced households.  Nothing here says which, so a roster-confirmed subset would be
-  our judgement, and no list of them is kept.
+- *The rosters support it without settling it.*  16 of the 48 have no roster line
+  agreeing with their W1 household on sex and an age gap of 2-6, against 11.5% of linked
+  households and 78.9% of another household in the same EA.  The closer control is the 201
+  W3 households also off W2's livestock cover, at 24.9% (P about 0.12 for 16 of 48 against
+  it).  That is a test on sex and age, not a finding that they share no person.
+- *The survey's own flag says the 48 look like linked households.*  W3's roster asks
+  =hh_s1q04_b=, "is [NAME] a new HH member" (1 yes, 2 no; label read from the =.dta=).
+  =individual_id= is only =household_id= plus the line number, so it carries nothing; the
+  flag's line set and sex do.  W3's preload for the 48 is not documented here, so what
+  "new" was asked against is an inference.
+  | W3 HH cover                          | the 48     | linked through W2 (3,651) | another W1 household, same EA (3,651) |
+  |--------------------------------------+------------+---------------------------+---------------------------------------|
+  | a not-new line                       | 47 of 48   | 99.7%                     | n/a                                   |
+  | not-new lines equal the W1 line set  | 47.9% (23) | 47.7%                     | 12.0%                                 |
+  | sex agrees on every shared line      | 68.8% (33) | 67.4%                     | 19.5%                                 |
+  Of the 16, 15 have a not-new line and 6 have a not-new set equal to W1's.  That fits
+  mostly true links plus some replaced households.  Nothing here says which, so a
+  roster-confirmed subset would be our judgement, and no list of them is kept.
 - *Why a rule can do it.*  The target is the truncated id on all 3,677 W3 links through
   W2, and =panel_ids.py= refuses to run if one stops being so.  The only rural or
   small-town households off W2's map are these 49.  Each target is a W1 household claimed
@@ -1811,17 +1823,23 @@ HH cover, 27 PP-only) and 1,255 identities, the three figures of the ESS3 BID (P
   truncated id (4,954 of 4,954).  W2's =ea_id2= to =ea_id= is the same truncation (335 of
   335), so the "W2 bridge" line in the evidence below is not independent either.  What an
   id cannot show is a replacement household at the same serial.
-- *The =panel_ids.json= entry says 2013-14.*  =local_tools.panel_ids= records the wave
-  before in its frame, so the 49 read =(2015-16, X) -> (2013-14, T)= although W2 holds T
-  for only one of them.  It did so before too, as =(2015-16, X) -> (2013-14, X)=, and it
-  still does for the 7 large-town W3 households on no W2 cover.  =updated_ids= is what
-  moves served =i=.
+- *The =panel_ids.json= entry says 2013-14, which is a false wave label.*
+  =local_tools.panel_ids= records the wave before in its frame, so the 49 read
+  =(2015-16, X) -> (2013-14, T)= although W2 holds T for only one of them.  It did so
+  before too, as =(2015-16, X) -> (2013-14, X)=, and it still does for the 7 large-town W3
+  households on no W2 cover: 55 of W3's 4,981 entries name a W2 pair the survey never
+  recorded (56 before).  So counting W3 entries as W2-W3 links gives 4,981 against 4,926
+  in =sample=.  No false household or chain follows, since no W3 target is itself a key,
+  and =updated_ids= is what moves served =i=.
 - *One target has three waves.*  One of the 49 has a W1 id that W2's map also targets,
-  from a W2 PP-only household on a different EA code (their ids differ in characters
-  8-10).  W3 does not hold that W2 id, so this is no rename onto an occupied target: =i=
-  is simply one household's id in W1, W2 and W3.  It is why W2 -> W3 goes from 4,925 of
-  4,925 linked households keeping =v= through =sample()= to 4,925 of 4,926, the one
-  exception to =sampling.yml='s =stable= at that boundary.
+  from a W2 PP-only household whose PP row names that W1 id.  W3 does not hold that W2 id,
+  so this is no rename onto an occupied target: =i= is one household's id in W1, W2 and
+  W3, as far as the data can say.  The two raw ids differ only at characters 8-10, where
+  W2's PP row has the rural placeholder =888=, although that row's own =rural= says small
+  town, as W1 and W3 do.  So W2's =v= for it is a code no other household holds, while its
+  W3 EA holds 9 W2 and 8 W3 households.  This is a keying difference, not a different EA
+  and not a move, and it is why W2 -> W3 goes from 4,925 of 4,925 linked households keeping
+  =v= through =sample()= to 4,925 of 4,926.  =sampling.yml='s =stable= stands.
 - *One household loses a W2-W3 link in =livestock=.*  W2's livestock cover holds 3
   households on neither its HH nor its PP cover (option (d) of the issue, not taken).  1
   of them is among the 49, so its W3 rows move to T while its one W2 =livestock= row keeps
@@ -1858,10 +1876,35 @@ of them.  The derived tables come back in a new row order, because they sort on 
 | food_quantities           | 326,082 |           524 |         47 |
 
 =interview_date= and =food_security= have no W3 rows, and =cluster_features= and
-=community_prices= have no =i=, so those four are exact.  Attrition moves only here:
-W1 -> W3 3,677 -> 3,726 in =sample= (the BID's figure), 3,630 -> 3,677 in
-=household_roster=, 3,600 -> 3,645 in =food_acquired=, 3,372 -> 3,408 in
-=household_characteristics=; W2 -> W3 4,925 -> 4,926 in =sample=.
+=community_prices= have no =i=, so those four are exact.
+
+Attrition, every cell that moves.  W1 -> W3 in =sample= is the BID's 3,726.  W2 -> W3 moves
+only for the two households above: the three-wave one in =sample= and =plot_features=, the
+livestock-only one in =livestock=.
+
+| cell     | table                                           | before | after |
+|----------+-------------------------------------------------+--------+-------|
+| W2 -> W3 | =sample=                                        |  4,925 | 4,926 |
+| W2 -> W3 | =plot_features=                                 |  3,418 | 3,419 |
+| W2 -> W3 | =livestock=                                     |  2,887 | 2,886 |
+| W1 -> W3 | =sample=                                        |  3,677 | 3,726 |
+| W1 -> W3 | =household_roster=                              |  3,630 | 3,677 |
+| W1 -> W3 | =assets=                                        |  3,651 | 3,699 |
+| W1 -> W3 | =people_last7days=                              |  3,651 | 3,699 |
+| W1 -> W3 | =housing=                                       |  3,624 | 3,670 |
+| W1 -> W3 | =food_acquired=, =food_quantities=, =nutrition= |  3,600 | 3,645 |
+| W1 -> W3 | =food_expenditures=                             |  3,529 | 3,573 |
+| W1 -> W3 | =food_prices=                                   |  3,524 | 3,568 |
+| W1 -> W3 | =food_coping=                                   |  3,479 | 3,524 |
+| W1 -> W3 | =household_characteristics=                     |  3,372 | 3,408 |
+| W1 -> W3 | =plot_features=                                 |  2,950 | 2,968 |
+| W1 -> W3 | =individual_education=                          |  2,677 | 2,705 |
+| W1 -> W3 | =plot_labor=                                    |  2,652 | 2,666 |
+| W1 -> W3 | =plot_inputs=                                   |  2,627 | 2,641 |
+| W1 -> W3 | =livestock=                                     |  2,480 | 2,494 |
+| W1 -> W3 | =crop_production=                               |  1,753 | 1,761 |
+| W1 -> W3 | =anthropometry=                                 |  1,635 | 1,648 |
+| W1 -> W3 | =shocks=                                        |  1,162 | 1,171 |
 
 =check_panel_consistency= passes on both sides.  =updated_ids_cover_waves= goes from warn
 to pass, because the baselines are now inferred as W1 and W4.  =panel_ids_targets_exist=
@@ -3862,7 +3905,8 @@ W3 are fieldwork too.
   that could not be visited for security reasons.  The remaining 15 were in different
   places and no respondent was available".  Measured: 27 on both PP and LS and not on
   HH, 26 matching that sentence and 1 also on PH; 10 in one EA absent from the HH
-  cover, and 17 each alone in their EA.  So 10 against the BID's 12, not reconciled.
+  cover, and 17 each alone in their EA.  So 10 against the BID's 12, not reconciled.  That
+  EA holds 12 households in W1 and in W2, none on W3's HH cover and 10 on its PP cover.
 - *W2, 25 (ESS2 BID, not held,
   https://microdata.worldbank.org/catalog/2247/download/40387, PDF p28)*: the same
   sentence with 30 households, ending "and were dropped from the entire ESS2 sample".
@@ -3880,8 +3924,8 @@ W3 are fieldwork too.
   nothing confirms it, and "about 62" movers fits the 60 outside the 6 EAs better.
 
 /Updated 2026-11-04 (GH #1443)./  The three BIDs above that this section reads from the
-catalog are now held: sidecars in each wave's =Documentation/= from acquisitions commit
-=f203adf39= (=ESS2_Basic_Information_Document.pdf=, "Basic Information Document, Ethiopia
+catalog are now held: sidecars in each wave's =Documentation/= from commit
+=11ed1b811= (=ESS2_Basic_Information_Document.pdf=, "Basic Information Document, Ethiopia
 Socioeconomic Survey 2018-19 V2.pdf", =ess5_basic_information_document_final.pdf=).  Every
 citation in this section was re-checked against the held copies, by pypdf text extraction:
 ESS2 p28, ESS3 p16, p23 and p31, ESS4 p13, p25 and p26, ESPS-5 p13 and p22.  All stand.
