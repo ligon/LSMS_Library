@@ -254,6 +254,7 @@ def test_the_disclosure_reaches_a_yield_kg_reader():
     assert res['Yield_kg'].tolist() == [12.5]
     assert res.attrs['derivations'] == _record()
     assert res.attrs['survey_kg_rows_by_wave'] == {'2021-22': 1}
+    assert res.attrs['survey_kg_off_label']['sized'] == 0
 
 
 def test_a_condition_level_is_read_and_a_total_in_each_state_sums():
@@ -268,6 +269,61 @@ def test_a_condition_level_is_read_and_a_total_in_each_state_sums():
     assert f.index.get_level_values('condition').tolist() == ['shelled', 'unshelled', 'shelled']
     assert _kg(df) == {('a', '1_1', 'Mil'): 37.0, ('b', '1_1', 'Mil'): 200.0}
     assert sum(f.attrs['kg_factor_sources'][layer] for layer in KG_FACTOR_LAYERS) == len(df)
+
+
+def test_the_off_label_screen_names_and_never_refuses():
+    """Report only: a total outside the band of its label is flagged and served."""
+    df = _frame([('low', '1_1', 'Mil', 'Sac de 100kg', 10.0, 70.0),      # 7 kg per sack
+                 ('fine', '1_1', 'Mil', 'Sac de 100kg', 10.0, 900.0),
+                 ('high', '1_1', 'Mil', 'Sac de 100kg', 4.0, 80000.0),   # 20 t per sack
+                 ('edge', '1_1', 'Mil', 'Sac de 100kg', 1.0, 10.0),      # exactly 0.1x
+                 ('tiya', '1_1', 'Mil', 'Tiya', 10.0, 99999.0),          # no stated mass
+                 ('none', '1_1', 'Mil', 'Sac de 100kg', 2.0, np.nan)])
+    f = harvest_kg_factors(df)
+    assert f['kg_survey_off_label'].tolist() == [True, False, True, False, False, False]
+    record = f.attrs['survey_kg_off_label']
+    assert (record['sized'], record['low'], record['high']) == (4, 1, 1)
+    assert record['by_wave'] == {'2021-22': {'sized': 4, 'low': 1, 'high': 1}}
+    json.dumps(record)
+    # Served all the same, the flagged rows included.
+    assert _kg(df)[('low', '1_1', 'Mil')] == 70.0
+    assert _kg(df)[('high', '1_1', 'Mil')] == 80000.0
+    assert f['KgFactorSource'].tolist()[:5] == ['survey_kg'] * 5
+
+
+def test_a_unit_with_no_stated_mass_cannot_be_named():
+    """A tonne in `Autre` implies 1,000 kg per unit.  It is neither refused nor named."""
+    df = _frame([('a', '1_1', 'Mil', 'Autre', 4.0, 4000.0)])
+    f = harvest_kg_factors(df)
+    assert not f['kg_survey_off_label'].any()
+    assert f.attrs['survey_kg_off_label']['sized'] == 0
+    assert _kg(df) == {('a', '1_1', 'Mil'): 4000.0}
+
+
+def test_the_off_label_screen_moves_no_number():
+    df = _frame([('a', '1_1', 'Mil', 'Sac de 100kg', 10.0, 70.0),
+                 ('b', '1_1', 'Mil', 'Tiya', 10.0, 25.0),
+                 ('c', '1_1', 'Mil', 'Kg', 10.0, np.nan)])
+    f = harvest_kg_factors(df)
+    want = df['Quantity_kg'].where(df['Quantity_kg'] > 0, df['Quantity'] * f['kg_metric'])
+    assert harvest_kg(df)['Harvest_kg'].tolist() == want.tolist()
+    assert harvest_kg(df).attrs['survey_kg_off_label'] == f.attrs['survey_kg_off_label']
+
+
+def test_a_frame_without_the_column_names_nothing():
+    df = _frame([('a', '1_1', 'Mil', 'Kg', 10.0, np.nan)]).drop(columns='Quantity_kg')
+    f = harvest_kg_factors(df)
+    assert not f['kg_survey_off_label'].any()
+    assert (f.attrs['survey_kg_off_label']['sized'], f.attrs['survey_kg_off_label']['low']) == (0, 0)
+
+
+def test_a_pooled_frame_names_by_country_and_wave():
+    df = _frame([('a', '1_1', 'Mil', 'Sac de 100kg', 10.0, 70.0),
+                 ('b', '1_1', 'Mil', 'Sac de 100kg', 10.0, 900.0)])
+    df = df.assign(country=['X', 'Y']).set_index('country', append=True)
+    by_wave = harvest_kg_factors(df).attrs['survey_kg_off_label']['by_wave']
+    assert by_wave == {'X': {'2021-22': {'sized': 1, 'low': 1, 'high': 0}},
+                       'Y': {'2021-22': {'sized': 1, 'low': 0, 'high': 0}}}
 
 
 def test_the_canonical_column_is_declared_optional_and_a_float():

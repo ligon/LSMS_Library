@@ -284,6 +284,21 @@ class TestServed:
         assert yields.attrs["derivations"] == res.attrs["derivations"]
         assert yields.attrs["survey_kg_rows_by_wave"] == by_wave
 
+    def test_the_off_label_screen_agrees_with_an_oracle_on_the_frame(self, built):
+        """Report only: the count equals one taken by hand, and every named row is served."""
+        _, df = built
+        got = harvest_kg_factors(df)
+        q, k = df["Quantity"].astype("float64"), df["Quantity_kg"].astype("float64")
+        label = pd.Series(np.asarray(df.index.get_level_values("u")), index=df.index).map(
+            {"Kg": 1.0, "Sac de 50 kg": 50.0, "Sac de 100 kg": 100.0, "Gramme": 0.001})
+        ratio = (k / q / label).where((k > 0) & (q > 0))
+        named = (ratio < 0.1) | (ratio > 10)
+        record = got.attrs["survey_kg_off_label"]
+        assert record["sized"] == int(ratio.notna().sum())
+        assert record["low"] + record["high"] == int(named.sum())
+        assert (got["kg_survey_off_label"].to_numpy() == named.to_numpy()).all()
+        assert (got.loc[got["kg_survey_off_label"], "KgFactorSource"] == "survey_kg").all()
+
     def test_every_positive_total_is_served_by_the_rung(self, built):
         _, df = built
         factors = harvest_kg_factors(df)

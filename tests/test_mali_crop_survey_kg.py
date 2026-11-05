@@ -170,6 +170,26 @@ class TestServed:
         assert res.attrs["derivations"]["Mali"][ESTIMATE]["rows"] == int(got["Quantity_kg"].notna().sum())
         assert res.attrs["survey_kg_rows_by_wave"][WAVE] == int(got["Quantity_kg"].gt(0).sum())
 
+    def test_the_off_label_screen_names_and_serves_the_largest_total(self, built):
+        """The reason GH #1559 exists.  An oracle on the file's own sack rows."""
+        _, df = built
+        got = harvest_kg_factors(df)
+        raw = _read(FILE, convert_categoricals=True)
+        num = _read(FILE, convert_categoricals=False)
+        q, k = (pd.to_numeric(num["s16cq16a"], errors="coerce").astype("float64"),
+                pd.to_numeric(num["s16cq16c"], errors="coerce").astype("float64"))
+        size = raw["s16cq16b"].astype("string").str.strip().map(
+            {"Kg": 1.0, "Sacs de 100 kg": 100.0, "Sacs de 50 kg": 50.0, "Sacs de 25 kg": 25.0}
+        ).astype("Float64").to_numpy(dtype="float64", na_value=np.nan)
+        ratio = pd.Series(k / q / size).where((k > 0) & (q > 0))
+        record = got.attrs["survey_kg_off_label"]["by_wave"][WAVE]
+        assert record["sized"] == int(ratio.notna().sum())
+        assert record["low"] == int((ratio < 0.1).sum())
+        assert record["high"] == int((ratio > 10).sum())
+        flagged = df.loc[got["kg_survey_off_label"].to_numpy(), "Quantity_kg"].astype("float64")
+        assert float(flagged.max()) == float(k.max())
+        assert (got.loc[got["kg_survey_off_label"], "KgFactorSource"] == "survey_kg").all()
+
     def test_the_rung_serves_every_positive_total_and_only_those(self, built):
         _, df = built
         source = harvest_kg_factors(df)["KgFactorSource"].to_numpy()

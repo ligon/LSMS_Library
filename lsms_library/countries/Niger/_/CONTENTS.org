@@ -2987,6 +2987,13 @@ waves hold 2.5M and 3.0M.  =Gros sac= and =Sac Moyen= state no size in this wave
   not trimmed.  Site Q names none of these, at either tail, because it judges a total against totals and not against
   the row's own quantity.  Only the masked 999998 would have fired.  =survey_kg_vs_metric=: 19.3% of 2,184 disagree by
   more than 10% in 2011-12, 44.1% of 1,078 in 2014-15, 17.5% of 2,144 in 2021-22.
+- *A total far from its label is named, and served (ruling @ligon 2026-11-05).*  =kg_survey_off_label= in =harvest_kg_factors=
+  and =attrs['survey_kg_off_label']= name a total outside 0.1x-10x of what the unit's label states: the under and over
+  columns above, 75 of Niger's 5,406 sized rows (=Sac de 100 kg= 53, =Sac de 50 kg= 17, =Gramme= 5).  It refuses nothing, and
+  it is a flag and not a verdict: the 5 =Gramme= rows fire and the survey looks right there.  Two limits (GH #1559).  It names
+  21 of 3E's 38 low sacks, since the other 17 sit between 10 and 20 kg per sack.  And it cannot see a unit with no stated
+  mass, which is 24,115 rows and 67.7% of Niger's survey kilograms (=Botte=, =Tiya=, =Panier=).  Those stay unscreened against
+  their own quantity.
 - *One row can move a wave less than it could.*
 
   | wave    | worst row against its label | share of wave | top row's share, metric only -> rung |

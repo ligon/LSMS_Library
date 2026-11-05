@@ -1143,7 +1143,9 @@ Columns:
         an estimate, and it is exactly 2.5 per Tiya on 2,881 of Niger's 4,402
         Tiya rows, so a registered key names those rows in `Derivation`.  It has
         junk of its own, and a low or high total is served as recorded and at most
-        NAMED by Site Q, never clipped.  Two things are not totals and are NA here:
+        NAMED, by Site Q or, against its unit's label, by `kg_survey_off_label` in
+        `harvest_kg_factors`; never clipped or refused (ruling @ligon 2026-11-05).  Two
+        things are not totals and are NA here:
         a "don't know" code, and a 0 beside a positive `Quantity`, which is no
         answer rather than a harvest of nothing.  Count both in the country's
         CONTENTS.org.  The ladder refuses a 0 anyway (`survey_kg_zero`).
