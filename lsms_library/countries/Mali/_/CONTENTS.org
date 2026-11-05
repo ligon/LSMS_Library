@@ -3229,9 +3229,11 @@ True share 0.494 -> 0.751; 1,968 of 4,884 rows change.
 =s14bq05__25= (=Autre stratégie=) alone has the Oui/Non label set; the other 25 hold
 ranks.  The hook's rank map never matched it, so all 72 rows that chose it served
 =HowCoped0= NA.  It now takes the first slot no other strategy holds.  Every one of
-the 72 chose nothing else.  In Burkina's file, which keeps the raw rank, 17 of 62
-code-25 choices are second or third, so Mali's file may have blanked such choices;
-that cannot be read from this file.
+the 72 chose nothing else, whereas in Burkina's file, which keeps the raw rank, 17 of
+62 code-25 choices are second or third.  =s14bq05_autre=, the text of the "autre", shows
+no blanked choice: it is filled on 71 of the 72 rows and on no other row (250 of 251
+code-25 rows across Niger, Mali, Senegal and Burkina, and no other row).  A source
+that blanked both would not show.
 
 The table serves 4,884 of the 8,760 reported shocks: the rest carry no follow-up, are all-NA
 and are dropped.  That is with the maintainer, and unchanged here.
