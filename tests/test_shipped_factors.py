@@ -145,12 +145,14 @@ def test_shipped_reaches_a_unit_no_other_layer_can_serve():
     assert harvest_kg(df, shipped_factors=table)["Harvest_kg"].iloc[0] == 300.0
 
 
-def test_shipped_is_in_the_layer_vocabulary_at_rank_two():
+def test_shipped_is_directly_below_reported():
     # `metric` joined at rank four in GH #929, between `survey_median` and
-    # `inferred`; `shipped` keeps rank two, which is what this test is for.
-    assert KG_FACTOR_LAYERS == ("reported", "shipped", "survey_median",
+    # `inferred`.  `survey_kg` joined first in GH #1436, so `shipped`'s index moved
+    # from 1 to 2; what this test is for is that it sits directly below `reported`.
+    assert KG_FACTOR_LAYERS == ("survey_kg", "reported", "shipped", "survey_median",
                                 "metric", "inferred", "none")
-    assert KG_FACTOR_LAYERS.index("shipped") == 1
+    assert (KG_FACTOR_LAYERS.index("shipped")
+            == KG_FACTOR_LAYERS.index("reported") + 1)
 
 
 # ---------------------------------------------------------------------------
@@ -490,16 +492,18 @@ def test_the_counts_dict_gains_both_keys_and_still_partitions():
         "kg_factor_sources"]
     # GH #931 added `declared` (rows the declared u_kg table offered a factor
     # for), outside the partition like `shipped_matched`.  0 here: a bare frame
-    # carries no `unit_kg` record.
+    # carries no `unit_kg` record.  GH #1436 added `survey_kg` to the partition and
+    # `survey_kg_zero` beside it, both 0 here: no `Quantity_kg`.
     assert set(counts) == set(KG_FACTOR_LAYERS) | {"reported_implausible",
                                                    "shipped_implausible",
                                                    "shipped_matched",
-                                                   "declared"}
+                                                   "declared",
+                                                   "survey_kg_zero"}
     assert sum(counts[layer] for layer in KG_FACTOR_LAYERS) == len(df)
-    assert counts == {"reported": 0, "shipped": 1, "survey_median": 0,
+    assert counts == {"survey_kg": 0, "reported": 0, "shipped": 1, "survey_median": 0,
                       "metric": 1, "inferred": 0, "none": 2,
                       "reported_implausible": 0, "shipped_implausible": 1,
-                      "shipped_matched": 2, "declared": 0}
+                      "shipped_matched": 2, "declared": 0, "survey_kg_zero": 0}
 
 
 def test_the_source_column_rides_through():

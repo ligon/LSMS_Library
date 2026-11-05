@@ -1097,26 +1097,62 @@ Columns:
         table)", which pointed a loader author at this column; it does not
         any more.
 
-        A FACTOR HERE, A PRODUCT IN `food_acquired`.  The antecedent is
+        A FACTOR HERE, A PRODUCT IN `Quantity_kg`.  The antecedent is
         `food_acquired.Quantity_kg` (Nigeria `s10bq2_cvn`, Malawi
         `cfactor`), which carries the exact per-row kilogram AMOUNT and is
         preferred over the inferred factor by the same rule -- see
         `transformations.conversion_to_kgs` and
-        `food_quantities_from_acquired`.  The two are one design with one
-        difference of carrier, and the difference is forced by the grain.
-        Food rows are SUMMED across units within an acquisition source, so
-        food needs the summable product.  Crop rows sit at
-        (t, i, plot_id, j, u, condition, season) and are never summed across
-        `u` or `condition`, so the factor is the natural carrier: it
-        identifies the container (a 100 kg sack is not a 120 kg sack), it
-        can be audited against the library's inferred factors for the same
-        `u`, and the product is one multiplication away.
+        `food_quantities_from_acquired`.  Which column a crop instrument
+        fills is decided by what it wrote down, not by the table.  An
+        instrument that asks a conversion factor (UNPS `a5?q6d`) fills this
+        column: it identifies the container (a 100 kg sack is not a 120 kg
+        sack), it can be audited against the library's inferred factors for
+        the same `u`, and the product is one multiplication away.  One that
+        asks the line's total kilograms (Niger, Mali 2021-22) fills
+        `Quantity_kg`, and never this column by dividing: that would be a
+        number no instrument wrote.  This paragraph used to argue from the
+        crop grain that crops need only the factor, which held until a crop
+        instrument turned out to ask the total (GH #1436).
 
         CONSUMERS MUST NEVER TREAT THIS AS A QUANTITY.  It is kg per unit,
         not kg.  Summing it, averaging it across rows of different `u`, or
         reading it as a harvest is a category error; the only sanctioned
         use is `Quantity * KgFactor` on the SAME row, which is what
         `harvest_kg` does.
+    Quantity_kg:
+      type: float
+      optional: true
+      note: |
+        The harvest of this LINE in kilograms, AS THE SURVEY WROTE IT DOWN --
+        e.g. Niger 2011-12 `as02eq07c` "quantite en kgs recoltee", or 2021-22
+        `s16cq16c` "Estimation Quantite totale UML en kg".  A TOTAL, not a
+        factor: within a unit it scales with `Quantity`, where a factor per unit
+        would not move.  NaN where the survey does not record it; optional
+        because most countries never ask.
+
+        `harvest_kg` reads it first (`KgFactorSource == 'survey_kg'`, ruling
+        @ligon 2026-11-04, GH #1436), ahead of a reported `KgFactor`, and serves
+        it as the row's kilograms in any unit, or with no unit or quantity at
+        all.  The two columns must never be converted into each other:
+        `Quantity_kg / Quantity` is what `kg_survey` reports, and it enters no
+        median and no sibling row.
+
+        THE SURVEY'S, NOT NECESSARILY WEIGHED.  It says who supplied the number,
+        as `survey_kg` does on the food ladder.  Niger and Mali 2021-22 label it
+        an estimate, and it is exactly 2.5 per Tiya on 2,881 of Niger's 4,402
+        Tiya rows, so a registered key names those rows in `Derivation`.  It has
+        junk of its own, and a low or high total is served as recorded and at most
+        NAMED by Site Q, never clipped.  Two things are not totals and are NA here:
+        a "don't know" code, and a 0 beside a positive `Quantity`, which is no
+        answer rather than a harvest of nothing.  Count both in the country's
+        CONTENTS.org.  The ladder refuses a 0 anyway (`survey_kg_zero`).
+
+        The state of the product is not in it.  `condition` applies, and on Niger
+        2021-22 the median kg / q of a unit is the same in both states (Tiya 2.5,
+        Sac de 100kg 100), so an estimate does not see the state and summing
+        across `condition` mixes states exactly as it does for `Quantity`.  It
+        covers what `Quantity` covers, so a registered window or product on
+        `Quantity` applies here too.
     KgFactor_sold:
       type: float
       optional: true
