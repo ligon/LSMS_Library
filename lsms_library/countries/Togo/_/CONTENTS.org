@@ -935,7 +935,9 @@ unfinished crops record a quantity and are keyed =harvest-to-date=.
 - =s16cq16c= and =s16dq05c= are totals in kg, as in Mali.  Not served.
 - WAITING: the state =s16cq16d= (Grain 7,790, Tubercule 1,008, Non-décortiqué 791, Non
   concerné 649, blank 559, Epis 45, Régime 24, Décortiqué 11) waits for the =condition= level
-  of the ehcvm-condition lane (#1436), not on development when this was written.
+  of the ehcvm-condition lane (#1436), not on development when this was written.  Its eight
+  codes are not Niger 2021-22's three (code 3 is =Tubercule= here and =na= there), so this
+  wave needs its own table, and the ruled fold does not name =Tubercule= or =Régime=.
 - =Unit_sold= is NA on 2018, whose sold unit =s16cq16b= is not read.
 - 2018's code 56 (356 rows) has no label there and =Ananas= here, with 17 rows; 2018's
   list stops at 55, so it is not assumed to be the same crop.  Left as it is.
