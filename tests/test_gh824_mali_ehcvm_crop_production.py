@@ -64,8 +64,9 @@ UNIT_BY_CODE = {1: "Kg", 2: "Unité", 3: "Cart (donkey)", 4: "Cart (ox)",
                 9: "Botte", 10: "Gerbe", 11: "Baignoire", 12: "Panier", 13: "Autre",
                 14: "Tonne"}
 
-#: Rows of the EAC-I waves, which this change must not move.
-EACI_ROWS = {"2014-15": 10341, "2017-18": 24719}
+#: Rows of the EAC-I waves, which this change must not move.  Re-pinned for GH #1457:
+#: 2017-18 gains 202 Farm-level rows, the s7g sales of crops on two or more plots.
+EACI_ROWS = {"2014-15": 10341, "2017-18": 24719 + 202}
 #: 2018-19: the source's rows.  2021-22: the source's rows plus the Farm-level ones:
 #: 70 for a sale, and since GH #1437 181 more for a derived total with no sale there.
 WAVE_ROWS = {"2018-19": 7992, "2021-22": 7247 + 70 + 181}
@@ -206,8 +207,9 @@ class TestDeclared:
 
     def test_the_derivation_is_registered_and_resolves(self):
         rec = records_for(COUNTRY, TABLE)[KEY]
-        assert list(rec.waves) == ["2021-22"]
-        assert set(rec.columns) == {"Quantity_sold", "Unit_sold", "Value_sold"}
+        # Re-pinned for GH #1457: the same rule now serves the 2017-18 s7g sales.
+        assert list(rec.waves) == ["2017-18", "2021-22"]
+        assert set(rec.columns) == {"Quantity_sold", "Unit_sold", "KgFactor_sold", "Value_sold"}
         assert callable(rec.resolve("function")) and callable(rec.resolve("inputs"))
 
     def test_make_reaches_every_wave(self):

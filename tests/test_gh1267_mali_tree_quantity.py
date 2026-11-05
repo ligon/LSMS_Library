@@ -273,7 +273,10 @@ class TestServed:
         # The waves with a tree roster: a 2021-22 row can carry GH #824's sale key.
         in_eaci = built.index.get_level_values("t").isin(TREE_ROWS)
         field = built[in_eaci & ~built["perennial"].fillna(False)]
-        assert field["Derivation"].isna().all()
+        # Re-pinned for GH #1457: a 2017-18 field row holding an s7g sale carries its key.
+        assert field["Derivation"].dropna().eq(
+            "Mali::crop_production::hh-crop-sale-single-row").all()
+        assert not field.xs("2014-15", level="t")["Derivation"].notna().any()
         assert field["months_harvested"].isna().all()
         summ = built.attrs["derivations"][COUNTRY]
         assert summ[KEY]["rows"] == sum(TREE_ROWS.values())
