@@ -986,8 +986,8 @@ Ruling @ligon 2026-11-04, option (D), set on Niger in #1471: the fold stays on t
 | 3 | Décortiqué | 838 | 432 / 406 | =shelled= |
 | 4 | Non-décortiqué | 2,428 | 1,065 / 1,363 | =unshelled= |
 | 5 | Non concerné | 5,452 | 3,424 / 2,028 | =shell_not_applicable= |
-| 6 | Fève (instrument, not =.dta=) | 371 | 0 / 371 | =other_condition=, provisional |
-| 7 | Autre à préciser (instrument, not =.dta=) | 956 | 0 / 956 | =other_condition=, provisional |
+| 6 | Fève (instrument, not =.dta=) | 371 | 0 / 371 | =other_condition= |
+| 7 | Autre à préciser (instrument, not =.dta=) | 956 | 0 / 956 | =other_condition= |
 | blank | | 6,365 | 3,730 / 2,635 | =unknown_condition=, column NA |
 
 *Codes 6 and 7 are named by the wave's own instrument.*  The =.dta= value label stops at 5, so
@@ -998,11 +998,15 @@ vague 2 one (=...-VAGUE2.pdf=, p. 197) adds =Fève= and =Autre à préciser=, wi
 file and print the five, so the CAPI is the source.  The sold state 16C.16c keeps five in
 both vagues (p. 199).
 
-*The fold of those two is provisional.*  The ruling names five answers.  =Fève= is mostly
-cacao (263 of 371), and on the cacao rows of vague 2 sold by the kilo it prices like =Grain=:
-median 750 FCFA on both (160 and 509 rows); but it also falls on rubber (32) and cotton
-(26).  =Autre à préciser= is mostly yam (436) and cassava (196), crops that read =Non concerné=
-in vague 1.  Both are =other_condition= until @ligon rules; one table row and one re-warm.
+*Both stay =other_condition=, and no claim is made that =Fève= is =Grain=.*  The ruling names five
+answers, and neither of these.  =Fève= is mostly cacao (263 of 371), and it also falls on rubber (32), cotton
+(26) and yam (12).  Cacao prices cannot say which state a line is in: sold by the kilo in vague 2, the median
+is 750 FCFA under =Grain=, =Fève=, =Décortiqué= and =Non concerné= alike and 700 under =Non-décortiqué=,
+with quartiles at 700-750 throughout.  The sold state on the same line, which has no =Fève= answer, reads
+=Non concerné= 201, =Grain= 83, =Non-décortiqué= 53 of 347 stated, and on cacao 145, 75, 35 of 263.
+=Autre à préciser= is mostly yam (436) and cassava (196), crops that read =Non concerné= in vague 1, and
+its sold state reads =Non concerné= on 411 of 424.  Any other fold is one table row and one re-warm, on a
+ruling.
 
 22,223 lines, unique on (household, field, parcel, crop code, unit), so the level separates
 nothing and adds no row.  A blank state is a blank unit on all 6,365.  The answer describes the

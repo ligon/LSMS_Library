@@ -49,7 +49,7 @@ FOLD = {1: "unshelled", 2: "shelled", 3: "shelled", 4: "unshelled",
 FRENCH = {1: "Epis", 2: "Grain", 3: "Décortiqué", 4: "Non-décortiqué",
           5: "Non concerné"}
 #: Cote d'Ivoire's vague 2 instrument adds two answers the .dta does not label
-#: (CIV-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf, p. 197).  The fold of both is provisional.
+#: (CIV-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf, p. 197).  Neither is claimed to be another answer.
 IVOIRE_LABELS = {**FRENCH, 6: "Fève", 7: "Autre à préciser"}
 IVOIRE_FOLD = {**FOLD, 6: "other_condition", 7: "other_condition"}
 

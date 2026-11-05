@@ -187,8 +187,8 @@ Data Scheme:
     # `shelled` / `unshelled` / `shell_not_applicable`, plus `unknown_condition`
     # for a blank code.  Five answers fold onto those tokens (ruled @ligon
     # 2026-11-04); condition_native below keeps what was answered.  Vague 2 added
-    # two more, Fève and Autre à préciser, served `other_condition` for now (GH
-    # #1436, provisional: see categorical_mapping.org).
+    # two more, Fève and Autre à préciser, served `other_condition` (GH #1436; see
+    # categorical_mapping.org).
     index: (t, i, plot_id, crop, u, condition)
     Quantity: float
     Quantity_sold: float
