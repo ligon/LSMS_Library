@@ -689,7 +689,8 @@ def derivations_table(country: str | list[str] | None = None) -> pd.DataFrame:
             "key": r.key, "country": r.country, "table": r.table, "name": r.name,
             "waves": "all" if r.waves == "all" else ", ".join(r.waves),
             "columns": ", ".join(r.columns or []),
-            "rows": json.dumps(r.rows) if r.rows else None,
+            # 0 names a deletion, and is falsy: it must not read as "no selector".
+            "rows": json.dumps(r.rows) if r.rows or r.rows == 0 else None,
             "bases": "+".join(r.bases),
             "n_assumptions": len(r.assumptions or []),
             "validated_against": r.validated_against, "since": r.since,
