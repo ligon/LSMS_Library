@@ -57,7 +57,6 @@ PARTIALLY_WIRED_SAMPLE = {
     "Peru": {"1985", "1990", "1991"},
     "Malawi": {"2024-25"},
     "Guinea-Bissau": {"2021-22"},
-    "CotedIvoire": {"2021-22"},
     "Benin": {"2021-22"},
     "Liberia": {"2014-15", "2016-17"},
 }
