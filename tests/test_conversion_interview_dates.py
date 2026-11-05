@@ -10,6 +10,9 @@ Mutant these tests must kill: restore
 ``pd.Timestamp(getattr(r, datecol)) for r in flat.itertuples()`` and every test
 of an ``Interview start`` frame fails.  ``test_int_t_frame`` still passes under
 that mutant, because ``Int_t`` is an identifier; it pins the other 20 countries.
+
+A second mutant: drop the sort on ``visit``, so the first row served wins.
+``test_visit_is_chosen_by_rule_not_row_order`` fails under it.
 """
 import warnings
 
@@ -80,6 +83,29 @@ def test_a_visit_with_no_start_is_not_the_date(monkeypatch):
     frame.iloc[0, frame.columns.get_loc("Interview start")] = pd.NaT
     _serve(monkeypatch, frame)
     assert _interview_dates("Fake") == {("h1", "2018"): pd.Timestamp("2018-11-06 09:00:00")}
+
+
+def test_visit_is_chosen_by_rule_not_row_order(monkeypatch):
+    """Rows served out of visit order still give the lowest dated visit.
+
+    The rows are permuted deterministically so a later visit always comes
+    first.  h2's visit 1 has no start, so it takes visit 2, not visit 3.
+    """
+    frame = _ehcvm_frame([
+        ("h1", "2021-22", "c1", 3, "2022-01-12 09:00:00"),
+        ("h2", "2021-22", "c1", 3, "2022-07-04 08:00:00"),
+        ("h1", "2021-22", "c1", 2, "2021-12-30 09:00:00"),
+        ("h2", "2021-22", "c1", 1, "2022-07-01 08:00:00"),
+        ("h1", "2021-22", "c1", 1, "2021-12-29 09:00:00"),
+        ("h2", "2021-22", "c1", 2, "2022-07-02 08:00:00"),
+    ])
+    frame = frame.reset_index()
+    frame.loc[(frame["i"] == "h2") & (frame["visit"] == 1), "Interview start"] = pd.NaT
+    frame["visit"] = frame["visit"].astype("Int64")
+    _serve(monkeypatch, frame.set_index(["i", "t", "v", "visit"]))
+    assert _interview_dates("Fake") == {
+        ("h1", "2021-22"): pd.Timestamp("2021-12-29 09:00:00"),
+        ("h2", "2021-22"): pd.Timestamp("2022-07-02 08:00:00")}
 
 
 def test_int_t_frame(monkeypatch):

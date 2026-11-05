@@ -99,8 +99,9 @@ def _interview_dates(country: str) -> dict:
 
     Loaded from ``Country(country).interview_date()``; ``{}`` when the country
     has no ``interview_date`` table or it cannot be built (callers then fall
-    back to the wave's nominal date).  A household with several visits gets the
-    first row with a date, in the order the table serves them.
+    back to the wave's nominal date).  A household with several visits gets its
+    lowest-numbered visit that has a date, chosen by sorting on ``visit``, not
+    by the order the table happens to serve.
     """
     try:
         from . import Country
@@ -118,7 +119,13 @@ def _interview_dates(country: str) -> dict:
                             if pd.api.types.is_datetime64_any_dtype(flat[col])), None)
         if datecol is None or "i" not in flat.columns or "t" not in flat.columns:
             return {}
-        flat = flat.dropna(subset=[datecol]).drop_duplicates(subset=["i", "t"])
+        flat = flat.dropna(subset=[datecol])
+        if "visit" in flat.columns:
+            # The first visit by rule.  drop_duplicates keeps the first row, and
+            # without the sort that was visit 1 only because melt_visit_intervals
+            # concatenates the visits in order.
+            flat = flat.sort_values("visit", kind="stable")
+        flat = flat.drop_duplicates(subset=["i", "t"])
         # Read the column, not a namedtuple field: itertuples() renames a column
         # that is not an identifier, so 'Interview start' raised AttributeError
         # here and seven countries converted on nominal dates (GH #1585).
