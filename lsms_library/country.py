@@ -39,9 +39,6 @@ from .local_tools import df_data_grabber, format_id, get_categorical_mapping, ge
 from .local_tools import (CATEGORICAL_KEY_ATTR, CATEGORICAL_MAPPING_DIR,
                           CATEGORICAL_MAPPING_FILE,
                           CATEGORICAL_RESERVED_COLUMNS,
-                          CategoricalKeyDeclarationError,
-                          CategoricalMappingConflictError,
-                          EmptyCategoricalTableError,
                           categorical_mapping_files,
                           load_categorical_level)
 from .local_tools import (
@@ -86,7 +83,7 @@ from .null_index_audit import check_index_levels
 from .null_index_audit import (NullIndexKeyError, NullIndexKeyWarning,
                                _NULL_INDEX_LEDGER,
                                _read_strict as _null_index_strict)
-from .quantity_audit import QuantityImplausibleError, check_quantities
+from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
 from .sampling import (attach as attach_sampling, check_cluster_identity,
@@ -992,6 +989,17 @@ def _property_value(instance, prop_name):
     if isinstance(prop, property):
         return prop.__get__(instance, type(instance))
     raise AttributeError(f"'{type(instance).__name__}' has no attribute '{prop_name}'")
+
+
+#: What a failed derivation may read as "try the legacy path": the builtins THEMSELVES.
+#: A subclass is a statement by whoever raised it -- a strict lever's refusal
+#: (``GrainCollapseError``, ``NullReadError``, ``NullIndexKeyError``,
+#: ``QuantityImplausibleError``), a malformed mapping table, ``GrainConflict`` -- and a
+#: second attempt would answer a question nobody asked (GH #1532).  It is a whitelist so
+#: the next guard needs no entry.  ``_rebuild_failure_error`` is a bare ``RuntimeError``
+#: and stays on it.  Used only by the dispatch in ``Country.__getattr__``, which no build
+#: fingerprint reaches.
+_GENERIC_BUILD_FAILURES = frozenset({FileNotFoundError, KeyError, ValueError, RuntimeError})
 
 
 def _rebuild_failure_error(country_name: str, method_name: str) -> RuntimeError:
@@ -3577,12 +3585,9 @@ class Country:
             f"this fatal."
         )
         if _null_index_strict():
-            # NullIndexKeyError subclasses RuntimeError.  That is safe ONLY
-            # because all three _add_market_index call sites in the generated
-            # table method sit OUTSIDE the derived-path
-            # ``except (FileNotFoundError, KeyError, ValueError, RuntimeError)``
-            # blocks; moved inside one, a strict raise would be swallowed into
-            # the legacy fallback (CLAUDE.md, Site C).
+            # NullIndexKeyError subclasses RuntimeError.  The derived-path
+            # handlers re-raise a subclass (_GENERIC_BUILD_FAILURES, GH #1532),
+            # and all three _add_market_index call sites sit outside them.
             raise NullIndexKeyError(msg)
         # Point the warning at the first frame outside lsms_library (the
         # user's Country/Feature call), not at the generated method.
@@ -6788,12 +6793,6 @@ class Country:
                             "Deriving %s from food_acquired failed (%s); "
                             "falling back to legacy aggregation", name, exc)
                         derived = None
-                    except (EmptyCategoricalTableError, CategoricalMappingConflictError,
-                            CategoricalKeyDeclarationError, QuantityImplausibleError):
-                        # GH #1493: the strict screen is a RuntimeError, and the
-                        # legacy path would report it as "no wave-level build
-                        # succeeded", after rebuilding what it could.
-                        raise
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
                         if subset_kg:
                             # GH #1512: the failure can name a wave the caller
@@ -6806,7 +6805,11 @@ class Country:
                                 "reads no factor stays on the request: "
                                 "units='units' or units='unitvalue'.")
                         if (units is not None or map_labels or valuation is not None
-                                or subset_kg or self._proven_absent(name, waves)):
+                                or subset_kg or type(exc) not in _GENERIC_BUILD_FAILURES
+                                or self._proven_absent(name, waves)):
+                            # GH #1532: a named class is a statement, never a
+                            # failed build; see _GENERIC_BUILD_FAILURES.
+                            #
                             # GH #1487: a kilogram subset also raises when it was
                             # a default call, whichever wave failed.  Its waves
                             # declare no `food_quantities`, so the legacy path
@@ -6885,10 +6888,9 @@ class Country:
                             if age_cuts is not None:
                                 rc_kwargs['age_cuts'] = tuple(age_cuts)
                             derived = roster_to_characteristics(roster, **rc_kwargs)
-                    except (EmptyCategoricalTableError, CategoricalMappingConflictError,
-                            CategoricalKeyDeclarationError):
-                        raise
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
+                        if type(exc) not in _GENERIC_BUILD_FAILURES:
+                            raise   # GH #1532: see _GENERIC_BUILD_FAILURES
                         logger.info(
                             "Deriving %s from household_roster failed (%s); "
                             "falling back to legacy aggregation", name, exc)

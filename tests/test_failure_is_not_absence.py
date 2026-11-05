@@ -12,13 +12,29 @@ about which failure may be read as what:
 import importlib.util
 import pickle
 
+import pandas as pd
 import pytest
 
 from lsms_library import _parallel_waves as pw
-from lsms_library.country import GrainCollapseError
+from lsms_library import country as C
+from lsms_library.build_transforms import GrainConflict
+from lsms_library.country import (Country, GrainCollapseError, LabelPassThroughError,
+                                  _rebuild_failure_error)
+from lsms_library.datetime_parse import DatetimeParseError
 from lsms_library.errors import WaveWorkerError
+from lsms_library.local_tools import IdWalkError, InTreeSourceError
+from lsms_library.null_index_audit import NullIndexKeyError
+from lsms_library.null_read_audit import NullReadError
+from lsms_library.quantity_audit import QuantityImplausibleError
+from lsms_library.sampling import ClusterIdentityError
 
+FOOD = ['food_expenditures', 'food_prices', 'food_quantities']
+DERIVED = FOOD + ['household_characteristics']
 GENERIC = [FileNotFoundError, KeyError, ValueError, RuntimeError]
+NAMED = [GrainCollapseError, NullReadError, NullIndexKeyError, DatetimeParseError,
+         LabelPassThroughError, QuantityImplausibleError, InTreeSourceError, GrainConflict,
+         NotImplementedError]
+NOT_CAUGHT_BY_CLASS = [ClusterIdentityError, IdWalkError, WaveWorkerError]
 
 
 def by_path_guard(tmp_path, base='Exception'):
@@ -85,3 +101,90 @@ class TestWorkerRelay:
 
     def test_it_is_not_a_class_a_derived_handler_catches(self):
         assert not issubclass(WaveWorkerError, tuple(GENERIC + [AttributeError, OSError]))
+
+
+
+def _food():
+    index = pd.MultiIndex.from_tuples(
+        [('2018-19', 'c', 'h', 'food', 'kg', 'purchased')],
+        names=['t', 'v', 'i', 'j', 'u', 's'])
+    return pd.DataFrame({'Quantity': [2.0], 'Expenditure': [8.0]}, index=index)
+
+
+
+def install_fault(monkeypatch, method, error, site='source', builder=False):
+    """``method``'s source raises ``error``; returns the tables that were then asked for."""
+    source = 'household_roster' if method == 'household_characteristics' else 'food_acquired'
+    calls = []
+    legacy = pd.DataFrame({'legacy': [1.0]}, index=pd.Index(['h'], name='i'))
+
+    def aggregate(self, waves, table, *args, **kwargs):
+        calls.append(table)
+        if table == source:
+            if site == 'source':
+                raise error
+            return _food()
+        return legacy.copy()
+
+    def finalize(*args, **kwargs):
+        raise error
+
+    monkeypatch.setattr(Country, '_aggregate_wave_data', aggregate)
+    monkeypatch.setattr(Country, '_unit_kg_factors', lambda self: {})
+    monkeypatch.setattr(Country, '_no_kg_factor_cells', lambda self: {})
+    monkeypatch.setattr(Country, '_has_country_builder', lambda self, table: builder)
+    if site == 'finalize':
+        monkeypatch.setattr(Country, '_finalize_result', finalize)
+    return calls, legacy
+
+
+
+def _forms(country):
+    waves = list(country.waves)
+    return [None, waves[:1], waves[:2], waves]
+
+
+
+@pytest.mark.parametrize('error_type', NAMED + NOT_CAUGHT_BY_CLASS)
+@pytest.mark.parametrize('method', DERIVED)
+@pytest.mark.parametrize('builder', [False, True])
+@pytest.mark.parametrize('form', range(4))
+def test_a_named_failure_reaches_the_caller_as_itself(monkeypatch, error_type, method, builder, form):
+    """Whether or not the legacy path could build the table: a strict refusal is not a
+    reason to try something else, and is not a failed build."""
+    error = error_type('the refusal')
+    calls, _ = install_fault(monkeypatch, method, error, builder=builder)
+    country = Country('Ethiopia')
+    with pytest.raises(error_type) as caught:
+        getattr(country, method)(waves=_forms(country)[form])
+    assert caught.value is error
+    assert method not in calls
+
+
+
+@pytest.mark.parametrize('error_type', NAMED)
+@pytest.mark.parametrize('method', FOOD)
+def test_a_named_failure_of_the_derivation_itself(monkeypatch, error_type, method):
+    error = error_type('the refusal')
+    calls, _ = install_fault(monkeypatch, method, error, site='finalize', builder=True)
+    with pytest.raises(error_type) as caught:
+        getattr(Country('Ethiopia'), method)()
+    assert caught.value is error
+    assert method not in calls
+
+
+
+@pytest.mark.parametrize('method', DERIVED)
+def test_a_by_path_guard_reaches_the_caller_as_itself(monkeypatch, tmp_path, method):
+    Guard = by_path_guard(tmp_path, 'ValueError')
+    error = Guard('the refusal')
+    calls, _ = install_fault(monkeypatch, method, error, builder=True)
+    with pytest.raises(Guard):
+        getattr(Country('Ethiopia'), method)()
+    assert method not in calls
+
+
+
+def test_the_rebuild_failure_is_still_a_bare_runtime_error():
+    """The one generic failure the fall-through exists for."""
+    assert type(_rebuild_failure_error('X', 't')) in C._GENERIC_BUILD_FAILURES
