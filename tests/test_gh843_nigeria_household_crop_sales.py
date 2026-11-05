@@ -128,11 +128,14 @@ def _harvest_frame(rows):
                 qty="qty", unit="unit", perennial=False)
 
 
-def _build(ng, harvest, sales, conv=None):
+def _build(ng, harvest, sales, conv=None, lines=False):
+    """The built frame; without ``production_obs`` unless ``lines`` asks for it,
+    since a test of placement addresses a row by plot and crop (GH #1433)."""
     raw, dec = _sale_file(sales, conv)
     records = ng._hh_crop_sale_frame(raw, dec, SPEC, LABELS)
-    return ng.crop_production_for_wave(
+    out = ng.crop_production_for_wave(
         "2016Q1", [_harvest_frame(harvest)], LABELS, hh_sales=records)
+    return out if lines else out.droplevel("production_obs")
 
 
 class TestWhatIsASale:
@@ -205,23 +208,31 @@ class TestPlacement:
         harvested = out.drop(index=("2016Q1", "h1", FARM_LEVEL, "Maize"))
         assert harvested["Value_sold"].isna().all(), "the sale is on one row only"
 
-    def test_a_row_discarded_by_the_dedup_is_not_counted_and_carries_nothing(self, ng):
-        """GH #1433 interaction.  Two raw lines of one (plot, crop) are one served
-        row, so the sale attaches to it, once, and the discarded twin is gone."""
+    def test_two_lines_of_one_plot_that_both_state_a_harvest_are_two_rows(self, ng):
+        """Re-pinned by GH #1433: both lines are served, so two rows state a harvest,
+        and the rule as ruled sends the sale to Farm-level (it picked the first line
+        when a dedup discarded the second)."""
         out = _build(ng, [("h1", "1", 1121, 9.0), ("h1", "1", 1123, 4.0)],
-                     [("h1", 1121, 2.0, 100.0, 1, None, None)])
-        assert len(out) == 1, "no Farm-level row: one served row"
-        row = out.loc[("2016Q1", "h1", "1", "Yam--roots")]
-        assert row["Quantity"] == 9.0 and row["Value_sold"] == 100.0
+                     [("h1", 1121, 2.0, 100.0, 1, None, None)], lines=True)
+        assert out.loc[("2016Q1", "h1", "1", "Yam--roots", "reported:crop_code:1121"),
+                       "Quantity"] == 9.0
+        assert out.loc[("2016Q1", "h1", "1", "Yam--roots", "reported:crop_code:1123"),
+                       "Quantity"] == 4.0
+        farm = out.loc[("2016Q1", "h1", FARM_LEVEL, "Yam--roots", "unresolved_observation")]
+        assert farm["Value_sold"] == 100.0 and pd.isna(farm["Quantity"])
+        assert out["Value_sold"].notna().sum() == 1, "the sale is on one row only"
 
-    def test_it_is_judged_on_the_line_the_dedup_kept(self, ng):
-        """The kept line of (plot, crop) has no quantity; its discarded twin does.
-        The served row states no harvest, so it takes no sale."""
+    def test_the_line_that_states_the_harvest_takes_it_beside_a_blank_twin(self, ng):
+        """Re-pinned by GH #1433: the blank line was the kept one, and the harvesting
+        line was discarded, so this sale used to go to Farm-level."""
         out = _build(ng, [("h1", "1", 1121, np.nan), ("h1", "1", 1123, 4.0)],
-                     [("h1", 1121, 2.0, 100.0, 1, None, None)])
-        assert pd.isna(out.loc[("2016Q1", "h1", "1", "Yam--roots"), "Quantity"])
-        assert pd.isna(out.loc[("2016Q1", "h1", "1", "Yam--roots"), "Value_sold"])
-        assert out.loc[("2016Q1", "h1", FARM_LEVEL, "Yam--roots"), "Value_sold"] == 100.0
+                     [("h1", 1121, 2.0, 100.0, 1, None, None)], lines=True)
+        assert len(out) == 2, "no Farm-level row"
+        row = out.loc[("2016Q1", "h1", "1", "Yam--roots", "reported:crop_code:1123")]
+        assert row["Quantity"] == 4.0 and row["Value_sold"] == 100.0
+        assert row["Derivation"] == SINGLE_ROW
+        twin = out.loc[("2016Q1", "h1", "1", "Yam--roots", "reported:crop_code:1121")]
+        assert pd.isna(twin["Value_sold"])
 
     def test_no_sale_means_no_derivation_and_w1_w2_shape_is_unchanged(self, ng):
         out = ng.crop_production_for_wave(
@@ -400,8 +411,7 @@ def _source_sales(t):
 
 
 def _source_harvest_rows(t):
-    """The ``(i, plot_id, crop)`` rows the plot-crop files yield, labelled crops, the
-    first line of each key in build order, with what that line states."""
+    """Every line of the plot-crop files with a labelled crop, with what it states."""
     from lsms_library.local_tools import get_dataframe
     labels = _crop_labels()
     parts = []
@@ -416,8 +426,6 @@ def _source_harvest_rows(t):
             "screener": pd.to_numeric(d[screener], errors="coerce").values,
         }))
     rows = pd.concat(parts, ignore_index=True).dropna(subset=["i", "crop"])
-    rows = rows.sort_values(["i", "plot_id", "crop"], kind="stable")
-    rows = rows.drop_duplicates(["i", "plot_id", "crop"], keep="first")
     return rows.assign(i=lambda d: _walk(t, d["i"]).values,
                        states=lambda d: (d["q"] > 0) & (d["screener"] != 2))
 
@@ -433,6 +441,8 @@ def served():
         pytest.skip("no warm Nigeria crop_production parquet")
     if "Derivation" not in cached.columns:
         pytest.skip("warm Nigeria crop_production parquet predates GH #843 (re-warm needed)")
+    if "production_obs" not in cached.index.names:
+        pytest.skip("warm Nigeria crop_production parquet predates GH #1433 (re-warm needed)")
     coverage = read_parquet_cache_waves(path)
     wanted = set(SALE_BLOCK) | set(PLOT_GRAIN_SALES)
     if coverage is not None and wanted - set(coverage):
@@ -601,7 +611,7 @@ class TestSoldFactorOracle:
         """The reason the factor is wired.  Without it the price pool is the 43 and
         41 sales in a metric unit, and this median was 1.40 and 7.55."""
         from lsms_library import transformations as T
-        d = served.set_index(["i", "t", "v", "plot_id", "crop"])
+        d = served.set_index(["i", "t", "v", "plot_id", "crop", "production_obs"])
         d = d.assign(Harvest_kg=pd.to_numeric(d["Quantity"], errors="coerce")
                      * T.harvest_kg_factors(d)["kg_per_unit"])
         out = T.median_price_valuation(d, ["v"], item_keys=("crop",), quantity_col="Harvest_kg")
@@ -654,29 +664,35 @@ class TestTheSaleUnitIsAUnit:
 
 @pytest.mark.requires_s3
 @pytest.mark.parametrize("t", sorted(PLOT_GRAIN_SALES))
-class TestW1W2Untouched:
-    def test_sales_match_the_plot_crop_row_and_nothing_is_added(self, served, t):
+class TestW1W2OnTheRow:
+    def test_every_line_keeps_its_own_sale_and_nothing_is_added(self, served, t):
+        """Re-pinned by GH #1433: every labelled line is served, each with its own
+        answer.  The sales W1/W2 record on the line must not move or be added to."""
         from lsms_library.local_tools import get_dataframe
         cfg = PLOT_GRAIN_SALES[t]
         d = get_dataframe(str(NIGERIA / cfg["wave"] / cfg["file"]), convert_categoricals=False)
         code = pd.to_numeric(d[cfg["crop"]], errors="coerce").astype("Int64")
+        line = pd.to_numeric(d["cropid"], errors="coerce").astype("Int64")
         raw = pd.DataFrame({
             "i": d["hhid"].map(_hh).astype("string").values,
             "plot_id": d["plotid"].map(_hh).astype("string").values,
             "crop": code.map(_crop_labels()).astype("string").values,
+            "production_obs": ("reported:crop_id:" + line.astype("string")).values,
             "q": pd.to_numeric(d["sa3q11a"], errors="coerce").values,
             "v": pd.to_numeric(d["sa3q12"], errors="coerce").values,
-        }).dropna(subset=["i", "crop"]).sort_values(["i", "plot_id", "crop"], kind="stable")
-        raw = raw.drop_duplicates(["i", "plot_id", "crop"], keep="first")
+        }).dropna(subset=["i", "crop"])
         raw["i"] = _walk(t, raw["i"]).values
         rows = served[served["t"] == t]
         assert FARM_LEVEL not in set(rows["plot_id"])
         assert rows["Derivation"].isna().all()
         assert len(rows) == len(raw)
-        key = ["i", "plot_id", "crop"]
+        assert pd.to_numeric(rows["Value_sold"], errors="coerce").sum() == pytest.approx(
+            raw["v"].sum(), abs=1e-6)
+        key = ["i", "plot_id", "crop", "production_obs"]
+        named = raw.dropna(subset=["production_obs"])
         got = rows.astype({k: str for k in key}).set_index(key).sort_index()
-        want = raw.astype({k: str for k in key}).set_index(key).sort_index()
-        assert got.index.equals(want.index)
+        want = named.astype({k: str for k in key}).set_index(key).sort_index()
+        got = got.loc[want.index]
         for ours, theirs in (("Value_sold", "v"), ("Quantity_sold", "q")):
             a = pd.to_numeric(got[ours], errors="coerce").astype("float64").to_numpy()
             b = want[theirs].to_numpy()
@@ -687,16 +703,18 @@ class TestW1W2Untouched:
 @pytest.mark.requires_s3
 @pytest.mark.parametrize("key", [SINGLE_ROW, SUMMED, TWO_UNITS])
 def test_derivation_inputs_join_to_the_served_rows(served, key):
-    """Each key's raw answers join the rows carrying it, by ``(t, i, plot_id, crop)``,
-    and the quantities a two-unit row withholds come back from here."""
+    """Each key's raw answers join the rows carrying it, by ``(t, i, plot_id, crop,
+    production_obs)``, and the quantities a two-unit row withholds come back from here."""
     import lsms_library as ll
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         inputs = ll.Country("Nigeria").derivation_inputs(key)
-    assert list(inputs.index.names) == ["t", "i", "plot_id", "crop", "source_row"]
+    assert list(inputs.index.names) == ["t", "i", "plot_id", "crop", "production_obs",
+                                        "source_row"]
     assert inputs.index.is_unique
     carrying = served[served["Derivation"].astype("string").str.contains(key, regex=False, na=False)]
     got = set(map(tuple, inputs.index.droplevel("source_row").to_frame(index=False)
                   .astype(str).drop_duplicates().values))
-    want = set(map(tuple, carrying[["t", "i", "plot_id", "crop"]].astype(str).values))
+    want = set(map(tuple, carrying[["t", "i", "plot_id", "crop", "production_obs"]]
+                   .astype(str).values))
     assert got == want

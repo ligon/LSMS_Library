@@ -20,8 +20,7 @@ transaction, so it is a column DISTINCT from ``Value_sold``.  Pinned here:
 3. the identification (data-gated): each named column's Stata variable label
    is the valuation question, not a neighbour;
 4. the built table (data-gated, warm cache only): per wave, every raw
-   valuation is served, or on a row with no crop label, or on a row the
-   pre-existing keep-first dedup drops.
+   valuation is served, or on a row with no crop label.
 """
 from __future__ import annotations
 
@@ -188,11 +187,9 @@ def test_named_column_is_the_valuation_question(wave):
 # --------------------------------------------------------------------------
 
 def _raw_accounting(ng, wave):
-    """``(raw, no_label, dedup_dropped)`` valuation counts for one wave, from
-    the raw files alone: every non-null valuation, those on a row with no
-    resolved crop label or household (``crop_production_for_wave``'s filter),
-    and those on a row its keep-first dedup at ``(t, i, plot_id, crop)``
-    discards (stable sort on ``(i, plot_id, crop)``, frames in script order)."""
+    """``(raw, no_label)`` valuation counts for one wave, from the raw files
+    alone: every non-null valuation, and those on a row with no resolved crop
+    label or household (``crop_production_for_wave``'s filter)."""
     from lsms_library.local_tools import get_dataframe
     labels = ng._crop_labels()
     parts = []
@@ -208,26 +205,25 @@ def _raw_accounting(ng, wave):
     raw = pd.concat(parts, ignore_index=True)
     valued = raw["val"].notna()
     labelled = raw["i"].notna() & raw["crop"].notna()
-    kept = raw[labelled].sort_values(["i", "plot_id", "crop"], kind="stable")
-    dropped = kept.duplicated(subset=["i", "plot_id", "crop"], keep="first")
-    return (int(valued.sum()), int((valued & ~labelled).sum()),
-            int((dropped & kept["val"].notna()).sum()))
+    return int(valued.sum()), int((valued & ~labelled).sum())
 
 
 @pytest.mark.requires_s3
 def test_api_frame_accounts_for_every_raw_valuation(ng_in_country_dir):
-    """Per wave: served + no-crop-label + dedup-dropped == raw non-null.
+    """Per wave: served + no-crop-label == raw non-null.
 
-    An identity rather than pinned counts, so a future change to the
-    (pre-existing) keep-first dedup moves the terms, not the test."""
+    Re-pinned by GH #1433: the keep-first dedup term is gone, because every
+    labelled line is served."""
     from lsms_library.local_tools import data_root, read_parquet_cache_waves
     path = data_root() / "Nigeria" / "var" / f"{TABLE}.parquet"
     try:
-        cols = pd.read_parquet(path).columns
+        cached = pd.read_parquet(path)
     except FileNotFoundError:
         pytest.skip("no warm Nigeria crop_production parquet (absent, or mid-rebuild)")
-    if COL not in cols:
+    if COL not in cached.columns:
         pytest.skip("warm Nigeria crop_production parquet predates GH #844 (re-warm needed)")
+    if "production_obs" not in cached.index.names:
+        pytest.skip("warm Nigeria crop_production parquet predates GH #1433 (re-warm needed)")
     coverage = read_parquet_cache_waves(path)
     if coverage is not None and set(PH_T.values()) - set(coverage):
         pytest.skip(f"partial warm cache: lacks {sorted(set(PH_T.values()) - set(coverage))}")
@@ -239,9 +235,9 @@ def test_api_frame_accounts_for_every_raw_valuation(ng_in_country_dir):
     assert str(df[COL].dtype) in ("float64", "Float64"), df[COL].dtype
     served = df[COL].notna().groupby(np.asarray(df.index.get_level_values("t"))).sum()
     for wave, t in PH_T.items():
-        raw, no_label, dedup = _raw_accounting(ng_in_country_dir, wave)
+        raw, no_label = _raw_accounting(ng_in_country_dir, wave)
         assert served.get(t, 0) > 0, (t, "valuation absent from a wave that asks it")
-        assert served.get(t, 0) + no_label + dedup == raw, (t, served.get(t, 0), no_label, dedup, raw)
+        assert served.get(t, 0) + no_label == raw, (t, served.get(t, 0), no_label, raw)
 
 
 @pytest.fixture
