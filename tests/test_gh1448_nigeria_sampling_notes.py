@@ -69,7 +69,7 @@ def test_site_c_quotes_the_renumbering_not_a_panel_count(t, renumbered):
 def test_the_notes_state_what_sample_and_the_crosswalk_say():
     """Every link's two ends against ``sample()``: kept, and for each change whether
     it is a mover's singleton or a real EA, which the two boundaries that declare
-    ``wave-scoped`` are the only ones allowed to hold."""
+    ``wave-scoped`` are the only ones allowed to hold.  Each note states its movers."""
     import lsms_library as ll
 
     with warnings.catch_warnings():
@@ -78,13 +78,14 @@ def test_the_notes_state_what_sample_and_the_crosswalk_say():
     v = {(i, t): x for (i, t), x in v.items()}
     records = sampling_records("Nigeria")
     for t, links in _links().items():
-        kept = moved = real = 0
+        kept = moved = back = real = 0
         for i, previous, previous_i in links:
             now, then = v[(i, t)], v[(previous_i, previous)]
             if now == then:
                 kept += 1
             elif now.startswith("moved-") or then.startswith("moved-"):
                 moved += 1
+                back += not now.startswith("moved-")
             else:
                 real += 1
         note = _note(records[t])
@@ -92,6 +93,13 @@ def test_the_notes_state_what_sample_and_the_crosswalk_say():
         assert kept + moved + real == len(links)
         if records[t].cluster_id_continuity == "stable":
             assert real == 0, t
+            if moved:
+                assert f"the other {moved} are" in note, t
+            else:
+                assert "the other" not in note, t
+            if back:
+                assert f"{moved - back} newly given" in note, t
+                assert f"{back} back on" in note, t
         else:
             assert f"{moved} are movers" in note, t
             assert f"{real} are" in note, t
