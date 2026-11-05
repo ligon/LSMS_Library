@@ -2970,3 +2970,49 @@ none is shared with another wave.
 Cache: =2014/_/data_info.yml= and =mapping.py= are build inputs, so every Burkina table hash and
 every 2014 wave hash moves, one Burkina re-warm.  No other country's, and no
 =build_transforms_fingerprint=.  Pinned by =tests/test_gh1464_burkina_sample_extension.py=.
+
+* 2026-11-04 -- WAITING the tomato tin stays folded: the kg measurement (GH #1226)
+
+The ruling said to stop folding =Boîte de tomate= onto =Boîte= in the =u= table, measuring the kg
+factors first and stopping if they got materially worse.  They do, on a line fixed before looking, so
+the table is unchanged.  Measured on cold builds with the edit in a private clone.  A second pair of builds also served the
+C05 / C06 values of GH #1442, which is held and not on development; the two agree except where noted.
+
+*Which rows are tomato tins differs by wave.*  2018-19 has both codes, and 5,314 of its 9,187 served
+tin rows are code 108.  2021-22 fields code 107 only (5,302 source rows), so nothing there says what a
+tin held.  In 2014 the only tin is =grosse boite de tomate=: all 5,423 served =Boîte= rows.  So the fold
+has two rows in the table, not one, and the second is 2014's.  =ehcvm_nsu_bfa2021.dta= weighs the two
+apart, median kg by size Petit / Moyen / Grand: tomato tin 0.83 / 1.41 / 1.84, =Boîte= 0.40 / 0.46 / 0.80.
+
+*What unfolding buys.*  2018-19 household rows meeting a community price in their own unit, of 138,429:
+at =(j, u)= 109,750 -> 113,800, at =(v, j, u)= 66,350 -> 69,637.  Of the 5,314 tomato rows, 4,083 match at
+=(j, u)= only once unfolded, and 1,212 match under the fold only because a generic =Boîte= price exists.
+On price it hardly matters: same-market community tomato tin against =Boîte=, median 1.0 over 43 cells.
+(The review's 4,010 and 1,206 use a slightly different row set.  This join is measured on development
+=df8faa75f=, where GH #1226 spells community =u= in the household's sized form; at =115b6ab71= it did not.)
+
+*What it costs.*  V1 unfolds =Boîte de tomate= only, V2 also folds =grosse boite de tomate= onto it.
+Against the unit weights, each row scored against the unit the survey recorded, median absolute log
+error and share within 2x, as built -> V1 -> V2:
+
+| rows | as built | V1 | V2 |
+|------+----------+----+----|
+| tomato tin, all | 0.166, 97.6% | 0.181, 80.4% | 0.181, 94.8% |
+| ... 2014 | 0.186, 98.8% | 0.293, 54.2% | 0.186, 98.8% |
+| ... 2018-19 | 0.104, 97.0% | 0.090, 92.9% | 0.090, 92.9% |
+| generic tin, all | 0.388, 77.2% | 0.446, 70.6% | 0.446, 70.6% |
+| ... 2018-19 | 0.446, 66.2% | 0.455, 66.9% | 0.455, 66.9% |
+| ... 2021-22 | 0.236, 86.2% | 0.363, 73.5% | 0.363, 73.5% |
+
+With those values served, the generic rows are the same and 2014's tomato rows hold 98.7% within 2x under
+all three (median log error 0.170 / 0.256 / 0.170).  kg by wave, 2014 / 2018-19 / 2021-22: V1 -2.43% / -0.83% /
+-0.54% (2014 -1.11% with those values served), V2 -0.01% / -0.83% / -0.54%.  462 of 20,151 tin rows fall from the item rung
+to =unit= under either, none rises.  No non-tin row's factor moves.
+
+The line: more than 5 points of within-2x or 0.05 of median log error on either kind of tin, more than 5%
+of tin rows falling a rung, or more than 2% of a wave's kg.  V1 crosses the first and the third.  V2 crosses
+the first on generic tins, through 2021-22, and that wave's rows are the least certain to be generic,
+since 2021-22 has no tomato code.  WAITING a ruling, GH #1226.  It should be re-measured once the unit-weight
+tables are wired (GH #1452), because those rows then read a survey weight rather than this inference.
+
+Cache: none.  This section is documentation; the =u= table is unchanged.
