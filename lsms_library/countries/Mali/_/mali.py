@@ -1006,7 +1006,8 @@ def _harvest_totals(lines, dispositions):
     ``<var>a`` and ``<var>b`` for each of :data:`_DISPOSITIONS`.  A pair qualifies when
 
     - every s16c row of it says the harvest is finished: a mixed pair's dispositions
-      cover what is harvested so far, so they are not a finished total;
+      cover what is harvested so far, so they are not a finished total, and an
+      unanswered row has not said so;
     - no row of it records a quantity: a recorded harvest is never overridden, and
       a total beside it on a Farm-level row would count it twice;
     - its positive dispositions all state one unit: no factor between units exists.
@@ -1026,7 +1027,8 @@ def _harvest_totals(lines, dispositions):
     stated = long.groupby(_SALE_KEYS).agg(Quantity=('quantity', 'sum'), u=('unit', 'first'),
                                           units=('unit', 'nunique'), unitless=('unitless', 'any'))
     facts = pd.DataFrame({'i': lines['i'], 'crop': lines['crop'],
-                          'open': lines['finished'].astype('string').str.strip().ne('Oui'),
+                          'open': (lines['finished'].astype('string').str.strip().ne('Oui')
+                                   .fillna(True).astype(bool)),
                           'recorded': pd.to_numeric(lines['Quantity'], errors='coerce').notna()})
     facts = facts.groupby(_SALE_KEYS).agg(lines=('open', 'size'), open=('open', 'any'),
                                           recorded=('recorded', 'any'))

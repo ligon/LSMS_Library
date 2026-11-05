@@ -104,6 +104,9 @@ class TestRules:
         [("h", "1_1", "Mil", 9.0, "Kg", "Oui", pd.NA)],                    # recorded
         [("h", "1_1", "Mil", 9.0, "Kg", "Oui", pd.NA),
          ("h", "2_1", "Mil", np.nan, pd.NA, "Oui", pd.NA)],                # recorded beside
+        [("h", "1_1", "Mil", np.nan, pd.NA, pd.NA, pd.NA)],                # unanswered
+        [("h", "1_1", "Mil", np.nan, pd.NA, "Oui", pd.NA),
+         ("h", "2_1", "Mil", np.nan, pd.NA, pd.NA, pd.NA)],                # unanswered beside
     ])
     def test_what_is_held_out_keeps_what_it_had(self, rows):
         served = _served(rows)
