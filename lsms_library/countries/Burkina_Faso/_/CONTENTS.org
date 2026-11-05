@@ -577,6 +577,9 @@ Not paid in the fixing branch; verified with =assume_cache_fresh=True=.
 | 2018-19 | =grappe_gps_bfa2018.dta= (one row per grappe) | =coordonnes_gps__Latitude= / =__Longitude=       | 0 / 585 -> *555 / 585*             |
 | 2021-22 | -- none usable (see below) --                | --                                               | 0 / 550 -> 0 / 550                 |
 
+/Since 2026-11-05 nine of the 555 are withheld, so 546 are served, and 516 carry into 2021-22: see
+"Copied 2018-19 fixes withheld, in both waves" at the end of this file./
+
 *What was wrong.*  Both the 2014 and the 2018-19 =df_geo= asked for
 =lat_dd_mod= / =lon_dd_mod= -- the LSMS-ISA offset-file spelling, which no
 Burkina Faso file carries.  The =KeyError= was swallowed by the GH #515
@@ -658,7 +661,7 @@ Measured:
   within their EA; see "THE THING TO KNOW" above); Region agrees 550/550, and
   527 of them have a 2018-19 fix.  Serving that fix for 2021-22 would be a
   cross-wave construction -- a registered derivation, not a config mapping --
-  and is not done.  /Done 2026-11-03, for 525 of the 527 (519 since 2026-11-04): see
+  and is not done.  /Done 2026-11-03, for 525 of the 527 (519 since 2026-11-04, 516 since 2026-11-05): see
   "2021-22 GPS carried from 2018-19 (GH #1057)" at the end of this file./
 - =s16a_me_bfa2021.dta= DOES carry parcel coordinates (=s16aq46__latitude= /
   =__longitude=, 4,180 of 8,467 parcels, inside the country).  Parcel grain,
@@ -2455,7 +2458,7 @@ spelling (pooled District stays 45, Region 13).
 The 2,035 pre-existing rows (all of 2014 and 2018-19, and the 550 panel
 grappes) are value- and dtype-equal to the shared warm parquet; 2014's grain
 report (1,034 of 10,800 rows, 94 zd, GH #1060) is unchanged.  Latitude and
-Longitude stay NaN for all 1,150 2021-22 grappes.  /Since GH #1057, 525 (since 2026-11-04, 519) panel
+Longitude stay NaN for all 1,150 2021-22 grappes.  /Since GH #1057, 525 (since 2026-11-04, 519; since 2026-11-05, 516) panel
 grappes carry the 2018-19 fix; the 600 cross-section grappes stay NaN./
 
 *New idiosyncrasy: the cross-section cover carries HOUSEHOLD GPS.*
@@ -2904,7 +2907,8 @@ provinces meet within 500 m, apart from one pair (6 and 11, Oudalan and Séno, 4
 of the place the others were read.
 
 *Nothing in 2018-19 is changed.*  The 2018-19 rows still serve all of the above as recorded,
-pending a ruling.
+pending a ruling.  /Ruled 2026-11-05: see "Copied 2018-19 fixes withheld, in both waves" at the end
+of this file./
 
 * 2026-11-04 -- 2014 =sample= holds the 389 (GH #1464)
 
@@ -3169,3 +3173,37 @@ vague 1: =d= Diminué is 70.0 in vague 1 and 54.6 in vague 2.  Neither official 
 fits the whole file: the label fits vague 1, and the report's heading and the printed
 questionnaire fit vague 2.  The vague-1 xls is not evidence about vague 1, because its
 sheet =S14_Chocs= is cell-identical to vague 2's (99 nonblank cells).
+* 2026-11-05 -- Copied 2018-19 fixes withheld, in both waves (GH #1057)
+
+*Ruling (@ligon, 2026-11-05).*  "Withhold the copied 2018-19 GPS fixes (555 to 546), and stop
+carrying 216, 218 and 350."  So nine grappes go NA in 2018-19: the seven copied fixes (216, 218, 226,
+237, 240, 350, 365) and the two holding a Kadiogo point (103, 104).  A summary of the question
+listed six; 555 to 546 takes nine, and 216, 218 and 350 cannot be withheld from 2021-22 for not being
+a reading of their grappe while 2018-19 serves them as one.
+
+*Where it is done.*  2018-19: the =cluster_features= hook in =2018-19/_/mapping.py= blanks both
+coordinates and leaves the row.  A withheld value has nowhere to carry a key, so the entry
+=Burkina_Faso::cluster_features::copied-grappe-gps-withheld= is =rows: 0=; =derivation_inputs= returns
+the file's nine rows, with =copy_of= naming the source.  2021-22: =_GPS_COPIED_READING_GRAPPES= joins
+the two existing lists in =2021-22/_/mapping.py=.  Both waves read the raw file, so neither depends on
+the other's hook; a test holds that nothing withheld in 2018-19 is carried.
+
+*Measured*, cold base against the change:
+
+| | base | after |
+|-+------+-------|
+| 2018-19 =Latitude= / =Longitude= non-null, of 585 rows | 555 / 555 | 546 / 546 |
+| 2021-22 non-null and carrying the key, of 1,150 rows | 519 | *516* |
+| Of the 550 panel grappes: carried / no fix / excluded | 519 / 22 / 9 | 516 / 22 / 12 |
+| Carried with a parcel coordinate: n, median, p90, maximum km | 271, 1.57, 4.92, 21.8 | 270, 1.57, 4.72, 21.8 |
+| Carried with none | 248 | 246 |
+
+*What stays.*  The sources (217, 219, 223, 232, 351, 369) keep their fixes: each is the reading.  229
+stays in 2018-19, since it is no copy, and stays out of 2021-22 under the 25 km ruling.  89 and 136 keep
+theirs, though they lie within 30 m of 103 and 104 and have no parcels, so nothing says whether they
+are readings of those grappes or of the place the others were read.  Parcel coordinates are not touched.
+
+Cache: =2018-19/_/mapping.py=, =2018-19/_/data_info.yml= and =2021-22/_/mapping.py= are build inputs, so
+every Burkina table hash and every 2018-19 and 2021-22 wave hash moves, one Burkina re-warm.  Pinned by
+=tests/test_gh1057_burkina_copied_gps.py=, whose oracle reads the source files and imports nothing from
+this directory.

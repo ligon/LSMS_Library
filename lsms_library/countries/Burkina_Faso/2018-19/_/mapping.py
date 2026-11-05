@@ -151,6 +151,74 @@ def household_roster(df):
     return df
 
 
+# ---------------------------------------------------------------------------
+# cluster_features: fixes that are not a reading of their own grappe (GH #1057)
+# ---------------------------------------------------------------------------
+#
+# Every fix in grappe_gps_bfa2018.dta at one or two decimals is a rounded copy of
+# another grappe's reading: the same Timestamp to the second, the same Altitude, an
+# Accuracy differing only by rounding, a position that rounds to it, the same
+# province.  All seven are in vague 2.  The value is the grappe whose reading it
+# copies.  Ruling of 2026-11-05: a copied reading is not a reading of that grappe.
+# The lists are literal; tests/test_gh1057_burkina_copied_gps.py recomputes them from
+# the file.
+_GPS_COPIED_READINGS = {'216': '217', '218': '219', '226': '223', '237': '232',
+                        '240': '232', '350': '351', '365': '369'}
+
+# 6 m apart, both Namentenga and 109 km from that province's median fix, within 30 m
+# of Kadiogo grappes 89 and 136, and stamped the same day as them.  Withheld by the
+# same ruling.
+_GPS_KADIOGO_POINT_GRAPPES = ('103', '104')
+
+_GPS_WITHHELD_GRAPPES = (*_GPS_COPIED_READINGS, *_GPS_KADIOGO_POINT_GRAPPES)
+
+_GPS_WITHHELD_KEY = 'Burkina_Faso::cluster_features::copied-grappe-gps-withheld'
+
+_GPS_RAW_COLUMNS = ['grappe', 'vague', 'coordonnes_gps__Latitude', 'coordonnes_gps__Longitude',
+                    'coordonnes_gps__Accuracy', 'coordonnes_gps__Altitude',
+                    'coordonnes_gps__Timestamp']
+
+
+def withhold_copied_grappe_gps(df):
+    """Blank ``Latitude`` / ``Longitude`` on the withheld grappes.
+
+    Takes the merged frame: the ``v`` index level, and the coordinates from ``df_geo``.
+    Every other column and every row stay as they are, in order, and no row gets a key:
+    a withheld value is not a served one, so the registered entry is ``rows: 0``.  With
+    neither column present (``df_geo`` could not be fetched, which the GH #675 drop stamp
+    reports) there is nothing to withhold.
+    """
+    out = df.copy()
+    present = [c for c in ('Latitude', 'Longitude') if c in out.columns]
+    if not present:
+        return out
+    withheld = out.index.get_level_values('v').isin(_GPS_WITHHELD_GRAPPES)
+    out.loc[withheld, present] = np.nan
+    return out
+
+
+def cluster_features(df):
+    """``cluster_features`` post-processor: see :func:`withhold_copied_grappe_gps`."""
+    return withhold_copied_grappe_gps(df)
+
+
+def inputs_cluster_features(wave='2018-19'):
+    """The registry `inputs` callable: the file's own row for each withheld fix, at
+    ``(t, v)``, with ``copy_of`` naming the grappe whose reading it copies (NA for 103
+    and 104, which share a point rather than copy a reading).
+    """
+    if wave != '2018-19':
+        raise ValueError(f'{_GPS_WITHHELD_KEY} covers 2018-19 only, not {wave!r}')
+    from lsms_library.paths import countries_root
+    gps = tools.get_dataframe(countries_root() / 'Burkina_Faso' / wave / 'Data'
+                              / 'grappe_gps_bfa2018.dta')
+    v = gps['grappe'].map(tools.format_id)
+    keep = v.isin(_GPS_WITHHELD_GRAPPES)
+    out = gps.loc[keep, _GPS_RAW_COLUMNS].assign(t=wave, v=v[keep])
+    out['copy_of'] = out['v'].map(_GPS_COPIED_READINGS).astype('string')
+    return out.set_index(['t', 'v'])
+
+
 FIES_ITEMS = ['Worried', 'HealthyDiet', 'FewFoods', 'SkippedMeal',
               'AteLess', 'RanOut', 'Hungry', 'WholeDay']
 

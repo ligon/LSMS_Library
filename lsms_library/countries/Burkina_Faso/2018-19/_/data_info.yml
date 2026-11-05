@@ -132,7 +132,8 @@ cluster_features:
         # optional-sub-df fallback and every cluster was served without GPS.
         # The file is one row per grappe (585 rows, 585 distinct grappes, the
         # same 585 as s00_me), so the merge on v is many-to-one and the
-        # projection to (t, v) is lossless.  30 grappes ship no fix.
+        # projection to (t, v) is lossless.  30 grappes ship no fix, and mapping.py's
+        # `cluster_features` hook withholds 9 of the 555 that do (GH #1057).
         file: grappe_gps_bfa2018.dta
         idxvars:
             v: grappe

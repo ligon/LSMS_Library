@@ -12,7 +12,9 @@ GPS.  A panel grappe's row carries its 2018-19 fix and the key
 ``Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19``.  Grappes 19, 365
 and 549 name a different province in the two waves and stay NA; by the ruling of
 2026-11-04 so do 103, 104, 226, 229, 237 and 240, whose fix lies more than 25 km from
-their own 2021-22 parcels; the cross-section (586-1185) has no antecedent and stays NA.
+their own 2021-22 parcels, and by that of 2026-11-05 so do 216, 218 and 350, rounded
+copies of another grappe's reading; the cross-section (586-1185) has no antecedent and
+stays NA.  The 2018-19 side of the 2026-11-05 ruling is in test_gh1057_burkina_copied_gps.py.
 
 The ``TestOracle*`` classes are the point.  They read the source files directly and
 import nothing from ``Burkina_Faso/_/``, so a bug in the hook cannot agree with itself.
@@ -57,7 +59,8 @@ MODAL_KEY = "Burkina_Faso::cluster_features::zd-modal-province"
 GPS_KEY = "Burkina_Faso::cluster_features::panel-grappe-gps-from-2018-19"
 PROVINCE_CHANGED = {"19", "365", "549"}
 FAR_FROM_PARCELS = {"103", "104", "226", "229", "237", "240"}
-EXCLUDED = PROVINCE_CHANGED | FAR_FROM_PARCELS
+COPIED_READING = {"216", "218", "350"}
+EXCLUDED = PROVINCE_CHANGED | FAR_FROM_PARCELS | COPIED_READING
 LOGEMENT = "emc2014_p1_logement_27022015.dta"
 GPS_FILE = "grappe_gps_bfa2018.dta"
 LAT, LON = "coordonnes_gps__Latitude", "coordonnes_gps__Longitude"
@@ -480,7 +483,8 @@ class TestOracleCarriedGps:
         gps, panel, _ = sources
         expect = (set(panel["grappe"].astype(int).astype(str))
                   & set(gps[gps[LAT].notna()].index)) - EXCLUDED
-        assert len(expect) == 519   # 525 until the six were withheld (ruling of 2026-11-04)
+        # 525 until the six were withheld (2026-11-04), 519 until the three (2026-11-05).
+        assert len(expect) == 516
         w = served[served["t"] == "2021-22"].set_index("v")
         carried = w[w["Latitude"].notna() | w["Longitude"].notna()]
         assert set(carried.index) == expect
@@ -491,7 +495,8 @@ class TestOracleCarriedGps:
     def test_the_2018_19_row_is_the_same_fix_and_carries_no_key(self, sources, served):
         gps, _, _ = sources
         w = served[served["t"] == "2018-19"].set_index("v")
-        assert len(w) == 585 and w["Latitude"].notna().sum() == 555
+        # 555 until the nine copied fixes were withheld (ruling of 2026-11-05).
+        assert len(w) == 585 and w["Latitude"].notna().sum() == 546
         assert w["Derivation"].isna().all()
         for v, row in w[w["Latitude"].notna()].iterrows():
             assert float(row["Latitude"]) == float(gps.loc[v, LAT]), v
@@ -515,7 +520,7 @@ class TestOracleCarriedGps:
         w = served[served["t"] == "2021-22"]
         assert set(w["Derivation"].dropna()) == {GPS_KEY}
         assert (w["Derivation"].notna() == w["Latitude"].notna()).all()
-        assert w["Derivation"].notna().sum() == 519
+        assert w["Derivation"].notna().sum() == 516
 
     def test_the_inputs_are_the_fix_behind_each_keyed_row(self, sources, served):
         gps, _, _ = sources
@@ -555,7 +560,7 @@ class TestConsumers:
         other = flat[flat["country"] != COUNTRY]
         assert len(other) and other["Derivation"].isna().all()
         mine = flat[flat["country"] == COUNTRY]
-        assert mine["Derivation"].value_counts().to_dict() == {GPS_KEY: 519, MODAL_KEY: 92}
+        assert mine["Derivation"].value_counts().to_dict() == {GPS_KEY: 516, MODAL_KEY: 92}
         summary = frame.attrs["derivations"][COUNTRY]
-        assert summary[MODAL_KEY]["rows"] == 92 and summary[GPS_KEY]["rows"] == 519
+        assert summary[MODAL_KEY]["rows"] == 92 and summary[GPS_KEY]["rows"] == 516
         json.dumps(summary)
