@@ -325,7 +325,7 @@ class TestRegistry:
     def test_the_table_lists_a_deletion_at_zero_rows(self):
         """0 is falsy, and it used to read as None, the same as an entry with no selector."""
         tbl = derivations_table()
-        deletions = [r.key for r in _all_records() if r.rows == 0]
+        deletions = [key for _, key, r in _all_records() if r.rows == 0]
         assert deletions
         assert (tbl.loc[deletions, "rows"] == "0").all()
 
