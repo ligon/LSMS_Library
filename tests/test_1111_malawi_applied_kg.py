@@ -86,6 +86,8 @@ def drive(monkeypatch):
                              if wave == '2013-14' else {'ag_g0b': ['R1']})
                 return pd.DataFrame({
                     **ids, **plot_crop, 'ag_g0d': [1], 'crop_code': [1],
+                    # GH #1228: the 2010-11 driver reads the crop specify text.
+                    'ag_g0d_os': [pd.NA],
                     'gardenid': ['RG01'], 'plotid': ['R1'],
                     'ag_g04a': [3.0], 'ag_g04b': [1], 'ag_g0f': [2],
                 })
@@ -144,7 +146,8 @@ MODERN = {'2016-17', '2019-20'}
 # Waves concatenating a Cross_Sectional and a Panel half.
 TWO_HALVES = {'2016-17', '2019-20'}
 HHIDS = {'2010-11': {'7'}, '2013-14': {'7'}, '2016-17': {'cs-17-7', '700'},
-         '2019-20': {'7', '700'}}
+         # GH #1278: the 2019-20 cross-sectional half carries its namespace now.
+         '2019-20': {'cs-19-7', '700'}}
 
 
 @pytest.mark.parametrize('wave', WAVES)

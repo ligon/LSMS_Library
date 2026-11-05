@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from lsms_library.local_tools import to_parquet
-from lsms_library.local_tools import get_dataframe
+from lsms_library.local_tools import get_dataframe, format_id
 
 import sys
 sys.path.append('../../_/')
@@ -25,6 +25,12 @@ hh_cs = get_dataframe('../Data/Cross_Sectional/hh_mod_a_filt.dta', convert_categ
 hh_pn = get_dataframe('../Data/Panel/hh_mod_a_filt_19.dta', convert_categoricals=True)
 regions_cs = hh_cs[['case_id', 'region']].rename(columns={'case_id': 'j'})
 regions_pn = hh_pn[['y4_hhid', 'region']].rename(columns={'y4_hhid': 'j'})
+# The same household-id keyspace the wave's cs_i mapping applies to sample and
+# household_roster (GH #1278): cross-sectional cases get the 'cs-19-' prefix,
+# panel cases stay bare; both pass through format_id.  Done here too so the
+# `regions` join below (keyed on j) still matches once `df`'s ids are prefixed.
+regions_cs['j'] = 'cs-19-' + regions_cs['j'].apply(format_id)
+regions_pn['j'] = regions_pn['j'].apply(format_id)
 regions = pd.concat([regions_cs, regions_pn]).drop_duplicates().set_index('j')['region']
 regions = regions.replace({'South': 'Southern'})
 regions.name = 'm'
@@ -38,6 +44,8 @@ df = df.rename(columns_dict, axis=1)
 panel_df = panel_df.rename(columns_dict, axis=1)
 df = df.loc[:, list(set(columns_dict.values()))]
 panel_df = panel_df.loc[:, list(set(columns_dict.values()))]
+df['j'] = 'cs-19-' + df['j'].apply(format_id)
+panel_df['j'] = panel_df['j'].apply(format_id)
 df = pd.concat([df, panel_df], axis=0)
 df['i'] = normalize_food_label(df['i'].astype(str).str.capitalize())
 

@@ -2,7 +2,9 @@
 
 Item-level (t, i, plot, crop) harvest feature.  Sources (Full_Sample/
 Agriculture):
-  * ag_mod_g — seasonal harvest, plot=ag_g0b, crop=ag_g0d (codes 1-48).
+  * ag_mod_g — seasonal harvest, plot=ag_g0b, crop=ag_g0d (codes 1-48).  Code
+    48 OTHER (SPECIFY) carries its name on the row, ag_g0d_os; a line naming
+    cowpea is served 'Cowpea (Khobwe)' (GH #1228).
   * ag_mod_p — perennial harvest, plot=ag_p0b, crop=ag_p0d (codes->+1000).
   * ag_mod_i — seasonal SALE (hh, crop): crop=ag_i0b, sold=ag_i01,
     qty=ag_i02a, unit=ag_i02b, S/U=ag_i02c, value=ag_i03.  No plot id.
@@ -45,7 +47,8 @@ harvest = [
     _harvest_block(g, hhid='hhid', plotkey='ag_g0b', cropcode='ag_g0d',
                    qty='ag_g13a', unit='ag_g13b', condition='ag_g13c',
                    plant_m='ag_g05a', plant_y='ag_g05b', harv_m='ag_g12b',
-                   intercrop='ag_g01', perennial=False, t=WAVE),
+                   intercrop='ag_g01', perennial=False, t=WAVE,
+                   crop_text='ag_g0d_os'),
     _harvest_block(p, hhid='hhid', plotkey='ag_p0b', cropcode='ag_p0d',
                    qty='ag_p09a', unit='ag_p09b', plant_y='ag_p04',
                    harv_m='ag_p06c', perennial=True, t=WAVE),

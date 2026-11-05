@@ -1,7 +1,7 @@
 """Build livestock for Malawi IHS5 2019-20 (GAP 4).
 
 Item-level (t, i, animal) livestock-roster feature.  IHS5 ships a
-Cross_Sectional half (bare case_id, NOT cs-prefixed) and a Panel half
+Cross_Sectional half (cs-19-prefixed case_id, GH #1278) and a Panel half
 (y4_hhid), concatenated into the single 2019-20 wave -- exactly like
 crop_production / plot_features.  Source per half: ag_mod_r1 (Module R
 livestock roster), one row per (HH, species).
@@ -24,9 +24,9 @@ WAVE = '2019-20'
 
 pieces = []
 
-# --- Cross-sectional half (bare case_id) ---
+# --- Cross-sectional half (cs-19 prefix) ---
 r_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_r1.dta', convert_categoricals=False)
-r_xs['hhid'] = r_xs['case_id'].apply(format_id)
+r_xs['hhid'] = 'cs-19-' + r_xs['case_id'].apply(format_id)
 pieces.append(_livestock_block(r_xs, hhid='hhid', animalcode='ag_r0a', t=WAVE))
 
 # --- Panel half (y4_hhid) ---

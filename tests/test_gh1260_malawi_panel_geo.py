@@ -452,7 +452,7 @@ def _wave_frame(malawi, wave):
 
 def _is_panel(i):
     """Panel ids are y{2,3,4}_hhid (``NNNN-NNN``); the cross-section's are
-    ``cs-17-<case_id>`` (2016-17) or the bare 12-digit case_id (2019-20)."""
+    ``cs-17-<case_id>`` (2016-17) or ``cs-19-<case_id>`` (2019-20, GH #1278)."""
     s = i.astype(str)
     return ~s.str.startswith("cs-") & s.str.contains("-")
 

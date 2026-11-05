@@ -1293,6 +1293,35 @@ def _normalise_unit_text(series):
     return s.where(s.notna() & (s != ''), pd.NA)
 
 
+#: GH #1228: seasonal code 48 is OTHER (SPECIFY).  A crop name its own Module G
+#: specify text states, in the form `_normalise_unit_text` writes, and the label
+#: that line is served.  Exact strings from a measured list, never a pattern.
+#: The label is `harmonize_food`'s, so it is the same string food_acquired.j
+#: carries in every wave.  No crop code is reserved for it: the instrument has
+#: none, so `_crop_code` and `production_obs` stay the recorded 48 and the sale
+#: attach, which keys on the code, does not move.
+_CROP_OTHER_SPECIFY = 48
+_CROP_TEXT_RECODE = {'COWPEAS': 'Cowpea (Khobwe)'}
+
+
+def _crop_text_labels(label, df, cropcode, crop_text):
+    """Relabel the code-48 lines whose own specify text is in `_CROP_TEXT_RECODE`.
+
+    Returns ``(label, named)``: the labels, and a boolean array of the lines
+    relabelled.  ``crop_text`` is None for a wave whose G file holds no crop
+    specify text on the row (every wave but 2010-11, CONTENTS.org, GH #856).
+    """
+    if crop_text is None:
+        return label, np.zeros(len(df), dtype=bool)
+    text = _normalise_unit_text(df[crop_text])
+    code = pd.to_numeric(df[cropcode], errors='coerce')
+    named = (code.eq(_CROP_OTHER_SPECIFY).fillna(False).to_numpy(dtype=bool)
+             & text.isin(list(_CROP_TEXT_RECODE)).fillna(False).to_numpy(dtype=bool))
+    out = label.astype('string').copy()
+    out[named] = text[named].map(_CROP_TEXT_RECODE).astype('string').array
+    return out, named
+
+
 def _recover_unit_code(code, text):
     """Recode OTHER (SPECIFY) unit rows whose text restates code 3 or 11.
 
@@ -1341,7 +1370,7 @@ def _recovered_counts(recovered_to):
 
 def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
                    plant_m=None, plant_y=None, harv_m=None, intercrop=None,
-                   perennial=False, t=None, unit_text=None):
+                   perennial=False, t=None, unit_text=None, crop_text=None):
     """Reshape one harvest module (G or P) to canonical long rows.
 
     All keyword args are RAW column names in ``df`` (or None when the
@@ -1366,10 +1395,16 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     (BASKET (DENGU)) -- the two codes the IHS4/IHS5 lists dropped -- is
     served that code's label (GH #856, ``_UNIT_TEXT_RECODE``); the count
     rides on ``attrs['unit_text_recovered']``.  ``Quantity`` never moves.
+
+    ``crop_text`` is the row's own crop specify-text column (2010-11 Module G:
+    ``ag_g0d_os``).  A code-48 line whose text is in ``_CROP_TEXT_RECODE`` is
+    served that label (GH #1228); its code, variety and ``production_obs`` stay
+    what was recorded.  The count rides on ``attrs['crop_text_recovered']``.
     """
     unit_map = _malawi_code_map('harmonize_crop_unit')
 
     crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=perennial)
+    crop_label, crop_named = _crop_text_labels(crop_label, df, cropcode, crop_text)
     # A blank key is `unknown_plot`, never NaN (GH #1476): these modules are
     # asked per plot, so this is a plot-grain answer with no identifier, and a
     # NaN on a declared index level is deleted by the next groupby.  The sentinel
@@ -1448,6 +1483,7 @@ def _harvest_block(df, *, hhid, plotkey, cropcode, qty, unit, condition=None,
     out = out[keep]
     out.attrs['unit_text_recovered'] = _recovered_counts(
         recovered_to[keep])
+    out.attrs['crop_text_recovered'] = int(crop_named[keep].sum())
     return out
 
 
@@ -2285,6 +2321,8 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     out.attrs['sale_basis_mismatch'] = mismatch
     out.attrs['sale_basis_ladder'] = tallies['sale_basis_ladder']
     out.attrs['unit_text_recovered'] = recovered
+    out.attrs['crop_text_recovered'] = sum(
+        piece.attrs.get('crop_text_recovered', 0) for piece in harvest_pieces)
     return out
 
 
@@ -2309,7 +2347,7 @@ _CROP_SALE_SOURCES = {
                      g='ag_mod_g.dta', p='ag_mod_p.dta', i='ag_mod_i.dta', q='ag_mod_q.dta',
                      hhid='case_id', prefix='', plot='named',
                      gplot='ag_g0b', gcrop='ag_g0d', pplot='ag_p0b', pcrop='ag_p0d',
-                     icrop='ag_i0b', qcrop='ag_q0b')],
+                     icrop='ag_i0b', qcrop='ag_q0b', gcrop_text='ag_g0d_os')],
     '2013-14': [dict(half='full', dir='Data',
                      g='AG_MOD_G_13.dta', p='AG_MOD_P_13.dta', i='AG_MOD_I_13.dta', q='AG_MOD_Q_13.dta',
                      hhid='y2_hhid', prefix='', plot='named',
@@ -2327,7 +2365,7 @@ _CROP_SALE_SOURCES = {
                      icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS)],
     '2019-20': [dict(half='xs', dir='Data/Cross_Sectional',
                      g='ag_mod_g.dta', p='ag_mod_p.dta', i='ag_mod_i.dta', q='ag_mod_q.dta',
-                     hhid='case_id', prefix='', plot='garden',
+                     hhid='case_id', prefix='cs-19-', plot='garden',
                      gplot='plotkey', gcrop='crop_code', pplot='plotkey', pcrop=None,
                      icrop='crop_code', qcrop='crop_code', **_UNIT_TEXT_COLS),
                 dict(half='panel', dir='Data/Panel',
@@ -2377,7 +2415,7 @@ def _crop_pieces(wave):
                            qty='ag_g13a', unit='ag_g13b', condition='ag_g13c',
                            plant_m='ag_g05a', plant_y='ag_g05b', harv_m='ag_g12b',
                            intercrop='ag_g01', perennial=False, t=wave,
-                           unit_text=h.get('gtext')),
+                           unit_text=h.get('gtext'), crop_text=h.get('gcrop_text')),
             _harvest_block(p, hhid='hhid', plotkey=h['pplot'], cropcode=pcrop,
                            qty='ag_p09a', unit='ag_p09b', plant_y='ag_p04',
                            harv_m='ag_p06c', perennial=True, t=wave,
@@ -3183,9 +3221,12 @@ _MWI_SEED_UNIT_LABELS = {
 }
 
 # Module H / Module F PURCHASE unit codes (ag_h{n}6b / ag_f{n}6b) -> label.
-# Same coding as the seed unit set for Module H; carried with the reported
-# purchased quantity.
-_MWI_PURCH_UNIT_LABELS = dict(_MWI_SEED_UNIT_LABELS)
+# Same coding as the seed unit set for Module H; served as Unit_purchased beside
+# the reported purchased quantity, and as Unit_received_as_gift (GH #1190).  On
+# the `u` Preferred Label axis at BUILD time, because the API maps a column only
+# when its name matches a table: `u` is served 'Kilogramme', and these two would
+# otherwise keep the raw 'Kilogram' (the Tanzania precedent, GH #637).
+_MWI_PURCH_UNIT_LABELS = {**_MWI_SEED_UNIT_LABELS, 2: 'Kilogramme'}
 
 
 def _int_codes(series):
@@ -3423,12 +3464,16 @@ def _seed_source_reference(data_path, *, script_path=None):
 
 
 def _seed_block(df, *, hhid, plotkey, cropcode, qty, unit, improved=None,
-                t=None, source_ref=None, source_half=None, row_positions=None):
+                t=None, source_ref=None, source_half=None, row_positions=None,
+                crop_text=None):
     """Reshape Module G's seed-planted columns to canonical long rows --
     one per source seed row (including missing crop).  ``cropcode`` is the harmonize_crop code
-    column (mapped to the shared crop/food label).  Returns (i, plot,
-    _input_code=SEED, crop, Quantity, u, Improved)."""
+    column (mapped to the shared crop/food label).  ``crop_text`` is as in
+    ``_harvest_block``: the same Module G line carries one crop label in both
+    tables (GH #1228).  Returns (i, plot, _input_code=SEED, crop, Quantity, u,
+    Improved)."""
     crop_label, _crop_code = _seed_crop_identity(df[cropcode])
+    crop_label, _ = _crop_text_labels(crop_label, df, cropcode, crop_text)
     q = (pd.to_numeric(df[qty], errors='coerce').astype('Float64')
          if qty and qty in df.columns
          else pd.Series(pd.NA, index=df.index, dtype='Float64'))
@@ -3473,44 +3518,99 @@ def _seed_block(df, *, hhid, plotkey, cropcode, qty, unit, improved=None,
     return out
 
 
+def _agree_purchase_units(rows, key):
+    """Reduce purchase components to one row per ``key``, summing only like units.
+
+    ``rows`` holds ``key`` + ``Quantity_purchased`` + ``Unit_purchased`` (no blank
+    unit: a recorded amount with no unit code arrives as ``Unknown``).  Where every
+    component is in one unit, the quantities add and the unit is served.  Where two
+    components disagree the sum would mean nothing, so the group is REFUSED (GH
+    #1190): ``Quantity_purchased`` and ``Unit_purchased`` are NA and ``Purchased``
+    stays True, because the household did buy.  No component is chosen over
+    another; the amounts stay in Module H.
+
+    A recorded 0 adds nothing, so its unit cannot disagree (2019-20 Panel: 2
+    Kilogram + 0 with no unit is 2 Kilogram).  A row whose quantity is already NA
+    was refused below and keeps the whole group refused.  ``attrs['mixed_unit_groups']``
+    counts the refusals.  Vectorised, as ``_sum_reported`` is, because pandas deep-copies
+    ``attrs`` once per group for a Python callable.
+    """
+    from lsms_library.transformations import U_UNKNOWN
+
+    q = rows['Quantity_purchased']
+    speaks = rows.loc[q.notna() & q.ne(0), key + ['Unit_purchased']].drop_duplicates()
+    refused = pd.concat([speaks.loc[speaks.duplicated(key, keep=False), key],
+                         rows.loc[q.isna(), key]]).drop_duplicates()
+    # The unit that speaks for a group: a nonzero component, else a named zero.
+    # to_numpy: a group refused below has an NA unit, and np.select refuses an NA.
+    rank = np.select([(q.notna() & q.ne(0)).to_numpy(dtype=bool),
+                      rows['Unit_purchased'].ne(U_UNKNOWN).fillna(False).to_numpy(dtype=bool)],
+                     [0, 1], 2)
+    unit = (rows.assign(_rank=rank).sort_values('_rank', kind='stable')
+            .groupby(key, as_index=False)['Unit_purchased'].first())
+    out = rows.groupby(key, as_index=False)['Quantity_purchased'].sum(min_count=1)
+    out = out.merge(unit, on=key, validate='one_to_one')
+    out = out.merge(refused.assign(_refused=True), on=key, how='left',
+                    validate='one_to_one')
+    no = out['_refused'].fillna(False).astype(bool).to_numpy()
+    out['Quantity_purchased'] = out['Quantity_purchased'].astype('Float64').mask(no)
+    out['Unit_purchased'] = out['Unit_purchased'].astype('string').mask(no)
+    out['Purchased'] = pd.array([True] * len(out), dtype='boolean')
+    out = out.drop(columns='_refused')
+    out.attrs['mixed_unit_groups'] = int(no.sum())
+    return out
+
+
 def _seed_purchase_block(df, *, hhid, cropcode, qty_cols, unit_cols,
                          value_cols, source_half=None):
-    """Reshape Module H purchased-seed columns to (i, crop) reported
-    purchase totals.  ``qty_cols``/``unit_cols``/``value_cols`` are lists
-    of the per-source raw column names (two purchase sources: ag_h16*,
-    ag_h26*).  A purchased amount is counted only where the corresponding
-    value column is non-zero (WB rule).  Returns (i, _crop_code,
-    Quantity_purchased) -- household-crop grain, no plot."""
+    """Reshape Module H purchased-seed columns to household-crop purchases.
+
+    ``qty_cols`` / ``unit_cols`` / ``value_cols`` are lists of the per-source raw
+    column names (Panel and the earlier waves: two purchase sources, ag_h16*,
+    ag_h26*; Cross_Sectional: ag_h07*).  A purchased amount is counted only where
+    the corresponding value column is non-zero (WB rule).  The unit travels with
+    its quantity, on the seed dictionary (GH #1190): it is the purchase's own unit,
+    not ``u``, which describes the amount planted (Module G), and no conversion
+    between the two is implied.  A recorded amount with no unit code is ``Unknown``.
+
+    Returns (i, _crop_code, Quantity_purchased, Unit_purchased, Purchased) --
+    household-crop grain, no plot -- one row per household-crop with a value-backed
+    purchase.  Components in unlike units are not summed: see
+    ``_agree_purchase_units``, which also says what such a group serves.
+    """
+    from lsms_library.transformations import U_UNKNOWN
+
     if source_half is None:
         crop_label, crop_code_int = _crop_codes(df[cropcode], perennial=False)
     else:
         crop_label, crop_code_int = _seed_crop_identity(df[cropcode])
-    cols = []
-    for qcol, vcol in zip(qty_cols, value_cols):
+    components = []
+    for qcol, ucol, vcol in zip(qty_cols, unit_cols, value_cols):
         if qcol not in df.columns:
             continue
         q = pd.to_numeric(df[qcol], errors='coerce').astype('Float64')
         if vcol and vcol in df.columns:
             v = pd.to_numeric(df[vcol], errors='coerce').astype('Float64')
             q = q.where(v.notna() & (v != 0), pd.NA)
-        cols.append(q)
-    if cols:
-        # Sum the per-source purchased amounts; the row total stays NA when
-        # NO source recorded a (value-backed) purchase -- so a household
-        # that did not buy seed of that crop gets NA, never a spurious 0.
-        total = pd.concat(cols, axis=1).sum(axis=1, min_count=1).astype('Float64')
-    else:
-        total = pd.Series(pd.NA, index=df.index, dtype='Float64')
-    out = pd.DataFrame({
-        'i':            df['hhid'].astype('string').values,
-        '_crop_code':   crop_code_int.values,
-        'Quantity_purchased': total.values,
-    })
-    out = out[out['_crop_code'].notna()]
-    grp = out.groupby(['i', '_crop_code'], as_index=False).agg(
-        {'Quantity_purchased': lambda s: s.sum(min_count=1)})
-    # Drop the (i, crop) rows where no purchase was recorded.
-    grp = grp[grp['Quantity_purchased'].notna()]
+        if ucol in df.columns:
+            codes = _int_codes(df[ucol])
+            unit = codes.map(_MWI_PURCH_UNIT_LABELS).astype('string')
+            unit = unit.fillna('Seed unit code ' + codes.astype('string'))
+        else:
+            unit = pd.Series(pd.NA, index=df.index, dtype='string')
+        components.append(pd.DataFrame({
+            'i': df['hhid'].astype('string').values,
+            '_crop_code': crop_code_int.values,
+            'Quantity_purchased': q.values,
+            'Unit_purchased': unit.fillna(U_UNKNOWN).values,
+        }))
+    key = ['i', '_crop_code']
+    columns = key + ['Quantity_purchased', 'Unit_purchased']
+    rows = (pd.concat(components, ignore_index=True) if components
+            else pd.DataFrame(columns=columns))
+    # A household that did not buy seed of that crop gets no row, never a 0.
+    rows = rows[rows['_crop_code'].notna() & rows['Quantity_purchased'].notna()]
+    grp = _agree_purchase_units(rows, key)
     if source_half is not None:
         grp['_source_half'] = source_half
     return grp
@@ -3550,7 +3650,7 @@ def _seed_gift_block(df, *, hhid, cropcode, source_half,
     q = pd.to_numeric(df[qty], errors='coerce').astype('Float64')
     if unit in df.columns:
         codes = _int_codes(df[unit])
-        u = codes.map(_MWI_SEED_UNIT_LABELS).astype('string')
+        u = codes.map(_MWI_PURCH_UNIT_LABELS).astype('string')
         u = u.fillna('Seed unit code ' + codes.astype('string'))
     else:
         u = pd.Series(pd.NA, index=df.index, dtype='string')
@@ -3627,9 +3727,10 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
         (_fertilizer_block, _organic_block, _pesticide_block, _seed_block),
         each carrying (i, plot, _input_code, crop, Quantity, u, Improved).
     seed_purchase_pieces : list[pd.DataFrame] | None -- outputs of
-        _seed_purchase_block (i, _crop_code, Quantity_purchased) at the
-        household-crop grain; source-aware results attach only to one known
-        observation of the same native code and half (no plot fabrication).
+        _seed_purchase_block (i, _crop_code, Quantity_purchased, Unit_purchased,
+        Purchased) at the household-crop grain; source-aware results attach only
+        to one known observation of the same native code and half (no plot
+        fabrication).
     seed_gift_pieces : list[pd.DataFrame] | None -- outputs of
         _seed_gift_block (seed received for free, with its own unit), attached
         by the same single-observation rule; never added to the purchase.
@@ -3670,7 +3771,22 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
     df['Applied'] = df['Applied'].astype('boolean')
 
     # Seed-purchase merge (household-crop grain -> single-plot seed rows).
+    # GH #1190: Purchased is True where a purchase is attached, including one
+    # whose components are in unlike units: there the household did buy and only
+    # the sum is refused, so Quantity_purchased and Unit_purchased stay NA.  NA
+    # elsewhere (Module D applied-on-plot rows record no purchase split).
     df['Quantity_purchased'] = pd.array([pd.NA] * len(df), dtype='Float64')
+    df['Unit_purchased'] = pd.array([pd.NA] * len(df), dtype='string')
+    df['Purchased'] = pd.array([pd.NA] * len(df), dtype='boolean')
+    refused_purchases = sum(p.attrs.get('mixed_unit_groups', 0)
+                            for p in (seed_purchase_pieces or []) if p is not None)
+    if refused_purchases:
+        warnings.warn(
+            f"Malawi/plot_inputs {t}: {refused_purchases} household-crop seed "
+            f"purchase(s) recorded in unlike units were not summed; where "
+            f"attached they serve Purchased True with no Quantity_purchased or "
+            f"Unit_purchased.  The amounts stay in Module H.  GH #1190.",
+            stacklevel=2)
     if seed_purchase_pieces and not source_observations:
         sp = pd.concat([p for p in seed_purchase_pieces if p is not None
                         and len(p)], ignore_index=True)
@@ -3691,8 +3807,9 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
             # 123 native units by wave), and 'first' kept ONE code's purchase.
             # GH #637 tail, defect B.  `min_count=1`: a crop with no
             # value-backed purchase stays NA (none reach here today).
-            sp = sp.groupby(['i', 'crop'], as_index=False)[
-                'Quantity_purchased'].sum(min_count=1)
+            # GH #1190: unlike units are not summed across codes either.
+            sp = _agree_purchase_units(sp[['i', 'crop', 'Quantity_purchased',
+                                           'Unit_purchased']], ['i', 'crop'])
             seed = df['input'] == 'Seed'
             # Count plots per (i, crop) among seed rows; attach only when a
             # crop's seed is on exactly one plot (unambiguous).
@@ -3701,18 +3818,22 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
                       .nunique().rename('_nplots').reset_index())
             attach = sp.merge(nplots, on=['i', 'crop'], how='inner')
             attach = attach[attach['_nplots'] == 1][
-                ['i', 'crop', 'Quantity_purchased']]
-            attach = attach.rename(
-                columns={'Quantity_purchased': '_qp'})
+                ['i', 'crop', 'Quantity_purchased', 'Unit_purchased', 'Purchased']]
+            attach = attach.rename(columns={'Quantity_purchased': '_qp',
+                                            'Unit_purchased': '_up',
+                                            'Purchased': '_pp'})
             df = df.merge(attach, on=['i', 'crop'], how='left')
-            take = seed & df['_qp'].notna()
+            take = seed & df['_pp'].notna()
             df['Quantity_purchased'] = df['Quantity_purchased'].where(
                 ~take, df['_qp'])
-            df = df.drop(columns=['_qp'])
+            df['Unit_purchased'] = df['Unit_purchased'].where(~take, df['_up'])
+            df['Purchased'] = df['Purchased'].where(~take, df['_pp'])
+            df = df.drop(columns=['_qp', '_up', '_pp'])
 
     if seed_purchase_pieces and source_observations:
         df = _attach_to_single_seed_observation(
-            df, seed_purchase_pieces, ['Quantity_purchased'], 'purchase')
+            df, seed_purchase_pieces,
+            ['Purchased', 'Quantity_purchased', 'Unit_purchased'], 'purchase')
 
     # GH #1190: seed received for free (H37/H38) is its own measurement in
     # its own unit, never a purchase.
@@ -3726,12 +3847,6 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
             df, seed_gift_pieces,
             ['Quantity_received_as_gift', 'Unit_received_as_gift',
              'Received_as_gift'], 'gift')
-
-    # Purchased flag: True where a purchased quantity is attached (seed),
-    # else NA (Module D fertilizer/pesticide applied-on-plot rows do not
-    # record a purchase split at the plot grain).
-    df['Purchased'] = pd.array([pd.NA] * len(df), dtype='boolean')
-    df.loc[df['Quantity_purchased'].notna(), 'Purchased'] = True
 
     df = df.drop(columns=['_input_code'])
     df['t'] = t
@@ -3760,6 +3875,7 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
     grp = grouped.agg({
         'Quantity':           'sum',
         'Quantity_purchased': 'first',
+        'Unit_purchased':     'first',
         'Purchased':          'first',
         'Improved':           'first',
         'Applied':            'max',
@@ -3786,7 +3902,10 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
             raise ValueError('Malawi plot_inputs reducer groups disagree')
         grp['Quantity'] = quantities['Quantity'].array
     grp = grp.set_index(keys)
-    return pd.concat([grp, native[list(grp.columns)]])
+    out = pd.concat([grp, native[list(grp.columns)]])
+    # Readable by a test; the warning above is what a build log sees.
+    out.attrs['seed_purchase_mixed_units'] = int(refused_purchases)
+    return out
 
 
 # --- livestock (GAP 4) --------------------------------------------------
@@ -3798,9 +3917,9 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
 # `collapse (max) livestock, by(<hhid>)`).  We keep the PRE-collapse roster
 # at its natural grain, which is strictly richer than their binary.  That
 # binary is only APPROXIMATELY `livestock().groupby(['t','i']).size() > 0`:
-# 38 / 2 / 34 / 31 households by wave answer ag_r00 Yes with no served row
-# (one of the 34 since GH #1435), and 2 / 0 / 1 / 0 served households do not
-# answer Yes.  Read ag_r00 for the exact binary; see CONTENTS.org.
+# 38 / 2 / 33 / 31 households by wave answer ag_r00 Yes with no served row, and
+# 2 / 0 / 1 / 0 served households do not answer Yes.  Read ag_r00 for the exact
+# binary; see CONTENTS.org.
 #
 # One row per (household, species).  Reported item columns (only those the
 # survey records; missing-in-wave -> NaN):
@@ -3819,10 +3938,16 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
 #                      transformations, NOT stored columns.  Malawi reports
 #                      no herd-total value column, so we carry the honest
 #                      per-head figure rather than fabricating a total.
+#   * Owned         -- ag_r01 as answered (True / False / NA), GH #1435.  It is
+#                      about the last 12 months, so True beside HeadCount 0 is an
+#                      answer: "During the last 12 months, have you or any member
+#                      of your household raised or owned any [LIVESTOCK]?" is the
+#                      question the IHS3, IHPS 2013 and IHS5 agriculture
+#                      questionnaires print.  The Stata labels of the 2016-17 and
+#                      2019-20 files shorten it to "Did you own [LIVESTOCK]?".
 #
-# The per-animal ownership gate is ag_r01 (Yes/No, "did you own
-# [LIVESTOCK]?"); ag_r00 is the HH-level any-livestock gate the WB binary
-# comes from.  We keep a roster row when the household reports owning that
+# The per-animal gate is ag_r01; ag_r00 is the HH-level any-livestock gate the
+# WB binary comes from.  We keep a roster row when the household reports owning that
 # species (ag_r01 == 1, i.e. "Yes") OR records any positive HeadCount /
 # HeadSold / HeadAcquired -- i.e. the species is genuinely part of the
 # household's livestock holding.  Rows for species the HH was simply asked
@@ -3847,18 +3972,22 @@ def _livestock_block(df, *, hhid, animalcode, owned_flag='ag_r01',
     lacks that field).  ``df`` must already carry an ``hhid`` string column.
     Returns a long DataFrame at grain (t, i, animal) with the reported item
     columns (HeadCount, HeadAcquired, HeadSold, ValuePerAnimal,
-    HeadCount12MonthsAgo) and an internal ``_animal_code`` used for the
+    HeadCount12MonthsAgo, Owned) and an internal ``_animal_code`` used for the
     keep-filter / dedup.  NO aggregation.
+
+    ``Owned`` is ``owned_flag`` (ag_r01) as answered, 1 True, 2 False, anything
+    else NA (GH #1435).  It keeps a row kept on that answer alone in the table,
+    where before its five questions left it with no payload.  A False row exists
+    only for a positive count elsewhere on it.
 
     ``prior_headcount`` is ag_r07, "How many [LIVESTOCK] did your household
     own exactly 12 months ago?" -- same name in all four waves (GH #855).  A
     second STOCK, never a fallback for HeadCount and never differenced into
     a flow.  It does not enter the keep-filter: measured 2026-11-03, no
     source row in any wave or half has ag_r07 > 0 without already meeting it
-    (ag_r07 follows the ag_r01 gate -- IHS3 "During the last 12 months,
-    have you or any member of your HH raised or owned any [LIVESTOCK]",
-    IHS5 "Did you own [LIVESTOCK]?" -- and is answered only on rows the
-    filter keeps, kept rows holding 0 now included).
+    (ag_r07 follows the ag_r01 gate -- "During the last 12 months, have you or
+    any member of your household raised or owned any [LIVESTOCK]?" -- and is
+    answered only on rows the filter keeps, kept rows holding 0 now included).
     """
     species_map = _malawi_code_map('harmonize_species')
     code = pd.to_numeric(df[animalcode], errors='coerce').astype('Int64')
@@ -3879,9 +4008,12 @@ def _livestock_block(df, *, hhid, animalcode, owned_flag='ag_r01',
     # Per-species ownership gate (ag_r01 == 1 "Yes").  NaN where the wave
     # lacks the column (then the count-based keep below carries the row).
     if owned_flag is not None and owned_flag in df.columns:
-        owns = pd.to_numeric(df[owned_flag], errors='coerce') == 1
+        answer = pd.to_numeric(df[owned_flag], errors='coerce')
+        owns = answer == 1
+        owned = answer.map({1: True, 2: False}).astype('boolean')
     else:
         owns = pd.Series(False, index=df.index)
+        owned = pd.Series(pd.NA, index=df.index, dtype='boolean')
 
     out = pd.DataFrame({
         't':            t,
@@ -3893,6 +4025,7 @@ def _livestock_block(df, *, hhid, animalcode, owned_flag='ag_r01',
         'HeadSold':     sold_n.values,
         'ValuePerAnimal': val.values,
         'HeadCount12MonthsAgo': prior.values,
+        'Owned':        owned.array,
         '_owns':        owns.values,
     })
     # Keep a roster row when the household genuinely holds the species:
@@ -3920,8 +4053,8 @@ def assemble_livestock(t, pieces):
     Returns
     -------
     pd.DataFrame indexed (t, i, animal) with columns HeadCount,
-    HeadAcquired, HeadSold, ValuePerAnimal, HeadCount12MonthsAgo.  Item-level
-    reported values only.
+    HeadAcquired, HeadSold, ValuePerAnimal, HeadCount12MonthsAgo, Owned.
+    Item-level reported values only.
     """
     cat = pd.concat(pieces, ignore_index=True)
 
@@ -3937,7 +4070,8 @@ def assemble_livestock(t, pieces):
     # (measured on Module R, GH #1435).  The rule, should one appear: the
     # head columns add over the lines and a BLANK STAYS BLANK (min_count=1),
     # so a recorded 0 and an unanswered cell stay different things; the
-    # per-head ValuePerAnimal is not additive and takes the first reported.
+    # per-head ValuePerAnimal is not additive and takes the first reported, and
+    # so does Owned, which is a no-op only because no such pair exists.
     cat['t'] = t
     keys = ['t', 'i', 'animal']
     grouped = cat.groupby(keys, as_index=False, dropna=False)
@@ -3948,70 +4082,14 @@ def assemble_livestock(t, pieces):
     if not value[keys].equals(grp[keys]):
         raise ValueError('Malawi livestock reducer groups disagree')
     grp['ValuePerAnimal'] = value['ValuePerAnimal'].array
+    if 'Owned' in cat.columns:
+        grp['Owned'] = grouped['Owned'].first()['Owned'].array
     columns = [c for c in ('HeadCount', 'HeadAcquired', 'HeadSold',
-                           'ValuePerAnimal', 'HeadCount12MonthsAgo')
+                           'ValuePerAnimal', 'HeadCount12MonthsAgo', 'Owned')
                if c in grp.columns]
     out = grp.set_index(keys)[columns]
     assert out.index.is_unique, f"Non-unique (t,i,animal) in livestock {t}"
     return out
-
-
-#: Registry key of the deletion below (``_/derivations.yml``, GH #1435).
-LIVESTOCK_NO_PAYLOAD = 'Malawi::livestock::owned-species-no-payload'
-
-#: The columns a livestock row serves: a row with none of them has no payload.
-_LIVESTOCK_SERVED = ['HeadCount', 'HeadAcquired', 'HeadSold', 'ValuePerAnimal',
-                     'HeadCount12MonthsAgo']
-
-#: Module R as the wave scripts read it: (source under the wave, household id
-#: column, id prefix).
-_MODULE_R_SOURCES = {
-    '2010-11': [('Data/Full_Sample/Agriculture/ag_mod_r1.dta', 'case_id', '')],
-    '2013-14': [('Data/AG_MOD_R1_13.dta', 'y2_hhid', '')],
-    '2016-17': [('Data/Cross_Sectional/ag_mod_r1.dta', 'case_id', 'cs-17-'),
-                ('Data/Panel/ag_mod_r1_16.dta', 'y3_hhid', '')],
-    '2019-20': [('Data/Cross_Sectional/ag_mod_r1.dta', 'case_id', ''),
-                ('Data/Panel/ag_mod_r1_19.dta', 'y4_hhid', '')],
-}
-
-
-def derive_livestock_no_payload(livestock):
-    """True where an assembled livestock row has no served answer.
-
-    Such a row was kept on ``ag_r01`` Yes alone.  ``_finalize_result``'s
-    ``dropna(how='all')`` removes it, so it is registered as a deletion.  A
-    recorded 0 is an answer, so a row holding one is not selected.
-    """
-    return livestock[_LIVESTOCK_SERVED].isna().all(axis=1)
-
-
-def inputs_livestock_no_payload(wave):
-    """The Module R lines behind the deletion (``rows: 0``), at ``(t, i, animal)``.
-
-    Every column of the source line under its original name, plus ``source``.
-    Re-reads the files through ``get_dataframe``; nothing is cached.
-    """
-    from lsms_library.local_tools import get_dataframe
-    from lsms_library.paths import countries_root
-    if wave not in _MODULE_R_SOURCES:
-        raise ValueError(f'livestock is built for {sorted(_MODULE_R_SOURCES)}, not {wave!r}')
-    root = countries_root() / 'Malawi' / wave
-    species = _malawi_code_map('harmonize_species')
-    raws, blocks = [], []
-    for source, hhid, prefix in _MODULE_R_SOURCES[wave]:
-        raw = get_dataframe(str(root / source), convert_categoricals=False)
-        raw['hhid'] = prefix + raw[hhid].apply(format_id)
-        blocks.append(_livestock_block(raw, hhid='hhid', animalcode='ag_r0a', t=wave))
-        code = pd.to_numeric(raw['ag_r0a'], errors='coerce').astype('Int64')
-        raws.append(raw.assign(t=wave, i=raw['hhid'].astype(str),
-                               animal=code.map(species).astype(object),
-                               source=source))
-    assembled = assemble_livestock(wave, blocks)
-    gone = assembled[derive_livestock_no_payload(assembled)].reset_index()
-    gone = gone[['t', 'i', 'animal']].astype(object)
-    lines = pd.concat(raws, ignore_index=True).drop(columns='hhid')
-    lines = lines.merge(gone.assign(i=gone['i'].astype(str)), on=['t', 'i', 'animal'])
-    return lines.set_index(['t', 'i', 'animal'])
 
 
 # --- anthropometry (GAP 5) ------------------------------------------------

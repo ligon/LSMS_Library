@@ -38,8 +38,8 @@ Malawi's idiosyncrasies
   the IHS4/IHS5 cross-section (``Data/Cross_Sectional/``, 2936 / 3818) and the
   IHPS 2016/2019 panel (``Data/Panel/``, 2939 / 3819).  Only the panel half
   links back (``y3_hhid -> y2_hhid``, ``y4_hhid -> y3_hhid``); cross-sectional
-  households (``cs-17-``-prefixed in 2016-17 tables) are never in the
-  crosswalk and keep their own ids.
+  households (``cs-17-`` / ``cs-19-``-prefixed in those waves' tables) are
+  never in the crosswalk and keep their own ids.
 * IHPS tracks split-off households, so several current households can claim
   one previous household.  ``update_id`` keeps them distinct with ``_N``
   suffixes (GH #504 guard against minting a live id).  Measured on the

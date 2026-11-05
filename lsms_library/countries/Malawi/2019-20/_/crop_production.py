@@ -1,9 +1,8 @@
 """Build crop_production for Malawi IHS5 2019-20 (GAP 1).
 
-IHS5 ships a Cross_Sectional half (bare case_id) and a Panel half
-(y4_hhid), concatenated into the single 2019-20 wave -- exactly like
-plot_features (sample().i for 2019-20 is the bare cross-sectional
-case_id, NOT cs-prefixed).  Plot key is gardenid_plotid in both halves.
+IHS5 ships a Cross_Sectional half (cs-19-prefixed case_id, GH #1278) and a
+Panel half (y4_hhid), concatenated into the single 2019-20 wave -- exactly
+like plot_features.  Plot key is gardenid_plotid in both halves.
 
 Seasonal modules (G, I) carry a harmonized `crop_code` (1-48); perennial
 modules (P, Q) carry the perennial crop code -- P uses ag_p0c, Q uses
@@ -67,13 +66,13 @@ def _half(g, p, i_mod, q, hh_of):
 
 harvest_all, sale_all = [], []
 
-# --- Cross-sectional half (bare case_id) ---
+# --- Cross-sectional half (cs-19 prefix) ---
 g_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_g.dta', convert_categoricals=False)
 p_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_p.dta', convert_categoricals=False)
 i_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_i.dta', convert_categoricals=False)
 q_xs = get_dataframe('../Data/Cross_Sectional/ag_mod_q.dta', convert_categoricals=False)
 h, s = _half(g_xs, p_xs, i_xs, q_xs,
-             lambda df: df['case_id'].apply(format_id))
+             lambda df: 'cs-19-' + df['case_id'].apply(format_id))
 harvest_all += h
 sale_all += s
 

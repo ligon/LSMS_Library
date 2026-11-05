@@ -9,13 +9,11 @@ Weight = hh_v08 (kg), Height = hh_v09 (cm); no MUAC in Module V.
 Age_months (cage logic) and Sex (hh_b03) come from the matching roster
 half via _anthropometry_block's join.
 
-ID NOTE: unlike 2016-17 (which keeps a 'cs-17-' prefix), the 2019-20
-household_roster's final Cross_Sectional i is the RAW 12-digit case_id
-(NO 'cs-19-' prefix), with the Panel y4_hhid walked to that same id space
-by updated_ids (verified 2026-06-14: the roster has 0 cs-19- rows; all i
-are plain 12-digit, some with id_walk's _N split suffix).  So we emit the
-raw case_id for the CS half (no i_prefix) and let the framework's id_walk
-remap the Panel half + join v at API time.
+ID NOTE: as in 2016-17 ('cs-17-'), the household_roster's Cross_Sectional i
+is 'cs-19-' + case_id (GH #1278; the bare id coincided with two IHS3
+households, a false panel link).  So the CS half passes that i_prefix, and
+the framework's id_walk remaps the Panel half's y4_hhid to its IHS3 baseline
+id + joins v at API time.
 
 This is the SAME Module V the World Bank cleaning code reads then collapses
 to WHO-2006 z-scores (MWI_IHPS4.do anthropometry block); we keep the RAW
@@ -30,16 +28,17 @@ from malawi import _anthropometry_block, assemble_anthropometry
 
 WAVE = '2019-20'
 
-# Cross_Sectional half (raw case_id, no prefix -- see ID NOTE).
+# Cross_Sectional half ('cs-19-' prefix -- see ID NOTE).
 cs_health = get_dataframe('../Data/Cross_Sectional/HH_MOD_V.dta')
 cs_roster = get_dataframe('../Data/Cross_Sectional/HH_MOD_B.dta')
 cs_piece = _anthropometry_block(
     cs_health, cs_roster, t=WAVE,
     hh_id_health='case_id', pid_health='PID',
     hh_id_roster='case_id', pid_roster='PID',
+    i_prefix='cs-19-',
 )
 
-# Panel half (raw y4_hhid; framework id_walk remaps to the case_id space).
+# Panel half (raw y4_hhid; framework id_walk remaps to the IHS3 case_id space).
 pn_health = get_dataframe('../Data/Panel/hh_mod_v_19.dta')
 pn_roster = get_dataframe('../Data/Panel/hh_mod_b_19.dta')
 pn_piece = _anthropometry_block(

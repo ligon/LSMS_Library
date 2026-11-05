@@ -9,7 +9,7 @@ sample:
     idxvars:
         i:
             - case_id
-            - function: cs_i
+            - mapping: cs_i
     myvars:
         v: ea_id
         weight: hh_wgt
@@ -33,7 +33,7 @@ interview_date:
     idxvars:
         i:
             - case_id
-            - function: cs_i
+            - mapping: cs_i
     myvars:
         # Cross_Sectional names the date column 'interviewDate' (single
         # visit); the Panel file uses 'interviewdate_v1' (Visit 1) +
@@ -66,7 +66,7 @@ cluster_features:
         idxvars:
             i:
                 - case_id
-                - function: cs_i
+                - mapping: cs_i
             v: ea_id
         myvars:
             Region: region
@@ -141,7 +141,7 @@ cluster_features:
         idxvars:
             i:
                 - case_id
-                - function: cs_i
+                - mapping: cs_i
         myvars:
             Latitude: ea_lat_mod
             Longitude: ea_lon_mod
@@ -153,9 +153,15 @@ cluster_features:
         - i
 
 subjective_well_being:
+    # ID: every Cross_Sectional table goes through `cs_i` (GH #1278), or it
+    # lands in a different namespace from sample / household_roster and every
+    # join silently matches nothing -- the failure 2016-17 was in until
+    # 2026-07-31 (Malawi/_/CONTENTS.org, "plot_features").
     file: Cross_Sectional/HH_MOD_T.dta
     idxvars:
-        i: case_id
+        i:
+            - case_id
+            - mapping: cs_i
     myvars:
         Own Step: hh_t05
         Neighbors Step: hh_t06
@@ -167,7 +173,9 @@ food_security:
     # DON'T KNOW/refused/NaN->NA (see _/mapping.py).
     file: Cross_Sectional/HH_MOD_T.dta
     idxvars:
-        i: case_id
+        i:
+            - case_id
+            - mapping: cs_i
     myvars:
         Worried:
             - hh_t13
@@ -214,7 +222,7 @@ household_roster:
     idxvars:
         i:
             - case_id
-            - function: cs_i #apply function to just case_id column for files using this column
+            - mapping: cs_i #apply function to just case_id column for files using this column
         pid: PID
     myvars:
         Sex: hh_b03
@@ -232,7 +240,7 @@ individual_education:
     idxvars:
         i:
             - case_id
-            - function: cs_i
+            - mapping: cs_i
         pid: PID
     myvars:
         Educational Attainment:
@@ -247,7 +255,7 @@ housing:
     idxvars:
         i:
             - case_id
-            - function: cs_i
+            - mapping: cs_i
     myvars:
         # Roof / Floor values harmonized via the auto-discovery `Roof`
         # and `Floor` tables in ../../_/categorical_mapping.org.
@@ -264,7 +272,9 @@ panel_ids:
 shocks:
     file: Cross_Sectional/HH_MOD_U.dta
     idxvars:
-        i: case_id
+        i:
+            - case_id
+            - mapping: cs_i
         Shock: hh_u0a
     myvars:
         AffectedIncome:
@@ -314,7 +324,9 @@ shocks:
 assets:
     file: Cross_Sectional/HH_MOD_L.dta
     idxvars:
-        i: case_id
+        i:
+            - case_id
+            - mapping: cs_i
         j: hh_l02
     myvars:
         Quantity: hh_l03

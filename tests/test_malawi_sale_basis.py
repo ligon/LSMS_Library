@@ -288,7 +288,7 @@ class TestScripts:
             for k in ('gplot', 'gcrop', 'pplot', 'icrop', 'qcrop'):
                 assert half[k] in src, (wave, k, half[k])
             # GH #856: the unit specify-text columns, where a wave passes them.
-            for k in ('gtext', 'ptext', 'itext', 'qtext'):
+            for k in ('gtext', 'ptext', 'itext', 'qtext', 'gcrop_text'):
                 if half.get(k):
                     assert f"'{half[k]}'" in src, (wave, k, half[k])
 

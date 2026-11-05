@@ -65,24 +65,18 @@ And not vacuously: the id strings match literally (=101011000014= on
 both sides), and the row counts show no namespace inflation -- rows
 never exceed source households x strategies.
 
-This was worth running rather than waving away, because *2019-20 has
-the surface shape of a namespace split*: its =data_info.yml= runs
-=case_id= through =cs_i= (='cs-19-' + format_id=) for =sample= /
-=household_roster= / =cluster_features=, while all three wave scripts
-pass =i_prefix=''= / bare =format_id=.
-
-*That asymmetry is a deliberate, already-recorded decision, not a
-defect* -- see "plot_features (GH #167)" below: "2016-17 cross-sectional
-id is =cs-17-=-prefixed in =sample()= ...; the wave script applies the
-same prefix so XS plots are not ~100% orphaned.  *All other halves emit
-the raw wave hhid* and rely on framework id_walk / =panel_ids=
-chaining."  2019-20 is one of those other halves.  The measurement
-confirms the documented expectation rather than contradicting it: the
-=cs-19-= prefix survives to the API on *neither* side (0 of 14,612 ids
-carry it, in any table), so both sides are in the raw =case_id=
-namespace and =i= joins exactly.  2016-17 reaches the same place by the
-other route -- prefixed on both sides.  A test pins the overlap per
-wave so neither route can drift.
+This was worth running rather than waving away, because *2019-20 had
+the surface shape of a namespace split*: its =data_info.yml= named
+=cs_i= (='cs-19-' + format_id=) for =sample= / =household_roster= /
+=cluster_features=, while all three wave scripts passed =i_prefix=''= /
+bare =format_id=.  The =cs-19-= prefix survived to the API on neither
+side (0 of 14,612 ids carried it, in any table), because =function:=
+is not a key the reader knows, so both sides were in the raw =case_id=
+namespace and =i= joined exactly.  /Corrected by GH #1278:/ this entry
+called that asymmetry "a deliberate, already-recorded decision"; it was
+a dead key, and the bare ids coincide with two IHS3 households.  Both
+sides now carry =cs-19-=, the route 2016-17 already took.  A test pins
+the overlap per wave so the two sides cannot drift.
 
 =plot_features= showed 4 apparent duplicate groups (3 in 2016-17
 Cross_Sectional, 1 in its Panel half).  Every one of them consists
@@ -802,7 +796,73 @@ codes and cowpea.  No general free-text cleaner.  The UNIT half is done (next
 entry); the cowpea half is drafted as its own issue (a new Preferred Label and
 a G-D plot join), not filed yet.  Until it lands, read a seasonal (Module G)
 =crop = 'Other'= as "cowpea in about half the rows whose text we hold" (it is
-not cowpea on the perennial side).
+not cowpea on the perennial side).  /GH #1228, 2026-11-04:/ 2010-11's own-text
+lines are now named, next entry; this reading still holds for 2016-17 and 2019-20.
+
+** DONE 2010-11: the lines whose own text says cowpea (GH #1228, ruling 2026-11-04)
+
+The ruling is the smallest step.  Of 2010-11's 328 code-48 G lines, 157 say exactly
+=COWPEAS= in =ag_g0d_os= (=malawi._CROP_TEXT_RECODE=; no other spelling occurs on
+code 48 in that wave), and they are served =crop = 'Cowpea (Khobwe)'=.  Everything
+else stays =Other=: the other 171 in 2010-11 (=NSEULA= 77 and =MSEWULA= 8 among
+them, which no source names), 2013-14 (no text held), and 2016-17 and 2019-20, whose
+names are only in Module D.
+
+*No crop code is reserved.*  The instrument has none, and the #1228 diagnostic says
+absence from a label table is not absence from the namespace, so only the LABEL
+moves.  =_crop_code=, =crop_variety= (=Other=) and =production_obs= (=reported:G:48=)
+stay what was recorded, which is also how a row shows where its label came from.
+A synthetic code would have detached sales, because the attach keys on the code.
+
+*Where it joins.*  =Cowpea (Khobwe)= is =harmonize_food='s Preferred Label, and
+=food_acquired.j= carries it in all five waves (1,295 / 1,526 / 812 / 1,375 / 1,440
+rows, 2004-05 on).  It is not in =harmonize_crop=, because no code carries it; a note
+above that table says so.
+
+*The sale side did not move.*  Cold builds, previous commit vs this one, 2010-11:
+33,549 rows either way, and =Quantity=, =Quantity_sold=, =Value_sold= and every rung of
+the sale-basis ladder are unchanged.  23 of the 157 rows carry a sale cell, 17 of them
+positive (51,820 MWK), attached by code 48 as before, and none carries a =Derivation=
+key.  *One residual:* Module I has its own =ag_i0b_os=, and on those 17 it says =COWPEAS=
+16 times and =MPHODZA= once, so one row labelled cowpea carries a sale the household
+named differently.  Module I's text is not read here (deferred with the rest).
+*A second, latent:* =derivation_inputs= labels a raw Module I / Q line from its code
+(=_crop_pieces=), so it would say =Other= where a relabelled harvest row says cowpea,
+and would not join that row on =(t, i, crop, u)=.  None of the 157 carries a =Derivation=
+key today, so nothing is broken, but a sale reaching one on a registered rung would be.
+The =MPHODZA= line is why Module I's text cannot simply be reused for this: PFAF (a plant
+database, not a Chichewa dictionary) lists Mphodza as =Vigna radiata=, mung bean, so it is
+probably not cowpea.  That household's own G line says =COWPEAS=, so the label is right for
+the harvest, and the one sale is the residual.  =MPHOZA=, probably the same word, is on 4 G
+and 3 I lines and stays =Other=.
+
+*The same line carries one label in both tables.*  Module G is also where
+=plot_inputs= reads seed, so the seed rows of those lines are relabelled too (155
+served, 153 with a planted amount); otherwise =crop= would join the two tables on
+everything but these.  Module H is untouched: a purchase attaches by code, and the 27
+purchases and 29 free receipts on those rows did not move.
+
+Measured, cold builds: =crop_production= 135,370 rows and =plot_inputs= 179,957, with
+only =crop= moving on 157 and 155 rows.  =Other= is now 206 rows in 2010-11 (171 of them
+Module G), and the other waves' are unchanged.  =seed_kg= and =nitrogen_kg= are
+digest-identical, because they do not key on =crop=; =harvest_kg_factors= assigns the same
+per-wave factor totals.  Site Q's warnings read the same.
+
+*Two consumers do key on =crop= (cold builds, development 4646a0fd2 vs this bundle merged
+onto it).*  =harvest_kg= has kept the crop level since GH #1460 (PR #1492), so the label
+moves there: rows 92,745 -> 92,746, because 131 keys leave =Other= and 132 appear (one plot
+holds both kinds of line).  In 2010-11 =Other= goes 20,808.5 -> 9,387.0 kg with 11,421.5
+under the new label; wave totals are unchanged, and 2013-14 and 2016-17 do not move.
+=crop_diversity= on its count basis rises on 8 2010-11 households (by 0.116 to 0.277): they
+now grow one more named crop.
+
+*A wave break on =crop=.*  The label exists only in 2010-11, while later waves' =Other= is
+still mostly cowpea (above), so a cowpea series cannot be read across waves until the
+Module D halves land.
+
+*Lines left out.*  6 more 2010-11 G lines say exactly =COWPEAS= on codes 1, 5, 11, 21 and 42
+(42 twice).  They keep their code's label: a text on a coded crop is a different decision
+from naming a residue.
 
 ** TODO Cowpea identity diagnostic checkpoint (GH #1228, 2026-10-30)
 
@@ -1828,7 +1888,7 @@ live in =categorical_mapping.org=.  Registered =materialize: make= in
 | 2010-11 | Full_Sample/Agriculture/ag_mod_c.dta            | Full_Sample/Agriculture/ag_mod_d.dta            | case_id               | ag_c00 / ag_d00    |
 | 2013-14 | AG_MOD_C_13.dta                                 | AG_MOD_D_13.dta                                 | y2_hhid               | ag_c00 / ag_d00    |
 | 2016-17 | Cross_Sectional/ag_mod_c.dta + Panel/ag_mod_c_16.dta | Cross_Sectional/ag_mod_d.dta + Panel/ag_mod_d_16.dta | case_id (cs) / y3_hhid | gardenid_plotid    |
-| 2019-20 | Cross_Sectional/ag_mod_c.dta + Panel/ag_mod_c_19.dta | Cross_Sectional/ag_mod_d.dta + Panel/ag_mod_d_19.dta | case_id / y4_hhid     | gardenid_plotid    |
+| 2019-20 | Cross_Sectional/ag_mod_c.dta + Panel/ag_mod_c_19.dta | Cross_Sectional/ag_mod_d.dta + Panel/ag_mod_d_19.dta | case_id (cs) / y4_hhid | gardenid_plotid    |
 
 Area: prefer GPS-measured =ag_c04c= (acres) x0.404686; else
 farmer-estimate =ag_c04a= converted via the =ag_c04b= unit code
@@ -1847,17 +1907,19 @@ Wave-specific notes (validated against the recon refuter pass,
   A column-restricted read (=usecols=[case_id, hhid, gardenid, plotid,
   ag_d02, ag_d21, ag_d28a]=) succeeds (15,724 rows); the wave script
   uses that path for this one file.
-- *2016-17 cross-sectional id* is =cs-17-=-prefixed in =sample()= (the
-  =cs_i= mapping the roster uses); the wave script applies the same
-  prefix so XS plots are not ~100% orphaned.  All other halves emit the
-  raw wave hhid and rely on framework id_walk / =panel_ids= chaining.
-- *2016-17 YAML-path tables must spell it =- mapping: cs_i=, NOT
-  =- function: cs_i=.*  This wave's working example is =sample= (see its
-  =idxvars.i=).  The 2019-20 wave uses =- function: cs_i= for the same job,
-  so copying that wave's block into this one *fails silently* --- the key is
-  ignored, the raw =case_id= is emitted, and the table lands in the wrong
-  namespace with no error.  Verified 2026-07-31: the =function:= spelling
-  left all four tables below at 0% overlap; =mapping:= took them to 100%.
+- *2016-17 and 2019-20 cross-sectional ids* are =cs-17-= / =cs-19-=-prefixed
+  in =sample()= (the =cs_i= mapping the roster uses; 2019-20 since GH #1278);
+  each wave script applies the same prefix so XS plots are not ~100%
+  orphaned.  All other halves emit the raw wave hhid and rely on framework
+  id_walk / =panel_ids= chaining.
+- *YAML-path tables must spell it =- mapping: cs_i=, NOT =- function: cs_i=.*
+  The =function:= spelling *fails silently*: the key is ignored, the raw
+  =case_id= is emitted, and the table lands in the wrong namespace with no
+  error.  Verified 2026-07-31 on 2016-17: the =function:= spelling left all
+  four tables below at 0% overlap; =mapping:= took them to 100%.  2019-20 used
+  =function:= in all seven of its declarations until GH #1278, so all of them
+  were dead and the whole wave was bare; =tests/test_gh1278_malawi_cs19_namespace.py=
+  refuses the spelling in any =data_info.yml=.
 - *Four tables were in that wrong namespace until 2026-07-31*:
   =food_security=, =subjective_well_being=, =shocks=, =assets= --- all four
   read =Cross_Sectional/*= and declared a bare =i: case_id=.  Measured
@@ -1890,7 +1952,8 @@ receive?"; this line called the column =Value= until 2026-10-23, but the
 build, =data_scheme.yml= and =data_info.yml= all name it =ValuePerAnimal=,
 and it is NOT a herd value -- GH #637 tail), =HeadCount12MonthsAgo= (head
 owned exactly 12 months ago, =ag_r07= -- a second stock, not a flow; GH
-#855, 2026-11-03).  One reported row per (household, species owned).
+#855, 2026-11-03), =Owned= (the species gate =ag_r01= as answered; GH #1435,
+2026-11-04).  One reported row per (household, species owned).
 
 Source: Module R livestock roster (=ag_mod_r1_{10,13,16,19}.dta=) -- the
 SAME file the World Bank cleaning code reads then *collapses to a single
@@ -1898,9 +1961,9 @@ HH "engaged-in-livestock" binary* (=MWI_IHPS{1-4}.do=: =recode ag_r00 ...
 gen(livestock)= then =collapse (max) livestock, by(<hhid>)=).  We keep
 the *pre-collapse* roster, which is strictly richer.  Their binary is
 only approximately =livestock().groupby(['t','i']).size() > 0=: measured
-2026-11-04 against raw =ag_r00=, 38 / 2 / 34 / 31 households by wave answer Yes
-with no served row (one of the 34 since GH #1435), and 2 / 0 / 1 / 0 served
-households do not answer Yes.  Read =ag_r00= for the exact binary.  A TLU rollup
+2026-11-04 against raw =ag_r00=, 38 / 2 / 33 / 31 households by wave answer Yes
+with no served row, and 2 / 0 / 1 / 0 served households do not answer Yes.  Read
+=ag_r00= for the exact binary.  A TLU rollup
 =Sigma(head x species-TLU-factor)= is a =transformations= concern, NOT a
 stored column.
 
@@ -1918,7 +1981,7 @@ Registered =materialize: make= in =data_scheme.yml=.
 | 2010-11 | Full_Sample/Agriculture/ag_mod_r1.dta                | case_id                |
 | 2013-14 | AG_MOD_R1_13.dta                                     | y2_hhid                |
 | 2016-17 | Cross_Sectional/ag_mod_r1.dta + Panel/ag_mod_r1_16.dta | case_id (cs-17) / y3_hhid |
-| 2019-20 | Cross_Sectional/ag_mod_r1.dta + Panel/ag_mod_r1_19.dta | case_id / y4_hhid      |
+| 2019-20 | Cross_Sectional/ag_mod_r1.dta + Panel/ag_mod_r1_19.dta | case_id (cs-19) / y4_hhid |
 
 =animal= is the =harmonize_species= Preferred Label (Code-keyed table in
 =categorical_mapping.org=).  Two code namespaces are reconciled: 2010-11
@@ -1937,14 +2000,14 @@ the species -- per-species ownership flag =ag_r01= == Yes, OR any
 positive reported =HeadCount= / =HeadSold= / =HeadAcquired=.  Rows for
 species the HH was merely asked about and does not own are dropped, so
 the feature is the household's actual herd, not the full species
-checklist.  (A row kept on =ag_r01= alone, with every served column blank,
-reaches the wave parquet but is not served: GH #1435, 2026-11-03.)
+checklist.  (A row kept on =ag_r01= alone, with its five questions blank, is
+served with =Owned= True: GH #1435.)
 
 Coverage cross-check (distinct livestock-owning HH per wave): the feature
 matches the raw Module-R =ag_r00= == Yes universe within ~0.5% every wave
-(2010-11: 5674 vs 5710; 2013-14: 1886 vs 1888; 2016-17: 6177 vs 6210;
-2019-20: 6544 vs 6575; corrected 2026-11-04: 2016-17 moved from 6178 under
-GH #1435, and 2019-20 had been stale at 6534).  The WB =Plot_dataset= livestock binary is much
+(2010-11: 5674 vs 5710; 2013-14: 1886 vs 1888; 2016-17: 6178 vs 6210;
+2019-20: 6544 vs 6575; corrected 2026-11-04: 2019-20 had been stale at 6534).
+The WB =Plot_dataset= livestock binary is much
 smaller (1484 / 1835 / 1119 / 1249) because it is joined onto the
 *plot-cultivating subsample* only -- so the item feature both is richer
 AND spans the correct, broader livestock-keeping universe.
@@ -2002,7 +2065,9 @@ What the crosswalk encodes, reproduced as found:
   half (the IHPS 2016 / 2019 rounds, BOTH held as catalog 3819's files --
   2016-17's are not 2939's, GH #1277) is wired: =y3_hhid ->
   y2_hhid= and =y4_hhid -> y3_hhid=.  The =Data/Cross_Sectional/= half (IHS4 /
-  IHS5, 2936 / 3818) keeps its own ids (12,447 / 11,434 households).
+  IHS5, 2936 / 3818) keeps its own ids (12,447 / 11,434 households), =cs-17-=
+  and =cs-19-=-prefixed so that they cannot match an IHS3 =case_id= (GH #1278;
+  the two JSON files did not move a byte when 2019-20 took its prefix).
 - IHPS tracks split-off households, so several current households can claim
   one previous household.  =local_tools.update_id= keeps them apart with
   =_N= suffixes: 896 / 996 / 1,726 suffixed ids in the three maps.  Row order
@@ -2781,12 +2846,10 @@ Development (=8a8278a2a=) -> this change, cold:
 - *9 IHS5 cross-sectional clusters already served coordinates outside
   Malawi's bounding box* (144 households, north of -9 and west of 32), before
   and after this change.
-- *2019-20's =function: cs_i= is not a recognised key*, so it is a no-op: the
-  IHS5 cross-sectional =i= is the bare 12-digit =case_id=, not
-  ='cs-19-'= + =case_id= (2016-17's =mapping: cs_i= does prefix).  =df_main=
-  and =df_geo= spell it identically, so the join is exact, and panel ids
-  (=NNNN-NNN=) cannot collide with it.  The comments that say "case_id
-  through =cs_i=" describe intent, not behaviour.
+- /Resolved by GH #1278:/ 2019-20's =function: cs_i= was not a recognised key,
+  so the IHS5 cross-sectional =i= was the bare 12-digit =case_id=.  =df_main=
+  and =df_geo= spelled it identically, so the join was exact, and panel ids
+  (=NNNN-NNN=) could not collide with it.  Both now spell =mapping: cs_i=.
 
 *** GH #1277: 2016-17's =Data/Panel/= is 3819's re-release of IHPS 2016, not 2939
 
@@ -4398,8 +4461,8 @@ at API finalization (184 blank crop/plot records and one known-crop blank).
 Country appends =input_obs= to its plot-input index; Feature appends it to the
 canonical index and supplies =unresolved_observation= for legacy countries.
 Consumers addressing index levels positionally must accommodate this axis.
-2016 cross-sectional IDs retain the deliberate =cs-17-= prefix, while 2019
-uses bare case_id. None of these identifiers establishes purchase units.
+2016 and 2019 cross-sectional IDs carry =cs-17-= and =cs-19-= (the latter
+since GH #1278). None of these identifiers establishes purchase units.
 
 * 2026-10-30 -- plot_inputs missing-unit remainder: no served residual (GH #1118)
 
@@ -4444,7 +4507,48 @@ cost introduced. Reviewable receipts and scripts are in dispatch
 =95c34db5277843d2b00fa5a597b6eda5/evidence/REPORT.md=; private operands are excluded
 from the evidence bundle and repository.
 
-* GH #1278: two unsubstantiated string-based longitudinal matches (decision open)
+* GH #1278: 2019-20 cross-sectional households are =cs-19-= (ruled and done 2026-11-04)
+
+*Ruling (@ligon, bulk, 2026-11-04):* an atomic =cs-19-= migration, following
+2016-17's =cs-17-=.  Everything below this block is the diagnosis of 2026-10-30
+that led to it, kept as written; its "no namespace repair is selected" no longer
+holds.
+
+*Why it is one change.*  Every Malawi table has to agree, and the symptom of a
+missed site is silence (an empty join reads as "this wave has no such data").
+The sites: 7 dead =function: cs_i= declarations; 4 YAML tables with a bare
+=i: case_id= (=subjective_well_being=, =food_security=, =shocks=, =assets=); 10
+household scripts; *and two the issue did not count*, the =malawi.py= tables behind
+=derivation_inputs=, which would have stopped those inputs joining the served rows:
+=_CROP_SALE_SOURCES=, and =_MODULE_R_SOURCES= until #1435's ruling removed it with its
+deletion.  =community_prices= is cluster-grain.
+
+*Why the prefix is per wave.*  33 bare =case_id=s coincide between IHS4 and IHS5, so a
+shared =cs-= would have made 33 false links of its own.  (IHS3 also shares 2 with IHS5
+and 10 with IHS4; no id is in all three.)  Read from the three cover files.
+
+*The crosswalk did not move.*  =make panel-ids= reads only the Panel cover through
+=y4_hhid=, so the two JSON files regenerate byte-identical.  That empty diff is the
+evidence that no panel household lost its link.
+
+*Measured, cold builds, =e92ae6b0f= vs this change.*  All 25 public tables and 7
+transforms: same rows, same dtypes, per-column digests equal once =cs-19-= is
+stripped from 2019-20 ids, same warnings by class.  Every 2019-20 household
+carries the prefix or a panel id, in every household table.  The 2 false links go,
+and nothing else in the attrition matrix moves:
+
+| measure                                        | before | after |
+|------------------------------------------------+--------+-------|
+| IHS5 ids also in IHS3 (read from the covers)   |      2 |     2 |
+| ... served under an IHS3 id                    |      2 |     0 |
+| 2010-11 -> 2019-20, =Country.panel_attrition= |  1,454 | 1,452 |
+| 2010-11 -> 2019-20, on the =sample= spine      |  1,454 | 1,452 |
+| 2019-20 cross-sectional ids carrying =cs-19-=  |      0 | 11,434 |
+
+=check_panel_consistency= is unchanged, 7 pass and 1 warn.  *All 11,434 ids change
+for a downstream user*: to compare with an older extract, strip =cs-19-=.  Cost: one
+full Malawi re-warm.
+
 
 At =10ad99d62=, the seven =function: cs_i= declarations in 2019-20
 =data_info.yml= are ignored by =Wave.column_mapping=. The actual formatter
@@ -4842,11 +4946,49 @@ quantity: a bare No is not attached, so the row universe does not grow).  Raw
 =ag_h37=: 4.  Served on attached rows: False 49 (2010-11 1, 2016-17 48), NA 3
 (2010-11 2, 2016-17 1), True 12,495.  The quantities are served as recorded.
 
-Not changed (#1190's representation half, a decision): =Quantity_purchased= is
-still in the purchase unit, which is not recorded, while =u= is the planted
-unit; the two H components (Panel / earlier waves) are still summed without
-their units.  The third purchase source =ag_h36a= has no value column and is
-still unread.
+/Representation half: done 2026-11-04, see "plot_inputs: the purchase's own unit"
+below./  The third purchase source =ag_h36a= has no value column and is still
+unread.
+
+* 2026-11-04 -- plot_inputs: the purchase's own unit (GH #1190, units half)
+
+=Unit_purchased= is the unit =Quantity_purchased= is recorded in (=ag_h07b=,
+=ag_h16b=, =ag_h26b=, on the seed dictionary), following Tanzania and Burkina
+Faso.  =u= describes the amount planted (Module G), and no conversion between
+the two is implied.  They differ on 1,907 of the 21,942 purchases with an amount
+(969 / 219 / 452 / 267 by wave).  A recorded amount with no unit code is =Unknown=
+(98 rows, all but 2 of them a recorded 0).  The 863 =Other (Specify)= purchases
+carry a text this does not read.
+
+*What a refused group serves.*  Components in unlike units are not summed.  The
+seed row keeps its planted answer as recorded, with =Purchased= True, because the
+household did buy, and =Quantity_purchased= and =Unit_purchased= blank.  Neither
+component is chosen over the other, and the amounts stay in Module H.  The builder
+warns with the count, and =attrs['seed_purchase_mixed_units']= carries it on the
+wave frame.  A recorded 0 adds nothing, so it cannot disagree: 2019-20 Panel's one
+2 Kilogramme + 0 with no unit stays 2 Kilogramme.  A positive amount with no unit
+would disagree with a named one (none occurs).
+
+*The ruling said 7 groups; there are 10.*  7 is 2010-11 alone (5 panel, 2
+cross-sectional), and 2013-14 has 2 and 2016-17 Panel 1.  Only 3 of the 10 reach a
+served row (2010-11 2, 2013-14 1; Maize, Nkwani, Groundnut), because a purchase
+attaches only to the single G observation of its code (GH #1298).
+
+Measured, private cold builds, #1278's commit vs this change: rows 179,957 ->
+179,957, index identical.  =Quantity_purchased= moves on those 3 rows only, value
+-> NA (the wave sums lose 25 native units in all, 619,570.25 -> 619,545.25), and
+=Purchased= not at all.  =seed_kg= and =nitrogen_kg= are digest-identical.
+
+*Also on the =u= axis: =Unit_received_as_gift=.*  The API maps a column only when
+its name matches a table, so =u= is served =Kilogramme= while a column named
+otherwise keeps the raw =Kilogram=.  Both unit columns are therefore written
+canonical at build time, the Tanzania precedent (GH #637).  That moves the
+spelling of the free-seed unit on 8,729 rows (#1190's binding half had added it as
+=Kilogram=), and no other value.
+
+Still open on #1190: =ag_h36a= (the third purchase source, no value column) is
+unread, and the 5 free-seed groups with two units are not served and counted only
+on the block's =attrs=.
 
 * 2026-11-03 -- plot_inputs: Module D use answers; a missing amount is not 0 (GH #1174, D half)
 
@@ -4876,11 +5018,39 @@ other column moves.  =nitrogen_kg= total unchanged (832,835.0 kg N); its rows
 37,100 -> 37,076 (plots whose only inorganic records had no amount were served
 0 kg N).
 
-*Seed half not changed.*  The issue's 390 Seed records predate #1323: G seed
-observations bypass the reducer since then, so none is summed to 0; one with
-no amount, unit or Improved answer is excluded at finalization as all-NA
-payload.  Whether a planted-crop roster line with no seed answer is "seed not
-used" or "amount unknown" is a separate question (residual).
+*Seed half: left excluded, counted below (GH #1174, ruling 2026-11-04).*  The
+issue's 390 Seed records predate #1323: G seed observations bypass the reducer
+since then, so none is summed to 0; one with no amount or Improved answer is
+excluded at finalization as all-NA payload.  (2 of them, both 2010-11, do record a
+unit; =u= is an index level, so a unit alone is not a payload.)  Whether such a
+line is "seed not used" or "amount unknown" is not settled by the instrument, so
+nothing is served for it.
+
+*The seed half, counted.*  Module G lines minus served Seed rows, cold build of
+e92ae6b0f, by each line's position in its own file (=input_obs=):
+
+| wave    | G lines | served | excluded | no crop code | crop code | ... with a harvest amount | ... positive |
+|---------+---------+--------+----------+--------------+-----------+---------------------------+--------------|
+| 2010-11 |  28,134 | 27,675 |      459 |          271 |       188 |                       188 |          186 |
+| 2013-14 |  10,169 |  9,984 |      185 |          184 |         1 |                         1 |            1 |
+| 2016-17 |  32,795 | 32,123 |      672 |          531 |       141 |                         8 |            7 |
+| 2019-20 |  42,661 | 42,622 |       39 |           32 |         7 |                         1 |            1 |
+| total   | 113,759 | 112,404 |   1,355 |        1,018 |       337 |                       198 |          195 |
+
+The ruling and the issue say 1,356 (460 in 2010-11): that was before #1422's
+2010-11 follow-up attached one more purchase.  *1,018 of the 1,355 are not seed
+questions at all:* they name no crop, nearly all no plot either (1,015), so they
+are empty roster lines.  Only the 337 that name a crop can pose the question, and
+the 188 of 2010-11, every one with a harvest amount, are the ones that read most
+like an unrecorded amount rather than no seed.  None of it is served, and no 0 is
+minted.  This is the same framework rule as the rows #1435 registered for a time;
+it is not registered as a deletion here (the ruling asks for a count), which is
+the consistent follow-up if the maintainer wants it.
+
+*The 19 fertilizer groups stay NA (ruling 2026-11-04).*  A blank enumerator total
+with a positive native quantity (2010-11 9, 2013-14 10): recovering them would be
+a registered derivation from the native pair, which #1111 chose not to substitute,
+and is worth doing only if asked.
 
 * 2026-11-03 -- livestock: the 12-months-ago stock ag_r07 (GH #855)
 
@@ -4929,45 +5099,37 @@ Neither kind is a recorded 0.  8 of the 14 blank =HeadCount= cells sit beside a
 positive purchase or sale, so serving them as "0 head now" was a claim the survey
 did not make.
 
-| wave    | =HeadCount= blank | =HeadAcquired= blank | =HeadSold= blank | rows served       |
-|---------+-------------------+----------------------+------------------+-------------------|
-| 2010-11 |                 8 |                   19 |               33 | 11,329 -> 11,328  |
-| 2013-14 |                 3 |                   15 |                9 | 4,099 -> 4,098    |
-| 2016-17 |                 2 |                    2 |                2 | 11,445 -> 11,443  |
-| 2019-20 |                 1 |                    2 |                2 | 12,253 -> 12,252  |
-| total   |                14 |                   38 |               46 | 39,126 -> 39,121  |
+| wave    | =HeadCount= blank | =HeadAcquired= blank | =HeadSold= blank | rows served |
+|---------+-------------------+----------------------+------------------+-------------|
+| 2010-11 |                 8 |                   19 |               33 |      11,329 |
+| 2013-14 |                 3 |                   15 |                9 |       4,099 |
+| 2016-17 |                 2 |                    2 |                2 |      11,445 |
+| 2019-20 |                 1 |                    2 |                2 |      12,253 |
+| total   |                14 |                   38 |               46 |      39,126 |
 
-Those cells were all served 0.  Cold builds, base 98c6069d2 vs this change: the
-API now serves 9 / 33 / 41 of them as NA, and the other 5 of each are the 5 rows
-below.  No other cell moves: on the 39,121 common rows no value changes, and
-=ValuePerAnimal=, =HeadCount12MonthsAgo=, the recorded zeros and every column
-total are the same.  The other 24 public Malawi tables, derived ones included,
-are digest-identical.
+Those cells were all served 0, and are all NA now.  No other cell moves:
+=ValuePerAnimal=, =HeadCount12MonthsAgo=, the recorded zeros and every column total
+are the same.  The other 24 public Malawi tables, derived ones included, were
+digest-identical (cold builds, base 98c6069d2 vs the reducer fix).
 
 *Idiosyncrasy: =ag_r01= Yes with none of the five served questions answered.*
 5 rows (1 / 1 / 2 / 1 by wave: Local Cock, Duck, Local Hen, Pig, Goat), all on
 households answering =ag_r00= Yes: recorded holdings, not hollow rows.  Beyond
 those two gates, one 2016-17 Panel row answers =ag_r01_1a= / =ag_r01_1b= (purposes
 for owning or keeping), and two carry only enumerator fields (=ag_r20=, =ag_r0c=).
-They stay in the wave parquets (39,126 rows, unchanged), but with the zeros gone
-they have no served column, so =_finalize_result='s =dropna(how='all')= stops
-serving them.  One 2016-17 household has no other livestock row, so that wave's
-owning households go 6,178 -> 6,177.  The loss is registered as the deletion
-=Malawi::livestock::owned-species-no-payload= (=rows: 0=);
-=derivation_inputs= returns the rows.  *This is not the #1174 outcome*, as this
-entry first said: there, answered rows kept their answer in =Applied= and only the
-group with no answer went.  Here the answer has no column to go in.  Whether to
-serve =ag_r01= as one is queued for the maintainer; no 0 is minted to keep a row.
+With the zeros gone they had nothing to serve, so for a day they were not served,
+registered as a deletion.  The next entry serves the answer instead; no 0 is minted
+to keep a row.
 
 *Consumers* (=rg= for the three names; only these read them):
 - =transformations.livestock_sales_value= drops a row with no =HeadSold=, as its
   docstring says: 36,118 -> 36,078 rows (-31 / -8 / 0 / -1), all of them rows
   that were valued at 0; totals identical by wave.
-- =transformations.livestock_engaged=: 20,282 -> 20,281 (the household above).
+- =transformations.livestock_engaged=: 20,282, unmoved once the next entry landed.
 - =transformations.tlu=: 391 rows and identical totals, but only because of a
   separate gap: =_TLU_FACTORS= knows 2 of Malawi's 22 =animal= labels (=Chicken=,
-  =Sheep=; 392 of 39,121 rows), so a cow, goat or local hen adds nothing and
-  nothing warns.  2010-11 totals 20.4 TLU.  Drafted as a framework issue.
+  =Sheep=; 392 of 39,126 rows), so a cow, goat or local hen adds nothing and nothing warns.
+  2010-11 totals 20.4 TLU.  Drafted as a framework issue.
 - The =ValuePerAnimal= given =HeadSold= table in =data_info.yml= (92.1 / 91.4)
   is unmoved: 92.08 / 91.45 either side.
 
@@ -5083,3 +5245,43 @@ This answers the section above (GH #1476), which says this questionnaire is not 
 is now, and "homestead" is not in the extracted text of its 98 pages either, so the word
 is on no page of the three held forms.  Why those 41 rows carry Module P answers is still
 unknown.
+of 268; 0 of 28 =build_transforms_fingerprint=).
+
+* 2026-11-04 -- livestock: =ag_r01= is served as =Owned= (GH #1435, ruling (b))
+
+The maintainer's ruling on the question the previous entry queued: serve the answer,
+keeping all 39,126 rows.  =Owned= is =ag_r01= as answered: True 39,114, False 12 (7 in
+2010-11, 5 in 2013-14, each kept for a positive count elsewhere on the row), no NA.
+The deletion =Malawi::livestock::owned-species-no-payload= and its callables are gone.
+
+*The name is loose, and it does NOT mean "owns one now".*  The question is about the
+last 12 months: 2,990 rows answer True beside =HeadCount= 0 (295 / 249 / 1,246 / 1,200
+by wave), and those are answers, not conflicts.
+
+*Idiosyncrasy: the wording differs by source, and not the way the Stata labels suggest.*
+Read from the questionnaires as well as the labels (this entry's ruling and the review
+before it had the labels only):
+
+| wave    | Stata label of =ag_r01=                         | questionnaire prints           |
+|---------+-------------------------------------------------+--------------------------------|
+| 2010-11 | "During the last 12 months, have you or any member of your HH raised or owned any" (truncated) | "raised or owned any [LIVESTOCK]?", 12 months |
+| 2013-14 | same, "household"                               | same                           |
+| 2016-17 | "Did you own [LIVESTOCK]?" (so does the DDI)    | no agriculture questionnaire held |
+| 2019-20 | "Did you own [LIVESTOCK]?"                      | "raised or owned any [LIVESTOCK]?", 12 months |
+
+So the label's "Did you own" is not evidence that the 2019-20 question changed: its own
+instrument prints the old wording.  2016-17 cannot be settled from what we hold.  The
+canonical =data_info.yml= declaration says this; do not read the column as ownership at
+interview in any wave.
+
+Measured, cold builds, previous commit vs this one: rows 39,121 -> 39,126 (+1 / +1 / +2
+/ +1, the five rows above).  Nothing else moves on the common rows, and the blank head
+cells stay NA (14 / 38 / 46).  =livestock_engaged= 20,281 -> 20,282, so the 2016-17
+household is back (owning households 5,674 / 1,886 / 6,178 / 6,544).
+=livestock_sales_value= 36,078 and =tlu= 391 rows are digest-identical.  The four row
+counts in =.coder/coverage/latest.csv= end where they started, so a regrade does not
+move them.
+
+Cost: canonical =data_info.yml= moves no other country's hash (Uganda, Niger 0; 0 of 28
+=build_transforms_fingerprint=), and =malawi.py= is one more Malawi re-warm, shared with
+the rest of this bundle.
