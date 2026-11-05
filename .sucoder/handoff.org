@@ -1,3 +1,24 @@
+#+title: Handoff, LSMS-ISA sweep
+* Current state, 2026-11-05 (Sue)
+Coordinator clone on =docs/isa-sweep-20261103=.  Everything lives in =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/=.
+** Read first
+- =MORNING.org=: the top section "ANSWERS WANTED" numbers the open questions (45), and the evidence follows.
+- =BULK.org=, =DECISIONS.org=: approved plan, and rulings with the maintainer's own words.
+- =reports/<lane>/=, =tasks/<lane>.md=, =prs/=: reports, briefs, PR bodies; =prep_*.sh= are the landing scripts.
+** Merged to development 2026-11-04
+#1515 Mali, #1521 test order, #1522 Burkina, #1523 Malawi, #1527 Niger, #1534 Uganda, #1541-#1545 and #1548 framework, #1550 Nigeria, #1553 EHCVM condition (six countries), #1558 Ethiopia links, #1563 survey_kg rung, #1564 EHCVM shocks 2021-22.  Nothing to master.
+** Held for the maintainer
+- #28 Togo =s07bq03a=: filed value = 1.115 x regional multiplier.  Blocks Togo, Benin (ready, =prs/wire-benin.md=) and Cote d'Ivoire, all branched from Togo's =67525c607=.  All three then take =Quantity_kg= (#1563 landed after their base).
+- #9 / #1452 =isa/ehcvm-1452-20261104= (=prs/ehcvm-1452.md=, =reports/ehcvm-1452/optionB/=): undoes #1450's repair until answered.
+- #35 shocks 2018-19 list 2: =208cf6b98 1e3821909 24fdbccfa d7fc478a2 9fe860822 4e194e8eb 94662783c=, =prs/ehcvm-shocks-2.md=.
+- #12 PR #1538 baseline fixture.  Runbook PR #1423.
+** Lanes in flight at this note
+ehcvm-strata author (final comparisons), wire-malawi-2024, multi-plot-sales (fixes, split into two PRs), failure-signals review, wire-civ author (record fixes).
+** Do not forget
+- No shared-cache re-warm until the lanes land; #1455's =LSMS_NO_CACHE= ban stands until then.  Then coverage regrade #1438.
+- The Novissi data (=private-togo-check/=, owner-only) must not be shared or released: PI's note.  Nothing from it goes in the repo, PRs or issues.  Delete the extraction when #28 is settled.
+- Rulings not to re-ask are in =DECISIONS.org=; a recommendation in =MORNING.org= is not a ruling.
+
 #+title: Handoff -- LSMS-ISA backlog campaign
 
 * Current -- 2026-11-04 (overnight, maintainer asleep), Sue / Claude Opus 5.5, job 40825266
