@@ -119,12 +119,14 @@ that no route means NA.
   So the value is the PSU through which the lineage entered the sample, not where
   the household lives or where it was itself drawn.  That is right for a design-based
   standard error and wrong as a location.
-- /=groupby('ea')= silently drops the NA rows./  =ea= is NA for 4.25% of wave weight in
-  2018-19 and 7.66% in 2019-20, and =groupby= drops a null key by default.  Those
-  households are not missing at random: they are the no-route households below.
+- /=groupby('ea')= silently drops the NA rows./  =ea= is NA for 29.32% of wave weight in
+  2009-10, 4.25% in 2018-19 and 7.66% in 2019-20, and =groupby= drops a null key by default.
+  Those households are not missing at random: in the two late waves they are the no-route
+  households below, and in 2009-10 mostly movers and split-offs (GH #1459, below).
 - /=ea= does not nest in =strata=./  52 of 317 EAs in 2013-14 and 81 of 316 in 2015-16
   span more than one =sregion=; 61 of 315 and 64 of 315 span more than one =subreg= in
-  the two inherited waves.  A variance estimator that nests PSUs in strata cannot take
+  the two inherited waves.  In the four early waves 0 of 322, 1 of 317, 44 of 321 and 65 of
+  321 span more than one stratum.  A variance estimator that nests PSUs in strata cannot take
   the column as it stands.
 
 *The keys are RAW source ids*, never the walked =i=, which is a canonical id from
@@ -181,7 +183,8 @@ covers, and that protection is partial.  Measured in the review of this change,
 |--------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------|
 | 2015-16 =gsec1=, remote unreachable  | =EndpointConnectionError= is outside the #515 handler's tuple, so =sample= for both waves raises after about 90 s and =v= is lost too (GH #1463). 2019-20, which needed only its own cover, built in 1.5 s on base and raises at 89 s now. |
 | 2015-16 =gsec1= or =AGSEC1=, =FileNotFoundError= | soft: =ea= is absent, every row and =v= survive (simulated; =tests/test_gh689_uganda_ea_psu.py=).  One =file:= list, so the whole column goes rather than 49 values of it: an =ea= that survived partly would not count as a lost column, and #675 would not grade the parquet degraded. |
-| 2018-19 =GSEC1=, 2019-20's bridge    | =ea= drops and =v= survives, but the drop record names the readable 2015-16 file (the sub-df's one =file:=), so the #675 probe returns True.  Every fresh process rebuilds (about 70 s offline), =DegradedCacheWarning= never fires, and #675's "one probe per process" breaks through its one-source-per-sub-df assumption.  It heals when the blob returns.  (A lost =AGSEC1= behind a readable =gsec1= should go the same way, since =_drop_record= names the first file; reasoned from the code, not measured.) |
+| 2015-16 =AGSEC1= behind a readable =gsec1=, =FileNotFoundError= | measured, fresh processes: =ea= is absent on both inherited waves and =v= survives.  The stamp names =gsec1.dta=, the sub-df's first file, so the #675 probe finds it readable.  Every fresh process rebuilds with =CacheRebuildWarning=, and =DegradedCacheWarning= never fires.  It heals once the file returns. |
+| 2018-19 =GSEC1=, 2019-20's bridge    | =ea= drops and =v= survives, but the drop record names the readable 2015-16 file (the sub-df's one =file:=), so the #675 probe returns True.  Every fresh process rebuilds (about 70 s offline), =DegradedCacheWarning= never fires, and #675's "one probe per process" breaks through its one-source-per-sub-df assumption.  It heals when the blob returns. |
 
 *Measured, cold =98c6069d2= vs cold =6db7bf0d5=, 2026-11-03.*  Every declared Uganda
 table, =Feature('sample')= over Uganda, Albania and Malawi, and
@@ -238,6 +241,14 @@ from the raw covers.
 | 2009-10 | 1,612 / 210         |   798 / 107           |   569 |
 | 2010-11 | 1,802 / 212         |   913 / 109           |     1 |
 | 2011-12 | 1,917 / 212         |   933 / 109           |    57 |
+
+*2009-10 stays NA where =comm= is blank, as ruled, and that is a lot of weight.*  Its 569 NA rows
+hold 29.32% of the wave's weight (mean weight 1.55, against 0.87 for the rest).  514 of them hold a
+label on the same household in another wave, so a fill would leave 3.53%.  This section defines
+=ea= as carried when a household moves, and most of these are that wave's movers and split-offs,
+so the fill would be consistent with it, and it is a construction the ruling did not ask for.  It
+is drafted as a follow-up.  For comparison, =ea= is NA for 0.12% of 2010-11's weight and 0% of
+2011-12's (its 57 have no weight).
 
 *Two kinds of label in one column, and why it is left that way.*  The ruling allowed a
 new column if mixing looked wrong on the numbers, and it does not.  Across all eight
