@@ -149,6 +149,9 @@ class TestFinishTail:
             "crop": ["Mil", "Mil", "Riz"], "u": ["Sac gros", "Kg", "Kg"],
             "Quantity": [10.0, 3.0, 5.0], "Quantity_sold": [4.0, None, None],
             "Value_sold": [800.0, None, None],
+            # GH #1436: the tail now indexes on condition, which the script always passes.
+            "condition": ["shelled", "unshelled", "unknown_condition"],
+            "condition_native": ["Grain", "Epis", None],
             **({} if unit_sold is None else {UNIT_SOLD: unit_sold}),
         })
 
