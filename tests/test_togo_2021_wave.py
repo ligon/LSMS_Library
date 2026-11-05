@@ -102,6 +102,22 @@ class TestSaleRules:
 
 
 class TestDeclared:
+    def test_a_split_good_does_not_take_2018s_bundle_label(self):
+        """#833's rule.  2018's `Fromage local` is 20x this wave's `Fromage` per small
+        unit and 1x its soy cheese; `Piment frais` is the one recorded exception."""
+        from lsms_library.local_tools import df_from_orgfile
+
+        table = df_from_orgfile(countries_root() / "Togo" / "_" / "categorical_mapping.org",
+                                name="harmonize_food")
+        label = dict(zip(table["Original Label"].astype(str).str.strip(),
+                         table["Preferred Label"].astype(str).str.strip()))
+        assert label["Fromage local"] == "Fromage"
+        assert label["Fromage"] == "Fromage (hors soja)"
+        assert label["Fromage à base de soja"] == "Fromage à base de soja"
+        assert label["Arachides décortiquées"] == "Arachides décortiquées (hors pilées)"
+        assert label["Arachides pilées"] == "Arachides pilées"
+        assert label["Piment"] == label["Piment frais"] == "Piment frais"
+
     def test_every_script_of_the_wave_uses_the_waves_id(self):
         """A script on 2018's bare i would orphan its table from sample."""
         import ast

@@ -254,7 +254,11 @@
 # labels are appended at the end of this table, on Niger's rule (GH #833): a
 # respelling of a good 2018 names takes 2018's Preferred Label; two goods 2018
 # bundles and 2021-22 splits stay split, each under its own label, and 2018's bundle
-# label stays on 2018 alone.  The list is in _/CONTENTS.org.
+# label stays on 2018 alone.  So 2021-22's `Fromage` and `Arachides décortiquées` take
+# labels of their own (2018's `Fromage local` prices with the soy cheese, and its
+# `décortiquées ou pilées` covers both).  `Piment frais` is the recorded exception: 2018's
+# `Piment` prices as this wave's fresh chilli, ratio 1.00.  The list and the evidence are
+# in _/CONTENTS.org.
 
 #+NAME: harmonize_food
 | Original Label                                                          | Preferred Label                                                                      |
@@ -424,7 +428,7 @@
 | Adémè (Feuilles crin-crin) | Autres légumes en feuilles |
 | Anchois fumés | Autres poissons fumés |
 | Arachide grillée | Arachide grillée |
-| Arachides décortiquées | Arachides décortiquées |
+| Arachides décortiquées | Arachides décortiquées (hors pilées) |
 | Arachides fraîches en coques | Arachides fraîches en coques |
 | Arachides séchées en coques | Arachides séchées en coques |
 | Arôme (Maggi, Jumbo, etc.) | Arôme (Maggi, Jumbo, etc.) |
@@ -448,7 +452,7 @@
 | Farine de blé local ou importé | Farine de blé local ou importé |
 | Farine de maïs | Farine de maïs |
 | Feuilles d'oseille | Feuilles d'oseille |
-| Fromage | Fromage |
+| Fromage | Fromage (hors soja) |
 | Gboma (Feuilles d'aubergine) | Autres légumes en feuilles |
 | Gâteaux | Gâteaux |
 | Huile de palme raffinée | Huile de palme raffinée |
