@@ -7,7 +7,8 @@ Sources (post-harvest passage 2; cultivation passage 1):
   - eaci17_s11fp1.dta  perennial-tree roster (one row per HH-tree; no field grid)
   - eaci17_s11cp1.dta  cultivation roster -> planting month
 
-Grain: (t, i, plot, crop).  plot = "{field}_{parcel}" (s7fq01_s7fq02) for
+Grain: (t, i, plot_id, crop), with `condition` the sentinel on every row (s7fq13b
+is not read; GH #1436).  plot_id = "{field}_{parcel}" (s7fq01_s7fq02) for
 seasonal crops; 'Farm-level' for perennial trees (GH #1476).  i = (grappe,
 exploitation) —
 the 2017-18 household key (cf. sample/cluster_features data_info.yml).

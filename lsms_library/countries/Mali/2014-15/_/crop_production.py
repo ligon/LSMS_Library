@@ -5,7 +5,8 @@ Sources (post-harvest, passage 2 / cultivation, passage 1):
   - EACIS3B_p2.dta   perennial-tree roster (one row per HH-tree; no field grid)
   - EACICULTURE_p1.dta (s1c) cultivation roster -> planting month + intercrop
 
-Grain: (t, i, plot, crop).  plot = "{field}_{parcel}" (s3aq01_s3aq02) for
+Grain: (t, i, plot_id, crop), with `condition` the sentinel on every row.
+plot_id = "{field}_{parcel}" (s3aq01_s3aq02) for
 seasonal crops; 'Farm-level' for perennial trees (GH #1476).  Reported,
 item-level columns only — Quantity / u / Quantity_sold / Unit_sold / Value_sold /
 months_harvested / planting_month / harvest_month / intercropped /

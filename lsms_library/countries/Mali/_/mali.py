@@ -298,7 +298,7 @@ def plot_features_for_wave(t, source, colmap):
     return df
 
 # ---------------------------------------------------------------------------
-# crop_production (GAP 1; parity loop) — item-level (t, i, plot, crop)
+# crop_production (GAP 1; parity loop) — item-level (t, i, plot_id, crop, condition)
 # ---------------------------------------------------------------------------
 #
 # All four waves are wired.  The two EAC-I waves (2014-15 EACI14, 2017-18
@@ -307,7 +307,7 @@ def plot_features_for_wave(t, source, colmap):
 # which the rulings of @ligon 2026-11-03 reverse (GH #824); they go through
 # finish_ehcvm_crop_production -- see the section after crop_production_finalize.
 #
-# Grain: one row per (t, i, plot, crop), where
+# Grain: one row per (t, i, plot_id, crop), each with its one condition, where
 #   - i     = Mali composite household id (grappe, menage/exploitation),
 #   - plot  = "{field_no}_{parcel_no}" for seasonal crops; 'Farm-level' for
 #             perennial trees (the perennial roster s3b/s11f is not on the
@@ -713,9 +713,9 @@ def crop_production_finalize(df):
     and optionally Unit_sold (decoded sold unit), KgFactor_sold (reported
     FIELD kg per sold unit) and months_harvested.
     Maps crop/unit labels -- the sold unit through the SAME ``u`` table as
-    the harvest unit (GH #824) -- coerces dtypes, sets the (t, i, plot, crop)
-    index with ``condition`` appended as the sentinel (GH #1436), and collapses
-    exact-duplicate index rows (a crop reported on the
+    the harvest unit (GH #824) -- coerces dtypes, collapses on (t, i, plot, crop),
+    and appends ``condition`` to that index as the sentinel (GH #1436).  The
+    collapse takes exact-duplicate index rows (a crop reported on the
     same plot more than once in a single questionnaire row-set) by summing
     the reported quantities / values and taking the first of the
     flags/dates.  A group whose rows report the sale in more than one sold
