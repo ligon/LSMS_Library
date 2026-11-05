@@ -20,6 +20,7 @@ import sys
 sys.path.append('../../_/')
 from lsms_library.local_tools import get_dataframe, to_parquet
 from tanzania import crop_production_for_wave
+import _hh_crop_sales
 
 
 seas = get_dataframe('../Data/AG_SEC_4A.dta', convert_categoricals=False)
@@ -47,10 +48,10 @@ colmaps = dict(
                          qty='ag7b_03', value='ag7b_04'),
 )
 
-df = crop_production_for_wave(
-    '2019-20', seas, fruit, peren,
-    sales=dict(seasonal=s5, fruit=s7a, perennial=s7b),
-    colmaps=colmaps)
+sales = dict(seasonal=s5, fruit=s7a, perennial=s7b)
+df = crop_production_for_wave('2019-20', seas, fruit, peren, sales=sales, colmaps=colmaps)
+# GH #1457: a sale of a code on two or more plots of its module, on ONE Farm-level row.
+df = _hh_crop_sales.derive_hh_crop_sale_attachment(df, '2019-20', sales, colmaps)
 assert df.index.is_unique, "crop_production 2019-20: (t,i,plot_id,j,production_obs) not unique"
 assert len(df) > 0
 to_parquet(df, 'crop_production.parquet')
