@@ -20,7 +20,9 @@ Single Index:
   # CONSUMER RULE: `plot_id == 'unknown_plot'` is NOT a plot.  It joins to no
   # plot_features row (no area, no GPS), so exclude it from any per-plot
   # quantity and REPORT how many rows you excluded.  Two `unknown_plot` rows of
-  # one household are not one plot.
+  # one household are not one plot.  `transformations.harvest_kg` and
+  # `crop_diversity(weight='count')` do this, in `attrs['unknown_plot_excluded']`
+  # (GH #1460).
   # `plot_id == 'Farm-level'` is not a plot either, so a count of plots drops
   # every such row.  On `crop_production` such a row holds a sale no plot can own
   # (Mali 2021-22; Nigeria W3-W5, GH #843 / #824) or a harvest from a roster off
