@@ -99,7 +99,9 @@ served as `strata`, because that is what each survey's design or files offer:
 
 This table covers the cases measured for GH #812, not every country. So
 `strata` identifies a stratum within one wave of one country. Do not compare or
-group on it across countries, and check before doing so across waves. Where the
+group on it across countries, and check before doing so across waves. Spelling
+differs too: the EHCVM labels end in `Urbain` or `Rural`, as the surveys write
+them, and Ethiopia's in `Urban` or `Rural`. Where the
 label is a construction it is registered: `df.attrs['derivations']` names those
 countries, and `Country(c).derivations()` gives the rule and its evidence. Each
 country's `_/CONTENTS.org` records what its `strata` holds.

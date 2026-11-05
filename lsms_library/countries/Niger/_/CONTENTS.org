@@ -3042,6 +3042,7 @@ households.  It is a recorded value, so no derivation.  =sample= became a =dfs:=
 =df_strate= hook in =2014-15/_/mapping.py= reduces the sub-frame to one row per grappe through
 =reduce_to_agreed=, which refuses a grappe holding two strata, because merging the raw file on
 =v= would be a cartesian product.
+=merge_how: left= costs no signal here: no grappe is in one file and not the other, either way.
 
 *The fifteenth cell.*  BID Table 1 (=ner_ehcvm2_information_de_base_eng.pdf= p.9) equals
 2021-22's households cell by cell, wave by wave, except Tillabéri urban wave 1, printed 106 where
