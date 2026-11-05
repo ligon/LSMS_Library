@@ -108,7 +108,7 @@ def _harvest(rows):
 
 
 def _sale(rows=()):
-    return pd.DataFrame(list(rows), columns=["holder_id", "crop_code", "sold", "sqty", "sval"])
+    return pd.DataFrame(list(rows), columns=["holder_id", "crop_code", "sold", "sqty", "sval"]).assign(household_id=lambda d: "H" + d["holder_id"].astype(str))  # the §11/§12 files name it (GH #1457)
 
 
 def _units(n, label="1. Kilogram"):
@@ -183,6 +183,10 @@ def test_a_sale_attaches_only_to_a_crops_one_line(eth):
         ("C", "3", 1, 1, 7, 1, 5.0), ("C", "3", 1, 2, 7, 1, 6.0),
         ("D", "4", 1, 1, 56, 1, 5.0), ("D", "4", 1, 1, 69, 2, 6.0)])
     df = _build(eth, harvest, colmap=W45, sale=sale, wave="2018-19").reset_index()
+    # Re-pinned for GH #1457: "nowhere" among the §9 rows, and one Farm-level row each.
+    farm = df[df["plot_id"] == "Farm-level"]
+    assert sorted(farm["Value_sold"]) == [20.0, 30.0] and farm["Quantity"].isna().all()
+    df = df[df["plot_id"] != "Farm-level"]
     got = df.groupby("i")["Value_sold"].apply(lambda v: v.dropna().tolist()).to_dict()
     assert got == {"A": [10.0], "B": [], "C": [], "D": [40.0]}
     d = df[df["i"] == "D"].set_index("production_obs")["Value_sold"]
@@ -195,13 +199,16 @@ def test_a_sect12_sale_attaches_only_to_a_crops_one_line(eth):
     harvest = _harvest([("A", "1", 1, 1, 72, 1, 5.0),
                         ("B", "2", 1, 1, 72, 1, 5.0), ("B", "2", 1, 1, 72, 2, 6.0)])
     sale12 = pd.DataFrame([("1", 72, 1, 1.0, 10.0), ("2", 72, 1, 1.0, 20.0)],
-                          columns=["holder_id", "crop_code", "q06", "q07", "q08"])
+                          columns=["holder_id", "crop_code", "q06", "q07", "q08"]).assign(household_id=lambda d: "H" + d["holder_id"].astype(str))  # the §11/§12 files name it (GH #1457)
     colmap = dict(W45, s12_crop_code="crop_code", s12_sold_flag="q06",
                   s12_qty="q07", s12_value="q08")
     with pytest.warns(eth.Sect12SaleWarning, match="several_s9_plots 1/1/20"):
         df = eth.crop_production_for_wave("2015-16", harvest, None, _sale(), colmap,
                                           unit_labels=_units(3), sale12=sale12)
-    got = df.reset_index().groupby("i")["Value_sold"].apply(lambda v: v.dropna().tolist())
+    # Re-pinned for GH #1457: the sale on two lines has its own Farm-level row.
+    flat = df.reset_index()
+    assert flat.loc[flat["plot_id"] == "Farm-level", "Value_sold"].tolist() == [20.0]
+    got = flat[flat["plot_id"] != "Farm-level"].groupby("i")["Value_sold"].apply(lambda v: v.dropna().tolist())
     assert got.to_dict() == {"A": [10.0], "B": []}
 
 
@@ -296,6 +303,8 @@ def test_nothing_is_collapsed(served):
 def test_rows_and_token_kind_per_wave(served, wave):
     df, _ = served
     g = df.xs(wave, level="t")
+    # Re-pinned for GH #1457: Farm-level sale rows name their module and holder instead.
+    g = g[g.index.get_level_values("plot_id") != "Farm-level"]
     assert len(g) == ROWS[wave], f"{wave}: {len(g)} rows"
     kinds = set(g.index.get_level_values("production_obs").str.rsplit(":", n=1).str[0])
     assert kinds == {f"reported:{S9[wave][4]}"}, kinds
@@ -326,6 +335,7 @@ def test_a_household_crop_sale_sits_on_one_row_of_a_one_line_crop(served, wave):
     nlines = lines.groupby(["holder", "code"]).size()
     to_pair = lines.set_index(["plot_id", "production_obs"])[["holder", "code"]]
     g = df.xs(wave, level="t").reset_index()
+    g = g[g["plot_id"] != "Farm-level"]    # GH #1457: every other sale has its own row
     sold = g[g["Value_sold"].notna()].join(to_pair, on=["plot_id", "production_obs"])
     assert sold["code"].notna().all()
     per_pair = sold.groupby(["holder", "code"]).size()

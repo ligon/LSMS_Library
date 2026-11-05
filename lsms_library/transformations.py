@@ -7816,7 +7816,8 @@ def _without_redundant_farm_level(flat, crop_level, plot_level):
     """Drop each ``Farm-level`` row whose household has a plot row of that crop.
 
     ``flat`` is a reset-index ``crop_production``.  Multi-plot sales are served
-    on ``plot_id = 'Farm-level'`` (Mali 2021-22; Nigeria W3-W5, GH #843), so such
+    on ``plot_id = 'Farm-level'`` (GH #843, #1457: Malawi, Mali 2017-18 and 2021-22,
+    Niger 2014-15 and 2021-22, Nigeria W3-W5, Tanzania, Ethiopia), so such
     a row repeats a crop the household already reports on a plot and is not a
     further occurrence of it.  A ``Farm-level`` row with no plot row of its crop
     is kept, because it is the only record of that crop: all of GhanaLSS

@@ -87,7 +87,7 @@ def _sale11():
          ("H5", 1, 1, 4.0, 80.0),
          ("H6", 3, 1, 2.0, 30.0),
          ("H6", 3, 1, nan, nan)],
-        columns=["holder_id", "crop_code", "sold", "sqty", "sval"])
+        columns=["holder_id", "crop_code", "sold", "sqty", "sval"]).assign(household_id=lambda d: "H" + d["holder_id"].astype(str))  # the §11/§12 files name it (GH #1457)
 
 
 def _units(n, label="1. Kilogram"):
@@ -277,6 +277,7 @@ def test_served_zero_sale_counts_per_wave(cp):
     now attach (the W1 two on Kg rows, so Quantity_sold 0 as well); the W4 / W5
     falls are zeros of a crop on several lines, which no longer attach; 86,403
     -> 86,437 rows (37 lines back, 3 rows left empty)."""
+    cp = cp[cp.index.get_level_values("plot_id") != "Farm-level"]  # GH #1457: a sale's own row has its own oracle
     t = cp.index.get_level_values("t")
     waves = sorted(set(t))
     v0 = {w: int(((cp["Value_sold"] == 0).fillna(False) & (t == w)).sum()) for w in waves}

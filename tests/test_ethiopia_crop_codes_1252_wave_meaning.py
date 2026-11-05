@@ -196,6 +196,7 @@ def test_served_relabelled_rows_and_perennial(cp):
     is 'Red Kidney Beans' or 'Mung bean'.  ``perennial``: True on every
     Cactus row, False on every Red Kidney Beans row (692 / 245 / 291 in W3 /
     W4 / W5 were True; 693 / 247 / 292 rows after the ruling)."""
+    cp = cp[cp.index.get_level_values("plot_id") != "Farm-level"]  # GH #1457: a sale's own row has its own oracle
     t = np.asarray(cp.index.get_level_values("t"), dtype=object)
     j = np.asarray(cp.index.get_level_values("j"), dtype=object)
     n = lambda w, lab: int(((t == w) & (j == lab)).sum())  # noqa: E731

@@ -86,7 +86,7 @@ def _harvest():
 def _sale11():
     return pd.DataFrame(
         [("H1", 7, 1, 20.0, 100.0), ("H4", 42, 1, 1.0, 11.0)],
-        columns=["holder_id", "crop_code", "sold", "sqty", "sval"])
+        columns=["holder_id", "crop_code", "sold", "sqty", "sval"]).assign(household_id=lambda d: "H" + d["holder_id"].astype(str))  # the §11/§12 files name it (GH #1457)
 
 
 def _sale12():
@@ -103,7 +103,7 @@ def _sale12():
          ("H8", 84, 1, 2.0, 50.0),     # no §9 row at all
          ("H9", 76, 1, 2.0, 25.0),     # its only §9 row is then dropped
          ("", nan, nan, nan, nan)],    # blank roster line
-        columns=["holder_id", "crop_code", "q06", "q07", "q08"])
+        columns=["holder_id", "crop_code", "q06", "q07", "q08"]).assign(household_id=lambda d: "H" + d["holder_id"].astype(str))  # the §11/§12 files name it (GH #1457)
 
 
 def _harvest_units():
@@ -170,11 +170,17 @@ def test_sect12_adds_no_row_and_moves_no_other_cell(eth):
     gives it a value -- H9, the one such row here; every other row is equal."""
     base, _ = _build(eth, with12=False)
     new, _ = _build(eth)
+    # Re-pinned for GH #1457: a §12 sale of classes 4 and 5 (H2, H8) has a Farm-level
+    # row of its own; §9 rows are what this pins.  Derivation and Unit_sold ride with
+    # the sale, as Quantity_sold does.
+    assert sorted(new.xs("Farm-level", level="plot_id")["Value_sold"]) == [40.0, 50.0]
+    new = new[new.index.get_level_values("plot_id") != "Farm-level"]
     h9 = new.index.get_level_values("plot_id").str.startswith("H9_")
     assert int(h9.sum()) == 1
     new = new[~h9]
     assert base.index.equals(new.index)
-    other = [c for c in base.columns if c not in ("Quantity_sold", "Value_sold")]
+    other = [c for c in base.columns
+             if c not in ("Quantity_sold", "Value_sold", "Unit_sold", "Derivation")]
     pd.testing.assert_frame_equal(base[other], new[other])
     for col in ("Quantity_sold", "Value_sold"):
         was = base[col].notna()
@@ -219,6 +225,10 @@ def test_a_row_carrying_a_sect12_sale_is_no_longer_dropped(eth):
 def test_derivation_stamp_is_on_exactly_the_rows_sect12_filled(eth):
     base, _ = _build(eth, with12=False)
     new, _ = _build(eth)
+    # Re-pinned for GH #1457: Farm-level §12 rows carry the key too; these are §9 rows.
+    farm = new.xs("Farm-level", level="plot_id")
+    assert list(farm["Derivation"]) == [eth.SECT12_SALE_DERIVATION] * len(farm)
+    new = new[new.index.get_level_values("plot_id") != "Farm-level"]
     key = eth.SECT12_SALE_DERIVATION
     assert key == "Ethiopia::crop_production::sect12-sale-period"
     # H9's row exists only because §12 gave it a value (ruling 2026-10-23: a
@@ -231,13 +241,14 @@ def test_derivation_stamp_is_on_exactly_the_rows_sect12_filled(eth):
     stamped = new["Derivation"] == key
     assert (stamped.fillna(False).to_numpy(dtype=bool)
             == filled.to_numpy(dtype=bool)).all()
-    assert set(new["Derivation"].dropna()) == {key}
+    # GH #1457: a §11 sale on its one §9 line carries its own key.
+    assert set(new["Derivation"].dropna()) == {key, eth.HH_CROP_SALE_SINGLE_ROW}
     assert int(filled.sum()) == 4                         # H1, H3, H6, H7
-    # the section-11 rows carry no key
-    assert _row(new, "H1", "Teff")["Derivation"].isna().all()
-    assert _row(new, "H4", "Banana")["Derivation"].isna().all()
-    # a wave without section 12 gets no Derivation column at all
-    assert "Derivation" not in base.columns
+    # Re-pinned for GH #1457: the section-11 rows carry the section-11 sale's key, not this.
+    assert _row(new, "H1", "Teff")["Derivation"].eq(eth.HH_CROP_SALE_SINGLE_ROW).all()
+    assert _row(new, "H4", "Banana")["Derivation"].eq(eth.HH_CROP_SALE_SINGLE_ROW).all()
+    # and a wave without section 12 has no row with this one
+    assert not base["Derivation"].astype("string").str.contains(key, regex=False).any()
 
 
 def test_derive_sect12_sale_is_the_identity_but_for_a_blank_no(eth):
@@ -407,13 +418,17 @@ def test_the_stamp_rides_to_the_served_table(cp):
     # 4,463 / 4,495 before the 2026-10-23 empty-row-filter ruling: W2's 209 and
     # W3's 62 stamped rows with no unit and no quantity are no longer dropped.
     # 544 / 4,557 before GH #1461: 2 W1 and 6 W3 folded-key lines now attach.
-    assert got == {"2011-12": 546, "2013-14": 4672, "2015-16": 4563,
+    # GH #1457 re-pin: + 1,811 / 1,187 / 1,320 Farm-level rows holding the sales of
+    # classes 4 and 5, 546 / 4,672 / 4,563 on §9 rows as before.
+    assert got == {"2011-12": 546 + 1811, "2013-14": 4672 + 1187, "2015-16": 4563 + 1320,
                    "2018-19": 0, "2021-22": 0}, got
     stamped = (d == key).fillna(False).to_numpy(dtype=bool)
     assert (cp.loc[stamped, ["Quantity_sold", "Value_sold"]].notna().any(axis=1)).all()
     # GH #1256 adds a second key, on W4/W5 rows only; no row carries both.
     window = "Ethiopia::crop_production::permanent-crop-12-month-window"
-    assert set(d.dropna()) <= {key, window}
+    # GH #1457 adds the §11 sale's keys; a §12 row carries none of them.
+    assert not d.dropna().str.contains(key, regex=False).mul(
+        d.dropna().str.contains("hh-crop-sale", regex=False)).any()
     assert not (d == window).fillna(False)[np.isin(np.asarray(t, dtype=object),
                                                    list(W13))].any()
     summ = cp.attrs["derivations"]["Ethiopia"][key]
@@ -436,7 +451,8 @@ def test_derivation_inputs_are_the_raw_lines_and_join_to_the_served_rows(cp, wav
     assert len(raw) == len(_raw(wave, f"sect12_ph_w{n}.dta"))
     assert {"holder_id", "crop_code", "ph_s12q02_a", "ph_s12q02_d",
             "ph_s12q06", "ph_s12q07", "ph_s12q08"} <= set(raw.columns)
-    served = cp[(cp["Derivation"].notna()) &
+    # GH #1457: §11's keys are on W1-W3 rows too; this is §12's own key.
+    served = cp[(cp["Derivation"] == "Ethiopia::crop_production::sect12-sale-period").fillna(False) &
                 (cp.index.get_level_values("t") == wave)]
     sk = set(served.reset_index().set_index(["t", "i", "j"]).index)
     missing = sk - set(raw.index)
@@ -450,6 +466,7 @@ def test_positive_sale_rows_per_wave(cp):
     W3 serves 2,300 of the 1,984 + 2,627 raw positive sale lines: the rest are
     holder-crops grown on several plots (the SALES GRAIN CAVEAT), counted by
     ``Sect12SaleWarning``."""
+    cp = cp[cp.index.get_level_values("plot_id") != "Farm-level"]  # GH #1457: a sale's own row has its own oracle
     v = cp["Value_sold"]
     t = cp.index.get_level_values("t")
     got = {w: int(((v > 0) & (t == w)).sum()) for w in sorted(set(t))}

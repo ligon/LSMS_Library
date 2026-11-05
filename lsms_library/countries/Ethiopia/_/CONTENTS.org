@@ -4529,3 +4529,36 @@ See =.coder/ledger/1287-ethiopia-anthropometry-runtime-checkpoint.md= and
 Result review =1c2a8ac6= and root acceptance =cf21eec6= retain the linked scope
 and limitations. No inventory credit precedes reviewed docs merge; other country
 cells and #1287 remain open. All earlier CONTENTS bytes are retained.
+
+* 2026-11-04 -- sales no §9 line holds: Farm-level (GH #1457)
+
+§11 and §12 record a sale per holder and crop.  A sale on one §9 line goes on it (the SALES GRAIN CAVEAT); every other one was unserved.
+The ruling on GH #843, option (d), extended in bulk on 2026-11-04, gives it ONE row with =plot_id = 'Farm-level'=, no =Quantity=, =u = 'Unknown'=, its
+own =Unit_sold= (new, optional), =production_obs = 'reported:<s11|s12>:<holder>:<crop code>'=.
+
+| Birr, cold                         |    2011-12 |   2013-14 |   2015-16 |   2018-19 |    2021-22 |
+|------------------------------------+------------+-----------+-----------+-----------+------------|
+| on a §9 line (§11 + §12), base     |    600,749 | 3,000,513 | 2,490,034 | 2,604,089 |  6,945,286 |
+| Farm-level, §11                    |  1,011,908 | 1,803,267 | 1,429,623 | 4,937,676 | 14,441,581 |
+| Farm-level, §12                    |  1,986,089 | 2,227,273 | 2,893,216 |         0 |          0 |
+|------------------------------------+------------+-----------+-----------+-----------+------------|
+| served                             |  3,598,746 | 7,031,053 | 6,812,873 | 7,541,765 | 21,386,867 |
+| rows at Farm-level (§11 / §12)     | 1,058 / 1,811 | 1,130 / 1,187 | 967 / 1,320 | 1,176 / 0 | 1,309 / 0 |
+
+Served equals the raw =sect11= + =sect12= sum in every wave, less three things this does NOT serve:
+- §12's repeated pairs (W2 145,586, W3 1,315 Birr): which line or sum is the holder's sale is not something the survey says.  Class 2 of =_attach_sect12_sales=.
+- §12 lines of a pair also in §11 (W2 83,250, W3 19,504 Birr): §11 wins, the two may record one sale twice.  Class 3.
+- One W2 §11 line with no crop code (180 Birr).
+
+*Idiosyncrasies bearing on this.*
+- *The key is the HOLDER, and =i= is the household.*  A household with two holders who sold one crop (11 / 28 / 35 / 6 / 11 pairs by wave) keeps two rows; the holder is in =production_obs=.
+- *W4/W5's =harvestedcrop_id= does not link a sale to a §9 line.*  It is a per-holder ordinal, unique on (holder, id), and §9's =crop_id= has the same small range, so 2,618 and 2,117 lines agree by accident.  The source has no plot here, measured.
+- *W1 §9 is a 7,750-row file against §4's 29,317 (above, "Unexplained; recorded").*  So 821 of W1's 1,754 §11 sales (820,239 Birr) have no §9 row, and 774 of those 821 have a §4 line: they were planted.  The Farm-level row holds the sale as recorded.  It does NOT resolve why W1 §9 is short.
+- *W1 §12's 1,683 no-§9-row sales (1.83M Birr) are the expected ones* (§9 excludes those crops), and their HARVEST (§12 Q3) is still in no served table: the open decision above stands.  So a W1 tree crop now shows a sale and no harvest.  See the report.
+- *W5 §11 lists 84 (holder, crop) pairs twice* under two =harvestedcrop_id=, and the values differ on 80.  The sum predates this; =hh-crop-sale-records-summed= and =-two-units= name it, on Nigeria's ruling B.
+- *Two lines of one crop on ONE plot (GH #1461, W4 1 sale 600 Birr; W5 7, 31,870 Birr) go to Farm-level.*  The plot is knowable.  Nigeria's ruling is pending on the same question.
+- *=Quantity_sold= on a §9 row stays as it is: only where the sale's unit equals =u=.*  That leaves 1 / 1,915 / 695 / 343 / 393 §9 rows with a value and no quantity, while a Farm-level row shows both, in its own =Unit_sold=.  Filling those rows would be a separate change.
+- *The window keys ride along.*  A §12 Farm-level row carries =sect12-sale-period=.  A W4/W5 Farm-level row carries =permanent-crop-12-month-window= where every §4 line of the (holder, crop) says permanent, because it has no plot for the row rule's join.
+- *Nigeria's ruling A is not extended.*  262 §11 sales (977K Birr) and 255 §12 sales (201K Birr) sit on Farm-level with exactly one line stating a harvest among several; 212 + 182 sales on a lone line stating no harvest keep it, unlike Nigeria.
+
+=Derivation= gains =hh-crop-sale-single-row= on the §9 rows already holding a §11 sale, beside any window key, and that and =Unit_sold= are all that move on them.
