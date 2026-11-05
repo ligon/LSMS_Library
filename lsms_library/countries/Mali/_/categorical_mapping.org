@@ -8,6 +8,28 @@
 | Segou                          | Ségou                          |
 | Tomboctou                      | Tombouctou                     |
 
+GH #812, 2026-11-04.  EHCVM =sample.strata= is region x milieu, as a label
+(=lsms_library/ehcvm.py=, =derive_region_milieu_stratum=).  This table is the
+=Region= table above crossed with the cover's two =s00q04= labels, row for row, so
+the region part of =strata= is =cluster_features.Region=.  No new judgement;
+=tests/test_gh812_ehcvm_strata.py= pins the identity.  Labels of any other wave's
+scheme match no key and pass through unchanged.
+
+The =Taoudénit= pair is the one addition to that cross.  The 2018-19 cover writes
+=Taoudénit= and =ehcvm_conso_mli2018.dta=, which =cluster_features= reads, writes
+=Taoudenit=, so without it =strata= and =Region= disagree on 14 clusters.  Should the
+=Region= table ever fold those two, drop the pair.
+
+#+name: strata
+| Original Label   | Preferred Label   |
+|------------------+-------------------|
+| Segou Urbain     | Ségou Urbain      |
+| Segou Rural      | Ségou Rural       |
+| Tomboctou Urbain | Tombouctou Urbain |
+| Tomboctou Rural  | Tombouctou Rural  |
+| Taoudénit Urbain | Taoudenit Urbain  |
+| Taoudénit Rural  | Taoudenit Rural   |
+
 * Food and Unit Labels (canonical shared label tables — Unit #0 foundation)
 
 # Canonical Code|Preferred Label|<per-wave> tables shared across

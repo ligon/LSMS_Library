@@ -95,6 +95,10 @@ sample:
                 - mapping:
                     Rural: Rural
                     Urbain: Urban
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
     df_weights:
         file: ehcvm_ponderations_mli2021.dta
         idxvars:

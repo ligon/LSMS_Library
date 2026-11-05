@@ -493,3 +493,49 @@ Mali::community_prices::gram-centilitre-poids:
     per-kg price on a stated-size variety is not validated against any external price.
   contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- community_prices.Quantity is kilograms by rule (GH #1179 memo)"'
   since: '2026-11-04'
+
+Mali::sample::region-milieu-stratum:
+  waves: ['2018-19', '2021-22']
+  columns: [strata]
+  rows: {}
+  rule: >-
+    strata = '<s00q01 label> <s00q04 label>', the region and area of residence the
+    household cover page records, for example 'Sikasso Rural'.  Labels and never
+    codes.  NA where either is missing.  No household file of these waves records a
+    stratum.  The region part is then spelled through this country's `strata` table
+    in categorical_mapping.org, at read time, which is the `Region` table crossed
+    with the two milieu labels.
+  function: lsms_library.ehcvm:derive_region_milieu_stratum
+  inputs: lsms_library.countries.Mali.2018-19._.mapping:inputs_strata
+  raw_variables: [s00q01, s00q04]
+  assumptions:
+    - text: >-
+        the stratum of the design is the combination of region and area of
+        residence, and 2021-22 keeps the 2018-19 plan.
+      basis: questionnaire
+      evidence: >-
+        mli_ehcvm2_information_de_base_eng.pdf (held, 2021-22/Documentation), section
+        4.1, p.10: "The survey is a panel cluster survey, and the sampling plan is
+        based on that of the 2018/2019 survey ... The stratum is the combination of
+        region and residence area."  A Basic Information Document, not the instrument.
+    - text: >-
+        the survey's own coding is the same cross.
+      basis: variable-label
+      evidence: >-
+        ehcvm_nsu_mli2021.dta, a unit table: `strate`, labelled "Strate
+        (Region*10+Milieu)".  Its 20 values are 2018-19's 20 cells.
+    - text: >-
+        Menaka and Taoudenit are served as the 2018-19 cover records them, and as the
+        2021-22 cover records the same clusters, under Gao and Tombouctou: a label is
+        the cover's own in each wave and is not carried across.  Of 6,133 households
+        in both waves 429 (36 clusters) change stratum on this account, Menaka to Gao
+        and Taoudenit to Tombouctou.  So 2018-19 has 20 cells and 2021-22 has 17.
+      basis: modelling-choice
+      evidence: Mali/_/CONTENTS.org, GH #812 ruling option W2, 2026-11-04.
+  validated_against: >-
+    BID Table 1, clusters by region and residence: all 17 cells equal 2021-22 (513
+    clusters; tests/test_gh812_ehcvm_strata.py transcribes the table).  No held table
+    states 2018-19's allocation.  Share of var(log cluster weight) between these cells
+    72.5% (2018-19) and 71.9% (2021-22), against 56.2% and 34.4% between regions alone.
+  contents: 'Mali/_/CONTENTS.org, "EHCVM strata are region x milieu labels (GH #812)"'
+  since: '2026-11-04'

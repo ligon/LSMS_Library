@@ -2610,6 +2610,8 @@ files and imports nothing from this directory.
 * 2026-11-04 -- the NPK slot, the EHCVM input files, and strata by wave (GH #1445, #812)
 
 Read-only measurement: nothing is wired and no served value moved.
+/The EHCVM strata were wired the same day: see "EHCVM strata are region x milieu labels"
+at the end of this file./
 
 *NPK.*  The served slot is bare: =s2cq25e= "Quantité de NPK appliquée sur la
 parcelle" (2014-15), =s7dq26c1= "Qté de NPK utilisée-Qté" (2017-18).  Grades appear
@@ -3263,3 +3265,39 @@ else ONE =plot_id = 'Farm-level'= row with no =Quantity= or =u=.  The Farm-level
   among these).  =perennial= is NA on a sale's row and True on a tree's.
 - *The 2 rows that state a harvest are not attached.*  Nigeria's ruling A (the one row that STATES a harvest) was not extended; these
   two (650,000 FCFA) go to Farm-level under "two or more rows".  No 2017-18 household states two lines on one plot: =s7f= has one row per plot-crop.
+* 2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)
+
+@ligon's ruling, option W2.  =sample.strata= in the EHCVM waves is ='<Region> Urbain|Rural'=,
+built from the cover's =s00q01= and =s00q04= labels by =ehcvm.derive_region_milieu_stratum=.
+No household file records a stratum, so it is a construction, registered as
+=Mali::sample::region-milieu-stratum= and stamped on every row it produced.  The new
+=strata= table in =_/categorical_mapping.org= is the =Region= table crossed with the
+two milieu labels, so the region part of =strata= is =cluster_features.Region=.
+
+| wave    | clusters | households | =strata=                            |
+|---------+----------+------------+-------------------------------------|
+| 2014-15 |      989 |      3,804 | empty, by the ruling                |
+| 2017-18 |      953 |      8,390 | =strate=, 47 codes, unchanged       |
+| 2018-19 |      551 |      6,602 | 20 region x milieu labels (was empty) |
+| 2021-22 |      513 |      6,143 | 17 region x milieu labels (was empty) |
+
+So =strata= holds three things across this country's waves, and they are not comparable:
+nothing, EAC-I's design codes and EHCVM's labels.  Site B now warns for 2014-15 alone.
+
+BID Table 1 (p.10) equals 2021-22 in all 17 cells; =tests/test_gh812_ehcvm_strata.py=
+transcribes it.  No held table states 2018-19's 20 cells.
+
+*Why 20 then 17.*  The 2018-19 cover has 11 regions and the 2021-22 cover 9: Menaka and
+Taoudenit, the regions the 51 EAs added in vague 2 were drawn to cover (see "Supplementary
+sample inside the wave"), are written under Gao and Tombouctou in 2021-22.  Each wave's label is
+its own cover's, so 429 of the 6,133 households in both waves change stratum (36 clusters):
+Menaka Rural to Gao Rural 204, Taoudenit Rural to Tombouctou Rural 155, Menaka Urbain to Gao
+Urbain 70.
+
+*=Taoudénit=.*  The 2018-19 cover writes =Taoudénit= and =ehcvm_conso_mli2018.dta=, which
+=cluster_features= reads, writes =Taoudenit=.  The =strata= table folds to the served =Region=
+spelling, so no other table moves; it is the one row outside Region x milieu.  The =Region= table
+prefers accents (=Ségou=), so the better end is a =Region= row and dropping this pair, which
+moves =cluster_features= on 14 clusters.  Left for a separate change.
+
+Cost: a Mali re-warm.  Other countries' =strata= hold other things: see =docs/guide/feature.md=.
