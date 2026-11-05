@@ -101,7 +101,12 @@ _RANK = {'Première stratégie': 0, 'Deuxième strategie': 1, 'Troisième strat�
 
 def shocks(df):
     '''HowCoped0..2 by the survey's own rank: s14bq05__N holds a rank label or Non,
-    where 2018's s14q05__N held an indicator.'''
+    where 2018's s14q05__N held an indicator.
+
+    Column 25, "Autre strategie", is the exception: 25 of the 26 columns carry the
+    `strategie` label set and this one `nonoui`, so it says Oui with no rank.  It goes
+    in the first empty slot; all 26 of its rows name no other strategy.
+    '''
     cope = [c for c in df.columns if c.startswith('Cope')]
     how = {0: [], 1: [], 2: []}
     for _, row in df[cope].iterrows():
@@ -110,6 +115,10 @@ def shocks(df):
             rank = _RANK.get(row[c])
             if rank is not None:
                 ranked[rank] = COPING_LABELS[int(c.replace('Cope', ''))]
+        if row['Cope25'] == 'Oui':
+            empty = next((k for k in range(3) if pd.isna(ranked[k])), None)
+            if empty is not None:
+                ranked[empty] = COPING_LABELS[25]
         for k in range(3):
             how[k].append(ranked[k])
     for k in range(3):

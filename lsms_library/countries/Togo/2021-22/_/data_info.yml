@@ -117,8 +117,8 @@ individual_education:
             - mappings: ['harmonize_education', 'Original Label', 'Preferred Label']
 
 subjective_well_being:
-    # 2018's s20q05 is s20aq05 here, and its codes run the other way (1 = Riche);
-    # the mapping is keyed on the labels, so the served step is unchanged.
+    # 2018's s20q05 is s20aq05 here, on the same code list (1 = Riche).  The mapping is
+    # keyed on the labels, and the served step runs the other way from the codes.
     file: s20a_me_tgo2021.dta
     idxvars:
         i:
@@ -152,7 +152,10 @@ assets:
 
 shocks:
     # s14a is the COVID-19 module; s14b is the module 2018 called s14.  The coping
-    # columns hold ranks here, not 2018's indicators: see mapping.shocks.
+    # columns hold ranks here, not 2018's indicators, except Cope25: see mapping.shocks.
+    # The framework drops the rows with no follow-up: 2,666 of 7,229 reported shocks are
+    # served, because the instrument asks follow-ups only of the last 12 months.  2018
+    # serves all 7,230, so a cross-wave incidence on this table reads as a false fall.
     file: s14b_me_tgo2021.dta
     idxvars:
         i:
@@ -181,8 +184,10 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
+        # s14bq04d is the herd ("l'Effectif du cheptel") in this wave.  2018's s14q04d,
+        # "Stock Produit Alimentaire", is s14bq04e here.
         AffectedConsumption:
-            - s14bq04d
+            - s14bq04e
             - mapping:
                 Diminué: True
                 Augmenté: True

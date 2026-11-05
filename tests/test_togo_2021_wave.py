@@ -241,6 +241,33 @@ class TestServed:
         assert len(s) > 0
         assert s["HowCoped0"].notna().sum() <= (ranked == 1).any(axis=1).sum()
 
+    def test_consumption_effect_reads_the_food_stock_not_the_herd(self):
+        s14 = _raw("s14b_me_tgo2021.dta", labels=True)
+        answered = s14[s14["s14bq04a"].notna()]
+        effect = {"Diminué": True, "Augmenté": True, "Inchangé": False, "Non-concerné": False}
+        food = answered["s14bq04e"].astype(str).map(effect).astype(bool)
+        herd = answered["s14bq04d"].astype(str).map(effect).astype(bool)
+        got = _served("shocks")["AffectedConsumption"].astype(bool)
+        assert len(got) == len(answered)
+        assert got.sum() == food.sum()
+        assert food.sum() != herd.sum()
+
+    def test_other_strategy_is_served_though_its_column_says_oui(self):
+        s14 = _raw("s14b_me_tgo2021.dta", labels=True)
+        answered = s14[s14["s14bq04a"].notna()]
+        oui = (answered["s14bq05__25"].astype(str) == "Oui").sum()
+        s = _served("shocks")
+        assert oui == 26
+        assert (s["HowCoped0"].astype("string") == "Autre stratégie").sum() == oui
+        assert s["HowCoped0"].notna().all()
+
+    def test_only_column_25_of_the_coping_grid_is_not_ranked(self):
+        s14 = _raw("s14b_me_tgo2021.dta", labels=True)
+        ranks = {"Non", "Première stratégie", "Deuxième strategie", "Troisième stratégie"}
+        off = [n for n in range(1, 27)
+               if not set(s14[f"s14bq05__{n}"].dropna().astype(str)) <= ranks]
+        assert off == [25]
+
     def test_fies_score_counts_the_yes_answers(self):
         s08 = _raw("s08a_me_tgo2021.dta")
         items = s08[[f"s08aq0{n}" for n in range(1, 9)]]
