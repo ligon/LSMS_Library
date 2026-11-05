@@ -4723,6 +4723,23 @@ class Country:
             msg, country=self.name, table=method_name, reason=reason,
             waves=tuple(sorted(now))), stacklevel=4)
 
+    def _grain_reports_for_waves(self, reports: Any, waves: list[str]) -> Any:
+        """The stamped grain reports about *waves*, or naming no wave (GH #1512).
+
+        A reader served one wave must not be told, or under
+        ``LSMS_GRAIN_STRICT`` failed, about another wave's collapse.  A stamped
+        report may name the round or, under ``build_context``, the wave folder
+        (Nigeria's ``2015-16`` holds ``2015Q3`` and ``2016Q1``), so either counts.
+        The twin of ``replay_datetime_audit(waves=)``.
+        """
+        if not isinstance(reports, list):
+            return reports
+        keep = {str(w) for w in waves}
+        keep |= {str(self.wave_folder_map.get(w, w)) for w in waves}
+        return [r for r in reports
+                if not isinstance(r, dict) or r.get("wave") is None
+                or str(r["wave"]) in keep]
+
     def _read_l2_country_cache(self, method_name: str, cache_path: Path,
                                waves: list[str]) -> tuple[pd.DataFrame | None, list[str] | None, str | None]:
         """The L2-country READ GATE: serve ``var/<table>.parquet`` or say why not.
@@ -4881,7 +4898,8 @@ class Country:
             # cold-build-only event and the loss is invisible on every
             # warm read, which is exactly how #323 survived its first fix.
             _replay_grain_audit(
-                read_parquet_grain_audit(cache_path),
+                self._grain_reports_for_waves(
+                    read_parquet_grain_audit(cache_path), waves),
                 self.name, method_name,
             )
             # GH #1045: the date-parse report, by the same argument -- filtered
@@ -5192,6 +5210,29 @@ class Country:
         folder_map = getattr(self, "wave_folder_map", None) or {}
         return any((self.file_path / folder_map.get(w, w) / "_" / f"{method_name}.py").exists()
                    for w in waves)
+
+    def _proven_absent(self, method_name: str, waves: list[str] | None) -> bool:
+        """Whether a strict subset of waves is answered 0 rows by declaration.
+
+        No requested wave declares the table and no country builder can make
+        it: the same test as ``absent_subset_frame`` inside
+        ``_aggregate_wave_data``, stated here for the dispatch above it, which
+        must not edit that fingerprinted closure.  ``False`` wherever a make
+        rule cannot be inspected (GH #1099).
+        """
+        if waves is None:
+            return False
+        requested = {str(w) for w in waves}
+        if (not requested
+                or not requested < {str(w) for w in self.waves}
+                or method_name not in self.data_scheme
+                or method_name in JSON_CACHE_METHODS
+                or any(method_name in self[w].data_scheme for w in waves)):
+            return False
+        if ((self.file_path / "_" / "Makefile").exists()
+                and not shutil.which("make", path=_script_subprocess_env().get("PATH"))):
+            return False
+        return not self._has_country_builder(method_name)
 
     def _has_country_builder(self, method_name: str) -> bool:
         """Can the COUNTRY level build ``method_name``?  GH #1039.
@@ -6711,14 +6752,20 @@ class Country:
                                  and {str(w) for w in waves} < {str(w) for w in self.waves})
                     if subset_kg:
                         transform_kwargs['serve_waves'] = waves
+                    # GH #1512: no requested wave declares the table and no
+                    # country builder can make it, so the answer is 0 rows
+                    # whatever the other waves hold.  The all-waves read is
+                    # then only cost: about 8 s warm and 75 s cold on Mali.
+                    no_source = (subset_kg
+                                 and self._proven_absent('food_acquired', waves))
                     derived = None
                     try:
-                        if subset_kg:
+                        if subset_kg and not no_source:
                             with _read_audit_waves('food_acquired', waves):
                                 fa = self._aggregate_wave_data(None, 'food_acquired')
                         else:
                             fa = self._aggregate_wave_data(waves, 'food_acquired')
-                        if isinstance(fa, pd.DataFrame) and not fa.empty:
+                        if isinstance(fa, pd.DataFrame) and (no_source or not fa.empty):
                             derived = transform_fn(fa, **transform_kwargs)
                             scheme_entry = self._materialization_entry(name)
                             derived = self._finalize_result(derived, scheme_entry, name,
@@ -6745,13 +6792,27 @@ class Country:
                             CategoricalKeyDeclarationError):
                         raise
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
-                        if units is not None or map_labels or valuation is not None or subset_kg:
+                        if subset_kg:
+                            # GH #1512: the failure can name a wave the caller
+                            # did not ask for, which reads like a bug.
+                            exc.add_note(
+                                f"{name}(waves={list(waves)}) reads every wave of "
+                                "food_acquired, because kilogram factors are "
+                                "estimated from all of them (GH #1487), so this "
+                                "may be a wave you did not request. A mode that "
+                                "reads no factor stays on the request: "
+                                "units='units' or units='unitvalue'.")
+                        if (units is not None or map_labels or valuation is not None
+                                or subset_kg or self._proven_absent(name, waves)):
                             # GH #1487: a kilogram subset also raises when it was
                             # a default call, whichever wave failed.  Its waves
                             # declare no `food_quantities`, so the legacy path
                             # reads the failure as proven absence and serves 0
                             # rows with no error (Mali, 2018-19 with 2014-15
-                            # broken: 162,032 rows on base).
+                            # broken: 162,032 rows on base).  GH #1512: the same
+                            # for any subset the legacy path would answer that
+                            # way, `food_expenditures` with or without `basis=`
+                            # above all, whose requested wave had failed.
                             #
                             # Caller explicitly asked for canonical units= /
                             # labels= / valuation= behaviour; the legacy
