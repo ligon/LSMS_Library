@@ -2737,7 +2737,9 @@ the test does find a real panel.
 | *2018-19 / 2021-22, =PanelHH= =Non=*     | 1,111 |      0.151 |   0.157 |        0.069 |   0.074 |
 
 *The last two rows are the same class of false link.*  The 2014-15 / 2017-18 row is fixed by a prefix per wave; the =PanelHH= =Non=
-row is not, and is an open ruling.
+row is not, and is an open ruling.  Measured for the per-wave prefix, cold, =111b64ed7= against =a035b61e3=: 2014-15 / 2017-18 shared ids
+3,560 -> 0, and with the prefixes stripped all 23 frame tables are equal, row order and dtypes included.  =panel_ids.py= regenerates
+both JSON files byte-identical.
 
 - *2014-15 / 2017-18: one prefix per wave, so these 3,560 ids go to 0 too* (ruling @ligon 2026-11-05, =EACI14_= and =EACI17_=).  They
   visit the same EAs (identical coordinates on all 920 recurring grappes), with households selected
