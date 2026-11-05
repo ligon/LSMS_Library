@@ -484,6 +484,18 @@ class TestServed:
         assert not bases & {"sachet", "unité", "panier", "Boite", "Tongolo", "litre", "102"}
         assert not {u for u in units if u[:1].isdigit()}
 
+    def test_the_brassee_units_take_2018s_sized_labels(self):
+        """Codes 217 and 218 respell what 2018-19 serves as a size of Tohoungolo."""
+        s07 = self._s07()
+        for code, label in ((217, "Tohoungolo (Avec 1 brassée)"), (218, "Tohoungolo (Avec 2 brassées)")):
+            rows = s07[s07["s07bq03b"] == code]
+            assert (rows["s07bq03c"] == 0).all() and len(rows) > 0
+            f = _served("food_acquired").xs(label, level="u")
+            purchased = f.xs("purchased", level="s")["Quantity"].astype(float).sum()
+            net = (rows["s07bq03a"].astype(float) - rows["s07bq04"].astype(float).fillna(0)
+                   - rows["s07bq05"].astype(float).fillna(0)).clip(lower=0)
+            assert purchased == pytest.approx(net.sum())
+
     def test_every_item_label_of_the_file_is_mapped(self):
         table = df_from_orgfile(countries_root() / "Benin" / "_" / "categorical_mapping.org",
                                 name="harmonize_food")

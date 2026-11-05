@@ -353,7 +353,14 @@ food_acquired:
         j:
             - s07bq01
             - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
-        u: s07bq03b
+        # Codes 217 and 218 are not bundles: they respell the sized forms 2018-19 serves,
+        # and every row of them is size-free in s07bq03c.  Here and not in the country's u
+        # table, which may not hold a sized label (test_food_kg_size_pool).
+        u:
+            - s07bq03b
+            - mapping:
+                tongolo avec 1 brassée: Tohoungolo (Avec 1 brassée)
+                tongolo avec 2 brassées: Tohoungolo (Avec 2 brassées)
     myvars:
         Quantity: s07bq03a
         Produced: s07bq04
