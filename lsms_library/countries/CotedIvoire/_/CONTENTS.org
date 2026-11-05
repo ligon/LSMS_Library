@@ -1135,7 +1135,8 @@ dispositions in the harvest's unit it is exact on 82.7%, within 10% on 85.7%, me
 2018-19 recorded against 2021-22 derived (n): cocoa 245 (912), 250 (717); rubber 583 (229), 612 (226); rice 819 (134),
 813 (94); cotton 901 (204), 822 (155); coffee 331 (71), 292 (84); yam 1,852 (162), 1,250 (77); oil palm 1,872 (63), 833 (55);
 cassava 1,361 (10), 730 (23).  =harvest_kg=: 2018-19 12,131,426, 2021-22 13,268,515.  The dispositions hold 9999 on 9
-records, with no label calling it missing: they enter the sum as recorded, and Site Q names the rows.
+records, with no label calling it missing: they enter the sum as recorded, and Site Q names the rows.  171 derived totals are in =Autres=, whose free text
+(=tonnes=, =tricycle=, =régimes=) may hide two units, as Mali's disclosed.
 
 =s16d= has no exact repeats, unlike Togo's: 14,171 records on 14,171 keys.  Sales, option (d): 8,467, 7,675 on their single
 row, keyed =hh-crop-sale-single-row=; 792 on one =Farm-level= row each.
@@ -1219,5 +1220,9 @@ Folded: =Sucre poudre= and =Sucre morceaux=, as 2018-19's own label says.  NOT f
 name: 2018-19's =Beurre= may or may not hold margarine.  =Piment frais= is 2018-19's =Piment=, as in Togo; =Piment séché= (5,585 rows) is apart, while 2018-19's one item has 11,920 rows against 9,917 + 5,585 here, so that item is a bundle and the exception is weaker here.
 78.3% of this wave's rows and 83.7% of 2018-19's are on a shared =j=.  A cross-wave demand system on =j= must bundle these itself.
 
-*Kilograms.*  =ehcvm_nsu_civ2021.dta= exists and is not wired (not ruled).  So this wave's kilograms come from the price-ratio ladder.  Because #1487 pools factors across a country's waves,
-wiring this table moves 2018-19's inferred kilograms at read time, native =Quantity= and =Expenditure= untouched.
+*Kilograms.*  =ehcvm_nsu_civ2021.dta= exists and is not wired (not ruled).  So this wave's kilograms come from the price-ratio ladder: =metric= 36,496 rows, =item_unit= 121,869,
+=item_unit_tight= 6,374, =unit= 140,730, =none= 13; 783 rows of both waves refused by the baseline gate go to =unit=.  Scored against the NSU weights, on 204,291 inferred purchased rows, joined on (household, item, base unit):
+median |log error| 0.71, within 2x on 49.1%, within 1.5x on 31.0%, median factor 1.54 x the NSU's (=unit= rung 1.98 x, 34.9% within 2x; =item_unit= 1.40 x, 64.0%).  So the ladder runs heavy here, where it runs light in Togo.
+Because #1487 pools factors across a country's waves, wiring this table moves 2018-19's inferred kilograms at read time, measured cold on the same code: =food_quantities(units='kgs')= 2018-19 358,536 -> 359,170, 128,245 of 296,928 rows move, median ratio 1.00, 10%-90% 0.88, 1.18;
+=food_prices= sum 144,660,803 -> 141,749,811, 78,498 of 182,890 rows, 10%-90% 0.80, 1.14.  Its rungs: =item_unit= 95,949 -> 111,868, =item_unit_tight= 0 -> 6,933, =unit= 173,867 -> 151,032, =none= 48 -> 31, =metric= unchanged at 27,081.
+2018-19's native =Quantity= and =Expenditure= do not move, and neither does =harvest_kg=.  2021-22's =food_quantities(units='kgs')= is 331,409.
