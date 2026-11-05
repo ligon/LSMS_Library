@@ -64,6 +64,7 @@ class Cell:
 CELLS = {
     "Benin": Cell("2018-19", "../Data/s16c_me_ben2018.dta", FRENCH, FOLD),
     "Togo": Cell("2018", "../Data1/s16c_me_tgo2018.dta", FRENCH, FOLD),
+    "Senegal": Cell("2018-19", "../Data/s16c_me_sen2018.dta", FRENCH, FOLD),
 }
 COUNTRIES = list(CELLS)
 

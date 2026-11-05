@@ -881,3 +881,25 @@ sample of markets, and the community files stop at =s04_co=.
 *The join.*  Household (t, j, u) cells with a 2018-19 community price: 614 of 1,263, covering 171,894 of 215,660 =food_acquired= rows.  122,462 of the 126,624 community rows find a household cell.  All 63 =j= occur in the household table.  7 =u= do not.
 
 *Cost.*  =data_scheme.yml= and a new wave script move every Senegal hash: one re-warm.  =.coder/coverage/latest.csv= grades the cell =absent= until the next =make matrix=.
+
+* 2026-11-04 -- =crop_production= serves =condition= and the recorded answer (GH #1436)
+
+Ruling @ligon 2026-11-04, option (D), set on Niger in #1471: the fold stays on the
+=condition= level and the survey's own answer rides in the optional column
+=condition_native=.  =2018-19/Data/s16c_me_sen2018.dta= records "Etat du produit" in =s16cq12c=, read by code
+through =harmonize_crop_condition_ehcvm1=.
+
+| code | =.dta= label | rows | =condition= |
+|------+--------------+------+-------------|
+| 1 | Epis | 503 | =unshelled= |
+| 2 | Grain | 2,577 | =shelled= |
+| 3 | Décortiqué | 921 | =shelled= |
+| 4 | Non-décortiqué | 3,004 | =unshelled= |
+| 5 | Non concerné | 826 | =shell_not_applicable= |
+| blank | | 597 | =unknown_condition=, column NA |
+
+8,428 lines, unique on (household, field, parcel, crop code, unit), so the level separates nothing and adds no row.  A blank state is a
+blank unit on all 597.  The answer describes the harvest quantity only: =s16cq16c= is the sold state, not served (GH #1462).
+2021-22 has no =crop_production= script, so this table reaches no 2021-22 row.  For whoever wires it: =s16c_me_sen2021.dta= =s16cq16d= has three answers, =1. Epis/coques= 1,899, =2. Grains= 2,420, =3. NA= 549, blank 1,626.  Code 3 collides with Décortiqué here, so that wave needs its own table (Niger's =harmonize_crop_condition_ehcvm2=), and =condition_native= stays NA there because nothing is folded.  The blank state is not quite the blank unit there: 1,626 against 1,622, and 240 lines state a condition with no quantity.
+
+*Cost:* one Senegal re-warm (=data_scheme.yml=, =categorical_mapping.org= and the wave script).
