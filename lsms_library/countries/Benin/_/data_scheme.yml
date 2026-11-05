@@ -152,6 +152,11 @@ Data Scheme:
     AffectedConsumption: bool
     HowCoped0: str
     HowCoped1: str
+    # 2021-22's s14bq05 ranks up to three strategies (337 rows have a third).  2018-19's
+    # hook emits two (no household there marks a third), so this rides NA on that wave.
+    HowCoped2:
+      type: str
+      optional: true
 
   plot_features:
     # Lasting parcel-level characteristics from the EHCVM agriculture
