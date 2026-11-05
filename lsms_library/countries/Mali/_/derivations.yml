@@ -229,8 +229,8 @@ Mali::crop_production::hh-crop-sale-single-row:
     row of that household and crop with plot_id = 'Farm-level' and no key for the
     sale, because its index value already discloses it.  No sale is split, summed,
     scaled or dropped, and a record that is not a sale serves nothing: no zero is
-    written.  This key shares a row with harvest-to-date or harvest-from-dispositions
-    through derivations.MULTI_SEP, in sorted order.
+    written.  This key shares a row with harvest-to-date, harvest-from-dispositions or
+    survey-kg-estimate through derivations.MULTI_SEP, in sorted order.
   function: lsms_library.countries.Mali._.mali:derive_hh_crop_sale_attachment
   inputs: lsms_library.countries.Mali._.mali:inputs_hh_crop_sale_single_row
   raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b,
@@ -277,16 +277,17 @@ Mali::crop_production::hh-crop-sale-single-row:
 
 Mali::crop_production::harvest-to-date:
   waves: ['2018-19', '2021-22']
-  columns: [Quantity]
+  columns: [Quantity, Quantity_kg]
   rule: >-
     Identity on a row whose harvest is not finished and which records a quantity:
     2018-19 s16cq10 = Non with s16cq12a, 2021-22 s16cq11 = Non with s16cq16a.  The value
     is served as recorded.  The key names its WINDOW: the question asks the quantity
     ALREADY harvested, so the row covers a part of the season under a column that
-    otherwise means all of it.  A row with no recorded quantity carries no key.  This
-    key shares a row with hh-crop-sale-single-row through derivations.MULTI_SEP, in
-    sorted order, and never with harvest-from-dispositions, which needs a finished crop
-    and no recorded quantity.
+    otherwise means all of it, and so does the row's Quantity_kg in 2021-22 (s16cq16c,
+    GH #1436).  A row with no recorded quantity carries no key.  This
+    key shares a row with hh-crop-sale-single-row and survey-kg-estimate through
+    derivations.MULTI_SEP, in sorted order, and never with harvest-from-dispositions,
+    which needs a finished crop and no recorded quantity.
   function: lsms_library.countries.Mali._.mali:derive_harvest_to_date
   inputs: lsms_library.countries.Mali._.mali:inputs_harvest_to_date
   raw_variables: [s16cq10, s16cq11, s16cq12, s16cq12a, s16cq12b, s16cq16a, s16cq16b]
@@ -386,6 +387,36 @@ Mali::crop_production::harvest-from-dispositions:
     yields run 1% to 18% below 2018-19's recorded ones, crop by crop (Mali/_/CONTENTS.org).  Not
     validated against an external total: no document here reports one.
   contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the 2021-22 harvest total, and the window key (GH #1437)"'
+  since: '2026-11-04'
+
+Mali::crop_production::survey-kg-estimate:
+  waves: ['2021-22']
+  columns: [Quantity_kg]
+  rule: >-
+    Identity on a 2021-22 row with a Quantity_kg: 16C.16c s16cq16c, served as recorded and
+    read first by the crop ladder (survey_kg).  The key says what the number is.  The
+    instrument calls it an estimate, so a row's kilograms are the survey's conversion of
+    its local unit and not a weighing.  A 0 beside a positive quantity (3 rows) is no
+    answer and is NA.  A row whose Quantity is harvest-from-dispositions
+    has none: s16d's other "c" columns are the state of the product, and s16dq05c, the
+    sale's kilograms, is not served.  Shares a row with harvest-to-date and
+    hh-crop-sale-single-row through derivations.MULTI_SEP, in sorted order.
+  function: lsms_library.countries.Mali._.mali:derive_survey_kg_estimate
+  inputs: lsms_library.countries.Mali._.mali:inputs_survey_kg_estimate
+  raw_variables: [s16cq16a, s16cq16b, s16cq16c, s16cq16d]
+  assumptions:
+    - text: >-
+        s16cq16c is the total for the line in kilograms, as estimated, and not a factor per
+        unit.  On the 129 Kg rows it equals s16cq16a on all 129; on 81 rows in 100 kg sacks
+        it is 100 x s16cq16a on 35, equals s16cq16a on 9, and otherwise neither.  Whether
+        the interviewer or the form did the conversion is not stated.
+      basis: variable-label
+      evidence: >-
+        s16c_me_mli2021.dta s16cq16c "16C.16c. Estimation Quantite totale UML en kg".
+  validated_against: >-
+    tests/test_mali_crop_survey_kg.py, whose oracle reads s16c directly.  An identity has
+    nothing to validate but its rows.
+  contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the survey harvest kilograms, 2021-22 (GH #1436)"'
   since: '2026-11-04'
 
 Mali::community_prices::gram-centilitre-poids:

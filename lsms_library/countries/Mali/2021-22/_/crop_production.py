@@ -21,6 +21,12 @@ goes on ONE row with plot_id = 'Farm-level' (70: 58 of crops on two rows and 12
 on three or more).  No sale is split, summed or dropped.  s16dq05c is an equivalent
 TOTAL in kg, so KgFactor_sold stays NA.
 
+THE SURVEY'S KILOGRAMS (GH #1436, ruling 2026-11-04).  Quantity_kg is s16cq16c, the
+instrument's "Estimation Quantite totale UML en kg", on the 306 of the 309 rows with a
+recorded quantity that state more than 0 kg, keyed
+Mali::crop_production::survey-kg-estimate.  A derived harvest has none:
+s16d's kg column is on the sale alone, and s16dq02c / s16dq03c / s16dq13c are the state.
+
 THE HARVEST (GH #1437, ruling 2026-11-04).  The instrument sends a finished harvest
 to the quantity, and the file has it on 22 of 5,237.  Where every s16c row of a
 household's crop is finished, none records a quantity, and the s16d dispositions
@@ -45,10 +51,11 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
 from mali import (derive_hh_crop_harvest_total, derive_hh_crop_sale_attachment,
-                  ehcvm_crop_condition_labels, ehcvm_crop_conditions,
+                  derive_survey_kg_estimate, ehcvm_crop_condition_labels, ehcvm_crop_conditions,
                   ehcvm_crop_labels, ehcvm_dispositions, ehcvm_household_ids,
                   ehcvm_intercropped, ehcvm_is_sale, ehcvm_plot_ids, ehcvm_unit_labels,
-                  finish_ehcvm_crop_production, stamp_harvest_to_date)
+                  finish_ehcvm_crop_production, stamp_harvest_to_date,
+                  stamp_survey_kg_estimate)
 
 src = get_dataframe('../Data/s16c_me_mli2021.dta', convert_categoricals=True)
 src_codes = get_dataframe('../Data/s16c_me_mli2021.dta', convert_categoricals=False)
@@ -60,6 +67,8 @@ harvest = pd.DataFrame({
     'condition':    ehcvm_crop_conditions(src_codes['s16cq16d']).values,
     'condition_native': ehcvm_crop_condition_labels(src['s16cq16d']).values,
     'Quantity':     src['s16cq16a'].values,
+    # A total for the line, not a factor per unit (GH #1436).
+    'Quantity_kg':  derive_survey_kg_estimate(src['s16cq16c'], src['s16cq16a']).values,
     'intercropped': ehcvm_intercropped(src['s16cq07']).values,
     'finished':     src['s16cq11'].values,
 })
@@ -90,6 +99,11 @@ df = derive_hh_crop_harvest_total(df, ehcvm_dispositions(records))
 derived = df['Derivation'].astype('string').str.contains(
     'harvest-from-dispositions', regex=False).fillna(False)
 assert df.loc[~derived, 'Quantity'].sum() == recorded, 'crop_production 2021-22: a recorded harvest moved'
+
+# A derived harvest has no recorded kilograms, and no kilograms were moved or doubled.
+assert df.loc[derived, 'Quantity_kg'].isna().all(), 'crop_production 2021-22: a derived row with kilograms'
+assert df['Quantity_kg'].sum() == src['s16cq16c'].sum(), 'crop_production 2021-22: kilograms moved'
+df = stamp_survey_kg_estimate(df)
 
 df = finish_ehcvm_crop_production(df, '2021-22')
 
