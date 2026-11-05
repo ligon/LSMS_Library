@@ -37,11 +37,14 @@ Sampling:
       cluster_id_continuity: stable
       cluster_id_note: |-
         `ea_id2` both waves.  Measured: 4,887 of 4,887 linked households keep
-        `v` (432 cluster pairs, all one-to-one).
+        `v` on the roster (432 cluster pairs, all one-to-one).  Through `sample()`,
+        4,925 of 4,926: the exception is a keying difference on W2's post-planting
+        cover, where one small-town household's id carries the rural placeholder
+        `888`.  It is not a different EA (GH #1467).
       source_type: derived-from-data
       confidence: high
       source_file: null
-      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Ethiopia rows); re-measured 2026-10-19 through Country("Ethiopia").sample()'
+      locator: 'slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2 (Ethiopia rows); re-measured 2026-10-19 through Country("Ethiopia").sample(); sample() figure 2026-11-04, CONTENTS.org "W3 households the survey counts as ESS1"'
 
   '2018-19':
     panel:
@@ -62,9 +65,10 @@ Sampling:
       cluster_id_continuity: stable
       cluster_id_note: |-
         `ea_id` both waves (Panel II).  Measured: 4,849 of 4,849 linked
-        households keep `v`.  But the household id embeds the EA id here, so a
-        household that moved EA could not appear in the linked set at all:
-        movers are UNOBSERVABLE by this measurement.
+        households keep `v` on the roster, 4,906 of 4,906 through `sample()`, the
+        ESPS-5 BID's balanced panel (PDF p43).  But the household id embeds the EA
+        id here, so a household that moved EA could not appear in the linked set
+        at all: movers are UNOBSERVABLE by this measurement.
       source_type: derived-from-data
       confidence: medium
       source_file: null

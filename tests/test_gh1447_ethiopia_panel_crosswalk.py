@@ -14,8 +14,8 @@ household covers read directly, by path, with nothing from ``Ethiopia/_/`` in
 the oracle.
 
 W3 households with a W1 baseline in W3's own ``household_id`` that are on no W2
-cover are deliberately NOT pinned either way: whether to link them awaits the
-maintainer (see ``Ethiopia/_/CONTENTS.org``, GH #1447).
+cover are linked by the rule GH #1467 ruled on; ``test_gh1467_ethiopia_panel_links.py``
+pins them, so this module leaves them out.
 """
 from __future__ import annotations
 
@@ -89,7 +89,7 @@ def test_no_household_id_is_minted_from_a_blank_baseline(updated_ids):
 def test_w3_links_chain_through_w2(updated_ids):
     """A W3 household on the W2 map keeps its W2 canonical id, whatever W3's ``household_id`` says.
 
-    Keys absent from the W2 map are left out, so this does not pin the 48 either way.
+    Keys absent from the W2 map are left out: GH #1467 links those by rule.
     """
     w2, w3 = updated_ids["2013-14"], updated_ids["2015-16"]
     on_w2_map = {k: v for k, v in w3.items() if k in w2}
