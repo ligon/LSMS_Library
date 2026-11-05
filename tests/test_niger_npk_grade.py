@@ -29,7 +29,6 @@ BARE = "NPK"
 ECVMA = {"2011-12": ("NER_2011_ECVMA_v01_M_Stata8/ecvmaas2c_p1.dta", "as02cq02", "as02cq03"),
          "2014-15": ("NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS02CP1.dta", "AS02CQ02", "AS02CQ03")}
 EHCVM = {"2018-19": "s16b_me_ner2018.dta", "2021-22": "s16b_me_ner2021.dta"}
-WITH_KEY = {**T._NITROGEN_CONTENT, "npk 15-15-15": 0.15}
 
 
 def _table():
@@ -55,7 +54,7 @@ class TestConfig:
         assert shares.iloc[0] == 0.15
 
     def test_the_grade_does_not_reach_the_bare_label(self):
-        shares, _ = T._nitrogen_shares([BARE, GRADED], WITH_KEY)
+        shares, _ = T._nitrogen_shares([BARE, GRADED], T._NITROGEN_CONTENT)
         assert shares.tolist() == [0.17, 0.15]
 
 
@@ -110,7 +109,7 @@ class TestServed:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             product = T.nitrogen_kg(rows, nitrogen_content={"npk 15-15-15": 1.0})
-            nitrogen = T.nitrogen_kg(rows, nitrogen_content=WITH_KEY)
+            nitrogen = T.nitrogen_kg(rows)
         assert float(product["Nitrogen_kg"].sum()) > 0
         assert float(nitrogen["Nitrogen_kg"].sum()) == pytest.approx(
             0.15 * float(product["Nitrogen_kg"].sum()))

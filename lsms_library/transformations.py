@@ -5661,6 +5661,8 @@ _NITROGEN_CONTENT = {
                           # IFDC/AFAP 2018; MoA Guide 2020)
     'npk 23:21:0+4s': 0.23,  # Malawi, Chitowe (IFDC proposed regs 2003 ex. 3;
                              # IFDC/AFAP 2018 Table 1; FAO & GoM 2018 p. IX)
+    'npk 15-15-15': 0.15,    # Niger ECVMA input code 5, GH #1445: "NPK 15/15",
+                             # and ecvma2_quest_agr_p1.pdf prints "NPK (15/15/15)"
 }
 
 
@@ -5932,8 +5934,11 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
     from the WB panel's uncited 0.07 and EPAR's 0.10 (Zimbabwe's and
     Zambia's Compound D grades).  Malawi's ``NPK 23:21:0+4S Fertilizer``
     (0.23, GH #1106) is Module D type code 1, whose source label in every
-    wave is ``23:21:0+4S/CHITOWE``; its citation is on its own map entry, and
-    the shared ``npk`` key stays NPK 17-17-17 for every other country.
+    wave is ``23:21:0+4S/CHITOWE``; its citation is on its own map entry.
+    Niger's ECVMA ``NPK 15-15-15`` (0.15, GH #1445) is input code 5, labelled
+    ``NPK 15/15``.  The shared ``npk`` key stays NPK 17-17-17 everywhere else,
+    a nominal share where the instrument states no grade (EHCVM's
+    ``NPK/Formule unique``, Niger's two later waves included).
     Organic inputs (manure, compost, organic fertilizer, in every corpus
     language) are REFUSED a share: they stay unmatched, are counted on
     ``refused_organic_*``, and are named in the warning as a refusal, not a
@@ -7253,9 +7258,9 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
           ``Fertilizer_kg_per_ha``.  Note this covers the INORGANIC
           vocabulary only: ``_NITROGEN_CONTENT``'s keys are the nutrient
           classes (nitrate / phosphate / potash / mixed), the product
-          names (urea, CAN, SA, DAP, NPK, TSP, SSP, MOP) and three cited
-          blends (Ethiopia NPS, Malawi D Compound, GH #867; Malawi NPK
-          23:21:0+4S, GH #1106) -- manure and other organic inputs are
+          names (urea, CAN, SA, DAP, NPK, TSP, SSP, MOP) and four cited
+          grades (Ethiopia NPS, Malawi D Compound, GH #867; Malawi NPK
+          23:21:0+4S, GH #1106; Niger NPK 15-15-15, GH #1445) -- manure and other organic inputs are
           refused a key (GH #867) and contribute nothing to either basis.
     area_col : str, default 'Area'
         Plot-area column in ``plot_features``.
