@@ -11,6 +11,7 @@ about which failure may be read as what:
 """
 import importlib.util
 import pickle
+import shutil
 import warnings
 
 import pandas as pd
@@ -214,6 +215,44 @@ def test_a_real_legacy_route_still_answers_and_says_so(monkeypatch, error_type, 
     assert calls[-1] == method
 
 
+@pytest.mark.parametrize('method', DERIVED)
+def test_a_legacy_route_that_fails_too_does_not_hide_the_reason(monkeypatch, method):
+    """Asked directly on a cold root, none of the ten legacy food routes built a row."""
+    error = ValueError('the cause')
+    calls, _ = install_fault(monkeypatch, method, error, builder=True)
+    real = Country._aggregate_wave_data
+    source = 'household_roster' if method == 'household_characteristics' else 'food_acquired'
+
+    def aggregate(self, waves, table, *args, **kwargs):
+        if table == source:
+            return real(self, waves, table, *args, **kwargs)
+        raise _rebuild_failure_error(self.name, table)
+
+    monkeypatch.setattr(Country, '_aggregate_wave_data', aggregate)
+    with pytest.warns(LegacyFallbackWarning), pytest.raises(ValueError) as caught:
+        getattr(Country('Ethiopia'), method)()
+    assert caught.value is error
+    assert 'Could not materialize' in caught.value.__notes__[0]
+
+
+@pytest.mark.parametrize('method', DERIVED)
+def test_a_legacy_route_that_answers_nothing_does_not_hide_the_reason(monkeypatch, method):
+    error = ValueError('the cause')
+    install_fault(monkeypatch, method, error, builder=True)
+    real = Country._aggregate_wave_data
+    source = 'household_roster' if method == 'household_characteristics' else 'food_acquired'
+
+    def aggregate(self, waves, table, *args, **kwargs):
+        if table == source:
+            return real(self, waves, table, *args, **kwargs)
+        return pd.DataFrame()
+
+    monkeypatch.setattr(Country, '_aggregate_wave_data', aggregate)
+    with pytest.warns(LegacyFallbackWarning), pytest.raises(ValueError) as caught:
+        getattr(Country('Ethiopia'), method)()
+    assert caught.value is error
+
+
 def test_a_units_refusal_with_nothing_to_fall_through_to_names_the_country(monkeypatch):
     error = UnitsUnavailableError(units='kgvalue', missing=['Expenditure'])
     calls, _ = install_fault(monkeypatch, 'food_prices', error, builder=False)
@@ -233,6 +272,7 @@ class TestLegacyCanBuild:
     def test_a_country_script_is_a_route(self):
         assert self._country('Tanzania')._legacy_can_build('food_expenditures', None)
 
+    @pytest.mark.skipif(shutil.which('make') is None, reason='needs make')
     def test_nothing_is_no_route(self):
         assert not self._country('Mali')._legacy_can_build('household_characteristics', None)
         assert not self._country('Albania')._legacy_can_build('household_characteristics', None)
@@ -460,12 +500,20 @@ class TestVJoin:
             out = country._join_v_from_sample(_frame())
         assert 'v' not in out.index.names
 
-    def test_a_country_with_no_sample_is_not_asked(self):
-        """Armenia declares no ``sample``, and the guard is at the call in ``_finalize_result``."""
-        country = Country('Armenia', preload_panel_ids=False)
-        assert 'sample' not in country.data_scheme
-        src = C.Country._finalize_result.__code__
-        assert '_join_v_from_sample' in src.co_names
+    @pytest.mark.parametrize('name,asked', [('Armenia', False), ('Malawi', True)])
+    def test_a_country_with_no_sample_is_not_asked(self, monkeypatch, name, asked):
+        """Armenia declares no ``sample``.  The guard is at the call in ``_finalize_result``."""
+        calls = []
+        monkeypatch.setattr(Country, '_join_v_from_sample',
+                            lambda self, df: calls.append(self.name) or df)
+        country = Country(name, preload_panel_ids=False)
+        country._panel_ids_attempted = True
+        country._updated_ids_cache = {}
+        assert ('sample' in country.data_scheme) is asked
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            country._finalize_result(_frame(), {}, 'household_roster')
+        assert bool(calls) is asked
 
 
 class _MarketStub:

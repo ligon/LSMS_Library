@@ -5263,7 +5263,8 @@ class Country:
         build as absence, or "Could not materialize", which hides the cause (GH #1516).
         Measured on the 38 countries that have a config: no country has a legacy route for
         ``household_characteristics``, and four have one for a food table (CotedIvoire,
-        Nigeria, Tanzania, Togo).
+        Nigeria, Tanzania, Togo).  Asked directly on a cold root, none of those ten cells
+        built a row.
         """
         requested = self.waves if waves is None else waves
         if any(method_name in self[w].data_scheme for w in requested):
@@ -6759,6 +6760,8 @@ class Country:
                 # derived fallback can touch data (ledger 1210, sections 2/4).
                 if waves is not None:
                     waves = self._validate_waves(waves)
+                # Set when a derivation failed and the legacy path is being tried.
+                derive_failure = None
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
                 if (name in self._FOOD_DERIVED
@@ -6834,6 +6837,7 @@ class Country:
                                 or subset_kg or not self._legacy_can_build(name, waves)):
                             raise exc.for_country(self.name) from exc
                         self._warn_legacy_fallback(name, 'food_acquired', exc)
+                        derive_failure = exc.for_country(self.name)
                         derived = None
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
                         if subset_kg:
@@ -6876,6 +6880,7 @@ class Country:
                             # nothing, which is the worse failure of the two.)
                             raise
                         self._warn_legacy_fallback(name, 'food_acquired', exc)
+                        derive_failure = exc
                         derived = None
                     if derived is not None:
                         # Relabel is outside the except so user-facing KeyErrors
@@ -6938,6 +6943,7 @@ class Country:
                                 or not self._legacy_can_build(name, waves)):
                             raise
                         self._warn_legacy_fallback(name, 'household_roster', exc)
+                        derive_failure = exc
                         derived = None
                     if derived is not None:
                         # This path never calls _finalize_result, so a mapping-site
@@ -6967,8 +6973,22 @@ class Country:
                 # _LABEL_SELECTION): _aggregate_wave_data is @build_transform()-
                 # tagged, so widening its signature would move every table's
                 # lsms_cache_hash for a change that cannot alter a cached byte.
-                with _label_selection(name, map_labels):
-                    result = self._aggregate_wave_data(waves, name, currency=currency)
+                try:
+                    with _label_selection(name, map_labels):
+                        result = self._aggregate_wave_data(waves, name, currency=currency)
+                except Exception as legacy_failure:
+                    # A legacy build that fails too does not get to replace the
+                    # reason it was tried with "Could not materialize" (GH #1532).
+                    if derive_failure is None:
+                        raise
+                    derive_failure.add_note(
+                        f"The legacy build of {name} was tried and failed as well: "
+                        f"{type(legacy_failure).__name__}: {legacy_failure}")
+                    raise derive_failure
+                if (derive_failure is not None
+                        and (not isinstance(result, pd.DataFrame) or result.empty)):
+                    # Nor does it get to answer a failed derivation with 0 rows.
+                    raise derive_failure
                 _assert_label_targets_present(result, map_labels,
                                               country=self.name, table=name)
                 # Apply relabeling to any table with a j index level

@@ -166,10 +166,9 @@ def test_unrelated_generic_legacy_failure_stays(monkeypatch, error_type, method)
     # GH #1516: the fallback is only for a country whose legacy path can build the table.
     monkeypatch.setattr(Country, '_has_country_builder', lambda self, table: True)
     country = Country('Ethiopia')
-    with pytest.warns(LegacyFallbackWarning), pytest.raises(
-            RuntimeError, match='Could not materialize Ethiopia/') as info:
+    # GH #1532: a legacy build that fails too does not replace the reason it was tried.
+    with pytest.warns(LegacyFallbackWarning), pytest.raises(error_type) as info:
         getattr(country, method)()
-    assert info.value is not original
-    assert info.value.__cause__ is None
-    assert info.value.__context__ is None
+    assert info.value is original
+    assert 'Could not materialize Ethiopia/' in info.value.__notes__[0]
     assert calls == [source, method]
