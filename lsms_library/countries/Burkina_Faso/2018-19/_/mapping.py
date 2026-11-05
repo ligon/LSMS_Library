@@ -208,7 +208,41 @@ COPING_LABELS = {
 }
 
 
+class ShockLayoutError(Exception):
+    """Section 14.04 of this file does not have the layout :func:`shocks` serves.
+
+    Subclasses ``Exception``, not ``ValueError`` / ``KeyError`` / ``RuntimeError``:
+    the derived-table paths catch those and would fall back to another build.
+    """
+
+
+def _food_stock_by_vague(df):
+    """Serve the food stock from the column each vague put it in (GH #1556).
+
+    Vague 1 asked five consequences (d = stock, e = achats, f blank) and vague 2
+    six (d = effectif du cheptel, e = stock, f = achats).  ``AffectedConsumption``
+    arrives as d and ``StockVague2`` as e, through one mapping.  A blank f is what
+    tells the two apart in the file, so a release where it stops being one raises:
+    d is a different question on those rows and nothing else would say so.
+    """
+    vague = pd.to_numeric(df.pop('vague'))
+    stock_vague2 = df.pop('StockVague2')
+    purchases = df.pop('PurchasesVague2')
+    five = vague.eq(1)
+    asked = stock_vague2.notna() | df['AffectedConsumption'].notna()
+    if not vague.isin([1, 2]).all() or purchases[five].notna().any() \
+            or purchases[~five & asked].isna().any():
+        raise ShockLayoutError(
+            f"s14q04f should be blank in vague 1 and filled in vague 2: "
+            f"{int(purchases[five].notna().sum())} filled in vague 1, "
+            f"{int(purchases[~five & asked].isna().sum())} blank in vague 2, "
+            f"vague values {sorted(vague.dropna().unique().tolist())}")
+    df['AffectedConsumption'] = df['AffectedConsumption'].where(five, stock_vague2)
+    return df
+
+
 def shocks(df):
+    df = _food_stock_by_vague(df)
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
     how_coped = {0: [], 1: [], 2: []}

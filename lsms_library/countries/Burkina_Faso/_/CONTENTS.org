@@ -3134,3 +3134,38 @@ in this file, unlike every sibling, and the hook read them as Yes/No and listed
 strategies by code, which is the 2018-19 hook copied over.  The values are the ranks:
 every row holds 1, 1-2 or 1-2-3.  Of the 1,120 rows with two or more strategies, 263
 change order and 217 change =HowCoped0=.
+
+* 2026-11-04 -- =shocks= 2018-19: section 14.04 changed between vagues (GH #1556)
+
+The =.dta= labels (and the DDI, which repeats them) read =s14q04d= stock, =e= achat,
+=f= achats again, with no livestock.  The questionnaire prints six columns (sheet
+=S14_Chocs= of both vague files): revenus, avoirs, production agricole, effectif du cheptel,
+stock, achats.  The file shows both layouts, split exactly by =vague=:
+
+- *Vague 1* asked five.  =f= is blank on every follow-up row, and =d= = stock, =e= = achats.
+- *Vague 2* asked the printed six.  =f= is filled on every row, and =d= = cheptel, =e= = stock, =f= = achats.
+
+Measured blind to the labels, vagues 1 (4,606 rows) / 2 (4,160):
+P(Diminué | animal-disease shock) - P(Diminué | other shocks) on =d= is -0.24 / 0.49;
+P(Non-concerné | no animals in =s17=) - P(Non-concerné | animals) on =d= is 0.08 / 0.49.
+The answer distribution of vague 1's =d= sits 0.009 against 0.204 (total variation) from vague 2's
+=e= and vague 2's =d=; vague 1's =e= sits 0.043 against 0.329 from vague 2's =f= and =e=.  No
+question about livestock was asked in vague 1, as far as this file shows; only the
+questionnaire says otherwise, and the sheet held for vague 1 does print the column.
+
+=AffectedConsumption= read =d= on the label's word, so vague 2 served livestock.  The
+hook now serves =d= in vague 1 and =e= in vague 2, and raises =ShockLayoutError= if a
+release stops showing this layout.  True share 0.628 -> 0.728; 1,655 of 8,765 rows change, all in
+vague 2.  So =AffectedConsumption= is comparable across vagues and with 2021-22 only
+from this change on.
+
+The national report reads =d= as livestock throughout, vague 1 included.  Tables 11.3
+and 11.4 of =ehcvm_2018_rapport_general.pdf= (PDF pp. 124, 126) reproduce to the decimal
+from =s14q03==1=, =hhweight=, both vagues pooled, on all 12 numbers (Augmenté / Diminué /
+Inchangé): revenu 0.7 / 85.3 / 11.0, avoirs 0.4 / 76.7 / 17.8, production agricole
+0.5 / 69.1 / 18.1, and =s14q04d=, headed "Effectif du cheptel", 0.4 / 62.6 / 24.5.  So the
+office published =d= as livestock against its own =.dta= label, and its "cheptel" pools
+vague 1: =d= Diminué is 70.0 in vague 1 and 54.6 in vague 2.  Neither official source
+fits the whole file: the label fits vague 1, and the report's heading and the printed
+questionnaire fit vague 2.  The vague-1 xls is not evidence about vague 1, because its
+sheet =S14_Chocs= is cell-identical to vague 2's (99 nonblank cells).

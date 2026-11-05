@@ -3306,3 +3306,27 @@ else ONE =plot_id = 'Farm-level'= row with no =Quantity= or =u=.  The Farm-level
   among these).  =perennial= is NA on a sale's row and True on a tree's.
 - *The 2 rows that state a harvest are not attached.*  Nigeria's ruling A (the one row that STATES a harvest) was not extended; these
   two (650,000 FCFA) go to Farm-level under "two or more rows".  No 2017-18 household states two lines on one plot: =s7f= has one row per plot-crop.
+
+* 2026-11-04 -- =shocks= 2018-19: section 14.04 changed between vagues (GH #1556)
+
+The =.dta= labels (and the DDI, which repeats them) read =s14q04d= stock, =e= achat,
+=f= achats again, with no livestock.  The questionnaire prints six columns (sheet
+=S14_Chocs= of both vague files): revenus, avoirs, production agricole, effectif du cheptel,
+stock, achats.  The file shows both layouts, split exactly by =vague=:
+
+- *Vague 1* asked five.  =f= is blank on every follow-up row, and =d= = stock, =e= = achats.
+- *Vague 2* asked the printed six.  =f= is filled on every row, and =d= = cheptel, =e= = stock, =f= = achats.
+
+Measured blind to the labels, vagues 1 (4,196 rows) / 2 (5,641):
+P(Diminué | animal-disease shock) - P(Diminué | other shocks) on =d= is -0.11 / 0.34;
+P(Non-concerné | no animals in =s17=) - P(Non-concerné | animals) on =d= is 0.04 / 0.28.
+The answer distribution of vague 1's =d= sits 0.032 against 0.158 (total variation) from vague 2's
+=e= and vague 2's =d=; vague 1's =e= sits 0.053 against 0.223 from vague 2's =f= and =e=.  No
+question about livestock was asked in vague 1, as far as this file shows; only the
+questionnaire says otherwise, and the sheet held for vague 1 does print the column.
+
+=AffectedConsumption= read =d= on the label's word, so vague 2 served livestock.  The
+hook now serves =d= in vague 1 and =e= in vague 2, and raises =ShockLayoutError= if a
+release stops showing this layout.  True share 0.632 -> 0.736; 2,197 of 9,837 rows change, all in
+vague 2.  So =AffectedConsumption= is comparable across vagues and with 2021-22 only
+from this change on.

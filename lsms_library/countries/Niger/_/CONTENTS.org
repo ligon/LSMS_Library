@@ -3026,7 +3026,7 @@ a masked 0 or code beside a =Tiya= stays =none=.
 By the file's labels and the questionnaire's column heads (=ner_ehcvm2_qnr_men_excel_vague1.pdf= p. 67),
 =s14bq04a..f= are revenu, avoirs, production agricole, effectif du cheptel, stock de
 produits alimentaires, achats.  =AffectedConsumption= read =d=, the livestock.  It now
-reads =e=, the stock, which is what the name has meant for this table in this family.
+reads =e=, the stock.
 True share 0.429 -> 0.777; 1,389 of 2,876 rows change.
 
 =s14bq05__25= (=Autre stratégie=) alone has the Oui/Non label set; the other 25 hold
@@ -3073,3 +3073,21 @@ The ruling on GH #843, option (d), extended in bulk on 2026-11-04, applies: the 
 two or more lines of which only ONE is served: the others hold no quantity or month, so =_finalize_result='s =dropna(how='all')= removes them at the API.
 =niger.served_harvest_lines= no longer counts such a line unless it is the crop's only one, so these 19 sit on their row: 2014-15 is 583 sales on a line
 (78,919,660 FCFA) and 498 on Farm-level (34,249,850 FCFA), rows 9,316 -> 9,297.  2021-22 has none, because its lines carry =intercropped=, and does not move.
+
+* 2026-11-04 -- =shocks= 2018-19: the =s14q04= labels are wrong (GH #1556)
+
+The =.dta= labels (and the DDI, which repeats them) read =d= stock, =e= achat, =f=
+achats again, with no livestock.  The questionnaire prints six columns (sheet
+=S14_Chocs= of both vague files): revenus, avoirs, production agricole, effectif du
+cheptel, stock, achats.  The file behaves like the questionnaire in both vagues, and
+=f= is filled in both.  Measured blind to the labels, per vague 1 / vague 2:
+P(Non-concerné | no animals in =s17=) - P(Non-concerné | animals) is 0.50 / 0.44 on
+=d= and 0.03 / 0.00 on =e=; P(Diminué | animal-disease shock) - P(Diminué | other
+shocks) is 0.44 / 0.58 on =d= and -0.14 / -0.36 on =e=.  2021-22, whose labels name
+=d= the cheptel, measures alike (0.51 / 0.63, 0.57 / 0.49).
+
+So =AffectedConsumption=, which read =d= on the label's word, served livestock here as
+well.  It now reads =e=.  True share 0.497 -> 0.692; 2,962 of 6,551 rows change.  Do
+not trust a =s14q04= label in this family without checking it this way: five siblings
+(Mali, Senegal, Burkina Faso, Benin, Togo) asked only five columns in vague 1, where
+the labels happen to be right.
