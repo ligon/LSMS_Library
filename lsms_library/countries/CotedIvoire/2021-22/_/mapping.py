@@ -205,7 +205,8 @@ def food_acquired(df):
     subtracts in two orders, so 12 such rows reach the reshape at 1.1e-16 instead of 0; the
     file's own residual has no value between 0 and 0.001.  They go the way a true zero goes.
     '''
-    out = _food_acquired_ehcvm(df.rename(index=_unit_label, level='u'), FOOD_ACQUIRED_DERIVATION)
+    df = df.rename(index=_unit_label, level='u')
+    out = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
     float_residue = (out.index.get_level_values('s') == 'purchased') & (out['Quantity'] < 1e-9).to_numpy()
     return out[~float_residue]
 

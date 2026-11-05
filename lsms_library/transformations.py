@@ -2119,7 +2119,7 @@ def _declared_no_kg_mask(df, no_kg, item_col='j'):
 #: fabricated factor: the label stays its own cell, as it is on the base code.
 _UNIT_SIZE_WORDS = frozenset({
     'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier',
-    'Très petit', 'Très petite', 'Autre taille',
+    'Très petit', 'Très petite', 'Très grand', 'Autre taille',
     'Sans brassée', 'Avec 1 brassée', 'Avec 2 brassées',
     'A 2 doigts', 'A 3 doigts', 'A 5 doigts',
     'Pequeno', 'Medio', 'Grande',

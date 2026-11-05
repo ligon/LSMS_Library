@@ -108,7 +108,7 @@ SIZES = {
               'A 5 doigts', 'Autre taille'},
     'Burkina_Faso': {'Petit', 'Moyen', 'Grand'},
     'CotedIvoire': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier', 'Très petit',
-                    'Très grand', 'Huitième'},
+                    'Très grand'},
     'Guinea-Bissau': {'Pequeno', 'Medio', 'Grande'},
     'Mali': {'Petit', 'Moyen', 'Grand'},
     'Niger': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier'},
