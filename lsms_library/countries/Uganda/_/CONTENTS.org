@@ -145,6 +145,10 @@ consumer as ='12.0'= across the outer merge.
   have served every household table with no =v=.  One build worker raises the class itself.  Under
   parallel workers a class in a by-path module does not pickle (GH #1524), so =__reduce__= sends
   a plain =Exception= carrying its name and message, which the derived-table paths do not catch.
+  Measured by injecting one disagreeing household, one and two workers: =sample=, =household_roster=,
+  =household_characteristics=, =food_expenditures= and =interview_date= all raise, on a wave subset
+  and on all waves, and nothing is written.  =Feature= drops Uganda with a warning, and
+  =conversion._interview_dates= returns ={}= with a warning, its fallback for any build failure.
 
 *The 149 + 66 of 2018-19 with no =ea=*, by what the source says about them:
 
@@ -276,18 +280,18 @@ the pairing is right; =tests/test_gh1459_uganda_early_ea.py= pins it.  It also m
 110 could carry a number and the column a single form, which the ruling did not have in
 front of it.  They are served their =comm=, as ruled; the alternative is a memo in the PR.
 
-*Measured, cold =b95e927f3= vs cold =a7c8f8078=, one node, 2026-11-04, with the =AGSEC1=
-source and the =Aggregate= split below.*  38 calls: every declared Uganda table,
+*Measured, cold development =14c0f5790= vs cold =c63f7e700=, one node, 2026-11-04, with the
+=AGSEC1= source and the =Aggregate= split below.*  38 calls: every declared Uganda table,
 =labels='Aggregate'= on the food tables, =market='Region'= and =market='District'=, and
 =Feature= over =sample= and =household_roster= (with Albania and Malawi) and
-=food_expenditures(labels='Aggregate')= (with Malawi and EthiopiaRHS).  30 are frame-equal
-(=check_exact=).  The other 8 are =sample= by itself, under =market='Region'= and through
-=Feature=, each equal once =ea= and =Derivation= are set aside, and the 5 =Aggregate= reads,
-each moving only the labels that CONTENTS says.  Warning counts match on all 38.  Malawi and
-EthiopiaRHS are frame-equal.  Hashes: 27 of 27 Uganda tables and 216 of 216 Uganda wave
-hashes move, 0 of the other 515 tables across 37 countries, and 0 of 38 build fingerprints.
-So the cost is one Uganda re-warm.  =var/sample= is the one entry of the 53 in
-=tests/fixtures/uganda_baseline.json= that moves.
+=food_expenditures(labels='Aggregate')= (with Nigeria, GhanaLSS, Malawi and EthiopiaRHS).  30 are
+frame-equal (=check_exact=).  The other 8 are =sample= by itself, under =market='Region'= and
+through =Feature=, each equal once =ea= and =Derivation= are set aside, and the 5 =Aggregate=
+reads, each moving only the labels that CONTENTS says.  Warning counts match on all 38.  The other
+countries are frame-equal.  Hashes: 27 of 27 Uganda tables and 216 of 216 Uganda wave hashes move,
+0 of the other 515 tables across 37 countries, and 0 of 38 build fingerprints.  So the cost is one
+Uganda re-warm.  =var/sample= is the one entry of the 53 in =tests/fixtures/uganda_baseline.json=
+that moves.
 
 **** TODO Decisions the ruling leaves open
 
@@ -1536,9 +1540,24 @@ those codes moves.  Read a wave's label before reading a bucket as a series.
 - /Other Aggregates hold two states and were not ruled on/: =Beans= (fresh, dry), =Peas=
   (=Peas=, dry), =Rice= (=Rice flour=), =Ginger= (fresh, powder), =Soybean= (fresh, dry).
 
-Not rerun: the CFE beta-spread test that =add-feature/food-acquired= gives for designing
-buckets.  A split cannot fail the test a fold has to pass, but a bucket this thin may fail
-=min_obs= where the old one did not.
+*What the split costs (cold, merge of development =14c0f5790=).*
+
+- /CFE by Region, default thresholds, one build, the fine table summed through each side's
+  column./  Items kept go from 43 to 46.  =Maize= and =Ground Nuts= drop out; =Maize (cobs)=,
+  =Maize (flour)= and the three nut states enter; =Millet (flour)=, with two waves, is not kept.
+  The betas support the split: cobs 0.726 against flour 0.435, shelled 0.879 against pounded 0.611.
+  36 common betas outside the families correlate 0.997, largest move 0.043.  The kept set is
+  fragile: with =Millet= left as one bucket the same run keeps 44, with Chicken, Cigarettes, Coffee
+  and Passion Fruits out and Kabalagala and Waragi in.
+- /Thin cells./  t-m-j cells under 30 rows go from 545 of 1,762 to 691 of 1,964.  =Sweet Potatoes
+  (dry)= and =(flour)= are 100% thin, =Maize= 88%, =Sim Sim (paste)= 86%, =Ground Nuts= 78%.
+- /Kg prices on the crop join are purer and far thinner./  Food kg rows a wave go from 822-1,246
+  to 5-17 for =Maize=, 394-691 to 1-12 for =Ground Nuts=, 2-212 to 2 in 2011-12 alone for =Cassava=,
+  and 1-2 to none for =Sweet Potatoes=.  No library code joins crop to food: =median_price_valuation=
+  uses crop sales, and =food_expenditures(valuation=...)= runs before the relabel.
+- /Pooled./  In =Feature('food_expenditures')(..., labels='Aggregate')= Uganda's =Maize= goes from
+  10,197 rows to 302, beside Nigeria's 3,249 and GhanaLSS's 4,512.  That aligns better, since Nigeria
+  keeps =Maize flour= apart, and Uganda's =Millet (flour)= (421 rows) now meets GhanaLSS's (187).
 
 * =people_last7days= counts MEMBERS, not visitors
 
