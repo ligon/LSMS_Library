@@ -303,16 +303,22 @@ Burkina_Faso::sample::region-milieu-stratum:
         result from the combination of the 13 regions with the two areas of residence
         (urban, rural)."  A Basic Information Document, not the instrument.
     - text: >-
-        2018-19 has the same 26 strata, not the three the English BID names.  The
-        documents disagree: the French report, section 1.3, gives representativity for
-        the two milieux and the 13 regions; basicinformationdocument_bfa.pdf, p.10,
-        says "representative for the strata of Ouagadougou, other urban areas and
-        rural areas".  Share of var(log cluster weight) between these 26 cells is
-        74.0%, against 8.2% between regions alone.
+        2018-19 has the same 26 strata.  Three documents give three stratifications, and
+        only bid_bfa_ehcvm2.pdf, p.4, of the later wave, states 13 x 2.  The French report
+        on 2018-19 (ehcvm_2018_rapport_general.pdf, section 1.3.1, printed p.16) says "La
+        stratification est faite avant le tirage des unités primaires et basée sur
+        l'urbanisation des agglomérations (urbain, rural)", and its Tableaux 1.1 and 1.2
+        allocate by region and by milieu separately.  basicinformationdocument_bfa.pdf,
+        p.10, says "representative for the strata of Ouagadougou, other urban areas and
+        rural areas".  Share of var(log cluster weight) between these 26 cells is 74.0%,
+        against 22.7% between urban and rural and 8.2% between regions.  The report plans
+        252 urban and 333 rural clusters where the cover has 263 and 322, so the cover
+        differs from the plan by 11 clusters on milieu even in the base wave.
       basis: modelling-choice
       evidence: >-
-        @ligon's ruling on GH #812, 2026-11-04.  Burkina_Faso/_/CONTENTS.org quotes both
-        documents.
+        @ligon's ruling on GH #812, 2026-11-04, resting on the panel BID, the survey's 26
+        unit-table codes and the weights.  The memo ruled on said the report gives 26; it
+        does not.  Burkina_Faso/_/CONTENTS.org quotes the three documents.
     - text: >-
         the 2021-22 cross-section is stratified the same way.  Catalog 6277 names no
         stratum; 76.1% of var(log cluster weight) lies between these cells.
