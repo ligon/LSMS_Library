@@ -3890,6 +3890,10 @@ _PLOT_CANONICAL = _PLOT_LEVELS[0]
 #: plot (``lsms_library/data_info.yml``, ``plot_id`` under ``Single Index``).
 _PLOT_FARM_LEVEL = 'Farm-level'
 
+#: The EPISTEMIC ``plot_id`` sentinel: the survey records a plot-grain answer but
+#: the plot identifier is missing.  Not a plot (the same ``data_info.yml`` note).
+_PLOT_UNKNOWN = 'unknown_plot'
+
 
 def _canonicalise_plot_level(res, plot_level):
     """Rename ``plot_level`` on ``res``'s index to :data:`_PLOT_CANONICAL`.
@@ -5097,7 +5101,9 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         convertible rows is absent from the result.  When True, those rows
         are carried at their native ``Quantity`` (a deliberate over-count
         used only for sensitivity analysis); the default False is the
-        parity-faithful choice.
+        parity-faithful choice.  ``attrs['unknown_plot_excluded']['kg']`` follows
+        the column, so under True it holds native quantities too (Uganda 380 rows
+        and 74,397.95 against 304 and 70,277.25).
 
     Returns
     -------
@@ -5108,6 +5114,14 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         so a ``Country`` frame whose crop level is ``crop`` and a ``Feature``
         frame of the same country give the same rows (GH #1460).  A ``country``
         level on a pooled frame is NOT carried and is not a grouping key.
+
+        ``plot_id == 'unknown_plot'`` rows are left out, per the canonical
+        CONSUMER RULE, and reported in
+        ``result.attrs['unknown_plot_excluded']`` as ``{'rows', 'rows_with_kg',
+        'kg'}`` (GH #1460): Uganda 403 rows, 304 with kg, 70,277.25 kg; Malawi 41,
+        17, 2,740 kg.  So this is NOT a complete household or crop total where
+        that record is non-zero; add it back for one.  Their factors are still
+        estimated from, so no other row's kilograms move.
 
         ``result.attrs['kg_factor_sources']`` is ``{layer: n_rows}`` over the
         INPUT rows and sums to ``len(crop_production)``.  It counts rows by
@@ -5185,8 +5199,17 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         kg = kg.where(kg.notna(), qty)
 
     out = pd.DataFrame({'Harvest_kg': kg})
-    out = out.replace(0, np.nan).dropna()
     plot_level = _resolve_plot_level(out.index.names)
+    # GH #1460: `unknown_plot` is not a plot, so it has no place in a per-plot
+    # quantity.  Two such rows of one household would sum into one "plot".
+    unknown = (out.index.get_level_values(plot_level).astype('object')
+               == _PLOT_UNKNOWN if plot_level is not None
+               else np.zeros(len(out), dtype=bool))
+    unknown = np.asarray(unknown, dtype=bool)
+    unknown_kg = out.loc[unknown, 'Harvest_kg']
+    unknown_kg = unknown_kg[unknown_kg.notna() & (unknown_kg != 0)]
+    out = out[~unknown]
+    out = out.replace(0, np.nan).dropna()
     crop_level = _resolve_crop_level(out.index.names)
     group_by = [n for n in ['t', 'i', plot_level, crop_level]
                 if n is not None and n in out.index.names]
@@ -5203,6 +5226,11 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         'kg_factor_disagreement']
     res.attrs['kg_factor_declared_from'] = factors.attrs[
         'kg_factor_declared_from']
+    res.attrs['unknown_plot_excluded'] = {
+        'rows': int(unknown.sum()),
+        'rows_with_kg': int(len(unknown_kg)),
+        'kg': float(unknown_kg.sum()),
+    }
     return res
 
 
@@ -7619,7 +7647,8 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
           per ``(u, condition)`` as well, so counting raw rows would score
           a maize crop reported in two conditions as twice the maize.  A
           ``plot_id = 'Farm-level'`` row counts only where the household has
-          no plot row of that crop (see Notes).
+          no plot row of that crop, and an ``unknown_plot`` row does not count
+          at all (see Notes).
         - ``'value'`` -- ``p_c`` is crop ``c``'s share of the household's
           reported ``Value_sold``.  **Covers SOLD output only**, so a
           household that sold one crop and ate three scores ``H = 0``:
@@ -7690,6 +7719,16 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     1987-88 and 1988-89, which a blanket filter would delete.  The ``'value'``
     basis keeps every such row: that is where the sale value is.
 
+    **An ``unknown_plot`` row is not an occurrence (GH #1460).**  Each distinct
+    plot counts once, and such a row names no plot: two of them may be one plot
+    or two.  The ``'count'`` basis leaves them out, before the ``Farm-level``
+    rule, so only a real plot can make a ``Farm-level`` row redundant.  A
+    household with no other crop row then has no score.  Reported in
+    ``result.attrs['unknown_plot_excluded']`` as ``{'rows', 'households_lost'}``:
+    Uganda 403 rows, 173 of 16,561 households move and 6 are lost; Malawi 41
+    rows, 22 of 36,682 move and 3 are lost.  The ``'value'`` basis keeps them,
+    because a sale share has no land key.
+
     **Not comparable across countries on the ``'count'`` basis.**  The
     occurrence key uses whichever of the land and season levels the
     country's ``crop_production`` carries -- ``(plot, season)`` for Uganda,
@@ -7726,6 +7765,7 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
             "or wire a planted-area column first.")
 
     flat = df.reset_index()
+    unknown_excluded = None
     if weight == 'value':
         if value_col not in flat.columns:
             raise ValueError(
@@ -7738,6 +7778,15 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     else:
         plot_level = _resolve_plot_level(names)
         if plot_level is not None:
+            unknown = flat[plot_level].astype('object').eq(
+                _PLOT_UNKNOWN).to_numpy(dtype=bool)
+            households = flat[group_by].drop_duplicates()
+            flat = flat[~unknown]
+            unknown_excluded = {
+                'rows': int(unknown.sum()),
+                'households_lost': len(households) - len(
+                    flat[group_by].drop_duplicates()),
+            }
             flat = _without_redundant_farm_level(flat, crop_level, plot_level)
         occurrence = [n for n in [plot_level, 'season']
                       if n is not None and n in flat.columns]
@@ -7759,7 +7808,10 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     h = -term.groupby(group_by).sum(min_count=1).dropna()
     # -0.0 for the single-crop case reads badly; normalise it away.
     h = h + 0.0
-    return h.to_frame('Crop_diversity').sort_index()
+    out = h.to_frame('Crop_diversity').sort_index()
+    if unknown_excluded is not None:
+        out.attrs['unknown_plot_excluded'] = unknown_excluded
+    return out
 
 
 # ===========================================================================

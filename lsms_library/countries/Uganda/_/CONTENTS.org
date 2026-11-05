@@ -4969,7 +4969,7 @@ The existing conditional null-key loss, reducers, units, plot construction,
 weights and second-season seed coverage gap remain. This does not resolve
 #829 WAITING, #647 PART-harvest additivity or the 2019 panel-weight questions.
 
-* =unknown_plot= and =harvest_kg=: GH #1460 (noted 2026-11-04, not fixed here)
+* =unknown_plot= and =harvest_kg=: GH #1460 (noted 2026-11-04, excluded and reported since)
 
 =transformations.harvest_kg= groups at =(t, i, plot_id, j)=, so it pools a household's
 =unknown_plot= rows of one crop as if they were one plot, which the canonical
@@ -4980,6 +4980,10 @@ Measured at this branch: 403 =crop_production= rows are =unknown_plot= (2009-10 
 #1460's first defect, summing across crops, does not reach this country; the
 =condition= sum and this pooling do.  =plot_inputs= holds 136 =unknown_plot= rows and
 =plot_labor= 141.
+
+=harvest_kg= and =crop_diversity(weight='count')= now leave these rows out, per the rule, and
+report them in =attrs['unknown_plot_excluded']=: =Harvest_kg= rows 89,207 -> 88,980, the 70,277 kg
+reported rather than served.  The =condition= sum stands.
 
 * GH1120 locating covers and singletons (2026-10-30, independent review pending)
 

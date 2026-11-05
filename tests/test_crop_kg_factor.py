@@ -585,17 +585,12 @@ def test_uganda_harvest_kg_baseline():
     # stays what it was; these are the pins to trust.
     assert len(cp) == 134_164
     assert (cp.index.get_level_values("plot_id") != "unknown_plot").sum() == 133_761
-    known = res[res.index.get_level_values("plot_id") != "unknown_plot"]
-    assert len(known) == 88_980
-    assert known["Harvest_kg"].sum() == pytest.approx(42_026_694.99297963, rel=1e-9)
-    # NOT a rule: these totals pin a known defect.  `harvest_kg` keeps
-    # `unknown_plot` and pools it at (t, i, plot_id, j) into 227 rows and
-    # 70,277.25 kg, where the consumer rule in lsms_library/data_info.yml says to
-    # exclude it from any per-plot quantity and report the count.  GH #1460; both
-    # lines (and the source counts, if the rows are excluded before them) will
-    # move if that is ruled.
-    assert len(res) == 89_207
-    assert res["Harvest_kg"].sum() == pytest.approx(42_096_972.24297963, rel=1e-9)
+    # GH #1460, ruled @ligon 2026-11-04: `harvest_kg` excludes `unknown_plot` and
+    # reports it, per the consumer rule in lsms_library/data_info.yml.
+    assert len(res) == 88_980
+    assert res["Harvest_kg"].sum() == pytest.approx(42_026_694.99297963, rel=1e-9)
+    assert res.attrs["unknown_plot_excluded"] == {
+        "rows": 403, "rows_with_kg": 304, "kg": pytest.approx(70_277.25)}
     assert res.attrs["kg_factor_sources"] == {
         "reported": 96_777, "shipped": 0, "survey_median": 4_841,
         "metric": 23_679, "inferred": 0, "none": 8_867,
