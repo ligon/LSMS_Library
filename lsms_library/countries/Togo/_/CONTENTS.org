@@ -814,4 +814,12 @@ through =harmonize_crop_condition_ehcvm1=.
 blank unit on all 606.  The answer describes the harvest quantity only: =s16cq16c= is the sold state, not served (GH #1462).
 2021-22 is held and not wired (GH #552), so the level reaches no 2021-22 row.  When it is wired, read its code list before reusing this table: Niger's and Senegal's 2021-22 lists have three answers, and code 3 means something else there.
 
+*The printed forms are not what was fielded.*  All three held Excel forms
+(=tgo_ehcvm1_qnr_household_excel_vague1.xls=, =..._vague2.xls=, =EHCVM_UEMOA_MEN_TOGO_V2.xls=, sheet
+=S16c_Agri=) print eight answers: 1 épis, 2 grain, 3 Tubercule, 4 Gousse, 5 Régime, 6 décortiqué,
+7 non-décortiqué, 8 non-concerné.  The file holds codes 1-5 in both vagues under the shared five labels,
+and its crops fit the labels and not the form: code 3 falls on cotton (82), maize (64) and groundnut (54),
+none of them a tuber, and code 5 on yam (587), cotton (575) and cassava (362), none of them a bunch.  So the
+=.dta= list is what was fielded, and it is the one this table reads.
+
 *Cost:* one Togo re-warm (=data_scheme.yml=, =categorical_mapping.org= and the wave script).
