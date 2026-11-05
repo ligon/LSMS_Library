@@ -3202,12 +3202,17 @@ All of the movement is on the 309 rows, 261,596 -> 346,373 kg:
 | carts, =Autre=, =Grenier=, others | 73 | none  |  57,269 |
 
 *Idiosyncrasies.*
-- *One row is 23% of the survey's kilograms.*  4 sacks of 100 kg, unfinished, stated at 80,000 kg.  Site Q does not
-  name it: its cell's scale is a total's, and 80,000 is under 100 x the p90.  Served, as recorded.  Without it the
-  sacks are 62,873 kg against a nominal 110,450.
-- *=kg == q= on sacks.*  On 9 of the 81 =Sac (100 Kg)= rows and 4 of the 21 =Sac (50 Kg)= the kilograms equal the sack
-  count, so the survey says 1 kg per sack.  35 of the 81 are exactly 100.  =survey_kg_vs_metric=: 62 of 236 disagree by
-  more than 10%.
+- *The survey's kilograms are 4.9% of the wave, and mostly a part of the season.*  346,373 of 7,062,291 kg; =metric= on the
+  derived harvests is the rest.  285 of the 306 rows are unfinished, so they carry =harvest-to-date= too.  This is a
+  small, different population from Niger's column, and no statement about Niger's carries over.
+- *One row is 23% of the survey's kilograms, 1.1% of the wave.*  4 sacks of 100 kg, unfinished, stated at 80,000 kg.  Site
+  Q does not name it: its cell's scale is a total's, and 80,000 is under 100 x the p90.  Served, as recorded.  Without it
+  the sacks are 62,873 kg against a nominal 110,450.  The wave's largest row is a metric one, 750,200 kg, 10.6%.
+- *Sacks barely scale.*  Log-log slope of kg on q on =Sac (100 Kg)= is 0.42, against 1.00 on =Kg= and 0.91 for Niger's
+  2021-22 sacks.  On 9 of the 81 rows and 4 of the 21 =Sac (50 Kg)= the kilograms equal the sack count, so the survey says
+  1 kg per sack; 35 of the 81 are exactly 100; 34 of the 81 are under 20 kg per sack.  On rows with a stated-mass label
+  and both answers the survey says 289,104 against 261,596 nominal: 30 under 0.1x the label (1,488 / 69,300), 2 over 10x
+  (92,000 / 1,000).  =survey_kg_vs_metric=: 62 of 236 disagree by more than 10%.
 - *=Autre= is where the column earns its keep.*  8 of the 11 rows specify tonnes in =s16cq16b_autre=, and 6 state 1,000
   kg per unit.  A factor of 1,000 would fail =KG_FACTOR_MAX=; a total need not meet it.
 - *3 rows state 0 kg* beside a positive quantity (=Autre= 2, =Cart (donkey)= 1).  No answer, not a harvest of nothing,

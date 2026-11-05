@@ -290,7 +290,7 @@ Mali::crop_production::harvest-to-date:
     which needs a finished crop and no recorded quantity.
   function: lsms_library.countries.Mali._.mali:derive_harvest_to_date
   inputs: lsms_library.countries.Mali._.mali:inputs_harvest_to_date
-  raw_variables: [s16cq10, s16cq11, s16cq12, s16cq12a, s16cq12b, s16cq16a, s16cq16b]
+  raw_variables: [s16cq10, s16cq11, s16cq12, s16cq12a, s16cq12b, s16cq16a, s16cq16b, s16cq16c]
   assumptions:
     - text: >-
         the recorded quantity on an unfinished row is what has been harvested so far,

@@ -1262,20 +1262,24 @@ _HARVEST_WINDOW_RAW = {
     '2021-22': ('s16c_me_mli2021.dta', 's16cq11', 's16cq12', 's16cq16a', 's16cq16b'),
 }
 
+#: The window key also covers ``Quantity_kg``, where the wave asks kilograms (GH #1436).
+_HARVEST_WINDOW_KG = {'2021-22': ['s16cq16c']}
+
 
 def inputs_harvest_to_date(wave):
     """The answers behind one wave's window keys, at (t, i, plot_id, crop).
 
     The registry ``inputs`` callable for ``harvest-to-date``: "finished?", the share
-    still to harvest, the quantity and its unit, as recorded.
+    still to harvest, the quantity and its unit, and the kilograms where the wave asks
+    them, as recorded.
     """
     name, finished, left, quantity, unit = _HARVEST_WINDOW_RAW[wave]
     src = _ehcvm_keyed(wave, name, 's16cq04')
     src['plot_id'] = ehcvm_plot_ids(src)
     keep = (src[finished].astype('string').str.strip().eq('Non')
             & pd.to_numeric(src[quantity], errors='coerce').notna())
-    return src.loc[keep, ['t', 'i', 'plot_id', 'crop', finished, left, quantity,
-                          unit]].set_index(['t', 'i', 'plot_id', 'crop'])
+    return src.loc[keep, ['t', 'i', 'plot_id', 'crop', finished, left, quantity, unit]
+                   + _HARVEST_WINDOW_KG.get(wave, [])].set_index(['t', 'i', 'plot_id', 'crop'])
 
 
 def inputs_survey_kg_estimate(wave):

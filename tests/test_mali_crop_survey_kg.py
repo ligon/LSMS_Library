@@ -65,7 +65,9 @@ class TestDeclared:
         assert "s16cq16c" in record["raw_variables"]
 
     def test_the_window_key_covers_the_kilograms(self):
-        assert "Quantity_kg" in records_for(COUNTRY, TABLE)[WINDOW]["columns"]
+        record = records_for(COUNTRY, TABLE)[WINDOW]
+        assert "Quantity_kg" in record["columns"]
+        assert "s16cq16c" in record["raw_variables"]
 
 
 def _household(frame):
@@ -152,6 +154,21 @@ class TestServed:
         got = got[got["Quantity_kg"].notna()]
         on = ["i", "plot_id", "crop"]
         assert sorted(map(tuple, raw[on].to_numpy())) == sorted(map(tuple, got[on].to_numpy()))
+
+    def test_the_window_inputs_hold_the_kilograms(self, built):
+        country, _ = built
+        raw = country.derivation_inputs(WINDOW).reset_index()
+        assert "s16cq16c" in raw.columns
+        recent = raw[raw["t"] == WAVE]
+        assert pd.to_numeric(recent["s16cq16c"], errors="coerce").notna().all()
+        assert pd.to_numeric(raw.loc[raw["t"] != WAVE, "s16cq16c"], errors="coerce").isna().all()
+
+    def test_a_harvest_kg_reader_can_see_the_estimate(self, built):
+        _, df = built
+        res = harvest_kg(df)
+        got = self._wave(built)
+        assert res.attrs["derivations"]["Mali"][ESTIMATE]["rows"] == int(got["Quantity_kg"].notna().sum())
+        assert res.attrs["survey_kg_rows_by_wave"][WAVE] == int(got["Quantity_kg"].gt(0).sum())
 
     def test_the_rung_serves_every_positive_total_and_only_those(self, built):
         _, df = built
