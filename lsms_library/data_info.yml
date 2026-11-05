@@ -496,8 +496,10 @@ Columns:
       # The design PSU where a country's `v` is not one (GH #689; Uganda only
       # today).  It is the enumeration area a household was SAMPLED in, carried
       # with it when it moves, so it says how the sample was drawn and is a
-      # poor location key.  It is NOT `v`, is not joined onto other tables, and
-      # is NA where the survey offers no route to it: never filled from `v`.
+      # poor location key.  It is NOT `v` and is not joined onto other tables.  It is
+      # NA where the survey offers no route to it.  Where the EA is what `v` already
+      # holds, under another label, `ea` serves it on one scale (Uganda's early waves,
+      # from `comm`, GH #1459); a `v` that is not an EA, such as a GPS bin, never fills it.
       type: str
       optional: true
     InterviewResult:

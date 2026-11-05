@@ -1,24 +1,33 @@
 Uganda::sample::agriculture-cover: &agriculture_cover
   waves: ['2015-16']
-  columns: [v]
+  columns: [v, ea]
   rows: {}
   rule: >-
     A household recorded in AGSEC1 and absent from gsec1 takes its recorded
-    AGSEC1 parish_code, formatted by the existing country format_id rule.
+    AGSEC1 parish_code, formatted by the existing country format_id rule, and
+    on sample its recorded AGSEC1 ea, the design PSU of origin, as recorded (the
+    function is the parish rule; ea needs only the same format_id).
     HH-covered households retain every HH-cover answer, including nulls.
     AGSEC1 hwgt_W5 supplies panel_weight only; cross-sectional weight is absent.
     No geographic component is inferred or carried from another wave.
   function: lsms_library.countries.Uganda._.uganda:derive_agriculture_cover_v
   inputs: lsms_library.countries.Uganda._.uganda:inputs_agriculture_cover
-  raw_variables: [HHID, parish_code, hwgt_W5, sregion, urban, region, district]
+  raw_variables: [HHID, parish_code, ea, hwgt_W5, sregion, urban, region, district]
   assumptions:
     - text: The agriculture cover records eligible households even without a completed household questionnaire.
       basis: modelling-choice
       evidence: Owner rulings GH1120 comments 6367256988 and 6380186741 (2026-10-23/24).
+    - text: AGSEC1.ea and gsec1.ea are one variable, so a household only AGSEC1 records can take AGSEC1.ea.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon, 2026-11-04.  The two are equal on all 2,622 households both
+        covers hold, and the build raises if a release breaks that.
   validated_against: Focused helper tests; bounded source verification recorded in dispatch evidence. Independent root acceptance pending.
   contents: Uganda/_/CONTENTS.org, GH1120 locating covers and singletons
   since: '2026-10-30'
-Uganda::cluster_features::agriculture-cover: *agriculture_cover
+Uganda::cluster_features::agriculture-cover:
+  <<: *agriculture_cover
+  columns: [v]
 
 Uganda::sample::unlocated-identity: &unlocated_identity
   waves: all
@@ -47,13 +56,14 @@ Uganda::sample::ea-tracking-key:
   columns: [ea]
   rows: {}
   rule: >-
-    A household with no ea of its own takes the gsec1.ea of the 2015-16
-    household its tracking key names. 2018-19: GSEC1.t0_hhid -> 2015-16
-    gsec1.HHID. 2019-20: gsec1.hhidold -> 2018-19 GSEC1.hhid -> t0_hhid ->
-    2015-16 gsec1.HHID. Raw source ids through format_id, never the walked
-    household id. A household the chain does not reach stays NA: a blank
-    hhidold is not a link, and nothing is read from the parish or parsed out
-    of an id. v is not involved and does not change.
+    A household with no ea of its own takes the 2015-16 ea of the household
+    its tracking key names, from gsec1 or, for a household only AGSEC1 records,
+    from AGSEC1. 2018-19: GSEC1.t0_hhid -> 2015-16 HHID. 2019-20: gsec1.hhidold
+    -> 2018-19 GSEC1.hhid -> t0_hhid -> 2015-16 HHID. Raw source ids through
+    format_id, never the walked household id. A household the chain does not
+    reach stays NA: a blank hhidold is not a link, AGSEC1.t0_hhid is not
+    followed, and nothing is read from the parish or parsed out of an id. v is
+    not involved and does not change.
   function: lsms_library.countries.Uganda._.uganda:derive_inherited_ea
   inputs: lsms_library.countries.Uganda._.uganda:inputs_inherited_ea
   raw_variables: [hhid, t0_hhid, hhidold, HHID, ea]
@@ -83,3 +93,51 @@ Uganda::sample::ea-tracking-key:
     without importing this module; CONTENTS.org records the before/after.
   contents: Uganda/_/CONTENTS.org, "The design PSU ea (GH #689)"
   since: '2026-11-03'
+
+Uganda::sample::ea-comm-link:
+  waves: ['2005-06', '2009-10', '2010-11', '2011-12']
+  columns: [ea]
+  rows: {}
+  rule: >-
+    An early-wave household whose frame EA is one of the 212 the survey numbers
+    from 2013-14 takes that number, through the reviewed comm_ea table. comm is
+    first served as its 8-digit frame code (comm_frame_ea). A blank comm or a
+    code that is not 8 digits stays NA. v is not involved and does not change.
+  function: lsms_library.countries.Uganda._.uganda:derive_comm_ea
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_ea_comm_link
+  raw_variables: [HHID, comm, HHID_old, ea]
+  assumptions:
+    - text: comm and ea are two labels of one frame EA, so a household on a comm in an early wave is on the paired ea.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon, 2026-11-04 (GH #1459).  No document states it.  On the 1,717
+        households linked 2011-12 -> 2013-14 by HHID_old, 212 comm and 212 ea pair
+        one-to-one (shuffled, 1,684 pairs).  ea is also the rank of comm among the 322
+        frame EAs of 2005-06, sorted, on all 212, which does not read a household.
+  validated_against: >-
+    tests/test_gh1459_uganda_early_ea.py re-derives the table from the raw covers
+    without importing this module.
+  contents: Uganda/_/CONTENTS.org, "One label across all eight waves (GH #1459)"
+  since: '2026-11-04'
+
+Uganda::sample::ea-own-comm:
+  waves: ['2005-06', '2009-10', '2010-11', '2011-12']
+  columns: [ea]
+  rows: {}
+  rule: >-
+    An early-wave household whose frame EA is one of the 110 rotated out before
+    2013-14 takes its own 8-digit comm as ea, since no household links it to a
+    number. It cannot collide with the labels 1-430. comm is first served as its
+    8-digit frame code (comm_frame_ea). v is not involved and does not change.
+  function: lsms_library.countries.Uganda._.uganda:derive_comm_ea
+  inputs: lsms_library.countries.Uganda._.uganda:inputs_ea_own_comm
+  raw_variables: [HHID, comm]
+  assumptions:
+    - text: A label of a different form is an acceptable way to name these 110 PSUs in one column.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon, 2026-11-04 (GH #1459).  A standard error clustered on ea needs
+        only that a label names one PSU; it reads neither the label's form nor its order.
+  validated_against: tests/test_gh1459_uganda_early_ea.py
+  contents: Uganda/_/CONTENTS.org, "One label across all eight waves (GH #1459)"
+  since: '2026-11-04'

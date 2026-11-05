@@ -18,9 +18,12 @@ Data Scheme:
     # The design PSU (GH #689): the EA a household was SAMPLED in, carried with
     # it when it moves.  `v` is a parish from 2013-14, so a design-based standard
     # error wants this column, and a location wants `v`.  Direct in 2013-14 and
-    # 2015-16; inherited through the survey's tracking key in 2018-19 and 2019-20
-    # (Derivation `Uganda::sample::ea-tracking-key`).  NA where there is no route,
-    # and in 2005-06 to 2011-12, where `v` is already the EA.
+    # 2015-16, with `AGSEC1.ea` for the 72 households only it records (Derivation
+    # `Uganda::sample::agriculture-cover`); inherited through the survey's tracking
+    # key in 2018-19 and 2019-20 (Derivation `Uganda::sample::ea-tracking-key`).  NA
+    # where there is no route.  In 2005-06 to 2011-12, from `comm` through the `comm_ea`
+    # table, so one label names a PSU across all eight waves (Derivations
+    # `Uganda::sample::ea-comm-link` and `ea-own-comm`, GH #1459).
     ea:
       type: str
       optional: true
@@ -162,7 +165,9 @@ Data Scheme:
     #   j      — crop, on the shared 'harmonize_crop' Preferred Labels,
     #            which REUSE the harmonize_food Aggregate Label strings
     #            for food crops (Maize, Beans, Rice, ...) so a crop j
-    #            joins food_acquired(labels='Aggregate').j.
+    #            joins food_acquired(labels='Aggregate').j.  Since GH #833 a
+    #            bare staple there is its harvest-state bucket: crop Maize meets
+    #            food Maize, which is grains, not maize flour.
     #   u      — reported native harvest unit ('harvest_units' table);
     #            'Unknown' where a wave-season records no harvest unit
     #            column.  Since GH #842 that is 2018-19 season A ONLY

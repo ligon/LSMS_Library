@@ -69,6 +69,11 @@ sample:
             v:
                 - comm
                 - mappings: comm_frame_ea
+            # The design PSU, on one label across all eight waves (GH #1459).  NA
+            # for a blank comm: a GPS bin is not an EA.
+            ea:
+                - comm
+                - mappings: comm_ea
             weight: wgt09
             panel_weight: wgt09  # pre-refreshment — same as cross-sectional
             strata: stratum

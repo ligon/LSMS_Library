@@ -52,6 +52,10 @@ sample:
         myvars:
             _cover: HHID
             v: comm
+            # The design PSU, on one label across all eight waves (GH #1459).
+            ea:
+                - comm
+                - mappings: comm_ea
             weight: mult
             panel_weight: mult  # pre-refreshment — same as cross-sectional
             strata: sregion

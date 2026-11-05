@@ -109,11 +109,16 @@ sample:
     # GH #689: the design PSU, which no file of this wave ships.  The country
     # hook `origin_ea` re-keys this 2015-16 frame to this wave's `hhid` through
     # GSEC1.t0_hhid, the survey's own tracking key; a household it does not
-    # reach stays NA.  Declared here so the file's sidecar is in this wave's
+    # reach stays NA.  Declared here so the files' sidecars are in this wave's
     # input hash, and so that a loss the GH #515 handler catches costs `ea`, not
     # `v`.  An unreachable remote is not caught: `sample` raises here (GH #1463).
+    # Two files because a tracking key can name a household only 2015-16's
+    # AGSEC1 records (ruling 2026-11-04).  The key stays GSEC1's: AGSEC1.t0_hhid
+    # disagrees with it on 86 households and is not read.
     origin_ea:
-        file: ../../2015-16/Data/gsec1.dta
+        file:
+            - ../../2015-16/Data/gsec1.dta
+            - ../../2015-16/Data/AGSEC1.dta
         idxvars:
             i: HHID
         myvars:
