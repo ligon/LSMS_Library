@@ -243,7 +243,7 @@ class TestTheFoodDispatch:
         """Only this class leaves the catch.  A bare call to a table the legacy path
         can answer still gets that chance, and logs why."""
         c, _ = country
-        monkeypatch.setattr(C.Country, '_proven_absent', lambda *a: False)
+        monkeypatch.setattr(C.Country, '_proven_absent', lambda *a: False, raising=False)
         real = C.Country._aggregate_wave_data
         seen = []
 
