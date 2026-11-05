@@ -4084,11 +4084,11 @@ def assemble_plot_inputs(t, input_pieces, seed_purchase_pieces=None,
 #                      transformations, NOT stored columns.  Malawi reports
 #                      no herd-total value column, so we carry the honest
 #                      per-head figure rather than fabricating a total.
-#   * Owned         -- ag_r01 as answered (True / False / NA), GH #1435.  It is
+#   * RaisedOrOwned -- ag_r01 as answered (True / False / NA), GH #1435.  It is
 #                      about the last 12 months, so True beside HeadCount 0 is an
 #                      answer: "During the last 12 months, have you or any member
 #                      of your household raised or owned any [LIVESTOCK]?" is the
-#                      question the IHS3, IHPS 2013 and IHS5 agriculture
+#                      question the IHS3, IHPS 2013, IHS4 and IHS5 agriculture
 #                      questionnaires print.  The Stata labels of the 2016-17 and
 #                      2019-20 files shorten it to "Did you own [LIVESTOCK]?".
 #
@@ -4118,10 +4118,10 @@ def _livestock_block(df, *, hhid, animalcode, owned_flag='ag_r01',
     lacks that field).  ``df`` must already carry an ``hhid`` string column.
     Returns a long DataFrame at grain (t, i, animal) with the reported item
     columns (HeadCount, HeadAcquired, HeadSold, ValuePerAnimal,
-    HeadCount12MonthsAgo, Owned) and an internal ``_animal_code`` used for the
+    HeadCount12MonthsAgo, RaisedOrOwned) and an internal ``_animal_code`` used for the
     keep-filter / dedup.  NO aggregation.
 
-    ``Owned`` is ``owned_flag`` (ag_r01) as answered, 1 True, 2 False, anything
+    ``RaisedOrOwned`` is ``owned_flag`` (ag_r01) as answered, 1 True, 2 False, anything
     else NA (GH #1435).  It keeps a row kept on that answer alone in the table,
     where before its five questions left it with no payload.  A False row exists
     only for a positive count elsewhere on it.
@@ -4171,7 +4171,7 @@ def _livestock_block(df, *, hhid, animalcode, owned_flag='ag_r01',
         'HeadSold':     sold_n.values,
         'ValuePerAnimal': val.values,
         'HeadCount12MonthsAgo': prior.values,
-        'Owned':        owned.array,
+        'RaisedOrOwned': owned.array,
         '_owns':        owns.values,
     })
     # Keep a roster row when the household genuinely holds the species:
@@ -4199,7 +4199,7 @@ def assemble_livestock(t, pieces):
     Returns
     -------
     pd.DataFrame indexed (t, i, animal) with columns HeadCount,
-    HeadAcquired, HeadSold, ValuePerAnimal, HeadCount12MonthsAgo, Owned.
+    HeadAcquired, HeadSold, ValuePerAnimal, HeadCount12MonthsAgo, RaisedOrOwned.
     Item-level reported values only.
     """
     cat = pd.concat(pieces, ignore_index=True)
@@ -4217,7 +4217,7 @@ def assemble_livestock(t, pieces):
     # head columns add over the lines and a BLANK STAYS BLANK (min_count=1),
     # so a recorded 0 and an unanswered cell stay different things; the
     # per-head ValuePerAnimal is not additive and takes the first reported, and
-    # so does Owned, which is a no-op only because no such pair exists.
+    # so does RaisedOrOwned, which is a no-op only because no such pair exists.
     cat['t'] = t
     keys = ['t', 'i', 'animal']
     grouped = cat.groupby(keys, as_index=False, dropna=False)
@@ -4228,10 +4228,10 @@ def assemble_livestock(t, pieces):
     if not value[keys].equals(grp[keys]):
         raise ValueError('Malawi livestock reducer groups disagree')
     grp['ValuePerAnimal'] = value['ValuePerAnimal'].array
-    if 'Owned' in cat.columns:
-        grp['Owned'] = grouped['Owned'].first()['Owned'].array
+    if 'RaisedOrOwned' in cat.columns:
+        grp['RaisedOrOwned'] = grouped['RaisedOrOwned'].first()['RaisedOrOwned'].array
     columns = [c for c in ('HeadCount', 'HeadAcquired', 'HeadSold',
-                           'ValuePerAnimal', 'HeadCount12MonthsAgo', 'Owned')
+                           'ValuePerAnimal', 'HeadCount12MonthsAgo', 'RaisedOrOwned')
                if c in grp.columns]
     out = grp.set_index(keys)[columns]
     assert out.index.is_unique, f"Non-unique (t,i,animal) in livestock {t}"

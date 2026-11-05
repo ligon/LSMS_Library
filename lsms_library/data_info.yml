@@ -817,20 +817,19 @@ Columns:
       note: |
         Head SOLD alive during the recall window.  A flow, and the
         denominator that turns SalesValue into a per-animal sale price.
-    Owned:
+    RaisedOrOwned:
       type: bool
       optional: true
       note: |
-        The survey's own answer to whether the household held this animal,
-        True / False as answered, NA where unanswered (Malawi Module R ag_r01,
-        GH #1435).  NOT a stock and NOT ownership at interview: Owned True
-        beside HeadCount 0 is an answer.  The wording differs by source, so do
-        not read it as "owned" alone.  Malawi 2010-11 and 2013-14 ask "During
-        the last 12 months, have you or any member of your household raised or
-        owned any [LIVESTOCK]?" (Stata label and questionnaire).  2016-17 and
-        2019-20's Stata label says "Did you own [LIVESTOCK]?", but the 2019-20
-        agriculture questionnaire prints the same "raised or owned" question,
-        and no 2016-17 agriculture questionnaire is held.
+        The survey's own answer to whether the household raised or owned this
+        animal in the last 12 months, True / False as answered, NA where
+        unanswered (Malawi Module R ag_r01, GH #1435; named Owned until
+        2026-11-05).  NOT a stock and NOT ownership at interview: RaisedOrOwned
+        True beside HeadCount 0 is an answer.  The IHS3, IHPS 2013, IHS4 and IHS5
+        agriculture questionnaires print "During the last 12 months, have you or
+        any member of your household raised or owned any [LIVESTOCK]?".  The
+        Stata label of the 2016-17 and 2019-20 files shortens it to "Did you own
+        [LIVESTOCK]?", which is not a different question.
     HeadCount12MonthsAgo:
       type: float
       note: |

@@ -10,9 +10,9 @@ add.
 
 Serving blanks as blanks left 5 rows answering only the species gate ``ag_r01``
 with no payload, so they stopped being served.  The maintainer's ruling
-(2026-11-04) keeps them: ``ag_r01`` is served as ``Owned``, as answered, and the
-deletion registered for a day is gone.  So the rows are 39,126 in the wave frames
-and at the API alike.
+(2026-11-04) keeps them: ``ag_r01`` is served as ``RaisedOrOwned``, as answered, and
+the deletion registered for a day is gone.  So the rows are 39,126 in the wave frames
+and at the API alike.  (The column was named ``Owned`` until the ruling of 2026-11-05.)
 
 Two tiers: static (synthetic rosters, no microdata) and source-gated (the six
 Module R files read directly, with an oracle that never enters the reducer).
@@ -28,12 +28,13 @@ import lsms_library as ll
 from lsms_library.derivations import derivation_records
 from lsms_library.local_tools import format_id, get_dataframe
 from lsms_library.paths import countries_root, data_root
+from lsms_library.yaml_utils import load_yaml
 
 MALAWI = countries_root() / 'Malawi'
 HEAD_COLUMNS = {'HeadCount': 'ag_r02', 'HeadAcquired': 'ag_r10', 'HeadSold': 'ag_r16',
                 'HeadCount12MonthsAgo': 'ag_r07'}
 COLUMN_ORDER = ['HeadCount', 'HeadAcquired', 'HeadSold', 'ValuePerAnimal',
-                'HeadCount12MonthsAgo', 'Owned']
+                'HeadCount12MonthsAgo', 'RaisedOrOwned']
 WAVES = ['2010-11', '2013-14', '2016-17', '2019-20']
 REMOVED_KEY = 'Malawi::livestock::owned-species-no-payload'
 
@@ -103,8 +104,8 @@ def test_value_per_animal_is_not_additive_and_columns_keep_their_order(malawi):
     assert _cell(out, '1', 'ValuePerAnimal') == 7.0
     assert list(out.columns) == COLUMN_ORDER
     assert list(out.index.names) == ['t', 'i', 'animal']
-    assert (out.drop(columns='Owned').dtypes == pd.Float64Dtype()).all()
-    assert out['Owned'].dtype == pd.BooleanDtype()
+    assert (out.drop(columns='RaisedOrOwned').dtypes == pd.Float64Dtype()).all()
+    assert out['RaisedOrOwned'].dtype == pd.BooleanDtype()
 
 
 def test_blanks_do_not_decide_the_keep_filter(malawi):
@@ -122,7 +123,7 @@ def test_an_owned_species_with_no_answers_keeps_its_answer_and_mints_no_zero(mal
     assert sorted(out.index.get_level_values('i')) == ['1', '2']
     blank = out.xs('1', level='i')
     assert blank[list(HEAD_COLUMNS) + ['ValuePerAnimal']].isna().all(axis=None)
-    assert bool(blank['Owned'].iloc[0]) is True
+    assert bool(blank['RaisedOrOwned'].iloc[0]) is True
 
 
 def test_owned_is_the_answer_as_given(malawi):
@@ -130,7 +131,7 @@ def test_owned_is_the_answer_as_given(malawi):
     out = _assemble(malawi, hhid=['1', '2', '3', '4'], ag_r0a=[301] * 4,
                     ag_r01=[1, 2, pd.NA, 9], ag_r02=[0.0, 3.0, 3.0, 3.0],
                     ag_r10=[0.0] * 4, ag_r16=[0.0] * 4, ag_r04=[5.0] * 4, ag_r07=[1.0] * 4)
-    owned = out['Owned'].droplevel(['t', 'animal'])
+    owned = out['RaisedOrOwned'].droplevel(['t', 'animal'])
     assert bool(owned['1']) is True
     assert bool(owned['2']) is False
     assert pd.isna(owned['3']) and pd.isna(owned['4'])
@@ -140,7 +141,7 @@ def test_a_wave_without_the_gate_serves_na(malawi):
     block = malawi._livestock_block(
         pd.DataFrame({'hhid': ['1'], 'ag_r0a': [301], 'ag_r02': [2.0]}),
         hhid='hhid', animalcode='ag_r0a', t='2010-11')
-    assert pd.isna(malawi.assemble_livestock('2010-11', [block])['Owned'].iloc[0])
+    assert pd.isna(malawi.assemble_livestock('2010-11', [block])['RaisedOrOwned'].iloc[0])
 
 
 def test_the_deletion_is_gone_with_its_machinery(malawi):
@@ -151,14 +152,27 @@ def test_the_deletion_is_gone_with_its_machinery(malawi):
         assert not hasattr(malawi, name), name
 
 
-def test_owned_is_declared_and_says_how_the_wording_differs():
+def test_raised_or_owned_is_declared_and_says_how_the_wording_differs():
     canonical = yaml.safe_load((MALAWI.parents[1] / 'data_info.yml').read_text())
-    declared = canonical['Columns']['livestock']['Owned']
+    declared = canonical['Columns']['livestock']['RaisedOrOwned']
     assert declared['type'] == 'bool'
     assert declared.get('optional') is True
     assert 'raised or' in declared['note'] and 'Did you own' in declared['note']
     scheme = yaml.safe_load((MALAWI / '_' / 'data_scheme.yml').read_text())['Data Scheme']
-    assert scheme['livestock']['Owned'] == {'type': 'bool', 'optional': True}
+    assert scheme['livestock']['RaisedOrOwned'] == {'type': 'bool', 'optional': True}
+
+
+def test_the_rename_reaches_malawi_livestock_and_nothing_else_named_owned():
+    """``Owned`` is gone from the livestock declarations.  Tanzania's ``plot_features``
+    column and Kosovo's tenure label share the word and not the question, so they stay."""
+    root = MALAWI.parent
+    canonical = yaml.safe_load((root.parent / 'data_info.yml').read_text())
+    assert 'Owned' not in canonical['Columns']['livestock']
+    scheme = yaml.safe_load((MALAWI / '_' / 'data_scheme.yml').read_text())['Data Scheme']
+    assert 'Owned' not in scheme['livestock']
+    tanzania = load_yaml(root / 'Tanzania' / '_' / 'data_scheme.yml')['Data Scheme']
+    assert tanzania['plot_features']['Owned'] == 'bool'
+    assert "1.0: 'Owned'" in (root / 'Kosovo' / '2000' / '_' / 'plot_features.py').read_text()
 
 
 def _source(relative, id_column, prefix):
@@ -181,7 +195,16 @@ def test_every_stored_row_is_served():
 
     stored = pd.read_parquet(data_root() / 'Malawi' / 'var' / 'livestock.parquet')
     assert keys(stored) == keys(served)
-    assert served['Owned'].notna().all()
+    assert served['RaisedOrOwned'].notna().all()
+
+
+@pytest.mark.requires_s3
+def test_feature_livestock_carries_one_column_for_the_answer():
+    """No column split at assembly, and no other country is given an answer."""
+    pooled = ll.Feature('livestock')(['Malawi', 'Tanzania'])
+    assert 'Owned' not in pooled.columns
+    assert pooled.xs('Malawi', level='country')['RaisedOrOwned'].notna().all()
+    assert pooled.xs('Tanzania', level='country')['RaisedOrOwned'].isna().all()
 
 
 @pytest.mark.requires_s3
@@ -209,7 +232,7 @@ def test_a_line_answering_only_the_gate_is_served(malawi, wave):
         [served.index.get_level_values(n).astype(str) for n in served.index.names],
         names=served.index.names)
     got = served.loc[expected]
-    assert got['Owned'].astype(bool).all()
+    assert got['RaisedOrOwned'].astype(bool).all()
     assert got[list(HEAD_COLUMNS) + ['ValuePerAnimal']].isna().all(axis=None)
 
 
@@ -227,7 +250,7 @@ def test_served_cells_equal_the_source_cells(malawi, wave):
         kept = ((pd.to_numeric(raw['ag_r01'], errors='coerce') == 1)
                 | (num['HeadCount'] > 0) | (num['HeadSold'] > 0) | (num['HeadAcquired'] > 0))
         frame = pd.DataFrame({'i': raw['hhid'].astype(str), **num})
-        frame['Owned'] = pd.to_numeric(raw['ag_r01'], errors='coerce').map(
+        frame['RaisedOrOwned'] = pd.to_numeric(raw['ag_r01'], errors='coerce').map(
             {1: True, 2: False}).astype('boolean')
         frame['animal'] = pd.to_numeric(raw['ag_r0a'], errors='coerce').map(species)
         expected.append(frame[kept & frame['animal'].notna()])
@@ -250,4 +273,4 @@ def test_served_cells_equal_the_source_cells(malawi, wave):
             pd.to_numeric(served[column]).astype('float64'),
             expected[column].astype('float64'),
             check_exact=True, check_names=False, check_index_type=False)
-    assert served['Owned'].tolist() == expected['Owned'].tolist()
+    assert served['RaisedOrOwned'].tolist() == expected['RaisedOrOwned'].tolist()
