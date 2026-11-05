@@ -218,6 +218,14 @@ class TestOracle:
             frame = getattr(ll.Country(COUNTRY), table)(waves=["2014"])
         assert frame.reset_index()["v"].notna().all()
 
+    def test_no_2014_household_is_labelled_a_mover(self):
+        """`roster_to_characteristics` fills a NaN `v` with 'Mover', so `v.notna()` cannot
+        see this: 379 of the 389 were served `v = 'Mover'`, and none of them moved."""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            frame = ll.Country(COUNTRY).household_characteristics(waves=["2014"])
+        assert (frame.reset_index()["v"].astype(str) != "Mover").all()
+
     def test_the_v_it_joins_is_the_one_food_acquired_reads_from_its_own_files(self, served):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
