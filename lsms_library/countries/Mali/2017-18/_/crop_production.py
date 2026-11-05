@@ -218,7 +218,7 @@ df = crop_production_finalize(df)
 df['Derivation'] = stamp_tree_derivations(df)
 
 assert len(df) > 0, "crop_production 2017-18 produced no rows"
-assert df.index.is_unique, "Non-unique (t, i, plot, crop) in crop_production 2017-18"
+assert df.index.is_unique, "Non-unique (t, i, plot, crop, condition) in crop_production 2017-18"
 
 to_parquet(df, 'crop_production.parquet',
            grain_audit=grain_reports('Mali', 'crop_production'))

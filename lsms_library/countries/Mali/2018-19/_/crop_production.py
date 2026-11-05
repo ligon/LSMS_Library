@@ -15,9 +15,13 @@ the harvest and the sale on the same line, so no cross-file join is needed.
                    through the u table, and the 245 real disagreements stay.
     Value_sold     s16cq17
     intercropped   s16cq07
+    condition      s16cq12c, "Etat du produit", by code through
+                   harmonize_crop_condition_ehcvm1 (GH #1436); the sentinel on a
+                   blank code
+    condition_native  the same answer as recorded, NA on a blank code
 
-Where Mali's file differs from Niger's: the index is (t, i, plot_id, crop), as in
-Mali's EAC-I waves, with `u` a column that is NA where no unit is recorded; Niger
+Where Mali's file differs from Niger's: the index is (t, i, plot_id, crop, condition),
+as in Mali's EAC-I waves, with `u` a column that is NA where no unit is recorded; Niger
 indexes `u` and fills `Unknown`.  Everything else is the same rule: served as
 recorded, nothing masked, and NA rather than 0 on a line whose s16cq15 is 'Non'.
 
@@ -33,17 +37,21 @@ sys.path.append('../../_/')
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
-from mali import (ehcvm_crop_labels, ehcvm_household_ids, ehcvm_intercropped,
+from mali import (ehcvm_crop_condition_labels, ehcvm_crop_conditions,
+                  ehcvm_crop_labels, ehcvm_household_ids, ehcvm_intercropped,
                   ehcvm_plot_ids, ehcvm_unit_labels,
                   finish_ehcvm_crop_production, stamp_harvest_to_date)
 
 src = get_dataframe('../Data/s16c_me_mli2018.dta', convert_categoricals=True)
+src_codes = get_dataframe('../Data/s16c_me_mli2018.dta', convert_categoricals=False)
 
 df = pd.DataFrame({
     'i':             ehcvm_household_ids(src).values,
     'plot_id':       ehcvm_plot_ids(src).values,
     'crop':          ehcvm_crop_labels(src['s16cq04']).values,
     'u':             ehcvm_unit_labels(src['s16cq12b']).values,
+    'condition':     ehcvm_crop_conditions(src_codes['s16cq12c']).values,
+    'condition_native': ehcvm_crop_condition_labels(src['s16cq12c']).values,
     'Quantity':      src['s16cq12a'].values,
     'Quantity_sold': src['s16cq16a'].values,
     'Unit_sold':     ehcvm_unit_labels(src['s16cq16b']).values,

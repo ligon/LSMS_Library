@@ -1,7 +1,7 @@
 """Concatenate wave-level crop_production for Mali (GAP 1; parity loop).
 
 Each EACI wave's ``Mali/<wave>/_/crop_production.py`` writes a parquet
-indexed by ``(t, i, plot, crop)`` with the reported item-level harvest
+indexed by ``(t, i, plot, crop, condition)`` with the reported item-level harvest
 columns (Quantity, u, Quantity_sold, Value_sold, planting_month,
 harvest_month, intercropped, perennial; since GH #824 / #1267 also
 Unit_sold, field-only KgFactor_sold, months_harvested and, on tree rows,
@@ -50,6 +50,6 @@ assert pieces, "crop_production: no wave-level parquets found"
 
 p = pd.concat(pieces)
 
-assert p.index.is_unique, "Non-unique (t, i, plot, crop) after concat"
+assert p.index.is_unique, "Non-unique (t, i, plot, crop, condition) after concat"
 
 to_parquet(p, '../var/crop_production.parquet', grain_audit=grain_audit)

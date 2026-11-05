@@ -714,7 +714,8 @@ def crop_production_finalize(df):
     FIELD kg per sold unit) and months_harvested.
     Maps crop/unit labels -- the sold unit through the SAME ``u`` table as
     the harvest unit (GH #824) -- coerces dtypes, sets the (t, i, plot, crop)
-    index, and collapses exact-duplicate index rows (a crop reported on the
+    index with ``condition`` appended as the sentinel (GH #1436), and collapses
+    exact-duplicate index rows (a crop reported on the
     same plot more than once in a single questionnaire row-set) by summing
     the reported quantities / values and taking the first of the
     flags/dates.  A group whose rows report the sale in more than one sold
@@ -806,7 +807,14 @@ def crop_production_finalize(df):
     out = out[['Quantity', 'u', 'Quantity_sold', 'Unit_sold', 'KgFactor_sold', 'Value_sold',
                'months_harvested', 'planting_month', 'harvest_month',
                'intercropped', 'perennial']]
-    return out.sort_index()
+    # GH #1436: the EHCVM waves serve the `condition` level, and every wave the
+    # country script concatenates must carry it.  2014-15 asks no state.  2017-18
+    # asks one (s7fq13b) in a list of its own that no ruling has folded, so it is
+    # not read yet: CONTENTS.org, "serves condition".  After the collapse, so
+    # the level moves no row.
+    out['condition_native'] = pd.array([pd.NA] * len(out), dtype='string')
+    out['condition'] = pd.array([CONDITION_NA] * len(out), dtype='string')
+    return out.set_index('condition', append=True).sort_index()
 
 
 # --- crop_production: the EHCVM waves (GH #824; rulings @ligon 2026-11-03) ----
@@ -847,8 +855,15 @@ def crop_production_finalize(df):
 # shape that keeps the EAC-I tree equivalents unwired.  planting_month,
 # harvest_month, months_harvested and perennial are NA: s16c asks none of them,
 # and it lists tree crops (Manguier, Anacarde) on the field grid without saying
-# which are perennial.  The Stata "Etat du produit" variables (s16cq12c, s16cq16c
-# in 2018-19; s16cq16d, s16dq05d in 2021-22) are not served.
+# which are perennial.
+#
+# CONDITION (GH #1436, ruling @ligon 2026-11-04).  "Etat du produit" of the harvest,
+# 2018-19 s16cq12c and 2021-22 s16cq16d, is the `condition` level, read by code, with
+# the answer as recorded in `condition_native`.  Both waves use the same five codes
+# and labels, so one table serves both.  A blank code is the sentinel, and so is a
+# row with no s16c line behind it (a Farm-level row) or a harvest derived from s16d,
+# whose s16cq16d is blank.  The sold states (s16cq16c, s16dq05d) are not served
+# (GH #1462).
 
 #: The canonical structural sentinel for `plot_id`: the record has no plot by
 #: design (lsms_library/data_info.yml, top of file).  It is not `unknown_plot`,
@@ -874,6 +889,10 @@ _DISPOSITIONS = ('s16dq02', 's16dq03', 's16dq05', 's16dq13')
 _SALE_KEYS = ['i', 'crop']
 _SALE_COLUMNS = ['Quantity_sold', 'Unit_sold', 'Value_sold']
 _EHCVM_INTERCROP = {'Association de cultures': True, 'Pure': False}
+
+#: The canonical sentinel of the `condition` level (lsms_library/data_info.yml): a
+#: real value and never NA, because a null index key is deleted by the next groupby.
+CONDITION_NA = 'unknown_condition'
 
 
 def _label_or_refuse(raw, mapped, where):
@@ -909,6 +928,30 @@ def ehcvm_intercropped(series):
     raw = series.astype('string').str.strip()
     mapped = raw.map(_EHCVM_INTERCROP)
     return _label_or_refuse(raw, mapped, 'the s16cq07 labels').astype('boolean')
+
+
+def ehcvm_crop_conditions(codes):
+    """Raw "Etat du produit" codes (``convert_categoricals=False``) through
+    ``harmonize_crop_condition_ehcvm1`` (GH #1436).  The table is read strictly: a
+    missing table must not serve every row as the sentinel.  A blank or off-scheme
+    code becomes :data:`CONDITION_NA`."""
+    table = tools.get_categorical_mapping(
+        tablename='harmonize_crop_condition_ehcvm1', idxvars='Code',
+        **{'Preferred Label': 'Preferred Label'})
+    table = {int(code): token for code, token in table.items()}
+    if sorted(table) != [1, 2, 3, 4, 5]:
+        raise ValueError(f'harmonize_crop_condition_ehcvm1: {table}')
+    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)
+    return mapped.astype('string').fillna(CONDITION_NA)
+
+
+def ehcvm_crop_condition_labels(labels):
+    """The state as the survey recorded it, for ``condition_native``: *labels* is the
+    column read with ``convert_categoricals=True``.  A blank stays NA, never a
+    sentinel, because a column has no NaN-key hazard (ruling @ligon 2026-11-04,
+    GH #1436)."""
+    out = pd.Series(labels).astype('string').str.strip()
+    return out.where(out != '', pd.NA)
 
 
 def ehcvm_household_ids(src):
@@ -1082,7 +1125,7 @@ def ehcvm_dispositions(src):
 
 
 def finish_ehcvm_crop_production(df, wave):
-    """The served frame of an EHCVM wave, indexed (t, i, plot_id, crop).
+    """The served frame of an EHCVM wave, indexed (t, i, plot_id, crop, condition).
 
     The same columns and dtypes as ``crop_production_finalize``, so the country
     concat changes no EAC-I value.  Reduces nothing: a repeated key raises.
@@ -1105,12 +1148,18 @@ def finish_ehcvm_crop_production(df, wave):
         out[col] = out[col].astype('string')
     if out[['i', 'plot_id', 'crop']].isna().any(axis=None):
         raise ValueError(f'crop_production {wave}: a NA household, plot or crop')
-    out = out.set_index(['t', 'i', 'plot_id', 'crop'])
-    if not out.index.is_unique:
+    # A Farm-level row has no s16c line behind it, so no state: the sentinel, and NA.
+    for col in ('condition', 'condition_native'):
+        if col not in out.columns:
+            out[col] = pd.NA
+        out[col] = out[col].astype('string')
+    out['condition'] = out['condition'].fillna(CONDITION_NA)
+    if out.duplicated(['i', 'plot_id', 'crop']).any():
         raise ValueError(f'crop_production {wave}: a repeated (i, plot_id, crop)')
+    out = out.set_index(['t', 'i', 'plot_id', 'crop', 'condition'])
     return out[['Quantity', 'u', 'Quantity_sold', 'Unit_sold', 'KgFactor_sold',
                 'Value_sold', 'months_harvested', 'planting_month',
-                'harvest_month', 'intercropped', 'perennial',
+                'harvest_month', 'intercropped', 'perennial', 'condition_native',
                 'Derivation']].sort_index()
 
 

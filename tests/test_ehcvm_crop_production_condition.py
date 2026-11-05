@@ -63,6 +63,8 @@ class Cell:
     #: Left out of the row-level oracles, by source code and by served label.
     excluded_crop_codes: tuple = ()
     excluded_crop_labels: tuple = ()
+    state: str = STATE
+    quantity: str = "s16cq12a"
 
 
 CELLS = {
@@ -83,8 +85,19 @@ class _SchemeLoader(yaml.SafeLoader):
 _SchemeLoader.add_constructor("!make", lambda loader, node: {"__make__": True})
 
 
-def _wave_dir(country: str) -> Path:
-    return countries_root() / country / CELLS[country].wave / "_"
+#: Mali has two EHCVM waves, on one list, read by shared helpers in ``mali.py``.
+MALI = {
+    "2018-19": Cell("2018-19", "../Data/s16c_me_mli2018.dta", FRENCH, FOLD),
+    "2021-22": Cell("2021-22", "../Data/s16c_me_mli2021.dta", FRENCH, FOLD,
+                    state="s16cq16d", quantity="s16cq16a"),
+}
+#: Mali's EAC-I waves carry only the sentinel.  2014-15 asks no state; 2017-18 asks one
+#: (s7fq13b) in a list of its own, unread until ruled, when this tuple moves.
+MALI_SENTINEL_WAVES = ("2014-15", "2017-18")
+
+
+def _wave_dir(country: str, wave: str | None = None) -> Path:
+    return countries_root() / country / (wave or CELLS[country].wave) / "_"
 
 
 def _script(country: str) -> str:
@@ -196,19 +209,19 @@ class TestScriptReadHelper:
 # the built table, against the source
 # ---------------------------------------------------------------------------
 
-def _source(country: str) -> pd.DataFrame:
+def _source(country: str, cell: Cell | None = None) -> pd.DataFrame:
     """(plot, code, recorded state, ruled fold, quantity), straight from s16c.  Imports
     nothing from ``countries/``: the codes go through the tables written out above."""
     from lsms_library.local_tools import format_id, get_dataframe
 
-    cell = CELLS[country]
+    cell = cell or CELLS[country]
     cwd = os.getcwd()
-    os.chdir(_wave_dir(country))
+    os.chdir(_wave_dir(country, cell.wave))
     try:
         raw = get_dataframe(cell.source, convert_categoricals=False)
     finally:
         os.chdir(cwd)
-    codes = pd.to_numeric(raw[STATE], errors="coerce")
+    codes = pd.to_numeric(raw[cell.state], errors="coerce")
     frame = pd.DataFrame({
         "plot_id": (raw["s16cq02"].apply(format_id).astype(str) + "_"
                     + raw["s16cq03"].apply(format_id).astype(str)).values,
@@ -216,7 +229,7 @@ def _source(country: str) -> pd.DataFrame:
         "code": codes.values,
         "condition_native": codes.map(cell.labels).values,
         "condition": codes.map(cell.fold).fillna(SENTINEL).values,
-        "Quantity": pd.to_numeric(raw["s16cq12a"], errors="coerce").values,
+        "Quantity": pd.to_numeric(raw[cell.quantity], errors="coerce").values,
     })
     return frame[~frame["crop_code"].isin(cell.excluded_crop_codes)]
 
@@ -330,3 +343,122 @@ class TestCotedIvoireUnlabelledCodes:
         added = pd.to_numeric(raw[STATE], errors="coerce").isin([6, 7])
         assert added.any()
         assert set(raw.loc[added, "vague"]) == {2}
+
+
+def _mali():
+    """``Mali/_/mali.py``, imported the way the wave scripts import it."""
+    import importlib
+    import sys
+
+    path = str(countries_root() / "Mali" / "_")
+    sys.path.insert(0, path)
+    try:
+        return importlib.import_module("mali")
+    finally:
+        sys.path.remove(path)
+
+
+class TestMaliDeclared:
+    """Mali's index has no ``u``, and its helpers are in ``mali.py``."""
+
+    def test_scheme_appends_the_level_and_declares_the_optional_column(self):
+        path = countries_root() / "Mali" / "_" / "data_scheme.yml"
+        with open(path, encoding="utf-8") as f:
+            entry = yaml.load(f, Loader=_SchemeLoader)["Data Scheme"][TABLE]
+        assert entry["index"] == "(t, i, plot_id, crop, condition)"
+        assert entry["condition_native"] == {"type": "str", "optional": True}
+
+    @pytest.mark.parametrize("wave", list(MALI))
+    def test_script_reads_its_own_state_by_code_and_by_label(self, wave):
+        script = (_wave_dir("Mali", wave) / f"{TABLE}.py").read_text(encoding="utf-8")
+        state = MALI[wave].state
+        assert _call_read(script, "ehcvm_crop_conditions") == (state, True)
+        assert _call_read(script, "ehcvm_crop_condition_labels") == (state, False)
+
+    @pytest.mark.parametrize("wave", list(MALI))
+    def test_table_is_the_ruled_fold_in_both_waves(self, wave, monkeypatch):
+        monkeypatch.chdir(_wave_dir("Mali", wave))
+        out = _mali().ehcvm_crop_conditions(
+            pd.Series([1.0, 2.0, 3.0, 4.0, 5.0, float("nan"), 77.0]))
+        assert out.tolist() == [FOLD[c] for c in range(1, 6)] + [SENTINEL, SENTINEL]
+        assert str(out.dtype) == "string"
+
+    def test_a_missing_table_raises(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        with pytest.raises((KeyError, FileNotFoundError)):
+            _mali().ehcvm_crop_conditions(pd.Series([1.0]))
+
+    def test_the_label_helper_keeps_the_answer_and_a_blank_stays_na(self):
+        out = _mali().ehcvm_crop_condition_labels(
+            pd.Series(["Non-décortiqué", " Grain ", "", None], dtype="object"))
+        assert out.iloc[:2].tolist() == ["Non-décortiqué", "Grain"]
+        assert out.iloc[2:].isna().all()
+
+    def test_the_ehcvm_tail_fills_a_row_with_no_state_and_appends_the_level(self):
+        frame = pd.DataFrame({
+            "i": ["1", "1"], "plot_id": ["1_1", "Farm-level"], "crop": ["Mil", "Mil"],
+            "u": ["Kg", None], "Quantity": [10.0, None], "Quantity_sold": [None, 3.0],
+            "Value_sold": [None, 90.0], "intercropped": [True, None],
+            "condition": ["shelled", None], "condition_native": ["Grain", None]})
+        out = _mali().finish_ehcvm_crop_production(frame, "2099-00")
+        assert list(out.index.names) == ["t", "i", "plot_id", "crop", "condition"]
+        got = out.reset_index().set_index("plot_id")
+        assert got.loc["1_1", "condition"] == "shelled"
+        assert got.loc["Farm-level", "condition"] == SENTINEL
+        assert pd.isna(got.loc["Farm-level", "condition_native"])
+
+    def test_the_eaci_tail_appends_the_sentinel_after_the_collapse(self, monkeypatch):
+        monkeypatch.chdir(_wave_dir("Mali", "2014-15"))  # the crop and unit tables
+        base = dict(t="2099-00", i="h1", crop="Mil", u="Sac", Quantity_sold=float("nan"),
+                    Unit_sold=pd.NA, Value_sold=float("nan"), months_harvested=pd.NA,
+                    planting_month=pd.NA, harvest_month=pd.NA, intercropped=pd.NA,
+                    perennial=False, plot_id="1_1")
+        rows = pd.DataFrame([dict(base, Quantity=2.0), dict(base, Quantity=3.0)])
+        out = _mali().crop_production_finalize(rows)
+        assert list(out.index.names) == ["t", "i", "plot_id", "crop", "condition"]
+        assert out["Quantity"].tolist() == [5.0]
+        assert out.index.get_level_values("condition").tolist() == [SENTINEL]
+        assert out["condition_native"].isna().all()
+
+
+@pytest.mark.requires_s3
+class TestMaliServed:
+
+    def test_level_is_served_and_the_index_stays_unique(self, built):
+        served = built("Mali")
+        assert "condition" in served.index.names
+        assert served.index.is_unique
+        assert set(served.index.get_level_values("condition")) <= _canonical_vocabulary()
+
+    @pytest.mark.parametrize("wave", MALI_SENTINEL_WAVES)
+    def test_the_eaci_waves_carry_only_the_sentinel(self, built, wave):
+        got = built("Mali").xs(wave, level="t")
+        assert set(got.index.get_level_values("condition")) == {SENTINEL}
+        assert got["condition_native"].isna().all()
+
+    @pytest.mark.parametrize("wave", list(MALI))
+    def test_the_stated_rows_are_the_source_rows(self, built, wave):
+        """The rows that state one, tuple by tuple.  Blank states are left out on both
+        sides: a Farm-level row or a derived harvest has a Quantity and no state."""
+        g = built("Mali").xs(wave, level="t").reset_index()
+        src = _source("Mali", MALI[wave])
+        keys = ["plot_id", "condition_native", "condition"]
+
+        def counts(frame):
+            frame = frame[frame["condition_native"].notna()]
+            return Counter(map(tuple, frame[keys].astype(object).values.tolist()))
+
+        assert counts(g) == counts(src)
+
+    @pytest.mark.parametrize("wave", list(MALI))
+    def test_the_level_is_the_ruled_fold_of_the_column(self, built, wave):
+        by_label = {FRENCH[code]: token for code, token in FOLD.items()}
+        g = built("Mali").xs(wave, level="t").reset_index()
+        expected = g["condition_native"].astype(object).map(by_label).fillna(SENTINEL)
+        assert (g["condition"].astype(object) == expected).all()
+
+    def test_a_farm_level_row_states_no_condition(self, built):
+        g = built("Mali").xs("2021-22", level="t").reset_index()
+        farm = g[g["plot_id"].eq("Farm-level")]
+        assert len(farm) > 0
+        assert set(farm["condition"]) == {SENTINEL}

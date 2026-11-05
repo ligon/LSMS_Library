@@ -3120,3 +3120,43 @@ and Burkina's printed community questionnaire, which still has "SECTION 5. RELEV
 PRIX A LA CONSOMMATION".  Mali's own community questionnaire is on neither WB 6275 nor
 IHSN 12257.  UEMOA's =MLI-EHCVM-V2.0= lists =Fichiers_Communautaire.rar=, which could
 not be read without its licence.
+
+* 2026-11-04 -- =crop_production= serves =condition= and the recorded answer (GH #1436)
+
+Ruling @ligon 2026-11-04, option (D), set on Niger in #1471: the fold stays on the
+=condition= level and the survey's own answer rides in the optional column
+=condition_native=.  The index is now =(t, i, plot_id, crop, condition)=; =u= stays a column, as
+in the EAC-I waves.  "Etat du produit" is read by code through
+=harmonize_crop_condition_ehcvm1=, and both EHCVM waves carry the same five codes and labels:
+
+| code | label | 2018-19 =s16cq12c= | 2021-22 =s16cq16d= | =condition= |
+|------+-------+--------------------+--------------------+-------------|
+| 1 | Epis | 1,044 | 22 | =unshelled= |
+| 2 | Grain | 3,110 | 111 | =shelled= |
+| 3 | Décortiqué | 814 | 24 | =shelled= |
+| 4 | Non-décortiqué | 1,758 | 63 | =unshelled= |
+| 5 | Non concerné | 659 | 89 | =shell_not_applicable= |
+| blank | | 607 | 6,938 | =unknown_condition=, column NA |
+
+50,550 rows before and after, unique on the old key, so the level separates nothing.  The answer
+describes the harvest quantity: the sold states (=s16cq16c=, =s16dq05d=) are not served (GH #1462).
+
+*2021-22 states a condition on 309 rows, the ones with a recorded =Quantity=.*  7,189 of 7,498 rows
+carry the sentinel: 6,938 blank =s16c= lines, among them the single-row harvest totals of GH #1437,
+and all 251 =Farm-level= rows, which have no =s16c= line behind them.
+
+*The harvest totals of GH #1437 sum across states.*  Their =s16d= dispositions state their own
+condition (=s16dq02c=, =s16dq03c=, =s16dq05d=, =s16dq13c=), and =derive_hh_crop_harvest_total= gates on one
+unit, not one state.  Of the 3,360 totals, 3,152 state one condition and 208 two, and on 166 of those
+the two fold differently (122 of the 166 in =Sac (100 Kg)=).  The level's own note says such
+quantities are not commensurable.  Served as summed, under =unknown_condition=, and not changed here.
+
+*2017-18 records a state, and it is not read.*  2014-15 asks none: no variable of =EACIS3A=, =EACIS3B=
+or =EACICULTURE= carries one.  But =eaci17_s7fp2.dta= =s7fq13b= ("Evaluation de la production campagne
+2017/18-Code Etat") belongs to the =Quantity= =s7fq13a=: Epis/Panicules 5,234, Décortiqué 9,035,
+Non-Décortiqué 7,237, Egrener 12, blank 2,931, of 24,449 field lines, unique on (household, plot, crop).
+That is a different list (code 2 is Décortiqué there and Grain in the EHCVM one), and the ruling names
+the EHCVM list.  So =unknown_condition= there says "not read", and not "not asked", until @ligon rules
+on the fold.  Tree rows (=s11f=) carry no state in either EAC-I wave.
+
+*Cost:* one Mali re-warm (=data_scheme.yml=, =categorical_mapping.org=, =mali.py= and the wave scripts).
