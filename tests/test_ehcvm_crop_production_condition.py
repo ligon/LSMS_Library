@@ -91,8 +91,9 @@ MALI = {
     "2021-22": Cell("2021-22", "../Data/s16c_me_mli2021.dta", FRENCH, FOLD,
                     state="s16cq16d", quantity="s16cq16a"),
 }
-#: Mali's EAC-I waves carry only the sentinel.  2014-15 asks no state; 2017-18 asks one
-#: (s7fq13b) in a list of its own, unread until ruled, when this tuple moves.
+#: Mali's EAC-I waves carry only the sentinel.  2014-15's harvest files hold no state;
+#: 2017-18 records one (s7fq13b) in a list of its own, unread until ruled, when this
+#: tuple moves.
 MALI_SENTINEL_WAVES = ("2014-15", "2017-18")
 
 

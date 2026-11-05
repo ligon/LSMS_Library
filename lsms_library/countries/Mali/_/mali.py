@@ -808,10 +808,11 @@ def crop_production_finalize(df):
                'months_harvested', 'planting_month', 'harvest_month',
                'intercropped', 'perennial']]
     # GH #1436: the EHCVM waves serve the `condition` level, and every wave the
-    # country script concatenates must carry it.  2014-15 asks no state.  2017-18
-    # asks one (s7fq13b) in a list of its own that no ruling has folded, so it is
-    # not read yet: CONTENTS.org, "serves condition".  After the collapse, so
-    # the level moves no row.
+    # country script concatenates must carry it.  2014-15's harvest files hold no
+    # state.  2017-18 records one (s7fq13b) in a list of its own that no ruling has
+    # folded, and it must never go through the EHCVM table, whose codes 3 and 4 it
+    # inverts: CONTENTS.org, "serves condition".  After the collapse, so the level
+    # moves no row.
     out['condition_native'] = pd.array([pd.NA] * len(out), dtype='string')
     out['condition'] = pd.array([CONDITION_NA] * len(out), dtype='string')
     return out.set_index('condition', append=True).sort_index()

@@ -3151,12 +3151,26 @@ unit, not one state.  Of the 3,360 totals, 3,152 state one condition and 208 two
 the two fold differently (122 of the 166 in =Sac (100 Kg)=).  The level's own note says such
 quantities are not commensurable.  Served as summed, under =unknown_condition=, and not changed here.
 
-*2017-18 records a state, and it is not read.*  2014-15 asks none: no variable of =EACIS3A=, =EACIS3B=
-or =EACICULTURE= carries one.  But =eaci17_s7fp2.dta= =s7fq13b= ("Evaluation de la production campagne
-2017/18-Code Etat") belongs to the =Quantity= =s7fq13a=: Epis/Panicules 5,234, Décortiqué 9,035,
-Non-Décortiqué 7,237, Egrener 12, blank 2,931, of 24,449 field lines, unique on (household, plot, crop).
-That is a different list (code 2 is Décortiqué there and Grain in the EHCVM one), and the ruling names
-the EHCVM list.  So =unknown_condition= there says "not read", and not "not asked", until @ligon rules
-on the fold.  Tree rows (=s11f=) carry no state in either EAC-I wave.
+*2017-18 records a state, and it is not read.*  The three 2014-15 files this table reads (=EACIS3A=,
+=EACIS3B=, =EACICULTURE=) hold no state variable; the "Etat du produit" of that wave's manual
+(=EACI_MANUEL_P1_V5_Redacted.pdf=, 2.15 and 2.23) belongs to the crop-cut questionnaire, a different list
+in a different file.  But =eaci17_s7fp2.dta= =s7fq13b= ("Evaluation de la production campagne 2017/18-Code
+Etat") belongs to the =Quantity= =s7fq13a=: Epis/Panicules 5,234, Décortiqué 9,035, Non-Décortiqué 7,237,
+Egrener 12, blank 2,931, of 24,449 field lines, unique on (household, plot, crop).  The ruling names the
+EHCVM list, so =unknown_condition= there says "not read", and not "not asked", until @ligon rules on the
+fold.  Tree rows (=s11f=) carry no state in either EAC-I wave.
+
+*That list can never share the EHCVM table: codes 3 and 4 invert it.*
+
+| code | 2017-18 =s7fq13b= | EHCVM | through the EHCVM table |
+|------+-------------------+-------+-------------------------|
+| 1 | Epis/Panicules | Epis | =unshelled=, the same |
+| 2 | Décortiqué | Grain | =shelled=, the same |
+| 3 | Non-Décortiqué | Décortiqué | =shelled=, *flips* 7,237 rows |
+| 4 | Egrener | Non-décortiqué | =unshelled=, *flips* 12 rows |
+
+7,249 rows would flip with no error raised, because every code is on the table.  The token shares would
+not compare across the two instruments in any case, because this list has no =Grain=: read with a fold of
+its own, the shelled share runs 0.38 for millet against 0.60 in 2018-19, and 0.48 for fonio against 0.92.
 
 *Cost:* one Mali re-warm (=data_scheme.yml=, =categorical_mapping.org=, =mali.py= and the wave scripts).

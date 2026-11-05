@@ -817,8 +817,9 @@
 # itself is served in the column `condition_native`.  Code 5 is a survey answer, not
 # the missing-data sentinel: a blank code is `unknown_condition`.
 #
-# Not for 2017-18: s7fq13b is a different list, 1 Epis/Panicules, 2 Décortiqué,
-# 3 Non-Décortiqué, 4 Egrener, and code 2 means something else there.
+# NEVER FOR 2017-18.  s7fq13b is a different list, 1 Epis/Panicules, 2 Décortiqué,
+# 3 Non-Décortiqué, 4 Egrener, and its codes 3 and 4 invert this table: read through
+# it, 7,249 rows would flip between `shelled` and `unshelled`, with no error raised.
 #+NAME: harmonize_crop_condition_ehcvm1
 | Code | Preferred Label      | Source Label   |
 |------+----------------------+----------------|

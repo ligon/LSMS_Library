@@ -221,9 +221,9 @@ Data Scheme:
     # categorical_mapping.org.  Five answers fold onto the bare form tokens `shelled` /
     # `unshelled` / `shell_not_applicable`; condition_native below keeps what was
     # answered.  `unknown_condition` on a blank code, a Farm-level row, a harvest
-    # derived from s16d, and every EAC-I row.  2014-15 asks no state.  2017-18 asks
-    # one (s7fq13b) in a four-answer list no ruling has folded, not read yet:
-    # CONTENTS.org.
+    # derived from s16d, and every EAC-I row.  2014-15's harvest files hold no state.
+    # 2017-18 records one (s7fq13b) in a four-answer list no ruling has folded, whose
+    # codes 3 and 4 invert the EHCVM table; not read yet: CONTENTS.org.
     index: (t, i, plot_id, crop, condition)
     Quantity: float
     u: str
