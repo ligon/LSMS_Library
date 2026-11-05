@@ -717,6 +717,7 @@ class TestShippedDeclarations:
         ("Niger", "2014-15", "stable"),              # ECVMA panel keeps GRAPPE
         ("Niger", "2018-19", "redefined"),           # ECVMA / EHCVM serials overlap
         ("Niger", "2021-22", "stable"),              # s00q07f1 == grappe
+        ("Togo", "2021-22", "stable"),               # one point per grappe, = 2018's fix
         ("GhanaLSS", "1988-89", "wave-scoped"),      # GLSS2 renumbering
         ("GhanaLSS", "1991-92", "unobservable"),     # no linkage: correct to group
         ("Ethiopia", "2013-14", "wave-scoped"),      # ea_id -> ea_id2
