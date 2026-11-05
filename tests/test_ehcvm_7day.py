@@ -105,8 +105,7 @@ AFTER = {
 SIZES = {
     'Benin': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Sans brassée',
               'Avec 1 brassée', 'Avec 2 brassées', 'A 2 doigts', 'A 3 doigts',
-              'A 5 doigts', 'Autre taille', 'Très petit', 'Très grand', 'Entier',
-              'Huitième'},
+              'A 5 doigts', 'Autre taille', 'Très petit', 'Très grand', 'Entier'},
     'Burkina_Faso': {'Petit', 'Moyen', 'Grand'},
     'CotedIvoire': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier'},
     'Guinea-Bissau': {'Pequeno', 'Medio', 'Grande'},
