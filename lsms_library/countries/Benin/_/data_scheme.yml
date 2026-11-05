@@ -64,8 +64,8 @@ Data Scheme:
 
   food_security:
     # FAO 8-item Food Insecurity Experience Scale (FIES).  EHCVM §8A
-    # 'Sécurité alimentaire', recall period = last 12 months.  Single
-    # EHCVM wave (2018-19) reads s08a_me_ben2018.dta; items
+    # 'Sécurité alimentaire', recall period = last 12 months.  Each EHCVM
+    # wave reads its own s08a_me_ben*.dta; items
     # s08aq01..s08aq08 map IN ORDER to the 8 canonical FIES items
     # (Worried..WholeDay).  Values Oui->True, Non->False;
     # "Ne sait pas"/"Refus"/NaN->NaN.  FCS (#332) is deliberately NOT
@@ -177,8 +177,8 @@ Data Scheme:
   livestock:
     # Item-level livestock roster (GAP 4).  One row per REPORTED
     # (household, species) the household owns/raises, from the EHCVM
-    # section-17 ('Élevage') module s17_me_ben2018.dta (single 2018-19
-    # wave; roster pre-filtered to owned species, s17q03 == 1).
+    # section-17 ('Élevage') module s17_me_ben*.dta (filtered to owned
+    # species, s17q03 == 1).
     #
     # GRAIN (t, i, animal) — NO v level: 'livestock' is in the framework's
     # _no_v_join set, so the household-level rows carry no cluster level and
@@ -200,7 +200,7 @@ Data Scheme:
   crop_production:
     # Item-level crop harvest (GAP 1).  One row per REPORTED (field, parcel,
     # crop) harvest line from the EHCVM agriculture module s16c_me_ben2018.dta
-    # (single 2018-19 wave) — REPORTED values only; harvest_kg / yield /
+    # (2021-22: below) — REPORTED values only; harvest_kg / yield /
     # main_crop / value-shares are transformations, never columns here.  crop
     # carries the native French crop label (Benin has no harmonize_food crop
     # table; Niger's passthrough behavior keeps the label as the item
@@ -250,8 +250,8 @@ Data Scheme:
 
   plot_inputs:
     # Item-level agricultural inputs (GAP 2).  One row per REPORTED input
-    # applied by a household from the EHCVM input roster s16b_me_ben2018.dta
-    # (single 2018-19 wave): input identity (Seed / Urea / DAP / NPK /
+    # applied by a household from the EHCVM input roster s16b_me_ben*.dta:
+    # input identity (Seed / Urea / DAP / NPK /
     # Phosphate / Organic manure / Organic compost / Pesticide / Herbicide /
     # Fungicide / Other phytosanitary), reported quantity used + native unit,
     # purchased flag + reported purchased quantity, and (seed rows) the seed's
@@ -310,8 +310,8 @@ Data Scheme:
 
   plot_labor:
     # Item-level plot labor (GAP 3).  One row per REPORTED labor SOURCE on a
-    # plot from the EHCVM agriculture-parcel module s16a_me_ben2018.dta (single
-    # 2018-19 wave).  REPORTED person-days; total_labor_days /
+    # plot from the EHCVM agriculture-parcel module s16a_me_ben*.dta.
+    # REPORTED person-days; total_labor_days /
     # total_family_labor_days / total_hired_labor_days / hired_labor_value (a
     # median-wage valuation) are TRANSFORMATIONS over these rows, never columns.
     #
@@ -338,11 +338,11 @@ Data Scheme:
   people_last7days:
     # Item-level individual 7-day labor (GAP 3).  One row per individual
     # carrying the REPORTED last-7-days labor participation, from the EHCVM
-    # 7-day module s04_me_ben2018.dta merged to the s01 roster (single 2018-19
-    # wave).  No rollups: the WB nb_members_working_age HH total is a
+    # 7-day module (s04_me_ben2018.dta; s04a_me_ben2021.dta) merged to the s01
+    # roster.  No rollups: the WB nb_members_working_age HH total is a
     # transformation, not a column here.
     #
-    # GRAIN (t, i, pid): pid = s01q00a (matches household_roster).  v
+    # GRAIN (t, i, pid): pid = s01q00a, membres__id in 2021-22 (matches household_roster).  v
     # auto-joins from sample() (people_last7days is NOT in the framework
     # _no_v_join set).
     #

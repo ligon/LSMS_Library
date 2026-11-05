@@ -285,7 +285,7 @@ class TestServed:
 
     def test_age_follows_the_answers_and_not_the_surveys_own_age(self):
         """The served Age is the file's birth year; ehcvm_individu.age is not, on 3,662 panel
-        members, where it is 2018-19's age + 3 (Togo's and Niger's agree on all but none)."""
+        members, where it is 2018-19's age + 3.  Togo's and Niger's have no such rows."""
         s01 = _members(_raw("s01_me_ben2021.dta"))
         key = pd.MultiIndex.from_arrays([_ids(s01), s01["membres__id"].astype(int).astype(str)])
         year = pd.Series(pd.to_numeric(s01["s01q03c"], errors="coerce").astype(float).to_numpy(), index=key)
