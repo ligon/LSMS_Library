@@ -13,10 +13,11 @@ i is built from (GRAPPE, MENAGE, EXTENSION) via niger.i -- the full
 ECVMA2 household key, matching this wave's sample / roster idxvars
 (GH #679; EXTENSION 2 is a split-off household).  As in 2021-22 a crop-level
 sale (a positive AS02EQ12A or AS02EQ13; 1,081 records) goes on the crop's single
-harvest LINE (564), keyed Niger::crop_production::hh-crop-sale-single-row, and
-otherwise on ONE row with plot_id = 'Farm-level' (517: 498 on two or more plots,
+SERVED harvest line (583), keyed Niger::crop_production::hh-crop-sale-single-row, and
+otherwise on ONE row with plot_id = 'Farm-level' (498: 479 on two or more served lines,
 19 with no harvest row), its index the sentinels of a row with no harvest (GH
-#1457).  No split, no sum, nothing dropped.  ``harvest_month`` = AS02EQ06A (month-of-harvest-start, 1-12);
+#1457).  A line with no quantity or month is removed at the API, so it does not count
+unless it is the crop's only line.  No split, no sum, nothing dropped.  ``harvest_month`` = AS02EQ06A (month-of-harvest-start, 1-12);
 ``planting_month`` is not in this module (NaN).  The modules' unlabelled
 "don't know" codes (9999 on the quantities, 9999999 on the sale value) are
 mapped to NA, exact value only (GH #865).
@@ -36,7 +37,7 @@ import pandas as pd
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
                    _finish_crop_production, _na_exact,
-                   derive_hh_crop_sale_attachment, stamp_hh_crop_sale)
+                   derive_hh_crop_sale_attachment, served_harvest_lines, stamp_hh_crop_sale)
 
 # "Don't know" codes of these modules, unlabelled in the .dta (GH #865) --
 # a DIFFERENT width from 2011-12's 999999.  Exact values only.  Raw counts:
@@ -111,7 +112,8 @@ records = sold_one
 # across plots or lines; GH #1360) -- AND sold in a single unit (no
 # fabricated conversion across units -- a second unit would duplicate the
 # harvest row).
-lines_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop']).size()
+serving = served_harvest_lines(df)     # a line the API would remove does not count
+lines_per = df[serving].dropna(subset=['i', 'crop']).groupby(['i', 'crop']).size()
 single = lines_per[lines_per == 1].index
 units_per = sold_one.groupby(['i', 'crop']).size()
 one_unit = units_per[units_per == 1].index
@@ -119,6 +121,8 @@ sold_one = sold_one[sold_one.set_index(['i', 'crop']).index.isin(single)
                     & sold_one.set_index(['i', 'crop']).index.isin(one_unit)]
 
 df = df.merge(sold_one, on=['i', 'crop'], how='left')
+sale_columns = [c for c in sold_one.columns if c not in ('i', 'crop')]
+df.loc[~serving, sale_columns] = pd.NA
 
 # Any other sale: ONE Farm-level row (GH #1457).
 df = derive_hh_crop_sale_attachment(df, records)

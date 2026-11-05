@@ -87,7 +87,7 @@ def _sale11():
          ("H5", 1, 1, 4.0, 80.0),
          ("H6", 3, 1, 2.0, 30.0),
          ("H6", 3, 1, nan, nan)],
-        columns=["holder_id", "crop_code", "sold", "sqty", "sval"])
+        columns=["holder_id", "crop_code", "sold", "sqty", "sval"]).assign(household_id=lambda d: "H" + d["holder_id"].astype(str))  # the §11/§12 files name it (GH #1457)
 
 
 def _units(n, label="1. Kilogram"):
@@ -277,12 +277,15 @@ def test_served_zero_sale_counts_per_wave(cp):
     now attach (the W1 two on Kg rows, so Quantity_sold 0 as well); the W4 / W5
     falls are zeros of a crop on several lines, which no longer attach; 86,403
     -> 86,437 rows (37 lines back, 3 rows left empty)."""
+    cp = cp[cp.index.get_level_values("plot_id") != "Farm-level"]  # GH #1457: a sale's own row has its own oracle
     t = cp.index.get_level_values("t")
     waves = sorted(set(t))
     v0 = {w: int(((cp["Value_sold"] == 0).fillna(False) & (t == w)).sum()) for w in waves}
     q0 = {w: int(((cp["Quantity_sold"] == 0).fillna(False) & (t == w)).sum()) for w in waves}
-    assert v0 == {"2011-12": 3143, "2013-14": 7734, "2015-16": 7051,
-                  "2018-19": 4512, "2021-22": 2961}, v0
-    assert q0 == {"2011-12": 3144, "2013-14": 2581, "2015-16": 0,
+    # 7,734 / 7,051 / 4,512 / 2,961 and W2 2,581 before GH #1457 counted served lines: a
+    # recorded "No" now also reaches the holder-crop's one served row.
+    assert v0 == {"2011-12": 3143, "2013-14": 8147, "2015-16": 7512,
+                  "2018-19": 4725, "2021-22": 3158}, v0
+    assert q0 == {"2011-12": 3144, "2013-14": 2684, "2015-16": 0,
                   "2018-19": 0, "2021-22": 0}, q0
     assert len(cp) == 86437

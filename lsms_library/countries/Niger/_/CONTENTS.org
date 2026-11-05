@@ -3010,7 +3010,7 @@ The ruling on GH #843, option (d), extended in bulk on 2026-11-04, applies: the 
 
 =Derivation= moves on the 564 + 1,265 rows already holding a sale, which is the only column that moves on them.
 
-*Disclosed, 19 of the 31 2014-15 sales above (433,900 FCFA, review of GH #1457).*  The script counts every s2e1 line of a crop, and each of these
-has two or more lines of which only ONE is served: the others hold no quantity or month, so =_finalize_result='s =dropna(how='all')= removes them at the
-API.  So the sale sits on Farm-level though the household has one served row, stating a harvest, for that crop.  Value and quantity are served either way;
-only the plot is not.  2021-22 has none: its lines carry =intercropped=.
+*Corrected, 19 of the 31 2014-15 sales above (433,900 FCFA, review of GH #1457).*  The script counted every s2e1 line of a crop, and each of these has
+two or more lines of which only ONE is served: the others hold no quantity or month, so =_finalize_result='s =dropna(how='all')= removes them at the API.
+=niger.served_harvest_lines= no longer counts such a line unless it is the crop's only one, so these 19 sit on their row: 2014-15 is 583 sales on a line
+(78,919,660 FCFA) and 498 on Farm-level (34,249,850 FCFA), rows 9,316 -> 9,297.  2021-22 has none, because its lines carry =intercropped=, and does not move.

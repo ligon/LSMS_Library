@@ -42,7 +42,7 @@ from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
                    _crop_conditions, _crop_sold_conditions,
                    _finish_crop_production, _crop_row_observations,
                    derive_survey_kg_estimate, stamp_survey_kg_estimate,
-                   derive_hh_crop_sale_attachment, stamp_hh_crop_sale)
+                   derive_hh_crop_sale_attachment, served_harvest_lines, stamp_hh_crop_sale)
 
 
 crop_map, unit_map = _crop_maps()
@@ -129,7 +129,8 @@ records = sold_one
 # (no fabricated split across plots or lines; GH #1360) -- AND sold in a
 # single unit and state (no fabricated conversion -- a second one would
 # duplicate the harvest row).  Measured: no pair sells in two units or states.
-lines_per = df.dropna(subset=['i', 'crop']).groupby(['i', 'crop']).size()
+serving = served_harvest_lines(df)     # a line the API would remove does not count
+lines_per = df[serving].dropna(subset=['i', 'crop']).groupby(['i', 'crop']).size()
 single = lines_per[lines_per == 1].index
 units_per = sold_one.groupby(['i', 'crop']).size()
 one_unit = units_per[units_per == 1].index
@@ -137,6 +138,8 @@ sold_one = sold_one[sold_one.set_index(['i', 'crop']).index.isin(single)
                     & sold_one.set_index(['i', 'crop']).index.isin(one_unit)]
 
 df = df.merge(sold_one, on=['i', 'crop'], how='left')
+sale_columns = [c for c in sold_one.columns if c not in ('i', 'crop')]
+df.loc[~serving, sale_columns] = pd.NA
 
 # Any other sale: ONE Farm-level row (GH #1457).  After the s16d de-duplication
 # above, so a line repeated once per harvest line is one sale here.

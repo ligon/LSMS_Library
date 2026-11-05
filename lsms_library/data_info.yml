@@ -25,7 +25,8 @@ Single Index:
   # (GH #1460).
   # `plot_id == 'Farm-level'` is not a plot either, so a count of plots drops
   # every such row.  On `crop_production` such a row holds a sale no plot can own
-  # (Mali 2021-22; Nigeria W3-W5, GH #843 / #824) or a harvest from a roster off
+  # (Mali 2017-18 and 2021-22; Nigeria W3-W5; Niger 2014-15 and 2021-22; Tanzania;
+  # Malawi; Ethiopia, GH #843 / #824 / #1457) or a harvest from a roster off
   # the field grid (Mali's EAC-I trees, GH #1476).  In a count of crop occurrences,
   # drop it where the household has a plot row of that crop and keep it where it
   # has none, because it is then the only record of the crop (GH #1469;
@@ -1242,15 +1243,17 @@ Columns:
         or records one whose unit the survey did not capture.
 
         A COUNTRY MAY LEGITIMATELY NOT DECLARE IT.  Where the sale module
-        is a SEPARATE file at a coarser grain, the honest fix is to attach
+        is a SEPARATE file at a coarser grain, one honest fix is to attach
         the sale only to the harvest row measured in the SAME unit, so the
         ratio is a price per `u` BY CONSTRUCTION -- which is what Malawi
-        does (`malawi._sale_block` / `assemble_crop_production`, commit
-        85947ff5, merging on `(i, _crop_code, u)`).  Both shapes are
+        does on a harvest row (`malawi._sale_block` / `assemble_crop_production`,
+        commit 85947ff5, merging on `(i, _crop_code, u)`).  Both shapes are
         correct; what is not correct is dividing by a quantity whose unit
-        the table never states.  `optional: true` because of exactly this:
-        the column exists where the instrument asks a second unit on the
-        same row (Uganda), and is absent where it does not.
+        the table never states.  A `plot_id = 'Farm-level'` sale has no harvest
+        `u`, so it needs this column (GH #843, #1457).  `optional: true` because
+        of exactly this: the column exists where the instrument asks a second
+        unit on the same row (Uganda) or a sale has no row of its own, and is
+        absent where neither holds.
     Condition_sold:
       type: str
       optional: true

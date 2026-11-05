@@ -60,9 +60,9 @@ def _build(eth, with12=True):
                               "field_id", "crop_code", "qty"])
     units = pd.Series([None] * len(h), dtype=object)
     sale = pd.DataFrame([("H1", 7, 1, 20.0, 300.0), ("H2", 2, 2, nan, nan)],
-                        columns=["holder_id", "crop_code", "sold", "sqty", "sval"])
+                        columns=["holder_id", "crop_code", "sold", "sqty", "sval"]).assign(household_id=lambda d: "H" + d["holder_id"].astype(str))  # the §11/§12 files name it (GH #1457)
     s12 = pd.DataFrame([("H4", 72, 1, 4.0, 80.0)],
-                       columns=["holder_id", "crop_code", "q06", "q07", "q08"])
+                       columns=["holder_id", "crop_code", "q06", "q07", "q08"]).assign(household_id=lambda d: "H" + d["holder_id"].astype(str))  # the §11/§12 files name it (GH #1457)
     kw = dict(sale12=s12) if with12 else {}
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
@@ -126,6 +126,7 @@ def test_served_rows_whose_only_number_is_a_sale_value(cp):
     positive lines / 11,339 Birr, all now served.  GH #1461: W5 276 -> 274, a
     Gishita and a Pumpkin (holder, crop) on several §9 lines of one plot, whose
     no-unit rows carried only a sale the rule no longer attaches."""
+    cp = cp[cp.index.get_level_values("plot_id") != "Farm-level"]  # GH #1457: a sale's own row has its own oracle
     t = np.asarray(cp.index.get_level_values("t"), dtype=object)
     u = np.asarray(cp.index.get_level_values("u"), dtype=object)
     only_value = ((u == "Unknown")

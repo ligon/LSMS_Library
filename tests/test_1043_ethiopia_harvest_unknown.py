@@ -25,7 +25,7 @@ COLS = dict(hhid='hh', holder_id='holder', parcel_id='parcel', field_id='field',
 def build(eth, units, quantity=5., value=None):
     h = pd.DataFrame({'hh':['hh'], 'holder':['holder'], 'parcel':[1],
                       'field':[1], 'crop':[7], 'qty':[quantity]})
-    sale = None if value is None else pd.DataFrame({'holder':['holder'], 'crop':[7],
+    sale = None if value is None else pd.DataFrame({'hh':['hh'], 'holder':['holder'], 'crop':[7],
                                                    'sold':[1], 'sqty':[np.nan], 'sval':[value]})
     return eth.crop_production_for_wave('2013-14', h, None, sale, COLS,
                                        unit_labels=units)

@@ -182,15 +182,20 @@ Data Scheme:
     # Item-level (t, i, plot_id, crop) harvest feature for the four IHS3+
     # IHPS waves (2010-11, 2013-14, 2016-17, 2019-20); GAP 1.  Reported
     # harvest Quantity + native unit + condition, and household-crop sale
-    # Quantity_sold / Value_sold.  Sales attach to single-plot crops only,
-    # in the sale's OWN unit (ag_i02b / ag_q02b, GH #824).  The sale-basis
+    # Quantity_sold / Value_sold.  Sales attach to a harvest row of single-plot
+    # crops only, in the sale's OWN unit (ag_i02b / ag_q02b, GH #824).  The sale-basis
     # ladder admits exact stated condition matches, an unknown wildcard,
     # registered price rules (including resolving contradictions), and
     # distinct not-applicable branches for measured non-separation or an
     # absent reference.  The ladder preserves reported quantities, values
     # and harvest condition; derived attachment/basis interpretation is
     # exposed by Derivation.  Unadmitted or ambiguous candidate sales are
-    # counted -- see malawi.py:assemble_crop_production.  Also includes
+    # counted -- see malawi.py:assemble_crop_production.  Every sale that reaches no
+    # harvest row sits on its own plot_id = 'Farm-level' row, no Quantity, u = Unknown,
+    # condition = unknown_condition, production_obs = 'reported:<I|Q>:<code>', with
+    # its own unit and state in Unit_sold / Condition_sold (GH #1457, option (d) of
+    # #843).  EXCLUDE plot_id == 'Farm-level' for plot-grain work; KEEP it for
+    # household or crop totals.  Also includes
     # item planting / harvest-end months and intercropped / perennial flags.
     # Sources:
     # seasonal Module G + perennial Module P (plot-crop harvest), seasonal
@@ -268,6 +273,15 @@ Data Scheme:
     crop_variety: str
     Quantity_sold: float
     Value_sold: float
+    # The sale's own unit and shelled/unshelled answer (ag_i02b / ag_q02b, ag_i02c /
+    # ag_q02c).  On a harvest row Unit_sold is the row's `u`, by construction.  They
+    # are what a Farm-level row states, and NA where there is no sale (GH #1457).
+    Unit_sold:
+      type: str
+      optional: true
+    Condition_sold:
+      type: str
+      optional: true
     planting_month: int
     harvest_month: int
     intercropped: bool

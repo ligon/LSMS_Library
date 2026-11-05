@@ -471,8 +471,11 @@ Malawi::crop_production::sale-basis-unresolved:
   columns: [Quantity_sold, Value_sold]
   rows: 0
   rule: >-
-    A DELETION.  A sale with a candidate harvest row (single-plot crop, same
-    unit) that no rung admits is attached to nothing, and is COUNTED in
+    A REFUSAL.  Until GH #1457 a deletion; the sale is now served on its own
+    plot_id = 'Farm-level' row with its own unit and state, and no row carries this
+    key, because the index discloses it.  A sale with a candidate harvest row
+    (single-plot crop, same unit) that no rung admits is attached to no harvest
+    row, and is COUNTED in
     attrs['sale_basis_mismatch'] and in the SaleAttachmentWarning the build
     emits, on one of three grounds, each counted in
     attrs['sale_basis_ladder'][this key]['grounds']: (1) a contradiction
@@ -488,8 +491,7 @@ Malawi::crop_production::sale-basis-unresolved:
     an exact match already claimed (`claimed_by_tier_a`).  Ambiguous
     pairings (more than one compatible row or sale) are a separate count,
     attrs['sale_suppressed'] (GH #854), not this entry.
-    The dropped rows have nowhere to carry a key; `derivation_inputs`
-    returns them.
+    `derivation_inputs` returns the lines.
   function: lsms_library.countries.Malawi._.malawi:derive_sale_basis
   inputs: lsms_library.countries.Malawi._.malawi:inputs_sale_basis_unresolved
   raw_variables:
@@ -501,13 +503,13 @@ Malawi::crop_production::sale-basis-unresolved:
   assumptions:
     - text: >-
         a sale that cannot be expressed at the row's declared grain (t, i,
-        plot_id, crop, u, condition) is not attached: attaching it on the
+        plot_id, crop, u, condition) is not attached to it: attaching it on the
         wrong basis makes Value_sold / Quantity_sold a price per the OTHER
         basis, which the condition-keyed kg factors then convert with the
-        wrong factor (GH #833).  Not lost data: the raw modules and
-        `_sale_block` still hold the household-crop total.
+        wrong factor (GH #833).  It has a row of its own since GH #1457, whose
+        Unit_sold and Condition_sold state the sale's basis.
       basis: modelling-choice
-      evidence: GH #833 (CONTENTS.org, "The rule"); README.org section 5.
+      evidence: GH #833 (CONTENTS.org, "The rule"); README.org section 5; GH #1457.
   validated_against: >-
     The build's own suppression predicate: `derivation_inputs` returns
     exactly the Module I/Q lines whose grouped sale has outcome
