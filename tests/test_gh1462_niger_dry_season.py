@@ -212,12 +212,15 @@ class TestServed:
     def test_the_key_is_on_every_dry_row_and_no_rainy_one(self, built):
         _, df = built
         got = df.reset_index()
-        dry = got["plot_id"] == "Farm-level"
-        assert set(got.loc[dry, "t"]) == {WAVE}
+        # Re-pinned for GH #1457: 2014-15 / 2021-22 multi-plot sales share the sentinel,
+        # with no harvest and no dry-season key.  Dry-season rows are 2011-12's.
+        farm = got["plot_id"] == "Farm-level"
+        dry = farm & (got["t"] == WAVE)
+        assert got.loc[farm & ~dry, "Quantity"].isna().all()
         assert got.loc[dry, "Derivation"].str.contains(TOTAL, regex=False).all()
         # This wave's only: 2021-22's Quantity_kg carries its own key since GH #1436.
         assert got.loc[~dry & (got["t"] == WAVE), "Derivation"].isna().all()
-        assert not got.loc[~dry, "Derivation"].fillna("").str.contains(TOTAL, regex=False).any()
+        assert not got.loc[~dry, "Derivation"].fillna("").str.contains("dry-season", regex=False).any()
         sold = (got["Quantity_sold"].fillna(0) > 0) | (got["Value_sold"].fillna(0) > 0)
         carries = got["Derivation"].fillna("").str.contains(SALE, regex=False)
         assert (carries == (dry & sold)).all()
@@ -240,8 +243,9 @@ class TestServed:
     def test_2014_15_has_no_dry_season_row(self, built):
         # Not missing: ECVMA2_AS03P1 is agricultural equipment, not a harvest.
         _, df = built
-        got = df.xs("2014-15", level="t").index.get_level_values("plot_id")
-        assert "Farm-level" not in set(got)
+        # Re-pinned for GH #1457: a sale's Farm-level row is here, and states no harvest.
+        got = df.xs("2014-15", level="t").reset_index()
+        assert got.loc[got["plot_id"] == "Farm-level", "Quantity"].isna().all()
         raw = _read("2014-15", "NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS03P1.dta",
                     convert_categoricals=False)
         assert not {"AS03EQ09A", "as03eq09a"} & set(raw.columns)

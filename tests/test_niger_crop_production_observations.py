@@ -49,7 +49,8 @@ INDEX = ["t", "i", "plot_id", "crop", "u", "condition", "production_obs"]
 #: Served rows per wave, cold rebuild after GH #1360 (before: 11,937 / 8,799
 #: / 13,717 / 11,923 = 46,376).
 #: 2011-12 was 11,967 before GH #1462 served section 3E's 575 dry-season lines.
-ROWS = {"2011-12": 12542, "2014-15": 8799, "2018-19": 13717, "2021-22": 12933}
+#: Re-pinned for GH #1457: 2014-15 + 517 and 2021-22 + 553 Farm-level sale rows.
+ROWS = {"2011-12": 12542, "2014-15": 8799 + 517, "2018-19": 13717, "2021-22": 12933 + 553}
 #: production_obs token kind served in each wave.
 KIND = {"2011-12": "reported", "2014-15": "unresolved_observation",
         "2018-19": "unresolved_observation", "2021-22": "row"}
@@ -245,6 +246,12 @@ class TestServed:
         df, _ = built
         g = df.xs(wave, level="t")
         assert len(g) == ROWS[wave], f"{wave}: {len(g)} rows"
+        # GH #1457: a sale's Farm-level row has no harvest line to name, so it carries
+        # the sentinel in every wave (2011-12's dry-season Farm-level rows name their 3E line).
+        if wave in ("2014-15", "2021-22"):
+            farm = g.index.get_level_values("plot_id") == "Farm-level"
+            assert set(g[farm].index.get_level_values("production_obs")) == {"unresolved_observation"}
+            g = g[~farm]
         kinds = set(g.index.get_level_values("production_obs").str.split(":").str[0])
         assert kinds == {KIND[wave]}, kinds
 
@@ -259,6 +266,8 @@ class TestServed:
     def test_2021_22_sale_totals(self, built):
         df, _ = built
         g = df.xs("2021-22", level="t").reset_index()
-        g = g[g["Value_sold"].notna()]
+        # GH #1457: what the one-line rule serves; the rest is on Farm-level, and
+        # tests/test_gh1457_niger_multi_plot_sales.py holds the raw total.
+        g = g[g["Value_sold"].notna() & (g["plot_id"] != "Farm-level")]
         assert g.groupby(["i", "crop"]).ngroups == W2021_SALE_PAIRS
         assert float(g["Value_sold"].sum()) == W2021_VALUE_SOLD

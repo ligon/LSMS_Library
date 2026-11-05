@@ -11,12 +11,12 @@ Two source files, as the instrument splits harvest from sale:
 
 i is built from (GRAPPE, MENAGE, EXTENSION) via niger.i -- the full
 ECVMA2 household key, matching this wave's sample / roster idxvars
-(GH #679; EXTENSION 2 is a split-off household).  As in 2021-22 the
-crop-level sale is attributed only to (i, crop) pairs with a single harvest
-LINE (hence a single plot); other pairs keep Quantity_sold / Value_sold NaN
-(no fabricated split).  Measured: no 2014-15 sale-bearing pair has two
-harvest lines, so the line rule serves exactly what the old plot rule did
-(GH #1360).  ``harvest_month`` = AS02EQ06A (month-of-harvest-start, 1-12);
+(GH #679; EXTENSION 2 is a split-off household).  As in 2021-22 a crop-level
+sale (a positive AS02EQ12A or AS02EQ13; 1,081 records) goes on the crop's single
+harvest LINE (564), keyed Niger::crop_production::hh-crop-sale-single-row, and
+otherwise on ONE row with plot_id = 'Farm-level' (517: 498 on two or more plots,
+19 with no harvest row), its index the sentinels of a row with no harvest (GH
+#1457).  No split, no sum, nothing dropped.  ``harvest_month`` = AS02EQ06A (month-of-harvest-start, 1-12);
 ``planting_month`` is not in this module (NaN).  The modules' unlabelled
 "don't know" codes (9999 on the quantities, 9999999 on the sale value) are
 mapped to NA, exact value only (GH #865).
@@ -35,7 +35,8 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
-                   _finish_crop_production, _na_exact)
+                   _finish_crop_production, _na_exact,
+                   derive_hh_crop_sale_attachment, stamp_hh_crop_sale)
 
 # "Don't know" codes of these modules, unlabelled in the .dta (GH #865) --
 # a DIFFERENT width from 2011-12's 999999.  Exact values only.  Raw counts:
@@ -103,6 +104,7 @@ sold_df = pd.DataFrame({
 # sum is a no-op here; the key still names the grain the sum is taken over.
 sold_one = (sold_df.groupby(['i', 'crop', 'Unit_sold'], as_index=False, dropna=False)
             [['Quantity_sold', 'Value_sold']].sum(min_count=1))
+records = sold_one
 
 # Attribute ONLY to (i, crop) pairs with a single harvest LINE -- one plot,
 # one line, so the sale lands on exactly one served row (no fabricated split
@@ -118,8 +120,15 @@ sold_one = sold_one[sold_one.set_index(['i', 'crop']).index.isin(single)
 
 df = df.merge(sold_one, on=['i', 'crop'], how='left')
 
+# Any other sale: ONE Farm-level row (GH #1457).
+df = derive_hh_crop_sale_attachment(df, records)
+
 df = _finish_crop_production(df, '2014-15')
+df['Derivation'] = stamp_hh_crop_sale(df)
 
 assert df.index.is_unique, 'crop_production 2014-15 repeats a native harvest line'
+# Conservation: the records' sums, on one row each.
+assert df['Value_sold'].sum() == records['Value_sold'].sum(), 'a sale value moved'
+assert df['Quantity_sold'].sum() == records['Quantity_sold'].sum(), 'a sold quantity moved'
 assert len(df) > 0, 'crop_production 2014-15 produced no rows'
 to_parquet(df, 'crop_production.parquet')
