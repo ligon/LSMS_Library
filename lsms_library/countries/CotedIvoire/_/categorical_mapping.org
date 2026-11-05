@@ -526,3 +526,41 @@
 | Téléphone portable                             | Phone (Mobile)  |
 | Ventilateur sur pied                           | Fan             |
 | Voiture personnelle                            | Car             |
+
+# harmonize_crop_condition_ehcvm1 (GH #1436): "Etat du produit", s16cq12c, the
+# physical state of the crop when the reported harvest quantity was measured --
+# the canonical `condition` index level of crop_production (lsms_library/
+# data_info.yml, Columns > crop_production > condition).  Read by code; Source
+# Label is the .dta value label, provenance only.  Niger/_/categorical_mapping.org
+# carries the reasoning for the same five codes.
+#
+# The instrument asks the form and never the dryness, so these are the bare form
+# tokens.  RULED, @ligon 2026-11-04 (GH #1436): the five answers fold onto three
+# tokens, ear and hull into `unshelled`, grain and hulled into `shelled`.  The
+# answer itself is served in the column `condition_native`.  Code 5 is a survey
+# answer, not the missing-data sentinel: a blank code is `unknown_condition`.
+#
+# COTE D'IVOIRE HAS SEVEN ANSWERS, NOT FIVE.  The vague 1 CAPI instrument
+# (CIV-EHCVM1-QNR-MEN-CAPI-VAGUE1.pdf, p. 191) lists the shared five.  The vague 2
+# one (CIV-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf, p. 197) adds 6 Fève and 7 Autre à
+# préciser, and the file agrees: 371 + 956 lines, every one in vague 2.  So the
+# Source Label of those two is the INSTRUMENT, not the .dta, whose value label stops
+# at 5, and the script reads them from this table.  The free text of 7
+# (s16Cq12c_autre) is not in the shipped file.
+#
+# PROVISIONAL, GH #1436: the ruling names five answers and neither of these two.
+# 7 is `other_condition` because that is what it says.  6 is `other_condition`
+# because no token says "bean" and folding it onto `shelled` is a judgement the
+# ruling did not make; the answer is in `condition_native` either way.  Changing a
+# row here is the whole fix, and one Cote d'Ivoire re-warm.  Never
+# `unknown_condition`: the survey answered.
+#+NAME: harmonize_crop_condition_ehcvm1
+| Code | Preferred Label      | Source Label     |
+|------+----------------------+------------------|
+|    1 | unshelled            | Epis             |
+|    2 | shelled              | Grain            |
+|    3 | shelled              | Décortiqué       |
+|    4 | unshelled            | Non-décortiqué   |
+|    5 | shell_not_applicable | Non concerné     |
+|    6 | other_condition      | Fève             |
+|    7 | other_condition      | Autre à préciser |

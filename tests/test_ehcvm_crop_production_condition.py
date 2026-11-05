@@ -48,6 +48,10 @@ FOLD = {1: "unshelled", 2: "shelled", 3: "shelled", 4: "unshelled",
         5: "shell_not_applicable"}
 FRENCH = {1: "Epis", 2: "Grain", 3: "Décortiqué", 4: "Non-décortiqué",
           5: "Non concerné"}
+#: Cote d'Ivoire's vague 2 instrument adds two answers the .dta does not label
+#: (CIV-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf, p. 197).  The fold of both is provisional.
+IVOIRE_LABELS = {**FRENCH, 6: "Fève", 7: "Autre à préciser"}
+IVOIRE_FOLD = {**FOLD, 6: "other_condition", 7: "other_condition"}
 
 
 @dataclass(frozen=True)
@@ -66,6 +70,8 @@ CELLS = {
     "Togo": Cell("2018", "../Data1/s16c_me_tgo2018.dta", FRENCH, FOLD),
     "Senegal": Cell("2018-19", "../Data/s16c_me_sen2018.dta", FRENCH, FOLD),
     "Burkina_Faso": Cell("2018-19", "../Data/s16c_me_bfa2018.dta", FRENCH, FOLD),
+    "CotedIvoire": Cell("2018-19", "../Data/Menage/s16c_me_CIV2018.dta",
+                        IVOIRE_LABELS, IVOIRE_FOLD),
 }
 COUNTRIES = list(CELLS)
 
@@ -289,3 +295,38 @@ class TestServed:
         served = built(country)
         pd.testing.assert_frame_equal(harvest_kg(served),
                                       harvest_kg(served.drop(columns="condition_native")))
+
+
+class TestCotedIvoireUnlabelledCodes:
+    """Codes 6 and 7 carry no .dta label; the column takes the instrument's."""
+
+    @pytest.fixture
+    def labels(self, monkeypatch):
+        monkeypatch.chdir(_wave_dir("CotedIvoire"))
+        return _helpers("CotedIvoire", "_crop_condition_labels")["_crop_condition_labels"]
+
+    def test_the_two_codes_read_the_instrument_and_the_rest_the_file(self, labels):
+        out = labels(pd.Series(["Epis", 6.0, 7.0, None], dtype="object"),
+                     pd.Series([1.0, 6.0, 7.0, float("nan")]))
+        assert out.iloc[:3].tolist() == ["Epis", "Fève", "Autre à préciser"]
+        assert pd.isna(out.iloc[3])
+        assert str(out.dtype) == "string"
+
+    def test_a_bare_number_is_never_served(self, labels):
+        out = labels(pd.Series([6.0, 7.0], dtype="object"), pd.Series([6.0, 7.0]))
+        assert not out.astype(str).str.contains(r"^\d").any()
+
+    @pytest.mark.requires_s3
+    def test_the_two_codes_occur_only_in_vague_2(self):
+        """What makes the instrument's vague 2 list the right reading: vague 1's has five."""
+        from lsms_library.local_tools import get_dataframe
+
+        cwd = os.getcwd()
+        os.chdir(_wave_dir("CotedIvoire"))
+        try:
+            raw = get_dataframe(CELLS["CotedIvoire"].source, convert_categoricals=False)
+        finally:
+            os.chdir(cwd)
+        added = pd.to_numeric(raw[STATE], errors="coerce").isin([6, 7])
+        assert added.any()
+        assert set(raw.loc[added, "vague"]) == {2}
