@@ -164,10 +164,43 @@ class TestTheVocabularyIsFrozenFromUganda:
         """#793: "freeze the vocabulary (design_tag / status /
         documentation_status)" -- as-is, so exactly Uganda's values."""
         uga = sampling_records("Uganda").values()
-        assert {r.design_tag for r in uga} == S.DESIGN_TAGS
+        # GH #1134 added `not-stated`, whose first record is Albania 2008; the
+        # both-directions rule over every shipped record is the test just below.
+        assert {r.design_tag for r in uga} == S.DESIGN_TAGS - {"not-stated"}
         assert {r.documentation_status for r in uga} == S.DOCUMENTATION_STATUSES
         assert {o["status"] for r in uga for o in (r.oversamples or [])} == \
             S.OVERSAMPLE_STATUSES
+
+    def test_every_allowed_design_tag_is_used_by_a_shipped_record(self):
+        """GH #1134: a tag is added only with the first evidenced record."""
+        tags = {r.design_tag for r in _shipped() if r.design_tag is not None}
+        assert tags == S.DESIGN_TAGS
+
+    @pytest.mark.parametrize("source_type", sorted(S.NOT_STATED_SOURCE_TYPES))
+    def test_not_stated_is_valid_where_no_document_states_a_design(self, source_type):
+        rec = SamplingRecord.from_config("X", "2000", design(
+            design_tag="not-stated", source_type=source_type, confidence="low"))
+        assert rec.design_tag == "not-stated" and not rec.documented
+
+    @pytest.mark.parametrize(
+        "source_type", sorted(S.SOURCE_TYPES - S.NOT_STATED_SOURCE_TYPES))
+    def test_not_stated_is_refused_under_a_document(self, source_type):
+        with pytest.raises(ValueError, match="says nothing states a design"):
+            SamplingRecord.from_config("X", "2000", design(
+                design_tag="not-stated", source_type=source_type))
+
+    def test_not_stated_still_needs_its_triple(self):
+        """Ruling: not option C.  The tag never travels without the other two."""
+        block = design(design_tag="not-stated", source_type="not-found")
+        block.pop("confidence")
+        with pytest.raises(ValueError, match="travel together"):
+            SamplingRecord.from_config("X", "2000", block)
+
+    def test_the_first_not_stated_record_is_albania_2008(self):
+        rec = sampling_records("Albania")["2008"]
+        assert (rec.design_tag, rec.source_type) == ("not-stated", "not-found")
+        assert rec.design_statement is None and not rec.documented
+        assert "No content available" in rec.locator
 
     def test_source_type_and_confidence_are_the_exemplar_headers_legend(self):
         assert S.SOURCE_TYPES == {"local-documentation", "wb-catalog",
