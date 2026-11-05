@@ -67,13 +67,12 @@ def _raw(wave, name):
 
 @pytest.fixture(scope="module")
 def served():
+    # No skip on a failed build: TestServed is `requires_s3`, so reaching here means
+    # the data is available, and a build that raises must fail this file.
     import lsms_library as ll
-    try:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            df = ll.Country(COUNTRY).plot_inputs()
-    except Exception as e:  # pragma: no cover - data not available
-        pytest.skip(f"{COUNTRY} plot_inputs not buildable here: {e}")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        df = ll.Country(COUNTRY).plot_inputs()
     return df
 
 
