@@ -938,7 +938,7 @@ row, keyed; 277 on one =Farm-level= row each.  A sale is a record with a positiv
 =shelled=.  The file states it on 376 rows; every other row, derived or =Farm-level=, is =unknown_condition=.  No answer falls outside the ruled fold, so nothing is =other_condition=.
 
 *=Quantity_kg=.*  =s16cq16c= (376 positive of 381) is the survey's kilograms for the recorded rows, and =s16dq05c= for the sold line, which the questionnaire asks per unit and the label calls a total, and the file holds
-both shapes (=Sac (100 Kg)=: 1,801 at 100 x q, 180 at 100, 57 at q).  The survey-kg rung has not landed on development: not served.  A derived total has no survey kilograms.
+both shapes (=Sac (100 Kg)=: 1,801 at 100 x q, 180 at 100, 57 at q).  Not served on this branch: the survey-kg rung landed on development (=909d9ba29=, GH #1436) after this wiring's base.  Mali's and Niger's wave scripts show the column to add.  A derived total has no survey kilograms.
 
 ** =plot_features=: =s16aq47= holds two scales, in both waves
 
