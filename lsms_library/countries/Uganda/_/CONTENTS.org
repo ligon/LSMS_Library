@@ -1434,7 +1434,7 @@ Nuts= =dried_with_shell= 3,032.
 | =Ground Nuts= 17,323,242  | =Ground Nuts= 838,025, =(shelled)= 2,140,585, =(pounded)= 12,184,647, =(paste)= 2,159,985 |
 | =Sim Sim= 3,435,070       | =Sim Sim= 3,248,920, =(paste)= 186,150                       |
 
-The total is 726,299,304.83 both ways, and the other 70 Aggregates are equal.  =food_expenditures=
+The total is 726,299,304.83 both ways, and the other 71 served Aggregates are equal.  =food_expenditures=
 goes from 242,043 rows to 243,043; =food_acquired= keeps its 355,571.  *=Maize= is now 1.5%
 of what it was*, because nearly all of it was flour; a user who wants the old bucket adds three.
 
@@ -1466,7 +1466,7 @@ same and still stay apart: #833's rule is that price magnitude does not license 
 | 2010-11, 2011-12, 2013-14, 2015-16 | 115 | =Millet (flour)=             |
 | 2018-19, 2019-20           | 1151 | =Millet flour=                       |
 
-(=food_expenditure_labels= in =nutrition.org= has recorded the same for years.)  So splitting
+(=food_expenditure_labels= in =nutrition.org= records the same.)  So splitting
 would serve a distinction the survey denies, and would end one series at 2015-16 and start
 another at 2018-19 under names that say grain and flour.  Set against other prices the step is
 small: flour at 2,000 in 2015-16 and 3,000 in 2018-19, ×1.5, while rice went ×1.2, sugar ×1.33
@@ -4975,7 +4975,7 @@ locates this household".
 | 2009-10 |         28 | 24 on =GSEC1= with a blank =comm= and no GPS fix: all 24 have =region= and 23 a district code.  4 are on =AGSEC3B= or =GSEC12= only. |
 | 2011-12 |         57 | on =AGSEC1= and other modules, not on =GSEC1=.  26 have a parcel GPS reading inside Uganda in =AGSEC2A= / =AGSEC2B=. |
 | 2013-14 |          1 | blank =h1aq4a=.  Its cover has =ea=, =region= and =h1aq1a=, and =unps_geovars_2013_14= has a fix.                   |
-| 2018-19 |         66 | on =AGSEC1= and not on =GSEC1=; =AGSEC1='s =region= is blank for all 66.  Other files not swept for a location.     |
+| 2018-19 |         66 | on =AGSEC1= and not on =GSEC1=; =AGSEC1='s =region= is blank for all 66.  Parcel GPS not checked.                   |
 | 2019-20 |          1 | blank =district=.                                                                                               |
 
 None of this is used to fill =v=: parcel GPS is where a parcel is and 2013-14's =ea= is a
