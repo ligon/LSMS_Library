@@ -393,8 +393,9 @@ Mali::community_prices::gram-centilitre-poids:
     On a Gramme row a recorded Poids of 5 or more is divided by 1,000, and on a Centilitre
     row by 100, in either passage, so Quantity is the lot in kg or litres, as on the Kg and
     Litre rows.  u stays the recorded unit and Price is untouched.  On these rows a Poids
-    below 1 is already kg or litres and from 1 up to 5 no reading fits: both stay as
-    recorded, carry no key and are counted in CONTENTS.org.  So does every other unit: a
+    below 1 is already kg or litres, and from 1 up to 5 as recorded is the better reading
+    and not an established one: both stay as recorded, carry no key and are counted in
+    CONTENTS.org.  So does every other unit: a
     Boite, Sachet, Tas, Unite, Paquet, Verre, Bidon, Kg or Litre row is served as recorded,
     whatever it holds.
   function: lsms_library.countries.Mali._.mali:derive_poids_base_unit
@@ -418,7 +419,10 @@ Mali::community_prices::gram-centilitre-poids:
         2x of that size, recorded / divided.  Poids >= 5: Gramme p1 0.00 / 0.92 (n=255), p2 0.00
         / 0.88 (227); Centilitre p1 0.00 / 1.00 (949), p2 0.00 / 0.89 (445).  Poids < 1:
         Gramme p1 0.76 / 0.00 (29), p2 0.86 / 0.00 (175); Centilitre p1 0.56 / 0.00 (25), p2
-        0.91 / 0.00 (980).  1 <= Poids < 5: 0.00 / 0.00 in all four cells (6, 63, 5, 39).
+        0.91 / 0.00 (980).  1 <= Poids < 5: 0.00 / 0.00 in all four cells (6, 63, 5, 39).  Against a
+        price reference over all products, broader and weaker, because small packets cost more per
+        kg: at 5 or more the recorded reading fits better on 3.7% of 1,533 Gramme rows and 0.2% of
+        1,555 Centilitre rows; from 1 up to 5 it falls within 2x on 41% and 44%, and dividing on 0%.
       basis: modelling-choice
       evidence: >-
         measured 2026-11-04 on EACIS04_p1.dta and EACIS04_p2.dta; a passage-only rule fails this
@@ -431,6 +435,14 @@ Mali::community_prices::gram-centilitre-poids:
         litres, and 608 entries of 999.
       basis: modelling-choice
       evidence: Mali/_/CONTENTS.org table, cold build of the served rows
+    - text: >-
+        the rule mis-reads about 43 of the 3,090 rows it converts, and no other threshold fixes
+        them: 22 Gramme rows fit as recorded and not divided (16 passage-2 salt at Poids 25), and 21
+        Centilitre rows at 250 or more look like millilitres (15 Huile de coton at 250, 6 Lait frais).
+        38 Boissons gazeuses rows at Centilitre 90 in passage 2, on the bottle labelled 33 cl, are
+        served 0.9 L.
+      basis: modelling-choice
+      evidence: Mali/_/CONTENTS.org, measured 2026-11-04 on EACIS04_p1.dta and EACIS04_p2.dta
   validated_against: >-
     tests/test_gh1179_mali_community_quantity.py, whose oracle reads EACIS04_p1/p2 directly.  The
     per-kg price on a stated-size variety is not validated against any external price.

@@ -1660,8 +1660,10 @@ def people_last7days_finalize(df):
 #
 # REPORTED columns only:
 #   Price       = s04q05/q08/q11, surveyed FCFA for a Quantity-sized lot.
-#   Quantity    = s04q04/q07/q10, lot weight in kg ("Poids (KG)"); 999 / 9999
-#                 sentinel is coerced to NA.
+#   Quantity    = s04q04/q07/q10, the lot's weight in kg, litres for a volume: a
+#                 gram or centilitre Poids of 5 or more is divided
+#                 (derive_poids_base_unit); other rows are as recorded, whatever
+#                 the column head says.  999 / 9999 sentinel is coerced to NA.
 #   Description = the s04q02 value label of that passage's file ("Riz importé
 #                 vendu en sac", "Boîte de 220g de marque 'Aicha'", ...).
 #
@@ -1692,7 +1694,8 @@ DERIVATION_POIDS = 'Mali::community_prices::gram-centilitre-poids'
 _POIDS_DIVISOR = {('Gramme', 1): 1000.0, ('Gramme', 2): 1000.0,
                   ('Centilitre', 1): 100.0, ('Centilitre', 2): 100.0}
 #: At or above this a Poids on such a row is in the row's own unit.  Below 1 it is
-#: already kg or litres, and from 1 up to here neither reading fits.
+#: already kg or litres.  From 1 up to here as recorded is the better reading and
+#: not an established one: dividing fits nothing, as recorded fits under half.
 _POIDS_NATIVE_FLOOR = 5.0
 #: The two passage files' three readings: unit, weight, price.
 _COMMUNITY_READINGS = (('s04q03', 's04q04', 's04q05'),
@@ -1708,8 +1711,8 @@ def derive_poids_base_unit(poids, unit, visit):
     2250, Unite 2, Gramme.  So on a ``Gramme`` or ``Centilitre`` row a Poids of 5 or
     more is in that unit, and is divided here, in either passage.  Every other value
     stays as recorded: below 1 it is already kg or litres (a 33 cl bottle at 0.33), and
-    from 1 up to 5 no reading fits, so it is counted rather than decided.  Rows on any
-    other unit stay as recorded.  Registered as
+    from 1 up to 5 dividing fits nothing while as recorded fits under half, so it is
+    counted rather than decided.  Rows on any other unit stay as recorded.  Registered as
     ``Mali::community_prices::gram-centilitre-poids``.
     """
     poids = pd.to_numeric(poids, errors='coerce')

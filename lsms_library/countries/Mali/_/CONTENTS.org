@@ -2908,8 +2908,8 @@ two plots, and summing by household does not.
 
 Ruling @ligon 2026-11-04.  *This corrects "=community_prices.Quantity= is a WEIGHT IN KG" above*, and the
 =Gramme= line of the table under it, which rested on the column head "Poids (KG)".  Both enumerator manuals
-(=EACI_MANUEL_P1_V5_Redacted.pdf= PDF pp. 103-104, =EACI_MANUEL_P2_V3.pdf= PDF p. 88, held from WB 2583 and
-FAO 1463 by the acquisitions lane; their sidecars are not on this branch) say: "Le poids et l'unité
+(=EACI_MANUEL_P1_V5_Redacted.pdf= PDF pp. 103-104, =EACI_MANUEL_P2_V3.pdf= PDF p. 88, in =2014-15/Documentation/=)
+say: "Le poids et l'unité
 correspondante sont liés", and a banana the agent finds "fait 2,250 kilogramme" is entered Poids 2250,
 Unité 2, and 2 is Gramme.
 
@@ -2920,7 +2920,7 @@ the recorded unit, =Price= does not move, and =Quantity= is kg (litres for a vol
 |---------------------------------------------------+-------------+-----+----------------------|
 | 5 or more                                         | / 1000, / 100 | yes | in the row's own unit, as the manual says |
 | above 0, below 1                                  | as recorded | no  | already kg or litres |
-| 1 up to, not including, 5                         | as recorded | no  | no reading fits; counted |
+| 1 up to, not including, 5                         | as recorded | no  | the better reading, not established; counted |
 | 0, or the 999 sentinel (NA)                       | as before   | no  | no usable weight     |
 
 *The rule is written per passage and is the same in both.*  The ruling asked for a unit-and-passage rule, and
@@ -2939,6 +2939,20 @@ stated size, as recorded / divided:
 And the per-unit price now agrees across sizes of one product, median FCFA per kg or litre: the 60 g tin
 1,667 and the 220 g tin 1,591 (2.1 and 1,000 before); the 33 cl bottle 857 and the 30 cl bottle 909 (8.6 and
 909 before).
+
+A price reference over all products with a =Kg= or =Litre= row is broader than these seven varieties and weaker, because small
+packets cost more per kg.  It agrees at 5 or more: the recorded reading fits better on 3.7% of 1,533 =Gramme= rows and 0.2% of
+1,555 =Centilitre= rows.  *From 1 up to 5 it says the stated-size table above is too strong as "no reading fits":* as recorded
+falls within 2x on 41% (=Gramme=) and 44% (=Centilitre=), and divided on 0%.  So as recorded is the better reading there, not an
+established one.
+
+*What the rule mis-reads, about 43 of the 3,090, not fixed by any other threshold:*
+
+- 22 =Gramme= rows fit as recorded and not divided, 16 of them passage-2 salt at Poids 25.
+- 21 =Centilitre= rows at 250 or more look like millilitres: 15 =Huile de coton= at 250, 6 =Lait frais=.
+
+Separately, 38 =Boissons gazeuses= rows at =Centilitre= 90 in passage 2, all on the bottle labelled 33 cl, are served 0.9 L.  90
+recurs in that passage on other units too, and nothing here says what it means.
 
 *What passage 2 does.*  Passage 1 follows the manual on 86% of =Gramme= and 97% of =Centilitre= entries.  Passage
 2 follows it on 33% and 27%: most of the rest are entered in kg or litres, as the column head says, and 608
@@ -2959,10 +2973,13 @@ rows hold the 999 sentinel, which passage 1 never uses (it writes 0, 594 rows). 
 
 - The 295 above.
 - Other units at 5 or more, 5,147 rows (979 in passage 1, 4,168 in passage 2): =Kg= 2,370, =Boite= 1,129, =Tas= 467,
-  =Litre= 342, =Sachet= 276, =Unité= 248, =Bidon= 130, =Paquet= 113, =Verre= 72.  Some are plainly grams, as the 60 g tin
-  at =Boite= 60; others plainly are not (a 20 L =Bidon=).  =Unit= alone cannot say, and passage 2's recurring 25, 20
-  and 90 (=Litre= 90 on 216 rows, =Kg= 25 on 1,116, mostly coarse salt) look like an interviewer convention.  No rule
-  was written for them.
+  =Litre= 342, =Sachet= 276, =Unité= 248, =Bidon= 130, =Paquet= 113, =Verre= 72.  Some are grams, as the 60 g tin at =Boite=
+  60, and others plainly are not (a 20 L =Bidon=).  A gram rule would damage more than it fixes: =Boite= rows fit as recorded
+  within 2x on 63% and as grams on 1.2%, and even =Boite= at 25 or more fits as grams on 4.4%.  =Litre= 90 on 216 rows looks like
+  an interviewer convention.  No rule was written for them.
+- *=Kg= at Poids 25*, 1,206 rows, 1,195 of them salt.  The two passages differ.  In passage 1, 90 rows, salt is priced 19.3 x
+  the variety's =Kg= at Poids 1, so these are 25 kg lots.  In passage 2, 1,116 rows, it is priced 1.0 x: a per-kg price with 25 in
+  the weight field, so =Price / Quantity= is about 25 x too low there.
 - =Kg= at exactly 1 is also the manual's own "could not weigh" entry: its second example is a plantain "pas en mesure
   de peser", entered Poids 1, Unité 1.  47,116 of the 54,848 =Kg= rows sit there, and nothing separates a weighed
   kilogram from an unweighed lot.  So =Price / Quantity= on =u = 'Kg'= is per kg only as far as that entry is honest.

@@ -39,7 +39,7 @@ class TestRule:
         ("Centilitre", 33.0, 0.33),
         ("Gramme", 0.5, 0.5),             # already kg
         ("Centilitre", 0.33, 0.33),       # already litres
-        ("Gramme", 1.0, 1.0),             # no reading fits: as recorded
+        ("Gramme", 1.0, 1.0),             # not established: as recorded
         ("Gramme", 4.0, 4.0),
         ("Centilitre", 3.0, 3.0),
         ("Gramme", 0.0, 0.0),             # a recorded zero stays
