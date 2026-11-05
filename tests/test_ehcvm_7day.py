@@ -50,7 +50,7 @@ WAVES = {
     'Mali': ['2018-19', '2021-22'],
     'Niger': ['2018-19', '2021-22'],
     'Burkina_Faso': ['2018-19', '2021-22'],
-    'CotedIvoire': ['2018-19'],
+    'CotedIvoire': ['2018-19', '2021-22'],
 }
 CELLS = [(c, w) for c, ws in WAVES.items() for w in ws]
 FUNCTION = 'lsms_library.ehcvm:derive_ehcvm_purchase_value'
@@ -72,6 +72,7 @@ BEFORE_SUM = {
     ('Burkina_Faso', '2018-19'): 65_315_307.5,
     ('Burkina_Faso', '2021-22'): 39_905_158.0,
     ('CotedIvoire', '2018-19'): 119_107_505.0,
+    ('CotedIvoire', '2021-22'): 170_793_500.0,
 }
 
 #: Served purchased-side ``Expenditure`` AFTER, under construction C, and the
@@ -95,6 +96,7 @@ AFTER = {
     ('Burkina_Faso', '2018-19'): (52_466_280.38, 9_386),
     ('Burkina_Faso', '2021-22'): (27_888_221.36, 6_148),
     ('CotedIvoire', '2018-19'): (105_011_084.65, 35_289),
+    ('CotedIvoire', '2021-22'): (121_393_491.0, 29_050),
 }
 
 #: The unit sizes each country may serve in `u` (GH #1224): each instrument's own
@@ -105,7 +107,8 @@ SIZES = {
               'Avec 1 brassée', 'Avec 2 brassées', 'A 2 doigts', 'A 3 doigts',
               'A 5 doigts', 'Autre taille'},
     'Burkina_Faso': {'Petit', 'Moyen', 'Grand'},
-    'CotedIvoire': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier'},
+    'CotedIvoire': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier', 'Très petit',
+                    'Très grand', 'Huitième'},
     'Guinea-Bissau': {'Pequeno', 'Medio', 'Grande'},
     'Mali': {'Petit', 'Moyen', 'Grand'},
     'Niger': {'Petit', 'Moyen', 'Grand', 'Quart', 'Demi', 'Entier'},

@@ -1,8 +1,16 @@
 # Formatting functions for CotedIvoire 2021-22 (EHCVM-2).  See _/CONTENTS.org "2021-22 wired".
+import re
+
 import numpy as np
 import pandas as pd
 
 import lsms_library.local_tools as tools
+
+from lsms_library.ehcvm import (
+    derivation_key as _derivation_key,
+    food_acquired_ehcvm as _food_acquired_ehcvm,
+    inputs_last_purchase as _inputs_last_purchase,
+)
 
 # The same projection as Togo 2021-22: Region, Rural and the GPS point are constant
 # within a grappe, and this raises, naming the grappes, on the day one is not.
@@ -164,6 +172,47 @@ def interview_date(df):
     household records no start, and 167 of the 728 record an end.'''
     df = df[df['Result'].astype('string').str.strip().ne('Non rempli')].drop(columns='Result')
     return tools.melt_visit_intervals(df)
+
+
+# --- food_acquired ------------------------------------------------------------------
+
+FOOD_ACQUIRED_DERIVATION = _derivation_key('CotedIvoire')
+
+_UNIT_CODE_PREFIX = re.compile(r'^\d+\.\s*')
+
+#: A label of this file that names what 2018-19 spells otherwise.  The rest keep their
+#: words, including the units 2018-19 kept apart and this file does not (`Bol/Cope`,
+#: `Papier/feuille d'emballage`).
+_UNIT_SPELLING = {'Cueillère': 'Cuillère'}
+
+
+def _unit_label(value):
+    '''s07bq03b, without the code: `139. Sachet` is 2018-19's `Sachet`.  The country's u
+    table then serves it, as it serves 2018-19's.'''
+    if not isinstance(value, str):
+        return value
+    label = _UNIT_CODE_PREFIX.sub('', value).strip()
+    return _UNIT_SPELLING.get(label, label)
+
+
+def food_acquired(df):
+    '''GH #876: purchased Quantity x s07bq08 / s07bq07a, keyed; size in u (GH #1224).
+
+    `u` is respelled here because a one-column idxvar binds format_id, not a formatter;
+    ConsumptionUnitCode and LastPurchaseUnitCode keep the code, which unit_match reads.
+
+    A row where s07bq04 + s07bq05 = s07bq03a exactly purchased nothing.  The shared hook
+    subtracts in two orders, so 12 such rows reach the reshape at 1.1e-16 instead of 0; the
+    file's own residual has no value between 0 and 0.001.  They go the way a true zero goes.
+    '''
+    out = _food_acquired_ehcvm(df.rename(index=_unit_label, level='u'), FOOD_ACQUIRED_DERIVATION)
+    float_residue = (out.index.get_level_values('s') == 'purchased') & (out['Quantity'] < 1e-9).to_numpy()
+    return out[~float_residue]
+
+
+def inputs_food_acquired(wave):
+    """The registry `inputs` callable: raw section-7B answers at (t, i, j)."""
+    return _inputs_last_purchase('CotedIvoire', wave)
 
 
 # --- the wave's scripts, and the registry's raw inputs ------------------------------

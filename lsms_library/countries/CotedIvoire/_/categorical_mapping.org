@@ -285,6 +285,12 @@
 # harmonize_food_acquired foods), deduped by Original Label; the
 # separate harmonize_food_acquired table is retired.
 
+# 2021-22 (GH #552) rows, the last block of the table: this file's labels carry the code
+# ('1. Riz local gros grain') and its code list moved, so each row names its own label.  Niger's
+# #833 rule: a respelling of a good 2018-19 names takes 2018-19's Preferred Label, and two goods
+# 2018-19 bundles and this wave splits stay split, the 2018-19 bundle label staying on 2018-19
+# alone (_/CONTENTS.org, "2021-22 wired").  The bare `Cacaoo` and `Autre (à préciser)` are this
+# file's crop labels for 2018-19's Cacao and Autre.
 #+NAME: harmonize_food
 | Original Label                                                         | Preferred Label                                                                      |
 |------------------------------------------------------------------------+--------------------------------------------------------------------------------------|
@@ -453,6 +459,176 @@
 | Viande de poulet                                                       | Viande de poulet                                                                     |
 | Vinaigre /moutarde                                                     | Vinaigre /moutarde                                                                   |
 | Œufs                                                                   | Œufs                                                                                 |
+| 1. Riz local gros grain                                                                                       | Riz local gros grain court                                                           |
+| 2. Riz local long grain                                                                                       | Riz local Danané petit grain long                                                    |
+| 3. Riz importé populaire (dénicachia)                                                                         | Riz importé Denicachia                                                               |
+| 4. Riz importé de luxe long grain                                                                             | Riz importé de Luxe                                                                  |
+| 5. Maïs en épi                                                                                                | Maïs en épi                                                                          |
+| 6. Maïs séché en grain (exclu maïs pop corn)                                                                  | Maïs en grain                                                                        |
+| 7. Mil                                                                                                        | Mil                                                                                  |
+| 8. Sorgho                                                                                                     | Sorgho                                                                               |
+| 10. Fonio                                                                                                     | Fonio                                                                                |
+| 11. Autres céréales en grain (à préciser) inclus maïs pop corn                                                | Autres céréales                                                                      |
+| 12. Farine de maïs                                                                                            | Farine de maïs                                                                       |
+| 13. Semoule de mais                                                                                           | Semoule de maïs                                                                      |
+| 14. Farine de mil                                                                                             | Farine de mil                                                                        |
+| 15. Semoule de mil                                                                                            | Semoule de mil                                                                       |
+| 16. Farine de blé local ou importé                                                                            | Farine de blé local ou importé                                                       |
+| 17. Couscous de blé                                                                                           | Couscous de blé                                                                      |
+| 18. Autres farines de céréales                                                                                | Autres farines de céréales                                                           |
+| 19. Autres semoules de céréales                                                                               | Autres semoules de céréales                                                          |
+| 20. Pâtes alimentaires                                                                                        | Pâtes alimentaires                                                                   |
+| 21. Pain moderne                                                                                              | Pain moderne                                                                         |
+| 22. Pain traditionnel                                                                                         | Pain traditionnel                                                                    |
+| 23. Croissants                                                                                                | Croissants                                                                           |
+| 24. Biscuits                                                                                                  | Biscuits                                                                             |
+| 25. Gâteaux                                                                                                   | Gâteaux                                                                              |
+| 26. Beignets, galettes                                                                                        | Beignets, galettes                                                                   |
+| 27. Viande de bœuf                                                                                            | Viande de bœuf                                                                       |
+| 29. Viande de mouton                                                                                          | Viande de mouton                                                                     |
+| 30. Viande de chèvre                                                                                          | Viande de chèvre                                                                     |
+| 31. Autres abats (foie, rognon, tête, patte, cou, gorge, os, testicule, queue, peau, etc.)                    | Abats (hors tripes)                                                                  |
+| 32. Viande de porc                                                                                            | Viande de porc                                                                       |
+| 33. Poulet sur pied                                                                                           | Poulet sur pied                                                                      |
+| 34. Viande de poulet                                                                                          | Viande de poulet                                                                     |
+| 35. Viande d'autres volailles domestiques (pintade, canard, dindon; caille, pigeon…)                          | Viande d'autres volailles domestiques                                                |
+| 36. Charcuterie (jambon, saucisson), conserves de viandes                                                     | Charcuterie (jambon, saucisson), conserves de viandes                                |
+| 37. Viande séchée (boeuf, mouton, chameau, etc.)                                                              | Viande séchée                                                                        |
+| 38. Gibiers (viande de brousse)                                                                               | Gibiers                                                                              |
+| 39. Autres viandes n.d.a. ( à préciser lapin, grenouille, etc)                                                | Autres viandes n.d.a                                                                 |
+| 40. Poisson frais Appolo                                                                                      | Appolo frais (Chinchards)                                                            |
+| 41. Carpe blanche                                                                                             | Carpe blanche                                                                        |
+| 42. Poisson frais Carpe rouge                                                                                 | Carpe rouge fraîche                                                                  |
+| 43. Poisson frais Capitaine                                                                                   | Capitaine frais                                                                      |
+| 44. Poisson fumé Hareng (Mangni)                                                                              | Poisson fumé mangni                                                                  |
+| 45. Poisson fumé Maquereau                                                                                    | Maquereau fumé                                                                       |
+| 46. Sardinelles fumées                                                                                        | Sardinelles fumées                                                                   |
+| 47. Crabes                                                                                                    | Crabes                                                                               |
+| 48. Crevettes fraiches                                                                                        | Crevettes fraiches                                                                   |
+| 49. Crevettes séchées                                                                                         | Crevettes séchées                                                                    |
+| 50. Autres fruits de mer (écrevisse…)                                                                         | Autres fruits de mer                                                                 |
+| 51. Conserves de poisson (sardine, thon…)                                                                     | Conserves de poisson                                                                 |
+| 52. Lait frais de vache                                                                                       | Lait frais                                                                           |
+| 53. Lait caillé, yaourt, dèguê                                                                                | Lait caillé, yaourt                                                                  |
+| 54. Lait concentré sucré                                                                                      | Lait concentré sucré                                                                 |
+| 55. Lait concentré non-sucré                                                                                  | Lait concentré non-sucré                                                             |
+| 56. Lait en poudre                                                                                            | Lait en poudre                                                                       |
+| 57. Fromage                                                                                                   | Fromage                                                                              |
+| 58. Lait et farines pour bébé                                                                                 | Lait et farines pour bébé                                                            |
+| 59. Autres produits laitiers (crème fraiche, creme glâcée...)                                                 | Autres produits laitiers                                                             |
+| 60. Œufs                                                                                                      | Œufs                                                                                 |
+| 61. Beurre et Margarine                                                                                       | Beurre et margarine                                                                  |
+| 62. Beurre de karité                                                                                          | Beurre de karité                                                                     |
+| 63. Huile de palme rouge                                                                                      | Huile de palme rouge                                                                 |
+| 64. Huile d'arachide raffinée                                                                                 | Huile d'arachide                                                                     |
+| 67. Huile de coton                                                                                            | Huile de coton                                                                       |
+| 68. Huile de palme raffinée | Huile de palme raffiné |
+| 69. Noix de palme( graine de palme)                                                                           | Noix de palme                                                                        |
+| 70. Autres huiles n.d.a. (maïs, huile palmiste, etc.) | Autres huiles n.d.a. (maïs, palmiste, soja, etc.) |
+| 71. Mangue                                                                                                    | Mangue                                                                               |
+| 72. Ananas                                                                                                    | Ananas                                                                               |
+| 73. Orange                                                                                                    | Orange                                                                               |
+| 74. Citron                                                                                                    | Citrons                                                                              |
+| 75. Autres agrumes (mandarine, pamplemousse, etc.)                                                            | Autres agrumes                                                                       |
+| 76. Banane douce                                                                                              | Banane douce                                                                         |
+| 77. Avocat                                                                                                    | Avocats                                                                              |
+| 78. Pastèque                                                                                                  | Pastèque                                                                             |
+| 79. Melon                                                                                                     | Melon                                                                                |
+| 80. Dattes                                                                                                    | Dattes                                                                               |
+| 81. Noix de coco                                                                                              | Noix de coco                                                                         |
+| 82. Canne à sucre                                                                                             | Canne à sucre                                                                        |
+| 83. Pommes                                                                                                    | Pommes                                                                               |
+| 84. Papaye                                                                                                    | Papaye                                                                               |
+| 85. Fruit de baobab                                                                                           | Fruit de baobab                                                                      |
+| 86. Néré                                                                                                      | Néré                                                                                 |
+| 87. Autres fruits (tamarin noir, liane sauvage, raisin, fraise, etc.)                                         | Autres fruits (hors pommes, papaye, baobab, néré)                                    |
+| 88. Salade (laitue)                                                                                           | Salade (laitue)                                                                      |
+| 89. Chou                                                                                                      | Chou                                                                                 |
+| 90. Carotte                                                                                                   | Carotte                                                                              |
+| 91. Haricot vert                                                                                              | Haricot vert                                                                         |
+| 92. Concombre                                                                                                 | Concombre                                                                            |
+| 93. Aubergine                                                                                                 | Aubergine,                                                                           |
+| 94. Courge/Courgette                                                                                          | Courge/Courgette                                                                     |
+| 95. Poivron frais                                                                                             | Poivron frais                                                                        |
+| 96. Tomate fraîche                                                                                            | Tomate fraîche                                                                       |
+| 97. Tomate séchée                                                                                             | Tomate séchée                                                                        |
+| 98. Gombo frais                                                                                               | Gombo frais                                                                          |
+| 99. Gombo sec/ séché/ pilé/poudre (djoumgbélé)                                                                | Gombo sec                                                                            |
+| 100. Oignon frais                                                                                             | Oignon frais                                                                         |
+| 101. Ail                                                                                                      | Ail                                                                                  |
+| 102. Feuilles d'oseille (dah)                                                                                 | Feuilles d'oseille                                                                   |
+| 103. Feuilles de patate                                                                                       | Feuilles de patate                                                                   |
+| 104. Epinards                                                                                                 | Épinard                                                                              |
+| 105. Kplala                                                                                                   | Kplala                                                                               |
+| 106. Autres feuilles (manioc, taro, baobab, haricot)                                                          | Feuilles de manioc, feuilles de taro et, autres feuilles                             |
+| 107. Autre légumes frais n.d.a. (aubergine violette, navet etc) | Autres légumes frais n.d.a |
+| 108. Concentré de tomate                                                                                      | Concentré de tomate                                                                  |
+| 109. Petits pois                                                                                              | Petits pois                                                                          |
+| 110. Petit pois secs                                                                                          | Petit pois secs                                                                      |
+| 111. Autres légumes secs n.d.a. (soja, pistache etc)                                                          | Autres légumes secs n.d.a                                                            |
+| 112. Niébé/Haricots secs                                                                                      | Niébé/Haricots secs                                                                  |
+| 113. Arachides fraîches en coques                                                                             | Arachides fraîches en coques                                                         |
+| 114. Arachides séchées en coques                                                                              | Arachides séchées en coques                                                          |
+| 115. Arachides décortiquées                                                                                   | Arachides décortiquées (hors pilées)                                                 |
+| 116. Arachides pilées/ concassé                                                                               | Arachides pilées/concassées                                                          |
+| 117. Arachide grillée                                                                                         | Arachide grillée                                                                     |
+| 118. Pâte d'arachide                                                                                          | Pâte d'arachide                                                                      |
+| 120. Sésame                                                                                                   | Sésame                                                                               |
+| 121. Noix de cajou                                                                                            | Noix de cajou                                                                        |
+| 122. Noix de karité                                                                                           | Noix de karité                                                                       |
+| 123. Manioc                                                                                                   | Manioc                                                                               |
+| 124. Igname                                                                                                   | Igname                                                                               |
+| 125. Banane plantain                                                                                          | Plantain                                                                             |
+| 126. Pomme de terre                                                                                           | Pomme de terre                                                                       |
+| 127. Taro, macabo                                                                                             | Taro, macabo                                                                         |
+| 128. Patate douce                                                                                             | Patate douce                                                                         |
+| 130. Farines de manioc                                                                                        | Farines de manioc                                                                    |
+| 131. Gari, tapioca                                                                                            | Gari, tapioca                                                                        |
+| 132. Attiéke/Atoukpou                                                                                         | Attiéke                                                                              |
+| 133. Fruit de Kapokier/ fromager                                                                              | Fruit de kapokier                                                                    |
+| 134. Sucre poudre                                                                                             | Sucre (poudre ou morceaux)                                                           |
+| 135. Sucre en morceaux                                                                                        | Sucre (poudre ou morceaux)                                                           |
+| 136. Miel                                                                                                     | Miel                                                                                 |
+| 137. Chocolat à croquer, pâte à tartiner                                                                      | Chocolat à croquer, pâte à tartiner                                                  |
+| 138. Caramel, bonbons, confiseries, etc                                                                       | Caramel, bonbons, confiseries, etc                                                   |
+| 139. Sel                                                                                                      | Sel                                                                                  |
+| 140. Piment séché/ poudre                                                                                     | Piment séché                                                                         |
+| 141. Piment frais                                                                                             | Piment frais                                                                         |
+| 142. Gingembre frais                                                                                          | Gingembre frais                                                                      |
+| 143. Gingembre moulu                                                                                          | Gingembre moulu                                                                      |
+| 144. Cube alimentaire (Maggi, Jumbo, )                                                                        | Cube alimentaire (Maggi, Jumbo, )                                                    |
+| 145. Arôme (Maggi, aromate,adja, etc.)                                                                        | Arôme (Maggi, Jumbo, etc.)                                                           |
+| 146. Soumbala (moutarde africaine)                                                                            | Soumbala (moutarde africaine)                                                        |
+| 147. Mayonnaise                                                                                               | Mayonnaise                                                                           |
+| 149. Autres vinaigres                                                                                         | Autres vinaigres                                                                     |
+| 150. Moutarde                                                                                                 | Moutarde                                                                             |
+| 151. Poivre                                                                                                   | Poivre                                                                               |
+| 152. Autres condiments (akpi etc)                                                                             | Autres condiments (hors poivre)                                                      |
+| 153. Noix de cola                                                                                             | Noix de cola                                                                         |
+| 154. Autres produits alimentaires (champignon …)                                                              | Autres produits alimentaires                                                         |
+| 155. Café en poudre (moulu)                                                                                   | Café en poudre                                                                       |
+| 156. Café soluble (instantané)                                                                                | Café soluble                                                                         |
+| 157. Thé (instantané)                                                                                         | Thé (instantané)                                                                     |
+| 158. Chocolat en poudre                                                                                       | Chocolat en poudre                                                                   |
+| 159. Autres tisanes et infusions n.d.a. (quinquelibat, citronelle, etc.)                                      | Autres tisanes et infusions n.d.a. (quinquelibat, citronelle, etc.)                  |
+| 160. Jus de fruits traditionnel (orange, bissap, gingembre, jus de cajou,etc.)                                | Jus de fruits traditionnel                                                           |
+| 161. Eau minérale/ filtrée                                                                                    | Eau minérale/ filtrée                                                                |
+| 162. Boissons gazeuses (coca, etc.)                                                                           | Boissons gazeuses (coca, etc.)                                                       |
+| 163. Jus en poudre                                                                                            | Jus en poudre                                                                        |
+| 164. Bières et vins traditionnels (Tchapalo, vin de palme, vin de raphia, vin de cajou, etc.) | Bières et vins traditionnels (dolo, vin de palme, vin de raphia, etc.) |
+| 165. Bières industrielles (Bock, Guinness, Ivoire, Dopel, Chill, Heineken, Desperado etc)                     | Bières industrielles                                                                 |
+| 166. Riz importé brisure                                                                                      | Riz importé brisure                                                                  |
+| 167. Céréales de petit déjeuner&nbsp;(quaker,corn flakes, granola, Flocon d’avoine, galette de riz soufflé..) | Céréales de petit déjeuner                                                           |
+| 168. Autres produits de boulangerie (pain de mie, pain de son etc)                                            | Autres produits de boulangerie                                                       |
+| 169. Pain sucré                                                                                               | Pain sucré                                                                           |
+| 170. Tripes (intestin et estomac)                                                                             | Tripes                                                                               |
+| 171. Autres volailles domestiques sur pied (pintade, canard, caille, pigeon, dindon etc)                      | Autres volailles sur pied                                                            |
+| 172. Escargots                                                                                                | Escargots                                                                            |
+| 173. Lait frais stérilisé sans sucre, demi-écremé/ écremé                                                     | Lait stérilisé                                                                       |
+| 174. Pâte de manioc (placali)                                                                                 | Pâte de manioc (placali)                                                             |
+| 175. Poisson séché en condiment (adjovan)                                                                     | Poisson séché en condiment (adjovan)                                                 |
+| 176. Feuille de Thé (Thé noir)                                                                                | Feuille de thé                                                                       |
+| 177. Jus de fruits manufacturé (orange, mangue, ananas etc)                                                   | Jus de fruits manufacturé                                                            |
 | Cacaoo                                                                                                        | Cocoa                                                                                |
 | Autre (à préciser)                                                                                            | Autre crop                                                                           |
 

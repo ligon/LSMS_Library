@@ -7,7 +7,7 @@
 # Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
 
 CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
-  waves: ['2018-19']
+  waves: ['2018-19', '2021-22']
   columns: [Expenditure]
   rows: {s: purchased}
   rule: >-
@@ -54,7 +54,8 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
         positive), 12,182 because the last purchase used a different unit
         CODE, 11,935 because it used the same code in a different SIZE (Petit
         / Moyen / Grand / Taille unique), which is a different container and
-        so a different price per unit.
+        so a different price per unit.  2021-22: 40,847 of the 232,969 SERVED purchased
+        rows (17.5%).
       basis: variable-label
       evidence: >-
         no EHCVM wave distributes a unit-conversion table;
@@ -68,6 +69,7 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
         7-day consumption s07bq03a (which would put the value of own-produced
         and gifted food into Expenditure) and B = net of own production only.
         2018-19: A 109,767,959, B 108,747,218, C (served) 105,011,085 FCFA, against a raw s07bq08 total of 119,107,505.
+        2021-22: A 124,699,154, B 123,793,766, C (served) 121,393,491 FCFA, against a raw s07bq08 total of 170,793,500.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
     - text: >-
@@ -79,6 +81,7 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
         it is checked and not served.  Own production keeps the identical
         treatment it already had (s = 'produced' from s07bq04, Expenditure NA).
         2018-19: 35,289 inkind rows carrying 106,756 units, 0 with an Expenditure.
+        2021-22: 29,050 inkind rows carrying 88,393 units, 0 with an Expenditure.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
   validated_against: >-
@@ -93,6 +96,13 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
     rows are served with Expenditure NA rather than with that imputation.  The
     instrument is the same in all twelve waves (identical s07bq0* Stata
     labels), so the reading carries by inference, not by measurement here.
+    2021-22 does ship a conso file, and the same test on ehcvm_conso_civ2021.dta gives:
+    on the 912 (household, product) rows where the candidates differ, the rule x 365/7 is
+    within 1% of depan(Achat) for 90.5%, against 28.7% for the own-production-only residual
+    and 1.0% for the gross quantity; median ratio over 192,160 joined rows 1.00000.  This
+    shows the arithmetic was carried out, not that s07bq03a is what the household said: the
+    file re-expresses about 15% of its consumption rows in another unit, and depan is built
+    on the re-expressed quantity (_/CONTENTS.org, "2021-22 wired").
   contents: 'CotedIvoire/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
 

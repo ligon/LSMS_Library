@@ -1180,3 +1180,42 @@ row for this wave; the verdict is =asked-not-distributed=, =.coder/coverage/abse
 ** Not wired
 
 =ehcvm_nsu=, =ehcvm_prix=, =s00_co=..=s04_co=, as 2018-19 declares no community table; section 9, as above.
+
+** =food_acquired= and =s07bq03a= (WAITING: with the maintainer)
+
+*The file re-expresses about 15% of its consumption rows in another unit, and no document says so.*  Not Togo's defect, and the checks
+written for Togo pass: =s07bq03a/s07bq04= on never-purchased own-production rows has mode 1.0 in all 33 regions (19,413 of 19,717 rows),
+and 401 of 28,703 =Jamais= rows keep a residual (1,231 of 43,380 in 2018-19).  But =s07bq03a= is on the quarter grid on 84.7% of positive rows, against 99.0% in
+2018-19, and it is not alone: =s07bq04= 73.8% (99.8%), =s07bq05= 76.4% (99.3%), while =s07bq07a= is 99.8% (99.9%).  The review read this as decimals.  It is not:
+- on rows with =0 < q4 < q3=, both off the grid, =q3/q4= is 2, 1.5, 1.33, 4, 3: the three columns move together, by a row's own factor;
+- 31.5% of off-grid values of 1 or more repeat exactly inside their (region, milieu, item, unit, size) cell (2.8% under a +-15% jitter);
+- the repeated values are ratios of =ehcvm_nsu= weights.  Mango =Unité (Moyen)= holds 152.13 on 168 rows, 76.07 and 304.27 besides: 82,000 g / 539 g, a code 105 size 4 expressed
+  in mangoes.  Honey in =Litre= is 0.0175 x 1 to 7 and 0.0095 x 2 to 7, the two =Cuillère= weights.  Salt in =Sachet (Petit)= in Abidjan is 0.13 and 0.26, 15 g / 115 g, the spoon.
+  My test that every off-grid row is such a ratio does not discriminate (34.6% against 31.8% on jittered values), so the mechanism is shown on these
+  cells and not on all 46,291.
+The household's own unit is not in the file, and =s07bq03b= names the unit after conversion.  The last purchase =s07bq07a/b/c= is not converted, nor is =s07bq08=.  It is row-level, in all regions and both vagues
+(15.4%, 15.1% off the grid), most on rows bought longest ago (=Jamais= 28.0%, =Hier= 10.5%).
+
+*What it does to the table.*  =(u, Quantity)= stays a self-consistent pair, and =Expenditure= reads a unit value only where the units match, so there is no false regional level and few
+phantoms: 601 purchased rows under 0.02, against 133 in 2018-19.  Off-grid rows are 28,126 of 233,016 purchased source rows and 4.4% of =Expenditure=, and their unit value equals the
+on-grid rows' at the median of 875 (item, unit, size) cells (10%-90%: 0.40, 1.43).  What it costs: =u= is not always what the household said, values can be absurd where a large unit met a small one (the mangoes), and
+=food_quantities(units='kgs')= rests on the converted figure.  UEMOA's =depan= is built on it: the rule reproduces =depan(Achat)= within 1% on 90.5% of 912 discriminating rows (28.7% net of own production only, 1.0% gross), and on
+92.6% of off-grid rows.  That shows the arithmetic, not that the column is raw.  Served as filed.  Memo in the PR.
+
+*The rest of the table.*  305,482 rows: 232,969 purchased, 43,463 produced, 29,050 =inkind=.  =Expenditure= 121,393,491 FCFA, NA on 17.5% of purchased rows (16.2% in 2018-19), raw =s07bq08= 170,793,500.
+Here =s07bq03b= and =s07bq07b= carry one label set (Togo's two differ), so no formatter is needed.  =s07b= is a grid of 173 items on every household, 2,242,945 rows, 303,274 with a quantity.
+12 rows where =q4 + q5 = q3= reached the reshape at 1.1e-16, from the shared hook subtracting in two orders; the wave's hook drops them, as the reshape drops a true zero.  The file has no residual between 0 and 0.001.
+
+*=u=.*  Read off the label, code removed.  =Cueillère= takes 2018-19's =Cuillère=; =Boite= takes =Boîte= through the country's table.  Kept in this file's words: =Bol/Cope= (2018-19 has =Bol= and =Cope=
+apart), =Papier/feuille d'emballage= (=Papier= and =Feuille=), =Filet= (=Filet au Kg=), =Sac ou sachet de riz=, =Sachet de spaghetti=.  (j, u): 1,763 here, 1,485 in 2018-19, 686 shared.
+
+*=j=.*  170 rows join =harmonize_food=, keyed on the code-carrying labels.  Niger's rule (#833): a respelling takes 2018-19's Preferred Label, and two goods 2018-19 bundles and this wave splits stay split.
+Folded: =Sucre poudre= and =Sucre morceaux=, as 2018-19's own label says.  NOT folded, each under its own label: =Crabes= / =Crevettes fraiches= / =Crevettes séchées= / =Autres fruits de mer=;
+=Pastèque= / =Melon=; =Aubergine,= / =Courge/Courgette=; =Gingembre frais= / =moulu=; =Café en poudre= / =soluble=; =Autres vinaigres= / =Moutarde=; =Arachides décortiquées (hors pilées)= / =pilées=;
+=Abats (hors tripes)= / =Tripes=; =Thé (instantané)= / =Feuille de thé=; =Jus de fruits traditionnel= / =manufacturé=; =Pommes=, =Papaye=, =Néré=, =Fruit de baobab=; =Maquereau fumé=, =Sardinelles fumées=
+(2018-19's =Autres Poissons fumés=); =Carpe blanche=, =Carpe rouge fraîche=, =Capitaine frais= (2018-19's =Tilapia=, =Sardinelles fraiches=, =Autres poissons frais=).  =Beurre et margarine= keeps its own
+name: 2018-19's =Beurre= may or may not hold margarine.  =Piment frais= is 2018-19's =Piment=, as in Togo; =Piment séché= (5,585 rows) is apart, while 2018-19's one item has 11,920 rows against 9,917 + 5,585 here, so that item is a bundle and the exception is weaker here.
+78.3% of this wave's rows and 83.7% of 2018-19's are on a shared =j=.  A cross-wave demand system on =j= must bundle these itself.
+
+*Kilograms.*  =ehcvm_nsu_civ2021.dta= exists and is not wired (not ruled).  So this wave's kilograms come from the price-ratio ladder.  Because #1487 pools factors across a country's waves,
+wiring this table moves 2018-19's inferred kilograms at read time, native =Quantity= and =Expenditure= untouched.

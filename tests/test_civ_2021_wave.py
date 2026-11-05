@@ -133,6 +133,27 @@ class TestDeclared:
         return dict(zip(table["Original Label"].astype(str).str.strip(),
                         table["Preferred Label"].astype(str).str.strip()))
 
+    def test_a_split_good_does_not_take_2018s_bundle_label(self):
+        """#833's rule."""
+        label = self._label()
+        assert label["31. Autres abats (foie, rognon, tête, patte, cou, gorge, os, testicule, queue, peau, etc.)"] == "Abats (hors tripes)"
+        assert label["115. Arachides décortiquées"] == "Arachides décortiquées (hors pilées)"
+        assert label["78. Pastèque"] == "Pastèque" and label["79. Melon"] == "Melon"
+        assert label["155. Café en poudre (moulu)"] == "Café en poudre"
+        bundles = {"Abats et tripes (foie, rognon, etc.)", "Arachides décortiquées ou pilées",
+                   "Pastèque, Melon", "Crabes, crevettes et autres fruits de mer",
+                   "Aubergine, Courge/Courgette", "Vinaigre /moutarde"}
+        prefixed = {k: v for k, v in label.items() if k[:1].isdigit() and ". " in k}
+        assert len(prefixed) == 170
+        assert not bundles & set(prefixed.values())
+
+    def test_a_respelling_takes_2018s_label(self):
+        label = self._label()
+        assert label["1. Riz local gros grain"] == "Riz local gros grain court"
+        assert label["2. Riz local long grain"] == "Riz local Danané petit grain long"
+        assert label["125. Banane plantain"] == "Plantain"
+        assert label["134. Sucre poudre"] == label["135. Sucre en morceaux"] == "Sucre (poudre ou morceaux)"
+
     def test_the_two_crop_spellings_are_2018s_crops(self):
         label = self._label()
         assert label["Cacaoo"] == label["Cacao"]
@@ -166,6 +187,13 @@ class TestDeclared:
         assert fns["strata"]("gÔh") == "GÔH"
         assert fns["Region"]("poro") == "PORO"
         assert fns["strata"]("AUTONOME D'ABIDJAN") == "AUTONOME D'ABIDJAN"
+
+    def test_the_unit_loses_its_code_and_keeps_its_words(self):
+        fn = ll.Country(COUNTRY)[WAVE].formatting_functions["_unit_label"]
+        assert fn("139. Sachet") == "Sachet"
+        assert fn("120. Cueillère") == "Cuillère"
+        assert fn("109. Bol/Cope") == "Bol/Cope"
+        assert fn("136. Sac (25 Kg)") == "Sac (25 Kg)"
 
     def test_the_condition_table_is_this_files_five_codes(self):
         table = df_from_orgfile(countries_root() / COUNTRY / WAVE / "_" / "categorical_mapping.org",
@@ -374,6 +402,71 @@ class TestServed:
         expected = pd.Series(pd.to_datetime(cover["s00q23a"]).to_numpy(), index=_ids(cover))
         got = pd.to_datetime(d["Interview start"])
         assert (got.sort_index() == expected.reindex(got.index).sort_index()).all()
+
+    def test_food_acquired_sums_are_the_files(self):
+        s07 = _raw("s07b_me_civ2021.dta")
+        qty = (s07["s07bq03a"].fillna(0) - s07["s07bq04"].fillna(0)
+               - s07["s07bq05"].fillna(0)).clip(lower=0)
+        same = ((s07["s07bq03b"] == s07["s07bq07b"]) & (s07["s07bq03c"] == s07["s07bq07c"])
+                & (s07["s07bq07a"] > 0))
+        value = (qty * s07["s07bq08"] / s07["s07bq07a"]).where(same)
+        f = _served("food_acquired")
+        side = f.groupby(level="s")[["Quantity", "Expenditure"]].sum()
+        assert side.loc["purchased", "Quantity"] == pytest.approx(qty.sum())
+        assert side.loc["purchased", "Expenditure"] == pytest.approx(value.sum())
+        assert side.loc["produced", "Quantity"] == pytest.approx(s07["s07bq04"].fillna(0).sum())
+        assert side.loc["inkind", "Quantity"] == pytest.approx(s07["s07bq05"].sum())
+        assert f.loc[f.index.get_level_values("s") != "purchased", "Expenditure"].isna().all()
+        assert f.index.is_unique
+
+    def test_no_purchased_row_is_a_floating_point_residue(self):
+        """A row with s07bq04 + s07bq05 = s07bq03a purchased nothing; 12 reach the reshape."""
+        f = _served("food_acquired").xs("purchased", level="s")
+        assert (f["Quantity"].astype(float) >= 1e-9).all()
+
+    def test_the_consumption_columns_move_together_in_every_region(self):
+        """Not Togo's defect: q3/q4 is 1 at the mode on never-purchased own-production rows,
+        region by region, and a Jamais row rarely keeps a residual.  What the file does
+        instead is in _/CONTENTS.org; this pins that no regional factor sits on s07bq03a."""
+        s07 = _raw("s07b_me_civ2021.dta")
+        cover = _raw("s00_me_civ2021.dta")[["grappe", "menage", "s00q01"]]
+        s07 = s07[s07["s07bq03a"] > 0].merge(cover, on=["grappe", "menage"])
+        never = s07[(s07["s07bq06"] == 5) & (s07["s07bq04"] > 0)].copy()
+        never["ratio"] = (never["s07bq03a"] / never["s07bq04"]).round(4)
+        modes = never.groupby("s00q01")["ratio"].agg(lambda r: r.value_counts().index[0])
+        assert len(modes) == 33 and (modes == 1.0).all()
+        jamais = s07[s07["s07bq06"] == 5]
+        residual = jamais["s07bq03a"] - jamais["s07bq04"].fillna(0) - jamais["s07bq05"].fillna(0)
+        assert (residual > 1e-9).mean() < 0.02
+
+    def test_u_loses_the_code_and_keeps_the_size(self):
+        f = _served("food_acquired")
+        units = set(f.index.get_level_values("u").unique())
+        assert not {u for u in units if u[:1].isdigit() and ". " in u}
+        assert {"Tas (Petit)", "Sachet (Moyen)", "Unité (Grand)", "Kg", "Litre"} <= units
+        assert not {u for u in units if u.startswith(("Kg (", "Litre ("))}
+
+    def test_the_purchase_unit_reads_as_the_code_says(self):
+        """s07bq03b and s07bq07b carry one label set here, so labels and codes agree."""
+        from lsms_library.ehcvm import unit_match
+
+        labels = _raw("s07b_me_civ2021.dta", labels=True)
+        codes = _raw("s07b_me_civ2021.dta")
+        keep = codes["s07bq03a"].notna() & codes["s07bq07a"].notna()
+        labels, codes = labels[keep], codes[keep]
+        by_code = ((codes["s07bq03b"] == codes["s07bq07b"])
+                   & (codes["s07bq03c"] == codes["s07bq07c"])).to_numpy()
+        got = unit_match(labels["s07bq03b"], labels["s07bq03c"],
+                         labels["s07bq07b"], labels["s07bq07c"]).to_numpy()
+        assert (got == by_code).all()
+
+    def test_every_item_label_of_the_file_is_mapped(self):
+        table = df_from_orgfile(countries_root() / COUNTRY / "_" / "categorical_mapping.org",
+                                name="harmonize_food")
+        keys = set(table["Original Label"].astype(str).str.strip())
+        labels = _raw("s07b_me_civ2021.dta", labels=True)["s07bq01"]
+        labels = {str(v).strip() for v in labels.dropna().unique() if isinstance(v, str)}
+        assert not labels - keys
 
     def _harvest_rows(self):
         """Crop rows with an answer.  One row names a crop and answers nothing, not even

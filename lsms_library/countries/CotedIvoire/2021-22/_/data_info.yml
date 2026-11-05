@@ -342,3 +342,33 @@ food_security:
                 Ne sait pas: null
                 Refus: null
 
+food_acquired:
+    # READ _/CONTENTS.org, "2021-22 wired" on s07bq03a before using this table: the file
+    # re-expresses about 15% of its consumption rows in another unit.
+    file: s07b_me_civ2021.dta
+    idxvars:
+        v: grappe
+        visit: vague
+        i:
+            - grappe
+            - menage
+        j:
+            - s07bq01
+            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+        # Labelled here with the code ('139. Sachet'), and the code list moved from
+        # 2018-19's (304 is Sac (22,5 kg) there and Papier/feuille d'emballage here), so
+        # mapping.u reads the label.
+        u: s07bq03b
+    myvars:
+        Quantity: s07bq03a
+        Produced: s07bq04
+        # GH #876.  Expenditure is derived by mapping.food_acquired, as in 2018-19; these
+        # raw inputs feed that hook and are dropped by the reshape.  s07bq03b and s07bq07b
+        # carry one label set, so no formatter is needed here (Togo's two differ).
+        GiftQuantity: s07bq05
+        ConsumptionUnitCode: s07bq03b
+        ConsumptionUnitSize: s07bq03c
+        LastPurchaseQuantity: s07bq07a
+        LastPurchaseUnitCode: s07bq07b
+        LastPurchaseUnitSize: s07bq07c
+        LastPurchaseValue: s07bq08
