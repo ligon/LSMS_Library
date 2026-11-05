@@ -3249,8 +3249,10 @@ All of the movement is on the 309 rows, 261,596 -> 346,373 kg:
   derived harvests is the rest.  285 of the 306 rows are unfinished, so they carry =harvest-to-date= too.  This is a
   small, different population from Niger's column, and no statement about Niger's carries over.
 - *One row is 23% of the survey's kilograms, 1.1% of the wave.*  4 sacks of 100 kg, unfinished, stated at 80,000 kg.  Site
-  Q does not name it: its cell's scale is a total's, and 80,000 is under 100 x the p90.  Served, as recorded.  Without it
-  the sacks are 62,873 kg against a nominal 110,450.  The wave's largest row is a metric one, 750,200 kg, 10.6%.
+  Q does not name it: its cell's scale is a total's, and 80,000 is under 100 x the p90.  =kg_survey_off_label= does (ruling
+  @ligon 2026-11-05), with 31 others of the 236 sized rows, outside 0.1x-10x of the label.  Served, as recorded.  Without it
+  the sacks are 62,873 kg against a nominal 110,450.  The wave's largest row is a metric one, 750,200 kg, 10.6%.  70 rows,
+  16.5% of the survey's kilograms, are on units with no stated mass and cannot be named (GH #1559).
 - *Sacks barely scale.*  Log-log slope of kg on q on =Sac (100 Kg)= is 0.42, against 1.00 on =Kg= and 0.91 for Niger's
   2021-22 sacks.  On 9 of the 81 rows and 4 of the 21 =Sac (50 Kg)= the kilograms equal the sack count, so the survey says
   1 kg per sack; 35 of the 81 are exactly 100; 34 of the 81 are under 20 kg per sack.  On rows with a stated-mass label
