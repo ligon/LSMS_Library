@@ -1628,8 +1628,9 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
 #         2026-09-25, ruling 2)
 #   4     both stated and different, price sides with the    contradiction-price-sale /
 #         sale's answer / the harvest row's                  contradiction-price-harvest
-#   5     everything else with a candidate row               sale-basis-unresolved (DELETION,
-#                                                            rows: 0 -- the suppressed lines)
+#   5     everything else with a candidate row               sale-basis-unresolved (a REFUSAL,
+#                                                            rows: 0: no harvest row holds these
+#                                                            lines, and each has a Farm-level row)
 #
 # Rungs 0-1 are the bundle's own compatibility rule and its 1:1 gate,
 # unchanged (tier A).  Rungs 2-4 (tier B) compete only for harvest rows and
@@ -1652,7 +1653,8 @@ SALE_BASIS_NOT_APPLICABLE = 'Malawi::crop_production::sale-basis-not-applicable'
 SALE_BASIS_NO_REFERENCE = 'Malawi::crop_production::sale-basis-no-reference'
 SALE_BASIS_CONTRADICTION_SALE = 'Malawi::crop_production::contradiction-price-sale'
 SALE_BASIS_CONTRADICTION_HARVEST = 'Malawi::crop_production::contradiction-price-harvest'
-#: The deletion entry (rows: 0): a sale with a candidate row that no rung admitted.
+#: The refusal entry (rows: 0): a sale with a candidate row that no rung admitted.
+#: Its own Farm-level row holds it since GH #1457, and carries no key.
 SALE_BASIS_UNRESOLVED = 'Malawi::crop_production::sale-basis-unresolved'
 SALE_BASIS_KEYS = (SALE_BASIS_WILDCARD, SALE_BASIS_FROM_PRICE,
                    SALE_BASIS_FROM_PRICE_OVERRULE,
@@ -2061,7 +2063,7 @@ def _attach_sales(t, harv, sale):
                 'sale': int((sub['condition_sold'] == _NOT_APPLICABLE).sum()),
                 'harvest': int((sub['condition'] == _NOT_APPLICABLE).sum())}
         ladder[name] = entry
-    # The deletion, by GROUND -- one count per way a candidate SALE fails,
+    # The refusal, by GROUND -- one count per way a candidate SALE fails,
     # so the registry entry's three grounds are countable and the refused
     # complement of each price rung is printed beside the rung (review of
     # 2026-09-25, items 4 and 6).  A PARTITION of the unresolved sales: each
@@ -2339,7 +2341,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     sale) holds on every rung.  What no rung admits is suppressed and
     COUNTED: ``attrs['sale_suppressed']`` (AMBIGUOUS pairings, the GH #854
     tally, shape unchanged), ``attrs['sale_basis_mismatch']`` (UNRESOLVED
-    -- registered as the deletion ``sale-basis-unresolved``), and
+    -- registered as the refusal ``sale-basis-unresolved``), and
     ``attrs['sale_basis_ladder']`` (sales and MWK per rung).
 
     Every sale none of that reaches is served too (GH #1457, ruling on GH #843 option
@@ -2655,7 +2657,7 @@ def inputs_sale_basis_contradiction_harvest(wave):
 
 
 def inputs_sale_basis_unresolved(wave):
-    """The SUPPRESSED sale lines -- the deletion entry's inputs (rows: 0)."""
+    """The REFUSED sale lines -- the refusal entry's inputs (rows: 0)."""
     return _inputs_sale_basis(wave, SALE_UNRESOLVED)
 
 

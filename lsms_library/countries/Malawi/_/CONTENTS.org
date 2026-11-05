@@ -1386,6 +1386,9 @@ silently on the wrong basis; see the section on the sale's own condition.
 
 ** =Feature('crop_production')= EXCLUDES Malawi until the framework fix lands (2026-09-10)
 
+*Out of date (corrected 2026-11-04).*  The fix landed: =crop_production= is registered in =index_info=, and =Feature= serves Malawi's rows (145,423 on the
+#1457 review's merge), unique, with =condition= kept.  What follows stands as the record of the exclusion.
+
 *Stated here because the level was kept on purpose, and because the next
 person to audit =Feature('crop_production')= will otherwise read Malawi's
 absence as a build failure.*
@@ -5303,7 +5306,8 @@ and filled on every row holding a sale: on a harvest row =Unit_sold= is =u=, by 
 |-----------------------------+--------------------+-------------------+--------------------+--------------------|
 | ladder, on a harvest row    | 5,116 (130,679,005)| 1,756 (95,010,945)| 4,544 (410,017,725)| 7,099 (529,712,448)|
 | crop on two or more plots   |   821 ( 11,139,550)|   335 (11,387,780)| 1,047 (162,563,371)| 2,185 (158,233,488)|
-| one row, in another unit    | 1,270 ( 10,755,325)|   439 (15,577,035)| 1,507 ( 55,219,866)| 1,638 ( 44,785,341)|
+| one row, in another unit    | 1,270 ( 10,755,325)|   439 (15,577,035)| 1,506 ( 55,216,266)| 1,638 ( 44,785,341)|
+| crop only on =unknown_plot= |     0              |     0             |     1 (      3,600)|     0              |
 | crop has no harvest row     |    78 (  1,166,015)|    34 (   583,150)|   225 ( 23,036,706)|   120 (  5,847,558)|
 | ladder refused (unresolved) |    94 (  1,088,250)|    21 (   315,300)|    89 (  6,009,600)|   137 (  6,244,030)|
 | sugar cane, code 39 (below) |     0              |    13 (   329,000)|     0              |     0              |
@@ -5315,7 +5319,7 @@ and filled on every row holding a sale: on a harvest row =Unit_sold= is =u=, by 
   discloses it).  =sale-basis-unresolved= stops being a deletion: a sale whose basis no rung admits now has a row of its own, stating its own basis.
   The ladder's count and its warning stand.
 - *=unknown_plot= is not =Farm-level=.*  A crop whose rows are =unknown_plot= (GH #1476) still attaches nothing, and its sale, the 3,600 MWK mango, now has a Farm-level row.
-- *One row, in another unit: 4,854 records, 126.34M MWK, are NOT on their row, and that is a decision for @ligon.*  Nigeria's shape puts such a sale on the one row, in its own
+- *One row, in another unit: 4,853 records, 126.33M MWK, are NOT on their row, and that is a decision for @ligon.*  Nigeria's shape puts such a sale on the one row, in its own
   =Unit_sold=.  Here GH #824 and #833 already ruled the other way, on evidence: 916 of them say harvest unshelled and sold shelled, so the row would hold a sale on another
   basis as well as in another unit.  Built to override nothing; the plot is lost on these sales.  See the report's memo.
 - *Code 39 in Modules P and Q is sugar cane (corrected on review).*  2013-14 P and Q carry it unlabelled, but =harmonize_crop= has 39 = =Sugar Cane=, 2013-14 Module I labels 39

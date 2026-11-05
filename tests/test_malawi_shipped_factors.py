@@ -501,9 +501,7 @@ class TestAgainstCropProduction:
         """A function of the crop code, so it is not a level.
 
         `production_obs` carries the code in the grain since #1373; putting
-        the variety there as well would only widen the index -- and widen the
-        index-shape divergence that already costs Malawi its place in
-        `Feature('crop_production')` (see the class below).
+        the variety there as well would only widen the index.
         """
         assert 'crop_variety' in cp.columns
         assert 'crop_variety' not in cp.index.names
@@ -627,9 +625,10 @@ class TestSaleSuppressionIsCounted:
 
 
 class TestFeatureExclusionIsRecordedNotAccidental:
-    """`condition` costs Malawi its place in `Feature('crop_production')`.
+    """`condition` cost Malawi its place in `Feature('crop_production')`, since fixed
+    (`Feature` serves Malawi's rows; CONTENTS.org says so above the record kept here).
 
-    That is a FRAMEWORK defect (`crop_production` is not in `index_info`, so
+    That was a FRAMEWORK defect (`crop_production` is not in `index_info`, so
     `Feature` falls through to the modal-index-shape filter), fixed separately
     on `fix/feature-canonical-index-crop-production` -- GH #775 / #569.  The
     level is kept ON PURPOSE: without it the shipped table is refused outright,
