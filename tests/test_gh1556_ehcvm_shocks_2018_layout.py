@@ -92,8 +92,21 @@ class TestStockByVague:
             module.shocks(_frame(**bad))
 
     def test_the_refusal_survives_the_fallback_catches(self, country):
-        error = _module(country).ShockLayoutError
-        assert not issubclass(error, (ValueError, KeyError, RuntimeError))
+        """The class survives the catches at one worker; the text survives everywhere.
+
+        In an all-wave cold build at two workers the error reaches the caller as
+        ``RuntimeError`` carrying this text, until the failure-signals PR lands (#1524).
+        So the message has to say what is wrong on its own.  ``Feature`` drops the
+        country with a warning that names it.  Measured by injection in the review of
+        #1556; this test does not repeat that injection.
+        """
+        module = _module(country)
+        assert not issubclass(module.ShockLayoutError, (ValueError, KeyError, RuntimeError))
+        filled = {'PurchasesVague2': ['Diminué', np.nan, 'Diminué', 'Inchangé', np.nan]}
+        with pytest.raises(module.ShockLayoutError) as refused:
+            module.shocks(_frame(**filled))
+        assert 's14q04f should be blank in vague 1' in str(refused.value)
+        assert '1 filled in vague 1' in str(refused.value)
 
 
 # ---------------------------------------------------------------------------- source-gated
