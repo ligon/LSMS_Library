@@ -164,14 +164,27 @@ Data Scheme:
     # units.  planting_month / perennial omitted (not recorded by EHCVM
     # s16c); harvest_month all-NaN here (only 2014-15 ECVMA recorded it) but
     # carried for cross-wave schema parity; intercropped from s16cq07.
+    #
+    # 2021-22 (GH #552) splits the module: s16c holds the harvest and s16d, with no
+    # plot, the sales.  A sale goes on the household's single harvest row for the crop,
+    # keyed hh-crop-sale-single-row, else on one row with plot_id = 'Farm-level' and
+    # u = 'Unknown' (option (d), @ligon 2026-11-03).  Unit_sold is the sold unit there;
+    # 2018's sold unit is not read yet, so it is NA on 2018.  A recorded harvest of an
+    # unfinished crop is keyed harvest-to-date.
     index: (t, i, plot_id, crop, u)
     Quantity: float
     Quantity_sold: float
+    Unit_sold:
+      type: str
+      optional: true
     Value_sold: float
     harvest_month:
       type: float
       optional: true
     intercropped: bool
+    Derivation:
+      type: str
+      optional: true
     materialize: make
 
   plot_inputs:
@@ -188,10 +201,26 @@ Data Scheme:
     # Non-crop-specific rows carry the sentinel '(not crop-specific)' and a
     # missing unit the 'Manquant' u label, both non-null so the framework's
     # canonical NaN-key de-dup collapse does not silently drop them.
+    #
+    # 2021-22 (GH #552) reads the purchase, s16bq08 / s16bq09a / s16bq09b, and the gift
+    # beside it, s16bq05 / s16bq07a / s16bq07b, as Burkina Faso (GH #1188).  2018 still
+    # serves the GIFT question under Purchased and Quantity_purchased: _/CONTENTS.org.
     index: (t, i, input, crop, u)
     Quantity: float
     Purchased: bool
     Quantity_purchased: float
+    Unit_purchased:
+      type: str
+      optional: true
+    Received_as_gift:
+      type: bool
+      optional: true
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
+      optional: true
     materialize: make
 
   plot_labor:

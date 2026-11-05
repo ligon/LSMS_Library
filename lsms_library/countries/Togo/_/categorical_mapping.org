@@ -176,6 +176,8 @@
 | Semences de césame                        | Seed                |
 | Semences de haricots/niébé                | Seed                |
 | Plants/boutures de tubercules             | Seed                |
+| Semences d'arichide                       | Seed                |
+| Plants d'hévéa, de teck                   | Seed                |
 | Autres semences                           | Seed                |
 | 20                                        | Seed                |
 
@@ -230,6 +232,8 @@
 | Semences de haricots/niébé    | Niébé/Haricots secs |
 | Semences d'autres céréales    | Autre céréale       |
 | Plants/boutures de tubercules | Autre tubercule     |
+| Semences d'arichide           | Arachide            |
+| Plants d'hévéa, de teck       | Hévéa, teck         |
 | Autres semences               | Autre crop          |
 | 20                            | Autre crop          |
 

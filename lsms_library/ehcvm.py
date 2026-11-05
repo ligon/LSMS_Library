@@ -154,13 +154,15 @@ def community_price_slots(base, codes, columns, rank):
     return pd.concat(pieces, ignore_index=True)
 
 from .build_transforms import food_acquired_to_canonical
-from .derivations import COLUMN as DERIVATION_COLUMN
+from .derivations import COLUMN as DERIVATION_COLUMN, union_keys
 
 __all__ = [
     "EHCVM_COUNTRIES", "DERIVATION_NAME", "RAW_VARIABLES",
-    "MYVARS", "UnitSizeLabelError", "carry_unit_size", "derivation_key",
-    "derive_ehcvm_purchase_value", "food_acquired_ehcvm",
-    "inputs_last_purchase", "served_unit_labels", "size_label", "sized_unit",
+    "FARM_LEVEL", "MYVARS", "UnitSizeLabelError", "carry_unit_size",
+    "derivation_key", "derive_ehcvm_purchase_value", "derive_harvest_to_date",
+    "derive_hh_crop_sale_attachment", "food_acquired_ehcvm", "hh_crop_records",
+    "inputs_last_purchase", "is_crop_sale", "served_unit_labels", "size_label",
+    "sized_unit", "stamp_harvest_to_date",
 ]
 
 #: The eight countries whose ``food_acquired`` comes from EHCVM section 7B.
@@ -709,3 +711,99 @@ def _normalise_index_as_served(frame: pd.DataFrame, wave_obj) -> pd.DataFrame:
         # An index-only frame, so the normaliser cannot touch a raw column.
         frame.index = fn(pd.DataFrame(index=frame.index)).index
     return frame
+
+
+# ---------------------------------------------------------------------------
+# crop_production of an EHCVM-2 wave (GH #552; rulings @ligon 2026-11-03)
+# ---------------------------------------------------------------------------
+#
+# EHCVM-2 splits the module EHCVM-1 kept on one line: s16c holds the plot-by-crop
+# harvest, and s16d, with no plot, what became of each crop.  Benin, Cote d'Ivoire and
+# Guinea-Bissau read as Togo does.  Mali has its own copy of the two functions below,
+# in mali.py, and Niger its older rule; neither imports these, so this section is in
+# neither's fingerprint.  Check that s16cq16a is filled before assuming a wave is
+# like Togo (10,325 of 10,877 rows): Mali's is on 309 of 7,247, which is GH #1437.
+
+#: The canonical structural sentinel for ``plot_id``: the record has no plot by
+#: design (lsms_library/data_info.yml, top of file).
+FARM_LEVEL = "Farm-level"
+
+_SALE_KEYS = ["i", "crop"]
+_SALE_COLUMNS = ["Quantity_sold", "Unit_sold", "Value_sold"]
+
+
+def hh_crop_records(frame: pd.DataFrame, crop: str = "s16dq01") -> pd.DataFrame:
+    """``s16d`` with one record per (grappe, menage, crop), or a refusal.
+
+    The export repeats a crop's record once per harvest line, byte for byte
+    (Niger 2021-22, GH #824; Togo 2021-22: 1,111 of 10,325 rows).  A line
+    identical to another on every column is the same record, not a second sale.
+    A pair that still has two different records is not an artefact of that kind,
+    so it raises rather than picking one.
+    """
+    out = frame[~frame.duplicated(keep="first")]
+    if out.duplicated(["grappe", "menage", crop]).any():
+        raise ValueError("s16d: two different records for one (household, crop)")
+    return out
+
+
+def is_crop_sale(quantity, value) -> pd.Series:
+    """A sale is a record with a positive sold quantity or a positive value."""
+    return (pd.to_numeric(quantity, errors="coerce").gt(0)
+            | pd.to_numeric(value, errors="coerce").gt(0))
+
+
+def derive_hh_crop_sale_attachment(harvest: pd.DataFrame, sales: pd.DataFrame,
+                                   key: str) -> pd.DataFrame:
+    """Place each household-crop sale on the served rows of a wave (option (d)).
+
+    ``harvest`` holds one row per plot-crop harvest record, with ``i``, ``crop`` and
+    ``plot_id``.  ``sales`` holds one row per sale, with ``i``, ``crop``,
+    ``Quantity_sold``, ``Unit_sold`` and ``Value_sold``; a second sale of one
+    (i, crop) raises.
+
+    A sale of an (i, crop) with EXACTLY ONE harvest row goes on that row, in its own
+    ``Unit_sold``, and that row alone carries ``key`` in ``Derivation``.  Any other
+    sale becomes ONE new row of that (i, crop) with ``plot_id = FARM_LEVEL``, its
+    other columns NA; the index value discloses it, so it carries no key.
+
+    No sold quantity or value is split, summed or scaled.  Registered per country as
+    ``<country>::crop_production::hh-crop-sale-single-row``.
+    """
+    if sales.duplicated(_SALE_KEYS).any():
+        raise ValueError("crop_production: more than one sale for a (i, crop)")
+    lines = harvest.groupby(_SALE_KEYS).size().rename("_lines").reset_index()
+    n = sales[_SALE_KEYS].merge(lines, on=_SALE_KEYS, how="left")["_lines"]
+    single = n.fillna(0).eq(1).to_numpy()
+    served = harvest.merge(sales.loc[single, _SALE_KEYS + _SALE_COLUMNS],
+                           on=_SALE_KEYS, how="left", validate="many_to_one",
+                           indicator="_attached")
+    derivation = pd.Series(pd.NA, index=served.index, dtype="string")
+    derivation[served.pop("_attached").eq("both")] = key
+    served[DERIVATION_COLUMN] = derivation
+    farm = sales.loc[~single, _SALE_KEYS + _SALE_COLUMNS].copy()
+    farm["plot_id"] = FARM_LEVEL
+    return pd.concat([served, farm], ignore_index=True)
+
+
+def derive_harvest_to_date(quantity):
+    """The identity: a recorded harvest of an unfinished crop, served as recorded.
+
+    The registry is the point.  s16cq16a asks the quantity ALREADY harvested, so on a
+    row whose harvest is not finished the served ``Quantity`` covers a part of the
+    season under a name that implies all of it.
+    """
+    return quantity
+
+
+def stamp_harvest_to_date(frame: pd.DataFrame, key: str) -> pd.DataFrame:
+    """Key the rows with ``finished == 'Non'`` and a recorded ``Quantity``."""
+    out = frame.copy()
+    out["Quantity"] = derive_harvest_to_date(pd.to_numeric(out["Quantity"], errors="coerce"))
+    mask = (out["finished"].astype("string").str.strip().eq("Non").fillna(False).astype(bool)
+            & out["Quantity"].notna())
+    derivation = out[DERIVATION_COLUMN].astype("string").copy()
+    derivation[mask] = pd.array([union_keys((value, key)) for value in derivation[mask]],
+                                dtype="string")
+    out[DERIVATION_COLUMN] = derivation
+    return out

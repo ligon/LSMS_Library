@@ -40,7 +40,92 @@ def _served(table):
         return getattr(ll.Country("Togo"), table)(waves=[WAVE])
 
 
+class TestSaleRules:
+    """The shared EHCVM-2 functions on synthetic frames, through the registry."""
+
+    KEY = "Togo::crop_production::hh-crop-sale-single-row"
+
+    def _harvest(self):
+        return pd.DataFrame({"i": ["a", "a", "b", "c"], "crop": ["x", "x", "x", "z"],
+                             "plot_id": ["1_1", "1_2", "1_1", "1_1"],
+                             "Quantity": [1.0, 2.0, 3.0, np.nan]})
+
+    def _sales(self):
+        return pd.DataFrame({"i": ["a", "b"], "crop": ["x", "x"], "Quantity_sold": [5.0, 6.0],
+                             "Unit_sold": ["Kg", "Tas"], "Value_sold": [50.0, 60.0]})
+
+    def test_one_harvest_row_takes_the_sale_and_the_key(self):
+        from lsms_library.ehcvm import derive_hh_crop_sale_attachment
+
+        out = derive_hh_crop_sale_attachment(self._harvest(), self._sales(), self.KEY)
+        row = out[(out["i"] == "b") & (out["plot_id"] == "1_1")].iloc[0]
+        assert row["Quantity_sold"] == 6.0 and row["Unit_sold"] == "Tas"
+        assert row["Derivation"] == self.KEY
+        assert out[out["i"] == "c"]["Derivation"].isna().all()
+
+    def test_two_harvest_rows_send_the_sale_to_one_farm_level_row(self):
+        from lsms_library.ehcvm import FARM_LEVEL, derive_hh_crop_sale_attachment
+
+        out = derive_hh_crop_sale_attachment(self._harvest(), self._sales(), self.KEY)
+        a = out[out["i"] == "a"]
+        assert a["Value_sold"].sum() == 50.0 and a["Value_sold"].notna().sum() == 1
+        farm = a[a["plot_id"] == FARM_LEVEL].iloc[0]
+        assert pd.isna(farm["Quantity"]) and pd.isna(farm["Derivation"])
+
+    def test_a_second_sale_of_a_pair_raises(self):
+        from lsms_library.ehcvm import derive_hh_crop_sale_attachment
+
+        sales = pd.concat([self._sales(), self._sales().iloc[:1]])
+        with pytest.raises(ValueError):
+            derive_hh_crop_sale_attachment(self._harvest(), sales, self.KEY)
+
+    def test_records_drop_exact_repeats_and_refuse_a_conflict(self):
+        from lsms_library.ehcvm import hh_crop_records
+
+        frame = pd.DataFrame({"grappe": [1, 1], "menage": [2, 2], "s16dq01": [3, 3],
+                              "s16dq06": [10.0, 10.0]})
+        assert len(hh_crop_records(frame)) == 1
+        frame.loc[1, "s16dq06"] = 11.0
+        with pytest.raises(ValueError):
+            hh_crop_records(frame)
+
+    def test_the_window_key_joins_the_sale_key_and_needs_a_quantity(self):
+        from lsms_library.derivations import MULTI_SEP
+        from lsms_library.ehcvm import stamp_harvest_to_date
+
+        frame = pd.DataFrame({"Quantity": [1.0, np.nan, 2.0], "finished": ["Non", "Non", "Oui"],
+                              "Derivation": pd.array([self.KEY, pd.NA, pd.NA], dtype="string")})
+        out = stamp_harvest_to_date(frame, "Togo::crop_production::harvest-to-date")
+        assert out["Derivation"].iloc[0] == MULTI_SEP.join(
+            sorted([self.KEY, "Togo::crop_production::harvest-to-date"]))
+        assert out["Derivation"].iloc[1:].isna().all()
+
+
 class TestDeclared:
+    def test_every_script_of_the_wave_uses_the_waves_id(self):
+        """A script on 2018's bare i would orphan its table from sample."""
+        import ast
+
+        for path in sorted((countries_root() / "Togo" / WAVE / "_").glob("*.py")):
+            if path.name == "mapping.py":
+                continue
+            source = path.read_text(encoding="utf-8")
+            names = {a.name for node in ast.walk(ast.parse(source))
+                     if isinstance(node, ast.ImportFrom) and node.module == "mapping"
+                     for a in node.names}
+            assert names & {"household_ids", "ID_PREFIX"}, path.name
+
+    def test_the_wave_reads_its_own_nonfood_table(self):
+        """Its codes are not 2018's: 415 was Perfume there and is a mask here."""
+        from lsms_library.local_tools import df_from_orgfile
+
+        table = df_from_orgfile(countries_root() / "Togo" / WAVE / "_" / "categorical_mapping.org",
+                                name="nonfood_items").set_index("Code")["Preferred Label"]
+        table.index = table.index.astype(int)
+        assert table[415] == "Washable Face Masks (COVID-19)"
+        assert table[417] == "Perfume"
+        assert table.is_unique
+
     def test_this_wave_prefixes_and_2018_does_not(self):
         fns = ll.Country("Togo")
         new = fns[WAVE].formatting_functions["i"]
@@ -222,3 +307,122 @@ class TestServed:
         keys = set(table["Original Label"].astype(str).str.strip())
         labels = set(_raw("s07b_me_tgo2021.dta", labels=True)["s07bq01"].astype(str).str.strip())
         assert not labels - keys
+
+    def test_crop_production_is_the_harvest_rows_and_each_sale_once(self):
+        s16c = _raw("s16c_me_tgo2021.dta")
+        s16c = s16c[s16c["s16cq04"].notna()]
+        s16d = _raw("s16d_me_tgo2021.dta").drop_duplicates()
+        sales = s16d[(s16d["s16dq05a"] > 0) | (s16d["s16dq06"] > 0)]
+        keys = pd.Series(1, index=pd.MultiIndex.from_arrays([_ids(sales), sales["s16dq01"]]))
+        assert keys.index.is_unique and len(sales) == 5976
+        cp = _served("crop_production")
+        assert cp.index.is_unique
+        plots = cp[cp.index.get_level_values("plot_id") != "Farm-level"]
+        assert len(plots) == len(s16c) == 10877
+        assert plots["Quantity"].astype(float).sum() == pytest.approx(s16c["s16cq16a"].sum())
+        assert cp["Value_sold"].astype(float).sum() == pytest.approx(sales["s16dq06"].sum())
+        assert cp["Quantity_sold"].astype(float).sum() == pytest.approx(sales["s16dq05a"].sum())
+        assert cp["Value_sold"].notna().sum() == len(sales)
+
+    def test_a_sale_is_on_its_single_row_or_on_one_farm_level_row(self):
+        s16c = _raw("s16c_me_tgo2021.dta")
+        s16c = s16c[s16c["s16cq04"].notna()]
+        s16d = _raw("s16d_me_tgo2021.dta").drop_duplicates()
+        sales = s16d[(s16d["s16dq05a"] > 0) | (s16d["s16dq06"] > 0)]
+        lines = s16c.groupby(["grappe", "menage", "s16cq04"]).size()
+        count = lines.reindex(pd.MultiIndex.from_frame(
+            sales[["grappe", "menage", "s16dq01"]])).fillna(0).to_numpy()
+        cp = _served("crop_production").reset_index()
+        farm = cp[cp["plot_id"] == "Farm-level"]
+        assert len(farm) == (count > 1).sum()
+        assert farm["Quantity"].isna().all() and farm["Value_sold"].notna().all()
+        assert (farm["u"] == "Unknown").all() and farm["Derivation"].isna().all()
+        keyed = cp["Derivation"].astype("string").str.contains("hh-crop-sale-single-row",
+                                                               regex=False).fillna(False)
+        assert keyed.sum() == (count == 1).sum()
+        assert (count == 0).sum() == 0
+
+    def test_the_window_key_is_on_the_unfinished_rows_that_record_a_quantity(self):
+        s16c = _raw("s16c_me_tgo2021.dta")
+        expected = ((s16c["s16cq11"] == 2) & s16c["s16cq16a"].notna()).sum()
+        cp = _served("crop_production")
+        keyed = cp["Derivation"].astype("string").str.contains("harvest-to-date",
+                                                               regex=False).fillna(False)
+        assert keyed.sum() == expected == 111
+
+    def test_the_inputs_join_to_the_keyed_rows(self):
+        c = ll.Country("Togo")
+        cp = _served("crop_production").reset_index()
+        for name, count in (("hh-crop-sale-single-row", None), ("harvest-to-date", 111)):
+            key = f"Togo::crop_production::{name}"
+            raw = c.derivation_inputs(key, wave=WAVE)
+            keyed = cp[cp["Derivation"].astype("string").str.contains(name, regex=False).fillna(False)]
+            assert set(zip(keyed["i"], keyed["crop"])) <= set(raw.index.droplevel("t"))
+            if count:
+                assert len(raw) == count
+
+    def test_plot_inputs_read_the_purchase_not_the_gift(self):
+        s16b = _raw("s16b_me_tgo2021.dta")
+        s16b = s16b[s16b["s16bq02"] == 1]
+        p = _served("plot_inputs")
+        assert len(p) == len(s16b)
+        assert p["Purchased"].astype("boolean").sum() == (s16b["s16bq08"] == 1).sum()
+        assert p["Received_as_gift"].astype("boolean").sum() == (s16b["s16bq05"] == 1).sum()
+        assert p["Quantity"].astype(float).sum() == pytest.approx(s16b["s16bq03a"].sum())
+        assert p["Quantity_purchased"].astype(float).sum() == pytest.approx(s16b["s16bq09a"].sum())
+        assert p["Quantity_received_as_gift"].astype(float).sum() == pytest.approx(s16b["s16bq07a"].sum())
+        # The two seed slots 2018's table did not name are not lost in a catch-all.
+        crops = p.index.get_level_values("crop").to_series()
+        assert crops.eq("Arachide").sum() == (s16b["s16bq01"] == 19).sum()
+        assert crops.eq("Hévéa, teck").sum() == (s16b["s16bq01"] == 21).sum()
+
+    def test_plot_features_area_prefers_the_measure(self):
+        s16a = _raw("s16a_me_tgo2021.dta")
+        f = _served("plot_features").reset_index()
+        assert len(f) == len(s16a) == 9182
+        estimate = s16a["s16aq09a"].where(s16a["s16aq09b"] == 1, s16a["s16aq09a"] / 10000)
+        area = s16a["s16aq47"].astype(float).where(s16a["s16aq45"] == 1, estimate)
+        area = area.where(area > 0)
+        assert f["Area"].astype(float).sum() == pytest.approx(area.sum())
+
+    def test_plot_labor_totals_are_the_grids(self):
+        s16a = _raw("s16a_me_tgo2021.dta")
+        family = s16a.filter(regex=r"^s16aq(33|35|37)b_\d+$").fillna(0).to_numpy().sum()
+        hired = 0.0
+        wage = 0.0
+        for base in ("s16aq39", "s16aq41", "s16aq43"):
+            for n in range(1, 5):
+                hired += (s16a[f"{base}a_{n}"] * s16a[f"{base}b_{n}"]).sum()
+                wage += s16a[f"{base}c_{n}"].fillna(0).sum()
+        got = _served("plot_labor").groupby(level="source")[["PersonDays", "Wage"]].sum()
+        assert got.loc["family", "PersonDays"] == pytest.approx(family)
+        assert got.loc["hired", "PersonDays"] == pytest.approx(hired)
+        assert got.loc["hired", "Wage"] == pytest.approx(wage)
+
+    def test_livestock_is_the_roster(self):
+        s17 = _raw("s17_me_tgo2021.dta")
+        got = _served("livestock")
+        assert len(got) == len(s17)
+        assert got["HeadCount"].astype(float).sum() == pytest.approx(s17["s17q06"].sum())
+        assert got["HeadSold"].astype(float).sum() == pytest.approx(s17["s17q10"].sum())
+        cattle = got.xs("Cattle", level="animal")["HeadCount"].astype(float).sum()
+        assert cattle == pytest.approx(s17.loc[s17["s17q01"] == 1, "s17q06"].sum())
+
+    def test_people_last7days_carries_every_member(self):
+        s04 = _raw("s04a_me_tgo2021.dta")
+        got = _served("people_last7days")
+        assert len(got) == len(s04) == 28815
+        assert got["farm_work"].astype("boolean").sum() == (s04["s04q06"] == 1).sum()
+        assert got["wage_work"].astype("boolean").sum() == (s04["s04q08"] == 1).sum()
+
+    def test_nonfood_items_follow_the_label_not_the_code(self):
+        got = _served("nonfood_expenditures")
+        assert got.index.is_unique
+        by_window = got.groupby("RecallWindow")["Expenditure"].sum()
+        for letter, window in dict(b="7 days", c="30 days", d="3 months", e="6 months",
+                                   f="12 months").items():
+            raw = _raw(f"s09{letter}_me_tgo2021.dta")
+            assert by_window[window] == pytest.approx(raw[f"s09{letter}q03"].sum())
+        s09d = _raw("s09d_me_tgo2021.dta")
+        mask = got.xs("Washable Face Masks (COVID-19)", level="j")["Expenditure"].astype(float).sum()
+        assert mask == pytest.approx(s09d.loc[s09d["s09dq01"] == 415, "s09dq03"].sum())

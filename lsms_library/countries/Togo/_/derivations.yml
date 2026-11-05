@@ -108,3 +108,80 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
     69,875 joined rows 1.00000.
   contents: 'Togo/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
+
+Togo::crop_production::hh-crop-sale-single-row:
+  waves: ['2021-22']
+  columns: [Quantity_sold, Unit_sold, Value_sold]
+  rule: >-
+    s16d records a sale for the household and crop, with no plot.  A sale is a
+    record with a positive s16dq05a or s16dq06, after the file's exact repeats are
+    removed.  Where the household has exactly one s16c row for the crop, the sale is
+    served on that row: Quantity_sold = s16dq05a, Unit_sold = s16dq05b, Value_sold =
+    s16dq06, as recorded, and that row carries this key.  What is derived is the
+    ATTACHMENT, not the numbers.  Any other sale is served on one row of that household
+    and crop with plot_id = 'Farm-level' and no key, because its index value already
+    discloses it.  No sale is split, summed, scaled or dropped.  This key shares a row
+    with harvest-to-date through derivations.MULTI_SEP, in sorted order.
+  function: lsms_library.ehcvm:derive_hh_crop_sale_attachment
+  inputs: lsms_library.countries.Togo.2021-22._.mapping:inputs_hh_crop_sale
+  raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq06]
+  assumptions:
+    - text: >-
+        s16d asks the sale once per crop, with no plot, and s16c records no sale.  Where
+        the household has one harvest row for the crop, no other row can hold the sale.
+        The sale is NOT thereby a share of that row's Quantity, and it may be in another
+        unit: Unit_sold says which.
+      basis: variable-label
+      evidence: >-
+        s16d_me_tgo2021.dta has no field or parcel variable; s16dq05a "16D.05a. Quelle
+        est la quantite de ce produit qui a deja ete vendue ?"; s16dq06 "16D.06. Quel a
+        ete le montant tire de la vente de ce produit?".  s16c_me_tgo2021.dta carries
+        s16cq02 and s16cq03 and no sale variable.
+    - text: >-
+        a sale of a crop on two or more rows is not allocated among them, since any split
+        would be invented.  It stays with the household and crop on a Farm-level row,
+        with u = 'Unknown', where gross_crop_revenue and median_price_valuation can read
+        it.  That row has no harvest Quantity.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-03, option (d), GH #824, for Mali 2021-22 and applied here
+        by the brief of GH #552; the Farm-level convention in lsms_library/data_info.yml.
+    - text: >-
+        identical s16d lines are one record.  The export repeats a crop's record once
+        per harvest line: 1,111 of 10,325 rows are exact repeats, 782 of them sales, and
+        no (household, crop) has two different records.
+      basis: modelling-choice
+      evidence: measured 2026-11-04; the same artefact as Niger 2021-22, GH #824
+  validated_against: >-
+    tests/test_togo_2021_wave.py, whose oracle reads s16c and s16d directly.  Not
+    validated against an external total: no document here reports one.
+  contents: 'Togo/_/CONTENTS.org, "2021-22 wired"'
+  since: '2026-11-04'
+
+Togo::crop_production::harvest-to-date:
+  waves: ['2021-22']
+  columns: [Quantity]
+  rule: >-
+    Identity on a row whose harvest is not finished and which records a quantity: s16cq11
+    = Non with s16cq16a.  The value is served as recorded.  The key names its WINDOW: the
+    question asks the quantity ALREADY harvested, so the row covers a part of the season
+    under a column that otherwise means all of it.  A row with no recorded quantity
+    carries no key.
+  function: lsms_library.ehcvm:derive_harvest_to_date
+  inputs: lsms_library.countries.Togo.2021-22._.mapping:inputs_harvest_to_date
+  raw_variables: [s16cq11, s16cq12, s16cq16a, s16cq16b]
+  assumptions:
+    - text: >-
+        the recorded quantity on an unfinished row is what has been harvested so far, and
+        not the season.  111 of the 403 unfinished rows record one.
+      basis: variable-label
+      evidence: >-
+        s16c_me_tgo2021.dta s16cq16a "16C.16a. Quantite deja recoltee pour la presente
+        campagne 2021/22?", s16cq11 "16C.11. Avez vous fini la recolte de cette culture?",
+        s16cq12 "16C.12. Quel pourcentage de la superficie vous reste-t-il a recolter?"
+  validated_against: >-
+    tests/test_togo_2021_wave.py, whose oracle reads s16c directly.  An identity has
+    nothing to validate but its rows.
+  contents: 'Togo/_/CONTENTS.org, "2021-22 wired"'
+  since: '2026-11-04'
+
