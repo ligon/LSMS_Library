@@ -206,3 +206,17 @@ class TestReview:
                                  ("h", "R2", "Other", 48, KG, "unknown_condition", 5.0)],
                         [("h", 48, KG, "unknown_condition", 1.0, 10.0)])
         assert out.xs(FARM, level="plot_id").index.get_level_values("crop").tolist() == ["Other"]
+
+    def test_a_blank_cell_stays_blank_on_a_farm_level_row_only(self, malawi):
+        # What _sale_block returns for a line with a value and no quantity: sum 0, none recorded.
+        sale = _sale([("h", 1, KG, "shelled", 0.0, 300.0), ("g", 1, KG, "shelled", 0.0, 300.0)]).assign(
+            _from_module_q=False, _quantity_recorded=False, _value_recorded=True)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out = malawi.assemble_crop_production(
+                "2010-11", [_harvest([("h", "R1", "Maize", 1, KG, "shelled", 10.0),
+                                      ("h", "R2", "Maize", 1, KG, "shelled", 10.0),
+                                      ("g", "R1", "Maize", 1, KG, "shelled", 10.0)])], [sale])
+        assert out.xs(FARM, level="plot_id")["Quantity_sold"].isna().all()
+        on_row = out[out.index.get_level_values("i") == "g"]
+        assert on_row["Quantity_sold"].tolist() == [0.0] and on_row["Value_sold"].tolist() == [300.0]

@@ -5323,5 +5323,7 @@ and filled on every row holding a sale: on a harvest row =Unit_sold= is =u=, by 
   (2013-14, 2010-11) the =crop= filter used to drop and labels the 13 sales (329,000 MWK), which the ladder then places.  Not checked against Module P's printed code list.
 - *A household's own rows name the crop.*  9 Farm-level rows of 2010-11 (39,470 MWK) are code 48 beside the household's =Cowpea (Khobwe)= lines (GH #1228), so they say
   =Cowpea (Khobwe)= and not =Other=, which would add a crop to =crop_diversity='s count.  Where a household's code carries two labels the row keeps the table's.
+- *A blank stays a blank on a Farm-level row.*  =_sale_block='s =sum= reads a blank as 0, which a harvest row keeps as it always did.  A Farm-level row does not: 3 =Quantity_sold= in
+  2010-11 and 2 =Value_sold= in 2013-14 are NA, not 0.  Existing rows do not move.
 - *No two-line trap.*  A crop on one plot in two rows goes through the ladder; =0= sales in any wave have 2+ rows stating a harvest on ONE plot and reach Farm-level.
   115 records (3.21M MWK) on 2+ plots have one row stating a harvest; Nigeria's ruling A was not extended to them.

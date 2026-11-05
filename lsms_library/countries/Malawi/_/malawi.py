@@ -1573,12 +1573,17 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
         'Quantity_sold':  qs.values,
         'Value_sold':     vs.values,
         '_from_module_q': perennial,
+        # Whether any line of the group recorded the cell: `sum` reads a blank as 0, which
+        # a harvest row keeps as it always did, and a Farm-level row does not (GH #1457).
+        '_quantity_recorded': qs.notna().values,
+        '_value_recorded': vs.notna().values,
     })
     keep = out['_crop_code'].notna().to_numpy()
     out = out[keep]
     grp = out.groupby(['i', '_crop_code', 'u', 'condition_sold'],
                       as_index=False, dropna=False).agg(
-        {'Quantity_sold': 'sum', 'Value_sold': 'sum', '_from_module_q': 'max'})
+        {'Quantity_sold': 'sum', 'Value_sold': 'sum', '_from_module_q': 'max',
+         '_quantity_recorded': 'max', '_value_recorded': 'max'})
     # Counted on the module's LINES, before the groupby sums them.
     grp.attrs['unit_text_recovered'] = _recovered_counts(recovered_to[keep])
     return grp
@@ -1928,8 +1933,11 @@ def _attach_sales(t, harv, sale):
     sale['condition_sold'] = sale['condition_sold'].astype('string')
     if '_from_module_q' not in sale.columns:     # a frame not from `_sale_block`
         sale['_from_module_q'] = pd.to_numeric(sale['_crop_code'], errors='coerce').ge(1000).fillna(False)
+        sale['_quantity_recorded'] = sale['Quantity_sold'].notna()
+        sale['_value_recorded'] = sale['Value_sold'].notna()
     sale = sale.groupby(skey, as_index=False, dropna=False).agg(
-        {'Quantity_sold': 'sum', 'Value_sold': 'sum', '_from_module_q': 'max'})
+        {'Quantity_sold': 'sum', 'Value_sold': 'sum', '_from_module_q': 'max',
+         '_quantity_recorded': 'max', '_value_recorded': 'max'})
     sale['_srow'] = range(len(sale))
 
     # A sale does not reach an `unknown_plot` row (GH #1476).  Its rows
@@ -2005,7 +2013,8 @@ def _attach_sales(t, harv, sale):
     assert len(harv) == n_harv, 'the sale attach must not change rows'
 
     # --- per-sale decisions -------------------------------------------------
-    dec = sale.set_index('_srow')[skey + ['Quantity_sold', 'Value_sold', '_from_module_q']].copy()
+    dec = sale.set_index('_srow')[skey + ['Quantity_sold', 'Value_sold', '_from_module_q',
+                                          '_quantity_recorded', '_value_recorded']].copy()
     dec['crop'] = pd.Series(pairs.groupby('_srow')['crop'].first()).reindex(dec.index)
     dec['outcome'] = None
     dec['rung'] = None
@@ -2223,7 +2232,8 @@ def _farm_level_sales(t, decisions, harv=None):
     two or more plots, a crop with no harvest row, a sale in a unit no row of its one
     plot uses (GH #824), and one the ladder refused for its basis (GH #833).  Also one
     the ladder attached to a harvest row that is then dropped because its crop code
-    is in no table.  Unit and state are the sale's own, in ``Unit_sold`` /
+    is in no table.  A cell no line recorded stays NA here, unlike the 0 of
+    ``_sale_block``'s sum on a harvest row.  Unit and state are the sale's own, in ``Unit_sold`` /
     ``Condition_sold``.  ``u``, ``condition`` describe a harvest, which this row does
     not have, so they are the sentinels.  One row per ``_sale_block`` record: no sale is
     split, or summed further.
@@ -2269,8 +2279,11 @@ def _farm_level_sales(t, decisions, harv=None):
         'intercropped': pd.Series(pd.NA, index=sale.index, dtype='boolean'),
         # A property of the module that asked, as on every harvest row.
         'perennial': sale['_from_module_q'].astype('boolean'),
-        'Quantity_sold': pd.to_numeric(sale['Quantity_sold'], errors='coerce').astype('Float64'),
-        'Value_sold': pd.to_numeric(sale['Value_sold'], errors='coerce').astype('Float64'),
+        # A blank stays a blank here, where no existing row can move.
+        'Quantity_sold': pd.to_numeric(sale['Quantity_sold'], errors='coerce').astype('Float64')
+                           .where(sale['_quantity_recorded'].astype(bool)),
+        'Value_sold': pd.to_numeric(sale['Value_sold'], errors='coerce').astype('Float64')
+                        .where(sale['_value_recorded'].astype(bool)),
         'Unit_sold': sale['u'].astype('string'),
         'Condition_sold': sale['condition_sold'].astype('string'),
         '_branch': pd.Series(pd.NA, index=sale.index, dtype='string'),
