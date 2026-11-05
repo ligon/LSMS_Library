@@ -116,8 +116,8 @@ Method: 900 ZD drawn with probability proportional to size at the first stage,
 
 - The catalog DDI's =sampling_procedure= instead gives 905 EAs / ~10 860
   households.  Recorded as a design-figure discrepancy; *not adjudicated*.
-- The realized counts recorded in the =sample= section of this file (10,224
-  households, 900 clusters) are data-side counts, a different kind of fact from
+- The realized counts recorded in the =sample= section of this file (10,411 in the
+  welfare file, 10,800 since GH #1464; 900 clusters) are data-side counts, a different kind of fact from
   these design figures.  No claim is made here about which is "right".
 
 *** Sub-samples / oversamples
@@ -509,7 +509,7 @@ per-native-unit unitvalue; only the kg aggregate excludes them.
 Sampling design table: cluster, weights, strata, and Rural classification.
 
 *** Waves
-- *2014 (EMC)*: =emc2014_welfare.dta=.  Weight variable =hhweight= (cross-sectional); no distinct panel weight (same variable used for both).  Numeric =strate= column (1--26, Region x Milieu).  10,224 households across 900 clusters.  /Since 2026-11-04 also the 389 households only the p1 food file holds, with no weight, 10,800 in all: see GH #1464 at the end of this file./
+- *2014 (EMC)*: =emc2014_welfare.dta=.  Weight variable =hhweight= (cross-sectional); no distinct panel weight (same variable used for both).  Numeric =strate= column (1--26, Region x Milieu).  10,411 households across 900 clusters (this said 10,224 until 2026-11-04, which matches no count of this file).  /Since 2026-11-04 also the 389 households only the p1 food file holds, with no weight, 10,800 in all: see GH #1464 at the end of this file./
 - *2018-19 (EHCVM)*: Two-file merge: cover page =s00_me_bfa2018.dta= (cluster, Rural) + =ehcvm_ponderations_bfa2018.dta= (cluster-level =hhweight=, same for both weight columns).  6,961 households across 585 clusters.  No explicit strata variable.
 - *2021-22 (EHCVM)*: Two-file merge: cover page =s00_me_bfa2021.dta= + =ehcvm_panel_ponderations_bfa2021.dta=.  Distinct weights: =hhweight2021= (cross-sectional) and =hhweight_panel= (panel/longitudinal).  Both weights are cluster-level (same value for all households in a grappe).  3,218 households across 550 clusters.  No explicit strata variable.
 
@@ -2028,7 +2028,7 @@ Burkina Faso cache hash moves) and changes served 2021-22 =i=.
 
 *Also measured, not reconciled*: =sample()= serves 10,411 / 7,010 / 3,227
 households for 2014 / 2018-19 / 2021-22; the "DONE sample" section above
-records 10,224 / 6,961 / 3,218.
+records 10,224 / 6,961 / 3,218.  /Its 10,224 was corrected to 10,411 on 2026-11-04./
 
 *Cache*: none.  =sampling.yml= is not a build input (=.yml= is outside
 =_BUILD_INPUT_SUFFIXES=) and =CONTENTS.org= is excluded as documentation.
@@ -2918,7 +2918,7 @@ Ethiopia, a household's item rows must agree before they are reduced, and nothin
 the plain-string members of a =file:= list, so a member with a per-file override (the form the
 food file takes here, and =Cross_Section/...= in 2021-22) is not in =Wave._input_hash=.  A new
 release of the p1 food file would rebuild =food_acquired=, where it is a plain string, and not
-=sample=.  It is a framework matter, reported separately: 24 such entries in 6 wave files.
+=sample=.  It is a framework matter, filed as GH #1510: 28 such entries in 9 wave files.
 
 *Why that file and not the logement one.*  Logement holds the same 10,800 households at
 household grain, but it has no =strate=, and the food file does.  The food file writes the
@@ -2937,6 +2937,10 @@ by the non-null mean as before: the 10,411 weights served do not move.
 *Why the welfare file omits them is still undocumented.*  Measured, households present in the
 person file of each passage: passage 2 244 of the 389 against 10,374 of the 10,411 others;
 passage 3 17 against 10,212; passage 4 388 against 10,379.  On =res_entr1=, 382 of the 389 read 1.
+Passage presence does not settle it (independent review, 2026-11-04): all 133 households in p1 and
+p4 only are missing from the welfare file, but of those in p1, p2 and p4, 238 are missing and 198
+kept, and 5 of the 389 appear in all four passages.  66% of the 389 are urban, against 38% of the
+welfare file.
 
 *Measured*, cold base (=115b6ab71=) against the change:
 
@@ -2958,11 +2962,13 @@ passage 3 17 against 10,212; passage 4 388 against 10,379.  On =res_entr1=, 382 
 The rows of those tables are otherwise unchanged; only =v= moves.
 =household_characteristics= had no NA =v= to clear, because =roster_to_characteristics= spells
 one =Mover=, and 379 of these households were served =v = 'Mover'=, a label that says something
-the survey does not.  They now carry their =zd=.
+the survey does not.  They now carry their =zd=.  The other 10 of the 389 have no row there on either
+side: all 18 of their roster rows have =MonthsSpent= 0, so the residence filter drops them.
 
 *What stays.*  One 2014 household is in the passage-3 files and in no p1 file (=zd= 262), so it
 keeps NA =v= on =food_coping= (5 rows) and =months_food_inadequate= (1), and =shocks= also holds
-it (3 rows, no =v= level).  It has no row in =sample=.
+it (3 rows, no =v= level).  It has no row in =sample=.  The p2-p4 person files hold 31 households not
+in p1, and it is the only one of them that reaches a served table (independent review).
 
 *The #1244 checkpoint's counts.*  The reviewed 10,411 / 27,824 are the state before this; the
 sections above carry a dated note.  Its namespace finding holds: the 389 ids are =EMC_= ids, and
