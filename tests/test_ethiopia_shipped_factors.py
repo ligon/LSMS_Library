@@ -412,6 +412,10 @@ def test_ethiopia_harvest_kg_before_and_after_the_shipped_table(ethiopia):
     import lsms_library as ll
 
     cp = ll.Country("Ethiopia").crop_production()
+    # GH #1457: + 9,958 Farm-level sale rows, which state no harvest, so they have no kg
+    # and only `none` would move.  These counts are the harvest rows'.
+    assert len(cp) == 86_437 + 9_958
+    cp = cp[cp.index.get_level_values("plot_id") != "Farm-level"]
     assert len(cp) == 86_437
     # Ethiopia asks NO per-row conversion factor, so `reported` is
     # structurally empty and `reported_vs_shipped` can never be populated.

@@ -2090,7 +2090,7 @@ def _farm_level_rows(t, placed, module, crop_map, perennial_codes, U_UNKNOWN,
         'production_obs': (f'reported:{module}:' + row['_holder'].astype('string') + ':'
                            + code.astype('string')).values,
         'u': U_UNKNOWN,
-        'harvest_month': pd.NA,
+        'harvest_month': pd.Series(pd.NA, index=row.index, dtype='Int64').values,
         'intercropped': pd.Series(pd.NA, index=row.index, dtype='boolean').values,
         'perennial': code.map(lambda x: int(x) in perennial_codes).astype('boolean').values,
         'planting_month': pd.Series(pd.NA, index=row.index, dtype='Int64').values,

@@ -21,7 +21,6 @@ import pytest
 import lsms_library as ll
 from lsms_library.local_tools import get_dataframe
 from lsms_library.paths import countries_root
-from tests.conftest import requires_s3
 
 MALAWI = countries_root() / "Malawi"
 FARM = "Farm-level"
@@ -161,7 +160,7 @@ def _source(wave):
     return value, quantity, n
 
 
-@requires_s3
+@pytest.mark.requires_s3
 @pytest.mark.parametrize("wave", list(SALES))
 class TestOracle:
 

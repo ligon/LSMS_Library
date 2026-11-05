@@ -21,7 +21,6 @@ import pytest
 import lsms_library as ll
 from lsms_library.local_tools import format_id, get_dataframe
 from lsms_library.paths import countries_root
-from tests.conftest import requires_s3
 
 ETHIOPIA = countries_root() / "Ethiopia"
 FARM = "Farm-level"
@@ -143,7 +142,7 @@ def _source(wave):
     return value
 
 
-@requires_s3
+@pytest.mark.requires_s3
 @pytest.mark.parametrize("wave", list(SOURCE))
 class TestOracle:
 
@@ -182,10 +181,15 @@ class TestOracle:
         assert g.loc[q, "Unit_sold"].notna().all() and (g.loc[q, "Unit_sold"] == g.loc[q, "u"]).all()
 
 
-@requires_s3
-@pytest.mark.parametrize("key,wave", [(SINGLE, "2021-22"), (SUMMED, "2021-22"), (TWO, "2021-22"), (SINGLE, "2013-14")])
-def test_inputs_return_the_lines(key, wave):
+@pytest.mark.requires_s3
+@pytest.mark.parametrize("key,wave", [(SINGLE, "2021-22"), (SUMMED, "2021-22"), (TWO, "2021-22"),
+                                      (SINGLE, "2013-14"), (SINGLE, "2011-12"), (SINGLE, "2018-19")])
+def test_inputs_return_the_lines_of_the_keyed_rows(served, key, wave):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        x = ll.Country("Ethiopia").derivation_inputs(key, wave=wave)
-    assert len(x) and list(x.index.names) == ["t", "i", "j"] and "holder_id" in x.columns
+        x = ll.Country("Ethiopia").derivation_inputs(key, wave=wave).reset_index()
+    assert list(x.columns[:3]) == ["t", "i", "j"] and "holder_id" in x.columns
+    g = served[served.t == wave]
+    keyed = g[g.Derivation.astype("string").str.contains(key, regex=False).fillna(False)]
+    assert len(keyed)
+    assert set(zip(keyed.i.astype(str), keyed.j.astype(str))) <= set(zip(x.i.astype(str), x.j.astype(str)))
