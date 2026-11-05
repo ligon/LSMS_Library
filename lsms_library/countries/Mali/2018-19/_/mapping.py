@@ -1,3 +1,5 @@
+import re
+
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
@@ -231,6 +233,47 @@ def food_security(df):
     return df
 
 
+#: s05q02 = 10 * s07bq03b + s07bq03c: the last digit is the household's size code.
+#: Quart / Demi / Entier are defined and unused here, so another digit raises.
+_S05_SIZES = {1: 'Petit', 2: 'Moyen', 3: 'Grand'}
+_S05_SIZED_LABEL = re.compile(r'^(?P<base>.*\S)\s*-\s*(?P<size>petit|moyen|grand)$',
+                              re.IGNORECASE)
+#: The community spells four units unlike the household's served base for the
+#: same unit code.  One source unit on each side, so these are respellings; the
+#: u table's many-to-one rows (Kg, Tas, Boite) are folds and are not applied.
+_S05_BASE_RESPELL = {'Alvéoole': 'Alvéole', 'Motte(boule)': 'Boule',
+                     'Moude (Moudé)': 'Moude', 'Seau (5 Kg )': 'Seau (5 Kg)'}
+
+
+def _s05_unit_label(code, label):
+    """Served ``u`` of one s05q02 code: the household's sized form (GH #1453).
+
+    ``Tas - Petit`` -> ``Tas (Petit)``, the ``<base> (<Size>)`` of
+    ``ehcvm.sized_unit``, so a sized community price joins a household's
+    ``food_acquired.u``.  The size comes from the code's DIGIT (Niger's rule:
+    ``_s05_unit_label`` in niger.py), and a label whose word disagrees raises.
+    A code with no size digit keeps its label verbatim.
+
+    NOT folded: ``Avec os en tas - Petit`` stays ``Avec os en tas (Petit)``, where
+    the household's ``u`` table serves ``Tas (Petit)``.  Folding would put two
+    source units under one label on 418 (grappe, product, vague) keys.
+    """
+    if pd.isna(code) or pd.isna(label):
+        return pd.NA         # community_prices_s05 refuses a missing key
+    code, label = int(code), str(label).strip()
+    digit = code % 10
+    if digit == 0:
+        return label
+    if digit not in _S05_SIZES:
+        raise ValueError(f's05 unit code {code}: no size for digit {digit}')
+    match = _S05_SIZED_LABEL.match(label)
+    if match is None or match['size'].title() != _S05_SIZES[digit]:
+        raise ValueError(f's05 unit code {code}: {label!r} does not name '
+                         f'{_S05_SIZES[digit]}')
+    base = match['base'].strip()
+    return f'{_S05_BASE_RESPELL.get(base, base)} ({_S05_SIZES[digit]})'
+
+
 def community_prices_s05(codes, labels):
     """Both reported EHCVM price slots, without selection (GH #821).
 
@@ -239,16 +282,24 @@ def community_prices_s05(codes, labels):
     821 §2-5 and CONTENTS.org. No per-kg price is computed.
 
     The s05 product code retains the source's finer product/variety identity
-    when harmonize_food maps several labels to one j. Unit-size labels stay
-    intact. A repeated public source key gets obs 3/4, then 5/6, in file order
-    (Niger's slot + 2*rank convention), including identical repeats. Missing
-    or nonpositive prices remain observations; no EAC-I eligibility filter or
-    weight-sentinel rule applies to this different instrument.
+    when harmonize_food maps several labels to one j. Each unit-size code keeps
+    a label of its own, spelled in the household's sized form (GH #1453,
+    :func:`_s05_unit_label`). A repeated public source key gets obs 3/4, then
+    5/6, in file order (Niger's slot + 2*rank convention), including identical
+    repeats. Missing or nonpositive prices remain observations; no EAC-I
+    eligibility filter or weight-sentinel rule applies to this different
+    instrument.
     """
     if not codes.index.equals(labels.index) or len(codes) != len(labels):
         raise ValueError('s05 codes and labels must have the same row index')
     codes, labels = codes.reset_index(drop=True), labels.reset_index(drop=True)
     description = labels['s05q01'].astype('string').str.strip()
+    served_units = pd.Series(
+        [_s05_unit_label(code, label) for code, label in zip(codes['s05q02'], labels['s05q02'])],
+        index=codes.index)
+    pairs = pd.DataFrame({'code': codes['s05q02'], 'u': served_units}).dropna().drop_duplicates()
+    if pairs['code'].duplicated().any() or pairs['u'].duplicated().any():
+        raise ValueError('s05 unit codes and served labels must be one to one')
     item_map = tools.get_categorical_mapping(
         tablename='harmonize_food', idxvars='Code',
         **{'Preferred Label': 'Preferred Label'})
@@ -256,7 +307,7 @@ def community_prices_s05(codes, labels):
         't': '2018-19',
         'v': codes['grappe'].map(tools.format_id).astype('string'),
         'j': description.map(item_map).fillna(description),
-        'u': labels['s05q02'].astype('string').str.strip(),
+        'u': served_units.astype('string'),
         'variety': codes['s05q01'].map(tools.format_id).astype('string'),
         'visit': pd.to_numeric(codes['vague']).astype('Int64'),
         'Description': description,

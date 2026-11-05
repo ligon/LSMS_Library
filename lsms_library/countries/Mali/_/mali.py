@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.transformations import U_UNKNOWN
-from lsms_library.derivations import MULTI_SEP
+from lsms_library.derivations import MULTI_SEP, union_keys
 from lsms_library.build_transforms import reduce_to_agreed
 from collections import defaultdict
 
@@ -13,6 +13,29 @@ def i(value):
     Formatting household id
     '''
     return tools.format_id(value.iloc[0])+'0'+tools.format_id(value.iloc[1],zeropadding=2)
+
+# Household namespaces (GH #1494, ruling @ligon 2026-11-04).  2014-15 and 2017-18
+# are EAC-I; 2018-19 and 2021-22 are EHCVM, a separate programme with no household
+# link (panel_ids.py).  Both number their clusters and households from 1, so ``i``
+# above spells the same string for unrelated households: 3,613 ids shared between
+# 2017-18 and 2018-19, 1,601 between 2014-15 and 2018-19, 3,341 and 1,493 with
+# 2021-22.  A cross-wave ``groupby('i')`` merged them.  Member-level roster match
+# on those ids is at the level of two unrelated households of one grappe
+# (CONTENTS.org, GH #1494).  Letters cannot occur in the numeric ids, so a prefixed
+# id can never equal an unprefixed one, whatever the serials do.  The EHCVM ids stay
+# as they are: 2018-19 / 2021-22 are the panel lineage in panel_ids / updated_ids.
+# Burkina Faso's ``EMC_`` is the precedent (GH #1244).
+EACI_PREFIX = 'EACI_'
+
+
+def eaci_i(value):
+    '''EAC-I household id: ``'EACI_' + i(value)``, e.g. (1, 1) -> ``'EACI_1001'``.
+
+    ``value`` is the row of ``[grappe, menage]`` (2014-15) or ``[grappe,
+    exploitation]`` (2017-18).  Used by those two waves' ``mapping.py`` and scripts.
+    '''
+    return EACI_PREFIX + i(value)
+
 
 def pid(value):
     '''
@@ -647,7 +670,7 @@ def _tree_roster_inputs(wave, columns):
     src = producing_trees(src, wave)
     out = src[columns].copy()
     out['t'] = wave
-    out['i'] = src.apply(lambda r: i(pd.Series([r['grappe'], r[hh]])), axis=1)
+    out['i'] = src.apply(lambda r: eaci_i(pd.Series([r['grappe'], r[hh]])), axis=1)
     # _crop_labels resolves its table relative to the cwd of a wave script;
     # this callable runs from anywhere, so name the same two rungs (wave _/,
     # then country _/) explicitly.
@@ -791,16 +814,21 @@ def crop_production_finalize(df):
 # 2018-19  s16c_me_mli2018.dta  one plot-by-crop file, harvest AND sale on the
 #                               line (Niger/2018-19/_/crop_production.py).
 # 2021-22  s16c_me_mli2021.dta  plot-by-crop, harvest only (s16cq16a is filled
-#                               on 309 of 7,247 rows: GH #1437; no harvest total
-#                               is derived here);
+#                               on 309 of 7,247 rows: GH #1437);
 #          s16d_me_mli2021.dta  household-by-crop dispositions, one row per
 #                               (household, crop), no plot.
 #
 # A 2021-22 sale goes on the household's single harvest ROW for that crop where
 # there is exactly one (the Niger 2021-22 rule after GH #1360: one served row,
 # not merely one plot), and otherwise on ONE row of that household and crop with
-# plot_id = 'Farm-level', which carries no harvest Quantity.  Nothing is dropped
-# and nothing is split: derive_hh_crop_sale_attachment.
+# plot_id = 'Farm-level'.  Nothing is dropped and nothing is split:
+# derive_hh_crop_sale_attachment.
+#
+# A finished 2021-22 harvest whose s16cq16a the file lacks takes the sum of its
+# s16d dispositions where they share one unit, placed the same way, on the single
+# row or the Farm-level row: derive_hh_crop_harvest_total (GH #1437).  Everything
+# else stays NA.  A recorded harvest of an unfinished crop keeps its value and takes
+# the window key harvest-to-date, in both waves.
 #
 # Why these waves do not go through crop_production_finalize:
 #   - it masks 99 and 9999 as the EACI "Manquant" codes.  s16cq12a carries no
@@ -834,6 +862,14 @@ FARM_LEVEL = 'Farm-level'
 #: s16d recorded for the household and crop rather than for the plot.
 DERIVATION_HH_CROP_SALE = (
     'Mali::crop_production::hh-crop-sale-single-row')
+
+#: Registry keys of the harvest (GH #1437): an identity naming a window, and a sum.
+DERIVATION_HARVEST_TO_DATE = 'Mali::crop_production::harvest-to-date'
+DERIVATION_HARVEST_DISPOSITIONS = 'Mali::crop_production::harvest-from-dispositions'
+
+#: What s16d records of a crop, each with its own quantity <var>a and unit <var>b:
+#: consumed, given away, sold, in stock.
+_DISPOSITIONS = ('s16dq02', 's16dq03', 's16dq05', 's16dq13')
 
 _SALE_KEYS = ['i', 'crop']
 _SALE_COLUMNS = ['Quantity_sold', 'Unit_sold', 'Value_sold']
@@ -926,6 +962,125 @@ def derive_hh_crop_sale_attachment(harvest, sales):
     return pd.concat([served, farm], ignore_index=True)
 
 
+def _with_key(derivation, mask, key):
+    """``derivation`` with ``key`` joined on where ``mask`` holds.
+
+    Two keys on one row are ``MULTI_SEP``-joined in sorted order
+    (``derivations.union_keys``), which is how a sale's attachment and a harvest's
+    derivation share the column.
+    """
+    out = derivation.astype('string').copy()
+    mask = pd.Series(mask, index=out.index).fillna(False).astype(bool)
+    out[mask] = pd.array([union_keys((value, key)) for value in out[mask]], dtype='string')
+    return out
+
+
+def derive_harvest_to_date(quantity):
+    """The identity: a recorded harvest of an unfinished crop, served as recorded.
+
+    Registered as ``Mali::crop_production::harvest-to-date``.  Nothing is computed.
+    The registry is the point: s16cq12a (2018-19) and s16cq16a (2021-22) ask the
+    quantity ALREADY harvested, so on a row whose harvest is not finished the served
+    ``Quantity`` covers a part of the season under a name that implies all of it.
+    """
+    return quantity
+
+
+def stamp_harvest_to_date(df):
+    """Key the rows with ``finished == 'Non'`` and a recorded ``Quantity``."""
+    out = df.copy()
+    out['Quantity'] = derive_harvest_to_date(pd.to_numeric(out['Quantity'], errors='coerce'))
+    derivation = (out['Derivation'] if 'Derivation' in out.columns
+                  else pd.Series(pd.NA, index=out.index, dtype='string'))
+    unfinished = out['finished'].astype('string').str.strip().eq('Non')
+    out['Derivation'] = _with_key(derivation, unfinished & out['Quantity'].notna(),
+                                  DERIVATION_HARVEST_TO_DATE)
+    return out
+
+
+def _harvest_totals(lines, dispositions):
+    """The (i, crop) pairs whose harvest their dispositions can state, with the sum.
+
+    ``lines`` holds the household's s16c rows of the crop: ``i``, ``crop``,
+    ``Quantity`` and ``finished``.  ``dispositions`` holds one row per (i, crop), with
+    ``<var>a`` and ``<var>b`` for each of :data:`_DISPOSITIONS`.  A pair qualifies when
+
+    - every s16c row of it says the harvest is finished: a mixed pair's dispositions
+      cover what is harvested so far, so they are not a finished total, and an
+      unanswered row has not said so;
+    - no row of it records a quantity: a recorded harvest is never overridden, and
+      a total beside it on a Farm-level row would count it twice;
+    - its positive dispositions all state one unit: no factor between units exists.
+
+    Returns ``Quantity``, ``u`` (the dispositions' own unit label) and ``lines`` (how
+    many s16c rows the pair has), indexed by (i, crop).
+    """
+    if dispositions.duplicated(_SALE_KEYS).any():
+        raise ValueError('crop_production: more than one s16d record for a (i, crop)')
+    long = pd.concat([
+        dispositions[_SALE_KEYS].assign(
+            quantity=pd.to_numeric(dispositions[f'{var}a'], errors='coerce').astype('float64'),
+            unit=dispositions[f'{var}b'].astype('string').str.strip())
+        for var in _DISPOSITIONS], ignore_index=True)
+    long = long[long['quantity'].gt(0)]
+    long['unitless'] = long['unit'].isna()
+    stated = long.groupby(_SALE_KEYS).agg(Quantity=('quantity', 'sum'), u=('unit', 'first'),
+                                          units=('unit', 'nunique'), unitless=('unitless', 'any'))
+    facts = pd.DataFrame({'i': lines['i'], 'crop': lines['crop'],
+                          'open': (lines['finished'].astype('string').str.strip().ne('Oui')
+                                   .fillna(True).astype(bool)),
+                          'recorded': pd.to_numeric(lines['Quantity'], errors='coerce').notna()})
+    facts = facts.groupby(_SALE_KEYS).agg(lines=('open', 'size'), open=('open', 'any'),
+                                          recorded=('recorded', 'any'))
+    pairs = stated.join(facts, how='inner')
+    keep = pairs['units'].eq(1) & ~pairs['unitless'] & ~pairs['open'] & ~pairs['recorded']
+    return pairs.loc[keep, ['Quantity', 'u', 'lines']]
+
+
+def derive_hh_crop_harvest_total(served, dispositions):
+    """A finished 2021-22 harvest the file lacks, from its dispositions (GH #1437).
+
+    ``served`` is the frame :func:`derive_hh_crop_sale_attachment` returns, with
+    ``finished`` beside it.  ``dispositions`` is :func:`ehcvm_dispositions`.  For a
+    pair of :func:`_harvest_totals`, ``Quantity`` is the sum of consumed, given, sold
+    and in stock, and ``u`` their unit.  It goes where the sale of that pair goes:
+    on the single s16c row, or, for two or more rows, on the pair's one Farm-level
+    row, created if no sale already made it.  That row carries the key.  It is
+    never split among plots.  Every other row keeps what it had.
+
+    Registered as ``Mali::crop_production::harvest-from-dispositions``.
+    """
+    plots = served['plot_id'].ne(FARM_LEVEL).fillna(True)
+    totals = _harvest_totals(served[plots], dispositions)
+    out = served.reset_index(drop=True)
+    plots = plots.reset_index(drop=True)
+    pair = pd.MultiIndex.from_frame(out[_SALE_KEYS])
+    target = ((plots & pair.isin(totals.index[totals['lines'].eq(1)]))
+              | (~plots & pair.isin(totals.index[totals['lines'].gt(1)])))
+    placed = totals.reindex(pair[target])
+    out['Quantity'] = pd.to_numeric(out['Quantity'], errors='coerce').astype('float64')
+    out.loc[target, 'Quantity'] = placed['Quantity'].to_numpy()
+    out['u'] = out['u'].astype('string')
+    out.loc[target, 'u'] = pd.array(placed['u'].to_numpy(), dtype='string')
+    out['Derivation'] = _with_key(out['Derivation'], target, DERIVATION_HARVEST_DISPOSITIONS)
+    several = totals[totals['lines'].gt(1)]
+    new = several[~several.index.isin(pair[~plots])].reset_index()[
+        _SALE_KEYS + ['Quantity', 'u']]
+    new['plot_id'] = FARM_LEVEL
+    new['Derivation'] = DERIVATION_HARVEST_DISPOSITIONS
+    return pd.concat([out, new], ignore_index=True)
+
+
+def ehcvm_dispositions(src):
+    """s16d, one row per (i, crop), with its dispositions on the served unit labels."""
+    out = pd.DataFrame({'i': ehcvm_household_ids(src).astype('string').values,
+                        'crop': ehcvm_crop_labels(src['s16dq01']).values})
+    for var in _DISPOSITIONS:
+        out[f'{var}a'] = pd.to_numeric(src[f'{var}a'], errors='coerce').values
+        out[f'{var}b'] = ehcvm_unit_labels(src[f'{var}b']).values
+    return out
+
+
 def finish_ehcvm_crop_production(df, wave):
     """The served frame of an EHCVM wave, indexed (t, i, plot_id, crop).
 
@@ -959,6 +1114,31 @@ def finish_ehcvm_crop_production(df, wave):
                 'Derivation']].sort_index()
 
 
+def _ehcvm_crop_map(wave):
+    """``harmonize_food`` by named rungs: an ``inputs`` callable runs from any cwd."""
+    from pathlib import Path
+    from lsms_library.paths import countries_root
+    root = Path(countries_root()) / 'Mali'
+    return tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Code',
+        dirs=[f'{root / wave / "_"}/', f'{root / "_"}/'],
+        **{'Preferred Label': 'Preferred Label'})
+
+
+def _ehcvm_keyed(wave, name, crop):
+    """One raw EHCVM crop file, as recorded, with the served ``t``, ``i`` and ``crop``."""
+    from pathlib import Path
+    from lsms_library.paths import countries_root
+    path = Path(countries_root()) / 'Mali' / wave / 'Data' / name
+    src = tools.get_dataframe(str(path), convert_categoricals=True)
+    out = src.copy()
+    out['t'] = wave
+    out['i'] = ehcvm_household_ids(src).astype('string')
+    out['crop'] = (src[crop].astype('string').str.strip().map(_ehcvm_crop_map(wave))
+                   .astype('string'))
+    return out
+
+
 def inputs_hh_crop_sale_single_row(wave):
     """Raw answers behind one wave's keyed rows, at (t, i, crop).
 
@@ -967,30 +1147,9 @@ def inputs_hh_crop_sale_single_row(wave):
     with the field and parcel of the single s16c row it went on, one row per
     keyed served row.
     """
-    from pathlib import Path
-    from lsms_library.paths import countries_root
-    root = Path(countries_root()) / 'Mali'
-    data = root / wave / 'Data'
     year = {'2021-22': '2021'}[wave]
-    harvest = tools.get_dataframe(str(data / f's16c_me_mli{year}.dta'),
-                                  convert_categoricals=True)
-    sold = tools.get_dataframe(str(data / f's16d_me_mli{year}.dta'),
-                               convert_categoricals=True)
-    # Named rungs, as in _tree_roster_inputs: this runs from any cwd.
-    crop_map = tools.get_categorical_mapping(
-        tablename='harmonize_food', idxvars='Code',
-        dirs=[f'{root / wave / "_"}/', f'{root / "_"}/'],
-        **{'Preferred Label': 'Preferred Label'})
-
-    def keyed(src, crop):
-        out = src.copy()
-        out['t'] = wave
-        out['i'] = ehcvm_household_ids(src).astype('string')
-        out['crop'] = (src[crop].astype('string').str.strip().map(crop_map)
-                       .astype('string'))
-        return out
-
-    harvest, sold = keyed(harvest, 's16cq04'), keyed(sold, 's16dq01')
+    harvest = _ehcvm_keyed(wave, f's16c_me_mli{year}.dta', 's16cq04')
+    sold = _ehcvm_keyed(wave, f's16d_me_mli{year}.dta', 's16dq01')
     sold = sold[ehcvm_is_sale(sold['s16dq05a'], sold['s16dq06'])]
     lines = harvest.groupby(_SALE_KEYS).size()
     single = lines[lines == 1].index
@@ -1000,6 +1159,45 @@ def inputs_hh_crop_sale_single_row(wave):
         harvest[_SALE_KEYS + ['s16cq02', 's16cq03']], on=_SALE_KEYS, how='inner',
         validate='one_to_one')
     return out.set_index(['t', 'i', 'crop'])
+
+
+def inputs_harvest_from_dispositions(wave):
+    """The s16d answers behind one wave's derived totals, at (t, i, crop).
+
+    The registry ``inputs`` callable for ``harvest-from-dispositions``: the four
+    quantities and their units as recorded, one row per keyed served row.
+    """
+    year = {'2021-22': '2021'}[wave]
+    harvest = _ehcvm_keyed(wave, f's16c_me_mli{year}.dta', 's16cq04')
+    sold = _ehcvm_keyed(wave, f's16d_me_mli{year}.dta', 's16dq01')
+    lines = harvest.assign(Quantity=harvest['s16cq16a'], finished=harvest['s16cq11'])
+    totals = _harvest_totals(lines, sold)
+    raw = [f'{var}{part}' for var in _DISPOSITIONS for part in 'ab']
+    out = sold[sold.set_index(_SALE_KEYS).index.isin(totals.index)]
+    return out[['t', 'i', 'crop', 's16dq01'] + raw].set_index(['t', 'i', 'crop'])
+
+
+#: Per wave: the file, then "finished?", "share left", quantity and unit.  The
+#: variable numbers flip between the two waves (CONTENTS.org).
+_HARVEST_WINDOW_RAW = {
+    '2018-19': ('s16c_me_mli2018.dta', 's16cq10', 's16cq11', 's16cq12a', 's16cq12b'),
+    '2021-22': ('s16c_me_mli2021.dta', 's16cq11', 's16cq12', 's16cq16a', 's16cq16b'),
+}
+
+
+def inputs_harvest_to_date(wave):
+    """The answers behind one wave's window keys, at (t, i, plot_id, crop).
+
+    The registry ``inputs`` callable for ``harvest-to-date``: "finished?", the share
+    still to harvest, the quantity and its unit, as recorded.
+    """
+    name, finished, left, quantity, unit = _HARVEST_WINDOW_RAW[wave]
+    src = _ehcvm_keyed(wave, name, 's16cq04')
+    src['plot_id'] = ehcvm_plot_ids(src)
+    keep = (src[finished].astype('string').str.strip().eq('Non')
+            & pd.to_numeric(src[quantity], errors='coerce').notna())
+    return src.loc[keep, ['t', 'i', 'plot_id', 'crop', finished, left, quantity,
+                          unit]].set_index(['t', 'i', 'plot_id', 'crop'])
 
 
 # ---------------------------------------------------------------------------
@@ -1462,8 +1660,10 @@ def people_last7days_finalize(df):
 #
 # REPORTED columns only:
 #   Price       = s04q05/q08/q11, surveyed FCFA for a Quantity-sized lot.
-#   Quantity    = s04q04/q07/q10, lot weight in kg ("Poids (KG)"); 999 / 9999
-#                 sentinel is coerced to NA.
+#   Quantity    = s04q04/q07/q10, the lot's weight in kg, litres for a volume: a
+#                 gram or centilitre Poids of 5 or more is divided
+#                 (derive_poids_base_unit); other rows are as recorded, whatever
+#                 the column head says.  999 / 9999 sentinel is coerced to NA.
 #   Description = the s04q02 value label of that passage's file ("Riz importé
 #                 vendu en sac", "Boîte de 220g de marque 'Aicha'", ...).
 #
@@ -1485,6 +1685,83 @@ _PRICE_QTY_SENTINELS = {999, 9999}
 
 COMMUNITY_PRICES_INDEX = ['t', 'v', 'j', 'u', 'variety', 'visit', 'obs']
 
+#: Registry key on a row whose recorded Poids was in the row's own gram or centilitre.
+DERIVATION_POIDS = 'Mali::community_prices::gram-centilitre-poids'
+
+#: (served unit, passage) -> what divides a Poids in that unit into kg (litres for
+#: a volume).  Written per passage because the two passages behave differently and
+#: each cell below was measured on its own (CONTENTS.org, GH #1179 memo).
+_POIDS_DIVISOR = {('Gramme', 1): 1000.0, ('Gramme', 2): 1000.0,
+                  ('Centilitre', 1): 100.0, ('Centilitre', 2): 100.0}
+#: At or above this a Poids on such a row is in the row's own unit.  Below 1 it is
+#: already kg or litres.  From 1 up to here as recorded is the better reading and
+#: not an established one: dividing fits nothing, as recorded fits under half.
+_POIDS_NATIVE_FLOOR = 5.0
+#: The two passage files' three readings: unit, weight, price.
+_COMMUNITY_READINGS = (('s04q03', 's04q04', 's04q05'),
+                       ('s04q06', 's04q07', 's04q08'),
+                       ('s04q09', 's04q10', 's04q11'))
+
+
+def derive_poids_base_unit(poids, unit, visit):
+    """``Quantity`` from the recorded ``Poids``, in kg (litres for a volume).
+
+    The column is headed "Poids (KG)", and both enumerator manuals say "Le poids et
+    l'unite correspondante sont lies": their worked example is 2.25 kg entered Poids
+    2250, Unite 2, Gramme.  So on a ``Gramme`` or ``Centilitre`` row a Poids of 5 or
+    more is in that unit, and is divided here, in either passage.  Every other value
+    stays as recorded: below 1 it is already kg or litres (a 33 cl bottle at 0.33), and
+    from 1 up to 5 dividing fits nothing while as recorded fits under half, so it is
+    counted rather than decided.  Rows on any other unit stay as recorded.  Registered as
+    ``Mali::community_prices::gram-centilitre-poids``.
+    """
+    poids = pd.to_numeric(poids, errors='coerce')
+    divisor = pd.Series([_POIDS_DIVISOR.get(cell) for cell in zip(unit, visit)],
+                        index=poids.index, dtype='float64')
+    native = poids.ge(_POIDS_NATIVE_FLOOR).fillna(False) & divisor.notna()
+    return poids.where(~native, poids / divisor)
+
+
+def inputs_gram_centilitre_poids(wave):
+    """The answers behind one wave's keyed rows, at the served community index.
+
+    The registry ``inputs`` callable for ``gram-centilitre-poids``: the item, the
+    variety and all three unit / weight / price triples of the source row, as recorded;
+    ``obs`` says which triple the served row read.  Unit codes 2 and 4 are Gramme and
+    Centilitre in both passages, where passage 2 omits two of the label sets.
+    """
+    from pathlib import Path
+    from lsms_library.paths import countries_root
+    data = Path(countries_root()) / 'Mali' / wave / 'Data'
+    crop_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Code',
+        dirs=[f'{data.parent / "_"}/', f'{data.parent.parent / "_"}/'],
+        **{'Preferred Label': 'Preferred Label'})
+    units = {2: 'Gramme', 4: 'Centilitre'}
+    raw = ['s04q01', 's04q02'] + [var for triple in _COMMUNITY_READINGS for var in triple]
+    pieces = []
+    for visit in (1, 2):
+        path = str(data / f'EACIS04_p{visit}.dta')
+        codes = tools.get_dataframe(path, convert_categoricals=False)
+        labels = tools.get_dataframe(path)
+        for obs, (unit, weight, price) in enumerate(_COMMUNITY_READINGS, 1):
+            keep = (pd.to_numeric(codes[unit], errors='coerce').isin(units)
+                    & pd.to_numeric(codes[price], errors='coerce').gt(0)
+                    & pd.to_numeric(codes[weight], errors='coerce').ge(_POIDS_NATIVE_FLOOR)
+                    & ~pd.to_numeric(codes[weight], errors='coerce').isin(_PRICE_QTY_SENTINELS))
+            out = codes.loc[keep, raw].copy()
+            out['s04q01'] = labels.loc[keep, 's04q01'].astype('string').str.strip()
+            out['s04q02'] = labels.loc[keep, 's04q02'].astype('string').str.strip()
+            out['t'] = wave
+            out['v'] = codes.loc[keep, 'grappe'].astype('Int64').astype('string')
+            out['j'] = out['s04q01'].map(crop_map).astype('string')
+            out['u'] = pd.to_numeric(codes.loc[keep, unit]).map(units).astype('string')
+            out['variety'] = pd.to_numeric(codes.loc[keep, 's04q02']).astype('Int64').astype('string')
+            out['visit'] = visit
+            out['obs'] = obs
+            pieces.append(out[out['j'].notna()])
+    return pd.concat(pieces, ignore_index=True).set_index(COMMUNITY_PRICES_INDEX)
+
 
 def community_prices_finalize(df):
     """Post-process a community_prices wave DataFrame.
@@ -1495,7 +1772,8 @@ def community_prices_finalize(df):
         s04q02 label), Price, Quantity.
     Maps j/u labels via harmonize_food / u, drops unmapped item/unit rows and
     rows with no positive price, coerces the Price/Quantity dtypes and the
-    999 Quantity sentinel, and indexes the result by
+    999 Quantity sentinel, reads a gram or centilitre Poids into kg or litres
+    (:func:`derive_poids_base_unit`), and indexes the result by
     (t, v, j, u, variety, visit, obs) -- one row per reported reading. No row
     is selected; a duplicate key is an error (GH #840).
     """
@@ -1514,8 +1792,12 @@ def community_prices_finalize(df):
     df['obs'] = obs.astype('int64')
     df['Description'] = df['Description'].astype('string').str.strip()
     # Keep only resolvable, genuinely-priced item-unit rows.
-    df = df[df['j'].notna() & df['u'].notna() & df['Price'].notna() & (df['Price'] > 0)]
+    df = df[df['j'].notna() & df['u'].notna() & df['Price'].notna() & (df['Price'] > 0)].copy()
     assert df['variety'].notna().all(), "community_prices: a priced row has no s04q02 code"
+    poids = df['Quantity']
+    df['Quantity'] = derive_poids_base_unit(poids, df['u'], df['visit'])
+    df['Derivation'] = pd.Series(pd.NA, index=df.index, dtype='string')
+    df.loc[poids.notna() & df['Quantity'].ne(poids), 'Derivation'] = DERIVATION_POIDS
 
     dup = df.duplicated(COMMUNITY_PRICES_INDEX, keep=False)
     assert not dup.any(), (
@@ -1536,6 +1818,6 @@ def community_prices_finalize(df):
     # community_prices_for_wave.)
     df['i'] = df['v']
     out = (df.set_index(['t', 'v', 'i', 'j', 'u', 'variety', 'visit', 'obs'])
-             [['Price', 'Quantity', 'Description']]
+             [['Price', 'Quantity', 'Description', 'Derivation']]
              .sort_index())
     return out

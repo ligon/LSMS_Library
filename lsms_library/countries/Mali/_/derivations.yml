@@ -226,10 +226,11 @@ Mali::crop_production::hh-crop-sale-single-row:
     is served on that row: Quantity_sold = s16dq05a, Unit_sold = s16dq05b,
     Value_sold = s16dq06, as recorded, and that row carries this key.  What is
     derived is the ATTACHMENT, not the numbers.  Any other sale is served on one
-    row of that household and crop with plot_id = 'Farm-level', no harvest
-    Quantity and no key, because its index value already discloses it.  No sale
-    is split, summed, scaled or dropped, and a record that is not a sale serves
-    nothing: no zero is written.
+    row of that household and crop with plot_id = 'Farm-level' and no key for the
+    sale, because its index value already discloses it.  No sale is split, summed,
+    scaled or dropped, and a record that is not a sale serves nothing: no zero is
+    written.  This key shares a row with harvest-to-date or harvest-from-dispositions
+    through derivations.MULTI_SEP, in sorted order.
   function: lsms_library.countries.Mali._.mali:derive_hh_crop_sale_attachment
   inputs: lsms_library.countries.Mali._.mali:inputs_hh_crop_sale_single_row
   raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b,
@@ -250,8 +251,8 @@ Mali::crop_production::hh-crop-sale-single-row:
         a sale of a crop on two or more rows is not allocated among them, since
         any split would be invented.  It stays with the household and crop on a
         Farm-level row, where gross_crop_revenue and median_price_valuation can
-        read it, and where harvest_kg and yield_kg do not, because it has no
-        Quantity.
+        read it.  That row has no harvest Quantity unless harvest-from-dispositions
+        put one there, so harvest_kg reads such a row only then.
       basis: modelling-choice
       evidence: >-
         ruling @ligon 2026-11-03, option (d), GH #824; the rule of Niger 2021-22
@@ -273,3 +274,177 @@ Mali::crop_production::hh-crop-sale-single-row:
     Not validated against an external total: no document here reports one.
   contents: 'Mali/_/CONTENTS.org, "2026-11-03 -- EHCVM crop_production wired (GH #824)"'
   since: '2026-11-03'
+
+Mali::crop_production::harvest-to-date:
+  waves: ['2018-19', '2021-22']
+  columns: [Quantity]
+  rule: >-
+    Identity on a row whose harvest is not finished and which records a quantity:
+    2018-19 s16cq10 = Non with s16cq12a, 2021-22 s16cq11 = Non with s16cq16a.  The value
+    is served as recorded.  The key names its WINDOW: the question asks the quantity
+    ALREADY harvested, so the row covers a part of the season under a column that
+    otherwise means all of it.  A row with no recorded quantity carries no key.  This
+    key shares a row with hh-crop-sale-single-row through derivations.MULTI_SEP, in
+    sorted order, and never with harvest-from-dispositions, which needs a finished crop
+    and no recorded quantity.
+  function: lsms_library.countries.Mali._.mali:derive_harvest_to_date
+  inputs: lsms_library.countries.Mali._.mali:inputs_harvest_to_date
+  raw_variables: [s16cq10, s16cq11, s16cq12, s16cq12a, s16cq12b, s16cq16a, s16cq16b]
+  assumptions:
+    - text: >-
+        the recorded quantity on an unfinished row is what has been harvested so far,
+        and not the season.  2021-22: 287 rows, a median 50% of the area still to harvest.
+        2018-19: 265 rows, a median 30%.
+      basis: variable-label
+      evidence: >-
+        s16c_me_mli2021.dta s16cq16a "16C.16a. Quantite deja recoltee pour la presente
+        campagne 2021/22?", s16cq11 "16C.11. Avez vous fini la recolte de cette culture?",
+        s16cq12 "16C.12. Quel pourcentage de la superficie vous reste-t-il a recolter?";
+        s16c_me_mli2018.dta s16cq12a, s16cq10, s16cq11, the same questions under other
+        numbers.
+  validated_against: >-
+    tests/test_gh1437_mali_harvest_total.py, whose oracle reads s16c directly.  An identity
+    has nothing to validate but its rows.
+  contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the 2021-22 harvest total, and the window key (GH #1437)"'
+  since: '2026-11-04'
+
+Mali::crop_production::harvest-from-dispositions:
+  waves: ['2021-22']
+  columns: [Quantity, u]
+  rule: >-
+    Where every s16c row of a household's crop answers s16cq11 = Oui, none records
+    s16cq16a, and the positive s16d quantities s16dq02a (consumed), s16dq03a (given),
+    s16dq05a (sold) and s16dq13a (in stock) all state one unit, Quantity is their sum and
+    u that unit.  It goes on the crop's single s16c row, or for two or more rows on the
+    crop's one plot_id = 'Farm-level' row, created if no sale made it, and is never split
+    among plots.  A crop whose dispositions span units, a crop with none, a crop with a
+    recorded quantity and a crop with an unfinished row all stay as recorded.  This key
+    shares a row with hh-crop-sale-single-row through derivations.MULTI_SEP, in sorted order.
+  function: lsms_library.countries.Mali._.mali:derive_hh_crop_harvest_total
+  inputs: lsms_library.countries.Mali._.mali:inputs_harvest_from_dispositions
+  raw_variables: [s16cq04, s16cq11, s16cq16a, s16dq01, s16dq02a, s16dq02b, s16dq03a, s16dq03b,
+                  s16dq05a, s16dq05b, s16dq13a, s16dq13b]
+  assumptions:
+    - text: >-
+        a finished harvest was consumed, given, sold or stored, so the four dispositions
+        add up to it.  The instrument asks the quantity of a finished harvest and the file
+        lacks it on 5,215 of 5,237 finished rows, a fielded skip or a release loss.
+      basis: questionnaire
+      evidence: >-
+        mli_ehcvm2_qnr_men_excel_vague1.pdf, printed p. 86: "(16C.11) Avez vous fini la
+        recolte de cette culture? 1 = Oui >(16C.16)".  Mali 2018-19 holds the harvest and all
+        four dispositions on one row (s16cq12a; s16cq13a, s16cq14a, s16cq16a, s16cq22a).  On its
+        5,583 finished rows with the dispositions in the harvest's unit the sum equals the
+        harvest exactly on 77.9%, within 10% on 82.1%, median ratio 1.000, 8.3% over 1.1 and 9.6%
+        under 0.9; over the 4,438 metric rows the kg totals differ by a ratio of 1.006.  This is
+        consistency within a row, and a respondent may anchor on the harvest just stated.  On
+        Niger 2021-22, where both sides exist, the sum equals the harvest exactly on 91.1% of
+        7,686 finished one-unit pairs (93.1% of 7,508 on the review's definition).
+    - text: >-
+        not all of a harvest need appear: s16d asks no quantity for seed kept, loss after
+        harvest or animal feed, so the sum can fall short of what was cut.  Not sized.
+      basis: modelling-choice
+      evidence: Niger's 91.1% is the only available check; s16d_me_mli2021.dta variable labels
+    - text: >-
+        units are not converted: no factor exists.  1,169 finished crops span two or more
+        units and stay NA.  Quantities in one unit are added across states: 208 of the 3,360
+        derived crops state two of Grain, Epis, Decortique, Non-decortique in that unit.
+        8 are in the unit Autre, whose free text is empty, 4 of them across two or more
+        dispositions, so they may hide two units.
+      basis: modelling-choice
+      evidence: ruling @ligon 2026-11-04, MORNING.org, option (b) of GH #1437; variables s16dq02c, s16dq03c, s16dq05d, s16dq13c
+    - text: >-
+        the sum is as good as its lines, and it inherits the file's large values.  It is not
+        trimmed and no pair is held out for this.  13 derived pairs have a sold line priced
+        under 1/10 of the crop's median over derived pairs' sold lines (14 over every metric
+        sold line), and carry 1,185,854 kg, 17.7% of derived kg.  On 4 of those the file's own
+        s16dq05c equals the sold quantity on a sack unit, so that line reads as kilograms keyed
+        as sacks: 1,136,700 kg, 16.9%, about 1.1M kg of it removed if read that way.  One of the
+        4 is the 7,502 Sac (100 Kg) row, 10.8% of the wave's kg alone and the only one Site Q
+        names.  26 pairs hold a non-sale disposition of 100 sacks or more, 820,100 kg, 12.2%,
+        with no price to test.  This is inherited from the same class in recorded data, not
+        created by the derivation: on 2018-19's recorded rows the same two tests flag 43 rows,
+        3,052,036 kg, 20.5%, and 39 rows, 549,450 kg, 3.7%.  Medians are not sensitive to it.
+      basis: modelling-choice
+      evidence: >-
+        measured 2026-11-04 from s16c and s16d of both waves.  The label of s16dq05c says a total
+        and the questionnaire says per unit; any rule for these lines belongs in its own issue
+        covering both waves.
+    - text: >-
+        a crop with an unfinished row is held out (76 pairs, 48 of them one-unit), because
+        its dispositions cover what is harvested so far.  A crop with a recorded quantity is
+        held out (11 of the finished one-unit pairs), because a recorded harvest is not
+        overridden and a Farm-level total beside it would count it twice.
+      basis: modelling-choice
+      evidence: GH #1437; the reconcile memo's 3,419 finished one-unit pairs are these 3,360 plus the 48 and the 11
+  validated_against: >-
+    tests/test_gh1437_mali_harvest_total.py, whose oracle reads s16c and s16d directly.  Cold build
+    of 2021-22: 3,360 keyed rows, 3,139 on the single s16c row and 221 Farm-level.  Median pure-stand
+    yields run 1% to 18% below 2018-19's recorded ones, crop by crop (Mali/_/CONTENTS.org).  Not
+    validated against an external total: no document here reports one.
+  contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- the 2021-22 harvest total, and the window key (GH #1437)"'
+  since: '2026-11-04'
+
+Mali::community_prices::gram-centilitre-poids:
+  waves: ['2014-15']
+  columns: [Quantity]
+  rows: {u: [Gramme, Centilitre]}
+  rule: >-
+    On a Gramme row a recorded Poids of 5 or more is divided by 1,000, and on a Centilitre
+    row by 100, in either passage, so Quantity is the lot in kg or litres, as on the Kg and
+    Litre rows.  u stays the recorded unit and Price is untouched.  On these rows a Poids
+    below 1 is already kg or litres, and from 1 up to 5 as recorded is the better reading
+    and not an established one: both stay as recorded, carry no key and are counted in
+    CONTENTS.org.  So does every other unit: a
+    Boite, Sachet, Tas, Unite, Paquet, Verre, Bidon, Kg or Litre row is served as recorded,
+    whatever it holds.
+  function: lsms_library.countries.Mali._.mali:derive_poids_base_unit
+  inputs: lsms_library.countries.Mali._.mali:inputs_gram_centilitre_poids
+  raw_variables: [s04q01, s04q02, s04q03, s04q04, s04q05, s04q06, s04q07, s04q08,
+                  s04q09, s04q10, s04q11]
+  assumptions:
+    - text: >-
+        the weight column is in the unit entered beside it, whatever its head says.
+      basis: questionnaire
+      evidence: >-
+        EACI_MANUEL_P1_V5_Redacted.pdf PDF pp. 103-104 and EACI_MANUEL_P2_V3.pdf PDF p. 88,
+        both "Attention. Le poids et l'unite correspondante sont lies", with a banana the agent
+        finds "fait 2,250 kilogramme" entered Poids 2250, Unite 2, code 2 being Gramme in the
+        community questionnaire's list.  Against it, the column head "Poids (KG)" of
+        EACI2014_COM_P2_11082014.pdf, which this file used to follow.
+    - text: >-
+        5 is where the readings separate, and it is the same in both passages.  Against the
+        size a variety's own label states (tea "environ 20g", the 60 g and 220 g tins, the
+        50-100 g and 200-250 g loaves, the 30 cl and 33 cl bottles), the share of rows within
+        2x of that size, recorded / divided.  Poids >= 5: Gramme p1 0.00 / 0.92 (n=255), p2 0.00
+        / 0.88 (227); Centilitre p1 0.00 / 1.00 (949), p2 0.00 / 0.89 (445).  Poids < 1:
+        Gramme p1 0.76 / 0.00 (29), p2 0.86 / 0.00 (175); Centilitre p1 0.56 / 0.00 (25), p2
+        0.91 / 0.00 (980).  1 <= Poids < 5: 0.00 / 0.00 in all four cells (6, 63, 5, 39).  Against a
+        price reference over all products, broader and weaker, because small packets cost more per
+        kg: at 5 or more the recorded reading fits better on 3.7% of 1,533 Gramme rows and 0.2% of
+        1,555 Centilitre rows; from 1 up to 5 it falls within 2x on 41% and 44%, and dividing on 0%.
+      basis: modelling-choice
+      evidence: >-
+        measured 2026-11-04 on EACIS04_p1.dta and EACIS04_p2.dta; a passage-only rule fails this
+        test: dividing all of passage 1 leaves its Poids < 1 rows 100x to 1000x too small, and
+        leaving passage 2 alone misses 1,110 rows.
+    - text: >-
+        passage 2 follows the manual only in part, and that is why the rule reads the value:
+        passage 1 holds 909 of 1,054 Gramme and 1,071 of 1,102 Centilitre rows at 5 or more;
+        passage 2 holds 624 of 1,891 and 486 of 1,781, the rest mostly already in kg or
+        litres, and 608 entries of 999.
+      basis: modelling-choice
+      evidence: Mali/_/CONTENTS.org table, cold build of the served rows
+    - text: >-
+        the rule mis-reads about 43 of the 3,090 rows it converts, and no other threshold fixes
+        them: 22 Gramme rows fit as recorded and not divided (16 passage-2 salt at Poids 25), and 21
+        Centilitre rows at 250 or more look like millilitres (15 Huile de coton at 250, 6 Lait frais).
+        38 Boissons gazeuses rows at Centilitre 90 in passage 2, on the bottle labelled 33 cl, are
+        served 0.9 L.
+      basis: modelling-choice
+      evidence: Mali/_/CONTENTS.org, measured 2026-11-04 on EACIS04_p1.dta and EACIS04_p2.dta
+  validated_against: >-
+    tests/test_gh1179_mali_community_quantity.py, whose oracle reads EACIS04_p1/p2 directly.  The
+    per-kg price on a stated-size variety is not validated against any external price.
+  contents: 'Mali/_/CONTENTS.org, "2026-11-04 -- community_prices.Quantity is kilograms by rule (GH #1179 memo)"'
+  since: '2026-11-04'

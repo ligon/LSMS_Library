@@ -730,6 +730,9 @@ class TestShippedDeclarations:
         ("Nigeria", "2012Q3", "stable"),             # movers are singletons
         ("Burkina_Faso", "2018-19", "redefined"),    # EMC zd / EHCVM grappe serials
         ("Burkina_Faso", "2021-22", "stable"),       # grappe == grappe_EHCVM1
+        ("Mali", "2017-18", "stable"),               # same EAs, identical fixes
+        ("Mali", "2018-19", "redefined"),            # EAC-I / EHCVM serials overlap
+        ("Mali", "2021-22", "stable"),               # same EAs, identical fixes
     ])
     def test_the_measured_boundaries(self, country, wave, value):
         assert sampling_records(country)[wave].cluster_id_continuity == value

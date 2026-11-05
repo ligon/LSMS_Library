@@ -156,9 +156,9 @@ Data Scheme:
     # 2026-11-03), EHCVM 2018-19 (s16c) and 2021-22 (s16c + s16d).
     #
     # plot = "{field}_{parcel}" for seasonal crops and for every EHCVM
-    # harvest row; 'Farm-level' for perennial trees (the EAC-I perennial roster
-    # is not on the seasonal field grid, GH #1476) and for a 2021-22 sale with
-    # no single harvest row (below).
+    # harvest row; 'Farm-level' for perennial trees (the EAC-I perennial roster is
+    # not on the seasonal field grid, GH #1476) and for a 2021-22 sale or derived
+    # harvest with no single harvest row (below).
     # crop = harmonize_food Preferred Label (food crops REUSE the consumed-
     # food label so crop_production.j joins food_acquired.j; non-food crops
     # — Coton, Soja, Voandzou, Dah/Fibre, tree species — get new labels).
@@ -174,13 +174,15 @@ Data Scheme:
     #
     # EHCVM (GH #824).  2018-19 s16c holds harvest and sale on one line, served
     # as recorded.  2021-22 s16c holds the harvest (s16cq16a, filled on 309 of
-    # 7,247 rows; NA elsewhere, no total derived: GH #1437) and s16d, with no
-    # plot, the sales.  A sale goes on the household's single harvest ROW for
-    # the crop where there is exactly one, keyed
+    # 7,247 rows) and s16d, with no plot, the sales.  A sale goes on the
+    # household's single harvest ROW for the crop where there is exactly one, keyed
     # hh-crop-sale-single-row in Derivation; otherwise on ONE
-    # row with plot_id = 'Farm-level' (the canonical structural sentinel) and
-    # no harvest Quantity, u or key.  EXCLUDE plot_id == 'Farm-level' for
-    # plot-grain work; KEEP it for household or crop totals: an EAC-I tree row
+    # row with plot_id = 'Farm-level' (the canonical structural sentinel).
+    # A finished 2021-22 crop with no recorded harvest and one-unit s16d dispositions
+    # takes their sum, the same way, keyed harvest-from-dispositions (GH #1437); the
+    # rest stay NA.  A recorded harvest of an unfinished crop is keyed harvest-to-date
+    # in both waves: a part of the season, as recorded.  EXCLUDE plot_id == 'Farm-level'
+    # for plot-grain work; KEEP it for household or crop totals: an EAC-I tree row
     # on it carries a harvest as well as a sale.  Neither wave
     # zero-fills a 'Non' (unlike 2017-18), and neither records planting_month,
     # harvest_month or perennial, which are NA there and which Site B therefore
@@ -422,7 +424,8 @@ Data Scheme:
     # weight: Quantity is NA, never NumberOfUnits or a fabricated one.
     # Its product code is variety (retaining finer identity under j mapping),
     # vague is visit; obs=1/2, then 3/4 for a repeated source key. Sized unit
-    # labels are retained verbatim. No rows or missing-price slots are dropped.
+    # labels take the household's spelling, Tas (Petit), one label per source
+    # unit code and no fold (GH #1453). No rows or missing-price slots are dropped.
     # 2017-18 has no community module wired. In the held 2021-22 release,
     # no s05 sidecar exists and ehcvm_prix has region/milieu, not grappe;
     # no cluster-grain declaration is made for that distinct source.
@@ -440,8 +443,11 @@ Data Scheme:
     #           post-harvest (EACIS04_p2).
     # obs     = the questionnaire reading slot, 1/2/3 (GH #822).
     # Price    = s04q05/q08/q11, surveyed FCFA for a Quantity-sized lot.
-    # Quantity = s04q04/q07/q10, lot WEIGHT in kg ("Poids (KG)"; CONTENTS.org);
-    #            the 999 loose-retail sentinel is coerced to NA.
+    # Quantity = s04q04/q07/q10, the lot's weight in kg, litres for a volume.  The
+    #            weight is tied to the row's unit (both manuals), so a gram or
+    #            centilitre weight of 5 or more is divided, keyed gram-centilitre-poids
+    #            in Derivation (CONTENTS.org, GH #1179 memo).  Other rows are as
+    #            recorded; the 999 loose-retail sentinel is coerced to NA.
     # NO ROW IS SELECTED (GH #840, @ligon 2026-10-18).  Until #840 the grain
     # was (t, v, j, u) and one reported price per cell was kept (post-harvest
     # passage first, then questionnaire order): 23,646 of 40,218 priced rows,

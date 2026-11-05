@@ -15,7 +15,11 @@ household one.  Variable map (identical across both passages):
                     CODE is the index level, the label is Description
   obs     = reading 1 / 2 / 3 on the same community price form
   unit / weight / price = s04q03/04/05, s04q06/07/08, s04q09/10/11
-  weight  = lot weight in kg; Price is FCFA for that lot (CONTENTS.org)
+  weight  = lot weight, tied to that reading's unit (both manuals: "Le poids et
+            l'unite correspondante sont lies"); Price is FCFA for that lot.
+            Quantity is that weight in kg, litres for a volume: a gram or
+            centilitre weight of 5 or more is divided, under the key
+            Mali::community_prices::gram-centilitre-poids (CONTENTS.org).
 
 Grain: (t, v, j, u, variety, visit, obs).  v = grappe (sample().v keyspace, so the
 price joins households); j = harmonize_food Preferred Label (REUSES the
@@ -24,7 +28,8 @@ crop_production.j); u = u-table Preferred Label.  CLUSTER-level: there is NO
 household i, so v is native and the framework's _join_v_from_sample does not
 fire.
 
-Reported columns only: Price, Quantity, Description.  No median / mean /
+Reported columns: Price, Quantity, Description, and Derivation on the rows above.
+No median / mean /
 index — those are transformations.py rollups over these rows — and, since
 GH #840, no SELECTION either: every priced (cluster, variety, passage) row is
 served.  GH #822 restores all three readings without changing eligibility.

@@ -1,7 +1,24 @@
 import os
+from pathlib import Path as _Path
+
 import numpy as np
 import pandas as pd
-from lsms_library.local_tools import all_dfs_from_orgfile
+from lsms_library.local_tools import all_dfs_from_orgfile, get_formatting_functions as _get_formatting_functions
+
+# Bind the helper to this config tree by its exact path, as Burkina Faso 2014 does.
+_eaci_i = _get_formatting_functions(
+    _Path(__file__).resolve().parents[2] / '_' / 'mali.py',
+    '_mali_eaci_namespace')['eaci_i']
+
+
+def i(value):
+    '''2014-15 household id, NAMESPACED: ``'EACI_' + grappe + '0' + menage``.
+
+    GH #1494.  Overrides the country ``i`` for every YAML table of this wave.
+    See ``mali.EACI_PREFIX``.
+    '''
+    return _eaci_i(value)
+
 
 # GH #380 (Phase 3 audit, 2026-06-07): the EACI 2014-15 Section 13
 # consumption module records quantity PER ACQUISITION SOURCE, not as a

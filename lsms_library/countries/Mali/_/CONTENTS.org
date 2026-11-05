@@ -2703,6 +2703,374 @@ shared unit equals the harvest exactly on 91.1%, within 10% on 92.2%, median rat
 4,815 household-crop pairs with a finished row, 3,419 have a positive sum in one unit (3,149 on a single
 s16c row, 270 on several), 1,194 span units and cannot be summed without a factor, 199 record no
 disposition and 3 have no =s16d= row.  Not derived here: GH #1437 is waiting on a ruling.
+
+* 2026-11-04 -- EAC-I household ids carry =EACI_=, and =sampling.yml= declares the boundaries (GH #1494)
+
+Ruling @ligon 2026-11-04, on Burkina Faso's =EMC_= precedent (GH #1244).  =mali.eaci_i= is
+='EACI_' + i(value)=: the two EAC-I =mapping.py= override =i= for every YAML table, and their
+eleven wave scripts and =_tree_roster_inputs= use it directly.  =pid= is not prefixed: it is a key
+only inside =(t, i)=.  The EHCVM ids stay bare, as the panel lineage in =panel_ids= / =updated_ids=,
+and neither JSON moves (the EAC-I maps were already empty; the regenerated file is byte-identical).
+
+*Why.*  Both programmes number clusters and households from 1, so =i= spelled the same string for
+unrelated households, and a cross-wave =groupby('i')= merged them.  Ids shared on the raw covers,
+now 0 across the programmes:
+
+| wave        | shared with 2018-19 | shared with 2021-22 |
+|-------------+---------------------+---------------------|
+| 2014-15     |               1,601 |               1,493 |
+| 2017-18     |               3,613 |               3,341 |
+
+*The test that says they are not households.*  For each shared id, the share of one wave's members
+that find a same-sex member of the expected age (+/- 1 year) in the other wave, one to one, against
+the same score for two DIFFERENT households of one grappe.  The first row is the positive control:
+the test does find a real panel.
+
+| ids                                      |     n | mean score | control | share >= 0.5 | control |
+|------------------------------------------+-------+------------+---------+--------------+---------|
+| 2018-19 / 2021-22, =PanelHH= =Oui=       | 5,022 |      0.528 |   0.172 |        0.609 |   0.069 |
+| 2017-18 / 2018-19                        | 3,613 |      0.167 |   0.163 |        0.044 |   0.045 |
+| 2014-15 / 2018-19                        | 1,600 |      0.145 |   0.153 |        0.036 |   0.054 |
+| *2014-15 / 2017-18*                      | 3,559 |      0.214 |   0.219 |        0.109 |   0.106 |
+| *2018-19 / 2021-22, =PanelHH= =Non=*     | 1,111 |      0.151 |   0.157 |        0.069 |   0.074 |
+
+*The last two rows are NOT fixed here, and are the same class of false link.*
+
+- *2014-15 / 2017-18: 3,560 ids survive the prefix*, because both waves carry the same one.  They
+  visit the same EAs (identical coordinates on all 920 recurring grappes), with households selected
+  afresh and no pointer between the files.  *All 3,560 fall on 2017-18 Lourd households and none on
+  Leger*: in rural EAs 2014-15's =menage= is 3, 6 or 9, and so is 2017-18's =exploitation= on the Lourd
+  form (Leger is 1, 2, 4, 5, 7, 8), so the numbering itself makes them recur.  Roster size correlates
+  at 0.18 on those ids, against 0.69 on the real panel; the score is 0.233 / 0.232 rural and 0.181 /
+  0.192 urban (review).  Whether to separate them is a decision the ruling did not take; a shared
+  =EACI_= is what was ruled, and the digits alone decide nothing.
+- *2018-19 / 2021-22: 1,111 of the 1,120 =PanelHH= =Non= households* spell the id of a 2018-19
+  household they are not.  =panel_ids= and =updated_ids= do not link them, but =i= is the same string.
+
+*Boundaries, =sampling.yml=* (notes and locators there): 2017-18 =stable= + =independent=; 2018-19
+=redefined= + =independent= (410 recurring serials a median 100 km apart, 5.2% of 405 within 10 km);
+2021-22 =stable= + =rotating-panel=.  Site C therefore warns on any frame carrying =v= across
+2017-18 / 2018-19, which is new on every all-wave Mali read that carries =v= and spans it.  It is correct:
+a cross-wave =groupby('v')= would merge unrelated EAs.  =['2014-15', '2017-18']= and =['2018-19', '2021-22']= stay
+silent, as do tables that do not span it (=plot_inputs=, =plot_labor=, =people_last7days=, =food_coping=, =plot_features=).
+
+*The =s01q04a= trap.*  In the EHCVM rosters =s01q04a= is blank where a birth date is recorded, so a
+head-of-household age comparison on that column alone scores a real panel at 0.003; the table above
+falls back on =s01q03c=.
+
+* 2026-11-04 -- 2018-19 community units take the household's sized spelling (GH #1453)
+
+Ruling @ligon 2026-11-04, option (b): respell the community side, do not fold it, and move no
+household label.  =mapping._s05_unit_label= serves =<base> (<Size>)=, with the size from the code's
+digit (=s05q02 = 10 * s07bq03b + s07bq03c=, as in Niger) and a refusal where the word contradicts it.
+This replaces "=s05q02='s full unit-size label is retained" in the 2026-10-30 entry above.  Nothing
+else in the table moves: 109,338 rows, both quote slots, =Price=, =variety=, =visit=, =obs=.
+
+*What is a respelling and what is a fold.*  Four community bases name one household unit in another
+spelling, and take the household's: =Alvéoole= -> =Alvéole=, =Motte(boule)= -> =Boule=, =Moude (Moudé)=
+-> =Moude=, =Seau (5 Kg )= -> =Seau (5 Kg)=.  The =u= table's many-to-one rows are folds and are not
+applied: =Avec os en tas= and =Sans os en tas= stay apart from =Tas=, =Boite de tomate= and =Boite de
+lait concentrée= from =Boite=, =Avec os au kg= / =Sans os au kg= / =Filet au kg= from =Kg=.  So 84 source
+codes serve 84 labels.
+
+| of the 84 s05 codes                                                   | codes |
+|-----------------------------------------------------------------------+-------|
+| same label as the household's for that code                           |    62 |
+| the household folds the unit, so by construction no join              |    15 |
+| no consumed household row at all (=Plaquette=, =Sac (100 Kg)=, =Sac (50 Kg)=, sized =Seau=) |     7 |
+
+| 2018-19, on served frames                                  | before | #1224 | now    |
+|------------------------------------------------------------+--------+-------+--------|
+| household (j, u) cells with a community price, of 433 / 910 / 910 |     34 |    33 |    216 |
+| household rows in those cells, of 162,032                  | 28,167 | 25,392 | 68,830 |
+
+*216 of 910 is not the limit of the join.*  The remaining gap is on =j=, and only part of it is a different product list.  21
+of the 57 priced products share a source code with the household and carry a different =j=, because every =s07bq01= label of
+this wave carries seven leading spaces and so never reaches =harmonize_food=: those products pair at 98.4% on raw codes, and hold
+42,753 of the 117,453 code-level hits.  41,556 consumption rows are on products the form does not list.  That is a defect of its
+own, predating this change, and fixing it moves household labels, which this ruling excluded: GH #1513.  It would take the join to
+294 of 835 cells and 103,747 rows if the label is stripped before mapping, or 342 of 910 and 109,838 if community =j= is bridged by
+product code.
+
+The joins pair the same units.  On the served label, 167 cells with a household unit value: median ratio 1.00, 94.6% in [0.5, 2],
+and Grand against Petit as a placebo gives 2.55 and 0.38.  Same-cluster, 41,963 household rows find a (v, j, u) price.  A price on
+=Avec os en tas (Petit)= does not reach a household's =Tas (Petit)= of meat; that is the cost of not folding, accepted by the ruling.
+
+* 2026-11-04 -- the 2021-22 harvest total, and the window key (GH #1437)
+
+Ruling @ligon 2026-11-04.  This supersedes "Not derived here" in the section above, and "no harvest
+total is derived" wherever it survives in older entries.  The keys are =harvest-from-dispositions= and
+=harvest-to-date=, in =derivations.yml=.
+
+*The total.*  For a household's crop, 2021-22: where every =s16c= row answers =s16cq11= =Oui=, none
+records =s16cq16a=, and the positive =s16d= quantities (consumed =s16dq02a=, given =s16dq03a=, sold
+=s16dq05a=, in stock =s16dq13a=) state one unit, =Quantity= is their sum and =u= that unit.  It goes where
+the sale of that crop goes: the single =s16c= row (3,139), or for two or more rows the crop's one
+=Farm-level= row (221: 40 on the row a sale already made, 181 new).  It is never split among plots.
+
+| household-crop pairs, of 6,362                        | pairs | served |
+|-------------------------------------------------------+-------+--------|
+| finished, one unit, nothing recorded                  | 3,360 | derived |
+| finished, one unit, a quantity recorded               |    11 | as recorded |
+| a finished and an unfinished row, one unit            |    48 | as recorded, or NA |
+| finished or mixed, dispositions in two or more units  | 1,194 | NA     |
+| finished or mixed, no positive disposition            |   199 | NA     |
+| finished, no =s16d= row                               |     3 | NA     |
+| no finished row                                       | 1,547 | as recorded, or NA |
+
+The memo's "3,419 one unit" is 3,360 + 11 + 48.  *Mixed pairs are held out* because their dispositions
+cover what is harvested so far, and *a recorded quantity is never overridden*, and a total beside
+one on a =Farm-level= row would count it twice.
+
+| 2021-22                 | before  | now       |
+|-------------------------+---------+-----------|
+| rows                    |   7,317 |     7,498 |
+| rows with a =Quantity=  |     309 |     3,669 |
+| kg, metric rows         | 261,596 | 6,977,513 |
+
+2,792 of the 3,360 are in a metric unit and carry 6,715,918 kg; per metric row 2,405 kg, against 2,650
+in 2018-19.  The other 568 (carts, =Baignoire=, =Gerbe=, ...) have no factor.
+
+*How good is the sum?*  Mali 2018-19 can test it on Mali's own file, because it holds the harvest and all four
+dispositions on one row (=s16cq12a=; =s16cq13a=, =s16cq14a=, =s16cq16a=, =s16cq22a=).  Finished rows, dispositions in the
+harvest's unit:
+
+|     n | exact | within 10% | median | over 1.1 | under 0.9 |
+|-------+-------+------------+--------+----------+-----------|
+| 5,583 | 77.9% |      82.1% |  1.000 |     8.3% |      9.6% |
+
+Over the 4,438 metric rows the kg totals differ by a ratio of 1.006, and medians are 1.0 for one to four dispositions.
+*The caveat is real*: this is consistency within a row, and a respondent may anchor on the harvest just stated.  Niger
+2021-22 gives 91.1% of 7,686 (93.1% of 7,508 on the review's definition).  Inside 2021-22 itself the overlap is small:
+10 pairs with a recorded quantity, a finished row and one shared unit, 4 exact; 140 unfinished pairs, 52.9% exact.
+*Disclosed, not resolved*: 208 of the 3,360 add two states of the product in one unit (=Grain= with =Epis=, say; on
+2018-19's two-state rows the median ratio is 1.0, mean 1.03); 8 are in unit =Autre=, whose free text is empty, 4 of them
+across two or more dispositions, so may hide two units; and =s16d= asks nothing about seed kept or post-harvest loss, so
+the sum can fall short of what was cut.
+
+*Is the scale plausible?*  Yes.  Pure-stand yields, one crop row on the plot and area over 0.01 ha, median kg/ha (n).
+2017-18 uses raw =s7c1q07= GPS hectares, because =plot_features= serves no EAC-I wave.
+
+| crop      | 2017-18     | 2018-19 recorded | 2021-22 derived | 2021-22 window |
+|-----------+-------------+------------------+-----------------+----------------|
+| Millet    |   587 (210) |        533 (826) |       438 (363) |        194 (7) |
+| Maize     | 1,342 (147) |      1,044 (744) |       856 (463) |       561 (13) |
+| Rice      |   970 (157) |    1,333 (1,067) |     1,154 (319) |       400 (53) |
+| Sorghum   |   326 (108) |        500 (523) |       476 (318) |        274 (6) |
+| Groundnut |   373 (176) |        862 (547) |       800 (328) |       397 (18) |
+| Cotton    |   822 (369) |        901 (524) |       891 (336) |       628 (65) |
+| All crops | 568 (1,438) |      800 (4,611) |     696 (2,310) |      516 (171) |
+
+Derived medians run 1% to 18% below 2018-19, which is what unasked seed and loss would do.  p90, derived / 2018-19, stays
+close: millet 1,366 / 1,446, maize 2,500 / 2,937, rice 5,256 / 6,598, sorghum 1,501 / 1,399, groundnut 2,559 / 2,733, cotton
+1,720 / 1,870.  Median kg per household-crop, 2018-19 / 2021-22: millet 1,200 / 1,100, maize 1,400 / 1,000, rice 1,400 /
+1,625, sorghum 700 / 700, groundnut 600 / 500, cotton 2,500 / 2,000.  The factor of 27 in =harvest_kg= is rows x 12.8 (236 to
+3,028) times kg per row x 2.1 (1,108 to 2,304), because the old rows were partial harvests.
+
+*The total is tail-sensitive; the medians are not.*  Nothing below is trimmed and no pair is held out; a rule belongs in its
+own issue covering both waves.  The label of =s16dq05c= says a total and the questionnaire says per unit.
+
+| class                                                                 | pairs or rows |        kg | share            |
+|-----------------------------------------------------------------------+---------------+-----------+------------------|
+| 2021-22, sold line under 1/10 of the crop's median price              |            13 | 1,185,854 | 17.7% of derived |
+| of which =s16dq05c= equals the sold quantity on a sack unit           |             4 | 1,136,700 | 16.9%            |
+| 2021-22, a non-sale disposition of 100 sacks or more (no price to test) |          26 |   820,100 | 12.2%            |
+| 2018-19 recorded, sold line under 1/10                                |            43 | 3,052,036 | 20.5% of recorded |
+| 2018-19 recorded, non-sale at 100 sacks or more                       |            39 |   549,450 | 3.7%             |
+
+The 13 use the crop's median over derived pairs' sold lines; over every metric sold line one cotton line at 0.099 makes 14,
+and the share is the same.  The 7,502 =Sac (100 Kg)= row is in the 4 and is 10.8% of the wave's kg alone (750,200 kg): its own
+sold line says 7,500 in the unit and 7,500 in =s16dq05c=, so it reads as kilograms.  Reading those 4 sold lines at the file's kg
+removes about 1.1M kg.  Site Q names that row, at 162.9 x, and no other.  *So this is inherited from the same class in recorded
+data, and not created by the derivation.*
+
+*The window key.*  =harvest-to-date= is an identity on a row with a recorded quantity and an unfinished
+harvest: 2021-22 =s16cq11= =Non=, 287 rows, a median 50% still to harvest; 2018-19 =s16cq10= =Non=, 265 rows,
+a median 30%.  The brief's "=s16cq11= = =Non=" is right for 2021-22 only: the variable numbers flip, and
+2018-19's =s16cq11= is the share left.  Its 86.9% of 2021-22 kg was the share BEFORE the total; it is now
+227,258 of 6,977,513 kg, 3.3%.  In 2018-19 it stays 12.0% (1,792,088 of 14,881,091).
+
+*How the keys share =Derivation=.*  One registered key per construction, joined in sorted order with
+=derivations.MULTI_SEP= (='+'=) on one row, as the tree keys already are:
+
+| keys on the row                                   | rows, 2021-22 |
+|---------------------------------------------------+---------------|
+| =harvest-from-dispositions=                       |         2,684 |
+| =harvest-from-dispositions+hh-crop-sale-single-row= |           676 |
+| =harvest-to-date=                                 |           237 |
+| =harvest-to-date+hh-crop-sale-single-row=         |            50 |
+| =hh-crop-sale-single-row=                         |           344 |
+
+The two harvest keys never meet: one needs a recorded quantity on an unfinished row, the other a finished
+crop with none.  A consumer asking "is this =Quantity= derived?" must test for containment, not equality.
+A =Farm-level= row carries a key only for its total; the sale on it is still disclosed by the index.
+
+*Farm-level now holds harvests in EHCVM too.*  =harvest_kg= reads the 173 of these 221 rows in a metric unit,
+as it reads the EAC-I trees; =yield_kg= does not, since no plot has that id; =crop_diversity(weight='count')= drops all of them,
+each repeating a crop on a plot row.  So summing kg by plot under-reads a 2021-22 household whose crop is on
+two plots, and summing by household does not.
+
+* 2026-11-04 -- community_prices.Quantity is kilograms by rule (GH #1179 memo)
+
+Ruling @ligon 2026-11-04.  *This corrects "=community_prices.Quantity= is a WEIGHT IN KG" above*, and the
+=Gramme= line of the table under it, which rested on the column head "Poids (KG)".  Both enumerator manuals
+(=EACI_MANUEL_P1_V5_Redacted.pdf= PDF pp. 103-104, =EACI_MANUEL_P2_V3.pdf= PDF p. 88, in =2014-15/Documentation/=)
+say: "Le poids et l'unité
+correspondante sont liés", and a banana the agent finds "fait 2,250 kilogramme" is entered Poids 2250,
+Unité 2, and 2 is Gramme.
+
+*The rule*, =mali.derive_poids_base_unit=, key =Mali::community_prices::gram-centilitre-poids=.  =u= stays
+the recorded unit, =Price= does not move, and =Quantity= is kg (litres for a volume):
+
+| recorded Poids, on a =Gramme= or =Centilitre= row | served      | key | why                  |
+|---------------------------------------------------+-------------+-----+----------------------|
+| 5 or more                                         | / 1000, / 100 | yes | in the row's own unit, as the manual says |
+| above 0, below 1                                  | as recorded | no  | already kg or litres |
+| 1 up to, not including, 5                         | as recorded | no  | the better reading, not established; counted |
+| 0, or the 999 sentinel (NA)                       | as before   | no  | no usable weight     |
+
+*The rule is written per passage and is the same in both.*  The ruling asked for a unit-and-passage rule, and
+a rule on the passage alone is the one thing the data refuse: passage 1 also holds a 33 cl bottle at 0.33, and
+dividing it would serve 3.3 ml.  Stated-size varieties (tea "environ 20g", the 60 g and 220 g tins, the two
+loaves, the 30 cl and 33 cl bottles) are an oracle the rule does not read.  Share of rows within 2x of the
+stated size, as recorded / divided:
+
+| unit, passage  | Poids >= 5          | 1 <= Poids < 5 | Poids < 1           |
+|----------------+---------------------+----------------+---------------------|
+| Gramme, 1      | 0.00 / 0.92 (n=255) | 0.00 / 0.00 (6) | 0.76 / 0.00 (29)   |
+| Gramme, 2      | 0.00 / 0.88 (227)   | 0.00 / 0.00 (63) | 0.86 / 0.00 (175) |
+| Centilitre, 1  | 0.00 / 1.00 (949)   | 0.00 / 0.00 (5) | 0.56 / 0.00 (25)   |
+| Centilitre, 2  | 0.00 / 0.89 (445)   | 0.00 / 0.00 (39) | 0.91 / 0.00 (980) |
+
+And the per-unit price now agrees across sizes of one product, median FCFA per kg or litre: the 60 g tin
+1,667 and the 220 g tin 1,591 (2.1 and 1,000 before); the 33 cl bottle 857 and the 30 cl bottle 909 (8.6 and
+909 before).
+
+A price reference over all products with a =Kg= or =Litre= row is broader than these seven varieties and weaker, because small
+packets cost more per kg.  It agrees at 5 or more: the recorded reading fits better on 3.7% of 1,533 =Gramme= rows and 0.2% of
+1,555 =Centilitre= rows.  *From 1 up to 5 it says the stated-size table above is too strong as "no reading fits":* as recorded
+falls within 2x on 41% (=Gramme=) and 44% (=Centilitre=), and divided on 0%.  So as recorded is the better reading there, not an
+established one.
+
+*What the rule mis-reads, about 43 of the 3,090, not fixed by any other threshold:*
+
+- 22 =Gramme= rows fit as recorded and not divided, 16 of them passage-2 salt at Poids 25.
+- 21 =Centilitre= rows at 250 or more look like millilitres: 15 =Huile de coton= at 250, 6 =Lait frais=.
+
+Separately, 38 =Boissons gazeuses= rows at =Centilitre= 90 in passage 2, all on the bottle labelled 33 cl, are served 0.9 L.  90
+recurs in that passage on other units too, and nothing here says what it means.
+
+*What passage 2 does.*  Passage 1 follows the manual on 86% of =Gramme= and 97% of =Centilitre= entries.  Passage
+2 follows it on 33% and 27%: most of the rest are entered in kg or litres, as the column head says, and 608
+rows hold the 999 sentinel, which passage 1 never uses (it writes 0, 594 rows).  Served rows:
+
+| unit, passage  | converted | below 1, as recorded | 1 to 5, not covered | 0  | NA  |
+|----------------+-----------+----------------------+---------------------+-----+-----|
+| Gramme, 1      |       909 |                  122 |                  23 | 312 |   7 |
+| Gramme, 2      |       624 |                1,086 |                 181 |   0 | 349 |
+| Centilitre, 1  |     1,071 |                   25 |                   6 | 282 |   7 |
+| Centilitre, 2  |       486 |                1,210 |                  85 |   0 | 259 |
+| all            |     3,090 |                2,443 |                 295 | 594 | 622 |
+
+3,090 of the table's 155,931 rows move, and those are exactly the keyed rows; every other =Quantity=, every
+=Price= and every =Description= is unchanged.
+
+*Rows no rule covers, as recorded and counted.*
+
+- The 295 above.
+- Other units at 5 or more, 5,147 rows (979 in passage 1, 4,168 in passage 2): =Kg= 2,370, =Boite= 1,129, =Tas= 467,
+  =Litre= 342, =Sachet= 276, =Unité= 248, =Bidon= 130, =Paquet= 113, =Verre= 72.  Some are grams, as the 60 g tin at =Boite=
+  60, and others plainly are not (a 20 L =Bidon=).  A gram rule would damage more than it fixes: =Boite= rows fit as recorded
+  within 2x on 63% and as grams on 1.2%, and even =Boite= at 25 or more fits as grams on 4.4%.  =Litre= 90 on 216 rows looks like
+  an interviewer convention.  No rule was written for them.
+- *=Kg= at Poids 25*, 1,206 rows, 1,195 of them salt.  The two passages differ.  In passage 1, 90 rows, salt is priced 19.3 x
+  the variety's =Kg= at Poids 1, so these are 25 kg lots.  In passage 2, 1,116 rows, it is priced 1.0 x: a per-kg price with 25 in
+  the weight field, so =Price / Quantity= is about 25 x too low there.
+- =Kg= at exactly 1 is also the manual's own "could not weigh" entry: its second example is a plantain "pas en mesure
+  de peser", entered Poids 1, Unité 1.  47,116 of the 54,848 =Kg= rows sit there, and nothing separates a weighed
+  kilogram from an unweighed lot.  So =Price / Quantity= on =u = 'Kg'= is per kg only as far as that entry is honest.
+  The advice above, to compare across tables only on sized units, stands.
+
+* 2026-11-04 -- rulings on what stays as it is: no sale, nil harvest, #821, scattered trees
+
+Rulings @ligon 2026-11-04.  Nothing here changes a served value.
+
+*"Did not sell" stays NA in the EHCVM waves.*  5,275 records of 2018-19 and 3,928 of 2021-22 answer =Non=
+and hold nothing, and they serve nothing, as Niger's do.  Both EAC-I waves zero-fill the same answer
+(2014-15 =s3aq22=, 2017-18 =s7gq20=).  So =gross_crop_revenue= is not comparable across Mali's programmes, and
+the gap is large, a choice of denominator rather than a change in sales:
+
+| wave    | households served | mean, FCFA | median | mean if =Non= were 0 |
+|---------+-------------------+------------+--------+----------------------|
+| 2014-15 |             2,289 |     33,805 |      0 | (is 0 already)       |
+| 2017-18 |             4,679 |     34,598 |      0 | (is 0 already)       |
+| 2018-19 |             1,232 |    506,067 | 196,125 |             201,056 |
+| 2021-22 |               820 |    510,607 | 195,000 |             174,385 |
+
+The last column counts every household answering =Oui= or =Non= on any crop (3,101 and 2,401).  Even so EHCVM stays
+five to six times EAC-I, which this does not explain.  Serving 0 was declined because 369 of the 2021-22 =Non= records
+sit on crops with several rows and would need =Farm-level= rows for sales that did not happen, and because an
+as-recorded NA is what Niger serves.  *A consumer comparing the two programmes must put them on one denominator
+first.*
+
+*=Recolte nulle= stays NA.*  236 rows of 2018-19, all in vague 2, answer =s16cq10= =Recolte nulle=, with =s16cq12a= and
+=s16cq15= empty.  =Quantity= reads NA, the same as a question not asked; 372 =Non= rows and 1 =Oui= row are NA too.  The answer
+is in the file for anyone who wants a zero.  2021-22's questionnaire prints the code (3) and no row answers it.
+
+*#821: the 2021-22 verdict stays =unsure=.*  =.coder/coverage/absent_verdicts.csv= is unchanged and was not touched
+here.  The wave's own BID says the community questionnaire has "four main sections" and that prices come "from a
+sample of markets" (=mli_ehcvm2_information_de_base_eng.pdf= PDF pp. 8-9), which fits the released =s00_co= to =s04_co=
+and the region-grain =ehcvm_prix_mli2021=.  Against closing it: the DDI's "local retail price information", Burkina
+Faso's printed Section 5, and, the decisive one, *Mali's own community questionnaire is on neither WB 6275 nor IHSN
+12257, so C4 is not met*, and a closing verdict needs C4.  UEMOA's =Fichiers_Communautaire.rar= could answer it and needs
+a login.  The ruling was to keep =unsure= unless the BID is accepted as C4, and it was not.
+
+*The 135 scattered tree rows of 2017-18 stay =Farm-level=.*  This answers "the location is still unwired" in the GH #1476
+section.  =s11fq04= splits the 270 rows exactly: 135 =Verger= with their own area and no location, 135 =Eparpillé= with a
+block and parcel (=s11fq05c=, =s11fq05d=).  128 of the 135 name a plot of the household's =s7f=, and 0 have the same crop on
+it.  They hold 17 convertible rows, 57,650 of the 177,879 kg.  A roster line is one species and asks one location, so
+the parcel is an attribute of the line and not of the harvest.  No 2017-18 yield moves today, because =plot_features=
+serves no EAC-I wave; served on the parcel, tree kilograms would land over a seasonal plot's area once it does.  Revisit
+with EAC-I =plot_features=; the cost then is one Mali re-warm.
+
+* 2026-11-04 -- what these four changes moved, cold (GH #1494, #1453, #1437, #1179)
+
+Cold builds in private roots, every declared table, =115b6ab71= against =0f382b5f4=.  With =EACI_= stripped from =i=,
+*21 of the 23 frame tables are equal, row order and dtypes included*: all but =community_prices= and =crop_production=.
+=panel_ids= has 5,011 entries and =updated_ids= four waves, equal on both sides.  At the #1494 commit alone all 23 are
+equal.  Those two commits predate #1476 on =development=; the merge differs from them only in =plot_id= on the 627 tree rows.  EAC-I rows prefixed: =sample= 12,194, =household_roster= 131,246, =food_acquired= 122,085.
+
+| table              | moved                                                                                     |
+|--------------------+-------------------------------------------------------------------------------------------|
+| =community_prices= | 2014-15 =Quantity= on 3,090 keyed rows of 155,931, nothing else; 2018-19 =u= spelling only, every key's count and =Price= sum equal, 84 labels of the same sizes |
+| =crop_production=  | 2014-15, 2017-18 unmoved; 2018-19 gains the key on 265 rows; 2021-22 3,360 keyed totals, 181 new rows, =Quantity_sold=, =Unit_sold=, =Value_sold=, =intercropped= unmoved on all 7,317 old rows |
+
+Consumers, 2021-22, before and after #1437 (other waves unchanged):
+
+| consumer                   | before        | after           |
+|----------------------------+---------------+-----------------|
+| =harvest_kg= rows, kg      | 236, 261,596  | 3,028, 6,977,514 (173 rows, 451,983 kg =Farm-level=) |
+| =yield_kg= rows, median kg/ha | 217, 505   | 2,753, 634      |
+| =median_price_valuation= rows valued, FCFA | 233, 59.8M | 3,016, 1,293.3M |
+| =gross_crop_revenue= FCFA  | 418,697,975   | 418,697,975     |
+| =crop_diversity= (count), mean | 0.6448 | 0.6448 |
+
+2018-19's median yield is 844.  *The 2021-22 yields now mix season totals, the derived rows, with partial harvests, the window
+rows*, and the key is what tells them apart.  The tail remains the =plot_features= question flagged above (p99 17,307, maximum 22,000,000 kg/ha).  *Site Q* gains one row: a
+2021-22 total of 7,502 =Sac (100 Kg)=, 162.9 x the reference, served as summed.  Sites B and I report the same columns.
+=Feature= over Mali, Niger and Burkina Faso, each with a unique index: =sample= 72,994, =household_roster= 536,295, =community_prices=
+534,290, all as before; =crop_production= 113,372 -> 113,553, the 181 new rows.
+
+On the merge =harvest_kg= reads these 173 EHCVM =Farm-level= rows beside the 66 EAC-I tree rows.
+
+*Site C is new on every all-wave Mali frame carrying =v=*, one =ClusterIdentityWarning= per call, 2017-18 -> 2018-19.  Under
+=LSMS_CLUSTER_STRICT=1= those reads now raise and =Feature= drops Mali.  *So =Feature= over Mali, Niger and Burkina Faso for
+=sample= or =household_roster= under that lever now returns an empty frame*, because Niger and Burkina Faso already raise; before
+this Mali was the survivor.
+
+*Cache.*  =build_transforms_fingerprint= 0 of 25.  =Country._table_cache_hash=: Mali 24 of 24, Niger 0 of 23, Burkina Faso 0 of 25, Uganda 0
+of 28.  =Wave._input_hash= Mali 96 of 96.  One Mali re-warm, and any ordering of these four commits costs the same one.
+
 * 2026-11-04 -- EAC-I enumerator manuals held; 2021-22 price source read from the BID (GH #1179, #821)
 
 *Held now, 2014-15/Documentation/.*  =bid_eaci14.pdf= and =EACI_MANUEL_P2_V3.pdf=
