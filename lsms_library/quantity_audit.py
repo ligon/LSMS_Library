@@ -774,8 +774,11 @@ def audit_near_zero(df: Any, column: str, *, country: str, table: str
     below the :data:`QUANTITY_LOW_REFERENCE_QUANTILE` of the positive values in
     its cell, on the same ladder with no floor.  ``ratio`` is reference over
     value.  Senegal 2018-19 holds three quantities near 1e-19, the residue of a
-    float subtraction, and each puts its error into a price.  A zero is never
-    judged: it records none, not almost none.
+    float subtraction, and each puts its error into a price, but those are the
+    rare case: most rows it names sit under a ``Value`` unit or a gram or
+    millilitre unit, and why is not established.  It flags, and does not say a
+    row is wrong: a small amount may be real.  A zero is never judged: it records
+    none, not almost none.
     """
     return audit_quantities(df, column, country=country, table=table,
                             tails=("low",))
@@ -868,13 +871,18 @@ def _format_quantity_report(report: dict[str, Any]) -> str:
     if direction == "high":
         tail = (f"more than {report['k']:,.0f}x the "
                 f"{report['reference_quantile'] * 100:.0f}th percentile")
-        causes = ("a quantity keyed into a container field, a calendar year "
-                  "keyed into a quantity field, and a missing-value sentinel "
-                  "that was never stripped")
+        answers = ("a quantity keyed into a container field, a calendar year "
+                   "keyed into a quantity field, and a missing-value sentinel "
+                   "that was never stripped have each been the answer in this "
+                   "corpus")
     else:
         tail = (f"more than {report['k']:,.0f}x below the "
                 f"{report['reference_quantile'] * 100:.0f}th percentile")
-        causes = "the residue of a floating-point subtraction"
+        answers = ("most such rows in this corpus sit under a 'Value' unit or a "
+                   "gram or millilitre unit, which reads like another scale or a "
+                   "larger unit keyed under a small one, though that is not "
+                   "established; a few are the residue of a floating-point "
+                   "subtraction, and a small amount may be real")
     return (
         f"{where}: {report['n_implausible']:,} of {report['rows']:,} row(s) "
         f"report a '{report['column']}' {tail} of comparable rows "
@@ -884,8 +892,8 @@ def _format_quantity_report(report: dict[str, Any]) -> str:
         f"NOTHING HAS BEEN CHANGED -- these rows are returned exactly as they "
         f"are stored, because clipping an implausible value would hide the "
         f"defect rather than fix it. Read this as a work queue: check the "
-        f"wave's source column and its unit label ({causes} "
-        f"have each been the answer in this corpus). Use quantity_reports() to "
+        f"wave's source column and its unit label ({answers}). "
+        f"Use quantity_reports() to "
         f"get the rows programmatically. Set {_QUANTITY_STRICT_ENV}=1 to make "
         f"this fatal."
     )

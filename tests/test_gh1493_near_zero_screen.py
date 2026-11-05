@@ -9,6 +9,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
+import lsms_library.country as C
+from lsms_library.local_tools import to_parquet
+from lsms_library.paths import data_root
 from lsms_library.quantity_audit import (
     QUANTITY_LOW_REFERENCE_QUANTILE,
     QUANTITY_MIN_CELL,
@@ -129,6 +132,21 @@ class TestCheckQuantities:
             check_quantities(_frame([4e-19] + _typical()), country='T',
                              table='food_acquired')
 
+    def test_the_low_tail_message_does_not_blame_one_cause(self):
+        """A float residue is 3 of 1,201 rows, so the message must not say it is
+        the answer; and it must not call a small amount an error."""
+        with pytest.warns(QuantityImplausibleWarning) as caught:
+            check_quantities(_frame([1e-19] + _typical()), country='T', table='food_acquired')
+        message = str(caught[0].message)
+        assert "'Value' unit" in message and 'gram or millilitre' in message
+        assert 'may be real' in message
+        assert 'have each been the answer' not in message
+
+    def test_the_upper_tail_message_keeps_its_causes(self):
+        with pytest.warns(QuantityImplausibleWarning) as caught:
+            check_quantities(_frame([1e6] + _typical()), country='T', table='food_acquired')
+        assert 'have each been the answer' in str(caught[0].message)
+
     def test_the_upper_tail_still_fires_alongside_it(self):
         with pytest.warns(QuantityImplausibleWarning):
             check_quantities(_frame([4e-19, 1e6] + _typical()), country='T',
@@ -155,6 +173,93 @@ class TestFoodPrices:
 
 
 @pytest.mark.requires_s3
+def _food_frame(y, *, tiny=False, dear=False):
+    """A wave of ordinary rice, with one quantity near zero or one huge outlay."""
+    rows = [(y, f'{y}h{k}', 'Rice', 'Kg', 'purchased', 2.0, 100.0) for k in range(40)]
+    rows += [(y, f'{y}t', 'Rice', 'Kg', 'purchased', 1e-19 if tiny else 2.0,
+              1e12 if dear else 100.0)]
+    out = pd.DataFrame(rows, columns=['t', 'i', 'j', 'u', 's', 'Quantity', 'Expenditure'])
+    return out.set_index(['t', 'i', 'j', 'u', 's'])
+
+
+class TestTheFoodDispatch:
+    """The strict error is a RuntimeError, which the dispatch catches for its legacy
+    path, so a bare `food_prices()` said "no wave-level build succeeded"."""
+
+    @pytest.fixture
+    def country(self, tmp_path, monkeypatch):
+        """Malawi's registry over controlled frames; `_food.kw` sets the defect."""
+        root = tmp_path / 'data'
+        monkeypatch.setenv('LSMS_DATA_DIR', str(root))
+        monkeypatch.setenv('LSMS_BUILD_BACKEND', 'dvc')
+        monkeypatch.setenv('LSMS_BUILD_WORKERS', '1')
+        monkeypatch.delenv('LSMS_NO_CACHE', raising=False)
+        monkeypatch.delenv('LSMS_GRAIN_STRICT', raising=False)
+        data_root.cache_clear()
+        monkeypatch.setattr(C.Country, '_join_v_from_sample', lambda self, df, *a, **k: df)
+        defects = {}
+
+        def grab(wave, request, *, _with_origin=False):
+            out = _food_frame(wave.year, **defects)
+            path = root / 'Malawi' / wave.year / '_' / 'food_acquired.parquet'
+            path.parent.mkdir(parents=True, exist_ok=True)
+            to_parquet(out, path, absolute_path=True)
+            return (out, 'parquet') if _with_origin else out
+
+        monkeypatch.setattr(C.Wave, 'grab_data', grab)
+        c = C.Country('Malawi', preload_panel_ids=False)
+        c._panel_ids_attempted = True
+        c._updated_ids_cache = {}
+        try:
+            yield c, defects
+        finally:
+            data_root.cache_clear()
+
+    @pytest.mark.parametrize('table', ['food_prices', 'food_quantities', 'food_expenditures'])
+    def test_a_near_zero_quantity_fails_for_what_it_is(self, country, monkeypatch, table):
+        c, defects = country
+        defects['tiny'] = True
+        monkeypatch.setenv('LSMS_QUANTITY_STRICT', '1')
+        with pytest.raises(QuantityImplausibleError, match='food_acquired'):
+            getattr(c, table)()
+
+    def test_an_impossible_price_fails_for_what_it_is(self, country, monkeypatch):
+        """`food_acquired` is clean here, so this is `food_prices`' own screen."""
+        c, defects = country
+        defects['dear'] = True
+        with pytest.warns(QuantityImplausibleWarning, match='food_prices'):
+            assert len(c.food_prices())
+        monkeypatch.setenv('LSMS_QUANTITY_STRICT', '1')
+        with pytest.raises(QuantityImplausibleError, match='food_prices'):
+            C.Country('Malawi', preload_panel_ids=False).food_prices()
+
+    def test_it_still_warns_and_serves_without_the_lever(self, country):
+        c, defects = country
+        defects['tiny'] = True
+        with pytest.warns(QuantityImplausibleWarning):
+            assert len(c.food_prices())
+
+    def test_another_failure_keeps_the_legacy_route(self, country, monkeypatch):
+        """Only this class leaves the catch.  A bare call to a table the legacy path
+        can answer still gets that chance, and logs why."""
+        c, _ = country
+        monkeypatch.setattr(C.Country, '_proven_absent', lambda *a: False)
+        real = C.Country._aggregate_wave_data
+        seen = []
+
+        def boom(self, waves=None, method_name=None, **kw):
+            seen.append(method_name)
+            if method_name == 'food_acquired':
+                raise RuntimeError('source unavailable')
+            return real(self, waves, method_name, **kw)
+
+        monkeypatch.setattr(C.Country, '_aggregate_wave_data', boom)
+        with pytest.raises(Exception) as caught:
+            c.food_prices()
+        assert not isinstance(caught.value, QuantityImplausibleError)
+        assert 'food_prices' in seen
+
+
 def test_senegal_names_its_residues_and_its_prices():
     import lsms_library as ll
     _clear_quantity_reports()
