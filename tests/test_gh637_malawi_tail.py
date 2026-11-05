@@ -284,7 +284,9 @@ def _country_table(table):
 
 @pytest.fixture(scope='module')
 def crop_production():
-    return _country_table('crop_production')
+    # GH #1457: a sale's Farm-level row is not a harvest; these pin harvest rows.
+    df = _country_table('crop_production')
+    return df[df.index.get_level_values('plot_id') != 'Farm-level']
 
 
 @pytest.fixture(scope='module')

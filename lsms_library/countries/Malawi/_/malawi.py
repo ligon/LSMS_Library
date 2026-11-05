@@ -1979,9 +1979,8 @@ def _attach_sales(t, harv, sale):
     admitted = tier_b[tier_b['_branch'].notna()]
     ok_b, amb_b = _one_to_one(admitted, skey)
 
-    ok = pd.concat([ok_a[['_hrow', '_srow', 'Quantity_sold', 'Value_sold', '_branch']],
-                    ok_b[['_hrow', '_srow', 'Quantity_sold', 'Value_sold', '_branch']]],
-                   ignore_index=True)
+    carried = ['_hrow', '_srow', 'Quantity_sold', 'Value_sold', 'condition_sold', '_branch']
+    ok = pd.concat([ok_a[carried], ok_b[carried]], ignore_index=True)
     assert not ok['_hrow'].duplicated().any()
     # A key marks a SALE.  A Module I / Q line the household did NOT sell
     # (ag_i01 != 1: NULL quantity, value and S/U) is summed by `_sale_block`
@@ -2176,6 +2175,97 @@ def _sum_recovered(pieces):
     return total
 
 
+#: The structural sentinel for a sale no harvest row holds (lsms_library/data_info.yml,
+#: top of file).  NOT `unknown_plot`, which says a plot exists and its id is missing.
+FARM_LEVEL = 'Farm-level'
+
+
+
+def _sold_answers(frame):
+    """True where a row holds a sale: a positive sold quantity or value."""
+    return (pd.to_numeric(frame['Quantity_sold'], errors='coerce').astype('float64').gt(0)
+            | pd.to_numeric(frame['Value_sold'], errors='coerce').astype('float64').gt(0))
+
+
+def _production_obs_of_sale(sale):
+    """``reported:<I|Q>:<code>`` of a sale's own record; a repeat is told apart.
+
+    The module that asked, and the code on the shared axis (a perennial code less its
+    offset, after the GH #869 recode).  A household can hold two records of one code,
+    in two units or states, and each keeps its own row: repeated IDs suffix EVERY
+    occurrence with ``/row:<n>``, the zero-based order within the household and code
+    (the canonical grammar, ``data_info.yml``, ``production_obs``).
+    """
+    code = pd.to_numeric(sale['_crop_code'], errors='coerce').astype('Int64')
+    perennial = code.ge(1000).fillna(False)
+    token = ('reported:' + pd.Series(np.where(perennial, 'Q', 'I'), index=sale.index, dtype='string')
+             + ':' + code.where(~perennial, code - 1000).astype('string'))
+    keys = [sale['i'], code]
+    n = token.groupby(keys).transform('size')
+    nth = token.groupby(keys).cumcount().astype('string')
+    return token.where(n.eq(1), token + '/row:' + nth).astype('string')
+
+
+def _farm_level_sales(t, decisions):
+    """One row per sale that reached no harvest row, on ``plot_id = FARM_LEVEL``.
+
+    The ruling on GH #843, option (d), extended in bulk on 2026-11-04 (GH #1457).
+    What the ladder attached stays where it is; this takes every other sale: a crop on
+    two or more plots, a crop with no harvest row, a sale in a unit no row of its one
+    plot uses (GH #824), and one the ladder refused for its basis (GH #833).  Also one
+    the ladder attached to a harvest row that is then dropped because its crop code
+    is in no table (2013-14 Module P/Q code 39, unlabelled in the file: 13 sales,
+    329,000 MWK).  Unit and state are the sale's own, in ``Unit_sold`` /
+    ``Condition_sold``.  ``u``, ``condition`` describe a harvest, which this row does
+    not have, so they are the sentinels.  One row per ``_sale_block`` record: no sale is
+    split, or summed further.
+
+    ``decisions`` is the second return value of :func:`_attach_sales`.  Returns the
+    frame in the columns of the harvest frame it joins, and its tally.
+    """
+    from lsms_library.transformations import U_UNKNOWN
+    crop_map = _malawi_code_map('harmonize_crop')
+    outcome = decisions['outcome'].astype(object)
+    no_row = outcome.isna() | outcome.isin([SALE_AMBIGUOUS, SALE_UNRESOLVED])
+    dropped_row = (pd.to_numeric(decisions['_crop_code'], errors='coerce').astype('Int64')
+                   .map(crop_map).isna())
+    sale = decisions[(no_row | dropped_row).to_numpy() & _sold_answers(decisions).to_numpy()].copy()
+    code = pd.to_numeric(sale['_crop_code'], errors='coerce').astype('Int64')
+    crop = code.map(crop_map)
+    native = code.where(code.lt(1000).fillna(True), code - 1000)
+    out = pd.DataFrame({
+        'i': sale['i'].astype('string'),
+        'plot_id': pd.Series(FARM_LEVEL, index=sale.index, dtype='string'),
+        # A code the table does not carry passes through as itself (data_info.yml, `j`):
+        # the harvest side drops such a row with a warning, and this one holds money.
+        'crop': crop.astype('string').where(crop.notna(), native.astype('string')),
+        '_crop_code': code,
+        'production_obs': _production_obs_of_sale(sale),
+        'Quantity': pd.Series(pd.NA, index=sale.index, dtype='Float64'),
+        'u': pd.Series(U_UNKNOWN, index=sale.index, dtype='string'),
+        'condition': pd.Series(_CONDITION_UNKNOWN, index=sale.index, dtype='string'),
+        'crop_variety': _map_codes(code, _malawi_code_map(_VARIETY_TABLE)),
+        'planting_month': pd.Series(pd.NA, index=sale.index, dtype='Int64'),
+        'harvest_month': pd.Series(pd.NA, index=sale.index, dtype='Int64'),
+        'intercropped': pd.Series(pd.NA, index=sale.index, dtype='boolean'),
+        # A property of the module that asked, as on every harvest row.
+        'perennial': code.ge(1000).astype('boolean'),
+        'Quantity_sold': pd.to_numeric(sale['Quantity_sold'], errors='coerce').astype('Float64'),
+        'Value_sold': pd.to_numeric(sale['Value_sold'], errors='coerce').astype('Float64'),
+        'Unit_sold': sale['u'].astype('string'),
+        'Condition_sold': sale['condition_sold'].astype('string'),
+        '_branch': pd.Series(pd.NA, index=sale.index, dtype='string'),
+    }).reset_index(drop=True)
+    by_cause = sale['outcome'].astype(object).where(sale['outcome'].notna(), 'no_candidate_row')
+    by_cause = by_cause.where(crop.notna(), 'crop_code_in_no_table')
+    value = pd.to_numeric(sale['Value_sold'], errors='coerce').astype('float64')
+    tally = {'wave': t, 'sales': int(len(sale)), 'value': float(value.sum()),
+             'by_cause': {str(k): {'sales': int((by_cause == k).sum()),
+                                   'value': float(value[by_cause == k].sum())}
+                          for k in pd.unique(by_cause)}}
+    return out, tally
+
+
 def assemble_crop_production(t, harvest_pieces, sale_pieces):
     """Combine reshaped harvest (_harvest_block) and sale (_sale_block)
     pieces into the canonical crop_production DataFrame for wave ``t``.
@@ -2219,6 +2309,13 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     tally, shape unchanged), ``attrs['sale_basis_mismatch']`` (UNRESOLVED
     -- registered as the deletion ``sale-basis-unresolved``), and
     ``attrs['sale_basis_ladder']`` (sales and MWK per rung).
+
+    Every sale none of that reaches is served too (GH #1457, ruling on GH #843 option
+    (d)): ONE row per ``_sale_block`` record with ``plot_id = 'Farm-level'``, no
+    ``Quantity``, ``u = 'Unknown'``, ``condition = 'unknown_condition'``, and the sale's
+    own unit and state in ``Unit_sold`` / ``Condition_sold`` (:func:`_farm_level_sales`,
+    ``attrs['sale_farm_level']``).  Those two columns are filled on every row holding a
+    sale, a harvest row's ``Unit_sold`` being its ``u`` by construction.
     """
     # GH #856: how many OTHER (SPECIFY) unit rows each block recovered to a
     # coded unit from its own specify text, summed over the wave's pieces.
@@ -2231,6 +2328,13 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
         sale = pd.concat(sale_pieces, ignore_index=True)
         harv, _decisions, tallies = _attach_sales(t, harv, sale)
         tally, mismatch = tallies['sale_suppressed'], tallies['sale_basis_mismatch']
+        # On a harvest row the sale's unit is the row's `u`, by construction.  A 0 is
+        # the survey's "did not sell", which has no unit or state.
+        holds_sale = _sold_answers(harv)
+        harv['Unit_sold'] = harv['u'].astype('string').where(holds_sale, pd.NA)
+        harv['Condition_sold'] = harv['condition_sold'].astype('string').where(holds_sale, pd.NA)
+        harv = harv.drop(columns='condition_sold')
+        farm, farm_tally = _farm_level_sales(t, _decisions)
         # "Attach nothing and COUNT IT" -- and the counting has to be code,
         # not a number frozen in CONTENTS.org that will not move when the
         # data does (GH #854 red-team item 6).
@@ -2243,7 +2347,8 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
                 f"shelled/unshelled answer is compatible with more than one "
                 f"harvest row of that plot-crop and unit (or one row with "
                 f"more than one sale), and attaching it to all of them "
-                f"would double-count it.  GH #854 / #833.",
+                f"would double-count it.  Each is served on a Farm-level row "
+                f"(GH #1457).  GH #854 / #833.",
                 SaleAttachmentWarning, stacklevel=2)
         if mismatch['sales']:
             grounds = tallies['sale_basis_ladder'].get(SALE_BASIS_UNRESOLVED, {}).get('grounds', {})
@@ -2262,13 +2367,16 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
                 f"unclaimed row carries; or the row / sale was already "
                 f"claimed on an exact match.  By ground: {grounds}.  A sale "
                 f"on a different basis is not a quantity of the row's "
-                f"declared grain (GH #833); registered as the deletion "
-                f"{SALE_BASIS_UNRESOLVED}.",
+                f"declared grain (GH #833); each is served on a Farm-level row "
+                f"instead (GH #1457), and {SALE_BASIS_UNRESOLVED} names the refusal.",
                 SaleAttachmentWarning, stacklevel=2)
     else:
         harv['Quantity_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
         harv['Value_sold'] = pd.array([pd.NA] * len(harv), dtype='Float64')
         harv['_branch'] = pd.array([pd.NA] * len(harv), dtype='string')
+        harv['Unit_sold'] = pd.array([pd.NA] * len(harv), dtype='string')
+        harv['Condition_sold'] = pd.array([pd.NA] * len(harv), dtype='string')
+        farm, farm_tally = None, {'wave': t, 'sales': 0, 'value': 0.0, 'by_cause': {}}
         tally = {'wave': t, 'sales': 0, 'rows': 0, 'value': 0.0}
         mismatch = {'wave': t, 'sales': 0, 'rows': 0, 'value': 0.0}
         tallies = {'sale_suppressed': tally, 'sale_basis_mismatch': mismatch,
@@ -2297,6 +2405,9 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
             stacklevel=2)
     harv = harv[harv['crop'].notna()]
 
+    if farm is not None and len(farm):
+        harv = pd.concat([harv, farm[harv.columns]], ignore_index=True)
+
     harv = harv.drop(columns=['_crop_code'])
     harv['t'] = t
 
@@ -2320,6 +2431,7 @@ def assemble_crop_production(t, harvest_pieces, sale_pieces):
     out.attrs['sale_suppressed'] = tally
     out.attrs['sale_basis_mismatch'] = mismatch
     out.attrs['sale_basis_ladder'] = tallies['sale_basis_ladder']
+    out.attrs['sale_farm_level'] = farm_tally
     out.attrs['unit_text_recovered'] = recovered
     out.attrs['crop_text_recovered'] = sum(
         piece.attrs.get('crop_text_recovered', 0) for piece in harvest_pieces)

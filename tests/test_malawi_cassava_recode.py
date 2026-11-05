@@ -61,7 +61,8 @@ def cp():
                     f'{type(exc).__name__}: {exc}')
     if df is None or df.empty:                              # pragma: no cover
         pytest.skip('Malawi crop_production empty')
-    return df
+    # GH #1457: a sale's Farm-level row is not a harvest row; these pin harvest rows.
+    return df[df.index.get_level_values('plot_id') != 'Farm-level']
 
 
 def _perennial_label(malawi_mod, code):

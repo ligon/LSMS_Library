@@ -259,7 +259,8 @@ class TestScripts:
         """Review item 6: the deletion's warning used to say the sale
         CONTRADICTS every row; the class holds three grounds."""
         src = _source()
-        i = src.index('registered as the deletion "')      # the f-string, not the docstring
+        # Re-pinned for GH #1457: no longer a deletion; the sale has a Farm-level row.
+        i = src.index('names the refusal')      # the f-string, not the docstring
         head = src[i - 1500:i]
         assert 'three' in head and 'grounds' in head
         assert 'CONTRADICTS' in head and 'SEPARATING' in head and 'claimed' in head
@@ -543,7 +544,11 @@ class TestAssemble:
             out = malawi_mod.assemble_crop_production(
                 '2010-11', [_harv([('h1', 'R1', 'Groundnut', 11, KG, S, 10)])],
                 [_sale([('h1', 11, KG, U, 4, 2500)])])
-        assert out['Value_sold'].isna().all() and out['Derivation'].isna().all()
+        # Re-pinned for GH #1457: refused from its harvest row, and on a Farm-level row.
+        harvest_row = out[out.index.get_level_values('plot_id') != 'Farm-level']
+        assert harvest_row['Value_sold'].isna().all() and out['Derivation'].isna().all()
+        farm = out.xs('Farm-level', level='plot_id')
+        assert farm['Value_sold'].tolist() == [2500.0] and farm['Condition_sold'].tolist() == [U]
         assert out.attrs['sale_basis_mismatch'] == {
             'wave': '2010-11', 'sales': 1, 'rows': 1, 'value': 2500.0}
         assert out.attrs['sale_basis_ladder'][DEL]['sales'] == 1
@@ -651,7 +656,9 @@ def delivered(country):
         cp = country.crop_production()
     except Exception as e:                    # pragma: no cover - no microdata
         pytest.skip(f'{COUNTRY} crop_production not buildable here: {e}')
-    return cp
+    # GH #1457: the ladder's rows.  What it did not attach is on Farm-level, with its
+    # own oracle in tests/test_gh1457_malawi_farm_level_sales.py.
+    return cp[cp.index.get_level_values('plot_id') != 'Farm-level']
 
 
 @pytest.mark.requires_s3

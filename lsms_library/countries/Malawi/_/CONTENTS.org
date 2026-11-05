@@ -5288,3 +5288,37 @@ move them.
 Cost: canonical =data_info.yml= moves no other country's hash (Uganda, Niger 0; 0 of 28
 =build_transforms_fingerprint=), and =malawi.py= is one more Malawi re-warm, shared with
 the rest of this bundle.
+
+* 2026-11-04 -- sales no harvest row holds: =Farm-level= (GH #1457)
+
+Modules I and Q record a sale per household and crop code, in its own unit and state.  The ladder (above) attaches one
+only to a single-plot crop's harvest row in the SAME unit, and until now any other sale was unserved: 514.28M of 1,679.70M MWK
+over the four waves.  That is what =gross_crop_revenue='s docstring measured as a lower bound.  The ruling on GH #843, option (d),
+extended in bulk on 2026-11-04, serves it on its own =plot_id = 'Farm-level'= row, one per =_sale_block= record, no =Quantity=,
+=u = 'Unknown'=, =condition = 'unknown_condition'=, =production_obs = 'reported:<I|Q>:<code>'= (a repeat of one household's code,
+the two-unit case, 7 pairs, suffixes =/row:<n>=), and the sale's own =Unit_sold= and =Condition_sold=.  Those two columns are new here
+and filled on every row holding a sale: on a harvest row =Unit_sold= is =u=, by construction, so nothing there moves.
+
+| records (MWK), cold         |            2010-11 |           2013-14 |            2016-17 |            2019-20 |
+|-----------------------------+--------------------+-------------------+--------------------+--------------------|
+| ladder, on a harvest row    | 5,116 (130,679,005)| 1,756 (95,010,945)| 4,544 (410,017,725)| 7,099 (529,712,448)|
+| crop on two or more plots   |   821 ( 11,139,550)|   335 (11,387,780)| 1,047 (162,563,371)| 2,185 (158,233,488)|
+| one row, in another unit    | 1,270 ( 10,755,325)|   439 (15,577,035)| 1,507 ( 55,219,866)| 1,638 ( 44,785,341)|
+| crop has no harvest row     |    78 (  1,166,015)|    34 (   583,150)|   225 ( 23,036,706)|   120 (  5,847,558)|
+| ladder refused (unresolved) |    94 (  1,088,250)|    21 (   315,300)|    89 (  6,009,600)|   137 (  6,244,030)|
+| harvest row has no crop code|     0              |    13 (   329,000)|     0              |     0              |
+|-----------------------------+--------------------+-------------------+--------------------+--------------------|
+| all, equal to the raw sum   | 7,379 (154,828,145)| 2,598 (123,203,210)| 7,412 (656,847,268)|11,179 (744,822,865)|
+
+*How it composes.*
+- *The ladder runs first and does not move.*  Same decisions, keys and tallies; a sale on its row stays on it, and a Farm-level row carries no key (its index
+  discloses it).  =sale-basis-unresolved= stops being a deletion: a sale whose basis no rung admits now has a row of its own, stating its own basis.
+  The ladder's count and its warning stand.
+- *=unknown_plot= is not =Farm-level=.*  A crop whose rows are =unknown_plot= (GH #1476) still attaches nothing, and its sale, the 3,600 MWK mango, now has a Farm-level row.
+- *One row, in another unit: 4,854 records, 126.34M MWK, are NOT on their row, and that is a decision for @ligon.*  Nigeria's shape puts such a sale on the one row, in its own
+  =Unit_sold=.  Here GH #824 and #833 already ruled the other way, on evidence: 916 of them say harvest unshelled and sold shelled, so the row would hold a sale on another
+  basis as well as in another unit.  Built to override nothing; the plot is lost on these sales.  See the report's memo.
+- *13 sales (329,000 MWK) sat on rows the build then dropped.*  2013-14 Modules P and Q carry a crop code 39 that is unlabelled in the file and in no table, so the harvest rows go
+  (with their warning, as before) and the sale keeps a Farm-level row with =crop = '39'= (the canonical pass-through).
+- *No two-line trap.*  A crop on one plot in two rows goes through the ladder; =0= sales in any wave have 2+ rows stating a harvest on ONE plot and reach Farm-level.
+  115 records (3.21M MWK) on 2+ plots have one row stating a harvest; Nigeria's ruling A was not extended to them.

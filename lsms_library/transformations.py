@@ -6974,16 +6974,13 @@ def gross_crop_revenue(crop_production, *, by=None, value_col='Value_sold'):
     repeats out of 45,592 rows (1.9% of value) are ordinary coincidence --
     two plots of one crop sold in equal quantity for equal money.
 
-    **On Malawi the risk runs the OTHER way: this is a systematic LOWER
-    BOUND, not a double count.**  Its sale is a HOUSEHOLD-crop question that
-    ``data_scheme.yml`` records as "attached to single-plot crops only", and
-    the consequence is measurable: of 87,440 ``(t, i, crop)`` groups grown
-    on ONE plot, 23,206 (**26.5%**) carry a sale row, against 514 of 19,311
-    (**2.7%**) for crops grown on more than one plot.  A crop spread over
-    two or more plots is almost never credited with a sale at all, by
-    instrument design -- so Malawi's ``Gross_crop_revenue`` UNDER-states
-    sales, and the shortfall is concentrated in exactly the households
-    farming the most land.  Do not read a Malawi total as complete.
+    **A household-crop sale is on ONE row, so a sum is complete and counts it
+    once.**  Where the survey records the sale per household and crop (Malawi,
+    Mali 2017-18 and 2021-22, Niger 2014-15 and 2021-22, Nigeria W3-W5, Tanzania,
+    Ethiopia), a sale that no harvest row can hold sits on one ``plot_id =
+    'Farm-level'`` row (GH #843, #1457), and this sum keeps those rows.  It used to
+    be a systematic lower bound: of Malawi's 87,440 ``(t, i, crop)`` groups grown on
+    ONE plot, 26.5% carried a sale row, against 2.7% of 19,311 grown on more.
 
     A household present in ``crop_production`` that reported no sale at all
     is ABSENT from the output, never 0 -- ``sum(min_count=1)``, the same
