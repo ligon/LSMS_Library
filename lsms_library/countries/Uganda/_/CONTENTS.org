@@ -138,8 +138,13 @@ consumer as ='12.0'= across the outer merge.
 - /A blank is not a link./  69 households in 2019-20 have =hhidold= == =''=; it
   formats to =None=, and =_follow_key= drops it first because =pd.merge= matches
   null keys to each other.
-- /A repeated target would raise./  The join is validated =many_to_one=: two children
-  may name one parent, but one key may not name two households.
+- /A repeated target raises =OriginEaError=./  Two children may name one parent, but one
+  key may not name two households, and =gsec1= and =AGSEC1= may not give one household two
+  =ea=.  The error counts and names no household.  It subclasses =Exception=, because
+  =_join_v_from_sample= catches =ValueError= (which the =MergeError= it replaces was) and would
+  have served every household table with no =v=.  One build worker raises the class itself.  Under
+  parallel workers a class in a by-path module does not pickle (GH #1524), so =__reduce__= sends
+  a plain =Exception= carrying its name and message, which the derived-table paths do not catch.
 
 *The 149 + 66 of 2018-19 with no =ea=*, by what the source says about them:
 

@@ -152,9 +152,48 @@ class TestTheSecondCover:
         assert got["ea"].tolist() == ["7", "12"]
         assert "_ag_ea" not in got.columns
 
-    def test_the_covers_disagreeing_raises(self):
-        with pytest.raises(ValueError, match="disagree on ea"):
+    def test_the_covers_disagreeing_raises_the_named_error(self):
+        with pytest.raises(Exception, match="disagree on ea for 1 household") as caught:
             self._adopt(self._covers([8, 12]))
+        assert type(caught.value).__name__ == "OriginEaError"
+
+
+class TestTheNamedError:
+    """``OriginEaError``: no data.  What it must survive, and what it must not say."""
+
+    @staticmethod
+    def _module():
+        import lsms_library as ll
+        return ll.Country("Uganda", preload_panel_ids=False)["2018-19"] \
+            .formatting_functions["_follow_key"].__globals__
+
+    def test_no_path_that_swallows_a_build_failure_catches_it(self):
+        """``_join_v_from_sample`` and the derived-table paths catch these four, and the
+        GH #515 handler catches the first two."""
+        err = self._module()["OriginEaError"]
+        assert issubclass(err, Exception)
+        for swallowed in (KeyError, FileNotFoundError, ValueError, RuntimeError):
+            assert not issubclass(err, swallowed)
+
+    def test_a_repeated_target_raises_it_with_counts_and_no_household_id(self):
+        module = self._module()
+        left = pd.DataFrame({"hhid": ["child"], "t0_hhid": ["SECRET-ID"]})
+        right = pd.DataFrame({"HHID": ["SECRET-ID", "SECRET-ID", "OTHER"], "ea": ["1", "2", "3"]})
+        with pytest.raises(module["OriginEaError"], match="1 value") as caught:
+            module["_follow_key"](left, "t0_hhid", right, "HHID")
+        assert "SECRET-ID" not in str(caught.value)
+
+    def test_it_crosses_a_process_boundary_as_an_exception_naming_itself(self):
+        """A by-path class does not pickle, and the fallback is a ``RuntimeError`` that the
+        derived-table paths catch (GH #1524)."""
+        import pickle
+        from lsms_library._parallel_waves import _pack_exception
+        err = self._module()["OriginEaError"]("Uganda sample: 1 household")
+        carried, type_name, _, _ = _pack_exception(err)
+        assert carried is err and type_name == "OriginEaError"
+        back = pickle.loads(pickle.dumps(carried))
+        assert type(back) is Exception
+        assert str(back) == "OriginEaError: Uganda sample: 1 household"
 
 
 # ------------------------------------------------------------------ the oracle --
@@ -445,6 +484,50 @@ class TestNothingElseMoves:
     def test_weights_still_normalise_to_mean_one(self, sample):
         means = sample.groupby(level="t")["weight"].mean()
         assert ((means - 1).abs() < 1e-9).all(), means
+
+
+@pytest.mark.requires_s3
+class TestACoverDisagreementStopsTheBuild:
+    """One household's ``AGSEC1.ea`` off by one, through the real reads.  It reaches the caller
+    of ``sample`` and of a table that joins ``v`` from it, which a ``ValueError`` would not."""
+
+    @pytest.mark.parametrize("wave", ["2015-16", "2018-19", "2019-20"])
+    @pytest.mark.parametrize("table", ["sample", "household_roster"])
+    def test_it_reaches_the_caller_with_no_household_id(self, tmp_path, monkeypatch, wave, table):
+        import lsms_library as ll
+        import lsms_library.country as C
+        import lsms_library.local_tools as LT
+        import lsms_library.paths as P
+
+        (tmp_path / "dvc-cache").symlink_to(P.data_root() / "dvc-cache")
+        monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("LSMS_BUILD_WORKERS", "1")
+        P.data_root.cache_clear()
+        real = LT.get_dataframe
+        held = real(str(UGANDA / "2015-16" / "Data" / "gsec1.dta"), convert_categoricals=False)
+
+        def perturbed(fn, *a, **k):
+            frame = real(fn, *a, **k)
+            if "2015-16/Data/AGSEC1.dta" not in str(fn):
+                return frame
+            frame = frame.copy()
+            row = frame.index[frame["HHID"].isin(held["HHID"])][0]
+            frame.loc[row, "ea"] = frame.loc[row, "ea"] + 1
+            return frame
+
+        monkeypatch.setattr(LT, "get_dataframe", perturbed)
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                with pytest.raises(Exception) as caught:
+                    getattr(ll.Country("Uganda", preload_panel_ids=False), table)(waves=[wave])
+        finally:
+            P.data_root.cache_clear()
+            for ledger in (C._DEGRADED_ATTEMPTED, C._SOURCE_PROBES,
+                           C._BUILD_DROP_LEDGER, C._REBUILD_HISTORY):
+                ledger.clear()
+        assert type(caught.value).__name__ == "OriginEaError"
+        assert not set(held["HHID"]) & set(str(caught.value).split())
 
 
 @pytest.mark.requires_s3

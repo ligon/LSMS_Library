@@ -503,7 +503,8 @@ def _adopt_alternate_cover(flat, table='sample'):
     primary cover lacks, like the others, but the two covers have to AGREE on
     every household both hold (2,622 of 2,622), because that equality is why
     ``AGSEC1.ea`` may stand as a second source at all (ruling 2026-11-04).  A
-    release where it fails raises rather than serving two EA vintages.
+    release where it fails raises ``OriginEaError`` rather than serving two EA
+    vintages.
 
     The temporary columns are dropped.  A frame without them is returned
     unchanged (every wave but 2015-16).
@@ -524,9 +525,11 @@ def _adopt_alternate_cover(flat, table='sample'):
                     stacklevel=2)
         if '_ag_ea' in flat and 'ea' in flat:
             own, second = flat['ea'].map(format_id), flat['_ag_ea'].map(format_id)
-            if (~only_alt & own.notna() & second.notna() & own.ne(second)).any():
-                raise ValueError('Uganda locating covers disagree on ea: AGSEC1.ea '
-                                 'can no longer stand as a second source for gsec1.ea')
+            differ = int((~only_alt & own.notna() & second.notna() & own.ne(second)).sum())
+            if differ:
+                raise OriginEaError(
+                    f'Uganda sample: gsec1 and AGSEC1 disagree on ea for {differ} household(s), '
+                    f'so AGSEC1.ea can no longer stand as a second source for gsec1.ea.')
         for c in alt:
             target = c[len(_ALT_COVER_PREFIX):]
             src = flat[c].loc[only_alt]
@@ -565,6 +568,32 @@ def _adopt_alternate_cover(flat, table='sample'):
     return flat.drop(columns=temps)
 
 
+class OriginEaError(Exception):
+    """The sources of ``sample.ea`` no longer give one answer for one household.
+
+    Raised when ``gsec1`` and ``AGSEC1`` disagree on a household both hold, or when a
+    tracking key would name two households.  That equality is why ``AGSEC1.ea`` may stand
+    as a second source (2,622 of 2,622 today), so a release that breaks it has to stop the
+    build.  The held files give it nothing to refuse.  The message carries counts, never a
+    household id.
+
+    An ``Exception`` subclass, as ``IdWalkError``, Burkina's ``EmcSampleError`` and Tanzania's
+    ``SplitOffClusterError`` are.  ``_join_v_from_sample`` catches ``ValueError``, ``KeyError``,
+    ``FileNotFoundError`` and ``AttributeError``, and the derived-table paths catch
+    ``RuntimeError`` too, so any of those would serve every Uganda household table with no
+    ``v`` and only a warning.  ``pandas.errors.MergeError``, which this replaces, is a
+    ``ValueError``.
+
+    A class in a by-path module does not pickle, so under parallel workers it would reach the
+    parent as a ``RuntimeError``, which the derived-table paths do catch, and they would serve
+    0 rows (GH #1524).  ``__reduce__`` therefore sends a plain ``Exception`` carrying the class
+    name and the message.  One build worker raises this class; more raise that.
+    """
+
+    def __reduce__(self):
+        return (Exception, (f'{type(self).__name__}: {self}',))
+
+
 #: The registry key on a row whose ``ea`` was inherited (GH #689).
 _EA_INHERITED_KEY = 'Uganda::sample::ea-tracking-key'
 #: Marker column ``origin_ea`` hands to ``sample``; never served.
@@ -583,14 +612,20 @@ def _follow_key(left, key, right, target):
 
     Compares ``format_id`` of both sides.  A blank key (2019-20 ``hhidold``, 69
     households) formats to ``None`` and is dropped first: ``pd.merge`` matches
-    null keys to each other, and a blank is not a link.  ``many_to_one`` because
-    two 2018-19 households may share a parent (5 parents do), and because a
-    repeated target would be a key that does not name one household.
+    null keys to each other, and a blank is not a link.  Two 2018-19 households may
+    share a parent (5 parents do), but a repeated target would be a key that does not
+    name one household: ``OriginEaError``, which counts them and names none.
     """
     lhs = left.assign(_key=left[key].map(format_id)).dropna(subset=['_key'])
     rhs = right.assign(_key=right[target].map(format_id)).dropna(subset=['_key'])
-    return (lhs.merge(rhs, on='_key', validate='many_to_one', suffixes=('', '_parent'))
-            .drop(columns='_key'))
+    repeated = rhs.loc[rhs['_key'].duplicated(keep=False), '_key'].nunique()
+    if repeated:
+        raise OriginEaError(
+            f'Uganda sample: {repeated} value(s) of {target} name more than one row with '
+            f'different answers, so a tracking key would not name one household.  If these '
+            f'are gsec1 and AGSEC1, the two covers no longer agree on ea, and AGSEC1.ea '
+            f'cannot stand as a second source.')
+    return lhs.merge(rhs, on='_key', suffixes=('', '_parent')).drop(columns='_key')
 
 
 def _tracking_links(wave):
@@ -640,8 +675,8 @@ def origin_ea(df):
     names.  ``df`` is the declared 2015-16 ``gsec1`` and ``AGSEC1`` frames
     concatenated, keyed on that wave's ``HHID``; this re-keys it to the current
     wave's household.  A household both covers hold appears twice with one ``ea``
-    (2,622 of 2,622); if they ever differ, ``_follow_key``'s ``many_to_one``
-    raises.  A household with no route is simply absent and stays NA: nothing is
+    (2,622 of 2,622); if they ever differ, ``_follow_key`` raises ``OriginEaError``.
+    A household with no route is simply absent and stays NA: nothing is
     read from ``v`` or parsed out of an id.  The route is the current wave's
     ``GSEC1`` tracking key only; ``AGSEC1.t0_hhid`` is not followed (it disagrees
     with ``GSEC1.t0_hhid`` on 86 households).
