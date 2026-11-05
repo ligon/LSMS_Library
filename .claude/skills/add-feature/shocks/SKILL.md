@@ -54,7 +54,7 @@ Most LSMS-ISA shocks modules follow this structure:
 | AffectedIncome | `hh_u03a` | Effect on income |
 | AffectedAssets | `hh_u03b` | Effect on assets |
 | AffectedProduction | `hh_u03c` | Effect on food production |
-| AffectedConsumption | `hh_u03d` | Effect on food consumption |
+| AffectedConsumption | `hh_u03d` | Effect on food stock |
 | HowCoped0 | `hh_u04a` | First coping strategy |
 | HowCoped1 | `hh_u04b` | Second coping strategy |
 | HowCoped2 | `hh_u04c` | Third coping strategy |
