@@ -5242,6 +5242,35 @@ def _parcel_from_feature_plot(plot_id):
     return str(plot_id).split('_', 1)[0]
 
 
+#: Countries whose ``crop_production`` and ``plot_features`` already share a
+#: complete land key, so ``yield_kg(on='parcel')`` joins it literally rather than
+#: cutting the area side at its first ``_``.  Ethiopia is
+#: ``holder_parcel_field``, Malawi ``garden_plot`` in its later waves, and the
+#: EHCVM countries ``field_parcel``.  The route GH #1110 gave ``fertilizer_rate``,
+#: extended to ``yield_kg`` and to the EHCVM countries (GH #1460, @ligon
+#: 2026-11-04).
+_YIELD_LITERAL_LAND_COUNTRIES = frozenset({
+    'Ethiopia', 'Malawi',
+    'Benin', 'Burkina_Faso', 'CotedIvoire', 'Guinea-Bissau', 'Mali', 'Niger',
+    'Senegal', 'Togo',
+})
+
+
+def _one_country(frame):
+    """The one country *frame* is, from its labels, else from ``attrs``.
+
+    ``None`` where it holds several, or does not say.  A label outranks a scalar
+    attr, which can be stale on pooled rows (GH #1160).
+    """
+    if 'country' in (frame.index.names or []):
+        labels = frame.index.get_level_values('country').unique()
+    elif 'country' in frame.columns:
+        labels = frame['country'].unique()
+    else:
+        return frame.attrs.get('country')
+    return labels[0] if len(labels) == 1 else None
+
+
 def yield_kg(crop_production, plot_features, *, area_col='Area',
              volume_as_mass=True, on='parcel',
              min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None,
@@ -5292,12 +5321,16 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
           ``i``; the existing ``attrs['country']='Uganda'`` enables its native
           constructor inverse for Country operands.  Coverage also requires
           convertible harvest and a matching positive area; neither missing
-          nor nonpositive area is filled.  **This is Uganda's decoding.**  The
-          area key is cut at its first ``_`` in every country, and the crop key
-          only loses a ``{hhid}-`` prefix, so where both features already share
-          a ``{field}_{parcel}`` key (Ethiopia and the EHCVM countries, Malawi's
-          later waves) no key matches at this grain.  Use ``'plot'`` there.
-          An empty result warns ``PlotGrainMismatchWarning``.
+          nor nonpositive area is filled.  **That decoding is Uganda's.**
+          Ethiopia, Malawi and the EHCVM countries already share a complete
+          field/plot key on both features (:data:`_YIELD_LITERAL_LAND_COUNTRIES`),
+          so here this mode joins that key whole and each plot keeps its own
+          area, as ``'plot'`` does.  It does not aggregate to a holder, garden or
+          field, and the output level stays named ``parcel``.  Labels naming one
+          country on both frames select this, or else matching
+          ``attrs['country']``; a pooled frame or missing metadata keeps the
+          decoding above and matches nothing there.  An empty result warns
+          ``PlotGrainMismatchWarning``.
         - ``'plot'``: join on the literal ``plot`` value verbatim.  Use only
           where the two features already share a plot vocabulary; on Uganda
           the literal ids never match and the result is empty.
@@ -5340,7 +5373,13 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
 
     base = [k for k in ['t', 'i'] if k in hk.columns and k in pf.columns]
 
-    if on == 'parcel':
+    land_country = _one_country(crop_production)
+    if (on == 'parcel' and isinstance(land_country, str)
+            and land_country in _YIELD_LITERAL_LAND_COUNTRIES
+            and _one_country(plot_features) == land_country):
+        hk['_land'] = hk[hk_key].astype(str)
+        pf['_land'] = pf[plot_key].astype(str)
+    elif on == 'parcel':
         native_country = crop_production.attrs.get('country')
         if not isinstance(native_country, str) or native_country != 'Uganda':
             native_country = None
@@ -7269,8 +7308,9 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
     on : {'parcel', 'plot'}, default 'parcel'
         Land-key mode to join the two features on. The default mode NAME
         matches :func:`yield_kg` for compatibility with the original Uganda
-        bridge. The Ethiopia/Malawi native-key dispatch below is specific to
-        ``fertilizer_rate``; it does not change ``yield_kg``. Originally,
+        bridge. The Ethiopia/Malawi native-key dispatch below is this function's;
+        :func:`yield_kg` has its own list, which also holds the EHCVM countries
+        (:data:`_YIELD_LITERAL_LAND_COUNTRIES`). Originally,
         with ``on='plot'`` as the default, ``fertilizer_rate(Uganda)``
         returned an EMPTY frame and said nothing (see
         :class:`PlotGrainMismatchWarning`).
