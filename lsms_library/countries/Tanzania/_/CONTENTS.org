@@ -1117,7 +1117,9 @@ Consequences for the data:
 Source: NPS 2020/21 Basic Information Document, pp. 7--8.
 
 
-** TODO Pull WB geovariables (weather/distance/soil) for older NPS waves (#449)
+** TODO Wire WB geovariables (weather/distance/soil) for older NPS waves (#449)
+
+Held since 2026-11-04 in =2008-15/Data/NPS-R{1,2,3}/=; see that dated entry.  No table reads them.
 
 - GitHub :: [[https://github.com/ligon/LSMS_Library/issues/449][#449]]
 
@@ -2943,3 +2945,52 @@ So the household files link to the panel on =r_hhid= almost whole.  76's zip is 
 =add_wave(subdir=)= is refused on this wave, because 42 UPD sidecars sit loose in
 =Data/=.  W1 and W2 name the coordinates =lat_modified= / =lon_modified=, W3
 =lat_dd_mod= / =lon_dd_mod=.
+
+* 2026-11-04 -- the W1-W3 geovariables are held, not wired (GH #449)
+
+This supersedes the section above ("measured and not yet placed"): the members are placed,
+and its table stands as the measurement.
+
+=2008-15/Data/NPS-R1/=, =NPS-R2/= and =NPS-R3/= hold the geovariables members of entries 76,
+1050 and 2252, taken from each entry's own Stata zip and published with
+=push_to_cache_batch=, as GH #1260 did for Malawi.  =add_wave(subdir=)= is refused here
+because 42 UPD sidecars sit loose in =Data/=.  =#+CATALOG_COVERS:= is unchanged: these
+three rounds stay covered, not held, apart from these 8 files.  There are no
+=#+CATALOG_SUBDIR:= lines, so re-acquiring 3814 is not refused.
+
+The zips ship more than the #449 table lists, as the section above measures.  =Plot.Geovariables_Y1_revised2=,
+=TZY2.HH.Geovariables= and =TZY2.PlotGeovaribales= are in the zips and not in the catalog's
+file rosters.  Household files link to =upd4_hh_a.r_hhid= in the same round: =hhid= 2,990
+of 2,990; =y2_hhid= 3,917 of 3,917 (=TZY2.HH= 3,924 of 3,924); =y3_hhid= 4,986 of 4,988.
+W1 and W2 name the coordinates =lat_modified= / =lon_modified=, W3 =lat_dd_mod= /
+=lon_dd_mod=.  Which of the two W2 household files a =geovariables= table reads (3,917
+against 3,924 rows, 50 against 43 columns) is a wiring decision.  76's zip is named
+=TZA_2008_NPS1_v02_M= under the idno =..._v03_M=.
+
+* 2026-11-04 -- WB 3455, the NPS Wave 4 Extended Panel release, is held and not registered
+
+=2014-15-EXT/= holds =TZA_2014_NPS-R4_v03_M_v03_A_EXT=: 72 files, 16 MB, with the BID,
+questionnaires and report.  The catalog's years run 2013-2016, which would label it =2013-16=,
+and its round is =2014-15=, already a logical wave of =2008-15/=.  So the directory is named for
+the subtitle, "Wave 4 - Extended Panel".
+
+It is 989 households, and all 989 =y4_hhid= are =r_hhid= in =upd4_hh_a= round 4 (see the
+Extended / Refresh split in =.claude/skills/tanzania-panel-design.md=).  So it adds no
+households to the UPD.  Its one named addition is =consumptionnps4_extended_panel= (988 rows).
+What else differs from the UPD's round 4 is not measured.
+
+Not in =Country.waves=: =tanzania.py= fixes the list and is byte-pinned by
+=tests/test_gh905_tanzania_signed_sums.py=, and registering it would count these households
+twice in 2014-15.
+
+* 2026-11-04 -- WB 2863, the Feed the Future supplemental survey 2016, is held and not registered
+
+=2016-FTFISS/= holds =TZA_2016_NPS-FTFISS_v01_M=: 12 files, 5.4 MB, with the BID, questionnaires and
+manual.  It re-interviews 797 NPS Wave 4 households in Dodoma, Manyara, Morogoro, Mbeya, Iringa
+and Unguja after the 2014-15 round; all 797 =y4_hhid= are =r_hhid= in =upd4_hh_a= round 4.  So it is a
+new interview of a sub-sample in six regions, on a shorter instrument (12 files), and not a
+national wave.
+
+Not in =Country.waves=: =tanzania.py= fixes the list and is byte-pinned by
+=tests/test_gh905_tanzania_signed_sums.py=.  To register it, move the list out of that module
+first, then decide whether a six-region supplement belongs on the =t= axis.

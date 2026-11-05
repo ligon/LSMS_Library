@@ -1,0 +1,5 @@
+outs:
+- md5: 41bd78521c3159f5d87c1d524e00b9e8
+  size: 3104
+  hash: md5
+  path: raindata.dta

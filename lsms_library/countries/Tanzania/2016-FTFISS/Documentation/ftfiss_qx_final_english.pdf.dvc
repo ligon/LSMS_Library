@@ -1,0 +1,5 @@
+outs:
+- md5: 3322374b71a2ecf923fac0cbd553afb0
+  size: 420015
+  hash: md5
+  path: ftfiss_qx_final_english.pdf

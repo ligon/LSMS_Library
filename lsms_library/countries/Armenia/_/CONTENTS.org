@@ -13,9 +13,10 @@
 # sign in citations (§3.1 etc.), which matches the assembled
 # slurm_logs/POPULATION_STATEMENTS_2026-07-21.org.
 
-Armenia ships exactly one wave, =1996= (the Armenian Household Budget Survey,
-AHBS 96 / HBS 1996), and ships no microdata -- =_/data_scheme.yml= carries
-=data_available: false=.  Everything below is documentation evidence.  No =.dta=
+Until 2026-11-04 Armenia shipped exactly one wave, =1996= (the Armenian Household
+Budget Survey, AHBS 96 / HBS 1996), and no microdata; see the last section for the ILCS
+waves.  =_/data_scheme.yml= still carries =data_available: false=.  This section is
+documentation evidence for 1996.  No =.dta=
 file was opened, and none could have been: the universe of a survey is a claim
 its documentation makes, not something to reverse-engineer from data.
 
@@ -292,3 +293,25 @@ repository (WB catalog 2324, download/34652).
   extracted text on 2026-07-21 before being written here.
 - Not done :: no =.dta= was opened (there are none locally, and it would be the
   wrong evidence in any case).
+
+* 2026-11-04 -- ILCS 2001-2017 held and registered, not wired (GH #597)
+
+Seventeen waves from WB =central=, each acquired whole by =add_wave=: 346 files, 1.01 GB, with
+questionnaires and methodology reports in each =Documentation/=.  The =1996= section above still
+describes 1996: it has no microdata.  =data_available= stays =false= until a table is wired, so tests
+that build features keep skipping this country.
+
+- *Labels.*  2950-2964 and 2966 are their year.  *3591 is 2017, not 2018*: the catalog's years and
+  the DDI's collection dates say 2018, the title and idno say 2017, and =hh.dta='s =year= is 2017 on
+  all 7,776 rows.  =2018= is left for WB 3617, ILCS 2018, which is LICENSED and not acquired
+  (=discover_waves= reports it =no=).
+- *Name changes.*  ISLS to 2003, ILCS from 2004.  Release folders hold the files except 2017,
+  which is flat.  2005's folder says =v01_M= under the idno =..._v02_M=, and its zip ships =tabz3=
+  where the catalog lists =z3_1=.
+- *Design.*  The all-households address frame starts in 2004; the DDI gives 2001-2003 as a
+  settlements-then-households sample, and =hh.dta= runs 4,037 households in 2001 and 7,776 in 2017,
+  so these are not one constant design.  Each wave has an empty universe field.
+- *Not read.*  The per-wave methodology PDFs were not read for the population records.
+- *Size.*  =hh=, =mem= and =x1= to =x5= exist in all 17, under 50 distinct file names.  Their columns
+  are not stable: across the 14 waves whose file is spelled in lower case, =hh= shares 13 column
+  names and =mem= 12.  So each year is its own map, and 1996's =data_info.yml= is no template.

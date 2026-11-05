@@ -1,0 +1,15 @@
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/8591
+
+#+CATALOG_ID: 8591
+#+CATALOG_IDNO: AFR_2014-2024_LSMS-HBI_v01_M
+#+CATALOG_TITLE: LSMS Household Business Indicators for Sub-Saharan Africa 2014-2024
+#+CATALOG_YEARS: 2014-2025
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/8591
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: add-wave
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-11-04
+#+PROVENANCE_NOTE: Acquired whole on 2026-11-04 by add_wave: all 3 data files in 8591's WB datafile list (household, individual, business), each pushed. A harmonized dataset derived from LSMS-ISA waves of five countries, not a survey wave: 'Harmonized dataset derived from survey data' (DDI version notes). The Basic Information Document names Ethiopia 2018/19 and 2021/22, Malawi 2019/20 and 2024, Nigeria 2018/19 and 2023/24, Tanzania 2014/15 and 2020/21, Uganda 2018/19 and 2019/20. Held under its own name, as Harmonized_LSMS-ISA_Ag is; 2014-24 is the catalog's span, not a wave. No table reads it.

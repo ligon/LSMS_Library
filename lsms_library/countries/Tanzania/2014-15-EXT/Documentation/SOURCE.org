@@ -1,0 +1,16 @@
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/3455
+
+#+CATALOG_ID: 3455
+#+CATALOG_IDNO: TZA_2014_NPS-R4_v03_M_v03_A_EXT
+#+CATALOG_TITLE: National Panel Survey 2014-2015
+#+CATALOG_YEARS: 2013-2016
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/hd8h-s870
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/3455
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: add-wave
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-11-04
+#+PROVENANCE_NOTE: Acquired whole on 2026-11-04 by add_wave: all 72 of the 72 data files in 3455's WB datafile list, each pushed. The catalog subtitle is 'Wave 4 - Extended Panel'. Its 989 households are all in 2008-15/'s round 4 (upd4_hh_a.r_hhid), so this is not a new wave of households; the release adds consumptionnps4_extended_panel. Held, not in Country.waves, not wired.

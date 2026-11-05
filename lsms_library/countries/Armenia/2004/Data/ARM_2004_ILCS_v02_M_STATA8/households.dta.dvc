@@ -1,0 +1,5 @@
+outs:
+- md5: 672837d3dc7cbe388ba1641c10a38a19
+  size: 9522107
+  hash: md5
+  path: households.dta

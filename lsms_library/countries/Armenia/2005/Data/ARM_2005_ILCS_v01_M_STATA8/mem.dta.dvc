@@ -1,0 +1,5 @@
+outs:
+- md5: d338dba078c68c3b1c1d17b96f4512d3
+  size: 5463657
+  hash: md5
+  path: mem.dta

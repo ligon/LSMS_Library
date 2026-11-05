@@ -1,0 +1,5 @@
+outs:
+- md5: 09f3b96c922e1ed60efd03821e36211b
+  size: 21283
+  hash: md5
+  path: pr1__fdp.dta

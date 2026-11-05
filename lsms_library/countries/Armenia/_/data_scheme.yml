@@ -1,9 +1,8 @@
 Country: Armenia
 
-# Microdata not present in this checkout.  Armenia is in the WB catalog
-# but its .dta files have not been downloaded.  Tests that build features
-# should skip.  Flip to true when data is added and materialized.
-# See GH #146 for the integration plan.
+# The ILCS waves 2001-2017 are held (2026-11-04) and no table reads them; 1996
+# has no microdata.  Tests that build features should skip.  Flip to true when
+# a table is wired.  See GH #146 for the integration plan and GH #597.
 data_available: false
 
 Data Scheme:

@@ -1,0 +1,5 @@
+outs:
+- md5: 091cfbc8865814bd571f4056dbdc6b3e
+  size: 8110326
+  hash: md5
+  path: mem_nal.dta

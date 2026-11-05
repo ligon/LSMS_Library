@@ -1,0 +1,5 @@
+outs:
+- md5: 0ce31bdecd0e3945ddd8fb0bc122a592
+  size: 22145
+  hash: md5
+  path: s16b_exp.dta

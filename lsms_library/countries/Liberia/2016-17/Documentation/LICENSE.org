@@ -1,0 +1,26 @@
+LICENSE (LBR_2016_HIES_v01_M)
+
+https://microdata.worldbank.org/index.php/catalog/2986/study-description#metadata-data_access
+
+1. Access policy
+CONTACTS
+
+
+CITATION REQUIREMENT
+Use of the dataset must be acknowledged using a citation which would include:
+- the Identification of the Primary Investigator
+- the title of the survey (including country, acronym and year of implementation)
+- the survey reference number
+- the source and date of download
+
+Example:
+
+Liberia Institute for Statistics and Geo-Information Services. Household Income and Expenditure Survey (HIES) 2016, Ref. LBR_2016_HIES_v01_M. Dataset downloaded from [URL] on [date].
+
+
+DISCLAIMER
+The user of the data acknowledges that the original collector of the data, the authorized distributor of the data, and the relevant funding agency bear no responsibility for use of the data or for interpretations or inferences based upon such uses.
+
+
+(Text copied from the World Bank catalog DDI export, https://microdata.worldbank.org/metadata/export/2986/json, 2026-11-04.)
+

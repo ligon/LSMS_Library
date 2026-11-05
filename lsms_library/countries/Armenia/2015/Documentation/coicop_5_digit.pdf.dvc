@@ -1,0 +1,5 @@
+outs:
+- md5: 97ae2bc6303b723d42e5913afec64ae5
+  size: 160494
+  hash: md5
+  path: coicop_5_digit.pdf

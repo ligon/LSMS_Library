@@ -1,0 +1,5 @@
+outs:
+- md5: 58b9139023cbc24b7b6cf67df97e17ff
+  size: 2804
+  hash: md5
+  path: prindex.dta

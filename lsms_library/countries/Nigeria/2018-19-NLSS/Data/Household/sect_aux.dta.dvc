@@ -1,0 +1,5 @@
+outs:
+- md5: 86c4cd9e6c46e385b3336805b4c87531
+  size: 9476530
+  hash: md5
+  path: sect_aux.dta

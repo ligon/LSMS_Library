@@ -5069,3 +5069,17 @@ sale" note in the ladder's findings (its =nunique() == 0= reason), its echo unde
 open items, and "40 of those 162".  The first and third call these rows "homestead trees";
 "homestead" is on no page of the held 2013-14 or 2019-20 questionnaires, and the 2016-17
 agriculture questionnaire is not held.  The 3,600 MWK sale they name stays unattached.
+
+* 2026-11-04 -- the IHS4 agriculture questionnaire is held; =ag_r01= asks "raised or owned"
+
+=2016-17/Documentation/fourth_integrated_household_survey_2016_2017_agriculture_questionnaire.pdf=
+(WB 2936, resource 47113) was not held.  Module R, R01, PDF p. 85: "During the last 12 months,
+have you or any member of your household raised or owned any [LIVESTOCK]?".  The 2019-20 form
+prints the same words on the same page.  The Stata label of =ag_r01= is "Did you own
+[LIVESTOCK]?" in both waves and both 2016-17 files, so the label is a shortening, not a
+different question.  No table changes.
+
+This answers the section above (GH #1476), which says this questionnaire is not held.  It
+is now, and "homestead" is not in the extracted text of its 98 pages either, so the word
+is on no page of the three held forms.  Why those 41 rows carry Module P answers is still
+unknown.

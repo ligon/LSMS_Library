@@ -1,0 +1,5 @@
+outs:
+- md5: c31bd3059e6c05afb8ed19245a2097a4
+  size: 64101
+  hash: md5
+  path: h2.dta

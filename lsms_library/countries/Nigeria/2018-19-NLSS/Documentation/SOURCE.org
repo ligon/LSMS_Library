@@ -1,0 +1,16 @@
+SOURCE
+
+https://microdata.worldbank.org/index.php/catalog/3827
+
+#+CATALOG_ID: 3827
+#+CATALOG_IDNO: NGA_2018_LSS_v01_M
+#+CATALOG_TITLE: Living Standards Survey 2018-2019
+#+CATALOG_YEARS: 2018-2019
+#+CATALOG_REPOSITORY: lsms
+#+CATALOG_DOI: https://doi.org/10.48529/8gbe-z155
+#+CATALOG_URL: https://microdata.worldbank.org/index.php/catalog/3827
+#+PROVENANCE_SOURCE: worldbank
+#+PROVENANCE_METHOD: add-wave
+#+PROVENANCE_VALIDATION: content-validated
+#+PROVENANCE_RECORDED: 2026-11-04
+#+PROVENANCE_NOTE: Acquired whole on 2026-11-04 by add_wave: all 47 of the 47 data files in 3827's WB datafile list, each pushed. This is the Nigeria Living Standards Survey, not the GHS-Panel: the directory name keeps it apart from 2018-19/, which holds GHS-Panel W4 (3557) over the same years. Held, not in Country.waves, not wired.
