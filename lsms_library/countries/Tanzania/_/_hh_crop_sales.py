@@ -22,6 +22,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from lsms_library.derivations import union_keys
 from lsms_library.local_tools import format_id, get_dataframe
 from lsms_library.paths import countries_root
 
@@ -102,8 +103,12 @@ def derive_hh_crop_sale_attachment(df, t, sales, colmaps, crop_labels=None):
     # A property of the module that asks, as on every harvest row.
     farm['perennial'] = records.loc[~alone, '_module'].ne('4A').astype('boolean')
 
-    derivation = pd.Series(pd.NA, index=flat.index, dtype='string')
-    derivation[_is_sale(flat).fillna(False).to_numpy(dtype=bool)] = HH_CROP_SALE
+    # Beside any key a row already has; crop_production_for_wave writes none today.
+    derivation = (flat['Derivation'].astype('string') if 'Derivation' in flat.columns
+                  else pd.Series(pd.NA, index=flat.index, dtype='string')).copy()
+    hit = _is_sale(flat).fillna(False).to_numpy(dtype=bool)
+    derivation[hit] = pd.array([union_keys((key, HH_CROP_SALE)) for key in derivation[hit]],
+                               dtype='string')
     flat['Derivation'] = derivation
     farm['Derivation'] = pd.Series(pd.NA, index=farm.index, dtype='string')
 

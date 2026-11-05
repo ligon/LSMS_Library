@@ -110,6 +110,16 @@ class TestRules:
                            [("2", 77, 1.0, 10.0)]).reset_index()
         assert got[got.plot_id == FARM].j.tolist() == ["crop_77"]
 
+    def test_the_key_joins_a_key_already_there(self, sales_module):
+        rows = _rows([("1", "p1", "Maize", "reported:4A:9", 10.0, 2.0, 300.0),
+                      ("2", "p1", "Maize", "reported:4A:9", 10.0, pd.NA, pd.NA)])
+        rows["Derivation"] = pd.array(["Tanzania::crop_production::other"] * 2, dtype="string")
+        got = sales_module.derive_hh_crop_sale_attachment(
+            rows, "2019-20", {"seasonal": _sale([("1", 9, 2.0, 300.0)])}, COLMAPS,
+            crop_labels={9: "Maize"}).reset_index().set_index("i")
+        assert got.loc["1", "Derivation"] == "+".join(sorted([KEY, "Tanzania::crop_production::other"]))
+        assert got.loc["2", "Derivation"] == "Tanzania::crop_production::other"
+
     def test_a_record_that_is_not_a_sale_serves_nothing_new(self, sales_module):
         got = self._derive(sales_module,
                            [("1", "p1", "Maize", "reported:4A:9", 10.0, pd.NA, pd.NA),
@@ -175,12 +185,12 @@ class TestOracle:
         on_row = s[one].merge(sold[sold.plot_id != FARM], left_on=["i", "harvest_obs"],
                               right_on=["i", "production_obs"], how="left", indicator=True)
         assert on_row._merge.eq("both").all() and len(on_row) == one.sum()
-        assert on_row.Derivation.eq(KEY).all()
+        assert on_row.Derivation.astype("string").str.contains(KEY, regex=False).all()
         assert on_row.rv.fillna(-1).eq(on_row.Value_sold.astype(float).fillna(-1)).all()
         at_farm = s[~one].merge(sold[sold.plot_id == FARM], left_on=["i", "farm_obs"],
                                 right_on=["i", "production_obs"], how="left", indicator=True)
         assert at_farm._merge.eq("both").all() and len(at_farm) == (~one).sum()
-        assert at_farm.Derivation.isna().all()
+        assert not at_farm.Derivation.astype("string").str.contains(KEY, regex=False).fillna(False).any()
         assert at_farm.rv.fillna(-1).eq(at_farm.Value_sold.astype(float).fillna(-1)).all()
         assert at_farm.rq.fillna(-1).eq(at_farm.Quantity_sold.astype(float).fillna(-1)).all()
 
@@ -199,6 +209,7 @@ class TestOracle:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             x = ll.Country("Tanzania").derivation_inputs(KEY, wave=wave).reset_index()
-        keyed = served[(served.t == wave) & served.Derivation.eq(KEY).fillna(False)]
+        keyed = served[(served.t == wave)
+                       & served.Derivation.astype("string").str.contains(KEY, regex=False).fillna(False)]
         assert len(x) == len(keyed)
         assert set(zip(x.i, x.production_obs)) == set(zip(keyed.i, keyed.production_obs))

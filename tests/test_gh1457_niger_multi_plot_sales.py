@@ -98,6 +98,15 @@ class TestRules:
         got = niger.stamp_hh_crop_sale(df)
         assert got.isna().tolist() == [False, True, True, True] and got.iloc[0] == KEY
 
+    def test_the_key_joins_a_key_already_there_and_leaves_the_rest(self, niger):
+        idx = pd.MultiIndex.from_tuples([("a", "1_1"), ("b", "1_1"), ("c", FARM)], names=["i", "plot_id"])
+        df = pd.DataFrame({"Quantity_sold": [1.0, np.nan, 1.0], "Value_sold": [1.0, np.nan, 1.0],
+                           "Derivation": ["Niger::crop_production::other", "Niger::crop_production::other", pd.NA]},
+                          index=idx)
+        got = niger.stamp_hh_crop_sale(df)
+        assert got.iloc[0] == "+".join(sorted([KEY, "Niger::crop_production::other"]))
+        assert got.iloc[1] == "Niger::crop_production::other" and pd.isna(got.iloc[2])
+
 
 def _household(df, wave):
     """The served raw id, spelled here (``niger.i``): 2014-15 grappe + '0' + menage
@@ -182,8 +191,10 @@ class TestOracle:
         one = x.n.fillna(0).eq(1)
         assert x.loc[~one, "plot_id"].eq(FARM).all()
         assert x.loc[one, "plot_id"].ne(FARM).all()
-        assert x.loc[one, "Derivation"].eq(KEY).all()
-        assert x.loc[~one, "Derivation"].isna().all()
+        # Tolerates a second key on the row (`Derivation` is MULTI_SEP-joined).
+        carries = x.Derivation.astype("string").str.contains(KEY, regex=False).fillna(False)
+        assert carries[one].all()
+        assert not carries[~one].any()
         assert x.rv.fillna(-1).astype(float).eq(x.Value_sold.fillna(-1).astype(float)).all()
 
     def test_a_farm_level_row_states_only_a_sale(self, served, wave):

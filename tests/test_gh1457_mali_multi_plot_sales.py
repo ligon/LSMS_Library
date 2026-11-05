@@ -132,8 +132,10 @@ class TestOracle:
         one = x.n.fillna(0).eq(1)
         assert x.loc[~one, "plot_id"].eq(FARM).all()
         assert x.loc[one, "plot_id"].ne(FARM).all()
-        assert x.loc[one, "Derivation"].eq(KEY).all()
-        assert x.loc[~one, "Derivation"].isna().all()
+        # Tolerates a second key on the row (`Derivation` is MULTI_SEP-joined).
+        carries = x.Derivation.astype("string").str.contains(KEY, regex=False).fillna(False)
+        assert carries[one].all()
+        assert not carries[~one].any()
         assert x.rv.fillna(-1).eq(x.Value_sold.fillna(-1)).all()
         assert x.rq.fillna(-1).eq(x.Quantity_sold.fillna(-1)).all()
 
@@ -157,6 +159,6 @@ class TestOracle:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             x = ll.Country("Mali").derivation_inputs(KEY, wave=WAVE).reset_index()
-        keyed = served[served.Derivation.eq(KEY).fillna(False)]
+        keyed = served[served.Derivation.astype("string").str.contains(KEY, regex=False).fillna(False)]
         assert len(x) == len(keyed)
         assert set(zip(x.i, x.crop)) == set(zip(keyed.i, keyed.crop))

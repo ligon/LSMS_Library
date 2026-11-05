@@ -760,12 +760,15 @@ def derive_hh_crop_sale_attachment(harvest, records):
 
 def stamp_hh_crop_sale(df):
     """The ``Derivation`` column of a finished 2014-15 / 2021-22 frame, a ``string``
-    Series on its index: :data:`HH_CROP_SALE` on a harvest line holding a sale.  A
+    Series on its index: :data:`HH_CROP_SALE` on a harvest line holding a sale, beside
+    any key already on that row (``MULTI_SEP``, sorted), and every other row's own.  A
     Farm-level row's index discloses it, and a 0 is not a sale."""
     plotted = df.index.get_level_values('plot_id') != FARM_LEVEL
     sold = is_crop_sale(df).astype('boolean').fillna(False).to_numpy(dtype=bool)
-    out = pd.Series(pd.NA, index=df.index, dtype='string')
-    out[plotted & sold] = HH_CROP_SALE
+    out = (df['Derivation'].astype('string').copy() if 'Derivation' in df.columns
+           else pd.Series(pd.NA, index=df.index, dtype='string'))
+    hit = plotted & sold
+    out[hit] = pd.array([union_keys((key, HH_CROP_SALE)) for key in out[hit]], dtype='string')
     return out
 
 
