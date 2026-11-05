@@ -207,7 +207,9 @@ def shocks(df):
         # Code 25 (Autre strategie) alone carries the Oui/Non label set, so its
         # rank is not in the file (GH #1556).  It takes the rank no other
         # strategy holds: ranks are otherwise gapless, and Burkina, which keeps
-        # the raw rank, shows 25 always filling the next one.
+        # the raw rank, shows 25 always filling the next one.  The instrument
+        # allows three strategies, so a fourth falls off the three served slots
+        # below and is dropped (0 held rows).
         held = {rank for rank, _ in ranked}
         for label in unranked:
             rank = min(set(range(1, len(held) + 2)) - held)

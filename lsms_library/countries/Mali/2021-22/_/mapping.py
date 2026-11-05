@@ -173,9 +173,12 @@ def shocks(df):
         # Code 25 (Autre strategie) alone carries the Oui/Non label set, so its
         # rank is not in the file (GH #1556).  It takes the first slot no other
         # strategy holds: ranks are otherwise gapless, and Burkina, which keeps
-        # the raw rank, shows 25 always filling the next one.
-        if autre is not None:
-            ranked[min(k for k in range(3) if pd.isna(ranked[k]))] = autre
+        # the raw rank, shows 25 always filling the next one.  The instrument
+        # allows three strategies, so a fourth has no slot and is dropped, as in
+        # Niger and Senegal (0 held rows).
+        free = [k for k in range(3) if pd.isna(ranked[k])]
+        if autre is not None and free:
+            ranked[free[0]] = autre
         for k in range(3):
             how_coped[k].append(ranked[k])
 

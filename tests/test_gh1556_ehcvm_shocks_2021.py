@@ -99,6 +99,10 @@ class TestLabelledRanks:
         got, lab = _served(country, c1=SECOND, c25='Oui')
         assert got[0] == lab[25] and got[1] == lab[1]
 
+    def test_a_fourth_strategy_is_dropped_and_does_not_raise(self, country):
+        got, lab = _served(country, c1=FIRST, c2=SECOND, c3=THIRD, c25='Oui')
+        assert got == [lab[1], lab[2], lab[3]]
+
     def test_non_and_blank_are_not_strategies(self, country):
         got, _ = _served(country, c1=np.nan, c25='Non')
         assert all(pd.isna(x) for x in got)
