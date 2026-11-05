@@ -202,6 +202,15 @@ def test_the_deletion_is_registered_and_resolves():
     assert callable(record.resolve('inputs'))
 
 
+def test_the_deletion_covers_every_wave_plot_inputs_is_built_for(malawi):
+    """A wave that builds plot_inputs and is missing here deletes its lines unregistered,
+    and derivation_inputs refuses the wave: nothing else would notice."""
+    from lsms_library.derivations import derivation_records
+    built = sorted(p.parent.parent.name for p in MALAWI.glob('*/_/plot_inputs.py'))
+    assert sorted(derivation_records('Malawi')[DELETION]['waves']) == built
+    assert sorted(malawi._SEED_LINE_SOURCES) == built
+
+
 def test_the_predicate_is_a_seed_row_with_no_payload(malawi):
     out = malawi.assemble_plot_inputs('2019-20', [_g_lines(malawi)])
     picked = malawi.derive_seed_line_no_payload(out)
