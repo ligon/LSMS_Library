@@ -5242,6 +5242,80 @@ def _parcel_from_feature_plot(plot_id):
     return str(plot_id).split('_', 1)[0]
 
 
+#: Held off the route below, so they keep today's empty result and warning: their
+#: ``s16aq47`` mixes hectares and square metres (GH #1531).  This goes beyond the
+#: ruling and is with @ligon.  Emptying this set is the whole of reversing it.
+_YIELD_LAND_ROUTE_HELD = frozenset({'Benin', 'Guinea-Bissau', 'Togo'})
+
+#: Countries whose ``crop_production`` and ``plot_features`` already share a
+#: complete land key, so ``yield_kg(on='parcel')`` joins it literally rather than
+#: cutting the area side at its first ``_``.  Ethiopia is
+#: ``holder_parcel_field``, Malawi ``garden_plot`` in its later waves, and the
+#: EHCVM countries ``field_parcel``.  The route GH #1110 gave ``fertilizer_rate``,
+#: extended to ``yield_kg`` and to the EHCVM countries (GH #1460, @ligon
+#: 2026-11-04), less :data:`_YIELD_LAND_ROUTE_HELD`.
+_YIELD_LITERAL_LAND_COUNTRIES = frozenset({
+    'Ethiopia', 'Malawi',
+    'Benin', 'Burkina_Faso', 'CotedIvoire', 'Guinea-Bissau', 'Mali', 'Niger',
+    'Senegal', 'Togo',
+}) - _YIELD_LAND_ROUTE_HELD
+
+
+def _country_households(frame):
+    """Distinct ``(country, t, i)`` of a frame whose rows name a country, else ``None``."""
+    columns = {}
+    for name in ('country', 't', 'i'):
+        if name in (frame.index.names or []):
+            columns[name] = frame.index.get_level_values(name)
+        elif name in frame.columns:
+            columns[name] = frame[name].array
+        else:
+            return None
+    return pd.DataFrame(columns).drop_duplicates()
+
+
+def _waves_joining_nothing(harvest, area, merged, crop_production, plot_features):
+    """The ``(country, t)`` cells with rows on both sides and none joined.
+
+    :func:`harvest_kg` loses the country (GH #1475), so a row gets it back through
+    ``(t, i)``.  Judged per wave alone, a pooled wave that another country's rows
+    keep non-empty would pass: Malawi 2019-20 beside Uganda.  ``country`` is the
+    frames' one country, or ``None`` where they name none.
+    """
+    if 't' not in harvest.columns:
+        return []
+    named = [who for who in map(_country_households, (crop_production, plot_features))
+             if who is not None]
+    if named and 'i' in harvest.columns:
+        who = pd.concat(named).drop_duplicates()
+
+        def cells(frame):
+            found = frame[['t', 'i']].merge(who, on=['t', 'i'])[['country', 't']]
+            return set(found.drop_duplicates().itertuples(index=False, name=None))
+    else:
+        one = _one_country(crop_production)
+        one = one if isinstance(one, str) else None
+
+        def cells(frame):
+            return {(one, t) for t in frame['t'].dropna().unique()}
+    return sorted((cells(harvest) & cells(area)) - cells(merged), key=str)
+
+
+def _one_country(frame):
+    """The one country *frame* is, from its labels, else from ``attrs``.
+
+    ``None`` where it holds several, or does not say.  A label outranks a scalar
+    attr, which can be stale on pooled rows (GH #1160).
+    """
+    if 'country' in (frame.index.names or []):
+        labels = frame.index.get_level_values('country').unique()
+    elif 'country' in frame.columns:
+        labels = frame['country'].unique()
+    else:
+        return frame.attrs.get('country')
+    return labels[0] if len(labels) == 1 else None
+
+
 def yield_kg(crop_production, plot_features, *, area_col='Area',
              volume_as_mass=True, on='parcel',
              min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None,
@@ -5292,12 +5366,19 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
           ``i``; the existing ``attrs['country']='Uganda'`` enables its native
           constructor inverse for Country operands.  Coverage also requires
           convertible harvest and a matching positive area; neither missing
-          nor nonpositive area is filled.  **This is Uganda's decoding.**  The
-          area key is cut at its first ``_`` in every country, and the crop key
-          only loses a ``{hhid}-`` prefix, so where both features already share
-          a ``{field}_{parcel}`` key (Ethiopia and the EHCVM countries, Malawi's
-          later waves) no key matches at this grain.  Use ``'plot'`` there.
-          An empty result warns ``PlotGrainMismatchWarning``.
+          nor nonpositive area is filled.  **That decoding is Uganda's.**
+          Ethiopia, Malawi and the EHCVM countries already share a complete
+          field/plot key on both features (:data:`_YIELD_LITERAL_LAND_COUNTRIES`,
+          which leaves out those :data:`_YIELD_LAND_ROUTE_HELD`), so here this mode joins that key whole and each plot keeps its own
+          area, as ``'plot'`` does.  It does not aggregate to a holder, garden or
+          field, and the output level stays named ``parcel``.  Labels naming one
+          country on both frames select this, or else matching
+          ``attrs['country']``.  A pooled frame or missing metadata keeps the
+          decoding above, which cuts a key at its first ``_``, so only a key
+          without one still matches: Malawi's 2010-11 and 2013-14 join and its
+          2016-17 and 2019-20 do not.  A wave with rows on both sides that joins
+          none warns ``PlotGrainMismatchWarning``, per country where the frames
+          name one.  Call this one country at a time.
         - ``'plot'``: join on the literal ``plot`` value verbatim.  Use only
           where the two features already share a plot vocabulary; on Uganda
           the literal ids never match and the result is empty.
@@ -5306,9 +5387,11 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     -------
     pd.DataFrame
         One ``Yield_kg`` column indexed by ``(t, i, parcel)`` (or
-        ``(t, i, plot_id)`` for ``on='plot'``) — kilograms per area-unit (the
-        area unit is whatever ``plot_features.AreaUnit`` records; Uganda
-        stores hectare-equivalent areas, so ``Yield_kg`` is kg/ha).
+        ``(t, i, plot_id)`` for ``on='plot'``) — kilograms per unit of *area_col*.
+        ``Area`` is canonically hectares, so that is kg/ha.  Do not read the unit
+        off ``plot_features.AreaUnit``, which names what the survey reported before
+        conversion: Malawi's says ``acres`` over hectare values, and Nigeria's and
+        Ethiopia's hold native labels.
 
     Notes
     -----
@@ -5340,7 +5423,13 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
 
     base = [k for k in ['t', 'i'] if k in hk.columns and k in pf.columns]
 
-    if on == 'parcel':
+    land_country = _one_country(crop_production)
+    if (on == 'parcel' and isinstance(land_country, str)
+            and land_country in _YIELD_LITERAL_LAND_COUNTRIES
+            and _one_country(plot_features) == land_country):
+        hk['_land'] = hk[hk_key].astype(str)
+        pf['_land'] = pf[plot_key].astype(str)
+    elif on == 'parcel':
         native_country = crop_production.attrs.get('country')
         if not isinstance(native_country, str) or native_country != 'Uganda':
             native_country = None
@@ -5389,6 +5478,23 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
             f"{sorted(map(str, harvest['_land'].unique()))[:3]}; area: "
             f"{sorted(map(str, area['_land'].unique()))[:3]}.{hint}",
             PlotGrainMismatchWarning, stacklevel=2)
+    elif len(merged):
+        lost = _waves_joining_nothing(harvest, area, merged, crop_production, pf)
+        if lost:
+            named = ', '.join(' '.join(str(c) for c in cell if c is not None)
+                              for cell in lost[:12])
+            more = f' (+{len(lost) - 12} more)' if len(lost) > 12 else ''
+            hint = f"Try on={'plot' if on == 'parcel' else 'parcel'!r}."
+            if on == 'parcel' and not isinstance(land_country, str):
+                hint = ("These frames do not name one country, so their keys were "
+                        "cut at the first '_', which a key both features share "
+                        "does not survive. Call yield_kg one country at a time, "
+                        "or pass on='plot' (GH #1475).")
+            warnings.warn(
+                f"yield_kg(on={on!r}): {len(lost)} wave(s) hold harvest and area "
+                f"rows and join none, so they are missing from the result: "
+                f"{named}{more}. {hint}",
+                PlotGrainMismatchWarning, stacklevel=2)
     with np.errstate(divide='ignore', invalid='ignore'):
         merged['Yield_kg'] = merged['Harvest_kg'] / merged['_Area']
     merged = merged.replace([np.inf, -np.inf], np.nan).dropna(subset=['Yield_kg'])
@@ -5627,6 +5733,9 @@ class NutrientCoverageWarning(UserWarning):
 
 class PlotGrainMismatchWarning(UserWarning):
     """Two plot-level features share no land key, so the join produced nothing.
+
+    Where one wave of a larger frame is what joined nothing, the result is not
+    empty and this warning is the only sign (GH #1460).
 
     The corpus runs two plot vocabularies (see :data:`_PLOT_LEVELS` and
     :func:`_parcel_from_crop_plot`), and a transform that joins across them
@@ -7269,8 +7378,9 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
     on : {'parcel', 'plot'}, default 'parcel'
         Land-key mode to join the two features on. The default mode NAME
         matches :func:`yield_kg` for compatibility with the original Uganda
-        bridge. The Ethiopia/Malawi native-key dispatch below is specific to
-        ``fertilizer_rate``; it does not change ``yield_kg``. Originally,
+        bridge. The Ethiopia/Malawi native-key dispatch below is this function's;
+        :func:`yield_kg` has its own list, which also holds the EHCVM countries
+        (:data:`_YIELD_LITERAL_LAND_COUNTRIES`). Originally,
         with ``on='plot'`` as the default, ``fertilizer_rate(Uganda)``
         returned an EMPTY frame and said nothing (see
         :class:`PlotGrainMismatchWarning`).
