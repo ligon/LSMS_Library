@@ -346,6 +346,8 @@ __all__ = [
     "QUANTITY_MIN_CELL",
     "QUANTITY_REFERENCE_QUANTILE",
     "QUANTITY_REFERENCE_FLOOR",
+    "QUANTITY_LOW_REFERENCE_QUANTILE",
+    "audit_near_zero",
     "audit_quantities",
     "check_quantities",
     "quantity_reports",
@@ -386,6 +388,11 @@ QUANTITY_REFERENCE_QUANTILE = 0.90
 #: ``plot_features.Area`` (module docstring), and stays.
 QUANTITY_REFERENCE_FLOOR = 1.0
 
+#: The lower tail's cell statistic (GH #1493): the upper rule's p90 mirrored, so
+#: it is just as immune to a few contaminated rows.  Only a positive value is
+#: judged and a zero never sets the scale, so a recorded "none" is never near zero.
+QUANTITY_LOW_REFERENCE_QUANTILE = 0.10
+
 #: WHICH columns of WHICH tables are screened.  A registry of *what is looked
 #: at*, NOT an allowlist of cells excused from looking -- the distinction the
 #: no-allowlist rule turns on, and the same kind of mapping as
@@ -415,6 +422,23 @@ _SCREENED_COLUMNS: dict[str, tuple[str, ...]] = {
     # rows (348 under the previous rule; the one that leaves is a Uganda
     # 2005-06 plot at 100.05x whose wave cell held 22 zero areas).
     "plot_features": ("Area",),
+    # GH #1493: a price is a ratio, so a near-zero quantity puts its error here.
+    # Senegal 2018-19 serves two prices near 1e22.  941 of 5,347,847 rows
+    # (0.018%) on 2026-11-04, Site Q's rate on food_acquired, and only the
+    # country being read warns.
+    "food_prices": ("Price",),
+}
+
+#: WHICH columns get the lower tail as well (GH #1493): a positive value more than
+#: :data:`QUANTITY_OUTLIER_K` times below its cell's
+#: :data:`QUANTITY_LOW_REFERENCE_QUANTILE`.  On 2026-11-04, 1,201 of 11,238,869
+#: positive ``food_acquired`` rows (0.011%) and 24 of 590,407 ``crop_production``
+#: (0.004%).  ``plot_features.Area`` is not here, because a small plot is a plot.
+#: Nor is ``food_prices.Price``: a low price is a high quantity, which the upper
+#: rule already names (1,965 of 5,347,847 rows would fire, 946 of them in Mali).
+_NEAR_ZERO_COLUMNS: dict[str, tuple[str, ...]] = {
+    "crop_production": ("Quantity",),
+    "food_acquired": ("Quantity",),
 }
 
 #: Alternate spellings of the identifying axes, in preference order.  All of
@@ -592,7 +616,9 @@ def _group_stats(values: np.ndarray, codes: np.ndarray,
 
 
 def _cell_reference(values: np.ndarray,
-                    keys: dict[str, tuple[np.ndarray, np.ndarray]]
+                    keys: dict[str, tuple[np.ndarray, np.ndarray]],
+                    *, quantile: float = QUANTITY_REFERENCE_QUANTILE,
+                    floor: float = QUANTITY_REFERENCE_FLOOR,
                     ) -> tuple[np.ndarray, np.ndarray]:
     """``(reference, rung)`` for every row.
 
@@ -653,12 +679,12 @@ def _cell_reference(values: np.ndarray,
                 # corpus (widest product measured: Malawi, 4,590).
                 codes = np.unique(codes, return_inverse=True)[1].astype(np.int64)
                 width = int(codes.max()) + 1 if n else 1
-        stat, size = _group_stats(scale, codes, QUANTITY_REFERENCE_QUANTILE)
+        stat, size = _group_stats(scale, codes, quantile)
         # ``stat > 0`` is implied by construction now (a quantile of strictly
         # positive values is positive); kept so the rule cannot silently
         # regress if the mask above is ever loosened.
         take = todo & (size >= QUANTITY_MIN_CELL) & (stat > 0)
-        reference[take] = np.maximum(stat[take], QUANTITY_REFERENCE_FLOOR)
+        reference[take] = np.maximum(stat[take], floor)
         rung[take] = name
     return reference, rung
 
@@ -695,6 +721,48 @@ def audit_quantities(df: Any, column: str, *, country: str, table: str
     with np.errstate(invalid="ignore", divide="ignore"):
         ratio = q / reference
         flagged = ratio > QUANTITY_OUTLIER_K
+    return _reports_for(
+        df, column, named, flagged, ratio, q, reference, rung,
+        country=country, table=table, direction="high",
+        quantile=QUANTITY_REFERENCE_QUANTILE, floor=QUANTITY_REFERENCE_FLOOR)
+
+
+def audit_near_zero(df: Any, column: str, *, country: str, table: str
+                    ) -> list[dict[str, Any]]:
+    """The lower tail of :func:`audit_quantities` (GH #1493).
+
+    Reports a strictly positive value more than :data:`QUANTITY_OUTLIER_K` times
+    below the :data:`QUANTITY_LOW_REFERENCE_QUANTILE` of the positive values in
+    its cell, on the same ladder with no floor.  ``ratio`` is reference over
+    value.  Senegal 2018-19 holds three quantities near 1e-19, the residue of a
+    float subtraction, and each puts its error into a price.  A zero is never
+    judged: it records none, not almost none.
+    """
+    if not isinstance(df, pd.DataFrame) or df.empty or column not in df.columns:
+        return []
+    q = _numeric(df[column])
+    positive = np.isfinite(q) & (q > 0)
+    if not positive.any():
+        return []
+
+    named = {axis: _axis(df, axis) for axis in ("t", "i", "plot", "j", "u")}
+    keys = {axis: named[axis] for axis in ("t", "u", "j")
+            if named[axis] is not None}
+    reference, rung = _cell_reference(
+        q, keys, quantile=QUANTITY_LOW_REFERENCE_QUANTILE, floor=0.0)
+
+    with np.errstate(invalid="ignore", divide="ignore"):
+        ratio = reference / q
+        flagged = positive & (ratio > QUANTITY_OUTLIER_K)
+    return _reports_for(
+        df, column, named, flagged, ratio, q, reference, rung,
+        country=country, table=table, direction="low",
+        quantile=QUANTITY_LOW_REFERENCE_QUANTILE, floor=0.0)
+
+
+def _reports_for(df, column, named, flagged, ratio, q, reference, rung, *,
+                 country, table, direction, quantile, floor):
+    """One report per wave of the rows *flagged*, each naming every one."""
     if not flagged.any():
         return []
 
@@ -730,14 +798,15 @@ def audit_quantities(df: Any, column: str, *, country: str, table: str
             "country": country,
             "table": table,
             "column": column,
+            "direction": direction,
             "wave": wave,
             "rows": int(wave_sizes.get(wave, len(df))),
             "n_implausible": len(offenders),
             "max_ratio": offenders[0]["ratio"],
             "k": QUANTITY_OUTLIER_K,
-            "reference_quantile": QUANTITY_REFERENCE_QUANTILE,
+            "reference_quantile": quantile,
             "min_cell": QUANTITY_MIN_CELL,
-            "reference_floor": QUANTITY_REFERENCE_FLOOR,
+            "reference_floor": floor,
             "offenders": offenders,
         })
     return reports
@@ -747,7 +816,8 @@ def audit_quantities(df: Any, column: str, *, country: str, table: str
 # Reporting -- one choke point, mirroring null_read_audit._emit_null_read_report
 # ---------------------------------------------------------------------------
 
-def _format_offender(offender: dict[str, Any]) -> str:
+def _format_offender(offender: dict[str, Any], direction: str = "high",
+                     quantile: float = QUANTITY_REFERENCE_QUANTILE) -> str:
     parts = [f"i={offender['i']}"]
     if offender["plot"] is not None:
         parts.append(f"plot={offender['plot']}")
@@ -755,8 +825,10 @@ def _format_offender(offender: dict[str, Any]) -> str:
         parts.append(offender["j"])
     if offender["u"] is not None:
         parts.append(f"u={offender['u']}")
-    parts.append(f"{offender['value']:,.10g} (x{offender['ratio']:,.1f} its "
-                 f"cell's p{QUANTITY_REFERENCE_QUANTILE * 100:.0f} of "
+    scale = (f"x{offender['ratio']:,.1f} its" if direction == "high"
+             else f"1/{offender['ratio']:,.1f} of its")
+    parts.append(f"{offender['value']:,.10g} ({scale} "
+                 f"cell's p{quantile * 100:.0f} of "
                  f"{offender['reference']:,.10g}, cell keyed on "
                  f"{offender['rung']})")
     return " ".join(parts)
@@ -769,22 +841,32 @@ def _format_quantity_report(report: dict[str, Any]) -> str:
     offenders = report["offenders"]
     shown = offenders[:_MAX_NAMED]
     more = len(offenders) - len(shown)
-    listed = "; ".join(_format_offender(o) for o in shown)
+    direction = report.get("direction", "high")
+    listed = "; ".join(
+        _format_offender(o, direction, report["reference_quantile"]) for o in shown)
+    if direction == "high":
+        tail = (f"more than {report['k']:,.0f}x the "
+                f"{report['reference_quantile'] * 100:.0f}th percentile")
+        causes = ("a quantity keyed into a container field, a calendar year "
+                  "keyed into a quantity field, and a missing-value sentinel "
+                  "that was never stripped")
+    else:
+        tail = (f"more than {report['k']:,.0f}x below the "
+                f"{report['reference_quantile'] * 100:.0f}th percentile")
+        causes = "the residue of a floating-point subtraction"
     return (
         f"{where}: {report['n_implausible']:,} of {report['rows']:,} row(s) "
-        f"report a '{report['column']}' more than {report['k']:,.0f}x the "
-        f"{report['reference_quantile'] * 100:.0f}th percentile of comparable rows "
+        f"report a '{report['column']}' {tail} of comparable rows "
         f"with a positive value (same wave, unit and crop where at least "
         f"{report['min_cell']} such rows exist; zeros never set the scale): "
         f"{listed}{f' (+{more} more)' if more else ''}. "
         f"NOTHING HAS BEEN CHANGED -- these rows are returned exactly as they "
-        f"are stored, because clipping an implausible harvest would hide the "
+        f"are stored, because clipping an implausible value would hide the "
         f"defect rather than fix it. Read this as a work queue: check the "
-        f"wave's source column and its unit label (a quantity keyed into a "
-        f"container field, a calendar year keyed into a quantity field, and a "
-        f"missing-value sentinel that was never stripped have each been the "
-        f"answer in this corpus). Use quantity_reports() to get the rows "
-        f"programmatically. Set {_QUANTITY_STRICT_ENV}=1 to make this fatal."
+        f"wave's source column and its unit label ({causes} "
+        f"have each been the answer in this corpus). Use quantity_reports() to "
+        f"get the rows programmatically. Set {_QUANTITY_STRICT_ENV}=1 to make "
+        f"this fatal."
     )
 
 
@@ -828,7 +910,9 @@ def quantity_reports(country: str | None = None,
     ``Country.food_prices()`` -- both derived from ``food_acquired`` -- is
     filed under ``table='food_acquired'``, and
     ``quantity_reports(table='food_quantities')`` is therefore empty even
-    when that call warned.
+    when that call warned.  ``food_prices`` also files its own ``Price`` findings
+    under ``table='food_prices'`` (GH #1493).  A report's ``direction`` is
+    ``'high'``, or ``'low'`` for :func:`audit_near_zero`.
     """
     out: list[dict[str, Any]] = []
     for (c, t), reports in _QUANTITY_LEDGER.items():
@@ -859,7 +943,9 @@ def check_quantities(df: Any, *, country: str, table: str) -> Any:
     table's warnings and files its findings under the SOURCE table's name --
     a finding reached through ``Country.food_quantities()`` is reported under
     ``table='food_acquired'``, which is also where
-    :func:`quantity_reports(table=...)` must look for it.
+    :func:`quantity_reports(table=...)` must look for it.  ``food_prices`` is
+    screened in its own right as well, on ``Price`` (GH #1493), and files that
+    under ``table='food_prices'``.
     """
     columns = _SCREENED_COLUMNS.get(str(table), ())
     if not columns:
@@ -869,6 +955,9 @@ def check_quantities(df: Any, *, country: str, table: str) -> Any:
         for column in columns:
             reports.extend(audit_quantities(df, column, country=country,
                                             table=table))
+        for column in _NEAR_ZERO_COLUMNS.get(str(table), ()):
+            reports.extend(audit_near_zero(df, column, country=country,
+                                           table=table))
     except QuantityImplausibleError:
         raise
     except Exception as exc:                                   # noqa: BLE001

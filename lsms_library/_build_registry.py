@@ -257,6 +257,7 @@ _EXCLUDED_CALLABLES = frozenset({
     # cannot silently cold-rebuild the corpus by re-wording a warning.
     "lsms_library.quantity_audit.check_quantities",
     "lsms_library.quantity_audit.audit_quantities",
+    "lsms_library.quantity_audit.audit_near_zero",
     # The null-index-key audit (null_index_audit, GH #847): the same argument,
     # one of the four guards up.  Counts NaN keys on declared index levels and
     # warns; provably returns its input unchanged.

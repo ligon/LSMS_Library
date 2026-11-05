@@ -590,7 +590,9 @@ Every guard above stops one question short. The shape guards ask whether a decla
 | cost | 72–77 ms of a ~1,040 ms Uganda warm read (7%), 9–13 ms of 123–164 ms on Tanzania — measured by a spy inside the read, not by differencing; identical under either rule (2026-10-23; at #857: 83 of 2,157 ms and 9 of 643 ms) |
 | lever | `LSMS_QUANTITY_STRICT=1` → `QuantityImplausibleError`. **Its own lever, not `LSMS_READ_STRICT`**: a destroyed row, an empty column and an impossible value are three concerns and ratchet separately |
 | accessor | `quantity_reports(country=, table=)`, twin of `null_read_reports()`; each report carries every offender, not just the dozen the warning prints |
-| scope | `crop_production.Quantity`, `food_acquired.Quantity` (#884) and `plot_features.Area` (#879); `_SCREENED_COLUMNS` is the extension point. Every `crop_production` row with a finite quantity finds a reference at some rung; the 68,192 that are never judged have no finite quantity (GhanaLSS's 37,280 among them) |
+| lower tail (GH #1493) | `audit_near_zero`: a positive value more than 100× below the p10 of its cell's positive values, same ladder, no floor, `direction: 'low'`. On `food_acquired.Quantity` and `crop_production.Quantity`: 1,201 of 11,238,869 and 24 of 590,407 positive rows, including Senegal 2018-19's three float residues near 1e-19 (2026-11-04). Same lever and accessor |
+| `food_prices` (GH #1493) | `Price` takes the upper rule under its own name, `quantity_reports(table='food_prices')`: 941 of 5,347,847 rows (0.018%), naming Senegal's two prices near 1e22 and Mali 2014-15's sentinel-sized ones. Not the lower tail: a low price is a high quantity, already named |
+| scope | `crop_production.Quantity`, `food_acquired.Quantity` (#884), `plot_features.Area` (#879) and `food_prices.Price` (#1493); `_SCREENED_COLUMNS` and `_NEAR_ZERO_COLUMNS` are the extension points. Every `crop_production` row with a finite quantity finds a reference at some rung; the 68,192 that are never judged have no finite quantity (GhanaLSS's 37,280 among them) |
 
 ## Site I: a NaN on a DECLARED INDEX LEVEL (`null_index_audit.py`, GH #847)
 
