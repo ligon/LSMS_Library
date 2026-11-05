@@ -744,7 +744,7 @@ class TestDelivered:
         summ = delivered.attrs['derivations'][COUNTRY]
         assert set(summ) - OFF_LADDER == set(KEYS) | {DEL}
         for key in KEYS:
-            assert summ[key]['rows'] == int((delivered['Derivation'] == key).sum())
+            assert summ[key]['rows'] == _keys_of(delivered).get(key, 0)
             assert summ[key]['in'] == 'crop_production'
         assert summ[DEL]['rows'] == 0
 
