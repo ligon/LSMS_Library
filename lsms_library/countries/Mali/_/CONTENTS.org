@@ -2788,13 +2788,12 @@ codes serve 84 labels.
 | household (j, u) cells with a community price, of 433 / 910 / 910 |     34 |    33 |    216 |
 | household rows in those cells, of 162,032                  | 28,167 | 25,392 | 68,830 |
 
-*216 of 910 is not the limit of the join.*  The remaining gap is on =j=, and only part of it is a different product list.  21
-of the 57 priced products share a source code with the household and carry a different =j=, because every =s07bq01= label of
-this wave carries seven leading spaces and so never reaches =harmonize_food=: those products pair at 98.4% on raw codes, and hold
-42,753 of the 117,453 code-level hits.  41,556 consumption rows are on products the form does not list.  That is a defect of its
-own, predating this change, and fixing it moves household labels, which this ruling excluded: GH #1513.  It would take the join to
-294 of 835 cells and 103,747 rows if the label is stripped before mapping, or 342 of 910 and 109,838 if community =j= is bridged by
-product code.
+*216 of 910 was not the limit of the join.*  The remaining gap was on =j=, and only part of it is a different product list.  21
+of the 57 priced products share a source code with the household and carried a different =j=, because every =s07bq01= label of
+this wave carries seven leading spaces and so never reached =harmonize_food=: those products pair at 98.4% on raw codes, and hold
+42,753 of the 117,453 code-level hits.  41,556 consumption rows are on products the form does not list.  That was a defect of its
+own, predating this change, and fixing it moved household labels, which this ruling excluded.  GH #1513 has since fixed it: 294 of
+835 cells, 103,360 rows; see the last section of this file.
 
 The joins pair the same units.  On the served label, 167 cells with a household unit value: median ratio 1.00, 94.6% in [0.5, 2],
 and Grand against Petit as a placebo gives 2.55 and 0.38.  Same-cluster, 41,963 household rows find a (v, j, u) price.  A price on
@@ -3334,3 +3333,43 @@ hook now serves =d= in vague 1 and =e= in vague 2, and raises =ShockLayoutError=
 release stops showing this layout.  True share 0.632 -> 0.736; 2,197 of 9,837 rows change, all in
 vague 2.  So =AffectedConsumption= is comparable across vagues and with 2021-22 only
 from this change on.
+* 2026-11-05 -- 2018-19 food labels reach =harmonize_food= (GH #1513)
+
+Every =s07bq01= label of 2018-19 carries seven leading spaces, and the =mappings:= lookup in =data_info.yml= is exact, so =j= was served
+as the source's own label, padding stripped later by =format_id=, and never mapped.  Ruling @ligon 2026-11-05, in its own PR.
+=mapping.j= strips the label, and =Wave.column_mapping= chains a function named for the level before the lookup.  All 138 stripped
+labels are in the table, 57 of them rename, on 62,680 source rows.  No other Mali wave's file is padded.
+
+*The fold.*  Nine of the table's groups are many-to-one (=Arachide= takes 4 source labels, =Poisson frais= 4), as they already are in
+2021-22, so =j= goes 138 -> 125.  Core sums rows that meet on the declared index and joins their =Derivation=: conserved, not selected.
+
+Cold, =111b64ed7= against =309cc7b48=.  20 of the 23 frame tables are equal whole, row order and dtypes included, and =panel_ids= and
+=updated_ids= are equal.  Three derived food tables move with =food_acquired=:
+
+| table               | 2014-15                 | 2018-19                     | 2021-22                 |
+|---------------------+-------------------------+-----------------------------+-------------------------|
+| =food_acquired=     | equal                   | rows 162,032 -> 161,212     | equal                   |
+| =food_expenditures= | equal                   | rows 103,931 -> 102,968     | equal                   |
+| =food_quantities=   | 22.3% of rows, kg -0.09% | rows 162,032 -> 159,896, kg +0.54% | 16.1% of rows, kg -0.28% |
+| =food_prices=       | 21.8% of rows           | rows 103,931 -> 103,513     | 15.9% of rows, median 675 -> 674 |
+
+- *=food_acquired= moved by label and sum alone.*  =Quantity= and =Expenditure= are unchanged on every (t, v, i, u, s) cell of 2018-19, and
+  in total by =s= (=Expenditure= 89,614,678.64).  Purchased rows 129,598 -> 129,085, in-kind 16,459 -> 16,413, produced 15,975 -> 15,714.
+- *=food_quantities= and =food_prices= move in OTHER waves, and that is not a label.*  The kilograms are inferred per (j, u) pooled across
+  waves (GH #850, #1487), so 2018-19 rows now vote in the cells of the foods they share with 2014-15 and 2021-22.  Rows keep their
+  labels and their native quantities; only the inferred factor moves.  Median ratio on moved rows: quantity 1.002 and 1.012, p5 to p95 0.80
+  to 1.04 and 0.73 to 1.13, price 0.998 and 0.988.  Largest cells by rows: =Gombo=, =Thé en paquet ou en sachet=, =Oignon=, =Poisson fumé=.
+  Whether the new factors are better was not scored.
+- *=labels='Aggregate'= cannot move*: Mali's table has no such column, so =LabelUnavailableError= before and after.
+
+| 2018-19, on served frames                                  | before | now     |
+|------------------------------------------------------------+--------+---------|
+| household (j, u) cells with a community price              | 216 of 910 | 294 of 835 |
+| household rows in those cells                              | 68,830 of 162,032 | 103,360 of 161,212 |
+| community rows meeting a household cell, of 109,338        | 57,600 | 81,866  |
+| household rows with a same-cluster (v, j, u) price         | 41,963 | 65,037  |
+| rows whose =j= occurs in a neighbouring wave               | 58.2%  | 96.1%   |
+| crop rows on a same-wave food =j=, of 7,992                | 3,064  | 5,795   |
+
+The issue's 103,747 rows is the pre-sum count; these 103,360 are served rows.  A bridge by product code would reach further, 342 of 910, but
+the labels now agree without one.  =ehcvm_nsu= on =isa/ehcvm-1452-20261104=, if it merges, joins by source code and does not read =j=.
