@@ -83,11 +83,12 @@ df = pd.DataFrame({
 })
 
 # --- the dry season (section 3E, GH #1462; registered in _/derivations.yml) -----
-# A crop line (as03eq01) with no field or parcel.  as03eq09a and as03eq11a are per
-# cycle (Stata: "en moyenne pour chaque cycle"; the English instrument and DDI: "the
-# first cycle") beside the count as03eq06.  as03eq09c, "Quantity in Kgs", is a line
-# total and not per-unit (kg equals the quantity on 5 of 7 Kg lines, kg/quantity is
-# 88 on a 100 kg sack), so it stays unwired, as its rainy twin does (GH #1436).
+# The 2010/11 contre-saison, asked in passage 1.  A crop line (as03eq01) with no field
+# or parcel.  as03eq09a and as03eq11a are per cycle (the English instrument and DDI:
+# "the first cycle"; the Stata label "en moyenne pour chaque cycle" is a template, the
+# rainy as02eq07a has it too) beside the count as03eq06.  as03eq09c, "Quantity in Kgs",
+# is a line total and not per-unit (kg equals the quantity on 5 of 7 Kg lines, a median
+# 86.7 per 100 kg sack), so it stays unwired, as its rainy twin does (GH #1436).
 # One row of 576 is byte-identical to another, with one (hid, line): the same
 # record, dropped as the s16d repeats are, or the line token would repeat.
 dry = get_dataframe(

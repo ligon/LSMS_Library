@@ -2626,15 +2626,24 @@ the BID does not describe.
 the contre-saison by type of crop" (=ECVMA_Quest_AGR_P1_V10_eng.pdf=, table of contents).  576 rows,
 271 households, read nowhere until the wiring below, so =crop_production= 2011-12 was the rainy
 season only.  Its shape differs from the rainy module: a crop line (=as03eq01=), no field or parcel;
-the quantity is "en moyenne pour chaque cycle" (=as03eq09a=, unit =as03eq09b= on 551, kg =as03eq09c=
-on 553) beside a cycle count =as03eq06= (=as03eq07=, the gap between cycles, is filled on 49); a
-sale on 457-463 rows (=as03eq11a/b/c=, =as03eq12=).
+the quantity is per cycle (=as03eq09a=, unit =as03eq09b= on 551, kg =as03eq09c= on 553) beside a
+cycle count =as03eq06= (=as03eq07=, the gap between cycles, is filled on 49); a sale on 457-463 rows
+(=as03eq11a/b/c=, =as03eq12=).
 
 *2014-15 has no such module, and =ECVMA2_AS03P1= is not one.*  It is section 3, "Equipements pour
 l'agriculture" (=AS03Q01= "Type d'équipement"; 45,570 rows).  =ecvma2_quest_agr_p1.pdf= has sections
-2A-2C and 3 and no dry-season production; =ecvma2_as2dp2.dta= asks only contre-saison costs
-(=AS02DQ03=, =AS02DQ05=).  So no 2014-15 dry-season harvest exists in the held files or the held
-instruments, and =crop_production= 2014-15 is not missing one.
+2A-2C and 3 and no dry-season production.  So no 2014-15 dry-season harvest exists in the held files
+or the held instruments, and =crop_production= 2014-15 is not missing one.
+
+CORRECTION (2026-11-04, review of GH #1462).  This entry used to say =ecvma2_as2dp2.dta= "asks only
+contre-saison costs", on the strength of =AS02DQ03='s Stata label ("Au cours de la contre-saison (juin
+2014-décembre 2014)").  That label is stale.  The questionnaire (=ecvma2_quest_ag_el_p2.pdf=) heads
+section 2D "AUTRES CHARGES RELATIVES AUX ACTIVITES AGRICOLES DE SAISON DEL PLUIES" and asks "Au cours de
+la saison des pluies (juin 2014-".  1,003 of its 1,903 households answer yes on some line.  So the
+conclusion holds and is stronger: section 2E is headed "QUANTIFICATION DE LA PRODUCTION DE SAISON DES
+PLUIES", and the only dry-season trace in the held files is =AS01Q32= in =ECVMA2_AS1P1.dta= ("Mode
+d'exhaure sur cette parcelle pendant la contre saison"), filled on 339 parcels of 180 of 2,168
+households.
 
 *RULED (@ligon, 2026-11-04): 3E is served.*  575 rows, 271 households, all on =plot_id =
 'Farm-level'= (the question is "all fields combined"), =production_obs = reported:3E:<as03eq01>=.
@@ -2642,14 +2651,22 @@ They are the wave's only =Farm-level= rows; Niger has no =season= level, so that
 =Derivation= are how to tell them apart.  =Feature()= gives them =unknown_season= with the rest.
 
 *Idiosyncrasies.*
-- *The two languages word the quantity differently.*  The Stata label says "en moyenne pour chaque
-  cycle".  The held English questionnaire (3E.9, 3E.11, printed pp. 27-28) and the DDI's English file
-  say "during the first cycle of production".  The ruled =Quantity = as03eq09a x as03eq06=
-  (=Niger::crop_production::dry-season-cycle-total=) is the season's harvest on the first wording and
-  an extrapolation on the second.  It only matters on 48 rows: 49 have two to four cycles, one with
-  no harvest.  The file cannot say which: on the 23 multi-cycle rows whose disposition units all match,
-  the dispositions sum to =as03eq09a= on 18 and to the product on none, so all these answers are on one
-  per-cycle footing, first or average.
+- *The wave pools two seasons.*  3E.2 prints "2010/11 contre-saison (December 2010 - May 2011)", and 394
+  of the 575 lines were first seeded in 2010.  Section 3E is asked in passage 1 and the rainy module in
+  passage 2, and both are served under =t = 2011-12=.  22 of the 271 households have no row in the rainy
+  file.
+- *The wording does not settle the reference.*  The held English questionnaire (printed pp. 27-29) says
+  "first cycle" on 3E.8, 3E.9 and 3E.11 and "on average for the first cycle" on 3E.19-22; 3E.6 and 3E.12
+  state no such window.  The DDI's English file agrees.  The Stata label on =as03eq09a=, "en moyenne pour
+  chaque cycle", reads as an average, but it is not independent evidence for one: the rainy =as02eq07a=
+  carries the same label in a module with no cycle question, whose English label says "on this plot", so
+  it is a template, and which way the copy ran is unknown.  The French instrument is not held.  The ruled
+  =Quantity = as03eq09a x as03eq06= (=Niger::crop_production::dry-season-cycle-total=) is the season's
+  harvest on an average and an extrapolation on the first cycle, and it stands.  It matters on 48 rows
+  (49 have two to four cycles, one with no harvest), 43,204 kg: 6.3% of 3E's kilograms, 3.4% of the
+  wave's.  On the 23 multi-cycle rows whose disposition units all match, the dispositions sum to
+  =as03eq09a= on 18 and to the product on none, so the answers share one per-cycle footing, first or
+  average.
 - *The sale keeps its recorded window* (=dry-season-sale-window=, an identity, the Mali tree shape):
   =as03eq11a= per cycle, =as03eq12= with none stated.  On a multi-cycle row (42 with a sale)
   =Quantity_sold / Quantity= is not a sold share.
@@ -2657,23 +2674,37 @@ They are the wave's only =Farm-level= rows; Niger has no =season= level, so that
   =as03eq11c= 39 confirm the width) where =as02eq07a= uses 999999; =as03eq12= uses 9999999 (1 row).
 - *One row is byte-identical to another*, with one (hid, line), and is dropped as the s16d repeats are.
 - *=as03eq09c= is a line total, not per-unit, and stays unwired.*  Kg equals the quantity on 5 of 7
-  =Kg= rows, and kg / quantity is a median 88 on a 100 kg sack, 50 on a 50 kg sack.  The same shape as
-  its rainy twin, so it belongs with the =Quantity_kg= ruling of GH #1436, multiplied like =Quantity=.
-- *Zero harvests.*  25 rows record =as03eq09a = 0= with no unit: =Quantity= 0, =u = 'Unknown'=, as
-  recorded.  9 of them carry a positive sale value and 4 a sold quantity; and 6 rows answering "no
-  sale" (=as03eq10 = 2=) carry a sale value.  Not repaired.
+  =Kg= rows, and kg / quantity is a median 86.7 on a 100 kg sack (187 rows, the code masked; 90 with it
+  in) and 50 on a 50 kg sack.  The same shape as its rainy twin, so it belongs with the =Quantity_kg=
+  ruling of GH #1436, and it is per cycle too, so that wiring must multiply it by =as03eq06= like
+  =Quantity=.
+- *"Zero" harvests are not the rainy module's zeros.*  25 rows record =as03eq09a = 0= with no unit:
+  =Quantity= 0, =u = 'Unknown'=, as recorded.  19 of the 25 show output elsewhere on the line (a sale
+  value on 9, consumption on 13, gifts on 9, seed on 5, a sold quantity on 4, feed on 4, kilograms on 2),
+  where the rainy module's 3,145 zero lines have no kilograms, sold quantity or value at all.  So a 3E
+  zero does not read as "no harvest".  And 6 rows answering "no sale" (=as03eq10 = 2=) carry 3,728,500
+  FCFA.  Not repaired.
 - *=carotte= was missing from =harmonize_food=* (12 rows; the crop code has no rainy use).  Added.
 
-*What it does to the kilograms: read this before using 2011-12 =harvest_kg=.*  =Sac de 100 kg= is
-in =metric= at its nominal weight, and 3E's rows are sacks where the rainy module's are mostly =Tiya=
-and =Botte=, which have no factor.  So 3E adds 689,743 kg to the wave's 595,825.5: 1,285,568.5 kg, up
-115.8%, from 329 rows with a factor against the rainy module's 1,885.  By unit, =Sac de 100 kg= is
-564,700 kg, of which =Poivron frais= and =Oignon frais= hold most, and the survey's own kilograms say
-less: on 187 =Sac de 100 kg= rows the nominal weight gives 489,100 kg a cycle and =as03eq09c= 271,054.
-Nothing is trimmed; the row is what was recorded, and the sack's weight is the =metric= rung's reading.
-=Value_sold= moves as far: 42,683,590 -> 132,213,940 FCFA, so 3E holds two thirds of the wave's sale
-value.  =crop_diversity(weight='count')= goes from 2,252 households, mean 0.916, to 2,274, mean 0.964:
-the 22 new ones are in 3E and not in the rainy module.  Cold, base =b95e927f3=.
+*What it does to the kilograms: read this before using 2011-12 =harvest_kg=.*  It goes from 595,825.5
+to 1,285,568.5 kg, up 115.8%, and that is mostly coverage, not production.  =Sac de 100 kg= is in =metric=
+at its nominal weight, and 3E's rows are sacks where the rainy module's are mostly =Tiya= and =Botte=,
+which have no factor: =metric= reads 21% of the rainy module's positive rows (1,885 of 8,822) and 60% of
+3E's (329 of 549).  On the survey's own kilograms (=as02eq07c= 1,583,324; =as03eq09c= x cycles 532,518) 3E
+is 25.2% of the wave, a rise of 33.6%, against 53.7% as served.  By unit, =Sac de 100 kg= is 564,700 of
+3E's 689,743 kg, and the survey says less: on 187 such rows the nominal weight gives 489,100 kg a cycle and
+=as03eq09c= 271,054.  Only 2011-12 gains a dry season, so its kilograms are not comparable across waves
+until the =survey_kg= rung of GH #1436 lands.  Nothing is trimmed.
+
+=Value_sold= goes 42,683,590 -> 132,213,940 FCFA, so 3E holds 67.7% of the wave's sale value.
+=crop_diversity(weight='count')= goes from 2,252 households, mean 0.916, to 2,274, mean 0.964: the 22 new
+ones are in 3E and not in the rainy module.  =weight='value'= goes from 693 households to 848, mean 0.159
+to 0.225.  Cold, base =b95e927f3=.
+
+*Unread, and recorded as such.*  3B, 3C and 3D (dry-season parcels, inputs and costs), so 2011-12
+=nitrogen_kg= is rainy-only while =crop_production= is not.  =as03eq08=, 3E's own area, so 3E's kilograms
+have no yield.  Separately, =Oignon frais= is 186 rows in 2011-12, 94 in 2014-15, 114 in 2018-19 and 4 in
+2021-22; the last is unexplained.
 
 *=Condition_sold= (2018-19 =s16cq16c=, 2021-22 =s16dq05d=).*  The state of what was sold, a separate
 answer from =condition=, read through the same =harmonize_crop_condition_*= tables.  Column, so NA on
@@ -2685,7 +2716,8 @@ harvest's under other labels (=épis/coques/panicules=, =grains=, =na=).  Served
 | 2018-19 |     2,185 |         722 |                    319 | 3,226 |
 | 2021-22 |       937 |         323 |                      5 | 1,265 |
 
-161 of the 3,226 fold differently from their harvest state in 2018-19.  2021-22's sale is crop-level
+161 of the 3,226 fold differently from their harvest state in 2018-19, and 105 of the 1,265 in 2021-22 (85
+=unshelled= -> =shelled=, 18 the reverse).  2021-22's sale is crop-level
 and reaches a row only where the pair has one harvest line (GH #1360), so its state does too; no pair
 sells in two states, so the sale attribution does not move.  2018-19's five answers fold to three here
 as on the level (ruling GH #1436), and no native sold column is served.  Burkina Faso and Mali carry

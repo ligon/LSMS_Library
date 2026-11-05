@@ -128,11 +128,13 @@ class TestDeclared:
         assert callable(resolve_callable(record["inputs"]))
 
     def test_the_multi_cycle_wording_is_a_choice_not_a_reading(self):
-        # The Stata label says an average, the English instrument the first cycle.
+        # The English instrument says the first cycle.  The Stata label says an
+        # average, and it is a template: the rainy as02eq07a carries it too.
         record = records_for(COUNTRY, TABLE)[TOTAL]
         first = record["assumptions"][0]
         assert first["basis"] == "modelling-choice"
         assert "first cycle" in first["text"] and "en moyenne" in first["text"]
+        assert "as02eq07a" in first["text"] and "template" in first["text"]
 
 
 def _read(wave, name, **kw):

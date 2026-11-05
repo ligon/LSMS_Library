@@ -226,21 +226,24 @@ Niger::crop_production::dry-season-cycle-total:
   raw_variables: [hid, as03eq01, as03eq03, as03eq06, as03eq09a, as03eq09b]
   assumptions:
     - text: >-
-        every cycle of a crop yields what as03eq09a records.  The sources word that
-        answer two ways.  The Stata label says an average: "quantite en uml de ce
-        produit avez-vous recolte en moyenne pour chaque cycle", and then the
-        product is the season's harvest.  The English questionnaire and the DDI's
-        English file say the first cycle: 3E.9 "How much of this produce did you
-        harvest during the first cycle of production?", "Quantity harvested during
-        the first cycle of production", and then the product extrapolates the first
-        cycle over the later ones.  No held file says which was fielded; the French
-        instrument is not held.  Ruled on the first wording, recorded with the
-        second.
+        every cycle of a crop yields what as03eq09a records.  The English
+        questionnaire says the first cycle: 3E.9 "How much of this produce did you
+        harvest during the first cycle of production?", likewise 3E.8 and 3E.11, and
+        3E.19-22 "on average for the first cycle"; the DDI's English file agrees.
+        On that wording the product extrapolates the first cycle over the later
+        ones.  The Stata label, "quantite en uml de ce produit avez-vous recolte en
+        moyenne pour chaque cycle", would make it the season's harvest, but it is not
+        independent evidence for an average: the rainy as02eq07a carries the same
+        label in a module with no cycle question, whose English label says "on this
+        plot", so it is a template, and which way the copy ran is unknown.  The French
+        instrument is not held.  The ruled product stands, on 48 rows and 43,204 kg:
+        6.3% of section 3E's kilograms and 3.4% of the wave's.
       basis: modelling-choice
       evidence: >-
-        ecvmaas3e_p1.dta variable labels; ECVMA_Quest_AGR_P1_V10_eng.pdf, Section
-        3E, printed pp. 27-29; ddi-documentation-english_microdata-2050.pdf; ruling
-        @ligon 2026-11-04 on GH #1462.
+        ecvmaas3e_p1.dta and ecvmaas2e_p2.dta variable labels;
+        ECVMA_Quest_AGR_P1_V10_eng.pdf, Section 3E, printed pp. 27-29;
+        ddi-documentation-english_microdata-2050.pdf; ruling @ligon 2026-11-04 on GH
+        #1462.
     - text: >-
         as03eq09a == 99999 is a "don't know", masked before the product, never on
         the total.  It is unlabelled, and a different width from the rainy module's
@@ -276,10 +279,10 @@ Niger::crop_production::dry-season-sale-window:
   assumptions:
     - text: >-
         preserve the reported sale without choosing a window for the value.  Stata
-        labels as03eq11a "vendu en moyenne pour chaque cycle" and as03eq12 "montant
-        tire de la vente de ce produit"; the English instrument asks 3E.11 "during
-        the first cycle of production" and 3E.12 "the amount received from the sale
-        of this product".  Over the 19 crop-unit cells priced on both kinds of row
+        labels as03eq11a "vendu en moyenne pour chaque cycle" (the template of the
+        harvest assumption) and as03eq12 "montant tire de la vente de ce produit";
+        the English instrument asks 3E.11 "during the first cycle of production" and
+        3E.12 "the amount received from the sale of this product".  Over the 19 crop-unit cells priced on both kinds of row
         (39 multi-cycle rows, thin), the median cell's multi-cycle unit value is 1.17
         times its one-cycle unit value, which does not look like a total over cycles
         and does not settle it.
