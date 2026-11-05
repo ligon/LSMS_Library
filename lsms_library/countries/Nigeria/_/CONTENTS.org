@@ -2549,7 +2549,7 @@ household and served crop can hold two records.
 | two records, one unit: quantity and value summed | 60 | 22 | 26 |
 | two records, two units: value summed, quantity withheld | 13 | 14 | 7 |
 
-The partition is per SERVED row, after the keep-first dedup; the sweep's earlier
+The partition is per SERVED row, on the one line per (plot, crop) served then; the sweep's earlier
 figures (749 / 1,050 / 683 on two or more plots) were per raw plot.  Against the first
 build, which counted served rows whatever they stated, ruling A moves 64 / 94 / 57
 household-crops (N1.5M / N3.4M / N8.8M, 1.2% of value) onto their one harvesting row,
@@ -2771,7 +2771,7 @@ harvest, and the rows are now every line.
   plot, and the rule does not pick a line.  They used to sit on whichever line came
   first.  Of the 42 with one sale record, 12 sat on a line of a different code from the
   one sold.  A sale's own code would place 202 of their 204 records on their own line,
-  but that is a different grain from the one ruled (the report's memo, GH #1433).
+  but that is a different grain from the one ruled, and it is left for a ruling.
 - Conservation holds: =Value_sold=, =Quantity_sold=, =Unit_sold= and =KgFactor_sold=
   are unchanged on every household-crop in W3-W5, none is on two rows, every attached
   row has a positive =Quantity= and a line token, and no Farm-level row has either.
