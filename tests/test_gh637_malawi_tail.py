@@ -238,7 +238,8 @@ class TestRepeatedRecords:
 HARVEST_NA = {'2010-11': 32, '2013-14': 284, '2016-17': 200, '2019-20': 276}
 HARVEST_ZERO = {'2010-11': 1258, '2013-14': 310, '2016-17': 3723, '2019-20': 3349}
 #: 2010-11 fell by 67 = 42 (Module G repeats) + 25 (the Module P repeat).
-HARVEST_SUM = {'2010-11': 970_088.8, '2013-14': 257_839.0,
+#: GH #1457: + 1 kg-unit + 436 from sugar cane's Modules P rows, restored by 1039 -> 39.
+HARVEST_SUM = {'2010-11': 970_089.8, '2013-14': 258_275.0,
                '2016-17': 1_871_058.4, '2019-20': 1_260_873.9}
 #: Seed Quantity per wave.  At #637-tail time (2026-10-23) these were
 #: 830,067.4 / 324,288.5 / 827,722.99 / 1,134,377.2; #1323 (GH #1298) serves
@@ -426,7 +427,7 @@ class TestRawOracle:
                 native = pd.to_numeric(df[col], errors='coerce')
                 code = native
                 if perennial:
-                    code = (code + 1000).replace({1100: 1001, 1021: 1018})
+                    code = (code + 1000).replace({1100: 1001, 1021: 1018, 1039: 39})
                 c = (pd.to_numeric(df['ag_g13c'], errors='coerce').map(cond).fillna(UNK)
                      if mod == 'g' else pd.Series(UNK, index=df.index))
                 u = pd.to_numeric(df['ag_g13b' if mod == 'g' else 'ag_p09b'], errors='coerce').map(unit)

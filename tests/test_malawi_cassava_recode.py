@@ -137,8 +137,9 @@ class TestDelivered:
         its own row, which added rows to every wave and is not this recode.
         """
         tot = cp.reset_index().groupby('t').size()
-        assert int(tot['2010-11']) == 33549
-        assert int(tot['2013-14']) == 12671
+        # GH #1457 re-pin: + 1 / + 23 Module P rows of sugar cane, 1039 -> 39.
+        assert int(tot['2010-11']) == 33549 + 1
+        assert int(tot['2013-14']) == 12671 + 23
 
     def test_recoded_native_codes_occur_only_in_ihs4_ihs5(self, cp):
         """The rule itself, on the native code `production_obs` now serves."""
@@ -157,3 +158,11 @@ class TestDelivered:
         vocabulary after the fix (the filter drops, but should now have
         nothing to drop)."""
         assert cp.reset_index()['crop'].notna().all()
+
+
+class TestSugarCane:
+    """GH #1457 review: Modules P and Q list sugar cane under its seasonal code 39."""
+
+    def test_code_39_of_the_perennial_modules_is_sugar_cane(self, malawi_mod):
+        assert malawi_mod._PERENNIAL_RECODE[1039] == 39
+        assert _perennial_label(malawi_mod, 39) == 'Sugar Cane'

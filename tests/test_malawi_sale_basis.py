@@ -78,7 +78,8 @@ SINCE = {OV: '2026-09-25', NR: '2026-09-25'}
 #: 198) and the from-price key's harvest side refused what OV now carries.
 ROWS = {
     '2010-11': {W: 949, P: 1, OV: 0, N: 5, NR: 117, CS: 67, CH: 19},
-    '2013-14': {W: 344, P: 0, OV: 0, N: 0, NR: 11, CS: 18, CH: 9},
+    # W 344 before GH #1457: sugar cane's 13 Module Q sales now reach their Module P rows.
+    '2013-14': {W: 357, P: 0, OV: 0, N: 0, NR: 11, CS: 18, CH: 9},
     '2016-17': {W: 521, P: 8, OV: 2, N: 42, NR: 37, CS: 46, CH: 23},
     '2019-20': {W: 1142, P: 29, OV: 2, N: 67, NR: 131, CS: 84, CH: 51},
 }
@@ -98,7 +99,8 @@ ROWS = {
 #: 409,090,925) and 2019-20 by +120,000 (527,653,548 -> 527,773,548).
 VALUE_SOLD_BEFORE = {'2010-11': 126_816_048.0, '2013-14': 94_338_845.0,
                      '2016-17': 394_826_755.0, '2019-20': 496_063_698.0}
-VALUE_SOLD_AFTER = {'2010-11': 130_679_005.0, '2013-14': 95_010_945.0,
+#: GH #1457: 2013-14 + 329,000, sugar cane's 13 Module Q sales on their Module P rows.
+VALUE_SOLD_AFTER = {'2010-11': 130_679_005.0, '2013-14': 95_339_945.0,
                     '2016-17': 410_017_725.0, '2019-20': 529_712_448.0}
 #: #1373 (see ROWS) moved these by +28,900 / +18,200 / +50,000 / +276,500 =
 #: +373,600 MWK from 130,650,105 / 94,992,745 / 409,967,725 / 529,435,948.
@@ -136,7 +138,8 @@ UNRESOLVED_GROUNDS = {'contradiction_no_separation': 271,
                       'claimed_by_tier_a': 0}
 #: One row per native crop code since #1373 (0377b733b); was 33,420 / 12,616 /
 #: 37,170 / 51,872.  `test_gh637_malawi_tail.py`'s raw oracle derives these.
-TOTAL_ROWS = {'2010-11': 33_549, '2013-14': 12_671, '2016-17': 37_177, '2019-20': 51_973}
+#: + 1 / + 23 for GH #1457: Module P rows of sugar cane, 1039 -> 39.
+TOTAL_ROWS = {'2010-11': 33_550, '2013-14': 12_694, '2016-17': 37_177, '2019-20': 51_973}
 
 
 @pytest.fixture(scope='module')

@@ -1151,8 +1151,12 @@ _MONTH_CODES = {i: i for i in range(1, 13)}  # months stored as 1-12 ints
 #: (Module Q `crop_code`) did NOT take the recode -- it still codes cassava
 #: 1 and other 18 in those waves (its rows are dropped downstream when no
 #: harvest row carries their code, i.e. "planted but no harvest reported").
+#: 1039 -> 39: Modules P and Q list sugar cane under its SEASONAL code 39 (2013-14
+#: Module I labels 39 SUGAR CANE; its P / Q columns carry the code with no label; 23 P
+#: rows and 13 Q sales there, 1 P row in 2010-11; 12 of the 13 sold by the ox-cart, GH
+#: #1457).  `harmonize_crop` has 39 and no 1039.
 _PERENNIAL_RECODE = {1100: 1001, 1021: 1018, 2800: 2800, 2900: 2900,
-                     3000: 3000}
+                     3000: 3000, 1039: 39}
 
 
 def _crop_codes(series, perennial=False):
@@ -1568,12 +1572,13 @@ def _sale_block(df, *, hhid, cropcode, sold_flag, qty_sold, value_sold,
         'condition_sold': cond_sold.values,
         'Quantity_sold':  qs.values,
         'Value_sold':     vs.values,
+        '_from_module_q': perennial,
     })
     keep = out['_crop_code'].notna().to_numpy()
     out = out[keep]
     grp = out.groupby(['i', '_crop_code', 'u', 'condition_sold'],
                       as_index=False, dropna=False).agg(
-        {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
+        {'Quantity_sold': 'sum', 'Value_sold': 'sum', '_from_module_q': 'max'})
     # Counted on the module's LINES, before the groupby sums them.
     grp.attrs['unit_text_recovered'] = _recovered_counts(recovered_to[keep])
     return grp
@@ -1921,8 +1926,10 @@ def _attach_sales(t, harv, sale):
     if 'condition_sold' not in sale.columns:
         sale['condition_sold'] = _CONDITION_UNKNOWN
     sale['condition_sold'] = sale['condition_sold'].astype('string')
+    if '_from_module_q' not in sale.columns:     # a frame not from `_sale_block`
+        sale['_from_module_q'] = pd.to_numeric(sale['_crop_code'], errors='coerce').ge(1000).fillna(False)
     sale = sale.groupby(skey, as_index=False, dropna=False).agg(
-        {'Quantity_sold': 'sum', 'Value_sold': 'sum'})
+        {'Quantity_sold': 'sum', 'Value_sold': 'sum', '_from_module_q': 'max'})
     sale['_srow'] = range(len(sale))
 
     # A sale does not reach an `unknown_plot` row (GH #1476).  Its rows
@@ -1998,7 +2005,7 @@ def _attach_sales(t, harv, sale):
     assert len(harv) == n_harv, 'the sale attach must not change rows'
 
     # --- per-sale decisions -------------------------------------------------
-    dec = sale.set_index('_srow')[skey + ['Quantity_sold', 'Value_sold']].copy()
+    dec = sale.set_index('_srow')[skey + ['Quantity_sold', 'Value_sold', '_from_module_q']].copy()
     dec['crop'] = pd.Series(pairs.groupby('_srow')['crop'].first()).reindex(dec.index)
     dec['outcome'] = None
     dec['rung'] = None
@@ -2191,15 +2198,17 @@ def _production_obs_of_sale(sale):
     """``reported:<I|Q>:<code>`` of a sale's own record; a repeat is told apart.
 
     The module that asked, and the code on the shared axis (a perennial code less its
-    offset, after the GH #869 recode).  A household can hold two records of one code,
-    in two units or states, and each keeps its own row: repeated IDs suffix EVERY
-    occurrence with ``/row:<n>``, the zero-based order within the household and code
-    (the canonical grammar, ``data_info.yml``, ``production_obs``).
+    offset, after the GH #869 recode; sugar cane's 39 is 39 in either module).  A
+    household can hold two records of one code, in two units or states, and each keeps
+    its own row: repeated IDs suffix EVERY occurrence with ``/row:<n>``, the zero-based
+    order within the household and code (the canonical grammar, ``data_info.yml``,
+    ``production_obs``).
     """
     code = pd.to_numeric(sale['_crop_code'], errors='coerce').astype('Int64')
-    perennial = code.ge(1000).fillna(False)
-    token = ('reported:' + pd.Series(np.where(perennial, 'Q', 'I'), index=sale.index, dtype='string')
-             + ':' + code.where(~perennial, code - 1000).astype('string'))
+    module_q = sale['_from_module_q'].astype('boolean').fillna(False).to_numpy(dtype=bool)
+    native = code.where(code.lt(1000).fillna(True), code - 1000)
+    token = ('reported:' + pd.Series(np.where(module_q, 'Q', 'I'), index=sale.index, dtype='string')
+             + ':' + native.astype('string'))
     keys = [sale['i'], code]
     n = token.groupby(keys).transform('size')
     nth = token.groupby(keys).cumcount().astype('string')
@@ -2214,8 +2223,7 @@ def _farm_level_sales(t, decisions):
     two or more plots, a crop with no harvest row, a sale in a unit no row of its one
     plot uses (GH #824), and one the ladder refused for its basis (GH #833).  Also one
     the ladder attached to a harvest row that is then dropped because its crop code
-    is in no table (2013-14 Module P/Q code 39, unlabelled in the file: 13 sales,
-    329,000 MWK).  Unit and state are the sale's own, in ``Unit_sold`` /
+    is in no table.  Unit and state are the sale's own, in ``Unit_sold`` /
     ``Condition_sold``.  ``u``, ``condition`` describe a harvest, which this row does
     not have, so they are the sentinels.  One row per ``_sale_block`` record: no sale is
     split, or summed further.
@@ -2249,7 +2257,7 @@ def _farm_level_sales(t, decisions):
         'harvest_month': pd.Series(pd.NA, index=sale.index, dtype='Int64'),
         'intercropped': pd.Series(pd.NA, index=sale.index, dtype='boolean'),
         # A property of the module that asked, as on every harvest row.
-        'perennial': code.ge(1000).astype('boolean'),
+        'perennial': sale['_from_module_q'].astype('boolean'),
         'Quantity_sold': pd.to_numeric(sale['Quantity_sold'], errors='coerce').astype('Float64'),
         'Value_sold': pd.to_numeric(sale['Value_sold'], errors='coerce').astype('Float64'),
         'Unit_sold': sale['u'].astype('string'),

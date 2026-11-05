@@ -5306,7 +5306,7 @@ and filled on every row holding a sale: on a harvest row =Unit_sold= is =u=, by 
 | one row, in another unit    | 1,270 ( 10,755,325)|   439 (15,577,035)| 1,507 ( 55,219,866)| 1,638 ( 44,785,341)|
 | crop has no harvest row     |    78 (  1,166,015)|    34 (   583,150)|   225 ( 23,036,706)|   120 (  5,847,558)|
 | ladder refused (unresolved) |    94 (  1,088,250)|    21 (   315,300)|    89 (  6,009,600)|   137 (  6,244,030)|
-| harvest row has no crop code|     0              |    13 (   329,000)|     0              |     0              |
+| sugar cane, code 39 (below) |     0              |    13 (   329,000)|     0              |     0              |
 |-----------------------------+--------------------+-------------------+--------------------+--------------------|
 | all, equal to the raw sum   | 7,379 (154,828,145)| 2,598 (123,203,210)| 7,412 (656,847,268)|11,179 (744,822,865)|
 
@@ -5318,7 +5318,8 @@ and filled on every row holding a sale: on a harvest row =Unit_sold= is =u=, by 
 - *One row, in another unit: 4,854 records, 126.34M MWK, are NOT on their row, and that is a decision for @ligon.*  Nigeria's shape puts such a sale on the one row, in its own
   =Unit_sold=.  Here GH #824 and #833 already ruled the other way, on evidence: 916 of them say harvest unshelled and sold shelled, so the row would hold a sale on another
   basis as well as in another unit.  Built to override nothing; the plot is lost on these sales.  See the report's memo.
-- *13 sales (329,000 MWK) sat on rows the build then dropped.*  2013-14 Modules P and Q carry a crop code 39 that is unlabelled in the file and in no table, so the harvest rows go
-  (with their warning, as before) and the sale keeps a Farm-level row with =crop = '39'= (the canonical pass-through).
+- *Code 39 in Modules P and Q is sugar cane (corrected on review).*  2013-14 P and Q carry it unlabelled, but =harmonize_crop= has 39 = =Sugar Cane=, 2013-14 Module I labels 39
+  =SUGAR CANE=, perennial "Other" is mostly sugar cane (above), and 12 of the 13 sales are by the ox-cart.  =_PERENNIAL_RECODE= now folds 1039 -> 39, which restores 23 + 1 harvest rows
+  (2013-14, 2010-11) the =crop= filter used to drop and labels the 13 sales (329,000 MWK), which the ladder then places.  Not checked against Module P's printed code list.
 - *No two-line trap.*  A crop on one plot in two rows goes through the ladder; =0= sales in any wave have 2+ rows stating a harvest on ONE plot and reach Farm-level.
   115 records (3.21M MWK) on 2+ plots have one row stating a harvest; Nigeria's ruling A was not extended to them.
