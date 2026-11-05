@@ -273,7 +273,8 @@ Data Scheme:
 
   crop_production:
     # Item-level reported crop harvest (GAP 1) at natural grain
-    # (t, i, plot_id, crop).  Source: post-harvest crop module secta3*.
+    # (t, i, plot_id, crop, production_obs).  Source: post-harvest crop module
+    # secta3*.
     # Crop-level harvest is recorded only in the post-harvest round, so
     # each wave maps to a single t = PH quarter (2011Q1 / 2013Q1 /
     # 2016Q1 / 2019Q1 / 2024Q1), distinct from plot_features' PP quarter
@@ -302,7 +303,17 @@ Data Scheme:
     # the PP planting roster (sect11f s11fq2) where present (W1-W3);
     # perennial = True for tree/permanent-crop rows (W4/W5 secta3iii), NA on a
     # Farm-level row.
-    index: (t, i, plot_id, crop)
+    #
+    # production_obs (GH #1433) is the canonical native crop-observation
+    # coordinate (data_info.yml, GH #1198): one (plot, crop) can carry several
+    # harvest lines, because harmonize_food folds several codes onto one label
+    # (Yam--roots is 1120-1124) and the W1-W3 rosters can repeat a code on a plot.
+    # W1-W3 serve the roster's own line id, reported:crop_id:<cropid> (W1 has 6
+    # labelled lines with none: CONSTRUCTED missing-id:row:<source_fingerprint>:<n>);
+    # W4/W5 ship no line id and the code names the line, reported:crop_code:<code>;
+    # a Farm-level sale row answers no line and carries unresolved_observation.
+    # Not a persistent id across waves.
+    index: (t, i, plot_id, crop, production_obs)
     Quantity: float
     u: str
     Quantity_sold: float

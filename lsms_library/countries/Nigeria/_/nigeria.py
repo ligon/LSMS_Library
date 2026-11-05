@@ -624,8 +624,8 @@ PH_QUARTER = {
 # crop_production (GAP 1) -- item-level reported crop harvest
 # ---------------------------------------------------------------------
 #
-# Natural grain (t, i, plot, crop): one row per crop grown on a plot in
-# the post-harvest crop module (secta3*).  Stores REPORTED item-level
+# Natural grain (t, i, plot_id, crop, production_obs): one row per harvest
+# line of the post-harvest crop module (secta3*).  Stores REPORTED item-level
 # fields only -- Quantity (native harvest qty) + u (native unit),
 # Quantity_sold + Value_sold (reported), planting_month + harvest_month
 # (item dates), intercropped + perennial flags.  No kg conversion, no
@@ -1008,6 +1008,49 @@ def _month_str(month_series, year_series):
     return out
 
 
+# ---------------------------------------------------------------------
+# crop_production: the native harvest line (GH #1433)
+# ---------------------------------------------------------------------
+#
+# (t, i, plot_id, crop) is not a harvest line.  `harmonize_food` folds several
+# codes onto one label (Yam--roots is 1120-1124, which is 1,449 of the 1,616 lines
+# concerned; also Fresh Pepper 2141/2142, Orange/tangerine 3150/3170), and the W1-W3
+# rosters can repeat one code on a plot (37 / 13 / 5 keys).  A keep-first dedup used
+# to discard the lines past the first, and they were distinct answers: only 70 of
+# the 794 keys agree across quantity, unit, value and sale.  The canonical
+# `production_obs` level names the line (lsms_library/data_info.yml, GH #1198):
+#   W1-W3  `reported:crop_id:<n>` -- the roster's `cropid`.  No recorded id repeats
+#          within a plot.  W1's has values -1 and 0, carried as recorded, and is
+#          blank on 6 labelled lines:
+#          `missing-id:row:<source_fingerprint>:<n>`, the zero-based row of the held
+#          release, bound to its sidecar.  CONSTRUCTED, not a survey id.
+#   W4/W5  `reported:crop_code:<n>` -- these files ship no `cropid`, and the code is
+#          unique within a plot across the annual and tree files together.
+#   a Farm-level sale row  CROP_OBS_NA: it answers no harvest line.
+# Not a persistent id: the spelling differs across waves, as it does in Ethiopia.
+CROP_OBS_NA = 'unresolved_observation'
+
+
+def _crop_line_observations(df, crop, line=None, source_ref=None):
+    """`production_obs` tokens for one plot-crop file, aligned to its rows.
+
+    `df` is the file as read, before any filter, so a constructed ordinal names
+    one physical line of the held release.  A line with no id and no `source_ref`
+    comes back NA, which `crop_production_for_wave` refuses if the line is served.
+    """
+    if line is None:
+        code = pd.to_numeric(df[crop], errors='coerce').astype('Int64')
+        return 'reported:crop_code:' + code.astype('string')
+    native = pd.to_numeric(df[line], errors='coerce').astype('Int64')
+    token = 'reported:crop_id:' + native.astype('string')
+    if source_ref is None:
+        return token
+    if not source_ref.startswith('dvc:'):
+        raise ValueError(f'constructed crop observations need a sidecar: {source_ref}')
+    row = pd.Series(np.arange(len(df)), index=df.index).astype('string')
+    return token.fillna('missing-id:row:' + source_ref + ':' + row)
+
+
 def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
     """Assemble item-level crop_production for one Nigeria GHS-Panel wave.
 
@@ -1021,6 +1064,13 @@ def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
             df        : raw DataFrame (convert_categoricals as noted below)
             dec       : decoded-label DataFrame (for crop/unit label decode)
             hhid, plot, crop                 column names (plot may be None)
+            line                             the roster's own line id (W1-W3
+                                             `cropid`); absent where the file
+                                             has none and the crop code names
+                                             the line (W4/W5).  See
+                                             `_crop_line_observations`
+            source_ref                       `source_fingerprint` of the file,
+                                             for a line whose id is missing (W1)
             qty, unit                        harvest qty / unit columns
             kg_factor                        SURVEY-REPORTED "Kg/L conversion
                                              factor" column asked BESIDE
@@ -1049,25 +1099,26 @@ def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
         {int cropcode: Preferred Label}.
     hh_sales : DataFrame, optional
         The wave's household-crop sale records (`hh_crop_sale_records`, the
-        W3-W5 A3.ii block), which name NO plot.  They are placed AFTER the
-        keep-first dedup below, so "the one row that states a harvest" is judged
-        on rows that survive it, and a discarded row can neither carry a sale
-        nor be counted (GH #843; `_attach_hh_crop_sales`).
+        W3-W5 A3.ii block), which name NO plot.  Each household and served crop
+        is placed on the one served line that states a harvest, or else on a
+        Farm-level row (GH #843; `_attach_hh_crop_sales`).
 
     Returns
     -------
-    DataFrame indexed by (t, i, plot, crop) with reported columns.
+    DataFrame indexed by (t, i, plot_id, crop, production_obs), one row per
+    harvest line with a labelled crop (GH #1433), with reported columns.
     W1/W2 read the sale off the plot-crop row.  W3-W5 place each household-crop
     sale on the household's one row for that crop that states a harvest, or else
-    on ONE `plot_id='Farm-level'` row with no harvest Quantity (GH #843), so a
-    sale is never on two rows and never split.
+    on ONE `plot_id='Farm-level'` row with no harvest Quantity (GH #843) and
+    `production_obs` the canonical sentinel, so a sale is never on two rows and
+    never split.
 
     `Unit_sold` (GH #824) is the unit the SALE was reported in, a second
     unit distinct from the row's `u` (the HARVEST unit).  It is a plain
     NA-bearing `string` column, never an index level and never
     sentinel-filled: NA means the row records no sale, the sale's unit was
-    simply not recorded (41 positive-sale rows in 2011Q1, 6 in 2013Q1;
-    measured 2026-10-14), or the household sold the crop in two units and no
+    simply not recorded (44 positive-sale rows in 2011Q1, 6 in 2013Q1;
+    measured 2026-11-04), or the household sold the crop in two units and no
     single quantity can be served (GH #843).
     Where it disagrees with `u` the row is a
     data-quality FLAG, not an identification of the price denominator
@@ -1092,6 +1143,9 @@ def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
             'i': i.values,
             'plot_id': plot.values,
             'crop': crop.values,
+            'production_obs': _crop_line_observations(
+                df, fr['crop'], line=fr.get('line'),
+                source_ref=fr.get('source_ref')).values,
         }, index=df.index)
 
         piece['Quantity'] = (pd.to_numeric(df[fr['qty']], errors='coerce')
@@ -1223,15 +1277,17 @@ def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
     # survey recorded the crop on the plot but no harvest qty).
     out = out[out['i'].notna() & out['crop'].notna()]
 
-    # Existing first-row dedup at (t,i,plot_id,crop) grain. It discards
-    # positive sales on 96 W1 / 66 W2 rows, not just exact duplicates;
-    # see CONTENTS.org Unit_sold residual and release_landing_2026-10-14/
-    # nigeria824.org. Keep this behaviour pending source-grain adjudication.
-    # drop_duplicates keeps a whole row, including any nulls on that row.
-    out = out.sort_values(['i', 'plot_id', 'crop'])
-    out = out.drop_duplicates(subset=['t', 'i', 'plot_id', 'crop'], keep='first')
-
-    out = out.set_index(['t', 'i', 'plot_id', 'crop']).sort_index()
+    # production_obs names every line, so a repeat is a source defect: raise,
+    # never select one (GH #1433; the Ethiopia GH #1461 / Niger GH #1360 rule).
+    # This used to be a keep-first dedup at (t, i, plot_id, crop), which threw
+    # away 822 harvest lines, 163 of them positive sales.
+    if out['production_obs'].isna().any():
+        raise ValueError(f'crop_production {t}: a served harvest line has no line id')
+    out = out.set_index(['t', 'i', 'plot_id', 'crop', 'production_obs']).sort_index()
+    if not out.index.is_unique:
+        raise ValueError(
+            f'crop_production {t}: production_obs does not identify every harvest '
+            f'line ({int(out.index.duplicated().sum())} repeated)')
     out = out[['Quantity', 'u', 'Quantity_sold', 'Value_sold', 'Unit_sold',
                'planting_month', 'harvest_month', 'intercropped', 'perennial',
                'KgFactor', 'Value_harvested', 'KgFactor_sold']]
@@ -1280,7 +1336,7 @@ _HH_SALE_TWO_UNITS = 'Nigeria::crop_production::hh-crop-sale-two-units'
 _HH_SALE_SOURCE = {
     '2015-16': dict(
         fn='Data/secta3ii_harvestw3.dta',
-        harvest=[('Data/secta3i_harvestw3.dta', 'sa3iq6i')],
+        harvest=[('Data/secta3i_harvestw3.dta', 'sa3iq6i')], line='cropid',
         sold='sa3iiq3', qty='sa3iiq5a', unit='sa3iiq5b', value='sa3iiq6'),
     '2018-19': dict(
         fn='Data/secta3ii_harvestw4.dta',
@@ -1382,22 +1438,26 @@ def derive_hh_crop_sale_attachment(records, served):
     records : DataFrame
         `hh_crop_sale_records`: one row per A3.ii sale record.
     served : DataFrame
-        Columns `i`, `plot_id`, `crop`, `Quantity`, one row per SERVED harvest
-        row of the wave, i.e. after the keep-first dedup.
+        Columns `i`, `plot_id`, `crop`, `production_obs`, `Quantity`, one row per
+        SERVED harvest line of the wave.
 
     Returns
     -------
     DataFrame indexed by `(i, crop)`, one row per household and served crop:
-    `plot_id`, `Quantity_sold`, `Value_sold`, `Unit_sold`, `KgFactor_sold`,
-    `Derivation`, `cause` ('one-states-harvest' / 'several-state-harvest' /
-    'none-states-harvest' / 'no-served-row'), `n_records`.
+    `plot_id`, `production_obs`, `Quantity_sold`, `Value_sold`, `Unit_sold`,
+    `KgFactor_sold`, `Derivation`, `cause` ('one-states-harvest' /
+    'several-state-harvest' / 'none-states-harvest' / 'no-served-row'),
+    `n_records`.
 
     The rule, from the rulings on GH #843 (@ligon, 2026-11-03, 2026-11-04):
 
     * exactly one served row of that household and crop STATES A HARVEST -> that
-      row's `plot_id`, even where its other rows are explicit "did not harvest";
+      row's `plot_id` and `production_obs`, even where its other rows are explicit
+      "did not harvest";
     * otherwise (two or more state one, or none does, or there is no row) ->
-      `FARM_LEVEL`.
+      `FARM_LEVEL` and `CROP_OBS_NA`.  Two lines of one plot are two rows here
+      (GH #1433): the plot is known and the line is not, and the rule does not
+      pick one.  CONTENTS.org has the count.
 
     A row states a harvest when its harvest `Quantity` is POSITIVE.  So:
 
@@ -1407,12 +1467,9 @@ def derive_hh_crop_sale_attachment(records, served):
       sa3iiiq7, W5 sa3iiiq17) needs no separate read: every NO line in the files
       has a blank quantity, and every positive quantity sits under a YES.
 
-    It is judged on the SERVED row, the line the keep-first dedup kept.  A
-    discarded twin's quantity does not make its kept row state a harvest.
-
     One household and crop can hold several records, because `harmonize_food`
     gives several codes one label (Yam--roots is 1120-1124) and W3's roster can
-    repeat a code.  One index key cannot hold two rows, so:
+    repeat a code.  The sale is placed once per household and crop, so:
 
     * every record's quantity in one unit -> quantity and value are summed;
     * two units (raw code, size or condition differ) -> `Value_sold` is
@@ -1442,10 +1499,11 @@ def derive_hh_crop_sale_attachment(records, served):
 
     n_rows = served.groupby(keys).size().reindex(out.index, fill_value=0)
     stating = served[pd.to_numeric(served['Quantity'], errors='coerce') > 0]
-    stating = stating.groupby(keys)['plot_id']
+    stating = stating.groupby(keys)
     n_stating = stating.size().reindex(out.index, fill_value=0)
-    only_plot = stating.first().reindex(out.index).astype('string')
-    out['plot_id'] = only_plot.where(n_stating == 1, FARM_LEVEL)
+    for level, otherwise in (('plot_id', FARM_LEVEL), ('production_obs', CROP_OBS_NA)):
+        only = stating[level].first().reindex(out.index).astype('string')
+        out[level] = only.where(n_stating == 1, otherwise)
     out['cause'] = 'none-states-harvest'
     out.loc[n_stating == 1, 'cause'] = 'one-states-harvest'
     out.loc[n_stating >= 2, 'cause'] = 'several-state-harvest'
@@ -1467,13 +1525,11 @@ def derive_hh_crop_sale_attachment(records, served):
 def _attach_hh_crop_sales(t, out, records):
     """Place a wave's household-crop sales on `out`, the served frame.
 
-    `out` has already been through the keep-first dedup, so every row counted
-    here is a row that is served: a discarded twin cannot receive a sale, and
-    cannot make a crop's one harvesting row look like two.  Each `(i, crop)` lands
-    on exactly one row, by construction, so no sale is on two rows.
+    Each `(i, crop)` lands on exactly one row, by construction, so no sale is on
+    two rows.
     """
     from lsms_library.transformations import U_UNKNOWN
-    served = out.index.to_frame(index=False)[['i', 'plot_id', 'crop']]
+    served = out.index.to_frame(index=False)[['i', 'plot_id', 'crop', 'production_obs']]
     # The new rows' index levels take the served frame's dtypes, so adding them
     # moves no pre-existing level's dtype.
     levels = {level: served[level].dtype for level in served.columns}
@@ -1481,7 +1537,7 @@ def _attach_hh_crop_sales(t, out, records):
     placed = derive_hh_crop_sale_attachment(records, served).reset_index()
     placed['t'] = t
     placed = placed.astype(levels)
-    placed = placed.set_index(['t', 'i', 'plot_id', 'crop'])
+    placed = placed.set_index(['t', 'i', 'plot_id', 'crop', 'production_obs'])
 
     out = out.copy()
     for col in ('Quantity_sold', 'Value_sold'):
@@ -1513,34 +1569,35 @@ def _attach_hh_crop_sales(t, out, records):
 
 
 def _served_plot_crop_keys(folder, crop_labels):
-    """`(i, plot_id, crop, Quantity)` of a wave's served harvest rows, from source.
-
-    The rows `crop_production_for_wave` keeps: labelled crop, household present,
-    one row per key, the first line of each after the same sort.
+    """`(i, plot_id, crop, production_obs, Quantity)` of a wave's served harvest
+    lines, from source: the lines `crop_production_for_wave` keeps, a labelled crop
+    and a household present.
     """
     from lsms_library.local_tools import get_dataframe
     from lsms_library.paths import countries_root
     root = countries_root() / 'Nigeria' / folder
+    spec = _HH_SALE_SOURCE[folder]
     pieces = []
-    for fn, qty in _HH_SALE_SOURCE[folder]['harvest']:
+    for fn, qty in spec['harvest']:
         raw = get_dataframe(str(root / fn), convert_categoricals=False)
         code = pd.to_numeric(raw['cropcode'], errors='coerce').astype('Int64')
         pieces.append(pd.DataFrame({
             'i': raw['hhid'].apply(format_id).astype('string').values,
             'plot_id': raw['plotid'].apply(format_id).astype('string').values,
             'crop': code.map(crop_labels).astype('string').values,
+            'production_obs': _crop_line_observations(
+                raw, 'cropcode', line=spec.get('line')).values,
             'Quantity': pd.to_numeric(raw[qty], errors='coerce').values,
         }))
-    rows = pd.concat(pieces, ignore_index=True).dropna(subset=['i', 'crop'])
-    rows = rows.sort_values(['i', 'plot_id', 'crop'])
-    return rows.drop_duplicates(['i', 'plot_id', 'crop'], keep='first')
+    return pd.concat(pieces, ignore_index=True).dropna(subset=['i', 'crop'])
 
 
 def _inputs_hh_crop_sale(wave, key):
     """The raw A3.ii answers behind the rows carrying `key`.
 
-    One row per source record, at `(t, i, plot_id, crop, source_row)`, so the
-    frame joins to the served row on its first four levels.  `source_row` is
+    One row per source record, at `(t, i, plot_id, crop, production_obs,
+    source_row)`, so the frame joins to the served row on its first five levels.
+    `source_row` is
     the zero-based row of the held release.  Several records can sit behind one
     served row, which is what a summed row is.  Original variable names.
     Re-reads the sources; nothing is cached.
@@ -1555,9 +1612,11 @@ def _inputs_hh_crop_sale(wave, key):
     answers = ['cropcode'] + _hh_sale_answer_columns(spec)
     if 'crop_number' in records.columns:
         answers = ['crop_number'] + answers
-    frame = records.merge(carrying[['plot_id']].reset_index(), on=['i', 'crop'])
+    frame = records.merge(carrying[['plot_id', 'production_obs']].reset_index(),
+                          on=['i', 'crop'])
     frame['t'] = PH_QUARTER[folder]
-    return frame.set_index(['t', 'i', 'plot_id', 'crop', 'source_row'])[answers]
+    return frame.set_index(['t', 'i', 'plot_id', 'crop', 'production_obs',
+                            'source_row'])[answers]
 
 
 def inputs_hh_crop_sale_single_row(wave):

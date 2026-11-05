@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 """Build item-level crop_production for Nigeria GHS-Panel (GAP 1).
 
-Natural grain (t, i, plot, crop): one row per crop grown on a plot in the
-post-harvest crop module (secta3*).  Stores REPORTED item-level fields
-only -- no kg conversion, no yield, no main_crop, no value shares (those
-are transformations).
+Natural grain (t, i, plot_id, crop, production_obs): one row per harvest line of
+the post-harvest crop module (secta3*).  Stores REPORTED item-level fields only
+-- no kg conversion, no yield, no main_crop, no value shares (those are
+transformations).
+
+production_obs (GH #1433) names the line, because harmonize_food folds several codes
+onto one label (Yam--roots is 1120-1124) and the W1-W3 rosters can repeat a code on
+a plot.  W1-W3 pass the roster's own `cropid` as `line`; W4/W5 ship none, and the
+code names the line.  W1's `cropid` is blank on 6 labelled lines, hence its
+`source_ref`.  See nigeria._crop_line_observations.
 
 Per-wave source structure (post-harvest round):
 
@@ -84,7 +90,7 @@ import sys
 sys.path.append('../../_/')
 import pandas as pd
 
-from lsms_library.local_tools import get_dataframe, to_parquet
+from lsms_library.local_tools import get_dataframe, source_fingerprint, to_parquet
 from nigeria import (PH_QUARTER, crop_production_for_wave, _crop_labels,
                      format_id, hh_crop_sale_records)
 
@@ -149,6 +155,7 @@ inter = _align_intercropped(
     '../2010-11/Data/Post Planting Wave 1/Agriculture/sect11f_plantingw1.dta')
 pieces.append(crop_production_for_wave(t, [dict(
     df=raw, dec=dec, hhid='hhid', plot='plotid', crop='sa3q2',
+    line='cropid', source_ref=source_fingerprint(f),
     qty='sa3q6a', unit='sa3q6b',
     qty_sold='sa3q11a', unit_sold='sa3q11b', value_sold='sa3q12', sold_on='plot',
     value_harvested='sa3q18',
@@ -163,7 +170,7 @@ inter = _align_intercropped(
     raw, 'hhid', 'plotid', 'cropcode',
     '../2012-13/Data/Post Planting Wave 2/Agriculture/sect11f_plantingw2.dta')
 pieces.append(crop_production_for_wave(t, [dict(
-    df=raw, dec=dec, hhid='hhid', plot='plotid', crop='cropcode',
+    df=raw, dec=dec, hhid='hhid', plot='plotid', crop='cropcode', line='cropid',
     qty='sa3q6a1', unit='sa3q6a2',
     qty_sold='sa3q11a', unit_sold='sa3q11b', value_sold='sa3q12', sold_on='plot',
     value_harvested='sa3q18',
@@ -180,7 +187,7 @@ inter = _align_intercropped(
     raw, 'hhid', 'plotid', 'cropcode',
     '../2015-16/Data/sect11f_plantingw3.dta')
 pieces.append(crop_production_for_wave(t, [dict(
-    df=raw, dec=dec, hhid='hhid', plot='plotid', crop='cropcode',
+    df=raw, dec=dec, hhid='hhid', plot='plotid', crop='cropcode', line='cropid',
     qty='sa3iq6i', unit='sa3iq6ii', value_harvested='sa3iq6a',
     harv_m='sa3iq6c1', harv_y='sa3iq6c2',
     intercropped=inter, perennial=False)], crop_labels,

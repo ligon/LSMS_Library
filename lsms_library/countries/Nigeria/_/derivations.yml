@@ -52,7 +52,7 @@ Nigeria::cluster_features::ph-same-location: *ph_same_location
 # and crop (A3.ii, secta3ii), with no plot.  One function, one decision, a key
 # per path so the path taken is countable.  A `plot_id='Farm-level'` row holding
 # one source record carries NO key: it is a survey answer at its own grain, and
-# the index value discloses that.  That covers 1,571 W4/W5 rows whose Unit_sold
+# the index value discloses that.  That covers 1,603 W4/W5 rows whose Unit_sold
 # and KgFactor_sold are the household total's, which the form states the sale in.
 # The frame alone cannot tell them from W3's own-unit answers; the assumptions on
 # the first entry below are the only record of that reading.
@@ -67,11 +67,10 @@ Nigeria::crop_production::hh-crop-sale-single-row:
     ATTACHMENT to a plot the sale block does not name.  A row states a harvest
     when its harvest Quantity is positive.  A blank does not, a zero does not,
     and an explicit "did not harvest" does not: every such line in the files has
-    a blank quantity, so the screener needs no separate read.  It is judged on the
-    SERVED row, after crop_production's keep-first dedup at (t, i, plot_id, crop).
-    Two or more rows stating a harvest, or none, is a plot_id='Farm-level' row
-    instead.  Unit_sold is the sale's own unit and can differ from the row's
-    harvest `u`.
+    a blank quantity, so the screener needs no separate read.  Each served harvest
+    line is one row (GH #1433).  Two or more rows stating a harvest, or none, is a
+    plot_id='Farm-level' row instead, including two lines of one plot.  Unit_sold is
+    the sale's own unit and can differ from the row's harvest `u`.
   function: lsms_library.countries.Nigeria._.nigeria:derive_hh_crop_sale_attachment
   inputs: lsms_library.countries.Nigeria._.nigeria:inputs_hh_crop_sale_single_row
   raw_variables: &hh_crop_sale_variables
@@ -130,9 +129,10 @@ Nigeria::crop_production::hh-crop-sale-single-row:
         take all four on #843".  Screener by quantity in every held file: 0 lines say
         NO with a positive quantity, and every positive quantity sits under a YES.
         The only reading the definition settles is a YES with 0 beside a positive
-        row (1 household-crop, W3, N48,000).  In W4, 2 household-crops (N6,500) go
-        Farm-level because the kept line of their one plot says no while a discarded
-        twin states a harvest: that is GH #1433's to change.
+        row (1 household-crop, W3, N48,000).  Those counts are from the frame of the
+        ruling, which served one line per (plot, crop); GH #1433 serves every line,
+        which CONTENTS.org records as moving 123 household-crops to Farm-level and 2
+        off it.
   validated_against: >-
     Cold build of Nigeria: Value_sold on attached plus Farm-level rows equals
     the raw secta3ii sum in all three rounds (N196,085,180 / N226,761,273 /
@@ -182,8 +182,8 @@ Nigeria::crop_production::hh-crop-sale-two-units:
   rule: >-
     Where one household and served crop holds several A3.ii sale records in
     DIFFERENT units (raw unit code, size or condition differ), Value_sold is
-    their sum and Quantity_sold, Unit_sold and KgFactor_sold are NA.  The declared index holds
-    one row per (t, i, plot_id, crop), so the two quantities cannot be two rows,
+    their sum and Quantity_sold, Unit_sold and KgFactor_sold are NA.  A sale is
+    placed once per household and crop, so the two quantities are not two rows,
     and the served value of Quantity_sold has one unit, so they cannot be
     summed.  The quantities are not lost: derivation_inputs returns each
     record's own.
