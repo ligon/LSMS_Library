@@ -691,6 +691,93 @@ def inputs_last_purchase(country: str, wave: str) -> pd.DataFrame:
     return _normalise_index_as_served(out, wave_obj)
 
 
+# ---------------------------------------------------------------------------
+# sample.strata: the documented stratum, region x milieu (GH #812)
+# ---------------------------------------------------------------------------
+#
+# Used by Senegal, Mali, Niger and Burkina Faso.  Benin, Togo, Guinea-Bissau and
+# Cote d'Ivoire serve the region alone (`strata: s00q01`) and do not import this.
+# No EHCVM household file records a stratum; the BIDs say it is the combination
+# of region and area of residence.  Labels and never codes: `s00q01` 1 is Boucle
+# du Mouhoun in Burkina's 2018-19 cover and Hauts-Bassins in its 2021-22 cover.
+
+#: The cover-page variables a stratum is built from: region, then milieu.
+STRATUM_RAW_VARIABLES = ("s00q01", "s00q04")
+
+
+def stratum_derivation_key(country: str) -> str:
+    """The registry key for one country's region x milieu ``strata``."""
+    return f"{country}::sample::region-milieu-stratum"
+
+
+def derive_region_milieu_stratum(region, milieu):
+    """``'<region label> <milieu label>'``, as the cover page writes them.
+
+    NA where either is missing or blank.  A number is REFUSED: a code that lost
+    its value label would otherwise be served as a label, and codes do not carry
+    across waves.  Region spellings are left as the file has them here; the
+    country's ``#+name: strata`` table folds them at read time, row for row its
+    ``Region`` table, so the region part of ``strata`` is ``cluster_features.Region``.
+
+    No options, by design (``SkunkWorks/derived_values.org``).  A user who wants
+    another stratification re-derives it from ``Country(c).derivation_inputs(key)``.
+    """
+    parts = []
+    for name, value in (("region", region), ("milieu", milieu)):
+        if pd.isna(value):
+            return pd.NA
+        if not isinstance(value, str):
+            raise ValueError(f"{name} {value!r} is not a label: a stratum is built "
+                             f"from value labels, never from codes (GH #812)")
+        value = value.strip()
+        if not value:
+            return pd.NA
+        parts.append(value)
+    return " ".join(parts)
+
+
+def strata_label(row):
+    """Cell formatter: ``strata: [s00q01, s00q04, {mapping: strata_label}]``."""
+    return derive_region_milieu_stratum(row.iloc[0], row.iloc[1])
+
+
+def stamp_region_milieu_stratum(df: pd.DataFrame, country: str) -> pd.DataFrame:
+    """The ``sample`` hook: stamp the registry key on every row with a stratum.
+
+    A row the merge brought in with no cover page has no ``strata`` and no key.
+    """
+    out = df.copy()
+    key = pd.Series(stratum_derivation_key(country), index=out.index, dtype="string")
+    out["Derivation"] = key.where(out["strata"].notna())
+    return out
+
+
+def inputs_region_milieu_stratum(country: str, wave: str) -> pd.DataFrame:
+    """The raw cover-page answers behind one wave's ``strata``, at ``(t, i)``.
+
+    ``i`` and the file list come from the wave's own ``sample.df_cover`` block so
+    the two cannot drift (Burkina 2021-22 reads two covers, each with its own
+    ``i``).  The columns are the ORIGINAL names with the labels the file holds;
+    ``Country.derivation_inputs`` re-keys ``i`` through ``updated_ids``.
+    """
+    from .country import Country
+    from .local_tools import df_data_grabber
+
+    wave_obj = Country(country)[wave]
+    cover = wave_obj.resources["sample"]["df_cover"]
+    spec = dict(cover)
+    spec["idxvars"] = {"i": cover["idxvars"]["i"]}
+    spec["myvars"] = {name: name for name in STRATUM_RAW_VARIABLES}
+    mapping = wave_obj.column_mapping("sample", spec)
+    mapping.pop("df_edit", None)
+    frames = [df_data_grabber(str(wave_obj.file_path / "Data" / filename),
+                              cols["idxvars"], **cols["myvars"])
+              for filename, cols in mapping.items()]
+    out = pd.concat(frames).reset_index()
+    out["t"] = wave
+    return out.set_index(["t", "i"])[list(STRATUM_RAW_VARIABLES)]
+
+
 #: Module-level callables in a wave's ``mapping.py`` that rewrite the reshaped
 #: frame's INDEX on the served path, and must therefore be applied to the
 #: raw-input frame's index too or it will not join.  Named rather than
