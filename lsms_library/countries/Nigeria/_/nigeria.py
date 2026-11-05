@@ -1117,8 +1117,8 @@ def crop_production_for_wave(t, frames, crop_labels, hh_sales=None):
     unit distinct from the row's `u` (the HARVEST unit).  It is a plain
     NA-bearing `string` column, never an index level and never
     sentinel-filled: NA means the row records no sale, the sale's unit was
-    simply not recorded (41 positive-sale rows in 2011Q1, 6 in 2013Q1;
-    measured 2026-10-14), or the household sold the crop in two units and no
+    simply not recorded (44 positive-sale rows in 2011Q1, 6 in 2013Q1;
+    measured 2026-11-04), or the household sold the crop in two units and no
     single quantity can be served (GH #843).
     Where it disagrees with `u` the row is a
     data-quality FLAG, not an identification of the price denominator

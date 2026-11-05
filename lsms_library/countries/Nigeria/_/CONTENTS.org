@@ -2252,10 +2252,12 @@ column, never an index level, never sentinel-filled.  Pinned by
   positive-sale rows discarded gives 96 / 66 (the 93 / 66 above additionally
   require both units);
   it sits in the country script, upstream of every core audit, so
-  =grain_reports()= cannot see it.  Reported for its own issue, not fixed.
+  =grain_reports()= cannot see it.  /Fixed 2026-11-04 (GH #1433): every line is
+  served, so the built table is now 3,544 both / 3,466 equal (97.8%) and 3,477 /
+  3,349 (96.3%), which is the raw table but for the 4 / 1 unlabelled unit codes./
   Non-null =Unit_sold= on the built table:
-  2011Q1 3,486, 2013Q1 3,430 (W3-W5 were 0 until GH #843; now 3,771 / 3,775 /
-  3,707).  The top served disagreement cells
+  2011Q1 3,582, 2013Q1 3,496 (3,486 / 3,430 before #1433; W3-W5 were 0 until
+  GH #843; now 3,771 / 3,775 / 3,707).  The top served disagreement cells
   are =l= -> =Kg= (10) and =Kg= <-> =Sack/Bag= (14) in 2011Q1, and =Kg= ->
   =Tiya= / =Mudu= (24) in 2013Q1: a kilogram harvest sold by the measure.
 - *The consumer rule is the canonical one*: where the two disagree the row
@@ -2302,8 +2304,9 @@ column, never an index level, never sentinel-filled.  Pinned by
   =Other inorganic= and =other (specify)= resolve to NOTHING.  Any share
   for them lands on #867 with its own disclosure and a signature.
 - *Unit_sold NA has three causes*: no sale on the row; a sale whose unit was
-  simply not recorded -- 41 positive-sale rows in 2011Q1, 6 in 2013Q1 (and 1 / 5
-  rows carry a =Unit_sold= with no positive sale); or, since GH #843, a
+  simply not recorded -- 44 positive-sale rows in 2011Q1, 6 in 2013Q1 (41 / 6
+  before GH #1433 served every line; and rows carry a =Unit_sold= with no positive
+  sale); or, since GH #843, a
   household-crop sold in two units.  Until #843 a third cause was "no sold-unit
   column (W3-W5)", which is no longer true.
 - *Not read, pre-existing scope*: =Quantity_sold= / =Value_sold= /
@@ -2393,9 +2396,10 @@ every pre-existing column of the 62,844-row API frame is
 | 2024Q1 | 8,627 (8,252 + 375) | 8 | 102 | 8,517 |
 | total | 50,324 | 24 | 718 | 49,582 |
 
-The dedup losses are the pre-existing =drop_duplicates(keep='first')= at
-=(t, i, plot_id, crop)= (the Unit_sold note above); it now also discards
-718 valuations and is still not changed here.  Zeros: 254 / 41 / 51 / 0 / 0
+The dedup losses are the =drop_duplicates(keep='first')= at =(t, i, plot_id,
+crop)= (the Unit_sold note above).  /Fixed 2026-11-04 (GH #1433): the 718 are
+served, so =Value_harvested= is now 9,854 / 9,868 / 10,233 / 11,726 / 8,619, every
+raw valuation but the 24 with no crop label./  Zeros: 254 / 41 / 51 / 0 / 0
 served rows.  No sentinel (no 9999-type value in any wave).  *One W5 outlier*:
 a single 2024Q1 row of N1,950,000,000 (the next largest in the wave is
 N11,440,000) -- about half of the wave's N3.81e9 served total.  Kept as
@@ -2408,10 +2412,11 @@ is the next table).
 - The W5 outlier is 65 bags x 100 kg (=KgFactor=) of rice valued at
   N1.95e9, about N300,000/kg: half the W5 total (N1.86e9 without it), and
   unflagged because Site Q screens =Quantity= only.
-- The dedup drops 718 valuations: on 16 keys the kept row has no valuation
+- The dedup dropped 718 valuations: on 16 keys the kept row has no valuation
   but a dropped twin does, and on 656 keys a dropped twin's valuation DIFFERS
   from the kept one -- so the duplicates are distinct observations, not
-  re-entries.  (Red-team review of the #844 commit, 2026-11-03.)
+  re-entries.  (Red-team review of the #844 commit, 2026-11-03.)  That finding is
+  GH #1433, fixed below.
 
 *Valuation vs. sale prices, W1/W2 (red-team review of the #844 commit,
 2026-11-03).*  The #844 issue comment asked for =sa3q18= to be compared with
@@ -2476,11 +2481,10 @@ that could differ are a YES with a zero and a YES with a blank.  On sale pairs t
 one household-crop (W3, N48,000): a YES with 0 beside a positive row, which attaches.
 A YES with a blank decides nothing, because no sale pair turns on one.
 
-It is judged on the SERVED row, the line the keep-first dedup kept.  In W4 two
-household-crops (N6,500) go Farm-level because the kept line of their one plot says no
-while a discarded twin, another code under the same label, states a harvest.  That is
-#1433's to change; 8 W4 and 3 W5 served rows have this shape, and only those 2 hold a
-sale.
+It is judged on the SERVED rows, and since GH #1433 every labelled line is one.  The
+rulings were made when only the first line of a =(plot, crop)= was served, and the
+counts in this section are from that frame unless they say otherwise.  [[*crop_production: one row per harvest line (GH #1433, 2026-11-04)][The #1433
+section]] has what moved.
 
 *The form.*  A3.ii is a crop roster.  W5 p. 19: "CAPI WILL MAKE A LIST OF ALL
 HARVESTED CROPS FROM FLAP D. IT WILL NOT LIST CROPS MORE THAN ONCE. IF THE
@@ -2594,12 +2598,8 @@ Cassava--roots) have none.  Ruled 2026-11-04 (C).  The labels are raw uppercase,
 =labels== never touches this level.  Extending =harmonize_food= would move harvest
 rows and is a separate decision.
 
-*Keep-first dedup (#1433) is not touched and cannot strand a sale.*  Sales are
-placed after it, on rows that survived, so a discarded twin can neither receive a
-sale nor count as stating a harvest.  Each household-crop lands on exactly
-one row by construction, and =crop_production_for_wave= asserts the index stays
-unique.  What the dedup still does: on an attached row whose crop had two raw lines
-on one plot, =Quantity= is the kept line's and the sale is the household's.
+*A sale cannot be stranded or doubled.*  Each household-crop lands on exactly one row
+by construction, and =crop_production_for_wave= asserts the index stays unique.
 
 *What else is out of scope.*  Processed-crop sales (W3 q19-21, W4 =sa3iiq18aa= /
 q20-21, W5 q21-24) are a different good in different units and are not read,
@@ -2698,6 +2698,109 @@ metric sales (2,249 and 991).
 rows, 4 summed rows whose factors disagree.  One =Kg= row reports a factor other than 1;
 it is served as reported and the consumer's screen rejects it
 (=supplied_factor_rejected=: 1).
+
+* crop_production: one row per harvest line (GH #1433, 2026-11-04)
+
+=_/crop_production.py= kept the first row of any duplicate at =(t, i, plot_id, crop)=.
+That key is not a harvest line, and the #323 rule applies: name the line, do not
+select one.  The index is now =(t, i, plot_id, crop, production_obs)=.
+
+*The idiosyncrasy.*  One plot can hold several lines of one served crop, for two
+reasons.  =harmonize_food= folds several codes onto one label: Yam--roots is 1120-1124,
+and it is 1,449 of the 1,616 lines concerned.  And the W1-W3 rosters can repeat one code
+on a plot.  The lines are distinct answers: 70 of the 794 keys agree across quantity,
+unit, valuation and sale.
+
+| | 2011Q1 | 2013Q1 | 2016Q1 | 2019Q1 | 2024Q1 |
+|-+-+-+-+-+-|
+| lines with a crop label | 12,985 | 12,948 | 11,956 | 15,237 | 10,540 |
+| keys with two or more lines | 227 | 163 | 125 | 173 | 106 |
+| ... two or more codes under one label | 190 | 150 | 120 | 173 | 106 |
+| ... one code repeated | 37 | 13 | 5 | 0 | 0 |
+| lines discarded | 233 | 171 | 127 | 183 | 108 |
+| ... with a positive harvest quantity | 207 | 157 | 121 | 139 | 102 |
+| ... with a valuation | 201 | 155 | 121 | 139 | 102 |
+| ... with a positive sale value | 97 | 66 | | | |
+
+*The token names the line.*  It is per wave, like Ethiopia's, and is not a panel id.
+
+| wave | =production_obs= | why |
+|-+-+-|
+| W1-W3 | =reported:crop_id:<cropid>= | the roster's line id; the code repeats on a plot, and =(i, plot, crop, cropid)= is unique on every labelled line |
+| W4, W5 | =reported:crop_code:<code>= | no =cropid= ships; the code is unique within a plot across the annual and tree files together |
+| W1, 6 lines | =missing-id:row:<source_fingerprint>:<n>= | =cropid= is blank; =n= is the zero-based row of the held release.  CONSTRUCTED |
+| a Farm-level sale row | =unresolved_observation= | it answers no harvest line |
+
+W1's =cropid= also has a -1 and a 0, carried as recorded, and repeats within =(hhid,
+plotid)= on 5 raw rows, always under different labels, so the index stays unique.  A
+repeat within the index, or a served line with no token, raises.
+
+*What moved, cold, =19db1a068= against this change.*
+
+| | 2011Q1 | 2013Q1 | 2016Q1 | 2019Q1 | 2024Q1 |
+|-+-+-+-+-+-|
+| rows, before | 12,752 | 12,777 | 12,525 | 16,029 | 11,064 |
+| rows, after | 12,985 | 12,948 | 12,708 | 16,241 | 11,208 |
+| ... harvest lines added | 233 | 171 | 127 | 183 | 108 |
+| ... Farm-level rows added | | | 56 | 29 | 36 |
+| =Value_harvested= non-null added | 201 | 155 | 121 | 139 | 102 |
+| =Value_sold= non-null added | 97 | 66 | 0 | 0 | 0 |
+| =Value_sold=, added, Naira | 1,848,860 | 1,009,350 | 0 | 0 | 0 |
+
+Every one of the 62,844 pre-existing harvest rows has an identical line in the new
+frame, on its key, =v=, =Quantity=, =u=, =KgFactor=, =Value_harvested=, months and
+flags.  72 of the 822 new lines repeat their kept twin on all of those.  =Value_sold=
+now equals the source in every round, W1/W2 included.  Site B, I and the grain audit
+report the same on both sides, and Site Q names the same five rows.
+
+*#843's rule applied as ruled, and what that does.*  The rule counts rows that state a
+harvest, and the rows are now every line.
+
+| household-crops with a sale | 2016Q1 | 2019Q1 | 2024Q1 |
+|-+-+-+-|
+| on the one row that states a harvest | 3,034 | 2,785 | 3,046 |
+| Farm-level, two or more state a harvest | 750 | 997 | 665 |
+| Farm-level, rows but none states one | 2 | 0 | 0 |
+| Farm-level, no served row | 0 | 7 | 3 |
+
+- 2 W4 household-crops (N6,500) move onto their line.  Their kept line said no and the
+  discarded twin stated the harvest.
+- *123 household-crops (56 / 31 / 36; N3,878,684 / N1,276,100 / N4,315,300, 0.83% of
+  sale value) move to Farm-level.  The rulings did not contemplate this.*  In every one,
+  two lines of ONE plot state a harvest (three in one W5 case), so the survey knows the
+  plot, and the rule does not pick a line.  They used to sit on whichever line came
+  first.  Of the 42 with one sale record, 12 sat on a line of a different code from the
+  one sold.  A sale's own code would place 202 of their 204 records on their own line,
+  but that is a different grain from the one ruled (the report's memo, GH #1433).
+- Conservation holds: =Value_sold=, =Quantity_sold=, =Unit_sold= and =KgFactor_sold=
+  are unchanged on every household-crop in W3-W5, none is on two rows, every attached
+  row has a positive =Quantity= and a line token, and no Farm-level row has either.
+- On one-record attached rows in one unit, the sold quantity exceeds the row's harvest
+  on 43 / 2 / 0 rows (43 / 3 / 0 before).
+
+*Consumers, before -> after.*
+- =gross_crop_revenue= now equals the source in W1/W2 too: +1.9%, +0.7%; W3-W5
+  identical.
+- =harvest_kg=: 31,624 -> 31,637 rows, totals +2.9% / +0.14% / +0.11% / +0.64% / +1.5%.
+  It sums to =(t, i, plot_id, j)=, so two yam lines on a plot are one figure in kg, and
+  a line whose unit has no factor is left out, as before.
+- =yield_kg= (joined on the PH quarter): 17,751 -> 17,755 rows; totals +1.6% / +0.2% /
+  +0.1% / +2.0% / +2.9%.
+- =median_price_valuation=: =Value= totals +2.2% / +0.08% / +0.05% / +0.5% / +0.8%.  W3-W5
+  prices are unmoved in every =(v, crop)= cell, so the rise there is the new lines being
+  valued.  W1/W2 prices move in 202 of 2,544 and 3 of 2,579 cells, where the recovered
+  sales enter the pool.
+- =crop_diversity=: =weight='count'= is identical, because it counts land units, not
+  lines.  =weight='value'=: 93 households move and 17 are new, all W1/W2.
+- =fertilizer_rate=, =nitrogen_kg=, =seed_kg= and valued =food_expenditures= are
+  identical, and the other 18 Nigeria tables built are frame-equal.
+- =Feature('crop_production')(['Nigeria', 'Tanzania', 'GhanaSPS'])= stays unique; Nigeria
+  serves its own =production_obs= where it had the sentinel on every row, and the other
+  two countries are frame-equal.
+
+*Cost:* =nigeria.py= and =data_scheme.yml= are in every Nigeria table's hash, so a
+country re-warm: 20 of 20 =Country._table_cache_hash= and 200 of 200 =Wave._input_hash=.
+Uganda, GhanaLSS, Malawi, Tanzania and all 31 =build_transforms_fingerprint= do not move.
 
 * crop_production: a unit =_canon_unit= cannot place is =Unknown= (GH #1047)
 
@@ -2989,6 +3092,9 @@ after):
 | 2019Q1 | 15 054 |                    11 393 |
 | 2024Q1 | 10 432 |                     8 285 |
 | total  | 62 844 |                    19 678 |
+
+/Since GH #1433 (2026-11-04) every labelled line is served: 2019Q1 11,531 and 2024Q1
+8,387 non-null.  The rest of this section is the #859 measurement./
 
 W1--W3 are all-NaN *because the column does not exist in the source*, which is
 why =data_scheme.yml= declares =KgFactor= =optional: true= --- the Site-B
