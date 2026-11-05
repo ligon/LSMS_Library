@@ -1955,7 +1955,7 @@ receive?"; this line called the column =Value= until 2026-10-23, but the
 build, =data_scheme.yml= and =data_info.yml= all name it =ValuePerAnimal=,
 and it is NOT a herd value -- GH #637 tail), =HeadCount12MonthsAgo= (head
 owned exactly 12 months ago, =ag_r07= -- a second stock, not a flow; GH
-#855, 2026-11-03), =Owned= (the species gate =ag_r01= as answered; GH #1435,
+#855, 2026-11-03), =RaisedOrOwned= (the species gate =ag_r01= as answered; GH #1435,
 2026-11-04).  One reported row per (household, species owned).
 
 Source: Module R livestock roster (=ag_mod_r1_{10,13,16,19}.dta=) -- the
@@ -2004,7 +2004,7 @@ positive reported =HeadCount= / =HeadSold= / =HeadAcquired=.  Rows for
 species the HH was merely asked about and does not own are dropped, so
 the feature is the household's actual herd, not the full species
 checklist.  (A row kept on =ag_r01= alone, with its five questions blank, is
-served with =Owned= True: GH #1435.)
+served with =RaisedOrOwned= True: GH #1435.)
 
 Coverage cross-check (distinct livestock-owning HH per wave): the feature
 matches the raw Module-R =ag_r00= == Yes universe within ~0.5% every wave
@@ -5046,9 +5046,10 @@ questions at all:* they name no crop, nearly all no plot either (1,015), so they
 are empty roster lines.  Only the 337 that name a crop can pose the question, and
 the 188 of 2010-11, every one with a harvest amount, are the ones that read most
 like an unrecorded amount rather than no seed.  None of it is served, and no 0 is
-minted.  This is the same framework rule as the rows #1435 registered for a time;
-it is not registered as a deletion here (the ruling asks for a count), which is
-the consistent follow-up if the maintainer wants it.
+minted.  Approved by the maintainer on 2026-11-05 and registered as the deletion
+=Malawi::plot_inputs::seed-line-no-payload= (=rows: 0=); =derivation_inputs= returns the
+lines.  Re-counted cold at 74e60f713, after #1523 and #1568: the table above stands, line
+for line.
 
 *The 19 fertilizer groups stay NA (ruling 2026-11-04).*  A blank enumerator total
 with a positive native quantity (2010-11 9, 2013-14 10): recovering them would be
@@ -5253,14 +5254,18 @@ is on no page of the three held forms.  Why those 41 rows carry Module P answers
 unknown.
 of 268; 0 of 28 =build_transforms_fingerprint=).
 
-* 2026-11-04 -- livestock: =ag_r01= is served as =Owned= (GH #1435, ruling (b))
+* 2026-11-04 -- livestock: =ag_r01= is served as =RaisedOrOwned= (GH #1435, ruling (b))
 
 The maintainer's ruling on the question the previous entry queued: serve the answer,
-keeping all 39,126 rows.  =Owned= is =ag_r01= as answered: True 39,114, False 12 (7 in
+keeping all 39,126 rows.  =RaisedOrOwned= is =ag_r01= as answered: True 39,114, False 12 (7 in
 2010-11, 5 in 2013-14, each kept for a positive count elsewhere on the row), no NA.
 The deletion =Malawi::livestock::owned-species-no-payload= and its callables are gone.
 
-*The name is loose, and it does NOT mean "owns one now".*  The question is about the
+*Named =Owned= until 2026-11-05, when the maintainer ruled the name =RaisedOrOwned=, which is
+what the question says.  An extract from before that date has the old name; the values are the
+same.*
+
+*It does NOT mean "owns one now".*  The question is about the
 last 12 months: 2,990 rows answer True beside =HeadCount= 0 (295 / 249 / 1,246 / 1,200
 by wave), and those are answers, not conflicts.
 
@@ -5272,13 +5277,13 @@ before it had the labels only):
 |---------+-------------------------------------------------+--------------------------------|
 | 2010-11 | "During the last 12 months, have you or any member of your HH raised or owned any" (truncated) | "raised or owned any [LIVESTOCK]?", 12 months |
 | 2013-14 | same, "household"                               | same                           |
-| 2016-17 | "Did you own [LIVESTOCK]?" (so does the DDI)    | no agriculture questionnaire held |
+| 2016-17 | "Did you own [LIVESTOCK]?" (so does the DDI)    | "raised or owned any [LIVESTOCK]?", 12 months (IHS4, R01, PDF p. 85: the entry above) |
 | 2019-20 | "Did you own [LIVESTOCK]?"                      | "raised or owned any [LIVESTOCK]?", 12 months |
 
-So the label's "Did you own" is not evidence that the 2019-20 question changed: its own
-instrument prints the old wording.  2016-17 cannot be settled from what we hold.  The
-canonical =data_info.yml= declaration says this; do not read the column as ownership at
-interview in any wave.
+So the label's "Did you own" is not evidence that the question changed: the IHS4 and IHS5
+instruments print the old wording.  (This table said no 2016-17 questionnaire was held; it
+has been, since the entry above.)  The canonical =data_info.yml= declaration says this; do
+not read the column as ownership at interview in any wave.
 
 Measured, cold builds, previous commit vs this one: rows 39,121 -> 39,126 (+1 / +1 / +2
 / +1, the five rows above).  Nothing else moves on the common rows, and the blank head

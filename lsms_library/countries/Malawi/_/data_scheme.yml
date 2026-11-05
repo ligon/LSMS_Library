@@ -383,9 +383,9 @@ Data Scheme:
     #                 GH #855).  A second STOCK, not a flow: never a fallback
     #                 for HeadCount, never differenced into acquisitions or
     #                 losses (the survey asks those flows directly).
-    #   Owned        (ag_r01, the species gate, as answered; GH #1435).  About
-    #                 the last 12 months, not a stock, and its wording differs
-    #                 by source: see `Columns: livestock` in data_info.yml.
+    #   RaisedOrOwned (ag_r01, the species gate, as answered; GH #1435).  About
+    #                 the last 12 months, not a stock, and the Stata labels shorten
+    #                 the question: see `Columns: livestock` in data_info.yml.
     # `animal` is the harmonize_species Preferred Label (the wave scripts
     # reconcile 2010-11's fine 301-318 code scheme with the later coarse
     # scheme -- Ox=3304, Donkey/Horse=3305, Chicken=3310,
@@ -400,7 +400,7 @@ Data Scheme:
     HeadSold: float
     ValuePerAnimal: float
     HeadCount12MonthsAgo: float
-    Owned:
+    RaisedOrOwned:
       type: bool
       optional: true
     materialize: make

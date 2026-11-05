@@ -2,7 +2,7 @@
 
 Each buildable wave's ``Malawi/<wave>/_/livestock.py`` produces a parquet
 indexed (t, i, animal) with the canonical item-level columns (HeadCount,
-HeadAcquired, HeadSold, ValuePerAnimal, HeadCount12MonthsAgo, Owned).  This
+HeadAcquired, HeadSold, ValuePerAnimal, HeadCount12MonthsAgo, RaisedOrOwned).  This
 script concatenates them.
 Cross-wave id_walk (panel-id chaining) is applied by the framework at API time in
 _finalize_result.  ``v`` is NOT joined: 'livestock' is in the framework

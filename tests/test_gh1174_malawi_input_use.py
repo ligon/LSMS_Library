@@ -185,3 +185,84 @@ def test_every_excluded_seed_line_has_no_seed_amount(wave):
             float(planted.sum()), abs=1e-6)
         assert int(rows['Quantity'].notna().sum()) == int(planted.notna().sum())
     assert excluded > 0
+
+
+# --- the registered deletion ---------------------------------------------------
+
+DELETION = 'Malawi::plot_inputs::seed-line-no-payload'
+
+
+def test_the_deletion_is_registered_and_resolves():
+    from lsms_library.derivations import derivation_records
+    record = derivation_records('Malawi')[DELETION]
+    assert record['rows'] == 0
+    assert record['table'] == 'plot_inputs'
+    assert list(record['waves']) == sorted(_G_SOURCES)
+    assert callable(record.resolve('function'))
+    assert callable(record.resolve('inputs'))
+
+
+def test_the_deletion_covers_every_wave_plot_inputs_is_built_for(malawi):
+    """A wave that builds plot_inputs and is missing here deletes its lines unregistered,
+    and derivation_inputs refuses the wave: nothing else would notice."""
+    from lsms_library.derivations import derivation_records
+    built = sorted(p.parent.parent.name for p in MALAWI.glob('*/_/plot_inputs.py'))
+    assert sorted(derivation_records('Malawi')[DELETION]['waves']) == built
+    assert sorted(malawi._SEED_LINE_SOURCES) == built
+
+
+def test_the_predicate_is_a_seed_row_with_no_payload(malawi):
+    out = malawi.assemble_plot_inputs('2019-20', [_g_lines(malawi)])
+    picked = malawi.derive_seed_line_no_payload(out)
+    assert sorted(out[picked].index.get_level_values('i')) == ['2']
+
+
+@pytest.mark.parametrize('wave', sorted(_G_SOURCES))
+def test_the_source_table_matches_the_wave_script(malawi, wave):
+    text = (MALAWI / wave / '_' / 'plot_inputs.py').read_text()
+    for half in malawi._SEED_LINE_SOURCES[wave]:
+        for key in ('g', 'h'):
+            assert half[key].rsplit('/', 1)[-1] in text, (wave, half[key])
+        for key in ('half', 'hhid', 'prefix', 'gcrop', 'hcrop'):
+            if half[key]:
+                assert half[key] in text, (wave, key, half[key])
+        for name in half['q'] + half['u'] + half['v']:
+            assert name in text, (wave, name)
+
+
+_LINE = r'^row:Malawi/(?P<src>[^@]+)@.*:(?P<pos>\d+)$'
+
+
+def _lines(input_obs):
+    """``{(file, position)}`` of each ``input_obs``."""
+    found = pd.Series(input_obs, dtype='string').str.extract(_LINE)
+    return set(zip(found['src'].dropna(), found['pos'].dropna().astype(int)))
+
+
+@pytest.mark.requires_s3
+@pytest.mark.parametrize('wave', sorted(_G_SOURCES))
+def test_the_registered_inputs_are_the_excluded_lines(wave):
+    """Exactly the excluded lines: none served, and none left out.  The right-hand
+    side is an oracle on Module G, every line of the wave's files (after the 2010-11
+    repeat policy) that no served row holds; nothing from the callable enters it."""
+    import numpy as np
+    from lsms_library.country import Country
+    from lsms_library.local_tools import get_dataframe
+    country = Country('Malawi')
+    pi = country.plot_inputs()
+    assert pi.attrs['derivations']['Malawi'][DELETION]['rows'] == 0
+    gone = country.derivation_inputs(DELETION, wave=wave)
+    assert list(gone.index.names) == ['t', 'i', 'input_obs']
+    assert gone.index.is_unique
+    obs = gone.index.get_level_values('input_obs').astype(str)
+    served = pi.xs(wave, level='t').index.get_level_values('input_obs').astype(str)
+    assert len(obs) and set(obs).isdisjoint(served)
+    assert pd.to_numeric(gone['ag_g04a'], errors='coerce').isna().all()
+
+    held = _lines(served)
+    expected = set()
+    for rel, _ in _G_SOURCES[wave]:
+        g = get_dataframe(str(MALAWI / rel), convert_categoricals=False)
+        keep = ~g.duplicated().to_numpy() if wave == '2010-11' else np.ones(len(g), dtype=bool)
+        expected |= {(rel, int(p)) for p in np.arange(len(g))[keep]} - held
+    assert _lines(obs) == expected

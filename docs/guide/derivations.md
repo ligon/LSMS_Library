@@ -209,7 +209,7 @@ entry per key:
 | `since` | the date the entry landed |
 | `waves` | a list, or `all` — the wave scope |
 | `columns` | which served fields the derivation produces: data columns or named index levels |
-| `rows` | a selector saying which rows carry the key, e.g. `{s: produced}` |
+| `rows` | a selector saying which rows carry the key, e.g. `{s: produced}`, or `0` for a deletion, which `ll.derivations()` lists as `0` |
 
 The loader (`derivations.DerivationRecord.from_config`) **refuses** an entry
 missing `rule`, `function`, `inputs`, `raw_variables` or `assumptions`, or an
