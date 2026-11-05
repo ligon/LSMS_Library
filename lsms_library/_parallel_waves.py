@@ -63,7 +63,9 @@ Correctness hazards the design addresses (numbered as in the GH #797 brief):
    naming ``country/wave/table``, in wave order, so ``GrainCollapseError`` /
    ``NullReadError`` keep their type under ``LSMS_*_STRICT``.  The pool is a
    ``concurrent.futures.ProcessPoolExecutor``, whose ``BrokenProcessPool``
-   surfaces a worker killed by the OOM killer instead of hanging.
+   surfaces a worker killed by the OOM killer instead of hanging.  What cannot
+   travel -- a class in a by-path module, a worker that died -- arrives as
+   ``errors.WaveWorkerError``, which no fallback catches (GH #1524).
 
 Why ``fork``: the per-wave builder is a closure over the live ``Country``
 (not picklable), and the package is already imported; the child inherits
@@ -84,6 +86,8 @@ from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from multiprocessing import get_all_start_methods, get_context
 from typing import Any, Callable
+
+from .errors import WaveWorkerError
 
 WORKERS_ENV = "LSMS_BUILD_WORKERS"
 MAKE_JOBS_ENV = "LSMS_MAKE_JOBS"
@@ -442,12 +446,18 @@ def _pack_warning(msg: warnings.WarningMessage) -> tuple:
 
 def _pack_exception(exc: BaseException) -> tuple:
     """``(exception_or_None, type_name, text, traceback)``.  The exception
-    object travels whole when it pickles (the normal case, including the
-    library's own ``GrainCollapseError`` / ``NullReadError``); otherwise the
-    parent rebuilds a ``RuntimeError`` from the text."""
+    object travels whole when it survives a pickle round trip (the normal case,
+    including the library's own ``GrainCollapseError`` / ``NullReadError``);
+    otherwise the parent raises a :class:`WaveWorkerError` built from the text.
+
+    A round trip, not ``dumps``: a class whose ``__init__`` takes more than its
+    ``args`` pickles and then fails to load, and a load failure in the pool's
+    result thread reads as a dead worker (``BrokenProcessPool``), which hides
+    the exception altogether.
+    """
     tb = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
     try:
-        pickle.dumps(exc)
+        pickle.loads(pickle.dumps(exc))
         carried: BaseException | None = exc
     except Exception:  # noqa: BLE001 -- un-picklable payload; carry the text
         carried = None
@@ -572,7 +582,9 @@ def relay(payload: dict, *, country: str, table: str) -> tuple[bool, Any]:
         exc, type_name, text, tb = err
         where = f"{country}/{payload['wave']}/{table}"
         if exc is None:
-            exc = RuntimeError(f"{type_name}: {text}")
+            # Not a RuntimeError: the derived-table paths and the v-join read those
+            # as a failed derivation and try something else (GH #1524).
+            exc = WaveWorkerError(f"{type_name}: {text}", original_type=type_name)
         note = f"raised while building {where} in a parallel wave worker; worker traceback:\n{tb}"
         if hasattr(exc, "add_note"):        # 3.11+
             exc.add_note(note)

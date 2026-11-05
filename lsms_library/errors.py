@@ -101,3 +101,21 @@ class UnregisteredCountryError(ValueError):
             f"acquisition, provenance stamping, scaffolding -- may pass "
             f"Country({country!r}, allow_unregistered=True)."
         )
+
+
+class WaveWorkerError(Exception):
+    """A wave's build failed in a parallel worker and its exception could not cross back.
+
+    ``_parallel_waves`` returns a worker's exception object when it survives a pickle
+    round trip.  A class in a by-path ``mapping.py`` or country module does not (GH #1524),
+    and a worker the OOM killer took has none to return.  This carries the original class
+    name and the text instead; the worker's traceback is in the exception's notes.
+
+    Subclasses ``Exception``, not ``RuntimeError``: it stands for a failure of unknown kind,
+    so nothing may read it as "this wave has no table" or retry it as a legacy build.
+    ``original_type`` is the name of the class that was raised.
+    """
+
+    def __init__(self, message, original_type=None):
+        super().__init__(message)
+        self.original_type = original_type
