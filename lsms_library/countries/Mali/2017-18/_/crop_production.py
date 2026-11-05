@@ -7,7 +7,8 @@ Sources (post-harvest passage 2; cultivation passage 1):
   - eaci17_s11fp1.dta  perennial-tree roster (one row per HH-tree; no field grid)
   - eaci17_s11cp1.dta  cultivation roster -> planting month
 
-Grain: (t, i, plot, crop).  plot = "{field}_{parcel}" (s7fq01_s7fq02) for
+Grain: (t, i, plot_id, crop), with `condition` the sentinel on every row (s7fq13b
+is not read; GH #1436).  plot_id = "{field}_{parcel}" (s7fq01_s7fq02) for
 seasonal crops; 'Farm-level' for perennial trees (GH #1476).  i = (grappe,
 exploitation) —
 the 2017-18 household key (cf. sample/cluster_features data_info.yml).
@@ -218,7 +219,7 @@ df = crop_production_finalize(df)
 df['Derivation'] = stamp_tree_derivations(df)
 
 assert len(df) > 0, "crop_production 2017-18 produced no rows"
-assert df.index.is_unique, "Non-unique (t, i, plot, crop) in crop_production 2017-18"
+assert df.index.is_unique, "Non-unique (t, i, plot, crop, condition) in crop_production 2017-18"
 
 to_parquet(df, 'crop_production.parquet',
            grain_audit=grain_reports('Mali', 'crop_production'))

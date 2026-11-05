@@ -171,7 +171,14 @@ Data Scheme:
     # u = 'Unknown' (option (d), @ligon 2026-11-03).  Unit_sold is the sold unit there;
     # 2018's sold unit is not read yet, so it is NA on 2018.  A recorded harvest of an
     # unfinished crop is keyed harvest-to-date.
-    index: (t, i, plot_id, crop, u)
+    # condition (GH #1436) is "Etat du produit", s16cq12c, the state of the crop
+    # when the harvest Quantity was measured, read by code through
+    # harmonize_crop_condition_ehcvm1 in categorical_mapping.org.  The instrument
+    # asks the form and never the dryness, so the values are the BARE FORM tokens
+    # `shelled` / `unshelled` / `shell_not_applicable`, plus `unknown_condition`
+    # for a blank code.  Five answers fold onto those tokens (ruled @ligon
+    # 2026-11-04); condition_native below keeps what was answered.
+    index: (t, i, plot_id, crop, u, condition)
     Quantity: float
     Quantity_sold: float
     Unit_sold:
@@ -182,6 +189,12 @@ Data Scheme:
       type: float
       optional: true
     intercropped: bool
+    # condition_native (GH #1436, ruling @ligon 2026-11-04) is the state label as
+    # recorded (s16cq12c), the answer the `condition` fold cannot show.  `optional`
+    # because a blank state is NA, never a sentinel.
+    condition_native:
+      type: str
+      optional: true
     materialize: make
 
   plot_inputs:

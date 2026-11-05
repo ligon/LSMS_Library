@@ -180,7 +180,8 @@ class TestDeclared:
         Loader.add_constructor("!make", lambda loader, node: {"__make__": True})
         with open(_root() / "_" / "data_scheme.yml", encoding="utf-8") as f:
             entry = yaml.load(f, Loader=Loader)["Data Scheme"][TABLE]
-        assert entry["index"] == "(t, i, plot_id, crop)"
+        # GH #1436 appended the condition level; `u` is still a column here.
+        assert entry["index"] == "(t, i, plot_id, crop, condition)"
 
     @pytest.mark.parametrize("raw, served", [
         ("Sacs de 100 kg", "Sac (100 Kg)"), ("Sac-100 Kg", "Sac (100 Kg)"),

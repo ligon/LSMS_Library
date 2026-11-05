@@ -7,7 +7,7 @@ unit (s16cq12a / s16cq12b), sold qty (s16cq16a), sale value (s16cq17), and
 the intercrop flag (s16cq07) are ALL recorded at this plot-crop grain in
 2018-19, so no cross-file join is needed.
 
-Index = (t, i, plot, crop, u); plot = "{s16cq02}_{s16cq03}" aligns with
+Index = (t, i, plot_id, crop, u, condition); plot_id = "{s16cq02}_{s16cq03}" aligns with
 plot_features' plot_id.  REPORTED values only — harvest_kg / yield /
 main_crop / value-shares are transformations, never columns here.
 
@@ -23,6 +23,10 @@ table.  Both mappers PASS UNMAPPED LABELS THROUGH unchanged (kept visible,
 flagged by the sanity checker) — exactly the Niger template behavior;
 Senegal's harmonize_food / u tables cover only a subset of the s16c crop /
 unit labels, so the rest surface in raw French.
+
+``condition`` is the harvest's own "Etat du produit" (s16cq12c, GH #1436), read
+by code and folded from five answers to three tokens; the column
+``condition_native`` keeps the answer as recorded.
 """
 import pandas as pd
 
@@ -66,8 +70,32 @@ def _unit_labels(unit_series, unit_map):
     return u.map(lambda x: unit_map.get(x, x) if pd.notna(x) else pd.NA).astype('string')
 
 
+def _crop_conditions(codes):
+    """Map raw "Etat du produit" codes (``convert_categoricals=False``) through
+    ``harmonize_crop_condition_ehcvm1`` (GH #1436).  The table is read strictly:
+    a missing table must not serve every row as the sentinel.  A blank or
+    off-scheme code becomes ``unknown_condition``, a real value and never NA,
+    because a null index key is deleted by the next ``groupby`` (GH #323 3b)."""
+    table = tools.get_categorical_mapping(
+        tablename='harmonize_crop_condition_ehcvm1', idxvars='Code',
+        **{'Preferred Label': 'Preferred Label'})
+    table = {int(code): token for code, token in table.items()}
+    assert sorted(table) == [1, 2, 3, 4, 5], f'harmonize_crop_condition_ehcvm1: {table}'
+    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)
+    return mapped.astype('string').fillna('unknown_condition')
+
+
+def _crop_condition_labels(labels):
+    """The state as the survey recorded it, for ``condition_native``: *labels* is
+    the column read with ``convert_categoricals=True``.  A blank stays NA, never a
+    sentinel, because a column has no NaN-key hazard (ruling @ligon 2026-11-04,
+    GH #1436)."""
+    out = pd.Series(labels).astype('string').str.strip()
+    return out.where(out != '', pd.NA)
+
+
 def _finish_crop_production(df, t):
-    """Common tail: tag t, build the (t, i, plot, crop, u) index, coerce
+    """Common tail: tag t, build the (t, i, plot_id, crop, u, condition) index, coerce
     numeric columns, and guarantee the full schema column set.  Drops
     placeholder rows with no crop recorded."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
@@ -84,10 +112,13 @@ def _finish_crop_production(df, t):
     df['crop'] = df['crop'].astype('string')
     df['u'] = df['u'].astype('string')
     df = df[df['crop'].notna()]
-    keep = ['t', 'i', 'plot_id', 'crop', 'u', 'Quantity',
-            'Quantity_sold', 'Value_sold', 'harvest_month', 'intercropped']
+    keep = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'Quantity',
+            'Quantity_sold', 'Value_sold', 'harvest_month', 'intercropped',
+            'condition_native']
     df = df[[c for c in keep if c in df.columns]]
-    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u'])
+    df['condition'] = df['condition'].astype('string')
+    df['condition_native'] = df['condition_native'].astype('string')
+    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition'])
     return df
 
 
@@ -113,6 +144,10 @@ df = pd.DataFrame({
     'plot_id':          plot.values,
     'crop':          _crop_labels(src['s16cq04'], crop_map).values,
     'u':             _unit_labels(src['s16cq12b'], unit_map).values,
+    # By code; the fold is ruled, see categorical_mapping.org (GH #1436).
+    'condition':     _crop_conditions(src_codes['s16cq12c']).values,
+    # What the fold cannot show: the answer as recorded, by label.
+    'condition_native': _crop_condition_labels(src['s16cq12c']).values,
     'Quantity':      src_codes['s16cq12a'].values,
     'Quantity_sold': src_codes['s16cq16a'].values,
     'Value_sold':    src_codes['s16cq17'].values,

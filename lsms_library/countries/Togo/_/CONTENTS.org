@@ -800,6 +800,36 @@ is folded into the hash, and no existing wave's =Wave._input_hash=.  When
 =food_acquired= is wired for 2021-22, pooled kg factors change for every
 Togo wave at read time (GH #1487).
 
+* 2026-11-04 -- =crop_production= serves =condition= and the recorded answer (GH #1436)
+
+Ruling @ligon 2026-11-04, option (D), set on Niger in #1471: the fold stays on the
+=condition= level and the survey's own answer rides in the optional column
+=condition_native=.  =2018/Data1/s16c_me_tgo2018.dta= records "Etat du produit" in =s16cq12c=, read by code
+through =harmonize_crop_condition_ehcvm1=.
+
+| code | =.dta= label | rows | =condition= |
+|------+--------------+------+-------------|
+| 1 | Epis | 63 | =unshelled= |
+| 2 | Grain | 7,845 | =shelled= |
+| 3 | Décortiqué | 326 | =shelled= |
+| 4 | Non-décortiqué | 705 | =unshelled= |
+| 5 | Non concerné | 2,020 | =shell_not_applicable= |
+| blank | | 606 | =unknown_condition=, column NA |
+
+11,565 lines, unique on (household, field, parcel, crop code, unit), so the level separates nothing and adds no row.  A blank state is a
+blank unit on all 606.  The answer describes the harvest quantity only: =s16cq16c= is the sold state, not served (GH #1462).
+2021-22 is held and not wired (GH #552), so the level reaches no 2021-22 row.  When it is wired, read its code list before reusing this table: Niger's and Senegal's 2021-22 lists have three answers, and code 3 means something else there.
+
+*The printed forms are not what was fielded.*  All three held Excel forms
+(=tgo_ehcvm1_qnr_household_excel_vague1.xls=, =..._vague2.xls=, =EHCVM_UEMOA_MEN_TOGO_V2.xls=, sheet
+=S16c_Agri=) print eight answers: 1 épis, 2 grain, 3 Tubercule, 4 Gousse, 5 Régime, 6 décortiqué,
+7 non-décortiqué, 8 non-concerné.  The file holds codes 1-5 in both vagues under the shared five labels,
+and its crops fit the labels and not the form: code 3 falls on cotton (82), maize (64) and groundnut (54),
+none of them a tuber, and code 5 on yam (587), cotton (575) and cassava (362), none of them a bunch.  So the
+=.dta= list is what was fielded, and it is the one this table reads.
+
+*Cost:* one Togo re-warm (=data_scheme.yml=, =categorical_mapping.org= and the wave script).
+
 * 2026-11-04 -- 2021-22 wired (GH #552)
 
 Every table 2018 serves.  The pilot for Benin, Cote d'Ivoire and Guinea-Bissau: the last
@@ -964,4 +994,3 @@ country's waves until it is corrected.  =s16bq01= has two slots 2018's tables di
   =s07bq07b= by code; =s09?q01= codes against the country's =nonfood_items= by label;
   =s16bq05= and =s16bq08= labels; =s16cq16a= fill (Togo's shape or Mali's); exact repeats in
   =s16d=; roster agreement by each of the three panel flags.
-

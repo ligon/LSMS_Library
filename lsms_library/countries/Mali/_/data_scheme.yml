@@ -214,7 +214,17 @@ Data Scheme:
     # s7gq20 == 'Non'.  The Leger questionnaire asks 7G.20 (sold?) but not
     # 7G.21 / 7G.22, so its 'Oui' rows carry no quantity or value.
     # Built by per-wave scripts + a country-level concatenator.
-    index: (t, i, plot_id, crop)
+    #
+    # condition (GH #1436, ruling @ligon 2026-11-04) is "Etat du produit", the state
+    # of the crop when the harvest Quantity was measured: 2018-19 s16cq12c, 2021-22
+    # s16cq16d, by code through harmonize_crop_condition_ehcvm1 in
+    # categorical_mapping.org.  Five answers fold onto the bare form tokens `shelled` /
+    # `unshelled` / `shell_not_applicable`; condition_native below keeps what was
+    # answered.  `unknown_condition` on a blank code, a Farm-level row, a harvest
+    # derived from s16d, and every EAC-I row.  2014-15's harvest files hold no state.
+    # 2017-18 records one (s7fq13b) in a four-answer list no ruling has folded, whose
+    # codes 3 and 4 invert the EHCVM table; not read yet: CONTENTS.org.
+    index: (t, i, plot_id, crop, condition)
     Quantity: float
     u: str
     Quantity_sold: float
@@ -235,6 +245,12 @@ Data Scheme:
     harvest_month: int
     intercropped: bool
     perennial: bool
+    # condition_native (GH #1436, ruling @ligon 2026-11-04) is the state label as
+    # recorded, the answer the `condition` fold cannot show.  `optional` because only
+    # the EHCVM rows that state one carry it; NA elsewhere, never a sentinel.
+    condition_native:
+      type: str
+      optional: true
     materialize: make
   plot_inputs:
     # Item-level agricultural inputs, GAP 2 (parity loop).  One row per

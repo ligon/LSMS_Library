@@ -8,7 +8,7 @@ plot-crop grain in 2018-19, so no cross-file join is needed.  This is the
 CotedIvoire analogue of Niger's EHCVM 2018-19 s16c crop module; the column
 scheme verified identical.
 
-Index = (t, i, plot, crop, u); plot = "{s16cq02}_{s16cq03}" aligns with
+Index = (t, i, plot_id, crop, u, condition); plot_id = "{s16cq02}_{s16cq03}" aligns with
 plot_features' plot_id.
 
 i is CotedIvoire's EHCVM composite household id.  CotedIvoire PREDATES the
@@ -26,6 +26,12 @@ kept visible and flagged by the sanity checker) where no map applies — the
 same pass-through behavior Niger's _crop_labels uses for unmapped labels.
 If a country-level harmonize_food is added later it is picked up
 automatically.  Units map through the existing CotedIvoire `u` table.
+
+``condition`` is the harvest's own "Etat du produit" (s16cq12c, GH #1436), read
+by code and folded onto the canonical tokens; the column ``condition_native``
+keeps the answer as recorded.  This file has seven answers where the other EHCVM
+files have five: the vague 2 instrument added 6 Fève and 7 Autre à préciser, and
+the .dta does not label them.  See categorical_mapping.org.
 """
 import pandas as pd
 
@@ -63,8 +69,41 @@ def _map_labels(source_labels, label_map):
     return lab.map(lambda x: label_map.get(x, x) if pd.notna(x) else pd.NA).astype('string')
 
 
+def _crop_conditions(codes):
+    """Map raw "Etat du produit" codes (``convert_categoricals=False``) through
+    ``harmonize_crop_condition_ehcvm1`` (GH #1436).  The table is read strictly:
+    a missing table must not serve every row as the sentinel.  A blank or
+    off-scheme code becomes ``unknown_condition``, a real value and never NA,
+    because a null index key is deleted by the next ``groupby`` (GH #323 3b)."""
+    table = get_categorical_mapping(
+        tablename='harmonize_crop_condition_ehcvm1', idxvars='Code',
+        **{'Preferred Label': 'Preferred Label'})
+    table = {int(code): token for code, token in table.items()}
+    assert sorted(table) == [1, 2, 3, 4, 5, 6, 7], f'harmonize_crop_condition_ehcvm1: {table}'
+    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)
+    return mapped.astype('string').fillna('unknown_condition')
+
+
+def _crop_condition_labels(labels, codes):
+    """The state as the survey recorded it, for ``condition_native``: *labels* is
+    the column read with ``convert_categoricals=True``, *codes* the same column
+    read without.  The .dta labels codes 1-5 only, so 6 and 7 arrive as bare
+    numbers and take the table's Source Label, as the vague 2 instrument prints
+    them (CIV-EHCVM1-QNR-MEN-CAPI-VAGUE2.pdf, p. 197).  A blank stays NA, never a
+    sentinel, because a column has no NaN-key hazard (ruling @ligon 2026-11-04,
+    GH #1436)."""
+    instrument = get_categorical_mapping(
+        tablename='harmonize_crop_condition_ehcvm1', idxvars='Code',
+        **{'Source Label': 'Source Label'})
+    instrument = {int(code): label for code, label in instrument.items()}
+    codes = pd.to_numeric(codes, errors='coerce').astype('Int64')
+    out = pd.Series(labels).astype('string').str.strip()
+    out = out.where(out != '', pd.NA)
+    return out.where(~codes.isin([6, 7]), codes.map(instrument).astype('string'))
+
+
 def _finish_crop_production(df, t):
-    """Common tail: tag t, build the (t, i, plot, crop, u) index, coerce
+    """Common tail: tag t, build the (t, i, plot_id, crop, u, condition) index, coerce
     numeric columns, guarantee the schema column set.  Mirrors
     niger.py:_finish_crop_production."""
     for col in ['Quantity', 'Quantity_sold', 'Value_sold']:
@@ -81,10 +120,13 @@ def _finish_crop_production(df, t):
     # Drop placeholder rows with no crop recorded (a parcel listed but no
     # crop grown / reported on the line).
     df = df[df['crop'].notna() & df['i'].notna()]
-    keep = ['t', 'i', 'plot_id', 'crop', 'u', 'Quantity',
-            'Quantity_sold', 'Value_sold', 'harvest_month', 'intercropped']
+    keep = ['t', 'i', 'plot_id', 'crop', 'u', 'condition', 'Quantity',
+            'Quantity_sold', 'Value_sold', 'harvest_month', 'intercropped',
+            'condition_native']
     df = df[[c for c in keep if c in df.columns]]
-    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u'])
+    df['condition'] = df['condition'].astype('string')
+    df['condition_native'] = df['condition_native'].astype('string')
+    df = df.set_index(['t', 'i', 'plot_id', 'crop', 'u', 'condition'])
     return df
 
 
@@ -111,6 +153,10 @@ df = pd.DataFrame({
     'plot_id':          plot.values,
     'crop':          _map_labels(src['s16cq04'], crop_map).values,
     'u':             _map_labels(src['s16cq12b'], unit_map).values,
+    # By code; the fold is ruled, see categorical_mapping.org (GH #1436).
+    'condition':     _crop_conditions(src_codes['s16cq12c']).values,
+    # What the fold cannot show: the answer as recorded, by label.
+    'condition_native': _crop_condition_labels(src['s16cq12c'], src_codes['s16cq12c']).values,
     'Quantity':      pd.to_numeric(src_codes['s16cq12a'], errors='coerce').values,
     'Quantity_sold': pd.to_numeric(src_codes['s16cq16a'], errors='coerce').values,
     'Value_sold':    pd.to_numeric(src_codes['s16cq17'], errors='coerce').values,
