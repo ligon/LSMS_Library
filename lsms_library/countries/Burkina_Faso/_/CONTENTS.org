@@ -3080,3 +3080,9 @@ True share 0.390 -> 0.691; 2,139 of 4,475 rows change.
 
 The table serves 4,475 of the 7,701 reported shocks: the rest carry no follow-up, are all-NA
 and are dropped.  That is with the maintainer, and unchanged here.
+
+The same day, =HowCoped= follows the recorded order.  =s14bq05__*= have no value labels
+in this file, unlike every sibling, and the hook read them as Yes/No and listed
+strategies by code, which is the 2018-19 hook copied over.  The values are the ranks:
+every row holds 1, 1-2 or 1-2-3.  Of the 1,120 rows with two or more strategies, 263
+change order and 217 change =HowCoped0=.
