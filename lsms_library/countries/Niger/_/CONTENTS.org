@@ -3057,6 +3057,18 @@ not corroborate that the cells are strata.  The BID's sentence is what names the
 
 *Across the EHCVM boundary.*  Each wave's label is its own cover's.  35 of the 5,055 households
 in both waves change stratum (3 clusters): Niamey Rural to Niamey Urbain 23, Diffa Rural to Diffa
-Urbain 12.  =Niamey Rural= is 2 clusters in 2018-19 and none in 2021-22.
+Urbain 12.
+
+*=Niamey Rural= is contested in 2021-22.*  It is 2 clusters on the 2018-19 cover and none on the 2021-22
+cover or welfare file, which is what =strata= serves.  But =ehcvm_ponderations_ner2021.dta= still codes 2
+Niamey clusters =Rural= (24 households, 12 per wave), exactly 2018-19's two, and =ehcvm_nsu_ner2021.dta=
+still lists =NiameyRural=.  Their weights do not settle it: log weight 5.82 and 6.11, against 5.73 (sd
+0.42) for the other 59 Niamey clusters.
+
+*More on the BID.*  The French version, p.12, says « La strate est la combinaison région/milieu »; the
+English "region/locality", p.9, is ambiguous.  Table 1 has a second misprint, a total: Tahoua wave 1
+prints 453, where 106 + 348 is 454.  Table 2's one-household differences in Diffa and Maradi are not noise:
+those cells equal the weight file's =milieu=, and they are the 2 grappes where that =milieu= varies
+within a grappe.  Table 2 still writes Niamey all urban, so it follows neither file throughout.
 
 Cost: a Niger re-warm.  Other countries' =strata= hold other things: see =docs/guide/feature.md=.
