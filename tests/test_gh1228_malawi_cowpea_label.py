@@ -155,6 +155,8 @@ def test_the_served_rows_are_the_source_lines():
     assert len(lines) == 157
     cp = Country('Malawi').crop_production()
     named = cp[cp.index.get_level_values('crop') == LABEL]
+    # GH #1457's Farm-level sale rows take the household's label too; they are no harvest line.
+    named = named[named.index.get_level_values('plot_id') != 'Farm-level']
     assert set(named.index.get_level_values('t')) == {'2010-11'}
     assert len(named) == len(lines)
     assert set(named.index.get_level_values('production_obs')) == {'reported:G:48'}
