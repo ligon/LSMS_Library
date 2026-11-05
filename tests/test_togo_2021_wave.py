@@ -170,3 +170,55 @@ class TestServed:
         expected = pd.Series(pd.to_datetime(cover["s00q23a"]).to_numpy(), index=_ids(cover))
         got = pd.to_datetime(d["Interview start"])
         assert (got.sort_index() == expected.reindex(got.index).sort_index()).all()
+
+    def test_food_acquired_sums_are_the_files(self):
+        s07 = _raw("s07b_me_tgo2021.dta")
+        qty = (s07["s07bq03a"].fillna(0) - s07["s07bq04"].fillna(0)
+               - s07["s07bq05"].fillna(0)).clip(lower=0)
+        same = ((s07["s07bq03b"] == s07["s07bq07b"]) & (s07["s07bq03c"] == s07["s07bq07c"])
+                & (s07["s07bq07a"] > 0))
+        value = (qty * s07["s07bq08"] / s07["s07bq07a"]).where(same)
+        f = _served("food_acquired")
+        side = f.groupby(level="s")[["Quantity", "Expenditure"]].sum()
+        assert side.loc["purchased", "Quantity"] == pytest.approx(qty.sum())
+        assert side.loc["purchased", "Expenditure"] == pytest.approx(value.sum())
+        assert side.loc["produced", "Quantity"] == pytest.approx(s07["s07bq04"].fillna(0).sum())
+        assert side.loc["inkind", "Quantity"] == pytest.approx(s07["s07bq05"].sum())
+        assert f.loc[f.index.get_level_values("s") != "purchased", "Expenditure"].isna().all()
+        assert f.index.is_unique
+
+    def test_the_purchase_unit_reads_as_the_code_says(self):
+        """Without the wave's map, 15,412 rows read as another unit (all sachets)."""
+        from lsms_library.ehcvm import unit_match
+
+        labels = _raw("s07b_me_tgo2021.dta", labels=True)
+        codes = _raw("s07b_me_tgo2021.dta")
+        by_code = ((codes["s07bq03b"] == codes["s07bq07b"])
+                   & (codes["s07bq03c"] == codes["s07bq07c"])).to_numpy()
+        fn = ll.Country("Togo")[WAVE].formatting_functions["LastPurchaseUnitCode"]
+        last = labels["s07bq07b"].map(fn)
+        got = unit_match(labels["s07bq03b"], labels["s07bq03c"],
+                         last, labels["s07bq07c"]).to_numpy()
+        assert (got == by_code).all()
+        raw = unit_match(labels["s07bq03b"], labels["s07bq03c"],
+                         labels["s07bq07b"], labels["s07bq07c"]).to_numpy()
+        assert (raw != by_code).sum() > 15000
+
+    def test_unit_labels_are_the_codes_ehcvm_units_name(self):
+        """u agrees with 2018's across the file's lower-case labels; the size rides."""
+        f = _served("food_acquired")
+        bases = {u.split(" (")[0] for u in f.index.get_level_values("u").unique()}
+        assert {"Sachet", "Tas", "Unité", "Boîte", "Morceau", "Panier"} <= bases
+        assert not bases & {"sachet", "tas", "unité", "boîte", "morceau", "panier"}
+        assert not {u for u in f.index.get_level_values("u").unique() if u.startswith("Kg (")}
+        # The file labels three codes 2018's has no name for.
+        assert {"Main", "Tête"} <= bases
+
+    def test_every_item_label_of_the_file_is_mapped(self):
+        from lsms_library.local_tools import df_from_orgfile
+
+        table = df_from_orgfile(countries_root() / "Togo" / "_" / "categorical_mapping.org",
+                                name="harmonize_food")
+        keys = set(table["Original Label"].astype(str).str.strip())
+        labels = set(_raw("s07b_me_tgo2021.dta", labels=True)["s07bq01"].astype(str).str.strip())
+        assert not labels - keys

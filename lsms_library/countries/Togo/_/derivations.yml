@@ -7,7 +7,7 @@
 # Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
 
 Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
-  waves: ['2018']
+  waves: ['2018', '2021-22']
   columns: [Expenditure]
   rows: {s: purchased}
   rule: >-
@@ -54,7 +54,12 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
         3,633 because the last purchase used a different unit CODE, 3,512
         because it used the same code in a different SIZE (Petit / Moyen /
         Grand / Taille unique), which is a different container and so a
-        different price per unit.
+        different price per unit.  2021-22: 38,092 of the 107,841 SERVED purchased
+        rows (35.3%).  On source rows with a purchased quantity, 38,182 of 108,057:
+        34,510 with no last purchase, 1,303 in a different unit code, 2,369 in the
+        same code at a different size.  The share is higher than 2018's because this
+        file fills s07bq07a only where s07bq06 is within 30 days: 36,328 rows answer
+        Plus de 30 jours or Jamais.
       basis: variable-label
       evidence: >-
         no EHCVM wave distributes a unit-conversion table;
@@ -68,6 +73,7 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
         7-day consumption s07bq03a (which would put the value of own-produced
         and gifted food into Expenditure) and B = net of own production only.
         2018: A 32,656,157, B 32,224,365, C (served) 31,676,795 FCFA, against a raw s07bq08 total of 44,452,024.
+        2021-22: A 35,429,400, B 35,230,935, C (served) 34,464,072 FCFA, against a raw s07bq08 total of 45,908,210.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
     - text: >-
@@ -79,6 +85,7 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
         it is checked and not served.  Own production keeps the identical
         treatment it already had (s = 'produced' from s07bq04, Expenditure NA).
         2018: 10,212 inkind rows carrying 26,045 units, 0 with an Expenditure.
+        2021-22: 10,579 inkind rows carrying 24,394 units, 0 with an Expenditure.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
   validated_against: >-
@@ -93,6 +100,11 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
     depan(Don) is an IMPUTATION at the same unit value and not a value the
     survey asked for; it is checked and deliberately not served.  The 365/7
     (median ratio 0.99931 = (365/7)/(365.25/7)) shows UEMOA reads the 7-day
-    consumption as the week.
+    consumption as the week.  2021-22, ehcvm_conso_tgo2021.dta, the same test: on the
+    2,068 (household, product) rows where the candidates differ and an Achat row
+    exists, the rule x 365/7 is within 1% of depan(Achat) for 90.8%, against 13.5%
+    for the own-production-only residual and 0.0% for the gross quantity; s07bq05 *
+    uv is within 1% of depan(Don) for 91.0% of 1,914 rows.  Median ratio over all
+    69,875 joined rows 1.00000.
   contents: 'Togo/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'

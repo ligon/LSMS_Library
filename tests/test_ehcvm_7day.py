@@ -41,9 +41,9 @@ from lsms_library.ehcvm import (
 )
 from lsms_library.paths import countries_root
 
-#: The twelve EHCVM 2018+ waves, country -> waves.
+#: The EHCVM 2018+ waves, country -> waves.
 WAVES = {
-    'Togo': ['2018'],
+    'Togo': ['2018', '2021-22'],
     'Benin': ['2018-19'],
     'Guinea-Bissau': ['2018-19'],
     'Senegal': ['2018-19', '2021-22'],
@@ -60,6 +60,7 @@ FUNCTION = 'lsms_library.ehcvm:derive_ehcvm_purchase_value'
 #: scale the change is against.
 BEFORE_SUM = {
     ('Togo', '2018'): 44_452_024.0,
+    ('Togo', '2021-22'): 45_908_210.33,
     ('Benin', '2018-19'): 87_287_926.96,
     ('Guinea-Bissau', '2018-19'): 91_353_379.75,
     ('Senegal', '2018-19'): 171_946_367.74,
@@ -82,6 +83,7 @@ BEFORE_SUM = {
 #: quantities and every Expenditure total are unchanged.
 AFTER = {
     ('Togo', '2018'): (31_676_794.87, 10_213),
+    ('Togo', '2021-22'): (34_464_072.25, 10_579),
     ('Benin', '2018-19'): (68_929_996.70, 18_645),
     ('Guinea-Bissau', '2018-19'): (57_552_942.85, 13_818),
     ('Senegal', '2018-19'): (147_345_570.63, 10_802),

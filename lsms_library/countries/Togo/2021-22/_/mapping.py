@@ -4,6 +4,12 @@ import pandas as pd
 
 import lsms_library.local_tools as tools
 
+from lsms_library.ehcvm import (
+    derivation_key as _derivation_key,
+    food_acquired_ehcvm as _food_acquired_ehcvm,
+    inputs_last_purchase as _inputs_last_purchase,
+)
+
 # The same projection as 2018: Region, Rural and the GPS point are constant within
 # a grappe, and this raises, naming the grappes, on the day one is not.
 from lsms_library.transformations import (
@@ -121,3 +127,30 @@ def food_security(df):
     score = items.sum(axis=1, skipna=True).where(~items.isna().all(axis=1), other=pd.NA)
     df['FIES_score'] = score.astype('Int64')
     return df
+
+
+FOOD_ACQUIRED_DERIVATION = _derivation_key('Togo')
+
+#: s07bq03b and s07bq07b label one code book twice.  `_unit_key` folds case and
+#: accents, and these two codes differ by more: 139 is `sachet` and `sachet
+#: (industrielle)`, 141 is `Sans os au tas` and `Sans os en tas`.  This file's labels
+#: carry no code prefix to settle it, so unit_match would read every sachet purchase
+#: as another unit: 55,169 rows match on the raw labels, 70,581 on the codes, and
+#: 70,581 with this map, row for row.
+_PURCHASE_UNIT_AS_CONSUMPTION_UNIT = {'sachet (industrielle)': 'sachet',
+                                      'Sans os en tas': 'Sans os au tas'}
+
+
+def LastPurchaseUnitCode(value):
+    '''s07bq07b, on s07bq03b's spelling of the same code.'''
+    return _PURCHASE_UNIT_AS_CONSUMPTION_UNIT.get(value, value)
+
+
+def food_acquired(df):
+    '''GH #876: purchased Quantity x s07bq08 / s07bq07a, keyed; size in u (GH #1224).'''
+    return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+
+
+def inputs_food_acquired(wave):
+    """The registry `inputs` callable: raw section-7B answers at (t, i, j)."""
+    return _inputs_last_purchase('Togo', wave)

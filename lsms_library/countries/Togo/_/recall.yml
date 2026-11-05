@@ -6,7 +6,7 @@
 #
 #   `basis` IS THE EVIDENCE RUNG, AND IT IS NOT DECORATION.
 #
-# Only 34 of the corpus's 58 stated windows are questionnaire-grade.  A
+# Only 35 of the corpus's 59 stated windows are questionnaire-grade.  A
 # `config-comment` rung means a maintainer asserted the number, not that an
 # instrument states it -- consumers are entitled to discount it, and a
 # `not-recorded` rung means nobody has looked, which is NOT the same as "no
@@ -27,3 +27,12 @@ Recall:
     recall_verbatim: 'total quantity of [XX] consumed in the past 7 days'
     evidence: 'lsms_library/countries/Togo/2018/Documentation/tgo_ehcvm1_qnr_household_excel_vague1.xls sheet S7b header ''B Consommation alimentaire des 7 derniers jours et achat des 30 derniers jours''; s07bq03a Stata label ''7B.03a. Qtite tot du [PRODUIT] conso par le MEN au cours des 7 derniers jours'''
     notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.'
+  '2021-22':
+    basis: questionnaire
+    ask_count_basis: declared
+    recall_days: 7
+    n_asks: 1
+    recall_verbatim: 'Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'
+    evidence: 'lsms_library/countries/Togo/2021-22/Documentation/tgo_ehcvm2_qnr_men_excel_vague1.pdf (and _vague2.pdf) PDF p.37 -- ''SECTION 7B: CONSOMMATION ALIMENTAIRE DES 7 DERNIERS JOURS ET ACHAT DES 30 DERNIERS JOURS''; 7B.03 ''Quelle est la quantité totale du [PRODUIT] consommé par le ménage au cours des 7 derniers jours?'''
+    notes: 'GH #876: Expenditure used to be s07bq08, the value of ONE purchase up to 30 days old (s07bq06), on the same row as the 7-day quantity -- one row, two clocks.  It is now derived onto the row''s own 7-day purchased quantity, (s07bq03a - s07bq04 - s07bq05).clip(0) x s07bq08/s07bq07a, NA where the last-purchase unit differs, and the gift quantity is served separately as s=''inkind''.  Both served numbers now sit on the 7-day window; the PRICE still comes from a purchase up to 30 days old.'
+    n_items_delivered: 151

@@ -325,3 +325,44 @@ food_security:
                 Non: False
                 Ne sait pas: null
                 Refus: null
+
+food_acquired:
+    file: s07b_me_tgo2021.dta
+    idxvars:
+        v: grappe
+        visit: vague
+        i:
+            - grappe
+            - menage
+        j:
+            - s07bq01
+            - mappings: ['harmonize_food', 'Original Label', 'Preferred Label']
+        # Unlike 2018, this file labels its unit codes.  These nine labels spell
+        # differently what the ehcvm_units table, and so 2018's u, calls the same
+        # code; the rest already agree.
+        u:
+            - s07bq03b
+            - mapping:
+                Alvéole / Plateau: Alvéole
+                Avec os au tas: Avec os en tas
+                boîte: Boîte
+                Cuillère: Cuillere
+                morceau: Morceau
+                panier: Panier
+                sachet: Sachet
+                tas: Tas
+                unité: Unité
+    myvars:
+        Quantity: s07bq03a
+        Produced: s07bq04
+        # GH #876.  Expenditure is derived by mapping.food_acquired, as in 2018;
+        # these raw inputs feed that hook and are dropped by the reshape.
+        GiftQuantity: s07bq05
+        ConsumptionUnitCode: s07bq03b
+        ConsumptionUnitSize: s07bq03c
+        LastPurchaseQuantity: s07bq07a
+        # Read through mapping.LastPurchaseUnitCode: the file's two unit variables
+        # spell codes 139 and 141 differently, and unit_match reads labels.
+        LastPurchaseUnitCode: s07bq07b
+        LastPurchaseUnitSize: s07bq07c
+        LastPurchaseValue: s07bq08
