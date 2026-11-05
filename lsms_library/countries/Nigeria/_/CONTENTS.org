@@ -908,13 +908,17 @@ adjacent rounds, not every revisit.
   includes the 21 households only the W2 agriculture cover lists (=HHTrack=: 19
   crisis area, 2 unknown reason), which =plot_inputs= reports on.  #1444.
 
-*=sampling.yml= counts a different population.*  Its "N of M linked households"
-are hhid overlaps of covers, most of them measured while =sample()= still stamped
-the PP cover on both rounds.  Its declared continuities hold over the new links:
-no real EA changes =v= across any boundary declared =stable=, and 10 households
-across 2018Q3 (1 EA) and 88 across 2023Q3 (10 of the 12 EAs) do change it, whole
-EAs with only the LGA code moving, as declared =wave-scoped=.  But it now reads, for example, "4,859 of 4,859" keep =v= at 2013Q1, where the
-links show 4,699 of 4,716 (17 PH movers).  Not edited here.
+*=sampling.yml= counts these links (GH #1448, 2026-11-04).*  Its "N of M linked
+households" used to be hhid overlaps of covers, most of them measured while
+=sample()= still stamped the PP cover on both rounds, so it read, for example,
+"4,859 of 4,859" keep =v= at 2013Q1 where the links show 4,699 of 4,716 (17 PH
+movers).  The notes now state the link counts, and
+=tests/test_gh1448_nigeria_sampling_notes.py= recomputes them.  The declared
+continuities did not move: no real EA changes =v= across any boundary declared
+=stable=, and 10 households across 2018Q3 (1 EA) and 88 across 2023Q3 (10 of the 12
+EAs) do change it, whole EAs with only the LGA code moving, as declared
+=wave-scoped=.  The 12 EAs (112 households) are a fact of the two covers; two of them
+hold no linked household.
 
 *Why not YAML.*  A =panel_ids:= block reads one file and is stamped with every
 round of its directory, so it expresses neither own covers nor a gate on a second
@@ -1044,7 +1048,7 @@ JEGA -> KALGO, EAs 548 and 926 MAIYAMA -> NGASKI, EAs 3956 and 3992 SURU ->
 DANKO WASAGU, Osun EA 220 EJIGBO -> EGBEDORE, and so on: *12 whole EAs (112
 households)* across 2019Q1 -> 2023Q3, plus *one* (=16/1624/136 ->
 16/1622/136=, 10 households) across 2016Q1 -> 2018Q3.  Every other changed
-=v= at a PH -> PP boundary is a mover's =moved-{hhid}= singleton.
+=v= at any boundary, PP -> PH included, is a mover's =moved-{hhid}= singleton.
 =Nigeria/_/sampling.yml= declares those two boundaries
 =cluster_id_continuity: wave-scoped= (partial), so a =Country('Nigeria')= frame
 carrying =v= across them raises a =ClusterIdentityWarning=; every other
