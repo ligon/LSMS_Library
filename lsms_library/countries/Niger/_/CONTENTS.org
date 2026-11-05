@@ -2852,6 +2852,64 @@ des 7 derniers jours?".  The BID's price component is a separate sample of marke
 (section 3.3), and the community files stop at =s04_co=.  No community questionnaire
 is listed on WB 6276, IHSN 12263 or INS Niger ANADO 173/191.
 
+* 2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)
+
+@ligon's ruling, option W2.  =sample.strata= in the EHCVM waves is ='<Region> Urbain|Rural'=,
+built from the cover's =s00q01= and =s00q04= labels by =ehcvm.derive_region_milieu_stratum=.
+No household file records a stratum, so it is a construction, registered as
+=Niger::sample::region-milieu-stratum= and stamped on every row it produced.  The new
+=strata= table in =_/categorical_mapping.org= is the =Region= table crossed with the
+two milieu labels, so the region part of =strata= is =cluster_features.Region=.
+
+| wave    | clusters | households | =strata=                                     |
+|---------+----------+------------+----------------------------------------------|
+| 2011-12 |      270 |      3,968 | =strate=, 25 recorded labels, unchanged      |
+| 2014-15 |      270 |      3,617 | =strate=, the same 25 labels (was empty)     |
+| 2018-19 |      504 |      6,024 | 16 region x milieu labels (was empty)        |
+| 2021-22 |      555 |      6,622 | 15 region x milieu labels (was empty)        |
+
+So the two programmes keep different schemes: ECVMA region x =zae=, as recorded (=Agadez
+pastorale=, =Tillaberi urbain=), and EHCVM region x milieu (=Agadez Rural=, =Tillabéri Urbain=).
+Not harmonised, because they are different stratifications.  The =strata= table's keys match no
+ECVMA label.
+
+*2014-15.*  =strate= is in =ECVMA2014_P1P2_Conso.dta=, a household x product x mode file
+(322,359 rows), constant within =GRAPPE=, on all 270 of =sample='s grappes and all 3,617
+households.  It is a recorded value, so no derivation.  =sample= became a =dfs:= block; the
+=df_strate= hook in =2014-15/_/mapping.py= reduces the sub-frame to one row per grappe through
+=reduce_to_agreed=, which refuses a grappe holding two strata, because merging the raw file on
+=v= would be a cartesian product.
+=merge_how: left= costs no signal here: no grappe is in one file and not the other, either way.
+
+*The fifteenth cell.*  BID Table 1 (=ner_ehcvm2_information_de_base_eng.pdf= p.9) equals
+2021-22's households cell by cell, wave by wave, except Tillabéri urban wave 1, printed 106 where
+the file holds 96.  The print is the error: that row's own total of 336 is 96 + 240, that
+column's total of 1,177 needs 96, and the BID's second table (p.11) prints 96.  That second table
+in turn differs from the file by one household in Diffa (156/227 against 155/228) and Maradi
+(97/394 against 96/395), and Table 1 does not.
+
+*What 15 of 15 proves.*  Table 1 is titled "initial sample" but totals to the delivered file (6,622),
+so it tabulates the same two cover variables.  The match checks this reading of the cover and does
+not corroborate that the cells are strata.  The BID's sentence is what names the stratum.
+
+*Across the EHCVM boundary.*  Each wave's label is its own cover's.  35 of the 5,055 households
+in both waves change stratum (3 clusters): Niamey Rural to Niamey Urbain 23, Diffa Rural to Diffa
+Urbain 12.
+
+*=Niamey Rural= is contested in 2021-22.*  It is 2 clusters on the 2018-19 cover and none on the 2021-22
+cover or welfare file, which is what =strata= serves.  But =ehcvm_ponderations_ner2021.dta= still codes 2
+Niamey clusters =Rural= (24 households, 12 per wave), exactly 2018-19's two, and =ehcvm_nsu_ner2021.dta=
+still lists =NiameyRural=.  Their weights do not settle it: log weight 5.82 and 6.11, against 5.73 (sd
+0.42) for the other 59 Niamey clusters.
+
+*More on the BID.*  The French version, p.12, says « La strate est la combinaison région/milieu »; the
+English "region/locality", p.9, is ambiguous.  Table 1 has a second misprint, a total: Tahoua wave 1
+prints 453, where 106 + 348 is 454.  Table 2's one-household differences in Diffa and Maradi are not noise:
+those cells equal the weight file's =milieu=, and they are the 2 grappes where that =milieu= varies
+within a grappe.  Table 2 still writes Niamey all urban, so it follows neither file throughout.
+
+Cost: a Niger re-warm.  Other countries' =strata= hold other things: see =docs/guide/feature.md=.
+
 * 2026-11-04 -- crop_production: the survey harvest kilograms are served (GH #1436)
 
 *RULED (@ligon, 2026-11-04, option A).*  =Quantity_kg= is served as an optional canonical column and read
@@ -3015,60 +3073,3 @@ The ruling on GH #843, option (d), extended in bulk on 2026-11-04, applies: the 
 two or more lines of which only ONE is served: the others hold no quantity or month, so =_finalize_result='s =dropna(how='all')= removes them at the API.
 =niger.served_harvest_lines= no longer counts such a line unless it is the crop's only one, so these 19 sit on their row: 2014-15 is 583 sales on a line
 (78,919,660 FCFA) and 498 on Farm-level (34,249,850 FCFA), rows 9,316 -> 9,297.  2021-22 has none, because its lines carry =intercropped=, and does not move.
-* 2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)
-
-@ligon's ruling, option W2.  =sample.strata= in the EHCVM waves is ='<Region> Urbain|Rural'=,
-built from the cover's =s00q01= and =s00q04= labels by =ehcvm.derive_region_milieu_stratum=.
-No household file records a stratum, so it is a construction, registered as
-=Niger::sample::region-milieu-stratum= and stamped on every row it produced.  The new
-=strata= table in =_/categorical_mapping.org= is the =Region= table crossed with the
-two milieu labels, so the region part of =strata= is =cluster_features.Region=.
-
-| wave    | clusters | households | =strata=                                     |
-|---------+----------+------------+----------------------------------------------|
-| 2011-12 |      270 |      3,968 | =strate=, 25 recorded labels, unchanged      |
-| 2014-15 |      270 |      3,617 | =strate=, the same 25 labels (was empty)     |
-| 2018-19 |      504 |      6,024 | 16 region x milieu labels (was empty)        |
-| 2021-22 |      555 |      6,622 | 15 region x milieu labels (was empty)        |
-
-So the two programmes keep different schemes: ECVMA region x =zae=, as recorded (=Agadez
-pastorale=, =Tillaberi urbain=), and EHCVM region x milieu (=Agadez Rural=, =Tillabéri Urbain=).
-Not harmonised, because they are different stratifications.  The =strata= table's keys match no
-ECVMA label.
-
-*2014-15.*  =strate= is in =ECVMA2014_P1P2_Conso.dta=, a household x product x mode file
-(322,359 rows), constant within =GRAPPE=, on all 270 of =sample='s grappes and all 3,617
-households.  It is a recorded value, so no derivation.  =sample= became a =dfs:= block; the
-=df_strate= hook in =2014-15/_/mapping.py= reduces the sub-frame to one row per grappe through
-=reduce_to_agreed=, which refuses a grappe holding two strata, because merging the raw file on
-=v= would be a cartesian product.
-=merge_how: left= costs no signal here: no grappe is in one file and not the other, either way.
-
-*The fifteenth cell.*  BID Table 1 (=ner_ehcvm2_information_de_base_eng.pdf= p.9) equals
-2021-22's households cell by cell, wave by wave, except Tillabéri urban wave 1, printed 106 where
-the file holds 96.  The print is the error: that row's own total of 336 is 96 + 240, that
-column's total of 1,177 needs 96, and the BID's second table (p.11) prints 96.  That second table
-in turn differs from the file by one household in Diffa (156/227 against 155/228) and Maradi
-(97/394 against 96/395), and Table 1 does not.
-
-*What 15 of 15 proves.*  Table 1 is titled "initial sample" but totals to the delivered file (6,622),
-so it tabulates the same two cover variables.  The match checks this reading of the cover and does
-not corroborate that the cells are strata.  The BID's sentence is what names the stratum.
-
-*Across the EHCVM boundary.*  Each wave's label is its own cover's.  35 of the 5,055 households
-in both waves change stratum (3 clusters): Niamey Rural to Niamey Urbain 23, Diffa Rural to Diffa
-Urbain 12.
-
-*=Niamey Rural= is contested in 2021-22.*  It is 2 clusters on the 2018-19 cover and none on the 2021-22
-cover or welfare file, which is what =strata= serves.  But =ehcvm_ponderations_ner2021.dta= still codes 2
-Niamey clusters =Rural= (24 households, 12 per wave), exactly 2018-19's two, and =ehcvm_nsu_ner2021.dta=
-still lists =NiameyRural=.  Their weights do not settle it: log weight 5.82 and 6.11, against 5.73 (sd
-0.42) for the other 59 Niamey clusters.
-
-*More on the BID.*  The French version, p.12, says « La strate est la combinaison région/milieu »; the
-English "region/locality", p.9, is ambiguous.  Table 1 has a second misprint, a total: Tahoua wave 1
-prints 453, where 106 + 348 is 454.  Table 2's one-household differences in Diffa and Maradi are not noise:
-those cells equal the weight file's =milieu=, and they are the 2 grappes where that =milieu= varies
-within a grappe.  Table 2 still writes Niamey all urban, so it follows neither file throughout.
-
-Cost: a Niger re-warm.  Other countries' =strata= hold other things: see =docs/guide/feature.md=.

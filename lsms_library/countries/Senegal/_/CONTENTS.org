@@ -886,6 +886,31 @@ sample of markets, and the community files stop at =s04_co=.
 
 *Cost.*  =data_scheme.yml= and a new wave script move every Senegal hash: one re-warm.  =.coder/coverage/latest.csv= grades the cell =absent= until the next =make matrix=.
 
+* 2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)
+
+@ligon's ruling, option W2.  =sample.strata= in the EHCVM waves is ='<Region> Urbain|Rural'=,
+built from the cover's =s00q01= and =s00q04= labels by =ehcvm.derive_region_milieu_stratum=.
+No household file records a stratum, so it is a construction, registered as
+=Senegal::sample::region-milieu-stratum= and stamped on every row it produced.  The new
+=strata= table in =_/categorical_mapping.org= is the =Region= table crossed with the
+two milieu labels, so the region part of =strata= is =cluster_features.Region=.
+
+| wave    | clusters | households | =strata= cells | before |
+|---------+----------+------------+----------------+-----------|
+| 2018-19 |      598 |      7,156 |             28 | no column |
+| 2021-22 |      596 |      7,120 |             28 | no column |
+
+BID Table 1a (held since GH #1084, =sen_ehcvm2_information_de_base_eng.pdf= p.12) equals
+2018-19 in all 28 cells; =tests/test_gh812_ehcvm_strata.py= transcribes it.  0 of the 6,432
+households in both waves change stratum.  The source's =thies=, =kedougou= and =sedhiou= stay
+unaccented, as =Region= does.
+
+=strata= is no longer =optional: true= in =data_scheme.yml=: every wave now carries it, and
+leaving the flag would disarm Site B for it.  The ruling did not name this; it is one line.
+
+Cost: a Senegal re-warm.  Other countries' =strata= hold other things: see
+=docs/guide/feature.md=, "=strata= Is Not One Vocabulary".
+
 * 2026-11-04 -- =crop_production= serves =condition= and the recorded answer (GH #1436)
 
 Ruling @ligon 2026-11-04, option (D), set on Niger in #1471: the fold stays on the
@@ -926,27 +951,3 @@ blanked both would not show.
 
 The table serves 4,182 of the 8,717 reported shocks: the rest carry no follow-up, are all-NA
 and are dropped.  That is with the maintainer, and unchanged here.
-* 2026-11-04 -- EHCVM strata are region x milieu labels (GH #812)
-
-@ligon's ruling, option W2.  =sample.strata= in the EHCVM waves is ='<Region> Urbain|Rural'=,
-built from the cover's =s00q01= and =s00q04= labels by =ehcvm.derive_region_milieu_stratum=.
-No household file records a stratum, so it is a construction, registered as
-=Senegal::sample::region-milieu-stratum= and stamped on every row it produced.  The new
-=strata= table in =_/categorical_mapping.org= is the =Region= table crossed with the
-two milieu labels, so the region part of =strata= is =cluster_features.Region=.
-
-| wave    | clusters | households | =strata= cells | before |
-|---------+----------+------------+----------------+-----------|
-| 2018-19 |      598 |      7,156 |             28 | no column |
-| 2021-22 |      596 |      7,120 |             28 | no column |
-
-BID Table 1a (held since GH #1084, =sen_ehcvm2_information_de_base_eng.pdf= p.12) equals
-2018-19 in all 28 cells; =tests/test_gh812_ehcvm_strata.py= transcribes it.  0 of the 6,432
-households in both waves change stratum.  The source's =thies=, =kedougou= and =sedhiou= stay
-unaccented, as =Region= does.
-
-=strata= is no longer =optional: true= in =data_scheme.yml=: every wave now carries it, and
-leaving the flag would disarm Site B for it.  The ruling did not name this; it is one line.
-
-Cost: a Senegal re-warm.  Other countries' =strata= hold other things: see
-=docs/guide/feature.md=, "=strata= Is Not One Vocabulary".
