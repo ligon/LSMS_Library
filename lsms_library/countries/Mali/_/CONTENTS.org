@@ -3218,3 +3218,20 @@ All of the movement is on the 309 rows, 261,596 -> 346,373 kg:
 - *3 rows state 0 kg* beside a positive quantity (=Autre= 2, =Cart (donkey)= 1).  No answer, not a harvest of nothing,
   so =Quantity_kg= is NA and the row falls down the ladder, as Niger's do.  Those units have no factor, so they contribute
   nothing.
+* 2026-11-04 -- =shocks= 2021-22: =s14bq04d= is the livestock (GH #1556)
+
+By the file's labels and the questionnaire's column heads (=mli_ehcvm2_qnr_men_excel_vague1.pdf= p. 69),
+=s14bq04a..f= are revenu, avoirs, production agricole, effectif du cheptel, stock de
+produits alimentaires, achats.  =AffectedConsumption= read =d=, the livestock.  It now
+reads =e=, the stock.
+True share 0.494 -> 0.751; 1,968 of 4,884 rows change.
+
+=s14bq05__25= (=Autre stratégie=) alone has the Oui/Non label set; the other 25 hold
+ranks.  The hook's rank map never matched it, so all 72 rows that chose it served
+=HowCoped0= NA.  It now takes the first slot no other strategy holds.  Every one of
+the 72 chose nothing else.  In Burkina's file, which keeps the raw rank, 17 of 62
+code-25 choices are second or third, so Mali's file may have blanked such choices;
+that cannot be read from this file.
+
+The table serves 4,884 of the 8,760 reported shocks: the rest carry no follow-up, are all-NA
+and are dropped.  That is with the maintainer, and unchanged here.
