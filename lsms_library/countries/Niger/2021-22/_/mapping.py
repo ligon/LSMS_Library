@@ -192,6 +192,7 @@ def shocks(df):
         # In 2021-22, cope columns contain rank strings instead of binary indicators.
         # Collect (rank, label) pairs and sort by rank to get ordered coping strategies.
         ranked = []
+        unranked = []
         for c in cope_cols:
             num = int(c.replace('Cope', ''))
             val = row[c]
@@ -200,6 +201,20 @@ def shocks(df):
             rank = _STRATEGY_RANK.get(str(val))
             if rank is not None:
                 ranked.append((rank, COPING_LABELS.get(num, f'Strategy {num}')))
+            elif str(val) == 'Oui':
+                unranked.append(COPING_LABELS.get(num, f'Strategy {num}'))
+
+        # Code 25 (Autre strategie) alone carries the Oui/Non label set, so its
+        # rank is not in the file (GH #1556).  It takes the rank no other
+        # strategy holds: ranks are otherwise gapless, and Burkina, which keeps
+        # the raw rank, shows 25 always filling the next one.  The instrument
+        # allows three strategies, so a fourth falls off the three served slots
+        # below and is dropped (0 held rows).
+        held = {rank for rank, _ in ranked}
+        for label in unranked:
+            rank = min(set(range(1, len(held) + 2)) - held)
+            held.add(rank)
+            ranked.append((rank, label))
 
         ranked.sort(key=lambda x: x[0])
         found = [label for _, label in ranked]

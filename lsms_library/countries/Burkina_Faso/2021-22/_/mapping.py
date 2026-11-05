@@ -239,7 +239,9 @@ def shocks(df):
 
     how_coped = {0: [], 1: [], 2: []}
     for _, row in df[cope_cols].iterrows():
-        found = []
+        # Unlabelled in this file, but the values are the instrument's ranks:
+        # every row holds 1, 1-2 or 1-2-3, and code 25 keeps its rank (GH #1556).
+        ranked = []
         for c in cope_cols:
             num = int(c.replace('Cope', ''))
             val = row[c]
@@ -248,9 +250,9 @@ def shocks(df):
             except (ValueError, TypeError):
                 continue
             if val >= 1:
-                found.append(COPING_LABELS.get(num, f'Strategy {num}'))
-            if len(found) == 3:
-                break
+                ranked.append((val, COPING_LABELS.get(num, f'Strategy {num}')))
+        ranked.sort(key=lambda x: x[0])
+        found = [label for _, label in ranked]
         for k in range(3):
             how_coped[k].append(found[k] if k < len(found) else np.nan)
 

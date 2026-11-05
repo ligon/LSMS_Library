@@ -2962,3 +2962,20 @@ the kilogram on this build, then the differences:
 The issue's 1,576,548 for 2011-12 predates section 3E.  "Screen" is a kg / q above =KG_FACTOR_MAX= or a =Kg= row off 1,
 which =reported= refuses and a total need not meet.  "No median fill": an implied factor enters no =survey_median=, so
 a masked 0 or code beside a =Tiya= stays =none=.
+* 2026-11-04 -- =shocks= 2021-22: =s14bq04d= is the livestock (GH #1556)
+
+By the file's labels and the questionnaire's column heads (=ner_ehcvm2_qnr_men_excel_vague1.pdf= p. 67),
+=s14bq04a..f= are revenu, avoirs, production agricole, effectif du cheptel, stock de
+produits alimentaires, achats.  =AffectedConsumption= read =d=, the livestock.  It now
+reads =e=, the stock, which is what the name has meant for this table in this family.
+True share 0.429 -> 0.777; 1,389 of 2,876 rows change.
+
+=s14bq05__25= (=Autre stratégie=) alone has the Oui/Non label set; the other 25 hold
+ranks.  The hook's rank map never matched it, so all 52 rows that chose it lost it,
+and the 35 that chose nothing else served =HowCoped0= NA.  It now takes the rank no
+other strategy holds.  Ranks are otherwise gapless here, and Burkina's file, which
+keeps the raw rank of code 25, shows it always filling the next one.  On 2 rows the
+only other strategy is a Deuxième, so =Autre stratégie= is served first.
+
+The table serves 2,876 of the 6,055 reported shocks: the rest carry no follow-up, are all-NA
+and are dropped.  That is with the maintainer, and unchanged here.

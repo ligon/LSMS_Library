@@ -903,3 +903,22 @@ blank unit on all 597.  The answer describes the harvest quantity only: =s16cq16
 2021-22 has no =crop_production= script, so this table reaches no 2021-22 row.  For whoever wires it: =s16c_me_sen2021.dta= =s16cq16d= has three answers, =1. Epis/coques= 1,899, =2. Grains= 2,420, =3. NA= 549, blank 1,626.  Code 3 collides with Décortiqué here, so that wave needs its own table (Niger's =harmonize_crop_condition_ehcvm2=), and =condition_native= stays NA there because nothing is folded.  The blank state is not quite the blank unit there: 1,626 against 1,622, and 240 lines state a condition with no quantity.
 
 *Cost:* one Senegal re-warm (=data_scheme.yml=, =categorical_mapping.org= and the wave script).
+* 2026-11-04 -- =shocks= 2021-22: =s14bq04d= is the livestock (GH #1556)
+
+By the file's labels and the questionnaire's column heads (=sen_ehcvm2_qnr_men_excel_vague1.pdf= p. 67),
+=s14bq04a..f= are revenu, avoirs, production agricole, effectif du cheptel, stock de
+produits alimentaires, achats.  =AffectedConsumption= read =d=, the livestock.  It now
+reads =e=, the stock.
+True share 0.304 -> 0.548; 1,544 of 4,181 rows change.
+
+=s14bq05__25= (=Autre stratégie=) alone has the Oui/Non label set; the other 25 hold
+ranks.  The hook's rank map never matched it, so all 65 rows that chose it served
+=HowCoped0= NA.  It now takes the rank no other strategy holds.  Every one of the 65
+chose nothing else, whereas in Burkina's file, which keeps the raw rank, 17 of 62
+code-25 choices are second or third.  =s14bq05_autre=, the text of the "autre", shows no
+blanked choice: it is filled on all 65 rows and on no other row (250 of 251 code-25
+rows across Niger, Mali, Senegal and Burkina, and no other row).  A source that
+blanked both would not show.
+
+The table serves 4,182 of the 8,717 reported shocks: the rest carry no follow-up, are all-NA
+and are dropped.  That is with the maintainer, and unchanged here.

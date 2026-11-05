@@ -150,7 +150,8 @@ def shocks(df):
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
     # For 2021-22: coping columns have ranked string values
-    # "Première stratégie", "Deuxième strategie", "Troisième stratégie", "Non"
+    # "Première stratégie", "Deuxième strategie", "Troisième stratégie", "Non";
+    # code 25 alone is "Oui"/"Non".
     rank_map = {
         'Première stratégie': 0,
         'Deuxième strategie': 1,
@@ -160,12 +161,24 @@ def shocks(df):
     how_coped = {0: [], 1: [], 2: []}
     for _, row in df[cope_cols].iterrows():
         ranked = [np.nan, np.nan, np.nan]
+        autre = None
         for c in cope_cols:
             num = int(c.replace('Cope', ''))
             val = row[c]
             if val in rank_map:
                 idx = rank_map[val]
                 ranked[idx] = COPING_LABELS.get(num, f'Strategy {num}')
+            elif str(val) == 'Oui':
+                autre = COPING_LABELS.get(num, f'Strategy {num}')
+        # Code 25 (Autre strategie) alone carries the Oui/Non label set, so its
+        # rank is not in the file (GH #1556).  It takes the first slot no other
+        # strategy holds: ranks are otherwise gapless, and Burkina, which keeps
+        # the raw rank, shows 25 always filling the next one.  The instrument
+        # allows three strategies, so a fourth has no slot and is dropped, as in
+        # Niger and Senegal (0 held rows).
+        free = [k for k in range(3) if pd.isna(ranked[k])]
+        if autre is not None and free:
+            ranked[free[0]] = autre
         for k in range(3):
             how_coped[k].append(ranked[k])
 
