@@ -717,6 +717,118 @@ def _finish_crop_production(df, t):
 
 
 # ---------------------------------------------------------------------------
+# A household-crop sale: its one harvest line, or Farm-level (GH #1457)
+# ---------------------------------------------------------------------------
+#
+# 2014-15 AS2E2 and 2021-22 s16d record a sale per household and crop, with no plot.
+# The wave scripts attach one to the crop's single harvest LINE (GH #1360).  Any other
+# sale goes on ONE row with plot_id = FARM_LEVEL, no harvest Quantity and the sentinels
+# of a row with no harvest on the index (ruling on GH #843, option (d); in bulk here,
+# 2026-11-04).  No sale is split, summed or dropped.
+
+HH_CROP_SALE = 'Niger::crop_production::hh-crop-sale-single-row'
+
+
+def is_crop_sale(frame):
+    """A sale is a record with a positive sold quantity or a positive value."""
+    return (pd.to_numeric(frame['Quantity_sold'], errors='coerce').astype('float64').gt(0)
+            | pd.to_numeric(frame['Value_sold'], errors='coerce').astype('float64').gt(0))
+
+
+def derive_hh_crop_sale_attachment(harvest, records):
+    """``harvest`` with ONE new row for each sale the line rule did not attach.
+
+    ``harvest`` is the wave's rows after the script's merge: a sale is on a crop's one
+    line, or nowhere.  ``records`` holds the crop-level records before that merge's
+    filters, one row per (i, crop, sold unit[, sold state]).  A pair that sold in two
+    units or states would need two rows on one key, which the script's uniqueness
+    assert refuses: measured, none does.  A sale's own unit and state ride on the row;
+    ``u``, ``condition`` and ``production_obs`` describe a harvest, which it does not
+    have.  A record that is not a sale serves nothing here.
+    """
+    keys = ['i', 'crop']
+    on_a_row = (harvest.loc[harvest['Quantity_sold'].notna() | harvest['Value_sold'].notna(), keys]
+                .drop_duplicates())
+    sales = records[is_crop_sale(records)]
+    placed = sales.merge(on_a_row, on=keys, how='left', indicator=True)['_merge'].eq('both')
+    farm = sales[~placed.to_numpy()].copy()
+    farm['plot_id'] = FARM_LEVEL
+    if 'production_obs' in harvest.columns:
+        farm['production_obs'] = CROP_OBS_NA
+    return pd.concat([harvest, farm], ignore_index=True)
+
+
+def stamp_hh_crop_sale(df):
+    """The ``Derivation`` column of a finished 2014-15 / 2021-22 frame, a ``string``
+    Series on its index: :data:`HH_CROP_SALE` on a harvest line holding a sale, beside
+    any key already on that row (``MULTI_SEP``, sorted), and every other row's own.  A
+    Farm-level row's index discloses it, and a 0 is not a sale."""
+    plotted = df.index.get_level_values('plot_id') != FARM_LEVEL
+    sold = is_crop_sale(df).astype('boolean').fillna(False).to_numpy(dtype=bool)
+    out = (df['Derivation'].astype('string').copy() if 'Derivation' in df.columns
+           else pd.Series(pd.NA, index=df.index, dtype='string'))
+    hit = plotted & sold
+    out[hit] = pd.array([union_keys((key, HH_CROP_SALE)) for key in out[hit]], dtype='string')
+    return out
+
+
+def inputs_hh_crop_sale_single_row(wave):
+    """The raw sale answers behind one wave's keyed rows, at (t, i, crop), under their
+    own names.  Registry ``inputs``; re-reads the source.  One row per keyed served row:
+    an s16d line repeated once per harvest line is one record (see the 2021-22 script),
+    and it needs one line to carry the key."""
+    from lsms_library.local_tools import get_dataframe
+    from lsms_library.paths import countries_root
+    if wave not in _HH_SALE_SOURCE:
+        raise ValueError(f'hh-crop-sale-single-row is {sorted(_HH_SALE_SOURCE)}, not {wave!r}')
+    spec = _HH_SALE_SOURCE[wave]
+    root = Path(countries_root()) / 'Niger' / wave / 'Data'
+    crop_map = tools.get_categorical_mapping(
+        tablename='harmonize_food', idxvars='Original Label',
+        dirs=[f"{Path(countries_root()) / 'Niger' / wave / '_'}/",
+              f"{Path(countries_root()) / 'Niger' / '_'}/"],
+        **{'Preferred Label': 'Preferred Label'})
+
+    def read(name, crop, hh):
+        lab = get_dataframe(str(root / name), convert_categoricals=True)
+        code = get_dataframe(str(root / name), convert_categoricals=False)
+        out = code.copy()
+        out['t'] = wave
+        out['i'] = lab.apply(lambda r: i(pd.Series([r[v] for v in hh], index=hh)), axis=1).values
+        out['crop'] = _crop_labels(code[crop], lab[crop], crop_map).values
+        return out
+
+    lines = read(spec['harvest'], spec['harvest_crop'], spec['hh']).dropna(subset=['i', 'crop'])
+    per_pair = lines.groupby(['i', 'crop']).size().rename('_lines').reset_index()
+    sale = read(spec['sale'], spec['sale_crop'], spec['hh'])
+    if spec.get('drop_repeats'):
+        sale = sale[~get_dataframe(str(root / spec['sale']),
+                                   convert_categoricals=False).duplicated(keep='first').to_numpy()]
+    sale = sale.dropna(subset=['i', 'crop'])
+    qty = _na_exact(sale[spec['qty']], spec.get('qty_codes', ()))
+    value = _na_exact(sale[spec['value']], spec.get('value_codes', ()))
+    sold = (qty.astype('float64').gt(0) | value.astype('float64').gt(0)).to_numpy(dtype=bool)
+    kept = sale[sold].merge(per_pair, on=['i', 'crop'], validate='many_to_one')
+    kept = kept[kept['_lines'] == 1]
+    return kept[['t', 'i', 'crop'] + spec['raw']].set_index(['t', 'i', 'crop'])
+
+
+#: Each wave's two crop files, as the wave scripts name them.
+_HH_SALE_SOURCE = {
+    '2014-15': dict(harvest='NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E1P2.dta',
+                    sale='NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E2P2.dta',
+                    harvest_crop='CULTURE', sale_crop='AS02EQ110B',
+                    hh=['GRAPPE', 'MENAGE', 'EXTENSION'],
+                    qty='AS02EQ12A', value='AS02EQ13', qty_codes=(9999,), value_codes=(9999999,),
+                    raw=['AS02EQ110B', 'AS02EQ12A', 'AS02EQ12B', 'AS02EQ13']),
+    '2021-22': dict(harvest='s16c_me_ner2021.dta', sale='s16d_me_ner2021.dta',
+                    harvest_crop='s16cq04', sale_crop='s16dq01', hh=['grappe', 'menage'],
+                    qty='s16dq05a', value='s16dq06', drop_repeats=True,
+                    raw=['s16dq01', 's16dq05a', 's16dq05b', 's16dq05d', 's16dq06']),
+}
+
+
+# ---------------------------------------------------------------------------
 # The dry season: 2011-12 section 3E, ecvmaas3e_p1 (GH #1462)
 # ---------------------------------------------------------------------------
 #

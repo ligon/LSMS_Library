@@ -217,8 +217,8 @@ Mali::crop_production::tree-sale-window:
   since: '2026-10-23'
 
 Mali::crop_production::hh-crop-sale-single-row:
-  waves: ['2021-22']
-  columns: [Quantity_sold, Unit_sold, Value_sold]
+  waves: ['2017-18', '2021-22']
+  columns: [Quantity_sold, Unit_sold, KgFactor_sold, Value_sold]
   rule: >-
     s16d records a sale for the household and crop, with no plot.  A sale is a
     record with a positive s16dq05a or s16dq06.  Where the household has exactly
@@ -231,10 +231,17 @@ Mali::crop_production::hh-crop-sale-single-row:
     scaled or dropped, and a record that is not a sale serves nothing: no zero is
     written.  This key shares a row with harvest-to-date, harvest-from-dispositions or
     survey-kg-estimate through derivations.MULTI_SEP, in sorted order.
+    written.  This key shares a row with harvest-to-date or harvest-from-dispositions
+    through derivations.MULTI_SEP, in sorted order.  2017-18 is the same rule on s7g
+    and s7f (GH #1457): s7gq21a, s7gq21b, s7gq21d (kg per sold unit) and s7gq22, a
+    quantity code 99 / 9999 masked as on every field row.  One difference, from the
+    ruling of 2026-10-23: a 2017-18 record that is not a sale still serves a crop on
+    one plot, s7gq20 = 'Non' as Quantity_sold = Value_sold = 0, with no key.
   function: lsms_library.countries.Mali._.mali:derive_hh_crop_sale_attachment
   inputs: lsms_library.countries.Mali._.mali:inputs_hh_crop_sale_single_row
   raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b,
-                  s16dq06]
+                  s16dq06, s7fq01, s7fq02, s7fq03, s7gq01, s7gq20, s7gq21a, s7gq21b,
+                  s7gq21d, s7gq22]
   assumptions:
     - text: >-
         s16d asks the sale once per crop, with no plot, and s16c records no sale.
@@ -255,9 +262,10 @@ Mali::crop_production::hh-crop-sale-single-row:
         put one there, so harvest_kg reads such a row only then.
       basis: modelling-choice
       evidence: >-
-        ruling @ligon 2026-11-03, option (d), GH #824; the rule of Niger 2021-22
-        after GH #1360 for the single row; the Farm-level convention in
-        lsms_library/data_info.yml, top of file.
+        ruling @ligon 2026-11-03, option (d), GH #824; extended to 2017-18 by the bulk
+        ruling of 2026-11-04, GH #1457; the rule of Niger 2021-22 after GH #1360 for
+        the single row; the Farm-level convention in lsms_library/data_info.yml, top of
+        file.
     - text: >-
         s16dq05c, "Estimation Quantite totale UML en kg", is not served.  It is a
         total (it equals s16dq05a on 495 of 495 rows sold in Kg, and 100 x
@@ -271,8 +279,11 @@ Mali::crop_production::hh-crop-sale-single-row:
     directly.  Cold build of 2021-22: 1,070 keyed rows and 70 Farm-level rows (58 of
     crops on two rows, 12 on three or more, 0 on none) hold the 1,140 sale records, no
     sale on two rows; Value_sold 394,396,600 + 24,301,375 = 418,697,975 FCFA, the raw sum.
+    tests/test_gh1457_mali_multi_plot_sales.py, the same for 2017-18: 459 keyed rows and
+    202 Farm-level rows hold the 661 sale records; Value_sold 132,259,405 + 48,469,050 =
+    180,728,455 FCFA, the raw s7gq22 sum (the build lost the 48,469,050 before GH #1457).
     Not validated against an external total: no document here reports one.
-  contents: 'Mali/_/CONTENTS.org, "2026-11-03 -- EHCVM crop_production wired (GH #824)"'
+  contents: 'Mali/_/CONTENTS.org, "2026-11-03 -- EHCVM crop_production wired (GH #824)"; "2026-11-04 -- 2017-18 multi-plot sales (GH #1457)"'
   since: '2026-11-03'
 
 Mali::crop_production::harvest-to-date:

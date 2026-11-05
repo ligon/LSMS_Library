@@ -2979,3 +2979,38 @@ only other strategy is a Deuxième, so =Autre stratégie= is served first.
 
 The table serves 2,876 of the 6,055 reported shocks: the rest carry no follow-up, are all-NA
 and are dropped.  That is with the maintainer, and unchanged here.
+* 2026-11-04 -- multi-plot sales (GH #1457)
+
+2014-15 AS2E2 and 2021-22 s16d record a sale per household and crop.  Until now one reached the table only on a
+crop's single harvest line; the rest was unserved, which understated revenue most for households farming most land.
+The ruling on GH #843, option (d), extended in bulk on 2026-11-04, applies: the line, keyed
+=hh-crop-sale-single-row=, or else ONE =plot_id = 'Farm-level'= row, =u = 'Unknown'=, =condition = 'unknown_condition'=,
+=production_obs = 'unresolved_observation'=, no =Quantity=, in its own =Unit_sold= (and 2021-22 =Condition_sold=).
+
+| sale records, cold             | 2014-15 | FCFA        | 2021-22 | FCFA        |
+|--------------------------------+---------+-------------+---------+-------------|
+| on the one line                |     564 |  78,485,760 |   1,265 |  68,629,070 |
+| Farm-level, two+ plots state   |     467 |  32,932,300 |     397 |  31,049,050 |
+| Farm-level, two+ state, ONE plot|      0 |           0 |     144 |   4,585,225 |
+| Farm-level, ONE line states    |      31 |     694,450 |      12 |     696,200 |
+| Farm-level, no harvest row     |      19 |   1,057,000 |       0 |           0 |
+|--------------------------------+---------+-------------+---------+-------------|
+| all, equal to the raw sum      |   1,081 | 113,169,510 |   1,818 | 104,959,545 |
+
+*How it composes with the rules already here.*
+- =s16d='s repeated lines (GH #824): the exact-duplicate drop runs first, so a sale repeated once per harvest line is one
+  sale, on one row.  The raw sum above is after that drop; before it the file sums to 164,095,420.
+- One harvest line (GH #1360) is kept, not replaced with one plot: the 144 two-line sales on ONE plot go to Farm-level, and
+  their plot is knowable.  Nigeria's lane found the same (ruling pending there).  Reported, not resolved.
+- Nigeria's ruling A, the one row that STATES a harvest, is not extended, so 31 + 12 sales sit on Farm-level with one harvest
+  line among their rows.  A lone line stating no harvest keeps its sale (2 sales, 2,500 FCFA, 2014-15), which differs from Nigeria.
+- The dry-season Farm-level rows of 2011-12 (GH #1462) are a different thing on the same sentinel: they carry a harvest.  No wave has both.
+- =Value_sold= and =Quantity_sold= of a 0 on a one-line crop stay, with no key.  The all-nines codes (GH #865) mask before a record is judged a sale.
+- A pair that sold in two units or states would need two rows on one key; the wave's uniqueness assert refuses it.  Measured: none.
+
+=Derivation= moves on the 564 + 1,265 rows already holding a sale, which is the only column that moves on them.
+
+*Disclosed, 19 of the 31 2014-15 sales above (433,900 FCFA, review of GH #1457).*  The script counts every s2e1 line of a crop, and each of these
+has two or more lines of which only ONE is served: the others hold no quantity or month, so =_finalize_result='s =dropna(how='all')= removes them at the
+API.  So the sale sits on Farm-level though the household has one served row, stating a harvest, for that crop.  Value and quantity are served either way;
+only the plot is not.  2021-22 has none: its lines carry =intercropped=.

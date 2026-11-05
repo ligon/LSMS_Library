@@ -3237,3 +3237,29 @@ that blanked both would not show.
 
 The table serves 4,884 of the 8,760 reported shocks: the rest carry no follow-up, are all-NA
 and are dropped.  That is with the maintainer, and unchanged here.
+* 2026-11-04 -- 2017-18 multi-plot sales (GH #1457)
+
+=eaci17_s7gp2= records a sale per household and crop, with no plot.  Until now a sale reached the
+table only where the crop was on one plot, so a crop on two or more kept =Quantity_sold= and =Value_sold=
+NA: revenue was understated most among households farming most land.  The ruling on GH #843, option
+(d), extended in bulk on 2026-11-04, applies: the single =s7f= row, keyed =hh-crop-sale-single-row=, or
+else ONE =plot_id = 'Farm-level'= row with no =Quantity= or =u=.  The Farm-level row's =Unit_sold= and
+=KgFactor_sold= are the sale's own.  =derive_hh_crop_sale_attachment= is the same function as 2021-22.
+
+| where a sale goes (661 records, cold)     | records | =Value_sold=, FCFA |
+|-------------------------------------------+---------+--------------------|
+| the crop's one row                        |     459 |        132,259,405 |
+| Farm-level: two or more plots state one   |     200 |         47,819,050 |
+| Farm-level: two rows, ONE states a harvest|       2 |            650,000 |
+|-------------------------------------------+---------+--------------------|
+| all, equal to the raw =s7gq22= sum        |     661 |        180,728,455 |
+
+- *What stays.*  A record that is not a sale still serves a crop on one plot: =s7gq20 = 'Non'= as a filled-in
+  0 (ruling 2026-10-23), an unrecorded answer as NA.  The 1,607 Leger =Oui= rows have no quantity to carry,
+  so a multi-plot crop's yes-with-no-number serves nothing.  No zero is written on a Farm-level row.
+- *The key moved on the 459.*  They held the sale before, unkeyed; =Derivation= is the only column that moves.
+- *Tree rows share the sentinel.*  A sale's Farm-level row and a tree's sit on one =plot_id= and =crop_production_finalize=
+  sums a repeated key, so the wave script refuses a meeting (0 today: the tree roster and =s7f= share no crop in one household
+  among these).  =perennial= is NA on a sale's row and True on a tree's.
+- *The 2 rows that state a harvest are not attached.*  Nigeria's ruling A (the one row that STATES a harvest) was not extended; these
+  two (650,000 FCFA) go to Farm-level under "two or more rows".  No 2017-18 household states two lines on one plot: =s7f= has one row per plot-crop.

@@ -175,7 +175,10 @@ Data Scheme:
     # plot_id (verified 100% join on the EHCVM waves).  Quantity_sold /
     # Value_sold are at plot-crop grain only where the survey records them
     # there (2011-12, 2018-19); in 2014-15 / 2021-22 the sale block is
-    # crop-level and is attributed only to single-plot crops, else NaN.
+    # crop-level: a sale goes on the crop's single harvest line, keyed
+    # hh-crop-sale-single-row, and otherwise on ONE plot_id = 'Farm-level' row
+    # with no harvest Quantity (GH #1457).  EXCLUDE plot_id == 'Farm-level' for
+    # plot-grain work; KEEP it for household or crop totals.
     # Columns intentionally OMITTED (no Niger wave records them, so an
     # all-NaN column would just trip the sanity checker — GAP rule "only
     # include columns the source actually records"): planting_month (no
@@ -224,9 +227,9 @@ Data Scheme:
     # data_info.yml, Unit_sold note): exclude or resolve, and report the
     # count.  NA-bearing, never sentinel-filled -- a column has no NaN-key
     # hazard, and NA means "no sale, or no sold unit recorded".  In 2014-15
-    # and 2021-22 the sale block is crop-level; the sale is attributed only to
-    # a crop reported on ONE harvest line (hence one plot) and sold in ONE
-    # unit, so it lands on one served row (GH #1360).  `optional` because a
+    # and 2021-22 the sale block is crop-level, so a sale lands on one served
+    # row: the crop's ONE harvest line (GH #1360) or a Farm-level row, whose `u`
+    # is `Unknown` and whose sold unit is here (GH #1457).  `optional` because a
     # row with no sale has no sold unit.
     Unit_sold:
       type: str

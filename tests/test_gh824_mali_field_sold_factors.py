@@ -116,12 +116,16 @@ def sold_fragment(sales, *, plots=('1_1',), seasonal_rows=None):
     stop = next(i for i,n in enumerate(body[start:], start) if assigns(n, 's11c'))
     module = ast.fix_missing_locations(ast.Module(body=body[start:stop], type_ignores=[]))
     seasonal = pd.DataFrame({'i': 'h', 'crop': 'Invented maize', 'plot_id': list(plots),
-                             'Quantity': 10., 'u': 'Kg', 'Quantity_sold': pd.NA,
-                             'Unit_sold': pd.NA, 'Value_sold': pd.NA})
+                             'Quantity': 10., 'u': 'Kg'})
     if seasonal_rows is not None:
-        seasonal = seasonal_rows.copy(deep=True)
+        # GH #1457: the script's harvest frame no longer carries empty sale columns.
+        seasonal = seasonal_rows.drop(columns=['Quantity_sold', 'Unit_sold', 'Value_sold']).copy(deep=True)
+    # GH #1457: the names the fragment now imports for the sale's placement.
     scope = {'pd': pd, 'WAVE': '2017-18', 's7g': sales,
-             'seasonal': seasonal, 'reduce_to_agreed': reduce_to_agreed}
+             'seasonal': seasonal, 'reduce_to_agreed': reduce_to_agreed,
+             'ehcvm_is_sale': M.ehcvm_is_sale, 'FARM_LEVEL': M.FARM_LEVEL,
+             '_is_quantity_sentinel': M._is_quantity_sentinel,
+             'derive_hh_crop_sale_attachment': M.derive_hh_crop_sale_attachment}
     exec(compile(module, str(path), 'exec'), scope)
     return scope['seasonal']
 
@@ -152,8 +156,14 @@ def test_actual_2017_sale_fold_preserves_amounts(factors, conflict):
 
 def test_existing_sale_gates_apply_to_new_factor_without_changing_quantities():
     result = sold_fragment(sale_rows([25., 25.]), plots=('1_1', '1_2'))
-    assert len(result) == 2 and result.Quantity.eq(10).all()
-    assert result[['Quantity_sold','Unit_sold','Value_sold','KgFactor_sold']].isna().all().all()
+    # Re-pinned for GH #1457: the sale of a crop on two plots no longer vanishes.  The
+    # plot rows hold nothing, and ONE Farm-level row holds it, with no harvest.
+    plotted = result[result.plot_id != 'Farm-level']
+    assert len(plotted) == 2 and plotted.Quantity.eq(10).all()
+    assert plotted[['Quantity_sold','Unit_sold','Value_sold','KgFactor_sold']].isna().all().all()
+    farm = result[result.plot_id == 'Farm-level']
+    assert len(farm) == 1 and farm.Quantity.isna().all() and farm.Value_sold.iloc[0] == 300
+    assert farm.Quantity_sold.iloc[0] == 5 and farm.KgFactor_sold.iloc[0] == 25
     no = sold_fragment(sale_rows([25., 25.], answer='Non'))
     assert no.Quantity_sold.iloc[0] == no.Value_sold.iloc[0] == 0
     assert no.Unit_sold.isna().all() and no.KgFactor_sold.isna().all()

@@ -2994,3 +2994,31 @@ national wave.
 Not in =Country.waves=: =tanzania.py= fixes the list and is byte-pinned by
 =tests/test_gh905_tanzania_signed_sums.py=.  To register it, move the list out of that module
 first, then decide whether a six-region supplement belongs on the =t= axis.
+
+* 2026-11-04 -- multi-plot sales (GH #1457)
+
+=AG_SEC_5A= / =7A= / =7B= record a sale per household and crop code, in the sale module asking about one harvest module.  The
+single-plot rule served one only where the code was on one plot of its module; the GH #637 entry above records the rest,
+"still not allocated".  The ruling on GH #843, option (d), extended in bulk on 2026-11-04, now serves it: the code's single row,
+keyed =hh-crop-sale-single-row=, or else ONE =plot_id = 'Farm-level'= row with no =Quantity= or =u=.
+
+| sale records, cold            | 2019-20 | TSh         | kg        | 2020-21 | TSh           | kg         |
+|-------------------------------+---------+-------------+-----------+---------+---------------+------------|
+| on the code's one plot        |     617 | 192,091,250 | 1,414,644 |   2,345 |   867,363,600 | 11,885,924 |
+| Farm-level, two+ plots state  |     159 | 117,148,650 |   119,229 |     629 |   442,307,920 |    779,842 |
+| Farm-level, one plot states   |      30 |  16,205,000 |   106,255 |      91 |    45,328,800 |    310,820 |
+|-------------------------------+---------+-------------+-----------+---------+---------------+------------|
+| all, equal to the raw sum     |     806 | 325,444,900 | 1,640,128 |   3,065 | 1,355,000,320 | 12,976,586 |
+
+- *=tanzania.py= did not change.*  Its digest is pinned (=tests/test_gh905_tanzania_signed_sums.py=), so this lives in
+  =_/_hh_crop_sales.py=, after =crop_production_for_wave=; a new =_/*.py= still moves every Tanzania hash, as =_upd_district.py= did.
+- *=production_obs=.*  A Farm-level row names the sale's own record, =reported:5A:<code>= (7A, 7B), so lumped codes and two modules of one
+  code stay apart and it never repeats a harvest row's =reported:4A:<code>=.
+- *=Unit_sold= is new, a constant =kg= on a row with a sold quantity.*  This reverses "Tanzania needs no such column" in =data_info.yml=:
+  =u= here describes the harvest and is NA where there is none, and =median_price_valuation= needs a unit for the sold kilograms.
+- *One plot stating a harvest is not attached.*  =ag4a_19 == 2= serves a recorded 0, and a plot of that kind still counts as a row, so 30 + 91 sales
+  with one harvesting plot sit on Farm-level (61.5M TSh).  Nigeria's ruling A was not extended.  Largest in this lane; see the report.
+- *Two lines of one crop on one plot cannot happen here.*  A module has one row per (household, plot, crop code), a repeat raises.
+- *Four rounds in one folder.*  =2008-15/= builds no =crop_production=, so sales cannot cross a round here.  Each wave reads only its own sale modules.
+
+Key on the 617 + 2,345 rows that already held a sale: =Derivation= and =Unit_sold= are new columns, and nothing else on those rows moves.

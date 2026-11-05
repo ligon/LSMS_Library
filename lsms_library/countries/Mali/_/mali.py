@@ -311,8 +311,8 @@ def plot_features_for_wave(t, source, colmap):
 #   - i     = Mali composite household id (grappe, menage/exploitation),
 #   - plot  = "{field_no}_{parcel_no}" for seasonal crops; 'Farm-level' for
 #             perennial trees (the perennial roster s3b/s11f is not on the
-#             field grid, GH #1476) and for a 2021-22 sale with no single
-#             harvest row,
+#             field grid, GH #1476) and for a 2017-18 or 2021-22 sale with no
+#             single harvest row (GH #1457),
 #   - crop  = harmonize_food Preferred Label (food crops REUSE the consumed-
 #             food label so crop_production.j joins food_acquired.j).
 #
@@ -322,7 +322,7 @@ def plot_features_for_wave(t, source, colmap):
 #   planting_month, harvest_month, intercropped, perennial
 # plus `Derivation` on the perennial (tree) rows -- see
 # derive_tree_twelve_month_total, derive_tree_sale_window and
-# stamp_tree_derivations below -- and on the 2021-22 rows that hold a
+# stamp_tree_derivations below -- and on the 2017-18 and 2021-22 rows that hold a
 # household-crop sale (derive_hh_crop_sale_attachment).
 #
 # Crop names and units arrive as DECODED Stata labels (strings), so the
@@ -981,12 +981,13 @@ def ehcvm_is_sale(quantity, value):
             | pd.to_numeric(value, errors='coerce').gt(0))
 
 
-def derive_hh_crop_sale_attachment(harvest, sales):
-    """Place each household-crop sale on the served rows of a wave (GH #824).
+def derive_hh_crop_sale_attachment(harvest, sales, columns=_SALE_COLUMNS):
+    """Place each household-crop sale on the served rows of a wave (GH #824, #1457).
 
     ``harvest`` holds one row per plot-crop harvest record, with columns
     ``i``, ``crop`` and ``plot_id``.  ``sales`` holds one row per sale, with
-    columns ``i``, ``crop``, ``Quantity_sold``, ``Unit_sold`` and ``Value_sold``;
+    columns ``i``, ``crop``, and ``columns`` (``Quantity_sold``, ``Unit_sold`` and
+    ``Value_sold`` by default; 2017-18 adds ``KgFactor_sold``);
     a second sale of one (i, crop) is refused rather than summed.
 
     A sale of an (i, crop) with EXACTLY ONE harvest row goes on that row, in its
@@ -1003,15 +1004,29 @@ def derive_hh_crop_sale_attachment(harvest, sales):
     lines = harvest.groupby(_SALE_KEYS).size().rename('_lines').reset_index()
     n = sales[_SALE_KEYS].merge(lines, on=_SALE_KEYS, how='left')['_lines']
     single = n.fillna(0).eq(1).to_numpy()
-    served = harvest.merge(sales.loc[single, _SALE_KEYS + _SALE_COLUMNS],
+    columns = list(columns)
+    served = harvest.merge(sales.loc[single, _SALE_KEYS + columns],
                            on=_SALE_KEYS, how='left', validate='many_to_one',
                            indicator='_attached')
     derivation = pd.Series(pd.NA, index=served.index, dtype='string')
     derivation[served.pop('_attached').eq('both')] = DERIVATION_HH_CROP_SALE
     served['Derivation'] = derivation
-    farm = sales.loc[~single, _SALE_KEYS + _SALE_COLUMNS].copy()
+    farm = sales.loc[~single, _SALE_KEYS + columns].copy()
     farm['plot_id'] = FARM_LEVEL
     return pd.concat([served, farm], ignore_index=True)
+
+
+def stamp_hh_crop_sale(derivation, df):
+    """``derivation`` with the attachment key on an EAC-I field row holding an s7g sale.
+
+    2017-18 only, and AFTER ``crop_production_finalize``: a positive sale on a row
+    with a plot.  A tree row's plot_id is ``FARM_LEVEL``, and so is a Farm-level
+    sale's, which needs no key: its index value discloses it.  A 0 is no sale.
+    """
+    plotted = df.index.get_level_values('plot_id').to_series(index=df.index).ne(FARM_LEVEL)
+    sold = (df['Quantity_sold'] > 0) | (df['Value_sold'] > 0)
+    return _with_key(derivation, plotted & sold.astype('boolean').fillna(False),
+                     DERIVATION_HH_CROP_SALE)
 
 
 def _with_key(derivation, mask, key):
@@ -1217,24 +1232,49 @@ def _ehcvm_keyed(wave, name, crop):
     return out
 
 
+def _eaci17_keyed(name, crop):
+    """One raw EAC-I 2017-18 crop file, as recorded, with the served ``t``, ``i``, ``crop``."""
+    from pathlib import Path
+    from lsms_library.paths import countries_root
+    wave = '2017-18'
+    src = tools.get_dataframe(str(Path(countries_root()) / 'Mali' / wave / 'Data' / name))
+    out = src.copy()
+    out['t'] = wave
+    out['i'] = src.apply(lambda r: eaci_i(pd.Series([r['grappe'], r['exploitation']])),
+                         axis=1).astype('string')
+    out['crop'] = (src[crop].astype('string').str.strip().map(_ehcvm_crop_map(wave))
+                   .astype('string'))
+    return out
+
+
 def inputs_hh_crop_sale_single_row(wave):
     """Raw answers behind one wave's keyed rows, at (t, i, crop).
 
     The registry ``inputs`` callable for
     ``hh-crop-sale-single-row``: the s16d sale as recorded,
     with the field and parcel of the single s16c row it went on, one row per
-    keyed served row.
+    keyed served row.  2017-18 is the s7g sale and the s7f row; its household key is
+    (grappe, exploitation), and its quantity codes are masked as the build masks them.
     """
-    year = {'2021-22': '2021'}[wave]
-    harvest = _ehcvm_keyed(wave, f's16c_me_mli{year}.dta', 's16cq04')
-    sold = _ehcvm_keyed(wave, f's16d_me_mli{year}.dta', 's16dq01')
-    sold = sold[ehcvm_is_sale(sold['s16dq05a'], sold['s16dq06'])]
+    if wave == '2017-18':
+        harvest = _eaci17_keyed('eaci17_s7fp2.dta', 's7fq03')
+        sold = _eaci17_keyed('eaci17_s7gp2.dta', 's7gq01')
+        quantity = pd.to_numeric(sold['s7gq21a'], errors='coerce')
+        sold = sold[ehcvm_is_sale(quantity.mask(_is_quantity_sentinel(quantity)), sold['s7gq22'])]
+        names = ['s7gq01', 's7gq20', 's7gq21a', 's7gq21b', 's7gq21d', 's7gq22']
+        plot = ['s7fq01', 's7fq02']
+    else:
+        year = {'2021-22': '2021'}[wave]
+        harvest = _ehcvm_keyed(wave, f's16c_me_mli{year}.dta', 's16cq04')
+        sold = _ehcvm_keyed(wave, f's16d_me_mli{year}.dta', 's16dq01')
+        sold = sold[ehcvm_is_sale(sold['s16dq05a'], sold['s16dq06'])]
+        names = ['s16dq01', 's16dq04', 's16dq05a', 's16dq05b', 's16dq06']
+        plot = ['s16cq02', 's16cq03']
     lines = harvest.groupby(_SALE_KEYS).size()
     single = lines[lines == 1].index
     harvest = harvest[harvest.set_index(_SALE_KEYS).index.isin(single)]
-    out = sold[['t', 'i', 'crop', 's16dq01', 's16dq04', 's16dq05a', 's16dq05b',
-                's16dq06']].merge(
-        harvest[_SALE_KEYS + ['s16cq02', 's16cq03']], on=_SALE_KEYS, how='inner',
+    out = sold[['t', 'i', 'crop'] + names].merge(
+        harvest[_SALE_KEYS + plot], on=_SALE_KEYS, how='inner',
         validate='one_to_one')
     return out.set_index(['t', 'i', 'crop'])
 
