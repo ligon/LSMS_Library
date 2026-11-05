@@ -5101,7 +5101,9 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         convertible rows is absent from the result.  When True, those rows
         are carried at their native ``Quantity`` (a deliberate over-count
         used only for sensitivity analysis); the default False is the
-        parity-faithful choice.
+        parity-faithful choice.  ``attrs['unknown_plot_excluded']['kg']`` follows
+        the column, so under True it holds native quantities too (Uganda 380 rows
+        and 74,397.95 against 304 and 70,277.25).
 
     Returns
     -------
