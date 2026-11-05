@@ -82,6 +82,28 @@ All per-country harmonization (categorical mappings, kinship decomposition,
 canonical spellings, dtype coercion) is applied by each `Country` before
 concatenation. `Feature` delegates to each country's existing table method.
 
+### `strata` Is Not One Vocabulary
+
+`Feature('sample')` pools a column that means different things in different
+countries, and sometimes in different waves of one country. A region, a region
+crossed with urban and rural, a survey's own design code and a district are all
+served as `strata`, because that is what each survey's design or files offer:
+
+| `strata` holds | Where |
+|---|---|
+| Region x milieu, as a label | EHCVM waves of Senegal, Mali, Niger, Burkina Faso; Ethiopia |
+| Region alone | Benin, Togo, Guinea-Bissau, Cote d'Ivoire 2018-19; GhanaLSS 1998-99 onward |
+| The file's own stratum, a label | Niger 2011-12 and 2014-15 (region x agro-ecological zone) |
+| The file's own stratum, a code | Mali 2017-18, Burkina Faso 2014 |
+| Nothing | Mali 2014-15 |
+
+This table covers the cases measured for GH #812, not every country. So
+`strata` identifies a stratum within one wave of one country. Do not compare or
+group on it across countries, and check before doing so across waves. Where the
+label is a construction it is registered: `df.attrs['derivations']` names those
+countries, and `Country(c).derivations()` gives the rule and its evidence. Each
+country's `_/CONTENTS.org` records what its `strata` holds.
+
 ### Error Handling
 
 If a country's data fails to load, `Feature` emits a warning and continues
