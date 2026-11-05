@@ -3009,3 +3009,8 @@ The ruling on GH #843, option (d), extended in bulk on 2026-11-04, applies: the 
 - A pair that sold in two units or states would need two rows on one key; the wave's uniqueness assert refuses it.  Measured: none.
 
 =Derivation= moves on the 564 + 1,265 rows already holding a sale, which is the only column that moves on them.
+
+*Disclosed, 19 of the 31 2014-15 sales above (433,900 FCFA, review of GH #1457).*  The script counts every s2e1 line of a crop, and each of these
+has two or more lines of which only ONE is served: the others hold no quantity or month, so =_finalize_result='s =dropna(how='all')= removes them at the
+API.  So the sale sits on Farm-level though the household has one served row, stating a harvest, for that crop.  Value and quantity are served either way;
+only the plot is not.  2021-22 has none: its lines carry =intercropped=.
