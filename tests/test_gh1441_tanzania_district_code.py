@@ -211,7 +211,7 @@ def test_guard_does_not_fire_without_a_household_to_rekey(mapping_2019):
 
 
 def test_guard_error_is_none_of_the_types_the_build_paths_catch(mapping_2019):
-    """Any of these would be swallowed, and every household table served no `v`."""
+    """Written when the v-join and the derived paths swallowed these (GH #1546, #1532)."""
     caught = (FileNotFoundError, KeyError, ValueError, AttributeError, RuntimeError, OSError)
     assert not issubclass(mapping_2019.SplitOffClusterError, caught)
 

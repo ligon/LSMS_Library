@@ -1,7 +1,7 @@
 """GH #1081: typed categorical errors survive generated derived dispatch."""
 import pandas as pd
 import pytest
-from lsms_library.country import Country, _rebuild_failure_error
+from lsms_library.country import Country, LegacyFallbackWarning, _rebuild_failure_error
 from lsms_library.local_tools import (
     CategoricalKeyDeclarationError, CategoricalMappingConflictError,
     EmptyCategoricalTableError, get_categorical_mapping, load_categorical_level,
@@ -138,8 +138,11 @@ def test_unrelated_generic_legacy_fallback_stays(monkeypatch, error_type, method
         return expected.copy()
 
     monkeypatch.setattr(Country, '_aggregate_wave_data', aggregate)
+    # GH #1516: the fallback is only for a country whose legacy path can build the table.
+    monkeypatch.setattr(Country, '_has_country_builder', lambda self, table: True)
     country = Country('Ethiopia')
-    pd.testing.assert_frame_equal(getattr(country, method)(), expected)
+    with pytest.warns(LegacyFallbackWarning):
+        pd.testing.assert_frame_equal(getattr(country, method)(), expected)
     assert calls == [source, method]
 
 
@@ -160,10 +163,12 @@ def test_unrelated_generic_legacy_failure_stays(monkeypatch, error_type, method)
         raise _rebuild_failure_error(self.name, table)
 
     monkeypatch.setattr(Country, '_aggregate_wave_data', aggregate)
+    # GH #1516: the fallback is only for a country whose legacy path can build the table.
+    monkeypatch.setattr(Country, '_has_country_builder', lambda self, table: True)
     country = Country('Ethiopia')
-    with pytest.raises(RuntimeError, match='Could not materialize Ethiopia/') as info:
+    # GH #1532: a legacy build that fails too does not replace the reason it was tried.
+    with pytest.warns(LegacyFallbackWarning), pytest.raises(error_type) as info:
         getattr(country, method)()
-    assert info.value is not original
-    assert info.value.__cause__ is None
-    assert info.value.__context__ is None
+    assert info.value is original
+    assert 'Could not materialize Ethiopia/' in info.value.__notes__[0]
     assert calls == [source, method]

@@ -286,11 +286,15 @@ def test_country_food_prices_names_the_country(country_without, units):
     assert str(info.value).startswith('Malawi: ')
 
 
-def test_country_food_prices_bare_call_falls_through(country_without):
+def test_country_food_prices_bare_call_falls_through(country_without, monkeypatch):
     """units=None (default kgvalue) on a food_acquired with no Expenditure:
-    the pre-#828 legacy fall-through is kept for a bare call."""
+    the pre-#828 legacy fall-through is kept for a bare call, where the legacy
+    path can build the table (GH #1516)."""
+    from lsms_library.country import Country, LegacyFallbackWarning
     c = country_without(['Expenditure'])
-    out = c.food_prices()
+    monkeypatch.setattr(Country, '_has_country_builder', lambda self, table: True)
+    with pytest.warns(LegacyFallbackWarning):
+        out = c.food_prices()
     pd.testing.assert_frame_equal(out, _LEGACY_SENTINEL)
 
 

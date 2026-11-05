@@ -39,9 +39,6 @@ from .local_tools import df_data_grabber, format_id, get_categorical_mapping, ge
 from .local_tools import (CATEGORICAL_KEY_ATTR, CATEGORICAL_MAPPING_DIR,
                           CATEGORICAL_MAPPING_FILE,
                           CATEGORICAL_RESERVED_COLUMNS,
-                          CategoricalKeyDeclarationError,
-                          CategoricalMappingConflictError,
-                          EmptyCategoricalTableError,
                           categorical_mapping_files,
                           load_categorical_level)
 from .local_tools import (
@@ -86,7 +83,7 @@ from .null_index_audit import check_index_levels
 from .null_index_audit import (NullIndexKeyError, NullIndexKeyWarning,
                                _NULL_INDEX_LEDGER,
                                _read_strict as _null_index_strict)
-from .quantity_audit import QuantityImplausibleError, check_quantities
+from .quantity_audit import check_quantities
 from . import _parallel_waves
 from .population import attach as attach_population, population_records
 from .sampling import (attach as attach_sampling, check_cluster_identity,
@@ -992,6 +989,17 @@ def _property_value(instance, prop_name):
     if isinstance(prop, property):
         return prop.__get__(instance, type(instance))
     raise AttributeError(f"'{type(instance).__name__}' has no attribute '{prop_name}'")
+
+
+#: What a failed derivation may read as "try the legacy path": the builtins THEMSELVES.
+#: A subclass is a statement by whoever raised it -- a strict lever's refusal
+#: (``GrainCollapseError``, ``NullReadError``, ``NullIndexKeyError``,
+#: ``QuantityImplausibleError``), a malformed mapping table, ``GrainConflict`` -- and a
+#: second attempt would answer a question nobody asked (GH #1532).  It is a whitelist so
+#: the next guard needs no entry.  ``_rebuild_failure_error`` is a bare ``RuntimeError``
+#: and stays on it.  Used only by the dispatch in ``Country.__getattr__``, which no build
+#: fingerprint reaches.
+_GENERIC_BUILD_FAILURES = frozenset({FileNotFoundError, KeyError, ValueError, RuntimeError})
 
 
 def _rebuild_failure_error(country_name: str, method_name: str) -> RuntimeError:
@@ -3224,18 +3232,36 @@ class Country:
         ``i`` and ``t`` in its index but not ``v``.  The sample()
         result is cached on the Country instance for reuse across
         features.
+
+        **A sample that refuses raises (GH #1546).**  Two things leave *df*
+        without ``v``, both with a :class:`SampleUnavailableWarning` on every
+        table served that way: a source of ``sample`` that is not there, and a
+        ``sample`` with no ``v`` column.  Any other exception is ``sample``'s
+        own, and is not caught: this used to catch ``KeyError``, ``ValueError`` and
+        ``AttributeError`` and log them at INFO, which served every household
+        table of a country with no ``v`` when a guard fired or a hook had a bug.
         """
         cache = getattr(self, '_sample_v_cache', None)
         if cache is None:
             try:
                 s = self.sample()
-                cache = s[['v']].copy()
-                self._sample_v_cache = cache
-            except (FileNotFoundError, KeyError, ValueError, AttributeError) as exc:
-                logger.info("sample() unavailable for v-join on %s: %s", self.name, exc)
-                self._sample_v_cache = False
-                return df
+            except FileNotFoundError as exc:
+                cache = False
+                self._sample_v_gap = f"sample() could not read a source ({exc})"
+            else:
+                if 'v' in s.columns:
+                    cache = s[['v']].copy()
+                else:
+                    cache = False
+                    self._sample_v_gap = "sample() has no `v` column"
+            self._sample_v_cache = cache
         if cache is False:
+            warnings.warn(
+                f"{self.name}: served without `v`: "
+                f"{getattr(self, '_sample_v_gap', 'sample() is unavailable')}.  A later "
+                f"groupby on `v`, and any cluster-level table, will not see these rows "
+                f"by cluster.",
+                SampleUnavailableWarning, stacklevel=2)
             return df
 
         idx_names = list(df.index.names)
@@ -3431,16 +3457,16 @@ class Country:
         if 'sample' in self.data_scheme:
             try:
                 s = self.sample()
-            except (OSError, KeyError, ValueError, AttributeError,
-                    DvcException) as exc:
-                # Sample-table missing / mis-shaped / DVC-fetch failure ->
-                # fall back to wave-level region scan.  Programmer bugs
-                # (TypeError, NameError) surface unchanged.
-                logger.info(
-                    "_add_market_index: could not load sample() for HH-level "
-                    "lookup of column %r on %s: %s",
-                    column, self.name, exc,
-                )
+            except (OSError, DvcException) as exc:
+                # A source that cannot be fetched -> fall back to the wave-level
+                # region scan, and say so: the label then comes from the cluster,
+                # not the household.  Anything else is sample's own refusal or
+                # bug and is not caught (GH #1546).
+                warnings.warn(
+                    f"{self.name}: market={column!r} is labelling households from "
+                    f"cluster_features, because sample() could not read a source "
+                    f"({type(exc).__name__}: {exc}).",
+                    SampleUnavailableWarning, stacklevel=2)
                 s = None
             if isinstance(s, pd.DataFrame) and column in s.columns:
                 hh_lookup = s[column].rename('m_hh')
@@ -3577,12 +3603,9 @@ class Country:
             f"this fatal."
         )
         if _null_index_strict():
-            # NullIndexKeyError subclasses RuntimeError.  That is safe ONLY
-            # because all three _add_market_index call sites in the generated
-            # table method sit OUTSIDE the derived-path
-            # ``except (FileNotFoundError, KeyError, ValueError, RuntimeError)``
-            # blocks; moved inside one, a strict raise would be swallowed into
-            # the legacy fallback (CLAUDE.md, Site C).
+            # NullIndexKeyError subclasses RuntimeError.  The derived-path
+            # handlers re-raise a subclass (_GENERIC_BUILD_FAILURES, GH #1532),
+            # and all three _add_market_index call sites sit outside them.
             raise NullIndexKeyError(msg)
         # Point the warning at the first frame outside lsms_library (the
         # user's Country/Feature call), not at the generated method.
@@ -5226,13 +5249,38 @@ class Country:
         if (not requested
                 or not requested < {str(w) for w in self.waves}
                 or method_name not in self.data_scheme
-                or method_name in JSON_CACHE_METHODS
-                or any(method_name in self[w].data_scheme for w in waves)):
+                or method_name in JSON_CACHE_METHODS):
             return False
+        return not self._legacy_can_build(method_name, waves)
+
+    def _legacy_can_build(self, method_name: str, waves: list[str] | None) -> bool:
+        """Can the legacy path build ``method_name`` for *waves*?
+
+        A requested wave declares the table, or the country level has a rule or a script
+        for it; ``True`` wherever a make rule cannot be inspected, so a table this cannot
+        answer for keeps its route.  ``False`` is the case a derived table must not fall
+        through: the legacy path could only answer 0 rows on a subset, which reads a failed
+        build as absence, or "Could not materialize", which hides the cause (GH #1516).
+        Measured on the 38 countries that have a config: no country has a legacy route for
+        ``household_characteristics``, and four have one for a food table (CotedIvoire,
+        Nigeria, Tanzania, Togo).  Asked directly on a cold root, none of those ten cells
+        built a row.
+        """
+        requested = self.waves if waves is None else waves
+        if any(method_name in self[w].data_scheme for w in requested):
+            return True
         if ((self.file_path / "_" / "Makefile").exists()
                 and not shutil.which("make", path=_script_subprocess_env().get("PATH"))):
-            return False
-        return not self._has_country_builder(method_name)
+            return True
+        return self._has_country_builder(method_name)
+
+    def _warn_legacy_fallback(self, table: str, source: str, exc: Exception) -> None:
+        """A derivation failed and the country's own build is about to answer for it."""
+        warnings.warn(
+            f"{self.name}/{table}: deriving it from {source} failed "
+            f"({type(exc).__name__}: {exc}), so the country's legacy build is being tried "
+            f"instead.  What it serves is not the derived table.",
+            LegacyFallbackWarning, stacklevel=4)
 
     def _has_country_builder(self, method_name: str) -> bool:
         """Can the COUNTRY level build ``method_name``?  GH #1039.
@@ -6712,6 +6760,8 @@ class Country:
                 # derived fallback can touch data (ledger 1210, sections 2/4).
                 if waves is not None:
                     waves = self._validate_waves(waves)
+                # Set when a derivation failed and the legacy path is being tried.
+                derive_failure = None
                 # For derived food tables, try deriving from food_acquired first
                 # before falling back to wave-level scripts / make
                 if (name in self._FOOD_DERIVED
@@ -6781,19 +6831,14 @@ class Country:
                         # be honoured by the legacy path, so it re-raises.
                         # Only a bare call (all three defaulted) keeps the
                         # pre-#828 legacy fall-through, and not on a kilogram
-                        # subset (GH #1487, see below).
-                        if units is not None or map_labels or valuation is not None or subset_kg:
+                        # subset (GH #1487, see below) or where there is
+                        # nothing to fall through to (GH #1516).
+                        if (units is not None or map_labels or valuation is not None
+                                or subset_kg or not self._legacy_can_build(name, waves)):
                             raise exc.for_country(self.name) from exc
-                        logger.info(
-                            "Deriving %s from food_acquired failed (%s); "
-                            "falling back to legacy aggregation", name, exc)
+                        self._warn_legacy_fallback(name, 'food_acquired', exc)
+                        derive_failure = exc.for_country(self.name)
                         derived = None
-                    except (EmptyCategoricalTableError, CategoricalMappingConflictError,
-                            CategoricalKeyDeclarationError, QuantityImplausibleError):
-                        # GH #1493: the strict screen is a RuntimeError, and the
-                        # legacy path would report it as "no wave-level build
-                        # succeeded", after rebuilding what it could.
-                        raise
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
                         if subset_kg:
                             # GH #1512: the failure can name a wave the caller
@@ -6806,16 +6851,21 @@ class Country:
                                 "reads no factor stays on the request: "
                                 "units='units' or units='unitvalue'.")
                         if (units is not None or map_labels or valuation is not None
-                                or subset_kg or self._proven_absent(name, waves)):
+                                or subset_kg or type(exc) not in _GENERIC_BUILD_FAILURES
+                                or not self._legacy_can_build(name, waves)):
+                            # GH #1532: a named class is a statement, never a
+                            # failed build; see _GENERIC_BUILD_FAILURES.
+                            #
                             # GH #1487: a kilogram subset also raises when it was
                             # a default call, whichever wave failed.  Its waves
                             # declare no `food_quantities`, so the legacy path
                             # reads the failure as proven absence and serves 0
                             # rows with no error (Mali, 2018-19 with 2014-15
-                            # broken: 162,032 rows on base).  GH #1512: the same
-                            # for any subset the legacy path would answer that
-                            # way, `food_expenditures` with or without `basis=`
-                            # above all, whose requested wave had failed.
+                            # broken: 162,032 rows on base).  GH #1512 / #1516:
+                            # the same wherever the legacy path cannot build the
+                            # table, whose subset answer is 0 rows and whose
+                            # all-waves answer ("Could not materialize") hides
+                            # this exception.
                             #
                             # Caller explicitly asked for canonical units= /
                             # labels= / valuation= behaviour; the legacy
@@ -6829,9 +6879,8 @@ class Country:
                             # looking exactly like one that ran and changed
                             # nothing, which is the worse failure of the two.)
                             raise
-                        logger.info(
-                            "Deriving %s from food_acquired failed (%s); "
-                            "falling back to legacy aggregation", name, exc)
+                        self._warn_legacy_fallback(name, 'food_acquired', exc)
+                        derive_failure = exc
                         derived = None
                     if derived is not None:
                         # Relabel is outside the except so user-facing KeyErrors
@@ -6885,13 +6934,16 @@ class Country:
                             if age_cuts is not None:
                                 rc_kwargs['age_cuts'] = tuple(age_cuts)
                             derived = roster_to_characteristics(roster, **rc_kwargs)
-                    except (EmptyCategoricalTableError, CategoricalMappingConflictError,
-                            CategoricalKeyDeclarationError):
-                        raise
                     except (FileNotFoundError, KeyError, ValueError, RuntimeError) as exc:
-                        logger.info(
-                            "Deriving %s from household_roster failed (%s); "
-                            "falling back to legacy aggregation", name, exc)
+                        # GH #1532: a named class is never a failed build.
+                        # GH #1516: no country has a legacy route for this
+                        # table, so falling through answered 0 rows on a
+                        # subset and "Could not materialize" on all waves.
+                        if (type(exc) not in _GENERIC_BUILD_FAILURES
+                                or not self._legacy_can_build(name, waves)):
+                            raise
+                        self._warn_legacy_fallback(name, 'household_roster', exc)
+                        derive_failure = exc
                         derived = None
                     if derived is not None:
                         # This path never calls _finalize_result, so a mapping-site
@@ -6921,8 +6973,22 @@ class Country:
                 # _LABEL_SELECTION): _aggregate_wave_data is @build_transform()-
                 # tagged, so widening its signature would move every table's
                 # lsms_cache_hash for a change that cannot alter a cached byte.
-                with _label_selection(name, map_labels):
-                    result = self._aggregate_wave_data(waves, name, currency=currency)
+                try:
+                    with _label_selection(name, map_labels):
+                        result = self._aggregate_wave_data(waves, name, currency=currency)
+                except Exception as legacy_failure:
+                    # A legacy build that fails too does not get to replace the
+                    # reason it was tried with "Could not materialize" (GH #1532).
+                    if derive_failure is None:
+                        raise
+                    derive_failure.add_note(
+                        f"The legacy build of {name} was tried and failed as well: "
+                        f"{type(legacy_failure).__name__}: {legacy_failure}")
+                    raise derive_failure
+                if (derive_failure is not None
+                        and (not isinstance(result, pd.DataFrame) or result.empty)):
+                    # Nor does it get to answer a failed derivation with 0 rows.
+                    raise derive_failure
                 _assert_label_targets_present(result, map_labels,
                                               country=self.name, table=name)
                 # Apply relabeling to any table with a j index level
@@ -8034,6 +8100,23 @@ def merge_label_pass_through_reports(sources) -> dict:
         if isinstance(per_country, Mapping):
             merged.update(per_country)
     return merged
+
+
+class SampleUnavailableWarning(UserWarning):
+    """``sample`` could not be read, so a table is served without what it supplies.
+
+    ``v`` (``Country._join_v_from_sample``) or the household-level market label
+    (``Country._add_market_index``).  Only for a source that is not there or a ``sample``
+    with no ``v``; a refusal from ``sample`` raises instead (GH #1546).
+    """
+
+
+class LegacyFallbackWarning(UserWarning):
+    """A derived table's derivation failed and the country's legacy build answered instead.
+
+    Only where a legacy route exists (``Country._legacy_can_build``); anywhere else the
+    failure itself is raised.  This used to be an INFO log line (GH #1516).
+    """
 
 
 class CacheRebuildWarning(UserWarning):

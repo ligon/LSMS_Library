@@ -378,7 +378,7 @@ class TestDelivered:
 
     def test_a_guard_raised_in_the_build_reaches_the_caller(self, monkeypatch):
         """GH #1224: the guard's instruction must survive the derived path, which
-        catches ValueError and would report "Could not materialize" instead.
+        used to read a ValueError as a failed build and report "Could not materialize".
         LSMS_NO_CACHE makes the build run, so the hook is really reached."""
         import lsms_library as ll
         from lsms_library import ehcvm

@@ -2528,10 +2528,13 @@ Neither is a defect of =cluster_features=.
   has frame households in more than one cluster, raising =SplitOffClusterError=.  It
   cannot fire today: 858 frame households sit on 858 distinct =y4_hhid=.  Injected in
   a throwaway clone, nothing is served without =v=.  With =LSMS_BUILD_WORKERS=1= the
-  error reaches the caller.  With parallel workers it arrives as a =RuntimeError=
-  naming it, because a class in a by-path =mapping.py= does not pickle; the derived
-  tables then retry and end in "Could not materialize", which is loud but hides the
-  cause.  =Feature= drops the country with a warning.
+  error reaches the caller.  With parallel workers it arrives as =errors.WaveWorkerError=
+  naming it, because a class in a by-path =mapping.py= does not pickle.  The derived
+  tables raise that too (GH #1524, 2026-11-05); they used to retry and end in "Could not
+  materialize", which took about 105 s on =food_expenditures= and hid the cause.
+  =Feature= drops the country with a warning.  The class's docstring in
+  =2019-20/_/mapping.py= still describes the old catch; editing that file moves every
+  Tanzania hash, so it waits for a re-warm.
 - *Measured cold against the same code without the two follow-ups:* exactly 238 =v=
   change in =sample=, all 2019-20, and no other column or household.  17 other tables
   carry the new =v= and are otherwise frame-equal, 5 have no =v= and are equal, and

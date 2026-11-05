@@ -241,9 +241,10 @@ class TestTheFoodDispatch:
 
     def test_another_failure_keeps_the_legacy_route(self, country, monkeypatch):
         """Only this class leaves the catch.  A bare call to a table the legacy path
-        can answer still gets that chance, and logs why."""
+        can answer still gets that chance, and warns why."""
         c, _ = country
-        monkeypatch.setattr(C.Country, '_proven_absent', lambda *a: False, raising=False)
+        # GH #1516: the fallback is only for a country whose legacy path can build the table.
+        monkeypatch.setattr(C.Country, '_has_country_builder', lambda self, table: True)
         real = C.Country._aggregate_wave_data
         seen = []
 
