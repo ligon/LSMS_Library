@@ -217,9 +217,9 @@ class TestCarryUnitSize:
 
 
 class TestGuardReachesTheCaller:
-    """The derived-table paths catch ValueError / KeyError / RuntimeError and fall
-    back to another build, which turns the guard's instruction into "Could not
-    materialize".  The delivered path is tested in test_ehcvm_7day.py."""
+    """Where a legacy build exists, the derived-table paths still try it for a bare
+    ValueError / KeyError / RuntimeError, and never for a named class (GH #1532).  The
+    delivered path is tested in test_ehcvm_7day.py."""
 
     def test_it_is_none_of_what_those_paths_catch(self):
         caught = (FileNotFoundError, KeyError, ValueError, RuntimeError)

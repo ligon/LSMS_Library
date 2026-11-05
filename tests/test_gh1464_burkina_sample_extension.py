@@ -122,7 +122,7 @@ class TestHook:
             mod.sample(_frame(WELFARE_ROWS + WELFARE_ROWS[:1]))
 
     def test_the_refusal_is_none_of_the_types_the_build_paths_catch(self):
-        """Any of these would be swallowed, and every 2014 household table served no `v`."""
+        """Written when the v-join and the derived paths swallowed these (GH #1546, #1532)."""
         caught = (FileNotFoundError, KeyError, ValueError, AttributeError, RuntimeError, OSError)
         assert not issubclass(_module().EmcSampleError, caught)
 

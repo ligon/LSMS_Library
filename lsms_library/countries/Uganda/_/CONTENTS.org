@@ -141,10 +141,13 @@ consumer as ='12.0'= across the outer merge.
 - /A repeated target raises =OriginEaError=./  Two children may name one parent, but one
   key may not name two households, and =gsec1= and =AGSEC1= may not give one household two
   =ea=.  The error counts and names no household.  It subclasses =Exception=, because
-  =_join_v_from_sample= catches =ValueError= (which the =MergeError= it replaces was) and would
-  have served every household table with no =v=.  One build worker raises the class itself.  Under
-  parallel workers a class in a by-path module does not pickle (GH #1524), so =__reduce__= sends
-  a plain =Exception= carrying its name and message, which the derived-table paths do not catch.
+  =_join_v_from_sample= used to catch =ValueError= (which the =MergeError= it replaces was) and would
+  have served every household table with no =v=; since GH #1546 it catches only a missing source.
+  One build worker raises the class itself.  Under parallel workers a class in a by-path module does
+  not pickle (GH #1524), so =__reduce__= sends a plain =Exception= carrying its name and message,
+  which the derived-table paths do not catch.  Since GH #1524 (2026-11-05) the relay would carry it
+  as =errors.WaveWorkerError= without that, so =__reduce__= looks redundant, by reading; removing it
+  edits =uganda.py= and moves every Uganda hash, so it waits for a re-warm, with the class's docstring.
   Measured by injecting one disagreeing household, one and two workers: =sample=, =household_roster=,
   =household_characteristics=, =food_expenditures= and =interview_date= all raise, on a wave subset
   and on all waves, and nothing is written.  =Feature= drops Uganda with a warning, and

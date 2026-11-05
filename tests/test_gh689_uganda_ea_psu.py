@@ -168,8 +168,8 @@ class TestTheNamedError:
             .formatting_functions["_follow_key"].__globals__
 
     def test_no_path_that_swallows_a_build_failure_catches_it(self):
-        """``_join_v_from_sample`` and the derived-table paths catch these four, and the
-        GH #515 handler catches the first two."""
+        """The GH #515 handler catches the first two.  ``_join_v_from_sample`` and the
+        derived-table paths caught all four until GH #1546 and #1532."""
         err = self._module()["OriginEaError"]
         assert issubclass(err, Exception)
         for swallowed in (KeyError, FileNotFoundError, ValueError, RuntimeError):

@@ -223,8 +223,8 @@ class TestNigerStrateHook:
 
 
 class TestARefusalIsNotSwallowed:
-    """`_join_v_from_sample` catches ValueError and logs it, and the derived-table paths
-    catch RuntimeError, ValueError and KeyError, so a refusal must be none of them."""
+    """Made none of ValueError, KeyError and RuntimeError because `_join_v_from_sample` and
+    the derived-table paths caught those.  Since GH #1546 and #1532 they raise it either way."""
 
     @staticmethod
     def _grab(monkeypatch, tmp_path, country, wave, frames):
