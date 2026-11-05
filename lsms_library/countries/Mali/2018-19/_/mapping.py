@@ -27,6 +27,19 @@ from lsms_library.ehcvm import (  # noqa: E402
 )
 
 
+def j(value):
+    '''The food label with its padding gone, so the ``mappings:`` lookup can find it.
+
+    Every ``s07bq01`` label of this wave carries seven leading spaces, and the lookup in
+    ``data_info.yml`` is exact, so 2018-19 ``j`` never received ``harmonize_food`` (GH
+    #1513).  Runs before that lookup, as ``column_mapping`` chains a function named for
+    the level; no other wave's file is padded.  ``value`` is a one-element row there,
+    and a scalar on a level with no ``mappings:`` (``assets``).
+    '''
+    label = value.iloc[0] if isinstance(value, pd.Series) else value
+    return label.strip() if isinstance(label, str) else label
+
+
 def inputs_strata(wave):
     """The registry `inputs` callable: the cover's region and milieu at (t, i)."""
     return _inputs_region_milieu_stratum('Mali', wave)
