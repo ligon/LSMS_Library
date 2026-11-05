@@ -1494,16 +1494,29 @@ holds 3,172 unlabelled code 115 rows, with no unit, quantity or value on any of 
 
 Undoing it is one table cell.
 
-*Three things this leaves.*
+*What a bucket means across waves.*  A bucket follows codes, and what the forms and files call
+those codes moves.  Read a wave's label before reading a bucket as a series.
 
-- /Code 143 changes its own label./  =Ground Nuts (shelled)= reads =ground nuts shelled= in
-  2005-06 and 2009-10 and =Ground nuts (shelled)= from 2018-19, but =Ground nut seeds
-  (unshelled)= from 2010-11 to 2015-16.  Its prices in those waves (3,600-4,000) sit nearer
-  =(pounded)= than =(in shell)=, which suggests a wording slip and does not settle it.  The code
-  has its own bucket, so nothing folds.  It is one more reason to read the wave's label.
-- /=Cassava (dry/flour)= stays in =Cassava (flour)=./  Through 2011-12 the survey asks one
-  line for both, and it was already there.  So =Cassava (flour)= is that line to 2011-12 and
-  flour alone after, and the continuous series is =(flour)= plus =(dry)=.
+- /=Cassava (dry/flour)= stays in =Cassava (flour)=./  The forms print =Cassava (Dry/ Flour)=
+  through 2015-16, while the files split it into codes 181 and 182 from 2013-14 (neither is on
+  those forms).  So =Cassava (flour)= is that one line to 2011-12 and flour alone after, and the
+  continuous series is =(flour)= plus =(dry)=.
+- /=Sweet Potatoes=./  The forms print =Sweet Potatoes (Dry/flour)= in 2013-14 and 2015-16, while
+  the files carry code 106 for dry and code 180 for flour.
+- /Some buckets start late./  =Ground Nuts (paste)= at 2010-11, =Cassava (dry)= and =Sweet Potatoes
+  (flour)= at 2013-14, and =Sim Sim (paste)= at 2018-19.
+- /Code 143 is shelled./  Its Stata value label reads =Ground nut seeds (unshelled)= from 2010-11 to
+  2015-16.  That is a metadata slip: the forms print =Ground nuts (shelled) 143= in 2005-06,
+  2010-11, 2011-12, 2013-14 and 2015-16.
+- /=Cassava (dry)= and =(flour)= in 2019-20 are served as labelled (GH #1525)./  Codes 1081 and 1082
+  do not behave as their labels say.  2019-20's 1081 has the unit mix (kg 0.54, basin 0.19, cup
+  0.16) of 2018-19's 1082 (0.54, 0.18, 0.15), and 2019-20's 1082 is heaps (about 0.72).  Of 2018-19's
+  1082 consumers, 62% consume 1081 in 2019-20 and 5% consume 1082, against unconditional rates of
+  24% and 4%.  Served, 2018-19 -> 2019-20: =Cassava (dry)= goes from 52 to 320 purchased rows and
+  511,650 to 2,322,965 UGX, and =Cassava (flour)= from 284 to 56 rows and 2,044,400 to 182,850 UGX.
+  So in that wave the split is not a state split.  The forms do not settle it: both print =108= Dry
+  and =108_1= Flour, and 1082 does not look like 2018-19's dry basins either, so this is not a
+  clean swap.  It is pre-existing at =Preferred Label=, and nothing is swapped without a source.
 - /Other Aggregates hold two states and were not ruled on/: =Beans= (fresh, dry), =Peas=
   (=Peas=, dry), =Rice= (=Rice flour=), =Ginger= (fresh, powder), =Soybean= (fresh, dry).
 
