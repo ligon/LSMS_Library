@@ -6,7 +6,7 @@ ESS3 is 3,699" (PDF p16), and 3,726 at the post-planting visit.  48 of those
 post-planting cover, so the chain through W2 cannot reach them.  They are linked
 by rule: a rural or small-town W3 household off W2's map has W3's own
 ``household_id`` as its W1 id.  The rule rests on the BID's accounting; the rosters
-do not separately confirm it (``Ethiopia/_/CONTENTS.org``).
+support it without settling it (``Ethiopia/_/CONTENTS.org``).
 
 The same regeneration records the links ``panel_ids`` used to leave out: W2 -> W1,
 which were only in ``updated_ids``, and W5 -> W4, identities that move no served id.
@@ -59,6 +59,19 @@ def _frame(wave, ids):
 # ---------------------------------------------------------------------------
 # The committed JSON
 # ---------------------------------------------------------------------------
+
+def test_the_maps_carry_the_bids_figures(updated_ids):
+    """Survey figures, not today's counts: nothing but a new release can move them.
+
+    ESS3 BID PDF p16: 3,726 ESS1 households at post-planting, 1,255 urban re-interviewed.
+    ESPS-5 BID PDF p43: a balanced panel of 4,906.  The covers that derive them are
+    ``requires_s3``, and this is the only tier GitHub CI runs for this file.
+    """
+    w3, w5 = updated_ids["2015-16"], updated_ids["2021-22"]
+    assert sum(k != v for k, v in w3.items()) == 3726
+    assert sum(k == v for k, v in w3.items()) == 1255
+    assert len(w5) == 4906
+
 
 def test_every_moving_w3_id_goes_to_its_truncated_id(updated_ids):
     moving = {k: v for k, v in updated_ids["2015-16"].items() if k != v}
