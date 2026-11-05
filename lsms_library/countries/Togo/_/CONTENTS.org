@@ -812,18 +812,20 @@ import.  =pid= is the file's member number, one number in every table of the wav
 =v= is the bare =grappe=: the clusters are the same (below), the households are not
 known to be.
 
-Measured, 2026-11-04, against each household's 2018 roster on (sex, birth year +-1):
-| group                                                | n     | median share of 2018 roster | >= half |
-|------------------------------------------------------+-------+-----------------------------+---------|
-| recurring key, =panel= = 1 (=ehcvm_ponderations=)    | 4,044 |                        0.50 |   51.3% |
-| recurring key, =PanelHH= = 1, =panel= = 2            |   431 |                        0.14 |   24.4% |
-| recurring key, =PanelHH= = 0, =panel= = 1            |   109 |                        0.43 |   49.5% |
-| recurring key, =PanelHH= = 0, =panel= = 2            |   966 |                        0.00 |    6.3% |
-| baseline: another household's roster in the grappe   | 5,441 |                        0.00 |      5% |
-5,441 of the 6,462 keys occur in 2018, so a link by identity would join at least 966
-different households (the Mali #1494 trap).  The file carries three flags that disagree:
-=PanelHH= (4,377), the weights file's =panel= (4,044), =s00q07d= "interviewed in
-2018/19" (3,938).  The BID's merge variables =s00q07f1=/=f2= are filled on only 1,941,
+Measured, 2026-11-04, against each household's 2018 roster on (sex, birth year +-1), and
+against its 2018 head (=ehcvm_individu=: same sex; age 1 to 6 years older):
+| group                                              | n     | median share of roster | roster >= half | head sex | head sex and age |
+|----------------------------------------------------+-------+------------------------+----------------+----------+------------------|
+| recurring key, =panel= = 1 (=ehcvm_ponderations=)  | 4,044 |                   0.50 |          51.3% |    96.1% |            61.3% |
+| recurring key, =PanelHH= = 1, =panel= = 2          |   431 |                   0.14 |          24.4% |    55.7% |            11.1% |
+| recurring key, =PanelHH= = 0, =panel= = 1          |   109 |                   0.43 |          49.5% |    93.6% |            56.0% |
+| recurring key, =PanelHH= = 0, =panel= = 2          |   966 |                   0.00 |           6.3% |    57.9% |             7.5% |
+| baseline: another household in the grappe          |       |                   0.00 |             5% |    62.2% |             7.9% |
+5,441 of the 6,462 keys occur in 2018, so a link by identity would join 1,397 households
+(=panel= = 2) that sit at the baseline: different households under a recurring number (the
+Mali #1494 trap).  The file carries three flags that disagree: =PanelHH= (4,377), the
+weights file's =panel= (4,044), =s00q07d= "interviewed in 2018/19" (3,938).  =panel= is
+the one that separates; =PanelHH= alone would admit the 431.  The BID's merge variables =s00q07f1=/=f2= are filled on only 1,941,
 and on the 55 where they differ from the current key their overlap sits at the baseline
 while the current key's does not, so they do not rescue a link.  Linking is a decision:
 memo in the PR of this change.  It would make Togo a panel country, with committed
