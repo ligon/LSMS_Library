@@ -876,9 +876,9 @@ by the additive collapse, as core does.
 *=Expenditure=* is NA on 10.5% of purchased rows (2018-19 9.7%).  =ehcvm_conso='s =codpr= shares this file's codes, unlike 2018-19's, so the check runs: the rule x 365/7 is
 within 1% of =depan(Achat)= for 90.6% of 1,245 discriminating rows.  That validates the arithmetic, not the quantity: Togo's rescaled column passes it too.
 
-*Kilograms.*  =ehcvm_nsu_ben2021.dta= exists and is not wired (not ruled for single-wave countries).  So this wave's kilograms come from the price-ratio ladder, as 2018-19's do: =metric= 25,831 rows, =item_unit= 84,810,
-=item_unit_tight= 435, =unit= 93,848, =none= 33.  Because #1487 pools factors across a country's waves, wiring this table moved 2018-19's inferred kilograms at read time, measured cold: =food_quantities(units='kgs')= 168,465 -> 185,171 (+9.9%),
-125,695 of 187,336 rows move, median ratio 1.05, p10 0.96, p90 1.47; =food_prices= sum 158.4M -> 131.5M, 91,403 of 133,112 rows move, median ratio 0.95, p10 0.68, p90 1.07; one more row in each, as 2 rows gain a factor.  Here the rungs move too: on 2018-19
+*Kilograms.*  =ehcvm_nsu_ben2021.dta= exists and is not wired (not ruled for single-wave countries).  So this wave's kilograms come from the price-ratio ladder, as 2018-19's do: =metric= 25,831 rows, =item_unit= 85,048,
+=item_unit_tight= 435, =unit= 93,610, =none= 33.  Because #1487 pools factors across a country's waves, wiring this table moved 2018-19's inferred kilograms at read time, measured cold: =food_quantities(units='kgs')= 168,465 -> 185,170 (+9.9%),
+125,699 of 187,336 rows move, median ratio 1.05, p10 0.96, p90 1.47; =food_prices= sum 158.4M -> 131.5M, 91,405 of 133,112 rows move, median ratio 0.95, p10 0.68, p90 1.07; one more row in each, as 2 rows gain a factor.  Here the rungs move too: on 2018-19
 =item_unit= 35,589 -> 64,567, =unit= 132,190 -> 102,936, =none= 155 -> 153, =metric= unchanged at 20,255, because a pair with too few reports in one wave clears the floor with two.  A single-wave request is still an exact slice.  2018-19's native =Quantity= and
 =Expenditure= do not move, and neither does =harvest_kg=.  =StatedVsInferredKgWarning= fires on 9 labels, up from 6.
 
@@ -926,3 +926,8 @@ of them NA (2018-19: 1,257) and leaves those between 100 and 1,000 served as hec
 ** Not wired
 
 =ehcvm_nsu=, =ehcvm_prix=, =s00_co=..=s04_co=.  =community_prices=, which 2018-19 serves from =s05_co=, has no source here: this wave has no =s05_co=, and =ehcvm_prix= is a separate market sample.
+
+** Cost, measured
+
+Base =67525c607= against the wiring: =Country._table_cache_hash= Benin 18 of 18, =Wave._input_hash= Benin 36 of 36, =build_transforms_fingerprint= 0 of 35.  One more: GhanaLSS 18 of 18 and 126 of 126, because adding =Très grand= to
+=transformations._UNIT_SIZE_WORDS= is an edit under =food_quantities_from_acquired=, which =GhanaLSS/_/nutrition.py= imports (CLAUDE.md, "Derived Tables").  No GhanaLSS label carries that word, so its values do not change; any other edit to that closure costs the same re-warm.
