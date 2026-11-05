@@ -178,6 +178,20 @@ def _ladder():
             if r.table == 'crop_production' and k not in OFF_LADDER}
 
 
+def _keys_of(frame):
+    """Rows per key.  A row can carry two (`Derivation` is MULTI_SEP-joined)."""
+    return frame['Derivation'].astype('string').str.split('+').explode().value_counts().to_dict()
+
+
+def _without(frame, keys):
+    """The rows carrying none of ``keys``."""
+    out = frame
+    for key in keys:
+        carries = out['Derivation'].astype('string').str.contains(key, regex=False).fillna(False)
+        out = out[~carries.to_numpy(dtype=bool)]
+    return out
+
+
 class TestRegistry:
     def test_eight_entries_one_per_rung(self):
         r = _ladder()
@@ -675,13 +689,13 @@ class TestDelivered:
     def test_rows_per_key_per_wave(self, delivered, wave):
         x = delivered.xs(wave, level='t', drop_level=False)
         assert len(x) == TOTAL_ROWS[wave]
-        got = x['Derivation'].value_counts().to_dict()
+        got = _keys_of(_without(x, OFF_LADDER))
         assert {k: got.get(k, 0) for k in KEYS} == ROWS[wave]
         assert set(got) <= set(KEYS)
 
     @pytest.mark.parametrize('wave', WAVES)
     def test_value_sold_moved_by_the_re_attached_sales(self, delivered, wave):
-        x = delivered.xs(wave, level='t', drop_level=False)
+        x = _without(delivered.xs(wave, level='t', drop_level=False), OFF_LADDER)
         assert x['Value_sold'].sum() == pytest.approx(VALUE_SOLD_AFTER[wave], rel=1e-9)
         assert VALUE_SOLD_AFTER[wave] > VALUE_SOLD_BEFORE[wave]
 
@@ -707,12 +721,14 @@ class TestDelivered:
         ladder = tallies['sale_basis_ladder']
         dropped = attached[attached['crop'].isna()]
         served = delivered.xs(wave, level='t', drop_level=False)
-        got = served['Derivation'].value_counts()
+        got = _keys_of(served)
         for key in KEYS:
             positive = ladder[key]['sales'] - ladder[key]['zero_quantity']
-            assert int(got.get(key, 0)) == positive - int((dropped['_branch'] == key).sum()), key
+            lost = dropped['_branch'].astype('string').str.contains(key, regex=False).fillna(False)
+            assert int(got.get(key, 0)) == positive - int(lost.sum()), key
         value = sum(ladder[name]['value'] for name in (malawi_mod.SALE_EXACT, *KEYS))
-        assert served['Value_sold'].sum() == pytest.approx(
+        # A sale in another unit is outside the ladder (R1 on the #1457 review).
+        assert _without(served, [k for k in OFF_LADDER if 'other-unit' in k])['Value_sold'].sum() == pytest.approx(
             value - dropped['Value_sold'].sum(), rel=1e-9)
 
     def test_a_key_marks_a_sale_and_only_a_sale(self, delivered):
