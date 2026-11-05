@@ -58,6 +58,10 @@ CS = 'Malawi::crop_production::contradiction-price-sale'
 CH = 'Malawi::crop_production::contradiction-price-harvest'
 DEL = 'Malawi::crop_production::sale-basis-unresolved'
 KEYS = (W, P, OV, N, NR, CS, CH)
+#: crop_production keys that are not rungs of the basis ladder: a sale the ladder had no
+#: row for, in the rulings queued on the #1457 review.
+OFF_LADDER = {'Malawi::crop_production::sale-other-unit-single-row',
+              'Malawi::crop_production::sale-one-row-states-harvest'}
 SINCE = {OV: '2026-09-25', NR: '2026-09-25'}
 
 #: Delivered ROWS carrying each key, per wave -- first measured on the cold
@@ -171,7 +175,7 @@ def _ladder():
     Scoped to the table: the country file also registers other tables'
     derivations (community_prices, GH #827), which are not rungs."""
     return {k: r for k, r in derivation_records(COUNTRY).items()
-            if r.table == 'crop_production'}
+            if r.table == 'crop_production' and k not in OFF_LADDER}
 
 
 class TestRegistry:
@@ -722,7 +726,7 @@ class TestDelivered:
 
     def test_attrs_summary_counts_the_labelled_rows_and_lists_the_deletion(self, delivered):
         summ = delivered.attrs['derivations'][COUNTRY]
-        assert set(summ) == set(KEYS) | {DEL}
+        assert set(summ) - OFF_LADDER == set(KEYS) | {DEL}
         for key in KEYS:
             assert summ[key]['rows'] == int((delivered['Derivation'] == key).sum())
             assert summ[key]['in'] == 'crop_production'
@@ -752,7 +756,7 @@ class TestDelivered:
 
     def test_registry_lists_every_key(self, country):
         import lsms_library as ll
-        assert set(country.derivations('crop_production')) == set(KEYS) | {DEL}
+        assert set(country.derivations('crop_production')) - OFF_LADDER == set(KEYS) | {DEL}
         tbl = ll.derivations()
         assert set(KEYS) | {DEL} <= set(tbl.index)
 
