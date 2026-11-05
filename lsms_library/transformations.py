@@ -4625,7 +4625,17 @@ def _kg_factor_series_with_declared(df, *, volume_as_mass=True, unit_kg=None):
 #: own ``attrs`` record, where a survey's estimate is named, and is absent when the frame
 #: has lost it.
 SURVEY_KG_BY_WAVE_ATTR = 'survey_kg_rows_by_wave'
-_KG_DISCLOSURE_ATTRS = ('derivations', SURVEY_KG_BY_WAVE_ATTR)
+SURVEY_KG_OFF_LABEL_ATTR = 'survey_kg_off_label'
+_KG_DISCLOSURE_ATTRS = ('derivations', SURVEY_KG_BY_WAVE_ATTR, SURVEY_KG_OFF_LABEL_ATTR)
+
+#: REPORT ONLY (ruling @ligon 2026-11-05, GH #1436).  A ``Quantity_kg`` whose implied factor
+#: falls outside this multiple of what the unit's own label says it weighs is NAMED, in
+#: ``kg_survey_off_label`` and ``attrs['survey_kg_off_label']``, and still served.  Nothing
+#: refuses a total.  A flag and not a verdict: Niger 2014-15's ``Gramme`` rows fire and the
+#: survey looks right there.  A unit with no stated mass (``Tiya``, ``Botte``, ``Autre``)
+#: cannot fire at all, and that is most of Niger's kilograms: GH #1559.  Site Q cannot do
+#: this: it judges a total against totals, not against the row's own quantity.
+SURVEY_KG_LABEL_BAND = (0.1, 10.0)
 
 
 def _survey_kg_totals(df):
@@ -4667,6 +4677,35 @@ def _survey_kg_rows_by_wave(df, usable):
     return out
 
 
+def _survey_kg_off_label(df, implied, metric):
+    """Rows whose implied factor is outside :data:`SURVEY_KG_LABEL_BAND` of their label.
+
+    Returns the row mask and the record: ``{'band', 'sized', 'low', 'high', 'by_wave'}``,
+    where ``sized`` counts the rows with both an implied factor and a stated mass, and
+    ``by_wave`` is shaped like ``survey_kg_rows_by_wave``.  Plain strings and numbers.
+    """
+    lo, hi = SURVEY_KG_LABEL_BAND
+    ratio = np.full(len(df), np.nan)
+    both = ~np.isnan(implied) & ~np.isnan(metric)
+    ratio[both] = implied[both] / metric[both]
+    low, high = both & (ratio < lo), both & (ratio > hi)
+    frame = pd.DataFrame({'sized': both, 'low': low, 'high': high}).astype(int)
+    waves = _level_or_column(df, 't')
+    by_wave = {}
+    if waves is not None:
+        waves = pd.Series(waves).astype(str).to_numpy()
+        country = _level_or_column(df, 'country')
+        if country is None:
+            by_wave = {str(w): {k: int(v) for k, v in row.items()}
+                       for w, row in frame.groupby(waves).sum().iterrows()}
+        else:
+            country = pd.Series(country).astype(str).to_numpy()
+            for (c, w), row in frame.groupby([country, waves]).sum().iterrows():
+                by_wave.setdefault(str(c), {})[str(w)] = {k: int(v) for k, v in row.items()}
+    return low | high, {'band': [lo, hi], 'sized': int(both.sum()), 'low': int(low.sum()),
+                        'high': int(high.sum()), 'by_wave': by_wave}
+
+
 def _implied_kg_factors(df, totals):
     """``Quantity_kg / Quantity``, NaN wherever that is not a usable factor."""
     if 'Quantity' not in df.columns:
@@ -4702,7 +4741,8 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         :data:`KG_FACTOR_MAX`, which is sized for a named container and would
         refuse a tonne or a granary (Mali 2021-22 ``Autre`` at 1,000 kg, tonnes in
         the free text), and it enters no ``survey_median``.  Site Q names
-        implausible totals (``quantity_audit``); nothing here clips them.  A
+        implausible totals (``quantity_audit``), and ``kg_survey_off_label`` a total far
+        from what its unit's label states; nothing here clips or refuses them.  A
         0 states no mass, so the row falls through, as a ``KgFactor`` of 0 does, and
         is counted under ``survey_kg_zero``.  A country masks a 0 beside a positive
         quantity at build time, so that count is a backstop: 0 on Niger and Mali.
@@ -4857,6 +4897,9 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
             usable total or no quantity to divide by.  ``groupby('u')`` on it is
             how to see that a wave's kilograms are a conversion and not a
             weighing (Niger 2021-22: exactly 2.5 per ``Tiya`` on 2,881 of 4,402).
+        ``kg_survey_off_label``
+            True where ``kg_survey`` is outside :data:`SURVEY_KG_LABEL_BAND` of the
+            mass the unit's label states.  Report only: the row is served regardless.
         ``kg_reported`` / ``kg_shipped`` / ``kg_survey_median`` /
         ``kg_metric`` / ``kg_inferred``
             what each layer offered for that row, whether or not it won.
@@ -4880,7 +4923,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
             normalises both ``None`` and ``pd.NA`` to NaN in an object
             column.
 
-        Four tallies ride on ``.attrs``:
+        Five tallies ride on ``.attrs``:
 
         ``kg_factor_sources``
             ``{layer: n_rows}`` over the INPUT rows.  The layers of
@@ -4906,6 +4949,9 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         ``survey_kg_rows_by_wave``
             rows ``survey_kg`` serves, per wave, 0 included: ``{wave: n}``, or
             ``{country: {wave: n}}`` on a frame with a ``country`` level.
+        ``survey_kg_off_label``
+            the count behind ``kg_survey_off_label``: ``{'band', 'sized', 'low', 'high',
+            'by_wave'}``.
         ``kg_factor_declared_from``
             where the declared table came from: ``'attrs'`` (the frame's own
             ``unit_kg`` record), ``'argument'`` (*unit_kg* passed), or
@@ -5041,6 +5087,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     # `crop_production` carries.
     survey_kg, from_survey, survey_zero = _survey_kg_totals(df)
     implied = _implied_kg_factors(df, survey_kg)
+    off_label, off_label_record = _survey_kg_off_label(df, implied, metric)
 
     # `resolved` is deliberately NOT re-expressed over `metric`: the seeds are
     # already inside `inferred_arr` with precedence, so splitting the label
@@ -5063,6 +5110,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         {'kg_per_unit': resolved,
          'KgFactorSource': source,
          'kg_survey': implied,
+         'kg_survey_off_label': off_label,
          'kg_reported': reported,
          'kg_reported_rejected': rejected,
          'kg_shipped': shipped,
@@ -5100,6 +5148,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     # GH #1436: `survey_kg` is one string across waves that differ, and the counts
     # above are pooled.
     out.attrs[SURVEY_KG_BY_WAVE_ATTR] = _survey_kg_rows_by_wave(df, from_survey)
+    out.attrs[SURVEY_KG_OFF_LABEL_ATTR] = off_label_record
     # Kept OUT of the counts so every value there stays an int.  It is what
     # tells "this country declares nothing for these units" ('attrs', with
     # `declared` 0) apart from "no declaration reached this call" (None) --
@@ -5254,7 +5303,9 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         input frame's record, which names a registered construction such as
         ``survey-kg-estimate`` (absent if the frame lost it).  ``survey_kg`` says the
         kilograms are the survey's; only these say whether a wave has any, and that a
-        wave's are an estimate.
+        wave's are an estimate.  ``result.attrs['survey_kg_off_label']`` counts the totals
+        outside :data:`SURVEY_KG_LABEL_BAND` of their unit's label, and served anyway;
+        :func:`harvest_kg_factors` names the rows.
 
     Notes
     -----
@@ -5356,6 +5407,7 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     res.attrs['kg_factor_declared_from'] = factors.attrs[
         'kg_factor_declared_from']
     res.attrs[SURVEY_KG_BY_WAVE_ATTR] = factors.attrs[SURVEY_KG_BY_WAVE_ATTR]
+    res.attrs[SURVEY_KG_OFF_LABEL_ATTR] = factors.attrs[SURVEY_KG_OFF_LABEL_ATTR]
     if 'derivations' in crop_production.attrs:
         res.attrs['derivations'] = crop_production.attrs['derivations']
     res.attrs['unknown_plot_excluded'] = {
@@ -5621,8 +5673,9 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
         off ``plot_features.AreaUnit``, which names what the survey reported before
         conversion: Malawi's says ``acres`` over hectare values, and Nigeria's and
         Ethiopia's hold native labels.  ``attrs`` carries
-        ``survey_kg_rows_by_wave`` and ``derivations`` from :func:`harvest_kg`: what the
-        kilograms are, which no ``Yield_kg`` value can say (GH #1436).
+        ``survey_kg_rows_by_wave``, ``survey_kg_off_label`` and ``derivations`` from
+        :func:`harvest_kg`: what the kilograms are, which no ``Yield_kg`` value can say
+        (GH #1436).
 
     Notes
     -----

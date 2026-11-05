@@ -497,7 +497,7 @@ def test_companion_exposes_every_layer_for_auditing():
     f = harvest_kg_factors(_frame(rows))
     # `kg_survey` (GH #1436) joined what each layer offers.
     assert list(f.columns) == ["kg_per_unit", "KgFactorSource", "kg_survey",
-                               "kg_reported",
+                               "kg_survey_off_label", "kg_reported",
                                "kg_reported_rejected", "kg_shipped",
                                "kg_shipped_rejected", "kg_shipped_source",
                                "kg_metric", "kg_declared", "kg_survey_median",
