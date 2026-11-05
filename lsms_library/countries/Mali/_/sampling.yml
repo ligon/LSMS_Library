@@ -17,9 +17,10 @@
 # programme and not across the switch.
 #
 # Do NOT measure the EAC-I -> EHCVM boundary by shared `i`: 0 is shared by
-# construction, because the EAC-I ids carry an 'EACI_' prefix (mali.eaci_i, GH
-# #1494).  That says nothing about `v`, exactly as Burkina Faso's 'EMC_' and
-# Niger's 'E_' do not.  Before the prefix, 3,613 ids were shared with 2017-18.
+# construction, because the EAC-I ids carry 'EACI14_' and 'EACI17_' prefixes
+# (mali.eaci14_i, mali.eaci17_i, GH #1494).  That says nothing about `v`, exactly
+# as Burkina Faso's 'EMC_' and Niger's 'E_' do not.  Before the prefix, 3,613 ids
+# were shared with 2017-18.
 
 Sampling:
 
@@ -35,9 +36,9 @@ Sampling:
         spelled.  The 2017-18 cover and sample files carry no pointer to a
         2014 household, and the design selects 9 households per EA, so
         `independent`, with one thing a
-        re-measurement will trip on: both waves still spell `i` from the same
-        serials, and 3,560 `i` recur between them.  They are not households:
-        on those ids 0.214 of a household's members find a same-sex member
+        re-measurement will trip on: both waves spell `i` from the same serials,
+        and before their prefixes 3,560 `i` recurred between them.  They were
+        not households: on those ids 0.214 of a household's members find a same-sex member
         three years older in the other wave, against 0.219 for two different
         households of one grappe; the EHCVM panel scores 0.528 against 0.172
         on the same test (CONTENTS.org, GH #1494).  All 3,560 are 2017-18
@@ -60,7 +61,7 @@ Sampling:
         two draws: EAC-I from the 2009 census, EHCVM-1 from the 6th edition of
         the EMOP frame, 500 EAs plus 51 added in vague 2.  No household links
         across this boundary (panel_ids.py).  On the 3,613 `i` the two waves
-        spelled alike before the 'EACI_' prefix, 0.167 of a household's members
+        spelled alike before the EAC-I prefixes, 0.167 of a household's members
         find their match against 0.163 for two different households of one
         grappe.  `redefined`, not `unobservable`: the keyspaces OVERLAP, so a
         cross-wave groupby('v') merges 410 pairs of unrelated clusters, which is

@@ -2706,11 +2706,11 @@ shared unit equals the harvest exactly on 91.1%, within 10% on 92.2%, median rat
 s16c row, 270 on several), 1,194 span units and cannot be summed without a factor, 199 record no
 disposition and 3 have no =s16d= row.  Not derived here: GH #1437 is waiting on a ruling.
 
-* 2026-11-04 -- EAC-I household ids carry =EACI_=, and =sampling.yml= declares the boundaries (GH #1494)
+* 2026-11-04 -- EAC-I household ids carry =EACI14_= and =EACI17_=, and =sampling.yml= declares the boundaries (GH #1494)
 
-Ruling @ligon 2026-11-04, on Burkina Faso's =EMC_= precedent (GH #1244).  =mali.eaci_i= is
-='EACI_' + i(value)=: the two EAC-I =mapping.py= override =i= for every YAML table, and their
-eleven wave scripts and =_tree_roster_inputs= use it directly.  =pid= is not prefixed: it is a key
+Ruling @ligon 2026-11-04, on Burkina Faso's =EMC_= precedent (GH #1244).  =mali.eaci14_i= and =mali.eaci17_i= are
+='EACI14_' + i(value)= and ='EACI17_' + i(value)=: the two EAC-I =mapping.py= override =i= for every YAML table, and their
+eleven wave scripts and =_tree_roster_inputs= use them directly.  =pid= is not prefixed: it is a key
 only inside =(t, i)=.  The EHCVM ids stay bare, as the panel lineage in =panel_ids= / =updated_ids=,
 and neither JSON moves (the EAC-I maps were already empty; the regenerated file is byte-identical).
 
@@ -2736,16 +2736,16 @@ the test does find a real panel.
 | *2014-15 / 2017-18*                      | 3,559 |      0.214 |   0.219 |        0.109 |   0.106 |
 | *2018-19 / 2021-22, =PanelHH= =Non=*     | 1,111 |      0.151 |   0.157 |        0.069 |   0.074 |
 
-*The last two rows are NOT fixed here, and are the same class of false link.*
+*The last two rows are the same class of false link.*  The 2014-15 / 2017-18 row is fixed by a prefix per wave; the =PanelHH= =Non=
+row is not, and is an open ruling.
 
-- *2014-15 / 2017-18: 3,560 ids survive the prefix*, because both waves carry the same one.  They
+- *2014-15 / 2017-18: one prefix per wave, so these 3,560 ids go to 0 too* (ruling @ligon 2026-11-05, =EACI14_= and =EACI17_=).  They
   visit the same EAs (identical coordinates on all 920 recurring grappes), with households selected
   afresh and no pointer between the files.  *All 3,560 fall on 2017-18 Lourd households and none on
   Leger*: in rural EAs 2014-15's =menage= is 3, 6 or 9, and so is 2017-18's =exploitation= on the Lourd
   form (Leger is 1, 2, 4, 5, 7, 8), so the numbering itself makes them recur.  Roster size correlates
   at 0.18 on those ids, against 0.69 on the real panel; the score is 0.233 / 0.232 rural and 0.181 /
-  0.192 urban (review).  Whether to separate them is a decision the ruling did not take; a shared
-  =EACI_= is what was ruled, and the digits alone decide nothing.
+  0.192 urban (review).
 - *2018-19 / 2021-22: 1,111 of the 1,120 =PanelHH= =Non= households* spell the id of a 2018-19
   household they are not.  =panel_ids= and =updated_ids= do not link them, but =i= is the same string.
 
@@ -3037,7 +3037,7 @@ with EAC-I =plot_features=; the cost then is one Mali re-warm.
 
 * 2026-11-04 -- what these four changes moved, cold (GH #1494, #1453, #1437, #1179)
 
-Cold builds in private roots, every declared table, =115b6ab71= against =0f382b5f4=.  With =EACI_= stripped from =i=,
+Cold builds in private roots, every declared table, =115b6ab71= against =0f382b5f4=.  With the EAC-I prefix stripped from =i=,
 *21 of the 23 frame tables are equal, row order and dtypes included*: all but =community_prices= and =crop_production=.
 =panel_ids= has 5,011 entries and =updated_ids= four waves, equal on both sides.  At the #1494 commit alone all 23 are
 equal.  Those two commits predate #1476 on =development=; the merge differs from them only in =plot_id= on the 627 tree rows.  EAC-I rows prefixed: =sample= 12,194, =household_roster= 131,246, =food_acquired= 122,085.

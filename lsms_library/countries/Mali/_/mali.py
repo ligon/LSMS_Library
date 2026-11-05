@@ -24,17 +24,22 @@ def i(value):
 # (CONTENTS.org, GH #1494).  Letters cannot occur in the numeric ids, so a prefixed
 # id can never equal an unprefixed one, whatever the serials do.  The EHCVM ids stay
 # as they are: 2018-19 / 2021-22 are the panel lineage in panel_ids / updated_ids.
-# Burkina Faso's ``EMC_`` is the precedent (GH #1244).
-EACI_PREFIX = 'EACI_'
+# Burkina Faso's ``EMC_`` is the precedent (GH #1244).  One prefix per EAC-I wave, because
+# the two waves are not linked either: they visit the same EAs with households selected
+# afresh, and both number rural households 3, 6 and 9 on the Lourd form, so 3,560 ids
+# recurred between them with a roster match at the level of two different households.
+EACI14_PREFIX = 'EACI14_'
+EACI17_PREFIX = 'EACI17_'
 
 
-def eaci_i(value):
-    '''EAC-I household id: ``'EACI_' + i(value)``, e.g. (1, 1) -> ``'EACI_1001'``.
+def eaci14_i(value):
+    '''2014-15 household id: ``'EACI14_' + i([grappe, menage])``.'''
+    return EACI14_PREFIX + i(value)
 
-    ``value`` is the row of ``[grappe, menage]`` (2014-15) or ``[grappe,
-    exploitation]`` (2017-18).  Used by those two waves' ``mapping.py`` and scripts.
-    '''
-    return EACI_PREFIX + i(value)
+
+def eaci17_i(value):
+    '''2017-18 household id: ``'EACI17_' + i([grappe, exploitation])``.'''
+    return EACI17_PREFIX + i(value)
 
 
 def pid(value):
@@ -670,7 +675,8 @@ def _tree_roster_inputs(wave, columns):
     src = producing_trees(src, wave)
     out = src[columns].copy()
     out['t'] = wave
-    out['i'] = src.apply(lambda r: eaci_i(pd.Series([r['grappe'], r[hh]])), axis=1)
+    wave_i = {'2014-15': eaci14_i, '2017-18': eaci17_i}[wave]
+    out['i'] = src.apply(lambda r: wave_i(pd.Series([r['grappe'], r[hh]])), axis=1)
     # _crop_labels resolves its table relative to the cwd of a wave script;
     # this callable runs from anywhere, so name the same two rungs (wave _/,
     # then country _/) explicitly.
@@ -1240,7 +1246,7 @@ def _eaci17_keyed(name, crop):
     src = tools.get_dataframe(str(Path(countries_root()) / 'Mali' / wave / 'Data' / name))
     out = src.copy()
     out['t'] = wave
-    out['i'] = src.apply(lambda r: eaci_i(pd.Series([r['grappe'], r['exploitation']])),
+    out['i'] = src.apply(lambda r: eaci17_i(pd.Series([r['grappe'], r['exploitation']])),
                          axis=1).astype('string')
     out['crop'] = (src[crop].astype('string').str.strip().map(_ehcvm_crop_map(wave))
                    .astype('string'))

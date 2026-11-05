@@ -66,10 +66,10 @@ class TestRules:
 
 
 def _hh(df):
-    """``EACI_`` + grappe + exploitation, spelled here and not imported."""
+    """``EACI17_`` + grappe + exploitation, spelled here and not imported."""
     g = df["grappe"].astype("Int64").astype("string")
     e = df["exploitation"].astype("Int64").astype("string").str.zfill(3)
-    return "EACI_" + g + e
+    return "EACI17_" + g + e
 
 
 @pytest.fixture(scope="module")

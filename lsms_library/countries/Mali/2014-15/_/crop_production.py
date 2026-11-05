@@ -57,7 +57,7 @@ import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
 from lsms_library.country import grain_reports
-from mali import (eaci_i as mali_i, crop_production_finalize, producing_trees,
+from mali import (eaci14_i as mali_i, crop_production_finalize, producing_trees,
                   tree_crop_rows, stamp_tree_derivations, FARM_LEVEL)
 
 WAVE = '2014-15'
