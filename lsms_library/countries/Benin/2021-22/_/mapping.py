@@ -50,6 +50,9 @@ def household_roster(df):
     '''
     gone = df['StillMember'].astype('string').str.strip().str.lower().eq('non').fillna(False)
     df = df[~gone.astype(bool)].copy()
+    # Those rows were the column's only NA, and they made it a float.  Whole numbers, as
+    # 2018-19's, so the concat does not widen that wave's column.
+    df['MonthsSpent'] = df['MonthsSpent'].astype('int64')
 
     def age(row):
         stated, d, m, y = row['Age']

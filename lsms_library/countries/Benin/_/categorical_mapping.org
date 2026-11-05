@@ -99,6 +99,7 @@
 | Sans os au kg | Sans os au Kg |
 | Sans os en tas | Sans os au tas |
 | Tongolo | Tohoungolo |
+| Sagagou (en bariba) | Sagagou |
 | unité | Unité |
 
 #+name: Roof
