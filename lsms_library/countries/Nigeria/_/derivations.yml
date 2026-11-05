@@ -52,7 +52,7 @@ Nigeria::cluster_features::ph-same-location: *ph_same_location
 # and crop (A3.ii, secta3ii), with no plot.  One function, one decision, a key
 # per path so the path taken is countable.  A `plot_id='Farm-level'` row holding
 # one source record carries NO key: it is a survey answer at its own grain, and
-# the index value discloses that.  That covers 1,571 W4/W5 rows whose Unit_sold
+# the index value discloses that.  That covers 1,603 W4/W5 rows whose Unit_sold
 # and KgFactor_sold are the household total's, which the form states the sale in.
 # The frame alone cannot tell them from W3's own-unit answers; the assumptions on
 # the first entry below are the only record of that reading.

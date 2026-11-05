@@ -624,8 +624,8 @@ PH_QUARTER = {
 # crop_production (GAP 1) -- item-level reported crop harvest
 # ---------------------------------------------------------------------
 #
-# Natural grain (t, i, plot, crop): one row per crop grown on a plot in
-# the post-harvest crop module (secta3*).  Stores REPORTED item-level
+# Natural grain (t, i, plot_id, crop, production_obs): one row per harvest
+# line of the post-harvest crop module (secta3*).  Stores REPORTED item-level
 # fields only -- Quantity (native harvest qty) + u (native unit),
 # Quantity_sold + Value_sold (reported), planting_month + harvest_month
 # (item dates), intercropped + perennial flags.  No kg conversion, no
@@ -1019,9 +1019,9 @@ def _month_str(month_series, year_series):
 # to discard the lines past the first, and they were distinct answers: only 70 of
 # the 794 keys agree across quantity, unit, value and sale.  The canonical
 # `production_obs` level names the line (lsms_library/data_info.yml, GH #1198):
-#   W1-W3  `reported:crop_id:<n>` -- the roster's `cropid`, unique within a plot and
-#          crop on every labelled line.  W1's has values -1 and 0, carried as
-#          recorded, and is blank on 6 labelled lines:
+#   W1-W3  `reported:crop_id:<n>` -- the roster's `cropid`.  No recorded id repeats
+#          within a plot.  W1's has values -1 and 0, carried as recorded, and is
+#          blank on 6 labelled lines:
 #          `missing-id:row:<source_fingerprint>:<n>`, the zero-based row of the held
 #          release, bound to its sidecar.  CONSTRUCTED, not a survey id.
 #   W4/W5  `reported:crop_code:<n>` -- these files ship no `cropid`, and the code is

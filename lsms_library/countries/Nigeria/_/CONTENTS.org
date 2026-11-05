@@ -2536,8 +2536,8 @@ stays NaN, it does not become 0.
 No file has an exact-duplicate record (Niger's s16d does, so this was checked, not
 assumed).  But =harmonize_food= gives several codes one label (Yam--roots is
 1120-1124, Fresh Pepper 2141/2142, Orange/tangerine 3150/3170, Avocado pear
-3220/3221), and the index holds one row per =(t, i, plot_id, crop)=, so one
-household and served crop can hold two records.
+3220/3221), so one household and served crop can hold two records, and a sale is
+placed once per household and served crop.
 
 | household-crops | 2016Q1 | 2019Q1 | 2024Q1 |
 |-+-+-+-|
@@ -2583,7 +2583,7 @@ that.  =Derivation= is declared in the canonical schema, never in =data_scheme.y
 - =perennial= is NA there: the row has no annual/perennial answer.
 - =KgFactor= stays the HARVEST factor on an attached row; it never rates the sale.
   =KgFactor_sold= does: see below.
-- A lone-record W4/W5 Farm-level row (953 + 618 = 1,571) carries no key, and its
+- A lone-record W4/W5 Farm-level row (968 + 635 = 1,603) carries no key, and its
   =Unit_sold= and =KgFactor_sold= are the household total's, inherited as the form
   states.  That reading is recorded on the =hh-crop-sale-single-row= entry only; the
   frame alone cannot tell these rows from W3's own-unit answers.
@@ -2726,14 +2726,13 @@ unit, valuation and sale.
 
 | wave | =production_obs= | why |
 |-+-+-|
-| W1-W3 | =reported:crop_id:<cropid>= | the roster's line id; the code repeats on a plot, and =(i, plot, crop, cropid)= is unique on every labelled line |
+| W1-W3 | =reported:crop_id:<cropid>= | the roster's line id; the code repeats on a plot, and no recorded =cropid= repeats within one |
 | W4, W5 | =reported:crop_code:<code>= | no =cropid= ships; the code is unique within a plot across the annual and tree files together |
 | W1, 6 lines | =missing-id:row:<source_fingerprint>:<n>= | =cropid= is blank; =n= is the zero-based row of the held release.  CONSTRUCTED |
 | a Farm-level sale row | =unresolved_observation= | it answers no harvest line |
 
-W1's =cropid= also has a -1 and a 0, carried as recorded, and repeats within =(hhid,
-plotid)= on 5 raw rows, always under different labels, so the index stays unique.  A
-repeat within the index, or a served line with no token, raises.
+W1's =cropid= also has a -1 and a 0, on one plot, carried as recorded.  A repeat within
+the index, or a served line with no token, raises.
 
 *What moved, cold, =19db1a068= against this change.*
 
@@ -2804,7 +2803,7 @@ Uganda, GhanaLSS, Malawi, Tanzania and all 31 =build_transforms_fingerprint= do 
 
 * crop_production: a unit =_canon_unit= cannot place is =Unknown= (GH #1047)
 
-=u= is a *column* here (the declared index is =(t, i, plot_id, crop)=), and
+=u= is a *column* here (the declared index is =(t, i, plot_id, crop, production_obs)=), and
 =crop_production_for_wave= used to serve NaN wherever =_canon_unit= returned
 NA: 13,138 rows (2011Q1 3,053 / 2013Q1 3,009 / 2016Q1 1,694 / 2019Q1 3,467 /
 2024Q1 1,915).  Census on the raw files: all but 12 have a *blank* raw unit
