@@ -241,8 +241,9 @@ class TestGuardReachesTheCaller:
 
     @pytest.mark.parametrize('table', ['food_prices', 'food_quantities', 'food_expenditures'])
     def test_a_valueerror_there_would_have_been_caught(self, monkeypatch, table):
-        """The control: this is the behaviour the subclass exists to avoid."""
-        from lsms_library.country import Country
+        """The control: a bare ValueError still tries the legacy build, which Togo has.
+        GH #1532: when that fails too, the ValueError is what is raised."""
+        from lsms_library.country import Country, LegacyFallbackWarning
         calls = []
 
         def boom(self, waves=None, method_name=None, **kw):
@@ -251,8 +252,9 @@ class TestGuardReachesTheCaller:
                 raise ValueError('the instruction')
             raise RuntimeError('fallback reached')
         monkeypatch.setattr(Country, '_aggregate_wave_data', boom)
-        with pytest.raises(RuntimeError, match='fallback reached'):
+        with pytest.warns(LegacyFallbackWarning), pytest.raises(ValueError, match='the instruction') as caught:
             getattr(Country('Togo'), table)()
+        assert 'fallback reached' in caught.value.__notes__[0]
         assert calls[0] == 'food_acquired' and len(calls) > 1, calls
 
 
