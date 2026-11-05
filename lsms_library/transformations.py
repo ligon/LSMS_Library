@@ -5344,10 +5344,72 @@ def _one_country(frame):
     return labels[0] if len(labels) == 1 else None
 
 
+def pp_ph_area_t(country):
+    """``{post-planting t: post-harvest t}`` for a ``Country``, or a folder map.
+
+    For :func:`yield_kg`'s *area_t*, in a country whose one wave folder holds a
+    post-planting and a post-harvest round.  Nigeria measures plots at post
+    planting and records the harvest at post harvest::
+
+        c = ll.Country('Nigeria')
+        yield_kg(c.crop_production(), c.plot_features(), area_t=pp_ph_area_t(c))
+
+    The earlier ``t`` of a folder is the planting round.  A folder holding one
+    round has nothing to pair.  One holding more than two is not this design
+    (Tanzania's ``2008-15/``), and is refused rather than guessed at.
+
+    *country* may be a ``{t: folder}`` mapping.  Pass the ``Country`` where you
+    have one: its ``wave_folder_map`` is empty until ``waves`` has been read.
+    """
+    if hasattr(country, 'waves'):
+        country.waves                                       # populates the map
+        wave_folder_map = country.wave_folder_map
+    else:
+        wave_folder_map = country
+    folders = {}
+    for t, folder in wave_folder_map.items():
+        folders.setdefault(folder, []).append(t)
+    pairs = {}
+    for folder, rounds in folders.items():
+        if len(rounds) > 2:
+            raise ValueError(
+                f"wave folder {folder!r} holds {len(rounds)} rounds "
+                f"({sorted(rounds)}), which is not a post-planting / post-harvest "
+                "pair")
+        if len(rounds) == 2:
+            planting, harvest = sorted(rounds)
+            pairs[planting] = harvest
+    return pairs
+
+
+def _area_on_harvest_rounds(pf, area_t):
+    """Move a reset-index ``plot_features``'s ``t`` onto the harvest round's.
+
+    Refused where a target round is already served, or named twice: its plots
+    would be counted twice, summing two rounds' areas for one plot.
+    """
+    if 't' not in pf.columns:
+        raise ValueError("yield_kg area_t= needs a 't' level on plot_features")
+    targets = [str(t) for t in area_t.values()]
+    repeated = sorted({t for t in targets if targets.count(t) > 1})
+    if repeated:
+        raise ValueError(
+            f"yield_kg area_t= maps more than one round onto {repeated}, which "
+            "would sum their areas for one plot")
+    held = {str(t) for t in pf['t'].dropna().unique()}
+    clash = sorted(held & {str(t) for t in area_t.values()})
+    if clash:
+        raise ValueError(
+            f"yield_kg area_t= maps onto {clash}, which plot_features already "
+            "serves")
+    moved = pf['t'].astype(object).map(lambda t: area_t.get(t, t))
+    return pf.assign(t=moved.astype(pf['t'].dtype))
+
+
 def yield_kg(crop_production, plot_features, *, area_col='Area',
              volume_as_mass=True, on='parcel',
              min_reports=SURVEY_MEDIAN_MIN_REPORTS, shipped_factors=None,
-             unit_kg=None):
+             unit_kg=None, area_t=None):
     """Harvested kilograms per unit plot area (WB ``yield_kg``).
 
     MECHANICAL reduction (GAP 1).  Sums :func:`harvest_kg` and plot area to a
@@ -5380,6 +5442,13 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
         Forwarded to :func:`harvest_kg` (GH #931).  Unlike *shipped_factors*
         it needs no passing: left ``None`` it is read from
         ``crop_production.attrs['unit_kg']``.
+    area_t : mapping, optional
+        ``{plot_features t: crop_production t}``, for a survey that measures
+        plots in one round and records the harvest in another (Nigeria, which
+        otherwise shares no wave and returns nothing; see :func:`pp_ph_area_t`).
+        A ``t`` it does not name stays as it is.  Refused where a target round
+        is already on ``plot_features`` or is named twice, either of which would
+        sum two rounds' areas.  The output carries the harvest round.
     on : {'parcel', 'plot'}, default 'parcel'
         Land grain to join on.
 
@@ -5448,6 +5517,8 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
             "plot_features must carry a 'plot_id' (or legacy 'plot') level")
     if area_col not in pf.columns:
         raise ValueError(f"plot_features must have a {area_col!r} column")
+    if area_t is not None:
+        pf = _area_on_harvest_rounds(pf, area_t)
 
     base = [k for k in ['t', 'i'] if k in hk.columns and k in pf.columns]
 
