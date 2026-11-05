@@ -692,3 +692,13 @@ Guinea-Bissau wave at read time (GH #1487).
 *Recorded, not repaired.*  Prices are served as recorded, including the non-integer ones.  =j= is the household's label by code, so code 37, =Carapau fresco= on the form and =Bentaninha fresco= in the household file, takes the household's label and keeps its own in =Description=.
 
 *Cost.*  =data_scheme.yml= and a new wave script move every Guinea-Bissau hash: one re-warm.  =.coder/coverage/latest.csv= grades the cell =absent= until the next =make matrix=.
+
+* 2026-11-05 -- Interview dates as a conversion key (GH #1585)
+
+=numeraire== now dates each household by its first dated =Interview start= row,
+which is visit 1 (=s00q23a=) for every 2018-19 household.  Measured cold at
+=e5dd343d4= plus the fix: every =food_expenditures= household has a date, and all
+but two lie in their own =vague='s window in the World Bank catalog (4293: 2018-09
+to 12 and 2019-04 to 06).  The two are households whose cover says vague 2 but
+whose visit-1 start is inside the first-visit window, so they convert at the 2018
+rate.  Recorded, not repaired.

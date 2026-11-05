@@ -3100,3 +3100,18 @@ well.  It now reads =e=.  True share 0.497 -> 0.692; 2,962 of 6,551 rows change.
 not trust a =s14q04= label in this family without checking it this way: five siblings
 (Mali, Senegal, Burkina Faso, Benin, Togo) asked only five columns in vague 1, where
 the labels happen to be right.
+
+* 2026-11-05 -- Interview dates as a conversion key (GH #1585)
+
+=numeraire== now dates each household by its first dated =Interview start= row,
+which is visit 1 (=s00q23a=) for every household in both EHCVM waves.  Measured
+cold at =e5dd343d4= plus the fix: every =food_expenditures= household has a date,
+and every visit-1 date lies in its own =vague='s window in the World Bank catalog
+(4296: 2018-10 to 12 and 2019-04 to 07; 6276: 2021-11 to 2022-02 and 2022-06 to 08).
+
+In 2021-22, 24 of 6,622 households have a later visit starting before visit 1, and
+two later-visit rows (two households) are dated January 2021, ten months before
+fieldwork.  And 106 households' latest visit start falls in another calendar year
+from visit 1, so the visit chosen moves the rate: 2021-22
+=food_expenditures(numeraire='FX')= is -8.55% against wave-nominal dates on visit 1,
+-8.72% on each household's latest visit start.
