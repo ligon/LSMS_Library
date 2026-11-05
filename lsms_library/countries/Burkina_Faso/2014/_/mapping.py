@@ -49,6 +49,22 @@ def i(value):
 # ---------------------------------------------------------------------------
 # sample: the households the welfare file leaves out (GH #1464)
 # ---------------------------------------------------------------------------
+class EmcSampleError(Exception):
+    """The two files behind the 2014 ``sample`` disagree in a way nothing here can settle.
+
+    Subclasses ``Exception``, as ``IdWalkError`` and Tanzania's ``SplitOffClusterError`` do.
+    ``_join_v_from_sample`` catches ``ValueError``, ``KeyError``, ``FileNotFoundError`` and
+    ``AttributeError``, and the derived-table paths catch ``RuntimeError`` too, so any of those
+    would serve every 2014 household table with no ``v`` and only a warning.
+
+    With one build worker it reaches the caller as itself.  With parallel workers a class in a
+    by-path ``mapping.py`` does not pickle (Tanzania/_/CONTENTS.org, GH #1441), so ``sample``
+    and ``household_roster`` raise a ``RuntimeError`` naming it, and the derived tables catch
+    that: see ``_/CONTENTS.org``, "2014 =sample= holds the 389", for what they then return.
+    The held files give it nothing to refuse.
+    """
+
+
 def sample(df):
     """``sample`` post-processor: extend the welfare file with the p1 households.
 
@@ -76,13 +92,13 @@ def sample(df):
     has_weight = flat['weight'].notna()
     welfare = flat[has_weight]
     if welfare['i'].duplicated().any():
-        raise ValueError(
+        raise EmcSampleError(
             'Burkina_Faso/2014 sample: emc2014_welfare.dta repeats a household.')
     added = flat[~has_weight]
     vary = added.groupby('i')[['v', 'Rural', 'strata']].nunique(dropna=False)
     n_vary = int((vary > 1).any(axis=1).sum())
     if n_vary:
-        raise ValueError(
+        raise EmcSampleError(
             f'Burkina_Faso/2014 sample: {n_vary} household(s) carry more than one '
             'zd / milieu / strate across their rows of the p1 food file; which is '
             "the household's is not something the survey says.")
@@ -91,13 +107,13 @@ def sample(df):
                     suffixes=('_welfare', '_food'))
              .dropna()[['strata_food', 'strata_welfare']].drop_duplicates())
     if pairs['strata_food'].duplicated().any() or pairs['strata_welfare'].duplicated().any():
-        raise ValueError(
+        raise EmcSampleError(
             'Burkina_Faso/2014 sample: strate is not one-to-one between '
             'emc2014_welfare.dta and the p1 food file.')
     new = added[~added['i'].isin(welfare['i'])].drop_duplicates('i').copy()
     strata = new['strata'].map(pairs.set_index('strata_food')['strata_welfare'])
     if strata.isna().any():
-        raise ValueError(
+        raise EmcSampleError(
             f"Burkina_Faso/2014 sample: {int(strata.isna().sum())} added household(s) "
             'carry a strate the households of both files never use.')
     new['strata'] = strata

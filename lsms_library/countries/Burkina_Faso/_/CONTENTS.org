@@ -2970,6 +2970,25 @@ keeps NA =v= on =food_coping= (5 rows) and =months_food_inadequate= (1), and =sh
 it (3 rows, no =v= level).  It has no row in =sample=.  The p2-p4 person files hold 31 households not
 in p1, and it is the only one of them that reaches a served table (independent review).
 
+*If the hook refuses.*  It cannot on the held files: no household's item rows disagree and the
+strate pairing is one-to-one.  It raises =EmcSampleError=, which subclasses =Exception= as Tanzania's
+=SplitOffClusterError= does, because =_join_v_from_sample= swallows =ValueError= and would serve
+every 2014 table with no =v=.  Measured by injecting one disagreeing row into the real p1 food read,
+in a private cold root:
+
+| call | one build worker | two build workers |
+|------+------------------+-------------------|
+| =sample()= | =EmcSampleError= | =RuntimeError= naming it |
+| =household_roster(waves=['2014'])= | =EmcSampleError= | =RuntimeError= naming it |
+| =household_characteristics(waves=['2014'])= | =EmcSampleError= | *0 rows, no warning* |
+| =food_expenditures(waves=['2014'])= | not run | *0 rows, no warning about it* |
+| =household_characteristics()= | not run | "Could not materialize", which hides the cause |
+| =Feature('sample')([Burkina_Faso, Togo])= | Togo only, country dropped | the same |
+
+The difference is pickling: a class in a by-path =mapping.py= does not pickle, so a worker's error
+arrives as a =RuntimeError=, which the derived-table paths catch and retry.  The 0-row answers are
+that framework path, not this hook, and would need an importable exception class to close.
+
 *The #1244 checkpoint's counts.*  The reviewed 10,411 / 27,824 are the state before this; the
 sections above carry a dated note.  Its namespace finding holds: the 389 ids are =EMC_= ids, and
 none is shared with another wave.

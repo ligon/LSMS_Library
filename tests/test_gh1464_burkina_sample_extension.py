@@ -40,11 +40,15 @@ WELFARE = "emc2014_welfare.dta"
 FOOD_P1 = "emc2014_p1_conso7jours_16032015.dta"
 
 
-def _hook():
+def _module():
     spec = importlib.util.spec_from_file_location("_bf_2014_gh1464", ROOT / "2014" / "_" / "mapping.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module.sample
+    return module
+
+
+def _hook():
+    return _module().sample
 
 
 def _frame(rows):
@@ -96,25 +100,63 @@ class TestHook:
     ])
     def test_a_household_whose_rows_disagree_is_refused(self, row):
         rows = WELFARE_ROWS + FOOD_ROWS + [("c", 2, np.nan, "BM_U", "Urban"), row]
-        with pytest.raises(ValueError, match="more than one"):
-            _hook()(_frame(rows))
+        mod = _module()
+        with pytest.raises(mod.EmcSampleError, match="more than one"):
+            mod.sample(_frame(rows))
 
     def test_a_strate_no_shared_household_uses_is_refused(self):
         rows = WELFARE_ROWS + FOOD_ROWS + [("c", 2, np.nan, "XX_U", "Urban")]
-        with pytest.raises(ValueError, match="never use"):
-            _hook()(_frame(rows))
+        mod = _module()
+        with pytest.raises(mod.EmcSampleError, match="never use"):
+            mod.sample(_frame(rows))
 
     def test_a_translation_that_is_not_one_to_one_is_refused(self):
         rows = WELFARE_ROWS + [("a", 1, np.nan, "BM_R", "Rural"), ("b", 2, np.nan, "BM_R", "Urban")]
-        with pytest.raises(ValueError, match="one-to-one"):
-            _hook()(_frame(rows))
+        mod = _module()
+        with pytest.raises(mod.EmcSampleError, match="one-to-one"):
+            mod.sample(_frame(rows))
 
     def test_a_repeated_welfare_household_is_refused(self):
-        with pytest.raises(ValueError, match="repeats"):
-            _hook()(_frame(WELFARE_ROWS + WELFARE_ROWS[:1]))
+        mod = _module()
+        with pytest.raises(mod.EmcSampleError, match="repeats"):
+            mod.sample(_frame(WELFARE_ROWS + WELFARE_ROWS[:1]))
+
+    def test_the_refusal_is_none_of_the_types_the_build_paths_catch(self):
+        """Any of these would be swallowed, and every 2014 household table served no `v`."""
+        caught = (FileNotFoundError, KeyError, ValueError, AttributeError, RuntimeError, OSError)
+        assert not issubclass(_module().EmcSampleError, caught)
+
+    def test_the_v_join_does_not_swallow_the_refusal(self, monkeypatch):
+        mod = _module()
+        country = ll.Country(COUNTRY, preload_panel_ids=False)
+
+        def refuse(*args, **kwargs):
+            raise mod.EmcSampleError("the two files disagree")
+
+        monkeypatch.setattr(country, "sample", refuse, raising=False)
+        frame = pd.DataFrame({"x": [1]}, index=pd.MultiIndex.from_tuples([("a", "2014")], names=["i", "t"]))
+        with pytest.raises(mod.EmcSampleError):
+            country._join_v_from_sample(frame)
 
 
 class TestWiring:
+    def test_a_refusal_reaches_the_caller_of_the_wave_build(self, monkeypatch, tmp_path):
+        """Through Wave.grab_data, with invented frames and a private data root."""
+        monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path))
+        monkeypatch.setenv("LSMS_NO_CACHE", "1")
+        frames = {
+            WELFARE: pd.DataFrame({"grappe": [2], "menage": [1], "hhweight": [9.0],
+                                   "strate": [4], "milieu": ["Rural"]}),
+            FOOD_P1: pd.DataFrame({"zd": [2, 3, 3], "menage": [1, 7, 7], "hhweight1": [5.0] * 3,
+                                   "strate": ["BM_R"] * 3, "milieu": ["RURAL", "RURAL", "URBAIN"]}),
+        }
+        monkeypatch.setattr(local_tools, "get_dataframe",
+                            lambda path, **kwargs: frames[str(path).split("/Data/")[-1]].copy())
+        with pytest.raises(Exception, match="more than one") as caught:
+            ll.Country(COUNTRY)["2014"].grab_data("sample")
+        assert type(caught.value).__name__ == "EmcSampleError"
+        assert not isinstance(caught.value, (ValueError, KeyError, RuntimeError))
+
     def test_no_passage_weight_is_read(self):
         with open(ROOT / "2014" / "_" / "data_info.yml", encoding="utf-8") as f:
             block = yaml.safe_load(f)["sample"]
