@@ -3232,18 +3232,36 @@ class Country:
         ``i`` and ``t`` in its index but not ``v``.  The sample()
         result is cached on the Country instance for reuse across
         features.
+
+        **A sample that refuses raises (GH #1546).**  Two things leave *df*
+        without ``v``, both with a :class:`SampleUnavailableWarning` on every
+        table served that way: a source of ``sample`` that is not there, and a
+        ``sample`` with no ``v`` column.  Any other exception is ``sample``'s
+        own, and is not caught: this used to catch ``KeyError``, ``ValueError`` and
+        ``AttributeError`` and log them at INFO, which served every household
+        table of a country with no ``v`` when a guard fired or a hook had a bug.
         """
         cache = getattr(self, '_sample_v_cache', None)
         if cache is None:
             try:
                 s = self.sample()
-                cache = s[['v']].copy()
-                self._sample_v_cache = cache
-            except (FileNotFoundError, KeyError, ValueError, AttributeError) as exc:
-                logger.info("sample() unavailable for v-join on %s: %s", self.name, exc)
-                self._sample_v_cache = False
-                return df
+            except FileNotFoundError as exc:
+                cache = False
+                self._sample_v_gap = f"sample() could not read a source ({exc})"
+            else:
+                if 'v' in s.columns:
+                    cache = s[['v']].copy()
+                else:
+                    cache = False
+                    self._sample_v_gap = "sample() has no `v` column"
+            self._sample_v_cache = cache
         if cache is False:
+            warnings.warn(
+                f"{self.name}: served without `v`: "
+                f"{getattr(self, '_sample_v_gap', 'sample() is unavailable')}.  A later "
+                f"groupby on `v`, and any cluster-level table, will not see these rows "
+                f"by cluster.",
+                SampleUnavailableWarning, stacklevel=2)
             return df
 
         idx_names = list(df.index.names)
@@ -3439,16 +3457,16 @@ class Country:
         if 'sample' in self.data_scheme:
             try:
                 s = self.sample()
-            except (OSError, KeyError, ValueError, AttributeError,
-                    DvcException) as exc:
-                # Sample-table missing / mis-shaped / DVC-fetch failure ->
-                # fall back to wave-level region scan.  Programmer bugs
-                # (TypeError, NameError) surface unchanged.
-                logger.info(
-                    "_add_market_index: could not load sample() for HH-level "
-                    "lookup of column %r on %s: %s",
-                    column, self.name, exc,
-                )
+            except (OSError, DvcException) as exc:
+                # A source that cannot be fetched -> fall back to the wave-level
+                # region scan, and say so: the label then comes from the cluster,
+                # not the household.  Anything else is sample's own refusal or
+                # bug and is not caught (GH #1546).
+                warnings.warn(
+                    f"{self.name}: market={column!r} is labelling households from "
+                    f"cluster_features, because sample() could not read a source "
+                    f"({type(exc).__name__}: {exc}).",
+                    SampleUnavailableWarning, stacklevel=2)
                 s = None
             if isinstance(s, pd.DataFrame) and column in s.columns:
                 hh_lookup = s[column].rename('m_hh')
@@ -8062,6 +8080,15 @@ def merge_label_pass_through_reports(sources) -> dict:
         if isinstance(per_country, Mapping):
             merged.update(per_country)
     return merged
+
+
+class SampleUnavailableWarning(UserWarning):
+    """``sample`` could not be read, so a table is served without what it supplies.
+
+    ``v`` (``Country._join_v_from_sample``) or the household-level market label
+    (``Country._add_market_index``).  Only for a source that is not there or a ``sample``
+    with no ``v``; a refusal from ``sample`` raises instead (GH #1546).
+    """
 
 
 class LegacyFallbackWarning(UserWarning):

@@ -16,11 +16,14 @@ import warnings
 import pandas as pd
 import pytest
 
+import lsms_library as ll
+from lsms_library import _build_registry as R
 from lsms_library import _parallel_waves as pw
 from lsms_library import country as C
 from lsms_library.build_transforms import GrainConflict
 from lsms_library.country import (Country, GrainCollapseError, LabelPassThroughError,
-                                  LegacyFallbackWarning, _rebuild_failure_error)
+                                  LegacyFallbackWarning, SampleUnavailableWarning,
+                                  _rebuild_failure_error)
 from lsms_library.datetime_parse import DatetimeParseError
 from lsms_library.errors import UnitsUnavailableError, WaveWorkerError
 from lsms_library.local_tools import IdWalkError, InTreeSourceError, to_parquet
@@ -49,12 +52,14 @@ def by_path_guard(tmp_path, base='Exception'):
     return module.Guard
 
 
-
 class PicklesButDoesNotLoad(Exception):
     def __init__(self, first, second):
         super().__init__(f'{first} {second}')
 
 
+# ---------------------------------------------------------------------------
+# #1524: what crosses back from a worker
+# ---------------------------------------------------------------------------
 
 class TestWorkerRelay:
     def test_a_by_path_guard_arrives_as_wave_worker_error(self, tmp_path):
@@ -105,13 +110,15 @@ class TestWorkerRelay:
         assert not issubclass(WaveWorkerError, tuple(GENERIC + [AttributeError, OSError]))
 
 
+# ---------------------------------------------------------------------------
+# #1532 and #1516: the dispatch, on a controlled source
+# ---------------------------------------------------------------------------
 
 def _food():
     index = pd.MultiIndex.from_tuples(
         [('2018-19', 'c', 'h', 'food', 'kg', 'purchased')],
         names=['t', 'v', 'i', 'j', 'u', 's'])
     return pd.DataFrame({'Quantity': [2.0], 'Expenditure': [8.0]}, index=index)
-
 
 
 def install_fault(monkeypatch, method, error, site='source', builder=False):
@@ -140,11 +147,9 @@ def install_fault(monkeypatch, method, error, site='source', builder=False):
     return calls, legacy
 
 
-
 def _forms(country):
     waves = list(country.waves)
     return [None, waves[:1], waves[:2], waves]
-
 
 
 @pytest.mark.parametrize('error_type', NAMED + NOT_CAUGHT_BY_CLASS)
@@ -163,7 +168,6 @@ def test_a_named_failure_reaches_the_caller_as_itself(monkeypatch, error_type, m
     assert method not in calls
 
 
-
 @pytest.mark.parametrize('error_type', NAMED)
 @pytest.mark.parametrize('method', FOOD)
 def test_a_named_failure_of_the_derivation_itself(monkeypatch, error_type, method):
@@ -175,7 +179,6 @@ def test_a_named_failure_of_the_derivation_itself(monkeypatch, error_type, metho
     assert method not in calls
 
 
-
 @pytest.mark.parametrize('method', DERIVED)
 def test_a_by_path_guard_reaches_the_caller_as_itself(monkeypatch, tmp_path, method):
     Guard = by_path_guard(tmp_path, 'ValueError')
@@ -184,7 +187,6 @@ def test_a_by_path_guard_reaches_the_caller_as_itself(monkeypatch, tmp_path, met
     with pytest.raises(Guard):
         getattr(Country('Ethiopia'), method)()
     assert method not in calls
-
 
 
 @pytest.mark.parametrize('error_type', GENERIC)
@@ -202,7 +204,6 @@ def test_with_nothing_to_fall_through_to_the_failure_is_raised(monkeypatch, erro
     assert method not in calls
 
 
-
 @pytest.mark.parametrize('error_type', GENERIC)
 @pytest.mark.parametrize('method', ['food_expenditures', 'household_characteristics'])
 def test_a_real_legacy_route_still_answers_and_says_so(monkeypatch, error_type, method):
@@ -213,7 +214,6 @@ def test_a_real_legacy_route_still_answers_and_says_so(monkeypatch, error_type, 
     assert calls[-1] == method
 
 
-
 def test_a_units_refusal_with_nothing_to_fall_through_to_names_the_country(monkeypatch):
     error = UnitsUnavailableError(units='kgvalue', missing=['Expenditure'])
     calls, _ = install_fault(monkeypatch, 'food_prices', error, builder=False)
@@ -221,7 +221,6 @@ def test_a_units_refusal_with_nothing_to_fall_through_to_names_the_country(monke
         Country('Ethiopia').food_prices()
     assert caught.value.country == 'Ethiopia'
     assert 'food_prices' not in calls
-
 
 
 class TestLegacyCanBuild:
@@ -243,12 +242,14 @@ class TestLegacyCanBuild:
         assert self._country('Mali')._legacy_can_build('household_characteristics', None)
 
 
+# ---------------------------------------------------------------------------
+# The same rules through the real build, on invented frames
+# ---------------------------------------------------------------------------
 
 def _roster(y):
     rows = [(y, f'{y}h{k}', '1') for k in range(3)]
     index = pd.MultiIndex.from_tuples(rows, names=['t', 'i', 'pid'])
     return pd.DataFrame({'Sex': ['M'] * 3, 'Age': [40] * 3, 'Relationship': ['Head'] * 3}, index=index)
-
 
 
 def _sample(y):
@@ -258,16 +259,13 @@ def _sample(y):
                          'strata': ['s'] * 3, 'Rural': ['Rural'] * 3}, index=index)
 
 
-
 def _purchases(y):
     rows = [(y, f'{y}h{k}', 'Rice', 'Kg', 'purchased') for k in range(3)]
     index = pd.MultiIndex.from_tuples(rows, names=['t', 'i', 'j', 'u', 's'])
     return pd.DataFrame({'Quantity': [1.0] * 3, 'Expenditure': [100.0] * 3}, index=index)
 
 
-
 BUILDERS = {'household_roster': _roster, 'sample': _sample, 'food_acquired': _purchases}
-
 
 
 @pytest.fixture
@@ -305,13 +303,11 @@ def registry(tmp_path, monkeypatch):
         data_root.cache_clear()
 
 
-
 @pytest.fixture
 def quiet():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         yield
-
 
 
 @pytest.mark.usefixtures('quiet')
@@ -349,7 +345,199 @@ class TestABrokenWaveInTheRoster:
         assert len(c.household_characteristics(waves=absent)) == 0
 
 
+@pytest.mark.usefixtures('quiet')
+class TestARefusalInSample:
+    """#1546.  Through the real v-join, from the table the user asked for."""
+
+    @pytest.mark.parametrize('error_type,raised', [
+        (ValueError, ValueError), (RuntimeError, RuntimeError), (GrainConflict, GrainConflict),
+        (KeyError, RuntimeError),   # build_wave names the wave (GH #1281)
+    ])
+    @pytest.mark.parametrize('table', ['household_roster', 'household_characteristics',
+                                       'food_acquired', 'food_expenditures'])
+    def test_it_reaches_the_caller(self, registry, error_type, raised, table):
+        c, waves, install = registry
+        install('sample', waves[0], error_type('the refusal'))
+        with pytest.raises(raised, match='the refusal'):
+            getattr(c, table)(waves=[waves[1]])
+
+    def test_a_by_path_guard_reaches_the_caller(self, registry, tmp_path):
+        c, waves, install = registry
+        Guard = by_path_guard(tmp_path)
+        install('sample', waves[0], Guard('the refusal'))
+        with pytest.raises(Guard):
+            c.household_roster()
+
+    def test_a_missing_source_serves_the_rows_and_says_so(self, registry):
+        c, waves, install = registry
+        install('sample', waves[0], FileNotFoundError('no such blob'))
+        with warnings.catch_warnings(record=True) as seen:
+            warnings.simplefilter('always')
+            out = c.household_roster(waves=[waves[1]])
+        assert 'v' not in out.index.names and len(out) == 3
+        said = [str(w.message) for w in seen if issubclass(w.category, SampleUnavailableWarning)]
+        assert said and 'no such blob' in said[0]
+
+    def test_a_clean_sample_joins_v(self, registry):
+        c, waves, _ = registry
+        out = c.household_roster(waves=[waves[1]])
+        assert 'v' in out.index.names and out.index.get_level_values('v').notna().all()
+
+
+@pytest.mark.usefixtures('quiet')
+class TestUnderParallelWorkers:
+    """#1524.  A by-path guard in a worker, on two targets, as the issue measured it."""
+
+    @pytest.fixture(autouse=True)
+    def two_workers(self, registry, monkeypatch):
+        monkeypatch.setenv('LSMS_BUILD_WORKERS', '2')
+        monkeypatch.setattr(pw, 'visible_cpus', lambda env=None: 4)
+        monkeypatch.setattr(pw, 'memory_worker_cap', lambda env=None: None)
+
+    @pytest.mark.parametrize('table', ['household_roster', 'household_characteristics',
+                                       'food_acquired', 'food_expenditures', 'food_quantities'])
+    def test_it_is_not_served_as_empty(self, registry, tmp_path, table):
+        c, waves, install = registry
+        install('sample', waves[0], by_path_guard(tmp_path)('the refusal'))
+        with pytest.raises(WaveWorkerError, match='Guard: the refusal') as caught:
+            getattr(c, table)(waves=[waves[1]])
+        assert caught.value.original_type == 'Guard'
+
+    def test_in_the_table_itself_it_is_not_served_as_empty(self, registry, tmp_path):
+        c, waves, install = registry
+        install('household_roster', waves[0], by_path_guard(tmp_path)('the refusal'))
+        with pytest.raises(WaveWorkerError, match='Guard: the refusal'):
+            c.household_characteristics()
+
+    def test_a_clean_build_is_unchanged(self, registry):
+        c, waves, _ = registry
+        assert len(c.household_characteristics(waves=waves[:2])) == 6
+
+
+# ---------------------------------------------------------------------------
+# #1546: the two reads of sample, directly
+# ---------------------------------------------------------------------------
+
+def _frame():
+    return pd.DataFrame({'x': [1]}, index=pd.MultiIndex.from_tuples([('a', '2014')], names=['i', 't']))
+
+
+class TestVJoin:
+    def _country(self, monkeypatch, sample):
+        country = Country('Malawi', preload_panel_ids=False)
+        calls = []
+
+        def fake(*args, **kwargs):
+            calls.append(1)
+            if isinstance(sample, Exception):
+                raise sample
+            return sample
+
+        monkeypatch.setattr(country, 'sample', fake, raising=False)
+        return country, calls
+
+    @pytest.mark.parametrize('error', [ValueError('x'), KeyError('x'), AttributeError('x'),
+                                       GrainConflict('x'), RuntimeError('x')])
+    def test_a_refusal_is_raised_and_not_remembered(self, monkeypatch, error):
+        country, calls = self._country(monkeypatch, error)
+        for _ in range(2):
+            with pytest.raises(type(error)):
+                country._join_v_from_sample(_frame())
+        assert len(calls) == 2
+
+    def test_a_missing_source_warns_on_every_table_and_reads_once(self, monkeypatch):
+        country, calls = self._country(monkeypatch, FileNotFoundError('gone'))
+        for _ in range(2):
+            with pytest.warns(SampleUnavailableWarning, match='gone'):
+                out = country._join_v_from_sample(_frame())
+            pd.testing.assert_frame_equal(out, _frame())
+        assert len(calls) == 1
+
+    def test_a_sample_with_no_v_warns(self, monkeypatch):
+        sample = pd.DataFrame({'weight': [1.0]}, index=_frame().index)
+        country, _ = self._country(monkeypatch, sample)
+        with pytest.warns(SampleUnavailableWarning, match='no `v`'):
+            out = country._join_v_from_sample(_frame())
+        assert 'v' not in out.index.names
+
+    def test_a_country_with_no_sample_is_not_asked(self):
+        """Armenia declares no ``sample``, and the guard is at the call in ``_finalize_result``."""
+        country = Country('Armenia', preload_panel_ids=False)
+        assert 'sample' not in country.data_scheme
+        src = C.Country._finalize_result.__code__
+        assert '_join_v_from_sample' in src.co_names
+
+
+class _MarketStub:
+    name = 'Fixtureland'
+    data_scheme = {'sample': {}, 'cluster_features': {}}
+    _add_market_index = Country._add_market_index
+    _report_unlabelled_markets = Country._report_unlabelled_markets
+
+    def __init__(self, sample):
+        self._sample = sample
+
+    def sample(self):
+        raise self._sample
+
+    def _market_lookup(self, column='Region'):
+        return pd.DataFrame({'t': ['2000'], 'v': ['c1'], 'm': ['North']})
+
+
+def _table():
+    index = pd.MultiIndex.from_tuples([('2000', 'c1', 'h1')], names=['t', 'v', 'i'])
+    return pd.DataFrame({'x': [1.0]}, index=index)
+
+
+class TestMarketLookup:
+    @pytest.mark.parametrize('error', [ValueError('x'), KeyError('x'), AttributeError('x'),
+                                       GrainConflict('x')])
+    def test_a_refusal_is_raised(self, error):
+        with pytest.raises(type(error)):
+            _MarketStub(error)._add_market_index(_table())
+
+    @pytest.mark.parametrize('error', [FileNotFoundError('gone'), OSError('gone')])
+    def test_an_unreachable_source_labels_from_the_cluster_and_says_so(self, error):
+        with pytest.warns(SampleUnavailableWarning, match='gone'):
+            out = _MarketStub(error)._add_market_index(_table())
+        assert out.index.get_level_values('m').tolist() == ['North']
+
+
+# ---------------------------------------------------------------------------
+# What must keep working
+# ---------------------------------------------------------------------------
+
+def test_the_feature_loop_still_drops_a_country_with_a_warning(monkeypatch, tmp_path):
+    Guard = by_path_guard(tmp_path)
+    good = _roster('2018-19').assign(Generation=0, Distance=0, Affinity='consanguineal')
+    good = good.drop(columns='Relationship')
+
+    def aggregate(self, waves, table, *args, **kwargs):
+        if self.name == 'Ethiopia':
+            raise Guard('the refusal')
+        return good.copy()
+
+    monkeypatch.setattr(Country, '_aggregate_wave_data', aggregate)
+    with warnings.catch_warnings(record=True) as seen:
+        warnings.simplefilter('always')
+        out = ll.Feature('household_characteristics')(['Ethiopia', 'Malawi'])
+    assert set(out.index.get_level_values('country')) == {'Malawi'}
+    assert any('Ethiopia' in str(w.message) and 'Guard: the refusal' in str(w.message) for w in seen)
+
 
 def test_the_rebuild_failure_is_still_a_bare_runtime_error():
     """The one generic failure the fall-through exists for."""
     assert type(_rebuild_failure_error('X', 't')) in C._GENERIC_BUILD_FAILURES
+
+
+def test_no_handler_edit_can_move_a_build_fingerprint():
+    """Every callable these rules live in stays out of every table's closure."""
+    seen, parts = set(), []
+    for _qn, (fn, _t) in R._BUILD_TRANSFORMS.items():
+        parts += R._closure_parts(fn, seen)
+    for name in ('Country._join_v_from_sample', 'Country._add_market_index',
+                 'Country._legacy_can_build', 'Country._warn_legacy_fallback',
+                 'Country._proven_absent', 'Country.__getattr__',
+                 '_parallel_waves._pack_exception', '_parallel_waves.relay',
+                 'WaveWorkerError', 'LegacyFallbackWarning', 'SampleUnavailableWarning'):
+        assert not [q for q in seen if q.endswith(name)], name
