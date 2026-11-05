@@ -329,14 +329,15 @@ def test_every_reported_quantity_is_served_exactly_once(served, wave):
 @pytest.mark.parametrize("wave", sorted(S9))
 def test_a_household_crop_sale_sits_on_one_row_of_a_one_line_crop(served, wave):
     """Raw oracle: every served sale belongs to a (holder, crop) with exactly one
-    distinct §9 line, and no (holder, crop) carries a sale on two rows."""
+    SERVED §9 line (GH #1457), and no (holder, crop) carries a sale on two rows."""
     df, _ = served
     lines = _lines(wave)
-    nlines = lines.groupby(["holder", "code"]).size()
     to_pair = lines.set_index(["plot_id", "production_obs"])[["holder", "code"]]
     g = df.xs(wave, level="t").reset_index()
     g = g[g["plot_id"] != "Farm-level"]    # GH #1457: every other sale has its own row
-    sold = g[g["Value_sold"].notna()].join(to_pair, on=["plot_id", "production_obs"])
+    rows = g.join(to_pair, on=["plot_id", "production_obs"])
+    nlines = rows.groupby(["holder", "code"]).size()
+    sold = rows[rows["Value_sold"].notna()]
     assert sold["code"].notna().all()
     per_pair = sold.groupby(["holder", "code"]).size()
     assert per_pair.max() == 1, wave

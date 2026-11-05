@@ -197,8 +197,9 @@ Ethiopia::crop_production::hh-crop-sale-single-row:
   columns: [Quantity_sold, Value_sold, Unit_sold]
   rule: >-
     Section 11 records a sale per holder and crop, with no plot.  A sale is a line with a
-    positive quantity or value.  Where the (holder, crop) is on exactly one section-9 line
-    its sale is served on that row, as recorded, and the row carries this key: Value_sold
+    positive quantity or value.  Where the (holder, crop) is on exactly one SERVED section-9
+    line (a line with no unit and no quantity does not count where another does, because
+    the empty-row filter removes it) its sale is served on that row, as recorded, and the row carries this key: Value_sold
     always, Quantity_sold only where the sale's unit is the row's u.  What is derived is the
     ATTACHMENT, not the numbers.  Any other sale is served on ONE row with plot_id =
     'Farm-level', u = 'Unknown', production_obs = 'reported:s11:<holder>:<crop code>', no
@@ -225,7 +226,7 @@ Ethiopia::crop_production::hh-crop-sale-single-row:
         a sale of a crop on two or more section-9 lines is not allocated among them, since any
         split would be invented.  That includes two lines of one crop on ONE plot, whose plot is
         knowable and lost here (W4 1 sale, 600 Birr; W5 7, 31,870 Birr).  A row with no stated
-        harvest still counts as a line: Nigeria's further ruling A is not extended.
+        harvest but with a unit still counts as a line: Nigeria's further ruling A is not extended.
       basis: modelling-choice
       evidence: rulings @ligon 2026-11-03 and 2026-11-04, GH #843 option (d), GH #1457.
   validated_against: >-

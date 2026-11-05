@@ -193,3 +193,46 @@ def test_inputs_return_the_lines_of_the_keyed_rows(served, key, wave):
     keyed = g[g.Derivation.astype("string").str.contains(key, regex=False).fillna(False)]
     assert len(keyed)
     assert set(zip(keyed.i.astype(str), keyed.j.astype(str))) <= set(zip(x.i.astype(str), x.j.astype(str)))
+
+
+class TestServedLines:
+    """F1 of the #1457 review: the caveat counts lines that will be SERVED."""
+
+    def _frame(self, rows):
+        return pd.DataFrame(rows, columns=["_holder", "_code", "u", "Quantity"]).astype(
+            {"_holder": "string", "_code": "Int64", "u": "string", "Quantity": "Float64"})
+
+    def test_a_placeholder_does_not_count_beside_a_served_line(self, ethiopia):
+        out = self._frame([("a", 1, "Kg", 5.0), ("a", 1, pd.NA, pd.NA)])
+        assert ethiopia._s9_line_is_served(out).tolist() == [True, False]
+        assert ethiopia._s9_lines_per_holder_crop(out)["_nlines"].tolist() == [1]
+
+    def test_a_lone_placeholder_counts_and_two_count_as_two(self, ethiopia):
+        out = self._frame([("a", 1, pd.NA, pd.NA), ("b", 1, pd.NA, pd.NA), ("b", 1, pd.NA, pd.NA)])
+        got = ethiopia._s9_lines_per_holder_crop(out).set_index("_holder")["_nlines"]
+        assert got.to_dict() == {"a": 1, "b": 2}
+
+    def test_a_row_with_a_unit_is_served_though_it_states_no_harvest(self, ethiopia):
+        out = self._frame([("a", 1, "Kg", pd.NA), ("a", 1, "Kg", 5.0)])
+        assert ethiopia._s9_lines_per_holder_crop(out)["_nlines"].tolist() == [2]
+
+    def test_a_frame_of_keys_counts_every_line(self, ethiopia):
+        out = pd.DataFrame({"_holder": ["a", "a"], "_code": pd.array([1, 1], dtype="Int64")})
+        assert ethiopia._s9_lines_per_holder_crop(out)["_nlines"].tolist() == [2]
+
+    def test_the_sale_goes_on_the_served_line_not_the_placeholder(self, ethiopia):
+        harvest = pd.DataFrame(
+            [("HH1", "H1", 1, 1, 7, 50.0, "1. Kilogram"), ("HH1", "H1", 1, 2, 7, np.nan, None)],
+            columns=["household_id", "holder_id", "parcel_id", "field_id", "crop_code", "qty", "unit"])
+        sale = pd.DataFrame([("HH1", "H1", 7, 1, 2.0, 30.0)],
+                            columns=["household_id", "holder_id", "crop_code", "sold", "sqty", "sval"])
+        colmap = dict(hhid="household_id", holder_id="holder_id", parcel_id="parcel_id", field_id="field_id",
+                      crop_code="crop_code", quantity="qty", s_crop_code="crop_code", s_sold_flag="sold",
+                      s_qty="sqty", s_value="sval")
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            got = ethiopia.crop_production_for_wave("2015-16", harvest, None, sale, colmap,
+                                                    unit_labels=harvest["unit"]).reset_index()
+        assert len(got) == 1 and got.plot_id.tolist() == ["H1_1_1"]
+        assert got.Value_sold.tolist() == [30.0] and got.Quantity_sold.tolist() == [2.0]
+        assert got.Derivation.tolist() == [SINGLE]

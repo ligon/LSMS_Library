@@ -418,9 +418,10 @@ def test_the_stamp_rides_to_the_served_table(cp):
     # 4,463 / 4,495 before the 2026-10-23 empty-row-filter ruling: W2's 209 and
     # W3's 62 stamped rows with no unit and no quantity are no longer dropped.
     # 544 / 4,557 before GH #1461: 2 W1 and 6 W3 folded-key lines now attach.
-    # GH #1457 re-pin: + 1,811 / 1,187 / 1,320 Farm-level rows holding the sales of
-    # classes 4 and 5, 546 / 4,672 / 4,563 on §9 rows as before.
-    assert got == {"2011-12": 546 + 1811, "2013-14": 4672 + 1187, "2015-16": 4563 + 1320,
+    # GH #1457 re-pin: + 1,811 / 1,049 / 1,206 Farm-level rows holding the sales of
+    # classes 4 and 5, and 546 / 5,138 / 5,002 on §9 rows, up from 546 / 4,672 / 4,563
+    # because a line now counts only if it is served.
+    assert got == {"2011-12": 546 + 1811, "2013-14": 5138 + 1049, "2015-16": 5002 + 1206,
                    "2018-19": 0, "2021-22": 0}, got
     stamped = (d == key).fillna(False).to_numpy(dtype=bool)
     assert (cp.loc[stamped, ["Quantity_sold", "Value_sold"]].notna().any(axis=1)).all()
@@ -474,5 +475,7 @@ def test_positive_sale_rows_per_wave(cp):
     # carrying a sale value is never dropped (+23 / +9 / +27 / +31 rows whose
     # §9 row has no unit and no quantity; GH #1253 moved no positive value).
     # 1,323 in W5 before GH #1461: a sale no longer sits on two lines of a crop.
-    assert got == {"2011-12": 854, "2013-14": 2760, "2015-16": 2309,
-                   "2018-19": 1395, "2021-22": 1315}, got
+    # 2,760 / 2,309 / 1,395 / 1,315 before GH #1457 counted served lines: 146 + 125 +
+    # 99 + 90 sales now on their one served row.
+    assert got == {"2011-12": 854, "2013-14": 2906, "2015-16": 2434,
+                   "2018-19": 1494, "2021-22": 1405}, got

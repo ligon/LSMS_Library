@@ -4538,12 +4538,18 @@ own =Unit_sold= (new, optional), =production_obs = 'reported:<s11|s12>:<holder>:
 
 | Birr, cold                         |    2011-12 |   2013-14 |   2015-16 |   2018-19 |    2021-22 |
 |------------------------------------+------------+-----------+-----------+-----------+------------|
-| on a §9 line (§11 + §12), base     |    600,749 | 3,000,513 | 2,490,034 | 2,604,089 |  6,945,286 |
-| Farm-level, §11                    |  1,011,908 | 1,803,267 | 1,429,623 | 4,937,676 | 14,441,581 |
-| Farm-level, §12                    |  1,986,089 | 2,227,273 | 2,893,216 |         0 |          0 |
+| on a served §9 line (§11 + §12)    |    600,749 | 3,118,955 | 2,581,435 | 2,821,001 |  7,648,678 |
+| Farm-level, §11                    |  1,011,908 | 1,801,422 | 1,420,999 | 4,720,764 | 13,738,189 |
+| Farm-level, §12                    |  1,986,089 | 2,110,676 | 2,810,439 |         0 |          0 |
 |------------------------------------+------------+-----------+-----------+-----------+------------|
 | served                             |  3,598,746 | 7,031,053 | 6,812,873 | 7,541,765 | 21,386,867 |
-| rows at Farm-level (§11 / §12)     | 1,058 / 1,811 | 1,130 / 1,187 | 967 / 1,320 | 1,176 / 0 | 1,309 / 0 |
+| rows at Farm-level (§11 / §12)     | 1,058 / 1,811 | 1,122 / 1,049 | 955 / 1,206 | 1,075 / 0 | 1,219 / 0 |
+
+*Served lines (review of GH #1457).*  The caveat counts SERVED §9 lines (=_s9_line_is_served=): a line with no unit and no quantity is removed by the empty-row
+filter, so it does not count where the holder has another line of the crop, and it takes no sale there.  Counting raw lines passed over a holder's one served row for
+463 sales, 8 + 138 / 12 + 114 / 101 / 90 by wave (§11 + §12 in W2 and W3), and those now sit on their row.  So the line rule of GH #1461 no longer sends the 100-Birr
+Gishita sale to Farm-level (it has three =crop_id= lines, one with a harvest).  A holder-crop with no such line keeps all its lines: one alone takes its sale, which is what
+keeps that row, and two or more mean Farm-level.
 
 Served equals the raw =sect11= + =sect12= sum in every wave, less three things this does NOT serve:
 - §12's repeated pairs (W2 145,586, W3 1,315 Birr): which line or sum is the holder's sale is not something the survey says.  Class 2 of =_attach_sect12_sales=.
@@ -4556,9 +4562,9 @@ Served equals the raw =sect11= + =sect12= sum in every wave, less three things t
 - *W1 §9 is a 7,750-row file against §4's 29,317 (above, "Unexplained; recorded").*  So 821 of W1's 1,754 §11 sales (820,239 Birr) have no §9 row, and 774 of those 821 have a §4 line: they were planted.  The Farm-level row holds the sale as recorded.  It does NOT resolve why W1 §9 is short.
 - *W1 §12's 1,683 no-§9-row sales (1.83M Birr) are the expected ones* (§9 excludes those crops), and their HARVEST (§12 Q3) is still in no served table: the open decision above stands.  So a W1 tree crop now shows a sale and no harvest.  See the report.
 - *W5 §11 lists 84 (holder, crop) pairs twice* under two =harvestedcrop_id=, and the values differ on 80.  The sum predates this; =hh-crop-sale-records-summed= and =-two-units= name it, on Nigeria's ruling B.
-- *Two lines of one crop on ONE plot (GH #1461, W4 1 sale 600 Birr; W5 7, 31,870 Birr) go to Farm-level.*  The plot is knowable.  Nigeria's ruling is pending on the same question.
+- *Two served lines of one crop on ONE plot (GH #1461, W4 1 sale 600 Birr; W5 7, 31,870 Birr) go to Farm-level.*  The plot is knowable.  Nigeria's ruling is pending on the same question.
 - *=Quantity_sold= on a §9 row stays as it is: only where the sale's unit equals =u=.*  That leaves 1 / 1,915 / 695 / 343 / 393 §9 rows with a value and no quantity, while a Farm-level row shows both, in its own =Unit_sold=.  Filling those rows would be a separate change.
 - *The window keys ride along.*  A §12 Farm-level row carries =sect12-sale-period=.  A W4/W5 Farm-level row carries =permanent-crop-12-month-window= where every §4 line of the (holder, crop) says permanent, because it has no plot for the row rule's join.
-- *Nigeria's ruling A is not extended.*  262 §11 sales (977K Birr) and 255 §12 sales (201K Birr) sit on Farm-level with exactly one line stating a harvest among several; 212 + 182 sales on a lone line stating no harvest keep it, unlike Nigeria.
+- *Nigeria's ruling A is not extended.*  After the served-line count, 52 W1 §11 sales (46,703 Birr) sit on Farm-level with exactly one line stating a harvest among several served ones: every W1 line has a unit, because W1 fixes kilos, so a line with no quantity is still served.  No other wave has any.  212 + 182 sales on a lone line stating no harvest keep it, unlike Nigeria.
 
 =Derivation= gains =hh-crop-sale-single-row= on the §9 rows already holding a §11 sale, beside any window key, and that and =Unit_sold= are all that move on them.

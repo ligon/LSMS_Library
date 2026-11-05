@@ -282,8 +282,10 @@ def test_served_zero_sale_counts_per_wave(cp):
     waves = sorted(set(t))
     v0 = {w: int(((cp["Value_sold"] == 0).fillna(False) & (t == w)).sum()) for w in waves}
     q0 = {w: int(((cp["Quantity_sold"] == 0).fillna(False) & (t == w)).sum()) for w in waves}
-    assert v0 == {"2011-12": 3143, "2013-14": 7734, "2015-16": 7051,
-                  "2018-19": 4512, "2021-22": 2961}, v0
-    assert q0 == {"2011-12": 3144, "2013-14": 2581, "2015-16": 0,
+    # 7,734 / 7,051 / 4,512 / 2,961 and W2 2,581 before GH #1457 counted served lines: a
+    # recorded "No" now also reaches the holder-crop's one served row.
+    assert v0 == {"2011-12": 3143, "2013-14": 8147, "2015-16": 7512,
+                  "2018-19": 4725, "2021-22": 3158}, v0
+    assert q0 == {"2011-12": 3144, "2013-14": 2684, "2015-16": 0,
                   "2018-19": 0, "2021-22": 0}, q0
     assert len(cp) == 86437

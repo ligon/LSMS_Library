@@ -1303,9 +1303,9 @@ def food_coping_for_wave(t, df, hhid):
 # crop) — NOT (plot, crop).  A holder who grows one crop on several plots
 # reports a single sale figure that cannot be split across plots without
 # fabricating an allocation.  We therefore attach Quantity_sold /
-# Value_sold to a §9 row ONLY where the (holder, crop) maps to exactly ONE §9
+# Value_sold to a §9 row ONLY where the (holder, crop) maps to exactly ONE served §9
 # harvest line (unambiguous; `hh-crop-sale-single-row`).  Where the crop is on
-# several lines -- several plots, or (W4/W5, GH #1461) several roster lines of
+# several served lines -- several plots, or (W4/W5, GH #1461) several roster lines of
 # one plot -- or on none, the sale goes on ONE row of its own with plot_id =
 # 'Farm-level', no Quantity, u = 'Unknown' and its own Unit_sold (GH #1457, the
 # ruling on GH #843 option (d)): we never duplicate or arbitrarily split a
@@ -2114,19 +2114,19 @@ def _farm_level_rows(t, placed, module, crop_map, perennial_codes, U_UNKNOWN,
 _S11_RAW = {
     '2011-12': dict(s11='sect11_ph_w1.dta', hh='household_id', code='crop_code', flag='ph_s11q01',
                     qty='ph_s11q03_a', unit=None, value='ph_s11q04_a',
-                    s9='sect9_ph_w1.dta', s9_code='crop_code'),
+                    s9='sect9_ph_w1.dta', s9_code='crop_code', s9_unit=None, s9_qty='ph_s9q12_a'),
     '2013-14': dict(s11='sect11_ph_w2.dta', hh='household_id2', code='crop_code', flag='ph_s11q01',
                     qty='ph_s11q03_a', unit=None, value='ph_s11q04',
-                    s9='sect9_ph_w2.dta', s9_code='crop_code'),
+                    s9='sect9_ph_w2.dta', s9_code='crop_code', s9_unit='ph_s9q04_b', s9_qty='ph_s9q04_a'),
     '2015-16': dict(s11='sect11_ph_w3.dta', hh='household_id2', code='crop_code', flag='ph_s11q01',
                     qty='ph_s11q03_a', unit='ph_s11q03_b', value='ph_s11q04',
-                    s9='sect9_ph_w3.dta', s9_code='crop_code'),
+                    s9='sect9_ph_w3.dta', s9_code='crop_code', s9_unit='ph_s9q04_b', s9_qty='ph_s9q04_a'),
     '2018-19': dict(s11='sect11_ph_w4.dta', hh='household_id', code='s11q01', flag='s11q07',
                     qty='s11q11a', unit='s11q11b', value='s11q12',
-                    s9='sect9_ph_w4.dta', s9_code='s9q00b'),
+                    s9='sect9_ph_w4.dta', s9_code='s9q00b', s9_unit='s9q05b', s9_qty='s9q05a'),
     '2021-22': dict(s11='sect11_ph_w5.dta', hh='household_id', code='s11q01b', flag='s11q07',
                     qty='s11q11a', unit='s11q11b', value='s11q12',
-                    s9='sect9_ph_w5.dta', s9_code='s9q00b'),
+                    s9='sect9_ph_w5.dta', s9_code='s9q00b', s9_unit='s9q05b', s9_qty='s9q05a'),
 }
 
 
@@ -2142,10 +2142,19 @@ def _inputs_hh_crop_sale(wave, key):
     data = countries_root() / 'Ethiopia' / wave / 'Data'
     raw = get_dataframe(str(data / spec['s11']), convert_categoricals=False)
     s9 = get_dataframe(str(data / spec['s9']), convert_categoricals=False)
-    s9 = s9[~s9.duplicated(keep='first')]
+    repeat = s9.duplicated(keep='first').to_numpy()
+    s9 = s9[~repeat]
+    # The build's own "served": a recorded unit (W1 fixes kilos) or quantity.
+    if spec['s9_unit']:
+        unit = get_dataframe(str(data / spec['s9']), convert_categoricals=True)[spec['s9_unit']][~repeat]
+        unit = _clean_unit_label(pd.Series(unit.values, index=s9.index))
+    else:
+        unit = pd.Series('Kg', index=s9.index)
     nlines = _s9_lines_per_holder_crop(pd.DataFrame({
         '_holder': s9['holder_id'].apply(format_id).values,
-        '_code': pd.to_numeric(s9[spec['s9_code']], errors='coerce').astype('Int64').values}))
+        '_code': pd.to_numeric(s9[spec['s9_code']], errors='coerce').astype('Int64').values,
+        'u': unit.values,
+        'Quantity': pd.to_numeric(s9[spec['s9_qty']], errors='coerce').values}))
     lines = pd.DataFrame({
         '_hh': raw[spec['hh']].apply(format_id).astype('string').values,
         '_holder': raw['holder_id'].apply(format_id).astype('string').values,
@@ -2192,15 +2201,35 @@ def _none_lines():
                          '_nlines': pd.Series(dtype='int64')})
 
 
+def _s9_line_is_served(out):
+    """True on a §9 line a holder-crop sale can sit on: one that will be SERVED.
+
+    The empty-row filter of :func:`crop_production_for_wave` removes a line with no
+    unit, no quantity and no sale, so such a line does not count where the holder has
+    another of that crop, and takes no sale there (GH #1457: 462 sales in W2-W5, whose
+    one served row was passed over for a line the filter then removed).  A holder-crop
+    with no such line keeps all of its lines: one alone takes its sale, which is what
+    keeps that row (the 2026-10-23 ruling), and two or more mean a Farm-level row.
+    A frame with neither column (a count over keys alone) counts every line.
+    """
+    if 'u' not in out.columns or 'Quantity' not in out.columns:
+        return np.ones(len(out), dtype=bool)
+    content = (out['u'].notna() | out['Quantity'].notna())
+    keys = [out['_holder'].astype('string'), out['_code']]
+    any_content = content.groupby(keys, dropna=False).transform('any')
+    return (content | ~any_content).to_numpy(dtype=bool)
+
+
 def _s9_lines_per_holder_crop(out):
-    """§9 lines per (holder, crop): ``_holder``, ``_code``, ``_nlines``.
+    """§9 served lines per (holder, crop): ``_holder``, ``_code``, ``_nlines``.
 
     The denominator of the SALES GRAIN CAVEAT, for §11 and §12 alike.  It counts
     LINES, not plots (GH #1461): with ``production_obs`` both lines of a crop
     listed twice on one plot are served, so a plot count would put the holder's
-    one sale on both rows.
+    one sale on both rows.  It counts SERVED lines (:func:`_s9_line_is_served`,
+    GH #1457).
     """
-    return (out.dropna(subset=['_code'])
+    return (out[_s9_line_is_served(out)].dropna(subset=['_code'])
                .groupby(['_holder', '_code']).size()
                .rename('_nlines').reset_index())
 
@@ -2356,8 +2385,10 @@ def _attach_sect12_sales(t, out, sale12, colmap, sale12_unit_labels=None,
     work = work.merge(v12, on=['_holder', '_code'], how='left')
     work = work.merge(q12, on=['_holder', '_code', 'u'], how='left')
     assert len(work) == n0, f"{t}: §12 attach changed the row count {n0} -> {len(work)}"
-    hit_v = work['_v12'].notna().to_numpy()
-    hit_q = work['_q12'].notna().to_numpy()
+    # The one served line takes it, not a line the filter then removes (GH #1457).
+    served_line = _s9_line_is_served(work)
+    hit_v = work['_v12'].notna().to_numpy() & served_line
+    hit_q = work['_q12'].notna().to_numpy() & served_line
     assert work.loc[hit_v, 'Value_sold'].isna().all(), \
         f"{t}: §12 would overwrite a §11 Value_sold"
     assert work.loc[hit_q, 'Quantity_sold'].isna().all(), \
@@ -2735,6 +2766,8 @@ def crop_production_for_wave(t, harvest, planting, sale, colmap,
         out = out.merge(
             qagg.rename(columns={'_sunit': 'u'}),
             on=['_holder', '_code', 'u'], how='left')
+        # The one served line takes it, not a line the filter below removes (GH #1457).
+        out.loc[~_s9_line_is_served(out), ['Quantity_sold', 'Value_sold']] = np.nan
 
     # §12 (W1-W3): the tree/fruit/vegetable/root-crop sale module, which §11
     # excludes by its own header.  Fills only what §11 left empty (GH #820).
