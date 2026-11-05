@@ -906,9 +906,14 @@ cross-wave demand system on =j= must bundle these itself.
 the last purchase only within 30 days (=s07bq06=, 36,328 rows are older or never).
 
 *Kilograms.*  =ehcvm_nsu_tgo2021.dta= exists and is not wired (not ruled for single-wave
-countries).  So this wave's kilograms come from the price-ratio ladder, as 2018's do, and
-because #1487 pools factors across a country's waves, wiring this table moves 2018's
-inferred kilograms at read time.  Numbers in the PR.
+countries).  So this wave's kilograms come from the price-ratio ladder, as 2018's do:
+=metric= 11,559 rows, =item_unit= 16,474, =unit= 108,174, =none= 7.  Because #1487 pools
+factors across a country's waves, wiring this table moved 2018's inferred kilograms at
+read time, measured cold on the same code: =food_quantities(units='kgs')= 2018 63,624 ->
+66,987, 91,261 of 110,740 rows move, median ratio 1.15; =food_prices= median ratio 0.87.
+The rungs barely move (=item_unit= 14,087 -> 14,450, =unit= 88,132 -> 87,771, =none= 33 ->
+31, =metric= unchanged at 10,344), so the move is the pooled =unit= factor itself.  2018's
+native =Quantity= and =Expenditure= do not move, and neither does =harvest_kg= (2,580,521).
 
 ** =crop_production=
 

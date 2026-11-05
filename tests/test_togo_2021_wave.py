@@ -415,6 +415,14 @@ class TestServed:
         assert got["farm_work"].astype("boolean").sum() == (s04["s04q06"] == 1).sum()
         assert got["wage_work"].astype("boolean").sum() == (s04["s04q08"] == 1).sum()
 
+    def test_every_nonfood_label_is_in_the_waves_own_table(self):
+        from lsms_library.local_tools import df_from_orgfile
+
+        table = df_from_orgfile(countries_root() / "Togo" / WAVE / "_" / "categorical_mapping.org",
+                                name="nonfood_items")
+        got = set(_served("nonfood_expenditures").index.get_level_values("j"))
+        assert got <= set(table["Preferred Label"].astype(str).str.strip())
+
     def test_nonfood_items_follow_the_label_not_the_code(self):
         got = _served("nonfood_expenditures")
         assert got.index.is_unique

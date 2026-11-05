@@ -91,7 +91,9 @@ def nonfood():
     except Exception as exc:                                   # pragma: no cover
         pytest.skip(f'Togo unavailable: {exc}')
     try:
-        return c.nonfood_expenditures()
+        # 2018 only: these pins are that wave's.  2021-22 (GH #552) has its own item
+        # table and is pinned in tests/test_togo_2021_wave.py.
+        return c.nonfood_expenditures(waves=['2018'])
     except Exception as exc:                                   # pragma: no cover
         pytest.skip(f'Togo nonfood_expenditures could not be built: '
                     f'{type(exc).__name__}: {exc}')

@@ -109,9 +109,9 @@ Data Scheme:
 
   plot_features:
     # Lasting parcel-level characteristics from the EHCVM agriculture
-    # module s16a (GH #167; Mali is the EHCVM reference, PR #284).  Togo
-    # has a single EHCVM wave (2018).  The source file lives in
-    # 2018/Data1/ (NOT 2018/Data/, which holds only _forEthan extracts).
+    # module s16a (GH #167; Mali is the EHCVM reference, PR #284).  The 2018
+    # source file lives in 2018/Data1/ (NOT 2018/Data/, which holds only
+    # _forEthan extracts); 2021-22's is in 2021-22/Data/.
     # plot_id = "{field_no}_{parcel_no}".  Latitude / Longitude are NOT
     # emitted — EHCVM s16a has no decimal-degree parcel GPS (s16aq47 is
     # an area, not a coordinate); deferred as in Uganda.
@@ -182,9 +182,6 @@ Data Scheme:
       type: float
       optional: true
     intercropped: bool
-    Derivation:
-      type: str
-      optional: true
     materialize: make
 
   plot_inputs:
