@@ -4161,7 +4161,14 @@ KG_FACTOR_DISAGREEMENT_TOLERANCE = 0.10
 #: everything that already outranked it, so separating it moves no
 #: ``kg_per_unit`` value -- it makes a DEFINITIONAL factor countable apart
 #: from a price-ratio guess, which the food ladder has done since GH #850.
-KG_FACTOR_LAYERS = ('reported', 'shipped', 'survey_median', 'metric',
+#:
+#: ``survey_kg`` (GH #1436, ruling @ligon 2026-11-04) is first: the survey wrote
+#: this line's kilograms down, the optional canonical ``Quantity_kg``, a TOTAL for
+#: the line and not a factor per unit.  It means what the food ladder's rung of
+#: the same name means, that the kilograms are the survey's and not the library's.
+#: It does NOT mean weighed: Niger and Mali 2021-22 label theirs "Estimation", and
+#: food's Nigeria ``s10bq2_cvn`` and Malawi ``cfactor`` are conversions too.
+KG_FACTOR_LAYERS = ('survey_kg', 'reported', 'shipped', 'survey_median', 'metric',
                     'inferred', 'none')
 
 
@@ -4613,6 +4620,61 @@ def _kg_factor_series_with_declared(df, *, volume_as_mass=True, unit_kg=None):
                      index=df.index, dtype='float64')
 
 
+#: The two records that say what the kilograms ARE, carried from the frame to
+#: :func:`harvest_kg` and :func:`yield_kg` (GH #1436).  ``derivations`` is the frame's
+#: own ``attrs`` record, where a survey's estimate is named, and is absent when the frame
+#: has lost it.
+SURVEY_KG_BY_WAVE_ATTR = 'survey_kg_rows_by_wave'
+_KG_DISCLOSURE_ATTRS = ('derivations', SURVEY_KG_BY_WAVE_ATTR)
+
+
+def _survey_kg_totals(df):
+    """``crop_production.Quantity_kg`` as ``(totals, usable, zero)`` ndarrays.
+
+    A usable total is finite and > 0.  ``zero`` is a total that is finite and not
+    positive, which the ladder refuses.  A frame with no such column is all NaN and
+    all False, so it resolves exactly as it did before the rung existed.
+    """
+    if 'Quantity_kg' not in df.columns:
+        totals = np.full(len(df), np.nan)
+    else:
+        totals = _as_float(df['Quantity_kg'])
+    finite = np.isfinite(totals)
+    usable = np.zeros(len(df), dtype=bool)
+    usable[finite] = totals[finite] > 0
+    return totals, usable, finite & ~usable
+
+
+def _survey_kg_rows_by_wave(df, usable):
+    """Rows the ``survey_kg`` rung serves, per wave: ``{wave: n}``, every wave in the
+    frame with 0 included, or ``{country: {wave: n}}`` on a frame with a ``country``
+    level.  Plain strings and ints, so the record survives ``df.to_parquet``.  The
+    rung's name is one string across waves that differ, so this is what lets a reader
+    see that a wave has no survey kilograms at all (Niger 2018-19).
+    """
+    waves = _level_or_column(df, 't')
+    if waves is None:
+        return {}
+    waves = pd.Series(waves).astype(str).to_numpy()
+    usable = pd.Series(np.asarray(usable, dtype=int))
+    country = _level_or_column(df, 'country')
+    if country is None:
+        return {str(w): int(n) for w, n in usable.groupby(waves).sum().items()}
+    country = pd.Series(country).astype(str).to_numpy()
+    out = {}
+    for (c, w), n in usable.groupby([country, waves]).sum().items():
+        out.setdefault(str(c), {})[str(w)] = int(n)
+    return out
+
+
+def _implied_kg_factors(df, totals):
+    """``Quantity_kg / Quantity``, NaN wherever that is not a usable factor."""
+    if 'Quantity' not in df.columns:
+        return np.full(len(df), np.nan)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        return _valid_factor(totals / _as_float(df['Quantity']))
+
+
 def harvest_kg_factors(crop_production, *, volume_as_mass=True,
                        min_reports=SURVEY_MEDIAN_MIN_REPORTS,
                        shipped_factors=None, unit_kg=None):
@@ -4627,6 +4689,23 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     Layers, in precedence order (``KgFactorSource`` records which one served
     each row)
 
+    ``survey_kg``
+        The row's own ``Quantity_kg``: the survey's kilograms for the LINE, a
+        total and not a factor (GH #1436).  Finite and > 0, on any unit, the
+        missing-unit sentinel included: it needs no unit, and it pools with
+        nothing.  ``kg_per_unit`` is the factor it IMPLIES, ``Quantity_kg /
+        Quantity``, as on the food ladder, so ``Quantity * kg_per_unit`` is the
+        survey's total; where that quotient cannot be formed (a missing or zero
+        ``Quantity``) the row keeps the factor of the layers below, still reports
+        ``survey_kg``, and :func:`harvest_kg` serves ``Quantity_kg`` regardless.
+        An implied factor is NOT a reported one: it is not screened against
+        :data:`KG_FACTOR_MAX`, which is sized for a named container and would
+        refuse a tonne or a granary (Mali 2021-22 ``Autre`` at 1,000 kg, tonnes in
+        the free text), and it enters no ``survey_median``.  Site Q names
+        implausible totals (``quantity_audit``); nothing here clips them.  A
+        0 states no mass, so the row falls through, as a ``KgFactor`` of 0 does, and
+        is counted under ``survey_kg_zero``.  A country masks a 0 beside a positive
+        quantity at build time, so that count is a backstop: 0 on Niger and Mali.
     ``reported``
         The row's own ``KgFactor`` column -- what the instrument wrote down
         (UNPS ``a5?q6d``, "conversion factor into kg"), where it is finite,
@@ -4678,9 +4757,10 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     ----------
     crop_production : pd.DataFrame
         The ``crop_production`` item feature.  Needs ``Quantity`` only for
-        the price-ratio branch of the inferred layer; needs ``u`` as an
-        index level or a column.  ``KgFactor``, ``condition`` and
-        ``country`` are all optional.
+        the price-ratio branch of the inferred layer and the implied factor of
+        ``survey_kg``; needs ``u`` as an index level or a column.
+        ``Quantity_kg``, ``KgFactor``, ``condition`` and ``country`` are all
+        optional.
     volume_as_mass : bool, default True
         Forwarded to :func:`_get_kg_factors` (1 litre = 1 kg for fluids).
     unit_kg : mapping, optional
@@ -4772,6 +4852,11 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
             reported number, and this column is CONSTRUCTED.
         ``KgFactorSource``
             one of :data:`KG_FACTOR_LAYERS`.
+        ``kg_survey``
+            the factor ``Quantity_kg`` implies for that row, NaN where it has no
+            usable total or no quantity to divide by.  ``groupby('u')`` on it is
+            how to see that a wave's kilograms are a conversion and not a
+            weighing (Niger 2021-22: exactly 2.5 per ``Tiya`` on 2,881 of 4,402).
         ``kg_reported`` / ``kg_shipped`` / ``kg_survey_median`` /
         ``kg_metric`` / ``kg_inferred``
             what each layer offered for that row, whether or not it won.
@@ -4795,28 +4880,32 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
             normalises both ``None`` and ``pd.NA`` to NaN in an object
             column.
 
-        Three tallies ride on ``.attrs``:
+        Four tallies ride on ``.attrs``:
 
         ``kg_factor_sources``
             ``{layer: n_rows}`` over the INPUT rows.  The layers of
             :data:`KG_FACTOR_LAYERS` partition the frame and sum to
-            ``len(crop_production)`` -- ``shipped`` included, and therefore
-            present as ``0`` when no table is passed.  Four further keys ride
-            OUTSIDE that partition, since a row they count is still served by
-            those layers: ``reported_implausible`` and
+            ``len(crop_production)`` -- ``survey_kg`` and ``shipped`` included,
+            and therefore present as ``0`` when there is no column or no table.
+            Five further keys ride OUTSIDE that partition, since a row they
+            count is still served by those layers: ``reported_implausible`` and
             ``shipped_implausible`` count rows whose offered factor the screen
             REJECTED, and ``shipped_matched`` counts rows the shipped table
             supplied a finite factor for at all -- a JOIN diagnostic taken
             before the sentinel, the screen and the rank, and the right number
             to check when a table looks like it did nothing.  ``declared``
             counts rows the *unit_kg* table offered a factor for, whether or
-            not a higher layer won.  POOLED: on a
+            not a higher layer won.  ``survey_kg_zero`` counts rows whose
+            ``Quantity_kg`` is finite and not positive.  POOLED: on a
             cross-country
             :class:`~lsms_library.feature.Feature` frame these counts run over
             every country at once, so ``reported: 40000`` says nothing about
             WHICH country reported.  Read it as a total, never as coverage;
             the per-row frame answers the real question with one
             ``groupby('country')``.
+        ``survey_kg_rows_by_wave``
+            rows ``survey_kg`` serves, per wave, 0 included: ``{wave: n}``, or
+            ``{country: {wave: n}}`` on a frame with a ``country`` level.
         ``kg_factor_declared_from``
             where the declared table came from: ``'attrs'`` (the frame's own
             ``unit_kg`` record), ``'argument'`` (*unit_kg* passed), or
@@ -4830,6 +4919,11 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
             factor and ``disagree`` counts those differing from the
             *reported* factor by more than
             :data:`KG_FACTOR_DISAGREEMENT_TOLERANCE` in relative terms.
+            ``survey_kg_vs_metric`` asks the same of the factor ``Quantity_kg``
+            implies against what a metric unit's label or declared mass says:
+            a low share is a conversion from the label, a high one a survey
+            that believes its sack holds something else (GH #1436).  A row the
+            label cannot speak to, a ``Tiya`` say, is in neither count.
             This is the audit hook: a large ``reported_vs_inferred`` share
             means the library's factor table and the instrument disagree
             about what a unit weighs, and the instrument is the one that was
@@ -4940,6 +5034,14 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     met_ok = ~np.isnan(metric)
     inf_ok = ~np.isnan(inferred_arr)
 
+    # GH #1436: the survey's own kilograms, a total for the line.  From here on
+    # the frame's other rows see nothing of them: `survey_median` above read
+    # `reported` only, so an implied factor cannot fill a sibling row, and
+    # `_kg_inference_frame`'s read of `Quantity_kg` needs an `Expenditure` that no
+    # `crop_production` carries.
+    survey_kg, from_survey, survey_zero = _survey_kg_totals(df)
+    implied = _implied_kg_factors(df, survey_kg)
+
     # `resolved` is deliberately NOT re-expressed over `metric`: the seeds are
     # already inside `inferred_arr` with precedence, so splitting the label
     # cannot move a number.  Written this way so the relabelling stays
@@ -4948,16 +5050,19 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         rep_ok, reported,
         np.where(shp_ok, shipped,
                  np.where(med_ok, survey_median, inferred_arr)))
+    resolved = np.where(np.isnan(implied), resolved, implied)
     source = np.where(
         rep_ok, 'reported',
         np.where(shp_ok, 'shipped',
                  np.where(med_ok, 'survey_median',
                           np.where(met_ok, 'metric',
                                    np.where(inf_ok, 'inferred', 'none')))))
+    source = np.where(from_survey, 'survey_kg', source)
 
     out = pd.DataFrame(
         {'kg_per_unit': resolved,
          'KgFactorSource': source,
+         'kg_survey': implied,
          'kg_reported': reported,
          'kg_reported_rejected': rejected,
          'kg_shipped': shipped,
@@ -4989,7 +5094,12 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     # GH #931.  Outside the partition, like `shipped_matched`: a declared row is
     # still SERVED by one of the five (`metric` unless a higher layer won).
     counts['declared'] = int(decl_ok.sum())
+    # GH #1436.  Outside too: such a row falls through to the layers below.
+    counts['survey_kg_zero'] = int(survey_zero.sum())
     out.attrs['kg_factor_sources'] = counts
+    # GH #1436: `survey_kg` is one string across waves that differ, and the counts
+    # above are pooled.
+    out.attrs[SURVEY_KG_BY_WAVE_ATTR] = _survey_kg_rows_by_wave(df, from_survey)
     # Kept OUT of the counts so every value there stays an int.  It is what
     # tells "this country declares nothing for these units" ('attrs', with
     # `declared` 0) apart from "no declaration reached this call" (None) --
@@ -5003,6 +5113,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
         'reported_vs_shipped': _disagreement(audited, shipped),
         'reported_vs_survey_median': _disagreement(audited, survey_median),
         'reported_vs_inferred': _disagreement(audited, inferred_arr),
+        'survey_kg_vs_metric': _disagreement(implied, metric),
         'tolerance': KG_FACTOR_DISAGREEMENT_TOLERANCE,
     }
     return out
@@ -5038,7 +5149,11 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     For each reported harvest row, convert the native-unit ``Quantity`` to
     kilograms, then sum within each plot-crop.
 
-    Each row's kg-per-unit factor is built by a LAYERED procedure, in
+    A row whose survey states its kilograms outright (**survey_kg**, the optional
+    ``Quantity_kg``, a total for the line, GH #1436) contributes exactly that, in
+    any unit or none; an estimate where the instrument says so, not a weighing
+    (Niger and Mali 2021-22 are registered: their ``Derivation`` says so).  Every
+    other row's kg-per-unit factor is built by a LAYERED procedure, in
     precedence order: the row's own **reported** ``KgFactor`` (what the
     instrument wrote down, e.g. UNPS ``a5?q6d``); a **shipped** factor from
     an externally supplied conversion table, when the caller passes one as
@@ -5133,13 +5248,22 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         ``result.attrs['kg_factor_declared_from']`` where the declared
         ``u_kg`` table came from (GH #931).
 
+        What the kilograms ARE rides beside them (GH #1436):
+        ``result.attrs['survey_kg_rows_by_wave']`` counts the rows the survey's own
+        total served, per wave, 0 included, and ``result.attrs['derivations']`` is the
+        input frame's record, which names a registered construction such as
+        ``survey-kg-estimate`` (absent if the frame lost it).  ``survey_kg`` says the
+        kilograms are the survey's; only these say whether a wave has any, and that a
+        wave's are an estimate.
+
     Notes
     -----
     **A sum across ``condition`` mixes states.**  ``data_info.yml`` says
     quantities in different states are not commensurable, and this reduction
     still sums them.  Uganda has 13,728 of 88,950 plot-crops with kilograms in
     two or more recorded states, 5.32M of their 41.9M kg, Malawi 8 plot-crops
-    (3,725 kg) and Niger 1 (400 kg, 2021-22); Benin, Burkina Faso, Cote d'Ivoire,
+    (3,725 kg) and Niger 53 (26,469 kg, 2021-22, 1 and 400 kg before its survey
+    kilograms were read, GH #1436); Benin, Burkina Faso, Cote d'Ivoire,
     Mali, Senegal and Togo serve a state too, with no plot-crop's kilograms in two
     (measured 2026-11-04, GH #1460, #1436).
     Read such a row as mass as harvested, not as a dry weight.
@@ -5195,6 +5319,11 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
                                  unit_kg=unit_kg)
     kg_per_unit = factors['kg_per_unit']
     kg = qty * kg_per_unit
+    # GH #1436: the survey's total itself, not quantity x implied factor, which
+    # would lose the rows that state kilograms beside a missing or zero quantity.
+    survey = factors['KgFactorSource'].to_numpy() == 'survey_kg'
+    if survey.any():
+        kg = kg.where(~survey, _as_float(df['Quantity_kg']))
     if carry_native:
         kg = kg.where(kg.notna(), qty)
 
@@ -5226,6 +5355,9 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         'kg_factor_disagreement']
     res.attrs['kg_factor_declared_from'] = factors.attrs[
         'kg_factor_declared_from']
+    res.attrs[SURVEY_KG_BY_WAVE_ATTR] = factors.attrs[SURVEY_KG_BY_WAVE_ATTR]
+    if 'derivations' in crop_production.attrs:
+        res.attrs['derivations'] = crop_production.attrs['derivations']
     res.attrs['unknown_plot_excluded'] = {
         'rows': int(unknown.sum()),
         'rows_with_kg': int(len(unknown_kg)),
@@ -5488,7 +5620,9 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
         ``Area`` is canonically hectares, so that is kg/ha.  Do not read the unit
         off ``plot_features.AreaUnit``, which names what the survey reported before
         conversion: Malawi's says ``acres`` over hectare values, and Nigeria's and
-        Ethiopia's hold native labels.
+        Ethiopia's hold native labels.  ``attrs`` carries
+        ``survey_kg_rows_by_wave`` and ``derivations`` from :func:`harvest_kg`: what the
+        kilograms are, which no ``Yield_kg`` value can say (GH #1436).
 
     Notes
     -----
@@ -5496,7 +5630,9 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     (only metric-named ``u`` rows convert), so ``Yield_kg`` is a *lower
     bound* on the WB figure for parcels dominated by non-metric containers.
     Where the harvest converts and the area key matches, magnitudes track
-    the WB ``yield_kg`` distribution.
+    the WB ``yield_kg`` distribution.  Its kilograms are :func:`harvest_kg`'s,
+    so a row with a ``Quantity_kg`` serves the survey's own total
+    (``survey_kg``, GH #1436), and ``plot_id = 'Farm-level'`` rows have no area.
     """
     if on not in {'parcel', 'plot'}:
         raise ValueError(f"yield_kg on= must be 'parcel' or 'plot', got {on!r}")
@@ -5505,6 +5641,7 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
                     min_reports=min_reports,
                     shipped_factors=shipped_factors,
                     unit_kg=unit_kg).reset_index()
+    disclosure = {k: hk.attrs[k] for k in _KG_DISCLOSURE_ATTRS if k in hk.attrs}
     hk_key = _resolve_plot_level(hk.columns)
     if hk_key is None:
         raise ValueError(
@@ -5602,7 +5739,9 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     land_level = 'parcel' if on == 'parcel' else _PLOT_CANONICAL
     out = merged.rename(columns={'_land': land_level})
     idx = base + [land_level]
-    return out.set_index(idx)[['Yield_kg']].sort_index()
+    res = out.set_index(idx)[['Yield_kg']].sort_index()
+    res.attrs.update(disclosure)
+    return res
 
 
 def _labor_days_by_source(plot_labor, source=None, *,
@@ -6104,7 +6243,9 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
         Use-answer rows (an ``input`` label ending in ``'?'``,
         :func:`is_use_answer_label`; e.g. Mali's ``Inorganic Fertilizer?``)
         are SKIPPED before label matching: they add no mass and are neither
-        matched nor unmatched.
+        matched nor unmatched.  The conversion is unit to kg only: ``plot_inputs``
+        has no ``Quantity_kg``, and the ``survey_kg`` rung of
+        :func:`harvest_kg_factors` is not consulted (GH #1436).
         ``attrs['nitrogen_input_match']``
         carries the label-join tally -- ``matched_rows`` /
         ``unmatched_rows`` / ``matched_labels`` / ``unmatched_labels``
@@ -6250,7 +6391,8 @@ def seed_kg(plot_inputs, *, seed_label='Seed', volume_as_mass=True, unit_kg=None
     Coverage: Uganda 2009-10/2010-11 seed rows record no quantity (only
     purchased-y/n + seed type), so those waves contribute no ``Seed_kg`` —
     matching the WB ``seed_kg`` which is also NaN there.  Otherwise shares
-    the metric-unit conversion caveat of :func:`harvest_kg`.
+    the metric-unit conversion caveat of :func:`harvest_kg`, though not its
+    ``survey_kg`` rung: ``plot_inputs`` has no ``Quantity_kg`` (GH #1436).
     """
     df = _plot_input_country_index(plot_inputs)
     if 'Quantity' not in df.columns:
@@ -7698,7 +7840,8 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
 
     METHODOLOGY transform.  ``H = -Sigma_c p_c ln p_c`` over the crops a
     household grew, where ``p_c`` is crop ``c``'s share of whatever
-    ``weight`` says the shares are shares OF.
+    ``weight`` says the shares are shares OF.  No basis reads a kilogram, so
+    the ``survey_kg`` rung and ``Quantity_kg`` move nothing here (GH #1436).
 
     Parameters
     ----------

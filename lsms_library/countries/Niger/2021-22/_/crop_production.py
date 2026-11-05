@@ -2,8 +2,9 @@
 
 The 2021-22 instrument SPLITS the crop module that 2018-19 kept together:
   - s16c_me_ner2021.dta : plot-crop level — harvest qty + unit (s16cq16a /
-    s16cq16b) and the intercrop flag (s16cq07).  One row per reported
-    (field, parcel, crop) harvest line.
+    s16cq16b), the survey's estimate of the line in kg (s16cq16c -> the
+    ``Quantity_kg`` column, GH #1436, keyed survey-kg-estimate) and the intercrop
+    flag (s16cq07).  One row per reported (field, parcel, crop) harvest line.
   - s16d_me_ner2021.dta : CROP level (no plot) — sold qty + unit (s16dq05a /
     s16dq05b -> the ``Unit_sold`` column, GH #824), sold state (s16dq05d -> the
     ``Condition_sold`` column, GH #1462) and sale value (s16dq06).
@@ -36,7 +37,8 @@ import pandas as pd
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
                    _crop_conditions, _crop_sold_conditions,
-                   _finish_crop_production, _crop_row_observations)
+                   _finish_crop_production, _crop_row_observations,
+                   derive_survey_kg_estimate, stamp_survey_kg_estimate)
 
 
 crop_map, unit_map = _crop_maps()
@@ -64,6 +66,8 @@ df = pd.DataFrame({
     'condition':    _crop_conditions(srcn['s16cq16d'],
                                      'harmonize_crop_condition_ehcvm2').values,
     'Quantity':     src['s16cq16a'].values,
+    # A total for the line, not a factor per unit (GH #1436).
+    'Quantity_kg':  derive_survey_kg_estimate(srcn['s16cq16c']).values,
     'intercropped': intercropped.values,
 })
 
@@ -130,6 +134,8 @@ sold_one = sold_one[sold_one.set_index(['i', 'crop']).index.isin(single)
 df = df.merge(sold_one, on=['i', 'crop'], how='left')
 
 df = _finish_crop_production(df, '2021-22')
+# After the tail, so the stamp rides on served rows (CLAUDE.md "Derived Values").
+df['Derivation'] = stamp_survey_kg_estimate(df)
 
 assert df.index.is_unique, 'crop_production 2021-22 repeats a native harvest line'
 assert len(df) > 0, 'crop_production 2021-22 produced no rows'

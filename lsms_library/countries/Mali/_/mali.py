@@ -853,7 +853,11 @@ def crop_production_finalize(df):
 # (Niger's rule).  KgFactor_sold is NA throughout: s16cq16c / s16dq05c, "Estimation
 # Quantite totale UML en kg", are TOTALS (s16dq05c == s16dq05a on 495 of 495 rows
 # sold in Kg, and == 100 x s16dq05a on 299 of 465 sold in 100 kg sacks), the
-# shape that keeps the EAC-I tree equivalents unwired.  planting_month,
+# shape that keeps the EAC-I tree equivalents unwired.  s16cq16c is served as the
+# harvest's Quantity_kg (GH #1436), only on the row that recorded it: s16d's other
+# "c" columns (s16dq02c, s16dq03c, s16dq13c) are the state of the product, so a
+# dispositions-derived Quantity has no survey kilograms, and s16dq05c is a sale's.
+# planting_month,
 # harvest_month, months_harvested and perennial are NA: s16c asks none of them,
 # and it lists tree crops (Manguier, Anacarde) on the field grid without saying
 # which are perennial.
@@ -882,6 +886,10 @@ DERIVATION_HH_CROP_SALE = (
 #: Registry keys of the harvest (GH #1437): an identity naming a window, and a sum.
 DERIVATION_HARVEST_TO_DATE = 'Mali::crop_production::harvest-to-date'
 DERIVATION_HARVEST_DISPOSITIONS = 'Mali::crop_production::harvest-from-dispositions'
+
+#: Registry key on a 2021-22 row with a Quantity_kg (GH #1436): an identity, because
+#: the instrument calls s16cq16c an estimate.
+DERIVATION_SURVEY_KG_ESTIMATE = 'Mali::crop_production::survey-kg-estimate'
 
 #: What s16d records of a crop, each with its own quantity <var>a and unit <var>b:
 #: consumed, given away, sold, in stock.
@@ -1042,6 +1050,26 @@ def stamp_harvest_to_date(df):
     return out
 
 
+def derive_survey_kg_estimate(kilograms, quantity):
+    """2021-22 s16cq16c -> ``Quantity_kg``: THE IDENTITY, bar a 0 for a positive harvest.
+
+    Registered as ``Mali::crop_production::survey-kg-estimate``.  Nothing is computed;
+    the registry says what the number is, as ``harvest-to-date`` does for a window.  A 0
+    beside a positive quantity (3 rows) is no answer, not a harvest of nothing, and is
+    NA, so the row falls down the ladder.  Returns float64.
+    """
+    kg = pd.to_numeric(kilograms, errors='coerce').astype('float64')
+    return kg.mask(kg.eq(0) & pd.to_numeric(quantity, errors='coerce').gt(0))
+
+
+def stamp_survey_kg_estimate(df):
+    """Key the rows whose ``Quantity_kg`` holds a value."""
+    out = df.copy()
+    out['Derivation'] = _with_key(out['Derivation'], out['Quantity_kg'].notna(),
+                                  DERIVATION_SURVEY_KG_ESTIMATE)
+    return out
+
+
 def _harvest_totals(lines, dispositions):
     """The (i, crop) pairs whose harvest their dispositions can state, with the sum.
 
@@ -1133,7 +1161,7 @@ def finish_ehcvm_crop_production(df, wave):
     """
     out = df.copy()
     out['t'] = wave
-    for col in ('Quantity', 'Quantity_sold', 'Value_sold', 'KgFactor_sold'):
+    for col in ('Quantity', 'Quantity_kg', 'Quantity_sold', 'Value_sold', 'KgFactor_sold'):
         if col not in out.columns:
             out[col] = pd.NA
         out[col] = pd.to_numeric(out[col], errors='coerce').astype('float64')
@@ -1158,7 +1186,7 @@ def finish_ehcvm_crop_production(df, wave):
     if out.duplicated(['i', 'plot_id', 'crop']).any():
         raise ValueError(f'crop_production {wave}: a repeated (i, plot_id, crop)')
     out = out.set_index(['t', 'i', 'plot_id', 'crop', 'condition'])
-    return out[['Quantity', 'u', 'Quantity_sold', 'Unit_sold', 'KgFactor_sold',
+    return out[['Quantity', 'Quantity_kg', 'u', 'Quantity_sold', 'Unit_sold', 'KgFactor_sold',
                 'Value_sold', 'months_harvested', 'planting_month',
                 'harvest_month', 'intercropped', 'perennial', 'condition_native',
                 'Derivation']].sort_index()
@@ -1234,20 +1262,38 @@ _HARVEST_WINDOW_RAW = {
     '2021-22': ('s16c_me_mli2021.dta', 's16cq11', 's16cq12', 's16cq16a', 's16cq16b'),
 }
 
+#: The window key also covers ``Quantity_kg``, where the wave asks kilograms (GH #1436).
+_HARVEST_WINDOW_KG = {'2021-22': ['s16cq16c']}
+
 
 def inputs_harvest_to_date(wave):
     """The answers behind one wave's window keys, at (t, i, plot_id, crop).
 
     The registry ``inputs`` callable for ``harvest-to-date``: "finished?", the share
-    still to harvest, the quantity and its unit, as recorded.
+    still to harvest, the quantity and its unit, and the kilograms where the wave asks
+    them, as recorded.
     """
     name, finished, left, quantity, unit = _HARVEST_WINDOW_RAW[wave]
     src = _ehcvm_keyed(wave, name, 's16cq04')
     src['plot_id'] = ehcvm_plot_ids(src)
     keep = (src[finished].astype('string').str.strip().eq('Non')
             & pd.to_numeric(src[quantity], errors='coerce').notna())
-    return src.loc[keep, ['t', 'i', 'plot_id', 'crop', finished, left, quantity,
-                          unit]].set_index(['t', 'i', 'plot_id', 'crop'])
+    return src.loc[keep, ['t', 'i', 'plot_id', 'crop', finished, left, quantity, unit]
+                   + _HARVEST_WINDOW_KG.get(wave, [])].set_index(['t', 'i', 'plot_id', 'crop'])
+
+
+def inputs_survey_kg_estimate(wave):
+    """The answers behind one wave's estimate keys, at (t, i, plot_id, crop).
+
+    The registry ``inputs`` callable for ``survey-kg-estimate``: the quantity, its
+    unit, the kilograms and the state, as recorded.
+    """
+    year = {'2021-22': '2021'}[wave]
+    src = _ehcvm_keyed(wave, f's16c_me_mli{year}.dta', 's16cq04')
+    src['plot_id'] = ehcvm_plot_ids(src)
+    keep = derive_survey_kg_estimate(src['s16cq16c'], src['s16cq16a']).notna()
+    return src.loc[keep, ['t', 'i', 'plot_id', 'crop', 's16cq16a', 's16cq16b', 's16cq16c',
+                          's16cq16d']].set_index(['t', 'i', 'plot_id', 'crop'])
 
 
 # ---------------------------------------------------------------------------

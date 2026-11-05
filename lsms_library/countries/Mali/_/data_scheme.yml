@@ -226,6 +226,15 @@ Data Scheme:
     # codes 3 and 4 invert the EHCVM table; not read yet: CONTENTS.org.
     index: (t, i, plot_id, crop, condition)
     Quantity: float
+    # Quantity_kg (GH #1436, ruling @ligon 2026-11-04) is the survey's own kilograms
+    # for the line, a TOTAL and not a factor: 2021-22 s16cq16c, which the instrument
+    # calls an estimate, on the 306 rows that record a quantity and more than 0 kg,
+    # keyed survey-kg-estimate.  NA on a derived harvest (s16d's kg column is the
+    # sale's) and in the other waves.  On an unfinished row it covers what Quantity covers,
+    # harvest-to-date.  harvest_kg reads it first (survey_kg).
+    Quantity_kg:
+      type: float
+      optional: true
     u: str
     Quantity_sold: float
     Unit_sold:

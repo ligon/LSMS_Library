@@ -144,7 +144,8 @@ class TestRules:
 
 class TestRegistry:
     @pytest.mark.parametrize("key,waves,columns", [
-        (WINDOW, ["2018-19", "2021-22"], {"Quantity"}),
+        # Quantity_kg joined in GH #1436: on an unfinished row it covers the same window.
+        (WINDOW, ["2018-19", "2021-22"], {"Quantity", "Quantity_kg"}),
         (TOTAL, ["2021-22"], {"Quantity", "u"}),
     ])
     def test_registered_and_resolves(self, key, waves, columns):

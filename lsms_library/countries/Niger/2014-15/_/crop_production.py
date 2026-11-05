@@ -2,8 +2,9 @@
 
 Two source files, as the instrument splits harvest from sale:
   - ECVMA2_AS2E1P2.dta : plot-crop harvest — qty + unit (AS02EQ07A /
-    AS02EQ07B) plus the harvest start/end month (AS02EQ06A / AS02EQ06B).
-    One row per reported (field, parcel, crop) line.
+    AS02EQ07B), the survey's own kilograms for the line (AS02EQ07C -> the
+    ``Quantity_kg`` column, GH #1436) plus the harvest start/end month
+    (AS02EQ06A / AS02EQ06B).  One row per reported (field, parcel, crop) line.
   - ECVMA2_AS2E2P2.dta : CROP level (no plot) — sold qty + unit
     (AS02EQ12A / AS02EQ12B -> the ``Unit_sold`` column, GH #824) and sale
     value (AS02EQ13).
@@ -44,6 +45,14 @@ from niger import (i as niger_i, _crop_maps, _crop_labels, _unit_labels,
 # ECVMA2_AS2E2P2.
 QTY_SENTINELS = (9999,)
 VALUE_SENTINELS = (9999999,)
+# The kilogram column's own codes (GH #1436).  AS02EQ07C == 999999 on the 23 rows
+# with AS02EQ07A == 9999.  999998 is one row, and is TREATED AS a code: the questionnaire
+# documents only 9999 and 99999.  The next largest total here is 24,000; the crop-level
+# sibling AS02EQ110E holds 9998 once beside 9999 ten times; this wave's files use a
+# "...98" family (AS01Q20 holds 99999998 on 1,275 rows, 9999998 on 620, 999998 on 70);
+# and the line's own sale would be 0.42 FCFA per kg.  One value to remove to reverse it.
+# See CONTENTS.org, "the survey harvest kilograms are served".
+KG_SENTINELS = (999999, 999998)
 
 
 crop_map, unit_map = _crop_maps()
@@ -68,6 +77,8 @@ df = pd.DataFrame({
     'crop':          _crop_labels(srcn['CULTURE'], src['CULTURE'], crop_map).values,
     'u':             _unit_labels(src['AS02EQ07B'], unit_map).values,
     'Quantity':      _na_exact(srcn['AS02EQ07A'], QTY_SENTINELS).values,
+    # A total for the line, not a factor per unit (GH #1436).
+    'Quantity_kg':   _na_exact(srcn['AS02EQ07C'], KG_SENTINELS).values,
     'harvest_month': hmonth.values,
 })
 

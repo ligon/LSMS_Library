@@ -202,6 +202,18 @@ Data Scheme:
     # (ruled @ligon 2026-11-04); `condition_native` below keeps what was answered.
     index: (t, i, plot_id, crop, u, condition, production_obs)
     Quantity: float
+    # Quantity_kg (GH #1436, ruling @ligon 2026-11-04) is the survey's own kilograms
+    # for the line, a TOTAL and not a factor: 2011-12 as02eq07c and, on Farm-level
+    # rows, as03eq09c x as03eq06; 2014-15 AS02EQ07C; 2021-22 s16cq16c, which the
+    # instrument calls an estimate and a Derivation key says so.  2018-19 asks none:
+    # its s16cq16c is the sold state.  Codes are NA, and so is a 0 beside a positive
+    # quantity.  harvest_kg reads it first (survey_kg).  `optional` because the canonical
+    # column is: it holds what an instrument asks, and most never do.  So Site B does not
+    # police it, and a wave losing it would be silent; tests/test_niger_crop_survey_kg.py
+    # reads each wave against its source instead.
+    Quantity_kg:
+      type: float
+      optional: true
     Quantity_sold: float
     Value_sold: float
     # THE SALE HAS ITS OWN UNIT (GH #824).  `u` is the HARVEST unit; every

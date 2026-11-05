@@ -482,9 +482,13 @@ class TestServed:
 
     def test_a_sack_converts_at_its_stated_weight(self, built):
         got = T.harvest_kg_factors(built)
-        flat = built.reset_index().assign(kg=got["kg_per_unit"].to_numpy())
+        flat = built.reset_index().assign(kg=got["kg_metric"].to_numpy(),
+                                          served=got["kg_per_unit"].to_numpy(),
+                                          source=got["KgFactorSource"].to_numpy())
         rows = flat[flat.t.isin(WAVE_ROWS) & (flat.u == "Sac (100 Kg)")]
         assert (rows.kg == 100.0).all()
+        # Since GH #1436 a row with the survey's own kilograms is served those instead.
+        assert (rows[rows.source != "survey_kg"].served == 100.0).all()
 
 
 @pytest.mark.requires_s3

@@ -3175,3 +3175,46 @@ not compare across the two instruments in any case, because this list has no =Gr
 its own, the shelled share runs 0.38 for millet against 0.60 in 2018-19, and 0.48 for fonio against 0.92.
 
 *Cost:* one Mali re-warm (=data_scheme.yml=, =categorical_mapping.org=, =mali.py= and the wave scripts).
+* 2026-11-04 -- the survey harvest kilograms, 2021-22 (GH #1436)
+
+*RULED (@ligon, 2026-11-04, option A).*  =Quantity_kg= is served as an optional canonical column and read first
+by the crop ladder, as =survey_kg=.  In Mali it is =s16cq16c=, "Estimation Quantité totale UML en kg", on 306 of the
+309 of 7,247 =s16c= rows with a recorded =s16cq16a=, and NA in every other wave.  The instrument calls it an
+estimate, so all 306 carry the identity key =survey-kg-estimate=, joined with =harvest-to-date= on the unfinished
+ones, whose kilograms cover the same part of the season.
+
+*A derived harvest has no survey kilograms, and that is a fact of the file.*  The =s16d= columns ending in "c" are not
+kilograms: =s16dq02c=, =s16dq03c= and =s16dq13c= are "Etat du produit" (=s16dq02c= holds 1 to 5), and only =s16dq05c=
+is, for the sale.  So =harvest-from-dispositions= keeps =Quantity= and =u=, and =harvest_kg= reads it through =metric=
+as before: 6,715,918 kg on 2,792 rows.  The wave script asserts that no derived row carries kilograms, so a pair never
+holds both, which is what #1437's "a recorded quantity is never overridden" already gave.  =Farm-level= rows are NA.
+Sold quantities are untouched: =KgFactor_sold= stays NA, and =s16dq05c= (4.87M kg, largest 1,150,000) stays unread.
+
+*What moves.*  =harvest_kg= 2021-22, 6,977,513 -> 7,062,291 kg; 3,028 -> 3,098 plot-crops; every other wave unchanged.
+All of the movement is on the 309 rows, 261,596 -> 346,373 kg:
+
+| unit                 | rows | nominal, =metric= | survey |
+|----------------------+------+-------------------+--------|
+| =Kg=                 |  129 |           134,371 | 134,371 |
+| =Sac (100 Kg)=       |   81 |           110,850 | 142,873 |
+| =Sac (50 Kg)=        |   21 |            15,950 |  11,625 |
+| =Sac (25 Kg)=        |    5 |               425 |     235 |
+| carts, =Autre=, =Grenier=, others | 73 | none  |  57,269 |
+
+*Idiosyncrasies.*
+- *The survey's kilograms are 4.9% of the wave, and mostly a part of the season.*  346,373 of 7,062,291 kg; =metric= on the
+  derived harvests is the rest.  285 of the 306 rows are unfinished, so they carry =harvest-to-date= too.  This is a
+  small, different population from Niger's column, and no statement about Niger's carries over.
+- *One row is 23% of the survey's kilograms, 1.1% of the wave.*  4 sacks of 100 kg, unfinished, stated at 80,000 kg.  Site
+  Q does not name it: its cell's scale is a total's, and 80,000 is under 100 x the p90.  Served, as recorded.  Without it
+  the sacks are 62,873 kg against a nominal 110,450.  The wave's largest row is a metric one, 750,200 kg, 10.6%.
+- *Sacks barely scale.*  Log-log slope of kg on q on =Sac (100 Kg)= is 0.42, against 1.00 on =Kg= and 0.91 for Niger's
+  2021-22 sacks.  On 9 of the 81 rows and 4 of the 21 =Sac (50 Kg)= the kilograms equal the sack count, so the survey says
+  1 kg per sack; 35 of the 81 are exactly 100; 34 of the 81 are under 20 kg per sack.  On rows with a stated-mass label
+  and both answers the survey says 289,104 against 261,596 nominal: 30 under 0.1x the label (1,488 / 69,300), 2 over 10x
+  (92,000 / 1,000).  =survey_kg_vs_metric=: 62 of 236 disagree by more than 10%.
+- *=Autre= is where the column earns its keep.*  8 of the 11 rows specify tonnes in =s16cq16b_autre=, and 6 state 1,000
+  kg per unit.  A factor of 1,000 would fail =KG_FACTOR_MAX=; a total need not meet it.
+- *3 rows state 0 kg* beside a positive quantity (=Autre= 2, =Cart (donkey)= 1).  No answer, not a harvest of nothing,
+  so =Quantity_kg= is NA and the row falls down the ladder, as Niger's do.  Those units have no factor, so they contribute
+  nothing.
