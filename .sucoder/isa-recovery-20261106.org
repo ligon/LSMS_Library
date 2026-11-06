@@ -1,0 +1,153 @@
+#+title: LSMS-ISA backlog recovery and assessment
+#+date: 2026-11-06
+
+* Assessment
+The November 3–5 sweep made substantial progress, but the campaign is unfinished.
+The remaining work is primarily in local branches, approved follow-ups, and five
+pending scientific/data decisions. The open-PR list alone is misleading.
+
+This recovery inventories and preserves work; it does not resume implementation,
+merge PRs, edit GitHub issues, rebuild shared caches, or release to master.
+
+* Verified GitHub state
+Retrieved 2026-11-06, approximately 13:20–13:27 PST, from ligon/LSMS_Library.
+The connected search returned at most 100 issues and incomplete status metadata;
+paginated gh REST collections supplied the complete inventory instead.
+
+| Item | Observed state |
+|------+----------------|
+| development | 65b1730f0, PR #1595 merged November 5 at 07:46 PST |
+| master / default branch | 097283459, v0.16.0 release on October 21 |
+| PRs merged since November 3 00:00 UTC | 82, all into development |
+| Issues closed since that boundary | 67: 36 older issues and 31 newly filed issues |
+| Repository-wide open issues | 182: 110 older and 72 newly filed since that boundary |
+| Open PRs | Only #1423, the sweep runbook reserved for maintainer reading |
+
+These are repository-wide event counts, not 182 independently assessed ISA bugs
+or a completion percentage. Issues overlap, and many newer issues record residuals
+discovered during the sweep. Some closed issues reflect rulings/documentation,
+not code fixes. No all-country or complete-suite verdict is implied.
+All issue metadata was inventoried; detailed body/comment reconciliation focused
+on five candidates (#1590, #1509, #1452, #1594, #1134), alongside the saved sweep
+reports and decisions. Other issues have not been newly diagnosed.
+
+The complete snapshots are under the durable recovery directory below. Current
+GitHub bodies and the latest rulings take precedence over old tracker headings.
+The November 3 TRACKER.org and November 5 handoff are historical snapshots.
+
+* Local recovery
+Coordinator checkout: /local/job40825266/mirrors/LSMS_Library,
+branch docs/isa-sweep-20261103, clean before this recovery documentation.
+Its code base predates the recent development merges; use a fresh development
+worktree for resumed implementation, not this documentation branch.
+The shared mirror's checked-out development also lags at 111b64ed7 (PR #1572).
+It has unrelated untracked historical logs and was left untouched. This clone's
+fresh github/development, not origin/development, is the correct restart base.
+
+All 170 worktrees were inspected: 167 clean and 3 dirty. A head not ancestral
+to development is not proof of unfinished work: many author commits were
+cherry-picked or amended before landing.
+
+| Worktree under /local/job40825266/worktrees/ | State and next action |
+|------------------------------------------------+-----------------------|
+| ehcvm-1452-land | Five modified files and one untracked regression test. Preserve option-B repair; finish tests and independent review. |
+| framework-1509 | Seven modified files; committed estimator work also survives. No final report; saved run has 2 failures / 2,368 passes. Diagnose before treating as ready. |
+| mali-panelhh | Three unresolved index conflicts, plus staged/unstaged changes. No CHERRY_PICK_HEAD, MERGE_HEAD or sequencer exists: do not assume --continue works. Reconstruct deliberately from saved state. |
+| wire-malawi-2024 | Committed author work and independent review survive. Mechanical corrections plus decisions 48–50 remain. |
+| stack-mali / mali-1436-s7 | Unlanded integration and s7fq13b work survive; saved integration log reports 1,074 passed. Reconcile with current development before reusing that historical result. |
+| togo-land / benin-land / civ-land | Original wiring replayed; newly ruled follow-ups incomplete. No final report for the combined follow-up. |
+
+Six prepared lanes have no implementation commits beyond their old development
+base: ehcvm-panel-weight, ehcvm-shocks-rows, burkina-parcels,
+ethiopia-large-town, gnb-condition, nigeria-1502. An existing worktree does
+not mean its task was completed. reports/ehcvm-ruled/ has no final report.
+
+All 21 dirty source files, staged/unstaged patches, index files and available
+conflict metadata were copied to shared storage without changing the originals.
+Benin f877bb010 and Cote d'Ivoire 6881cdde8 landing tips lacked shared-mirror
+branch refs; both are now preserved in a verified Git bundle. Original author
+branches were already durable. No worktrees or branches were deleted.
+
+Durable recovery directory:
+/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/recovery-20261106/
+- unfinished/ and unfinished.json: the three dirty worktrees.
+- unpublished-land-branches.bundle: both previously local-only landing tips.
+  Requires existing base 2a888bceaf7a74ee855cb47fd7493c17cd3da773.
+- worktrees.json: complete 170-worktree inventory with mirror-ref checks.
+- github-snapshot/: complete open-issue and PR collections, recent closures.
+
+* Decisions: do not re-ask settled questions
+Read DECISIONS.org:216–221 and MORNING.org:8 in the sweep directory.
+The final recorded approval was: "Yes to the block, and your recommendations
+on #28-#47, except we should discuss #40".
+
+This supersedes the handoff's holds on Togo #28, 2018-19 shocks #35 and Uganda
+baseline #12. PRs #1579 and #1538 are now merged. Togo's implementation still
+needs finishing, but its recorded ruling is settled. Item 9 / #1452 option B
+was interpreted by the previous coordinator as covered by the table approval,
+and that interpretation was disclosed to the maintainer; retain this qualification
+rather than inventing a separately explicit vote or re-asking by default.
+
+Five numbered questions remain open; these are queue numbers, not GitHub IDs:
+
+| Item | Pending choice | Recorded recommendation |
+|------+----------------+-------------------------|
+| 40 | Meaning of AffectedConsumption across surveys | Use purchases under that name, plus AffectedFoodStock where stock is asked. Explicitly excepted from approval. |
+| 48 | Malawi 2024–25 mixed survey weights | Use hh_wgt for IHS6 and NA for 1,948 IHPS rows; retain panel weights and normalize ihps_weight. |
+| 49 | Malawi 2024–25 kilogram factors | Borrow IHS5 factors as a registered derivation pending the new NSO table. Reviewer reverses the author's recommendation. |
+| 50 | Malawi food code 119, Grain Mill | Classify under Maize; its interpretation as maize flour is an inference. |
+| 51 | Dates outside catalog fieldwork windows | Keep recorded interview dates; do not clamp before currency conversion. Separate from the lookup fix already merged in #1595. |
+
+Sources: MORNING.org:48,56–59; reports/review-wire-malawi/VERDICT.md;
+reports/interview-dates/REPORT.md. These are recovered recommendations, not
+fresh scientific validation. Runbook #1423 and a release remain separate
+maintainer review steps. The shared sucoder installation was not upgraded.
+
+* Restart queue
+1. Finish #1452's older-wave option-B repair and review. It is a prerequisite
+   for wiring the new EHCVM waves' survey weight tables without undoing #1450.
+2. Recover #1509's purchase-only factor estimator and diagnose its saved failures.
+   #1442 remains explicitly held behind it. Finish #1590's approved handling
+   of failed waves/corrupt crosswalks before the bundled cache rebuild.
+3. Resume approved Togo -> Benin/Cote d'Ivoire wiring and the existing Mali
+   integration. Finish the six prepared lanes above, including Nigeria #1502.
+   Use tasks/togo-benin-civ.md and tasks/ehcvm-ruled.md as the saved briefs.
+4. Resolve the five pending choices; Malawi's mechanical review corrections
+   can proceed independently of choices 48–50. Treat #40 separately from
+   the already approved shock-column and row-retention fixes.
+5. Diagnose #1594 promptly in parallel with independent work: the reported
+   Mali 2014–15 FX expenditure total is about 70 times later waves. The
+   November 6 maintainer comment rules out redenomination and directs a
+   source-to-FX household trace plus recall/imputation checks. This is an
+   observed anomaly with an unknown cause, not a proven currency bug.
+6. After the necessary lanes land, perform one bundled shared-cache rewarm,
+   then coverage regrade #1438 and release validation. Do not warm now just
+   because many PRs have merged. Preserve the recorded LSMS_NO_CACHE restriction.
+
+Reconcile issue text as work resumes. For example, #1134 still claims a frozen
+two-value vocabulary although #1541 added not-stated and an Albania exemplar;
+its November 5 comment acknowledges that. Narrow to the remaining curation/
+vocabulary scope rather than blindly closing the broader issue. #1452's old
+question list likewise predates the recorded rulings. No tracker edits were
+made during this assessment.
+
+* Runtime and verification
+- Allocation 40825266 on n0035.savio4 remains live: co_carleton, 12 CPUs, 96G;
+  about 8 days 21 hours remained at first inspection. Another user allocation
+  40824891 is also live and was left untouched.
+- Process inspection showed no old Claude workers, Python builds or pytest
+  processes on this node. New read-only recovery agents have finished.
+- Mounted venv generation 20261019T221223Z works. PYTHONPATH and real-path
+  assertions verified import from this checkout, not the shared mirror.
+- make api-audit passed on the documentation checkout: all 15 skills listed,
+  no untracked hashed build inputs. This is not a test of current development.
+- Git bundle verification passed. Original dirty source files remain intact.
+- No product tests or cache rebuilds were rerun for this recovery. Saved
+  historical test results retain their original scope and revision limitations.
+- Priority-account accounting: 78,810.93 of 1,500,000 SUs used at start/end,
+  no reported delta; this allocation is on co_carleton. No jobs submitted.
+
+Do not publish or reproduce private Novissi data. Its existing restriction
+and cleanup instruction remain in force; recovery did not inspect or copy it.
+The earlier October custody/manifest workflow is explicitly superseded by
+the November plain reconcile -> fix -> test -> independent review -> PR loop.

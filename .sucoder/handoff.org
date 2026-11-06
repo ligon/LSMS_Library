@@ -1,4 +1,29 @@
 #+title: Handoff, LSMS-ISA sweep
+* Current state, 2026-11-06 recovery (Codex)
+Read =.sucoder/isa-recovery-20261106.org= for the reconciled state and restart queue.
+GitHub development is =65b1730f0= (PR #1595); master remains =097283459=.
+Since November 3: 82 PRs merged to development, 67 issues closed; 182 repository-wide
+issues remain open. Only open PR is #1423. These counts are not an ISA completion percentage.
+
+All 170 worktrees inspected: 167 clean, 3 dirty (=ehcvm-1452-land=,
+=framework-1509=, =mali-panelhh=). Their 21 unfinished source files, patches and
+Git state are backed up under the sweep directory's =recovery-20261106/=. The
+previously local-only Benin/Cote d'Ivoire landing tips are in a verified bundle there.
+Mali has unresolved index conflicts but no cherry-pick/merge continuation metadata.
+No branches/worktrees were deleted, no product builds rerun, no GitHub writes made.
+
+The November 5 section below is superseded: later =DECISIONS.org= rulings clear
+its Togo/#1452/shocks/baseline holds. Only numbered decisions 40,48,49,50,51 remain
+unanswered; #9's inclusion in the last block remains the disclosed interpretation.
+Prepared-but-unimplemented lanes and local integration work are listed in the recovery note.
+Finish #1452, #1509/#1590 and approved country work before the bundled rewarm and
+#1438 coverage regrade. Diagnose new #1594 (Mali FX expenditure scale) promptly.
+The runbook #1423 and a release remain separate maintainer review steps.
+
+Allocation and mounted venv are healthy; no previous build/worker processes found.
+Coordinator stays on the documentation branch; resumed code work must start from
+fresh development in isolated worktrees. Keep the private Novissi restriction.
+
 * Current state, 2026-11-05 (Sue)
 Coordinator clone on =docs/isa-sweep-20261103=.  Everything lives in =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/=.
 ** Read first
