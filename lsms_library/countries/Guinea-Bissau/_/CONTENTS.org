@@ -702,3 +702,33 @@ but two lie in their own =vague='s window in the World Bank catalog (4293: 2018-
 to 12 and 2019-04 to 06).  The two are households whose cover says vague 2 but
 whose visit-1 start is inside the first-visit window, so they convert at the 2018
 rate.  Recorded, not repaired.
+
+* Shocks: food purchases and food stocks (2026-11-06, GH #1561)
+
+The maintainer ruling is =AffectedConsumption= for food *purchases* and
+=AffectedFoodStock= for food stocks, following Ethiopia. Neither field
+measures food eaten. Both are nullable booleans using the existing answer
+map: increases and decreases are True, unchanged and ordinary
+not-concerned answers False, and missing answers stay missing.
+
+Both vagues have six consequences: =s14q04d= is livestock, =e= food
+stock, =f= food purchases. This is not the five/six-column split in Benin
+and Togo; the same e/f selectors apply in both vagues.
+
+The source variable label still calls d "Stock Produit Alimentaire" and e
+"Achat de Produit Alimentaire"; these labels conflict with the fielded
+six-column layout. The independent 2026-11-05 EHCVM shocks review
+(=reports/review-ehcvm-shocks/VERDICT.md= in the isa-sm-20261103 burst)
+identifies the layouts using source structure, animal disease/ownership
+contrasts and purchase responses, not the misleading labels. The source
+controls in =tests/test_shocks_extension_food_effects.py= independently
+select the expected columns and check the livestock-specific behaviour
+of d. No contradictory shocks-layout statement was found in this file.
+
+The Portuguese answer mapping is retained (=Aumentou=/=Diminuiu= true;
+=Não se alterou=/=Não abrangido= false). The existing coping-code-25
+interpretation is not adjudicated by this food-effects change.
+
+Only the existing 2018-19 declaration is changed. Registered but unfinished
+2021-22 wiring is outside this change. Other effects, coping strategies,
+row/index identity and timing are preserved.

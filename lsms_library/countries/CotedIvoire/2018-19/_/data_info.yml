@@ -244,8 +244,17 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
+        # Six columns in both vagues: e is food stock, f food purchases;
+        # d is livestock despite its stale source variable label (GH #1561).
+        AffectedFoodStock:
+            - s14q04e
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
         AffectedConsumption:
-            - s14q04d
+            - s14q04f
             - mapping:
                 Diminué: True
                 Augmenté: True

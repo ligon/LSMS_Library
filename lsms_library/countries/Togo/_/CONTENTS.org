@@ -823,3 +823,33 @@ none of them a tuber, and code 5 on yam (587), cotton (575) and cassava (362), n
 =.dta= list is what was fielded, and it is the one this table reads.
 
 *Cost:* one Togo re-warm (=data_scheme.yml=, =categorical_mapping.org= and the wave script).
+
+* Shocks: food purchases and food stocks (2026-11-06, GH #1561)
+
+The maintainer ruling is =AffectedConsumption= for food *purchases* and
+=AffectedFoodStock= for food stocks, following Ethiopia. Neither field
+measures food eaten. Both are nullable booleans using the existing answer
+map: increases and decreases are True, unchanged and ordinary
+not-concerned answers False, and missing answers stay missing.
+
+Vague 1 has five consequences: =s14q04d= is food stock, =e= food
+purchases, =f= blank. Vague 2 has six: =d= livestock, =e= food stock,
+=f= food purchases. Select by each row's =vague=, not by household or
+cluster. The hook refuses a release with a different f/vague layout.
+
+The source variable label still calls d "Stock Produit Alimentaire" and e
+"Achat de Produit Alimentaire"; these labels conflict with the fielded
+six-column layout. The independent 2026-11-05 EHCVM shocks review
+(=reports/review-ehcvm-shocks/VERDICT.md= in the isa-sm-20261103 burst)
+identifies the layouts using source structure, animal disease/ownership
+contrasts and purchase responses, not the misleading labels. The source
+controls in =tests/test_shocks_extension_food_effects.py= independently
+select the expected columns and check the livestock-specific behaviour
+of d. No contradictory shocks-layout statement was found in this file.
+
+The wave remains =2018= and uses =Data1/s14_me_tgo2018.dta=; do not
+substitute the older =Data/= extracts or rename the wave.
+
+Only the existing 2018 declaration is changed. Registered but unfinished
+2021-22 wiring is outside this change. Other effects, coping strategies,
+row/index identity and timing are preserved.
