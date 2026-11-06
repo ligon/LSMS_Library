@@ -3115,3 +3115,42 @@ fieldwork.  And 106 households' latest visit start falls in another calendar yea
 from visit 1, so the visit chosen moves the rate: 2021-22
 =food_expenditures(numeraire='FX')= is -8.55% against wave-nominal dates on visit 1,
 -8.72% on each household's latest visit start.
+
+* 2026-11-06 -- shocks: purchases and food stocks are separate answers
+
+Ruling @ligon: =AffectedConsumption= means food purchases;
+=AffectedFoodStock= means food stocks, following Ethiopia. This supersedes
+the earlier semantic binding, quoted above as "reads =e=, the stock" under
+=AffectedConsumption=. It does not reverse the source-layout findings.
+
+ECVMA 2011-12 =ms11q04d/e= and 2014-15 =MS10Q04D/E= read
+stock/purchases. Their variable labels truncate before naming the object;
+the GH #1556 independent review, section 2, verified the column order from
+response behaviour. The held sources again show purchases Augmente/Increase
+far more often than stock. EXTENSION remains part of the 2014 household key,
+and panel walking and the EHCVM E_ namespace are unchanged.
+
+2018-19 uses =s14q04e= for stock and =s14q04f= for purchases in both
+vagues, despite the misleading released d/e labels.
+2021-22 reads =s14bq04e= for stock and =s14bq04f= for purchases; d remains
+the separate, unserved livestock question. Source-specific response maps
+remain unchanged: an increase or decrease is True, with existing unchanged,
+not-concerned and declared missing-code mappings preserved. A missing stock
+answer cannot fill purchases, or the reverse.
+
+Measured against development plus the ruling ledger, in a private data root:
+
+| wave | rows, unchanged | purchases differing from former stock binding |
+|------+-----------------+-----------------------------------------------|
+| 2011-12 | 4,298 | 637 |
+| 2014-15 | 3,781 | 650 |
+| 2018-19 | 6,551 | 1,202 |
+| 2021-22 | 2,876 | 325 |
+
+Every old key and every unrelated column, including coping, is exact-equal.
+=AffectedFoodStock= equals the former =AffectedConsumption= on every old row;
+no row was added or removed. Independent numeric-source tests verify both
+answers, with wrong-column controls; the prior layout/ownership and coping
+tests retain their assertions. The separate all-follow-up-missing shock-row
+policy is unchanged. These country/wave config edits invalidate this country
+through the normal hash checks; no shared cache was re-warmed.

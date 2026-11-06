@@ -160,11 +160,13 @@ class ShockLayoutError(Exception):
 
 
 def _food_stock_by_vague(df):
-    """Serve the food stock from the column each vague put it in (GH #1556).
+    """Serve food stock and purchases from each vague's own columns (GH #1556).
 
     Vague 1 asked five consequences (d = stock, e = achats, f blank) and vague 2
-    six (d = effectif du cheptel, e = stock, f = achats).  ``AffectedConsumption``
-    arrives as d and ``StockVague2`` as e, through one mapping.  A blank f is what
+    six (d = effectif du cheptel, e = stock, f = achats).  ``AffectedFoodStock``
+    arrives as d, ``StockVague2`` as e, and ``AffectedConsumption`` as f,
+    through the same Boolean mapping. ``PurchasesVague2`` retains raw f for the
+    guard, independent of whether a label maps to a Boolean. A blank f is what
     tells the two apart in the file, so a release where it stops being one raises:
     d is a different question on those rows and nothing else would say so.
     """
@@ -172,7 +174,7 @@ def _food_stock_by_vague(df):
     stock_vague2 = df.pop('StockVague2')
     purchases = df.pop('PurchasesVague2')
     five = vague.eq(1)
-    asked = stock_vague2.notna() | df['AffectedConsumption'].notna()
+    asked = stock_vague2.notna() | df['AffectedFoodStock'].notna()
     if not vague.isin([1, 2]).all() or purchases[five].notna().any() \
             or purchases[~five & asked].isna().any():
         raise ShockLayoutError(
@@ -180,7 +182,8 @@ def _food_stock_by_vague(df):
             f"{int(purchases[five].notna().sum())} filled in vague 1, "
             f"{int(purchases[~five & asked].isna().sum())} blank in vague 2, "
             f"vague values {sorted(vague.dropna().unique().tolist())}")
-    df['AffectedConsumption'] = df['AffectedConsumption'].where(five, stock_vague2)
+    df['AffectedFoodStock'] = df['AffectedFoodStock'].where(five, stock_vague2)
+    df['AffectedConsumption'] = df['AffectedConsumption'].where(~five, stock_vague2)
     return df
 
 

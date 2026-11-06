@@ -139,8 +139,16 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Manquant: False
-        AffectedConsumption:
+        AffectedFoodStock:
             - MS10Q04D
+            - mapping:
+                Dimunié: True
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Manquant: False
+        AffectedConsumption:
+            - MS10Q04E
             - mapping:
                 Dimunié: True
                 Diminué: True
