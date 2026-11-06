@@ -659,6 +659,18 @@ Columns:
       type: bool
     AffectedConsumption:
       type: bool
+      note: |
+        Reported effect of the shock on FOOD PURCHASES (maintainer ruling,
+        2026-11-06). Increase or decrease is True; unchanged is False.
+        This is a qualitative response, not measured food consumption.
+        Food-stock responses belong in AffectedFoodStock, never in this field.
+    AffectedFoodStock:
+      type: bool
+      optional: true
+      note: |
+        Reported effect of the shock on FOOD STOCKS, separately from purchases.
+        Follow the source's effect/missing-response mapping. Omit when the
+        instrument does not ask the question; do not substitute purchases.
     HowCoped0:
       type: str
     HowCoped1:

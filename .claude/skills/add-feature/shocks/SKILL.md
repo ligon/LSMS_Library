@@ -16,14 +16,22 @@ shocks:
     AffectedAssets: bool
     AffectedProduction: bool
     AffectedConsumption: bool
+    AffectedFoodStock: bool  # where asked
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
 ```
 
 - **Index:** household (`i`) × wave (`t`) × shock type (`Shock`)
-- **Effect columns:** boolean — did the shock affect income/assets/production/consumption?
+- **Effect columns:** nullable boolean — did the shock affect income/assets/production/food purchases/food stocks?
 - **Coping columns:** categorical — up to 3 coping strategies per shock
+
+**Maintainer ruling, 2026-11-06:** follow Ethiopia's two-column model.
+`AffectedConsumption` means the qualitative effect on **food purchases**;
+`AffectedFoodStock` means the effect on **food stocks**. Neither measures actual
+consumption. Preserve the source's separate answers and missingness. Increase
+and decrease both remain True under the existing effect mapping. A country
+without a stock question does not acquire a fabricated stock response.
 
 Reference: Uganda's shocks implementation in `lsms_library/countries/Uganda/` (uses `.py` scripts with `!make`).
 
@@ -54,7 +62,8 @@ Most LSMS-ISA shocks modules follow this structure:
 | AffectedIncome | `hh_u03a` | Effect on income |
 | AffectedAssets | `hh_u03b` | Effect on assets |
 | AffectedProduction | `hh_u03c` | Effect on food production |
-| AffectedConsumption | `hh_u03d` | Effect on food stock |
+| AffectedFoodStock | `hh_u03d` | Effect on food stock |
+| AffectedConsumption | `hh_u03e` | Effect on food purchases |
 | HowCoped0 | `hh_u04a` | First coping strategy |
 | HowCoped1 | `hh_u04b` | Second coping strategy |
 | HowCoped2 | `hh_u04c` | Third coping strategy |
@@ -164,10 +173,10 @@ Malawi has 5 waves. The shocks module changes between the first and subsequent w
 | Wave | File | i | Shock | Effects | Coping |
 |------|------|---|-------|---------|--------|
 | 2004-05 | `sec_ab.dta` | `case_id` | `ab02` | `ab04` (combined) | `ab07a/b/c` |
-| 2010-11 | `Full_Sample/Household/hh_mod_u.dta` | `case_id` | `hh_u0a` | `hh_u03a-d` (separate) | `hh_u04a/b/c` |
-| 2013-14 | `HH_MOD_U_13.dta` | `y2_hhid` | `hh_u0a` | `hh_u03a-d` | `hh_u04a/b/c` |
-| 2016-17 | `Cross_Sectional/hh_mod_u.dta` | `case_id` | `hh_u0a` | `hh_u03a-d` | `hh_u04a/b/c` |
-| 2019-20 | `Cross_Sectional/HH_MOD_U.dta` | `case_id` | `hh_u0a` | `hh_u03a-d` | `hh_u04a/b/c` |
+| 2010-11 | `Full_Sample/Household/hh_mod_u.dta` | `case_id` | `hh_u0a` | `hh_u03a-e` (stock d, purchases e) | `hh_u04a/b/c` |
+| 2013-14 | `HH_MOD_U_13.dta` | `y2_hhid` | `hh_u0a` | `hh_u03a-e` | `hh_u04a/b/c` |
+| 2016-17 | `Cross_Sectional/hh_mod_u.dta` | `case_id` | `hh_u0a` | `hh_u03a-e` | `hh_u04a/b/c` |
+| 2019-20 | `Cross_Sectional/HH_MOD_U.dta` | `case_id` | `hh_u0a` | `hh_u03a-e` | `hh_u04a/b/c` |
 
 ### Reviewing agent output
 
@@ -198,4 +207,11 @@ Reference implementations: `Senegal/2018-19/_/2018-19.py`, `Benin/2018-19/_/2018
 
 The `data_info.yml` declares all 26 Cope columns as myvars; the formatting function transforms them post-extraction. The `data_scheme.yml` declares only `HowCoped0/1/2: str` (not the 26 Cope columns).
 
-**Note on Affected* columns**: EHCVM surveys DO have effect data (s14q04a-d with French labels: Diminué, Augmenté, Inchangé, Non-concerné). The mapping dicts must use French labels. If these columns appear all-null, the most likely cause is stale cached parquets — purge the cache and rebuild.
+**EHCVM effect columns:** do not infer their meaning from the `.dta` letters
+alone. In the six-column layout, d is livestock, e is food stock and f is food
+purchases. Some 2018-19 releases have five columns in vague 1 (d stock, e
+purchases, f blank) and six in vague 2. Reuse the existing wave hooks and their
+layout-refusal tests; choose both food fields per row and preserve the existing
+French/Portuguese response maps. See the country's `CONTENTS.org` and
+`tests/test_gh1556_ehcvm_shocks_2018_layout.py`. Rebuild only the affected table
+in a private data root when verifying changed source mappings.
