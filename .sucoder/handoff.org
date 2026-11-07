@@ -1,4 +1,34 @@
 #+title: Handoff, LSMS-ISA sweep
+* Checkpoint, 2026-11-07 22:22 UTC: next shared workers submitted
+Shared1510 has ONE remote implementer dispatch774ab9d1b5d84c30bc6f13bbda30cda0,
+job41005372. Shared1475/1517 has ONE remote implementer
+06c11ed49f814408936fbdfba51b696e, job41005397. Original1475 worker41005339
+failed143 in owned-child FD inspectionerrno13; source remainedc964/no task report.
+Explicit result and sacctFAILED15:0 preceded this ONE unchanged-guard/task retry
+on a different node, excluding failedn0219 plus coordinator. Original preserved.
+Both pin currentdevelopmentc964 and free2CPU8G90min, private runtime/cache/results,
+no source-data/GitHub writes. Root owns independent review/source acceptance and
+publication/merge. Exact tasks/profiles/receipts under B/framework-{1510,1475}-
+dispatch-20261107; country registry links observed states. Existing country
+workers' completed recommendations are not competing implementation ownership.
+First1510submit2d0405c998704944a160bc635c434dab rc2 pre-sbatch clone timeout;
+no job receipt and absent schedulercomment verified. Standard private-source
+repack/fullfsck preserved every ref/object path, installed-helper clone27.343s
+under unchanged30. Controlled single retry submitted41005372; all old evidence
+retained. Systempython lacked sucoder on an initial preflight; corrected to the
+installed CLI shebang interpreter before any target access. No guard bypass.
+Malawi5af exacthead offlineCI is now11331PASS/5569skip/4xfail, exit0,
+1016.71s. Source/APIjob41005203 stillRUNNING at latest author receipt; all6frames
+built and integration waits for terminal. Root approved ONLY selective integration
+on NEW c964 tree afteractors, filesystem branchfix/malawi-food-integration-20261107;
+old5af frozen. Preserve landed1590 JSON/error/retry/reset logic byte-for-byte and
+add opt-in panelguard inside DataFrame try branch. Newhead needs combined tests,
+source/defaultMake parity/CI/independentreview; no GitHub/weight48 changes.
+Mali1594 issue updated with bounded native99,999,999 tail/authority uncertainty,
+raw-before-collapse rule and no mask. Repeated-seven-day-passage finding linked
+to existing851 rather than duplicated into a new issue. Both fresh body/state
+readbacks EXACT, original1594 text preserved. No exposure rescale/new default.
+
 * Checkpoint, 2026-11-07 22:10 UTC: eight country queues returned; two framework repairs merged
 Latest user steering explicitly endorses sucoder dispatch on other nodes; local
 chat concurrency is not the campaign compute limit. Eight country-owner roles
