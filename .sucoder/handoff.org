@@ -1,4 +1,52 @@
 #+title: Handoff, LSMS-ISA sweep
+* Active checkpoint, 2026-11-07: revised framework candidate frozen
+The previous turn made progress through tracker reconciliation, independent
+failure probes, preserved recovery evidence and dispatch of approved food work.
+Current development was fetched and remains =8558fefe0=; no new merges yet.
+
+#1590 revised clean candidate =3b6a064fa1283376f36a540e8cf26eabe0f16394= fixes
+the three reviewer blockers plus a related single-stage output pointing at the
+rejected country parquet. Narrow placements approved: per-invocation output
+identity receipt for wave calls' ambiguous country fallback; UnicodeDecodeError
+propagation/retry; removal of rejected aggregate's retired-stage shortcut; an
+unchanged rejected same-path stage output is not certified. No widened eviction
+or forced reproduction. =local_recovery= is re-reviewing exact revised head.
+Final affected run191 passed/10skipped. Earlier broader903pass run's one static
+same-line guard failure was corrected without assertion edits; final offline CI
+still required. Free job =41003890= (4CPUs24G2h) was confirmed RUNNING; immutable
+bundle/checkout asserts revised SHA. Final35source comparisons, corrected four
+fault controls, hash census and isolated offline CI are sequential in that job.
+
+RE-REVIEW BLOCKED =3b6a064fa=: original seven probes plus revised37 all pass,
+but a new actual2worker probe shows a sibling's write can satisfy another wave's
+stat-change receipt, falsely completing a no-output wave. Root approved the
+narrow correction: keep primary getters in parallel; move legacy fallback and
+its receipt/GH535 filter into the ordered parent loop AFTER prebuild joins all
+workers. No global lock, expanded eviction or t-based inference. Preserve the
+old failing concurrent artifact and independently adapt its mutual-barrier
+fixture to bounded no-overlap/PID/order, coverage and positive-output convergence
+checks. Author and reviewer are doing this before another freeze. The live
+41003890 run remains immutable prior-candidate evidence, not final acceptance.
+
+#1452 exact =88b46e717= offline suite is independently read back GREEN:
+11,398passed,245skipped,4xfailed,629warnings in17m39s. Script preflight asserts
+exactSHA/import/config, empty private data/config, no credentials and unshare -rn.
+Source job =41002776= remains RUNNING, baseline all seven countries complete;
+candidate had reached Senegal. =decision_recovery= now completes its independent
+review while #1590 final compute runs. Local PR draft prepared at sweep
+=prs/ehcvm-1452-recovery-20261107.md=; pending gates are explicit, not publishable yet.
+
+Malawi food grounding: full released factor key
+=(region,item_code,unit_code,Otherunit)= is unique over1768rows. DroppingOtherunit
+leaves conflicting code23 cells; do not average them. Factor source distinguishes
+field/imputed/standard/few-observation cases; do not call all measured. Old119 is
+yellow maize flour, which does not establish a Gramil crosswalk; unit74 changes
+Tin1Kg toBundle and new120coexists with835Popcorn. Root approved explicit refusals
+of these unproven matches/collapse. Item50 maize-flour classification is settled
+independently. =github_reconcile= must finish compatibility inventory and exact
+recover-file plan/ledger before transformation code. Pinned research/config stay
+untouched; weights48 and wholewave merge remain held.
+
 * Active checkpoint, 2026-11-07: independent reviews underway
 Previous goal turn made progress: item50 approval recorded in =584fee361=.
 This turn reconciled GitHub #1452 to approved policy plus remaining verification
