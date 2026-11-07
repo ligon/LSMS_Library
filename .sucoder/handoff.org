@@ -32,6 +32,12 @@ and roster agree on all household sizes but total53,643 people versus BID53,641.
 A two-person/source-revision explanation is plausible, not established. Keep
 this discrepancy explicit; matching grand totals does not prove matching all
 calibration cells or common target dates. No production policy is selected.
+Research is now frozen at =131dcdd4540b1fd62ab58033a60836342ee38e2f=, findings
+ledger =3f1a4070e=. =local_recovery= has the independent charter challenge in a
+separate review tree, sequenced behind any urgent #1452/#1590 evidence.
+=github_reconcile= is newly assigned the approved Malawi food follow-ups49/50
+in a NEW implementation worktree, grounding/plan first. It must leave the frozen
+research and pinned83a config untouched; no decision48 or whole-wave merge.
 
 The preserved #1509 log's two failures are both the new delivered-ledger oracle
 indexing with an NA-containing object mask (Uganda/GhanaLSS), not yet a verified
