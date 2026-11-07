@@ -4782,6 +4782,32 @@ def _implied_kg_factors(df, totals):
         return _valid_factor(totals / _as_float(df['Quantity']))
 
 
+def _crop_inferred_kg_factors(df, *, volume_as_mass=True):
+    """Apply the existing crop inference separately to each labeled country.
+
+    The unit helper returns one mapping for its operand. Local household and
+    unit labels do not identify a country; partition positionally before that
+    estimate rather than reattaching country after it (GH1475 ledger §§2–4).
+    Plot-input and food inference policies are unchanged.
+    """
+    countries = _level_or_column(df, 'country')
+    if countries is None:
+        return _kg_factor_series(df, volume_as_mass=volume_as_mass)
+    if pd.isna(countries).any():
+        raise ValueError("crop_production country labels must be non-null")
+    work = df
+    if 'country' in df.index.names and 'country' in df.columns:
+        work = df.drop(columns='country')
+    if work.empty:
+        return _kg_factor_series(work, volume_as_mass=volume_as_mass)
+    labels = pd.Series(countries).reset_index(drop=True)
+    factors = np.full(len(work), np.nan)
+    for positions in labels.groupby(labels, sort=False).indices.values():
+        factors[positions] = _kg_factor_series(
+            work.iloc[positions], volume_as_mass=volume_as_mass).to_numpy()
+    return pd.Series(factors, index=df.index, dtype='float64')
+
+
 def harvest_kg_factors(crop_production, *, volume_as_mass=True,
                        min_reports=SURVEY_MEDIAN_MIN_REPORTS,
                        shipped_factors=None, unit_kg=None):
@@ -5048,6 +5074,11 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
 
     Notes
     -----
+    Supplied country labels partition the inferred layer before estimating
+    its unit mapping; an estimate cannot borrow another country's price or
+    household keys. Country labels must be non-null. Country-less inference
+    and the reported/shipped/survey/metric precedence are unchanged.
+
     Only the reported and survey-median layers are validity-filtered
     (finite, > 0).  The inferred layer is used exactly as
     :func:`_kg_factor_series` returns it, so that a frame with no
@@ -5057,7 +5088,7 @@ def harvest_kg_factors(crop_production, *, volume_as_mass=True,
     asymmetry is a guarantee about identity, not a hole.
     """
     df = crop_production
-    inferred = _kg_factor_series(df, volume_as_mass=volume_as_mass)
+    inferred = _crop_inferred_kg_factors(df, volume_as_mass=volume_as_mass)
     inferred_arr = inferred.to_numpy(dtype='float64', na_value=np.nan)
 
     # The READ half of `inferred`, separated out (GH #929).  `_kg_factor_series`
@@ -5344,8 +5375,9 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
         of those levels are present), summed over native units, ``condition``
         and season.  The output levels are always spelled ``plot_id`` and ``j``,
         so a ``Country`` frame whose crop level is ``crop`` and a ``Feature``
-        frame of the same country give the same rows (GH #1460).  A ``country``
-        level on a pooled frame is NOT carried and is not a grouping key.
+        frame of the same country give the same rows (GH #1460). Supplied
+        ``country`` labels are retained as the first grouping/index level,
+        including one labeled country and empty results (GH #1475).
 
         ``plot_id == 'unknown_plot'`` rows are left out, per the canonical
         CONSUMER RULE, and reported in
@@ -5427,7 +5459,7 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     -- which is why wiring ``KgFactor`` is the only thing that can ever
     convert Uganda's 2018-19 season-A rows.
     """
-    df = crop_production.copy()
+    df = _country_index_for_transform(crop_production.copy(), 'crop_production')
     if 'Quantity' not in df.columns:
         raise ValueError("crop_production must have a 'Quantity' column")
 
@@ -5461,6 +5493,8 @@ def harvest_kg(crop_production, *, volume_as_mass=True, carry_native=False,
     crop_level = _resolve_crop_level(out.index.names)
     group_by = [n for n in ['t', 'i', plot_level, crop_level]
                 if n is not None and n in out.index.names]
+    if group_by and 'country' in out.index.names:
+        group_by.insert(0, 'country')
     res = out.groupby(group_by).sum()
     # Normalise the plot and crop level names to the canonical 'plot_id' and
     # 'j' so downstream (yield_kg) and cross-country callers see one schema
@@ -5541,37 +5575,18 @@ _YIELD_LITERAL_LAND_COUNTRIES = frozenset({
 }) - _YIELD_LAND_ROUTE_HELD
 
 
-def _country_households(frame):
-    """Distinct ``(country, t, i)`` of a frame whose rows name a country, else ``None``."""
-    columns = {}
-    for name in ('country', 't', 'i'):
-        if name in (frame.index.names or []):
-            columns[name] = frame.index.get_level_values(name)
-        elif name in frame.columns:
-            columns[name] = frame[name].array
-        else:
-            return None
-    return pd.DataFrame(columns).drop_duplicates()
-
-
 def _waves_joining_nothing(harvest, area, merged, crop_production, plot_features):
     """The ``(country, t)`` cells with rows on both sides and none joined.
 
-    :func:`harvest_kg` loses the country (GH #1475), so a row gets it back through
-    ``(t, i)``.  Judged per wave alone, a pooled wave that another country's rows
-    keep non-empty would pass: Malawi 2019-20 beside Uganda.  ``country`` is the
-    frames' one country, or ``None`` where they name none.
+    Use retained country directly: local ``(t, i)`` can name households in
+    several countries. Country-less operands keep their existing scalar label.
     """
     if 't' not in harvest.columns:
         return []
-    named = [who for who in map(_country_households, (crop_production, plot_features))
-             if who is not None]
-    if named and 'i' in harvest.columns:
-        who = pd.concat(named).drop_duplicates()
-
+    if all('country' in frame.columns for frame in (harvest, area, merged)):
         def cells(frame):
-            found = frame[['t', 'i']].merge(who, on=['t', 'i'])[['country', 't']]
-            return set(found.drop_duplicates().itertuples(index=False, name=None))
+            return set(frame[['country', 't']].drop_duplicates().itertuples(
+                index=False, name=None))
     else:
         one = _one_country(crop_production)
         one = one if isinstance(one, str) else None
@@ -5722,12 +5737,11 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
           area, as ``'plot'`` does.  It does not aggregate to a holder, garden or
           field, and the output level stays named ``parcel``.  Labels naming one
           country on both frames select this, or else matching
-          ``attrs['country']``.  A pooled frame or missing metadata keeps the
-          decoding above, which cuts a key at its first ``_``, so only a key
-          without one still matches: Malawi's 2010-11 and 2013-14 join and its
-          2016-17 and 2019-20 do not.  A wave with rows on both sides that joins
-          none warns ``PlotGrainMismatchWarning``, per country where the frames
-          name one.  Call this one country at a time.
+          ``attrs['country']``. Pooled operands dispatch the existing route
+          by each row's country, including Uganda's native constructor inverse;
+          scalar attrs cannot override those labels. Missing metadata retains
+          the former fallback. A country-wave with rows on both sides that
+          joins none warns ``PlotGrainMismatchWarning``.
         - ``'plot'``: join on the literal ``plot`` value verbatim.  Use only
           where the two features already share a plot vocabulary; on Uganda
           the literal ids never match and the result is empty.
@@ -5737,6 +5751,8 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     pd.DataFrame
         One ``Yield_kg`` column indexed by ``(t, i, parcel)`` (or
         ``(t, i, plot_id)`` for ``on='plot'``) — kilograms per unit of *area_col*.
+        Supplied country labels prepend ``country`` to these levels; both
+        operands must carry non-null country labels or both must omit them.
         ``Area`` is canonically hectares, so that is kg/ha.  Do not read the unit
         off ``plot_features.AreaUnit``, which names what the survey reported before
         conversion: Malawi's says ``acres`` over hectare values, and Nigeria's and
@@ -5758,6 +5774,16 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     if on not in {'parcel', 'plot'}:
         raise ValueError(f"yield_kg on= must be 'parcel' or 'plot', got {on!r}")
 
+    # Reuse GH1160's paired-operand contract, before quantity/area filtering.
+    crop_country = _level_or_column(crop_production, 'country')
+    area_country = _level_or_column(plot_features, 'country')
+    if (crop_country is None) != (area_country is None):
+        raise ValueError(
+            "yield_kg: country labels must be present on both crop_production "
+            "and plot_features, or absent from both")
+    if area_country is not None and pd.isna(area_country).any():
+        raise ValueError("yield_kg: plot_features country labels must be non-null")
+
     hk = harvest_kg(crop_production, volume_as_mass=volume_as_mass,
                     min_reports=min_reports,
                     shipped_factors=shipped_factors,
@@ -5768,7 +5794,10 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
         raise ValueError(
             "harvest_kg must yield a 'plot_id' level to join area")
 
-    pf = plot_features.reset_index()
+    pf = plot_features
+    if 'country' in pf.index.names and 'country' in pf.columns:
+        pf = pf.drop(columns='country')
+    pf = pf.reset_index()
     plot_key = _resolve_plot_level(pf.columns)
     if plot_key is None:
         raise ValueError(
@@ -5778,10 +5807,25 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
     if area_t is not None:
         pf = _area_on_harvest_rounds(pf, area_t)
 
-    base = [k for k in ['t', 'i'] if k in hk.columns and k in pf.columns]
+    base = [k for k in ['country', 't', 'i'] if k in hk.columns and k in pf.columns]
 
     land_country = _one_country(crop_production)
-    if (on == 'parcel' and isinstance(land_country, str)
+    if on == 'parcel' and crop_country is not None:
+        hk['_land'] = [
+            str(p) if c in _YIELD_LITERAL_LAND_COUNTRIES
+            else _parcel_from_crop_plot(p, i, country=c if 'i' in base else None)
+            for p, i, c in zip(hk[hk_key],
+                                hk['i'] if 'i' in hk.columns else [''] * len(hk),
+                                hk['country'])
+        ]
+        pf['_land'] = [str(p) if c in _YIELD_LITERAL_LAND_COUNTRIES
+                       else _parcel_from_feature_plot(p)
+                       for p, c in zip(pf[plot_key], pf['country'])]
+        if hk.empty:
+            hk['_land'] = hk['_land'].astype(str)
+        if pf.empty:
+            pf['_land'] = pf['_land'].astype(str)
+    elif (on == 'parcel' and isinstance(land_country, str)
             and land_country in _YIELD_LITERAL_LAND_COUNTRIES
             and _one_country(plot_features) == land_country):
         hk['_land'] = hk[hk_key].astype(str)
@@ -5842,7 +5886,8 @@ def yield_kg(crop_production, plot_features, *, area_col='Area',
                               for cell in lost[:12])
             more = f' (+{len(lost) - 12} more)' if len(lost) > 12 else ''
             hint = f"Try on={'plot' if on == 'parcel' else 'parcel'!r}."
-            if on == 'parcel' and not isinstance(land_country, str):
+            if (on == 'parcel' and crop_country is None
+                    and not isinstance(land_country, str)):
                 hint = ("These frames do not name one country, so their keys were "
                         "cut at the first '_', which a key both features share "
                         "does not survive. Call yield_kg one country at a time, "
@@ -6305,6 +6350,24 @@ def _warn_nitrogen_coverage(tally, total_mass, n_rows):
             NutrientCoverageWarning, stacklevel=3)
 
 
+def _country_index_for_transform(df, feature):
+    """Promote row country without inventing identity from scalar metadata.
+
+    Shared normalization from GH1159, extended to crop transforms; the
+    plot-input-specific local-key guard remains in its original wrapper.
+    """
+    country = _level_or_column(df, 'country')
+    if country is not None:
+        if pd.isna(country).any():
+            raise ValueError(f"{feature} country labels must be non-null; supply "
+                             "each row's country or split into country-less frames")
+        if 'country' not in df.index.names:
+            return df.set_index('country', append=True)
+        if 'country' in df.columns:
+            return df.drop(columns='country')
+    return df
+
+
 def _plot_input_country_index(df):
     """Keep country identity before plot-input filtering (GH #1159).
 
@@ -6312,18 +6375,12 @@ def _plot_input_country_index(df):
     index-before-column convention of ``_declared_kg_factors``; see ledger
     ``1159-pooled-reducers.md`` sections 2-4.  Metadata alone adds no axis.
     """
-    country = _level_or_column(df, 'country')
-    if country is not None:
-        if pd.isna(country).any():
-            raise ValueError(
-                "plot_inputs country labels must be non-null; supply each "
-                "row's country or split into country-less frames")
+    df = _country_index_for_transform(df, 'plot_inputs')
+    if 'country' in df.index.names:
         if not any(name in df.index.names for name in ('t', 'i', *_PLOT_LEVELS)):
             raise ValueError(
                 "plot_inputs must carry local plot identity in its index "
                 "('t', 'i', or 'plot_id'); country alone is not a plot key")
-        if 'country' not in df.index.names:
-            return df.set_index('country', append=True)
     return df
 
 
@@ -7062,7 +7119,8 @@ def gross_crop_revenue(crop_production, *, by=None, value_col='Value_sold'):
     -------
     pd.DataFrame
         One ``Gross_crop_revenue`` column, in nominal local currency,
-        indexed by ``(t, i)`` (or ``(t, i, <crop level>)``).
+        indexed by ``(t, i)`` (or ``(t, i, <crop level>)``). Supplied country
+        labels prepend ``country``, including one country and empty results.
 
     Notes
     -----
@@ -7108,7 +7166,7 @@ def gross_crop_revenue(crop_production, *, by=None, value_col='Value_sold'):
     never-zero-fill rule as :func:`rcsi`.  Reindex against ``sample()`` if
     you want the non-sellers as explicit zeros.
     """
-    df = crop_production
+    df = _country_index_for_transform(crop_production, 'crop_production')
     if value_col not in df.columns:
         raise ValueError(
             f"crop_production must have a {value_col!r} column")
@@ -7116,6 +7174,8 @@ def gross_crop_revenue(crop_production, *, by=None, value_col='Value_sold'):
     group_by = [n for n in ['t', 'i'] if n in names]
     if not group_by:
         raise ValueError("crop_production must have 't' and/or 'i' levels")
+    if 'country' in names:
+        group_by.insert(0, 'country')
 
     if by is not None:
         if by not in _CROP_LEVELS:
@@ -7998,8 +8058,9 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     -------
     pd.DataFrame
         One float ``Crop_diversity`` column indexed by ``(t, i)``,
-        non-negative, in NATS (natural log).  A household growing one crop
-        scores exactly 0.
+        non-negative, in NATS (natural log). Supplied country labels prepend
+        ``country``, including one country and empty results. A household
+        growing one crop scores exactly 0.
 
     Raises
     ------
@@ -8077,7 +8138,7 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
         raise ValueError(
             "crop_diversity weight= must be 'count', 'value' or 'area', got "
             f"{weight!r}")
-    df = crop_production
+    df = _country_index_for_transform(crop_production, 'crop_production')
     names = list(df.index.names or [])
     crop_level = _resolve_crop_level(names)
     if crop_level is None:
@@ -8086,6 +8147,8 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     group_by = [n for n in ['t', 'i'] if n in names]
     if not group_by:
         raise ValueError("crop_production must have 't' and/or 'i' levels")
+    if 'country' in names:
+        group_by.insert(0, 'country')
 
     if weight == 'area':
         raise NotImplementedError(

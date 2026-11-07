@@ -5952,3 +5952,18 @@ ACCEPTANCE govern the scope. Original fourteen-country #1287/#1288 and broader
 backlog remain open.
 See =.coder/ledger/1287-uganda-food-acquired-runtime-checkpoint.md= and
 =slurm_logs/isa_recovery_2026-10-29/Uganda/1287-food-acquired-public-checkpoint/REPORT.md=.
+
+* Country-labeled parcel yield (GH #1475 / #1517, 2026-11-07)
+
+This extends the explicit country-axis restriction recorded under GH #1205;
+that older paragraph describes the previous protected boundary. A crop and
+area pair carrying row-level =country= on BOTH operands now retains that
+identity through conversion, reduction and joining. Uganda rows select the
+same validated =hhid-parcel-plot= constructor inverse after household walking;
+other countries' rows cannot acquire it from a stale scalar Uganda attribute.
+The nonempty ASCII-decimal parcel/plot suffix checks, matching common =i=,
+malformed/unmarked fallbacks, positive-area requirement and literal-plot mode
+are unchanged. A country axis on only one operand is refused, following the
+existing fertilizer-rate paired-identity rule. No native household or plot
+key is rewritten. This entry records the shared implementation and synthetic
+controls, not new source counts or a completed source verification campaign.
