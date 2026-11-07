@@ -300,7 +300,7 @@ class TestDelivered:
         assert 'Derivation' in fa.columns
         x = fa.xs(wave, level='t', drop_level=False)
         s = x.index.get_level_values('s').astype(str)
-        # GH #1452: a 2021-22 row of four countries can carry a second key, the
+        # GH #1452: a 2018-19/2021-22 row of four countries can carry a second key, the
         # unit weight's, on any source; this test is about the #876 key.
         got = x['Derivation'].fillna('').str.contains(derivation_key(country), regex=False).to_numpy()
         assert (got == (s == 'purchased')).all()

@@ -132,11 +132,11 @@ product x unit x size -> grams, from a market survey that weighs the product
 (Mali's BID s.3.4; Cote d'Ivoire's NSU questionnaire).  Mali's BID s.2.3 says the
 factors were collected in 2018/19, "remain valid", and were supplemented in 2021;
 it is Mali's document, and Niger's and Senegal's folders hold none.
-:func:`food_acquired_with_unit_weights` wraps :func:`food_acquired_ehcvm` for those
-four waves and serves a per-row ``Quantity_kg`` from it, which the food kg ladder
-reads first (``survey_kg``).  It is a wrapper, and not a change to
-:func:`food_acquired_ehcvm`, so that the other eight waves' import closures (and
-hashes) do not move.
+:func:`food_acquired_with_unit_weights` wraps :func:`food_acquired_ehcvm` for both
+2018-19 and 2021-22 in those four countries and serves a per-row ``Quantity_kg``
+from it, which the food kg ladder reads first (``survey_kg``).  The other EHCVM
+countries retain their existing :func:`food_acquired_ehcvm` wiring.  The 2018-19
+product join uses labels rather than assuming product codes carry across waves.
 
 *National, not by stratum: a modelling choice.*  :func:`nsu_unit_weights` takes the
 median of a key's rows across the table.  Against a household's last-purchase unit

@@ -933,4 +933,9 @@ class TestDelivered:
         record = fa.attrs['derivations'][country][key]
         assert record['rows'] == int(stamped.sum()) > 0
         assert record['columns'] == ['Quantity_kg']
-        assert record['waves'] == list(WAVES)
+        # Public summaries expose rows/columns/in; coverage is carried by
+        # the stamped observations, not a nonexistent summary `waves` key.
+        by_wave = fa.loc[stamped].groupby(level='t').size()
+        assert by_wave.index.astype(str).tolist() == list(WAVES)
+        assert by_wave.gt(0).all()
+        assert int(by_wave.sum()) == record['rows']
