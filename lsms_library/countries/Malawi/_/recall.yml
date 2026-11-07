@@ -64,3 +64,13 @@ Recall:
     evidence: '2019-20/Documentation/fifth_integrated_household_survey_2019_2020_and_the_integrated_household_panel_survey_2019_household_questionnaire.pdf PDF pp.39-46 -- G01 ''Over the past one week (7 days), did you or others in your household consume any [. . .]?''; G03 ''How much in total did your household consume in the past week?''; module title ''MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK'' (p.46).  One ask: 2019-20/Documentation/fifth_integrated_household_survey_ihs5_2019_2020_basic_information_document.pdf PDF pp.17-18 (''the cross-sectional households were visited only once'')'
     notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption.  Read 2026-10-23 (GH #1084).  The window is MODULE G''s own, not the rCSI battery.  One instrument for IHS5 and IHPS 2019 (its title says so).  Build reads Cross_Sectional/HH_MOD_G1.dta and Panel/hh_mod_g1_19.dta hh_g03a..hh_g07b = G03..G07 (hh_g01 label ''Over the past one week, did you or others in your household consume any [ITEM]?'').  ONE ask: one row per household-item in both files.'
     n_items_delivered: 133
+
+  '2024-25':
+    basis: questionnaire
+    ask_count_basis: declared
+    recall_days: 7
+    n_asks: 1
+    recall_verbatim: 'Over the past one week (7 days), did you or others in your household consume any [. . .]?'
+    evidence: '2024-25/Documentation/ihps_ihs6_household_questionnaire.pdf PDF pp.49-56 -- G01 ''Over the past one week (7 days), did you or others in your household consume any [. . .]?''; ''MODULE G: FOOD CONSUMPTION OVER PAST ONE WEEK'' (p.56).  One instrument for IHS6 and IHPS 2024 (its file name and module list say so).  One ask: 2024-25/Documentation/ihps_bid.pdf PDF p.35 -- ''in 2024, households were each visited once''.'
+    notes: 'data_scheme "last 7 days" belongs to food_coping (rCSI), not consumption, and this wave has no rCSI battery.  Read 2026-11-04 (GH #1275).  Build reads Cross_Sectional/hh_mod_g1.dta and Panel/hh_mod_g1_24.dta hh_g03a..hh_g07b = G03..G07, the Panel file for the retained households only.  ONE ask: one row per household-item in both files.'
+    n_items_delivered: 143

@@ -92,7 +92,12 @@ def test_invalid_request_preserves_complete_cache_tree(native_food, monkeypatch,
                                                        route, kwargs, mixed):
     c, root, state = native_food
     c.food_acquired()  # ordinary writer establishes hash and all-wave coverage
-    assert len(list((root / 'Malawi').glob('*/_/food_acquired.parquet'))) == 5
+    declared = _food_waves(c)
+    assert '2024-25' in declared
+    expected = {f'{wave}/_/food_acquired.parquet' for wave in declared}
+    actual = {str(path.relative_to(root / 'Malawi'))
+              for path in (root / 'Malawi').glob('*/_/food_acquired.parquet')}
+    assert actual == expected
     bad = 'invalid-wave'
     with pytest.raises(KeyError) as reference:
         c[bad]

@@ -1,5 +1,8 @@
 Country: Malawi
 
+Panel IDs:
+  guard_minted_from: '2024-25'
+
 Data Scheme:
   sample:
     index: (i, t)
@@ -10,6 +13,13 @@ Data Scheme:
     Rural: str
     Region: str
     District: str
+    # Original author's source columns; weighting policy is held under decision 48.
+    ihps_hhid:
+      type: str
+      optional: true
+    ihps_weight:
+      type: float
+      optional: true
   cluster_features:
     index: (t, v)
     Region: str

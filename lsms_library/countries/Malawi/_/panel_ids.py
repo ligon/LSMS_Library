@@ -27,7 +27,7 @@ would move suffixes between real households.
 
 Malawi's idiosyncrasies
 -----------------------
-* Two programs, five waves.  IHS2 (2004-05) is not a panel baseline: "The
+* Two programs, six waves.  IHS2 (2004-05) is not a panel baseline: "The
   IHPS sample does NOT have any links to the IHS2 sample. The IHS3 serves as
   a baseline ONLY for the panel subsample." (``2016-17/Documentation/
   ihps_2016_bid_updated_final.pdf`` p. 4, fn. 1, quoted in CONTENTS.org).
@@ -45,6 +45,20 @@ Malawi's idiosyncrasies
   suffixes (GH #504 guard against minting a live id).  Measured on the
   development build this replaces (9a0ed5f3c): 896 / 996 / 1,726 suffixed ids
   in the 2013-14 / 2016-17 / 2019-20 maps.
+* 2024-25 holds IHS6 (8507) and IHPS 2024 (8520), and links ``y5_hhid ->
+  y4_hhid``.  ``y4_hhid`` is blank on the 815 refreshment households, which
+  ``format_id`` reads as missing, so ``local_tools.panel_ids`` drops them: they
+  have no previous round, and they are served under their IHS6 ``cs-24-`` id
+  (GH #1275).  Of the 1,948 retained households, 1,338 keep their previous
+  canonical id and 610 get an ``_N`` split-off.  /Corrected 2026-11-05:/ this
+  said 1,355 and 593, counting 17 minted ids that equalled an id another
+  lineage held in 2019-20.
+* From 2024-25 on, a minted ``_N`` also avoids every id an earlier wave issued
+  (``Panel IDs: guard_minted_from`` in ``data_scheme.yml``,
+  ``local_tools.panel_ids_guarding``).  ``update_id`` guards only against the
+  current wave's live ids, so 2024-25 had minted 25 ids held earlier by
+  since-departed lineages (17 in 2019-20); the guard moves 33 of its ids and no
+  earlier wave's.  2019-20's own 10 such ids are left for a separate issue.
 * Only the waves present in the frame appear in the output.  2013-14 is the
   first of them, so its link to 2010-11 lives in ``updated_ids['2013-14']``
   (4,000 entries) and in no ``panel_ids`` key; ``panel_ids`` holds the 2,508
@@ -57,7 +71,8 @@ from pathlib import Path as _Path
 import pandas as pd
 import yaml
 
-from lsms_library.local_tools import format_id, get_dataframe, panel_ids
+from lsms_library.local_tools import (format_id, get_dataframe, panel_ids,
+                                     panel_ids_guarding)
 
 _HERE = _Path(__file__).resolve().parent
 _COUNTRY_DIR = _HERE.parent
@@ -116,9 +131,19 @@ def build_frame():
     return frame
 
 
+def guard_from():
+    """``Panel IDs: guard_minted_from`` in data_scheme.yml, as the library reads it."""
+    with open(_HERE / 'data_scheme.yml', encoding='utf-8') as f:
+        block = (yaml.safe_load(f) or {}).get('Panel IDs') or {}
+    guard = block.get('guard_minted_from') if isinstance(block, dict) else None
+    return str(guard) if guard else None
+
+
 def main():
     frame = build_frame()
-    D, updated_ids = panel_ids(frame)
+    guard = guard_from()
+    D, updated_ids = (panel_ids_guarding(frame, guard_from=guard) if guard
+                      else panel_ids(frame))
 
     # GH #914: write beside THIS script, never into the process's cwd.
     with open(_HERE / 'panel_ids.json', 'w') as f:

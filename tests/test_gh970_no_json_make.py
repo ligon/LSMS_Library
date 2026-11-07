@@ -20,8 +20,8 @@ These tests pin that on a private, empty ``LSMS_DATA_DIR``:
   written to the JSON-tier cache under the private root (never in-tree).
 
 The per-wave extraction is monkeypatched (``Wave.grab_data``) so the test is
-hermetic -- no microdata, no DVC, no S3.  Malawi has three waves declaring
-``panel_ids`` (2013-14, 2016-17, 2019-20).
+hermetic -- no microdata, no DVC, no S3. Malawi has four waves declaring
+``panel_ids`` (2013-14, 2016-17, 2019-20, 2024-25).
 
 Since GH #894 no country is Design B: Malawi ships a committed
 ``_/panel_ids.json`` that the cached-candidate lookup would find first.  The
@@ -54,6 +54,7 @@ def _fake_panel_ids_frame(wave: str) -> pd.DataFrame:
         "2013-14": [("0001-001", "101012150028"), ("0002-001", "101015620053")],
         "2016-17": [("0010-001", "0001-001"), ("0011-001", "0002-001")],
         "2019-20": [("0100-001", "0010-001")],
+        "2024-25": [("0200-001", "0100-001")],
     }[wave]
     idx = pd.MultiIndex.from_tuples([(wave, i) for i, _ in rows], names=["t", "i"])
     return pd.DataFrame({"previous_i": [p for _, p in rows]}, index=idx)
@@ -144,6 +145,7 @@ def test_cold_design_b_panel_ids_never_shells_out(cold_private_root, monkeypatch
 
     assert isinstance(result, Mapping) and len(result) > 0, "Design B must still derive the crosswalk"
     assert isinstance(c.updated_ids, Mapping) and len(c.updated_ids) > 0
+    assert c.updated_ids['2024-25']['0200-001'] == '101012150028'
     offending = [r.getMessage() for r in caplog.records if "Makefile build failed" in r.getMessage()]
     assert not offending, offending
 
@@ -172,8 +174,10 @@ def test_cold_design_b_panel_ids_with_no_make_on_path(cold_private_root, monkeyp
         monkeypatch.setattr(subprocess, name, no_make)
     caplog.set_level(logging.WARNING, logger="lsms_library.country")
 
-    result = ll.Country(COUNTRY).panel_ids
+    c = ll.Country(COUNTRY)
+    result = c.panel_ids
     assert isinstance(result, Mapping) and len(result) > 0
+    assert c.updated_ids['2024-25']['0200-001'] == '101012150028'
     assert not [r for r in caplog.records if "Makefile build failed" in r.getMessage()]
     # ``run_make_target`` would catch the FileNotFoundError and downgrade it
     # to a *different* warning ("Makefile execution failed"), so the only

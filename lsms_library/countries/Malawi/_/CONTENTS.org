@@ -1,6 +1,47 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
+* 2026-11-07 -- food follow-ups 49/50: IHS5 borrowing and Gramil
+
+Maintainer item49 ("yes, borrow") authorizes cross-wave IHS5 released factors
+for 2024-25, registered as =Malawi::food_acquired::borrow-ihs5-factor=.
+Historical recommendations here that "the mean of conversion factors was taken"
+and "A fuzzy-matching approach ... is needed" are not this borrowing rule.
+The actual source is =2019-20/Data/Cross_Sectional/ihs_foodconversion_factor_2020.dta=,
+MD5 =dc1bed57a31e20232d04bd1ac5bb0f01=, with 1,768 unique full
+=(region,item_code,unit_code,Otherunit)= keys. Dropping Otherunit creates
+conflicting code23 groups. No averaging or coarse harmonized-label join is used.
+Source origins include field, imputed, calculated-standard and sparse-field
+factors; these are released factors, not all newly measured container weights.
+
+Only supported item/unit meanings, full region/size keys and informative exact
+code23 text are eligible. Numeric identity does not support 119 yellow flour to
+Grain Meal, 74 Tin1Kg to Bundle, new120 to835 Popcorn, broadened items or
+undocumented sizes. Unmatched/ambiguous remains missing. Existing metric
+conversion stays at its original choke point, native amounts/units are retained,
+and a collapsed group needs complete contributing-quantity coverage before its
+borrowed kilograms are served. Original raw operands, factor origin/key, source
+year and MD5 are retrievable at input grain through =derivation_inputs=.
+An active expenditure-only row with unknown quantity cannot certify a complete
+kilogram sum. Label compatibility preserves numeric fractions, decimal/range
+punctuation and Unicode numeric fractions; =No1/2= is not =No12=, and
+=LOAF30.0G= is not =LOAF300G=. These are conservative refusals, not numeric aliases.
+
+Item50 ("yes") classifies native =Grain Meal (Gramill)=, code119, as maize
+flour. Questionnaire p49 prints =Grain Mill (Gramil)= among maize flours;
+p58 separately asks grain milling fees. Preserve Preferred Label
+=Grain Meal (Gramill)=, use GD Category =Maize= and own aggregate/short label
+=Gramil=. This establishes no refined/mgaiwa/madeya subtype or IHS5 factor
+crosswalk. The previous Other Cereals assignment and the old food script's
+claim that borrowing "would be a modelling choice nobody has made" are
+superseded by these explicit rulings.
+
+This carrier recovers only 2024 food and its original sample/ID and label/recall
+dependencies. Original sample mapping/maps remain comparison evidence; decision48
+and whole-wave merge remain held. Current shocks/stock, livestock and agriculture
+fixes are preserved. Synthetic controls and private source/API verification have
+separate scopes; no shared rewarm or completed source validation is claimed here.
+
 Brief table of contents and todo list. Malawi has 5 rounds of data, corresponding to IHS2-IHS5 plus IHPS.
 
 * The three =groupby().first()= sites in =malawi.py= (GH #637)

@@ -19,6 +19,7 @@ SHIPPED IHS5 crop conversion tables, for use as
 ``harvest_kg(cp, shipped_factors=...)``.
 """
 
+import functools
 import pandas as pd
 import numpy as np
 import re
@@ -5398,3 +5399,39 @@ def ihps_panel_cluster_features(df, *, status_source):
     # EA's stayers first: the cluster then takes a stayer's attributes.
     is_stayer = panel & status.eq('stayer').fillna(False).to_numpy(dtype=bool)
     return df.iloc[np.argsort(~is_stayer, kind='stable')]
+
+
+# 2024 food/sample identity dependencies (GH #1275).
+CS_24 = "cs-24-"
+
+def ihps24_refreshed():
+    """``{y5_hhid: IHS6 case_id}`` of the IHPS 2024 refreshment households.
+
+    IHPS 2024 is a retained half and a refreshment half; the refreshment EAs
+    are a subsample of IHS6's second-quarter EAs and their households are the
+    same interviews (``ihps_bid.pdf`` section 3.1.2).  They are the rows of the
+    Panel cover with a blank ``y4_hhid``, and that file's ``case_id`` holds
+    their IHS6 ``case_id`` where it holds the IHS3 baseline id for the retained
+    half.  Read from the cover so that the set follows the release.
+    """
+    from lsms_library.paths import countries_root
+    return _ihps24_refreshed(str(countries_root()))
+
+@functools.lru_cache(maxsize=2)
+def _ihps24_refreshed(root):
+    from lsms_library.local_tools import get_dataframe
+    cover = get_dataframe(f'{root}/Malawi/2024-25/Data/Panel/hh_mod_a_filt_24.dta')
+    blank = cover['y4_hhid'].map(format_id).isna()
+    return dict(zip(cover.loc[blank, 'y5_hhid'].map(format_id),
+                    cover.loc[blank, 'case_id'].map(format_id)))
+
+def drop_ihps24_refreshed(df, column=None):
+    """Drop the Panel copy of the refreshment households' rows.
+
+    ``column`` names the id column of a raw Panel module; without it ``df`` is
+    a stacked wave frame with an ``i`` index level, where IHS6 rows carry the
+    ``cs-24-`` prefix and so cannot match a ``y5_hhid``.
+    """
+    ids = (df[column].map(format_id) if column
+           else df.index.get_level_values('i'))
+    return df[~pd.Index(ids).isin(list(ihps24_refreshed()))]
