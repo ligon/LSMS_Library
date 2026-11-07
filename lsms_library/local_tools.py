@@ -806,7 +806,12 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
 
 def _collect_file_paths_from_block(block):
     """Walk a data_info.yml feature block and yield every ``file:`` value
-    encountered, including those nested in ``dfs:`` sub-blocks."""
+    encountered, including those nested in ``dfs:`` sub-blocks.
+
+    A list member may override variables for one source. Match
+    ``Wave.column_mapping``: the first mapping key is the consumed path;
+    the override payload contains variables, not further declarations.
+    """
     if isinstance(block, dict):
         f = block.get("file")
         if isinstance(f, str):
@@ -815,8 +820,13 @@ def _collect_file_paths_from_block(block):
             for x in f:
                 if isinstance(x, str):
                     yield x
-        for v in block.values():
-            yield from _collect_file_paths_from_block(v)
+                elif isinstance(x, dict) and x:
+                    path = next(iter(x))
+                    if isinstance(path, str):
+                        yield path
+        for key, value in block.items():
+            if key not in {"file", "idxvars", "myvars"}:
+                yield from _collect_file_paths_from_block(value)
     elif isinstance(block, list):
         for item in block:
             yield from _collect_file_paths_from_block(item)
