@@ -105,6 +105,10 @@ household_roster:
 
 food_acquired:
     file: s07b_me_ner2021.dta
+    # GH #1452.  Read by mapping.py's food_acquired hook, not by the grabber; declared
+    # so the table's DVC sidecar is in this table's input hash.
+    unit_weights:
+        file: ehcvm_nsu_ner2021.dta
     idxvars:
         v: grappe
         visit: vague

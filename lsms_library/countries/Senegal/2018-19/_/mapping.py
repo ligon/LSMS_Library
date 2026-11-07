@@ -5,7 +5,7 @@ import lsms_library.local_tools as tools
 from lsms_library.ehcvm import (
     UnitSizeLabelError,
     derivation_key as _derivation_key,
-    food_acquired_ehcvm as _food_acquired_ehcvm,
+    food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
     inputs_last_purchase as _inputs_last_purchase,
     served_unit_labels as _served_unit_labels,
     sized_unit as _sized_unit,
@@ -50,7 +50,8 @@ def inputs_food_acquired(wave):
 
 
 def food_acquired(df):
-    return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+    return _food_acquired_with_unit_weights(
+        df, FOOD_ACQUIRED_DERIVATION, wave='2018-19')
 from collections import defaultdict
 
 def v(value):

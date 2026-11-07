@@ -9,7 +9,7 @@ from lsms_library.transformations import (
 from lsms_library.ehcvm import (
     UnitSizeLabelError,
     derivation_key as _derivation_key,
-    food_acquired_ehcvm as _food_acquired_ehcvm,
+    food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
     inputs_last_purchase as _inputs_last_purchase,
     served_unit_labels as _served_unit_labels,
     sized_unit as _sized_unit,
@@ -67,7 +67,8 @@ def food_acquired(df):
     No number changes here: one constant level is appended, nothing is summed,
     reduced or dropped.
     """
-    return add_visit_level(_food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION), visit=1)
+    return add_visit_level(_food_acquired_with_unit_weights(
+        df, FOOD_ACQUIRED_DERIVATION, wave='2018-19'), visit=1)
 
 def v(value):
     '''
