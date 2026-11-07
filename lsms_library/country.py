@@ -5455,6 +5455,9 @@ class Country:
         ):
             try:
                 _ = self.updated_ids
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                # A present but corrupt crosswalk is not optional absence.
+                raise
             except (FileNotFoundError, KeyError, ValueError):
                 pass  # updated_ids not available for this country
 
@@ -5490,14 +5493,27 @@ class Country:
 
             return pd.concat(aligned_dfs.values(), axis=0, sort=False)
 
+        def output_identity(path):
+            """Invocation-local write receipt, not source-content validation."""
+            try:
+                stat = path.stat()
+            except FileNotFoundError:
+                return None
+            return (stat.st_dev, stat.st_ino, stat.st_size,
+                    stat.st_mtime_ns, stat.st_ctime_ns)
+
         def run_make_target(method_name: str, wave: str | None = None, *,
-                            strict_country_make: bool = False):
+                            strict_country_make: bool = False,
+                            _with_output: bool = False):
             """
             Execute legacy Makefile targets either at the country level or for a specific wave.
 
             Only the direct non-DVC materialize:make country-builder route
             opts into terminal recipe failures (GH #1288, ledger §4).
             """
+            def result(value, produced=False):
+                return (value, produced) if _with_output else value
+
             base_path = self.file_path if wave is None else self[wave].file_path
             # Resolve the wave folder for path construction (e.g. '2008-09' -> '2008-15')
             wave_folder = self.wave_folder_map.get(wave, wave) if wave else None
@@ -5550,9 +5566,27 @@ class Country:
                 seen.add(cand)
                 unique_candidates.append(cand)
 
+            # A wave fallback can read the shared country parquet. Its mere
+            # presence does not prove this invocation produced the missing
+            # wave: both make and a no-output script may exit zero and leave
+            # it untouched (GH #1590). Keep the legacy data-return path, but
+            # certify this ambiguous output only if the producer changed it.
+            # Wave-specific outputs remain attributable to their wave/folder;
+            # direct country builders retain their existing contract (#866,
+            # #1039). No output is evicted here and t values are not evidence.
+            country_output = unique_candidates[-1]
+
+            def prior_output():
+                return (output_identity(country_output)
+                        if wave is not None and _with_output else None)
+
+            def produced_output(path, prior):
+                return (wave is None or path != country_output
+                        or output_identity(path) != prior)
+
             if makefile_path is None and script_path is None:
                 warnings.warn(f"No Makefile or script found for {self.name}/{wave or '_'} {method_name}.")
-                return pd.DataFrame()
+                return result(pd.DataFrame())
 
             cwd_path = makefile_dir if makefile_dir is not None else script_path.parent
             if method_name in JSON_CACHE_METHODS:
@@ -5570,7 +5604,7 @@ class Country:
                 # parent, which is what actually fixes import identity.
                 return _script_subprocess_env(repo_root)
 
-            def try_make(make_dir: Path) -> Path | None:
+            def try_make(make_dir: Path) -> tuple[Path, bool] | None:
                 if make_dir is None or not (make_dir / "Makefile").exists():
                     return None
                 makefile = make_dir / "Makefile"
@@ -5608,6 +5642,7 @@ class Country:
                         # success and failure; the private CI wrapper remains
                         # the publication boundary, not this classifier.
                         run_options = {"stderr": subprocess.PIPE}
+                    prior = prior_output()
                     try:
                         built = subprocess.run(make_cmd, cwd=make_dir, check=True,
                                                env=make_env, **run_options)
@@ -5635,22 +5670,21 @@ class Country:
                     # Check the data_root candidate locations (GH #803: never in-tree)
                     for candidate in unique_candidates:
                         if candidate.exists():
-                            return candidate
+                            return candidate, produced_output(candidate, prior)
                 return None
 
-            def try_script(script: Path) -> Path | None:
+            def try_script(script: Path) -> tuple[Path, bool] | None:
                 if script is None or not script.exists():
                     return None
                 python_bin = sys.executable or "python3"
-                try:
-                    subprocess.run([python_bin, str(script)], cwd=script.parent, check=True, env=build_env())
-                    logger.info(f"Python fallback executed for {script.parent.name}.{method_name}.")
-                except subprocess.CalledProcessError as error:
-                    warnings.warn(f"Python fallback failed for {script}: {error}")
-                    return None
+                # A selected producer exiting nonzero is a failed build,
+                # never proof that this wave lacks the table (GH #1590).
+                prior = prior_output()
+                subprocess.run([python_bin, str(script)], cwd=script.parent, check=True, env=build_env())
+                logger.info(f"Python fallback executed for {script.parent.name}.{method_name}.")
                 for candidate in unique_candidates:
                     if candidate.exists():
-                        return candidate
+                        return candidate, produced_output(candidate, prior)
                 return None
 
             # Pre-warm the DVC cache for this feature's source files
@@ -5671,31 +5705,40 @@ class Country:
                 # downstream is the safety net.
                 pass
 
-            output_path: Path | None = None
+            output: tuple[Path, bool] | None = None
             if makefile_path is not None:
-                output_path = try_make(makefile_path.parent)
+                output = try_make(makefile_path.parent)
 
-            if output_path is None and script_path is not None:
-                output_path = try_script(script_path)
+            if output is None and script_path is not None:
+                output = try_script(script_path)
 
-            if output_path is None:
+            if output is None:
                 logger.warning(f"Data file {target_path} still missing after running fallbacks.")
-                return None
+                return result(None)
 
+            output_path, output_produced = output
             if output_path.suffix == ".json":
                 with open(output_path, "r", encoding="utf-8") as json_file:
-                    return json.load(json_file)
+                    return result(json.load(json_file), output_produced)
 
             df_local = get_dataframe(str(output_path))
             # GH #868: a wave script's grain report exists only in its stamp.
             _replay_wave_stamp(output_path, self.name, method_name, wave)
             df_local = map_index(df_local)
-            return df_local
+            return result(df_local, output_produced)
 
-        def load_from_waves(waves, *, evict_country_cache=False, country_builder=True):
+        def load_from_waves(waves, *, evict_country_cache=False, country_builder=True,
+                            _with_coverage=False):
+            completed_waves = []
+
+            def result(value, coverage=None):
+                if not _with_coverage:
+                    return value
+                return value, list(completed_waves if coverage is None else coverage)
+
             empty = absent_subset_frame()
             if empty is not None:
-                return empty
+                return result(empty)
             # Hashless (script-written) L2-wave parquets can't self-invalidate,
             # so evict them at the start of every wave-rebuild descent; the loop
             # below then re-runs Make/the script from source rather than reusing
@@ -5716,13 +5759,14 @@ class Country:
             def build_wave(w):
                 """Stage 1 -- the expensive, wave-independent part of the
                 walk: the YAML extraction or the ``make``/script run for ONE
-                wave.  Everything content-determining about a wave's build
-                lives here; ``_parallel_waves`` only decides which process
-                runs it (GH #797)."""
+                wave. Legacy fallbacks that may target the shared country
+                output run later in the ordered parent loop (GH #1590).
+                ``_parallel_waves`` only schedules these primary getters."""
                 wave_obj = self[w]
                 wave_has_table = method_name in wave_obj.data_scheme
                 wave_result = None
                 successful_empty = False
+                completed = not wave_has_table
 
                 if wave_has_table:
                     try:
@@ -5745,6 +5789,9 @@ class Country:
                                 and len(wave_result) == 0)
                         else:
                             wave_result = getter()
+                        completed = successful_empty or (
+                            isinstance(wave_result, pd.DataFrame) and not wave_result.empty
+                        ) or isinstance(wave_result, dict)
                     except KeyError as error:
                         # GH #1281 (ledger §4): a declared wave's config or
                         # hook failure is not absence. Stop before concat can
@@ -5754,37 +5801,13 @@ class Country:
                             f"failed with KeyError: {error}. Check this wave's "
                             "configuration and source columns."
                         ) from error
-                    except AttributeError as error:
-                        warnings.warn(str(error))
+                    # AttributeError from a declared getter/hook is a build
+                    # defect, not absence. Let the original error propagate,
+                    # including through the parallel-wave relay (GH #1590).
 
-                use_legacy = wave_has_table and not successful_empty and (
-                    wave_result is None
-                    or (isinstance(wave_result, pd.DataFrame) and wave_result.empty)
-                )
-
-                if use_legacy:
-                    wave_result = run_make_target(method_name, wave=w)
-                    # GH #535: run_make_target reads the whole shared folder's
-                    # script output, so for a country whose ``waves`` splits one
-                    # folder into several quarter-waves (Nigeria PP/PH share one
-                    # folder, e.g. 2010Q3 + 2011Q1 -> 2010-11) every quarter
-                    # re-injects the same script-tagged rows -- an exact doubling
-                    # at concat that surfaces as a false-positive GH #323
-                    # "duplicate tuple(s)" warning (plus a wasted 2x build).
-                    # Mirror grab_data's per-wave t-filter (~country.py:1092):
-                    # keep only the rows whose ``t`` matches the requested wave
-                    # ``w``.  No-op for single-t-per-folder tables and for
-                    # Tanzania's multi-round folder (``t == wave`` holds there);
-                    # ``w`` is never None on this in-loop path.
-                    if (isinstance(wave_result, pd.DataFrame)
-                            and not wave_result.empty
-                            and 't' in (wave_result.index.names or [])):
-                        wave_result = wave_result[
-                            wave_result.index.get_level_values('t') == w
-                        ]
                 # _parallel_waves keeps this second payload opaque. Proof is
                 # per invocation, not a worker-local mutable closure or attrs.
-                return wave_has_table, (wave_result, successful_empty)
+                return wave_has_table, (wave_result, successful_empty, completed)
 
             # GH #797: fan stage 1 out over a fork pool, one worker per
             # distinct make target (waves sharing a folder build serially in
@@ -5820,7 +5843,39 @@ class Country:
                         prebuilt[w], country=self.name, table=method_name)
                 else:
                     wave_has_table, outcome = build_wave(w)
-                wave_result, successful_empty = outcome
+                wave_result, successful_empty, completed = outcome
+
+                # GH #1590: legacy fallbacks can all name the SAME country
+                # output. Run them only here, after primary workers have all
+                # joined, so a sibling's write cannot certify a no-op call.
+                # Primary getters and shared wave-folder grouping stay parallel;
+                # this deliberately serializes only the legacy fallback work.
+                use_legacy = wave_has_table and not successful_empty and (
+                    wave_result is None
+                    or (isinstance(wave_result, pd.DataFrame) and wave_result.empty)
+                )
+
+                if use_legacy:
+                    wave_result, completed = run_make_target(
+                        method_name, wave=w, _with_output=True)
+                    # GH #535: run_make_target reads the whole shared folder's
+                    # script output, so for a country whose ``waves`` splits one
+                    # folder into several quarter-waves (Nigeria PP/PH share one
+                    # folder, e.g. 2010Q3 + 2011Q1 -> 2010-11) every quarter
+                    # re-injects the same script-tagged rows -- an exact doubling
+                    # at concat that surfaces as a false-positive GH #323
+                    # "duplicate tuple(s)" warning (plus a wasted 2x build).
+                    # Mirror grab_data's per-wave t-filter (~country.py:1092):
+                    # keep only the rows whose ``t`` matches the requested wave
+                    # ``w``.  No-op for single-t-per-folder tables and for
+                    # Tanzania's multi-round folder (``t == wave`` holds there);
+                    # ``w`` is never None on this in-loop path.
+                    if (isinstance(wave_result, pd.DataFrame)
+                            and not wave_result.empty
+                            and 't' in (wave_result.index.names or [])):
+                        wave_result = wave_result[
+                            wave_result.index.get_level_values('t') == w
+                        ]
 
                 if isinstance(wave_result, pd.DataFrame):
                     if (
@@ -5841,6 +5896,11 @@ class Country:
                     wave_result = _normalize_dataframe_index(wave_result, scheme_entry, w, method_name,
                                                             country=self.name)
 
+                # Coverage is producer evidence, not the surviving t values.
+                # An unsupported wave and a proven zero-row result complete;
+                # a declared wave with no produced output does not (GH #1590).
+                if completed:
+                    completed_waves.append(w)
                 barren_outcomes.append(
                     (not wave_has_table and wave_result is None) or successful_empty)
                 if successful_empty:
@@ -5861,17 +5921,17 @@ class Country:
                     if dict_payloads and not df_payloads:
                         combined: dict[str, Any] = {}
                         combined.update(dict_payloads)
-                        return combined
+                        return result(combined)
                     results = {k: v for k, v in df_payloads.items() if not v.empty}
                     if not results:
-                        return pd.DataFrame()
+                        return result(pd.DataFrame())
 
                 non_empty_df = {k: df for k, df in results.items() if not df.empty}
                 if not non_empty_df:
-                    return pd.DataFrame()
+                    return result(pd.DataFrame())
                 if len(non_empty_df) > 1:
-                    return safe_concat_dataframe_dict(non_empty_df)
-                return pd.concat(non_empty_df.values(), axis=0, sort=False)
+                    return result(safe_concat_dataframe_dict(non_empty_df))
+                return result(pd.concat(non_empty_df.values(), axis=0, sort=False))
 
             if (empty_witnesses and all(barren_outcomes) and requested_wave_set
                     and requested_wave_set < {str(w) for w in self.waves}
@@ -5884,7 +5944,7 @@ class Country:
                 # checks it. Never fabricate declared payload columns here.
                 witness = pd.concat(empty_witnesses, axis=0, sort=False)
                 witness.attrs[_CONSTRUCTED_EMPTY_ATTR] = True
-                return witness
+                return result(witness)
 
             # GH #1039 (red team r1): the make backend came here because
             # `_has_country_builder` found NO country-level rule or script, so
@@ -5904,7 +5964,7 @@ class Country:
                 if (empty_witnesses
                         or {str(w) for w in waves} >= {str(w) for w in self.waves}):
                     raise _rebuild_failure_error(self.name, method_name)
-                return _empty_declared_frame(scheme_entry)
+                return result(_empty_declared_frame(scheme_entry))
 
             # GH #866: no wave produced rows, so the country-level
             # make/script fallback is about to run -- and `try_make` would
@@ -5918,12 +5978,16 @@ class Country:
                 self._evict_stale_country_cache(method_name)
 
             country_fallback = run_make_target(method_name, wave=None)
+            # The country builder remains the producer for its whole request.
+            # Its internal concatenation is opaque here (GH1287/1292); never
+            # infer completion from its observed t values. Wave producers above
+            # have finer, explicit evidence and must not borrow this contract.
             if isinstance(country_fallback, dict):
                 if country_fallback:
-                    return country_fallback
-                return {}
+                    return result(country_fallback, waves)
+                return result({}, waves)
             if isinstance(country_fallback, pd.DataFrame) and not country_fallback.empty:
-                return country_fallback
+                return result(country_fallback, waves)
 
             raise _rebuild_failure_error(self.name, method_name)
 
@@ -6012,8 +6076,6 @@ class Country:
             empty = absent_subset_frame()
             if empty is not None:
                 return empty
-            cache_exists = cache_path.exists()
-
             # GH #891: single-wave and all-wave requests share this one path, so
             # the cache carries a manifest of the waves it was BUILT from and is
             # served only to a request it covers.  On a miss we rebuild the
@@ -6075,7 +6137,8 @@ class Country:
                     if not stage_infos:
                         # GH #891: build the union, cache the union (stamped with
                         # its coverage), return only what was asked for.
-                        df = load_from_waves(build_waves, evict_country_cache=evict_country_cache)
+                        df, completed_waves = load_from_waves(build_waves, evict_country_cache=evict_country_cache,
+                                                              _with_coverage=True)
                         if _is_constructed_empty(df):
                             # GH #1218 / #1221 follow-up: absence of the
                             # REQUESTED waves, constructed -- it must not be
@@ -6088,7 +6151,7 @@ class Country:
                             to_parquet(df, cache_path,
                                        cache_hash=self._table_cache_hash(method_name, build_waves),
                                        grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
-                                       cache_waves=build_waves,
+                                       cache_waves=completed_waves,
                                        datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
                                        build_drops=build_drops)
                             _mark_degraded_written((self.name, method_name), build_drops)
@@ -6105,13 +6168,24 @@ class Country:
                         deduped_infos.append(info)
                     stage_infos = deduped_infos
 
-                    def collect_stage_outputs(stage_list):
+                    rejected_country_output = output_identity(cache_path)
+
+                    def collect_stage_outputs(stage_list, proven_stage_refs):
                         stage_results: dict[str, pd.DataFrame] = {}
+                        readable_refs = set()
                         for stage in stage_list:
                             if stage.fmt != "parquet":
                                 raise ValueError(f"Unsupported format {stage.fmt} for {method_name}")
                             output_path = stage.output_path
                             if output_path.exists():
+                                # A stage may name the country cache itself.
+                                # The read gate rejected that file; clean DVC
+                                # status cannot certify it through another
+                                # path. A newly written/replaced stage output
+                                # retains the producer's ordinary authority.
+                                if (output_path == cache_path
+                                        and output_identity(output_path) == rejected_country_output):
+                                    continue
                                 df_wave = get_dataframe(output_path)
                                 df_wave = map_index(df_wave)
                                 df_wave = self._augment_index_from_related_tables(
@@ -6122,9 +6196,25 @@ class Country:
                                 df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave, method_name,
                                                                     country=self.name)
                                 stage_results[stage.wave or "ALL"] = df_wave
-                        return stage_results
+                                readable_refs.add(stage.stage_ref)
+                        # The retired stage route is a different producer from
+                        # load_from_waves. An existing output after a failed
+                        # reproduce is available data under its legacy fallback
+                        # policy, but is not proof of completed coverage (#1590).
+                        completed_refs = readable_refs & proven_stage_refs
+                        completed_waves = []
+                        for w in build_waves:
+                            relevant = [s for s in stage_list if s.wave is None or s.wave == w]
+                            if relevant:
+                                complete = all(s.stage_ref in completed_refs for s in relevant)
+                            else:
+                                complete = method_name not in self[w].data_scheme
+                            if complete:
+                                completed_waves.append(w)
+                        return stage_results, completed_waves
 
-                    def consolidate_stage_outputs(stage_results: dict[str, pd.DataFrame]) -> pd.DataFrame | None:
+                    def consolidate_stage_outputs(stage_results: dict[str, pd.DataFrame],
+                                                  completed_waves) -> pd.DataFrame | None:
                         if not stage_results:
                             return None
                         non_empty_df = {k: v for k, v in stage_results.items() if not v.empty}
@@ -6140,7 +6230,7 @@ class Country:
                         to_parquet(combined_df, cache_path,
                                    cache_hash=self._table_cache_hash(method_name, build_waves),
                                    grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
-                                   cache_waves=build_waves,
+                                   cache_waves=completed_waves,
                                    datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
                                    build_drops=build_drops)
                         _mark_degraded_written((self.name, method_name), build_drops)
@@ -6154,6 +6244,7 @@ class Country:
 
                     loaded_stages = []
                     dirty = True
+                    proven_stage_refs = set()
                     try:
                         for info in stage_infos:
                             stage = _load_stage(info.stage_ref)
@@ -6164,83 +6255,56 @@ class Country:
                                 for stage in loaded_stages
                             ]
                         dirty = any(stage_status)
+                        proven_stage_refs = {
+                            info.stage_ref for info, status in zip(stage_infos, stage_status)
+                            if not status
+                        }
                     except (OSError, ValueError, KeyError) as status_error:
                         warnings.warn(
                             f"DVC status failed for {method_name}: {status_error!r}. Assuming dirty outputs."
                         )
                         dirty = True
 
-                    if cache_exists and not dirty:
-                        try:
-                            logger.debug(f"Reading {method_name} from cache {cache_path}")
-                            cached_df = get_dataframe(cache_path)
-                            cached_df = map_index(cached_df)
-                            # GH #323: the OTHER warm-read path.  Same argument as at
-                            # the v0.8.0 fast-path read above -- this parquet is
-                            # post-collapse, so nothing downstream can re-detect the
-                            # loss; replay what the cold build stamped.  (Largely dead
-                            # since the DVC stage layer was retired in v0.7.0, but a
-                            # silent warm read is exactly the hole being closed, so it
-                            # does not get to stay open on a technicality.)
-                            _replay_grain_audit(
-                                read_parquet_grain_audit(cache_path),
-                                self.name, method_name,
-                            )
-                            replay_datetime_audit(
-                                read_parquet_datetime_audit(cache_path),
-                                self.name, method_name, waves=waves,
-                            )
-                            wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
-                            cached_df = self._augment_index_from_related_tables(
-                                cached_df,
-                                scheme_entry,
-                                wave_hint,
-                            )
-                            cached_df = _normalize_dataframe_index(
-                                cached_df,
-                                scheme_entry,
-                                wave_hint,
-                                method_name,
-                                country=self.name,
-                            )
-                            # GH #891: this reads the SAME shared cache_path as
-                            # the v0.8.0 fast path above, so it needs the same
-                            # coverage discipline.  Unlike that path it is not
-                            # hash-gated (DVC stage status decided freshness), so
-                            # serve it only when the manifest proves coverage.
-                            _cov = read_parquet_cache_waves(cache_path)
-                            if _cov is None or not set(map(str, waves)) <= set(map(str, _cov)):
-                                logger.debug(
-                                    f"stage-cache read SKIPPED (coverage): {method_name} "
-                                    f"covers {_cov}; request needs {sorted(waves)}"
-                                )
-                                dirty = True
-                            else:
-                                return self._restrict_to_waves(cached_df, waves)
-                        except (FileNotFoundError, PathMissingError):
-                            dirty = True  # fall through to repro if cache missing unexpectedly
+                    # This country cache already failed the hash/coverage/
+                    # degraded gate above. Clean DVC statuses can certify the
+                    # stage outputs below, never override that rejected read
+                    # with an old aggregate (GH #1590).
 
                     stage_outputs: dict[str, pd.DataFrame] | None = None
+                    stage_coverage = []
                     if not dirty:
-                        stage_outputs = collect_stage_outputs(stage_infos)
+                        stage_outputs, stage_coverage = collect_stage_outputs(
+                            stage_infos, proven_stage_refs)
                         if not stage_outputs:
                             dirty = True
 
                     if dirty:
                         stage_iter = loaded_stages or [_load_stage(info.stage_ref) for info in stage_infos]
+                        fallback_to_waves = False
                         with repo.lock, _redirect_stdout_to_stderr():
-                            for stage in stage_iter:
+                            for info, stage in zip(stage_infos, stage_iter):
+                                proven_stage_refs.discard(info.stage_ref)
                                 try:
                                     stage.reproduce()
+                                    proven_stage_refs.add(info.stage_ref)
                                 except (OSError, ValueError, RuntimeError) as reproduce_error:
                                     warnings.warn(f"DVC reproduce failed for {stage.addressing}: {reproduce_error!r}. Falling back to legacy loaders.")
-                                    stage_outputs = collect_stage_outputs(stage_infos)
-                                    combined_outputs = consolidate_stage_outputs(stage_outputs)
+                                    stage_outputs, stage_coverage = collect_stage_outputs(
+                                        stage_infos, proven_stage_refs)
+                                    combined_outputs = consolidate_stage_outputs(
+                                        stage_outputs, stage_coverage)
                                     if combined_outputs is not None:
                                         return combined_outputs
-                                    return load_from_waves(waves, evict_country_cache=evict_country_cache)
+                                    fallback_to_waves = True
+                                    break
 
-                        stage_outputs = collect_stage_outputs(stage_infos)
+                        if not fallback_to_waves:
+                            stage_outputs, stage_coverage = collect_stage_outputs(
+                                stage_infos, proven_stage_refs)
+                        if not stage_outputs and any(info.output_path == cache_path for info in stage_infos):
+                            fallback_to_waves = True
+                        if fallback_to_waves:
+                            return load_from_waves(waves, evict_country_cache=evict_country_cache)
                         if not stage_outputs:
                             raise KeyError(f"No data produced for {method_name} via DVC.")
 
@@ -6255,7 +6319,7 @@ class Country:
                         return self._restrict_to_waves(
                             next(iter(stage_outputs.values())), waves)
 
-                    combined_outputs = consolidate_stage_outputs(stage_outputs)
+                    combined_outputs = consolidate_stage_outputs(stage_outputs, stage_coverage)
                     if combined_outputs is None:
                         raise KeyError(f"No data produced for {method_name} via DVC.")
                     return combined_outputs
@@ -6279,7 +6343,8 @@ class Country:
                 # countries (Uganda, Senegal, etc.) whose stages fail at
                 # reproduce never populate the cache and rebuild from
                 # source on every call.
-                df = load_from_waves(build_waves, evict_country_cache=evict_country_cache)
+                df, completed_waves = load_from_waves(build_waves, evict_country_cache=evict_country_cache,
+                                                      _with_coverage=True)
                 if _is_constructed_empty(df):
                     return df  # never cached; see the no-stage write above
                 if isinstance(df, pd.DataFrame):
@@ -6289,7 +6354,7 @@ class Country:
                     to_parquet(df, cache_path,
                                cache_hash=self._table_cache_hash(method_name, build_waves),
                                grain_audit=_GRAIN_LEDGER.get((self.name, method_name)),
-                               cache_waves=build_waves,
+                               cache_waves=completed_waves,
                                datetime_audit=_DATETIME_LEDGER.get((self.name, method_name)),
                                build_drops=build_drops)
                     _mark_degraded_written((self.name, method_name), build_drops)
@@ -6375,14 +6440,15 @@ class Country:
         """
         Compute and cache both panel_ids and updated_ids.
 
-        Records the attempt via ``self._panel_ids_attempted`` regardless of
-        outcome so the property accessors don't re-run the miss path on
-        every access.  Countries that don't declare ``panel_ids`` in their
+        Records completed attempts via ``self._panel_ids_attempted`` so the
+        property accessors don't re-run a legitimate miss on every access.
+        Unexpected failures remain retryable, including corrupt JSON.
+        Countries that don't declare ``panel_ids`` in their
         data_scheme are silently absent (no warning); countries that
         declare it but fail to materialize trigger the loud warning, which
         is the case worth surfacing.
         """
-        # Mark the attempt up front so any return path counts.
+        # Also guards recursive table loads while this computation is active.
         self._panel_ids_attempted = True
 
         # Declared-absent: no panel_ids in data_scheme means the country
@@ -6394,23 +6460,34 @@ class Country:
             self._updated_ids_cache = None
             return
 
-        panel_ids_dic = self._aggregate_wave_data(None, 'panel_ids')
-        if isinstance(panel_ids_dic, dict):
-            updated_ids_dic = self._aggregate_wave_data(None, 'updated_ids')
-            self._panel_ids_cache = panel_ids_dic
-            self._updated_ids_cache = updated_ids_dic
-        elif isinstance(panel_ids_dic, pd.DataFrame) and not panel_ids_dic.empty:
-            panel_ids_dic, updated_ids_dic = panel_ids(panel_ids_dic)
-            self._panel_ids_cache = panel_ids_dic
-            self._updated_ids_cache = updated_ids_dic
-        else:
-            # Declared but materialization failed — this IS noteworthy.
-            logger.warning(
-                f"Panel IDs declared in data_scheme but not materialized "
-                f"for {self.name}."
-            )
-            self._panel_ids_cache = None
-            self._updated_ids_cache = None
+        try:
+            panel_ids_dic = self._aggregate_wave_data(None, 'panel_ids')
+            if isinstance(panel_ids_dic, dict):
+                updated_ids_dic = self._aggregate_wave_data(None, 'updated_ids')
+                self._panel_ids_cache = panel_ids_dic
+                self._updated_ids_cache = updated_ids_dic
+            elif isinstance(panel_ids_dic, pd.DataFrame) and not panel_ids_dic.empty:
+                panel_ids_dic, updated_ids_dic = panel_ids(panel_ids_dic)
+                self._panel_ids_cache = panel_ids_dic
+                self._updated_ids_cache = updated_ids_dic
+            else:
+                # Declared but materialization failed — this IS noteworthy.
+                logger.warning(
+                    f"Panel IDs declared in data_scheme but not materialized "
+                    f"for {self.name}."
+                )
+                self._panel_ids_cache = None
+                self._updated_ids_cache = None
+        except Exception as error:
+            # Preserve the historical optional-absence classes consumed by
+            # _aggregate_wave_data, except malformed/undecodable JSON (both
+            # ValueErrors): present corrupt input is never absence (#1590).
+            if (isinstance(error, (json.JSONDecodeError, UnicodeDecodeError))
+                    or not isinstance(error, (FileNotFoundError, KeyError, ValueError))):
+                self._panel_ids_attempted = False
+                self._panel_ids_cache = None
+                self._updated_ids_cache = None
+            raise
 
     @property
     def panel_ids(self) -> dict[str, Any] | None:
