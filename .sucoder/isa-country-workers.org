@@ -47,8 +47,8 @@ Remote shared implementation workers ended native143 in descriptor inspection. T
 | 1510 | root closure | PR1601 merged f51ccf; issue closed; final560 ledger-only over065; GitHub/offline/review pass |
 | 1475/1517 | root closure | PR1600 merged3b28d293; both issues closed; final9335 ledger-only over2269; source/offline/review/GitHub and bounded new-base integration pass |
 | Malawi food49/50 | root hold | PR1604 DRAFT finald892, code7f; source/offline/review complete; weights48/whole-wave held |
-| 1528 BFA/Mali sold condition | finish_1590 | exactafe6; source/API/Make/Feature/warm pass; fullCI job41006173 running; independent139pass/6skip verdict forthcoming |
-| 1174 Malawi deletion provenance | malawi_revision_food | exact0efac3; focused108pass; source/offline job41006209 running; independent review required |
+| 1528 BFA/Mali sold condition | finish_1590 | exactafe6; source/API/Make/Feature/warm pass; fullCI job41006173 running; independent CLOSED noP1/P2,139pass/6skip |
+| 1174 Malawi deletion provenance | malawi_revision_food | exact0efac3; focused108pass; source/API/Make/Feature/warm pass; fullCI job41006209 running; finish_1452 independent review active |
 | 1509 | root decision queue | bounded evidence complete; required eligibility question pending user; no default chosen |
 | 1602/1603 | root queue | separate inherited prewarm resolver / unqualified shipped warning residuals |
 

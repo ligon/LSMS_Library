@@ -24,15 +24,16 @@ Inherited unqualified shipped warning remains1603. Shared rewarm/master deferred
 
 PR1604 OPEN DRAFT finald89270489c99eede294a0c52bf3befdaed7e8411,
 code7f459978 source/offline/independent gates closed. Finald892 only ledger,
-root library/tests tree equality verified. Weights48/whole-wave merge STILL HELD,
+root library/tests tree equality verified. Final GitHub unit/Windows SUCCESS;
+source/DVC/docs explicitly skipped. Weights48/whole-wave merge STILL HELD,
 even if configured GitHub checks pass. Two inherited source audit failures remain
 explicitly documented; do not claim all-green feature audit.
 
 1528 authorfinish_1590 exactafe6f4389ac69cfe97a102a07ccc7b1644dd1fcf,
 NEWtreefix-1528-sold-condition-current-20261107 on GitHubc964. Source/API/Make/
 Feature/warm/payload retention passed; job41006173 full offlineCI RUNNING.
-Independentfinish_1452 checks139pass/6skip, own three source dictionaries verified;
-durable verdict forthcoming. Existing rows/index/order/dtypes/nulls exact; Mali
+Independentfinish_1452 CLOSED noP1/P2,139pass/6skip; own three source dictionaries
+verified. B/reports/review-1528-sold-condition-20261107/VERDICT.md. Existing rows/index/order/dtypes/nulls exact; Mali
 attrs differ only by transported derivation columns. Frozen until actors close;
 then bounded ordinary integration with current GitHub development, no rebase/force.
 
@@ -40,8 +41,10 @@ then bounded ordinary integration with current GitHub development, no rebase/for
 tree malawi-deletion-provenance, branchfix/1174-malawi-deletion-provenance-20261107.
 Ledgerb8f6 first; source census1DAPgroup/1line among19265 rawDrecords, MD5 checked.
 Focused108pass; free cold job41006209 source/API/seedreplay/Make/Feature/warm/full
-offlineCI active. No shared producer/reducer/finalizer or food/weight change.
-Independent review still required. Frozen actors must finish before base integration.
+offlineCI active. Source/API/Make/Feature/warm PASS:179957 served plot-input rows
+exact;1355 seedraw+1DAP rawline replay and nativefields exact,14warmcache files
+unchanged. No shared producer/reducer/finalizer or food/weight change. Independent
+review NOWassignedfinish_1452, reportreview-1174-malawi-deletion-provenance-20261107. Frozen actors must finish before base integration.
 
 1509 required user eligibility answer STILL PENDING: independently observed
 purchase-price evidence versus every purchase-labelled row (including allocated
