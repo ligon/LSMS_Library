@@ -57,6 +57,16 @@ inputs; labels on only one input are refused, with no inference or
 broadcasting. An index level takes precedence over a redundant country
 column. Area keys may still be columns. Country-less calls keep their
 existing contract, and attrs alone do not add country.
+The crop reducers `harvest_kg`, `gross_crop_revenue` and `crop_diversity`
+likewise prepend supplied country identity, including singleton and empty
+results. Crop conversion estimates are computed separately within each
+country; identical unit labels and household keys do not establish a shared
+conversion factor. `yield_kg` requires non-null country on both crop and area
+operands or neither, retains country through the land join, and selects each
+row's existing country-specific land route. Labels outrank scalar attrs;
+country-less inputs keep their existing behavior. This preserves each
+instrument's land keys and definitions, without making crop occurrence
+entropy or differently recorded harvest conditions comparable across countries.
 Other transforms have their own documented grouping and joining contracts.
 
 ## Design Decisions

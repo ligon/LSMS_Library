@@ -108,7 +108,15 @@ def test_pooled_country_identity_overrides_a_stale_scalar_country_attr(axis, ope
             pf = pf.assign(country='Uganda')
     cp.attrs['country'] = 'Uganda'
     pf.attrs['country'] = 'Uganda'
-    assert yield_kg(cp, pf).empty
+    if operand != 'both':
+        with pytest.raises(ValueError, match='country.*both'):
+            yield_kg(cp, pf)
+    else:
+        # GH1517 permits Uganda's own row label to select its validated
+        # constructor inverse; a stale scalar attr still cannot decode Other.
+        out = yield_kg(cp, pf)
+        assert out.index.tolist() == [('Uganda', '2013-14', '1021000108', '1')]
+        assert out['Yield_kg'].tolist() == [4.]
 
 
 def test_harvest_conversion_keeps_native_plot_ids_after_household_walk():
