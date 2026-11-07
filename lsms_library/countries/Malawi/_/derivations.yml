@@ -624,7 +624,7 @@ Malawi::community_prices::struck-item-one-unit:
 # nothing is served for it and the loss is registered here.
 Malawi::plot_inputs::seed-line-no-payload:
   waves: ['2010-11', '2013-14', '2016-17', '2019-20']
-  columns: [Quantity, Quantity_purchased, Unit_purchased, Purchased, Improved, Quantity_received_as_gift, Unit_received_as_gift, Received_as_gift]
+  columns: [Quantity, Quantity_purchased, Unit_purchased, Purchased, Improved, Applied, Quantity_received_as_gift, Unit_received_as_gift, Received_as_gift]
   rows: 0
   rule: >-
     A DELETION.  A Module G line with no planted amount (ag_g04a), no Improved answer
@@ -655,3 +655,41 @@ Malawi::plot_inputs::seed-line-no-payload:
     (459 / 185 / 672 / 39 by wave, cold build of 74e60f713), none with a planted amount.
   contents: 'Malawi/_/CONTENTS.org, "The seed half, counted"'
   since: '2026-11-05'
+
+# Issue 1174: the nonseed residual of the same existing all-payload-NA gate.
+Malawi::plot_inputs::nonseed-group-no-payload:
+  waves: ['2010-11']
+  columns: [Quantity, Quantity_purchased, Unit_purchased, Purchased, Improved, Applied, Quantity_received_as_gift, Unit_received_as_gift, Received_as_gift]
+  rows: 0
+  rule: >-
+    A DELETION. A 2010-11 Module D nonseed group whose entire assembled payload
+    is missing is removed by the existing _finalize_result dropna(how='all').
+    The current source has one DAP Fertilizer group with no ag_d38 answer and
+    no enumerator-total quantity. A unit is an index level, not payload.
+    A recorded zero, False, or any other payload prevents this deletion.
+    No use answer is inferred and no native amount replaces a blank total.
+    The dropped group has nowhere to carry a key; derivation_inputs returns
+    every contributing original Module D line, once per source-release row.
+  function: lsms_library.countries.Malawi.2010-11._.mapping:derive_nonseed_group_no_payload
+  inputs: lsms_library.countries.Malawi.2010-11._.mapping:inputs_nonseed_group_no_payload
+  raw_variables:
+    - ag_mod_d.case_id, ag_d00 (household and plot keys)
+    - ag_mod_d.ag_d38, ag_d39a, ag_d39d, ag_d39f, ag_d39i (use, types and selected enumerator-total kg)
+    - ag_mod_d.ag_d39b, ag_d39c, ag_d39g, ag_d39h (separate native amounts/units, retained without substitution)
+    - ag_mod_d.ag_d36, ag_d37a, ag_d37b, ag_d40, ag_d41a, ag_d41b, ag_d41c, ag_d41d, ag_d41e, ag_d41f (other Module D blocks)
+  assumptions:
+    - text: >-
+        Preserve the existing all-payload-NA exclusion without interpreting
+        missing use as No or as an affirmative use. This is disclosure of an
+        existing deletion, not a new source-eligibility or quantity rule.
+      basis: modelling-choice
+      evidence: >-
+        Issue 1174 narrowed 2026-11-05; merged PR 1422; Malawi CONTENTS.org,
+        "Module D use answers; a missing amount is not 0".
+  validated_against: >-
+    Current-base sanctioned Module D census: 19,265 source lines, one deleted
+    DAP group contributed by one raw line, with Quantity and Applied missing.
+    Source MD5 d143b71ea7c7f4efcac3b9afa0d6be48. Full API conservation and raw
+    replay are recorded in the task ledger and source validation receipts.
+  contents: 'Malawi/_/CONTENTS.org, "Nonseed deletion provenance"'
+  since: '2026-11-07'

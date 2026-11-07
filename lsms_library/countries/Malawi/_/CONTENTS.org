@@ -3,6 +3,25 @@
 
 Brief table of contents and todo list. Malawi has 5 rounds of data, corresponding to IHS2-IHS5 plus IHPS.
 
+* 2026-11-07 -- Nonseed deletion provenance (GH #1174)
+
+The existing all-payload-NA finalizer also removes one 2010-11 Module D DAP
+group with no =ag_d38= answer and no enumerator-total quantity. This is now
+disclosed separately as =Malawi::plot_inputs::nonseed-group-no-payload=
+(=rows: 0=). A current-base sanctioned census finds one group backed by one
+raw line among 19,265 Module D records. =derivation_inputs= returns the
+original Module D columns and release-row identity; if several lines or
+slots contribute to a deleted group, their raw lines remain recoverable.
+Deleted groups and returned source lines are distinct counts.
+
+No native quantity, missingness, unit, =Applied= answer or served row changes.
+A recorded zero or False remains payload. The 19 fertilizer groups with a
+blank enumerator total keep NA; no native amount is substituted. The earlier
+seed ruling and deletion stay intact, with =Applied= added to that entry's
+declared columns. This does not interpret missing use as No or decide whether
+fertilizer was used. Historical #1174 eligibility caveats above/below remain
+historical; this entry documents the existing nonseed exclusion only.
+
 * The three =groupby().first()= sites in =malawi.py= (GH #637)
 
 Reviewed for *key soundness* -- the only thing that makes a
