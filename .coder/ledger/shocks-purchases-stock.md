@@ -60,5 +60,28 @@ New-wave author branches are outside this PR; document the ruling for their
 integration rather than editing or merging those unfinished branches.
 
 ## Verification
-Pending implementation, source-to-output checks, affected regression tests,
-cross-country Feature shocks audit and independent review.
+Implemented across 22 existing waves in ten countries using the machinery in
+§2, with the two distinct source-answer definitions in §3 and unchanged rows,
+indexes, coping answers and other effects under §4. Ethiopia and Uganda remain
+controls; Malawi 2004-05 has no manufactured stock answer.
+
+At implementation commit e1cd67958197c126c6a9872127f252b91480a816:
+- 432 targeted synthetic/source/schema tests passed; an independent reviewer
+  repeated those 432 successfully in a fresh private cache.
+- Cold baseline/candidate comparison retained all 271,973 rows across twelve
+  countries, exactly matching indexes and unrelated values. Independent
+  snapshot verification confirmed it; Ethiopia/Uganda frames were unchanged.
+- Feature shocks audit phases 1/2 had no fail/error. All 25 baseline findings
+  persisted unchanged; the only three additions report the absent stock
+  question in Malawi 2004-05. Direct Feature assembly preserves both nullable
+  boolean answers and all rows, with Uganda stock cells missing.
+- Country documentation and source-selector review found no blocker. Source
+  limits remain explicit: older EAC/ECVMA labels are truncated and supported by
+  the prior independent review plus response signatures; CIV Stata .d decoding
+  remains #1561. Unfinished 2021/2024 wave branches remain outside this change.
+
+Final independent review, offline CI, exact-head GitHub checks and merge status
+are recorded with PR #1596 and the durable sweep report
+`reports/shocks-purchases-stock/` under the 2026-11-03 backlog sweep. These are
+verification of this implementation, not a claim that existing grain or other
+unrelated audit warnings are resolved.
