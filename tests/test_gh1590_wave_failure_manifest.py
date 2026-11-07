@@ -5,6 +5,7 @@ replace only source-reader, DVC and subprocess IO leaves (GH1281/GH1292).
 """
 from contextlib import nullcontext
 import json
+import os
 from pathlib import Path
 import subprocess
 from types import SimpleNamespace
@@ -387,7 +388,10 @@ def test_terminal_failure_retains_original_exception_object(survey,monkeypatch,r
 
 @pytest.mark.parametrize('producer', ['script', 'make'])
 @pytest.mark.parametrize('warm', [False, True])
-def test_country_output_written_by_wave_producer_proves_coverage(survey, monkeypatch, producer, warm):
+@pytest.mark.parametrize('workers', [1, 2])
+def test_country_output_written_by_wave_producer_proves_coverage(survey, monkeypatch, producer, warm, workers):
+    monkeypatch.setenv('LSMS_BUILD_WORKERS', str(workers))
+    assert P.build_workers(2) == workers
     survey.script()
     if warm:
         survey.load([GOOD])
@@ -402,12 +406,122 @@ def test_country_output_written_by_wave_producer_proves_coverage(survey, monkeyp
         return subprocess.CompletedProcess(argv, 0)
 
     monkeypatch.setattr(C.subprocess, 'run', write_country)
-    got = survey.load([BAD])
-    assert len(got) == 1 and got['x'].tolist() == [2001.0]
-    assert L.read_parquet_cache_waves(survey.cache) == ([GOOD, BAD] if warm else [BAD])
+    # Two requested targets exercise a real two-worker prebuild even when
+    # no country output exists yet. A warm request expands through coverage.
+    got = survey.load([BAD] if warm else [GOOD, BAD])
+    bad = got[got.index.get_level_values('t') == BAD]
+    assert len(bad) == 1 and bad['x'].tolist() == [2001.0]
+    assert L.read_parquet_cache_waves(survey.cache) == [GOOD, BAD]
     survey.getters.clear()
-    pd.testing.assert_frame_equal(survey.load([BAD]), got)
+    pd.testing.assert_frame_equal(survey.load([BAD]), bad)
     assert survey.getters == []
+
+
+def test_parallel_primary_builds_join_before_ordered_shared_country_fallbacks(
+        survey, monkeypatch, tmp_path):
+    """A sibling write cannot certify a no-op producer (reviewer counterexample).
+
+    Check actual execution PIDs/order, not just the requested worker count.
+    The original mutual-wait race reproducer remains in the review artifacts;
+    its required concurrent fallback execution is now deliberately forbidden.
+    """
+    monkeypatch.setenv('LSMS_BUILD_WORKERS', '2')
+    assert P.build_workers(3) == 2
+    for wave in (BAD, EMPTY):
+        (survey.country_path / wave / '_/data_info.yml').write_text('facts: {}\n')
+        (survey.country_path / wave / '_/facts.py').write_text('# synthetic producer\n')
+    survey.load([GOOD])
+    events = tmp_path / 'primary-events'
+    primary = C.Wave.grab_data
+    parent_pid = os.getpid()
+    calls = []
+    repaired = False
+
+    def getter(self, name, *, _with_origin=False):
+        if self.year in (BAD, EMPTY):
+            value = pd.DataFrame()
+            result = (value, 'missing') if _with_origin else value
+        else:
+            result = primary(self, name, _with_origin=_with_origin)
+        with events.open('a') as stream:
+            stream.write(f'{self.year} {os.getpid()}\n')
+        return result
+
+    def produce(argv, *args, **kwargs):
+        wave = Path(argv[1]).parent.parent.name
+        assert wave in (BAD, EMPTY)
+        # Every primary worker has finished before any legacy invocation.
+        observed = [line.split() for line in events.read_text().splitlines()]
+        assert {row[0] for row in observed} == {GOOD, BAD, EMPTY}
+        assert all(int(row[1]) != parent_pid for row in observed)
+        assert os.getpid() == parent_pid
+        calls.append(wave)
+        if wave == EMPTY or repaired:
+            frame = pd.DataFrame({'t': [wave], 'i': ['synthetic'],
+                                  'x': [float(wave)]}).set_index(['t', 'i'])
+            L.to_parquet(frame, survey.cache, absolute_path=True)
+        return subprocess.CompletedProcess(argv, 0)
+
+    monkeypatch.setattr(C.Wave, 'grab_data', getter)
+    monkeypatch.setattr(C.subprocess, 'run', produce)
+    got = survey.load([BAD, EMPTY])
+    assert calls == [BAD, EMPTY]
+    assert set(got.index.get_level_values('t')) == {EMPTY}
+    assert L.read_parquet_cache_waves(survey.cache) == [GOOD, EMPTY]
+
+    repaired = True
+    events.write_text('')
+    calls.clear()
+    got = survey.load([BAD])
+    assert calls == [BAD, EMPTY]
+    assert got['x'].tolist() == [float(BAD)]
+    assert L.read_parquet_cache_waves(survey.cache) == [GOOD, BAD, EMPTY]
+    calls.clear()
+    events.write_text('')
+    pd.testing.assert_frame_equal(survey.load([BAD]), got)
+    assert len(survey.load([GOOD, EMPTY])) == 2
+    assert calls == [] and events.read_text() == ''
+
+
+@pytest.mark.parametrize('workers', [1, 2])
+def test_shared_folder_fallback_retains_per_wave_filter(survey, monkeypatch, workers):
+    monkeypatch.setenv('LSMS_BUILD_WORKERS', str(workers))
+    # GOOD and BAD share a physical folder; EMPTY supplies a second primary
+    # target so the parallel case is real, rather than the one-target path.
+    scheme_path = survey.country_path / '_/data_scheme.yml'
+    scheme = yaml.safe_load(scheme_path.read_text())
+    scheme['wave_folder_map'] = {BAD: GOOD}
+    scheme_path.write_text(yaml.safe_dump(scheme))
+    (survey.country_path / GOOD / '_/data_info.yml').write_text('facts: {}\n')
+    (survey.country_path / GOOD / '_/facts.py').write_text('# shared-wave producer\n')
+    primary = C.Wave.grab_data
+
+    def getter(self, name, *, _with_origin=False):
+        if self.year in (GOOD, BAD):
+            value = pd.DataFrame()
+            return (value, 'missing') if _with_origin else value
+        return primary(self, name, _with_origin=_with_origin)
+
+    def produce(argv, *args, **kwargs):
+        assert Path(argv[1]) == survey.country_path / GOOD / '_/facts.py'
+        frame = pd.DataFrame({'t': [GOOD, BAD], 'i': ['synthetic'] * 2,
+                              'x': [float(GOOD), float(BAD)]}).set_index(['t', 'i'])
+        out = survey.cache.parent.parent / GOOD / '_/facts.parquet'
+        out.parent.mkdir(parents=True, exist_ok=True)
+        L.to_parquet(frame, out, absolute_path=True)
+        return subprocess.CompletedProcess(argv, 0)
+
+    monkeypatch.setattr(C.Wave, 'grab_data', getter)
+    monkeypatch.setattr(C.subprocess, 'run', produce)
+    country = survey.country()
+    assert country.waves == WAVES
+    targets = {w: country[w].wave_folder for w in (GOOD, BAD, EMPTY)}
+    assert P.build_workers(len(P.group_waves_by_target(list(targets), targets))) == workers
+    got = survey.load([GOOD, BAD, EMPTY], country=country)
+    assert len(got) == 2 and got.index.is_unique
+    assert got.groupby(level='t')['x'].sum().to_dict() == {GOOD: float(GOOD), BAD: float(BAD)}
+    assert L.read_parquet_cache_waves(survey.cache) == [GOOD, BAD, EMPTY]
+    pd.testing.assert_frame_equal(survey.load([GOOD, BAD, EMPTY]), got)
 
 
 def test_failed_make_write_does_not_certify_later_noop_invocation(survey, monkeypatch):

@@ -5759,9 +5759,9 @@ class Country:
             def build_wave(w):
                 """Stage 1 -- the expensive, wave-independent part of the
                 walk: the YAML extraction or the ``make``/script run for ONE
-                wave.  Everything content-determining about a wave's build
-                lives here; ``_parallel_waves`` only decides which process
-                runs it (GH #797)."""
+                wave. Legacy fallbacks that may target the shared country
+                output run later in the ordered parent loop (GH #1590).
+                ``_parallel_waves`` only schedules these primary getters."""
                 wave_obj = self[w]
                 wave_has_table = method_name in wave_obj.data_scheme
                 wave_result = None
@@ -5805,32 +5805,6 @@ class Country:
                     # defect, not absence. Let the original error propagate,
                     # including through the parallel-wave relay (GH #1590).
 
-                use_legacy = wave_has_table and not successful_empty and (
-                    wave_result is None
-                    or (isinstance(wave_result, pd.DataFrame) and wave_result.empty)
-                )
-
-                if use_legacy:
-                    wave_result, completed = run_make_target(
-                        method_name, wave=w, _with_output=True)
-                    # GH #535: run_make_target reads the whole shared folder's
-                    # script output, so for a country whose ``waves`` splits one
-                    # folder into several quarter-waves (Nigeria PP/PH share one
-                    # folder, e.g. 2010Q3 + 2011Q1 -> 2010-11) every quarter
-                    # re-injects the same script-tagged rows -- an exact doubling
-                    # at concat that surfaces as a false-positive GH #323
-                    # "duplicate tuple(s)" warning (plus a wasted 2x build).
-                    # Mirror grab_data's per-wave t-filter (~country.py:1092):
-                    # keep only the rows whose ``t`` matches the requested wave
-                    # ``w``.  No-op for single-t-per-folder tables and for
-                    # Tanzania's multi-round folder (``t == wave`` holds there);
-                    # ``w`` is never None on this in-loop path.
-                    if (isinstance(wave_result, pd.DataFrame)
-                            and not wave_result.empty
-                            and 't' in (wave_result.index.names or [])):
-                        wave_result = wave_result[
-                            wave_result.index.get_level_values('t') == w
-                        ]
                 # _parallel_waves keeps this second payload opaque. Proof is
                 # per invocation, not a worker-local mutable closure or attrs.
                 return wave_has_table, (wave_result, successful_empty, completed)
@@ -5870,6 +5844,38 @@ class Country:
                 else:
                     wave_has_table, outcome = build_wave(w)
                 wave_result, successful_empty, completed = outcome
+
+                # GH #1590: legacy fallbacks can all name the SAME country
+                # output. Run them only here, after primary workers have all
+                # joined, so a sibling's write cannot certify a no-op call.
+                # Primary getters and shared wave-folder grouping stay parallel;
+                # this deliberately serializes only the legacy fallback work.
+                use_legacy = wave_has_table and not successful_empty and (
+                    wave_result is None
+                    or (isinstance(wave_result, pd.DataFrame) and wave_result.empty)
+                )
+
+                if use_legacy:
+                    wave_result, completed = run_make_target(
+                        method_name, wave=w, _with_output=True)
+                    # GH #535: run_make_target reads the whole shared folder's
+                    # script output, so for a country whose ``waves`` splits one
+                    # folder into several quarter-waves (Nigeria PP/PH share one
+                    # folder, e.g. 2010Q3 + 2011Q1 -> 2010-11) every quarter
+                    # re-injects the same script-tagged rows -- an exact doubling
+                    # at concat that surfaces as a false-positive GH #323
+                    # "duplicate tuple(s)" warning (plus a wasted 2x build).
+                    # Mirror grab_data's per-wave t-filter (~country.py:1092):
+                    # keep only the rows whose ``t`` matches the requested wave
+                    # ``w``.  No-op for single-t-per-folder tables and for
+                    # Tanzania's multi-round folder (``t == wave`` holds there);
+                    # ``w`` is never None on this in-loop path.
+                    if (isinstance(wave_result, pd.DataFrame)
+                            and not wave_result.empty
+                            and 't' in (wave_result.index.names or [])):
+                        wave_result = wave_result[
+                            wave_result.index.get_level_values('t') == w
+                        ]
 
                 if isinstance(wave_result, pd.DataFrame):
                     if (

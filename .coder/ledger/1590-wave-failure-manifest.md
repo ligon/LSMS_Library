@@ -186,3 +186,51 @@ in 180.29 seconds (new 37-case regression module, GH866, GH1039, GH1288).
 This includes genuine changed/new country producers, no-output scripts/Make,
 failed-Make write followed by a no-op, and all four same-path stage controls.
 Full exact-head offline CI and source verification remain separate gates.
+
+### Parallel producer attribution revision
+
+Independent review of frozen `3b6a064fa1283376f36a540e8cf26eabe0f16394`
+passed 44 prior controls, then demonstrated a remaining parallel race: two
+legacy fallback scripts snapshot the same country output, and a no-op wave
+mistakes its sibling's write for its own. The original mutually waiting
+counterexample is preserved in the review report. A file change is a valid
+invocation receipt only when sibling legacy producers cannot overlap.
+
+Root approved moving all legacy fallback execution/receipt selection into
+the existing ordered parent loop after `_parallel_waves.prebuild` joins.
+Primary getters keep their parallel shared-folder scheduling; GH535's wave
+filter is unchanged. This deliberately serializes legacy fallback producers,
+including wave-specific ones, to exclude simultaneous contenders for shared
+country outputs without widening eviction or changing direct country-builder
+authority. A separate control verifies actual child PIDs for primary getters,
+all getters complete before any fallback, parent PID and wave order for
+fallbacks, exclusion of the no-op wave, positive sibling output, repaired
+coverage and stable warm convergence. New/changed output controls also run
+with two actual prebuild targets and one or two workers.
+
+The running 41003890 snapshot remains frozen to the previous candidate;
+its source/CI results are prior-candidate evidence, not validation of this
+revision. Exact revised-head source and offline checks follow after freezing.
+
+Verification attempts for this revision: the first selection had 73 passes
+and eight failures in the newly expanded positive controls because their
+selector assumed t was the first index level; selecting the named t level
+corrected the test oracle. The focused scheduler/cache/fallback selection
+then passed 235 cases (10 skipped). Two additional actual shared-folder
+controls passed and preserve GH535 filtering under one and two workers.
+
+Prior-candidate job 41003890 finished 35/35 exact source comparisons, all
+four source fault/repair controls and the metadata hash census. Its offline
+suite had 11,326 passed, one failed, 245 skipped and four xfailed in 1210.70s.
+The old location-index fixture touched a hashless country output and mocked
+a no-op same-path stage, then expected the rejected output to be accepted.
+Root approved making that mocked stage actually rewrite its declared output;
+all original equality/index assertions remain, with reproduction asserted.
+The negative no-op controls remain separate. The affected tests passed 83
+cases; a separately supplied reviewer module failed collection because its
+unqualified fixture import needed the tests directory on PYTHONPATH. That
+invocation is recorded as 83 passed, one collection error; the seven external
+reviewer probes are rerun with the correct explicit import path.
+That separate rerun passed all seven probes in 10.34s. The external original
+parallel counterexample stays preserved; independent adapted no-overlap
+review and full exact-head source/offline checks remain required.

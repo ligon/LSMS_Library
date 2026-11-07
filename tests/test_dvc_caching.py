@@ -512,6 +512,11 @@ class TestDVCCaching:
         cache_path.touch()
 
         cached_df = pd.DataFrame({"col1": [1]}).set_index(pd.Index([0], name="i"))
+        # The touched country cache has no hash and is rejected by the read
+        # gate. A same-path stage must actually produce its declared output;
+        # clean status plus an unchanged file is not a build receipt (GH1590).
+        reproduce = Mock(side_effect=lambda: write_parquet(
+            cached_df, cache_path, absolute_path=True))
 
         stage_key = "testcountry::::test_data"
         stage_info = StageInfo(
@@ -555,6 +560,7 @@ class TestDVCCaching:
                 mock_stage = Mock()
                 mock_stage.addressing = f"{file_part}:{stage_name}"
                 mock_stage.status = Mock(return_value=[])  # clean status
+                mock_stage.reproduce = reproduce
                 return mock_stage
 
             mock_repo.stage = Mock()
@@ -571,6 +577,7 @@ class TestDVCCaching:
         pd.testing.assert_frame_equal(result, cached_df)
         # Note: assertions may need adjustment based on implementation
         assert mock_augment.called
+        reproduce.assert_called_once_with()
 
     def test_panel_ids_dict_cache_written_as_json(
         self,
