@@ -1,0 +1,60 @@
+#+title: Recover the purchase-evidence estimator lane, GitHub 1509
+
+* Scope and authority
+Resume the existing framework blocker after the active repairs; this brief is
+prepared, not dispatched. The maintainer approved holding Burkina's #1442 until
+the estimator filter is resolved. That is not blanket approval of every policy
+choice in the interrupted candidate. The original brief is sweep
+=tasks/framework-1509.md=; preserve its measurement and stop-on-harm requirements.
+
+Do not mutate =/local/job40825266/worktrees/framework-1509= or its saved backup.
+Prepare a fresh isolated worktree from current GitHub development. Read the
+shared prior-art skill and open a new ledger BEFORE code; no task-specific
+1509 ledger was found in the preserved tree. Read the full CONTENTS first for
+each country whose sources or fixtures you use, including LOGBOOK/WAITING/TODO;
+name relevant idiosyncrasies and quote contradictions rather than assuming stale
+documentation. Read food/units/aggregate-labels and cache/fingerprint guidance.
+
+* Preserved implementation and actual failure evidence
+The old branch =isa/framework-1509-purchases-20261105= contains three unlanded
+commits: =cc962ee15= (purchase filter), =3427b74c4= (whole-wave fallback without
+a priced purchase), =a54480dbb= (early exit / measured-quantity optimization).
+Seven dirty files include country notes, AGENTS and the regression test. They
+were backed up under sweep =recovery-20261106/unfinished/=; inspect each delta
+before selectively recovering it. Do not replay unrelated changes or historical
+claims onto current development, especially after #1452's scoped inference work.
+
+The saved final log =reports/framework-1509/logs/tests_kg.out= reports
+2 failed, 2368 passed, 74 skipped, 4 xfailed. Both failures are the new
+=TestDelivered.test_the_ledger_names_the_waves_with_no_priced_purchase= oracle,
+for Uganda and GhanaLSS: =waves[priced.to_numpy()]= receives an object mask with
+NA and raises ValueError. This identifies the observed failure location; it
+does not prove the candidate's policy or implementation correct. Reproduce on
+the new base, distinguish nullable-mask oracle defects from estimator defects,
+and retain explicit missing-value controls. Do not simply delete assertions,
+relabel failures as baseline, or assume all historical xfails are acceptable.
+
+* Definitions requiring evidence and independent review
+- The preserved candidate excludes non-purchases only in waves with a priced
+  purchase; it reads whole waves otherwise (notably GhanaLSS). Source-less
+  frames remain pooled; NA/unknown sources are excluded in strict waves.
+  Treat these as proposed choices. Explain their statistical assumptions,
+  compare to literal purchase-only estimation, and flag any necessary ruling.
+- Restrict estimation evidence without dropping served acquisition rows.
+  Preserve survey_kg, metric, no_kg, size pooling, subset invariance and attrs.
+  Coordinate with landed/current #1452, reusing its scoped inference machinery.
+- Read the current issue/comments and the preserved source summaries first.
+  Reuse valid measurements only with their exact revision/input provenance;
+  regenerate comparisons invalidated by the current code or source changes.
+- Complete the original per-country/wave factor, quantity, price and rung
+  comparisons, source answer-key scoring and harmed-cell report. Demonstrate
+  #1442's derived non-purchase values do not contaminate the estimator under
+  the selected rule. Stop for a concrete evidence memo if harm or an unresolved
+  policy choice prevents the intended filter; do not silently choose a fallback
+  merely because it preserves more old outputs.
+
+Use private L2/shared L1, sanctioned readers, mounted venv and exact import/config
+assertions, pinned BLAS/build workers and modest free compute. No shared rewarm,
+LSMS_NO_CACHE, production-weight change, dependency/fixture change or GitHub writes.
+Deliver tests, full measurement scope, limitations, a residual draft, independent
+review and final CI before PR/authorized development merge handled by root.

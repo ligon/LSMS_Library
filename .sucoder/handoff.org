@@ -1,4 +1,45 @@
 #+title: Handoff, LSMS-ISA sweep
+* Active checkpoint, 2026-11-07: independent reviews underway
+Previous goal turn made progress: item50 approval recorded in =584fee361=.
+This turn reconciled GitHub #1452 to approved policy plus remaining verification
+gates, retaining the original issue and reading back the exact new title/body.
+It remains open; no new product merge is claimed.
+
+#1590 author froze =fbe8c2d735a8a30f4af383d4edc6a14f73a4d8e0=; independent
+review by =local_recovery= reproduced THREE BLOCKERS: a successful no-output
+wave script borrows an old country parquet and falsely completes coverage;
+non-UTF8 updated_ids JSON is swallowed as optional absence; the clean retired
+DVC-stage route can serve a poisoned old cache without checking the new hash.
+Correction and another review are required. Root approved correcting these but
+requires concrete placement before widening country-cache eviction/fallback
+policy. Old candidate evidence (841 distinct targeted cases, author reports all
+35 healthy source comparisons exactly equal) is not final acceptance. Job
+=41003057= then FAILED 1:0 after12m11s: the first real API fault control stopped
+at its pre-hook row-count oracle; remaining controls did not run. Root confirmed
+the terminal state via sacct. Correct the oracle and run source controls plus
+final offline CI on the revised head; do not claim the failed job passed.
+
+#1452 remains frozen at =88b46e717=; =decision_recovery= has its independent
+review assignment in a separate worktree. Source/offline-CI job =41002776= was
+confirmed live. An extra Slurm step initially lacked the source step's FUSE
+mount and failed its yaml preflight before tests; mounting the existing image
+within that step corrected it. No dependency installation or false CI pass.
+
+Weight research has conditional-composite diagnostics and a retained failed
+calibration oracle: IHPS's 48 printed household cells match integer rounding;
+four IHS6 cells differ (max about864 weighted households). Current IHS6 cover
+and roster agree on all household sizes but total53,643 people versus BID53,641.
+A two-person/source-revision explanation is plausible, not established. Keep
+this discrepancy explicit; matching grand totals does not prove matching all
+calibration cells or common target dates. No production policy is selected.
+
+The preserved #1509 log's two failures are both the new delivered-ledger oracle
+indexing with an NA-containing object mask (Uganda/GhanaLSS), not yet a verified
+estimator diagnosis. Recovery brief prepared, not dispatched:
+=.sucoder/tasks/framework-1509-recovery-20261107.org=. The old three commits and
+seven dirty files remain untouched. Whole-wave fallback policy needs evidence,
+not automatic approval inferred from the #1442 hold.
+
 * Active goal checkpoint, 2026-11-07: three lanes progressing
 Goal ACTIVE: resolve ISA issues and shared blockers with reviewed/verified fixes
 and authorized development merges. No master release or shared rewarm yet.
