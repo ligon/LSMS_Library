@@ -1,0 +1,47 @@
+#+title: LSMS-ISA country workers and coordinator queue
+#+date: 2026-11-07T22:07:59.195187+00:00
+
+* Ownership and scheduling
+Root manages priorities, shared dependencies, scientific decisions, review, GitHub publication and development merges. Each country has a stable owner role and a durable queue/checkpoint; the role survives worker restarts. Separate jobs run on the free Slurm account.
+
+All eight workers returned the bounded initial queue reconciliation. Six dispatches succeeded; Burkina Faso and Uganda returned complete required evidence with native exit0 but supervisor exit74, so their infrastructure is recorded as failed. Burkina preservation is warm; Uganda preservation is unverified. Every required report/queue hash was independently verified against its publication manifest. Root acceptance of the recommendations remains pending. Product fixes already in flight remain reserved to their existing workers; country owners propose the next three evidence-backed assignments before implementation. Shared framework changes remain in a separate root-managed lane.
+
+| Country | Owner role | Dispatch ID | Slurm job | Returned task / infrastructure |
+|---------+------------+-------------+-----------+--------------------------------|
+| Burkina_Faso | country-burkina-faso | e5dc01ee92064fc1a0c8913f867e6f0a | 41005103 | completed / failed (native 0, supervisor 74) |
+| Ethiopia | country-ethiopia | ebaa4689a7534165b7b5b1acf4bcd851 | 41005158 | completed / succeeded (native 0, supervisor 0) |
+| Malawi | country-malawi | 30ea1ed494424e38b1773f1e2f5b7e4a | 41005130 | completed / succeeded (native 0, supervisor 0) |
+| Mali | country-mali | ec58a6f0b942430da1baab0e72b86aff | 41005132 | completed / succeeded (native 0, supervisor 0) |
+| Niger | country-niger | 96fb740ab2954290a924ef18fe387061 | 41005134 | completed / succeeded (native 0, supervisor 0) |
+| Nigeria | country-nigeria | 6b65cdcd447b467fa2d48fcf016346e6 | 41005136 | completed / succeeded (native 0, supervisor 0) |
+| Tanzania | country-tanzania | f6aefecb47af4d79a21100c11335b826 | 41005138 | completed / succeeded (native 0, supervisor 0) |
+| Uganda | country-uganda | de460bf09e8845f9ae203f689356eef2 | 41005139 | completed / failed (native 0, supervisor 74) |
+
+* Evidence and controls
+- Registry and receipts: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-20261107/owner-registry.json= and =launches/=.
+- Every worker has a private checkout, native state, runtime, data/config/cache and result repository. Initial tasks have no source-reader credentials or shared L1 and authorize no data builds, tests or product/GitHub writes.
+- Required returns: =queue.json= and =report.md=, source/context hashes, complete scoped issue disposition, named country idiosyncrasies and top-three proposed tasks. Root reviews results; successful infrastructure alone is not acceptance.
+- The existing per-dispatch =MESSAGES_TO_AGENT.txt= / =QUESTIONS_FROM_AGENT.txt= files provide steering. No external messages are sent by country workers.
+- Source is full/nonshallow pinned =8558fefe0=; newer root merges are delivered as explicit context updates. The 182-issue snapshot is a dated input, not a live completion count.
+- Per worker: 2 CPUs, 8G, 90 minutes, free co_carleton/savio3_htc/savio_lowprio. Eight jobs request 16 CPUs and 64G in total, excluding coordinator n0035.savio4.
+
+* Active implementation reservations
+- #1452: merged in PR1597, development0c4004872; issue closed; separate adoption residual1598. Shared re-warm is deferred.
+- #1590: merged in PR1599, developmentc964c6c4f; issue closed; shared re-warm deferred.
+- #1509: bounded comparison/synthetic/current-input phase by finish_1590, no product rule chosen; #1442 held behind it.
+- Malawi food49/50: malawi_revision_food owns frozen5af, source/API and offlineCI; independent162 controls pass. Whole-wave merge and weight decision48 remain held.
+- Mali1594: source tail/repeated-ask diagnosis exists; exact99,999,999 semantics unverified, no mask applied.
+
+* Preserved startup failures
+The first Burkina dispatch preparation timed out cloning the large mirror before any job existed. A complete compact source with identical 92,789 objects / 6,338 ancestors passed full fsck and the unchanged clone helper in19.93s; the second Burkina attempt is listed above.
+Ethiopia attempt1 job41005128 failed143 in the runtime process-inspection guard. Attempt2 was submitted only after explicit terminal evidence, with safeguards unchanged. Both original receipts/diagnostics are preserved.
+
+* Shared queue deduplication
+Issue1510 appears in Burkina Faso, Malawi and Nigeria recommendations: root has assigned ONE shared implementation lane, now being prepared for dispatch. Issue1475/1517 is likewise one shared country-identity lane, not separate country fixes. Issue1528 spans Burkina Faso and Mali and needs coordinated source-specific scope. Queue/context entry totals overlap and must never be summed as unique backlog counts.
+
+* Root workflow
+1. Reconcile each proposed task against current GitHub state, merged work and DECISIONS.
+2. Assign an explicit scope and frozen base; preserve country-local context in its owner report.
+3. Use isolated implementation and independent review, private caches and source-backed checks.
+4. Publish and merge verified green work to development with expected-head pinning.
+5. Update the issue residual/closure and this registry; coordinate the deferred shared re-warm only after prerequisites land.

@@ -1,4 +1,61 @@
 #+title: Handoff, LSMS-ISA sweep
+* Checkpoint, 2026-11-07 22:10 UTC: eight country queues returned; two framework repairs merged
+Latest user steering explicitly endorses sucoder dispatch on other nodes; local
+chat concurrency is not the campaign compute limit. Eight country-owner roles
+now have private dispatched assessments, complete queue.json/report.md and
+required evidence hashes verified against publication manifests. Registry:
+.sucoder/isa-country-workers.org; durable machine record:
+B/country-workers-20261107/owner-registry.json (B is the campaign root).
+Six dispatches succeeded. Burkina and Uganda native0/supervisor74 both delivered
+complete artifacts but infrastructure FAILED; Burkina preservation warm, Uganda
+unverified. Preserve these distinctions. First Ethiopia guard failure retained;
+controlled unchanged-safeguard retry succeeded. No duplicate active jobs claimed.
+Stable ownership means durable role/queue/checkpoint, not an immortal worker.
+All recommendations remain subject to current-state root review. Overlapping
+country/context totals are NOT unique bug counts. Shared1510 proposals from
+three countries are ONE root-owned lane; shared1475/1517 and sold-state1528 also
+need coordinated ownership. finish_1452 is preparing1510 remote task/profile/
+current-source/dry-run; root must review and submit, no submission yet.
+
+PR1597 MERGED: exacthead40ab273553dc6948997c0e21046242cfb3f0a789,
+merge0c40048726331292f26da93f008858a8471f2e96; GH1452 closed completed.
+Followup1598 covers own-country NSU weights Togo/Benin/CotedIvoire2021-22;
+no cross-country borrowing. GH1451 sized metric residual remains separate.
+PR1599 MERGED after green GitHub unit-tests/Windows smoke and no review threads:
+exacthead8c84c9d3ff805fc0b75a6562a7b0d2c2faab6f17,
+merge/current development c964c6c4f25945dc14636fd094893b16b12180b7.
+GH1590 closed completed; exact body/state readback matches. Independent344pass/
+10skip, exact35source frames, five source/API failure-repair controls and full
+isolated offline11334pass/245skip/4xfail support this head. Remote source/DVC/
+docs checks were SKIPPED, not claimed passed. Global orchestrator fingerprint
+movement intentional; shared corpus re-warm and master release STILL DEFERRED.
+
+Malawi food final frozen5af868f3cebd8cb18650711f61f71444d10b14b4 closes two
+review findings (active unknown quantity completeness and numeric-label token
+meaning). Independent final162 controls pass; 1768-factor admission mask stays
+1492admit/276refuse. Source/API/Make/Feature/warm job41005203 and exacthead offline
+CI were RUNNING at checkpoint; author owns them. No edits while actors run.
+A prior10c API harness incorrectly compared intended2024 Quantity_kg changes;
+closed corrected comparisons preserve native/all five old-wave Quantity_kg.
+Old-wave INFERRED factor/kg/price spillovers are real and separately measured:
+unchanged native kg is not unchanged inference. See closed-10c-effects.json.
+After current actors finish, selectively integrate final guard with landed1590
+JSON error/retry/completion logic; never replay an old whole Country file.
+Decision48 production weight policy/whole-wave merge remains HELD. Bounded
+research revision993 and critic closure are complete; no NA/normalization or
+production composite estimator has been approved.
+
+GH1509 plan502672cbd reviewed by root; finish_1590 may now perform bounded
+synthetic/oracle recovery and authenticated current-input comparison on new
+c964 base. Three arms explicitly current/literal purchase-only/unapproved
+fallback. No product default selected; no source-less or whole-wave rescue.
+Evaluate actual normal/tableless evidence frames; preserve1452/scoped NSU,
+exact kg/gates/served-scope attrs. First external-key harm/unresolved policy
+stops product progression with <=12-line concrete evidence memo. GH1442 held.
+Mali1594 bounded diagnosis396f42db retained:55 raw99999999 explain source tail;
+exact missing-code semantics not established, NO MASK. Repeated positive
+seven-day asks are real; representation/authority remains separate decision.
+
 * Recovery checkpoint, 2026-11-07 20:33 UTC: workers resumed from durable state
 The preceding goal work made progress: independent reviews identified and
 corrected framework boundaries, seven-country source comparisons passed,
