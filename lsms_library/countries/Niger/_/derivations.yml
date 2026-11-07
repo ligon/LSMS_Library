@@ -18,8 +18,10 @@ Niger::food_acquired::7day-purchase-at-last-purchase-unit-value:
     unit value of the household's LAST PURCHASE of the item.  NaN where
     s07bq07a is missing or not positive, and NaN where the last purchase was
     made in a different unit from the consumption unit (s07bq07b/s07bq07c vs
-    s07bq03b/s07bq03c): no EHCVM wave ships a unit-conversion table, so there
-    is no exact conversion and NA is the honest answer.  Units are compared on
+    s07bq03b/s07bq03c): this construction converts nothing between units, and
+    NA is the honest answer.  (This entry used to say no EHCVM wave ships a
+    unit-conversion table; 2021-22 does, GH #1452, and it is not used here.)
+    Units are compared on
     the EHCVM numeric code where the label carries one, else on the label with
     case, accents, padding and punctuation folded -- the two variables carry
     DIFFERENT value-label sets inside the same .dta.  Before GH #876 the served
@@ -62,7 +64,8 @@ Niger::food_acquired::7day-purchase-at-last-purchase-unit-value:
         which is a different container and so a different price per unit.
       basis: variable-label
       evidence: >-
-        no EHCVM wave distributes a unit-conversion table;
+        the 2018-19 waves distribute no unit-conversion table, and 2021-22's
+        ehcvm_nsu is not applied to a price;
         lsms_library/categorical_mapping/ehcvm_units.org is a code->label
         codebook with no factors
     - text: >-
@@ -438,4 +441,111 @@ Niger::crop_production::hh-crop-sale-single-row:
     104,959,545 FCFA, each the raw sum (exact s16d repeats dropped first).  Not validated against
     an external total: no document here reports one.
   contents: 'Niger/_/CONTENTS.org, "2026-11-04 -- multi-plot sales (GH #1457)"'
+  since: '2026-11-04'
+
+Niger::food_acquired::nsu-national-unit-weight:
+  waves: ['2018-19', '2021-22']
+  columns: [Quantity_kg]
+  rule: >-
+    Quantity_kg = Quantity x kg_factor, per acquisition source, where kg_factor is the
+    median over ehcvm_nsu_ner2021.dta's rows of the row's (product, unit, size), in grams over 1000.
+    Unit and size are the row's s07bq03b and s07bq03c codes in both waves.  The product
+    is the s07bq01 code in 2021-22, whose numbering the table uses; in 2018-19, whose
+    numbering is a different one, it is found by LABEL, never by code (ehcvm.
+    nsu_product_crosswalk): the same label up to spelling, else through the country's
+    harmonize_food, else the parts of a label listing goods the instrument later split,
+    else the label's stem.  A product reading several table products takes the median of
+    their weights.  Each row's tier is nsu_join in derivation_inputs.  NA, with no key,
+    where no weight is found; where the served unit is Kg or Litre, whose kilograms the
+    label states; and where the row's canonical key is duplicated at the build, because
+    core sums Quantity on such a key and selects any other column.  Those rows stay on the
+    inferred ladder.  No Quantity or u changes.
+  function: lsms_library.ehcvm:derive_nsu_kg_factor
+  inputs: lsms_library.countries.Niger.2021-22._.mapping:inputs_food_acquired_unit_weight
+  raw_variables: [s07bq01, s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, annee, strate, produit, unite, taille, p50, mu]
+  assumptions:
+    - text: >-
+        a key's weight in the table is the weight of that unit of that product in
+        that size, for any row of the wave.  The survey ships the table; the served
+        row's own quantity is untouched.
+      basis: variable-label
+      evidence: >-
+        ehcvm_nsu_ner2021.dta, read by code; unit and size codes agree with s07b_me's on
+        every code both files label, up to spelling.
+    - text: >-
+        national, not by stratum.  Against an independent implied weight, a household's
+        last-purchase unit value over the same stratum's median Kg price with 5+ reports each,
+        the national weight's median absolute log error is 0.22 against the stratum cell's 0.24,
+        within 2x 92.2% against 85.9%.  Row by row this reverses, 0.31 against 0.24, though
+        national stays ahead within 2x (87.8% against 81.8%).  Market Tiya weighings by stratum
+        settle it: national 0.170 / 95.2%, stratum 0.186 / 92.0%, and a stratum's departure from
+        the national weight predicts nothing (slope 0.014).  Over the whole file 99.9% of
+        consumed rows find a weight, 77% a stratum cell; stratum weights would add 7.3% to the
+        kilograms on rows both serve.
+      basis: modelling-choice
+      evidence: >-
+        GH #1452, 2026-11-04.  The check is noisy: a small lot's price per kg runs
+        above a kilogram's, so the implied weight runs high, and it compares the
+        two rules, not either with the truth.
+    - text: >-
+        the file is cumulative, not two annual tables: annee 2021 holds the keys of
+        43% of 2021-22's consumed rows and the whole file 99.9%, and the two years
+        share only 98 of 1,578 keys.  A key's weight comes from its latest annee, so
+        a 2018 weighing serves a 2021-22 row where 2021 did not weigh that key.  The
+        file says nothing about its design and this wave's folder holds no documentation.
+        Mali's BID (s.2.3, Mali's document, not Niger's) describes one that fits: NSU factors
+        collected in 2018/19 "remain valid", with a supplementary collection in 2021 to complete
+        missing units.  Both years use 2021-22's product codes.  On the 98 shared keys, 24
+        disagree by more than 1.5x; they carry 10,673 rows and 31,699 kg.  Of the 119,315
+        consumed rows with a table weight, 65,127 (115,462 kg) read a 2018 weighing and
+        54,188 (62,363 kg) a 2021 one; a row's year is nsu_year in derivation_inputs.
+      basis: modelling-choice
+      evidence: >-
+        ehcvm_nsu_ner2021.dta, s07b_me_ner2021.dta.  (Sel, Sachet, Petit) is the
+        commonest consumed key and exists only in the 2018 rows.  The household
+        check below reads the 2018 rows as well as the 2021 rows on 2021-22 prices:
+        within 2x 92.1% (126 cells) and 96.2% (79 cells).
+    - text: >-
+        mu, the column labelled mean, not p50.  p50 reads 985.6 g on Kg rows: it is
+        a constant 0.9856 on a median (p50 / 0.9856 is an integer on 71% of rows, p50
+        itself on 4%; p50 / mu is exactly 0.9856 on 3,772 of 9,518 rows), and mu reads
+        1000.  Nothing is corrected: mu is a column the survey ships.  A mean is the
+        more exposed to a bad weighing, which the national median then damps.
+      basis: modelling-choice
+      evidence: >-
+        stated-mass rows of the file, mean absolute log error of the national p50 /
+        mu: Kg 0.031 / 0.021, Sac (50 Kg) 0.032 / 0.023, Sac (25 Kg) 0.016 / 0.005,
+        Sac (100 Kg) 0.278 / 0.274.
+    - text: >-
+        2018-19 reads the same weight per key as 2021-22, with the product found by label,
+        because this file's product codes are 2021-22's (126 of the 138 codes the two
+        household files share name different foods).  Of 2018-19's consumed rows 91,411 join
+        on the label, 1,889 as the parts of a bundle, 621 through harmonize_food and 401 on
+        the stem; 98.3% of non-metric served rows read a weight, 60,526 consumed rows from a
+        2018 weighing and 33,796 from a 2021 one.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-04.  Matched items, 2021-22 over 2018-19, median / row-weighted:
+        Kg rows 1.04 / 0.98, inference 1.00 / 1.08, both waves on the table 1.05 / 1.04.
+        Staple cereals among consumers, g per person per day: inference 262 -> 281, table
+        440 -> 442.
+    - text: >-
+        Kg and Litre keep their labels.  Their table rows are not read: a kilogram is
+        a kilogram, and a table litre is not a density (in these tables most oils
+        read exactly 1000 g).
+      basis: modelling-choice
+      evidence: GH #1452, 2026-11-04.  Those rows are the check on the join instead.
+  validated_against: >-
+    the rows whose label states the mass, which the table was not fitted to: the
+    national weight of a Kg row is 1000 g at the median, and the delivered factor
+    reproduces the table read directly from the two files
+    (tests/test_ehcvm_unit_weights.py).  Outside the survey's households: ehcvm_prix_ner2021.dta weighs market
+    lots.  National weight against market grams over 112 (product, unit) keys, at the size
+    nearest the market weight: median abs. log error 0.144, within 2x 94.6%, signed -0.001; 26
+    Tiya keys 0.116 / 96.2%.  Outliers: Poivron frais x2.04, Sorgho x1.28 (Tiya Entier 3,168 g
+    in the table, 2,469 g at market, 2018 rows only), Piment seche x0.60.  Table rows against
+    market per-kg go from 0.735 / 47.6% under the inference to 0.295 / 75.2%, and item medians'
+    correlation with the market from 0.25 to 0.84.
+    Measured kilograms are in Niger/_/CONTENTS.org.
+  contents: 'Niger/_/CONTENTS.org, "EHCVM unit-weight table wired (GH #1452)"'
   since: '2026-11-04'

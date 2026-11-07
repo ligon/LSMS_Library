@@ -215,8 +215,12 @@ class TestConfig:
         m = _mapping(country, wave)
         # Re-pinned GH #1224: the three hooks that sweep mojibake after this
         # call also pass their repair as `decode=` (test_ehcvm_unit_size.py).
+        # Re-pinned GH #1452: the four countries' hooks call the wrapper that adds the
+        # unit weight (test_ehcvm_unit_weights.py), which calls the same function.
         assert re.search(r'_food_acquired_ehcvm\(df, FOOD_ACQUIRED_DERIVATION(,\s*'
-                         r'decode=_decode_mojibake)?\)', m)
+                         r'decode=_decode_mojibake)?\)', m) or re.search(
+            rf"_food_acquired_with_unit_weights\(\s*df, FOOD_ACQUIRED_DERIVATION, "
+            rf"wave='{wave}'(,\s*decode=_decode_mojibake)?\)", m)
         assert f"_derivation_key('{country}')" in m
         assert 'def inputs_food_acquired(wave):' in m
 
@@ -296,9 +300,13 @@ class TestDelivered:
         assert 'Derivation' in fa.columns
         x = fa.xs(wave, level='t', drop_level=False)
         s = x.index.get_level_values('s').astype(str)
-        got = x['Derivation'].notna().to_numpy()
+        # GH #1452: a 2021-22 row of four countries can carry a second key, the
+        # unit weight's, on any source; this test is about the #876 key.
+        got = x['Derivation'].fillna('').str.contains(derivation_key(country), regex=False).to_numpy()
         assert (got == (s == 'purchased')).all()
-        assert set(x.loc[got, 'Derivation'].unique()) == {derivation_key(country)}
+        keys = set(x['Derivation'].dropna().str.split('+').explode())
+        assert keys - {derivation_key(country)} <= {
+            f'{country}::food_acquired::nsu-national-unit-weight'}
 
     @pytest.mark.parametrize('country', sorted(NON_EHCVM_WAVES))
     def test_a_non_ehcvm_wave_of_the_same_country_carries_no_key(self, built, country):
@@ -349,7 +357,8 @@ class TestDelivered:
         assert len(inkind) == n
         assert inkind['Expenditure'].isna().all()
         assert (inkind['Quantity'] > 0).all()
-        assert inkind['Derivation'].isna().all()   # a reported quantity, not a derivation
+        # A reported quantity, not a derivation of it.  GH #1452: its kilograms can be.
+        assert not inkind['Derivation'].fillna('').str.contains(derivation_key(country), regex=False).any()
 
     @pytest.mark.parametrize('country,wave', CELLS)
     def test_own_production_is_untouched_and_valueless(self, built, country, wave):
@@ -359,7 +368,8 @@ class TestDelivered:
                                  .xs('produced', level='s')
         assert len(produced) > 0
         assert produced['Expenditure'].isna().all()
-        assert produced['Derivation'].isna().all()
+        # GH #1452: the unit weight's key can be on this row; the #876 key cannot.
+        assert not produced['Derivation'].fillna('').str.contains(derivation_key(country), regex=False).any()
 
     @pytest.mark.parametrize('country,wave', CELLS)
     def test_every_size_suffix_is_the_countrys_own(self, built, country, wave):
@@ -413,7 +423,7 @@ class TestDelivered:
         assert list(raw.columns) == RAW_VARIABLES
         assert list(raw.index.names) == ['t', 'i', 'j']
         served = built(country).xs(wave, level='t', drop_level=False)
-        served = served[served['Derivation'].notna()]
+        served = served[served['Derivation'].fillna('').str.contains(key, regex=False)]
         served_k = set(served.reset_index().set_index(['t', 'i', 'j']).index)
         missing = served_k - set(raw.index)
         assert not missing, (

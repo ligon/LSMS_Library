@@ -4,7 +4,8 @@ import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
-    food_acquired_ehcvm as _food_acquired_ehcvm,
+    food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
+    inputs_unit_weight as _inputs_unit_weight,
     inputs_last_purchase as _inputs_last_purchase,
 )
 
@@ -28,6 +29,9 @@ from lsms_library.ehcvm import (  # noqa: E402
 def sample(df):
     return _stamp_region_milieu_stratum(df, 'Senegal')
 
+# GH #1452: `Quantity_kg` from the survey's own unit-weight table, national median;
+# which file and column, and why: lsms_library.ehcvm.NSU_TABLES.
+
 
 def inputs_food_acquired(wave):
     """The registry `inputs` callable: raw section-7B answers at (t, i, j).
@@ -40,8 +44,14 @@ def inputs_food_acquired(wave):
     return _inputs_last_purchase('Senegal', wave)
 
 
+def inputs_food_acquired_unit_weight(wave):
+    """The registry `inputs` callable of the unit-weight derivation (GH #1452)."""
+    return _inputs_unit_weight('Senegal', wave)
+
+
 def food_acquired(df):
-    return _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION)
+    return _food_acquired_with_unit_weights(
+        df, FOOD_ACQUIRED_DERIVATION, wave='2021-22')
 from collections import defaultdict
 
 def v(value):

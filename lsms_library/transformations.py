@@ -2357,6 +2357,71 @@ def _inferred_kg_rungs(df, units, seeded, group_levels, item_col, gates, infer):
             'item_contradicting': item_contradicting}
 
 
+def _pooled_kg_rungs(df, units, seeded, group_levels, item_col, gates, infer):
+    """:func:`_inferred_kg_rungs`, and the rows that read their family's size pool.
+
+    GH #1450: an UNSIZED label reads the cell of its base unit pooled over every
+    size.  Sized rows keep the rungs computed on the labels as served, so they
+    cannot move; a frame with no sized sibling for any bare label gets no pool, so
+    nothing else can.  See :data:`_UNIT_SIZE_WORDS`.
+    """
+    rungs = _inferred_kg_rungs(df, units, seeded, group_levels, item_col,
+                               gates, infer)
+    pool_frame, size_pool_rows = _size_pooled_frame(df)
+    if infer and pool_frame is not None:
+        pool_units = pool_frame.index.get_level_values('u').astype(
+            str).str.lower()
+        pooled = _inferred_kg_rungs(pool_frame, pool_units, seeded,
+                                    group_levels, item_col, gates, infer)
+        for name in _KG_RUNG_ARRAYS:
+            rungs[name] = np.where(size_pool_rows, pooled[name], rungs[name])
+    return rungs, size_pool_rows
+
+
+#: ``Derivation`` names whose ``Quantity_kg`` reads a table weighed for some waves of a
+#: country and not others (GH #1452).  Any other ``Quantity_kg`` keeps its place in the
+#: estimate, as a survey's answer about its own row.
+_KG_WAVE_SCOPED_TABLES = ('nsu-national-unit-weight',)
+
+
+def _rows_older_than_their_table(df):
+    """``(mask, frame)`` for the waves a wave-scoped table did not reach, else ``(None, None)``.
+
+    *mask* marks the rows of a wave where no row carries a name in
+    :data:`_KG_WAVE_SCOPED_TABLES`, and *frame* is *df* with ``Quantity_kg`` NA on the
+    rows that do.  An NA ``Quantity_kg`` is what an absent one is to the estimators, so
+    *frame* estimates what *df* would have estimated with the table never wired.  A
+    country with no such key, or no wave without one, gets ``(None, None)`` and one
+    estimate, as before.
+    """
+    if not {'Quantity_kg', 'Derivation'} <= set(df.columns) or 't' not in (df.index.names or []):
+        return None, None
+    from .derivations import MULTI_SEP, parse_key
+
+    def is_scoped(value):
+        for key in value.split(MULTI_SEP):
+            try:
+                _, table, name = parse_key(key)
+            except ValueError:
+                continue
+            if table == 'food_acquired' and name in _KG_WAVE_SCOPED_TABLES:
+                return True
+        return False
+
+    names = df['Derivation'].astype('string')
+    # Parse each distinct key union once.  A substring in another derivation's
+    # name (or country/table slot) must not change an unrelated survey's vote.
+    scoped = {value: is_scoped(value) for value in names.dropna().unique()}
+    read = names.map(scoped).fillna(False).to_numpy(dtype=bool)
+    if not read.any():
+        return None, None
+    waves = df.index.get_level_values('t').astype(str)
+    older = ~waves.isin(pd.unique(waves[read]))
+    if not older.any():
+        return None, None
+    return np.asarray(older), df.assign(Quantity_kg=df['Quantity_kg'].mask(read))
+
+
 def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                     min_reports=FOOD_KG_MIN_REPORTS,
                     min_baseline=FOOD_KG_MIN_BASELINE,
@@ -2453,7 +2518,10 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
     EHCVM row lacks a size; :data:`_UNIT_SIZE_WORDS` has the measurement.  Every
     other label is its own cell and no second estimate is made.
 
-    ONE NUMBER PER ``(j, u)`` OF THE FRAME.  So it is one number per country only
+    ONE NUMBER PER ``(j, u)`` OF THE FRAME.  The #1452 exception keeps a wave
+    without NSU-table kilograms on the estimate with those kilograms removed;
+    it preserves that wave's prior cross-wave pool.  Within each estimate, it
+    is one number per country only
     if the frame holds the whole country, which is what ``serve_waves`` is for
     (GH #1487): ``Country`` passes every wave and names the ones it serves.
 
@@ -2496,20 +2564,20 @@ def food_kg_factors(df, *, volume_as_mass=True, item_col='j', unit_kg=None,
                  tight_tolerance=tight_tolerance,
                  baseline_max_spread=baseline_max_spread)
     infer = have_price and bool(group_levels)
-    rungs = _inferred_kg_rungs(df, units, seeded, group_levels, item_col,
-                               gates, infer)
-    # GH #1450: an UNSIZED label reads the cell of its base unit pooled over
-    # every size.  Sized rows keep the rungs just computed, so they cannot
-    # move; a frame with no sized sibling for any bare label gets no pool, so
-    # nothing else can.  See :data:`_UNIT_SIZE_WORDS`.
-    pool_frame, size_pool_rows = _size_pooled_frame(df)
-    if infer and pool_frame is not None:
-        pool_units = pool_frame.index.get_level_values('u').astype(
-            str).str.lower()
-        pooled = _inferred_kg_rungs(pool_frame, pool_units, seeded,
-                                    group_levels, item_col, gates, infer)
+    rungs, size_pool_rows = _pooled_kg_rungs(df, units, seeded, group_levels,
+                                             item_col, gates, infer)
+    # GH #1452, option B (ruling @ligon 2026-11-05): a row of a wave no
+    # wave-scoped table reached reads the estimate with that table's kilograms
+    # taken out, so wiring a table to the newer waves leaves an older wave's
+    # factors where they were.
+    older, tableless = _rows_older_than_their_table(df)
+    if infer and older is not None:
+        prior, _ = _pooled_kg_rungs(tableless, units, seeded, group_levels,
+                                    item_col, gates, infer)
         for name in _KG_RUNG_ARRAYS:
-            rungs[name] = np.where(size_pool_rows, pooled[name], rungs[name])
+            rungs[name] = np.where(older, prior[name], rungs[name])
+        rungs['contradicting'] = {**prior['contradicting'],
+                                  **rungs['contradicting']}
     # GH #1487: the estimators above read every row; everything below reads the
     # rows a ``serve_waves=`` request serves, so the frame, the partition, the
     # other attrs and the row-level warnings all describe those rows.  What an

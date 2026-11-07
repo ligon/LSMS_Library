@@ -91,11 +91,12 @@ NaN, never a guess, in two cases:
 
 * ``s07bq07a`` is 0, negative or missing -- there is no unit value to compute;
 * the last purchase was made in a DIFFERENT unit from the one the consumption
-  was reported in (``s07bq07b/c`` vs ``s07bq03b/c``).  No EHCVM wave ships a
-  unit-conversion table -- ``lsms_library/categorical_mapping/ehcvm_units.org``
-  is a code->label codebook with no factors, and the only conversion files in
-  these countries are the 2021 West-African *calorie* tables -- so there is no
-  exact conversion to apply and the honest answer is NA.
+  was reported in (``s07bq07b/c`` vs ``s07bq03b/c``).  This valuation converts
+  nothing.  The 2018-19 waves ship no unit-conversion table
+  (``lsms_library/categorical_mapping/ehcvm_units.org`` is a code->label codebook
+  with no factors), and four 2021-22 waves' ``ehcvm_nsu`` table (below; this
+  sentence used to say no wave ships one) weighs a unit, which is not used to
+  move a price between units.  So the honest answer is NA.
 
 Unit identity is compared on :func:`_unit_key`, not on the raw label, because
 the two variables carry DIFFERENT value-label sets inside the same ``.dta``:
@@ -123,11 +124,78 @@ because the suffix would cost the kg ladder its reading of that label and
 ``transformations.py`` is not this module's to change.  No quantity is
 rescaled and no weight is attached to a size.  ``Expenditure`` is untouched:
 :func:`unit_match` reads the unit and size columns, not ``u``.
+
+The survey's own unit weights (GH #1452)
+----------------------------------------
+Burkina Faso, Mali, Niger and Senegal 2021-22 ship ``ehcvm_nsu_*2021.dta``:
+product x unit x size -> grams, from a market survey that weighs the product
+(Mali's BID s.3.4; Cote d'Ivoire's NSU questionnaire).  Mali's BID s.2.3 says the
+factors were collected in 2018/19, "remain valid", and were supplemented in 2021;
+it is Mali's document, and Niger's and Senegal's folders hold none.
+:func:`food_acquired_with_unit_weights` wraps :func:`food_acquired_ehcvm` for those
+four waves and serves a per-row ``Quantity_kg`` from it, which the food kg ladder
+reads first (``survey_kg``).  It is a wrapper, and not a change to
+:func:`food_acquired_ehcvm`, so that the other eight waves' import closures (and
+hashes) do not move.
+
+*National, not by stratum: a modelling choice.*  :func:`nsu_unit_weights` takes the
+median of a key's rows across the table.  Against a household's last-purchase unit
+value over the same stratum's median ``Kg`` price, cells with 5+ reports each, the
+national weight's median absolute log error is 0.27 against the stratum cell's 0.44
+in Burkina Faso, 0.49 against 0.51 in Mali, 0.22 against 0.24 in Niger; Senegal's
+stratum file repeats its national table 28 times.  The same test row by row narrows
+in Burkina and Mali and REVERSES in Niger, 0.31 against 0.24, though the national
+weight stays ahead within 2x (87.8% against 81.8%).  Against an outside reference,
+Niger's market weighings of ``Tiya``, national beats stratum, 0.170 against 0.186,
+and a stratum's departure from the national weight predicts nothing (slope 0.014).
+The national weight also serves more rows: stratum cells cover 75% / 87% / 77% of
+Burkina's / Mali's / Niger's consumed rows, the national weights 90% / 100% / 99.9%.
+Stratum weights would give 1.6-7.3% more kilograms on the rows both rules serve.
+
+*Kg and Litre keep their labels.*  Their table rows are not used
+(:data:`_EXACT_METRIC_LABELS`): a kilogram is a kilogram, and a table litre is
+not a density (oils at exactly 1000 g, Niger's ``Lait caille`` at 4371 g).
+Those rows are the check on the join instead: the national table weight of a
+``Kg`` row is 1000 g at the median in all four countries.  A container that
+states a size (``Sac (25 Kg)``, ``Paquet (250 g)``) does read the table, because
+the table is what such a container held.  It agrees with the label on every
+stated size but one, Senegal's ``Paquet (250 g)``, where it reads a median 25 g.
+The label is the defect: the market file weighs "paquet de 25g" tea at 25 g on 477
+observations, which owes nothing to household prices, and the same unit is sized
+Petit / Moyen / Grand.  Row by row, households put the table within 2x on 75-85% of
+those rows and the label on 12-13% (methods in ``Senegal/_/CONTENTS.org``).
+:class:`StatedLabelOverruledWarning` reports such a disagreement when the wave builds.
+
+*2018-19 reads the same table, by label (ruling @ligon 2026-11-04).*  The factors were
+mostly collected in that round, and one label should not carry two weights across the
+boundary.  The wave reads the same weight per key that 2021-22 reads.  But a product CODE
+does not carry over: the tables use 2021-22's numbering, in both of Niger's years, and most
+product codes the two waves' household files share carry different labels (Burkina Faso 124
+of 135, Mali 123 of 134, Niger 126 of 138, Senegal 128 of 140; Niger's 118 is ``Sel`` in
+2018-19 and ``Pate d'arachide`` in 2021-22).  So
+:func:`nsu_product_crosswalk` joins the PRODUCT by label, in tiers, and never falls back on
+the code.  UNIT and SIZE codes do mean the same in both waves (tested), so they are read as
+codes.  A row whose product finds no label stays on the inferred ladder.
+
+*Earlier waves do not read it (option B, ruling @ligon 2026-11-05).*  Burkina Faso 2014 and
+Mali 2014-15 keep the estimate they had: :func:`lsms_library.transformations.food_kg_factors`
+estimates their rows with this key's ``Quantity_kg`` taken out, because a survey kilogram
+otherwise leaves the per-unit estimate, and with both newer waves on the table an older wave
+would estimate from itself alone.  The name it scopes on is :data:`NSU_DERIVATION_NAME`.
+
+No row is rescaled and no ``u`` changes.  A row the table has no weight for, and
+a row whose key is duplicated at the hook, keep ``Quantity_kg`` NA and stay on
+the inferred ladder: ``country._normalize_dataframe_index`` SUMS ``Quantity``
+and ``Expenditure`` on a duplicated key and SELECTS any other column, so a
+kilogram on such a row would describe one row of a summed group.  That loses a
+table kilogram on 1,218 rows (Mali 891, Niger 8, Senegal 262, Burkina Faso 57), at
+most 0.54% of a country's table kilograms.
 """
 from __future__ import annotations
 
 import re
 import unicodedata
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -161,6 +229,11 @@ __all__ = [
     "MYVARS", "UnitSizeLabelError", "carry_unit_size", "derivation_key",
     "derive_ehcvm_purchase_value", "food_acquired_ehcvm",
     "inputs_last_purchase", "served_unit_labels", "size_label", "sized_unit",
+    "NSU_COUNTRIES", "NSU_DERIVATION_NAME", "NSU_JOIN_TIERS", "NSU_RAW_VARIABLES",
+    "NSU_TABLES", "NSU_TABLE_WAVE", "nsu_product_crosswalk",
+    "StatedLabelOverruledWarning", "UnitWeightJoinError", "derive_nsu_kg_factor",
+    "food_acquired_with_unit_weights", "inputs_unit_weight",
+    "nsu_derivation_key", "nsu_unit_weights",
 ]
 
 #: The eight countries whose ``food_acquired`` comes from EHCVM section 7B.
@@ -496,9 +569,8 @@ def derive_ehcvm_purchase_value(quantity, quantity_unit, quantity_size,
     last_size)`` (``s07bq07b``/``s07bq07c``).
 
     Returns NaN -- never a guess -- where the unit value cannot be formed
-    (``last_quantity`` missing or <= 0) or where the two units differ: no
-    EHCVM wave ships a unit-conversion table, so there is no exact conversion
-    and the survey does not support one.
+    (``last_quantity`` missing or <= 0) or where the two units differ: this
+    valuation converts nothing between units (see the module docstring).
 
     No options, by design (``SkunkWorks/derived_values.org``): a cached
     parquet must be one identifiable construction.  A user who wants the raw
@@ -809,3 +881,530 @@ def _normalise_index_as_served(frame: pd.DataFrame, wave_obj) -> pd.DataFrame:
         # An index-only frame, so the normaliser cannot touch a raw column.
         frame.index = fn(pd.DataFrame(index=frame.index)).index
     return frame
+
+
+# ---------------------------------------------------------------------------
+# the survey's own unit weights, 2021-22 (GH #1452)
+# ---------------------------------------------------------------------------
+
+#: The countries whose 2021-22 wave ships ``ehcvm_nsu_*2021.dta``.
+NSU_COUNTRIES = ("Burkina_Faso", "Mali", "Niger", "Senegal")
+
+#: Name slot of the registry key: one record per country, one shared function.
+NSU_DERIVATION_NAME = "nsu-national-unit-weight"
+
+#: The section-7B variables the unit weight reads, in questionnaire order.
+NSU_RAW_VARIABLES = ["s07bq01", "s07bq03a", "s07bq03b", "s07bq03c", "s07bq04",
+                     "s07bq05"]
+
+
+#: The wave whose product codes the tables use, and whose source they align with.
+NSU_TABLE_WAVE = "2021-22"
+
+#: What each country's table is.  Why each column, CONTENTS.org and the registry:
+#: Burkina Faso's ``poids_moyen`` because its two labels are swapped; Niger's ``mu``
+#: because ``p50`` is scaled, and ``annee`` because the file is cumulative; Senegal's
+#: ``_nat`` because its three files are one table.
+NSU_TABLES = {
+    "Burkina_Faso": dict(table="ehcvm_nsu_bfa2021.dta", product="codpr", unit="uniteID",
+                         size="tailleID", weight="poids_moyen", year=None, names=None,
+                         sources={"2018-19": "s07b_me_bfa2018.dta",
+                                  "2021-22": "s07b_me_bfa2021.dta"}),
+    "Mali": dict(table="ehcvm_nsu_mli2021.dta", product="produitID", unit="uniteID",
+                 size="tailleID", weight="poids", year=None, names=None,
+                 sources={"2018-19": "s07b_me_mli2018.dta",
+                          "2021-22": "s07b_me_mli2021.dta"}),
+    "Niger": dict(table="ehcvm_nsu_ner2021.dta", product="produit", unit="unite",
+                  size="taille", weight="mu", year="annee", names=None,
+                  sources={"2018-19": "s07b_me_ner2018.dta",
+                           "2021-22": "s07b_me_ner2021.dta"}),
+    "Senegal": dict(table="ehcvm_nsu_sen2021_nat.dta", product="produitID", unit="uniteID",
+                    size="tailleID", weight="poids", year=None, names="produitNom",
+                    sources={"2018-19": "s07b_me_sen2018.dta",
+                             "2021-22": "s07b_me_sen2021.dta"}),
+}
+
+#: How a row's product found its table weight.  ``code``: 2021-22, whose codes are the
+#: table's.  The rest are 2018-19's label tiers, tried in this order: ``label``, the
+#: wave's label equals the table's or 2021-22's label for a table code, up to spelling;
+#: ``harmonized``, the two meet through the country's ``harmonize_food``; ``parts``, the
+#: label lists goods the instrument later split (``Aubergine, Courge/Courgette``), and
+#: reads all of them; ``stem``, they agree before the first ``(``, ``,`` or ``/``, which
+#: is what truncated labels need (Mali's ``Cube alimentaire (Maggi, Ju``).
+NSU_JOIN_TIERS = ("code", "label", "harmonized", "parts", "stem")
+
+#: A label whose parts are not separated by punctuation.  One entry, large enough to
+#: name: sugar is 5,865 of Burkina Faso's and 6,547 of Mali's 2018-19 consumed rows.
+_NSU_BUNDLES = {"sucre poudre ou morceaux": ("sucre poudre", "sucre morceaux",
+                                              "sucre en poudre", "sucre en morceaux")}
+
+
+class UnitWeightJoinError(Exception):
+    """The wide ``food_acquired`` frame is not the source file, row for row.
+
+    Subclasses ``Exception`` for the reason :class:`UnitSizeLabelError` does:
+    the derived-table paths catch ``RuntimeError`` / ``ValueError`` /
+    ``KeyError`` and would quietly retry another build.
+    """
+
+
+class StatedLabelOverruledWarning(UserWarning):
+    """A unit-weight table disagrees with the mass a unit's own label states.
+
+    ``survey_kg`` outranks ``metric`` in the food ladder, so nothing else reports
+    this: ``transformations.StatedVsInferredKgWarning`` compares a label with an
+    INFERRED factor.  Raised when the wave builds, so a warm read does not repeat
+    it; the same comparison stays available as ``stated_kg`` beside
+    ``nsu_kg_per_unit`` in ``Country(c).derivation_inputs(key)``.
+    """
+
+
+#: How far a table weight may sit from a label's stated mass before the build says
+#: so.  Senegal's ``Paquet (250 g)`` sits at 10x; every other stated size in the
+#: four tables sits within 2x at the median.
+STATED_LABEL_TOLERANCE = 2.0
+
+#: The stated masses and volumes in the four countries' unit labels.  A copy of the
+#: part of ``transformations._EXPLICIT_METRIC_PATTERNS`` they need, for the reason
+#: :data:`_EXACT_METRIC_LABELS` is a copy; ``tests/test_ehcvm_unit_weights.py`` fails
+#: if it reads any of those labels differently from ``_parse_explicit_metric``.
+_STATED_QUANTITY = re.compile(
+    r"(?<![\d.,])(\d+(?:,\d+)?)\s*"
+    r"(kilogrammes?|kilograms?|kgs?|grammes?|grams?|gms?|grs?|g|centilitres?|cl|"
+    r"millilitres?|ml|litres?|liters?|ltrs?|lts?|l)\b", re.IGNORECASE)
+_STATED_SCALE = (("k", 1.0), ("gr", 1e-3), ("gm", 1e-3), ("g", 1e-3), ("c", 1e-2),
+                 ("m", 1e-3), ("l", 1.0))
+
+
+def _stated_kg(label) -> float:
+    """The kilograms (or litres) a served unit label states, else NaN."""
+    if not isinstance(label, str):
+        return np.nan
+    m = _STATED_QUANTITY.search(label)
+    if m is None:
+        return np.nan
+    unit = m.group(2).lower()
+    scale = next(v for k, v in _STATED_SCALE if unit.startswith(k))
+    return float(m.group(1).replace(",", ".")) * scale
+
+
+def _report_overruled_labels(country: str, wave: str, labels, factor) -> None:
+    """Warn where a table weight sits far from the mass the row's label states."""
+    frame = pd.DataFrame({"u": np.asarray(labels, dtype=object),
+                          "factor": np.asarray(factor, dtype=float)}).dropna()
+    frame["stated"] = frame["u"].map(_stated_kg)
+    frame = frame[frame["stated"] > 0]
+    if frame.empty:
+        return
+    ratio = frame["factor"] / frame["stated"]
+    wide = (ratio > STATED_LABEL_TOLERANCE) | (ratio < 1 / STATED_LABEL_TOLERANCE)
+    if not wide.any():
+        return
+    by_unit = pd.DataFrame({"u": frame["u"], "wide": wide, "ratio": ratio}).groupby("u").agg(
+        rows=("wide", "size"), wide=("wide", "sum"), median=("ratio", "median"))
+    by_unit = by_unit[by_unit["wide"] > 0].sort_values("wide", ascending=False)
+    text = "; ".join(f"{u!r} {int(r.wide):,} of {int(r.rows):,} rows, median table / label "
+                     f"{r['median']:.2f}" for u, r in by_unit.iterrows())
+    warnings.warn(StatedLabelOverruledWarning(
+        f"{country} {wave}: the unit-weight table overrules a stated label by more than "
+        f"{STATED_LABEL_TOLERANCE:g}x: {text}.  The table is served; compare stated_kg "
+        f"with nsu_kg_per_unit in derivation_inputs (GH #1452)."), stacklevel=3)
+
+
+def nsu_derivation_key(country: str) -> str:
+    """``'<country>::food_acquired::nsu-national-unit-weight'``."""
+    if country not in NSU_COUNTRIES:
+        raise ValueError(f"{country!r} ships no EHCVM unit-weight table: {NSU_COUNTRIES}")
+    return f"{country}::food_acquired::{NSU_DERIVATION_NAME}"
+
+
+def nsu_unit_weights(table: pd.DataFrame, *, product: str, unit: str, size: str,
+                     weight: str, year: str | None = None) -> pd.Series:
+    """Kilograms per unit, indexed ``(product, unit, size)`` by numeric code.
+
+    ``table`` is the file read with ``convert_categoricals=False``.  A key's
+    weight is the MEDIAN of its positive rows across the table, in grams over
+    1000: one number per key, from however many strata the table has.  A
+    duplicated (key, stratum) cell (34 in Burkina Faso, 10 in Mali, and the two
+    rows of each disagree) simply contributes both rows.
+
+    ``year`` names a column for a table that holds several rounds' weighings
+    (Niger's ``annee``): a key's weight then comes from its latest year only.
+    """
+    if year is not None:
+        tab = table[[product, unit, size, weight, year]].copy()
+    else:
+        tab = table[[product, unit, size, weight]].copy()
+    w = pd.to_numeric(tab[weight], errors="coerce")
+    keep = (w > 0) & tab[[product, unit, size]].notna().all(axis=1)
+    tab = tab[keep].assign(**{weight: w[keep].astype(float)})
+    for col in (product, unit, size):
+        tab[col] = tab[col].astype(float).astype("int64")
+    keys = [product, unit, size]
+    if year is not None:
+        latest = tab.groupby(keys)[year].transform("max")
+        tab = tab[tab[year] == latest]
+    out = tab.groupby(keys)[weight].median() / 1000.0
+    out.index.names = ["product", "unit", "size"]
+    return out.rename("kg_per_unit")
+
+
+def derive_nsu_kg_factor(product, unit, size, served_unit, weights: pd.Series) -> np.ndarray:
+    """Kilograms per unit for each row, from the survey's own table; NaN otherwise.
+
+    ``product``, ``unit`` and ``size`` are the row's numeric ``s07bq01``,
+    ``s07bq03b`` and ``s07bq03c``; ``served_unit`` the bare ``u`` label the
+    Country API serves for its unit; ``weights`` is :func:`nsu_unit_weights`.
+
+    NaN -- and so the inferred ladder -- where the table has no row for the key
+    or a code is missing, and where the served unit is an exact metric label
+    (``Kg``, ``Litre``), whose kilograms the label states.  The served
+    ``Quantity_kg`` is this factor times the row's own quantity
+    (``food_acquired_to_canonical``'s ``kg_factor``), for each acquisition
+    source separately, so it sums like the quantity it was built from.
+
+    No options, by design (``SkunkWorks/derived_values.org``).  A user who
+    wants a stratum's cell or a different column calls
+    ``Country(c).derivation_inputs(key)`` and re-derives.
+    """
+    codes = [pd.to_numeric(pd.Series(np.ravel(x)), errors="coerce").fillna(-1)
+             .astype("int64").to_numpy() for x in (product, unit, size)]
+    found = weights.reindex(pd.MultiIndex.from_arrays(codes)).to_numpy(dtype=float)
+    labels = pd.Series(np.ravel(served_unit), dtype=object)
+    metric = labels.map(lambda s: isinstance(s, str)
+                        and s.strip().lower() in _EXACT_METRIC_LABELS).to_numpy(dtype=bool)
+    return np.where(metric, np.nan, found)
+
+
+def _label_text(value):
+    """A label with its mojibake and its code prefix repaired, or ``None``."""
+    if not isinstance(value, str):
+        return None
+    text = value.replace("&nbsp;", " ").replace("\u00c5__", "oe").strip()
+    try:
+        text = text.encode("latin-1").decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        pass
+    for mark in ("\u0153", "\u0152", "\x9c", "\x8c"):
+        text = text.replace(mark, "oe")
+    return _SIZE_CODE_PREFIX.sub("", text).strip() or None
+
+
+def _label_key(value):
+    """:func:`_label_text` without accents, case or punctuation, or ``None``."""
+    text = _label_text(value)
+    if text is None:
+        return None
+    text = "".join(ch for ch in unicodedata.normalize("NFKD", text)
+                   if not unicodedata.combining(ch))
+    return re.sub(r"[^a-z0-9]+", " ", text.lower()).strip() or None
+
+
+def _label_stem(value):
+    """The key of a label's text before its first ``(``, ``,`` or ``/``."""
+    text = _label_text(value)
+    return None if text is None else _label_key(re.split(r"[(,/]", text, maxsplit=1)[0])
+
+
+def _label_parts(value) -> list:
+    """The keys of the goods a label lists: its text outside parentheses, split on
+    ``,`` and ``/``.  Empty for a label that lists one good."""
+    text = _label_text(value)
+    if text is None:
+        return []
+    bundled = _NSU_BUNDLES.get(_label_key(text))
+    if bundled:
+        return list(bundled)
+    parts = re.split(r"[,/]", re.sub(r"\(.*?(\)|$)", " ", text))
+    keys = [_label_key(part) for part in parts]
+    keys = [key for key in keys if key]
+    return keys if len(keys) > 1 else []
+
+
+def nsu_product_crosswalk(wave_labels: dict, table_labels: dict, harmonize=None) -> pd.DataFrame:
+    """Which table products each of a wave's product codes reads, joined by LABEL.
+
+    ``wave_labels`` is ``{code: label}`` for the wave's ``s07bq01``; ``table_labels``
+    ``{table code: labels}``, every spelling known for that code; ``harmonize``
+    ``{label key: preferred label}``, the country's ``harmonize_food``.  Returns one row
+    per (``wave_code``, ``table_code``) pair with the ``tier`` it was found on
+    (:data:`NSU_JOIN_TIERS`).  A code's first tier with any match wins, and several
+    matching table codes are all kept: 2018-19's ``Sucre (poudre ou morceaux)`` reads both
+    of 2021-22's sugars.
+
+    The codes themselves are never compared.  That is the point: 118 is ``Sel`` in Niger's
+    2018-19 file and ``Pate d'arachide`` in the table.
+    """
+    harmonize = harmonize or {}
+
+    def preferred(label):
+        return harmonize.get(_label_key(label), label)
+
+    def by_label(label):
+        return [_label_key(label)]
+
+    def by_harmonized(label):
+        return [_label_key(preferred(label))]
+
+    def by_stem(label):
+        return [_label_stem(label), _label_stem(preferred(label))]
+
+    rows = []
+    for tier, keys_of in (("label", by_label), ("harmonized", by_harmonized),
+                          ("parts", by_label), ("stem", by_stem)):
+        index: dict = {}
+        for code, labels in table_labels.items():
+            for label in labels:
+                # A part names a good as the table does, or its stem: 2021-22's own
+                # label for aubergine is the truncated ``Aubergine,``.
+                for key in keys_of(label) + ([_label_stem(label)] if tier == "parts" else []):
+                    if key:
+                        index.setdefault(key, set()).add(code)
+        done = {r[0] for r in rows}
+        for code, label in wave_labels.items():
+            if code in done:
+                continue
+            if tier == "parts":
+                hits = set().union(*[index.get(key, set()) for key in _label_parts(label)] or [set()])
+                rows.extend((code, hit, tier) for hit in sorted(hits))
+                continue
+            for key in keys_of(label):
+                hits = index.get(key or "", ())
+                if hits:
+                    rows.extend((code, hit, tier) for hit in sorted(hits))
+                    break
+    return pd.DataFrame(rows, columns=["wave_code", "table_code", "tier"])
+
+
+def _nsu_walk(country: str, wave: str, tab: pd.DataFrame) -> pd.DataFrame:
+    """:func:`nsu_product_crosswalk` for one older wave, from the files' own labels.
+
+    ``tab`` is the country's table as read.  ``tests/test_ehcvm_unit_weights.py`` pins
+    what this returns outside the ``label`` tier: those rows depend on the country's
+    ``harmonize_food``, so a later fold there moves kilograms here.
+    """
+    from .country import Country, _categorical_key_column
+    from .local_tools import get_categorical_mapping
+    from .paths import countries_root
+
+    spec = NSU_TABLES[country]
+    root = countries_root() / country
+    table_path = root / NSU_TABLE_WAVE / "Data" / spec["table"]
+    wave_labels = get_categorical_mapping(str(root / wave / "Data" / spec["sources"][wave]))["s07bq01"]
+    wave_labels = {int(c): lab for c, lab in wave_labels.items()}
+    own = get_categorical_mapping(str(root / NSU_TABLE_WAVE / "Data" / spec["sources"][NSU_TABLE_WAVE]))["s07bq01"]
+    table_labels: dict = {}
+    for code in tab[spec["product"]].dropna().astype(float).astype("int64").unique():
+        table_labels[int(code)] = [own.get(int(code))]
+    if spec["names"] is not None:
+        for code, name in zip(tab[spec["product"]].astype(float).astype("int64"), tab[spec["names"]]):
+            table_labels[int(code)].append(name)
+    else:
+        named = get_categorical_mapping(str(table_path)).get(spec["product"], {})
+        for code, name in named.items():
+            if int(code) in table_labels:
+                table_labels[int(code)].append(name)
+    food = Country(country).categorical_mapping.get("harmonize_food")
+    harmonize = {}
+    if food is not None:
+        key = _categorical_key_column(food)
+        harmonize = {_label_key(a): b for a, b in zip(food[key], food["Preferred Label"])
+                     if _label_key(a) and isinstance(b, str) and b.strip()}
+    return nsu_product_crosswalk(wave_labels, table_labels, harmonize)
+
+
+def _nsu_read(country: str, wave: str):
+    """The source with its codes, and the weights keyed on THIS wave's product codes.
+
+    Returns ``(raw, weights, years, tiers)``.  ``weights`` is :func:`nsu_unit_weights`,
+    with the product level translated by :func:`nsu_product_crosswalk` where the wave is
+    not the table's own; a code reading several table products takes the median of their
+    weights.  ``years`` is the same shape, the year of the latest weighing behind it, or
+    ``None``.  ``tiers`` is ``{wave code: tier}``, empty on the table's own wave.
+    """
+    from .local_tools import get_dataframe
+    from .paths import countries_root
+
+    spec = NSU_TABLES[country]
+    root = countries_root() / country
+    raw = get_dataframe(root / wave / "Data" / spec["sources"][wave], convert_categoricals=False)
+    table_path = root / NSU_TABLE_WAVE / "Data" / spec["table"]
+    tab = get_dataframe(table_path, convert_categoricals=False)
+    keyed = dict(product=spec["product"], unit=spec["unit"], size=spec["size"],
+                 weight=spec["weight"], year=spec["year"])
+    weights = nsu_unit_weights(tab, **keyed)
+    years = None
+    if spec["year"] is not None:
+        good = tab[pd.to_numeric(tab[spec["weight"]], errors="coerce") > 0].dropna(
+            subset=[spec["product"], spec["unit"], spec["size"]])
+        years = good.assign(**{c: good[c].astype(float).astype("int64")
+                               for c in (spec["product"], spec["unit"], spec["size"])}
+                            ).groupby([spec["product"], spec["unit"], spec["size"]])[spec["year"]].max()
+        years.index.names = weights.index.names
+    if wave == NSU_TABLE_WAVE:
+        return raw, weights, years, {}
+
+    walk = _nsu_walk(country, wave, tab)
+
+    def translate(series, how):
+        frame = series.rename("value").reset_index().merge(
+            walk, left_on="product", right_on="table_code")
+        out = getattr(frame.groupby(["wave_code", "unit", "size"])["value"], how)()
+        out.index.names = ["product", "unit", "size"]
+        return out
+
+    return (raw, translate(weights, "median").rename("kg_per_unit"),
+            None if years is None else translate(years, "max"),
+            dict(zip(walk["wave_code"], walk["tier"])))
+
+
+def _served_labels(country: str, df_u, decode=None) -> pd.Series:
+    """The bare ``u`` the Country API serves for each row's raw label."""
+    u = pd.Series(np.asarray(df_u, dtype=object))
+    if decode is not None:
+        u = u.map(lambda v: decode(v) if isinstance(v, str) else v)
+    uniq = pd.unique(u.dropna().to_numpy())
+    return u.map(dict(zip(uniq, served_unit_labels(country, uniq))))
+
+
+def _nsu_factor(df: pd.DataFrame, country: str, wave: str, decode=None) -> np.ndarray:
+    """:func:`derive_nsu_kg_factor` for each row of the wide frame ``df``.
+
+    The wide frame carries value LABELS and they are not what the table is keyed on, so
+    the unit and size come as CODES, and on the table's own wave the product too, read
+    from the source itself.  That read is matched to ``df`` by position, which holds only
+    if ``df`` is still the file row for row, so it is checked on two of the file's
+    columns and refused otherwise.
+    """
+    raw, weights, _, _ = _nsu_read(country, wave)
+    source = NSU_TABLES[country]["sources"][wave]
+    for mine, theirs in (("Quantity", "s07bq03a"), ("LastPurchaseValue", "s07bq08")):
+        a = pd.to_numeric(df[mine], errors="coerce").to_numpy(dtype=float)
+        b = pd.to_numeric(raw[theirs], errors="coerce").to_numpy(dtype=float)
+        if not np.array_equal(a, b, equal_nan=True):
+            raise UnitWeightJoinError(
+                f"{country} {wave}: the wide food_acquired frame is not {source} "
+                f"row for row ({mine} != {theirs}), so its codes cannot be read "
+                f"by position")
+    labels = _served_labels(country, df.index.get_level_values("u"), decode)
+    factor = derive_nsu_kg_factor(raw["s07bq01"], raw["s07bq03b"], raw["s07bq03c"],
+                                  labels, weights)
+    _report_overruled_labels(country, wave, labels, factor)
+    return factor
+
+
+def food_acquired_with_unit_weights(df: pd.DataFrame, key: str, *, wave: str,
+                                    drop_columns=("visit",), decode=None) -> pd.DataFrame:
+    """:func:`food_acquired_ehcvm` with a per-row ``Quantity_kg`` from the table.
+
+    ``key`` is the wave's #876 key.  Rows that get kilograms also carry
+    :func:`nsu_derivation_key` in ``Derivation``, joined to any key already
+    there (``+``), on all three acquisition sources.  Everything else about the
+    frame is what :func:`food_acquired_ehcvm` returns.
+
+    A row whose canonical key is duplicated here keeps ``Quantity_kg`` NA and no
+    new key: see the module docstring.  It needs no reducer, and it means no
+    served kilogram is touched by the core collapse that follows.
+    """
+    from .derivations import union_keys
+
+    country = _country_of(key)
+    factor = _nsu_factor(df, country, wave, decode=decode)
+    out = food_acquired_ehcvm(df.assign(kg_factor=factor), key,
+                              drop_columns=drop_columns, decode=decode)
+    kg = pd.to_numeric(out["Quantity_kg"], errors="coerce").to_numpy(dtype=float)
+    kg = np.where(out.index.duplicated(keep=False), np.nan, kg)
+    out["Quantity_kg"] = kg
+
+    weight_key = nsu_derivation_key(country)
+    current = out[DERIVATION_COLUMN].astype(object)
+    joined = {v: union_keys([v, weight_key]) for v in current.dropna().unique()}
+    stamped = current.map(joined).where(current.notna(), weight_key)
+    out[DERIVATION_COLUMN] = pd.Series(
+        np.where(np.isfinite(kg), stamped.to_numpy(dtype=object),
+                 current.to_numpy(dtype=object)),
+        index=out.index, dtype="string")
+    return out
+
+
+def _extracted_units(country: str, wave: str, quantity) -> np.ndarray:
+    """``u`` for each source row, as the wave's own extraction hands it to the hook.
+
+    The wave's declared ``u`` (its ``mappings:`` included), read by the same grabber
+    as the table, with the served index rewrites (Niger's mojibake) applied.  Not
+    :func:`inputs_last_purchase`, which every EHCVM country reads and which holds the
+    unit as a raw answer.  ``quantity`` is the source's ``s07bq03a``, and a read that
+    is not the file row for row is refused, as the hook's is.
+    """
+    from .country import Country
+    from .local_tools import df_data_grabber
+
+    wave_obj = Country(country)[wave]
+    spec = dict(wave_obj.resources["food_acquired"])
+    spec["idxvars"] = {k: v for k, v in spec["idxvars"].items() if k == "u"}
+    spec["myvars"] = {"s07bq03a": "s07bq03a"}
+    mapping = wave_obj.column_mapping("food_acquired", spec)
+    mapping.pop("df_edit", None)
+    (filename, cols), = mapping.items()
+    frame = df_data_grabber(str(wave_obj.file_path / "Data" / filename),
+                            cols["idxvars"], **cols["myvars"])
+    read = pd.to_numeric(frame["s07bq03a"], errors="coerce").to_numpy(dtype=float)
+    if not np.array_equal(read, quantity, equal_nan=True):
+        raise UnitWeightJoinError(
+            f"{country} {wave}: the extraction of u is not {filename} row for row")
+    return np.asarray(_normalise_index_as_served(frame, wave_obj).index.get_level_values("u"),
+                      dtype=object)
+
+
+def inputs_unit_weight(country: str, wave: str) -> pd.DataFrame:
+    """The raw answers and table weight behind one wave's ``Quantity_kg``.
+
+    Indexed ``(t, i, j)`` as the served table is (:func:`inputs_last_purchase`
+    supplies the index and the labelled answers), every source row at the INPUT
+    grain, with the ORIGINAL section-7B variable names (``s07bq01`` as its numeric
+    code, which the labelled ``j`` has already harmonized away), the numeric
+    ``unit_code`` and ``size_code`` the join reads, ``nsu_kg_per_unit``: the
+    national weight, NaN where the table has none or the served unit is ``Kg`` /
+    ``Litre``, ``stated_kg``: the mass the served unit's label states, NaN where
+    it states none, and ``nsu_join``: how the product found its weight
+    (:data:`NSU_JOIN_TIERS`, NA where it did not).  Where the table holds several
+    years (Niger), ``nsu_year`` is the latest behind that weight.  The table's own
+    stratum rows are in the file the registry entry names; a user who wants a
+    stratum's weight reads it from there.
+
+    ``nsu_kg_per_unit`` is what :func:`food_acquired_with_unit_weights` read for the
+    row, so the served unit comes from the wave's own extraction
+    (:func:`_extracted_units`), as the hook's does: a raw label is padded in Mali's
+    2018-19 and a bare number in Burkina's, and neither says the unit is ``Kg``.  The
+    one row it does not describe is a source row whose canonical key repeats (two
+    product codes folded into one ``j``): that row reports its weight here and the
+    hook declines to serve it, for the reason in the module docstring.
+    """
+    out = inputs_last_purchase(country, wave)
+    out = out[[c for c in NSU_RAW_VARIABLES if c != "s07bq01"]].copy()
+    raw, weights, years, tiers = _nsu_read(country, wave)
+    source = NSU_TABLES[country]["sources"][wave]
+    if len(raw) != len(out):
+        raise UnitWeightJoinError(f"{country} {wave}: {len(out)} input rows, {len(raw)} in {source}")
+    raw_q = pd.to_numeric(raw["s07bq03a"], errors="coerce").to_numpy(dtype=float)
+    if not np.array_equal(pd.to_numeric(out["s07bq03a"], errors="coerce").to_numpy(dtype=float),
+                          raw_q, equal_nan=True):
+        raise UnitWeightJoinError(f"{country} {wave}: the input frame is not {source} row for row")
+    labels = _served_labels(country, _extracted_units(country, wave, raw_q))
+    out.insert(0, "s07bq01", raw["s07bq01"].to_numpy())
+    out["unit_code"] = raw["s07bq03b"].to_numpy()
+    out["size_code"] = raw["s07bq03c"].to_numpy()
+    out["nsu_kg_per_unit"] = derive_nsu_kg_factor(
+        raw["s07bq01"], raw["s07bq03b"], raw["s07bq03c"], labels.to_numpy(), weights)
+    out["stated_kg"] = labels.map(_stated_kg).to_numpy(dtype=float)
+    found = out["nsu_kg_per_unit"].notna().to_numpy()
+    product = pd.to_numeric(raw["s07bq01"], errors="coerce").fillna(-1).astype("int64")
+    join = "code" if wave == NSU_TABLE_WAVE else None
+    tier = product.map(tiers).to_numpy(dtype=object) if tiers else np.full(len(out), join, dtype=object)
+    out["nsu_join"] = pd.Series(np.where(found, tier, None), index=out.index, dtype="string")
+    if years is not None:
+        codes = pd.MultiIndex.from_arrays(
+            [pd.to_numeric(raw[c], errors="coerce").fillna(-1).astype("int64")
+             for c in ("s07bq01", "s07bq03b", "s07bq03c")])
+        out["nsu_year"] = np.where(found, years.reindex(codes).to_numpy(dtype=float), np.nan)
+    return out

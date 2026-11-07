@@ -18,8 +18,10 @@ Senegal::food_acquired::7day-purchase-at-last-purchase-unit-value:
     unit value of the household's LAST PURCHASE of the item.  NaN where
     s07bq07a is missing or not positive, and NaN where the last purchase was
     made in a different unit from the consumption unit (s07bq07b/s07bq07c vs
-    s07bq03b/s07bq03c): no EHCVM wave ships a unit-conversion table, so there
-    is no exact conversion and NA is the honest answer.  Units are compared on
+    s07bq03b/s07bq03c): this construction converts nothing between units, and
+    NA is the honest answer.  (This entry used to say no EHCVM wave ships a
+    unit-conversion table; 2021-22 does, GH #1452, and it is not used here.)
+    Units are compared on
     the EHCVM numeric code where the label carries one, else on the label with
     case, accents, padding and punctuation folded -- the two variables carry
     DIFFERENT value-label sets inside the same .dta.  Before GH #876 the served
@@ -63,7 +65,8 @@ Senegal::food_acquired::7day-purchase-at-last-purchase-unit-value:
         unit.
       basis: variable-label
       evidence: >-
-        no EHCVM wave distributes a unit-conversion table;
+        the 2018-19 waves distribute no unit-conversion table, and 2021-22's
+        ehcvm_nsu is not applied to a price;
         lsms_library/categorical_mapping/ehcvm_units.org is a code->label
         codebook with no factors
     - text: >-
@@ -189,4 +192,102 @@ Senegal::sample::region-milieu-stratum:
     var(log cluster weight) between these cells 90.8% (2018-19) and 88.7% (2021-22),
     against 58.8% and 58.6% between regions alone.
   contents: 'Senegal/_/CONTENTS.org, "EHCVM strata are region x milieu labels (GH #812)"'
+  since: '2026-11-04'
+
+Senegal::food_acquired::nsu-national-unit-weight:
+  waves: ['2018-19', '2021-22']
+  columns: [Quantity_kg]
+  rule: >-
+    Quantity_kg = Quantity x kg_factor, per acquisition source, where kg_factor is the
+    median over ehcvm_nsu_sen2021_nat.dta's rows of the row's (product, unit, size), in grams over 1000.
+    Unit and size are the row's s07bq03b and s07bq03c codes in both waves.  The product
+    is the s07bq01 code in 2021-22, whose numbering the table uses; in 2018-19, whose
+    numbering is a different one, it is found by LABEL, never by code (ehcvm.
+    nsu_product_crosswalk): the same label up to spelling, else through the country's
+    harmonize_food, else the parts of a label listing goods the instrument later split,
+    else the label's stem.  A product reading several table products takes the median of
+    their weights.  Each row's tier is nsu_join in derivation_inputs.  NA, with no key,
+    where no weight is found; where the served unit is Kg or Litre, whose kilograms the
+    label states; and where the row's canonical key is duplicated at the build, because
+    core sums Quantity on such a key and selects any other column.  Those rows stay on the
+    inferred ladder.  No Quantity or u changes.
+  function: lsms_library.ehcvm:derive_nsu_kg_factor
+  inputs: lsms_library.countries.Senegal.2021-22._.mapping:inputs_food_acquired_unit_weight
+  raw_variables: [s07bq01, s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, produitID, uniteID, tailleID, poids]
+  assumptions:
+    - text: >-
+        a key's weight in the table is the weight of that unit of that product in
+        that size, for any row of the wave.  The survey ships the table; the served
+        row's own quantity is untouched.
+      basis: variable-label
+      evidence: >-
+        ehcvm_nsu_sen2021_nat.dta, read by code; unit and size codes agree with s07b_me's on
+        every code both files label, up to spelling.
+    - text: >-
+        national, not by stratum.  The stratum cell's departure from the national
+        weight is mostly noise: against an independent implied weight, a household's
+        last-purchase unit value over the same stratum's median Kg price with 5+
+        reports each, the national weight's median absolute log error is
+        the same number on both sides, 0.48, since the stratum file repeats the national table, and the slope of the household's deviation on the stratum's is
+        undefined, no stratum differs.  99.9% of consumed rows find a weight (159 of 219,717 do not).
+      basis: modelling-choice
+      evidence: >-
+        GH #1452, 2026-11-04.  The check is noisy: a small lot's price per kg runs
+        above a kilogram's, so the implied weight runs high, and it compares the
+        two rules, not either with the truth.
+    - text: >-
+        the three files are one table, so which is read is immaterial, and _nat is
+        the plainest: ehcvm_nsu_sen2021.dta repeats it across 28 region x milieu
+        cells (0 of 1,737 keys vary, 0 of 48,636 rows differ from _nat) and
+        ehcvm_nsu_sen2021_nat2023.dta only renames produitID to codpr and adds
+        unite = 10 * uniteID + tailleID (poids identical in every row).
+      basis: variable-label
+      evidence: tests/test_ehcvm_unit_weights.py reads all three.
+    - text: >-
+        the unit `paquet (250 g)`, served Paquet (250 g), reads the table, and is the
+        one stated size the table overrules: table / label is a median 0.10 over its
+        5,918 rows.  The label is the defect.  The market file weighs "paquet de 25g" tea at
+        25 g on 477 observations, which owes nothing to household prices, and the same unit
+        is sized Petit / Moyen / Grand, with the table reading 25 / 250 / 625 g for tea.
+        Row by row, households put the table within 2x on 75-85% of rows and the label on
+        12-13%: 85.1% / 12.2% on 5,400 served rows against the item's Kg-row price, 74.8% /
+        13.3% on 5,691 last-purchase rows.  On the 1,650 rows with a stratum Kg price, 75.2% /
+        38.8%.  Disclosed, not patched: Pates / Paquet / Grand reads 5 kg (Petit 250 g, Moyen
+        500 g), which households' prices put near 0.5 kg; its 99 rows carry 978 of the unit's
+        3,181 kg.
+      basis: modelling-choice
+      evidence: >-
+        s07b_me_sen2021.dta, ehcvm_nsu_sen2021_nat.dta, ehcvm_prix_sen2021.dta.  The other
+        stated sizes agree with the table at the median (Bouteille de 20 L at 0.95).
+        Ruling @ligon 2026-11-04: a weighed table may overrule a stated label, with a
+        report when they disagree (ehcvm.StatedLabelOverruledWarning).
+    - text: >-
+        2018-19 reads the same weight per key as 2021-22, with the product found by label.
+        Of 2018-19's consumed rows 138,612 join on the label, 24,326 through harmonize_food
+        and 4,450 as the parts of a bundle (Aubergine, Courge/Courgette alone, 0.508 / 54.8%
+        against 2018-19's community price ratios, though its parts agree on the main keys);
+        99.4% of non-metric served rows read a weight.  volume_as_mass=False cannot decline
+        the stated-volume rows that read the table: 1,728 of 1,730 in 2021-22 and 2,276 of
+        2,293 in 2018-19, 18,987 kg.  Disclosed, by ruling.
+      basis: modelling-choice
+      evidence: >-
+        Ruling @ligon 2026-11-04.  Matched items, 2021-22 over 2018-19, median / row-weighted:
+        Kg rows 1.14 / 1.14, inference 1.05 / 1.07, both waves on the table 1.16 / 1.14.
+    - text: >-
+        Kg and Litre keep their labels.  Their table rows are not read: a kilogram is
+        a kilogram, and a table litre is not a density (in these tables most oils
+        read exactly 1000 g).
+      basis: modelling-choice
+      evidence: GH #1452, 2026-11-04.  Those rows are the check on the join instead.
+  validated_against: >-
+    the rows whose label states the mass, which the table was not fitted to: the
+    national weight of a Kg row is 1000 g at the median, and the delivered factor
+    reproduces the table read directly from the two files
+    (tests/test_ehcvm_unit_weights.py).  Outside the survey's households: ehcvm_prix_sen2021.dta weighs "paquet
+    de 25g" tea at 0.025 kg on 477 observations, the table's Petit.  Table rows against market
+    per-kg, median abs. log error / within 2x, go from 0.415 / 73.6% under the inference to
+    0.413 / 69.0% under the table, and item medians' correlation with the market from 0.59 to
+    0.69.  Table against 2018-19 community price ratios: 0.382 / 81.0%.
+    Measured kilograms are in Senegal/_/CONTENTS.org.
+  contents: 'Senegal/_/CONTENTS.org, "EHCVM unit-weight table wired (GH #1452)"'
   since: '2026-11-04'

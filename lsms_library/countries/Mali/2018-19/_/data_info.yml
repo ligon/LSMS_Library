@@ -189,6 +189,13 @@ household_roster:
 
 food_acquired:
     file: s07b_me_mli2018.dta
+    # GH #1452.  Read by mapping.py's food_acquired hook, not by the grabber; declared so
+    # their DVC sidecars are in this table's input hash.  2021-22's source for its product
+    # labels: the table uses that wave's codes, which are not this wave's.
+    unit_weights:
+        file:
+            - ../../2021-22/Data/ehcvm_nsu_mli2021.dta
+            - ../../2021-22/Data/s07b_me_mli2021.dta
     idxvars:
         v: grappe
         visit: vague

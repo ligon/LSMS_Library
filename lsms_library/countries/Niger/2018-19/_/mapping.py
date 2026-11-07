@@ -6,7 +6,7 @@ from lsms_library.transformations import food_acquired_to_canonical as _food_acq
 
 from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
-    food_acquired_ehcvm as _food_acquired_ehcvm,
+    food_acquired_with_unit_weights as _food_acquired_with_unit_weights,
     inputs_last_purchase as _inputs_last_purchase,
 )
 
@@ -169,8 +169,8 @@ def food_acquired(df):
     """
     # GH #1224: `decode` -- the served base unit of a sized row is read
     # through the same repair the sweep below applies to every other row.
-    df = _food_acquired_ehcvm(df, FOOD_ACQUIRED_DERIVATION,
-                              decode=_decode_mojibake)
+    df = _food_acquired_with_unit_weights(df, FOOD_ACQUIRED_DERIVATION, wave='2018-19',
+                                          decode=_decode_mojibake)
     df = _decode_mojibake_in_df(df)
     # Fill a missing unit with the `Unknown` sentinel, AFTER the mojibake
     # sweep so the two never fight over the same value.
