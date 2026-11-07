@@ -19,7 +19,7 @@ The eight delegated country-owner assessments preceded this implementation. Ugan
 | `_survey_median_factors`, `_declared_kg_factors`, shipped joins | Already country-aware; reported factor support and declarations | Reuse unchanged |
 | `_parcel_from_crop_plot`, `_parcel_from_feature_plot` | Validated Uganda constructor inverse and former fallback; `test_gh1205_uganda_parcel_prefix.py` | Reuse; authorize Uganda inverse from its own row labels, not pooled attrs |
 | `_YIELD_LITERAL_LAND_COUNTRIES`, `_YIELD_LAND_ROUTE_HELD` | Existing whole-key routes and explicit Benin/Guinea-Bissau/Togo hold; `test_gh1460_yield_land_route.py` | Reuse exact sets |
-| `_area_on_harvest_rounds`, `pp_ph_area_t` | Explicit PP→PH round mapping and collision refusals; `test_gh1460_yield_area_t.py` | Preserve; map/check labeled area within its country |
+| `_area_on_harvest_rounds`, `pp_ph_area_t` | Explicit PP→PH round mapping and collision refusals; `test_gh1460_yield_area_t.py` | Preserve the existing explicit mapping and refusal contract |
 | `_waves_joining_nothing` | GH1545 partial-loss warning, currently reconstructs country through local `(t,i)` | Extend to use retained country directly; preserve actual lost-wave warnings |
 | `_without_redundant_farm_level` | Already includes country in crop occurrence identity | Reuse unchanged |
 | `Feature`, `_harmonize_country_frame` | Prepends country and resolves crop/plot aliases; cross-country skill / audit harness | Exercise actual synthetic assembly, do not rebuild country data in first phase |
@@ -42,7 +42,7 @@ The eight delegated country-owner assessments preceded this implementation. Ugan
 - Crop inference must equal separate-country inference under identical local keys; never change food inference or adjacent plot-input policy as a shortcut.
 - Per-country declared/shipped weights, survey totals, support floors, screening and kilogram precedence remain unchanged. Exact kilograms are not inferred factors.
 - Whole-key routes and the three held countries stay exactly as ruled. No missing/nonpositive area filling, area/unit redefinition, guessed plot parsing or unknown-country inference.
-- For country-labeled areas, PP/PH source/target conflicts are checked within country, so another country's round name cannot create false refusal or authorize mixing.
+- Preserve the explicit PP/PH mapping and its existing unconditional duplicate-target/already-served-target refusal contract. A country-specific mapping API or relaxation of those refusals is outside this task.
 - Preserve existing disclosure scope and real warnings. Old tests that deliberately pin the now-fixed pooled failure require explicit new oracles, while unrelated stale-attr, malformed-key and country-less controls remain intact.
 - Independent review, full hash census, exact-head offline CI and bounded real source/API acceptance remain separate gates. No master release or shared re-warm.
 
