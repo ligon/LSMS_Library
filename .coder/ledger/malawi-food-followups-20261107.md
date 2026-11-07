@@ -266,3 +266,72 @@ parity, appropriateCI and a fresh independent review on the exact integration
 head. Keep prior scientific evidence source-bound, including the material
 older-wave inference changes in closed-10c-effects.json, distinct from unchanged
 older native Quantity_kg. Decision48/whole-wave production merge remain HELD.
+
+### Final integrated verification and handoff
+
+Implementation frozen at `7f45997805592035d7f337541ab75d9186447a6f`, from
+current development `c964c6c4f25945dc14636fd094893b16b12180b7`.
+The current exception handler is byte-identical to c964; removing only the new
+opt-in dispatch makes the compute-method AST equal to c964. Thirteen scientific
+and configuration files are byte-identical to final food candidate 5af. Legacy
+panel_ids/update_id behavior and earlier committed maps remain unchanged.
+
+- Combined current JSON/Unicode/runtime failure-retry and reservation-guard
+  controls: 721 passed, 2 skipped, 55.18s. These failures retain the same exception
+  object, reset attempt/cache state, and permit the guarded retry.
+- Full offline CI: 11,486 passed, 5,646 skipped, 4 xfailed, 699 warnings,
+  1,107.89s, exit 0. Two workers/loadfile, BLAS/OMP/MKL/build workers 1, closed
+  source-credential gate, private L2.
+- Free cold source job 41005535: COMPLETED 0:0, 34:30, peak RSS 12,387,248K,
+  4 CPU/32G. All six fresh frames equal the closed 5af candidate exactly.
+  Original recovered baseline sample/native food/index/unitvalues/expenditures
+  and older native Quantity_kg remain exact. Row counts: sample 71,954;
+  food 1,303,208; unitvalues 929,624; kgvalues 928,050; quantities 1,302,634;
+  expenditures 929,920.
+- Actual default/Make food and sample parity passes (wave-cache reuse is
+  explicitly recorded); genuine singleton Feature payload/provenance passes.
+  All 169,995 public derivation-input rows join/rederive and preserve original
+  raw factor fields/year/MD5. The full 1,768-row admission mask changes zero rows
+  (1,492 admitted/276 refused). Source/API assertions took 1,525.60s.
+- Complete food audit: 350 records, 3 pass/345 warn/2 fail. The two failures are
+  reported-Price kgprice/unitprice assembly, reproduced on recovered baseline
+  and 5af in audit-price-basis-classification.json. No all-green audit claim.
+- Fresh-process Country/Feature values, typed axes/order/masks/attrs match;
+  all 18 private cache parquet sizes/epochs/bytes unchanged, 19.22s.
+
+Cache scope measured against current c964: shared guard code changes 553/553
+country-table, 2,283/2,313 wave-table and 39/39 build-time-feature fingerprints.
+Subsequent food/config changes 26 country/156 wave fingerprints, all Malawi,
+zero BTF. This known shared-hook hash cost remains separate from its non-opt-in
+runtime invariance. No shared L2 writes or rewarm were performed.
+
+Native older-wave kilograms are unchanged; the existing inference ladder does
+change materially when new-wave observations enter. For waves 2004, 2010, 2013,
+2016, 2019, 2024 respectively: changed factor rows
+42,033/4,659/8,976/47,004/8,089/201,954; changed rungs
+1,979/17/288/2,195/97/172,173; changed derived quantities
+42,032/4,657/8,976/47,003/8,089/201,903; changed kilogram prices
+23,534/2,717/6,876/37,361/6,343/148,925. Full rung distributions and price
+quantiles remain in source-validation/closed-10c-effects.json. Exact integrated
+frame equality to 5af, which equals 10c, binds these effects to the final product
+without repeating an estimator campaign. No clipping or new estimator was added.
+
+Durable aggregate evidence: burst reports/malawi-food-followups-20261107/
+integration/{source-bindings.json,offline-receipt.json,source-receipt.json,
+fingerprint-scope.json,FINAL-REPORT.md,PR-DRAFT.md}, plus source-validation/
+{candidate-api-summary.json,food-feature-audit.jsonl,fresh-warm-summary.json}.
+Failed attempts and earlier critic logs remain retained; raw logs/pickles are
+private and must not be attached to a public PR.
+
+Fresh independent integration review CLOSED on exact 7f: 58 new adversarial plus
+88 existing controls, 146 passed, zero failures/errors/skips. Whole Country-module
+AST equals c964 after removing only the approved import/helper/dispatch; exception
+handler and legacy helper source are byte-exact. Review independently pins 13
+scientific/config files, local_tools and three tests to 5af. Ordinary optional
+FileNotFoundError/KeyError/ValueError retain c964's existing classification;
+not every guard exception is a retry. See the separate review directory
+review-malawi-food-integration-20261107/FINAL-INTEGRATION-VERDICT.md.
+Root owns GitHub publication and merge. The earlier 5af behavioral review closed
+both food contract bugs; it is separate from this integration review. This is a
+minimal food/sample-ID carrier with other 2024 tables unwired. Decision 48,
+production weights/normalization/NA policy and whole-wave release remain HELD.
