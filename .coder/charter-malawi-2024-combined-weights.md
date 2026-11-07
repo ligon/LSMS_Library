@@ -1,7 +1,8 @@
 # Investigation charter — Malawi 2024–25 combined survey weights
 
-Status: draft for maintainer sign-off, 2026-11-07. Requested investigation;
-production weighting changes remain on hold under decision 48.
+Status: SIGNED OFF by the maintainer on 2026-11-07: "Yes, proceed."
+The bounded investigation is authorized; production weighting changes remain
+on hold under decision 48.
 
 ## §0 Question, restated
 

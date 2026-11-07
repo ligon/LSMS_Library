@@ -14,9 +14,11 @@ its named copy/provenance are in sweep =reports/malawi-weights/=. Final weight
 ratios include separate calibration/trimming; do not interpret them as selection
 probabilities, or presume that prevents every valid composite estimator.
 
-The maintainer requested a charter on November 7. Draft for sign-off:
+The maintainer requested a charter on November 7 and signed off with "Yes, proceed":
 =.coder/charter-malawi-2024-combined-weights.md=, grounded in its per-task ledger.
-This scopes research, not a production policy or the earlier proposed NA assignment.
+The bounded investigation is authorized. Research code uses development =8558fefe0=
+and the separately pinned unfinished Malawi config at =83a0ec252=. It selects no
+production policy or the earlier proposed NA assignment.
 Items 49/50/51 remain pending. Prior snapshots below are historical.
 
 * Current state, 2026-11-06 recovery (Codex)
