@@ -5336,3 +5336,38 @@ and filled on every row holding a sale: on a harvest row =Unit_sold= is =u=, by 
   2010-11 and 1 =Value_sold= in 2013-14 are NA, not 0.  Existing rows do not move.  A 2019-20 Citrus row's =Value_sold= of 0 is the survey's own answer, and stays.
 - *No two-line trap.*  A crop on one plot in two rows goes through the ladder; =0= sales in any wave have 2+ rows stating a harvest on ONE plot and reach Farm-level.
   115 records (3.21M MWK) on 2+ plots have one row stating a harvest; Nigeria's ruling A was not extended to them.
+
+* 2026-11-06 -- shocks: food purchases and food stocks are separate answers
+
+Module U asks =hh_u03d= about food stock(s) and =hh_u03e= about food
+purchases in each wired wave (2010-11, 2013-14, 2016-17, 2019-20).
+Verified from the variable and value labels of each held source, acquired
+through =get_data_file=.  All four encode 1 Increase, 2 Decrease, 3 Did Not
+Change, with capitalization differences between releases.
+
+Under the maintainer's purchases/stock ruling, =AffectedConsumption= now
+reads =hh_u03e= and =AffectedFoodStock= preserves =hh_u03d=, formerly served
+under =AffectedConsumption=.  Either direction is True, unchanged is False,
+and a missing answer stays NA.  These are qualitative effects, not amounts.
+
+Idiosyncrasy retained: 2016-17 and 2019-20 shocks read only the
+Cross_Sectional source and keep =cs-17-= / =cs-19-= IDs through =mapping:
+cs_i=.  The 2013-14 =y2_hhid= still walks through the committed panel map.
+IHS2 2004-05's Module AB has no corresponding food-effect questions wired;
+its declaration is untouched.  The unwired 2024-25 wave is untouched.
+
+Private cold comparison against =174671bca=: all 76,302 rows and their index
+are identical, as are income/assets/production effects and the three coping
+answers.  Old =AffectedConsumption= equals new =AffectedFoodStock= on every
+row.  The purchases / stock nonmissing counts are:
+
+| wave    | rows   | purchases | stock  |
+|---------+--------+-----------+--------|
+| 2010-11 | 17,422 |    17,406 | 17,410 |
+| 2013-14 |  9,952 |     9,950 |  9,952 |
+| 2016-17 | 27,904 |    27,904 | 27,904 |
+| 2019-20 | 21,024 |    21,024 | 21,024 |
+
+Regression coverage: =tests/test_shocks_malawi_iraq_food_effects.py= checks
+independent synthetic answers and missingness, then compares every served
+effect and coping answer to the raw source by household and shock.

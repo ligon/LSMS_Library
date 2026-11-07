@@ -307,7 +307,18 @@ shocks:
                 DID NOT CHANGE: False
                 Increase: True
                 INCREASE: True
+        # Module U asks food stock (d) separately from food purchases (e).
         AffectedConsumption:
+            - hh_u03e
+            - mapping:
+                Decrease: True
+                DECREASE: True
+                Did not change: False
+                Did Not Change: False
+                DID NOT CHANGE: False
+                Increase: True
+                INCREASE: True
+        AffectedFoodStock:
             - hh_u03d
             - mapping:
                 Decrease: True

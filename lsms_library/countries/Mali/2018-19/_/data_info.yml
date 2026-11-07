@@ -297,9 +297,16 @@ shocks:
         # Section 14.04 changed between vagues (GH #1556).  Vague 1 asked five
         # consequences: d = stock, e = achats, f blank.  Vague 2 asked six, as the
         # questionnaire prints: d = effectif du cheptel, e = stock, f = achats.  The
-        # .dta labels describe vague 1 only.  shocks() in mapping.py serves the stock.
-        AffectedConsumption:
+        # .dta labels describe vague 1 only.  shocks() in mapping.py serves stock and purchases separately.
+        AffectedFoodStock:
             - s14q04d
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedConsumption:
+            - s14q04f
             - mapping:
                 Diminué: True
                 Augmenté: True

@@ -39,16 +39,18 @@ def _block(country):
     return info['shocks']['myvars']
 
 
-def test_niger_reads_e_in_both_vagues():
-    assert _block('Niger')['AffectedConsumption'][0] == 's14q04e'
+def test_niger_reads_stock_e_and_purchases_f_in_both_vagues():
+    assert _block('Niger')['AffectedFoodStock'][0] == 's14q04e'
+    assert _block('Niger')['AffectedConsumption'][0] == 's14q04f'
 
 
 @pytest.mark.parametrize('country', SPLIT)
 def test_split_files_bring_both_columns_through_one_mapping(country):
     block = _block(country)
-    assert block['AffectedConsumption'][0] == 's14q04d'
+    assert block['AffectedFoodStock'][0] == 's14q04d'
+    assert block['AffectedConsumption'][0] == 's14q04f'
     assert block['StockVague2'][0] == 's14q04e'
-    assert block['AffectedConsumption'][1] == block['StockVague2'][1]
+    assert block['AffectedFoodStock'][1] == block['StockVague2'][1] == block['AffectedConsumption'][1]
     assert block['PurchasesVague2'] == 's14q04f' and block['vague'] == 'vague'
 
 
@@ -62,7 +64,8 @@ def _module(country):
 
 def _frame(**extra):
     base = {'vague': [1, 1, 2, 2, 2],
-            'AffectedConsumption': [True, False, True, True, np.nan],
+            'AffectedFoodStock': [True, False, True, True, np.nan],
+            'AffectedConsumption': [np.nan, np.nan, True, False, np.nan],
             'StockVague2': [False, True, False, False, np.nan],
             'PurchasesVague2': [np.nan, np.nan, 'Diminué', 'Inchangé', np.nan],
             'Cope1': [1, 0, 1, 1, np.nan]}
@@ -74,8 +77,10 @@ def _frame(**extra):
 class TestStockByVague:
     def test_each_vague_serves_its_own_stock_column(self, country):
         out = _module(country).shocks(_frame())
-        assert out['AffectedConsumption'].tolist()[:4] == [True, False, False, False]
+        assert out['AffectedFoodStock'].tolist()[:4] == [True, False, False, False]
+        assert out['AffectedConsumption'].tolist()[:4] == [False, True, True, False]
         assert pd.isna(out['AffectedConsumption'].iloc[4])
+        assert pd.isna(out['AffectedFoodStock'].iloc[4])
 
     def test_helpers_do_not_reach_the_table(self, country):
         out = _module(country).shocks(_frame())
@@ -152,18 +157,24 @@ def _multiset(frame):
     return collections.Counter(frame.itertuples(index=False, name=None))
 
 
-def _expected(raw, rule):
+def _expected(raw, rule, purchase_rule):
     stock = rule(raw)
     return pd.DataFrame({'Shock': raw['Shock'].values,
                          'AffectedIncome': _truth(raw['s14q04a']).values,
                          'AffectedAssets': _truth(raw['s14q04b']).values,
                          'AffectedProduction': _truth(raw['s14q04c']).values,
-                         'AffectedConsumption': stock.values})
+                         'AffectedFoodStock': stock.values,
+                         'AffectedConsumption': purchase_rule(raw).values})
 
 
 def _by_layout(raw):
     d, e = _truth(raw['s14q04d']), _truth(raw['s14q04e'])
     return d.where(pd.to_numeric(raw['vague']) == 1, e)
+
+
+def _purchases_by_layout(raw):
+    e, f = _truth(raw['s14q04e']), _truth(raw['s14q04f'])
+    return e.where(pd.to_numeric(raw['vague']) == 1, f)
 
 
 @pytest.mark.requires_s3
@@ -193,12 +204,13 @@ class TestAgainstTheSource:
         for letter in 'de':
             assert _responds_to_owning_no_animals(rows, letter) < NO_LIVESTOCK_QUESTION
 
-    @pytest.mark.parametrize('country,rule', [
-        ('Niger', lambda raw: _truth(raw['s14q04e'])),
-        *((c, _by_layout) for c in SPLIT)])
-    def test_served_is_the_stock_of_each_layout(self, country, rule, source):
+    @pytest.mark.parametrize('country,rule,purchase_rule', [
+        ('Niger', lambda raw: _truth(raw['s14q04e']), lambda raw: _truth(raw['s14q04f'])),
+        *((c, _by_layout, _purchases_by_layout) for c in SPLIT)])
+    def test_served_is_the_stock_and_purchases_of_each_layout(self, country, rule, purchase_rule, source):
         raw = source(country)
         served = ll.Country(country).shocks(waves=[WAVE]).reset_index()
-        cols = ['Shock', 'AffectedIncome', 'AffectedAssets', 'AffectedProduction', 'AffectedConsumption']
-        assert _multiset(served[cols]) == _multiset(_expected(raw, rule)[cols])
-        assert _multiset(served[cols]) != _multiset(_expected(raw, lambda r: _truth(r['s14q04d']))[cols])
+        cols = ['Shock', 'AffectedIncome', 'AffectedAssets', 'AffectedProduction', 'AffectedConsumption', 'AffectedFoodStock']
+        assert _multiset(served[cols]) == _multiset(_expected(raw, rule, purchase_rule)[cols])
+        assert _multiset(served[cols]) != _multiset(_expected(raw, lambda r: _truth(r['s14q04d']), purchase_rule)[cols])
+        assert _multiset(served[cols]) != _multiset(_expected(raw, rule, rule)[cols])

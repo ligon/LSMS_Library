@@ -32,7 +32,7 @@ FIXED = {'Niger': 's14b_me_ner2021.dta', 'Mali': 's14b_me_mli2021.dta',
 #: The labelled files; Burkina's section 14.05 carries no value labels at all.
 LABELLED = ['Niger', 'Mali', 'Senegal']
 AFFECTED = {'AffectedIncome': 'a', 'AffectedAssets': 'b', 'AffectedProduction': 'c',
-            'AffectedConsumption': 'e'}
+            'AffectedConsumption': 'f', 'AffectedFoodStock': 'e'}
 KEPT_LABELS = {1: 'Utilisation de son épargne', 25: 'Autre stratégie', 26: 'Aucune stratégie'}
 
 
@@ -48,9 +48,10 @@ def _wired_waves():
 
 
 @pytest.mark.parametrize('country,block', _wired_waves(), ids=lambda x: x if isinstance(x, str) else '')
-def test_affected_consumption_reads_the_stock_not_the_livestock(country, block):
+def test_food_effects_read_purchases_and_stock_separately(country, block):
     source = block['myvars']['AffectedConsumption']
-    assert source[0] == 's14bq04e', f'{country}: {source[0]} is not the food stock'
+    assert source[0] == 's14bq04f', f'{country}: {source[0]} is not food purchases'
+    assert block['myvars']['AffectedFoodStock'][0] == 's14bq04e'
 
 
 def test_the_four_fixed_waves_are_all_wired():
@@ -169,7 +170,7 @@ def _multiset(frame):
 
 
 def _expected(raw, stock_letter='e'):
-    letters = dict(AFFECTED, AffectedConsumption=stock_letter)
+    letters = dict(AFFECTED, AffectedFoodStock=stock_letter)
     out = pd.DataFrame({name: _truth(raw[f's14bq04{x}']) for name, x in letters.items()})
     out.insert(0, 'Shock', raw['Shock'].values)
     return out
@@ -194,6 +195,13 @@ class TestAgainstTheSource:
         raw, _ = source(country)
         cols = ['Shock', *AFFECTED]
         assert _multiset(served(country).reset_index()[cols]) != _multiset(_expected(raw, 'd')[cols])
+
+    def test_stock_cannot_stand_in_for_purchases(self, country, source, served):
+        raw, _ = source(country)
+        expected = _expected(raw)
+        expected['AffectedConsumption'] = expected['AffectedFoodStock']
+        cols = ['Shock', *AFFECTED]
+        assert _multiset(served(country).reset_index()[cols]) != _multiset(expected[cols])
 
     def test_slots_follow_the_ranks_and_keep_code_25(self, country, source, served):
         raw, copes = source(country)
