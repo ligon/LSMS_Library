@@ -1,0 +1,84 @@
+#+title: Malawi 2024–25 food follow-ups — approved borrowing and item 119 investigation
+
+* Authority and scheduling
+Maintainer ruling, 2026-11-07: "On #49, yes, borrow". Borrow IHS5 2019–20 food-unit
+factors for 2024–25, explicitly registered as a derivation. The source year and
+cross-wave assumption must be visible; replace the borrowing when an appropriate
+new source is available. No production weighting change is authorized: decision 48
+is under the separate signed-off research charter.
+
+This is the next implementation lane when a worker slot frees. Do not preempt
+the active #1452/#1590 prerequisite repairs or mutate the pinned configuration
+used by the weight investigator. Existing 2024–25 author work is at =83a0ec252=;
+prepare an isolated follow-up worktree and reconcile with current development.
+Whole-wave merge remains gated by its remaining review/decision work.
+
+* Required grounding
+Read full Malawi =_/CONTENTS.org= including LOGBOOK/WAITING/TODO first; name the
+idiosyncrasies and quote contradictions. Read food-acquired and units skills,
+the derivation contract, the prior-art ledger/STANDING, and the existing 2019–20
+food builder and =ihs_foodconversion_factor_2020.dta= declaration. Check the prior
+review in =reports/review-wire-malawi/VERDICT.md=, Memo B, but do not confuse its
+simulated =(item,unit)= median borrowing with an exact source-table join.
+
+Open a per-task ledger before code. Reuse source readers, existing conversion
+machinery and registered-derivation/inputs machinery. No alternate kg estimator.
+
+* Item 49 implementation and acceptance
+- Join the actual source factors using their documented keys and supported
+  cross-wave item/unit mapping; preserve region/size distinctions where present.
+  A missing or ambiguous match remains missing and uses the existing ladder;
+  borrowing approval is not permission to manufacture a new item crosswalk.
+- Keep native Quantity, Expenditure, source/index and source-unit information
+  intact. Construct summable Quantity_kg only on supported rows, with an explicit
+  registry key, source-year inputs and assumptions. Do not count a metric
+  conversion twice or overwrite another legitimate derivation.
+- Retain every source row; test exact unrelated-column/index invariance, factor
+  joins, missing/ambiguous cells, derivation_inputs and default/Make consistency.
+- Compare inference-only and borrowed builds on private cold caches. Measure all
+  older-wave food quantities/prices/factor-rung effects as well as 2024–25. The
+  expected reduction in extreme cells is a diagnostic, not a license to clip data.
+- Measure cache/input/fingerprint scope; validate sample weights are unchanged.
+  Run targeted source-backed tests, offline CI and food Feature audit; independent
+  review precedes PR/authorized development merge. Never merge to master or
+  rewarm the shared cache in this lane.
+
+* Item 50: inspect, do not silently choose food or service
+The maintainer proposed interpreting =Grain Mill (Gramil)=, code 119, literally
+as a milling service and requested comparison with other corpus treatments.
+The previous recommendation to map it to Maize is not an approved decision.
+
+Existing precedents:
+- Togo =nonfood_items= code 217: =Grain Milling Fees=, used by its section-9
+  nonfood expenditure script. Cote d'Ivoire's questionnaire-derived nonfood list
+  separately names =Frais de mouture des cereales= at 217.
+- Malawi community price codes 3/4 explicitly price grinding a 50 kg bag of
+  maize/rice, distinct from maize flour. Tanzania's community price mapping
+  likewise keeps Maize Grinding as a service with no consumed-food counterpart.
+
+New contrary evidence requiring reconciliation:
+- The Malawi 2024–25 questionnaire (PDF p.49) prints =Grain Mill (Gramil)= at
+  119 among maize flours, with food-consumption quantity/unit and source columns.
+- The NSO's earlier Malawi dictionary explicitly names community-price item 2
+  =Maize flour (Gramil, Rab, or locally milled)=, separately from item 3's charge
+  to grind maize and item 4's charge to grind rice:
+  https://microdata.worldbank.org/index.php/catalog/2248/variable/F187/V6616?name=com_ck00a
+  This is evidence that Gramil can denote maize flour, not proof by itself of
+  the current code's meaning. A harmonized =Meal= label is not a primary source.
+- UNIDO's 1988 Malawi maize-mill feasibility report lists Gramil flour products
+  (historical corroboration, not a 2024 code crosswalk):
+  https://www.unido.org/publications/ot/9647091/pdf
+
+Verify the current instrument, raw label and response/quantity/source patterns;
+inspect separate household milling-charge questions if held. Preserve service
+costs under their actual semantics and do not infer edible kg for a service.
+Return a concise source-backed recommendation and any remaining ambiguity before
+changing the current classification or guessing a borrowed factor for item 119.
+
+* Runtime and scope
+Sanctioned get_dataframe/get_data_file, exact import/config identity and a private
+data root with shared L1 only. Mounted venv, BLAS/build workers pinned to one;
+modest free co_carleton burst jobs for long builds. No DVC CLI, shared-cache writes,
+dependencies/lockfile/fixture changes, weakened assertions or public household IDs.
+Do not edit the separate weight research or its pinned =wire-malawi-2024= worktree.
+Deliver exact commits, tests, source coverage, residuals and unverified portions.

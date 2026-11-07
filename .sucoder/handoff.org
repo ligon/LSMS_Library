@@ -1,4 +1,45 @@
 #+title: Handoff, LSMS-ISA sweep
+* Active goal checkpoint, 2026-11-07: three lanes progressing
+Goal ACTIVE: resolve ISA issues and shared blockers with reviewed/verified fixes
+and authorized development merges. No master release or shared rewarm yet.
+
+- #1452: =local_recovery= owns =worktrees/ehcvm-1452-recovery=, candidate
+  =88b46e717=. 401 synthetic/config/registry/size/hash tests passed; strict #1450
+  assertions and current non-food blocks preserved. Source baseline/candidate,
+  healthy-country controls and Feature/hash sweep run in free job =41002776=
+  (savio3_htc, 4 CPUs; observed RUNNING). Root approved selective recovery only.
+- #1590: =decision_recovery= owns =worktrees/wave-failure-manifest=, ledger
+  =629847638=. Clean baseline hook/script census in free job =41002718=
+  (savio4_htc, 4 CPUs; observed RUNNING). Root approved same coverage invariant
+  for the discovered DVC-stage producer as well: never stamp missing/failed
+  stages as complete, without inventing coverage or unrelated failure policy.
+- Malawi weights: =github_reconcile= owns =worktrees/malawi-combined-weights=.
+  Source checkpoint =e8b40f7d9=, findings ledger =b8713c1d8=. Reproduced membership,
+  historical links, original scales and source hashes. Timing/calibration and
+  domain differences are explicit. Root reviewed DESIGN-INPUT-MAP and released
+  conditional identification/composite research, not production weights. Evaluate
+  the two official cross-section estimators with correct overlap contributions;
+  no naive independent-variance optimal lambda or ratio-as-probability claim.
+
+Fresh independent review and exact final CI remain required for implementation.
+Researchers may return a supported, conditional or constructive insufficiency
+result under the signed-off charter. Durable reports live in the sweep directory
+under =reports/ehcvm-1452-recovery-20261107/=,
+=reports/1590-wave-failure-manifest-20261107/=, and
+=reports/malawi-combined-weights-20261107/=.
+
+New rulings: #49 YES, borrow IHS5 food-unit factors as a registered derivation;
+#51 NO, do not clamp dates. #48 remains research-held. #50 requests a check of
+the milling-service interpretation; primary NSO evidence separately calls
+Gramil maize flour and names milling fees, so a clarification question is pending.
+No food/service classification has been silently selected. The next worker task
+is =.sucoder/tasks/malawi-food-followups-20261107.org= (also copied to sweep/tasks/).
+Do not mutate the pinned =wire-malawi-2024= config used by weights research.
+
+Tracker reconciliation completed/read back: #1134 now describes structural-tag
+residuals after merged #1541; #1136 acknowledges completed option A. Both stay
+open for the approved one-evidenced-tag-at-a-time work after the defect queue.
+
 * Current state, 2026-11-07: shocks landed; weight investigation chartered
 Shocks ruling 40 is implemented in PR #1596, merged to development as =8558fefe0=.
 Reviewed head =d73cdb3d1= passed 432 targeted/source/schema tests and offline CI
