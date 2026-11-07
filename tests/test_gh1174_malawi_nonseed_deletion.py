@@ -49,7 +49,7 @@ def test_registry_documents_both_deletions_and_applied():
     records = derivation_records('Malawi')
     record = records[KEY]
     assert record['rows'] == 0
-    assert record['waves'] == ('2010-11',)
+    assert record['waves'] == ['2010-11']
     assert 'Applied' in record['columns']
     assert 'Applied' in records[SEED]['columns']
     assert callable(record.resolve('function'))
