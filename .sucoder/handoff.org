@@ -1,4 +1,61 @@
 #+title: Handoff, LSMS-ISA sweep
+* Recovery checkpoint, 2026-11-07 20:33 UTC: workers resumed from durable state
+The preceding goal work made progress: independent reviews identified and
+corrected framework boundaries, seven-country source comparisons passed,
+the weights critique completed, and the food/prerequisite placement was approved.
+At20:33 all prior collaboration workers were no longer live; ps showed no
+Python/pytest/build process and squeue showed only allocations40825266/40824891.
+Do not infer running work from the older status paragraphs below.
+
+Fresh GitHub fetch shows development still8558fefe0; only open PR is1423,
+the runbook reserved for maintainer review. No new product PR/merge is claimed.
+New isolated workers (old author trees preserved):
+- =finish_1590=: exact clean candidate
+  =8c84c9d3ff805fc0b75a6562a7b0d2c2faab6f17=, final parent-loop fallback
+  serialization. Existing revision3 controls/logs are at sweep reports1590.
+  Final source/CI run on this exact revision had NOT been launched. Prior
+  job41003890 on3b6a completed35exact source comparisons/fourfaultcontrols/hash,
+  then offlineCI had11326pass/245skip/4xfail/1failure: a fixture expected an
+  unchanged rejected same-path country cache to serve. Root approved making its
+  reproducer actually write output, retaining frame/index/called assertions and
+  the no-op negative; inspect8c84's exact committed changes and rerun final gates.
+- =finish_1452=: preserve dirty old88tree (three test/doc files); recover only
+  those authorized changes in NEW tree. Source job41002776 TIMEOUT2:00:09.
+  Seven-country comparisons and four stale rebuilds PASS; offlineCI11398pass
+  (245skip/4xfail) PASS. Source pytest had four new-oracle KeyError(waves)
+  failures and no final summary. Separate original4fail/corrected4pass traces
+  are preserved. Closed89/93MB L2 snapshots and operands are durable. Finish
+  corrected source tests, Feature checks, GhanaLSS importer/hash control, final
+  doc/test revision and source acceptance. Independent review286pass/no blocker
+  is at sweep reports/review-1452-recovery-20261107/VERDICT.md. P3 doccounts
+  are part of the preserved follow-up. Worker also supplies fresh1590 re-review
+  while deterministic verification runs.
+- =malawi_revision_food=: first complete the ONE bounded research revision in
+  NEW tree from frozen131dcdd, then resume food in another NEW tree from ledger
+  074c41f84 plus preserved dirty guard helpers/test. Keep both original research
+  and pinned83aconfig untouched. Critique supports conditional fixed-lambda
+  composite and final-weight nonidentification; clarify unequal-population
+  annual ratio versus equal-quarter mean, leaving annualMalawi unevaluated,
+  and explain estimated internalC6 coefficients summing1 do not establish exact
+  unbiasedness. Preserve explicit four-cell/two-person source discrepancy and
+  all uncertainty/input limits. No production policy follows; decision48 held.
+
+Food placement APPROVED: minimal2024food/sample/ID carrier only; opt-in panel-ID
+guard helpers and narrow Country hook in separate prerequisite commits/tests,
+with current fingerprint measurement and default/Make map parity. Coordinate
+1590's _compute_panel_ids fixes on integration; no historical whole-file copy.
+Item119 nativePreferredLabel plus GDCategoryMaize/ownaggregate/shortGramil is
+approved, no processing-subtype or factor-crosswalk guess. Partial factor
+coverage must not produce a falsely complete collapsed Quantity_kg sum. See
+the task ledger/inventory for unsupported codes/units and provenance categories.
+Big source builds use free modest bursts after bounded checks; no shared rewarm.
+
+All compute restarts require actual terminal/missing-handle evidence; none were
+restarted merely because an observation timed out. Existing helpers are sweep
+submit.sh/burst.sh, ALWAYS--cold (default would use shared L2). New Slurm step
+must mount the existing image in its own namespace and assert absolute interpreter,
+code/config/import and frozen SHA. No dependency installation/paid fallback.
+
 * Active checkpoint, 2026-11-07: revised framework candidate frozen
 The previous turn made progress through tracker reconciliation, independent
 failure probes, preserved recovery evidence and dispatch of approved food work.
