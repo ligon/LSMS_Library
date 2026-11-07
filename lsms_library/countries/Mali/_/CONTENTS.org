@@ -3456,3 +3456,22 @@ With #1487 a lone request serves the all-waves column.  =KgFactorSource=, =surve
 *What could check this.*  =ehcvm_prix_mli2021= is outside the household data, with per-=Kg= prices only; it holds no usable unit weights.  Table rows against market per-kg, median abs. log error / within 2x, 2021-22: 0.592 / 55.0% under the inference, 0.507 / 69.7% under the table, signed -0.46 to +0.39; correlation of item medians with the market 0.49 to 0.58, though at item medians the error goes 0.418 to 0.509.  2018-19 rows against that 2021-22 market: 0.701 / 47.6% -> 0.678 / 64.1%, item correlation 0.67 -> 0.86 on 22 items.  2018-19 community price ratios, table-free but price ratios: 0.284 / 82.2% against the table.  The rows whose label states the mass check the join.  The household =Kg= purchase check ranks table rules; it cannot rank table against inference, since the inference is estimated from those prices.
 
 *Corrects the #876 section above*: "no EHCVM wave ships a unit-conversion table" is wrong for 2021-22.  The #876 NA on a last purchase in another unit stands; a table that weighs a unit is not what that construction uses, and whether it should be is a separate question.
+
+* 2026-11-07 — own EHCVM sold condition (GH1528)
+2018-19 s16cq16c and 2021-22 s16dq05d each record the SOLD product's state.
+Each own released dictionary was checked independently: 1 Epis, 2 Grain,
+3 Décortiqué, 4 Non-décortiqué, 5 Non concerné. Condition_sold reuses the
+existing EHCVM fold as an optional NA-bearing column; condition_sold_native
+keeps the literal sold label. A blank is NA, never unknown_condition.
+The 2021 answer accompanies its sale through the existing exactly-one-row or
+Farm-level placement. No eligibility, quantity, unit, harvest-total, survey-kg,
+period or EAC-I rule changes. In particular 2021 s16cq16c remains the harvest
+KG TOTAL and is never read as sold state. A derived harvest can still mix states
+and retain unknown_condition even when its sale has a known state.
+
+Sanctioned numeric/labelled reads found 2,111 state answers / 7,992 records in
+2018 and 1,140 / 5,068 in the 2021 sale module. Every state answer accompanies
+a positive sale in its own module. The sold states were previously unread; this
+does not amend the older EAC-I tree-window ruling or wire its different state
+list. Source and verification receipts: .coder/ledger/1528-sold-condition.md.
+Added-payload retention and cold API equality remain separate verification gates.

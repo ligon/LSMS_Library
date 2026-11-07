@@ -3296,3 +3296,19 @@ With #1487 a lone request serves the all-waves column.  =KgFactorSource=, =surve
 *Corrects the #876 section above*: "no EHCVM wave ships a unit-conversion table" is wrong for 2021-22.  The #876 NA on a last purchase in another unit stands; a table that weighs a unit is not what that construction uses, and whether it should be is a separate question.
 
 *GH #1451, measured here, not served.*  The 176 bare 2018-19 rows (=Litre= / =Grand= 175, =Kg= / =Grand= 1) cannot be sized from this table: it, like the other three countries', holds =Kg= and =Litre= at =taille unique= only, and =Kg= and =Litre= stay on their labels, here too now that 2018-19 reads the table.  The 175 are =Jus de fruits= (130) and =Vinaigre /moutarde= (45), median 2.0 L, with no size-free row of the same product and unit to compare them with.  Serving them as =Litre (Grand)= needs the kg ladder to read a metric base under a size, which is =transformations.py=; see #1451.
+
+* 2026-11-07 — own sold condition, 2018-19 (GH1528)
+The 2018-19 s16c sold answer s16cq16c (16C.16c.Etat du produit) is
+separate from harvest s16cq12c. Its own released dictionary is 1 Epis, 2 Grain,
+3 Décortiqué, 4 Non-décortiqué, 5 Non concerné, matching this wave's existing
+three-token harvest fold. Condition_sold carries that fold as an optional
+NA-bearing column; condition_sold_native retains the literal label. Neither
+supplies harvest condition, a unit factor, or a conversion. Blank sold answers
+stay NA. This does not wire any 2014 or 2021 crop module.
+
+Sanctioned numeric/labelled source reads found 5,356 sold-state answers among
+15,593 records, all beside positive quantity or value; 5,368 records have a
+positive sale. The printed four-answer form remains contradicted by the released
+five-answer dictionary (“The printed form is not what was fielded.” above).
+Source and verification receipts: .coder/ledger/1528-sold-condition.md. Added
+payload row-retention and cold API comparisons are separate verification gates.
