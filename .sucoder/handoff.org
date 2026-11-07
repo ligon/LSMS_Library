@@ -1,4 +1,107 @@
 #+title: Handoff, LSMS-ISA sweep
+* Progress checkpoint, 2026-11-07 23:15 UTC: reviewed fixes and source comparisons
+This goal turn is PROGRESS: two actual implementations, independent defects
+found/corrected, two draft PRs, completed source/API evidence, a concrete scientific
+eligibility memo, and a next country implementation. Goal remainsACTIVE; the
+full ISA/shared backlog is not complete. Do not infer live actors from old entries.
+
+Remote1510 job41005372 and1475 retry41005397 BOTH terminalFAILED15:0/native143,
+owned-child descriptor-mount inspectionerrno13; no task report/product changes.
+No further native dispatch retries. All first8 country reports remain delivered
+(six infrastructure successes, Burkina/Uganda artifacts complete with preservation
+errors). Root moved implementations into NEW local worktrees, kept all failures.
+
+GH1510: finish_1452 author at065082e44ae2ae024823b93a6f9df78a09614f79,
+worktreeframework-1510-local-20261107. Root independent review found ff4a's
+unconditional payload-name exclusion skipped genuine DFS subframes namedmyvars/
+idxvars (alsofile). Actual mapping+sidecar-hash proof retained, revised065 closesit.
+102focused +1distinct fake-FS residual passes; root22focused+4namespacepasses.
+StrictAPIaudit0. Full registered metadata38countries/450countrytable/1895wave/
+35build/186import:450/450country,1877/1895wave,35/35BTF move globally via
+aggregate→prewarm→collector.18NonecellsPeru3waves×6tables;0/186importschange.
+Public runtime-derived surface553/2313/39 reconciled separately, not newcaches.
+Offline CI CLOSED0:11464passed/245skip/4xfail1034.89s; exact -m not requires_s3,
+source cases excluded; collect-only deselection accounting pending. DraftPR1601
+OPEN exact065; WindowsSUCCESS, unitRUNNING lastread. Root requested final
+DOCS-ONLY ledger phase3 commit afteractorsclosed; byteproof code/tests/config
+mustremain065; pushfinaldochead and require configuredGHA beforeauthorizedmerge.
+Independent finalreportB/reports/review-1510-source-overrides-20261107/FINAL-VERDICT.md.
+Prewarm bare-Data-path resolver remains inherited and separately filedGH1602;
+no realprewarmbenefit/source-read claim. Hashfixtureoperator failures retained.
+
+GH1475/1517: rootauthor NEWtreefix-1475-country-crop-20261107, frozen2269d325e
+(full2269d325ec9f5d7da6ab10c7242f71d824e6b486), draftPR1600OPEN.503focusedpass;
+77untouchedbasefail. Existingcountry rules reused1159/1160/1205/1460, no food or
+plot-input inference policy change. Crop-only pricepools: independent5/20kg
+Basket mustnot become12.5/12.5. Fourreducers retainrowcountry andyielddispatches
+ownland routes; heldBenin/GB/Togounchanged, area_toldrefusalsunchanged.
+Independentfinish_1590 verdict616existing+45newpass; fourretainedfailures areONE
+inheritedunqualifiedshippedwarninggap exactparent-proven, filedGH1603.
+Actualguarded metadata census450/1895/35/186 ALLUNCHANGED,0errors/denials,
+sourcecode2269 clean; positive tracked-helper controls running separately.
+Free deterministic coldjob41005570 on n0028.savio4,4CPU32G90min, controller
+PTY41666: sourceBASE254.806s, candidate40.595s, freshwarm42.452s ALLexit0.
+SIXnativeCountryframes +24Countryderivedframes exact; eightactualFeature
+transformoutputs equalstackedindependentcountries; currentpublicFeatureinputs
+unchanged. Freshwarm60cacheparquets bytes/epochsunchanged. Privateoperands are
+B/private/framework-1475-2269-source (700/files600), verifierlogdir700/logs600;
+running scriptbytes unchanged. Full isolatedofflineCI nowactive in samejob;
+configuredGitHubunitactive/Windowsgreen. MustfinishCI/terminalreceipt and final
+ledgerphase3/doc-onlybyteproof beforemerge; no cache/masterrelease.
+ReportsB/reports/framework-1475-local-20261107; independentreview siblingfolder.
+Root sourceoperator copies configuredreader ONLYinto receivingallocationprivate
+config, neverprints/archivescreds. Baseline uses exactc964, candidatemount/code/
+config/privateL2 asserted; sharedL1existingonly, no sharedL2rewarm.
+
+Malawi food integration: exact7f45997805592035d7f337541ab75d9186447a6f,
+branchfix/malawi-food-integration-20261107 filesystempublished only. Sourcejob
+41005535 COMPLETED0:0/34:30, controller21758closed0. All6freshframes exact5af,
+originalbaseline sample/nativefood/index/unitvalues/exp andoldernativekgexact;
+actualMakefood/sample andFeature;169995publicinputs/rederive/rawfactorfields;
+1768admissionmask1492/276unchanged. Fullaudit350=3pass345warn2fails, both
+unsupportedPricebasiskgprice/unitprice reproducedonbaseline2d85+5af (notgreen).
+Freshwarm19.22s/18cachefilesunchanged,typedCountry/Featureexact.
+Full integrationofflineCI terminal0:11486pass5646skip4xfail1107.89s.
+Freshindependentfinish_1590 integrationreviewCLOSED146pass:13Malawifiles+
+local_tools/3oldtestfilesbyteexact5af; wholeCountryASTc964 afterONLYapproved
+helper/import/dispatcherremoval; handlerbytesandlegacyIDfuncsexact. Newguard
+exceptionspreserveoriginalidentity/cleanup/retry; oldoptionalclassificationkept.
+Reportreview-malawi-food-integration-20261107/FINAL-INTEGRATION-VERDICT.md.
+AuthorpreparingfinalDOCS-ONLYledgercommitwithbyteproof; rootshouldpublishDRAFT
+onfinalheadandrequireGitHubchecks. Weights48/wholewavemergeSTILLHELD, not an
+authorization to ship a productionweight/default policy. No furtherbehaviorreview
+neededifbyteproofexact; nooldfrozen5af/83a/researchtreewrites.
+
+1509 boundedphase EXECUTED on c964, ledger-onlyheadff955905c6e9ae7cd1b028006530b878c37c272e.
+38external+122currentcontracttestsPASS. FreshCambodia38201/Serbia200046raw
+frames authenticatedexacttosavedoperands. Literalpurchase-onlykg -1.0832%/
+-2.1216%, nofinitefactorloss/rung/price-rowcoveragechange; fallbackproposal
+matchesliteral wherepricedpurchasesexist. No externalaccuracyclaim.
+STOPmemo12lines: Cambodian purchasedQuantity=totalQ*spent/(spent+obtained),
+325positivepairedsourceunitvaluesidentical; doublingONLYrawobtainedpreserves
+purchasedexpenditure/keysbutschangesthose325purchasequantitiesand2574Piece
+factors(.1153846154→.1142857143). Canonical-only nonpurchaseperturbationsmissit.
+Root REQUIREDasynceligibilityquestiondelivered: independentlyobservedpurchase
+prices vsallsource-labelledpurchases(includingallocatedQ); answerpending,
+no productrule/defaultchosen. Source/codeprogressionHELD on1509 and1442.
+B/reports/framework-1509-comparison-20261107/{EVIDENCE-MEMO.md,REPORT.md}.
+
+BoundedMalawiweights993 critiqueclosed; finalreportdurablycopiedto
+B/reports/malawi-weights-revision-20261107/FINAL-REPORT.md alongsideexactpatch/
+manifest. Finalweight ratios doNOTidentifyselectionpi; fixedexternal-lambda
+composite is conditionalpoint-estimatorresult, no identifiedjointvariance/CI.
+Productionpolicy48/NA/normalization remainsHELD.
+
+Nextcountry1528 assignedfinish_1590: correctbranchfix/1528-sold-condition-current-20261107
+NEWtreefromGitHubc964, ledger1d8b2f393BEFOREcode. ReadfullBFA/MaliCOUNTS,
+verifyown-sourcecodes/labels andNAonNoSale; nativeconditionanswerfollowcurrent
+ruling. Nofactor/valuation/grainpolicychanges, preserveoldpayload/measureanynew
+rowretention. PrivateL2/sanctionedboundedreads/freeburstsallowed; noGithub/shared
+L2/DVCCLI/dependencies. IMPORTANT filesystemorigin/development111b isSTALE
+Nov5PR1572, not advanced; author's untouchedinitialstaletree/refpreserved and
+freshcorrecttreeidentityconfirmedbeforeanyledger/code/data. Root neveradvanced
+sharedmirror development. Author maypublishONLYcurrent-specificfilesystemref.
+
 * Checkpoint, 2026-11-07 22:22 UTC: next shared workers submitted
 Shared1510 has ONE remote implementer dispatch774ab9d1b5d84c30bc6f13bbda30cda0,
 job41005372. Shared1475/1517 has ONE remote implementer

@@ -39,17 +39,19 @@ Ethiopia attempt1 job41005128 failed143 in the runtime process-inspection guard.
 * Shared queue deduplication
 Issue1510 appears in Burkina Faso, Malawi and Nigeria recommendations: root has dispatched ONE shared implementation lane. Issue1475/1517 is likewise one shared country-identity lane, not separate country fixes. Issue1528 spans Burkina Faso and Mali and needs coordinated source-specific scope. Queue/context entry totals overlap and must never be summed as unique backlog counts.
 
-* Current shared implementation workers
-Both use pinned development c964c6c4f, private runtime/cache/results, free2CPU8G90min, and no source-data/GitHub writes. Initial authorization is bounded implementation plus hermetic/metadata checks; source-backed acceptance and independent review remain separate.
+* Current implementation ownership (2026-11-07 23:15 UTC)
+Both remote shared implementation workers TERMINATED native143 in process-descriptor inspection, without a task report or product changes. No further retries; their exact failures remain in the registry. Local implementation proceeded in separate clean c964 worktrees. Local model slots and remote deterministic compute are distinct resources.
 
-| Issues | Dispatch | Job | Observed phase |
-|--------+----------+-----+----------------|
-| 1510 | 774ab9d1b5d84c30bc6f13bbda30cda0 | 41005372 | RUNNING / agent_execution |
-| 1475,1517 | 06c11ed49f814408936fbdfba51b696e | 41005397 | RUNNING / agent_execution |
+| Scope | Current owner | Frozen code / gate |
+|-------+---------------+--------------------|
+| 1510 | finish_1452 | 065082; draftPR1601, code/review/offline complete; final doc-only ledger + GitHub checks pending |
+| 1475/1517 | root | 2269d325; draftPR1600, source/API/warm and independent review pass; CI job41005570 + GitHub checks running |
+| Malawi food49/50 | malawi_revision_food | 7f459978; source/API/warm/offline and independent review pass; final docs forthcoming; weights48/whole-wave held |
+| 1528 BFA/Mali sold condition | finish_1590 | NEW branchfix/1528-sold-condition-current-20261107 from GitHubc964; ledger1d8b2f393; bounded own-source semantics probe next |
+| 1509 | root decision queue | bounded evidence complete, source-label versus independent-purchase-price eligibility question pending user; no default chosen |
+| 1602/1603 | root queue | inherited prewarm resolver / unqualified shipped warning residuals filed separately |
 
-The first1510 submit rc2 timed out in the unchanged30s source-clone guard before sbatch. No job existed (receipt/scheduler reconciled). Standard private-source repack refreshed the full bitmap; all refs/object paths unchanged, fullfsck0 and exact installed-helper clone27.343s. One controlled identical-task retry submitted41005372. Original failure and setup diagnostics remain preserved; no installed guard was changed.
-
-The first1475 worker41005339 failed143 in native owned-child FD inspection (errno13), with sourcehead unchangedc964 and no task report. Explicit result and sacctFAILED15:0 were confirmed before ONE retry on a different node (41005397), safeguards/task unchanged. Preserve original result; do not count it as completed implementation.
+Filesystem origin/development is stale111b (Nov5); GitHub development was freshly c964. Never treat the filesystem branch as current GitHub. An untouched1528 tree from111b is preserved; its replacement fetched/verified GitHubc964 before ledger/code/data. Original owner-role queues remain the durable country context, not competing fix assignments.
 
 * Root workflow
 1. Reconcile each proposed task against current GitHub state, merged work and DECISIONS.
