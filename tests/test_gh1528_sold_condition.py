@@ -181,7 +181,8 @@ def test_served_answers_equal_own_raw_codes_and_literal_labels(country, wave, fi
     literal = local_tools.get_dataframe(str(path), convert_categoricals=True)
     table = local_tools.df_from_orgfile(ROOT / country / "_/categorical_mapping.org",
                                        name="harmonize_food")
-    mapping = dict(zip(table["Original Label"].astype(str).str.strip(),
+    source_header = "Original Label" if country == "Burkina_Faso" else "Code"
+    mapping = dict(zip(table[source_header].astype(str).str.strip(),
                        table["Preferred Label"].astype(str).str.strip()))
     ids = (numeric.grappe.astype(int).astype(str) + "0"
            + numeric.menage.astype(int).astype(str).str.zfill(2))
