@@ -130,6 +130,23 @@ def test_variable_maps_do_not_add_source_sidecar_dependencies(metadata):
     assert wave._input_hash('facts') == configured
 
 
+@pytest.mark.parametrize('name', ['main', 'myvars', 'idxvars', 'file'])
+def test_named_dfs_blocks_keep_sources_even_with_variable_field_names(metadata, name):
+    country, wave, sidecar, block = metadata
+    # grab_data resolves each dfs name in its parent block. The same spelling
+    # can name a subframe here and a variable map inside that subframe.
+    outer = {'dfs': [name], 'final_index': ['t', 'i'], 'merge_on': ['i'], name: block}
+    info = wave.file_path / '_/data_info.yml'
+    info.write_text(yaml.safe_dump({'facts': outer}, sort_keys=False))
+    consumed = set(wave.column_mapping(name, wave.resources['facts'][name])) - {'df_edit'}
+    assert consumed == {'../Data/plain.dta', '../Data/panel.dta'}
+    assert set(lt._collect_file_paths_from_block(wave.resources['facts'])) == consumed
+    before = wave._input_hash('facts'), country._table_cache_hash('facts', country.waves)
+    sidecar('panel.dta', '8' * 32)
+    after = wave._input_hash('facts'), country._table_cache_hash('facts', country.waves)
+    assert all(old != new for old, new in zip(before, after))
+
+
 def test_secondary_prewarm_caller_uses_overrides_with_fake_remote(metadata, tmp_path, monkeypatch):
     country, _, _, _ = metadata
     calls = []

@@ -810,10 +810,14 @@ def _collect_file_paths_from_block(block):
 
     A list member may override variables for one source. Match
     ``Wave.column_mapping``: the first mapping key is the consumed path;
-    the override payload contains variables, not further declarations.
+    the override payload contains variables, not further declarations. Names
+    listed in ``dfs`` designate sibling subframes even when they happen to
+    spell ``file``, ``idxvars`` or ``myvars``.
     """
     if isinstance(block, dict):
-        f = block.get("file")
+        names = block.get("dfs")
+        subframes = names if isinstance(names, (list, dict)) else ()
+        f = block.get("file") if "file" not in subframes else None
         if isinstance(f, str):
             yield f
         elif isinstance(f, list):
@@ -825,7 +829,7 @@ def _collect_file_paths_from_block(block):
                     if isinstance(path, str):
                         yield path
         for key, value in block.items():
-            if key not in {"file", "idxvars", "myvars"}:
+            if key in subframes or key not in {"file", "idxvars", "myvars"}:
                 yield from _collect_file_paths_from_block(value)
     elif isinstance(block, list):
         for item in block:
