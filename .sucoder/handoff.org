@@ -29,10 +29,10 @@ under =reports/ehcvm-1452-recovery-20261107/=,
 =reports/malawi-combined-weights-20261107/=.
 
 New rulings: #49 YES, borrow IHS5 food-unit factors as a registered derivation;
-#51 NO, do not clamp dates. #48 remains research-held. #50 requests a check of
-the milling-service interpretation; primary NSO evidence separately calls
-Gramil maize flour and names milling fees, so a clarification question is pending.
-No food/service classification has been silently selected. The next worker task
+#51 NO, do not clamp dates. #48 remains research-held. #50 YES, classify code 119
+=Grain Mill (Gramil)= as maize flour: the maintainer answered "On #50, yes" to
+that explicit choice after the primary NSO evidence distinguished Gramil flour
+from milling fees. This does not establish a borrowed factor crosswalk. The next worker task
 is =.sucoder/tasks/malawi-food-followups-20261107.org= (also copied to sweep/tasks/).
 Do not mutate the pinned =wire-malawi-2024= config used by weights research.
 

@@ -1,4 +1,4 @@
-#+title: Malawi 2024–25 food follow-ups — approved borrowing and item 119 investigation
+#+title: Malawi 2024–25 food follow-ups — approved borrowing and maize-flour classification
 
 * Authority and scheduling
 Maintainer ruling, 2026-11-07: "On #49, yes, borrow". Borrow IHS5 2019–20 food-unit
@@ -6,6 +6,10 @@ factors for 2024–25, explicitly registered as a derivation. The source year an
 cross-wave assumption must be visible; replace the borrowing when an appropriate
 new source is available. No production weighting change is authorized: decision 48
 is under the separate signed-off research charter.
+
+Maintainer ruling on item 50, 2026-11-07: "On #50, yes", answering the explicit
+choice to classify code 119 =Grain Mill (Gramil)= as maize flour after the source
+check below. This supersedes the initial milling-service interpretation.
 
 This is the next implementation lane when a worker slot frees. Do not preempt
 the active #1452/#1590 prerequisite repairs or mutate the pinned configuration
@@ -43,10 +47,13 @@ machinery and registered-derivation/inputs machinery. No alternate kg estimator.
   review precedes PR/authorized development merge. Never merge to master or
   rewarm the shared cache in this lane.
 
-* Item 50: inspect, do not silently choose food or service
+* Item 50: approved maize-flour classification
 The maintainer proposed interpreting =Grain Mill (Gramil)=, code 119, literally
 as a milling service and requested comparison with other corpus treatments.
-The previous recommendation to map it to Maize is not an approved decision.
+After reviewing the contrary primary evidence, the maintainer approved maize
+flour. Apply the existing appropriate maize-flour mapping, preserve the native
+label/code, and document the source evidence and the decision. This approval
+does not establish a factor crosswalk for borrowing under item 49.
 
 Existing precedents:
 - Togo =nonfood_items= code 217: =Grain Milling Fees=, used by its section-9
@@ -56,7 +63,7 @@ Existing precedents:
   maize/rice, distinct from maize flour. Tanzania's community price mapping
   likewise keeps Maize Grinding as a service with no consumed-food counterpart.
 
-New contrary evidence requiring reconciliation:
+Source evidence supporting the approved interpretation:
 - The Malawi 2024–25 questionnaire (PDF p.49) prints =Grain Mill (Gramil)= at
   119 among maize flours, with food-consumption quantity/unit and source columns.
 - The NSO's earlier Malawi dictionary explicitly names community-price item 2
@@ -72,8 +79,10 @@ New contrary evidence requiring reconciliation:
 Verify the current instrument, raw label and response/quantity/source patterns;
 inspect separate household milling-charge questions if held. Preserve service
 costs under their actual semantics and do not infer edible kg for a service.
-Return a concise source-backed recommendation and any remaining ambiguity before
-changing the current classification or guessing a borrowed factor for item 119.
+Test the approved classification and disclose any contradictory new evidence.
+Leave a borrowed factor missing unless its item/unit mapping is supported; do
+not infer that the maize-flour classification makes every older maize factor
+applicable to item 119.
 
 * Runtime and scope
 Sanctioned get_dataframe/get_data_file, exact import/config identity and a private
