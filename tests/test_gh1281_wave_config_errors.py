@@ -135,7 +135,7 @@ def test_unrequested_bad_wave_does_not_break_valid_subset(fake_country):
     assert result["x"].tolist() == [2.0]
 
 
-def test_attributeerror_keeps_existing_legacy_fallback(fake_country, monkeypatch):
+def test_attributeerror_refuses_partial_build_after_1590(fake_country, monkeypatch):
     original = C.Wave.grab_data
 
     def loader(self, request, **kwargs):
@@ -144,6 +144,6 @@ def test_attributeerror_keeps_existing_legacy_fallback(fake_country, monkeypatch
         return original(self, request, **kwargs)
 
     monkeypatch.setattr(C.Wave, "grab_data", loader)
-    result = fake_country.load()
-    assert list(result.index.get_level_values("t")) == ["2000"]
-    assert result["x"].tolist() == [2.0]
+    with pytest.raises(AttributeError, match="synthetic legacy loader"):
+        fake_country.load()
+    assert not fake_country.cache.exists()

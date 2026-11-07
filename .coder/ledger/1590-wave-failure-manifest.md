@@ -44,8 +44,8 @@ change invalidates old incorrectly complete manifests; re-warming is later.
 
 ## §4 Invariants and proposed safe placement
 
-1. Keep the scheduler's outer `(has_table, result)` protocol and existing
-   nested `(wave_result, successful_empty)` outcome. Account for coverage in
+1. Keep the scheduler's outer `(has_table, result)` protocol and extend its
+   nested `(wave_result, successful_empty)` outcome with completion evidence. Account for coverage in
    the parent after relay, not in a worker-local set, public attrs, or t values.
 2. Remove the catch that converts a hook AttributeError to a warning. Retain
    the contextual KeyError route and genuine declaration absence. First run
@@ -67,9 +67,13 @@ change invalidates old incorrectly complete manifests; re-warming is later.
    poisoned old-hash cache cannot be re-stamped complete after failure, and
    that repaired sources subsequently recover full coverage. Explicit
    assume_cache_fresh remains the documented caller promise, not a repair.
-7. Do not infer complete retired DVC-stage coverage from requested waves if
-   those stage outputs are missing; inventory this separate path and report
-   any scope extension before changing it.
+7. The retired DVC-stage writer had the same requested-set coverage defect.
+   Root explicitly approved including this producer on Nov 7. Cover a wave
+   only when every relevant stage has readable output and proved clean or
+   completed reproduction. A failed reproduction may still serve existing
+   data under its old fallback policy, but cannot certify that wave. A
+   country-wide stage is explicitly responsible for the requested scope;
+   do not infer this scope from observed t values.
 
 ## §5 Reuse decisions
 
@@ -83,8 +87,8 @@ change invalidates old incorrectly complete manifests; re-warming is later.
 
 ## §6 Review checkpoint
 
-No new survey-policy ruling is identified. Root reviews this concrete design
-before implementation. Remaining implementation distinction: pass positive
+No new survey-policy ruling is identified. Root reviewed and approved this
+design before implementation. The implementation distinction is positive
 script-output evidence without turning a no-builder empty sentinel into a
 successful empty wave. The retired DVC-stage path is inventoried separately.
 
@@ -99,4 +103,44 @@ no shared re-warm or source mutation. Run broader tests after targeted checks.
 
 ### Phase 3 — verification
 
-Pending implementation and measured evidence.
+Baseline source census: free co_carleton job 41002718, exact baseline snapshot,
+fresh private L2 and shared L1. All 35 callable registered tables across
+Albania and Burkina_Faso succeeded; zero entries into the swallowed
+AttributeError branch, observed before removing that catch. Every healthy
+frame saved privately for exact candidate comparison. This is a two-country
+census, not a claim about every country. Full CONTENTS files read first.
+
+Named idiosyncrasies: Albania's 1996 directory is not a declared LSMS wave;
+2004 retains 83 weighted households with unknown cluster, and 2005 is a fresh
+draw. Burkina's EMC households use EMC_ and EHCVM refresh households use CS_;
+the 2018/2021 identifier formatters differ and panel renaming is exactly once.
+Recorded historical sample counts and panel-only descriptions are superseded
+by later explicit entries in CONTENTS; no new source contradiction found.
+
+Baseline new controls: 14 failed, 4 passed, reproducing all three reported
+routes plus missing-output and retired-stage manifest defects. First targeted
+run: 838 passed, two obsolete expectations failed. Root approved updating
+GH1281's expectation of swallowed AttributeError to propagation/no-cache and
+GH1292's private receipt shape to include completed=True. Their existing
+empty-schema, attrs and warning controls remain. Affected rerun: 70 passed.
+
+Scope/process deviations: the retired-stage writer and these two existing
+test files are necessary extensions expressly approved by root. Existing
+GH675 tests also ran their CotedIvoire source fixture; its scope was noticed
+after launch, and the full current CONTENTS was reread then, rather than
+before that run. The source-backed tests passed in private L2. The country
+notes explicitly correct the old claim that GPS is not tracked: coordinates
+are required again; 117/1,084 released clusters have null coordinates, and a
+missing GPS source must preserve the existing degraded-cache healing policy.
+The recorded "same households followed across 4 waves" claim is explicitly
+contradicted later by the rotating half-panel description; no survey policy
+was inferred or changed here.
+
+Metadata-only hash census: 35/35 unique declared-table build fingerprints
+and 36/36 Albania/Burkina country hashes changed. Warm Burkina sample hash
+cost averaged 6.55 ms baseline and 6.62 ms candidate (100 calls each).
+This is the approved global invalidation; no shared corpus re-warm occurred.
+
+Candidate source verification is pending on free job 41003057: private fresh
+L2, 35 exact baseline frame comparisons, then real-source/API faults and
+repairs for all three routes. Production source is frozen to its snapshot.
