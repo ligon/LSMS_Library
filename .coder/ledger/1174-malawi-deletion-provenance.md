@@ -72,10 +72,20 @@ requests that metadata correction without changing its predicate.
 
 ## §5 Reuse decision
 
-Reuse the current finalizer and rows: 0 mechanism. If the raw D census confirms
-the residual, add a separate explicitly scoped nonseed deletion record and a
-wave-local mapping predicate/input replay using the existing fertilizer block
-and assembler, leaving producer math untouched. Wave-local placement is already
+The bounded sanctioned source probe confirms the residual on the current base:
+19,265 Module D records (no repeats), 16,560 inorganic groups, exactly one DAP
+group with missing Quantity and Applied, backed by one raw line with no ag_d38
+answer or selected total. Source bytes match MD5
+d143b71ea7c7f4efcac3b9afa0d6be48 (14,149,534 bytes). Probe and API audit exited 0.
+
+Reuse the current finalizer and rows: 0 mechanism. Add a separate 2010–11
+nonseed-group deletion record and predicate/input replay in the existing wave
+mapping.py. Reuse all three existing Module D blocks and the assembler; leave
+producer math untouched. Assemble the same projected blocks twice: once with
+real household IDs to find deleted full groups, once with release positions as
+temporary IDs to identify exactly which raw lines contribute to those groups.
+Return original raw lines and their stable release coordinates, not projected
+or invented quantities. Wave-local placement is already
 supported by resolve_callable and narrows wave-hash scope; measure actual hashes
 rather than predicting a table-only cache effect. Add Applied to the existing
 seed record's columns as the issue requests. Prove raw input replay, full native
@@ -84,7 +94,7 @@ conservation, Default/Make/Feature/warm behavior and appropriate tests on a free
 ## §6 Open questions
 
 No scientific decision is requested: registration documents an existing
-deletion and does not decide whether fertilizer was used. Current source group
-and raw-line counts remain to be measured. Stop any affected extension if its
+deletion and does not decide whether fertilizer was used. Full default/API
+conservation and all-wave deletion counts remain to be measured. Stop any affected extension if its
 eligibility/replay cannot be tied exactly to the current producer; document
 the ambiguity instead of broadening the rule.
