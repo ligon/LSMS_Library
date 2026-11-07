@@ -39,19 +39,20 @@ Ethiopia attempt1 job41005128 failed143 in the runtime process-inspection guard.
 * Shared queue deduplication
 Issue1510 appears in Burkina Faso, Malawi and Nigeria recommendations: root has dispatched ONE shared implementation lane. Issue1475/1517 is likewise one shared country-identity lane, not separate country fixes. Issue1528 spans Burkina Faso and Mali and needs coordinated source-specific scope. Queue/context entry totals overlap and must never be summed as unique backlog counts.
 
-* Current implementation ownership (2026-11-07 23:15 UTC)
-Both remote shared implementation workers TERMINATED native143 in process-descriptor inspection, without a task report or product changes. No further retries; their exact failures remain in the registry. Local implementation proceeded in separate clean c964 worktrees. Local model slots and remote deterministic compute are distinct resources.
+* Current implementation ownership (2026-11-07 23:52 UTC)
+Remote shared implementation workers ended native143 in descriptor inspection. Their failures are preserved; no further native retries. Local isolated implementation and free remote deterministic verification are separate resources.
 
-| Scope | Current owner | Frozen code / gate |
-|-------+---------------+--------------------|
-| 1510 | finish_1452 | 065082; draftPR1601, code/review/offline complete; final doc-only ledger + GitHub checks pending |
-| 1475/1517 | root | 2269d325; draftPR1600, source/API/warm and independent review pass; CI job41005570 + GitHub checks running |
-| Malawi food49/50 | malawi_revision_food | 7f459978; source/API/warm/offline and independent review pass; final docs forthcoming; weights48/whole-wave held |
-| 1528 BFA/Mali sold condition | finish_1590 | NEW branchfix/1528-sold-condition-current-20261107 from GitHubc964; ledger1d8b2f393; bounded own-source semantics probe next |
-| 1509 | root decision queue | bounded evidence complete, source-label versus independent-purchase-price eligibility question pending user; no default chosen |
-| 1602/1603 | root queue | inherited prewarm resolver / unqualified shipped warning residuals filed separately |
+| Scope | Owner | Current gate |
+|-------+-------+--------------|
+| 1510 | root closure | PR1601 merged f51ccf; issue closed; final560 ledger-only over065; GitHub/offline/review pass |
+| 1475/1517 | root closure | PR1600 merged3b28d293; both issues closed; final9335 ledger-only over2269; source/offline/review/GitHub and bounded new-base integration pass |
+| Malawi food49/50 | root hold | PR1604 DRAFT finald892, code7f; source/offline/review complete; weights48/whole-wave held |
+| 1528 BFA/Mali sold condition | finish_1590 | exactafe6; source/API/Make/Feature/warm pass; fullCI job41006173 running; independent139pass/6skip verdict forthcoming |
+| 1174 Malawi deletion provenance | malawi_revision_food | exact0efac3; focused108pass; source/offline job41006209 running; independent review required |
+| 1509 | root decision queue | bounded evidence complete; required eligibility question pending user; no default chosen |
+| 1602/1603 | root queue | separate inherited prewarm resolver / unqualified shipped warning residuals |
 
-Filesystem origin/development is stale111b (Nov5); GitHub development was freshly c964. Never treat the filesystem branch as current GitHub. An untouched1528 tree from111b is preserved; its replacement fetched/verified GitHubc964 before ledger/code/data. Original owner-role queues remain the durable country context, not competing fix assignments.
+Authoritative GitHub development3b28d293f71b962c3d878c2886be9ee794407915. Filesystem origin/development111b stays stale/untouched. Active actors remain frozen until terminal; subsequent integration uses ordinary merges, never rebase/force. Eight owner-role queues remain durable context. No shared cache rewarm/master release.
 
 * Root workflow
 1. Reconcile each proposed task against current GitHub state, merged work and DECISIONS.

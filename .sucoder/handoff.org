@@ -1,4 +1,58 @@
 #+title: Handoff, LSMS-ISA sweep
+* Authoritative checkpoint, 2026-11-07 23:52 UTC
+Goal remains ACTIVE; this turn made concrete progress. GitHub development is
+3b28d293f71b962c3d878c2886be9ee794407915. Filesystem origin/development111b
+is stale and deliberately untouched. Earlier checkpoints below are historical.
+
+PR1601 MERGED final560ce01ed2076e6dca08d1415259911f8c2ee72b as
+f51ccf2135247c7c8b619216c577780e00b1d7ec; issue1510 CLOSED completed.
+Final560 differs from verified065 only in the ledger. Final GitHub unit/Windows
+passed; source/DVC/docs skipped. Offline11464pass/245skip/4xfail, with5404
+source-marked cases deselected explicitly. Bare-Data prewarm resolver remains1602.
+
+PR1600 MERGED final9335d31a670601905556e812ee2f12bf090399a2 as
+3b28d293f71b962c3d878c2886be9ee794407915; issues1475/1517 CLOSED completed,
+exact body/state readbacks verified. Final9335 is ledger-only over verified2269.
+Source/API/Make/warm job41005570 COMPLETED0:0; offline11525pass/5649skip/4xfail.
+Five tracked-helper positive controls passed. Final GitHub unit/Windows passed;
+source/DVC/docs skipped. New-base verification mergeabbe23d417a23e23581cf0ef9e5dd0b3df47a8ae
+passed32 exact source-output/typed-attrs comparisons and104 focused checks.
+Actual merged tree9ef2ec1d5b46cf2a1076c97c9bd4b8802a102e59 exactly equals it.
+No new full source run is claimed for that bounded integration check. Reports
+B/reports/framework-1475-local-20261107 (directory700; private data stays private).
+Inherited unqualified shipped warning remains1603. Shared rewarm/master deferred.
+
+PR1604 OPEN DRAFT finald89270489c99eede294a0c52bf3befdaed7e8411,
+code7f459978 source/offline/independent gates closed. Finald892 only ledger,
+root library/tests tree equality verified. Weights48/whole-wave merge STILL HELD,
+even if configured GitHub checks pass. Two inherited source audit failures remain
+explicitly documented; do not claim all-green feature audit.
+
+1528 authorfinish_1590 exactafe6f4389ac69cfe97a102a07ccc7b1644dd1fcf,
+NEWtreefix-1528-sold-condition-current-20261107 on GitHubc964. Source/API/Make/
+Feature/warm/payload retention passed; job41006173 full offlineCI RUNNING.
+Independentfinish_1452 checks139pass/6skip, own three source dictionaries verified;
+durable verdict forthcoming. Existing rows/index/order/dtypes/nulls exact; Mali
+attrs differ only by transported derivation columns. Frozen until actors close;
+then bounded ordinary integration with current GitHub development, no rebase/force.
+
+1174 authormalawi_revision_food exact0efac3b72185dae8703db895dbc472e9a1bbeb8e,
+tree malawi-deletion-provenance, branchfix/1174-malawi-deletion-provenance-20261107.
+Ledgerb8f6 first; source census1DAPgroup/1line among19265 rawDrecords, MD5 checked.
+Focused108pass; free cold job41006209 source/API/seedreplay/Make/Feature/warm/full
+offlineCI active. No shared producer/reducer/finalizer or food/weight change.
+Independent review still required. Frozen actors must finish before base integration.
+
+1509 required user eligibility answer STILL PENDING: independently observed
+purchase-price evidence versus every purchase-labelled row (including allocated
+quantities). Preselection/time is not approval. Malawi48 production/normalization
+policy also HELD; bounded weights critique closed. Mali1594 raw sentinel semantics
+remain unverified; no mask. These holds do not block the other implementation lanes.
+
+Remote native worker FD-guard failures preserved; no more blind retries. Bounded
+diagnosis found no evidence for the GPG hypothesis and no justified config fix.
+Deterministic compute continues on free Slurm allocations with private L2.
+
 * Progress checkpoint, 2026-11-07 23:15 UTC: reviewed fixes and source comparisons
 This goal turn is PROGRESS: two actual implementations, independent defects
 found/corrected, two draft PRs, completed source/API evidence, a concrete scientific
