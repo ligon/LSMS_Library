@@ -1,4 +1,24 @@
 #+title: Handoff, LSMS-ISA sweep
+* Current state, 2026-11-07: shocks landed; weight investigation chartered
+Shocks ruling 40 is implemented in PR #1596, merged to development as =8558fefe0=.
+Reviewed head =d73cdb3d1= passed 432 targeted/source/schema tests and offline CI
+(11,290 passed; 245 skipped; 4 xfailed), plus GitHub unit/Windows-smoke checks.
+All 271,973 rows and unrelated fields were preserved across twelve countries.
+Issues #1556/#1561 now describe only remaining wave-adoption / CIV missing-code work.
+Evidence: sweep =reports/shocks-purchases-stock/STATUS.md=. No shared rewarm yet.
+
+Decision 48 was reopened when the maintainer said "Actually, hold up" and asked
+whether =wt_cross= and =wt_long= determine retained-household inclusion probabilities.
+No weight changes have been implemented. The verified IHPS BID is DVC-tracked;
+its named copy/provenance are in sweep =reports/malawi-weights/=. Final weight
+ratios include separate calibration/trimming; do not interpret them as selection
+probabilities, or presume that prevents every valid composite estimator.
+
+The maintainer requested a charter on November 7. Draft for sign-off:
+=.coder/charter-malawi-2024-combined-weights.md=, grounded in its per-task ledger.
+This scopes research, not a production policy or the earlier proposed NA assignment.
+Items 49/50/51 remain pending. Prior snapshots below are historical.
+
 * Current state, 2026-11-06 recovery (Codex)
 Read =.sucoder/isa-recovery-20261106.org= for the reconciled state and restart queue.
 GitHub development is =65b1730f0= (PR #1595); master remains =097283459=.
