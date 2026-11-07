@@ -144,3 +144,45 @@ This is the approved global invalidation; no shared corpus re-warm occurred.
 Candidate source verification is pending on free job 41003057: private fresh
 L2, 35 exact baseline frame comparisons, then real-source/API faults and
 repairs for all three routes. Production source is frozen to its snapshot.
+
+### Independent-review revision
+
+Frozen first candidate `fbe8c2d735a8a30f4af383d4edc6a14f73a4d8e0`
+matched all 35 baseline source frames exactly. Job 41003057 then failed
+(1:0, 12m11s) at the first fault probe's incorrect row-count oracle: 10,800
+is Burkina's post-hook household count, whereas the hook receives welfare
+household rows concatenated with food-item rows. The replacement oracle sums
+independent sanctioned source reads. The remaining fault controls had not run.
+
+Independent review found three valid blockers: an unchanged country parquet
+masqueraded as a wave script/Make output; undecodable UTF-8 was still caught
+as optional ValueError; and clean DVC status could override a rejected old
+country cache. All seven reviewer probes are retained. Root approved narrow
+placements: per-subprocess file-identity receipts for ambiguous country
+outputs on wave calls, UnicodeDecodeError alongside JSONDecodeError, and
+removal of the redundant retired-stage cache shortcut. File identity is an
+invocation-local write receipt under the producer's declared scope, not
+source validation. Direct country builders, wave-specific output authority,
+optional source handling and existing eviction placement remain unchanged.
+
+An additional bounded probe reproduced the same defect when a single stage
+names the rejected country cache itself. Root approved treating an unchanged
+rejected same-path output as unproven and taking the existing wave-loader
+fallback when no independently proved stage output remains. New/changed
+same-path output keeps the stage's existing producer authority. No forced
+reproduction or additional eviction was introduced. Four controls cover
+unchanged, failed-unchanged, rewritten and newly produced country-stage output.
+
+First revised focused suite: 33 passed. Expanded targeted suite: 903 passed,
+10 skipped, one failed. The failure was GH866's unchanged source-text guard:
+multiline formatting hid two existing eviction arguments. Restoring their
+same-line layout preserved the assertion and all six call sites. Affected
+rerun: 41 passed, 10 skipped. The additional country-stage probe failed before
+its correction; final affected and full offline/source runs follow on the
+revised frozen candidate. No prior failed attempt is counted as a pass.
+
+Final affected rerun after the single-stage correction: 191 passed, 10 skipped
+in 180.29 seconds (new 37-case regression module, GH866, GH1039, GH1288).
+This includes genuine changed/new country producers, no-output scripts/Make,
+failed-Make write followed by a no-op, and all four same-path stage controls.
+Full exact-head offline CI and source verification remain separate gates.

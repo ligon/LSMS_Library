@@ -5455,7 +5455,7 @@ class Country:
         ):
             try:
                 _ = self.updated_ids
-            except json.JSONDecodeError:
+            except (json.JSONDecodeError, UnicodeDecodeError):
                 # A present but corrupt crosswalk is not optional absence.
                 raise
             except (FileNotFoundError, KeyError, ValueError):
@@ -5492,6 +5492,15 @@ class Country:
                 aligned_dfs[key] = df
 
             return pd.concat(aligned_dfs.values(), axis=0, sort=False)
+
+        def output_identity(path):
+            """Invocation-local write receipt, not source-content validation."""
+            try:
+                stat = path.stat()
+            except FileNotFoundError:
+                return None
+            return (stat.st_dev, stat.st_ino, stat.st_size,
+                    stat.st_mtime_ns, stat.st_ctime_ns)
 
         def run_make_target(method_name: str, wave: str | None = None, *,
                             strict_country_make: bool = False,
@@ -5557,6 +5566,24 @@ class Country:
                 seen.add(cand)
                 unique_candidates.append(cand)
 
+            # A wave fallback can read the shared country parquet. Its mere
+            # presence does not prove this invocation produced the missing
+            # wave: both make and a no-output script may exit zero and leave
+            # it untouched (GH #1590). Keep the legacy data-return path, but
+            # certify this ambiguous output only if the producer changed it.
+            # Wave-specific outputs remain attributable to their wave/folder;
+            # direct country builders retain their existing contract (#866,
+            # #1039). No output is evicted here and t values are not evidence.
+            country_output = unique_candidates[-1]
+
+            def prior_output():
+                return (output_identity(country_output)
+                        if wave is not None and _with_output else None)
+
+            def produced_output(path, prior):
+                return (wave is None or path != country_output
+                        or output_identity(path) != prior)
+
             if makefile_path is None and script_path is None:
                 warnings.warn(f"No Makefile or script found for {self.name}/{wave or '_'} {method_name}.")
                 return result(pd.DataFrame())
@@ -5577,7 +5604,7 @@ class Country:
                 # parent, which is what actually fixes import identity.
                 return _script_subprocess_env(repo_root)
 
-            def try_make(make_dir: Path) -> Path | None:
+            def try_make(make_dir: Path) -> tuple[Path, bool] | None:
                 if make_dir is None or not (make_dir / "Makefile").exists():
                     return None
                 makefile = make_dir / "Makefile"
@@ -5615,6 +5642,7 @@ class Country:
                         # success and failure; the private CI wrapper remains
                         # the publication boundary, not this classifier.
                         run_options = {"stderr": subprocess.PIPE}
+                    prior = prior_output()
                     try:
                         built = subprocess.run(make_cmd, cwd=make_dir, check=True,
                                                env=make_env, **run_options)
@@ -5642,20 +5670,21 @@ class Country:
                     # Check the data_root candidate locations (GH #803: never in-tree)
                     for candidate in unique_candidates:
                         if candidate.exists():
-                            return candidate
+                            return candidate, produced_output(candidate, prior)
                 return None
 
-            def try_script(script: Path) -> Path | None:
+            def try_script(script: Path) -> tuple[Path, bool] | None:
                 if script is None or not script.exists():
                     return None
                 python_bin = sys.executable or "python3"
                 # A selected producer exiting nonzero is a failed build,
                 # never proof that this wave lacks the table (GH #1590).
+                prior = prior_output()
                 subprocess.run([python_bin, str(script)], cwd=script.parent, check=True, env=build_env())
                 logger.info(f"Python fallback executed for {script.parent.name}.{method_name}.")
                 for candidate in unique_candidates:
                     if candidate.exists():
-                        return candidate
+                        return candidate, produced_output(candidate, prior)
                 return None
 
             # Pre-warm the DVC cache for this feature's source files
@@ -5676,26 +5705,27 @@ class Country:
                 # downstream is the safety net.
                 pass
 
-            output_path: Path | None = None
+            output: tuple[Path, bool] | None = None
             if makefile_path is not None:
-                output_path = try_make(makefile_path.parent)
+                output = try_make(makefile_path.parent)
 
-            if output_path is None and script_path is not None:
-                output_path = try_script(script_path)
+            if output is None and script_path is not None:
+                output = try_script(script_path)
 
-            if output_path is None:
+            if output is None:
                 logger.warning(f"Data file {target_path} still missing after running fallbacks.")
                 return result(None)
 
+            output_path, output_produced = output
             if output_path.suffix == ".json":
                 with open(output_path, "r", encoding="utf-8") as json_file:
-                    return result(json.load(json_file), True)
+                    return result(json.load(json_file), output_produced)
 
             df_local = get_dataframe(str(output_path))
             # GH #868: a wave script's grain report exists only in its stamp.
             _replay_wave_stamp(output_path, self.name, method_name, wave)
             df_local = map_index(df_local)
-            return result(df_local, True)
+            return result(df_local, output_produced)
 
         def load_from_waves(waves, *, evict_country_cache=False, country_builder=True,
                             _with_coverage=False):
@@ -6040,8 +6070,6 @@ class Country:
             empty = absent_subset_frame()
             if empty is not None:
                 return empty
-            cache_exists = cache_path.exists()
-
             # GH #891: single-wave and all-wave requests share this one path, so
             # the cache carries a manifest of the waves it was BUILT from and is
             # served only to a request it covers.  On a miss we rebuild the
@@ -6103,9 +6131,8 @@ class Country:
                     if not stage_infos:
                         # GH #891: build the union, cache the union (stamped with
                         # its coverage), return only what was asked for.
-                        df, completed_waves = load_from_waves(
-                            build_waves, evict_country_cache=evict_country_cache,
-                            _with_coverage=True)
+                        df, completed_waves = load_from_waves(build_waves, evict_country_cache=evict_country_cache,
+                                                              _with_coverage=True)
                         if _is_constructed_empty(df):
                             # GH #1218 / #1221 follow-up: absence of the
                             # REQUESTED waves, constructed -- it must not be
@@ -6135,6 +6162,8 @@ class Country:
                         deduped_infos.append(info)
                     stage_infos = deduped_infos
 
+                    rejected_country_output = output_identity(cache_path)
+
                     def collect_stage_outputs(stage_list, proven_stage_refs):
                         stage_results: dict[str, pd.DataFrame] = {}
                         readable_refs = set()
@@ -6143,6 +6172,14 @@ class Country:
                                 raise ValueError(f"Unsupported format {stage.fmt} for {method_name}")
                             output_path = stage.output_path
                             if output_path.exists():
+                                # A stage may name the country cache itself.
+                                # The read gate rejected that file; clean DVC
+                                # status cannot certify it through another
+                                # path. A newly written/replaced stage output
+                                # retains the producer's ordinary authority.
+                                if (output_path == cache_path
+                                        and output_identity(output_path) == rejected_country_output):
+                                    continue
                                 df_wave = get_dataframe(output_path)
                                 df_wave = map_index(df_wave)
                                 df_wave = self._augment_index_from_related_tables(
@@ -6222,55 +6259,10 @@ class Country:
                         )
                         dirty = True
 
-                    if cache_exists and not dirty:
-                        try:
-                            logger.debug(f"Reading {method_name} from cache {cache_path}")
-                            cached_df = get_dataframe(cache_path)
-                            cached_df = map_index(cached_df)
-                            # GH #323: the OTHER warm-read path.  Same argument as at
-                            # the v0.8.0 fast-path read above -- this parquet is
-                            # post-collapse, so nothing downstream can re-detect the
-                            # loss; replay what the cold build stamped.  (Largely dead
-                            # since the DVC stage layer was retired in v0.7.0, but a
-                            # silent warm read is exactly the hole being closed, so it
-                            # does not get to stay open on a technicality.)
-                            _replay_grain_audit(
-                                read_parquet_grain_audit(cache_path),
-                                self.name, method_name,
-                            )
-                            replay_datetime_audit(
-                                read_parquet_datetime_audit(cache_path),
-                                self.name, method_name, waves=waves,
-                            )
-                            wave_hint = stage_infos[0].wave if len(stage_infos) == 1 else None
-                            cached_df = self._augment_index_from_related_tables(
-                                cached_df,
-                                scheme_entry,
-                                wave_hint,
-                            )
-                            cached_df = _normalize_dataframe_index(
-                                cached_df,
-                                scheme_entry,
-                                wave_hint,
-                                method_name,
-                                country=self.name,
-                            )
-                            # GH #891: this reads the SAME shared cache_path as
-                            # the v0.8.0 fast path above, so it needs the same
-                            # coverage discipline.  Unlike that path it is not
-                            # hash-gated (DVC stage status decided freshness), so
-                            # serve it only when the manifest proves coverage.
-                            _cov = read_parquet_cache_waves(cache_path)
-                            if _cov is None or not set(map(str, waves)) <= set(map(str, _cov)):
-                                logger.debug(
-                                    f"stage-cache read SKIPPED (coverage): {method_name} "
-                                    f"covers {_cov}; request needs {sorted(waves)}"
-                                )
-                                dirty = True
-                            else:
-                                return self._restrict_to_waves(cached_df, waves)
-                        except (FileNotFoundError, PathMissingError):
-                            dirty = True  # fall through to repro if cache missing unexpectedly
+                    # This country cache already failed the hash/coverage/
+                    # degraded gate above. Clean DVC statuses can certify the
+                    # stage outputs below, never override that rejected read
+                    # with an old aggregate (GH #1590).
 
                     stage_outputs: dict[str, pd.DataFrame] | None = None
                     stage_coverage = []
@@ -6282,6 +6274,7 @@ class Country:
 
                     if dirty:
                         stage_iter = loaded_stages or [_load_stage(info.stage_ref) for info in stage_infos]
+                        fallback_to_waves = False
                         with repo.lock, _redirect_stdout_to_stderr():
                             for info, stage in zip(stage_infos, stage_iter):
                                 proven_stage_refs.discard(info.stage_ref)
@@ -6296,10 +6289,16 @@ class Country:
                                         stage_outputs, stage_coverage)
                                     if combined_outputs is not None:
                                         return combined_outputs
-                                    return load_from_waves(waves, evict_country_cache=evict_country_cache)
+                                    fallback_to_waves = True
+                                    break
 
-                        stage_outputs, stage_coverage = collect_stage_outputs(
-                            stage_infos, proven_stage_refs)
+                        if not fallback_to_waves:
+                            stage_outputs, stage_coverage = collect_stage_outputs(
+                                stage_infos, proven_stage_refs)
+                        if not stage_outputs and any(info.output_path == cache_path for info in stage_infos):
+                            fallback_to_waves = True
+                        if fallback_to_waves:
+                            return load_from_waves(waves, evict_country_cache=evict_country_cache)
                         if not stage_outputs:
                             raise KeyError(f"No data produced for {method_name} via DVC.")
 
@@ -6338,9 +6337,8 @@ class Country:
                 # countries (Uganda, Senegal, etc.) whose stages fail at
                 # reproduce never populate the cache and rebuild from
                 # source on every call.
-                df, completed_waves = load_from_waves(
-                    build_waves, evict_country_cache=evict_country_cache,
-                    _with_coverage=True)
+                df, completed_waves = load_from_waves(build_waves, evict_country_cache=evict_country_cache,
+                                                      _with_coverage=True)
                 if _is_constructed_empty(df):
                     return df  # never cached; see the no-stage write above
                 if isinstance(df, pd.DataFrame):
@@ -6476,9 +6474,9 @@ class Country:
                 self._updated_ids_cache = None
         except Exception as error:
             # Preserve the historical optional-absence classes consumed by
-            # _aggregate_wave_data, except JSONDecodeError (a ValueError):
-            # that denotes present malformed input, never absence (GH #1590).
-            if (isinstance(error, json.JSONDecodeError)
+            # _aggregate_wave_data, except malformed/undecodable JSON (both
+            # ValueErrors): present corrupt input is never absence (#1590).
+            if (isinstance(error, (json.JSONDecodeError, UnicodeDecodeError))
                     or not isinstance(error, (FileNotFoundError, KeyError, ValueError))):
                 self._panel_ids_attempted = False
                 self._panel_ids_cache = None

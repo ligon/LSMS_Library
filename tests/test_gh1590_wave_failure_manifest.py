@@ -231,14 +231,17 @@ def test_missing_primary_subsource_is_not_a_successful_empty(survey):
 
 
 @pytest.mark.parametrize('warm', [False, True])
-def test_corrupt_json_repeated_same_country_refuses_then_recovers(survey, warm):
+@pytest.mark.parametrize('payload,error', [(b'{corrupt', json.JSONDecodeError),
+                                         (b'\xff', UnicodeDecodeError)])
+def test_corrupt_json_repeated_same_country_refuses_then_recovers(survey, warm, payload, error):
     if warm:
         survey.load()
     path = survey.panel()
+    path.write_bytes(payload)
     country = survey.country()
     before = survey.cache.read_bytes() if survey.cache.exists() else None
     for _ in range(2):
-        with pytest.raises(json.JSONDecodeError):
+        with pytest.raises(error):
             survey.load(country=country)
         assert not country._panel_ids_attempted
         assert country._updated_ids_cache is None
@@ -294,3 +297,182 @@ def test_stage_producer_only_covers_proven_outputs(survey, monkeypatch, scenario
             L.to_parquet(fixed, infos[1].output_path, absolute_path=True)
             assert len(survey.load([BAD])) == 1
             assert L.read_parquet_cache_waves(survey.cache) == [GOOD, BAD]
+
+
+# Independent review boundary probes, retained as regression controls.
+def test_successful_script_without_output_cannot_claim_warm_missing_wave(survey):
+    survey.script()
+    survey.load([GOOD])
+    assert L.read_parquet_cache_waves(survey.cache) == [GOOD]
+    survey.fault = 'missing'
+    result = survey.load([BAD])
+    assert result.empty
+    assert BAD not in L.read_parquet_cache_waves(survey.cache)
+
+
+def test_non_utf8_present_crosswalk_is_not_optional_absence(survey):
+    path = survey.panel()
+    path.write_bytes(b'\xff')
+    country = survey.country()
+    for _ in range(2):
+        with pytest.raises(UnicodeDecodeError):
+            survey.load(country=country)
+        assert not country._panel_ids_attempted
+    assert not survey.cache.exists()
+
+
+def test_clean_stage_status_cannot_revalidate_a_poisoned_old_manifest(survey,monkeypatch):
+    infos=[];stages={}
+    folder=survey.cache.parent.parent/'stage-controls';folder.mkdir(parents=True)
+    for wave in [GOOD,BAD]:
+        path=folder/(wave+'.parquet')
+        frame=pd.DataFrame({'t':[wave],'i':['synthetic'],'x':[float(wave)]}).set_index(['t','i'])
+        L.to_parquet(frame,path,absolute_path=True)
+        ref='dvc.yaml:'+wave
+        infos.append(SimpleNamespace(stage_ref=ref,fmt='parquet',wave=wave,output_path=path))
+        stages[wave]=SimpleNamespace(addressing=ref,status=lambda **kw:{},reproduce=lambda:None)
+    class Repo:
+        lock=nullcontext()
+        stage=SimpleNamespace(load_one=lambda file,name:stages[name])
+        def __init__(self,*args,**kwargs):pass
+        def close(self):pass
+    monkeypatch.setattr(C,'Repo',Repo)
+    monkeypatch.setattr(C.Country,'_resolve_materialize_stages',lambda *args:infos)
+    poisoned=pd.DataFrame({'t':[GOOD],'i':['synthetic'],'x':[float(GOOD)]}).set_index(['t','i'])
+    survey.cache.parent.mkdir(parents=True,exist_ok=True)
+    L.to_parquet(poisoned,survey.cache,absolute_path=True,cache_hash='previous-orchestrator',cache_waves=[GOOD,BAD])
+    got=survey.load([BAD])
+    assert len(got)==1
+    assert set(got.index.get_level_values('t'))=={BAD}
+
+
+@pytest.mark.parametrize('workers',[1,2])
+def test_noop_make_cannot_claim_a_missing_wave_from_country_cache(survey,monkeypatch,workers):
+    import subprocess
+    monkeypatch.setenv('LSMS_BUILD_WORKERS',str(workers))
+    survey.script()
+    (survey.country_path/BAD/'_'/ 'Makefile').write_text('# synthetic no-output recipe\n')
+    survey.load([GOOD])
+    survey.fault='missing'
+    calls=[]
+    def noop(argv,*args,**kwargs):
+        assert argv[0]=='make'
+        calls.append(argv)
+        return subprocess.CompletedProcess(argv,0)
+    monkeypatch.setattr(C.subprocess,'run',noop)
+    assert survey.load([BAD]).empty
+    assert BAD not in L.read_parquet_cache_waves(survey.cache)
+
+
+@pytest.mark.parametrize('route',['hook','script'])
+def test_terminal_failure_retains_original_exception_object(survey,monkeypatch,route):
+    import subprocess
+    if route=='hook':
+        error=AttributeError('sentinel-hook-failure')
+        original=C.Wave.grab_data
+        def fail(self,name,**kwargs):
+            if self.year==BAD:raise error
+            return original(self,name,**kwargs)
+        monkeypatch.setattr(C.Wave,'grab_data',fail)
+    else:
+        survey.script()
+        error=subprocess.CalledProcessError(71,['synthetic-script'],output='sentinel-out',stderr='sentinel-err')
+        def fail(*args,**kwargs):raise error
+        monkeypatch.setattr(C.subprocess,'run',fail)
+    with pytest.raises(type(error)) as caught:
+        survey.load()
+    assert caught.value is error
+    assert not survey.cache.exists()
+
+
+@pytest.mark.parametrize('producer', ['script', 'make'])
+@pytest.mark.parametrize('warm', [False, True])
+def test_country_output_written_by_wave_producer_proves_coverage(survey, monkeypatch, producer, warm):
+    survey.script()
+    if warm:
+        survey.load([GOOD])
+    if producer == 'make':
+        (survey.country_path / BAD / '_/Makefile').write_text('# synthetic recipe\n')
+
+    def write_country(argv, *args, **kwargs):
+        assert (argv[0] == 'make') == (producer == 'make')
+        frame = pd.DataFrame({'t': [BAD], 'i': ['synthetic'], 'x': [2001.0]}).set_index(['t', 'i'])
+        survey.cache.parent.mkdir(parents=True, exist_ok=True)
+        L.to_parquet(frame, survey.cache, absolute_path=True)
+        return subprocess.CompletedProcess(argv, 0)
+
+    monkeypatch.setattr(C.subprocess, 'run', write_country)
+    got = survey.load([BAD])
+    assert len(got) == 1 and got['x'].tolist() == [2001.0]
+    assert L.read_parquet_cache_waves(survey.cache) == ([GOOD, BAD] if warm else [BAD])
+    survey.getters.clear()
+    pd.testing.assert_frame_equal(survey.load([BAD]), got)
+    assert survey.getters == []
+
+
+def test_failed_make_write_does_not_certify_later_noop_invocation(survey, monkeypatch):
+    survey.script()
+    survey.load([GOOD])
+    (survey.country_path / BAD / '_/Makefile').write_text('# synthetic recipe\n')
+    calls = []
+
+    def partial_then_noop(argv, *args, **kwargs):
+        calls.append(argv)
+        if len(calls) == 1:
+            frame = pd.DataFrame({'t': [GOOD], 'i': ['synthetic'], 'x': [2000.0]}).set_index(['t', 'i'])
+            L.to_parquet(frame, survey.cache, absolute_path=True)
+            raise subprocess.CalledProcessError(1, argv)
+        return subprocess.CompletedProcess(argv, 0)
+
+    monkeypatch.setattr(C.subprocess, 'run', partial_then_noop)
+    assert survey.load([BAD]).empty
+    assert len(calls) == 2
+    assert BAD not in L.read_parquet_cache_waves(survey.cache)
+
+
+@pytest.mark.parametrize('scenario', ['unchanged', 'failed_unchanged', 'rewritten', 'new'])
+def test_country_stage_cannot_reuse_rejected_cache_but_can_produce_output(survey, monkeypatch, scenario):
+    if scenario != 'new':
+        old = pd.DataFrame({'t': [GOOD], 'i': ['synthetic'], 'x': [2000.0]}).set_index(['t', 'i'])
+        survey.cache.parent.mkdir(parents=True, exist_ok=True)
+        L.to_parquet(old, survey.cache, absolute_path=True,
+                     cache_hash='previous-orchestrator', cache_waves=[GOOD, BAD])
+    before = survey.cache.read_bytes() if survey.cache.exists() else None
+    calls = []
+
+    def reproduce():
+        calls.append(True)
+        if scenario in ('rewritten', 'new'):
+            # Distinct values prove this positive came from the stage, not
+            # from the fallback YAML producer's ordinary 2001.0 value.
+            frame = pd.DataFrame({'t': [BAD], 'i': ['synthetic'], 'x': [91.0]}).set_index(['t', 'i'])
+            survey.cache.parent.mkdir(parents=True, exist_ok=True)
+            L.to_parquet(frame, survey.cache, absolute_path=True)
+        elif scenario == 'failed_unchanged':
+            raise RuntimeError('synthetic country stage failure')
+
+    info = SimpleNamespace(stage_ref='dvc.yaml:all', fmt='parquet', wave=None,
+                           output_path=survey.cache)
+    stage = SimpleNamespace(addressing=info.stage_ref, status=lambda **kw: {}, reproduce=reproduce)
+
+    class Repo:
+        lock = nullcontext()
+        stage = SimpleNamespace(load_one=lambda *args: stage)
+
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(C, 'Repo', Repo)
+    monkeypatch.setattr(C.Country, '_resolve_materialize_stages', lambda *args: [info])
+    got = survey.load([BAD])
+    assert len(got) == 1 and set(got.index.get_level_values('t')) == {BAD}
+    assert calls == [True]
+    if scenario in ('rewritten', 'new'):
+        assert got['x'].tolist() == [91.0]
+    else:
+        assert got['x'].tolist() == [2001.0]
+        assert survey.cache.read_bytes() == before
+        assert L.read_parquet_cache_hash(survey.cache) == 'previous-orchestrator'
