@@ -158,8 +158,15 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 NA: False
-        AffectedConsumption:
+        AffectedFoodStock:
             - CS3D
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                NA: False
+        AffectedConsumption:
+            - CS3E
             - mapping:
                 Diminué: True
                 Augmenté: True

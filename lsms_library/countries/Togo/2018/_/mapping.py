@@ -147,7 +147,40 @@ def Age(value):
     return result
 
 
+class ShockLayoutError(Exception):
+    """Section 14.04 differs from the documented five/six-column layout.
+
+    Not a ValueError/KeyError/RuntimeError: build fallbacks must not hide it.
+    """
+
+
+def _food_effects_by_vague(df):
+    """Select stock and purchases per row, preserving mapped missing answers.
+
+    Vague 1: d = stock, e = purchases, f blank.  Vague 2: d = livestock,
+    e = stock, f = purchases (GH #1561).  The raw f sentinel checks this
+    layout independently of the answer-to-boolean mapping, as in the core
+    EHCVM 2018-19 hooks.  The same e is purchases in vague 1 and stock in 2.
+    """
+    vague = pd.to_numeric(df.pop('vague'))
+    stock_vague2 = df.pop('StockVague2')
+    purchases = df.pop('PurchasesVague2')
+    five = vague.eq(1)
+    asked = stock_vague2.notna() | df['AffectedFoodStock'].notna()
+    if not vague.isin([1, 2]).all() or purchases[five].notna().any() \
+            or purchases[~five & asked].isna().any():
+        raise ShockLayoutError(
+            f"s14q04f should be blank in vague 1 and filled in vague 2: "
+            f"{int(purchases[five].notna().sum())} filled in vague 1, "
+            f"{int(purchases[~five & asked].isna().sum())} blank in vague 2, "
+            f"vague values {sorted(vague.dropna().unique().tolist())}")
+    df['AffectedFoodStock'] = df['AffectedFoodStock'].where(five, stock_vague2)
+    df['AffectedConsumption'] = df['AffectedConsumption'].where(~five, stock_vague2)
+    return df
+
+
 def shocks(df):
+    df = _food_effects_by_vague(df)
     cope_cols = [c for c in df.columns if c.startswith('Cope')]
 
     how_coped = {0: [], 1: [], 2: []}

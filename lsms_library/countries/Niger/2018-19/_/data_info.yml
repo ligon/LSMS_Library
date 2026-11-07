@@ -210,8 +210,15 @@ shocks:
         # Section 14.04 asks revenus, avoirs, production agricole, effectif du cheptel,
         # stock, achats.  The .dta labels leave out the cheptel and so run one letter
         # late: s14q04d is the cheptel, s14q04e the stock (GH #1556).
-        AffectedConsumption:
+        AffectedFoodStock:
             - s14q04e
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedConsumption:
+            - s14q04f
             - mapping:
                 Diminué: True
                 Augmenté: True

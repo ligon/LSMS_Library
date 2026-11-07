@@ -197,8 +197,15 @@ shocks:
                 Inchangé: False
                 Non-concerné: False
         # s14bq04d is "Effectif du cheptel"; the food stock is s14bq04e (GH #1556).
-        AffectedConsumption:
+        AffectedFoodStock:
             - s14bq04e
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedConsumption:
+            - s14bq04f
             - mapping:
                 Diminué: True
                 Augmenté: True

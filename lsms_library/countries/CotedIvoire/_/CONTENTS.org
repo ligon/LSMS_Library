@@ -1014,3 +1014,35 @@ harvest quantity only: =s16cq16c= is the sold state, not served (GH #1462).  202
 not wired (GH #552), so the level reaches no 2021-22 row.
 
 *Cost:* one CotedIvoire re-warm (=data_scheme.yml=, =categorical_mapping.org= and the wave script).
+
+* Shocks: food purchases and food stocks (2026-11-06, GH #1561)
+
+The maintainer ruling is =AffectedConsumption= for food *purchases* and
+=AffectedFoodStock= for food stocks, following Ethiopia. Neither field
+measures food eaten. Both are nullable booleans using the existing answer
+map: increases and decreases are True, unchanged and ordinary
+not-concerned answers False, and missing answers stay missing.
+
+Both vagues have six consequences: =s14q04d= is livestock, =e= food
+stock, =f= food purchases. This is not the five/six-column split in Benin
+and Togo; the same e/f selectors apply in both vagues.
+
+The source variable label still calls d "Stock Produit Alimentaire" and e
+"Achat de Produit Alimentaire"; these labels conflict with the fielded
+six-column layout. The independent 2026-11-05 EHCVM shocks review
+(=reports/review-ehcvm-shocks/VERDICT.md= in the isa-sm-20261103 burst)
+identifies the layouts using source structure, animal disease/ownership
+contrasts and purchase responses, not the misleading labels. The source
+controls in =tests/test_shocks_extension_food_effects.py= independently
+select the expected columns and check the livestock-specific behaviour
+of d. No contradictory shocks-layout statement was found in this file.
+
+The source remains =Data/Menage/s14_me_CIV2018.dta=. Its Stata special
+missing =.d= (labelled =Non concerné=) still reaches these effects as NA,
+as it does for the other effects. Decoding that sentinel consistently is
+a separate GH #1561 residual; this change does not turn missing answers
+into False. Historical CILSS waves do not gain a shocks declaration.
+
+Only the existing 2018-19 declaration is changed. Registered but unfinished
+2021-22 wiring is outside this change. Other effects, coping strategies,
+row/index identity and timing are preserved.

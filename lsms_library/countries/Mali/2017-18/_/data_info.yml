@@ -121,8 +121,15 @@ shocks:
                 Diminué: True
                 Augmenté: True
                 Inchangé: False
-        AffectedConsumption:
+        AffectedFoodStock:
             - s5q04d
+            - mapping:
+                ' Diminué': True
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+        AffectedConsumption:
+            - s5q04e
             - mapping:
                 ' Diminué': True
                 Diminué: True

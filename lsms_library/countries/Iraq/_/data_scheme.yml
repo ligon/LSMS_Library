@@ -41,16 +41,19 @@ Data Scheme:
   shocks:
     # Shocks-and-coping roster. 2012 ONLY (module 2012ihses20): 23 shock
     # categories x household, filtered to experienced shocks by the
-    # _/mapping.py `shocks` df_edit hook.  i=questid (matches sample).
+    # 2012/_/2012.py `shocks` df_edit hook.  i=questid (matches sample).
     # Impact bools from q2002_1/2/3/5 (income/assets/food production/food
-    # purchases; DECREASE|INCREASE -> True).  HowCoped0/1/2 from q2003_1/2/3.
+    # purchases) and q2002_4 (food stock); DECREASE|INCREASE -> True.
+    # HowCoped0/1/2 from q2003_1/2/3.
     # 2006-07 is NOT wired: its 2007ihses18_risks.dta is one row/HH with no
     # shock-level structure (no per-shock impact or coping roster).
     index: (t, i, Shock)
     AffectedIncome: bool
     AffectedAssets: bool
     AffectedProduction: bool
+    # Food purchases; food stocks are a separate question.
     AffectedConsumption: bool
+    AffectedFoodStock: bool
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str

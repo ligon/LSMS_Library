@@ -98,7 +98,9 @@ Data Scheme:
     AffectedIncome: bool
     AffectedAssets: bool
     AffectedProduction: bool
+    # Food purchases; food stocks are a separate question.
     AffectedConsumption: bool
+    AffectedFoodStock: bool
     HowCoped0: str
     HowCoped1: str
     HowCoped2: str
