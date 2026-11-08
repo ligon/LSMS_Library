@@ -34,6 +34,7 @@ reviewed JSON sources and unrelated prerequisite bytes/availability.
 | _evict_hashless_wave_caches / _evict_stale_country_cache | country.py:5060,5089 | GH479 cache tests / GH866 source guards: unchanged |
 | _restrict_to_waves / _finalize_result / _assert_built_required_columns | country.py:4690,4025,5168 | GH1327, GH479: reuse, validate before promotion |
 
+Historical stage-1 reading record (not current-stage runtime evidence):
 Read full STANDING, existing1288/1590/make-country-wave-subset ledgers,
 GH866/GH1039 source/tests, supplied issue body/comment, source proof and all four
 historical1288 artifacts. The repository has no separately named479/866/1039
@@ -63,7 +64,8 @@ and canonical data_info.yml; no schema/science change is intended.
    hardlink or overwrite a live prerequisite. Seed copies only of registered
    parquets with current hashes and sufficient declared coverage, distinguishing
    selected country output (always absent) from wave/other-table inputs.
-   Do not seed hashless/stale inputs. Copy declared available L1 blobs using the
+   Do not seed unverified managed caches. Hashless raw/DVC provenance remains
+   eligible. Copy declared available L1 blobs using the
    existing lookup; do not link L1, fetch, clean, or change acquisition policy.
 3. Prepare the selected table's declared physical wave contributions, once per
    physical script folder. Reuse current seeded inputs; run missing script
@@ -85,10 +87,11 @@ and canonical data_info.yml; no schema/science change is intended.
 
 Unknown computed input paths remain the existing hash boundary. This design
 supports root-honoring producers using declared managed inputs, not arbitrary
-absolute-path or out-of-band reads. A stale OTHER rule-less prerequisite cannot
-be made current merely by copying it: leave the live file intact, omit the stale
-copy, and preserve native missing-prerequisite refusal. No new declaration or
-availability contract is silently invented for that unsupported case.
+absolute-path or out-of-band reads. An unproven OTHER cache cannot be made current merely by copying it. Literal
+registered Other inputs use their existing producer privately; declared raw/DVC
+inputs retain source provenance. Truly computed/unregistered/unverifiable inputs
+can retain the native missing-prerequisite refusal under ROOT's explicit narrow
+availability ruling below, without any claim that the live bytes are stale.
 
 ## §5 Reuse decision
 
@@ -113,8 +116,9 @@ Prepared runtime placement is not a runtime grant. All regression drafts UNRUN.
 
 ### Phase 3 — verification
 
-Pending implementation and static-only conservation/syntax checks. No executed
-result is inferred from a drafted assertion or historical runtime evidence.
+Source implementation/review and static checks completed in the new cold stage
+as recorded below. Every runtime gate remains UNRUN. No executed behavior is
+inferred from drafted assertions or historical runtime evidence.
 
 ### Coordinator refinements at implementation checkpoint
 
@@ -204,3 +208,102 @@ pre-finalize payload/typed attrs, warning and ledger side effects, original
 nonzero cause, source drift/interruption and unaffected call-site defaults.
 Static ALL-scoped fingerprint impact is expected across country and wave tiers;
 no measured counts or corpus success can be claimed here.
+
+### Cold-stage source completion and anchored review (2026-11-08)
+
+Ledger-FIRST commit: 0348f58d44e1f06a5c12cfefb6c08526c595fa07 (ledger only).
+Code/test/docs commit: 04d9d0ea5f6709d0f58146800e35e08226694486.
+Published solely to this dispatch's private results.git. This final ledger update
+is a separate commit. Current source/config identity is the asserted d2b1/tree56cf
+union, not historical stage1 source or a stale filesystem branch.
+
+Actual static defects corrected in the inherited draft (all anchored on §2–§4):
+
+- A native Other-country transaction promotes only its country output; it cannot
+  supply an explicitly required Other-wave companion by accident. Extend the
+  same runner with default-off internal wave-only preparation, preserving all
+  physical/logical declarations. Keep true native country transforms for an
+  Other-country input. No second extraction or scientific transform was added.
+- Raw/DVC provenance could be mistaken for a managed Other cache. Keep sidecar-
+  declared raw inputs distinct; copy already-available L1 bytes at private
+  redirected paths where needed, without demanding or manufacturing L2 hashes.
+  All live Other/source bytes remain intact. No global drop/force/cleanup.
+- The inherited cold path replayed unscoped country reports, did not start its
+  selected ledgers clean, and could lose subprocess wave evidence in a native
+  concatenator. Reuse existing scoped grain/date replay, drop warning/healing
+  primitives and per-load selected ledgers. Preserve wave/native footer evidence
+  through the optional metadata-only writer, and the existing just-written
+  degraded-cache retry policy. Existing read-gate definitions are untouched.
+- A producer could replace its output between DataFrame validation and stamping.
+  Freeze a parent-owned private pre-finalize snapshot, validate a deep copy,
+  check stable selected-wave bytes, sources and original output, then stamp and
+  promote the snapshot. Warm validation uses a deep copy too. A cheap warm file
+  identity check is only a race receipt; declared hashes/coverage establish
+  freshness. Neither changed bytes nor stat identity is a freshness oracle.
+- Propagate the selected build stack through native/YAML children so recursive
+  API builds cannot lose the existing cycle check. Preserve exact Make target
+  absence vs failed prerequisite classification, native stderr and original
+  exception cause. No unknown probe is reclassified as absence.
+
+Regression drafts now have 46 test-function definitions, not collected cases or
+passes. All 103 inherited Assert AST nodes are retained exactly, with no new
+skip/xfail or relaxed expected payload. Added drafts cover the literal Other-wave
+path, declared raw/DVC input, snapshot substitution race, private-wave mutation,
+interruption, exactly-once IDs, cold/warm scoped diagnostic ledgers, degraded
+healing, a grouped-wave companion that cannot satisfy a no-output country build,
+and an actual native Other builder yielding independently literal15,25. Its
+Other native transform converts wave values1,2 to5 and carries a builder marker;
+generic concatenation would produce11,21 and fail. The computed/hashless/no-
+producer availability refusal remains separate; both conserve frozen liveOther.
+
+Explicit fixture corrections: the Other IO-leaf child mock now consumes the
+extended table/wave-path/country-input arguments and emits only requested
+physical paths. Per-fixture process-ledger keys are saved/restored to prevent
+cross-test contamination. Expected values and inherited assertions were not
+changed. Added numeric assertions compare exact nonmissing NumPy values and
+masks as well as full keys/dtypes and typed producer attrs. Native toy scripts,
+Makefiles and tests remain UNRUN; they require a separate ROOT runtime plan.
+
+Actual source-only outcomes: three top-level modules AST-parse and compile in
+memory without pyc/execution. Nine finite child-command/script-template families
+were rendered as text and compiled without execution; dynamic script-edit
+expressions remain explicitly unverified. Against actual currentdd40, 168/169
+existing Country functions and 86/87 local_tools functions retain their ASTs;
+only the tagged aggregate and metadata stamp writer change. Seven existing
+nested default loaders/helpers are unchanged, including load_from_waves and
+load_dataframe_with_dvc. GH479/GH866 eviction placement, GH1303 classifier/probe,
+GH1327 restriction, read gates, finalizer and scientific helpers retain their
+actual original ASTs. Git diff --check passed. New helpers extend the declared
+input/metadata/producer boundary; no schema, registry, lock or hash exclusion was
+changed. This is an anchored source review, not a functional acceptance verdict.
+
+One static audit attempt asked own Git for original WIPa33c, which is deliberately
+outside this worker's ancestry, and failed with 'not a tree object'. No fetch or
+base change followed. The corrected audit compares actual initial d2b1 objects
+AND bytes with the supplied immutable WIP salvage manifest, and compares every
+nonowned mode/type/blob with actual currentdd40. Final frozen identities/counts
+are in source-byte-proof.json. No failure was relabeled as a pass.
+
+Source-only completion leaves no identified blocking conflict in the selected
+contract. It does NOT establish runtime correctness, actual-country exposure,
+scientific equality or a universal input-declaration solution. All imports,
+collection/tests, Make/native/toy producers, raw/data/cache reads, API/Feature,
+cold/warm runs, hash census, corpus rewarm and CI/GitHub gates are UNRUN here.
+The read-only Git/rg/stdlib AST/text substitution was used; no extra agents,
+providers, acquisition, installs or native-state inspection. The existing runtime
+profile supplies an interpreter, not task-execution authority.
+
+The risk remains HIGH in footprint: the aggregate and explicit child dispatchers
+are ALL-scoped build transforms. Expect broad L2-country AND L2-wave invalidation
+and extra private copy/snapshot disk/IO, without claiming measured counts or
+rewarm success. A future metadata census must establish exact scope. Conservative
+offered-input manifests can also cause a rebuild after an unused offered Other
+changes; they are evidence over available declared inputs, not a generic Make
+parser. Arbitrary computed/outside-root reads remain outside established closure.
+
+GH1288 remains OPEN. Residual: measure broader actual-country/table exposure;
+review default/JSON/legacy callers' failure paths; review declaration coverage;
+retain the narrow computed/unregistered/unverifiable Other AVAILABILITY tradeoff
+without calling correct-looking live bytes stale. No original failed report,
+source143, denied extension, submission-timeout package or witness is overwritten.
+Coordinator and independent acceptance remain pending.
