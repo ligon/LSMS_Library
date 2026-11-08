@@ -80,6 +80,31 @@ threads. Unless a trustworthy pinned paginated query is established, the merge
 helper must return coordinator-required without issuing a merge. Functional
 behavior and independent/root acceptance remain unverified here.
 
+Root steering reports development advanced to
+`5cd21347d0010ebff2a57a34313985227fb1466a` in fourteen disjoint incoming paths.
+That is coordinator-supplied metadata, not independently tested here. The source
+pin remains `e9f577292770c4934cf2687293dbd3a289ee0993`; no fetch/reset/rebase.
+
 ### Phase 3 — verification
 
-Pending author-phase anchored static review and frozen test-plan hashes.
+Author-phase static completion only; execution and independent/root acceptance
+are pending. Product/test draft commit:
+`54c5fbb0ce0eef021c4dfd12389253ea2a17b15b`.
+
+| changed entry point / symbols | anchored static finding |
+|---|---|
+| merge `unique_object`, `require`, `names`, `validate_approval`, `validate_observation`, main gate | OK (§§3–4): full reviewed head/base and explicit successful checks; unsupported/missing/duplicate/unknown observations reject; no merge executes, even when green, because complete review/thread proof remains unverified |
+| burst argument/env setup and ISOLATED body / submit argument/env/exit handling | OK (§4): full source SHA checked after detach, empty private roots before optional import, inherited access removed by allowlist, task CPUs and coordinator exclusions, real exit propagation; not universal I/O confinement |
+| prep/open `die` and main paths | OK (§4): reviewed base/head and exact remote observations gate mutation/publication; push failures stop creation; semantic conflicts remain for coordinator |
+| briefs `gh_json`, `collect_issue`, `issue_text`, `main` | OK (§§3–4): paginated complete body/comments, counts/update receipts and required fresh complete ruling read; no truncation or universal source grant |
+| report `checked_path`, `main` | OK (§§3–5): explicit text/dispatch report artifacts only; no native JSONL extraction; task-supported external evidence allowed |
+| skill/runbook/country/reviewer templates | OK (§§3–4): reconcile/fix/test/review/partial residual and full CONTENTS/log/TODO/contradiction rules retained; historical FD cause UNLOCALIZED; pinned bounded pilot, no upgrade/moving-main or blind unknown-submit retry |
+| `Contracts` fixture/invoke/calls and 29 drafted tests / local executable MOCK | OK (§5): new coverage because none existed; negative controls observe whether merge/create/task was called, full long history retained, environment before import and child exits checked; **not executed** |
+
+No library/country/config/dependency/AGENTS edit. Call-site recheck uses the same
+Git/ripgrep floor; affected callers are owned runbook/templates and the new test.
+Static checks: five shell files plus embedded isolated Bash body via `bash -n`;
+three Python files, merger Python and generated mock body via stdlib AST parsing;
+Git diff whitespace check. Exact current hashes and receipts are in supported
+`syntax-checks.json`, `test-draft-hashes.json`, `prior-art-phase3.md` and the
+unexecuted `verification-plan.json`. No test check is claimed as passing.
