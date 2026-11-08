@@ -741,9 +741,9 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
             if not block:
                 continue
             for fn in _collect_file_paths_from_block(block):
-                # Resolve relative to the wave's _/ directory (matches
-                # the convention wave scripts use).
-                abs_path = (wave_obj.file_path / "_" / fn).resolve()
+                # Match the YAML loader and Wave._input_hash (ledger1602§2),
+                # using the actual Wave's mapped physical folder.
+                abs_path = Path(os.path.normpath(wave_obj.file_path / "Data" / fn))
                 sidecar = abs_path.with_name(abs_path.name + ".dvc")
                 if not sidecar.exists():
                     continue  # untracked source — no DVC fetch needed
