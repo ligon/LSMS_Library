@@ -4067,8 +4067,8 @@ native =j= are unchanged; code-mode crop/community mappings still skip blank key
 This dated curation decision qualifies the earlier #1144 account that an alternate
 label request leaves all three native names uncurated; that historical record is
 retained.  =Pepper= still passes through with the ordinary coverage warning and
-strict-mode refusal.  Its source does not choose Fresh/Dry/ground/spice, so no
-such classification is inferred.  Whole #1537 remains OPEN for that question.
+strict-mode refusal.  The served name does not state Fresh/Dry/ground/spice, so no
+such classification is inferred; its source-identity question remains held.  Whole #1537 remains OPEN for that question.
 
 Both committed Org parsers, all eight quarter maps and invented price-grain/value
 controls passed in the bounded 29-control source-free proof.  The default route
