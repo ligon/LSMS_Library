@@ -3315,3 +3315,30 @@ value exact to cold baseline, zero added/removed API rows (15,587, including the
 same six existing source-record drops). Cold Make, warm and Feature agree; an
 ordinary merge with the current framework repeats exact source/API equality.
 Receipts and separately qualified full CI/review: .coder/ledger/1528-sold-condition.md.
+
+* 2026-11-07 -- Site Q extends to used inputs and species counts (GH #1482, #1485)
+
+Source-free declaration check only: =plot_inputs= binds =Quantity= to used
+=s16bq03a= in =s16bq03b=, while purchase and gift quantities carry their own
+unit columns (the #1188 entry above). =livestock= is declared at =(t,i,animal)=
+for 2018-19 only: =s17q06= / =s17q08= / =s17q10= become =HeadCount= /
+=HeadAcquired= / =HeadSold=, via =harmonize_species_ehcvm= and =ehcvm_i=.
+These are inspected builder/config bindings, not fresh checks of the source.
+
+The shared quantity audit now counts/names upper-tail used amounts and each
+declared livestock head count, without changing rows, keys, units or values.
+An =animal= species stays separate at every comparison rung; unit, country,
+wave and any supplied period/season/visit do too. A thin species or unit cell
+can stay unjudged. Input comparisons may pool crop, then input, within those
+boundaries. Existing screens retain their previous ladder.
+
+The earlier NPK/Tonne concentration remains attributed to its dated measurement;
+no data-entry explanation, fertilizer correction, sentinel or nitrogen grade
+is selected. This change has only invented-input/config verification until a
+separate source stage is authorized. Full row/corpus firing rates, source
+dictionary reach and the issue's extreme-row reproduction remain unverified.
+The audit runs after reads, so it needs no parquet metadata stamp or schema
+bump. =CONTENTS.org= is excluded from cache hashes; the shared audit entry
+points are excluded too. Exact metadata hash checks belong to the task receipt,
+not a claim that the country was rebuilt. Ledger:
+=.coder/ledger/1482-1485-quantity-diagnostics.md=.
