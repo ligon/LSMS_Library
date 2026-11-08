@@ -8,7 +8,7 @@ ROOT approved IMPLEMENTATION-BRIEF e61dbbc946d20e0ebf8d6ac10e1fd453f37ebb5f9e97e
 
 ##§2 Reuse machinery
 
-- 2011-12/_/plot_inputs.py existing2C loader/gate/labels/native carrier, tested by tests/test_niger_input_observations.py (locate exact existing names before implementation).
+- 2011-12/_/plot_inputs.py existing2C loader/gate/labels/native carrier, tested by tests/test_niger_ecvma_input_observations.py (actual-driver slot/payload/gate and native-key refusal controls).
 - Niger/_/niger.py: niger_i, _input_labels/_crop_labels/_unit_labels, _input_maps/_crop_maps, _ecvma_input_observations and _finish_plot_inputs/fill_missing_u. Preserve generic helper bytes unless ROOT separately approves mechanically required declared-source registry addition.
 - _ecvma_input_observations already scopes recorded slot to relative sourcepath+sidecar SHA+slot-column; no new ordinal IDs or grain.
 - Existing source reader get_dataframe and writer to_parquet remain production IO, no surrogate API implementation. Root-approved pure-builder fixture supplies invented labeled/numeric frames and existing maps/observation helper; no real Country/Wave object.
