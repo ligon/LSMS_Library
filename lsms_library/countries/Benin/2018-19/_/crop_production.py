@@ -32,6 +32,7 @@ import sys
 
 sys.path.append('../../_/')
 import pandas as pd
+from lsms_library.ehcvm import crop_condition_codes, crop_condition_labels
 
 import lsms_library.local_tools as tools
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id
@@ -76,8 +77,7 @@ def _crop_conditions(codes):
         **{'Preferred Label': 'Preferred Label'})
     table = {int(code): token for code, token in table.items()}
     assert sorted(table) == [1, 2, 3, 4, 5], f'harmonize_crop_condition_ehcvm1: {table}'
-    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)
-    return mapped.astype('string').fillna('unknown_condition')
+    return crop_condition_codes(pd.to_numeric(codes, errors='coerce'), table).fillna('unknown_condition')
 
 
 def _crop_condition_labels(labels):
@@ -85,8 +85,7 @@ def _crop_condition_labels(labels):
     the column read with ``convert_categoricals=True``.  A blank stays NA, never a
     sentinel, because a column has no NaN-key hazard (ruling @ligon 2026-11-04,
     GH #1436)."""
-    out = pd.Series(labels).astype('string').str.strip()
-    return out.where(out != '', pd.NA)
+    return crop_condition_labels(labels)
 
 
 def _finish_crop_production(df, t):
