@@ -1,4 +1,77 @@
 #+title: Handoff, LSMS-ISA sweep
+* Authoritative scrum checkpoint, 2026-11-08T06:18:27.768723+00:00
+Goal ACTIVE; previous goal turn PROGRESS; this turn PROGRESS (actual BFA source
+acceptance, merge1618, issue residual reconciliation, new1621 publication and
+Nigeria implementation/review). GitHub development728992c7697bdf25286e3d63a7ae70092829a843.
+Root docs branch stays isolated; filesystem development/master/sharedrewarm untouched.
+
+- PR1618 MERGED728992c7, actual tree1ca40a6f equals exact4candidate/36upstream
+  disjoint object/mode union. No issue closure claimed:1482 remains OPEN for
+  Tonne quantity-basis investigation;1485 remains OPEN for fertilizer behavior.
+  Both bodies/titles now distinguish completedscreening and remainingwork.
+- Candidate-only source41019889 COMPLETED0:0 on76f2,4CPU24G/free,277s total.
+  Ordinary plot_inputs22877 andlivestock13961 returned; both strict native
+  serialization-carrier oracles PASS; plotAPIpickle byteidentical to preserved
+  baseline b1afd351...14a. Freshfalse-readerwarm strictly reproduces bothframes,
+  typedattrs,structuredQledgers and8cachebytes/hash/wave manifests. Snapshot8
+  physicallysaved+rootSHAverified.3coldguards11rawgetters/11Stata;1warmguard
+ 0raw/Stata;0denials/unhandledexceptions;credsremoved. Operatorsstillfrozen.
+  ROOT-SOURCE-ACCEPTANCE-41019889.json andROOT-MERGE.json in B/reports/
+  bfa-1482-1485-completion-20261108. Originalfailedstages/NAcarrieroracles kept.
+  Baselineplotwarm, baselinelivestock actualAPIcold/warm andlostoldnativeparquet
+  remain UNVERIFIED. Rootacceptedtargeteddiagnosticrepair using actualcandidate
+  cold/native/warm+actualbaselineplotparity+unchangedproducer/framework evidence
+  and129controls/fullCI/GitHub; never falselyreportsoldbaselinegatespassed.
+- Totals18developmentmerges/16issuesclosed. Freshpaginated171repoopen. Original
+  scoped147 uniqueissues=13freshverifiedclosed/134open/0unknown. Other3closures
+  are newresidual1602/1603/1616. Countryqueuesoverlap; donotsumcounts.
+  Newliveoverlay B/reports/scrum-ready-queue-20261108/live-country-queues-0607.json
+  preservesoriginaldatedqueue;READY.json reservesnextframework/countrytasks.
+
+Current3localworkers, no remote native modeljobs:
+1. finish1452 completed independentfertilizer review33c218:82distinct/0skip,
+   noP1/P2, exactbaselinerates/dtypes/attrs/oldwarnings/errors+protectedASTs,
+   fullMalawi5417prefix+14newlines authenticated. Now independentlyreviews
+   Nigeria2fa773, fullNigeria4019 record authenticated; matrixfrozen BEFORE
+   candidate/authorinspection. Noauthor44/old16+6/source/APIreplays authorized.
+2. finish1590 owns frozenfertilizer33c218, PR1621 DRAFT; author180focused/74new,
+   external48typedparity, independent82, strictAPI0. CurrentTLUcomposition06d0
+   exact191orderedASTnodes union; metadata0/450/1895/35/186/18None,0errorsdenials.
+   Fullprivateoffline41019974 genuinelyRUNNING/identitygatePASS; finalGitHub
+   unit/WindowsIN_PROGRESS. Author now begins shared1578 duplicate-derivation-
+   registry repair inNEW728992checkout, ledger-first/no globalYAML behavior or
+   source/default changes. Existingfert code/operators stay immutable; monitorCI.
+   One initialrootmanifestassert failed withoutcapturedactualdigest; subsequent
+   two stable reads match all8ORIGINAL/v2hashes, no observedauthor mutation/cause
+   claim. ROOT-PREFLIGHT-CLOSURE-v2.json grants exactlyoneCI+census after stop.
+3. malawi_revision_food froze Nigeria1518safeharvest2fa773/base8a35: only3ADDED
+   paths(ledger,module,tests), all19102preexistingentriesexact.44sourcefreecontrols
+   pass/0skip; exactkernelpre-serialization parity/auditArrowstrict. Original
+   aggregateArrowindexdtypefailure reproducedonunchangedkernel;nocasting/false
+   strictcarrierclaim. Independentreviewrunning. Now prepares728992+2fa current
+   composition+onefullprivateCI/sourcefreecensus usingunchangedacceptedtemplate,
+   MUSTsurface frozenoperators/refproof forroot BEFORElaunch. Then draft NEW
+   sealedW3 fullraw-to-serving bridgecorrespondence plan usingclosed artifacts/
+   committedmap; actual9+7mask/full11956universe gate stillUNRUN, separategrant
+   afterreview required. No oldrawcapture/getter/16+6/3/44cohort replay.
+
+Rootnext: reviewNigeriaCIoperatorfreeze, authorizeonly exact unchangedprivate
+operator; monitor41019974/PR1621checks, readindependentNigeriaverict thengrant
+newsealedcorrespondenceonlyfrozenoperator. Publish/mergereviewedgreenpartialwork
+withcurrentcompositionproof. BFAnewmerge isdisjointfromfert transformpaths;
+proveunionbefore1621merge, no redundantfullsuite absentnewconcern. Keep1485open
+forautomaticanonymousnumericrecoverypolicy.1578getsindependentreviewafterfreeze.
+Nextready1592fallback, recoveredNiger1529/Ethiopia1570diagnostics preserveoriginal
+custody/closedsource andrequirecountryread; no blindrawreplay orforceddefaults.
+
+Scientificholds persist:weights48/wholewave1604,1509/1442purchasepriceeligibility,
+Tanzania1497fallback,Niger/Mali1560/1571quantity/window/state,Mali1594sentinel,
+Nigeria1518national/zone/fluidbasis.49/50/51+qualitativeshocksdecisionssettled.
+RemoteClaudeauth/CodexownedgitFDguard stillimpaired;2closedsyntheticrepros do
+notestablishcause. No native/tool/guard/hook/dependency changes or extra native
+retry authorized. Earlier1535sharedcacheincident remains qualified. Allcurrent
+workprivate;masterrelease/sharedrewarm deferred. Goalnotcomplete/blocked.
+
 * Authoritative scrum checkpoint, 2026-11-08T05:57:34.573263+00:00
 Goal ACTIVE; this goal turn PROGRESS. Root owns queue, worker assignment,
 independent review, publication and authorized development merges. Three local
