@@ -39,9 +39,10 @@ class TestFormatters:
         assert i(pd.Series([12, 3])) == PREFIX[wave] + "12003"
 
     @pytest.mark.parametrize("wave", EHCVM)
-    def test_an_ehcvm_wave_keeps_the_bare_panel_id(self, wave):
+    def test_an_ehcvm_wave_uses_its_ruled_raw_namespace(self, wave):
         i = ll.Country("Mali")[wave].formatting_functions["i"]
-        assert i(pd.Series([12, 3])) == "12003"
+        expected = "EHCVM21_12003" if wave == "2021-22" else "12003"
+        assert i(pd.Series([12, 3])) == expected
 
     @pytest.mark.parametrize("wave", EACI)
     def test_the_person_id_is_not_namespaced(self, wave):
