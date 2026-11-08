@@ -19,3 +19,10 @@ Reuse accepted aggregate facts and their source/head limits, without reopening c
 
 ## §6 Remaining decisions
 The open #1570/#1457 questions remain as in the dated country record; this factual note selects none of them. ROOT owns review, publication and eventual closure. Final verification will prove only two owned documentation paths, old CONTENTS prefix retention and all other mode/type/object entries exact. No tests are needed or authorized for this docs-only change.
+
+## Phase 3 — anchored documentation verification
+OK (§2/§5): appended only the ROOT-accepted factual formatter finding, with exact two source names, historical source/runtime and current byte-identity qualification, sealed report/manifest and this tracked ledger. All6983/763/22334 counts agree with authenticated aggregate receipts; no capture was reopened.
+
+OK (§3/§4): all4577 earlier country lines and290775bytes remain an exact prefix; holder/household distinction, local attachment versus later Farm-level scope, missing section3/full-native boundary and Q3/window/grams/Birr/sales questions remain explicit. Literal zero is not reinterpreted as a production-join result; no scientific or default selection follows. Country note committed separately as65cbe2011 after ledger-firstb8e5c2304.
+
+Verification is docs-only: git diff --check and whole mode/type/blob conservation of every nonowned entry; no import, test, source/payload/PDF/readers/API/census/build/cache/rewarm/runtime replay. The final candidate permits only this ledger plus Ethiopia/_/CONTENTS.org to differ fromebb65. ROOT retains publication and whole1570 remains open. No new idiosyncrasy beyond the bounded finding is inferred.
