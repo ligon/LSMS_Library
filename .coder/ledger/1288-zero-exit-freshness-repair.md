@@ -1,8 +1,12 @@
 # Prior-Art Ledger — GH1288 zero-exit Make freshness repair
 
-**Base:** 5695e0855e9182b9e61559d802ce7249102818be, tree
- aac6725ec7a05b77c9dcf78689f903797c186882.
-**Branch:** dispatch/f779ad1ac1c94d2b823af3f96f5b2a22.
+**Current cold-stage base:** d2b1c070d03da8b25daa6d1fe2b88a1c5ea89fe2,
+ tree 56cf7143ad466ea27a14af1992ef740e02edfb61 (asserted with own Git).
+**Branch:** dispatch/dd3c3ebd650a4b919b834565a36c0cf1.
+**Historical stage-1 base:** 5695e0855e9182b9e61559d802ce7249102818be,
+ tree aac6725ec7a05b77c9dcf78689f903797c186882; historical branch
+ dispatch/f779ad1ac1c94d2b823af3f96f5b2a22. Inherited source is an UNREVIEWED
+ draft, not an accepted implementation.
 **Search tier:** Git + rg + stdlib AST/text, the AGENTS-approved substitute.
 The supplied REPAIR-CONTRACT is selected authority; historical refusal-only
 reports are qualified history. This stage permits NO task runtime.
@@ -161,3 +165,42 @@ wave literal sources already folded by the existing hash remain eligible for
 normal verified reuse without a redundant manifest. Declared source paths are
 also used to copy only already-available L1 blobs, including literal Other
 closure. Existing raw/DVC provenance remains eligible.
+
+### New cold-stage ledger-FIRST checkpoint (2026-11-08)
+
+This is a distinct source-only completion, not resumption or retry of native
+41031186: native/supervisor143, SIGTERM15, Slurm FAILED15:0 at43:02 of45min;
+ROOT's single extension was denied. Only the old ledger checkpoint was published;
+four required reports were missing. Original source/evidence and failures are
+immutable. Old ledger-FIRST bbe8ea6621ee3a98d33b4efd70d0b95720455f22 remains an
+ancestor. Current d2b1 is currentdd40 plus exactly five salvaged WIP paths; the
+supplied SOURCE-PROOF/SALVAGE-COMPOSITIONS are authentication, not behavior proof.
+The submission clone timeout happened before manifest/sbatch; its infrastructure
+amendment supplies no task runtime, cache, source-data or acquisition grant.
+
+The selected algorithm remains productive private transactions, actual native
+country builder, current declared-input closure and logical coverage independent
+of emitted rows. ROOT-TRANSACTION-REFINEMENTS requires deep-copy validation with
+PRE-finalize promoted bytes/attrs, preserved read-gate evidence/warnings/degraded
+and coverage semantics, no global eviction or force, and discoverable Other
+builder/script fallback. ROOT-AVAILABILITY-RULING allows only the narrow truly
+computed/unregistered/unverifiable Other availability residual. The discriminating
+healthy literal Other must produce independent exact15,25 privately; both it and
+the computed refusal conserve live Other bytes. Hashless alone is no refusal.
+Declared current raw/DVC provenance stays eligible. GH1288 remains OPEN.
+
+Only this ledger, caching.md, country.py, local_tools.py and the new GH1288 test
+module are owned. First NEW commit is ledger ONLY; final ledger will be separate.
+Five external evidence reports were initialized UNFINISHED/UNRUN before code.
+Verification is Git/rg/stdlib AST/JSON/text/compile-no-pyc only, using the prepared
+interpreter with -I -S; no imports, collection, tests, Make, producers, data/cache
+reads, providers/network, census, additional agents or native-state inspection.
+Generic Alpha/Beta fixtures only. All meaningful inherited assertions remain;
+necessary fixture corrections will be named precisely. No new hash exclusions.
+
+Phase3 is PENDING. Review will specifically inspect private closure vs false
+copy/touch proof, physical/logical alias coverage, raw vs managed Other handling,
+pre-finalize payload/typed attrs, warning and ledger side effects, original
+nonzero cause, source drift/interruption and unaffected call-site defaults.
+Static ALL-scoped fingerprint impact is expected across country and wave tiers;
+no measured counts or corpus success can be claimed here.
