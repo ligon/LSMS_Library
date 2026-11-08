@@ -4,9 +4,7 @@ Ledger 1537-partial-curation §§2–5. The default/crop boundary test injects t
 metadata result to preserve the original guard's df_data_grabber ban; it does
 not claim an end-to-end execution of that banned metadata cascade.
 """
-import ast
 from copy import deepcopy
-from pathlib import Path
 import warnings
 
 import numpy as np
@@ -84,7 +82,7 @@ def test_default_crop_decoder_boundary_skips_actual_parser_blank_keys(curation, 
         raw = pd.Series(table['Preferred Label'].to_numpy(),
                         index=table['Code'].map(local_tools.format_id)).to_dict()
         if table is candidate:
-            assert None in raw  # witness the real blank-key path, not deletion in a fixture
+            assert any(pd.isna(key) for key in raw)  # parser null key is retained at this boundary
         with monkeypatch.context() as scoped:
             scoped.setattr(local_tools, 'get_categorical_mapping', lambda **k: raw)
             default = nigeria.harmonized_food_labels()
@@ -94,6 +92,13 @@ def test_default_crop_decoder_boundary_skips_actual_parser_blank_keys(curation, 
         assert None not in default
         results.append(default)
     assert results[0] == results[1]
+    # Each possible parser/null-key scalar is skipped by the exact decoder,
+    # preserving the source guard instead of invoking df_data_grabber.
+    for blank in (None, np.nan, pd.NA, ''):
+        with monkeypatch.context() as scoped:
+            scoped.setattr(local_tools, 'get_categorical_mapping',
+                           lambda **k: {**results[0], blank: 'Never a source code'})
+            assert nigeria.harmonized_food_labels() == results[0]
     # Crop / community code-mode consumers map exactly these integer codes.
     codes = pd.Series([1080, 1060, 2140, 12, 21, 43, 76, 99999, None], dtype='Int64')
     pd.testing.assert_series_equal(codes.map(results[0]), codes.map(results[1]))
