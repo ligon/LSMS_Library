@@ -1,4 +1,110 @@
 #+title: LSMS-ISA country workers and coordinator queue
+* Current scrum checkpoint 2026-11-08T19:50:15.649120+00:00
+The goal remains ACTIVE. The previous goal turn made PROGRESS. Development is
+e97a469262393d06563c8bf90c9ff465388c0173: 33 development merges and 25 issue closures.
+Original 147-country queue: 21 closed /126 open; repository162 open at the last
+complete recount. No master release, shared harmonized-cache rewarm or production-
+weight change is authorized. Do not mark the overall goal complete.
+
+** Current user priority: document check on #1575
+The user explicitly requested delegation to establish planned sample stratification,
+if any. finish_1452 owns Benin, Togo, Guinea-Bissau and CotedIvoire, exact e97 source.
+Full personal CONTENTS reads:790/855/734/1048lines, including logs/waiting/TODO.
+R=reports/1575-ehcvm-stratification-doccheck-20261108. Eight exact held PDFs were
+admitted/read/copied privately and parsed successfully (actor23957/receipt407bf17c).
+Five exact official public PDFs were fetched once each with zero redirects/errors
+(actor47176), then network-off parsed (60649). GB2021 two downloads match existing
+sidecar MD5/size. Three2018 BIDs are new private local downloads, NOT newly managed
+DVC holdings. No survey microdata, credentials, providers, production changes or tests.
+
+The checker has now read explicit own2021BID retrospective2018 region×milieu definitions
+for all four: Benin departement/residence; GB FRp16/ENp13, CIV FRp13/ENp12,
+Togo FRp12/ENp11, Benin FRp13/ENp14. Final8-row matrix/shortquotes/sourcepages still
+being sealed; ROOT has not yet independently reviewed all primary projections.
+Togo 'Lome Commune ... rural' older prose and 'GrandLome' urban-only allocation
+need version/domain qualification, not an assumed typo/equivalent geography.
+Eleven nonzero table allocation cells are NOT automatically proof of planned empty-
+cell exclusion. Separate2018planned design from2021same-cluster revisit. #1575 stays
+open; this task is document evidence, no stratum/default/weight patch yet.
+
+** Newly approved Mali #1494 decision
+User explicitly chose: namespace ALL2021-22raw IDs, map back ONLY approved panel
+links; unlinked/unknown/orphan retain distinct IDs, known canonical panel IDs stable.
+ROOT chose literal EHCVM21_ consistent with EACI14_/EACI17_. No repeated approval
+question. Mwi implements on new e97-based fix-1494 tree, ledger-firstef3f7dec1.
+All YAML/script/rawderivation consumers must agree; preserve old raw-coordinate
+identity/occupancy guards and3/8held omissions. No new links/weights/filtering.
+Exactly two committed reviewed JSON maps were mechanically transported:5011approved
+source keys EACH, inverseprefix gives BYTE-EXACT oldfiles including targets/order/
+otherwaves. No source-cover regeneration or getter. EHCVM21 helper/2021 mapping and
+allscript/raw bindings drafted;18invented tests remain UNRUN pending frozen fixture
+review. Existing EACI namespace/sampling work already resolved1515/1586, do notredo.
+Root narrowed1494 title/body to live EHCVM residual and recorded the new ruling.
+
+** Numeric-string fix #1499 / PR1636
+Head0afeca370a3345d859f7d71c403afe1c6f455c20/treeaac6725e, exact19139-object
+union4owned/22upstream/nooverlap. Its previously prospective docparent4ae3 is now
+admitted to actuale97 through WHOLE-tree equality5bcad0e2; no source/header changes
+or actor replay. Published FS verify/1499-on-1635-prospective-20261108 and GitHub
+fix/1499-numeric-additive-20261108; DRAFT PR1636 targets development.
+Author130/baseline8/independent76 all closed PASS; Decimal P2 corrected, original
+failure retained. Current strictAPI0/89.205s and metadata0/115.886s bothclosed;
+ROOT verified all59 final packet files, manifest41342a8c788a7814f58403f5d8987aa4dacf823089a9f18831b023188e78724c.
+ROOT independently measured450/450table,1877/1895wave (18Noneunchanged),35/35BTF,
+0/186FIF changes across38registeredcountries; all other metadata equal. This is a
+GLOBAL next-access rebuild footprint including non-ISA. No exclusions changed or
+shared rewarm performed. GHA/current full release gates still pending.
+
+ONE full configured offline job41030609 is LIVE on n4252.savio4, ownerfinish_1590,
+launcher session41369. Manifestb05fb0b9be46033149bf8f3fb83f5a65d8148cc6ea9b768c7fb87ecdd5b560ec;
+ROOT fully read/inverse-verified unchanged accepted trace/lease policy.8CPU32G45min,
+4/loadfile/600thread/restart0/480durable stacks/O_EXCLsetup leases. Fouractual
+collections18317unique identical, DIRECT0380parent18195 allpresent+122new1499IDs.
+Last actual scan ~70percent/13017leases,0failed/replay/workerloss; controller3dumps,
+workerstackfiles0. No terminal/PASSclaim, no restart or budget change. Source immutable.
+
+** Mali documentation #1574 / PR1635 MERGED
+Actualmergee97 parents[5cd21347,4ae3e7c9], WHOLEtree5bcad0e2 EXACTverified4ae3.
+GHA42511061026 unit/windowsSUCCESS/sixconditionalSKIP; freshreviews/threadsEMPTY;
+expectedheadmerge+actualparents/tree verified. Only4holding/docs paths+ownledger.
+Actual managedwrite/fresh privateempty-L1 readbackPASS; outerfinalignorehashFAILED
+preserved/no replay. API0/census0, EVERYmap/othermetadata equal parent. Root updated
+1574 body: holdingavailability done, complete51-code list/visual correspondenceOPEN.
+One nativeFirefoxpage13 attempt timedout/noPNG; separatepage13embedded-image
+inventory0 also stopped, both no-documentary-absence inference. Original/copyseals
+exact. No more visual attempts underway. Existing source notes remain historical.
+
+** Ethiopia #1570 diagnostic completed, larger issue OPEN
+13invented exact-source controlsPASS; separate trusted2-capture actor65033 CLOSED
+PASS173.104s (inner170.982s), guardsactive0denials, exact2preseal→2loads→2postseal,
+all typedframes/axes/values/masks/attrs/in-RAMpickle snapshots exact. Result actual:
+S9total7750/valid7746/4invalid, S4valid29317. Literalstorage-tagged5key matches0;
+exactformatted diagnostic5 ANDactualencodedplot/crop yield6983ONE-TO-ONEmatches,
+S9unmatched763/S4unmatched22334.0rawrepeats/formattingaliases/encodedcollisions/
+multiHHprojection. No native/API/scientific linkage/eligibility/rowloss claim.
+ROOT reviewed actual result/outer proof and updated1570 body with bounded findings
+while retaining original sales/Q3/value-only/grams/Birr residuals. No raw reread.
+R=reports/1570-formatter-only-proposal-v1-20261108; capturemanifest1f8d920b9a8eb77779c6b23452bcc1f0dd92dfc7c6a067167ae20f8f2b661cae.
+Separateledger-onlybf64d72db608a7f5c0f0ac3ae1364e96fb8a0e6d and external proposed
+country append remain ROOT publication work. Historicalee880/fdec source kernels
+are current-byte-equivalent; whole latest source/native acceptance not claimed.
+
+** Other ready work and holds
+Remote1423 author86a82a6b/job41029918 COMPLETED native0/supervisor0/publicationcomplete,
+head d025cd7dbd916482d456560425e12b58a8c5f1d1 fetched to root dispatch/1423 ref.
+No restart/resume. Author drafted29unittest methods UNRUN. finish1452 independent
+static review found no concrete P1/P2 yet and froze a40-method mocked stdlib cohort
+(29author+11new), also UNRUN pending ROOT full runtime review. Candidate merger is
+explicitly ALWAYS coordinator-required; no complete live review-thread query.
+R=reports/review-1423-backlog-runbook-revision-20261108, finalmanifestd7bc2503a61ae3c1ab19524380bd83dac4cd2742b2a5ff09d51467aa4c00fca6,
+runtimemanifestb6fb9a3f2a29113f932889a6f4bc366e7be3b2eced8e464f24af5a64f36d0982.
+User#1575priority now owns1452;1423packet unchanged. ROOT may run finitefixture
+cohort after reading driver/source boundaries, no actualgh/git/srun/merge/data access.
+1288 static design checkpoint exists, UNIMPLEMENTED. Validator-only refusal is not
+yet a complete freshness repair; preserve479/866prerequisite constraints and current
+working library. #1066 USER warning-replay question STILLPENDING, no implementation.
+Malawi combined-weight/no-master/sharedrewarm/scientific holds preserved.
+
 * Current scrum checkpoint 2026-11-08T18:33:00.047840+00:00
 Goal ACTIVE; turn PROGRESS. MERGED PR1633/#1540 now CLOSED completed.
 Actual development 5cd21347d0010ebff2a57a34313985227fb1466a, parentsfdec+0380,
