@@ -227,6 +227,15 @@ Index Info:
     # the modal rule its `obs` level made it the excluded minority.
     community_prices: (t, v, j, u, variety, visit, obs)
 
+  # Provider requirements are distinct from the preferred canonical shape.
+  # GH1588: only these two tables opt in; m is optional on ordinary household
+  # characteristics and s is optional on legacy food expenditures. This does
+  # not register food_expenditures or change the healthy shape winner. Other
+  # tables' reduced/optional-axis contracts have not been censused here.
+  required_index_levels:
+    household_characteristics: [t, v, i]
+    food_expenditures: [t, v, i, j]
+
   # Per-feature canonical level-name ALIASES: `<the name a country emits>:
   # <the canonical name>`.  Applied by `feature._rename_index_levels` to each
   # country's frame BEFORE alignment, so a country that names the same axis

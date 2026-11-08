@@ -228,6 +228,17 @@ def _level_aliases(table_name: str) -> dict[str, str]:
     return {str(k): str(v) for k, v in aliases.items()}
 
 
+def _required_index_levels(table_name: str) -> list[str]:
+    """Explicit provider requirements, separate from canonical shape (GH1588).
+
+    Canonical coordinates are not universally mandatory: some tables accept
+    reduced providers or fabricate optional detail. Only declared opt-ins are
+    validated; this does not change which healthy index shape wins.
+    """
+    spec = (_index_info_section().get("required_index_levels") or {}).get(table_name)
+    return list(spec) if isinstance(spec, list) else []
+
+
 def _missing_level_sentinels(table_name: str) -> dict[str, str]:
     """``{canonical level: sentinel value}`` for *table_name*.
 
@@ -1029,6 +1040,7 @@ class Feature:
         targets = countries if countries is not None else self.countries
         frames: list[pd.DataFrame] = []
         canonical_levels = _canonical_index_levels(self.table_name)
+        required_levels = _required_index_levels(self.table_name)
         fabricate_missing = _fabricates_missing_levels(self.table_name)  # #506
         aliases = _level_aliases(self.table_name)                       # #569
         sentinels = _missing_level_sentinels(self.table_name)           # #569/#775
@@ -1055,6 +1067,31 @@ class Feature:
             canonical_levels = [lvl for lvl in canonical_levels if lvl != "v"]
             if "m" not in canonical_levels:
                 canonical_levels = canonical_levels + ["m"]
+
+        # Required identity is an opt-in contract, not a new canonical shape.
+        # Keep the existing harmonizer and healthy-provider vote unchanged,
+        # including food_expenditures' unregistered/optional-source shapes.
+        if required_levels:
+            if use_numeraire is not None or pass_currency == 'index':
+                if CURRENCY_LEVEL not in required_levels:
+                    required_levels.append(CURRENCY_LEVEL)
+            if kwargs.get("market") is not None:
+                required_levels = [lvl for lvl in required_levels if lvl != "v"]
+                if "m" not in required_levels:
+                    required_levels.append("m")
+        index_unavailable: dict[str, dict[str, Any]] = {}
+
+        def _reject_missing_index(name: str, df: pd.DataFrame,
+                                  allowed_missing: Mapping[str, Any]) -> bool:
+            missing = [lvl for lvl in required_levels
+                       if lvl not in df.index.names and lvl not in allowed_missing]
+            if not missing:
+                return False
+            index_unavailable[name] = {
+                "missing": missing, "required": list(required_levels),
+                "index": list(df.index.names), "rows": len(df),
+            }
+            return True
 
         # Countries dropped because they cannot honour a labels=X request (no
         # curated column).  Accumulated and reported ONCE after the loop, with a
@@ -1102,6 +1139,13 @@ class Feature:
                         f"No data for {self.table_name} in {name}"
                     )
                     continue
+                if required_levels:
+                    # Check before harmonization can project/collapse detail or
+                    # fabricate missing levels (ledger1588 §§2–5). Existing
+                    # declared aliases/sentinels remain permitted.
+                    df = _rename_index_levels(df, aliases, name, self.table_name)
+                    if _reject_missing_index(name, df, sentinels):
+                        continue
                 captured_attrs[name] = {
                     k: ({name: df.attrs[k]} if carrier.per_country
                         else df.attrs[k])
@@ -1116,6 +1160,8 @@ class Feature:
                     aliases=aliases, sentinels=sentinels,
                     alignment_report=alignment_report,
                 )
+                if required_levels and _reject_missing_index(name, df, {}):
+                    continue
                 # Prepend country as an index level
                 df = pd.concat({name: df}, names=["country"])
                 frames.append(df)
@@ -1171,6 +1217,15 @@ class Feature:
             return result
 
         def _mark_unavailable(result: pd.DataFrame, n_kept: int) -> pd.DataFrame:
+            if index_unavailable:
+                warnings.warn(
+                    f"{self.table_name}: missing required index level(s) for "
+                    f"{len(index_unavailable)} country(ies) {index_unavailable}; "
+                    f"they were dropped from the assembly (kept {n_kept}). "
+                    f"See df.attrs['index_unavailable']; access the excluded "
+                    f"data via Country(name).{self.table_name}()."
+                )
+                result.attrs['index_unavailable'] = dict(index_unavailable)
             return _mark_units_unavailable(
                 _mark_labels_unavailable(result, n_kept), n_kept)
 
