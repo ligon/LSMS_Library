@@ -65,10 +65,11 @@ No new country idiosyncrasy is discovered or country file edited here.
 
 ## §5 Reuse decision
 
-New lazy property is the missing interface: resolve through existing waves
+New functools.cached_property is the missing interface: resolve through existing waves
 only when there is no public mapping in the instance dictionary, then retain
-the original map or an empty mutable fallback. A setter stores the exact
-public value in that same dictionary slot. Remove the constructor's empty
+the original map or an empty mutable fallback. Its non-data descriptor leaves
+ordinary public assignment/deletion in the same instance dictionary slot;
+no setter or private backing field is needed. Remove the constructor's empty
 placeholder; constructor remains lazy. The waves source is unchanged.
 This avoids a second resolver, waves caching or changed loader precedence.
 No scientific ruling is needed. New invented controls are necessary to test
