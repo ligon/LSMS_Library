@@ -75,12 +75,39 @@ mechanical metadata/invented-input properties; not scientific/API acceptance.
 
 ## §6 Open questions for ROOT
 
-Original guard bans the default route's `df_data_grabber`. Preserve it; requested
-steering in the absolute QUESTIONS channel on static-chain plus actual-parser
-proof versus separately authorized metadata-only execution. No exception added.
-Pepper identity, whole #1537, full census and every data/API stage remain open.
+ROOT accepted static exact noarg/crop/community source-chain reasoning plus real
+Org parsers/all-quarter checks, real format_id and pure decoder-tail null controls.
+No real noarg producer invocation or full-route runtime parity may be claimed.
+No df_data_grabber exception was added. Required parser/unit proof remains unrun.
+
+Startup-v3 completed one qualified library-metadata process, then installed
+magic.compat requested the same lookup again. The one-process preflight refused
+that second Popen before spawn. Runtime work stopped for ROOT; no retry or second
+lookup exception is authorized. Pepper identity, whole #1537, census and every
+data/API stage remain open. The private product commit is conditional/unvalidated.
 
 ## Phase 3 — verification
 
-Pending candidate freeze and qualified startup. Historical import stop and all
-old reports remain immutable; no old test has yet run in this continuation.
+- **OK (§§2–4, static):** exact product diff is only the two authorized rows,
+  each with blank Code and eight blank quarter cells; removing those bytes
+  reproduces the immutable baseline Org exactly. Core/country helper source is
+  unchanged. Full source-chain excerpts/hashes are private affected-route proof.
+- **OK (§4, static):** all sixteen original test-function ASTs are exact. Only
+  their historical curation fixture binds the immutable baseline asset. Five new
+  candidate functions read the actual committed Org and compare baseline, not
+  candidate against itself. Null-key controls preserve the strict reader ban.
+- **UNEXECUTED (§4):** no project import or pytest collection completed; zero
+  tests ran. Startup-v1 failed an asymmetric realpath assertion before lookup.
+  Startup-v2 refused the trusted `.venv` alias before lookup. ROOT personally
+  granted a narrower v3 read-containment correction; raw/write checks and the
+  original strict guard stayed exact. V3 then refused magic.compat's second
+  lookup. Each namespace preserves its original operator/freeze/log/receipt.
+- **OPEN (§§4–6):** real-parser/all-quarter/pure decoder-tail runtime proof and
+  Pepper/strict/price controls are unrun. The code-free two-row candidate is not
+  merge-ready. Metadata wrapper/operator preparation is unrun, requires a new
+  final-head freeze and exact ROOT preimport/census grant; no counts/deltas or
+  closed-baseline admission are claimed. Nigeria Org invalidation must be paid.
+
+No production decoder/reducer/schema was reinvented. The partial curation does
+not settle #1144's Pepper boundary. All historical reports, source cohorts and
+the old335 import failure remain unchanged; no scientific/full-issue closure.
