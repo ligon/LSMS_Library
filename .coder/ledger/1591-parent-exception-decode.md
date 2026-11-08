@@ -79,6 +79,9 @@ source/config/CONTENTS change or original producer execution is authorized.
 - Serialization or parent-load failure retains original type/text/tb in existing
   WaveWorkerError; do not misclassify it as a dead worker or catchable absence.
 - A decoded non-BaseException gets that same fallback, not a late TypeError.
+  Actual type ancestry is required: isinstance may consult an instance-provided
+  __class__ property. ROOT selects issubclass(type(exc),BaseException), preserving
+  the existing exceptException/interrupt boundary and false-valued real errors.
 - Warn/file ledgers before refusal, retain dedup and requested wave order;
   forkunsafe detection/fallback, actual death, grouping, serial/no-fork/daemon
   and all CPU/memory/thread policies remain unchanged.
@@ -156,3 +159,18 @@ build fingerprint; full450/1895/35/186 metadata census, strictAPI, fullCI and
 independent review are UNRUN for1591 and remain separate gates. The unrelated
 1578 fullCI success does not validate this task. No source/getter/actualCountry
 API/scientificMake/warm/shared-cache/GitHub campaign occurred.
+
+
+### Independent-review P2 and bounded revision selection
+
+Exact89aba independent12case run:9PASS3FAIL7.33s. Two distinct proxy shapes
+expose the same validation defect: an advertised ValueError __class__ passes
+isinstance then causes TypeError at raise; a __class__ getter raising RuntimeError
+escapes validation. The third failure repeats the advertised proxy after side
+effects. All original64PASS and independent failure receipts remain immutable;
+no own old-cohort replay is needed to establish this confirmed finding.
+ROOT authorizes a one-predicate genuine-ancestry repair, canonical regressions for
+both proxy shapes plus false-valued genuine exceptions, and bounded affected
+relay controls. No pool/forkunsafe/ledger/warning/source/default/metadata policy
+changes, fullCI or metadata campaign is included. Ethiopia preparation is held
+without a running actor; resume it only after the new1591 freeze is handed off.
