@@ -118,7 +118,15 @@ def food_acquired(df):
         # quantity OR (purchased only) a positive expenditure.
         qpos = pd.to_numeric(sub['Quantity'], errors='coerce').fillna(0) > 0
         epos = pd.to_numeric(sub['Expenditure'], errors='coerce').fillna(0) > 0
-        return sub[qpos | epos]
+        eligible = qpos | epos
+        if exp_col == 'ExpenditurePurchased':
+            # GH #1594 / ledger §3-4: the user ruled that exact raw
+            # s13q03c=99,999,999 is missing in BOTH 2014 passages. Keep
+            # original contribution eligibility, including value-only rows;
+            # mask before the existing canonical additive collapse.
+            amount = pd.to_numeric(sub['Expenditure'], errors='coerce')
+            sub['Expenditure'] = amount.mask(amount.eq(99_999_999))
+        return sub[eligible]
 
     purchased = _stream('purchased', 'QuantityPurchased', 'UnitPurchased',
                         'ExpenditurePurchased')
