@@ -47,7 +47,7 @@ PYTEST_WORKERS ?= $(or $(SLURM_CPUS_ON_NODE),$(shell nproc 2>/dev/null || echo 1
 #   make test PYTEST_WORKERS=4
 PYTEST_ARGS ?= -n $(PYTEST_WORKERS) --dist=loadfile
 
-.PHONY: setup test test-full retest test-ff build release clean help \
+.PHONY: setup test test-full retest test-ff uganda-invariance build release clean help \
         profile profile-cold profile-cprofile matrix matrix-coverage \
         api-audit docs-gen
 
@@ -76,6 +76,14 @@ test: setup
 
 test-full: setup
 	$(POETRY) run pytest $(PYTEST_ARGS) --rebuild-caches
+
+# Read-only, strict baseline verification. The operator must supply an owned
+# private L2 root; this target deliberately has NO setup/materialization step.
+# Example: make uganda-invariance LSMS_DATA_DIR=/private/data
+# INVARIANCE_ARGS may add --report /private/uganda-invariance.json.
+uganda-invariance:
+	@test -n "$(LSMS_DATA_DIR)" || { echo "Set LSMS_DATA_DIR to an explicit private data root" >&2; exit 2; }
+	$(POETRY) run python scripts/check_uganda_invariance.py --data-root "$(LSMS_DATA_DIR)" --complete $(INVARIANCE_ARGS)
 
 # Iterative-development test targets.  Both use pytest's cache at
 # .pytest_cache/ to remember which tests failed on the previous run.
@@ -216,6 +224,7 @@ clean:
 
 help:
 	@echo "Top-level targets:"
+	@echo "  uganda-invariance LSMS_DATA_DIR=/private/data  # read-only COMPLETE baseline check"
 	@echo "  setup    Install dependencies via Poetry"
 	@echo "  test       Run pytest suite (fast tier, uses L2 parquet cache)"
 	@echo "  test-full  Run pytest with cold cache (--rebuild-caches: purges L1+L2)"
