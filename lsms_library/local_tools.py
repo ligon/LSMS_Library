@@ -3291,13 +3291,40 @@ def cache_freshness(path: str | Path, expected_hash: str | None) -> str:
     return "fresh" if stored == expected_hash else "stale"
 
 
-def stamp_parquet_hash(path: str | Path, expected_hash: str | None) -> bool:
+def read_parquet_make_inputs(path: str | Path, *, _with_presence=False):
+    """Declared-input witness for direct Make reuse (GH1288); footer only."""
+    result, present = None, False
+    try:
+        import pyarrow.parquet as pq
+        md = pq.read_schema(str(path)).metadata or {}
+        present = b'lsms_make_inputs' in md
+        value = json.loads(md[b'lsms_make_inputs'])
+        if (isinstance(value, dict) and set(value) == {'sources', 'tables'}
+                and all(isinstance(part, dict)
+                        and all(isinstance(k, str) and isinstance(v, str)
+                                for k, v in part.items()) for part in value.values())):
+            result = value
+    except (OSError, ValueError, KeyError, TypeError, ArrowInvalid):
+        pass
+    return (result, present) if _with_presence else result
+
+
+def stamp_parquet_hash(path: str | Path, expected_hash: str | None, *,
+                       cache_waves: list[str] | None = None,
+                       make_inputs: dict | None = None) -> bool:
     """Best-effort: embed *expected_hash* into an existing parquet's
     schema metadata via an atomic rewrite.
 
     Used for trust-once-then-stamp migration of legacy / script-written
     parquets so subsequent reads are guarded.  Never raises; returns
     ``True`` on success (or when the stamp is already present).
+
+    ``cache_waves`` is explicit producer coverage, never inferred from rows.
+    The isolated Make transaction supplies it only AFTER verifying its inputs
+    and output (GH1288 repair ledger §4). Other callers retain the old behavior.
+    Arrow/pandas metadata and all audit stamps are retained verbatim.
+    ``make_inputs`` similarly records verified declared prerequisite/source
+    fingerprints, because a selected-table hash need not fold Other tables.
     """
     if expected_hash is None:
         return False
@@ -3313,9 +3340,19 @@ def stamp_parquet_hash(path: str | Path, expected_hash: str | None) -> bool:
         import pyarrow.parquet as pq
         table = pq.read_table(str(path))
         md = dict(table.schema.metadata or {})
-        if md.get(_CACHE_HASH_KEY) == expected_hash.encode():
+        coverage = (json.dumps([str(w) for w in cache_waves]).encode()
+                    if cache_waves is not None else None)
+        inputs = (json.dumps(make_inputs, sort_keys=True).encode()
+                  if make_inputs is not None else None)
+        if (md.get(_CACHE_HASH_KEY) == expected_hash.encode()
+                and (coverage is None or md.get(_CACHE_WAVES_KEY) == coverage)
+                and (inputs is None or md.get(b'lsms_make_inputs') == inputs)):
             return True
         md[_CACHE_HASH_KEY] = expected_hash.encode()
+        if coverage is not None:
+            md[_CACHE_WAVES_KEY] = coverage
+        if inputs is not None:
+            md[b'lsms_make_inputs'] = inputs
         table = table.replace_schema_metadata(md)
         _atomic_write_table(table, path)
         return True

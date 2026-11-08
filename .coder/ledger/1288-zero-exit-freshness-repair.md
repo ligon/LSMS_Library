@@ -111,3 +111,53 @@ Prepared runtime placement is not a runtime grant. All regression drafts UNRUN.
 
 Pending implementation and static-only conservation/syntax checks. No executed
 result is inferred from a drafted assertion or historical runtime evidence.
+
+### Coordinator refinements at implementation checkpoint
+
+ROOT's shared steering accepts the transaction approach and requires validation
+on a deep copy, leaving promoted bytes/attrs PRE-finalize. No post-finalize
+serialization or second id_walk is permitted. Existing read-gate replay/drop and
+coverage behavior remains authoritative.
+
+Hashless OTHER is UNPROVEN, not necessarily stale. Explore ordinary registered
+Other builders in the private transaction: discover literal managed references
+with existing scan_script_data_refs and declared paths, and ask the actual
+Country API to build a referenced unproven table under the private root. Never
+substitute generic concatenation for the selected country compiler. Unknown
+dynamic dependencies are not guessed, and unknown missing prerequisites remain
+native failures. A genuinely hashless, rule-less, dynamically referenced Other
+with no established builder/provenance is a remaining availability boundary for
+ROOT review, not evidence that it is stale. Broader default/JSON/legacy failure
+paths and real exposure remain explicit partial-GH1288 residuals.
+
+### Static closure refinement
+
+Current _table_cache_hash folds selected wave hashes but not another table's
+raw-source sidecars, and country-only literal raw references are not separately
+folded there. A warm Make result therefore also needs its recorded declared
+Other-table hashes and literal/YAML source_fingerprint values. Extend the existing
+parquet metadata writer/reader with an optional lsms_make_inputs manifest used
+ONLY by direct Make reuse; do not change _table_cache_hash grammar, default cache
+read policy, registry exclusions or scientific content. Compare this finite
+manifest before/after building and on direct warm reuse. This is freshness input
+evidence, not a second data/cache tier. Known literal Other closure is collected
+with the existing scanner/registry; computed-path residual remains explicit.
+
+### ROOT ruling on the concrete availability discriminator
+
+The shared channel explicitly accepts the invented computed/hashless/rule-less
+Other case ONLY as an availability boundary/residual, not stale-source evidence
+or actual-country exposure. Narrow contextual refusal may protect genuinely
+computed/unregistered/unverifiable inputs. Ordinary discoverable prerequisites
+must retain builder/script fallback. The required healthy literal dependency
+must privately rebuild and yield exact15,25; both cases preserve live Other
+bytes/availability. Both tests remain UNRUN. GH1288 remains OPEN for broader
+exposure, other callers and declaration questions; no scientific/config contract
+is added. The new draft names both cases explicitly.
+
+The extra direct-Make manifest records Other table hashes and country-only/raw
+literal references not already covered by Wave._input_hash. YAML and ordinary
+wave literal sources already folded by the existing hash remain eligible for
+normal verified reuse without a redundant manifest. Declared source paths are
+also used to copy only already-available L1 blobs, including literal Other
+closure. Existing raw/DVC provenance remains eligible.
