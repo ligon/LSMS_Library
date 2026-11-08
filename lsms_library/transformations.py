@@ -6694,7 +6694,11 @@ def tlu(livestock, *, tlu_factors=None, head_col='HeadCount'):
     Returns
     -------
     pd.DataFrame
-        One ``TLU`` column indexed by ``(t, i)``.
+        One ``TLU`` column indexed by ``(t, i)``. If country is explicitly
+        supplied as an index level or column, it is retained first, including
+        singleton and empty results. Country-less calls retain their local
+        keys; scalar attrs do not add a country axis. Null country labels
+        raise before filtering, and an index label outranks a redundant column.
 
     Notes
     -----
@@ -6704,7 +6708,7 @@ def tlu(livestock, *, tlu_factors=None, head_col='HeadCount'):
     smallholder herd lands at roughly 1-5 TLU; values are bounded below by 0.
     Species absent from the factor map contribute nothing. Unsupported
     positive heads emit :class:`TLUCoverageWarning`, explicitly disclosing
-    omitted contributions. The returned rows and values are unchanged:
+    omitted contributions. Unsupported-species handling is unchanged:
     a household with no nonmissing supported contribution remains absent.
     ``attrs['tlu_species_coverage']`` counts every input row before reduction,
     with per-original-label positive/zero/missing/negative row counts for
@@ -6716,6 +6720,13 @@ def tlu(livestock, *, tlu_factors=None, head_col='HeadCount'):
     df = livestock
     if head_col not in df.columns:
         raise ValueError(f"livestock must have a {head_col!r} column")
+    # Capture the explicitly selected measure before country promotion can
+    # remove a column (head_col may itself be 'country'). The shared helper
+    # preserves row order/count, so positional reindexing cannot duplicate
+    # colliding households (ledger1616 §§2–5).
+    head = pd.to_numeric(df[head_col], errors='coerce')
+    df = _country_index_for_transform(df, 'tlu')
+    head = head.set_axis(df.index)
     if 'animal' in (df.index.names or []):
         labels = df.index.get_level_values('animal').astype(str)
     elif 'animal' in df.columns:
@@ -6724,7 +6735,6 @@ def tlu(livestock, *, tlu_factors=None, head_col='HeadCount'):
         raise ValueError("livestock must have an 'animal' level or column")
     animal = labels.str.lower()
 
-    head = pd.to_numeric(df[head_col], errors='coerce')
     weight = pd.Series(animal, index=df.index).map(factors).astype(float)
     coverage = _tlu_species_coverage(labels, head, weight, head_col)
     positive = {label: count['positive_rows']
@@ -6743,6 +6753,8 @@ def tlu(livestock, *, tlu_factors=None, head_col='HeadCount'):
     contrib = head * weight
     out = pd.DataFrame({'TLU': contrib}).dropna()
     group_by = [n for n in ['t', 'i'] if n in out.index.names]
+    if group_by and 'country' in out.index.names:
+        group_by = ['country'] + group_by
     result = out.groupby(group_by).sum()
     result.attrs['tlu_species_coverage'] = coverage
     return result

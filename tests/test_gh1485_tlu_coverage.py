@@ -152,14 +152,16 @@ def test_supported_negative_zero_and_missing_heads_keep_existing_values():
     assert not caught and out.attrs['tlu_species_coverage']['supported_rows'] == 4
 
 
-def test_bounded_patch_preserves_existing_country_pooling_pending_separate_ruling():
-    # Root is separately notified: this is inherited behavior, not accepted identity.
+def test_country_repair_preserves_existing_factors_warning_and_coverage():
+    # GH1616 supersedes the explicitly temporary country-pooling pin; the
+    # numeric factors, warning behavior and all-input coverage remain unchanged.
     x = _herd(['Chicken', 'Chicken'], [10, 20], axis='column')
     x['country'] = ['invented-A', 'invented-B']
     x = x.set_index(['country', 'animal'], append=True)
     out, caught = _run(x)
-    assert out.index.names == ['t', 'i'] and len(out) == 1
-    assert out.TLU.tolist() == [10 * .01 + 20 * .01]
+    assert out.index.names == ['country', 't', 'i'] and len(out) == 2
+    assert out.index.get_level_values('country').tolist() == ['invented-A', 'invented-B']
+    assert out.TLU.tolist() == [10 * .01, 20 * .01]
     assert not caught and out.attrs['tlu_species_coverage']['input_rows'] == 2
 
 
