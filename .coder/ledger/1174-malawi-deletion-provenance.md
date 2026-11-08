@@ -1,9 +1,11 @@
 # Prior-Art Ledger — Malawi nonseed deletion provenance (issue 1174)
 
 Search tier: git + ripgrep + AST floor. Fresh GitHub development base:
-`c964c6c4f25945dc14636fd094893b16b12180b7`. Current integration baseline, freshly
-fetched after terminal verification, is GitHub development
-`3b28d293f71b962c3d878c2886be9ee794407915`; root requested an ordinary merge
+`c964c6c4f25945dc14636fd094893b16b12180b7`. The verified source-integration baseline
+is `3b28d293f71b962c3d878c2886be9ee794407915`. After its terminal checks, GitHub
+development advanced to `bcd77200f4fd555a8dfc10656d3e7100ae03fd6f` with disjoint
+Burkina Faso/Mali changes only. Root requested ordinary merges and byte/smoke
+closure for that disjoint advance, preserving the frozen topic history,
 preserving the frozen topic history, without rebase/force. The filesystem
 origin's stale development ref is not a baseline. Inherits STANDING.md §§3–4, CLAUDE.md
 Derived Values, and canonical lsms_library/data_info.yml.
@@ -120,6 +122,23 @@ hash census and fresh cold baseline/candidate APIs/Make/Feature/replay/warm
 checks on the merged freeze. Configured final-head GitHub CI remains root's
 gate; retain the complete earlier full-CI receipt as prior-head evidence.
 
+The current-base merge freeze 1e8af2516869a861590cc0bc189840a87ba77337 passes
+332 relevant controls and strict API audit. Free cold job 41009999 completed
+0:0 in 2:54: current-base/candidate native frames, all seed inputs, exact raw
+nonseed replay, Make/Feature and fresh warm checks pass; 14 cache files per
+head retain bytes/epochs. Public-method hash changes are 26 country/26 wave
+cells, partitioned into 22 declared country/22 declared 2010 wave cells plus
+four auto-derived method hashes each; all changes are Malawi, zero shared BTF.
+All four task files are byte-exact reviewed 0ef, and every upstream changed
+file is byte-exact 3b28. Completed receipts are under the task's integration/.
+
+Root's subsequent bcd advance contains only the 1528 Burkina Faso/Mali topic,
+its country docs/ledger and tests. Incoming paths were freshly fetched and
+checked: no Malawi/shared-runtime/AGENTS/CLAUDE change. After normal merge,
+prove the entire Malawi tree, shared runtime and task tests remain exact 1e8,
+then run bounded smoke. Root explicitly requires no repeated native or full
+campaign for this disjoint advance; configured GitHub CI tests the final merge.
+
 This completes the existing-wave residual only. The issue's conditional
 2024–25/15-line seed provenance follow-up belongs to issue 1275 and the held
 whole-wave work; it is neither implemented nor verified here. Root will carry
@@ -128,8 +147,9 @@ that checklist before narrowing/closing issue 1174. No new 2024 wiring.
 ## §6 Open questions
 
 No scientific decision is requested: registration documents an existing
-deletion and does not decide whether fertilizer was used. Current-base
-integration validation remains; the earlier baseline cohort is complete.
+deletion and does not decide whether fertilizer was used. Current-base source
+integration is complete; disjoint-base byte/smoke closure and final configured
+GitHub CI remain.
 Stop any affected extension if its
 eligibility/replay cannot be tied exactly to the current producer; document
 the ambiguity instead of broadening the rule.
