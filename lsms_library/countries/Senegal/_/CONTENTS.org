@@ -1081,3 +1081,28 @@ With #1487 a lone request serves the all-waves column.  =KgFactorSource=, =surve
 *What could check this.*  =ehcvm_prix_sen2021= is outside the household data.  It weighs "paquet de 25g" tea at 25 g on 477 observations, the table's =Petit=.  Table rows against market per-kg, median abs. log error / within 2x: 2021-22 0.415 / 73.6% -> 0.413 / 69.0%, item correlation 0.59 -> 0.69; 2018-19 against that 2021-22 market 0.473 / 67.3% -> 0.413 / 67.7%, item correlation 0.66 -> 0.85.  2018-19 community price ratios, table-free but price ratios: 0.353 / 82.0% against the table, the weakest of the four on this test, which has no cells at Mali's sugar.  The =Kg= purchase check cannot rank table against inference, since the inference is estimated from those prices.
 
 *Corrects the #876 section above*: "no EHCVM wave ships a unit-conversion table" is wrong for 2021-22.  The #876 NA on a last purchase in another unit stands; a table that weighs a unit is not what that construction uses, and whether it should be is a separate question.
+
+* 2026-11-08 -- missing food unit uses the existing =Unknown= sentinel (GH #1500; source-only)
+
+The live 2018-19 =mapping.py::food_acquired= hook now replaces only missing
+=u= index positions with =transformations.U_UNKNOWN= after the existing shared
+size, canonical reshape, purchase valuation and NSU-weight processing returns.
+A recorded size cannot name an absent base unit: the sentinel is exactly
+=Unknown=, never =Unknown (Moyen)=.  Consumption and last-purchase unit/size
+answers, =Quantity=, =Expenditure=, =Quantity_kg= and =Derivation= are not edited.
+The hook refuses newly coalescing full keys rather than reducing their rows.
+
+The mojibake-keyed =u=/=j= crosswalk pairing above is retained.  The legacy
+=2018-19/_/food_acquired.py= remains DEAD; YAML plus the existing shared
+=food_acquired_with_unit_weights= helper is the live path.  Present codes,
+labels and literal missing-looking tokens are not reclassified, and 2021-22
+source is unchanged.
+
+The issue's 21 served records / quantity 63.5 (17 purchased, 4 in-kind) are
+*historical observations*, not counts measured for this repair.  The older
+size entry's source-row denominator is different.  Current source/data/API,
+Org-label/NSU decoding, focused regression execution, typed Country/Feature,
+cold/warm/cache-hash census and full CI checks are *UNRUN*.  New regression
+drafts use invented literal oracles and explicitly stubbed factor/label
+boundaries; they do not establish real-source parity.  Static source analysis
+anticipates one Senegal re-warm, not a measured or completed re-warm.
