@@ -1,4 +1,42 @@
 #+title: Handoff, LSMS-ISA sweep
+* Live release-lane update 2026-11-08T11:59:49.581913+00:00
+Rootdocs prior4a297fa36; development remainsb284/25merges21closures/166open.
+1520 CURRENTsource d5f62c24d48c794f478f54a958bd168a884de53c exactcf0+b284 ordinary
+merge.5owned/17incoming paths overlapONLYtransformations; applyingexactcandidate
+b834→cf0patch toisolatedb284transform givesBYTEEXACTmerge. Country.pyexactauthor;
+ENTIRE19120mode/type/blobunionexact/clean/newFSverify/1520-current-20261108 exact.
+Conditionalgate passed:operator9scripts inversebyteexactexceptapprovednamespace/
+lane/head/privatepaths;entry0755twicechecked. NewfullCI41023662 RUNNINGpytest/
+n0051.savio4/free8CPU32G45min/4loadfile/alltests/ownclone/ownprivateL1/falsecreds/
+unshare/BLASbuild1,actualidentityd5f passed. Agentfinish1590ownslauncher93908.
+CandidatecensusCLOSED0/122.704s:0/450/1895/35/186,18None/public553/2313/39 and
+EVERYnonheadfield exactlyclosedc8baseline;0errors/denials/privatefiles. API0/9.779s.
+Baselineheaderpreserved/no replay, actualb284diffONLY1606ledger. No fullsuite
+terminalcountyet; DO NOTresubmitonmonitorobservationtimeout. Source/PDF/raw/API/
+rewarm ungranted; this ismetadata+configuredofflineCI only.
+
+1537 portabilityFIX COMPLETE head0b2d483fd7aa1d81c53b8ec4238b2f3434296bf9 ordinary
+FF. CommitEXACT135462B b834Org under tests/fixtures/gh1537/baseline-categorical_mapping.org,
+SHA1ec375a0939d1bebc0398935580eba931bb798189a9940d31be1a29f34c41f29/Gitblob7c4fcaba5786588f2abddbb5c3b0c1a448920a9d.
+FixturePath(__file__)-relative/noISA_CONTEXT_ROOT/historylookup; samehash/parser.
+All21TESTfunctionAST/assertions+2productionrows exactold27f552; no29greenreplay.
+DatedNigeriaappendix records2aliases/blankCode+quartercells/Pepperunqualifiedhold;
+onlyfixture/binding/docs/ownledgerdiff. PORTABILITY-MANIFESTd2248a1b atreports/
+1537-partial-curation-local-20261108. Rootrequestedfinish1590 independentSTATIC
+matrix/guardprep WHILE1520actorslive, no runtimeyet. FullNigeria prior4019prefix
++ALL59newlines read→4078current. Proposedstrengthening: realOrgmetadata-only
+get_categorical_mapping/df_data_grabber→Code/format_id/defaultdecoder withinexact
+2knownOrgpaths+orgtbl/idxvars/valuebinding, ALLrawget_dataframe/CountryAPI remain
+blocked. This isNEWpendingmetadata-scopegrant, notrelaxing originalclosedauthor
+strictguard orclaimingactualsource/API. Whole1537/PepperOPEN.
+
+finish1452 nowprepares1547remotecharter ONLYwithcorrect675nuance (unavailable-
+requiredstayssoft;existingprimary/config-requiredfailuresloud); no1547dryrun/job.
+Mwi preparingNigeractualdefault9rawreader/coldwarmproposal, NO9blobaccessyet.
+All3locals remainassigned;0native-modeljobsafter1520terminal. RootownsPRmerge/
+sourcegates, workerfinish1590owns1520currentverification+1537nextreview.
+GoalACTIVE. Otherholds/settleddecisions unchanged aspriorcheckpoint.
+
 * Current scrum handoff 2026-11-08T11:50:14.381942+00:00
 GoalACTIVE/PROGRESS. GitHub development b284112edee7dcc764415bb4e69a7d1814cf512b.25development
 merges/21issueclosures in sweep. Fresh166repoopen; original147scope17closed/
