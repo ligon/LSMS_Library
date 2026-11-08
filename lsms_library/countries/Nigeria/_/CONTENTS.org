@@ -4055,3 +4055,24 @@ and [[https://github.com/ligon/LSMS_Library/pull/1622][PR #1622]]. Durable sourc
 =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1518-nigeria-sealed-correspondence-v2-20261108/REPORT.md=,
 with =RESULT.json= and =STAGE-RECEIPT.json= in the same directory. The source
 audit contains every original row; private outputs/IDs are not published here.
+
+* 2026-11-08 -- GH #1537: two label-only Aggregate aliases; Pepper remains unqualified
+
+Preferred =Groundnuts= now maps to the already existing Aggregate =Groundnuts=,
+and =Maize (shelled)= to existing =Maize=.  These are two label-only rows in
+=harmonize_food=: both Code cells and all eight quarter cells PER row are blank.
+They add no numeric/quarter aliases, units or buckets.  Original rows and default
+native =j= are unchanged; code-mode crop/community mappings still skip blank keys.
+
+This dated curation decision qualifies the earlier #1144 account that an alternate
+label request leaves all three native names uncurated; that historical record is
+retained.  =Pepper= still passes through with the ordinary coverage warning and
+strict-mode refusal.  The served name does not state Fresh/Dry/ground/spice, so no
+such classification is inferred; its source-identity question remains held.  Whole #1537 remains OPEN for that question.
+
+Both committed Org parsers, all eight quarter maps and invented price-grain/value
+controls passed in the bounded 29-control source-free proof.  The default route
+was checked by its unchanged source chain and pure decoder tail, not a real
+no-argument producer/API invocation.  No actual source/current coverage count,
+quantity/price/unit/factor/weight rule or cold/warm acceptance is claimed.  The
+historical 121-label/11,649-row/2.4% figures were not remeasured.

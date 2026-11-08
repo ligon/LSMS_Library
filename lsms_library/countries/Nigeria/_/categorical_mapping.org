@@ -295,6 +295,8 @@
 | 4014 | Pounded yam and soup | Pounded yam and soup | --- | Pounded yam and soup | --- | Pounded yam and soup | --- | --- | --- | --- |
 | 4015 | Ice cream | Ice cream | --- | Ice cream | --- | Ice cream | --- | --- | --- | --- |
 | 4016 | Kunu | Kunu | --- | Kunu | --- | Kunu | --- | --- | --- | --- |
+|  | Groundnuts | Groundnuts |  |  |  |  |  |  |  |  |
+|  | Maize (shelled) | Maize |  |  |  |  |  |  |  |  |
 
 * Units
 
