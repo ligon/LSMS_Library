@@ -1,6 +1,15 @@
 # Prior-Art Ledger — GH1606 stage-aware dtype diagnostics
 
 Search: Git/ripgrep/AST floor; no GitNexus service. Inherits STANDING.md.
+
+**REOPENED 2026-11-08 — finalized datetime fidelity follow-up.** Current base
+b284112edee7dcc764415bb4e69a7d1814cf512b. ROOT's guarded metadata/invented probe
+shows canonical datetime versus local str misgraded as finalized string. Prior
+ROOT-supported limited-dtype assumption was incomplete for the original full
+canonical-after-local requirement. Earlier tests/CI/merge receipts below remain
+historical, not proof of datetime fidelity. This follow-up uses ONLY actual global
+schema plus generic Alpha/Beta invented carriers; no real-country fixture/source
+or Country construction. ROOT explicitly authorized recognition, not date policy.
 Base ebb87135cdd11a63e3b463b6b21c3e556c628a8d. ROOT read/approved the external
 charter, checker/canonical-loader and selected contract before implementation.
 AGENTS full prior read authenticated SHA b5ea7b495528b61727e52df306fcd481ab8120b3f6d937c0c18c867aea47993a;
@@ -11,8 +20,10 @@ identity proves exact same file, no instruction changes.
 ## §1 Task
 
 Explicit stage="native" (legacy default) or "finalized" for rough dtype grading.
-Known public API adapters explicitly finalized. Only supported global rough
-types override local; unsupported global types retain local grading. Canonical-only
+Known public API adapters explicitly finalized. ALL currently declared global
+rough types override local, including GLOBAL datetime through the existing pandas
+dtype predicate. Unknown FUTURE global types retain local grading. Native local
+map/behavior remains exact legacy; no global datetime entry in _DTYPE_MAP. Canonical-only
 present columns checked only in dtype check, even absent local feature; never
 required. No data/caster/other-check/source/science/cache changes.
 
@@ -23,6 +34,7 @@ required. No data/caster/other-check/source/science/cache changes.
 | _load_scheme | diagnostics.py:194 | local index/type/optional parser unchanged |
 | _DTYPE_MAP / _check_dtype_consistency | diagnostics.py:248/402 | extend current numeric/string/bool predicates, list/string handling, first-five warn cap |
 | _load_canonical_dtypes | country.py:7833 | reuse authoritative global Columns.type parser, no new parser |
+| pandas.api.types.is_datetime64_any_dtype | existing pandas dependency | reuse dtype predicate ONLY on finalized GLOBAL datetime; no date coercion |
 | _enforce_canonical_dtypes | country.py:7855 | precedence authority ONLY; mutating caster never called |
 | is_this_feature_sane | diagnostics.py:716 | add explicit context keyword; native omission exact baseline |
 | validate_feature | diagnostics.py:934 | public API result, explicit finalized helper call; test with invented strict fakes |
@@ -35,9 +47,13 @@ required. No data/caster/other-check/source/science/cache changes.
 
 STANDING.md §3/§4: cached parquets hold pre-finalize data. Existing canonical
 caster says "the canonical schema (data_info.yml) wins over any country-level
-override". This diagnostic mirrors only types recognized by its EXISTING rough
-_DTYPE_MAP; no new datetime/exact-dtype system. Unsupported global types retain
-local grading, preventing a silent unknown-type exemption. Caller declares stage,
+override". Finalized GLOBAL datetime must be recognized with
+pd.api.types.is_datetime64_any_dtype: naive, timezone-aware, units, NaT and typed
+empty retain dtype recognition. No parse/cast/calendar/clamp/value inspection.
+Recognition is tracked ONLY for globally declared datetime columns; LOCAL-only
+datetime remains unsupported exactly as legacy. Unknown FUTURE global types
+retain local grading, preventing a silent unknown-type exemption. The existing
+native _DTYPE_MAP remains byte-exact, without a datetime key. Caller declares stage,
 never inferred from dtype/attrs/path/country. Other checks receive unchanged local
 scheme; SanityReport.ok continues allowing warnings.
 
@@ -62,11 +78,14 @@ all other checks. New meaningful invented controls verify stage/caller/immutabil
 
 ## §6 Questions
 
-None blocking: ROOT selected native default, canonical-only present checks and
-unsupported-global retention. Hash footprint UNMEASURED; no census grant. Freeze
+None blocking: ROOT selected full current canonical priority including datetime,
+native default unchanged, canonical-only present checks, and unknown-FUTURE-global
+retention. Earlier datetime-as-unsupported fixtures must be explicitly reclassified
+to genuinely future types; keep their assertions, add wrong-datetime negatives.
+One affected+new guarded cohort only; no old35/full/source/actualCountry/census replay. Hash footprint UNMEASURED; no census grant. Freeze
 before one invented focused cohort; independent review after frozen code/tests.
 
-### Phase3 — verification complete; ROOT release gates remain
+### Phase3 — historical limited-dtype verification; datetime follow-up PENDING
 
 - `_check_dtype_consistency` — OK (§2/§3): reuses the existing canonical loader
   and rough predicates, never caster/parser. Supported global types override only
@@ -136,3 +155,41 @@ This final update changes only this task ledger. All nonledger objects remain
 exactly the tested current composition. Configured GitHub checks and merge
 remain the final publication gate; there is no source-corpus replay, scientific
 rule change, native cache rewrite, production-weight change or master release.
+
+### Current follow-up freeze — Phase1
+
+Reuse existing canonical loader and pandas dtype predicate; no new parser,
+producer or schema. Preserve all non-dtype checks, severity/order, immutable
+frame/scheme, unknown-future fallback and native forbidden-loader behavior.
+ROOT probeRESULT at reports/1606-datetime-fidelity-probe-20261108 is reused as
+historical diagnosis, not replayed. New scope implements GLOBAL datetime only,
+with actual canonical schema/invented carriers; reclassifies prior datetime
+unsupported inputs explicitly. Freeze code/tests before one affected/new cohort
+under accepted private MAIN/unshare/falsecreds/MPL/XDG/thread1/2loadfile guards.
+Independent review/metadata/currentCI/publication remain ROOT gates. No new
+runtime success at this ledger-first commit. Prior receipts are immutable.
+
+
+### ROOT datetime follow-up publication checkpoint — 2026-11-08 13:04 UTC
+
+The datetime follow-up975f9 passed46 focused/affected controls (33new,11affected
+companions,2exact-parent comparisons) and strict static API audit. Independent
+review passed20 additional controls,13.70s pytest/28.96s wrapper, with unchanged
+source-refusal guards and no source/private-data reads. The current declared
+canonical type vocabulary is recognized; dormant date/timestamp aliases remain
+outside this correction. No parsing, casting, calendar or value validation was
+added. The previous limited-type closure remains historical; issue1606 is open.
+
+Current composition e3dc93d0f11f676bb13be11aa6795a20b70a76d3 has parents975f9 andd82,
+with the exact19,121-entry source union and no overlapping paths. Candidate-only
+guarded metadata and strict API audit passed; every non-head metadata field
+and all450/1,895/35/186 fingerprints match the admitted closed1520baseline.
+The18None cells and public553/2313/39 inventories are unchanged.
+
+Full configured offlineCI41024398 is RUNNING at this dated checkpoint. Final
+results and publication decision belong in the PR validation record and
+reports/1606-datetime-current-verification-20261108. This is a historical
+checkpoint, not a completion claim. The publication commit changes only this
+ledger; all code/test objects remain frozen for the running full suite. No
+master release, shared-cache rebuild, production weights or scientific
+interpretation changes are authorized here.
