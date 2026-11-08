@@ -1,4 +1,52 @@
 #+title: Handoff, LSMS-ISA sweep
+* Active assignments and stopped release 2026-11-08T12:55:14.579549+00:00
+Development d82ecf6e3 /26 merges /21 currently closed sweep issues. Fresh repository
+166open; original147 scope18closed/129open. #1606REOPENED remains accurate.
+Previous headers are historical checkpoints, not competing current assignments.
+
+All3 local workers ACTIVE; completed agents are reactivated with followup_task.
+finish_1452 owns #1547 verification: author638 31PASS/API0; currenta6c641 ordinary
+638+d82,19122fullmode/type/blob union and exactcountry.py patch proof accepted.
+FSverify/1547-current-20261108 published/readbackexact. Acceptedoperators frozen
+1f1b389e; ONEfullCI41024376 allocated/free8CPU32G45m/4loadfile/privateL1/falsecreds/
+unshare; API1722/metadata35824 launchedonce. Agentownsallterminal/JUnit proofs.
+Remote1547job41023860 completedinfra0/taskPARTIAL atROOTfixturegate, preserved;
+localcompletion is new context, no retrospectivegrant/restart. ROOTfullfixture
+anddiff reviewSTATIC, notindependent-runtime claim. Nextmechanical task: #1606
+releaseoperatorsPREP on ROOTe3dc93d0f11f676bb13be11aa6795a20b70a76d3, parents975f9+d82,
+19121objectunion4owned5incomingNOoverlap/clean/exactFSverifyref. No1606actorsyet.
+
+finish_1590 owns #1537 corrective verification +#1606 independentSTATIC prep.
+Original fullCI41024214 FAILED1:0:12226PASS/5652skip/4xfail/1FAIL,723.39s.
+Failure is old expected-map comprehension int(NaN), BEFORE eitherdecoderassertion,
+for2intentional blankCodealiasrows. Allold17854JUnitnodesretained+29newPASS,
+only1oldoutcomechanged. Originalfailedrun preserved/no blindretry. MinimalTEST-
+ONLY FF5495663 over6351 adds pd.notna(code) filter; exactint/labelpredicates+
+BOTHcomplete decoder equalityassertions unchanged. Production/configsubtree
+BYTEEXACT6351. ROOTread fullpatch/proof;3affectedcontrols proposed/unexecuted,
+ROOToperatorreview pending. No PR yet; whole1537/PepperOPEN. Candidatecensus/API
+closed on unchangedproduction:20/450countrytable+200/1895wavehashes ALLNigeria,
+othernonhashmetadataexact,18None/public553231339unchanged.
+
+malawi_revision_food owns #1529 releasePREP +Mali#1574 staticdocumentinventory.
+Niger actual9raw job41024309 COMPLETED0:0/3m40s, coordinator98.41965s; guarded
+ordinaryonewavecold+freshwarm PASS.9605native/publickeys/reportedpayloads/masks/
+dtypes exact, vmissing0;7L2bytes/footercoverage/fullreturnedframe/attrs/ledger
+unchangedwarm; warmraw/Stata0;3guards0denials;privatecredentialcopyremoved.
+ROOTfulloperator+aggregateproofreview ACCEPTED boundedactualreader/native/public
+carrier contract. No generic26column categoryparity/fullbaseline/Feature/science
+claim. FINALmanifest e3ad77855293f3f304673dedef4c6ae97a9d70572235217725ee502b61297f4b.
+NextNiger: ordinary4cca+d82currentcomposition/wholeobjectproof/releaseoperators/
+partialPR+residualdraft PREP ONLY; no newsource/fullCI grant yet.
+Mali1574: FULL3551lineCONTENTS grounded(prior3481prefix+70new); own2017five
+sidecars identified; alreadymerged812leaves2017designcodes. Staticmetadata only,
+noPDF/raw/getter/API/labels/default modification. Report exactown-code-list
+candidates/missingdocumentation. Maintain1529caveats/3B3D3E designholds.
+
+Eightoriginalcountrydispatches are historicalterminal, not a reserve of8live
+agents. No native model job currentlyactive. No masterrelease/sharedrewarm/
+productionweightchange. Remainingowners/decisions retained in earlier records.
+
 * Scrum queue update 2026-11-08T12:45:41.033196+00:00
 Goal ACTIVE. GitHub development d82ecf6e3ca11f2da55601ce93578f5f3f45e25a; 26 development merges and
 21 currently closed sweep issues. #1606 was REOPENED for global datetime dtype
