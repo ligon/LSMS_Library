@@ -150,7 +150,9 @@ def test_purchase_flag_is_not_inferred_from_amount(driver, flag, expected):
 def test_dry_invalid_native_observations_refuse(driver, mutation):
     labeled, numeric = frames('as03cq')
     if mutation == 'null-slot': numeric.loc[90, 'as03cq02'] = np.nan
-    if mutation == 'fraction-slot': numeric.loc[90, 'as03cq02'] = 11.5
+    if mutation == 'fraction-slot':
+        numeric['as03cq02'] = numeric['as03cq02'].astype(float)
+        numeric.loc[90, 'as03cq02'] = 11.5
     if mutation == 'duplicate-slot': numeric.loc[50, 'as03cq02'] = 11
     if mutation == 'missing-household': numeric.loc[90, 'hid'] = np.nan
     with pytest.raises(ValueError, match='Niger input observations'):
