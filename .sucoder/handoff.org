@@ -1,4 +1,71 @@
 #+title: Handoff, LSMS-ISA sweep
+* Active pipeline checkpoint 2026-11-08T08:58:02.704391+00:00
+GoalACTIVE/PROGRESS. Development remains b8346cf1f953ac82517b1b7473c715a5655ca950,
+21developmentmerges17closures. Fresh paginated170repoopen; exact147originalscope
+14closed133open authenticated in reports/scrum-ready-queue-20261108/live-country-summary-0837.json.
+Rootdocs previous0d3ca11be. No master/sharedrewarm/productionweight changes.
+
+1578 original fullCI41020419 remains FAILED12030P1old15stimeout/causeunproven.
+V2 failed before0tests/0Make due empty-directory harness error, preserved.
+V3 samehost41021945 COMPLETED0:0/n0048: unchanged BASEfa76 and CANDc8fb original
+15stest eachONCEPASS,2Make total(expectedrefusal2,0.29/0.21s),13guards eachactive,
+0denials/0datafiles. Serialdidnotreprofull-loadtimeout; noflakeorcausalclaim.
+Current ordinary composition a7119e19bb147e78487b3ee288cecb9de8f08aef parents
+c88+b834,4owned12incomingNOoverlap/entire19113mode-type-blob unionexact.
+NEW FS verify/1578-b834-current-20261108 exacta711; oldc8fbrefimmutable.
+Rootreviewed fulloperator52024c31 + layoutdelta; ONEnewfullCI41022082 RUNNING
+n0055.savio4/free8CPU32G45min/4loadfile/fulltests/falsecreds/unshare/privateL1.
+Original15stest/Make/assertions unchanged. Fresh strictAPI0/9.61s; NEW actualb834
+baseline+a711 metadata0/450/1895/35/186,public553/2313/39/18None exact,0errors/
+denials/privatefiles,123.95/125.39s. Rootreadactualcomparison/receipts.
+finish1590 now1591author ledgerfirst09bd9347e onb834, codeuntouchedatlastreceipt;
+actualoldpoolnegatives thenminimalbyteswire/parentrelaydecode+BaseException
+validation. Preserveallpublicexceptions/reduce/forkunsafe/warnings/ledgers/
+serial/realdeadworker behavior. No countryproducer/source/API campaign.
+
+CAPACITY: isolated64110stdlib +4runtime/staging controlsPASS0failure/denials;
+32actualprojectimports pinned641, fakeGit/sbatch only. No installed/source/
+dependency/auth/config/hook change. Entire224sourceblobs/modes remainexact.
+RootreadFULL entry/task/profile/bootstrap/320lineobserver+pin-onlydiff/source
+fsck/closure. ONEsupportedDRYRUNrc0/3.18s/no dispatchdir/stage/job; project
+canonicala07ca779, --exportNONE/norequeue/free4CPU8G15min/timeout120, nooptional
+sharedL1names/bindings. Rootreadfullsubmit_once83db2f64;ONEactualpilot authorized.
+PilotSUBMITTED41022138/dispatchf050a03f1fd645aba081dcd0599e0b01 RUNNINGn0192.savio3.
+Actualworkerccb4/runner9786/protocole7ec/projecta07c exact; only normalmanaged
+nativeauthstaging authorized, no manual native contents/HOME/CODEX overrides.
+finish1452 owns scopedmetadata monitoring/normalterminal/seal/privatepublication
+acceptance. No retry/scale-up/concurrentpilot grant; historicalcause UNLOCALIZED,
+capacityNOTyetclaimedrestored. Priorfilename-onlybroadBcatalogqualification
+preserved; no nativepayload/contentread/output, stoppedandno repeat.
+
+Niger1529 fullcharter4c5 + fullnewdraft/input/codecontrols ROOTreviewed. Invented
+v1controlstartup FAILED3/0tests when stdlibplatform.processor attempted uname;
+immutablefailedmanifestad415ff6. BoundedNEWv2 publicmetadata preflight exact
+uname-p binary2833c365 beforearmingunchangedguard;23PASS12.84s/0unexpecteddenials,
+18expectedselftests/3guards,2execnetworkers; noLSMS/payload/sourceimports.
+Rootreadactual FINAL-RECEIPT andgranted ONE LOCALoriginal frozenclosed-artifact
+stage (no Slurm needed for10MBretainedframes). Rootauthorization8c65a117 binds
+operator102f99c6/helper401b52c4/manifest/4c5/mountedinterpreter/exactprivatepaths.
+ONEstageCLOSED0; final19filemanifest15427a3b/13privateexports17534432bytes.
+15pre/post witnessesEXACT/0errors/data-configempty.55860rawrows preserved in
+originalserializednumericbytes+separatederivedaudits. Frozenloop10trustedpickle
++5artifactJSON loads (not universalIOcensus). Dry3C1067/272HH,14dryonly;
+raw3B768/nativeqaunique;3D409paid;3E576raw/575view. Dryquantity999=0;area41literal
+999/60zero stillunruled. cq08bTOTALFCFA notunit; nophysicalparceljoin/3Dcosttotal/
+season/area/yield/default chosen. ActualcurrentservingFALSE, rainycrop2E/PDFoutside
+admission. Rootreadsourceclosure+safeaggregateonly, no extraartifactreopen.
+malawi_revision_food nowREADONLYEthiopia1570taskcard (fullcountryfirst) plusnext
+native3Ctransport-onlycard; no newsource/production/API taskgrant.
+
+Nextroot: verifyactualpilotprogressANDnormal supervisor/seal/privatecommit/
+publication before concurrency decision; collect1578fullCI terminal+countdiff,
+then docs-onlyfinalfreeze/GitHub/expectedheadmerge ifallgatespass. Arrange1591
+independentreview afterfreeze. Review1570/1529concretetaskcards; preserveuser
+scientificrulings49borrow/50maizeflour-afterprimaryevidence/51NOdateclamp,48
+investigationcompletedbutproductionweight/wholewavePR1604held. Neverreasksettled
+choices or infer scientificallyrequiredapprovalfromelapsedtime. All3localmodels
+assigned; historical8countryjobs terminal, nativepilot isONEactualnewworker.
+
 * Scrum checkpoint 2026-11-08T08:35:18.878518+00:00
 Goal ACTIVE/PROGRESS. GitHub development b8346cf1f953ac82517b1b7473c715a5655ca950;
 PR1623 MERGED, issue1592 confirmed CLOSED completed via fresh connector read.
