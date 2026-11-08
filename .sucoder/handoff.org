@@ -1,4 +1,71 @@
 #+title: Handoff, LSMS-ISA sweep
+* Progress checkpoint, 2026-11-08 00:16 UTC
+Previous goal turn was PROGRESS (merged1600/1601, closed1475/1510/1517).
+This turn is also PROGRESS: new1535 implementation/negative proof/review/census,
+PR1605 publication, country-source integrations, issue1275 conditional residual
+reconciliation and next country charters. Goal ACTIVE, full backlog not complete.
+GitHub development remains3b28d293f71b962c3d878c2886be9ee794407915; verify fresh.
+
+1528 final2c23bf6ad58a94663bf4d46d3dbd2dbd3a5d2d48 published GitHub DRAFT
+PR1605 (base3b28); configured unit/Windows RUNNING, source/DVC/docs SKIPPED.
+Independentroot proof: final changes ONLY ledger+twoCONTENTS versus tested0586,
+every other Git tree entry identical. Originalafe6 full offline11462pass/5652skip/
+4xfail; independent139pass/6skip. Currentbase ordinarymerge0586 source/API/Feature/
+warm ALLfields+typedattrs exactclosedafe6; focus233pass/6skip, hashes confined
+BFA/Mali, job41007730 COMPLETED0:0. RootownsremainingCI/ready/exactheadmerge/
+closure; authorfinish_1590 moved to Uganda1480. No more1528scientific replay.
+
+1174 original0ef job41006209 COMPLETED0:0; source/API/Make(withwavecachereuse)/
+Feature/warm passed, independent171pass/9sourcecasesdeselected noP1/P2. Author
+malawi_revision_food doing bounded ordinaryintegration with3b28 afterCIterminal.
+Do not substitute old fullCI for final-head CI. Conditional2024+15line provenance
+requirement is now explicitly carried in existing1275 (exactbodyreadbackPASS),
+not implemented/verified by1174; wholewave/weights48held. No19blankkg recovery.
+
+1535 rootNEWtreefix-1535-harvest-month-20261108, frozen
+ d673f13bd107b8f6e542eec13830f4a9e2bfb880 on3b28. Ledgerfirst7e49. Productonly
+22 YAMLlines: optionalcanonicalstr planting_month+harvest_month, existingCountry
+finalizer reused; noFeature/newparser/countrywriter changes. Public numericmonth
+carriers become nullabletext; existingmonthsets/yearmonthstringsverbatim, no
+calendar interpretation/selection/fill/rounding. Parentv3 8fail/6pass:4numericdtype
+and4Arrow failures(twofields,bothorders). Initialfixturefalsefails retained.
+Privatecorrectivefocus442pass/2warmtestsskipped; strictAPIaudit0. Metadata450/
+1895/35/186 unchanged, zero errors/denials; runtime553/2313/39 reported separately.
+Independentfinish_1452 CLOSEDnoP1/P2:30candidatepass;18baselineexpectedArrow
+controls pass/12candidate-only skips, all6orders/fieldsindividually+together,
+actualprivate inventedL2gate3reads/cacheunchanged. Fulltypedattrs matchbeforeArrow;
+afterArrow require matchingbaseline nonmonthJSON normalization (recordsubclasses
+becomedicts inparent too); donotclaimtypedattrsroundtrip. Reportreview-1535...
+
+IMPORTANT1535shared-cache incident: firstsupportingfocus accidentally omitted
+globalprivate LSMS_DATA_DIR/config, causingGH798warmtests torefreshsharedMali/Tz
+interview_date/sample caches. User explicitly notified. B/reports/1535-crop-month-
+carriers-20261108/shared-cache-incident.json enumerates13recentparquets inbounded
+window; no beforemanifest, so NOTcompleteattribution/no bytecontinuity claim.
+No blindrollback/re-stamp. Every latertest explicitlyprivate+falsecreds/networkoff.
+Planned corpusrewarm/masterrelease stilldeferred; do NOTsay no sharedwrite occurred.
+
+1535source attempt41007850 CANCELLED byroot beforeBURST/sourceactor afterwrong
+CROP_REPORTnestedpathpreflightfinding, PTY49657closed143.41007930 FAILED1:0,
+PTY64345closed1: actual3country(Tz/Nigeria/Ghana)parentharvestArrowfails but
+planting serializes becauseonlyNigeria hasnonmissingplanting inthatcohort.
+The overstrictrootoracle stoppedbeforecandidate/CI; originaloperands/logs retained.
+Separate source-v2 expandscohortwithMalawi numericplanting, matchingbaseline
+Arrowattrscontrol, operatorssealedmanifest. Free4CPU32G90m --cold job41008543
+RUNNING, controllerPTY38910 confirmedlive; report B/reports/1535-crop-month-
+carriers-20261108/source-v2. Sourcephasebasecold, candidate reusesparentnativeL2
+(appropriatepost-readfix); candidate/warm snapshots assert no cachebyte/epoch
+changes. FullisolatedofflineCI follows onlysourcephasesgreen. Keepd673frozen.
+
+Next countrywork: finish_1452 Nigeria1502 foodfactor W2/W3 ledger-first bounded
+investigation/decisionpacket,1518crop separate; no productconversion rule/default.
+finish_1590 Uganda1480 invariancecoverage/fullmode implementation, fullCURRENT
+UgandaCONTENTS5969lines FIRST (mainrootolder5321), no hardcodedhistorical53,
+no baseline/fixture weakening, no implicitsharedbuild. NewbranchesfromGitHub3b28.
+All8ownerrolequeues remain durable; selectedrecommendations accepted/deduplicated.
+1509requiredpurchaseeligibilityquestion pendinguser;48productionpolicyheld;
+Mali1594sentinelsemanticsunverified/no mask. Continueotherauthorizedlanes.
+
 * Authoritative checkpoint, 2026-11-07 23:52 UTC
 Goal remains ACTIVE; this turn made concrete progress. GitHub development is
 3b28d293f71b962c3d878c2886be9ee794407915. Filesystem origin/development111b

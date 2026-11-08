@@ -4,7 +4,7 @@
 * Ownership and scheduling
 Root manages priorities, shared dependencies, scientific decisions, review, GitHub publication and development merges. Each country has a stable owner role and a durable queue/checkpoint; the role survives worker restarts. Separate jobs run on the free Slurm account.
 
-All eight workers returned the bounded initial queue reconciliation. Six dispatches succeeded; Burkina Faso and Uganda returned complete required evidence with native exit0 but supervisor exit74, so their infrastructure is recorded as failed. Burkina preservation is warm; Uganda preservation is unverified. Every required report/queue hash was independently verified against its publication manifest. Root acceptance of the recommendations remains pending. Product fixes already in flight remain reserved to their existing workers; country owners propose the next three evidence-backed assignments before implementation. Shared framework changes remain in a separate root-managed lane.
+All eight workers returned the bounded initial queue reconciliation. Six dispatches succeeded; Burkina Faso and Uganda returned complete required evidence with native exit0 but supervisor exit74, so their infrastructure is recorded as failed. Burkina preservation is warm; Uganda preservation is unverified. Every required report/queue hash was independently verified against its publication manifest. Root accepted the shared1510/1475/1517 repairs, the1528/1174 country lanes and shared1535. Other recommendations remain pending current-state review. Product fixes already in flight remain reserved to their existing workers; country owners propose the next three evidence-backed assignments before implementation. Shared framework changes remain in a separate root-managed lane.
 
 | Country | Owner role | Dispatch ID | Slurm job | Returned task / infrastructure |
 |---------+------------+-------------+-----------+--------------------------------|
@@ -53,6 +53,9 @@ Remote shared implementation workers ended native143 in descriptor inspection. T
 | 1602/1603 | root queue | separate inherited prewarm resolver / unqualified shipped warning residuals |
 
 Authoritative GitHub development3b28d293f71b962c3d878c2886be9ee794407915. Filesystem origin/development111b stays stale/untouched. Active actors remain frozen until terminal; subsequent integration uses ordinary merges, never rebase/force. Eight owner-role queues remain durable context. No shared cache rewarm/master release.
+
+* 2026-11-08 updates
+1528 integration0586 source/hash/233focused controls passed afterafe6 full offline11462pass/5652skip/4xfail. Finaldocs/publication pending. 1174 original0ef source/offline job41006209 COMPLETED0:0 and independent171pass/9source-deselected; current-base integration next. Shared1535 ownerroot exactd673, reviewerfinish_1452: two optional global month-string declarations; privatefocused442pass/2warm skips and zero metadata hash changes. Four-country source-v2/fullCI job41008543 submitted; first cancelled wrong-path submission and three-country oracle failure preserved. Initial supporting warm tests unintentionally refreshed shared Mali/Tanzania caches; exact bounded metadata evidence is in1535 report/shared-cache-incident.json, with no complete attribution or rollback claim. All later checks use explicit private roots. Conditional2024 deletion provenance carried to existing1275; no weight policy/wave promotion.
 
 * Root workflow
 1. Reconcile each proposed task against current GitHub state, merged work and DECISIONS.
