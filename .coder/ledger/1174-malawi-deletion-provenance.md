@@ -5,8 +5,8 @@ Search tier: git + ripgrep + AST floor. Fresh GitHub development base:
 is `3b28d293f71b962c3d878c2886be9ee794407915`. After its terminal checks, GitHub
 development advanced to `bcd77200f4fd555a8dfc10656d3e7100ae03fd6f` with disjoint
 Burkina Faso/Mali changes only. Root requested ordinary merges and byte/smoke
-closure for that disjoint advance, preserving the frozen topic history,
-preserving the frozen topic history, without rebase/force. The filesystem
+closure for that disjoint advance, preserving the frozen topic history without
+rebase/force. The filesystem
 origin's stale development ref is not a baseline. Inherits STANDING.md §§3–4, CLAUDE.md
 Derived Values, and canonical lsms_library/data_info.yml.
 
@@ -82,74 +82,94 @@ requests that metadata correction without changing its predicate.
 
 ## §5 Reuse decision
 
-The bounded sanctioned source probe confirms the residual on the current base:
-19,265 Module D records (no repeats), 16,560 inorganic groups, exactly one DAP
-group with missing Quantity and Applied, backed by one raw line with no ag_d38
-answer or selected total. Source bytes match MD5
-d143b71ea7c7f4efcac3b9afa0d6be48 (14,149,534 bytes). Probe and API audit exited 0.
+Extend the existing rows: 0 registry with a separate 2010–11 nonseed-group
+record. The predicate documents the existing finalizer's all-payload-NA rule;
+producer math, all three Module D projections, reducer and finalizer stay
+unchanged. The wave-local replay assembles the existing projections with real
+household IDs to find deleted full groups, then with release positions as
+identities to retain their exact raw-line membership. It returns original
+columns at the input grain, once per contributing release row. The existing
+source-reference helper and public ID walk are reused. Applied is added only
+to the existing seed record's declared metadata.
 
-Reuse the current finalizer and rows: 0 mechanism. Add a separate 2010–11
-nonseed-group deletion record and predicate/input replay in the existing wave
-mapping.py. Reuse all three existing Module D blocks and the assembler; leave
-producer math untouched. Assemble the same projected blocks twice: once with
-real household IDs to find deleted full groups, once with release positions as
-temporary IDs to identify exactly which raw lines contribute to those groups.
-Return original raw lines and their stable release coordinates, not projected
-or invented quantities. Wave-local placement is already
-supported by resolve_callable and narrows wave-hash scope; measure actual hashes
-rather than predicting a table-only cache effect. Add Applied to the existing
-seed record's columns as the issue requests. Prove raw input replay, full native
-conservation, Default/Make/Feature/warm behavior and appropriate tests on a freeze.
+Current source confirms one deleted DAP group/one raw line among 19,265 Module
+D records and 16,560 inorganic groups. Selected totals and ag_d38 are missing;
+source MD5 is d143b71ea7c7f4efcac3b9afa0d6be48 (14,149,534 bytes). A source line
+and a canonical group are distinct counts even though both are one here.
+No use/routing interpretation follows from the missing answer.
 
-The initial implementation freeze 0efac3b72185dae8703db895dbc472e9a1bbeb8e is
-terminal-verified. Author focused checks: 108 passed; independent review: 171
-passed (108 existing + 63 independent), with nine source cases deselected.
-Cold job 41006209 completed 0:0: both APIs, Make/Feature, raw replay, unchanged
-seed inputs and fresh warm checks pass; 14 private cache files unchanged per
-head. Source frames preserve 179,957 plot-input rows, 57,118 sample rows and
-37,076 nitrogen rows. All 1,356 prefinal hollow groups are 1,355 seed + one DAP.
-Full offline CI: 11,464 passed, 5,646 skipped, four xfailed, 1,008.38s. Initial
-test-only tuple/list assertion failure and reviewer harness failures remain
-retained. These are exact 0ef/c964 receipts, not final current-base results.
+Initial freeze 0efac3b72185dae8703db895dbc472e9a1bbeb8e is preserved in history.
+After its terminal source/full-CI campaign, ordinary merge onto GitHub 3b28
+produced source-verified freeze 1e8af2516869a861590cc0bc189840a87ba77337.
+All four task files remain byte-exact reviewed 0ef; all incoming source-hash and
+crop-country files remain byte-exact upstream. The later bcd advance contains
+only the 1528 Burkina Faso/Mali topic, its ledger/country docs and tests.
+It was ordinarily merged as 9f14d476906e1ad193bb3bb761e1350c9382c77f.
+The complete Malawi tree, 58 shared-library files and eight relevant test files
+are byte-exact source-verified 1e8. Root explicitly required byte/smoke closure
+rather than another native/full campaign for this disjoint advance.
 
-Now normal-merge freshly fetched 3b28, preserving both upstream ledgers and all
-upstream code. The four task implementation/test files must remain byte-exact
-0ef. Malawi CONTENTS/AGENTS/CLAUDE have no upstream delta. Source collection
-changes only hashing; nitrogen_kg's own AST is unchanged, but its country-index
-helper changed upstream, so rerun the current-base cohort rather than assume
-compatibility. Run bounded relevant 1510/1475/task controls, API audit, actual
-hash census and fresh cold baseline/candidate APIs/Make/Feature/replay/warm
-checks on the merged freeze. Configured final-head GitHub CI remains root's
-gate; retain the complete earlier full-CI receipt as prior-head evidence.
+## Phase 3 — anchored verification
 
-The current-base merge freeze 1e8af2516869a861590cc0bc189840a87ba77337 passes
-332 relevant controls and strict API audit. Free cold job 41009999 completed
-0:0 in 2:54: current-base/candidate native frames, all seed inputs, exact raw
-nonseed replay, Make/Feature and fresh warm checks pass; 14 cache files per
-head retain bytes/epochs. Public-method hash changes are 26 country/26 wave
-cells, partitioned into 22 declared country/22 declared 2010 wave cells plus
-four auto-derived method hashes each; all changes are Malawi, zero shared BTF.
-All four task files are byte-exact reviewed 0ef, and every upstream changed
-file is byte-exact 3b28. Completed receipts are under the task's integration/.
+- **OK (§§2–4):** the predicate preserves every observed payload, including
+  zero/False, and excludes seed/other waves. Raw replay reuses the three
+  projections, full-key reducer, repeat policy, sidecar release identity and
+  public ID handling. No alternate producer, quantity estimate or eligibility
+  rule is introduced. The 19 blank-total groups remain NA under unchanged
+  producer code and exact native-payload conservation.
+- **OK (§§2/4/5):** independent source-free review on exact 0ef passes 171
+  controls (108 existing + 63 independent), with nine source cases deselected,
+  no P1/P2 blocker. Its scalar membership oracle, dtype/Parquet, full payload
+  boundaries, public ID/wave modes and actual finalizer tests are distinct
+  from author source evidence. Reviewer harness failures remain retained.
+- **OK (§§4–5):** first cold job 41006209 completed 0:0, 20:30, peak RSS
+  5,689,216K. Full offline CI on 0ef: 11,464 passed, 5,646 skipped, four
+  xfailed, 697 warnings, 1,008.38s. This remains prior-head evidence.
+- **OK (§§4–5):** merged 1e8 passes 332 relevant task/source/country-index/
+  nitrogen controls and strict API audit. Cold current-base job 41009999
+  completed 0:0 in 2:54, peak RSS 4,649,808K. Before decoding, all 18 held
+  D/G/H sources (119,527,563 bytes) match declared MD5s/stable descriptors.
+  Both heads use private cold L2 and the existing shared L1.
+- **OK (§§3–5):** current-base/candidate frames are exact: 179,957 served
+  plot-input rows, 181,313 prefinal rows, 57,118 sample rows, 37,076 nitrogen
+  rows and 179,957 Feature rows. Native amounts/masks, full keys/units/Applied
+  and old typed attrs are exact; only the declared registry metadata differs.
+  The 67,553 served nonseed rows retain Applied True 67,489 / False 49 / NA 15.
+- **OK (§§3–5):** all 1,356 hollow prefinal groups are disclosed: 1,355 seed
+  lines (459/185/672/39) plus one DAP group. Seed inputs remain exact. The new
+  public accessor returns the one original D line, with exact raw fields,
+  public ID walk and replayed deleted full key; it joins to no served row.
+  Default/Make parity passes with explicit wave-cache reuse. Feature native
+  payload and old attrs match. Both fresh-process warm checks match typed
+  output/attrs and retain all 14 cache-file bytes/epochs per head; snapshots
+  are durable in integration/verification-1e8af251/.
+- **OK (§§2/4/5):** measured own hash scope against 3b28 is 26 public-method
+  country/26 wave cells: 22 declared country/22 declared 2010 wave cells plus
+  four auto-derived method hashes each. All changed cells are Malawi; zero
+  shared BTF/non-Malawi differences. Root's disjoint bcd merge leaves all
+  relevant runtime/Malawi inputs byte-exact. No shared L2 write or rewarm.
+- **OK (§§4–5):** exact 9f final smoke passes 108 controls, 14 warnings,
+  9.85s; the complete incoming-path/byte proof is recorded. Initial author
+  107-pass/one tuple-vs-list test assertion failure remains preserved; the
+  correction changed only that assertion. All verification actors are terminal.
 
-Root's subsequent bcd advance contains only the 1528 Burkina Faso/Mali topic,
-its country docs/ledger and tests. Incoming paths were freshly fetched and
-checked: no Malawi/shared-runtime/AGENTS/CLAUDE change. After normal merge,
-prove the entire Malawi tree, shared runtime and task tests remain exact 1e8,
-then run bounded smoke. Root explicitly requires no repeated native or full
-campaign for this disjoint advance; configured GitHub CI tests the final merge.
+Evidence root: B/reports/1174-malawi-deletion-provenance-20261107/.
+completed-0ef-receipt.json and integration/completed-receipt.json bind source,
+CI, logs/XML, scripts and Slurm exits. Independent review is in the separate
+review-1174-malawi-deletion-provenance-20261107/VERDICT.md. The integration byte
+bindings and disjoint-base-byte-proof.json preserve exact head distinctions.
+Raw logs/pickles are private; public reports carry aggregates only.
 
-This completes the existing-wave residual only. The issue's conditional
-2024–25/15-line seed provenance follow-up belongs to issue 1275 and the held
-whole-wave work; it is neither implemented nor verified here. Root will carry
-that checklist before narrowing/closing issue 1174. No new 2024 wiring.
+The pre-existing-wave provenance residual is complete. The conditional
+2024–25/15-line seed follow-up belongs to issue 1275 and held whole-wave work;
+it is NOT implemented or verified here. Root will carry that checklist before
+narrowing/closing issue 1174. No new 2024 wiring, source eligibility, invented
+zero, quantity recovery, weight48 or food-policy change is authorized.
 
 ## §6 Open questions
 
-No scientific decision is requested: registration documents an existing
-deletion and does not decide whether fertilizer was used. Current-base source
-integration is complete; disjoint-base byte/smoke closure and final configured
-GitHub CI remain.
-Stop any affected extension if its
-eligibility/replay cannot be tied exactly to the current producer; document
-the ambiguity instead of broadening the rule.
+No scientific decision blocks this provenance correction. The source records
+no use answer on the deleted DAP group; no inference about use or routing is
+made. Root owns final configured GitHub CI, bounded integration acceptance,
+PR publication and issue closure. Earlier full CI and independent review are
+kept bound to their actual heads; no final-head full-suite rerun is claimed.
