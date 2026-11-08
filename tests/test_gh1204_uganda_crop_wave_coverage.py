@@ -132,14 +132,21 @@ def test_supported_cold_subset_keeps_native_observations_and_audit(
     assert out.index.get_level_values('production_obs').tolist() == ['slot:1', 'slot:2', 'slot:3']
     assert out.Quantity.tolist() == [2.5, 2.5, 0.0]
     assert out.KgFactor.tolist() == [1.0, 1.0, 1.0]
-    assert out.harvest_month.iloc[:2].tolist() == [6, 6]
+    # GH1535: the public carrier is text; cached native answers stay numeric.
+    assert out.harvest_month.iloc[:2].tolist() == ['6', '6']
     assert out.intercropped.iloc[:2].tolist() == [False, False]
     assert pd.isna(out.harvest_month.iloc[2]) and pd.isna(out.intercropped.iloc[2])
     assert out.attrs['id_converted'] is True
     assert out.attrs['transport_marker'] == {'flag': True, 'integer': 1}
     assert [r['wave'] for r in C.grain_reports('Uganda', 'crop_production')] == [SUPPORTED]
+    native = pd.read_parquet(var.parent.parent / SUPPORTED / '_' / 'crop_production.parquet')
+    assert native.harvest_month.dtype == pd.Int64Dtype()
+    assert native.harvest_month.iloc[:2].tolist() == [6, 6]
+    assert pd.isna(native.harvest_month.iloc[2])
     if backend == 'dvc':
         raw = pd.read_parquet(var)
+        assert raw.harvest_month.dtype == pd.Int64Dtype()
+        assert raw.harvest_month.iloc[:2].tolist() == [6, 6]
         assert _waves(raw) == {SUPPORTED} and len(raw) == 3
         assert raw.attrs['id_converted'] is True
         assert lt.read_parquet_cache_waves(var) == [SUPPORTED]
@@ -210,7 +217,7 @@ def test_barren_crop_order_matches_native_declaration_without_cache_writes(
     assert empty.Quantity_sold.dtype == pd.Float64Dtype()
     assert empty.Value_sold.dtype == pd.Float64Dtype()
     assert empty.KgFactor.dtype == pd.Float64Dtype()
-    assert empty.harvest_month.dtype == pd.Int64Dtype()
+    assert empty.harvest_month.dtype == pd.StringDtype()
     assert empty.intercropped.dtype == pd.BooleanDtype()
     assert empty.Unit_sold.dtype == pd.StringDtype()
     assert empty.Condition_sold.dtype == pd.StringDtype()
