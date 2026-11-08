@@ -130,7 +130,7 @@ K=30 -> 380 rows, K=50 -> 228, K=100 -> 120, K=150 -> 75, K=300 -> 37 (the
 pre-#1259 rule on the same build: 401, 240, 129, 81, 39; 2026-09-09: 417,
 261, 151, 90, 49).
 
-WHAT IT FIRES ON TODAY -- **every** country declaring ``crop_production``,
+HISTORICAL FIRING BENCHMARK -- **every** country declaring ``crop_production``,
 cold-built at development ``9a0ed5f3c`` on 2026-10-23 and read with
 ``pd.read_parquet`` exactly as the #857 sweep reads it (the shared warm cache
 graded ``stale`` against that commit for all sixteen).  (The first version of
@@ -159,6 +159,11 @@ Togo              11,565          1       1        8 ms
 Uganda           133,761         26      22       96 ms
 **total**    **672,461**    **129** **120**
 =============  =========  =========  ======  ==========
+
+These row counts, firing counts and timings describe that dated build, not
+the current corpus.  In particular, Nigeria's 62,844-row frame predates
+GH #843's Farm-level sales and GH #1433's retained harvest lines (2026-11-04);
+see ``countries/Nigeria/_/CONTENTS.org`` for the subsequent measurements.
 
 GhanaLSS carries no finite ``Quantity`` at all (a Site B matter, not this
 one's).  #1259 removes nine rows and adds none.  All nine sat in cells their

@@ -399,10 +399,26 @@ def _check_declared_columns(df: pd.DataFrame, scheme: dict, feature: str) -> Che
                  f"All {len(expected_cols)} declared columns present")
 
 
-def _check_dtype_consistency(df: pd.DataFrame, scheme: dict, feature: str) -> Check:
-    """Check that column dtypes roughly match declarations."""
+def _check_dtype_consistency(
+    df: pd.DataFrame, scheme: dict, feature: str, *, stage: str = "native",
+) -> Check:
+    """Roughly grade native local types or finalized canonical-over-local types.
+
+    Only global types supported by this rough checker override local types.
+    Other global types retain local grading; this is not an exact check of
+    every dtype the public finalizer can produce (ledger #1606 §3).
+    """
+    if stage not in ("native", "finalized"):
+        raise ValueError("stage must be 'native' or 'finalized'")
     spec = scheme.get(feature, {})
     expected_cols = spec.get("columns", {})
+    if stage == "finalized":
+        from .country import _load_canonical_dtypes
+
+        expected_cols = dict(expected_cols)
+        for col, declared in _load_canonical_dtypes().get(feature, {}).items():
+            if str(declared) in _DTYPE_MAP:
+                expected_cols[col] = declared
     if not expected_cols:
         return Check("dtype_consistency", "pass", "No dtype declarations (skipped)")
     issues = []
@@ -719,6 +735,7 @@ def is_this_feature_sane(
     feature: str,
     *,
     extra_optional: set[str] | None = None,
+    stage: str = "native",
 ) -> SanityReport:
     """Run all sanity checks on a feature DataFrame.
 
@@ -730,6 +747,13 @@ def is_this_feature_sane(
         Country name (e.g., ``'Uganda'``).
     feature : str
         Feature/table name (e.g., ``'food_acquired'``).
+    stage : {'native', 'finalized'}, optional
+        Inspection stage for dtype grading only. The default checks local
+        declarations for native/cache frames. Use ``'finalized'`` for public
+        API frames: supported global rough types override local types, and
+        present canonical-only columns are checked without becoming required.
+        Unsupported global types retain local grading. Other checks keep the
+        local schema. This does not cast the frame or verify exact dtypes.
     extra_optional : set[str], optional
         Column names to exempt from ``no_all_null_columns``, *in addition* to
         those declared ``optional`` in the country's scheme.
@@ -752,6 +776,8 @@ def is_this_feature_sane(
         Contains individual Check results.  ``report.ok`` is True if
         no checks failed (warnings are allowed).
     """
+    if stage not in ("native", "finalized"):
+        raise ValueError("stage must be 'native' or 'finalized'")
     scheme = _load_scheme(country)
     report = SanityReport(country=country, feature=feature)
     optional = set(scheme.get(feature, {}).get("optional", set()))
@@ -768,7 +794,7 @@ def is_this_feature_sane(
     report.checks.append(_check_no_all_null_columns(df, optional))
     report.checks.append(_check_no_constant_columns(df))
     report.checks.append(_check_declared_columns(df, scheme, feature))
-    report.checks.append(_check_dtype_consistency(df, scheme, feature))
+    report.checks.append(_check_dtype_consistency(df, scheme, feature, stage=stage))
     report.checks.append(_check_value_constraints(df, scheme, feature))
     report.checks.append(_check_declared_spellings(df, feature))
     report.checks.append(_check_duplicate_index(df))
@@ -995,7 +1021,8 @@ def validate_feature(
     report.checks.append(_check_no_all_null_columns(df, optional))
     report.checks.append(_check_no_constant_columns(df))
     report.checks.append(_check_declared_columns(df, scheme, feature))
-    report.checks.append(_check_dtype_consistency(df, scheme, feature))
+    report.checks.append(_check_dtype_consistency(df, scheme, feature,
+                                                 stage="finalized"))
     report.checks.append(_check_value_constraints(df, scheme, feature))
     report.checks.append(_check_declared_spellings(df, feature))
     report.checks.append(_check_duplicate_index(df))

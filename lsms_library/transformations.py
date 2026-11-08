@@ -5640,11 +5640,11 @@ def pp_ph_area_t(country):
     round has nothing to pair.  One holding more than two is not this design
     (Tanzania's ``2008-15/``), and is refused rather than guessed at.
 
-    *country* may be a ``{t: folder}`` mapping.  Pass the ``Country`` where you
-    have one: its ``wave_folder_map`` is empty until ``waves`` has been read.
+    *country* may also be a ``{t: folder}`` mapping, including a ``Country``'s
+    directly accessed ``wave_folder_map``.
     """
     if hasattr(country, 'waves'):
-        country.waves                                       # populates the map
+        country.waves                     # support country-like lazy map providers
         wave_folder_map = country.wave_folder_map
     else:
         wave_folder_map = country
@@ -8220,7 +8220,8 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     test_crop_diversity_count_separates_plots_and_seasons``.
 
     **A ``Farm-level`` row is not a further occurrence of a crop the household
-    reports on a plot (GH #1469).**  It holds a sale no plot can own (70 rows in Mali 2021-22 and, with GH #843, 2,303
+    reports on a plot (GH #1469).**  It holds a sale without a unique
+    harvest-row attachment (70 rows in Mali 2021-22 and, with GH #843, 2,303
     in Nigeria W3-W5, none with a harvest ``Quantity``) or a harvest from a roster off
     the field grid (Mali's 627 EAC-I tree rows, GH #1476, 534 with a ``Quantity``, none
     repeating a plotted crop).  Counted as a land unit, the sale rows move 50 of 2,857
@@ -8229,7 +8230,10 @@ def crop_diversity(crop_production, *, weight='count', value_col='Value_sold'):
     crop in that wave.  It keeps one where it has none, because then the row is
     the only record of the crop: 10 of Nigeria's, and all 37,280 rows of GhanaLSS
     1987-88 and 1988-89, which a blanket filter would delete.  The ``'value'``
-    basis keeps every such row: that is where the sale value is.
+    basis keeps every such row: that is where the sale value is.  The Nigeria
+    counts and effects above are the pre-#1433 GH #843 measurements, not current
+    counts.  GH #1433 (2026-11-04) retained every labelled harvest line and
+    changed sale attachment; see ``countries/Nigeria/_/CONTENTS.org``.
 
     **An ``unknown_plot`` row is not an occurrence (GH #1460).**  Each distinct
     plot counts once, and such a row names no plot: two of them may be one plot
