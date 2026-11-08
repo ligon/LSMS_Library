@@ -131,3 +131,26 @@ configured data checks, metadata footprint and science acceptance belong to ROOT
   ROOT clarified that the private config directory must be empty and the
   filename is intentionally absent. No retry/config adoption occurred. The
   revised proposal preserves empty config/data/nonsymlink L1 and false creds.
+
+
+### ROOT publication checkpoint — 2026-11-08 13:03 UTC
+
+The unchanged implementation passed31 focused controls and strict static API
+audit. ROOT separately read the complete403-line fixture and narrow production
+diff; this is independent STATIC review, not another runtime cohort. Current
+composition a6c64108d913e903171a943209b26ba67146ee25 combines6389349 andd82.
+The exact base-to-author country.py patch applies byte-for-byte to currentd82;
+all19,122 tracked mode/type/blob entries match the intended source union.
+
+Candidate-only guarded metadata verification and strict API audit passed.
+Measured fingerprint changes:450country tables,1,877wave tables and35build
+registrations;0framework-import fingerprints. All18None wave cells and all
+non-fingerprint metadata remain unchanged. This broad cache impact must be
+covered by the deferred bundled rebuild; shared caches were not rewarmed.
+
+Full configured offlineCI41024376 is RUNNING at this dated checkpoint. Final
+outcome and publication decision belong in the PR validation record and
+reports/1547-current-verification-20261108. This paragraph is a historical
+checkpoint, not a completion claim. Source code/tests remain frozen; the
+publication commit changes only this ledger. No production weight, master
+release, source campaign or scientific default change is authorized here.
