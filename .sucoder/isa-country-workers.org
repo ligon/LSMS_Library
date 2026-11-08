@@ -1,4 +1,132 @@
 #+title: LSMS-ISA country workers and coordinator queue
+* Current scrum handoff 2026-11-08T09:59:37.779545+00:00
+GoalACTIVE/PROGRESS. GitHub development bb828626f51ba04c65298f715c7c0f092b5583d2.
+22developmentmerges/18issueclosures in sweep. Freshpaginated169repoopen;
+original147scope15closed132open. Rootdocs priorb3f9d04ab; originalFSdevelopment
+111b staysuntouched. No masterrelease/sharedrewarm/productionweightchange.
+
+1578 COMPLETE: PR1624 mergedbb828 fromfinal0c963b0a640ee2a660c635c8c0c725d4426125c0;
+finalGitHubunit+WindowsSUCCESS/6conditionalSKIPPED, review/threads empty. Root
+verifiedactualparentsb834+0c963 andactualtree799881b2b140cc1893e907bf46770a3e82bb5abe
+exacttestedcurrentcomposition+ownledgerONLY. Issue1578CLOSEDcompleted/bodyupdated.
+ROOT-MERGE.json in reports/1578-finalization-20261108. FullCI12108P5652skip4xfail,
+indep46/44new/corpus15registries81records/metadata0-N/API0. OriginalfullCI
+41020419 FAILED1inert15stimeout remainsfailed;v2zero-testlayoutfailure preserved;
+v3samehostserial2PASS didnotprovehistoricalcause. No timeout/assertion change.
+
+1591 authorP2 revisedFROZEN6a53b2bf8c207c34ed558b8a7d132b233cc92126(runtime901870dab635c8545a3b64a5462165b6963e4f70),
+FFfrom89aba. OnlyONEproductionpredicate change afterindepfinding: realancestry
+issubclass(type(exc),BaseException) vsisinstance(proxy).2proxy+1falsevalued
+actualexception regressions appended;oldtests prefixexact.24affectedPASS7.38s,
+0guarddenials; old64authorPASS+indep9P3F preserved, notsummedunique.
+IndependentMwi qualifiedP2CLOSED: original12matrix9P3F, affected7closure6P1F;
+2proxycases/actualBaseException/falsevalued/class/interruptPASS. Remaining
+sideeffecttest finallyreachedwarningcheck; inventedunloadedfilename gave0
+warnings viaUNCHANGEDemitter. Newv3 ONLYfilename→actual__file__ origin+metadata
+witness, ONEsamecasePASS inclwarning/all4ledgers/payloadimmutability. No product
+emitter/expectation change, unknown-originbehavior notadjudicatedaspolicy.
+Finalverdictdda0207b/manifest0e6f3597 at reports/review-1591-wave-exception-relay-
+closure-v3-20261108. Unique12originalcases,7affected+1samecaseclosure, no19newclaim.
+ROOTreadfullcode/matrix/operators/predicate/selection;9P3F and6P1F remainimmutable.
+
+1591 CURRENT composition a889d105ddde9117c7d2fcdfb1cc2bef284677c6 parents6a53+bb828;
+6owned4incoming1578pathsNOoverlap/entire19115mode-type-blob unionexact/clean.
+NEW FSverify/1591-current-20261108 exact. Rootgrantedacceptednamespace/lane/head-
+onlytemplates;15filemanifest6356a9a9 twicechecked. SourceconstructorONLYmetadata.
+Candidate-onlydd7667 censusCLOSED0/123.16s:0of450/1895/35/186/public553/2313/39/
+18None exact,0errors/denials/privatefiles; closeda711map4bf0 preservedheader,
+actualbbdifferenceONLY1578ledger admitted, no baseline replay. StrictAPI0/8.4255s.
+FullCI41022704 RUNNINGpytest/n0054/free8CPU32G45min/4loadfile/wholeconfiguredtests,
+falsecreds/ownprivateL1/unshare/BLASbuild1. Sourcehead/operatorstaysfrozen/no retry.
+Ownerfinish1590 monitors, then EtW1PREPonly. Rootnextactualterminal+countproof,
+finaldocsledger/GitHub/checks/currentcomposition/expectedheadmerge ifgreen.
+
+Ethiopia1570 correctedrecoveryfirstACTUAL19PASS/13.47spytest28.07wrapper exact
+bf0a4db67bfcee3c645084976c3e3cab8b582e8e. Helper90ba/testa414 exactoldcorrected
+bytes/assertions;7productionbindings unchanged/3preimportguardidentities+active
+profiles0denials/privatefiles0. Sourcefreeinventedpurehelper/cropmapstub/None-
+intercrop ONLY, NOTfullnative/APIparity. Original17P2F preserved. Finala7f213ca60013e18924ddef675efb87b4c88900c
+ledger-onlyoverbf0;ONLY3taskpaths vsb834(allotherobjects exact). R=reports/1570-
+ethiopia-diagnostic-recovery-20261108. finish1590 NOWprepares W1seven-dataset/
+21DATAartifact operator+independentraworacle/controls only: NO21/70payloadopen,
+raw/PDF/acquisition/getters/API/Make/warm/import/test orfakeemptysect3parity.
+Full4577countryrecordauthenticated;820closed/1257merged vsstale1570phrase,
+Q3harvest/window/overlap/componentpartialanswers remainunruled.
+
+Niger1529 actual3C candidateFROZENe3c0e85612271c4829342214554cd00f501d34ed(runtime866684dcc,
+correctedtest824422dfc06ca4868f356b489c9d79fcd183680a), newbb-based
+fix/1529-niger-native3c-20261108.5paths/19110originalmode-type-blobs exact,
+allniger.py/sharedcode/schema/maps/otherwaves exact. OriginalCONTENTS220623B
+prefix/SHA4cd9 exact+datedcandidate-onlynote. Existinghelper dynamically sees
+newliteral3C source, no registryexpansion needed.24uniqueinventedcases:
+original23PASS1negativefixtureconstructionFAIL(pandasint assignment beforebuilder),
+fixture-onlyfloatcolumn then targeted1PASS. OneintermediatebadmanualSHAargv
+stoppedBEFOREpytest0tests, preserved; exactstructuredargv correction succeeded.
+3active13guards0denials; no actualsource/categorycard/API/Make/warm/hash/fullCI/
+independentacceptance. Finalproof reports/1529-niger-native3c-implementation-
+20261108/finalization/FINAL-BYTE-PROOF.json. MwiNOWpreparessix2C+3Cartifact
+nativecorrespondence executable+independentroworacle, NO payloadgrant. Must
+preserveall2C/order/grain/rawunknowns/unit05b vs08bTOTALFCFA/sourcequalifiedslots;
+cardsaredicts,notactualcategorizedframes—doNOTfakecurrentloader/APIparity.
+Seasonaxis/3Bjoin/3Dcostsurface/3Earea/yield/consumerfactor/annualestimand/weights
+remainseparate;3Crawcoveragechange isroutine andfull1529 remainsOPEN.
+
+Remote641 two usefuljobs hadNOactualoverlap:
+-1549 job41022551/5cdec1c30ea643ef87e67258ea5d23e6 FAILED70beforeproject/native,
+ workspacehelper120stimeout/cleanupcomplete;0bytepreparelogs,sourceheadb834
+ publicationincomplete/partial snapshot NOTauthorpatch. ExactsubphaseUNKNOWN.
+-1537 job41022556/0e611a6fd55d4f688c2a956c80239370 COMPLETED0:0/15:43/native0/
+ supervisor0/localplacement+envverified/0races, sealed/exited/placed,
+ publicationcompletef7a457c4e116f3f39e3263a4dd01ce80ecbea82b. BoundedTASKcompleted
+ DIAGNOSIS/OPTIONS only. ONLYnewledger+tests vsb834, productionfalse/patchNOTapplied.
+ Unitstartupguardrefusedmagic/ctypesldconfigdevnullBEFOREcollection; units/API/
+ source/hash/Make/warmUNRUN. RootrulingsbelowarrivedAFTERterminal; steeringFALSE,
+ don'tclaimconsumed/executed. Finalallowlistproof pendingfinish1452sealing.
+
+RootrulingsforNEW1537continuation (notoldworker): approveONLY2clear ownalias
+rowsGroundnuts→existingGroundnuts,Maize(shelled)→existingMaize IFblankCode/quarter
+keys cannotalteroldnative/code-basedroutes/units/values/otherlabels. KeepPepper
+passthrough+warning—noFresh/Dry/ground/spice/newbucket inference; wholeissueOPEN.
+PermitqualifiedtrustedmagicONLYpubliclibrarydiscoverywarmup beforeUNCHANGED
+strictguard; bindstdlibfind_library('magic'),exactldconfig-p executable/hash,
+privatefalsecreds/unshare/ownruntime, no compiler/otherprocess fallback, then
+source/API/writeguardBEFOREligonlibrary/LSMSimport. No postarmexception; preserve
+original0testguardstop. Normaldata/CountryAPI/censusstillungranted. Newexplicit
+continuation PREPONLY untilrootreadsfinaltask/source/proof; no restartofterminal.
+
+ROOTread1549 setupmemo b179e877/manifest8db94568 at private/two-worker-1549-1537-
+preparation-20261108/setup-timeout-diagnosis-1549. NOsupportedworkspace-deadline
+knob at641: CLI--timeoutaffectscoordinatorclone/sbatch, workerinnermax(120,
+checkpoint_timeout30)=120; profile300islaterbootstrap. Nevereditmanifest/
+checkpoint/tool/source/guardtoextendit. Actual1549Start01:33:55End01:35:59;
+1537Start01:36:02(localdisplay),threeSECONDSlater: no ownprepoverlap/contention.
+Packold650MB93209objects vsnew/bothstaged649MB93554; no sourcebloatcauseclaim.
+FirstCPU21.475/RSS1111.5M,whichquietGit/setupoperationblockedUNKNOWN.
+
+ROOTAUTHORIZED ONE NEW1549replacement differentFREEsupportedpoolco_carleton/
+savio4_htc/carleton_htc4_normal/4CPU8G45min/excluden0035, same641/b834/task/
+profile278af493/timeout120. Materialchangednode/pool +knownsame-source1537
+bootstrapavailability, NOTprovenremedy/cause. Freshparent/STARTED/receipts;
+finish1452mayprepare/freezeallowednamespace/resource/sourcehead-onlyonepilot
+controller, ONEdryrun thenONEsubmit CONDITIONALonexactpins/readback/absentroot/
+optionalsharedL1namesabsent; beyondalloweddeltaSTOProotreview. Managedauthonly,
+no manualnativecontents/HOME/CODEX/install/source/guard/hook/depschanges. No
+furtherautomaticattemptifsetupfails. Oldfailedincompletesnapshotuntouched.
+1537NEWcontinuation stillPREPONLY (supportedwarmstateonlyifnormaltoolallows;
+no manualstatecontent/migration); mayprepare1606READONLYcharterbetweenchecks.
+
+All3localworkers busy:finish1590(1591CI+Et21prep),Mwi(Niger6artifactprep),
+finish1452(remoteproof/setupmemo/replacement/1537newscope). Remoteactive0 after
+1537terminal pendingauthorizedreplacement. No8workerreliability claim; isolated
+641source only, GLOBALinstalledSuCoder remainsoldc9daf/unchanged. Original
+onepilot41022138 infrastructurePASS/taskBLOCKED remainsqualified, notrewritten.
+Nextrootcollect1591terminal,reviewNigersourceoperator+ownoracle/independenttests,
+Et21operator,1537continuationpacket,knownreplacementreceipt. GoalACTIVE, never
+complete/blockedwhilemeaningfulwork remains. Scientificrulings49borrow/50maize-
+flourafterprimaryevidence/51NOclamp settled;48productionweights/whole1604held,
+1509questionpendinguser. Do not reasksettleddecisions or promoteheldwholeissues.
+
+
 #+date: 2026-11-07T22:07:59.195187+00:00
 
 * Ownership and scheduling
