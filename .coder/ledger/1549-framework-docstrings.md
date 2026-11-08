@@ -87,5 +87,26 @@ verification, independent review and publication.
 ---
 ### Phase 3 — verification
 
-Pending implementation and source-free byte/AST/API checks. Full CI and data
-checks are outside the initial grant; no cache-cost count is claimed.
+- `quantity_audit` module docstring — **OK (§2/§3/§4)**: retain the entire
+  dated table, rule, firing counts, timings and scientific examples; rename
+  its heading to a historical benchmark and identify subsequent Nigeria work.
+- `crop_diversity` docstring — **OK (§2/§3/§4)**: preserve every numerical
+  example, count/value and Farm-level/unknown_plot distinction. Correct the
+  attachment description and date the Nigeria counts/effects before #1433.
+- **No REINVENTION or CONTRADICTION**: there is no new implementation. The
+  verification removes ONLY the allowed module/function docstrings, not all
+  docstrings, and obtains equal ASTs and equal remaining source bytes.
+- `evidence/static-validation.py` passed once under the prepared Python,
+  `unshare -rn`, explicit private roots and thread pins. It executes the
+  existing pure source-credential gate (False), blocks library/provider
+  imports and raw/harmonized opens, and permits no writes outside evidence.
+  Package resolution and runtime identities pass without importing the package.
+- Strict direct `scripts/api_surface_audit.py --strict` passes: ten kwargs
+  documented, all fifteen hand-authored skills listed, zero untracked hashed
+  inputs. Five existing unused public helpers are informational and untouched.
+- Exact proof and complete logs are in the absolute dispatch evidence directory
+  named by this assignment (`static-proof.json`, `validation.log`, `api-audit.log`).
+  No data files were produced and no guard denials occurred.
+- Full CI and data checks remain outside this assignment. Actual cache-hash
+  enumeration remains a separate ROOT-approved stage; no numerical cache-cost
+  or no-invalidation claim follows from these static checks.
