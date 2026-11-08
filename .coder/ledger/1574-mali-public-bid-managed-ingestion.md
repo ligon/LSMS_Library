@@ -1,6 +1,6 @@
 # Prior-Art Ledger — GH1574 public own BID documentation holding
 
-**Search tier:** git/ripgrep/AST source inspection; no package import, payload reopen, credential/config-home read, cache/write/getter/DVC runtime. Base current root-admitted5a06d85cd02237cc515b0cda57012a9cab3d5e11, own isolated proposal tree. Inherits STANDING.md/CLAUDE.md.
+**Search tier:** git/ripgrep/AST source inspection; no package import, payload reopen, credential/config-home read, cache/write/getter/DVC runtime. Initial base5a06d85cd02237cc515b0cda57012a9cab3d5e11; ordinary disjoint integration now includes actual GitHub developmentfdec032efd4b98ed4b99883c9586f5ef07b7bf3e, own isolated proposal tree. Inherits STANDING.md/CLAUDE.md.
 
 ## §1 Task
 Prepare one managed ingestion of already-fetched public own Mali2017-18 English Basic Information Document (World Bank catalog3409/resource47785), target `Mali/2017-18/Documentation/bid_eaci17.pdf`, with generated DVC sidecar, SOURCE provenance and dated CONTENTS availability note. Root must review the concrete code/write scope before any cache/remote/credential operation. This makes documentation available; it does NOT resolve GH1574’s missing51-code stratum list or choose labels/weights/defaults.
@@ -18,7 +18,7 @@ Prepare one managed ingestion of already-fetched public own Mali2017-18 English 
 | installed dvc config_schema / Repo.site_cache_dir | Private cache.dir/core.site_cache_dir and analytics/check_update settings supported | private local overrides only; no installs/source edits |
 
 ## §3 Country facts and contradictions
-Personal full3551-line Mali CONTENTS read authenticated byteexact SHAe10f15f214218de84c76850ee9c7f4bab17e3be00315a1d960d85ed6df6d26a7 including LOGBOOK/WAITING/TODO; priorfull3481+all70changes recorded in prior task receipt. Idiosyncrasy:2017 EAC-I revisits2014 EAs but selects new households, rural Lourd is households3/6/9 (one-third), Leger the other six, distinct from EHCVM. Its declared national representation excludesKidal, while own BID also reports security-related unvisited EAs without identifying them; do not infer weights’ realized coverage.
+Personal full3551-line Mali CONTENTS prefix authenticated SHAe10f15f214218de84c76850ee9c7f4bab17e3be00315a1d960d85ed6df6d26a7 including LOGBOOK/WAITING/TODO, plus my personally written/read31 appended1594 lines, gives CURRENT3582lines/SHAe719eef161dd6ac839d431c073b10ee7ea782eb750a028e318b003f95916fd80. Latest bytes equal reviewed final728 exactly; priorfull3481+all70changes remain recorded. Idiosyncrasy:2017 EAC-I revisits2014 EAs but selects new households, rural Lourd is households3/6/9 (one-third), Leger the other six, distinct from EHCVM. Its declared national representation excludesKidal, while own BID also reports security-related unvisited EAs without identifying them; do not infer weights’ realized coverage.
 
 CONTENTS quotes the English BID and says “NOT present in this repo.” This remains TRUE of the current library holding despite the newly fetched PRIVATE original. Preserve that prior statement as historical; add a dated availability note ONLY after managed push and cold managed readback. Existing quotations and survey rulings are not replaced as stale.
 
@@ -38,4 +38,7 @@ Workflow contradiction: CONTRIBUTING’s older writer instructions recommend exp
 Reuse normal managed singlepath helper/credential context and readonly documentation reader, existing installed MAIN/dependencies and exact publicoriginal. New code is only an external frozen transaction/receipt/write-scope wrapper; it does not alter tools or production APIs. No tests/sourcecohort because the task is managed documentation custody; actual finite managed readback is its meaningful validation once authorized.
 
 ## §6 Remaining decision/gates
-ROOT reviews frozen operator/credential locations/cache/write/readback scope before any writer operation. If writer profile missing/invalid, STOP; no login/install/producercontact or substitute credentials. Final sidecar/provenance/availability cannot be claimed before success. GH1574 remains open for its scientific code-list/visual evidence. Root alone GitHub publication; queued1594Draft PR1634 remains separate and immutable.
+ROOT reviews frozen operator/credential locations/cache/write/readback scope before any writer operation. If writer profile missing/invalid, STOP; no login/install/producercontact or substitute credentials. Final sidecar/provenance/availability cannot be claimed before success. GH1574 remains open for its scientific code-list/visual evidence. Root alone GitHub publication; merged1594 source actors/packets remain separate and immutable; no sentinel policy is reimplemented here.
+
+### Integration admission
+Actual GitHub ref independently readfdec032efd4b98ed4b99883c9586f5ef07b7bf3e. The sole own1574ledger is disjoint from incoming four Mali1594 paths; ordinary no-ff merge, no rebase/force. Current CONTENTS3582/hash authenticated as above. Managed calls are multi-step external operations, not atomic remote rollback; failed/partial publication is preserved for review, never silently labelled available.
