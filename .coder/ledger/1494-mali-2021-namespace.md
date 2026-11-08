@@ -27,3 +27,7 @@ Extend existing country/wavehelpers and sourcequalifiedscriptcalls, notsharedfra
 
 ## §6 Remaining gates
 Before tests, freeze candidate/code/test/operator/guard/sourceboundaries and surfaceROOT. After purecontrols, independentreview and any later sourcecorrespondence need ROOTscope; no sourcegrant inferred. Persist datedcountrydecision alongside oldcaveat. ROOTowns scientific/release closure;1494 notclosed by code alone.
+
+
+### Prepared implementation checkpoint (before any test runtime)
+Own-path2021formatter, plot/crop/disposition/rawinput paths now shareEHCVM21_. SharedEHCVMfood/sample input paths already use the wave's own column_mapping, so no sharedcode change.2018defaultreturn and barei/pid/EACI AST exact. Generator candidate/identity/implicit/orphan/occupied-slot code AST exact after removing docstrings; namespace onlyoutputkeys. Strict transport of the TWOprebound committedJSONsources moved5011approved2021keys each; inverse-prefix serializes byteexact to bothoriginalfiles (ordering/targets/otherwaves), no newedges/sourcecover/regeneration. No empiricalNon/unlinkedcounts measured.18inventedcontrols authored/ASTcounted, NOTcollected/run; existingrawformatter pin strengthened to assertnew2021rawcontract while2018staysbare. DatedCONTENTS appendsuserdecision after exact3601prefix. Frozenruntimeproposal/independentreview remain nextgates, not completedtests.
