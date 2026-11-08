@@ -1,4 +1,107 @@
 #+title: LSMS-ISA country workers and coordinator queue
+* Current scrum handoff 2026-11-08T11:17:34.000918+00:00
+Previous turn PROGRESS:1549 mergedPR1626/issueclosed;1606 independentreview+
+currentcomposition+census/API completed;NigerP2 closed/nextsourcegate granted;
+Ethiopia22 newcontrols passed;newremote1520 submitted;all3locals reactivated.
+GoalACTIVE. GitHub development a799ce58df57be8a80eb4c80a04370fbcca5685e.24development
+merges/20issueclosures. Freshpaginated167repoopen; original147scope17closed/
+130open (1549closure actualchecked). FSdevelopment111b untouched. No master
+release/sharedrewarm/productionweights. Rootdocs prior7410f3ca8.
+
+1549 COMPLETE:1626mergeda799 from385e7ac6a,actualparents ebb+385/tree569c2a9752484eb51f26bc4a8fc549ad9de278db verified. GitHubunit/windowsSUCCESS,
+reviews/threads empty,issueCLOSEDcompleted11:02:14UTC/bodyupdated. Onlyhistorical
+docstrings+ownledger;0/450/1895/35/186 measured/18None/publicscopeexact. No rawcount
+campaign. Originalremotehelperfailure remainsFAILED; replacement41022789 complete.
+
+1606 finalauthora08babdf04802785c648dba7b5521f2c22c252eb/613runtime (all19116
+nonledgerobjects exact). Author35new+3externalparentcontrols38PASS;ROOT6distinct
+independentPASS13.224s/28.36wrapper/3earlyprofiles0denials/privatefiles0. Actual
+tracked canonicalmonth metadata, native no-global-loader, unsupportedtype/local
+retention, sharedmap/attrs immutability, canonicalonly/absent/allnullcoverage checked.
+Historicalreusedrootrunnerlabel8 explicitly qualified ACTUALJUnit6. Fullcode/ledger/
+18packetmembers read. Source136campaign staysclosed;roughchecknotexactcalendar.
+Currentcompositionc8d1b5431b9cde8dcaeba74594dcad23ffb0556e parentsa08+a799,
+4owned3incomingdisjoint/entire19118mode-type-blob union exact/clean. NewFS
+verify/1606-current-20261108 exact. Actualcandidate-only censusCLOSED0/121.94s:
+ALLfields excepthead exactlycloseda889map SHA c99b6d5...;0/450country/1895wave/
+35build/186import,18None/public553/2313/39 exact,0errors/denials. Closedbaseline
+notreplayed;incomingtwo1549docstrings+2ledgers explicitlyadmitted from actualtree
+and1549zero-impactproof. CurrentstrictAPI0/8.421s. SourceconstructorONLYmetadata.
+FullCI first41023382 FAILED126 BEFORErunner/pytest: ROOTcopylostentryexecutable
+mode0644. Bootstrapimportdidoccur; notestsran. Evidence preserved;chmod0755 same
+bytes only. Freshv2job41023422 RUNNINGpytest/n0044/free8CPU32G45min/4loadfile/
+FULLconfiguredtests/no-m-or-k/privateemptyL1+falsecreds/unshare/BLASbuild1. Known
+schedulerchdirfallback/tmp thenbootstrapownW; identityassertcorrect. No restart
+ofunknownoutcome. R=reports/1606-current-verification-20261108; v1out1606, v2out
+1606-v2. ROOTlivePTY66572(v2launcher); 56573census/22096API/60746v1 CLOSED.
+Expect35newfullCIcases vs closed1591, but actualcounts UNMEASUREDuntilterminal.
+
+Niger1529 P2 COMPLETEinsourcefreereview: authorfinal4cca2e8e29a42b292c3c0d2657e197343e1bdc5f/runtimebb0d4b8c9ef7b20ca94d0a99e63fc4ef3f16ca40. Minimal
+nonemptycomponentassemblyafterbothread/builds. Bothone-emptydirections exact,
+all-emptyoriginalAssertionError/text retained, no cast/oraclerelaxation. Author
+7affectedPASS;independent8PASS13.26s/29.013wrapper (7old+1new,25unaffectednotrerun),
+3preimportprofiles0denials/data0. Original32run31TOTALPASS1FAIL immutable. Entire
+finalonlyledger delta proof accepted. ROOTread completeproduction/testdelta+
+8selection/operator/finalverdict.33distinctexternalcases acrossstages,not40.
+Original24authorcontrols/fixturefailure retained too.
+Oracle8controlsPASS (largeHHID besidefractionalqty usescolumnarrays+actualscalar
+niger_i), then NEW10support controlsPASS/10.81s/26.192wrapper/3earlyguards0denials,
+noold8replay. All6stillsealedatpreparation. V2 f4772d2a23fd64f2800cb273456cc7a75a5ff0a5178783f8b5b63d5fb22142c7 fullROOTsource/14file+7binding review complete:
+actualformat_id mapkeys;independentcopiesBEFOREcandidate;typedattrs/maps/cards/
+labels witnesses;all6preseals-beforedeserialize/allpostseals/failureattemptjournal.
+ROOT NOWgrants ONEexact6sourcecorrespondence stage:2C+3C numeric/cards/labels,
+4trustedpickle+2JSONonce. Auth reports/1529-native3c-six-v2-authorization-20261108/
+ROOT-AUTHORIZATION.json SHA a4a08ba4dc53b68bd17bce01776c0cffab5d8867b64f5c6c26c8e949bc0a85c0;
+newprivate B/private/1529-native3c-six-v2-20261108. Mwiownsactualexecution under
+unchangedfrozenwrapper/guards,stopnewfailure/noretry. CARDPROJECTIONONLY—notactual
+reader/Default/Make/Feature/warm/API/nativeparity.3B/3D/3E season/window/unit/
+area/cost/factors/weights remainunruled;full1529OPEN. No original15campaign replay.
+
+Ethiopia1570 sevenJSONmetadata stageCLOSED7parses/all7presealedbeforeparse/all7
+postequal;confirmed owncovers HH/holder/ea, s10extra crop_id vs5coordinate
+projection, s11/s12lackparcel/field; s12Q3past12months/noKGinthelabel. Metadata
+notpopulation/uniqueness/cardfidelity. Newpurediagnostic22controlsPASS13.41s/
+28.134wrapper/3preimportprofiles0denials/data0;original19NOTreplayed. Runtime
+f032041ce276647ce3fedd52d5d97f5afe1debb8/finalledger8082de5543c329e4f64884e9c431c53ab7fe506c allnonledgerexact;7production/old19bytesexact. finish1590
+NOWprepares UNEXECUTED14pickle (7numeric+7categories) stage with allpre/postseals,
+independentraworacle/failurejournal/reusedclosed7labels bindings; NO14stat/hash/
+open/load granted yet. Numeric1/2 captionsliteralgroupings only/cardinterpretation
+unproven. Missingsect3_pp W1 means no whole-nativeparity/nofakeNoneintercrop.
+
+Remote1520 NEWjob41023375/82c7d51d14274b4daa83b22eef5ddcbf SUBMITTEDONCEafter
+supportedDRYRUN andexact641/source/assets/pins. RUNNINGnative/n0028/env+placement
+verified, project352cfca828d89d4b0c864255618bf943320eb4b162b68aa1bbc2d5f33d4fe0ad,
+b834sourcefrozen/currentwavecodeexact;nohotrebase. Pureinvented__new__ bound
+properties only/noactualCountry/Feature/source/getter/census. ROOTreadfullTASK/
+profile/PLAN/sourceproof/countrygrounding;briefrequiresfullNigeria/Tanzania
+CONTENTS inclWAITING/LOGBOOK/TODO andquotecontradictions. Normal641guards/auth;
+installedSuCoder unchanged. No2nativeoverlap claim (1537terminalbeforesubmit).
+
+1537 continuation41023140 INFRAcomplete0/sealed/exited/placed/publicationcomplete,
+TASKBLOCKED/d15f062b3380216fe82f7d8a2f02c45655604707:2conditionalblankCodealiases,
+16old+5newfunctions NEVERcollected. Preflightfailures preserved: configempty
+expectation, v1stdlibalias, v2trustedvenvalias, v3secondlegitimatecompatlookup
+refused BEFOREspawn. Oldstrictguardneverarmed. Rootv4grant arrivedAFTERterminal,
+LIVEprecondition preventedchannelwrite/restart. Terminalallowlist sealed7655779b/
+bd485b0d, onlycode/requiredreports/operators/proofmetadata, nonativeprivatecontent.
+ROOTauthorized NEWLOCALcontext—notremote/native-state resume: finish1452 exactd15
+newtree ledgerd762449145a95e6f799093503a6349b0ebb3e25e/nonledgerexact. MAIN-ownjob
+mount/privateemptyL1/falsecreds/unshare;originalstrictguard codeafterEVENTS=[]
+byteexact. v4 bindscompatSHA3ad490d82f2da72dcd5232a2bbec981a2673454fa793ee54636182a79a3e1692,
+exactTWOknown init+compat qualifiedldconfig/soname/dlopen lookups, no compiler/
+stub/cache/fallback/extraimport; CsystemmagicDBinitqualifiednotuniversalauditclaim.
+ONEfinitev4+never-run selection authorized afterfreeze, actualresultpending. Immutable
+BASEOrgfromb834Git/newcandidate testsactualOrg; noargdefaultonlystaticchain+real
+format_id/puretailcontrols, actualdf_data_grabber ban remains. Pepperheld/whole1537OPEN.
+
+All3localagents were explicitly followup_task activated lastturn and realrunning
+readback verified; send_message alone DOESNOTwakecompletedagents. Mwi resumed
+again aftersupportpacketcompletion; currently6stage owner. finish1590 Et14proposal;
+finish1452local1537+remote1520monitor; ROOT1606fullCI/metadata+queue+sourcegates.
+Settled49borrowIHS5/50maizeflour(primaryevidence)/51NOdateclamp persist; pending48
+productionweights+wholewavePR1604/1509purchaseeligibility/1442/1497/1518defaultW1W2
+and1560/1571salescience unchanged. No needreasksettleddecisions. GoalACTIVE.
+
 * Worker activation correction 2026-11-08T10:53:01.289929+00:00
 Live list_agents found finish1590 and Mwi COMPLETED: send_message delivered
 assignments but did not restart them. ROOT explicitly followup_task-woke BOTH;
