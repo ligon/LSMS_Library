@@ -1,8 +1,11 @@
 # Prior-Art Ledger — Malawi nonseed deletion provenance (issue 1174)
 
 Search tier: git + ripgrep + AST floor. Fresh GitHub development base:
-`c964c6c4f25945dc14636fd094893b16b12180b7`; the filesystem origin's development
-ref is not the source of this checkout. Inherits STANDING.md §§3–4, CLAUDE.md
+`c964c6c4f25945dc14636fd094893b16b12180b7`. Current integration baseline, freshly
+fetched after terminal verification, is GitHub development
+`3b28d293f71b962c3d878c2886be9ee794407915`; root requested an ordinary merge
+preserving the frozen topic history, without rebase/force. The filesystem
+origin's stale development ref is not a baseline. Inherits STANDING.md §§3–4, CLAUDE.md
 Derived Values, and canonical lsms_library/data_info.yml.
 
 ## §1 Task, restated
@@ -28,6 +31,7 @@ missingness, use, unit, eligibility, weight, food or whole-wave policy changes.
 | derivations.py rows: 0 / resolve_callable | Existing deletion disclosure, wave-local mapping callable resolution, no served stamp | reuse; test_derivations.py |
 | Country.derivation_inputs | Raw variables at input grain, framework id_walk(state='raw') | reuse unchanged; test existing public input machinery |
 | Country._finalize_result | Existing dropna(how='all') and post-read attrs summary | reuse unchanged |
+| Current-base source collector / crop-country helpers | Merged 1510 hashes consumed override paths; merged 1475/1517 retains supplied country identity | retain upstream byte-exact; validate current-base compatibility |
 
 ## §3 Definitions and country grounding
 
@@ -47,6 +51,10 @@ read 8558 grounding. Relevant CONTENTS §§4996–5058 were reread in full.
 - Historical “#1174 eligibility likewise remains unresolved” predates these
   explicit rulings; preserve that history and name the narrow residual rather
   than reopening eligibility. No new contradiction has been established.
+- Older applied-unit helper commentary is qualified by dated country evidence:
+  “those statements are contradicted by the separate native applied-unit,
+  enumerator-total and timing columns.” Reuse the unchanged evidenced driver;
+  do not reinterpret timing fields as units or alter unrelated comments here.
 
 Registry contract: derivations.py says integer zero “names a deletion”; dropped
 rows have no place to carry a key. Country.derivation_inputs returns ORIGINAL
@@ -91,10 +99,37 @@ rather than predicting a table-only cache effect. Add Applied to the existing
 seed record's columns as the issue requests. Prove raw input replay, full native
 conservation, Default/Make/Feature/warm behavior and appropriate tests on a freeze.
 
+The initial implementation freeze 0efac3b72185dae8703db895dbc472e9a1bbeb8e is
+terminal-verified. Author focused checks: 108 passed; independent review: 171
+passed (108 existing + 63 independent), with nine source cases deselected.
+Cold job 41006209 completed 0:0: both APIs, Make/Feature, raw replay, unchanged
+seed inputs and fresh warm checks pass; 14 private cache files unchanged per
+head. Source frames preserve 179,957 plot-input rows, 57,118 sample rows and
+37,076 nitrogen rows. All 1,356 prefinal hollow groups are 1,355 seed + one DAP.
+Full offline CI: 11,464 passed, 5,646 skipped, four xfailed, 1,008.38s. Initial
+test-only tuple/list assertion failure and reviewer harness failures remain
+retained. These are exact 0ef/c964 receipts, not final current-base results.
+
+Now normal-merge freshly fetched 3b28, preserving both upstream ledgers and all
+upstream code. The four task implementation/test files must remain byte-exact
+0ef. Malawi CONTENTS/AGENTS/CLAUDE have no upstream delta. Source collection
+changes only hashing; nitrogen_kg's own AST is unchanged, but its country-index
+helper changed upstream, so rerun the current-base cohort rather than assume
+compatibility. Run bounded relevant 1510/1475/task controls, API audit, actual
+hash census and fresh cold baseline/candidate APIs/Make/Feature/replay/warm
+checks on the merged freeze. Configured final-head GitHub CI remains root's
+gate; retain the complete earlier full-CI receipt as prior-head evidence.
+
+This completes the existing-wave residual only. The issue's conditional
+2024–25/15-line seed provenance follow-up belongs to issue 1275 and the held
+whole-wave work; it is neither implemented nor verified here. Root will carry
+that checklist before narrowing/closing issue 1174. No new 2024 wiring.
+
 ## §6 Open questions
 
 No scientific decision is requested: registration documents an existing
-deletion and does not decide whether fertilizer was used. Full default/API
-conservation and all-wave deletion counts remain to be measured. Stop any affected extension if its
+deletion and does not decide whether fertilizer was used. Current-base
+integration validation remains; the earlier baseline cohort is complete.
+Stop any affected extension if its
 eligibility/replay cannot be tied exactly to the current producer; document
 the ambiguity instead of broadening the rule.
