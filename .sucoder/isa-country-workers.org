@@ -1,5 +1,67 @@
 #+title: LSMS-ISA country workers and coordinator queue
-* Current worker overlay 2026-11-08, after PR1423
+* Current checkpoint after PR1639 — goal ACTIVE
+This goal turn made PROGRESS: five development merges and two issue closures.
+Actual development d89da5992e1b51116a029a84995fada49d5f0c3c; cumulative38merges/
+27sweep issue closures. Fresh complete GitHub recount:160 open issues; original147
+scope23closed/124open, exactlymatching independently verified closed IDs.
+Evidence: reports/current-reconciliation-20261108-after1494/OPEN-ISSUES.json.
+No master release, shared harmonized-cache rewarm or production-weight change.
+IMPORTANT: the root docs checkout carries older library code. Read current Git refs
+or pinned worktrees; never import that working tree as current development.
+
+1499 CLOSED via1636/5695: full12661PASS/5652SKIP/4X; global fingerprint impact recorded.
+1494 CLOSED via1638/dd40aae5546987760fe279a737592d9febb572bf. Actualparents[ebb,ac0],
+whole19154object treeb4fb9bb9 EXACT reviewed union. Author18+independent20/API/metadata/
+GHA passed; full41031188 COMPLETED0 in39:11,12679PASS/5652SKIP/4X. All18317prior outcomes
+match under ONLY2explicit formatter-test-ID renames;18genuine newPASS. ROOT verified49
+sealed files, actualJUnit and all18335collection/lease/phase coverage. See1494-full-current-
+trace-proposal-v1-20261108. Preserve ROOT-INITIAL-COMPOSITION-ASSUMPTION: two best merge
+bases e97/0afe required the already-admitted actual5695 byte base; no source/test replay.
+Mali IDs use EHCVM21_ raw then approvedmapback;5011links/eachJSON inversebyteexact;
+no new held-link recovery. Measured Mali-only20country/80wave/1FIF changes.
+
+1575 planned-design notes MERGED1637/585; allfour region×milieu (Benin department),
+original2018 versus2021cluster revisit. Togo geography caveat retained. Three missing
+original BIDs now ACTUAL managedwrite+freshreadonly retrievalPASS: Togo/GB/CIV; six
+active guards0denials, original/profile continuity+cleanup. Session9328terminal0.
+13metadata/ledger paths finalized at ac5519892cbd9d26bf2215a0ae536f77914b00e4;
+DRAFT PR1640 awaitsCI, no table/science change. Reports1575-three-bids-managed-{ingestion-
+closure,finalization}-20261108. LedgerGitdelivery AFTERruntime is explicitly recorded;
+frozen draft/preparation preceded it. Whole1575 remainsOPEN for sample wiring.
+
+Workflow1423 MERGEDebb after40mockedPASS+GHA; actualunion19152objects verified.
+Ethiopia1570 docs MERGED1639/d89: actualparents[dd40,a37], whole19155object treed46750a9
+EXACTexpected union. OriginalCONTENTS prefix intact. Bounded6983 formattedmatches versus
+literaltyped0 doNOTprove scientific linkage/eligibility/row loss/fullnative parity;
+section3/Q3/window/grams/Birr/sales residuals remainOPEN. No capture/source replay.
+
+Local work now: finish_1452 independently reviews1501a263bed33 (onewritegate+exactheld
+predicateexclusion/docs/tests); matrix12contracts frozen precandidate, runtimeUNRUN.
+malawi_revision_food independently reviews Senegal1500a3cd05a5 (4paths, finalmissingu
+sentinel, originalNSUcall unchanged); countryread/matrix beforecandidate, runtimeUNRUN.
+1501 author source complete/static only; grammar1/true/yes ON, everythingelseOFF;
+AGENTS cacheparagraph/__init__ module docstring updates explicitly approved, no broad
+hash exclusion. Meaningful FakeLand/privateCSV/parquet41case proposal needsrootreview.
+
+finish_1590 owns preserved1288 and1500 terminal source artifacts plus nextcold charter.
+1288f779/job41031186 FAILED15/native143/supervisor143 at43:02; extension45→60 denied
+once bySlurm, no retry/escalation. Committedbbe8ledgeronly; WIPa33c has partialcode/tests.
+Four original reports missing. New clean salvage d2b1c070d03da8b25daa6d1fe2b88a1c5ea89fe2
+preserves5authorized WIPobjects onactualdd40, ledger-first ancestry; two dispatcherfiles
+excluded, originals immutable. All19156object union exact;3AST parses pass,36static testdefs
+UNRUN. NEW60min coldsource-only completion package in preparation; NOT submitted yet.
+Preserve productiveprivate transaction/PRE-finalize bytes/OTHER fallback invariants;
+unknown computed/unverifiable Other availability is an explicit narrow residual, not
+stale evidence. Broader routing/default/JSON/legacy exposure keeps1288OPEN.
+1500 cold792d/job41031488 native0/source-phase complete but supervisorFAILED74 for missing
+country-grounding.json. Other9 artifacts and candidatea3cd/treeb01814e preserved. Additive
+RECOVERED-GROUNDING-STATEMENTS extracts actual report statements, doesNOTrepair original74.
+Code/testdraft UNRUN; no fix acceptance yet. No old native worker resumed. Remote active0
+at this checkpoint; local reviewers and continuation preparation remain productive.
+
+Pending user1066 warning-replay choice unchanged; other scientific/weight holds retained.
+
+* Earlier worker overlay after PR1423
 Actual developmentebb65d191b6f856ff1b0f77068765409b3957929;36merged/26closed.
 Original country scope22closed/125open of147. Goal ACTIVE; no master/shared rewarm/weights.
 finish_1452: independent1494 review20controls PASS;1575 three managed-document

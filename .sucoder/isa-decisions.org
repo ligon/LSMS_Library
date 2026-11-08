@@ -2,7 +2,7 @@
 
 * 2026-11-08: Mali household namespaces, GH1494
 The user selected: "Namespace all 2021–22 raw IDs, then map back only approved panel links (recommended). Unlinked, unknown and orphan records retain distinct IDs."
-ROOT implementation choice: EHCVM21_ for the raw2021 namespace, consistent with EACI14_/EACI17_. Preserve every approved panel target/canonical ID and existing conservative link omission; no new link recovery, classification, filtering or reweighting. Implementation is delegated, not merged.
+ROOT implementation choice: EHCVM21_ for the raw2021 namespace, consistent with EACI14_/EACI17_. Preserve every approved panel target/canonical ID and existing conservative link omission; no new link recovery, classification, filtering or reweighting. Implemented/merged PR1638 atdd40aae55; issue1494closed. No new held-link recovery or production-weight change.
 
 * 2026-11-08: Numeric text in additive aggregation, GH1499
 Convert valid numeric strings BEFORE aggregation. Malformed nonmissing text must raise; true missing/native numeric values and precision remain intact. Implemented/merged PR1636 at5695e0855; issue1499closed. Full configured offline12661PASS/5652SKIP/4XFAIL and all18195parent outcomes exact; global fingerprint footprint recorded, shared rewarm deferred.
@@ -12,7 +12,7 @@ Treat exactly99,999,999 in raw2014–15 purchased-food expenditure as missing be
 
 * 2026-11-08: Document investigation, GH1575
 The user requested delegation to establish planned stratification, if any, from sample-design documents for Benin, Togo, Guinea-Bissau and CotedIvoire. This is a document-evidence investigation; no strata/default/weight change has been made.
-Completed and ROOT reviewed: all four explicitly planned region × residence milieu (department in Benin); their own second-edition BIDs describe the original2018 design and a same-cluster2021 revisit. Exact French PDF pages: Benin13, Togo12, Guinea-Bissau16, CotedIvoire13. Togo's Lomé Commune/Grand Lomé domain discrepancy remains unresolved. Report: burst/isa-sm-20261103/reports/1575-ehcvm-stratification-doccheck-20261108/REPORT.md, SHA256 f551c55e50aac9d00cfc4df42f59e5df8f77f6673cfe265a7d53dd2fe3b1b4fd. GitHub1575 updated, still open for implementation. Documentation-only country-note candidate delegated; no runtime/DVC/production changes authorized in that phase.
+Completed and ROOT reviewed: all four explicitly planned region × residence milieu (department in Benin); their own second-edition BIDs describe the original2018 design and a same-cluster2021 revisit. Exact French PDF pages: Benin13, Togo12, Guinea-Bissau16, CotedIvoire13. Togo's Lomé Commune/Grand Lomé domain discrepancy remains unresolved. Report: burst/isa-sm-20261103/reports/1575-ehcvm-stratification-doccheck-20261108/REPORT.md, SHA256 f551c55e50aac9d00cfc4df42f59e5df8f77f6673cfe265a7d53dd2fe3b1b4fd. GitHub1575 updated, still open for implementation. Country notes mergedPR1637. Three missing original BIDs subsequently passed normalmanagedpush+freshreadonlyreadback; metadataDRAFTPR1640 pendingCI. No sample-strata/weight change; whole1575 remainsopen.
 
 * Earlier decisions preserved
 AffectedConsumption means food purchases; AffectedFoodStock means food stocks, following Ethiopia's model.
