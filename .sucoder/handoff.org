@@ -1,5 +1,42 @@
 #+title: Handoff, LSMS-ISA sweep
-* Current scrum checkpoint 2026-11-08T19:50:15.649120+00:00
+* Current scrum checkpoint 2026-11-08, after PR1636
+The goal remains ACTIVE; this turn made PROGRESS. Actual GitHub development is
+5695e0855e9182b9e61559d802ce7249102818be: 34 development merges /26 issue closures.
+Original country queue:22 closed /125 open of147 (1499 belongs to this scope).
+Repository162-open recount predates the newly verified1499 closure; no fresh complete
+repository recount is claimed. No master release, shared rewarm or production-weight change.
+
+1499 CLOSED after PR1636: actual parents[e97,0afeca], entire tree aac6725e EXACT
+reviewed head. Full41030609 COMPLETED0 in43:43:12661PASS/5652SKIP/4XFAIL;
+all18195 prior outcomes exact +122newPASS; all18317 collection/lease/protocol records
+reconcile. ROOT verified45 sealed files, GitHub unit/windowsSUCCESS and6explicitSKIP,
+fresh reviews/threads empty. Global next-access footprint450country/1877wave/35BTF;
+18None wave cells and186FIF unchanged. No shared rebuild. Full manifest e0e4bc37...
+at reports/1499-full-current-trace-proposal-v1-20261108/full-v1.
+
+1575 document question completed and issue updated: allfour region×milieu, Benin
+department; original2018 design versus2021 cluster revisit. Togo domains unresolved.
+ROOT reviewed report, all13PDF/text hashes and8-row matrix. Four-country documentation
+PR1637, ea88907/treea771a383, only4CONTENTS+ledger; original prefixes preserved,
+all code/config/tests exact5695. GitHub42518322828 running. Issue remains OPEN.
+Three missing managed2018 BID holdings are delegated for preparation; no newDVCwrite.
+
+1494 frozen56473 author18PASS; ROOT inverse-byte-proved both5011-link JSON maps.
+Independent static review noP1/P2; reviewer20additional controls now granted once.
+Current-admitted integration ac0c7bb/treee4bbec06 preserves all10owned paths; prospective
+headers retained, actual5695 entiretree=0afe admitted. API84263 CLOSED0; metadata57865
+LIVE at last actor update. Full suite /publication remain pending. No new link recovery.
+
+1423 revised helpers: independent40mockedPASS, no live-provider/submission claim.
+Integrated bc2a013/treef1678729:13owned/23incoming/disjoint, full19151object union.
+Existing PR1423 safely fast-forwarded580c→bc2; explicit base refresh to development
+corrected its stale e42 comparison to actual5695, now13changed paths. GHA42518782547
+running, reviews/threads empty. No full library-suite replay: library/config unchanged.
+finish_1590 prepares a new cold remote source-only #1288 productive-freshness fix
+charter using admitted isolated641; no launch yet. Historical validator-only proposal
+remains unselected. No terminal old worker is resumed.
+
+* Historical checkpoint 2026-11-08T19:50:15.649120+00:00
 The goal remains ACTIVE. The previous goal turn made PROGRESS. Development is
 e97a469262393d06563c8bf90c9ff465388c0173: 33 development merges and 25 issue closures.
 Original 147-country queue: 21 closed /126 open; repository162 open at the last

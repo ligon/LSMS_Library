@@ -1,5 +1,21 @@
 #+title: LSMS-ISA country workers and coordinator queue
-* Current scrum checkpoint 2026-11-08T19:50:15.649120+00:00
+* Current worker overlay 2026-11-08, after PR1636
+Actual development5695e0855e9182b9e61559d802ce7249102818be;34merged/26closed.
+Original country scope22closed/125open of147. Goal ACTIVE; no master/shared rewarm/weights.
+finish_1452: independent1494 review20controls granted; next1575 three managed-document
+holding gaps preparation. Author1494 eighteen controls alreadyPASS; no replay.
+malawi_revision_food: ac0c prospective1494 integration admitted to actual5695 by exact
+whole-tree equivalence; API84263 CLOSED0, metadata57865 LIVE at last update.
+finish_1590:1499 full41030609 terminalPASS sealed;1423 sourceintegration published byROOT
+to existingPR1423/bc2. Now coldremote1288 productive freshness repair charter preparation.
+Remote model workers:0 at this checkpoint. Eight original country jobs are historical
+completed/failed assessments, not idle waiting workers. No resumes of terminal actors.
+ROOT:1499 closed/PR1636merged;1575 docsPR1637 open;1423 and1637 GHA gates pending.
+1575 documentary answer allfour region×milieu; original2018/revisit2021 distinction and
+Togo geographic caveat preserved. Implementation remains open. Pending1066 question,
+scientific48/1497/1509/1442/1518/1560/1571 andMalawi weights remain held as recorded.
+
+* Historical checkpoint 2026-11-08T19:50:15.649120+00:00
 The goal remains ACTIVE. The previous goal turn made PROGRESS. Development is
 e97a469262393d06563c8bf90c9ff465388c0173: 33 development merges and 25 issue closures.
 Original 147-country queue: 21 closed /126 open; repository162 open at the last

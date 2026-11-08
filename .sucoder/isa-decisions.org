@@ -5,7 +5,7 @@ The user selected: "Namespace all 2021–22 raw IDs, then map back only approved
 ROOT implementation choice: EHCVM21_ for the raw2021 namespace, consistent with EACI14_/EACI17_. Preserve every approved panel target/canonical ID and existing conservative link omission; no new link recovery, classification, filtering or reweighting. Implementation is delegated, not merged.
 
 * 2026-11-08: Numeric text in additive aggregation, GH1499
-Convert valid numeric strings BEFORE aggregation. Malformed nonmissing text must raise; true missing/native numeric values and precision remain intact. PR1636 is under verification, not merged.
+Convert valid numeric strings BEFORE aggregation. Malformed nonmissing text must raise; true missing/native numeric values and precision remain intact. Implemented/merged PR1636 at5695e0855; issue1499closed. Full configured offline12661PASS/5652SKIP/4XFAIL and all18195parent outcomes exact; global fingerprint footprint recorded, shared rewarm deferred.
 
 * 2026-11-08: Mali purchased-food sentinel, GH1594
 Treat exactly99,999,999 in raw2014–15 purchased-food expenditure as missing before passage aggregation. Preserve quantities, native eligibility and legitimate paired values. Implemented/merged PR1634; issue closed. Recall/exposure GH851 remains separate.
