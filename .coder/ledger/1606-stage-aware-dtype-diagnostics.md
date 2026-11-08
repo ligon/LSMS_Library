@@ -66,7 +66,42 @@ None blocking: ROOT selected native default, canonical-only present checks and
 unsupported-global retention. Hash footprint UNMEASURED; no census grant. Freeze
 before one invented focused cohort; independent review after frozen code/tests.
 
-### Phase3 — pending
+### Phase3 — verification complete; ROOT release gates remain
 
-No implementation/test success at this ledger-first freeze. Final anchored
-verification will be recorded in its own docs-only commit after checks close.
+- `_check_dtype_consistency` — OK (§2/§3): reuses the existing canonical loader
+  and rough predicates, never caster/parser. Supported global types override only
+  for explicit finalized stage; unsupported types retain local grading, including
+  known-local/unknown-global adversaries. No REINVENTION or CONTRADICTION.
+- `is_this_feature_sane` — OK (§3/§4): native default exact parent parity;
+  invalid stage before schema/provider; input/scheme unchanged; only dtype Check
+  can change. Canonical-only columns never become required; all other checks
+  receive untouched local schema and keep their previous grading.
+- `validate_feature` and audit scan — OK (§2/§4): actual adapters explicitly
+  finalized on their public result, verified through strict invented providers.
+  Existing direct cached-parquet callers remain native by omission.
+- Frozen runtime/test authority613073885edf1a3496659a3b3ca038fe108c4f88:
+  ONE author selection35 new committed controls plus3 new external closed-parent
+  controls,38PASS/0fail/0skip/0deselected in16.56s. Mounted MAIN/private empty
+  roots/falsecredentials/unshare/BLASbuild1/2loadfile;3 guard receipts retain13
+  active bindings each,0denials,datafiles0. Strict static API audit exit0.
+- Independent ROOT review6 new controls PASS/0fail/error/skip,13.224s; runtime613
+  clean/operator bytes exact,3early profiles0denials/data0. Historical runner
+  label8 is not an actual count:6 controls ran. Author38 were not repeated.
+- Independent controls cover actual canonical month metadata with invented
+  carriers, native-loader refusal, supported/unsupported mixture, declaration/
+  nested-attrs immutability, canonical-only/absent and unchanged allnull/coverage.
+- Whole country.py/canonical loader, all configs and existing tests are exact
+  base. This own ledger-only finalization leaves EVERY nonledger tracked mode/
+  type/blob object exact613; final external byteproof binds the documentation head.
+- Operator bookkeeping is preserved externally: instruction check initially
+  compared a symlink blob to resolved contents; packet preparation initially
+  required private config directory remain totally empty, but dependency import
+  created an EMPTY private matplotlib directory (0files). Neither was a test or
+  source failure; no product/data/cohort replay or guard relaxation followed.
+- No real Country/Feature/source/table/API/Make/warm/census or closed136-frame
+  replay. Metadata hash footprint remains UNMEASURED, full offline/configured CI
+  and GitHub publication/merge are ROOT-owned pending gates. This is rough dtype
+  grading, not exact finalizer/calendar verification or scientific endorsement.
+
+External receipts: reports/1606-stage-aware-dtype-20261108 and independent
+reports/review-1606-root-20261108 in the isa-sm-20261103 burst workspace.
