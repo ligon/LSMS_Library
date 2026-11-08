@@ -31,7 +31,7 @@ from lsms_library.transformations import food_prices_from_acquired
 def curation():
     # ROOT 2026-11-08: historical diagnosis assertions bind the immutable
     # pre-curation artifact; candidate tests read the live Org separately.
-    path = Path(os.environ['ISA_CONTEXT_ROOT']) / 'baseline-categorical_mapping.org'
+    path = Path(__file__).resolve().parent / 'fixtures/gh1537/baseline-categorical_mapping.org'
     assert hashlib.sha256(path.read_bytes()).hexdigest() == (
         '1ec375a0939d1bebc0398935580eba931bb798189a9940d31be1a29f34c41f29')
     return df_from_orgfile(path, name='harmonize_food')
