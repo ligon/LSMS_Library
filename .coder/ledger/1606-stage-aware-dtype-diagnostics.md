@@ -105,3 +105,34 @@ before one invented focused cohort; independent review after frozen code/tests.
 
 External receipts: reports/1606-stage-aware-dtype-20261108 and independent
 reports/review-1606-root-20261108 in the isa-sm-20261103 burst workspace.
+
+### ROOT current-composition release verification (2026-11-08)
+
+The reviewed runtime613 and final authora08 were combined with development
+a799ce58, retaining all 19,118 mode/type/blob entries in the exact disjoint
+union. Incoming #1549 changes only two docstrings and its own ledger.
+The resulting frozen build is c8d1b5431b9cde8dcaeba74594dcad23ffb0556e.
+
+The actual candidate-only census completed with zero changed fingerprints
+among 450 country, 1,895 wave, 35 build-transform and 186 framework-import
+cells. All metadata except the head is exactly the preserved closed a889 map;
+the 18 None wave entries and public scope553/2313/39 remain unchanged. The
+intervening docstrings and ledger-only changes are separately admitted and
+verified; the closed baseline was not replayed. Strict API audit passed.
+
+Full configured offline CI41023422 completed0 on its own mounted environment,
+with false credentials, private empty nonsymlink L1 before runner import,
+loopback-only namespace, BLAS/build1 and four loadfile workers: 12,161 passed,
+5,652 skipped, four xfailed. JUnit has17,817 cases and zero failures/errors;
+every prior17,782 case is retained, plus exactly35 new committed cases. The
+three external author controls and six independent controls are separate.
+
+The first launch41023382 remains failed126: a copied entry script had mode
+0644 and could not execute, before runner or pytest. Bootstrap package import
+did occur. Correcting only mode0755 and using a fresh output namespace led
+to the completed run above; no tested code or assertions changed.
+
+This final update changes only this task ledger. All nonledger objects remain
+exactly the tested current composition. Configured GitHub checks and merge
+remain the final publication gate; there is no source-corpus replay, scientific
+rule change, native cache rewrite, production-weight change or master release.
