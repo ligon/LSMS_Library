@@ -21,6 +21,7 @@ import sys
 from types import SimpleNamespace
 
 import pandas as pd
+import numpy as np
 import pytest
 import yaml
 
@@ -113,6 +114,18 @@ def model(tmp_path, monkeypatch, request):
     receiver._updated_ids_cache = None
     receiver._panel_ids_attempted = True
     receiver.assume_cache_fresh = False
+    # These are process-local ledgers, shared by otherwise independent toy
+    # receivers. Isolate only this fixture's table keys, preserving all other
+    # tables and restoring previous state after the test.
+    ledgers = [C._GRAIN_LEDGER, C._BUILD_DROP_LEDGER, C._DATETIME_LEDGER, C._REBUILD_HISTORY]
+    keys = [(name, TABLE), (name, OTHER)]
+    saved = [{key: copy.deepcopy(ledger[key]) for key in keys if key in ledger}
+             for ledger in ledgers]
+    for ledger in ledgers:
+        for key in keys:
+            ledger.pop(key, None)
+    monkeypatch.setattr(C, '_DEGRADED_ATTEMPTED', {
+        key for key in C._DEGRADED_ATTEMPTED if key[:2] not in keys})
 
     class Model:
         country = receiver
@@ -130,6 +143,8 @@ def model(tmp_path, monkeypatch, request):
         during_country = None
         child_failure = False
         requires_other = False
+        requires_other_wave = False
+        wave_reports = {}
 
         @property
         def selected(self):
@@ -158,6 +173,18 @@ def model(tmp_path, monkeypatch, request):
                                           check_categorical=True)
             assert actual.attrs['producer'] == RAW_ATTRS['producer']
             assert actual.attrs['country'] == name
+            # Nullable extension assertions alone have previously admitted a
+            # one-ULP drift. Check keys, masks and actual nonmissing payloads
+            # independently, without normalizing expected to actual dtypes.
+            assert actual.index.tolist() == expected.index.tolist()
+            assert actual.columns.tolist() == expected.columns.tolist()
+            for column in expected.columns:
+                np.testing.assert_array_equal(actual[column].isna(), expected[column].isna())
+                keep = expected[column].notna()
+                np.testing.assert_array_equal(actual.loc[keep, column].to_numpy(dtype='float64'),
+                                              expected.loc[keep, column].to_numpy(dtype='float64'))
+            for key in ['integer', 'flag', 'missing', 'labels']:
+                assert type(actual.attrs['producer'][key]) is type(RAW_ATTRS['producer'][key])
 
         def record(self, path, frame):
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -194,6 +221,9 @@ def model(tmp_path, monkeypatch, request):
                 if mode == 'empty':
                     f = f.iloc[:0].copy()
                 self.record(out, f)
+                if wave in self.wave_reports:
+                    assert L.stamp_parquet_hash(out, self.country[wave]._input_hash(table),
+                                               **self.wave_reports[wave])
                 return
             out = outroot / name / 'var' / f'{table}.parquet'
             self.events.append(('country', table, outroot))
@@ -220,6 +250,9 @@ def model(tmp_path, monkeypatch, request):
                 f['x'] = f['x'] * 10.0
                 if self.requires_other:
                     support = L.get_dataframe(outroot / name / 'var/support.parquet')
+                    f['x'] = f['x'] + support['x'].iloc[0]
+                if self.requires_other_wave:
+                    support = L.get_dataframe(outroot / name / 'a/_/support.parquet')
                     f['x'] = f['x'] + support['x'].iloc[0]
                 f.attrs = copy.deepcopy(RAW_ATTRS)
             self.record(out, f)
@@ -271,7 +304,7 @@ def model(tmp_path, monkeypatch, request):
                     self.native(table, wave, env)
                 return subprocess.CompletedProcess(args, 0, stderr=b'')
             if '-c' in args:
-                table = args[-1] if '_materialize_make_other' in args[2] else args[-2]
+                table = args[4]
                 outroot = Path(env['LSMS_DATA_DIR'])
                 if self.child_failure:
                     raise subprocess.CalledProcessError(11, args)
@@ -284,11 +317,14 @@ def model(tmp_path, monkeypatch, request):
                     # IO-leaf response for a successful ACTUAL Other API child.
                     # Separate helper tests below bind actual YAML materializer.
                     self.events.append(('other', table, outroot))
-                    out = outroot / name / 'var' / f'{table}.parquet'
-                    out.parent.mkdir(parents=True, exist_ok=True)
-                    L.to_parquet(payload(values=(5.0, 5.0)), out, absolute_path=True,
-                                 cache_hash=self.country._table_cache_hash(table, self.country.waves),
-                                 cache_waves=self.country.waves)
+                    for relative in json.loads(args[5]):
+                        self.record(outroot / relative, payload(['a'], [5.0]))
+                    if json.loads(args[6]):
+                        out = outroot / name / 'var' / f'{table}.parquet'
+                        out.parent.mkdir(parents=True, exist_ok=True)
+                        L.to_parquet(payload(values=(5.0, 5.0)), out, absolute_path=True,
+                                     cache_hash=self.country._table_cache_hash(table, self.country.waves),
+                                     cache_waves=self.country.waves)
                 return subprocess.CompletedProcess(args, 0)
             script = Path(args[-1])
             wave = None if script.parent == root / '_' else script.parent.parent.name
@@ -300,6 +336,10 @@ def model(tmp_path, monkeypatch, request):
     try:
         yield m
     finally:
+        for ledger, previous in zip(ledgers, saved):
+            for key in keys:
+                ledger.pop(key, None)
+            ledger.update(previous)
         countries_root.cache_clear()
         data_root.cache_clear()
         L._resolve_data_path.cache_clear()
@@ -878,3 +918,225 @@ def test_computed_current_other_is_eligible_and_revalidated_on_warm(model):
         model.load()
     assert file_state(model.selected) == selected
     assert file_state(other) == before
+
+
+def test_literal_other_wave_is_prepared_without_a_surrogate_country_cache(model):
+    other = model.wave_path('a', OTHER)
+    model.seed(other, payload(['a'], [901.0]))
+    before = file_state(other)
+    (model.source / '_/facts.py').write_text("OTHER = '../a/_/support.parquet'\n")
+    model.requires_other_wave = True
+    model.assert_literal(model.load(), payload(values=(15.0, 25.0)))
+    assert file_state(other) == before
+    child = next(args for args, _ in model.calls if '-c' in args)
+    assert json.loads(child[5]) == [f'{model.country.name}/a/_/support.parquet']
+    assert json.loads(child[6]) is False
+    assert any(e[:2] == ('other', OTHER) for e in model.events)
+
+
+def test_declared_raw_dvc_parquet_is_not_rejected_as_a_hashless_other_cache(model, monkeypatch):
+    # Invented sidecar and private L1 only; the resolver leaf authenticates its
+    # available blob. This is neither a provider call nor a real survey fixture.
+    raw = model.source / 'a/_/support.parquet'
+    raw.with_name(raw.name + '.dvc').write_text('outs:\n- md5: ' + 'a' * 32 + '\n')
+    blob = model.data / 'dvc-cache/aa' / ('a' * 30)
+    model.seed(blob, payload(['a'], [5.0]))
+    monkeypatch.setattr(L, '_dvc_cache_path', lambda path: blob if Path(path) == raw else None)
+    other = model.wave_path('a', OTHER)
+    model.seed(other, payload(['a'], [901.0]))
+    before = {p: file_state(p) for p in [blob, other, raw.with_name(raw.name + '.dvc')]}
+    (model.source / '_/facts.py').write_text("RAW = '../a/_/support.parquet'\n")
+    model.requires_other_wave = True
+    model.assert_literal(model.load(), payload(values=(15.0, 25.0)))
+    assert not any(e[0] == 'other' for e in model.events)
+    assert {p: file_state(p) for p in before} == before
+    manifest = L.read_parquet_make_inputs(model.selected)
+    assert manifest['tables'] == {}
+    assert manifest['sources'][str(raw)] == L.source_fingerprint(raw)
+    assert L.read_parquet_cache_hash(blob) is None
+
+
+def test_validation_output_race_cannot_stamp_a_different_native_payload(model, monkeypatch):
+    model.seed(model.selected, payload(values=(901.0, 902.0)))
+    before = file_state(model.selected)
+    finalize = C.Country._finalize_result
+    def race(self, frame, *args, **kw):
+        root = next(e[2] for e in reversed(model.events) if e[:2] == ('country', TABLE))
+        model.record(root / self.name / 'var/facts.parquet', payload(values=(801.0, 802.0)))
+        return finalize(self, frame, *args, **kw)
+    monkeypatch.setattr(C.Country, '_finalize_result', race)
+    with pytest.raises(RuntimeError, match='output changed during validation'):
+        model.load()
+    assert file_state(model.selected) == before
+    assert L.read_parquet_cache_hash(model.selected) is None
+
+
+def test_private_wave_mutation_during_country_build_is_not_current_input_proof(model):
+    def tamper():
+        root = next(e[2] for e in reversed(model.events) if e[:2] == ('country', TABLE))
+        model.record(root / model.country.name / 'a/_/facts.parquet', payload(['a'], [901.0]))
+    model.during_country = tamper
+    with pytest.raises(RuntimeError, match='prepared wave input changed'):
+        model.load()
+    assert not model.selected.exists()
+    assert not model.wave_path('a').exists()
+
+
+def test_country_interruption_never_promotes_or_loses_live_prerequisites(model, monkeypatch):
+    model.seed(model.selected, payload(values=(901.0, 902.0)))
+    model.seed(model.wave_path('a'), payload(['a'], [901.0]))
+    before = {p: file_state(p) for p in [model.selected, model.wave_path('a')]}
+    native = model.native
+    def interrupt(table, wave, env):
+        if wave is None:
+            raise InterruptedError('invented interrupted producer')
+        return native(table, wave, env)
+    monkeypatch.setattr(model, 'native', interrupt)
+    with pytest.raises(InterruptedError, match='invented interrupted producer'):
+        model.load()
+    assert {p: file_state(p) for p in before} == before
+    assert not list(model.data.glob('.lsms_make_*'))
+
+
+def test_single_pass_ids_are_validated_on_a_copy_on_cold_and_warm(model):
+    # The raw h0 -> p -> q chain must move h0 ONCE. A finalized stored cache
+    # lacking a reliable flag would walk p again on the next read.
+    model.country._updated_ids_cache = {'a': {'h0': 'p', 'p': 'q'}}
+    expected = payload().rename(index={'h0': 'p'}, level='i')
+    model.assert_literal(model.load(), expected)
+    stored = L.get_dataframe(model.selected)
+    pd.testing.assert_frame_equal(stored, payload(), check_exact=True)
+    assert stored.attrs == RAW_ATTRS
+    model.assert_literal(model.load(), expected)
+    assert L.get_dataframe(model.selected).attrs == RAW_ATTRS
+
+
+def test_cold_and_warm_replay_scope_and_report_ledgers_are_per_load(model, monkeypatch):
+    # A wave subprocess's report must survive a native compiler that does not
+    # relay footers. The a request must not warn/fail for b, cold OR warm.
+    grain = {'wave': 'b', 'site': 'reduce_to_agreed', 'levels': ['t', 'i'],
+             'rows': 2, 'groups': 1, 'dropped': 1, 'destroyed': 1, 'conflicting_groups': 1}
+    date = {'wave': 'b', 'column': 'when', 'n': 1, 'unparsed': 1,
+            'calendar': 'gregorian', 'kind': 'date'}
+    model.wave_reports['b'] = {'grain_audit': [grain], 'datetime_audit': [date]}
+    monkeypatch.setenv('LSMS_GRAIN_STRICT', '1')
+    monkeypatch.setenv('LSMS_DATE_STRICT', '1')
+    model.assert_literal(model.load(['a']), payload(['a'], [10.0]))
+    assert C.grain_reports(model.country.name, TABLE) == []
+    assert C._DATETIME_LEDGER.get((model.country.name, TABLE), []) == []
+    assert L.read_parquet_grain_audit(model.selected) == [grain]
+    assert L.read_parquet_datetime_audit(model.selected) == [date]
+    with pytest.raises(C.GrainCollapseError):
+        model.load(['b'])
+    monkeypatch.delenv('LSMS_GRAIN_STRICT')
+    with pytest.raises(C.DatetimeParseError):
+        model.load(['b'])
+    model.assert_literal(model.load(['a']), payload(['a'], [10.0]))
+    assert C.grain_reports(model.country.name, TABLE) == []
+    assert C._DATETIME_LEDGER.get((model.country.name, TABLE), []) == []
+
+
+def test_wave_drop_evidence_survives_and_uses_existing_degraded_healing_policy(model, monkeypatch):
+    drop = {'wave': 'a', 'sub': 'extra', 'kind': 'unavailable', 'error': 'unavailable',
+            'file': 'invented-extra.csv', 'missing_required': [], 'missing_optional': ['extra']}
+    model.wave_reports['a'] = {'build_drops': [drop]}
+    probes = []
+    monkeypatch.setattr(C, '_probe_source', lambda path: probes.append(path) or False)
+    with pytest.warns(C.DegradedCacheWarning):
+        model.assert_literal(model.load())
+    assert L.read_parquet_build_drops(model.selected) == [drop]
+    before, calls = file_state(model.selected), len(model.calls)
+    with pytest.warns(C.DegradedCacheWarning):
+        model.assert_literal(model.load())
+    assert len(model.calls) == calls
+    assert file_state(model.selected) == before
+    assert not probes, 'just-written degraded cache keeps the existing one-attempt policy'
+    C._DEGRADED_ATTEMPTED.discard((model.country.name, TABLE))
+    monkeypatch.setattr(C, '_probe_source', lambda path: probes.append(path) or True)
+    with pytest.warns(C.DegradedCacheWarning):
+        model.assert_literal(model.load())
+    assert len(model.calls) > calls
+    assert probes == ['invented-extra.csv']
+
+
+def test_literal_other_native_selected_script_yields_exact_15_25_and_preserves_live_other(model, monkeypatch):
+    """UNRUN native discriminator required by ROOT's availability ruling.
+
+    Actual Other API, native wave scripts and native country script run in the
+    private transaction. The country transform turns wave values 1,2 into 5;
+    concatenation alone would yield 11,21 at the selected facts oracle.
+    """
+    name = model.country.name
+    for table in [TABLE, OTHER]:
+        for w, value, household in [('a', 1.0, 'h0'), ('b', 2.0, 'h1')]:
+            (model.source / w / '_' / f'{table}.py').write_text(
+                'import os\nfrom pathlib import Path\nimport pandas as pd\n'
+                'from lsms_library.local_tools import to_parquet\n'
+                f'f=pd.DataFrame({{"t":["{w}"],"i":["{household}"],'
+                f'"x":pd.array([{value}],dtype="Float64")}}).set_index(["t","i"])\n'
+                f'f.attrs={RAW_ATTRS!r}\n'
+                f'p=Path(os.environ["LSMS_DATA_DIR"])/"{name}"/"{w}"/"_"/"{table}.parquet"\n'
+                'p.parent.mkdir(parents=True,exist_ok=True)\n'
+                'to_parquet(f,p,absolute_path=True)\n')
+    (model.source / '_/support.py').write_text(
+        'import os\nfrom pathlib import Path\nimport pandas as pd\n'
+        'from lsms_library.local_tools import get_dataframe,to_parquet\n'
+        f'r=Path(os.environ["LSMS_DATA_DIR"])/"{name}"\n'
+        'a=get_dataframe(r/"a/_/support.parquet")\n'
+        'b=get_dataframe(r/"b/_/support.parquet")\n'
+        'f=a.copy(deep=True)\nf["x"]=a["x"].iloc[0]+b["x"].iloc[0]+2.0\n'
+        'f.attrs={"selected_other_builder":True}\n'
+        '(r/"var").mkdir(parents=True,exist_ok=True)\n'
+        'to_parquet(f,r/"var/support.parquet",absolute_path=True)\n')
+    (model.source / '_/facts.py').write_text(
+        'import os\nfrom pathlib import Path\nimport pandas as pd\n'
+        'from lsms_library.local_tools import get_dataframe,to_parquet\n'
+        f'r=Path(os.environ["LSMS_DATA_DIR"])/"{name}"\n'
+        'support=get_dataframe("../var/support.parquet")\n'
+        'assert support.attrs["selected_other_builder"] is True\n'
+        'f=pd.concat([get_dataframe(r/"a/_/facts.parquet"),'
+        'get_dataframe(r/"b/_/facts.parquet")])\n'
+        'f["x"]=f["x"]*10.0+support["x"].iloc[0]\n'
+        f'f.attrs={RAW_ATTRS!r}\n'
+        '(r/"var").mkdir(parents=True,exist_ok=True)\n'
+        'to_parquet(f,r/"var/facts.parquet",absolute_path=True)\n')
+    rules = ('LSMS_DATA_ROOT ?= $(LSMS_DATA_DIR)\n'
+             f'VAR_DIR ?= $(LSMS_DATA_ROOT)/{name}/var\n')
+    for table in [TABLE, OTHER]:
+        rules += (f'$(LSMS_DATA_ROOT)/{name}/%/_/{table}.parquet: ../%/_/{table}.py\n'
+                  '\t$(PYTHON) $<\n'
+                  f'$(VAR_DIR)/{table}.parquet: {table}.py '
+                  f'$(LSMS_DATA_ROOT)/{name}/a/_/{table}.parquet '
+                  f'$(LSMS_DATA_ROOT)/{name}/b/_/{table}.parquet\n'
+                  f'\t$(PYTHON) {table}.py\n')
+    rules += '$(VAR_DIR)/facts.parquet: $(VAR_DIR)/support.parquet\n'
+    (model.source / '_/Makefile').write_text(rules)
+    other = model.data / name / 'var/support.parquet'
+    model.seed(other, payload(values=(901.0, 902.0)))
+    before = file_state(other)
+    monkeypatch.setattr(C.subprocess, 'run', REAL_RUN)
+    model.assert_literal(model.load(), payload(values=(15.0, 25.0)))
+    assert file_state(other) == before
+    assert L.read_parquet_cache_hash(other) is None
+    before_selected = file_state(model.selected)
+    model.assert_literal(model.load(), payload(values=(15.0, 25.0)))
+    assert file_state(model.selected) == before_selected
+    assert file_state(other) == before
+
+
+def test_grouped_wave_companion_cannot_satisfy_a_no_output_country_producer(model, monkeypatch):
+    model.seed(model.selected, payload(values=(901.0, 902.0)))
+    before = file_state(model.selected)
+    native = model.native
+    def wave_companion(table, wave, env):
+        result = native(table, wave, env)
+        if wave == 'b':
+            model.record(Path(env['LSMS_DATA_DIR']) / model.country.name / 'var/facts.parquet',
+                         payload(values=(801.0, 802.0)))
+        return result
+    monkeypatch.setattr(model, 'native', wave_companion)
+    model.country_mode = 'no-output'
+    with pytest.raises(RuntimeError, match='produced no safe output'):
+        model.load()
+    assert file_state(model.selected) == before
+    assert L.read_parquet_cache_hash(model.selected) is None

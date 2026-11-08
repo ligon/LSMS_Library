@@ -3311,7 +3311,10 @@ def read_parquet_make_inputs(path: str | Path, *, _with_presence=False):
 
 def stamp_parquet_hash(path: str | Path, expected_hash: str | None, *,
                        cache_waves: list[str] | None = None,
-                       make_inputs: dict | None = None) -> bool:
+                       make_inputs: dict | None = None,
+                       grain_audit: list[dict] | None = None,
+                       datetime_audit: list[dict] | None = None,
+                       build_drops: list[dict] | None = None) -> bool:
     """Best-effort: embed *expected_hash* into an existing parquet's
     schema metadata via an atomic rewrite.
 
@@ -3325,6 +3328,9 @@ def stamp_parquet_hash(path: str | Path, expected_hash: str | None, *,
     Arrow/pandas metadata and all audit stamps are retained verbatim.
     ``make_inputs`` similarly records verified declared prerequisite/source
     fingerprints, because a selected-table hash need not fold Other tables.
+    Optional audit records carry the verified producer's input evidence when
+    the native country builder did not relay its wave subprocesses' footers.
+    No DataFrame is serialized here; raw payload, attrs and other metadata stay.
     """
     if expected_hash is None:
         return False
@@ -3344,15 +3350,20 @@ def stamp_parquet_hash(path: str | Path, expected_hash: str | None, *,
                     if cache_waves is not None else None)
         inputs = (json.dumps(make_inputs, sort_keys=True).encode()
                   if make_inputs is not None else None)
+        audits = {key: json.dumps(value).encode() for key, value in (
+            (_GRAIN_AUDIT_KEY, grain_audit), (_DATETIME_AUDIT_KEY, datetime_audit),
+            (_BUILD_DROPS_KEY, build_drops)) if value is not None}
         if (md.get(_CACHE_HASH_KEY) == expected_hash.encode()
                 and (coverage is None or md.get(_CACHE_WAVES_KEY) == coverage)
-                and (inputs is None or md.get(b'lsms_make_inputs') == inputs)):
+                and (inputs is None or md.get(b'lsms_make_inputs') == inputs)
+                and all(md.get(key) == value for key, value in audits.items())):
             return True
         md[_CACHE_HASH_KEY] = expected_hash.encode()
         if coverage is not None:
             md[_CACHE_WAVES_KEY] = coverage
         if inputs is not None:
             md[b'lsms_make_inputs'] = inputs
+        md.update(audits)
         table = table.replace_schema_metadata(md)
         _atomic_write_table(table, path)
         return True

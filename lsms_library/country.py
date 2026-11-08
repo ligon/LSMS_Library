@@ -5452,7 +5452,8 @@ class Country:
                            build_drops=_wave_build_drops(self.name, method_name, w))
 
     @build_transform()  # child dispatch is explicit, so fingerprint its policy too
-    def _materialize_make_other(self, method_name: str):
+    def _materialize_make_other(self, method_name: str, wave_inputs=(), *,
+                                country_input=True):
         """Child-only dispatch to an Other table's existing authoritative API.
 
         Retain genuine materialize:make country builders and their transforms;
@@ -5464,7 +5465,15 @@ class Country:
         native = (isinstance(backend, str) and backend.lower() == 'make'
                   and self._has_country_builder(method_name))
         os.environ['LSMS_BUILD_BACKEND'] = 'make' if native else 'dvc'
-        return self._aggregate_wave_data(method_name=method_name)
+        if wave_inputs:
+            # A native country transaction promotes ONLY its country output;
+            # its temporary waves do not become this caller's wave inputs.
+            # Prepare explicitly referenced physical waves with the SAME
+            # runner instead of assuming a country build left companions.
+            self._aggregate_wave_data(method_name=method_name,
+                                      _make_wave_inputs_only=wave_inputs)
+        if country_input:
+            return self._aggregate_wave_data(method_name=method_name)
 
     def _make_other_references(self, method_name: str):
         """Literal managed prerequisites, using the existing source scanner.
@@ -5488,6 +5497,8 @@ class Country:
                 if not ref.lower().endswith('.parquet'):
                     continue
                 path = Path(os.path.normpath(script.parent / ref))
+                if path.with_name(path.name + '.dvc').is_file():
+                    continue  # declared raw/DVC provenance, not an Other cache
                 for base in (self.file_path, data_root(self.name)):
                     try:
                         relative = Path(self.name) / path.relative_to(base)
@@ -5549,7 +5560,7 @@ class Country:
                         is_managed |= Path(self.name) / path.relative_to(base) in managed
                     except ValueError:
                         pass
-                if not is_managed:
+                if not is_managed or path.with_name(path.name + '.dvc').is_file():
                     all_sources.add(path)
         for path in all_sources - covered_sources:
             sources[str(path)] = source_fingerprint(path)
@@ -5560,15 +5571,17 @@ class Country:
     def _make_build_root(self, method_name: str):
         """Private output transaction for a direct country Make builder.
 
-        Only current DECLARED inputs are copied. Selected country output is
-        absent; stale/hashless wave inputs are absent. Thus neither Make's
+        Only current DECLARED managed inputs or authenticated raw/DVC inputs
+        are copied. Selected country output is absent; unproven selected wave
+        caches are absent. Thus neither Make's
         mtime/no-rule success nor a no-output producer can borrow old bytes.
         Other VAR/wave files and grouped-rule companions remain available in
         the live root and are never overwritten by this transaction (§4).
 
         This is bounded by the existing declared-input hash: arbitrary dynamic
-        or absolute outside-root dependencies are not certified. A stale
-        rule-less prerequisite must fail rather than acquire a false stamp.
+        or arbitrary outside-root dependencies are not certified. An unknown
+        computed prerequisite is an availability boundary, not proved stale;
+        ordinary discoverable Other producers are tried privately.
         """
         from .local_tools import _dvc_cache_path
 
@@ -5590,7 +5603,8 @@ class Country:
                                    f'declared Make wave input {logical}')
 
         def signature(path):
-            if path.is_symlink():
+            if (path.is_symlink()
+                    or not path.resolve().is_relative_to(live.resolve())):
                 raise RuntimeError(f'{self.name}/{method_name}: unsafe linked Make input {path}')
             if not path.exists():
                 return None
@@ -5624,11 +5638,13 @@ class Country:
         with tempfile.TemporaryDirectory(prefix='.lsms_make_', dir=live) as tmp:
             root = Path(tmp)
 
-            def copy_input(path):
+            def copy_input(path, relative=None):
                 before = signature(path)
-                destination = root / path.relative_to(live)
+                destination = root / (path.relative_to(live) if relative is None else relative)
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(path, destination)
+                # The destination is inside the private root, itself under
+                # live, but never a link to a live prerequisite.
                 if signature(destination) != before or signature(path) != before:
                     raise RuntimeError(f'{self.name}/{method_name}: Make input '
                                        f'changed while copying: {path}')
@@ -5679,7 +5695,13 @@ class Country:
                                     for w in logical)):
                         if yaml_path:
                             if table in contributing:
-                                if self[logical[0]]._read_l2_wave_cache(table, path) is None:
+                                # Input preparation is not an API serve. Grade
+                                # drops with the existing gate policy here;
+                                # replay only the selected served waves later.
+                                verdict, _ = _degraded_cache_verdict(
+                                    read_parquet_build_drops(path),
+                                    (self.name, table, logical[0]))
+                                if _no_cache() or verdict == 'rebuild':
                                     continue
                             elif read_parquet_build_drops(path):
                                 continue
@@ -5710,6 +5732,22 @@ class Country:
                         raise RuntimeError(f'{self.name}/{method_name}: L1 lookup '
                                            f'is outside the active data root: {blob}')
                     copy_input(blob)
+                    # A declared raw parquet may have the same spelling as a
+                    # managed path. Its sidecar, not a harmonized-cache hash,
+                    # establishes provenance. Supply the authenticated blob at
+                    # the private redirected path without stamping it as L2.
+                    if ref.suffix.lower() == '.parquet':
+                        try:
+                            relative = Path(self.name) / ref.relative_to(self.file_path)
+                        except ValueError:
+                            pass
+                        else:
+                            copy_input(blob, relative)
+                elif ref.is_relative_to(live) and ref.is_file():
+                    # Explicit raw sources already in data_root are eligible
+                    # too. Unknown computed/unregistered cache paths are NOT
+                    # discovered by this loop or silently copied wholesale.
+                    copy_input(ref)
             for table in set(others.values()):
                 table_hash = self._table_cache_hash(table, self.waves)
                 if table_hash is None:
@@ -5723,7 +5761,8 @@ class Country:
     @build_transform()  # orchestrator: nested safe_concat_dataframe_dict / load_from_waves bake cross-wave
                         # alignment+concat into the parquet, not re-applied on read (#522, round-6)
     def _aggregate_wave_data(self, waves: list[str] | None = None, method_name: str | None = None,
-                             currency: str | None = None) -> pd.DataFrame | dict[str, Any]:
+                             currency: str | None = None,
+                             _make_wave_inputs_only=None) -> pd.DataFrame | dict[str, Any]:
         """Aggregates data across multiple waves using a single dataset method.
 
         If the required `.parquet` file is missing, it requests `Makefile` to
@@ -5731,6 +5770,9 @@ class Country:
 
         ``currency`` is forwarded to :meth:`_finalize_result` to optionally
         attach the ISO 4217 currency label (monetary tables only).
+        ``_make_wave_inputs_only`` is internal child plumbing for explicit
+        physical Other-wave prerequisites; it prepares those paths and returns
+        without a country build, finalization or live cache promotion.
         """
         if method_name not in self.data_scheme+['other_features', 'food_prices_quantities_and_expenditures', 'updated_ids']:
             warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
@@ -5947,7 +5989,11 @@ class Country:
                 if build_root is not None:
                     env.update(LSMS_DATA_DIR=str(build_root),
                                LSMS_DATA_ROOT=str(build_root),
-                               VAR_DIR=str(managed_country / 'var'))
+                               VAR_DIR=str(managed_country / 'var'),
+                               LSMS_COUNTRIES_ROOT=str(self.file_path.parent),
+                               LSMS_MAKE_BUILD_STACK=json.dumps(
+                                   json.loads(env.get('LSMS_MAKE_BUILD_STACK', '[]'))
+                                   + [[self.name, method_name]]))
                 return env
 
             def try_make(make_dir: Path) -> tuple[Path, bool] | None:
@@ -6083,6 +6129,51 @@ class Country:
             _replay_wave_stamp(output_path, self.name, method_name, wave)
             df_local = map_index(df_local)
             return result(df_local, output_produced)
+
+        def prepare_make_waves(root, selected_paths=None):
+            # One authoritative preparation route for selected and Other wave
+            # inputs (ledger §2/§4). Physical dedup retains every logical label.
+            inputs = self._make_wave_inputs(method_name)
+            if selected_paths is not None and not set(selected_paths) <= {str(p) for p in inputs}:
+                raise RuntimeError(f'{self.name}/{method_name}: unknown declared Make wave input')
+            prepared = []
+            for relative, (logical, yaml_path) in inputs.items():
+                if selected_paths is not None and str(relative) not in selected_paths:
+                    continue
+                path = root / relative
+                if not path.is_file():
+                    if yaml_path:
+                        env = _script_subprocess_env(self.file_path.parent)
+                        env.update(LSMS_DATA_DIR=str(root), LSMS_DATA_ROOT=str(root),
+                                   VAR_DIR=str(root / self.name / 'var'),
+                                   LSMS_COUNTRIES_ROOT=str(self.file_path.parent),
+                                   LSMS_MAKE_BUILD_STACK=json.dumps(
+                                       json.loads(env.get('LSMS_MAKE_BUILD_STACK', '[]'))
+                                       + [[self.name, method_name]]))
+                        code = (
+                            'import json, sys; from lsms_library.country import Country; '
+                            'Country(sys.argv[1], preload_panel_ids=False)'
+                            '._materialize_make_yaml(sys.argv[2], json.loads(sys.argv[3]))')
+                        subprocess.run([sys.executable, '-c', code, self.name,
+                                        method_name, json.dumps(logical)],
+                                       cwd=self.file_path, env=env, check=True)
+                    else:
+                        run_make_target(method_name, wave=logical[0],
+                                        strict_country_make=True, wave_only=True,
+                                        build_root=root, _path_only=True)
+                if (not path.is_file() or path.is_symlink()
+                        or not path.resolve().is_relative_to(root.resolve())):
+                    raise RuntimeError(f'{self.name}/{method_name}: declared '
+                                       f'Make wave {logical} produced no safe output at {path}')
+                get_dataframe(str(path))  # a touch is not a parquet; a typed empty is
+                prepared.append(path)
+            return prepared
+
+        if _make_wave_inputs_only is not None:
+            # Internal child-only entry: never used by default/JSON/legacy
+            # callers, and never finalizes or promotes a country table.
+            prepare_make_waves(data_root(), _make_wave_inputs_only)
+            return None
 
         def load_from_waves(waves, *, evict_country_cache=False, country_builder=True,
                             _with_coverage=False):
@@ -6749,6 +6840,14 @@ class Country:
             # GH1288 repair ledger §4: valid reuse or an isolated productive
             # build, never exit0/existence/mtime as evidence of current inputs.
             cache = data_root(self.name) / 'var' / f'{method_name}.parquet'
+            # As at the existing country gate, reports describe THIS load,
+            # not a previous load in this process. No other table is cleared.
+            _GRAIN_LEDGER.pop((self.name, method_name), None)
+            _BUILD_DROP_LEDGER.pop((self.name, method_name), None)
+            _DATETIME_LEDGER.pop((self.name, method_name), None)
+            # A cheap invocation-local race check, NOT freshness evidence:
+            # reuse below still requires current declared hashes + coverage.
+            cache_before = output_identity(cache)
             expected = self._table_cache_hash(method_name, self.waves)
             recorded_inputs, record_present = read_parquet_make_inputs(cache, _with_presence=True)
             extra = recorded_inputs['tables'] if recorded_inputs is not None else ()
@@ -6756,17 +6855,18 @@ class Country:
             known_record = set(extra) <= set(registry) - JSON_CACHE_METHODS
             declared_inputs = self._make_declared_inputs(
                 method_name, _extra_tables=extra if known_record else ())
-            if (expected is not None and cache_freshness(cache, expected) == 'fresh'
-                    and known_record
-                    and (recorded_inputs == declared_inputs
-                         or (not record_present
-                             and declared_inputs == {'tables': {}, 'sources': {}}))):
-                reused, _, _ = self._read_l2_country_cache(method_name, cache, waves)
+            proof_ok = (known_record and (recorded_inputs == declared_inputs
+                        or (not record_present
+                            and declared_inputs == {'tables': {}, 'sources': {}})))
+            miss_reason = 'STALE: declared Make input evidence is missing or changed'
+            if expected is not None and (proof_ok or cache_freshness(cache, expected) != 'fresh'):
+                reused, _, miss_reason = self._read_l2_country_cache(method_name, cache, waves)
                 if reused is not None:
                     if (self._table_cache_hash(method_name, self.waves) != expected
-                            or self._make_declared_inputs(method_name, _extra_tables=extra) != declared_inputs):
+                            or self._make_declared_inputs(method_name, _extra_tables=extra) != declared_inputs
+                            or output_identity(cache) != cache_before):
                         raise RuntimeError(f'{self.name}/{method_name}: inputs changed during Make reuse')
-                    return finish_frame(reused)
+                    return finish_frame(reused.copy(deep=True))
 
             if expected is None:
                 raise RuntimeError(f'{self.name}/{method_name}: cannot establish '
@@ -6776,6 +6876,7 @@ class Country:
             key = [self.name, method_name]
             if key in stack:
                 raise RuntimeError(f'{self.name}/{method_name}: cyclic managed Make prerequisites')
+            self._report_rebuild(method_name, miss_reason, list(self.waves), cache)
             # Keep the runner's existing best-effort acquisition/cache warming
             # in the normal data root, before private copies are made. Otherwise
             # newly fetched L1 blobs would live only in a disposable transaction.
@@ -6792,59 +6893,44 @@ class Country:
                 # registered dependencies, try its actual builder/API privately
                 # rather than copying old bytes or declaring it unavailable.
                 for table in dict.fromkeys(others.values()):
-                    needed = [root / p for p, owner in others.items() if owner == table]
+                    relative_needed = [p for p, owner in others.items() if owner == table]
+                    needed = [root / p for p in relative_needed]
+                    if any(p.is_symlink() or not p.resolve().is_relative_to(root.resolve())
+                           for p in needed):
+                        raise RuntimeError(f'{self.name}/{method_name}: unsafe Other Make prerequisite {table}')
                     if all(p.is_file() for p in needed):
                         continue
+                    country_input = Path(self.name) / 'var' / f'{table}.parquet' in relative_needed
+                    wave_inputs = [str(p) for p in relative_needed if p.parent.name == '_']
                     env = _script_subprocess_env(self.file_path.parent)
                     env.update(LSMS_DATA_DIR=str(root), LSMS_DATA_ROOT=str(root),
                                VAR_DIR=str(root / self.name / 'var'),
                                LSMS_COUNTRIES_ROOT=str(self.file_path.parent),
                                LSMS_MAKE_BUILD_STACK=json.dumps(stack + [key]))
                     code = (
-                        'import sys; from lsms_library.country import Country; '
+                        'import json, sys; from lsms_library.country import Country; '
                         'Country(sys.argv[1], preload_panel_ids=False)'
-                        '._materialize_make_other(sys.argv[2])')
-                    subprocess.run([sys.executable, '-c', code, self.name, table],
+                        '._materialize_make_other(sys.argv[2], json.loads(sys.argv[3]), '
+                        'country_input=json.loads(sys.argv[4]))')
+                    subprocess.run([sys.executable, '-c', code, self.name, table,
+                                    json.dumps(wave_inputs), json.dumps(country_input)],
                                    cwd=self.file_path, env=env, check=True)
-                    # Actual producer coverage is required even when the
-                    # requested prerequisite is one physical wave output.
+                    # A wave-only prerequisite needs its physical producer,
+                    # not an unrelated all-country cache as a surrogate.
                     built = root / self.name / 'var' / f'{table}.parquet'
                     table_hash = self._table_cache_hash(table, self.waves)
                     coverage = read_parquet_cache_waves(built)
-                    if (not all(p.is_file() for p in needed)
-                            or table_hash is None
-                            or cache_freshness(built, table_hash) != 'fresh'
-                            or coverage is None
-                            or not set(map(str, self.waves)) <= set(coverage)):
+                    country_verified = (not country_input or (
+                        cache_freshness(built, table_hash) == 'fresh'
+                        and coverage is not None
+                        and set(map(str, self.waves)) <= set(coverage)))
+                    if (not all(p.is_file() and not p.is_symlink()
+                                and p.resolve().is_relative_to(root.resolve()) for p in needed)
+                            or table_hash is None or not country_verified):
                         raise RuntimeError(f'{self.name}/{method_name}: Other '
                                            f'prerequisite {table} did not establish current coverage')
-                for relative, (logical, yaml_path) in self._make_wave_inputs(method_name).items():
-                    path = root / relative
-                    if not path.is_file():
-                        if yaml_path:
-                            env = _script_subprocess_env(self.file_path.parent)
-                            env.update(LSMS_DATA_DIR=str(root), LSMS_DATA_ROOT=str(root),
-                                       VAR_DIR=str(root / self.name / 'var'),
-                                       LSMS_COUNTRIES_ROOT=str(self.file_path.parent))
-                            # The child owns its paths/cache globals; the parent
-                            # never mutates process-wide roots or environment.
-                            code = (
-                                'import json, sys; from lsms_library.country import Country; '
-                                'Country(sys.argv[1], preload_panel_ids=False)'
-                                '._materialize_make_yaml(sys.argv[2], json.loads(sys.argv[3]))')
-                            subprocess.run([sys.executable, '-c', code, self.name,
-                                            method_name, json.dumps(logical)],
-                                           cwd=self.file_path, env=env, check=True)
-                        else:
-                            run_make_target(method_name, wave=logical[0],
-                                            strict_country_make=True, wave_only=True,
-                                            build_root=root, _path_only=True)
-                    if (not path.is_file() or path.is_symlink()
-                            or not path.resolve().is_relative_to(root.resolve())):
-                        raise RuntimeError(f'{self.name}/{method_name}: declared '
-                                           f'Make wave {logical} produced no safe output at {path}')
-                    # A touch is not a parquet; a zero-row parquet is valid.
-                    get_dataframe(str(path))
+                prepared = prepare_make_waves(root)
+                prepared_hashes = {p: cached_file_hash(p) for p in prepared}
 
                 verify()
                 target = root / self.name / 'var' / f'{method_name}.parquet'
@@ -6861,20 +6947,60 @@ class Country:
                     raise RuntimeError(f'{self.name}/{method_name}: country Make '
                                        'produced no safe output; refusing stale candidates')
                 verify()
-                frame = get_dataframe(str(output))
-                _replay_wave_stamp(output, self.name, method_name, None)
-                frame = map_index(frame)
-                finalized = finish_frame(self._restrict_to_waves(frame.copy(deep=True), waves))
-                verify()
-                # Verified producer coverage, never observed t values. The
-                # sanctioned metadata rewrite retains typed payload and attrs.
-                if not stamp_parquet_hash(output, expected, cache_waves=list(self.waves),
-                                          make_inputs=declared_inputs):
-                    raise RuntimeError(f'{self.name}/{method_name}: cannot stamp '
-                                       'verified Make output; refusing promotion')
-                verify()
-                cache.parent.mkdir(parents=True, exist_ok=True)
-                os.replace(output, cache)
+                for path, before in prepared_hashes.items():
+                    if cached_file_hash(path) != before:
+                        raise RuntimeError(f'{self.name}/{method_name}: prepared wave input '
+                                           f'changed during country Make build: {path}')
+
+                # Freeze the producer's bytes before validation. No child knows
+                # this fresh parent-owned directory; the footer rewrite and
+                # promotion operate on the SAME isolated pre-finalize snapshot.
+                # A later producer/sibling write cannot substitute other bytes
+                # between the DataFrame read and the freshness stamp.
+                with tempfile.TemporaryDirectory(prefix='.verified_', dir=root) as verified_dir:
+                    candidate = Path(verified_dir) / output.name
+                    output_before = cached_file_hash(output)
+                    shutil.copy2(output, candidate)
+                    if (output_before is None or cached_file_hash(candidate) != output_before
+                            or cached_file_hash(output) != output_before):
+                        raise RuntimeError(f'{self.name}/{method_name}: Make output changed while snapshotting')
+                    frame = get_dataframe(str(candidate))
+                    # Collect surviving native AND prepared-wave evidence. A
+                    # native concatenator need not know how to stamp reports
+                    # filed in separate wave processes. Values/attrs stay raw.
+                    def reports(reader):
+                        merged = []
+                        for path in [*prepared, candidate]:
+                            for report in reader(path) or []:
+                                if report not in merged:
+                                    merged.append(report)
+                        return merged or None
+                    grain = reports(read_parquet_grain_audit)
+                    dates = reports(read_parquet_datetime_audit)
+                    drops = reports(read_parquet_build_drops)
+                    _replay_grain_audit(self._grain_reports_for_waves(grain, waves),
+                                        self.name, method_name)
+                    replay_datetime_audit(dates, self.name, method_name, waves=waves)
+                    _replay_build_drops(drops, self.name, method_name)
+                    _warn_degraded_serve(self.name, method_name, drops, candidate)
+                    frame = map_index(frame)
+                    finalized = finish_frame(self._restrict_to_waves(frame.copy(deep=True), waves))
+                    verify()
+                    if cached_file_hash(output) != output_before:
+                        raise RuntimeError(f'{self.name}/{method_name}: Make output changed during validation')
+                    # Explicit producer coverage includes known unsupported and
+                    # successfully empty logical waves, never observed t values.
+                    if not stamp_parquet_hash(candidate, expected, cache_waves=list(self.waves),
+                                              make_inputs=declared_inputs, grain_audit=grain,
+                                              datetime_audit=dates, build_drops=drops):
+                        raise RuntimeError(f'{self.name}/{method_name}: cannot stamp '
+                                           'verified Make output; refusing promotion')
+                    verify()
+                    if cached_file_hash(output) != output_before:
+                        raise RuntimeError(f'{self.name}/{method_name}: Make output changed before promotion')
+                    cache.parent.mkdir(parents=True, exist_ok=True)
+                    os.replace(candidate, cache)
+                    _mark_degraded_written((self.name, method_name), drops)
                 return finalized
 
         if not use_dvc and method_name in JSON_CACHE_METHODS:
