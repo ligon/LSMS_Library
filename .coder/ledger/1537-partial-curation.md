@@ -80,43 +80,56 @@ Org parsers/all-quarter checks, real format_id and pure decoder-tail null contro
 No real noarg producer invocation or full-route runtime parity may be claimed.
 No df_data_grabber exception was added. Required parser/unit proof remains unrun.
 
-The terminal remote d15 record preserves startup-v3: one qualified metadata
-process, then refusal before magic.compat's second spawn. Its task remains
-BLOCKED/0tests; no remote restart, protected native-state read or retrospective
-success claim. ROOT subsequently authorized a NEW LOCAL d15 code continuation:
-fresh isolated MAIN-mounted checkout/private empty config/data/L1, false creds,
-unshare, thread1. One v4 preflight additionally binds compat.py SHA3ad490d8,
-permits MAX TWO exact known ldconfig-p processes with exactly two magic soname/
-dlopen lookups, origin-bound installed init then compat, same three trusted read
-roots and original strict guard exact before project import. No generic fallback,
-cache/stub or post-arm exception. System magic database initialization occurs
-in C; Python audit is not a universal filesystem-I/O census. Freeze before ONE
-never-run original16+new5 selection; any new guard/auth/native failure stops.
-Pepper, whole1537, census and all actual-source/API gates remain held. This
-ledger-first local phase does not claim runtime proof has run.
+The remote d15 record remains BLOCKED/0tests and immutable. ROOT authorized a
+NEW LOCAL code-only continuation, no native-state resume. After preserved v4–v6
+startup/collection refusals, exact v7 binding/package-import correction produced
+FIRST actual execution:29PASS (24parameterized historical cases from16functions,
+plus5actual-candidate functions),0skip/fail/deselected,29.56s. Final runtime/test
+head cd8713b9b9b6cccdfe631a0b2ca6b6f6ae681283; only one package-qualified test
+import differs from d15 tests, all21 function/assertion ASTs identical.
 
-## Phase 3 — preserved remote verification (local v4 pending)
+Pepper, whole1537, independent review, hash census/fullCI and every actual-source/
+API/Make/warm stage remain ROOT-held. Actual noarg producer was not invoked;
+accepted proof is actual parsers/quarter decoders plus static chain/pure tail.
 
-- **OK (§§2–4, static):** exact product diff is only the two authorized rows,
-  each with blank Code and eight blank quarter cells; removing those bytes
-  reproduces the immutable baseline Org exactly. Core/country helper source is
-  unchanged. Full source-chain excerpts/hashes are private affected-route proof.
-- **OK (§4, static):** all sixteen original test-function ASTs are exact. Only
-  their historical curation fixture binds the immutable baseline asset. Five new
-  candidate functions read the actual committed Org and compare baseline, not
-  candidate against itself. Null-key controls preserve the strict reader ban.
-- **UNEXECUTED (§4):** no project import or pytest collection completed; zero
-  tests ran. Startup-v1 failed an asymmetric realpath assertion before lookup.
-  Startup-v2 refused the trusted `.venv` alias before lookup. ROOT personally
-  granted a narrower v3 read-containment correction; raw/write checks and the
-  original strict guard stayed exact. V3 then refused magic.compat's second
-  lookup. Each namespace preserves its original operator/freeze/log/receipt.
-- **OPEN (§§4–6):** real-parser/all-quarter/pure decoder-tail runtime proof and
-  Pepper/strict/price controls are unrun. The code-free two-row candidate is not
-  merge-ready. Metadata wrapper/operator preparation is unrun, requires a new
-  final-head freeze and exact ROOT preimport/census grant; no counts/deltas or
-  closed-baseline admission are claimed. Nigeria Org invalidation must be paid.
+## Phase 3 — local author verification complete; ROOT gates remain
 
-No production decoder/reducer/schema was reinvented. The partial curation does
-not settle #1144's Pepper boundary. All historical reports, source cohorts and
-the old335 import failure remain unchanged; no scientific/full-issue closure.
+- **OK (§§2–4):** exact product remains TWO label-only rows. Real committed Org
+  parsed by both existing readers; original rows exact after removing additions,
+  two missing Code cells and8blank quarters PER row. Existing numeric Code/label
+  spelling via actual format_id preserved despite parser numeric dtype promotion.
+- **OK (§§2–4):** all8actual quarter mappings/warnings/missing-code controls
+  equal immutable pre-curation Org. Actual noarg metadata/getter/producer remains
+  banned; source-chain/static proof plus real-parser/format_id and exact integer
+  decoder-tail controls prove blank keys skipped. No false full-route/API claim.
+- **OK (§4):** native/default j and values/units/fullpricegrain/missingness/attrs
+  preserved on invented frames. Collisions retain every row; Pepper passthrough,
+  warning/strict refusal and ContractB/malformed/index errors unchanged. All16
+  original test functions bind immutable baseline;5new ones read actual candidate.
+- **OK (§4):** ONE actual finite selection29PASS/0skip/fail/deselected,29.56s;
+  wrapper0/55.67s, original strict testphase events[]. Exact MAIN/cwd/import/root,
+  private empty nonsymlink L1/config/data, falsecreds, unshare/threadbuild1.
+- Qualified preflights occur BEFORE strict arm: two bound init/compat libmagic
+  lookups; installed urllib3's ONE pinned AF_INET6/SOCK_STREAM (::1,0) capability
+  probe, naturally HAS_IPV6False underunshare,0denials. No testphase network
+  allowance. ROOT-reviewed MPL_IGNORE_SYSTEM_FONTS/privateMPLCONFIGDIR/privateTMP
+  and log-file binding avoid dependency startup process/output operations; original
+  strict audit/profile bodies unchanged. Python audit is not universal C-library
+  filesystem proof; trusted magic system database initialization is documented.
+- All remotev1-v3 and localv4-v6 history retained: no green rewrite. Localv4
+  magic passed then strict fc-list refusal;v5 logging/devnull and caughtbind
+  refused before collection;v6 collection-only localized urllib3 _has_ipv6 and
+  exposed bare sibling import. ROOT authorized one package-qualified import
+  correction, preserving EVERY function/assertion AST. No testcase ever executed
+  before v7; v6collected24/0executed/1error is not a test pass.
+- No new production decoder/parser/reducer/schema, factor or bucket was
+  reinvented. No contradictions to preserved historical1144 record are silently
+  erased; later ROOT conditional ruling covers only two existing buckets.
+- **PENDING (§§4–6):** ROOT independent review, ordinary current composition,
+  metadata footprint/fullCI/configuredCI/publication. Org is country-wide build
+  input; footprint UNMEASURED, no exclusion change or zero-cost claim. No real
+  source/Country/Feature/API/noargproducer/Make/warm/PDF/native cohort replay.
+  Whole1537 remainsOPEN; no Fresh/Dry/ground/spice Pepper inference or new policy.
+
+Receipts: reports/1537-partial-curation-local-20261108/startup-v7 in burstisa-sm-
+20261103. Original remote/BLOCKED reports and all source evidence immutable.
