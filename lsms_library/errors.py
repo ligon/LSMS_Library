@@ -106,9 +106,10 @@ class UnregisteredCountryError(ValueError):
 class WaveWorkerError(Exception):
     """A wave's build failed in a parallel worker and its exception could not cross back.
 
-    ``_parallel_waves`` returns a worker's exception object when it survives a pickle
-    round trip.  A class in a by-path ``mapping.py`` or country module does not (GH #1524),
-    and a worker the OOM killer took has none to return.  This carries the original class
+    ``_parallel_waves`` carries pickled bytes and reconstructs the exception in the
+    parent relay.  A class in a by-path or child-only module may not load there
+    (GH #1524 / #1591), and a worker the OOM killer took has none to return.
+    This carries the original class
     name and the text instead; the worker's traceback is in the exception's notes.
 
     Subclasses ``Exception``, not ``RuntimeError``: it stands for a failure of unknown kind,
