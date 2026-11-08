@@ -92,9 +92,9 @@ class ValuationLadderWarning(UserWarning):
 
 
 class ShippedFactorWarning(UserWarning):
-    """A ``shipped_factors`` table did not join the way its author meant.
+    """A ``shipped_factors`` table has a join-scope or matching diagnostic.
 
-    Two situations, both of which used to be SILENT and both of which look
+    These situations used to be SILENT and look
     exactly like a working table from the counts alone:
 
     * the table matched **zero** rows -- almost always a vocabulary mismatch
@@ -106,6 +106,8 @@ class ShippedFactorWarning(UserWarning):
       The multi-row form of this already raised (the surviving keys become
       ambiguous); the single-row form did not, so the more careless loader
       got the weaker signal.  This makes both loud.
+    * a non-empty table has no country key and is offered to rows carrying
+      multiple countries, so its factors apply across those countries.
 
     Its own class so it can be filtered or promoted to an error
     (``warnings.simplefilter('error', ShippedFactorWarning)``) independently
@@ -4417,9 +4419,11 @@ def _shipped_factor_lookup(df, shipped_factors):
     not say which unit is not a factor: a ``j``-only table would hand a crop's
     single number to a sack, a basket and a tin alike.
 
-    A table with no ``country`` key applied to a pooled
+    A non-empty table with no ``country`` key applied to a pooled
     :class:`~lsms_library.feature.Feature` frame is applied to EVERY country's
-    rows (that is the dropped-key rule again, and it now warns).
+    rows, and warns about that scope. Only explicit row-country labels count;
+    no table country is inferred from scalar attrs. The warning concerns the
+    offer even where a higher-ranked reported factor wins.
 
     REFUSES an ambiguous table.  Two rows sharing a join key are two different
     answers to the same question; averaging them, or letting a
@@ -4538,6 +4542,17 @@ def _shipped_factor_lookup(df, shipped_factors):
             "national, and a one-condition table serves every condition.  "
             "Resolve the level onto crop_production first, or reduce the "
             "table to the coarser grain deliberately.",
+            ShippedFactorWarning, stacklevel=3)
+
+    countries = _level_or_column(df, 'country')
+    if (len(sf) and 'country' not in table_keys and countries is not None
+            and pd.Series(countries).nunique(dropna=True) > 1):
+        # Existing explicit identity precedence; no factor policy (ledger1603).
+        warnings.warn(
+            "shipped_factors has no 'country' key and crop_production carries "
+            "multiple country labels, so this explicit table is applied to "
+            f"the pooled countries using {list(keys)}. Include a 'country' "
+            "key if the table should be country-specific.",
             ShippedFactorWarning, stacklevel=3)
 
     row_cols = [_normalise_join_key(_level_or_column(df, k)) for k in keys]
