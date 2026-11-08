@@ -63,3 +63,6 @@ Authoritative GitHub development3b28d293f71b962c3d878c2886be9ee794407915. Filesy
 3. Use isolated implementation and independent review, private caches and source-backed checks.
 4. Publish and merge verified green work to development with expected-head pinning.
 5. Update the issue residual/closure and this registry; coordinate the deferred shared re-warm only after prerequisites land.
+
+* 2026-11-08 00:30 UTC gate update
+PR1605 merged asbcd77200f,1528closed; finalCIunit/Windows passed. 1535source-v3job41009395cold/warm/exportpasses253611rows/33cachefilesunchanged; fullCIrunning, residual1606 records2newdtypeauditWARNs(61pass7warn0fail), noallgreenclaim. 1174integration1e8source/hashjob41009999activeafter332focusedpass; original0ef fullCI11464pass/5646skip/4xfail.1480and1502ledgersrootread/authorized; scientificpoliciesheld. Seehandoffforterminalfailedattempts,rootsharedcacheincidentandexplicitqualifications.

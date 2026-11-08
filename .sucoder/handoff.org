@@ -1,4 +1,64 @@
 #+title: Handoff, LSMS-ISA sweep
+* Authoritative checkpoint, 2026-11-08 00:30 UTC
+Goal ACTIVE; this turn PROGRESS includes actual developmentmerge/1528closure,
+1535implementation+source/export/review evidence, separate1606auditresidual,
+and new Uganda/Nigeria work. Current GitHub development:
+bcd77200f4fd555a8dfc10656d3e7100ae03fd6f. Filesystemdevelopment111b staysstale.
+
+PR1605 MERGED final2c23bf6ad58a94663bf4d46d3dbd2dbd3a5d2d48 asbcd77200f;
+issue1528 CLOSED completed, exactbody/state readbackPASS. FinalGitHubunit+
+WindowsSUCCESS, source/DVC/docsSKIPPED, reviewthreads/reviews empty. Actualmerge
+treec0475e32b59aa157b4fd196174b5de5d5f4eee07 equalsfinalPRtree. Rootindependent
+every-nondoc-entry proof preserved; local/source/review/integration gates inprior
+checkpoint allclosed. RootshouldfinishPR/reportmergedstatuspackaging ifneeded.
+
+1535 d673f13bd107b8f6e542eec13830f4a9e2bfb880 STILLFROZEN, notGitHubpublished.
+source-v2 job41008543 FAILED1:0 afterall4Country/defaultFeature comparisons
+PASS andsuccessfulArrowwrite, atstrictstring-indexna_valuenormalizationassert.
+No warm/fullCI ranthere. Originalfail retainedinFAILED-ROUNDTRIP-QUALIFICATION.
+Separate source-v3 reusesSHA-authenticatedclosedparentoperands (no newbaseline
+sourcecalls), newcoldcandidateandwarm. Job41009395,controllerPTY84739 live.
+Candidate122.20s+warm12.77s BOTHexit0: Tz16978/Nigeria66090/GhanaSPS25109/
+Malawi145434,defaultFeature253611. WHOLEpublicframes/index/dtypes/typedattrs
+exactparent withONLYmonthcolsnullabletext. NewmonthfieldsArrowexact; nonmonth
+fields/index/attrs matchPARENTnonmonthArrowcontrol. ExistingArrowStringDtype
+na_value/recordsubclassJSONconversion remainsqualified, notclaimedtyped-bitexact.
+Freshwarm33parquetfilesbytes/epochsunchanged. FullisolatedofflineCI NOWrunning.
+B/reports/1535-crop-month-carriers-20261108/source-v3, privateoperands sibling
+private/1535-crop-months-d673-v3. Keepd673/operatorsfrozenuntilterminal.
+
+1535 standardclosed-source-frame audit136records: parent63pass/5warn/0fail,
+candidate61pass/7warn/0fail. ONLYchanges2dtypeWARNsMwi/Tz localnativeNumeric
+versuspubliccanonicalstr. FILEDseparateresidual1606(stage-awareinspection),
+reviewerconfirmsnotP2; AUDIT-WARN-ADDENDUM durable. DoNOTcallauditallgreen.
+Independent30controlsPASS, strictAPIaudit0, all450/1895/35/186hashesunchanged.
+Source/control/setupfailures andshared-cache incident remainexplicitbelow.
+No blanket 'no sharedcache writes' claim: GH798supportingtestearlierrefreshed
+Mali/Tzsharedcaches accidentally; usernotified,13recentfilemetadataobservations
+withoutbeforemanifest, noblindrollback, allsubsequenttestsexplicitprivate.
+
+1174 original0ef fulloffline11464pass/5646skip/4xfail1008.38s; job41006209
+COMPLETED0:0. Ordinarycurrent3b28integration1e8af2516869a861590cc0bc189840a87ba77337
+frozen, all4taskfilesexactreviewed0ef/all10upstreamfilesexact3b28. Relevant332
+checksPASS. Source/hash job41009999 active, authorPTY62589; finaldocs/GitHubCI
+pending. NewbcdBFA/Mali-onlyadvance cannotjustifynewnative/fullcampaign; after
+actorsclose proveincomingpaths/ordinaryintegration asneeded. Conditional2024
+15deletion-linesunverified/notimplementedhere, nowexplicit1275;48wholewaveheld.
+
+1480 finish_1590 ledger9907f626 surfaced/rootread/authorized. FullCURRENTUganda
+record5969lines; dynamic53entries/13tables/265fields. Implementreuseinspection+
+visiblepytestcoverageandexplicitprivate-rootread-onlyCOMPLETECLI/Make. No
+implicitbuild/baselinerefresh/sourcechange; completecoverage!=invariancepass.
+1502 finish_1452 Nigeria ledger3f5bae932 surfaced/rootread/authorized. Source
+inventory4uniquefiles/5sanctionedcalls; CSVsidecarsuseexistingmd5-dos2unix, not
+physicalMD5. W2PP417/PH453uniqueitem-unit; W3 table1029rows,4duplicated-keyrows,
+unit_othermatters,national+6zones,167assumption-notes. Unwiredlegacyloaderunsafe
+(swaprounds/uniformscaling/dropdimensions/keepfirst), doNOTreuseasauthority.
+PHofficialdictionaryg_cl0centilitre/1gram; livePPdictionary385/nsu_cd contradicts
+heldCSV417/s7bq2b, preservecontradiction; semantics/docs/fulljoins stillunderstudy.
+No productionfactor/default/geography/pooling rule selected.1518cropseparate.
+1509requiredusereligibilityanswerpending,48productionheld,Mali1594nomask.
+
 * Progress checkpoint, 2026-11-08 00:16 UTC
 Previous goal turn was PROGRESS (merged1600/1601, closed1475/1510/1517).
 This turn is also PROGRESS: new1535 implementation/negative proof/review/census,
