@@ -1286,6 +1286,28 @@ Columns:
         NA-bearing for the same reason `Unit_sold` is, and unlike the
         `condition` INDEX level, which must carry `unknown_condition`.
       spellings: *crop_condition_vocabulary
+    planting_month:
+      type: str
+      optional: true
+      note: |
+        Survey-specific month answer, carried as nullable text so countries
+        with numeric month codes and countries with year-month strings can
+        be stacked and saved together (GH #1535). Numeric codes retain their
+        textual form; existing strings are preserved verbatim. This does not
+        supply a year, parse a date, validate a month or equate calendars.
+        Native builders and pre-finalize parquets keep their own types.
+    harvest_month:
+      type: str
+      optional: true
+      note: |
+        Survey-specific harvest month answer, carried as nullable text for
+        cross-country assembly and Parquet export (GH #1535). Retain complete
+        multi-month answers (GhanaSPS) and year-month strings (Nigeria), and
+        stringify numeric scalars without selecting, rounding or parsing a
+        month. Missing stays missing. Text is a common carrier, not a common
+        calendar or event: a survey's harvest-start, harvest-end or season-end
+        proxy retains its documented meaning. Native builders and cached
+        pre-finalize values retain their original representations.
     condition_sold_native:
       type: str
       optional: true

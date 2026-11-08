@@ -2,20 +2,12 @@
 
 Three-tier test strategy
 ------------------------
-- **Fast tier** (default ``pytest``): uses both L1 (country-level) and
-  L2 (wave-level) parquet caches at ``~/.local/share/lsms_library/``.
-  Tests the API surface and ``_finalize_result()`` transformations
-  but does NOT exercise the wave-level build pipeline.  As a session-
-  start safety hook, Uganda's L1+L2+in-tree caches are purged each run
-  (Uganda is where extraction-layer iteration happens; staleness here
-  has bitten GH #196 / #197 / #161).  Cost: ~5-15 min per session for
-  Uganda's table rebuilds.
-- **Skip-purge sub-mode** (``pytest --no-purge``): same as the fast
-  tier but without the Uganda auto-purge.  Use during iterative
-  diagnosis loops where the failures under investigation are known
-  not to be Uganda-extraction-related (e.g. framework bugs, import
-  errors, test-expectation tweaks).  Re-run without ``--no-purge``
-  for the final pre-merge / pre-release verification.
+- **Fast tier** (default ``pytest``): reads valid configured caches and uses
+  the source credential gate for data-dependent tests. Uganda's former automatic
+  session purge was retired on 2026-09-22; the library checks content hashes.
+- **Compatibility option** (``pytest --no-purge``): accepted as a no-op.
+  Uganda invariance coverage is reported separately; skipped comparisons do not
+  certify a complete baseline check.
 - **Soft rebuild** (``pytest --rebuild`` or ``LSMS_NO_CACHE=1 pytest``):
   sets ``LSMS_NO_CACHE=1``.  The framework bypasses L1 reads and L2
   reads on the YAML path, but **script-path L2 parquets** (written by
@@ -39,8 +31,7 @@ purge of any tier runs, because such an invocation executes no tests and must
 therefore have no side effects.  This matters beyond tidiness: the purge target
 resolves through ``data_root()``, which is a *shared* scratch path, so asking
 "what tests exist?" used to evict parquets belonging to other sessions -- and
-under ``--rebuild-caches`` it took every country, not just Uganda.  The purge
-itself is unchanged and still fires on every real run.
+under ``--rebuild-caches`` it took every country, not just Uganda.  An explicit hard rebuild still purges; ordinary runs do not.
 """
 
 from __future__ import annotations
@@ -48,6 +39,64 @@ from __future__ import annotations
 import os
 import shutil
 import warnings
+import pytest
+
+
+_UGANDA_TEST_ID = "test_uganda_invariance.py::test_parquet_matches_baseline["
+
+
+def pytest_itemcollected(item):
+    """Remember actual collection before -k/-m deselection, without cache IO."""
+    if _UGANDA_TEST_ID in item.nodeid:
+        scope = item.config.__dict__.setdefault("_uganda_invariance_collected", set())
+        scope.add(item.nodeid)
+
+
+def pytest_deselected(items):
+    for item in items:
+        if _UGANDA_TEST_ID in item.nodeid:
+            scope = item.config.__dict__.setdefault("_uganda_invariance_deselected", set())
+            scope.add(item.nodeid)
+
+
+def pytest_sessionfinish(session, exitstatus):
+    # Xdist does not send deselected Items as TestReports. Its native worker
+    # output carries collection evidence even when no Uganda test executes.
+    if hasattr(session.config, "workeroutput"):
+        session.config.workeroutput["uganda_invariance_scope"] = {
+            name: sorted(getattr(session.config, "_uganda_invariance_" + name, ()))
+            for name in ("collected", "deselected")
+        }
+
+
+@pytest.hookimpl(optionalhook=True)
+def pytest_testnodedown(node, error):
+    scope = getattr(node, "workeroutput", {}).get("uganda_invariance_scope", {})
+    for name in ("collected", "deselected"):
+        # Every worker collects the same items; union rather than count them.
+        node.config.__dict__.setdefault("_uganda_invariance_" + name, set()).update(scope.get(name, ()))
+
+
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    """Report missing Uganda comparisons without reading/building any cache."""
+    # Standalone copies of this conftest need no repository helper, and normal
+    # unrelated selections should not acquire a report (ledger1480 §§2–4).
+    collected = getattr(config, "_uganda_invariance_collected", ())
+    if not collected and not any(_UGANDA_TEST_ID in
+               getattr(report, "nodeid", "")
+               for reports in terminalreporter.stats.values() for report in reports):
+        return
+    import json
+    from pathlib import Path
+    from tests.uganda_invariance_reporting import pytest_coverage, summary_lines
+
+    path = Path(__file__).parent / "tests/fixtures/uganda_baseline.json"
+    baseline = json.loads(path.read_text())
+    summary = pytest_coverage(terminalreporter, baseline, collected=collected,
+                              deselected=getattr(config, "_uganda_invariance_deselected", ()))
+    terminalreporter.section("Uganda baseline comparison coverage")
+    for line in summary_lines(summary):
+        terminalreporter.write_line(line)
 
 
 def _addoption_once(parser, *names, **kwargs):
