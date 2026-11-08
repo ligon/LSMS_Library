@@ -9,7 +9,7 @@ Apply the user's 2026-11-08 ruling that exact 99,999,999 is a missing-value sent
 ## §2 Existing machinery
 | Symbol | Path | Role / tests | Decision |
 |---|---|---|---|
-| food_acquired | countries/Mali/2014-15/_/mapping.py:84 | Existing source-stream reshape; tests/test_mali_food_acquired.py and food accounting controls located by rg | extend only purchased raw expenditure mask |
+| food_acquired | countries/Mali/2014-15/_/mapping.py:84 | Existing source-stream reshape; no direct existing wave mapper test found; tests/test_gh1513_mali_padded_food_labels.py covers other-wave labels | extend only purchased raw expenditure mask |
 | myvars/file | same wave data_info.yml:128 | Both EACIALI_p1/p2 s13q03c -> ExpenditurePurchased before mapping | reuse; no source/schema change |
 | _normalize_dataframe_index | country.py:9124 | Actual additive canonical aggregation; sum(min_count=1), rederived Price; tests/test_assets_additive.py and food duplicate controls | reuse actual pure normalizer in focused tests |
 | _mask_value_code / _is_quantity_sentinel | countries/Mali/_/mali.py:506 | Source-specific tree-value 999999 and separate tree-quantity rules | precedent only; NOT reuse code/field/value scope |
