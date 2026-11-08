@@ -3196,3 +3196,80 @@ With #1487 a lone request serves the all-waves column.  =KgFactorSource=, =surve
 *Corrects the #876 section above*: "no EHCVM wave ships a unit-conversion table" is wrong for 2021-22.  The #876 NA on a last purchase in another unit stands; a table that weighs a unit is not what that construction uses, and whether it should be is a separate question.
 
 *A trap in this file's codes.*  Both =annee= use 2021-22's product numbering (2018 rows carry codes above 138, which do not exist in the 2018-19 household file), and that numbering is not 2018-19's: 126 of the 138 product codes the two waves' household files share name different foods (118 is =Sel= in 2018-19, =Pâte d'arachide= in 2021-22).  2018-19 therefore joins the product by label; a test pins it (code 118 reads =Sel='s weight).  Its codes 8500, 9400, 10022, 10048, 10049, 10300 and 10400 match no household code, and 2018-19 reads four of them by label: 9400 (=Courgette=) and 10022 (=Courge/courgette=) through =Aubergine, Courge/Courgette= (1,144 rows), 10048 through =Piment= (4,464 rows) and 10049 through =Gingembre= (1,235 rows).
+
+
+* 2026-11-08 -- Sold kilograms: own-form conflict and unruled source cases (GH #1560, #1571)
+
+This is a documentation of the bounded investigation at
+=investigate/1560-sold-kilograms-20261108=, frozen
+=8283ad309120e34f2e9822c3a3eee7651de49f8f=. Independent scientific review and a
+ruling remain necessary before selecting an interpretation. No sold-kg carrier,
+missing-code rule, sale eligibility, state/price policy or default is selected.
+The earlier note, "Only the harvest is ruled", still applies. Its description
+of sold kg "in the same shape" is qualified by the own 2021 forms below; it is
+not a reason to assume a questionnaire stale.
+
+*Own sources, not another wave's codes.* The authenticated numeric files are:
+
+| wave | sold-kg field | source under the wave's Data/ | byte MD5 |
+|------+---------------+--------------------------------+----------|
+| 2011-12 | as02eq12c | NER_2011_ECVMA_v01_M_Stata8/ecvmaas2e_p2.dta | ea4fa33e3be22bc3fd64f960e59e1734 |
+| 2011-12 | as03eq11c | NER_2011_ECVMA_v01_M_Stata8/ecvmaas3e_p1.dta | 6f56e3005ec0f78c538ca328adb801dd |
+| 2014-15 | AS02EQ12C | NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2E2P2.dta | 2814e0cf3c9d245d0ced27bd57391826 |
+| 2021-22 | s16dq05c | s16d_me_ner2021.dta | 3ac98925eb5c253b9cb6b7c473c3cce5 |
+
+The own instruments under each wave's Documentation/ are:
+
+| wave | own PDF | PDF page / question | byte MD5 |
+|------+---------+---------------------+----------|
+| 2011-12 | ECVMA_Quest_AGR_P2_V10_eng.pdf | 12 / 2E12, parallel quantity, unit and kg for the parcel sale | 29230918513780268c8bace16c6fc1f1 |
+| 2011-12 | ECVMA_Quest_AGR_P1_V10_eng.pdf | 29 / 3E11, first-cycle sale; 3E12 value has no explicit window | 0c623fe015890207b98c669314219f70 |
+| 2014-15 | ecvma2_quest_ag_el_p2.pdf | 13 / 2E12, parallel quantity, UML and kg sold | fca944f35dfda9f1b3e4a1b50571d8c8 |
+| 2021-22 | ner_ehcvm2_qnr_men_excel_vague1.pdf | 83 / 16D05 | 465e2578b1706a76207e8687a25b6178 |
+| 2021-22 | ner_ehcvm2_qnr_men_excel_vague2.pdf | 83 / 16D05 | 40fdf4da6421061168807d17e269a146 |
+
+Both own 2021 vagues instruct "poids en kg d'UNE UML" and head the column as
+an equivalent for one UML. The released =s16dq05c= label instead says an
+estimated TOTAL. Its own kg-unit controls after the existing exact sale-repeat
+drop equal reported quantity on45/48 records and equal1 on0; this supports
+total-like stored values, but does not prove any CAPI/export multiplication.
+No resolving export/cleaning algorithm was located in the held declared-wave
+files or the inspected official variable/related-material metadata. This is a
+bounded search, not proof that none exists. Source/form disagreement remains
+open, and neither document is presumed obsolete.
+
+*Windows and codes remain separate decisions.* The own 3E form asks for the
+FIRST production cycle, while the Stata quantity label says an average per
+cycle. GH #1436 comment6648014838 says sold kg must be multiplied by
+=as03eq06=; the current sale-window derivation preserves recorded
+=Quantity_sold= and =Value_sold=, whose value window is unspecified. No cycle
+product is chosen here. Sold-kg zeros and nines need their own interpretation:
+after existing duplicate policy, rainy kg has10 exact9999, dry39 exact99999,
+and2014 eleven exact9999, some beside ordinary quantity/value answers. A
+harvest or native-quantity missing-code rule is not automatically a sold-kg rule.
+
+*All-source coverage includes contradictions.* Seven dry records have positive
+sold kg but no positive native sale quantity/value (8740 raw kg, all cycles1).
+Their own sold flag says Non on6/Oui on1, and6 weights equal own raw harvest kg.
+These are contradictory source answers, not seven established additional sales;
+all already have native harvest rows. Two rainy and seven2014 additional
+positive-kg/no-positive-sale cases are literal9999 beside current native
+quantity/value missing codes. One2014 code-like household-crop pair has no
+native row. A future carrier must account for these cases without silently
+restricting its source denominator, adding a row, or inventing quantity/zero.
+
+The existing exact duplicate-sale policy and single-served-line/Farm-level
+placement remain unchanged. =Condition_sold= describes a sale donor; =condition=
+describes a harvest recipient. A donor-state/recipient-state comparison is a
+separate policy question, including unknown states; no new pooling/fallback
+follows from improved raw-denominator coverage. Diagnostic price comparisons
+are raw-only sensitivities, with unresolved codes/windows/meaning, and carry no
+scientific price endorsement. =KgFactor_sold= remains kg per ONE unit: a total
+must not be inserted there or divided by quantity to invent a factor.
+
+Evidence: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1560-sold-kilograms-investigation-20261108/=
+(=REPORT.md=, =DECISION-PACKET.md=, =receipts/artifact-manifest.json=).
+The existing sanctioned captures/form projections were reused; no source/API,
+parquet or PDF replay was performed for this docs addition. The packet records
+all raw/deduplicated denominators, failed attempts and UNSENT questions. Its
+composed native-script replay is not a Default/Make/Feature/warm/full-CI oracle.
