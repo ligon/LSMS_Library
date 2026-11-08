@@ -7934,7 +7934,13 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
       a nominal, not a measured, nitrogen figure.
 
     Plots with fertilizer but zero or missing area are dropped (an infinite
-    rate is not a rate).
+    rate is not a rate). A nonempty result warns when an entire eligible
+    ``(country, t)`` cell has rows on both sides but no matching land join.
+    This discloses whole-cell omissions; unmatched plots within a surviving
+    cell are outside this diagnostic. No keys or rates are repaired. Callers
+    who know both complete plot vocabularies agree may explicitly use
+    ``on='plot'``. For the documented Ethiopia/Malawi literal-key route,
+    preserve known country provenance on both operands.
     """
     if nutrient not in {'N', 'product'}:
         raise ValueError(
@@ -8062,9 +8068,30 @@ def fertilizer_rate(plot_inputs, plot_features, *, nutrient='N',
                 f"{sorted(map(str, area['_land'].unique()))[:3]}. Try "
                 f"on={'plot' if on == 'parcel' else 'parcel'!r}.",
                 PlotGrainMismatchWarning, stacklevel=2)
+    # Diagnose the existing land join, not subsequent finite-rate filtering.
+    # Anonymous labels may use paired agreed provenance for this message only;
+    # the helper must never borrow a one-sided/conflicting original attr.
+    lost_cells = []
+    if not merged.empty and 't' in base:
+        context = pd.DataFrame()
+        input_label = plot_inputs.attrs.get('country')
+        area_label = plot_features.attrs.get('country')
+        if (isinstance(input_label, str) and isinstance(area_label, str)
+                and input_label == area_label):
+            context.attrs['country'] = input_label
+        lost_cells = _waves_joining_nothing(fert, area, merged, context, pf)
     with np.errstate(divide='ignore', invalid='ignore'):
         merged[out_col] = merged[num_col] / merged['_Area']
     merged = merged.replace([np.inf, -np.inf], np.nan).dropna(subset=[out_col])
+    if not merged.empty and lost_cells:
+        warnings.warn(
+            f"fertilizer_rate(on={on!r}): {len(lost_cells)} eligible "
+            f"(country, t) cell(s) have no matching country/household/land "
+            f"keys: {lost_cells!r}. They have fertilizer and positive-area "
+            "rows on both sides but contribute no rates to this nonempty "
+            "result. Check both operands' country provenance and land-key "
+            "vocabularies; None denotes anonymous country identity.",
+            PlotGrainMismatchWarning, stacklevel=2)
     # `on=` is a MODE string, not a level name: the emitted level is the
     # canonical `plot_id` (or `parcel`).
     land_name = 'parcel' if on == 'parcel' else _PLOT_CANONICAL

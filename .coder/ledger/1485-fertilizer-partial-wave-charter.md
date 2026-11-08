@@ -145,3 +145,34 @@ full country read authenticated unchanged above, all usercountry caveats retaine
 Tests and docs freeze precede independentreview; laterfullCI/hash/GitHub gates
 remain separately authorized/rootowned. This selectedscope is committed BEFORE
 any product/test edits.
+
+
+### Diagnostic interpretation correction and executed evidence
+
+Original raw-input NULLt probe6cases: actual old/new numeric results exact,
+0newwarnings. Initial interpretation wrongly assumed those groups reached the
+eligible numerator. BEFORE any proposed marker edit, actual nitrogen_kg code
+showed its prior groupby defaultdropna=True removes NULLt first; the later
+rate groupby(dropna=False) cannot restore them. Root confirmed preserving
+actual eligibility. No marker path, nitrogen/helper change or input remask was
+applied. Originalprobe and failedinterpretation are retained externally, and
+matched/lostNULL plus literal sentinel-looking values have explicit controls.
+
+Main cohort155passed/0skip19.34s:49new +106existing1110/1160controls. Final
+new controls7passed6.75s:area/volume kwargs,warningfilters,fullylostcountry.
+External2passed9.43s:48new nullable/typed cohorts match exactbaseline631bb
+frames/attrs/errors/existingwarnings/input, and all non-fertilizer module ASTs
+and every original fertilizer executable statement remain exact. Complete-empty
+warning branch and signature are untouched. Functiondoc clarification afterwards
+is proved executable-AST exact; it limits provenance-based literal dispatch to
+existing Ethiopia/Malawi, while explicitplot mode requires knownmatchingkeys.
+Root owns latercurrentTLU8a35 composition, independentreview and fullCI/hash/
+GitHub gates. No source/native/API-data/warm campaign or shared-cache write.
+
+Final eligibility controls18passed8.18s (disjoint from155+7):actual numerator
+excludes matched/lost NULLt, while literal None/<NA>/__missing_t__ strings remain
+distinct eligiblecells. Thus180distinct focused unit cases were exercised in
+three selections, not a claimed180-case single run.74new cases total;48external
+baseline cohorts are separate. StrictAPIaudit0. All actors closed beforefreeze;
+private falsecred/unshare/MAINvenv exactidentity/BLASbuild1/pytest2loadfile, named
+source/API/write tripwires active0denials and private datafiles0.
