@@ -110,3 +110,24 @@ verification, independent review and publication.
 - Full CI and data checks remain outside this assignment. Actual cache-hash
   enumeration remains a separate ROOT-approved stage; no numerical cache-cost
   or no-invalidation claim follows from these static checks.
+
+### ROOT acceptance and current integration (2026-11-08)
+
+The historical Phase 3 boundary above is retained. The subsequently authorized
+candidate-only metadata census at f18c8e5e8 completed with exit 0: zero changes
+among 450 country, 1,895 wave, 35 build-transform and 186 framework-import
+fingerprints. The 18 None wave cells and public scope (553 country-method
+cells, 2,313 wave-method cells, 39 names) are unchanged. The closed b834
+baseline was compared without replay. No source or table data was read.
+
+ROOT reviewed the full product diff, the Nigeria harvest-line and attachment
+record, all 18 final evidence members, exact AST preservation outside the two
+docstrings, and the actual metadata receipts. The original failed workspace
+preparation remains failed; the separate replacement job 41022789 completed.
+This documentation correction introduces no new numerical corpus counts.
+
+Integration onto development ebb87135 changes only the two docstrings and
+this task ledger. Incoming #1578 and #1591 work is disjoint and retained.
+No manual full-suite replay is needed for this documentation-only change;
+configured GitHub checks must pass before merge. No scientific rule, default,
+source value, unit, warning or cache behavior changes.
