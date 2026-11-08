@@ -168,3 +168,28 @@ unsupported inputs explicitly. Freeze code/tests before one affected/new cohort
 under accepted private MAIN/unshare/falsecreds/MPL/XDG/thread1/2loadfile guards.
 Independent review/metadata/currentCI/publication remain ROOT gates. No new
 runtime success at this ledger-first commit. Prior receipts are immutable.
+
+
+### ROOT datetime follow-up publication checkpoint — 2026-11-08 13:04 UTC
+
+The datetime follow-up975f9 passed46 focused/affected controls (33new,11affected
+companions,2exact-parent comparisons) and strict static API audit. Independent
+review passed20 additional controls,13.70s pytest/28.96s wrapper, with unchanged
+source-refusal guards and no source/private-data reads. The current declared
+canonical type vocabulary is recognized; dormant date/timestamp aliases remain
+outside this correction. No parsing, casting, calendar or value validation was
+added. The previous limited-type closure remains historical; issue1606 is open.
+
+Current composition e3dc93d0f11f676bb13be11aa6795a20b70a76d3 has parents975f9 andd82,
+with the exact19,121-entry source union and no overlapping paths. Candidate-only
+guarded metadata and strict API audit passed; every non-head metadata field
+and all450/1,895/35/186 fingerprints match the admitted closed1520baseline.
+The18None cells and public553/2313/39 inventories are unchanged.
+
+Full configured offlineCI41024398 is RUNNING at this dated checkpoint. Final
+results and publication decision belong in the PR validation record and
+reports/1606-datetime-current-verification-20261108. This is a historical
+checkpoint, not a completion claim. The publication commit changes only this
+ledger; all code/test objects remain frozen for the running full suite. No
+master release, shared-cache rebuild, production weights or scientific
+interpretation changes are authorized here.
