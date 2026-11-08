@@ -1,40 +1,58 @@
-<!-- Red-team reviewer brief (see ../savio-sweep.md).  Give the reviewer the issue, the
-     branch and the author's repro COMMAND -- not the author's conclusions.  Requested changes
-     go back to the author as one new commit; the coordinator then re-checks or re-reviews. -->
+<!-- Independent reviewer template. Fill every placeholder with a reviewed value.
+     Freeze bytes before review; task grants determine source and execution scope. -->
 
-# Red-team review: {COUNTRY} #{ISSUE}
+# Independent review — {COUNTRY}, issue {ISSUE}
 
-You are an independent skeptic reviewing one candidate fix in the LSMS Library
-before it becomes a PR. You did not write it. Decide whether it should ship.
+You did not author this candidate. Return APPROVE / CHANGES / REJECT with evidence.
 
-- Issue: https://github.com/ligon/LSMS_Library/issues/{ISSUE} (read it with
-  `gh issue view -R ligon/LSMS_Library {ISSUE} --comments`)
-- Candidate branch: `{BRANCH}` (published in the shared mirror
-  {MIRROR} and in the coordinator clone)
-- Base: development `{BASE}`
-- Author's repro command (verify it yourself; do not trust its conclusion):
-  {REPRO}
+- Repository/issue: `{REPO}`, issue `{ISSUE}`; complete body, all paginated
+  comments/rulings and freshness receipt: `{ISSUE_HISTORY}`. Read the complete
+  current history (including linked authority) through the task's admitted
+  channel before acting; request a refreshed snapshot if direct reads are forbidden.
+- Full development base SHA: `{BASE_SHA}`.
+- Full candidate SHA: `{CANDIDATE_SHA}`. Branch `{BRANCH}` is a label, not authority.
+- Admitted full committed shared Git repository: `{SOURCE_REPOSITORY}`.
+- Frozen task/source/access/resource/evidence plan: `{TASK_PLAN}`.
+- Author's reproduction **command**, not conclusion: `{REPRO}`.
 
-## Do
+Read the task grant and repository instructions first. For assigned country work,
+read its full `_/CONTENTS.org`, including TODO/WAITING/LOGBOOK, **first**; name the
+relevant idiosyncrasy, quote contradictions and report genuinely new ones for the
+owner to record. Do not invent country work for a source-free task. Read the full
+diff between the two full SHAs; verify its scope against the grant and own ledger.
 
-1. Read `lsms_library/countries/{COUNTRY}/_/CONTENTS.org` (incl. TODO/WAITING/LOGBOOK)
-   and the CLAUDE.md sections the diff touches. Name the idiosyncrasy that matters.
-2. Read the full diff (`git diff {BASE}..{BRANCH}`).
-3. Does it resolve the issue *as stated*, and only that? Look for: silent row loss
-   or invention, grain changes, a declared index broken or a reducer added, values
-   derived but not registered, a wave silenced with `optional: true`, other waves or
-   tables of this country moved, tests that pin today's numbers rather than the rule.
-4. Run the repro on base and on candidate yourself. Use a burst job, not this node:
-   `{SWEEP_DIR}/submit.sh -c 4 -m 24G -t 1:00:00 -l <log> -- --cold <branch> <cmd...>`
-   (`--cold` = private empty harmonized cache, shared source blobs; `development` for base).
-   Also run the tests the diff adds or touches the same way.
-5. Do not edit the branch, do not write to GitHub, no `dvc` CLI, never `pkill`/`killall`
-   by pattern, and only read-only git (`log`, `diff`, `show`; do not fetch refs into the
-   coordinator's clone).  Temp files under `{SWEEP_DIR}/reports/review-{ISSUE}/`.
+Check the issue contract, collateral effects and tests. In country data work,
+look for row loss/invention, grain changes, broken identifiers hidden by reducers,
+unregistered derived values, `optional: true` silencing a wave, or tests merely
+pinning today's counts. Preserve prior maintainer decisions in CONTENTS/log/TODO.
 
-## Report (short)
+Run only the finite verification admitted by the task. For admitted data claims,
+compare exact base and candidate in **separate private roots** with identical
+admitted inputs; a source-free change does not require a source build. Burst form:
 
-- Verdict: APPROVE / CHANGES (list each, concretely) / REJECT (why)
-- What you ran and the numbers you got (base vs candidate)
-- Collateral changes found (or "none found", saying what you checked)
-- Anything the PR body should state that the author left out
+```
+submit.sh -c 4 -m 24G -t 1:00:00 -l /approved/review/base.log \
+  --coordinator-job COORDINATOR_JOB_ID --exclude-nodes COORDINATOR_NODES -- \
+  --source {SOURCE_REPOSITORY} --expected-source-sha {BASE_SHA} \
+  --python {PYTHON} -- COMMAND ARGUMENTS
+```
+
+Use `{CANDIDATE_SHA}` for the candidate run, never the literal moving branch
+`development`. All paths/commands/resources require the task grant. Before any
+LSMS import, private empty config/data/L1/state/cache/tmp/MPL, build workers 1 and
+BLAS pins must exist. No shared-cache symlink, credentials, acquisition or blob
+projection is authorized by this template or the wrapper. Respect cpus-per-task,
+exclude coordinator job/nodes, and use the free account unless the user authorized
+billing. These wrappers do not provide universal I/O confinement.
+
+Do not edit the candidate or GitHub. Use read-only Git; no ref fetch/reset/merge.
+No DVC CLI, native state/transcript reads, or pattern kills. Use the supplied
+absolute evidence/steering/result interfaces, or return final text for an
+in-process review. Required review receipts and own ledger are allowed at granted
+paths. Freeze bytes until **all** workers and verifiers terminate; atomic rename
+does not permit overlap. New bytes need a new isolated version and review.
+
+Report the verdict and concrete changes, full input SHAs, what you ran with
+results (base/candidate where relevant), collateral effects and scope checked,
+PR must-state items, and every unverified limit. Tests drafted but not executed
+are unverified. Approval does not authorize publication or merge by itself.

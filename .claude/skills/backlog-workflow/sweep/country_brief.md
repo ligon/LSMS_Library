@@ -1,135 +1,135 @@
-<!-- Country-owner brief for a backlog sweep (see ../savio-sweep.md).  Fill the {PLACEHOLDERS}
-     (make_briefs.py does it) and append the country's queue and issue texts.  Round 1 of the
-     2026-11-03 ISA sweep used this text; the process-hygiene rule was added after it. -->
+<!-- Country-owner template. Fill with make_briefs.py; the explicit task plan
+     controls capabilities, source scope, evidence paths and verification. -->
 
-# LSMS-ISA backlog, round {ROUND} -- {COUNTRY} owner
+# Backlog round {ROUND} — {COUNTRY} owner
 
-You are the {COUNTRY} owner in an eight-country LSMS-ISA backlog sweep run by a
-coordinator ("Sue", Claude Opus 5.5) on this node. Your job: work this country's
-open GitHub issues down with the plain loop **reconcile -> fix -> test -> report**.
-The coordinator red-teams your commits and opens the PRs; you never write to GitHub.
+Use **reconcile -> fix -> test -> independent review -> PR**. You draft findings,
+commits and residuals; the coordinator owns external writes. Use the actual author
+identity and runtime adapter. Do not invent a model, coauthor or tool identity.
 
-**Keep it simple.** The previous campaign stalled under its own bookkeeping
-(hash manifests, custody records, "release"/"freeze"/"authority" documents,
-private witness files). Do none of that. Report the commands you ran, the numbers
-you measured, the tests and their results, and -- in one line each -- what you
-did not verify. That is the whole evidence standard.
+## Immutable inputs and task grant
 
-## Your checkout and runtime
+- Checkout: `{WORKTREE}`, branch `{BRANCH}`; coordinator checkout `{COORD_CLONE}`.
+- Reviewed development base: `{BASE_SHA}` (full SHA).
+- Initial admitted candidate: `{CANDIDATE_SHA}` (full SHA). Assert HEAD equality
+  before work. After a commit, report the new full SHA; new bytes need new review.
+- Prepared Python: `{PYTHON}`; sweep helpers: `{SWEEP_DIR}`.
+- Task plan SHA256: `{TASK_PLAN_SHA256}`. Read the complete plan below. It controls
+  permitted source reads, imports, commands, resources and evidence destinations.
+  Missing access authority means stop that dependent operation and report the limit.
+  This template does not grant survey reads, downloads, credentials or source builds.
 
-- Your worktree: `{WORKTREE}`, branch `{BRANCH}`, based on
-  development `{BASE}`. Work, run and commit only there (`cd` into it
-  for every command). Every commit is published automatically to the shared mirror by
-  a post-commit hook ("SUCODER: published ..."); that is how burst jobs see your work.
-- Python: `{PYTHON}` (mounted venv
-  image) with `PYTHONPATH={WORKTREE}` and
-  `LSMS_COUNTRIES_ROOT={WORKTREE}/lsms_library/countries`,
-  cwd = the worktree. Once, assert the import identity (CLAUDE.md, scrum-master
-  addendum 3, the `git rev-parse --show-toplevel` snippet).
-- **Data policy (important; other sessions read the shared cache):**
-  - *Before you edit anything*, reads may use the shared warm cache (the default
-    data root). Your config equals development's there, so this is an ordinary read.
-  - *After any edit*, never read through the shared cache. Use a private data root:
-    `export LSMS_DATA_DIR={PRIVATE_DATA}/{COUNTRY}; mkdir -p $LSMS_DATA_DIR;`
-    `ln -sfn {SHARED_L1} $LSMS_DATA_DIR/dvc-cache`
-    (private harmonized tables, shared source blobs). It starts cold, so the first
-    read of a table builds it from source. For a fair before/after, build "before"
-    in that private root too when the numbers are sensitive to cache state.
-- **Compute:** this node is shared by eight agents. Locally: at most 2 cores and about
-  10 minutes per command, with `OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
-  MKL_NUM_THREADS=1 LSMS_BUILD_WORKERS=1`. Anything bigger (cold builds of large
-  tables, test files over a few minutes) goes to a separate Slurm job: commit first,
-  then
-  `{SWEEP_DIR}/submit.sh -c 4 -m 24G -t 1:00:00 -l {SWEEP_DIR}/reports/{COUNTRY}/<name>.log -- --cold {BRANCH} <cmd...>`
-  (`--cold` = private empty harmonized cache on that node; use branch `development`
-  for a base-commit control). Run long ones with the Bash tool in the background.
-- Tests: targeted only, e.g. `python -m pytest tests/test_x.py -n 2 --dist=loadfile -q
-  > <log> 2>&1` (write output to a file, never through `| tail`).
-- Reading GitHub is fine (`gh issue view -R ligon/LSMS_Library N --comments`, `gh pr view`);
-  writing to GitHub is the coordinator's job.
-- Process hygiene: never `pkill`/`killall` by pattern (other agents run identically named
-  builds on this node) -- stop only PIDs you started.  Never run broad pytest `-k` selections
-  or `test_derivations` locally (they start cold multi-country builds).  Temp files go under
-  `{PRIVATE_DATA}/{COUNTRY}/tmp`, never the coordinator's scratchpad (shared by all agents).
-- Git: only inside your worktree, only `add`/`commit`/`log`/`diff`/`show`/`status`.
-  Never `checkout`/`switch`/`reset`/`rebase`/`stash`/`clean`/`restore`/`merge`/`push`/`worktree`,
-  and never touch `{COORD_CLONE}` or `~/mirrors/`.
+{TASK_PLAN}
 
-## Before touching any issue
+## History and reconciliation before action
 
-1. Read `lsms_library/countries/{COUNTRY}/_/CONTENTS.org` in full, including
-   TODO/WAITING/LOGBOOK entries. In your report, **name** the idiosyncrasies that
-   bear on your queue (not "I checked"). If a finding contradicts that file, that
-   is a result to quote, not evidence the file is stale. Add genuinely new
-   idiosyncrasies you discover (short, dated entries).
-2. Read the parts of `CLAUDE.md` your issues touch (grain collapse, derived values,
-   categorical mappings, script-path tables, kg factors, sample/v, ...) and the
-   relevant `.claude/skills/add-feature/...` sub-skill. For any non-trivial change,
-   follow `prior-art-ledger` lightly: find existing machinery before writing new.
-3. `grep -c 'materialize: make\|!make' lsms_library/countries/{COUNTRY}/_/data_scheme.yml`
-   -- if you edit a script-path table, read the script's docstring first and say
-   what its complication is.
+The complete body and every comment retrieved at `{RETRIEVED_AT}` are below.
+Pagination/count/timestamp evidence: `{HISTORY_EVIDENCE}`. These REST reads are
+not transactional and are not a perpetual authority. Before acting, retrieve and
+read the **complete current body and all paginated comments/rulings**, including
+linked maintainer decisions, or obtain the coordinator's refreshed complete
+snapshot through the admitted channel. If provider reads are forbidden, ask the
+coordinator through the supplied steering channel; do independent permitted work.
+Do not claim a partial or stale snapshot is self-contained authority.
+
+For assigned country work, read `lsms_library/countries/{COUNTRY}/_/CONTENTS.org`
+in full **first**, including TODO/WAITING/LOGBOOK. Name the idiosyncrasies relevant
+to the queue in your report. A contradiction is a result to **quote**, with its
+source; do not assume the record is stale. Add genuinely new idiosyncrasies as
+short dated entries within the edit grant. If no country work is assigned, do
+not invent it or read survey modules/data to populate this section.
+
+Read relevant `CLAUDE.md` and skill instructions. Before any non-trivial change,
+create your **own** `.coder/ledger/<task-slug>.md` under `prior-art-ledger`.
+For a script-path table, read its docstring and say why YAML was insufficient.
+
+## Runtime and verification
+
+Use only the prepared runtime and explicit task source plan. Establish private
+empty config/data/L1/state/cache/tmp/MPL roots **before any LSMS import**, with
+`LSMS_BUILD_WORKERS=1` and BLAS pins. Do not link writable shared L1 or use shared
+L2, even before editing. No credentials, acquisition or read-only blob projection
+is admitted without a separately reviewed task-specific plan. The wrapper is not
+universal I/O confinement; the task's actual boundary still governs the command.
+Keep HOME/CODEX_HOME unchanged and leave inherited access/cache bypasses out.
+
+For an admitted heavier command, use a separate allocation with explicit CPUs,
+memory, wall time and excluded coordinator job/nodes. The helper syntax is:
+
+```
+submit.sh -c 4 -m 24G -t 1:00:00 -l /approved/task/run.log \
+  --coordinator-job COORDINATOR_JOB_ID --exclude-nodes COORDINATOR_NODES -- \
+  --source /approved/shared/full.git --expected-source-sha FULL_COMMIT_SHA \
+  --python /approved/prepared/python -- COMMAND ARGUMENTS
+```
+
+Replace every example input with the reviewed finite argv and the full base or
+candidate SHA above. Never use a moving `development`/branch control. The wrapper
+defaults to private empty caches; it does not admit a source build. Source-free
+changes use their own scoped checks. Run only admitted targeted tests; where
+pytest is admitted, use `--dist=loadfile`, allocation-budgeted workers, BLAS pins
+and `LSMS_BUILD_WORKERS=1`; write logs to a file, not a filtering pipe. Report
+unexecuted tests honestly. Freeze source/helper/test/task bytes until both worker
+and verifier terminate, or use a new isolated version. Atomic rename is insufficient.
 
 ## Per issue
 
-1. **Reconcile.** The issue text may be stale: ~115 PRs merged 2026-10-23..11-01.
-   Check `git log --oneline -- <paths>` and measure the claim at the pinned commit
-   with a real `Country('{COUNTRY}')` call. If it is already resolved, draft a
-   close comment citing the merged PR and your measurement.
-2. **Classify.** A/B = defect you can fix now in country config/scripts. C = needs a
-   human decision (DECISION issues, "human decision required", scientific
-   judgement). D = needs data acquisition. Do not implement C or D.
-3. **Fix (A/B), at most ~3 issues this round, highest leverage first.** Measure
-   before; edit; measure after (rows, cells, the specific values the issue names);
-   add or extend a targeted test where behaviour changes; run the tests that cover
-   the area. One issue per commit, commits independent where possible (the
-   coordinator cherry-picks each onto its own PR branch). Commit on your branch
-  `{BRANCH}`. Commit subject
-   `{COUNTRY}: <what> (#N)`; body says what, why, the measured before/after, and
-   `Closes #N` or `Addresses #N`; end with
-   `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
-4. **Partial fix?** Draft the residual: either a narrowed title/body for #N, or a
-   new issue (title, body, tier) when the residual is a different kind of work.
-5. **C issues:** write a decision memo of at most 12 lines: the question, the
-   options, the measured evidence (numbers), your recommendation and its cost.
-   Check the numbers still hold at the pinned commit before quoting them.
+1. **Reconcile** against merged work and the exact pinned base. Use source-only
+   evidence for source-only claims. Reproduce data claims only with granted
+   inputs/commands; otherwise mark unverified. Draft a closure comment only when
+   the evidence supports it, citing merged PR/full SHA and relevant measurements.
+2. **Classify:** A/B = permitted defect fix; C = human/scientific decision; D =
+   acquisition. Draft C/D for the coordinator; do not implement them implicitly.
+3. **Fix** at most three permitted A/B issues, highest leverage first. Record
+   before/after evidence, add meaningful targeted tests for behavior changes,
+   and run only the authorized checks. Independent commits where possible.
+   Commit subjects identify the country/task and issue; bodies state what, why
+   and validation. Put issue-closing keywords only in the draft PR body. No
+   hardcoded coauthor trailer; use the actual author/adapter identity.
+4. **Partial fix:** draft either a narrowed remaining title/body or a linked new
+   residual issue (title/body/tier). A partial without a residual is incomplete.
+5. **C decision memo:** question, options, evidence, recommendation and cost in
+   about twelve lines. Label dated observations and unverified current numbers.
 
-## Scope fence
+## Scope and process fence
 
-- Edit only `lsms_library/countries/{COUNTRY}/**` and `tests/**`.
-- If the correct fix needs framework code (`lsms_library/*.py`, the canonical
-  `lsms_library/data_info.yml`, shared `lsms_library/categorical_mapping/`), do
-  not edit it: describe the change precisely in the report (file:line, sketch of
-  the diff, blast radius from `rg`) and move on. Framework changes run in a
-  separate serialized lane.
-- Never: the `dvc` CLI, `LSMS_ALLOW_INTREE_SOURCES`, `gh` or any GitHub write,
-  force-push, editing anything outside your checkout, or `optional: true` to
-  silence a single wave. Core never aggregates silently; a derived value must be
-  registered (CLAUDE.md "Derived Values"); fix a broken index rather than
-  declaring a reducer.
-- No raw microdata rows or coordinates in commits or reports; counts are preferred,
-  plus at most a few example keys where needed to make a bug reproducible.
+Country-task defaults are `lsms_library/countries/{COUNTRY}/**`, scoped `tests/**`,
+your required own `.coder/ledger/<task-slug>.md`, and explicitly supported task
+report/evidence/receipt directories. The task plan can narrow or explicitly extend
+this fence. Required source/custody/access receipts and review evidence are
+permitted within its supported paths. No blanket ban on evidence artifacts.
 
-## Report (the deliverable)
+Describe needed framework work (file:line, proposed diff, `rg` blast radius) for
+the serialized framework lane unless the task explicitly grants those edits.
+Never use a DVC CLI, acquisition bypass, force-push, GitHub write or shared cache
+mutation. Country-fix Git is limited to add/commit/log/diff/show/status in its
+own worktree; no reset/rebase/stash/clean/restore/merge/worktree changes. Do not
+kill by pattern; stop only your owned processes. Temp files use the task's private
+tmp. Never use `optional: true` to silence one wave, nor a reducer to hide a broken
+index; register derived values under the applicable repository contract. No raw
+microdata rows or coordinates in commits/reports.
 
-Maintain `{SWEEP_DIR}/reports/{COUNTRY}/REPORT.md`,
-updated after each issue (the coordinator reads it mid-run), with these sections:
+## Report and supported channels
 
-1. **Idiosyncrasies** that bear on the queue (from CONTENTS.org, named).
-2. **Triage table**: issue | tier | still reproduces at {BASE}? (measured) | action.
-3. **Fixes**: per fix -- issue, commit SHA, files, before/after numbers, tests run
-   and result, draft PR title and body (ready to paste), residual draft if partial.
-4. **Decision memos** for C issues.
-5. **Close-comment drafts** for issues already resolved.
-6. **New problems found** (draft issue title/body/tier), and framework changes needed.
+Use `SUCODER_DISPATCH_EVIDENCE_DIR/report.md` and the supplied result interface
+when the task provides them. Use the supplied **absolute** MESSAGES_TO_AGENT.txt
+and QUESTIONS_FROM_AGENT.txt paths at checkpoints; same-named checkout files are
+not substitutes. Only write these paths when granted. In-process agents can
+return final text, or write an explicitly granted report artifact in their own
+worktree/evidence directory; the coordinator may copy that artifact with
+`save_report.py`. Never open native JSONL transcripts, SQLite or native state to
+recover a report.
 
-Your final message to the coordinator: a short summary (under 30 lines) -- commits with SHAs,
-issues fixed / closable / needing a decision, and anything blocking -- pointing to REPORT.md for detail.
+Keep the report concise: named country idiosyncrasies if assigned; triage table;
+full commit SHAs and changed paths; before/after evidence; commands actually run
+and results; PR draft and partial residuals; C memos and closure drafts; framework
+needs; one line for each unverified limit. Return a short final summary with the
+supported report path. No unsupported warm-resume promise.
 
-## Your queue (ordered by a quick pre-sort; re-order if reconciliation says so)
+## Queue
 
 {QUEUE_LIST}
 
-## Issue texts (bodies and the last two comments, as of 2026-11-03)
+## Complete retrieved issue bodies and comments
 
 {ISSUES}
