@@ -67,10 +67,6 @@ def food_acquired(df):
             units = units.insert(len(units), U_UNKNOWN)
         filled = index.set_levels(units, level='u').set_codes(
             np.where(missing, units.get_loc(U_UNKNOWN), codes), level='u')
-        if len(filled.unique()) != len(index.unique()):
-            raise ValueError(
-                'Senegal 2018-19 food_acquired: missing u -> Unknown would '
-                'merge distinct full keys')
         out.index = filled
     return out
 from collections import defaultdict

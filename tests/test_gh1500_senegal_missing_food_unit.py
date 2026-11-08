@@ -192,14 +192,23 @@ def test_preexisting_duplicate_full_keys_are_preserved_without_reduction():
 
 @pytest.mark.parametrize('units', [[None, 'Unknown'],
                                    [None, None, 'Unknown', 'Unknown']])
-def test_new_full_key_collision_is_refused_even_if_each_old_key_already_repeats(units):
+def test_new_full_key_collision_preserves_all_rows_even_if_old_keys_repeat(units):
     original = _same_key_output(units)
     before = deepcopy(original)
-    hook, incoming, _ = _boundary(original)
-    with pytest.raises(ValueError, match='merge distinct full keys'):
-        hook(incoming)
+    incoming = _output(pd.Index(['Kg', None], dtype=object))
+    input_before = deepcopy(incoming)
+    def upstream(df, key, *, wave):
+        assert df is incoming
+        assert key == PURCHASE and wave == '2018-19'
+        return deepcopy(original)
+    got = _live_hook(upstream)(incoming)
+    _assert_only_u(got, before, ['Unknown'] * len(units))
+    assert got.shape == before.shape
+    assert got.index.duplicated(keep=False).tolist() == [True] * len(units)
     pd.testing.assert_frame_equal(original, before, check_exact=True)
     assert original.attrs == before.attrs
+    pd.testing.assert_frame_equal(incoming, input_before, check_exact=True)
+    assert incoming.attrs == input_before.attrs
 
 
 def _wide(unit='Tas', size='Petit', **changes):

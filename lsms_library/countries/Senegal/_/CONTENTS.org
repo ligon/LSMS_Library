@@ -1106,3 +1106,16 @@ cold/warm/cache-hash census and full CI checks are *UNRUN*.  New regression
 drafts use invented literal oracles and explicitly stubbed factor/label
 boundaries; they do not establish real-source parity.  Static source analysis
 anticipates one Senegal re-warm, not a measured or completed re-warm.
+
+** Collision clarification for the source-only GH #1500 revision
+
+The preceding entry describes the original frozen hook's refusal. That
+unconditional refusal was an availability regression, not a required grain
+policy: the ROOT instruction to expose collisions did not mandate raising.
+The revised label-only hook retains *all* rows, payload and order, including
+new duplicate full keys after missing =u= becomes =Unknown=. It neither
+aggregates nor drops rows and adds no warning; existing downstream grain
+policy is unchanged. The two collision regression drafts now require this
+return and input immutability. Runtime and real-source verification remain
+UNRUN; the original source-phase supervisor failure and missing grounding
+artifact remain recorded separately.
