@@ -404,20 +404,24 @@ def _check_dtype_consistency(
 ) -> Check:
     """Roughly grade native local types or finalized canonical-over-local types.
 
-    Only global types supported by this rough checker override local types.
-    Other global types retain local grading; this is not an exact check of
-    every dtype the public finalizer can produce (ledger #1606 §3).
+    Global datetime declarations use pandas' dtype predicate without parsing
+    or casting values. Other supported global types override local types;
+    unknown future global types retain local grading (ledger #1606 §3).
     """
     if stage not in ("native", "finalized"):
         raise ValueError("stage must be 'native' or 'finalized'")
     spec = scheme.get(feature, {})
     expected_cols = spec.get("columns", {})
+    canonical_datetime_cols = set()
     if stage == "finalized":
         from .country import _load_canonical_dtypes
 
         expected_cols = dict(expected_cols)
         for col, declared in _load_canonical_dtypes().get(feature, {}).items():
-            if str(declared) in _DTYPE_MAP:
+            if str(declared) == "datetime":
+                canonical_datetime_cols.add(col)
+                expected_cols[col] = declared
+            elif str(declared) in _DTYPE_MAP:
                 expected_cols[col] = declared
     if not expected_cols:
         return Check("dtype_consistency", "pass", "No dtype declarations (skipped)")
@@ -426,6 +430,10 @@ def _check_dtype_consistency(
         if col_name not in df.columns:
             continue
         actual = df[col_name].dtype
+        if col_name in canonical_datetime_cols:
+            if not pd.api.types.is_datetime64_any_dtype(actual):
+                issues.append(f"{col_name}: expected datetime, got {actual}")
+            continue
         if isinstance(declared_type, list):
             # List declaration = constrained string column
             if not (pd.api.types.is_string_dtype(actual) or pd.api.types.is_object_dtype(actual)):
@@ -752,8 +760,10 @@ def is_this_feature_sane(
         declarations for native/cache frames. Use ``'finalized'`` for public
         API frames: supported global rough types override local types, and
         present canonical-only columns are checked without becoming required.
-        Unsupported global types retain local grading. Other checks keep the
-        local schema. This does not cast the frame or verify exact dtypes.
+        Canonical datetimes accept naive or timezone-aware datetime dtypes
+        without parsing or casting values. Unknown future global types retain
+        local grading. Other checks keep the local schema. This does not cast
+        the frame or verify exact dtype units or calendar values.
     extra_optional : set[str], optional
         Column names to exempt from ``no_all_null_columns``, *in addition* to
         those declared ``optional`` in the country's scheme.

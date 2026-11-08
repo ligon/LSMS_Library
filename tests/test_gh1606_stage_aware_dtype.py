@@ -80,7 +80,8 @@ def test_recognized_canonical_types_override_local(
         FEATURE, stage="finalized").status == wanted
 
 
-@pytest.mark.parametrize("unknown", ["datetime", "future_type", "FLOAT", ""])
+# Canonical datetime is now recognized; these remain genuinely unsupported types.
+@pytest.mark.parametrize("unknown", ["future_datetime_type", "future_type", "FLOAT", ""])
 @pytest.mark.parametrize("dtype,values,wanted", [
     ("Float64", [1, None], "pass"),
     ("string", ["1", None], "warn"),
@@ -107,7 +108,7 @@ def test_canonical_only_present_column_even_without_local_feature(
 
 @pytest.mark.parametrize("stage", ["native", "finalized"])
 def test_constraints_absent_unknown_and_no_declarations(stage, canonical):
-    canonical({"absent_global": "str", "x": "datetime"})
+    canonical({"absent_global": "str", "x": "future_datetime_type"})
     df = frame(["a", None], "string")
     local = scheme({"x": ["a", "b"], "absent_local": "float"})
     assert d._check_dtype_consistency(df, local, FEATURE, stage=stage).status == "pass"
