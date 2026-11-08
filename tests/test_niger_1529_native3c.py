@@ -188,3 +188,69 @@ def test_main_uses_both_own_sources_once_and_preserves_2c_prefix(driver, monkeyp
     assert_frame_equal(actual.iloc[:len(expected_rainy)], expected_rainy, check_exact=True)
     assert_frame_equal(actual.iloc[len(expected_rainy):], expected_dry, check_exact=True)
     assert actual.index.is_unique
+
+
+@pytest.mark.parametrize('empty_source', [DRY, RAINY])
+def test_main_one_empty_component_preserves_exact_frame(driver, monkeypatch, empty_source):
+    rainy, rn = frames('as02cq'); dry, dn = frames('as03cq')
+    source_frames = {RAINY: (rainy, rn), DRY: (dry, dn)}
+    source_frames[empty_source] = tuple(frame.iloc[:0].copy() for frame in source_frames[empty_source])
+    snapshots = {path: tuple(frame.copy(deep=True) for frame in pair)
+                 for path, pair in source_frames.items()}
+    reads, built, writes = [], {}, []
+    original_builder = driver._build_input_source
+    def tracked_builder(labeled, numeric, **kwargs):
+        path = kwargs['source_path']
+        result = original_builder(labeled, numeric, **kwargs)
+        result.attrs = {'invented_component': path, 'nullable_witness': ('invented', None)}
+        built[path] = result
+        return result
+    def invented_reader(path, convert_categoricals=True):
+        reads.append((path, convert_categoricals))
+        return source_frames[path][0 if convert_categoricals else 1].copy(deep=True)
+    monkeypatch.setattr(driver, '_build_input_source', tracked_builder)
+    monkeypatch.setattr(driver, 'get_dataframe', invented_reader)
+    monkeypatch.setattr(driver, 'to_parquet', lambda frame, path: writes.append((frame, path)))
+    monkeypatch.setattr(driver, '_input_maps', lambda: (MAPS['input_map'], MAPS['unit_map'], {}))
+    monkeypatch.setattr(driver, '_crop_maps', lambda: (MAPS['crop_map'], {}))
+    driver.main()
+    nonempty_source = RAINY if empty_source == DRY else DRY
+    expected = built[nonempty_source]
+    assert len(built[empty_source]) == 0 and len(expected) > 0
+    assert reads == [(RAINY, True), (RAINY, False), (DRY, True), (DRY, False)]
+    assert list(built) == [RAINY, DRY]
+    assert len(writes) == 1 and writes[0][1] == 'plot_inputs.parquet'
+    actual = writes[0][0]
+    assert actual is expected
+    assert_frame_equal(actual, expected, check_exact=True)
+    assert actual.attrs == expected.attrs
+    if nonempty_source == RAINY:
+        baseline = original_2c(driver, *source_frames[RAINY])
+        assert_frame_equal(actual, baseline, check_exact=True)
+    for path, pair in source_frames.items():
+        for actual_input, before in zip(pair, snapshots[path]):
+            assert_frame_equal(actual_input, before, check_exact=True)
+            assert actual_input.attrs == before.attrs
+
+
+def test_main_all_empty_retains_original_refusal_after_both_sources(driver, monkeypatch):
+    source_frames = {RAINY: tuple(f.iloc[:0] for f in frames('as02cq')),
+                     DRY: tuple(f.iloc[:0] for f in frames('as03cq'))}
+    reads, attempts, writes = [], [], []
+    original_builder = driver._build_input_source
+    def tracked_builder(labeled, numeric, **kwargs):
+        attempts.append(kwargs['source_path'])
+        return original_builder(labeled, numeric, **kwargs)
+    def invented_reader(path, convert_categoricals=True):
+        reads.append((path, convert_categoricals))
+        return source_frames[path][0 if convert_categoricals else 1].copy(deep=True)
+    monkeypatch.setattr(driver, '_build_input_source', tracked_builder)
+    monkeypatch.setattr(driver, 'get_dataframe', invented_reader)
+    monkeypatch.setattr(driver, 'to_parquet', lambda *args, **kwargs: writes.append(args))
+    monkeypatch.setattr(driver, '_input_maps', lambda: (MAPS['input_map'], MAPS['unit_map'], {}))
+    monkeypatch.setattr(driver, '_crop_maps', lambda: (MAPS['crop_map'], {}))
+    with pytest.raises(AssertionError) as caught:
+        driver.main()
+    assert str(caught.value) == 'plot_inputs 2011-12 produced no rows'
+    assert reads == [(RAINY, True), (RAINY, False), (DRY, True), (DRY, False)]
+    assert attempts == [RAINY, DRY] and writes == []

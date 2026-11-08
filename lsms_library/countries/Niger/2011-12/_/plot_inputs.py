@@ -82,7 +82,10 @@ def main():
             source_path='../Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaas3c_p1.dta',
             input_map=input_map, unit_map=unit_map, crop_map=crop_map),
     ]
-    df = pd.concat(sources)
+    # Empty native frames can carry different index dtypes. Preserve the sole
+    # contributing component exactly; both sources were already read/built.
+    nonempty = [frame for frame in sources if len(frame) > 0]
+    df = pd.concat(nonempty) if len(nonempty) > 1 else (nonempty or sources)[0]
     assert df.index.is_unique, 'plot_inputs has repeated native input observations'
     assert len(df) > 0, 'plot_inputs 2011-12 produced no rows'
     to_parquet(df, 'plot_inputs.parquet')
