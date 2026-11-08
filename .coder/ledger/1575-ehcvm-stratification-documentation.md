@@ -62,3 +62,22 @@ have sidecars; three 2018 BIDs (Togo/GB/CIV) do not. No new framework or tests.
 
 No blocker to this evidence-only append. Geographic crosswalks, strata wiring,
 managed document ingestion and final production acceptance remain separate.
+
+## Phase 3 — documentation-only verification
+
+The four appendices retain every original country file as an exact byte prefix:
+Benin +25 lines, Togo +29, Guinea-Bissau +27, CotedIvoire +31. Live caveats and
+conflicting earlier instructions remain. Own BID quotations/pages and the
+original-design versus cluster-revisit qualification reuse the already reviewed
+primary-document packet (§2); no new PDF parse or source access occurred.
+
+All additions are documentary. Togo's geographic names and zero-allocation
+limit remain unadjudicated; the other capital exceptions are country-specific.
+Static whitespace verification passed. No functional test, build, metadata
+census, microdata/API/cache/rewarm/DVC or GitHub action was run or claimed.
+External managed-holding inventory confirms two of the five newly private PDFs
+already have sidecars and three first-edition BIDs do not. No holding was added.
+
+Verification receipts, final source identity and whole mode/type/blob proof are
+in `reports/1575-ehcvm-stratification-docs-candidate-20261108` in the same burst.
+ROOT review and any integration/publication remain pending.
