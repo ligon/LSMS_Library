@@ -1,4 +1,82 @@
 #+title: LSMS-ISA country workers and coordinator queue
+* Current scrum checkpoint 2026-11-08T15:26:55.039604+00:00
+Goal ACTIVE. Development remains 609b7720f8dbc72b85cb846fdd1f63e84d51f977.
+No new merge in this checkpoint. Last measured counts: 29 development merges,
+23 closed sweep issues; original147 scope19closed/128open;164repositoryopen.
+These counts are inherited observations, not a fresh GitHub recount.
+
+NEW USER DECISIONS recorded on GitHub:
+- #1499: convert VALID numeric strings BEFORE aggregation. Reject malformed
+  nonmissing tokens (including conversion-created NA); preserve genuine NA,
+  already numeric carriers, identifiers, index, labels and units. Covers actual
+  declared additive operands and affected Price arithmetic. Earlier issue
+  reject-all-strings recommendation and reviewer malformed-to-NA assumption
+  are superseded. Frozen24 reviewer matrix is PREP, not executed proof.
+- #1594: exact99,999,999 is a missing-value sentinel, per maintainer interpretation.
+  Mali2014-15 raw purchased value s13q03c in BOTH passages, BEFORE aggregation.
+  Preserve original contribution eligibility/keys/quantities and legitimate
+  paired16,325XOF. No deleting derived large totals/zero filling/recall change.
+  Candidate c4d51302bc6ff6e06e870c4347d7ecd9403e5303 (ledger-first1438cade5)
+  has14 new synthetic+3 exact-parent controls; ROOT approved one frozen17 cohort
+  fed854a3…; local session5805 CLOSED17PASS/0fail/0skip;34.158s wrapper.
+  Three guards active/0denials/private data0files0links/sourceclean. Final manifest
+  590a6570a2a4586364985d76b3dd35faa84b210ad83c03747210d47d48a06ef2.
+  Existing captures retain
+  only one native household, not all55 sentinel rows, and lack historical case-A
+  seals; new bounded2-held-DTA source proof PREPARATION chosen, no decode grant.
+
+CURRENT owners (3local agents, zero active native model jobs):
+- finish_1452: #1540 independent51 NEW external controls PASS,0skip/fail,
+  source-free private-data0/3x13 guard bindings active/0denials. Static seven
+  helper-home maps/AST/Guinea/schema assertions PASS.14 inherited integer-cast
+  warnings retained. Manifest c3d4e13e057ad63498a12a14d2598664f5f1763ca58dec6fa09950c10b91313e.
+  Exact native final5e5ba26febef7cf86f34a33eaf9b2411e74d2b4d/runtimead680…
+  author270PASS. Native41024962 completed task/native0; supervisor74 only because
+  evidence publisher refused five pytest *current symlink dirs. Workspace
+  publication COMPLETE, safe24regular-file packet6087a646… preserved; no restart.
+  Owner now prepares ordinary current609b integration/object-union/hash/API/fullCI
+  operator; no GitHub publication. Then local #1499 finisher, with corrected
+  independent matrix from1590. Remote1499 is terminal, not a product candidate.
+- finish_1590: #1529 Feature gate V6 FAILED1/74.01s AFTER Feature returned;
+  len9605 assertion failed, two caught guard refusals, actual denied paths/locals
+  UNRECORDED. All8 originals and7 cache copies pre/post unchanged, L1files0.
+  StartupV3 separately PASS40.32s/exact2ldconfig, no8-artifact/Feature IO.
+  Static likely mechanism: _input_hash probes absent script-output literal
+  Data/plot_inputs.parquet; overrestrictive guard raises RuntimeError rather
+  than ordinary ENOENT caught by cached_file_hash, hash returnsNone and fresh
+  gate may refuse. This is reachable SOURCE reasoning, NOT observed exact V6
+  path/cause and NOT a product defect diagnosis. Failure manifest8ef3557112ef894f
+  ff52b56f94d01902d2e0399412c37473ad25ab8bb922495e preserved.
+  V7 finite absent-only hash-metadata correction + informative refusal logs
+  PREPARATION, existing non-target data still refused; peer/root review before
+  ONE actual attempt. Historicalf66 verification target unchanged.
+  Current PR1632 head291334b2ee730a549da9153ab0a0e5607bf0f47b fullCI41025001
+  CLOSED0:12311P5652S4X; JUnit17967 retains17947parent outcomes+20newP.
+  API0/meta0;19Niger country+19Niger2011wave hashes only. GitHub unit/Windows
+  SUCCESS. DRAFT held pending faithful Feature proof; whole1529 staysOPEN3B3D3E.
+- malawi_revision_food: #1594 focused cohort and bounded raw-proof prep above;
+  #1574 official BID47785 parsed32pages/14.73s/0denials, original PDF preserved
+  SHA33423a38c73f5459b102ecd7e1eb6f9e830346e839119d2085c71a6730b3e2c0.
+  Five earlier held PDFs parsed219pages.51-strata statement found, complete51
+  mapping UNLOCATED in bounded text, visual proof pending. No mapping/weights
+  inference or DVC ingestion/push grant; managed-document proposal queued.
+
+Remote #1499 job41025681/eed9f2ec8afa4dd7906c63db243b53d6 TERMINAL:
+startup guard refused /dev/null through magic/ctypes/ldconfig BEFORE any reducer,
+0tests, original13 guards UNREACHED. Native0/taskBLOCKED; supervisor74 because
+snapshot helper timeout, cleanup complete (different from1540symlinks).
+Private result7d74438fb04909ab814fbab8ded4ee0738a90fee exists; safe15-file packet
+20ace5d4a41eb20bdb40dc0666338370f5952f64732460141a31d18a5b0b2364.
+No product implementation, no retrospective steering or automatic restart.
+
+Tanzania triage sealed ad4a8802bf9a0018641b03a3db3db5f012067e48e40d420af562bd2e4034d8f9:
+#1136 design after defect queue;#1135 complete movers measurement before numeric
+formatter;#1497/#1442/#1509 science held. #1288 freshness design and#1066 assumed-
+fresh grain diagnostic are possible next finite lanes, not implemented.
+No master release, shared rewarm or production-weight change. Whole-wave Malawi
+PR1604 remains held. Eight original country model jobs are historical terminal,
+not eight waiting agents. Preserve earlier receipts/failed phases as history.
+
 * Current scrum checkpoint 2026-11-08T13:58:31.043827+00:00
 Goal ACTIVE. GitHub development 609b7720f8dbc72b85cb846fdd1f63e84d51f977.29development merges and23currently
 closed sweep issues. Fresh GraphQL164repoissuesOPEN; original147scope19closed/
