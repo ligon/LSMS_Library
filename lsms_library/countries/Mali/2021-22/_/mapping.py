@@ -1,8 +1,19 @@
 # Formatting Functions for Mali 2021-22
+from pathlib import Path as _Path
 import pandas as pd
 from lsms_library.local_tools import format_id
 import numpy as np
 import lsms_library.local_tools as tools
+
+# Own config-tree binding, identical to the existing EACI wave override pattern.
+_ehcvm21_i = tools.get_formatting_functions(
+    _Path(__file__).resolve().parents[2] / '_' / 'mali.py',
+    '_mali_ehcvm21_namespace')['ehcvm21_i']
+
+def i(value):
+    '''2021-22 raw key: EHCVM21_; only approved panel maps return bare IDs.'''
+    return _ehcvm21_i(value)
+
 from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
     food_acquired_with_unit_weights as _food_acquired_with_unit_weights,

@@ -3599,3 +3599,37 @@ all images/tables is inferred. No stratum label, source eligibility, weight,
 survey-design interpretation or data/schema/default changes accompany this
 holding. Exact provenance is in =2017-18/Documentation/SOURCE.org= and
 =.coder/ledger/1574-mali-public-bid-managed-ingestion.md=.
+
+
+* 2026-11-08 -- all 2021-22 raw household IDs have a namespace; only approved panel links map back (GH #1494)
+
+User ruling: “Namespace all 2021–22 raw IDs, then map back only approved
+panel links (recommended). Unlinked, unknown and orphan records retain
+distinct IDs.” The chosen raw prefix is =EHCVM21_=, applied to every
+2021-22 household through its own YAML formatter, scripted EHCVM plot/crop
+helpers and raw derivation-input keys. It does not classify every non-=Oui=
+answer as =Non=, drop a household, or alter its native coordinates, answers,
+weight, plot/person keys, eligibility, unit or season.
+
+The older entry above calls =PanelHH= =Non= an “open ruling” and says that
+“1,111 of the 1,120” replacement households spell a 2018-19 ID. That records
+the preceding state and historical counts; it is retained. This decision
+resolves the namespace policy rather than re-measuring those counts or
+asserting identity from numeric overlap. EACI14_/EACI17_ and 2018-19 IDs,
+person IDs and all other countries keep their existing rules.
+
+Only the already approved 2021-22 panel source keys acquire the prefix in
+=panel_ids.json= and =updated_ids.json=; every previous-wave target and
+approved edge stays the same. The generator still makes its identity,
+previous-pointer and occupied-slot decisions in BARE coordinates, then
+prefixes output source keys. Its old conservative omissions are preserved:
+this change does not restore the three chain-related or eight occupied-slot
+links held separately. Neither source covers nor the JSON generator were
+run for the prepared mechanical transport. The two committed files carried
+5,011 approved edges; removing the new source prefix reproduces both old
+files byte for byte, including ordering, targets and other waves.
+
+Implementation/test preparation is separate from actual source/API/cache
+acceptance. The finite source-free controls and later independent review
+must close before a new actual serving claim; no whole-country re-warm or
+source replay is implied. See =.coder/ledger/1494-mali-2021-namespace.md=.
