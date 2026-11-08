@@ -129,6 +129,24 @@ with warnings.catch_warnings(record=True) as w:
     # Inspect w for any per-country failures
 ```
 
+`household_characteristics` and `food_expenditures` validate required provider
+index levels before comparing country shapes. A provider missing a required
+level is excluded with a warning; `df.attrs['index_unavailable']` records its
+missing and required levels, returned index names, and row count. A present
+level with null values is retained. The excluded frame remains available through
+the Country API.
+
+These requirements are declared separately under
+`Index Info > required_index_levels`: `(t, v, i)` for household characteristics
+and `(t, v, i, j)` for food expenditures. A requested `market` replaces required
+`v` with `m`; monetary index/numeraire modes require `currency`. Ordinary
+household characteristics may omit `m`, and legacy food expenditures may omit
+`s`. Their existing shape selection and source detail are preserved: this does
+not register a new canonical food-expenditure shape or combine incompatible
+source shapes. Other tables keep their existing reduced-index contracts. If
+every provider is excluded, Feature returns the existing empty assembly with
+the exclusion record.
+
 ## Available Tables
 
 Most tables declared in a country's `data_scheme.yml` can be used with
