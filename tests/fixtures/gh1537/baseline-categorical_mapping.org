@@ -1,0 +1,1028 @@
+#+title: Categorical Mapping for Nigeria
+
+* Food Items
+
+  Food item codes changed between wave 1 (2010-11) and wave 2 (2012-13),
+  when the survey expanded from ~80 to ~130 items.  The Preferred Label
+  is the most specific available label; the Aggregate Label groups
+  sub-varieties (e.g. "Maize (shelled)" and "Maize (unshelled)" both
+  aggregate to "Maize").
+
+  Community-price item codes (GAP C / community_prices feature) reuse this
+  same table.  The post-harvest community price module (Section C8,
+  sectc8_harvest*) in W3-W5 carries the consumption-module item_cd scheme,
+  so its items resolve directly via Code here -- no extension needed.  W1/W2
+  community-price use the community questionnaire's OWN (disjoint) item-code
+  scheme, mapped by NAME to these Preferred Labels in nigeria.py
+  (_W1W2_PRICE_ITEM), reusing existing food labels where the priced good is
+  a consumption-module food.  Codes 4001-4016 below register the only
+  genuinely NEW price-questionnaire items (prepared foods / drinks the
+  consumption module does not list: Moi moi, Akara, Kulikuli, the soups,
+  Kunu, juices, flours, Ice cream); they appear only in the W1/W2 community
+  price round (PH quarters 2011Q1/2013Q1).
+
+  Crop-production item codes (GAP 1 / crop_production feature) are appended
+  to the same table.  The post-harvest crop module (secta3*) uses its own
+  cropcode scheme (1010-9999), DISJOINT from the food-consumption codes
+  above (1-601), so they coexist in one Code column with no collision.  The
+  Preferred Label REUSES the consumed-food label where the crop is itself a
+  consumed food (e.g. cropcode 1080 MAIZE -> "Maize", 1110 RICE ->
+  "Rice--local"), so crop_production.j joins food_acquired.j on Preferred
+  Label.  New Preferred Labels are added only for non-food / newly-introduced
+  crops (Cotton, Tobacco, Gum arabic, Rubber, Jute, Cocoa, Cowpea, Wheat,
+  Ginger, ...).  The per-wave columns for crop rows carry the native crop
+  label in the PH harvest quarters (2011Q1/2013Q1/2016Q1/2019Q1); 2023-24
+  (PH quarter 2024Q1) has no column but resolves via Code.
+
+#+NAME: harmonize_food
+| Code | Preferred Label                         | Aggregate Label              | 2010Q3                                        | 2011Q1                                        | 2012Q3                                        | 2013Q1                                        | 2015Q3                                        | 2016Q1                                        | 2018Q3                                        | 2019Q1                                        |
+|------+-----------------------------------------+------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|
+|    1 | Full Breakfast (Away)                   | Full Breakfast               | Full Breakfast (Away)                         | Full Breakfast (Away)                         | Full Breakfast (Away)                         | Full Breakfast (Away)                         | Full Breakfast (Away)                         | Full Breakfast (Away)                         | Full Breakfast (Away)                         | Full Breakfast (Away)                         |
+|    2 | Full Lunch (Away)                       | Full Lunch                   | Full Lunch (Away)                             | Full Lunch (Away)                             | Full Lunch (Away)                             | Full Lunch (Away)                             | Full Lunch (Away)                             | Full Lunch (Away)                             | Full Lunch (Away)                             | Full Lunch (Away)                             |
+|    3 | Full Dinner (Away)                      | Full Dinner                  | Full Dinner (Away)                            | Full Dinner (Away)                            | Full Dinner (Away)                            | Full Dinner (Away)                            | Full Dinner (Away)                            | Full Dinner (Away)                            | Full Dinner (Away)                            | Full Dinner (Away)                            |
+|    4 | Side dishes (Away)                      | Side dishes                  | Side dishes (Away)                            | Side dishes (Away)                            | Side dishes (Away)                            | Side dishes (Away)                            | Side dishes (Away)                            | Side dishes (Away)                            | Side dishes (Away)                            | Side dishes (Away)                            |
+|    5 | Snacks (Away)                           | Snacks                       | Snacks (Away)                                 | Snacks (Away)                                 | Snacks (Away)                                 | Snacks (Away)                                 | Snacks (Away)                                 | Snacks (Away)                                 | Snacks (Away)                                 | Snacks (Away)                                 |
+|    6 | Dairy beverages (Away)                  | Dairy beverages              | Dairy beverages (Away)                        | Dairy beverages (Away)                        | Dairy beverages (Away)                        | Dairy beverages (Away)                        | Dairy beverages (Away)                        | Dairy beverages (Away)                        | Dairy beverages (Away)                        | Dairy beverages (Away)                        |
+|    7 | Vegetables (Away)                       | Vegetables                   | Vegetables (Away)                             | Vegetables (Away)                             | Vegetables (Away)                             | Vegetables (Away)                             | Vegetables (Away)                             | Vegetables (Away)                             | Vegetables (Away)                             | Vegetables (Away)                             |
+|    8 | Non alcoholic drinks                    | Non alcoholic drinks         | Non alcoholic drinks                          | Non alcoholic drinks                          | Non alcoholic drinks                          | Non alcoholic drinks                          | Non alcoholic drinks                          | Non alcoholic drinks                          | Non alcoholic drinks                          | Non alcoholic drinks                          |
+|    9 | Alcoholic drinks                        | Alcoholic drinks             | Alcoholic drinks                              | Alcoholic drinks                              | Alcoholic drinks                              | Alcoholic drinks                              | Alcoholic drinks                              | Alcoholic drinks                              | Alcoholic drinks                              | Alcoholic drinks                              |
+|   10 | Guinea corn/sorghum                     | Guinea corn/sorghum          | Guinea corn/sorghum                           | Guinea corn/sorghum                           | Guinea corn/sorghum                           | Guinea corn/sorghum                           | Guinea corn/sorghum                           | Guinea corn/sorghum                           | Guinea corn/sorghum                           | Guinea corn/sorghum                           |
+|   11 | Millet                                  | Millet                       | Millet                                        | Millet                                        | Millet                                        | Millet                                        | Millet                                        | Millet                                        | Millet                                        | Millet                                        |
+|   12 | Maize                                   | Maize                        | Maize                                         | Maize                                         | ---                                           | ---                                           | ---                                           | ---                                           | ---                                           | ---                                           |
+|   13 | Rice--local                             | Rice                         | Rice--local                                   | Rice--local                                   | Rice--local                                   | Rice--local                                   | Rice--local                                   | Rice--local                                   | Rice--local                                   | Rice--local                                   |
+|   14 | Rice--imported                          | Rice                         | Rice--imported                                | Rice--imported                                | Rice--imported                                | Rice--imported                                | Rice--imported                                | Rice--imported                                | Rice--imported                                | Rice--imported                                |
+|   15 | Bread                                   | Bread                        | Bread                                         | Bread                                         | ---                                           | ---                                           | ---                                           | ---                                           | ---                                           | ---                                           |
+|   16 | Maize flour                             | Maize flour                  | Maize flour                                   | Maize flour                                   | Maize flour                                   | Maize flour                                   | Maize flour                                   | Maize flour                                   | Maize flour                                   | Maize flour                                   |
+|   17 | Yam flour                               | Yam flour                    | Yam flour                                     | Yam flour                                     | Yam flour                                     | Yam flour                                     | Yam flour                                     | Yam flour                                     | Yam flour                                     | Yam flour                                     |
+|   18 | Cassava flour                           | Cassava flour                | Cassava flour                                 | Cassava flour                                 | Cassava flour                                 | Cassava flour                                 | Cassava flour                                 | Cassava flour                                 | Cassava flour                                 | Cassava flour                                 |
+|   19 | Wheat flour                             | Wheat flour                  | Wheat flour                                   | Wheat flour                                   | Wheat flour                                   | Wheat flour                                   | Wheat flour                                   | Wheat flour                                   | Wheat flour                                   | Wheat flour                                   |
+|   20 | Maize (unshelled, on the cob)           | Maize                        | Other grains and flour                        | Other grains and flour                        | Maize (unshelled, on the cob)                 | Maize (unshelled, on the cob)                 | Maize (unshelled, on the cob)                 | Maize (unshelled, on the cob)                 | Maize (unshelled, on the cob)                 | Maize (unshelled, on the cob)                 |
+|   21 | Maize (shelled, on the cob)             | Maize                        | ---                                           | ---                                           | Maize (shelled)                               | Maize (shelled)                               | Maize (shelled, on the cob)                   | Maize (shelled, on the cob)                   | Maize (shelled, on the cob)                   | Maize (shelled, on the cob)                   |
+|   22 | Maize (shelled, off the cob)            | Maize                        | ---                                           | ---                                           | Other grains and flour                        | Other grains and flour                        | Maize (shelled, off the cob)                  | Maize (shelled, off the cob)                  | Maize (shelled, off the cob)                  | Maize (shelled, off the cob)                  |
+|   23 | Other grains and flour                  | Other grains and flour       | ---                                           | ---                                           | ---                                           | ---                                           | Other grains and flour                        | Other grains and flour                        | Other grains and flour                        | Other grains and flour                        |
+|   25 | Bread                                   | Bread                        | ---                                           | ---                                           | Bread                                         | Bread                                         | Bread                                         | Bread                                         | Bread                                         | Bread                                         |
+|   26 | Cake                                    | Cake                         | ---                                           | ---                                           | Cake                                          | Cake                                          | Cake                                          | Cake                                          | Cake                                          | Cake                                          |
+|   27 | Buns/Pofpof/Donuts                      | Buns/Pofpof/Donuts           | ---                                           | ---                                           | Buns/Pofpof/Donuts                            | Buns/Pofpof/Donuts                            | Buns/Pofpof/Donuts                            | Buns/Pofpof/Donuts                            | Buns/Pofpof/Donuts                            | Buns/Pofpof/Donuts                            |
+|   28 | Biscuits                                | Biscuits                     | ---                                           | ---                                           | Biscuits                                      | Biscuits                                      | Biscuits                                      | Biscuits                                      | Biscuits                                      | Biscuits                                      |
+|   29 | Meat Pie/Sausage Roll                   | Meat Pie/Sausage Roll        | ---                                           | ---                                           | Meat Pie/Sausage Roll                         | Meat Pie/Sausage Roll                         | Meat Pie/Sausage Roll                         | Meat Pie/Sausage Roll                         | Meat Pie/Sausage Roll                         | Meat Pie/Sausage Roll                         |
+|   30 | Cassava--roots                          | Cassava                      | Cassava--roots                                | Cassava--roots                                | Cassava--roots                                | Cassava--roots                                | Cassava--roots                                | Cassava--roots                                | Cassava--roots                                | Cassava--roots                                |
+|   31 | Yam--roots                              | Yam                          | Yam--roots                                    | Yam--roots                                    | Yam--roots                                    | Yam--roots                                    | Yam--roots                                    | Yam--roots                                    | Yam--roots                                    | Yam--roots                                    |
+|   32 | Gari--white                             | Gari                         | Gari--white                                   | Gari--white                                   | Gari--white                                   | Gari--white                                   | Gari--white                                   | Gari--white                                   | Gari--white                                   | Gari--white                                   |
+|   33 | Gari--yellow                            | Gari                         | Gari--yellow                                  | Gari--yellow                                  | Gari--yellow                                  | Gari--yellow                                  | Gari--yellow                                  | Gari--yellow                                  | Gari--yellow                                  | Gari--yellow                                  |
+|   34 | Cocoyam                                 | Cocoyam                      | Cocoyam                                       | Cocoyam                                       | Cocoyam                                       | Cocoyam                                       | Cocoyam                                       | Cocoyam                                       | Cocoyam                                       | Cocoyam                                       |
+|   35 | Plantains                               | Plantains                    | Plantains                                     | Plantains                                     | Plantains                                     | Plantains                                     | Plantains                                     | Plantains                                     | Plantains                                     | Plantains                                     |
+|   36 | Sweet potatoes                          | Sweet potatoes               | Sweet potatoes                                | Sweet potatoes                                | Sweet potatoes                                | Sweet potatoes                                | Sweet potatoes                                | Sweet potatoes                                | Sweet potatoes                                | Sweet potatoes                                |
+|   37 | Potatoes                                | Potatoes                     | Potatoes                                      | Potatoes                                      | Potatoes                                      | Potatoes                                      | Potatoes                                      | Potatoes                                      | Potatoes                                      | Potatoes                                      |
+|   38 | Other roots and tuber                   | Other roots and tuber        | Other roots and tuber                         | Other roots and tuber                         | Other roots and tuber                         | Other roots and tuber                         | Other roots and tuber                         | Other roots and tuber                         | Other roots and tuber                         | Other roots and tuber                         |
+|   40 | Soya beans                              | Soya beans                   | Soya beans                                    | Soya beans                                    | Soya beans                                    | Soya beans                                    | Soya beans                                    | Soya beans                                    | Soya beans                                    | Soya beans                                    |
+|   41 | Brown beans                             | Brown beans                  | Brown beans                                   | Brown beans                                   | Brown beans                                   | Brown beans                                   | Brown beans                                   | Brown beans                                   | Brown beans                                   | Brown beans                                   |
+|   42 | White beans                             | White beans                  | White beans                                   | White beans                                   | White beans                                   | White beans                                   | White beans                                   | White beans                                   | White beans                                   | White beans                                   |
+|   43 | Groundnuts (unshelled)                  | Groundnuts                   | Groundnuts                                    | Groundnuts                                    | Groundnuts                                    | Groundnuts (unshelled)                        | Groundnuts (unshelled)                        | Groundnuts (unshelled)                        | Groundnuts (unshelled)                        | Groundnuts (unshelled)                        |
+|   44 | Groundnuts (shelled)                    | Groundnuts                   | Other nuts/seeds/pulses                       | Other nuts/seeds/pulses                       | Other nuts/seeds/pulses                       | Groundnuts (shelled)                          | Groundnuts (shelled)                          | Groundnuts (shelled)                          | Groundnuts (shelled)                          | Groundnuts (shelled)                          |
+|   45 | Other nuts/seeds/pulses                 | Other nuts/seeds/pulses      | ---                                           | ---                                           | Other nuts/seeds/pulses                       | Other nuts/seeds/pulses                       | Other nuts/seeds/pulses                       | Other nuts/seeds/pulses                       | Other nuts/seeds/pulses                       | Other nuts/seeds/pulses                       |
+|   46 | Coconut                                 | Coconut                      | ---                                           | ---                                           | ---                                           | ---                                           | Coconut                                       | Coconut                                       | Coconut                                       | Coconut                                       |
+|   47 | Kola nut                                | Kola nut                     | ---                                           | ---                                           | ---                                           | ---                                           | Kola nut                                      | Kola nut                                      | Kola nut                                      | Kola nut                                      |
+|   48 | Cashew nut                              | Cashew nut                   | ---                                           | ---                                           | ---                                           | ---                                           | Cashew nut                                    | Cashew nut                                    | Cashew nut                                    | Cashew nut                                    |
+|   50 | Palm oil                                | Palm oil                     | Palm oil                                      | Palm oil                                      | Palm oil                                      | Palm oil                                      | Palm oil                                      | Palm oil                                      | Palm oil                                      | Palm oil                                      |
+|   51 | Butter/Margarine                        | Butter/Margarine             | Butter/Margarine                              | Butter/Margarine                              | Butter/Margarine                              | Butter/Margarine                              | Butter/Margarine                              | Butter/Margarine                              | Butter/Margarine                              | Butter/Margarine                              |
+|   52 | Groundnut oil                           | Groundnut oil                | Groundnut oil                                 | Groundnut oil                                 | Groundnut oil                                 | Groundnut oil                                 | Groundnut oil                                 | Groundnut oil                                 | Groundnut oil                                 | Groundnut oil                                 |
+|   53 | Other oils and fats                     | Other oils and fats          | Other oils and fats                           | Other oils and fats                           | Other oils and fats                           | Other oils and fats                           | Other oils and fats                           | Other oils and fats                           | Other oils and fats                           | Other oils and fats                           |
+|   54 | Sheabutter                              | Sheabutter                   | ---                                           | ---                                           | ---                                           | ---                                           | Sheabutter                                    | Sheabutter                                    | ---                                           | ---                                           |
+|   55 | Coconut oil                             | Coconut oil                  | ---                                           | ---                                           | ---                                           | ---                                           | Coconut oil                                   | Coconut oil                                   | Coconut oil                                   | Coconut oil                                   |
+|   56 | Animal fat                              | Animal fat                   | ---                                           | ---                                           | ---                                           | ---                                           | Animal fat                                    | Animal fat                                    | Animal fat                                    | Animal fat                                    |
+|   60 | Bananas                                 | Bananas                      | Bananas                                       | Bananas                                       | Bananas                                       | Bananas                                       | Bananas                                       | Bananas                                       | Bananas                                       | Bananas                                       |
+|   61 | Orange/tangerine                        | Orange/tangerine             | Orange/tangerine                              | Orange/tangerine                              | Orange/tangerine                              | Orange/tangerine                              | Orange/tangerine                              | Orange/tangerine                              | Orange/tangerine                              | Orange/tangerine                              |
+|   62 | Mangoes                                 | Mangoes                      | Mangoes                                       | Mangoes                                       | Mangoes                                       | Mangoes                                       | Mangoes                                       | Mangoes                                       | Mangoes                                       | Mangoes                                       |
+|   63 | Avocado pear                            | Avocado pear                 | Avocado pear                                  | Avocado pear                                  | Avocado pear                                  | Avocado pear                                  | Avocado pear                                  | Avocado pear                                  | Avocado pear                                  | Avocado pear                                  |
+|   64 | Pineapples                              | Pineapples                   | Pineapples                                    | Pineapples                                    | Pineapples                                    | Pineapples                                    | Pineapples                                    | Pineapples                                    | Pineapples                                    | Pineapples                                    |
+|   65 | Fruit canned                            | Fruit canned                 | Fruit canned                                  | Fruit canned                                  | Fruit canned                                  | Fruit canned                                  | Fruit canned                                  | Fruit canned                                  | Fruit canned                                  | Fruit canned                                  |
+|   66 | Other fruits                            | Other fruits                 | Other fruits                                  | Other fruits                                  | Other fruits                                  | Other fruits                                  | Other fruits                                  | Other fruits                                  | Other fruits                                  | Other fruits                                  |
+|   67 | Pawpaw                                  | Pawpaw                       | ---                                           | ---                                           | ---                                           | ---                                           | Pawpaw                                        | Pawpaw                                        | Pawpaw                                        | Pawpaw                                        |
+|   68 | Watermelon                              | Watermelon                   | ---                                           | ---                                           | ---                                           | ---                                           | Watermelon                                    | Watermelon                                    | Watermelon                                    | Watermelon                                    |
+|   69 | Apples                                  | Apples                       | ---                                           | ---                                           | ---                                           | ---                                           | Apples                                        | Apples                                        | Apples                                        | Apples                                        |
+|   70 | Tomatoes                                | Tomatoes                     | Tomatoes                                      | Tomatoes                                      | Tomatoes                                      | Tomatoes                                      | Tomatoes                                      | Tomatoes                                      | Tomatoes                                      | Tomatoes                                      |
+|   71 | Tomato puree (canned)                   | Tomato puree                 | Tomato puree (canned)                         | Tomato puree (canned)                         | Tomato puree (canned)                         | Tomato puree (canned)                         | Tomato puree (canned)                         | Tomato puree (canned)                         | Tomato puree (canned)                         | Tomato puree (canned)                         |
+|   72 | Onions                                  | Onions                       | Onions                                        | Onions                                        | Onions                                        | Onions                                        | Onions                                        | Onions                                        | Onions                                        | Onions                                        |
+|   73 | Garden eggs/egg plant                   | Garden eggs/egg plant        | Garden eggs/egg plant                         | Garden eggs/egg plant                         | Garden eggs/egg plant                         | Garden eggs/egg plant                         | Garden eggs/egg plant                         | Garden eggs/egg plant                         | Garden eggs/egg plant                         | Garden eggs/egg plant                         |
+|   74 | Okra--fresh                             | Okra                         | Okra--fresh                                   | Okra--fresh                                   | Okra--fresh                                   | Okra--fresh                                   | Okra--fresh                                   | Okra--fresh                                   | Okra--fresh                                   | Okra--fresh                                   |
+|   75 | Okra--dried                             | Okra                         | Okra--dried                                   | Okra--dried                                   | Okra--dried                                   | Okra--dried                                   | Okra--dried                                   | Okra--dried                                   | Okra--dried                                   | Okra--dried                                   |
+|   76 | Fresh Pepper                            | Fresh Pepper                 | Pepper                                        | Pepper                                        | Pepper                                        | Fresh Pepper                                  | Fresh Pepper                                  | Fresh Pepper                                  | Fresh Pepper                                  | Fresh Pepper                                  |
+|   77 | Dry Pepper                              | Dry Pepper                   | Leaves (Cocoyam, Spinach, etc.)               | Leaves (Cocoyam, Spinach, etc.)               | Leaves (Cocoyam, Spinach, etc.)               | Dry Pepper                                    | Dry Pepper                                    | Dry Pepper                                    | Dry Pepper                                    | Dry Pepper                                    |
+|   78 | Leaves (Cocoyam, Spinach, etc.)         | Leaves                       | Other vegetables (fresh or canned)            | Other vegetables (fresh or canned)            | Other vegetables (fresh or canned)            | Leaves (Cocoyam, Spinach, etc.)               | Leaves (Cocoyam, Spinach, etc.)               | Leaves (Cocoyam, Spinach, etc.)               | Leaves (Cocoyam, Spinach, etc.)               | Leaves (Cocoyam, Spinach, etc.)               |
+|   79 | Other vegetables (fresh or canned)      | Other vegetables             | ---                                           | ---                                           | Other vegetables (fresh or canned)            | Other vegetables (fresh or canned)            | Other vegetables (fresh or canned)            | Other vegetables (fresh or canned)            | Other vegetables (fresh or canned)            | Other vegetables (fresh or canned)            |
+|   80 | Chicken                                 | Chicken                      | Chicken                                       | Chicken                                       | Chicken                                       | Chicken                                       | Chicken                                       | Chicken                                       | Chicken                                       | Chicken                                       |
+|   81 | Duck                                    | Duck                         | Duck                                          | Duck                                          | Duck                                          | Duck                                          | Duck                                          | Duck                                          | Duck                                          | Duck                                          |
+|   82 | Other domestic poultry                  | Other domestic poultry       | Other domestic poultry                        | Other domestic poultry                        | Other domestic poultry                        | Other domestic poultry                        | Other domestic poultry                        | Other domestic poultry                        | Other domestic poultry                        | Other domestic poultry                        |
+|   83 | Agricultural eggs                       | Agricultural eggs            | Agricultural eggs                             | Agricultural eggs                             | Agricultural eggs                             | Agricultural eggs                             | Agricultural eggs                             | Agricultural eggs                             | Agricultural eggs                             | Agricultural eggs                             |
+|   84 | Local eggs                              | Local eggs                   | Local eggs                                    | Local eggs                                    | Local eggs                                    | Local eggs                                    | Local eggs                                    | Local eggs                                    | Local eggs                                    | Local eggs                                    |
+|   85 | Other eggs (not chicken)                | Other eggs                   | Other eggs (not chicken)                      | Other eggs (not chicken)                      | Other eggs (not chicken)                      | Other eggs (not chicken)                      | Other eggs (not chicken)                      | Other eggs (not chicken)                      | Other eggs (not chicken)                      | Other eggs (not chicken)                      |
+|   90 | Beef                                    | Beef                         | Beef                                          | Beef                                          | Beef                                          | Beef                                          | Beef                                          | Beef                                          | Beef                                          | Beef                                          |
+|   91 | Mutton                                  | Mutton                       | Mutton                                        | Mutton                                        | Mutton                                        | Mutton                                        | Mutton                                        | Mutton                                        | Mutton                                        | Mutton                                        |
+|   92 | Pork                                    | Pork                         | Pork                                          | Pork                                          | Pork                                          | Pork                                          | Pork                                          | Pork                                          | Pork                                          | Pork                                          |
+|   93 | Goat                                    | Goat                         | Goat                                          | Goat                                          | Goat                                          | Goat                                          | Goat                                          | Goat                                          | Goat                                          | Goat                                          |
+|   94 | Wild game meat                          | Wild game meat               | Wild game meat                                | Wild game meat                                | Wild game meat                                | Wild game meat                                | Wild game meat                                | Wild game meat                                | Wild game meat                                | Wild game meat                                |
+|   95 | Canned beef/corned beef                 | Canned beef/corned beef      | Canned beef/corned beef                       | Canned beef/corned beef                       | Canned beef/corned beef                       | Canned beef/corned beef                       | Canned beef/corned beef                       | Canned beef/corned beef                       | Canned beef/corned beef                       | Canned beef/corned beef                       |
+|   96 | Other meat (excl. poultry)              | Other meat                   | Other meat (excl. poultry)                    | Other meat (excl. poultry)                    | Other meat (excl. poultry)                    | Other meat (excl. poultry)                    | Other meat (excl. poultry)                    | Other meat (excl. poultry)                    | Other meat (excl. poultry)                    | Other meat (excl. poultry)                    |
+|  100 | Fish--fresh                             | Fish                         | Fish--fresh                                   | Fish--fresh                                   | Fish--fresh                                   | Fish--fresh                                   | Fish--fresh                                   | Fish--fresh                                   | Fish--fresh                                   | Fish--fresh                                   |
+|  101 | Fish--frozen                            | Fish                         | Fish--frozen                                  | Fish--frozen                                  | Fish--frozen                                  | Fish--frozen                                  | Fish--frozen                                  | Fish--frozen                                  | Fish--frozen                                  | Fish--frozen                                  |
+|  102 | Fish--smoked                            | Fish                         | Fish--smoked                                  | Fish--smoked                                  | Fish--smoked                                  | Fish--smoked                                  | Fish--smoked                                  | Fish--smoked                                  | Fish--smoked                                  | Fish--smoked                                  |
+|  103 | Fish--dried                             | Fish                         | Fish--dried                                   | Fish--dried                                   | Fish--dried                                   | Fish--dried                                   | Fish--dried                                   | Fish--dried                                   | Fish--dried                                   | Fish--dried                                   |
+|  104 | Snails                                  | Snails                       | Snails                                        | Snails                                        | Snails                                        | Snails                                        | Snails                                        | Snails                                        | Snails                                        | Snails                                        |
+|  105 | Seafood (lobster, crab, prawns, etc)    | Seafood                      | Seafood (lobster, crab, prawns, etc)          | Seafood (lobster, crab, prawns, etc)          | Seafood (lobster, crab, prawns, etc)          | Seafood (lobster, crab, prawns, etc)          | Seafood (lobster, crab, prawns, etc)          | Seafood (lobster, crab, prawns, etc)          | Seafood (lobster, crab, prawns, etc)          | Seafood (lobster, crab, prawns, etc)          |
+|  106 | Canned fish/seafood                     | Canned fish/seafood          | Canned fish/seafood                           | Canned fish/seafood                           | Canned fish/seafood                           | Canned fish/seafood                           | Canned fish/seafood                           | Canned fish/seafood                           | Canned fish/seafood                           | Canned fish/seafood                           |
+|  107 | Other fish or seafood                   | Other fish or seafood        | Other fish or seafood                         | Other fish or seafood                         | Other fish or seafood                         | Other fish or seafood                         | Other fish or seafood                         | Other fish or seafood                         | Other fish or seafood                         | Other fish or seafood                         |
+|  110 | Fresh milk                              | Fresh milk                   | Fresh milk                                    | Fresh milk                                    | Fresh milk                                    | Fresh milk                                    | Fresh milk                                    | Fresh milk                                    | Fresh milk                                    | Fresh milk                                    |
+|  111 | Milk powder                             | Milk powder                  | Milk powder                                   | Milk powder                                   | Milk powder                                   | Milk powder                                   | Milk powder                                   | Milk powder                                   | Milk powder                                   | Milk powder                                   |
+|  112 | Baby milk powder                        | Baby milk powder             | Baby milk powder                              | Baby milk powder                              | Baby milk powder                              | Baby milk powder                              | Baby milk powder                              | Baby milk powder                              | Baby milk powder                              | Baby milk powder                              |
+|  113 | Milk tinned (unsweetened)               | Milk tinned                  | Milk tinned (unsweetened)                     | Milk tinned (unsweetened)                     | Milk tinned (unsweetened)                     | Milk tinned (unsweetened)                     | Milk tinned (unsweetened)                     | Milk tinned (unsweetened)                     | Milk tinned (unsweetened)                     | Milk tinned (unsweetened)                     |
+|  114 | Cheese (wara)                           | Cheese                       | Other milk products                           | Other milk products                           | Cheese (wara)                                 | Cheese (wara)                                 | Cheese (wara)                                 | Cheese (wara)                                 | Cheese (wara)                                 | Cheese (wara)                                 |
+|  115 | Other milk products                     | Other milk products          | ---                                           | ---                                           | Other milk products                           | Other milk products                           | Other milk products                           | Other milk products                           | Other milk products                           | Other milk products                           |
+|  120 | Coffee                                  | Coffee                       | Coffee                                        | Coffee                                        | Coffee                                        | Coffee                                        | Coffee                                        | Coffee                                        | Coffee                                        | Coffee                                        |
+|  121 | Chocolate drinks (including Milo)       | Chocolate drinks             | Chocolate drinks (including Milo)             | Chocolate drinks (including Milo)             | Chocolate drinks (including Milo)             | Chocolate drinks (including Milo)             | Chocolate drinks (including Milo)             | Chocolate drinks (including Milo)             | Chocolate drinks (including Milo)             | Chocolate drinks (including Milo)             |
+|  122 | Tea                                     | Tea                          | Tea                                           | Tea                                           | Tea                                           | Tea                                           | Tea                                           | Tea                                           | Tea                                           | Tea                                           |
+|  130 | Sugar                                   | Sugar                        | Sugar                                         | Sugar                                         | Sugar                                         | Sugar                                         | Sugar                                         | Sugar                                         | Sugar                                         | Sugar                                         |
+|  131 | Jams                                    | Jams                         | Jams                                          | Jams                                          | Jams                                          | Jams                                          | Jams                                          | Jams                                          | Jams                                          | Jams                                          |
+|  132 | Honey                                   | Honey                        | Honey                                         | Honey                                         | Honey                                         | Honey                                         | Honey                                         | Honey                                         | Honey                                         | Honey                                         |
+|  133 | Other sweets and confectionary          | Other sweets and confectionary | Other sweets and confectionary                | Other sweets and confectionary                | Other sweets and confectionary                | Other sweets and confectionary                | Other sweets and confectionary                | Other sweets and confectionary                | Other sweets and confectionary                | Other sweets and confectionary                |
+|  140 | Condiments (salt, spices, pepper, etc)  | Condiments                   | Condiments (salt, spices, pepper, etc)        | Condiments (salt, spices, pepper, etc)        | Condiments (salt, spices, pepper, etc)        | Condiments (salt, spices, pepper, etc)        | Condiments (salt, spices, pepper, etc)        | Condiments (salt, spices, pepper, etc)        | ---                                           | ---                                           |
+|  141 | Salt                                    | Salt                         | ---                                           | ---                                           | Salt                                          | Salt                                          | Salt                                          | Salt                                          | Salt                                          | Salt                                          |
+|  142 | Unground Ogbono                         | Unground Ogbono              | ---                                           | ---                                           | Unground Ogbono                               | Unground Ogbono                               | Unground Ogbono                               | Unground Ogbono                               | Unground Ogbono                               | Unground Ogbono                               |
+|  143 | Ground Ogbono                           | Ground Ogbono                | ---                                           | ---                                           | Ground Ogbono                                 | Ground Ogbono                                 | Ground Ogbono                                 | Ground Ogbono                                 | Ground Ogbono                                 | Ground Ogbono                                 |
+|  144 | Ground Pepper                           | Ground Pepper                | ---                                           | ---                                           | Ground Pepper                                 | Ground Pepper                                 | Ground Pepper                                 | Ground Pepper                                 | Ground Pepper                                 | Ground Pepper                                 |
+|  145 | Melon (shelled)                         | Melon                        | ---                                           | ---                                           | Melon (shelled)                               | Melon (shelled)                               | Melon (shelled)                               | Melon (shelled)                               | Melon (shelled)                               | Melon (shelled)                               |
+|  146 | Melon (unshelled)                       | Melon                        | ---                                           | ---                                           | Melon (unshelled)                             | Melon (unshelled)                             | Melon (unshelled)                             | Melon (unshelled)                             | Melon (unshelled)                             | Melon (unshelled)                             |
+|  147 | Melon (ground)                          | Melon                        | ---                                           | ---                                           | ---                                           | ---                                           | Melon (ground)                                | Melon (ground)                                | Melon (ground)                                | Melon (ground)                                |
+|  148 | Other Spices                            | Other Spices                 | ---                                           | ---                                           | ---                                           | ---                                           | ---                                           | ---                                           | Other Spices (e.g. Maggi)                     | Other Spices                                  |
+|  150 | Bottled water                           | Bottled water                | Bottled water                                 | Bottled water                                 | Bottled water                                 | Bottled water                                 | Bottled water                                 | Bottled water                                 | Bottled water                                 | Bottled water                                 |
+|  151 | Sachet water                            | Sachet water                 | Sachet water                                  | Sachet water                                  | Sachet water                                  | Sachet water                                  | Sachet water                                  | Sachet water                                  | Sachet water                                  | Sachet water                                  |
+|  152 | Malt drinks                             | Malt drinks                  | Malt drinks                                   | Malt drinks                                   | Malt drinks                                   | Malt drinks                                   | Malt drinks                                   | Malt drinks                                   | Malt drinks                                   | Malt drinks                                   |
+|  153 | Soft drinks (Coca Cola, spirit, etc)    | Soft drinks                  | Soft drinks (Coca Cola, spirit, etc)          | Soft drinks (Coca Cola, spirit, etc)          | Soft drinks (Coca Cola, spirit, etc)          | Soft drinks (Coca Cola, spirit, etc)          | Soft drinks (Coca Cola, spirit, etc)          | Soft drinks (Coca Cola, spirit, etc)          | Soft drinks (Coca Cola, spirit, etc)          | Soft drinks (Coca Cola, spirit, etc)          |
+|  154 | Fruit juice canned/Pack                 | Fruit juice canned/Pack      | Fruit juice canned/Pack                       | Fruit juice canned/Pack                       | Fruit juice canned/Pack                       | Fruit juice canned/Pack                       | Fruit juice canned/Pack                       | Fruit juice canned/Pack                       | Fruit juice canned/Pack                       | Fruit juice canned/Pack                       |
+|  155 | Other non--alcoholic drinks             | Other non alcoholic drinks   | Other non--alcoholic drinks                   | Other non--alcoholic drinks                   | Other non--alcoholic drinks                   | Other non--alcoholic drinks                   | Other non--alcoholic drinks                   | Other non--alcoholic drinks                   | Other non--alcoholic drinks                   | Other non--alcoholic drinks                   |
+|  160 | Beer (local and imported)               | Beer                         | Beer (local and imported)                     | Beer (local and imported)                     | Beer (local and imported)                     | Beer (local and imported)                     | Beer (local and imported)                     | Beer (local and imported)                     | Beer (local and imported)                     | Beer (local and imported)                     |
+|  161 | Palm wine                               | Palm wine                    | Palm wine                                     | Palm wine                                     | Palm wine                                     | Palm wine                                     | Palm wine                                     | Palm wine                                     | Palm wine                                     | Palm wine                                     |
+|  162 | Pito                                    | Pito                         | Pito                                          | Pito                                          | Pito                                          | Pito                                          | Pito                                          | Pito                                          | Pito                                          | Pito                                          |
+|  163 | Gin                                     | Gin                          | Gin                                           | Gin                                           | Gin                                           | Gin                                           | Gin                                           | Gin                                           | Gin                                           | Gin                                           |
+|  164 | Other alcoholic beverages               | Other alcoholic beverages    | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     | Other alcoholic beverages                     |
+|  601 | Guava                                   | Guava                        | ---                                           | ---                                           | ---                                           | ---                                           | Guava                                         | Guava                                         | Guava                                         | Guava                                         |
+| 1010 | Cowpea | Cowpea | --- | Beans/Cowpea | --- | Beans/Cowpea | --- | Beans/Cowpea | --- | Beans/Cowpea |
+| 1020 | Cassava--roots | Cassava | --- | Cassava Old | --- | Cassava Old | --- | Cassava Old | --- | Cassava Old |
+| 1040 | Cocoyam | Cocoyam | --- | Cocoyam | --- | Cocoyam | --- | Cocoyam | --- | Cocoyam |
+| 1050 | Cotton | Cotton | --- | Cotton | --- | Cotton | --- | Cotton | --- | Cotton |
+| 1051 | Cotton | Cotton | --- | Seed Cotton | --- | Seed Cotton | --- | Seed Cotton | --- | Seed Cotton |
+| 1052 | Cotton | Cotton | --- | Cotton Lint | --- | Cotton Lint | --- | Cotton Lint | --- | Cotton Lint |
+| 1053 | Cotton | Cotton | --- | Cotton Seed | --- | Cotton Seed | --- | Cotton Seed | --- | Cotton Seed |
+| 1060 | Groundnuts (unshelled) | Groundnuts | --- | Ground Nut/Peanuts | --- | Ground Nut/Peanuts | --- | Ground Nut/Peanuts | --- | Ground Nut/Peanuts |
+| 1061 | Groundnuts (unshelled) | Groundnuts | --- | Unshelled Ground Nuts | --- | Unshelled Ground Nuts | --- | Unshelled Ground Nuts | --- | Unshelled Ground Nuts |
+| 1062 | Groundnuts (shelled) | Groundnuts | --- | Shelled Ground Nuts | --- | Shelled Ground Nuts | --- | Shelled Ground Nuts | --- | Shelled Ground Nuts |
+| 1070 | Guinea corn/sorghum | Guinea corn/sorghum | --- | Guinea Courn/Sorghum | --- | Guinea Courn/Sorghum | --- | Guinea Courn/Sorghum | --- | Guinea Courn/Sorghum |
+| 1080 | Maize | Maize | --- | Maize | --- | Maize | --- | Maize | --- | Maize |
+| 1081 | Maize (unshelled, on the cob) | Maize | --- | Unshelled Maize(Cob) | --- | Unshelled Maize(Cob) | --- | Unshelled Maize(Cob) | --- | Unshelled Maize(Cob) |
+| 1082 | Maize (shelled, off the cob) | Maize | --- | Shelled Maize(Grain) | --- | Shelled Maize(Grain) | --- | Shelled Maize(Grain) | --- | Shelled Maize(Grain) |
+| 1083 | Maize | Maize | --- | Pop Corn Maize | --- | Pop Corn Maize | --- | Pop Corn Maize | --- | Pop Corn Maize |
+| 1090 | Melon (unshelled) | Melon | --- | Melon | --- | Melon | --- | Melon | --- | Melon |
+| 1091 | Melon (unshelled) | Melon | --- | Unshelled Melon | --- | Unshelled Melon | --- | Unshelled Melon | --- | Unshelled Melon |
+| 1092 | Melon (shelled) | Melon | --- | Shelled Melon | --- | Shelled Melon | --- | Shelled Melon | --- | Shelled Melon |
+| 1093 | Watermelon | Watermelon | --- | Water Melon | --- | Water Melon | --- | Water Melon | --- | Water Melon |
+| 1100 | Millet | Millet | --- | Millet/Maiwa | --- | Millet/Maiwa | --- | Millet/Maiwa | --- | Millet/Maiwa |
+| 1110 | Rice--local | Rice | --- | Rice | --- | Rice | --- | Rice | --- | Rice |
+| 1111 | Rice--local | Rice | --- | Unshelled Rice(Paddy) | --- | Unshelled Rice(Paddy) | --- | Unshelled Rice(Paddy) | --- | Unshelled Rice(Paddy) |
+| 1112 | Rice--local | Rice | --- | Shelled Rice(Milled) | --- | Shelled Rice(Milled) | --- | Shelled Rice(Milled) | --- | Shelled Rice(Milled) |
+| 1120 | Yam--roots | Yam | --- | Yam | --- | Yam | --- | Yam | --- | Yam |
+| 1121 | Yam--roots | Yam | --- | White Yam | --- | White Yam | --- | White Yam | --- | White Yam |
+| 1122 | Yam--roots | Yam | --- | Yellow Yam | --- | Yellow Yam | --- | Yellow Yam | --- | Yellow Yam |
+| 1123 | Yam--roots | Yam | --- | Water Yam | --- | Water Yam | --- | Water Yam | --- | Water Yam |
+| 1124 | Yam--roots | Yam | --- | Three Leave Yam | --- | Three Leave Yam | --- | Three Leave Yam | --- | Three Leave Yam |
+| 2010 | Acha | Acha | --- | Acha | --- | Acha | --- | Acha | --- | Acha |
+| 2020 | Bambara nut | Bambara nut | --- | Bambara Nut | --- | Bambara Nut | --- | Bambara Nut | --- | Bambara Nut |
+| 2030 | Bananas | Bananas | --- | Banana | --- | Banana | --- | Banana | --- | Banana |
+| 2040 | Sesame | Sesame | --- | Beeni-Seed/Sesame | --- | Beeni-Seed/Sesame | --- | Beeni-Seed/Sesame | --- | Beeni-Seed/Sesame |
+| 2050 | Carrot | Carrot | --- | Carrot | --- | Carrot | --- | Carrot | --- | Carrot |
+| 2060 | Cucumber | Cucumber | --- | Cucumber | --- | Cucumber | --- | Cucumber | --- | Cucumber |
+| 2070 | Cabbage | Cabbage | --- | Cabbage | --- | Cabbage | --- | Cabbage | --- | Cabbage |
+| 2071 | Lettuce | Lettuce | --- | Letus | --- | Letus | --- | Letus | --- | Letus |
+| 2080 | Garden eggs/egg plant | Garden eggs/egg plant | --- | Garden Egg | --- | Garden Egg | --- | Garden Egg | --- | Garden Egg |
+| 2090 | Garlic | Garlic | --- | Garlic | --- | Garlic | --- | Garlic | --- | Garlic |
+| 2100 | Ginger | Ginger | --- | Ginger | --- | Ginger | --- | Ginger | --- | Ginger |
+| 2101 | Ginger | Ginger | --- | Ginger Peeled | --- | Ginger Peeled | --- | Ginger Peeled | --- | Ginger Peeled |
+| 2102 | Ginger | Ginger | --- | Ginger Split | --- | Ginger Split | --- | Ginger Split | --- | Ginger Split |
+| 2103 | Other Spices | Other Spices | --- | Other Spices/Vanila | --- | Other Spices/Vanila | --- | Other Spices/Vanila | --- | Other Spices/Vanila |
+| 2110 | Gum arabic | Gum arabic | --- | Gum Arabic | --- | Gum Arabic | --- | Gum Arabic | --- | Gum Arabic |
+| 2120 | Okra--fresh | Okra | --- | Okro | --- | Okro | --- | Okro | --- | Okro |
+| 2130 | Onions | Onions | --- | Onion | --- | Onion | --- | Onion | --- | Onion |
+| 2140 | Fresh Pepper | Fresh Pepper | --- | Pepper | --- | Pepper | --- | Pepper | --- | Pepper |
+| 2141 | Fresh Pepper | Fresh Pepper | --- | Sweet Pepper | --- | Sweet Pepper | --- | Sweet Pepper | --- | Sweet Pepper |
+| 2142 | Fresh Pepper | Fresh Pepper | --- | Small Pepper | --- | Small Pepper | --- | Small Pepper | --- | Small Pepper |
+| 2143 | Other Spices | Other Spices | --- | Atare | --- | Atare | --- | Atare | --- | Atare |
+| 2150 | Pigeon pea | Pigeon pea | --- | Pigeon Pea | --- | Pigeon Pea | --- | Pigeon Pea | --- | Pigeon Pea |
+| 2160 | Pineapples | Pineapples | --- | Pineapple | --- | Pineapple | --- | Pineapple | --- | Pineapple |
+| 2170 | Plantains | Plantains | --- | Plantain | --- | Plantain | --- | Plantain | --- | Plantain |
+| 2180 | Potatoes | Potatoes | --- | Potato | --- | Potato | --- | Potato | --- | Potato |
+| 2181 | Sweet potatoes | Sweet potatoes | --- | Sweet Potato | --- | Sweet Potato | --- | Sweet Potato | --- | Sweet Potato |
+| 2190 | Pumpkin | Pumpkin | --- | Pumpkin | --- | Pumpkin | --- | Pumpkin | --- | Pumpkin |
+| 2191 | Pumpkin | Pumpkin | --- | Pumpkin Leave | --- | Pumpkin Leave | --- | Pumpkin Leave | --- | Pumpkin Leave |
+| 2192 | Pumpkin | Pumpkin | --- | Pumpkin Fruit | --- | Pumpkin Fruit | --- | Pumpkin Fruit | --- | Pumpkin Fruit |
+| 2193 | Pumpkin | Pumpkin | --- | Pumpkin Seed | --- | Pumpkin Seed | --- | Pumpkin Seed | --- | Pumpkin Seed |
+| 2194 | Leaves (Cocoyam, Spinach, etc.) | Leaves | --- | Green Vegetable | --- | Green Vegetable | --- | Green Vegetable | --- | Green Vegetable |
+| 2195 | Leaves (Cocoyam, Spinach, etc.) | Leaves | --- | Dry Leaves(Kuka) | --- | Dry Leaves(Kuka) | --- | Dry Leaves(Kuka) | --- | Dry Leaves(Kuka) |
+| 2200 | Rizga | Rizga | --- | Rizga | --- | Rizga | --- | Rizga | --- | Rizga |
+| 2210 | Shea nuts | Shea nuts | --- | Shea Nuts | --- | Shea Nuts | --- | Shea Nuts | --- | Shea Nuts |
+| 2220 | Soya beans | Soya beans | --- | Soya Beans | --- | Soya Beans | --- | Soya Beans | --- | Soya Beans |
+| 2230 | Sugar cane | Sugar cane | --- | Sugar Cane | --- | Sugar Cane | --- | Sugar Cane | --- | Sugar Cane |
+| 2240 | Tea | Tea | --- | Tea | --- | Tea | --- | Tea | --- | Tea |
+| 2250 | Tobacco | Tobacco | --- | Tobacco | --- | Tobacco | --- | Tobacco | --- | Tobacco |
+| 2260 | Tomatoes | Tomatoes | --- | Tomato | --- | Tomato | --- | Tomato | --- | Tomato |
+| 2270 | Walnut | Walnut | --- | Walnut | --- | Walnut | --- | Walnut | --- | Walnut |
+| 2280 | Wheat | Wheat | --- | Wheat | --- | Wheat | --- | Wheat | --- | Wheat |
+| 2290 | Zobo | Zobo | --- | Zobo | --- | Zobo | --- | Zobo | --- | Zobo |
+| 2291 | Zobo | Zobo | --- | Zobo Seed | --- | Zobo Seed | --- | Zobo Seed | --- | Zobo Seed |
+| 3010 | Apples | Apples | --- | Apple | --- | Apple | --- | Apple | --- | Apple |
+| 3020 | Cashew nut | Cashew nut | --- | Cashew | --- | Cashew | --- | Cashew | --- | Cashew |
+| 3021 | Cashew nut | Cashew nut | --- | Cashew Fruit | --- | Cashew Fruit | --- | Cashew Fruit | --- | Cashew Fruit |
+| 3022 | Cashew nut | Cashew nut | --- | Cashew Nut | --- | Cashew Nut | --- | Cashew Nut | --- | Cashew Nut |
+| 3030 | Dry Pepper | Dry Pepper | --- | Chilli | --- | Chilli | --- | Chilli | --- | Chilli |
+| 3040 | Cocoa | Cocoa | --- | Cocoa | --- | Cocoa | --- | Cocoa | --- | Cocoa |
+| 3041 | Cocoa | Cocoa | --- | Cocoa Pod | --- | Cocoa Pod | --- | Cocoa Pod | --- | Cocoa Pod |
+| 3042 | Cocoa | Cocoa | --- | Cocoa Beans | --- | Cocoa Beans | --- | Cocoa Beans | --- | Cocoa Beans |
+| 3050 | Coconut | Coconut | --- | Coconut | --- | Coconut | --- | Coconut | --- | Coconut |
+| 3060 | Coffee | Coffee | --- | Coffe | --- | Coffe | --- | Coffe | --- | Coffe |
+| 3061 | Coffee | Coffee | --- | Coffe Arabica | --- | Coffe Arabica | --- | Coffe Arabica | --- | Coffe Arabica |
+| 3062 | Coffee | Coffee | --- | Coffee Robuster | --- | Coffee Robuster | --- | Coffee Robuster | --- | Coffee Robuster |
+| 3070 | Date palm | Date palm | --- | Date Palm | --- | Date Palm | --- | Date Palm | --- | Date Palm |
+| 3080 | Grapefruit | Grapefruit | --- | Grape Fruit | --- | Grape Fruit | --- | Grape Fruit | --- | Grape Fruit |
+| 3090 | Guava | Guava | --- | Guava | --- | Guava | --- | Guava | --- | Guava |
+| 3100 | Jute | Jute | --- | Jute | --- | Jute | --- | Jute | --- | Jute |
+| 3110 | Kola nut | Kola nut | --- | Kolanut | --- | Kolanut | --- | Kolanut | --- | Kolanut |
+| 3111 | Kola nut | Kola nut | --- | Kolanut Unshelled | --- | Kolanut Unshelled | --- | Kolanut Unshelled | --- | Kolanut Unshelled |
+| 3112 | Kola nut | Kola nut | --- | Kolanut Shelled | --- | Kolanut Shelled | --- | Kolanut Shelled | --- | Kolanut Shelled |
+| 3113 | Kola nut | Kola nut | --- | Bitter Kola | --- | Bitter Kola | --- | Bitter Kola | --- | Bitter Kola |
+| 3120 | Lemon | Lemon | --- | Lemon | --- | Lemon | --- | Lemon | --- | Lemon |
+| 3130 | Lime | Lime | --- | Lime | --- | Lime | --- | Lime | --- | Lime |
+| 3140 | Locust bean | Locust bean | --- | Locust Bean | --- | Locust Bean | --- | Locust Bean | --- | Locust Bean |
+| 3150 | Orange/tangerine | Orange/tangerine | --- | Mandarin/Tangerine | --- | Mandarin/Tangerine | --- | Mandarin/Tangerine | --- | Mandarin/Tangerine |
+| 3160 | Mangoes | Mangoes | --- | Mango | --- | Mango | --- | Mango | --- | Mango |
+| 3170 | Orange/tangerine | Orange/tangerine | --- | Orange | --- | Orange | --- | Orange | --- | Orange |
+| 3180 | Palm oil | Palm oil | --- | Oil Palm Tree | --- | Oil Palm Tree | --- | Oil Palm Tree | --- | Oil Palm Tree |
+| 3181 | Palm oil | Palm oil | --- | Fresh Fruit Bunch | --- | Fresh Fruit Bunch | --- | Fresh Fruit Bunch | --- | Fresh Fruit Bunch |
+| 3182 | Palm oil | Palm oil | --- | Fresh Nut | --- | Fresh Nut | --- | Fresh Nut | --- | Fresh Nut |
+| 3183 | Palm oil | Palm oil | --- | Palm Oil | --- | Palm Oil | --- | Palm Oil | --- | Palm Oil |
+| 3184 | Palm kernel | Palm kernel | --- | Palm Kernel | --- | Palm Kernel | --- | Palm Kernel | --- | Palm Kernel |
+| 3190 | Unground Ogbono | Ogbono | --- | Agbono(Oro Seed) | --- | Agbono(Oro Seed) | --- | Agbono(Oro Seed) | --- | Agbono(Oro Seed) |
+| 3200 | Oil bean | Oil bean | --- | Oil Bean | --- | Oil Bean | --- | Oil Bean | --- | Oil Bean |
+| 3210 | Pawpaw | Pawpaw | --- | Pawpaw | --- | Pawpaw | --- | Pawpaw | --- | Pawpaw |
+| 3220 | Avocado pear | Avocado pear | --- | Pear | --- | Pear | --- | Pear | --- | Pear |
+| 3221 | Avocado pear | Avocado pear | --- | Avocado Pear | --- | Avocado Pear | --- | Avocado Pear | --- | Avocado Pear |
+| 3230 | Rubber | Rubber | --- | Rubber | --- | Rubber | --- | Rubber | --- | Rubber |
+| 3231 | Rubber | Rubber | --- | Rubber Lump | --- | Rubber Lump | --- | Rubber Lump | --- | Rubber Lump |
+| 3232 | Rubber | Rubber | --- | Rubber Sheet | --- | Rubber Sheet | --- | Rubber Sheet | --- | Rubber Sheet |
+| 3240 | Cherry (Agbalumo) | Cherry (Agbalumo) | --- | Cherry(Agbalumo) | --- | Cherry(Agbalumo) | --- | Cherry(Agbalumo) | --- | Cherry(Agbalumo) |
+| 3250 | Eru | Eru | --- | Eru | --- | Eru | --- | Eru | --- | Eru |
+| 3260 | Iyere | Iyere | --- | Iyere | --- | Iyere | --- | Iyere | --- | Iyere |
+| 9999 | Other crop | Other crop | --- | Other (Specify) | --- | Other (Specify) | --- | Other (Specify) | --- | Other (Specify) |
+| 4001 | Millet flour | Millet flour | --- | Millet flour | --- | Millet flour | --- | --- | --- | --- |
+| 4002 | Plantain flour | Plantain flour | --- | Plantain flour | --- | Plantain flour | --- | --- | --- | --- |
+| 4003 | Fufu/Cassava dough (akpu) | Fufu/Cassava dough (akpu) | --- | Fufu/Cassava dough (akpu) | --- | Fufu/Cassava dough (akpu) | --- | --- | --- | --- |
+| 4004 | Moi moi | Moi moi | --- | Moi moi | --- | Moi moi | --- | --- | --- | --- |
+| 4005 | Akara (bean cake) | Akara (bean cake) | --- | Akara (bean cake) | --- | Akara (bean cake) | --- | --- | --- | --- |
+| 4006 | Kulikuli (groundnut cake) | Kulikuli (groundnut cake) | --- | Kulikuli (groundnut cake) | --- | Kulikuli (groundnut cake) | --- | --- | --- | --- |
+| 4007 | Orange juice | Orange juice | --- | Orange juice | --- | Orange juice | --- | --- | --- | --- |
+| 4008 | Pineapple juice | Pineapple juice | --- | Pineapple juice | --- | Pineapple juice | --- | --- | --- | --- |
+| 4009 | Cooked rice and stew | Cooked rice and stew | --- | Cooked rice and stew | --- | Cooked rice and stew | --- | --- | --- | --- |
+| 4010 | Fufu and soup | Fufu and soup | --- | Fufu and soup | --- | Fufu and soup | --- | --- | --- | --- |
+| 4011 | Tuo and soup | Tuo and soup | --- | Tuo and soup | --- | Tuo and soup | --- | --- | --- | --- |
+| 4012 | Amala and soup | Amala and soup | --- | Amala and soup | --- | Amala and soup | --- | --- | --- | --- |
+| 4013 | Gari and soup | Gari and soup | --- | Gari and soup | --- | Gari and soup | --- | --- | --- | --- |
+| 4014 | Pounded yam and soup | Pounded yam and soup | --- | Pounded yam and soup | --- | Pounded yam and soup | --- | --- | --- | --- |
+| 4015 | Ice cream | Ice cream | --- | Ice cream | --- | Ice cream | --- | --- | --- | --- |
+| 4016 | Kunu | Kunu | --- | Kunu | --- | Kunu | --- | --- | --- | --- |
+
+* Units
+
+  Unit codes changed significantly across waves.  Wave 1 (2010-11) used
+  6 simple codes (Kg, g, l, ml, piece, other).  Wave 2 (2012-13) added
+  local unit names (mudu, derica, congo, etc.) with codes 1-16.
+  Waves 3-4 (2015-16, 2018-19) restructured to codes with size
+  modifiers (small/medium/large) using codes 1-122 and 900.
+
+  Note: the same code number can mean different things across waves
+  (e.g., code 10 = "medium derica" in wave 2 but "bin/basket" in
+  waves 3-4).  The per-wave columns record the wave-specific meaning,
+  and food_acquired DECODES FROM THEM (nigeria.food_unit_labels, GH
+  #607) -- the Preferred Label column is only the W3/W4 meaning and is
+  what the wave-blind automatic mapping would apply.  The 2010-11 column
+  holds BOTH W1 code spaces (post-planting 1-6; post-harvest 1-4 and the
+  sized 11-95), which do not collide.  W2 code 4 is centilitre per both
+  W2 .dta files (was recorded as ml).
+
+  Harvest production units (GAP 1 / crop_production): the post-harvest
+  crop module (secta3*) reports harvest quantity in its own per-wave
+  production-unit-code scheme (which collides on Code with the food
+  scheme, so it is NOT given per-wave Code columns here).  crop_production.py
+  decodes the native unit label and normalizes it to a size-agnostic base
+  Preferred Label (Sack/Bag, Basket, Basin, Bowl, Bunch, Bundle, Tuber,
+  Heap, Stalk, Wheelbarrow, Piece, Pick-up, Jerry Can, Mudu, Congo, Derica,
+  Tiya, Kobiowu, Paint rubber, ...).  Codes 1001-1018 below register the
+  base harvest units that the food module's size-prefixed rows did not
+  already cover; the rest reuse existing food-unit Preferred Labels (Kg, g,
+  l, cl, Sack/Bag, Basket, Basin, Tuber, Wheelbarrow, ...).  kg-conversion
+  factors are NOT stored here (that is a transformation).
+
+#+NAME: u
+| Code | Preferred Label              | 2010-11                      | 2012-13                      | 2015-16                      | 2018Q3                       | 2019Q1                       |
+|------+------------------------------+------------------------------+------------------------------+------------------------------+------------------------------+------------------------------|
+|    1 | Kg                           | Kg                           | Kg                           | Kg                           | Kg                           | Kg                           |
+|    2 | g                            | g                            | g                            | g                            | g                            | g                            |
+|    3 | l                            | l                            | l                            | l                            | l                            | l                            |
+|    4 | cl                           | ml                           | cl                           | cl                           | cl                           | cl                           |
+|    5 | mudu                         | piece                        | mudu                         | ---                          | ---                          | ---                          |
+|    6 | olodo                        | other                        | olodo                        | ---                          | ---                          | ---                          |
+|    7 | congo                        | ---                          | congo                        | ---                          | ---                          | ---                          |
+|    8 | paint rubber                 | ---                          | paint rubber                 | ---                          | ---                          | ---                          |
+|    9 | large derica                 | ---                          | large derica                 | ---                          | ---                          | ---                          |
+|   10 | bin/basket                   | ---                          | medium derica                | bin/basket                   | bin/basket                   | bin/basket                   |
+|   11 | paint rubber                 | Sack/Bag Small               | small derica                 | paint rubber                 | paint rubber                 | paint rubber                 |
+|   12 | milk cup                     | Sack/Bag Medium              | milk cup                     | milk cup                     | milk cup                     | milk cup                     |
+|   13 | cigarette cup                | Sack/Bag Big/Large           | cigarette cup                | cigarette cup                | cigarette cup                | cigarette cup                |
+|   14 | tin                          | Sack/Bag Extra Large         | tiya                         | tin                          | tin                          | ---                          |
+|   15 | kobiowu                      | ---                          | kobiowu                      | ---                          | ---                          | ---                          |
+|   16 | piece                        | ---                          | piece                        | ---                          | ---                          | ---                          |
+|   20 | small congo                  | ---                          | ---                          | small congo                  | congo                        | congo                        |
+|   21 | large congo                  | Basket Small                 | ---                          | large congo                  | ---                          | ---                          |
+|   30 | small mudu                   | ---                          | ---                          | small mudu                   | mudu                         | mudu                         |
+|   31 | large mudu                   | Basin Small                  | ---                          | large mudu                   | ---                          | ---                          |
+|   40 | small derica                 | ---                          | ---                          | small derica                 | derica                       | derica                       |
+|   41 | medium derica                | Bunch Small                  | ---                          | medium derica                | ---                          | ---                          |
+|   42 | large derica                 | Bunch Medium                 | ---                          | large derica                 | ---                          | ---                          |
+|   43 | very large derica            | Bunch Big                    | ---                          | very large derica            | ---                          | ---                          |
+|   50 | small tiya                   | ---                          | ---                          | small tiya                   | tiya                         | tiya                         |
+|   51 | medium tiya                  | Yam Tuber Small              | ---                          | medium tiya                  | ---                          | ---                          |
+|   52 | large tiya                   | Yam Tuber Medium             | ---                          | large tiya                   | ---                          | ---                          |
+|   60 | small kobiowu                | ---                          | ---                          | small kobiowu                | kobiowu                      | kobiowu                      |
+|   61 | medium kobiowu               | Bundle Small                 | ---                          | medium kobiowu               | ---                          | ---                          |
+|   62 | large kobiowu                | Bundle Medium                | ---                          | large kobiowu                | ---                          | ---                          |
+|   70 | small bowl                   | ---                          | ---                          | small bowl                   | bowl                         | bowl                         |
+|   71 | medium bowl                  | Wheelbarrow Small            | ---                          | medium bowl                  | ---                          | ---                          |
+|   72 | large bowl                   | Wheelbarrow Medium           | ---                          | large bowl                   | ---                          | ---                          |
+|   80 | small piece                  | ---                          | ---                          | small piece                  | piece                        | piece                        |
+|   81 | medium piece                 | Pick-up Van Small            | ---                          | medium piece                 | ---                          | ---                          |
+|   82 | large piece                  | Pick-up Van Medium           | ---                          | large piece                  | ---                          | ---                          |
+|   90 | small heap                   | ---                          | ---                          | small heap                   | heap                         | heap                         |
+|   91 | medium heap                  | Jerry Can Small              | ---                          | medium heap                  | ---                          | ---                          |
+|   92 | large heap                   | Jerry Can Medium             | ---                          | large heap                   | ---                          | ---                          |
+|  100 | small bunch                  | ---                          | ---                          | small bunch                  | bunch                        | bunch                        |
+|  101 | medium bunch                 | ---                          | ---                          | medium bunch                 | ---                          | ---                          |
+|  102 | large bunch                  | ---                          | ---                          | large bunch                  | ---                          | ---                          |
+|  110 | small stalk                  | ---                          | ---                          | small stalk                  | stalk                        | stalk                        |
+|  111 | medium stalk                 | ---                          | ---                          | medium stalk                 | ---                          | ---                          |
+|  112 | large stalk                  | ---                          | ---                          | large stalk                  | ---                          | ---                          |
+|  120 | small packet/sachet          | ---                          | ---                          | small packet/sachet          | packet/sachet                | packet/sachet                |
+|  121 | medium packet/sachet         | ---                          | ---                          | medium packet/sachet         | ---                          | ---                          |
+|  122 | large packet/sachet          | ---                          | ---                          | large packet/sachet          | ---                          | ---                          |
+|  900 | other specify                | ---                          | ---                          | other specify                | other specify                | other specify                |
+| 22 | Basket Medium | Basket Medium | --- | --- | --- | --- |
+| 23 | Basket Big | Basket Big | --- | --- | --- | --- |
+| 32 | Basin Medium | Basin Medium | --- | --- | --- | --- |
+| 33 | Basin Big/Large | Basin Big/Large | --- | --- | --- | --- |
+| 34 | Basin Extra Large | Basin Extra Large | --- | --- | --- | --- |
+| 53 | Yam Tuber Big/Large | Yam Tuber Big/Large | --- | --- | --- | --- |
+| 63 | Bundle Big | Bundle Big | --- | --- | --- | --- |
+| 93 | Jerry Can Big | Jerry Can Big | --- | --- | --- | --- |
+| 94 | Jerry Can Large | Jerry Can Large | --- | --- | --- | --- |
+| 24 | Basket Extra Large | Basket Extra Large | --- | --- | --- | --- |
+| 73 | Wheelbarrow Big/Large | Wheelbarrow Big/Large | --- | --- | --- | --- |
+| 74 | Wheelbarrow Extra Large | Wheelbarrow Extra Large | --- | --- | --- | --- |
+| 83 | Pick-up Van Big | Pick-up Van Big | --- | --- | --- | --- |
+| 95 | Jerry Can Drum | Jerry Can Drum | --- | --- | --- | --- |
+| 125 | Packet | --- | --- | --- | Packet | Packet |
+| 130 | Sack/Bag | --- | --- | --- | Sack/Bag | Sack/Bag |
+| 140 | Basket | --- | --- | --- | Basket | Basket |
+| 150 | Basin | --- | --- | --- | Basin | Basin |
+| 170 | Wheelbarrow | --- | --- | --- | Wheelbarrow | Wheelbarrow |
+| 200 | Loaf | --- | --- | --- | Loaf | Loaf |
+| 211 | Tuber | --- | --- | --- | Tuber | Tuber |
+| 240 | Bottle/Can | --- | --- | --- | Bottle/Can | Bottle/Can |
+| 250 | Sachet | --- | --- | --- | Sachet | ---    |
+| 251 | Bag of 20 Sachets | --- | --- | --- | Bag of 20 Sachets | Bag of 20 Sachets |
+| 270 | Cube | --- | --- | --- | Cube | Cube |
+| 280 | Metric Cup | --- | --- | --- | Metric Cup | Metric Cup |
+| 290 | Wrap | --- | --- | --- | Wrap | Wrap |
+| 300 | Spoon | --- | --- | --- | Spoon | ---   |
+| 301 | Tea Spoon | --- | --- | --- | Tea Spoon | Tea Spoon |
+| 302 | Table Spoon | --- | --- | --- | Table Spoon | Table Spoon |
+| 310 | Crate | --- | --- | --- | Crate | Crate |
+| 320 | Slice | --- | --- | --- | Slice | Slice |
+| 330 | Whole Animal | --- | --- | --- | Whole Animal | Whole Animal |
+| 340 | Shot | --- | --- | --- | Shot | ---  |
+| 131 | other specify (131) | --- | --- | Sack/Bag Medium | --- | --- |
+| 151 | other specify (151) | --- | --- | Basin Medium | --- | --- |
+| 152 | other specify (152) | --- | --- | Basin Large | --- | --- |
+| 161 | Bundle Medium | --- | --- | Bundle Medium | --- | --- |
+| 1001 | Bowl | --- | --- | --- | --- | --- |
+| 1002 | Bunch | --- | --- | --- | --- | --- |
+| 1003 | Bundle | --- | --- | --- | --- | --- |
+| 1004 | Cigarette cup | --- | --- | --- | --- | --- |
+| 1005 | Congo | --- | --- | --- | --- | --- |
+| 1006 | Derica | --- | --- | --- | --- | --- |
+| 1007 | Heap | --- | --- | --- | --- | --- |
+| 1008 | Jerry Can | --- | --- | --- | --- | --- |
+| 1009 | Kobiowu | --- | --- | --- | --- | --- |
+| 1010 | Milk cup | --- | --- | --- | --- | --- |
+| 1011 | Mudu | --- | --- | --- | --- | --- |
+| 1012 | Olodo | --- | --- | --- | --- | --- |
+| 1013 | Packet/Sachet | --- | --- | --- | --- | --- |
+| 1014 | Paint rubber | --- | --- | --- | --- | --- |
+| 1015 | Pick-up | --- | --- | --- | --- | --- |
+| 1016 | Piece | --- | --- | --- | --- | --- |
+| 1017 | Stalk | --- | --- | --- | --- | --- |
+| 1018 | Tiya | --- | --- | --- | --- | --- |
+| 1019 | days | --- | --- | --- | --- | --- |
+
+* Geopolitical Zones
+
+#+NAME: Region
+| Original Label                           | Preferred Label                          |
+|------------------------------------------+------------------------------------------|
+| 1. North Central                         | North Central                            |
+| NORTH CENTRAL                            | North Central                            |
+| north central                            | North Central                            |
+| 2. North East                            | North East                               |
+| NORTH EAST                               | North East                               |
+| north east                               | North East                               |
+| 3. North West                            | North West                               |
+| NORTH WEST                               | North West                               |
+| north west                               | North West                               |
+| 4. South East                            | South East                               |
+| SOUTH EAST                               | South East                               |
+| south east                               | South East                               |
+| 5. South South                           | South South                              |
+| SOUTH SOUTH                              | South South                              |
+| south south                              | South South                              |
+| 6. South West                            | South West                               |
+| SOUTH WEST                               | South West                               |
+| south west                               | South West                               |
+
+* Strata (Geopolitical Zones as sampling strata)
+
+#+NAME: strata
+| Original Label                           | Preferred Label                          |
+|------------------------------------------+------------------------------------------|
+| 1. North Central                         | North Central                            |
+| NORTH CENTRAL                            | North Central                            |
+| north central                            | North Central                            |
+| North Central                            | North Central                            |
+| 2. North East                            | North East                               |
+| NORTH EAST                               | North East                               |
+| north east                               | North East                               |
+| North East                               | North East                               |
+| 3. North West                            | North West                               |
+| NORTH WEST                               | North West                               |
+| north west                               | North West                               |
+| North West                               | North West                               |
+| 4. South East                            | South East                               |
+| SOUTH EAST                               | South East                               |
+| south east                               | South East                               |
+| South East                               | South East                               |
+| 5. South South                           | South South                              |
+| SOUTH SOUTH                              | South South                              |
+| south south                              | South South                              |
+| South South                              | South South                              |
+| 6. South West                            | South West                               |
+| SOUTH WEST                               | South West                               |
+| south west                               | South West                               |
+| South West                               | South West                               |
+
+* States
+
+#+NAME: District
+| Original Label                           | Preferred Label                          |
+|------------------------------------------+------------------------------------------|
+| 1. Abia                                  | Abia                                     |
+| Abia                                     | Abia                                     |
+| abia                                     | Abia                                     |
+| 2. Adamawa                               | Adamawa                                  |
+| Adamawa                                  | Adamawa                                  |
+| adamawa                                  | Adamawa                                  |
+| 3. Akwa Ibom                             | Akwa Ibom                                |
+| Akwa Ibom                                | Akwa Ibom                                |
+| akwa ibom                                | Akwa Ibom                                |
+| 4. Anambra                               | Anambra                                  |
+| Anambra                                  | Anambra                                  |
+| anambra                                  | Anambra                                  |
+| 5. Bauchi                                | Bauchi                                   |
+| Bauchi                                   | Bauchi                                   |
+| bauchi                                   | Bauchi                                   |
+| 6. Bayelsa                               | Bayelsa                                  |
+| Bayelsa                                  | Bayelsa                                  |
+| bayelsa                                  | Bayelsa                                  |
+| 7. Benue                                 | Benue                                    |
+| Benue                                    | Benue                                    |
+| benue                                    | Benue                                    |
+| 8. Borno                                 | Borno                                    |
+| Borno                                    | Borno                                    |
+| borno                                    | Borno                                    |
+| 9. Cross River                           | Cross River                              |
+| Cross River                              | Cross River                              |
+| cross river                              | Cross River                              |
+| 10. Delta                                | Delta                                    |
+| Delta                                    | Delta                                    |
+| delta                                    | Delta                                    |
+| 11. Ebonyi                               | Ebonyi                                   |
+| Ebonyi                                   | Ebonyi                                   |
+| ebonyi                                   | Ebonyi                                   |
+| 12. Edo                                  | Edo                                      |
+| Edo                                      | Edo                                      |
+| edo                                      | Edo                                      |
+| 13. Ekiti                                | Ekiti                                    |
+| Ekiti                                    | Ekiti                                    |
+| ekiti                                    | Ekiti                                    |
+| 14. Enugu                                | Enugu                                    |
+| Enugu                                    | Enugu                                    |
+| enugu                                    | Enugu                                    |
+| 37. FCT                                  | FCT Abuja                                |
+| FCT Abuja                                | FCT Abuja                                |
+| fct abuja                                | FCT Abuja                                |
+| 15. Gombe                                | Gombe                                    |
+| Gombe                                    | Gombe                                    |
+| gombe                                    | Gombe                                    |
+| 16. Imo                                  | Imo                                      |
+| Imo                                      | Imo                                      |
+| imo                                      | Imo                                      |
+| 17. Jigawa                               | Jigawa                                   |
+| Jigawa                                   | Jigawa                                   |
+| jigawa                                   | Jigawa                                   |
+| 18. Kaduna                               | Kaduna                                   |
+| Kaduna                                   | Kaduna                                   |
+| kaduna                                   | Kaduna                                   |
+| 19. Kano                                 | Kano                                     |
+| Kano                                     | Kano                                     |
+| kano                                     | Kano                                     |
+| 20. Katsina                              | Katsina                                  |
+| Katsina                                  | Katsina                                  |
+| katsina                                  | Katsina                                  |
+| 21. Kebbi                                | Kebbi                                    |
+| Kebbi                                    | Kebbi                                    |
+| kebbi                                    | Kebbi                                    |
+| 22. Kogi                                 | Kogi                                     |
+| Kogi                                     | Kogi                                     |
+| kogi                                     | Kogi                                     |
+| 23. Kwara                                | Kwara                                    |
+| Kwara                                    | Kwara                                    |
+| kwara                                    | Kwara                                    |
+| 24. Lagos                                | Lagos                                    |
+| Lagos                                    | Lagos                                    |
+| lagos                                    | Lagos                                    |
+| 25. Nasarawa                             | Nasarawa                                 |
+| Nasarawa                                 | Nasarawa                                 |
+| nasarawa                                 | Nasarawa                                 |
+| 26. Niger                                | Niger                                    |
+| Niger                                    | Niger                                    |
+| niger                                    | Niger                                    |
+| 27. Ogun                                 | Ogun                                     |
+| Ogun                                     | Ogun                                     |
+| ogun                                     | Ogun                                     |
+| 28. Ondo                                 | Ondo                                     |
+| Ondo                                     | Ondo                                     |
+| ondo                                     | Ondo                                     |
+| 29. Osun                                 | Osun                                     |
+| Osun                                     | Osun                                     |
+| osun                                     | Osun                                     |
+| 30. Oyo                                  | Oyo                                      |
+| Oyo                                      | Oyo                                      |
+| oyo                                      | Oyo                                      |
+| 31. Plateau                              | Plateau                                  |
+| Plateau                                  | Plateau                                  |
+| plateau                                  | Plateau                                  |
+| 32. Rivers                               | Rivers                                   |
+| Rivers                                   | Rivers                                   |
+| rivers                                   | Rivers                                   |
+| 33. Sokoto                               | Sokoto                                   |
+| Sokoto                                   | Sokoto                                   |
+| sokoto                                   | Sokoto                                   |
+| 34. Taraba                               | Taraba                                   |
+| Taraba                                   | Taraba                                   |
+| taraba                                   | Taraba                                   |
+| 35. Yobe                                 | Yobe                                     |
+| Yobe                                     | Yobe                                     |
+| yobe                                     | Yobe                                     |
+| 36. Zamfara                              | Zamfara                                  |
+| Zamfara                                  | Zamfara                                  |
+| zamfara                                  | Zamfara                                  |
+
+Housing (Roof / Floor): canonical harmonization per
+=lsms_library/categorical_mapping/canonical_housing_labels.org= (GH #170),
+auto-applied by column name at API time.  The wave scripts
+(={wave}/_/housing.py=) normalise source spellings first (=Terrazo= in
+2018-19, =Terazo= in 2023-24 -> =Terrazzo=); these two tables then fold
+that spelling onto the canon.  =Terrazzo= -> *Terrazzo* since 2026-09-02
+(GH #727; was *Tiles*): 16 floors in 2018Q3 and 13 in 2024Q1 move out of
+=Tiles=.  Prose stays ABOVE the =#+NAME:= lines.
+
+#+NAME: Roof
+| Alternate Spelling           | Preferred Label  |
+|------------------------------+------------------|
+| Iron Sheets                  | Iron Sheets      |
+| Zinc Sheet                   | Iron Sheets      |
+| Long/Short Span Sheets       | Iron Sheets      |
+| Grass                        | Thatch           |
+| Thatch                       | Thatch           |
+| Asbestos Sheet               | Asbestos         |
+| Concrete                     | Concrete         |
+| Clay Tiles                   | Clay Tiles       |
+| Step Tiles                   | Clay Tiles       |
+| Plastic Sheeting             | Plastic Sheeting |
+| Mud                          | Mud              |
+
+#+NAME: Floor
+| Alternate Spelling   | Preferred Label |
+|----------------------+-----------------|
+| Smooth Cement        | Cement          |
+| Smoothed Mud         | Earth           |
+| Sand/Dirt/Straw      | Earth           |
+| Tile                 | Tiles           |
+| Wood                 | Wood            |
+| Terrazzo             | Terrazzo        |
+| Marble               | Tiles           |
+
+* plot_features harmonization tables (GH #167)
+
+  Lasting plot characteristics from the post-planting Agriculture
+  module sect11b / sect11b1.  See =Nigeria/_/nigeria.py=
+  (=plot_features_for_wave=) and the per-wave
+  =Nigeria/{wave}/_/plot_features.py= scripts.
+
+** harmonize_acquire (WAVE-KEYED)
+
+  The "How was [PLOT] acquired?" code scheme EVOLVES across waves
+  (s11bq4 in W1; s11b1q4 in W2--W5): W1/W2 have 4 codes, W3 has 6,
+  W4 has 7, W5 fully re-orders to 9 codes (e.g. W5 code 2 = "rented
+  in", W4 code 2 = "rented for cash/inkind").  So the lookup MUST be
+  keyed on (Wave, Code) -- a flat Code map would mislabel rows.  This
+  mirrors the Uganda wave-keyed-acquire lesson (GH #167 pilot).
+
+  Canonical Tenure spellings (from lsms_library/data_info.yml):
+  purchase -> owned; rented -> rented_in; inheritance -> inherited;
+  sharecropped in -> sharecropped_in; used-free / distributed-by-
+  community / granted-by-customary-or-community -> communal;
+  temporary-land-exchange / allocated-by-government / gifted ->
+  other_tenure.  Codes absent for a wave map to NaN (no silent
+  default).
+
+#+NAME: harmonize_acquire
+| Wave    | Code | Preferred Label |
+|---------+------+-----------------|
+| 2010-11 |    1 | owned           |
+| 2010-11 |    2 | rented_in       |
+| 2010-11 |    3 | communal        |
+| 2010-11 |    4 | communal        |
+| 2012-13 |    1 | owned           |
+| 2012-13 |    2 | rented_in       |
+| 2012-13 |    3 | communal        |
+| 2012-13 |    4 | communal        |
+| 2015-16 |    1 | owned           |
+| 2015-16 |    2 | rented_in       |
+| 2015-16 |    3 | communal        |
+| 2015-16 |    4 | communal        |
+| 2015-16 |    5 | inherited       |
+| 2015-16 |    6 | sharecropped_in |
+| 2018-19 |    1 | owned           |
+| 2018-19 |    2 | rented_in       |
+| 2018-19 |    3 | communal        |
+| 2018-19 |    4 | communal        |
+| 2018-19 |    5 | inherited       |
+| 2018-19 |    6 | sharecropped_in |
+| 2018-19 |    7 | other_tenure    |
+| 2023-24 |    1 | owned           |
+| 2023-24 |    2 | rented_in       |
+| 2023-24 |    3 | communal        |
+| 2023-24 |    4 | communal        |
+| 2023-24 |    5 | inherited       |
+| 2023-24 |    6 | sharecropped_in |
+| 2023-24 |    7 | other_tenure    |
+| 2023-24 |    8 | other_tenure    |
+| 2023-24 |    9 | other_tenure    |
+
+** harmonize_tenure_system (W5 only: s11b1q4b)
+
+  Only the 2023-24 (W5) questionnaire asks the legal/customary tenure
+  regime separately (s11b1q4b).  Earlier waves leave TenureSystem NaN.
+  Canonical TenureSystem spellings: state / community / cooperative
+  were extended for this cross-country rollout (GH #167).
+
+#+NAME: harmonize_tenure_system
+| Code | Preferred Label     |
+|------+---------------------|
+|    1 | customary           |
+|    2 | freehold            |
+|    3 | leasehold           |
+|    4 | state               |
+|    5 | community           |
+|    6 | cooperative         |
+|   96 | other_tenure_system |
+
+** harmonize_soil (stable W2--W5: s11b1q44 / W5 s11b1q61)
+
+  W1 (2010-11) does not ask soil type -> SoilType NaN that wave.
+  SoilType has no canonical spellings constraint in data_info.yml, so
+  these descriptive labels are carried as-is.
+
+#+NAME: harmonize_soil
+| Code | Preferred Label |
+|------+-----------------|
+|    1 | sandy           |
+|    2 | clay            |
+|    3 | sandy_clay      |
+|    4 | forest_loam     |
+|    5 | loamy           |
+|    6 | other           |
+|   96 | other           |
+
+* Agricultural inputs (plot_inputs, GAP 2)
+
+** harmonize_input -- input-type identity (the plot_inputs `input` axis)
+
+  The plot_inputs feature's ``input`` index level carries one of these
+  Preferred Labels.  The country-level ``_/plot_inputs.py`` script
+  resolves each module's native input identity to the Preferred Label
+  directly (mirroring how crop_production resolves crops via
+  harmonize_food), so this table is the canonical REGISTRY for the
+  cross-wave input taxonomy.  The per-wave columns record the native
+  source label / questionnaire concept each Preferred Label is built
+  from; ``---`` means the wave does not record that input separately.
+
+  Fertilizer types: W1/W2/W3 record a single fertilizer-type code per
+  acquisition channel (1=NPK, 2=UREA, 3=COMPOSITE MANURE -> Organic
+  Fertilizer, 4=OTHER); W4/W5 give NPK / Urea / other-inorganic /
+  organic each its own quantity column.  Pesticide / herbicide carry the
+  reported quantity used (+unit).  Animal Traction carries reported own +
+  rented animal-days (u = days).  Seeds are the per-plot-crop seed-use
+  rows (crop carried on the harmonize_food ``crop`` index level).  The
+  plain "did you use a tractor/machine?" question records no per-input
+  quantity at this grain, so it is NOT stored as a flag-only row (it is a
+  ``used_machinery`` transformation, not a data-layer item).
+
+#+NAME: harmonize_input
+| Code | Preferred Label            | 2010Q3            | 2012Q3            | 2015Q3              | 2018Q3             | 2023Q3             |
+|------+----------------------------+-------------------+-------------------+---------------------+--------------------+--------------------|
+|    1 | Seed                       | seed (sect11e)    | seed (sect11e)    | seed (sect11e)      | seed (sect11f)     | seed (sect11f)     |
+|    2 | NPK                        | npk               | NPK               | 1. NPK              | NPK                | NPK                |
+|    3 | Urea                       | urea              | UREA              | 2. UREA             | UREA               | UREA               |
+|    4 | Organic Fertilizer         | composite manure  | Composite Manure  | 3. COMPOSITE MANURE | organic fertilizer | organic fertilizer |
+|    5 | Other Inorganic Fertilizer | other (specify)   | Other (specify)   | 4. OTHER (SPECIFY)  | other inorganic    | other inorganic    |
+|    6 | Pesticide                  | pesticide         | pesticide         | pesticide           | pesticide          | pesticide          |
+|    7 | Herbicide                  | herbicide         | herbicide         | herbicide           | herbicide          | herbicide          |
+|    8 | Animal Traction            | animal traction   | animal traction   | animal traction     | animal traction    | animal traction    |
+
+* Livestock (livestock, GAP 4)
+
+** harmonize_species -- animal identity (the livestock `animal` axis)
+
+  The livestock feature's ``animal`` index level carries the ``Preferred
+  Label`` from this table.  The country-level ``_/livestock.py`` script
+  resolves each wave's native animal code (101--123, a single STABLE
+  scheme across all five GHS-Panel waves) to the Preferred Label directly
+  (mirroring how crop_production resolves crops via harmonize_food and
+  plot_inputs resolves inputs via harmonize_input), so this table is the
+  canonical REGISTRY for the cross-wave animal taxonomy.
+
+  Two label granularities, both retained as columns:
+  - ``Preferred Label`` keeps the ITEM as the survey records it -- the
+    cattle life-stages (Calf-Female / Calf-Male / Heifer / Steer / Cow /
+    Bull / Ox) and the chicken types (Chicken-Layer / Chicken-Local /
+    Chicken-Broiler / Chicken-Cockerel) stay DISTINCT, because each is a
+    separately-reported herd row for a household.  Collapsing them would
+    fold several reported (i, animal) rows into one index tuple and
+    destroy item-level detail (the whole point of going richer than the
+    WB single engaged-y/n binary).  This is the ``animal`` index value.
+  - ``Species`` is the canonical biological-species rollup (Cattle /
+    Donkeys / Horses / Goats / Sheep / Pigs / Poultry / Rabbits / Fish /
+    Camels / Other), where the cross-life-stage / cross-breed variation
+    is unimportant.  It is NOT an index level -- a downstream tlu /
+    herd-aggregation transformation groups the item rows by Species.
+
+  Code 123 (Other-Specify) maps to Preferred Label "Other Livestock"
+  (Species "Other").  ``v`` is NOT joined (livestock is in the framework
+  ``_no_v_join`` set -- the grain is (t, i, animal)).  The per-wave
+  columns record the native decoded animal label; ``---`` means the wave
+  does not enumerate that animal (W4/W5 dropped Rabbit 119 and Fish 121).
+
+#+NAME: harmonize_species
+| Code | Preferred Label | Species  | 2010-11         | 2012-13         | 2015-16            | 2018-19            | 2023-24            |
+|------+-----------------+----------+-----------------+-----------------+--------------------+--------------------+--------------------|
+|  101 | Calf-Female     | Cattle   | calf female     | CALF FEMALE     | 101. CALF FEMALE   | 101. CALF FEMALE   | 101. CALF FEMALE   |
+|  102 | Calf-Male       | Cattle   | calf male       | CALF MALE       | 102. CALF MALE     | 102. CALF MALE     | 102. CALF MALE     |
+|  103 | Heifer          | Cattle   | heifer          | HEIFER          | 103. HEIFER        | 103. HEIFER        | 103. HEIFER        |
+|  104 | Steer           | Cattle   | steer           | STEER           | 104. STEER         | 104. STEER         | 104. STEER         |
+|  105 | Cow             | Cattle   | cow             | COW             | 105. COW           | 105. COW           | 105. COW           |
+|  106 | Bull            | Cattle   | bull            | BULL            | 106. BULL          | 106. BULL          | 106. BULL          |
+|  107 | Ox              | Cattle   | ox              | OX              | 107. OX            | 107. OX            | 107. OX            |
+|  108 | Donkey          | Donkeys  | donkey          | DONKEY          | 108. DONKEY        | 108. DONKEY        | 108. DONKEY        |
+|  109 | Horse           | Horses   | horse           | HORSE           | 109. HORSE         | 109. HORSE         | 109. HORSE         |
+|  110 | Goat            | Goats    | goat            | GOAT            | 110. GOAT          | 110. GOAT          | 110. GOAT          |
+|  111 | Sheep           | Sheep    | sheep           | SHEEP           | 111. SHEEP         | 111. SHEEP         | 111. SHEEP         |
+|  112 | Pig             | Pigs     | pig             | PIG             | 112. PIG           | 112. PIG           | 112. PIG           |
+|  113 | Chicken-Layer   | Poultry  | chicken-layer   | CHICKEN-LAYER   | 113. CHICKEN-LAYER | 113. CHICKEN-LAYER | 113. CHICKEN-LAYER |
+|  114 | Chicken-Local   | Poultry  | chicken-local   | CHICKEN-LOCAL   | 114. CHICKEN-LOCAL | 114. CHICKEN-LOCAL | 114. CHICKEN-LOCAL |
+|  115 | Chicken-Broiler | Poultry  | chicken-broiler | CHICKEN-BROILER | 115. CHICKEN-BROILER | 115. CHICKEN-BROILER | 115. CHICKEN-BROILER |
+|  116 | Chicken-Cockerel| Poultry  | chicken-cockery | CHICKEN-COCKERY | 116. CHICKEN-COCKERY | 116. CHICKEN-COCKERY | 116. CHICKEN-COCKEREL |
+|  117 | Turkey          | Poultry  | turkey          | TURKEY          | 117. TURKEY        | 117. TURKEY        | 117. TURKEY        |
+|  118 | Duck            | Poultry  | duck            | DUCK            | 118. DUCK          | 118. DUCK          | 118. DUCK          |
+|  119 | Rabbit          | Rabbits  | rabbit          | RABBIT          | 119. RABBIT        | ---                | ---                |
+|  120 | Guinea Fowl     | Poultry  | guinea fowl     | GUINEA FOWL     | 120. GUINEA FOWL   | 120. GUINEA FOWL   | 120. GUINEA FOWL   |
+|  121 | Fish            | Fish     | fish            | FISH            | 121. FISH          | ---                | ---                |
+|  122 | Camel           | Camels   | camel           | CAMEL           | 122. CAMEL         | 122. CAMEL         | 122. CAMEL         |
+|  123 | Other Livestock | Other    | other (specify) | OTHER (SPECIFY) | 123. OTHER (SPECIFY) | 123. OTHER (SPECIFY) | 123. OTHER (SPECIFY) |
+
+* Labor (plot_labor + people_last7days, GAP 3)
+
+** harmonize_labor_source -- the plot_labor `source` axis
+
+  The plot_labor feature's ``source`` index level carries one of these
+  three Preferred Labels.  The country-level ``_/plot_labor.py`` script
+  emits the canonical label directly (mirroring how livestock emits the
+  harmonize_species label), so this table is the canonical REGISTRY for the
+  plot-labor source taxonomy.  Every GHS-Panel post-harvest plot labor
+  roster (secta2) splits reported plot labor into exactly these three
+  acquisition channels:
+  - ``family``  household-member labor (the worker-slot block, sa2q1[a-d]*).
+  - ``hired``   paid hired labor (man / woman / child blocks; carries Wage).
+  - ``other``   free / exchange labor (sa2q12a/b/c; no cash wage).
+
+#+NAME: harmonize_labor_source
+| Code | Preferred Label | Concept                                         |
+|------+-----------------+-------------------------------------------------|
+|    1 | family          | household-member labor (worker-slot roster)     |
+|    2 | hired           | paid hired labor (carries reported Wage)        |
+|    3 | other           | free / exchange labor (no cash wage)            |
+
+** harmonize_industry -- the people_last7days `Industry` axis
+
+  The people_last7days feature's ``Industry`` column carries one of these
+  Preferred Labels (the harmonized industry of a member's wage/main work;
+  ``<NA>`` for non-wage-workers / non-working-age).  The country-level
+  ``_/people_last7days.py`` script resolves each wave's native industry
+  code to the Preferred Label directly (W1-W4 the section-3 ``s3q14``
+  1--14 code grouping; W5 the ISIC-style ``s4aq41_code`` ranges), so this
+  table is the canonical REGISTRY for the wage-work industry taxonomy.
+  The grouping mirrors NGA_GHS{1..5}.do's ``ind_ag``..``ind_serv``
+  branches (no Fishing branch in the W1-W4 code list -> Fishing only
+  appears in W5).
+
+#+NAME: harmonize_industry
+| Code | Preferred Label | s3q14 (W1-W4) | s4aq41_code (W5) |
+|------+-----------------+---------------+------------------|
+|    1 | Agriculture     | 1             | 101--299         |
+|    2 | Fishing         | ---           | 301--399         |
+|    3 | Mining          | 2             | 501--999         |
+|    4 | Manufacturing   | 3--5          | 1010--4000       |
+|    5 | Construction    | 6             | 4100--4500       |
+|    6 | Services        | 7--14         | 4501--10000      |
+
+* harmonize_education (GH #171)
+
+Maps Nigeria GHS-Panel highest-education-completed labels (section 2,
+post-harvest ``s2aq9`` in W1--W4, ``s2q9`` in W5) onto the canonical
+ordinal vocabulary (see ../../../categorical_mapping/canonical_education_labels.org).
+Row-additive over the global ``harmonize_education`` base: this delta
+carries only Nigeria's own attainment spellings.  The same survey level
+appears in three orthographic forms across waves -- lowercase (W1
+post-harvest ``sect2a_harvestw1``), UPPERCASE (W2
+``sect2a_harvestw2``), and numbered ``NN. LABEL`` (W3--W5) -- plus minor
+whitespace / wording variants; every observed exact string is listed so
+the dict lookup is total (unmapped strings would pass through verbatim
+and fail the canonical-vocabulary check).
+
+Level collapse (mirrors Uganda's grade collapse):
+- Nursery / Pre-Nursery / Kindergarten -> Pre-primary
+- Primary 1--5 (P1--P5) -> Primary incomplete; Primary 6 (P6) -> Primary complete
+- Junior Secondary 1--3 (JS1--JS3) -> Lower secondary
+- Senior Secondary 1--2 (SS1--SS2) / Lower 6 -> Upper secondary;
+  Senior Secondary 3 (SS3) / Upper 6 -> Upper secondary complete
+- Modern School (post-primary stream) -> Lower secondary
+- Vocational/Technical (secondary or tertiary) -> Vocational/Technical
+- Teacher Training / Teacher Certificate Grade II / NCE / Nursing School /
+  OND/ND / HND / Poly/Prof -> Tertiary certificate/diploma
+- University (any level) / 1st Degree -> Bachelor
+- Higher Degree / Post-Graduate Degree -> Postgraduate
+- Quranic / Integrated Quranic / Integrated Islamic Education /
+  Adult Education / Basic Literacy / Post Literacy -> Informal
+- None -> None
+
+#+name: harmonize_education
+| Original Label                                                     | Preferred Label              |
+|--------------------------------------------------------------------+------------------------------|
+| none                                                               | No education                 |
+| NONE                                                               | No education                 |
+| 0. NONE                                                            | No education                 |
+| n1                                                                 | Pre-primary                  |
+| n2                                                                 | Pre-primary                  |
+| N1                                                                 | Pre-primary                  |
+| N2                                                                 | Pre-primary                  |
+| 1. N1                                                              | Pre-primary                  |
+| 2. N2                                                              | Pre-primary                  |
+| 1. NURSERY 1                                                       | Pre-primary                  |
+| 2. NURSERY 2                                                       | Pre-primary                  |
+| 3. PRE-NURSERY                                                     | Pre-primary                  |
+| 3. PRE-NURSERY (incl. Kindergarten)                                | Pre-primary                  |
+| p1                                                                 | Primary incomplete           |
+| p2                                                                 | Primary incomplete           |
+| p3                                                                 | Primary incomplete           |
+| p4                                                                 | Primary incomplete           |
+| p5                                                                 | Primary incomplete           |
+| P1                                                                 | Primary incomplete           |
+| P2                                                                 | Primary incomplete           |
+| P3                                                                 | Primary incomplete           |
+| P4                                                                 | Primary incomplete           |
+| P5                                                                 | Primary incomplete           |
+| 11. P1                                                             | Primary incomplete           |
+| 12. P2                                                             | Primary incomplete           |
+| 13. P3                                                             | Primary incomplete           |
+| 14. P4                                                             | Primary incomplete           |
+| 15. P5                                                             | Primary incomplete           |
+| 11. PRIMARY 1                                                      | Primary incomplete           |
+| 12. PRIMARY 2                                                      | Primary incomplete           |
+| 13. PRIMARY 3                                                      | Primary incomplete           |
+| 14. PRIMARY 4                                                      | Primary incomplete           |
+| 15. PRIMARY 5                                                      | Primary incomplete           |
+| p6                                                                 | Primary complete             |
+| P6                                                                 | Primary complete             |
+| 16. P6                                                             | Primary complete             |
+| 16. PRIMARY 6                                                      | Primary complete             |
+| js1                                                                | Lower secondary              |
+| js2                                                                | Lower secondary              |
+| js3                                                                | Lower secondary              |
+| JS1                                                                | Lower secondary              |
+| JS2                                                                | Lower secondary              |
+| JS3                                                                | Lower secondary              |
+| 21. JS1                                                            | Lower secondary              |
+| 22. JS2                                                            | Lower secondary              |
+| 23. JS3                                                            | Lower secondary              |
+| 21. JUNIOR SECONDARY 1 (JS 1)                                      | Lower secondary              |
+| 22. JUNIOR SECONDARY 2 (JS 2)                                      | Lower secondary              |
+| 23. JUNIOR SECONDARY 3 (JS 3)                                      | Lower secondary              |
+| modern school                                                      | Lower secondary              |
+| MODERN SCHOOL                                                      | Lower secondary              |
+| 33. MODERN SCHOOL                                                  | Lower secondary              |
+| ss1                                                                | Upper secondary              |
+| ss2                                                                | Upper secondary              |
+| SS1                                                                | Upper secondary              |
+| SS2                                                                | Upper secondary              |
+| 24. SS1                                                            | Upper secondary              |
+| 25. SS2                                                            | Upper secondary              |
+| 24. SENIOR SECONDARY 1 (SS 1)                                      | Upper secondary              |
+| 25. SENIOR SECONDARY 2 (SS 2)                                      | Upper secondary              |
+| lower 6                                                            | Upper secondary              |
+| 27. LOWER 6                                                        | Upper secondary              |
+| 27. LOWER 6 (HSE 1)                                                | Upper secondary              |
+| ss3                                                                | Upper secondary complete     |
+| SS3                                                                | Upper secondary complete     |
+| 26. SS3                                                            | Upper secondary complete     |
+| 26. SENIOR SECONDARY 3 (SS 3)                                      | Upper secondary complete     |
+| upper 6                                                            | Upper secondary complete     |
+| 28. UPPER 6                                                        | Upper secondary complete     |
+| 28. UPHER 6                                                        | Upper secondary complete     |
+| 28. UPPER 6 (HSE 2)                                                | Upper secondary complete     |
+| vocational/technical                                               | Vocational/Technical         |
+| VOCATIONAL/TECHNICAL                                               | Vocational/Technical         |
+| 32. VOCATIONAL/TECHNICAL                                           | Vocational/Technical         |
+| 321. SECONDARY VOCATIONAL/TECHNICAL/COMMERCIAL                     | Vocational/Technical         |
+| 322. TERTIARY VOCATIONAL/TECHNICAL/COMMERCIAL                      | Vocational/Technical         |
+| nce                                                                | Tertiary certificate/diploma |
+| NCE                                                                | Tertiary certificate/diploma |
+| 34. NCE                                                            | Tertiary certificate/diploma |
+| 34. NATIONAL CERTIFICATE OF EDUCATION                              | Tertiary certificate/diploma |
+| 35. NURSING SCHOOL                                                 | Tertiary certificate/diploma |
+| 35. NURSING SCHOOL (NON-UNIVERSITY)                                | Tertiary certificate/diploma |
+| 31. TEACHER TRAINING                                               | Tertiary certificate/diploma |
+| 31. TEACHER CERTIFICATE GRADE II (TCGDII)                          | Tertiary certificate/diploma |
+| poly/prof                                                          | Tertiary certificate/diploma |
+| POLY/PROF                                                          | Tertiary certificate/diploma |
+| 41. POLY/PROF                                                      | Tertiary certificate/diploma |
+| 41. POLYTECHNIC/PROF                                               | Tertiary certificate/diploma |
+| 411. OND 1, OND 2                                                  | Tertiary certificate/diploma |
+| 411. OND1/ND1,OND2/ND2                                             | Tertiary certificate/diploma |
+| 412. HND 1, HND 2                                                  | Tertiary certificate/diploma |
+| 412. HND1,HND2                                                     | Tertiary certificate/diploma |
+| 1st degree                                                         | Bachelor                     |
+| 1ST DEGREE                                                         | Bachelor                     |
+| 42. 1ST DEGREE                                                     | Bachelor                     |
+| 421. UNIVERSITY - LEVELS 100, 200 OR 300                           | Bachelor                     |
+| 421. UNIVERSITY - LEVELS 100, 200 OR, 300                          | Bachelor                     |
+| 422. UNIVERSITY  - 400 LEVEL                                       | Bachelor                     |
+| 422. UNIVERSITY - 400 LEVEL                                        | Bachelor                     |
+| 423. UNIVERSITY  - 500 LEVEL                                       | Bachelor                     |
+| 423. UNIVERSITY - 500 LEVEL                                        | Bachelor                     |
+| 424. UNIVERSITY  - 600 LEVEL                                       | Bachelor                     |
+| 424. UNIVERSITY - 600 LEVEL                                        | Bachelor                     |
+| higher degree                                                      | Postgraduate                 |
+| 43. HIGHER DEGREE                                                  | Postgraduate                 |
+| 43. HIGHER DEGREE / POST-GRADUATE DEGREE                           | Postgraduate                 |
+| quaranic                                                           | Informal                     |
+| QUARANIC                                                           | Informal                     |
+| 51. QUARANIC                                                       | Informal                     |
+| integrated quaranic                                                | Informal                     |
+| INTEGRATED QUARANIC                                                | Informal                     |
+| 52. INTEGRATED QUARANIC                                            | Informal                     |
+| 52. INTEGRATED ISLAMIC EDUCATION (ISLAMIYYA, TSANGAYA, OR QUR'ANIC) | Informal                    |
+| 61. ADULT EDUCATION                                                | Informal                     |
+| 62. BASIC LITERACY PROGRAM                                         | Informal                     |
+| 64. POST LITERACY II                                               | Informal                     |
