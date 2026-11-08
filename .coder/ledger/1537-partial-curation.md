@@ -191,3 +191,8 @@ offlineCI41024407 on corrected5495663 is RUNNING at this dated checkpoint. Final
 validation/publication decisions belong in the PR body and the corresponding
 ROOT receipts. Publication adds only this ledger checkpoint; all code/test
 objects remain frozen. Shared-cache rebuilding and master release remain deferred.
+
+Subsequent terminal proof: corrected fullCI41024407 PASSED with12,227passed,
+5,652skipped and4xfailed (726.61s pytest). ROOT independently compared its
+JUnit against the closed1520suite: all17,854prior outcomes retained unchanged,
+plus exactly29new passing cases. The first failed run is not relabeled.
