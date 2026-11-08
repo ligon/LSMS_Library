@@ -181,3 +181,26 @@ separately authorized full-universe sealed-input correspondence gate on the
 frozen implementation; invented tests do not claim to remeasure those masks.
 No W1/W2/yield/public unsafe operand/default/scientific policy is implemented.
 Whole1518 remains open. Independent review precedes any new source gate.
+
+## §10 Independent review corrections — ledger first
+
+ROOT approved only two bounded corrections on a NEW isolated tree from
+ordinary composition40d5fe902434e6640f2e2a352ce0457c0f1153d9 (current728992
+plus exact2fa). Original author/review/composition evidence stays immutable.
+No source or scientific interpretation is changed.
+
+Reviewer found selected nullable Float64 pd.NA factors bypass finite-positive
+validation through DataFrame.all(skipna). Convert only the validation matrix
+to numeric float with explicit NA->NaN and retain the existing refusal of any
+missing/nonfinite/nonpositive factor. No imputation, clipping or factor edits.
+
+Reviewer also found NEW derived W3_ServedUnit.to_numpy() loses StringDtype
+NA semantics on all-unserved rows. Preserve that extension array in the derived
+audit column. Do not cast raw fields or shared kernel outputs. Raw numeric-
+Categorical Arrow limitations must remain explicit where the unchanged raw-only
+control proves them; no universal audit roundtrip claim beyond the raw codec.
+
+Add/run new discriminating nullable admission and all-unserved audit controls,
+plus only affected meaningful companions. Do not replay old40/9/44, closed
+source/16+6/3 cohorts, fullCI/census/source/API/Make/warm. Corrected freeze needs
+independent closure before the held CI/census operators are finalized/launched.
