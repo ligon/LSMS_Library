@@ -1,4 +1,48 @@
 #+title: Handoff, LSMS-ISA sweep
+* Current scrum checkpoint 2026-11-08T18:33:00.047840+00:00
+Goal ACTIVE; turn PROGRESS. MERGED PR1633/#1540 now CLOSED completed.
+Actual development 5cd21347d0010ebff2a57a34313985227fb1466a, parentsfdec+0380,
+entire tree46d46bd8a080d66f092812e1beea31f325a0838c EXACTreviewed0380.
+32 development merges /25 closed sweep issues. FreshcompleteGHopen snapshot162;
+original147scope21closed126open (closed1540 added, prior20retained).
+
+Full41029309 CLOSED COMPLETED0:0 n0056:12539P5652S4X/1427.85pytest;
+ROOT actual18195JUnit unique records:18181parentoutcomesEXACT+14MaliPASS,
+0fail/error/missing/changed. Root actual4identicalcollections and18195exact
+firstsetup leases/filenames verified, eachprotocol/setup/teardown18195times;
+normal4worker-down records error_typeNoneType. Own initialROOTmetadatafilename
+assertion guessed wrong testmodule; corrected actualcommittedfilename, no data/
+testresult changes. Sourceclean0380. Originala222failedfull causeUNKNOWN retained.
+CurrentAPI0/metadata0, GHA42506596722 unit/WindowsSUCCESS/sixconditionalSKIP,
+freshreviews/threadsEMPTY/mergeable/source+base pinned beforeexpectedheadmerge.
+ROOT postmergeparents/fulltree/explicitissueclosedreadback confirmed.
+Evidence reports/1540-on-mali-current-integration-20261108/ROOT-FULL-JUNIT-REVIEW.json,
+ROOT-FULL-LEASE-REVIEW.json,ROOT-RELEASE-ASSESSMENT.json; final1540 ROOT-MERGE.
+Sharedcache/master/productionweight holds unchanged.
+
+NEXT1499:1452 finishing1288staticdesign then newimmutableactual5cd+final86
+composition/API+hash PREP ONLY/noexecution; admit closed0380map viaentiretree
+matchactual5cd. Old2c/fdec preparation untouched. Source831/author130/baseline8/
+independent76/staticAPI0 allclosed; final86a117 exactnonledger831.
+NEXT1574:Mwi newimmutableactual5cd+ddf32a4aae7dea4b9b3b536c12fa26a0b35f5610
+composition/API+hash PREP ONLY/noexecution. Root verified exactly5owned paths and
+19129otherobjects exactfdec; bothfinalmanifests5+4filesauthenticated. Actualnormal
+managedwrite/freshreadPASS with wrapperfinalignorehashFAILED preserved; no replay.
+Whole1574 remainsOPEN for51-code list/visual. Visualprepare identified publicPDFp13
+extract refersmissingtable, p10sampling51/p14regionalcounts; FirefoxPDFjs available
+butheadlesscanvasreadinessUNPROVEN. No PDFopen/render; keepvisualqueued.
+
+1590 fullCI finalreceipt/journal sealing, then1570formatter operator PREP ONLY.
+Remote1570 static charter accepted; futuredata diagnosticUNGRANTED.
+Remote1423 authoring86a82a6bf3f64db392ad8ddc6503ec46/job41029918 remainsLIVE
+lastsupportedstatus starting/cloning; rootSTATUS2 pending session3762. Sourcee9f577
+fullordinaryfdec+PR1423, alltool/profile/task bindings frozen. Existingrequired
+steeringchannel notes new5cd andincoming14disjointpaths; keepworkerpin/noreset.
+No functional test/source/LSMS/native-state/GitHub capability; syntax/codeauthoring
+only. Root owns release. No eightidlecountryworkers: historical terminalactors
+arenotwaiting, newworkassignedexplicitly. #1066 userwarningreplayQUESTIONPENDING;
+no implementation or impliedyes. Other scientific holds persist.
+
 * Current scrum checkpoint 2026-11-08T18:25:11.177753+00:00
 Goal ACTIVE; turn PROGRESS. Development stillfdec032 /31merges/24closed;
 original147scope20closed127open/repo163open, last verified recount retained.
