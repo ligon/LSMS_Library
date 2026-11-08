@@ -114,3 +114,37 @@ validation evidence will live in the dispatch evidence directory.
   configured CI and merge. No source campaign is implied by the 40 synthetic
   passes. Evidence: dispatch evidence/report.md, RESULT.json, validation.log,
   PR-DRAFT.md, pinned-runtime-source.json and original guard receipts.
+
+### ROOT independent and current release verification (2026-11-08)
+
+Independent review of cf0abd30 passed26 new cases, with zero skips/errors or
+P1/P2 findings. They exercise descriptor laziness, authority, public mutation,
+falsey mappings, exception identity, deletion, script paths and grain-report
+filtering through actual methods and invented metadata providers. Source/API
+constructors remain blocked. Private dependency config is explicit from startup;
+the author's historical Matplotlib fallback qualification remains unchanged.
+
+Current composition d5f62c24d48c794f478f54a958bd168a884de53c combines cf0 with
+development b284. Country.py equals the author; applying the exact b834-to-cf0
+transformations patch onto b284 produces the merged bytes. The full19,120
+mode/type/blob union is exact; no source, precedence or schema rule changed.
+
+One full configured offline CI41023662 completed0 on n0051.savio4:12,198 passed,
+5,652 skipped,4 xfailed,738.09s pytest. All17,817 prior cases and outcomes are
+retained, with exactly37 additional passing committed cases. The separate
+independent26 and three existing author pair controls are not new full-CI cases.
+Mounted own environment, false credentials, private empty nonsymlink L1,
+loopback-only namespace, BLAS/build1 and four loadfile workers were verified.
+
+Actual candidate-only metadata completed0: all fields except head equal the
+closed c8 comparator, with zero changed fingerprints among450country,1895wave,
+35build-transform and186framework-import cells.18None entries and public
+scope553/2313/39 remain unchanged. Actual b284 differs from the comparator only
+in the1606 task ledger; its original header/hash is preserved, without replay.
+Strict API audit passed. Entry mode0755 was verified before the first launch.
+
+This final ledger-only update preserves every nonledger object of the tested
+composition. GitHub checks and merge remain the publication gate. No raw-source,
+Country data API, Make acceptance, shared-cache rewarm, production-weight or
+master-release campaign follows from these offline and metadata results.
+The separate1606 datetime-priority follow-up is reopened and remains unfinished.
