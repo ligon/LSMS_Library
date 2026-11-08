@@ -43,6 +43,9 @@ class NativeHarvestAudit:
     W3_-prefixed lineage/status fields, one per release position. Likewise
     ``conversion_rows`` retains every source factor row, including holds.
     Each frame can be serialized independently; neither stores a frame in attrs.
+    Exact roundtrip fidelity is limited by the caller's original raw codec
+    (for example, Arrow may lose numeric/unused categorical types/categories).
+    Raw fields are never cast to conceal those underlying carrier limitations.
     Metadata contains only provenance/cards/counts and no inferred source truth.
     """
 
@@ -109,7 +112,10 @@ def _factor_inputs(conversion, card, geography, provenance):
     fluid = body.str.contains(_FLUID, case=False, regex=True).fillna(False)
     held = conflict | fluid
     values = raw[list(columns.values())].apply(pd.to_numeric, errors='raise')
-    if not (np.isfinite(values).all().all() and (values > 0).all().all()):
+    # Validation view ONLY: nullable unknowns must fail just like float NaN.
+    # Do not change raw/audit/admitted values or let pandas skip unknown checks.
+    validation = values.to_numpy(dtype=float, na_value=np.nan)
+    if not (np.isfinite(validation).all() and (validation > 0).all()):
         raise ValueError('conversion factors must be finite and positive; no clipping')
     for code, expected in ((1, 1.), (2, .001)):
         own_definition = 'KILOGRAM (KG)' if code == 1 else 'GRAMS (G)'
@@ -255,7 +261,7 @@ def _native_w3_inputs(harvest, conversion, *, harvest_unit_card,
     served_u = pd.Series(pd.NA, index=raw.index, dtype='string')
     if eligible.any():
         served_u.loc[eligible] = footprint.reindex(expected.index)['u'].to_numpy()
-    audit[_PREFIX + 'ServedUnit'] = served_u.to_numpy()
+    audit[_PREFIX + 'ServedUnit'] = served_u.array
     audit[_PREFIX + 'ServingStatus'] = np.where(eligible, 'eligible',
         np.where(i.isna(), 'missing-household', 'unlabelled-crop'))
     audit[_PREFIX + 'MassStatus'] = np.where(~eligible, 'unserved',

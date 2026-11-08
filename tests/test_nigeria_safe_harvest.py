@@ -366,3 +366,58 @@ def test_no_sales_synthesis_and_current_producer_witness():
     expected=ng.crop_production_for_wave('2016Q1',[dict(df=h,dec=dec,hhid='hhid',plot='plotid',
         crop='cropcode',line='cropid',qty='sa3iq6i',unit='sa3iq6ii',perennial=False)],{1120:'Yam'})
     assert audit.native_lines.W3_ProductionObs.tolist() == expected.index.get_level_values('production_obs').tolist()
+
+
+@pytest.mark.parametrize('geography,column', [('national','conv_national'),('zone','conv_NE_2')])
+@pytest.mark.parametrize('kind', ['nullable', 'float-nan'])
+def test_selected_missing_factor_refuses_regardless_of_nullable_dtype(geography,column,kind):
+    f = table()
+    f[column] = f[column].astype('Float64' if kind == 'nullable' else 'float64')
+    f.loc[0,column] = pd.NA if kind == 'nullable' else np.nan
+    before = f.copy(deep=True)
+    with pytest.raises(ValueError,match='finite and positive'):
+        run(f=f,geography=geography)
+    pd.testing.assert_frame_equal(f,before,check_exact=True)
+
+
+@pytest.mark.parametrize('geography', ['national','zone'])
+def test_positive_nullable_factors_retain_raw_payload_and_kernel_output(geography):
+    f = table()
+    columns = ['conv_national'] if geography == 'national' else list(nh._ZONES.values())
+    ordinary = run(f=f,geography=geography)
+    for column in columns:
+        f[column] = f[column].astype('Float64')
+    before=f.copy(deep=True)
+    result,audit=run(f=f,geography=geography)
+    pd.testing.assert_frame_equal(f,before,check_exact=True)
+    pd.testing.assert_frame_equal(audit.conversion_rows[f.columns],before,check_exact=True)
+    pd.testing.assert_frame_equal(result,ordinary[0],check_exact=True)
+    assert result.attrs == ordinary[0].attrs
+    pd.testing.assert_frame_equal(audit.native_lines,ordinary[1].native_lines,check_exact=True)
+
+
+@pytest.mark.parametrize('reason', ['missing-household','unlabelled-crop','missing-crop'])
+def test_all_unserved_new_unit_field_retains_nullable_string_arrow(reason):
+    import pyarrow as pa
+    h = native([(10,1,1120,1,130,1,2.)])
+    for column in ['hhid','plotid','cropcode','cropid','sa3iq6ii','zone']:
+        h[column] = h[column].astype('Int64')
+    if reason == 'missing-household':h.loc[0,'hhid']=pd.NA
+    if reason == 'unlabelled-crop':h.loc[0,'cropcode']=9999
+    if reason == 'missing-crop':h.loc[0,'cropcode']=pd.NA
+    f=table()
+    before_h,before_f=h.copy(deep=True),f.copy(deep=True)
+    # First prove that these invented raw types support the strict carrier.
+    for raw in [h,f]:
+        pd.testing.assert_frame_equal(pa.Table.from_pandas(raw).to_pandas(),raw,check_exact=True)
+    result,audit=run(h,f)
+    assert result.empty
+    assert audit.metadata['eligible_rows']==audit.metadata['delegated_rows']==0
+    assert isinstance(audit.native_lines.W3_ServedUnit.dtype,pd.StringDtype)
+    assert audit.native_lines.W3_ServedUnit.isna().all()
+    pd.testing.assert_frame_equal(audit.native_lines[h.columns],before_h,check_exact=True)
+    pd.testing.assert_frame_equal(audit.conversion_rows[f.columns],before_f,check_exact=True)
+    for frame in [audit.native_lines,audit.conversion_rows]:
+        pd.testing.assert_frame_equal(pa.Table.from_pandas(frame).to_pandas(),frame,check_exact=True)
+    pd.testing.assert_frame_equal(h,before_h,check_exact=True)
+    pd.testing.assert_frame_equal(f,before_f,check_exact=True)

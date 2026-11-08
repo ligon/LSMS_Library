@@ -204,3 +204,29 @@ Add/run new discriminating nullable admission and all-unserved audit controls,
 plus only affected meaningful companions. Do not replay old40/9/44, closed
 source/16+6/3 cohorts, fullCI/census/source/API/Make/warm. Corrected freeze needs
 independent closure before the held CI/census operators are finalized/launched.
+
+## §11 Bounded correction controls closed
+
+The selected numeric factor matrix now has a TEMPORARY float/NA->NaN
+validation view only; raw conversion, audit, admitted values and kernel operand
+dtypes are unchanged on valid inputs. Unknown validity refuses through the same
+finite-positive ValueError as floatNaN. W3_ServedUnit retains its existing
+StringDtype extension array instead of becoming an object ndarray. No raw
+field or shared kernel output is cast. Audit docs explicitly limit arbitrary
+raw-codec roundtrip fidelity (including numeric/unused categories).
+
+14PASS/0skip in8.81s:9 NEW parameterized nullable-admission/positive-payload/
+all-unserved typed-audit cases plus5 affected companions (full row ledger,
+pre-all-layer holds, mixed nullable audit, exact kernel parity/Arrow limit,
+all-fluid empty delegation). The original44 function ASTs remain exact; their
+whole cohort was not rerun. An initial new-test helper import collection error
+under the configured import mode is preserved (5companions passed/1collection
+error); moving the NEW cases into the existing author module corrected test
+layout without changing any original function or assertion.
+
+Mounted exact import/countries/private false-credential/unshare/thread/build
+controls remain active. No source or old40/9/44/16+6/3 cohorts, fullCI/census,
+API/Make/warm/native jobs. TESTED-BYTES binds tested implementation/test SHA256
+to this freeze; no unnecessary repeat after a metadata-only Git commit.
+Independent reviewer closes the two original findings on the new exact head
+before held CI/census plan finalization. Whole1518 remains open.
