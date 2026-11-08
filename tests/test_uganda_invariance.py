@@ -29,6 +29,10 @@ float64 ULPs in eight cells (ledger ``uganda-nutrition-cpu-hash.md`` sections
 3-4).  This finite allowance does not round values, relax structural checks,
 or accept an unmeasured exact fingerprint.  A null primary remains unpinned.
 
+Coverage is reported explicitly at session end (GH1480). For a read-only
+complete check, use ``scripts/check_uganda_invariance.py --data-root PRIVATE
+--complete``; it never builds or falls back to configured/shared roots.
+
 A parquet whose ``lsms_cache_waves`` manifest does not cover the waves its
 baseline entry was taken over is skipped, not compared (GH #1113): it is a
 correct partial build left by a subset request (GH #891), and under xdist
@@ -37,10 +41,12 @@ another test file's single-wave call can write one before this file runs.
 
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import pandas as pd
 import pytest
+
+from tests.uganda_invariance_reporting import FIELDS, PROPERTY, entry_result
 
 pytestmark = pytest.mark.requires_s3
 
@@ -90,7 +96,6 @@ def _fingerprint(df: pd.DataFrame) -> dict:
 
 
 BASELINE = _load_baseline()
-UGANDA_ROOT = _find_uganda_root()
 
 
 # Canonical dtype equivalence for invariance comparison.  pandas 3.0 is
@@ -121,24 +126,15 @@ def _canonical_dtypes(d: dict) -> dict:
 
 @pytest.fixture(scope="module")
 def uganda_root():
-    if UGANDA_ROOT is None:
-        pytest.skip("Uganda country directory not found")
-    # Skip if no parquets are built (e.g., CI without data access)
-    has_parquets = any(UGANDA_ROOT.rglob("*.parquet"))
-    if not has_parquets:
-        from lsms_library.paths import data_root
-        data_root.cache_clear()
-        ext = data_root("Uganda")
-        has_parquets = ext.exists() and any(ext.rglob("*.parquet"))
-    if not has_parquets:
-        pytest.skip("No Uganda parquets built (requires data access)")
-    return UGANDA_ROOT
+    # Resolve only after the existing source-data gate admits this test.
+    # The CLI and default terminal reporter never call this fixture.
+    return _find_uganda_root()
 
 
 @pytest.fixture(scope="module")
 def uganda_waves():
     from lsms_library import Country
-    return [str(w) for w in Country("Uganda").waves]
+    return [str(w) for w in Country("Uganda", preload_panel_ids=False).waves]
 
 
 def _expected_coverage(rel_path: str, uganda_waves: list[str]) -> list[str]:
@@ -178,49 +174,20 @@ def _parquet_ids():
     return sorted(BASELINE.keys())
 
 
-@pytest.mark.parametrize("rel_path", _parquet_ids())
-def test_parquet_matches_baseline(uganda_root, uganda_waves, rel_path):
-    """Each parquet must exactly match its baseline fingerprint."""
-    from lsms_library.local_tools import read_parquet_cache_waves
+def _assert_field(field, actual, baseline_entry, rel_path):
+    """The existing scientific assertions, selected one field at a time.
 
-    baseline_entry = BASELINE[rel_path]
-
-    if "error" in baseline_entry:
-        pytest.skip(f"Baseline recorded an error for {rel_path}: {baseline_entry['error']}")
-
-    # Check both in-tree and data_root locations
-    parquet_path = uganda_root / rel_path
-    if not parquet_path.exists():
-        from lsms_library.paths import data_root
-        data_root.cache_clear()
-        alt_path = data_root("Uganda") / rel_path
-        if alt_path.exists():
-            parquet_path = alt_path
-    if not parquet_path.exists():
-        pytest.skip(f"Parquet not built: {rel_path}")
-
-    # The manifest is read again after the data: writes are atomic renames,
-    # so a concurrent rebuild can swap the file between the two reads.
-    expected = _expected_coverage(rel_path, uganda_waves)
-    reason = _coverage_skip_reason(
-        rel_path, read_parquet_cache_waves(parquet_path), expected)
-    if reason:
-        pytest.skip(reason)
-    df = pd.read_parquet(parquet_path, engine="pyarrow")
-    reason = _coverage_skip_reason(
-        rel_path, read_parquet_cache_waves(parquet_path), expected)
-    if reason:
-        pytest.skip(reason)
-    actual = _fingerprint(df)
-
+    Keeping them together lets every required check run after a mismatch,
+    without introducing a different CLI oracle (ledger1480 §§2–4).
+    """
     # Check shape
-    if baseline_entry["shape"] is not None:
+    if field == "shape" and baseline_entry["shape"] is not None:
         assert actual["shape"] == baseline_entry["shape"], (
             f"{rel_path}: shape mismatch: {actual['shape']} != {baseline_entry['shape']}"
         )
 
     # Check columns
-    if baseline_entry["columns"] is not None:
+    if field == "columns" and baseline_entry["columns"] is not None:
         assert actual["columns"] == baseline_entry["columns"], (
             f"{rel_path}: column mismatch:\n"
             f"  actual:   {actual['columns']}\n"
@@ -228,7 +195,7 @@ def test_parquet_matches_baseline(uganda_root, uganda_waves, rel_path):
         )
 
     # Check index names
-    if baseline_entry["index_names"] is not None:
+    if field == "index_names" and baseline_entry["index_names"] is not None:
         assert actual["index_names"] == baseline_entry["index_names"], (
             f"{rel_path}: index names mismatch:\n"
             f"  actual:   {actual['index_names']}\n"
@@ -237,7 +204,7 @@ def test_parquet_matches_baseline(uganda_root, uganda_waves, rel_path):
 
     # Check dtypes (after canonicalizing string-family equivalence —
     # see _DTYPE_EQUIVALENCE above).
-    if baseline_entry["dtypes"] is not None:
+    if field == "dtypes" and baseline_entry["dtypes"] is not None:
         assert _canonical_dtypes(actual["dtypes"]) == _canonical_dtypes(baseline_entry["dtypes"]), (
             f"{rel_path}: dtype mismatch:\n"
             f"  actual:   {actual['dtypes']}\n"
@@ -245,7 +212,7 @@ def test_parquet_matches_baseline(uganda_root, uganda_waves, rel_path):
         )
 
     # Check content hash
-    if baseline_entry["content_hash"] is not None:
+    if field == "content_hash" and baseline_entry["content_hash"] is not None:
         accepted_hashes = [baseline_entry["content_hash"],
                            *baseline_entry.get("content_hash_variants", [])]
         assert actual["content_hash"] in accepted_hashes, (
@@ -253,3 +220,93 @@ def test_parquet_matches_baseline(uganda_root, uganda_waves, rel_path):
             f"  actual:   {actual['content_hash']}\n"
             f"  expected exact hash(es): {accepted_hashes}"
         )
+
+
+
+def _unknown_key_reason(rel_path, waves, tables):
+    path = PurePosixPath(rel_path)
+    parts = path.parts
+    if path.is_absolute() or ".." in parts or path.as_posix() != rel_path:
+        return "baseline key is not a normalized relative cache path"
+    if not ((len(parts) == 2 and parts[0] == "var") or
+            (len(parts) == 3 and parts[0] in waves and parts[1] == "_")):
+        return "baseline key has an unknown wave/tier layout"
+    if path.suffix != ".parquet" or path.stem not in tables:
+        return "baseline key names an unknown declared table or file type"
+    return None
+
+
+def inspect_parquet(rel_path, baseline_entry, parquet_path, waves, tables):
+    """Read ONE explicitly named file; no root fallback, acquisition or build.
+
+    Result fields count all required comparisons, including those following a
+    mismatch. Missing/partial/error entries are explicit gaps (ledger1480 §4).
+    """
+    from lsms_library.local_tools import read_parquet_cache_waves
+
+    result = entry_result(rel_path, baseline_entry)
+    unknown = _unknown_key_reason(rel_path, waves, tables)
+    if unknown:
+        result.update(status="unknown_key", reason=unknown)
+        return result
+    if "error" in baseline_entry:
+        result.update(status="baseline_error", reason=str(baseline_entry["error"]))
+        return result
+    absent = sorted(set(FIELDS) - set(baseline_entry))
+    if absent:
+        result.update(status="baseline_error", reason=f"Baseline fields absent: {absent}")
+        return result
+    try:
+        if parquet_path is None or not parquet_path.is_file():
+            result.update(status="missing", reason=f"Parquet not built: {rel_path}")
+            return result
+        expected = _expected_coverage(rel_path, waves)
+        manifest = read_parquet_cache_waves(parquet_path)
+        reason = _coverage_skip_reason(rel_path, manifest, expected)
+        if reason:
+            result.update(status="partial", reason=reason)
+            return result
+        df = pd.read_parquet(parquet_path, engine="pyarrow")
+        manifest = read_parquet_cache_waves(parquet_path)
+        reason = _coverage_skip_reason(rel_path, manifest, expected)
+        if reason:
+            result.update(status="partial", reason=reason)
+            return result
+        result["coverage_metadata_absent"] = manifest is None
+        actual = _fingerprint(df)
+        failures = []
+        for field in FIELDS:
+            if baseline_entry[field] is None:
+                continue
+            try:
+                _assert_field(field, actual, baseline_entry, rel_path)
+            except AssertionError as exc:
+                result["fields"][field] = "failed"
+                failures.append(str(exc))
+            else:
+                result["fields"][field] = "passed"
+        compared = any(value in {"passed", "failed"} for value in result["fields"].values())
+        result.update(status=("mismatch" if failures else "matched") if compared else "unpinned",
+                      reason="\n".join(failures) or None)
+    except Exception as exc:
+        result.update(status="error", reason=f"{type(exc).__name__}: {exc}")
+    return result
+
+
+@pytest.mark.parametrize("rel_path", _parquet_ids())
+def test_parquet_matches_baseline(uganda_root, uganda_waves, rel_path, record_property):
+    """Compare existing caches, preserving the ordinary source-data test gate."""
+    from lsms_library import Country
+
+    entry = BASELINE[rel_path]
+    parquet_path = uganda_root / rel_path if uganda_root is not None else None
+    if parquet_path is not None and not parquet_path.exists():
+        from lsms_library.paths import data_root
+        data_root.cache_clear()
+        parquet_path = data_root("Uganda") / rel_path
+    tables = set(Country("Uganda", preload_panel_ids=False).resources["Data Scheme"])
+    result = inspect_parquet(rel_path, entry, parquet_path, uganda_waves, tables)
+    record_property(PROPERTY, json.dumps(result))
+    if result["status"] in {"missing", "partial", "baseline_error", "unpinned"}:
+        pytest.skip(result["reason"] or "No pinned comparisons")
+    assert result["status"] == "matched", result["reason"]

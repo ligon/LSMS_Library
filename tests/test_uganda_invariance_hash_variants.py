@@ -39,7 +39,7 @@ def check_parquet(tmp_path, monkeypatch):
             fingerprint.update(actual_fields or {})
             monkeypatch.setattr(invariance, "_fingerprint", lambda df: fingerprint)
         invariance.test_parquet_matches_baseline(
-            tmp_path, ["2019-20"], rel_path)
+            tmp_path, ["2019-20"], rel_path, lambda *args: None)
 
     return frame, check
 

@@ -3480,6 +3480,23 @@ Both EAC-I waves have the new optional fields entirelyNA. Cold Make/warm/Feature
 agree; current-framework integration repeats full frame/attrs equality.
 Receipts and separately qualified full CI/review: .coder/ledger/1528-sold-condition.md.
 
+* 2026-11-08 -- Taoudenit prefers the accented Region label (GH #1576)
+
+The earlier GH #812 note's “Left for a separate change” is addressed by the
+specified cosmetic fold: =Region= maps =Taoudenit= to =Taoudénit=.  The old
+=strata= exception folded the accented cover label backwards to =Taoudenit=;
+it is replaced by the ordinary =Region= table crossed with =Urbain|Rural=.
+Already accented cover labels pass through unchanged.  No administrative
+boundary, wave-specific design code, weight, household key or native amount is
+reinterpreted.  In particular, EAC-I 2014's empty strata and 2017's design codes
+remain distinct from the EHCVM region-milieu labels.
+
+Hermetic mapping/finalizer controls and the exact metadata hash footprint are
+recorded in =.coder/ledger/1576-mali-taoudenit.md=.  The earlier 14-cluster count
+is the issue's source expectation, not a new measurement here; independent
+source/API/warm verification is a separate coordinator-managed gate.  No shared
+cache has been re-warmed by this implementation.
+
 
 * 2026-11-08 -- Sold kilograms: both own 2021 forms retain the label/instruction conflict (GH #1560)
 

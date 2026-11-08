@@ -5967,3 +5967,51 @@ are unchanged. A country axis on only one operand is refused, following the
 existing fertilizer-rate paired-identity rule. No native household or plot
 key is rewritten. This entry records the shared implementation and synthetic
 controls, not new source counts or a completed source verification campaign.
+
+* Explicit invariance comparison coverage (GH #1480, 2026-11-08)
+
+Ordinary pytest now reports the number of baseline entries and pinned fields
+actually compared, plus credential/setup skips, mismatches and not-run entries.
+It retains the data gate and adds no cache discovery/build to the terminal
+reporter. The former root-conftest header still described the retired automatic
+purge; its prose is corrected without reintroducing any purge.
+
+The opt-in read-only command is =scripts/check_uganda_invariance.py= with
+=--data-root /private/data --complete= (or =make uganda-invariance= with explicit
+=LSMS_DATA_DIR=). It reads only existing named Uganda cache files; no configured
+shared-root fallback, acquisition, build, cache stamp or baseline refresh.
+Optional JSON records every entry and each pinned comparison. The manifest is
+the dynamic scope, not a hard-coded53. Short wave manifests remain uncompared;
+missing metadata still follows the previous comparison contract, never a guess
+from observed t. Unknown keys/files and explicitly unpinned debt are separate.
+
+COMPLETE coverage is distinct from successful invariance: a fully compared
+mismatching cohort still fails. The original fingerprint, five assertions,
+dtype equivalences, approved nutrition primary/exact measured alternate and
+null-debt semantics are preserved. No baseline value or scientific rule is
+changed; current-source mismatches, if any, must be reported rather than
+regenerated. Verification and cost evidence: .coder/ledger/1480-uganda-invariance-coverage.md.
+
+* Demand input source aggregation (GH #1439 / #1526)
+
+=food_expenditures(market='Region')= retains acquisition-source =s=, including
+when =labels='Aggregate'= changes item =j=. CFE requires log expenditures on
+exactly =(i,t,m,j)=. The earlier Aggregate-split CFE result above therefore
+does not establish that the old unadapted demand-helper/skill recipe ran:
+GH #1526 records that its reviewer explicitly summed across =s=.
+
+The in-repository =lsms_library.demands.prepare_demand_inputs= now performs
+that consumer aggregation in monetary levels before logs, preserving every
+supplied source value. =basis='purchased'= remains the cash-outlay default;
+=basis='total'= explicitly requests all recorded acquisition values, without
+imputing an unreported own-production/in-kind value. All-missing groups stay
+missing; partially missing groups yield recorded subtotals. Keep the original
+food frame for per-source provenance and missingness.
+
+The adapter refuses absent/ambiguous market identities, repeated native keys
+and country axes rather than letting CFE silently drop or pool them. It does
+not repair the recorded missing Region labels, District vocabulary changes,
+EA/parish design, price provenance or sample/weight caveats. This entry records
+the adapter contract and source-free validation scope, not a new Uganda demand
+fit or source/cache build. Native food API, Aggregate buckets and invariance
+baselines remain unchanged. Ledger: =.coder/ledger/1439-demand-source-index.md=.
