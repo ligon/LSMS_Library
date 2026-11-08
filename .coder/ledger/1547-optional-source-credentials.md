@@ -110,5 +110,24 @@ configured data checks, metadata footprint and science acceptance belong to ROOT
 
 ### Phase 3 verification
 
-Pending implementation and separately approved source-free runtime. No test or
-timing claim is made by this planning commit.
+- `Wave.grab_data` — **OK (static, §2–§4)**: production delta is exactly the
+  real exception import and existing tuple entry, implemented in
+  `b4b4c078f61559dc91dd77fba07653663b535086`. No try boundary, bare rethrow,
+  classifier, post-hook guard, metadata, probe, read gate or fingerprint
+  exclusion changed. Critical prior-art source/tests and every country config
+  are byte-identical to the frozen base. No reinvention or static contradiction.
+- `tests/test_gh1547_optional_credentials.py` — **prepared (§2–§4)**: actual
+  production method on a strict invented duck receiver, finite in-memory
+  provider/writer/tier/probe seams; 31 cases statically expected. No old fixture
+  execution, actual constructor/getter/source/writer or AST handler substitute.
+- Runtime is **UNEXECUTED / PARTIAL** pending ROOT's exact guard/operator
+  review through the absolute dispatch channels. No LSMS import or test/API
+  audit has run; actual collection/pass/fail/skip/deselection counts and parent
+  runtime discrimination are unmeasured. Static manifest/byte/diff and shell
+  syntax checks pass. Full/configured CI, metadata footprint and scientific
+  acceptance remain ROOT-owned gates. Evidence: dispatch `evidence/report.md`,
+  `validation.log`, `RESULT.json` and frozen `proposal/FROZEN.sha256`.
+- One read of the runtime profile's predicted config filename returned ENOENT;
+  ROOT clarified that the private config directory must be empty and the
+  filename is intentionally absent. No retry/config adoption occurred. The
+  revised proposal preserves empty config/data/nonsymlink L1 and false creds.
