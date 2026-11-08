@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import lsms_library.local_tools as tools
+from lsms_library.transformations import U_UNKNOWN
 from lsms_library.ehcvm import (
     UnitSizeLabelError,
     derivation_key as _derivation_key,
@@ -50,8 +51,24 @@ def inputs_food_acquired(wave):
 
 
 def food_acquired(df):
-    return _food_acquired_with_unit_weights(
+    out = _food_acquired_with_unit_weights(
         df, FOOD_ACQUIRED_DERIVATION, wave='2018-19')
+    # GH #1500; ledger §4.  Fill only the final label, after size/NSU/value
+    # processing: a size or last purchase cannot supply a missing unit answer.
+    index = out.index
+    unit_level = index.names.index('u')
+    codes = index.codes[unit_level]
+    missing = codes == -1
+    if missing.any():
+        units = index.levels[unit_level]
+        if U_UNKNOWN not in units:
+            if isinstance(units, pd.CategoricalIndex) and U_UNKNOWN not in units.categories:
+                units = units.add_categories([U_UNKNOWN])
+            units = units.insert(len(units), U_UNKNOWN)
+        filled = index.set_levels(units, level='u').set_codes(
+            np.where(missing, units.get_loc(U_UNKNOWN), codes), level='u')
+        out.index = filled
+    return out
 from collections import defaultdict
 
 def v(value):
