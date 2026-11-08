@@ -1,4 +1,68 @@
 #+title: Handoff, LSMS-ISA sweep
+* Current scrum checkpoint 2026-11-08T18:11:49.953342+00:00
+Goal ACTIVE/unbounded; previous turn PROGRESS. GitHub development fdec032efd4b98ed4b99883c9586f5ef07b7bf3e.
+31 development merges /24 currently closed sweep issues. Original147 country
+queue20 CLOSED/127 OPEN (all20 verified against GitHub); repository163 OPEN.
+No master release, shared harmonized-cache rewarm or production-weight change.
+
+Mali #1594 MERGED PR1634/CLOSED completed. Root verified actual fdec parents
+5a06+3aa215d9 and whole tree471a887ad799900141e9df63c9dcfae1f23b9b10 equals
+reviewed head. Exact raw99,999,999 purchased expenditure mask only in both2014
+passages; eligibility precedes mask. Canonical122085 rows/keys/Quantity/dtypes/
+attrs unchanged; XOF5652532205 ->152532260 (55 derived sentinel equivalents,
+55 changed cells/45 newly missing). Legitimate16325 XOF preserved. Existing
+sparse derived output90925 ->90885 through40 all-NA row drops. Recovery and
+independent static review PASS;17 focused+5 adapter PASS; current API/metadata
+PASS; GitHub full configured unit/Windows SUCCESS. No additional HPC full suite
+claimed. Original V4 JSON serialization failure and partial telemetry preserved.
+Root release assessment/final manifest390340d9 in1594-current-verification;
+ROOT-MERGE in1594-finalization. #851 stays open.
+
+PR1633/#1540 DRAFT now0380a1e79751400fa86bab039839ab943c19cdd9 integrated
+actual Mali development fdec. Root19135-entry full source union exact:14 helper
+owned vs4 Mali incoming disjoint. Current staticAPI0/metadata0 and root hash
+review132country/249wave/7FIF,0BTF; same7 EHCVM countries, Guinea unchanged.
+Current full job41029309 RUNNING n0056 /owned session89277:4/loadfile,
+600s timeout,480s durable stacks/resources/phases, worker restart0 and per-node
+O_EXCL leases. All4 collected identical18195 =18181 parent+14 new Mali cases;
+~43percent latest /no reported failures, replay refusals or worker loss yet.
+NOT terminal/certified. Old a222 full41027766 remains FAILED3:0/incomplete;
+old exact two-test diagnostic41028653 PASS1/SKIP1, NOT REPRODUCED in narrower
+workload, no crash-cause claim. Root owns PR/current release; body refresh pending.
+
+#1499 corrected831369016ba029849b92684d518665e6b5f90a9a author130 PASS,
+unchanged original baseline8 PASS, independent72+4precision PASS. Independent
+first candidate found mixed Decimal precision/dtype regression; corrected
+candidate preserves native objects and parses only text in mixed object columns.
+Both reducers comply with user convert-valid-numeric-strings ruling; malformed
+nonmissing text raises, true NA/native numeric/ID/labels/Price order preserved.
+All actors CLOSED, strict staticAPI0; no data/guard denials. Author appending
+ledger-only checkpoint; root current fdec integration/hash/fullCI/GitHub pending.
+Author final manifest e84b99efba8bb4b1c3653b28d9ec40778365403dacb56074f53ec50dd1de77ec;
+independent closure6ce7f9f66e6eb3b19fe95a2fc6e90030cf8116a468375a65e2b76d38f6ab2750.
+
+Mali #1574 frozen89655 public BID ingestion proposal FULL ROOT read/20operator+
+10source SHA verification. ONE normal managed helper writer+fresh empty-L1 reader
+authorized through ROOT-AUTHORIZATION SHA d24b4e07d9818e093b0d860c6e4125765589398611f56f7e5fb4c030da537001;
+Mwi executes exact plan once, private profiles/cache/config only, then root
+reviews actual readback/cleanup before commit/PR. No parse/source/strata/weight
+change. #1574 whole remains OPEN for51-code list/visual evidence. No success yet.
+
+Remote Ethiopia #1570 static formatter worker b79f39dc/job41028659 COMPLETED0
+on n0028/16min; native task succeeded, root evidence acceptance pending. No raw,
+formatter, test or table API execution by model. Full4577 country grounding;
+W1 has native script not YAML crop tables; plot formatter/join omits household
+and numeric crop parser differs from format_id. Need root full formatter-plan/
+source-binding review before new finite actual-formatter diagnostic charter.
+Installed SuCoder unchanged; isolated641 supported CLI only; no terminal resume.
+
+PR1423 independent static review CHANGES REQUESTED: unpinned merger/check gate,
+writable shared caches/concurrency/script/doc guidance conflicts. No execution
+or GitHub writes. Review manifest e2cd4e0e4323a08f6a99093fe5fccf9ed616dd439db13e6b61e737d47f29dc7a.
+#1066 USER replay-grain-warning QUESTION still pending; design only/no implementation.
+Other scientific holds persist, including Malawi PR1604 wholewave/weights,
+1497 HH-vs-cluster,1509 eligibility/1442,1518 W1/W2/defaultyield,1560/1571.
+
 * Current scrum checkpoint 2026-11-08T16:48:15.263995+00:00
 Goal ACTIVE. Previous turn was PROGRESS. Development is still
 5a06d85cd02237cc515b0cda57012a9cab3d5e11: 30 development merges and 23 closed
