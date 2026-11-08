@@ -3273,3 +3273,37 @@ The existing sanctioned captures/form projections were reused; no source/API,
 parquet or PDF replay was performed for this docs addition. The packet records
 all raw/deduplicated denominators, failed attempts and UNSENT questions. Its
 composed native-script replay is not a Default/Make/Feature/warm/full-CI oracle.
+
+* 2026-11-08 -- Dry3C native-input candidate (GH #1529; source correspondence pending)
+
+The earlier note, "Unread, and recorded as such. 3B, 3C and 3D", described
+unwired production modules. A bounded closed-capture diagnostic now inspected
+those modules; that does not by itself prove current serving. In particular,
+the statement that =nitrogen_kg= is rainy-only must not be replaced with a
+source/API acceptance claim from that diagnosis.
+
+Own =ecvmaas3c_p1.dta= (MD5 =2bd4194c4b82380e772e29bcf161c99d=) has
+7,860 raw rows and 1,067 explicit-Yes input lines from 272 households in the
+closed diagnostic. Fourteen of those households are absent from rainy input
+candidates. Its used and purchased quantities contain no literal 999 on the
+selected lines; thirteen literal 99 in each remain separate reported values,
+not a new missing-code rule. The unit code 99 is a different coordinate.
+
+The candidate in =.coder/ledger/1529-niger-native3c.md= transports own3C
+=as03cq03==1= lines through the existing recorded-slot input carrier, keeping
+the original2C contribution first. =as03cq05b= is the native unit;
+=as03cq08b= is TOTALFCFA and is never a unit/factor. The source-qualified
+= input_obs = distinguishes the same household/slot across2C and3C, preserving
+equal reported seed lines without parcel allocation. The own3C window is the
+stated whole2010/11 dry season (December2010--May2011), not a per-cycle amount.
+No season axis, cycle multiplication,3Bparcel join,3Dcost surface or3Earea/yield
+choice is included. Added coverage can change existing consumer totals; common
+wave =t= does not establish a common annual estimand.
+
+At this note's freeze only invented native-builder controls have run.
+Six-capture correspondence, actual reader-category fidelity, current serving,
+Default/Make/Feature/warm and independent review remain separate pending gates.
+No scientific factor, unit, window, sale/state/price or default is selected;
+all live GH #1560/#1571 qualifications above remain in force. Whole GH #1529
+remains open. Durable evidence/proposals are under
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1529-niger-native3c-implementation-20261108/=.
