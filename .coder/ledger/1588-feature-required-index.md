@@ -70,13 +70,13 @@ BLAS/OMP/MKL/build1 and pytest2/loadfile. No fixture/baseline/tolerance weakenin
 
 ## §5 Bounded design and tests
 
-Proposed minimal declaration: new required_index_levels OPT-IN for
+Root CONFIRMED (2026-11-08): new required_index_levels OPT-IN ONLY for
 household_characteristics=[t,v,i] and food_expenditures=[t,v,i,j]; no canonical
 index_info changes and no default reinterpretation of other tables. Broader
-requiredness is a separate evidence-backed declaration. Root clarification of
-this concrete boundary is pending; do not silently choose all-canonical-required.
+requiredness is a separate evidence-backed declaration. No interview_date or
+other-table requirement is introduced; do not infer all-canonical-required.
 
-After approval, extend Feature loop with pre-vote required validation, reusing
+Implemented: extend Feature loop with pre-vote required validation, reusing
 existing harmonizer/aliases/sentinels and degradation; preserve existing canonical
 shape selection EXACTLY. Test actual synthetic Feature assembly for every missing
 required axis/order, invalid/healthy count+row majorities, singleton/all-invalid,
@@ -93,6 +93,55 @@ metadata-only verification requires actual receipts; no rewarm/source replay.
 
 ## §6 Decisions and remaining gates
 
-Await root's narrow opt-in declaration scope. Any actual API-contract conflict or
-healthy row/index/value regression stops implementation and is reported. Root
-owns final review/integration/publication and unresolved science/other lanes.
+Root approved the narrow two-table declaration scope. No API-contract conflict
+was found within that scope. Runtime freeze8a0bc55ee0f44ad127eb7f676d2d8ad843b02456
+contains only Feature/schema/docs/new tests. Root owns independent review, full
+configured CI, current-development composition, publication and expected-head
+merge. Broader required-axis adoption remains unmeasured and unapproved.
+
+
+### Verification and preserved attempts
+
+- Final relevant focused stage:136passed/3source-gatedskips,252.74s, normal600s
+  timeout, pytest2/loadfile. Includes54new controls and82existing canonical-index
+  controls. All old selector/harmonizer ASTs remain exact1fb; only Feature.__call__
+  and the new private declaration reader change among executable nodes.
+- Exact-runtime8a0 final smoke:4passed/0skips,8.60s, including the strengthened
+  all-invalid requested-axis records, numeraire forwarding and native-record /
+  negative/missing Expenditure preservation. Full136 stage and final4 overlap;
+  do not sum as distinct checks.
+- Exact1fb-vs-candidate actual Feature comparison:20valid invented cohorts,
+  72ordered assemblies, complete frames/attrs/warnings exact, inputs unchanged.
+  Four separate actual before/after counterfactuals reproduce missing-v majority
+  choosing the wrong healthy shape on both affected tables/orders, then preserve
+  all3healthy rows and exclude2invalid providers with explicit reasons.
+- Strict scripts/api_surface_audit.py --strict exit0 on identical production
+  bytes. No untracked native build inputs. No schemas/fixtures/required column
+  baselines or tolerances weakened; actual Expenditure, nullable arrays, source
+  labels, native extra detail, market/currency/numeraire, all-invalid/empty and
+  kept-country attrs are checked.
+- All commands used exact MAINvenv/cwd/PYTHONPATH/countries/import, private
+  data/config/cache, absent credentials/false gate, unshare-rn and threads/build1.
+  Final direct source/API/read/write tripwire receipts retain13active bindings
+  per controller/worker with0denials; no data-root files exist.
+- Preserved first new-control stage:51pass/1NEWoraclefail. An all-null-v object's
+  raw xs dictionary/dtype is not the assembled sibling-union dictionary. Exact
+  baseline/candidate/full-concat proof confirms every row/NA/value unchanged.
+  The new oracle now compares the complete exact concatenation and EA arrays,
+  with explicit NA checks; no actual output is normalized.
+- Preserved broader old-regression profile stage:441passed/4source skips, three
+  worker-crash entries ALLthe SAME exhaustive plot_labor permutation node. The
+  diagnostic's180s timeout/profiler overhead repeatedly killed/rescheduled it;
+  owned pytest controller interrupted after824.65s, exit2, all actors reaped.
+  This is failed/partial evidence, not green and not3distinct product failures.
+  Only the affected canonical-index file and final new controls were rerun with
+  direct source refusals and normal600s timeout, producing136/3 above. Successful
+  other files were not replayed. Counts overlap and must not be combined.
+
+Native/API/Make/Feature-real-data/warm/full-CI/hash census were NOT RUN. Static
+native hash stability expectation is not a measured0/N result. Only consumer
+assembly changes; no raw source campaign, shared-cache writes/rewarm, DVC,
+dependency/GitHub writes, native source/config/wave changes or scientific default.
+All original recovered refs/trees and prior task/source evidence remain unchanged.
+Durable packet:reports/1588-required-feature-index-20261108 in the20261103 burst
+workspace, including identities, code hashes, guard receipts and preserved logs.
