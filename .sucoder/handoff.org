@@ -40,8 +40,9 @@ withoutbeforemanifest, noblindrollback, allsubsequenttestsexplicitprivate.
 1174 original0ef fulloffline11464pass/5646skip/4xfail1008.38s; job41006209
 COMPLETED0:0. Ordinarycurrent3b28integration1e8af2516869a861590cc0bc189840a87ba77337
 frozen, all4taskfilesexactreviewed0ef/all10upstreamfilesexact3b28. Relevant332
-checksPASS. Source/hash job41009999 active, authorPTY62589; finaldocs/GitHubCI
-pending. NewbcdBFA/Mali-onlyadvance cannotjustifynewnative/fullcampaign; after
+checksPASS. Source/hash job41009999 COMPLETED0:0/2:54, authorPTY62589closed0;
+current3b28/1e8 APIs/Make/Feature/rawreplay/sourcecountsPASS, bothwarm14files
+unchanged, strictAPIaudit0. Finaldocs/GitHubCI pending. NewbcdBFA/Mali-onlyadvance cannotjustifynewnative/fullcampaign; after
 actorsclose proveincomingpaths/ordinaryintegration asneeded. Conditional2024
 15deletion-linesunverified/notimplementedhere, nowexplicit1275;48wholewaveheld.
 
