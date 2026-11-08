@@ -13,7 +13,7 @@ Expose the actual comparison coverage of every currently declared Uganda baselin
 | tests/test_uganda_invariance.py _load_baseline, _fingerprint, _canonical_dtypes | Reuse raw SHA256 hash_pandas_object, five-field checks, narrow existing dtype equivalences. No new fingerprint engine. |
 | _expected_coverage / _coverage_skip_reason | Reuse pre/post-read wave-footers; explicit short manifest cannot compare; missing footer still follows existing comparison contract, never guessed from t. GH1113. |
 | test_parquet_matches_baseline | Retain scientific assertions and the requires_s3 collection gate; extend its shared inspection result so reporter/CLI count each pinned field, including failures, errors and non-comparisons. Existing15 hash-variant controls remain meaningful. |
-| Pytest terminalreporter.stats / TestReport.user_properties / record_property | Reuse native reporter and xdist-serialized properties for a terminal coverage summary, including credential-gated/setup skips without IO. No new global build/report framework. |
+| Pytest terminalreporter.stats / TestReport.user_properties / record_property / native collection + workeroutput | Reuse native report/property transport for comparisons and native collected/deselected scope union for workers that execute no Uganda test; no cache IO or double counting. |
 | Explicit read-only command + Make recipe | Add a small COMPLETE operator over the SAME inspection routine, required private data-root argument and optional JSON report. It reads only named existing cache files and never materializes or falls back to shared configuration. No new implicit build behavior. |
 | tests/fixtures/uganda_baseline.json | Read-only dynamic inventory. Current53 keys/13tables, no error/null entries; one permitted measured nutrition alternate. Generator never invoked. |
 | conftest.py / tests/conftest.py | Existing root option compatibility and credential gate; ordinary unit data gate stays, no new cache access in reporter. Retired purge is not reintroduced. |
@@ -46,3 +46,84 @@ Before accepting: hermetic empty/partial/full/mismatch/error/unpinned/unknown-ke
 ## §6 Open questions
 
 None blocks the authorized test-only change. Scientific baseline mismatches are separate evidence/residuals; they cannot be repaired by this task. The ledger is committed/surfaced before implementation.
+
+
+### Phase3 — verified handoff
+
+Ledger-first9907f626e9ffaac999fc11249382929372442b98 preceded implementation;
+original5093db0d6628086305ca471306ea73c4bd7a979e, reporter-fix
+e0ef0be2ef9051c9e62e42cde0bc246ee1a6cfb8 and all original review/source
+artifacts remain preserved. Final tested integration is
+4f861a4bbbae3d0df2bd9a7c6ab901f340afce19, ordinary merge with fresh GitHub
+8505ee8a05359f66a820534c5af2ab3873671a27. All9 task paths are byte-exact to
+reviewede0ef;18 incoming BFA/Mali1528 and Malawi1174 paths are disjoint/exact.
+Filesystem development111b remained untouched. Only the authorized filesystem
+fix/1480-uganda-invariance-coverage-20261108 ref was fast-forward published.
+
+Implemented: shared structured inspection retains all original scientific
+oracles; native pytest reports plus actual collection/deselection evidence
+count every declared baseline entry/field. Explicit-root read-only COMPLETE
+CLI/Make target never builds/acquires/stamps/refreshes or falls back to a
+shared root. Ordinary reporter does no cache discovery. Unknown files are
+not inventoried there; the explicit operator names extras separately.
+
+Independent5093 review found a real P2: when xdist deselected every collected
+Uganda comparison, no TestReport reached the controller and no section was
+printed. Reporter-onlye0ef records collection before selection, carries it
+through native workeroutput and unions worker scope. Collected-but-unexecuted
+comparisons remain visible; a never-collected module stays quiet. Original
+changes-requested verdict and reproducer remain unchanged. Separate closure:
+10passed67.76s, actual serial/n2 all-deselected/partial/never-collected/zero-
+selected controls plus dedup/no-IO checks; no remaining finding. No source
+campaign replay was needed for this hook fix.
+
+Author focused frozene0ef:70passed,53credential-skipped,157.47s pytest /
+159.158s wrapper. Default summary explicitly INCOMPLETE0/53 entries,0/265
+required fields, verification NOTPASSED. This includes9 new selection controls,
+original finite hash/structure controls, empty/partial/full/mismatch/error,
+missingness/unknown-key/unpinned/report-output and conftest compatibility.
+All use private data/config, false credentials, unshare-rn, exact mounted-main
+package/countries-root/head assertions, BLAS/build1 and pytest2/loadfile.
+The earlier v3 run overlapped an edit and remains NON-AUTHORITATIVE; its
+checks were repeated on frozen code. No invalid attempt is promoted.
+
+Separate source job41011740 COMPLETED0:0 at exact5093, freeco_carleton
+--cold4CPU32G: all13 dynamically inventoried ordinary getters succeeded in
+237.040s; COMPLETE exit0 matched all53 entries/265 pinned fields, zero unpinned.
+The37 extra generated wave files are outside the shipped baseline scope and
+reported separately. Every private cache file's bytes/mode/nsmtime and the
+manifest digest remained unchanged through the read-only operator. The receipt's
+operator_seconds10.762 includes inventory/snapshot closure, not pure CLI time;
+no separately measured pure-operator time is claimed. No baseline was generated.
+This validates the current manifest cohort, not every Uganda feature, source
+truth, historical freshness or population interpretation.
+
+Comparator/CLI/Make/hash-variant controls/manifest are byte-exact5093 after the
+reporter fix; entry_result/summarize/summary_lines ASTs are unchanged. Original
+fingerprint/dtype/coverage-gate functions and all5 assertion ASTs match3b28.
+Manifest SHA25603252ade67950b3677b72c8b27fb1cfe6cc6c7127f1ed1bca746dddc701a866d.
+Library arithmetic/config inputs remain outside this test-only change;
+CONTENTS is documentation excluded from build hashes. No tolerance/skip,
+fixture/scientific baseline, dependency, source policy or default was relaxed.
+
+Full isolated offlineCI job41014455 COMPLETED0:0, exact integrated4f861:
+11632passed,5652skipped,4xfailed,692warnings;1384.84s pytest/1389.313s wrapper,
+24m54s Slurm. Freeco_carleton4CPU32G, own image mount, private EMPTY data/config,
+false credential gate/unshare, BLAS/build1 and pytest2/loadfile. Head-after
+matches and code-clean-after is true. The node-local submission-cwd warning
+preceded helper clone/cd; exact runtime cwd/package/config/mount checks passed
+before test launch. This is offline CI, separate from source COMPLETE above.
+Strict metadata API/skill audit on integrated4f861 exit0 with private roots.
+
+All scientific/source/review/CI actors closed before this ledger-only update.
+Final whole-tree byte proof binds every non-ledger tracked path to tested4f861;
+therefore the final docs freeze needs no code/source replay. Durable evidence:
+B/reports/1480-uganda-invariance-coverage-20261108/{REPORT.md,SOURCE-RECEIPT.json,
+reporter-fix-byte-ast-proof.json,integration-byte-proof.json,offline-integrated/}
+and B/reports/review-1480-uganda-invariance-coverage-20261108/{VERDICT.md,
+REPORTER-CLOSURE.md,closure-e0ef/}, where B is the task burst root.
+
+Remaining root-owned gates: final-head GitHub unit/Windows checks, PR review,
+expected-head publication/merge and issue closure. No GitHub writes, shared-L2
+rewarm/clear or scientific policy decision by this worker. No scientific
+residual introduced; inherited country caveats in§3 remain qualified.
