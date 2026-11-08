@@ -234,3 +234,89 @@ actual capacity is restored. All five R3 partial-code custody records preserved.
 Malawi weights48/whole-wave1604,1509/1442,1560/1571 and scientific fallback1497
 remain held;49/50/51 already settled. Master/shared-cache rewarm remain deferred.
 
+
+* Authoritative scrum checkpoint, 2026-11-08T05:57:34.573263+00:00
+Goal ACTIVE; this goal turn PROGRESS. Root owns queue, worker assignment,
+independent review, publication and authorized development merges. Three local
+workers have real tasks; historical eight-country jobs are not live workers.
+
+GitHub development8a35e1c2297c5a3f8e6437e125246ee187f1f638. Filesystem development
+stays untouched. Fresh paginated repository-wide open issues: 171 (not ISA-only).
+Cumulative17 development merges /16 issue closures, including residual1602,
+1603 and1616; evidence-only merges do not imply scientific closure.
+- PR1614 TLU omission disclosure MERGEDc2d98b7d; parent1485 OPEN. Combined
+  exact1603 composition full offline11777/5652skip/4xfail, independent67;
+  final GitHub checks and actual merge-tree proof passed. No factors changed.
+- PR1619 Feature required identity MERGED631bb6d;1588 CLOSED. Final3b63afda
+  narrow opt-in only household_characteristics[t,v,i],food_expenditures[t,v,i,j].
+  Missing identity degrades before lossy harmonization/schema voting. Existing
+  positive test fixture required invented v; test-only correction preserves old
+  assertions and negative case. Original one-failure CI retained. Final full
+  offline11831/5652skip/4xfail, independent23,72healthy comparisons, final GitHub
+  checks and exact actual composition treefbbec566 passed. No native campaign.
+- PR1620 country-aware TLU MERGED8a35e1c22;1616 CLOSED. Headac970ae6,
+  author214/8sourceSkip +400typed parity, independent34; offline11824/5652/4,
+  final GitHub checks pass. Latest upstream Feature changes are disjoint6paths
+  versus4TLUpaths; every actual mode/object matches prospective treedfece39c.
+  Root receipts in reports/1616-tlu-current-verification-20261108.1485 OPEN.
+- PR1618 BFA SiteQ1482/1485 DRAFT247e369: GitHub unit/Windows pass, full offline
+ 11780/5652/4, independent129. SOURCE GATE INCOMPLETE: do not merge yet.
+
+Actual worker assignments:
+1. finish1452: BFA source failure closure and candidate-only continuation charter;
+   no new source/API execution before root review. All completed CI/reviews closed.
+2. finish1590: bounded1485 fertilizer lost-country/wave disclosure implementation,
+   plus docs for existing explicit recovery only. No numerical/rate/default or
+   partial-plot recovery change; whole1485 not closed. Latest main155pass; two
+   separate controls compare48 typed adversaries, final7 controls closing.
+3. malawi_revision_food: Nigeria1518 consumer/native bridge CHARTER ONLY. Explicit
+   national vs own-zone selection, provenance/code-bound enumeration handling,
+   hold fluids before every eligible layer, opt-inW3fullkeys/serving eligibility,
+   metadata-only W1/W2 quantity-mode inventory. No product/API/raw work yet.
+
+BFA SOURCE evidence and next constraints:
+- Frozen10physical privateL1 identities20,311,324bytes are exact required ordinary
+  dependencies:2source tables+8allwave sample files (sample() lackswaves arg).
+  Original2capture was4fullStata+2headers, not2; addendum preserves originals.
+- Source41019121 path collision and41019202 relative Make guard failure retained;
+  both0raw/getters. Exact revisedguard authorizes normalized same canonical target,
+  never extra options/escape/wrong target. Actual helper positive and negatives pass.
+- Source41019375 FAILED after baseline actual plot_inputs returned22877rows7cols.
+  Private plot_inputs-cold.pkl preserved; comparison of native parquet to in-memory
+  expectation failed on inherited StringDtype pd.NA vs nan index carrier. Actual
+  main8+producer2 =10getters/10fullStata parses; zero guard denials. Livestock,
+  candidate and warm never ran; all ephemeral credentials removed. No blind replay.
+- Closed unchanged-writer in-memory serialization probe passes exact values/dtypes/
+  masks/typed attrs and reproduces NA-kind drift; does not prove unavailable actual
+  native file. Originals and failed oracle preserved; no casting/normalization.
+- One SSH probe had PAM_SLURM denial only. ONE approved readonly allocation41019644
+  exactn0028 now establishes /local/job41019375/bfa-siteq-private/base/data ABSENT
+  at recovery time;0bytes/parquets/import/API/getters. No repeat recovery. Preserved
+  baseline API return is reusable, baselinewarm/unstartedlivestock UNVERIFIED.
+- finish1452 next freezes candidate-only plan with serialized carrier expectation,
+  completed baseline return reuse and explicit remaining coverage limits. No fake
+ 2018-only sample or allwave manifest; root reviews before executing source.
+
+Remote model capacity impaired, zero active model jobs; three local workers busy.
+Claude auth not logged in; Codex observed owned-git descriptor mounts EINVAL22
+on41018752. Process identity is known, precise operation/cause UNLOCALIZED.
+Synthetic localGit41018900 and local-to-Lustre41019029 complete without refusal;
+second20pushes/223unchangedguard checks, two exit-race EACCES handled as exited.
+Original real failure and all probe/operator errors retained. No installed tool,
+guard, hook, dependency or source changes; no further native/repro retry authorized.
+Supported --timeout120 fixed clone prep only; it did not solve runtime guard.
+
+Nigeria1518 WIP independently reviewed16author+6consumer controls;711unique
+nativepairs yield695national/4170zone after9conflicts+7fluidholds;11956rawrows
+retained.108heldfluid rows fall through default consumer; numbered label parsing
+and serving eligibility need explicit bridge. Three NEW invented probes also show
+volume_as_mass=False alone cannot block other eligible conversion layers. Public
+issue records gaps; no physical-kg or price-policy approval/native replay claim.
+
+Scientific holds persist: Malawi weights48/wholewave1604;1509/1442purchase-price
+eligibility;1497fallback;1560/1571sold-kg quantity/window/state;Mali1594sentinel;
+Nigeria1518national/zone choice.49/50/51 and qualitative shocks decisions settled.
+Earlier1535sharedcache incident remains qualified, no byte-continuity/rollback
+claim. Master release and shared rewarm deferred. All current runs private roots,
+explicit import identity, mountedvenv, pinned threads, source privacy preserved.
+
