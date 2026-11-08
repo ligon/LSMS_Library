@@ -1,4 +1,126 @@
 #+title: LSMS-ISA country workers and coordinator queue
+* Current scrum handoff 2026-11-08T11:50:14.381942+00:00
+GoalACTIVE/PROGRESS. GitHub development b284112edee7dcc764415bb4e69a7d1814cf512b.25development
+merges/21issueclosures in sweep. Fresh166repoopen; original147scope17closed/
+130open (1606newoutsideoriginalscope). FSdevelopment111b untouched; no master
+release/sharedrewarm/productionweights. Priorrootdocs739f724d2.
+
+1606 COMPLETE: PR1627 MERGEDb284 fromcfe3ac758fe67f10ed01e6072ab287fc336a4758,
+actualparentsa799+cfe/treeb54f1e864ef0ce954dc8174659b46b0b4047d891 exactreviewed
+CIcompositionc8+ownledgeronly. GitHubunit/windowsSUCCESS/6conditionalSKIPPED,
+reviews/threads empty. IssueCLOSEDcompleted11:42:19UTC/bodyretainsoriginalreport.
+FullCI41023422 COMPLETED0:0/13:51/n0044:12161PASS5652skip4xfail/723.47spytest;
+JUnit17817/0failureerror,allprior17782IDsretained+exact35new. Author35+3external,
+ROOT6indep distinct/3earlyprofiles0denials. ActualmetadataCLOSED0/121.94s:
+ALLfieldsexcepthead equalcloseda889map;0/450/1895/35/186,18None/public553/2313/39
+exact, baselineNOTreplayed. API0/8.42s. Originalfailed41023382mode0644exit126
+PRErunner/pytest kept;bootstrapimporthappened. Onlyentrymode0755+freshv2namespace
+fixed; noneofvalidatedcode/assertionschanged. ALLroot1606actors CLOSED:66572,
+56573,22096,60746. Reports1606-finalization-20261108/ROOT-MERGE.json andcurrent-
+verificationcount/identity/receipt prove.1549PR1626/1591PR1625/1578PR1624/1592PR1623
+remainCOMPLETE. No furtherwork orreplay neededontheselanes.
+
+1520 remote41023375 terminalCOMPLETED0:0/15:43/n0028/native0/supervisor0/task
+completed/sealed-exited-placed/publicationcomplete. Finalcf0abd30b0a21e616d6edf4c9867c757d093381b/runtime5730d463a17b868be245066046f9260d62c5258b/nonledgerexact.
+40PASS=37new+3existing incl2parentnegatives/API0. Cachedpropertydropsinitempty
+mapplaceholder/reusesUNCHANGEDwavesauthority/refobject/publicassignmutationdelete;
+countryotherAST exact,transformationsexecutableAST exact. Sourcegetter/raw/native
+countrymodule/Countryconstructor neverrun. KnownMPLattempt/root/.config denied
+thenautomaticprivateTMP fallback retained, no falseexhaustivehermeticityclaim.
+Rootreadfullproductiondiff/report/packet; FINAL-ALLOWLISTmanifest19b3bfdc/
+seal4ac175b3. Independentfinish1590 NEW26controlsPASS11.35s/26.82wrapper,
+3preimportprofiles0denials/data0/source8+operator8exact. MPL/XDGexplicitprivatefrom
+startup; old40notreplayed;noP1/P2. Entire26testsmatrix/runner/rootreadcompleted.
+NOWfinish1590 owns CURRENTcomposition/releaseverification CONDITIONALgrant:
+newcf0+b284mergeNOTrebase;Country.pyexactauthor,transformations.pp_phdoc/comment
+vs1549cropdiversitydoc exact3waypatchproof (NOTdisjointpathclaim),entireother
+mode/type/blob union;newFSverify/1520-current-20261108 only. Accepted1606templates
+namespace/lane/head/privateprefixonly+assertENTRY0755 beforeONEfullCI8CPU32G45m/
+4loadfile/alltests/no-m-k/privateownL1/falsecreds/unshare/BLAS1. AlsoONEcandidate-
+onlymetadata+API;closedC8map admitsb284ONLYownledgerdelta/headerpreserved/no
+baseline replay. Anybeyonddelta/failureSTOP;noautomaticretry/newhash exclusion.
+Noactorsclaimedrunninguntilactualsubmitted;37newfullcasesexpectednotmeasured.
+ROOTownsGitHub/finaldocs/checks/merge. Nativejobcapacitytwo-overlap remainsUNPROVEN.
+
+1537 LOCALfirstACTUALcohort29PASS/29.56s(24historicalcasesfrom16functions+5
+candidatefunctions); runtimecd8713b9b9b6cccdfe631a0b2ca6b6f6ae681283/finalledger
+27f552d50adfa9498bd558c8ae850948de8a0e18/nonledgerexact, allstrictEVENTSempty,
+noSource/Country/API/noargproducer/census. Nativej/quarter/Pepper/pricegrain
+assertionspassed. ImmutableBASEOrg1ec375a0939d1bebc0398935580eba931bb798189a9940d31be1a29f34c41f29;
+2productionlabelrows removalexactoldOrg. Rootv4-v7 historypreserved:magic2known
+init+compatlookups prewarm;v4originalstrictblockedfc-list;v5MPL_IGNORE_SYSTEM_FONTS1
++MPLCONFIGDIRevidence+TMPDIRevidence fixedimport,logging/devnull+unknownbind stopped;
+v6collection-only loggingbound+observerlocalizedurllib3IPv6probe,24collected0run/
+newtestfixtureImportError. v7onelegitpackageimportfix,knownurllib3preflightbefore
+strict(max1pinned_has_ipv6('::1',0)AF_INET6/SOCK_STREAMinsideunshare,actualHAS_IPV6
+FALSE natural),originalstrictbodyUNCHANGEDafterprewarm,0testphasebindallowed;
+actual29PASS. Alloldremotesdiagnosis/BLOCKED/refusals stayhistorical,notrelabeled.
+ROOTfound NEXTCIportabilityblocker: curationfixtureusesISA_CONTEXT_ROOT external
+asset! finish1452 MUST now ordinaryFFcommitexactBASEOrgunderrepo
+ tests/fixtures/gh1537/baseline-categorical_mapping.org;fixturePath(__file__)-
+relative/sameSHA;noGit-historylookup/reducedfixture/all21TESTASTassertsunchanged.
+AddsmalldatedNigeriaCONTENTS 2blankCode/all8blankquarteraliasnote+Pepperheld.
+No29greenreplayforpath-onlybinding; rootindep/fullCIstandardenvwillcover. Old27f
+packet preserved. NewheadPENDING. Whole1537/Pepper remainsOPEN, no fullCI/meta/
+independentacceptanceyet. Actualnoargproducerguardstaysbanned;realOrg+format_id
+andunchangedpuretail boundary/staticchain qualifythedefaultproof.
+
+Niger1529 P2final4cca/runtimebb0:author7affectedPASS,indep8PASSafteroriginal32
+31P1F;no casts/assertionrelaxation,allnonledgerexact. Oracle8PASS+new10supportPASS
+(oldcohortsnotreplayed). ONE6sourceCARDPROJECTION stage CLOSED0/17.233s:
+2Cfull40464→8538,3Cfull7860→1067,joint9605unique;0selectednotnative/missinglabel/
+nonmissing-own-card-unmatched,independentexpectedBEFOREcandidate exactframes+
+attrs,raw/labeled/maps/cards/labelsunchanged. ALL6preseals BEFORE4trustedpickle+
+2JSONonce,all6postequal,guardactive0denials/data0/cleanhead.6privateexports600,
+parent700. Stage FINAL-MANIFESTf52a3ce7/report256144e8 underreports/1529-niger-
+native3c-six-v2-stage-20261108;fulljournal B/private/1529-native3c-six-v2-20261108/
+private-output. NO actualreader/native/publicAPI/Default/Make/Feature/warm claim.
+Mwi NOWpreparesactualreader+defaultONEwavecold/freshprocessprivatewarm ONLY:
+actualv-from-samplejoin callsALL4samplewaves, sourceclosureNINErawDTA(2inputs+
+7sample),declared15,952,409bytes. Committedpanel/updateJSON sources avoidpanel
+regeneration; includeactual2014strata/2018+2021stamps/weightcarrierunchanged.
+Makebackendrequires3additionalinputDTA+internalNO_CACHE, remainsUNGRANTED.
+Read-onlyexactsharedL1blob→validatedprivatecopy proposed/stopifmissing,noshared
+cachewrite. Reuseknown1482BFAcold/native/warmguardtoolingiffit. NO9blobstat/hash/
+copy/fetch/rawreader/getter/APIgranteduntilROOTreadscompletecustody+childguardplan.
+Sourcewindow/season/area/cost/3B/3D/3E/factors/weights science remainunruled.
+
+Ethiopia1570 Et14source stage CLOSED0 exact8082/runtimef032:14trustedloads
+7DataFrames+7owndicts,all14presealsbeforefirstdeserialize+14postequal,28successful
+journalentries,298.914sdiag/313.644wrapper/guardactive0denials/data0/clean15bindings.
+No19/22/original7JSON/raw/native/API/Make/warmreplay. Allsourcecounts7750/29317/
+9226/7872/21249/covers3239/3049;ownkeys+s10crop_idexplicitprojection. Reportrows
+arenotuniqueHHs. Q3positive6226/zero104/missing1542;ownlabelpast12months/nounit
+KG stated,quantrepresentationHELD. Cash-onlymajorstates3s11/25s12,NOTassignedto
+unmatchedmarginals. Original14verdict UNKNOWNcauseof0literaltyped s9↔s4 matches
+remainsimmutable; source-stage PASSnotindependentnative/scientificacceptance.
+ROOT NEWtwo-capture dtype-onlyfollowup CLOSED0:ALL2preseals-before2loads/post2
+identical,rawinmemorypickle snapshots identical,0denials/noLSMSimport/noformatter/
+join. s9crop_codefloat64(7746floats+4missing),s4int16(29317integers);HH/holderboth
+str,parcelbothint8,fieldint16vsint8bothIntegral. FrozenoracleF-vs-IcroptagFORCES
+previous0;NOTevidenceabsentcommonrecords/brokenproductionjoin. Whyactualstorage
+typesdifferNOTestablished/missing-inducedexplanationunproven;futureactualproduction-
+formatter/collision sensitivity unrun. R=reports/1570-key-dtype-followup-20261108
+FINDING.md/FINAL-MANIFEST40734a47. Full14verdictbef3215d/manifest1f8d0efa at
+reports/1570-w1-fourteen-capture-result-v1-20261108. No wholeparity(sect3_ppabsent)
+/fakeNoneintercrop/scale/component/eligibility/weightpolicy. Whole1570OPEN.
+
+1547NEXTREMOTE PREPafter1537portability fix: finish1452 staticNoCredentialsError
+vs515/675taxonomychart+meaningfulhermeticfixtureboundary/task/profile/PLAN ONLY.
+IMPORTANTrootprovisionalwordingCORRECTED: retainexisting UNAVAILABLE-required
+losssoft675degraded(2233–35/2277–80); onlycurrentlyhardprimary/CONFIG-required/
+schemafailures stayhard. DoNOTintroduce newrequiredhardpolicy. NarrowNoCredentials
+handlingconsistentexistingavailability; quoteexistingcode/tests beforefixbrief.
+No new1547job/dryrun/sourceactor authorizedyet.1520country.pyoverlapdifferent
+regions mustbeownedinrootqueue, no duplicateowner.
+
+All3localworkers active: finish1590→1520composition/metadata/fullCIconditional;
+finish1452→1537portablefixturethen1547PREP;Mwi→Niger9sourceactualservingproposal.
+Usefollowup_taskforcompletedagents andverifylive; send_message aloneDOESNOTwake.
+0native-modeljobsliveafter1520terminal;no8waiting/2overlapclaim. Settled49borrow/
+50maizeflourperprimaryevidence/51NOdateclamp remain;productionweights48/wholewave
+PR1604/1509eligibility/1442/1497/1518defaultW1W2yield/1560+1571scienceheld. GoalACTIVE.
+
 * Current scrum handoff 2026-11-08T11:17:34.000918+00:00
 Previous turn PROGRESS:1549 mergedPR1626/issueclosed;1606 independentreview+
 currentcomposition+census/API completed;NigerP2 closed/nextsourcegate granted;
