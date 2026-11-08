@@ -1,4 +1,15 @@
 #+title: LSMS-ISA country workers and coordinator queue
+* Worker activation correction 2026-11-08T10:53:01.289929+00:00
+Live list_agents found finish1590 and Mwi COMPLETED: send_message delivered
+assignments but did not restart them. ROOT explicitly followup_task-woke BOTH;
+Mwi acknowledged producer priority and10-15min estimate. Live readback now shows
+ROOT+all3local workers RUNNING. Earlier assignment entries describe grants,
+not proof that work had begun. On future reassignment, inspect status and use
+followup_task for completed agents, then verify actualrunning/acknowledgment.
+Nextremote reservation1520 (lazy wave_folder_map) assigned finish1452 toPREP
+only AFTER1606frozen cohort; no new dispatch authorized. PR1626 unit pending,
+WindowsPASS; ROOT owns checked-head merge and explicitissueclosure.
+
 * Current scrum handoff 2026-11-08T10:50:18.630217+00:00
 Goal ACTIVE/PROGRESS. GitHub development ebb87135cdd11a63e3b463b6b21c3e556c628a8d.
 23 development merges/19 issue closures. Fresh paginated168 repository open;
