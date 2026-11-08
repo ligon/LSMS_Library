@@ -141,3 +141,43 @@ warm/native/CI campaign, no new dependency or global parser/ranking change.
 Existing3 kernel counterexamples and16+6/W3 cohort are closed and not rerun.
 Freeze final product/tests before independent review; any future sealed W3
 correspondence gate needs separate authorization. Whole1518 remains open.
+
+## §9 Implementation freeze and bounded controls
+
+Implemented one opt-in native_w3_harvest_kg with mandatory geography and a
+PRIVATE _native_w3_inputs. Reused recovered50be transcription/hold conditions,
+current pure crop producer/production_obs, existing id_walk(state='raw') and
+shared harvest kernels. No existing library/country/config file was edited.
+The two-result API returns the kernel aggregate and NativeHarvestAudit with
+native_lines, conversion_rows and plain JSON-serializable metadata. Both raw
+frames retain exact columns/dtypes/NA/index; W3_-prefixed derived fields cannot
+overwrite source columns. Source MD5+release-row witnesses and current serving
+keys are separate. Arbitrary input mass/price fields and attrs are never copied
+into the private operand. Held rows precede every layer/pooling donor, all
+nonheld eligible lines (including missing/zero/negative quantities) remain in
+the delegated operand, and every harvest call explicitly uses False.
+
+Invented source-free controls:44PASS/0skip,10.59s under mounted MAINvenv,
+exact cwd/import/countries, unshare-rn, private false credentials/data roots,
+pinned BLAS/build1 and pytest2loadfile. Runtime guard receipts self-test19
+direct bindings and record unexpected denials. Final frozen-head rerun/receipts
+are packaged separately in B/reports/1518-nigeria-safe-harvest-20261108.
+
+Preserved development failures: first7fail/28pass included a real nullable-mask
+bug (fixed), an overstrong Arrow object-dtype expectation (typed diagnostics
+fixed), and warning/setup oracle mistakes. Second1fail/34pass was the shared
+kernel's unchanged Arrow index dtype drift; third1fail/36pass used an incorrectly
+typed invented expected index. Fourth42PASS and final44PASS retain all original
+fail logs. Exact aggregate values/dtypes and existing kernel attrs match the
+actual shared kernel before serialization. BOTH audit frames roundtrip with
+strict typed equality. Aggregate Arrow values/keys match, but its StringDtype
+crop index becomes pandas str: no output/kernel cast or exact-dtype roundtrip
+claim. Hold-warning public caller/promoted-warning checks preserve inputs.
+
+No real source blob/PDF/frame, closed16+6/W3 cohort or previous3 kernel probes
+was reopened. No source/API/Make/Feature/warm/full-CI/hash/native campaign or
+new dependency. The original9+7 source-record hold masks require the later
+separately authorized full-universe sealed-input correspondence gate on the
+frozen implementation; invented tests do not claim to remeasure those masks.
+No W1/W2/yield/public unsafe operand/default/scientific policy is implemented.
+Whole1518 remains open. Independent review precedes any new source gate.
