@@ -1,4 +1,195 @@
 #+title: Handoff, LSMS-ISA sweep
+* Authoritative checkpoint, 2026-11-08 03:47 UTC
+Previous goal turn PROGRESS (1535+1480 merged); this turn PROGRESS (1602 merged,
+eight concrete country execution jobs and5source-ready continuations dispatched,
+40own-source captures delivered, four fixes reviewed/CI advanced, Tanzania
+investigation completed). Goal ACTIVE. User explicitly corrected root: keep
+eight country agents busy, act as scrum master. This is a priority, not another
+request for an initial queue assessment. Root must delegate verification/service
+work and refill ready tasks; do NOT count ended/failed workers as active.
+
+GitHub development1ce4f525b6f6042eadfe785c3bfd2818e34e1808. PR1610/1602 MERGED,
+final4ba397815aaf66c5c8338437233d6eea15521259; actual merge parentsc780+4ba,
+tree1f133a2149c077dabf96d8256420486ca1e9b95c EXACTfinalhead. Unit14m7s/Windows
+SUCCESS, source/DVC/docsSKIPPED; reviews/threads empty. Issue1602CLOSED completed
+with exactbody readback. Root ROOT-MERGE/ROOT-PUBLICATION.json in1602report.
+Ten total issue closures through nine merges:9originalsnapshot closures plus
+newresidual1602. Expectedallrepo176open (refresh beforeclaim), NOTISA-only.
+Globalhashcost450country/1877wave/35build,0/186import;18Noneunchanged.526missed
+feature/sourcebindings ->421paths/415MD5withamiss, GLOBALuniongain409/403 after
+12oldreachableoverlap. No actualprefetch/performanceclaim or plannedsharedwarm.
+
+Mali1576 DRAFT PR1611 finala2753b193418b14e627afcf5d827286ee9415b7b, ledger-only
+over4f5e50672b03dc9557e7200652cdef7df604f2d0.170focus/1skip; independent180/1,
+13independentcases; noP1/P2. Actualbasecold41017859 +candidate41017883: full
+typed/keyed/ordered/NA/otherattrs exact except14Regionlabels/551clusterrows and
+168stratalabels/6602samplerows, alltargetRural. Ownsource4files/12closedartifacts
+independentlyconfirm14clusters168households. Candidatefreshwarm4cachebytes/hash/
+coverageunchanged, snapshotsdurable BEFOREwarm. BASEwarmUNVERIFIED: guardfalse
+positiveonprivateL2read,oldcachegone; completedbasecoldnotreplayed. Root accepts
+boundedlimitationexplicitly, never promote tobasewarmpass. Operatornamespace/
+DVCtmp/absentprobe/rawvsparquet misclassifications andprivateSegou/Ségou oracle
+failure preserved; v5actual-loader8controls covercorrectpaths. Oneauthorlocal
+inspection accidentallydisplayedrawkeyedfailedlog; no IDs inreports/PR/Git.
+Source/directgetters fullyparseStata, no metadata-onlyphysicalIO claim.
+Metadata20country/80wave ALLMali,0shared/import. Ordinarycurrent1ce composition
+9f51edc30c15aac4e8c78540b18384eb81997658 fulloffline41018204 COMPLETED0:0:
+11678pass/5652skip/4xfail705.98s. PR1611finalGitHubchecks pending; noactualMake/
+Feature/allwavesourcegateclaim. Sources/producers/frameworkunchanged.
+
+Uganda1439/1526 DRAFT PR1612 head ec17d5e6717e0bff537bddd18a7a9e9477646ab0,
+treef58b08be145915807619deb2ce5a9f68615e0cd5, reconstructedfromimmutable5file
+archiveSHA b9a481208af06deb7e5a0c2af4f93f53f569df1740a4ca216fe843ad72b883fb.
+Originalremote6d71results.git contains ONLYc780, notthecode. Exact5archivehashes
+and3protectedbaseline/reporterhashes verified; originalarchive/reports untouched.
+prepare_demand_inputs sums suppliedMONETARYLEVELS overs beforelogs, preserves
+purchaseddefault/explicitbasis, allNA/partialrecordedsubtotal/zero/log0 behavior,
+refusesextraidentity/ambiguousmarkets. No implicitownproductionvaluation/fitting.
+29author+25independentPASS54total, actualinstalledCFE0.10.0inputcheck executed,
+strictAPI0. IndependentreviewB/reports/review-1439-1526-uganda-demand-20261108.
+Ordinary1ce composition2ac48c634706d3cf4f698857f589101f3383f747 fulloffline
+41018205 COMPLETED0:0:11693pass/5652skip/4xfail696.76s. FinalGitHubpending.
+Root readhelper/doccontract; partialmissing sums are explicitlyrecordedsubtotals,
+notcomplete/imputedtotals; CountryfoodAPI/installedCFE unchanged.
+
+Shared1603 FINAL54b06b2b5ce50d49cdcf5e74ae40df5644be07fd ledger-onlyoverab8e6fdf
+c3b5b2e51d457ab2c1ae198c5d1f35f9 (concatenate). Author201focus+3hashpositive,
+API0/all450/1895/35/186hashesunchanged. Independentoriginal37pass8harnessfails
+assumedpublicNAcountryaccepted; baselinepublicalreadyrejects. Rootv2corrected
+NAcontrolsassertbothpublicrefusals+directlookupsemantics,44pass1missingfixture
+parameter failure; rootv3fixesONLYfixtureinjection,45PASS8.56s atab8, no product
+change. Allfailurelogs preserved. NoP1/P2. Ordinary1ce compositionff8a29edfc60c720
+a928e003a0fb4cc5eac375c3 fulloffline41018203 COMPLETED0:0:11702/5652skip/4xfail
+711.81s. Finalauthorpacket B/reports/1603-shipped-factor-warning-20261108/
+FINAL-* andPR-DRAFT-FINAL ready. Rootfinalbyteproof/push/draftPR/GHA next.
+
+Malawi1485TLUcoverage final02986035e5b40b3beb481e85f34702d5002293e1, ledger-only
+over952eb819d5f492aff0c3847062f44d6fb0d31bea, preserveslegacyfactors/rows/values.
+Structuredper-original-label headsign/missing counts+dedicatedunsupportedpositive
+omissionwarning ONLY; no factor/NA/imputation/raisingdefaultchange. Author32new,
+100exactrandomreferencecontrols,468focus/12inheritedskips; API0/zero450/1895/35/
+186hashdeltas. Independentfinish_1452 FINAL67pass(35new+32author), JSON/Arrow
+roundtrips4, guards0denials; noP1/P2. FertilizerAST/codeunchanged, anonymousparcel
+route stillloses2/4syntheticwaves; explicitcountry/agreedattrs/onplot keeps4/4.
+TLUCOUNTRY-RESIDUAL documents inheritedcrosscountrypool of0.1+0.2into0.3; notfixed
+orfiledseparatelyyet. SiteQanotherowner. Whole1485mustremainOPEN withprecise
+residuals evenafterTLUwarningmerge. Fulloffline41018496 RUNNING onordinary1ce
+compositione7c73204a6d745dc4ad58fb044afda27cbb7312e, filesystemverifyref1485-tlu-
+current-20261108. Deputyreceipts B/reports/verification-deputy-tlu-offline-20261108.
+
+Verificationdeputyfinish_1590 launched3CIs CONCURRENTLY, allfullselection/no-m
+exclusion, freeco8CPU32G/pytest4loadfile, BLAS/build1,wholechildunshare, ownmain
+mount,exactcode/import,countries,brandNEWemptyprivate data/config/cache,absent
+read/writecreds,falsegate,nonsymlinkprivateL1. All3nowCOMPLETED0/clean,JUnit
+reconciled, sourcecases skipped5652; nosourceverificationimplied. Mode/type/blob
+owned/upstreampaths exact/disjoint, normalmerges only; filesystemverifyrefs only.
+B/reports/verification-deputy-three-offline-20261108 FINAL-RESULTS/GATE-PACKET/
+COMPOSITIONS. RootownsallGitHubwrites/expectedheadmerge; noforce/rebase/squash.
+
+Countryexecution capacity: initial8queueassessments completed, then NEWround2
+atB/country-workers-round2-20261108: jobs BFA41017639/Eth41017643/Mwi41017645/
+Mali41017648/Niger41017664/Nigeria41017672/Tz41017674/Ug41017676. Allterminal:
+5infra0 nativephases(taskunfinished/preparedpatches),3Refused143(Mwi/Mali/Tz).
+Those3were replacedbyinprocessfinish_1590/finish_1452/malawi_revision_food.
+Five SOURCE-READY continuations at B/country-workers-continuation-20261108:
+BFA90b1...41017836,Eth1f123...41017840,Niger8f2...41017841,Nigeriacec0...41017853,
+Uganda3d6...41017856. ALLFIVE Refused143 owned-childFDerrno13, notwaiting/complete.
+PartialpublishedheadsBFA247e3693996786e27afc7f38a10aab984c8cfe9c,
+Nigeria406c0c4ddf11dee630c3ac3bd84606c3f63a36fc,
+Uganda4c3199a080032db932aa25ab03d9f09fd28c9bb7; Eth/Nigerc780. Exactdirectory/
+results/evidence paths inthatroot owner-registry.json andstatus-{country}.json.
+DoNOTrecursenativehomes/SQLite/secrets. finish_1452 nowreadonlyrecovering/classifying
+partialcode/evidence,nexttasks. Newreservations: BFASiteQ1482/livestock1485+1569;
+Eth1570+sharedmarketfallback1592; Niger1529; Nigeria1518; Uganda1588healthyFeature
+rowloss while1439recipeawaitsreview. Sharedcode/scientificscope mustnotduplicate.
+
+REMOTEFAILURE IS SYSTEMIC/UNRESOLVED. Oldfirst-GPGhypothesisunsupported; logged
+Malawilast14commandscontainedNOunshareinvocation (onlyrgpattern), soinner-unshare
+causalhypothesis NOTconfirmed; all5newcontinuationsfaileddespiteseparation.
+InstallednativeCodexcommand alreadybypassesapproval/sandbox; don'tinvent aconfig
+remedy. Nativeguard/sourceAST unchanged, installed/sourceSuCoderHEADc9dafdb.
+No guardweakening,installedtoolchange,sourcecachewarm orblindfailednativetaskretry.
+ClaudeSUPPORTEDadapterpilot has NOTlaunched:2preps timedout sourceGitclone30s,
+exit2/nojob, bothpreserved. Privatefullsource622.61MiB/93309objects; exactclone
+benchmark25.917s succeeded/c780/noshallow. Privatepreflight.git MIDXbitmap+
+pack.threads2 (ONLYprivateGitmetadata,allrefs/commitunchanged), secondexactclone
+24.318s succeeded, preparation48.59s; claude-bitmap-clone.json. Thisremedy isfor
+cloneprep only, notFDguard/auth/restoredcapacity. DoNOTclaimClaudeisrunning.
+
+malawi_revision_food nowownscritical EXTERNAL observerasset, noSuCoder/installed/
+productedits: continuationroot/owned-proc-observer-20261108 privateassetrepo.
+Implementation176612bbf703edc35f123db40450471d9beb9b95, exactJobOwnership source
+reuse(realUID+allocationcgroup+PIDincarnation, actualsupervisor exclusion),
+two-phaseidentityjournal BEFORE sensitive probes; comm/UID/Gid/PPid/starttime/
+caps/seccomp/namespaces/readability/errno only, NOargv/env/FDtargets/credentials/
+data.50msidentity/250msprobe,boundedlifetime/bytes,private600durablefsync changes,
+best-effortracequalification(observercannotguaranteePIDcapturebefore100msguard).
+Deterministic41018437 failednewtestprocUID-must0assumption (16pass1fail), actual
+UID43292 recorded.41018486 COMPLETED0:18pass3.34s; actualPR_GET_DUMPABLE0,
+identitysequence4BEFOREfdEACCESsequence11, unchangedguardstillRefused13.
+Bootstraplifecycle/cgroupownedSIGTERMclosurepassed. Cost~0.65CPUcore/50mspoll
+(32.85msmean/max37.35), explicitpilotbudget4CPU. Actualstagedfilename isworker.py,
+notdispatch_worker.py; integrationasset/testfixture correctionpending atlast
+message. NOnewnativeworkeruntil rootreviewsfrozenasset/profile/evidence/plan.
+One15minClaude4CPU8Gpilotplanned withALLguardsintact, workremainsEthiopia source
+analysis+1592; actualauth/placement unproven. Need traceidentity torestoreeight
+reliableagents; currentlyonlylocalLLMworkverifiedactive (notCPUpytestworkers).
+
+ROOT CLOSEDINPUTS: round2 requested46declaredfiles; exactc780preflightadmitsall
+46sidecars. FirstpreflightusedOLDdocscheckout and falselymissed2TzEXTsidecars;
+bothpresentcurrent butnotdefaultsharedL1. TzdelegatedspecificDVC-only fetch.
+RootOTHER5countries40files(35DTA5PDF117502970bytes):41017776 failedbeforeANY
+getter/Stata parse duewronglocal_tools.get_data_file namespace, privatephysical
+copies/authalreadydone; immutablev1retained. Correctedcanonicaldata_access
+projection41017784 COMPLETED0:13.13sreaderoperator,35numeric+35categoriesOnly
+FULLStata parses+headerreads+5PDFprojections,40success,110derivedartifacts.
+Allrawfilesprivate700/600, stableFDsize/SHA independentlyverified; configured
+readercopy600removedfinally, noacquisition/network/sharedL2writes. ROOT-admission
+firstharnessappliedraw600ruletononsecretoperatorcode644; correctedONLYcode-vs-
+rawmodecheck, allrawalready600, no getterreplay. CLOSED-SOURCE-ADMISSION.json
+bindsactualmanifest/operator/sourcehashes. Source-ownedpureclosedanalysisgranted
+onlyownnumeric.pkl/categories.pkl/variablelabels/PDFfiles, nofreshgetters/API/
+Make/builds; IDsprivate. CategoriesOnlyisNOTmetadata-onlyphysicalIO. PDFtool is
+existingpypdf6.21.4 ZIP(SHA5998ebb4...), noinstallation. Nigeria complete852body/
+ALLcomments supplemented, neverborrow Ethiopia duplicate/densityrules.
+
+Tanzania1497 frozen12b1ba81e19ad24a2ee1abada2b29b42f8e68bbe COMPLETEbounded
+diagnosis/docs,24controls0skip/0fail7.24s; allproductionpanel_ids/tanzania.py/
+JSON/config exactc780 (onlyCONTENTSappendix inlibrary),907JSON/636R4closed
+replays exact. Source41017793 failednonexistentAPItripwire BEFOREgetters;
+41017803 projected/authenticatedall10files butblanketreadparquettrapblocked
+naturalDTAprobe BEFOREreturns. Recovery41017857 COMPLETED0, reusedclosed10files
+no newprojections/network, FIRST6numeric+6categories/12Stata parses+4PDFs,
+28sealedartifacts/credentialsremoved. Sourcecardsmissinghh_a16/hh_a25 andPDF
+wrongpointerwarnings preserved; novisual/textcompletenessclaim. Full238pairs/
+175families: all221observedoldheads getcontinuation,17absentpairs14families
+retainfirst-coverfallback. Split13joint=6currenthead/member1+1nonheadfallback+
+6absentfallback; frame218=208current+2nonheadfallback+8absent; neither7=4third
+siblings/current+3absentfallback. Earliermarginalconflationcorrected/preserved.
+30roster-vs-coverpreviousHHdisagreements; releasedpersonkeyagrees0differences,
+selectedcurrenthead candidates0wrong-family. No IDrepair ornewfallbackrule
+proven/selected. All989oldheads ownperson1,heldEXTdisjoint/989notregistered
+caveats andbackcasting/WAITING114 retained. Independentfinish_1590 reviewNOW
+active: full3108countryread,all40reports+28capturesverified,238/907/636andjoint
+counts independentlyreproduced; newadversaries/verdictpending. No freshsource/
+API/Make/Feature/warm/fullCIclaims. B/reports/1497-tanzania-head-tracking-20261108.
+
+Niger/Mali1560/1571 packet8283 anddocs-onlyd3ce notes independentPASS62assertions+
+16controls, noP1/P2; stillunpublished, no chosenrawkg/cycle/state/code/default.
+Nigeria1502nullablecorrection-v2 independent26PASS/P2CLOSED, fourcounterfactual
+framesunchanged/old61reports62raw1.564GB unchanged; finaldecisionpacketpolicyheld.
+Malawiweights48production/wholewaveHELD,1509requiredeligibilityanswerpending
+(1442dependent),1604foodDRAFThelddespitegreen.49borrow/50Gramil/51noclamp and40
+purchasesvsstocks honored. No masterrelease/plannedsharedcachewarm. Earlier
+GH798supportwarmtest DID refreshMali/Tzsharedcache;13recentmetadataobservations
+withoutbeforemanifest, noblindrollback/allcontinuityclaim. Alllaterrootsprivate.
+
+Next: finishobserveractualworker.pyintegrationcontrols/rootreview thenSINGLE
+nativepilot; don'trequeueblind. ReviewpartialR3codeandfeedreadytasks/peerreviews
+asworkersfinish. Rootpublish1603final/GHA, poll1611/1612exactheadchecks, keepTLU
+CI/reviewqueue moving; normalboundedcomposition before authorizedexpected-head
+developmentmerges/manualissueclosures. No fullgoalcompletionclaim.
+
 * Authoritative checkpoint, 2026-11-08 02:06 UTC
 This goal turn PROGRESS:1535+1480 reviewed green PRs merged, both issues closed;
 Nigeria nullable diagnostic P2 independently closed; all-country metadata overlay
