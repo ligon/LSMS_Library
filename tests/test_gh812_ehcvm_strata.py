@@ -40,11 +40,6 @@ COUNTRIES = ("Senegal", "Mali", "Niger", "Burkina_Faso")
 REGION_ONLY = {"Benin": "2018-19", "Togo": "2018", "Guinea-Bissau": "2018-19",
                "CotedIvoire": "2018-19"}
 
-#: The one addition to Region x milieu: the 2018-19 cover writes Taoudénit and the file
-#: cluster_features reads writes Taoudenit.
-EXTRA_ROWS = {"Mali": {"Taoudénit Urbain": "Taoudenit Urbain",
-                       "Taoudénit Rural": "Taoudenit Rural"}}
-
 #: Every cover a wave's strata is built from.
 COVERS = {
     ("Senegal", "2018-19"): ["Data/s00_me_sen2018.dta"],
@@ -143,7 +138,6 @@ class TestStrataTable:
         region = _lookup(tables["Region"])
         expected = {f"{raw} {m}": f"{preferred} {m}"
                     for raw, preferred in region.items() for m in MILIEUX}
-        expected.update(EXTRA_ROWS.get(country, {}))
         assert _lookup(tables["strata"]) == expected
 
     @pytest.mark.parametrize("country", COUNTRIES)
