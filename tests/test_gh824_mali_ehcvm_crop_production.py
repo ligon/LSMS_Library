@@ -209,7 +209,8 @@ class TestDeclared:
         rec = records_for(COUNTRY, TABLE)[KEY]
         # Re-pinned for GH #1457: the same rule now serves the 2017-18 s7g sales.
         assert list(rec.waves) == ["2017-18", "2021-22"]
-        assert set(rec.columns) == {"Quantity_sold", "Unit_sold", "KgFactor_sold", "Value_sold"}
+        assert set(rec.columns) == {"Quantity_sold", "Unit_sold", "KgFactor_sold", "Value_sold",
+                                    "Condition_sold", "condition_sold_native"}
         assert callable(rec.resolve("function")) and callable(rec.resolve("inputs"))
 
     def test_make_reaches_every_wave(self):
