@@ -57,5 +57,50 @@ month semantics remain survey-specific. A request to normalize these values
 would be a separate task and is not inferred here.
 
 ### Phase 3 — verification
-Pending baseline negative, candidate focused controls, independent review,
-metadata invalidation census and bounded actual-source/round-trip evidence.
+- Canonical declarations: OK (§§2–5). Only two optional `str` declarations
+  reuse the existing finalizer; no parser, Feature implementation, native
+  writer, cache writer or estimator is added. Existing numeric public month
+  assertions are deliberately updated; native wave/country caches gain five
+  explicit numeric-value/type protections. No fixture, source amount, skip or
+  tolerance is relaxed. Independent closure at4b635:28 passed/no skips;
+  52 old assertion nodes unchanged, two public expectations replaced.
+- Parent negative: eight failures/six passes in the final14-case reproducer,
+  including both month columns and both country orders. Earlier fixture
+  constructor/index-oracle errors are retained separately.
+- Source/API: frozen d673 actual Tanzania/Nigeria/GhanaSPS/Malawi frames and
+  default Feature253611rows match the parent exactly except intended month
+  text. New month fields export and round-trip exactly. Other fields/index
+  types/attrs match the parent's identical nonmonth Arrow round-trip control;
+  existing string-index null and record-subclass JSON normalization are not
+  claimed as bitwise typed-metadata preservation. Warm33cache files retain
+  bytes/epochs. Source-v3 authenticates/reuses closed successful parent inputs;
+  no parent source campaign was replayed to correct packaging assertions.
+- Independent original review:30 candidate passes,18 parent expected-Arrow
+  controls across all six country orders; no P1/P2. Standard sanity audit:
+  parent63pass/5warn/0fail, candidate61/7/0. Two new native-declaration versus
+  canonical-type warnings are explicitly separated as GH1606, with reviewed
+  non-blocking status. No all-green/corpus-wide audit claim.
+- Full isolated offline CI at4b635:11581 passed/5652 skipped/4xfailed,
+  558.35s pytest/561.55s runner, eight allocated CPUs/four loadfile workers,
+  false credentials/private roots/network disabled. Initial d673 full run
+  (11553pass/5649skip/4xfail/eight stale public-month expectation failures)
+  remains an actual failed run; source checks from it are separate evidence.
+- Current-development composition9d84 over8505:151 relevant checks pass.
+  Core/schema/Feature/Country/Malawi crop producers remain byte-identical to
+  tested4b635; incoming1174 only adds plot-input mapping functions and changes
+  plot-input registry entries, with crop registry slice exact. This is bounded
+  composition/byte evidence, not a new native source build or full-suite run.
+- Final metadata census8505 versus9d84:zero differences among450 declared
+  country-table,1895wave,35build and186import fingerprints, zero errors or
+  provider/build denials; runtime-derived553/2313/39 surface kept separate.
+  API audit passes. Final ledger-only freeze requires root tree equality and
+  configured final-head GitHub checks before authorized development merge.
+- Operational qualification: an initial supporting warm regression omitted
+  explicit private global roots and refreshed shared Mali/Tanzania caches.
+  User notified;13 recent parquet metadata observations were recorded without
+  a prior snapshot, so no complete attribution/continuity claim or blind
+  rollback. Subsequent tests/censuses/source actors use explicit private roots.
+  All cancelled/setup/source-oracle failures remain in versioned reports.
+- Scientific boundaries (§§3–4): calendar meanings remain survey-specific;
+  no weight, food inference, sold-unit policy, whole-wave promotion or master
+  release is part of this change. Planned shared corpus rewarming stays held.
