@@ -873,8 +873,8 @@ def crop_production_finalize(df):
 # the answer as recorded in `condition_native`.  Both waves use the same five codes
 # and labels, so one table serves both.  A blank code is the sentinel, and so is a
 # row with no s16c line behind it (a Farm-level row) or a harvest derived from s16d,
-# whose s16cq16d is blank.  The sold states (s16cq16c, s16dq05d) are not served
-# (GH #1462).
+# whose s16cq16d is blank. The separate sold states s16cq16c/s16dq05d now
+# retain their own fold and native answer (GH1528), without supplying harvest state.
 
 #: The canonical structural sentinel for `plot_id`: the record has no plot by
 #: design (lsms_library/data_info.yml, top of file).  It is not `unknown_plot`,
@@ -967,6 +967,16 @@ def ehcvm_crop_condition_labels(labels):
     GH #1436)."""
     out = pd.Series(labels).astype('string').str.strip()
     return out.where(out != '', pd.NA)
+
+
+def ehcvm_crop_sold_conditions(codes):
+    """Own EHCVM sold-state fold, NA-bearing (ledger1528 §§2–4).
+
+    Both own sold dictionaries were checked, including 2021 s16dq05d; no
+    harvest answer supplies a sold state and no blank becomes an index sentinel.
+    """
+    folded = ehcvm_crop_conditions(codes)
+    return folded.where(folded != CONDITION_NA, pd.NA)
 
 
 def ehcvm_household_ids(src):
@@ -1199,7 +1209,7 @@ def finish_ehcvm_crop_production(df, wave):
     if out[['i', 'plot_id', 'crop']].isna().any(axis=None):
         raise ValueError(f'crop_production {wave}: a NA household, plot or crop')
     # A Farm-level row has no s16c line behind it, so no state: the sentinel, and NA.
-    for col in ('condition', 'condition_native'):
+    for col in ('condition', 'condition_native', 'Condition_sold', 'condition_sold_native'):
         if col not in out.columns:
             out[col] = pd.NA
         out[col] = out[col].astype('string')
@@ -1210,7 +1220,7 @@ def finish_ehcvm_crop_production(df, wave):
     return out[['Quantity', 'Quantity_kg', 'u', 'Quantity_sold', 'Unit_sold', 'KgFactor_sold',
                 'Value_sold', 'months_harvested', 'planting_month',
                 'harvest_month', 'intercropped', 'perennial', 'condition_native',
-                'Derivation']].sort_index()
+                'Condition_sold', 'condition_sold_native', 'Derivation']].sort_index()
 
 
 def _ehcvm_crop_map(wave):
@@ -1274,7 +1284,7 @@ def inputs_hh_crop_sale_single_row(wave):
         harvest = _ehcvm_keyed(wave, f's16c_me_mli{year}.dta', 's16cq04')
         sold = _ehcvm_keyed(wave, f's16d_me_mli{year}.dta', 's16dq01')
         sold = sold[ehcvm_is_sale(sold['s16dq05a'], sold['s16dq06'])]
-        names = ['s16dq01', 's16dq04', 's16dq05a', 's16dq05b', 's16dq06']
+        names = ['s16dq01', 's16dq04', 's16dq05a', 's16dq05b', 's16dq05d', 's16dq06']
         plot = ['s16cq02', 's16cq03']
     lines = harvest.groupby(_SALE_KEYS).size()
     single = lines[lines == 1].index
