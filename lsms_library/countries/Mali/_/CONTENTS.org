@@ -3580,3 +3580,22 @@ not a repeated measure”, nor authorize halving, annualizing, changing the
 observation unit/weights, or changing the aggregate-amount/aggregate-quantity
 Price rule. The already recorded own-production-value/manual conflict also
 remains; this purchased-field correction imputes no own-production value.
+
+* 2017-18 public BID documentation holding (recorded 2026-11-08T18:19:35.897403+00:00)
+
+The English Basic Information Document already quoted above (World Bank
+catalog 3409, resource 47785) is now held as
+=2017-18/Documentation/bid_eaci17.pdf= through its managed DVC sidecar.
+Normal =get_data_file('Mali/2017-18/Documentation/bid_eaci17.pdf')= in a fresh
+reader tree and empty private L1 returned bytes matching the public original
+(MD5 =a3c822057e8eb09ab756b82095595332=; 1,223,133 bytes). The earlier
+“NOT present in this repo” sentence records the preceding holding status;
+its sampling quotations and caveats remain intact.
+
+This adds documentation availability. GH #1574's 51-code stratum label list
+remains unresolved: the closed 32-page extracted-text search did not locate
+a complete list, and visual table confirmation is pending. No absence from
+all images/tables is inferred. No stratum label, source eligibility, weight,
+survey-design interpretation or data/schema/default changes accompany this
+holding. Exact provenance is in =2017-18/Documentation/SOURCE.org= and
+=.coder/ledger/1574-mali-public-bid-managed-ingestion.md=.
