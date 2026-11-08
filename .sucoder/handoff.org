@@ -1,7 +1,7 @@
 #+title: Handoff, LSMS-ISA sweep
-* Current scrum checkpoint 2026-11-08, after PR1637
+* Current scrum checkpoint 2026-11-08, after PR1423
 The goal remains ACTIVE; this turn made PROGRESS. Actual GitHub development is
-585021853847a2ccfeb0d7f48a6daa11f2cce0e4: 35 development merges /26 issue closures.
+ebb65d191b6f856ff1b0f77068765409b3957929: 36 development merges /26 issue closures.
 Original country queue:22 closed /125 open of147 (1499 belongs to this scope).
 Fresh complete two-page GitHub recount:161 open issues, excluding PRs; saved at
 reports/current-reconciliation-20261108-after1499/OPEN-ISSUES.json. No master release,
@@ -31,20 +31,32 @@ headers retained, actual5695 entiretree=0afe admitted. API84263 and metadata5786
 CLOSED0:20Mali country-table/80wave/1FIF changes, allothermetadata exact; ROOT verified
 actualmaps/all30sealedfiles. DRAFT PR1638 headac0. Full41031188/session50472 LIVE on
 n4252, exactownclone/privateidentityPASS,4loadfile/600thread/maxrestart0/free8CPU32G45min.
-Baseline18317 includes2explicitformatter-test-ID renames; preserve rawsets and exact
-twocasebijections, expect18genuinenewcases only as hypothesis. No new link recovery.
+Actual allfour collections18335unique confirmed; rawbaseline2missing/20added becomes
+0missing/18genuineadded ONLY under the2frozenformatter-ID bijections. Final outcomes
+remain unproven while41031188 runs. No new link recovery. Mwi also prepares a separate
+Ethiopia1570 documentation-only note on ebb, ownledgerFIRSTb8e5c2304, completecountry
+read authenticated; sealedaggregates only, no captures/source/runtime replay.
 
 1423 revised helpers: independent40mockedPASS, no live-provider/submission claim.
 Integrated bc2a013/treef1678729:13owned/23incoming/disjoint, full19151object union.
-Existing PR1423 safely fast-forwarded580c→bc2; explicit base refresh to development
-corrected its stale e42 comparison to actual5695, now13changed paths. GHA42518782547
-running, reviews/threads empty. No full library-suite replay: library/config unchanged.
+Existing PR1423 safely fast-forwarded580c→bc2; explicit base refresh corrected its stale
+comparison. GHA42518782547 unit/windowsSUCCESS/6SKIP, fresh reviews/threads empty.
+MERGED at ebb65d191, parents[585,bc2], actualtree6b984601 EXACT independently proved
+13owned+5currentdocchanges union (19152objects). No full library-suite replay:
+library/config unchanged; mocked controls and standardCI cover workflow changes.
 finish_1590 owns NEW cold remote source-only #1288 productive-freshness worker:
 dispatchf779ad1ac1c94d2b823af3f96f5b2a22/job41031186 RUNNING n0036, source5695,
 free4CPU8G45min/no-requeue; actual submit27685 CLOSED0 and supportedstatus live.
 ROOT reviewed20frozenoperator/charter files, dryrun, exactsource/tool; granted one
 submit. No taskruntime/source/API/cache grant. Historical validator-only proposal
 remains unselected. No terminal old worker is resumed.
+ROOT reviewed worker's transaction algorithm checkpoint; refinements explicitly require
+PRE-finalize stored bytes, validation on a copy, productive existing OTHER builder/script
+fallback, no blanket hashless-prerequisite refusal, and exact narrow unsupported-case
+evidence. Broader actual exposure/default/JSON/legacy failpaths remain1288 residuals.
+finish_1590 also prepares a separate cold Senegal1500 country fix charter (Unknown unit
+sentinel), source-only/currentebb; not submitted yet. Full countryCONTENTS-first and unit
+skills required, no speculative factor/crosswalk or real-source campaign.
 
 * Historical checkpoint 2026-11-08T19:50:15.649120+00:00
 The goal remains ACTIVE. The previous goal turn made PROGRESS. Development is

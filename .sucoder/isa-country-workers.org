@@ -1,18 +1,21 @@
 #+title: LSMS-ISA country workers and coordinator queue
-* Current worker overlay 2026-11-08, after PR1637
-Actual development585021853847a2ccfeb0d7f48a6daa11f2cce0e4;35merged/26closed.
+* Current worker overlay 2026-11-08, after PR1423
+Actual developmentebb65d191b6f856ff1b0f77068765409b3957929;36merged/26closed.
 Original country scope22closed/125open of147. Goal ACTIVE; no master/shared rewarm/weights.
 finish_1452: independent1494 review20controls PASS;1575 three managed-document
 holding gaps executable preparation on585 source. Author1494 eighteen controls PASS.
 malawi_revision_food: ac0c prospective1494 integration admitted to actual5695 by exact
 whole-tree equivalence; API84263+metadata57865 CLOSED0, DRAFT PR1638; full41031188 /
-session50472 LIVE n4252, exactownclone/privateidentityPASS. No cohort/baseline reruns.
+session50472 LIVE n4252, exactownclone/privateidentityPASS, actualfourcollections18335.
+No separate cohort/baseline actors. Additional Ethiopia1570 country-note docs preparation.
 finish_1590:1499 full41030609 terminalPASS sealed;1423 sourceintegration published byROOT
 to existingPR1423/bc2. Owns coldremote1288 productive freshness repair, dispatchf779ad1
 /job41031186 RUNNING n0036 source5695; source-only task, no package/data runtime grant.
+Also prepares separate new cold Senegal1500 source-only unit-sentinel charter; unsubmitted.
 Remote model workers:1 at this checkpoint. Eight original country jobs are historical
 completed/failed assessments, not idle waiting workers. No resumes of terminal actors.
-ROOT:1499 closed/PR1636merged;1575 docsPR1637merged;1423 GHA gate pending.
+ROOT:1499 closed/PR1636merged;1575 docsPR1637merged;workflow1423merged at ebb65d191,
+actualparents and entire19152object union verified. MaliPR1638 remains draft/full running.
 Fresh complete GitHub issue recount161open; originalcountry22closed/125open.
 1575 documentary answer allfour region×milieu; original2018/revisit2021 distinction and
 Togo geographic caveat preserved. Implementation remains open. Pending1066 question,
