@@ -1,4 +1,82 @@
 #+title: LSMS-ISA country workers and coordinator queue
+* Current scrum checkpoint 2026-11-08T16:11:39.520772+00:00
+Previous goal turn was PROGRESS. Goal remains ACTIVE and unbounded.
+GitHub development5a06d85cd02237cc515b0cda57012a9cab3d5e11;30 development merges/
+23 currently closed sweep issues. Whole1529 staysOPEN. Last measured original147
+scope19closed/128open and164repositoryOPEN are inherited, NOT a new recount.
+No master release, shared harmonized-cache rewarm or production-weight change.
+
+MERGED PR1632 (partial1529): actualmerge5a06 parents609b+291334b2ee730a549da9153ab0a0e5607bf0f47b;
+whole merge tree4204c63d567bd2a7e55da074912ee9926c028b0a EXACTtested291.
+ROOT independently verified17947parentJUnit outcomes unchanged+20newPASS,
+full12311P5652S4X. GitHub42486259337 unit/WindowsSUCCESS/sixconditionalSKIP,
+no reviews/unresolvedthreads. Root final receipt reports/1529-finalization-20261108/ROOT-MERGE.json.
+Feature V8 historicalf66 actualPASS117.271s:ONE normalFeature/9605exactfullkeys,
+payload/NA/extensiondtypes/typedattrs+onlydeclaredaxes, two intendedprivateL2reads,
+no source/Stata/build/FeaturePopen/guarddenials.8originalpre+8post and7copiesexact,
+privateL1empty;4genuineabsenthashprobes/0targetopens. ROOT verified46finalmanifest
+entries, SHA2689c6df45cd7d633df4f7ebe9a85a3e09239374cbdc49ae1449548f45ddc379;
+additive scopewordingv2e8da2634 retained. OneUserWarning messageUNRECOVERED.
+This is historicalassembly, not current291cachefreshness or newnativecampaign.
+Issue1529 title/body narrowedremaining3Buse/3Dpayment-count+mean/3Ecropcyclearea,
+notclosed; originalreport retained. No newseason/parcel/dose/valuation default.
+
+PR1633 DRAFT #1540: finalcurrent a222d9fc2fdf37b3c57b9b5259c93e6cc841a2c6,
+ROOTWworktrees/verify-1540-current-20261108; GitHubfix/1540-ehcvm-condition-helpers-20261108,
+FSverify/1540-current-20261108. Originalcurrent07e full41027172 COMPLETED0,
+12505P5652S4X/884.93s; ROOT actual18161JUnit retains17947parent+214newPASS.
+Ledger-only44759a4a9 thenordinary5a merge ->a222; ROOT19133mode/type/blob union
+14owned/5incoming/0overlap, alltestedcodeexact. Originalauthor270 andindependent51
+PASS distinct, not replayed. ROOT launched ONE newcombinedcurrent fullCI41027766,
+authoritativeRUNNING/n0044;launcher25847. NewAPI8369 CLOSED0/9.61s, metadata95365
+CLOSED0/128.90s. Rootsame132/450table+249/1895wave+7/186FIFhashdeltas, seven
+countriesBenin/BFA/CIV/Mali/Niger/Senegal/Togo;0/35BTF andallothermetadataexact,
+Guinea unaffected. Accepted9operator inverses exact;manifest39605273490c9c9ce396207a81224fa6678cdb1cd4b406979ae90b4179bee900.
+R=reports/1540-on-niger-current-verification-20261108 hasACTOR-HANDLES/rootpreflight/
+ROOT-HASH-REVIEW/admittedclosed291baseline; no baseline/sourcewarm replay.
+GitHub PR1633 finalhead checks/currentfullCI/reviewthreadreadback/expectedmerge
+andexplicit1540closure pending. ROOT owns branch/release; otheragentsleavealone.
+
+#1594 Mali maintainer exact99,999,999 mask c4d51302b remains UNMERGED.
+17focused+5privateadaptercontrolsPASS; full native proof V3 failedPREDECODE only
+becauseemptydata assertion rejectedimport-createdemptyL1 (0numeric/2sealsequal).
+V4 exactempty-nonsymlink-L1 fix/rootauthbbc0c232 andmanifestcdf9a9bf launchedONE
+stage9986. ActualFAILED1/122.52s at FINALjson.dump np.int32Stata label-card KEY;
+0mapper/kernel assertionfailure reported, allfour newlycomputed canonical/pure-
+derived outputs saved, bothprivateDTA pre/postMD5+SHAequal. PartialJSON/log
+immutable; no automaticrepair/rawreread/pickleload. Exact frozen source initial
+statusFAILED ->trycomputesPASS ->finallyguard/postseal gates ->JSONwriter emits
+statusfirst; independent1590 now tests whether actualprefixPASS proves final
+boolean gateconjunction, WITHOUT inventing individualunsavedguard/counterfields.
+Mwi preparing metadata-onlyseals/finiterecovery of4newoutputs; ROOT mustreview/
+grant payloadload stage. Original2DTAs68MB authenticated; source/readerscope
+wasexacttwo numericparses+boundedownlabelmetadata, no publicCountry/API/Make/warm.
+V3 privateadaptercarrier order corrected before anyrawdecode; actualframework
+lookup-order differences qualified, not claimedgenericloaderfidelity.
+Whole851recall/exposure remainsunruled. Preservelegitimatepaired16325, no zeros/
+halving/annualization/reweighting/defaultchange. See1594 V3/V4 reports/failures.
+
+ACTIVE locals:
+- finish_1452: local1499 author onfresh5a, ledger-first/finiteplan beforeproduct;
+  no candidateyet. Remote1499 terminalstartupBLOCKED is NOTproductwork.
+- finish_1590: independentstatic1594 partial-receipt/program-order review;
+  independent1499 corrected26matrix held precandidate. Completed1066 DESIGN
+  docshead20e6ff952, reportmanifestef408f427b4846654af508dc50310ee8279e189b2b7ac5cdd9b3656ee0a46a9e.
+- malawi_revision_food:1594 four-output recoveryprep;1574managedpublicBID ingestion
+  stillqueued, no DVC/writegrant/newsourcecampaign.
+Native modeljobs0; original8countryjobs historicalterminal, not8waitingagents.
+
+#1066 reconciled directlyagainst609b source: originalno-DVCwrite passesgrain_audit
+sincePR1105; title/bodynarrowed residualassume_cache_freshgrainreplay. ROOTasync
+USERQUESTION PENDING: shouldstoredwarnings/diagnosticsreplaywhilefreshnesschecks
+remainbypassed? No implementationauthorizedbeforeanswer. DesigncoversBOTH
+manifest-covered andlegacyfull-wavehits/date-firststrictordering/currentkeyreset;
+20syntheticscenarios/35branchpairs planned,0tests/API/source/census. Hashneutrality
+only statically anticipated fromexcludedreadgate, notmeasured0/N.
+Other798/1438final-sourcecoverage and1288freshness residuals stillopen; no footer-
+onlyservedcertification. Settled1499 validnumericstringsconvert/rejectmalformed
+newNA,49borrow/50maizeflour/51noclamp and48jointweightinvestigationlimits retained.
+
 * Current scrum checkpoint 2026-11-08T15:26:55.039604+00:00
 Goal ACTIVE. Development remains 609b7720f8dbc72b85cb846fdd1f63e84d51f977.
 No new merge in this checkpoint. Last measured counts: 29 development merges,
