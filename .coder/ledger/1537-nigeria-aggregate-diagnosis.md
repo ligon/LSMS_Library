@@ -59,6 +59,18 @@ cannot recover those names; `_relabel_j` keys only on `Preferred Label` and
 does not read the quarter/code route. The separate legacy `aggregate_items.json`
 is consumed by old `food_quantities.py`/`unitvalues.py`, not by `_relabel_j`.
 The current guide already records #1537's dated passthrough observation.
+That inactive JSON separately has exact `Groundnuts → Groundnuts`,
+`Maize (shelled) → Maize`, `Pepper → Pepper`, and `Dry Pepper → Pepper`.
+It corroborates the first two options but cannot authorize importing its
+different Pepper scheme into the current country curation.
+
+The complete static Preferred-to-Aggregate conflict check also found
+`Unground Ogbono`: code142 targets `Unground Ogbono`, crop3190 targets `Ogbono`
+(`categorical_mapping.org:149,270`). Existing `_relabel_j` uses last-row-wins.
+This is a separate #787 ambiguity, recorded for ROOT without correction or
+data measurement. For the selected options, collision families are existing
+shelled/unshelled Groundnuts and all four own Preferred maize states; Maize
+flour, groundnut oil/cake and mixed Condiments remain separate foods.
 
 Keep default/Preferred calls identical; preserve all payloads, dtypes, nulls,
 index levels and untouched inputs. No producer/weights/quantities/units/kg
@@ -106,6 +118,36 @@ thread/build limits 1, pytest at most n2/loadfile, logs to files.
 
 ## Phase 3 — verification
 
-Pending. No production symbol changed. Full source/API/Make/warm-cache checks
-and the metadata hash census remain unrun. Record failures without overwriting
-them; independent ROOT acceptance remains pending.
+No production symbol changed; no curation patch was applied. The diagnosis
+and review-only patch live under the dispatch evidence directory. ROOT has
+the mapping and import-guard questions through the absolute shared channel.
+
+- **OK (§§2–5, static only):** exact committed food-table extraction supplies
+  all native/Preferred/Aggregate rows and the collision/conflict matrix.
+  AST inspection verifies rename placement and Contract B catch discrimination.
+  The review patch contains exactly two label-only rows with eleven cells each.
+- **OK (§4, syntax only):** the new sixteen-function adversarial test module
+  parses and calls no `Country`/`Feature` constructor. It covers the recorded
+  names, proposed partial mapping, warnings/strictness, null/typed labels,
+  missing-versus-malformed curation, unchanged inputs/full keys/price values,
+  and the exact nested Feature marker plus report-carrier helper. These are
+  authored controls, not executed passes.
+- **UNEXECUTED (§5):** the first guarded unit operator failed during import,
+  before collection: `ligonlibrary.dataframes → magic → ctypes.find_library`
+  attempted an ldconfig lookup; the write guard refused `/dev/null` O_RDWR
+  before a subprocess started. The original operator and traceback remain
+  unchanged (`validation.log`). No guard was relaxed or unit attempt retried.
+  ROOT must approve the next execution strategy. A later test edit only adds
+  syntax-checked controls; the refused cohort is not claimed as testing them.
+- **OK (§4, boundaries):** production package/country bytes match initial
+  source; only this ledger and the new test module are committed. Therefore
+  this packet changes no declared build input by static scope. This is not
+  a completed hash census, nor a measured cache-count claim. Applying the
+  proposed Org patch would change Nigeria build inputs and needs a separate
+  hash-cost/cold-data review; no exclusions may conceal that cost.
+- **OPEN (§6):** Pepper science, ROOT acceptance, unit execution, the exact
+  metadata-census grant and any source/API/Make/warm checks remain separate.
+
+No reinvention or production contradiction was introduced. Treating historical
+Preferred specificity as proof of native Pepper freshness would contradict
+§3; the proposed packet deliberately preserves that unresolved boundary.
