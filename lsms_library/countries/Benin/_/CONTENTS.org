@@ -788,3 +788,28 @@ strategies. No =HowCoped2= is added.
 Only the existing 2018-19 declaration is changed. Registered but unfinished
 2021-22 wiring is outside this change. Other effects, coping strategies,
 row/index identity and timing are preserved.
+
+* 2026-11-08 — documented planned strata, not a wiring change (GH #1575)
+
+The own INStaD second-edition BID (September 2023),
+=2021-22/Documentation/ben_ehcvm2_information_de_base.pdf=, section 4.1,
+PDF p. 13 (English edition p. 14), explicitly describes the *original
+2018/19* design: "La strate est la combinaison département/milieu de
+résidence." Source: https://microdata.worldbank.org/index.php/catalog/6272/related-materials .
+Clusters were selected PPS within these strata, then 12 households with
+equal probability within each cluster. The 2021/22 strategy revisits the
+same clusters and supplements households to 12 where needed; it is not
+a new independent first-stage draw.
+
+This corroborates the own 2018 DDI p. 4 quoted above: 23 explicit strata,
+with Littoral purely urban. Country/urban/rural/department reporting
+domains and allocation targets are distinct from sampling strata. The
+earlier instruction "Treat the design as departement-stratified for
+inference" is preserved; the BID supplies the more detailed planned
+definition without relying on the quoted weight-variance shares.
+
+This is documentary evidence only. The 2018-19 YAML still wires region
+alone to =strata=; 2021-22 remains registered but unwired at this source
+pin. No sample, weights, defaults or geographic crosswalk changes are
+selected here. The document check and exact PDF identities are recorded
+in the GH #1575 evidence packet.

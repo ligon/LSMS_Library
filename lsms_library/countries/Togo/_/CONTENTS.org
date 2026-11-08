@@ -853,3 +853,32 @@ substitute the older =Data/= extracts or rename the wave.
 Only the existing 2018 declaration is changed. Registered but unfinished
 2021-22 wiring is outside this change. Other effects, coping strategies,
 row/index identity and timing are preserved.
+
+* 2026-11-08 — documented planned strata and capital-domain caveat (GH #1575)
+
+The own second-edition BID (September 2023),
+=2021-22/Documentation/tgo_ehcvm2_information_de_base.pdf=, section 4.1,
+PDF p. 12 / printed p. 11 (English edition p. 11), explicitly describes
+the *original 2018/19* design: "La strate est la combinaison région/milieu
+de résidence." Source: https://microdata.worldbank.org/index.php/catalog/6279/related-materials .
+Clusters were selected PPS within strata, then 12 households with equal
+probability within each cluster. The 2021/22 strategy revisits the same
+clusters and completes households to 12 where needed, rather than making
+a new independent first-stage draw. This is direct design evidence, not
+an inference from the weight shares behind the earlier region-only
+recommendation, which remains recorded above.
+
+The earlier own June 2021 BID p. 10 says "except Lome Commune where all
+respondents are from rural areas"
+(https://microdata.worldbank.org/catalog/4298/download/52590). The 2023
+retrospective Table 1a (French p. 12, English p. 12) labels *Grand Lomé*
+and allocates 98 urban / 0 rural clusters. Preserve both accounts: no
+equivalence between these geographic names, translation typo or formal
+planned-cell exclusion is established here. Eleven nonzero allocation
+cells in that table is a count, not a separately stated stratum count.
+
+No =strata=, native labels, weights or defaults change. The native wave
+remains =2018= with =Data1/= sources; 2021-22 is registered but unwired
+at this source pin. Household strata are separate from the price/NSU
+market samples. Geographic reconciliation and wiring require their own
+scope; exact document identities are in the GH #1575 evidence packet.
