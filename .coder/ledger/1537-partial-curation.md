@@ -147,3 +147,22 @@ accepted proof is actual parsers/quarter decoders plus static chain/pure tail.
 
 Receipts: reports/1537-partial-curation-local-20261108/startup-v7 in burstisa-sm-
 20261103. Original remote/BLOCKED reports and all source evidence immutable.
+
+
+### Root-authorized existing Code-oracle correction
+
+First full current-composition offline run6351/job41024214 FAILED1:0:
+12226PASS/5652skip/4xfail/1FAIL,723.39s. The sole failure is
+`test_noargument_mapping_keeps_complete_global_code_contract`: expected-map
+comprehension attempts int(NaN) for the two approved blankCode label-only
+rows, before either decoder assertion. JUnit retains all17854 oldnodes, adds
+29passing nodes, and changes only this existing outcome. Original failed
+receipts/log/JUnit remain immutable under1537-on-1520-verification.
+
+Root selected minimal TEST-ONLY predicate correction: pd.notna(code) before
+existing int(code), unchanged label filters and both full noargument/crop
+map equality assertions. No production/Org/science/expected-value change.
+Existing candidate tests already pin exactly two blankCode/eightblankquarter
+alias rows; no duplicate representation cohort is added. Independent21
+actualmetadata controls remain closed. New affected proof/fullCI remain
+unexecuted pending separately frozen operator/rootreview.
