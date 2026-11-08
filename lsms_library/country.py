@@ -106,7 +106,7 @@ import subprocess
 import tempfile
 import json
 from dataclasses import dataclass
-from functools import lru_cache
+from functools import cached_property, lru_cache
 from sys import stderr
 import sys
 from dvc.repo import Repo
@@ -2584,7 +2584,6 @@ class Country:
         # re-emit warnings) on every property access for countries that
         # don't declare panel_ids in data_scheme.yml.
         self._panel_ids_attempted = False
-        self.wave_folder_map = {}
         if trust_cache:
             warnings.warn(
                 "trust_cache is deprecated and will be removed in a future "
@@ -2831,6 +2830,17 @@ class Country:
                 resolved.append(info)
 
         return resolved
+
+    @cached_property
+    def wave_folder_map(self) -> dict[str, str]:
+        """Logical wave labels mapped to physical folders, resolved on first read.
+
+        Reuse ``waves``' metadata precedence. Keep its mapping object so public
+        assignment, mutation and later ``waves`` refreshes behave as before.
+        Countries without a declared map use the logical labels as folders.
+        """
+        _ = self.waves
+        return self.__dict__.get('wave_folder_map', {})
 
     @property
     def waves(self) -> list[str]:
@@ -5826,10 +5836,7 @@ class Country:
             # index augmentation, the grain-audited normalisation, concat)
             # runs HERE, in the parent, in wave order.
             # The folder map is resolved through ``self[w]`` (the same lookup
-            # ``grab_data`` uses for its make target), not read off
-            # ``self.wave_folder_map`` -- that attribute is populated as a side
-            # effect of the ``waves`` property and is still ``{}`` when a
-            # caller passed ``waves`` explicitly.  ``getattr`` with the wave
+            # ``grab_data`` uses for its make target).  ``getattr`` with the wave
             # itself as fallback: tests stub ``__getitem__`` with bare
             # namespaces that carry no ``wave_folder``.
             prebuilt = _parallel_waves.prebuild(

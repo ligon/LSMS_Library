@@ -5640,11 +5640,11 @@ def pp_ph_area_t(country):
     round has nothing to pair.  One holding more than two is not this design
     (Tanzania's ``2008-15/``), and is refused rather than guessed at.
 
-    *country* may be a ``{t: folder}`` mapping.  Pass the ``Country`` where you
-    have one: its ``wave_folder_map`` is empty until ``waves`` has been read.
+    *country* may also be a ``{t: folder}`` mapping, including a ``Country``'s
+    directly accessed ``wave_folder_map``.
     """
     if hasattr(country, 'waves'):
-        country.waves                                       # populates the map
+        country.waves                     # support country-like lazy map providers
         wave_folder_map = country.wave_folder_map
     else:
         wave_folder_map = country
