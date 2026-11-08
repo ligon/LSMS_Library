@@ -1,4 +1,65 @@
 #+title: Handoff, LSMS-ISA sweep
+* Current scrum checkpoint 2026-11-08T18:25:11.177753+00:00
+Goal ACTIVE; turn PROGRESS. Development stillfdec032 /31merges/24closed;
+original147scope20closed127open/repo163open, last verified recount retained.
+
+1574 DOCUMENT HOLDING SUCCESSFUL through normal helper phases, publication
+pending. V1 FAILED import prehelper preserved. New authorized V2 exactwrite
+PASS+freshreadonly emptyL1read PASS (1223133B, MD5a3c822057e8eb09ab756b82095595332,
+SHA33423a38c73f5459b102ecd7e1eb6f9e830346e839119d2085c71a6730b3e2c0),
+guards active/0denials, write1helper/3CLI/read1helper/0CLI. OuterV2 FAILED1 at
+final source10 assertion because it wrongly demanded old authorized .gitignore;
+no relabel/replay. SourcePDFpostexact/privateprofiles+config.localsremovedTRUE;
+originalprofilepoststat loop UNREACHED. Root read actual receipt/fourpathdiff/
+finalproof. Independent ordinaryGit conservation19130nonowned; expected4paths.
+Finalization evidence7195c8cc at reports/1574-managed-holding-finalization-evidence.
+Mwi authorized ONLY4docs/sidecar+ownledger finalcommit/FSpublication; session78643
+lastlive. Root currentintegration/PR/merge pending; whole1574 visual/51-mapOPEN.
+
+1499 sourceFINAL86a1179d85bc5fb35a3aa099973ea4d170249e68 FS-published;
+root admitted all52author+6final+41independentmanifestfiles. All19131nonledger
+objects exacttested831. Author130/base8/independent76/staticAPI0 allclosed.
+Agent prepared immutable2c6b075aae1cb20e46357736bb0b5a2f94da709d atopfdec,
+19134union4owned4incoming0overlap; NO actors/push. R1499-current-fdec-verification-prep,
+manifest954197337eb937d54106b8f663b5bdcc1118b20a61bcce893adc91c85531636c.
+Current hash/API plan ROOT ungranted: wait1633landing then freshcomposition/context,
+closedcomparator admission/no baseline replay. Agent1452 now STATIC1288 diagnosis/
+design only, no runtime/source/product edits/commits/GitHub; may interruptfor1499.
+
+PR1633 current0380 DRAFT; root bodyupdated currentfullrunning/qualifiedoldfailures.
+GitHub42506596722 currentunit/windowsSUCCESS/sixconditionalSKIP. Full41029309
+same89277 LIVE last51percent9396leases;0failed/replayrefusals/workerloss atscan.
+Controller480s watchdog fired5309B (normal longrun watch); workers progressing/
+workerstackfiles0 then. No terminal/cause/passclaim. finish1590 owns fullterminal
+andJUnit reconciliation, plus unexecuted1570formatteroperator preparation.
+
+1570 remote static charter ACCEPTED byroot after fullreport/formatterplan+
+26file/27symbol/10ASTbindingverification and supportedresult native0/supervisor0/
+publicationcomplete. Packet reports/1570-static-formatter-review/accepted-static-evidence.
+NOdata/formatter/APIexecution. Actualtwo-inputmanifest/oldseals from1570-key-dtype
+now suppliedto1590; complete nonkey schema absent, no need fabricate/preprobe;
+prepare singlelegitimate-load recording/snapshot ofallcolumns afteradmission.
+No future runtime granted yet. Own5a source qualified relevantfdecbytesexact.
+
+NEW REMOTE1423 author worker86a82a6bf3f64db392ad8ddc6503ec46/job41029918
+submitted0; supportedSTATUS1RUNNINGstarting/cloning n0028; NOT claimednativeworkyet.
+P=private/1423-runbook-revision-preparation-20261108. Exactsourcee9f577292770c4934cf2687293dbd3a289ee0993
+ordinaryfdec+1423head580c, ROOT19142union11owned2255incoming0overlap. Bare shared
+sourceupdatedviaisolatedprepbranch, oldpinskept. Task11919fc8577a693186734f22ee0374114304f8edd98bdee0cb18bdbacab71192,
+profile4d9639426d5371d54538f0026b6d864e6a67210ac14fd27756b48829412e05ad,
+dryproject9d74c1fcae42a4f150214c014729671ad62fbda93ca4eda04403064050acf7f2.
+Same admitted641tool224files/one-shotcontroller/bootstrap/observer/runtimeimage.
+Actualstagedworkerccb4/runner9786/protocole7ec exact. Allowed11runbookhelperpaths+
+ownledger+focusednewhermetictests; codeauthoring+stdlibAST/bashsyntax ONLY,
+functionaltests preparedUNRUN, no LSMS/Pandas/source/raw/cache/credentials/native
+state/transcripts/GitHub/toolinstall. Root owns review/grant/PR. Requirementsfix
+approvedhead+base/check gate, privatecache defaults, fullcomments/rulings, truthful
+FDcause/isolatedpinneddispatch, no nativeJSONL extractor, pushfailurepropagation.
+Use supportedCLIstatus/result; monitor required dispatchchannels, no terminalrestart.
+
+1066 userwarningreplay question PENDING; no implementation. Scientific/wholewave/
+weights/master/sharedrewarm holds unchanged. All firstfailedreceipts retained.
+
 * Current scrum checkpoint 2026-11-08T18:11:49.953342+00:00
 Goal ACTIVE/unbounded; previous turn PROGRESS. GitHub development fdec032efd4b98ed4b99883c9586f5ef07b7bf3e.
 31 development merges /24 currently closed sweep issues. Original147 country
