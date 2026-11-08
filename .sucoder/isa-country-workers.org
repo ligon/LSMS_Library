@@ -66,3 +66,13 @@ Authoritative GitHub development3b28d293f71b962c3d878c2886be9ee794407915. Filesy
 
 * 2026-11-08 00:30 UTC gate update
 PR1605 merged asbcd77200f,1528closed; finalCIunit/Windows passed. 1535source-v3job41009395cold/warm/exportpasses253611rows/33cachefilesunchanged; fullCIrunning, residual1606 records2newdtypeauditWARNs(61pass7warn0fail), noallgreenclaim. 1174integration1e8source/hashjob41009999activeafter332focusedpass; original0ef fullCI11464pass/5646skip/4xfail.1480and1502ledgersrootread/authorized; scientificpoliciesheld. Seehandoffforterminalfailedattempts,rootsharedcacheincidentandexplicitqualifications.
+
+* 2026-11-08 01:55 UTC current gates
+Development8505ee8a0; seven snapshot issues closed through six merges,179repository issues open versus182original plusfournewresiduals. Country queues overlap:147unique scoped originalIDs,140open,7closed,0unknown; assessments remain dated8558metadata context.
+1174 mergedPR1607/closed; conditional2024provenance remains1275, weights48held.1535 draftPR1608d861 full offline11581pass/5652skip/4xfail;151integrationpass;source253611rows and0hashchanges; finalGHAunitpending/Windowspass.1480draftPR1609b25 full offline11632pass/5652skip/4xfail; actual53entries265fields pass; independent reporter P2 closed10controls; finalGHApending.
+1602frozen0994 authorfinish_1452;120focuspass/globalhashcost disclosed;41017138RUNNING; finish_1590 independent review followsNigeria1502nullable-v2closure.1502v2corrects nullable-completeness flags with allfouroutputframes unchanged;23controls pass,old61reports+62raw unchanged; no productpolicy.1560/1571author malawi_revision_food own forms conflict with TOTALlabels, no default; source recovery41016358completed,packet underway.1603nextboundedwarningfixchartered,ledger/design first.1604Malawifood/48and1509/1442scientificholds persist.
+Root GitHub publication/expected-head merge authority unchanged; no master release/plannedsharedrewarm. Earlier1535sharedwarmtestincident remains qualified in handoff. See current owner-registry.json/live-country-queues-20261108.json and latest handoff for heads, failures and evidence paths.
+
+
+* 2026-11-08 01:59 UTC landed and review closure
+1535PR1608merged72197c8ee,issueclosed; eight snapshot issues closed through seven merges. Final-headunit/WindowsSUCCESS,sourceDVCdocsSKIPPED,exactactualmergetreeproof.1502nullable-v2independentP2CLOSED26controls/fourunchangedoutputframes/old61reports+62rawhashespreserved.1609unitpending/Windowspass; root separate prospective1535composition focusedPTY17269active.1602fullCI41017138andindependentreviewactive;1603ledgerfirstfresh72197.1560dryweight-onlyrecordsmostlyownsaleNON,notestablishedmissingsales;nodefault.

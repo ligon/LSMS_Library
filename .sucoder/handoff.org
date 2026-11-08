@@ -1,4 +1,138 @@
 #+title: Handoff, LSMS-ISA sweep
+* Authoritative checkpoint, 2026-11-08 01:59 UTC
+PROGRESS:1535 PR1608 MERGED and issue CLOSED completed, exact readback;
+development72197c8eeccde679673ef3561204d39666c5dfea. Actual merge parents8505+d861,
+treef440a30afa6a875ae4bd5b7b2725ced82c0b3bca equals final PR head. Final GitHub
+unit-tests SUCCESS10m42s and Windows SUCCESS, other source/DVC/docs SKIPPED;
+review threads/reviews empty. Root FINAL-REPORT/RESULT/ROOT-PUBLICATION updated.
+Eight snapshot issues now closed through seven merges; repository open count
+expected178 (refresh before final count).1606 diagnostic residual remains open.
+
+1502 nullable-correction-v2 independently CLOSED no remaining P1/P2:
+26guarded controls14.61s, finite-positive reference reproduces all four corrected
+certification frames; all old amounts/contributor counts and four reconstructed
+counterfactual inputs/attrs exact; original61report+62private1.564GB files unchanged.
+Original CHANGESREQUESTED verdict preserved; closure is additive in
+B/reports/review-nigeria-1502-investigation-20261108/nullable-correction-v2-closure.
+No source/native/API/PDF replay or production/scientific policy change.
+finish_1452 packaging new additive final decision packet; originals/v2 frozen.
+
+Uganda PR1609b25: Windows SUCCESS; unit still RUNNING. Root created SEPARATE
+prospective ordinary composition checkout verify-1480-with-1535-20261108;
+four incoming1535paths only, all nine1480task paths unchanged. Private/no-network
+focused integration actorPTY17269 RUNNING, logs/receipt in1480report root-
+integration-1535*. Source/nativebaseline unchanged; no new source campaign.
+Before merge: verify this combined check and final-head GitHub success, fresh
+reviews/currentbase, then assert actual merge tree equals tested composition.
+Do not change authorb25 checkout or rebase/force-push; no new GHA head needed
+merely for the separately verified disjoint composition.
+
+1602 frozen0994 fullCI41017138 RUNNING verified at01:58UTC; independent
+finish_1590 review underway. Root read actual local_tools.py one-expression
+Data/normpath diff and the full report/globalhashcost.1603authorfinish_1452
+will start fresh72197branch/ledger before product code.1560 dry weight-only
+qualification: six of seven own sale answers NON and one OUI; six kg values
+equal native harvestkg. These are contradictory source candidates, not seven
+established additional sales. Author is recording the conflict, no rule/mask.
+All holds, preserved failures and incident qualifications in01:55checkpoint apply.
+
+* Authoritative checkpoint, 2026-11-08 01:55 UTC
+Previous goal turn: PROGRESS (verified fresh GitHub state and dispatched bounded
+independent closure/review). Current turn: PROGRESS, published Uganda PR1609,
+updated issue1480, completed root publication receipts and refreshed all-country
+metadata overlay. Goal ACTIVE; no completion/blocked claim.
+
+GitHub development8505ee8a05359f66a820534c5af2ab3873671a27; filesystem
+origin/development111b remains stale/untouched. Seven original snapshot issues
+closed through six development merges:1452,1590,1510,1475,1517,1528,1174.
+179 repository-wide issues open versus182 originally, four new residuals
+1598/1602/1603/1606. This is NOT an ISA-only completion count. Country-owner
+scope147unique original IDs has140stillopen,7verifiedclosed,0unknown; scopes
+include shared/context issues and overlap. Initial source8558 assessments
+remain dated; live overlay is metadata rather than fresh scientific triage.
+
+PR1607 MERGED final2cf4c0764387b882f6512a2635b121af8df3f3c4 as8505ee8a0;
+1174 CLOSED completed and actual merge tree89d9c0555c61bc684df31a1ab1f122e56c7941ce
+equals final head. Unit/Windows SUCCESS, source/DVC/docs SKIPPED. Conditional
+2024 provenance explicitly carried to1275, not implemented/verified. Root
+publication receipt B/reports/1174-malawi-deletion-provenance-20261107/ROOT-PUBLICATION.json.
+
+1535 finald861c24c277a7872226457072a51a8691c139af0 DRAFT PR1608. Corrected
+full isolated offline job41012352 COMPLETED0:0 at4b635fe9:11581passed,
+5652skipped,4xfail;558.35s pytest. Two stale public month-type assertions changed,
+52old assertions retained,5native numeric cache protections added. Independent
+closure28pass. Original source-v3 job41009395 preserved FAILED1:0 solely8stale
+API expectations after source/warm/export passed; earlier cancellations/oracle/
+Arrow index-normalization failures remain preserved. Source4countries253611rows,
+33freshwarmcachefiles unchanged. Ordinary8505 integration9d84 passes151controls,
+core/schema/Malawi crop producers/registry exact. Finald861 ledger-only proof.
+Final450table/1895wave/35build/186import census0changes/0errors/0denials;
+strict API0. Audit61pass/7warn/0fail versus63/5/0, two stage warnings tracked1606.
+GitHub unit pending and Windows SUCCESS at01:52UTC; source/DVC/docs skipped.
+Root FINAL-REPORT.md and RESULT.json now packaged. Await final checks/reviews,
+ready/expected-head merge/manual issue closure; no new code/source campaign.
+
+1480 finalb25e842f36ad81982558452d83d0b67322763d5f DRAFT PR1609 published;
+current base8505. Root verified only ledger differs from integrated full-CI
+4f861a4bbbae3d0df2bd9a7c6ab901f340afce19 and library/tests/scripts exact.
+Full offline41014455 COMPLETED0:0:11632pass/5652skip/4xfail;1384.84s pytest.
+Actual source41011740 at5093 COMPLETE53/53entries265/265fields,13tables,
+237.040s builds; existing cache bytes/mode/nsmtime and baseline unchanged.
+All37extra wave paths outside manifest scope, not accepted baseline entries.
+Independent original all-deselected-xdist P2 preserved and CLOSED at e0ef by
+10controls;70author controls pass/53credential skips explicitly INCOMPLETE.
+No baseline/fixture/tolerance change. Final GitHub unit/Windows pending;
+root ready/merge/closure remains. Report path B/reports/1480-uganda-invariance-coverage-20261108.
+
+1502 Nigeria numerical evidence independently reproduced, but one P2 nullable
+Boolean .all(skipna=True) diagnostic found. Frozen nullable-correction-v2:
+23controls/four CLOSED pure-transform recomputations pass; W3complete145534->145533,
+PHgrams17205->17201,PHgrams+cl18048->18044; amountSeries/four outputframes/
+factors/unitvalues unchanged. Machine incompleteQty0->1 W3. Old61reportfiles+
+62privateartifacts1.564GB rehashed unchanged, original75ba tree untouched.
+finish_1590 independent closure active, THEN1602 independent review. No new
+source/native/CountryAPI/PDF calls. Production factor policy remains undecided.
+Own5PDF projection now retained/authenticated1108pages,3,014,112textbytes;
+ephemeral credential copy removed. Existing cachedpypdf portable ZIP in
+B/private/existing-pdf-tool/pypdf-6.21.4.zip, SHA5998ebb4d7f1f6b59cf718425bd7337165496a4e025c55bc8a91dd7b87035039;
+no dependency installation. categories_only actually internally parses full
+Stata frames:1502five calls,1528reviewseven parses/three files. Original wrong
+physical-read-cost prose preserved with explicit addenda; no replay.
+
+1602 authorfinish_1452 frozen0994e131659aaa5854887f3c7af1416a06145a8c:
+one prewarm path expression now matches actual Wave Data/normpath semantics;
+120focuspass/18newfake-provider controls.526new sidecars reachable among762
+physical entries; no actual acquisition/performance claim. Hash cost global
+450table/1877wave/35build,0import changes explicitly disclosed. Metadata/API
+actors closed0; full isolated offline41017138 RUNNING verified at01:49UTC.
+Independent finish_1590 next after1502closure. Frozen inputs remain unchanged.
+1603 assigned finish_1452 next: generic unqualified shipped-factor warning,
+ledger/design required before code, no factor policy/default/value change.
+
+1560/1571 Niger/Mali author malawi_revision_food: source recovery41016358
+COMPLETED0:0 atc3badfcb,8summaries/9authenticatedforms1705pages. Prior V1
+JSON mapping-key failure preserved with8numeric captures reused, no raw replay.
+Own Niger AND Mali2021 forms instruct per-ONE-UML despite released TOTAL labels;
+metric kg values look total-like, but CAPI/export multiplication is hypothesis,
+no held derivation code located. Seven positive dry weight-only records and
+sentinel-like9999 rainy/2014 cases need explicit ruling; no row/mask invented.
+Closed native replay/diagnostic packet underway; production unchanged.
+
+Scientific holds:48productionweights/wholeMalawiwave;1509required purchase-price
+eligibility answer (1442dependent), no default from elapsed time.49borrow/50Gramil/
+51noclamp already honored. MalawifoodPR1604 staysDRAFT despite green checks.
+No master release or planned shared-cache rewarm. Earlier1535 supporting warm
+tests DID unintentionally refresh shared Mali/Tanzania caches:13recent-file
+metadata observations without before-manifest, no complete attribution/rollback.
+All subsequent tests explicit private roots/config,false creds/unshare/BLAS1.
+Remote native dispatch FD guards remain unresolved; no blind retries or guard
+changes. Local isolated authors plus free Slurm deterministic checks continue.
+
+Next: poll1608/1609 exact-head checks and review state; land reviewed green work
+with merge commits/manual issue closures. Integrate subsequent base advances
+normally with bounded relevant verification. Finish1502closure/1602review+CI,
+1560decision packet,1603ledger. Update registry and root receipts at each gate.
+
 * Authoritative checkpoint, 2026-11-08 00:30 UTC
 Goal ACTIVE; this turn PROGRESS includes actual developmentmerge/1528closure,
 1535implementation+source/export/review evidence, separate1606auditresidual,
