@@ -36,7 +36,9 @@ Country is an explicit Feature-prepended row identity, independent of its
 cardinality; it is not inferred from household strings or attrs['country'].
 Keep country first in output, then EXISTING available t/i group keys. Current
 TLU permits t-only or i-only; no new requirement for both is authorized. With
-neither key it raises via groupby([]); country alone must not legalize that sum.
+neither key a nonempty contribution frame raises via groupby([]); country alone
+must not legalize that sum. The current pandas empty/no-local-key path instead
+returns its existing empty result, which is preserved (reviewer baseline finding).
 Present-null country rejects even on rows later filtered for unsupported/missing
 heads. An index label outranks a contradictory/null column; null index cannot be
 repaired from a valid column or scalar attr. No new label vocabulary/case cleanup.
@@ -83,7 +85,7 @@ be named country) and align its unchanged numeric Series positionally to the
 promoted same-row/order index; labels/factors then use the normalized frame.
 No new scientific choice is necessary under the already-ruled identity contract.
 
-First prove currentbase collision using invented actual tlu calls. Then index/
+Prove currentbase collision using invented exact-base tlu calls, then index/
 column/reordered axes, same/distinct local keys, multiple/reversed/singleton/
 empty/all-filtered countries, partial/all-null labels and index-vs-column/attrs
 precedence. Include absent labels with stale attrs, categorical unused labels,
@@ -102,3 +104,36 @@ authorizes implementation once grounded; surface this ledger then proceed.
 No paired-operand, fertilizer, food, country-label-inference or factor expansion.
 Source/hash/fullCI/independent review/current-base composition/publication gates
 remain separate and must be reported truthfully. Root owns GitHub and rulings.
+
+
+### Executed bounded evidence / runtime freeze
+
+Final private hermetic cohort:214passed/8requires-source skips,18.91s.
+47new controls cover country presence/axes/order, null/refusal/precedence,
+singleton/empty/filtering, partial and absent local keys (including existing
+empty no-local quirks), custom head_col=country, native nullable heads,
+separate-country arithmetic, categorical labels and actual invented Feature
+livestock assembly. Existing1485coverage,1159helpers and863transforms remain
+covered; no real Country/native/source/cache operation runs. All direct source/
+API/write tripwires remain active,0denials, private data roots empty.
+
+Preserved initial cohort:162passed/1failed,16.43s. Its only failure was the old
+1485test explicitly pinning country pooling “pending separate ruling”, not a
+factor/coverage regression. Supersede only that test's grouping/name assertions
+for root-approved1616, retaining exact arithmetic factors, absent warnings and
+all-input coverage counts. No other old test/fixture/skip/tolerance changes.
+
+External exact-c2d pure-transform controls:3passed, including400typed country-less
+cohorts with full frames/attrs/errors/warnings/inputs exact and all module AST
+nodes other than tlu exact. Actual merged baseline's10/20Chicken colliding
+households produce one0.30000000000000004row; candidate retains two0.1/0.2rows.
+This executable baseline was run after the tiny working patch existed, not a
+pretended pre-edit build. The pristine c2d function bytes are compiled with
+unchanged dependencies for the independent arithmetic comparison.
+
+Strict API surface audit exit0; no untracked native build inputs. All actors
+closed before runtime commit. No raw/source/API/native/warm or metadata-hash/full
+CI replay. Native hashes remain unmeasured for this patch. Independent review,
+current-base integration, configured full CI and GitHub gates remain for root.
+Durable exact receipts, baseline counterexample/parity, country byte admission
+and preserved first failure:reports/1616-tlu-country-grouping-20261108.
