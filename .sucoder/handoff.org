@@ -1,4 +1,122 @@
 #+title: Handoff, LSMS-ISA sweep
+* Latest publication/capacity update, 2026-11-08T07:53:18.137139+00:00
+GoalACTIVE/PROGRESS. Developmentff281acb8 unchanged (PR1622verifiedmerged),
+20merges16closures/171repoopenlastknown;whole1518OPENnarrowedaccurately.
+PR1623 nowDRAFT final4272ffe27b08cee0fc0c4dbab258b5a86d950ce0 targeting
+development. Alllocal1592gatesPASS:38focused35indep/0-Nmetadata/strictAPI,
+full12011/5652/4; finalheadGitHubchecksPENDING. Rootprovedactualfinalownledger
+ONLYdifferencefrom838/all19107otherobjects exact; currentff28+427exact4NI/
+3owneddisjointunion, prospective510f6a987a9dd2e5defc374708de8a3350035f04.
+Rootreadcountry.pydiff; no userapprovalneededfornormalexpected-headmerge after
+freshchecks/actualtreeproof. Issue1592notclosedyet. ROOTproof +COUNT-reconciliation
+in1592author/CIreportdirectories. Currentrootdocs66aa707cd beforethischeckpoint.
+
+HighvalueCAPACITYfinding(primaryREADONLY): upstreamSuCoderissue79CLOSED because
+PR81 merged641d8fdbab6e67a29b214d16399ffc5af6e29b0cOct30, adding bounded1s
+terminalproof tiedUID/starttime;two concurrentnativecontrols reportedlypassed.
+ActuallocalHEADc9daf/staged4b09841guard lacksboundedproof, onlyinstantgone/Z/X.
+This is a VERSION/ADMISSIONgap, NOTprovenactual41018752cause/fix. Rootacknowledged
+shouldhavecheckedupstreamversionearlier. Primaryfinish1452 authenticatesexact
+PR/source/stagedhashes/compatibility;malawi_revision_food nowINDEPENDENTREADONLY
+PR81safety/compat/reuse reviewer. No source/installed/tool/guard/hook/dependency/
+auth/ref mutation, native/model/reprojob or forbiddennativehome/state/SQLite/
+transcript/argv/env/FDtargetread authorized. Preferknownreviewedupstreamreuse in
+isolatedversion-pinnedexisting-depscandidateIFsafe/compatible; any archive/new
+checkout/adoption/pilot must beconcreteROOT-reviewed futuregrant. Live/unreadable
+processes muststillfailclosed; no bypass/guardweakening. 1591parkedlowpriority,
+no1591tree/commit. Source79/81URLs/knowncontrolproofsawaitprimarypacket.
+
+Niger1529charter FROZEN4c5b7b44f442589170f3da73ba2f0758db200f1e/basefa76,
+ledgerfirst8c1cf947. Docs-only2paths, all19106originalmodes/objects exact; full
+3275lineCOUNTRYrecordread. R=reports/1529-niger-dry-season-charter-20261108,
+FINAL-MANIFEST05e5d636e79bc93fed92ecf7240afd7bc30da52f9c4bbe7e475d5bf08f079bec
+25files. Source15existingsealedDATAartifacts proposedforfull3B/C/D/E8 NEWstage,
+PDFstillSEALEDunlessseparatevisualgrant. Staticmaterial:R2cq08bwaswrongunit
+binding(TOTALFCFA),3Brecordedas03bqa neededversusfield-onlykey; R3old1067/272/
+14dryonly conservationjustselfrename, notcurrentservingproof. No payloadopened,
+rawgetter/import/test/API/Make/warm/nativework. QualifiedCOUNTRYnoteexternalonly
+pendingvalidation. ROOTmustreadcharter+plan beforeanyexecutableprep/sourcegrant;
+whole1529OPEN/no season/area/cost/window/state/scientificdefault chosen. Author
+nowcapacitypeerreviewasabove; charterandoldcustodyimmutable.
+
+finish1590 exclusivelyowns1578failed15s inertMake-timeout classification+bounded
+sameNODE BASE/CANDIDATEreproPREP. RootgrantONLYprepare/feesfree2CPU8G10min;
+freezeoperator+Ethiopiarecordproof beforeROOTlaunchgrant. Exactoriginaltest15s/
+allassertions/testMakebytes unchanged, no codefix/timeoutincrease/weakening.
+Original12030pass1failfullCIremainsFAILED;targetedgreenwon'tretroactivelypass.
+No newfullsuite untilrootreviewsconcretecounterfactual. Do NOTinterruptother
+userjobs41017316/40824891. Allscientificweights/master/sharedrewarmholds persist.
+
+Rootnext: checkPR1623specificliveGitHubchecks; merge+close1592onlywhenallgreen.
+Review1578frozenreprobeforeONEboundedactor. ReadbothcapacityPR81packets then
+safelycharterisolatedadmission/pilot ifevidencewarrants;don'tinventnewguardpolicy.
+ReadNiger1529wholecharterforthenextcountrywork; sealeddata remainsclosed.
+Nevermarkgoalcomplete/blockedwhilethismeaningfulworkexists.
+
+* Authoritative merge/review update, 2026-11-08T07:41:48.609701+00:00
+GoalACTIVE/PROGRESS. GitHubdevelopmentff281acb8a069ec748095db8ac54b2a16127dc97,
+actualtreed4d387856bead7cd55e975dcdc31d80c723f9f8b.20developmentmerges/16issue
+closures;171repoopen lastpagination07:01. Scope147=13closed134open; partial1518
+NOTclosed. Rootdocs priorcheckpoint66aa707cd. No master/sharedrewarm/weightschange.
+
+- PR1622 MERGEDff281acb fromfinal1ac9946ba2e9c519fcd5bfa5d2fa65534213ae15.
+  BothfinalheadGitHubchecksPASS; source/fullCI/census/review gatesalreadyPASS.
+  Rootreadledger+38lineCOUNTRYappend, independentlyprovedall19105othermodes/
+  objects exacttested232, complete4019prefixunchanged. Actualmergeparents/tree
+  checked, ROOT-MERGE.json in reports/1518-nigeria-finalization-20261108.
+  Issue1518body/title NOWnarrowed: verifiedpureoptinW3helper complete; default
+  harvest/yieldadoption,W1/W2,finalAPI/A3ii/PP/v/Make/Feature/warm/yield and
+  scientificgeography/bundle/fluidinterpretations remainOPEN. No defaultselected.
+- 1578 FULLCI41020419 FAILED1:0/21:10. Original12030pass/1fail/5652skip/4xfail,
+ 1115.40s/JUnit17687. Soleoldtest test_gh1171_ethiopia_nutrition_make.py::
+  test_undeclared_fct_target_refuses_without_running_nutrition TimedOut15s.
+  Test+Makefile bytes exactfa76/c8fb, fixture5inertfakewaves/no registryfile,
+  no YAML/duplicate error; all44new registry controlsPASS. Actualsystemcause
+  UNPROVEN, noflakeclaim/timeoutchange/fixtureweakening. Originalfailedrun and
+  FAILED-FULL-CI-RESULTS.json/FAILURE-CLASSIFICATION.md immutable in1578CIreport.
+  Rootauthorizes PREPARATION ONLY ofONE sameoriginalNODEBASEfa76/candidatec8fb
+  exactoriginaltest15s eachonce/inertprivatefalsecreds/unshare/free2CPU8G10min;
+  no newactor untilROOTfrozenoperatorreview. Read/authenticateEthiopiafullrecord
+  first. TargetedgreenwillNOTrelabeloldfailedfullCI; furtherfullsuite requires
+  rootdecisionafterevidence. Author85b/c8fb/operatorsimmutable; no newproductfix.
+- 1592 FULLCI41020555 COMPLETED0:0/runner+launcher0:12011PASS5652skip4xfail,
+ 1304.59s/JUnit17667zeroerrors. Selectedscope838clean, metadata0/N/strictAPI0,
+ 38author+35UNIQUEindepPASS. Independent warningcollectorharnessfix retained;
+  noP1/P2,6guards0denials. Newdocs-only4272ffe27b08cee0fc0c4dbab258b5a86d950ce0
+  changesONLYownledger of19108entries, allproduct/tests/config exact838.
+  Original427ledgerCI-PENDING-at07:24:46 remainshistoricallytrue; external
+  OFFLINE-CI-COMPLETION-ADDENDUM extendsfactswithoutrewritingfrozenartifact.
+  ROOTnextreadcountry.pyminimaldiff+proofs, publishDRAFTfinal427 thenfinalGHA/
+  currentff28compositionbeforemerge/close1592. No source/CI/censusreplay needed.
+
+Actualmodels allassigned:
+1.finish1590:1578timeoutfailureclassified, now preparingboundedcounterfactual
+  executableforROOTreview, no retry.1592indep35closurecomplete.
+2.finish1452:1592code/doc/test/CIallclosed; nowREADONLYremotecapacityrecovery
+  CHARTER PRIORITY overlow1591. ActualSuCoderHEADc9dafdb...clean, FULL91AGENTS+
+ 55completehandoffread. NO installed/upstream/tool/guard/hook/deps/ref mutation,
+ nativejobs/model/repro/auth changes or forbiddennativehome/state/SQLite/
+ transcript/argv/env/FDtargetreads. AnalyzeactualownedgitmountEINVAL22 vsold
+ toyNNP0/privateNSdifference; causeUNLOCALIZED/tworeprosnonreproducing. Need
+ concreteboundednewinformation/repro/acceptance/safefailclosedfixplan BEFORE
+ anynewactorgrant; neverweaken guards orblindnative retry.1591issueonlyread,
+ no1591tree/commit/product. Existing1592actorsallterminal.
+3.malawi_revision_food:NEWNiger1529charteronly, ledgerfirst8c1cf947/basefa76,
+ FULLcurrent3275lines220623bytesCONTENTSreadin11ranges, SHA4cd9bce70a6c8c06eb7c5e854e3626807351e15332cdf40ff4c290d99815d746.
+ Fresh1529/1527/1462comments;readlive1560/1571caveats despite1617docsmerged.
+ R2/R3code/custody authenticatedreadonly, NOsealedpayloaddeserialize/operator/
+ raw/getter/API/Make/warm. Material: R2sources.json mislabeledcq08bunit though
+ ownlabels/form saysTOTALFCFA;3Bneedsrecordedas03bqa notcandidatefield-onlykey.
+ R3old1067applied272HH/14dry-onlyHHselfrename/reorderconservation NOTcurrent-
+ servingproof. Preparingfull3B/C/D/E8admission/decisioncharter, no scientific
+ season/area/window/state/default selected. Rootgrantbeforefutureartifactreads.
+
+Rootnext: publishverified1592finalhead, monitorGitHub; review1578frozencounter-
+ factual beforeONEboundedactor; keeporiginalfailedsuiteimmutable. ReadNiger
+ charterbeforeproduct/sourcegrant. Allstandingweights48/wholewave1604,1509/
+1442,1497,1560/1571,1594,1482,1518scienceholds persist;49/50/51+shockssettled.
+ Goalnotcomplete/blocked; no routinepermissionquestion needed.
+
 * Authoritative scrum checkpoint, 2026-11-08T07:01:35.540466+00:00
 Goal ACTIVE. PreviousgoalturnPROGRESS; thisturnPROGRESS: merged1621, closed
 NigeriaP2reviews, actualnewfullsourcecorrespondence+fullCIpassed, moved1578/1592.
