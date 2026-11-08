@@ -1,5 +1,49 @@
 #+title: LSMS-ISA country workers and coordinator queue
-* Current checkpoint after PR1639 — goal ACTIVE
+* Current checkpoint after PR1640 and fresh1288 submission — goal ACTIVE
+This continuation made PROGRESS: ROOT accepted the sealed independent1500 review,
+narrowed1575 to remaining sample wiring, and launched the amended1288 source worker.
+Actual GitHub development27577bc2d3c856e5bbd88eee157fd46f286ffee1, independently
+read through ls-remote; cumulative39merges/27issue closures. Last complete recount
+remains160open; original147scope23closed/124open. No new whole-issue closure here.
+No master release, shared harmonized-cache rewarm or production-weight change.
+Root docs checkout library code is OLD; use currentrefs/pinned worktrees.
+
+1575: PR1640 MERGED27577, parents[d89,ac551], whole19159object reviewed union EXACT.
+Three Togo/Guinea-Bissau/CotedIvoire2018 BIDs have committed sidecars/provenance and
+actual normalpush+freshreadonlyreadback proof. GHA42524730372 unit/windowsSUCCESS,
+6optionalSKIP. Country notes alreadymerged1637. Whole1575 remainsOPEN; title now
+states remaining documented region×milieu sample wiring. Togo domain caveat retained.
+
+1500: correctedsourceeaf5474b/currentcomposition75359e1a removes only the unconditional
+collision refusal, preserving ALLrows/payload/order/visible duplicatefullkeys. Original
+independent matrix/oracle unchanged. Actualsession71665 exit0:24uniquePASS,0skip/error/
+fail/denial, all3identities+activeguards valid, emptyprivateconfig/data, sourceclean.
+ROOT independently verified61sealed files and actual24JUnitrecords; finalmanifest
+53579e740f9d0494061a130c739321ce14c7a274ac21d46574c49767d254bf74.
+This is actualmapping+exactNSU-SPY scope ONLY, not realNSU/source/current21-row/API/cache
+or fullpipeline acceptance. Originalnative0/supervisor74/missinggrounding preserved.
+malawi_revision_food prepares next currentintegration/author-fixture release plan;
+NO runtime grant yet. Issue1500OPEN.
+
+1288: original43:02/native143/WIPa33/fourmissingreports and failed2eee clone120s package
+immutable. Source-qualified641 proves clone failure BEFORE manifest/ANYsbatch:0job.
+ONEnew sameflags cloneprobe8271 exit0/86.736s; causeofoldtimeout UNKNOWN. Newprivate
+package exactd2b1/tree56cf/full94324ancestry; genericoperators/profile/context exactold;
+only namespace+supported submissiondeadline120→600 and chronologyaddendum differ.
+ROOT read fullactual task/contract/operator, independently checked31hashes/modes/inverse,
+and granted ONEnew source-only submission. Actualsubmit CLOSED0/dd3c3ebd650a4b919b834565a36c0cf1,
+job41032433 independently LIVE RUNNINGn0039.savio4/60min/free4CPU8G. finish_1590 owns
+supportedstatus/result and normalchannels. NO taskruntime/tests/data/cache/API grant.
+Reports1288-clone-timeout-amendment-preparation-v2-20261108, ROOT-REVIEW-AND-GRANT.json.
+Productiveprivate transaction/PRE-finalize/Other15,25+frozenlivebytes contract unchanged;
+computed/unregistered/unverifiable Other narrowavailability and broader1288residualsOPEN.
+
+1501: finish_1452 prepares unchanged53-case Fakeland/privateCSV/parquet conditionalguard.
+Only original missing-.dvc Repo constructor edge may be proposed, not realDVCoperations;
+complete plan/operator/sourcequalification pendingROOTreview. RuntimeUNRUN/ungranted.
+Pending1066 userchoice and all scientific/weight holds remain as recorded.
+
+* Earlier checkpoint after PR1639 — goal ACTIVE
 This goal turn made PROGRESS: five development merges and two issue closures.
 Actual development d89da5992e1b51116a029a84995fada49d5f0c3c; cumulative38merges/
 27sweep issue closures. Fresh complete GitHub recount:160 open issues; original147
