@@ -5991,3 +5991,27 @@ dtype equivalences, approved nutrition primary/exact measured alternate and
 null-debt semantics are preserved. No baseline value or scientific rule is
 changed; current-source mismatches, if any, must be reported rather than
 regenerated. Verification and cost evidence: .coder/ledger/1480-uganda-invariance-coverage.md.
+
+* Demand input source aggregation (GH #1439 / #1526)
+
+=food_expenditures(market='Region')= retains acquisition-source =s=, including
+when =labels='Aggregate'= changes item =j=. CFE requires log expenditures on
+exactly =(i,t,m,j)=. The earlier Aggregate-split CFE result above therefore
+does not establish that the old unadapted demand-helper/skill recipe ran:
+GH #1526 records that its reviewer explicitly summed across =s=.
+
+The in-repository =lsms_library.demands.prepare_demand_inputs= now performs
+that consumer aggregation in monetary levels before logs, preserving every
+supplied source value. =basis='purchased'= remains the cash-outlay default;
+=basis='total'= explicitly requests all recorded acquisition values, without
+imputing an unreported own-production/in-kind value. All-missing groups stay
+missing; partially missing groups yield recorded subtotals. Keep the original
+food frame for per-source provenance and missingness.
+
+The adapter refuses absent/ambiguous market identities, repeated native keys
+and country axes rather than letting CFE silently drop or pool them. It does
+not repair the recorded missing Region labels, District vocabulary changes,
+EA/parish design, price provenance or sample/weight caveats. This entry records
+the adapter contract and source-free validation scope, not a new Uganda demand
+fit or source/cache build. Native food API, Aggregate buckets and invariance
+baselines remain unchanged. Ledger: =.coder/ledger/1439-demand-source-index.md=.
