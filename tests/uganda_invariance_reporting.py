@@ -58,11 +58,22 @@ def summary_lines(summary):
     ]
 
 
-def pytest_coverage(terminalreporter, baseline):
+def pytest_coverage(terminalreporter, baseline, *, collected=(), deselected=()):
     """Reuse xdist-serialized report properties; never inspect a data root."""
     results = {}
     phase_errors = set()
     seen = False
+    for nodeid in set(collected) | set(deselected):
+        if TEST_ID not in nodeid:
+            continue
+        seen = True
+        key = nodeid.split(TEST_ID, 1)[1].removesuffix("]")
+        if key not in baseline:
+            results[key] = {"key": key, "status": "unknown_key", "fields": {},
+                            "reason": "pytest collected a key outside the baseline inventory"}
+        else:
+            status = "deselected" if nodeid in deselected else "not_run"
+            results[key] = entry_result(key, baseline[key], status, "not selected by pytest" if status == "deselected" else None)
     for category, reports in terminalreporter.stats.items():
         for report in reports:
             nodeid = getattr(report, "nodeid", "")

@@ -252,18 +252,8 @@ def test_unknown_report_key_is_visible_and_never_verifies():
     assert report["unknown_result_keys"] == ["surprise"] and not report["invariance_passed"]
 
 
-@pytest.mark.parametrize("mode,exitcode,coverage,checked", [
-    ("full", 0, "COMPLETE", 5), ("empty", 0, "INCOMPLETE", 0),
-    ("partial", 0, "INCOMPLETE", 0), ("mismatch", 1, "COMPLETE", 5),
-    ("error", 1, "INCOMPLETE", 0),
-])
-def test_actual_xdist_report_transport_on_invented_private_cohort(tmp_path, mode, exitcode, coverage, checked):
-    """Execute the actual test/reporter in a copied, invented one-entry project.
-
-    Its source mark is retained. No source credential plugin is copied because
-    these are invented parquets, not country data; source/build calls are fatal.
-    The committed scientific fixture is never changed.
-    """
+def _run_invented_coverage(tmp_path, mode, *, workers=2, selection=None):
+    """Run actual copied comparator/hooks with invented files and fatal IO guards."""
     import pyarrow as pa
     import pyarrow.parquet as pq
     project = tmp_path / "project"
@@ -292,7 +282,15 @@ def test_actual_xdist_report_transport_on_invented_private_cohort(tmp_path, mode
         entry["content_hash"] = "0" * 64
     elif mode == "error":
         path.write_bytes(b"not parquet")
-    (tests / "fixtures/uganda_baseline.json").write_text(json.dumps({KEY: entry}))
+    baseline = {KEY: entry}
+    if selection is not None:
+        for key in ("var/nutrition.parquet", "2019-20/_/sample.parquet"):
+            target = data / "Uganda" / key
+            target.parent.mkdir(parents=True, exist_ok=True)
+            frame.to_parquet(target)
+            baseline[key] = entry
+        (tests / "test_worker.py").write_text("def test_other_worker():\n    assert True\n")
+    (tests / "fixtures/uganda_baseline.json").write_text(json.dumps(baseline))
     guard = '''
 def pytest_sessionstart(session):
     import pathlib,sys,lsms_library
@@ -303,7 +301,7 @@ def pytest_sessionstart(session):
     assert countries_root().resolve()==expected/'lsms_library/countries'
     assert data_root().resolve()==pathlib.Path(os.environ['LSMS_DATA_DIR']).resolve()
     def profile(frame,event,arg):
-        if event=='call' and frame.f_globals.get('__name__','').startswith('lsms_library') and frame.f_code.co_name in {'get_dataframe','get_data_file','grab_data','run_make_target','to_parquet','_compute_panel_ids'}:
+        if event=='call' and (frame.f_globals.get('__name__') or '').startswith('lsms_library') and frame.f_code.co_name in {'get_dataframe','get_data_file','grab_data','run_make_target','to_parquet','_compute_panel_ids'}:
             raise AssertionError('Invented coverage test attempted a source/build')
     sys.setprofile(profile)
 '''
@@ -313,11 +311,57 @@ def pytest_sessionstart(session):
                COVERAGE_CODE_ROOT=str(repo), LSMS_CONFIG_DIR=str(tmp_path / "empty-config"),
                LSMS_S3_CREDS=str(tmp_path / "empty-config/no-creds"), LSMS_SKIP_AUTH="1",
                LSMS_COUNTRIES_ROOT=str(repo / "lsms_library/countries"), PYTHONPATH=str(repo))
-    proc = subprocess.run([sys.executable, "-m", "pytest", "-n", "2", "--dist=loadfile", "-q"],
-                          cwd=project, env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    args = [sys.executable, "-m", "pytest", "-n", str(workers), "--dist=loadfile", "-q"]
+    if selection == "never_collected":
+        args += ["tests/test_worker.py"]
+    elif selection is not None:
+        args += ["tests/test_uganda_invariance.py", "tests/test_worker.py"]
+        args += ["-k", {"all_deselected": "other_worker", "partial_selection": "not nutrition",
+                        "no_tests_selected": "no_such_selected_test"}[selection]]
+    proc = subprocess.run(args, cwd=project, env=env, text=True,
+                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=90)
     (tmp_path / "inner-pytest.log").write_text(proc.stdout)
+    return proc
+
+
+@pytest.mark.parametrize("mode,exitcode,coverage,checked", [
+    ("full", 0, "COMPLETE", 5), ("empty", 0, "INCOMPLETE", 0),
+    ("partial", 0, "INCOMPLETE", 0), ("mismatch", 1, "COMPLETE", 5),
+    ("error", 1, "INCOMPLETE", 0),
+])
+def test_actual_xdist_report_transport_on_invented_private_cohort(tmp_path, mode, exitcode, coverage, checked):
+    proc = _run_invented_coverage(tmp_path, mode)
     assert proc.returncode == exitcode, proc.stdout
     expected_entries = 1 if checked else 0
     assert f"coverage {coverage}: {expected_entries}/1 entries, {checked}/5 required field comparisons" in proc.stdout
     assert "verification PASSED" in proc.stdout if mode == "full" else "verification NOT PASSED" in proc.stdout
     assert "unknown files=not inventoried" in proc.stdout
+
+
+@pytest.mark.parametrize("workers", [0, 2])
+@pytest.mark.parametrize("selection", ["all_deselected", "partial_selection", "never_collected", "no_tests_selected"])
+def test_actual_collection_scope_survives_serial_and_xdist_selection(tmp_path, workers, selection):
+    proc = _run_invented_coverage(tmp_path, "full", workers=workers, selection=selection)
+    assert proc.returncode == (5 if selection == "no_tests_selected" else 0), proc.stdout
+    if selection == "never_collected":
+        assert "Uganda baseline comparison coverage" not in proc.stdout
+        assert "Uganda invariance coverage" not in proc.stdout
+    else:
+        compared, fields, deselected = (2, 10, 1) if selection == "partial_selection" else (0, 0, 3)
+        assert f"INCOMPLETE: {compared}/3 entries, {fields}/15 required field comparisons" in proc.stdout
+        assert f"deselected={deselected}" in proc.stdout
+        assert "verification NOT PASSED" in proc.stdout
+
+
+def test_collection_evidence_without_reports_and_absent_scope_do_not_do_io(monkeypatch):
+    baseline = {KEY: dict.fromkeys(FIELDS, "pinned")}
+    terminal = SimpleNamespace(stats={})
+    monkeypatch.setattr(Path, "rglob", lambda *a: pytest.fail("reporter scanned a data root"))
+    assert pytest_coverage(terminal, baseline) is None
+    nodeid = _report(KEY).nodeid
+    result = pytest_coverage(terminal, baseline, collected=[nodeid])
+    assert result["entry_counts"] == {"not_run": 1}
+    assert result["checked_fields"] == 0 and not result["invariance_passed"]
+    result = pytest_coverage(terminal, baseline, collected=[nodeid, nodeid], deselected=[nodeid])
+    assert result["entry_counts"] == {"deselected": 1}
+    assert result["required_entries"] == 1

@@ -39,13 +39,50 @@ from __future__ import annotations
 import os
 import shutil
 import warnings
+import pytest
+
+
+_UGANDA_TEST_ID = "test_uganda_invariance.py::test_parquet_matches_baseline["
+
+
+def pytest_itemcollected(item):
+    """Remember actual collection before -k/-m deselection, without cache IO."""
+    if _UGANDA_TEST_ID in item.nodeid:
+        scope = item.config.__dict__.setdefault("_uganda_invariance_collected", set())
+        scope.add(item.nodeid)
+
+
+def pytest_deselected(items):
+    for item in items:
+        if _UGANDA_TEST_ID in item.nodeid:
+            scope = item.config.__dict__.setdefault("_uganda_invariance_deselected", set())
+            scope.add(item.nodeid)
+
+
+def pytest_sessionfinish(session, exitstatus):
+    # Xdist does not send deselected Items as TestReports. Its native worker
+    # output carries collection evidence even when no Uganda test executes.
+    if hasattr(session.config, "workeroutput"):
+        session.config.workeroutput["uganda_invariance_scope"] = {
+            name: sorted(getattr(session.config, "_uganda_invariance_" + name, ()))
+            for name in ("collected", "deselected")
+        }
+
+
+@pytest.hookimpl(optionalhook=True)
+def pytest_testnodedown(node, error):
+    scope = getattr(node, "workeroutput", {}).get("uganda_invariance_scope", {})
+    for name in ("collected", "deselected"):
+        # Every worker collects the same items; union rather than count them.
+        node.config.__dict__.setdefault("_uganda_invariance_" + name, set()).update(scope.get(name, ()))
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
     """Report missing Uganda comparisons without reading/building any cache."""
     # Standalone copies of this conftest need no repository helper, and normal
     # unrelated selections should not acquire a report (ledger1480 §§2–4).
-    if not any("test_uganda_invariance.py::test_parquet_matches_baseline[" in
+    collected = getattr(config, "_uganda_invariance_collected", ())
+    if not collected and not any(_UGANDA_TEST_ID in
                getattr(report, "nodeid", "")
                for reports in terminalreporter.stats.values() for report in reports):
         return
@@ -55,7 +92,8 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
 
     path = Path(__file__).parent / "tests/fixtures/uganda_baseline.json"
     baseline = json.loads(path.read_text())
-    summary = pytest_coverage(terminalreporter, baseline)
+    summary = pytest_coverage(terminalreporter, baseline, collected=collected,
+                              deselected=getattr(config, "_uganda_invariance_deselected", ()))
     terminalreporter.section("Uganda baseline comparison coverage")
     for line in summary_lines(summary):
         terminalreporter.write_line(line)
