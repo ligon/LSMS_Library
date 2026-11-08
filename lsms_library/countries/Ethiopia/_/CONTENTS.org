@@ -4575,3 +4575,49 @@ Served equals the raw =sect11= + =sect12= sum in every wave, less three things t
 - *Nigeria's ruling A is not extended.*  After the served-line count, 52 W1 §11 sales (46,703 Birr) sit on Farm-level with exactly one line stating a harvest among several served ones: every W1 line has a unit, because W1 fixes kilos, so a line with no quantity is still served.  No other wave has any.  212 + 182 sales on a lone line stating no harvest keep it, unlike Nigeria.
 
 =Derivation= gains =hh-crop-sale-single-row= on the §9 rows already holding a §11 sale, beside any window key, and that and =Unit_sold= are all that move on them.
+
+* 2026-11-08 -- W1 key representation and literal storage identity (GH #1570)
+
+The W1 producer formats household, holder, parcel and field through
+=format_id=, but converts =crop_code= through
+=to_numeric(errors=coerce).astype(Int64)=. Its planting attachment uses
+the encoded holder_parcel_field and numeric crop; it does not use household.
+Literal storage identity is a separate diagnostic: the two closed numeric
+captures of =2011-12/Data/sect9_ph_w1.dta= and
+=2011-12/Data/sect4_pp_w1.dta= carry floating and integer crop codes, respectively.
+
+A bounded formatter experiment retained all 7,750 section 9 and 29,317
+section 4 rows. Four section 9 crop keys were missing. Literal typed
+comparison over five coordinates found zero matches. The formatted diagnostic
+over five coordinates and the actual encoded plot/crop projection each found
+6,983 one-to-one shared keys, 763 unmatched valid section 9 keys, and 22,334
+unmatched section 4 keys. Applying the household formatter to section 4 was
+diagnostic only; the actual join projection omits household. The two inputs
+and complete typed frames, axes and attrs remained unchanged. This experiment
+ran the frozen source expressions, not the whole producer or API. Its
+historical source was fdec plus ledger head =ee880b046=; the relevant
+Ethiopia subtree and =local_tools.py= objects are also byte-exact on the
+documentation base =ebb65d191=. No latest whole-head runtime claim follows.
+
+These two captures had no full-record repeats, formatter-induced full-key
+aliases, encoded component collisions, or actual projection keys spanning
+multiple households. That is a bounded observation, not a general uniqueness
+guarantee: invented controls demonstrate the algorithm's fractional-ID and
+underscore ambiguity mechanisms.
+
+The earlier literal zero therefore does not establish absent common
+agricultural records or a broken production join. The new matches and
+unmatched counts do not establish harvest or planting eligibility, row loss,
+scientific linkage, or why section 9 is short. They also do not establish
+final labelled native keys or API output. The missing section 3 intercrop
+operand still prevents full W1 native parity. Section 12 Q3 harvest, its
+window, partial grams/Birr arithmetic, and the other #1457/#1570 decisions
+remain open. A Farm-level sale is not a harvest. No key, filter, allocation,
+unit, season, weight or other default changed. Earlier receipts retain their
+dates and scopes; whole #1570 remains open.
+
+Evidence and source limits are recorded in
+=.coder/ledger/1570-ethiopia-formatter-country-note.md= and the sealed
+aggregate report at
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1570-formatter-only-proposal-v1-20261108/CAPTURES-REPORT.md=
+(manifest SHA256 =1f8d920b9a8eb77779c6b23452bcc1f0dd92dfc7c6a067167ae20f8f2b661cae=).
