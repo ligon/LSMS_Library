@@ -30,3 +30,10 @@ EXTEND2011driver with a pure source-local builder, reusing all existing helpers;
 ##§6 Remaining decisions/gates
 
 No new scientific choice needed for verbatim carrier. Actual current serving/defaultMake/Feature/warm/hash/fullCI/source gates require separate later grants and truthfully scoped receipts. Exact own3C map matches need source-card correspondence under a future six-artifact grant; no payload reads now. If source-qualified registry mechanically required, surface actual AST/hash delta before generic-helper changes. No whole1529 closure or season/consumer-policy approval.
+
+
+##Phase3 invented controls / freeze qualification
+
+Runtime866684dcc; test-only824422dfc06ca4868f356b489c9d79fcd183680a. Original24unique controls (17new+7existing) produced23PASS/1fixture-constructionFAIL: pandas3 refused fractional assignment into invented int64 slot BEFORE builder. Original outcome/log sealed; only negative fixture casts its own slot to float, preserving refusal expectation and every product byte. Targeted1case thenPASS under identical guards/newprivate namespace. A prior targeted startup manually transcribed wrong fullSHA and exactHEAD gate refused beforepytest0tests; preserved separately. Final targeted uses exactstructuredargv mechanically from frozenJSON. Do not count as25unique tests or an allgreen originalrun.
+
+Three active guard receipts per actual teststage,13bindings each/0denials, mountedMAIN/import/config/loopback/privatefalsecreds, empty nonsymlinkprivate data/L1, BLASbuild1/pytest2loadfile. Both2C reference parity and populated own3C/main/gate/masks/99-vs-unit/08bmoney/slot controls passed. No Countryhelper/schema/map/otherwave code change; only2011driver and source-aware testfixture. Dated country note appends facts/qualifications to exact authenticated3275line prefix. Actualsource/reader/default/API/Make/warm/hash/fullCI and independentreview remain pending; no sourcecapture payload was reopened. Static six-artifact operator/independent expected projection is proposed separately for ROOT review, not executed.
