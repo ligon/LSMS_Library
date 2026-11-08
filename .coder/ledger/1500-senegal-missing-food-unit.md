@@ -60,7 +60,7 @@ The live YAML/hook distinction is confirmed by current source, not by running
 that legacy script. Both halves of each mojibake pairing stay untouched.
 
 **Documented contradiction, retained with its correction:** the #876 text says
-`no EHCVM wave ships a unit-conversion table` (610); the final line says
+`no EHCVM wave ships a unit-conversion table` (615); the final line says
 `*Corrects the #876 section above*: "no EHCVM wave ships a unit-conversion table" is wrong for 2021-22.`
 The latter paragraph also keeps #876's different-unit value NA rule. Current
 NSU processing is already wired; no factor, value or scalar answer changes.
@@ -106,5 +106,44 @@ existing absolute QUESTIONS_FROM_AGENT.txt only if one arises.
 
 ### Phase 3 — verification
 
-Pending implementation. This first commit is the ledger checkpoint, before
-production edits. Final anchored static findings will be committed separately.
+- `food_acquired` — OK **statically**, anchored on §§2–5: the upstream helper
+  call and its arguments are AST-identical; the only new behavior follows its
+  return. The repair changes only `out.index`, fills missing `u` codes, and
+  rejects newly coalescing full keys. No payload computation was added.
+- `U_UNKNOWN` — OK **statically**, anchored on §§2–3: imported existing string
+  constant, source literal `'Unknown'`; no new spelling or helper/estimator.
+  No REINVENTION of NSU, valuation, size, canonical reshape or inference.
+- All other mapping symbols/imports — OK **statically**, anchored on §4:
+  normalized non-food module AST SHA256
+  `2bd544884a0f38ec7384d194650ce4add24acfb7d0c769dcbec5a8d5c3d824cb`
+  equals base. Full nonowned mode/type/blob comparison: **19,150 equal**.
+  The 2018 YAML, all 2021 source, shared framework, crosswalks, registries,
+  existing tests/fixtures/baselines/locks and dependencies remain exact.
+- Country documentation — OK **statically**, anchored on §§3–4: original
+  74,262-byte document is an exact prefix; only a dated 25-line append follows.
+  The old no-table claim and its correction remain intact. No contradictory
+  source fact was used to license a wider edit.
+- `tests/test_gh1500_senegal_missing_food_unit.py` — new **UNRUN drafts**,
+  anchored on §§4–5. Thirteen test functions cover missing representations,
+  present tokens/codes, categorical units/unused categories, null and typed
+  unrelated axes, payloads/attrs/order, empty frames, existing/new duplicate
+  full keys, input immutability, existing size/value rules and literal invented
+  Quantity_kg/Derivation controls. Shared factor and label lookups are explicitly
+  stubbed; this is not real source/Org/typed API parity.
+- Actual checks: prepared interpreter with `-I -S -B`, stdlib AST parsing of
+  production and draft source, exact helper-call/non-food AST comparisons,
+  source-copy/protected-byte checks, full Git-tree conservation, and
+  `git diff --check`. The evidence script reports 31 static checks before this
+  final ledger; none imports or executes task/test code.
+- Code/test/docs unit: `919abe403` (after ledger-first commit `004891407`).
+  Final ledger is a separate commit. `ledger-checkpoint.md` was surfaced before
+  implementation. Evidence lives in the absolute private dispatch evidence
+  directory, not a new tracked product path.
+- Anticipated hashes, **not measured outcomes**: all Senegal country-table
+  hashes and 2018 wave-table hashes change through the whole mapping file;
+  2021 wave inputs and other-country objects stay exact. CONTENTS.org is
+  excluded from hashing. No corpus-wide schema bump or re-warm performed.
+- Runtime verdict: **UNRUN**, not a reasoned pass. No source, Country/Feature,
+  real NSU/Org, getter, parquet/cache/DVC/Make, warm/hash census, full CI,
+  independent reviewer or GitHub operation was run. Those remain coordinator
+  gates. The source-only deliverable is complete; acceptance remains pending.
