@@ -70,9 +70,32 @@ loader, including types/fields/order,without resolving/importing its callables.
 Hashscope must be measuredmetadata-only, no read-path0/N assertion by intuition.
 Use authenticatedclosedcurrentBFAmap if available, otherwise boundedfreshbaseline.
 
-## §6 Gates
+## §6 Executed evidence and remaining gates
 
-Rootexplicitmerge ruling resolves compatibility; no sciencechoice needed.
-All tests privatefalsecreds/unshare/MAINvenv exactcwd/import/countries-root,
-BLAS/build1/pytest2loadfile and namedsource/API/write refusals. Freeze tests,
-validregistrycensus,hashcost and ledger before independentreview/publication.
+44new controls are green:43passed13.14s in finalsource stage plus1corrected
+publicentrypoint control5.90s.28existingkey/record/registrycontrols passed in
+initialstage; no overlap is added as a claimed single-run count. Finalcorpus
+2controls passed6.98s:ALL15committed files/81valid DerivationRecords, including
+2framework records, match exact728baseline typedfields/recordtypes/order;
+recordclass/allothercallable definitions and yaml_utils bytes exact. No registry
+rewrites,producerimports orcallableresolution. The guide's old “currentlyempty”
+framework claim contradicted these2records and is removed, not silently ignored.
+StrictAPIaudit exit0 on finalproductionbytes. Named source/API/write guards
+remain active0denials, private datafiles0; alltestactorsclosed beforefreeze.
+
+Preserved attempts:initial28existingpass/37newsetuperrors imported public
+ll.derivations function asmodule; documentedGH883 import_module escape hatch
+corrects only the new fixture. Initialexternal census also failedcollection
+for that import and is preserved. Corrected37newcases passed11.79s. Expanded
+final43pass/1newfixturefail patchedll.countries, while actual table uses
+catalog.countries. Correct actualdependency with identical assertions; corrected
+casepasses. Production unchanged by those fixture fixes. Native merge-tag
+handling follows installedSafeLoader tag-based semantics even for taggedcomplex
+key shapes; explicitmembers are checked before flattening.
+
+Root's authenticated728closedbaseline-map admission permits candidate-only
+450/1895/35/186 metadata census, preservingoriginalmeasuredhead. Hashcost remains
+UNRUN at runtimefreeze, never a guessed0/N. Rootpreflight REQUIRED before any
+CI/census launch; existing acceptedoperators with only lane/namespace changes.
+Independentreview/fullCI/GitHub/currentbase composition are separategates.
+Allsource/native/API/Make/warm/shared-cache/GitHub campaigns remain unrun.
