@@ -3025,3 +3025,84 @@ keyed =hh-crop-sale-single-row=, or else ONE =plot_id = 'Farm-level'= row with n
 - *Four rounds in one folder.*  =2008-15/= builds no =crop_production=, so sales cannot cross a round here.  Each wave reads only its own sale modules.
 
 Key on the 617 + 2,345 rows that already held a sale: =Derivation= and =Unit_sold= are new columns, and nothing else on those rows moves.
+
+* 2026-11-08 -- GH #1497: household continuation is distinct from parent-cluster inheritance
+
+Read-only diagnosis on development =c780562b299bb100cdd006037ba424c8ad3264e9=;
+no committed crosswalk, helper, sampling variable or served identity changed.
+This qualifies the earlier note: "=updated_ids= links the split-off rather than
+the frame household for 13; the lineage is the same, so =v= is unaffected."
+The existing =v= ruling remains separate from which household inherits canonical =i=.
+
+** Own keys and instruments
+
+- NPS4 EXT cover/roster: =2014-15-EXT/Data/TZA_2014_NPS-R4_v03_M_v03_A_EXT_STATA11/hh_sec_a.dta=
+  (MD5 =5eb390e355ac3e19a62612ef9086ce03=) and =hh_sec_b.DTA=
+  (=2e595aa2b81b6631cc6f77df614c83ef=): 989 households, 4,742 people.
+  All 989 roster heads (=hh_b05= code 1, HEAD) have own person number =indidy4= 1.
+- SDD =2019-20/Data/HH_SEC_A.dta= (=9179d7f5e7621d642b79034cf9cec238=),
+  =HH_SEC_B.dta= (=96aab692dbc65fe97240a2b182f58015=), and
+  =npssdd.panel.key.dta= (=12160235dd5c5c94b4664ca360ee7b5b=):
+  1,184 cover households, 5,587 roster people, 30,852 panel-key rows across rounds.
+  Full own current/previous person keys have zero duplicates. Absent-round
+  household IDs in the panel key are empty strings while person numbers are NA;
+  household =notna()= alone does not identify a present person key.
+- SDD roster =hh_b06= is the previous NPS4 person number, with 99 meaning NOT
+  PREVIOUSLY PRESENT. Its own =y4_hhid= and person number agree with the individual
+  panel key on all 3,846 previously present people. Thirty have a previous household
+  different from their current household cover's =y4_hhid=. The SDD BID below,
+  PDF p.14, explicitly describes people from different previous households merging:
+  use each person's full previous-household/person key, not cover ID plus person1.
+- Own forms =2014-15-EXT/Documentation/nps_household_qx_y4_final_english_.pdf=
+  (=e415e74e1e6cece7c0fb1a5b7b7497cd=) and
+  =2019-20/Documentation/nps_sdd_household_qx_final_english_.pdf=
+  (=e6b3ba0b53ee3d182037ee89d565bb5a=), PDF p.4, instruct head on line1.
+  SDD BID =2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf=
+  (=6d791f6953f8efb0d04ce7ca4bddb3f4=), PDF p.12, defines the suffix using the
+  lowest retained previous member number. An ORIGINAL household need not retain
+  suffix001; neither suffix nor ORIGINAL status selects canonical continuation.
+
+** All 238 split-off/frame pairs, not 238 distinct families
+
+The exact native parent-cluster derivation identifies 238 pairs across 175 previous
+households. Full-cover/roster replay reproduces all 907 committed SDD links; the
+UPD R4 chain reproduces all 636 committed entries. Independent person keys confirm
+previous-head locations: frame210, this split7, another sibling4, not observed17.
+The pair-specific continuation counts are frame218, split13, other sibling7.
+All 221 occurrences with an observed previous head select that person's household.
+
+The 13 split continuations are six whose current head is the previous head, one
+with the previous head present as a non-head (first-cover-row fallback), and six
+with no observed previous head (fallback). The seven links to neither member of
+a pair select another sibling: four with the previous head, three via fallback.
+The remaining frame links are 208 current-head/person1 choices and ten fallbacks
+(two previous heads now non-head; eight previous heads not observed).
+
+Maintainer commit =f8a26df995492b789e2ab15de3634a6ac4d3ec1f= says the split
+"containing the original head" inherits the ID. The existing helper instead first
+filters CURRENT HEAD before testing previous member1; with none it selects the
+first input cover row. Invented controls show that fallback depends on row order
+and multiple eligible current heads can both inherit. Observed 20 fallback pair
+occurrences span 17 families; the 17 absent-head pairs span 14 families. No death,
+migration, or correct fallback policy follows from absence. No ID repair is
+established by these diagnostics; a fallback interpretation remains for ruling.
+
+** Retained document tensions and limits
+
+The SDD BID PDF pp.7–9 describes previously missed people and distance tracking;
+p.11 says only close-proximity tracking and p.37 says no previously missed
+household was tracked. Preserve these internal tensions; do not assume a page is
+stale or infer why a particular old head is absent. The held 2014/15 BID
+=2014-15-EXT/Documentation/tznps_2014_2015_bid_06_27_2017.pdf=
+(=53be2a92e13dd6512803a49a105b33ba=), PDF p.7, describes the initial release
+without EXT; the separately held EXT source above exists and all989 households
+are in current UPD R4. This is not authority to register EXT as another wave.
+
+Sealed source capture job41017857: six numeric plus six category reader roles,
+12 actual full Stata parses, four PDFs; warnings and failed earlier harness
+attempts retained. PDF extraction recovered object-pointer warnings, so no full
+visual completeness claim. Diagnostic case IDs remain private. Durable aggregate
+packet: =reports/1497-tanzania-head-tracking-20261108/= in the 20261103 burst
+workspace; reproducible classifier and invented controls in
+=bench/research/tanzania_1497/=. No Country/Feature/Make/warm/source-policy or
+scientific price endorsement is claimed; library and build inputs stay unchanged.

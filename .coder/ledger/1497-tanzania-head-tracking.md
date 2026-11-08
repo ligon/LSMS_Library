@@ -147,3 +147,73 @@ stream's natural parquet probe; refuse every other parquet source and PAR1 bytes
 An invented-DTA sanctioned-getter control must prove the exact legitimate probe
 path, with a separate cache/path refusal control. The first6numeric+6category
 returns and12actual full Stata parses remain to be executed under the same grant.
+
+### Closed source recovery and classifier grounding
+
+Recovery41017857/frozenb05f91f02 completed0:0/1:27,28sealedfiles, credentials
+removed. All10 originals reused under terminalSHA+ownMD5;0newprojections/network,
+12reader-role returns/12actual fullStata parses. Preserve missing value-label
+metadata warnings for hh_a16/hh_a25 and five recovered PDF object-pointer warnings;
+no full visual completeness is claimed. Own SDD cover1184/roster5587/panelkey30852,
+UPDcover29250,NPS4EXTcover989/roster4742; forms50/71/73/85pages.
+
+Own SDDhh_b06 means previous NPS4 member ID and labels99 NOT PREVIOUSLY PRESENT;
+hh_b05 code1 HEAD. Own NPS4indidy4 is the person number, hh_b05 code1 HEAD.
+Both SDDcover and roster carry y4_hhid, and panelkey independently carries both
+household/person keys. The classifier must separately compare roster-vs-cover
+previous-household identity and panel-key linkage; do not assume member1 belongs
+to cover's previous household. Reuse the exact native selector and238-cohort
+sample derivation. Count whole-source keys/duplicates/missingness and all target
+pairs before cross-tabulation. Classify actual NPS4head location by full own
+household+person key, independently of the code's CURRENT-HEAD/member1 gate,
+and compare committed/replayed chains without regenerating JSON. No default or
+crosswalk change follows from a disagreement or row-order-sensitive fallback.
+
+Classifier-v1 refused before case inference because the panel key's absent-wave
+household IDs are empty STRINGS while person numbers are NA; `.notna()` on the
+household alone falsely admitted historical-only rows and duplicate blank keys.
+The corrected current/previous presence predicates require a nonblank household
+AND nonmissing own person number, with all30852 rows and incomplete/partial-role
+counts retained in the report. This is a diagnostic full-key presence distinction,
+not a new source eligibility/ID policy. The own forms both say head on line1
+(PDF4), and the SDDBID PDF12 defines the suffix by the lowest retained NPS4member
+number; neither instruction is replaced by code assumptions.
+
+Closed classifier-v2 reproduces all238 pairs,907 committed links and636 UPD-R4
+links exactly. Independent individual keys reproduce210/7/4/17 locations. All989
+NPS4 heads are own person1. Own roster/panelkey previous-HH agrees for3846 prior
+members;30 disagree with current cover, as own SDDBID PDF14 explicitly permits
+when households merge. Add a JOINT linkage/location/method table and current-head
+person-key attribution; marginals alone must not be conflated. An initial root
+status message incorrectly joined marginals and was immediately corrected with
+the exact joint table. Preserve both messages; final packet uses joint evidence.
+
+Own SDDBID PDF7–9 describes distant tracking and previously missed people, whereas
+PDF11 says only close-proximity tracking and PDF37 says no previously missed
+household was tracked. Record these internal contradictions, not a stale-form
+assumption or grounds to classify an absent head as dead. PDF12 suffix is lowest
+retained previous-person number; PDF14 full previous household+person key permits
+merged families. Neither identifies a canonical-ID fallback rule. The helper's
+CURRENT-HEAD/person1 gate and first-row fallback remain existing policy, with a
+scientific ruling needed before changing them.
+
+Classifier-v3 joint table closes without different-parent CURRENT-head attribution:
+all218 candidate-head pair occurrences match the cover previous household through
+the independent panel key. The four 'elsewhere' locations are relative to a pair,
+so inspect ALL siblings before calling them an external-family link or wrong
+continuation. Extend aggregate accounting to selected third siblings, exact
+first-cover fallback equality and distinct-family denominators. Preserve prior
+status-message corrections and all earlier classifier outputs.
+
+Classifier-v4 confirms all221 pair occurrences with an observed actual NPS4 head
+select that person's household;0 observed heads in an unselected sibling/outside
+family. All7 neither links select another sibling of the same cover parent. The
+20 first-cover-row fallback occurrences span17 families:3 present oldheads now
+non-head (2frame/1split),17 absent-oldhead pairs spanning14 families. Absent does
+not establish death/migration or a justified canonical fallback. No incorrect
+committed linkage is proven. Freeze a diagnostic-only candidate, add these genuine
+idiosyncrasies to CONTENTS without replacing prior notes, and request only the
+remaining fallback interpretation. No module/JSON/sample/weight change is selected.
+Production identity checks allow only that CONTENTS documentation delta and prove
+all other tracked library files exact c780; CONTENTS is explicitly excluded from
+build hashes. Final controls/replay use the actual candidate diagnostic bytes.
