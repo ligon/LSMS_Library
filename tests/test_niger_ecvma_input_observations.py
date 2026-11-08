@@ -41,8 +41,14 @@ def test_actual_driver_preserves_slots_payload_and_eligibility(monkeypatch, wave
     labelled[pre+'04'] = ['mil']*4 + [pd.NA]
     labelled[pre+suffix('05b')] = 'kg'
     written = []
-    monkeypatch.setattr(local_tools, 'get_dataframe', lambda path, convert_categoricals=True:
-                        (labelled if convert_categoricals else numeric).copy())
+    def invented_reader(path, convert_categoricals=True):
+        frame = (labelled if convert_categoricals else numeric).copy()
+        if str(path).endswith('ecvmaas3c_p1.dta'):
+            # This existing control isolates the original2C footprint. The
+            # new3C-specific controls supply populated, own-prefix dry inputs.
+            return frame.iloc[:0].rename(columns=lambda c: c.replace('as02cq', 'as03cq'))
+        return frame
+    monkeypatch.setattr(local_tools, 'get_dataframe', invented_reader)
     monkeypatch.setattr(local_tools, 'to_parquet', lambda df, *a, **kw: written.append(df))
     root = countries_root()/'Niger'
     monkeypatch.chdir(root/wave/'_')
