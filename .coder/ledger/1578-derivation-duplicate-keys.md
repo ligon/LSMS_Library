@@ -75,7 +75,7 @@ Use authenticatedclosedcurrentBFAmap if available, otherwise boundedfreshbaselin
 44new controls are green:43passed13.14s in finalsource stage plus1corrected
 publicentrypoint control5.90s.28existingkey/record/registrycontrols passed in
 initialstage; no overlap is added as a claimed single-run count. Finalcorpus
-2controls passed6.98s:ALL15committed files/81valid DerivationRecords, including
+2controls passed6.74s:ALL15committed files/81valid DerivationRecords, including
 2framework records, match exact728baseline typedfields/recordtypes/order;
 recordclass/allothercallable definitions and yaml_utils bytes exact. No registry
 rewrites,producerimports orcallableresolution. The guide's old “currentlyempty”
@@ -99,3 +99,56 @@ UNRUN at runtimefreeze, never a guessed0/N. Rootpreflight REQUIRED before any
 CI/census launch; existing acceptedoperators with only lane/namespace changes.
 Independentreview/fullCI/GitHub/currentbase composition are separategates.
 Allsource/native/API/Make/warm/shared-cache/GitHub campaigns remain unrun.
+
+
+## §7 Phase 3 — measured composition and failed full-suite gate (2026-11-08)
+
+This addendum supersedes only the runtime-freeze UNRUN statuses in §6. The
+runtime source head85b07a0328cd8fedcf38c4864945bb317fcbbacd remains frozen.
+The final two-control corpus run was6.74s; the old6.98s entry referred to the
+preceding corpus attempt. TIMING-ADDENDUM.json preserves that correction.
+
+Independent review CLOSED PASS:46 new distinct controls, no P1/P2 findings,
+no skips/deselection, all15registry files/81typed ordered records exact baseline.
+Six source/API/write guard receipts were active with0denials/private files0.
+See reports/review-1578-duplicate-registry-20261108/{VERDICT.md,evidence.json}.
+
+An ordinary composition with current fa76ee4364d3e27cdbe08f0bb1d2014b060a8f9b
+froze c8fb35ca957432d4bd59e1beeed2bedc0b3c6d9a. Four owned paths and five
+incoming paths were disjoint; all mode/type/blob identities were proven, and the
+filesystem verification ref read back exact before actors launched. No rebase,
+force push, registry rewrite or scientific definition change was involved.
+Candidate-only source-free metadata census CLOSED0 in123.121457s: differences
+0/450country,0/1895wave,0/35build,0/186import fingerprints;0errors/denials,
+18None and public metadata surface unchanged. The authenticated closed baseline
+map and original measured-header provenance were retained; no baseline replay.
+
+The full offline CI gate is FAILED, not green: job41020419 FAILED1:0,21:10,
+12030passed,1failed,5652skipped,4xfailed in1115.40s. JUnit contains17687cases,
+1failure,0errors,5656skips including the4expected failures. All44new registry
+controls passed. Exact source/operator/Make/test bytes and clean head receipts
+are retained in reports/1578-current-verification-20261108, along with the
+original logs/JUnit and FAILED-FULL-CI-RESULTS.json.
+
+The sole failure was the original GH1171 inert GNU Make test
+`test_undeclared_fct_target_refuses_without_running_nutrition`: the original
+subprocess.run timeout15s expired before stdout/stderr were captured. Both the
+entire test file and real Ethiopia Makefile are byte-identical between fa76 and
+c8fb. The fixture constructs only invented scripts/paths and does not load a
+derivation registry. This classifies the observed failure path; it does not prove
+a system cause or establish a flake. The blocked operation/PID and ambient Make
+settings were not captured by that failed actor. FAILURE-CLASSIFICATION.md
+preserves those limits. No fixture, assertion, timeout or product code changed.
+
+Root authorized preparation of one same-node fa76/c8fb counterfactual, exactly
+once per head with the original15s timeout and all original assertions. Its
+operator is separately frozen at reports/1578-fct-counterfactual-20261108;
+ROOT preflight is pending and the diagnostic has NOT launched at this ledger
+freeze. Targeted results cannot relabel the failed full suite; any replacement
+full CI requires root review of the diagnostic evidence first.
+
+All original runtime/review/verification trees and failed stage receipts remain
+immutable. No source acquisition, Country API, raw decode, native/scientific
+Make target, warm cache, dependency, shared-cache or GitHub write was performed
+by this phase. Final GitHub checks/publication and a green full-suite gate remain
+unmet; this is draft readiness with an explicit failed verification gate.
