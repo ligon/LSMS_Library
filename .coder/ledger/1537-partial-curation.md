@@ -55,8 +55,9 @@ record it as dated clarification, never rewrite that historical paragraph.
   immutable baseline on every existing code and missing/unknown input.
 - Existing aliases, all old rows, crop/community codebooks and units unchanged.
   Ogbono conflict is separate. Inactive aggregate JSON is not current authority.
-- Original diagnosis fixture binds immutable context baseline Org; preserve all
-  assertions. New candidate checks read the actual file and compare baseline.
+- Original diagnosis fixture binds the complete immutable b834 Org committed at
+  tests/fixtures/gh1537/baseline-categorical_mapping.org; repository-relative
+  Path(__file__) replaces the dispatch-only environment asset. Preserve all assertions. New candidate checks read the actual file and compare baseline.
 - Qualified installed magic warmup precedes the UNCHANGED original strict guard;
   arm before ligonlibrary/LSMS/Nigeria. No generic subprocess fallback or post-arm
   exception. One original invented selection, only failed/new cases thereafter.
@@ -125,6 +126,19 @@ accepted proof is actual parsers/quarter decoders plus static chain/pure tail.
 - No new production decoder/parser/reducer/schema, factor or bucket was
   reinvented. No contradictions to preserved historical1144 record are silently
   erased; later ROOT conditional ruling covers only two existing buckets.
+- **OK (§4, portability only):** ROOT found the dispatch-only ISA_CONTEXT_ROOT
+  fixture dependency. The EXACT entire b834 Org (135462bytes, SHA256
+  1ec375a0939d1bebc0398935580eba931bb798189a9940d31be1a29f34c41f29) is now
+  committed under tests/fixtures/gh1537. Only curation fixture path expression
+  changed to repository-relative Path(__file__); SAME hash assertion/parser,
+  all21 TESTfunction ASTs/assertions and TWO production rows exact27f552.
+  No git-history lookup or invented/reduced fixture. The29green cohort was NOT
+  replayed for this binding-only change; ROOT standard-environment CI remains.
+- **OK (§3/§4, docs):** dated Nigeria CONTENTS note records why the two label-only
+  aliases are safe and retains the historical three-passthrough paragraph.
+  Native name Pepper remains unqualified, and its source-identity question held;
+  no raw-source classification is claimed. Contents is documentation, not a new
+  producer/estimator/source rule. Exact nonowned object proof extends prior packet.
 - **PENDING (§§4–6):** ROOT independent review, ordinary current composition,
   metadata footprint/fullCI/configuredCI/publication. Org is country-wide build
   input; footprint UNMEASURED, no exclusion change or zero-cost claim. No real
