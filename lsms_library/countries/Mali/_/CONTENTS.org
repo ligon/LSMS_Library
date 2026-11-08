@@ -3473,5 +3473,9 @@ Sanctioned numeric/labelled reads found 2,111 state answers / 7,992 records in
 2018 and 1,140 / 5,068 in the 2021 sale module. Every state answer accompanies
 a positive sale in its own module. The sold states were previously unread; this
 does not amend the older EAC-I tree-window ruling or wire its different state
-list. Source and verification receipts: .coder/ledger/1528-sold-condition.md.
-Added-payload retention and cold API equality remain separate verification gates.
+list. Verification retains all3,251 own EHCVM sold answers, including1,070 on
+the single harvest row and70 on Farm-level in2021. All old values/keys/types/NA
+patterns exact to cold baseline; zero added/removed rows (50,752 all-wave rows).
+Both EAC-I waves have the new optional fields entirelyNA. Cold Make/warm/Feature
+agree; current-framework integration repeats full frame/attrs equality.
+Receipts and separately qualified full CI/review: .coder/ledger/1528-sold-condition.md.

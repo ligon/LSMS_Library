@@ -3310,5 +3310,8 @@ Sanctioned numeric/labelled source reads found 5,356 sold-state answers among
 15,593 records, all beside positive quantity or value; 5,368 records have a
 positive sale. The printed four-answer form remains contradicted by the released
 five-answer dictionary (“The printed form is not what was fielded.” above).
-Source and verification receipts: .coder/ledger/1528-sold-condition.md. Added
-payload row-retention and cold API comparisons are separate verification gates.
+Verification: all5,356 sold answers retained; every old field/key/type/missing
+value exact to cold baseline, zero added/removed API rows (15,587, including the
+same six existing source-record drops). Cold Make, warm and Feature agree; an
+ordinary merge with the current framework repeats exact source/API equality.
+Receipts and separately qualified full CI/review: .coder/ledger/1528-sold-condition.md.
