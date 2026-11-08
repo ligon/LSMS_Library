@@ -344,7 +344,7 @@ def _scan_one_country(feature: str, name: str) -> tuple[list[Finding], str, int 
         findings += _null_read_findings(feature, name)
         findings += _scale_findings(feature, name, result)
 
-        report = is_this_feature_sane(result, name, feature)
+        report = is_this_feature_sane(result, name, feature, stage="finalized")
         for c in report.checks:
             if c.status == "pass":
                 continue
