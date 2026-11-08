@@ -3428,6 +3428,10 @@ class Country:
         ``sample()`` doesn't expose ``column`` still get a market label
         (via the historical cluster-level path).
 
+        If ``sample()`` cannot read a source and *df* has no ``v``, its
+        original availability exception is raised: the cluster lookup needs
+        an existing household-to-cluster relation.
+
         A row that gets no label from either source is **kept, with ``m``
         NA** -- the shape ``groupby(..., dropna=False)`` would give -- and
         reported by :meth:`_report_unlabelled_markets`.  It used to be deleted
@@ -3458,12 +3462,15 @@ class Country:
             try:
                 s = self.sample()
             except (OSError, DvcException) as exc:
+                if 'v' not in flat.columns:
+                    # The cluster lookup needs the input's existing identity.
+                    raise
                 # A source that cannot be fetched -> fall back to the wave-level
                 # region scan, and say so: the label then comes from the cluster,
                 # not the household.  Anything else is sample's own refusal or
                 # bug and is not caught (GH #1546).
                 warnings.warn(
-                    f"{self.name}: market={column!r} is labelling households from "
+                    f"{self.name}: market={column!r} is attempting to label households from "
                     f"cluster_features, because sample() could not read a source "
                     f"({type(exc).__name__}: {exc}).",
                     SampleUnavailableWarning, stacklevel=2)

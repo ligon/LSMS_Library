@@ -57,6 +57,14 @@ inputs; labels on only one input are refused, with no inference or
 broadcasting. An index level takes precedence over a redundant country
 column. Area keys may still be columns. Country-less calls keep their
 existing contract, and attrs alone do not add country.
+A nonempty fertilizer-rate result warns when an entire eligible `(country,t)`
+cell has fertilizer and positive-area rows but no matching keys. Anonymous
+warnings use no country from one-sided or conflicting metadata. The rates and
+join policy remain unchanged; unmatched plots within a surviving cell are outside
+this whole-cell check. Where both full plot vocabularies are known to agree,
+callers can explicitly choose `on='plot'`. The documented Ethiopia/Malawi literal
+route also uses known country provenance retained on both inputs. The warning
+discloses omissions and does not recover missing rates.
 The crop reducers `harvest_kg`, `gross_crop_revenue` and `crop_diversity`
 likewise prepend supplied country identity, including singleton and empty
 results. Crop conversion estimates are computed separately within each

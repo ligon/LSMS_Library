@@ -5415,3 +5415,17 @@ choose =on='plot'=. The strings alone cannot establish Malawi identity, and
 no automatic routing change is made. Warning-only disclosure would not
 recover those rates or close the whole GH #1485 issue. Livestock Site Q is
 a separate coordinated task; Malawi weights48 and scientific defaults stay held.
+
+* 2026-11-08 -- Whole-wave fertilizer omissions are disclosed, not recovered (GH #1485)
+
+The earlier "no PlotGrainMismatchWarning" describes the previous partial-loss
+behavior. =fertilizer_rate= now warns when a nonempty rate result omits entire
+eligible =(country,t)= cells whose fertilizer and positive-area rows join none.
+Anonymous inputs are not labelled Malawi from one-sided/conflicting attrs or
+=garden_plot= spelling. The legacy anonymous rows/rates remain unchanged; no
+land-key, fertilizer dose, area, factor or default is inferred or repaired.
+Partial unmatched plots within a surviving wave remain outside this detector.
+Known matching full keys can use the existing explicit =on='plot'=, or callers
+can retain known country provenance on BOTH operands. These are caller choices,
+not an automatic recovery. Historical 14,909/37,010 source counts were not
+remeasured. This warning-only follow-up does not close the broader GH #1485.
