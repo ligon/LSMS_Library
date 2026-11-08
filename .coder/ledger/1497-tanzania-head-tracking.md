@@ -136,3 +136,14 @@ Correct the diagnostic to trap actual Country/Feature construction plus existing
 writers, add a hermetic attachment check, and use a separately frozen cold
 continuation under the same exact six+four source grant. This changes no library,
 guard, permission policy or input set, and cannot be claimed as a source failure.
+
+Capture41017803/frozen5130f409 also exited1 with0numeric/category returns:
+all10 configured projections were successfully MD5-authenticated and retained,
+but the blanket pandas parquet trap intercepted get_dataframe's normal binary
+format probe BEFORE Stata. Preserve that failure and all closed original bytes.
+Recovery reuses the10 terminal-hashed originals (no new projection/network cohort)
+into physical privateL1. Allow only the actual current-role/MD5-bound private-DTA
+stream's natural parquet probe; refuse every other parquet source and PAR1 bytes.
+An invented-DTA sanctioned-getter control must prove the exact legitimate probe
+path, with a separate cache/path refusal control. The first6numeric+6category
+returns and12actual full Stata parses remain to be executed under the same grant.
