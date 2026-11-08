@@ -230,3 +230,54 @@ API/Make/warm/native jobs. TESTED-BYTES binds tested implementation/test SHA256
 to this freeze; no unnecessary repeat after a metadata-only Git commit.
 Independent reviewer closes the two original findings on the new exact head
 before held CI/census plan finalization. Whole1518 remains open.
+
+## §12 Phase3 closure and country record (docs-only finalization)
+
+Independent corrected-head review2323284b closed both P2 findings with16
+targeted PASS/0fail/skip/deselected in11.05s; original HOLD/failures and carrier
+limits remain. FINAL-HEAD-VERDICT.md / FINAL-evidence.json live under the durable
+review-1518-nigeria-safe-harvest-20261108 report directory. No original40/9 cohort
+replay or source re-decoding was used for that closure.
+
+The one separately ROOT-authorized NEW sealed correspondence v2 stage completed
+0 in14.06s on exact232. Six original artifact seals verified before4trusted
+pickle deserializations+2variable-label JSON reads,0newraw/getter/sourceAPI.
+All11956 native rows retain the current pure-producer + once-applied committed
+ID key witness (0unserved), including1690quantity-missing lines. Original711
+factor rows retain exact9identity+7fluid masks;177 native holds=69conflict-pair
++108fluid. Both explicit national/zone calls delegate11779rows,8892shipped and
+2887none,0factor-present quantity-missing rows,8786aggregate rows. Held rows
+were absent from all3captured kernel calls per geography; explicitFalse and
+exact kernel output/existing attrs proven. Raw inputs/audits remain exact.
+Direct19negative selftests and profile/write/source guards closed0denials.
+No old16+6/3/44/sourcecohort rerun, actualCountryAPI/Make/Feature/warm or yield.
+
+Candidate-only metadata census on232 completed0 in119.95s:0/450country-table,
+0/1895wave,0/35build-transform,0/186framework-import deltas; public surface and
+18None-wave cells unchanged,0errors/denials. ROOT's closed baseline was reused
+with original measured head intact, never replayed or relabelled.
+
+FULL configured private offline CI job41020235 on n0054.savio4 is ACTUALLY
+CLOSED0:0 before this docs freeze:11966passed/5652skipped/4xfailed/719warnings
+in1218.53s, pytestwall1231.06s, allocation22:27. Launcher/session10352 also0,
+exact232head/clean after, false-credential/private-empty L1/L2+config gate,
+unshare-rn, own mounted image,8CPU32G/free45m/cold,pytest4loadfile/buildBLAS1.
+The skips and expected failures are preserved; this is not a source/API claim.
+No restart, kill or duplicate campaign. Receipts/operators in durable report
+1518-nigeria-current-review-verification-20261108.
+
+Country CONTENTS was authenticated against the personally read FULL4019-line
+LOGBOOK/WAITING/TODO record, SHA1e190907429161724890d4e77b494d1c39f3ba4fc0a243e1b3e123fd4e235d16.
+The entire old byte prefix remains exact. Appended ROOT-approved factual note
+records the new source/native/current-key distinctions and hold coverage while
+quoting retained reported-factor, quantity-block and valuation caveats; no stale
+doc assumption. Links name this tracked ledger, PR1622 and the fully defined
+durable source report path. No real household IDs enter public artifacts.
+
+Durable source report: /global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1518-nigeria-sealed-correspondence-v2-20261108/REPORT.md
+Durable source receipt: same directory/STAGE-RECEIPT.json and RESULT.json.
+This finalization changes only CONTENTS and this ledger in a NEW separate tree.
+All product/test/mapping/build-input modes+objects remain exact232; no tests or
+source campaign is repeated for docs. Actual final Country API/A3ii/PP/sample/v/
+Make/Feature/warm/yield/W1/W2/scientific-default gates stay unrun/unselected.
+Whole1518 remains OPEN; root owns GitHub publication/currentbase integration.
