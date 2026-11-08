@@ -230,3 +230,62 @@ def test_module_imported_only_after_fork_uses_original_error(two_workers, tmp_pa
     assert 'Traceback' in caught.value.__notes__[-1]
     assert name not in sys.modules and str(tmp_path) not in sys.path
     assert pw.relay(outcomes['healthy'], country='Invented', table='toy') == (True, 'healthy')
+
+
+class AdvertisedExceptionProxy:
+    class_reads = 0
+
+    @property
+    def __class__(self):
+        type(self).class_reads += 1
+        return ValueError
+
+
+class RaisingClassProxy:
+    class_reads = 0
+
+    @property
+    def __class__(self):
+        type(self).class_reads += 1
+        raise RuntimeError('proxy class lookup is not the worker error')
+
+
+class ReducesToProxy(Exception):
+    def __init__(self, proxy_type):
+        self.proxy_type = proxy_type
+        super().__init__('original worker refusal')
+
+    def __reduce__(self):
+        return self.proxy_type, ()
+
+
+@pytest.mark.parametrize('proxy_type', [AdvertisedExceptionProxy, RaisingClassProxy])
+def test_decoded_proxy_class_cannot_replace_native_failure(proxy_type):
+    proxy_type.class_reads = 0
+    packed = packed_error(ReducesToProxy(proxy_type))
+    assert isinstance(packed[0], bytes)
+    with pytest.raises(WaveWorkerError) as caught:
+        pw.relay(payload(packed), country='Invented', table='toy')
+    assert caught.value.original_type == 'ReducesToProxy'
+    assert str(caught.value) == 'ReducesToProxy: original worker refusal'
+    assert packed[3] in caught.value.__notes__[-1]
+    assert 'Invented/failed/toy' in caught.value.__notes__[-1]
+    assert proxy_type.class_reads == 0
+
+
+class FalseValuedError(Exception):
+    def __bool__(self):
+        return False
+
+
+def test_false_valued_actual_exception_still_preserves_payload():
+    original = FalseValuedError('actual exception despite false truth value')
+    original.evidence = {'kind': 'native', 'missing': None}
+    original.add_note('existing false-valued note')
+    packed = packed_error(original)
+    with pytest.raises(FalseValuedError) as caught:
+        pw.relay(payload(packed), country='Invented', table='toy')
+    assert type(caught.value) is FalseValuedError and not caught.value
+    assert caught.value.args == original.args and caught.value.evidence == original.evidence
+    assert caught.value.__notes__[0] == 'existing false-valued note'
+    assert 'Invented/failed/toy' in caught.value.__notes__[-1]

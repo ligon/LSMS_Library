@@ -582,7 +582,7 @@ def relay(payload: dict, *, country: str, table: str) -> tuple[bool, Any]:
         except Exception:  # noqa: BLE001 -- preserve the original worker evidence
             exc = None
         where = f"{country}/{payload['wave']}/{table}"
-        if not isinstance(exc, BaseException):
+        if not issubclass(type(exc), BaseException):
             # A custom reducer may load successfully but return a nonexception.
             # Not a RuntimeError: the derived-table paths and the v-join read those
             # as a failed derivation and try something else (GH #1524).
