@@ -15,7 +15,7 @@ from pandas.testing import assert_frame_equal
 from lsms_library import local_tools
 from lsms_library.countries.Nigeria._ import nigeria
 from lsms_library.paths import countries_root
-from test_gh1537_aggregate_diagnosis import curation, prices, relabel
+from tests.test_gh1537_aggregate_diagnosis import curation, prices, relabel
 from lsms_library.country import LabelPassThroughError, LabelPassThroughWarning
 
 
