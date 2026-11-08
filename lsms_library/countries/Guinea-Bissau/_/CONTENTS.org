@@ -759,3 +759,21 @@ an explicit later resolution in the community-prices note; it is not
 reopened here. No sample/strata/weights/defaults change: 2018-19 still
 wires region alone, and 2021-22 is registered but unwired at this source
 pin. Exact document identities are in the GH #1575 evidence packet.
+
+* 2026-11-08 — original EHCVM2018 BID managed holding (GH #1575)
+
+The own original2018/19 Basic Information Document, a separate source from
+the second-edition BID discussed above, is now held at =2018-19/Documentation/basicinformationdocument_gnb.pdf=
+through its normal managed DVC sidecar. A fresh same-source reader tree,
+empty private L1 and read-only profile retrieved the exact public original
+via normal =get_data_file=; verified 2026-11-08T20:45:27.792449+00:00.
+MD5 =1e0d877afa3d2b838debe1f8f7ceb95f=; 329823 bytes. Exact public source and
+SHA256 provenance are appended to =2018-19/Documentation/SOURCE.org=.
+
+This adds document availability only. Existing planned2018-design versus
+2021-cluster-revisit distinctions and all prior notes remain intact.
+The SAB urban-only qualification remains as documented.
+No sample, strata, native labels, weights, schema or defaults change.
+No new download, PDF parse, microdata read or source/table campaign was
+needed for this holding; the earlier document-check evidence is reused.
+See =.coder/ledger/1575-three-public-bids-managed-ingestion.md=.

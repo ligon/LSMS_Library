@@ -882,3 +882,21 @@ remains =2018= with =Data1/= sources; 2021-22 is registered but unwired
 at this source pin. Household strata are separate from the price/NSU
 market samples. Geographic reconciliation and wiring require their own
 scope; exact document identities are in the GH #1575 evidence packet.
+
+* 2026-11-08 — original EHCVM2018 BID managed holding (GH #1575)
+
+The own original2018/19 Basic Information Document, a separate source from
+the second-edition BID discussed above, is now held at =2018/Documentation/basicinformationdocument_tgo.pdf=
+through its normal managed DVC sidecar. A fresh same-source reader tree,
+empty private L1 and read-only profile retrieved the exact public original
+via normal =get_data_file=; verified 2026-11-08T20:42:29.183666+00:00.
+MD5 =42ff0272d615674fde2f748e0639077e=; 344466 bytes. Exact public source and
+SHA256 provenance are appended to =2018/Documentation/SOURCE.org=.
+
+This adds document availability only. Existing planned2018-design versus
+2021-cluster-revisit distinctions and all prior notes remain intact.
+The Lomé Commune versus Grand Lomé domain/version discrepancy remains unresolved.
+No sample, strata, native labels, weights, schema or defaults change.
+No new download, PDF parse, microdata read or source/table campaign was
+needed for this holding; the earlier document-check evidence is reused.
+See =.coder/ledger/1575-three-public-bids-managed-ingestion.md=.
