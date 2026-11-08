@@ -9230,10 +9230,18 @@ def _normalize_dataframe_index(
     # Aggregate duplicates if any remain
     if not df.index.is_unique:
         present_levels = [lvl for lvl in declared if lvl in df.index.names]
+        from .feature import _ADDITIVE_MEASURE_COLUMNS, _numeric_additive_operands
+        additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
+        present_additive = [c for c in (additive or ()) if c in df.columns]
         # Convert unordered categoricals to strings so the groupby below works
         for col in df.columns:
             if hasattr(df[col], 'cat') and not df[col].cat.ordered:
-                df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
+                if col in present_additive:
+                    # Preserve real NA separately from literal 'nan'/'None':
+                    # the checked operand path must refuse those tokens.
+                    df[col] = df[col].astype('string')
+                else:
+                    df[col] = df[col].astype(str).replace({'nan': pd.NA, 'None': pd.NA, '<NA>': pd.NA})
         # GH #514/#323: collapsing a non-unique canonical index silently
         # DISCARDS the dropped rows.  For additive-measure tables
         # (food_acquired, whose source legitimately records the same item across
@@ -9243,10 +9251,6 @@ def _normalize_dataframe_index(
         # one observed row of the group (GH #871).
         # Single source of truth for the additive column map lives in feature.py
         # (imported lazily to avoid an import cycle).
-        from .feature import _ADDITIVE_MEASURE_COLUMNS
-        additive = _ADDITIVE_MEASURE_COLUMNS.get(table_name) if table_name else None
-        present_additive = [c for c in (additive or ()) if c in df.columns]
-
         # GH #323: AUDIT BEFORE DESTROYING.  This is the only moment at which the
         # evidence exists -- one line further down the dropped rows are gone, and
         # the parquet we cache is written from the collapsed frame, which is why
@@ -9337,7 +9341,9 @@ def _normalize_dataframe_index(
             # double: measured on GhanaLSS 1998-99 `food_acquired`, 392 of
             # 161,176 groups differ, at a maximum relative difference of 4e-16.
             # Column totals, the NA pattern and every dtype are unchanged.
-            grouped = df.groupby(level=present_levels, observed=True)
+            numeric = _numeric_additive_operands(
+                df, present_additive, f"{country or '?'}/{table_name}")
+            grouped = numeric.groupby(level=present_levels, observed=True)
             sums = grouped[present_additive].sum(min_count=1)
             overlay = {c: sums[c] for c in present_additive}
             if _DERIVATION_COLUMN in df.columns:
