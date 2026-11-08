@@ -125,3 +125,14 @@ before any classifier inference; failures remain separate source-specific eviden
 
 No policy choice is needed for the authorized diagnosis. Any load-bearing
 ambiguity stops only that interpretation while independent accounting continues.
+
+### First capture attachment failure
+
+Deterministic source41017793/frozen8ac42ed6 exited1 before any projection/getter:
+the diagnostic tried to patch nonexistent Country.load_dataframe_with_dvc (it is
+a nested closure).0reader roles/0Stata parses/0sources were captured; credential
+copy was removed. Staging10bindings, failed logs and terminal custody remain.
+Correct the diagnostic to trap actual Country/Feature construction plus existing
+writers, add a hermetic attachment check, and use a separately frozen cold
+continuation under the same exact six+four source grant. This changes no library,
+guard, permission policy or input set, and cannot be claimed as a source failure.
