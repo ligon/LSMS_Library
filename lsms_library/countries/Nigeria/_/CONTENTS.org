@@ -4017,3 +4017,41 @@ units pool into the panel's kg factors (GH #1487).
 *Borno.*  BID Box 1, PDF p. 11: the Borno sample has a different frame and weights and "is not
 representative of the state and must be treated separately from the data of the other states."
 No =population.yml= row was added: the wave has no API label yet.
+
+* W3 shipped harvest factors: opt-in bridge audit, not a reported factor (GH #1518)
+
+The native A3i harvest source =2015-16/Data/secta3i_harvestw3.dta=
+(MD5 =aaff46107fa1940949cb8cb84e1f1747=) keeps the full =cropid=/
+=production_obs= line grain. The separate published =Data/ag_conv_w3.dta=
+(MD5 =188456c9f0a97592d4e40dc6de36ea0b=) has crop/unit/zone mass candidates;
+the size-coarsened served =u= is unsuitable as its lookup key. This does not
+change the existing note "W1--W3 are all-NaN because the column does not exist
+in the source": that note concerns *reported per-row KgFactor*. "A factor
+belongs to the quantity block it was asked beside" remains binding.
+
+The separately opt-in =native_w3_harvest_kg= accepts admitted own numeric
+sources/cards, current crop labels and committed ID mappings. It requires an
+explicit national-versus-own-zone choice and keeps raw release positions, full
+native crop/unit codes and actual container sizes. It does not wire a default
+table, replace native quantities or select a scientific geography/default.
+
+On the exact held two-release artifacts and frozen implementation2323284b,
+all11956 native harvest rows retained their current pure-producer + once-walked
+PH2016Q1-ID key witness, including1690 quantity-missing lines;0 native rows were
+currently unserved in that bounded comparison. The711-row factor audit retains
+the original9 unit/card-conflict and7 fluid-basis holds. Those affect69 native
+conflict-pair rows and108 native fluid rows (177 total), withheld before every
+consumer layer/donor path. Both explicit geographies delegate11779 rows, with
+8892 shipped-factor and2887 unresolved-factor rows. Counts describe coverage,
+not scientific validity of published/borrowed/imputed container weights.
+
+No fluid density, conflicting bundle size, price-pooling or W1/W2 quantity-mode
+ruling follows. Actual final Country API/sales/PP/sample/v/Make/warm/yield routes
+were not exercised by this pure-producer witness. Keep those limits and the
+existing valuation caveat "Do not sum median_price_valuation over W3".
+
+Tracked contract and gate record: =.coder/ledger/1518-nigeria-safe-harvest.md=
+and [[https://github.com/ligon/LSMS_Library/pull/1622][PR #1622]]. Durable source evidence:
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1518-nigeria-sealed-correspondence-v2-20261108/REPORT.md=,
+with =RESULT.json= and =STAGE-RECEIPT.json= in the same directory. The source
+audit contains every original row; private outputs/IDs are not published here.
