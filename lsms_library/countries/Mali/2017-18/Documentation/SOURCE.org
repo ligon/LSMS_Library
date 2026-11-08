@@ -12,3 +12,13 @@ https://microdata.worldbank.org/index.php/catalog/3409
 #+PROVENANCE_SOURCE: worldbank
 #+PROVENANCE_METHOD: source-url
 #+PROVENANCE_RECORDED: 2026-07-12
+
+* Additional public documentation: English Basic Information Document
+
+- Survey :: Enquête Agricole de Conjoncture Intégrée aux Conditions de Vie des Ménages 2017 (EAC-I 2017), catalog 3409, MLI_2017_EAC-I_v03_M.
+- Document :: English Basic Information Document, catalog resource 47785, official filename =bid_eaci17.pdf=.
+- Public source :: https://microdata.worldbank.org/catalog/3409/download/47785
+- Original retrieval :: 2026-11-08T13:52:56Z; one public HTTP response, no authentication or redirect, application/octet-stream attachment with this filename.
+- Physical bytes :: 1223133; MD5 =a3c822057e8eb09ab756b82095595332=; SHA256 =33423a38c73f5459b102ecd7e1eb6f9e830346e839119d2085c71a6730b3e2c0=.
+- Managed holding verified :: 2026-11-08T18:19:35.897403+00:00; generated single-file DVC sidecar and fresh normal read-only get_data_file retrieval matched the original bytes. Existing catalog directives and LICENSE.org remain unchanged.
+- Evidence limits :: Closed text extraction read 32 pages; no complete 51-stratum code list was located by that bounded search. Visual table confirmation remains pending; this is no claim that a list is absent from images or tables, and no stratum mapping or weight change.
