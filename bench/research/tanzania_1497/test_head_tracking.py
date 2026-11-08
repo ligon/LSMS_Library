@@ -5,6 +5,8 @@ import warnings
 
 import pandas as pd
 import pytest
+from lsms_library import local_tools as LT
+SANCTIONED_GETTER=LT.get_dataframe
 
 
 @pytest.fixture(scope='module')
@@ -103,3 +105,23 @@ def test_capture_tripwires_attach_to_actual_public_targets_without_source_call()
                        lambda:pd.read_parquet('invented.parquet'),
                        lambda:pd.DataFrame().to_parquet('invented.parquet')]:
             with pytest.raises(AssertionError,match='build-writer-tripwire'):action()
+
+
+def test_sanctioned_dta_probe_is_real_and_confined_to_bound_stream(tmp_path):
+    from contextlib import ExitStack
+    import lsms_library
+    from lsms_library import local_tools
+    from bench.research.tanzania_1497.capture import attach_build_tripwires,confined_dta_probe,digest
+    path=tmp_path/'invented.dta';pd.DataFrame({'value':[1,2]}).to_stata(path,write_index=False)
+    item={'path':'Invented/only.dta','md5':digest(path,'md5')};current={'source':item['path'],'role':'numeric'};records=[]
+    probe=confined_dta_probe(pd.read_parquet,{path.resolve():item},current,records,local_tools._is_stata_dta)
+    def refuse(*a,**k):raise AssertionError('unrelated IO/build forbidden')
+    with ExitStack() as stack:
+        attach_build_tripwires(stack,lsms_library,local_tools,pd,refuse,probe)
+        out=SANCTIONED_GETTER(path,convert_categoricals=False)
+        assert out.value.tolist()==[1,2]
+        assert len(records)==1 and records[0]['md5_binding']==item['md5']
+        with pytest.raises(AssertionError,match='parquet/cache path'):pd.read_parquet(tmp_path/'cache.parquet')
+        other=tmp_path/'other.dta';other.write_bytes(path.read_bytes())
+        with other.open('rb') as stream:
+            with pytest.raises(AssertionError,match='unbound parquet/cache'):pd.read_parquet(stream)

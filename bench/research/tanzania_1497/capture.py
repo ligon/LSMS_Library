@@ -17,13 +17,29 @@ def digest(path,algorithm='sha256'):
     return h.hexdigest()
 
 
-def attach_build_tripwires(stack,library,local,pandas,forbidden):
+def attach_build_tripwires(stack,library,local,pandas,forbidden,parquet_probe=None):
     """Actual public construction/writer targets, not the nested loader closure."""
     stack.enter_context(patch.object(library.Country,'__init__',forbidden))
     stack.enter_context(patch.object(library.Feature,'__init__',forbidden))
     stack.enter_context(patch.object(local,'to_parquet',forbidden))
-    stack.enter_context(patch.object(pandas,'read_parquet',forbidden))
+    stack.enter_context(patch.object(pandas,'read_parquet',parquet_probe or forbidden))
     stack.enter_context(patch.object(pandas.DataFrame,'to_parquet',forbidden))
+
+
+def confined_dta_probe(original,allowed,current,records,is_stata):
+    """Retain the sanctioned reader's format probe only on bound DTA streams."""
+    def probe(stream,*args,**kwargs):
+        assert hasattr(stream,'read') and hasattr(stream,'seek'),'parquet/cache path prohibited'
+        name=getattr(stream,'name',None)
+        assert name is not None,'parquet/cache path prohibited'
+        path=Path(name).resolve();binding=allowed.get(path)
+        assert binding is not None,'unbound parquet/cache stream prohibited'
+        assert current.get('role') in ('numeric','categories') and current.get('source')==binding['path']
+        cursor=stream.tell();head=stream.read(64);stream.seek(cursor)
+        assert is_stata(head),'only a bound Stata format probe is permitted'
+        records.append({'source':binding['path'],'role':current['role'],'private_stream':str(path),'md5_binding':binding['md5']})
+        return original(stream,*args,**kwargs)
+    return probe
 
 
 def main():
@@ -51,16 +67,30 @@ def main():
     (config/'config.yml').write_text('data_dir: '+str(data)+'\n')
     report=Path(os.environ['TANZANIA1497_REPORT']).resolve();report.mkdir(mode=0o700,parents=True,exist_ok=False)
     result={'head':head,'production_base':spec['production_base'],'job':os.environ['SLURM_JOB_ID'],
-            'staging':[],'sources':[],'errors':[],'reader_roles':[],'stata_read_returns':[]}
+            'staging':[],'sources':[],'errors':[],'reader_roles':[],'stata_read_returns':[],
+            'natural_dta_parquet_probes':[],'new_source_projections':0}
     try:
         import yaml
-        for item in spec['sources']:
+        recovery=Path(os.environ['TANZANIA1497_RECOVER']).resolve() if os.environ.get('TANZANIA1497_RECOVER') else None
+        old=None
+        if recovery:
+            old=json.loads(Path(str(recovery)+'.terminal.json').read_text())
+            assert old['head']=='5130f40980312002edb4fb70db09a3a386a72ee4' and old['job']=='41017803' and old['exit_code']==1
+            assert old['credential_copy_absent']
+            result['recovery']={'closed_job':old['job'],'head':old['head'],'no_new_projections':True}
+        for n,item in enumerate(spec['sources']):
             p=w/'lsms_library/countries'/item['path']
             side=yaml.safe_load(Path(str(p)+'.dvc').read_text())['outs'][0]
             assert side['md5']==item['md5'] and side['size']==item['size'],item['path']
             relative=Path(item['md5'][:2])/item['md5'][2:]
-            origin=next((p for p in [shared/relative,shared/'files/md5'/relative] if p.is_file()),None)
-            entry={'source':item['path'],'md5':item['md5'],'bytes':item['size'],'shared_blob_present':origin is not None}
+            if recovery:
+                rel='private-originals/'+f'{n:02d}-'+Path(item['path']).name
+                origin=recovery/rel
+                assert digest(origin)==old['files'][rel]['sha256']
+            else:origin=next((p for p in [shared/relative,shared/'files/md5'/relative] if p.is_file()),None)
+            entry={'source':item['path'],'md5':item['md5'],'bytes':item['size'],
+                   'shared_blob_present':None if recovery else origin is not None,
+                   'origin_kind':'terminal-hashed-private-original' if recovery else 'sharedL1'}
             if origin:
                 before=(origin.stat().st_size,origin.stat().st_mtime_ns,digest(origin,'md5'))
                 assert before[0]==item['size'] and before[2]==item['md5']
@@ -68,7 +98,8 @@ def main():
                 shutil.copyfile(origin,target);target.chmod(0o444)
                 assert digest(target,'md5')==item['md5']
                 assert before==(origin.stat().st_size,origin.stat().st_mtime_ns,digest(origin,'md5'))
-                entry['physical_private_copy']=True;entry['shared_unchanged']=True
+                entry['physical_private_copy']=True
+                entry['closed_original_unchanged' if recovery else 'shared_unchanged']=True
             result['staging'].append(entry)
         import lsms_library
         from lsms_library import local_tools, data_access
@@ -82,6 +113,12 @@ def main():
                             'data_root':str(data),'countries_root':str(countries_root()),'config':str(config)}
         def forbidden(*args,**kwargs):raise AssertionError('WB/acquisition/API/Make/parquet forbidden in1497 capture')
         current={}
+        allowed={}
+        for item in spec['sources']:
+            if item['kind']=='dta':
+                rel=Path(item['md5'][:2])/item['md5'][2:]
+                allowed[(l1/rel).resolve()]=item
+                allowed[(l1/'files/md5'/rel).resolve()]=item
         previous=sys.getprofile()
         def observe(frame,event,arg):
             if previous:previous(frame,event,arg)
@@ -96,14 +133,19 @@ def main():
             for name in providers:
                 if hasattr(data_access,name):stack.enter_context(patch.object(data_access,name,forbidden))
             import pandas as pd
-            attach_build_tripwires(stack,lsms_library,local_tools,pd,forbidden)
+            probe=confined_dta_probe(pd.read_parquet,allowed,current,result['natural_dta_parquet_probes'],local_tools._is_stata_dta)
+            attach_build_tripwires(stack,lsms_library,local_tools,pd,forbidden,probe)
             for n,item in enumerate(spec['sources']):
                 current.clear();current.update(source=item['path'],role='projection')
                 entry=dict(item);slug=f'{n:02d}-'+Path(item['path']).name
                 try:
-                    projected=data_access.get_data_file(item['path'])
+                    if recovery:projected=recovery/'private-originals'/slug
+                    else:
+                        projected=data_access.get_data_file(item['path'])
+                        result['new_source_projections']+=1
                     assert projected is not None,'sanctioned source projection unavailable'
-                    projected=Path(projected).resolve();assert projected.is_relative_to(data)
+                    projected=Path(projected).resolve()
+                    assert projected.is_relative_to(recovery if recovery else data)
                     assert projected.stat().st_size==item['size'] and digest(projected,'md5')==item['md5']
                     original=report/'private-originals'/slug;original.parent.mkdir(mode=0o700,exist_ok=True)
                     shutil.copyfile(projected,original);original.chmod(0o400)
