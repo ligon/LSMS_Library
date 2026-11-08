@@ -580,6 +580,52 @@ _ADDITIVE_MEASURE_COLUMNS = {
 }
 
 
+def _numeric_additive_operands(df: pd.DataFrame, columns: list[str],
+                               context: str) -> pd.DataFrame:
+    """Prepare consumed text operands without changing numeric inputs (GH1499).
+
+    Reuse pandas' numeric grammar, but never turn a nonmissing token into NA.
+    This is a view for the existing sums, not a schema or categorical cast;
+    the caller's frame, selection and audit still describe its original rows.
+    See .coder/ledger/1499-numeric-additive-collapse.md §§3–5.
+    """
+    if df.index.is_unique:
+        return df
+    converted = {}
+    for column in columns:
+        values = df[column]
+        if pd.api.types.is_numeric_dtype(values.dtype):
+            continue
+        textual = any(isinstance(value, (str, bytes)) for value in values)
+        if isinstance(values.dtype, pd.CategoricalDtype):
+            if not values.notna().any():
+                textual = any(isinstance(value, (str, bytes))
+                              for value in values.cat.categories)
+        else:
+            textual |= (pd.api.types.is_string_dtype(values.dtype)
+                        and not pd.api.types.is_object_dtype(values.dtype))
+        if not textual:
+            # In particular, object-carried numbers can exceed the parser's
+            # range or carry decimal precision. Keep their values and errors.
+            continue
+        message = (f"{context}: cannot aggregate {column!r}; "
+                   "nonmissing additive values must be numeric")
+        try:
+            numeric = pd.to_numeric(values, errors="raise")
+        except (TypeError, ValueError):
+            raise ValueError(message) from None
+        if (numeric.isna() & values.notna()).any():
+            # errors='raise' alone accepts empty text as newly missing.
+            raise ValueError(message)
+        converted[column] = numeric
+    if not converted:
+        return df
+    out = df.copy()
+    for column, values in converted.items():
+        out[column] = values
+    return out
+
+
 def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
                               country: str | None = None) -> pd.DataFrame:
     """Collapse duplicate index tuples left after dropping an extra index level.
@@ -666,7 +712,9 @@ def _collapse_duplicate_index(df: pd.DataFrame, table_name: str,
     # max rel 4e-16, with totals, NA pattern and dtypes unchanged).  That is a
     # behaviour change #871 did not ask for; see the full note at
     # country._normalize_dataframe_index (GH #871).
-    grouped = df.groupby(level=levels, observed=True)
+    numeric = _numeric_additive_operands(
+        df, present, f"{country or '?'}/{table_name}")
+    grouped = numeric.groupby(level=levels, observed=True)
     sums = grouped[present].sum(min_count=1)
     overlay = {c: sums[c] for c in present}
     if _DERIVATION_COLUMN in df.columns:
