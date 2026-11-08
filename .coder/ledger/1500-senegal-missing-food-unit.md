@@ -76,8 +76,9 @@ have different historical denominators; neither is a new measurement.
   Operate on the helper's output, which is already distinct from the input.
 - Use MultiIndex levels/codes to avoid resetting unrelated axes or stringifying
   present units. Add the sentinel category if a categorical `u` needs it.
-- Detect newly coalescing full keys and raise with a source-free message;
-  preserve pre-existing duplicates and do not aggregate or weaken grain guards.
+- Preserve all rows, payload and order when missing-unit relabelling creates
+  duplicate full keys; do not aggregate, drop or add an unconditional refusal.
+  Existing downstream grain policy remains unchanged. See the scope correction below.
 - Keep all other hooks, 2021 source, shared framework, registry, crosswalks,
   dependencies and existing tests byte-exact. Product paths are only those in
   REPAIR-CONTRACT.md. Country documentation is a dated append, never a rewrite.
@@ -91,7 +92,7 @@ have different historical denominators; neither is a new measurement.
 | Missing-unit meaning | reuse | Import `U_UNKNOWN`; no new sentinel or inference |
 | Purchase/production/gift and NSU computations | reuse | Existing live shared helper owns them |
 | Output label repair | extend | Only the wave-local live return boundary needs it; Niger's broad helper changes more types |
-| Collision visibility | extend | Refuse two distinct old full keys becoming one; do not introduce a reducer |
+| Collision transport | reuse | Preserve all rows and duplicate full keys; existing downstream grain policy owns any later treatment |
 | Focused evidence | new | Required new test module; invented literal oracles plus explicitly stubbed NSU/label boundaries, UNRUN |
 | Cache behavior | reuse | Anticipate Senegal-only invalidation, all its country tables and 2018 wave tables; no shared schema bump |
 
@@ -108,8 +109,10 @@ existing absolute QUESTIONS_FROM_AGENT.txt only if one arises.
 
 - `food_acquired` — OK **statically**, anchored on §§2–5: the upstream helper
   call and its arguments are AST-identical; the only new behavior follows its
-  return. The repair changes only `out.index`, fills missing `u` codes, and
-  rejects newly coalescing full keys. No payload computation was added.
+  return. The original frozen revision changed only `out.index`, filled missing
+  `u` codes, and rejected newly coalescing full keys. That last refusal was an
+  availability regression, corrected by the superseding scope below; it was
+  never mandated by ROOT. No payload computation was added.
 - `U_UNKNOWN` — OK **statically**, anchored on §§2–3: imported existing string
   constant, source literal `'Unknown'`; no new spelling or helper/estimator.
   No REINVENTION of NSU, valuation, size, canonical reshape or inference.
@@ -147,3 +150,26 @@ existing absolute QUESTIONS_FROM_AGENT.txt only if one arises.
   real NSU/Org, getter, parquet/cache/DVC/Make, warm/hash census, full CI,
   independent reviewer or GitHub operation was run. Those remain coordinator
   gates. The source-only deliverable is complete; acceptance remains pending.
+
+### 2026-11-08 — superseding collision-contract correction
+
+ROOT clarified that the reviewed instruction to “expose” newly colliding full
+keys never mandated an unconditional `ValueError`. The original author chose
+that refusal; it rejects an otherwise valid label-only return and is an
+availability regression. The original `a3cd05a5` source, native exit 0, supervisor
+74 and missing `country-grounding.json` publication remain immutable history.
+
+The authorized revision removes only that four-line guard. It retains the
+filled index and every row, value, order and attribute, including newly duplicate
+full keys. It adds no warning, reducer or downstream grain-policy change. Both
+new collision test parameters will require literal returned rows/payload/order
+and input immutability. All existing repository tests and independent reviewer
+oracles stay unchanged. No runtime is authorized for this revision.
+
+Grounding: the coordinator's personal full 1,083-line country read is authenticated
+by exact prefix SHA256 `e95ffaeef89c9388c7f5b1c01ce532433457771d0173732dbe3185e522bf4585`;
+all 25 appended lines were then read. The 1,108-line document SHA256 before this
+revision is `77513331e247187fc96f63b49c7d4a95a7103578a102166e9bee3876240e234f`. The mojibake
+crosswalk warning and the recorded 2021-22 conversion-table contradiction remain
+unchanged. The appended statement that the hook refuses collisions is a statement
+of the old implementation, superseded explicitly by the new country correction.
