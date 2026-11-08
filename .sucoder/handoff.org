@@ -1,4 +1,82 @@
 #+title: Handoff, LSMS-ISA sweep
+* Authoritative checkpoint, 2026-11-08 02:06 UTC
+This goal turn PROGRESS:1535+1480 reviewed green PRs merged, both issues closed;
+Nigeria nullable diagnostic P2 independently closed; all-country metadata overlay
+and root receipts refreshed;1603concrete ledger/design approved;1560packet ready.
+Goal ACTIVE. GitHub developmentc780562b299bb100cdd006037ba424c8ad3264e9.
+Filesystem development111b stale/untouched; main docs branch has no product edits.
+
+Nine ORIGINAL snapshot issues CLOSED through eight development merges:
+1452/1590/1510/1475/1517/1528/1174/1535/1480. Fresh paginated all-repo list177open
+versus182snapshot,4new residuals1598/1602/1603/1606. These are NOT ISA-only counts.
+Original owner scope147uniqueIDs=138open/9closed/0unknown; shared/context scopes
+overlap, no country-total sum or fresh scientific assessment claim. Immutable
+country assessments at8558 retained; metadata overlays and closed-nine receipts
+in B/country-workers-20261107. Registry and COORDINATOR updated.
+
+1535 MERGED PR1608 as72197c8eeccde679673ef3561204d39666c5dfea, closed completed;
+root publication/merge proof in1535report.1480 MERGED PR1609 as c780562b2,
+parents72197+b25e842f36ad81982558452d83d0b67322763d5f. Actual tree
+ed5f6804341f393d99502e8f878d66cd7a406c9b EXACT separately tested prospective
+3fc44dc209fa06a2db45e3d7a61f011f2b0e3e2c. Its root private/no-network combined
+89pass/53credential-skip run154.60s/157.30swrapper; both head/clean stable. Nine
+Uganda task paths and four incoming1535paths disjoint/exact, baseline unchanged.
+Finalb25 GitHubunitSUCCESS10m58s/WindowsSUCCESS2m14s, source/DVC/docsSKIPPED,
+reviews/threads empty.1480CLOSED completed exactbody readback. Root publication,
+ROOT-ACTUAL-MERGE and ROOT-COMPOSITION-BYTE-PROOF in1480report. Author report/
+scientific operands remain frozen; no repeated source/fullsuite after composition.
+PTY17269 combinedactor CLOSED0; docscommitPTY76712 CLOSED0/published082418368.
+
+1602 source-free full offline job41017138 now COMPLETED0:0/24:46, verified sacct
+at02:05UTC. Author must authenticate actual pytest summary/head/clean terminal
+receipts before final-green claim. Independent finish_1590:137controls nearing
+completion, actual one-expression AST delta/global450table/1877wave/35build,
+0import scope confirmed. No P1/P2 reported yet; final verdict pending.
+Count clarification REQUIRED in additive final packet:526previously missed
+feature/source bindings dedup421paths/415MD5s with at least one missed binding;
+12paths/MD5s already reachable via another old binding, so GLOBALoldunion gains
+409paths/403MD5s. Original census frozen; no rerun needed. After all actors
+close, author final docs/ordinary currentbase composition/freeze, root review,
+GitHub final-head checks, expected-head merge+manual closure remain. No actual
+source-acquisition speed/availability claim; broad invalidation is disclosed.
+
+1603 authorfinish_1452 ledger236a217732e855470d2821193750239a3a1849b2 rooted
+atfresh72197, root read full ledger/lookup/extraction and APPROVED concrete design.
+Warn only nonempty unqualified shipped table on >1nonmissing explicit country
+labels; index precedence; no attrs/default/factor/value/rank/counter change;
+ambiguity refusal before warning-as-error; existing diagnostics coexist. Author
+implementing source-free controls; no frozen1602/1502 artifact changes.
+
+1502 additive final-decision-packet-20261108 published externally, investigation
+COMPLETE/P2CLOSED/POLICYHELD.23author and26independent controls overlap; do NOT
+sum as49distinct. Corrected helper0f024d081ca8ed71710ac07cdd8eab1cf06f5c18dd0b9901502c7967858b598e;
+four counterfactual inputs/attrs unchanged, old61reports+62raw1.564GB hashes exact.
+Root read independent CLOSURE.md. No production table/national-zone/density/
+pooling/eligibility/default choice. Original wrong read-cost prose retained with
+addenda (categories_only internally FULLparses), no replay/dependency change.
+
+1560/1571 authorfrozen8283ad309120e34f2e9822c3a3eee7651de49f8f, clean own branch
+investigate/1560-sold-kilograms-20261108, filesystemref exact. REPORT/DECISION-
+PACKET/PROPOSED-COUNTRY-NOTES rootreadFULL.6focusedpass/2.76s;46recoveryfiles
+rehash;4nativeframes exact;133reportmanifest artifacts. Library/tests/Make/deps
+byte exact8505. No actual Default/Make/Feature/publicID/warm/fullCI claimed.
+Both2021 Niger/Mali vagues conflict per-ONE-UML form versus TOTAL labels; metric
+records total-like does NOT prove CAPI/export multiplication. Raw9999/99999/zero/
+firstcycle-vs-valuewindow and sixdrysaleNON/oneOUI cases remain unresolved.
+Niger2014+2021Farm-level raw-denominator sensitivity251/1051->1041/1051 is
+support only, NOT approved scientific prices. Independent finish_1590 queued
+AFTER1602review: closed-data/retained-text only, no source/native/API/PDF cohort
+replay. Author malawi_revision_food assigned NEWdocs-only currentbase branch to
+record these genuine country caveats/questions, preserve8283 and artifacts,
+freeze/proposePR before rootpublication; then propose next high-impact country
+task with fresh dedup, no implementation until scoped. No producer contact.
+
+All scientific holds/incident/failure qualifications below remain. No master
+release or planned shared-cache rewarm. Mainroot/actors use explicit private
+roots, mounted interpreter, falsecreds/unshare/BLAS1 where data not authorized.
+Next:1602terminal receipts+verdict/finalpublication;1603frozencontrols/review;
+1560independent review/countrydocs then concise ruling packet;next country queue.
+
 * Authoritative checkpoint, 2026-11-08 01:59 UTC
 PROGRESS:1535 PR1608 MERGED and issue CLOSED completed, exact readback;
 development72197c8eeccde679673ef3561204d39666c5dfea. Actual merge parents8505+d861,
