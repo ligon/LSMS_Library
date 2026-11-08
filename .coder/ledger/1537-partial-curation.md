@@ -166,3 +166,28 @@ Existing candidate tests already pin exactly two blankCode/eightblankquarter
 alias rows; no duplicate representation cohort is added. Independent21
 actualmetadata controls remain closed. New affected proof/fullCI remain
 unexecuted pending separately frozen operator/rootreview.
+
+
+### ROOT partial-publication checkpoint — 2026-11-08 13:13 UTC
+
+This change curates only the two label-only Groundnuts and Maize(shelled) aliases.
+The exact baseline Org is a portable committed fixture. Author29 controls and
+independent21 controls passed, including the actual guarded codebook cascade,
+all8quarter maps and full-grain price/value preservation. Generic Pepper remains
+unqualified and issue1537 remains open; no Fresh/Dry interpretation is supplied.
+
+First fullCI41024214 failed in the old expected-map comprehension's int(NaN),
+before either decoder assertion. Test-only5495663 adds pd.notna(code) while
+retaining the exact integer conversion, label filters and both complete-map
+assertions. Three additional affected controls passed: corrected actual candidate,
+original function on exact baseline metadata, and the original blank-code failure
+before any decoder call. The failed full run remains immutable. No production or
+Org bytes changed in that correction.
+
+The candidate metadata/API gates passed with20country-table and200wave fingerprint
+changes, allNigeria; other metadata and18None cells remain unchanged. This is a
+partial curation proof, not an actual source/table API campaign. Full configured
+offlineCI41024407 on corrected5495663 is RUNNING at this dated checkpoint. Final
+validation/publication decisions belong in the PR body and the corresponding
+ROOT receipts. Publication adds only this ledger checkpoint; all code/test
+objects remain frozen. Shared-cache rebuilding and master release remain deferred.
