@@ -199,3 +199,73 @@ The old64PASS and independent9PASS3FAIL remain separate immutable records. New
 independent closure is still required; no final no-P1/P2 or fullCI claim follows
 from these own24passes. Ethiopia's19case preparation remains unexecuted until
 this frozen revision is handed back to the independent reviewer per ROOT.
+
+
+## Final current-development verification (2026-11-08)
+
+This addendum extends the frozen author/reviewer statuses above. All original
+negative and failed actor receipts remain preserved; no runtime/test/config
+change follows this ledger-only finalization.
+
+Independent original89aba review ran12 distinct cases:9passed/3failed,
+confirming one P2 validation defect. An unpickled nonexception may advertise
+__class__=ValueError or raise while __class__ is read; isinstance then either
+accepts a proxy or raises a different exception. Runtime901870dab635c8545a3b64a5462165b6963e4f70
+changes only that predicate to issubclass(type(exc),BaseException). Two proxy
+regressions and a false-valued actual-exception case were appended, preserving
+all prior test bytes. The bounded author affected run passed24cases;43old
+unaffected cases were not replayed. Final6a53b2bf8c207c34ed558b8a7d132b233cc92126
+is ledger-only over901. Original64authorPASS and independent9P3F remain.
+
+Independent affected closure ran7cases on6a53:6passed; the remaining synthetic
+sideeffects case reached its warning assertion for the first time and failed
+because its invented filename had no loaded module under the unchanged emitter.
+A separate v3 changed only that filename to actual __file__, retained all
+assertions and witnessed the loaded origin before the test. That one case
+passed, reaching warning/all4ledgers/payload-immutability assertions. Original
+9P3F and6P1F remain immutable; unknown-origin warning behavior is not silently
+changed or adjudicated by this fixture correction. These are12 original unique
+boundaries and7 affected closures, with1of those7 rerun after origin correction,
+not additional19/20 unique controls. No open P1/P2 remains in the selected scope.
+No source-backed occurrence or universal warning-transport claim follows.
+
+Ordinary current composition a889d105ddde9117c7d2fcdfb1cc2bef284677c6 has parents
+6a53 and developmentbb828626f51ba04c65298f715c7c0f092b5583d2. Six owned and four
+incoming1578 paths are disjoint; all19115 mode/type/blob entries match their
+exact union with no manual runtime changes or rebase.
+
+Candidate-only metadata census closed0 in123.160200s under private roots,
+false source credentials and network isolation:0/450country,0/1895wave,
+0/35build and0/186import fingerprints changed; public553/2313/39 surface and
+18None cells match. The closeda711 map/header is retained and ROOT admitted
+currentbb through its ledger-only difference from tested a711. No baseline
+actor was replayed. Guarded strict API audit closed0 in8.425532s. All guards
+were active with0denials/private data files0; these checks build no source table.
+
+Fresh configured full offline CI41022704 COMPLETED0:0 in13:48 on n0054.savio4:
+12126passed/5652source-gated skips/4xfailed in719.96s, JUnit17782cases with zero
+failures/errors. Whole tests directory, four loadfile workers, BLAS/build1,
+fresh mounted runtime, private own nonsymlink L1/L2/config, false credentials
+and unshare-rn were used. All17764 priora711 case IDs remain plus exactly18new
+1591 cases. Thus12108 prior passes+18new=12126;skip/xfail counts are unchanged.
+The44 incoming1578 cases are retained. The17720-case b834 complement is an
+inference from actual candidate JUnit, not a separately collected baseline.
+Source-gated skips establish no real-source scientific acceptance.
+
+Every own verification actor is closed; source head and all15operator files
+remain exact. Final head changes only this ledger after tested a889; GitHub
+publication/final-head checks and expected-head merge remain root-managed gates.
+
+Durable packet root:
+/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/
+-1591-wave-exception-relay-20261108 (original author and revision-p2 receipts)
+-review-1591-wave-exception-relay-20261108 (original9P3F)
+-review-1591-wave-exception-relay-closure-v2-20261108 (6P1F)
+-review-1591-wave-exception-relay-closure-v3-20261108 (origin-qualified1P)
+-1591-current-verification-20261108 (composition/metadata/API/fullCI/JUnit/counts)
+-1591-finalization-20261108 (root final-object/publication/merge receipts)
+
+No country/config/schema/source conversion, raw acquisition, real Country/Feature
+API/native/scientific Make/warm campaign, production-weight change, shared cache
+re-warm or master release is included. This Python wave-pool repair is distinct
+from the separate SuCoder native-worker infrastructure investigation.
