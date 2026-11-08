@@ -101,6 +101,17 @@ ZIP, with exact sidecars in proposed-documents.json. No read is authorized yet.
 Root may instead supply authenticated closed key-only captures with all required
 fields/metadata. Publish every denominator/refusal and a precise unresolved memo.
 
+Root has now explicitly GRANTED exactly the six remote-inventory DTA files and
+four proposed own PDFs, configured sanctioned readers and private600 credential
+copy/removal. Two missing EXT shared-L1 blobs may be fetched through the existing
+declared-DVC/S3 path; this is not source absence or new acquisition. Freeze one
+modest free --cold4CPU24G deterministic capture with physical privateL1, exact
+productionc780 identity,10 get_data_file projections (six DTA authenticated before
+parsing plus four PDF),six numeric andsix category getter roles (12 internal full
+Stata parses), no WB/acquisition fallback, and existing pypdfZIP after PDF magic/
+MD5 gates. Capture original bytes, complete metadata and numeric operands privately
+before any classifier inference; failures remain separate source-specific evidence.
+
 ## §6 Open scientific/source questions
 
 1. Does own previous-member number1 identify the actual NPS4 head on every case?
