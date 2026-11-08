@@ -29,6 +29,9 @@ s16cq12a asks the quantity ALREADY harvested.  On a line whose s16cq10 is 'Non' 
 is served as recorded and carries the window key
 Mali::crop_production::harvest-to-date (GH #1437).
 
+Condition_sold and condition_sold_native carry s16cq16c independently of the
+harvest state; the own five-code sold list uses the existing fold (GH1528).
+
 See mali.py, "crop_production: the EHCVM waves".
 """
 import sys
@@ -37,7 +40,7 @@ sys.path.append('../../_/')
 import pandas as pd
 
 from lsms_library.local_tools import get_dataframe, to_parquet
-from mali import (ehcvm_crop_condition_labels, ehcvm_crop_conditions,
+from mali import (ehcvm_crop_condition_labels, ehcvm_crop_conditions, ehcvm_crop_sold_conditions,
                   ehcvm_crop_labels, ehcvm_household_ids, ehcvm_intercropped,
                   ehcvm_plot_ids, ehcvm_unit_labels,
                   finish_ehcvm_crop_production, stamp_harvest_to_date)
@@ -56,6 +59,8 @@ df = pd.DataFrame({
     'Quantity_sold': src['s16cq16a'].values,
     'Unit_sold':     ehcvm_unit_labels(src['s16cq16b']).values,
     'Value_sold':    src['s16cq17'].values,
+    'Condition_sold': ehcvm_crop_sold_conditions(src_codes['s16cq16c']).values,
+    'condition_sold_native': ehcvm_crop_condition_labels(src['s16cq16c']).values,
     'intercropped':  ehcvm_intercropped(src['s16cq07']).values,
     'finished':      src['s16cq10'].values,
 })
