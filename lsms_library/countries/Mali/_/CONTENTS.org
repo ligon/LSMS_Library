@@ -3496,3 +3496,56 @@ recorded in =.coder/ledger/1576-mali-taoudenit.md=.  The earlier 14-cluster coun
 is the issue's source expectation, not a new measurement here; independent
 source/API/warm verification is a separate coordinator-managed gate.  No shared
 cache has been re-warmed by this implementation.
+
+
+* 2026-11-08 -- Sold kilograms: both own 2021 forms retain the label/instruction conflict (GH #1560)
+
+The earlier note, "The label of =s16dq05c= says a total and the questionnaire
+says per unit", remains unresolved. Both own vagues were authenticated in the
+bounded investigation frozen at =8283ad309120e34f2e9822c3a3eee7651de49f8f=
+(=investigate/1560-sold-kilograms-20261108=). Independent scientific review and
+a ruling are still needed; this note selects no carrier, default or price rule.
+
+The own source is =2021-22/Data/s16d_me_mli2021.dta=, byte MD5
+=445edd178dd9ea19a327c8d4b3827ead=:5068 unique household-crop records,1140
+nonmissing =s16dq05c=,1136 positive and4 zero, raw sum4873574, max1150000.
+The own released label says estimated TOTAL. Both forms under
+=2021-22/Documentation/= retain the per-ONE-UML instruction, while the header
+itself says total:
+
+| own PDF | PDF page (printed) / question | byte MD5 |
+|---------+-------------------------------+----------|
+| mli_ehcvm2_qnr_men_excel_vague1.pdf | 88 (87) / 16D05 | 6c5baa2aacbc74ee3385dd985a9687fb |
+| mli_ehcvm2_qnr_men_excel_vague2.pdf | 88 (87) / 16D05 | 3a3e729a65810bbe712a27dbc721ba7d |
+
+The own kg-unit controls equal reported sold quantity on495/495 records and
+kg equals1 on0 (all quantities differ from1). This supports total-like stored
+values, not an identified CAPI/export algorithm, nor proof about every other
+unit. No resolving cleaning/export program was located in the held declared-wave
+files or inspected official variable/related-material metadata; this bounded
+search does not establish global absence. Neither the form nor release label
+is dismissed as stale. Do not borrow another country's/wave's unit codes.
+
+All-source accounting found no positive kg-only record outside the current
+positive native quantity/value sale class. Four reported zero kg sit beside
+positive sold quantity; zero/missingness and very large totals remain their own
+unruled questions, with no clipping or guessed factor. Native quantity/value,
+units, states, eligibility and the1070 single-harvest-row/70 Farm-level sale
+placement are unchanged. This does not amend the separate EAC-I tree/window
+rulings. =KgFactor_sold= is per ONE unit, so a reported total must not be put
+there or divided by quantity to fabricate a factor.
+
+=Condition_sold= is a donor answer, not a harvest recipient state. Many sold
+answers occur beside unknown harvest state, including Farm-level sales. Raw-only
+national donor-state/recipient-state diagnostics materially change coverage;
+they select no unknown-state/fallback, price pool or scientific price estimate.
+A literal carrier and any opt-in consumer require separate decisions after the
+form/release conflict is resolved.
+
+Evidence and exact own-source/form custody:
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1560-sold-kilograms-investigation-20261108/=
+(=REPORT.md=, =DECISION-PACKET.md=, =receipts/artifact-manifest.json=).
+This docs addition reuses the closed packet and performs no source/API, parquet
+or PDF replay. The packet distinguishes raw diagnostics, composed native-script
+replay and unperformed Default/Make/Feature/warm/full-CI gates; its questions
+remain UNSENT and no producer contact occurred.
