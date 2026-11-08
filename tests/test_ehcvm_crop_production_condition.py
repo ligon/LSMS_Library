@@ -38,6 +38,7 @@ import yaml
 
 import lsms_library.local_tools as tools
 from lsms_library.paths import countries_root
+from lsms_library.ehcvm import crop_condition_codes, crop_condition_labels
 
 TABLE = "crop_production"
 SENTINEL = "unknown_condition"
@@ -118,7 +119,9 @@ def _helpers(country: str, *names: str) -> dict:
     keep = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in names]
     assert {n.name for n in keep} == set(names), f"{country}: {names}"
     namespace = {"pd": pd, "tools": tools,
-                 "get_categorical_mapping": tools.get_categorical_mapping}
+                 "get_categorical_mapping": tools.get_categorical_mapping,
+                 "crop_condition_codes": crop_condition_codes,
+                 "crop_condition_labels": crop_condition_labels}
     exec(compile(ast.Module(keep, []), f"{country}/{TABLE}.py", "exec"), namespace)
     return namespace
 

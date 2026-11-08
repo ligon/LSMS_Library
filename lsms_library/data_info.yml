@@ -1030,10 +1030,11 @@ Columns:
       note: |
         The state of the crop as the survey recorded it, in the survey's own
         words, where the `condition` level folds several answers onto one token.
-        Ruling @ligon 2026-11-04 (GH #1436): the EHCVM list has five answers
-        (Epis, Grain, Décortiqué, Non-décortiqué, Non concerné) and the level
-        serves three tokens, so this column keeps the recorded answer in the API.
-        Cote d'Ivoire's vague 2 instrument adds two more, Fève and Autre à
+        Ruling @ligon 2026-11-04 (GH #1436): the five-answer EHCVM instruments
+        record Epis, Grain, Décortiqué, Non-décortiqué and Non concerné; their
+        level serves three tokens, so this column keeps the recorded answer.
+        Answer domains remain instrument-specific. Cote d'Ivoire's vague 1 has
+        those five answers; its vague 2 adds two more, Fève and Autre à
         préciser, which its .dta does not label, so its column takes those two from
         the instrument.
         It is the `crop_variety` shape: a COLUMN named for the level it refines,

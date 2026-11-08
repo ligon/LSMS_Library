@@ -15,6 +15,7 @@ import yaml
 from lsms_library.derivations import resolve_callable, records_for
 from lsms_library.paths import countries_root
 from lsms_library import local_tools
+from lsms_library.ehcvm import crop_condition_codes, crop_condition_labels
 
 
 FIELDS = ["Condition_sold", "condition_sold_native"]
@@ -34,7 +35,9 @@ def _burkina(*names):
     nodes = [n for n in ast.parse(path.read_text()).body
              if isinstance(n, ast.FunctionDef) and n.name in names]
     assert {n.name for n in nodes} == set(names)
-    env = {"pd": pd, "get_categorical_mapping": local_tools.get_categorical_mapping}
+    env = {"pd": pd, "get_categorical_mapping": local_tools.get_categorical_mapping,
+           "crop_condition_codes": crop_condition_codes,
+           "crop_condition_labels": crop_condition_labels}
     exec(compile(ast.Module(nodes, []), str(path), "exec"), env)
     return env
 

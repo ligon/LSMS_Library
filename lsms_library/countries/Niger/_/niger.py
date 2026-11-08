@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pandas as pd
+from lsms_library.ehcvm import crop_condition_codes, crop_condition_labels
 import numpy as np
 import json
 from ligonlibrary.dataframes import from_dta
@@ -615,8 +616,7 @@ def _crop_conditions(codes, table):
     ``harmonize_crop_condition_*`` table.  A blank or off-scheme code becomes
     :data:`CONDITION_NA` -- a real value, never NA, because a null index key is
     deleted by the next ``groupby`` (GH #323 3b)."""
-    mapped = _map_codes(pd.to_numeric(codes, errors='coerce'), _harmonized_codes(table))
-    return mapped.fillna(CONDITION_NA)
+    return crop_condition_codes(pd.to_numeric(codes, errors='coerce'), _harmonized_codes(table)).fillna(CONDITION_NA)
 
 
 def _crop_condition_labels(labels):
@@ -627,8 +627,7 @@ def _crop_condition_labels(labels):
     a column has no NaN-key hazard, and NA says no state was recorded.  Only
     surrounding whitespace is touched.  Ruling @ligon 2026-11-04 (GH #1436).
     """
-    out = pd.Series(labels).astype('string').str.strip()
-    return out.where(out != '', pd.NA)
+    return crop_condition_labels(labels)
 
 
 def _crop_sold_conditions(codes, table):

@@ -34,6 +34,7 @@ files have five: the vague 2 instrument added 6 Fève and 7 Autre à préciser, 
 the .dta does not label them.  See categorical_mapping.org.
 """
 import pandas as pd
+from lsms_library.ehcvm import crop_condition_codes, crop_condition_labels
 
 from lsms_library.local_tools import get_dataframe, to_parquet, format_id, get_categorical_mapping
 
@@ -80,8 +81,7 @@ def _crop_conditions(codes):
         **{'Preferred Label': 'Preferred Label'})
     table = {int(code): token for code, token in table.items()}
     assert sorted(table) == [1, 2, 3, 4, 5, 6, 7], f'harmonize_crop_condition_ehcvm1: {table}'
-    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)
-    return mapped.astype('string').fillna('unknown_condition')
+    return crop_condition_codes(pd.to_numeric(codes, errors='coerce'), table).fillna('unknown_condition')
 
 
 def _crop_condition_labels(labels, codes):
@@ -97,8 +97,7 @@ def _crop_condition_labels(labels, codes):
         **{'Source Label': 'Source Label'})
     instrument = {int(code): label for code, label in instrument.items()}
     codes = pd.to_numeric(codes, errors='coerce').astype('Int64')
-    out = pd.Series(labels).astype('string').str.strip()
-    out = out.where(out != '', pd.NA)
+    out = crop_condition_labels(labels)
     return out.where(~codes.isin([6, 7]), codes.map(instrument).astype('string'))
 
 
