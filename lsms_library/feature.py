@@ -610,13 +610,26 @@ def _numeric_additive_operands(df: pd.DataFrame, columns: list[str],
             continue
         message = (f"{context}: cannot aggregate {column!r}; "
                    "nonmissing additive values must be numeric")
+        text_cells = values.map(lambda value: isinstance(value, (str, bytes)))
+        mixed_objects = (pd.api.types.is_object_dtype(values.dtype)
+                         and (values.notna() & ~text_cells).any())
+        operands = values[text_cells] if mixed_objects else values
         try:
-            numeric = pd.to_numeric(values, errors="raise")
+            numeric = pd.to_numeric(operands, errors="raise")
         except (TypeError, ValueError):
             raise ValueError(message) from None
-        if (numeric.isna() & values.notna()).any():
+        if (numeric.isna() & operands.notna()).any():
             # errors='raise' alone accepts empty text as newly missing.
             raise ValueError(message)
+        if mixed_objects:
+            # Parse only the text. Re-parsing native objects (e.g. Decimal)
+            # can lose precision; ordinary Series inference preserves the
+            # same native/text-converted numeric counterpart's carrier.
+            parsed = iter(numeric)
+            numeric = pd.Series(
+                [next(parsed) if is_text else value
+                 for value, is_text in zip(values, text_cells)],
+                index=values.index, name=values.name)
         converted[column] = numeric
     if not converted:
         return df

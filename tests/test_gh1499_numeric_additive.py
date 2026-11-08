@@ -314,3 +314,44 @@ def test_empty_typed_frame_remains_unchanged(route):
     out = collapse(df, route)
     pd.testing.assert_frame_equal(out, df, check_exact=True)
     assert out.attrs == df.attrs
+
+
+@pytest.mark.parametrize("route", ROUTES)
+@pytest.mark.parametrize("column", ["Quantity", "Expenditure"])
+@pytest.mark.parametrize("native", [Decimal("0.1234567890123456789"), 2**70],
+                         ids=["decimal", "large-integer"])
+def test_mixed_native_object_and_text_preserves_numeric_counterpart(route, column, native):
+    df = frame([1, 2], [1, 2], dtype="object", price=True)
+    df[column] = pd.Series([native, "2"], index=df.index, dtype="object")
+    expected_input = copy.deepcopy(df)
+    expected_input[column] = pd.Series([native, 2], index=df.index, dtype="object")
+    before = copy.deepcopy(df)
+    expected = collapse(expected_input, route)
+    out = collapse(df, route)
+    pd.testing.assert_frame_equal(out, expected, check_exact=True)
+    assert type(out[column].iloc[0]) is type(native)
+    assert out[column].iloc[0] == native + 2
+    unchanged(df, before)
+
+
+@pytest.mark.parametrize("route", ROUTES)
+def test_mixed_native_decimal_text_and_real_na_preserves_counterpart(route):
+    native = Decimal("0.1234567890123456789")
+    df = frame([native, pd.NA, "2"], [1, pd.NA, 2], dtype="object", price=True)
+    before = copy.deepcopy(df)
+    expected = collapse(frame([native, pd.NA, 2], [1, pd.NA, 2],
+                              dtype="object", price=True), route)
+    out = collapse(df, route)
+    pd.testing.assert_frame_equal(out, expected, check_exact=True)
+    assert type(out["Quantity"].iloc[0]) is Decimal
+    unchanged(df, before)
+
+
+@pytest.mark.parametrize("route", ROUTES)
+@pytest.mark.parametrize("bad", ["", "not-a-number"])
+def test_mixed_native_decimal_does_not_hide_invalid_text(route, bad):
+    df = frame([Decimal("0.1234567890123456789"), bad], [1, 2], dtype="object")
+    before = copy.deepcopy(df)
+    with pytest.raises(ValueError, match="nonmissing additive values must be numeric"):
+        collapse(df, route)
+    unchanged(df, before)
