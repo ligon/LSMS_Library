@@ -174,3 +174,28 @@ both proxy shapes plus false-valued genuine exceptions, and bounded affected
 relay controls. No pool/forkunsafe/ledger/warning/source/default/metadata policy
 changes, fullCI or metadata campaign is included. Ethiopia preparation is held
 without a running actor; resume it only after the new1591 freeze is handed off.
+
+
+### P2 revision verification
+
+Runtime901870dab635c8545a3b64a5462165b6963e4f70 changes exactly one production
+predicate from89aba: genuine type ancestry via issubclass(type(exc),BaseException).
+All prior test bytes remain as a prefix; append two decoded proxy regressions
+(advertised ValueError __class__, raising __class__ getter) and one false-valued
+actual exception preserving args/metadata/notes. Neither proxy getter is touched.
+All other library/config/producer bytes and all existing assertions remain exact.
+
+One bounded affected selection CLOSED0:24PASS,0skip/deselection in7.38s pytest,
+12.738128s wrapper. It comprises3new plus21affected prior relay cases: original
+strict payload/type/notes, malformed/nonexception decode, custom BaseException
+remapping, actual child-only class failures, warning/all-four-ledger side effects,
+real owned-child death, and the9existing WorkerRelay cases. The old64cohort was
+not replayed; its unchanged nonaffected43controls retain historical evidence.
+Three fresh controller/xdist receipts have13activebindings each,0denials; private
+root has zero data files/symlinks and exact MAIN/import/config/falsecred/loopback
+identity. No actual Country/source/API/Make/warm/fullCI/metadata run occurred.
+
+The old64PASS and independent9PASS3FAIL remain separate immutable records. New
+independent closure is still required; no final no-P1/P2 or fullCI claim follows
+from these own24passes. Ethiopia's19case preparation remains unexecuted until
+this frozen revision is handed back to the independent reviewer per ROOT.
