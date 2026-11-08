@@ -84,3 +84,58 @@ Developmentc780562b2;1535PR1608and1480PR1609MERGED/issuesCLOSED. Nine snapshot i
 Userrequireskeeping8countryagentsbusy. Eightround2concretetasksreturned5successfulinfra/3FDrefusals; fiveSOURCE-READYcontinuationsALLRefused143. DoNOTcountended/failedjobsactive. Exactregistry/statuses at B/country-workers-continuation-20261108;3failedcountrylanesrecoveredlocally. Currentlocalroles: finish_1452reviews/partialrecovery, finish_1590verificationdeputy+Tanzaniapeerreview, malawi_revision_foodexternalowned-processobserver. Nativeguardcauseunknown; GPG/inner-unshare hypothesesunproven, no guardweakening. Claudeadapter2prepsclone-timeout/nojob; privatefullsourcebitmap/2packthreads benchmark24.318s, auth/nativeexecutionunverified. Observer18deterministicpasses captures nondumpableidentitybeforeEACCESwhileunchangedguardrefuses; actualworker.pybindingcorrection/rootpilotreviewpending.
 Development1ce4f525b,PR1610merged/1602closed,10totalclosures(9original+1newresidual)/9merges. PR1611Mali1576a275DRAFT source14clusters168HH/candidatewarm+independent/offline11678pass,BASEwarmUNVERIFIED; PR1612Uganda1439/1526ec17DRAFT54controls/full11693pass,immutable5filearchiveprovenance.1603final54b06ledgeronly/45independent/full11702pass needsrootPR. TLU02986independent67pass/fullCI41018496RUNNING,whole1485open. Threeotherofflinejobs41018203/04/05allCOMPLETED0 withprivate/no-credential/unshare/fullselection source5652skips.
 Rootsource40heldfiles/110derivedartifacts admitted at round2/CLOSED-SOURCE-ADMISSION.json (35numeric+35full-parsecategorygetters/5PDF), allprivateandhashverified; originalwrong-namespacecapturebeforegetterfailpreserved. TZsixDTA+fourPDFsource recoverypassed12fullStata parses/28artifacts, source907/636replays andall238casescomplete; noJSONchange,17absentheadpairs14familiesfallbackheld; independentreviewpending. Rootqueue/scienceholds remain; no master/sharedwarm. Latesthandoffhasexactheads,allfailedoperatorsandremaininggates.
+
+* Scrum-master checkpoint, 2026-11-08 04:03 UTC
+Goal ACTIVE; this turn PROGRESS. Root owns queue/refill, reviews, GitHub writes
+and authorized development merges. No user approval is needed for routine next work.
+
+GitHub development: 1fb02d5b2d525ccf4ed59bb291305286e87606e4.
+- PR1611 MERGED ff32760965df37adf208e7c7869221a029f66c25;1576 CLOSED.
+- PR1612 MERGED1fb02d5b2d525ccf4ed59bb291305286e87606e4;1439+1526 CLOSED.
+  Final-head unit/Windows checks passed for both. Actual merge trees equal the
+  verified prospective compositions. Root merge receipts are in each lane report.
+- PR1613 DRAFT shipped-factor warning, head54b06b2b; final GitHub unit pending.
+- PR1614 DRAFT TLU disclosure ONLY, head02986035; independent67 and full offline
+  11696 passed/5652 skipped/4 expected failures. Final GitHub checks pending.
+  Parent1485 stays OPEN: fertilizer/SiteQ remain. Country-pooling residual is1616.
+- PR1615 DRAFT Tanzania evidence, head12b1ba81; independent45 passed and sealed
+  arithmetic/source conservation. Six of13 split continuations satisfy head rule,
+  one observed former head is now non-head and follows fallback, six are absent
+  former-head fallback.1497 stays OPEN for fallback interpretation; no ID repair.
+- Repository-wide open issue count freshly paginated:174 (not ISA-only).
+  Cumulative11 development merges closed13 issues (12 original + residual1602).
+
+Actual worker topology, not eight idle agents:
+- Three local workers ACTIVE: finish1452 BFA1482/1485 independent recovery/review;
+  finish1590 new1588 bounded Feature required-index fix; malawi_revision_food
+  Nigeria1518 WIP review plus observational remote health monitoring.
+- All five failed R3 continuations now have an exact read-only code/ref recovery
+  inventory. BFA committed code; Nigeria/Uganda/Niger useful uncommitted snapshots;
+  Ethiopia R3 empty but original R2 five-file patch retained. No acceptance from
+  incomplete logs. Custody: reports/r3-failed-continuation-triage-20261108/.
+- Root submitted ONE supported Claude pilot62c917c9935d4625a72ffef7a0cc3d0f,
+  job41018647, n0028.savio4, free4CPU8G15min. At04:03 it was RUNNING/cloning;
+  native model/auth/useful task progress NOT YET verified. No claim eight restored.
+  Full private bitmap-source preparation succeeded22.596s, exactc780/nonshallow.
+  Existing Ethiopia task/grants, original profile/runtime and native guards intact.
+- External observer final6cb9120c, operationalb6b5b46d,19 controls passed;
+  optional profilef425f4bd. Root read code/profile/proofs/plan and rehashed assets.
+  Trace is private permitted process metadata, best-effort; no argv/environment/
+  FD targets or guard weakening. Earlier historical denied-PID cause unestablished.
+  Observer author monitors status/readiness/deniedPID+incarnation only; no resubmit.
+  Launch receipt: country-workers-continuation-20261108/launches/
+  Ethiopia-claude-observer-submission.json. Do not retry unknown submission state.
+
+1588 scope: separate OPT-IN required_index_levels ONLY household_characteristics
+[t,v,i] and food_expenditures[t,v,i,j], existing market/currency adjustment.
+Reject/degrade invalid required identity before schema voting, preserve canonical
+and optional-axis winner for valid providers. Recovered patch's new canonical food
+schema would change valid modal winners; root explicitly rejected that expansion.
+No pid/s/visit requirement for unrelated tables, no fake v or source build.
+
+Next root: follow one pilot actual state/task progress, integrate1613/14/15 only
+when final checks/reviews/current composition pass, refill country source-ready
+work if pilot is viable. Finish1452/1590/Mwi keep separate lanes moving meanwhile.
+Held scientific policies, Malawi production weights/whole-wave PR1604,1509,
+1560/1571 sold-kg meaning and master/shared rewarm remain unchanged.
+
