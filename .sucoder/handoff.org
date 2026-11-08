@@ -1,10 +1,11 @@
 #+title: Handoff, LSMS-ISA sweep
-* Current scrum checkpoint 2026-11-08, after PR1636
+* Current scrum checkpoint 2026-11-08, after PR1637
 The goal remains ACTIVE; this turn made PROGRESS. Actual GitHub development is
-5695e0855e9182b9e61559d802ce7249102818be: 34 development merges /26 issue closures.
+585021853847a2ccfeb0d7f48a6daa11f2cce0e4: 35 development merges /26 issue closures.
 Original country queue:22 closed /125 open of147 (1499 belongs to this scope).
-Repository162-open recount predates the newly verified1499 closure; no fresh complete
-repository recount is claimed. No master release, shared rewarm or production-weight change.
+Fresh complete two-page GitHub recount:161 open issues, excluding PRs; saved at
+reports/current-reconciliation-20261108-after1499/OPEN-ISSUES.json. No master release,
+shared rewarm or production-weight change.
 
 1499 CLOSED after PR1636: actual parents[e97,0afeca], entire tree aac6725e EXACT
 reviewed head. Full41030609 COMPLETED0 in43:43:12661PASS/5652SKIP/4XFAIL;
@@ -17,23 +18,32 @@ at reports/1499-full-current-trace-proposal-v1-20261108/full-v1.
 1575 document question completed and issue updated: allfour region×milieu, Benin
 department; original2018 design versus2021 cluster revisit. Togo domains unresolved.
 ROOT reviewed report, all13PDF/text hashes and8-row matrix. Four-country documentation
-PR1637, ea88907/treea771a383, only4CONTENTS+ledger; original prefixes preserved,
-all code/config/tests exact5695. GitHub42518322828 running. Issue remains OPEN.
-Three missing managed2018 BID holdings are delegated for preparation; no newDVCwrite.
+PR1637 MERGED at585021853, parents[5695,ea88907], entiretreea771a383 EXACT reviewed;
+only4CONTENTS+ledger, original prefixes preserved, all code/config/tests exact5695.
+GitHub42518322828 unit/windowsSUCCESS/6SKIP, reviews/threads empty. Issue remains OPEN.
+Three missing managed2018 BID holdings are delegated for executable preparation on
+new585 source; approved3target paths/normalhelper/readback plan, no newDVCwrite yet.
 
 1494 frozen56473 author18PASS; ROOT inverse-byte-proved both5011-link JSON maps.
-Independent static review noP1/P2; reviewer20additional controls now granted once.
+Independent static review noP1/P2; reviewer20additional controls CLOSED PASS.
 Current-admitted integration ac0c7bb/treee4bbec06 preserves all10owned paths; prospective
-headers retained, actual5695 entiretree=0afe admitted. API84263 CLOSED0; metadata57865
-LIVE at last actor update. Full suite /publication remain pending. No new link recovery.
+headers retained, actual5695 entiretree=0afe admitted. API84263 and metadata57865
+CLOSED0:20Mali country-table/80wave/1FIF changes, allothermetadata exact; ROOT verified
+actualmaps/all30sealedfiles. DRAFT PR1638 headac0. Full41031188/session50472 LIVE on
+n4252, exactownclone/privateidentityPASS,4loadfile/600thread/maxrestart0/free8CPU32G45min.
+Baseline18317 includes2explicitformatter-test-ID renames; preserve rawsets and exact
+twocasebijections, expect18genuinenewcases only as hypothesis. No new link recovery.
 
 1423 revised helpers: independent40mockedPASS, no live-provider/submission claim.
 Integrated bc2a013/treef1678729:13owned/23incoming/disjoint, full19151object union.
 Existing PR1423 safely fast-forwarded580c→bc2; explicit base refresh to development
 corrected its stale e42 comparison to actual5695, now13changed paths. GHA42518782547
 running, reviews/threads empty. No full library-suite replay: library/config unchanged.
-finish_1590 prepares a new cold remote source-only #1288 productive-freshness fix
-charter using admitted isolated641; no launch yet. Historical validator-only proposal
+finish_1590 owns NEW cold remote source-only #1288 productive-freshness worker:
+dispatchf779ad1ac1c94d2b823af3f96f5b2a22/job41031186 RUNNING n0036, source5695,
+free4CPU8G45min/no-requeue; actual submit27685 CLOSED0 and supportedstatus live.
+ROOT reviewed20frozenoperator/charter files, dryrun, exactsource/tool; granted one
+submit. No taskruntime/source/API/cache grant. Historical validator-only proposal
 remains unselected. No terminal old worker is resumed.
 
 * Historical checkpoint 2026-11-08T19:50:15.649120+00:00
