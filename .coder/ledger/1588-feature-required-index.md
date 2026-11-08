@@ -145,3 +145,28 @@ dependency/GitHub writes, native source/config/wave changes or scientific defaul
 All original recovered refs/trees and prior task/source evidence remain unchanged.
 Durable packet:reports/1588-required-feature-index-20261108 in the20261103 burst
 workspace, including identities, code hashes, guard receipts and preserved logs.
+
+
+### 2026-11-08 superseding test-contract follow-up
+
+Original79bb, independent23-control PASS and failed full-private CI41019052
+remain immutable. That full selection yielded11830passed/1failed/5652skipped/
+4xfailed,805.93s: only test_failure_is_not_absence's Feature-degrade positive
+provider lacked required v. Its patched aggregator supplied the same v-less
+roster even for sample, contradicting the newly explicit healthy HC contract.
+Root authorized a TEST-ONLY correction, not a production guard exception.
+
+New isolated revision from79bb adds an invented cluster ONLYto this case's
+positive frame, retaining all3original rows/payload, negative Ethiopia Guard,
+all original statements/assertions and every other fixture/test AST. Stronger
+checks pin complete three output keys, exact healthy demographic frame/dtypes
+and input immutability. No expected scientific baseline is regenerated.
+Corrected case PASS on actual1fb and candidate separately; candidate whole
+failure-signals file plus all54required-index controls:612passed/0skipped,
+233.23s (overlapping case smoke is not additive). Private/no-credential/unshare
+MAINvenv exact identity, threads/build1 and pytest2/loadfile receipts are at
+reports/1588-test-contract-20261108. All library/config paths are byte-exact79bb;
+reuse the closed c2d/composition metadata0/450,0/1895,0/35,0/186 census only with
+that proof. No source/native/API-data/warm/census replay. Independent test-only
+closure and one justified fresh composed full offline CI remain separate gates;
+root owns PR1619 updates/publication/merge.

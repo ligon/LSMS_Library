@@ -559,6 +559,10 @@ def test_the_feature_loop_still_drops_a_country_with_a_warning(monkeypatch, tmp_
     Guard = by_path_guard(tmp_path)
     good = _roster('2018-19').assign(Generation=0, Distance=0, Affinity='consanguineal')
     good = good.drop(columns='Relationship')
+    # This positive provider satisfies the household key; the deliberately
+    # reduced _roster fixture remains unchanged for the other failure tests.
+    good = good.assign(v='invented-cluster').set_index('v', append=True)
+    original = good.copy(deep=True)
 
     def aggregate(self, waves, table, *args, **kwargs):
         if self.name == 'Ethiopia':
@@ -571,6 +575,18 @@ def test_the_feature_loop_still_drops_a_country_with_a_warning(monkeypatch, tmp_
         out = ll.Feature('household_characteristics')(['Ethiopia', 'Malawi'])
     assert set(out.index.get_level_values('country')) == {'Malawi'}
     assert any('Ethiopia' in str(w.message) and 'Guard: the refusal' in str(w.message) for w in seen)
+    assert out.index.names == ['country', 't', 'v', 'i']
+    assert out.index.tolist() == [
+        ('Malawi', '2018-19', 'invented-cluster', f'2018-19h{k}')
+        for k in range(3)
+    ]
+    # The refusal must preserve the complete healthy result, including its
+    # payload/dtypes, rather than merely leave a country name on an empty frame.
+    from lsms_library.transformations import roster_to_characteristics
+    expected = roster_to_characteristics(original, final_index=['t', 'v', 'i'])
+    expected = pd.concat({'Malawi': expected}, names=['country'])
+    pd.testing.assert_frame_equal(out, expected, check_exact=True)
+    pd.testing.assert_frame_equal(good, original, check_exact=True)
 
 
 def test_the_rebuild_failure_is_still_a_bare_runtime_error():
