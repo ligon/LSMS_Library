@@ -64,7 +64,7 @@ from mali import (derive_hh_crop_harvest_total, derive_hh_crop_sale_attachment,
 src = get_dataframe('../Data/s16c_me_mli2021.dta', convert_categoricals=True)
 src_codes = get_dataframe('../Data/s16c_me_mli2021.dta', convert_categoricals=False)
 harvest = pd.DataFrame({
-    'i':            ehcvm_household_ids(src).astype('string').values,
+    'i':            ehcvm_household_ids(src, wave='2021-22').astype('string').values,
     'plot_id':      ehcvm_plot_ids(src).values,
     'crop':         ehcvm_crop_labels(src['s16cq04']).values,
     'u':            ehcvm_unit_labels(src['s16cq16b']).values,
@@ -81,7 +81,7 @@ records = get_dataframe('../Data/s16d_me_mli2021.dta', convert_categoricals=True
 records_codes = get_dataframe('../Data/s16d_me_mli2021.dta', convert_categoricals=False)
 sold = records[ehcvm_is_sale(records['s16dq05a'], records['s16dq06'])]
 sales = pd.DataFrame({
-    'i':             ehcvm_household_ids(sold).astype('string').values,
+    'i':             ehcvm_household_ids(sold, wave='2021-22').astype('string').values,
     'crop':          ehcvm_crop_labels(sold['s16dq01']).values,
     'Quantity_sold': pd.to_numeric(sold['s16dq05a'], errors='coerce').values,
     'Unit_sold':     ehcvm_unit_labels(sold['s16dq05b']).values,
@@ -105,7 +105,7 @@ assert on_a_row['Quantity_sold'].sum() == sales['Quantity_sold'].sum()
 
 recorded = pd.to_numeric(df['Quantity'], errors='coerce').astype('float64').sum()
 df = stamp_harvest_to_date(df)
-df = derive_hh_crop_harvest_total(df, ehcvm_dispositions(records))
+df = derive_hh_crop_harvest_total(df, ehcvm_dispositions(records, wave='2021-22'))
 
 # Nothing recorded moved: every other Quantity is the file's.
 derived = df['Derivation'].astype('string').str.contains(

@@ -12,3 +12,12 @@ https://microdata.worldbank.org/index.php/catalog/4292
 #+PROVENANCE_SOURCE: worldbank
 #+PROVENANCE_METHOD: source-url
 #+PROVENANCE_RECORDED: 2026-07-12
+
+* Additional public documentation: original EHCVM2018 Basic Information Document
+
+- Document :: Own original-design Basic Information Document; official attachment =basicinformationdocument_civ.pdf=.
+- Public source :: https://microdata.worldbank.org/catalog/4292/download/52543
+- Original retrieval :: 2026-11-08T19:44:47.921097+00:00; one public HTTPS response, no authentication or redirect; matching official Content-Disposition filename. No refetch or PDF parse in managed ingestion.
+- Physical bytes :: 399631; MD5 =d59df2bd076ce061ed4c0e54162cb292=; SHA256 =7ae6d65ff9b68f8015b5439e626f5200ed6255714a487e4cd69e165e4b7b1f34=.
+- Managed holding verified :: 2026-11-08T20:47:32.115435+00:00; generated sidecar and fresh normal read-only get_data_file retrieval matched the original bytes. Existing catalog directives and LICENSE.org remain unchanged.
+- Evidence limits :: This records documentary custody, not a new source census, sample/strata/weights/default decision or an independent2021 first-stage draw. Existing GH1575 quotations and country exceptions remain intact.
