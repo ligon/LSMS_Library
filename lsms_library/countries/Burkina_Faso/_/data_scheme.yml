@@ -240,6 +240,14 @@ Data Scheme:
     condition_native:
       type: str
       optional: true
+    # Sold-side own answer, separate from harvest condition (GH1528).
+    Condition_sold:
+      type: str
+      optional: true
+    condition_sold_native:
+      type: str
+      optional: true
+
     materialize: make
 
   plot_inputs:
