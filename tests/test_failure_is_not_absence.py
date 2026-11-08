@@ -91,11 +91,26 @@ class TestWorkerRelay:
         """``dumps`` passes, the parent's load fails, and the pool calls the worker dead."""
         exc = PicklesButDoesNotLoad('two', 'arguments')
         pickle.dumps(exc)
-        assert pw._pack_exception(exc)[0] is None
+        packed = pw._pack_exception(exc)
+        assert isinstance(packed[0], bytes)
+        payload = {'wave': 'w', 'warnings': [], 'grain': [], 'null': [], 'error': packed}
+        with pytest.raises(WaveWorkerError) as caught:
+            pw.relay(payload, country='X', table='t')
+        assert caught.value.original_type == 'PicklesButDoesNotLoad'
+        assert str(caught.value) == 'PicklesButDoesNotLoad: two arguments'
+        assert 'X/w/t' in caught.value.__notes__[-1]
 
     def test_an_importable_class_still_travels_whole(self):
         exc = GrainCollapseError('strict')
-        assert pw._pack_exception(exc)[0] is exc
+        packed = pw._pack_exception(exc)
+        assert isinstance(packed[0], bytes)
+        back = pickle.loads(packed[0])
+        assert type(back) is GrainCollapseError and back.args == exc.args
+        payload = {'wave': 'w', 'warnings': [], 'grain': [], 'null': [], 'error': packed}
+        with pytest.raises(GrainCollapseError) as caught:
+            pw.relay(payload, country='X', table='t')
+        assert type(caught.value) is GrainCollapseError and caught.value.args == exc.args
+        assert 'X/w/t' in caught.value.__notes__[-1]
 
     def test_a_dead_worker_is_not_a_build_failure(self):
         payload = {'wave': 'w', 'warnings': [], 'grain': [], 'null': [],

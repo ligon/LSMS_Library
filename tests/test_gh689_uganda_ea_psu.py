@@ -190,8 +190,8 @@ class TestTheNamedError:
         from lsms_library._parallel_waves import _pack_exception
         err = self._module()["OriginEaError"]("Uganda sample: 1 household")
         carried, type_name, _, _ = _pack_exception(err)
-        assert carried is err and type_name == "OriginEaError"
-        back = pickle.loads(pickle.dumps(carried))
+        assert isinstance(carried, bytes) and type_name == "OriginEaError"
+        back = pickle.loads(carried)
         assert type(back) is Exception
         assert str(back) == "OriginEaError: Uganda sample: 1 household"
 
