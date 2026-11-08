@@ -1,4 +1,55 @@
 #+title: Handoff, LSMS-ISA sweep
+* Current scrum checkpoint 2026-11-08T16:48:15.263995+00:00
+Goal ACTIVE. Previous turn was PROGRESS. Development is still
+5a06d85cd02237cc515b0cda57012a9cab3d5e11: 30 development merges and 23 closed
+sweep issues. #1529 remains open for its narrowed 3B/3D/3E residuals.
+No master release, shared-cache rewarm or production-weight change.
+
+PR1633 / #1540 remains DRAFT at a222d9fc2fdf37b3c57b9b5259c93e6cc841a2c6.
+GitHub run42498209994 unit and Windows SUCCESS; six conditional jobs skipped.
+The separate configured full job41027766 is TERMINAL FAILED3:0, not running:
+12,500 passed, 5,633 skipped, four xfailed, two worker losses and xdist scheduler
+KeyError(gw5). Cause of worker loss UNKNOWN; no assertion-failure trace retained.
+The old 07e full12505PASS remains separate. Root sealed original failed evidence
+at reports/1540-on-niger-current-verification-20261108/ROOT-FAILED-RUN.json.
+Root actual JUnit reconciliation: parent green union18181 expected; 43 missing
+(25 expected PASS/18 SKIP), two anonymous entries retained, one internal error.
+The stale-country test records BOTH PASS and worker-crash ERROR; Senegal real-
+Country near-zero test expected SKIP records worker-crash ERROR. All other named
+outcomes match. This does not prove a teardown location or complete coverage.
+No rerun started. finish_1590 diagnoses statically after its completed Mali review;
+next diagnostic must retain durable pre-timeout stacks and preserve failed run.
+Root owns PR1633/current branch and release. PR body now discloses the failure.
+
+Mali #1594 c4d source patch is UNMERGED. Four-produced-output recovery PASS0 in
+35.017s, four loads and four pre/post seals equal, active guard/zero denials,
+zero raw reads and zero private-data files. Canonical122085 rows/keys/Quantity/
+dtypes/attrs unchanged. Expenditure5652532205 ->152532260 XOF; removed5499999945,
+55 derived sentinel equivalents, 55 changed cells, 45 newly missing amounts.
+Existing sparse derived output90925 ->90885 (40 all-missing rows dropped), with
+legitimate16325 XOF preserved in affected cells. Nominal2014 FX493.8 and PPP195.2
+traces verified through unchanged pure helpers; no actual public/date API claim.
+Recovery manifestda5affc451902baee2449837555b04655495ea856662e1f034874bcd305f2810.
+Original V4 remains FAILED final JSON serialization, not repaired or replayed.
+Independent static program-order proof supports final Boolean guard/postseal gates
+from authenticated prefixPASS, without recovering individual missing telemetry;
+manifest64a850cc924f5e953be42b7e32e8c1346effe97f6f26ca3a1e2c331e79811359.
+Independent PRODUCT static review found no introduced P1/P2; full personal Mali
+3551-line grounding and #851 contradiction retained. Manifestf436476eb3ec3293aa9b1396189614b453666c3c4ff22daeb83c402d99363027.
+Mwi finishes docs-only country note/ledger then current5a integration/API/metadata
+preparation. No extra source/API/warm replay or new full-CI launch authorized yet.
+
+Local assignments: finish_1452 authors #1499 on5a (ledger-first23c2bdb93), with
+end-to-end minimal implementation and finite baseline8/candidate tests approved.
+ROOT reviewed NEW max1 pinned urllib3 IPv6 loopback capability constructor/bind,
+metadata-preflight only; close before LSMS/reducers, original13 guards unchanged.
+Known magic/MPL startup scope reused. No generic socket or process exemption;
+new unexpected boundary stops, original remote failure preserved. finish_1590
+remains independent1499 reviewer and diagnoses1633 worker loss. Mwi owns1594
+finalization and queued1574 managed-document ingestion proposal. All3 active.
+#1066 replay-warning USER QUESTION remains pending; design only, no implementation.
+Other held scientific decisions and last measured issue counts remain unchanged.
+
 * Current scrum checkpoint 2026-11-08T16:11:39.520772+00:00
 Previous goal turn was PROGRESS. Goal remains ACTIVE and unbounded.
 GitHub development5a06d85cd02237cc515b0cda57012a9cab3d5e11;30 development merges/
