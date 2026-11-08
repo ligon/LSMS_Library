@@ -152,3 +152,68 @@ immutable. No source acquisition, Country API, raw decode, native/scientific
 Make target, warm cache, dependency, shared-cache or GitHub write was performed
 by this phase. Final GitHub checks/publication and a green full-suite gate remain
 unmet; this is draft readiness with an explicit failed verification gate.
+
+
+## §8 Final current-development verification (2026-11-08)
+
+This addendum extends the historically correct §7 frozen state; the original
+failed full suite and every failed fixture/operator attempt remain preserved.
+No runtime, test, registry, configuration or generic YAML-loader change follows
+this ledger-only finalization.
+
+The bounded diagnostic's V2 job41021744 failed before pytest/Make: its harness
+mistook legitimate empty cache directories for files. It executed zero original
+tests and zero Make processes. A separately frozen V3 corrected only that
+private-layout validation. Three source-free layout controls accepted the real
+two empty directories and refused a seeded regular file and symlink L1.
+V3 job41021945 completed0:0 on the original n0048.savio4 host. Baselinefa76
+and candidatec8fb each ran the original unchanged15s test once and passed;
+their single Make children returned expected refusal2 in0.290536/0.212962s.
+All13 source/API/write guard bindings per case remained active with0denials.
+This serial comparison did not reproduce the full-load timeout. Its historical
+system cause remains UNPROVEN; the old fullCI41020419 remains FAILED1:0.
+
+An ordinary composition a7119e19bb147e78487b3ee288cecb9de8f08aef joins final
+ledger headc88db92e3e3266a60172e88897a8df36c2d7b858 with current development
+b8346cf1f953ac82517b1b7473c715a5655ca950. All19113 mode/type/blob entries
+match the disjoint union: four owned paths, twelve incoming paths, no overlap.
+No manual runtime changes or rebase were used.
+
+Fresh metadata-only actors measured actual b834 and a711 separately under
+private roots, false source credentials and network isolation:0/450country,
+0/1895wave,0/35build,0/186import fingerprints changed; all18None cells and
+public553country/2313wave/39method surface entries match. Each actor closed0,
+with0errors/denials/private data files, in123.952211/125.393419s. The guarded
+strict API audit closed0 in9.612560s. These are metadata checks, not table data,
+Country/Feature builds or source verification.
+
+Fresh full offline CI41022082 COMPLETED0:0 in14:24 on n0055.savio4. The full
+configured test directory ran with four loadfile workers, BLAS/build threads1,
+a fresh mounted image, private nonsymlink L1/L2/config, false reader credentials
+and unshare-rn:12108passed/5652skipped/4xfailed in693.80s. JUnit17764 cases
+contains zero failures/errors; all44 new registry controls passed. The source
+skips establish no real-source scientific acceptance.
+
+All17687 old case IDs remain. The77 additional cases are exactly53 Nigeria
+safe-harvest and24 market-refusal cases merged since c8fb. Thus12030 original
+passes + the original timeout case now passing +77 incoming =12108 passes;
+skips/xfails are unchanged. The44 owned registry cases are the sole test-file
+addition relative to b834. The17720-case complement in candidate JUnit is not
+claimed as a separately executed baseline collection.
+
+The prior independent46-control PASS/noP1P2 review and exact15-registry/
+81-record typed-order corpus parity remain applicable: all tested runtime and
+test objects are unchanged. All verification actors are closed and frozen
+operators remain exact. Final GitHub publication/checks and expected-head
+merge are the remaining root-managed gates.
+
+Durable packets (absolute root):
+/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/
+- 1578-fct-counterfactual-20261108-v2 (zero-test failure and addendum)
+- 1578-layout-control-20261108-v3 and1578-fct-counterfactual-20261108-v3
+- 1578-b834-composition-proof-20261108
+- 1578-b834-verification-20261108 (fullCI/JUnit/count reconciliation/API/maps)
+- 1578-finalization-20261108 (root final-object and publication receipts)
+
+No real source/getter/raw decode/scientific Make/native builder/warm campaign,
+production-weight change, master release or shared cache re-warm is claimed.
