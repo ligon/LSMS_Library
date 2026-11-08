@@ -115,3 +115,44 @@ new scientific or source policy decision is identified. If actual contract
 conflict appears, report exact evidence before broadening. Parent-side decode
 catches Exception, preserving the existing interrupt/BaseException boundary.
 1578 fullCI41022082 is separately monitored at exacta711; no duplicate suite.
+
+
+### Phase 3 — executed pure verification
+
+Runtime737d89b307b0e7edf0f766101c33ce60a470403b changes only packing and
+relay behavior. All other parallel-module AST is exact, including warning
+emission, all four ledgers, target grouping, forkunsafe/serial/real-death paths
+and CPU/memory policies. errors.py changes documentation only; its normalized
+behavior AST, Country/config/schema/build-registry objects are exact b834.
+
+Before product edits, exact oldhead b834 ran both actual fork regressions and
+failed as expected: parent missing module and parent module missing class both
+misreported BrokenProcessPool instead of WorkerOnlyError. Original probe,
+logs/receipts/JUnit remain unchanged (2FAIL,7.13s pytest/13.384s wrapper).
+
+Final runtime pure selection passed64,0skip/deselected in11.93s pytest
+(18.505s wrapper):15new controls,39existing parallel controls,9existing
+WorkerRelay controls plus the existing all-build-closure exclusion pin. Actual
+fork cases include child module state unavailable in parent, a real module
+imported from invented Python code only after fork, a healthy sibling, full
+warning/grain/null/datetime/drop relay before refusal, and real owned-child
+exit kept as BrokenProcessPool. Direct controls preserve strict exception
+types/attributes/notes, bad constructor/dump/corrupt-pickle fallbacks,
+intentional BaseException reduction/remapping and nonexception rejection.
+
+The only existing test-method edits are the two WorkerRelay private-carrier
+assertions and GH689's private carrier/decode assertion. All other method ASTs
+are exact; its decoded generic Exception/type-prefixed text assertions remain.
+The actual GH689 Country/config entrypoint was NOT executed; an invented
+custom-reducer equivalent passed instead. No fixture, baseline, skip or
+numerical tolerance was weakened. Six controller/xdist guard receipts stayed
+active with0denials; private roots retained zero data files/symlinks.
+
+Anchored verdict: OK (§§2–4) for reuse of the four-field error tuple, fallback,
+notes, warning/ledger ordering and parent reconstruction. OK (§4) for actual
+worker-death and forkunsafe distinctions. No CONTRADICTION or REINVENTION
+identified. Structural closure controls show no parallel callable enters a
+build fingerprint; full450/1895/35/186 metadata census, strictAPI, fullCI and
+independent review are UNRUN for1591 and remain separate gates. The unrelated
+1578 fullCI success does not validate this task. No source/getter/actualCountry
+API/scientificMake/warm/shared-cache/GitHub campaign occurred.
