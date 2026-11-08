@@ -86,4 +86,31 @@ validation evidence will live in the dispatch evidence directory.
 
 ### Phase 3
 
-Pending frozen implementation and one guarded invented-focused selection.
+- **OK (§§2–5 reuse):** frozen implementation
+  5730d463a17b868be245066046f9260d62c5258b uses cached_property and the
+  unchanged waves resolver. Static AST proof removes just the new descriptor,
+  cached_property import and old constructor placeholder and recovers the
+  complete original country.py AST. transformations executable AST is equal.
+- **OK (§§3–4 definitions):** country modules/records are byte-identical to
+  b834. Source authority, sorted waves, map references, public assignments,
+  mutation, deletion, later refresh and inert logical/physical Wave transport
+  are tested. Two parent controls exhibit the initial empty map and agree
+  after the original resolver runs. No new folder, ID, round or science rule.
+- **OK (§4 focused tests):** ONE frozen selection: 37 new invented cases plus
+  3 existing dictionary-only pair controls, 40 passed in 5.99s, exit0. Actual
+  descriptors/getitem run on __new__ instances, strict fake metadata and inert
+  Wave; only Tanzania's literal mapping is read statically. No real module or
+  Country/Feature constructor. Accepted guard copied byte-identically; zero
+  named guard refusals. Strict static API audit and diff check exit0 too.
+- **Runtime qualification:** prepared MAIN interpreter and exact package/cwd/
+  source/config bindings asserted; private empty data/L1/config, false source
+  credential gate, unshare -rn, BLAS/build1 and pytest2/loadfile. Matplotlib's
+  first dependency import attempted /root/.config/matplotlib, got PermissionError
+  and automatically used private TMPDIR. No manual recovery/retry or guard
+  waiver followed. This attempt remains a limitation, not a claim of exhaustive
+  filesystem hermeticity. ROOT was notified through the absolute shared channel.
+- **UNMEASURED / unrun:** build-hash footprint, metadata census, full suite,
+  actual country/source/getter/build/cache/Make/DVC campaign, independent review,
+  configured CI and merge. No source campaign is implied by the 40 synthetic
+  passes. Evidence: dispatch evidence/report.md, RESULT.json, validation.log,
+  PR-DRAFT.md, pinned-runtime-source.json and original guard receipts.
