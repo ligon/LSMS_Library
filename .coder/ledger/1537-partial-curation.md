@@ -73,20 +73,29 @@ Reuse immutable diagnosis/route/proposed-patch/operator/failure evidence rather
 than repeat static extraction or historical cohorts. New tests only establish
 mechanical metadata/invented-input properties; not scientific/API acceptance.
 
-## §6 Open questions for ROOT
+## §6 ROOT rulings and remaining questions
 
 ROOT accepted static exact noarg/crop/community source-chain reasoning plus real
 Org parsers/all-quarter checks, real format_id and pure decoder-tail null controls.
 No real noarg producer invocation or full-route runtime parity may be claimed.
 No df_data_grabber exception was added. Required parser/unit proof remains unrun.
 
-Startup-v3 completed one qualified library-metadata process, then installed
-magic.compat requested the same lookup again. The one-process preflight refused
-that second Popen before spawn. Runtime work stopped for ROOT; no retry or second
-lookup exception is authorized. Pepper identity, whole #1537, census and every
-data/API stage remain open. The private product commit is conditional/unvalidated.
+The terminal remote d15 record preserves startup-v3: one qualified metadata
+process, then refusal before magic.compat's second spawn. Its task remains
+BLOCKED/0tests; no remote restart, protected native-state read or retrospective
+success claim. ROOT subsequently authorized a NEW LOCAL d15 code continuation:
+fresh isolated MAIN-mounted checkout/private empty config/data/L1, false creds,
+unshare, thread1. One v4 preflight additionally binds compat.py SHA3ad490d8,
+permits MAX TWO exact known ldconfig-p processes with exactly two magic soname/
+dlopen lookups, origin-bound installed init then compat, same three trusted read
+roots and original strict guard exact before project import. No generic fallback,
+cache/stub or post-arm exception. System magic database initialization occurs
+in C; Python audit is not a universal filesystem-I/O census. Freeze before ONE
+never-run original16+new5 selection; any new guard/auth/native failure stops.
+Pepper, whole1537, census and all actual-source/API gates remain held. This
+ledger-first local phase does not claim runtime proof has run.
 
-## Phase 3 — verification
+## Phase 3 — preserved remote verification (local v4 pending)
 
 - **OK (§§2–4, static):** exact product diff is only the two authorized rows,
   each with blank Code and eight blank quarter cells; removing those bytes
