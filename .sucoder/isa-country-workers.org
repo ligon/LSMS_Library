@@ -740,3 +740,89 @@ investigationcompletedbutproductionweight/wholewavePR1604held. Neverreasksettled
 choices or infer scientificallyrequiredapprovalfromelapsedtime. All3localmodels
 assigned; historical8countryjobs terminal, nativepilot isONEactualnewworker.
 
+
+* Ready PR, completed pilot and refilled queue 2026-11-08T09:20:12.350773+00:00
+GoalACTIVE/PROGRESS. Development b8346cf1f953ac82517b1b7473c715a5655ca950 remains
+21merges17closures/170repoopenlastpaginated; original147scope14closed133open.
+Rootdocs prior4c99ea1b5. No master/sharedrewarm/productionweight changes.
+
+PR1624 OPEN READY at0c963b0a640ee2a660c635c8c0c725d4426125c0, baseb834,
+https://github.com/ligon/LSMS_Library/pull/1624. Registry1578 ALLlocalgatesPASS:
+currenta711 fullCI41022082 COMPLETED0:0/14:24,12108PASS5652skip4xfail693.8s,
+JUnit17764/0failure/error. All17687oldcases retained,+77exactNI53/market24;
+originaltimeoutcasenowpass; oldfullCI41020419 stillFAILED/causeunproven.
+Freshb834+a711metadata0/450/1895/35/186/publicsurface18Noneexact;strictAPI0;
+46independentcontrols and15registry/81recordparity applicable. Rootreadactual
+fullcodediff/guide/terminal/countproof andmadeONLYownledgerfinalization0c963:
+all19112othermode/type/blobs exacta711; finaltree799881b2b140cc1893e907bf46770a3e82bb5abe.
+ROOT-FINAL-BYTE-PROOF/PR-BODY in reports/1578-finalization-20261108. GitHub
+WindowsPASS,unit-testsINPROGRESS lastcheck; other6jobsSKIPPED, notsourceproof.
+Nextrootfreshchecks/base+head/reviewthreads,expected-headmerge/actualtreeproof,
+thenclose1578completed if allgatespass. Notmerged/closedatthischeckpoint.
+
+1591 authorFROZEN89aba8dec6e3b8170213cdcdf0c2cb88c0999715, runtime737d89b307b0e7edf0f766101c33ce60a470403b/baseb834;
+FSfix/1591-wave-exception-relay-20261108 normalpublished,ledgerfirst09bd9347.
+Only _pack_exception/relay behavior changes tobyteswire+parentdecode+BaseException
+validation, errors.py docs and3privatecarrieroracles; allotherparallelAST and
+country/config/core/buildregistry exact.64PASS15new49existing,actualfork cases,
+6active13bindingguards0denials/datafiles/symlinks0. Originaloldhead2expected
+forkFAIL(BrokenProcessPool vsWorkerOnlyError) preserved. No actualGH689Country
+entrypoint/source/API/Make/warm campaign. ROOTreadfullcodediff/report/proof.
+malawi_revision_food NOWindependentSTATICmatrix/operatorfreeze, no runtimegrant.
+finish1590 NOWEthiopia1570recovery/prep, mustfullCOUNTRYfirst/full4577+named
+idiosyncrasy/quotecontradictions; no imports/tests/source untilrootplanreview.
+
+Ethiopia card FROZEN reports/triage-1570-ethiopia-20261108/TASK-CARD729a5bc4,
+manifestcb4a335e. ROOTreadfullcard: recoverR2fivefilepatch9cbe1828(45518B),
+17PASS2boolcomparatorFAIL then correctedWITHOUTgreenreceipt. Existing7W1datasets/
+21DATAartifacts proposedlater; NOTall70, no rawrecapture. sect3_pp_w1 intercrop
+isNOTinclosedcaptures, so no fakebuilder/APIparity. Section12Q3holder-cropharvest/
+window/doublecount and kg/gram/minor-Birr/partialanswers requireevidence. #820
+actuallyCLOSED/#1257merged; stale1570phrase doesn'tretireharvestresidual.
+Niger native3C card FROZEN reports/1529-niger-native3c-next-card-20261108/
+TASK-CARDcafe4702/manifest6c24b60d, ROOTreadfullcard.1067drylines/272HH/14dryonly,
+sourcequalifiedslotsneeded; dryquantity999=0 removesonlythatspecifichold.
+Routineown3Cnativewiring canadvanceindependent3B/3D/3Eareaquestions, butcurrent
+consumercoveragewillchange andcommonannualestimandnotproved. No newseasonaxis,
+area/costsurface/quantitymask/density/price/weight/default chosen. Laterexact6
+2C+3CDATAartifactsnativecorrespondenceproposed, no repeated15modulecohort.
+No newNigerproducer/source/APIgrantyet; Mwi retainsreservation.
+
+641pilot41022138 TERMINAL COMPLETED0:0/9:50/n0192, native+supervisor0,
+projectready/localplacement/environmentverified,0inspectionraces,preservation
+preserved/classsealed/runnerexited+placed, publicationcomplete/nonincomplete.
+Exactly ONEprivated51b9f4e22f53188908b9778dc693a3f7537cde5commit over8558,
+all19062originalmode/type/blobs exact;sole130lineplanningledgeraddition.
+Rootreadactual FINAL-REVIEW/INDEPENDENT-PROOF andstaged/receivingruntimepins,
+privateL1linked0/readerabsent/observerready, normalterminalmetadata. This is
+ONEworker infrastructurePASS; workerTASKremainsBLOCKED afterpre-actionJSsyntax
+errorinevidencewriting. Reports/RESULTpreservedunchanged, nottaskcompleted.
+Rootclarification09:04:48writtenwhilelaststatuslive permittingONEsyntaxrepair
+only; consumptionUNVERIFIED, no restart/retrynative/extraGitcommitoccurred.
+Futuretasks allowroutinepre-actionfile/syntax/testfixes; no-retryprotectsunknown
+submission/native/auth/config/guard/sourceoutcomes. No historicalcause/fix or
+8workerreliabilityclaim. Installed/globalSuCoder unchanged; useisolated641entry.
+Finalpilotmanifest26d2d516/INDEPENDENT-PROOF3d665888 under private/isolated-
+sucoder-641-admission-20261108/proposed-native-pilot/FINAL-REVIEW.
+
+finish1452 nowprepares TWOusefulconcurrenttasks ONLY, no launchgrantyet:
+1549 staleNigeriaframeworkdoccounts (freshOPEN0comments; fingerprintimpact
+required, no livecountclaim),1537 Nigeria3Aggregatepassthroughlabels (freshOPEN
+0comments; owncuratedmaps/labelContractB/parentandaggregateskillsfirst, no guessed
+Pepper/statebucket/nativejchange, sourcefreefirst). No overlapping1591/1578/
+Niger/Ethiopia reservation. PersonalfullNigeria4019prefix+ALL38newlines4057
+current authenticated. NEW private fullsource B/private/concurrency-source-b834-
+20261108.git complete: HEADb834/tree510f6a987/19111trackedmode-type-blobs and
+93554reachableobjects exact/fullbare/nonshallow/fsck0/noalternates/promisor/
+filter. Originalmain4c99HEAD/refs/compact8558/shared641/install untouched.
+Sourceproof in private/two-worker-1549-1537-preparation-20261108/SOURCE-PROOF.
+ROOTstillmustreadtwofrozen task/profile/argv/assets/manifests beforeconcurrent
+sourcefreegrants. No idlelocalmodels; nativeactive0afteronepilotterminal.
+
+Queuewarning: historicalcountryassessments use inconsistentfreeformscopekind
+values(country_specific,country,country_task,direct,Nigeria-specific,None).
+Neverfilteronlycountry_specific andinferothershave0candidates. Overall147ID
+union/closedcounts areindependentofthatclassification. Do not repeat1287ISA
+inventory(all62accepted) or905Tzheld4ULPsweep asnewreadywork; new1549/1537
+freshissuecontentchosenbyrootinstead. Allthree localworkers assigned above.
+
