@@ -1,4 +1,69 @@
 #+title: Handoff, LSMS-ISA sweep
+* Current scrum handoff 2026-11-08T10:50:18.630217+00:00
+Goal ACTIVE/PROGRESS. GitHub development ebb87135cdd11a63e3b463b6b21c3e556c628a8d.
+23 development merges/19 issue closures. Fresh paginated168 repository open;
+original147 union:16 freshly verified closed/131open. Country entries overlap.
+Prior checkpoint49d9e60f6. FSdevelopment111b untouched. No master release,
+shared-cache rewarm or production-weight changes.
+
+1591 COMPLETE PR1625 mergedebb/issueCLOSEDcompleted. Actual parentsbb828+c2b6,
+treeb4dfd2019966656ed95e8b9eede16911797b4ca0 exact. GitHubunit/windows passed.
+FullCI41022704 completed0:12126PASS5652skip4xfail/JUnit17782zeroerrors/failures.
+Independent qualified proxy/sideeffect closure accepted; original failures kept.
+1578 PR1624 and1592 PR1623 remain complete.
+
+1549 replacement41022789 COMPLETED0/native0/supervisor0/taskcompleted/sealed/
+exited/placed/publicationcomplete. Authorf18c8e5e8 onlytwo docstrings+ownledger.
+ROOT reviewed all18 final packet members, actual AST/surrounding bytes, historical
+country record and metadata. Actual0/450country,0/1895wave,0/35build,0/186import;
+18None/public553/2313/39 exact. Closed baseline not replayed. Current final
+385e7ac6a0c9f89bbae6b49d720c2775d4891162 retains19113other currententries exact.
+PR1626 OPEN/GitHub checks pending. No manual suite replay for docs-only change.
+Old1549job41022551 helper failure remains failed; historical cause unknown.
+
+1537 NEW cold-context job41023140/dispatchb652f73ee7394b229c56307b5c34bf22
+RUNNING native on n0028 after ONEdryrun/ONEactual. Exactf7 source/isolated641,
+projectbb4dfdc2675ab3fb770f296575bf6d314bf78c643ec2a33fae8bbbe5106c7cae.
+OnlyGroundnuts/Maize(shelled) blank-code aliases authorized; Pepper held.
+Trustedmagic preflight before unchanged strictguard; original16functions NEVERran.
+Olddiagnosis assertions bind immutableBASEOrg; NEWcandidate tests read actualOrg/
+parser against all baselinequarter/noarg/crop/community/null-code routes.
+No raw/API/census grant. Bootstrapclarification written before nativeprogress,
+consumption unproved. Olddiagnosis41022556 complete; no nativeoverlap with1549.
+No two/eight native-worker capacity claim. Normal cold managed task only.
+
+1529 Niger independent32:31PASS1FAIL P2 emptydryconcat changes old2C HHindex
+dtype toobject. Mwi owns minimal assemblyrevision, bothsourceattempts/readorder/
+writeafterALLsuccess/both one-empty directions/original all-emptyerror exact.
+No casts/oraclerelaxation. finish1590 eight affected cases frozen, awaiting newhead
+andROOTgrant. Original31P1F/authorfixturefailure preserved. Six-real-artifact
+correspondence NO PAYLOAD GRANT: v2 must fix rowcoercion/resolverformat_id fidelity/
+independentcopies+immutability/attrs/all-six preseal+failurefinally journal scope.
+Sourcefree oraclecontrols authorized; actual6 remain sealed.
+
+1570 Ethiopia19sourcefreePASS remains NOTnative/APIparity. W1db80673 PREPonly.
+ROOT now authorizes exactly7selected variable-labels.json metadata: s9/s4/s11/
+s12/s10/cover_pp/cover_ph. Frozen7manifest/ALLpresealbeforeJSON/allpostwitness,
+stdlibonly/privateoutputs. Other14numeric/cards/stat/hash/original70/raw/PDF/
+pickle/getters remain ungranted. finish1590 owns finite task whilewaitingNiger;
+Nigerreviewpriority. Missingsect3_pp prevents whole-native parity claim.
+
+1606 charter reviewed: finish1452 isolatedebb-based authorimplementation granted
+whilemonitoring1537. Native legacydefault; publicAPIcallers explicitlyfinalized;
+supportedroughcanonical types override local for dtypeonly. Canonical-only present
+columns checked, neverrequired; unsupportedglobal retainslocalgrading with explicit
+limitedsupport/negativecontrol. Reusecanonical loader, nevercaster/newdatetime.
+ONE frozenfocused invented-frame cohort/privateguards/falsecreds/no network,
+identityassertions/2loadfile/threadbuild1. No actualCountry/Feature/samplecache/
+raw/census. Freeze authorpacket for separate independentreview.
+
+Assignments: Mwi Nigerproducer+v2oracle; finish1590 Nigerindependent+Ethiopia7JSON;
+finish1452 remoteNigeria monitor+1606author; ROOT queue/1549CIpublicationmerge.
+All3localagents assigned,1remote native active. Original8country assessments
+are historical delivered results, not8waiting agents. Pending1509/1442/1497/
+1518defaultW1W2yield/1560/1571/productionweights48+wholewavePR1604 remainheld.
+49YESborrowIHS5/50maizeflour(primaryevidence)/51NOdateclamp remain settled.
+
 * Current scrum handoff 2026-11-08T09:59:37.779545+00:00
 GoalACTIVE/PROGRESS. GitHub development bb828626f51ba04c65298f715c7c0f092b5583d2.
 22developmentmerges/18issueclosures in sweep. Freshpaginated169repoopen;
