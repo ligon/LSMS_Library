@@ -224,7 +224,29 @@ def community_price_slots(base, codes, columns, rank):
 from .build_transforms import food_acquired_to_canonical
 from .derivations import COLUMN as DERIVATION_COLUMN
 
+
+def crop_condition_codes(codes, table):
+    """Map numeric condition codes using the caller's own instrument dictionary.
+
+    Return nullable strings; the harvest caller supplies its index sentinel.
+    Dictionary acquisition, validation and answer domains stay with the caller.
+    Fractional numeric codes retain the nullable-integer conversion error.
+    """
+    mapped = codes.astype('Int64').map(table)
+    return mapped.astype('string')
+
+
+def crop_condition_labels(labels):
+    """Keep literal recorded answers, stripping whitespace and blanking empties.
+
+    Instrument-specific replacements for unlabelled codes belong to the caller.
+    """
+    out = pd.Series(labels).astype('string').str.strip()
+    return out.where(out != '', pd.NA)
+
+
 __all__ = [
+    "crop_condition_codes", "crop_condition_labels",
     "EHCVM_COUNTRIES", "DERIVATION_NAME", "RAW_VARIABLES",
     "MYVARS", "UnitSizeLabelError", "carry_unit_size", "derivation_key",
     "derive_ehcvm_purchase_value", "food_acquired_ehcvm",

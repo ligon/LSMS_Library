@@ -1,6 +1,7 @@
 # Formatting  Functions for Mali
 import re
 import pandas as pd
+from lsms_library.ehcvm import crop_condition_codes, crop_condition_labels
 import numpy as np
 import lsms_library.local_tools as tools
 from lsms_library.transformations import U_UNKNOWN
@@ -956,8 +957,7 @@ def ehcvm_crop_conditions(codes):
     table = {int(code): token for code, token in table.items()}
     if sorted(table) != [1, 2, 3, 4, 5]:
         raise ValueError(f'harmonize_crop_condition_ehcvm1: {table}')
-    mapped = pd.to_numeric(codes, errors='coerce').astype('Int64').map(table)
-    return mapped.astype('string').fillna(CONDITION_NA)
+    return crop_condition_codes(pd.to_numeric(codes, errors='coerce'), table).fillna(CONDITION_NA)
 
 
 def ehcvm_crop_condition_labels(labels):
@@ -965,8 +965,7 @@ def ehcvm_crop_condition_labels(labels):
     column read with ``convert_categoricals=True``.  A blank stays NA, never a
     sentinel, because a column has no NaN-key hazard (ruling @ligon 2026-11-04,
     GH #1436)."""
-    out = pd.Series(labels).astype('string').str.strip()
-    return out.where(out != '', pd.NA)
+    return crop_condition_labels(labels)
 
 
 def ehcvm_crop_sold_conditions(codes):
