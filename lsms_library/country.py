@@ -2369,7 +2369,7 @@ class Wave:
         # Write failures warn but don't propagate — the caller gets a
         # correct DataFrame either way.
         if (cache_path is not None
-                and not os.environ.get('LSMS_NO_CACHE')
+                and not _no_cache()
                 and isinstance(df, pd.DataFrame)
                 and not df.empty):
             try:
@@ -2472,7 +2472,7 @@ class Wave:
         return (df, origin) if _with_origin else df
     
     # GH #1455 (ruling @ligon, 2026-11-04): no reducer here, on any route.  A
-    # frame built in memory -- `LSMS_NO_CACHE` set to any non-empty string, or an
+    # frame built in memory -- historically any non-empty `LSMS_NO_CACHE` value, or an
     # L2-wave write that failed -- used to go through a `groupby(index).agg` that lost every column it did
     # not name (`Derivation`), turned NaN into 0 (`sum`, min_count=0) and deleted
     # NaN keys, and the country tier then wrote that frame stamped with the
@@ -8263,12 +8263,10 @@ class GrainCollapseWarning(RuntimeWarning):
 def _no_cache() -> bool:
     """Whether ``LSMS_NO_CACHE`` is on: ``1``, ``true`` or ``yes``, in any case.
 
-    How both L2 read gates read this flag (GH #1455, @ligon 2026-11-04), spelled
-    as :func:`_grain_strict` spells its lever.  ``0``, ``false``, ``no``, an empty
-    string and anything else leave it off.  The L2-wave WRITE gate in
-    :meth:`Wave.grab_data` does not read it through here yet: it still tests the
-    string's truthiness, because any edit to ``grab_data`` moves every table's
-    fingerprint (GH #1501).  Route every new read through this.
+    Both L2 read gates (GH #1455) and the YAML-path L2-wave write gate
+    (GH #1501) use this predicate, spelled as :func:`_grain_strict` spells its
+    lever.  ``0``, ``false``, ``no``, an empty string and anything else leave it
+    off.  Route every new read through this.
     """
     return os.environ.get("LSMS_NO_CACHE", "").lower() in {"1", "true", "yes"}
 
