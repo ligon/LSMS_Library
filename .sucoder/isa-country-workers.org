@@ -139,3 +139,98 @@ work if pilot is viable. Finish1452/1590/Mwi keep separate lanes moving meanwhil
 Held scientific policies, Malawi production weights/whole-wave PR1604,1509,
 1560/1571 sold-kg meaning and master/shared rewarm remain unchanged.
 
+
+* Authoritative scrum checkpoint, 2026-11-08 04:25 UTC
+Goal ACTIVE; this goal turn PROGRESS. User explicitly says root is scrum master:
+keep workers assigned, manage dependencies/verification/merges, do not ask routine
+permission or count ended jobs as active. Current three local workers are active.
+
+GitHub development1b0e4e07907377bd3855379b8f13c7eae675ac5a. Filesystem development
+is not authoritative and must not be moved. Root docs branch checkpoint follows.
+- PR1611/1576 mergedff327609; PR1612/1439+1526 merged1fb02d5b.
+- PR1613/1603 merged2df9fb9b;1603 CLOSED. Exact final-head GitHub unit/Windows
+  checks and actual merge-tree proof passed; ROOT-MERGE.json in lane report.
+- PR1615 Tanzania evidence merged20afc615;1497 remains OPEN for fallback policy.
+- PR1617 Niger/Mali country notes merged:
+  1b0e4e07907377bd3855379b8f13c7eae675ac5a;1560/1571 remain OPEN/held.
+  Final-head unit/Windows and exact actual merge trees checked for all three.
+- PR1614 TLU-only disclosure head02986035 has green final GitHub checks and
+  independent67 PASS. Do NOT merge yet: new1603 shares transformations.py.
+  Root ordinary compositionfefc9729a6c5420747f7daa293db2586afef5089, FSref
+  verify/1485-with-1603-20261108, preserves disjoint exact AST changes:
+  upstream ShippedFactorWarning/_shipped_factor_lookup versus TLU warning/tally/tlu.
+  Other statements and other owned/upstream objects are exact. Additional full
+  offline verification job41018791 is genuinely pytest-running; finish1452 owns.
+  Previously passed TLU-only composition11696/5652skip/4xfail.
+- Fresh paginated repository-wide open count173 (not ISA-only); cumulative14
+  development merges closed14 issues (12 original snapshot + residual1602/1603).
+  Two evidence/doc merges close no scientific issue. Snapshot date in report.
+
+Actual assignments/operational work:
+1. finish1452: BFA1482/1485 reviewed247e369129 PASS (52 external/35author/42old),
+   one source-marked deselection; metadata0/450/1895/35/186 and strict API audit0.
+   Full offline composition76f2c0e60d465854fffc84fc88a4219fad23b2c2 vsdev2df9,
+   job41018784 genuinely pytest-running; owns this AND TLU+1603 job41018791.
+   B/reports/bfa-1482-1485-completion-20261108 and
+   B/reports/verify-1485-with-1603-offline-v3-20261108 hold immutable receipts.
+   Root TLU setup failures preserved:41018769 missing FS ref (root started early),
+   41018779 exit126 because root copyfile lost entry executable mode. No operator/
+   tests began. Agent v3 uses exact original entry/mode700 and verified FSref.
+2. finish1590: new1588 narrow opt-in required_index_levels only household_
+   characteristics[t,v,i],food_expenditures[t,v,i,j], market/currency adjustment;
+   all other/canonical/optional schema winners unchanged. Ledger-first8e05f09e.
+  72 ordered healthy baseline/candidate comparisons PASS frames/attrs/warnings.
+   New52-control stage51PASS/one NEW concat-domain oracle failure, independently
+   proven inherited by exact baseline/full-concat check; correct only new oracle.
+   Existing regression stage near94% lost worker under180s profiling timeout;
+   terminal analysis pending, normal600 only if justified timeout. No green final.
+3. malawi_revision_food: external process observer + Nigeria1518 WIP/code review;
+   full current Nigeria4019-line read authenticated. Observer asset6cb9120c/
+   operationalb6b5b46d,19controls; native guards and installed code unchanged.
+   ONE new harmless synthetic Git lifecycle repro authorized, free2CPU4G10min,
+   exact existing JobOwnership/inspect_file_mounts + observer, no LSMS/nativehome/
+   model/data, no argv/env/FDtarget recording or policy/guard weakening. External
+   ledger/frozen commands/receipts required; then Nigeria triage continues.
+
+Remote capacity remains impaired, not eight idle/running workers:
+- Claude pilot62c917c9/job41018647 reached native2.1.318 but exit1 AUTH:
+  Not logged in. No task/model response or FDRefused; no login/config action.
+- Codex first observer prep c974df04 failed clone30s BEFOREsbatch/nojob.
+- Root discovered supported --timeout120 feeds BOTH preparatory clone and sbatch
+  in identical installed/source dispatch.py lines268/295 (SHA0ac8a93c...). No tool
+  edits needed. Corrected Codex2ab393424def4e71acd78d6cf32030c0/job41018752
+  submitted after59.840s prep, runtime/observer ready on n0028.savio4.
+- It ran ~251s then failed143: descriptor MOUNTS errno22 EINVAL, not priorEACCES13.
+  Actual deniedPID2018875/start91955401 is commgit, exe/usr/bin/git, parent
+  git-receive-pac2018866/start91955346. RealUID43292x4/Gid501x4, procdir555
+  owner43292, NoNewPrivs1/Seccomp0/TracerPid0/CapEff0. Sampled metadata/FDdir/
+  fdinfo3of3 all successful; NO sampledEINVAL, no later probe. Cause/precise
+  failed operation remains UNLOCALIZED. Do not call it proven unshare/GPG/auth.
+  Observer normalSIGTERM; sealed trace318594B SHA505eb5df044b8e509a0d3d4421d1d1a79cd8014f4c3018841aedbbe24d909293.
+  Private allowed identity receipt: R3/observer-pilot-health-20261108/
+  CODEX-FD-REFUSAL.json. No nativehome/state/SQLite/transcript content read.
+  No more native model retry authorized; synthetic repro is next concrete work.
+
+BFA SOURCE PREPARATION ROOT GRANT (not yet live API actor): root read full plan
+SHA391f488acc4389bdfd0045da9d4dbc5b07ac2269b08ef94d041933fa0ec60a2a and
+inventorySHA5a67d1cddf6785447e20e3f7f88b25f2e1bd2646ea6c8b67e0ffea824a6d218c.
+Chose wider ordinary2018 plot_inputs/livestock acceptance. Authorize unfinished
+closed2capture public-key/payload checks and inspect/authenticate/private-copy
+ONLY frozen10 listed heldL1 identities: existing s16b/s17 +8 all-wave sample
+files. Plot_inputs calls self.sample() without waves, so2014×2/2018×2/2021×4
+are real dependencies; no2018-only sample mock. No acquisition ifmissing,
+no GPS/roster/othercountry, no shared writes. Agent freezes explicit Make child
+adapter/cold baseline2df9 vscandidate76f2 + durableL2/freshfalsecredwarm guards;
+ROOT MUST REVIEW FROZEN EXECUTABLE BEFORE new getter/API execution. No completed
+raw capture replay or baseline-warm inference; all policy/weights/rulings held.
+
+Next root: review frozen BFA source operator when ready; monitor/accept two full
+CI results, then current-library/doc byte proof + expected-head merge1614 only
+when gates pass; keep1485 parentopen and residual1616 separate. Independently
+review1588 after final freeze, advanceBFA PR after gates. Follow synthetic Git
+repro evidence before choosing any upstream remedy. Do not weaken guard or patch
+installed tools. Refill with recoveredNiger1529/Ethiopia1570/1592 or1616 when
+actual capacity is restored. All five R3 partial-code custody records preserved.
+Malawi weights48/whole-wave1604,1509/1442,1560/1571 and scientific fallback1497
+remain held;49/50/51 already settled. Master/shared-cache rewarm remain deferred.
+
