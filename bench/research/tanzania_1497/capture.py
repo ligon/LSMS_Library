@@ -17,6 +17,15 @@ def digest(path,algorithm='sha256'):
     return h.hexdigest()
 
 
+def attach_build_tripwires(stack,library,local,pandas,forbidden):
+    """Actual public construction/writer targets, not the nested loader closure."""
+    stack.enter_context(patch.object(library.Country,'__init__',forbidden))
+    stack.enter_context(patch.object(library.Feature,'__init__',forbidden))
+    stack.enter_context(patch.object(local,'to_parquet',forbidden))
+    stack.enter_context(patch.object(pandas,'read_parquet',forbidden))
+    stack.enter_context(patch.object(pandas.DataFrame,'to_parquet',forbidden))
+
+
 def main():
     os.umask(0o077)
     w=Path(os.environ['W']).resolve();assert Path.cwd()==w
@@ -86,10 +95,8 @@ def main():
         with ExitStack() as stack:
             for name in providers:
                 if hasattr(data_access,name):stack.enter_context(patch.object(data_access,name,forbidden))
-            stack.enter_context(patch.object(lsms_library.Country,'load_dataframe_with_dvc',forbidden))
             import pandas as pd
-            stack.enter_context(patch.object(pd,'read_parquet',forbidden))
-            stack.enter_context(patch.object(pd.DataFrame,'to_parquet',forbidden))
+            attach_build_tripwires(stack,lsms_library,local_tools,pd,forbidden)
             for n,item in enumerate(spec['sources']):
                 current.clear();current.update(source=item['path'],role='projection')
                 entry=dict(item);slug=f'{n:02d}-'+Path(item['path']).name

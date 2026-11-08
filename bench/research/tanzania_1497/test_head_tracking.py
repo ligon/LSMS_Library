@@ -88,3 +88,18 @@ def test_native_selector_conserves_input_payloads_and_roster_order_irrelevant(na
     pd.testing.assert_frame_equal(c,before_c,check_exact=True)
     pd.testing.assert_frame_equal(r,before_r,check_exact=True)
     assert c.attrs==before_c.attrs and r.attrs==before_r.attrs
+
+
+def test_capture_tripwires_attach_to_actual_public_targets_without_source_call():
+    from contextlib import ExitStack
+    import lsms_library
+    from lsms_library import local_tools
+    from bench.research.tanzania_1497.capture import attach_build_tripwires
+    def refuse(*a,**k):raise AssertionError('build-writer-tripwire')
+    with ExitStack() as stack:
+        attach_build_tripwires(stack,lsms_library,local_tools,pd,refuse)
+        for action in [lambda:lsms_library.Country('Invented'),lambda:lsms_library.Feature('invented'),
+                       lambda:local_tools.to_parquet(pd.DataFrame(),'invented.parquet'),
+                       lambda:pd.read_parquet('invented.parquet'),
+                       lambda:pd.DataFrame().to_parquet('invented.parquet')]:
+            with pytest.raises(AssertionError,match='build-writer-tripwire'):action()
