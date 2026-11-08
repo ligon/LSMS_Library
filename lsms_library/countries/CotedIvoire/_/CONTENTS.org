@@ -1046,3 +1046,34 @@ into False. Historical CILSS waves do not gain a shocks declaration.
 Only the existing 2018-19 declaration is changed. Registered but unfinished
 2021-22 wiring is outside this change. Other effects, coping strategies,
 row/index identity and timing are preserved.
+
+* 2026-11-08 — documented EHCVM region/milieu strata (GH #1575)
+
+The own INS second-edition BID (September 2023),
+=2021-22/Documentation/civ_ehcvm2_information_de_base.pdf=, section 4.1,
+PDF p. 13 (English edition p. 12), explicitly describes the *original
+2018/19* design: "La strate est la combinaison région/milieu."
+Source: https://microdata.worldbank.org/index.php/catalog/6273/related-materials .
+Clusters were selected PPS within strata, then 12 households with equal
+probability within each cluster. The 2021/22 strategy revisits these
+clusters and supplements households to 12 where needed; it is not a new
+independent first-stage draw.
+
+Initial-allocation Tables 1a/1b (French pp. 12–13, English pp. 10–11)
+contain 33 regional/autonomous-district rows with both milieux: 66
+nonzero cells by our count, not a separately quoted official count.
+Abidjan has 80 urban + 4 rural clusters, and Yamoussoukro also has both
+milieux. Do not import a capital urban-only rule from another country.
+Reporting domains, precision targets and market/NSU samples are distinct
+from household sampling strata.
+
+Preserve the conflicting notes above: the early section says "Strata are
+identified via =s00q01= (Region) combined with =s00q04= (Urban/Rural)",
+while the later section says "sample.strata is wired from the cover-page
+region code". The exact 2018-19 YAML wires =strata: s00q01=; this note
+records the own planned definition without changing that wiring or using
+the weight-variance shares as design evidence. The uppercase =CIV= /
+nested =Data/Menage/= convention remains; 2021-22 is registered but
+unwired at this source pin. Older CILSS waves have a different design.
+No sample, strata, weights or defaults change. Exact document identities
+are in the GH #1575 evidence packet.

@@ -732,3 +732,30 @@ interpretation is not adjudicated by this food-effects change.
 Only the existing 2018-19 declaration is changed. Registered but unfinished
 2021-22 wiring is outside this change. Other effects, coping strategies,
 row/index identity and timing are preserved.
+
+* 2026-11-08 — documented planned region/milieu strata (GH #1575)
+
+The own INE second-edition BID,
+=2021-22/Documentation/gnb_ehcvm2_information_de_base.pdf=, section 4.1,
+PDF p. 16 (English edition p. 13), explicitly describes the *original
+2018/19* design: "La strate est la combinaison région/milieu de résidence."
+Source: https://microdata.worldbank.org/catalog/6274/download/100359 .
+Its frontmatter p. 2 names an Abidjan workshop of 11–22 September 2023;
+the cover has no publication date. Clusters were selected PPS within
+strata, then 12 households with equal probability per cluster. The
+2021/22 strategy revisits these clusters and completes households to 12
+where needed; it is not a new independent first-stage draw.
+
+The own 2018 DDI p. 4 / BID p. 10 explicitly describe SAB as urban-only.
+Table 1a of the later BID also allocates SAB 92 urban / 0 rural clusters.
+Seventeen nonzero region/milieu cells is our table count, not an official
+quoted stratum count. Its table is labeled 2021/22 while surrounding
+text describes the original design; retain that qualification.
+
+The earlier "Treat the design as region-stratified for inference"
+recommendation remains above; this adds the own planned definition,
+independently of weights. The previously open vague/grappe question has
+an explicit later resolution in the community-prices note; it is not
+reopened here. No sample/strata/weights/defaults change: 2018-19 still
+wires region alone, and 2021-22 is registered but unwired at this source
+pin. Exact document identities are in the GH #1575 evidence packet.
