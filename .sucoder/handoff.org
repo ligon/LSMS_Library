@@ -1,4 +1,102 @@
 #+title: Handoff, LSMS-ISA sweep
+* Authoritative scrum checkpoint, 2026-11-08T07:01:35.540466+00:00
+Goal ACTIVE. PreviousgoalturnPROGRESS; thisturnPROGRESS: merged1621, closed
+NigeriaP2reviews, actualnewfullsourcecorrespondence+fullCIpassed, moved1578/1592.
+GitHub developmentfa76ee4364d3e27cdbe08f0bb1d2014b060a8f9b; actualtree72fe07dd.
+Filesystemdevelopment/master/sharedrewarm untouched.19developmentmerges/16issue
+closures;freshpaginated171repoopen. Originalscoped147=13closed/134open at06:07
+verifiedoverlay (sharedcountryqueuesoverlap); threeadditionalresidualclosures
+1602/1603/1616. DoNOTcountpartiallyaddressed1482/1485or1518 asclosed.
+
+PR1621 MERGEDfa76ee4 from33c218; finalGitHubunit+WindowsPASS, independent82,
+metadata0/450189535186/18None/0errorsdenials, fullprivate41019974completed0:0:
+11952pass/5652skip/4xfail/722.14s/JUnit17608zeroerrors. Rootactualmergeparents/
+treeexact current728+fert,4BFAincoming+5fertpaths exactdisjoint union, ROOT-MERGE
+in reports/1485-fertilizer-current-verification-20261108. Rootcollectionaudit
+explains+54Feature+74fert vsoldac970.1485body/title narrowed to remaining
+ANONYMOUSNUMERICRECOVERYPOLICY; allwarning/TLU/speciesscreeningstepscomplete,
+expliciton=plot/provenance route documented. No automaticnumericpolicychosen.
+
+Nigeria1518 correctedcode2323284bfd067bc59e2c80fbc3e89ba0c979d44f:
+- DraftPR1622 open(head232), finalGitHubchecks/rootintegrationstillrequired.
+- Original2fa/40d5 immutable. Independent40:30P10F, targeted9:5P4F,
+  classification4P identifiedtwoP2 findings plusinheritedArrowraw-category
+  limits. Boundedfix232: temporaryfactorvalidationview ONLY, derivedServedUnit
+  extensionarray; no callerraw/kernelcast.14authortargeted+16independentclosure
+  pass, noopenP1/P2selectedscope; oldfailures remain. Exactrawcodec limitsdoc.
+- Fullprivateoffline41020235COMPLETED0:0/n0054/22:27:11966PASS5652skip4xfail,
+ 1218.53spytest. JUnit17622zeroerrors; rootcountauditexact+35BFA-74fert+53NI
+  vs11952priorfullsuite. Nodewasslow; no restart/kill. Sourcefreecensus0/N all
+ 450/1895/35/186/public/18None/errors0, closedbaselineadmitted/noBASEreplay.
+- NEWsealedsourcev2 actualONEstagePASS14.06s, currentcoordinatorMAINvenv/
+  unshare/threadbuild1/privatefalsecreds. Sixauthenticatedclosedartifacts:
+ 4trustedpickle deserializations+2JSON,0newrawdecodes/getters/API/Make/warm.
+  Full11956A3i native rows ALLcurrentpureproducer+committedIDeligible;1690
+  quantityNAretained;711factorrows exact9identity+7fluidhold masks/digests.
+ 177nativeheld=69conflictpair+108fluid;11779delegated,8892shipped/2887none,
+ 8786aggregateplotcroprows ineachEXPLICITnational/zone. Allheldcontributors
+  excludedbeforeall3kernelcalls/mode; exactrawpayload/dtype/index andexisting
+  kernelattrs/resultparity. No geography/default/density/pricepolicychosen.
+  ROOT-SOURCE-ACCEPTANCE.json in reports/1518-nigeria-sealed-correspondence-v2-
+ 20261108 independentlychecks frozenhashes,guards19selftests+profileactive,
+ 0denials. FullIDs/auditsprivate700/600. FinalCountryAPI/A3ii/PP/sample/v/Make/
+  Feature/warm/yield/W1W2 UNRUN andnotclaimed. Whole1518OPEN.
+- EarlierUNEXECUTEDsourceproposalv1f28 preserved: staticdependencygeneric
+  df_data_grabber conflictsguard. v2ef7 reusesPUREdf_from_orgfile/format_id/
+  exactcurrentCodePreferredloopAST; unchangedguards/wrapper/inputseals. Root
+  readfullv1+delta/parser andauthorizedONEv2; no broadreadwhitelistclaim.
+- Author now appends genuinelynewCOUNTRYfindings+Phase3ledger inNEWseparate
+  finalizationtree from232; allrunningCI/verify/source trees/232ref immutable.
+  ProposednoteROOTapproved; bindfull4019prefix+allchanges, no undefinedBalias
+  (citeledger/PR1622/fullreportpath). Newdocs-onlyhead mustprove ALLproduct/
+  tests/maps exact232 before ROOTFFGitHubbranch +finalheadGitHubchecks. No manual
+  fullCI/source replay. ROOT-POST-FERTILIZER-COMPOSITION.json: fa76+232 exact5
+  incomingfert/3NIdisjoint modes/objects, prospectivec154b263. Recomputefordocs.
+
+Actualthreeworkerassignments (zero remotenative modelworkers):
+1. finish1590: froze1578 runtime85b07a0328cd8fedcf38c4864945bb317fcbbacd/base728.
+  Private localderivationsloader rejectsEXPLICITdupmappingmembers BEFOREYAML
+  flattening; preserveslegitimatealiases+mergeoverrides/genericload_yaml.
+ 44new/28oldcontrols,15files81typedorderedrecords exact; strictAPI0. Independent
+  finish1452CLOSED46newcontrols/0skip/noP1P2/6activeguards0denials. Currentfa76+
+ 85b ordinaryc8fb35ca957432d4bd59e1beeed2bedc0b3c6d9a exact4owned/5incoming
+  pathunion. Root8operatorhashes+ONLYnamespace/lanechanges+FSrefpreflightPASS.
+  ONEfullprivateCI41020419RUNNING +candidate-onlycensus88635; nobaselinereplay.
+  Author now independentlyreviews1592838 againstfa76, matrixfrozen beforecode/
+  authorinspection. See reports/1578-current-verification-20261108 and
+  review-1578-duplicate-registry-20261108. Originalfixture/setupfails preserved.
+2. finish1452: authored1592 approvedOptionA frozen838d20412d9ad3f8bb5725d3a9b4
+ 137172b010c9/basefa76 (fullSHA838d20412d9ad3f8bb5725d3a9b4137172b010c9).
+  ONLY_add_market_index bareoriginalavailabilityexception whennov BEFOREfalse
+  warning/no secondsamplecall; existingvwarningtruthfulattempting. HHpriority/
+  existingvfull(t,v)/guards/NAstrict unchanged. _joinv/returnedbad-sample shape
+  untouched.38focused+strictAPI0+actualfullmetadata0/Nall450189535186 passed,
+  original12diagnosiscohortnotreplayed. Now NEWCIverifytree/ref/operatorpreparation
+  sameacceptedtemplate; MUSTsurfacefrozenpreflightROOTbeforeONEfullCIlaunch.
+  Phase3ledgerclosureinSEPARATEtree afterindependentreview, no product/testdelta.
+  Report reports/1592-market-sample-unavailable-20261108;ROOT-CENSUS-APPROVAL.
+3. malawi_revision_food: NI finaldocs+checkpoint proof, fullCI/sourceallclosed;
+  rootwillrefillNiger1529diagnosticcharter afterfinalization. No newsourcegrant
+  implicit. OldNiger/Ethiopia recoveredcustody/closedartifacts staypreserved.
+
+Rootnext: verify newNIcountrydoc/Phase3head protectedbytes thenFFpublishPR1622
+(expectedold232), monitor finalheadGitHubCI; no freshfullCI/sourcecampaign.
+Review1578/1592reports/finalproofs,ROOTCIpreflights anddraftPRs afterpeerreview;
+mergeonlyfinalheadgreen/currentexacttrees. Keepworkersrefilled: nextcountry
+Niger1529 recovereddiagnosticcharter FIRSTfullCONTENTS/logs/caveats, source
+artifactscopes explicit; future1591parentexception transport remainslowpriority.
+READY.json/liveoverlay and ROOT-1578-COMPATIBILITY-RULING/currentclosedmap
+admission in reports/scrum-ready-queue-20261108. Do not repeat closedcohorts.
+
+Scientific/productionholds: Malawidecision48weights+wholewave1604;1509/1442
+purchasepriceeligibility;1497fallback;Niger/Mali1560/1571unit/window/state;
+Mali1594sentinel;1482Tonneinterpretation;1518W1/W2/geography/fluidbasis.49/50/51
+andqualitativeshocksdecisions alreadysettled, notnewpermissionquestions. Remote
+Claudeauth/CodexownedgitFDguard stillimpaired;2closednonnativerepros nonreproduced,
+no newnative/tool/guard/hook/dependency change authorized. Earlier1535sharedcache
+incident qualified, no blanketbytecontinuity orrollbackclaim. Goalnotcomplete
+orblocked; authorizationspersist, no routineuserapproval needed.
+
 * Nigeria review hold update, 2026-11-08T06:20:40.280468+00:00
 Supersedes the Nigeria CI-launch preparation status below. Independent40case
 review2fa closed30PASS/10FAIL.2genuine nullable Float64pd.NA selectedfactor
