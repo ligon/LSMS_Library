@@ -6618,6 +6618,46 @@ _TLU_FACTORS = {
 }
 
 
+class TLUCoverageWarning(UserWarning):
+    """Positive reported heads have no species factor and contribute no TLU.
+
+    The complete unsupported-label tally, including zero, missing and negative
+    heads, is carried by ``result.attrs['tlu_species_coverage']``. This warning
+    neither supplies a factor nor changes the existing returned rows/values.
+    """
+
+
+def _tlu_species_coverage(labels, head, weight, head_col):
+    """Count unsupported labels before missing contributions disappear.
+
+    GH1485 ledger §§2–5: the nitrogen coverage diagnostic is the precedent;
+    head-sign/missing categories describe rows, never an imputed herd size.
+    """
+    unsupported = weight.isna().to_numpy()
+    labels = np.asarray(labels, dtype=str)
+    states = {
+        'positive_rows': head.gt(0).fillna(False).to_numpy(dtype=bool),
+        'zero_rows': head.eq(0).fillna(False).to_numpy(dtype=bool),
+        'missing_rows': head.isna().to_numpy(),
+        'negative_rows': head.lt(0).fillna(False).to_numpy(dtype=bool),
+    }
+    counts = {}
+    for label in sorted(set(labels[unsupported])):
+        selected = unsupported & (labels == label)
+        counts[str(label)] = {
+            'rows': int(selected.sum()),
+            **{key: int((selected & mask).sum())
+               for key, mask in states.items()},
+        }
+    return {
+        'head_col': head_col,
+        'input_rows': len(head),
+        'supported_rows': int((~unsupported).sum()),
+        'unsupported_rows': int(unsupported.sum()),
+        'unsupported_labels': counts,
+    }
+
+
 def tlu(livestock, *, tlu_factors=None, head_col='HeadCount'):
     """Tropical Livestock Units owned per household.
 
@@ -6647,26 +6687,50 @@ def tlu(livestock, *, tlu_factors=None, head_col='HeadCount'):
     engaged-y/n binary — see :func:`livestock_engaged`), so this transform
     is sanity-checked on magnitudes, not against a WB column.  A typical
     smallholder herd lands at roughly 1-5 TLU; values are bounded below by 0.
-    Species absent from the factor map contribute nothing (and emit no
-    error — callers wanting strict coverage check the species set first).
+    Species absent from the factor map contribute nothing. Unsupported
+    positive heads emit :class:`TLUCoverageWarning`, explicitly disclosing
+    omitted contributions. The returned rows and values are unchanged:
+    a household with no nonmissing supported contribution remains absent.
+    ``attrs['tlu_species_coverage']`` counts every input row before reduction,
+    with per-original-label positive/zero/missing/negative row counts for
+    unsupported species. Missing includes values coerced to NA by the existing
+    numeric conversion. Matching still uses only the existing lowercase lookup;
+    no species equivalence or factor is inferred. A factor of zero is supported.
     """
     factors = _TLU_FACTORS if tlu_factors is None else tlu_factors
     df = livestock
     if head_col not in df.columns:
         raise ValueError(f"livestock must have a {head_col!r} column")
     if 'animal' in (df.index.names or []):
-        animal = df.index.get_level_values('animal').astype(str).str.lower()
+        labels = df.index.get_level_values('animal').astype(str)
     elif 'animal' in df.columns:
-        animal = df['animal'].astype(str).str.lower()
+        labels = df['animal'].astype(str)
     else:
         raise ValueError("livestock must have an 'animal' level or column")
+    animal = labels.str.lower()
 
     head = pd.to_numeric(df[head_col], errors='coerce')
     weight = pd.Series(animal, index=df.index).map(factors).astype(float)
+    coverage = _tlu_species_coverage(labels, head, weight, head_col)
+    positive = {label: count['positive_rows']
+                for label, count in coverage['unsupported_labels'].items()
+                if count['positive_rows']}
+    if positive:
+        named = ', '.join(f'{label!r} ({count:,} positive rows)'
+                          for label, count in list(positive.items())[:8])
+        warnings.warn(
+            f"tlu omitted contributions from {sum(positive.values()):,} row(s) "
+            f"with positive {head_col} and no species TLU factor: {named}. "
+            "Returned TLU covers matched species only. Inspect "
+            "attrs['tlu_species_coverage'] for every unsupported label and "
+            "head-count category; tlu_factors= accepts explicit own-label factors.",
+            TLUCoverageWarning, stacklevel=2)
     contrib = head * weight
     out = pd.DataFrame({'TLU': contrib}).dropna()
     group_by = [n for n in ['t', 'i'] if n in out.index.names]
-    return out.groupby(group_by).sum()
+    result = out.groupby(group_by).sum()
+    result.attrs['tlu_species_coverage'] = coverage
+    return result
 
 
 def livestock_engaged(livestock):

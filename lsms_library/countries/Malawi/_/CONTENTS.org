@@ -5390,3 +5390,28 @@ row.  The purchases / stock nonmissing counts are:
 Regression coverage: =tests/test_shocks_malawi_iraq_food_effects.py= checks
 independent synthetic answers and missingness, then compares every served
 effect and coping answer to the raw source by household and shock.
+
+* 2026-11-08 -- TLU coverage is disclosed; anonymous fertilizer keys remain unresolved (GH #1485)
+
+=tlu= retains its existing factors, returned households and numerical totals.
+It now carries =attrs['tlu_species_coverage']= with unsupported original-label
+row counts separated into positive, zero, missing and negative head counts.
+Missing includes the existing numeric conversion's unanswered/nonnumeric
+values; it is never a recorded zero. Unsupported positive heads emit
+=TLUCoverageWarning= stating that their contributions were omitted. No cow,
+goat or local-hen equivalence/factor is inferred, and an unsupported-only
+household remains absent from the old TLU result rather than being invented
+as zero or NA. The older #1435 statement that "nothing warns" describes the
+previous behavior; its measured herd totals are historical, not refreshed here.
+
+The anonymous =fertilizer_rate= caveat above remains after merged GH #1475,
+which deliberately excluded this transform. Source-free actual-transform
+controls reproduce a nonempty result losing later =garden_plot= waves under
+the legacy parcel route; this is a mechanism check, not a new source census
+or remeasurement of 14,909/37,010. Both supplied row-country identity or
+matching scalar provenance preserve Malawi's full native keys under the
+existing contract. A caller who knows the two vocabularies match can already
+choose =on='plot'=. The strings alone cannot establish Malawi identity, and
+no automatic routing change is made. Warning-only disclosure would not
+recover those rates or close the whole GH #1485 issue. Livestock Site Q is
+a separate coordinated task; Malawi weights48 and scientific defaults stay held.
