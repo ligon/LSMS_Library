@@ -49,3 +49,31 @@ Add canonical one-empty-direction and all-empty regressions. Freeze revised head
 
 
 P2 revision verification: frozen runtime bb0d4b8c9ef7b20ca94d0a99e63fc4ef3f16ca40 passes ONE affected7case run (3new canonical cases+4existing affected cases),0skip/error/failure. Sole2C/sole3C frames are returned exactly, including object identity/axes/dtypes/attrs; both empty sources retain exact original AssertionError text, all four reads and both builder attempts, no writer call. Multiple-populated-source/order and original2C/source-prefix controls pass. Three13binding guard receipts active/0denials, private data0files, exact mountedMAIN/cwd/import/config/falsecreds/unshare/BLASbuild1/pytest2loadfile. Oldauthor23P1fixture/corrected1P and independent31P1F remain immutable; no whole24 orsource replay. Final ledger-only freeze preserves all product/test objects on runtime; independent affected closure remains ROOT/reviewer gate.
+
+
+### ROOT partial-publication checkpoint — 2026-11-08T13:30:26.844284+00:00
+
+The frozen4cca native3C implementation passed the bounded empty-component
+independent review8controls, independent native oracle8controls and10support
+controls. Its six-artifact correspondence stage preserves9,605observations and
+remains CARDPROJECTION qualified. Actual-reader job41024309 then read9heldDTA
+sources through the unchanged reader, preserving every native/public key,
+Quantity/Purchased/Quantity_purchased value, NA mask and dtype, with0missingv.
+Fresh-process warm frames/attrs/ledgers and7private L2files were unchanged.
+All3source guards passed, and the private reader copy was removed. These
+source claims apply to4cca; no original public baseline was replayed.
+
+Composition f66 merges4cca with then-currentd82. Its entire384-entry Niger
+subtree is exact4cca. The full configured offline suite passed12,218tests,
+with5,652skipped and4xfailed (635.68s); ROOT-reviewed report records all17,854
+prior outcomes unchanged and20new passing cases. Static API and guarded
+metadata checks passed;19Niger country-table/19Niger2011wave fingerprints
+change because whole-wave build inputs are hashed. Other cells are unchanged.
+
+Publication is partial:3B cultivation/use,3D count/mean-payment operands and
+3E native crop-cycle-area/design questions remain open. No parcel allocation,
+season axis, new sentinel interpretation, cost total, yield denominator,
+unit/factor/weight or scientific default is selected. Final stacked-framework
+integration, the separately scoped Feature check and GitHub checks remain
+pending; final validation and publication decisions belong in the PR body
+and ROOT receipts. Whole1529 must remain open after this partial transport.
