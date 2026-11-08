@@ -1,0 +1,65 @@
+{
+  "production_base": "c780562b299bb100cdd006037ba424c8ad3264e9",
+  "sources": [
+    {
+      "path": "Tanzania/2019-20/Data/HH_SEC_A.dta",
+      "md5": "9179d7f5e7621d642b79034cf9cec238",
+      "size": 584392,
+      "kind": "dta"
+    },
+    {
+      "path": "Tanzania/2019-20/Data/HH_SEC_B.dta",
+      "md5": "96aab692dbc65fe97240a2b182f58015",
+      "size": 2249923,
+      "kind": "dta"
+    },
+    {
+      "path": "Tanzania/2019-20/Data/npssdd.panel.key.dta",
+      "md5": "12160235dd5c5c94b4664ca360ee7b5b",
+      "size": 3272775,
+      "kind": "dta"
+    },
+    {
+      "path": "Tanzania/2008-15/Data/upd4_hh_a.dta",
+      "md5": "dd8133164050755f4e2e33d37f08daa3",
+      "size": 17800269,
+      "kind": "dta"
+    },
+    {
+      "path": "Tanzania/2014-15-EXT/Data/TZA_2014_NPS-R4_v03_M_v03_A_EXT_STATA11/hh_sec_a.dta",
+      "md5": "5eb390e355ac3e19a62612ef9086ce03",
+      "size": 293973,
+      "kind": "dta"
+    },
+    {
+      "path": "Tanzania/2014-15-EXT/Data/TZA_2014_NPS-R4_v03_M_v03_A_EXT_STATA11/hh_sec_b.DTA",
+      "md5": "2e595aa2b81b6631cc6f77df614c83ef",
+      "size": 619877,
+      "kind": "dta"
+    },
+    {
+      "path": "Tanzania/2014-15-EXT/Documentation/nps_household_qx_y4_final_english_.pdf",
+      "md5": "e415e74e1e6cece7c0fb1a5b7b7497cd",
+      "size": 1052621,
+      "kind": "pdf"
+    },
+    {
+      "path": "Tanzania/2014-15-EXT/Documentation/tznps_2014_2015_bid_06_27_2017.pdf",
+      "md5": "53be2a92e13dd6512803a49a105b33ba",
+      "size": 1609118,
+      "kind": "pdf"
+    },
+    {
+      "path": "Tanzania/2019-20/Documentation/nps_sdd_household_qx_final_english_.pdf",
+      "md5": "e6b3ba0b53ee3d182037ee89d565bb5a",
+      "size": 862082,
+      "kind": "pdf"
+    },
+    {
+      "path": "Tanzania/2019-20/Documentation/tznps_sdd_2019_20_basic_information_document_updated_november_2022.pdf",
+      "md5": "6d791f6953f8efb0d04ce7ca4bddb3f4",
+      "size": 1552867,
+      "kind": "pdf"
+    }
+  ]
+}
