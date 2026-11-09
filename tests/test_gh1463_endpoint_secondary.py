@@ -14,7 +14,7 @@ import sys
 import warnings
 
 from botocore.exceptions import (
-    BotoCoreError, ConnectionClosedError, EndpointConnectionError,
+    BotoCoreError, HTTPClientError, EndpointConnectionError,
     PartialCredentialsError,
 )
 import pandas as pd
@@ -146,9 +146,9 @@ def test_primary_endpoint_keeps_original_identity_cause_and_traceback(invented, 
 @pytest.mark.parametrize("exc", [
     LT.InTreeSourceError("invented source refusal"), LT.ParquetFormatError("invented format"),
     ValueError("invented value"), PermissionError("invented permission"),
-    BotoCoreError(), ConnectionClosedError(endpoint_url="https://invented.invalid"),
+    BotoCoreError(), HTTPClientError(error="invented unrelated HTTP client error"),
     PartialCredentialsError(provider="invented", cred_var="invented"),
-], ids=["in-tree", "parquet", "value", "permission", "botocore", "other-connection", "partial-credentials"])
+], ids=["in-tree", "parquet", "value", "permission", "botocore", "unrelated-http", "partial-credentials"])
 def test_unrelated_secondary_failures_remain_loud(invented, exc):
     h = invented
     h.errors[FILES[1]] = exc
