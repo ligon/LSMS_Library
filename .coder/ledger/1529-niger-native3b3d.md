@@ -41,3 +41,11 @@ Bounded actual source gate7304 CLOSED0/20.23s: exactheld3B MD5960ee…56057B and
 One existing byteexact metadata operator dd7667… run31622 CLOSED0/132.56s. Closed6e map admitted tobase dec2 by entire lsms_library tree identity, original header retained/no baseline replay. Existing19Niger country hashes +19Niger2011wave hashes change; added2country+8declared-wave cells and2BTFkeys, existing35BTF/all186FIF exact, no removals/18None exact,0errors/denials. Addedwave hash cells are metadata enumeration, not laterwave source support. Only nonhash differences are Niger/publicmethod additions and derived totals; all other countries/fields/overrides exact. Full comparisons in external report.
 
 Independent1452 SOURCE-only review passes frozenproduct/correctedfixture; final source/evidence carry and ROOT release remain separate gates. No fullsuite, acquisition, shared cache clear/rewarm, science or whole1529 completion claimed. External packet: reports/1529-native3b3d-implementation-20261109/.
+
+Additive attrs identity qualification: the first four-produced-output-only
+comparison ran from mirror cwd without an explicit package identity assertion;
+it remains historical, not the final identity-bound acceptance. A corrected
+checker on exact8839 checkout/PYTHONPATH/privateempty config/data confirmed
+attrs and attribute types equal, four more produced-output loads, zero raw/
+reader/API calls. Total8produced-output loads across both checks; source gate,
+focused tests and census unchanged. No scientific/product correction occurred.
