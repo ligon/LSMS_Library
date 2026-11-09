@@ -110,7 +110,7 @@ from dataclasses import dataclass
 from functools import cached_property, lru_cache
 from sys import stderr
 import sys
-from dvc.repo import Repo
+from ._dvc_runtime import DVCMetadataCompatibilityError, RuntimeDVCRepo as Repo
 from dvc.exceptions import DvcException, PathMissingError
 from botocore.exceptions import (
     ConnectionClosedError, ConnectTimeoutError, EndpointConnectionError,
@@ -6163,6 +6163,8 @@ class Country:
                 from .local_tools import _warm_dvc_cache_for_feature
                 if build_root is None:
                     _warm_dvc_cache_for_feature(self, method_name, wave=wave)
+            except DVCMetadataCompatibilityError:
+                raise
             except Exception:
                 # Pre-warm must never break a build.  The retry loop
                 # downstream is the safety net.
@@ -6948,6 +6950,8 @@ class Country:
                 from .local_tools import _warm_dvc_cache_for_feature
                 for table in [method_name, *self._make_declared_inputs(method_name)['tables']]:
                     _warm_dvc_cache_for_feature(self, table)
+            except DVCMetadataCompatibilityError:
+                raise
             except Exception:
                 pass  # unchanged best-effort policy; producer reads are authoritative
             with self._make_build_root(method_name) as (root, expected, verify, others, declared_inputs):
@@ -9620,6 +9624,8 @@ def _probe_source(rel: str) -> bool:
     token = _lt._FAST_PROBE_OUTCOME.set(outcome)
     try:
         ok = bool(_lt.source_fetchable_fast(path))
+    except DVCMetadataCompatibilityError:
+        raise
     except Exception:  # noqa: BLE001 -- any failure to fetch is "still unavailable"
         ok = False
     finally:
