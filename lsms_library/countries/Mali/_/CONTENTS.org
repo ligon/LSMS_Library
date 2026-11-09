@@ -3633,3 +3633,29 @@ Implementation/test preparation is separate from actual source/API/cache
 acceptance. The finite source-free controls and later independent review
 must close before a new actual serving claim; no whole-country re-warm or
 source replay is implied. See =.coder/ledger/1494-mali-2021-namespace.md=.
+
+* 2026-11-09 -- GH #1574: held BID visual and sampling-header checks
+
+All 32 pages of the managed =2017-18/Documentation/bid_eaci17.pdf= were
+rendered with installed Poppler and personally inspected. PDF p.10 (printed
+p.7) states that 51 explicit strata were selected but does not enumerate
+their codes. Table 1 on PDF p.14 (printed p.11) gives eight-region sample
+counts, not a 51-code list. The questionnaire/file annex (PDF pp.17-29) and
+geovariable annex (pp.30-32) did not supply a complete crosswalk in this
+bounded review. This is not proof of absence from other official holdings.
+
+The BID's weights-file pointer, PDF p.16 (printed p.13), names
+=EACI17_ECHANTILLON.dta=, already declared by =sample.df_weights= with
+=strata: strate=. A single metadata-only read of the held 241,444-byte file
+(MD5 =2a14355a2a9f95588f78902fb8244f6f=) found =strate='s literal variable
+label =codestrate=, an empty value-label-set reference, and no value-label
+dictionaries in the file. No data rows were read; the historical occupied-code
+count was not repeated. Original bytes and the private copy stayed unchanged.
+
+The earlier text-search, unsuccessful browser render and zero page-13 embedded
+images remain separate history. This completed raster/header check still does
+not provide the authoritative 51-code list or its correspondence to =strate=.
+GH #1574 remains open; no label, stratum, weight, survey-design or default
+change follows. Closed reports under the 20261103 burst =reports/= are
+=1574-mali-bid-poppler-layout-20261109/= and
+=1574-mali-sampling-header-20261109/=.
