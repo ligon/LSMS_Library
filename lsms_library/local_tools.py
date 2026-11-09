@@ -538,7 +538,13 @@ def _fast_window_select(outcome, remote, fs):
     valid = [entry for entry in entries
              if entry[0] > now and _fast_same_route(entry[4], _fast_route(entry[3], entry[2][5]))]
     with _FAST_CONNECT_STATE.lock:
-        _FAST_CONNECT_STATE.windows[:] = [e for e in _FAST_CONNECT_STATE.windows if any(e is v for v in valid)]
+        # Only the snapshot was validated. Preserve later publications, and
+        # retain ALL live entries as well as the snapshot until mutex exit:
+        # pruning or the owner/options transitions below may drop a last owner
+        # whose SDK finalizer can perform IO.
+        released = _FAST_CONNECT_STATE.windows
+        _FAST_CONNECT_STATE.windows = [e for e in released
+            if not any(e is s for s in entries) or any(e is v for v in valid)]
         if scope is not None:
             owner = scope[0]
             old = _FAST_CONNECT_STATE.owner
