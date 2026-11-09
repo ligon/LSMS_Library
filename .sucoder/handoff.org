@@ -86,6 +86,8 @@ holds (1497/1509/1442/1518/1560/1571/1502/etc.) persist; see archive/DECISIONS.
   Report1519-actual-labelled-construction-20261109 preserves the oracle reassociation
   failure and three cumulative labelled loads. Next: actionable issue disposition and
   decide whether label-vs-code routing is a defined wiring bug or needs a maintainer ruling.
+  ROOT applied corrected1519 title/body08:05:38, original preserved/issueOPEN. Existing
+  own-label/prefix semantics are defined behavior; no speculative numeric-code fix authorized.
   Exact numeric envelope keys are frame/positions/missing_masks/dtypes; cardsplain dict.
 - 1525 completionacdb: prior203linereview+two officialPDF114pages/4layouts read; printed
   108Dry/108_1Flour confirmed. CEB01description/CEB02code versus export bridge UNRESOLVED;
@@ -106,6 +108,8 @@ defined fix without reopening data; finish_1590 manages remote queue/refills.
 08:00UTC actual remote count was ONE (GNB1531); two local workers plus manager assignments
 are not eight workers. User's underutilization criticism is valid. Refill ordered for CIV1562
 official export semantics and fresh ready-issue inventory; count only confirmed execution.
+08:05:42UTC both refills confirmed agent_execution: jobs41038937(CIV),41038938(inventory),
+alongside GNB41038666; THREE remote actual workers, substantive new output still pending.
 Use collaboration status and Q/reports/ROLLING-ACTUAL-STATE.json for actual phases, never
 historic eight-job counts. Eight productive executions were reached; completed actors are
 not busy. Refill purposeful work/reviews only, no invented tasks or repeated finished cohorts.

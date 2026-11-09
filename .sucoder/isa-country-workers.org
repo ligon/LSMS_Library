@@ -29,9 +29,14 @@ Historical eight country assessments and completed refills are not busy.
 - 1531 GNB explicitunit authority diagnosis; no threshold/unit inference or clamp change.
 - 1525/1000/905 meaningful holds preserved; do not manufacture a fix from negative evidence.
 
-08:00UTC: ONE remote executing (GNB1531); local1452 and manager active, Mwi just finished
-and was reassigned. Refills ordered: CIV1562 official SurveySolutions export documentation;
-fresh read-only inventory to identify ready fixes. Neither counts busy until execution.
+08:00UTC: ONE remote executing (GNB1531); user criticism of underfilled pool accepted.
+08:05:42UTC supported status confirms THREE remote agent_execution jobs with fresh heartbeats:
+- GNB1531 job41038666 (GPS source/instrument diagnosis, final supplement).
+- CIV1562 job41038937, dispatcha3c8758e25194d3190f01412dd3bae83 (official export semantics).
+- Ready-issue inventory job41038938, dispatchb4a31c186b114fb18ee41cc57bb01e08.
+Two new jobs have started research; substantive results pending. Local1452 performs current
+Tanzania runtime verification; Mwi completed1519 disposition, ROOT applied residual to GitHub
+08:05:38. Existing unit-label comparison is defined behavior, not an approved numeric-code fix.
 Do not repeat a historical eight-worker claim. Report useful throughput and actual phases.
 
 Standard ordinary private-DVC template integrity/dryrun/ONEsubmit within existing finite
