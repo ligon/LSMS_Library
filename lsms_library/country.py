@@ -3219,23 +3219,6 @@ class Country:
                 raise RuntimeError("cluster_features returned no data for any wave.")
             cf = pd.concat(cf_parts, ignore_index=True)
 
-            # Wave-level cluster_features() returns raw data that has not
-            # been through _apply_categorical_mappings().  Apply the
-            # country's categorical mapping here so that market labels are
-            # normalised (e.g. "DODOMA" -> "Dodoma") before the lookup is
-            # cached and joined onto every downstream table.
-            cat_maps = self.categorical_mapping
-            if cat_maps:
-                lower_lookup_cm = {name.lower(): name for name in cat_maps}
-                key = lower_lookup_cm.get(column.lower())
-                if key is not None:
-                    table = cat_maps[key]
-                    if "Preferred Label" in table.columns:
-                        source = _categorical_key_column(table)
-                        if source is not None:
-                            rdict = table.set_index(source)["Preferred Label"].to_dict()
-                            cf[column] = cf[column].replace(rdict)
-
         if cf.empty:
             raise RuntimeError("cluster_features returned no data for any wave.")
 
@@ -3245,6 +3228,11 @@ class Country:
                 f"'{column}' not in cluster_features columns. "
                 f"Available: {available}"
             )
+
+        if not needs_country_loader:
+            # Match the Country fallback exactly once, without relabelling
+            # identity keys or unrelated cluster attributes (GH1440).
+            cf[column] = self._apply_categorical_mappings(cf[[column]])[column]
 
         lookup = (cf[['t', 'v', column]]
                   .dropna(subset=[column])
