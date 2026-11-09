@@ -1,4 +1,17 @@
 #+title: Current LSMS-ISA worker queue
+* Current authoritative checkpoint 2026-11-09T18:17:03.245378+00:00
+Development20c85655a67cd754a6c5ea4b118b5ded4b53b87b;68merges/38closures.
+1669MERGED+CI/postmerge verified. No pending PR through1669.
+Actual local check: two running + one completed; completed1452 explicitly reactivated.
+1452 Nigeria923789 current integrated public acceptance GRANTED/running preparation;
+Mwi8517b923 v3 current integrated source-free cohort GRANTED after freeze;
+1590 remote D narrow R1 repair dispatch + source-only country queue refill.
+D peer one new deterministic concurrency control FAILED; repair/re-review required,
+original114PASS/census/failing control retained. Do not claim D accepted.
+Niger1530/Uganda1525/Mali1495 source-only refill authorized if fresh reconciliation
+confirms unaddressed/unowned; pending submissions are NOT busy workers.
+Full exact source/evidence/authorization and inherited fences in [[file:handoff.org]].
+
 * Currentexecution2026-11-09T17:49:49.854173+00:00
 1669READY/CI42666328856RUNNING; maina9/67merges38closures. Rootfirstpoll+mergegreen.
 Mwi851v2freeze/1452Nigeria587metadata28894+publicclosureplan/1590D4390cohort+monitor;ONEremote41048173.

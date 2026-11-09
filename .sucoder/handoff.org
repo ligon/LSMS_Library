@@ -1,4 +1,82 @@
 #+title: Current LSMS-ISA goal handoff
+* Authoritative execution checkpoint 2026-11-09T18:17:03.245378+00:00
+This supersedes live statuses below. Goal ACTIVE; 68 verified development merges,
+38 whole-issue closures. Seven PRs 1663–1669 merged in this stretch.
+Development 20c85655a67cd754a6c5ea4b118b5ded4b53b87b,
+tree e4faf713dbfbcb303c573d4b201113105e22ab12. Filesystem origin branch
+handoff/isa-development-20261109 successfully published at this exact commit.
+
+PR1669 MERGED and postmerge verified. CI42666328856 actual checkout
+c60a3f97e1c01098b172b734756181ff764bc077, parents a9e15b3a + ed475c67;
+13419 passed/5661 skipped/4 expected failures, Windows362 passed/1 skipped.
+Actual merge parents a9e15b3abf4f21a2517e0f0b55fee049d910120c and
+ed475c6718a4106d874c9ef973b8e3e353e53597; whole tree exact tested tree.
+Evidence reports/ci-admission-1669-20261109. No new open PR through1669.
+1051 tracker refreshed: A/B/C/E merged; D remains unaccepted/unmerged.
+
+Worker accounting correction: live check found TWO running local agents plus ONE
+completed local worker. Root reactivated finish_1452 with already-authorized
+Nigeria public closure. Do not count reservations, monitors or completed jobs.
+Current productive local assignments: Nigeria acceptance; approved851 API port.
+finish_1590 manages remote D repair and newly authorized country queue refill.
+
+Nigeria587 integrated clean923789f8ea5cf612482fb667c6e036393a968b4d,
+parents20c85655 + cad481; all5 owned exactcad/all19232 others exact20.
+Public finite plan GRANTED (not still awaiting permission): 4 held DTA files,
+read-only fixed sample copy272458B, max12 additional native parses, four phases
+900s each, original strict six comparisons, private tiers/no network, two singleton
+Feature calls through real-constructor sample-v-memo adapter only. Expected attr
+transforms frozen first. No fake PP, new sample build or scope extension.
+Initial copy-preflight failed whole stat_result equality due atime; preserved before
+copies/native/API. Agent correcting wrapper to stable identity plus MD5/SHA; no
+product edit. Original PH parse/21 pure controls are not replayed. Old standalone
+20country/200wave census is historical versus6848. ONE final combined census vs
+closedE map needs exact Root baseline/header admission after final source scope.
+
+851 integrated v3 clean7b923774dffb23f927fbe50cd1f0f349a0f2920c,
+tree3b942ac97dada58b807e7ef108db91d672411b61; parents guard5c24b6f9 and20c85655.
+Root's committed-AST control found retired copied ContextVar slot KeyError;
+correction changes non-None guard to truthiness and adds copied-retired oracle.
+Original93d40 preserved unrun. E country helpers and current Mali/BFA1437 notes
+conserved. Root AUTHORIZED initial source-free 23-class+3-counterfactual cohort
+following source/operator freeze: plain pytest optional DIAG absent, identities,
+private empty roots, threads/build1/loadfile2, cleanup/reentrancy/strictness/one-full-
+build/relabel/market/FX/attrs/empty cases. No raw/API/census yet. Do not leave
+worker waiting for another routine grant. Original false narrower empty-exposure
+preflight rejected; approved private one-shot full-frame handoff retained.
+
+D author e52fa5c9a936c565810000b2f6b5724f8aeee5a5/runtime4390a52b,
+114 focused passes, sole census452country/1885wave/37BTF/124FIF changed,
+all keys/14nonhash/18None exact. Original run/map immutable.
+Independent peer41048970/750862cc71ce4ccb8fc48a4f7e744a06 REQUEST_CHANGES:
+selector validates snapshot outside lock then prunes live list, discarding a fresh
+concurrent publication and permitting final backend release under mutex.
+ONE frozen independent actual-function interleaving control FAILED (1F/0E/S),
+finalizer lock-held true expected false; not actual SDK deadlock/latency evidence.
+Canonical Q/private/Review-1051D-window-product-e52-oncf8/dispatch/750862cc71ce4ccb8fc48a4f7e744a06/evidence/report.md,
+SHA1695a984e82ce142a48bff8a247a7570844ff2d9377bd37a580a33cb410c1ee6.
+Root read entire product local_tools/country diff + peer report. R1 repair authorized:
+NEW child/current20 composition, preserve post-snapshot publications; retain all
+removed/owner refs until after lock. Freeze repair + unchanged R1 oracle, one
+focused correction cohort/no bulk114 replay, ONE corrected final census vs original
+closedE map/no baseline replay, same independent peer verifies unchanged R1.
+Manager preparing new cold author dispatch; do not count it running before proof.
+
+Queue refill standing grant: manager first refreshes current issue/comments and
+published evidence, then NEW source/document-only remote assignments Niger1530,
+Uganda1525, Mali1495 IF unaddressed and unowned. No duplicate old diagnosis,
+raw/nativeAPI/acquisition/recode/weight/strata/default changes. Mandatory fullcountry
+CONTENTS+LOGBOOK/WAITING/TODO, named idiosyncrasy and quoted contradictions,
+prior-art ledger first, isolated current20 trees, no GitHub writes. Docs-only Mali
+candidate permitted if genuinely residual. 2CPU8G60min/free-account profile,
+no nested agents or new metaoperator/canary/framework. Report actual launch facts.
+
+All scientific holds below remain, including1575 implementation choice. Its four-
+country documentary check is COMPLETE; do not dispatch it again. No master release,
+shared cache rebuild, production weight change or raw source acquisition authorized.
+Next root actions: admit exactE baseline to Nigeria, review851 actual focused results
+and integrated diff, D repaired source/peer then promptly publish/runCI/merge green.
+
 * Execution updates 2026-11-09T17:49:49.854173+00:00
 RootEPR1669 openedREADY oned475,CI42666328856 verifiedRUNNING; publicationpeer/sourcegate complete.
 NEXTTURNFIRST pollthisCI+mergegreenpromptly; don'tleavegreenPRwhile doingdesign. Mainstill a9/67merges38closures.
