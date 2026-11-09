@@ -5072,12 +5072,17 @@ class Country:
                 # parquet), fall through to the normal path rather than guess.
                 covered = read_parquet_cache_waves(parquet_path)
 
-                def _replay_dates():
-                    # GH #1045: this short-circuit serves the parquet too, so
-                    # it replays the build-time date-parse report like every
-                    # other warm read.  (The grain audit is not replayed here;
-                    # that is a separate, pre-existing gap.)
+                def _replay_audits():
+                    # GH #1066: replay stored evidence like the normal
+                    # read gate, without asserting freshness or completeness.
+                    # Clear both ledgers before a strict grain report can raise.
+                    _GRAIN_LEDGER.pop((self.name, method_name), None)
                     _DATETIME_LEDGER.pop((self.name, method_name), None)
+                    _replay_grain_audit(
+                        self._grain_reports_for_waves(
+                            read_parquet_grain_audit(parquet_path), waves),
+                        self.name, method_name,
+                    )
                     replay_datetime_audit(read_parquet_datetime_audit(parquet_path),
                                           self.name, method_name, waves=waves)
 
@@ -5090,7 +5095,7 @@ class Country:
                         return None
                     df_cached = map_index(df_cached)
                     df_cached = self._restrict_to_waves(df_cached, waves)
-                    _replay_dates()
+                    _replay_audits()
                     return df_cached
                 if covered is None and set(waves) == set(self.waves):
                     try:
@@ -5098,7 +5103,7 @@ class Country:
                     except FileNotFoundError:
                         return None
                     df_cached = map_index(df_cached)
-                    _replay_dates()
+                    _replay_audits()
                     return df_cached
                 logger.debug(
                     f"assume_cache_fresh short-circuit SKIPPED (coverage): "
