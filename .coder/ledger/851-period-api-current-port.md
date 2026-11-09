@@ -89,7 +89,7 @@ ROOT separately grants their runtime and later final metadata census. Pending
 scientific/carrier issues (GLSS3 within-wave windows, household cover-status
 shortfall, native Mali visit detail) are not implemented here.
 
-## Phase 2 — frozen source draft, verification unrun
+## Phase 2 — historical 968 draft, superseded without execution
 
 Source port 00536f9001513ded5d4d32f235d812d82f0d7116 plus test-only fixture
 child 93c9614122db7a88b4e9b7196d79a8a2034d20fd retains the entire current
@@ -147,3 +147,33 @@ poststep/attrs preservation and continuation cleanup/failure controls. Reuse
 the approved CSV/YAML without another promoter run; update only truthful guide
 and generated dispatch docs through their existing generator as necessary.
 No tests, data/API, raw, census or native cohort execution is authorized yet.
+
+## Current revision draft — cb92 source, runtime unrun
+
+Source/test revision cb92ebe5fb6f6c938752091b69d5321195b2e3d3 removes the
+rejected exposure preflight. Availability is based on represented t, including
+declared-but-actual-empty unknown recall returning healthy empty. Early table
+and vocabulary refusals remain. No promoter or docs-generator rerun is needed:
+all CSV/YAML and generated dispatch doc parts are exact the reviewed 968 draft.
+
+Feature alone establishes a private ContextVar slot bound to actual owner
+identity/table/period. Country claims it once on explicit period entry; nested
+direct calls cannot claim the outer request. On partial availability failure it
+offers a continuation of the existing poststeps and immediately raises the same
+typed error. Feature records unavailable waves, takes that exact error's
+continuation once, finishes the same full unconverted frame, slices and converts.
+No method is re-called with period=None or smaller waves. The two shared finish
+helper bodies are exact original poststep AST after local argument renaming.
+Normal direct Country errors remain immediate. Default None neither establishes
+nor claims the handoff. Token/reference cleanup uses finally on every path;
+consumed callback references are deleted even on error/interrupt. No frame or
+callback is attached to the public exception or cached on the instance.
+
+The new pure draft pins empty/unknown acceptance, one full build, explicit
+period derivation strictness, literal relabel/reaggregate/market/FX2 arithmetic
+through existing helpers with finite lookup/date/factor leaves, attrs and input
+conservation, default None, nested owner/token isolation and error/interrupt
+cleanup. Warning survival is taken from the actual assembled country names,
+so a failed continuation cannot be described as kept. Historical 30 requirements
+are retained with an additive ROOT-disposition erratum; collection/tests/census
+remain zero pending ROOT review of the new frozen selection and runner.
