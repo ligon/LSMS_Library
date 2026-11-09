@@ -17,3 +17,7 @@ Original oldroutingclaim plus no-docadmission preserved as tension, not stale te
 
 ## §6 Remaining authority
 Authenticated deployed country/passageCAPI project/export/version/changehistory and relevant release/export documentation. ROOT approved the documentary content and authorized these ordinary source commits; ROOT retains PR/GitHub publication. Whole1437 is not closed by this paper check.
+
+## §7 Phase 3 — documentation delivery
+
+ROOT reviewed and approved both external appendices and the closed documentary report before source delivery. Ledger delivery bbe9f1128 preceded the two-country source change 3d005831e; both followed the historical document stage. Original Mali3661/BFA3344 prefixes (including Mali1574) and every nonowned mode/type/blob are exact 6848b6b7380ebd511082c6f95ff5dd65d6397fa7. Only59 documentary lines were appended. No code/config/test/default changed; no parser/render/raw/API/build/test/census replay was performed for this delivery. The original documentary result and its bounded/version/CAPI qualifications remain unchanged. External source proof and PR draft: reports/1437-country-notes-delivery-20261109. ROOT retains GitHub publication and issue disposition.
