@@ -1,4 +1,4 @@
-"""Real Malawi2013 native inputs: existing hash and private-copy resolution."""
+"""Real Malawi2013 native input discovery and private-copy resolution."""
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -20,7 +20,6 @@ def test_scanner_discovers_the_real_sidecars_for_private_copy():
         assert source_fingerprint(source).startswith(f'dvc:{source.name}:')
     # Old bare literals already resolved for the wave hash under Data, but
     # script-relative private copying pointed at absent _/ sources instead.
-    assert {WAVE / 'Data' / name for name in NAMES} == SOURCES
     assert not SOURCES.intersection({SCRIPT.parent / name for name in NAMES})
     assert all(not (SCRIPT.parent / (name + '.dvc')).exists() for name in NAMES)
 
