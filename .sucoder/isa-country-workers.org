@@ -1,4 +1,56 @@
 #+title: LSMS-ISA country workers and coordinator queue
+* Current checkpoint — 2026-11-09T05:18UTC — goal ACTIVE, PROGRESS
+Actual utilization is below eight workers. Historical eight country assessments are finished,
+not busy. Latest supported manager observation: Burkina Faso1463 production job41036558 and
+Niger1530 two-source job41036618 executing; Malawi1190 G/header41036559 failed native143 /
+supervisor71 at DVC SQLite placement check, before0 input loads/0 analysis checks. New proposed
+one-key profile DVC_SITE_CACHE_DIR allocation-private correction is independently reviewed by
+Mwi; manager authorized one fresh cold submission after PASS with all protections preserved.
+ROOT has authorized routine source-only/pure-test TierA/B queue refill using successful ordinary
+private profiles without repeated packaging approval. Up to8 remote tasks if genuinely ready;
+no invented work, no scientific holds implemented and no new data acquisition.
+Local agents:1452 doing read-only1495 release admission, Mwi reviewing recovery then1463 code,
+1590 managing rolling remote dispatch. ROOT owns GitHub mutation and final merge decisions.
+
+Authoritative development a63306951177cde76de21bdcefd4026eb382f5a3: PR1643 MERGED /1468CLOSED.
+Sweep42 development merges /30 issue closures. CI42560528180:12813PASS/5649SKIP/4XFAIL,
+WindowsPASS; reviewed whole tree/merge parents checked. Earlier2CI failures retained, corrected
+only obsolete test contracts with stronger JSON persistence/readback/no-source-write checks.
+
+1495 PR1644 OPEN head9d267417b544cd8834f736cf93dc8ae7fba617fb. Documentation-only farm-level
+harvest/sale clarification; parsed YAML/code AST/assertions unchanged. Existing12controls and
+independent review PASS. API0/hash0; all hashes/public/override metadata unchanged. CI42564119192
+awaits release admission by1452; ROOT final merge only. No fresh corpus counts claimed.
+
+1288 PR1645 OPEN draft headc821054706c26dd838dc08b47b39882da823cff5, depends1644.
+CI42566311410 in progress. Original accepted24 cases PASS with fixture-only restoration of
+four original fingerprint helpers; old22P2F attempt remains failure history, not combined counts.
+Current integration2 formerly failing native-Other smoke cases PASS. Portable24 and original46
+now in configuredCI; full current result pending. Independent current code/portable review PASS.
+API0/hash0 on exactc821; ROOT verified19 sealed members and complete comparison. Measured450
+country-table/1877wave/35BTF changes,0FIF,18None preserved. Public surface/config/overrides exact;
+collector-call ancestry trace differs because new helper reaches unchanged collector first.
+Accepted qualified metadata change, not source-data success. No shared cache rebuilt.
+1288 whole issue remains OPEN for broader caller/legacy/source-exposure/dynamic-input residuals.
+Reports:1288-current-integration-portable-20261109,1288-current-release-gates-20261109,
+review-1288-current-portable-integration-20261109. GitHub branch verified exactc821.
+
+Remote completed useful work: Mali1495 author, BF1463 diagnosis, Malawi1190 independent H review,
+Niger1530 source diagnosis. Completed jobs do not count busy. BF1463 fix narrowly adds
+EndpointConnectionError to secondary-dfs existing soft-drop handling; primary still raises,
+config-required losses still raise; unavailable secondary remains existing675soft even required.
+1190 H analysis independent210checks/27controls PASS. ThreeG author finds none of2 thirdpurchase
+or5 mixedgift groups meets existing single-known-G rule; requires carrier/allocation decision.
+SixH headers reveal2016H38a OTHER UNIT label vs current quantity interpretation; quote discrepancy,
+do not silently rebind. G/header independent review failed infrastructure before examining inputs.
+Niger1530 current raw diagnosis restricted2own2021DTAs plus authenticated old captured forms text;
+no PDF/new2018/raw acquisition or forced historical counts.
+
+Scientific holds unchanged:48 production weights/1604;1575 implementation choice unanswered;
+1066 warning replay unanswered;49borrow/50maizeflour/51NOclamp final rulings retained. No master
+release, shared cache rewarm, production weight edits or producer contact. ROOT docs checkout
+library code is old: use pinned current refs/worktrees. Earlier checkpoint below is historical.
+
 * Current goal checkpoint — 2026-11-09T04:03UTC — PROGRESS, ACTIVE
 Previous goalturn made authoritativePROGRESS: PR1642 merged29de/GH1501CLOSED,41sweepmerges/
 29closures. This turn:1468implemented+independentlyreviewed/API+metadataPASS/PR1643OPEN;
