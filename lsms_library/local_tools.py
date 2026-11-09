@@ -559,7 +559,9 @@ def _fast_window_select(outcome, remote, fs):
                 _FAST_CONNECT_STATE.windows[:] = [e for e in _FAST_CONNECT_STATE.windows if not any(e is c for c in changed)]
                 _FAST_CONNECT_STATE.epoch += 1
             for entry in _FAST_CONNECT_STATE.windows:
-                if entry[2][1:] == scope[1:]:
+                # A late publication survives pruning for the next caller, but
+                # this caller may select only an identity it route-validated.
+                if any(entry is v for v in valid) and entry[2][1:] == scope[1:]:
                     outcome.suppressed = True
                     outcome.fs = entry[3]  # SELECT retained route, no fresh native
                     return entry[3]
