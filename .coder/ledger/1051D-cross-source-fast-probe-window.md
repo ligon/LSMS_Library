@@ -49,5 +49,85 @@ Freeze production/tests/selection/oracles before ONE ordinary source-free cohort
 ## §6 Open questions / authority
 No blocking contract question identified. ROOT expressly authorizes immediate continuation after this first ledger-only commit; no permission wait. Any genuine source incompatibility goes to absolute QUESTIONS_FROM_AGENT while independent work continues. ROOT owns patch review, independent peer, CI, publication/integration/merge. No whole1051 closure/default-operator eligibility/field latency claim.
 
-## Phase 3
-UNFINISHED; behavioral tests and census UNRUN.
+## Phase 3 — closed verification and bounded result
+
+Runtime/source freeze: 4390a52b9ad7461cab0d0198cb9c2d33099ed3f5. First new commit
+9ec15516ff2bc75c1c4923cbe76a105fd0564b94 was ledger ONLY over cf8. This final
+checkpoint is ledger ONLY; all tested/censused nonledger objects stay exact.
+
+- Four existing seams — OK (§2–§5): `_probe_source` uses a context-local private
+  outcome while preserving one-argument source helper substitutions and original
+  warmer keyword signature. Deferred False is never source-memoized; actual
+  completed False retains the explicitly separate legacy limitation. Ordinary
+  warming does not read advisory context/window, and keeps None/reader results.
+- S3 scope/route/evidence/window helpers — OK (§3–§5): normal fs_args preparation
+  plus populated native/session/client/signer metadata, static/anonymous and
+  nonrefreshing shared-profile credentials, retained backend SELECTED for equal
+  later scopes. No fresh native/client/discovery for identity. Actual failures
+  bind the authority and requested object/discovery route. All exposed attempts
+  across both layouts must be positive connect evidence; mixed responses, read,
+  closed, auth/missing/local errors and pre-cleanup temp progress veto. Same
+  five-second completion deadline, no sliding, max16 decline at capacity, short
+  locks/no IO or sleep, lazy reference release/no explicit client close.
+- Generations/resources — OK (§4): owner/root/config/environment and populated
+  native/session/client/auth changes fail open; reset/reachable response prevents
+  older in-flight publication. PID/fork replaces inherited mutex. Opaque runtime
+  state object follows existing nonconstant-state conventions, so activation and
+  reset do not become build constants; no fingerprint exclusion was added.
+- A/B/C/E and retry contracts — OK (§4): entire original `_is_transient_fetch_error`,
+  `_remote_md5_available`, `_local_cache_write_denied` and every other existing
+  local_tools AST node exact except the three authorized seams; country.py only
+  `_probe_source` changes. Primary loud errors/config guards, E coverage unknown,
+  B ALL-within/ANY-across and legacy footers, once-key/just-written bounds retain
+  actual selected companion coverage. C1 always runs its unchanged max-two exists
+  branch after observed local denial, active GET window included; HEAD never seeds.
+
+ONE ordinary source-free focused cohort CLOSED0: **114 passed = 103 new + 11
+selected existing**, 0 failures/errors/skips, 9.72 pytest / 15.777 outer seconds.
+Source/tests/selection/literal oracles frozen before execution. D1–D17 represented
+with ROOT B+C1/default-profile corrections. D1 Alpha6 GET/4 sleeps, distinct Beta0
+GET/0 HEAD/0 sleeps; structured Endpoint positive2 GET/0 sleeps. Real backend
+configuration preparation reads only invented profile metadata; native provider
+leaves are fake. Static/anon/profile positives and refreshing/unknown negatives,
+configured-default retention without new native construction, route/config/auth/
+owner/root/PID changes, full retry/layout/progress/error vetoes, local/L1 priority,
+expiry/response/reset/concurrent in-flight/cap16/reference lifetime and safe fork
+are discriminated. Actual ordinary CSV stream decodes [7,11], warmer None and
+original final exception identity hold. Meaningful companions: 2 legacy675
+compatibility, 3 A primary errors, 5 E/B coverage/readgate cases and 1 C ordinary
+stream/private L2 heal. No historical56/E71/A78/B41 bulk replay or new baseline.
+Three controller/worker receipts assert mounted interpreter/own cwd/PYTHONPATH/
+config-root, absent optional observation exports and only loopback under
+unshare-rn. Two loadfile workers max; BLAS/OMP/MKL/build1. Config/data roots0files;
+only invented fixture files in owned private tmp. Integrity/cleanup unconditional.
+
+ONE existing candidate-only metadata census CLOSED0 / **136.693 seconds**, versus
+supplied closed E header7384234791251cd33352c4df0f35a823a9fbc482, baseline SHA256
+6618775057aaadf6f47ba4a584aed3ccd2acd6d479b44a573a447dc8490b312c. Supplied CARRY
+proves cf8 ledger-only over that code. Baseline never replayed. Existing operators
+retain all guards and tracked config-CSV allowance; only interpreter-prefix and
+report namespace substitutions, byte-exact inverse proof. Fresh owned0700 roots,
+absent credentials, unshare-rn. Bounded metadata constructors/config fingerprints
+only; no actual table/API/getter/build. **452/452 country-table, 1885/1903 wave,
+37/37 build-transform, 124/186 framework-import hashes change**; ALL keysets and
+14 nonhash fields exact, all18None exact, errors0/denials0/privateconfigdata0.
+Broad harmonized-cache invalidation disclosed; no rewarm/exclusion/schema bump.
+Candidate map SHA256616632e39e5f95c00f6d261a395f377768a0081a161e061330aee388c1ab0ef6.
+
+One infrastructure preparation issue is retained: a detached controller did not
+survive its launching shell, with empty controller log and no hash.log/receipt/
+map. The existing operator opens hash.log BEFORE spawning its collector, proving
+no collector invocation occurred there. The same frozen operator then ran once
+in a tracked foreground session. No failed behavioral test/census assertion,
+source revision, weakened guard, passed-case replay or automatic rerun occurred.
+
+Limits: eligibility is demonstrated on invented default/profile/static metadata,
+not actual operator credentials. Unknown/refreshing/proxied/unsupported routes
+retain existing cost. C HEAD-only offline cost and completed source-False memo
+recovery remain. Savings are sequential eligible wrapper-call reductions after
+first sequence, not SDK HTTP attempts, first-sequence savings, field latency or
+universal outage detection. No real raw/network/API/acquisition/Make producer/
+shared-cache build or country config/scientific changes. ROOT patch review,
+independent peer, configured CI, integration/publication/merge remain pending;
+whole1051 is not closed. Evidence: supplied dispatch evidence directory, five
+mandatory owned regular0600 files plus source/plan/logXML/map/inverse receipts.
