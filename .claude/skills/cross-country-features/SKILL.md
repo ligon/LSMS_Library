@@ -37,15 +37,19 @@ then fail (GH #325/#326).
 **Registration alone is not enough** — it needs the per-country level *names* to be
 consistent. Heterogeneity blocks it (and naive registration can make it worse):
 - Different names for the same level (`crop`→`j`, `plot`→`plot_id`) → **declare them in
-  `Index Info › level_aliases`** (GH #569, landed for `crop_production`). This used to
+  `Index Info › level_aliases`** (GH #569; `crop_production`, `plot_labor` and
+  `plot_inputs` are registered). `plot_inputs` aliases `crop` to `j`;
+  `plot_labor` needs no level-name alias. This used to
   say "harmonize the per-country index names first", i.e. curate ~14 country configs;
   it is now a two-line config entry applied at assembly by `_rename_index_levels`.
   The `Country()` path keeps its native names, which is why
   `transformations._CROP_LEVELS` / `_PLOT_LEVELS` still exist.
-  **The plot axis is `plot_id`** (@ligon, 2026-09-10) — the spelling all 23
-  `plot_features` countries already declare — so `crop_production` is registered
-  `(t, v, i, plot_id, j, u, condition, season)` and `plot` is the alias, not the
-  target. Every `transformations.py` plot-grain transform (`harvest_kg`,
+  **The plot axis is `plot_id`** (@ligon, 2026-09-10) — the spelling used by
+  `plot_features` — and `plot` is the alias, not the target. Read the current
+  full shapes from `index_info`: crop, labor and input registrations also keep
+  `production_obs`, `labor_obs` and `input_obs`, respectively. Labor keeps
+  `stage` and `worker`; inputs keep `u` and `season`, so registration preserves
+  those distinctions. Every `transformations.py` plot-grain transform (`harvest_kg`,
   `nitrogen_kg`, `seed_kg`, `yield_kg`, `fertilizer_rate`) EMITS `plot_id`
   whichever spelling it was handed. A shared axis NAME is not a shared
   VOCABULARY: `crop_production` keys Uganda's plots `{hhid}-{parcel}-{plot}`

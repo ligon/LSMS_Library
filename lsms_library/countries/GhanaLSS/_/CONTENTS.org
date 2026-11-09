@@ -5298,16 +5298,21 @@ farming; 112 and 130 also appear, and the 1xx block is agriculture / forestry /
 fishing on any reading.  Filter on the codes; do not assume a published
 correspondence until one is found and recorded.
 
-** =plot_labor=: hired and exchange labour, without a plot level
+** =plot_labor=: hired and exchange labour at household grain
 
 Wired from Section 9 Part D for both panel waves at
-=(t, i, stage, source, worker)=.  Deliberately NOT a new table: every country
+=(t, i, plot_id, stage, source, worker)=, with =plot_id='Farm-level'=.
+Deliberately NOT a new table: every country
 in the corpus already holds hired labour in =plot_labor= under
 =source='hired'=, and GhanaSPS already declares a SIX-level =plot_labor=
 =(t, i, plot_id, season, stage, source)= whose =stage= vocabulary is reused
-here.  =plot_labor= has no canonical =index_info= or =Columns= entry (GH #569),
-so the corpus shape is convention -- and it already runs from four levels to
-six.
+here.  GH #569 registered =plot_labor= in the canonical =index_info=;
+the current Feature index is =(t, v, i, plot_id, stage, source, worker,
+season, labor_obs)=.  Feature preserves the native stage/worker detail and
+adds declared sentinels for absent levels, including =unknown_season= and
+=unresolved_observation= here.  Country keeps its native index, with =v=
+joined at API time.  There is still no canonical =Columns= block for
+=plot_labor=; its country-specific measures remain as declared.
 
 Two sources, both household-grain and both 12-month recall:
 
@@ -5373,6 +5378,13 @@ Established here (@ligon, 2026-09-16) and expected to recur: surveys record
 farm quantities at four different grains, and *none is better or worse in
 general* -- which you want depends on the application.
 
+The table records GhanaLSS's existing spellings.  GH #1119 subsequently
+established =(not crop-specific)= for a structural crop marker on =j=,
+distinct from =plot_id='Farm-level'=; =unknown_crop= denotes a crop-specific
+record whose crop was not recorded.  GhanaLSS still writes =j='Farm-level'=
+in its non-crop-specific input blocks.  That country migration remains
+separate; Feature registration does not relabel these =j= values.
+
 | survey resolves  | =plot_id=     | =j=           |
 |------------------+---------------+---------------|
 | farm level only  | =Farm-level=  | =Farm-level=  |
@@ -5399,8 +5411,12 @@ Q43-44 resolves neither.  =plot_labor= uses the same value on =stage= and
 
 Two earlier tables in the corpus express the same fact by DROPPING the level --
 the EHCVM =plot_inputs= and EthiopiaRHS =crop_production= (GH #512).  They
-predate this convention; aligning them is a separate question, not a defect
-fixed here.
+predate this convention.  Since GH #569, Feature supplies
+=plot_id='Farm-level'= for the EHCVM input tables through
+=missing_level_sentinels=; Country retains their native index without a plot
+level.  EthiopiaRHS's coarse crop table remains excluded from Feature crop
+assembly when it lacks a plot axis: crop registration does not declare that
+plot sentinel.  Neither case is changed by this documentation repair.
 
 *** =_relabel_j= passes an unmapped =j= through unchanged -- and that is pinned
 
