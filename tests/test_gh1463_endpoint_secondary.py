@@ -9,6 +9,8 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 from types import MethodType, SimpleNamespace
+import subprocess
+import sys
 import warnings
 
 from botocore.exceptions import (
@@ -20,6 +22,7 @@ import pyarrow.parquet as pq
 import pytest
 
 from lsms_library import country as C, local_tools as LT
+from lsms_library.paths import data_root
 from tests.test_gh1547_optional_credentials import (
     FILES, TABLE, YEAR, drop_expected, invented as invented,
 )
@@ -45,8 +48,8 @@ def expected_frame(h, *, complete=False, stored=False):
     lat = schema["Latitude"]
     assert (lat["type"] if isinstance(lat, dict) else lat) == "float"
     idx = pd.MultiIndex.from_tuples([(YEAR, "c1"), (YEAR, "c2")], names=["t", "v"])
-    payload = {"Region": pd.array(["N", pd.NA], dtype="string[pyarrow]")
-               if stored else pd.Series(["N", None], dtype=object).array}
+    payload = {"Region": pd.Series(["N", None], index=idx,
+                                  dtype="string[pyarrow]" if stored else object)}
     if complete:
         payload["Latitude"] = pd.array([1.5, 2.5], dtype="float64")
     payload["Other"] = pd.array([7, 8], dtype="Int64")
@@ -249,13 +252,64 @@ def test_actual_generated_wave_dispatcher_reaches_the_repaired_handler(invented)
     assert "_in_getattr" not in receiver.__dict__ and len(h.write_calls) == 1
 
 
+def cache_gate(h, tier):
+    """Bind the real read gates to invented receivers (ledger §2)."""
+    if tier == "wave":
+        gate = MethodType(C.Wave._read_l2_wave_cache, h.wave)
+        def read_gate():
+            return gate(TABLE, h.output), None
+    else:
+        receiver = SimpleNamespace(name="Alpha", waves=[YEAR], wave_folder_map={})
+        def table_hash(request, waves):
+            assert request == TABLE and waves == [YEAR]
+            return "invented-1547-hash"
+        receiver._table_cache_hash = table_hash
+        for name in ("_cache_covers_waves", "_restrict_to_waves", "_grain_reports_for_waves"):
+            setattr(receiver, name, MethodType(getattr(C.Country, name), receiver))
+        gate = MethodType(C.Country._read_l2_country_cache, receiver)
+        def read_gate():
+            frame, covered, reason = gate(TABLE, h.output, [YEAR])
+            assert covered == [YEAR]
+            return frame, reason
+    return read_gate
+
+
+def fresh_warm(path, tier, required):
+    """Ordinary fresh-interpreter assertion helper; no nested pytest/producer.
+
+    Only the fast provider is invented; actual storage reader and both bound
+    gates run. No Country/Wave constructor or full source reader is invoked.
+    """
+    from tests.test_gh1547_optional_credentials import Harness
+    h = Harness()
+    h.output = Path(path)
+    if required:
+        h.required()
+    h.fast_result = endpoint()
+    LT.source_fetchable_fast = h.fast
+    assert not C._SOURCE_PROBES and not C._DEGRADED_ATTEMPTED and not C._BUILD_DROP_LEDGER
+    read_gate = cache_gate(h, tier)
+    before = h.output.read_bytes(), h.output.stat().st_mtime_ns
+    for _ in range(2):
+        with pytest.warns(C.DegradedCacheWarning) as caught:
+            frame, reason = read_gate()
+        pd.testing.assert_frame_equal(frame, expected_frame(h, stored=True), check_exact=True)
+        assert reason is None and len(caught) == 1
+        assert caught[0].message.missing == (("Latitude",) if required else ())
+        assert caught[0].message.missing_optional == (() if required else ("Latitude",))
+    assert len(h.fast_calls) == 1 and h.read_calls == [] and h.write_calls == []
+    assert before == (h.output.read_bytes(), h.output.stat().st_mtime_ns)
+
+
 @pytest.mark.parametrize("required", [False, True])
 @pytest.mark.parametrize("tier", ["wave", "country"])
 def test_endpoint_drop_footer_fresh_warm_serve_and_healing(invented, monkeypatch, tmp_path, required, tier):
     h = invented
     if required:
         h.required()
-    h.output = tmp_path / "private-data" / "Alpha" / YEAR / "_" / f"{TABLE}.parquet"
+    monkeypatch.setenv("LSMS_DATA_DIR", str(tmp_path / "private-data"))
+    data_root.cache_clear()
+    h.output = data_root("Alpha") / YEAR / "_" / f"{TABLE}.parquet"
     exc = endpoint()
     h.errors[FILES[1]] = exc
     def writer(frame, path, **kwargs):
@@ -278,28 +332,18 @@ def test_endpoint_drop_footer_fresh_warm_serve_and_healing(invented, monkeypatch
     assert b"lsms_build_drops" in pq.read_schema(h.output).metadata
     pd.testing.assert_frame_equal(LT.get_dataframe(h.output), expected, check_exact=True)
 
-    if tier == "wave":
-        gate = MethodType(C.Wave._read_l2_wave_cache, h.wave)
-        def read_gate():
-            return gate(TABLE, h.output), None
-    else:
-        # Actual country read gate on an invented receiver; no Country API or constructor.
-        receiver = SimpleNamespace(name="Alpha", waves=[YEAR], wave_folder_map={})
-        def table_hash(request, waves):
-            assert request == TABLE and waves == [YEAR]
-            return "invented-1547-hash"
-        receiver._table_cache_hash = table_hash
-        for name in ("_cache_covers_waves", "_restrict_to_waves", "_grain_reports_for_waves"):
-            setattr(receiver, name, MethodType(getattr(C.Country, name), receiver))
-        gate = MethodType(C.Country._read_l2_country_cache, receiver)
-        def read_gate():
-            frame, covered, reason = gate(TABLE, h.output, [YEAR])
-            assert covered == [YEAR]
-            return frame, reason
+    read_gate = cache_gate(h, tier)
+
+    child = subprocess.run([sys.executable, "-c",
+        "from tests.test_gh1463_endpoint_secondary import fresh_warm; "
+        "import sys; fresh_warm(sys.argv[1], sys.argv[2], sys.argv[3] == 'required')",
+        str(h.output), tier, "required" if required else "optional"],
+        capture_output=True, text=True, timeout=30)
+    assert child.returncode == 0, child.stdout + child.stderr
 
     frozen = h.output.read_bytes(), h.output.stat().st_mtime_ns
     h.fast_result = endpoint()
-    # A fresh process starts with empty memo/ledger. Both gates see the footer,
+    # Also reset process state in this builder process. Both gates see the footer,
     # warn and serve; the failed fast probe is memoised, without a source read.
     for state in (C._DEGRADED_ATTEMPTED, C._SOURCE_PROBES, C._BUILD_DROP_LEDGER):
         state.clear()
