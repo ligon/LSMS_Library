@@ -1,6 +1,6 @@
 # Prior-Art Ledger — GH #1135 Tanzania measurement configuration
 
-**Status:** grounded; config port and final static verification pending.
+**Status:** completed for the authorized source-only port; coordinator integration acceptance pending.
 **Source:** `79f5979cf8022e64928c5150950dfb00456994da`.
 **Search tier:** ripgrep + own Git + stdlib text/AST only. No GitNexus,
 Make audit, project import, parser, test collection or task runtime.
@@ -29,7 +29,7 @@ intentionally does not yet accept the measurement field.
 | Reviewed measurement definition / checker | frozen `reviewed-sampling.py.txt:208`, `:718` | Read-only source supplied for reviewed commit `f1cf7d06f30367cd1e34a4b3db4012f951b2e497`; never imported/executed |
 | Frozen port corrections | `APPROVED-SCHEMA.md` and Tanzania `COUNTRY-INPUT.json`, three rows | Authoritative scope and literal counts; override obsolete reviewed commentary, not current config |
 | Round-3 renumbering | `Tanzania/_/CONTENTS.org:2098`–2139 | Dated 2026-10-19 raw tracking-line vs API-household distinction |
-| Geocode layouts / current split-off qualification | `CONTENTS.org:2182` scheme table; `:2478` onward GH #1441 | Preserve current 2019-20 300-pair / 130-branching-ID note |
+| Geocode layouts / current split-off qualification | `CONTENTS.org` “The identifier already carries the answer” scheme table; `:2481` onward GH #1441 | Preserve current 2019-20 300-pair / 130-branching-ID note |
 | Older cluster-key ledger | `.coder/ledger/323-tanzania-key.md` §§3–4, 6, 9 | Historical context only; newer CONTENTS qualifications remain binding |
 
 Fully read `CONTENTS.org` (all 3,156 lines, including LOGBOOK/WAITING/TODO)
@@ -46,8 +46,8 @@ Per STANDING §3 and `CLAUDE.md` “Site C” / “sample() and Cluster Identity
 against the preceding logical wave, not the physical folder. Four logical
 rounds share `2008-15/`; 2014-15 pools Extended and Refresh panels, tracked
 separately in 2019-20 and 2020-21. UPD4 back-casts split-off descendants into
-earlier rounds (`CONTENTS.org:65` onward); UPHI lines are not interviewed
-households. WAITING #114 remains live (`:1167` onward).
+earlier rounds (`CONTENTS.org:69` onward); UPHI lines are not interviewed
+households. WAITING #114 remains live (`:1154` onward).
 
 The frozen measurement definition (`reviewed-sampling.py.txt:208` onward)
 defines N as linked households with `v` on BOTH sides, D as their all-causes
@@ -95,8 +95,8 @@ Task-specific hard limits:
 | Net-of-movers counts | reuse unknown state | Omit counts and mover_rule at all three boundaries |
 | Runtime/schema implementation | reuse coordinator-owned port | No worker implementation or execution; integration acceptance pending |
 
-All three locators will name own-country committed notes and original dated
-measurement provenance. The 2014-15 locator will additionally retain the exact
+All three added locators name own-country committed notes and original dated
+measurement provenance. The 2014-15 locator additionally retains the exact
 historical strict_k oracle path from reviewed COUNTRY-INPUT. That oracle is
 not independently opened, rerun or claimed current. No new estimator or
 policy is introduced.
@@ -108,13 +108,49 @@ go only to the absolute shared QUESTIONS_FROM_AGENT channel; no human prompt
 is needed for already-authorized work. The absolute MESSAGES_TO_AGENT channel
 was checked at initialization and after country/contract reads.
 
-Remaining: ledger-only first commit; config-only commit; static source-byte
-and Git-object proof; separate final-ledger commit; publication to private
-results.git; final five canonical evidence files. No runtime or numerical
-acceptance, full GH #1135 closure or coordinator acceptance is claimed.
+The ledger-only first commit is `2523bcb68ea25df4a13fb9531492a62a87e037e4`;
+the config-only commit is `eadbe029bed849f9a807a2d96d1780c2acb1f388` (75
+inserted lines, zero removed). This final ledger revision is a separate
+commit. Durable canonical evidence is in the dispatch evidence directory:
+`report.md`, `RESULT.json`, `verification-plan.json`, `ledger-checkpoint.md`,
+`source-byte-proof.json`; `verify_source.py` reproduces the static proof.
+Private publication and final HEAD seals are recorded there after this commit.
+No runtime/numerical acceptance, full GH #1135 closure or coordinator
+acceptance is claimed.
 
 ### Phase 3 — verification
 
-UNFINISHED. Static anchored verification will replace this paragraph after
-the config port. Runtime/parser/tests and scientific verification remain
-UNRUN by explicit dispatch instruction.
+- **OK (§§1, 4):** independent lexical removal of ONLY the three measurement
+  blocks reproduces the exact 5,599 base config bytes, SHA256
+  `e5cbd88efcb38e2689f33ddbc5b5dfffa0b67d8bd01896408c3f5f3c5228a3f6`.
+  The port is 10,060 bytes, SHA256
+  `b707140be8d2db77acd564f4956e414e403a45c9e983f3316ddcf180d9b3d7a1`.
+  Exact lengths are independently recorded in source-byte-proof.json.
+- **OK (§§2–5):** static literal counts match all three frozen own-country
+  rows; keys match the reviewed source's literal schema via stdlib AST;
+  known K <= D <= N; all net counts and mover_rule omitted; 2019-20 K marked
+  not_applicable rather than unknown or an incidental one-to-one number.
+- **OK (§§3–4):** 2012-13 measurement confidence high and 2014-15 medium
+  match the reviewed records; both retain dated provenance. Parent-panel
+  confidence and every pre-existing field remain byte exact. The old
+  2019-20 note's “310 cluster pairs” / “131 cluster ids” was superseded by
+  current “300 cluster pairs” / “130 cluster ids” with the GH #1441
+  historical qualification. The port preserves that complete current note;
+  no contradictory authority blocks N/D or the ruled K not_applicable state.
+- **OK (§§1, 4):** 19,247 non-owned tracked entries retain exact Git
+  mode/type/blob identity against base; config Git mode remains 100644;
+  no non-owned staged/unstaged change. Full object manifest retained in
+  evidence. Source-only blast radius: three optional metadata blocks in
+  Tanzania, plus this ledger; no implementation symbols changed.
+- **OK (§§2, 5):** no estimator, getter, classifier, reducer or schema code
+  introduced; no reinvention found in this metadata-only port.
+- **Proof correction retained:** the first static proof over-specified a
+  filesystem permission of 0644, while this prepared checkout uses 0600.
+  The Git mode is 100644; the corrected proof verifies that mode and records
+  actual filesystem permissions. No chmod/protection change occurred.
+- **UNRUN (§§1, 4, 6):** all project imports, parsers, tests/collection,
+  Country/Feature/getters/builds, source/header/DTA checks, Make, DVC,
+  network/acquisition/providers/cache/rewarm, weights and scientific/default
+  checks. `make api-audit` and GitNexus were replaced only by text skill
+  enumeration, rg and own Git scope proof. Base's deliberate interim
+  shared-schema mismatch is not treated as a test failure or repaired here.
