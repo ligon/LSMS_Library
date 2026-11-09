@@ -13,12 +13,20 @@ OPEN/0comments; its observed counts are historical evidence, not remeasured.
 
 ## §2 Existing machinery
 
-Inherit STANDING.md §2. Locate the country's native reader/food normalizer and
-committed own-item/units maps before proposing anything. Reuse existing1525/833
-reports and closed own-round document extracts first; no new parser/framework.
-Normal structural key normalization is distinct from evidence of food meaning.
-This initial ledger precedes tracing the production path; exact symbols and
-closed evidence locators will be filled from the bounded source investigation.
+Inherit STANDING.md §2. Current own2018/2019 food_acquired drivers map native
+CEB01→item and CEB03C→units. uganda.py:938–963 sets item→j and directly renames
+with harmonized_food_labels (:890–927). Only Org keys are int-coerced; the
+numeric-key augmentation is for units. There is no underscore-removal/ordinal
+swap for items. categorical_mapping.org:123–124 directly maps1081Dry/1082Flour;
+legacy108 remains dry/flour. Country._relabel_j:3958ff keeps None/Preferred and
+maps Preferred→Aggregate separately. No source semantics are proved by those
+structural operations, and no tests were executed in this authority phase.
+
+Reuse full203-line review-uganda-small/VERDICT.md and the closed acdb4113 own
+form task:114pages already read, both page11 grids positively show printed
+108Dry/108_1Flour and CEB01Description/CEB02Code. ExportCEB01-code meaning is
+still unbridged. Do not repeat forms or historical unit/panel cohorts. Exact
+external proof/plan: reports/1525-uganda-cassava-source-authority-20261109.
 
 ## §3 Definitions
 
@@ -55,3 +63,15 @@ exported1081/1082 meanings? Does structural normalization lose a distinction,
 or is the ambiguity already in the producer's release? These are questions to
 resolve by evidence, not permission for a recode. ROOT owns any further read
 grant and GitHub updates; no new scientific choice is inferred.
+
+## Bounded checkpoint
+
+Source-only path reconciliation rules out an existing structural normalization
+that could justify a swap. Own2019BID566821B/MD5e491bd04efbd14658bd7e70050d0edfa
+is now held in manager-sealed private custody but remains UNPARSED in this lane.
+DOC-READ-PLAN proposes one pinned existing parser pass, not an admitted new read.
+The own interviewers manual is absent at the two checked ordinary L1 layouts.
+No source/header/row/API/Make/census/cache/acquisition or new PDF parser call.
+
+Phase3 source-only check: OK anchored§2–§4; no product symbol added, no label
+or scientific policy altered. The semantic authority question in§6 remains.
