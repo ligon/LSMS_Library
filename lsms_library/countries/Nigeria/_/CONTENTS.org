@@ -4113,3 +4113,30 @@ remaining authority is fielded A3/export-custodian evidence tied to private
 source positions: were household-crop totals ever copied across plot lines,
 and what transaction linkage distinguishes them? Whole #1552 remains open;
 no deduplication, household-crop reassignment, unit, weight or default changed.
+
+* 2026-11-09 -- W3 post-harvest also records coping day counts (GH #587)
+
+The historical statement that the post-harvest round has "no equivalent
+battery" is contradicted for W3 by its own instrument and released fields.
+=2015-16/Documentation/PH_W3_Household_Quest.pdf=, PDF p.58 (printed55),
+Section12 Q1, asks the same nine seven-day coping day counts, with zero when
+there were no days. Its cover identifies Wave3 PH, February/March2016,
+VERSION1; its December2016 generation metadata do not authenticate every
+fielded CAPI version.
+
+The own =2015-16/Data/sect12_harvestw3.dta= header (sidecar MD5
+=ad699abe993590bcb73401bd37093ade=,779585bytes) carries =hhid= and all nine
+=s12q1a..s12q1i= numeric DAYS fields with matching labels and no value-label
+sets. This header check decoded zero rows; its4582-observation count is not
+a measured uniqueness, missingness or response count.
+
+W3's driver now transports those PH answers under =t = '2016Q1'= through the
+existing helper with explicit own-field bindings. PP =2015Q3= keeps its own
+file and processing. No PP answer is copied to PH, and no new missing-value,
+sentinel, range, eligibility, ID or weighting rule is selected. All other
+rounds and the separate FIES interface remain unchanged. The W1/W2 PH and
+C8 PP documentary gaps are not resolved by this W3 repair; whole #587 stays
+open. Closed documentary/header evidence is in the 20261103 burst reports
+=587-nigeria-own-round-documents-20261109/= and
+=587-nigeria-W3PH-coping-source-binding-20261109/=; actual-row/API acceptance
+is separate from those source bindings.
