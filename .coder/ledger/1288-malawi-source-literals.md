@@ -83,3 +83,29 @@ explicit private cache directory. Original failed log/JUnit remain immutable.
 This docs-only checkpoint records the country caveat before one final existing
 metadata census. Its measured impact and final independent review remain
 pending; no current Country/Feature data/producer, raw reader or cache warm ran.
+
+### Final metadata cost and scope (measured, no data build)
+
+The one candidate-only existing census onfd86ab23618c731ec185c672d249e5e6e250281c
+closed0 in122.480s. Operator source is byte-exact to the accepted Niger literal
+metadata operator. Closed baseline retains header6e1b26d4; actual object proof
+admits9514/fb04 through only excluded CONTENTS/ledger/AGENTS/skill prose, without
+a baseline replay. All450 country /1895 wave /35 BTF /186 FIF keys compared.
+Changes:22 country hashes, ALL Malawi;22 wave hashes, ALL Malawi2010–11;
+0 BTF and0 FIF. No keys added/removed. All nonhash fields match exactly,
+including public/registration/physical waves, overrides, closure paths,
+18 None wave cells, and zero errors/denials. Data/config files remain zero.
+The existing wave hash includes all wave module bytes, explaining the22-table
+wave footprint rather than only the five repaired tables. No hash exclusions
+were introduced to hide this measured cost.
+
+Final evidence is under
+/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1288-malawi-source-literals-20261109/.
+PROCESSING-PROOF.json, SOURCE-CONSERVATION.json, both focused logs/JUnits,
+identity/receipt files and metadata/COMPLETE-COMPARISON.json retain actual
+source/test/history limits. The original shortlist and first failed fixture
+run are immutable. The only later commit is this ledger closure; every product,
+configuration, mapping and test object remains exact the measured candidate.
+Independent review and Root-owned release/CI remain pending. No actual source,
+producer, default/Make cold/warm/backend parity, public API, shared cache warm
+or whole-GH1288 resolution is claimed.
