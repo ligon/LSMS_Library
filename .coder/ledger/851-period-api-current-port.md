@@ -262,3 +262,85 @@ emptystring/list/tuple from_config refusals, valid boundaries and a complete
 or scientific record change. Live actual7b/current20 actor remains untouched.
 Freeze correction before one focused portable cohort; final metadata collector
 only after final source, keeping old zero-footprint7b result historical.
+
+## Corrected source and closed finite actual acceptance — 2026-11-09
+
+Frozen correction a9eae4428babe4ebc7280baa1598c1a0876c9134 changes exactly the
+from_config raw-option transport line; replacing its direct get with the old
+orNone makes all production bytes exact67df. All20YAML/67record cells and all
+other product behavior remain exact. ONE correction cohort29194 closed0:
+26uniquePASS/0F/E/S,13.049515s,3identity records/private data+configfiles0.
+Five falsey nonmappings now refuse; None/emptydict/Quantity1 remain valid;
+all67packaged dictionaries and per-column exposures equal exact parentclassmethod
+source. The26include17rechecked earlier override cases plus9new cases, so the
+181initial+26correction runs cover190distinct pytest nodes, not207unique.
+The original independent FalseFAIL/P2 remains historical. Same independent
+peer's a9 followup is qualified nointroducedP1/P2, original False control now
+PASS; Q/reports/review-851-falsey-corrected-source-admission-20261109/ADMISSION.json
+binds the report/source/control receipts. It did no API/census replay.
+
+ONE final corrected metadata82607 closed0/126.105106s on unchanged cleana9.
+Compared to the closed7b map:0/452country,0/1903wave,0/37BTF,0/186FIF changes;
+allkeysets and ALLnonhash fields exact,18None/errors0/denials0/privatefiles0.
+Candidate mapSHA bd0ad83adb2687897786b18a7d6ca9c13425143dee192ed1761d05c012ae2130.
+Standalone7b0footprint remains immutable; no baseline replay/exclusion/schema
+bump/shared rebuild. This is measured zero build-invalidation cost.
+
+ROOT granted finite actual scope9already-held inputs118,614,781B, maximum15
+full StataReader.read calls,900s/child. Actual current20 baseline built normal
+private caches; correcteda9 normally served them only after expectedhash and
+coverage checks, with no assume-fresh/forced footer/restamp. Full Mali includes
+2014/2018/2021 and own2021NSU/crosswalk inputs; BFA scope is2014's four passages.
+Fixedv is projected from actual servedFA's unique(i,t,v), never fake IDs or
+sample/weight proof. Real constructors/committed ID maps and actual Feature
+are retained; the temporary Feature package-alias factory installs ONLY this
+instance memo and restores itself in finally. No acquisition/shared writes,
+new source/default/unit/sentinel/eligibility or household denominator changed.
+
+Original actualV1 wrapper82860 CLOSED1 is preserved: actual20Mali cold
+CLOSED0/521.334376s/11parses, then7b warm external-oracle ll.recall module/function
+alias error before any period call. No Mali raw was replayed. After the binding
+fix and correcteda9/67valid-record proof, actualV283192 CLOSED1/190.589788s
+preserves21strict passes then original full-frame-slice versus healthySubset
+STRICTFAIL. The full slice retains unused i-domain11536; normal subset has3803.
+No index prune/sort/attrdrop/tolerance or cast was applied to make it pass.
+
+ROOT's additive disposition preserves that strictFAIL and compares the normal
+subset to ONE actual unchanged20 warm same-request reference instead. V388593
+actually closed outer0 (observed terminalchunk4863da): reference20Mali0/38.096094s,
+a9remainingMali0/292.516572s,20BFAcold0/205.812164s,a9BFAwarm0/160.730488s.
+The new named unchanged-route strict subset comparison passes, with expanded
+ordered tuples/operands/masks/dtypes separately equal to the originalfullslice.
+All6axis-domain and11typed attribute-difference entries are reported explicitly;
+healthy serving scopes kg diagnostics/population/recall/sampling differently
+from a literal full-frame slice. The original DataFrame equality is STILLFAIL,
+not normalized or relabelledPASS. Observed food_acquired aggregate(None) proves
+full inference for the subset. Full Mali quantity has414260rows; both2014
+logical subsets108711rows. A separate bounded2produced-PKL metadata description
+84011 closed0 with file/RAMimmutability; no native/API replay.
+
+Correcteda9 accepted stages preserve V2's21passed checks and V3's9remainingMali
++19BFA named checks (not49pytest tests). They validate default/explicitNone
+against actual20, allfour target periods, critical Mali14day/BFAQuantity7day
+versusExpenditure28day arithmetic, real defaultkg/full-pool serving and actual
+singleton Feature. The isolated unknownMali2018 immutable-record fixture is
+explicitly artificial, not natural unavailability: directCountry typed-refuses,
+Feature performs ONE full read, retains2014/2021 literal factors0.5/1 and cleans
+up the handoff/constructor/record lookup. Shared unchanged shortfall/carrier
+helpers are qualified; no independent finalizer or sample/weights claim.
+
+Cumulative native parses are EXACT15(Mali11+BFA4), not filenames9; all candidate
+warm phases have0rawgetters/parse/producer/writer and unchanged privatecache
+inventories. Source20/a9 and all9original/private inputs remain pre/post exact.
+All7actual source-observer records acrossV1/V2/V3 are active/0denials; closed
+metadata-only descriptor has its separate record. V3declares36outputfiles,
+oldMali baseline9 and reusedV2four files remain independently pre/post sealed.
+No source/API/test/census replay is needed for this final ledger-only child.
+Durable packet reports/851-period-api-current-v3-20261109/actual-v{1,2,3} retains
+all original statuses, receipts/seals, originalstrict comparator, operator
+freezes and additive disposition; correction test/metadata packet is
+reports/851-falsey-column-config-correction-20261109. ROOT owns closed actual
+independent audit/publication/CI/merge; this ledger claims neither whole-corpus
+acceptance nor resolution of1148, scientific unit policies or natural unknown
+wave completeness. All defaultdata/options except the2approved recallmetadata
+corrections remain the tested current behavior.
