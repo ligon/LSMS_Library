@@ -7,7 +7,8 @@ Single Index:
   # `plot_id` -- plot.  Two sentinels, and they mean different things
   # (GH #1120 D3 / GH #1119, @ligon 2026-10-23):
   #   Farm-level   -- STRUCTURAL: the record is household-grain by design and
-  #                   has no plot (plot_inputs' `missing_level_sentinels`
+  #                   is not allocated to an individual plot (plot_inputs'
+  #                   `missing_level_sentinels`
   #                   below; GhanaLSS/_/CONTENTS.org "The Farm-level
   #                   convention").
   #   unknown_plot -- EPISTEMIC: the survey records a plot-grain answer but the
@@ -24,15 +25,17 @@ Single Index:
   # `crop_diversity(weight='count')` do this, in `attrs['unknown_plot_excluded']`
   # (GH #1460).
   # `plot_id == 'Farm-level'` is not a plot either, so a count of plots drops
-  # every such row.  On `crop_production` such a row holds a sale no plot can own
+  # every such row.  On `crop_production` a Farm-level row may carry a sale,
+  # a harvest, or both.  It may hold a sale no plot can own
   # (Mali 2017-18 and 2021-22; Nigeria W3-W5; Niger 2014-15 and 2021-22; Tanzania;
   # Malawi; Ethiopia, GH #843 / #824 / #1457) or a harvest from a roster off
-  # the field grid (Mali's EAC-I trees, GH #1476).  In a count of crop occurrences,
+  # the field grid (Mali's EAC-I trees, GH #1476), or household-level harvest records
+  # (Mali 2021-22, GH #1437).  In a count of crop occurrences,
   # drop it where the household has a plot row of that crop and keep it where it
   # has none, because it is then the only record of the crop (GH #1469;
   # `transformations.crop_diversity(weight='count')`).  All 37,280 rows of GhanaLSS
   # 1987-88 / 1988-89 are Farm-level, so a blanket filter there deletes every crop
-  # record.  A value sum keeps every such row; the sale is there.
+  # record.  A value sum keeps every such row's value where present.
   plot_id: plot id
   int_t: interview date
   # Opaque crop-observation coordinate within the full native key (GH1198).
