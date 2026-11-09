@@ -3467,7 +3467,7 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
         df = all
 
     fn = Path(fn)
-    if cache_hash is not None or grain_audit or cache_waves or datetime_audit or build_drops:
+    if cache_hash is not None or grain_audit or cache_waves is not None or datetime_audit or build_drops:
         import pyarrow as pa
         table = pa.Table.from_pandas(df, preserve_index=index)
         md = dict(table.schema.metadata or {})
@@ -3478,7 +3478,7 @@ def to_parquet(df: pd.DataFrame, fn: str | Path, index: bool = True, absolute_pa
             # so the warm read can re-emit it (the pre-collapse frame that
             # proved the loss is long gone by then).
             md[_GRAIN_AUDIT_KEY] = json.dumps(grain_audit).encode()
-        if cache_waves:
+        if cache_waves is not None:
             # GH #891: carry the wave coverage with the data, so a request for
             # a subset of these waves is a hit rather than a rebuild.
             md[_CACHE_WAVES_KEY] = json.dumps([str(w) for w in cache_waves]).encode()
