@@ -1,9 +1,9 @@
-# Prior-art ledger — GH #1554 documentary findings
+# Prior-art ledger — Niger/Nigeria crop-evidence documentary findings
 
 ## §1 Scope and source
 
 Documentation only, based on writer `2bc8bfbe7eb7fcb3379c589c1c2dd248186af19e`.
-Own only this ledger and Niger `_/CONTENTS.org`; preserve its entire prefix.
+Own only this ledger and Niger/Nigeria `_/CONTENTS.org`; preserve both entire prefixes.
 No production, native quantities/IDs/weights, sample, schema or scientific rule changes.
 
 ## §2 Existing evidence and reuse
@@ -38,7 +38,7 @@ Append a dated short country finding, then prove exact prefix and every other
 tracked mode/type/blob. No tests, census, raw/PDF parse, API/build/cache work is
 appropriate for this prose-only delivery. ROOT owns independent review/publication.
 
-## §6 Phase 3 — documentary conservation
+## §6 Historical 1554-only checkpoint — documentary conservation
 
 Dated country note committed at `45c1f94a4de6e9758bf2c4cce52f4f37cd563300`.
 The original3381lines/227984bytes remain an exact prefix;39lines append only.
@@ -48,3 +48,36 @@ are untouched. No runtime/tests/census/raw/PDF/API/build/cache work was performe
 External source proof, exact diff and PR draft live in
 `reports/1554-niger-onion-date-documentation-20261109/`.
 ROOT review/publication/required CI remain pending; this is not their acceptance.
+
+## §7 Reviewed expansion before publication
+
+ROOT grouped the unpublished country notes to avoid redundant documentation CI.
+Reuse Nigeria diagnosis `6cfbaa73b43351eaae25c3e22e8b692a8957b81b` and qualified
+independent review `reports/review-1552-nigeria-repeated-sales-20261109/`
+(manifest `789709be5c545d06d9f8ef98d2f20293fd50051e2dd9e7cd1cde93d2d6c2dc9b`).
+Personal full Nigeria4078-line country read carries by exact SHA256
+`603a6157713ff5352094620158f6f72ab4adb4f11e5f9e97b435ebf65193993d`.
+Its PP/PH quarters, cropid grain and harmonized-code collision caveats remain.
+Historical75/67 are excess occurrences, not transactions or all member rows.
+
+Reuse the separately closed1555 own-three-document followup; frozen proposed
+appendix SHA256 `db45d98cecc4fe220eaf31d80963bcec5978a588f9c9ec30a5498806e1cbca55`.
+Reviewed report/cell-export/DDI-text locators distinguish harvest/sold fields and
+retain workbook-vs-release unit/state discrepancies. No official factor absence
+or fielded-CAPI bridge is inferred. No new workbook/PDF/household parse occurred.
+
+Whole1552/1555 and the existing dry-cycle/window/area/state holds stay open.
+No runtime code, tests, metadata, cache, sample, weights, units or defaults change.
+ROOT retains final review, required CI, publication and issue decisions.
+
+## §8 Final two-country documentary conservation
+
+Country additions freeze at `5f715497d78b088d4f95f18bfbf262e1f9f36104`:
+Niger appends77lines (1554 plus the exact37-line1555 appendix), Nigeria37lines.
+Both full3381/4078-line prefixes remain byte-exactwriter2bc8; all19197nonowned
+mode/type/blob objects are unchanged. My source/document-only1555 text review
+passes against the closed cell exports, DDI57–58/649–650/654 and source bindings.
+Mwi independent1554/1552 appendix review is pending at this ledger freeze;
+ROOT review, requiredCI and publication remain pending. No runtime was repeated.
+Full patch, source proof, qualified1555 admission and final-scope PR draft are in
+`reports/crop-evidence-country-notes-20261109/`; original1554-only packet retained.
