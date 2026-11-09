@@ -82,6 +82,24 @@ Sampling:
         Faso 2018-19 (GH #1243); `wave-scoped` would claim a crosswalk is
         meaningful, and none is.  Region is compared on the served,
         spelling-harmonised labels (8 regions both sides).
+      cluster_id_measurement:
+        linked_households: 0
+        not_applicable: [clusters_renumbered]
+        note: |-
+          Historical record dated 2026-10-23 at development 9a0ed5f3c,
+          preserved in reviewed GH #1135 source
+          f1cf7d06f30367cd1e34a4b3db4012f951b2e497; not remeasured for
+          this source-only port.  No household links ECVMA to EHCVM-1 in
+          that record: the 2018-19 cover and weights file carry no ECVMA
+          pointer and panel_ids.py links nothing across programmes.
+          (0 shared `i` through sample() is by construction -- the 'E_'
+          prefix -- and is not this evidence.)  The hazard is the 267
+          shared `v` integers naming unrelated EAs (Region agrees on 27,
+          chance), not a renumbering, so a count of renumbered cluster ids
+          does not apply.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'Historical measurement 2026-10-23 at development 9a0ed5f3c, recorded at 79f5979cf8022e64928c5150950dfb00456994da in lsms_library/countries/Niger/_/sampling.yml, 2018-19 panel.cluster_id_note and panel.locator; lsms_library/countries/Niger/_/CONTENTS.org, "2026-10-23 -- =v= across wave boundaries", 2014-15 -> 2018-19. Recorded provenance names the 2018-19 cover s00_me_ner2018.dta and weights file (no ECVMA pointer), and Niger/_/panel_ids.py docstring; source-only port, no remeasurement.'
       source_type: derived-from-data
       confidence: high
       source_file: null

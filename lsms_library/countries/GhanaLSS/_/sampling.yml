@@ -27,6 +27,21 @@ Sampling:
         with Region and Rural agreeing 79/79 (GH #942).  The 79 is a LOWER
         BOUND on the retained clusters (half of 176 is ~88), and the other 97
         GLSS1 / 91 GLSS2 clusters are genuinely different EAs.
+      cluster_id_measurement:
+        linked_households: 712
+        households_changed: 712
+        clusters_renumbered: 79
+        note: |-
+          Historical measurement recorded 2026-10-19, ported without
+          remeasurement.  None of the 712 linked households keeps `v`; they
+          fall in 79 one-to-one cluster pairs, Region and Rural agreeing
+          79/79.  79 counts the ids among LINKED households: it is a lower
+          bound on the retained clusters (half of GLSS1's 176 is ~88).
+          No movement classification was applied, so the net-of-movers
+          share is not measured.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'Historical 2026-10-19 Country("GhanaLSS").sample() measurement recorded in lsms_library/countries/GhanaLSS/_/CONTENTS.org, "Cluster (PSU) variable" (lines 397-410 at 79f5979c), and this boundary''s cluster_id_note in lsms_library/countries/GhanaLSS/_/sampling.yml; GH #942; GH #1135 H3 table (712 linked, 712 change)'
       source_type: local-documentation
       confidence: high
       source_file: 'lsms_library/countries/GhanaLSS/1991-92/Documentation/pdf/G3report.pdf'
