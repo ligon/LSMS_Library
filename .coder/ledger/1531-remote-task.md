@@ -107,7 +107,7 @@ the 1000 ha clamp, or construct a real table.
   no instrument bytes are admitted in this packet. Do not infer two different
   fielded versions from their filenames. No routine approval is pending.
 
-### Phase 3 — verification
+### Phase 3 — header-phase verification (frozen before scope extension)
 
 The first new commit, `8a6ac2ad199b59df297546a7d9a9cc8e1172c597`, contains
 only this ledger and was surfaced before source metadata reads. All five exact
@@ -155,3 +155,31 @@ No ledger contradiction or reinvention was found in the bounded diagnosis.
 The helper's hectares assumption is unverified, not disproved by assigning the
 separate m2 field's authority to it. Root retains independent integration,
 review, CI, GitHub and merge responsibility.
+
+### Authorized numeric extension checkpoint — 2026-11-09
+
+After the header-only closure, the absolute steering channel added an explicit
+ROOT grant: “characterizing DISTINCT explicitly m² s16aq47a itself, its
+presence/missingness and s16aq45 flag/known farmer-unit relation”. This extends
+the conditional gate; it does not transfer the m2 authority to `s16aq47`.
+The completed header-only evidence (including zero reader counters and original
+failures) is preserved in `evidence/header-phase-closure/` externally.
+
+Before any numeric read, `numeric-read-decision.json` freezes one sanctioned
+`get_dataframe(..., convert_categoricals=False)` call on the already-admitted
+private 2018 copy. Retain every source row/column/index/position/dtype/attr and
+all missing masks before analytic copies. Keep the source and retained originals
+immutable and sealed. The question is the distinct explicit-m2 field's
+presence/missingness by literal `vague`, GPS measured flag and farmer unit,
+including unknown/missing flags unchanged. The analysis fields are `vague`,
+`grappe`, `menage`, `s16aq02`, `s16aq03`, `s16aq45`, `s16aq47`, `s16aq47a`,
+`s16aq09a`, `s16aq09b`, `s16aq48`; all other columns remain retained.
+
+No sample intersection, ratios, thresholds, medians, p90, yield, trimming,
+missing-to-zero/No, ambiguous-q47 unit inference or product/default/clamp edit.
+Disclose the actual added read and measured parse wall time. Own instrument /
+export authority remains the priority; coordinator is checking only own held
+questionnaire declarations without acquisition. Any q47a-source proposal is for
+ROOT review only, with its own explicit m2 authority and no q47 unit borrowing.
+2021 remains missing/unserved/unread. Numeric extension verification is UNRUN
+at this ledger-only checkpoint; no additional permission is pending.
