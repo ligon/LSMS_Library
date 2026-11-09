@@ -65,12 +65,30 @@ def _assert_niger_fresh(frame):
     assert frame.index.is_unique
 
 
+def _trace_native_waves(country, path):
+    """Instrument ONLY this test's invented scripts; shared fixture is unchanged."""
+    for wave in WAVES:
+        script = country.file_path / wave / '_' / f'{NIGER_TABLE}.py'
+        body = script.read_text()
+        start = (f'from pathlib import Path\n'
+                 f'with Path({str(path)!r}).open("a") as trace: trace.write("start {wave}\\n")\n')
+        done = (f'\nwith Path({str(path)!r}).open("a") as trace: trace.write("done {wave}\\n")\n')
+        script.write_text(start + body + done)
+
+
+def _is_country_command(argv, country):
+    return bool(argv) and argv[0] == 'make' and Path(argv[-1]).parent.name == 'var' and Path(argv[-1]).parent.parent.name == country.name
+
+
 @pytest.mark.parametrize('failing', [WAVES[0], WAVES[2], WAVES[-1]])
 @pytest.mark.parametrize('planted', [False, True], ids=['no-old-outputs', 'all-old-outputs'])
 def test_failed_niger_recipe_never_serves_old_or_partial_payload(
-        niger_tree, monkeypatch, capfd, failing, planted):
+        niger_tree, monkeypatch, capfd, tmp_path, failing, planted):
+    """A failed private wave preparation is loud and never alters live inputs."""
     monkeypatch.setenv('LSMS_MAKE_JOBS', '1')
     country = niger_tree(NIGER_TABLE, failing=failing)
+    trace = tmp_path / 'native-preparation.log'
+    _trace_native_waves(country, trace)
     if planted:
         _plant_old_waves()
     paths = _niger_paths()
@@ -86,27 +104,73 @@ def test_failed_niger_recipe_never_serves_old_or_partial_payload(
     monkeypatch.setattr(C.subprocess, 'run', tracked)
     with warnings.catch_warnings(record=True) as seen:
         warnings.simplefilter('always')
+        with pytest.raises(subprocess.CalledProcessError) as caught:
+            country.crop_production()
+    error = caught.value
+    assert error.returncode == 1
+    assert Path(error.cmd[-1]) == country.file_path / failing / '_' / f'{NIGER_TABLE}.py'
+    assert not any(_is_country_command(call, country) for call in calls)
+    assert not any(call[-1] == str(country.file_path / '_' / f'{NIGER_TABLE}.py') for call in calls)
+    assert 'injected wave failure' in capfd.readouterr().err
+    assert not any('Python fallback' in str(w.message) for w in seen)
+    expected = []
+    for wave in WAVES[:WAVES.index(failing)]:
+        expected.extend([f'start {wave}', f'done {wave}'])
+    expected.append(f'start {failing}')
+    assert trace.read_text().splitlines() == expected
+    assert _snapshot(paths) == before, 'private failure changed a LIVE prerequisite'
+    assert not paths['country'].exists(), 'must not write/serve a partial country'
+
+
+
+@pytest.mark.parametrize('planted', [False, True], ids=['no-old-outputs', 'all-old-outputs'])
+def test_failed_country_recipe_after_healthy_private_preparation_is_terminal(
+        niger_tree, monkeypatch, capfd, tmp_path, planted):
+    """Country-stage failure retains original Make cause after healthy prep."""
+    country = niger_tree(NIGER_TABLE)
+    trace = tmp_path / 'healthy-private-preparation.log'
+    _trace_native_waves(country, trace)
+    if planted:
+        _plant_old_waves()
+    paths = _niger_paths()
+    before = _snapshot(paths)
+    makefile = country.file_path / '_' / 'Makefile'
+    with makefile.open('a') as stream:
+        stream.write('\n$(VAR_DIR)/crop_production.parquet:\n'
+                     '\t@echo injected-country-stage-failure >&2\n'
+                     '\t@exit 7\n')
+    calls, failures = [], []
+    real_run = subprocess.run
+
+    def tracked(argv, *args, **kwargs):
+        calls.append(list(map(str, argv)))
+        try:
+            return real_run(argv, *args, **kwargs)
+        except subprocess.CalledProcessError as error:
+            failures.append(error)
+            raise
+
+    monkeypatch.setattr(C.subprocess, 'run', tracked)
+    with warnings.catch_warnings(record=True) as seen:
+        warnings.simplefilter('always')
         with pytest.raises(RuntimeError, match='Make build failed for Niger/crop_production') as caught:
             country.crop_production()
     cause = caught.value.__cause__
     assert isinstance(cause, subprocess.CalledProcessError)
-    assert cause.returncode == 2
+    assert cause is failures[-1] and cause.returncode == 2
+    assert b'injected-country-stage-failure' in cause.stderr
     assert str(paths['country']) in str(caught.value)
-    assert b'injected wave failure' in cause.stderr
-    assert 'injected wave failure' in capfd.readouterr().err
+    assert 'injected-country-stage-failure' in capfd.readouterr().err
+    selected = Path(cause.cmd[-1])
+    assert selected != paths['country']
+    assert selected.is_relative_to(data_root()) and selected.parent.name == 'var'
+    assert any(part.startswith('.lsms_make_') for part in selected.parts)
+    assert [call for call in calls if _is_country_command(call, country)] == [list(map(str, cause.cmd))]
+    assert calls[-1] == list(map(str, cause.cmd)), 'a fallback ran after country recipe failure'
     assert not any('Python fallback' in str(w.message) for w in seen)
-    table_calls = [a for a in calls if any('crop_production' in p for p in a)]
-    assert table_calls == [['make', '-s', str(paths['country'])]], table_calls
-    assert not paths['country'].exists(), 'must not write/serve a partial country'
-    failed_at = WAVES.index(failing)
-    for j,w in enumerate(WAVES):
-        if j < failed_at:
-            assert pd.read_parquet(paths[w])['Quantity'].tolist() == [1.0, 2.0]
-        elif planted:
-            assert _snapshot({w: paths[w]})[w] == before[w], 'failed/unreached old output changed'
-            assert pd.read_parquet(paths[w])['Quantity'].tolist() == OLD[w]
-        else:
-            assert not paths[w].exists(), 'failed/unreached wave unexpectedly built'
+    assert trace.read_text().splitlines() == [event for wave in WAVES for event in (f'start {wave}', f'done {wave}')]
+    assert _snapshot(paths) == before
+    assert not paths['country'].exists()
 
 
 def test_healthy_niger_recipe_replaces_all_old_waves(niger_tree):
@@ -116,9 +180,10 @@ def test_healthy_niger_recipe_replaces_all_old_waves(niger_tree):
     frame = country.crop_production()
     _assert_niger_fresh(frame)
     for w in WAVES:
-        assert _snapshot(_niger_paths())[w] != before[w]
-        assert pd.read_parquet(_niger_paths()[w])['Quantity'].tolist() == [1.0, 2.0]
+        assert _snapshot(_niger_paths())[w] == before[w], 'selected-only promotion changed a LIVE wave'
+        assert pd.read_parquet(_niger_paths()[w])['Quantity'].tolist() == OLD[w]
     assert len(pd.read_parquet(_niger_paths()['country'])) == 8
+
 
 
 def test_healthy_niger_warm_make_keeps_outputs_and_exact_result(niger_tree):
@@ -153,15 +218,32 @@ def test_shared_probe_runner_missing_target_classifier(target, diagnostics, expe
     assert C._make_target_is_missing(diagnostics.encode('utf-8'), target) is expected
 
 
-def test_missing_requested_target_keeps_real_intree_alternate(fakeland, capfd):
+def test_missing_requested_target_keeps_real_intree_alternate(fakeland, capfd, monkeypatch):
     country = fakeland.build(makefile=_MAKEFILE_WAVE_ONLY, country_script=_COUNTRY_SCRIPT)
+    calls = []
+    real_run = subprocess.run
+    def tracked(argv, *args, **kwargs):
+        calls.append(list(map(str, argv)))
+        return real_run(argv, *args, **kwargs)
+    monkeypatch.setattr(C.subprocess, 'run', tracked)
     with pytest.warns(UserWarning, match='Makefile execution failed') as seen:
         frame = country.build_me()
-    assert len(seen) == 2, 'data-root and in-tree-var rule absent; _/ alternate builds'
+    targets = [Path(call[-1]) for call in calls if call[0] == 'make']
+    wave = [p for p in targets if p.parent.name == '_' and p.parent.parent.name == '2001']
+    country_targets = [p for p in targets if p.parent.name == 'var']
+    alternate = country.file_path / '_' / 'build_me.parquet'
+    assert len(wave) == 2 and any(part.startswith('.lsms_make_') for part in wave[0].parts)
+    assert wave[1] == country.file_path / '2001/_/build_me.parquet'
+    assert len(country_targets) == 2 and targets[-1] == alternate
+    missing_targets = [wave[0], *country_targets]
+    assert len(seen) == len(missing_targets)
+    for target in missing_targets:
+        assert sum(str(target) in str(item.message) for item in seen) == 1
     assert frame['x'].tolist() == [7.0]
     assert fakeland.var.exists()
     assert 'No rule to make target' in capfd.readouterr().err
     assert not list((fakeland.country_dir/'_').glob('*.parquet'))
+
 
 
 def test_script_only_country_still_builds_without_makefile(fakeland):
@@ -172,19 +254,30 @@ def test_script_only_country_still_builds_without_makefile(fakeland):
 def test_missing_make_executable_keeps_country_python_fallback(fakeland, monkeypatch):
     country = fakeland.build(country_script=_COUNTRY_SCRIPT)
     real_run = subprocess.run
-    missing = []
+    missing, python_calls = [], []
 
     def no_make(argv, *args, **kwargs):
         if argv[0] == 'make':
-            missing.append(argv)
+            missing.append(list(map(str, argv)))
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), 'make')
+        python_calls.append(list(map(str, argv)))
         return real_run(argv, *args, **kwargs)
 
     monkeypatch.setattr(C.subprocess, 'run', no_make)
     with pytest.warns(UserWarning, match='Makefile execution failed'):
         frame = country.build_me()
-    assert len(missing) == 3
+    wave_targets = [Path(call[-1]) for call in missing
+                    if Path(call[-1]).parent.name == '_' and Path(call[-1]).parent.parent.name == '2001']
+    country_targets = [Path(call[-1]) for call in missing if Path(call[-1]).parent.name == 'var']
+    assert len(wave_targets) == 2
+    assert any(any(part.startswith('.lsms_make_') for part in target.parts) for target in wave_targets)
+    assert country.file_path / '2001/_/build_me.parquet' in wave_targets
+    assert len(country_targets) == 2
+    assert Path(missing[-1][-1]) == country.file_path / '_/build_me.parquet'
+    assert [call[-1] for call in python_calls] == [
+        str(country.file_path / '2001/_/build_me.py'), str(country.file_path / '_/build_me.py')]
     assert frame['x'].tolist() == [7.0]
+
 
 
 def test_broken_prerequisite_is_terminal_even_with_viable_python(fakeland, capfd):

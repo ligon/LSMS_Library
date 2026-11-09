@@ -52,6 +52,9 @@ EXPECTED_ENTRY_POINTS = {
     # cached content and must heal already-corrupt current-hash country food.
     "lsms_library.country.Wave.food_acquired",
     "lsms_library.country.Country._aggregate_wave_data",
+    # GH1288: isolated child dispatch is not a static callable edge.
+    "lsms_library.country.Country._materialize_make_yaml",
+    "lsms_library.country.Country._materialize_make_other",
     "lsms_library.local_tools.df_data_grabber",
     # GH #1045: the build-time calendar parser, tagged for exactly the tables
     # that carry a calendar column (datetime_parse.CALENDAR_TABLES) and

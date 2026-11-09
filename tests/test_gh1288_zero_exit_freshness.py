@@ -26,6 +26,7 @@ import pytest
 import yaml
 
 from lsms_library import country as C, local_tools as L
+from lsms_library import _build_registry as R
 from lsms_library.paths import countries_root, data_root
 
 TABLE = 'facts'
@@ -64,6 +65,11 @@ def model(tmp_path, monkeypatch, request):
     Preparing/clearing process-local resolver memos is confined to this fixture;
     no task module or actual dataset is constructed at authoring time.
     """
+    captured_access_helpers = {
+        name: getattr(L, name) for name in (
+            '_dvc_cache_path', '_warm_dvc_cache_for_feature',
+            '_ensure_dvc_pulled', '_try_get_data_file')}
+    R.clear_caches()
     name = request.param
     config, live = tmp_path / 'countries', tmp_path / 'data'
     config.mkdir()
@@ -128,6 +134,7 @@ def model(tmp_path, monkeypatch, request):
         key for key in C._DEGRADED_ATTEMPTED if key[:2] not in keys})
 
     class Model:
+        original_access_helpers = captured_access_helpers
         country = receiver
         source = root
         data = live
@@ -336,6 +343,7 @@ def model(tmp_path, monkeypatch, request):
     try:
         yield m
     finally:
+        R.clear_caches()
         for ledger, previous in zip(ledgers, saved):
             for key in keys:
                 ledger.pop(key, None)
@@ -1111,6 +1119,15 @@ def test_literal_other_native_selected_script_yields_exact_15_25_and_preserves_l
                   f'\t$(PYTHON) {table}.py\n')
     rules += '$(VAR_DIR)/facts.parquet: $(VAR_DIR)/support.parquet\n'
     (model.source / '_/Makefile').write_text(rules)
+    # Exercise the real worker-order risk: an earlier IO-leaf case can memoize
+    # framework hashes while these four functions are stubbed. Restore and
+    # clear before native inputs are seeded or their validating hash is used.
+    model.country._table_cache_hash(OTHER, model.country.waves)
+    for helper, original in model.original_access_helpers.items():
+        monkeypatch.setattr(L, helper, original)
+    R.clear_caches()
+    assert all(getattr(L, helper) is original
+               for helper, original in model.original_access_helpers.items())
     other = model.data / name / 'var/support.parquet'
     model.seed(other, payload(values=(901.0, 902.0)))
     before = file_state(other)
