@@ -134,6 +134,24 @@ def test_sidecar_identity_reuses_driver_and_countries_relative_paths(mw, tmp_pat
         mw._labor_source_reference('../Data/absent.dta', script_path=driver)
 
 
+def _source_string(node, tree):
+    """Resolve only the drivers' static string grammar, never execute a script."""
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+        return _source_string(node.left, tree) + _source_string(node.right, tree)
+    if isinstance(node, ast.Name):
+        definitions = [statement for statement in tree.body
+                       if isinstance(statement, ast.Assign)
+                       and len(statement.targets) == 1
+                       and isinstance(statement.targets[0], ast.Name)
+                       and statement.targets[0].id == node.id
+                       and statement.end_lineno < node.lineno]
+        assert definitions, f'No prior static source binding for {node.id}'
+        return _source_string(definitions[-1].value, tree)
+    raise AssertionError('Source path is not a supported static string expression')
+
+
 def test_all_six_driver_refs_equal_their_loader_literals_and_capture_before_fields():
     seen = 0
     for wave in ['2010-11', '2013-14', '2016-17', '2019-20']:
@@ -155,7 +173,7 @@ def test_all_six_driver_refs_equal_their_loader_literals_and_capture_before_fiel
             kw = {v.arg: v.value for v in n.keywords}
             assert isinstance(kw['source_ref'], ast.Call)
             assert kw['source_ref'].func.id == '_labor_source_reference'
-            assert ast.dump(kw['source_ref'].args[0]) == ast.dump(reads[raw].value.args[0])
+            assert _source_string(kw['source_ref'].args[0], tree) == _source_string(reads[raw].value.args[0], tree)
             point = positions[kw['row_positions'].id]
             assert reads[raw].end_lineno < point.lineno < n.lineno
             assert ast.dump(point.value) == ast.dump(ast.parse(
@@ -187,3 +205,23 @@ def test_actual_feature_alignment_retains_distinct_labor_observations(mw):
     assert out.index.get_level_values('season').tolist() == ['unknown_season'] * 2
     numbers(out.PersonDays, [2., 5.])
     numbers(out.Wage, [3., 7.])
+
+
+@pytest.mark.parametrize('provenance,loader', [
+    ("BASE + 'ag_mod_d.dta'", "'../Data/wrong.dta'"),
+    ("BASE + 'wrong.dta'", "'../Data/ag_mod_d.dta'"),
+    ("'../Data/Panel/ag_mod_d.dta'", "'../Data/ag_mod_d.dta'"),
+])
+def test_static_driver_source_comparison_rejects_divergence(provenance, loader):
+    tree = ast.parse(f"BASE = '../Data/'\nreference = {provenance}\nloaded = {loader}\n")
+    with pytest.raises(AssertionError):
+        assert _source_string(tree.body[1].value, tree) == _source_string(tree.body[2].value, tree)
+
+
+@pytest.mark.parametrize('expression', [
+    "unknown_source", "make_source()", "f'{BASE}ag_mod_d.dta'", "42",
+])
+def test_static_driver_source_check_refuses_unknown_or_dynamic_forms(expression):
+    tree = ast.parse(f"BASE = '../Data/'\nreference = {expression}\n")
+    with pytest.raises(AssertionError):
+        _source_string(tree.body[1].value, tree)
