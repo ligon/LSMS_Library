@@ -895,8 +895,8 @@ class TestTheMeasurementRecord:
         assert all(isinstance(v, str) and v for v in unused.values())
 
     @pytest.mark.parametrize("country,wave,n,d,k,na", [
-        # lifted from each boundary's cluster_id_note / the served sample /
-        # the raw Nigeria covers (1135-measurement-record/oracle.json)
+        # Dated committed boundary measurements; Nigeria follows the current
+        # GH #1264 crosswalk notes, not the superseded Oct23 cover oracle.
         ("GhanaLSS", "1988-89", 712, 712, 79, None),
         ("Ethiopia", "2013-14", 3776, 3776, 333, None),
         ("Tanzania", "2012-13", 2904, 591, 82, None),
@@ -906,8 +906,8 @@ class TestTheMeasurementRecord:
         ("Uganda", "2010-11", 2640, 433, None, ["clusters_renumbered"]),
         ("Uganda", "2013-14", 1717, 1717, None, ["clusters_renumbered"]),
         ("Uganda", "2018-19", 2973, 2973, None, ["clusters_renumbered"]),
-        ("Nigeria", "2018Q3", 1493, 79, 1, None),
-        ("Nigeria", "2023Q3", 5067, 343, 11, None),
+        ("Nigeria", "2018Q3", 1454, 54, 1, None),
+        ("Nigeria", "2023Q3", 4736, 267, None, None),
         ("Burkina_Faso", "2018-19", 0, None, None, ["clusters_renumbered"]),
         ("Niger", "2018-19", 0, None, None, ["clusters_renumbered"]),
     ])
@@ -923,19 +923,18 @@ class TestTheMeasurementRecord:
         assert got == want, (got, want)
 
     def test_nigeria_records_the_marker_dependence_not_a_net_count(self):
-        """@ligon 2026-10-23, after the red team: the net-of-movers count
-        depends on the mover marker, so it lives in the note."""
+        """Current crosswalk counts do not settle a mover classifier.
+        Preserve the Oct23 not-measured ruling without requiring its
+        superseded cover counts or conditional bounds as current evidence."""
         recs = sampling_records("Nigeria")
-        for wave, rows in (("2018Q3", ("..... 10", "..... 25", "50..56")),
-                           ("2023Q3", ("..... 112", "..... 150",
-                                       "226..249"))):
+        for wave in ("2018Q3", "2023Q3"):
             m = recs[wave]["panel"]["cluster_id_measurement"]
             assert "households_changed_net_of_movers" not in m, wave
+            assert "mover_rule" not in m, wave
             note = m["note"]
             assert note.startswith("Net of movers is NOT measured"), wave
-            for row in rows:
-                assert row in note, (wave, row)
-        # the withdrawn bound is gone everywhere it was written
+        # Neither withdrawn nor conditional historical bounds are a current
+        # net count; both remain excluded from warning text below.
         note = recs["2023Q3"]["panel"]["cluster_id_measurement"]["note"]
         assert "86..106" not in note
 
