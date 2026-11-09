@@ -26,6 +26,19 @@ Sampling:
         violations), so a crosswalk is derivable; the ESS may ship it directly
         in Pub_ETH_HouseholdGeovars_Y2 (unverified, DESIGN.org Q6).  The 100
         large-town EAs added this wave are new and have no W1 antecedent.
+      cluster_id_measurement:
+        linked_households: 3776
+        households_changed: 3776
+        clusters_renumbered: 333
+        note: |-
+          Historical measurement (2026-10-19): none of the 3,776 linked panel
+          households kept `v`; their 333 cluster pairs formed a complete
+          bijection (every W1 EA mapped to exactly one W2 EA). No movement
+          classification was applied, so the net-of-movers count was not
+          measured. Counts retain the scope of that dated measurement.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'Historical 2026-10-19 measurement, recorded in sampling.yml at 79f5979cf8022e64928c5150950dfb00456994da, 2013-14 panel.cluster_id_note, and CONTENTS.org "Cluster (PSU) identifier" (measured through Country("Ethiopia").sample()); GH #1135 H3 table (3,776 linked, 3,776 change)'
       source_type: derived-from-data
       confidence: high
       source_file: null
