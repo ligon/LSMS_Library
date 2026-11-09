@@ -45,14 +45,34 @@ Container analysis41041673 succeeded and generated20 skills, removing retired
 advice, but inherited a temporary bare-origin project name. All350 key symbols
 and148 source paths validated on pinned input; initial one-based validation
 mismatch remains recorded alongside the source-bound zero-based correction.
-ROOT separately authorizes ONE supported --name LSMS_Library regeneration;
-that final result is pending at this ledger-first delivery checkpoint.
+ROOT separately authorized ONE supported --name LSMS_Library regeneration.
+Job41041794 completed0 on the same pinned source/tool/container. It generated20
+properly named skills; every file is byte-identical to the earlier successful
+output after only the documented project-name substitution. That carries all
+350 symbol checks,148 source files,126 key-file links and100 entrypoints.
+The final archive was applied mechanically without manual generated edits in
+1b7a57a97346a3633a559ac9e4b41b6363365d2e, after ledger-firstca6ddf945.
 
 ## §6 Limits and final gates
 The command supplies --embeddings, but tool default safety cap skipped it at
 50,138 nodes versus50,000. FTS was unavailable under deliberate load-only
 extension policy. Neither feature is claimed repaired or published; only
 community documentation is delivered. No embedding-cap override or FTS install.
-Final generated hashes, project labels, symbols/paths, complete nonowned-object
-identity and Root review/configured CI remain to close. No metadata census or
+Final generated hashes/project labels/symbol paths match the saved tool output.
+All generated lines retain the tool's raw zero-based coordinate convention.
+Complete nonowned-object proof is recorded with the final delivery; Root review,
+current integration and configured PR CI remain pending. No metadata census or
 survey/backend/source campaign is justified by these documentation-only paths.
+
+Evidence lives under B/reports/218-generated-skill-refresh-name-v4-20261109,
+with B=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103. Earlier native
+failure, cancelled Lustre image build, successful node-local image build,
+temporary-name success and initial coordinate-validator mismatch retain their
+separate immutable packets. Native preflight proves Node24.12.0/GitNexus1.6.9/
+glibc2.36 and resolved SSL/crypto; no installs/library-path patches occurred.
+The official linux/amd64 image digest is
+sha256:d318ba50c09fe519ec81396723ef353d5eed7b5be0f1c46779b4cbaf4f70cbd9;
+the verified durable SIF SHA is
+c76d8a755ad90b2c5a9a3c38cafb7c57f4ae1ffb173eff1c7e30d4cf7204cbb6.
+No shared index/registry or global environment was updated; private indexes
+are analysis artifacts, not a semantic-search/FTS release.
