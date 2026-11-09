@@ -1,7 +1,7 @@
 # Prior-Art Ledger — GH1288 CI structural/test-contract corrections
 
 **Source:**c821054706c26dd838dc08b47b39882da823cff5; searchgit/ripgrep/AST.
-**State:** ROOT-approved test-only correction, before implementation/runtime.
+**State:** test-only correction frozen/tested at87f054a466625a4fae61e411fa3f934639f4cda5; ROOT review/integration pending.
 
 ## §1 Task
 Update six test modules for the reviewed isolated productive Make transaction.
@@ -49,4 +49,33 @@ None blocking ROOT-approved changes.1452 separately owns two authorOther and
 nine strictrecipe cases; neither their source/tests/ledger is changed here.
 
 ## Phase3
-Pending focused test-only verification. All original20CI failures preserved.
+- **OK (§2–§4):** exact2 child-dispatch entrypoint names added; exact-set equality retained.
+- **OK (§4):** optional `niger_tree(..., trace=False)` preserves the SCRIPT
+  constant and default native script bytes;1452 confirmed compatibility before
+  their integration. Only four negative cases opt in. Original native
+  CalledProcessError1/cmd and diagnostic survive; first2 prepared privately,
+  third fails, no fourth/compiled result/live-wave or country writes.
+  Other recipe-stop, compiler refusal/YAML/healthy controls remain exact and pass.
+- **OK (§2–§4):** Uganda full income waves/[11,22] remain exact; saved live
+  earnings/enterprise bytes/mtime/current hashes/one-wave manifests stay exact,
+  while selected income has current all-wave hash/coverage.
+- **OK (§4):** precise no-output RuntimeError text retained with no live target;
+  both rebuild routes have one report before their respective build descent.
+  Existing runtime warning/memo controls remain unchanged and pass.
+- **OK (§2–§4):** GH809 reads actual normal/assumed-fresh gates, pins actual
+  warm branches’ gate linkage/no write/stamp, and adds an invented direct
+  twice-hit spy proving exact stored payload/bytes/mtime without stamp/write.
+  Existing legacy→stale and wave legacy-stamp rules remain. The two real-cache
+  delivered tests are unchanged and explicitly excluded from this pure run.
+- **Actual focused run:**75PASS/0fail/error/skip,158.00s pytest/165.986s wrapper,
+  outer0. MAIN/private fresh roots/unshare/threads1/n2loadfile;3 package/config
+  identity records, source clean/private datafiles0. Import-created private
+  config/s3_creds placeholder recorded; configuration is not claimed empty.
+ 44 warnings retained, including existing diagnostic/optional-module signals.
+- All product/schema/config/exclusion mode/type/blob entries stay exactc821;
+ 19162 nonowned objects exact. Six tests+this new ledger are the only paths.
+- Receipts: reports/1288-ci-structural-contract-tests-20261109 under durable
+  isa-sm-20261103 burst root, focused-v1. No failed new runtime attempt,
+  source acquisition/survey decoding/shared cache/census/fullsuite or1452
+  owned strictrecipe/authorOther cohort replay. Original20CI failures remain
+  preserved. ROOT owns further combined review/configuredCI/publication.
