@@ -1,121 +1,125 @@
 #+title: Current LSMS-ISA goal handoff
-* Goal and authoritative state — 2026-11-09T08:02UTC
-Goal ACTIVE/unbounded. Resolve the LSMS-ISA backlog and shared framework blockers with
-verified fixes, independent review, PRs and authorized development merges. Preserve
-scientific holds; no master release, shared cache rewarm, production-weight change or
-producer contact. Recent progress includes three repairs and a documentation merge.
+* Authoritative state — 2026-11-09T08:50UTC
+Goal ACTIVE/unbounded; objective incomplete. Previous goal turn made progress (1519
+reconciliation and actual refills). This turn made progress: real backend checks, Niger
+source repair, evidence-backed issue edits and PR1649. No blocked audit qualifies.
 
-GitHub development =9514be02e06d360dd4418db67426c2555ddff5be=.
-Sweep total: 47 development merges / 33 issue closures. Do not count partial issues closed.
-Primary checkout is the OLD-code docs branch; run library work in exact pinned worktrees.
-MAIN Python: =/local/job40825266/venv_img/bin/python=; assert cwd/PYTHONPATH/countries_root.
+GitHub development: =9514be02e06d360dd4418db67426c2555ddff5be=.
+Sweep total: 47 development merges / 33 issue closures. Partial issues are not closed.
+No master release, shared-cache rewarm, production-weight change or producer contact.
+The ROOT checkout is the OLD-code docs branch; use exact pinned worker checkouts.
+Mounted Python: =/local/job40825266/venv_img/bin/python=; assert cwd/import/countries root.
 
-B = /global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103
-Q = B/country-workers-refill-20261108
-Full chronological evidence/authorities remain in B/HANDOFF.org, B/DECISIONS.org and reports.
-Tracked prior handoffs preserved byte-exact in [[file:archive/20261109T0730-handoff.org][full handoff archive]]
-and [[file:archive/20261109T0730-isa-country-workers.org][worker history]], with SHA/size manifest alongside.
-Never infer completion or a live process from an old checkpoint.
+B=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103
+Q=B/country-workers-refill-20261108
+Full evidence/chronology: B/HANDOFF.org, B/DECISIONS.org and individual reports.
+Complete former7813-line handoffs remain byte-exact in [[file:archive/20261109T0730-handoff.org][archive]]
+and [[file:archive/20261109T0730-isa-country-workers.org][worker history]], with SHA/size manifest. Never infer live work from history.
 
-* Merged this turn; actual gates and final trees verified
-- PR1645: =82ee0bc94a6b6a4c10fd09891437229cee2dae82=; head72e3f6fc/treef961.
-  CI42572032825:12973PASS/5649SKIP/4X,846s,WindowsPASS. Parents[11714,72] and whole
-  tested/reviewed tree exact. GH1288 stays OPEN for real exposure, other callers and
-  undeclared/computed inputs; original evidence retained in updated issue details.
-- PR1646: =af91b3f71a22153052c82c7a385b2decb2537483=; headfe970/treef10dd9.
-  CI42572734540:13002PASS/5649SKIP/4X,1014.93s,WindowsPASS. Parents[82ee,fe970],
-  old/current synthetic and reviewed trees exact. GH1463 explicitly CLOSED. Exact
-  secondary EndpointConnectionError only; primary/config errors remain loud.
-- PR1647: current6d9563 above; head6e1b26d4/tree40b5dff18c0f4a6d0a692e1cf1d9028d24507230.
-  CI42575926459:13046PASS/5649SKIP/4X,1053.56s,WindowsPASS. Parents[af91,6e] and whole
-  tested/reviewed tree exact. GH1440 CLOSED; GH1454 partial fingerprint/prose repair OPEN.
-  Baked EHCVM mapper dependency now fingerprinted; market cold/warm uses existing mapper
-  once on requested column only. Original numeric-string P2 and failed attempts retained.
+* Recent merges and live publication
+- PR1645:82ee0bc9, head72e3f6fc, treef9611f97. CI42572032825:12973PASS/5649SKIP/4X,
+  WindowsPASS. Reviewed/tested whole tree and actual parents verified.1288 remains OPEN.
+- PR1646:af91b3f7, headfe970f7c, treef10dd9e2. CI42572734540:13002PASS/5649SKIP/4X,
+  WindowsPASS.1463 CLOSED. Secondary EndpointConnectionError soft-drop only; no outage timing claim.
+- PR1647:6d9563f7, head6e1b26d4, tree40b5dff1. CI42575926459:13046PASS/5649SKIP/4X,
+  WindowsPASS.1440 CLOSED;1454 partial OPEN. Market mapping once on requested cold column.
+- PR1648:9514be02, headb8faa8d7, tree5dd81369. CI42578680928:13046PASS/5649SKIP/4X,
+  WindowsPASS. Documentation only;1122/1530/1190 updated and OPEN. All actual merge parents,
+  reviewed/tested trees and terminal logs verified; ROOT receipts live in corresponding reports.
 
-ROOT CI/merge receipts: B/reports/{1288-corrected-current-composition-20261109,
-1463-corrected-1288-restack-20261109,1454-1440-current-release-gates-20261109}.
-Original20 CI failures were fixed through reviewed TEST/FIXTURE-only corrections:
-168 controls+6affected rechecks (not174unique),75 separate controls;142oldasserts retained.
-No product weakening, hash exclusions or shared rewarm. Current mapper release API/44tests
-passed; full metadata vs2e has zero incremental changes. Helper/global-prose union cost:
-450country/1877wave/0BTF/12FIF changes;18None/allnonhashfields exact. FIF=framework-import.
-Latest map=f1d9064270f6f91ac7bbde4448bcb7e73091242b1ccff6a19c745a2e65a1014e.
+PR1649 OPEN/ready: [[https://github.com/ligon/LSMS_Library/pull/1649][Guinea-Bissau GPS unit notes]], branch
+=docs/1531-gnb-gps-authority-current-20261109=; head262ce33d030e941abd6fe0f9f50f0d6781fa404b,
+treef815b41becaa0460a6ee9699aa042fc03ea7c192; base9514. Only GNB CONTENTS+ledger;
+original prefix exact, runtime/config/tests unchanged. ROOT independently reviewed final54-line
+note against source evidence and documentary peer review. Strict static API audit passed.
+CI42586780943: Windows129058406529 SUCCESS; unit129058406774 running at last check.
+Synthetic3201d46b must still match actual terminal checkout/parents/full tree before merge.
+No1531 closure or area-source policy follows. R=reports/1531-gnb-current-documentation-20261109.
 
-* Latest documentation merge; release queue empty
-PR1648 MERGED =9514be02e06d360dd4418db67426c2555ddff5be=; head
-=b8faa8d763617adb70b0d6d9a0020cc2944ad5e2=,
-branch docs/agriculture-country-plot-notes-20261109, base6d9563; tree
-=5dd81369b53cc870a4a8c49f625d3b1a88e430e4=. Exact7 docs/ledger paths only; code/config/tests/
-Org table/source blocks exact6e. API/metadata carry by input identity, not new runs.
-B/reports/agriculture-country-plot-notes-current-20261109 contains ROOT admission and union.
-Niger/Malawi original3309/5431line prefixes preserved. Independent f187 doc review PASS.
-1122 original63eb had P2; child45bf qualifies coarse-provider exclusion, ROOT actualFeature
-source review and final peer95489/terminal0/0 confirm. Whole1122/1530/1190 remain OPEN.
-CI42578680928 passed13046/5649skip/4expected failures plus Windows smoke. Actual synthetic
-9270ba89 parents[6d,b8] and whole reviewed tree exact; merge parents/tree independently
-verified. ROOT-MERGE.json records admission. Issues1122/1530/1190 updated, all still OPEN.
+* Decisions pending — goal continuation is not approval
+-1190: two async choices unanswered: separate seed-acquisition table vs Farm-level acquisition
+ rows; all recorded third-H36 quantities with literalH34 vs requireH34Yes. All-H/residual scope
+ and2016 field-export mapping also unresolved. No carrier/gate implementation.
+-1562 NEW async: use relative positive-value order for CIV only (1 before3), documenting the
+ unexplained gap, or wait for release-specific encoding evidence. No decoder until answer.
+-1575 strata implementation and1066 warning replay remain unanswered.
+-48 signed-off bounded weights investigation closed993097b9; production/1604 HELD. Do not repeat.
+-49 borrow YES;50 final maize-flour ruling YES;51 NO date clamp. Other eligibility/state/unit/
+ window holds1497/1509/1442/1518/1560/1571/1502/1483/1577 remain; see DECISIONS/archive.
 
-* Pending maintainer decisions — no implicit approval
-NEW async1190 questions await user: separate seed-acquisition table (recommended) vs
-Farm-level plot_inputs acquisition-only rows; keep every third H36 quantity+literal H34
-flag (recommended) vs require H34Yes. Both observed positive third cases are Yes, so data
-cannot choose. All-H vs residual scope and2016quantity-label interpretation also unresolved.
-No carrier/gate implementation. Existing first/second value gates, planted G amounts,
-allocation, units and cost/payer fields stay as ruled until an explicit new decision.
-1575 strata implementation and1066 warning replay questions remain unanswered.
-48 bounded weights research closed993097b9; production policy/1604 HELD. Do not repeat it.
-49 borrow YES;50 FINAL maize flour YES;51 NO date clamp. Other eligibility/state/unit/window
-holds (1497/1509/1442/1518/1560/1571/1502/etc.) persist; see archive/DECISIONS.
+* Current fixes, verification and exact limits
+-1288 Tanzania at9514:4 actual API phases0;6 strict whole-frame/typed-attrs comparisons PASS.
+ Full6555/2019=1212/2020=5343/unsupported2008=0; full6-wave coverage. Warm0raw/producer/
+ compiler/writer, inventories exact. Cold reads default2/Make4. Original parent import failure
+ and closed setup failure retained; corrected closed-only comparison passed without source replay.
+-1288 Nigeria at9514:4 actual API phases0;6 strict comparisons PASS; full23196/PP2010=5115/
+ PP2023=3650/validPHempty0. All10waves covered; warm0raw/producer/writer/cachechange.
+ Cold default5/Make5 reads. R=reports/1288-niger-nigeria-livestock-real-exposure-20261109.
+-1288 Niger baseline9514 stopped BEFORE raw/API: computed2014 path defeats literal closure.
+ Minimal identical-path literal repair c1059180074dc20f6756b3d6019eb6c7c41327f6, branch
+ fix/1288-niger-livestock-source-literal-20261109;3 tests PASS. Metadata changes19/450country
+ and19/1895wave(allNiger2014);0/35BTF,0/186FIF;18None/all nonhash fields exact.
+ Fixed-source4APIphases0,12reads, but FIRST strict comparison FAILED on index equality
+ (outer15855=1). Closed diagnosis: same30230 rows and expanded row keys/order/dtypes;
+ default i.levels8027 vs Make10049 with different codes/unused levels. t/animal levels exact.
+ Complete closed value/mask/typed-attrs classification still pending. DO NOT normalize to
+ claim parity, replay source, or relabel baseline tested.1452 owns diagnosis and source repair.
+-1569 sold audit final8f45c6c9/code5192179, remote41039117 terminal0/0, source ref
+ refs/remotes/dispatch/1569-sold-audit-20261109. Quantity_sold AND native sale-price checks,
+ explicit Unit_sold/Condition_sold; no harvest-unit/condition borrowing.67 corrected tests
+ (64new+3existing); superseded proposals/base failures retained. Mwi independent review active.
+ No new coverage-warning/zero-flag API, strict-mode change, sentinel recode or data mutation.
+-218 finalce46e47ba96e2ab22ff7c4cb07f4f33259471a6a/code05272dd9, remote41039180 terminal0/0;
+ refs/remotes/dispatch/218-retired-food-route-20261109. Onlycountry.py/new12-case test/ledger.
+19 focused PASS, baseline11PASS+1expectedFAIL. Full actual metadata:450/450country,
+1877/1895wave,35/35BTF change;18None exact,0/186FIF; all14nonhash fields exact.
+ Broad both-tier next-access invalidation must be disclosed/reviewed; nonzero impact is allowed.
+ No exclusions/rewarm; unowned non-ISA Makefile/prose/.gitignore residual stays OPEN.
+ Independent review and ROOT publication decision still needed.
+-1136 transport child41039257/dispatch78ad933af2be41b39e462609a6161765: DESIGN/synthetic
+ diagnosis ONLY; ROOT read note and explicitly held product adapter. Parent priority is after
+ defect queue. Novel ledger snapshots cannot establish every-build occurrence; preserve that
+ limitation and1066 replay decision. Finish bounded design; do not invent occurrence semantics.
 
-* Completed source findings and active followups
-- 1190 H/G/header independent fe7f:18filesonce,62643key-viewchecks,16newcontrols;0/2third
-  and0/5gift groups eligible under current G criterion (5multi,2nojoint). Not served recovery.
-  2016H07a OTHER-SPECIFY/H38a OTHER-UNIT conflict,2013truncation,2019payer-not-value remain.
-  Source-only TierC design7655 is18k report; ROOT read it; user choices pending.
-- 1530 author1b72: own2021s16c/s16d each4onion positions; unchanged pure helper retains4.
-  No API/2018/upstream-cause claim. Peer c18d127checks qualified, six capture sessions48pickle/
-  12JSON reads; native0/supervisor74 FAILEDpublicationcap retained, skipped72MBsnapshot
-  physically present in normal evidence. No raw/PDF/redecode. Notes in1648 preserve limits.
-- 1519 authorfaa6:434299rows; three tiny2018 totals/last quantities already raw, zero
-  subtraction-order differences;2021min.003. Original3tiny vs4historicalflags qualified.
-  First peer c889 UNFINISHED/0numeric due wrong envelope assumption. Replacement02d99359
-  first numeric census complete,4closedloads once, core source findings corroborated.
-  Actual-labelled continuation completed:2018match150499/E-NA64045/priceable149434;
-  2021match171977/E-NA47801/priceable170365. Three tiny native2018 cases remain two valued
-  and one unit mismatch. Not API/NSU/canonical collapse or a physical-unit policy ruling.
-  Report1519-actual-labelled-construction-20261109 preserves the oracle reassociation
-  failure and three cumulative labelled loads. Next: actionable issue disposition and
-  decide whether label-vs-code routing is a defined wiring bug or needs a maintainer ruling.
-  ROOT applied corrected1519 title/body08:05:38, original preserved/issueOPEN. Existing
-  own-label/prefix semantics are defined behavior; no speculative numeric-code fix authorized.
-  Exact numeric envelope keys are frame/positions/missing_masks/dtypes; cardsplain dict.
-- 1525 completionacdb: prior203linereview+two officialPDF114pages/4layouts read; printed
-  108Dry/108_1Flour confirmed. CEB01description/CEB02code versus export bridge UNRESOLVED;
-  no swap authority or raw/map replay.1000c8c5 paper/workbook UNRESOLVED after29retrievals;
-  no density edits/redundant retrieval loop.905489c signed4ULP counterexamples held0vs2;
-  passing rejection controls are not optimization acceptance.
-- New bounded lanes authorized: own2016XS/Panel agriculture documents for1190header conflicts
-  (two closedheaders+trustedparser/noDTA/rebind);1562Coted2018ownheldCAPI PDF/XLSX semantics
-  (no verified Designer archive/GUID assumption, no raw/rank/default change);1531GNBonly
-  GPS/farmer-unit authority, atmost2declaredhelds16a files/headercardsfirst/no ratio threshold,
-  clamp change or remote acquisition. Manager submits routine private templates directly.
+* Scientific/documentary findings already completed
+-1519 reconciled/open: tiny2018 quantities pre-exist subtraction; actual-labelled pure valuation
+ yields2priced/1unit mismatch. No new full API/NSU/canonical claim or clamp policy. Existing
+ own-label/prefix matching is defined behavior, not a proven numeric-code wiring bug.
+-1562 standard historical software contract established conditionally: positive ordered values
+ are selection positions; no nativeGUID needed for that claim. Own released header has no
+ linked label records defining3. One numeric read285824x39:11581 rows onlypositive1,
+2197exact{1,3}, no2/ties/outside0..3; option26 exclusive2137. This rejects an INTACT consecutive
+ rank pattern, not every possible preserved relative order. User ruling pending; no decoder.
+ ROOT read official ReleaseLetter11 and own catalog/related-materials: no cleaning/code attachment
+ listed there or in held own2018 tree. No producer contact or further acquisition authorized.
+-GNB1531: ownpaperQ47 hectares; distinctDTAq47a explicitlym²; export relationship unknown.
+1191 paired source rows allvague2/flag1. One saved-capture comparison:33exactequal, zero
+ exact10000 transforms either direction. No row-unit inference/source choice. PR1649 note
+ remains frozen to earlier reviewed instrument/header/presence evidence. ROOT updated1531/open.
+-1122 now exactly3 deferred Ghana build comments. Transformation passage already replaced by
+1f8f359b0 (#1460), ancestor9514; no imaginary edit/hash experiment. ROOT narrowed issue.
+-1190 own2016 XS/Panel forms share one1490901B questionnaire; paper quantity/unit pairs do not
+ establish exporta/b mappings.0/2third and0/5gift groups eligible for current single-G attach.
+-1530 four native onions in each own2021 source retained by pure helper; no served/API/2018/
+ upstream gate-cause acceptance.1525 field-code/export bridge unresolved;1000 paper/workbook
+ unavailable after bounded research;905 signed4ULP counterexamples retained, no optimization.
+-1454 partial OPEN: helper/global-prose UNION cost450country/1877wave/0BTF/12FIF;18None
+ exact. Latest closed mapf1d9064270f6f91ac7bbde4448bcb7e73091242b1ccff6a19c745a2e65a1014e.
 
 * Ownership and operating rules
-ROOT controls GitHub mutations/merges. finish_1452 verifies1288 on actual Tanzania livestock
-at9514 using two held LF inputs/private roots, up to6 native parses including Make overhead;
-no recipe/product edit. malawi_revision_food drafts1519 disposition and assesses a minimal
-defined fix without reopening data; finish_1590 manages remote queue/refills.
-08:00UTC actual remote count was ONE (GNB1531); two local workers plus manager assignments
-are not eight workers. User's underutilization criticism is valid. Refill ordered for CIV1562
-official export semantics and fresh ready-issue inventory; count only confirmed execution.
-08:05:42UTC both refills confirmed agent_execution: jobs41038937(CIV),41038938(inventory),
-alongside GNB41038666; THREE remote actual workers, substantive new output still pending.
-Use collaboration status and Q/reports/ROLLING-ACTUAL-STATE.json for actual phases, never
-historic eight-job counts. Eight productive executions were reached; completed actors are
-not busy. Refill purposeful work/reviews only, no invented tasks or repeated finished cohorts.
-Ordinary profile has allocation-private DVC_SITE_CACHE_DIR, false/absent credentials,
-private config/data/L1, threads1. SDKworkerSHAa228 retained; no per-job new guard project.
-No nativehome/state/transcript/SQLite/observer-body reads. Normal project evidence allowed.
-Current output filenames exact: report.md, RESULT.json, verification-plan.json,
-ledger-checkpoint.md, source-byte-proof.json. Failed SDK74 publication/canonical-name histories
-remain failures even if useful project artifacts are recovered. Do not restart live work.
+ROOT alone writes GitHub and authorizes development merges. Local Mwi queue is owned by ROOT;
+manager1590 must send briefs rather than assign her concurrently.1452 owns1288; Mwi1569 review;
+1590 owns remote dispatches/results. Completed/preparing/sealing actors are not productive workers.
+Fresh inventory be2cecc12a5b20adbc819a069828738dd01a99be examined all154open issues and found
+only3 ready shared tasks1569/218/1136child. All dispatched; no fourth/fifth manufactured.
+Use collaboration status and Q/reports/ROLLING-ACTUAL-STATE.json, with supported live-handle
+polls for authoritative waits. Native agent_execution alone can include finalization, not new work.
+
+Existing ordinary private-DVC templates suffice; no fresh guard/capture/sealing frameworks.
+Pinned threads/BLAS/build1; source identity and held-input custody; no raw acquisition/shared
+cache writes unless explicitly scoped.148/62 historical compiler cells are not a fresh runtime audit.
+No nativehome/state/transcripts/SQLite/observer-body reads. Canonical remote artifacts: report.md,
+RESULT.json,verification-plan.json,ledger-checkpoint.md,source-byte-proof.json. Preserve all failed
+native/supervisor/outer runs as failures. Source/object identity can carry gates; don't invent runs.
+Before merge: fresh PR/reviews/threads, actual terminal unit+Windows logs, actual synthetic parents
+and whole reviewed tree. After merge: actual parents/tree, exact remaining issue edits/closures.
