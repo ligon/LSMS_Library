@@ -1,6 +1,6 @@
 # Prior-Art Ledger — GH #1135 Nigeria measurement config
 
-**Status:** grounded; config port and static verification pending.
+**Status:** source-only config port statically verified; coordinator acceptance pending.
 **Base:** `79f5979cf8022e64928c5150950dfb00456994da`.
 **Search tier:** source text, ripgrep and own Git; prepared Python stdlib only.
 Inherits [STANDING.md](STANDING.md). No package imports or runtime checks.
@@ -22,7 +22,7 @@ this ledger and `lsms_library/countries/Nigeria/_/sampling.yml` are owned.
 | Composite cluster identity | `CONTENTS.org:985-1061` | `v=state/lga/ea`; `ea=0` singletons; whole-EA LGA changes | reuse, no identity changes |
 | Existing schema reader | `lsms_library/sampling.py:201,584,653` | `_PANEL_FIELDS`, `_check_panel`, `sampling_records`; `tests/test_sampling.py` is the existing test surface | unchanged; base does not accept new field yet |
 | Existing Nigeria checks | `tests/test_gh1448_nigeria_sampling_notes.py:1-115` | text says notes count the committed crosswalk; includes source-dependent sample comparison | read only; not collected or run |
-| Reviewed schema text | `$ISA_CONTEXT_ROOT/reviewed-sampling.py.txt:219-274,743-855` | optional counts, independent provenance, coherence and missing-state contract | read only, never imported/executed |
+| Reviewed schema text | `$ISA_CONTEXT_ROOT/reviewed-sampling.py.txt:219-274,717-845` | optional counts, independent provenance, coherence and missing-state contract | read only, never imported/executed |
 | Frozen port authority | `$ISA_CONTEXT_ROOT/APPROVED-SCHEMA.md` and `COUNTRY-INPUT.json`, both assigned rows | Nigeria-specific correction overrides obsolete old literals | reuse exactly |
 
 The full 4,142-line `CONTENTS.org` was personally read, including TODO/WAITING
@@ -101,8 +101,43 @@ runtime acceptance remain coordinator gates, not outcomes claimed here.
 
 ### Phase 3 — verification
 
-UNFINISHED. Planned: prove exact base reconstruction after removing only the
-new blocks; verify the two literal records against §2/§3/§5; verify all other
-tracked objects and three-commit separation against §4. Mandatory evidence:
-`report.md`, `RESULT.json`, `verification-plan.json`, `ledger-checkpoint.md`,
-`source-byte-proof.json` under `SUCODER_DISPATCH_EVIDENCE_DIR` only.
+Source proof at config commit `faaa6442132f2ed096dc18096ca9422f4136262c`
+passed using the prepared interpreter with stdlib text/AST/Git only. The
+reviewable verifier is `verify-source.py` under the evidence directory; it
+does not import or execute the frozen schema or any project module.
+
+- **OK (anchored on §2/§3/§5):** exactly two blocks, at 2018Q3 and 2023Q3,
+  with N1454/D54/K1 and N4736/D267, respectively. Literal count spellings,
+  field names, independent provenance and dated qualifiers agree with the
+  frozen contract. Known counts satisfy coherence; no computation from data.
+- **OK (anchored on §3/§4):** both net counts and mover rules omitted;
+  2023Q3 K omitted as unknown, never zero or `not_applicable`. The old
+  1493/79, 5067/343/K11 records and conditional bounds are not restored.
+- **OK (anchored on §4):** removing only the 2,316 inserted bytes (32 lines)
+  reproduces all 7,885 original bytes, SHA256
+  `ba9ec16d22cf23db9037f4c1227b55164716d70825a998ab38842d182a48f26f`.
+  The 10,201-byte candidate is SHA256
+  `a61e2d0c69b7e158f1c1f40b9527390c56fd90cbe2fb64383516dda5e2073a37`.
+- **OK (anchored on §4):** all 19,247 nonowned tracked entries retain exact
+  base mode/type/object identity. Config mode/type is unchanged; ledger is
+  new. `git diff --check` passes; tracked worktree is clean at config head.
+- **OK (anchored on §4/§5):** no new algorithm or shared behavior: no
+  reinvention. The existing base reader's field set lacks this block; the
+  reviewed text admits it. This deliberate interim integration limit is
+  reported, not repaired or runtime-tested by this worker.
+
+Initial ledger-only commit is `26df7fe0dca6b72a9b011a5a0dbedcc83100b2ca`;
+config-only commit is `faaa6442132f2ed096dc18096ca9422f4136262c`. This final
+ledger update is separate. The verifier repeats the byte/object/commit checks
+after this commit and records the exact final head in `source-byte-proof.json`.
+
+Canonical durable evidence: `report.md`, `RESULT.json`,
+`verification-plan.json`, `ledger-checkpoint.md`, `source-byte-proof.json` in
+`SUCODER_DISPATCH_EVIDENCE_DIR`. All five existed as UNFINISHED before the
+long country read. Checkpoints preserved pending publication honestly.
+
+**UNRUN by explicit task scope:** package imports, YAML/schema validation,
+pytest/collection, actual Country/Feature/getter/API, data/header/DTA,
+Make/api-audit, DVC/network/acquisition/provider/cache/rewarm and numerical
+or weighting checks. Skills were enumerated by source frontmatter only.
+No runtime, scientific or full GH #1135 closure is claimed.
