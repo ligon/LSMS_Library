@@ -1,125 +1,113 @@
 #+title: Current LSMS-ISA goal handoff
-* Authoritative state — 2026-11-09T08:50UTC
-Goal ACTIVE/unbounded; objective incomplete. Previous goal turn made progress (1519
-reconciliation and actual refills). This turn made progress: real backend checks, Niger
-source repair, evidence-backed issue edits and PR1649. No blocked audit qualifies.
-
-GitHub development: =9514be02e06d360dd4418db67426c2555ddff5be=.
-Sweep total: 47 development merges / 33 issue closures. Partial issues are not closed.
-No master release, shared-cache rewarm, production-weight change or producer contact.
-The ROOT checkout is the OLD-code docs branch; use exact pinned worker checkouts.
-Mounted Python: =/local/job40825266/venv_img/bin/python=; assert cwd/import/countries root.
-
+* Authoritative checkpoint — 2026-11-09T10:39UTC
+Goal ACTIVE; intended backlog resolution remains incomplete.
+GitHub development: dfaeed64ba38e59c0d407fc435bf7a5a7ac83b70.
+Verified sweep total: 51 development merges / 34 issue closures.
+ROOT checkout is the OLD-code docs branch. Use pinned worktrees for source work.
+Python: /local/job40825266/venv_img/bin/python. Assert cwd/import/countries-root identity.
 B=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103
 Q=B/country-workers-refill-20261108
-Full evidence/chronology: B/HANDOFF.org, B/DECISIONS.org and individual reports.
-Complete former7813-line handoffs remain byte-exact in [[file:archive/20261109T0730-handoff.org][archive]]
-and [[file:archive/20261109T0730-isa-country-workers.org][worker history]], with SHA/size manifest. Never infer live work from history.
 
-* Recent merges and live publication
-- PR1645:82ee0bc9, head72e3f6fc, treef9611f97. CI42572032825:12973PASS/5649SKIP/4X,
-  WindowsPASS. Reviewed/tested whole tree and actual parents verified.1288 remains OPEN.
-- PR1646:af91b3f7, headfe970f7c, treef10dd9e2. CI42572734540:13002PASS/5649SKIP/4X,
-  WindowsPASS.1463 CLOSED. Secondary EndpointConnectionError soft-drop only; no outage timing claim.
-- PR1647:6d9563f7, head6e1b26d4, tree40b5dff1. CI42575926459:13046PASS/5649SKIP/4X,
-  WindowsPASS.1440 CLOSED;1454 partial OPEN. Market mapping once on requested cold column.
-- PR1648:9514be02, headb8faa8d7, tree5dd81369. CI42578680928:13046PASS/5649SKIP/4X,
-  WindowsPASS. Documentation only;1122/1530/1190 updated and OPEN. All actual merge parents,
-  reviewed/tested trees and terminal logs verified; ROOT receipts live in corresponding reports.
+* Honest utilization and current assignments
+At live audit10:36UTC: finish_1590 running; finish_1452 and malawi_revision_food completed.
+There were NOT eight busy workers. Latest supported remote snapshot10:18UTC reports ZERO
+active remote workers; current Slurm listing has no additional ISA worker allocation.
+ROOT immediately refilled both completed local agents:
+- finish_1590: existing PR1653/1654 CI monitoring and terminal admission evidence.
+- finish_1452: final218 ledger-only carry review; separate generated-skill residual diagnosis.
+- malawi_revision_food: integrate reviewed218 residual onto Uganda a91ec271; one actual
+ integrated metadata comparison, publication preparation in an isolated worktree.
+- ROOT: diff review, GitHub publication/development merges, prioritization and status repair.
+This is three assigned local workers plus ROOT; monitoring is not counted as implementation.
+No fabricated tasks or repeated finished surveys to fill an eight-worker target.
 
-PR1649 OPEN/ready: [[https://github.com/ligon/LSMS_Library/pull/1649][Guinea-Bissau GPS unit notes]], branch
-=docs/1531-gnb-gps-authority-current-20261109=; head262ce33d030e941abd6fe0f9f50f0d6781fa404b,
-treef815b41becaa0460a6ee9699aa042fc03ea7c192; base9514. Only GNB CONTENTS+ledger;
-original prefix exact, runtime/config/tests unchanged. ROOT independently reviewed final54-line
-note against source evidence and documentary peer review. Strict static API audit passed.
-CI42586780943: Windows129058406529 SUCCESS; unit129058406774 running at last check.
-Synthetic3201d46b must still match actual terminal checkout/parents/full tree before merge.
-No1531 closure or area-source policy follows. R=reports/1531-gnb-current-documentation-20261109.
+* Latest completed development merges
+-1649 GNB documentary note: fb04f101dddc12ce975a41bc83f759e11a336e8c.
+ CI13046PASS/5649SKIP/4X; Windows362PASS/1SKIP.1531 remains OPEN; no unit/source ruling.
+-1650 sold-quantity/sale-price diagnostics:42a25fabc9d1712ff176927b80e31c29a7de9489.
+ CI13110PASS/5649SKIP/4X; Windows362PASS/1SKIP.1569 explicitly CLOSED for screening scope.
+ No source sentinel recoding, new coverage warning or input-frame mutation.
+-1651 retired implicit food-route guard:611dbf2421cced66975dcc9688b80bf699529588.
+ CI13122PASS/5649SKIP/4X; Windows362PASS/1SKIP.218 remains OPEN for source cleanup.
+ Measured metadata450country/1877wave/35BTF hashes;18None and all nonhash fields exact.
+-1652 Niger literal source declarations:dfaeed64ba38e59c0d407fc435bf7a5a7ac83b70.
+ CI13134PASS/5649SKIP/4X; Windows362PASS/1SKIP.1288 remains OPEN.
+ Actual integration metadata19country/38wave hashes;0BTF/FIF, all nonhash fields exact.
+All four merges have actual terminal checkout/tree/parent evidence and postmerge verification.
+Retargeted CI may use a distinct parent commit with identical complete tree; preserve that
+qualification and prospective-merge proof. Do not invent updated synthetic parent identities.
 
-* Decisions pending — goal continuation is not approval
--1190: two async choices unanswered: separate seed-acquisition table vs Farm-level acquisition
- rows; all recorded third-H36 quantities with literalH34 vs requireH34Yes. All-H/residual scope
- and2016 field-export mapping also unresolved. No carrier/gate implementation.
--1562 NEW async: use relative positive-value order for CIV only (1 before3), documenting the
- unexplained gap, or wait for release-specific encoding evidence. No decoder until answer.
--1575 strata implementation and1066 warning replay remain unanswered.
--48 signed-off bounded weights investigation closed993097b9; production/1604 HELD. Do not repeat.
--49 borrow YES;50 final maize-flour ruling YES;51 NO date clamp. Other eligibility/state/unit/
- window holds1497/1509/1442/1518/1560/1571/1502/1483/1577 remain; see DECISIONS/archive.
+* Current publication queue
+PR1653 Malawi source-discovery batch, ready, base development:
+ head b443ebde989bd69d61627eb0f64d161904ec1b1b;
+ tree a79e9e06a8daf86749b489e8154e727f5ed9f898.
+ Original reviewed integration430a7bfa; b443 is one empty commit with identical WHOLE tree.
+ Eleven getter arguments in six scripts; processing/provenance/IDs preserved.
+ Metadata22country/44wave hashes,0BTF/FIF, all nonhash fields exact.
+ First PR event produced no Actions jobs. Empty push then close/reopen recorded; actual
+ CI42601058242 started10:27:55. Which action caused delivery is not established.
+ Windows362PASS/1SKIP; unit129105344214 still running at last observation.
+ Actual Windows checkout932267b8 differs from advertised8fec7f87; both have parents
+ [dfaeed64,b443] and exact reviewed full tree. Verify actual UNIT checkout independently.
+ R=B/reports/1288-malawi-current-publication-20261109.
 
-* Current fixes, verification and exact limits
--1288 Tanzania at9514:4 actual API phases0;6 strict whole-frame/typed-attrs comparisons PASS.
- Full6555/2019=1212/2020=5343/unsupported2008=0; full6-wave coverage. Warm0raw/producer/
- compiler/writer, inventories exact. Cold reads default2/Make4. Original parent import failure
- and closed setup failure retained; corrected closed-only comparison passed without source replay.
--1288 Nigeria at9514:4 actual API phases0;6 strict comparisons PASS; full23196/PP2010=5115/
- PP2023=3650/validPHempty0. All10waves covered; warm0raw/producer/writer/cachechange.
- Cold default5/Make5 reads. R=reports/1288-niger-nigeria-livestock-real-exposure-20261109.
--1288 Niger baseline9514 stopped BEFORE raw/API: computed2014 path defeats literal closure.
- Minimal identical-path literal repair c1059180074dc20f6756b3d6019eb6c7c41327f6, branch
- fix/1288-niger-livestock-source-literal-20261109;3 tests PASS. Metadata changes19/450country
- and19/1895wave(allNiger2014);0/35BTF,0/186FIF;18None/all nonhash fields exact.
- Fixed-source4APIphases0,12reads, but FIRST strict comparison FAILED on index equality
- (outer15855=1). Closed diagnosis: same30230 rows and expanded row keys/order/dtypes;
- default i.levels8027 vs Make10049 with different codes/unused levels. t/animal levels exact.
- Complete closed value/mask/typed-attrs classification still pending. DO NOT normalize to
- claim parity, replay source, or relabel baseline tested.1452 owns diagnosis and source repair.
--1569 sold audit final8f45c6c9/code5192179, remote41039117 terminal0/0, source ref
- refs/remotes/dispatch/1569-sold-audit-20261109. Quantity_sold AND native sale-price checks,
- explicit Unit_sold/Condition_sold; no harvest-unit/condition borrowing.67 corrected tests
- (64new+3existing); superseded proposals/base failures retained. Mwi independent review active.
- No new coverage-warning/zero-flag API, strict-mode change, sentinel recode or data mutation.
--218 finalce46e47ba96e2ab22ff7c4cb07f4f33259471a6a/code05272dd9, remote41039180 terminal0/0;
- refs/remotes/dispatch/218-retired-food-route-20261109. Onlycountry.py/new12-case test/ledger.
-19 focused PASS, baseline11PASS+1expectedFAIL. Full actual metadata:450/450country,
-1877/1895wave,35/35BTF change;18None exact,0/186FIF; all14nonhash fields exact.
- Broad both-tier next-access invalidation must be disclosed/reviewed; nonzero impact is allowed.
- No exclusions/rewarm; unowned non-ISA Makefile/prose/.gitignore residual stays OPEN.
- Independent review and ROOT publication decision still needed.
--1136 transport child41039257/dispatch78ad933af2be41b39e462609a6161765: DESIGN/synthetic
- diagnosis ONLY; ROOT read note and explicitly held product adapter. Parent priority is after
- defect queue. Novel ledger snapshots cannot establish every-build occurrence; preserve that
- limitation and1066 replay decision. Finish bounded design; do not invent occurrence semantics.
+PR1654 Uganda source declarations, ready, currently stacked on1653 feature branch:
+ head a91ec271da1fd943fa56bd008b59f63325d4e1cd;
+ tree e2f0fb81fcb96cb679a2af0caaef4dc635795425.
+ Seven anthropometry scripts retain ANTHRO_FILES map and getter; explicit literal consistency
+ checks fail before IO, including optimized Python.23 focused controls passed.
+ Metadata24country/168wave hashes,0BTF/FIF, all nonhash fields exact.
+ CI42599665607: Windows success, original unit129100715145 still running at last observation.
+ Retarget to development AFTER1653 merge; never merge into the feature branch.
+ R=B/reports/1288-uganda-current-publication-20261109.
 
-* Scientific/documentary findings already completed
--1519 reconciled/open: tiny2018 quantities pre-exist subtraction; actual-labelled pure valuation
- yields2priced/1unit mismatch. No new full API/NSU/canonical claim or clamp policy. Existing
- own-label/prefix matching is defined behavior, not a proven numeric-code wiring bug.
--1562 standard historical software contract established conditionally: positive ordered values
- are selection positions; no nativeGUID needed for that claim. Own released header has no
- linked label records defining3. One numeric read285824x39:11581 rows onlypositive1,
-2197exact{1,3}, no2/ties/outside0..3; option26 exclusive2137. This rejects an INTACT consecutive
- rank pattern, not every possible preserved relative order. User ruling pending; no decoder.
- ROOT read official ReleaseLetter11 and own catalog/related-materials: no cleaning/code attachment
- listed there or in held own2018 tree. No producer contact or further acquisition authorized.
--GNB1531: ownpaperQ47 hectares; distinctDTAq47a explicitlym²; export relationship unknown.
-1191 paired source rows allvague2/flag1. One saved-capture comparison:33exactequal, zero
- exact10000 transforms either direction. No row-unit inference/source choice. PR1649 note
- remains frozen to earlier reviewed instrument/header/presence evidence. ROOT updated1531/open.
--1122 now exactly3 deferred Ghana build comments. Transformation passage already replaced by
-1f8f359b0 (#1460), ancestor9514; no imaginary edit/hash experiment. ROOT narrowed issue.
--1190 own2016 XS/Panel forms share one1490901B questionnaire; paper quantity/unit pairs do not
- establish exporta/b mappings.0/2third and0/5gift groups eligible for current single-G attach.
--1530 four native onions in each own2021 source retained by pure helper; no served/API/2018/
- upstream gate-cause acceptance.1525 field-code/export bridge unresolved;1000 paper/workbook
- unavailable after bounded research;905 signed4ULP counterexamples retained, no optimization.
--1454 partial OPEN: helper/global-prose UNION cost450country/1877wave/0BTF/12FIF;18None
- exact. Latest closed mapf1d9064270f6f91ac7bbde4448bcb7e73091242b1ccff6a19c745a2e65a1014e.
+Next218 source cleanup final103961c856d5b2f4625ff9026680d6ff8709b18c:
+ reviewed source064398379020d2210f975bf49cc12cfdfe3a8ed9; own ledger-only final carry pending.
+ Five source files: remove retired derived-food recipes/var entries from Togo,CIV,Afghanistan
+ Makefiles, correct food-acquired skill, remove obsolete unitlabels.csv ignore exception.
+ Preserve native food_acquired, CIV shocks, distinct unit_labels.csv, public derived methods.
+32 private Make dry-runs and strict static API audit passed; independent source review PASS.
+ Metadata35country hashes(Togo18+CIV17),0wave/BTF/FIF; all nonhash fields exact.
+ Afghanistan unregistered; no public API/build claim. Existing retired files can still be
+ 'up to date' under GNU Make; no stale-file cleanup claim. Generated-skill stale reference
+ remains separate. ROOT has reviewed the actual five-file diff.
+ Mwi preparing actual integration on a91; no GitHub PR yet.
+ R=B/reports/218-retired-make-residual-fix-20261109.
 
-* Ownership and operating rules
-ROOT alone writes GitHub and authorizes development merges. Local Mwi queue is owned by ROOT;
-manager1590 must send briefs rather than assign her concurrently.1452 owns1288; Mwi1569 review;
-1590 owns remote dispatches/results. Completed/preparing/sealing actors are not productive workers.
-Fresh inventory be2cecc12a5b20adbc819a069828738dd01a99be examined all154open issues and found
-only3 ready shared tasks1569/218/1136child. All dispatched; no fourth/fifth manufactured.
-Use collaboration status and Q/reports/ROLLING-ACTUAL-STATE.json, with supported live-handle
-polls for authoritative waits. Native agent_execution alone can include finalization, not new work.
+* Decisions and scientific limits
+-1562 unanswered async choice: use CIV relative positive-value order1 before3, documenting
+ unexplained gap, or wait for release-specific evidence.2197rows exactly{1,3}, no2/ties.
+ Own paper/software contract supports importance ranks conditionally; no release bridge yet.
+ No decoder implementation until answer. Goal continuation is not approval.
+-1190 two unanswered carrier/third-H36 gate questions;1575 strata and1066 warning replay held.
+-48 bounded weights investigation complete; production weights/1604 held.
+-49 borrow YES;50 final maize-flour ruling YES;51 NO date clamp.
+ Other previously recorded eligibility/unit/state/window holds remain; see DECISIONS/history.
+-1288 Tanzania and Nigeria actual cold/warm/backend strict frame+typed-attrs comparisons PASS.
+ Niger fixed source ran4API phases successfully, but4cross-backend STRICT comparisons FAIL:
+ unused household index levels/codes differ. Same30230expanded rows/keys/order/dtypes/values/
+ masks/typed attrs; default8027levels vs Make10049. Within-backend cold/warm strictPASS.
+ No normalization/pruning workaround or strict parity acceptance; prior country caveat applies.
+-1519 tiny2018 values pre-exist subtraction; pure native-labelled valuation2priced/1unit mismatch.
+ No numeric-code wiring bug, clamp, full-API or canonical-source claim established.
+-1531 GNB paperQ47 hectares vs distinctDTAq47a explicit square meters; relationship unresolved.
+1191finite pairs:33exactequal, zero exact10000 transforms. No approximate conversion ruling.
+-1136 transport DESIGN/synthetic only. Maintainer says build after defect queue drains;
+ ROOT held adapter. Deduplicated ledger novelty cannot prove every-build occurrence.
+-1122 exactly3 deferred Ghana comments;1530 pure source evidence only;1525 export bridge and
+1000 missing paper/workbook unresolved.1454 partial remains open for units/parser/synonyms.
 
-Existing ordinary private-DVC templates suffice; no fresh guard/capture/sealing frameworks.
-Pinned threads/BLAS/build1; source identity and held-input custody; no raw acquisition/shared
-cache writes unless explicitly scoped.148/62 historical compiler cells are not a fresh runtime audit.
-No nativehome/state/transcripts/SQLite/observer-body reads. Canonical remote artifacts: report.md,
-RESULT.json,verification-plan.json,ledger-checkpoint.md,source-byte-proof.json. Preserve all failed
-native/supervisor/outer runs as failures. Source/object identity can carry gates; don't invent runs.
-Before merge: fresh PR/reviews/threads, actual terminal unit+Windows logs, actual synthetic parents
-and whole reviewed tree. After merge: actual parents/tree, exact remaining issue edits/closures.
+* Operating rules and durable history
+ROOT alone mutates GitHub and merges development. No master release, production-weight change,
+producer contact, shared harmonized-cache rewarm or new raw acquisition without scoped authority.
+Private existing operators only; pin threads/build1; do not create guard/capture/sealing projects.
+Country workers must read full current CONTENTS including LOGBOOK/WAITING/TODO; quote quirks.
+No nativehome/state/transcript/SQLite reads. Canonical remote project artifacts only.
+Before merge: fresh PR/reviews/threads, terminal actual unit+Windows logs, actual tested whole tree
+and parents, prospective-current merge proof when base changed. After: actual parents/tree and
+precise issue residual/closure. Do not count queued/finalizing/complete/coordinator tasks busy.
+
+Full original7813-line history remains byte-exact in .sucoder/archive/20261109T0730-*.
+Intermediate checkpoints remain in git and B/HANDOFF.org/B/DECISIONS.org; never erase history.
+The prior10a7 docs commit accidentally retained08:50 status after a failed text replacement;
+this whole-file rewrite corrects live status without changing source or archived evidence.

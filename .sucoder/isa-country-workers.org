@@ -1,41 +1,33 @@
-#+title: Current country/framework worker queue
-Development9514be02e06d360dd4418db67426c2555ddff5be;47merges/33closures. Goal ACTIVE.
-Current checkpoint08:50UTC; detailed evidence/decisions: [[file:handoff.org]].
-Full older history: [[file:archive/20261109T0730-isa-country-workers.org]].
+#+title: Current LSMS-ISA worker queue
+Checkpoint2026-11-09T10:39UTC. Developmentdfaeed64;51merges/34closures. Goal ACTIVE.
+Detailed authoritative state: [[file:handoff.org]].
 
-* Local workers
-- ROOT: GitHub, scientific decisions, publication/merge review; owns local Mwi queue.
-- finish_1452:1288 Niger literal-source repair, actual Niger index-level discrepancy; Tanzania/
- Nigeria actual parity passed. Source/read/metadata stages completed, no replay for comparisons.
-- malawi_revision_food: independent1569 sale-audit review; previous GNB/CIV work completed.
-- finish_1590: remote dispatches, supported statuses, admissions; no concurrent Mwi assignments.
+* Actual utilization
+Audit10:36UTC: ONE active local worker; TWO completed awaiting reassignment. ZERO actual
+remote workers at latest supported10:18 snapshot, consistent with current scheduler listing.
+Eight busy workers was not the current state. ROOT refilled both completed workers immediately.
 
-* Ready publication and actual fixes
-- PR1649 GNB documentation: head262ce33d/treef815b41b/base9514, ready. CI42586780943:
- Windows SUCCESS, unit running lastcheck. ROOT must verify terminal checkout/whole tree/parents.
--1569 final8f45c6c9/code5192179, native/supervisor0/0;67 corrected tests. Independent Mwi review.
--218 finalce46e47b/code05272dd9, native/supervisor0/0;19focused tests. Global hash impact
-450country/1877wave/35BTF,0FIF/18None exact. Independent review/publication decision next.
--Niger literal fixc1059180:3testsPASS,19country+19wave hashes move. Four real API phases0,
- but strict full comparison fails on unused i-level dictionary/codes; same expanded keys/order/
- dtypes so far. Closed diagnosis pending; no parity acceptance or casting/sorting workaround.
--1136 remote41039257: design/synthetic diagnosis only. ROOT held adapter behind defect queue;
- novelty-only ledger snapshots do not prove each build reported. Finish bounded design.
+* Current assignments
+- finish_1590: monitor existing CI1653/1654; deliver terminal actual checkout/count evidence.
+- finish_1452: final218ledger carry review, then separate generated-skill residual diagnosis.
+- malawi_revision_food: isolate/integrate218final103961 ontoUgaa91; actual metadata delta;
+ prepare publication, filesystem-publish only. ROOT owns GitHub.
+- ROOT: review, publish/merge todevelopment, reconcile issues, maintain queue/status.
+Three assigned local workers plusROOT; CI monitoring is not active implementation.
 
-* Completed findings and policy holds
-- Tanzania full6555/subset1212/5343/empty0 and Nigeria23196/5115/3650/empty0: strict backend
- parity/typedattrs accepted; freshwarm0source/producer/writer/cache changes. No shared rewarm.
-- GNB doc/head262ce frozen; numeric pair evidence separately shows no exact10000 transform.
-- CIV numeric2197{1,3} gaps/no2/no ties; relative-order user decision pending. No decoder.
--1190 carrier/gate,1575strata,1066replay and productionweights choices remain held.
--1122 narrowed to3 country comments deferred to planned rebuilds; framework wording alreadygone.
--1519 native-outlier policy unresolved; no subtraction or numeric-routing fix justified.
+* Delivery queue
+-1653 Malawi: ready/base development/headb443/treea79e. CI42601058242 unitrunning;
+ Windows362PASS/1SKIP. Empty commit exactsource; close/reopen trigger history preserved.
+-1654 Uganda: ready/stacked1653/heada91/treee2f0. CI42599665607 unitrunning; WindowsPASS.
+ Retarget todevelopment only after1653merged. Never merge into featurebranch.
+-218 residual: fivefiles+ownledger103961,32Makechecks+APIaudit/independentreviewPASS.
+ Actual integrated metadata35Togo/CIVcountryhashes expected, all other fields exact; running
+ preparation must prove it. Generated-skill reference separate; Afghanistanunregistered.
+-1649/1650/1651/1652 all MERGED with actual tree/parent/terminalCI proofs.
+1569CLOSED;1288/218/1531 partial OPEN.
 
-* Actual pool accounting
-Fresh inventory be2cecc examined154open issues; identified3 ready tasks1569/218/1136child,
-all dispatched. No fourth/fifth invented. Inventory/1569/218 remote tasks terminal0/0;
-completed or sealing actors must not count busy. Runtime Niger failure is a real new result.
-Q=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108
-Use Q/reports/ROLLING-ACTUAL-STATE.json plus supported handle polls for live phases.
-Queued, running, finalizing, finished, failed and missing are distinct. Eight is a target,
-not a claim. Reassign purposeful work promptly; do not repeat finished cohorts to fill quota.
+* Holds
+1562 relative-order user ruling pending;1190carrier/gate,1575strata,1066replay pending.
+Production weights held. Scientific/source/unit choices remain as recorded; no inferred approval.
+1136adapter held behind defect queue. Do not repeat finished cohorts to inflate utilization.
+Full original history: [[file:archive/20261109T0730-isa-country-workers.org]].
