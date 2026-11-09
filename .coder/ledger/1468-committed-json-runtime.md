@@ -21,6 +21,9 @@ Search tier: ripgrep, git objects/history, direct source/test reads.
   JSON, then its existing parquet variants, then the supported legacy wave
   fallback. Reuse unchanged; do not add another parser or candidate policy.
 * Nested load_with_dvc_cache already uses that reader on the default backend.
+* Wave.grab_data's script-generation fallback can call
+  _build_wave_script_target before the ordered country fallback. The new
+  missing-source controls exercise that real edge separately.
 * Country._compute_panel_ids and lazy properties preserve corrupt/Unicode JSON
   failures as retryable; tests/test_gh1590_wave_failure_manifest.py pins this.
 * tests/test_panel_ids_persistence.py and test_gh970_no_json_make.py pin the
@@ -50,19 +53,24 @@ dated two-alias decision; Pepper remains unqualified. Neither is reinterpreted.
 ## §4 Invariants and explicit limits
 
 The normal JSON reader's private-over-committed candidate precedence stays.
-Present malformed or non-UTF8 inputs must raise and recover after repair;
-legitimate missing/legacy Design-B behavior stays unchanged. In particular,
-this task does not invent a new global missing-crosswalk refusal policy.
-Missing all reader candidates retains the existing wave fallback; that is a
-different boundary from ignoring a present committed source.
+Present malformed or non-UTF8 inputs must raise and recover after repair.
+Root clarified the initial brief before product edits: preserve legitimate
+Design-B YAML-derived maps and readable wave caches, but never preserve
+offline publisher execution when JSON is absent. Missing all reader candidates
+retains valid wave fallback. Exhausted unproductive waves follow the existing
+rebuild failure, without country or wave Make/Python publishers. This is the
+committed-SOURCE invariant, not a new blanket missing-JSON refusal.
 Committed bytes/mode/mtime must not change. No publisher, Make, source provider
 or wave build should run when a supported JSON candidate is present.
 No non-panel values/rows/index/attrs or script/Make dispatch changes.
 
 ## §5 Reuse and verification plan
 
-Extend only the non-DVC JSON route to call load_json_cache, mirroring the
-existing default route. New invented-country controls exercise actual dispatch
+Extend the non-DVC JSON route to call load_json_cache, mirroring the default.
+At the existing country and Wave publisher execution boundaries, return their
+existing no-output/missing shapes for JSON_CACHE_METHODS only. Both readable
+wave caches and YAML extraction remain before the Wave generation guard.
+New invented-country controls exercise actual dispatch
 for both JSON methods, both backends, make present/absent, private no-cache,
 read-only config, candidate precedence, errors/retry and legacy wave fallback.
 Producer/subprocess/provider tripwires must prove bypass prevention. A healthy
@@ -74,7 +82,38 @@ No broad suite, metadata census or real-country runtime is claimed.
 
 ## §6 Questions and Phase3 status
 
-No new scientific choice. Root was notified of the missing-reader fallback
-boundary before product edits; existing reader behavior is preserved.
-Phase1 ledger delivery precedes product changes. Runtime/review/fullCI are
-UNRUN at this checkpoint; Phase3 will be a separate ledger-only commit.
+No new scientific choice. The initial missing-reader ambiguity was resolved by
+Root's explicit never-publish/keep-valid-YAML ruling before product edits.
+
+Phase3 (2026-11-09): ledger-first df686ac26 preceded runtime/product4a82da400.
+Fixture-only bd28786d binds the provider tripwire to data_access, where
+get_data_file actually lives. Country runtime bytes are unchanged from4a82.
+
+* OK (§2/§3): existing JSON reader/parser/candidate precedence reused unchanged;
+  non-DVC route now uses it. No new parser or JSON policy.
+* OK (§4): both actual publisher execution edges guarded for exactly the two
+  existing JSON_CACHE_METHODS. No non-panel condition/body/signature changes.
+* Actual candidate bd28786d:43new+5existing source-free regressions PASS48,
+  0fail/error/skip, pytest7.71s, wrapper12.88s, inner/outer0. Both package and
+  config/interpreter identities and false credentials asserted in controller
+  plus two loadfile workers, unshare-rn, private empty initial data/config/L1,
+  BLAS/build1. This is ordinary targeted testing, not a universal IO sandbox.
+* Actual immutable29de counterfactual:22selected,8PASS14FAIL/0error/skip.
+  Eight Make-backend present-JSON bypasses, two real Wave script generation
+  edges, four country/ordered-wave fallback edges fail the new invariants.
+  Baseline source stays clean. These are synthetic tripwires, not evidence
+  that actual crosswalks were rewritten in this run.
+* Preserved first baseline-v1:22setup errors/0test-function executions from a
+  new-fixture wrong-module attribute patch. No product evidence; corrected
+  only that fixture binding, without assertion/semantic relaxation.
+* OK (§4/§5): read-only JSON bytes/mode/mtime, missing/corrupt/Unicode recovery,
+  both backends/make states/private no-cache, candidate precedence, real YAML
+  extraction with invented reader leaf, readable wave-cache preservation and
+  actual healthy non-panel Python fallback all pass.
+* Source scope: only Country._aggregate_wave_data and Wave.grab_data change.
+  No fingerprints are excluded. Broad build-hash impact is possible and must
+  be measured by release metadata gates; no shared rewarm is authorized.
+* No real-country/source/API/Make campaign, metadata census, fullCI or
+  independent runtime acceptance is claimed. Root owns separate independent
+  review/current integration/release. Source and runtime receipts live at
+  B/reports/1468-committed-json-runtime-local-20261109.
