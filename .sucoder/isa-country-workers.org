@@ -13,6 +13,19 @@ sourceoutputvalidation. Toolcompute is not a countryagent. CorrectedMalawiactual
 4children0/2strictP4F/expandedall6P, not strictparity. Oldfailed7f captureloss preserved.
 No claim8busy; oldthreecountrydiagnosisworkers allterminalandtheirreviews complete.
 
+* Live correction 2026-11-09T13:20Z
+User correctly challenged utilization: three local agents, initially only two running;
+ROOT explicitly reactivated completed1452. Ethiopia actual cohort now running91551;
+Mali Make-only completion85125 remains running. These are two verification processes,
+not two additional agents. Old remote country jobs and GitNexus jobs are terminal.
+1590 now refreshes READY issue ownership and dispatches independent eligible remote
+work; no remote productive worker is counted before an actual launch/status receipt.
+1658 test-only correction ebb6b340 passed89 focused cases and independent review,
+ROOT reviewed and pushed it; full CI42624205448 running. No product/config changes.
+218 generator final6e38550c delivered; ROOT integrated current860 as c79fe078,
+all25owned objects exactauthor/allnonowned exactcurrent. Independent Mwi review
+pending before PR; no generator/API/native/census replay for integration.
+
 * Delivery
 1653/1654/1655/1656/1657 allMERGED,actualtrees/parents/fullCIverified.
 1554documentaryinvestigationCLOSED;1552/1555/1288/218/1529partialOPEN.
