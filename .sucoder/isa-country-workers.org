@@ -1,5 +1,5 @@
 #+title: Current country/framework worker queue
-Current development: =6d9563f7aac1e65e10e98b002ae935f1bd84c266=;46merges/33closures.
+Current development: =9514be02e06d360dd4418db67426c2555ddff5be=;47merges/33closures.
 Goal ACTIVE. Primary code checkout is old; use exact pinned worktrees.
 Full current release/decision handoff: [[file:handoff.org]]. Full former worker chronology:
 [[file:archive/20261109T0730-isa-country-workers.org]]. SHA/size archive manifest alongside.
@@ -13,20 +13,26 @@ Historical eight country assessments and completed refills are not busy.
 
 * Current local roles
 - ROOT: user scientific decisions, issue disposition, GitHub PR/merge decisions.
-- finish_1452: PR1648 actualCI/release tree admission; docs review/integration complete.
-- malawi_revision_food:1519 SOURCE-ONLY decoder→grabber→MYVARS→unit_match route trace.
+- finish_1452:1288 actual Tanzania livestock private runtime verification at9514.
+- malawi_revision_food:1519 actionable disposition and minimal-fix/decision assessment;
+  actual-labelled pre-collapse continuation complete, no additional data loads assigned.
 - finish_1590: remote statuses, final source admissions and purposeful rolling refill.
 
 * Current workstream state
 - 1288 direct Make repair MERGED1645; broader exposure/dynamic-input issue OPEN.
 - 1463 endpoint soft-drop MERGED1646/issueCLOSED; no outage-latency claim.
 - 1440 market cold/warm +1454 fingerprint/prose MERGED1647;1440CLOSED/1454partialOPEN.
-- 1648docs b8faa8d7 OPEN draft/configuredCI pending; three issues stay OPEN.
+- 1648docs MERGED9514;13046tests and Windows passed; three issues updated/still OPEN.
 - 1190 carrier/gate choices pending user; labels/doc check independent; no implementation.
-- 1519 source-origin finding supported; label-route acceptance unfinished; no clamp policy.
+- 1519 native-origin/pure label-route findings complete; no API/clamp policy claim.
 - 1562 ownCIVCAPI rendered artifacts, no Designer/archive assumption; documentary only.
 - 1531 GNB explicitunit authority diagnosis; no threshold/unit inference or clamp change.
 - 1525/1000/905 meaningful holds preserved; do not manufacture a fix from negative evidence.
+
+08:00UTC: ONE remote executing (GNB1531); local1452 and manager active, Mwi just finished
+and was reassigned. Refills ordered: CIV1562 official SurveySolutions export documentation;
+fresh read-only inventory to identify ready fixes. Neither counts busy until execution.
+Do not repeat a historical eight-worker claim. Report useful throughput and actual phases.
 
 Standard ordinary private-DVC template integrity/dryrun/ONEsubmit within existing finite
 scope is authorized without another packaging approval loop. Modest freeHTC resources,

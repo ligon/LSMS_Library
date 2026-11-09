@@ -1,12 +1,12 @@
 #+title: Current LSMS-ISA goal handoff
-* Goal and authoritative state — 2026-11-09T07:30UTC
+* Goal and authoritative state — 2026-11-09T08:02UTC
 Goal ACTIVE/unbounded. Resolve the LSMS-ISA backlog and shared framework blockers with
 verified fixes, independent review, PRs and authorized development merges. Preserve
 scientific holds; no master release, shared cache rewarm, production-weight change or
-producer contact. Previous goal turn made progress; this turn merged three repairs.
+producer contact. Recent progress includes three repairs and a documentation merge.
 
-GitHub development =6d9563f7aac1e65e10e98b002ae935f1bd84c266=.
-Sweep total: 46 development merges / 33 issue closures. Do not count partial issues closed.
+GitHub development =9514be02e06d360dd4418db67426c2555ddff5be=.
+Sweep total: 47 development merges / 33 issue closures. Do not count partial issues closed.
 Primary checkout is the OLD-code docs branch; run library work in exact pinned worktrees.
 MAIN Python: =/local/job40825266/venv_img/bin/python=; assert cwd/PYTHONPATH/countries_root.
 
@@ -41,8 +41,9 @@ passed; full metadata vs2e has zero incremental changes. Helper/global-prose uni
 450country/1877wave/0BTF/12FIF changes;18None/allnonhashfields exact. FIF=framework-import.
 Latest map=f1d9064270f6f91ac7bbde4448bcb7e73091242b1ccff6a19c745a2e65a1014e.
 
-* Current release queue
-PR1648 OPEN draft: =b8faa8d763617adb70b0d6d9a0020cc2944ad5e2=,
+* Latest documentation merge; release queue empty
+PR1648 MERGED =9514be02e06d360dd4418db67426c2555ddff5be=; head
+=b8faa8d763617adb70b0d6d9a0020cc2944ad5e2=,
 branch docs/agriculture-country-plot-notes-20261109, base6d9563; tree
 =5dd81369b53cc870a4a8c49f625d3b1a88e430e4=. Exact7 docs/ledger paths only; code/config/tests/
 Org table/source blocks exact6e. API/metadata carry by input identity, not new runs.
@@ -50,8 +51,9 @@ B/reports/agriculture-country-plot-notes-current-20261109 contains ROOT admissio
 Niger/Malawi original3309/5431line prefixes preserved. Independent f187 doc review PASS.
 1122 original63eb had P2; child45bf qualifies coarse-provider exclusion, ROOT actualFeature
 source review and final peer95489/terminal0/0 confirm. Whole1122/1530/1190 remain OPEN.
-Next: actual configured CI, fresh head/base/reviews/threads, tested whole-tree proof, then
-ROOT-authorized merge and precise issue updates. Do not infer green from parent CI.
+CI42578680928 passed13046/5649skip/4expected failures plus Windows smoke. Actual synthetic
+9270ba89 parents[6d,b8] and whole reviewed tree exact; merge parents/tree independently
+verified. ROOT-MERGE.json records admission. Issues1122/1530/1190 updated, all still OPEN.
 
 * Pending maintainer decisions — no implicit approval
 NEW async1190 questions await user: separate seed-acquisition table (recommended) vs
@@ -78,8 +80,12 @@ holds (1497/1509/1442/1518/1560/1571/1502/etc.) persist; see archive/DECISIONS.
   subtraction-order differences;2021min.003. Original3tiny vs4historicalflags qualified.
   First peer c889 UNFINISHED/0numeric due wrong envelope assumption. Replacement02d99359
   first numeric census complete,4closedloads once, core source findings corroborated.
-  Label-code support differs6374/6373rows2018,0in2021: not a served-loss claim. Mwi traces
-  actualdecoder/grabber/YAML/unit_match SOURCE ONLY; no numeric replay/forced agreement.
+  Actual-labelled continuation completed:2018match150499/E-NA64045/priceable149434;
+  2021match171977/E-NA47801/priceable170365. Three tiny native2018 cases remain two valued
+  and one unit mismatch. Not API/NSU/canonical collapse or a physical-unit policy ruling.
+  Report1519-actual-labelled-construction-20261109 preserves the oracle reassociation
+  failure and three cumulative labelled loads. Next: actionable issue disposition and
+  decide whether label-vs-code routing is a defined wiring bug or needs a maintainer ruling.
   Exact numeric envelope keys are frame/positions/missing_masks/dtypes; cardsplain dict.
 - 1525 completionacdb: prior203linereview+two officialPDF114pages/4layouts read; printed
   108Dry/108_1Flour confirmed. CEB01description/CEB02code versus export bridge UNRESOLVED;
@@ -93,8 +99,13 @@ holds (1497/1509/1442/1518/1560/1571/1502/etc.) persist; see archive/DECISIONS.
   clamp change or remote acquisition. Manager submits routine private templates directly.
 
 * Ownership and operating rules
-ROOT controls GitHub mutations/merges. finish_1452 monitors1648/release evidence;
-malawi_revision_food owns1519 source-route trace; finish_1590 manages remote queue/refills.
+ROOT controls GitHub mutations/merges. finish_1452 verifies1288 on actual Tanzania livestock
+at9514 using two held LF inputs/private roots, up to6 native parses including Make overhead;
+no recipe/product edit. malawi_revision_food drafts1519 disposition and assesses a minimal
+defined fix without reopening data; finish_1590 manages remote queue/refills.
+08:00UTC actual remote count was ONE (GNB1531); two local workers plus manager assignments
+are not eight workers. User's underutilization criticism is valid. Refill ordered for CIV1562
+official export semantics and fresh ready-issue inventory; count only confirmed execution.
 Use collaboration status and Q/reports/ROLLING-ACTUAL-STATE.json for actual phases, never
 historic eight-job counts. Eight productive executions were reached; completed actors are
 not busy. Refill purposeful work/reviews only, no invented tasks or repeated finished cohorts.
