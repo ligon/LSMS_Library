@@ -16,8 +16,8 @@ ROOT immediately refilled both completed local agents:
 - finish_1590: existing PR1653/1654 CI monitoring and terminal admission evidence.
 - finish_1452:218 final ledger carry PASS; generated-skill residual draft done. Now repairing
  the actual CI failure in the Malawi source-identity regression test, isolated off b443.
-- malawi_revision_food: integrate reviewed218 residual onto Uganda a91ec271; one actual
- integrated metadata comparison, publication preparation in an isolated worktree.
+- malawi_revision_food:218 integration preparation COMPLETE. Now checking only existing
+ inventory entries newly unblocked by1650/1651/1652; no repeat whole backlog sweep.
 - ROOT: diff review, GitHub publication/development merges, prioritization and status repair.
 This is three assigned local workers plus ROOT; monitoring is not counted as implementation.
 No fabricated tasks or repeated finished surveys to fill an eight-worker target.
@@ -47,7 +47,8 @@ PR1653 Malawi source-discovery batch, ready, base development:
  Metadata22country/44wave hashes,0BTF/FIF, all nonhash fields exact.
  First PR event produced no Actions jobs. Empty push then close/reopen recorded; actual
  CI42601058242 started10:27:55. Which action caused delivery is not established.
- Windows362PASS/1SKIP; unit129105344214 still running at last observation.
+ Windows362PASS/1SKIP; unit129105344214 CANCELLED at latest observation.
+ ROOT and1590 did not cancel it; cause is unproven. No rerun without the known test repair.
  Actual Windows checkout932267b8 differs from advertised8fec7f87; both have parents
  [dfaeed64,b443] and exact reviewed full tree. Verify actual UNIT checkout independently.
  R=B/reports/1288-malawi-current-publication-20261109.
@@ -79,7 +80,8 @@ Next218 source cleanup final103961c856d5b2f4625ff9026680d6ff8709b18c:
  remains separate. ROOT has reviewed the actual five-file diff.
  Mwi actual integration5a216c279d78d196a36a5ffb701dcd8f564a2753 on a91,
  tree2f7d362056ed64576bbdddb5b3e2a13d4f577d4f, complete19195-object union exact.
- Single integrated metadata actor90856 running; no GitHub PR yet. Await parent test repair
+ Single integrated metadata90856 CLOSED0/126.593s:35 country hashes only, all other fields
+ exact; no GitHub PR yet. Await parent test repair
  before initiating combined CI, to avoid replaying the known failing assertion.
  R=B/reports/218-retired-make-residual-fix-20261109.
 
