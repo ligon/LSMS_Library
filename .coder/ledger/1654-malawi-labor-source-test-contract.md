@@ -17,3 +17,11 @@ One ordinary private MAIN/unshare/false-creds/thread1 pytest2/loadfile selection
 
 ## §6 Gates
 ROOT owns integration/configuredCI/publication; independent review separate. Runtime UNRUN at this ledger-first checkpoint. All product/config/country-source objects remain exactb443; tests change only the syntax-derived identity proxy plus new genuine refusal controls.
+
+### Phase3 — exact test-contract repair
+
+Ledger620fc09d9 preceded test runtime4a79e1fbefadcca8d066c43bd50e46b8b7cfe048. Only existing testfile changed: bounded static string resolution, one replaced syntax-equality assertion, three wrong-source and four unsupported/dynamic refusal cases. All14 existing function ASTs recover exactly after reverting that one comparison; all23 original assert statements retain their safety intent, including six-driver total, capture-before-fields/order/np.arange and Feature transport. No driver/helper/product or expected value changed.
+
+ONE private ordinary selection completed outer0/child0 on exact4a79:35 uniquePASS/0fail/error/skip. Full labor-observation file23cases (16existing+7new), original2010source-regression10 and2013anthropometry2. Pytest7.53s/JUnit11.849s/wrapper14.793s, three MAIN/cwd/package/countries/data identities, private data/config files0, unshare-rn/false credentials/BLASbuild1/pytest2loadfile. The expected Feature missing-stage/worker/season sentinel warning remains; existing package Python-version FutureWarnings remain. No failure was hidden, source script executed or clinical/source/raw/API/Make/census/fullsuite replayed. Invented sidecar writes remain under test-owned temporary roots.
+
+Original configuredCI failure remains historical:13,168PASS/1FAIL at AST BinOp versus Constant, not source-path divergence. Independent review/configured exact-current CI/publication remain ROOT-owned. This final commit changes only the ledger; all test/product/config bytes remain exact measured4a79. Evidence: reports/1654-malawi-labor-source-test-contract-20261109. Whole1288 and parent source/API/scientific caveats unchanged.
