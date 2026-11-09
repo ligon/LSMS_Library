@@ -413,6 +413,22 @@ def test_detailed_output_validation_remains_real_dvc_error(tiny, bad_flags):
         assert _snapshot(root) == before
 
 
+@pytest.mark.parametrize("bad_path", [None, 17])
+def test_malformed_legacy_path_is_not_reinterpreted_as_an_output_name(tiny, bad_path):
+    root, data, metadata, remote, fs = tiny
+    (root / "dvc.yaml").write_text(yaml.safe_dump({"stages": {"materialize": {
+        "foreach": {"fixture": {"country": "Invented", "wave": "w0",
+                                 "table": "facts", "format": "parquet"}},
+        "do": {"cmd": "must-not-run", "outs": [{"path": bad_path}]}}}}))
+    before = _snapshot(root)
+    if bad_path is None:
+        assert C._load_materialize_stage_map(str(root)) == {}  # original skip
+    else:
+        with pytest.raises(AttributeError):  # original nonstring .replace error
+            C._load_materialize_stage_map(str(root))
+    assert _snapshot(root) == before
+
+
 @pytest.mark.parametrize("failure", ["recipe", "intree"])
 def test_fresh_stage_errors_are_not_redirected_or_suppressed(tiny, failure):
     if failure == "intree" and (os.name == "nt" or os.geteuid() == 0):
