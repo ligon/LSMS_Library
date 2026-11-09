@@ -17,3 +17,13 @@ Extendensure keyword-onlyprivateoption+smalllocalpermission/remoteexists helpers
 
 ## §6 Open boundaries
 No concrete machineryconflict: genericfs.exists isexistingbackendAPI, alreadyresolvedremote hasbothsourcekeys. Exceptionfilename-onlyclassification conservative; anambiguous/localalias error withoutpositivefilename retainsoldfalseadvisoryratherthanguessing. Existence doesnotproveactualstreamdecode/rebuild success; testboth. ROOTownsindependentreview/configuredfullCI/merge.
+
+## Phase3 — implementation verification
+
+Frozenruntime abaf0084afcb5c819699bdc16672235bd7feee89. Only productionfunctions _ensure_dvc_pulled/source_fetchable_fast changed and2smallhelpersadded; allotherlocaltoolsASTs exact, country.py executableASTexact (probedoc only), original675ALLassertASTs retained plusnewfixturekeywordassert. Opt-in True appears ONLYin source_fetchable_fast. CIVproduct/config/tests/note exactparent7eab. No conflict/reinventeddecoder/globalfailurestate.
+
+ONE focused97997 CLOSED0:73PASS/0F/E/S (44new,29existing),12.92s pytest/19.33s outer,3durableidentities/exactMAIN+checkout,privateconfigureddata/config files0/sourceclean. Fullnewfixture/controlmodule reusedreviewed6e4aa612 tinyCSV/FSleaves; pure675methods and8existingensuremethods. Explicitly excludedONLY2unmarked realCIVdata675tests; no realCountry/normalAPI/raw/network. Alllocalmkdir/tempwrite/rename EACCES/EROFS×2layouts healviaactualordinaryTinyCSVstream[7,11]; currentcached/writablepaths0HEAD; remote/ambiguous/diskfull/unrelatedIO/badsidecar0HEAD; false/error metadata bounded2; positiveHEADnotdecodeproof; source memo/once-per-key andprivateL2 actualreadgate/reader/writerheal pass. No olddiagnosis33P/fourintentionalFAIL replay or rewrittenexpectations.
+
+ONE finalmetadata75082 CLOSED0/127.32s onabaf. ClosedCIV3de map fb5a5569… admitted to7eab by onlyexcludedCIVCONTENTS librarydifference/nonlibrary709docs; originalmapheader retained, no baseline rerun. Measured452country/1885wave/37BTF/124FIF change; all18None/keysets/ALLnonhash exact/errors0/denials0. This is broad sharedensurebody invalidation, explicitly disclosed; no exclusion/schema bump/sharedrewarm.
+
+Finalledger-only child keepsALLtested/hashed nonledgerobjects exactabaf. ROOT ownsindependentproductionreview/configuredfullCI/publication; whole1051otherresiduals notclaimedclosed. OrdinarywarmerNone/besteffort/retry/layout/cleanup andconsumerprobe/rebuildmemos remainexisting; remoteexists isavailabilityonly. Source/test/focused/map receipts in /global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1051C-readonly-metadata-fallback-20261109.
