@@ -59,3 +59,43 @@ Raw/API/Make/native build/acquisition/rewarm remain excluded. No new source
 payload or original cohorts. Country discovery caveat records this finite
 engineering fact; whole1288 and clinical1401 remain open. Independent review
 follows. Current code, tests and hash impact UNIMPLEMENTED/UNRUN at checkpoint.
+
+### Phase3 — finite engineering verification
+
+Ledger-first654956a04 preceded runtime/testa924423f8cc6a2ca0cf184f1df1b5e7d7a9542ff.
+Seven native scripts add only a full literal declaration and explicit RuntimeError
+on disagreement with authoritative ANTHRO_FILES[t], before the UNCHANGED getter.
+Independent author removal of those two AST statements recovers all old script
+bytes/AST exactly. ANTHRO_FILES/COLMAPS, IDs, actual measure/filter/deduplication
+and output code remain exact42a25; no2005 contribution invented. All seven
+committed sidecar paths/metadata verified, without raw payload access.
+
+Actual23 focused controls PASS/0fail/error/skip: seven real scanner/sidecar,
+seven actual private-input collector metadata receivers, seven healthy actual
+scripts with invented reader/helper/writer leaves, and two drift-before-IO
+cases at optimize0/2. Existing getter receives its actual authoritative string
+once with unchanged kwargs; helper/writer ordering and frame identity/attrs
+are retained. Drift triggers before all three leaves even when optimized.
+Clinical transforms are intentionally stubbed, not newly validated. No source
+or normal Country producer runs. Pytest5.94s/wrapper12.932s/outer0, three own
+source/config/MAIN identities, private data/config files0. No failed attempt.
+
+ONE existing byte-exact metadata operator on a924 CLOSED0/122.314s. Closed6e
+map header preserved, with ROOT-approved carry: excluded docs tofb04, then
+reviewed1569 diagnostics under unchanged existing quantity-audit exclusions
+to42a; all other hashed source/config objects exact. No baseline replay.
+Full450/1895/35/186 comparisons:24 country hashes ALL Uganda;168wave hashes,
+24each of the seven modified waves. Uganda2005 and every other country exact.
+0BTF/0FIF and all nonhash fields equal, including public/registered surfaces,
+physical waves/overrides/closure paths/18None wave cells,0errors/denials.
+Private metadata data/config files0. This conservative all-wave-script hash
+cost is measured, not hidden with exclusions; no actual cache was warmed.
+
+Evidence lives at
+/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1288-uganda-anthro-source-declarations-20261109/.
+Focused logs/JUnit/receipts, PROCESSING-PROOF and complete metadata comparison
+retain exact actor/source bindings. Final commit is this ledger-only closure;
+all runtime/config/test objects remain exact a924. Independent review and
+Root-owned integration/configuredCI/publication remain pending. No actual raw,
+clinical/native/API/default/Make/cold-warm/source freshness parity, acquisition
+or shared cache rewarm is claimed. Whole1288 and clinical1401 remain open.
