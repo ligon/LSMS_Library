@@ -19,3 +19,12 @@ New portable invented controls exercise actualWave/columnmapping/formatter/CSV/p
 
 ## §6 Release limitation
 No source metadata can recover an omitted second path from an old ambiguous stamp without a rebuild. This knownlegacy limitation remains explicit. No migration or broad hashinvalidator is introduced. ROOT ownsreview/fullCI/publication.
+
+## Phase3 — frozen product verification
+Runtime2107170862c8c4ca6922b385314cc23490e450df. Only _drop_record/_degraded_cache_verdict/_warn_degraded_serve ASTnodes change; every other countryAST and allotherproduction/config/schema/exclusion/version objects exact224e. Four ownedpaths: thisledger/country.py/newportabletest/cachingguide.
+
+ONE98140 focused CLOSED0:41PASS=32new9existingpure675,0F/E/S,16.648s wrapper,3durableidentities/sourceclean. ActualWave/columnmapping/CSV/privateDVC/normalwriter/footer/readgate/memo controls prove ALLwithin/ANYacross, bothorders, postfirst-success absentsecond, mixedconfig-required hard/configoptional ungraded, orderednormalizeddedup, malformedlist conservative, legacyfile-only+ambiguousstamp behavior, and complete rebuild/warm bytesmtime unchanged. No old24diagnosis replay. Runtime/tmp outsidepublishedE; configureddata/config0files, onlyinventedfixturetmpblobs/parquets; no realcountry/source/network/API/Make/fullsuite.
+
+ONE13825 census CLOSED0/128.156s vsCLOSED224e map7044bf8… (headerretained,nobaselinereplay):0/452country,0/1903wave,0/37BTF,0/186FIF changes. All18None/keysets/14nonhash exact/errors0/denials0/privateconfigdata0. Existingread/dropmetadata exclusions unchanged; no exclusion/schema added.
+
+Legacyambiguousmulti-file stamps retainfile-only limitation untillegitimaterebuild; no automaticmigration/currentconfiglookup. Original diagnosis0ee8/24baselineoracles preserved. Finalledger-only checkpoint conserves alltested/hashednonledgerobjects; remoteindependentreview/combinedAintegration+finalmetadata/configuredCI/ROOTpublication remain separate.
