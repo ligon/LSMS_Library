@@ -23,3 +23,10 @@ Malawi49: borrow IHS5 conversion factors. Malawi50: final accepted interpretatio
 
 * Pending choice
 GH1066: whether assume_cache_fresh should replay stored grain warnings/diagnostics remains unanswered. Do not interpret elapsed time or the suggested option as approval.
+
+* 2026-11-08:1288 private-input finding withdrawn
+Root and independent reviewer withdrew the proposed privateOther-overwriteP2 after
+checking native producer semantics and healthy grouped-output/computedOther controls.
+A blanket private-input immutability protocol is not authorized or required by this
+witness. Original7d product bytes remain; only8b26ledgererratum added. Original-contract
+synthetic verification is pending; this withdrawal is not runtime acceptance.

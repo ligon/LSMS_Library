@@ -1,4 +1,40 @@
 #+title: Handoff, LSMS-ISA sweep
+* Utilization correction and PR1642 — goal ACTIVE (2026-11-08)
+The user's criticism of slow progress is correct. Actual supported scheduler check
+at2026-11-09T02:18UTC showed ZERO remote country workers: only coordinator40825266
+RUNNING plus unrelated41025554PENDING. Original eight country jobs are FINISHED,
+not eight busy workers. Local1452/1590/Mwi are assigned review, queue refill and
+1288 controls respectively; completed agents are not counted busy. Excessive bespoke
+verification guards and serial handoffs consumed time. Refill uses the proven641
+normalproject dispatch/profile, private scoped runtime and ordinary targeted checks;
+no new per-metadata-function guard requirement. First package/root review precedes
+rolling submissions; do not count preparation/queued/finished as active workers.
+
+1501 final8eaebb96ded31358bb503885cd01527bdd3b2c76 independently accepted source-only
+conservation: all19161 nonledger objects exact current68,12nonledger bindings exact,
+ledger sole intentional exception. Actual v5 synthetic53PASS (41candidate+12independent),
+strictAPI0 and fullmetadata0 closed before final ledger-onlyappend. Measured changes
+450/450country,1877/1895wave,35/35buildtransform,0/186frameworkimport;18Noneunchanged.
+Root verified sealed runtime/map results, independent finalreview PASS. Published
+GitHubPR1642 exact8ea/base6863;CI42550500926 unit/windows RUNNING,6optionaljobsSKIPPED.
+No merge/issueclosure yet. No duplicateprivatefull unless actualCIcoveragegap.
+
+1288 CORRECTION TO PREVIOUS CHECKPOINT: purported privateOther105 overwrite P2 is
+WITHDRAWN. The witness changed native producer semantics;117/129 is correct for that
+program. Healthy native builders may write private cooutputs. Blanket immutability
+would contradict interface-not-data and existing healthy computedOther controls.
+No product correction retained. Original7d code/docs/tests conserved exactly in
+ledger-only erratum8b26a14b12cdfdc156a0038fa6b0db573c80d09f; held full draft preserved.
+Root independently accepted reassessment memo and code conservation. This is NOT
+runtime acceptance. New original-contract controls v3 have24staticexpected cases;
+Mwi preparing bounded private execution proposal. Broader1288 residual remainsOPEN.
+Rreview-1288-p2-premise-reassessment-20261108,1288-private-input-closure-correction-20261108,
+review-1288-original-contract-controls-v3-20261108. Original failed witnesses retained.
+
+Development remains6863;40merges/28sweepclosures;latest complete snapshot159open,
+original147scope24closed/123open. 1575 implementation choice and1066warning replay
+still PENDING. No master release/shared L2 rewarm/production weight change.
+
 * Current checkpoint after PR1641 — goal ACTIVE
 This continuation made PROGRESS: Senegal1500 verified/merged/explicitlyCLOSED; independent
 1288review found a concreteP2 and correctionisdelegated;1501failedguards arepreserved;
