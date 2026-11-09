@@ -51,3 +51,29 @@ any failure. Final ledger commit separate; ROOT/1452 independent review follows.
 ## §6 Status
 Ledger-first checkpoint only; correction and verification UNRUN. ROOT already
 authorized the concrete correction and finite controls; no further scope choice.
+
+## Phase3 — bounded correction verified
+Ledger-firste461252e4 preceded runtime d4b3931bde44e10e6adf1bd1511ffbea19009f66.
+Only the positive fixture's availability stub and obsolete docstring changed;
+all original positive and named-error assertions remain. Three new absent-route
+cases require original bare ValueError identity, source-only call order, no
+legacy warning/build and no fallback note. No library/config/Make byte changed.
+
+ONE private MAIN/unshare/false-credential/empty-L1/thread1/two-loadfile actor
+ran the complete affected module plus the exact selected existing1532 dispatch,
+legacy success/failure,1081generic fallback and bare-price companions:
+217PASS,0FAIL/ERROR/SKIP,46.74s pytest/53.970s outer,exit0. Runtime head and clean
+worktree identical before/after. Private data files0; privateconfig/config.yml
+was intentionally created and is recorded rather than claimed absent. Two
+upstream google.api_core Python-version FutureWarnings remain. No baseline,
+fullsuite, metadata census, actual data/API/producer or cache rewarm replay.
+Original2FAIL/13174PASS/5649SKIP/4XFAIL run remains FAILED and immutable.
+
+Independent source review passed exactd4b3931b: all old assertions/othermethod
+ASTs and all other objects conserved. No independent focused-cohort replay.
+Evidence: reports/1655-unit-size-legacy-fixture-repair-20261109 in the private
+isa-sm-20261103 burst; focused.xml/log,PRELAUNCH,IDENTITY,RECEIPT and final
+object proof/manifest. Independent review: review-1655-unit-size-legacy-fixture-
+20261109. This final ledger-only child preserves every runtime/test/config byte
+of the measured d4 head. ROOT owns publication/composition and fresh exact-head
+configured CI; this focused run does not relabel the failed full run green.
