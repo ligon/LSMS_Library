@@ -114,11 +114,13 @@ def provider(tmp_path, monkeypatch, request):
         w.observation.update(events=w.events, drop_records=h.records(),
                              output_written=h.output.exists())
         request.node.user_properties.append(('observation', json.dumps(w.observation)))
-        out = Path(os.environ['DIAGNOSIS_OBSERVATIONS'])
-        out.mkdir(parents=True, exist_ok=True)
-        safe = hashlib.sha256(request.node.nodeid.encode()).hexdigest()
-        (out/(safe+'.json')).write_text(json.dumps(
-            {'nodeid': request.node.nodeid, **w.observation}, indent=2)+'\n')
+        output_root = os.environ.get('DIAGNOSIS_OBSERVATIONS')
+        if output_root:
+            out = Path(output_root)
+            out.mkdir(parents=True, exist_ok=True)
+            safe = hashlib.sha256(request.node.nodeid.encode()).hexdigest()
+            (out/(safe+'.json')).write_text(json.dumps(
+                {'nodeid': request.node.nodeid, **w.observation}, indent=2)+'\n')
         assert all(p.read_bytes() == before for p, before in w.original_sidecars.items())
         assert all(not p.exists() for p in sources.values())
         for state in (C._SOURCE_PROBES, C._DEGRADED_ATTEMPTED, C._BUILD_DROP_LEDGER):
