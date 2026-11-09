@@ -1,53 +1,20 @@
 #+title: Current LSMS-ISA worker queue
-* Current 2026-11-09T15:49:39.976455+00:00
-Actual3localworkers+ROOT/0remoteat15:48Z, not8.61merges/38closures;development97463a699.
-1452implements1051B;Mwimplements1051A;1590manual1570+remoteindependentreviewqueue;RootCI/merges.
-1661+1662merged;1663+1664publishedREADY CI. Fullauthoritativehandoff [[file:handoff.org]].
-Allolderlivestatusessupersededbelow.
+Checkpoint2026-11-09T16:47:51.066895+00:00;development6848b6b7380ebd511082c6f95ff5dd65d6397fa7;66merges/38closures;goalACTIVE.
+Fullauthoritativehandoff [[file:handoff.org]], olderqueuehistoryinGit/archive.
 
-Checkpoint2026-11-09T13:12:34+00:00;development86077a65;56merges/35closures;goalACTIVE.
-Fullcurrentstate [[file:handoff.org]]. Fullhistoricalarchive preserved.
+* Actual work (not8workers)
+-ROOT:source/peer/CI/merge/issue reconciliation.1663–1667 allMERGED+actualtreesverified.
+-1452:1437datedMali/BFAdocappendices+ledger on6848 (reactivated);851indepcontractreviewcomplete.
+-Mwi:851approvedAPIport Wfix-851-period-api-port-cd6-20261109;scope/schemafreeze+promoter2of20changed;
+ concretecandidate/puretestfreezebeforeRootreview. No actualraw/API/census/pytestyet.
+-1590:queue/custody/monitoractualremotehandles; do notcountcompletedreviewjobs.
+-Dremote41044910/4287bd055c8f41ef8afffadd309ed3c6:positiveendpointFASTPROBEcrosssourcecostdesignonly.
+-Eremote41044943/2932b293ac2f47e0b44e452f03e843b6:explicitinputlineageimplementationoncd6.
+Actual2productive remotes confirmed16:45, bothn0036;3localassignments+ROOT, not8.
 
-* Actual assignments/status
--ROOT:review/publication/CI/developmentmerges/issueprecision.
--1452:1658CIevidence+Ethiopialivestockfullyheldplan/authorized4phaseactual, plus closedMalawi
-currentpacketreview whenfree. Ethiopiaactualhandle notyetreported; no readiness-asexecution.
--Mwi:Make-onlyMali completion85125 on860 (defaultsuccessretained/originalMake480stimeout
-preserved); separate1658test-onlyno-vpinrepair Wfix-1658-native-no-v-fixture-20261109.
--1590:correctedMalawi41041286 result/SDK74qualifiedadmission; namedGitNexusregen9102 and
-sourceoutputvalidation. Toolcompute is not a countryagent. CorrectedMalawiactualfinished:
-4children0/2strictP4F/expandedall6P, not strictparity. Oldfailed7f captureloss preserved.
-No claim8busy; oldthreecountrydiagnosisworkers allterminalandtheirreviews complete.
-
-* Live correction 2026-11-09T13:20Z
-User correctly challenged utilization: three local agents, initially only two running;
-ROOT explicitly reactivated completed1452. Ethiopia actual cohort now running91551;
-Mali Make-only completion85125 remains running. These are two verification processes,
-not two additional agents. Old remote country jobs and GitNexus jobs are terminal.
-1590 now refreshes READY issue ownership and dispatches independent eligible remote
-work; no remote productive worker is counted before an actual launch/status receipt.
-1658 test-only correction ebb6b340 passed89 focused cases and independent review,
-ROOT reviewed and pushed it; full CI42624205448 running. No product/config changes.
-218 generator final6e38550c delivered; ROOT integrated current860 as c79fe078,
-all25owned objects exactauthor/allnonowned exactcurrent. Independent Mwi review
-pending before PR; no generator/API/native/census replay for integration.
-
-* Delivery
-Latest correction after13:30Z: THREElocalRUNNING+TWOremoteRUNNING (1561job41041960,
-709job41041974,2coreseachn0037)=FIVEworkers excludingROOT. Not8. No duplicate1230
-worker:1372alreadymergeditem2;ROOTnarrowed1230body/title toitem1policy/history.
-Ethiopia91551first3phases0/24parses;freshMakewarmongoing. Mali85125all6strictPASS,
-independent1452closedreviewPASS.1288trackerupdated with exactMali/Malawilimits.
-1658hasNEWmergeHOLD:plot_cultivation reservedby862+currentdesign. Mwi implements
-mechanicalcultivation_records rename inNEWchild ofebb6, sameobs/payload/3D/no-v;
-newfocused/source/metadata gates authorized. OldCI42624205448 is historicalONLY.
-1659generatedskillsPRpublishedc79fe078/tree d772dea9; CI42624967861running, WindowsP.
-IndependentMwi+ROOTsource/integrationPASS. No generator/native/API/census replay.
-
-1653/1654/1655/1656/1657 allMERGED,actualtrees/parents/fullCIverified.
-1554documentaryinvestigationCLOSED;1552/1555/1288/218/1529partialOPEN.
-PR1658nativeNiger3B/3D 07db/tree8d405 base860:26distinctfocused+actual768x26/6192x12/
-APIaudit/metadata/independentPASS. FullCI failedsoleobsoletehistorical8 no-vsettest;Mwi
-repaironlyshippedexpected8+new2,keepfallback/version-skew/productunchanged, rerun3sourcefree
-modules. ROOTwillFF/pushcorrectedhead/CI. No actualsource/censusreplayfortest-onlychange.
-Allscientific/productionweightchoices preserved;seehandoff/decisions. No master/sharedrewarm.
+* Completed / gates
+Apeer2d4dsourcequalified/P2fixturematchedCI→testonly062a/28plainPASS→full13332PASS→1665merged.
+Bpeerqualified/32plainPASS; RootfalseBenvP2withdrawn(actualguardexists), NO Btestedit.
+1666full13364PASS+Windows;1667qualifiedmanualpeer/RootMali/docsource+full13364PASS+Windows, merged.
+Oldmanual/A/B/D/E jobs allterminalnative0/supervisor0; notworkers. NewDfollowupnotoldDnative-resume.
+OriginalCI28Ateardownerrorsandallotherpriorfailuresretained. No newscience/weights/sharedrewarm/master.

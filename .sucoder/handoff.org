@@ -1,96 +1,161 @@
 #+title: Current LSMS-ISA goal handoff
-* AUTHORITATIVE CURRENT CHECKPOINT — 2026-11-09T15:49:39.976455+00:00
-Goal ACTIVE, incomplete/unbounded. Actual development97463a699eea8e32369cef2655b1e57b9a58000d;
-61 verified merges /38 issue closures. This supersedes ALL older live/status paragraphs below.
-User correctly challenged utilization. ACTUAL THREE LOCALworkers + ROOT, ZEROremote at
-15:48Z (1590 preparing one finite B independent-review dispatch; do not count until launched).
-1452 is implementing1051B multifile drop metadata; Mwi implements1051A narrow outagecatch;
-1590 restores/manages Ethiopia1570manual and remote review queue; ROOT review/CI/merges.
-All3 live via collaboration.list_agents. No claim8workers or8current-country corpus sweeps.
+* AUTHORITATIVE checkpoint 2026-11-09T16:47:51.066895+00:00
+Goal ACTIVE/unbounded/incomplete. PreviousgoalturnPROGRESS; currentturnPROGRESS:
+5verifieddevelopmentmerges1663–1667; codefixes, managedmanual recovery, boundedcountry
+checks, source-diagnoses, approved851port started. NOwholeissueclosures thisturn.
+Actualdevelopment6848b6b7380ebd511082c6f95ff5dd65d6397fa7;66verifiedmerges/38closures.
+Rootcheckout OLDcodedocsbranch; NEVERrunlibrarychecksfromit. MAIN=/local/job40825266/venv_img/bin/python;
+usepinnedW/cwd/PYTHONPATH/LSMS_COUNTRIES_ROOT andassertrealimportidentity.
+B=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103; Q=B/country-workers-refill-20261108.
+Prior15:49primary archived .sucoder/archive/20261109T1549-active-checkpoint.org;
+olderhistory belowretained. Fulloldarchives .sucoder/archive/. Thissection supersedesalloldlivestatuses.
 
-Latest MERGED and actualparents/whole-tree verified:
-1659/218 generatedskills:952690833b4814f595c6e521d0625adce5e612c4/tree d772dea9;
- CI42624967861 unit13186P/5649S/4X,Windows362P1S;218CLOSED. Embeddingcap/FTS limits retained.
-1658 Niger native3B/3D:87df6b6bf058e36e1adcf3fa9887e6cdc44b6e36/tree a4b7f312;
- CI42629930983 unit13212P/5661S/4X,Windows362P1S. Finalnative API cultivation_records
- (NOTreservedplot_cultivation), farm_cost_operands;768x26/6192x12. Renamedafter Rootfound
-862contractmiss; oldfailedCI/testfixture/oldnamereviews retained.1529narrowed3Earea/yieldOPEN.
-1660/709 thresholddocs:333d047bb65f08a7ffef92f564392c33c8220aeb/tree318b7a50;
- CI42633588751 unit13212P/5661S/4X.709CLOSED. PeerP3missing--finalargv remainsqualified;
- ROOT boundedcontent+originalprefix+source admission explicitly notoverallpeerPASS.
-1661/1561 CIV Stata.d:53b0c26c9e33607f9b6dba0e3d0d51ff1685b8fa/tree9281d4fe;
- CI42641767803 unit13242P/5661S/4X,Windows362P1S.1561CLOSED;1562ranksheld/1556separate.
- Scoped stata_missing_map on5effectcolumns, ordinarydecoder+selectedtagscan/datefalse;
- genuineNA/unrelatedtags unchanged. ActualWave285824/Country+Feature13778/fourreadsTOTAL.
- Originaloracle/writerfixture/import/SDK74 histories retained; peer14P2fixtureF then
-2affectedP (16distinct, not18/fresh16green). Broad metadata452/1885/37BTF/124FIF; no sharedrewarm.
-1662/1288 Niger+Malawi livestock INDEX:97463a699eea8e32369cef2655b1e57b9a58000d;
- treea0bdbf887feeac79dd4acc700382528e540952cf;headcf31667820a395724a22c527182cc0f214cd693b.
- CI42644915982 actualcheckouta6c586e739de0829b149bb39d8e196fd5f72afe1 parents7eab+cf316;
- testedbase WHOLEtree==actualmain53b0, prospective/actualtree exact.13260P/5661S/4X/846.23s;
- Windows362P1S/15.41s;6optionaldatajobsSKIP. Fullreview/threads0. ClosedactualreviewqualifiedPASS:
- sixoriginalstrict+sixdecomp each;Niger30230full/Malawi39126;12nativeparseseach;warm0productive.
- Malawioriginalinvalid2004shorthand failure remains, acceptedcold reusedno rawreplay.
- Two compilersONLY nowexistingid_walk completeframebeforeunchangedwriter+id_converted gate;
- allmaps/globalreader/normalizer/sample/weights unchanged. Metadata43country/216wave/2FIF.
- Root tracker1288 updated withactualN/Mrepair+BFAcheckpoint; whole1288OPEN.
-All CI/postmerge receipts: B/reports/ci-admission-<PR>-20261109 (1658rename folderdifferent).
+* Current genuine workers (do notclaim8)
+Local1452 RUNNING:1437datedMali/BFA docappendices+ledger onNEWbranch off6848 (justreactivated);
+851independentpreimplementationcontract review completed, notcandidateacceptance.
+LocalMwi RUNNING:approved851periodAPI additiveport Wfix-851-period-api-port-cd6-20261109,
+basecd6. Source/schema/oraclefreeze reviewed; concretecodedraft/frozenpureselection pending.
+Local1590 RUNNING:remotequeue+custody/refadmission. Actual2productive remotes as16:45:
+ Dfollowup41044910/4287bd055c8f41ef8afffadd309ed3c6 n0036, SOURCE/DESIGNonly;
+ Eimplementation41044943/2932b293ac2f47e0b44e452f03e843b6 n0036,2CPU8G60min;
+ bothsupportedagent_execution/environmentverified/nonstale. Do notcountsetup/dryrun/jobsasextraagents.
+OldA/B/D/E/manual jobs terminal0/publicationcomplete; notworkers. Use followup_task toWAKE completedlocalagents.
+RootownsGHwrites/indepreview/currentcomposition/CI/developmentmerge; remoteauthorspublishonlyFS/privategit.
 
-OPEN PUBLICATION STACK — retainbranches/retargetchildren BEFORE parentmerge:
-1663 READY HEADfallback branchpublish/1051C-on-index-20261109 head224e30ea94b2c78dca77fd2386c8c49e4e778a17
- tree61289abc26141d988ed8a31052a4e73bfb490d83, nowbase development;CI42647940160 RUNNING.
- LocalEACCES/EROFS provenmkdir/temp/rename ONLYinternalfastprobe optin metadataexists <=2sameMD5keys.
- No streaming/parse/WB/index inprobe;ordinarywarmerNone/retry/layout/cleanup unchanged.
- Author41c1/abaf:73P=44new29existing;1452independentreviewPASS/noP1P2P3. Rootreadproductiondiff.
- ONEcombinedcensus132.48s:452country/1885wave/37BTF/124FIF;18None/keysets/nonhash exact.
- R1051C-publication-on-index-20261109, finalmapSHA7044bf8b7504def1419cbb5c8a809d1aa5e552ef787e5a5bdef4b9010ced327f.
- Thisresolves1051C ONLY;other1051A/B/D/Eremainopen. No schema/exclusion/sharedcachework.
-1664 READY Tanzania587docs branchpublish/587-tanzania-on-combined-20261109
- head128fe3f1cce11de41d0e5e22699144c5b5ad525f/treeb53d529833d4515e65e132beb95f1fb46a4ed59e
- base1663branch;CI42648129840 RUNNING. Author7a48225d;Rootread48lineCOUNTSappend/proof/disposition.
- ThreeheldUPDdocs prove retrospectiveR1absence NOToriginalfielding, nocorrectlyempty/regrade.
- Wholeoriginal3108lineprefix exact/allnonowned224exact.587issuecheckpoint added;
- broader39historicalcoverageblocs remainOPEN, Nigeriafalsepositivehypothesisrefutedbypreexistingcomment.
+* Latest MERGED — fullCI/actualcheckout/parents/tree/postmerge verified
+1663 CreadonlyL1probe:389694ee1ec1eb29b40e15f94f61f1b36b2cf323,
+ head224e30ea94b2c78dca77fd2386c8c49e4e778a17/tree61289abc26141d988ed8a31052a4e73bfb490d83.
+ CI42647940160 actual93baa0aa95274277a14d7ac6f1d3b481d80b0807 parentscf316+224;
+ testedbaseWHOLEtree==actualmain974;13304P/5661S/4X/1086.42s,Windows362P1S18.35.
+ Independent1452PASS on41c1 +Root6owned/allnonownedconservation.73focused44new29old.
+ Fastprobe-onlypositiveLOCAL EACCES/EROFS mkdir/temp/rename permits<=2sameconfiguredMD5metadataexists;
+ ordinarywarmerNone/retry/layout/cleanup unchanged; noHEADonremote/ambiguous/otherIO. AvailabilityNOTdecodeproof.
+ Onecombinedcensus224 vsINDEX1d194:452country/1885nonnullwaves/37BTF/124FIF;18None/keysets/nonhash exact.
+1664 Tanzania587docs:2aa90258cf347bb426a04d2b7a6d741da5dbbd49,
+ head128fe3f1cce11de41d0e5e22699144c5b5ad525f/treeb53d529833d4515e65e132beb95f1fb46a4ed59e.
+ CI42648129840 actualf6e0ee1e4b73eab9e2408c2c3942da1c5f41b5b3 parents224+128;
+13304P/5661S/4X1081.88s/Windows362P1S15.63.48linecountryappend+ledgeronly/original3108prefixexact.
+3heldUPDdocs establishretrospectiveR1absence NOToriginal2008fielding/no correctlyempty/notasked/regrade.
+587OPENfororiginalauthority ANDwider39historicalcoverageblocs; preexistingNigeriafalsepositivehypothesisREFUTED.
+1665 A5outageclasses:5d525ce50add22f949e21674c7a2e53ba0f6d62c,
+ head062a018998c1d8a9cbc5cc21886eba4b7da2a92d/treec2fa8df680ff739a5a3eb4aaebcb1fadfa4c99db.
+ CorrectedCI42653571493 actual8ad00b79b2f4c49d0bb6e3f9b7da9e77df65d12a parents2aa+062;
+13332P/5661S/4X677.48s/Windows362P1S15.25. Productruntime1f8dd78P=28new29old1463+21pure675.
+ FiveclassesbuiltinConnectionError/TimeoutError+botocoreConnectTimeout/ReadTimeout/ConnectionClosed;
+ secondaryexistingget_data/formatterboundaryexplicit; primary/programmer/otherIOloud. AllothercountrymethodASTexact.
+ Sourcefinalfbcb /publicationef762; onecensus452country1885wave37BTF/0FIF vs224 closedmap7044bf8b;
+ map6096ec986ce8d5c8a34be4f40fffb33c1cd8aa945e2f78fe362ee2ee26233dcb, allkeys/nonhash18None exact.
+ OriginalCI42649627278 FAILED13332bodiesPASS+28teardownERRORDIAGNOSIS_OBSERVATIONS unconditionallyrequired.
+ RemoteApeer2d4d5f37 independentlyfoundP2TESTONLY/no productP1P2. Mwi062a optionalexportguard
+ preservesallasserts/cleanup+wholeproduction;28ordinarypytestPASS withexportenvABSENT(controller+2workers).
+ Old78/censusonoriginalpin retained, notreplayed; test-onlynewledger outsidehash. R1051A-optional-observation-export.
+ ApeerADMISSION Q/reports/review-1051A-remote-source-admission-20261109 SHA077a1082…/28files.
+1666 Bmultifileheal:03acc1d8d71c153d46a1d3070e21285b43b21027,
+ headfe62d84172062978b4876b1e459d9d9e3591a13a/tree2b1423cf15854ce3a1056c3abd5043c7fd535d8d.
+ CI42653782297 actual430b72d0e0d1aa891488cc4a53e8b33145f1230f parents062+fe62;
+13364P/5661S/4X1001.95s/Windows362P1S16.84. Bauthor2267807c/runtime210717 on224:41P32new9old.
+ Addorderedmissingtrackedfiles;ALLwithinone droppedsubdf/ANYacrossindependentdrops; mixeddefinite
+ no-source typo config classificationusesexistingrequiredhardguard. Legacyfile/memos/warnings preserved;
+ oldambiguousmultifilestamps unchangeduntilligitimaterebuild, nocurrentconfiginventory/migration.
+ Originalcombinedc88 treef13b5964;3Bnodesexactauthor/allAimports+tuple+otherASTexactA. Bstandalone
+ census0changes andONEfinalcombinedcensus127.567s vsA6096 also0/452country0/1903wave0/37BTF0/186FIF;
+ allkeysets/14nonhash/18None exact. Nonewexclusion/schema/cachework. fe62 ONLYcarriesAfixtureguard+ledger.
+ OriginalB CI42650739734 FAILED13364P+28inheritedAteardownERROR; full logsealed.
+ ROOTinitialBsamebuginference WITHDRAWN: rgline94hadprecedingguardline93. NO Btest/productedit.
+ Unchangedc88whole32ordinarypytestPASSbothDIAG_CASE_OUTPUT/DIAGNOSIS_OBSERVATIONSUNSET,
+ R1051B-plain-pytest-portability-20261109 manifest29c00ad5… . PeerBae1f0593qualifiedPASS:
+ runtimeparentmissingbutclosedfullpatchtree reconstructed;Rootactualparentobjects+ASTcarry+32prooffillgap.
+1667 Ethiopia1570manual+Mali1574docs:6848b6b7380ebd511082c6f95ff5dd65d6397fa7,
+ headcd6bf32f4d398220dd3489d4247dda96672e0e9a/tree14c503b006bec8c156d205642370970ece2387cc.
+ CI42653839201 actual44412767e54c007b50fe07aa45dc426f91d3346d parentsfe62+cd6;
+13364P/5661S/4X1079.32s/Windows362P1S13.11.7docpathsonly/allotherobjects+testsBexact.
+ Ethiopiaauthor15a8429f on333d; Mali9b7facad onc88; Rootordinarycombinedbb469 thenAfixturecarrycd6.
+ Qualifiedindepmanualpeer06aec41481082209aaba681f424070157f8fdce9 noP1P2; primarymanual79–81 independently
+ reparsed. HistoricalcatalogHTMLnotretained/postexecutionoperators/intermediateGitmissing/live-storage
+ not-replayed limits explicit, notoverallfreshstorage/scienceclaim. RootMali3raster/headerreview+7objectproof.
+ Manualpeer Q/reports/review-1570-manual-remote-source-admission-20261109 SHA d7ad9b12… .
+ALLsixoptional/datajobsSKIPperCI; unitchecksNOTcorpuschecks. Retargetedtestedbasewhole-treeequivalence
+andprospective-current merge-tree explicit; actualbase_shaAPIsnapshotcanbeSTALE. Branchesretained.
+Alllogs/PREMERGE/POSTMERGE B/reports/ci-admission-<PR>-20261109. No openPRofthese5now.
 
-CURRENT APPROVED ENGINEERING LANES:
-1051A Mwi diagnosis ef05a98956d6e3bbd42d84f9e432af1f3ecd616f on224:33P=26new7pure675
- actualtinyCSV/DVCget_dataframe→Wave/drop/footer. Endpointalreadysoft1463;5residualoutageclassesescape.
- ROOTapprovedenumeratebuilt-inConnectionError/TimeoutError+botocoreConnectTimeout/ReadTimeout/
- ConnectionClosed insecondarytuple;primaryrethrow/programmerTypeError/genericOSError/Permissionloud.
- Intentional narrow1463oldConnectionClosed-loud fixturecontract update; catchalreadycoversformatter
- explicit. Freshisolatedbranch/ledgerfirst/freeze/focusedonecohort/onefinalcensusvs224 closedmap.
-1051B1452 diagnosis3542 on224:24P=15new9pure675. First-onlydroppathcausesprematureheal;
- mixed no-sidecar typo+tracked misclassifiedunavailable bypassesrequiredconfigguard. ROOTapproved
- additive ordered dedup missingfiles metadata, ALLwithinone droppedsubdf/ANYacrossindependentdrops;
- legacysinglefile intact, malformednonemptylist conservative, memos/oncekey/warnings/provenance.
- Include mixeddefiniteno-sourceconfigcorrection. NOoldambiguousmultifileautomaticmigration,
- schema/configlookup/globalinvalidate. Frozenfocused+onefinalcensusvs224, no baseline replay/raw/API.
- A/Bsharedcountry.py edits isolated;ROOTcomposes.1590 preparesremoteindependentreviews (no replay).
+* Completed documentary findings and exact remaining authority
+Ethiopia manual NEWofficialpublicDOCrestorationoneHTTP200 catalog2053/download40404,
+1755699B/SHAe1fb422a6a2fb02f5743766410bd68230322b8d375d294299b1921ae775ea344,
+MD5b6cb4f4b898ca8c5169913fe9e36543d. ROOTauthorizedtargetedDVCpushONLYmanual0,
+normalfreshreadonlyget_data_file fromemptyprivateL1+noPDF0/10.723s exactbytes;2privatedatafiles,
+no WBfallback/parser. Remoteavailabilityhistoricalreceipt, notfreshstateeverylaterturn.
+B/private/1570-W1-manual-restoration-20261109/ERSS_2011_12_Enumerator_Manual_English.pdf durable0400.
+Manual79–80 transfersPPparcel/field/cropIDs, samesection4excepttree/root/no renumber;
+81selfreportALLtemporaryregardlesscropcut/notextrapolate. WindowtensionmanualexpectedMeherwhenunfinished
+vsPHformlastcompletedseason remains. No newrowattribution/allocation;1570OPENexport/Q3/units/value.
+ManagedPPexactpriorofficialfe6de…;manageroldversion-differenceclaimfalseERRATUM preserved.
+Mali1574:own32BIDpages ALLrendered/viewed; no complete51crosswalklocated, NOTglobalabsence.
+PDF10states51/PDF14eightregioncounts/PDF16weightsfilepointer. OneALREADYheld241444B
+EACI17_ECHANTILLON headerMD52a14355a2a9f95588f78902fb8244f6f/zero_rows: strate='codestrate',
+emptylabelsetreference/NOvaluelabeldictionaries. Historical47occupiednotrerun. Original3635COUNTS
+prefixexact+26lines;1574OPENauthoritative51map+correspondence. No labels/strata/weights/defaultchange.
+1437NEWactual5own2021PDFs8753915B exactsource/privateprepost,60textpages/15rastersallauthorviewed,
+actual31718/0/17.130s,28rotatedtextnoticesretained. Allfourforms finishedOui→Q16C.16:
+MaliPDF87/printed86,BFAPDF85/84;BFAmanualPDF127–128/124–125agrees. Percrop/line/parcel,
+notHHCtotal; unfinished100%no-start/loss skips andMali-onlyzerocode3 remain. 2024PDFgeneration
+vs2021covers/MLIV2metadataVAGUE1-Copia retained; no deployedCAPIversion/rowcauseproved.
+REPORT/VISUALmatrix B/reports/1437-harvest-routing-document-stage-v1-20261109 manifest786bc493… .
+Externaldrafts R1437-country-notes-draft-20261109:30Mali/29BFA lines+ledger; Rootacceptedboundedcontent,
+1452nowapplieson6848 originalMali3661/BFA3344prefixespreserved; newcommit/sourceproof/PRPENDING.
+Mali1515/ad44total/windowalreadysettled; thischeckdoesNOTreopenit orapproveBFAderivation.
 
-ETHIOPIA1570MANUAL restored ONEofficialpublicDOCGET (userauthorizedlocal/DVCdocavailability):
- B/private/1570-W1-manual-restoration-20261109/ERSS_2011_12_Enumerator_Manual_English.pdf
-1755699bytes/SHAe1fb422a6a2fb02f5743766410bd68230322b8d375d294299b1921ae775ea344
- MD5b6cb4f4b898ca8c5169913fe9e36543d;officialcatalog2053/download40404;newrestore notretroheldclaim.
- ManualPDF79–80 transfersPPparcel/field/cropIDs, same§4excepttree/root, DONOTRENUMBER;
- PDF81 ALLtemporarycropsselfreportregardlesscropcutselection; doNOTextrapolate2mx2m.
- Windowtension manualexpectedMeherincomplete vsPHformlastcompletedseason retained;no rowattribution.
-1590prepared4docpatch+ledger on333d, taskprivateDVCadd0/copycache. Rootreadactualpatch+commands,
- authorizedTARGETEDPUSH ONLYnewmanualsidecar existingremote, verifyactualobject;no broad/sharedpush.
- SOURCE.org pendingpushstatus mustreflectactualoutcome; independentdocreview thenROOTintegrates1664.
- Prior2PDFjob41043513/fa1c terminal0/effe81;17Efilesauthenticated,PNGsoutsideE limitsretained.
- ManagerPPversionerratumexplicit:managedPP exactlypriorofficialfe6de..., notdifferent;
- no raw/API/old6983rowcaptureexperiment replay. Manual isnewadditivescope afteroldjobclosed.
+* Current next engineering lanes
+1051D sourcefollowup only onadmitted1d6bf61a18f7c43d3f8beb3ddbacb8a7ff25da57/base224.
+Initial56purePASS/91msinjectedtimingNOTreal14–19soutage. Existingper-sourceboolmemoalreadycaps
+repeatsbutcachedFalsepersistsafterlocalrecovery; differentnewsourcepaysownprobes. OriginalDproposal
+5sper-objectTTL DOESNOTsolvefirstunique-sourcecost;Rootrejectedascompletion/substitution.
+FollowupmustproposeFAST-PROBE-ONLYcross-source suppression, positiveendpoint-connectfailure
+scope/actualget_remoteidentitylifecycle, safe404/auth/local/read/closedcounterexamples,
+secondlayout/defaultwarmer/CHEAD/recoverypreservation+boundedTTL/reset. NOblanketoutagelatch,
+newuserknob/product/tests/networkuntilconcretereview. Dsource0productionchanges.
+1051E IMPLEMENTATIONnowauthorizedoncd6, Rootproposal exact
+B/reports/1051E-input-lineage-design-20261109/PROPOSAL.md. Optionalderived.inputs+tablelocal
+output_inputs, harmonizedmergednames/preDrop/index; consumeinputsnotforwardkwargs. No inference
+forundeclarededges; legacyunannotatedbehaviorunchanged. Distinctaffected/coverageUNKNOWNfooter,
+neverpresentdatafalselymissing; conservativefullsiblinggradedonlywithexplicitdeclareddependency.
+Declaredorderedchains/self-input; fullysuppliedsibling+malformed+partial/omitted/hookcontrolsmandatory.
+Existingsoletransformercoalescealreadyraisesmissinginput, keepLOUD. Configpolicy/primary/hookexceptions,
+Bfiles/ALLwithinANYacross/memos/oncekey preserved; no filling/filtering/scientific/countrycuration.
+Ledgerfirst/frozenportableordinarypytestnoexportenvrequirements, meaningfulactualtinyWave/footer/gate
+selection, ONEfinalexistingcensus vsclosedA+Bmap/no baseline replay; Rootconcretepatch+indeppeer+CI.
+OldE19purePASSsource-diagnosis0eda6ec5936a27e353a2ae88a80f5641afe39a31, notproductfix.
+OldB/D/Eadmissions Q/reports/1051-BDE-source-admissions-20261109, exactprivateverdictfiles/refs.
+1051stillOPEN D/E+explicitA/Bscope/legacyqualifications, neverwholeclosedfromsubparts.
 
-ALL8country bounded actualcallercohorts completed atRECORDEDpins, notfreshcurrentwholecorpus:
- Tanzania/Nigeria9514 livestock;Uganda38d anthropometry;Mali/Ethiopia/BFA860 livestock/plot_features;
- Niger/Malawi7a9 correctedlivestock. StrictwholeframePASS perqualifiedclosedreceipts.
- OriginalMali480timeout/Make-onlycompletion;MalawiSDK74 andwrongshorthand;fixedvlookup/sample/weights
- limits remain. No countryscientificvalidity claim. See corresponding closedreviewreportdirs.
+851APPROVEDperiodAPI nowlocalMwiportafterfrozencorebase;mergeONLYafterA/B (NOWlanded).
+Heldcf117d101187799b9f985c0686a567adb2177937 preserved, no destructive rebase. Fieldwisecandidate
+67CSVSHAa7dfad0d95c51779c7b0014b8cdcfa73c7ef5737567e1aa7b2b29fd914029fc2 preservesALLcurrent
+citations/evidencerungs34questionnaire/3variablelabels andall67keys;160conflicts/25recordsenumerated.
+OnlysettledMali2asks14days+BurkinaQuantity1vsExp4 overrides. CanonicaldefaultDATA/index/dtypes/NA
+unchanged; onlytheseapprovedrecallattrs corrections, no newMali publicvisitcarrier. Explicitperiod
+no-visit-level/not-measured shortfall, no householdaskcountinference/food-rowcorrection.
+Countrytypedall-or-nothing/FeaturewaveContractB/FULLREADslice#850/current1487/1512/1516/1532
+strictbranches andcanonicalrequired-indexempty preserved. periodNone NOnewpreflight. Earlymetadata
+refusal excludesonlyexisting_proven_absent;declaredbutactual0rowsunknownrecallisFLAGGEDcompatibility
+edge, notsilentlyselected. Rootneedsconcretereviewbeforetestexecution. 1452indepSOURCEpreimplementation
+reviewfrozen34289b37… atRreview-851-period-contract-preimplementation-20261109; NOTcandidateacceptance.
+Plan/schema/30oracles B/reports/851-period-api-port-cd6-20261109 freeze2f54eb18… .
+PromoterONCE50174/0/11.35s generated20YAML/67rows, ONLYMali+BFA changed/other18exact;
+Maliask_count_basis DECLARED, notoldn_visits>1→measured inference; Quantityoverrideimmutable.
+No pytest/census/raw/APIyet; Mwi preparesadditivecurrentcode+portablepureoracles/finalfreeze.
 
-Fence: NOmasterrelease/sharedharmonizedcacheclear/rewarm/rawsurveyacquisition/producercontact.
- PublicmanualDOCrestore exception above only.1562/1190/1575implementation/1066warning/productionweights
-1604holds persist;goalcontinuationNOTdecisionapproval. Do notcountjobs/verificationprocessesasworkers.
- Rootcheckout OLDcodedocsbranch;usepinnedworktrees/MAIN/realimportidentities. Keeporigfailures/sourcepins.
+* Fences / pending decisions / next actions
+Rootimmediatelyverify/publish1437docchild; finish851concretediff/pureselectionreview; monitorD/Eowned
+handles(no restartfromobservationtimeout); keepcompletedlocalagentsbusyviafollowup_task.
+Update1051/1570/1574 issue+1665/1666/1667PRbodies toremovePENDINGafteractualmerges; finalfreshfetchfirst.
+No masterrelease/sharedharmonizedcacheclear/rewarm/rawsurveyacquisition/producercontact.
+PublicmanualDOCrestore/push/readback explicitauthorizedexception, notsurveyacquisition.
+Pending1562copingorder,1190carrier/thirdseedgate,1575strataimplementationchoice,1066grainwarning
+replay, productionweights1604 unchanged. 48jointinclusioninvestigationcomplete/productionweightsHELD;
+49borrowYES/50maizeflourYES/51NOdateclamp;1494namespace/1499numericstrings/1594sentinelalreadylanded.
+All8boundedcallercohorts completedatRECORDEDpins (Tz/Nga9514;Uga38d;Mli/Eth/BFA860;Ner/Mwi7a9),
+notafreshcurrentwholecorpus/Feature/science/sample/weightsaudit. Originalfailures+fixedvlookup/source
+custodylimits retained. GoalNOTcomplete; manycountryresidualsandpendingauthoritiesremain.
 
 * Historical checkpoints below (superseded live statuses, evidence retained)
 
