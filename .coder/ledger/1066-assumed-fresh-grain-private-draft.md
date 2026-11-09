@@ -75,3 +75,32 @@ LSMS_GRAIN_STRICT semantics, as this private draft demonstrates? ROOT owns
 presentation when the maintainer is available. This ledger is not an approval.
 An initial broad text search returned irrelevant numeric CSV false hits;
 they were not inputs or authority; subsequent reads were scoped source/md/org.
+
+## §7 Closed private draft evidence — still HOLD
+
+Frozen runtime94df999ff38fc33183c577675aaf344f18458903. One ordinary
+MAIN/unshare/thread1/loadfile2 cohort, DIAGNOSIS_OBSERVATIONS explicitly absent,
+actual session1272 terminal outer0; 17 unique PASS/0fail/error/skip in107.513s.
+Fifteen portable candidate cases plus two original1c fresh-process witnesses;
+no retries. Three controller/worker import/config identities retained.
+Coveredsubset and legacyfull branches match the normal helper's warning text,
+filtered reports/from_cache/date evidence and payload; strict grain precedes
+date strict like normal reads. Missing audits clear only this table's evidence;
+miss/race/JSON exclusions preserve their prior ledger behavior. Genuine NULL
+keys/full legacy rows remain. Assumed hits invoked no hash/grade/probe/build/
+stamp/write spies and preserved synthetic parquet bytes/mtime/size. Normal
+reference uses a fixed synthetic expected hash, not a real fingerprint census.
+The original1c witnesses retain silence/stale grain ledger alongside normal
+replay, without treating the unanswered policy as an accepted failure oracle.
+No actual Country constructor, country/native input, DVC/provider/network,
+shared cache, census or full suite. Controller data/config empty; synthetic
+parquets were intentionally written only inside pytest private fixtures.
+
+Evidence: B/reports/1066-assumed-fresh-grain-private-draft-20261109/
+focused.xml, focused.log, FOCUSED-RECEIPT.json, identities/, BASELINE-covered.json,
+BASELINE-legacy.json, SOURCE-PROOF.json, OBJECT-PROOF.json and DRAFT.patch.
+This final child changes only this ledger; production/tests remain runtime
+exact. No GitHub mutation, ready PR, merge or issue-resolution claim.
+Recommendation is now concrete: replay historical evidence with existing
+strict semantics, without asserting freshness/completeness. Maintainer choice
+remains required; time or successful tests do not select it.
