@@ -1,4 +1,16 @@
 #+title: Current LSMS-ISA worker queue
+* Authoritative current queue: PR1678 corrected CI
+Development d604/76 verified merges/41 closures; PR1677 MERGED/postverified.
+PR1678 corrected12d OPEN, CI42718759156 WindowsPASS/unitRUNNING/sixSKIP.
+Root: CI/publication/merge and issue reconciliation.
+finish_1590:1032 SOURCE-ONLY read-only DVC runtime prototype on d604.
+malawi_revision_food:1071 SOURCE-ONLY managed unreadable Parquet recovery charter.
+finish_1452:1436 Mali2017 SOURCE-ONLY held-document/operand binding inventory.
+All six remote country workers completed/admitted; zero productive remotes.
+Closed review results and stale nested REPORT packaging qualification are in
+[[file:handoff.org]]. No runtime grant for1032/1071 yet. Older live states below
+are historical and superseded.
+
 * Latest: PR1677 in CI
 Main993/75 verified merges/41 closures. PR1677 head5377 OPEN; CI42707971494 WindowsPASS/unitRUNNING.
 Mwi owns joint stack metadata actor42123 on immutablefadf; Nepal one-child operator still UNRUN and awaits Root plan review.

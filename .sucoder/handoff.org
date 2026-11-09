@@ -1,4 +1,96 @@
 #+title: Current LSMS-ISA goal handoff
+* Authoritative checkpoint: corrected PR1678 CI, 2026-11-09
+This section supersedes older live/preparation statuses below. Goal ACTIVE.
+Development d6044e280596988dac3a9b5bab78f4e5c9feb9d4; tree
+3c6e9ae94e413e5d3dc44cc1cabfb3f07febe3b8. 76 verified merges/41 whole
+closures. FS origin/handoff/isa-development-20261109 pushed exact d604.
+PR1677 MERGED/postverified: CI42707971494 tested f05eceb41ad557d93cf1e714fd0bd1f28bf48346,
+actual merge d604 has exact tested parents/tree. Unit13793P/5673S/4X;
+Windows362P/1S; six optional SKIP. R/ci-admission-1677-20261109.
+#1135 remains OPEN, public title/body narrowed to complete-mover and physical-
+cluster measurements; delivered typed dated measurements are not fresh audits.
+
+PR1678 OPEN corrected head12d053c801638db6b5102b74407af5adf2747b32,
+treed3c14182d9ebdd8f25e1671c9caef61073b12f58. GitHub+FS pushes completed0.
+NEW CI42718759156: Windows129507016280 SUCCESS; unit129507016685 RUNNING;
+six optional jobs SKIPPED. Original CI42709622704 FAILED:1F/13805P/5673S/4X,
+sole test_no_handler_edit_can_move_a_build_fingerprint. Existing availability
+handler Country._legacy_can_build entered build closure via the new guard.
+Root authorized ONLY adding this established non-content handler to explicit
+exclusions, not weakening invariant or excluding the orchestrator. Product
+fixa0f84b50fffc4eeb7496c805779b1a8c1cd69982; final12d ledger-only child.
+Entire Country and ALL tests exact originalfadf; all19262 nonledger objects
+exacta0f84. Six unchanged focused controls PASS, actor77879 closed0/13.854s.
+One corrected combined census82372 CLOSED0/127.855s:452country/1885wave/
+37BTF/0FIF changes versus BOTH original failed-stack6c6f and current1135
+616457 maps; all14 other fields/keys/18None exact,E0D0/private0.
+Corrected map6bafa7a41dac811fd794d180ce151d20ad7db5f6c4248fab8afd1d0b2c971801.
+R/381-handler-fingerprint-ci-repair-20261109 FINAL-MANIFEST
+ e8a04fc5558f3da8d0d2f61962012f37759479696c775f500ac9da6c68a61297.
+Root source admission R/381-unwired-stacked-publication-20261109/
+ROOT-CI-REPAIR-ADMISSION.json; independent review R/review-381-optional-make-
+stderr-20261109/handler-fingerprint-repair-v1 manifest
+ e1f0f3dbff48e44b415fb12d9bb048758ab7ffb0c92b2c35ad467c8fc7cd8f96 PASS
+WITH PACKAGING QUALIFICATION: final manifest authenticates all23 members;
+nested older FOCUSED manifest authenticates18/19, but pins an unavailable
+previous REPORT.md version. Current report is final-manifest-bound. Do not
+claim full old nested manifest, reconstruct lost report or replay runtime.
+Root accepts this qualification; source/test/runtime receipts authenticate.
+
+Original Nepal default acceptance actually PASSED on immutable f5924b:
+one child58451 closed0/5.796s, real Country('Nepal').food_expenditures(),
+default DVC backend, precise bare RuntimeError about current wiring,
+public warnings0/logs empty/forbidden operations0/private data-config0.
+Real metadata1Repo+1DVCFS+2make-n; five metadata files inventoried separately.
+No raw/header/parquet/provider DATA/actual recipes. R/381-nepal-default-probe-
+plan-20261109 final manifestdcb642eaf3c38a78d7d42acd0315aa4b12dfbed76d82c7bf1ddf9fd83ad0bba6.
+Armenia source-only audit distinguishes absent1996 from held2001-17 unwired;
+current derived unregistered route is one clear unsupported warning+empty,
+Feature food discovery excludes it. No actual Armenia runtime count claimed.
+Independent original requirement audit recommends bounded whole381 closure
+ONLY after corrected CI and exact actual merge verification. Never infer
+upstream absence or claim zero-wave-universe distinct case runtime tested.
+
+Current actual workers: finish_1590 #1032 SOURCE-ONLY adapter prototype;
+malawi_revision_food resumed #1071 SOURCE-ONLY unreadable-managed-Parquet
+charter; finish_1452 now #1436 Mali2017 SOURCE-ONLY document/operand binding
+inventory. Root owns CI/publication/merges/queue. All six earlier country
+remotes CLOSED/admitted; zero productive remotes, not eight busy workers.
+#1032 W=fix-1032-readonly-runtime-prototype-20261109, based actuald604,
+ledgerfirst945a18a84. No runtime yet. Reuse source live workingtree/sidecars/
+SCM guards, managedL1, public supplied-Repo path + honest protected hooks.
+Stable cooperating process locks, PID-owned state cleanup, readonly-L1 reader
+must work; metadata under existing DVC_SITE_CACHE_DIR or owner cache, not
+require writabledata_root. Preserve >=3.67,<4 structural compatible support;
+no exact-version blanket refusal. Root review frozen prototype before runtime.
+#1071 no implementation/runtime; preserve wave coverage before eviction,
+normal bounded rebuild, exact phase/class ownership and fatal fresh-output/
+raw/user/schema/strict/source/recipe failures. No corruption-by-message claim.
+
+#932 reconciliation:1049 merged3ff6ddf60ca2bbcef2c595a51d3aee5b31d51ba6;
+cron/disclosure/merge_group present even master. Ruleset25124452 onlyunit-tests,
+no merge_queue; appending data-tests alone is NOT sufficient. Repo public and
+owner_type User; current GitHub docs restrict merge queues to organization
+repositories and skipped required jobs count success. Thus old proposed PUT
+is NOT approved/NOT a viable complete repair. Need compatible concrete policy
+proposal; no rules/settings/secrets/data-workflow mutation authorized here.
+Official sources: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue
+and https://docs.github.com/en/pull-requests/reference/status-checks .
+Retained data run42698613061/job129437041346 now CLOSED FAILURE on older
+097283459f80016b0f00a51b814a0cb964a42789; full-test step failed, unit/build
+Uganda/gate-open steps succeeded. Metadata-only, no test failure diagnosis
+or current-development result claimed. No new data job triggered. Public932
+now narrowed with official docs and preserved full original history. Platform
+metadata is retained in .sucoder/932-platform-check-20261109.json. R/scrum-next-backlog-993-20261109
+has sealed source triage and old proposed payload, NOT applied.
+
+NEXT: update1678/#381 public status; poll SAME new CI, download actual logs,
+prove actual checkout/tree and prospective merge before mutation, inspect
+preflight exit0, merge expectedhead12d if gates pass, postverify/pushFS.
+Then close bounded381 preserving original history/actual-vs-source limits;
+counts would become77/42. Continue1032/1071 source review,1436 inventory.
+No master release/shared-cache rebuild/raw acquisition/weights/provider contact.
+
 * Latest authoritative addendum: after publishing PR1677
 Goal ACTIVE. Main remains99318fdfb959db07eede83c8000bf7ee0bed30d7;
 75 verified merges/41 whole closures. All PRs through1676 merged/postverified.
