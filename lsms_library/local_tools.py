@@ -1778,12 +1778,69 @@ def _read_parquet_with_index_policy(f, *, read_errors=(), **kwargs):
     return _restore_parquet_index_string_policy(df, metadata), None
 
 
-def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False) -> pd.DataFrame:
+def _validate_stata_missing_map(option):
+    """Validate the explicit source-column -> extended-tag -> label option."""
+    if option is None:
+        return {}
+    if not isinstance(option, dict):
+        raise ValueError('stata_missing_map must be a column/tag/label dictionary')
+    if not option:
+        return {}
+    for column, tags in option.items():
+        if not isinstance(column, str) or not column or not isinstance(tags, dict) or not tags:
+            raise ValueError('stata_missing_map needs named source columns and nonempty tag maps')
+        for tag, label in tags.items():
+            if (not isinstance(tag, str) or len(tag) != 2 or tag[0] != '.'
+                    or tag[1] not in 'abcdefghijklmnopqrstuvwxyz' or not isinstance(label, str)):
+                raise ValueError('stata_missing_map requires extended tags .a through .z and string labels')
+    return option
+
+
+def _overlay_stata_missing_map(frame, stream, option, release):
+    """Overlay only requested typed tags onto the ordinary decoder output.
+
+    Finite values, labels and encoding remain owned by normal from_dta.
+    Formats <=111 have only a single missing distinction in pandas' reader.
+    """
+    if release is None or release <= 111:
+        raise ValueError('stata_missing_map requires a Stata format supporting extended missing tags')
+    from pandas.io.stata import StataMissingValue
+    stream.seek(0)
+    with pd.io.stata.StataReader(stream) as reader:
+        native = reader.read(columns=list(option), convert_missing=True,
+                             convert_categoricals=False, convert_dates=False)
+    if (not isinstance(frame, pd.DataFrame) or len(native) != len(frame)
+            or not native.index.identical(frame.index)
+            or any(column not in frame.columns or column not in native.columns for column in option)):
+        raise ValueError('stata_missing_map native scan does not match decoded rows/index/columns')
+    out = frame.copy(deep=True)
+    for column, tags in option.items():
+        for tag, label in tags.items():
+            mask = native[column].map(lambda value: isinstance(value, StataMissingValue)
+                                      and value.string == tag)
+            if mask.any():
+                values = out[column]
+                if not (pd.api.types.is_object_dtype(values.dtype)
+                        or isinstance(values.dtype, pd.StringDtype)):
+                    values = values.astype(object)
+                out[column] = values.mask(mask, label)
+    return out
+
+
+def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: str | None = None, categories_only: bool = False, stata_missing_map: dict[str, dict[str, str]] | None = None) -> pd.DataFrame:
     """From a file named fn, try to return a dataframe.
 
     Hope is that caller can be agnostic about file type,
     or if file is local or on a dvc remote.
+
+    stata_missing_map explicitly maps selected Stata source-column extended
+    tags (e.g. {"answer": {".d": "Not applicable"}}) to labels before
+    extraction. It adds one selected-column native scan; all other decoding
+    and the omitted/empty-option fallback remain unchanged.
     """
+    missing_map = _validate_stata_missing_map(stata_missing_map)
+    if missing_map and categories_only:
+        raise ValueError('stata_missing_map requires a data read, not categories_only')
     fn = _resolve_data_path(fn)
 
     def local_file(fn):
@@ -1868,6 +1925,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # chain below, unchanged.
         dct = _load_dct_for(fn)
         if dct is not None:
+            if missing_map:
+                raise ValueError('stata_missing_map is only supported for Stata data')
             if isinstance(f, str):
                 raw = Path(f).read_bytes()
             else:
@@ -1880,6 +1939,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # first bytes say the file is (see the block comment above
         # ``_sniff_head``).
         head = _sniff_head(f)
+        if missing_map and not _is_stata_dta(head):
+            raise ValueError('stata_missing_map is only supported for Stata data')
         if Path(fn).suffix.lower() == '.dta' and not _is_stata_dta(head):
             raise ValueError(f'{fn} has a .dta suffix but no Stata header')
         # GH #1070: likewise a ``.parquet``.  Its CSV fallback served a
@@ -1948,6 +2009,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 f.seek(0)
                 out = from_dta(f,convert_categoricals=convert_categoricals,encoding=encoding,categories_only=categories_only)
             except (ValueError, struct.error) as exc:
+                if missing_map:
+                    raise ValueError('stata_missing_map cannot use a tag-losing fallback decoder') from exc
                 failure = exc
             else:
                 # GH #805: pandas decoded this file as latin-1; re-decode its
@@ -1955,6 +2018,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
                 release = _stata_release(head)
                 if encoding is None and release is not None and release < 118:
                     out = _redecode_cp1252(out, f)
+                if missing_map:
+                    out = _overlay_stata_missing_map(out, f, missing_map, release)
                 return out
 
             try:
@@ -2132,7 +2197,7 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
 #def regularize_string(s):
 
 @build_transform()  # build-path: extraction/formatting baked verbatim into the L2 parquet (#522)
-def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categoricals: bool = True, encoding: str | None = None, orgtbl: str | None = None, missing_ok: bool = False, **kwargs: Any) -> pd.DataFrame:
+def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categoricals: bool = True, encoding: str | None = None, orgtbl: str | None = None, missing_ok: bool = False, stata_missing_map: dict[str, dict[str, str]] | None = None, **kwargs: Any) -> pd.DataFrame:
     """From a file named fn, grab both index variables and additional variables
     specified in kwargs and construct a pandas dataframe.
 
@@ -2203,8 +2268,11 @@ def df_data_grabber(fn: str | Path, idxvars: dict[str, Any] | str, convert_categ
         raise ValueError(df_data_grabber.__doc__)
 
     if orgtbl is None:
-        df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding)
+        options = {} if stata_missing_map is None else {'stata_missing_map': stata_missing_map}
+        df = get_dataframe(fn,convert_categoricals=convert_categoricals,encoding=encoding, **options)
     else:
+        if _validate_stata_missing_map(stata_missing_map):
+            raise ValueError('stata_missing_map is not supported for Org tables')
         df = df_from_orgfile(fn,name=orgtbl,encoding=encoding)
         if df.shape[0]==0:
             raise KeyError(f'No table {orgtbl} in {fn}.')
