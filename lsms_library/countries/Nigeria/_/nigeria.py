@@ -2226,10 +2226,11 @@ def livestock_for_wave(t, df, animal_code, owned, head_now, head_acquired,
 # GHS section 9 ("Food Security") is a coping day-count battery, NOT an
 # HFIAS occurrence/frequency scale.  Items s9q1a..s9q1i ask "HOW MANY
 # DAYS [in the last 7] HAD TO..." for each coping strategy, coded 0-7.
-# Collected in the post-planting round only (sect9_plantingwN.dta), so
-# each wave maps to a single t = PP_QUARTER[wave].  The post-harvest
-# round has no equivalent battery.  sect9b (W4+) is FIES and is wired
-# separately (do not include here).
+# The existing W1-W3 PP bindings use sect9_plantingwN.dta. The historical
+# assertion "the post-harvest round has no equivalent battery" is contradicted
+# for W3 by its own PH Section 12 Q1 and released s12q1a..i labels (GH #587).
+# W3 now supplies those separate PH answers through an explicit items mapping;
+# no other PH round is inferred. sect9b (W4+) is FIES, wired separately.
 #
 # Canonical rCSI strategy names (LessPreferred, LimitVariety,
 # LimitPortion, ReduceMeals, RestrictAdults, BorrowFood) plus the
@@ -2249,14 +2250,14 @@ FOOD_COPING_ITEMS = {
 
 
 def food_coping_for_wave(t, df, id_col='hhid', items=None):
-    """Reshape a sect9 coping battery into long-form food_coping.
+    """Reshape a day-count coping battery into long-form food_coping.
 
     Parameters
     ----------
     t : str
-        The single post-planting quarter for this wave (e.g. '2010Q3').
+        The source's logical round (e.g. '2010Q3' or W3 PH '2016Q1').
     df : DataFrame
-        Raw sect9_plantingwN data (one row per household), read with
+        Raw source battery (one row per household), read with
         ``convert_categoricals=False`` so the day counts stay numeric.
     id_col : str
         Household id column (Nigeria GHS uses 'hhid').
