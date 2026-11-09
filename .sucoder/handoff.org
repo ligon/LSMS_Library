@@ -1,4 +1,16 @@
 #+title: Handoff, LSMS-ISA sweep
+* Authoritative update — 2026-11-09T05:19UTC
+PR1644 merged11714b185fe2c90f1bc6c60164aa40d358acf0f3; ROOT verified parents[a633,9d],
+whole tree65d39fae matches reviewed and CI tree. Issue1495 explicitlyCLOSED retaining body.
+Sweep43 development merges /31 closures. 1452 now monitors1645 CI42566311410 and prepares
+read-only release evidence; ROOT alone decides/executes GitHub merge.
+Latest supported remote observation05:15:58: ONLY Niger41036618 actively executing.
+BF41036558 is FAILED supervisor74/native0, missing complete report/RESULT/plan/sourceproof;
+no acceptance or completed fix claim. Malawi41036559 FAILED71/143 before analysis. Both excluded
+from busy count. Manager investigating supported failure metadata and recovering ordinary queue.
+Earlier two-active statement is superseded. Eight workers are NOT busy. Local review/queue work
+is separately assigned, not counted as remote country execution. User informed plainly.
+
 * Current checkpoint — 2026-11-09T05:18UTC — goal ACTIVE, PROGRESS
 Actual utilization is below eight workers. Historical eight country assessments are finished,
 not busy. Latest supported manager observation: Burkina Faso1463 production job41036558 and
