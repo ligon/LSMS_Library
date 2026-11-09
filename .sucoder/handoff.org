@@ -1,4 +1,161 @@
 #+title: Current LSMS-ISA goal handoff
+* Authoritative current checkpoint 2026-11-09T19:16:28.257116+00:00
+Goal ACTIVE/incomplete; this goal turn PROGRESS: Nigeria1670merged,851181+26pure,
+actualsource partial verification, newdraft1671, newUgandaprimaryauthority/doccandidate,
+Dindependentracefailures+localfix, productiveworkerrefill and failedNode recovery.
+Current development a578e1a1f95a8d2ccc11d540fc11e6112b54d846,
+tree e0ebd9475d71934367406018104ed0fb9bf032a9; 69 verified merges /38 wholeissueclosures.
+FSoriginhandoff/isa-development-20261109 successfully updated to exacta578.
+No master release/shared harmonized rebuild/productionweights/rawacquisition.
+
+NIGERIA PR1670 MERGED a578, parents[20c85655a67cd754a6c5ea4b118b5ded4b53b87b,
+5fca008ef18b9dd502963613d088ef84f7017db5]. Actualtestedcheckout
+ d079f37e9a03b5b6c6781043ab942658b3bfb353 sameparents/wholeTREEe0ebd947.
+CI42675150088:unit129354571037 13440P/5661S/4X/645.63s;
+Windows129354570979 362P1S16.14s;sixoptionalSKIP. Rootdownloadedlogs,
+verifiedcheckout/tree/parents, rehashedALL93manifestmembers, PRE/POSTMERGE in
+reports/ci-admission-1670-20261109. OriginalCI42673807147 attempt1 failedZEROJOBS:
+GitHub Internalservererror correlation7c3b3345-2b40-4bfe-8674-b2cf8da7f0f3.
+Attempt2 unitrunning/Windowspass, automaticallycancelledbysourcechild; allretained.
+Originaltested923789 publiccohortall4children0/all6unchangedstrictPASS/bothFeature
+PASS/12additionalnativeparses (13incloldPHgate),18captureseals/14observers0D;
+source/fixed-v/samplelimitations retained. Child5fca onlyhashedYAMLcomment;
+Root+peerparsedtag/value/order exact/allotherobjects exact923789; NOAPIreplay.
+Originalcensus12669 preserved20Nigeria country/200waves. Correctedfinal13256
+outer0/124.697s same20/200,0BTF/FIF/all14nonhash+keys+18Noneexact; Rootindependent
+complete comparisonPASS. FinalmapSHAa46be1dbc169960e965da68f1503554734f28241372b3cd24300ab7e5c25fcc2.
+Comment-onlycost20countrydigests/0additionalwaves. RpublicFINAL-MANIFEST
+7a4bc15bef5bd17125281ad35f21e841623f44e6b8d8e243c14539495c12f275/93.
+IndependentMwi report0160af7f..., additiveCOMMENT-CHILD-ADMISSION resolvedstalecomment.
+587+PR1670trackers updatedMERGED; whole587remainsOPEN. Counts69/38not70.
+
+851 DRAFT PR1671 OPEN, branchpublish/851-current-20261109,
+head5f1f1692c0b3cfa5e345780ee9c25d1d5ae725df/tree d36ea7fad2802d7ddd7e6989179f9706cb47414c;
+RootpublicationWpublish-851-current-20261109 currenta578+fixedauthora9 union:
+19ownedexacta9/19221nonownedexacta578. Rootproof
+reports/851-current-publication-20261109/ROOT-SOURCE-ADMISSION.json.
+GitHubpushdone; FSoriginpushowned60796(notyetpolled). CI42680635357:
+unit129373893802 RUNNING; Windows129373894076 SUCCESS;6optionalSKIP.
+NEXTROOTFIRSTpollthisCI, butDO NOTmergeuntilactualandpeerremaininggatesclose.
+
+851 authorparent7b923774dffb23f927fbe50cd1f0f349a0f2920c initial181uniquePASS/0F/E/S,
+source7bclean/private0files; R851-period-api-current-v3-20261109.
+Contextretired-copyKeyErrorfixed5c24; parentfailedASTwitnesspreserved.
+Ledgeronly67df09b70eec8b5d3ca418b9304a9aea4b9611aa allnonledgerexact7b.
+Originalindependentpeer41049853/60d57db6f00040dfbab19b464f312f3d terminal/native0/SDK0,
+finalaa3cc11ef9e75969aec6452550a7204b43ccd95a. INTRODUCEDP2-851-01:
+from_config `get(n_asks_by_column) or None` erasesFalse/nonmappingfalsey values;
+ONEfrozenoldcontrolFAILED beforeanyproductfix. Originalfindingpreserved.
+Q/reports/review-851-original-P2-source-admission-20261109/ADMISSION SHA8b78f12f...
+Fixeda9eae4428babe4ebc7280baa1598c1a0876c9134/tree0056768dc57c332eb86f036c6f5dfabfcb9eac18:
+soleproductiondelta removes`orNone`, validatorsunchanged;26focusedPASS inclall67
+validpackagedrecord/exposurecounterfactuals; NO181replay. Rootreadentirefix/tests.
+Correctedfinalmetadata82607 CLOSED0/126.105s vsclosed7b map0/452country,0/1903wave,
+0/37BTF,0/186FIF/allnonhash+keys+18Noneexact;0D/errors/private0.
+Mapbd0ad83adb2687897786b18a7d6ca9c13425143dee192ed1761d05c012ae2130.
+Original7b map9b3cf9bb43f3ae95bb813e3cf1acd1f77a617966a63aa93c6fc54b449c87575d retained0vsE.
+CorrectionindependentORIGINALONEcontrolrecheck job41050540/847a96b8e258451aa561ee9978844092,
+verifiedagent_execution19:08/fresh2.05s/n0030; no26/181/API/censusreplay, manager1590owns.
+
+851 actualROOTgrant Rv3/ROOT-ACTUAL-SCOPE-GRANT.json
+c1ee477fead000ed3e7dec40d037f73268ff8a5de054c6a3acbb42cf95b1487a:
+9exactheldfiles118614781B/MAX15cumulativefullnativeparses/900schild,
+Mali2014+2018+2021fullfood+own2021NSU/BFA2014fourpassages; actual20coldnormal
+privatecache, candidatewarm0raw/no producer/writes; no sourcefetch/sharedwrites.
+FixedownFA(i,t,v)lookup ONLY, realconstructor/ID/finalizer/Featurealiasrestore;
+conditionalvlookup notsample/weightsauthority. Literal4periods/native2014denominators,
+Mali fulldefaultkg/samescopeSubset; explicitfixture-onlyimmutableunrecordedMali2018
+for real-valuedpartialFeature oneFULLREAD, notnaturalmissingwave/scientificchange.
+ActualV1 actor82860 CLOSED1: actual20Mali coldPASS521.334s/11nativeparses;
+7bwarmFA/exp/NonePASS then external`fromlsms_libraryimportrecall`functionalias
+AttributeError BEFOREperiodcalls. Originalfailure/coldcaches8PKLs preserved.
+ActualV2 actor83192 CLOSED1/190.590s correctedactuala9warm0raw:21criteriaPASS
+(FA/nativeflowdefaults/None/all4nativeperiods/singletonFeature/fullkgdefaultparity),
+then originalliteral FULLSLICE strictcomparisonFAILED unusedMIi domain11536vs3803
+onhealthysubset. NotproductPASS; no pruning/sort/normalization/tolerance permitted.
+Existingtransformations.py2460–2502/2584–2589 explicitly scopes healthySubsetkg
+attrs toservedrows while readingfullinferenceuniverse; Rootpersonallyreadsource.
+RootAPPROVEDadditivev3 ONEactual20warmhealthySubsetreference0raw; SAMEunchanged
+strictcandidate-vs-that underNEWcriterion, retainfullsliceFAIL, separatelyexisting
+closedorderedkeys/operands/masks/dtypes/axisdomain/ALLscopedattrdecomposition+full
+aggregate(None,food_acquired)trace. Thisdoesnotshrinkfactorpooloroverwriteoldoracle.
+Thenremainingfullkgperiod/fixturepartial+BFA4without21replay. NoMali rawreplay.
+ActualV3 LIVE88593/ownedMwi atlastreport; Rv3/actual-v3 manifest
+8489c55a7abfaae9a3adc9d7aee562415005b7fef708b3bc9bfad7a571cb004f;
+sourcea9/current20; sharednativecounter11/MAX15/BFA4remaining. AllV1/V2sealedoriginals
+unchanged. Remainingactualgates NOTcomplete; Rootmustreviewnewbaseline/decomposition,
+healthySubsetstrictandfixturepartial/non2014 factors, BFA2exposures/defaults/Features.
+
+D1051: original4390/e52 author114PASS/census452/1885/37/124 kept. Originalindependent
+R1control1FAIL lastbackendreleasedundermutex; oldpeer41048970/750862cc retained.
+R1correction7b288fc3ad2611ab8fe086fced0cc8c002d06bf5 (runtimefe7fa121):23PASS
+(14new9companions),census0/142.105s all452/1885/37/124FIF changedvsE,
+18None/all14nonhash exact. Onlyselecthelper productchanged; refsALLlive/snapshot/
+oldowner retainedoutside lock, latepublicationspreserved. R1oraclenowstrongretain
+until explicitoutside-reset; originalfailedfixtureexact, prevalidatedowner
+initializationdisclosed(notrealSDKclaim). Q/reports/1051D-R1-corrected-source-admission-
+20261109/ADMISSION SHAf8d399bb...; oldR1reviewadmissionaa97812d... .
+Rootsource-review foundremainingfreshentryvalidationgap (preserveslateentrythen
+selectsALLlivewithoutvalidatedmembership). SAMEnewpeer41050528/
+32271bf46b244b0c964f3a9cb4658c4b confirmedagent_execution and ONEold-sourceNEW
+counterexample actuallyFAILED/6.114s: unvalidatedlateinvalidbackendselected;
+nextcallprunes/finalizeroutsideFalse. OriginalR2freeze19:10:32/testSHA746b7d0e...
+E=Q/private/Review-1051D-R2-late-publication-7b/dispatch/32271bf46b244b0c964f3a9cb4658c4b/evidence.
+PeerremainsLIVEawaitingfinalsourceimmutablecontrolrecheck; managerowns.
+LOCAL1452 ownsDfinal tinyfix, NOduplicateDremoteauthor submitted:
+Wfix-1051D-validated-window-membership-20261109 offa578+7b,
+ledgerfirst9c2842913. Frozen05f727be31229a6c94cc8b875333c07c75b05c21/
+tree77464f887cd7039f30a5e4d79a55df0d4330f62c. Soleproduct1identity-membership
+conditionselectsonlyvalidated-and-still-live; preserveunvalidatedlatefornextcall.
+2new+10relevant=12focused planned (notyetresult); old23/114notbulkreplayed.
+ThenONEcorrectedfinalcensusvsoriginalclosedE66187750/head738423/no baseline replay;
+exactexistingdd7667/b40d/no exclusions/sharedwrites. Rootauthorizesfullboundsalready.
+Samepeerhas05f727 andoriginalfrozencontrolrecheck; finalSource/12/census/peer/CIneeded.
+Rootmustpersonallyreviewfinal1condition+pubcomposition thenopenPR/CI promptly.
+
+UGANDA1525 source/documenttask completed by1452; no recodepossibleyet.
+NewprimaryBID566821B/MD5e491bd04efbd14658bd7e70050d0edfa/SHA2d0b5794...:
+first3then35remaining=38uniquepages personallyread,2pypdfstages0+onePDF16render0,
+no native/header/API/acquisition. PDF16Table1 confirmsGSEC15B ConsumptionItem key
+hhid/CEB01; PDF8/30SurveySolutions. CurrentdirectCEB01→Org1081Dry1082Flour,
+NOitemunderscore normalizer; paperCEB01Description/CEB02Codevsrelease remainsversion
+bridge, notgetterfix. Annex1unit108medium400gcup/annex2crop630Cassava areothernamespaces.
+Whole38BID hasnofoodstate1081/1082semanticbridge; no globalabsence/erratumclaim.
+Remainingartifact ownSurveySolutions rosterGUID/version/exportspec orproducererratum
+mappingpaper108/108_1 torelease1081/1082+affectedrelease/records/rule. Whole1525OPEN.
+DOCScandidate d64dc3236c14d5c56d3bc24b14b9779d22169ada/tree871ed585459b964866e2de14288d98ad7db0a476,
+offa578, exactly2owned(CONTENTS40lineappend+ledger); all19236othersa578exact;
+original6032prefixSHA0294e2e6...exact. R1525-uganda-country-notes-delivery-20261109
+manifest62dfe6d721868a7eb72d2af8706ec09fc8a85923a9e3d139cec27a6eb10bec6d;
+sourceevidenceFINAL-MANIFEST138a5bba.../66. RoothasNOTyetreadprimaryPDF16raster/
+full40append orpublishedPR. ThisisavailableusefulNEXTrootreview/PR, no tests/census
+neededforreversibledocs; configuredCIstillrequiredbybranch. 1452nowD, notidle.
+
+REMOTECOUNTRYrecovery: Ethereum1570sourceonlyjob41050181/
+64b3e9c912c74fe991bb71f01e1212c9 and Niger1530heldNEWBID/gateexportjob41050182/
+411dbf07cc3b4a8a8322931352a52fb1 allocatedn0028, supportedheartbeatsstopped18:50.
+AUTHORITATIVEschedulerState=MIXED+COMPLETING+NOT_RESPONDING plus BOTHbatchsstat
+Communicationconnectionfailure/unknown9001; sacctmasterDB6819unavailable(notjoboutcome).
+Causebeyondnodecommunicationsunknown; no OOM/model/speculation/nativehome/SDKreads.
+RootINTENTIONALLYauthorizedcancelONLYthese2 becauseconcretenodestate, notmerelyage.
+scancelboth0at19:13:47; BOTHstillCOMPLETING atlatest, NOTterminal/stopped; NOreplacementyet.
+Manager1590mustpollSAMEhandles andonlyafterauthoritativeCANCELLED/NODE_FAIL/missing
+ONEnewcoldreplacement/task excludingn0028/newnamespace/reuseexacttask/profile/evidence.
+Originalartifacts/nativeoutcomesunknownretained; no restartsolelyobstimeout/no newcanary.
+Q/reports/n0028-scheduler-metadata-20261109.json, n0028-country-stale-supported-stderr-20261109.json,
+n0028-ROOT-intentional-cancellation-20261109.json. No admin/producercontact.
+Confirmedproductive remoteat19:08: Dpeer41050528 and851fixpeer41050540; terminalold
+jobsnotworkers, allocatedstale2notworkers. Local1452D, Mwi851actual,1590dispatchmanager.
+Neverclaim8busy. All8NEXT-ACTIONtickets refreshed:1495CLOSED1644/1468CLOSED1643/
+1463CLOSED1646;1530prior4rows/formsdone1648;1575doccheckdone1637/1640. No duplicatecohorts.
+
+Scientific/weight/strata/IDs/defaultholds below unchanged:1575implementationchoice,
+1066storedgrain-warningreplay,1190carrier/thirdgate,1562same-releaseexportsemantics,
+1604draft/productionweights. Sourceonly48investigationcomplete(no jointprobability
+frommarginalweights);49borrowYES/50maizeflourYES/51NOdateclamp;1494/1499/1594landed.
+No goalcomplete/blocked/pause. New docs/sourceAPIcheckpointupdates851/587/1562public
+trackers preserveoriginalhistories/failures and no broadscientificclosureclaims.
+
 * Current execution 2026-11-09T18:27:48.597503+00:00
 Previous goal turn PROGRESS; this turn PROGRESS: current851181-test verification,
 new Nigeria PR1670 and actual remoteD repair launch. Goal ACTIVE/incomplete.

@@ -1,4 +1,16 @@
 #+title: Current LSMS-ISA worker queue
+* Authoritative 2026-11-09T19:16:28.257116+00:00
+Maina578e1a1f95a8d2ccc11d540fc11e6112b54d846/69merges38closures;1670MERGED+actualtreeverified.
+Draft1671head5f1f1692/currenta578+851a9fixedsource;CI42680635357running/windowspass.
+851actualV3owned88593 live/counter11/15(noMali replay);21PASS+originalunused-domain
+strictFAIL retained/newhealthybaseline+payloadproof pending;BFA4remaining.
+1452localD05f727oneconditionfix/12focused+censuspending; samepeer41050528 originalnewR2FAIL
+andfixrechecklive. Mwi851correcteda9/26P/67recordparity/zerofinalfootprint; fixpeer41050540live.
+1590manager:2countryjobs41050181/182n0028NOT_RESPONDING communicationsfailure, intentional
+scancel0 butCOMPLETINGnotterminal; no replacementsuntilterminal, thenoneeachhealthyNode.
+Uganda1525doccandidate d64dc323 readyROOTreview/PR(fullBIDnewCEB01keyauthority/no semanticbridge),
+no code/recode;1452nowDnotidle. No8busyclaim. Fullbindings/remaininggates [[file:handoff.org]].
+
 * Live checkpoint 2026-11-09T18:27:48.597503+00:00
 Main20/68merges38closures; PR1670DRAFT923789/CI42673807147queued, readyonlyafterfinalgates.
 1452cohort7267 defaultcold/warm+MakecoldPASS;Makewarmlive,12additionalnativeparsesEXHAUSTED.
