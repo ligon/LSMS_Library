@@ -1,4 +1,52 @@
 #+title: Current LSMS-ISA goal handoff
+* New active checkpoint — 2026-11-09, after 13:30Z
+User correctly challenged utilization. Three local agents are RUNNING after ROOT
+explicitly reactivated completed1452, plus TWO verified RUNNING remote workers:
+1561 job41041960/6b05e4e44303456c9eae0f227be92177 and709 job41041974/
+cb8929a313fb4e428a290dec76473b47, each2coresn0037. FIVEworkers excludingROOT, not8.
+Do not count completed jobs, preparation, monitoring or verification subprocesses as
+extra agents.1590 is refreshing eligible queue and dispatching concrete independent
+READY work; stale1495/1463 closed,1530/1525 diagnosisalreadydone/authorityheld. Fresh
+1561 CIV Stata.d source/synthetic diagnosis runs;709 datedsentinel documentation
+correction runs.1230 fullcomments prove item2alreadymerged1372/26803b8105;
+NOduplicateworker dispatched. ROOTnarrowedissue1230title/body tolexicalnumeric-key
+policy, preservesoriginalreport/history andexisting928numericcontract. No parserchange.
+1072GhanaLSS-onlyrepair HELDoutside8ISA/sharedblocking scope unless concreteISA
+dependency identified; do NOTfillseatswithunrelatedcountrywork.
+
+1658 test-only correction ebb6b340cb6e8058404022fa77235e46a7537c6a/tree4664dcf4
+passed89 whole3modulecases/independent1452+ROOTreview; FFpublished. CI42624205448
+running. IMPORTANT NEW MERGE HOLD: fresh#862/source/design reservation proves name
+plot_cultivation requires a separate perplot/perseason/person contract. ROOT/oldpeer
+missed that reservation. Independent1452confirmed; ROOTauthorized routine native3B
+carrier rename to cultivation_records, same cultivation_obs/rawpayload/no-v/IDs/3D,
+preserve all existing futureplot_cultivation comments/design. Mwi owns NEW isolatedW
+offebb6+ledgerfirst; update3Bdriver/Make/canonical/required/Nigerscheme/tests/newcountry
+note. Priorclosedresults remainhistorical, not currentrenameacceptance. Grant: one
+whole3modulefocusedrun, exactexistingheldsourceoperator withnamebindingsonly/max4
+fullparses/privatecopies, oneexistingmetadata census frozenfinal; no newframework/
+science/acquisition/sharedwrites.1452 independentreview then ROOT FFpush/newCI.
+
+218 generatedskills independentlyPASS Mwi/all20outputfiles/350symbols/148sourcefiles/
+126links/100entrypoints/protected19189nongeneratedobjects. ROOT compositionc79fe078
+55386b6b351624f12282cd51888ef56b/treed772dea9ee529c0e01a50a76641b9758e3215e45:
+25owned exactauthor6e38550c, allnonownedexact860. PublishedPR1659 base development,
+branchrelease/218-generated-skills-current-20261109. CI42624967861running. Fullold
+attempts/zero-basedcoords/embeddingcap/FTSlimits preserved; no tool/native/censusreplay.
+
+Mali Make-only85125 CLOSED0: Makecold526.02s/Makewarm363.55s, all6 unchanged strict
+comparisonsPASS, full40696/early9939/late30757/empty0. Reuses originalsealeddefault
+frames, NOdefaultAPIreplay;6newrawparses/cumulative15includingoldfailed9. Old480failure
+remainsfailed. R1288-mali-livestock-real-exposure-plan-20261109/make-completion-v2.
+1452 independentclosedreviewPASS, manifest948828ab745ef8bdd8234ef585d0fecae8c1a053b2fef316f739bb6ed3c889a4;
+all6serializedframe-pairs also byteidentical, no payload/APIreplay. Ethiopia91551
+actualRUNNING on860: defaultcold0/163.60s/defaultwarm0/40.02s/full37179/fivewaves,
+Makecold0/502.97s,24fullparsesexactcap; Makefreshwarm live/no additionalrawallowed.
+CorrectedMalawi closedreview1452 QUALIFIED evidencePASS/strict2P4F remainsFAIL,
+expandedall6P; SDK74/channel-symlinklimits explicit. Reviewmanifest4ac6c5cbd19c9b239
+cf99222d94b7d18433a43410569af7abb33cdf8ad5c830d. No newAPI/raw/comparatorreplay.
+ROOTupdated1288issuebody with qualifiedMali/Malawicheckpoints; whole1288stillOPEN.
+
 * Authoritative checkpoint 2026-11-09T13:12:34+00:00
 Goal ACTIVE/unbounded/incomplete. Previous goal turn PROGRESS; this turn PROGRESS:
 five PRs1653–1657 merged,1554 closed, three country diagnoses reconciled, new1529 native

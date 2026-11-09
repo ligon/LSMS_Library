@@ -27,6 +27,17 @@ all25owned objects exactauthor/allnonowned exactcurrent. Independent Mwi review
 pending before PR; no generator/API/native/census replay for integration.
 
 * Delivery
+Latest correction after13:30Z: THREElocalRUNNING+TWOremoteRUNNING (1561job41041960,
+709job41041974,2coreseachn0037)=FIVEworkers excludingROOT. Not8. No duplicate1230
+worker:1372alreadymergeditem2;ROOTnarrowed1230body/title toitem1policy/history.
+Ethiopia91551first3phases0/24parses;freshMakewarmongoing. Mali85125all6strictPASS,
+independent1452closedreviewPASS.1288trackerupdated with exactMali/Malawilimits.
+1658hasNEWmergeHOLD:plot_cultivation reservedby862+currentdesign. Mwi implements
+mechanicalcultivation_records rename inNEWchild ofebb6, sameobs/payload/3D/no-v;
+newfocused/source/metadata gates authorized. OldCI42624205448 is historicalONLY.
+1659generatedskillsPRpublishedc79fe078/tree d772dea9; CI42624967861running, WindowsP.
+IndependentMwi+ROOTsource/integrationPASS. No generator/native/API/census replay.
+
 1653/1654/1655/1656/1657 allMERGED,actualtrees/parents/fullCIverified.
 1554documentaryinvestigationCLOSED;1552/1555/1288/218/1529partialOPEN.
 PR1658nativeNiger3B/3D 07db/tree8d405 base860:26distinctfocused+actual768x26/6192x12/
