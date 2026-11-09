@@ -112,7 +112,10 @@ from sys import stderr
 import sys
 from dvc.repo import Repo
 from dvc.exceptions import DvcException, PathMissingError
-from botocore.exceptions import EndpointConnectionError, NoCredentialsError
+from botocore.exceptions import (
+    ConnectionClosedError, ConnectTimeoutError, EndpointConnectionError,
+    NoCredentialsError, ReadTimeoutError,
+)
 from pyarrow.lib import ArrowInvalid
 from datetime import datetime
 from typing import Any, Callable, Iterable, Mapping
@@ -2121,7 +2124,9 @@ class Wave:
                         merge_dfs.append(sub_df.reset_index())
                         merged_names.append(i)
                     except (FileNotFoundError, PathMissingError, DvcException,
-                            KeyError, NoCredentialsError, EndpointConnectionError) as exc:
+                            KeyError, NoCredentialsError, EndpointConnectionError,
+                            ConnectionError, TimeoutError, ConnectTimeoutError,
+                            ReadTimeoutError, ConnectionClosedError) as exc:
                         if idx == 0:
                             # The primary sub-df is required; re-raise
                             raise
