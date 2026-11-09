@@ -126,3 +126,38 @@ existing JSON/parquet candidates first; valid YAML fallback remains when absent,
 and offline publishers never run. This commit changes only that skill prose and
 this ledger, preserving every tested production/test object. It introduces no
 new runtime evidence; exact-final-head API/hash/CI gates remain ROOT-owned.
+### Test-contract follow-up after configured CI (2026-11-09)
+
+Root reported configured CI42558101929 on49cc0330d:12811pass,2fail,
+5649skip,4xfail; Windows passed. The two failures are preserved CI evidence,
+not relabeled as a successful suite. Root explicitly authorized test-only
+alignment on a new49cc child, retaining production bytes and all old oracles
+except the incompatible publisher fixture/count expectation described here.
+
+* test_dvc_caching::TestDVCCaching::test_panel_ids_dict_cache_written_as_json
+  previously supplied its dictionary by a fake Make publisher writing JSON
+  through the build target. It now supplies a legitimate wave dictionary via
+  the existing wave-getter leaf and retains/strengthens persistence checks:
+  exact result and JSON payload, actual second-call cache readback without
+  another getter, exact stored bytes/mtime, no private parquet substitution,
+  immutable input dictionary, no source JSON/parquet or changed source files,
+  and no Make/Python/DVC invocation. Config and data roots remain distinct.
+* test_gh866::test_exactly_the_country_tier_call_sites_pass_the_flag now pins
+  five calls instead of six because the non-DVC JSON branch shares the reader's
+  wave fallback. All three eviction forwarders and placement/no-JSON-deletion
+  test bodies remain unchanged. The test additionally pins that JSON branch's
+  existing reader route; no missing-source or eviction policy is relaxed.
+* Actual f3ec7589cf34c83b951868fc8b456704952c4fc6 targeted cohort:53unique
+  PASS,0fail/error/skip, pytest7.45s, wrapper12.95s, inner/outer0. This is the
+  explicitly authorized43new rerun, both corrected targets and8pure companion
+  cases. Three MAIN/source/config identities and false credentials asserted,
+  unshare-rn/private empty initial config/data/L1, BLAS/build1,2loadfile workers.
+  No parent/source/API/census/full suite was replayed.
+* All lsms_library/config objects, production code/signatures, original43new
+  test bodies and every other source object remain byte/mode/type identical to
+  reviewed49cc. Only these two legacy test functions change in f3ec; this
+  ledger-only follow-up is a separate commit after its actor closed.
+* Root's existing49cc API/hash results are source-identity evidence, not new
+  runs by this author. Independent test-delta review and exact final-head
+  configured CI are still release gates; no private duplicate full suite or
+  scientific/source/cache campaign is claimed.
