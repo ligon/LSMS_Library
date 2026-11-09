@@ -231,3 +231,48 @@ No blocking question. Original 29 tests and failed P2 review stay historical;
 no rerun or reclassification. Named hashed script/scheme/transformations
 wording remains held. Independent wording/object closure, final current
 composition, CI, GitHub and merge belong to ROOT.
+
+
+### P2 author Phase 3 — frozen prose and static verification
+
+Prose frozen in `3bb27c42d32db0de70bc4f7d0c1c71e969600f88`, separately
+from first ledger-only checkpoint `8470cd7faff46ec14a0290af8f925c9962a37350`.
+This final append is ledger-only; the original 9,882-byte 63eb prefix and all
+preceding checkpoint text remain exact.
+
+- OK (§2/§3): the paragraph now conditions EthiopiaRHS's exclusion on both a
+  missing plot axis and assembly alongside a canonical plot-grain provider.
+  It explicitly retains a sole provider or providers all sharing the same
+  reduced shape and states that crop registration supplies no plot sentinel.
+  Source anchors are `_select_kept_shape` (`feature.py:434-491`), its call and
+  concat (`:1307,:1326`), canonical requirements (`data_info.yml:238-240`) and
+  crop sentinels (`:369-373`). Existing controls were inspected, not executed.
+- OK (§1/§4): literal 63eb-to-prose-commit diff changes exactly the two owned
+  paths. All other 19,164 tracked mode/type/blob records are identical; this
+  includes all 13,529 other production paths and all 508 test paths. Every
+  byte outside the exact replaced sentence in GhanaLSS CONTENTS is preserved,
+  including all 460 table lines and four executable source blocks.
+- OK (§4): 799 production Python files, 572,869 AST nodes and 268 production
+  YAML objects remain exact. YAML values were not loaded. CLAUDE remains the
+  mode120000 symlink to AGENTS.md; both AGENTS and the cross-country skill
+  remain exact. Named held script/scheme/transformations objects remain exact.
+- OK (§4/§5): direct prepared-interpreter strict API audit exited 0 (10 kwargs,
+  15 skills, five advisory unused helpers, no untracked hashed inputs). The
+  source proof and `git diff --check` exited 0. Make itself was not invoked:
+  this narrower charter prohibits it. Static path resolution and the supplied
+  runtime attestation were used without importing the package; the ordinary
+  private LSMS_CONFIG_DIR binding was also checked without reading config.
+- Held (§6): zero package imports, tests or runtime probes executed. The old
+  29-case result and failed independent P2 review are preserved as historical
+  evidence, never relabelled as new acceptance. No actual cache-hash or
+  performance cost was measured; no source/warm/full-CI acceptance is claimed.
+  ROOT still owns independent wording/object closure, final current composition,
+  CI, GitHub and merge.
+
+The external evidence directory holds all five mandatory case-sensitive files,
+plus the literal patch, full other-object and AST manifests, static anchors,
+prior-review copies and actual command logs. Final commit/tree/parent and
+private normal-ref equality are recorded externally after this commit (a
+ledger cannot contain its own commit hash). Final object/prefix checks will
+be repeated at that commit. Only pre-existing untracked source-tree channel
+copies remain; the absolute external steering/question channels govern.
