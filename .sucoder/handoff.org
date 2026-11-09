@@ -1,4 +1,89 @@
 #+title: Current LSMS-ISA goal handoff
+* LATEST AUTHORITATIVE ADDENDUM 2026-11-09T17:47:33.180234+00:00
+This supersedes stale live/status bullets below. Goal ACTIVE/unbounded/incomplete.
+CurrentturnPROGRESS: SIXmerged1663–1668, no wholeissueclosures; total67merges/38closures.
+Actualdevelopmenta9e15b3abf4f21a2517e0f0b55fee049d910120c/tree7114682f6045a879e1517706ef92200fd788098d.
+1668 MERGED source6adcd7299cae3dcb030585279095790240942ca7; CI42659603639 actuald5049a4b11f24665d65291d3c0c3239f4a8714db
+ parents6848+6adc;13364P/5661S/4X856.72s,Windows362P1S14.62; allsixoptionaljobsSKIP.
+Actualmergeparents[6848,6adc]/wholeTreeexact; B/reports/ci-admission-1668-20261109 PRE/POST/logs.
+1437datednoteslanded; printedfinishedharvest→Q16C16confirmed,butdeployedCAPI/rowcauseUNKNOWN.
+1051/1570/1574/1437trackers reconciled;1665–1667finalPRdescriptionsrewritten finalbehavior/validation.
+
+PR1669 OPEN READY, CI42666328856 RUNNING (freshlyconfirmed):
+branchpublish/1051E-current-20261109 headed475c6718a4106d874c9ef973b8e3e353e53597,
+treee4faf713dbfbcb303c573d4b201113105e22ab12,parents[30adad164d84212d2832be814c39f8bca8865b95,a9e15b3abf4f21a2517e0f0b55fee049d910120c].
+Eauthorcf8cdd998b44b1503ac522dbcd15111e22196300/ea204product/738423fixturechild;
+all5ownedobjects exactauthor/allnonownedexacta9; entiretests exactcf8; librarydiffONLY2excluded1437COUNTS.
+Rootreadentireproductiondiff+docs/noP1P2. Independentpeer82adbecacd3dc513752502a10befcb31ecd6a3b4 noP1P2;
+Q/reports/review-1051E-remote-source-admission-20261109/ADMISSION.json SHA11779007… .
+Original68P3F followedONLY3fixturecorrectedP=71distinct, NOT74/fresh71green; productbyteexactea204→738→cf8.
+Finalcensus452country/1885nonnullwave/37BTF changes,0FIF/allkeys+14nonhash/18Noneexact; no replay.
+Optionalderived.inputs/output_inputs consumeharmonizednames+indexproviders, declaredchains/selfinput;
+coverage_unknown_required/optional+affected_outputs separatefromdirectabsence. No countrycuration/defaultdatachange.
+Rootpublicationproof B/reports/1051E-current-publication-20261109/ROOT-SOURCE-ADMISSION.json.
+RootpushedbranchbothGitHub+FSorigin; Wpublish-1051E-current-20261109. NEXTTURNPOLLTHISCI FIRST,
+mergegreenpromptlyafteractualcheckout/tree/currentmergeproof; do notletgreenPRssitwhileplanningotherlanes.
+
+ACTUALworkers:local3(Rootusecollaboration.list_agents) + DremoteONEverifiedproductive n0225:
+41048173/5d658fda84c0436e93f06c47ce6b9da5,2CPU8G60min, started17:33, agent_execution17:34.
+No8busyclaim. AlloldA/B/D/E/manual/Epeer jobsterminal/admitted. Manager1590ownsDsamehandle+watcher15612/v8;
+watcherrenewalisNOTworkerrestart. Dnewledger9ec15516ff2bc75c1c4923cbe76a105fd0564b94/parentcf8 ONLYledger.
+DIMPLEMENTATIONauthorizedB+C1 (notA-only0normaldefault savings), Rootfullselecteddecision
+B/reports/1051D-selected-window-design-20261109/DECISION.md; admittedproposalSHA93ca350c… .
+Five-sec non-sliding16scopeMAX/privatefastprobeonly, retainALREADYusedeligiblebackend; defaultS3profile
+nonrefreshingauthenticationmustbeaddressed/no newclientfordiscoveryidentity/no credentialbodies.
+Uniformpositiveconnectevidenceafterallretry/twolayouts/progressveto;ordinarywarmer/stream/decoder/CHEADunchanged.
+TransientdeferredFalseMUSTNOTpoisonSOURCE_PROBES;completedlegacyFalse recoveryseparate. No userknob/SDKmod/schema/exclusion.
+Freezeportablecohort+ONEfinalcensusvsEmap/Root+indeppeer+CI. No historical56/realnetwork/raw/APIreplay.
+Doldsource25f4f7f5cd4bc2fe0ff06c9cda9e93a3bd4bdd1c/source-onlydesignadmitted3b48c978… preserved.
+
+LocalMwi851:968c9c3127fdfd03153c578198c7ce20cfba3300 draftFROZEN (tree89d3d32ca50c655a9350d7e8e2aef4387444c001),
+NOTacceptedfinal.19owned/all19216nonownedcd6exact, originalproduct00536f/test93c961; no pytest/censusyet.
+R851-period-api-port-cd6-20261109 DRAFTmanifest567ffbc2…/24files. Promoter20YAML onlyMali+BFA2changed/18exact.
+RootREJECTEDnarrowerdeclared-but-actual-emptyunknownrecallrefusal; preserveheldrepresented-t healthyempty.
+V2childworkinprogress: no exposurepreflight, onlyearlytable/vocabvalidation; privateexistingContextVarstyle
+Feature-onlyone-shothandoff(matchesactualCountryidentity+table+period, top-levelclaim/erroridentity) offers
+existingpoststepcontinuationonCountrytypedfailure. DirectCountryimmediatetypedfailure unchanged;
+FeatureconsumesSAMEfullunconvertednormalpostprocessedresultonce/slices+converts/#850/nosecondcall.
+Strict1487/1512/1516/1532guardsremainactive; notalwaysperiodNone. DefaultNone neverbridge.
+Callback/tokenclearedonerror/interrupt/nestedrequests. Rootacceptedmechanism; newconcretediff/freeze+pureselection
+REQUIREDbeforetestgrant. Controls:declared-emptyPASS/oneactualbuild/strictfailures/reentrancy/attrs/relabel+market+FX.
+No newscience/publicvisitcarrier: approvedMali2asks14days+BurkinaQuantity1recallattrs exceptionsonly.
+Root1452indeppreimplementationreview34289b37… NOTcandidateacceptance; preservecurrent canonicalempty/requiredindex.
+
+Local1452Nigeria587 SOURCE+FIX now, currentsourcebranchfix-587-nigeria-w3-ph-coping-20261109
+Wsame, candidatecad481b646d5167a1f7b65842c93d5df79b3d994/ledgerde81a4408/base6848.
+Docreconciliation:original22historicalNigeria cells:4dategapsfixed1094/6f920ancestor;18needspecificauthority.
+50cellstaticmatrix44declared26scriptselectedlabels areNOTfresh row/tier counts. Existing1287actualgateshistoricalnotreplayed.
+All3PPcommunityW1/W3/W5PDFsabsentfromexactknownL1paths; cannotcertifyC8PPnotasked.
+Sixheldown-rounddocs6.728MB/81textpages/17rastersallviewed(sourceprivateexact),104products;
+W3PHHHexplicitHOUSINGmovedPP; SAME9strategy7daycopingbatterypositive, contradictsno-PH-equivalentcomment;
+W3PHagriculturalnewplotarea/GPSandW5prefilledPPGPS+ownershipupdates notsameasfullPPcarry/plotTable.
+ReportEIGHTEEN-CELL matrix R587-nigeria-own-round-documents-20261109 manifest052af63e… .
+NativeW3PHsect12_harvestw3 header attempt4930 CLOSED1 AFTERmetadata/0rows due np.int32JSONKEYserialization;
+originalfailurepreserved. ONEauthorizedreplacementmetadata-v2 CLOSED0/0.915s,0rows34vars/header4582.
+Nine s12q1a..i byte numeric/no labels matchownPHformDAYS; hhidstorage l/nativeID, frozenbinding481e4bec… .
+RootauthorizedW3ONLYexplicitPH9mapping/t2016Q1 viaUNCHANGEDhelper;PP+allotherrounds unchanged/no borrowing.
+Pure31758 CLOSED0/21PASS/3identities. PHsource79693 CLOSED0/6.524s oncad481:
+ONEsanctionedget_dataframe(convert_categoricalsFalse)/ONEfullStataread,ALL34physicalcolsdecoded→10retained;
+4582unique nonmissingHHIDs/41238native+storedstrategyrows; source-native/input/writer-return/storagestrictALLPASS,
+onehelper/onewriter/profileactive/original+privateMD5SHAfullidentitiesexact. NoPP/Country/Feature/samplecall.
+DataBudget779585B/MD5ad699abe993590bcb73401bd37093ade. Nooriginalspecial-missing-tagfidelityclaim.
+R587-nigeria-W3PH-coping-repair-20261109/source-gate-v1 receipts; rawrowproducts PRIVATE/publicaggregatesonly.
+FinalONEexistingmetadatafootprintauthorizedaftersemanticfreeze. ExactclosedBASELINE
+B/reports/1051B-publication-on-outage-20261109/metadata/hashes-candidate.json
+SHA60975ac2e398248d1af92e3005c135450aeea2fcf4a4ede82b678c7be9e02419 (KEEPoriginalc88header).
+Rootadmitted6848bycode/config/datadeclarations exactexceptexcludedCOUNTS+unreferencedDocs;
+frozenmanifesteb7a67eb… validatesmap; repairR/BASELINE-MAP-ADMISSION.json. RootfirstJSONdisplaywrongkey
+candidate_header correctedactualcandidate_head/manifestbinding, nogeneration/replay.
+BroaderpublicacceptancePENDING:agentmustpreparefiniteprivatefullW3PP/PH realproducer/Country/Feature/default+Make/warm
+closureplanusingexisting1288operator/idmaps/samplelookupifneeded. NO actualcallsuntilplanadmitted;
+neverusefakePPasrealacceptance, no newguard/framework/sharedcache/acquisition. Whole587staysOPEN.
+
+All67mergesactualtrees/CIverified. No master/sharedharmonizedrewarm/productionweights/rawacquisition/producercontact.
+Userpending1562/1190/1575/1066/1604choicesunchanged; earlier48investigation/49borrow/50maizeflour/51NOclamp honored.
+Source1663–1668PRdescriptionsandissuesupdated; remainingnewE1669CI Rootfirstpriority. GoalNOTcomplete.
+
 * AUTHORITATIVE checkpoint 2026-11-09T16:47:51.066895+00:00
 Goal ACTIVE/unbounded/incomplete. PreviousgoalturnPROGRESS; currentturnPROGRESS:
 5verifieddevelopmentmerges1663–1667; codefixes, managedmanual recovery, boundedcountry

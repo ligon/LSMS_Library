@@ -1,4 +1,12 @@
 #+title: Current LSMS-ISA worker queue
+* Latest 2026-11-09T17:47:33.180234+00:00
+Developmenta9e15b3abf4f21a2517e0f0b55fee049d910120c;67verifiedmerges/38closures;1663–1668allMERGED.
+Onlynewopen1669READY headed475/treee4faf/CI42666328856RUNNING;NEXTTURNPOLL+MERGEGREEN FIRST.
+Mwi851v2privateFeaturehandoff/empty-parityrevision (no tests/censusyet);1452NigeriaW3PHcopingcad481
+21purePASS+ONErealPHparse4582HH/41238rowsPASS, metadata+fullpublicplanpending;1590Dimplementationqueue.
+ONEproductiveDremote41048173/5d658fda84c0436e93f06c47ce6b9da5 n0225;alloldreviewjobsdone.
+Ecf8author+peer82adbeccomplete/admitted, no longerworkers. Fullbindings/gates [[file:handoff.org]].
+
 Checkpoint2026-11-09T16:47:51.066895+00:00;development6848b6b7380ebd511082c6f95ff5dd65d6397fa7;66merges/38closures;goalACTIVE.
 Fullauthoritativehandoff [[file:handoff.org]], olderqueuehistoryinGit/archive.
 
