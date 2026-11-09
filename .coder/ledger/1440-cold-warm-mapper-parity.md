@@ -1,7 +1,7 @@
 # Prior-Art Ledger — GH1440 cold/warm mapper parity correction
 
 **Base:**a72fac624290cff75ae013379827486a55afd412. Git/ripgrep/AST floor.
-**State:** ROOT-approved narrow correction, ledger before code/runtime.
+**State:** narrow correction tested/frozen f2a12155e049856cad822a5edf241a0853a68e2c; independent review/release pending.
 
 ## §1 Task
 Correct the independent synthetic cold/warm mismatch in the candidate market
@@ -50,5 +50,27 @@ this child independently. ExternalpriorP2 review manifestbf3fdae8c1bdde151441312
 under reports/review-1440-pakistan-cold-market-20261109 in durableburstroot.
 
 ## Phase3
-Pending source freeze and meaningful pure regression run. No original122
-cohort replay or source/actualPakistan build is authorized here.
+- **OK (§2–§4):** raw requested column passes through the existing Country
+  mapper exactlyonce; already-finalized fallback skips it. Existing missing-column
+  and empty checks precede projection. No normalizer/helper/schema/Make change.
+  Production outside `_market_lookup` remains byte-exacta72.
+- **OK (§4–§5):** nine pure regression cases pass: all seven earlier healthy
+  independent controls, now-positive own numeric-Code/string-label cold/warm
+  case, and explicit projection isolation of t/v/District/unrelated metadata.
+  Typed NA/payload/index/attrs/input immutability and exact loader failures stay.
+  The existing non-idempotent chain case proves no second mapping.
+- **OK (§5):** key-resolver duckreceiver binds the actual mapper. Only the
+  market caller structural pin follows that concrete one-column delegation
+  through the unchanged resolver; all other caller/assertions and exact
+  positional/declared-key expectations remain.
+- **Actual frozen run:**16PASS/0fail/error/skip,7.30s pytest14.687s wrapper/outer0,
+  MAIN/private fresh roots/unshare/threads1/n2loadfile;three exact package/config
+  identities. Datafiles0/sourceclean; import created a private config/s3_creds
+  placeholder, so configuration is not claimed empty. No failed correction run.
+- Original independent a72 numeric-parity FAIL and both earlier fixture failures
+  remain frozen. Its seven healthy unique cases are now author regressions;
+  this is not independent acceptance of this correction. ROOT/1452 review next.
+- No original122 replay, actualPakistan/raw/provider/Make/build/source/warm/cache
+  campaign, fullsuite or hashcensus. Complete cache impact UNMEASURED.
+  Receipts: reports/1440-mapper-parity-correction-20261109 in durable
+  isa-sm-20261103 burst root. Final ledger-only child preserves tested bytes.
