@@ -26,4 +26,4 @@ Reuse completed full author/peer aggregate reports and frozen Git source bytes. 
 Both issues remain open. Niger upstream inclusion/export/own16A answers and Malawi native carrier/field-label/attachment choices remain outside this docs task. Manager/root own further TierC design.
 
 ## Phase3 verification
-Pending append and complete mode/type/blob comparison. No runtime planned or necessary for docs-only changes.
+OK (anchored on §§3–4): Niger adds72 lines (reviewed54-line body plus durable evidence/qualified peer closure); Malawi adds67. Both complete original prefixes remain exact. All 19172 nonowned mode/type/blob entries are exact against2e154; owned paths are only these two CONTENTS files and this ledger. No executable/config/test object changed. Git diff --check passes. No imports, payload opens, analysis, tests, API/hash census or other runtime were performed. Evidence/source/admission proofs are in the external1530-1190-country-notes-20261109 report namespace. Both issues remain open and source/form/policy questions stay held.
