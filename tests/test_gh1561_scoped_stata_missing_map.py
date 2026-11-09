@@ -1,5 +1,6 @@
 """Invented Stata-tag transport: normal decode plus one scoped native scan."""
 from copy import deepcopy
+import importlib.util
 import io
 from pathlib import Path
 from types import SimpleNamespace
@@ -230,10 +231,19 @@ def test_opt_in_adds_exactly_one_selected_native_scan(tmp_path, monkeypatch):
     assert calls[1] == {'columns': ['answer'], 'convert_missing': True, 'convert_categoricals': False, 'convert_dates': False}
 
 
+def _dat_pair(*args, **kwargs):
+    # Bind the existing pure fixture by this checkout's path; pytest's
+    # importlib mode does not expose a top-level test_dat_dct_reader module.
+    path = ROOT / 'tests/test_dat_dct_reader.py'
+    spec = importlib.util.spec_from_file_location('gh1561_existing_dat_fixture', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module._pair(*args, **kwargs)
+
+
 @pytest.mark.parametrize('option', [None, {}])
 def test_dat_dictionary_default_unchanged(tmp_path, option):
-    from test_dat_dct_reader import _pair
-    path = _pair(tmp_path, 'CLUST,POPUL,NAME\n101,2000,InventedA\n102,.,InventedB\n')
+    path = _dat_pair(tmp_path, 'CLUST,POPUL,NAME\n101,2000,InventedA\n102,.,InventedB\n')
     original = lt.get_dataframe(path)
     out = lt.get_dataframe(path, stata_missing_map=option)
     pd.testing.assert_frame_equal(out, original, check_exact=True)
@@ -244,8 +254,7 @@ def test_dat_dictionary_default_unchanged(tmp_path, option):
 
 
 def test_dat_dictionary_opted_mapping_refused_before_payload_reader(tmp_path, monkeypatch):
-    from test_dat_dct_reader import _pair
-    path = _pair(tmp_path, 'CLUST,POPUL,NAME\n101,2000,Invented\n')
+    path = _dat_pair(tmp_path, 'CLUST,POPUL,NAME\n101,2000,Invented\n')
     monkeypatch.setattr(lt, '_read_dat_with_dct', lambda *a, **k: pytest.fail('DAT payload decoder reached'))
     with pytest.raises(ValueError, match='only supported for Stata'):
         lt.get_dataframe(path, stata_missing_map={'POPUL': {'.d': 'Not applicable'}})
