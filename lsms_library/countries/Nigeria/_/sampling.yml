@@ -114,6 +114,22 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'CONTENTS.org, "Sub-samples: refresh and long panel", "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
+      cluster_id_measurement:
+        linked_households: 1454
+        households_changed: 54
+        clusters_renumbered: 1
+        note: |-
+          Historical measurement recorded 2026-11-04 (GH #1448), over the
+          GH #1264 interviewed-household crosswalk. Copied from the committed
+          panel note for this port; not remeasured or a current-accuracy claim.
+          households_changed includes movers and all other causes of change.
+          Net of movers is unknown: no settled count or mover rule is recorded
+          for this linked-household population. Earlier marker-dependent
+          measurements describe a different population and are not carried
+          forward.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'lsms_library/countries/Nigeria/_/sampling.yml at 79f5979cf8022e64928c5150950dfb00456994da, 2018Q3 panel.cluster_id_note and panel.locator (recorded 2026-11-04, GH #1448 over GH #1264 crosswalk); lsms_library/countries/Nigeria/_/CONTENTS.org at the same commit, "Panel crosswalk rebuilt" and "sampling.yml counts these links"'
 
   '2019Q1':
     panel:
@@ -145,6 +161,22 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'CONTENTS.org, "Sub-samples: long panel (1,590 -> 1,376) and refresh", "Panel crosswalk rebuilt"; re-measured 2026-11-04 over _/panel_ids.json through Country("Nigeria").sample()'
+      cluster_id_measurement:
+        linked_households: 4736
+        households_changed: 267
+        note: |-
+          Historical measurement recorded 2026-11-04 (GH #1448), over the
+          GH #1264 interviewed-household crosswalk. Copied from the committed
+          panel note for this port; not remeasured or a current-accuracy claim.
+          households_changed includes movers and all other causes of change.
+          The 12 EAs (112 households) on the covers and the 10 EAs with 88
+          linked households do not establish the one-to-one renumbering count;
+          clusters_renumbered remains unknown. Net of movers is also unknown:
+          no settled count or mover rule is recorded for this population.
+          Earlier counts and marker-dependent bounds are not carried forward.
+        source_type: derived-from-data
+        confidence: high
+        locator: 'lsms_library/countries/Nigeria/_/sampling.yml at 79f5979cf8022e64928c5150950dfb00456994da, 2023Q3 panel.cluster_id_note and panel.locator (recorded 2026-11-04, GH #1448 over GH #1264 crosswalk); lsms_library/countries/Nigeria/_/CONTENTS.org at the same commit, "Panel crosswalk rebuilt" and "sampling.yml counts these links"'
 
   '2024Q1':
     panel:
