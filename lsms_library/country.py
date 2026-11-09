@@ -9431,8 +9431,10 @@ def _probe_source(rel: str) -> bool:
     """Can the source at ``rel`` (relative to the countries root) be fetched now?
 
     FAST tiers only (``local_tools.source_fetchable_fast``): an untracked local
-    file, or the DVC sidecar plus its L1 blob -- no ``DVCFS.open`` streaming
-    and no World Bank download, and the file is not parsed.  Measured on a
+    file, or the DVC sidecar plus its L1 blob. After positively local cache-write
+    EACCES/EROFS only, remote metadata existence is also availability evidence,
+    not decode/rebuild proof. No ``DVCFS.open`` streaming or World Bank download
+    runs here, and the file is not parsed.  Measured on a
     first probe per process: 0.01 s for a sidecar whose blob is cached; ~1 s
     for a blob absent locally (one direct remote GET, whether it fetches or
     finds nothing -- 1.10 s / 1.04 s; bounded by ``_ensure_dvc_pulled``'s

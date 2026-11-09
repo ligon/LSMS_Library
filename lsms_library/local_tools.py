@@ -317,7 +317,37 @@ def _get_file_with_retry(fs, src: str, dst: str, *,
             sleep(base_delay * (2 ** attempt))
 
 
-def _ensure_dvc_pulled(fn) -> None:
+def _local_cache_write_denied(error, temporary_path=None) -> bool:
+    """Positive EACCES/EROFS evidence for a known local cache operation.
+
+    With a get_file error, only its primary failing filename naming the exact
+    local destination qualifies. A remote/absent/ambiguous filename does not.
+    Callers omit temporary_path only for direct local mkdir/rename operations.
+    """
+    if not isinstance(error, OSError) or error.errno not in (errno.EACCES, errno.EROFS):
+        return False
+    if temporary_path is None:
+        return True
+    if error.filename is None:
+        return False
+    try:
+        return os.path.abspath(os.fsdecode(error.filename)) == os.path.abspath(os.fspath(temporary_path))
+    except (TypeError, ValueError):
+        return False
+
+
+def _remote_md5_available(fs, source_keys) -> bool:
+    """Best-effort metadata only, on the two already-resolved DVC keys."""
+    for source in source_keys:
+        try:
+            if fs.exists(source):
+                return True
+        except Exception:  # availability probe only; no extra retry or decoder
+            continue
+    return False
+
+
+def _ensure_dvc_pulled(fn, *, _metadata_on_local_write_denied: bool = False) -> bool | None:
     """Best-effort warm of the local DVC cache for a tracked path.
 
     The hot path (cache hit) is two ``os.path.exists`` calls and a tiny
@@ -351,9 +381,10 @@ def _ensure_dvc_pulled(fn) -> None:
     which was a big improvement, but still paid the index walk cost
     on every miss.  The current bypass eliminates it.
 
-    Every error is swallowed.  This function is best-effort warming
-    glue; the caller's ``DVCFS.open`` streaming fallback handles any
-    failure to populate the cache.
+    Every operational error is swallowed. Ordinary callers retain the
+    best-effort/None warming contract and streaming fallback. Only the fast
+    heal probe opts into metadata availability after positively local
+    EACCES/EROFS: at most two exists checks, not proof of decoding/rebuilding.
     """
     try:
         # Try several interpretations of fn to find the .dvc sidecar.
@@ -468,16 +499,23 @@ def _ensure_dvc_pulled(fn) -> None:
         # blob concurrently (rare in practice; each contender wants a
         # different blob).
         dst = cache_layouts[0]
-        dst.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            dst.parent.mkdir(parents=True, exist_ok=True)
+        except OSError as error:
+            if _metadata_on_local_write_denied and _local_cache_write_denied(error):
+                return _remote_md5_available(fs, src_candidates)
+            raise
         tmp = dst.with_suffix(dst.suffix + f".tmp.{os.getpid()}")
         for src in src_candidates:
+            operation = 'fetch'
             try:
                 _get_file_with_retry(fs, src, str(tmp))
+                operation = 'rename'
                 tmp.rename(dst)
                 return
             except FileNotFoundError:
                 continue  # wrong layout -- try the other one
-            except Exception:  # noqa: BLE001
+            except Exception as error:  # noqa: BLE001
                 # Transient retries exhausted, or a non-transient remote / disk
                 # error (incl. aiohttp ClientPayloadError, not an OSError).
                 # Clean up any partial temp and fall through to the streaming
@@ -486,6 +524,9 @@ def _ensure_dvc_pulled(fn) -> None:
                     tmp.unlink()
                 except OSError:
                     pass
+                if (_metadata_on_local_write_denied
+                        and _local_cache_write_denied(error, None if operation == 'rename' else tmp)):
+                    return _remote_md5_available(fs, src_candidates)
                 continue
         # Both layouts missed -- the blob is genuinely not on the
         # remote.  Fall through to streaming fallback at the call site.
@@ -571,6 +612,9 @@ def source_fetchable_fast(path: str | Path) -> bool:
     """Can the source at absolute ``path`` be read from the FAST tiers -- an
     untracked local file, or the DVC sidecar plus its L1 blob (fetched into the
     blob cache under ``data_root()`` if absent, by ``_ensure_dvc_pulled``)?
+    After positively local cache-write EACCES/EROFS only, metadata existence on
+    either configured remote md5 key is also availability evidence. This does
+    not parse the source or prove a later rebuild will decode it successfully.
 
     Deliberately NOT the full ``get_dataframe`` chain: no ``DVCFS.open``
     streaming fallback (a sidecar-tree walk) and no World Bank download.  This
@@ -584,7 +628,9 @@ def source_fetchable_fast(path: str | Path) -> bool:
     if tier == "local":
         return True
     if tier == "dvc":
-        _ensure_dvc_pulled(path)
+        availability = _ensure_dvc_pulled(path, _metadata_on_local_write_denied=True)
+        if availability is not None:
+            return availability
         return _dvc_cache_path(path) is not None
     return False
 

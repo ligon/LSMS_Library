@@ -184,6 +184,23 @@ waves, using the existing read-gate policies. Finalization never writes back.
 Default/JSON/legacy failure policies, explicit `assume_cache_fresh`, and the
 existing wave-rebuild and guarded country-fallback evictions retain their scope.
 
+### Degraded sources with a read-only L1
+
+The once-per-source heal probe normally uses local files or cached DVC blobs,
+fetching an absent blob through the configured backend. If a **local** cache
+mkdir, temporary write or rename fails with `EACCES`/`EROFS`, that probe alone
+may check metadata existence on the same two configured remote md5 keys. It
+makes at most two existence calls, with no streaming, parsing, World Bank
+fallback or additional retry loop. A positive result is availability evidence,
+not proof that a rebuild can decode the source. The existing per-process probe
+memo and once-per-key rebuild limit still apply.
+
+Cached blobs and successful writable-cache fetches make no extra existence
+calls. Remote access failures, ambiguous error locations and unrelated IO
+errors do not trigger this fallback. Ordinary readers and cache warmers keep
+their best-effort behavior and their existing streaming fallback; there is no
+new user setting or shared-cache write policy.
+
 ## Cache Location
 
 All three tiers are under the user data directory:
