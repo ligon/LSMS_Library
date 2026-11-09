@@ -175,15 +175,18 @@ Tanzania, Uganda.
 Malawi and Nigeria were design **B** (per-wave `data_info.yml` wiring, cache
 parquet only) until #894. `Country._compute_panel_ids` still branches on which
 it got -- A returns a `dict`, B a `DataFrame` that `panel_ids(df)` converts --
-and for a country whose waves declare blocks, `LSMS_BUILD_BACKEND=make` still
-takes the B route from them. Malawi's `panel_ids.py` reads the same per-wave
+and both backends now read the existing JSON/parquet candidates first (GH #1468).
+When every candidate is absent, valid per-wave blocks retain the B fallback;
+runtime fallbacks never execute the offline crosswalk publishers. Malawi's
+`panel_ids.py` reads the same per-wave
 `panel_ids:` blocks (Pattern 1 above), builds the frame exactly as the YAML path
 did (`format_id` on both ids, source-file row order, which decides who keeps the
 bare id in a split), and calls `panel_ids(df)`; the dicts were verified equal to
 design B's. Nigeria's did too until #1264, which needed each round's own cover
 and an interview gate on a second file. A block can express neither, so Nigeria's
 blocks are gone and its script (Pattern 3) holds the wiring; leaving them would
-have made the make backend serve a different crosswalk from the committed one.
+have made the make backend serve a different crosswalk from the committed one
+before #1468 made both backends use the same source reader.
 `tests/test_panel_ids_persistence.py::DESIGN_B_PENDING` is now empty, so a
 *twelfth* country cannot pick a design by accident.
 

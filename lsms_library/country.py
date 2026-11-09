@@ -2317,6 +2317,11 @@ class Wave:
             parquet_fn = self._fresh_script_parquet(request, candidates)
 
             if parquet_fn is None:
+                # GH #1468: crosswalk publishers are maintainer tools, never
+                # runtime fallbacks. YAML-derived and readable cached maps
+                # retain their ordinary paths above.
+                if request in JSON_CACHE_METHODS:
+                    return result(pd.DataFrame(), 'missing')
                 makefile_path = self.file_path.parent /'_'/ "Makefile"
                 if not makefile_path.exists():
                     warnings.warn(f"Makefile not found in {makefile_path.parent}. Unable to generate required data.")
@@ -5532,6 +5537,11 @@ class Country:
             def result(value, produced=False):
                 return (value, produced) if _with_output else value
 
+            # GH #1468 / #914: committed crosswalks are sources. Neither a
+            # country nor a wave fallback may execute their offline publisher.
+            if method_name in JSON_CACHE_METHODS:
+                return result(None)
+
             base_path = self.file_path if wave is None else self[wave].file_path
             # Resolve the wave folder for path construction (e.g. '2008-09' -> '2008-15')
             wave_folder = self.wave_folder_map.get(wave, wave) if wave else None
@@ -6398,7 +6408,7 @@ class Country:
         has_data_scheme_entry = isinstance(data_scheme, dict) and data_scheme.get(method_name) is not None
 
         if not use_dvc and method_name in JSON_CACHE_METHODS:
-            df = load_from_waves(waves)
+            df = load_json_cache(method_name)
         else:
             try:
                 if use_dvc:
