@@ -5,6 +5,7 @@ properties and id_walk run unchanged. No native driver or data build is run.
 Ledger: malawi-compiler-declarations-20261028.md §§2–5.
 """
 import os
+import json
 from pathlib import Path
 import runpy
 
@@ -207,10 +208,22 @@ def test_declared_error_keeps_identity_cause_and_never_writes(compiler, variant,
 @pytest.mark.parametrize('empty', [(), (0, 2), (0, 1, 2, 3)])
 def test_healthy_and_declared_empty_frames_conserve_exact_native_output(compiler, empty):
     table, select, seed, run, frames, failure, reads, writes = compiler
-    _, discovered = select()
+    country, discovered = select()
     seed(discovered, empty)
     expected_paths = [f'../{obj.wave_folder}/_/{table}.parquet' for _, obj in discovered]
     expected = _expected(table, [frames[path] for path in expected_paths])
+    if table == 'livestock':
+        # GH1288 explicitly moves ONLY this compiler to post-walk country i.
+        # Supply a real committed-source fixture; other compiler contracts stay raw.
+        maps = {wave: {'cs-17-0007': 'canonical-7', 'canonical-7': 'earlier-7',
+                       '0012-003': 'canonical-12'} for wave in WAVES}
+        own = country.file_path / '_'
+        schema = json.loads((own / 'data_scheme.yml').read_text())
+        schema['Data Scheme'].update(panel_ids=None, updated_ids=None)
+        (own / 'data_scheme.yml').write_text(json.dumps(schema))
+        (own / 'panel_ids.json').write_text('{}')
+        (own / 'updated_ids.json').write_text(json.dumps(maps))
+        expected = local_tools.id_walk(expected, maps, state='raw')
     run()
     assert reads == expected_paths
     assert len(writes) == 1
@@ -218,7 +231,8 @@ def test_healthy_and_declared_empty_frames_conserve_exact_native_output(compiler
     assert writes[0].attrs == expected.attrs
     assert writes[0].index.is_unique
     # Exercise actual identity classification/substitution once on invented maps.
-    # The compiler itself must keep raw IDs and never walk them on its own.
+    # All other compilers keep raw IDs; livestock's approved country cache
+    # already carries the flag. Actual detection must not move it a second time.
     if len(expected) and table != 'community_prices':
         maps = {wave: {'cs-17-0007': 'canonical-7', 'canonical-7': 'earlier-7', '0012-003': 'canonical-12'} for wave in WAVES}
         walked = local_tools.id_walk(writes[0], maps)

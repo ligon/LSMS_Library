@@ -3498,3 +3498,24 @@ conversion or scientific default is selected; whole1529 remains open.
 
 Evidence: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1529-native3b3d-implementation-20261109/=;
 ledger =.coder/ledger/1529-niger-native3b3d.md= records exact scope and checks.
+
+* 2026-11-09 -- Livestock country-cache ID stage (GH #1288)
+
+Only the =_/livestock.py= country compiler now applies the existing single-pass
+=id_walk= to its complete native-ID frame BEFORE the unchanged =to_parquet=.
+The stored =id_converted= flag prevents a second API-time walk; the existing
+writer constructs the country index before full/subset/empty row selection.
+This follows CLAUDE's post-walk =i= convention for L2-country artifacts.
+Other Niger country compilers retain their existing raw-ID contracts.
+
+The earlier “whole-frame-finalizer unused-level failure” remains an actual
+historical failure, not a discarded result. Two invented parent cases reproduce
+the strict domain mismatch; the new two-country compiler/storage/selector
+controls pass all six strict pairs each, alongside the focused reader/ID tests.
+No new Niger raw/producer/API cohort was run for this change, so those earlier
+real cross-backend failures are not retroactively called fixed.
+
+No mapping/link, EXTENSION split-off, namespace guard, native row/value/quantity,
+weight or scientific rule changes. Full country-build ID errors now precede
+subset return; no invalid full-coverage artifact is accepted. Whole #1288 stays
+open. See =.coder/ledger/1288-livestock-compiler-walk.md=.
