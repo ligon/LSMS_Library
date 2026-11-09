@@ -120,3 +120,30 @@ Reproduction and machine-readable proofs: dispatch evidence
 `verify_docs_only.py`, `source-byte-proof.json`, `runtime-boundary.json`,
 `private-root-closure.json`, `farm-level-controls.log`/`.xml`, `api-audit.log`,
 `verification-plan.json` and `report.md`.
+### Current-stack wording qualification (2026-11-09)
+
+Root authorized a separate candidate on frozen GH1468 final
+`0bd646141b1a657ba483e94a4295dd82b8f74554`, ordinarily merged with reviewed
+GH1495 `2de6733ed931ce7808eae0ccfc69f4777f727555`. This is not a development
+or GitHub merge. The complete 19165-leaf merge is the disjoint mode/type/blob
+union; only the three1495 paths differ from the1468 parent.
+
+The global comment now says **household-level harvest records**, rather than
+an unqualified household harvest total. Mali's registered
+`harvest-from-dispositions` construction and separate `harvest-to-date` window
+remain unchanged. GH1437's latest comment6646862292 records Mali's half as
+completed by1515/ad44c8d46; the issue's open Burkina scope does not reopen the
+Mali decision. Finished/one-unit/no-recorded-quantity admission, mixed-pair
+refusals and unfinished-harvest window disclosure remain as documented, along
+with the seed/loss/state/unit caveats. The wording makes no new claim that a
+constructed sum is a complete physical or full-season harvest.
+
+This child changes only that explanatory comment and this ledger qualification.
+Full parsed YAML, every executable Python AST/assertion and all other source
+objects remain identical to the1468 parent, except the already reviewed1495
+test docstring and this task ledger. No data, scientific/default/weight,
+allocation, `_without_redundant_farm_level`, count or value rule changes.
+Historical0/627 and Ghana37,280 counts are not remeasured. No tests/source/API/
+hash census were replayed; the author12controls/API0 and independent static
+review stay qualified evidence. Root owns final doc carry, current metadata/
+API/CI, dependent PR publication and any development merge.

@@ -29,7 +29,7 @@ Single Index:
   # a harvest, or both.  It may hold a sale no plot can own
   # (Mali 2017-18 and 2021-22; Nigeria W3-W5; Niger 2014-15 and 2021-22; Tanzania;
   # Malawi; Ethiopia, GH #843 / #824 / #1457) or a harvest from a roster off
-  # the field grid (Mali's EAC-I trees, GH #1476), or a household harvest total
+  # the field grid (Mali's EAC-I trees, GH #1476), or household-level harvest records
   # (Mali 2021-22, GH #1437).  In a count of crop occurrences,
   # drop it where the household has a plot row of that crop and keep it where it
   # has none, because it is then the only record of the crop (GH #1469;
