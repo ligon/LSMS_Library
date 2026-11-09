@@ -18,4 +18,14 @@ OLD wavehash already resolved bare filename under wave/Data and found correctsid
 Two new source-free regressions only: actualscanner/sidecars plus actualprivatecollector, explicitly exposing Data-vs-script-relative distinction. OrdinaryprivateMAIN/cwd/PYTHONPATH/COUNTRIES identity, falsecredentials/unshare/thread1/2loadfile. ONE finalcandidate metadata census using unchanged acceptedoperator; compare against closed originalfb04-admittedmap and old8bed(fd86header)map; no baselinereplay/alloldcohort rerun. Sourceconservation and independentaddendumreview beforeROOTpublication.
 
 ## §6 Boundary/Phase3
-Focusedcontrols/metadata/addendumpeer pending. Existing2010focused5PASS+5fixtureFAIL thenaffected5PASS and original8bedproof retain exactheads; no freshwholebatch/native/API claim. ROOT owns finalcomposedreview/CI/publication; whole1288 remainsopen.
+Authorfocusedcontrols/metadata complete; independentaddendumpeer and finalconfiguredCI pending atthisfreeze. Existing2010focused5PASS+5fixtureFAIL thenaffected5PASS and original8bedproof retain exactheads; no freshwholebatch/native/API claim. ROOT owns finalcomposedreview/CI/publication; whole1288 remainsopen.
+
+
+## Phase3 — anchored author evidence
+OK (§2–§5): EXACT2getterargument folds; completefiletext/ASTinverse recovers8bed. BASE, defaultkwargs, PID→hh_b01 merge, allprocessing/provenance/writer byteexact. Old2010five-script/test/CONTENTS/helpers/schema/sidecars unchanged;3ownedaddendumpaths/19182othermode-type-blob objects exact8bed.
+
+Only2new source-free controls executed onbf50de8a85a18d072dfe39fc80b28a69f90a16a0:2PASS0fail/error/skip,13.65s/outer0;3controller-worker MAIN/source/countries/privateDATA identities verified. Actualscanner/sidecar and existingprivatecollector controls, with unchangedcompiler missingmarker retained. Data/config0files. No oldcohort/native/API/source replay.
+
+ONE finalcandidate metadata census onbf50 CLOSED0/124.66s, sourceclean, emptyprivate data/config/errors0/denials0. Full38/450/1895/35/186 compare: versusclosed8bed(fd86header)22table+22wave ONLYMalawi2013;2010wavehashes exact. Versusoriginalfb04-admittedclosed6emap22table+44wave(22each2010/2013).0BTF/FIF; exactkeysets/public/registration/overrides/collectorclosure/18None/allotherfields. Thisis conservativewave-script bodyhash impact, NOT newlymissing sourcehash; oldbareData-relative sourcehashes alreadycorrect. Nobaselinereplay/exclusion/sharedrewarm.
+
+Finalledger-onlychild preserves EVERY nonledger object exactlybf50, original8bed/2010evidence remains immutable with split5scannerPASS+5fixtureFAIL→affected5PASS qualification. No actualfreshbatch producer/APIparityclaim. Independentaddendumreview+ROOTcomposedreview/configuredCI release gates remain; no further scope expansion. Packet B/reports/1288-malawi-2013-anthropometry-source-addendum-20261109.
