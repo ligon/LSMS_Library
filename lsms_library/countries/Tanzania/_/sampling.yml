@@ -51,6 +51,27 @@ Sampling:
       confidence: medium
       source_file: 'lsms_library/countries/Tanzania/2008-15/Data/upd4_hh_a.dta'
       locator: 'clusterid by (UPHI, round), round 2 vs round 3; CONTENTS.org "Cluster id renumbering at round 3 (GH #942)"'
+      cluster_id_measurement:
+        linked_households: 2904
+        households_changed: 591
+        clusters_renumbered: 82
+        note: |-
+          Historical measurement recorded 2026-10-19, ported without
+          remeasurement: 591 of 2,904 linked households changed `v`, in
+          82 one-to-one cluster pairs (82 of 409 clusters). CONTENTS.org
+          identifies whole-cluster renumbering rather than mover tracking,
+          but no movement classification was applied, so no net-of-movers
+          count is recorded. The raw tracking-line figures (1,565 of 7,082,
+          83 pairs) describe a different layer, not this denominator.
+        source_type: derived-from-data
+        confidence: high
+        locator: >-
+          lsms_library/countries/Tanzania/_/sampling.yml@79f5979cf8022e64928c5150950dfb00456994da,
+          2012-13 panel.cluster_id_note; same country's CONTENTS.org,
+          "Cluster id renumbering at round 3 (GH #942)" (measured 2026-10-19
+          through Country("Tanzania").sample()); GH #1135 H3 table
+          (2,904 linked, 591 change), preserved in reviewed source
+          f1cf7d06f30367cd1e34a4b3db4012f951b2e497.
 
   '2014-15':
     panel:
@@ -70,6 +91,33 @@ Sampling:
       confidence: medium
       source_file: null
       locator: 're-measured 2026-10-19 through Country("Tanzania").sample(); CONTENTS.org "Cluster id renumbering at round 3 (GH #942)"'
+      cluster_id_measurement:
+        linked_households: 521
+        households_changed: 108
+        clusters_renumbered: 35
+        note: |-
+          Historical counts recorded 2026-10-19, with the strict-ID oracle
+          count recorded 2026-10-23; ported without remeasurement. Of 556
+          linked households, 521 had `v` on both sides: 413 kept it and
+          108 changed. These changes mixed 12 round-3 clusters returning
+          to their round-2 id (58 households), 10 households in 8 clusters
+          taking new-format ids, and 35 linked to refresh-sample ids.
+          That refresh linkage was itself unverified because rounds 3
+          and 4 reuse r_hhid strings. The reviewed strict-ID oracle counted
+          35 of 57 earlier ids as one-to-one renumberings; the other 22
+          split. This partly unverified linkage warrants medium confidence.
+          No net-of-movers count is recorded.
+        source_type: derived-from-data
+        confidence: medium
+        locator: >-
+          lsms_library/countries/Tanzania/_/sampling.yml@79f5979cf8022e64928c5150950dfb00456994da,
+          2014-15 panel.cluster_id_note (re-measured 2026-10-19 through
+          Country("Tanzania").sample()); same country's CONTENTS.org,
+          "Cluster id renumbering at round 3 (GH #942)"; GH #1135 H3 table
+          (521 linked, 108 change); historical clusters_renumbered:
+          slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json
+          (strict_k, Tanzania 2012-13->2014-15, measured 2026-10-23),
+          preserved in reviewed source f1cf7d06f30367cd1e34a4b3db4012f951b2e497.
 
   '2019-20':
     panel:
@@ -89,6 +137,33 @@ Sampling:
       confidence: high
       source_file: null
       locator: 'CONTENTS.org, "The cluster key of cluster_features" (scheme table); slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org §2.5; re-measured 2026-10-19 through Country("Tanzania").sample()'
+      cluster_id_measurement:
+        linked_households: 849
+        households_changed: 849
+        not_applicable: [clusters_renumbered]
+        note: |-
+          Historical measurement recorded 2026-10-19, ported without
+          remeasurement: 907 households linked, 849 with `v` on both sides,
+          and none kept `v`. NPS-SDD changed every id's layout from 8 to
+          9 characters; movement made the old-to-new relation many-to-many.
+          The reviewed 2026-10-23 strict-ID oracle's incidental one-to-one
+          pairs do not describe this whole-layout change, so the renumbering
+          count is not applicable. The historical 849 include movers; no
+          net-of-movers count is recorded. These counts are not a new
+          measurement after GH #1441; the existing boundary note retains
+          its later 300-pair / 130-branching-ID qualification.
+        source_type: derived-from-data
+        confidence: high
+        locator: >-
+          lsms_library/countries/Tanzania/_/sampling.yml@79f5979cf8022e64928c5150950dfb00456994da,
+          2019-20 panel.cluster_id_note (re-measured 2026-10-19 through
+          Country("Tanzania").sample()); same country's CONTENTS.org,
+          "The cluster key of cluster_features" (scheme table);
+          slurm_logs/2026-09-18_gh942_cluster_identity/DESIGN.org section 2.5;
+          GH #1135 H3 table (849 linked, 849 change); historical one-to-one
+          qualification: slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json
+          (strict_k, Tanzania 2014-15->2019-20, measured 2026-10-23),
+          preserved in reviewed source f1cf7d06f30367cd1e34a4b3db4012f951b2e497.
 
   '2020-21':
     panel:
