@@ -114,12 +114,16 @@ only; no actual table/API/getter/build. **452/452 country-table, 1885/1903 wave,
 Broad harmonized-cache invalidation disclosed; no rewarm/exclusion/schema bump.
 Candidate map SHA256616632e39e5f95c00f6d261a395f377768a0081a161e061330aee388c1ab0ef6.
 
-One infrastructure preparation issue is retained: a detached controller did not
-survive its launching shell, with empty controller log and no hash.log/receipt/
-map. The existing operator opens hash.log BEFORE spawning its collector, proving
-no collector invocation occurred there. The same frozen operator then ran once
-in a tracked foreground session. No failed behavioral test/census assertion,
-source revision, weakened guard, passed-case replay or automatic rerun occurred.
+Infrastructure launch evidence is qualified: detached launch returned PID3533143;
+a later ps result had no row, its controller log was empty and hash.log/receipt/
+map were absent at that checkpoint. No terminal return code or exit cause was
+recorded, so these observations do not establish why it stopped. Both launches
+used the SAME evidence/hash.log exclusive-x path, opened BEFORE spawning the
+collector; the file was never removed. This establishes at most one collector
+start even if a delayed controller later resumes. The tracked foreground
+controller and actual collector closed0. Original empty log/preflight preserved;
+no further runtime/census was launched. No failed behavioral test/census assertion,
+source revision, weakened guard or passed-case replay occurred.
 
 Limits: eligibility is demonstrated on invented default/profile/static metadata,
 not actual operator credentials. Unknown/refreshing/proxied/unsupported routes
