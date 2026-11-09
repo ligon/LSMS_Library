@@ -3379,3 +3379,42 @@ comparison or agronomic decline is established. "Only the harvest is ruled"
 and the own sold-kg ONE-UML/TOTAL disagreement remain in force. Whole GH
 #1530 remains open; the finite residual is own16A inclusion and executed
 collection/export handling, not a demonstrated crop decoder or mapper defect.
+
+* 2026-11-09 -- Recorded onion planting months and module provenance (GH #1554)
+
+Bounded own-source diagnosis =a7536cfa330e16c6330f2107234ab324ebead2aa=,
+independently reviewed; no producer/API run or season reassignment. Raw 2011-12
+2E has 81 onion occurrences (79 households), versus 70 positive-quantity rows
+(68 households); raw 3E has 105 (103 households), versus 103 positive rows
+(101 households). Equal crop names do not identify a season or duplicate.
+
+All 81 2E onion occurrences link to exactly one own 2B record on the SIX released
+coordinates: =hid, grappe, menage, field, parcel, crop=. First planting month
+is June on 34, July on 31, August on 12, March on three and May on one: 77/81
+are June--August. This is not a household-only date attachment. Across ALL
+12,091 2E rows, 108 have no 2B candidate and 29 have two; no answer is selected
+for an ambiguous key. The full 2B source retains its 99 onion occurrences.
+
+Own =ECVMA_Quest_AGR_P1_V10_eng.pdf=, PDF p.19/printed p.18, 2B.11 asks first
+planting MONTH, not year/day; 2B.7 is pure/mixed cultivation, not irrigation.
+Own =ECVMA_Quest_AGR_P2_V10_eng.pdf=, PDF p.11, 2E.4/7 asks rainy-season parcel
+work and plot harvest, not planting/harvest dates. All 81 onion rows answer
+Yes to 2E.4. P1 PDF p.28/printed p.27, 3E.4/5 records first-sowing month/year
+and weeks to harvest, not an observed calendar harvest date. Dry onion sowing
+answers span January 2010--July 2011; earlier sowing can precede harvest within
+the named December 2010--May 2011 window. No day or harvest date is imputed.
+The P1 cover says English is for convenience and French was administered;
+the held English/source-label first-cycle-versus-average conflict remains.
+
+The own household source joins uniquely on =(hid, grappe, menage)=: 69 of 70
+positive rainy onion occurrences are in Agadez (67 households), one in Diffa.
+The Agadez household zone is =Pastorale=; neither region nor that household
+classification establishes a plot's irrigation or season. Two unmatched
+non-onion harvest rows remain retained. Dry onions span all eight regions.
+
+This qualifies the earlier "Filter plot_id != 'Farm-level' for the same season":
+that filter identifies 2E provenance, not verified calendar timing. Retain the
+recorded modules, quantities, IDs, weights and existing #1462 cycle rule.
+Administered French wording and export/window handling remain unresolved;
+#1529 crop-cycle area and #1560/#1571 sold-kg/window/state holds are unchanged.
+No crop-name, region or Farm-level rule can reassign these sources.
