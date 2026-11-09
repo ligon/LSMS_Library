@@ -62,8 +62,13 @@ def test_private_make_input_collection_sees_real_sources(table, relative_sources
         MetadataOnly(), table, _with_sources=True)
     expected = {WAVE / 'Data/Full_Sample' / name for name in relative_sources}
     extra = {WAVE / '_/ag_mod_d.dta'} if table == 'plot_labor' else set()
-    assert sources == expected | extra
+    # The unchanged country compiler's f-string contributes this literal
+    # suffix too. Keep that existing metadata marker, without treating it as
+    # an authenticated raw source or altering the scanner.
+    compiler_fragment = Path(f'/_/{table}.parquet')
+    assert sources == expected | extra | {compiler_fragment}
     # Correct wave literals are already authenticated in the existing wave
     # hash. Preserve the harmless old provenance literal's missing marker.
-    assert record == {'tables': {}, 'sources': {
-        str(path): 'missing:ag_mod_d.dta' for path in extra}}
+    expected_markers = {str(path): 'missing:ag_mod_d.dta' for path in extra}
+    expected_markers[str(compiler_fragment)] = f'missing:{table}.parquet'
+    assert record == {'tables': {}, 'sources': expected_markers}
