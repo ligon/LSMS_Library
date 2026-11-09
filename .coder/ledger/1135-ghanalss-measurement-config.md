@@ -18,10 +18,10 @@ not a new measurement or a runtime/scientific acceptance of GH #1135.
 |---|---|---|
 | `GhanaLSS/_/sampling.yml:17–33` | Rotating-panel, wave-scoped boundary; 712 linked households and 79 bijective cluster pairs in `cluster_id_note` | Reuse committed historical facts; preserve every existing byte |
 | `GhanaLSS/_/CONTENTS.org:389–418` | Cluster numbering; dated 2026-10-19 measurement and lower-bound caveat | Read all 5,856 lines before config editing, including TODO vocabulary and all dated notes; no separate LOGBOOK/WAITING body |
-| `GhanaLSS/_/CONTENTS.org:1193–1211` | PANELC person-to-household linkage: 714 households; rotation by design | Keep the distinct historical linkage population; do not substitute it for the measurement denominator |
+| `GhanaLSS/_/CONTENTS.org:1192–1211` | PANELC person-to-household linkage: 714 households; rotation by design | Keep the distinct historical linkage population; do not substitute it for the measurement denominator |
 | `lsms_library/sampling.py:201–205` | Base panel field allow-list lacks `cluster_id_measurement` | Deliberate interim mismatch; coordinator owns the shared schema/tests |
 | Frozen `APPROVED-SCHEMA.md:1–9` | Approved count names, provenance, omissions and country corrections | Reuse verbatim contract; Nigeria/Tanzania corrections binding but outside this country's edit |
-| Frozen `reviewed-sampling.py.txt:209–260,722–831` | Count meanings, allowed fields, coherence and provenance | Read-only source, never imported/executed; names `tests/test_sampling.py`, but no tests run here |
+| Frozen `reviewed-sampling.py.txt:209–260,717–828` | Count meanings, allowed fields, coherence and provenance | Read-only source, never imported/executed; names `tests/test_sampling.py`, but no tests run here |
 | Frozen `COUNTRY-INPUT.json` | One assigned old record, reviewed source `f1cf7d06f30367cd1e34a4b3db4012f951b2e497` | Reuse literals 712 / 712 / 79 and derived-from-data / high provenance; dated own locators |
 
 Frozen assets live under `$ISA_CONTEXT_ROOT`; their exact paths and SHA256
@@ -46,7 +46,7 @@ GLSS1 to GLSS2 and *none* keeps its =v=” and “The 79 is a *lower bound* on t
 retained workloads”. Preserve the workload/EA distinction; never infer ~88
 or the survey's design PSU counts as K.
 
-Quoted historical tension: CONTENTS.org:1198–1200 says “Deduplicating to
+Quoted historical tension: CONTENTS.org:1198–1199 says “Deduplicating to
 household level yields 714 panel households.” Its 2026-10-19 cluster section
 instead records 712 sample-linked households. The frozen definition uses
 the with-`v` sample population, and the current boundary note already uses
@@ -93,6 +93,32 @@ no human approval prompt or external messages.
 
 ### Phase 3 — verification
 
-UNFINISHED: initial ledger only. Base/config/docs identity checks passed;
-config insertion, byte-removal proof, all-other-object proof and private
-publication remain pending. No runtime/test acceptance is claimed.
+- OK (§2/§5): the single 1988-89 record copies all three assigned literals,
+  712 / 712 / 79, with `derived-from-data` / `high` and dated own-file
+  locators. Config-only commit:
+  `30ae409dfe51be10c632748fc85893e60eae18d7`; initial ledger-only commit:
+  `a8a90346af7e5c95bbe06be7ee3eda31b72635ba`.
+- OK (§3): the note explicitly says historical 2026-10-19, ported without
+  remeasurement. The 79 remains a linked-ID lower bound, not a design count.
+  The 714 PANELC statement is preserved; no cause of the 714/712 difference
+  is inferred, and no new authority contradicting the assigned field was
+  established.
+- OK (§4): unknown net-of-movers count, mover rule and `not_applicable` are
+  absent. Plain-decimal spelling and static K <= D <= N coherence pass;
+  field names and provenance values match the frozen source's AST constants.
+  The frozen source is never imported or executed.
+- OK (§4/§5): removing only the new 15-line block (config lines 30–44)
+  reproduces the original 4,746 bytes exactly, SHA256
+  `c12793f8640372b80a42c561fb15b5b3161852c5eb8be6cf8bf5e1db4ee33f92`.
+  Every current nonmeasurement byte is preserved. All 19,247 nonowned
+  recursive tracked entries have the base's identical mode/type/object ID;
+  CONTENTS.org and shared code/tests/other countries stay exact.
+- OK (§4): `git diff --check` passes. Source-only proof and reviewable
+  nonowned-object manifest are in the dispatch evidence directory, alongside
+  the five canonical reports and the stdlib `verify-source.py` recipe.
+  Evidence is external to the tracked tree.
+- UNRUN (§4/§6): package/parser/tests/data/API/build/cache/network gates.
+  Base schema rejection of this new field is deliberate coordinator staging;
+  this verifies a source-only metadata port, not runtime behavior, current
+  scientific accuracy or full issue closure. Private publication is recorded
+  separately in the dispatch report after the final ledger-only commit.
