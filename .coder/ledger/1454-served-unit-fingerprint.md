@@ -1,7 +1,7 @@
 # Prior-Art Ledger — GH1454 served-unit build dependency
 
 **Source:**11714b185fe2c90f1bc6c60164aa40d358acf0f3. Search tier: git/ripgrep/AST floor.
-**State:** design/proposed source-only repair; no source builds or census.
+**State:** approved repair frozen/tested at f450039e813eca991f5845e9c3f55128c8fa3736; independent review/release pending. No source builds or census.
 
 ## §1 Task
 Version the categorical mapper actually baked into EHCVM sized-unit parquets by
@@ -53,4 +53,27 @@ No scientific/default decision needed. ROOT reviews proposed source/test diff
 and anticipated scope before expensive full metadata census or release work.
 
 ## Phase3
-Pending. Source-only design; no tests/imports/builds/census executed yet.
+- **OK (§2–§5):** country-module delegation reaches the unchanged mapper and
+  `_augment_numeric_code_keys`/`_categorical_key_column` through existing resolver.
+  Existing Country AST is exact after removing only the new helper; other EHCVM
+  executable AST is exact after inverting only its local import/call.
+- **OK (§4):** six new pure controls PASS/0skip at f450, 15.590s wrapper.
+  Semantic mapper-source mutation moves the EHCVM import fingerprint; unrelated
+  script closure and food/sample global fingerprints stay exact. Post-read
+  finalizer-source mutation stays outside that EHCVM closure. Delegation/probe/
+  sized-bare-null values, dtypes, attrs, empty behavior and inputs are preserved.
+- **OK (§2/§4):**150 unchanged companions PASS/0skip in17.13s pytest,
+  23.578s wrapper: selected EHCVM size/hook/wiring controls, hermetic key resolver
+  and12 pure registry controls. Omitted derived API dispatch and real-Country
+  hash-grid fixtures. This is not raw-source/API/build/census evidence.
+- Both runs used MAIN/private roots/unshare/threads1/n2loadfile, exact package
+  and countries-root identities; source clean/datafiles0. Import created a
+  private config/s3_creds placeholder; configuration is not claimed empty.
+- Registry/schema/config and all scientific/default rules unchanged. No new
+  global transform tag/exclusion or schema bump. Complete actual hash impact
+  UNMEASURED; existing whole-wave/country aggregation may broaden invalidation
+  within countries importing the EHCVM path. ROOT owns further review/census.
+- Receipts: reports/1454-served-unit-fingerprint-proposal-20261109 under the
+  durable isa-sm-20261103 burst root, six-v1 and companions-v1. No failed runtime
+  attempts; an initial source-edit assertion was corrected before execution
+  without changing other Country imports or running tests on partial edits.
