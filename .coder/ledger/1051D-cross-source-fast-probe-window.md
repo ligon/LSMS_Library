@@ -135,3 +135,54 @@ shared-cache build or country config/scientific changes. ROOT patch review,
 independent peer, configured CI, integration/publication/merge remain pending;
 whole1051 is not closed. Evidence: supplied dispatch evidence directory, five
 mandatory owned regular0600 files plus source/plan/logXML/map/inverse receipts.
+
+## R1 correction — checkpoint before implementation (UNFINISHED / UNRUN)
+
+ROOT authorizes only the snapshot/prune ownership-transition defect family.
+Current source is dcb02ccbd35a89718ab9a85c35cdb221dfaad9c4, the ordinary
+whole-object composition of current development20c85655 and original D e52fa5c9.
+Original4390/e52, the 114PASS receipt and original census, and independent R1
+1FAIL remain immutable history. The original control asset SHA256
+5842b5f11b1f09464f04e412b219efdb0dc748ac801a6d7e431daad6683ebf51 is unchanged.
+The earlier generations/resources OK statement above did not cover R1's
+between-lock publication schedule; it is historical, not new acceptance.
+
+Read ROOT-DECISION, R1-REPORT, exact R1-ORIGINAL-CONTROL, actual AGENTS/CLAUDE
+(same file), shared prior-art-ledger skill, STANDING and this existing ledger.
+Search tier: git + ripgrep/AST; GitNexus unavailable. `make api-audit` cannot
+start because poetry is absent; skill descriptions inspected directly. No
+country scope: no country edit, fixture, actual Country/Feature or data API.
+
+Repair plan: select may prune only entries present in its validated snapshot;
+entries published afterward survive unless a separate existing owner/options
+invalidation applies. Keep the full old snapshot AND full live list strongly
+owned until mutex exit, including owner/options replacement. Inspect reset,
+clear, publish expiry, cap and fork transitions for the same lifetime risk;
+retain old owner references too. No explicit close, IO, sleep or finalizer
+under the mutex. B+C1, fixed internal5s/max16, default nonrefreshing profile,
+source bool memo, ordinary warmers, C HEAD and A/B/E policies stay binding.
+Only private local_tools window helpers, focused permanent tests and this
+ledger may change; preserve all original tests/assertions and public bytes.
+
+Frozen-control plan: use the original deterministic two-thread schedule and
+real publish/select with invented metadata leaves. ROOT explicitly corrects
+the discard guard: after select the concurrent entry is retained, weakref alive
+and events=[]; explicit outside-lock reset then weakref dead/events=[False].
+The original failed artifact is never edited. W/interpreter context rebindings
+will be disclosed. Add lock/expiry/eviction/owner-change lifetime controls.
+Freeze exact product/tests/selection/oracles/diff BEFORE ONE focused cohort,
+including only relevant existing D resource-boundary controls, no bulk114 or
+historical selections, and preserve any new failure without automatic retry.
+Ordinary pytest: all DIAG_* exports absent controller/workers; private roots
+and absent creds before import; prepared interpreter/own cwd/PYTHONPATH/config
+realpath assertions; unshare-rn, two loadfile workers, BLAS/OMP/MKL/build1;
+unconditional integrity and cleanup, file logs. No network/raw/native/SDK IO.
+
+After focused close, ONE final corrected COMBINED metadata census using the
+existing collector/runner, permitted context substitutions with exact inverse
+and all guards. Compare all maps/keysets/nonhash/18None/errors/denials against
+closed E SHA6618775057aaadf6f47ba4a584aed3ccd2acd6d479b44a573a447dc8490b312c,
+original header7384234791251cd33352c4df0f35a823a9fbc482; no baseline replay.
+One tracked foreground handle and fresh owned0700 empty private roots. Final
+ledger-only child preserves all tested/censused nonledger bytes. ROOT source,
+independent peer, CI and integration/merge gates remain; no self-review.
