@@ -68,9 +68,10 @@ not a newly executed package-import assertion.
 
 The charter's explicit “OWNED paths ONLY” names this ledger, while its later
 FIRSTNEW instruction names `709-threshold-correction-remote-task.md`. Recorded
-the conflict in the absolute shared `QUESTIONS_FROM_AGENT.txt`; absent contrary
-steering, use this explicitly owned path and do not create the unowned alias.
-The charter already authorizes proceeding after surfacing this ledger checkpoint;
+the conflict in the absolute shared `QUESTIONS_FROM_AGENT.txt`. Coordinator
+steering on 2026-11-09 UTC confirms this owned path and identifies the generic
+remote-task suffix as a template mismatch; no second ledger or scope change.
+The charter already authorizes proceeding after surfacing the ledger checkpoint;
 no further routine approval is needed. No open scientific question is introduced.
 
 ### Phase 3 — verification
@@ -110,5 +111,5 @@ This is the separate final ledger qualification. Final-head byte/object checks
 and exact command exits are recorded in external dispatch evidence
 `source-byte-proof.json`, `verification-plan.json` and `report.md`; the immutable
 document-stage pass is retained in `document-static.json`. Shared steering was
-read at checkpoints and provided no contrary filename instruction; the explicit
-owned ledger path was retained, with no unowned alias created.
+read at checkpoints and explicitly confirmed the owned ledger path, with no
+unowned alias created. The filename question is resolved.
