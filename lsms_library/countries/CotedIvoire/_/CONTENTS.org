@@ -1095,3 +1095,47 @@ No sample, strata, native labels, weights, schema or defaults change.
 No new download, PDF parse, microdata read or source/table campaign was
 needed for this holding; the earlier document-check evidence is reused.
 See =.coder/ledger/1575-three-public-bids-managed-ingestion.md=.
+
+* 2026-11-09 -- scoped Stata =.d= transport for shocks (GH #1561)
+
+Only the existing 2018-19 =Menage/s14_me_CIV2018.dta= declaration opts
+into =stata_missing_map=. On =s14q04a/b/c/e/f= only, typed Stata =.d=
+becomes the existing =Non-concerné= dictionary key, then False. Ordinary
+missing and other tags remain unknown. This does not alter d (livestock),
+the six-column layout, coping answers, selectors or the unresolved #1562
+order interpretation. The earlier field-label/layout conflict remains.
+
+The actual own file is format 118 with byte storage on these fields. Each
+field's own value-label set associates =.d= with =Non concerné= (long
+value-label key 2147483625). Recognition uses the reader's typed tag,
+not that storage integer. Current measured =.d= cells are:
+
+| source field | effect | =.d= cells |
+|--------------+--------+------------|
+| s14q04a | AffectedIncome | 904 |
+| s14q04b | AffectedAssets | 1724 |
+| s14q04c | AffectedProduction | 3440 |
+| s14q04e | AffectedFoodStock | 2516 |
+| s14q04f | AffectedConsumption | 1820 |
+
+The bounded check retains all 285,824 declared Wave rows, with unique,
+nonmissing full keys. Each effect retains 272,046 ordinary-missing cells
+at that boundary. Existing =to_parquet= converts object carriers to
+strings with their missing masks preserved; the ordinary public finalizer
+then returns nullable booleans. This existing carrier behavior is unchanged.
+Country and singleton Feature each returned 13,778 rows under their existing
+post-read pipeline, with no further raw reads. This is not a baseline public
+row-count comparison or a new occurrence/eligibility rule.
+
+The opt-in costs one additional selected-column native scan; the normal
+finite-value/label/encoding decoder is reused. The actual check used four
+full row reads total; a later two-produced-frame comparison and public warm
+checks used zero more. Expected carrier/public comparisons reuse the
+unchanged writer, normalizer and finalizer, rather than independently
+validating those helpers. Both earlier harness failures remain recorded.
+
+Shared reader fingerprints move broadly; no schema bump, exclusion or
+shared rewarm is applied. Other countries/waves and unfinished 2021-22
+wiring gain no opt-in. Evidence and exact source/read limits are in
+=.coder/ledger/1561-scoped-stata-missing-map.md= and
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1561-scoped-stata-missing-map-20261109-revision-v2/=.
