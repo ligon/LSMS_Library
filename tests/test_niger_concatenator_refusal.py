@@ -32,6 +32,7 @@ the defect ("DID NOT RAISE": the other waves were served).
 from __future__ import annotations
 
 import os
+from pathlib import Path
 import runpy
 import shutil
 import subprocess
@@ -253,15 +254,26 @@ def niger_tree(tmp_path, monkeypatch):
     countries_root.cache_clear()
     data_root.cache_clear()
 
-    def install(table, failing=None):
+    def install(table, failing=None, *, trace=False):
         index, column = TABLES[table]
         (build / 'data_scheme.yml').write_text(
             SCHEME.format(table=table, index=', '.join(index), column=column))
         shutil.copy2(SOURCE / '_' / f'{table}.py', build / f'{table}.py')
         for w in WAVES:
             fail = "raise SystemExit('injected wave failure')" if w == failing else ''
-            (root / 'Niger' / w / '_' / f'{table}.py').write_text(
-                SCRIPT.format(fail=fail, index=index, column=column, table=table))
+            script = SCRIPT.format(fail=fail, index=index, column=column, table=table)
+            if trace:
+                # Optional finite evidence outside the disposable transaction;
+                # default fixture users retain the original script unchanged.
+                start = (f"with open({str(tmp_path / 'native-preparation.log')!r}, 'a') as log:\n"
+                         "    log.write(w + ':start\\n')\n")
+                done = (f"with open({str(tmp_path / 'native-preparation.log')!r}, 'a') as log:\n"
+                        "    log.write(w + ':done\\n')\n")
+                script = script.replace('w = Path.cwd().parent.name\n',
+                                        'w = Path.cwd().parent.name\n' + start)
+                script += done
+            (root / 'Niger' / w / '_' / f'{table}.py').write_text(script)
+        install.trace_path = tmp_path / 'native-preparation.log'
         return Country('Niger')
 
     try:
@@ -274,21 +286,24 @@ def niger_tree(tmp_path, monkeypatch):
 @pytest.mark.parametrize('table', NAMES)
 def test_make_backend_refuses_instead_of_serving_the_other_waves(niger_tree, capfd, table):
     """Before: the three good waves came back, 2018-19 silently absent."""
-    c = niger_tree(table, failing='2018-19')
-    # GH #1288: a genuine failed country recipe is terminal before the Python
-    # concatenator fallback. Its missing-wave refusal is tested separately.
+    c = niger_tree(table, failing='2018-19', trace=True)
+    # Native preparation now precedes the country recipe. Its original nonzero
+    # cause must stop the transaction before either a compiler or live write.
+    before = {str(p): p.read_bytes() for p in data_root().glob(f'Niger/*/_/{table}.parquet')}
+    assert before == {}
     with warnings.catch_warnings(record=True) as seen:
         warnings.simplefilter('always')
-        with pytest.raises(RuntimeError, match=f'Make build failed for Niger/{table}') as caught:
+        with pytest.raises(subprocess.CalledProcessError) as caught:
             getattr(c, table)()
-    assert isinstance(caught.value.__cause__, subprocess.CalledProcessError)
-    assert caught.value.__cause__.returncode == 2
+    assert caught.value.returncode == 1
+    assert Path(caught.value.cmd[-1]) == Path(c.file_path) / '2018-19' / '_' / f'{table}.py'
     assert not any('Python fallback' in str(w.message) for w in seen)
     err = capfd.readouterr().err
-    assert 'injected wave failure' in err, f'{table}: recipe diagnostic not seen'
-    # Not vacuous: the waves before the failed one did build.
-    built = sorted(p.parent.parent.name for p in data_root().glob(f'Niger/*/_/{table}.parquet'))
-    assert built == ['2011-12', '2014-15'], f'{table}: wave parquets {built}'
+    assert 'injected wave failure' in err, f'{table}: native diagnostic not seen'
+    # Prior native work happened privately, not by mutating live wave caches.
+    assert niger_tree.trace_path.read_text().splitlines() == [
+        '2011-12:start', '2011-12:done', '2014-15:start', '2014-15:done', '2018-19:start']
+    assert {str(p): p.read_bytes() for p in data_root().glob(f'Niger/*/_/{table}.parquet')} == before
     assert not (data_root() / 'Niger' / 'var' / f'{table}.parquet').exists()
 
 
