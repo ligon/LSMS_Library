@@ -57,6 +57,9 @@ lacks the new schema. Source text and byte proofs are the only allowed checks.
   Last two are the 2026-10-19 measurements. The supplied 2026-10-23 notes
   also record 65/212 and 576/788 one-to-one pairs; these stay qualified
   prose, not K, and their original historical locators are retained.
+  The cited historical `slurm_logs/isa_backlog_2026-10-21/1135-measurement-record/oracle.json`
+  is not tracked here; those statements are carried from the supplied reviewed
+  record, not independently authenticated by reading or rerunning that oracle.
 
 ## §4 Invariants & assumptions
 
@@ -109,7 +112,32 @@ at checkpoints; no human approval or new agent is requested.
 
 ### Phase 3 — verification
 
-UNFINISHED: ledger-grounding checkpoint only. Exact base/config/document/input
-bindings checked with stdlib text and Git. Configuration insertion, count-text
-checks, removable-block proof, nonowned Git object proof and publication remain
-pending. No numerical measurement or runtime/test result is asserted.
+Source-only implementation and static verification complete. Grounding ledger
+commit `b8cda57e0f9251b833185812c1c615d5d7dfb2d4` precedes configuration-only
+commit `1964039a1182fa1a017458addbdbaee024b58be4`; this update is separate.
+
+- **OK (§2/§3):** four inserted records match the supplied decimal N/D
+  literals; keys/provenance match the frozen source's AST constants. All K
+  values are not applicable; unknown net counts and mover rules are omitted.
+- **OK (§4):** removing only the four inserted blocks recovers all 27,351
+  original configuration bytes and SHA256
+  `ce9e1c206d5df139a6b8d04b24cc000fc81849bf4a3d9dcd1b96bf8c48f89843`.
+  The 33,513-byte candidate has SHA256
+  `e1cc98e890373697043cc2948f25660aba5432798aaad39414c3b42834c42dca`.
+- **OK (§4):** all 19,247 nonowned tracked leaf mode/type/object identities
+  equal the exact base. Only this ledger and Uganda `sampling.yml` differ.
+  `git diff --check` passes. Existing EA/design/oversample/source fields and
+  all old notes remain byte-exact, including the current 2013-14 correction.
+- **OK (§5):** reuses historical facts; no new machinery or remeasurement.
+  The independently structured inverse in the durable `verify-source.py`
+  uses only stdlib text/AST and own Git. It never imports the reviewed code
+  or calls the actual YAML/schema parser.
+- **UNRUN (§4):** every runtime/test/data/build/cache/scientific gate named
+  above. Base/new-schema interim incompatibility is deliberate; coordinator
+  integration/acceptance remains pending. No whole-issue closure follows.
+
+Durable canonical evidence: `report.md`, `RESULT.json`,
+`verification-plan.json`, `ledger-checkpoint.md`, `source-byte-proof.json`
+under the dispatch evidence directory supplied by the user. Final-head
+verification and private result-ref publication are recorded there separately;
+no source-repository push is authorized or made.
