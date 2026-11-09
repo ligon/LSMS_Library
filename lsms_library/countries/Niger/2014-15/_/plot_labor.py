@@ -54,9 +54,8 @@ def _rows(df, source, field_col, parcel_col, day_cols,
     })
 
 
-base = '../Data/NER_2014_ECVMA-II_v02_M_STATA8/'
-pp = get_dataframe(base + 'ECVMA2_AS2AP1.dta', convert_categoricals=False)
-ph = get_dataframe(base + 'ECVMA2_AS2AP2.dta', convert_categoricals=False)
+pp = get_dataframe('../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2AP1.dta', convert_categoricals=False)
+ph = get_dataframe('../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS2AP2.dta', convert_categoricals=False)
 
 frames = []
 # --- post-planting (AS2AP1; plot = AS01Q01_AS01Q03) -----------------------

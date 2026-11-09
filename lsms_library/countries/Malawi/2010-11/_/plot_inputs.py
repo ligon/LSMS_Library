@@ -38,9 +38,9 @@ WAVE = '2010-11'
 BASE = '../Data/Full_Sample/Agriculture/'
 G_SOURCE = '../Data/Full_Sample/Agriculture/ag_mod_g.dta'
 
-d = get_dataframe(BASE + 'ag_mod_d.dta', convert_categoricals=False)
+d = get_dataframe('../Data/Full_Sample/Agriculture/ag_mod_d.dta', convert_categoricals=False)
 g = get_dataframe(G_SOURCE, convert_categoricals=False)
-h = get_dataframe(BASE + 'ag_mod_h.dta', convert_categoricals=False)
+h = get_dataframe('../Data/Full_Sample/Agriculture/ag_mod_h.dta', convert_categoricals=False)
 
 # IHS3 ships exact repeat RECORDS (every column equal): G 9 (the same records
 # crop_production drops -- they carry seed too), H 45, D 0.  A repeat is a

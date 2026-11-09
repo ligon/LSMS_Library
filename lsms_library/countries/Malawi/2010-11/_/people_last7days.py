@@ -25,7 +25,7 @@ from malawi import _people_last7days_block, assemble_people_last7days
 WAVE = '2010-11'
 BASE = '../Data/Full_Sample/Household/'
 
-labor = get_dataframe(BASE + 'hh_mod_e.dta', convert_categoricals=False)
+labor = get_dataframe('../Data/Full_Sample/Household/hh_mod_e.dta', convert_categoricals=False)
 
 piece = _people_last7days_block(
     labor, t=WAVE, hhid='case_id', pid='id_code', layout='legacy',

@@ -5496,3 +5496,16 @@ Full independent report:
 =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/private/Malawi-1190-G-header-private-dvc-v2/dispatch/bdb03cac106c4f9a9f0549a4c66acbd0/evidence/report.md=.
 No data, reader, API, cache, schema, source eligibility, weight, field binding,
 plot allocation or scientific default changes with this documentation.
+
+* 2026-11-09 -- IHS3 script source discovery (GH #1288, partial)
+
+The 2010-11 =livestock=, =crop_production=, =plot_inputs=, =plot_labor=
+and =people_last7days= builders read Full_Sample sources under separate
+=Agriculture/= and =Household/= subdirectories. Their nine =BASE + filename=
+getter expressions now spell the identical full paths as literals, so the
+existing source scanner/private Make preparation sees the committed sidecars.
+The already explicit =plot_inputs= G source and the labor provenance argument
+are unchanged. This is a dependency-discovery repair, not a change to native
+rows, identifiers, eligibility, quantities, costs, units or scientific defaults.
+No actual source/API/build parity or whole-GH1288 closure follows from the
+source-only controls; see =.coder/ledger/1288-malawi-source-literals.md=.
