@@ -344,3 +344,66 @@ release acceptance must establish executed24, not a Make-absence skip pass.
 Genuine absence may use the same capability convention as existing native Make
 tests. No source/real-country/API/cache/census campaign or new exclusions.
 This checkpoint's portable module and current smoke are UNRUN/unwritten here.
+
+### Phase 3 — current integration and portable delivery (2026-11-09)
+
+The preceding checkpoint is historical preparation; the portable module is now
+committed and the bounded current verification below is closed. Ordinary merge
+465e556e6ae66e0c33557d4e86ed113a654d39fe has the exact conflict-free preview
+tree cdf64815663f95301a7bedad9d3040b681cf6b99. Ledger-first integration checkpoint
+f0e400727 preceded portable-test commit
+e0d47a0960f17ee438c6a9b584efc5e3c523a2d7. No manual conflict resolution or new
+product implementation was needed. The current six-path delta comprises the
+original five GH1288 paths and one portable regression module.
+
+Anchored on §§2–5, existing declaration/hash/coverage/native-builder machinery
+is reused. Entire current country.py is original7d plus exactly the admitted
+current1501 no-cache predicate and current1468 JSON reader/publisher guards and
+their existing explanatory text. Wave.grab_data and _no_cache retain current9d
+ASTs; the registry/exclusions, all country configurations, existing unrelated
+tests, the two corrected1468 legacy tests and Mali1495 documentation remain
+current9d-exact. No fingerprint exclusion, schema or scientific policy changed.
+
+Portable-module SHA256 is
+b9ec8393b6241429e38c5ab5b7512a121efb453548ad7cb5bb4cbe92e4ddd222.
+All19 original function/helper ASTs, all9 test-function bodies/decorators and
+the24 semantic cases match accepted externalv2 exactly. The full module AST
+inverts exactly after only the repository-relative fixture import, module
+description, and existing genuine GNU-Make-availability convention. The four
+original owned access helpers are restored after model setup and before any
+test seeding/hash. No external grant/guard/report path or pytest symlink no-op
+was delivered. Ordinary pytest convenience links are allowed normally.
+
+Actual collection on exact e0d47a source returned child0 with all24 unique node
+IDs, GNU Make4.2.1 and clean unchanged source. Its launching tool response was
+context-truncated, so the outer launcher handle/exit is unavailable; the frozen
+driver receipt proves child0/6.895s, not a separately observed outer shell exit.
+The collection was not repeated.
+
+The ONLY current behavioral smoke executed was the previously affected native
+Other Alpha/Beta pair, with unchanged literal17/29/full-frame/typed-attrs and
+live-prerequisite conservation oracles. Actual2 unique PASS,0fail/error/skip;
+JUnit90.581s, wrapper96.736s, child0 and observed outer0 (session93050).
+All three controller/worker identities assert this package/config source,
+mounted MAIN, separate private data roots and false credential availability.
+Execution used unshare-rn, BLAS/build1 and pytest2 --dist=loadfile. This was an
+ordinary synthetic private runtime, not the historical custom operation guard;
+no denial/profile census is claimed. No source acquisition, real-country API,
+shared cache or additional native cohort was executed.
+
+The separately accepted original7d externalv2 actual24PASS/73active/0denials
+remains historical source evidence. Do not add its counts to this current2
+smoke or relabel the remaining22 current cases as executed. Exact-current
+configured fullCI must execute all portable24 (GNU Make present), the original
+author regression module and the full offline suite. Current independent
+integration review, metadata hash footprint, static API and final GitHub checks
+remain coordinator gates. This separate ledger-only commit leaves every tested
+non-ledger mode/type/blob exactly e0d47a, proved in the external final packet.
+
+GH1288 remains OPEN for actual-country/table exposure, declaration coverage and
+broader callers, including the explicit truly computed/unregistered/unverifiable
+Other availability boundary. Correct-looking live bytes are not labeled stale
+without evidence. Original source143/timeout reports, v1's22PASS/2FAIL and link
+denials, v2's accepted24, all current receipts and the collection-handle
+limitation remain intact. No baseline/native/source/full-suite replay was used
+to fill an unverified gate.
