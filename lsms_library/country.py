@@ -3135,8 +3135,7 @@ class Country:
         # py_ls = [f.stem for f in (self.file_path / "_").iterdir() if f.suffix == '.py']
 
         # # Customed
-        # replace_dic = {'food_prices_quantities_and_expenditures': ['food_expenditures', 'food_quantities', 'food_prices'],
-        #                 'unitvalues': ['food_prices'],
+        # replace_dic = {'unitvalues': ['food_prices'],
         #                 'other_features': ['cluster_features']}
         # # replace the key with the value in the dictionary
         # for key, value in replace_dic.items():
@@ -5792,7 +5791,7 @@ class Country:
         physical Other-wave prerequisites; it prepares those paths and returns
         without a country build, finalization or live cache promotion.
         """
-        if method_name not in self.data_scheme+['other_features', 'food_prices_quantities_and_expenditures', 'updated_ids']:
+        if method_name not in self.data_scheme+['other_features', 'updated_ids']:
             warnings.warn(f"Data scheme does not contain {method_name} for {self.name}")
             return pd.DataFrame()
 

@@ -29,8 +29,8 @@ from lsms_library.local_tools import get_dataframe, to_parquet
 from niger import i as niger_i, _species_maps, _map_codes, _finish_livestock
 
 
-base = '../Data/NER_2014_ECVMA-II_v02_M_STATA8/'
-srcn = get_dataframe(base + 'ECVMA2_AS4AP2.dta', convert_categoricals=False)
+srcn = get_dataframe('../Data/NER_2014_ECVMA-II_v02_M_STATA8/ECVMA2_AS4AP2.dta',
+                     convert_categoricals=False)
 
 ecvma_map, _ = _species_maps()
 
