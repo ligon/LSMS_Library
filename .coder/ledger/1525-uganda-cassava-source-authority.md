@@ -71,7 +71,9 @@ that could justify a swap. ROOT subsequently admitted own2019BID566821B,
 MD5e491bd04efbd14658bd7e70050d0edfa. First68613closed0:38pages exceeded the
 initial30pagecap, so only1–3 were projected. Explicit expanded grant24826closed0
 read remaining4–38; all38unique pages personally read,2PDFparser sessions,
-0first3replay/0rasters, original/private/parserZIP stable hashes/FD prepost.
+0first3replay, original/private/parserZIP stable hashes/FD prepost. A subsequent
+ROOT-admitted single Poppler/Cairo raster of PDF16 was personally viewed and
+confirmed the Table1 foodrow/key alignment;0extra pypdf/text parse.
 No native headers/rows/capture payload/API/Make/census/cache/acquisition.
 
 New primary discriminator: BIDPDF16Table1 independently lists consumption-item
@@ -87,3 +89,14 @@ Phase3: OK anchored§2–§4; no product symbol/label/science change. This narro
 erratum for the released version, with affectedrecords and correctionrule.
 BoundedBIDnegative is not globalabsence/as-fieldedtruth. Evidence and precise
 remaining producer question: external BID-DISPOSITION.md/BID-FINDINGS.json.
+
+## Documentary delivery on current development
+
+ROOT authorized a dated40-line country appendix, prepared in a NEW branch from
+actuala578e1a1f95a8d2ccc11d540fc11e6112b54d846. The prior ownledger history was
+ordinarily merged first; doccommitda95d27c1 records only the appendix. Entire
+original6032-line/382100B country prefix SHA0294e2e6771bd3c22632c118c72fff595b98db2a12fe1d8e1ddf9b44f691c9e8
+is preserved; current Nigeria/1051E and every other product/config/test remain
+unchanged. This final checkpoint is ownledger-only. No tests/API/census/raw/
+new source acquisition or GitHub mutation. ROOT owns content review/publication.
+Whole1525 stays OPEN. Code/label/unit/Aggregate/default/weight/science unchanged.
