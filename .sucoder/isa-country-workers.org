@@ -1,4 +1,11 @@
 #+title: Current LSMS-ISA worker queue
+* Latest: PR1677 in CI
+Main993/75 verified merges/41 closures. PR1677 head5377 OPEN; CI42707971494 WindowsPASS/unitRUNNING.
+Mwi owns joint stack metadata actor42123 on immutablefadf; Nepal one-child operator still UNRUN and awaits Root plan review.
+Standalone1135 and381UX censuses CLOSED with source/evidence sealed; no replay. All six remote country workers CLOSED/admitted.
+Root owns pending publication/merge; finish_1590 and finish_1452 completed their current assigned tasks, not busy workers.
+Detailed active gates and source hashes: [[file:handoff.org]].
+
 * Current: after PR1676, 2026-11-09
 Development99318fdfb959db07eede83c8000bf7ee0bed30d7;75 verified merges/41 closures.
 All PRs through1676 merged and postverified. No new PR for the two lanes yet.

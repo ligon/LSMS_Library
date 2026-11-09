@@ -1,4 +1,90 @@
 #+title: Current LSMS-ISA goal handoff
+* Latest authoritative addendum: after publishing PR1677
+Goal ACTIVE. Main remains99318fdfb959db07eede83c8000bf7ee0bed30d7;
+75 verified merges/41 whole closures. All PRs through1676 merged/postverified.
+Root docs/handoff consolidation commitfe95bc5af is published; this addendum
+supersedes the preparation/live states in the checkpoint below.
+
+#1135 FINAL5377a0734145c1ef4aa2d38ba8679ecd9bc38b78,
+tree3c6e9ae94e413e5d3dc44cc1cabfb3f07febe3b8; final ledger-only over measured59f8aa96,
+all19260 nonledger objects exact. R/1135-current993-final-release-20261109,
+manifest38649996ffb394ecb171038a772d1b5e87373d626301e7618bf3f72bec20d612.
+The sole metadata actor8426 CLOSED0/127.411s: zero changes all452country/
+1903wave/37BTF/186FIF maps,14 nonhash fields, keys and18None; errors0/denials0/
+private0/source clean. Candidate mapSHA616457913caf00a9684c6238c0d3dadf02ecf464da1c05be46f5ad10a39548cc.
+R/1135-current993-metadata-20261109 closed manifest1ba331d2985c8c841efdb731853371fbf7aaa1b1933e616725143543f1725b5b.
+Independent closed-test/final author carry PASS at R/review-1135-shared-interim-source-
+20261109/closed-test-carry-v1, manifest96c689b81a008ce7fabae4dc64def3c4beb7cc7a2416688309b926e70e2eb632.
+Root personally proved final16 owned objects/all19245 others exact993, sampling
+exact985/test exactc207 and direct raw JSON equality except header. Proof:
+R/1135-root-publication-20261109/ROOT-SOURCE-ADMISSION.json.
+
+PR1677 OPEN https://github.com/ligon/LSMS_Library/pull/1677
+head5377 as above, branchpublish/1135-on-current993-20261109, base993.
+Author FS push already0; Root GitHub push0. CI42707971494 actual live now:
+Windows129469709106 SUCCESS; unit129469709716 RUNNING; six optional SKIP.
+NEXT ROOT poll this exact CI, download actual logs, check exact head/source/
+tested tree and prospective current merge, then merge/postverify if all gates
+pass. NO full local suite or old cohort/census replay. Whole1135 stays OPEN
+for complete-mover/physical cluster authority; public body updated PR/current
+199P1F+targeted2P/zero footprint. Use Addresses, not automatic whole closure.
+
+#381 UX standalone finalf5924b10807794f523c719a08609e44a67ce6c7d,
+tree7bb28b7fcb497996d010336825b6d16edaead4a1, ledger-only17 lines over measured
+ ef162ffc4bbc27ed88ffdf5c0ca954f7e866df1d; all19255 nonledger exact.
+R/381-unwired-table-current-publication-20261109 FINAL-MANIFEST
+87030fb254b3f2be87475316e88346a1ff3555fb69b82d6180acea970bdb77e6.
+Sole standalone actor71261 CLOSED0/129.385s:452country/1885wave/37BTF/0FIF
+changes vs baselinef3fa, full14 other fields/keys/18None exact, private0/E0D0,
+source clean. CandidateSHA07dcbaaf0a4bc61b2fc9943dc46b9d1cbaa8b7da999eaa77697fcc71684e3e81.
+No source or tests beyond import-only702b after reviewed908274.
+
+ROOT prepared STACKED PUBLICATION fadf00bda0c711bd18573892f1e5d166498e3880,
+tree1b1ed3d5bbe66755fe5e8c28cc5db546ab69497b = exact5377 + exactf592.
+W=/local/job40825266/worktrees/publish-381-unwired-after-measurements-20261109,
+branchpublish/381-unwired-after-measurements-20261109. NOT PUSHED/NO PR YET.
+R/381-unwired-stacked-publication-20261109/ROOT-SOURCE-UNION.json proves16
+inherited1677 objects +3 UX objects, all19244 others exact993.
+Because two runtime changes are composed, Root granted ONE ADDITIONAL joint
+candidate-only census, not a sum of standalone hash counts. Actual actor42123
+is LIVE on immutablefadf, Mwi owns same handle through terminal. R/.../metadata
+holds both unchanged original closed baselines: UX07dc/header ef162 and
+currentf3fa/header5ad2. Compare full four maps/14 fields/keys/18None against
+BOTH; no baseline collector, tests, data or provider replay. Do not mutate
+this frozen head/ledger during collection. Add evidence outside source.
+After joint outcome/source/private0/complete comparisons and final source
+review, Root may push/open the next PR stacked on1677; actual merge must
+match the complete CI-tested tree even if base advanced through inherited
+1677. No required check/code difference can be skipped. Current only1677 is
+open for these two lanes; do not call the unpublished stack a PR.
+
+NEPAL ORIGINAL-CASE PROBE: Mwi is PREPARING, NOT RUNNING, one bounded real-
+metadata negative integration query on immutable standalonef592. Root first
+mis-specified Country(use_dvc=False), but constructor has NO such parameter;
+that was caught before execution and is corrected. Supported plan must use
+Country('Nepal').food_expenditures(), actual DEFAULT dvc backend and default
+constructor flags. Source-inspect route first. Fresh empty private roots,
+false credentials/unshare and actual leaf-name guards; normal local Repo/
+stage/config inspection may proceed (metadata-only factory construction
+recorded separately). NO raw/header/parquet reads/writes, remote/provider
+DATA requests, streaming, producers or actual Make recipes; existing make -n
+metadata inspection only. One child/max120s, no baseline/API replay/retry.
+If default necessarily requires forbidden data access, report before launch.
+Do not stub a provider or switch backend to manufacture a default-path pass.
+Mwi must send frozen supported-API operator/plan for Root review; it is NOT
+launch-approved yet. This probes the original named Nepal wiring case;
+prior synthetic52-case controls do not establish actual Nepal warning count.
+No whole381 closure before the original residual is actually verified/merged.
+
+Current local assignments: Root publication/CI/queue; Mwi joint census42123+
+UNRUN Nepal plan; finish_1590 finished1135 source/metadata, no live actor;
+finish_1452 finished1135 independent closed-evidence carry, no live execution.
+All six remote country workers remain CLOSED/admitted. Zero productive
+remotes; no replacement/replay or quota tasks. Completed reviewers require
+followup_task to reactivate: send_message alone does NOT wake them. A missed
+wake caused a real review delay this turn; Root corrected it and personally
+reviewed c207 before launching the two affected controls.
+
 * Authoritative checkpoint: 2026-11-09, after PR #1676
 The goal is ACTIVE and incomplete. This goal turn made concrete progress:
 three PRs merged (#1674–1676), #1066 closed, six country workers returned
