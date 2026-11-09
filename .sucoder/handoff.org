@@ -1,4 +1,47 @@
 #+title: Current LSMS-ISA goal handoff
+* Latest authoritative checkpoint: PR1678 merged/postverified
+Goal ACTIVE. Development bb5f4cca5fff139c3675a20096ecdb57205615d6,
+complete treed3c14182d9ebdd8f25e1671c9caef61073b12f58;77 verified merges/
+42 whole closures. FS handoff ref pushed exactbb5f (terminal0).
+PR1678 actualparents d6044e280596988dac3a9b5bab78f4e5c9feb9d4 +
+12d053c801638db6b5102b74407af5adf2747b32; entiretree/parents EXACT CI checkout
+b4c7d5062ea78ada45d2d43fc9f0dac4d4a53309. Corrected CI42718759156 SUCCESS:
+unit129507016685 13806P/5673S/4X/692.55s, Windows129507016280
+362P/1S/11.98s, six optional SKIP. OriginalfailedCI remains preserved.
+R/ci-admission-1678-20261109 has logs/run/PREMERGE-corrected and POSTMERGE-
+corrected. First Root preflight failed an incorrect expected test filename;
+NO mutation followed that failure. Erratum preserved; corrected exact four-
+path assertion and all other checks PASSED exit0 before merge. Actual test
+path is tests/test_gh381_unwired_table_diagnostic.py. No weakening/test replay.
+#381 CLOSED after independent bounded original-requirement audit + actual
+Nepal default probe + Armenia source-only acceptance + merge proof. Public
+PR/body retains failedCI, focused39+13 history, six repair controls, corrected
+452/1885/37/0 cost and nested oldREPORT qualification. No actual data-suite
+acceptance, zero-wave-universe distinct runtime test, master release or shared
+cache rebuild claimed. #1135 remains OPEN and narrowed; delivered dated records
+are not fresh measurements.
+
+#932 public title/body narrowed; three official-source constraints now verified:
+user-owned repo cannot use merge queues; conditionally skipped jobs satisfy
+requiredchecks; workflow_dispatch JOB checks do not satisfy required PRchecks.
+Context-only PUT and existing manualdispatch alone are insufficient; no admin
+change/data trigger. Historical full data run42698613061 FAILED on097283459,
+metadata-only observation, not current-development test result.
+#1436 public body now reconciles merged1553/1563/1582 and preserves original;
+current residual Mali2017 own-state authority and missing2021 integrations,
+plus explicit out-of-eight GNB authority. No repeated old condition/rung patch.
+
+#1032 source prototype41799b383 now frozen (full SHA forthcoming); six owned
+paths include _dvc_runtime.py, country.py, local_tools.py, new1032 tests,
+existing1001 fixture and ownledger. Base d604; UNRUN. Root reviewed ~200line
+adapter and controls; requested source-only child tests for ACTUAL Country
+materialize stage success/failure, since original stage controls invoke Stage
+directly and Countrycold control has stages:{}. No runtime grant yet.
+finish_1590 owns this; malawi_revision_food1071 source charter;
+finish_1452 completes1436 held-text binding inventory; all three RUNNING,
+zero productive remotes. Root owns queue/review/publication. Earlier live
+CI status below is superseded by this completed checkpoint.
+
 * Authoritative checkpoint: corrected PR1678 CI, 2026-11-09
 This section supersedes older live/preparation statuses below. Goal ACTIVE.
 Development d6044e280596988dac3a9b5bab78f4e5c9feb9d4; tree
@@ -72,8 +115,9 @@ cron/disclosure/merge_group present even master. Ruleset25124452 onlyunit-tests,
 no merge_queue; appending data-tests alone is NOT sufficient. Repo public and
 owner_type User; current GitHub docs restrict merge queues to organization
 repositories and skipped required jobs count success. Thus old proposed PUT
-is NOT approved/NOT a viable complete repair. Need compatible concrete policy
-proposal; no rules/settings/secrets/data-workflow mutation authorized here.
+is NOT approved/NOT a viable complete repair. Official docs also say workflow_dispatch job checks do not satisfy required
+PR checks; existing manual dispatch alone is not an enforcement fix. Need a
+compatible concrete policy proposal; no rules/settings/secrets/data-workflow mutation authorized here.
 Official sources: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue
 and https://docs.github.com/en/pull-requests/reference/status-checks .
 Retained data run42698613061/job129437041346 now CLOSED FAILURE on older

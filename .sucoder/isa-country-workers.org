@@ -1,7 +1,7 @@
 #+title: Current LSMS-ISA worker queue
 * Authoritative current queue: PR1678 corrected CI
-Development d604/76 verified merges/41 closures; PR1677 MERGED/postverified.
-PR1678 corrected12d OPEN, CI42718759156 WindowsPASS/unitRUNNING/sixSKIP.
+Development bb5f/77 verified merges/42 closures; PR1678 MERGED/postverified.
+CI42718759156 unit13806P/5673S/4X, Windows362P/1S, sixSKIP; #381 CLOSED.
 Root: CI/publication/merge and issue reconciliation.
 finish_1590:1032 SOURCE-ONLY read-only DVC runtime prototype on d604.
 malawi_revision_food:1071 SOURCE-ONLY managed unreadable Parquet recovery charter.
