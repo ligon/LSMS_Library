@@ -339,6 +339,15 @@ cache path.
 
 ## Assume Cache Fresh Mode
 
+!!! note "Stored grain-audit replay (GH1066)"
+    Successful assumed-fresh reads replay stored grain warnings and
+    `grain_reports()` entries, using the same requested-wave filtering and
+    `LSMS_GRAIN_STRICT` behavior as the normal cache read. Date replay remains;
+    strict grain errors take precedence just as on the normal path. Historical
+    footer evidence does not establish current freshness or served completeness.
+    The selected policy restores stored diagnostics without checking hashes,
+    probing sources, rebuilding data or writing the cache.
+
 ```python
 uga = ll.Country('Uganda', assume_cache_fresh=True)
 ```
