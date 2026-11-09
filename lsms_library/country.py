@@ -9597,8 +9597,9 @@ def _probe_source(rel: str) -> bool:
     narrowing: a source reachable ONLY through the WB download does not
     auto-heal -- but with no sidecar and no file such a ``file:`` is classed
     ``config`` at build time (:func:`_drop_record`) and is never probed.
-    Memoised per process; looked up on the module at call time so a test can
-    patch the one seam.
+    Completed probes are memoised per process. A deferred advisory False is
+    transient and is not memoised. Looked up on the module at call time so a
+    test can patch the one seam.
     """
     if rel in _SOURCE_PROBES:
         return _SOURCE_PROBES[rel]
@@ -9606,11 +9607,16 @@ def _probe_source(rel: str) -> bool:
     path = Path(rel)
     if not path.is_absolute():
         path = countries_root() / rel
+    outcome = _lt._FastProbeOutcome()
+    token = _lt._FAST_PROBE_OUTCOME.set(outcome)
     try:
         ok = bool(_lt.source_fetchable_fast(path))
     except Exception:  # noqa: BLE001 -- any failure to fetch is "still unavailable"
         ok = False
-    _SOURCE_PROBES[rel] = ok
+    finally:
+        _lt._FAST_PROBE_OUTCOME.reset(token)
+    if not outcome.suppressed:
+        _SOURCE_PROBES[rel] = ok
     return ok
 
 

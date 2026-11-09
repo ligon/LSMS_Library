@@ -87,6 +87,9 @@ import hashlib
 import ssl
 import time
 import uuid
+import threading
+import socket
+from urllib.parse import urlsplit, unquote
 from importlib.resources import files
 from dvc.api import DVCFileSystem
 import pyreadstat
@@ -287,10 +290,313 @@ def _is_transient_fetch_error(exc: BaseException) -> bool:
     )
 
 
+# GH1051D; ledger §3–§5. Private advisory state, never a build/read gate.
+_FAST_CONNECT_SECONDS = 5.0
+_FAST_CONNECT_LIMIT = 16
+class _FastConnectState:
+    # Opaque runtime state, like the existing ContextVar state: never a
+    # serializable build constant. No fingerprint exclusion is needed.
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.pid = os.getpid()
+        self.epoch = 0
+        self.owner = None
+        self.windows = []
+
+
+_FAST_CONNECT_STATE = _FastConnectState()
+_FAST_PROBE_OUTCOME = contextvars.ContextVar("_fast_probe_outcome", default=None)
+
+
+def _reset_fast_connect_windows():
+    """Release references without closing clients another caller may own."""
+    state = _FAST_CONNECT_STATE
+    with state.lock:
+        state.epoch += 1
+        released, owner = state.windows, state.owner
+        state.windows = []
+        state.owner = None
+    # Drop last references outside the lock; SDK finalizers may perform IO.
+    del released, owner
+
+
+def _fast_connect_after_fork():
+    # Never acquire a lock inherited from a vanished parent's thread.
+    state = _FAST_CONNECT_STATE
+    state.lock = threading.Lock()
+    state.pid = os.getpid()
+    _reset_fast_connect_windows()
+
+
+if hasattr(os, 'register_at_fork'):
+    os.register_at_fork(after_in_child=_fast_connect_after_fork)
+
+
+def _fast_frozen(value):
+    """Opaque comparison only; never format/log this effective configuration."""
+    if value is None or type(value) in (str, bool, int, float):
+        return value
+    if isinstance(value, dict) and all(type(k) is str for k in value):
+        return tuple((k, _fast_frozen(v)) for k, v in sorted(value.items()))
+    if type(value) in (list, tuple):
+        return tuple(_fast_frozen(v) for v in value)
+    raise ValueError('unsupported advisory configuration')
+
+
+def _fast_authority(url):
+    parsed = urlsplit(url)
+    if (parsed.scheme not in ('http', 'https') or not parsed.hostname
+            or parsed.username or parsed.password or parsed.fragment):
+        raise ValueError('unsupported advisory authority')
+    return (parsed.scheme, parsed.hostname.lower(),
+            parsed.port or (443 if parsed.scheme == 'https' else 80))
+
+
+def _fast_scope(remote, fs):
+    """Resolve wrapper options normally, but NEVER touch a fresh native .fs."""
+    from dvc_s3 import S3FileSystem
+    if type(fs) is not S3FileSystem:
+        return None
+    try:
+        path = remote.path.removeprefix('s3://')
+        bucket, _, prefix = path.partition('/')
+        if (not re.fullmatch(r'[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]', bucket)
+                or '..' in bucket or ':' in path or '?' in path or '#' in path):
+            return None
+        args = fs.fs_args  # existing normal backend preparation, no native client
+        sdk_config = args.get('config_kwargs', {})
+        s3 = sdk_config.get('s3', {})
+        if (sdk_config.get('proxies') or any(os.environ.get(k) for k in (
+                'HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'http_proxy', 'https_proxy', 'all_proxy'))):
+            return None  # a target URL does not prove the proxy route connected
+        if (s3.get('use_accelerate_endpoint') or s3.get('use_dualstack_endpoint')
+                or s3.get('addressing_style') not in (None, 'auto', 'path', 'virtual')):
+            return None
+        repo = DVCFS.repo
+        # Environment values stay opaque, including credentials/proxies. No files
+        # or credential getters are consulted. Static retained sessions do not
+        # reread a profile file during this finite window.
+        environment = tuple(sorted((k, v) for k, v in os.environ.items()
+                            if k.startswith('AWS_') or k.upper() in {
+                                'HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'NO_PROXY',
+                                'SSL_CERT_FILE', 'SSL_CERT_DIR', 'REQUESTS_CA_BUNDLE'}))
+        owner = (DVCFS, repo, os.path.realpath(_COUNTRIES_DIR),
+                 os.path.realpath(_DVC_CACHE_DIR), environment)
+        config = _fast_frozen((repo.config, fs.config, args))
+        return (owner, repo.config['core'].get('remote'), remote.path,
+                type(fs), config, bucket, prefix, s3.get('addressing_style', 'auto'))
+    except (AttributeError, TypeError, ValueError, KeyError):
+        return None
+
+
+def _fast_route(fs, bucket):
+    """Already-populated S3 route/auth/session metadata only; no SDK getters."""
+    from aiobotocore.credentials import AioCredentials
+    from botocore.credentials import Credentials
+    from s3fs import S3FileSystem
+    try:
+        native = vars(fs).get('fs')
+        if type(native) is not S3FileSystem:
+            return None
+        state = vars(native)
+        session, general, creator = (state.get(k) for k in ('session', '_s3', '_s3creator'))
+        if session is None or general is None or creator is None:
+            return None
+        cached = state.get('cache_regions')
+        buckets = vars(creator).get('_buckets') if cached else None
+        if cached and (type(buckets) is not dict or vars(creator).get('_client') is not general):
+            return None
+        client = buckets.get(bucket, general) if cached else general
+        discovery = bool(cached and bucket not in buckets)
+        http = client._endpoint.http_session
+        sessions = vars(http).get('_sessions')
+        if sessions is None or (sessions and all(s.closed for s in sessions.values())):
+            return None
+        # s3fs can refresh the general client even when routing to a bucket client.
+        general_sessions = vars(general._endpoint.http_session).get('_sessions')
+        if general_sessions is None or (general_sessions and all(s.closed for s in general_sessions.values())):
+            return None
+        credentials = vars(client._request_signer).get('_credentials')
+        if state.get('anon') is True:
+            if credentials is not None:
+                return None
+        elif type(credentials) not in (AioCredentials, Credentials):
+            return None  # refreshable, deferred or unknown provider
+        elif credentials.method not in ('explicit', 'shared-credentials-file', 'config-file'):
+            return None
+        elif credentials.method != 'explicit' and vars(session).get('_credentials') is not credentials:
+            return None
+        authority = _fast_authority(client.meta.endpoint_url)
+        return (native, session, general, creator, client, credentials,
+                http, authority, discovery, cached)
+    except (AttributeError, TypeError, ValueError):
+        return None
+
+
+def _fast_same_route(left, right):
+    return (left is not None and right is not None
+            and all(a is b for a, b in zip(left[:7], right[:7]))
+            and left[7:] == right[7:])
+
+
+def _fast_connect_error(error, source, scope, route):
+    from botocore.exceptions import ConnectTimeoutError, EndpointConnectionError
+    from aiohttp import (ClientConnectorError, ClientConnectorSSLError,
+                         ClientConnectorCertificateError, ClientProxyConnectionError)
+    if type(error) not in (ConnectTimeoutError, EndpointConnectionError):
+        return False
+    if type(error) is EndpointConnectionError:
+        cause = error.kwargs.get('error')
+        if cause is None:
+            cause = error.__cause__
+        if not (type(cause) is socket.gaierror or (
+                isinstance(cause, ClientConnectorError)
+                and not isinstance(cause, (ClientConnectorSSLError,
+                                           ClientConnectorCertificateError,
+                                           ClientProxyConnectionError)))):
+            return False
+    if getattr(error, 'response', None) is not None or route is None:
+        return False
+    try:
+        url = error.kwargs['endpoint_url']
+        parsed = urlsplit(url)
+        authority = _fast_authority(url)
+        scheme, host, port = route[7]
+        bucket = scope[5]
+        virtual = (scheme, bucket + '.' + host, port)
+        if authority not in (route[7], virtual):
+            return False
+        if scope[7] == 'path' and authority != route[7]:
+            return False
+        if scope[7] == 'virtual' and authority != virtual and not host.startswith(bucket + '.'):
+            return False
+        if type(error) is EndpointConnectionError and isinstance(cause, ClientConnectorError):
+            if cause.host.lower() != authority[1] or (cause.port or port) != authority[2]:
+                return False
+        key = source.removeprefix('s3://').split('/', 1)[1]
+        expected = '/' + (key if authority == virtual else bucket + '/' + key)
+        # An explicit endpoint can already name the virtual-host bucket.
+        if host.startswith(bucket + '.') and authority == route[7]:
+            expected = '/' + key
+        allowed = {expected}
+        if route[8]:  # retained general client is about to discover this bucket
+            allowed.add('/' if authority == virtual else '/' + bucket)
+        return unquote(parsed.path) in allowed and not parsed.query
+    except (AttributeError, TypeError, ValueError, KeyError, IndexError):
+        return False
+
+
+class _FastProbeOutcome:
+    """Per invocation, never a persisted or source-memoized result."""
+    def __init__(self):
+        self.suppressed = False
+        self.scope = self.route = self.fs = self.remote = None
+        self.epoch = None
+        self.errors = 0
+        self.failure_authority = None
+        self.eligible = True
+
+    def observe(self, fs, source, destination, error):
+        self.errors += 1
+        route = _fast_route(fs, self.scope[5]) if self.scope else None
+        if self.route is None:
+            self.route = route
+        try:
+            # Before cleanup: even a zero-byte temp proves response/progress.
+            progressed = Path(destination).exists()
+        except OSError:
+            progressed = True
+        positive = _fast_connect_error(error, source, self.scope, route)
+        authority = _fast_authority(error.kwargs['endpoint_url']) if positive else None
+        if self.failure_authority is None:
+            self.failure_authority = authority
+        self.eligible &= (not progressed and _fast_same_route(self.route, route)
+                          and positive and authority == self.failure_authority)
+        if not self.eligible:
+            self.clear()
+
+    def clear(self):
+        # A response or unknown outcome conservatively invalidates old in-flight
+        # publishers too. No IO under the transition lock.
+        with _FAST_CONNECT_STATE.lock:
+            _FAST_CONNECT_STATE.epoch += 1
+            released = _FAST_CONNECT_STATE.windows
+            _FAST_CONNECT_STATE.windows = []
+        del released
+
+
+def _fast_window_select(outcome, remote, fs):
+    pid = os.getpid()
+    if pid != _FAST_CONNECT_STATE.pid:
+        _fast_connect_after_fork()
+    scope = _fast_scope(remote, fs)
+    outcome.remote = remote
+    now = time.monotonic()
+    # Route metadata is inspected outside the lock. Entries are immutable after
+    # insertion; publication verifies the epoch captured by this transition.
+    with _FAST_CONNECT_STATE.lock:
+        entries = list(_FAST_CONNECT_STATE.windows)
+    valid = [entry for entry in entries
+             if entry[0] > now and _fast_same_route(entry[4], _fast_route(entry[3], entry[2][5]))]
+    with _FAST_CONNECT_STATE.lock:
+        # Only the snapshot was validated. Preserve later publications, and
+        # retain ALL live entries as well as the snapshot until mutex exit:
+        # pruning or the owner/options transitions below may drop a last owner
+        # whose SDK finalizer can perform IO.
+        released = _FAST_CONNECT_STATE.windows
+        _FAST_CONNECT_STATE.windows = [e for e in released
+            if not any(e is s for s in entries) or any(e is v for v in valid)]
+        if scope is not None:
+            owner = scope[0]
+            old = _FAST_CONNECT_STATE.owner
+            if old is None or not (old[0] is owner[0] and old[1] is owner[1] and old[2:] == owner[2:]):
+                _FAST_CONNECT_STATE.windows.clear()
+                _FAST_CONNECT_STATE.epoch += 1
+                _FAST_CONNECT_STATE.owner = owner
+            # Same alias/path with changed effective options invalidates its old
+            # generation. Distinct routes may coexist up to the finite cap.
+            changed = [e for e in _FAST_CONNECT_STATE.windows if e[2][1:3] == scope[1:3] and e[2][3:] != scope[3:]]
+            if changed:
+                _FAST_CONNECT_STATE.windows[:] = [e for e in _FAST_CONNECT_STATE.windows if not any(e is c for c in changed)]
+                _FAST_CONNECT_STATE.epoch += 1
+            for entry in _FAST_CONNECT_STATE.windows:
+                # A late publication survives pruning for the next caller, but
+                # this caller may select only an identity it route-validated.
+                if any(entry is v for v in valid) and entry[2][1:] == scope[1:]:
+                    outcome.suppressed = True
+                    outcome.fs = entry[3]  # SELECT retained route, no fresh native
+                    return entry[3]
+        outcome.scope, outcome.fs = scope, fs
+        outcome.epoch = _FAST_CONNECT_STATE.epoch
+    return fs
+
+
+def _fast_window_publish(outcome):
+    if not (outcome.scope and outcome.eligible and outcome.errors >= 2
+            and _fast_same_route(outcome.route, _fast_route(outcome.fs, outcome.scope[5]))):
+        return
+    current = _fast_scope(outcome.remote, outcome.fs)
+    if (current is None or current[0][0] is not outcome.scope[0][0]
+            or current[0][1] is not outcome.scope[0][1] or current != outcome.scope):
+        return
+    now = time.monotonic()
+    deadline = now + _FAST_CONNECT_SECONDS
+    with _FAST_CONNECT_STATE.lock:
+        released = list(_FAST_CONNECT_STATE.windows)
+        _FAST_CONNECT_STATE.windows[:] = [e for e in released if e[0] > now]
+        if outcome.epoch != _FAST_CONNECT_STATE.epoch:
+            return
+        # No sliding extension, replacement or cross-scope eviction at capacity.
+        if (len(_FAST_CONNECT_STATE.windows) < _FAST_CONNECT_LIMIT
+                and not any(e[2][1:] == outcome.scope[1:] for e in _FAST_CONNECT_STATE.windows)):
+            _FAST_CONNECT_STATE.windows.append((deadline, outcome.epoch, outcome.scope,
+                                          outcome.fs, outcome.route))
+
+
 def _get_file_with_retry(fs, src: str, dst: str, *,
                          attempts: int | None = None,
                          base_delay: float = _FETCH_BASE_DELAY,
-                         sleep=time.sleep) -> None:
+                         sleep=time.sleep, _fast_probe=None) -> None:
     """``fs.get_file(src, dst)`` with bounded retry on transient TLS errors.
 
     Re-raises ``FileNotFoundError`` immediately (the caller then tries the next
@@ -305,9 +611,13 @@ def _get_file_with_retry(fs, src: str, dst: str, *,
         try:
             fs.get_file(src, dst)
             return
-        except FileNotFoundError:
+        except FileNotFoundError as exc:
+            if _fast_probe is not None:
+                _fast_probe.observe(fs, src, dst, exc)
             raise
         except Exception as exc:  # noqa: BLE001 -- classify, then retry or re-raise
+            if _fast_probe is not None:
+                _fast_probe.observe(fs, src, dst, exc)
             try:
                 Path(dst).unlink()
             except OSError:
@@ -386,6 +696,7 @@ def _ensure_dvc_pulled(fn, *, _metadata_on_local_write_denied: bool = False) -> 
     heal probe opts into metadata availability after positively local
     EACCES/EROFS: at most two exists checks, not proof of decoding/rebuilding.
     """
+    _fast_probe = _FAST_PROBE_OUTCOME.get() if _metadata_on_local_write_denied else None
     try:
         # Try several interpretations of fn to find the .dvc sidecar.
         # Wave scripts pass cwd-relative paths like '../Data/foo.dta'.
@@ -503,13 +814,25 @@ def _ensure_dvc_pulled(fn, *, _metadata_on_local_write_denied: bool = False) -> 
             dst.parent.mkdir(parents=True, exist_ok=True)
         except OSError as error:
             if _metadata_on_local_write_denied and _local_cache_write_denied(error):
-                return _remote_md5_available(fs, src_candidates)
+                available = _remote_md5_available(fs, src_candidates)
+                if available and _fast_probe is not None:
+                    _fast_probe.clear()
+                return available
             raise
+        if _fast_probe is not None:
+            fs = _fast_window_select(_fast_probe, remote, fs)
+            if _fast_probe.suppressed:
+                return False
         tmp = dst.with_suffix(dst.suffix + f".tmp.{os.getpid()}")
         for src in src_candidates:
             operation = 'fetch'
             try:
-                _get_file_with_retry(fs, src, str(tmp))
+                if _fast_probe is None:
+                    _get_file_with_retry(fs, src, str(tmp))
+                else:
+                    _get_file_with_retry(fs, src, str(tmp), _fast_probe=_fast_probe)
+                if _fast_probe is not None:
+                    _fast_probe.clear()
                 operation = 'rename'
                 tmp.rename(dst)
                 return
@@ -526,8 +849,13 @@ def _ensure_dvc_pulled(fn, *, _metadata_on_local_write_denied: bool = False) -> 
                     pass
                 if (_metadata_on_local_write_denied
                         and _local_cache_write_denied(error, None if operation == 'rename' else tmp)):
-                    return _remote_md5_available(fs, src_candidates)
+                    available = _remote_md5_available(fs, src_candidates)
+                    if available and _fast_probe is not None:
+                        _fast_probe.clear()
+                    return available
                 continue
+        if _fast_probe is not None:
+            _fast_window_publish(_fast_probe)
         # Both layouts missed -- the blob is genuinely not on the
         # remote.  Fall through to streaming fallback at the call site.
         try:
@@ -608,7 +936,7 @@ def source_tier(path: str | Path) -> str | None:
     return None
 
 
-def source_fetchable_fast(path: str | Path) -> bool:
+def source_fetchable_fast(path: str | Path, *, _outcome=None) -> bool:
     """Can the source at absolute ``path`` be read from the FAST tiers -- an
     untracked local file, or the DVC sidecar plus its L1 blob (fetched into the
     blob cache under ``data_root()`` if absent, by ``_ensure_dvc_pulled``)?
@@ -628,7 +956,14 @@ def source_fetchable_fast(path: str | Path) -> bool:
     if tier == "local":
         return True
     if tier == "dvc":
-        availability = _ensure_dvc_pulled(path, _metadata_on_local_write_denied=True)
+        outcome = _outcome if _outcome is not None else _FAST_PROBE_OUTCOME.get()
+        if outcome is None:
+            outcome = _FastProbeOutcome()
+        token = _FAST_PROBE_OUTCOME.set(outcome)
+        try:
+            availability = _ensure_dvc_pulled(path, _metadata_on_local_write_denied=True)
+        finally:
+            _FAST_PROBE_OUTCOME.reset(token)
         if availability is not None:
             return availability
         return _dvc_cache_path(path) is not None
