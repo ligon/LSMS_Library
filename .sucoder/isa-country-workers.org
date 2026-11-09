@@ -1,4 +1,73 @@
 #+title: LSMS-ISA country workers and coordinator queue
+* Current goal checkpoint — 2026-11-09T04:03UTC — PROGRESS, ACTIVE
+Previous goalturn made authoritativePROGRESS: PR1642 merged29de/GH1501CLOSED,41sweepmerges/
+29closures. This turn:1468implemented+independentlyreviewed/API+metadataPASS/PR1643OPEN;
+1190real93,106-rowdiagnosiscomplete;1288failurecauseidentified/v2actorLIVE; remoteordinary
+nativeflowfinallyworking. Do notcallgoalcomplete/blocked. No master/sharedrewarm/weightschange.
+Rootdocscheckout librarycodeOLD; usepinnedrefs/worktrees. Currentdevelopment29de1acf35e6eff0cf7c2d47977745fcd0bab6ab.
+
+1468: author51d8cb23f46080ab5ca3f85163ee520dfbaada96;48PASS(43new+5existing), parent22=8P14F.
+Initial22fixtureSETUPerrorspreserved. IndependentMwi10PASS, noP1/P2; startupdummyAWSenv0test
+failurepreservedbeforecorrectedenv(noassertionschanged). ROOTdocs-only49cc0330d3306f505fca617f237c64178db996fe
+corrects panel-idsSKILL caveat+ownledger ONLY; peerproved19162otherobjects exact51d8.
+PR1643 exact49cc/base29de. ROOT API0/9.87s/hash0/120.61s; byteexactclosedoperators/newprivate
+roots. Complete38countrymap:450/450country,1877/1895wave,35/35BTF,0/186FIFchanged;18None/
+ALLotherfields/publicscope/overrides/errors/denials exact. Baseline23912022maporiginal68header
+retained; actual29de differsONLYown1501ledger (metadatairrelevant). Candidate208cebe34fdfb3858c8b1f5464d18853850658dc3bdd99a37638fe968bde1fc1.
+R1468-final-release-gates-20261109/COMPLETE-COMPARISON.json. No privatefull/sourcecampaign.
+CI42558101929FAILED2/12811PASS/5649SKIP/4X;WindowsSUCCESS. OLDtest_dvc_caching dictJSONtest
+usesfakeMake toWRITE SOURCEJSON, incompatiblewith914/1468;866structuralpinexpects6calls now5,
+3evictionforwardersunchanged. ROOTreadfulltraces+explicitlyauthorized1452TEST-ONLYcorrection
+NEW49ccchild: legitimatewave-dict fallback+exactPRIVATEJSONpersist/readback/noin-treewrites;
+8665callswithsame3evicts/placement/noJSONdeletion. No product/oracle/skipweakening. Mwipeerthen
+exactnewheadCI required; priorAPI/hash maycarryonlyunderkernel/inputconservation, notnewrunclaim.
+
+1288original7dproductUNCHANGED. First24actor92658 CLOSED1/785.33s:22P2F(allOtherrebuild),
+61activeprofiles,24genericlinkdenials. ROOTverified15sealedcausefiles/4freshmetadataprobes0:
+originalfixturefourLSMSaccesshelperstubsremove6frameworkclosurehelpers; parenthash differs
+realchildBTF/FIF despiteOther5. No productP2established. Genericlinksstronglymatchpytest
+current shortcuts butoldcaller/pathunrecorded; doNOTrelabeloldattemptclean. V2fixture-only
+adapterrestores4originalfunctionobjects BEFOREseed/hash; pinnedpytest_force_symlink only
+becomesvalidatedprivate-currentNOOP(no linksallowed). All9tests/helpers/oracles/24families
+exact; originaloperation/provider/linkrefusals retained. Manifest99b81e0cdd73071c94d79328215855e25b484cf96f7656eeb2474192982438df,
+peer23fcebb9...qualifiedPASS; ROOTbothpreflight0/grantwritten. ONEFULL24nowLIVE ROOTowned
+exec12619 at04:01:15. R1288-original-contract-runtime-proposal-v2-20261109/attempt-v2.
+No accepted24yet; don'tsumold22+new2.1452ownsoperatorprep, Mwiobservesordinaryoutputs.
+
+1190H-onlyactualauthor42885 CLOSED0/8.392s:93,106fullrows/12sealednative+cardloads;2positive
+thirdpurchases(H34Yes/ownunit2),5mixedgiftgroups/10positiveYescomponents. Allrows/flags/NA/
+negatives retained; wholegiftuniverse15zeros/1negative/83No/4blank isNOTservedcohort. NoG/
+currentserving/IDwalk/plotattachmentmeasured; no gate/carrierselected. R1190-malawi-h-only-
+diagnosis-20261108 manifest174b5e3b... . SixrawDTA+12typedassetsseals held/private; initial
+optionalJSONnumpykeyfailurepreserved, five-filecontinuation0/nofirstfilere-read. Remote
+independent12assetreviewpackageprepared, waitingordinarycanaryrollout. MwiGproposalmetadata
+ONLY3relevantreleases(2010Full/2013/2019Panel);Gnotadmittedforopen/copy/decodeyet.
+
+Remotequeue: original8historicaljobsFINISHED; doNOTcountthem. NEW1468job41035521FAILED70
+preparehelper120stimeout; Mali41035696FAILED70, BF41035706CANCEL143/nativeNULL/evidence0.
+NewisolatedSDK6e4813a5462fb300d2cab98cedd62bd4f55dc78d changesONLYpreparefloor120→600
+(parent641/223otherobjects exact), globalCLIunchanged. Finite5controlsPASS+realshippedworker
+a2288d18verified. Canary41036003passedclone/mount/import butFAILEDbootstrap1:receivingpin
+stilloldccb4. Correct2literals(SDKreceipt+expectedworkerSHA) only. Canary41036061thenFAILED
+bootstrap2 atcustomobserver ValueError internalcauseUNKNOWN; neverreadobserver/nativebodies.
+ROOTremovedONLY2finalcustomobserverlaunchlines; normalmanagedSDKhome/ownership/FD/mount/
+env/immutable-source/privateLSMS/credential/sourcepinchecksremain. This isOURinstrumentation,
+notuserrequiredguard. Allfailedrecordsimmutable. Depth1normalGitprovider exact6863ID/tree/
+ALL19161objects/no promisor/alternates/missing,28.91MiB vs622.27MiB history. Actualclone+checkout0.
+Finalordinaryv4Mali canary41036101/2c58d4e2362f4950b769bea4c27f1a8d RUNNINGn0036;
+supported03:55:48agent_execution/heartbeat2.56s, SDKbyteproofexact. FirstgenuineNEWnativeagent,
+notcompletedissue. Coordinatornewsubmit10s vsprior255s isuncontrolledobservedcomparison.
+1590ownsnormalprojectartifactcheck+rollingBFA1463diagnosis/Malawi1190independentreview next;
+no1468duplicate(local1452). Rootstandingnormalprojectbootstraperrorlogreadgrant; no repeated
+perjobask/nativehome-state-transcript/observerbodyinspection. Eightnextactionsfile honest:
+ready3packages, Niger1530boundeddiagnosis, othercountriesreconciliation/scienceholds, noforce8fixes.
+
+1575implementation/1066warningreplaychoicesPENDING;48productionweightpolicyHELD, bounded
+researchindependentclosure993097b9alreadycomplete withremaininginsufficiency/sourceoraclefailures.
+49borrow/50maizeflour/51NOclamp acceptedrulingsunchanged.587optionalannotationREADYDESIGNonly,
+not39cellclosure; freshcommentREFUTESNigeria22false-positivepremise.1287all62selectedISAcompiler
+cellsreceipt-covered, original14country/nonISA/#1288scopeOPEN; no repeatISAcompilercampaign.
+
 * Actual first replacement job and1288 execution — 2026-11-09T02:53UTC
 FirstNEWremote1468 submit CLOSED0: job41035521, dispatch52e6be8a4f7c4c4b89f61c3bdc2c6772,
 submitted02:52:17/scheduler02:52:38RUNNING.623MBcanonicalsource clone+submit298s;
