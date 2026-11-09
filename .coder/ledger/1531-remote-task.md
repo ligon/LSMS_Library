@@ -23,7 +23,7 @@ the 1000 ha clamp, or construct a real table.
 | wave driver `colmap` | `lsms_library/countries/Guinea-Bissau/2018-19/_/plot_features.py:26` | binds `s16aq47`, `s16aq45`, `s16aq09a/b`; full driver forbidden | reuse declarations as evidence |
 | `i` | `lsms_library/countries/Guinea-Bissau/_/guinea_bissau.py:21` | own `(grappe, menage)` household formatting | preserve; no manufactured keys |
 | `get_dataframe` | `lsms_library/local_tools.py` (STANDING §2/§4) | sanctioned numeric reader; may fetch/parse full data | UNRUN unless the charter's conditional numeric gate is satisfied |
-| Stata header interface | mounted pandas `StataReader.variable_labels/value_labels` | charter explicitly admits metadata-only access; counter must remain zero | reuse; no `read`, `get_chunk`, iteration or `categories_only` |
+| Stata header interface | mounted pandas `StataReader.variable_labels/value_labels` | one metadata parse captured 301 fields / 36 value-label sets; every recorded `lines_read` = 0 | reused; no `read`, `get_chunk`, iteration or `categories_only` |
 | canonical plot schema | `lsms_library/data_info.yml:103,604–611` | `plot_id`, `Area` hectares, `AreaUnit` original survey unit | cite; no schema changes |
 | derivation registry | `lsms_library/countries/Guinea-Bissau/_/derivations.yml` | two entries, food and community prices; no plot-area entry | report absence; do not register a new construction |
 
@@ -40,6 +40,16 @@ the 1000 ha clamp, or construct a real table.
   against this source's metadata, not an independent instrument authority.
 - Preserve the exact question labels, typed value-label codes and links,
   storage types/formats and field positions before any interpretation.
+- Own admitted 2018 source cards distinguish two GPS fields: bound `s16aq47`
+  asks “16A.47. Quelle est la superficie de la parcelle selon les mesures GPS ?”
+  with no unit or value-label link; unbound `s16aq47a` asks “16A.47a. Qual é a
+  área da parcela (em m2) de acordo com as medidas GPS?”. The explicit m2
+  authority belongs to the latter. It does not establish the former's unit,
+  their relationship or row/vague applicability. Both are doubles.
+- `S16AQ09B` is linked only to farmer-unit field `s16aq09b`: typed codes
+  1 “Hectare (Ha)”, 2 “Metro quadrado (m2)”. `s16aq45` links to a different
+  codebook, `S16AQ45`: 1 “Sim”, 2 “Não”, for GPS measured. Neither that flag
+  nor reason-for-nonmeasurement `s16aq48` assigns a unit to bound `s16aq47`.
 
 ## §4 Invariants & assumptions
 
@@ -79,24 +89,69 @@ the 1000 ha clamp, or construct a real table.
 | binding trace | reuse static source declarations | executing the producer is unnecessary and forbidden |
 | units / measurement semantics | reuse own admitted Stata cards and committed own instrument text | units cannot be estimated from magnitude |
 | metadata serialization | new external evidence only | preserve typed dictionaries with pickle or typed records; plain JSON object keys would coerce numeric codes |
-| numerical discrimination | deferred, conditional | only if an identified metadata flag leaves a specific source question unresolved |
+| numerical discrimination | UNRUN; gate not satisfied | no identified flag assigns units to bound `s16aq47`; co-occurrence with the separate m2 field would not supply authority |
 | repair / row classification | out of scope | diagnosis grant supplies no authority for a default change |
 
 ## §6 Open questions for the human
 
-- Nonblocking discrepancy: the charter calls 2021-22 wired, but this pin has
-  registration only. Record it in the absolute shared questions channel;
-  proceed with the independent 2018 header diagnosis and 2021 static limitation.
-- Any missing GPS unit authority will be named as an exact missing question /
-  document, not filled with a guessed conversion. No routine approval is pending:
-  the charter already authorizes bounded work after this surfaced checkpoint.
+- The original charter incorrectly called both waves wired. This was reported
+  in the absolute shared questions channel; the coordinator's subsequent
+  “COORDINATOR SCOPE ERRATUM” explicitly accepts the finding and calls 2021
+  an “unserved holding only”. No 2021 header or serving claim was invented.
+- Exact missing authority: own 2018 household instrument section 16A Q47/Q47a
+  and official export/cleaning definitions establishing each field's unit,
+  relationship and applicability by vague. Declared own documents are
+  `2018-19/Documentation/gnb_ehcvm1_qnr_household_excel_vague{1,2}.xlsx`;
+  both sidecars declare MD5 `0f3d80b68800a577659f5ead1032cdf9`, 673,399 bytes.
+  These are declarations, not document-byte or question-content verification;
+  no instrument bytes are admitted in this packet. Do not infer two different
+  fielded versions from their filenames. No routine approval is pending.
 
 ### Phase 3 — verification
 
-UNRUN at the ledger-only checkpoint. All five required evidence files were
-initialized before long reading. `make api-audit STRICT=1` exited 2 because
-Poetry is unavailable (recipe command error 127); the authorized exact fallback
-`PROJECT_PYTHON scripts/api_surface_audit.py --strict` exited 0: 10 documented
-kwargs, 15 listed skills, no untracked hashed build inputs. No source metadata
-or numeric rows have yet been read. Final verification will distinguish held
-2018 metadata, missing 2021 metadata and every UNRUN scientific/integration gate.
+The first new commit, `8a6ac2ad199b59df297546a7d9a9cc8e1172c597`, contains
+only this ledger and was surfaced before source metadata reads. All five exact
+required evidence filenames were initialized before long reading. The country
+documentation freeze is separate commit
+`62e450c130b4a5c07364258b41404092fb509e1c`; this final ledger update is its
+own commit. Final SHA and detailed command records live in the external packet
+(`report.md`, `RESULT.json`, `verification-plan.json`, `ledger-checkpoint.md`,
+`source-byte-proof.json`). Private publication is by the prepared commit hook.
+
+- `StataReader` metadata reuse — **OK (anchored on §§2–5)**. Exactly one
+  admitted existing private copy, pre/post-all MD5/SHA256/size/mode/inode/mtime
+  unchanged; shared original DTA never read. 301 fields and 36 value-label
+  dictionaries preserved in the original typed pickle, including NumPy int32
+  keys; typed JSON records preserve code bytes and dtypes. Header nobs 9,873
+  does not mean rows read. `lines_read` stayed 0 at construction and after
+  both metadata methods. Numeric `get_dataframe` calls: 0.
+- Unit diagnosis — **OK (anchored on §§3–5)**. Explicit m2 authority exists
+  for the distinct `s16aq47a`; unit authority for bound `s16aq47` remains
+  missing in admitted metadata. No mixed-unit verdict or forced repair.
+- Documentation update — **OK (anchored on §§3–4)**. Records actual field
+  distinction, exact missing authority, and registered-but-unwired 2021;
+  preserves prior claims as quoted history. No executable/config/schema/unit/
+  default changes. No new production helper or tests; existing tests unchanged.
+- Independent evidence controls — **OK (anchored on §§3–4)**.
+  `PROJECT_PYTHON evidence/verify-evidence.py` exited 0: 11 controls including
+  reconstruction of typed codes, distinct unit vs measurement codebooks,
+  positive explicit-m2 field, zero reader counters, own native bindings, nine
+  unchanged production/config files, post-all seals and bounded changed paths.
+- Failures preserved: `make api-audit STRICT=1` exited 2 because Poetry is
+  unavailable (recipe command error 127); authorized exact fallback
+  `PROJECT_PYTHON scripts/api_surface_audit.py --strict` exited 0 (10 kwargs,
+  15 listed skills, no untracked hashed build inputs). Initial header script
+  exited 1 while rendering NumPy int32 to JSON, after preserving its typed
+  pickle. Recovery rendered that pickle with typed records, exited 0, and
+  did not reopen the DTA. No failed result was relabeled as passing.
+- UNRUN: 2021 actual header (missing admitted source, no fetch/hunt);
+  numeric rows (conditional gate unsatisfied); instrument document bytes
+  (not admitted); real tables/native producer/Make data builds; scientific
+  unit acceptance; fingerprint/performance measurement; full CI / warm cache
+  acceptance. Runtime import identity passed with the prepared interpreter,
+  exact cwd/PYTHONPATH/countries root and private roots/absent credentials.
+
+No ledger contradiction or reinvention was found in the bounded diagnosis.
+The helper's hectares assumption is unverified, not disproved by assigning the
+separate m2 field's authority to it. Root retains independent integration,
+review, CI, GitHub and merge responsibility.
