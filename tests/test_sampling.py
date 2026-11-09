@@ -932,7 +932,10 @@ class TestTheMeasurementRecord:
             assert "households_changed_net_of_movers" not in m, wave
             assert "mover_rule" not in m, wave
             note = m["note"]
-            assert note.startswith("Net of movers is NOT measured"), wave
+            assert "not measured" in note.casefold(), wave
+            # Current provenance is the already-committed #1264 crosswalk
+            # measurement (dated 2026-11-04), not the old cover oracle.
+            assert "2026-11-04" in m["locator"], wave
         # Neither withdrawn nor conditional historical bounds are a current
         # net count; both remain excluded from warning text below.
         note = recs["2023Q3"]["panel"]["cluster_id_measurement"]["note"]
