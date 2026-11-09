@@ -3659,3 +3659,33 @@ GH #1574 remains open; no label, stratum, weight, survey-design or default
 change follows. Closed reports under the 20261103 burst =reports/= are
 =1574-mali-bid-poppler-layout-20261109/= and
 =1574-mali-sampling-header-20261109/=.
+
+* 2026-11-09 -- GH #1437: own printed harvest routes; fielded CAPI still unknown
+
+Both own2021/2022 passage forms,
+=2021-22/Documentation/mli_ehcvm2_qnr_men_excel_vague1.pdf= and
+=mli_ehcvm2_qnr_men_excel_vague2.pdf=, PDF p.87 (printed86), show finished
+Q16C.11 =1 = Oui ► (16C.16)=. Q16C.16 asks quantity already harvested for the
+present2021/2022 campaign. PDF p.86 (printed85) identifies one crop per line
+per parcel; this is not the household-crop disposition total. Both forms also
+print zeroharvest(code3)→16C.14. Unfinished100% not-started and100% lost
+routes go to the next crop; do not infer every unfinished row was askedQ16.
+
+The old country report says “sparse because of how the questionnaire was
+routed” while admitting “I read no questionnaire or enumerator manual this
+round.” Preserve that tension beside the later note that paper routes finished
+harvests TO quantity. The five-document check confirms the printed statement,
+not the deployed CAPI rule or any released row's missingness cause.
+
+Covers identify Mali/EHCVM2021/2022 and passage1/2; the held PDFs have2024
+generation metadata. Passage2's metadata title mentions VAGUE1-Copia while
+its visible cover says VAGUE2. These are not authenticated fielded versions.
+An exact deployed CAPI project/export/version and change history remain needed.
+Mali's1515/ad44 total/window ruling is already settled in its existing scope;
+this check neither rederives it nor changes quantities, IDs, units or defaults.
+
+Closed sourcec88 documentary packet in the20261103 burst =reports/=:
+=1437-harvest-routing-document-stage-v1-20261109/=. Five held PDFs stayed
+MD5/SHA/size/identity-exact;60textpages and15rendered pages were produced,
+all15renders personally viewed.28rotated-text notices remain; this is not
+full-document visual or as-fielded CAPI certification. No raw/API replay.
