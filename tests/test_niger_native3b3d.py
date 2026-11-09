@@ -205,7 +205,7 @@ def test_registered_shape_actual_country_finalizer_and_singleton_feature(drivers
     def forbidden(*a, **kw):
         raise AssertionError('native transport must not request sample/market/source')
     monkeypatch.setattr(country, '_join_v_from_sample', forbidden)
-    served = country._finalize_result(walked, country.data_scheme[table], table)
+    served = country._finalize_result(walked, country.resources['Data Scheme'][table], table)
     expected = before.rename(index={'811': '900'}, level='i').reorder_levels(['i', 't', obs])
     assert_frame_equal(served, expected, check_exact=True)
     assert served.attrs['id_converted'] is True
