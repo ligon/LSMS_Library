@@ -105,3 +105,24 @@ No exclusions/schema bump/shared rewarm. Full changedkeys/rawmaps and terminal
 receipt under381-unwired-table-current-publication-20261109/metadata.
 This is measured broad fingerprint cost, not data-output or production-incidence
 measurement. Finalledger-only carry preserves measured/tested production.
+
+## §10 CI handler-fingerprint correction (source preparation)
+PR1678 original unit run42709622704/job129475394086 retained:1failure,
+13,805passes/5,673skips/4xfails. Sole failed invariant is existing
+`test_failure_is_not_absence.py::test_no_handler_edit_can_move_a_build_fingerprint`:
+Country._legacy_can_build became reachable through the new direct build-path
+call. It was already an availability/failure-routing handler; it changes no
+parquet values. Existing `_has_country_builder`/`_probe_country_builder` are
+excluded for this same architecture. ROOT explicitly authorizes ONLY adding
+this one established handler to _EXCLUDED_CALLABLES, revising the previous
+no-new-exclusions fence for that exact architectural reason.
+
+New isolated child of frozenfadf; publishedPR1678 stays unchanged. The23-line
+orchestrator insertion remains hashed and every Country/test/config object
+must stay byteexactfadf. Do not exclude the orchestrator, all helpers, or hide
+its452/1885/37 measured cost. If this handler ever shapes cached content, the
+exclusion must be revisited. Existing failure invariant and mechanism/content
+controls are unchanged; freeze before one small selected pure cohort. No
+13,805/52/API replay; correctedcombined metadata awaits ROOT after outcomes.
+Original CI/source/maps remain immutable. The1071 source-only charter is
+paused and unimplemented; no corruption policy or cache operation is bundled.
