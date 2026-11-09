@@ -2060,6 +2060,8 @@ class Wave:
             return df
 
         if data_info:
+            from .build_transforms import _input_lineage, _output_inputs
+            output_inputs = _output_inputs(data_info.get('output_inputs', {}))
             # Vertical Merge dfs
             if data_info.get('dfs'):
                 merge_dfs = []
@@ -2072,6 +2074,7 @@ class Wave:
                 # supplied, is recorded in the parquet this build writes -- the
                 # content hash cannot tell a degraded build from a complete one.
                 dropped: list[dict[str, Any]] = []
+                input_lineage = {}
                 _forget_wave_build_drops(self.country.name, request, self.year)
                 # GH #1063: the merge keys in a FIXED order -- 't' first, then
                 # the declared `merge_on` order.  This used to be
@@ -2186,6 +2189,11 @@ class Wave:
                         if rec["kind"] == "config":
                             config_bugs.append((i, sub_file, exc, rec["cause"]))
                         dropped.append(rec)
+                        # Explicit lineage includes index-level providers too;
+                        # legacy direct-missing fields still use myvars only.
+                        for name in (set(sub_data_info.get('idxvars') or {})
+                                     | set(sub_data_info.get('myvars') or {})):
+                            input_lineage.setdefault(name, {})[i] = {name}
                         if rec["cause"] == "no-such-source":
                             warnings.warn(
                                 f"{self.name}/{request}: no such source for "
@@ -2230,7 +2238,12 @@ class Wave:
                 derived_spec = data_info.get('derived')
                 if derived_spec:
                     from .transformations import apply_derived
-                    df = apply_derived(df, derived_spec)
+                    df = apply_derived(df, derived_spec, _lineage=input_lineage)
+                # Snapshot all final-hook/direct declarations together: their
+                # order does not invent a chain. Self-input reads pre-hook data.
+                input_lineage.update({
+                    output: _input_lineage(inputs, input_lineage)
+                    for output, inputs in output_inputs.items()})
                 # `drop:` removes the temporary columns that existed only to
                 # feed the `derived:` transformers.  Listed columns that aren't
                 # present are silently skipped so YAML authors don't have to
@@ -2310,7 +2323,10 @@ class Wave:
                     _file_wave_drops(
                         self.country.name, request, dropped, df,
                         ((self.country.resources or {}).get('Data Scheme')
-                         or {}).get(request))
+                         or {}).get(request), input_lineage={
+                             output: input_lineage.get(output, {})
+                             for output in dict.fromkeys([
+                                 *(derived_spec or {}), *output_inputs])})
 
             else:
                 mapping_details = self.column_mapping(request, data_info)
@@ -9275,26 +9291,34 @@ def _wave_grain_audit(country: str, table: str, wave: str | None) -> list[dict] 
 # ---------------------------------------------------------------------------
 
 class DegradedCacheWarning(UserWarning):
-    """A cached table is served WITHOUT a required column, because a source
-    file could not be read when it was built and still cannot (GH #675).
+    """A cached table has direct absence or declared coverage-unknown evidence.
 
     ``country``, ``table``, ``missing`` (the REQUIRED columns absent),
     ``missing_optional`` (the ``optional: true`` columns absent -- graded too
     since 675-b, when the cause was an unavailable source) and ``files`` (the
     unavailable sources, relative to the countries root) say what is wrong.
+    ``coverage_unknown_required`` / ``coverage_unknown_optional`` name outputs
+    affected by an explicit input interruption; ``input_drops`` retains their
+    input names, present/absent state and source/drop provenance (GH1051E).
+    This evidence does not establish lost rows or incorrect values.
     The table rebuilds by itself in the first process that can fetch the file;
     ``lsms-library cache clear --country <C>`` forces it.
     """
 
     def __init__(self, message: str, *, country: str, table: str,
                  missing: tuple = (), files: tuple = (),
-                 missing_optional: tuple = ()):
+                 missing_optional: tuple = (),
+                 coverage_unknown_required: tuple = (),
+                 coverage_unknown_optional: tuple = (), input_drops: tuple = ()):
         super().__init__(message)
         self.country = country
         self.table = table
         self.missing = missing
         self.missing_optional = missing_optional
         self.files = files
+        self.coverage_unknown_required = coverage_unknown_required
+        self.coverage_unknown_optional = coverage_unknown_optional
+        self.input_drops = input_drops
 
 
 # (country, table) -> drop records filed during this process's builds.
@@ -9411,12 +9435,14 @@ def _drop_record(wave: str, sub: str, exc: Exception, paths: list[Path],
 
 
 def _file_wave_drops(country: str, table: str, dropped: list[dict],
-                     df: Any, scheme_entry: Any) -> None:
+                     df: Any, scheme_entry: Any, *, input_lineage=None) -> None:
     """File one wave build's drops with the DECLARED columns each cost --
     ``missing_required`` and ``missing_optional`` -- judged against the frame
     after ``derived:``/``drop:``/``df_edit``, the same moment as the #323/#515
     guard.  A column a sibling sub-df supplies is not "missing"; a temporary
-    column the scheme does not declare is never counted."""
+    column the scheme does not declare is never counted. Explicit lineage adds
+    separate coverage-unknown fields, never recategorizing presence as absence.
+    """
     have = (set(map(str, df.columns)) | {
         str(n) for n in df.index.names if n is not None}
         if isinstance(df, pd.DataFrame) else set())
@@ -9426,12 +9452,25 @@ def _file_wave_drops(country: str, table: str, dropped: list[dict],
         supplies = set(rec.pop("supplies", []) or [])
         rec["missing_required"] = sorted((required & supplies) - have)
         rec["missing_optional"] = sorted((optional & supplies) - have)
+        # Separate evidence from direct absence: even a fully supplied sibling
+        # cannot disprove an explicitly declared provider interruption (§3/§4).
+        affected = {
+            output: {"inputs": sorted(providers[rec["sub"]]),
+                     "present": output in have}
+            for output, providers in (input_lineage or {}).items()
+            if output in required | optional and rec["sub"] in providers}
+        if affected:
+            rec["coverage_unknown_required"] = sorted(required & affected.keys())
+            rec["coverage_unknown_optional"] = sorted(optional & affected.keys())
+            rec["affected_outputs"] = affected
         _file_build_drop(country, table, rec)
 
 
 def _drop_missing(d: dict) -> list[str]:
-    """Declared columns one drop record cost, required first."""
-    return list(d.get("missing_required") or []) + list(d.get("missing_optional") or [])
+    """Directly absent columns or explicitly interrupted declared outputs."""
+    return (list(d.get("missing_required") or []) + list(d.get("missing_optional") or [])
+            + list(d.get("coverage_unknown_required") or [])
+            + list(d.get("coverage_unknown_optional") or []))
 
 
 def _degraded_drops(drops: Any) -> list[dict]:
@@ -9516,7 +9555,9 @@ def _degraded_cache_verdict(drops: Any, key: tuple) -> tuple[str, str | None]:
     if not healed:
         return "serve", None
     _DEGRADED_ATTEMPTED.add(key)
-    return "rebuild", (f"degraded: built without {_describe_missing(degraded)} "
+    condition = ("built with " if any(d.get("affected_outputs") for d in degraded)
+                 else "built without ")
+    return "rebuild", (f"degraded: {condition}{_describe_missing(degraded)} "
                        f"because {', '.join(healed)} could not be read; it can "
                        f"be read now (GH #675)")
 
@@ -9527,6 +9568,13 @@ def _describe_missing(degraded: list[dict]) -> str:
     opt = sorted({c for d in degraded for c in d.get("missing_optional") or []})
     parts = ([f"required column(s) {req}"] if req else []) + (
         [f"optional column(s) {opt}"] if opt else [])
+    if any(d.get("affected_outputs") for d in degraded):
+        parts = [f"entirely absent {part}" for part in parts]
+    for field, label in (("coverage_unknown_required", "required"),
+                         ("coverage_unknown_optional", "optional")):
+        affected = sorted({c for d in degraded for c in d.get(field) or []})
+        if affected:
+            parts.append(f"coverage unknown for {label} output(s) {affected}")
     return " and ".join(parts)
 
 
@@ -9545,6 +9593,11 @@ def _warn_degraded_serve(country: str, table: str, drops: Any,
     missing = tuple(sorted({c for d in degraded for c in d.get("missing_required") or []}))
     missing_optional = tuple(sorted(
         {c for d in degraded for c in d.get("missing_optional") or []}))
+    unknown_required = tuple(sorted(
+        {c for d in degraded for c in d.get("coverage_unknown_required") or []}))
+    unknown_optional = tuple(sorted(
+        {c for d in degraded for c in d.get("coverage_unknown_optional") or []}))
+    input_drops = tuple(d for d in degraded if d.get("affected_outputs"))
     locations = []
     multifile = False
     for drop in degraded:
@@ -9559,21 +9612,28 @@ def _warn_degraded_serve(country: str, table: str, drops: Any,
     detail = "; ".join(
         f"wave {d.get('wave')}: sub-df '{d.get('sub')}' ({', '.join(sources)}) "
         f"-> {_drop_missing(d)} [{d.get('error')}]"
+        + (f"; declared input interruption: {d['affected_outputs']}"
+           if d.get('affected_outputs') else "")
         for d, sources in zip(degraded, locations))
     status = ("and those required sources have not all been restored to this "
               "cached build in this process. " if multifile else
               "and that file still cannot be fetched in this process. ")
     where = f"{country}/{wave}/{table}" if wave else f"{country}/{table}"
+    condition = ("with " if input_drops else "WITHOUT declared ")
+    qualification = (" This is coverage-unknown evidence, not proof of lost rows "
+                     "or wrong values." if input_drops else "")
     warnings.warn(DegradedCacheWarning(
-        f"{where}: serving a cached table WITHOUT declared "
-        f"{_describe_missing(degraded)}.  The build that wrote {path} could "
+        f"{where}: serving a cached table {condition}"
+        f"{_describe_missing(degraded)}.{qualification}  The build that wrote {path} could "
         f"not read {', '.join(files)} and dropped it (the GH #515 "
         f"optional-sub-df fallback), {status} It will be rebuilt automatically by the first process "
         f"that can fetch it from disk or the DVC blob cache; `lsms-library "
         f"cache clear --country {country}` forces a rebuild now (GH #675).  "
         f"Detail: {detail}",
         country=country, table=table, missing=missing, files=files,
-        missing_optional=missing_optional),
+        missing_optional=missing_optional,
+        coverage_unknown_required=unknown_required,
+        coverage_unknown_optional=unknown_optional, input_drops=input_drops),
         stacklevel=stacklevel)
 
 

@@ -216,6 +216,51 @@ Older ambiguous multi-file stamps still contain only one path until a legitimate
 rebuild writes the richer evidence. There is no automatic migration, source-config
 lookup, schema bump or promise that metadata availability proves decoding.
 
+### Explicit input lineage and unknown coverage
+
+Wave table declarations can describe inputs used by a derived step or a final
+hook. Names refer to harmonized merged columns or index levels before `drop:`,
+not raw source variable names or derivation-registry retrieval functions:
+
+```yaml
+derived:
+  v:
+    kind: coalesce_coord_bin
+    lat: Latitude
+    lon: Longitude
+    inputs: [v, Latitude, Longitude]
+output_inputs:
+  Region: [Region, Region_enrichment]
+```
+
+`inputs` is reserved metadata and is consumed before transformer kwargs are
+dispatched. Derived steps execute in declaration order, once each. Name the
+existing target explicitly when a step reads it: self-input means its value
+before that step. Explicit chains propagate interrupted-provider lineage.
+`output_inputs` belongs to the table in wave `data_info.yml`, for final hooks
+and direct sibling coverage; its entries all refer to the pre-hook state.
+Empty mappings/lists declare no dependencies. Malformed declarations raise;
+input presence is not validated by this metadata, and transform/hook errors
+retain their existing behavior, including absent coordinate errors.
+
+If a declared input's provider was dropped, the footer adds
+`coverage_unknown_required`, `coverage_unknown_optional` and `affected_outputs`.
+Each affected output records the interrupted original input names and whether
+the final output is present, alongside the drop's wave, subframe and source
+`file`/`files`. Existing `missing_required`/`missing_optional` fields continue to
+mean entirely absent direct columns. Unknown coverage is conservative even if
+a sibling fills every value: it is not evidence of lost rows or wrong values.
+Warnings distinguish these states and expose `coverage_unknown_required`,
+`coverage_unknown_optional` and `input_drops` separately from `missing` fields.
+
+Unavailable explicit interruptions use the existing bounded degraded probe and
+rebuild policy, including per-source memo, once per key, just-written suppression
+and all-source readiness for multi-file drops. Configuration drops keep their
+existing policy. No declarations means legacy behavior; old footers are not
+inferred or migrated, and unrelated temporary columns remain ungraded. This
+metadata does not fill, filter, normalize or otherwise change the frame, its
+axes or attrs. Existing country configurations are not automatically annotated.
+
 ## Cache Location
 
 All three tiers are under the user data directory:
