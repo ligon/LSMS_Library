@@ -582,45 +582,59 @@ class TestDVCCaching:
     def test_panel_ids_dict_cache_written_as_json(
         self,
         mock_country_structure,
+        monkeypatch,
     ):
-        """panel_ids dictionary results should persist as JSON."""
+        """A legitimate wave dictionary persists privately, without a publisher."""
+        from lsms_library.paths import countries_root
+
+        monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
         panel_ids_json = mock_country_structure / "_" / "panel_ids.json"
         panel_ids_parquet = mock_country_structure / "_" / "panel_ids.parquet"
+        expected = {"2020-21": {"A": "B"}}
+        wave_dictionary = {"A": "B"}
+        wave_getter = Mock(return_value=wave_dictionary)
+        source_root = Path(countries_root()) / "TestCountry"
+        (source_root / "_" / "Makefile").write_text("# maintainer-only publisher\n")
+        (source_root / "_" / "panel_ids.py").write_text("# offline publisher\n")
 
-        def fake_make(cmd, cwd, check, **kwargs):
-            target = Path(cwd) / cmd[-1]
-            data = {"2020-21": {"A": "B"}}
-            target.write_text(json.dumps(data))
+        def source_state():
+            return {str(p.relative_to(source_root)):
+                    (p.stat().st_mode, p.stat().st_mtime_ns, p.read_bytes())
+                    for p in source_root.rglob("*") if p.is_file()}
 
-        # Ensure Makefile exists so loader attempts to run it
-        makefile_path = mock_country_structure / "_" / "Makefile"
-        makefile_path.write_text("# dummy makefile\n")
-
-        with patch("lsms_library.country.files") as mock_files, \
-            patch("lsms_library.country.Repo") as mock_repo_class, \
-            patch("lsms_library.country.subprocess.run", side_effect=fake_make) as _mock_make, \
+        source_before = source_state()
+        assert not panel_ids_json.exists() and not panel_ids_parquet.exists()
+        with patch("lsms_library.country.Repo", side_effect=AssertionError("no DVC build")) as mock_repo, \
+            patch("lsms_library.country.subprocess.run", side_effect=AssertionError("no Make/Python publisher")) as mock_process, \
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "data_scheme", new_callable=PropertyMock) as mock_scheme, \
             patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
-            patch.object(Country, "file_path", new_callable=PropertyMock) as mock_file_path:
-
-            mock_files.return_value = mock_country_structure.parent.parent
-
-            mock_repo = Mock()
-            mock_repo.status.return_value = {}
-            mock_repo_class.return_value = mock_repo
-
+            patch.object(Country, "__getitem__", return_value=SimpleNamespace(
+                panel_ids=wave_getter, data_scheme=["panel_ids"])):
             mock_waves.return_value = ["2020-21"]
             mock_scheme.return_value = ["panel_ids"]
             mock_resources.return_value = {"Data Scheme": {"panel_ids": {}}}
-            mock_file_path.return_value = mock_country_structure
-
             country = Country("TestCountry", preload_panel_ids=False)
             result = country._aggregate_wave_data(method_name="panel_ids")
+            assert result == expected
+            assert json.loads(panel_ids_json.read_text()) == expected
+            stored = panel_ids_json.read_bytes()
+            stored_mtime = panel_ids_json.stat().st_mtime_ns
+            second = country._aggregate_wave_data(method_name="panel_ids")
+            assert second == expected
+            assert panel_ids_json.read_bytes() == stored
+            assert panel_ids_json.stat().st_mtime_ns == stored_mtime
+            wave_getter.assert_called_once_with()
+            mock_process.assert_not_called()
+            mock_repo.assert_not_called()
 
         assert isinstance(result, dict)
         assert panel_ids_json.exists()
         assert not panel_ids_parquet.exists()
+        assert wave_dictionary == {"A": "B"}
+        assert source_state() == source_before
+        assert not list(source_root.rglob("*.json"))
+        assert not list(source_root.rglob("*.parquet"))
 
     def test_panel_ids_dataframe_cache_written_as_parquet(
         self,
