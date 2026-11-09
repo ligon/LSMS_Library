@@ -1,4 +1,10 @@
 #+title: Current LSMS-ISA worker queue
+* Latest21:09UTC
+72verifiedmerges/40closures;1051CLOSED.1674WindowsPASS/unitRUNNING.
+Mwi381purecontrolsafterRootsourceintentadmission;1452independent381sourcepeer;1590approved1135SOURCEPORT(full7countrygroundingfirst).
+Countrydocscombinede45fmechanical+independentreviewPASS, unpushedawaiting1674merge.
+Fullsource/evidence/remaininggates [[file:handoff.org]].
+
 * Current21:05UTC2026-11-09
 Development79f/72verifiedmerges39closures;1674c988OPEN+CI42698354320running.
 Root:1673postmergeerrorcorrection/1051closure/1066publication(done)/countrydocsstaging.
