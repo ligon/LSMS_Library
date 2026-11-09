@@ -1,4 +1,50 @@
 #+title: Current LSMS-ISA goal handoff
+* Source work since verified PR1678
+#1071 concrete source charter ROOT-APPROVED as engineering contract, manifest
+364f71fe75ffe910268a2714ff00712141b0a321647a7df85e476e5f2889dea1 at
+R/1071-managed-cache-read-recovery-charter-20261109. First implementation is
+SOURCE-ONLY in /local/job40825266/worktrees/fix-1071-managed-cache-read-tranche-
+20261109, basebb5f. Four gate families only: YAML-wave, script-wave, normal
+country, both assumed-fresh branches/call-local miss+coverage handoff. Retain
+pd.read_parquet-only OSError/ArrowInvalid boundary; footer/index/null/strict/
+replay/fresh output/source errors stay fatal. Exact identity invalidation,
+coverage captured before rejection, no mtime reuse/recovery loop. No runtime
+yet. other_features/JSON-parquet/retiredstage/privateMake prerequisite owner
+routes explicitly deferred: no whole1071 closure from this tranche.
+
+#1032 independent initial source review R/review-1032-readonly-dvc-runtime-
+source-20261109 MANIFEST-v1 3ac7abfcd5f3e76eec90b11ccaea92a27c377ed0441a1982600782f2ed4e4f5a.
+Concrete P2: constructor except deletes state while partial State SQLite
+handles can be open before CacheManager fails. ROOT authorized narrow child:
+close only actually initialized owned handles without triggering lazy attrs,
+retain diagnostic state if closure fails, preserve original constructionerror.
+No other P1/P2 found in41799 so far. Separate actualCountry stage control
+found genuine resolver prerequisite: installed valid detailed outs syntax
+{template:{cache:false}} was skipped by old path-only resolver beforeparams.
+ROOT authorized narrow key-form recognition preserving string/legacy path and
+actual DVC validation, no schema/parser framework. ActualCountry foreach
+success and unchanged fallback failures must be controlled; do not alter
+existing DvcException fallback policy. All source/tests UNRUN. Root requested
+one original installedDVC invented-readonly baseline witness plus finite new
+controls/existing1001/dvc_caching companions after finalsource/review/grant;
+no baselinecollector/allcountry/fullsuite. No runtime grant yet.
+
+Mali1436 inventory complete R/1436-mali-2017-processing-authority-inventory-
+20261109 manifest794d156bff4e7015b4e8fbacf895c079100c39f2eeecbcc71a20d568731fb63b.
+Root additionally admitted ONLY two already-held public FrenchP2 pages29–30
+via existingPoppler/Cairo operator, one unshare childexit0/8.42s; source/copy
+known MD5/SHAprepostexact, no LSMS/native/provider/acquisition. Personally
+viewed both originalPNG: PDF29/printed28 Q7F13 includes THREE state choices
+and FOUR subcolumns ProductionenUML/UML/Etat/EquivalentenKg with NO printed
+letter suffixes. PDF30/printed29 Q7F21 independently yes/no threshing before
+storage. No code4Egrener/export/CAPI bridge; no recode justified. Detailed
+R/1436-mali-q13-q21-visual-check-20261109 manifest
+8983c996e7241a86890647077e3b2db8a1dfce3434c5d5b789e72aeed1d78841.
+Public1436updated own-wave authority residual. 1452 asked to append this new
+idiosyncrasy to MaliCONTENTS in separate SOURCE-ONLY docs W offbb5, ledgerfirst,
+exact oldprefix/allnonowned preservation, then finish1032independentreview.
+No countrymap/scientific choice or runtime permission in docs task.
+
 * Latest authoritative checkpoint: PR1678 merged/postverified
 Goal ACTIVE. Development bb5f4cca5fff139c3675a20096ecdb57205615d6,
 complete treed3c14182d9ebdd8f25e1671c9caef61073b12f58;77 verified merges/
