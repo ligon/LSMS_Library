@@ -17,3 +17,15 @@ Extend existing formal option plumbing+one narrowhelper; no secondcountrydecoder
 
 ## §6 Open boundary
 No machinery conflict found: source-record formal option fits existing Wave→grabber→reader. Preserve documented instrument/exportlabel conflict. Potential optionaldecoder unsupportedformat is fail-loud, not permission to reinterpret codes. Results pending.
+
+## Phase3 — closed source-free implementation evidence
+
+OK (§§2–5): reviewed native-carrier parent cd833667dd9de442f09681f995b5baada5f7993e merged ordinarily before frozen52b3382e96e5874ba1d1f02d903e995fda4ff08b; all12incoming mode/type/blob objects retained exact. Normal from_dta source remains installed a0632fb6…, finite/value-label/encoding decode reused; native pandas <=111 cannot retain extendedtag distinction and opted reads fail explicitly. No dependency/lock/schema/exclusion change.
+
+ONE focused actor36031 closed0:127PASS/1existingPeru-private-blobSKIP in7.32s pytest/14.47s outer. Actual128JUnit cases,26NEWpassed; four wholemodules selected with requires_s3 cases excluded explicitly. Three durable exactMAIN/checkout/countries/data identities; private configured data/config files0 and sourceclean. Tests cover two storage widths, typed.d vsordinary./unrelated.a, finite/unselected payload+attrs conservation, omitted/empty unchanged route, invalidoptions, defaultfallback retained/optedlossyfallback refused, nativeindex/column/row refusal, internalDVCfilelike, source-record scoping, realWave/ownYAML dictionaries/privateparquet, exactlyone additional selectedscan. No original diagnosis15cohort replay.
+
+ONE finalmetadata actor13873 closed0/124.52s on52b338. Baselineclosed322577map admitted tocd833 by ENTIRElsms_library tree equality (originalheader retained; no baseline rerun). Actual452/452country hashes,1885/1903wave hashes,37/37BTF,124/186FIF change.18Nonewavecells exact; keysets/totals/ALLothermetadata exact,errors0/denials0,private configured data/config files0. This shared build-reader repair broadly invalidates caches; no exclusions/schema bump or sharedrewarm.
+
+InventoryONLY exactCIV s14 managedsidecarMD5 3ac071cdb8b0f960990a506ad529c9a3/13,180,118B and exactheld regularfile lstat. Rawpayload opens/hashes/copies/parses0 in this implementation task. Proposed actualgate remains NOTgranted/NOTexecuted: distinctprivatecopy, independent ordinary+typedscan expected then one actualWave extraction, capped4StataReader.read calls, no Country/Feature/sample/othermodules. Actualsource format/encoding/incidence/API acceptance, independent product review, configured fullCI andROOTpublication remain pending. No country result note added without actualgate. Whole1561/1562 and other scientific decisions are not declared closed.
+
+Closedcode/test/source/provenance/runtime/map receipts are under /global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1561-scoped-stata-missing-map-20261109. Finalledger child preserves all tested/hashed nonledger bytes.
