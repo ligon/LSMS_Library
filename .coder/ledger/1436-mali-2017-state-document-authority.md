@@ -17,3 +17,7 @@ Append only a dated documentary reconciliation. The printed three-choice state c
 
 ## §6 Verification plan
 Prove exact original country prefix, exactly two owned paths and full nonowned mode/type/blob identity. No tests, parser, metadata census or data execution is needed for this appendix.
+
+### Phase 3 — documentary candidate
+
+The 36-line appendix at 650dc6142f7bd2e3a0a5e8f3ff6174ed0888675e preserves the entire 3,708-line country prefix byte-for-byte. Only the Mali CONTENTS appendix and this task ledger are owned; all other mode/type/blob objects remain exact base bb5f4cca5fff139c3675a20096ecdb57205615d6. Whitespace validation passed. No parser, native data, API, tests, builds or metadata census were executed. The code-4 authority question remains open.
