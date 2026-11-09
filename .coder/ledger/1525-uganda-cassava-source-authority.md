@@ -67,11 +67,23 @@ grant and GitHub updates; no new scientific choice is inferred.
 ## Bounded checkpoint
 
 Source-only path reconciliation rules out an existing structural normalization
-that could justify a swap. Own2019BID566821B/MD5e491bd04efbd14658bd7e70050d0edfa
-is now held in manager-sealed private custody but remains UNPARSED in this lane.
-DOC-READ-PLAN proposes one pinned existing parser pass, not an admitted new read.
-The own interviewers manual is absent at the two checked ordinary L1 layouts.
-No source/header/row/API/Make/census/cache/acquisition or new PDF parser call.
+that could justify a swap. ROOT subsequently admitted own2019BID566821B,
+MD5e491bd04efbd14658bd7e70050d0edfa. First68613closed0:38pages exceeded the
+initial30pagecap, so only1–3 were projected. Explicit expanded grant24826closed0
+read remaining4–38; all38unique pages personally read,2PDFparser sessions,
+0first3replay/0rasters, original/private/parserZIP stable hashes/FD prepost.
+No native headers/rows/capture payload/API/Make/census/cache/acquisition.
 
-Phase3 source-only check: OK anchored§2–§4; no product symbol added, no label
-or scientific policy altered. The semantic authority question in§6 remains.
+New primary discriminator: BIDPDF16Table1 independently lists consumption-item
+GSEC15B.dta keyedhhid/CEB01, supporting current driverfield despite the printed
+forms' CEB01Description/CEB02Code discrepancy. PDF8/30 identifies SurveySolutions;
+it does not identify deployed questionnaireGUID/version. FullBID gives no
+food1081/1082/108_1semanticbridge. Unit108 inAnnex1 is a medium400gcup and
+crop630Cassava inAnnex2 is another namespace; neither may decode foodstate.
+The own interviewers manual remains absent at the two checked ordinary L1layouts.
+
+Phase3: OK anchored§2–§4; no product symbol/label/science change. This narrows
+§6 to the exact SurveySolutions foodroster/export specification or producer
+erratum for the released version, with affectedrecords and correctionrule.
+BoundedBIDnegative is not globalabsence/as-fieldedtruth. Evidence and precise
+remaining producer question: external BID-DISPOSITION.md/BID-FINDINGS.json.
