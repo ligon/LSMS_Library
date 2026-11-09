@@ -25,7 +25,7 @@ Initial ledger, config, and final ledger updates require separate commits.
 | Ethiopia `_/CONTENTS.org:1735`, `:3854` | Later cover expansion: "W2 adds" / "25 links with 3776 unchanged". | Broader later linkage is not this dated measurement's denominator; no recomputation. |
 | Frozen `APPROVED-SCHEMA.md:1` through `:9` in the supplied `ISA_CONTEXT_ROOT` | Approved country contract, including the binding Nigeria/Tanzania corrections and byte preservation. | Reuse contract; no other country config is owned. |
 | Frozen `COUNTRY-INPUT.json`, sole Ethiopia `2013-14` row | Literal old counts and own locators. `panel_only_equal` is true; surrounding blank-line difference explains the full-entry comparison's false flag. | Reconcile with own base bytes, never replace the old file wholesale. |
-| Frozen `reviewed-sampling.py.txt`, `_MEASUREMENT_COUNTS`, `_MEASUREMENT_FIELDS`, `_check_measurement` | Optional typed measurement with independent provenance, unknown versus not-applicable, canonical counts and coherence. | Read-only source; never imported or executed. |
+| Frozen `reviewed-sampling.py.txt:238`, `:249`, `:717` (`_MEASUREMENT_COUNTS`, `_MEASUREMENT_FIELDS`, `_check_measurement`) | Optional typed measurement with independent provenance, unknown versus not-applicable, canonical counts and coherence. | Read-only source; never imported or executed. |
 | Base `lsms_library/sampling.py:201`, `:584`, `:653` | Existing frozen panel fields and loader do not yet support the new measurement field. | Coordinator owns schema integration; deliberate interim mismatch, no repair here. |
 | `tests/test_sampling.py:1`, `:218` | Existing source declares config/vocabulary coverage. | Read as source only; no execution/collection and no new test. |
 
@@ -83,7 +83,43 @@ publication is authorized.
 
 ### Phase 3 — verification
 
-UNFINISHED. The initial ledger precedes config mutation. Planned checks:
-literal counts/provenance against approved assets, text-only field/coherence
-review, exact config byte restoration after block removal, nonowned Git
-object identity, and separate commit/path scope. No runtime acceptance claim.
+- **OK (anchored on §1/§2/§5):** one 13-line block adds only the assigned
+  historical N=3776, D=3776, K=333 at `2013-14`. Initial ledger-only commit
+  `02e4129b86ef96891319abfc2f8f7c6b8f3a0a56` precedes config-only commit
+  `dc14f475c992521a5fe07f7d6efaf19bbc5ce251`; this final ledger update is
+  separate. No estimator or transform was introduced or reinvented.
+- **OK (anchored on §3/§4):** literal plain-decimal counts agree with the
+  assigned source, with K <= D <= N. The new block carries its own
+  derived-from-data/high provenance, base-commit locator, 2026-10-19 date,
+  and historical-scope qualification. Net count, mover rule and
+  not-applicable list are absent, preserving unknown/inapplicable semantics.
+- **OK (anchored on §4):** stripping only the added nested block restores
+  the original config bytes exactly: SHA256
+  `c49e816d4d7e296b24c27a8b75fc529a1b44356d77a6e4aa9d8800d3d7f64820`.
+  Candidate config SHA256:
+  `86b77332ab2ae03d379e3f590f55add3c7b6709a9c23507f4d3d0b1f526a66f6`.
+  All current notes and nonmeasurement metadata survive unchanged.
+- **OK (anchored on §1/§4):** 19,247 nonowned tracked leaf objects retain
+  exact base mode/type/blob identities. Nonowned index modes/blob IDs and
+  working-tree diffs are unchanged. `CONTENTS.org` retains SHA256
+  `fce745f494c76fa5b6da336794ac98ceaa19b42bd2cbd3bb79a55a867331799a`.
+  Git whitespace checks pass. Only the two owned tracked paths change.
+- **OK (anchored on §2/§5):** approved source assets match the supplied
+  project-runtime manifest; own config and document hashes match the
+  country-input asset. Old/current panel content is identical; its
+  whole-entry mismatch is exactly a surrounding blank line. Stdlib AST
+  inspection confirms the reviewed schema is source text and base lacks the
+  new field. No shared parser, package or reviewed code was executed.
+- **UNRUN (anchored on §1/§4/§5):** all tests/collection, package imports,
+  Country/Feature/getters/builds, raw/header/DTA/capture/API/census, DVC,
+  Make, network/acquisition/provider/cache/rewarm/weight operations and
+  scientific/fresh measurement acceptance. Prepared runtime identity was
+  checked through supplied setup metadata and interpreter realpaths only.
+
+Reviewable evidence is outside the tracked tree at the dispatch's durable
+`SUCODER_DISPATCH_EVIDENCE_DIR`: `report.md`, `RESULT.json`,
+`verification-plan.json`, `ledger-checkpoint.md`, `source-byte-proof.json`,
+plus the reviewable stdlib/Git proof script and diff. This completes only the
+assigned source port; schema integration, runtime acceptance and issue closure
+remain coordinator work. No unrecorded quirk, blocking contradiction, or
+scientific/default-policy change was introduced.
