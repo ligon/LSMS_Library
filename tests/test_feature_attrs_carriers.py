@@ -60,10 +60,10 @@ class TestTheRegistry:
 
     def test_every_carrier_is_registered(self):
         # `labels_unmatched` added for GH #787 item 3; `unit_kg` for GH #931;
-        # `sampling` for GH #793.
+        # `sampling` for GH #793; `period` for GH #851 Phase II.
         assert [c.name for c in F._ATTRS_CARRIERS] == \
             ["population", "recall", "derivations", "labels_unmatched",
-             "unit_kg", "sampling"]
+             "unit_kg", "sampling", "period"]
 
     def test_feature_did_not_import_the_SHADOWING_callables(self):
         """`lsms_library` binds public callables over two of its own submodule
@@ -81,6 +81,7 @@ class TestTheRegistry:
         assert F._ATTRS_CARRIERS[1].keys == (R.ATTRS_KEY,)
         assert F._ATTRS_CARRIERS[2].keys == (D.ATTRS_KEY,)
         assert F._ATTRS_CARRIERS[4].keys == (T.UNIT_KG_ATTRS_KEY,)
+        assert F._ATTRS_CARRIERS[6].keys == (R.PERIOD_ATTRS_KEY,)
 
     def test_the_captured_keys_are_exactly_the_carriers_keys(self):
         """The capture at the top of the country loop and the re-attach after
@@ -91,7 +92,7 @@ class TestTheRegistry:
         assert set(F._CARRIED_ATTRS_KEYS) == {
             P.ATTRS_KEY, P.ATTRS_RESOLUTION_KEY, R.ATTRS_KEY, D.ATTRS_KEY,
             "labels_unmatched", T.UNIT_KG_ATTRS_KEY, S.ATTRS_KEY,
-            S.ATTRS_RESOLUTION_KEY}
+            S.ATTRS_RESOLUTION_KEY, R.PERIOD_ATTRS_KEY}
 
     def test_each_carrier_delegates_to_its_own_modules_merge(self):
         """The union rule belongs to the module that defines the record.
@@ -105,7 +106,8 @@ class TestTheRegistry:
                                (F._ATTRS_CARRIERS[2], D.merge_attrs),
                                (F._ATTRS_CARRIERS[3],
                                 merge_label_pass_through_reports),
-                               (F._ATTRS_CARRIERS[4], T.merge_unit_kg_attrs)):
+                               (F._ATTRS_CARRIERS[4], T.merge_unit_kg_attrs),
+                               (F._ATTRS_CARRIERS[6], R.merge_period_attrs)):
             closed_over = {c.cell_contents for c in carrier.attach.__closure__}
             assert merge in closed_over, \
                 f"{carrier.name} does not call its module's merge_attrs"
