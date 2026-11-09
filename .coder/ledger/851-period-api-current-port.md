@@ -195,3 +195,55 @@ helper edits and Mali/Burkina documentary notes. Preserve current country
 prefixes plus the exact851 appendices. No record/citation/promoter change,
 runtime, census, raw/API or parent replay. Any genuine source overlap must be
 resolved explicitly and proved rather than treating incoming code as optional.
+
+## Closed current source-free and metadata gates — 2026-11-09
+
+Exact integrated source7b923774dffb23f927fbe50cd1f0f349a0f2920c/tree
+3b942ac97dada58b807e7ef108db91d672411b61 ordinary parents5c24b6f9 and
+actual20c85655 preserves every incoming E Wave/global helper and current
+1437 note. All19,219 nonowned mode/type/blob objects equal actual20; only the
+generated Country.__getattr__ span differs in country.py, with all other
+Country/Wave source bytes exact20. Mali3691/Burkina3373 current note prefixes
+remain exact plus the respective17/12 own851 lines. No mapper comment/AST
+was changed; the old Mali sample-split wording remains explicitly qualified.
+
+ROOT authorized ONE initial meaningful portable pure cohort after the copied-
+retired-context guard fix/current integration. Actor72813 actually closed
+outer0,181 uniquePASS/0failure/error/skip,47.214621s, source clean/exact7b
+before/after. Controller/gw0/gw1 import/countries/config/data identity records
+are durable; DIAGNOSIS_OBSERVATIONS was absent in parent/workers, private
+LSMS data/config files0. No realCountry/source/API/Make/census ran in that
+cohort. Literal fixtures cover the unchanged30requirements plus healthy
+unknown-record empty, typed nonempty refusal, same full read/one-build
+continuation and owner/nested/copied-retired/error/interrupt cleanup. Real
+relabel/reaggregation/market/conversion helpers use finite invented leaves;
+this is not independent real-source finalizer validation. The three additional
+pure baseline-dispatch controls use exact current20 __getattr__ source.
+Historical968/93d40 drafts and ROOT's source-only copied-context failure remain
+unmodified; no earlier181-like suite or old153/delivered cohort was replayed.
+
+ONE authorized existing metadata census71173 closed outer0/129.772345s on
+exact unchanged clean7b. Closed E map header7384234791251cd33352c4df0f35a823a9fbc482,
+SHA6618775057aaadf6f47ba4a584aed3ccd2acd6d479b44a573a447dc8490b312c,
+was admitted to actual20 by whole library identity except two explicitly
+excluded country CONTENTS files; original header retained, no baseline replay.
+Actual full comparison:0/452country hashes,0/1903wave hashes,0/37build-transform
+fingerprints and0/186framework-import fingerprints changed. Keysets and ALL
+other metadata fields exact;18None wave cells, errors0, denials0, private
+data/config files0. No hash exclusions/schema bump or shared rebuild/warm.
+Candidate mapSHA9b3cf9bb43f3ae95bb813e3cf1acd1f77a617966a63aa93c6fc54b449c87575d.
+Thus these read/API/recall changes incur zero persisted-build invalidation;
+this is a measured footprint, not actual cached-data/period acceptance.
+
+External durable packet reports/851-period-api-current-v3-20261109 contains
+COMPOSITION-PROOF, focused.xml/receipt/threeidentities/terminal observation,
+CLOSED-FOCUSED-MANIFEST(SHA135f3a20f2335999fa9eb3d136083d44c97ec4121cf379fc10a71b5a6d0f94ad)
+and metadata/BASELINE-ADMISSION,hash-receipt,COMPLETE-COMPARISON and both maps.
+Independent source/contract review is pending at this ledger freeze. Actual
+Country/Feature/defaultNone source-specific acceptance is NOT yet executed or
+claimed. External ACTUAL-ACCEPTANCE-PLAN/DEFAULT-KG-COMPLEMENT explicitly separate
+native2014 denominators from real defaultkg/full-inference/partialavailability
+gaps, list finite held-source stat-only inventories and fixed-v sample seam
+limits. No source payload/hash/copy/NSU call was made by that preparation.
+This child closes ledger bookkeeping only; frozen7b measurement/review tree,
+product/tests/records/generator source and all original receipts stay exact.
