@@ -2,7 +2,7 @@
 
 **Initial source:** a63306951177cde76de21bdcefd4026eb382f5a3.
 **Search tier:** git + ripgrep + AST floor; no GitNexus tool available.
-**State:** grounded; implementation and verification UNFINISHED.
+**State:** exact production repair and bounded synthetic verification completed; ROOT review/integration pending.
 
 ## §1 Task, restated
 Admit only botocore.exceptions.EndpointConnectionError alongside the existing
@@ -92,8 +92,57 @@ None blocks the authorized patch. ROOT independently reviews/integrates and owns
 PR/GitHub/merge and any broader cache/rebuild measurements.
 
 ## Phase 3 — verification
-UNFINISHED. Freeze code/tests before running. Preserve every actual failed
-attempt and exact command/exit/counts. Final ledger update in its own commit.
-Historical context/1463-DIAG-* remains frozen: first 68 PASS / 4 FAIL on strict
-prewrite-object versus stored-string Region, then 4 matching-storage passes;
-never an all-green historical cohort, and no entire cohort rerun here.
+Code/tests frozen at ccb40d5ab2a28b0895fa4eac5878cba3140b5f67 for the final
+endpoint run. Production SHA256:
+02349e38f583410250bcb93e43401c422ccdbcda226145c627b0dc1c9694ea6f.
+Final test SHA256 is in external FROZEN-code-tests.json; this final update is
+ledger-only. No concurrent editor/verifier or agent was used.
+
+- **OK (§2–§4)** import + secondary handler: exact text replacement and complete
+  module AST equality after removing ONLY the authorized alias and tuple member.
+  Every other production AST node and tracked production file is unchanged.
+  Primary bare raise remains with no expression/cause or traceback translation.
+- **OK (§3–§4)** 29 new endpoint cases pass (test03, exit 0, 20.03 s): actual
+  bound grab_data and generated Wave dispatcher, actual df_data_grabber
+  formatter boundary, local/sidecar/no-source classification, optional/required
+  loss, source/provenance/unrelated errors, final hooks, drop footer and both
+  bound cache gates. Four fresh-interpreter children serve endpoint-degraded
+  parquets twice with one fast probe each, exact independent storage schemas
+  and unchanged bytes/mtime. State-reset parent controls verify healing misses,
+  once-per-key behavior and actual rebuilds with now-available invented rows.
+  This is bounded framework composition, not independent survey validation.
+- **OK (§2–§4)** 59 unchanged companion cases pass at identical production
+  bytes in test01: 31 GH1547, 16 pure GH675, 6 null-preserving storage,
+  6 pure failure-boundary controls. No real-country fixture was used.
+  This is not a final all-88 rerun: disjoint latest passing sets are stated.
+- **Preserved actual attempts:** test01 exit 1: 59 PASS, 1 new-module collection
+  ERROR (bare helper import failed); test02 exit 1: 18 PASS, 11 FAIL. Seven
+  failures exposed expected-frame constructor inference to string instead of
+  the explicit prewrite object provider; four exposed an output path moved
+  without rebinding data_root. Explicit Series dtypes and the ordinary private
+  LSMS_DATA_DIR binding fixed the test setups. No actual-data casts, changed
+  existing assertions/tolerances/skips or production expansion. Frozen attempt
+  sources, logs, XML and exact commands are external evidence. These failures
+  retain their original status; test03 is new evidence, not a relabel.
+- **OK (§4)** prepared-runtime identities and frozen bytes asserted before each
+  test command; 2 pytest workers --dist=loadfile, BLAS/OMP/MKL/build all 1,
+  file logs. No shared cache writes, credentials, source acquisition, SDK
+  request, real Country/Feature/table/native/Make data build, or full CI.
+- **Audit:** make api-audit exit 2 (Poetry absent, recipe exit 127); direct
+  PROJECT_PYTHON scripts/api_surface_audit.py --strict exit 0, all 15 skills
+  listed. No additional task skill applies. No runtime/dependency mutation.
+- **Boundary qualification (§4):** the existing try also encloses sub-frame
+  callable formatters. An EndpointConnectionError raised there is now soft
+  too; a column_mapping error and final request-hook endpoint stay loud.
+  The catch was not relocated or broadened to a parent exception class.
+- **Anticipated metadata/build impact: UNMEASURED.** Static all-table
+  build_transform root implies both harmonized tiers invalidate corpus-wide;
+  no hash census, source build, shared clear/re-warm or full-CI claim follows.
+
+Historical context/1463-DIAG-* is copied byte-for-byte into external evidence:
+first 68 PASS / 4 FAIL on strict prewrite-object versus stored-string Region,
+then 4 matching-storage passes. Those original assertions/results are frozen,
+never an all-green historical cohort, and the entire old cohort was not rerun.
+No CONTRADICTION or REINVENTION against §2–§4 was found. Unrelated broader API,
+scientific, metadata census, live outage/retry timing and ROOT integration
+acceptance remain unexecuted; no new country quirk or CONTENTS patch is proposed.
