@@ -4076,3 +4076,40 @@ was checked by its unchanged source chain and pure decoder tail, not a real
 no-argument producer/API invocation.  No actual source/current coverage count,
 quantity/price/unit/factor/weight rule or cold/warm acceptance is claimed.  The
 historical 121-label/11,649-row/2.4% figures were not remeasured.
+
+* 2026-11-09 -- Equal W1/W2 sale payloads are not transaction identity (GH #1552)
+
+Bounded diagnosis =6cfbaa73b43351eaae25c3e22e8b692a8957b81b=, independently
+reviewed, retains every recorded line. Own W1 PH agriculture form PDF pp.13--15
+and W2 PH form PDF pp.14--17 carry Plot ID/Crop ID and prefilled/additional
+plot-crop roster lines. Own February 2011 manual pp.118--119 and February 2013
+manual pp.106--107 support that organization. Q9 screens sales since harvest;
+Q11 quantity/own unit and Q12 Naira value refer to the MAIN buyer. Q14--17
+other buyers and Q18 hypothetical harvest valuation are separate answers.
+These are not individual transaction records or fixed calendar-quarter totals.
+
+Current W1/W2 code copies =sa3q11a/sa3q11b/sa3q12= from each native row;
+=cropid= is a line within a plot, not a crop code or persistent transaction ID.
+W3--W5 household-crop sale allocation supplies no W1/W2 interpretation. The two
+complete admitted A3 exports (13,018/12,948 rows) have no exact full-record
+repeat or repeated nonmissing =(hhid, plotid, cropid)= key. Equal sale answers
+already occur at distinct source positions; no library multiplication was
+established by static binding and the bounded invented-join control. Actual
+PP inputs/producer/API were not executed in this diagnosis.
+
+Historical 75/67 are EXCESS occurrences, not all member rows: 73/58 groups
+contain 148/125 members under the old harmonized-crop, positive-value,
+any-plot definition; 3/1 recovered lines are members of those groups. Requiring
+complete native-code payloads and distinct plots instead gives 70/58 groups,
+142/125 members and 72/67 excess occurrences. The historical arithmetic excess
+Naira 720,500/1,677,800 is a sensitivity count, NOT an identified overcount.
+
+Among harmonized cross-plot groups, only 5/4 agree on all raw fields except
+plot/line; buyer codes differ in 5/12. Neither equality nor disagreement proves
+transaction duplication or independence. W1 form/manual skips and Q4 wording
+conflict, and W2's manual repeats a Q15 heading; no source is declared stale.
+Published form identity does not authenticate every fielded version. The
+remaining authority is fielded A3/export-custodian evidence tied to private
+source positions: were household-crop totals ever copied across plot lines,
+and what transaction linkage distinguishes them? Whole #1552 remains open;
+no deduplication, household-crop reassignment, unit, weight or default changed.
