@@ -126,3 +126,28 @@ controls are unchanged; freeze before one small selected pure cohort. No
 13,805/52/API replay; correctedcombined metadata awaits ROOT after outcomes.
 Original CI/source/maps remain immutable. The1071 source-only charter is
 paused and unimplemented; no corruption policy or cache operation is bundled.
+
+## §11 Closed narrow fingerprint repair and corrected combined footprint
+Frozen a0f84b50fffc4eeb7496c805779b1a8c1cd69982 changes only the one approved
+handler exclusion plus its rationale; removing5inserted lines restoresfadf's
+entire registry. All19,261nonowned objects/Country/alltestbytes exactfadf;
+23-line orchestrator stays hashed. No producer/data/API behavior was changed.
+One selected pure run77879 CLOSEDouter0/13.854s:6PASS/0F/E/S in6.97s, including
+the originalfailed invariant and fiveexisting mechanism-vs-content controls.
+Three controller/worker import/config identities,0provider/network tripwires,
+privatecontrollerdata/config0; clean/headunchanged. No13,805/52/Nepal replay.
+
+ROOT reviewed frozen diff and sixcontrols, then authorized ONE corrected
+combined-source collector82372:outer0/127.855s, cleanimmutablea0f84/private0/
+errors0/denials0. Full comparisons retain original failed-stackfadf/header+
+mapSHA6c6f6af3a5a2b0e4c3f62ea850e82075990452c4601b6a41d744f78d53b69b76
+and current1135original59f8/header+mapSHA616457913caf00a9684c6238c0d3dadf02ecf464da1c05be46f5ad10a39548cc.
+ACTUAL changes against EACH:452country/1885wave/37BTF/0FIF, not summed effects.
+All4keysets/14nonhash fields exact;18None wavecells preserved. Corrected mapSHA
+6bafa7a41dac811fd794d180ce151d20ad7db5f6c4248fab8afd1d0b2c971801.
+No baseline replay, schema bump, broader exclusion or shared rewarm. The failed
+originalCI and every oldsource/map remain immutable, not relabeled successful.
+Finalledger-only child preserves tested/measured runtime; ROOT owns final
+independentcarry/publication/configuredCI and issueclosure. Source/result proof,
+originalsixJUnit/identities and bothmapcomparisons live in
+B/reports/381-handler-fingerprint-ci-repair-20261109.1071 stayssourceonly/paused.
