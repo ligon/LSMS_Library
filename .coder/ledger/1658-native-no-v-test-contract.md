@@ -15,3 +15,19 @@ Expected shipped set =historical8 UNION exact2approved names. Explicitly assert 
 ## §5–6 Verification
 
 Freeze then run whole declarative module +whole required-index module +whole native3b3d synthetic module once with mountedMAIN/privateconfigdata/absentcreds/unshare/thread1/pytest2loadfile. No actual native/source/API/census replay. Preserve routine fixture failures and correct only affected setup if required; final independent1452 source/evidence review follows. Source/result pending; ROOT owns release.
+
+## Phase3 closure
+
+Runtimeb24e5283dfdca670d6cda27ed3aede7fe9e6b1ae passed one whole requested
+three-module run:89uniquePASS/0fail/error/skip,60.07pytest/67.37outer seconds,
+owner87891exit0. Exactdeclarative10/required-index54/native-synthetic25 cases;
+threecontroller/worker identity receipts, sourceclean/privateconfig/data0.
+Original1658CI failure remains. No actual native/source/API/census replay.
+
+Only shipped-set targetfunction and explanatory modulecomments change;
+all9other originalfunctionASTs are exact07db. Historicalfallbackconstant and
+entireproduct/config tree are byte/mode/type exact07db, including bothapproved
+canonicalindexes/skip_extra. Thus priorproduct/API/metadata/source evidence
+carries by sourceidentity, not a claimednewcensus. Root/1452 independentreview
+and publication remain separate. External packet:
+reports/1658-native-no-v-test-contract-20261109/.
