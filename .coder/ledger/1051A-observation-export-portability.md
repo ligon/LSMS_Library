@@ -14,3 +14,6 @@ FreezebeforeONEwhole28case module, standardpytestDIAGNOSIS_OBSERVATIONS explicit
 
 ## §5 Open boundaries
 Old78passedunderexplicitexportenv; not portableCIacceptance. Newboundedrun mustproveabsent-envcase whiletest/integrity/cleanup remain. No productionrepairorhashimpact claimed.
+
+## Phase3 — actual standard-env regression
+Runtime70e2b0cdf170c5242e1d670defd0399eb99ffc78: ONLYgetenv/conditionalJSONexport, completeassertAST+byteinverseproof exactprior, fixtureuser_properties andallintegrity/cleanup outsidecondition. ONE30941CLOSED0/28PASS0F/E/S/8.51pytest16.30outer, DIAGNOSIS_OBSERVATIONS explicitlyunset+assertedabsent incontroller/gw0/gw1 beforeimports,3durableMAIN/cwdidentities/cleanexacthead/privateconfigureddata+configfiles0. No78/census/raw/API/productrun. PriorCI13332P/5661S/4X/28teardownERRORs andindependentP2 stayhistorical; oldprivateoperator78worked onlybecauseitsetexportenv. This repairsportabletestsetup, notproduction. Finalledgerchild retainsallruntime nonledgerobjects; ROOTownsFF/publication/carries. R=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1051A-optional-observation-export-20261109.
