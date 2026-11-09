@@ -186,3 +186,94 @@ original header7384234791251cd33352c4df0f35a823a9fbc482; no baseline replay.
 One tracked foreground handle and fresh owned0700 empty private roots. Final
 ledger-only child preserves all tested/censused nonledger bytes. ROOT source,
 independent peer, CI and integration/merge gates remain; no self-review.
+
+## R1 correction — bounded verification closed
+
+Frozen tested/censused head fe7fa121d337385a0f195f30286d6b946c19c514,
+tree87e01503edbafef31687f1a5cd1a3fae3c1a8ae0. First new commit
+ac831fb8741a963aa36fc10879cda6400bf22c21 appends ONLY this ledger.
+This final child changes ONLY this ledger; all nonledger objects remain exact.
+
+Only changed product helper: `_fast_window_select` (§2/§4/R1 plan). The old
+snapshot stays strongly referenced by `entries`, and the complete live list at
+the second lock by `released`. Assigning a new list prunes only identities in
+the snapshot that failed validation; concurrent publications survive. The same
+`released` reference protects all entries later removed by owner/options
+invalidation, including entries absent from the snapshot. Local `old` protects
+old owner metadata. Returning or unwinding through `with` exits the mutex before
+frame reference destruction. No close/IO/sleep added. Existing reset holds both
+old windows and owner until outside the lock; clear holds windows; publish holds
+its full live copy through expiry and epoch-rejection returns. Capacity declines
+insertion without eviction; fork replaces the inherited lock before reset.
+These other transitions required no product edit. All B+C1/internal5s/max16,
+auth/scope/default-profile/memo/warmer/C HEAD/A/B/E rules remain unchanged.
+
+Fixture correction disclosed BEFORE freeze/run in the absolute shared question
+channel and evidence: the original control publishes prevalidated entries
+directly after reset, leaving state.owner=None. Publish does not set owner, so
+unchanged select owner initialization independently clears those entries. Under
+ROOT's standing bounded fixture-only authority, the permanent derivative binds
+the exact invented owner before publication. The deterministic two-thread event
+schedule and real publish/select helpers are unchanged. ROOT's stronger oracle
+asserts new entry retained, weakref alive, events=[] immediately after select;
+explicit OUTSIDE-lock reset then weakref dead/events=[False]. Historical W/prefix
+checks move to a portable identity plugin. The original failed file, immediate
+discard guard and R1 1FAIL artifact stay byte-exact in assets, not revised.
+No product policy was changed to accommodate the fixture, and no failed cohort
+preceded this source-proved setup repair. The shared question received no new
+steering; elapsed time was not treated as approval.
+
+ONE frozen focused cohort CLOSED0: **23 passed =14 new ownership cases+9 selected
+existing D resource cases**, 0 failures/errors/skips; 9.448 pytest/17.407 outer
+seconds. New cases cover the actual concurrent publication schedule, concurrent
+owner/options eviction, last-window release on reset/clear/select expiry/route
+invalidity/owner/options/publish expiry/rejected publication, last owner-metadata
+release, and preserving another in-flight owner without close. Existing cases:
+fixed expiry, reset/response/config generation, max16, actual fork lock reset,
+concurrent first failures, last retained native lifetime, runtime-state hash
+neutrality. No bulk114/56/E71/A78/B41 or rerun. Controller/gw0/gw1 receipts have
+distinct PIDs, exact own source/prepared interpreter/config paths, absent optional
+DIAG exports and credentials, loopback-only namespace; two loadfile workers,
+BLAS/OMP/MKL/build1, private DVC-site roots. Integrity/cleanup unconditional;
+private config/data have zero files. Only invented metadata/provider leaves;
+no actual SDK finalizer, native session, network, raw source or data API.
+
+ONE corrected combined metadata census CLOSED0: 142.105 collector/142.391 outer
+seconds, one tracked foreground handle, no detached controller/relaunch. Existing
+collector/runner retain all guards and pinned tracked-config CSV allowance;
+only interpreter-prefix/report-label substitutions, exact inverse proof. Fresh
+owned0700 empty private roots/unshare-rn. Compared with supplied CLOSED E map
+SHA6618775057aaadf6f47ba4a584aed3ccd2acd6d479b44a573a447dc8490b312c, original
+header7384234791251cd33352c4df0f35a823a9fbc482, never replayed: **452/452 table,
+1885/1903 wave,37/37 BTF,124/186 FIF changed**. All keysets/14 nonhash fields/
+18None exact; errors0/denials0/private config+data files0. Candidate map SHA256
+e8adf3f63e995b73a4b56324c01ab9f31fa3b87f9c3f743bd409ec31f0ebdf56.
+This is broad harmonized next-access invalidation, not a rewarm. No schema lever,
+fingerprint exclusion, cache build or serving was changed/performed.
+
+Source evidence compares all19238 frozen objects to initial dcb02cc: only this
+ledger, local_tools.py and the new ownership test module differ. Product AST
+comparison changes only `_fast_window_select`; original D module/tests/assertions,
+country.py/public seams/caching guide and every country/config object are exact.
+All supplied context assets match their SHA seals. Initial dcb tree matches the
+supplied current20+originalD composition receipt; current20/e52 parent Git objects
+are unavailable in this shallow checkout, so historical whole-object composition
+remains a supplied sealed assertion, not a freshly repeated Git comparison.
+Original4390/e52/114PASS/census and independent R1 1FAIL remain historical; the
+old114/census support unchanged behavior only, not new acceptance/current hashes.
+
+Evidence: supplied dispatch evidence directory, five mandatory regular0600 final
+files, exact frozen patch/plan/control derivation, ownership proof, object manifest,
+operator inverse, controller/worker receipts, log/XML, maps/comparison and seals.
+No source push: commits publish only to the supplied private results Git ref.
+Preexisting untracked source channel copies were preserved outside the checkout
+so the unchanged metadata runner's clean-tree assertion could remain exact;
+all steering/question reads/writes use the required absolute shared channels.
+`make api-audit` failed before starting because poetry is absent; frontmatter
+descriptions inspected directly, no install/runtime replacement. GitNexus absent;
+git/ripgrep/AST substitution and HIGH build-fingerprint reach disclosed.
+
+This closes only the authorized author correction and its bounded checks. ROOT
+source review, the same independent peer, configured CI and integration/merge
+remain pending. No self-review/whole1051 closure, actual operator credential
+eligibility, SDK-request or field-latency claim; all original residuals remain.
