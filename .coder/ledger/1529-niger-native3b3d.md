@@ -49,3 +49,11 @@ checker on exact8839 checkout/PYTHONPATH/privateempty config/data confirmed
 attrs and attribute types equal, four more produced-output loads, zero raw/
 reader/API calls. Total8produced-output loads across both checks; source gate,
 focused tests and census unchanged. No scientific/product correction occurred.
+
+## Current naming status (2026-11-09; GH1658/862)
+
+The preceding closed checkpoints retain their historical plot_cultivation
+name/receipts. The public3B carrier is now cultivation_records, retaining
+cultivation_obs/nativepayload. Reserved plot_cultivation belongs to862's
+future per-season plot/person design; it is not an alias or this household
+roster. See1658-native-cultivation-name.md for the mechanical rename/gates.

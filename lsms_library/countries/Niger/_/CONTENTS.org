@@ -3459,7 +3459,7 @@ original diagnosis and its independent review remain separate.
 
 * 2026-11-09 -- Native cultivation and payment operands (GH #1529)
 
-The 2011-12 =plot_cultivation= table now transports the complete own3B
+The 2011-12 =cultivation_records= table now transports the complete own3B
 cultivation/seed/use roster: 768 rows and all26 numeric-reader source columns,
 including603 worked-Yes and165 No rows. =cultivation_obs= qualifies the recorded
 =as03bqa= household slot by its declared source; it is NOT a unique physical
@@ -3485,6 +3485,10 @@ row order for these full universes, with unique observation coordinates.
 Country/Feature retain their normal index-level ordering and supported attrs;
 Feature's existing all-null-column policy still applies to future operands.
 This is native transport, not a universal raw-archive API.
+
+The household roster name is =cultivation_records=. =plot_cultivation= remains
+reserved by GH #862 for a separately designed per-season plot/person table;
+this native transport does not fill that grain or expose an old-name alias.
 
 Only the two2011-12 sources are wired; no source coverage in later waves is
 asserted. Existing3C and all other native table bodies are unchanged. The

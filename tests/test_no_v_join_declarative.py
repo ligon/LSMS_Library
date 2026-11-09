@@ -27,7 +27,7 @@ from lsms_library.country import (
 # GH1529 native roster shapes; the old-version fallback remains historical.
 # --------------------------------------------------------------------------
 def test_shipped_yaml_reproduces_historical_set():
-    native = {'plot_cultivation': ['t', 'i', 'cultivation_obs'],
+    native = {'cultivation_records': ['t', 'i', 'cultivation_obs'],
               'farm_cost_operands': ['t', 'i', 'cost_obs']}
     assert len(_NO_V_JOIN_FALLBACK) == 8
     assert set(_no_v_join_tables()) == set(_NO_V_JOIN_FALLBACK) | set(native)

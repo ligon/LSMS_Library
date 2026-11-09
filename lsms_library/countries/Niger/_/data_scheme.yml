@@ -118,7 +118,7 @@ Data Scheme:
   # Native ECVMA2011-12 rosters: all source columns are retained WITHOUT
   # dtype declarations, recoding or monetary-total aliases (GH1529).
   # No v: these own household observations do not require a sample join.
-  plot_cultivation:
+  cultivation_records:
     # 3B field/parcel/subparcel/crop/seed/use answers. cultivation_obs is the
     # recorded household/slot scoped to the declared source, not a plot ID.
     index: (t, i, cultivation_obs)

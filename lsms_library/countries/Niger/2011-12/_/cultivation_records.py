@@ -20,7 +20,7 @@ def build_native(raw):
     panel walking remains the ordinary Country finalizer's responsibility.
     """
     if any(name in raw.columns for name in ('t', 'i', 'cultivation_obs')):
-        raise ValueError('Niger plot_cultivation source contains a reserved coordinate')
+        raise ValueError('Niger cultivation_records source contains a reserved coordinate')
     households = raw['hid'].map(
         lambda value: niger_i(value) if pd.notna(value) else pd.NA)
     observations = _ecvma_input_observations(
@@ -33,7 +33,7 @@ def build_native(raw):
          households.array, observations.array],
         names=['t', 'i', 'cultivation_obs'])
     if not result.index.is_unique:
-        raise ValueError('Niger plot_cultivation repeats a native observation')
+        raise ValueError('Niger cultivation_records repeats a native observation')
     return result
 
 
@@ -41,7 +41,7 @@ def main():
     raw = get_dataframe(
         '../Data/NER_2011_ECVMA_v01_M_Stata8/ecvmaas3b_p1.dta',
         convert_categoricals=False)
-    to_parquet(build_native(raw), 'plot_cultivation.parquet')
+    to_parquet(build_native(raw), 'cultivation_records.parquet')
 
 
 if __name__ in ('__main__', '<run_path>'):

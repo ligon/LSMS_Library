@@ -16,7 +16,7 @@ from lsms_library.country import Country, _no_v_join_tables
 from lsms_library.feature import Feature, _canonical_index_levels, _required_index_levels
 from lsms_library.paths import countries_root
 
-TABLES = [('plot_cultivation', 'cultivation_obs', '3b'),
+TABLES = [('cultivation_records', 'cultivation_obs', '3b'),
           ('farm_cost_operands', 'cost_obs', '3d')]
 
 
@@ -145,14 +145,14 @@ def test_cultivation_invalid_recorded_slot_refuses(drivers, slots):
     raw = source('3b')
     raw['as03bqa'] = slots
     with pytest.raises(ValueError, match='household|slot'):
-        drivers['plot_cultivation'].build_native(raw)
+        drivers['cultivation_records'].build_native(raw)
 
 
 def test_cultivation_missing_household_uses_existing_identity_refusal(drivers):
     raw = source('3b').astype({'hid': 'Float64'})
     raw.loc[raw.index[1], 'hid'] = pd.NA
     with pytest.raises(ValueError, match='household'):
-        drivers['plot_cultivation'].build_native(raw)
+        drivers['cultivation_records'].build_native(raw)
 
 
 def test_cost_missing_household_is_not_replaced_by_an_invented_id(drivers):
@@ -244,3 +244,14 @@ def test_feature_missing_observation_degrades_and_all_null_column_boundary(drive
         out = feat(['Invented'], currency=None)
     assert out.empty
     assert any('required index' in str(w.message) for w in caught)
+
+
+def test_reserved_plot_cultivation_is_not_registered_or_an_alias():
+    # GH862 reserves this name for a future per-season plot/person design.
+    assert _canonical_index_levels('plot_cultivation') == []
+    assert _required_index_levels('plot_cultivation') == []
+    country = Country('Niger', preload_panel_ids=False)
+    assert 'cultivation_records' in country.data_scheme
+    assert 'plot_cultivation' not in country.data_scheme
+    with pytest.raises(AttributeError):
+        getattr(country, 'plot_cultivation')

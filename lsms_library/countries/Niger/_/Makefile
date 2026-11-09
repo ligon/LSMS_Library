@@ -95,8 +95,8 @@ clean:
 .PHONY: all clean
 
 # Native2011 cultivation/cost operands only; no country compiler (GH1529).
-../%/_/plot_cultivation.parquet: ../%/_/plot_cultivation.py niger.py
-	(cd $(@D) && python plot_cultivation.py)
+../%/_/cultivation_records.parquet: ../%/_/cultivation_records.py niger.py
+	(cd $(@D) && python cultivation_records.py)
 
 ../%/_/farm_cost_operands.parquet: ../%/_/farm_cost_operands.py niger.py
 	(cd $(@D) && python farm_cost_operands.py)

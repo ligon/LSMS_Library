@@ -102,7 +102,7 @@ Index Info:
     household_characteristics: (t, v, i, m)
     plot_features: (t, v, i, plot_id)
     # Native seasonal roster/expense operands, not lasting parcels or totals.
-    plot_cultivation: (t, i, cultivation_obs)
+    cultivation_records: (t, i, cultivation_obs)
     farm_cost_operands: (t, i, cost_obs)
     food_acquired: (t, v, i, j, u, s)
     interview_date: (t, v, i, visit)
@@ -241,7 +241,7 @@ Index Info:
   # tables' reduced/optional-axis contracts have not been censused here.
   required_index_levels:
     household_characteristics: [t, v, i]
-    plot_cultivation: [t, i, cultivation_obs]
+    cultivation_records: [t, i, cultivation_obs]
     farm_cost_operands: [t, i, cost_obs]
     food_expenditures: [t, v, i, j]
 
