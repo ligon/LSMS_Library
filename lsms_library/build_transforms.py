@@ -24,6 +24,7 @@ backward compatibility with the country scripts that import them from there.
 import contextvars
 import os
 import warnings
+from collections.abc import Mapping
 from contextlib import contextmanager
 
 import numpy as np
@@ -316,22 +317,69 @@ _DERIVED_TRANSFORMERS = {
 }
 
 
+def _declared_inputs(value, context):
+    """Validate explicit harmonized input names, including absent inputs.
+
+    This is a declaration, not a presence check (ledger 1051E §3).
+    """
+    if (not isinstance(value, list)
+            or not all(isinstance(name, str) and name.strip() for name in value)):
+        raise ValueError(f"{context} must be a list of nonempty input names")
+    return value
+
+
+def _output_inputs(spec):
+    """Validate the optional wave-table output_inputs mapping."""
+    if not isinstance(spec, Mapping):
+        raise ValueError("output_inputs must be a mapping of outputs to input lists")
+    for output, inputs in spec.items():
+        if not isinstance(output, str) or not output.strip():
+            raise ValueError("output_inputs output names must be nonempty strings")
+        _declared_inputs(inputs, f"output_inputs[{output!r}]")
+    return spec
+
+
+def _input_lineage(inputs, lineage):
+    """Snapshot interrupted providers before a step, including self-input.
+
+    The sidecar maps harmonized names to {dropped subframe: original inputs}.
+    It never touches the frame or infers undeclared edges (1051E §4/§5).
+    """
+    out = {}
+    for name in inputs:
+        for sub, originals in lineage.get(name, {}).items():
+            out.setdefault(sub, set()).update(originals)
+    return out
+
+
 @build_transform()
-def apply_derived(df, derived_spec):
+def apply_derived(df, derived_spec, *, _lineage=None):
     """Apply a ``derived:`` block from ``data_info.yml`` to a DataFrame.
 
     ``derived_spec`` is ``{output_col: {kind: <name>, **kwargs}}``; each
     entry dispatches to the transformer registered under ``kind`` in
     :data:`_DERIVED_TRANSFORMERS`.  The target column name is forwarded
     to the transformer as ``target=<output_col>`` and must not appear
-    in the YAML kwargs.  Unknown ``kind`` raises ``ValueError`` with
+    in the YAML kwargs. Optional ``inputs`` lists harmonized pre-step columns
+    or index levels; it is consumed here, never passed to the transformer.
+    ``_lineage`` is private Wave sidecar plumbing; transforms still run once.
+    Unknown ``kind`` raises ``ValueError`` with
     the list of registered transformers so mistakes surface at read
     time, not in a mysterious downstream KeyError.
     """
     if not derived_spec:
         return df
+    if not isinstance(derived_spec, Mapping):
+        raise ValueError("derived must be a mapping of outputs to transformer specs")
     for output_col, step in derived_spec.items():
+        if not isinstance(output_col, str) or not output_col.strip():
+            raise ValueError("derived output names must be nonempty strings")
+        if not isinstance(step, Mapping):
+            raise ValueError(f"derived: entry for {output_col!r} must be a mapping")
         step = dict(step)                          # don't mutate caller
+        inputs = _declared_inputs(step.pop('inputs', []),
+                                  f"derived[{output_col!r}].inputs")
+        lineage = _input_lineage(inputs, _lineage) if _lineage is not None else None
         kind = step.pop('kind', None)
         if kind is None:
             raise ValueError(
@@ -350,6 +398,8 @@ def apply_derived(df, derived_spec):
                 f"registered transformers: {registered}"
             )
         df = fn(df, target=output_col, **step)
+        if _lineage is not None:
+            _lineage[output_col] = lineage
     return df
 
 

@@ -3343,6 +3343,35 @@ points are excluded too. Exact metadata hash checks belong to the task receipt,
 not a claim that the country was rebuilt. Ledger:
 =.coder/ledger/1482-1485-quantity-diagnostics.md=.
 
+* 2026-11-09 -- GH #1437: own2021 printed finished-harvest route confirmed
+
+Both own forms =2021-22/Documentation/Questionnaire/bfa_ehcvm2_vague1.pdf=
+and =bfa_ehcvm2_vague2.pdf=, PDF p.85 (printed84), route finished Q16C.11
+=1 = Oui ► (16C.16)=. Q16C.16 asks quantity already harvested for the present
+2021/2022 campaign; the preceding PDF p.84 (printed83) enumerates one crop
+per line per parcel. Their Q11 prints Yes/No, not Mali's third zeroharvest
+option. Unfinished100% not-started and100% lost routes go to the next crop.
+
+The own =2021-22/Documentation/manuelagent_ehcvm2_version_v2.pdf=, PDF
+pp.127–128 (printed124–125), independently directs Oui toQ16C.16 and explains
+the quantity/unit/estimatedkg/product-state boxes. This confirms the earlier
+“instrument asks what the file lacks” note's printed routing, not a fielded
+CAPI skip or release/export-loss explanation. Historical row counts are not
+remeasured, and the older causal routing claim/no-document admission recorded
+in Mali's country report remains a tension, not an accepted row-level cause.
+
+Forms' covers identify Burkina/EHCVM2021/2022/passage1–2; manualcover says
+August2021, while the PDFs' generation metadata are2024. The blank PAPI/CAPI
+format selector is not proof of actual implementation. No deployed project/
+export/version is authenticated. Primary6224panel and secondary6277partialCS
+remain distinct; do not infer a shared deployed rule or promote2021 crop
+production, a new harvest derivation, unit/weight policy or default.
+
+Closed sourcec88 packet: =reports/1437-harvest-routing-document-stage-v1-20261109/=
+in the20261103 burst. Exact5held-doc custody,60textpages/15renders, all15renders
+personally viewed;28rotated-text notices retained. Only these viewed pages
+are visually checked; no as-fielded CAPI, raw/API or row-cause claim follows.
+
 * 2026-11-09 -- GH #851: column-specific declared food exposure
 
 EMC 2014 retains four seven-day expenditure asks (28 days), but only passage1
