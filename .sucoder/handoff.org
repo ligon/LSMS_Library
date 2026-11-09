@@ -1,4 +1,19 @@
 #+title: Current LSMS-ISA goal handoff
+* Supplemental baseline and actual worker observation
+Root admitted closedE baseline for Nigeria final census at
+B/reports/587-nigeria-W3PH-current-public-acceptance-20261109/ROOT-E-BASELINE-ADMISSION.json
+SHAcb1f39c25d862e3893d00acb02913ae43035711edc20a740f08f21a9d7341b7a.
+E map SHA6618775057aaadf6f47ba4a584aed3ccd2acd6d479b44a573a447dc8490b312c,
+original head7384234791251cd33352c4df0f35a823a9fbc482 retained; exact manifest
+binding and measured-to20 two excluded CONTENTS-only difference proved. ONE final
+candidate collector granted after actual final source, no baseline replay.
+851 worker acknowledged initial cohort grant; freezes7b923 first, no ledger
+mutation during verifier. Nigeria agent acknowledged current integration923789.
+Live squeue observation showed ONLY root40825266 and unrelated41037662;
+therefore ZERO productive remote workers at that observation. Manager instructed
+to launch D before more seal preparation, then country refill; pending tasks are
+not workers. Two productive local implementer/validators plus dispatch coordinator.
+
 * Authoritative execution checkpoint 2026-11-09T18:17:03.245378+00:00
 This supersedes live statuses below. Goal ACTIVE; 68 verified development merges,
 38 whole-issue closures. Seven PRs 1663–1669 merged in this stretch.
