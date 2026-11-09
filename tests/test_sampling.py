@@ -877,14 +877,69 @@ class TestTheMeasurementRecord:
             households_changed=10, clusters_renumbered=10))
 
     def test_every_shipped_incomparable_boundary_is_measured(self):
-        """The ruling's first line needs a size for every warned boundary;
-        the curation covers all of today's (stable ones may not carry one)."""
+        """The approved port curates these 13 dated boundaries exactly.
+        Other warned boundaries may remain explicitly unmeasured; their
+        warning and strict policy do not depend on inventing a count."""
         import lsms_library as ll
-        missing = [(name, w) for name in ll.countries()
+        expected = {
+            ("Burkina_Faso", "2018-19"), ("Ethiopia", "2013-14"),
+            ("GhanaLSS", "1988-89"), ("Niger", "2018-19"),
+            ("Nigeria", "2018Q3"), ("Nigeria", "2023Q3"),
+            ("Tanzania", "2012-13"), ("Tanzania", "2014-15"),
+            ("Tanzania", "2019-20"), ("Uganda", "2009-10"),
+            ("Uganda", "2010-11"), ("Uganda", "2013-14"),
+            ("Uganda", "2018-19"),
+        }
+        records = {(name, w): r for name in ll.countries()
                    for w, r in sampling_records(name).items()
-                   if r.cluster_id_continuity in S.INCOMPARABLE_CLUSTER_IDS
-                   and not r["panel"].get("cluster_id_measurement")]
-        assert missing == [], missing
+                   if (r.get("panel") or {}).get("cluster_id_measurement")}
+        assert set(records) == expected
+        assert all(r.cluster_id_continuity in S.INCOMPARABLE_CLUSTER_IDS
+                   for r in records.values())
+
+    def test_current_unmeasured_boundary_preserves_warning_span_and_strict(
+            self, monkeypatch):
+        """Real current metadata, synthetic rows; no Mali data measurement."""
+        import lsms_library as ll
+        waves = ll.Country("Mali").waves
+        record = sampling_records("Mali")["2018-19"]
+        assert record.cluster_id_continuity == "redefined"
+        assert "cluster_id_measurement" not in record["panel"]
+        monkeypatch.delenv("LSMS_CLUSTER_STRICT", raising=False)
+        for requested, in_frame in ((["2017-18", "2018-19"], True),
+                                    (["2017-18", "2021-22"], False)):
+            S._clear_sampling_reports()
+            df = frame(requested)
+            before = df.copy(deep=True)
+            report = S.audit_cluster_identity(
+                df, country="Mali", table="sample", waves=waves)
+            (boundary,) = report["boundaries"]
+            assert (boundary["from"], boundary["to"]) == ("2017-18", "2018-19")
+            assert boundary["cluster_id_continuity"] == "redefined"
+            assert boundary["measurement"] is None
+            assert boundary["in_frame"] is in_frame
+            message = S._format_cluster_report(report)
+            assert "size not measured" in message.splitlines()[0]
+            assert "no household is linked" not in message
+            assert ("between the waves you asked for" in message.splitlines()[0]) \
+                is (not in_frame)
+            out, caught = warns(lambda: S.check_cluster_identity(
+                df, country="Mali", table="sample", waves=waves))
+            assert out is df
+            pd.testing.assert_frame_equal(df, before)
+            assert len(caught) == 1
+            assert caught[0].category is S.ClusterIdentityWarning
+            assert str(caught[0].message) == message
+            assert S.sampling_reports(country="Mali", table="sample") == [report]
+            with monkeypatch.context() as strict:
+                strict.setenv("LSMS_CLUSTER_STRICT", "1")
+                with pytest.raises(S.ClusterIdentityError) as exc:
+                    S.check_cluster_identity(
+                        df, country="Mali", table="sample", waves=waves)
+            assert str(exc.value) == message
+            pd.testing.assert_frame_equal(df, before)
+            assert S.sampling_reports(country="Mali", table="sample") == [report]
+        S._clear_sampling_reports()
 
     def test_the_unused_fields_are_named_with_reasons(self):
         """The two exempted from the used-by-a-shipped-record test."""
