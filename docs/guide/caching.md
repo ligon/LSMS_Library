@@ -201,6 +201,21 @@ errors do not trigger this fallback. Ordinary readers and cache warmers keep
 their best-effort behavior and their existing streaming fallback; there is no
 new user setting or shared-cache write policy.
 
+### Dropped subframes with multiple source files
+
+A dropped multi-file subframe records every declared tracked source whose L1
+blob is absent. It becomes eligible for the existing once-per-key retry only
+when all recorded sources are fetchable; separate dropped subframes can heal
+independently. Discovery uses sidecar/local-cache metadata, not new source reads.
+A definite no-source path remains a configuration problem even when another
+listed file is tracked; existing required-column config errors stay loud.
+
+The existing `file` field and older single-file stamps retain their behavior.
+New stamps add an ordered `files` list; malformed lists do not claim healing.
+Older ambiguous multi-file stamps still contain only one path until a legitimate
+rebuild writes the richer evidence. There is no automatic migration, source-config
+lookup, schema bump or promise that metadata availability proves decoding.
+
 ## Cache Location
 
 All three tiers are under the user data directory:
