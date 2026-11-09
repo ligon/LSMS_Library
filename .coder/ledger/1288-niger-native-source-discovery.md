@@ -18,4 +18,16 @@ Only constant-prefix folds and unusedbase removals. Finite2011loop retains two o
 Reuse existing scanner/sidecar/preparation; extend regressions; no general resolver or exclusions. One final metadata census measures the coherent batch versus closed baseline and priorlivestockmap, no baseline replay. Registered community_prices has nativewaveMake rule and no owncountrycompiler; actualdirectbuilderprobing was notrun. No claim all3country dynamicexpressions resolved: Niger31/Nigeria59/Tanzania46physical registeredMake-table scripts were statically inventoried; manual actionable shortlist capped5newcases.
 
 ## §6 Open/verification boundary
-Independent review +configuredCI required before PR. No scientific ruling. Phase3 pending focusedmetadata regressions/finalcensus. Keep original strict livestock backendfailures and separately exactobservedpayload/typedattrs proof.
+Independent review +configuredCI required before PR. No scientific ruling. Phase3 completed for author controls/metadata; independent finalbatch review and configured exact-head CI pending. Keep original strict livestock backendfailures and separately exactobservedpayload/typedattrs proof.
+
+
+## Phase3 anchored verification
+OK (§2–§5): five new scripts change only constant path spelling/unusedbase removal; the2011finite loop preserves exactordered filenames/passages. Original livestockscript bitexact78ead. Sourcefold proof and wholeobject proof external; no processing/default/schema/helper/scientific changes or evaluator.
+
+Author13distinct source-free tests PASS/0skip/13.71s on07d095af61f544013bfd92d718d360438f3ce11b: six actualscript/sidecar controls, six actualpreparationcollector controls, existinggenericscanner. Exactimport/countries/data/mainmount identity asserted; falsecredentials/networkisolated privateemptydata. No raw/API/native replay.
+
+ONE final metadata census on07d CLOSED0/125.28s, emptyprivate data/config,0errors/denials. Full38/450/1895/35/186:19Nigertable hashes +38Nigerwave hashes (19each2011/2014) differ versus both originalclosedbaseline and priorlivestock-only map; unchangedkeysets/publicsurface/overrides/closure/18None/allotherfields/BTF/FIF. Added affected-wave scope is2011's19; existing2014's19moveagain. No exclusion/sharedrewarm/baselinereplay.
+
+Original c105livestockactual proof remains pinned to that source: successfuldefault/Makecold/warmprocesses,12fullparses, typedobservedpayload/key/order/masks/attrs exact; strictinternalunusedlevel/codesfailures retained. Existing CONTENTS/GH1196 qualification is not repaired/canonicalized and whole1288 remainsopen. None of the additionalfive scripts has new native/API validation in this batch; identicalpath/bodyproof and source-free tests are the validation scope.
+
+Finalledgeronly carry preserves every other object exactly07d. Reports B/reports/1288-niger-native-source-batch-20261109, source-onlyboundedshortlist sibling1288-make-literal-discovery-source-review-20261109. ROOT owns independentacceptance/publication/CI; no GitHub mutation byauthor.
