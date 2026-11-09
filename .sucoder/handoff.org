@@ -1,4 +1,84 @@
 #+title: Current LSMS-ISA goal handoff
+* Authoritative current checkpoint 2026-11-09T21:21UTC
+PREVIOUS GOAL TURN progress:1051closed,1066approvedpublished; CURRENT TURN progress:
+1066MERGED+CLOSED,1675docsPRopened,6actualremotecountryworkersrunning,381controls/
+independentreview,1135publicruling/currentcountreconciliation. GoalACTIVE/incomplete.
+Development50a927d69fcba3497b6956f7c5dff55004d42590/treeceda3a17c1754ff7cf485d20791fd92ec1c0260c;
+73verifiedmerges/41wholeissueclosures. FSoriginhandoff/isa-development-20261109 pushed50.
+
+1674MERGED50, exactparents[79f5979cf8022e64928c5150950dfb00456994da,
+c9885ba4431d45792da818c1c052b3efcda2e751]. CI42698354320 tested
+6c4e90d75a23a74e23ea9061d057bce4e7f47991 SAMEparents/tree. Unit129436145735
+13699P5661S4X/792.44s;Windows129436145276 362P1S/14.93s;sixoptionalSKIP.
+Rci-admission-1674-20261109/{unit.log,windows.log,run.json,PREMERGE.json,POSTMERGE.json}.
+Preflightexit0explicitlycheckedBEFOREmutation; postexacttree/parents verified; issue1066
+CLOSEDcompleted21:17:03Z afterfullresidualcriteriaaudit; original1105writefix+newbothreadbranches,
+userselectednormalstrict,0footprint/17syntheticclaimsqualified, noactualdata/sharedrewarm.
+PRbodyrewrittenCIdone/actualmerge; isa-decisionsstillneedsfinalMERGEDdelta(draftoldpublishedstate).
+
+1675OPEN https://github.com/ligon/LSMS_Library/pull/1675
+RootpublicationWpublish-1570-1530-evidence-current-20261109 branchnamesame.
+Final2ba8042aa4280146758fb6f95a7ea2385c64b5ce/treeaa4f5882efc9414b4daba52500e1411a7cf3d38d
+=priorreviewede45fENTIREtreeEXACT aftermergingactual50. EXACT4DOCobjects authorEth9c277/
+Nigerda7a; all19248nonownedexact50 includingallruntime/config/tests; fullCOUNTS4652/3521
+prefixesexactcurrent,48/47appends. RootR1570-1530-current-publication-20261109/
+ROOT-FINAL-CARRY.json addsfinalproofwithoutalteringolderpeer/sourcepacket. BothGitHub+FSoriginpush0.
+CI42701142623RUNNING:unit129445864264running,Windows129445864649SUCCESS,6optionalSKIP21:20Z.
+NEXTROOTpoll1675 aftergreen/downloadlogs/preflightpass/merge/postverify; onlydocs, no extra
+localtest/census/data/parser. Whole1570/1530remainOPEN; bothpublicissuebodiesupdatedwithPR,
+closedmetadata+numericgatefindings, residualauthority/arithmeticscope. NewCF30paircardmetadata
+remainsseparatereviewaddendum, notsilentlyinsertedfrozennotes. OlderPRtextscurrentCIpendingcorrect.
+
+381AUTHOR Mwi runtime29ff remainsreviewedqualifiedPASS, meaningfullynewtestchild
+2ecb7c7da94d9f5bcaaf1abe327a8867115b9f04; correctednewallabsenttestsource1f72731e...
+(no productchanges). R381-missing-target-warning-proposal-20261109:
+focused-v1actor22443CLOSED1/13.19s=36SETUPerrors/0bodies becauseexternalguardstale
+_try_get_from_worldbank vsactual_try_get_data_file; oldwrapper/sourcecleanretained.
+RootadmittedONLYexternalguardleafcorrection/newprivateattempt. focused-v2actor5342CLOSED1:
+35PASS+1neworacleFAIL:allabsentactualexistingRuntimeError('Could not materialize Coverage1590/facts')
+afterretainednamedlogger, testwronglyexpectedempty. Productunchanged/35controlsmeaningful.
+affected-v3actor66697onecorrectedtestPASSinclosedJUnit/exit0 (peerread; authorouterconfirmationpending).
+Correctedoracle requiresnamedRuntimeError+nooutput/cache+namedlogger andquietspecificabsence;
+nofailureconverttowarning. REPORTAS35initial+1correcteddistinct, NEVERfresh36greenrun.
+Allordinaryunshare/cwd/PYTHONPATH/MAIN/privateconfigdataidentities/0provider-networkdenials;
+noactualcountrydata/API/census. GNUmakerequiredlikereused1288tests(CIhasit).
+Peer1452sourcepacket Rreview-381-optional-make-stderr-20261109/MANIFEST
+8dd9f13b9ea18dafbb4c38a320f86ac57c3ea797fcc6bc8e4aef84355d2a9c58/5members;
+new10controlssource/35+1actualreceiptadditivereviewsealingnow.
+RootGRANTED afterONEaffectedcloses: carryontoactual50(current1066method preserved,381try_makeexact29ff),
+freezecompleteproduct/neworacle/sourcecarry; ONEcandidate-onlymetadata census onfinalsource,
+baselineclosed340c DmapR1051D-Windows-851-UgDoc-final-metadata-20261109/hashes-candidate.json
+SHA6a4b8a7a4be5686908bbfcc24a1cde4c15324f2867f833e52dfbf711928eee96. Baselineheader340c
+PRESERVED; actual50addsproved0footprint1066readgate; scope452country1903wave37BTF186FIF/18None,
+all4maps+14nonhash/keysets/error/denial/private0/terminal/sourcecleanrecorded, no baselinecollectorreplay.
+No impliedZEROchanges: run_make_targetmayaffecthashclosure; discloseACTUALmeasuredcost.
+NO PRyet; Rootownsfinalsource/currentCI. Original381alsoNepal/Armeniaoneclearnodatanotice
+UNPROVEN,Armenia1996vsheld2001–17qulificationmeansnoblanketlistshortcut. Addresses381only;
+publicresidualneedsnarrowingwithfuturePR, notwholeclosure. Existingfood_acquired-firstalreadyfixed.
+
+1135currentpublicbodyUPDATED21:12:18Z: latermaintainerrulingslinked, existingunmerged
+implementationreuse/sourceportactive,currentNGAdatedN1454/D54/K1andN4736/D267/Kunknown,
+netbothUNMEASURED; originalcomplete-mover/physicalidentityauthorityquestionsREMAINOPEN,
+notreplacedwithsentinelstats orclosedbyengineeringonly. Fulloldbodypreservedindetails.
+Shared1590fullBurkinacomplete; sharedcodeportactive; 6REMOTE ACTUALsubmit0+agent_executionfresh21:16:36:
+Ethiopia41055343/a74f3ba23a314c508b4d3e401721c8f1;
+GhanaLSS41055348/5a9baf89241a492292c2ae3597502cc4;
+Niger41055345/e57001c0206a422788065b0b50d49484;
+Nigeria41055344/d6793a85ae8d4506856c22973d3c3819;
+Tanzania41055346/0cf535a554ab453c8ff87ed94f2a066c;
+Uganda41055347/1f726aee11a641de8f46c8863d0ffe31.
+All79f/2CPU8GB60min/freeaccount/exclude0028,0035,healthy0030/0034/0037. Supportedphase
+agent_execution/stateRUNNING/freshHB0.6–1.5s, initialnativeversionpending(sooutputsnotyetclaimed).
+Q/private/{Country}-1135-measurement-config-79f-20261109; exactproviderall19248HEADobjects
+no missing/promisor/alternates,ordinarySDK6e/bootstrap/privateDVC unchanged. Source-only
+NOtests/raw/API/headers/re-measure/GH/sciencedefault. EveryTASK5earlycanonicalfiles+mandatory
+fullownCONTENTS/LOGBOOK/WAITING/TODO/namequirk/contradictionrule; eachownsampling.yml+ownledger.
+SchemaFROZENBEFOREallsubmits Q/private/1135-country-config-shared-context-79f-20261109/
+{APPROVED-SCHEMA.md,reviewed-sampling.py.txt,PACKAGES.json,SOURCE-AND-REUSE-PROOF.json,
+ROLLING-ACTUAL-STATE.json}.1590ownsactualwatchers/results/mergingsourceonlywithproofs;
+noactivityclaimfromreservation/managerwatcher/completedjob. Laterresultsneednative0/SDK0/source
+admissionbeforeintegration, notjustschedulerCOMPLETED. No8quotaworkersinvented.
+
 * Latest dispatch steering 2026-11-09T21:11UTC
 1590actual1135W/local/job40825266/worktrees/fix-1135-current-measurement-port-20261109 branchsame/base79f, no source/configedits yet21:10. Full7countrygrounding30,784lines/1.96MB is substantial. RootSTEERED split:1590owns sharedsampling.py/tests/ledger +Burkina configsincefullreadbegun; prepareexactreviewedschema specthenONEreusableexistingprofile/brief anddispatchSIXsource-onlycountryconfigworkers(Ethiopia,GhanaLSS,Niger,Nigeria,Tanzania,Uganda), modestfreeallocation/healthyNode/exclude n0028,n0035. Eachownsampling.yml+ownledgerONLY on79f, mandatoryFULLownCONTENTSfirstinclLOGBOOK/WAITING/TODO/namequirk/quotecontradictions, liftsealed13inventory/currentnotes/datedprovenance; preserveallnonmeasurementconfig; no AGENTS/CNTtransplant/runtime/tests/API/raw/header/acquisition/census/GH/weights/re-measure. Nigeria1454/54/K1 and4736/267/Kunknown, bothnetunknown; Tanz300/130prosepreserved. Exactschema frozenBEFOREdispatch; authorcollectsourcesandindividualproofs into sharedportthenRootreview. No submitted/acceptedhandles YET, no6busyclaim. Existingtypedrecordrulings settle scope. Ifdispatchsetupunavailable, sharedportproceedswhileRootarrangescountryconfigs; avoidauthorfull7sequentialgrind. RootgoalACTIVE.
 

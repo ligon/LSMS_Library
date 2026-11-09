@@ -1,4 +1,11 @@
 #+title: Current LSMS-ISA worker queue
+* Latest21:21UTC
+73verifiedmerges/41closures,development50a927d6;1066CLOSEDafter1674merge+exactCIproof.
+1675docsOPENhead2ba8042/CI42701142623unitRUNNING/WindowsPASS.
+1135SIXremoteactualaccepted+supportedagent_executionfresh:41055343/348/345/344/346/347;1590sharedport+resultsmanager.
+Mwi38135initial+1correcteddistinctcontrols/port50+metadataauthorized;1452independentsource+closedreceiptadmission.
+No381PR/wholeclosure, knownnodatanoticeunproven. Fullsource/evidence [[file:handoff.org]].
+
 * Latest21:09UTC
 72verifiedmerges/40closures;1051CLOSED.1674WindowsPASS/unitRUNNING.
 Mwi381purecontrolsafterRootsourceintentadmission;1452independent381sourcepeer;1590approved1135SOURCEPORT(full7countrygroundingfirst).
