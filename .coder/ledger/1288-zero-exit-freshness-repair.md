@@ -307,3 +307,40 @@ retain the narrow computed/unregistered/unverifiable Other AVAILABILITY tradeoff
 without calling correct-looking live bytes stale. No original failed report,
 source143, denied extension, submission-timeout package or witness is overwritten.
 Coordinator and independent acceptance remain pending.
+### Current integration and portable regression checkpoint (2026-11-09)
+
+Root accepted original7d6ccd1e through the separately frozen v2 actual24:
+24PASS (22normative+2late observations),73active profiles,0denials, clean
+source; original v1's22PASS/2FAIL plus24link denials is not accepted evidence.
+The v2 fixture repair restores four original owned local_tools function objects
+before parent seeding/fingerprinting, avoiding a parent/child closure mismatch.
+It changes no native/oracle/product policy. The genuine computed/hashless/
+rule-less Other availability residual remains separate and whole1288 stays open.
+
+This NEW integration starts on frozen current stack
+9d267417b544cd8834f736cf93dc8ae7fba617fb, ordinarily merging exact7d6ccd1e.
+Actual merge base is dd40aae5, not6863. A pre-source external ledger plan and
+complete original task-ledger read preceded the merge. Git's preview/actual
+merge is conflict-free; no resolution or source rewrite was made. Five original
+1288 paths are admitted, preserving all current1501 no-cache semantics,
+1468JSON reader and both publisher guards, two corrected legacy tests and the
+1495 comments/docstring. Current/development/GitHub merging remains Root-owned.
+
+Before adding the sixth owned path, freeze this tracked checkpoint: deliver
+accepted v2 controls as tests/test_gh1288_native_original_contract.py. All nine
+existing test functions, helper/value/typed-attrs oracles,24producer families,
+24semantic parameters and four-owned-helper restoration fixture stay exact.
+Only module documentation/import portability and the existing genuine
+shutil.which('make') availability mark may differ. No external report/grant/
+guard dependency or pytest current-symlink workaround belongs in repo tests.
+Normal pytest convenience links remain normal; external old guards stay intact.
+
+Root's finite current-composition choice is ONLY the two previously affected
+nativeOther Alpha/Beta cases as ordinary private smoke, following explicit
+import/collection/identity and actual Make-availability checks. Do not run a
+third private24 or whole original46. Configured exact-current fullCI must run
+all portable24 plus original author tests and the full offline suite; Linux
+release acceptance must establish executed24, not a Make-absence skip pass.
+Genuine absence may use the same capability convention as existing native Make
+tests. No source/real-country/API/cache/census campaign or new exclusions.
+This checkpoint's portable module and current smoke are UNRUN/unwritten here.
