@@ -14,7 +14,8 @@ There were NOT eight busy workers. Latest supported remote snapshot10:18UTC repo
 active remote workers; current Slurm listing has no additional ISA worker allocation.
 ROOT immediately refilled both completed local agents:
 - finish_1590: existing PR1653/1654 CI monitoring and terminal admission evidence.
-- finish_1452: final218 ledger-only carry review; separate generated-skill residual diagnosis.
+- finish_1452:218 final ledger carry PASS; generated-skill residual draft done. Now repairing
+ the actual CI failure in the Malawi source-identity regression test, isolated off b443.
 - malawi_revision_food: integrate reviewed218 residual onto Uganda a91ec271; one actual
  integrated metadata comparison, publication preparation in an isolated worktree.
 - ROOT: diff review, GitHub publication/development merges, prioritization and status repair.
@@ -57,12 +58,17 @@ PR1654 Uganda source declarations, ready, currently stacked on1653 feature branc
  Seven anthropometry scripts retain ANTHRO_FILES map and getter; explicit literal consistency
  checks fail before IO, including optimized Python.23 focused controls passed.
  Metadata24country/168wave hashes,0BTF/FIF, all nonhash fields exact.
- CI42599665607: Windows success, original unit129100715145 still running at last observation.
+ CI42599665607: Windows success, original unit129100715145 FAILED at10:37UTC: sole node
+ tests/test_1120_malawi_labor_observations.py::test_all_six_driver_refs_equal_their_loader_literals_and_capture_before_fields.
+13168PASS/1FAIL/5649SKIP/4X,1164.82s. Test compares AST syntax: unchanged path now a
+ full literal while provenance retains BASE+filename. Product path/provenance are identical;
+1452 repairing test to compare bounded static path values and retain all ordering controls.
+ Actual checkout67b2e7b5435ead22a35ec830677ea405307a04a3; no CI retry yet.
  Retarget to development AFTER1653 merge; never merge into the feature branch.
  R=B/reports/1288-uganda-current-publication-20261109.
 
 Next218 source cleanup final103961c856d5b2f4625ff9026680d6ff8709b18c:
- reviewed source064398379020d2210f975bf49cc12cfdfe3a8ed9; own ledger-only final carry pending.
+ reviewed source064398379020d2210f975bf49cc12cfdfe3a8ed9; own ledger-only final carry independently PASS (all19188 nonledger objects exact).
  Five source files: remove retired derived-food recipes/var entries from Togo,CIV,Afghanistan
  Makefiles, correct food-acquired skill, remove obsolete unitlabels.csv ignore exception.
  Preserve native food_acquired, CIV shocks, distinct unit_labels.csv, public derived methods.
@@ -71,7 +77,10 @@ Next218 source cleanup final103961c856d5b2f4625ff9026680d6ff8709b18c:
  Afghanistan unregistered; no public API/build claim. Existing retired files can still be
  'up to date' under GNU Make; no stale-file cleanup claim. Generated-skill stale reference
  remains separate. ROOT has reviewed the actual five-file diff.
- Mwi preparing actual integration on a91; no GitHub PR yet.
+ Mwi actual integration5a216c279d78d196a36a5ffb701dcd8f564a2753 on a91,
+ tree2f7d362056ed64576bbdddb5b3e2a13d4f577d4f, complete19195-object union exact.
+ Single integrated metadata actor90856 running; no GitHub PR yet. Await parent test repair
+ before initiating combined CI, to avoid replaying the known failing assertion.
  R=B/reports/218-retired-make-residual-fix-20261109.
 
 * Decisions and scientific limits

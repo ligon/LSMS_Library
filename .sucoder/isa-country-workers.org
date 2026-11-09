@@ -9,7 +9,8 @@ Eight busy workers was not the current state. ROOT refilled both completed worke
 
 * Current assignments
 - finish_1590: monitor existing CI1653/1654; deliver terminal actual checkout/count evidence.
-- finish_1452: final218ledger carry review, then separate generated-skill residual diagnosis.
+- finish_1452:218ledger carry PASS/generatedresidual draft done; now isolated test-only
+ repair of1654 actual Malawi source-path AST assertion failure, off parentb443.
 - malawi_revision_food: isolate/integrate218final103961 ontoUgaa91; actual metadata delta;
  prepare publication, filesystem-publish only. ROOT owns GitHub.
 - ROOT: review, publish/merge todevelopment, reconcile issues, maintain queue/status.
@@ -18,7 +19,7 @@ Three assigned local workers plusROOT; CI monitoring is not active implementatio
 * Delivery queue
 -1653 Malawi: ready/base development/headb443/treea79e. CI42601058242 unitrunning;
  Windows362PASS/1SKIP. Empty commit exactsource; close/reopen trigger history preserved.
--1654 Uganda: ready/stacked1653/heada91/treee2f0. CI42599665607 unitrunning; WindowsPASS.
+-1654 Uganda: ready/stacked1653/heada91/treee2f0. CI42599665607 unitFAILED10:37UTC; WindowsPASS. Sole stale source-syntax assertion under parentMalawi;1452repairing.
  Retarget todevelopment only after1653merged. Never merge into featurebranch.
 -218 residual: fivefiles+ownledger103961,32Makechecks+APIaudit/independentreviewPASS.
  Actual integrated metadata35Togo/CIVcountryhashes expected, all other fields exact; running
