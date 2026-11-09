@@ -13,16 +13,14 @@ import warnings
 
 from botocore.exceptions import (
     BotoCoreError, ConnectionClosedError, EndpointConnectionError,
-    NoCredentialsError, PartialCredentialsError,
+    PartialCredentialsError,
 )
-from dvc.exceptions import DvcException
 import pandas as pd
 import pyarrow.parquet as pq
 import pytest
 
 from lsms_library import country as C, local_tools as LT
-from lsms_library.paths import countries_root
-from test_gh1547_optional_credentials import (
+from tests.test_gh1547_optional_credentials import (
     FILES, TABLE, YEAR, drop_expected, invented as invented,
 )
 
