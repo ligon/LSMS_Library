@@ -11,7 +11,7 @@ import pandas as pd
 import pytest
 
 from lsms_library import country as C
-from test_gh1590_wave_failure_manifest import (
+from tests.test_gh1590_wave_failure_manifest import (
     survey, NAME, GOOD, BAD, EMPTY, ABSENT, WAVES,
 )
 
