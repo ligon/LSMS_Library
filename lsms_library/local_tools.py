@@ -328,7 +328,8 @@ def _fast_connect_after_fork():
     _reset_fast_connect_windows()
 
 
-os.register_at_fork(after_in_child=_fast_connect_after_fork)
+if hasattr(os, 'register_at_fork'):
+    os.register_at_fork(after_in_child=_fast_connect_after_fork)
 
 
 def _fast_frozen(value):
