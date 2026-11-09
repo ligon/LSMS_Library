@@ -38,7 +38,7 @@ All CI/postmerge receipts: B/reports/ci-admission-<PR>-20261109 (1658rename fold
 
 OPEN PUBLICATION STACK — retainbranches/retargetchildren BEFORE parentmerge:
 1663 READY HEADfallback branchpublish/1051C-on-index-20261109 head224e30ea94b2c78dca77fd2386c8c49e4e778a17
- tree61289abc26141d988ed8a31052a4e73bfb490d83, nowbase development;CIpending/inflight.
+ tree61289abc26141d988ed8a31052a4e73bfb490d83, nowbase development;CI42647940160 RUNNING.
  LocalEACCES/EROFS provenmkdir/temp/rename ONLYinternalfastprobe optin metadataexists <=2sameMD5keys.
  No streaming/parse/WB/index inprobe;ordinarywarmerNone/retry/layout/cleanup unchanged.
  Author41c1/abaf:73P=44new29existing;1452independentreviewPASS/noP1P2P3. Rootreadproductiondiff.
@@ -47,7 +47,7 @@ OPEN PUBLICATION STACK — retainbranches/retargetchildren BEFORE parentmerge:
  Thisresolves1051C ONLY;other1051A/B/D/Eremainopen. No schema/exclusion/sharedcachework.
 1664 READY Tanzania587docs branchpublish/587-tanzania-on-combined-20261109
  head128fe3f1cce11de41d0e5e22699144c5b5ad525f/treeb53d529833d4515e65e132beb95f1fb46a4ed59e
- base1663branch;CIpending. Author7a48225d;Rootread48lineCOUNTSappend/proof/disposition.
+ base1663branch;CI42648129840 RUNNING. Author7a48225d;Rootread48lineCOUNTSappend/proof/disposition.
  ThreeheldUPDdocs prove retrospectiveR1absence NOToriginalfielding, nocorrectlyempty/regrade.
  Wholeoriginal3108lineprefix exact/allnonowned224exact.587issuecheckpoint added;
  broader39historicalcoverageblocs remainOPEN, Nigeriafalsepositivehypothesisrefutedbypreexistingcomment.
