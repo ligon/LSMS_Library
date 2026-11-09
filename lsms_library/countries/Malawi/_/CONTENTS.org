@@ -5509,3 +5509,26 @@ are unchanged. This is a dependency-discovery repair, not a change to native
 rows, identifiers, eligibility, quantities, costs, units or scientific defaults.
 No actual source/API/build parity or whole-GH1288 closure follows from the
 source-only controls; see =.coder/ledger/1288-malawi-source-literals.md=.
+
+* 2026-11-09 -- Livestock country-cache ID stage (GH #1288)
+
+The 2026-10-28 entry says the compiler “continues to concatenate raw wave IDs
+without running =id_walk= itself.” That remains the earlier contract; this
+explicit technical change applies ONLY to =_/livestock.py=. Its complete
+native-ID frame now receives the existing single-pass =id_walk= BEFORE the
+unchanged =to_parquet=, following CLAUDE's L2-country post-walk =i= convention.
+The stored =id_converted= flag prevents a second walk; ordinary reader and
+full/subset/empty row-selection rules do not prune or reconstruct their index.
+All other Malawi compilers retain their existing raw-ID contracts.
+
+New invented actual-compiler/storage/finalizer controls reproduce both parent
+strict failures and pass all six candidate pairs per country, with zero second
+walk. The focused reader/ID/compiler selection passes 133 cases. No new Malawi
+raw/producer/API cohort ran: the prior real four cross-backend unused-level
+failures and original capture/publication qualifications remain historical.
+
+Committed household links, IHS2 absence, IHS3 canonical IDs, CS17/CS19 namespaces,
+Module R eligibility/stock/flow fields and weights remain unchanged. Full-build
+ID errors precede subset return, preserving country coverage integrity. This
+selects no new scientific ID/quantity policy or whole #1288 closure. See
+=.coder/ledger/1288-livestock-compiler-walk.md=.
