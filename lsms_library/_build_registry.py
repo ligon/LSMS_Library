@@ -144,6 +144,10 @@ _EXCLUDED_CALLABLES = frozenset({
     # tests/test_build_transform_hash.py::
     # test_editing_a_wave_read_gate_moves_no_hash.
     "lsms_library.country.Wave._read_l2_wave_cache",
+    # The reading of LSMS_NO_CACHE (GH #1455).  It decides whether a parquet is
+    # read or written, and a no-cache build writes the same bytes of data as an
+    # ordinary one, so it determines no byte of content.
+    "lsms_library.country._no_cache",
     "lsms_library.country.Wave._fresh_script_parquet",
     "lsms_library.country.Country._read_assumed_fresh_cache",
     # GH #675: the degraded-build record.  Filing a drop, grading a stamped

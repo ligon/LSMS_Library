@@ -2,8 +2,8 @@
 
 Ruling, @ligon 2026-11-04: remove the memory-route reducer from
 ``Wave.food_acquired``, and only ``1``, ``true`` or ``yes`` turn ``LSMS_NO_CACHE``
-on.  Both read gates do; the L2-wave write gate waits for GH #1501.  The reducer
-ran wherever the L2-wave write did not happen -- the flag set in
+on.  Both read gates and the L2-wave write gate use that predicate (GH #1501).
+The reducer ran wherever the L2-wave write did not happen -- the flag set in
 any spelling, or a failed write -- and the country tier then stamped what it
 produced with the current hash, so it graded ``fresh`` and every later read
 served it: ``Derivation`` gone, ``Expenditure`` and ``Quantity`` NaN turned to 0,
@@ -33,7 +33,6 @@ COUNTRY = 'Fakeland'
 WAVE = '2001'
 TABLE = 'food_acquired'
 ON = ['1', 'true', 'TRUE', 'True', 'yes', 'YES']
-SKIPS_THE_WAVE_WRITE = ['0', 'false', 'no', 'off']
 OFF = ['0', '', 'false', 'FALSE', 'no', 'off', '2', ' 1 ']
 
 # A row with no Expenditure and one with no Quantity (the reducer's sum made both
@@ -142,8 +141,8 @@ class TestThePredicate:
         """The unrouted reads were how `"0"` meant on at one gate and off at
         another.  Scope: `environ.get` inside functions of `lsms_library/*.py`.
         It does not see a country module (Niger's `wave_producers` saves and
-        restores the flag), `environ[...]` or a module-level read.  `grab_data`
-        is the L2-wave write gate, held for GH #1501."""
+        restores the flag), `environ[...]` or a module-level read.  The write
+        gate now uses the same predicate as the read gates (GH #1501)."""
         readers = []
         for path in Path(lsms_library.__file__).parent.glob('*.py'):
             tree = ast.parse(path.read_text(encoding='utf-8'))
@@ -159,8 +158,14 @@ class TestThePredicate:
                             and isinstance(node.args[0], ast.Constant)
                             and node.args[0].value == 'LSMS_NO_CACHE'):
                         readers.append(f'{path.name}:{fn.name}')
-        assert sorted(set(readers)) == ['country.py:_no_cache',
-                                        'country.py:grab_data']
+        assert sorted(set(readers)) == ['country.py:_no_cache']
+
+    def test_only_the_cache_predicate_is_excluded_from_content_fingerprints(self):
+        from lsms_library._build_registry import _is_build_callable
+
+        assert not _is_build_callable(C._no_cache)
+        assert _is_build_callable(C.Wave.grab_data)
+        assert _is_build_callable(C.to_parquet)
 
 
 class TestTheRoute:
@@ -245,12 +250,40 @@ class TestOffSpellingsBypassNoRead:
         _same(pd.read_parquet(fakeland.var), clean_parquet)
         _same(fakeland.read(), clean_api)
 
-    @pytest.mark.parametrize('value', SKIPS_THE_WAVE_WRITE)
-    def test_a_non_empty_off_spelling_still_skips_the_wave_write(self, fakeland, value):
-        """As documented, until GH #1501 routes the write gate: this pin flips
-        then.  It costs a wave parquet and no content."""
-        fakeland.read(LSMS_NO_CACHE=value)
-        assert fakeland.var.exists() and not fakeland.wave.exists()
+    @pytest.mark.parametrize('value', OFF)
+    def test_an_off_spelling_writes_the_wave_parquet(self, fakeland, monkeypatch, value):
+        """GH #1501: an off value changes neither the wave write nor its frame."""
+        expected, origin = fakeland.country()[WAVE].grab_data(
+            TABLE, _with_origin=True)
+        assert origin == 'materialized' and fakeland.wave.exists()
+        fakeland.clear()
+        monkeypatch.setenv('LSMS_NO_CACHE', value)
+        actual, origin = fakeland.country()[WAVE].grab_data(
+            TABLE, _with_origin=True)
+        assert origin == 'materialized' and fakeland.wave.exists()
+        pd.testing.assert_frame_equal(actual, expected, check_exact=True)
+        assert (pickle.dumps(actual.attrs, protocol=5)
+                == pickle.dumps(expected.attrs, protocol=5))
+
+    @pytest.mark.parametrize('value', ON)
+    def test_an_on_spelling_skips_only_the_wave_write(self, fakeland, monkeypatch, value):
+        expected, origin = fakeland.country()[WAVE].grab_data(
+            TABLE, _with_origin=True)
+        assert origin == 'materialized' and fakeland.wave.exists()
+        fakeland.clear()
+        monkeypatch.setenv('LSMS_NO_CACHE', value)
+        actual, origin = fakeland.country()[WAVE].grab_data(
+            TABLE, _with_origin=True)
+        assert origin == 'memory' and not fakeland.wave.exists()
+        pd.testing.assert_frame_equal(actual, expected, check_exact=True)
+        assert (pickle.dumps(actual.attrs, protocol=5)
+                == pickle.dumps(expected.attrs, protocol=5))
+
+    def test_an_unset_flag_writes_the_wave_parquet(self, fakeland):
+        frame, origin = fakeland.country()[WAVE].grab_data(TABLE, _with_origin=True)
+        assert origin == 'materialized' and fakeland.wave.exists()
+        assert len(frame) == 4 and 'Derivation' in frame
+        assert frame['Expenditure'].isna().sum() == frame['Quantity'].isna().sum() == 1
 
     def test_an_empty_string_writes_the_wave_parquet(self, fakeland):
         fakeland.read(LSMS_NO_CACHE='')
