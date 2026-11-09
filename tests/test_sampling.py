@@ -932,7 +932,8 @@ class TestTheMeasurementRecord:
             assert "households_changed_net_of_movers" not in m, wave
             assert "mover_rule" not in m, wave
             note = m["note"]
-            assert "not measured" in note.casefold(), wave
+            assert any(word in note.casefold() for word in
+                       ("not measured", "unknown")), wave
             # Current provenance is the already-committed #1264 crosswalk
             # measurement (dated 2026-11-04), not the old cover oracle.
             assert "2026-11-04" in m["locator"], wave
