@@ -3519,3 +3519,50 @@ No mapping/link, EXTENSION split-off, namespace guard, native row/value/quantity
 weight or scientific rule changes. Full country-build ID errors now precede
 subset return; no invalid full-coverage artifact is accepted. Whole #1288 stays
 open. See =.coder/ledger/1288-livestock-compiler-walk.md=.
+
+* 2026-11-09 -- Released 16A gate and cover records (GH #1530)
+
+Two zero-row metadata sessions on the own2021 release identify =s16aq00=
+in =s16a_me_ner2021.dta= (MD5 =8be60644b1bad81ece6df5c7f1ebc269=)
+as 16A.00, asking about cultivation during =campagne hivernale 2021/22=.
+Its native card =s16Aq00= is =1 Oui / 2 Non=. Native =grappe, menage, vague=
+and field/parcel ordinals =s16aq02/s16aq03= are present; metadata does not
+establish their uniqueness or actual answers. The cover source is
+=s00_me_ner2021.dta= (MD5 =274ab72da709b8ff5517b9647c731139=).
+
+A separately admitted TWO sanctioned numeric reads retained exactly six
+fields from each source, preserving every released row, order, dtype and
+missing value. All5,729 released16A rows record =Oui=; no =Non=, missing or
+other gate answer was observed IN THIS FILE. They form3,468 complete,
+consistent valid =(grappe, menage, vague)= groups:1,958 single-row groups
+and1,510 repeated groups, with1--9 released parcel rows per group. No row was
+deduplicated or household collapsed. Native =vague= values1/2 remain literal,
+not assumed visit or campaign assignments.
+
+The cover has6,622 unique valid raw-key groups. Full outer comparison gives
+3,468 matched,3,154 cover-only and0 agriculture-only groups; neither source
+has a missing raw key. Of the cover-only groups, =s00q27= is literally
+=1 Complet= for3,049, =2 Partiel= for84 and missing for21. These statuses do
+NOT supply the absent agriculture gate answer. A cover-only record is NOT
+therefore =Non=, not-asked or ineligible; the released positive-only parcel
+slice cannot recover a full No/omission universe or its construction rule.
+
+The first numeric attempt stopped BEFORE any child/read because earlier
+metadata recorded UID0 inside =unshare -r=, versus host UID43292. The admitted
+replacement explicitly bound both namespaces and every other unchanged
+identity/content field; it completed exactly TWO full Stata parses, not a
+data repair/retry after decoded rows. Two later loads of sealed PRODUCED
+operand/coverage frames completed the status crosswalk with0 new native/API
+reads. Original/private sources and operand frames remain unchanged; native
+IDs and row products stay private, with only aggregate findings reported.
+
+The earlier four C/D onion source positions, own crop-code/form/helper
+findings and the missing16C.01 ordinal/16C.05 NAME remain untouched; no C/D
+replay or key link was performed. Existing export-cause prose and the later
+BID's unidentified executed export mechanism remain qualified history.
+Needed authority is a full gate No/omission roster or a version-bound fielded
+SurveySolutions GUID plus enable/roster/export specification tied to this
+release. No gate/filter, season, quantity, unit, ID, weight or scientific
+default changes; no2018 decline or causal export explanation. Whole1530 stays
+open. Evidence: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1530-niger-2021-gate-metadata-20261109/=
+and =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1530-niger-2021-gate-answers-20261109/=.
