@@ -8,9 +8,11 @@ roster.  ``v`` is NOT baked in: 'livestock' is in the framework
 ``_no_v_join`` set, so the household-level rows carry no cluster level and
 the framework does not join one from ``sample()``.
 
-As in the crop_production / plot_inputs siblings, this does NOT apply
-``id_walk`` here; the framework runs it in ``_finalize_result`` on every
-read.  Each wave's ``_finish_livestock`` already sums the ECVMA animal
+The country cache stores household IDs after the existing single-pass
+``id_walk`` (GH #1288 / CLAUDE "Panel ID Transitive Chains"). The unchanged
+writer carries ``id_converted``, so finalization does not walk it again.
+The other country compilers retain their own raw-ID contracts.
+Each wave's ``_finish_livestock`` already sums the ECVMA animal
 sub-type lines (bœuf/vache/... -> Cattle) onto one row per (household,
 canonical species), so the ``(t, i, animal)`` index is UNIQUE within each
 wave and the concatenation stays unique across waves (the four ``t`` values
@@ -22,11 +24,20 @@ Undeclared waves skip; declared missing/unreadable outputs fail before a
 country write (GH #1123). Make-producer routing is a separate boundary; see
 the helper's docstring and the country ledger.
 """
-from lsms_library.local_tools import to_parquet
+from lsms_library import Country
+from lsms_library.local_tools import id_walk, to_parquet
 from niger import concat_wave_parquets
 
 
 
 p = concat_wave_parquets('livestock')
+
+# Walk the complete known-native input before serialization, like the default
+# build. The writer reconstructs its ordinary stored index; readers/selectors
+# preserve that country domain without another walk (ledger1288 §§3–5).
+if 'i' in p.index.names and not p.attrs.get('id_converted'):
+    updated_ids = Country('Niger', preload_panel_ids=False).updated_ids
+    if updated_ids is not None:
+        p = id_walk(p, updated_ids, state='raw')
 
 to_parquet(p, '../var/livestock.parquet')
