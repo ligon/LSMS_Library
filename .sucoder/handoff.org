@@ -1,4 +1,22 @@
 #+title: Current LSMS-ISA goal handoff
+* Latest publication: Mali documentary PR1679 OPEN
+https://github.com/ligon/LSMS_Library/pull/1679
+headc0cb4c3c2e71e46c47ba1443222ebcabc2003186/tree3060380212a25a755685aa85e5a0632b5557090d;
+branchdocs/1436-mali-2017-state-authority-20261109, baseactualbb5f.
+W=/local/job40825266/worktrees/docs-1436-mali-2017-state-authority-20261109.
+Exactly MaliCONTENTS36lineappend + .coder/ledger/1436-mali-2017-state-document-authority.md;
+wholeold3708line/256787byteprefixexact, all19262otherobjects exactbase.
+Root reviewed both files/whitespace/source ancestry and proof, pushedGitHub0.
+R/1436-mali-2017-state-documentary-candidate-20261109 manifest50c6fbad210cd92afe21e6d7f32e5d2c98a7de602dced58aadb51752b8cc3dfa,
+ROOT-SOURCE-ADMISSION.json records personally reproduced conservation.
+Configured CI42722361292 RUNNING; do not call merged. Whole1436 remainsOPEN,
+publicbody links this documentation while maintaining exact remainingwork.
+No localtests/runtime/census needed for docsonly, configuredrequiredCI retained.
+Root owns eventual log/exact-tree preflight/merge/postverify/FSref.
+Source workers still1590(1032partialhandles+actualCountrystage+resolver),
+Mwi(1071approvedcoregateSOURCEimplementation),1452(1032independentreview,
+Mali docscompleted). Development stillbb5f/77merges/42closures.
+
 * Source work since verified PR1678
 #1071 concrete source charter ROOT-APPROVED as engineering contract, manifest
 364f71fe75ffe910268a2714ff00712141b0a321647a7df85e476e5f2889dea1 at
