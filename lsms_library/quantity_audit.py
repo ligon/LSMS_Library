@@ -338,6 +338,21 @@ invented-input checks. Thin cells can go unjudged, and a repeated suspect value
 can still set its own p90. Absence of a warning is not validation. See ledger
 ``1482-1485-quantity-diagnostics.md`` for the census and source-validation gates.
 
+SOLD AMOUNTS AND NATIVE SALE PRICES (GH #1569). ``Quantity_sold`` uses its
+explicit ``Unit_sold``, never harvest ``u``. ``Sale_price`` is a diagnostic
+name for ``Value_sold / Quantity_sold`` per that sold unit, computed only for
+finite positive amounts; it is never added to the served frame. The existing
+p90/support/tolerance arithmetic is reused, trying crop then pooling crops
+within the same supplied country, wave, season, sold unit and sold condition.
+Sold unit/state are never dropped or borrowed from harvest labels. Farm-level
+rows participate. Missing/unknown sold units, unusable amounts and cells below
+the positive-support floor remain unassessed and silent, under the existing
+no-reference contract. A disagreement between harvest and sold units remains
+unresolved; an outlier names both labels and uses the sold label AS REPORTED,
+not as established physical truth. Only the upper tail is added by default.
+No real-data firing rate or runtime cost has been measured for this extension;
+see ledger ``1569-sold-diagnostics-remote-task.md``.
+
 CACHE.  Like ``null_read_audit`` this is pure reporting -- it provably returns
 its input unchanged -- so its entry points are listed in
 ``_build_registry._EXCLUDED_CALLABLES`` and its ledger in
@@ -439,7 +454,7 @@ _SCREENED_COLUMNS: dict[str, tuple[str, ...]] = {
     # `Quantity_kg` (GH #1436) is the survey's own total, read first by the crop
     # ladder and served as recorded, so this is the only place an impossible one
     # is named.
-    "crop_production": ("Quantity", "Quantity_kg"),
+    "crop_production": ("Quantity", "Quantity_kg", "Quantity_sold", "Sale_price"),
     "food_acquired": ("Quantity",),
     # GH #879: the canonical schema declares plot_features.Area in
     # HECTARES with AreaUnit a PROVENANCE label, but six countries served
@@ -754,6 +769,86 @@ def _cell_references(values: np.ndarray,
 # Site Q -- the delivered table.  Is a screened value impossible?
 # ---------------------------------------------------------------------------
 
+def _audit_crop_sales(df: Any, column: str, *, country: str,
+                      tails: tuple[str, ...] = ("high",),
+                      ) -> list[dict[str, Any]]:
+    """Screen native sold amounts with explicit sold-unit denominators.
+
+    Reuses Site Q arithmetic (ledger 1569 §§2–5), with the crop fine-to-coarse
+    shape but no cross-unit/state/country/wave/season reference. Plot, cluster
+    and source coordinates name the original row; they are not new support
+    gates. No conversion, factor inference or harvest-label fallback occurs.
+    The open unit vocabulary is retained; the shared missing-unit predicate
+    identifies absent/sentinel labels without making physical assumptions.
+    Unassessable values keep the existing silent/no-reference behavior.
+    """
+    if not isinstance(df, pd.DataFrame) or len(df) == 0:
+        return []
+    if "Quantity_sold" not in df.columns:
+        return []
+    if column == "Sale_price" and "Value_sold" not in df.columns:
+        return []
+    from .transformations import _unit_sentinel_mask
+
+    named = {a: _axis(df, a) for a in (
+        "country", "t", "v", "i", "plot", "j", "u", "source", "s",
+        "period", "season", "visit", "production_obs", "Unit_sold",
+        "Condition_sold", "condition_sold_native")}
+    named["harvest_u"] = named["u"]
+    named["u"] = named["Unit_sold"]  # NEVER substitute harvest u.
+    if named["Unit_sold"] is None:
+        return []
+    codes, categories = named["Unit_sold"]
+    sold = pd.Series([categories[c] if c >= 0 else None for c in codes])
+    unsupported = (_unit_sentinel_mask(pd.DataFrame({"u": sold}))
+                   | sold.astype("string").str.strip().eq("").fillna(False).to_numpy(bool))
+    quantity = _numeric(df["Quantity_sold"])
+    eligible = np.isfinite(quantity) & (quantity > 0) & ~unsupported
+    q = quantity
+    value = (_numeric(df["Value_sold"]) if "Value_sold" in df.columns
+             else np.full(len(df), np.nan))
+    if column == "Sale_price":
+        with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
+            q = value / quantity
+        eligible &= np.isfinite(value) & (value > 0) & np.isfinite(q) & (q > 0)
+    if not eligible.any():
+        return []
+
+    # Canonical crop axes plus the sold unit/state columns (data_info.yml).
+    # Unlike the historical crop ladder's wave rung, the sold path must never
+    # pool different denominators or substitute harvest condition for sale.
+    base = [a for a in ("country", "t", "season", "Unit_sold", "Condition_sold")
+            if named[a] is not None]
+    keys = {a: named[a] for a in base + ["j"] if named[a] is not None}
+    cols = base + (["j"] if "j" in keys else [])
+    rungs = [(",".join(cols), cols)]
+    if cols != base:
+        rungs.append((",".join(base), base))
+    references, rung = _cell_references(
+        np.where(eligible, q, np.nan), keys, tuple(_TAILS[t] for t in tails),
+        rungs=rungs)
+    reports = []
+    for tail, reference in zip(tails, references):
+        with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
+            ratio = q / reference if tail == "high" else reference / q
+        quantile, floor = _TAILS[tail]
+        reports.extend(_reports_for(
+            df, column, named, eligible & (ratio > QUANTITY_OUTLIER_K),
+            ratio, q, reference, rung, country=country, table="crop_production",
+            direction=tail, quantile=quantile, floor=floor))
+    for report in reports:
+        report["unit_column"] = "Unit_sold"
+        report["unit_semantics"] = "as-reported"
+        if column == "Sale_price":
+            report["definition"] = "Value_sold / Quantity_sold"
+        for offender in report["offenders"]:
+            pos = offender["row_position"]
+            offender["quantity_sold"] = float(quantity[pos])
+            offender["value_sold"] = (float(value[pos]) if np.isfinite(value[pos])
+                                      else None)
+    return reports
+
+
 def audit_quantities(df: Any, column: str, *, country: str, table: str,
                      tails: tuple[str, ...] = ("high",),
                      ) -> list[dict[str, Any]]:
@@ -772,7 +867,14 @@ def audit_quantities(df: Any, column: str, *, country: str, table: str,
     *tails* adds the lower tail (:func:`audit_near_zero`) on the same ladder,
     which is why they are one call: the sort is the cost, and a column that takes
     both pays for it once (GH #1493).
+
+    On ``crop_production``, ``Quantity_sold`` uses explicit sold labels and
+    ``Sale_price`` names the native ratio ``Value_sold / Quantity_sold``, not a
+    served column. No sold unit is inferred from harvest labels. Missing unit
+    or insufficient positive support returns no report, as on the other paths.
     """
+    if table == "crop_production" and column in {"Quantity_sold", "Sale_price"}:
+        return _audit_crop_sales(df, column, country=country, tails=tails)
     if not isinstance(df, pd.DataFrame) or df.empty or column not in df.columns:
         return []
     q = _numeric(df[column])
@@ -871,6 +973,26 @@ def _reports_for(df, column, named, flagged, ratio, q, reference, rung, *,
         for axis in ("animal", "input", "period", "season", "visit"):
             if named.get(axis) is not None:
                 offender[axis] = _label(named[axis], pos)
+        if "Unit_sold" in named:
+            # Retain native row identity, including source/state coordinates;
+            # no household/crop collapse is performed by the diagnostic.
+            for axis in ("Unit_sold", "harvest_u", "Condition_sold",
+                         "condition_sold_native", "v", "source", "s", "production_obs"):
+                coordinate = named.get(axis)
+                label = None
+                if coordinate is not None:
+                    code = int(coordinate[0][pos])
+                    if code >= 0 and pd.notna(coordinate[1][code]):
+                        label = str(coordinate[1][code])
+                offender[axis] = label
+            offender["u"] = offender["Unit_sold"]
+            offender["row_position"] = int(pos)
+            row_key = df.index[pos]
+            if not isinstance(df.index, pd.MultiIndex):
+                row_key = (row_key,)
+            offender["index"] = [
+                [name, None if pd.isna(label) else str(label)]
+                for name, label in zip(df.index.names, row_key)]
         wave = _label(named["t"], pos)
         scope = (_label(country_axis, pos), wave) if country_axis is not None else wave
         by_wave.setdefault(scope, []).append(offender)
@@ -933,7 +1055,12 @@ def _format_offender(offender: dict[str, Any], direction: str = "high",
     for axis in ("input", "period", "season", "visit"):
         if axis in offender:
             parts.append(f"{axis}={offender[axis]}")
-    if offender["u"] is not None:
+    if "Unit_sold" in offender:
+        for axis in ("Unit_sold", "harvest_u", "Condition_sold", "v", "source", "s",
+                     "production_obs"):
+            if offender.get(axis) is not None:
+                parts.append(f"{axis}={offender[axis]}")
+    elif offender["u"] is not None:
         parts.append(f"u={offender['u']}")
     scale = (f"x{offender['ratio']:,.1f} its" if direction == "high"
              else f"1/{offender['ratio']:,.1f} of its")
@@ -977,6 +1104,14 @@ def _format_quantity_report(report: dict[str, Any]) -> str:
             + ("species kept separate at every rung; " if report["table"] == "livestock"
                else "crop, then input may pool within those boundaries; ")
             + f"at least {report['min_cell']} positive rows; zeros never set the scale")
+    if report["table"] == "crop_production" and report["column"] in {"Quantity_sold", "Sale_price"}:
+        comparison = (
+            "explicit Unit_sold and sold condition kept separate within country/"
+            "wave/season; crop then the same sold-unit/state cell; "
+            f"at least {report['min_cell']} positive finite rows")
+        answers = ("Sale_price means Value_sold / Quantity_sold per Unit_sold, "
+                   "not per harvest u or per kg; disagreeing unit labels "
+                   "remain unreliable, and no sentinel or source correction is inferred")
     return (
         f"{where}: {report['n_implausible']:,} of {report['rows']:,} row(s) "
         f"report a '{report['column']}' {tail} of comparable rows "
