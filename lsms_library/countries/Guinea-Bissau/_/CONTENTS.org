@@ -798,8 +798,9 @@ between them; their coexistence does not establish mixed-unit q47 rows.
 
 Current =plot_features= still selects =s16aq47= when GPS flag =s16aq45 == 1=
 and that field is present, otherwise the farmer estimate =s16aq09a=.
-Farmer unit =s16aq09b= is 1 hectare / 2 m² (instrument =K5/K6=, Q9), with
-code 2 divided by 10,000; it is not a GPS unit. The GPS flag is Sim/Não
+Farmer unit =s16aq09b= is 1 hectare / 2 m² (instrument =K5/K6=, Q9);
+the farmer estimate is divided by 10,000 for code 2. It is not a GPS unit.
+The GPS flag is Sim/Não
 (=EL5/EL6=, Q45), not a unit code. The existing nonpositive/>1000 ha clamp,
 source binding, fallback, rows and defaults are unchanged by this diagnosis.
 
