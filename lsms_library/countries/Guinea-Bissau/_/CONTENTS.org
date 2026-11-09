@@ -777,3 +777,57 @@ No sample, strata, native labels, weights, schema or defaults change.
 No new download, PDF parse, microdata read or source/table campaign was
 needed for this holding; the earlier document-check evidence is reused.
 See =.coder/ledger/1575-three-public-bids-managed-ingestion.md=.
+
+* 2026-11-09 — GPS question units and the distinct m² export (GH #1531)
+
+The own 2018 household instrument asks GPS question 47 in *hectares*:
+=2018-19/Documentation/gnb_ehcvm1_qnr_household_excel_vague1.xlsx=,
+=S16a_Agri!EO5/EO6= (16A.47), "Qual é a área da parcela (em hectares) de
+acordo com as medidas GPS?". The vague 2 sidecar declares the *same physical
+workbook*: MD5 =0f3d80b68800a577659f5ead1032cdf9=, 673,399 bytes;
+these are not two independently verified forms.
+
+The released =2018-19/Data/s16a_me_gnb2018.dta= (MD5
+=39a00532332e724fa9c50bf206c58334=, 6,531,988 bytes) labels bound
+=s16aq47= as GPS area without a unit. Its DISTINCT =s16aq47a= explicitly
+asks GPS area "em m2". The instrument's Q47 wording supports the question-level
+hectares interpretation, but the inspected 16A cells, amendment notes,
+defined names and comments supply no official export/cleaning relationship
+between these fields or row-specific unit assignment. No unit is transferred
+between them; their coexistence does not establish mixed-unit q47 rows.
+
+Current =plot_features= still selects =s16aq47= when GPS flag =s16aq45 == 1=
+and that field is present, otherwise the farmer estimate =s16aq09a=.
+Farmer unit =s16aq09b= is 1 hectare / 2 m² (instrument =K5/K6=, Q9);
+the farmer estimate is divided by 10,000 for code 2. It is not a GPS unit.
+The GPS flag is Sim/Não
+(=EL5/EL6=, Q45), not a unit code. The existing nonpositive/>1000 ha clamp,
+source binding, fallback, rows and defaults are unchanged by this diagnosis.
+
+Presence in all 9,873 source rows, not unique plots or a sample join:
+
+| GPS fields present | source rows |
+|--------------------+-------------|
+| both q47 and q47a   |        1191 |
+| q47 only           |        3612 |
+| q47a only          |           0 |
+| neither            |        5070 |
+
+All 1,191 q47a rows are literal vague 2 / GPS flag 1 and also have q47.
+Their farmer units are 1 on 442 rows and 2 on 749; these remain farmer units.
+Flag 2 (5,057 rows) and missing flags (13) are distinct; neither has a GPS area.
+No ratios, magnitudes, mixed-row classification or candidate table were used.
+The explicit-m² q47a supports dimensional conversion by 1/10,000 on its own;
+selecting or combining it with q47/farmer estimates remains unruled.
+
+Read the earlier "No questionnaire is held" note alongside these verified
+own declarations, and "there is no 2021-22 wave" alongside the later held,
+registered-but-unwired record. At source =6d9563f7=, 2021 has only Country/Wave
+metadata, no plot driver, and is absent from the plot concatenator. Its declared
+s16a (MD5 =00d948d16d402ebf8b60fa6c03763705=, 5,594,481 bytes) was missing
+from the admitted staging and its header remains unread; no 2018 unit authority
+or serving claim is transferred to it.
+
+Diagnosis frozen at =d41aa628ea929cd49bf9414a4c78bcbe3b693bba=;
+see =.coder/ledger/1531-remote-task.md=. Durable report:
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/private/Guinea-Bissau-1531-GPS-unit-audit-6d/dispatch/2172b44031b04472ade9414bade8d4fc/evidence/report.md=.
