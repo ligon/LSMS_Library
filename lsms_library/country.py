@@ -1633,8 +1633,14 @@ class Wave:
         idxvars_updated = {key: map_formatting_function(key, value, format_id_function = True) for key, value in idxvars.items()}
         myvars_updated = {key: map_formatting_function(key, value) for key, value in myvars.items()}
 
+        def file_record(index, variables, options):
+            record = {'idxvars': index, 'myvars': variables}
+            if 'stata_missing_map' in options:
+                record['stata_missing_map'] = options['stata_missing_map']
+            return record
+
         if isinstance(files, str):
-            final_mapping[files] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
+            final_mapping[files] = file_record(idxvars_updated, myvars_updated, data_info)
             return final_mapping
         
         if isinstance(files, list):
@@ -1643,7 +1649,11 @@ class Wave:
                     idxvars_override = idxvars_updated.copy()
                     myvars_override = myvars_updated.copy()
                     file_name, overrides = next(iter(i.items()))
+                    file_options = {key: data_info[key] for key in ('stata_missing_map',) if key in data_info}
                     for key, val in overrides.items():
+                        if key == 'stata_missing_map':
+                            file_options[key] = val
+                            continue
                         if key in datetime_specs or is_datetime_spec(val):
                             # GH #1045: the spec's temporary source columns
                             # were expanded once for every file; a per-file
@@ -1658,9 +1668,9 @@ class Wave:
                             idxvars_override[key] = map_formatting_function(key, val, format_id_function = True)
                         else:
                             myvars_override[key] = map_formatting_function(key, val)
-                    final_mapping[file_name] = {'idxvars': idxvars_override, 'myvars': myvars_override}
+                    final_mapping[file_name] = file_record(idxvars_override, myvars_override, file_options)
                 else:
-                    final_mapping[i] = {'idxvars': idxvars_updated, 'myvars': myvars_updated}
+                    final_mapping[i] = file_record(idxvars_updated, myvars_updated, data_info)
                 
             return final_mapping
         
@@ -2011,7 +2021,7 @@ class Wave:
                 last_error: Exception | None = None
                 for candidate in dict.fromkeys(candidates):
                     try:
-                        df = df_data_grabber(candidate, mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat, missing_ok=multiple_files)
+                        df = df_data_grabber(candidate, mappings['idxvars'], **mappings['myvars'], convert_categoricals=convert_cat, missing_ok=multiple_files, **({key: mappings[key] for key in ('stata_missing_map',) if key in mappings}))
                         break
                     except (FileNotFoundError, PathMissingError) as error:
                         last_error = error
