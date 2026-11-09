@@ -59,3 +59,27 @@ still sees plot_labor's old bare literal in its unchanged provenance argument;
 this is not the missing actual-source omission and will be reported explicitly.
 Country/wave/cache fingerprint impacts are unmeasured at this checkpoint.
 Focused tests, final metadata comparison and independent review remain pending.
+
+### Source and focused-control closure
+
+Ledger-first789552459 preceded code/test699b581de. Exactly nine getter path
+arguments changed. External PROCESSING-PROOF.json inverses those arguments and
+recovers every original script byte/AST; BASE, G_SOURCE and labor provenance
+remain exact. All eight distinct native source sidecars are untouched.
+
+First actual cohort: ten collected, five scanner PASS / five preparation FAIL.
+The new metadata oracle omitted the existing country compiler f-string suffix
+/_/<table>.parquet. That scanner artifact was unchanged and is separate from
+the actual raw-source omission. Test-onlyd393d3639 adds its precise missing
+marker, preserving full expected source sets and existing labor marker. No
+production/scanner fix was made. Only the five affected preparation controls
+were rerun: five PASS, zero failures/skips. Ten distinct controls are covered
+across the two runs; no final-head all-ten run is claimed. The unchanged five
+scanner test ASTs/product bytes carry from the first run. Three identities per
+run verify own package/config/MAIN; both private data/config file counts zero.
+Initial pytest cache-directory warnings are retained; the affected run uses an
+explicit private cache directory. Original failed log/JUnit remain immutable.
+
+This docs-only checkpoint records the country caveat before one final existing
+metadata census. Its measured impact and final independent review remain
+pending; no current Country/Feature data/producer, raw reader or cache warm ran.
