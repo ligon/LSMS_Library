@@ -4629,7 +4629,9 @@ download 40404, and is now locally DVC-managed as
 =2011-12/Documentation/ERSS_Manual_HH_AG_COM_APRIL_30_ENGLISH.pdf=.
 Its SHA256 =e1fb422a6a2fb02f5743766410bd68230322b8d375d294299b1921ae775ea344=
 matches the earlier #1183 instrument record. The former missing-in-admission
-history is retained; remote DVC availability remains unverified pending push.
+history is retained. A targeted DVC push and one fresh read-only managed
+retrieval from an empty private cache verify this document's remote availability;
+no broader documentation or survey-data holding is asserted.
 
 Manual PDF pp79--80 (printed pp78--79) explicitly transfers the parcel, field,
 crop ID/name/code from post-planting to section 9, lists the same crops as

@@ -28,7 +28,10 @@ located. The 1,755,699-byte download matches the exact SHA256 recorded by the
 2026-10-30 official-instrument review:
 =e1fb422a6a2fb02f5743766410bd68230322b8d375d294299b1921ae775ea344=.
 DVC raw-byte MD5 is =b6cb4f4b898ca8c5169913fe9e36543d=.
-The individual-document sidecar and a verified task-private local DVC object
-were prepared; a remote DVC push has NOT been performed or verified. This
-one-document restoration does not restamp the held dataset/release facts
-above or establish that all catalog documentation is locally available.
+The individual-document sidecar and task-private local DVC object were
+prepared. A targeted push of only this manual to =ligonresearch_s3= succeeded.
+A fresh read-only =get_data_file= call, with an empty private L1 and no in-tree
+PDF, then retrieved exactly the same bytes, MD5 and SHA256. Its only private
+data files were the manual blob and PDF copy. No broader push or survey-data
+acquisition ran. This one-document holding does not restamp the dataset/release
+facts above or establish that all catalog documentation is locally available.
