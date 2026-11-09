@@ -63,3 +63,48 @@ it live for legacy calls; bytes/content remain visible for genuine failures.
 No locale/decoder/science/default/data behavior change is proposed. Hash cost
 of changed tagged orchestrator must be measured if/when authorized later;
 no census or new exclusion in this preparation grant.
+
+## §7 Approved execution and preserved failed attempts
+ROOT reviewed29ff source and authorized the pure selection;2ecb added ten
+invented controls alongside26 existing classifier/strict/fallback cases.
+Initial focused-v1/22443 outer1 had36setupERROR/0bodies: the external provider
+tripwire named nonexistent _try_get_from_worldbank. Sole external correction
+used existing _try_get_data_file. No product/oracle changes at that stage.
+Focused-v2/5342 outer1 ran35PASS/1FAIL; new all-absent test incorrectly expected
+empty rather than the existing named RuntimeError. Product refusal was correct.
+1f727 strengthens only that new assertion to require the named private cache,
+no output and existing final diagnosis. Affected-v3/66697 outer0 passed the
+one affected case (7.11s pytest/13.753s wrapper); prior35 were not replayed.
+This proves36distinct cases across35initial+ONEcorrected passes, not one36P
+run. All original failed logs/XML/wrappers stay intact. Three exact source/
+config identities and zero provider/network tripwires are retained; empty
+controller config/data checks passed. Synthetic Make/CSV/parquets only.
+
+## §8 Current integration and measured footprint
+Ordinary merge5ad2f832bb624ebbbfdbce9f7531531e13873bd8 has parents actual
+50a927d69fcba3497b6956f7c5dff55004d42590 and corrected1f727. All19,248 nonowned
+mode/type/blob objects match50. try_make text is exact reviewed29ff;
+_read_assumed_fresh_cache exact50; replacing only try_make/classifier docstring
+restores the entire50 Country source. Tests/old ledger objects exact1f727.
+ROOT granted ONE unchanged metadata collector, twice preflight and private
+empty lane, versus closed340c original header/mapSHA6a4b8a7a4be5686908bbfcc24a1cde4c15324f2867f833e52dfbf711928eee96.
+50 adds excluded1066 readgate only; no baseline replay. Actual session92345
+outer0/130.587s; actual changed hashes table=452, wave=1885, btf=37, fif=0.
+All452country/1903wave/37BTF/186FIF keysets and14nonhash fields agree;
+18None wave cells retained; errors0/denials0; private data/config files0;
+source clean/head unchanged. Complete map and exact changed keys retained.
+Final ledger-only child carries measured/tested semantics without replay.
+
+## §9 Release scope / residual / evidence
+Addresses#381; do not claim whole closure. Current food dispatch already
+builds food_acquired before transform. Original no-source-country one-clear-
+notice request remains unverified: no blanket Nepal/Armenia shortcut. Armenia
+has held-but-unwired survey data, not uniform absence. Existing final logger
+and rebuild refusal remain. No actual-country/native/API/build/corpus/full
+suite/shared-cache work or policy/default change. Legacy stderr buffering is
+an approved timing tradeoff; actual success/failure bytes remain visible.
+Durable evidence: B/reports/381-missing-target-warning-proposal-20261109
+(PROPOSAL,SOURCE/CURRENT proofs, NO-DATA-SCOPE, CLOSED-FOCUSED-EVIDENCE,
+all3attempts, metadata-current complete comparison/receipt, PR-BODY).
+Independent1452 qualified test/source PASS sealed test-carry-v1; current
+integration/final ledger review is separate additive admission, no replay.
