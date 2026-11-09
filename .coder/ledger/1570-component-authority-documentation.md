@@ -19,3 +19,10 @@ Extend only the country knowledge record, cite exact source versions and closed 
 
 ## §6 Open questions
 W1 Decimal scale/export representation and blank-component conventions remain unresolved. W2 conversion-table values, code correspondence and coverage are unmeasured by this evidence. ROOT owns subsequent operand admission and publication; this branch holds all further parse/math work.
+
+## Phase 3 — anchored verification
+OK (§§1/3): exact original 4652-line/295408-byte CONTENTS prefix retained; dated authority appendix adds 48 lines. All other existing mode/type/blob objects are identical to ba03. Exactly two owned paths differ: the country documentation and this new ledger.
+
+OK (§§2/4): both closed evidence-manifest SHA256 bindings authenticated as quoted; no payload or PDF was reopened. The unit-code/quantity distinction, general-household manual context, unresolved Decimal/blank conventions, and original-versus-corrected page stages remain explicit. No conversion coverage or data-value result is asserted.
+
+OK (§5): ledger-first 2104c6a97 preceded country-only 759185ae8; this final ledger-only commit records verification. `git diff --check` passed. No tests/import/runtime/census/API/native/document-reader/cache operation was needed or run for these prose changes. No new machinery or scientific/default selection; ROOT owns publication and any later parse/math admission.
