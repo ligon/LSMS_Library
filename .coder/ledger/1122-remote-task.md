@@ -132,3 +132,102 @@ also returned search errors; neither is verification success. All required
 artifacts, exact exits, private-publication receipt and final SHA are under the
 absolute dispatch evidence directory, outside tracked source. Independent
 review/current integration/CI and overall issue closure remain root-owned.
+
+
+## P2 author revision — checkpoint (2026-11-08)
+
+### §1 Exact ROOT scope and preserved history
+
+This is a new author's narrow source-only revision of frozen candidate
+`63ebd54c5bbceeae8f21b4a3df9d21b800689465`. The complete preceding ledger
+prefix remains byte-exact; its original four-path candidate and 29-test result
+are historical evidence, not a fresh acceptance claim. The supplied independent
+review ended at `7cc28672d7a3a067df7422e7566deab6d96c929e` with verdict
+`P2_DOCUMENTATION_REVISION_REQUESTED`, one P2 and no P1. Its coordinator
+preflight records state `succeeded`, phase `finished`, scheduler `COMPLETED`;
+this author has not inspected native state or the observer.
+
+ROOT's exact bounded scope:
+
+> Then edit ONLY the newly added paragraph at GhanaLSS CONTENTS5417–5419.
+> ROOT's required meaning: EthiopiaRHS's coarse crop table is excluded from
+> Feature crop assembly when it lacks a plot axis AND is assembled alongside
+> a canonical plot-grain provider; a sole provider or providers ALL sharing
+> the same reduced shape are retained; crop registration supplies no crop
+> plot sentinel. Use plain accurate prose, preserve the surrounding accepted
+> text and all original country caveats. Do not change registration, canonical
+> requirements, shape winner, inputs, rows, mappings, test assertions or any
+> other semantics.
+
+Only `lsms_library/countries/GhanaLSS/_/CONTENTS.org` and an append to this
+ledger may differ from 63eb. The first new commit is ledger-only; the prose
+commit and final ledger-only commit are separate. The charter authorizes
+continuation after this surfaced checkpoint without another permission gate.
+
+### §2 Reused machinery and static anchors
+
+Search tier: own Git + ripgrep + source text/AST (floor). Reuse all behavior:
+`feature.py:434-491` (`_select_kept_shape`) keeps one provider or all agreeing
+shapes before considering a canonical competitor, then prefers the canonical
+shape if present. `Feature.__call__` applies that selector at `:1307` and
+concatenates kept frames at `:1326`. Existing controls at
+`tests/test_feature_canonical_index.py:421`, `:472`, `:477` cover the canonical
+winner, all-agree and sole-provider cases; they are read only, not rerun.
+`data_info.yml:238-240` imposes required axes only on two other features;
+`:369-373` declares crop sentinels without `plot_id`. No actual EthiopiaRHS
+metadata or other country's metadata/fixture is needed or inspected.
+
+### §3 Definitions and contradictions personally checked
+
+Inherit `STANDING.md` §3/§4, `CLAUDE.md` (actual symlink to `AGENTS.md`) and
+canonical `lsms_library/data_info.yml`; do not redefine shape or structural
+sentinel semantics. Personally read all 5,854 GhanaLSS CONTENTS lines,
+including TODO text; no LOGBOOK drawer or WAITING task occurs beyond the
+TODO declaration. Actual idiosyncrasy: Section 9 is household-grain;
+"Do not read =Y09A:IDFARM= as a plot identifier" (`:4640`), and Part B
+asks no harvest quantity (`:5112-5117`). Preserve those caveats.
+
+CONTRADICTION (preserved, not assumed stale): the earlier record says
+"=plot_labor= is deliberately NOT wired" (`:5090`), whereas `:5301-5304`
+says "=plot_labor=: hired and exchange labour at household grain" and
+"Wired from Section 9 Part D for both panel waves". This revision does not
+adjudicate that history. The target's "remains excluded ... when it lacks a
+plot axis" is overbroad against the selector's `len(frames) <= 1` and
+`len(shapes) == 1` early returns (`feature.py:461-466`); qualification is
+confined to the newly added paragraph.
+
+### §4 Invariants and verification boundary
+
+Preserve every other mode/type/blob object, original country caveat, table,
+source block, production Python node, config, test and fixture. No import of
+`lsms_library`, collection, runtime tests, Make invocation, actual provider,
+data getter/build/cache/acquisition, dependency install, shared-cache write,
+LSMS_NO_CACHE, GitHub operation or source push. Static package resolution and
+the supplied setup attestation establish the intended path without executing
+the package. Mounted PROJECT_PYTHON, exact cwd/PYTHONPATH/countries root,
+private data/DVC-site bindings and thread/build limits were verified before
+source checks. HOME/XDG/CODEX_HOME/SDK guards are unchanged.
+
+The top-level Make recipe was read, not invoked (ROOT explicitly forbids
+Make). Its actual stdlib/text/AST script was run directly through the prepared
+interpreter: `scripts/api_surface_audit.py --strict`, exit 0. The five required
+evidence files were initialized UNFINISHED/UNRUN before long reading. Initial
+large text outputs were truncated and recovered by bounded reads; an unset
+`git config --get core.hooksPath` returned exit 1 (no configured hook path),
+not a failed product test. No new runtime acceptance is claimed.
+
+### §5 Reuse / extend decision
+
+Reuse the current selector, canonical requirements and sentinel registration
+without edits. Extend only the paragraph with the canonical-competitor
+condition and both retention cases. Verify by the literal two-path diff,
+whole-tree mode/type/blob comparison, original-ledger-prefix comparison and
+unchanged production ASTs. CONTENTS hashing exclusion is source-supported at
+`country.py:1083,1396,4606`; actual hashes/performance were not measured.
+
+### §6 Questions and held work
+
+No blocking question. Original 29 tests and failed P2 review stay historical;
+no rerun or reclassification. Named hashed script/scheme/transformations
+wording remains held. Independent wording/object closure, final current
+composition, CI, GitHub and merge belong to ROOT.
