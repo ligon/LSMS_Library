@@ -210,7 +210,8 @@ def _make_target_is_missing(diagnostics: str | bytes, target: str | Path) -> boo
     Shared by the GH #1039 rule probe and GH #1288 strict country runner
     (ledger 1288 §2/§4). A missing prerequisite means a broken existing rule,
     and a nested make's no-rule message followed by a recipe failure does too.
-    Callers use the C locale; unfamiliar diagnostics are never absence.
+    The rule probe and strict caller use the C locale; unfamiliar
+    diagnostics on any route are never absence.
     """
     if isinstance(diagnostics, bytes):
         # Classify a copy; the original bytes remain on CalledProcessError and
@@ -6085,35 +6086,38 @@ class Country:
                                          f'VAR_DIR={managed_country / "var"}'])
                     make_cmd.append(str(target))
                     make_env = build_env()
-                    run_options = {}
+                    # GH #381: classify a proven missing requested target
+                    # before emitting misleading build-failure diagnostics.
+                    # Keep the legacy environment and stdout streaming; only
+                    # strict execution forces C locale as before. Unknown or
+                    # non-English diagnostics remain conservative failures.
+                    run_options = {"stderr": subprocess.PIPE}
                     if strict_country_make:
                         make_env.update(LC_ALL="C", LANGUAGE="C")
-                        # Keep stdout streamed. Replay actual stderr on both
-                        # success and failure; the private CI wrapper remains
-                        # the publication boundary, not this classifier.
-                        run_options = {"stderr": subprocess.PIPE}
                     prior = prior_output()
                     try:
                         built = subprocess.run(make_cmd, cwd=make_dir, check=True,
                                                env=make_env, **run_options)
-                        if strict_country_make and built.stderr:
+                        if built.stderr:
                             _reemit_make_stderr(built.stderr)
                         logger.info(f"Makefile executed successfully for {self.name}/{wave or 'ALL'}. Rechecking for {method_name}...")
                     except subprocess.CalledProcessError as error:
+                        diagnostics = error.stderr or ""
+                        if _make_target_is_missing(diagnostics, target):
+                            logger.debug("No Make rule for requested target %s; trying fallbacks.", target)
+                            continue
+                        if diagnostics:
+                            _reemit_make_stderr(diagnostics)
                         if strict_country_make:
-                            diagnostics = error.stderr or ""
-                            if diagnostics:
-                                _reemit_make_stderr(diagnostics)
-                            if not _make_target_is_missing(diagnostics, target):
-                                selected_context = (
-                                    f" (selected cache {data_root(self.name) / 'var' / f'{method_name}.parquet'})"
-                                    if build_root is not None else "")
-                                raise RuntimeError(
-                                    f"Make build failed for {self.name}/{method_name} "
-                                    f"at target {target}{selected_context}; refusing cached output "
-                                    "and alternate/Python fallbacks after a "
-                                    "failed country recipe or prerequisite."
-                                ) from error
+                            selected_context = (
+                                f" (selected cache {data_root(self.name) / 'var' / f'{method_name}.parquet'})"
+                                if build_root is not None else "")
+                            raise RuntimeError(
+                                f"Make build failed for {self.name}/{method_name} "
+                                f"at target {target}{selected_context}; refusing cached output "
+                                "and alternate/Python fallbacks after a "
+                                "failed country recipe or prerequisite."
+                            ) from error
                         warnings.warn(f"Makefile execution failed for {self.name}/{wave or '_'} {method_name}: {error}")
                         continue
                     except FileNotFoundError as error:

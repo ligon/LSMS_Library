@@ -226,7 +226,8 @@ def test_missing_requested_target_keeps_real_intree_alternate(fakeland, capfd, m
         calls.append(list(map(str, argv)))
         return real_run(argv, *args, **kwargs)
     monkeypatch.setattr(C.subprocess, 'run', tracked)
-    with pytest.warns(UserWarning, match='Makefile execution failed') as seen:
+    with warnings.catch_warnings(record=True) as seen:
+        warnings.simplefilter('always')
         frame = country.build_me()
     targets = [Path(call[-1]) for call in calls if call[0] == 'make']
     wave = [p for p in targets if p.parent.name == '_' and p.parent.parent.name == '2001']
@@ -236,12 +237,11 @@ def test_missing_requested_target_keeps_real_intree_alternate(fakeland, capfd, m
     assert wave[1] == country.file_path / '2001/_/build_me.parquet'
     assert len(country_targets) == 2 and targets[-1] == alternate
     missing_targets = [wave[0], *country_targets]
-    assert len(seen) == len(missing_targets)
-    for target in missing_targets:
-        assert sum(str(target) in str(item.message) for item in seen) == 1
+    assert len(missing_targets) == 3
+    assert not any('Makefile execution failed' in str(item.message) for item in seen)
     assert frame['x'].tolist() == [7.0]
     assert fakeland.var.exists()
-    assert 'No rule to make target' in capfd.readouterr().err
+    assert 'No rule to make target' not in capfd.readouterr().err
     assert not list((fakeland.country_dir/'_').glob('*.parquet'))
 
 
