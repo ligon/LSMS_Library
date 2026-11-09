@@ -13,6 +13,8 @@ what a cold build does to the counts is measured in the PR, not pinned.
 """
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -241,7 +243,7 @@ class TestGuardReachesTheCaller:
 
     @pytest.mark.parametrize('table', ['food_prices', 'food_quantities', 'food_expenditures'])
     def test_a_valueerror_there_would_have_been_caught(self, monkeypatch, table):
-        """The control: a bare ValueError still tries the legacy build, which Togo has.
+        """With an explicit legacy route, a bare ValueError tries that build.
         GH #1532: when that fails too, the ValueError is what is raised."""
         from lsms_library.country import Country, LegacyFallbackWarning
         calls = []
@@ -252,10 +254,37 @@ class TestGuardReachesTheCaller:
                 raise ValueError('the instruction')
             raise RuntimeError('fallback reached')
         monkeypatch.setattr(Country, '_aggregate_wave_data', boom)
+        monkeypatch.setattr(Country, '_legacy_can_build',
+                            lambda self, method_name, waves: method_name == table)
         with pytest.warns(LegacyFallbackWarning), pytest.raises(ValueError, match='the instruction') as caught:
             getattr(Country('Togo'), table)()
         assert 'fallback reached' in caught.value.__notes__[0]
         assert calls[0] == 'food_acquired' and len(calls) > 1, calls
+
+
+    @pytest.mark.parametrize('table', ['food_prices', 'food_quantities', 'food_expenditures'])
+    def test_without_a_legacy_route_the_original_valueerror_reaches_the_caller(self, monkeypatch, table):
+        """An absent legacy route cannot turn the source failure into a build."""
+        from lsms_library.country import Country, LegacyFallbackWarning
+        calls = []
+        original = ValueError('the instruction')
+
+        def boom(self, waves=None, method_name=None, **kw):
+            calls.append(method_name)
+            if method_name == 'food_acquired':
+                raise original
+            pytest.fail('an absent legacy route must not be built')
+        monkeypatch.setattr(Country, '_aggregate_wave_data', boom)
+        monkeypatch.setattr(Country, '_legacy_can_build',
+                            lambda self, method_name, waves: False)
+        with warnings.catch_warnings(record=True) as emitted:
+            warnings.simplefilter('always', LegacyFallbackWarning)
+            with pytest.raises(ValueError, match='the instruction') as caught:
+                getattr(Country('Togo'), table)()
+        assert caught.value is original
+        assert calls == ['food_acquired'], calls
+        assert not any(isinstance(item.message, LegacyFallbackWarning) for item in emitted)
+        assert not getattr(original, '__notes__', ())
 
 
 class TestHook:
