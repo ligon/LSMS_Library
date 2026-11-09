@@ -88,3 +88,20 @@ import fix. No footprint grant or census yet: final composition/impact remains
 forROOT review. No blanket no-data country shortcut/whole381 closure claim.
 This precise current-wiring RuntimeError is not an upstream-availability or
 acquisition claim; unrelated Repo/GH329 diagnostics are not globally silenced.
+
+## §9 Current publication and authorized metadata closure
+Ordinary integrationef162ffc4bbc27ed88ffdf5c0ca954f7e866df1d has parents actual
+99318fdfb959db07eede83c8000bf7ee0bed30d7 and finalauthora3dd96. All3owned
+objects exactauthor,19,253nonowned exact993; Countryinverse removes only23lines
+and restores993, tests exact702b. No focusedcohort replay for integration.
+ROOT baseline admissionmetadata-baseline-993-source-admission-20261109 proves
+measured5ad2→993 only5excluded countryCONTENTS/ledger changes. Original5ad2
+header/mapSHAf3fa09f31e227d4c6ca47109aaa32a9524016a0997df4b8792df5d30ca6e2d73
+retained; no baseline replay/restamp. ONEcollector/session71261 closedouter0/
+129.385s on clean immutableef162; changed hashes 452 table, 1885 wave, 37 btf, 0 fif.
+All452country/1903wave/37BTF/186FIF keysets and14nonhash fields exact;
+18None wavecells retained, errors0/denials0, privatecontrollerdata/config0.
+No exclusions/schema bump/shared rewarm. Full changedkeys/rawmaps and terminal
+receipt under381-unwired-table-current-publication-20261109/metadata.
+This is measured broad fingerprint cost, not data-output or production-incidence
+measurement. Finalledger-only carry preserves measured/tested production.
