@@ -1,4 +1,13 @@
 #+title: Current LSMS-ISA worker queue
+* Live checkpoint 2026-11-09T18:27:48.597503+00:00
+Main20/68merges38closures; PR1670DRAFT923789/CI42673807147queued, readyonlyafterfinalgates.
+1452cohort7267 defaultcold/warm+MakecoldPASS;Makewarmlive,12additionalnativeparsesEXHAUSTED.
+Mwi851181purePASS,current7b923clean; nowindependentNigeriaexternalreviewthen851actualplan.
+1590dispatchmanager: Dauthor41049593/dfe2cd4fb13947c2a096485f8a24a811 verifiedagent_execution
+n0030, R1repair. 851remoteindependentreviewnext, refillsfresh-checkonly/no duplicates.
+Mali1495closed1644/Niger1530boundedcounts+formsdone1648; outdatedticketsarenotreadywork.
+Fullbindings/actualcounts/remaininggates in [[file:handoff.org]]. No8busyclaim.
+
 * Current authoritative checkpoint 2026-11-09T18:17:03.245378+00:00
 Development20c85655a67cd754a6c5ea4b118b5ded4b53b87b;68merges/38closures.
 1669MERGED+CI/postmerge verified. No pending PR through1669.

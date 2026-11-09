@@ -1,4 +1,76 @@
 #+title: Current LSMS-ISA goal handoff
+* Current execution 2026-11-09T18:27:48.597503+00:00
+Previous goal turn PROGRESS; this turn PROGRESS: current851181-test verification,
+new Nigeria PR1670 and actual remoteD repair launch. Goal ACTIVE/incomplete.
+Main still20c85655a67cd754a6c5ea4b118b5ded4b53b87b/treee4faf713dbfbcb303c573d4b201113105e22ab12;
+68merges/38closures. PR1604 remains draft under scientific hold; do not merge.
+
+PR1670 DRAFT now OPEN on923789f8ea5cf612482fb667c6e036393a968b4d,
+branchfix-587-nigeria-w3-ph-coping-current-20261109/base20. CI42673807147 queued;
+syntheticc2f7c6901f0581fda189bbd84c53de694ad04d24/tree056e723371bed3002b6b58ee19083e7fd46fb05b,
+parents[20,923789], whole treeexacthead; no CI acceptanceyet. Rootreadentire5path
+productiondiff+197line21test module, noP1P2seen. Evidence reports/ci-admission-1670-20261109/INITIAL-CI-STATE.json.
+Roottoverify actualCIcheckout/logs/tree/finalgates before ready/merge; do notleavegreenCIwaiting.
+
+Nigeria publiccohortowned1452 session7267 LIVE current923789:
+defaultcoldCLOSED0/50.362s, defaultwarmCLOSED0/31.723s;
+MakecoldCLOSED0/230.502s, MakewarmLIVE atlastreport. Four heldDTA/privatefixedv.
+Actual12additionalfullnativeparses exactly (4default+8Make);13includingoriginalPHgate.
+No furthernativeparsesallowed. Defaultwarm full167077/PP2015Q3 41282/PH2016Q1 41238/
+unsupported2019Q1 0;allv_missing0. SingletonFeature strictvalue/axes/dtypes/typedattrs
+and PHnormalID/vnativeconservationPASS. MakePH41238/Int64/v_missing0. Original
+absolute-target no-rule diagnostics/fallbacks retained. Sixstickystrictcomparisons
+plus capturecustody and terminalclosure followMakewarm; ONEfinalcombinedcensus
+afteractualfinalsource vsclosedE baselineadmittedbelow. No replay of21/onePHgate.
+Rootreadfrozenrun_real.py/RUNTIME-FREEZE; fourprocesses/twoFeaturecalls, all18files
+(10Country/4Feature-oracle/4receipts) sealedbeforecomparison; unchangedGH1196.
+
+851 exact7b923 v3 initialordinaryfocusedcohort CLOSED0/47.214621s:
+181uniquePASS/0F/E/S, threeidentityreceipts, cleanheadunchanged/privateDATA+CONFIG0.
+R=reports/851-period-api-current-v3-20261109 FOCUSED-RECEIPT/focused.xml/log;
+PRELAUNCH-MANIFEST SHA653a28033280d39041b6f60d493fe44d8c48c99681802f5989d151ed84f37a97.
+RootreadCountry/Feature/Recallcore+errors/promoterdiffs; retiredcopied-contextguard
+fix accepted and tested. Originalv2KeyError witness/failedprototypes preserved.
+Rootauthorized ONEfinalmetadatafootprintvsclosedE onlyafterfinalsemanticscope;
+no baseline replay. ActualCountry/Feature acceptance stillUNRUN; Mwi toprepare
+finitepreciseheld-input/privateplan, no grantinferred. Don'tmistake181purecontrols
+foractualsource/fullAPI. Remote independent851source-review requested manager1590,
+exact7b923/current20 19owned/19219nonowned; launchnotyetverified.
+Mwi meanwhile assigned SHORT independent Nigeria587source/evidence review externally
+reports/review-587-nigeria-w3ph-current-20261109, no edits/runs in1452frozenworktree,
+mandatoryfullNigeriaCONTENTS inclLOGBOOK/WAITING/TODO/namedidiosyncrasy+contradiction.
+Do not addreviewledger to851verificationtree. Return851actualplan afterward.
+
+D R1 newauthor ACTUALLYsubmitted0 at18:23:24 job41049593,
+dispatchdfe2cd4fb13947c2a096485f8a24a811, n0030.savio4. Rootsupportedstatus
+18:26-ish stateRUNNING/phaseagent_execution/heartbeat2.25s/publicationnotstarted.
+Private/Shared-1051D-R1-current20-correction/dispatch. Sourceexactdcb02ccbd35a89718ab9a85c35cdb221dfaad9c4
+current20+e52 union(all5Dexact/allother20exact); free2CPU8G60m.
+Profilec0e77c19c05a0dca8b87ef61c297c9cc6bb4444fe851bd8422a2c2739d58995c.
+Originale52/4390/114PASS/map and independent1FAIL remainimmutable. Correctedlifetime
+oracle RootAPPROVED afterreading originaltest: SAMEdeterministic interleaving and
+realpublish/select; immediately assert newentryretained/weakrefalive/events[];
+then explicitoutside-lockreset, weakrefdead/events[False]. Originaldiscardassertion
+cannotremaininretentionfix; originalfileexact/context-onlyW/prefixrebinddisclosed.
+No weakerlockoracle, no actualSDKdeadlock/latencyclaim. Onefocusedrepaircohort+one
+finalcensusvsoriginalclosedE; sameindependentpeer re-reviewafterfrozenrepair.
+
+Queuefreshreconciliation Rootdirectissuefetch: Mali1495CLOSED/#1644alreadydone;
+DO NOTdispatchstaleticket. Niger1530own4positions/mapping/heldforms alreadymerged1648;
+onlyupstreamgate/exportdiscriminator/crosswaveexplanation remains, NOcountreplay.
+Uganda1525stillOPENserved-as-labelleduntilsourceauthority. Managerinstructedfresh
+bodiesbefore source-onlyrefill, provedprofile/reducedpreparation/no newcanaryframework.
+Prioritize actual851peer afterDauthor; no8busyclaim. Current actual2localproductive
+workers+dispatchcoordinator+ONEremoteDverifiedagent_execution; newreview/refills pending.
+
+1562 tracker updated from existingclosedstructuralcheck (NOTnewsourceparse): 285824rows/
+26fields;11581singlepositive1 rows,2197paired1+3 rows; no2/ties/threepositivefields.
+Directintactconsecutive-rankhypothesisfails2197, doesn'tdefine3orauthorize decoder.
+Same-releaseexport/cleaningauthority or explicitconstructiondecision remains.
+1066grain-warning/1575strata/1190carrier+thirdgate/1562/1604scientificchoicesstillheld.
+1575fourcountrydoccheck COMPLETE/no redispatch. Allpriorraw/acquisition/sharedcache/
+weights/masterfencesremain. No wholeissueclosureormergeclaimedthisturnyet.
+
 * Supplemental baseline and actual worker observation
 Root admitted closedE baseline for Nigeria final census at
 B/reports/587-nigeria-W3PH-current-public-acceptance-20261109/ROOT-E-BASELINE-ADMISSION.json
