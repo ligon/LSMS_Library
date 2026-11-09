@@ -5,6 +5,14 @@
 available. This is a bounded country diagnosis, not a Feature audit or repair.
 Inherited baseline: [STANDING.md](STANDING.md), especially §§3–5.
 
+**Current completed result after explicit supplements:** own instrument GPS Q47
+asks hectares; the DTA's distinct `s16aq47a` explicitly asks m2 and is present
+on 1,191 rows. No export bridge or mixed-row unit discriminator was found.
+One full authorized numeric read and one admitted workbook inspection are
+complete; the original header phase remains frozen separately. No product,
+unit, source-binding, clamp, schema or default changes. 2021 is missing/unread
+and unwired. Details and limits follow; earlier phase checkpoints are labeled.
+
 ## §1 Task, restated
 
 Trace Guinea-Bissau's own `s16aq47` GPS-area binding, farmer estimate/unit,
@@ -14,6 +22,9 @@ headers/cards of the one admitted private 2018-19 s16a copy after sealing it;
 whether explicit source metadata supplies a GPS unit discriminator. Do not
 infer units from magnitudes or the farmer's unit, classify mixed rows, change
 the 1000 ha clamp, or construct a real table.
+The subsequent explicit ROOT supplements authorize one numeric presence audit
+of the distinct m2 field and inspection of one held own instrument; their
+pre-read checkpoints and final findings are recorded below.
 
 ## §2 Existing machinery
 
@@ -22,7 +33,7 @@ the 1000 ha clamp, or construct a real table.
 | `plot_features_for_wave` | `lsms_library/countries/Guinea-Bissau/_/guinea_bissau.py:56` | GPS-first farmer fallback; own native keys; static inspection here, no direct own helper test located | cite only; do not execute |
 | wave driver `colmap` | `lsms_library/countries/Guinea-Bissau/2018-19/_/plot_features.py:26` | binds `s16aq47`, `s16aq45`, `s16aq09a/b`; full driver forbidden | reuse declarations as evidence |
 | `i` | `lsms_library/countries/Guinea-Bissau/_/guinea_bissau.py:21` | own `(grappe, menage)` household formatting | preserve; no manufactured keys |
-| `get_dataframe` | `lsms_library/local_tools.py` (STANDING §2/§4) | sanctioned numeric reader; may fetch/parse full data | UNRUN unless the charter's conditional numeric gate is satisfied |
+| `get_dataframe` | `lsms_library/local_tools.py:1781` (STANDING §2/§4) | sanctioned numeric reader | reused exactly once on the sealed existing private copy after the explicit ROOT supplement; no fetch |
 | Stata header interface | mounted pandas `StataReader.variable_labels/value_labels` | one metadata parse captured 301 fields / 36 value-label sets; every recorded `lines_read` = 0 | reused; no `read`, `get_chunk`, iteration or `categories_only` |
 | canonical plot schema | `lsms_library/data_info.yml:103,604–611` | `plot_id`, `Area` hectares, `AreaUnit` original survey unit | cite; no schema changes |
 | derivation registry | `lsms_library/countries/Guinea-Bissau/_/derivations.yml` | two entries, food and community prices; no plot-area entry | report absence; do not register a new construction |
@@ -50,6 +61,16 @@ the 1000 ha clamp, or construct a real table.
   1 “Hectare (Ha)”, 2 “Metro quadrado (m2)”. `s16aq45` links to a different
   codebook, `S16AQ45`: 1 “Sim”, 2 “Não”, for GPS measured. Neither that flag
   nor reason-for-nonmeasurement `s16aq48` assigns a unit to bound `s16aq47`.
+- Later-admitted own workbook, MD5 `0f3d80b68800a577659f5ead1032cdf9`:
+  `S16a_Agri!EO5` is `(16A.47)`, `EO6` explicitly says GPS area “em hectares”.
+  `K5/K6` identifies farmer question 9 and both ha/m2 units; `EL5/EL6`
+  identifies measured-by-GPS question 45 with Sim/Não and skip to 48.
+  This is direct question-level GPS hectares authority, not a farmer-unit
+  borrowing. The distinct DTA 47a m2 label remains separate. No export-name,
+  47a question, transformation or relationship appears in the inspected 16A
+  cells, amendment notes, exact export/47a search, defined names or comments.
+  Numbering/meaning support a semantic Q47 link; an export conversion is not
+  documented. A uniform hectares question does not classify mixed rows.
 
 ## §4 Invariants & assumptions
 
@@ -89,7 +110,7 @@ the 1000 ha clamp, or construct a real table.
 | binding trace | reuse static source declarations | executing the producer is unnecessary and forbidden |
 | units / measurement semantics | reuse own admitted Stata cards and committed own instrument text | units cannot be estimated from magnitude |
 | metadata serialization | new external evidence only | preserve typed dictionaries with pickle or typed records; plain JSON object keys would coerce numeric codes |
-| numerical discrimination | UNRUN; gate not satisfied | no identified flag assigns units to bound `s16aq47`; co-occurrence with the separate m2 field would not supply authority |
+| numerical discrimination | reused reader once under explicit later ROOT grant | characterize distinct known-m2 `s16aq47a` presence and literal flag/farmer-unit relation only; no q47 unit transfer |
 | repair / row classification | out of scope | diagnosis grant supplies no authority for a default change |
 
 ## §6 Open questions for the human
@@ -98,14 +119,15 @@ the 1000 ha clamp, or construct a real table.
   in the absolute shared questions channel; the coordinator's subsequent
   “COORDINATOR SCOPE ERRATUM” explicitly accepts the finding and calls 2021
   an “unserved holding only”. No 2021 header or serving claim was invented.
-- Exact missing authority: own 2018 household instrument section 16A Q47/Q47a
-  and official export/cleaning definitions establishing each field's unit,
-  relationship and applicability by vague. Declared own documents are
+- Exact remaining missing authority: official export/cleaning definitions
+  establishing the relationship of exported `s16aq47` and `s16aq47a` and
+  applicability by vague. Own instrument section 16A was subsequently admitted
+  and read, supplying Q47 hectares wording but no export bridge. Own documents are
   `2018-19/Documentation/gnb_ehcvm1_qnr_household_excel_vague{1,2}.xlsx`;
   both sidecars declare MD5 `0f3d80b68800a577659f5ead1032cdf9`, 673,399 bytes.
-  These are declarations, not document-byte or question-content verification;
-  no instrument bytes are admitted in this packet. Do not infer two different
-  fielded versions from their filenames. No routine approval is pending.
+  Both declarations share one verified physical workbook, now inspected under
+  the explicit supplement. Do not infer two different fielded versions from
+  their filenames. No routine approval is pending.
 
 ### Phase 3 — header-phase verification (frozen before scope extension)
 
@@ -207,3 +229,53 @@ are kept distinct. These are presence counts only, not q47 unit inference.
 No header/cards/11-control rerun; the original zero-reader-counter header phase
 remains preserved as history. Instrument and final supplementary verification
 remain to be completed before a new closure.
+
+### Phase 3 — completed supplementary verification
+
+- Numeric reuse — **OK (§§2–5, explicit numeric checkpoint)**.
+  `read-authorized-numeric.py` exited 0 after exactly one sanctioned
+  `get_dataframe` call. Complete 9,873 x 301 reader output, original index,
+  row/column positions, dtypes, attrs and all-column missing masks retained
+  before analytic copies. Original pickle is owner-only/read-only; exact frame,
+  masks, attrs and positions compare equal after analysis. Source and original
+  seals match. API-call wall time: 0.4138639532 seconds. Internal parser-call
+  count was not instrumented; this is no general performance benchmark.
+- Presence diagnosis — **OK (§§3–5)**. Both fields present: 1,191 source rows;
+  q47-only: 3,612; q47a-only: 0; neither: 5,070. All q47a rows are literal
+  vague 2 / measurement flag 1. Farmer-unit 1: 442, unit 2: 749 on those rows;
+  these are farmer units, not a GPS unit assignment. Flag 2 (5,057) and missing
+  (13) stay distinct, with neither GPS field populated. No ratio, threshold,
+  magnitude, yield or unit inference was computed. These counts are not a
+  household/sample join or a claim of unique plot counts.
+- Instrument authority — **OK (§3, explicit instrument checkpoint)**.
+  `read-own-instrument.py` exited 0: one physical workbook load, 375 nonempty
+  own16A cells retained with coordinates/merged ranges; load wall time
+  2.9027291061 seconds. `check-own-export-notes.py` exited 0 (0.0632155580 s)
+  and one relevant-layout XML check exited 0 (0.0552382912 s). These retain
+  amendment wording, exact export/47a search, defined names, relevant comments,
+  styles and cached measurement-flag formula text. Q47's area cell has no fill;
+  no color-based export transformation was inferred. Workbook pre/post seals
+  match, including the extra XML pass's SHA256; shared original was never opened.
+- Authority distinction — **OK (§3)**. The admitted instrument explicitly asks
+  GPS Q47 hectares, which qualifies the header-only missing-unit conclusion.
+  The DTA explicitly asks distinct q47a m2. Missing export bridge is reported,
+  rather than using either field's unit to relabel the other or declaring mixed
+  rows. This is a unit-authority diagnosis, not scientific unit acceptance.
+- Proposal — **OK (§5)**. External `q47a-source-proposal.md` gives the exact
+  m2-to-hectare factor 1/10000 for that distinct field on its own, for ROOT
+  review. No candidate values/table/producer or fallback/default/clamp change.
+- Final documentation freeze: `38cf70372623fb71e80a0294ab4bd78ae77881a0`.
+  This updated ledger is committed separately. New final SHA, actual commands,
+  all five exact required filenames and both-source post-all seals are recorded
+  in the external final closure. Original `053e42b4` header closure and its 11
+  controls/zero counters remain preserved and were not rerun. The two earlier
+  failed commands remain failures; both supplementary read commands passed.
+- Remaining UNRUN/missing gates: 2021 header (missing/no fetch), official export
+  bridge (not admitted), product/producer/config/default changes (not authorized),
+  pytest/full CI, scientific mixed-row acceptance, source-build/warm/fingerprint
+  cost acceptance. Only the bounded API/workbook/XML wall times above were
+  measured. No additional DTA parse, acquisition, shared-cache write, install,
+  subagent, source push or unrelated-country authority.
+
+No contradiction or reinvention was found against the current ledger. ROOT
+retains independent review/integration/CI/GitHub/merge and source-proposal choice.
