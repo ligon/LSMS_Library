@@ -115,6 +115,22 @@ Data Scheme:
     aggregation:
       visit: first
 
+  # Native ECVMA2011-12 rosters: all source columns are retained WITHOUT
+  # dtype declarations, recoding or monetary-total aliases (GH1529).
+  # No v: these own household observations do not require a sample join.
+  cultivation_records:
+    # 3B field/parcel/subparcel/crop/seed/use answers. cultivation_obs is the
+    # recorded household/slot scoped to the declared source, not a plot ID.
+    index: (t, i, cultivation_obs)
+    materialize: make
+
+  farm_cost_operands:
+    # 3D incurred flag, payment count, MEAN FCFA/payment, financing and all
+    # original fields. cost_obs is a constructed PREfilter release position;
+    # no transaction identity, multiplication, Cost or Expenditure is implied.
+    index: (t, i, cost_obs)
+    materialize: make
+
   plot_features:
     # Lasting parcel-level characteristics from the EHCVM agriculture
     # module s16a (GH #167; Niger is an EHCVM sibling of the Mali

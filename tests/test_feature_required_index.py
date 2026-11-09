@@ -107,6 +107,8 @@ TABLES = ["household_characteristics", "food_expenditures"]
 def test_required_optins_do_not_change_canonical_or_other_table_contracts():
     assert _index_info_section()["required_index_levels"] == {
         "household_characteristics": ["t", "v", "i"],
+        "cultivation_records": ["t", "i", "cultivation_obs"],
+        "farm_cost_operands": ["t", "i", "cost_obs"],
         "food_expenditures": ["t", "v", "i", "j"],
     }
     assert _required_index_levels("household_characteristics") == ["t", "v", "i"]

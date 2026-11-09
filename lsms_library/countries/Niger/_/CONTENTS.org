@@ -3456,3 +3456,45 @@ default or public API changed; whole GH1555 remains open.
 
 Evidence: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1555-held-protocol-followup-20261109/REPORT.md=;
 original diagnosis and its independent review remain separate.
+
+* 2026-11-09 -- Native cultivation and payment operands (GH #1529)
+
+The 2011-12 =cultivation_records= table now transports the complete own3B
+cultivation/seed/use roster: 768 rows and all26 numeric-reader source columns,
+including603 worked-Yes and165 No rows. =cultivation_obs= qualifies the recorded
+=as03bqa= household slot by its declared source; it is NOT a unique physical
+parcel. Field/parcel/subparcel/crop components remain native columns, not an
+allocation key. The eight =as03bq12a--h= use answers keep literal9 and missing
+answers; no household3C quantity is distributed onto these lines.
+
+The 2011-12 =farm_cost_operands= table transports all6,192 own3D rows and12
+source columns, including3690 missing charge/paid-code rows and2093 No rows,
+not just409 Yes rows. =cost_obs= is a CONSTRUCTED zero-based release position
+bound to the source sidecar, not a payment or transaction identifier. Native
+=as03dq04= is the number of payments; =as03dq05= is MEAN FCFA EACH PAYMENT.
+Own English P1 PDF p.27/printed p.26 names December2010--May2011. No total
+Cost/Expenditure, count-times-mean, annualization or plot/labor allocation is
+created. The two zero counts, one zero mean and literal count99 stay recorded.
+
+Both tables use standard household IDs and panel walking. The canonical
+=(t,i,cultivation_obs)= / =(t,i,cost_obs)= shapes have no =v=; they neither
+invent a cluster nor require a sample join. Raw =hid= and all native fields
+remain separate columns. A bounded held-source/default Country and singleton
+Feature check preserved every numeric-reader native field, dtype, NA mask and
+row order for these full universes, with unique observation coordinates.
+Country/Feature retain their normal index-level ordering and supported attrs;
+Feature's existing all-null-column policy still applies to future operands.
+This is native transport, not a universal raw-archive API.
+
+The household roster name is =cultivation_records=. =plot_cultivation= remains
+reserved by GH #862 for a separately designed per-season plot/person table;
+this native transport does not fill that grain or expose an old-name alias.
+
+Only the two2011-12 sources are wired; no source coverage in later waves is
+asserted. Existing3C and all other native table bodies are unchanged. The
+administered-French/window caveats,3E first/average-cycle/area/999/yield issues
+and1560/1571 factor/state/window holds remain. No new seasonal, sentinel,
+conversion or scientific default is selected; whole1529 remains open.
+
+Evidence: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1529-native3b3d-implementation-20261109/=;
+ledger =.coder/ledger/1529-niger-native3b3d.md= records exact scope and checks.
