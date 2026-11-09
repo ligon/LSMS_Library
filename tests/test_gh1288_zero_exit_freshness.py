@@ -69,8 +69,7 @@ def model(tmp_path, monkeypatch, request):
         name: getattr(L, name) for name in (
             '_dvc_cache_path', '_warm_dvc_cache_for_feature',
             '_ensure_dvc_pulled', '_try_get_data_file')}
-    R.build_transforms_fingerprint.cache_clear()
-    R.framework_imports_fingerprint.cache_clear()
+    R.clear_caches()
     name = request.param
     config, live = tmp_path / 'countries', tmp_path / 'data'
     config.mkdir()
@@ -344,8 +343,7 @@ def model(tmp_path, monkeypatch, request):
     try:
         yield m
     finally:
-        R.build_transforms_fingerprint.cache_clear()
-        R.framework_imports_fingerprint.cache_clear()
+        R.clear_caches()
         for ledger, previous in zip(ledgers, saved):
             for key in keys:
                 ledger.pop(key, None)
@@ -1127,8 +1125,7 @@ def test_literal_other_native_selected_script_yields_exact_15_25_and_preserves_l
     model.country._table_cache_hash(OTHER, model.country.waves)
     for helper, original in model.original_access_helpers.items():
         monkeypatch.setattr(L, helper, original)
-    R.build_transforms_fingerprint.cache_clear()
-    R.framework_imports_fingerprint.cache_clear()
+    R.clear_caches()
     assert all(getattr(L, helper) is original
                for helper, original in model.original_access_helpers.items())
     other = model.data / name / 'var/support.parquet'
