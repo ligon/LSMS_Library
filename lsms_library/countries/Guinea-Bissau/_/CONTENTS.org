@@ -778,99 +778,55 @@ No new download, PDF parse, microdata read or source/table campaign was
 needed for this holding; the earlier document-check evidence is reused.
 See =.coder/ledger/1575-three-public-bids-managed-ingestion.md=.
 
-* 2026-11-09 — header-only GPS unit checkpoint (GH #1531)
+* 2026-11-09 — GPS question units and the distinct m² export (GH #1531)
 
-Diagnosis at =6d9563f7aac1e65e10e98b002ae935f1bd84c266=, with no area,
-unit, clamp or wiring change. Only the admitted private read-only copy of
-=2018-19/Data/s16a_me_gnb2018.dta= was inspected: MD5
-=39a00532332e724fa9c50bf206c58334=, 6,531,988 bytes, unchanged before/after.
-The Stata header declares 301 variables and 9,873 observations; the latter
-is a header count, not rows read. =StataReader.variable_labels/value_labels=
-left the reader's =lines_read= at 0. Original typed dictionaries are retained
-in the private GH #1531 evidence packet.
+The own 2018 household instrument asks GPS question 47 in *hectares*:
+=2018-19/Documentation/gnb_ehcvm1_qnr_household_excel_vague1.xlsx=,
+=S16a_Agri!EO5/EO6= (16A.47), "Qual é a área da parcela (em hectares) de
+acordo com as medidas GPS?". The vague 2 sidecar declares the *same physical
+workbook*: MD5 =0f3d80b68800a577659f5ead1032cdf9=, 673,399 bytes;
+these are not two independently verified forms.
 
-The wave driver binds GPS area to =s16aq47=, whose exact question label is
-"16A.47. Quelle est la superficie de la parcelle selon les mesures GPS ?".
-It states no unit and has no value-label link. A distinct, unbound field
-=s16aq47a= explicitly asks "16A.47a. Qual é a área da parcela (em m2) de
-acordo com as medidas GPS?". Both are stored as doubles. The explicit m2
-label applies to =s16aq47a=; it does not establish the unit of =s16aq47=,
-their relationship, or their applicability to particular rows/vagues.
+The released =2018-19/Data/s16a_me_gnb2018.dta= (MD5
+=39a00532332e724fa9c50bf206c58334=, 6,531,988 bytes) labels bound
+=s16aq47= as GPS area without a unit. Its DISTINCT =s16aq47a= explicitly
+asks GPS area "em m2". The instrument's Q47 wording supports the question-level
+hectares interpretation, but the inspected 16A cells, amendment notes,
+defined names and comments supply no official export/cleaning relationship
+between these fields or row-specific unit assignment. No unit is transferred
+between them; their coexistence does not establish mixed-unit q47 rows.
 
-=s16aq09b= links to =S16AQ09B=: 1 =Hectare (Ha)=, 2 =Metro quadrado (m2)=.
-This is the unit of the farmer estimate =s16aq09a= ("selon l'exploitant"),
-not a GPS unit declaration. =s16aq45= links to =S16AQ45=: 1 =Sim=, 2 =Não=,
-answering whether GPS measurement occurred. =s16aq48= asks the reason for
-nonmeasurement. Neither supplies a unit for =s16aq47=. No numeric rows were
-read: these cards do not identify a flag assigning units to the bound GPS
-field, and numerical co-occurrence cannot supply the missing authority.
+Current =plot_features= still selects =s16aq47= when GPS flag =s16aq45 == 1=
+and that field is present, otherwise the farmer estimate =s16aq09a=.
+Farmer unit =s16aq09b= is 1 hectare / 2 m² (instrument =K5/K6=, Q9), with
+code 2 divided by 10,000; it is not a GPS unit. The GPS flag is Sim/Não
+(=EL5/EL6=, Q45), not a unit code. The existing nonpositive/>1000 ha clamp,
+source binding, fallback, rows and defaults are unchanged by this diagnosis.
 
-The earlier plot_features note and the helper call the bound GPS area
-hectares. This audit leaves that assumption unverified; it does not prove
-mixed units or authorize borrowing =s16aq09b= onto GPS. The next evidence
-needed is the own 2018 household instrument's section 16A Q47/Q47a and an
-official export/cleaning definition of their relationship and units. Both
-declared 2018 household XLSX sidecars name MD5
-=0f3d80b68800a577659f5ead1032cdf9= (673,399 bytes); no questionnaire bytes
-were admitted or parsed in this diagnosis. The earlier "No questionnaire is
-held for this country" note must be read alongside these declarations,
-without inferring the contents of either form.
+Presence in all 9,873 source rows, not unique plots or a sample join:
 
-The earlier "there is no 2021-22 wave" plot note also needs the later
-registration qualification: at this source pin, =2021-22/_/data_info.yml=
-contains only Country/Wave, there is no plot driver, and the country
-concatenator lists only 2018-19. The declared 2021 s16a (MD5
-=00d948d16d402ebf8b60fa6c03763705=, 5,594,481 bytes) was missing from the
-admitted staging; its actual header remains unread. No acquisition or
-second-wave serving claim follows. See =.coder/ledger/1531-remote-task.md=.
+| GPS fields present | source rows |
+|--------------------+-------------|
+| both q47 and q47a   |        1191 |
+| q47 only           |        3612 |
+| q47a only          |           0 |
+| neither            |        5070 |
 
-** Later authorized supplement: own instrument and distinct m2 field
+All 1,191 q47a rows are literal vague 2 / GPS flag 1 and also have q47.
+Their farmer units are 1 on 442 rows and 2 on 749; these remain farmer units.
+Flag 2 (5,057 rows) and missing flags (13) are distinct; neither has a GPS area.
+No ratios, magnitudes, mixed-row classification or candidate table were used.
+The explicit-m² q47a supports dimensional conversion by 1/10,000 on its own;
+selecting or combining it with q47/farmer estimates remains unruled.
 
-After that header-only checkpoint, ROOT explicitly admitted one own 2018
-questionnaire workbook and one numeric read of the already-held 2018 s16a.
-The prior checkpoint and its zero-reader-counter evidence remain preserved.
-No product, source binding, unit rule, clamp or default is changed.
+Read the earlier "No questionnaire is held" note alongside these verified
+own declarations, and "there is no 2021-22 wave" alongside the later held,
+registered-but-unwired record. At source =6d9563f7=, 2021 has only Country/Wave
+metadata, no plot driver, and is absent from the plot concatenator. Its declared
+s16a (MD5 =00d948d16d402ebf8b60fa6c03763705=, 5,594,481 bytes) was missing
+from the admitted staging and its header remains unread; no 2018 unit authority
+or serving claim is transferred to it.
 
-*The own instrument explicitly asks GPS question 47 in hectares.*
-The single physical workbook (MD5 =0f3d80b68800a577659f5ead1032cdf9=,
-673,399 bytes; shared by both vague sidecars) has =S16a_Agri!EO5= =16A.47=
-and =EO6=: "Qual é a área da parcela (em hectares) de acordo com as medidas
-GPS?" followed by a next-parcel instruction. =K5/K6= identifies farmer
-question 9, permitting hectares or square metres with the same 1/2 unit codes.
-=EL5/EL6= identifies GPS-measured question 45, Sim/Não, skipping to 48 for Não.
-
-This supplies hectares authority for the instrument's GPS question 47,
-alongside the DTA's explicit m2 label for the distinct =s16aq47a=. The
-instrument's 16A cells, amendment notes, exact export-identifier search,
-defined names and relevant comments provide no =s16aq47=/=s16aq47a= export
-definition, 47a question, or transformation/relationship between these fields.
-Numbering and wording support the question-level link; they do not document
-an export conversion or authorize classifying any bound-q47 rows as mixed.
-No unit is borrowed from the farmer estimate or transferred between GPS fields.
-
-*The added numeric read is presence-only.* One sanctioned =get_dataframe= call
-returned all 9,873 source rows and 301 columns; every original row/index/source
-position/dtype/attr and all-column missing masks were retained in an immutable
-owner-only pickle before analytic copies. Both the admitted DTA and the
-workbook match their pre/post seals. No DTA re-read or header-card rerun.
-
-| source field presence | rows |
-|-----------------------+------|
-| both =s16aq47a= and =s16aq47= | 1191 |
-| =s16aq47= only               | 3612 |
-| =s16aq47a= only              |    0 |
-| neither                     | 5070 |
-
-All 1,191 =s16aq47a= observations are in literal vague 2 and GPS flag 1. Their
-farmer-unit codes are 1 on 442 rows and 2 on 749; those codes describe the farmer
-estimate, not the GPS field. GPS flag 2 (5,057 rows) and missing flags (13)
-remain distinct; neither has a present GPS-area field. These are source
-presence counts, not a sample join, ratio, unit inference or magnitude audit.
-The added =get_dataframe= call took 0.414 seconds wall time; this is not an
-instrumented count of its internal parser calls or a performance benchmark.
-
-The known-unit =s16aq47a= can support a ROOT-reviewed proposal for its own
-measurement with the exact m2-to-hectare factor 1/10000. Its integration with
-the existing GPS/farmer rule, and the export relationship to question 47,
-remain for review; no producer/candidate table is changed. The missing 2021
-actual header and registered-but-unwired qualification remain unchanged.
+Diagnosis frozen at =d41aa628ea929cd49bf9414a4c78bcbe3b693bba=;
+see =.coder/ledger/1531-remote-task.md=. Durable report:
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/private/Guinea-Bissau-1531-GPS-unit-audit-6d/dispatch/2172b44031b04472ade9414bade8d4fc/evidence/report.md=.
