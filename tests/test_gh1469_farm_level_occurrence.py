@@ -103,8 +103,8 @@ def test_a_frame_with_no_farm_rows_is_untouched():
 
 
 def test_a_null_plot_id_is_not_the_sentinel():
-    """A null `plot_id` is not Farm-level, and counts as a plot row.  (Mali's
-    tree rows were served null until GH #1476.)"""
+    """A null `plot_id` is not Farm-level, and counts as a plot row.  Mali's
+    tree rows use Farm-level (GH #1476); the null here is synthetic."""
     df = _frame([("w1", "h1", None, "Mango", None),
                  ("w1", "h1", FARM, "Mango", 5.0),
                  ("w1", "h1", "p1", "Beans", None)])
