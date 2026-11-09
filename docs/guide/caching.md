@@ -140,6 +140,50 @@ You can still invalidate manually:
 Either way, the rebuild reads from L1 (the DVC blob cache) where
 possible, so you only pay the S3 cost once per blob per machine.
 
+### Direct country builders with the Make backend
+
+For a declared `materialize: make` table with a country builder, a current
+country parquet with sufficient declared wave coverage can be reused. Otherwise
+the library builds in a temporary data root: current registered prerequisites
+are copied, missing declared wave contributions use the existing loaders or
+scripts, and the selected country target starts absent. The actual country
+builder still supplies the table and its transformations. A zero-exit producer
+that leaves no output cannot borrow an old wave or country parquet.
+
+Finalization and required-column validation inspect a copy. After checking that
+declared inputs stayed stable, the library stamps the original **pre-finalize**
+parquet with its input hash and full builder coverage, then atomically replaces
+only the selected country output. Live wave files, other tables, reviewed JSON
+sources and grouped-rule companions retain their original bytes and availability.
+The optional `lsms_make_inputs` footer records declared Other-table hashes and
+literal source fingerprints not already covered by the selected wave hashes.
+Direct Make reuse checks this witness as well as the normal hash/coverage gate.
+Available declared L1 blobs are copied into the temporary root; there is no
+shared writable L1 link. Cold builds therefore need extra temporary disk space.
+
+Literal registered Other-table references can use their existing builders in
+the private root when reuse is unproven. Explicit Other-wave references run
+the physical wave producer; a native country build is not assumed to retain
+its temporary wave companions. Declared raw/DVC inputs keep their source
+provenance and are eligible without a harmonized-cache hash. A hashless input alone is not evidence
+of staleness. Dependencies computed outside the existing declarations/literal
+scanner remain a boundary: a missing rule or unknown prerequisite keeps its
+native failure, and an input with no current producer/provenance is not copied
+and certified merely to keep the build running. Root-honoring, sanctioned IO is
+required; arbitrary outside-root reads are not certified by this mechanism.
+This can refuse a legacy build whose computed, hashless, rule-less prerequisite
+happens to be correct but has no established current producer/provenance. The
+live file is retained. This availability tradeoff is an explicit residual;
+broader country exposure and other backend failure paths remain unverified.
+The native output is copied to a parent-owned private snapshot for validation
+and promotion, so a later producer write cannot replace the bytes being
+validated. Prepared selected-wave bytes and declared source fingerprints must
+remain stable through the country build. Wave grain/date/drop evidence is
+retained in the country footer; grain and date replay describe the requested
+waves, using the existing read-gate policies. Finalization never writes back.
+Default/JSON/legacy failure policies, explicit `assume_cache_fresh`, and the
+existing wave-rebuild and guarded country-fallback evictions retain their scope.
+
 ## Cache Location
 
 All three tiers are under the user data directory:
@@ -316,15 +360,16 @@ country and environment:
 | Make / script | When `data_scheme.yml` marks a table `materialize: make` | Per-country/wave Makefiles and standalone Python scripts; the only choice for tables that cannot be expressed purely in YAML (post-planting/post-harvest dual rounds, multi-wave source files, etc.). These also write L2-wave parquets via `to_parquet()` |
 
 ```bash
-# Rebuild from source on every call, bypassing both Parquet tiers
+# Select the Make backend (this does not bypass the parquet tiers)
 export LSMS_BUILD_BACKEND=make
 ```
 
-Note that `LSMS_BUILD_BACKEND=make` changes how `_aggregate_wave_data`
-dispatches (`country.py:3727`): a table with a `data_scheme.yml` entry goes to
-`load_from_waves`, otherwise to `run_make_target()`. Either way both L2 parquet
-tiers are bypassed. L1 is still used to serve
-raw blobs. Use only when actively debugging.
+`LSMS_BUILD_BACKEND=make` changes how `_aggregate_wave_data` dispatches.
+A declared `materialize: make` table with a country builder uses the private
+transaction described above, including verified warm country reuse. A declared
+table without that builder uses its waves, whose YAML loaders still read and
+write L2-wave parquets. Other legacy callers retain their existing runner.
+L1 still serves raw blobs.
 
 ## Build Parallelism
 
