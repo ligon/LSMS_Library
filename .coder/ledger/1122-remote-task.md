@@ -93,9 +93,42 @@ claim a live GitHub status. Full source/warm/census/CI acceptance belongs to roo
 
 ### Phase 3 — verification
 
-UNRUN at ledger checkpoint. Runtime identity has been asserted at source HEAD.
-`make api-audit STRICT=1` encountered absent Poetry (recipe error127); the actual
-recipe's prepared-interpreter script was then run and reported 15/15 skills
-listed, 10/10 kwargs documented and no untracked hashed inputs. Exact exits,
-final byte/node comparison, selected test counts and final SHA will be recorded
-in evidence and this ledger's separate final commit.
+Documentation frozen in `3bc1868b503020b2f16a32774eb825eba56e35bb`; this
+final ledger update is a separate commit. The initial ledger-only checkpoint
+was `cfe790f8ddbb4e46075d9d75962f394546d3fb94`, surfaced before prose edits.
+
+- OK (§2/§3): GhanaLSS now distinguishes the registered Feature index from its
+  native Country index and the still-absent canonical Columns block. EHCVM
+  input alignment is explicitly Feature-side; the coarse EthiopiaRHS caveat
+  stays. #1119 markers are distinguished without relabeling GhanaLSS data.
+- OK (§2/§5): skill prose names all three registrations and later observation
+  axes. AGENTS has one corrected human paragraph; CLAUDE remains its symlink.
+  No new callable, estimator, test, fixture or schema was introduced.
+- OK (§4): prepared runtime identity at source HEAD passed. Final strict audit
+  fallback `PROJECT_PYTHON scripts/api_surface_audit.py --strict` exited 0:
+  15/15 skills listed, 10/10 kwargs documented, no untracked hashed inputs.
+  Five no-call-site machinery advisories remain. `make api-audit STRICT=1`
+  itself exited 2 (Poetry absent, recipe error127); it is not reported green.
+- OK (§2/§4): existing `TestDeclarations`, `TestRenameIndexLevels`,
+  `TestAlignToCanonicalLevels`, `TestPlotTableDeclarations` passed: 29 cases,
+  exit0, 0 skipped, 0 failures, three warnings (two dependency FutureWarnings
+  and an assembly-sentinel warning on an invented frame). Run with the mounted
+  interpreter, `-n 2 --dist=loadfile`, ordinary private bindings, pinned threads
+  and file/JUnit logs. No actual country/table build or source getter ran.
+- OK (§4): static source comparison passes for 799 production Python files /
+  572,869 AST nodes and 268 YAML files, all byte-identical to source. The other
+  13,529 production paths remain unchanged. Both country records preserve all
+  548 table rows and six executable source blocks; GhanaSPS is wholly unchanged.
+  Held files, every test/fixture, generated GitNexus block and CLAUDE symlink
+  remain equal. `git diff --check` exited0. Final evidence rechecks this at the
+  final ledger commit; no further documentation edit is planned.
+- Cost qualification (§4): CONTENTS exclusion is established statically from
+  `_ORG_HASH_SKIP` and its consumers. No actual cache hash census, warm/cold
+  source build, performance timing or full CI ran. Hashed comments stay HELD.
+
+Execution notes: an initial patch failed its context check and changed no file;
+the corrected patch applied. A speculative test filename and absent ledger glob
+also returned search errors; neither is verification success. All required
+artifacts, exact exits, private-publication receipt and final SHA are under the
+absolute dispatch evidence directory, outside tracked source. Independent
+review/current integration/CI and overall issue closure remain root-owned.
