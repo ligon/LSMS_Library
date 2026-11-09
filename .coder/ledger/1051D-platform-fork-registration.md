@@ -17,3 +17,6 @@ Reuse closed Dfocused runner/identity plugin and dd7667 metadata/run-gate operat
 
 ## §6 Remaining gates
 Linux pure controls cannot prove Windows full module import; ROOT owns exact new-head configuredWindowsCI/publication. No scientific decision. Phase1 precedes product edit.
+
+### Phase3 — actual finite closure
+OK (§§2–4): tested9931ce282fd0206ecfc90b9bc3ee925fc5e4fc83, focused4411 actualouter0/child0,7PASS0F/E/S (new2capability+existing5fork/reset/owner),7.54s pytest/13.959746s wrapper,3identities/privateconfig+data0/sourceclean. Solemetadata55758 actualouter0/child0/132.107320s: vsclosedD05f/headerpreserved,0/452country0/1903wave(18None)0/37BTF0/186FIF;all14nonhash/topkeysets exact/errors0/denials0/privateconfig+data0. Original Windows importfailure42687513487 preserved; actualnewWindowsCI stillfinalimportgate. No12/23/114bulk/baseline/raw/API replay. Guard removal reconstructs entireparentlocal_tools byteexact; callbacks/allhelperbodies/existingtests unchanged, no exclusions/schema policy. External reports/1051D-platform-fork-registration-20261109 bind fullsourcepatch/7JUnit/3identities/originalfailure/completecensuscomparison and actualhandles. This final ledger-only child changes no tested/censused byte. ROOT owns integration/GitHub/CI/release.
