@@ -62,8 +62,10 @@ def test_all_absent_retains_named_final_diagnostic(survey, monkeypatch, caplog, 
     makefile.write_text('all:\n\t@true\n')
     with warnings.catch_warnings(record=True) as seen:
         warnings.simplefilter('always')
-        out = survey.load([BAD])
-    assert out.empty and not path.exists()
+        with pytest.raises(RuntimeError, match='Could not materialize Coverage1590/facts') as caught:
+            survey.load([BAD])
+    assert str(survey.cache) in str(caught.value)
+    assert not path.exists() and not survey.cache.exists()
     assert any('Data file ' + str(path) + ' still missing after running fallbacks.' in x.message
                for x in caplog.records)
     assert not any('Makefile execution failed' in str(w.message) for w in seen)
