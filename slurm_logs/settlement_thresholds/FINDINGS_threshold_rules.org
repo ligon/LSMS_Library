@@ -943,3 +943,30 @@ The reusable piece is the *text cache*: 794 extracted documents keyed by DVC
 md5, with page/sheet markers.  Any future documentation question over this
 corpus (currency units, recall periods, sampling design) is a grep away once
 that cache exists, and rebuilding it takes about 15 minutes end to end.
+
+* Dated correction -- 2026-11-09 UTC: Stata double missing marker
+
+This supersedes only the diagnosis and year-based boundary in the first bullet
+under "Data-quality landmines found along the way": "corruption", "Stata float
+artifact", and "not a documented missing-value sentinel".  The original text
+above remains verbatim as historical evidence.
+
+The later [[file:../sentinel_audit/FINDINGS_1.7498e100.org][sentinel report (2026-08-22, including its self-corrections)]]
+establishes that =1.7498005798264095e+100= is exactly =2^333= (IEEE754
+=0x54c0000000000000=), Stata's documented system-missing (=.=) marker for
+=double= in =.dta= formats 104/105.  The relevant boundary is storage type
+=double= and file format (the reader's =format <=105= condition), not survey
+year or a floating-point corruption artifact.
+
+That report traces the pandas recode to upstream PR #59325 (milestone 3.0),
+records its absence from the =v2.2.3= source tag, and reports correct handling
+on its installed pandas 3.0.2 stack.  These are the report's historical
+source/version and installed-reader observations, not a claim that every
+=pandas >=2.2= version handles it or a validation of today's installed reader.
+
+The documented conditional conversion belongs to the supported reader; no
+unconditional filter or sentinel/threshold list follows.  This correction makes
+no reader, configuration, dependency-floor or country-normalization change and
+no coverage verdict.  No corpus census, reader validation or remeasurement of
+other historical conclusions was performed here, and arbitrary occurrences of
+the number elsewhere are not thereby scientifically adjudicated.
