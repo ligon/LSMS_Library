@@ -1,4 +1,7 @@
-# GH1066 — PRIVATE DRAFT, warning policy NOT selected
+# GH1066 — stored grain replay; policy selected 2026-11-09
+
+Current status: the user selected the policy below; earlier PRIVATE/HOLD
+statements record the original unselected prototype and remain historical.
 
 ## §1 Task and hold
 
@@ -104,3 +107,18 @@ exact. No GitHub mutation, ready PR, merge or issue-resolution claim.
 Recommendation is now concrete: replay historical evidence with existing
 strict semantics, without asserting freshness/completeness. Maintainer choice
 remains required; time or successful tests do not select it.
+
+## User disposition and current integration — 2026-11-09
+
+Exact user selection, relayed by ROOT: **“Replay warnings and normal strict
+policy (Recommended)”**. This answers restoration of stored grain warnings,
+grain_reports and LSMS_GRAIN_STRICT refusal. The earlier HOLD is revoked for
+this selected policy; it did not expire or follow from test success. No new
+knob or science choice. Ordinary merge onto actualba03 preserves the tested
+prototype runtime; only decision prose/comments/docstrings change next.
+Original17PASS means15candidate cases +2baseline witness cases, not19cases.
+Original current1c missing-replay counterexamples remain preserved.
+
+ROOT owns GitHub/release; independent peer review remains required before
+merge. One final candidate-only existing metadata census is authorized; no
+new source/raw/API/build/corpus/fullsuite or baseline replay.
