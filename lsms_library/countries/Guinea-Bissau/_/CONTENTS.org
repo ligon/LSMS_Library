@@ -777,3 +777,49 @@ No sample, strata, native labels, weights, schema or defaults change.
 No new download, PDF parse, microdata read or source/table campaign was
 needed for this holding; the earlier document-check evidence is reused.
 See =.coder/ledger/1575-three-public-bids-managed-ingestion.md=.
+
+* 2026-11-09 — GPS area source cards do not establish the bound field's unit (GH #1531)
+
+Diagnosis at =6d9563f7aac1e65e10e98b002ae935f1bd84c266=, with no area,
+unit, clamp or wiring change. Only the admitted private read-only copy of
+=2018-19/Data/s16a_me_gnb2018.dta= was inspected: MD5
+=39a00532332e724fa9c50bf206c58334=, 6,531,988 bytes, unchanged before/after.
+The Stata header declares 301 variables and 9,873 observations; the latter
+is a header count, not rows read. =StataReader.variable_labels/value_labels=
+left the reader's =lines_read= at 0. Original typed dictionaries are retained
+in the private GH #1531 evidence packet.
+
+The wave driver binds GPS area to =s16aq47=, whose exact question label is
+"16A.47. Quelle est la superficie de la parcelle selon les mesures GPS ?".
+It states no unit and has no value-label link. A distinct, unbound field
+=s16aq47a= explicitly asks "16A.47a. Qual é a área da parcela (em m2) de
+acordo com as medidas GPS?". Both are stored as doubles. The explicit m2
+label applies to =s16aq47a=; it does not establish the unit of =s16aq47=,
+their relationship, or their applicability to particular rows/vagues.
+
+=s16aq09b= links to =S16AQ09B=: 1 =Hectare (Ha)=, 2 =Metro quadrado (m2)=.
+This is the unit of the farmer estimate =s16aq09a= ("selon l'exploitant"),
+not a GPS unit declaration. =s16aq45= links to =S16AQ45=: 1 =Sim=, 2 =Não=,
+answering whether GPS measurement occurred. =s16aq48= asks the reason for
+nonmeasurement. Neither supplies a unit for =s16aq47=. No numeric rows were
+read: these cards do not identify a flag assigning units to the bound GPS
+field, and numerical co-occurrence cannot supply the missing authority.
+
+The earlier plot_features note and the helper call the bound GPS area
+hectares. This audit leaves that assumption unverified; it does not prove
+mixed units or authorize borrowing =s16aq09b= onto GPS. The next evidence
+needed is the own 2018 household instrument's section 16A Q47/Q47a and an
+official export/cleaning definition of their relationship and units. Both
+declared 2018 household XLSX sidecars name MD5
+=0f3d80b68800a577659f5ead1032cdf9= (673,399 bytes); no questionnaire bytes
+were admitted or parsed in this diagnosis. The earlier "No questionnaire is
+held for this country" note must be read alongside these declarations,
+without inferring the contents of either form.
+
+The earlier "there is no 2021-22 wave" plot note also needs the later
+registration qualification: at this source pin, =2021-22/_/data_info.yml=
+contains only Country/Wave, there is no plot driver, and the country
+concatenator lists only 2018-19. The declared 2021 s16a (MD5
+=00d948d16d402ebf8b60fa6c03763705=, 5,594,481 bytes) was missing from the
+admitted staging; its actual header remains unread. No acquisition or
+second-wave serving claim follows. See =.coder/ledger/1531-remote-task.md=.
