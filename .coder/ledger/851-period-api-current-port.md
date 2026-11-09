@@ -121,3 +121,29 @@ The external review packet is reports/851-period-api-port-cd6-20261109 under
 the 20261103 burst: PORT-PLAN, ACCEPTANCE-ORACLES, source/static bindings,
 literal source diff, exact pure node selection, two invented pre-port default
 counterfactuals and ordinary private runner. All tests/census remain UNRUN.
+
+## Revision charter — represented-wave availability and one-build handoff
+
+ROOT's subsequent disposition preserves held represented-t semantics, including
+declared-but-actual-empty unknown recall returning a healthy empty result.
+The preceding 968 draft and its unexecuted metadata-refusal oracle are historical;
+no test ran on that draft. Exposure availability must not be inferred from a
+declaration. Retain only vocabulary/table validation before DataFrame IO.
+
+Use the existing ContextVar/contextmanager convention (country.py
+_label_selection/_READ_AUDIT_WAVES) for a private single Feature invocation.
+On a partial PeriodUnavailableError, generated Country offers a one-shot
+continuation of its existing remaining poststeps, then raises. Direct Country
+calls keep their immediate refusal; Feature alone establishes a matching
+(country,table,period) handoff. It records unavailable cells, consumes the
+continuation once, and slices/converts that same fully postprocessed full read.
+The context clears references and resets in finally, including errors and
+interrupts. No second method call, public option, stored instance frame,
+exception payload field, period=None bypass or inference-pool change.
+
+Before runtime ROOT reviews a new frozen draft and pure selection, including
+declared-empty unknown PASS, nonempty typed refusal, single full build, normal
+poststep/attrs preservation and continuation cleanup/failure controls. Reuse
+the approved CSV/YAML without another promoter run; update only truthful guide
+and generated dispatch docs through their existing generator as necessary.
+No tests, data/API, raw, census or native cohort execution is authorized yet.
