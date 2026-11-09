@@ -61,3 +61,50 @@ framework. Existing strictAPI/registration checks may be selected proportionatel
 later, not duplicated automatically. Independent review follows finalsource.
 ROOT owns GitHub/current integration/release. Current implementation/verification
 UNRUN at this ledger-first checkpoint.
+
+### Phase3 — bounded author closure
+
+Ledger-firste0cd7a557 preceded source064398379020d2210f975bf49cc12cfdfe3a8ed9.
+Exactly five approved files changed: three Makefile retired var entries/grouped
+recipes, two proved stale skill paragraphs and obsolete unitlabels.csv ignore
+exception/comment. CIV shocks retained; every other Makefile byte recovered by
+inverse. All library Python/YAML/Org/native/test/AGENTS/generated objects and
+public generic unit helper/distinctunit_labels.csv remain exactdfaeed. No new
+repository mirror tests or shared missing-script guard added.
+
+Reviewed parse-time shell operations before execution. One ordinary private
+MAIN/unshare/thread1 actor ran32GNUmake -n graph probes against EXACT old/new
+Makefile copies and inert private .py fixtures. Old graphs exposed all retired
+recipes; candidate retiredtargets refuse with exact No-rule error, while all
+retains native outputs and CIV shocks. Explicit productivefood_acquired and
+CIVshocks command graphs are byte-equal before/after. All fixture input bytes
+unchanged; no Python recipe/source/native producer executed. Existing direct
+scripts/api_surface_audit.py --strict exits0:10kwargs,15hand-authoredskills,
+5unchanged machinery advisories, no untracked buildinputs. Generated skill tree
+is excluded by that audit, so PASS does not validate its stale entries.
+Combined wrapper5.172s/exit0, private data/config files0. A preparatory wrong
+bin/api_audit.py lookup failed before audit; actual path came from the current
+Makefile, no wrong-path execution occurred. No runtime failures or retries.
+
+ONE candidate-only byte-exact existing metadata operator on064 CLOSED0 in
+122.692s, private data/config0/errors0/denials0. Baseline09c50085 originalheader
+retained; its entireGit tree7bcef328e626e6c1119259a35dbd33cfa3fa70eb is EXACT
+currentdfaeed, so no baseline replay. Full450/1895/35/186 keysets unchanged:
+35country hashes move (CIV17,Togo18);0wave/BTF/FIF. Every nonhash field exact,
+including public/order/materialization/registration/overrides/closure paths and
+18None wave cells. Afghanistan remains an unregistered entry, not a measured
+registered-country rebuild. No cache warm or native output equality measured.
+
+Evidence:
+/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/218-retired-make-residual-fix-20261109/.
+MAKE-GRAPHS,MAKE-SCOPE-PROOF,API/CHECKS receipts,SOURCE-CONSERVATION and complete
+metadata comparisons record actual scope. Final ledger-only child preserves
+all measured runtime/config/test bytes; independent review and ROOT-owned
+integration/publication/CI follow. No source acquisition/raw/API/producer/full
+suite or sharedcache operation.1651 country.py scope remains separate/complete.
+
+Generated .claude/skills/generated/skill/SKILL.md still advertises removed
+prices_and_units. Ownership/regeneration remains separately flagged and this
+file was not edited; truthful AGENTS historical paragraphs are preserved. No
+claim all historical text/old science/gap matrices have been re-audited. Whole
+GH218 disposition remains ROOT-owned rather than automatically closed here.
