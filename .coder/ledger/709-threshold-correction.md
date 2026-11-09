@@ -75,5 +75,40 @@ no further routine approval is needed. No open scientific question is introduced
 
 ### Phase 3 — verification
 
-UNRUN. Initial ledger-only commit precedes the document append. Final qualification
-will be a separate ledger-only commit after static validation.
+- **OK (§§1–4):** frozen document commit
+  `e097f5533bb35364b130380e6d7593b11311d940` appends 27 lines / 1,652 bytes;
+  all 57,089 original bytes remain exact (SHA256
+  `18cdc2765144b09c34b705ede5dd8231fa158b8e3ed47e69b0f8385ebe316c9a`).
+  The relative link resolves to the precise later report in the pinned base,
+  whose bytes are unchanged. The correction date is actual UTC 2026-11-09.
+- **OK (§§2–5):** nine stdlib/Git static checks passed at the document commit
+  (exit 0): original prefix, UTC date, pinned link, committed object allowlist,
+  working object allowlist, additions only, diff whitespace, first commit
+  ledger-only, and clean tracked tree. Across 19,200 base tree objects, 19,199
+  retain the same mode/type/blob; the historical document is the sole changed
+  base object and this ledger the sole addition. No source/config/test object
+  changed. Initial ledger-only checkpoint was
+  `9a6758aed3eab37ff740613db2c966bf3fb5e87f`.
+- **Recorded checkpoint failure (§4):** the earlier pre-commit run returned 1:
+  8/9 checks passed, with only tracked-tree cleanliness failing because the
+  report append was not committed yet. `precommit-static.json` / `.log` retain
+  that result. The later clean-tree pass does not relabel it.
+- **OK (§§2–5):** independent stdlib arithmetic confirms the literal's exact
+  `2^333` equality and IEEE754 bits. This is arithmetic, not reader or corpus
+  evidence. No new symbol, test, sentinel rule, scientific assumption or country
+  interpretation was introduced; no reinvention or contradiction found against
+  this ledger.
+- **Limits (§4):** zero test/API/hash suites, library/reader imports, actual
+  survey/source/capture/cache reads, data builds, downloads or corpus scans.
+  Current installed-reader behavior and package import identity were not
+  executed; runtime path/bindings were checked with site initialization disabled,
+  with package identity only as reported by supplied setup metadata. Cache-hash
+  and performance costs were not measured. Independent review, current
+  integration, CI, PR/publication remain ROOT-owned.
+
+This is the separate final ledger qualification. Final-head byte/object checks
+and exact command exits are recorded in external dispatch evidence
+`source-byte-proof.json`, `verification-plan.json` and `report.md`; the immutable
+document-stage pass is retained in `document-static.json`. Shared steering was
+read at checkpoints and provided no contrary filename instruction; the explicit
+owned ledger path was retained, with no unowned alias created.
