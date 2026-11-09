@@ -201,6 +201,27 @@ errors do not trigger this fallback. Ordinary readers and cache warmers keep
 their best-effort behavior and their existing streaming fallback; there is no
 new user setting or shared-cache write policy.
 
+### Repeated advisory connection failures
+
+After both remote layouts finish their existing retry sequence with uniform,
+positively identified connection-establishment failures, the fast heal probe
+can defer other uncached sources on the same eligible S3 route for five seconds.
+The deadline does not slide. It retains the backend already used, including a
+default-endpoint route with demonstrably nonrefreshing profile authentication;
+unknown or refreshing authentication and ambiguous routes keep probing normally.
+Local files and either L1 layout still win immediately. A deferred False is
+transient and is not added to the completed per-source memo. Completed actual
+negative probes keep their existing memo behavior.
+
+Only advisory GET probes participate. The local-write-denial metadata branch
+still makes its original at-most-two existence calls, even during this window;
+HEAD-only failures never start it. Ordinary readers, warmers and streaming keep
+their full paths. State is process-local, reset on owner/configuration changes,
+and bounded to 16 retained routes. Expiry releases references lazily on a later
+probe without closing another caller's client. Savings concern sequential
+eligible wrapper calls after the first sequence, not SDK HTTP attempts, measured
+field latency or universal outage detection. There is no user setting.
+
 ### Dropped subframes with multiple source files
 
 A dropped multi-file subframe records every declared tracked source whose L1
