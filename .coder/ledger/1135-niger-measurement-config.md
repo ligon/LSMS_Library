@@ -1,6 +1,7 @@
 # Prior-Art Ledger -- GH #1135 Niger measurement configuration
 
-**Status:** grounded; source-only port and static verification pending.
+**Status:** source-only configuration port statically verified; coordinator
+integration/runtime/scientific acceptance remains outside this task.
 **Source:** `79f5979cf8022e64928c5150950dfb00456994da`.
 **Search tier:** ripgrep + own Git + standard-library text/AST checks. No
 GitNexus, package imports, survey reads, parsers, tests or runtime calls.
@@ -99,5 +100,39 @@ human approval step.
 
 ### Phase 3 -- verification
 
-UNFINISHED: configuration insertion, exact source subtraction, allowed-path and
-Git object proofs, final ledger commit and private publication remain pending.
+- **OK (sections 2-5):** config commit
+  `b0effb9aba6787dad0d96a64b36241eaaca519ca` adds exactly one 18-line
+  `2018-19.panel.cluster_id_measurement` block. The only numeric field is the
+  supplied plain-decimal `linked_households: 0`; `clusters_renumbered` is in
+  `not_applicable`. D, net count and mover rule are omitted, without inferring
+  them from the zero denominator.
+- **OK (sections 2-4):** the record carries its own `derived-from-data` /
+  `high` provenance, exact historical date/development/reviewed-source pins,
+  own country locators and explicit no-remeasurement qualification. No fresh
+  current-population claim is made. The current-versus-reviewed gloss
+  difference and the separate seasonal wording tension remain reported.
+- **OK (section 4):** removing only the new block recovers all 7,653 base
+  configuration bytes and SHA256
+  `aeec2b8b9ff54f173bbf4c8a356761942f0b843cd169b8a769059cf2dda470b4`.
+  New config SHA256:
+  `d1a9ebaa751e693dae0ebe68005bb829deb45b4e49eb1ce39d28a31084efcbe9`.
+- **OK (sections 1, 4):** 19,247 nonowned leaf Git entries compare exact to
+  base in path/mode/type/object. Only this ledger and Niger sampling.yml
+  differ. Config mode/type remain `100644 blob`; `git diff --check` passes.
+  Initial commit `0774bdaa8cfc721478ce3560c43e65a1fd6842cd` is ledger only;
+  the next commit is config only. This verification update is ledger only.
+- **OK (section 5):** no new runtime symbol or computation; the literal port
+  reuses the assigned historical record. No reinvention or blocking authority
+  contradiction was found.
+- **UNRUN (sections 2, 4, 6):** all package imports, YAML/library parser calls,
+  pytest/collection, actual Country/Feature/getter/build/census/data/header/
+  capture/API checks, DVC/Make/network/acquisition/provider/cache/rewarm,
+  weights and numerical/scientific acceptance. These are prohibited here,
+  not failed or implicitly passed. Base79f's deliberate schema mismatch is
+  left for the coordinator; whole GH #1135 is not closed.
+
+Durable review evidence is the dispatch evidence directory's `report.md`,
+`RESULT.json`, `verification-plan.json`, `ledger-checkpoint.md` and
+`source-byte-proof.json`; the final report records final HEAD, repeat tree
+proof and private publication after this commit. No evidence is stored in
+nonowned tracked paths.
