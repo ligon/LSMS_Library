@@ -3418,3 +3418,41 @@ recorded modules, quantities, IDs, weights and existing #1462 cycle rule.
 Administered French wording and export/window handling remain unresolved;
 #1529 crop-cycle area and #1560/#1571 sold-kg/window/state holds are unchanged.
 No crop-name, region or Farm-level rule can reassign these sources.
+
+* 2026-11-09 -- GH1555: own held crop form and release labels differ
+
+The two held 2018 household workbooks
+=ner_ehcvm1_qnr_household_excel_vague1.xls= (MD5
+=f81b8a683df527c0e6b7fed3af264c8a=) and =..._vague2.xls= (MD5
+=9348df36d0dc436796baaf6f1bbfaf28=) each have 39 sheets; their extracted
+cell values are identical although their binary hashes differ. The own
+=ddi-documentation-english_microdata-4296.pdf= (MD5
+=b427ee093362e2a1dbb8cf5a47c7e6b8=) has 938 pages.
+
+In both workbooks, =S16c_Agri!M5= and =M17:O17= ask harvest quantity in UML,
+unit and product state. =W5= and =W17:Y17= separately ask the sold quantity,
+unit and state. These are the release's =s16cq12a/b/c= versus =s16cq16a/b/c=;
+=s16cq16c= is SOLD state, not harvest kilograms or a harvest-factor key.
+The question retains the literal campaign 2017/18 wording; no window is renamed.
+
+The workbook's =S16c_Agri!M11= unit list has seven codes, ending at =7 Autre=.
+The released own card, corroborated by DDI pp. 649--650, instead has
+=7 Botte=, =8 Tia= and =9 Autre=. Workbook =M15= names state 5 =Entier=;
+release/DDI p. 650 names it =Non concerné=. No assumption that the form is
+stale, no replacement of released labels and no new condition fold is selected.
+DDI pp. 57--58 list the source's 50 fields; p. 654 separately lists sold state.
+
+=Unites!B9= tells INS to fill the country's unit list, but no entries or factors
+are filled. No crop conversion/calibration/weighing rule was found in the
+inspected 39-sheet cell values or 938-page DDI text. Workbook comments, macros,
+embedded objects and PDF images were not inspected. This does NOT establish
+that no official crop factor exists or that another protocol contains none.
+
+The remaining authority gap is the fielded-CAPI/export bridge and any separate
+kg-per-ONE-harvest-unit protocol keyed to crop, native HARVEST state and any
+required geography. Direct =Kg= is already mass; food NSU, another wave's sack
+size and sold state cannot supply that bridge. No data, mapping, conversion
+default or public API changed; whole GH1555 remains open.
+
+Evidence: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1555-held-protocol-followup-20261109/REPORT.md=;
+original diagnosis and its independent review remain separate.
