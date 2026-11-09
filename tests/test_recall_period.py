@@ -66,8 +66,8 @@ RECORDS = {
 
 def frame(waves, col="Expenditure", values=None):
     idx = pd.MultiIndex.from_tuples(
-        [(w, f"h{k}", "maize", "purchased") for k, w in enumerate(waves)],
-        names=["t", "i", "j", "s"])
+        [(w, "C1", f"h{k}", "maize", "purchased") for k, w in enumerate(waves)],
+        names=["t", "v", "i", "j", "s"])
     values = values if values is not None else [70.0 * (k + 1)
                                                 for k in range(len(waves))]
     return pd.DataFrame({col: values}, index=idx)
@@ -328,11 +328,11 @@ class TestToPeriod:
 # the generated Country method (no data read)
 # ---------------------------------------------------------------------------
 #
-# Nigeria's REAL records are used on purpose: 2010Q3/2011Q1 are 7-day
-# config-comment cells (convert), 2018Q3 varies by acquisition source
-# (`within_wave_variation='by-s'`, refused).  _aggregate_wave_data is
-# monkeypatched to serve a synthetic food_acquired, filtered by `waves=`
-# the way the real one is.
+# Invented records use familiar logical wave labels: two known seven-day
+# windows and one by-source-varying window. No real records or constructor are
+# read. Actual generated Country dispatch/transform functions receive finite
+# payload and metadata leaves; the finalizer's cluster lookup is an invented
+# constant, so these tests do not independently validate finalization.
 
 def _synthetic_food_acquired(waves):
     rows = [(t, "C1", f"{t}-h{k}", "Maize", "kg", "purchased")
@@ -382,8 +382,17 @@ def nigeria(monkeypatch):
     }
     monkeypatch.setattr(R, "recall_records", lambda name: records)
     monkeypatch.setattr(C, "recall_records", lambda name: records)
-    monkeypatch.setattr(SyntheticCountry, "_finalize_result",
-        lambda self, df, *a, **kw: df.copy(deep=True))
+    def finalize(self, df, *args, **kwargs):
+        # A finite invented cluster lookup: retain current required-v behavior
+        # without a sample build or a real Country constructor/finalizer.
+        out = df.copy(deep=True)
+        if "v" not in out.index.names:
+            names = list(out.index.names)
+            out = out.assign(v="C1").set_index("v", append=True)
+            out = out.reorder_levels(["t", "v", *[n for n in names if n != "t"]])
+        return out
+
+    monkeypatch.setattr(SyntheticCountry, "_finalize_result", finalize)
     monkeypatch.setattr(SyntheticCountry, "_materialization_entry",
         lambda self, name: {})
     monkeypatch.setattr(SyntheticCountry, "_relabel_j",
@@ -550,7 +559,7 @@ class TestCurrentPort:
         actual = c.food_quantities(waves=["2018Q3"], units="kgs", period="day")
         assert actual.empty
         assert calls == [(["2018Q3"], "food_acquired")]
-        assert actual.index.names == ["t", "i", "j", "u", "s"]
+        assert actual.index.names == ["t", "v", "i", "j", "u", "s"]
 
     def test_named_build_failure_keeps_identity_under_period(
             self, nigeria, monkeypatch):
