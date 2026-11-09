@@ -9,10 +9,10 @@ canonical-schema YAML).  ``_finalize_result`` now consults
   * ``Join v from sample > skip_extra`` -- framework-special / not-yet-declared
     tables.
 
-These tests pin (a) that the shipped YAML reproduces the *exact* historical
-set (default-preserving), (b) the parsing rules, and (c) the version-skew
-fallback so v-join can never silently switch on for a table that never
-carried v.
+These tests pin (a) the historical shipped exclusions plus explicitly approved
+new canonical no-v tables, (b) the parsing rules, and (c) the unchanged
+historical version-skew fallback so v-join cannot silently switch on for a
+table that never carried v.
 """
 import lsms_library.country as C
 from lsms_library.country import (
@@ -23,11 +23,20 @@ from lsms_library.country import (
 
 
 # --------------------------------------------------------------------------
-# Default-preserving: the shipped data_info.yml must reproduce the historical
-# hardcoded set exactly.  This is the load-bearing regression guard.
+# The shipped schema keeps all historical exclusions and the two approved
+# GH1529 native roster shapes; the old-version fallback remains historical.
 # --------------------------------------------------------------------------
 def test_shipped_yaml_reproduces_historical_set():
-    assert set(_no_v_join_tables()) == set(_NO_V_JOIN_FALLBACK)
+    native = {'cultivation_records': ['t', 'i', 'cultivation_obs'],
+              'farm_cost_operands': ['t', 'i', 'cost_obs']}
+    assert len(_NO_V_JOIN_FALLBACK) == 8
+    assert set(_no_v_join_tables()) == set(_NO_V_JOIN_FALLBACK) | set(native)
+    data = C.yaml.safe_load(C.files('lsms_library').joinpath('data_info.yml').read_text())
+    indexes = C._parse_index_info(data)
+    for table, levels in native.items():
+        assert indexes[table] == levels
+        assert 'v' not in indexes[table]
+        assert table not in data['Join v from sample']['skip_extra']
 
 
 def test_historical_members_present():

@@ -93,3 +93,10 @@ clean:
 	@echo "sources, not build products (GH #914).  Regenerate: make panel-ids"
 
 .PHONY: all clean
+
+# Native2011 cultivation/cost operands only; no country compiler (GH1529).
+../%/_/cultivation_records.parquet: ../%/_/cultivation_records.py niger.py
+	(cd $(@D) && python cultivation_records.py)
+
+../%/_/farm_cost_operands.parquet: ../%/_/farm_cost_operands.py niger.py
+	(cd $(@D) && python farm_cost_operands.py)
