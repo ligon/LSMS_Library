@@ -177,3 +177,21 @@ cleanup. Warning survival is taken from the actual assembled country names,
 so a failed continuation cannot be described as kept. Historical 30 requirements
 are retained with an additive ROOT-disposition erratum; collection/tests/census
 remain zero pending ROOT review of the new frozen selection and runner.
+
+## Retired copied-context correction and actual-current integration charter
+
+ROOT's source-only counterexample on exact93d40 compiles committed AST with
+stdlib: copy_context inside the handoff retains the shared slot after scope
+exit clears it. Claiming that retired empty slot raises KeyError('owner').
+Original receipt is ROOT-RETIRED-COPY-CONTEXT.json in the v2 external packet;
+no library/data import or pytest ran. Correct only the claim's inactive-slot
+guard and add a copied-retired-context lifecycle oracle; all other semantics,
+one-shot owner matching and default None remain unchanged.
+
+Before runtime freeze, ordinarily merge actual development
+20c85655a67cd754a6c5ea4b118b5ded4b53b87b (verified tree
+e4faf713dbfbcb303c573d4b201113105e22ab12) and conserve its E Wave/global
+helper edits and Mali/Burkina documentary notes. Preserve current country
+prefixes plus the exact851 appendices. No record/citation/promoter change,
+runtime, census, raw/API or parent replay. Any genuine source overlap must be
+resolved explicitly and proved rather than treating incoming code as optional.
