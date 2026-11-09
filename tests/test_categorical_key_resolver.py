@@ -324,6 +324,7 @@ class _MarketCountry:
     name = "Fixtureland"
     waves = ["2000"]
     _market_lookup = Country._market_lookup
+    _apply_categorical_mappings = Country._apply_categorical_mappings
 
     def __init__(self, cat_maps, cf):
         self.categorical_mapping = cat_maps
@@ -480,6 +481,15 @@ def test_every_caller_routes_through_the_resolver(fn):
     ignore ``#+key:``.  ``_finalize_result``'s ``harmonize_<method>`` hook has
     no seam a unit test can drive, so this structural check is its guard."""
     src = inspect.getsource(fn)
+    if fn is Country._market_lookup:
+        # GH1440 delegates only its requested raw column to the same mapper.
+        # Retain the resolver-reach guard through that concrete callable edge.
+        tree = ast.parse(textwrap.dedent(src))
+        calls = [n for n in ast.walk(tree) if isinstance(n, ast.Call)
+                 and ast.unparse(n.func) == 'self._apply_categorical_mappings']
+        assert len(calls) == 1
+        assert ast.unparse(calls[0].args[0]) == 'cf[[column]]'
+        src += inspect.getsource(Country._apply_categorical_mappings)
     assert "_categorical_key_column(" in src, fn.__qualname__
     assert not _INLINE_PICK.search(src), (
         f"{fn.__qualname__} picks a key column inline; route it through "
