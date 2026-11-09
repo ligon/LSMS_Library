@@ -1,0 +1,14 @@
+[
+  {
+    "original": ".sucoder/handoff.org",
+    "archive": ".sucoder/archive/20261109T0730-handoff.org",
+    "bytes": 503032,
+    "sha256": "849c1a5516c6e95e805aa488ca60a2bf68938d44645c5cb762ac940ab0f7c9c1"
+  },
+  {
+    "original": ".sucoder/isa-country-workers.org",
+    "archive": ".sucoder/archive/20261109T0730-isa-country-workers.org",
+    "bytes": 199545,
+    "sha256": "80cc558f413ae2303ce9b018b14a28ccf37ced0614598b5a5cd92e97a1e4f37b"
+  }
+]
