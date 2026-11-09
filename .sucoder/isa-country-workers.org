@@ -1,4 +1,26 @@
 #+title: LSMS-ISA country workers and coordinator queue
+* PR1642 merged and GH1501 closed — 2026-11-09T02:39UTC
+Actual development29de1acf35e6eff0cf7c2d47977745fcd0bab6ab, parents[6863,8eaebb96],
+whole reviewed tree141e7950d9c5cea6e340eac7c65c51c49be41825 EXACT. CI42550500926
+completedSUCCESS: unit12770PASS/5649SKIP/4XFAIL in571.51s, WindowsSUCCESS,6optionalSKIP.
+ActualCIcheckout1c160246parents[6863,8ea], whole19162leaf reviewed treeexact; ROOT
+checkedactual unfilteredpytest/loadfile/600stimeout/threadpins/falsecredential logs.
+Freshreviews0/threads0/conflictfree/currentheads verified; ready+authorizedmerge.
+GH1501 explicitlyCLOSED withcurrentfootprint/scopeandoriginalhistoricalreportretained.
+Sweep41developmentmerges/29closures; repository158open is DERIVED fromlast159minus1501,
+notfreshcompleteenumeration. Original147scope25closed/122open on same basis.
+Evidence1501-final-ledger-release-20261108/ROOT-CI-MERGE-ADMISSION.json,ROOT-MERGE.json.
+No real-source/corpus campaign/sharedrewarm/masterrelease/productionweight change.
+
+Firstremote1468package reviewed/rootauthorized atcountry-workers-refill-20261108/
+private/Nigeria-1468;manifestfba3b6b84edc371ca05206228daa56679185fa69af1f59d2afb85bc42340808c.
+RootapprovedONEsubmitafter normaldryrun0 with4CPU8G60mfreeaccount/pinned6863/641.
+ROOT-GRANT.json physicallywritten;1590ownsactualdryrun/submit/reconcile, notrootduplicate.
+Pinned6863retained thoughdevelopmentadvanced29de; integrateordinarylater, neverrestart.
+Atlast02:40schedulercheckZEROremotejobs; preparationnotcountedasbusy. Otherready scopes:
+Mali1495docs-onlydefinition/testdocstring, Burkina1463frameworkconnectionfailurediagnosis.
+MwiownsMalawi1190residualdiagnosticbrief;1452source-only1288executableproposalreview.
+
 * Utilization correction and PR1642 — goal ACTIVE (2026-11-08)
 The user's criticism of slow progress is correct. Actual supported scheduler check
 at2026-11-09T02:18UTC showed ZERO remote country workers: only coordinator40825266
