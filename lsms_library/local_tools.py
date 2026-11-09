@@ -1808,7 +1808,7 @@ def _overlay_stata_missing_map(frame, stream, option, release):
     stream.seek(0)
     with pd.io.stata.StataReader(stream) as reader:
         native = reader.read(columns=list(option), convert_missing=True,
-                             convert_categoricals=False)
+                             convert_categoricals=False, convert_dates=False)
     if (not isinstance(frame, pd.DataFrame) or len(native) != len(frame)
             or not native.index.identical(frame.index)
             or any(column not in frame.columns or column not in native.columns for column in option)):
@@ -1925,6 +1925,8 @@ def get_dataframe(fn: str | Path, convert_categoricals: bool = True, encoding: s
         # chain below, unchanged.
         dct = _load_dct_for(fn)
         if dct is not None:
+            if missing_map:
+                raise ValueError('stata_missing_map is only supported for Stata data')
             if isinstance(f, str):
                 raw = Path(f).read_bytes()
             else:

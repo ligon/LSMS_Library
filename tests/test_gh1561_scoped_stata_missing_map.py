@@ -227,4 +227,45 @@ def test_opt_in_adds_exactly_one_selected_native_scan(tmp_path, monkeypatch):
     lt.get_dataframe(path, stata_missing_map=OPTION)
     assert len(calls) == 2
     assert calls[0] == {'convert_dates': True, 'convert_categoricals': False}
-    assert calls[1] == {'columns': ['answer'], 'convert_missing': True, 'convert_categoricals': False}
+    assert calls[1] == {'columns': ['answer'], 'convert_missing': True, 'convert_categoricals': False, 'convert_dates': False}
+
+
+@pytest.mark.parametrize('option', [None, {}])
+def test_dat_dictionary_default_unchanged(tmp_path, option):
+    from test_dat_dct_reader import _pair
+    path = _pair(tmp_path, 'CLUST,POPUL,NAME\n101,2000,InventedA\n102,.,InventedB\n')
+    original = lt.get_dataframe(path)
+    out = lt.get_dataframe(path, stata_missing_map=option)
+    pd.testing.assert_frame_equal(out, original, check_exact=True)
+    assert out.columns.tolist() == ['CLUST', 'POPUL', 'NAME']
+    assert out.CLUST.tolist() == [101, 102]
+    assert out.POPUL.iloc[0] == 2000 and pd.isna(out.POPUL.iloc[1])
+    assert out.NAME.tolist() == ['InventedA', 'InventedB']
+
+
+def test_dat_dictionary_opted_mapping_refused_before_payload_reader(tmp_path, monkeypatch):
+    from test_dat_dct_reader import _pair
+    path = _pair(tmp_path, 'CLUST,POPUL,NAME\n101,2000,Invented\n')
+    monkeypatch.setattr(lt, '_read_dat_with_dct', lambda *a, **k: pytest.fail('DAT payload decoder reached'))
+    with pytest.raises(ValueError, match='only supported for Stata'):
+        lt.get_dataframe(path, stata_missing_map={'POPUL': {'.d': 'Not applicable'}})
+
+
+def test_date_formatted_selected_column_keeps_native_tag_until_overlay(tmp_path):
+    path = synthetic(tmp_path/'date-tag.dta')
+    data = path.read_bytes()
+    start, end = data.index(b'<formats>') + len(b'<formats>'), data.index(b'</formats>')
+    original_format = data[start:end]
+    assert original_format.startswith(b'%12.0g') and not original_format[len(b'%12.0g'):].strip(b'\0')
+    replacement = b'%td' + b'\0' * (len(original_format)-3)
+    path.write_bytes(data[:start] + replacement + data[end:])
+    ordinary = lt.get_dataframe(path)
+    assert pd.api.types.is_datetime64_any_dtype(ordinary.answer.dtype)
+    expected = ordinary.copy()
+    expected['answer'] = expected.answer.astype(object)
+    expected.loc[6, 'answer'] = 'Non-concerné'
+    out = lt.get_dataframe(path, stata_missing_map=OPTION)
+    pd.testing.assert_frame_equal(out, expected, check_exact=True)
+    assert isinstance(out.answer.iloc[0], pd.Timestamp)
+    assert out.answer.iloc[[5, 7]].isna().all()
+    assert out.answer.iloc[6] == 'Non-concerné'
