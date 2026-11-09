@@ -24,4 +24,10 @@ Reuse scanner, sidecar resolution, direct-builder preparation, native helpers an
 No scientific decision needed. Root authorized literal repair and conditional held-only four-source actual verification. Independent review and measured metadata impact required before PR; baseline Niger actual route remains unrun.
 
 ## Phase 3
-Pending focused regression, fixed-source actual default/Make comparison, metadata footprint, independent review.
+OK (§2–§5): exact source inverse proves only identical full getter literal; no processing/global resolver/parser change. Three focused controls PASS, including real sidecar and actual preparation collector.
+
+Actual fixed-source default/Make cold+freshwarm processes all0,4heldDTAs20,877,001B,12fullStata parses,19active observers0denials, warmcache inventory exact. Both within-backend original strict cold/warm comparisons PASS. Original outerdriver1 and ALL4 crossbackend original strict failures are preserved: i.levels retains2,022unused raw-only mapped IDs on Make (10,049vs8,027 labels), while exactexpandedkeys/order/types/payload/dtypes/masks/typedattrs match. No sort/cast/tolerance or removal of unusedlevels. This is a broader representation boundary, not source-literal acceptance by normalization. Baseline9514 Niger source/API remains UNRUN; no replay.
+
+Metadata0/errors0/denials0 on full38/450/1895/35/186:19Niger table+19Niger2014wave hashes move through unchanged conservative all-wave-build-script hashing;0BTF/FIF and allother metadata/keysets/public/overrides/18None unchanged. No exclusions/sharedrewarm.
+
+Reports: B/reports/1288-niger-livestock-source-literal-20261109. Original failedpostprocessing and firstcloseddiagnostic shutdowncallback issue retained, finalclosedclassification0/no source/API/raw/parquet access. Independent review and exact-head configuredCI PENDING; source repair not whole1288 closure.
