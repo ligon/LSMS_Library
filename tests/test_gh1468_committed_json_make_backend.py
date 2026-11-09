@@ -14,7 +14,7 @@ import subprocess
 import pandas as pd
 import pytest
 
-from lsms_library import country as C, local_tools as L
+from lsms_library import country as C, local_tools as L, data_access as D
 from lsms_library.paths import countries_root, data_root
 
 
@@ -64,7 +64,7 @@ def toy(tmp_path, monkeypatch):
         raise AssertionError('unexpected source/provider or offline publisher')
 
     monkeypatch.setattr(L, '_ensure_dvc_pulled', forbidden)
-    monkeypatch.setattr(L, 'get_data_file', forbidden)
+    monkeypatch.setattr(D, 'get_data_file', forbidden)
 
     class Toy:
         root = country
