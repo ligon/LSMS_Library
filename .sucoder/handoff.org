@@ -1,4 +1,99 @@
 #+title: Current LSMS-ISA goal handoff
+* AUTHORITATIVE CURRENT CHECKPOINT — 2026-11-09T15:49:39.976455+00:00
+Goal ACTIVE, incomplete/unbounded. Actual development97463a699eea8e32369cef2655b1e57b9a58000d;
+61 verified merges /38 issue closures. This supersedes ALL older live/status paragraphs below.
+User correctly challenged utilization. ACTUAL THREE LOCALworkers + ROOT, ZEROremote at
+15:48Z (1590 preparing one finite B independent-review dispatch; do not count until launched).
+1452 is implementing1051B multifile drop metadata; Mwi implements1051A narrow outagecatch;
+1590 restores/manages Ethiopia1570manual and remote review queue; ROOT review/CI/merges.
+All3 live via collaboration.list_agents. No claim8workers or8current-country corpus sweeps.
+
+Latest MERGED and actualparents/whole-tree verified:
+1659/218 generatedskills:952690833b4814f595c6e521d0625adce5e612c4/tree d772dea9;
+ CI42624967861 unit13186P/5649S/4X,Windows362P1S;218CLOSED. Embeddingcap/FTS limits retained.
+1658 Niger native3B/3D:87df6b6bf058e36e1adcf3fa9887e6cdc44b6e36/tree a4b7f312;
+ CI42629930983 unit13212P/5661S/4X,Windows362P1S. Finalnative API cultivation_records
+ (NOTreservedplot_cultivation), farm_cost_operands;768x26/6192x12. Renamedafter Rootfound
+862contractmiss; oldfailedCI/testfixture/oldnamereviews retained.1529narrowed3Earea/yieldOPEN.
+1660/709 thresholddocs:333d047bb65f08a7ffef92f564392c33c8220aeb/tree318b7a50;
+ CI42633588751 unit13212P/5661S/4X.709CLOSED. PeerP3missing--finalargv remainsqualified;
+ ROOT boundedcontent+originalprefix+source admission explicitly notoverallpeerPASS.
+1661/1561 CIV Stata.d:53b0c26c9e33607f9b6dba0e3d0d51ff1685b8fa/tree9281d4fe;
+ CI42641767803 unit13242P/5661S/4X,Windows362P1S.1561CLOSED;1562ranksheld/1556separate.
+ Scoped stata_missing_map on5effectcolumns, ordinarydecoder+selectedtagscan/datefalse;
+ genuineNA/unrelatedtags unchanged. ActualWave285824/Country+Feature13778/fourreadsTOTAL.
+ Originaloracle/writerfixture/import/SDK74 histories retained; peer14P2fixtureF then
+2affectedP (16distinct, not18/fresh16green). Broad metadata452/1885/37BTF/124FIF; no sharedrewarm.
+1662/1288 Niger+Malawi livestock INDEX:97463a699eea8e32369cef2655b1e57b9a58000d;
+ treea0bdbf887feeac79dd4acc700382528e540952cf;headcf31667820a395724a22c527182cc0f214cd693b.
+ CI42644915982 actualcheckouta6c586e739de0829b149bb39d8e196fd5f72afe1 parents7eab+cf316;
+ testedbase WHOLEtree==actualmain53b0, prospective/actualtree exact.13260P/5661S/4X/846.23s;
+ Windows362P1S/15.41s;6optionaldatajobsSKIP. Fullreview/threads0. ClosedactualreviewqualifiedPASS:
+ sixoriginalstrict+sixdecomp each;Niger30230full/Malawi39126;12nativeparseseach;warm0productive.
+ Malawioriginalinvalid2004shorthand failure remains, acceptedcold reusedno rawreplay.
+ Two compilersONLY nowexistingid_walk completeframebeforeunchangedwriter+id_converted gate;
+ allmaps/globalreader/normalizer/sample/weights unchanged. Metadata43country/216wave/2FIF.
+ Root tracker1288 updated withactualN/Mrepair+BFAcheckpoint; whole1288OPEN.
+All CI/postmerge receipts: B/reports/ci-admission-<PR>-20261109 (1658rename folderdifferent).
+
+OPEN PUBLICATION STACK — retainbranches/retargetchildren BEFORE parentmerge:
+1663 READY HEADfallback branchpublish/1051C-on-index-20261109 head224e30ea94b2c78dca77fd2386c8c49e4e778a17
+ tree61289abc26141d988ed8a31052a4e73bfb490d83, nowbase development;CIpending/inflight.
+ LocalEACCES/EROFS provenmkdir/temp/rename ONLYinternalfastprobe optin metadataexists <=2sameMD5keys.
+ No streaming/parse/WB/index inprobe;ordinarywarmerNone/retry/layout/cleanup unchanged.
+ Author41c1/abaf:73P=44new29existing;1452independentreviewPASS/noP1P2P3. Rootreadproductiondiff.
+ ONEcombinedcensus132.48s:452country/1885wave/37BTF/124FIF;18None/keysets/nonhash exact.
+ R1051C-publication-on-index-20261109, finalmapSHA7044bf8b7504def1419cbb5c8a809d1aa5e552ef787e5a5bdef4b9010ced327f.
+ Thisresolves1051C ONLY;other1051A/B/D/Eremainopen. No schema/exclusion/sharedcachework.
+1664 READY Tanzania587docs branchpublish/587-tanzania-on-combined-20261109
+ head128fe3f1cce11de41d0e5e22699144c5b5ad525f/treeb53d529833d4515e65e132beb95f1fb46a4ed59e
+ base1663branch;CIpending. Author7a48225d;Rootread48lineCOUNTSappend/proof/disposition.
+ ThreeheldUPDdocs prove retrospectiveR1absence NOToriginalfielding, nocorrectlyempty/regrade.
+ Wholeoriginal3108lineprefix exact/allnonowned224exact.587issuecheckpoint added;
+ broader39historicalcoverageblocs remainOPEN, Nigeriafalsepositivehypothesisrefutedbypreexistingcomment.
+
+CURRENT APPROVED ENGINEERING LANES:
+1051A Mwi diagnosis ef05a98956d6e3bbd42d84f9e432af1f3ecd616f on224:33P=26new7pure675
+ actualtinyCSV/DVCget_dataframe→Wave/drop/footer. Endpointalreadysoft1463;5residualoutageclassesescape.
+ ROOTapprovedenumeratebuilt-inConnectionError/TimeoutError+botocoreConnectTimeout/ReadTimeout/
+ ConnectionClosed insecondarytuple;primaryrethrow/programmerTypeError/genericOSError/Permissionloud.
+ Intentional narrow1463oldConnectionClosed-loud fixturecontract update; catchalreadycoversformatter
+ explicit. Freshisolatedbranch/ledgerfirst/freeze/focusedonecohort/onefinalcensusvs224 closedmap.
+1051B1452 diagnosis3542 on224:24P=15new9pure675. First-onlydroppathcausesprematureheal;
+ mixed no-sidecar typo+tracked misclassifiedunavailable bypassesrequiredconfigguard. ROOTapproved
+ additive ordered dedup missingfiles metadata, ALLwithinone droppedsubdf/ANYacrossindependentdrops;
+ legacysinglefile intact, malformednonemptylist conservative, memos/oncekey/warnings/provenance.
+ Include mixeddefiniteno-sourceconfigcorrection. NOoldambiguousmultifileautomaticmigration,
+ schema/configlookup/globalinvalidate. Frozenfocused+onefinalcensusvs224, no baseline replay/raw/API.
+ A/Bsharedcountry.py edits isolated;ROOTcomposes.1590 preparesremoteindependentreviews (no replay).
+
+ETHIOPIA1570MANUAL restored ONEofficialpublicDOCGET (userauthorizedlocal/DVCdocavailability):
+ B/private/1570-W1-manual-restoration-20261109/ERSS_2011_12_Enumerator_Manual_English.pdf
+1755699bytes/SHAe1fb422a6a2fb02f5743766410bd68230322b8d375d294299b1921ae775ea344
+ MD5b6cb4f4b898ca8c5169913fe9e36543d;officialcatalog2053/download40404;newrestore notretroheldclaim.
+ ManualPDF79–80 transfersPPparcel/field/cropIDs, same§4excepttree/root, DONOTRENUMBER;
+ PDF81 ALLtemporarycropsselfreportregardlesscropcutselection; doNOTextrapolate2mx2m.
+ Windowtension manualexpectedMeherincomplete vsPHformlastcompletedseason retained;no rowattribution.
+1590prepared4docpatch+ledger on333d, taskprivateDVCadd0/copycache. Rootreadactualpatch+commands,
+ authorizedTARGETEDPUSH ONLYnewmanualsidecar existingremote, verifyactualobject;no broad/sharedpush.
+ SOURCE.org pendingpushstatus mustreflectactualoutcome; independentdocreview thenROOTintegrates1664.
+ Prior2PDFjob41043513/fa1c terminal0/effe81;17Efilesauthenticated,PNGsoutsideE limitsretained.
+ ManagerPPversionerratumexplicit:managedPP exactlypriorofficialfe6de..., notdifferent;
+ no raw/API/old6983rowcaptureexperiment replay. Manual isnewadditivescope afteroldjobclosed.
+
+ALL8country bounded actualcallercohorts completed atRECORDEDpins, notfreshcurrentwholecorpus:
+ Tanzania/Nigeria9514 livestock;Uganda38d anthropometry;Mali/Ethiopia/BFA860 livestock/plot_features;
+ Niger/Malawi7a9 correctedlivestock. StrictwholeframePASS perqualifiedclosedreceipts.
+ OriginalMali480timeout/Make-onlycompletion;MalawiSDK74 andwrongshorthand;fixedvlookup/sample/weights
+ limits remain. No countryscientificvalidity claim. See corresponding closedreviewreportdirs.
+
+Fence: NOmasterrelease/sharedharmonizedcacheclear/rewarm/rawsurveyacquisition/producercontact.
+ PublicmanualDOCrestore exception above only.1562/1190/1575implementation/1066warning/productionweights
+1604holds persist;goalcontinuationNOTdecisionapproval. Do notcountjobs/verificationprocessesasworkers.
+ Rootcheckout OLDcodedocsbranch;usepinnedworktrees/MAIN/realimportidentities. Keeporigfailures/sourcepins.
+
+* Historical checkpoints below (superseded live statuses, evidence retained)
+
 * New active checkpoint — 2026-11-09, after 13:30Z
 User correctly challenged utilization. Three local agents are RUNNING after ROOT
 explicitly reactivated completed1452, plus TWO verified RUNNING remote workers:

@@ -1,4 +1,10 @@
 #+title: Current LSMS-ISA worker queue
+* Current 2026-11-09T15:49:39.976455+00:00
+Actual3localworkers+ROOT/0remoteat15:48Z, not8.61merges/38closures;development97463a699.
+1452implements1051B;Mwimplements1051A;1590manual1570+remoteindependentreviewqueue;RootCI/merges.
+1661+1662merged;1663+1664publishedREADY CI. Fullauthoritativehandoff [[file:handoff.org]].
+Allolderlivestatusessupersededbelow.
+
 Checkpoint2026-11-09T13:12:34+00:00;development86077a65;56merges/35closures;goalACTIVE.
 Fullcurrentstate [[file:handoff.org]]. Fullhistoricalarchive preserved.
 
