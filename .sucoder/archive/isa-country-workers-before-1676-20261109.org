@@ -1,0 +1,89 @@
+#+title: Current LSMS-ISA worker queue
+* Latest21:21UTC
+73verifiedmerges/41closures,development50a927d6;1066CLOSEDafter1674merge+exactCIproof.
+1675docsOPENhead2ba8042/CI42701142623unitRUNNING/WindowsPASS.
+1135SIXremoteactualaccepted+supportedagent_executionfresh:41055343/348/345/344/346/347;1590sharedport+resultsmanager.
+Mwi38135initial+1correcteddistinctcontrols/port50+metadataauthorized;1452independentsource+closedreceiptadmission.
+No381PR/wholeclosure, knownnodatanoticeunproven. Fullsource/evidence [[file:handoff.org]].
+
+* Latest21:09UTC
+72verifiedmerges/40closures;1051CLOSED.1674WindowsPASS/unitRUNNING.
+Mwi381purecontrolsafterRootsourceintentadmission;1452independent381sourcepeer;1590approved1135SOURCEPORT(full7countrygroundingfirst).
+Countrydocscombinede45fmechanical+independentreviewPASS, unpushedawaiting1674merge.
+Fullsource/evidence/remaininggates [[file:handoff.org]].
+
+* Current21:05UTC2026-11-09
+Development79f/72verifiedmerges39closures;1674c988OPEN+CI42698354320running.
+Root:1673postmergeerrorcorrection/1051closure/1066publication(done)/countrydocsstaging.
+1452:actual1673postmergePASS, bounded1051closureauditfinishing.
+Mwi:countrydocsreviewDONE, next381localSOURCE-ONLYfrozenpatchbeforetests.
+1590:complete148issueinventorySEALED,1135existingimplementationcurrentportPLAN.
+No activeproductivecountryremotes;watcher48093manageronly.381remoteCANCELLEDbeforedispatch.
+Fullsource/evidence/currentnextsteps in [[file:handoff.org]]. No8busyworkersclaim.
+
+* Authoritative 2026-11-09T19:16:28.257116+00:00
+Maina578e1a1f95a8d2ccc11d540fc11e6112b54d846/69merges38closures;1670MERGED+actualtreeverified.
+Draft1671head5f1f1692/currenta578+851a9fixedsource;CI42680635357running/windowspass.
+851actualV3owned88593 live/counter11/15(noMali replay);21PASS+originalunused-domain
+strictFAIL retained/newhealthybaseline+payloadproof pending;BFA4remaining.
+1452localD05f727oneconditionfix/12focused+censuspending; samepeer41050528 originalnewR2FAIL
+andfixrechecklive. Mwi851correcteda9/26P/67recordparity/zerofinalfootprint; fixpeer41050540live.
+1590manager:2countryjobs41050181/182n0028NOT_RESPONDING communicationsfailure, intentional
+scancel0 butCOMPLETINGnotterminal; no replacementsuntilterminal, thenoneeachhealthyNode.
+Uganda1525doccandidate d64dc323 readyROOTreview/PR(fullBIDnewCEB01keyauthority/no semanticbridge),
+no code/recode;1452nowDnotidle. No8busyclaim. Fullbindings/remaininggates [[file:handoff.org]].
+
+* Live checkpoint 2026-11-09T18:27:48.597503+00:00
+Main20/68merges38closures; PR1670DRAFT923789/CI42673807147queued, readyonlyafterfinalgates.
+1452cohort7267 defaultcold/warm+MakecoldPASS;Makewarmlive,12additionalnativeparsesEXHAUSTED.
+Mwi851181purePASS,current7b923clean; nowindependentNigeriaexternalreviewthen851actualplan.
+1590dispatchmanager: Dauthor41049593/dfe2cd4fb13947c2a096485f8a24a811 verifiedagent_execution
+n0030, R1repair. 851remoteindependentreviewnext, refillsfresh-checkonly/no duplicates.
+Mali1495closed1644/Niger1530boundedcounts+formsdone1648; outdatedticketsarenotreadywork.
+Fullbindings/actualcounts/remaininggates in [[file:handoff.org]]. No8busyclaim.
+
+* Current authoritative checkpoint 2026-11-09T18:17:03.245378+00:00
+Development20c85655a67cd754a6c5ea4b118b5ded4b53b87b;68merges/38closures.
+1669MERGED+CI/postmerge verified. No pending PR through1669.
+Actual local check: two running + one completed; completed1452 explicitly reactivated.
+1452 Nigeria923789 current integrated public acceptance GRANTED/running preparation;
+Mwi8517b923 v3 current integrated source-free cohort GRANTED after freeze;
+1590 remote D narrow R1 repair dispatch + source-only country queue refill.
+D peer one new deterministic concurrency control FAILED; repair/re-review required,
+original114PASS/census/failing control retained. Do not claim D accepted.
+Niger1530/Uganda1525/Mali1495 source-only refill authorized if fresh reconciliation
+confirms unaddressed/unowned; pending submissions are NOT busy workers.
+Full exact source/evidence/authorization and inherited fences in [[file:handoff.org]].
+
+* Currentexecution2026-11-09T17:49:49.854173+00:00
+1669READY/CI42666328856RUNNING; maina9/67merges38closures. Rootfirstpoll+mergegreen.
+Mwi851v2freeze/1452Nigeria587metadata28894+publicclosureplan/1590D4390cohort+monitor;ONEremote41048173.
+Seehandofflatest2addendafortruecurrentstate; allolderlivesuperseded.
+
+* Latest 2026-11-09T17:47:33.180234+00:00
+Developmenta9e15b3abf4f21a2517e0f0b55fee049d910120c;67verifiedmerges/38closures;1663–1668allMERGED.
+Onlynewopen1669READY headed475/treee4faf/CI42666328856RUNNING;NEXTTURNPOLL+MERGEGREEN FIRST.
+Mwi851v2privateFeaturehandoff/empty-parityrevision (no tests/censusyet);1452NigeriaW3PHcopingcad481
+21purePASS+ONErealPHparse4582HH/41238rowsPASS, metadata+fullpublicplanpending;1590Dimplementationqueue.
+ONEproductiveDremote41048173/5d658fda84c0436e93f06c47ce6b9da5 n0225;alloldreviewjobsdone.
+Ecf8author+peer82adbeccomplete/admitted, no longerworkers. Fullbindings/gates [[file:handoff.org]].
+
+Checkpoint2026-11-09T16:47:51.066895+00:00;development6848b6b7380ebd511082c6f95ff5dd65d6397fa7;66merges/38closures;goalACTIVE.
+Fullauthoritativehandoff [[file:handoff.org]], olderqueuehistoryinGit/archive.
+
+* Actual work (not8workers)
+-ROOT:source/peer/CI/merge/issue reconciliation.1663–1667 allMERGED+actualtreesverified.
+-1452:1437datedMali/BFAdocappendices+ledger on6848 (reactivated);851indepcontractreviewcomplete.
+-Mwi:851approvedAPIport Wfix-851-period-api-port-cd6-20261109;scope/schemafreeze+promoter2of20changed;
+ concretecandidate/puretestfreezebeforeRootreview. No actualraw/API/census/pytestyet.
+-1590:queue/custody/monitoractualremotehandles; do notcountcompletedreviewjobs.
+-Dremote41044910/4287bd055c8f41ef8afffadd309ed3c6:positiveendpointFASTPROBEcrosssourcecostdesignonly.
+-Eremote41044943/2932b293ac2f47e0b44e452f03e843b6:explicitinputlineageimplementationoncd6.
+Actual2productive remotes confirmed16:45, bothn0036;3localassignments+ROOT, not8.
+
+* Completed / gates
+Apeer2d4dsourcequalified/P2fixturematchedCI→testonly062a/28plainPASS→full13332PASS→1665merged.
+Bpeerqualified/32plainPASS; RootfalseBenvP2withdrawn(actualguardexists), NO Btestedit.
+1666full13364PASS+Windows;1667qualifiedmanualpeer/RootMali/docsource+full13364PASS+Windows, merged.
+Oldmanual/A/B/D/E jobs allterminalnative0/supervisor0; notworkers. NewDfollowupnotoldDnative-resume.
+OriginalCI28Ateardownerrorsandallotherpriorfailuresretained. No newscience/weights/sharedrewarm/master.
