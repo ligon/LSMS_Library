@@ -4621,3 +4621,32 @@ Evidence and source limits are recorded in
 aggregate report at
 =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1570-formatter-only-proposal-v1-20261108/CAPTURES-REPORT.md=
 (manifest SHA256 =1f8d920b9a8eb77779c6b23452bcc1f0dd92dfc7c6a067167ae20f8f2b661cae=).
+
+* 2026-11-09 -- W1 section 4/9 manual transfer rule (GH #1570)
+
+The exact official W1 enumerator manual was newly restored from catalog 2053,
+download 40404, and is now locally DVC-managed as
+=2011-12/Documentation/ERSS_Manual_HH_AG_COM_APRIL_30_ENGLISH.pdf=.
+Its SHA256 =e1fb422a6a2fb02f5743766410bd68230322b8d375d294299b1921ae775ea344=
+matches the earlier #1183 instrument record. The former missing-in-admission
+history is retained. A targeted DVC push and one fresh read-only managed
+retrieval from an empty private cache verify this document's remote availability;
+no broader documentation or survey-data holding is asserted.
+
+Manual PDF pp79--80 (printed pp78--79) explicitly transfers the parcel, field,
+crop ID/name/code from post-planting to section 9, lists the same crops as
+section 4 except tree/root crops, and forbids renumbering those IDs. PDF p81
+(printed p80) requires the holder's self-reported yield for every temporary
+crop whether selected for crop cutting or not; the small crop-cut weights are
+not to be extrapolated. Crop-cut selection is therefore not a documented
+restriction on that self-report roster. These are instrument instructions,
+not proof that each released source row follows them or that every section 4
+row belongs in section 9.
+
+Preserve the window tension: the PH form p6 asks about the last completed
+agricultural season and gives a clipped no-harvest-zero instruction; manual
+p81 asks for expected Meher harvest if harvesting is incomplete. Neither is
+silently chosen as a new harvest/default rule. The export-column bridge,
+source compliance and reason for the historical unmatched rows remain open.
+No old row/count/capture experiment was replayed, no harvest is allocated to
+plots, and section 12 Q3, grams/Birr and other #1570 residuals are unchanged.

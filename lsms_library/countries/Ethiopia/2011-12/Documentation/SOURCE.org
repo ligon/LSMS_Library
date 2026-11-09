@@ -12,3 +12,26 @@ https://microdata.worldbank.org/index.php/catalog/2053
 #+PROVENANCE_SOURCE: worldbank
 #+PROVENANCE_METHOD: source-url
 #+PROVENANCE_RECORDED: 2026-07-12
+
+* 2026-11-09 -- Exact W1 enumerator manual restored locally (GH #1570)
+
+=ERSS_Manual_HH_AG_COM_APRIL_30_ENGLISH.pdf= is the public World Bank
+catalog 2053 document at
+https://microdata.worldbank.org/catalog/2053/download/40404 . Its catalog title
+is "2011/12 ERSS, Enumerator Manual for Household, Agriculture, and Community
+Questionnaires" (catalog date 2011-09-01). The PDF title says September 2011;
+its creation/modification metadata says 2013-04-30. These are distinct dates,
+not a new survey release.
+
+This is a NEW restoration after the prior held-document pointer could not be
+located. The 1,755,699-byte download matches the exact SHA256 recorded by the
+2026-10-30 official-instrument review:
+=e1fb422a6a2fb02f5743766410bd68230322b8d375d294299b1921ae775ea344=.
+DVC raw-byte MD5 is =b6cb4f4b898ca8c5169913fe9e36543d=.
+The individual-document sidecar and task-private local DVC object were
+prepared. A targeted push of only this manual to =ligonresearch_s3= succeeded.
+A fresh read-only =get_data_file= call, with an empty private L1 and no in-tree
+PDF, then retrieved exactly the same bytes, MD5 and SHA256. Its only private
+data files were the manual blob and PDF copy. No broader push or survey-data
+acquisition ran. This one-document holding does not restamp the dataset/release
+facts above or establish that all catalog documentation is locally available.
