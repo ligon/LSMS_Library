@@ -247,3 +247,18 @@ gaps, list finite held-source stat-only inventories and fixed-v sample seam
 limits. No source payload/hash/copy/NSU call was made by that preparation.
 This child closes ledger bookkeeping only; frozen7b measurement/review tree,
 product/tests/records/generator source and all original receipts stay exact.
+
+## P2-851-01 correction charter — ledger first
+
+Independent peer on7b found RecallRecord.from_config silently erased falsey
+invalid nonmapping n_asks_by_column via `data.get(...) or None` before the
+existing validator. Its actual False counterexample failed as expected by the
+peer oracle; original report/control remains immutable, no actual packaged
+numerical regression was asserted. ROOT authorizes only direct transport of
+this field to existing _by_column, retaining valid None/emptydict/nonempty
+mapping meanings and every other parser/record/data policy. Add false/zero/
+emptystring/list/tuple from_config refusals, valid boundaries and a complete
+67packaged-record parent counterfactual. No181 replay, actualdata/API/newraw
+or scientific record change. Live actual7b/current20 actor remains untouched.
+Freeze correction before one focused portable cohort; final metadata collector
+only after final source, keeping old zero-footprint7b result historical.

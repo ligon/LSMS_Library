@@ -515,3 +515,79 @@ class TestDelivered:
         except Exception as e:                # pragma: no cover
             pytest.skip(f"not buildable here: {e}")
         assert "population" in df.attrs
+
+
+class TestFromConfigByColumn:
+    """The config entry point must not erase a malformed falsey option."""
+
+    CONFIG = {"recall_days": 7, "n_asks": 4, "basis": "config-comment",
+              "evidence": "invented explicit config"}
+
+    @pytest.mark.parametrize("value", [False, 0, "", [], ()])
+    def test_falsey_nonmapping_is_refused(self, value):
+        with pytest.raises(TypeError, match="n_asks_by_column must be a mapping"):
+            RecallRecord.from_config("Invented", "w", {
+                **self.CONFIG, "n_asks_by_column": value})
+
+    @pytest.mark.parametrize("value,quantity_exposure", [
+        (None, 28), ({}, 28), ({"Quantity": 1}, 7),
+    ])
+    def test_valid_boundary_preserves_exposure(self, value, quantity_exposure):
+        import copy
+        config = {**self.CONFIG, "n_asks_by_column": value}
+        before = copy.deepcopy(config)
+        record = RecallRecord.from_config("Invented", "w", config)
+        assert record.exposure_days("Quantity") == quantity_exposure
+        assert record.exposure_days("Expenditure") == 28
+        assert config == before
+        if value:
+            assert dict(record.n_asks_by_column) == {"Quantity": 1}
+        else:
+            assert record.n_asks_by_column is None
+            assert "n_asks_by_column" not in record
+
+    def test_all_67_packaged_records_equal_exact_parent_config_method(self):
+        from lsms_library.country import load_yaml
+        seen = set()
+        for country in COUNTRIES:
+            data = load_yaml(Path(countries_root()) / country / "_" / "recall.yml")
+            for wave, entry in data["Recall"].items():
+                key = (country, str(wave))
+                assert key not in seen
+                seen.add(key)
+                before = _parent_851_from_config(RecallRecord, country, str(wave), entry)
+                after = RecallRecord.from_config(country, str(wave), entry)
+                assert dict(after) == dict(before), key
+                assert type(after) is type(before) is RecallRecord
+                for column in ("Quantity", "Expenditure"):
+                    assert after.exposure_days(column) == before.exposure_days(column), key
+        assert len(seen) == 67
+
+
+# Exact pre-correction configuration method, function name only changed.
+# This is a valid-packaged-record counterfactual, not the malformed-value oracle.
+# Its constructor/validators are unchanged by this one-line production repair.
+from typing import Any
+
+def _parent_851_from_config(cls, country: str, wave: str, data: dict[str, Any]
+                    ) -> "RecallRecord":
+        def _num(key, cast):
+            v = data.get(key)
+            if v is None or v == "":
+                return None
+            return cast(v)
+
+        return cls(
+            country=country,
+            wave=wave,
+            recall_days=_num("recall_days", float),
+            n_asks=_num("n_asks", int),
+            n_asks_by_column=data.get("n_asks_by_column") or None,
+            ask_count_basis=data.get("ask_count_basis") or "unknown",
+            basis=data.get("basis") or "not-recorded",
+            recall_verbatim=data.get("recall_verbatim") or None,
+            evidence=data.get("evidence") or None,
+            within_wave_variation=data.get("within_wave_variation") or None,
+            n_items_delivered=_num("n_items_delivered", int),
+            notes=data.get("notes") or None,
+        )
