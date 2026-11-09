@@ -3706,3 +3706,39 @@ under GH #851; =period=None= preserves recorded values and public grain.
 Unavailable windows raise from Country and degrade by wave from Feature.
 The evidence CSV retains this cell's variable-label rung and citation.
 See =docs/guide/recall.md= and =.coder/ledger/851-period-api-current-port.md=.
+
+* 2026-11-09 -- EACI 2017 harvest state: printed card versus export (GH #1436)
+
+The own second-passage French questionnaire
+=2017-18/Documentation/eaci17_p2_french.pdf= (committed sidecar MD5
+=5ebb8d492312926ef8045516300e2e27=, 857,409 bytes) was visually checked at
+PDF pages 29--30, printed pages 28--29. The retained English form agrees with
+the distinction below. These are documentary versions, not proof of the exact
+paper/tablet/CAPI instrument deployed for every released record.
+
+Q7F13 asks for production of the current 2017/2018 campaign, including the
+quantity already harvested if harvest is partial. Its four left-to-right
+subcolumns are =Production en UML=, =UML=, =Etat= and =Equivalent en Kg=.
+The printed state card has only =1 Epis/Panicules=, =2 Décortiqué= and
+=3 Non-Décortiqué=. No =a/b/c= export suffixes are printed. Q7F21 separately
+asks =Avez vous battu= the product before storing it, with =1 Oui= / =2 Non=
+and responsibility/date follow-ups. That operation is not the Q13 state answer.
+
+The own =bid_eaci17.pdf= annex (PDF pages 21--22; sidecar MD5
+=a3c822057e8eb09ab756b82095595332=) binds =7-F Production= to
+=eaci17_s7fp2= and =7-G Utilization= to =eaci17_s7gp2=. It does not supply
+a field-level dictionary linking the printed card to all export codes.
+
+Preserve the earlier note, "Recorded and not served", alongside the dated
+EHCVM condition implementation and the specific "2017-18 records a state, and
+it is not read" qualification. The recorded native =s7fq13b= card has four
+labels, including =4 Egrener=; the three-choice printed Q13 card does not
+explain that fourth answer. No fresh native header or row read was made for
+this documentary check. The existing 2017 quantity/unit bindings and unread
+state remain unchanged; EHCVM codes 3/4 cannot be substituted.
+
+The unresolved authority is an own-2017 release/form/CAPI/export dictionary or
+erratum binding =s7fq13b= (especially =4 Egrener=) to the printed state card
+and explaining its processing/shelling meaning. Q21, sale answers or a different
+wave cannot supply that bridge. No condition recode, kg factor, quantity,
+identifier, weight or default follows from this finding.
