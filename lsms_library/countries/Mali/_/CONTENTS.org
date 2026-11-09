@@ -3689,3 +3689,20 @@ Closed sourcec88 documentary packet in the20261103 burst =reports/=:
 MD5/SHA/size/identity-exact;60textpages and15rendered pages were produced,
 all15renders personally viewed.28rotated-text notices remain; this is not
 full-document visual or as-fielded CAPI certification. No raw/API replay.
+
+* 2026-11-09 -- GH #851: declared period conversion, collapsed EACI series retained
+
+The approved period denominator for 2014-15 is two seven-day asks, or 14
+days. This corrects recall metadata; the existing source mapper and collapsed
+public series are unchanged. Earlier sample-split wording does not establish
+a one-ask denominator for these two EACI passages. No visit axis is restored.
+The packaged record remains =ask_count_basis: declared=. Explicit period
+conversion reports =shortfall_source: no-visit-level= and no shortfall count;
+food rows cannot reconstruct household interview status. The current raw
+=s13q03c= sentinel interpretation, quantities, prices and weights are unchanged.
+
+=food_expenditures= and =food_quantities= accept an explicit target period
+under GH #851; =period=None= preserves recorded values and public grain.
+Unavailable windows raise from Country and degrade by wave from Feature.
+The evidence CSV retains this cell's variable-label rung and citation.
+See =docs/guide/recall.md= and =.coder/ledger/851-period-api-current-port.md=.
