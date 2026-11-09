@@ -449,10 +449,11 @@ Data Scheme:
     # Family B (coping-strategies / rCSI), #332.  GHS section 9 ("Food
     # Security") is a coping day-count battery (items s9q1a..s9q1i: "how
     # many days in the last 7 had to [strategy]", coded 0-7), NOT an
-    # HFIAS occurrence/frequency scale.  Collected in the post-planting
-    # round only, so each wave maps to a single t = PP quarter
-    # (2010Q3 / 2012Q3 / 2015Q3 for W1-W3) -> materialize: make.  W4+
-    # section 9 switched to FIES (sect9b), wired separately.
+    # HFIAS occurrence/frequency scale.  W1-W3 post-planting section 9
+    # maps to PP quarters 2010Q3 / 2012Q3 / 2015Q3.  W3 additionally
+    # supplies its own PH section 12 Q1 battery (s12q1a..i) under the
+    # separate visit label 2016Q1 (GH #587), never a PP carry-forward.
+    # W4+ section 9 switched to FIES (sect9b), wired separately.
     index: (t, i, Strategy)
     Days: int
     materialize: make
