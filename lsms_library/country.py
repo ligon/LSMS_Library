@@ -3178,10 +3178,17 @@ class Country:
             return cached
 
         cf_parts = []
+        needs_country_loader = False
         for wave in self.waves:
             try:
                 w = self[wave]
                 c = w.cluster_features()
+                if (c.empty and 'cluster_features' in w.data_scheme
+                        and not w.resources.get('cluster_features')):
+                    # A cold script wave can need the Country loader's existing
+                    # script fallback when there is no Makefile (GH #1440).
+                    needs_country_loader = True
+                    break
                 if not c.empty:
                     cf_parts.append(c.reset_index())
             except (FileNotFoundError, KeyError, ValueError) as exc:
@@ -3202,27 +3209,35 @@ class Country:
                 )
                 continue
 
-        if not cf_parts:
+        if needs_country_loader:
+            # Reuse the declared all-wave loader once, outside the wave-skip
+            # catch: its failures must reach Country/Feature callers. Its
+            # result already has categorical mappings; do not apply them twice.
+            cf = self.cluster_features().reset_index()
+        else:
+            if not cf_parts:
+                raise RuntimeError("cluster_features returned no data for any wave.")
+            cf = pd.concat(cf_parts, ignore_index=True)
+
+            # Wave-level cluster_features() returns raw data that has not
+            # been through _apply_categorical_mappings().  Apply the
+            # country's categorical mapping here so that market labels are
+            # normalised (e.g. "DODOMA" -> "Dodoma") before the lookup is
+            # cached and joined onto every downstream table.
+            cat_maps = self.categorical_mapping
+            if cat_maps:
+                lower_lookup_cm = {name.lower(): name for name in cat_maps}
+                key = lower_lookup_cm.get(column.lower())
+                if key is not None:
+                    table = cat_maps[key]
+                    if "Preferred Label" in table.columns:
+                        source = _categorical_key_column(table)
+                        if source is not None:
+                            rdict = table.set_index(source)["Preferred Label"].to_dict()
+                            cf[column] = cf[column].replace(rdict)
+
+        if cf.empty:
             raise RuntimeError("cluster_features returned no data for any wave.")
-
-        cf = pd.concat(cf_parts, ignore_index=True)
-
-        # Wave-level cluster_features() returns raw data that has not
-        # been through _apply_categorical_mappings().  Apply the
-        # country's categorical mapping here so that market labels are
-        # normalised (e.g. "DODOMA" -> "Dodoma") before the lookup is
-        # cached and joined onto every downstream table.
-        cat_maps = self.categorical_mapping
-        if cat_maps:
-            lower_lookup_cm = {name.lower(): name for name in cat_maps}
-            key = lower_lookup_cm.get(column.lower())
-            if key is not None:
-                table = cat_maps[key]
-                if "Preferred Label" in table.columns:
-                    source = _categorical_key_column(table)
-                    if source is not None:
-                        rdict = table.set_index(source)["Preferred Label"].to_dict()
-                        cf[column] = cf[column].replace(rdict)
 
         if column not in cf.columns:
             available = [c for c in cf.columns if c not in ('i', 't', 'v')]
