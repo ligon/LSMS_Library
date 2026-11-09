@@ -10,6 +10,7 @@ import hashlib
 import os
 from pathlib import Path
 import shlex
+import shutil
 import socket
 import stat
 import subprocess
@@ -298,6 +299,120 @@ def test_genuine_private_output_stage_preserves_source(tiny):
         assert not (root / "dvc.lock").exists()
 
 
+def _foreach_country(tiny, monkeypatch, *, failure=None):
+    root, data, metadata, remote, fs = tiny
+    name, wave = "InventedMaterialize", "w0"
+    country = root / name
+    (country / "_").mkdir(parents=True)
+    (country / wave / "_").mkdir(parents=True)
+    (country / "_/data_scheme.yml").write_text(yaml.safe_dump({
+        "Country": name, "Waves": [wave], "Data Scheme": {
+            "facts": {"index": "(t, i)", "x": "float"}}}))
+    # No ordinary wave or script producer exists for this invented table.
+    (country / wave / "_/data_info.yml").write_text("{}\n")
+    output = (root / "must-not-write.parquet" if failure == "intree"
+              else data / "stage-facts.parquet")
+    attempts = data / "stage-attempts.txt"
+    expected = pd.DataFrame({"x": [15.0, 25.0]}, index=pd.MultiIndex.from_tuples(
+        [(wave, "h1"), (wave, "h2")], names=["t", "i"]))
+    code = ("from pathlib import Path; import pandas as pd; "
+            f"Path({str(attempts)!r}).open('a').write('attempt\\n'); ")
+    code += ("raise ValueError('literal foreach recipe failure')" if failure == "recipe"
+             else f"pd.DataFrame({{'x': [15.0,25.0]}}, index=pd.MultiIndex.from_tuples("
+                  f"[({wave!r},'h1'),({wave!r},'h2')], names=['t','i']))"
+                  f".to_parquet({str(output)!r})")
+    command = (subprocess.list2cmdline([sys.executable, "-c", code])
+               if os.name == "nt" else
+               f"{shlex.quote(sys.executable)} -c {shlex.quote(code)}")
+    stage = {"foreach": {"fixture": {
+        "country": name, "wave": wave, "table": "facts", "format": "parquet",
+        "output": str(output)}}, "do": {
+            "cmd": command, "outs": [{"${item.output}": {"cache": False}}]}}
+    (root / "dvc.yaml").write_text(yaml.safe_dump({"stages": {"materialize": stage}}))
+    monkeypatch.setenv("LSMS_BUILD_WORKERS", "1")
+    monkeypatch.setenv("LSMS_BUILD_BACKEND", "dvc")
+    monkeypatch.setenv("LSMS_ISSUES_LOG", str(data / "issues.jsonl"))
+    monkeypatch.delenv("LSMS_NO_CACHE", raising=False)
+    return name, wave, output, attempts, expected
+
+
+def test_actual_country_foreach_materialize_private_output_once(tiny, monkeypatch):
+    root, data, metadata, remote, fs = tiny
+    name, wave, output, attempts, expected = _foreach_country(tiny, monkeypatch)
+    resolved = C._load_materialize_stage_map(str(root))
+    assert resolved[(name, wave, "facts")].output_path == output
+    with _readonly(root):
+        before = _snapshot(root)
+        actual = C.Country(name, preload_panel_ids=False)._aggregate_wave_data(
+            method_name="facts")
+        pd.testing.assert_frame_equal(actual, expected)
+        assert attempts.read_text().splitlines() == ["attempt"]
+        assert _snapshot(root) == before
+        assert not (root / "dvc.lock").exists()
+    assert output.exists()
+    assert (data / name / "var/facts.parquet").exists()
+
+
+@pytest.mark.parametrize("failure", ["recipe", "intree"])
+def test_country_foreach_failure_is_visible_without_stale_success(
+        tiny, monkeypatch, caplog, failure):
+    if failure == "intree" and (os.name == "nt" or os.geteuid() == 0):
+        pytest.skip("this control requires enforced POSIX read-only permissions")
+    root, data, metadata, remote, fs = tiny
+    name, wave, output, attempts, expected = _foreach_country(
+        tiny, monkeypatch, failure=failure)
+    stale = data / name / "var/facts.parquet"
+    stale.parent.mkdir(parents=True)
+    expected.assign(x=999.0).to_parquet(stale)  # hashless, unverified old result
+    if failure == "recipe":
+        expected.assign(x=777.0).to_parquet(output)
+    with _readonly(root):
+        before = _snapshot(root)
+        with pytest.raises(RuntimeError, match=f"Could not materialize {name}/facts"):
+            C.Country(name, preload_panel_ids=False)._aggregate_wave_data(
+                method_name="facts")
+        assert attempts.read_text().splitlines() == ["attempt"]
+        assert "DVC unavailable for facts" in caplog.text
+        assert "failed to run:" in caplog.text
+        assert _snapshot(root) == before
+    assert not output.exists()
+    assert not stale.exists()  # ordinary fallback cannot stamp/serve old content
+    assert not (data / "must-not-write.parquet").exists()
+
+
+@pytest.mark.parametrize("form", ["string", "legacy_path", "detailed"])
+def test_materialize_output_identity_forms_use_existing_resolver(tiny, form):
+    root, data, metadata, remote, fs = tiny
+    template = "build/${item.country}/${item.wave}/${item.table}.${item.format}"
+    out = (template if form == "string" else {"path": template}
+           if form == "legacy_path" else {template: {"cache": False}})
+    (root / "dvc.yaml").write_text(yaml.safe_dump({"stages": {"materialize": {
+        "foreach": {"fixture": {"country": "Invented", "wave": "w0",
+                                 "table": "facts", "format": "parquet"}},
+        "do": {"cmd": "not-run", "outs": [out]}}}}))
+    result = C._load_materialize_stage_map(str(root))
+    assert set(result) == {("Invented", "w0", "facts")}
+    assert result[("Invented", "w0", "facts")].output_path == (
+        root / "build/Invented/w0/facts.parquet")
+
+
+@pytest.mark.parametrize("bad_flags", [{"cache": "not-a-boolean"}, "not-a-mapping"])
+def test_detailed_output_validation_remains_real_dvc_error(tiny, bad_flags):
+    from dvc.utils.strictyaml import YAMLValidationError
+    root, data, metadata, remote, fs = tiny
+    (root / "dvc.yaml").write_text(yaml.safe_dump({"stages": {"materialize": {
+        "foreach": {"fixture": {"country": "Invented", "wave": "w0",
+                                 "table": "facts", "output": str(data / "facts")}},
+        "do": {"cmd": "must-not-run", "outs": [{"${item.output}": bad_flags}]}}}}))
+    # The resolver must not skip invalid flags and pretend no stage exists.
+    assert ("Invented", "w0", "facts") in C._load_materialize_stage_map(str(root))
+    with _readonly(root):
+        before = _snapshot(root)
+        with pytest.raises(YAMLValidationError):
+            fs.repo.stage.load_one("dvc.yaml", "materialize@fixture")
+        assert _snapshot(root) == before
+
+
 @pytest.mark.parametrize("failure", ["recipe", "intree"])
 def test_fresh_stage_errors_are_not_redirected_or_suppressed(tiny, failure):
     if failure == "intree" and (os.name == "nt" or os.geteuid() == 0):
@@ -456,3 +571,150 @@ def test_malformed_present_config_is_not_missing_or_a_blank_fallback(tiny):
         with pytest.raises(ConfigError):
             _ = fs.repo
         assert _snapshot(root) == before
+
+
+def test_real_partial_cache_config_failure_closes_sqlite_before_removal(tiny, monkeypatch):
+    from dvc.config import RemoteNotFoundError
+    from dvc_data.hashfile.state import State
+    root, data, metadata, remote, fs = tiny
+    with (root / ".dvc/config").open("a") as stream:
+        stream.write("[cache]\n    local = missing_remote\n")
+    closed = []
+    original_close = State.close
+
+    def observe_close(state):
+        assert Path(state.tmp_dir).exists()
+        assert getattr(state.hashes._local, "con", None) is not None
+        assert getattr(state.links._local, "con", None) is not None
+        original_close(state)
+        assert getattr(state.hashes._local, "con", None) is None
+        assert getattr(state.links._local, "con", None) is None
+        closed.append(Path(state.tmp_dir))
+
+    monkeypatch.setattr(State, "close", observe_close)
+    with _readonly(root):
+        before = _snapshot(root)
+        with pytest.raises(RemoteNotFoundError):
+            _ = fs.repo
+        assert _snapshot(root) == before
+    assert len(closed) == 1
+    assert not closed[0].parent.exists()
+    assert fs._runtime_repo is None
+
+
+def test_construction_close_failure_preserves_original_and_retains_state(tiny, monkeypatch):
+    from dvc.cachemgr import CacheManager
+    from dvc.config import RemoteNotFoundError
+    from dvc_data.hashfile.state import State
+    root, data, metadata, remote, fs = tiny
+    with (root / ".dvc/config").open("a") as stream:
+        stream.write("[cache]\n    local = missing_remote\n")
+    original_init, original_close = CacheManager.__init__, State.close
+    original_errors, retained = [], []
+    cleanup_error = PermissionError("literal private close failure")
+
+    def observe_init(manager, repo):
+        try:
+            original_init(manager, repo)
+        except RemoteNotFoundError as error:
+            original_errors.append(error)
+            raise
+
+    def fail_close(state):
+        retained.append(state)
+        raise cleanup_error
+
+    try:
+        with monkeypatch.context() as patch:
+            patch.setattr(CacheManager, "__init__", observe_init)
+            patch.setattr(State, "close", fail_close)
+            with pytest.raises(RemoteNotFoundError) as caught:
+                _ = fs.repo
+            assert caught.value is original_errors[0]
+            assert any("state retained" in note for note in caught.value.__notes__)
+            assert len(retained) == 1
+            assert Path(retained[0].tmp_dir).exists()
+            assert getattr(retained[0].hashes._local, "con", None) is not None
+            assert getattr(retained[0].links._local, "con", None) is not None
+    finally:
+        # Explicit fixture custody, after verifying the production retention.
+        for state in retained:
+            original_close(state)
+            shutil.rmtree(Path(state.tmp_dir).parent)
+
+
+def test_unpublished_inner_state_ownership_retains_directory(tiny, monkeypatch):
+    from dvc_data.hashfile.cache import Cache, HashesCache
+    root, data, metadata, remote, fs = tiny
+    original_init = Cache.__init__
+    links = []
+    failure = OSError("literal second State-cache constructor failure")
+
+    def observe_links(cache, directory=None, *args, **kwargs):
+        original_init(cache, directory, *args, **kwargs)
+        if Path(directory).name == "links":
+            links.append(cache)
+
+    def fail_hashes(*args, **kwargs):
+        raise failure
+
+    try:
+        with monkeypatch.context() as patch:
+            patch.setattr(Cache, "__init__", observe_links)
+            patch.setattr(HashesCache, "__init__", fail_hashes)
+            with pytest.raises(OSError) as caught:
+                _ = fs.repo
+            assert caught.value is failure
+            assert any("state retained" in note for note in caught.value.__notes__)
+            assert len(links) == 1
+            assert Path(links[0].directory).exists()
+    finally:
+        for cache in links:
+            directory = Path(cache.directory)
+            cache.close()
+            shutil.rmtree(directory.parent.parent)
+
+
+def test_explicit_provider_close_failure_keeps_handles_and_state_for_retry(tiny, monkeypatch):
+    root, data, metadata, remote, fs = tiny
+    repo = fs.repo
+    directory = repo._runtime_state
+    failure = PermissionError("literal owner close failure")
+
+    def fail_close():
+        raise failure
+
+    with monkeypatch.context() as patch:
+        patch.setattr(repo.state, "close", fail_close)
+        with pytest.raises(PermissionError) as caught:
+            fs.close()
+        assert caught.value is failure
+        assert fs._runtime_repo is repo
+        assert directory.exists()
+        assert not repo._runtime_closed
+        assert repo._runtime_cleanup_failed and fs._runtime_cleanup_failed
+    fs.close()  # explicit recovery after the close error has been removed
+    assert not directory.exists()
+    assert fs._runtime_repo is None
+
+
+@pytest.mark.skipif(os.name == "nt" or (hasattr(os, "geteuid") and os.geteuid() == 0),
+                    reason="requires enforced POSIX read-only permissions")
+def test_original_installed_dvc_readonly_baseline_witness(tiny, request):
+    """Run separately: observed original defect, never a candidate pass."""
+    from dvc.api import DVCFileSystem
+    root, data, metadata, remote, fs = tiny
+    payload = b"amount\n41\n43\n"
+    _sidecar(root, "baseline.csv", payload)
+    _object(data / "dvc-cache", payload)
+    original = DVCFileSystem(root, config={"cache": {"dir": str(data / "dvc-cache")}})
+    try:
+        with _readonly(root):
+            before = _snapshot(root)
+            with pytest.raises(PermissionError) as caught:
+                with original.open("baseline.csv", "rb") as stream:
+                    stream.read()
+            request.node.user_properties.append(("original_exception", repr(caught.value)))
+            assert _snapshot(root) == before
+    finally:
+        original.close()

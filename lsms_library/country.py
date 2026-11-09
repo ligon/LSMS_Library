@@ -870,6 +870,10 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
         out_entry = outs[0]
         if isinstance(out_entry, dict):
             out_template = out_entry.get("path")
+            if not isinstance(out_template, str) and len(out_entry) == 1:
+                # DVC's ordinary detailed form is {template: {cache: false}}.
+                # Extract identity only; real DVC still validates its flags.
+                out_template = next(iter(out_entry))
         else:
             out_template = out_entry
         if not out_template:

@@ -89,6 +89,7 @@ class RuntimeDVCRepo(Repo):
         self._runtime_pid = os.getpid()
         self._runtime_ready = False
         self._runtime_closed = True  # no owned state directory exists yet
+        self._runtime_cleanup_failed = False
         root = os.path.abspath(os.fspath(root_dir))
         # Canonicalize only the lock identity; retain DVC's original lexical
         # root for relative paths and a symlinked working-tree override.
@@ -115,11 +116,16 @@ class RuntimeDVCRepo(Repo):
         try:
             super().__init__(root_dir=root, config=effective,
                              uninitialized=uninitialized)
-        except BaseException:
-            # Construction has not published this Repo. Never touch the shared
-            # lock namespace or any source metadata on failure.
-            shutil.rmtree(self._runtime_state)
-            self._runtime_closed = True
+        except BaseException as cause:
+            # State may already own SQLite handles when CacheManager fails.
+            # Close only resources actually assigned to this instance; using
+            # Repo.close here could initialize a previously unused lazy SCM.
+            try:
+                self.close()
+            except BaseException as cleanup:
+                cause.add_note(
+                    f"DVC runtime state retained at {self._runtime_state}; "
+                    f"construction cleanup failed: {type(cleanup).__name__}")
             raise
         self._runtime_ready = True
 
@@ -137,22 +143,55 @@ class RuntimeDVCRepo(Repo):
     def scm_context(self):
         return _RuntimeSCMContext(self.scm, self.config)
 
+    def _close_initialized(self):
+        errors = []
+        seen = set()
+        # Preserve installed Repo.close's order without evaluating any lazy
+        # property. _scm can hold a supplied/initialized SCM before caching.
+        for name in ("scm", "_scm", "state", "dvcfs", "_data_index"):
+            resource = self.__dict__.get(name)
+            if resource is None or id(resource) in seen:
+                continue
+            seen.add(id(resource))
+            try:
+                resource.close()
+            except BaseException as error:
+                errors.append(error)
+        if errors:
+            for other in errors[1:]:
+                errors[0].add_note(f"Additional DVC close failure: {type(other).__name__}")
+            raise errors[0]
+
     def close(self):
         if (getattr(self, "_runtime_pid", None) != os.getpid()
                 or getattr(self, "_runtime_closed", True)):
             return
-        if self._runtime_ready:
-            # If close fails, retain state for honest diagnostics rather than
-            # deleting files underneath a handle that might still be active.
-            super().close()
-        shutil.rmtree(self._runtime_state)
+        try:
+            self._close_initialized()
+            if (not self._runtime_ready and self.__dict__.get("state") is None
+                    and "site_cache_dir" in self.__dict__):
+                # DVC's State constructor can itself fail after opening its
+                # first cache but before assigning State to Repo. Those inner
+                # handles are not ours to discover through lazy properties.
+                # Retain the directory rather than delete beneath unknown
+                # ownership; the original construction exception is preserved.
+                raise DVCMetadataCompatibilityError(
+                    "Incomplete DVC State ownership; runtime directory retained")
+            shutil.rmtree(self._runtime_state)
+        except BaseException:
+            # Do not remove files under a live handle or retry invisibly from
+            # __del__. An explicit owner close may retry after diagnosis.
+            self._runtime_cleanup_failed = True
+            raise
         self._runtime_closed = True
+        self._runtime_cleanup_failed = False
 
     def __del__(self):
         # No global registry and no automatic tempfile finalizer. GC may run
         # after fork or interpreter teardown; the owner-PID guard is mandatory.
         try:
-            self.close()
+            if not getattr(self, "_runtime_cleanup_failed", False):
+                self.close()
         except Exception:
             pass
 
@@ -168,6 +207,7 @@ class RuntimeDVCFileSystem(DVCFileSystem):
         self._runtime_repo = None
         self._runtime_fs = None
         self._runtime_lock = threading.RLock()
+        self._runtime_cleanup_failed = False
 
     @property
     def fs(self):
@@ -179,6 +219,7 @@ class RuntimeDVCFileSystem(DVCFileSystem):
             self._runtime_fs = None
             self._runtime_lock = threading.RLock()
             self._runtime_pid = os.getpid()
+            self._runtime_cleanup_failed = False
         with self._runtime_lock:
             if self._runtime_fs is None:
                 repo = RuntimeDVCRepo(self._runtime_root,
@@ -186,8 +227,13 @@ class RuntimeDVCFileSystem(DVCFileSystem):
                                       uninitialized=True)
                 try:
                     fs = _DVCFileSystem(repo=repo, subrepos=False)
-                except BaseException:
-                    repo.close()
+                except BaseException as cause:
+                    try:
+                        repo.close()
+                    except BaseException as cleanup:
+                        cause.add_note(
+                            f"DVC runtime state retained at {repo._runtime_state}; "
+                            f"filesystem cleanup failed: {type(cleanup).__name__}")
                     raise
                 self._runtime_repo = repo
                 self._runtime_fs = fs
@@ -197,15 +243,21 @@ class RuntimeDVCFileSystem(DVCFileSystem):
         if self._runtime_pid != os.getpid():
             return  # never finalize an inherited parent's resources
         with self._runtime_lock:
-            if self._runtime_fs is not None:
-                self._runtime_fs.close()
-            if self._runtime_repo is not None:
-                self._runtime_repo.close()
+            try:
+                if self._runtime_fs is not None:
+                    self._runtime_fs.close()
+                if self._runtime_repo is not None:
+                    self._runtime_repo.close()
+            except BaseException:
+                self._runtime_cleanup_failed = True
+                raise
             self._runtime_fs = None
             self._runtime_repo = None
+            self._runtime_cleanup_failed = False
 
     def __del__(self):
         try:
-            self.close()
+            if not getattr(self, "_runtime_cleanup_failed", False):
+                self.close()
         except Exception:
             pass
