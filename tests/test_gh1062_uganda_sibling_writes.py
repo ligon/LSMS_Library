@@ -238,11 +238,12 @@ def test_income_pins_sibling_backend_and_restores_environment(original, fail_on,
     assert os.environ['LSMS_NO_CACHE'] == 'preserve-this-value'
 
 
-def test_income_make_backend_expands_valid_subset_sibling_caches(tmp_path):
+def test_income_make_backend_expands_private_siblings_and_preserves_live_subset_caches(tmp_path):
     """Exercise actual public cache coverage and Make routing, without data access.
 
     Both sibling parquets already exist with valid hashes/one-wave manifests.
-    Their thin Make wrappers therefore cannot repair coverage by themselves.
+    Their thin Make wrappers cannot repair coverage by themselves. GH1288
+    expands private prerequisites; the original live siblings remain exact.
     """
     if not shutil.which('make'):
         pytest.skip('make is unavailable')
@@ -296,20 +297,26 @@ import lsms_library as ll
 from lsms_library.paths import data_root
 from lsms_library.local_tools import read_parquet_cache_hash, read_parquet_cache_waves
 c = ll.Country('Uganda', preload_panel_ids=False)
+live_before = {}
 os.environ['LSMS_BUILD_BACKEND'] = 'dvc'
 for table in ['earnings', 'enterprise_income']:
     getattr(c, table)(waves=['2020-21'])
     path = data_root('Uganda') / 'var' / (table + '.parquet')
     assert read_parquet_cache_waves(path) == ['2020-21']
     assert read_parquet_cache_hash(path) == c._table_cache_hash(table, c.waves)
+    live_before[table] = (path.read_bytes(), path.stat().st_mtime_ns)
 os.environ['LSMS_BUILD_BACKEND'] = 'make'
 answer = c.income()
 assert set(answer.index.get_level_values('t')) == set(c.waves), 'all-wave income reused valid partial siblings'
 assert answer['income'].tolist() == [11., 22.]
 for table in ['earnings', 'enterprise_income']:
     path = data_root('Uganda') / 'var' / (table + '.parquet')
-    assert set(read_parquet_cache_waves(path)) == set(c.waves)
+    assert read_parquet_cache_waves(path) == ['2020-21']
     assert read_parquet_cache_hash(path) == c._table_cache_hash(table, c.waves)
+    assert (path.read_bytes(), path.stat().st_mtime_ns) == live_before[table]
+income_path = data_root('Uganda') / 'var' / 'income.parquet'
+assert set(read_parquet_cache_waves(income_path)) == set(c.waves)
+assert read_parquet_cache_hash(income_path) == c._table_cache_hash('income', c.waves)
 print(json.dumps({'income': answer['income'].tolist(), 'waves': c.waves}))
 """
     proc = subprocess.run([sys.executable, '-c', code], cwd=tmp_path, env=env,

@@ -117,6 +117,6 @@ def test_success_without_native_output_still_refuses_subset(direct):
     fake, country = direct
     # No readable target: filtering must never manufacture an empty success.
     (fake.country_dir / '_' / 'build_me.py').write_text('pass\n')
-    with pytest.raises(RuntimeError, match='Could not materialize'):
+    with pytest.raises(RuntimeError, match='country Make produced no safe output; refusing stale candidates'):
         country.build_me(waves=['2001'])
     assert not fake.var.exists()
