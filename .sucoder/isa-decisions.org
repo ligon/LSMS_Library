@@ -21,8 +21,8 @@ Concrete2018-only design reviewed (existing812ownlabelregion/department×milieu;
 AffectedConsumption means food purchases; AffectedFoodStock means food stocks, following Ethiopia's model.
 Malawi49: borrow IHS5 conversion factors. Malawi50: final accepted interpretation is maize flour; this supersedes the earlier milling-service discussion. Malawi51: no date clamp. Malawi48: joint inclusion cannot be identified from marginal cross/long weights alone; production weights remain unchanged under the investigation.
 
-* Pending choice
-GH1066: whether assume_cache_fresh should replay stored grain warnings/diagnostics remains unanswered. Do not interpret elapsed time or the suggested option as approval.
+* 2026-11-09: Stored grain diagnostics, GH1066
+The user explicitly selected: "Replay warnings and normal strict policy (Recommended)". Successful assume_cache_fresh=True hits must replay stored wave-filtered grain warnings/reports and enforce existing LSMS_GRAIN_STRICT refusal, with normal grain-before-date precedence. This supersedes the previous pending-policy hold. No freshness check, source probe, rebuild or cache write is added. Reviewed final private candidate6b4ee1559b7552969ab3a1c8eed16528a92ac1bd; publication/CI follows on current development.
 
 * 2026-11-08:1288 private-input finding withdrawn
 Root and independent reviewer withdrew the proposed privateOther-overwriteP2 after

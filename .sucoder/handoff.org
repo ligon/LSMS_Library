@@ -1,4 +1,170 @@
 #+title: Current LSMS-ISA goal handoff
+* Authoritative checkpoint 2026-11-09T21:05 UTC (supersedes older live entries)
+Goal ACTIVE/incomplete. Development79f5979cf8022e64928c5150950dfb00456994da,
+tree69f8aefb46e1c60d79fef07e5dd2a4addf905c22. 72 verified merges/39 wholeissueclosures;
+1051 closureaudit finishing; closure makes40. FSoriginhandoff/isa-development-20261109
+pushed79f successfully. No masterrelease/sharedrewarm/rawacquisition/productionweights.
+B=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103;
+Q=B/country-workers-refill-20261108. Rootbranchdocs/isa-sweep-20261103 OLDcode,
+neverrunruntimehere. Python/local/job40825266/venv_img/bin/python; privateworktree
+cwd/PYTHONPATH/countriesroot exact, BLAS/build1, no optionalDIAGenv or home/nativeSDK reads.
+
+NEW EXPLICIT USER1066 RULING: "Replay warnings and normal strict policy (Recommended)".
+Persistedisa-decisions.org. The oldpolicyHOLD is superseded. Normalgrain-before-date
+strictrefusal and storedwavefilteredwarnings/reports, nohash/probe/build/cachewrites.
+Finalprivate6b4ee1559b7552969ab3a1c8eed16528a92ac1bd offba03; reviewedselected
+1a2ecdfe4ed65702fc281599781f1ddb6e306f2c runtimeexacttested94df (commentwordonly).
+17syntheticP=15candidate+2baselinewitness cases (fourbaselinechildinterpreters),
+NOTactualcountryevidence. Originalbaselinewitness silence retained, no bulk rerun.
+Independent1452qualifiedPASS Rreview-1066-assumed-fresh-grain-20261109/
+VERDICT.md/FINAL-MANIFEST ddc5f474165f752eb853c6a1b28d3735bd54c16f594fe32ebe08d1836ba144e8.
+Selectedcollector37806 CLOSED0/123.270s sourceclean/private0. Initialstaged40fbaseline
+was WRONG becauseDnotinba03, retained; corrected5fcaNGAbaseline map a46be1dbc169960e965da68f1503554734f28241372b3cd24300ab7e5c25fcc2,
+candidate8ac1c0aa3a524191159d12197f069ba32e9976895a783938f2a8bd66cbb46a41.
+All4maps452/1903/37/186+14nonhash+keys18None exact,0E0D. No collector replay.
+RootdirectallrawJSONexceptheadEQUAL and ROOT-BASELINE-SOURCE-ADMISSION.json
+inR1066-selected-policy-current-20261109/metadata sealed correctedsourcecarry.
+
+PR1674 OPEN https://github.com/ligon/LSMS_Library/pull/1674
+publicationc9885ba4431d45792da818c1c052b3efcda2e751/treeceda3a17c1754ff7cf485d20791fd92ec1c0260c
+on79f+6b4. Wpublish-1066-current-20261109 branchpublish/1066-current-20261109,
+bothGitHub+FSoriginpush0. Fourownedfiles only. Entiremethodexactauthor; inverse
+oneassumedfreshmethod restoresENTIRE79fCountry; inverse9linedocaddition restores
+ENTIRE79fguide; othertwoobjects author; allnonowned79f. Rootproof
+R1066-current-publication-20261109/ROOT-SOURCE-ADMISSION.json. NOnewcombinedcensus.
+ConfiguredCI42698354320RUNNING unit129436145735/windows129436145276/sixoptionalSKIP.
+NEXTROOTPOLLTHISCI andmergeonlyallrequiredsuccess/exacttestedtree/sourceproof;
+GH1066bodyupdatedapproved+PR/17/0footprint; remainsOPENuntilactualmergeverification.
+
+MERGES SINCE OLD19:16CHECKPOINT:
+1670Nigeria alreadya578e1a1f95a8d2ccc11d540fc11e6112b54d846; historicalbelow.
+1671periodAPI MERGED1c1ef12da4f592e1899db67cf937251aa890ac86,
+parents[a578,5f1f1692c0b3cfa5e345780ee9c25d1d5ae725df],tree
+ d36ea7fad2802d7ddd7e6989179f9706cb47414c. CI42680635357 checkout
+cc0d633d52e3b05d7e66510cc0114ff5b101e9d5 sameparents/tree;
+unit13563P5661S4X938.84s,Windows362P1S11.91s/sixSKIP. Rci-admission-1671-20261109.
+Whole851CLOSED aftercompletecriteriasource/actualaudit. Finalfixeda9 falseyconfig
+P2 retainedoldFAIL->samecontrolPASS;190distinctpurecases,not207. Real15native=11Mali+4BFA,
+49namedmanualchecks notpytest; oldV1aliaserror andV2literalunusedMI-domainFAIL retained.
+V3newhealthySubsetactual20strictbaseline+payloadchecks PASS; fullkgfullinferencepool
+kept, noaxisprune/attrdelete/tolerance. Finalledgermovedonlybedecc33d39389e3f4f3456b6bd7e4767822fce7;
+this82lineledger landednext1672. PeerclosedqualifiedPASS bindings in
+R851-period-api-current-v3-20261109 andR851-falsey-column-config-correction-20261109;
+Q/reports/review-851-falsey-corrected-source-admission-20261109/ADMISSION3aabf304...
+Finalmanifest e7172c702d188994b6033f33b94e5b7fcd09e7d31aaa9c5cb1f4e55f3375340d.
+
+1672Uganda1525authority+851finalledger MERGEDba03bf85a126827b6005fe34b417ed60dbbf98b9,
+parents[1c1ef,5b605bf3a1b67b2bfade7d8e0b065eb9fa56b4f0],tree5099a9d843b94c4775761fe731c9764b44c3aa0e.
+CI42686367335 checkoutcd9692db03ae9acb0cbcc86f6be5e976d7a5563a sameparents/tree;
+unit13563P5661S4X1066.58s,Windows362P1S14.61s/sixSKIP. Rci-admission-1672-20261109.
+Exactly3DOCfiles40Ugandaappend+ownledgerexactd64dc323 and82line851ledgerexactbede;
+allruntime/config/test1c1ef. Uganda38BIDtextpages+onep16raster0: GSEC15BitemkeyCEB01
+supportsgetter despitepaperheaderCEB02Code, no1081/1082semanticbridge. Whole1525OPEN.
+
+1673D1051 MERGED79f5979cf8022e64928c5150950dfb00456994da,
+parents[ba03,340c1c281400c13909a7254123f2af2c35625676],tree69f8aefb46e1c60d79fef07e5dd2a4addf905c22.
+CI42691692429 testedf86d44c03442e38e99d2b023aa7f25765937d7ed sameparents/WHOLETREE;
+unit129412777142 13684P5661S4X947.15s; Windows129412776405 362P1S15.84s/sixSKIP.
+RootmeaningfulERROR: preflightcheckerexit1 wasignoredbyJS thenmerged. Solefailed
+predicatechanged==0, actualschemachanged=[]; no source/fingerprintfailure. Preserve
+originalfailure, doNOTclaimpassedpremerge. Independent1452actualpostverification
+R1673-postmerge-independent-verification-20261109 confirmsall19248objects exact,
+all4rawmaps40f vs340c EXACT/all14nonhash/18None/E0D0. CORRECTED-RETROSPECTIVE-CHECKER.json
+explicitaftermergeonly. CIlogsRci-admission-1673-20261109 includeoriginalWindowsFAIL
+(os.register_at_fork absent). Fix9931guard+7P, finalledger8c6fd81d66b7d9174b12b1c54169d8a62bdd5267
+allnonledger9931. Doriginal114P, R1 23P, R2 12P OVERLAP; neverclaim149distinct.
+R1originalselectorlateentrydrop/finalizerunderlockFAIL retained, repaired7b;
+RootR2unvalidatedlateentryselectionFAIL retained->05fidentitymembershipPASS;
+finalruntimeallrefsretain/pruneonlyvalidsnapshotselection. ONEfinalcombinedWindows
+map340cSHA6a4b8a7a4be5686908bbfcc24a1cde4c15324f2867f833e52dfbf711928eee96
+vs40f6f6c50e0...0extraallmaps14nonhash. OriginalDglobalfootprint disclosed452/1885/37/124,
+no sharedrewarm. Fixed5second/non-sliding/max16process scopes, onlypositivelyuniform
+connectionestablishmentfailuresafterfullnormalretries/bothlayouts. Local/L1first,
+knownalready-usedstaticroute only; unknown/dynamic/mixed/readclosed/TLS/auth/404failopen;
+no HEADseed/suppressedFalse notcompletedmemo, allordinaryfetch/decoder pathsunchanged.
+Whole1051 A/B/C/E already1663/1665/1666/1669; boundedA–Eclosureaudit1452finishing.
+
+COUNTRY SOURCE STAGES NOW CLOSED, NO ACTIVE REMOTE COUNTRY WORKERS:
+OldEth41050181/Ner41050182 n0028NOT_RESPONDING+COMPLETING/communications9001
+intentionallycancelled; later6sacctjobsteps CANCELLEDby43292/controllerempty.
+OriginalnativeoutcomesUNKNOWN/unaccepted; nosuccessclaim. Onefreshreplacementeach
+41050807/e4fd1623fa2542448fc7c6b6b3fde311 Eth and41050808/aa77903698ef4b2ba931e97a145d2f81
+Nerhealthy n0030 closednative0SDK0/admitted. Source-only20 countrybindings exact1c/ba03.
+Q/reports/{1570-source-bindings,1530-BID-discriminator}-source-admission-20261109.
+Watcher48093manageronly. Do notcountwatcher/completed/reservationsasworkers.
+
+Ethiopia1570: W1scriptomitsgrams/Decimalcompanions; ownlabelsconfirmseparatecomponents,
+NOarithmeticdefaultyet. W2exacttwoheaders4795aa126d75569c77178231a61516ce/7438350,
+d74b4bd87496d6d98290a0a058e2355d/3354457,0rows. q04_b14unitselector; q03_aKILO+
+q03_bGRAMS; q04singleBirr; _other40char; _cf labelconversionJOINCODE notnumericfactor.
+W1PH622952BMD5d9332d9f8332c8f25a9e7ee2030bf2be PDF6harvestKILO/GRAM,PDF10sales
+KILO/GRAM+singleBIRR. InitialPDF6/11/12wrongtargetretained/additivePDF9/10onlynewparse;
+manualp18roundwholeBirr generalHHexamples/p83agKG/Birr; releasedBIRRDecimal tensionunresolved.
+R1570-component-metadata-plan-current1c1ef-20261109 ACTUAL-FINAL-MANIFEST968381626...
+/additive-v2FINAL2730c222... . No blank0,/100,harvestallocation,window,1457policy.
+Docs9c277493fb77eea755376acd13d3e910fcfa75a8 offba03 twoowned:
+48lineCOUNTSappend+ownledger,4652prefixfce745f4... exact/all19240nonownedba03.
+R1570-component-authority-documentation-20261109 manifest4d66fd049...
+NewCFsourceholds actual68776BMD5dbfd5dc89c96be24380cda0d18bb29f3; existing
+_crop_cf_table/crop_conversion_factors reusedsourceONLY, helperNOTcalled.
+ONEnewmetadata59607 CLOSED0/1.090s0rows/all11requestedfields. unit_cd30typedpairsEXACT
+ownW2_cfcard (floatvsrawshort;namespaces/Statarev differ), national+8regionlabels;
+NOobservedfactors,coverage,join,sign/direction/blank0. Initialstagingfullstatfailure
+0contextsretained;atimecauseLIKELYNOTPROVEN. Finalledgerb71a90386b7c53a871e314671ea5454d49dee438,
+allnonledgerba03. R1570-crop-cf-wave2-metadata-20261109 REPORT/LITERAL-CODEBOOK-COMPARISON.
+
+Niger1530: full3521CONTENTS/d50a9232; ownSept2023BID17pages genericSuSo/no versionbound
+executedenable/exportbridge. Two0rowheaders identifygate s16aq00/campagnehivernale2021/22,
+card1Oui2Non. Exacttwoadmittednumericreads2fullStata (all194+29colsdecode then6+6projection),
+V2actor22413CLOSED0/6.648s. V1stagingUIDnamespaceassertionfailedBEFORE0parses, retained;
+v2explicitprioruid0/host43292/allotheridentitysame approved. ALL5729releasedgateanswersOui,
+0No/NA/unknown.3468completeconsistentraw(g,m,vague)groups=1958single+1510repeat1–9rows.
+Cover6622uniquevalidgroups;3468both/3154coveronly/0agonly/0missingkeys. Coveronly
+q27Complet3049/Partiel84/NA21: NOTnegativegate/notasked/ineligible/exportrule.
+Vague1/2literal. No dedup/HHcollapse/panel/weight/unit/science. Closedstatusoperation
+60333loads2producedframes0native; fiveproducedframesdurableB/private/1530-niger-2021-gate-closed-operands-20261109.
+R1530-niger-2021-gate-{metadata,answers}-20261109; answersmanifest0e68aeec61f431c800ba6e8b65ed5f7079d8f7b1cb2c395edae5051e87971c72.
+NeedfullNo/omissionroster orownSuSoGUID/versionenable/roster/exportprojection; morepositive
+fileparsecannotrecoveromitteduniverse. Old4C/Donioncapturesnotreplayed.
+Docsda7a00471bc0c99bbe365d4e33073054ac8449c3 offba03:47lineCOUNTSappend+ownledger,
+3521prefixexact/all19240nonownedba03. R1530-niger-gate-release-documentation-20261109
+manifest58b48330f6d2e2d9eeef34256c65d53cfd6bad5134fcda45155e38838d9ddcff.
+
+BOTHCOUNTRYDOCS independentlyMwiqualifiedPASS/noP1P2:
+Rreview-1570-1530-country-evidence-notes-20261109 REVIEW.md/PROOF.json;
+personallyPH6/10rasters+closedheaders/statusJSONreviewed, entireprefix/objectproofs.
+Whole1570/1530OPEN. Rootreadbothappends. PreparedcombinedpublicationW
+/local/job40825266/worktrees/publish-1570-1530-evidence-current-20261109,
+branchpublish/1570-1530-evidence-current-20261109 BASEc9881674plusbothauthorsmerged.
+NOTPUSHED/NO PR YET: finishfourDOCownedexactproof thenpublishafter1674landing,
+soonecurrentCIrun, no tests/census/datareplays. AdditiveCFfindingnotmixedintofrozennotes.
+
+FRESH COMPLETE QUEUE REFILL:
+R=scrum-ready-refill-ba03-20261109,148openissues viaREST2pages[100,50]=150records(2PRs),
+independentsearch148/incompletefalse; snapshotba03 retained, later1673merged79f observed.
+MANIFEST2e9ddc66bf73282e39ee69576d3f0dd3a51eb10e232c075813ffdde8bc6ec566;
+OPEN-ISSUES-ALL-PAGES/OPEN-ISSUE-METADATA/INVENTORY-PROOF/RANKED-LEDGER/381-BOUNDED-FIX-BRIEF.
+OnlyTWOdefensibleengineeringactions, no fake3/8readyclaim:
+1135 retainedUNMERGED implementation refs/remotes/origin/fix/1135-cluster-measurement-record-20261023,
+runtimefdc5b0648/evidencef1cf7d06f. RootreadEXPLICITmaintainerrulings6368171589(Oct23)
++6377277422(Oct24) typedoptionalperboundarymeasurement/provenance, known/notmeasured,
+NigeriaW4countingmovers79/1493=5.29%,netUNMEASURED; oldW5range86..106withdrawn/
+conditional226..249notsettled. Oldbodyholdsupersededbylaterexplicitrulings.
+1590currentlySOURCE-ONLYcurrentportPLAN/13curatedrecords vscurrentdocs; no remeasurement,
+no historical238P/mutants/0hashpromotedcurrent. Rootauthorizedplan; implementonlyafter
+currentport/minimalverification/sourcefreeze. PreserveSPAN/strict/data/no threshold.
+381residual exactmissingREQUESTEDMake targetwarningbeforehealthy alternate/script;
+originalderivefoodMakefirstalreadyfixed. MwiassignedLOCALsource-onlyfrozenpatch on79f,
+reuse_make_target_is_missing, retainrecipe/prereq/nested/unknownstderr/missingmakefailure,
+allabsentfinaldiagnostic/healthyYAMLnoMake/strictdirectfailures. No runtimeuntilRootreviews
+proposedsemanticexpectationupdates. NoactualcountryAPI/raw/census/GH/sharedwrites.
+1590remote381dispatchinstructionCANCELLED before submission; no duplicateworker.
+905naivevectorizationcounterexamples/4ULPstrategyneeded;1045rawinputcontract/1069explicit
+TierCrewarm/1032tmp/932CI/1509eligibility/1190carrier+thirdgate/1562same-releaseexportsemantics
+held. Tanzania1441already1488+1498; old1468/1463/1495/709/218/851closed, doNOTredispatch.
+Remaininguserchoices1575stratawiring/1190/1562/1604 held;1066nowAPPROVED.49borrowYES,
+50maizeflourYES,51NOdateclamp,48cannotinferjointinclusionfrommarginalweights unchanged.
+
 * Authoritative current checkpoint 2026-11-09T19:16:28.257116+00:00
 Goal ACTIVE/incomplete; this goal turn PROGRESS: Nigeria1670merged,851181+26pure,
 actualsource partial verification, newdraft1671, newUgandaprimaryauthority/doccandidate,
