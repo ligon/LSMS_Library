@@ -45,4 +45,5 @@ def test_existing_make_preparation_collects_the_real_source():
     record, sources = Country._make_declared_inputs(
         MetadataOnly(), 'livestock', _with_sources=True)
     assert sources == {SOURCE}
-    assert record == {'tables': {}, 'sources': {str(SOURCE): source_fingerprint(SOURCE)}}
+    # The wave hash already covers this exact source; do not duplicate it.
+    assert record == {'tables': {}, 'sources': {}}
