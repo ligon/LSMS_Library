@@ -6030,3 +6030,43 @@ This finite discovery fix adds no 2005 contribution and establishes no new
 raw/native/API parity or whole-GH1288 closure. The earlier fixed-STORAGE
 checkpoint's source-freshness/clinical limitations remain; see
 =.coder/ledger/1288-uganda-anthro-source-declarations.md=.
+
+* 2026-11-09 documentary clarification: cassava item key, not a state recode (GH #1525)
+
+The existing note remains the governing qualification: =1081/1082= are served
+as labelled, this is =not a clean swap=, and =nothing is swapped without a
+source=. Historical unit mixes, panel recurrence and purchased-row counts above
+were not remeasured for this documentary check.
+
+Own =2019-20/Documentation/unps2019_20_bid.pdf=, UBOS /Uganda National Panel
+Survey 2019/2020 Basic Information Document/ (566,821 bytes,
+MD5 =e491bd04efbd14658bd7e70050d0edfa=), supplies a narrower primary fact:
+*PDF page 16, Table 1* lists the food/beverages/tobacco consumption-item file
+=GSEC15B.dta= keyed by =hhid/CEB01=. The row alignment was checked visually.
+This supports the current driver's =CEB01= item field despite the own household
+forms' page-11 =CEB01= Description / =CEB02= Code grid; it is not authority to
+change the getter to =CEB02= or to infer either cassava state's meaning.
+
+At the current driver/helper, =CEB01= becomes =j= and the country
+=harmonize_food= table directly maps =1081= to dry and =1082= to flour.
+Only the mapping keys are integer-normalized; there is no paper-code
+underscore-removal/swap rule. A spelling change cannot supply the missing
+paper =108/108_1= to export =1081/1082= semantic bridge.
+
+BID PDF pages 8 and 30 identify /Survey Solutions/ for 2018/19 and 2019/20.
+Section 15 (page 14) gives consumption context, not that code bridge. All 38
+BID pages were read: no such food-state/export correction was found in this
+held document. Annex 1 (pages 35–37) is /unit/ codes (=108= is a medium 400g
+cup); Annex 2 (page 38) is /crop/ codes (=Cassava= =630=). Neither namespace
+may decode these food states. This is a bounded documentary finding, not a
+global absence claim or proof of the deployed CAPI roster.
+
+The cover's survey year and April 2021 PDF creation metadata do not identify
+every specific export version. =SOURCE.org= records WB catalog 3902 /
+=UGA_2019_UNPS_v03_M=; that catalog identity is not a version stamp in the BID.
+Still needed: the attributable own Survey Solutions food roster/questionnaire
+GUID + version/export specification or producer erratum connecting the printed
+fields/codes to the released fields/codes, with affected records and an explicit
+correction rule for both populations. Labels, units, Aggregate buckets, native
+values, weights and all scientific defaults remain unchanged. Whole #1525 is
+open; no native/header/API/build/cache or new statistical check ran here.
