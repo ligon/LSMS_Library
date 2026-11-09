@@ -46,6 +46,7 @@ from .recall import period_days as _period_days
 from .recall import period_refusal as _period_refusal
 from .recall import to_period as _to_period
 from .recall import attach as _recall_attach
+from .recall import _period_handoff, _take_period_continuation
 from .derivations import attach as _derivations_attach
 from .derivations import ATTRS_KEY as _DERIVATIONS_ATTRS_KEY
 from .derivations import merge_attrs as _derivations_merge_attrs
@@ -174,8 +175,10 @@ def _convert_convertible_waves(df: pd.DataFrame, country: str, table: str,
                                known_waves=None) -> pd.DataFrame:
     """The ``period=`` wave-grain degrade (GH #851): convert a SLICE.
 
-    *df* is the country's table read WITHOUT ``period=`` -- byte-for-byte the
-    frame an unconverted ``Feature`` call gets.  Keep the rows whose wave is
+    *df* is the same invocation's full unconverted, normally postprocessed
+    result, handed over privately after typed availability refusal. Country's
+    strict period guards remained active; no second method call occurred.
+    Keep the rows whose wave is
     in *convertible* and apply :func:`recall.to_period` to them, so every
     kept row is that unconverted row times its wave's factor, exactly.
 
@@ -1255,10 +1258,9 @@ class Feature:
 
         # Same contract for period= (GH #851), at the WAVE grain: {country:
         # [waves whose recall window is not established]}.  A country whose
-        # other waves convert is KEPT, restricted to those waves;
-        # `period_dropped` names the countries none of whose waves convert.
+        # other waves convert can be kept, restricted to those waves. The
+        # final warning reports survival from the actual assembled result.
         period_unavailable: dict[str, list[str]] = {}
-        period_dropped: list[str] = []
 
         # The metadata records each country's frame arrived with: population
         # (GH #603), recall (GH #851) and derivations -- see _ATTRS_CARRIERS
@@ -1291,28 +1293,33 @@ class Feature:
                             f"{self.table_name}: {name}'s method does not accept "
                             f"{key!r}; ignored for this country"
                         )
-                try:
+                if period is None:
                     df = method(**call_kwargs)
-                except PeriodUnavailableError as e:
-                    # Contract B for period= (GH #851), degraded at the grain
-                    # of the WAVE rather than the country (the labels= /
-                    # units= precedent): the window is a property of the
-                    # (country, wave) cell, and dropping whole countries would
-                    # discard GhanaLSS's six convertible waves for its one
-                    # stratified wave -- the very cells the kwarg exists to
-                    # compare.  Read the table WITHOUT period=, keep the
-                    # convertible waves' rows and convert those
-                    # (_convert_convertible_waves says why not re-call with
-                    # waves=).  Drop the country only when none converts.
-                    period_unavailable[name] = sorted(e.unavailable)
-                    if not e.convertible:
-                        period_dropped.append(name)
-                        continue
-                    df = method(**{k: v for k, v in call_kwargs.items()
-                                   if k != "period"})
-                    df = _convert_convertible_waves(
-                        df, name, self.table_name, period, e.convertible,
-                        known_waves=c.waves)
+                else:
+                    with _period_handoff(c, self.table_name, period) as handoff:
+                        try:
+                            df = method(**call_kwargs)
+                        except PeriodUnavailableError as e:
+                            # Preserve strict Country dispatch and its full
+                            # inference universe. Finish this SAME unconverted
+                            # read; never re-call the method with period=None
+                            # or a smaller wave set.
+                            period_unavailable[name] = sorted(e.unavailable)
+                            if not e.convertible:
+                                continue
+                            continuation = _take_period_continuation(handoff, e)
+                            if continuation is None:
+                                # A foreign/custom error supplied no matching
+                                # same-call result. Refuse, never retry/serve an
+                                # unscaled frame as converted.
+                                raise
+                            try:
+                                df = continuation()
+                            finally:
+                                del continuation
+                            df = _convert_convertible_waves(
+                                df, name, self.table_name, period, e.convertible,
+                                known_waves=c.waves)
                 if not isinstance(df, pd.DataFrame) or df.empty:
                     warnings.warn(
                         f"No data for {self.table_name} in {name}"
@@ -1355,14 +1362,11 @@ class Feature:
                 units_unavailable.append((name, tuple(e.missing)))
                 continue
             except PeriodUnavailableError as e:
-                # Only reachable if converting the convertible slice above
-                # raised again -- which would mean the record changed between
-                # the two reads.  Drop the country; never serve an unscaled
-                # frame.
+                # No matching continuation, or represented-wave validation
+                # failed again in the continuation/slice. Drop the country;
+                # never retry or serve an unscaled frame.
                 period_unavailable[name] = sorted(
                     set(period_unavailable.get(name, [])) | set(e.unavailable))
-                if name not in period_dropped:
-                    period_dropped.append(name)
                 continue
             except Exception as e:  # broad catch intentional: surface per-country failures as warnings
                 # Cross-country aggregation must not crash on one country's
@@ -1414,12 +1418,14 @@ class Feature:
             if not period_unavailable:
                 return result
             n_cells = sum(len(w) for w in period_unavailable.values())
-            restricted = [c for c in period_unavailable if c not in period_dropped]
+            kept_names = set(result.index.get_level_values("country"))
+            restricted = [c for c in period_unavailable if c in kept_names]
+            dropped_whole = [c for c in period_unavailable if c not in kept_names]
             fates = []
             if restricted:
                 fates.append(f"{restricted} kept their other waves, converted")
-            if period_dropped:
-                fates.append(f"{period_dropped} had no convertible wave and "
+            if dropped_whole:
+                fates.append(f"{dropped_whole} produced no converted result and "
                              f"were dropped whole")
             warnings.warn(
                 f"{self.table_name}: period={period!r} unavailable for "

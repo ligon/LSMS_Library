@@ -7446,10 +7446,14 @@ class Country:
                     # food_prices gets its own sentence (a price is not a
                     # flow); the message lives in recall.py so Feature's
                     # up-front refusal says the same thing.
-                    from .recall import PERIOD_TABLES, period_days, period_refusal
+                    from .recall import (PERIOD_TABLES, period_days, period_refusal,
+                                         _claim_period_handoff,
+                                         _offer_period_continuation)
+                    from .errors import PeriodUnavailableError
                     if name not in PERIOD_TABLES:
                         raise TypeError(period_refusal(name))
                     period_days(period)
+                    period_ticket = _claim_period_handoff(self, name, period)
                 if (volume_as_mass is not True
                         and name not in {'food_prices', 'food_quantities'}):
                     raise TypeError(
@@ -7490,31 +7494,6 @@ class Country:
                 # derived fallback can touch data (ledger 1210, sections 2/4).
                 if waves is not None:
                     waves = self._validate_waves(waves)
-                if period is not None:
-                    # GH851: metadata can refuse an unavailable declared wave
-                    # before any food/valuation DataFrame read.  Proven-absent
-                    # subsets retain GH1512's healthy empty result; a country-
-                    # builder route whose wave membership is uncertain defers
-                    # to to_period's represented-t validation after the read.
-                    from .recall import unavailable_reason
-                    from .errors import PeriodUnavailableError
-                    period_records = recall_records(self.name)
-                    period_waves = self.waves if waves is None else waves
-                    period_source = ('food_acquired'
-                                     if 'food_acquired' in self.data_scheme else name)
-                    unavailable, convertible = {}, []
-                    for wave in period_waves:
-                        why = unavailable_reason(period_records.get(str(wave)))
-                        if why is None:
-                            convertible.append(str(wave))
-                        elif self._proven_absent(period_source, [wave]):
-                            continue
-                        elif period_source in self[wave].data_scheme:
-                            unavailable[str(wave)] = why
-                    if unavailable:
-                        raise PeriodUnavailableError(
-                            country=self.name, period=period, table=name,
-                            unavailable=unavailable, convertible=convertible)
                 # Set when a derivation failed and the legacy path is being tried.
                 derive_failure = None
                 # For derived food tables, try deriving from food_acquired first
@@ -7643,6 +7622,35 @@ class Country:
                         # through to the legacy aggregation path.
                         _assert_label_targets_present(derived, map_labels,
                                                       country=self.name, table=name)
+                        def _finish_food_result(value):
+                            # BELT-AND-BRACES, and the reason matters because a
+                            # wrong one is exactly the failure CLAUDE.md corrects
+                            # for _join_v_from_sample.  Measured 2026-09-09: the
+                            # post-steps below already re-attach `attrs`
+                            # themselves (_add_market_index at country.py:2547,
+                            # _relabel_j at :2899, and `convert` likewise), and on
+                            # THIS path `v` is already an index level so
+                            # _join_v_from_sample skips rather than merging -- so
+                            # nothing in the current pipeline would drop the
+                            # tallies without this line.  It is kept anyway: the
+                            # governing rule is that `attrs` survive only when
+                            # every input AGREES (CLAUDE.md, "Panel ID Transitive
+                            # Chains"), so a future post-step that grows a second,
+                            # disagreeing input would drop them SILENTLY.  Do not
+                            # read this as "the merges below drop attrs"; they do
+                            # not, today.
+                            _val_attrs = {k: v for k, v in value.attrs.items()
+                                          if k.startswith('valuation')}
+                            reagg = name in {'food_expenditures', 'food_quantities'}
+                            value = self._relabel_j(value, j_labels, reaggregate=reagg)
+                            if market is not None:
+                                value = self._add_market_index(value, column=market, table=name)
+                            if numeraire is not None:
+                                from .conversion import convert as _convert
+                                value = _convert(value, to=numeraire, country=self.name)
+                            if _val_attrs:
+                                value.attrs.update(_val_attrs)
+                            return value
                         if period is not None:
                             # GH #851 Phase II.  Outside the except for the
                             # same reason as the relabel: a PeriodUnavailable-
@@ -7657,36 +7665,16 @@ class Country:
                             # shortfall from it (option A, @ligon 2026-10-20)
                             # and discloses it on attrs['period'].
                             from .recall import to_period
-                            derived = to_period(derived, self.name, period,
-                                                table=name, visits=fa)
-                        # BELT-AND-BRACES, and the reason matters because a
-                        # wrong one is exactly the failure CLAUDE.md corrects
-                        # for _join_v_from_sample.  Measured 2026-09-09: the
-                        # post-steps below already re-attach `attrs`
-                        # themselves (_add_market_index at country.py:2547,
-                        # _relabel_j at :2899, and `convert` likewise), and on
-                        # THIS path `v` is already an index level so
-                        # _join_v_from_sample skips rather than merging -- so
-                        # nothing in the current pipeline would drop the
-                        # tallies without this line.  It is kept anyway: the
-                        # governing rule is that `attrs` survive only when
-                        # every input AGREES (CLAUDE.md, "Panel ID Transitive
-                        # Chains"), so a future post-step that grows a second,
-                        # disagreeing input would drop them SILENTLY.  Do not
-                        # read this as "the merges below drop attrs"; they do
-                        # not, today.
-                        _val_attrs = {k: v for k, v in derived.attrs.items()
-                                      if k.startswith('valuation')}
-                        reagg = name in {'food_expenditures', 'food_quantities'}
-                        derived = self._relabel_j(derived, j_labels, reaggregate=reagg)
-                        if market is not None:
-                            derived = self._add_market_index(derived, column=market, table=name)
-                        if numeraire is not None:
-                            from .conversion import convert as _convert
-                            derived = _convert(derived, to=numeraire, country=self.name)
-                        if _val_attrs:
-                            derived.attrs.update(_val_attrs)
-                        return derived
+                            try:
+                                derived = to_period(derived, self.name, period,
+                                                    table=name, visits=fa)
+                            except PeriodUnavailableError as exc:
+                                _offer_period_continuation(
+                                    period_ticket, exc,
+                                    lambda frame=derived, finish=_finish_food_result:
+                                        finish(frame))
+                                raise
+                        return _finish_food_result(derived)
 
                 # Derive household_characteristics from household_roster
                 if (name in self._ROSTER_DERIVED
@@ -7762,6 +7750,18 @@ class Country:
                     raise derive_failure
                 _assert_label_targets_present(result, map_labels,
                                               country=self.name, table=name)
+                def _finish_legacy_result(value):
+                    # Apply relabeling to any table with a j index level
+                    if (isinstance(value, pd.DataFrame) and not value.empty
+                            and 'j' in (value.index.names or [])):
+                        reagg = name in {'food_expenditures', 'food_quantities'}
+                        value = self._relabel_j(value, j_labels, reaggregate=reagg)
+                    if market is not None and isinstance(value, pd.DataFrame) and not value.empty:
+                        value = self._add_market_index(value, column=market, table=name)
+                    if numeraire is not None and isinstance(value, pd.DataFrame) and not value.empty:
+                        from .conversion import convert as _convert
+                        value = _convert(value, to=numeraire, country=self.name)
+                    return value
                 if (period is not None and isinstance(result, pd.DataFrame)
                         and not result.empty):
                     # Only a food-derived table reaches here with period= set
@@ -7773,18 +7773,15 @@ class Country:
                     # No food_acquired is in scope here, so the ask shortfall
                     # is not measured (attrs['period'] says 'not-measured').
                     from .recall import to_period
-                    result = to_period(result, self.name, period, table=name)
-                # Apply relabeling to any table with a j index level
-                if (isinstance(result, pd.DataFrame) and not result.empty
-                        and 'j' in (result.index.names or [])):
-                    reagg = name in {'food_expenditures', 'food_quantities'}
-                    result = self._relabel_j(result, j_labels, reaggregate=reagg)
-                if market is not None and isinstance(result, pd.DataFrame) and not result.empty:
-                    result = self._add_market_index(result, column=market, table=name)
-                if numeraire is not None and isinstance(result, pd.DataFrame) and not result.empty:
-                    from .conversion import convert as _convert
-                    result = _convert(result, to=numeraire, country=self.name)
-                return result
+                    try:
+                        result = to_period(result, self.name, period, table=name)
+                    except PeriodUnavailableError as exc:
+                        _offer_period_continuation(
+                            period_ticket, exc,
+                            lambda frame=result, finish=_finish_legacy_result:
+                                finish(frame))
+                        raise
+                return _finish_legacy_result(result)
             doc_parts = [
                 f"Return {name} as a DataFrame, aggregated across *waves*.\n\n",
                 "Parameters\n----------\n",

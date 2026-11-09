@@ -91,6 +91,8 @@ lengths.
 from __future__ import annotations
 
 from functools import lru_cache
+from contextlib import contextmanager
+from contextvars import ContextVar
 from pathlib import Path
 from typing import Any
 
@@ -111,6 +113,56 @@ __all__ = [
 
 #: ``df.attrs`` key holding ``{country: {wave: RecallRecord}}``.
 ATTRS_KEY = "recall"
+
+# A private, single Feature invocation may finish the unconverted result after
+# a typed availability failure without rebuilding it. Direct Country callers
+# get the original immediate error. Reuses the ContextVar convention of
+# country._label_selection; this is not a cache or a public option.
+_PERIOD_HANDOFF: ContextVar = ContextVar("lsms_period_handoff", default=None)
+
+
+@contextmanager
+def _period_handoff(owner, table: str, period: str):
+    slot = {"owner": owner, "table": table, "period": period, "claimed": False}
+    token = _PERIOD_HANDOFF.set(slot)
+    try:
+        yield slot
+    finally:
+        try:
+            _PERIOD_HANDOFF.reset(token)
+        finally:
+            slot.clear()
+
+
+def _claim_period_handoff(owner, table: str, period: str):
+    slot = _PERIOD_HANDOFF.get()
+    if (slot is not None and slot["owner"] is owner
+            and slot["table"] == table and slot["period"] == period
+            and not slot["claimed"]):
+        # A nested direct call, even on the same owner/table/period, cannot
+        # supply the outer invocation's frame. A nested Feature gets its own
+        # context/token, restored when that invocation closes.
+        slot["claimed"] = True
+        return slot
+    return None
+
+
+def _offer_period_continuation(ticket, error, continuation):
+    if (ticket is None or ticket is not _PERIOD_HANDOFF.get()
+            or not ticket.get("claimed") or ticket.get("offered")
+            or not error.convertible
+            or error.country != ticket["owner"].name
+            or error.table != ticket["table"] or error.period != ticket["period"]):
+        return
+    ticket.update(error=error, continuation=continuation, offered=True)
+
+
+def _take_period_continuation(ticket, error):
+    if (ticket is None or ticket is not _PERIOD_HANDOFF.get()
+            or ticket.get("error") is not error):
+        return None
+    ticket.pop("error")
+    return ticket.pop("continuation", None)
 
 #: Evidence rungs, strongest first.  Mirrors :mod:`lsms_library.capability`.
 BASIS_LADDER = (
@@ -787,9 +839,10 @@ def to_period(df, country: str, period: str, *, table: str,
     every such wave and the convertible ones.  Converting the known waves and
     leaving the rest unscaled would return one column on two clocks; filling
     the unknown ones with NA would read as zero under ``sum()`` (GH #828).
-    ``Feature`` degrades over the error at the wave grain: it reads the
-    table without ``period=``, keeps the rows of ``.convertible`` waves and
-    converts those with this function.
+    ``Feature`` degrades over the error at the wave grain: a private,
+    one-shot continuation completes the same full unconverted result's
+    poststeps, then keeps ``.convertible`` rows and converts them here.
+    The original strict period request remains active; no method is re-called.
 
     Returns a COPY carrying ``attrs[PERIOD_ATTRS_KEY] = {country: {...}}``:
     the target, its length in days, the scaled column and, per wave, the

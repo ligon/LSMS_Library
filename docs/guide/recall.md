@@ -41,17 +41,20 @@ quantity, expenditure, identifier or missing-value treatment.
 `Country` raises `lsms_library.errors.PeriodUnavailableError` if a requested
 conversion cannot be established. The error names the country, table, target,
 unavailable waves and reasons, and convertible waves. No known wave is returned
-scaled alongside an unknown wave left on its original clock. A metadata-safe
-refusal precedes the data read; uncertain routes are checked against represented
-wave values after reading. Existing metadata-proven-absent subsets stay empty.
+scaled alongside an unknown wave left on its original clock. Vocabulary and
+unsupported-table refusals precede the data read. Exposure availability is
+checked on represented wave values: declaring a source does not prove it has
+rows. Empty results remain healthy even if the requested recall is unknown;
+existing metadata-proven-absent subsets also stay empty.
 
 `Feature('food_expenditures')(..., period='day')` follows Contract B: keep
 convertible wave rows, drop unavailable cells, emit one aggregate warning and
 record their names in `attrs['period_unavailable']`. If none survives, the
-existing canonical empty index remains available. A degraded country is read
-without conversion over the same requested wave universe, then sliced and
-converted. It is never re-read with a smaller wave selection to recompute
-kilogram factors. Whole-read kilogram diagnostics retain that inference scope;
+existing canonical empty index remains available. The explicit period request
+keeps Country's strict guards. On typed failure, a private one-shot continuation
+finishes the same full unconverted result's normal poststeps, then Feature
+slices and converts it. There is no second method call or smaller wave read to
+recompute kilogram factors. Whole-read kilogram diagnostics retain that inference scope;
 population, recall, sampling and derivation records describe the served slice.
 
 ## What the conversion record means

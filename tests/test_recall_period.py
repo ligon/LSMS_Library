@@ -415,6 +415,14 @@ def nigeria(monkeypatch):
                 return out
             if table in ("food_expenditures", "food_quantities"):
                 return _LEGACY_SENTINEL.copy()
+            if table == "household_roster":
+                selected = waves_present if waves is None else waves
+                index = pd.MultiIndex.from_tuples(
+                    [(w, "C1", "h1", p) for w in selected for p in ("1", "2")],
+                    names=["t", "v", "i", "pid"])
+                return pd.DataFrame(
+                    {"Age": pd.array([25, pd.NA] * len(selected), dtype="Int64")},
+                    index=index)
             return pd.DataFrame()
 
         monkeypatch.setattr(Country, "_aggregate_wave_data", fake_aggregate)
@@ -508,13 +516,52 @@ class TestCountry:
 class TestCurrentPort:
     """Current dispatch invariants over invented frames, with no constructor IO."""
 
-    def test_unavailable_declared_wave_refuses_before_any_frame_read(self, nigeria):
+    def test_nonempty_declared_unknown_wave_refuses_after_one_full_read(self, nigeria):
         c = nigeria(["2010Q3", "2018Q3"])
         with pytest.raises(PeriodUnavailableError) as caught:
             c.food_expenditures(period="day")
         assert caught.value.convertible == ["2010Q3"]
         assert set(caught.value.unavailable) == {"2018Q3"}
-        assert nigeria.calls == []
+        assert nigeria.calls == ["food_acquired"]
+
+    def test_declared_but_empty_unknown_recall_is_a_healthy_empty(
+            self, nigeria, monkeypatch):
+        c = nigeria(["2018Q3"])
+        empty = frame([], values=[])
+        calls = []
+
+        def empty_source(waves, table, **kwargs):
+            calls.append((waves, table))
+            return (_synthetic_food_acquired([]) if table == "food_acquired"
+                    else empty.copy(deep=True))
+
+        monkeypatch.setattr(c, "_aggregate_wave_data", empty_source)
+        actual = c.food_expenditures(period="day")
+        pd.testing.assert_frame_equal(actual, empty, check_exact=True)
+        assert actual.attrs == empty.attrs
+        assert calls == [(None, "food_acquired"), (None, "food_expenditures")]
+        assert "food_acquired" in c["2018Q3"].data_scheme
+        assert R.unavailable_reason(R.recall_records(c.name)["2018Q3"]) is not None
+
+    def test_feature_declared_empty_stays_canonically_empty(
+            self, nigeria, monkeypatch):
+        import lsms_library as ll
+
+        c = nigeria(["2018Q3"])
+        monkeypatch.setattr(c, "_aggregate_wave_data",
+                            lambda waves, table, **kw: frame([], values=[]))
+        monkeypatch.setattr(ll, "Country", lambda *a, **kw: c)
+        feature = F.Feature("food_expenditures")
+        object.__setattr__(feature, "_countries", [c.name])
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            actual = feature([c.name], period="day", currency=None)
+            baseline = feature([c.name], currency=None)
+        pd.testing.assert_frame_equal(actual, baseline, check_exact=True)
+        assert actual.attrs == baseline.attrs
+        assert actual.empty and actual.index.names[0] == "country"
+        assert actual.groupby("country").size().empty
+        assert R._PERIOD_HANDOFF.get() is None
 
     def test_none_adds_no_metadata_or_provider_calls(self, nigeria, monkeypatch):
         c = nigeria(["2010Q3"])
@@ -524,6 +571,7 @@ class TestCurrentPort:
             raise AssertionError("period=None must not preflight recall")
 
         monkeypatch.setattr(C, "recall_records", forbidden)
+        monkeypatch.setattr(R, "_claim_period_handoff", forbidden)
         baseline = c.food_expenditures()
         actual = c.food_expenditures(period=None)
         pd.testing.assert_frame_equal(actual, baseline, check_exact=True)
@@ -545,6 +593,23 @@ class TestCurrentPort:
         assert nigeria.calls == ["food_acquired"]
         assert actual.attrs["period_unavailable"] == {"Nigeria": ["2018Q3"]}
         assert len([w for w in caught if "period=" in str(w.message)]) == 1
+        assert R._PERIOD_HANDOFF.get() is None
+
+    def test_feature_explicit_period_keeps_current_derivation_strictness(
+            self, nigeria, monkeypatch):
+        import lsms_library as ll
+
+        c = nigeria(["2010Q3"], drop=["Expenditure"])
+        monkeypatch.setattr(ll, "Country", lambda *a, **kw: c)
+        feature = F.Feature("food_expenditures")
+        object.__setattr__(feature, "_countries", [c.name])
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            actual = feature([c.name], period="day", currency=None)
+        assert actual.empty
+        assert nigeria.calls == ["food_acquired"]  # no legacy fallback
+        assert any("Expenditure" in str(w.message) for w in caught)
+        assert R._PERIOD_HANDOFF.get() is None
 
     def test_proven_absent_subset_stays_empty(self, nigeria, monkeypatch):
         c = nigeria(["2010Q3", "2018Q3"])
@@ -577,7 +642,159 @@ class TestCurrentPort:
             c.food_expenditures(period="day")
         assert caught.value is failure
 
-    def test_uncertain_wave_membership_defers_to_represented_t(
+    def test_direct_country_failure_does_not_run_remaining_poststeps(
+            self, nigeria, monkeypatch):
+        c = nigeria(["2010Q3", "2018Q3"])
+        poststeps = []
+
+        def forbidden(*args, **kwargs):
+            poststeps.append(True)
+            raise AssertionError("direct Country availability error is immediate")
+
+        monkeypatch.setattr(c, "_relabel_j", forbidden)
+        with pytest.raises(PeriodUnavailableError) as caught:
+            c.food_expenditures(period="day")
+        assert poststeps == [] and nigeria.calls == ["food_acquired"]
+        assert not any(isinstance(value, pd.DataFrame) or callable(value)
+                       for value in vars(caught.value).values())
+        assert R._PERIOD_HANDOFF.get() is None
+
+    def test_feature_continuation_poststep_error_is_not_retried(
+            self, nigeria, monkeypatch):
+        import lsms_library as ll
+
+        c = nigeria(["2010Q3", "2018Q3"])
+        calls = []
+        failure = ValueError("literal poststep refusal")
+
+        def stop(*args, **kwargs):
+            calls.append(True)
+            raise failure
+
+        monkeypatch.setattr(c, "_relabel_j", stop)
+        monkeypatch.setattr(ll, "Country", lambda *a, **kw: c)
+        feature = F.Feature("food_expenditures")
+        object.__setattr__(feature, "_countries", [c.name])
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            actual = feature([c.name], period="day", currency=None)
+        messages = [str(w.message) for w in caught]
+        assert actual.empty and calls == [True]
+        assert nigeria.calls == ["food_acquired"]
+        assert any("literal poststep refusal" in message for message in messages)
+        assert any("produced no converted result" in message for message in messages)
+        assert not any("kept their other waves" in message for message in messages)
+        assert R._PERIOD_HANDOFF.get() is None
+
+    def test_same_full_postprocessed_reference_covers_relabel_market_fx_and_attrs(
+            self, nigeria, monkeypatch):
+        import lsms_library as ll
+        import lsms_library.conversion as conversion
+        import lsms_library.country as country_module
+
+        c = nigeria(["2010Q3", "2018Q3"])
+        food = _synthetic_food_acquired(c.waves)
+        rice = food.rename(index={"Maize": "Rice"}, level="j").copy()
+        rice["Expenditure"] = 7.0
+        food = pd.concat([food, rice])
+        original_food = food.copy(deep=True)
+        trace = []
+
+        def aggregate(waves, table, **kwargs):
+            trace.append(("read", waves, table))
+            assert waves is None and table == "food_acquired"
+            return food.copy(deep=True)
+
+        original_finalize = c._finalize_result
+
+        def finalize(df, *args, **kwargs):
+            out = original_finalize(df, *args, **kwargs)
+            if kwargs.get("currency") == "index":
+                out = out.assign(currency="NGN").set_index("currency", append=True)
+            out.attrs["valuation_trace"] = {"literal": "kept"}
+            return out
+
+        labels = pd.DataFrame({"Preferred Label": ["Maize", "Rice"],
+                               "Aggregate Label": ["Cereal", "Cereal"]})
+        monkeypatch.setattr(type(c), "categorical_mapping",
+                            property(lambda self: {"food_items": labels}))
+        original_relabel = country_module.Country._relabel_j
+        original_market = country_module.Country._add_market_index
+        original_convert = conversion.convert
+
+        def relabel(df, labels, **kwargs):
+            trace.append(("relabel", labels, tuple(df.index.get_level_values("t").unique())))
+            return original_relabel(c, df, labels, **kwargs)
+
+        def market(df, column, **kwargs):
+            trace.append(("market", column, tuple(df.index.get_level_values("t").unique())))
+            return original_market(c, df, column, **kwargs)
+
+        def convert(df, **kwargs):
+            trace.append(("numeraire", kwargs["to"], tuple(df.index.get_level_values("t").unique())))
+            return original_convert(df, **kwargs)
+
+        monkeypatch.setattr(c, "_aggregate_wave_data", aggregate)
+        monkeypatch.setattr(c, "_finalize_result", finalize)
+        monkeypatch.setattr(c, "_relabel_j", relabel)
+        monkeypatch.setattr(c, "_add_market_index", market)
+        monkeypatch.setattr(c, "_market_lookup", lambda column: pd.DataFrame(
+            {"t": c.waves, "v": ["C1", "C1"], "m": ["MarketA", "MarketA"]}))
+        # Actual pure conversion math, with a finite factor table and no date API.
+        monkeypatch.setattr(conversion, "_load_factors", lambda: pd.DataFrame({
+            "Country": [c.name], "_date": [pd.Timestamp("1900-01-01")], "FX": [2.0]}))
+        monkeypatch.setattr(conversion, "_interview_dates", lambda name: {})
+        monkeypatch.setattr(conversion, "convert", convert)
+        options = {"labels": "Aggregate", "market": "Region", "numeraire": "FX"}
+        baseline = c.food_expenditures(**options)
+        expected = baseline.loc[baseline.index.get_level_values("t") == "2010Q3"].copy()
+        expected["Expenditure"] = expected["Expenditure"] / 7
+        trace.clear()
+        monkeypatch.setattr(ll, "Country", lambda *args, **kwargs: c)
+        feature = F.Feature("food_expenditures")
+        object.__setattr__(feature, "_countries", [c.name])
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            actual = feature([c.name], period="day", **options).xs(c.name, level="country")
+        pd.testing.assert_frame_equal(actual, expected, check_exact=True)
+        assert actual["Expenditure"].tolist() == [1.0, 1.5]
+        assert actual.index.get_level_values("j").tolist() == ["Cereal", "Cereal"]
+        assert actual.index.get_level_values("m").tolist() == ["MarketA", "MarketA"]
+        assert actual.index.get_level_values("currency").tolist() == ["FX", "FX"]
+        assert actual.attrs["valuation_trace"] == {"literal": "kept"}
+        assert actual.attrs["conversion"]["to"] == "FX"
+        assert trace == [
+            ("read", None, "food_acquired"),
+            ("relabel", "Aggregate", ("2010Q3", "2018Q3")),
+            ("market", "Region", ("2010Q3", "2018Q3")),
+            ("numeraire", "FX", ("2010Q3", "2018Q3")),
+        ]
+        assert R._PERIOD_HANDOFF.get() is None
+        pd.testing.assert_frame_equal(food, original_food, check_exact=True)
+
+    @pytest.mark.parametrize("failure", [KeyboardInterrupt("stop"), SystemExit(17)])
+    def test_feature_continuation_interrupt_cleans_context(
+            self, nigeria, monkeypatch, failure):
+        import lsms_library as ll
+
+        c = nigeria(["2010Q3", "2018Q3"])
+        poststeps = []
+
+        def stop(*args, **kwargs):
+            poststeps.append(True)
+            raise failure
+
+        monkeypatch.setattr(c, "_relabel_j", stop)
+        monkeypatch.setattr(ll, "Country", lambda *a, **kw: c)
+        feature = F.Feature("food_expenditures")
+        object.__setattr__(feature, "_countries", [c.name])
+        with pytest.raises(type(failure)) as caught:
+            feature([c.name], period="day", currency=None)
+        assert caught.value is failure
+        assert poststeps == [True] and nigeria.calls == ["food_acquired"]
+        assert R._PERIOD_HANDOFF.get() is None
+
+    def test_undeclared_wave_membership_still_uses_represented_t(
             self, nigeria, monkeypatch):
         from types import SimpleNamespace
 
@@ -625,6 +842,69 @@ class TestCurrentPort:
         assert actual.attrs["keep"] == original.attrs["keep"]
 
 
+class TestHandoffLifecycle:
+    @staticmethod
+    def error(owner):
+        return PeriodUnavailableError(
+            country=owner.name, period="day", table="food_expenditures",
+            unavailable={"bad": "unknown"}, convertible=["good"])
+
+    def test_owner_identity_table_period_and_single_claim(self):
+        from types import SimpleNamespace
+
+        owner = SimpleNamespace(name="Alpha")
+        same_name = SimpleNamespace(name="Alpha")
+        with R._period_handoff(owner, "food_expenditures", "day") as slot:
+            assert R._claim_period_handoff(same_name, "food_expenditures", "day") is None
+            assert R._claim_period_handoff(owner, "food_quantities", "day") is None
+            assert R._claim_period_handoff(owner, "food_expenditures", "week") is None
+            ticket = R._claim_period_handoff(owner, "food_expenditures", "day")
+            assert ticket is slot
+            assert R._claim_period_handoff(owner, "food_expenditures", "day") is None
+            error = self.error(owner)
+            calls = []
+            R._offer_period_continuation(ticket, error,
+                                         lambda: calls.append("once") or "frame")
+            assert R._take_period_continuation(ticket, self.error(owner)) is None
+            continuation = R._take_period_continuation(ticket, error)
+            assert calls == []
+            assert R._take_period_continuation(ticket, error) is None
+            assert continuation() == "frame" and calls == ["once"]
+        assert slot == {} and R._PERIOD_HANDOFF.get() is None
+        assert R._take_period_continuation(ticket, error) is None
+
+    def test_nested_feature_scope_restores_outer_and_cannot_steal_its_offer(self):
+        from types import SimpleNamespace
+
+        owner = SimpleNamespace(name="Alpha")
+        error = self.error(owner)
+        with R._period_handoff(owner, "food_expenditures", "day") as outer:
+            ticket = R._claim_period_handoff(owner, "food_expenditures", "day")
+            R._offer_period_continuation(ticket, error, lambda: "outer")
+            with R._period_handoff(owner, "food_expenditures", "day") as inner:
+                inner_ticket = R._claim_period_handoff(owner, "food_expenditures", "day")
+                inner_error = self.error(owner)
+                assert R._take_period_continuation(ticket, error) is None
+                R._offer_period_continuation(inner_ticket, inner_error, lambda: "inner")
+                assert R._take_period_continuation(inner_ticket, inner_error)() == "inner"
+            assert inner == {} and R._PERIOD_HANDOFF.get() is outer
+            assert R._take_period_continuation(ticket, error)() == "outer"
+        assert outer == {} and R._PERIOD_HANDOFF.get() is None
+
+    @pytest.mark.parametrize("failure", [ValueError("poststep"), KeyboardInterrupt("stop"), SystemExit(9)])
+    def test_scope_clears_callback_and_token_on_every_exception_family(self, failure):
+        from types import SimpleNamespace
+
+        owner = SimpleNamespace(name="Alpha")
+        with pytest.raises(type(failure)) as caught:
+            with R._period_handoff(owner, "food_expenditures", "day") as slot:
+                ticket = R._claim_period_handoff(owner, "food_expenditures", "day")
+                R._offer_period_continuation(ticket, self.error(owner), lambda: "unused")
+                raise failure
+        assert caught.value is failure
+        assert slot == {} and R._PERIOD_HANDOFF.get() is None
+
+
 # ---------------------------------------------------------------------------
 # Feature (fake Country; no data read)
 # ---------------------------------------------------------------------------
@@ -632,7 +912,7 @@ class TestCurrentPort:
 class _PeriodCountry:
     """A Country whose food_expenditures goes through the REAL to_period over
     hand-built records, and honours ``waves=`` -- so the Feature plumbing
-    (catch, second read, slice, warning, marker, carrier) is exercised end
+    (catch, one-shot handoff, slice, warning, marker, carrier) is exercised end
     to end.
 
     ``POOLED`` makes every value depend on the wave set REQUESTED, the way
@@ -653,6 +933,8 @@ class _PeriodCountry:
 
     def food_expenditures(self, waves=None, currency=None, period=None):
         type(self).calls.append((self.name, waves, period))
+        ticket = (R._claim_period_handoff(self, "food_expenditures", period)
+                  if period is not None else None)
         present = [w for w in self.WAVES[self.name]
                    if waves is None or w in waves]
         value = 210.0 * (len(present) if self.POOLED else 1)
@@ -661,8 +943,12 @@ class _PeriodCountry:
         # monkeypatches sampling_records for this fake country
         S.attach(df, self.name, known_waves=self.waves)
         if period is not None:
-            df = R.to_period(df, self.name, period, table="food_expenditures",
-                             records=RECORDS)
+            try:
+                df = R.to_period(df, self.name, period, table="food_expenditures",
+                                 records=RECORDS)
+            except PeriodUnavailableError as exc:
+                R._offer_period_continuation(ticket, exc, lambda frame=df: frame)
+                raise
         return df
 
     food_quantities = food_expenditures
@@ -718,15 +1004,14 @@ class TestFeature:
                        ("Alpha", "w7"): pytest.approx(30.0),
                        ("Beta", "w7"): pytest.approx(30.0)}
 
-    def test_the_second_read_is_the_unconverted_table_not_a_wave_subset(
+    def test_partial_failure_reuses_the_same_full_result_without_recalling(
             self, feature):
         """Red team r1, R3: re-calling with ``waves=convertible`` moved
         non-period numbers wherever a value depends on the requested wave
-        set.  The degrade now reads the table as an unconverted Feature
-        would -- same waves, no period -- and slices."""
+        set. The degrade finishes the same call's unconverted full result
+        through its one-shot handoff, then slices. It never re-calls."""
         _call(feature(), ["Beta"], period="week")
-        assert _PeriodCountry.calls == [("Beta", None, "week"),
-                                        ("Beta", None, None)]
+        assert _PeriodCountry.calls == [("Beta", None, "week")]
 
     def test_kept_rows_are_the_unconverted_rows_times_the_factor(
             self, feature, monkeypatch):
@@ -747,7 +1032,7 @@ class TestFeature:
         _, msgs = _call(feature(), ["Alpha", "Beta", "Gamma"], period="day")
         (msg,) = [m for m in msgs if "period=" in m]
         assert "['Beta'] kept their other waves" in msg
-        assert "['Gamma'] had no convertible wave and were dropped whole" in msg
+        assert "['Gamma'] produced no converted result and were dropped whole" in msg
 
     def test_the_slice_carries_records_for_the_rows_served(self, feature):
         out, _ = _call(feature(), ["Beta"], period="day")
@@ -784,6 +1069,8 @@ class TestFeature:
         assert list(out.index.names) == [
             "country", *F._canonical_index_levels("food_expenditures")]
         assert out.groupby("country").size().empty
+        assert _PeriodCountry.calls == [("Gamma", None, "day")]
+        assert R._PERIOD_HANDOFF.get() is None
 
     def test_no_period_no_marker_no_record(self, feature):
         out, msgs = _call(feature(), ["Alpha", "Beta", "Gamma"])
@@ -791,7 +1078,12 @@ class TestFeature:
         assert "period" not in out.attrs
         assert not [m for m in msgs if "period=" in m]
 
-    def test_explicit_none_matches_the_default_frame_and_attrs(self, feature):
+    def test_explicit_none_matches_the_default_frame_and_attrs(self, feature, monkeypatch):
+        def forbidden(*args, **kwargs):
+            raise AssertionError("period=None must not establish/claim a handoff")
+
+        monkeypatch.setattr(F, "_period_handoff", forbidden)
+        monkeypatch.setattr(R, "_claim_period_handoff", forbidden)
         f = feature()
         base, base_messages = _call(f, ["Alpha", "Beta"])
         actual, actual_messages = _call(f, ["Alpha", "Beta"], period=None)
