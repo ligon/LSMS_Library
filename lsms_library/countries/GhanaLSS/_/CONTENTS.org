@@ -5414,8 +5414,10 @@ the EHCVM =plot_inputs= and EthiopiaRHS =crop_production= (GH #512).  They
 predate this convention.  Since GH #569, Feature supplies
 =plot_id='Farm-level'= for the EHCVM input tables through
 =missing_level_sentinels=; Country retains their native index without a plot
-level.  EthiopiaRHS's coarse crop table remains excluded from Feature crop
-assembly when it lacks a plot axis: crop registration does not declare that
+level.  EthiopiaRHS's coarse crop table is excluded from Feature crop
+assembly when it lacks a plot axis and is assembled alongside a canonical
+plot-grain provider.  A sole provider or providers all sharing the same reduced
+shape are retained.  Crop registration supplies no
 plot sentinel.  Neither case is changed by this documentation repair.
 
 *** =_relabel_j= passes an unmapped =j= through unchanged -- and that is pinned
