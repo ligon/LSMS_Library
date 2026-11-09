@@ -28,7 +28,7 @@ from malawi import (_plot_labor_block, assemble_plot_labor,
 WAVE = '2010-11'
 BASE = '../Data/Full_Sample/Agriculture/'
 
-d = get_dataframe(BASE + 'ag_mod_d.dta', convert_categoricals=False)
+d = get_dataframe('../Data/Full_Sample/Agriculture/ag_mod_d.dta', convert_categoricals=False)
 d_labor_positions = np.arange(len(d), dtype=np.int64)
 d['hhid'] = d['case_id'].apply(format_id)
 d['plotkey'] = d['ag_d00'].apply(format_id)
