@@ -17,3 +17,6 @@ Reuse closedaggregatefacts/source/card/normalreaderreceipts; documentationonly, 
 
 ## §6 Release
 ROOT owns independentcontentreview/GitHub/CI/merge. Whole1530 remainsopen. No tests/census needed forunhashedcountryprose; finalprefix/nonownedproof required.
+
+### Phase3 — source conservation
+OK (§§2–4): dated47-line appendix preserves exact3521-line personalprefix; entireoriginalNiger tree exact1c atba03. OnlyCONTENTS+thisledger owned; allotherbase mode/type/blob objects exact, with no executable/config/test/sidecar change. All24metadata+27numeric sealedreport members authenticated; no payload/parser/data/API/test/census replay. Existing4C/Dsourcepositions/form/code/tablefindings and contradictions untouched; twofullnativeparses/zero-rowmetadata/UIDpreflight/closed2producedloads distinguished. SourceonlyPRdraft andprefix/nonownedproof external reports/1530-niger-gate-release-documentation-20261109. Whole1530 remainsopen and ROOT owns finalreview/publication/CI.
