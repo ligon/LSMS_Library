@@ -1,4 +1,9 @@
 #+title: Current LSMS-ISA worker queue
+* Currentexecution2026-11-09T17:49:49.854173+00:00
+1669READY/CI42666328856RUNNING; maina9/67merges38closures. Rootfirstpoll+mergegreen.
+Mwi851v2freeze/1452Nigeria587metadata28894+publicclosureplan/1590D4390cohort+monitor;ONEremote41048173.
+Seehandofflatest2addendafortruecurrentstate; allolderlivesuperseded.
+
 * Latest 2026-11-09T17:47:33.180234+00:00
 Developmenta9e15b3abf4f21a2517e0f0b55fee049d910120c;67verifiedmerges/38closures;1663–1668allMERGED.
 Onlynewopen1669READY headed475/treee4faf/CI42666328856RUNNING;NEXTTURNPOLL+MERGEGREEN FIRST.

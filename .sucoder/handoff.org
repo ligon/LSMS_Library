@@ -1,4 +1,33 @@
 #+title: Current LSMS-ISA goal handoff
+* Execution updates 2026-11-09T17:49:49.854173+00:00
+RootEPR1669 openedREADY oned475,CI42666328856 verifiedRUNNING; publicationpeer/sourcegate complete.
+NEXTTURNFIRST pollthisCI+mergegreenpromptly; don'tleavegreenPRwhile doingdesign. Mainstill a9/67merges38closures.
+1437PR1668merged+a9POSTMERGEverified; latestissue/PRdescriptionsreconciled. Rootworkingbranchlastsavedc4f62a868,
+new67checkpointcommitfollowed; copyB/CURRENTmatcheslivehandoff. Sixmerges1663–1668thisturn,not5.
+
+851 v2mechanismacceptedRoot: existingContextVar-stylePRIVATEFeature-onlyone-shot bridge; matchesactualowneridentity,
+table/period/top-levelclaim+erroridentity; no publicerrorframe/knob. DirectCountryimmediatetypedfailure; Feature consumes
+existingpoststepcontinuationONCE toobtainSAMEfullunconvertednormalpostprocessedframe, slices+converts; no secondcall,
+strictguardsactive. No exposureavailabilitypreflight whereemptinessunknown; vocab/tablepreflight remains; declared-empty
+unknownrecallhealthyempty maintained. Callback/tokenclearerrors/interrupts/nestedcalls. Staticpoststepbodyinverses match968.
+Mwireviseschild/controls(relabel/market/FX/attrs/fullbuild/empty/reentrancy); pendingnewfrozen source+Rootpure-runtimegrant.
+No pytest/census/nativeactualAPIyet. Old968prototype preserved, notacceptedforstricteremptybehavior.
+
+NGA587 candidatecad481 sourcegatePH79693PASS: onefull34colparse→10operands,4582uniqueHH/41238strategyrows,
+source-native+helper/writerreturn/storageSTRICTpass. PPallotherrounds helperASTunchanged, pure31758 21PASS.
+ONEfinalmetadatafootprintLIVE owned28894 viaexactexistingdd7667/b40d collectors/privateempty, admittedbaseline60975
+c88headerpreserved/6848sourceexclusionproof atrepairR/BASELINE-MAP-ADMISSION.json. BroaderW3/APIgateNOTdone:
+food_copingjoinsv/sample; realMakecountrybuilderneedsW1–W3sources. Agentpreparesfiniteprivate allinputs/default/Make/
+Country/Feature/warmclosureplan; no actualcallsuntilRootconcretereview, no fakePP/PH-onlyclaimaswholeacceptance.
+
+Dimplementation41048173/5d658fda84c0436e93f06c47ce6b9da5 n0225 verifiedagent_execution.
+Runtimefrozen4390a52b9ad7461cab0d0198cb9c2d33099ed3f5;focused+censusUNRUN as17:46:48; authorhasstandingonecohortgrant.
+CanonicalQ/private/Shared-1051D-window-implementation-cf8/dispatch/5d658fda84c0436e93f06c47ce6b9da5/evidence/source.patch
+63546B +verification-plan/source-byte-proof. Newmodule+6meaningfulcompatibilitycompanions, notold56/E71/A78/B41bulk.
+Rootconcretesourcereview+indeppeer+CIneeded; don'tassumePASS. Managerownsjob+watcher15612.
+
+Allscientific/weight/strata/IDs/default/sourceacquisition/sharedcache/masterfencesbelowremain.
+
 * LATEST AUTHORITATIVE ADDENDUM 2026-11-09T17:47:33.180234+00:00
 This supersedes stale live/status bullets below. Goal ACTIVE/unbounded/incomplete.
 CurrentturnPROGRESS: SIXmerged1663–1668, no wholeissueclosures; total67merges/38closures.
