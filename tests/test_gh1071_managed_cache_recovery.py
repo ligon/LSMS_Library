@@ -342,3 +342,48 @@ def test_script_open_disappearance_keeps_its_existing_fatal_policy(script_wave, 
     with pytest.raises(FileNotFoundError) as got:
         w.grab_data(SCRIPT_TABLE)
     assert got.value is error and makes == [] and not path.exists()
+
+
+@pytest.mark.parametrize('route', ['normal', 'assumed-covered', 'assumed-legacy'])
+def test_country_engine_matches_original_getter_despite_pandas_option(owned, monkeypatch, route):
+    c = C.Country.__new__(C.Country)
+    c.name = 'Invented'
+    c.assume_cache_fresh = True
+    c.wave_folder_map = {}
+    monkeypatch.setattr(C.Country, 'waves', property(lambda self: ['w1', 'w2']))
+    monkeypatch.setattr(C.Country, '_table_cache_hash', lambda *a: 'expected')
+    if route == 'assumed-legacy':
+        frame = L.get_dataframe(owned)
+        _plant(owned, frame, cache_hash='expected')
+    original, engines = pd.read_parquet, []
+    def spy(*a, **kw):
+        engines.append(kw.get('engine', '<omitted>'))
+        return original(*a, **kw)
+    # A broken omission would dispatch to fastparquet. No second engine is
+    # required: actual old getter and candidate must both explicitly pyarrow.
+    with pd.option_context('io.parquet.engine', 'fastparquet'):
+        monkeypatch.setattr(pd, 'read_parquet', spy)
+        expected = C.map_index(L.get_dataframe(owned))
+        if route == 'normal':
+            got, _, reason = c._read_l2_country_cache('facts', owned, ['w1', 'w2'])
+            assert reason is None
+        else:
+            got = c._read_assumed_fresh_cache('facts', ['w1', 'w2'])
+    _exact(got, expected)
+    assert engines == ['pyarrow', 'pyarrow']
+
+
+def test_wave_keeps_omitted_engine_option(yaml_wave, monkeypatch):
+    w, path, expected, frame = yaml_wave
+    _plant(path, frame, cache_hash=expected)
+    ordinary, engines = pd.read_parquet, []
+    def spy(*a, **kw):
+        engines.append(kw.get('engine', '<omitted>'))
+        # Only payload fixture backend is supplied here, avoiding an optional
+        # fastparquet dependency. Assert the actual Wave dispatch is omitted.
+        assert 'engine' not in kw
+        return ordinary(*a, engine='pyarrow', **kw)
+    with pd.option_context('io.parquet.engine', 'fastparquet'):
+        monkeypatch.setattr(pd, 'read_parquet', spy)
+        got = w.grab_data(YAML_TABLE)
+    assert got['Sex'].tolist() == ['SENTINEL'] and engines == ['<omitted>']

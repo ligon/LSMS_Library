@@ -282,7 +282,7 @@ class TestDVCCaching:
             result = country._aggregate_wave_data(None, "test_data")
 
         mock_repo.assert_not_called()
-        mock_get_df.assert_called_once_with(cache_path, open_errors=(FileNotFoundError,), check_null=True)
+        mock_get_df.assert_called_once_with(cache_path, open_errors=(FileNotFoundError,), check_null=True, engine='pyarrow')
         mock_map_index.assert_called_once()
         pd.testing.assert_frame_equal(
             result.reset_index(drop=True),

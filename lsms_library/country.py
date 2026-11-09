@@ -5040,7 +5040,7 @@ class Country:
         def _serve_cached():
             if _recover_unreadable:
                 cached_df, read_error, observed = _read_managed_parquet_cache(
-                    cache_path, open_errors=(OSError,), check_null=True)
+                    cache_path, open_errors=(OSError,), check_null=True, engine='pyarrow')
                 if read_error is not None:
                     if observed is not None:
                         _reject_unreadable_cache(cache_path, observed, read_error)
@@ -5163,7 +5163,7 @@ class Country:
 
                 def _read_cached():
                     frame, error, observed = _read_managed_parquet_cache(
-                        parquet_path, open_errors=(FileNotFoundError,), check_null=True)
+                        parquet_path, open_errors=(FileNotFoundError,), check_null=True, engine='pyarrow')
                     if error is not None and observed is not None:
                         _reject_unreadable_cache(parquet_path, observed, error)
                         return None, covered, f'read-error: {error!r}'
