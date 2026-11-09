@@ -1,6 +1,7 @@
 # Prior-Art Ledger — GH #1495 Farm-level definition documentation
 
-**Status:** grounded before the documentation edit; verification pending.
+**Status:** bounded documentation patch complete; root independent review pending.
+**Frozen documentation commit:** `4e1da9597f6360d941db27b46586713a04be315d`.
 **Source:** `6863a6bf6a7ad1e4af1c9743fa4992f393a1e4ce`.
 **Search tier:** git + ripgrep + source/AST inspection (floor); no index refresh.
 Inherits [STANDING.md](STANDING.md), especially §§3–4, and `CLAUDE.md`.
@@ -27,7 +28,7 @@ docstring was found. Remaining prose still says the record "has no plot" and
 | `lsms_library/transformations.py:8114` | `_without_redundant_farm_level` tests keys and the sentinel, not sale/harvest content; keeps a Farm-level row only where no non-Farm-level row repeats its household-wave-crop (country when present) | Existing pure GH #1469 controls; no helper edit |
 | `tests/test_gh1469_farm_level_occurrence.py:105` | Synthetic null plot key is not the structural sentinel | Existing assertion and fixture stay exact |
 | `tests/test_gh1476_mali_tree_farm_level.py:33` | Static control checks both EAC-I producers write `FARM_LEVEL`, not null | Run this existing source-only control |
-| `Mali/2014-15/_/crop_production.py`, `Mali/2017-18/_/crop_production.py` (under `lsms_library/countries/`) | EAC-I tree records use `'plot_id': FARM_LEVEL`; numeric tree columns come from `mali.tree_crop_rows` | Read source, do not execute producers |
+| `Mali/2014-15/_/crop_production.py:142`, `Mali/2017-18/_/crop_production.py:226` (under `lsms_library/countries/`) | EAC-I tree records use `'plot_id': FARM_LEVEL`; numeric tree columns come from `mali.tree_crop_rows` | Read source, do not execute producers |
 | `lsms_library/countries/Mali/_/mali.py:623,1171` | Tree rows carry harvest and sale answers; `derive_hh_crop_harvest_total` fills or creates a Farm-level row for a multi-row crop, even without a sale | Existing implementation plus dated CONTENTS receipts; no new oracle or data replay |
 
 ## §3 Definitions & conventions in force
@@ -40,7 +41,7 @@ Full Mali `_/CONTENTS.org` read, including the TODO/WAITING convention and dated
 decisions. Concrete grounding (existing documentary receipts, not new counts):
 
 - Lines 2652–2686, GH #1476: the tree roster is household/species grain.
-  Lines 2670–2673 say scattered trees can name a parcel but "the parcel is an
+  Lines 2672–2676 say scattered trees can name a parcel but "the parcel is an
   attribute of the line"; this qualifies the schema's "has no plot" wording.
 - Lines 2680–2684: "Farm-level now means two things here: a tree row carries a
   harvest; a 2021-22 sale row (above) carries none." The historical observation
@@ -61,8 +62,8 @@ Parsed schema must be entirely equal (no descriptive-value exception planned).
 All executable Python AST, non-docstring tokens, test fixtures/assertions,
 markers and tolerances must remain exact. No new tests, skips or baseline edits.
 
-`Wave._input_hash` (`country.py:1362` onward) hashes wave/country build inputs;
-`Country._table_cache_hash` (`country.py:4516` onward) folds those hashes plus
+`Wave._input_hash` (`country.py:1354` onward) hashes wave/country build inputs;
+`Country._table_cache_hash` (`country.py:4517` onward) folds those hashes plus
 country inputs/framework closures. The edited global YAML comments are not a
 wave/country YAML input, and the test docstring is outside those inputs. Record
 the source-based hash implication separately from an unperformed hash census.
@@ -84,5 +85,38 @@ issue's older description is explicitly reconciled above; no broad reassessment.
 
 ### Phase 3 — verification
 
-Pending. Evidence lives in the dispatch's private evidence directory; final
-ledger will record exact results and limits in a separate commit.
+- **OK (anchored on §§3–4):** global YAML changes only comments. Full parsed
+  schema equality and exact non-comment bytes pass; no descriptive-value
+  exception, schema-structure change or cache-schema bump.
+- **OK (anchored on §§2–4):** only the named null-key docstring changes in Python.
+  Executable AST (docstrings removed), every other Python token and all 16
+  assertions in that file are exact. Git's full tracked diff proves every other
+  test, fixture, assertion and executable file unchanged. `transformations.py`,
+  Mali's module and CONTENTS also have exact source-byte proofs.
+- **OK (anchored on §5):** existing pure GH #1469 tests plus GH #1476's existing
+  static wave-source control: **12 passed** with `-n 2 --dist=loadfile`, thread
+  limits/build workers 1, private prepared runtime. `requires_s3` tests were
+  excluded by selection, not altered or newly skipped. Two pre-existing Google
+  dependency Python-version FutureWarnings remain in the file log/JUnit.
+- **OK (anchored on §4):** strict static API audit passed (10 kwargs documented,
+  15 hand-authored skills listed, no untracked hashed build inputs). Ran the
+  Make target's script directly with `PROJECT_PYTHON` to retain the prepared
+  interpreter; no Poetry/setup/dependency action. Five public helpers without
+  call sites are its existing informational findings, not repaired here.
+- **OK (anchored on §§4–5):** `git diff --check` passes. Package/config/data
+  realpaths match the prepared binding, credentials remain absent and private
+  data-root path inventory is unchanged; private nonsymlink L1 remains empty.
+- **Hash implication (source-based):** edited global YAML comments are outside
+  the directly hashed wave/country YAML inputs; parsed schema values are exact,
+  and the test file is outside build inputs. No cache invalidation is expected.
+  No Country/Wave hash census or shared-cache check/rewarm was performed.
+- **Limits:** no survey bytes/PDFs, producers, actual Country/Feature/table
+  builds, source/API/cold/warm campaign or full CI. Prior documentary counts
+  are cited as historical receipts only. No new GhanaLSS example or module was
+  used; existing citations remain unchanged. No independent review is claimed.
+  Root owns review/integration and any further scientific decisions.
+
+Reproduction and machine-readable proofs: dispatch evidence
+`verify_docs_only.py`, `source-byte-proof.json`, `runtime-boundary.json`,
+`private-root-closure.json`, `farm-level-controls.log`/`.xml`, `api-audit.log`,
+`verification-plan.json` and `report.md`.
