@@ -714,23 +714,3 @@ def test_explicit_provider_close_failure_keeps_handles_and_state_for_retry(tiny,
     assert fs._runtime_repo is None
 
 
-@pytest.mark.skipif(os.name == "nt" or (hasattr(os, "geteuid") and os.geteuid() == 0),
-                    reason="requires enforced POSIX read-only permissions")
-def test_original_installed_dvc_readonly_baseline_witness(tiny, request):
-    """Run separately: observed original defect, never a candidate pass."""
-    from dvc.api import DVCFileSystem
-    root, data, metadata, remote, fs = tiny
-    payload = b"amount\n41\n43\n"
-    _sidecar(root, "baseline.csv", payload)
-    _object(data / "dvc-cache", payload)
-    original = DVCFileSystem(root, config={"cache": {"dir": str(data / "dvc-cache")}})
-    try:
-        with _readonly(root):
-            before = _snapshot(root)
-            with pytest.raises(PermissionError) as caught:
-                with original.open("baseline.csv", "rb") as stream:
-                    stream.read()
-            request.node.user_properties.append(("original_exception", repr(caught.value)))
-            assert _snapshot(root) == before
-    finally:
-        original.close()
