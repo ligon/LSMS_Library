@@ -1,34 +1,22 @@
-#+title: Current LSMS-ISA worker queue
-Checkpoint2026-11-09T10:39UTC. Developmentdfaeed64;51merges/34closures. Goal ACTIVE.
-Detailed authoritative state: [[file:handoff.org]].
+#+title: Current ISA country/framework queue
+Checkpoint2026-11-09T10:59UTC;developmentdfaeed64;51merges/34closures;goalACTIVE.
+Full state: [[file:handoff.org]]. Historical archive retained unchanged.
 
-* Actual utilization
-Audit10:36UTC: ONE active local worker; TWO completed awaiting reassignment. ZERO actual
-remote workers at latest supported10:18 snapshot, consistent with current scheduler listing.
-Eight busy workers was not the current state. ROOT refilled both completed workers immediately.
+* Current work
+-1552 Nigeria: remote41040569/n0037,actualagent_execution; repeated sales diagnosis.
+-1554 Niger: remote41040568/n0037,actualagent_execution; onion dates/regions.
+-1555 Niger: remote41040570/n0039,actualagent_execution; harvest-kg unit coverage.
+-1452: approved4process Uganda anthropometry actual backend exposure, exact38d;
+7heldsources,newpresent-byte fixedv lookup only, no sample/weights/science upgrade.
+-Mwi: minimal explicit-empty wave coverage writer fix offa234; actual stale-warm defect
+reproduced; preserve legacy return policy, repair future writes and old cache invalidation.
+-1590: actual three remote results/watcher68344, not counted as implementation.
+-ROOT: CI, publication/development merges, review and decisions.
 
-* Current assignments
-- finish_1590: monitor existing CI1653/1654; deliver terminal actual checkout/count evidence.
-- finish_1452:218ledger carry PASS/generatedresidual draft done; now isolated test-only
- repair of1654 actual Malawi source-path AST assertion failure, off parentb443.
-- malawi_revision_food:218 integration5a216c27 complete; metadata0/35countryhashes only.
- Now checks prior inventory for newly unblocked country tasks after1650/1651/1652. ROOT owns GitHub.
-- ROOT: review, publish/merge todevelopment, reconcile issues, maintain queue/status.
-Three assigned local workers plusROOT; CI monitoring is not active implementation.
-
-* Delivery queue
--1653 Malawi: ready/base development/headb443/treea79e. CI42601058242 unitCANCELLED(cause unknown);
- Windows362PASS/1SKIP. Empty commit exactsource; close/reopen trigger history preserved.
--1654 Uganda: ready/stacked1653/heada91/treee2f0. CI42599665607 unitFAILED10:37UTC; WindowsPASS. Sole stale source-syntax assertion under parentMalawi;1452repairing.
- Retarget todevelopment only after1653merged. Never merge into featurebranch.
--218 residual: fivefiles+ownledger103961,32Makechecks+APIaudit/independentreviewPASS.
- Actual integrated metadata35Togo/CIVcountryhashes expected, all other fields exact; running
- preparation must prove it. Generated-skill reference separate; Afghanistanunregistered.
--1649/1650/1651/1652 all MERGED with actual tree/parent/terminalCI proofs.
-1569CLOSED;1288/218/1531 partial OPEN.
-
-* Holds
-1562 relative-order user ruling pending;1190carrier/gate,1575strata,1066replay pending.
-Production weights held. Scientific/source/unit choices remain as recorded; no inferred approval.
-1136adapter held behind defect queue. Do not repeat finished cohorts to inflate utilization.
-Full original history: [[file:archive/20261109T0730-isa-country-workers.org]].
+* Published fixes awaiting CI
+1653Malawi c0d4/treea5d4,base development;CI42603805841/unit129114586601.
+1654Uganda38d/treead23,stack1653;CI42603809484/unit129114478109.
+1655retiredcleanup a234/treecb38,stack1654;CI42604104679/unit129115511300.
+All3Windows362PASS/1SKIP; units live10:58. Retarget only after parentmerged;
+never merge featurebranch.35targetedtestcorrection+independentreviews passed.
+No claim all remaining issues resolved. Pending scientific choices remain in handoff/decisions.
