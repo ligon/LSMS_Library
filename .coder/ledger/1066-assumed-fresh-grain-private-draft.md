@@ -122,3 +122,20 @@ Original current1c missing-replay counterexamples remain preserved.
 ROOT owns GitHub/release; independent peer review remains required before
 merge. One final candidate-only existing metadata census is authorized; no
 new source/raw/API/build/corpus/fullsuite or baseline replay.
+
+## Closed selected-policy current gate
+
+Runtime1a2ecdfe4ed65702fc281599781f1ddb6e306f2c is tested94df exact
+except decision comment/module-docstring;15candidate+2baseline cases carry
+without replay. One finalmetadata session37806 actualouter0/123.270s, exact
+cleanhead/prepost and private data/config0. Original40f staging retained;
+ROOT corrected baseline to closedNGA5fca because candidate lacksD. No
+wrong-baseline comparison or secondcollector was run. Corrected map
+SHAa46be1dbc169960e965da68f1503554734f28241372b3cd24300ab7e5c25fcc2
+keeps original5fca header; currentmap SHA
+8ac1c0aa3a524191159d12197f069ba32e9976895a783938f2a8bd66cbb46a41.
+Actual0/452country/0/1903wave/0/37BTF/0/186FIF;14nonhash/keysets exact,
+18None/errors0/denials0. R1066-selected-policy-current-20261109 retains
+sourcecarry/patch and metadata comparison/receipt/correction. Finalchild
+ledger-only; independentreview pending at freeze, ROOT owns publication.
+No source/raw/API/test/baseline replay or shared-cache/registry change.
