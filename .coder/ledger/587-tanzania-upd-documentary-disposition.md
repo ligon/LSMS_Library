@@ -19,3 +19,6 @@ Reuse closed primary-page evidence and country note; add only a concise dated di
 
 ## §6 Remaining authority
 Authenticated original2008/09 household questionnaire with matching language/date/version and full routing/addenda is still needed. No code fix or automatic negative-fielding verdict follows. Whole587 remains open.
+
+## Phase3 — documentation verification
+Closed disposition manifest and all13 bound report/text witnesses authenticated; selected UPQ68–70/BID5,17,29/DDI9 contexts personally read without PDF parsing. Own appendix preserves all3108 original country lines byte-exact and keeps the earlier declaration-omits-round1 wording visible. Original-form claim, unification/redirected-skips limitation and DDI/BID version distinction appear together. Only this ledger and a48-line country appendix change; all executable/config/test/build objects are unchanged. No tests/build/census are appropriate to the unhashed documentation-only change. ROOT content review and required PR CI/publication remain pending; whole587 is open.
