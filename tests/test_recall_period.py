@@ -891,6 +891,27 @@ class TestHandoffLifecycle:
             assert R._take_period_continuation(ticket, error)() == "outer"
         assert outer == {} and R._PERIOD_HANDOFF.get() is None
 
+    def test_copied_retired_context_is_inactive_and_cannot_recover_callback(self):
+        from contextvars import copy_context
+        from types import SimpleNamespace
+
+        owner = SimpleNamespace(name="Alpha")
+        error = self.error(owner)
+        calls = []
+        with R._period_handoff(owner, "food_expenditures", "day") as slot:
+            ticket = R._claim_period_handoff(owner, "food_expenditures", "day")
+            R._offer_period_continuation(ticket, error,
+                                         lambda: calls.append("retired"))
+            saved = copy_context()
+        assert slot == {} and R._PERIOD_HANDOFF.get() is None
+        assert saved.run(R._PERIOD_HANDOFF.get) is slot
+        assert saved.run(R._claim_period_handoff, owner, "food_expenditures", "day") is None
+        assert saved.run(R._offer_period_continuation, ticket, error,
+                         lambda: calls.append("foreign")) is None
+        assert saved.run(R._take_period_continuation, ticket, error) is None
+        assert calls == [] and slot == {}
+        assert R._PERIOD_HANDOFF.get() is None
+
     @pytest.mark.parametrize("failure", [ValueError("poststep"), KeyboardInterrupt("stop"), SystemExit(9)])
     def test_scope_clears_callback_and_token_on_every_exception_family(self, failure):
         from types import SimpleNamespace

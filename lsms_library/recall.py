@@ -136,7 +136,7 @@ def _period_handoff(owner, table: str, period: str):
 
 def _claim_period_handoff(owner, table: str, period: str):
     slot = _PERIOD_HANDOFF.get()
-    if (slot is not None and slot["owner"] is owner
+    if (slot and slot["owner"] is owner
             and slot["table"] == table and slot["period"] == period
             and not slot["claimed"]):
         # A nested direct call, even on the same owner/table/period, cannot
