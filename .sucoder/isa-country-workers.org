@@ -1,4 +1,36 @@
 #+title: LSMS-ISA country workers and coordinator queue
+* Actual first replacement job and1288 execution — 2026-11-09T02:53UTC
+FirstNEWremote1468 submit CLOSED0: job41035521, dispatch52e6be8a4f7c4c4b89f61c3bdc2c6772,
+submitted02:52:17/scheduler02:52:38RUNNING.623MBcanonicalsource clone+submit298s;
+--timeout600worked. Actualreceipt undercountry-workers-refill-20261108/private/Nigeria-1468.
+Root took ownership of firstdryrun/submit after1590acknowledged no competing invocation.
+Initial system/usr/bin/python3 was3.6 and stopped on subprocess text= before any dryrun
+outputs/worker; unchanged MAIN invocation then normaldryrun0/state dry_run andactualsubmit0.
+No attempt is relabeled. Root first supportedstatus query session2521 pending atthiswrite.
+
+Mali1495docs-only andBurkina1463diagnosis packages ROOTreadFULLandSHAmembersverified;
+a59d0b667ee20bf4515ce0819a311b96116aaf998142bc22a12213f125151f6c and
+195a5186bb553e006addab30436ad2c8bfc36f430bbb2a761aa8a087a743aebe respectively.
+1590authorizedONEdryrun+ONEsubmitEACH/no furtherrootroundtrip.2CPU8G30m and4CPU8G60m,
+normalprivate641profile/freeaccount. No jobIDs yet atthiswrite; doNOTcountprepareasbusy.
+
+1288 independent1452source-onlyproposalrecommendation GRANT/no concreteblocker;
+ROOTactuallyranbothmetadata preflights0/all26operator+12source+25runtimebindingsexact,
+then ROOT-RUNTIME-GRANT9a53da99 written. ONEoriginal7d actual24caseactor NOWRUNNING,
+rootownedexecsession92658.22normative+2lateobservations, no completeacceptanceyet.
+1452monitorsordinaryoutputs/assessment; no rerun/oraclechanges. Its source-onlyreview
+sealer's laterabsenceassertion hit the already-authorizedactor creating namespaces;
+retainprelaunchvsrunning distinction, not an operatorfailure. No universalOSsandboxclaim.
+
+Malawi1190 ROOTreadFULLbrief+all6Hsidecars, explicitlyadmittedexact6heldL1 MD5/sizeverify,
+distinctprivatecopy+decodeONLY. NOacquisition/sharedwrites/G/realCountry/Feature/API or
+productionpolicy. All6staged B/private/1190-malawi-h-input-assets-20261108/inputs/00..05.dta,
+stagingmanifest679566c65878aa32220d36f7f45dcbb30f73fdbe54db2f022298fc0f795b8b82.
+Mwi firstdecode33524exit1 aftertwo successfulsource00 numeric/categoryreads:optionalJSON
+NumPyint32keyserialization failed. Originaloperator/outputs/failurepreserved. Ordinary
+serialization-onlycontinuation onfiveunreadfilesauthorized/no source00repeat;75151RUNNING,
+reports/1190-malawi-h-input-decode-continuation-v2-20261108. Typedmappingauthoritative.
+
 * PR1642 merged and GH1501 closed — 2026-11-09T02:39UTC
 Actual development29de1acf35e6eff0cf7c2d47977745fcd0bab6ab, parents[6863,8eaebb96],
 whole reviewed tree141e7950d9c5cea6e340eac7c65c51c49be41825 EXACT. CI42550500926
