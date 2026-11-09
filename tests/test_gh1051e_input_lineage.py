@@ -252,6 +252,7 @@ def test_actual_coalesce_partial_sibling_and_pre_step_self_input(h):
     h.info['Beta']['myvars'] = {'Latitude': 'lat'}
     h.scheme['Result'] = 'str'
     h.info['derived'] = {'Result': {'kind': 'coalesce_coord_bin',
+                                  'lat': 'Latitude', 'lon': 'Longitude',
                                   'inputs': ['Result', 'Latitude', 'Longitude']}}
     out = h.build()
     assert_unknown(h.records[0], required=True, inputs=('Latitude',))
@@ -265,6 +266,7 @@ def test_actual_coalesce_entirely_absent_input_keeps_original_valueerror(h):
     h.info['Alpha']['myvars'].update({'Result': 'old', 'Longitude': 'lon'})
     h.info['Beta']['myvars'] = {'Latitude': 'lat'}
     h.info['derived'] = {'Result': {'kind': 'coalesce_coord_bin',
+                                  'lat': 'Latitude', 'lon': 'Longitude',
                                   'inputs': ['Result', 'Latitude', 'Longitude']}}
     h.prepare()
     with pytest.raises(ValueError, match="'Latitude' not in DataFrame columns; cannot synthesise 'Result' from coordinates"):
@@ -349,7 +351,7 @@ def test_configuration_missing_direct_output_policy_is_unchanged(h, required, fi
         assert ('Result' in out) is fill
 
 
-@pytest.mark.parametrize('bad', [None, '', 'tmp', ('tmp',), [None], [''], [' '], [7], {'tmp': []}])
+@pytest.mark.parametrize('bad', [None, '', 'tmp', [None], [''], [' '], [7], {'tmp': []}])
 def test_malformed_derived_inputs_are_loud_before_callable_or_writer(h, monkeypatch, bad):
     calls = []
     monkeypatch.setitem(BT._DERIVED_TRANSFORMERS, 'finite', lambda *a, **k: calls.append(k))
@@ -521,3 +523,14 @@ def test_coverage_unknown_preserves_b_any_across_independent_drops_and_heals(h):
     hit, _, reason = country_gate(h)()
     pd.testing.assert_frame_equal(hit, restored, check_exact=True)
     assert reason is None and h.events == before
+
+
+def test_python_tuple_inputs_are_rejected_before_dispatch(monkeypatch):
+    # YAML sequences deserialize to lists. Exercise a Python-only tuple at the
+    # actual dispatcher rather than laundering it through safe_dump/load.
+    calls = []
+    monkeypatch.setitem(BT._DERIVED_TRANSFORMERS, 'finite', lambda *a, **k: calls.append(k))
+    frame = pd.DataFrame({'tmp': [0]})
+    with pytest.raises(ValueError, match='inputs.*list of nonempty input names'):
+        BT.apply_derived(frame, {'Result': {'kind': 'finite', 'inputs': ('tmp',)}})
+    assert calls == [] and frame.columns.tolist() == ['tmp']
