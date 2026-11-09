@@ -3307,3 +3307,75 @@ No scientific factor, unit, window, sale/state/price or default is selected;
 all live GH #1560/#1571 qualifications above remain in force. Whole GH #1529
 remains open. Durable evidence/proposals are under
 =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1529-niger-native3c-implementation-20261108/=.
+
+* 2026-11-08 -- Four onion occurrences already in the two own 2021 sources (GH #1530)
+
+Bounded native diagnosis at =a63306951177cde76de21bdcefd4026eb382f5a3=,
+not a whole-country decline verdict or an API/producer replay. Own
+=s16c_me_ner2021.dta= (MD5 =d16c402cfadc395e6a684b2bf3d768a4=) has
+16,468 physical rows and 24 columns; own =s16d_me_ner2021.dta= (MD5
+=3ac98925eb5c253b9cb6b7c473c3cce5=) has 12,232 rows and 47 columns.
+All source crops were counted before onion. The SEPARATE native cards
+=s16cq04= / =cultures__id= and =s16dq01= / =culture_utilisation__id=
+each label code 33 =Oignon=, with FOUR source occurrences in each file.
+Each own card was checked against its actual unchanged reader return on
+every column/cell. The exact current label map sends all four harvests to
+=Oignon frais=; all four have positive quantities, survive the pure tail,
+and receive their own sale on a single harvest line. No onion occurrence
+is lost to the existing full-row sale-repeat rule, a missing crop/unit,
+an all-column-null payload, or Farm-level placement in this bounded cohort.
+This is pure-helper output, not final API serving.
+
+Historical own questionnaire text captures were admitted after launch,
+without reopening a PDF. Both project PDF p.70's =16A.00= as asking about
+the =campagne hivernale 2021/2022= and routing No to Section 17; p.81
+follows Section 16A's parcels and asks for all their crops, one per line;
+p.83 transfers the preceding section's crops into 16D. The own crop annex
+(p.101) also prints =33 Oignon=. This is the instrument's literal scope,
+not an agronomic explanation of the four rows. Actual 16A gate answers
+and the collection/export mechanism are outside these two admitted DTAs;
+no 2018 source or whole-country production inference was made.
+
+Idiosyncrasies worth retaining: the form has a crop NAME (16C.05) and an
+ordinal (16C.01), neither a column of the 24-column harvest release.
+Both captured annexes print code 55 TWICE (=Anacarde= and
+=Autre (a specifier)=, accents omitted here); both DTA cards give it
+=Autre (a preciser)=. Those are source/form conflicts, not a license to
+rename catch-all rows. The existing sold-kg ONE-UML versus TOTAL conflict
+above is independently visible in these own text captures and remains open.
+
+Across all crops, 12,933 harvest occurrences survive the missing-crop drop;
+the other 3,535 lack a reader-visible crop. System versus extended Stata
+missing tags cannot be separated by the sanctioned reader's public flags.
+All 38 full-row harvest repeats are retained as distinct occurrences.
+All 47 numeric-read sale columns, including string fields, define the
+3,329 dropped sale repeats; 8,903 retained rows form 8,691 crop/unit/state
+records. Their 1,818 positive sales conserve quantity and value under
+unchanged placement (1,265 harvest lines, 553 Farm-level rows).
+There are also eight positive harvest quantities whose own flag says
+=Recolte nulle= and lost area is 100%; these literal contradictory answers
+are retained. Nothing here changes a flag, source, scientific rule or default.
+
+The frozen author is =1b72c7ca523c779ab113170dc5fa9642f5f3859e=.
+The qualified independent review at
+=c18dfe77f2430f14bfa3f97cfb161d7199c842f1= corroborates the four source
+occurrences in each file, their own-card correspondence and the selected
+current pure-helper result. Its 127 passing checks used six closed-capture
+sessions (48 pickle and 12 historical form-JSON reads), with no raw/PDF
+parse. This is not a once-only capture review or fresh reader/API evidence.
+The peer's native process exited 0, but its supervisor exited 74 on the
+evidence cap; that dispatch remains FAILED, not successful SDK completion.
+Historical-source equality in that peer is qualified by the supplied custody
+assertion and its independently measured current-source bindings.
+
+Durable full reports and command/custody receipts, outside this Git tree:
+- Author: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/private/Niger-1530-two-source-a633-v1/dispatch/d4a9425a3d2141178993c245c51c238e/evidence/report.md=.
+- Peer: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/private/Niger-1530-independent-captures-current11714/dispatch/f9bcda9948b9468c839e25005839d217/evidence/report.md=.
+- Source admission: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/reports/1530-two-source-final-admission/= and =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/reports/COMPLETED-REFILL-SOURCE-ADMISSION-20261109/1530-independent-review-ADMISSION.json=.
+Typed full sources and all-position witnesses remain private. These paths
+identify durable evidence, not diagnostic files merged into this library.
+The earlier four =Oignon frais= rows remain unexplained upstream; no 2018
+comparison or agronomic decline is established. "Only the harvest is ruled"
+and the own sold-kg ONE-UML/TOTAL disagreement remain in force. Whole GH
+#1530 remains open; the finite residual is own16A inclusion and executed
+collection/export handling, not a demonstrated crop decoder or mapper defect.

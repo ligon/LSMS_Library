@@ -5429,3 +5429,70 @@ Known matching full keys can use the existing explicit =on='plot'=, or callers
 can retain known country provenance on BOTH operands. These are caller choices,
 not an automatic recovery. Historical 14,909/37,010 source counts were not
 remeasured. This warning-only follow-up does not close the broader GH #1485.
+
+* 2026-11-09 -- Module H third purchases, mixed gifts and own question labels (GH #1190)
+
+This dated evidence qualifies, rather than replaces, the earlier
+"Representation half: done" and "ag_h36a ... is unread" / five mixed-unit
+free-seed groups remaining unserved. The bounded H and G investigations now
+read those admitted answers; they do not wire a third purchase, choose a new
+carrier or establish current public recovery. Whole GH #1190 remains open.
+
+*Attachment is a separate gate.* The independent review at
+=fe7f5e63ab944c6c9e02e5d8cc2c47ff73b87a2a= reproduces zero of two
+third-purchase groups and zero of five mixed-gift groups attachable under
+the current G single-source-observation criterion. Five groups have multiple
+G observations; two have no joint household/native-crop G key. The matching
+observation counts are 4 / 0 for the third purchases; 2 / 2 / 4 for the
+2010-11 mixed gifts, and 2 / 0 for the 2013-14 gifts. One four-observation
+group spans three known plots: distinct-plot counting is not observation
+uniqueness. Every matched target G record is distinct, not a full-record
+repeat. Raw and current 2010 repeat-policy classifications agree.
+
+The no-joint-key households do have G records, and their native crop codes
+occur elsewhere in G; neither zero is explained by a missing household or
+numeric-type mismatch in this cohort. No orphan, planting or season cause
+is inferred. Missing/zero quantities and unknown plots remain in the full
+G denominator; no positivity, Improved or known-plot filter manufactured
+uniqueness. This is attachment evidence from admitted G/H records and actual
+pure helpers, not an H value/gate choice, a full producer or Country/Feature
+result, or a count of potential served recoveries. The two third amounts
+and ten mixed-gift components remain native answers in their own units;
+no allocation, selected component, unlike-unit sum or unit conversion follows.
+
+*Own header wording conflicts with an unqualified quantity reading.* The six
+new variable-question-label assets are bound to their own held H releases:
+- 2016-17 Cross_Sectional =ag_h07a= ends with "(U)(Other Specify)" although
+  the current code treats it as purchase quantity. Both 2016 headers label
+  =ag_h38a= "(OTHER UNIT)" although current code treats it as gift quantity;
+  their b fields explicitly say UNIT. This conflicts with the unqualified
+  assertion that every H38a header says quantity; it does not establish which
+  label or binding should be changed.
+- 2013-14's H16a/b, H26a/b and H36a/b share truncated question prefixes;
+  H38a/b do likewise. Those literal labels alone cannot distinguish the a/b
+  roles. Their own unit cards and existing wiring are separate evidence.
+- 2019-20 Panel =ag_h36_1a/b= ask who in the household paid for the first /
+  second seed purchase: payer/person, not money. They cannot be substituted
+  as a third-source purchase-value field or a new value gate. The own source
+  field is =ag_h35__0= (also 2016 Panel); 2010 uses =ag_h35=.
+- 2010 H36a/b explicitly name QUANT / UNIT; 2016 Panel does too. Absence of
+  third-source fields from the 2016/2019 Cross_Sectional headers is a header
+  fact, not proof that the questionnaire never asked them. Full skip wording
+  and the unresolved truncated/contradictory labels remain unadjudicated.
+
+The independent supplement loaded exactly 12 closed native/card pickles and
+six header JSONs, with 18 unchanged physical pre/post seals and 18 typed-object
+comparisons. It added 16 meaningful controls; it did not parse original DTAs
+or rerun the earlier whole-H cohort. The historical H-only review's 210
+comparisons / 27 controls / 12 loads and lack of question labels remain a
+separate, qualified record. Failed transport/setup and late mandatory-artifact
+initialization histories remain preserved; no retroactive clean-run claim.
+
+Evidence and source pins are recorded in =.coder/ledger/1530-1190-country-notes.md=.
+Durable author G and header reports are under
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1190-three-G-attachment-diagnosis-20261109/=
+and =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1190-H-header-metadata-20261109/=.
+Full independent report:
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-workers-refill-20261108/private/Malawi-1190-G-header-private-dvc-v2/dispatch/bdb03cac106c4f9a9f0549a4c66acbd0/evidence/report.md=.
+No data, reader, API, cache, schema, source eligibility, weight, field binding,
+plot allocation or scientific default changes with this documentation.
