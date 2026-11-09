@@ -183,3 +183,27 @@ questionnaire declarations without acquisition. Any q47a-source proposal is for
 ROOT review only, with its own explicit m2 authority and no q47 unit borrowing.
 2021 remains missing/unserved/unread. Numeric extension verification is UNRUN
 at this ledger-only checkpoint; no additional permission is pending.
+
+### Own instrument extension checkpoint — 2026-11-09
+
+The manager subsequently admitted ONE private read-only own2018 questionnaire
+workbook, shared by both committed vague declarations: MD5
+`0f3d80b68800a577659f5ead1032cdf9`, 673,399 bytes. The absolute steering
+channel names the exact private copy and manifest (SHA256
+`dc9aeace332700279ac97fa9ecde974a3850997202dc370f4399773b979c8aad`).
+Inspect only the own16A GPS47/47a, measurement flag, farmer area/unit wording
+and export identifiers, with pre/post seals and existing tooling. No download,
+other-country authority, product/default/clamp edit or independent-two-forms
+claim. Instrument reading is UNRUN at this checkpoint; no permission is pending.
+
+The previously authorized SINGLE `get_dataframe` numeric call is complete,
+exit0: all9,873 rows and301 columns, index/source positions/dtypes/attrs and
+all301 missing masks retained in an immutable owner-only pickle before copies.
+The admitted DTA and retained original are unchanged. Additional call wall time
+was0.4138639532 seconds (not an internally instrumented parser-call count).
+`s16aq47a` is present on1,191 rows, all literal vague2/measurement flag1 and all
+also holding `s16aq47`; q47-only3,612, neither5,070. Flag2 and13 missing flags
+are kept distinct. These are presence counts only, not q47 unit inference.
+No header/cards/11-control rerun; the original zero-reader-counter header phase
+remains preserved as history. Instrument and final supplementary verification
+remain to be completed before a new closure.
