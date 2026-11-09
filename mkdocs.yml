@@ -67,6 +67,7 @@ nav:
   - User Guide:
       - Country: guide/country.md
       - Data Methods & Kwargs: guide/data-methods.md
+      - Recall Windows & Periods: guide/recall.md
       - Feature: guide/feature.md
       - Caching: guide/caching.md
       - Panel Data: guide/panel-data.md

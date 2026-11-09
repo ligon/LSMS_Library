@@ -3342,3 +3342,15 @@ bump. =CONTENTS.org= is excluded from cache hashes; the shared audit entry
 points are excluded too. Exact metadata hash checks belong to the task receipt,
 not a claim that the country was rebuilt. Ledger:
 =.coder/ledger/1482-1485-quantity-diagnostics.md=.
+
+* 2026-11-09 -- GH #851: column-specific declared food exposure
+
+EMC 2014 retains four seven-day expenditure asks (28 days), but only passage1
+asks quantity (7 days). The recall record now carries =Quantity: 1= under
+=n_asks_by_column=; the module count remains four. This metadata supports only
+explicit derived-table period conversion, not a source/visit/weight change.
+=period=None= preserves the recorded data; prices have no period conversion.
+A visit food-row shortfall remains a disclosed upper-bound proxy, not household
+cover status or a correction to declared exposure. The dated missing/partial
+passage and document-layout qualifications above remain in force.
+See =docs/guide/recall.md= and =.coder/ledger/851-period-api-current-port.md=.

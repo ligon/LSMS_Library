@@ -3659,3 +3659,20 @@ GH #1574 remains open; no label, stratum, weight, survey-design or default
 change follows. Closed reports under the 20261103 burst =reports/= are
 =1574-mali-bid-poppler-layout-20261109/= and
 =1574-mali-sampling-header-20261109/=.
+
+* 2026-11-09 -- GH #851: declared period conversion, collapsed EACI series retained
+
+The approved period denominator for 2014-15 is two seven-day asks, or 14
+days. This corrects recall metadata; the existing source mapper and collapsed
+public series are unchanged. Earlier sample-split wording does not establish
+a one-ask denominator for these two EACI passages. No visit axis is restored.
+The packaged record remains =ask_count_basis: declared=. Explicit period
+conversion reports =shortfall_source: no-visit-level= and no shortfall count;
+food rows cannot reconstruct household interview status. The current raw
+=s13q03c= sentinel interpretation, quantities, prices and weights are unchanged.
+
+=food_expenditures= and =food_quantities= accept an explicit target period
+under GH #851; =period=None= preserves recorded values and public grain.
+Unavailable windows raise from Country and degrade by wave from Feature.
+The evidence CSV retains this cell's variable-label rung and citation.
+See =docs/guide/recall.md= and =.coder/ledger/851-period-api-current-port.md=.
