@@ -55,3 +55,36 @@ No new scientific question. ROOT must review frozen placement, stage safeguard
 and concrete pure tests before imports/tests/API/census. Source-only work now;
 no production incidence or whole381 closure claim. Potential tagged-orchestrator
 fingerprint impact must be measured only under a later grant.
+
+## §7 Closed pure evidence / source qualification
+Frozen908274 adds only23lines at the approved shared boundary; entireCountry
+text restores6eb3 by removing that insertion. Independent1452 source PASS,
+no unresolvedP1/P2; registered/nonJSON/full/nonempty and singleton stage proof,
+inspection-fail-open/private preparation bypass independently reviewed.
+Initial ordinary focused-v1/session14914 CLOSEDouter1/18.998s:39existing
+companions PASS; newmodule collectionERROR before its13bodies because the
+fixture import lacked the existing tests. package prefix. Original log/XML/
+receipt remain intact. Sole import-line child702b3b8e6fa1dfc61309646aa09d088e7e1ddcdb
+preserves ALLproduction and testoracles. Imported helper names authenticated
+against committed GH1590 module AST before reuse (survey27/NAME21/wavecodes22/
+WAVES23), not merely assumed after broad package substitution.
+ROOT authorized only13previously unexecuted cases:focused-v2/session6370
+CLOSEDouter0/13.532s, pytest13PASS/0F/E/S/7.02s. The39passes were NOT replayed.
+Acceptance52distinct=39initial+13corrected-import, not one52PASS run. Both
+attempts preserve three exact import/cwd/countries/config/data identities,
+zero provider/network tripwire calls and private controllerdata/config0.
+No actual countrydata/provider/raw/header/API/build/census/fullsuite occurred.
+Existing unavailableprimary/config/producer/JSON failures stayed loud;
+healthy caches, strictsubset empties and originalbuilder paths were checked
+by companions/newcontrols. The emptyrequest test has a nonempty countrywave
+universe: the zero-wave FULL-universe boolguard is source-proven only, not
+claimed dynamically exercised. No new exclusion/schema/default/policy.
+
+## §8 Evidence / release boundary
+B/reports/381-unwired-table-diagnostic-proposal-20261109 contains SOURCE.patch,
+SOURCE-PROOF, SELECTION, both original/corrected attempts and their exact
+identities/tripwires; focused-v2/CORRECTION-PROOF+HELPER-BINDINGS pin the sole
+import fix. No footprint grant or census yet: final composition/impact remains
+forROOT review. No blanket no-data country shortcut/whole381 closure claim.
+This precise current-wiring RuntimeError is not an upstream-availability or
+acquisition claim; unrelated Repo/GH329 diagnostics are not globally silenced.
