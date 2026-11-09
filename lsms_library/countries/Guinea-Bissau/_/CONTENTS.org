@@ -778,7 +778,7 @@ No new download, PDF parse, microdata read or source/table campaign was
 needed for this holding; the earlier document-check evidence is reused.
 See =.coder/ledger/1575-three-public-bids-managed-ingestion.md=.
 
-* 2026-11-09 — GPS area source cards do not establish the bound field's unit (GH #1531)
+* 2026-11-09 — header-only GPS unit checkpoint (GH #1531)
 
 Diagnosis at =6d9563f7aac1e65e10e98b002ae935f1bd84c266=, with no area,
 unit, clamp or wiring change. Only the admitted private read-only copy of
@@ -823,3 +823,54 @@ concatenator lists only 2018-19. The declared 2021 s16a (MD5
 =00d948d16d402ebf8b60fa6c03763705=, 5,594,481 bytes) was missing from the
 admitted staging; its actual header remains unread. No acquisition or
 second-wave serving claim follows. See =.coder/ledger/1531-remote-task.md=.
+
+** Later authorized supplement: own instrument and distinct m2 field
+
+After that header-only checkpoint, ROOT explicitly admitted one own2018
+questionnaire workbook and one numeric read of the already-held2018 s16a.
+The prior checkpoint and its zero-reader-counter evidence remain preserved.
+No product, source binding, unit rule, clamp or default is changed.
+
+*The own instrument explicitly asks GPS question47 in hectares.*
+The single physical workbook (MD5 =0f3d80b68800a577659f5ead1032cdf9=,
+673,399 bytes; shared by both vague sidecars) has =S16a_Agri!EO5= =16A.47=
+and =EO6=: "Qual é a área da parcela (em hectares) de acordo com as medidas
+GPS?" followed by a next-parcel instruction. =K5/K6= identifies farmer
+question9, permitting hectares or square metres with the same1/2 unit codes.
+=EL5/EL6= identifies GPS-measured question45, Sim/Não, skipping to48 for Não.
+
+This supplies hectares authority for the instrument's GPS question47,
+alongside the DTA's explicit m2 label for the distinct =s16aq47a=. The
+instrument's16A cells, amendment notes, exact export-identifier search,
+defined names and relevant comments provide no =s16aq47=/=s16aq47a= export
+definition,47a question, or transformation/relationship between these fields.
+Numbering and wording support the question-level link; they do not document
+an export conversion or authorize classifying any bound-q47 rows as mixed.
+No unit is borrowed from the farmer estimate or transferred between GPS fields.
+
+*The added numeric read is presence-only.* One sanctioned =get_dataframe= call
+returned all9,873 source rows and301 columns; every original row/index/source
+position/dtype/attr and all-column missing masks were retained in an immutable
+owner-only pickle before analytic copies. Both the admitted DTA and the
+workbook match their pre/post seals. No DTA re-read or header-card rerun.
+
+| source field presence | rows |
+|-----------------------+------|
+| both =s16aq47a= and =s16aq47= |1191|
+| =s16aq47= only               |3612|
+| =s16aq47a= only              |   0|
+| neither                     |5070|
+
+All1,191 =s16aq47a= observations are in literal vague2 and GPS flag1. Their
+farmer-unit codes are1 on442 rows and2 on749; those codes describe the farmer
+estimate, not the GPS field. GPS flag2 (5,057 rows) and missing flags (13)
+remain distinct; neither has a present GPS-area field. These are source
+presence counts, not a sample join, ratio, unit inference or magnitude audit.
+The added =get_dataframe= call took0.414 seconds wall time; this is not an
+instrumented count of its internal parser calls or a performance benchmark.
+
+The known-unit =s16aq47a= can support a ROOT-reviewed proposal for its own
+measurement with the exact m2-to-hectare factor1/10000. Its integration with
+the existing GPS/farmer rule, and the export relationship to question47,
+remain for review; no producer/candidate table is changed. The missing2021
+actual header and registered-but-unwired qualification remain unchanged.
