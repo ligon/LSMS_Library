@@ -17,3 +17,10 @@ Promote exactdiagnosis26cases toacceptedregressions byexplicitsoftclassset addit
 
 ## §6 Limits
 OtherSDK/TLS/aiohttp/requests types unmeasured/unadmitted; not whole1051closure,1051B separatelyowned. Frozen diagnosticbranch/report preserved unchanged; implementation has separate receipts.
+
+## Phase3 — frozen implementation and actual verification
+Runtime1f8dd0cdc4150feedd4e0bd028703149b5bddd83. Fullcountry.py byteinverse removesonly3imports+5tuplemembers; everyotherCountry/WavemethodASTexact224. Existing1463ALLassertASTs exact, intentionalConnectionClosedError→HTTPClientError parameteronly. Actualdiagnosisef05a989 history preserved unchanged. No decoder/retry/probe/CIV/INDEX/carrier/config/schema/exclusion change.
+
+ONEfocused90308 CLOSED0/78uniquePASS0F/E/S,32.60pytest/39.70outer:28new(26diagnosis-derived+2formatterboundary),29existing1463,21pure675; exact2realCIV675tests excluded/no realdata.3durable MAIN/checkout identities, cleanhead/private top-levelconfigdatafiles0. Invented CSV/privateL1/L2 writes intentional.5secondarytypes nowunavailable+required/optionalfooters; primaryidentity/configguard/programmerTypeError/EIO/PermissionError andonce-per-source/keymemos conserved. No universalnetworkclosure claim.
+
+ONEfinalmetadata6390 CLOSED0/125.10 on1f8dd, closed224header/map reused(no baseline replay). Actual452country-table/1885wave/37BTF/0FIF differences; allkeysets/nonhash/public/overrides/18None exact/errors0/denials0/configdatafiles0. Broadsharedgrab_data hashcost disclosed; no schemabump/exclusion/sharedrewarm. Candidate map6096ec986ce8d5c8a34be4f40fffb33c1cd8aa945e2f78fe362ee2ee26233dcb. Finalledgerchild preservesallnonledgerobjects exacttested/hashedhead. R=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1051A-secondary-outage-degrade-20261109; remoteindependentreview via1590/ROOTrelease pending. Whole1051notclosed.
