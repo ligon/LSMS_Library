@@ -9358,6 +9358,10 @@ def _drop_record(wave: str, sub: str, exc: Exception, paths: list[Path],
                  supplies: Any) -> dict[str, Any]:
     """One dropped sub-df, classified (GH #675).
 
+    Multi-file unavailable drops also carry ``files``: ordered, deduplicated
+    tracked paths whose L1 blobs were absent. Legacy single-file stamps keep
+    their original shape; old ambiguous multi-file stamps are not migrated.
+
     ``kind`` is ``config`` -- with ``cause`` ``missing-column`` (a ``KeyError``:
     the file loaded but lacks a column the YAML names) or ``no-such-source``
     (the ``file:`` names no file on disk AND no ``.dvc`` sidecar: a typo'd path)
@@ -9367,22 +9371,38 @@ def _drop_record(wave: str, sub: str, exc: Exception, paths: list[Path],
     the file readable, rebuild, drop again and trip the GH #920 repeat
     detector every process.  Config drops are fixed at their source (#1050).
     """
-    norm = [Path(os.path.normpath(p)) for p in paths]
+    norm = list(dict.fromkeys(Path(os.path.normpath(p)) for p in paths))
+    tiers = {p: source_tier(p) for p in norm}
     if isinstance(exc, KeyError):
         kind, cause = "config", "missing-column"
-    elif not any(source_tier(p) for p in norm):
+    elif any(tier is None for tier in tiers.values()):
         kind, cause = "config", "no-such-source"
     else:
         kind, cause = "unavailable", None
-    # Name the file that failed: the first with no source, else the first.
-    target = next((p for p in norm if source_tier(p) is None), norm[0])
+    # Retain the legacy representative file, including for older readers.
+    target = next((p for p in norm if tiers[p] is None), norm[0])
     try:
         rel = target.relative_to(countries_root()).as_posix()
     except ValueError:
         rel = str(target)
-    return {"wave": wave, "sub": sub, "file": rel, "kind": kind, "cause": cause,
-            "error": f"{type(exc).__name__}: {exc}"[:300],
-            "supplies": [str(c) for c in (supplies or {})]}
+    record = {"wave": wave, "sub": sub, "file": rel, "kind": kind, "cause": cause,
+              "error": f"{type(exc).__name__}: {exc}"[:300],
+              "supplies": [str(c) for c in (supplies or {})]}
+    if kind == "unavailable" and len(norm) > 1:
+        # GH1051(B): get_data stops at the first failed file, but the whole
+        # subframe is dropped. Inspect all declared sidecars/L1 paths only;
+        # never fetch or parse while recording this evidence.
+        from .local_tools import _dvc_cache_path
+        missing = []
+        for path in norm:
+            if tiers[path] == "dvc" and _dvc_cache_path(path) is None:
+                try:
+                    missing.append(path.relative_to(countries_root()).as_posix())
+                except ValueError:
+                    missing.append(str(path))
+        if missing:
+            record["files"] = missing
+    return record
 
 
 def _file_wave_drops(country: str, table: str, dropped: list[dict],
@@ -9475,8 +9495,19 @@ def _degraded_cache_verdict(drops: Any, key: tuple) -> tuple[str, str | None]:
         return "complete", None
     if key in _DEGRADED_ATTEMPTED:
         return "serve", None
-    healed = sorted({d.get("file") for d in degraded
-                     if d.get("file") and _probe_source(str(d["file"]))})
+    healed = set()
+    for drop in degraded:
+        if "files" in drop:
+            sources = drop["files"]
+            # Do not let malformed metadata or vacuous all([]) claim healing.
+            if (not isinstance(sources, list) or not sources
+                    or not all(isinstance(p, str) and p for p in sources)):
+                continue
+        else:
+            sources = [str(drop["file"])] if drop.get("file") else []
+        if sources and all(_probe_source(path) for path in sources):
+            healed.update(sources)
+    healed = sorted(healed)
     if not healed:
         return "serve", None
     _DEGRADED_ATTEMPTED.add(key)
@@ -9509,17 +9540,30 @@ def _warn_degraded_serve(country: str, table: str, drops: Any,
     missing = tuple(sorted({c for d in degraded for c in d.get("missing_required") or []}))
     missing_optional = tuple(sorted(
         {c for d in degraded for c in d.get("missing_optional") or []}))
-    files = tuple(sorted({str(d.get("file")) for d in degraded}))
+    locations = []
+    multifile = False
+    for drop in degraded:
+        sources = drop.get("files")
+        if (isinstance(sources, list) and sources
+                and all(isinstance(p, str) and p for p in sources)):
+            locations.append(sources)
+            multifile = True
+        else:
+            locations.append([str(drop.get("file"))])
+    files = tuple(sorted({path for sources in locations for path in sources}))
     detail = "; ".join(
-        f"wave {d.get('wave')}: sub-df '{d.get('sub')}' ({d.get('file')}) "
-        f"-> {_drop_missing(d)} [{d.get('error')}]" for d in degraded)
+        f"wave {d.get('wave')}: sub-df '{d.get('sub')}' ({', '.join(sources)}) "
+        f"-> {_drop_missing(d)} [{d.get('error')}]"
+        for d, sources in zip(degraded, locations))
+    status = ("and those required sources have not all been restored to this "
+              "cached build in this process. " if multifile else
+              "and that file still cannot be fetched in this process. ")
     where = f"{country}/{wave}/{table}" if wave else f"{country}/{table}"
     warnings.warn(DegradedCacheWarning(
         f"{where}: serving a cached table WITHOUT declared "
         f"{_describe_missing(degraded)}.  The build that wrote {path} could "
         f"not read {', '.join(files)} and dropped it (the GH #515 "
-        f"optional-sub-df fallback), and that file still cannot be fetched in "
-        f"this process.  It will be rebuilt automatically by the first process "
+        f"optional-sub-df fallback), {status} It will be rebuilt automatically by the first process "
         f"that can fetch it from disk or the DVC blob cache; `lsms-library "
         f"cache clear --country {country}` forces a rebuild now (GH #675).  "
         f"Detail: {detail}",
