@@ -1,4 +1,4 @@
-"""PRIVATE GH1066 proposal: stored audit replay, pending maintainer choice.
+"""GH1066: selected stored audit replay and normal strict policy.
 
 Fresh interpreters, tiny invented parquets, actual normal/assumed read gates.
 No normal Country constructor, country metadata, source/provider or build.

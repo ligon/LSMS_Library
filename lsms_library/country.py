@@ -5073,7 +5073,7 @@ class Country:
                 covered = read_parquet_cache_waves(parquet_path)
 
                 def _replay_audits():
-                    # GH #1066 draft: replay stored evidence like the normal
+                    # GH #1066: replay stored evidence like the normal
                     # read gate, without asserting freshness or completeness.
                     # Clear both ledgers before a strict grain report can raise.
                     _GRAIN_LEDGER.pop((self.name, method_name), None)
