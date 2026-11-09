@@ -510,7 +510,7 @@ class RecallRecord(dict):
             wave=wave,
             recall_days=_num("recall_days", float),
             n_asks=_num("n_asks", int),
-            n_asks_by_column=data.get("n_asks_by_column") or None,
+            n_asks_by_column=data.get("n_asks_by_column"),
             ask_count_basis=data.get("ask_count_basis") or "unknown",
             basis=data.get("basis") or "not-recorded",
             recall_verbatim=data.get("recall_verbatim") or None,
