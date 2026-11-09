@@ -4650,3 +4650,51 @@ silently chosen as a new harvest/default rule. The export-column bridge,
 source compliance and reason for the historical unmatched rows remain open.
 No old row/count/capture experiment was replayed, no harvest is allocated to
 plots, and section 12 Q3, grams/Birr and other #1570 residuals are unchanged.
+
+* 2026-11-09 -- W1/W2 harvest and sale component authority (GH #1570)
+
+Own W2 PH headers distinguish harvest quantity =ph_s9q04_a= from its
+14-code unit selector =ph_s9q04_b=; the latter is not a gram component.
+In =sect11_ph_w2.dta=, sale quantity has separate =ph_s11q03_a= (Kilo)
+and =ph_s11q03_b= (Grams), while total sales value is the single
+=ph_s11q04= (BIRR); no =ph_s11q04_b= is in that file's name inventory.
+These are own export metadata, not an instruction to combine partial answers.
+
+The additional W2 harvest field =ph_s9q04_b_other= is a 40-character
+other-specify string. The label of =ph_s9q04_b_cf= is “Conversion factor
+unit code (for merging with Crop_CF_Wave2)”: its 30 code-label choices
+identify conversion-table UNIT CODES, not per-row numeric kilogram factors.
+Table values, actual code correspondence and applicable conversion coverage
+were not measured. This does not contradict the earlier no-per-row-factor
+caveat or authorize a factor join; the separate lookup remains under review.
+
+The own W1 PH form =2b_Post_Harvest_English.pdf=, PDF p6 (section 9 Q12),
+prints harvest KILO/GRAM columns. PDF p10 (section 11 Q3/Q4) prints the sold
+KILO/GRAM pair and one total-value BIRR column, including in-kind valuation.
+No separate decimal/cents box or partial-component blank rule was observed.
+The released W1 labels still distinguish Kilos/Grams and BIRR/BIRR Decimal.
+Restored manual PDF p18 (printed p17, section 3.16) says no cents/round to
+Birr in general coding guidance with household examples; agriculture PDF p83
+(printed p82) says record sold quantity in kilograms and sales value in Birr.
+Their relation to the released BIRR Decimal field remains unresolved: neither
+a decimal denominator, blank-as-zero nor a data-rounding rule is selected.
+
+Keep the existing scoped tensions: “It adds no row” concerns the attachment
+helper, while the later Farm-level sale carrier has no harvest quantity;
+“=Quantity_sold= on a §9 row stays as it is: only where the sale's unit equals
+=u=.” Separate =Unit_sold= and holder identity remain essential. Multiple
+holders can reuse parcel numbers, and W2/W3 =household_id2= is not silently
+substituted for =household_id=. No sale becomes a harvest through this note.
+
+Version bindings: W2 section 9 MD5 =4795aa126d75569c77178231a61516ce=,
+section 11 =d74b4bd87496d6d98290a0a058e2355d=; own W1 PH form MD5
+=d9332d9f8332c8f25a9e7ee2030bf2be=, SHA256
+=eed6a8b9d2bd1995fcbd3b0a60a6a3a724b5f71430d75178597c47fdb1a74276=.
+The restored manual retains SHA256 =e1fb422a6a2fb02f5743766410bd68230322b8d375d294299b1921ae775ea344=.
+Evidence: =B/reports/1570-component-metadata-plan-current1c1ef-20261109/=
+with =header-results/=, =ph-pages/= and =additive-v2/=; B is the burst root
+recorded in =.coder/ledger/1570-component-authority-documentation.md=.
+The original PDF6/11/12 stage did not reach sale Q3/Q4; the separately
+recorded PDF9/10 stage did. Both receipts and page rasters are retained.
+Three header-only contexts read no records. No source-value effect, row-loss,
+harvest allocation, crop-window or GH #1457 policy conclusion follows.
