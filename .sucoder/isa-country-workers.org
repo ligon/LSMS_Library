@@ -1,22 +1,23 @@
-#+title: Current ISA country/framework queue
-Checkpoint2026-11-09T10:59UTC;developmentdfaeed64;51merges/34closures;goalACTIVE.
-Full state: [[file:handoff.org]]. Historical archive retained unchanged.
+#+title: Current LSMS-ISA worker queue
+Checkpoint2026-11-09T13:12:34+00:00;development86077a65;56merges/35closures;goalACTIVE.
+Fullcurrentstate [[file:handoff.org]]. Fullhistoricalarchive preserved.
 
-* Current work
--1552 Nigeria: remote41040569/n0037,actualagent_execution; repeated sales diagnosis.
--1554 Niger: remote41040568/n0037,actualagent_execution; onion dates/regions.
--1555 Niger: remote41040570/n0039,actualagent_execution; harvest-kg unit coverage.
--1452: approved4process Uganda anthropometry actual backend exposure, exact38d;
-7heldsources,newpresent-byte fixedv lookup only, no sample/weights/science upgrade.
--Mwi: minimal explicit-empty wave coverage writer fix offa234; actual stale-warm defect
-reproduced; preserve legacy return policy, repair future writes and old cache invalidation.
--1590: actual three remote results/watcher68344, not counted as implementation.
--ROOT: CI, publication/development merges, review and decisions.
+* Actual assignments/status
+-ROOT:review/publication/CI/developmentmerges/issueprecision.
+-1452:1658CIevidence+Ethiopialivestockfullyheldplan/authorized4phaseactual, plus closedMalawi
+currentpacketreview whenfree. Ethiopiaactualhandle notyetreported; no readiness-asexecution.
+-Mwi:Make-onlyMali completion85125 on860 (defaultsuccessretained/originalMake480stimeout
+preserved); separate1658test-onlyno-vpinrepair Wfix-1658-native-no-v-fixture-20261109.
+-1590:correctedMalawi41041286 result/SDK74qualifiedadmission; namedGitNexusregen9102 and
+sourceoutputvalidation. Toolcompute is not a countryagent. CorrectedMalawiactualfinished:
+4children0/2strictP4F/expandedall6P, not strictparity. Oldfailed7f captureloss preserved.
+No claim8busy; oldthreecountrydiagnosisworkers allterminalandtheirreviews complete.
 
-* Published fixes awaiting CI
-1653Malawi c0d4/treea5d4,base development;CI42603805841/unit129114586601.
-1654Uganda38d/treead23,stack1653;CI42603809484/unit129114478109.
-1655retiredcleanup a234/treecb38,stack1654;CI42604104679/unit129115511300.
-All3Windows362PASS/1SKIP; units live10:58. Retarget only after parentmerged;
-never merge featurebranch.35targetedtestcorrection+independentreviews passed.
-No claim all remaining issues resolved. Pending scientific choices remain in handoff/decisions.
+* Delivery
+1653/1654/1655/1656/1657 allMERGED,actualtrees/parents/fullCIverified.
+1554documentaryinvestigationCLOSED;1552/1555/1288/218/1529partialOPEN.
+PR1658nativeNiger3B/3D 07db/tree8d405 base860:26distinctfocused+actual768x26/6192x12/
+APIaudit/metadata/independentPASS. FullCI failedsoleobsoletehistorical8 no-vsettest;Mwi
+repaironlyshippedexpected8+new2,keepfallback/version-skew/productunchanged, rerun3sourcefree
+modules. ROOTwillFF/pushcorrectedhead/CI. No actualsource/censusreplayfortest-onlychange.
+Allscientific/productionweightchoices preserved;seehandoff/decisions. No master/sharedrewarm.
