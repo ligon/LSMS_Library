@@ -37,3 +37,14 @@ cycle treatment remain unchanged.
 Append a dated short country finding, then prove exact prefix and every other
 tracked mode/type/blob. No tests, census, raw/PDF parse, API/build/cache work is
 appropriate for this prose-only delivery. ROOT owns independent review/publication.
+
+## §6 Phase 3 — documentary conservation
+
+Dated country note committed at `45c1f94a4de6e9758bf2c4cce52f4f37cd563300`.
+The original3381lines/227984bytes remain an exact prefix;39lines append only.
+All19198nonowned tracked mode/type/blob objects are exactwriter2bc8; whitespace
+check passes. Existing scientific statements/rules and every other source path
+are untouched. No runtime/tests/census/raw/PDF/API/build/cache work was performed.
+External source proof, exact diff and PR draft live in
+`reports/1554-niger-onion-date-documentation-20261109/`.
+ROOT review/publication/required CI remain pending; this is not their acceptance.
