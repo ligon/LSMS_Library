@@ -1,4 +1,109 @@
 #+title: LSMS-ISA country workers and coordinator queue
+* Authoritative checkpoint — 2026-11-09T05:59UTC — goal ACTIVE / PROGRESS
+Previous goal turn made PROGRESS: PR1644 merged11714b185fe2c90f1bc6c60164aa40d358acf0f3,
+GH1495 closed;43 sweep development merges/31 closures. This turn adds1463 recovered author,
+independent10 controls/API/metadata gates and draft1646; actual remote refill reached8; source
+investigations completed and1288CI failures now have reviewed test-only corrections underway.
+No master, shared rewarm, production weights or producer contact. Current development11714.
+
+1288 PR1645 headc821: CI42566311410 FAILED20/12949PASS/5649SKIP/4X in1007.20s;
+WindowsPASS. All18622collected: author46functions/132cases, portable9functions/24cases.
+Do not claim132author allgreen. Two failures are same4helper fixture fingerprint mismatch;
+other18 phase/sideeffect/structural test assumptions. Full20unabridged sections/matrix/proposal
+in1288-current-release-gates-20261109/GITHUB-RELEASE; triagemanifest0b57039d.../23members.
+ROOT read proposals and approved TEST/FIXTURE-ONLY correction, not product changes.
+1452 owns author2+strictrecipe modules in worktrees/fix-1288-own-ci-test-contracts-20261109;
+ledgerFIRSTeb2398903bbc474d94a68ebb7f85c7a4d7b727a2; implementation not yet frozen/runtimeUNRUN.
+Restore4originalfunctions before native15/25 seed/hash, clear registry memos at fixturestart,
+afterrestore and teardown; preserve all payload/provider/Other oracles. Split prep failure
+from real countryrecipe failure after healthy privateprep; preserve original causes/stderr,
+no recovery after failed countryrecipe and no live dependency mutation.
+Mwi sixother test modules source87f054a466625a4fae61e411fa3f934639f4cda5:75focusedPASS/0skip,
+158.00spytest/165.986swrapper, no product changes. ROOT personally reviewed allsixdiffs:
+exact2dynamicentrypoint pins; GH809 actualreadgates/callers +new no-write freshhit; GH920 once
+perexclusive descent; Ugandaincome11/22/allwaves +original live sibling bytes/mtime/coverage;
+NigeroriginalprepCPE1/order/no live writes; subsetspecificrefusal. Finalledger seal pending.
+Do not replay75 unnecessarily. Mwi will review1452 fixes; current fullCI remains mandatory.
+Both PR public bodies now disclose failed dependency/test corrections. 'FIF' means FRAMEWORK-
+IMPORT fingerprint, not Feature interface; API is measured separately.
+
+1463 original843522bf72751df961217b79ecb0a1d7d7df2e82 /a633 exact import+except EndpointConnectionError,
+primary bare raise and675secondary/config policy preserved. Worker41036558 native0/supervisor74
+remains FAILED because four artifacts used1463-prefix; declared project outputs recovered by
+byte-exact aliases, no rerun. Manager admission Q/reports/1463-production-artifact-name-recovery.
+Author29newPASS+59companionsPASS separate runs; initial setup/assert failures preserved.
+Mwi independent10PASS after wrong tripwire-owner setup10errors; sealeda460bc4e.../16files.
+ROOT verified all16 plus actual v2JUnit/source inverse; first ROOT check selected retained
+failedv1 XML and stopped, correctedselection thenPASS; no replay.
+Current ordinarymerge4d5cccd4ed41634a5fe6642f436709331e8753ec parents[c821,843], whole union19170
+leaves/entirecountryexactc821+2additions. DraftPR1646 depends1645, CI42567640884 pending/known
+bad ancestor; no merge. API0/10.386s, hash0/127.156s measured450table/1877wave/35BTF changes,
+0FIF,18None andALLnonhashfields INCLUDINGcollectortrace exact versusc821625778 map.
+Newmap2275f57f9e0620a0f72739a9a3b751b207c922c3212c81c66507097f631f039f;
+FINAL-MANIFEST823902bd.../21files ROOTverified; ROOT-API-METADATA-ACCEPTANCE saved.
+After1288testcorrections, restack1646 preservingendpoint2lines; do not rerun metadata if
+wholekernel/config conservation proves test-only carry. Corrected exact-headCI stillneeded.
+
+1454 fingerprint SUBTASK only (otherpolicyitemsOPEN): Mwi source878704e236c288000eea49d58eb9e3ef6208a160
+ledger-only overf450039e813eca991f5845e9c3f55128c8fa3736, ordinaryFS published. Tiny countrymodule
+_apply_build_categorical_mappings delegates unchangedCountry mapper; EHCVM localfunctionimport
+exposes actual mapper/helpers via EXISTING closure resolution. No registry/schema/config/tag/
+mapper semantics changes. ROOT approved design;6new+150purecompanionsPASS/0skip; finalmanifest
+eca1239f... . Wholemetadata footprint UNMEASURED. 1452 independent source review queued after
+1288sourcefrozen. Integrate oncurrent1463 later, then measuredfullmetadata/API/CI. Do notclose
+whole1454 or implement size factors/synonyms/parser policy with this dependency repair.
+
+Remote actual8productive phases confirmed05:47:32 by supportedSDK+freshheartbeats; this is
+historical observation, NOT permanentcurrentcount. Rolling registry updatedevery60s underQ/
+reports/ROLLING-ACTUAL-STATE.json, manager1590. Jobs initially active:41036796Malawi1190,
+41037017Pakistan1440,41037018Senegal1519,41037016GhanaSPS905,41037015Uganda1000,
+41037117Ghana1122docs,41037118Uganda1525authority,41037119shared1454parser/comment diagnosis.
+Malawi/905 subsequently FINISHED; exclude frombusy. Replacement Niger1530independent41037246
+submitted; no count asproductive untilphaseconfirmed. Next1190carrier/gate DESIGN ONLY queued.
+Successful ordinary private-DVC profile now reusable; routine integrity/dryrun/onesubmit
+within authorized scopes needs no bespokeROOTreview. All5canonical artifact filenames explicit.
+Knownfailedjobs/protections preserved. No nativehome/state/transcript/SQLite/observerbodyreads.
+
+Niger1530 raw diagnosis41036618 SUCCEEDED0/0; head1b72c7ca523c779ab113170dc5fa9642f5f3859e,
+Q/reports/1530-two-source-final-admission manifestec6dbc4f... . ROOT read FULL19k report.
+Own2021s16c/s16d each4code33Oignon positions, unchangedmapping/helperretainall4/onesaleeach.
+No API/finalserve/2018comparison/countforcing/upstreamcauseclaim. Sixfullpayloadparses+2header
+opens disclosed; initialnumpyJSONkey failure retained, savedfirstsource notreread. Ownhistorical
+forms establish16A rainy2021/22 gate scope ONLY; gateanswers/exporthandling UNREAD.55Anacarde/
+Autre andsoldkgperUML-vs-total conflicts quoted. Independent job41037246 admits10sealed assets
+14,704,309B (8typednative/card/header returns+2formtextcaptures), no DTA/2018/redecode/API.
+Source/data conservation andbounded4onion finding require independent acceptance before docPR;
+whole1530 OPEN for upstream discriminator. Source/code unchanged.
+
+Malawi1190 independentG/header replacement41036796 SUCCEEDED0/0, headfe7f5e63ab944c6c9e02e5d8cc2c47ff73b87a2a,
+Q/reports/1190-G-header-independent-final-source-admission manifest15626e96... . ROOT read full
+report.18inputs eachonce/physical+typedpostseals exact;62,643completeHkey-view checks agree.
+0/2thirdslot+0/5mixedgift eligible:5multiG,2nojointG;16NEWcontrolscenariosPASS. No old210/27
+replay/API/productionmeasurement. CurrentCONTENTS5431lines personally read bypeer.
+Sixheaders preserve2016H07a OTHER-SPECIFY/H38a OTHER-UNIT vsquantitybindings,2013truncations,
+2019H36_1 payerfields notvalue. No fieldreinterpretation or substitutepricegate approved.
+Preserved initialprobe dtype mistake, loaderpre-exec-hash gap and late exactmandatory-filename
+initialization. Whole1190 remains OPEN. Next DESIGN must show concrete nativeHH/crop/component
+carrier choices and thirdH34Yes+quantity/noownvalue gate withoutplotallocation/unitmixing/
+bought-as-applied inference; existingploteligibility recoversZEROseven groups. No automatic
+TierCimplementation. Source proposal should examinepriorart before inventing newAPI.
+
+Senegal1519 twoheldsources FOUND innormaluserL1 despite B/l1-ro absence. ROOT finiteauthorized
+ONLY81ca34b9294020363cbd890c383fc529/11595120B anddf37cb1b84aec05f455d8b62e6a33359/13882336B;
+manager distinctprivate0400copies/MD5SHAprepostverified, manifest1144d1da... inB/private/
+1519-senegal-exact-two-held-assets-20261109. Liveworker notified. No generalL1access/acquisition/
+API/Make/sharedwrites or arbitraryepsilon/rounding policy. Actual arithmetic diagnosis pending.
+Uganda1000 legitimatepublicauthorposted paper reproductions authorized asprimaryresearch,
+includingAcademia, withbibliographic/version/provenancequalification; no login/payment/bypass/
+contact or assumednumericcorrection. Publicliteratureread needs no newpermissionroundtrip.
+GhanaSPS905 diagnosis489c1cc4d51ab25b177c8bb68a9e7e74c268439d HELD:3callbacks real;
+6signed4ULPcounterexamplesFAIL(0vs2), productionunchanged;64passingreject/spy/companioncontrols
+areNOT optimizationacceptance, no speedclaim. ExistingTanzaniacounterexample contract unchanged.
+
+Scientific holds1575/1066 unanswered;48productionweights/1604held;49borrow/50maizeflour/51NOclamp
+remain accepted. Preserve allotherscientific strata/eligibility/quantity/window/state holds.
+Rootdocscheckout librarycode OLD; use pinnedrefs/worktrees. Priorcheckpointsbelow historical.
+
 * Authoritative update — 2026-11-09T05:19UTC
 PR1644 merged11714b185fe2c90f1bc6c60164aa40d358acf0f3; ROOT verified parents[a633,9d],
 whole tree65d39fae matches reviewed and CI tree. Issue1495 explicitlyCLOSED retaining body.
