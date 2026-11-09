@@ -55,6 +55,7 @@ from .local_tools import (
     read_parquet_datetime_audit,
     read_parquet_build_drops,
     _read_parquet_with_index_policy,
+    _read_managed_parquet_cache,
     source_tier,
     _collect_file_paths_from_block,
 )
@@ -313,6 +314,55 @@ def _build_wave_script_target(make_dir: Path, wave_target: Path, *,
             "country-level targets.", RuntimeWarning, stacklevel=3)
     subprocess.run([sys.executable, f"./{script.name}"], cwd=script.parent,
                    check=True, env=env)
+
+
+def _reject_unreadable_cache(path: Path, observed, error: Exception, *,
+                             require_removal: bool = True) -> None:
+    """Reject only the observed managed entry; never a replacement or source.
+
+    Caller supplies its existing data_root cache path. No recursive cleanup,
+    raw/L1 deletion, symlink-target deletion or generic get_dataframe recovery.
+    Reader failure is evidence of unreadability, not physical byte damage.
+    """
+    root = data_root().absolute()
+    try:
+        parts = path.absolute().relative_to(root).parts
+    except ValueError:
+        raise error
+    owned_shape = ((len(parts) == 3 and parts[1] == 'var')
+                   or (len(parts) == 4 and parts[2] == '_'))
+    if (not owned_shape or path.suffix != '.parquet' or path.is_symlink()
+            or not path.resolve().is_relative_to(root.resolve())):
+        raise error
+    try:
+        current = path.lstat()
+    except FileNotFoundError:
+        warnings.warn(f'Unreadable managed cache at {path} ({error!r}); '
+                      'entry disappeared; rebuilding through the normal route',
+                      UserWarning, stacklevel=3)
+        return
+    fields = ('st_dev', 'st_ino', 'st_size', 'st_mtime_ns', 'st_ctime_ns')
+    if any(getattr(current, field) != getattr(observed, field) for field in fields):
+        raise RuntimeError(f'Managed cache changed while rejecting unreadable entry: {path}') from error
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        warnings.warn(f'Unreadable managed cache at {path} ({error!r}); '
+                      'entry disappeared; rebuilding through the normal route',
+                      UserWarning, stacklevel=3)
+        return
+    except OSError as unlink_error:
+        if require_removal:
+            raise unlink_error from error
+        # YAML builds directly from source and can return the healthy RAM
+        # frame even when the existing best-effort cache write also fails.
+        warnings.warn(f'Unreadable managed cache at {path} ({error!r}); '
+                      f'could not remove it ({unlink_error!r}); rebuilding '
+                      'from source with the existing best-effort cache write',
+                      UserWarning, stacklevel=3)
+        return
+    warnings.warn(f'Unreadable managed cache at {path} ({error!r}); '
+                  'rebuilding through the normal route', UserWarning, stacklevel=3)
 
 
 _RESERVED_U_SENTINELS = frozenset({'kg', 'Value'})
@@ -1886,15 +1936,11 @@ class Wave:
                 wave_drops, (self.country.name, request, self.year))
             if (cache_freshness(cache_path, expected_wave_hash) != "stale"
                     and degraded_verdict != "rebuild"):
-                try:
-                    cache_file = open(cache_path, 'rb')
-                except OSError:
-                    df_cached = None
-                else:
-                    with cache_file:
-                        df_cached, _ = _read_parquet_with_index_policy(
-                            cache_file, read_errors=(OSError, ArrowInvalid),
-                        )
+                df_cached, read_error, observed = _read_managed_parquet_cache(
+                    cache_path, open_errors=(OSError,))
+                if read_error is not None and observed is not None:
+                    _reject_unreadable_cache(cache_path, observed, read_error,
+                                             require_removal=False)
                 if df_cached is not None:
                     if (expected_wave_hash is not None
                             and read_parquet_cache_hash(cache_path) is None):
@@ -1913,10 +1959,12 @@ class Wave:
                     return df_cached
         return None
 
-    def _fresh_script_parquet(self, request: str, candidates: list[Path]) -> Path | None:
-        """The script-path READ GATE: the first existing, non-STALE candidate.
+    def _fresh_script_parquet(self, request: str, candidates: list[Path]) -> tuple[Path | None, pd.DataFrame | None, bool]:
+        """The script-path READ GATE: path/frame and whether Make must force.
 
-        ``None`` sends ``grab_data`` to Make.  A hashless candidate grades
+        An unreadable old cache is rejected once; the fresh output is read
+        strictly by grab_data. Returning the decoded hit avoids a second read.
+        A missing path sends ``grab_data`` to Make.  A hashless candidate grades
         ``legacy`` and is selected -- the v0.8.0 upgrade path for parquets
         under ``data_root`` and exactly why an in-tree file must never be a
         candidate (GH #803) -- and it is NOT stamped: script-written wave
@@ -1931,6 +1979,7 @@ class Wave:
         which paths are candidates is build logic and stays fingerprinted.
         """
         expected_wave_hash = self._input_hash(request)
+        force = False
         for candidate in candidates:
             if candidate.exists():
                 if cache_freshness(candidate, expected_wave_hash) == "stale":
@@ -1939,8 +1988,14 @@ class Wave:
                         f"will rebuild via Make"
                     )
                     continue
-                return candidate
-        return None
+                frame, error, observed = _read_managed_parquet_cache(candidate)
+                if error is not None:
+                    if observed is not None:
+                        _reject_unreadable_cache(candidate, observed, error)
+                        force = True
+                    continue
+                return candidate, frame, force
+        return None, None, force
 
     @build_transform()  # body is build-path: check_adding_t, >1e99 sentinel, dfs merge, map_index (#522)
     def grab_data(self, request: str, *, _with_origin: bool = False) -> pd.DataFrame | tuple[pd.DataFrame, str]:
@@ -2357,7 +2412,7 @@ class Wave:
             # script-path READ GATE, in its own method and excluded from the
             # build fingerprint (GH #1040).  Which paths are candidates is
             # still decided here (_script_parquet_candidates is build logic).
-            parquet_fn = self._fresh_script_parquet(request, candidates)
+            parquet_fn, df, unreadable_cache = self._fresh_script_parquet(request, candidates)
 
             if parquet_fn is None:
                 # GH #1468: crosswalk publishers are maintainer tools, never
@@ -2377,7 +2432,7 @@ class Wave:
                 # and the no-make fallback (#968) all live in the helper, which
                 # is kept out of the build fingerprint.
                 _build_wave_script_target(cwd_path, relative_parquet_path,
-                                          force=intree_artefact)
+                                          force=intree_artefact or unreadable_cache)
                 logger.info(f"Makefile executed successfully for {self.name}. Rechecking for parquet file...")
 
                 for candidate in candidates:
@@ -2389,8 +2444,10 @@ class Wave:
                 logger.warning(f"Parquet file for {request} still missing after running Makefile.")
                 return result(pd.DataFrame(), 'missing')
 
-            with open(parquet_fn, 'rb') as parquet_file:
-                df, _ = _read_parquet_with_index_policy(parquet_file)
+            if df is None:
+                # New output: no recovery loop around producer defects.
+                with open(parquet_fn, 'rb') as parquet_file:
+                    df, _ = _read_parquet_with_index_policy(parquet_file)
             origin = 'parquet'
             # GH #868: the wave script ran out of process; whatever its
             # reducer reported lives only in the stamp it wrote.
@@ -4832,7 +4889,8 @@ class Country:
                 or str(r["wave"]) in keep]
 
     def _read_l2_country_cache(self, method_name: str, cache_path: Path,
-                               waves: list[str]) -> tuple[pd.DataFrame | None, list[str] | None, str | None]:
+                               waves: list[str], *, _recover_unreadable: bool = True
+                               ) -> tuple[pd.DataFrame | None, list[str] | None, str | None]:
         """The L2-country READ GATE: serve ``var/<table>.parquet`` or say why not.
 
         Returns ``(df, covered, miss_reason)``:
@@ -4979,8 +5037,22 @@ class Country:
             logger.debug(f"GH #675 cache MISS ({degraded_reason}): {method_name} at {cache_path}")
             return None, covered, degraded_reason
 
-        try:
-            cached_df = get_dataframe(cache_path)
+        def _serve_cached():
+            if _recover_unreadable:
+                cached_df, read_error, observed = _read_managed_parquet_cache(
+                    cache_path, open_errors=(OSError,), check_null=True)
+                if read_error is not None:
+                    if observed is not None:
+                        _reject_unreadable_cache(cache_path, observed, read_error)
+                    else:
+                        warnings.warn(f'Cache open failed for {cache_path} ({read_error!r}); '
+                                      'rebuilding through the normal route',
+                                      UserWarning, stacklevel=3)
+                    return None, covered, f'read-error: {read_error!r}'
+            else:
+                # Deferred private Make preparation retains its exact old
+                # strict decoder and outer error/miss policy, without unlink.
+                cached_df = get_dataframe(cache_path)
             cached_df = map_index(cached_df)
             # GH #323: this parquet was written POST-collapse, so its
             # index is unique and _normalize_dataframe_index can never
@@ -5019,26 +5091,28 @@ class Country:
             # were asked for.  Requested-wave semantics are enforced
             # here, on the serve path -- nothing downstream filters.
             return self._restrict_to_waves(cached_df, waves), covered, None
+
+        if _recover_unreadable:
+            # No policy/schema/index/audit exception is a decode miss.
+            return _serve_cached()
+        try:
+            return _serve_cached()
         except (OSError, ArrowInvalid) as cache_read_error:
-            # Stale / corrupted cache parquet -> rebuild from source.
-            # Surface to the user (not just debug log) so a silent
-            # cache-miss isn't mistaken for a healthy build.
-            # Programmer bugs (TypeError, AttributeError) propagate.
-            # stacklevel=3 (this method -> load_dataframe_with_dvc ->
-            # _aggregate_wave_data) names the same frame the pre-#908
-            # stacklevel=2 did from inside the closure.
+            # Original1071 pre-tranche behavior for the deferred live Other
+            # owner only. In particular ParquetFormatError remains fatal.
             warnings.warn(
                 f"v0.7.0 cache read failed for {method_name} "
                 f"({cache_read_error!r}); rebuilding from source",
-                category=UserWarning,
-                stacklevel=3,
-            )
+                category=UserWarning, stacklevel=3)
             return None, covered, f"read-error: {cache_read_error!r}"
 
     def _read_assumed_fresh_cache(self, method_name: str,
-                                  waves: list[str]) -> pd.DataFrame | None:
+                                  waves: list[str]) -> pd.DataFrame | tuple | None:
         """The ``assume_cache_fresh`` short-circuit: ``var/<table>.parquet``
-        served WITHOUT a hash check, or None to take the ordinary path.
+        served WITHOUT a hash check, or a miss to take the ordinary path.
+
+        An unreadable-cache miss carries (None, saved coverage, reason) to
+        this SAME invocation's normal loader; no state survives the call.
 
         A hit is returned pre-finalize, restricted to *waves* where the #891
         manifest says it covers them; ``_aggregate_wave_data`` finalizes it.
@@ -5087,22 +5161,26 @@ class Country:
                     replay_datetime_audit(read_parquet_datetime_audit(parquet_path),
                                           self.name, method_name, waves=waves)
 
+                def _read_cached():
+                    frame, error, observed = _read_managed_parquet_cache(
+                        parquet_path, open_errors=(FileNotFoundError,), check_null=True)
+                    if error is not None and observed is not None:
+                        _reject_unreadable_cache(parquet_path, observed, error)
+                        return None, covered, f'read-error: {error!r}'
+                    return frame
+
                 if covered is not None and set(map(str, waves)) <= set(map(str, covered)):
-                    try:
-                        df_cached = get_dataframe(parquet_path)
-                    except FileNotFoundError:
-                        # GH #778: another builder/clear can remove the cache
-                        # after the exists/footer checks. Use the ordinary path.
-                        return None
+                    df_cached = _read_cached()
+                    if df_cached is None or isinstance(df_cached, tuple):
+                        return df_cached
                     df_cached = map_index(df_cached)
                     df_cached = self._restrict_to_waves(df_cached, waves)
                     _replay_audits()
                     return df_cached
                 if covered is None and set(waves) == set(self.waves):
-                    try:
-                        df_cached = get_dataframe(parquet_path)
-                    except FileNotFoundError:
-                        return None
+                    df_cached = _read_cached()
+                    if df_cached is None or isinstance(df_cached, tuple):
+                        return df_cached
                     df_cached = map_index(df_cached)
                     _replay_audits()
                     return df_cached
@@ -5728,7 +5806,8 @@ class Country:
                                      table_inputs == {'tables': {}, 'sources': {}}))
                         reusable = False
                         if proof_ok and table in contributing:
-                            reused, _, _ = self._read_l2_country_cache(table, country_path, self.waves)
+                            reused, _, _ = self._read_l2_country_cache(
+                                table, country_path, self.waves, _recover_unreadable=False)
                             reusable = reused is not None
                         elif proof_ok:
                             # Dynamic Make dependencies may use a complete,
@@ -5874,7 +5953,8 @@ class Country:
         # The `assume_cache_fresh` short-circuit: a READ GATE in its own method,
         # excluded from the build fingerprint (GH #1040).
         df_cached = self._read_assumed_fresh_cache(method_name, waves)
-        if df_cached is not None:
+        recovery_miss = df_cached if isinstance(df_cached, tuple) else None
+        if recovery_miss is None and df_cached is not None:
             return self._finalize_result(df_cached, scheme_entry, method_name, currency=currency)
 
         if (
@@ -6595,8 +6675,8 @@ class Country:
             # The v0.8.0 / GH #809 / GH #891 L2-country READ GATE lives in its
             # own method, excluded from the build fingerprint (GH #908): it
             # decides WHETHER to serve the parquet, never what a build writes.
-            cached_df, covered, miss_reason = self._read_l2_country_cache(
-                method_name, cache_path, waves)
+            cached_df, covered, miss_reason = (recovery_miss if recovery_miss is not None
+                else self._read_l2_country_cache(method_name, cache_path, waves))
             if miss_reason is None:
                 return cached_df
             # A coverage-short or bypassed cache may hold valid other-wave
@@ -6943,8 +7023,9 @@ class Country:
             proof_ok = (known_record and (recorded_inputs == declared_inputs
                         or (not record_present
                             and declared_inputs == {'tables': {}, 'sources': {}})))
-            miss_reason = 'STALE: declared Make input evidence is missing or changed'
-            if expected is not None and (proof_ok or cache_freshness(cache, expected) != 'fresh'):
+            miss_reason = (recovery_miss[2] if recovery_miss is not None
+                           else 'STALE: declared Make input evidence is missing or changed')
+            if recovery_miss is None and expected is not None and (proof_ok or cache_freshness(cache, expected) != 'fresh'):
                 reused, _, miss_reason = self._read_l2_country_cache(method_name, cache, waves)
                 if reused is not None:
                     if (self._table_cache_hash(method_name, self.waves) != expected

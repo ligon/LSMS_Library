@@ -2159,6 +2159,30 @@ def _read_parquet_with_index_policy(f, *, read_errors=(), **kwargs):
     return _restore_parquet_index_string_policy(df, metadata), None
 
 
+def _read_managed_parquet_cache(path, *, open_errors=(), check_null=False):
+    """Read one caller-owned cache, separating payload failure from policy.
+
+    Only initial pd.read_parquet OSError/ArrowInvalid is recoverable1071.
+    Open errors retain each gate's existing policy; footer/index restoration
+    and the former get_dataframe null audit remain outside that catch.
+    The opened file identity lets the owner reject precisely the old entry.
+    Raw/user files and newly produced outputs must keep their strict reader.
+    """
+    try:
+        stream = open(path, 'rb')
+    except open_errors as error:
+        return None, error, None
+    with stream:
+        identity = os.fstat(stream.fileno())
+        frame, error = _read_parquet_with_index_policy(
+            stream, read_errors=(OSError, ArrowInvalid))
+    if error is not None:
+        return None, error, identity
+    if check_null:
+        frame = check_read(frame, path)
+    return frame, None, identity
+
+
 def _validate_stata_missing_map(option):
     """Validate the explicit source-column -> extended-tag -> label option."""
     if option is None:
