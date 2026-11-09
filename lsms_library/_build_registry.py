@@ -204,6 +204,11 @@ _EXCLUDED_CALLABLES = frozenset({
     # listed so a future direct call from build code cannot fold the probe
     # into every hash.
     "lsms_library.country.Country._probe_country_builder",
+    # GH #381 / #1516: this established availability/failure-routing handler
+    # now has a direct build-path caller. It chooses a route, never parquet
+    # content; handler edits must remain outside content fingerprints. The
+    # calling orchestrator stays versioned. Revisit if the handler shapes data.
+    "lsms_library.country.Country._legacy_can_build",
     # The wave-script RUNNER (GH #968): make if installed, else the wave
     # script directly.  It decides which program executes the script, not
     # what the script writes -- the script text and the country _/Makefile
