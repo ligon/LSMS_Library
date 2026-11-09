@@ -3106,3 +3106,51 @@ packet: =reports/1497-tanzania-head-tracking-20261108/= in the 20261103 burst
 workspace; reproducible classifier and invented controls in
 =bench/research/tanzania_1497/=. No Country/Feature/Make/warm/source-policy or
 scientific price endorsement is claimed; library and build inputs stay unchanged.
+
+* 2026-11-09 -- GH #587: held UPD evidence does not settle original R1 fielding
+
+Completed held-document review, source =86077a65f225c42e2b03005e4b5eb15ec8a509a8=;
+this note uses its sealed text/layout witnesses, not a new PDF or data read.
+All page citations below are one-based PDF pages. The three held files are in
+=2008-15/Documentation/=:
+
+- =nps_upq_questionnaire.pdf= (UPQ; MD5 =348766362d76a96f4c39674e8c254d70=), pp.68–70.
+- =NPS_UPD_Basic_Information_Document.pdf= (BID; MD5 =38a095404848139cacbb4244cef24626=), pp.5–7,17,29; cover2019.
+- =ddi-documentation-english_microdata-3814.pdf= (DDI; MD5 =0da1ef7bfca74ae4dbb2dbb62b767046=), p.9.
+
+UPQ68–70 literally marks the R1 Food Security panel
+“THIS MODULE NOT PRESENT IN R1”. UPQ68 supplies the eight household
+past-seven-day day counts; BID17 lists R2–R4 and R1: Not present.
+This is positive evidence of *retrospective harmonized instrument/release
+absence*, not an independently authenticated original2008/09 fielding verdict.
+BID29 calls R1 H =Governance= and R2 Food Security =I= (R3/R4/UPD =H=):
+a generic claim that R1 had no Section H would be wrong.
+
+BID5 calls the lower panels the “original form at time of its respective
+dissemination”, while its footnote redirects skips to UPD variable names;
+pp.6–7 explain unification/recoding. Preserve both statements. The upper U
+panel is a union model, not an additional fielded round. BID17's Module G
+control relocates an R1 question from E despite its original-file Not present
+line: module/file absence alone cannot prove a concept was never asked elsewhere.
+DDI9 identifies the supplied UPQ but lists a *2018* BID named
+=nps_upq_basic_information_document.pdf=; that is not the admitted
+*2019-cover* =NPS_UPD_Basic_Information_Document.pdf=. Their identities remain
+distinct; the DDI does not authenticate the held BID as its listed version.
+
+The earlier wording “food_coping's UPD declaration still omits round 1”
+remains above. The closed860 diagnostic instead reports the producer maps
+round1 and the historical snapshot declares the logical wave: this wording
+tension is retained, without a new data-side coverage measurement or regrade.
+No authenticated original2008/09 household field instrument was among these
+three files. Matching original version/date/language, full routing and any
+applicable addenda remain the prerequisite to settle original fielding. Do not
+infer =not-asked=, =correctly-empty= or a new table from the UPD annotation,
+union questions, annual insufficiency grids or shock-response menus.
+
+Closed packet: =reports/587-UPD-documentary-disposition-20261109/= in the
+20261103 country-workers-refill workspace; its =EVIDENCE.json= binds the
+canonical report, primary text/layout pages and PDF custody seals. Text/layout
+is not raster/blackout completeness; parser recovery messages remain retained.
+This completes the held-UPD check only. GH #587 and its original-round authority
+gap remain open; NPS backcasting, WAITING #114, panel/ID/weight rules and all
+source/code/defaults are unchanged.
