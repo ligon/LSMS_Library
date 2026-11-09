@@ -73,3 +73,42 @@ ROOT source/independent review/configured CI/publication. No user/scientific
 choice is needed for this ordinary membership correction. Report parent control
 and candidate results separately; no self-independent claim or universal-outage/
 SDK-request/latency promise. Final ledger-only child conserves tested nonledger.
+
+## Phase3 — bounded correction closed
+
+Frozen/runtime source05f727be31229a6c94cc8b875333c07c75b05c21,
+tree77464f887cd7039f30a5e4d79a55df0d4330f62c. Sole production change remains
+the final validated-identity membership condition in _fast_window_select;
+removing it makes that function AST exact7b, all other module/product nodes,
+original tests/oracles and the other five D paths are exact. Initial ordinary
+currenta578+7b tree equals manager5f382, currentNigeria6 preserved. No policy,
+SDK/client/readers/warmer/retry/auth/source/schema/exclusion changes.
+
+ONE affected focused cohort41544 CLOSEDouter0/child0,13.090s wrapper:
+12collected12PASS/0F/E/S =2new real-helper interleavings+10selected existing
+retention/scope/owner/expiry controls. Both invalidated and healthy late windows
+stay unused by first caller and retained for next validation; invalid is pruned,
+healthy selected next time. OriginalR1 last-owner/outside-lock controls remain.
+Three durable identities assert source/interpreter/cwd/countries/privatecfgdata,
+loopback/noDIAG/falsecreds;2loadfile workers/threadbuild1, cfg/data0files/clean.
+No parent/23/114 bulk replay or real source/network/API/SDK data operation.
+
+Independent manager1590 reports NEWoriginalcontrol on old7b ONE1FAIL, then SAME
+SHA746b7d0e control on05f ONE1PASS. These are peer-owned actors, not author
+counterfactuals; original R1FAIL,114/23PASS and maps remain immutable. Same peer
+full-source/final-carry acceptance is separate and ROOT-owned, not inferred here.
+
+ONE corrected final metadata95237 CLOSEDouter0/138.702s, unchanged accepted
+dd7667/b40d operators/newemptyprivate/unshare, originalclosedE SHA66187750…/
+header73842347… retained/no baseline replay:452/452country,1885/1903wave,
+37/37BTF,124/186FIF hashes change. Allkeysets/all14nonhash/18None exact,
+errors0/denials0/privatecfgdata0/sourceclean. Candidate map SHA
+3599ac796d1a22070edcb16068e3c2311a9e23713406b513f75b30468c6d02a4.
+This is broad next-access invalidation, not measured rebuilding/rewarming.
+No hidden exclusions/schema bump or actual operator/SDK/field-latency claim.
+
+OK anchored§2–§5. This final commit changes only this ledger; all tested/censused
+nonledger bytes stay exact05f. ROOT owns configuredCI, review, GitHub and release.
+Evidence: reports/1051D-validated-window-selection-20261109. All author actors
+are closed; no new author failure/retry/source adaptation occurred. Whole1051
+and unrelated legacy/C1/eligibility limitations remain as previously recorded.
