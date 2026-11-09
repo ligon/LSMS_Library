@@ -6249,6 +6249,29 @@ class Country:
             empty = absent_subset_frame()
             if empty is not None:
                 return result(empty)
+            # GH #381: prove missing current wiring before impossible fallback
+            # work. Cache hits and healthy unsupported subsets returned above.
+            # A partial DVC stage map is still a configured producer: the
+            # existing multiwave resolver is all-or-none, so ask per wave.
+            unwired = False
+            if (waves and method_name in self.data_scheme
+                    and method_name not in JSON_CACHE_METHODS
+                    and requested_wave_set >= {str(w) for w in self.waves}):
+                try:
+                    unwired = (
+                        not self._legacy_can_build(method_name, waves)
+                        and not any(self._resolve_materialize_stages(method_name, [w])
+                                    for w in waves))
+                except Exception:
+                    # Optional diagnostic proof must not replace an uncertain
+                    # inspection with absence; retain the original build route.
+                    pass
+            if unwired:
+                raise RuntimeError(
+                    f"Could not materialize {self.name}/{method_name}: no configured "
+                    "wave source or country builder for requested waves "
+                    f"{list(waves)}. This describes current table wiring, not "
+                    "upstream data availability.")
             # Hashless (script-written) L2-wave parquets can't self-invalidate,
             # so evict them at the start of every wave-rebuild descent; the loop
             # below then re-runs Make/the script from source rather than reusing
