@@ -70,5 +70,82 @@ No incompatible contract question currently. ROOT explicitly authorizes work
 without a ledger approval pause. Corpus incidence and dependency annotation are
 outside scope. A focused failure is preserved; no automatic retry.
 
-## Phase 3 — verification
-UNRUN. Product and tests not yet implemented or frozen; metadata census UNRUN.
+## Phase 3 — actual verification and limits
+
+Product source ea204bbc4dd287cb3c03e67ae9a19aa0e8cb8bfc; final runtime source
+7384234791251cd33352c4df0f35a823a9fbc482 is fixture-only and keeps every product
+and guide byte exact. Initial b7d09568 was ledger only. ROOT owns independent
+review, configured CI and integration; no whole-issue or live-incidence claim.
+
+- `_declared_inputs` / `_output_inputs` — OK (§3/§5): list/mapping/nonempty-name
+  validation only, no source presence test; reserved inputs never reach kwargs.
+- `_input_lineage` / `apply_derived` / `Wave.grab_data` — OK (§3/§4): external
+  sidecar snapshots pre-step self-input, ordered chains and simultaneous table
+  declarations; only explicit outputs are filed. One transform execution,
+  no new frame/attrs normalization, no inferred undeclared edges. Existing
+  primary/formatter/hook/config boundaries and scientific coalesce are exact.
+- `_file_wave_drops` / `_drop_missing` — OK (§2–§5): extend existing footer,
+  separate coverage_unknown_required/optional plus affected_outputs original
+  inputs and final presence; direct missing fields retain legacy semantics.
+- `DegradedCacheWarning` / `_describe_missing` / `_warn_degraded_serve` /
+  `_degraded_cache_verdict` — OK (§4/§5): distinct unknown-coverage wording and
+  structured input_drops; reuse bounded source/key/write suppression. B source
+  inventories/ALL-within/ANY-across and C permission-only HEAD remain intact.
+  No alternative reader/writer/probe, new global setting, schema or exclusion.
+- Every unowned tracked object, all country config and all existing tests exact
+  cd6; `local_tools.py`, `_build_registry.py`, canonical schema and original
+  fill_v_with_coord_bin AST/bytes are unchanged. Full Git manifest and patch
+  saved. HIGH shared hash blast radius is measured below, not hidden.
+
+ONE meaningful focused cohort at ea204bbc CLOSED exit1: **68 passed / 3 failed**,
+0 errors/skips, 10.82 pytest / 17.588 outer seconds. Original log/XML/failures
+preserved. The two actual coalesce fixtures omitted lat/lon kwargs, so the
+unchanged defaults correctly raised for `_lat`, not their intended Latitude.
+The tuple negative fixture was serialized by YAML to a valid list; its fake
+transform returned None and the existing frame check raised AttributeError.
+These are concrete fixture errors, not accepted product outcomes.
+
+ROOT16:58UTC explicitly approved the exact fixture-only repair and ONE bounded
+three-case continuation. Bind both coordinate names and test Python tuple at
+actual apply_derived directly, retaining expected ValueError/no-dispatch/frame
+oracles. All existing assertion ASTs exact. Continuation at 73842347 CLOSED
+exit0: **3 passed**, 0 failures/errors/skips, 6.55 pytest / 13.254 outer seconds.
+Never reran the other 68, the full cohort or historical E19/A/B diagnoses.
+Results remain separate: **71 unique logical controls**, not 74 and not a fresh
+71-green run. Six controller/worker identity receipts show mounted interpreter,
+own checkout/config root and all DIAG_* / DIAGNOSIS_OBSERVATIONS absent. Ordinary
+pytest, two loadfile workers, BLAS/OMP/MKL/build workers1 and unshare -rn. All
+fixture cleanup/integrity is unconditional, export is unnecessary.
+
+Actual tiny Alpha/Beta Wave/CSV/extraction/drop/writer/footer/read gates cover
+required/optional hook NA and omitted outputs, actual derived partial sibling
+and original loud entirely-absent input, direct partial/fully-filled siblings,
+ordered/self-input chains, undeclared temporaries/empty dependencies, malformed
+shapes, config required/optional, legacy footers, zero/NA/dtypes/axes/attrs,
+fresh reads/source memo/once-key/just-written and B multi-source readiness.
+Configured private data/config roots had 0 files after both runs; invented L1/L2
+and pytest/runtime state stayed outside published evidence. No real source/API,
+network/acquisition, Make producers, shared-cache writes or native state work.
+
+ONE final existing candidate-only metadata collector at 73842347 CLOSED exit0,
+133.963 seconds. Original operators retain all assertions; only interpreter
+prefix/report namespace changed, with byte-exact inverse proof. Fresh owned
+chmod0700 private roots, false credentials, own cwd/PYTHONPATH/countries root,
+mounted interpreter and unshare -rn. Supplied baseline SHA256 60975ac2… retained
+its c88f80de header. No baseline replay. The historical c88 Git object is absent
+in this shallow dispatch: SOURCE-CONTEXT-CARRY is supplied authority, not a
+locally repeated historical diff. All new source comparisons use exact cd6.
+
+Measured vs closed A+B: **452/452 country**, **1885/1903 wave**, **37/37 build
+transform**, **0/186 framework-import** hashes changed. ALL map/top-level keysets,
+14 nonhash metadata fields and all **18 None wave cells** exact; errors0,
+denials0; private configured data/config files0. This is broad harmonized cache
+invalidation; no rewarm performed. Metadata constructors/config computation
+were the only real-country census use, never serving/building/getting a table.
+Original E19 stays supplied historical evidence. Existing dependencies remain
+unannotated until separately curated; this framework does not establish corpus
+incidence or prove wrong values/lost rows from an interrupted declared input.
+
+Reviewable receipts, source seals, complete Git object manifest and final report
+are in the dispatch evidence directory (five mandatory files regular0600).
+Final ledger-only child conserves every tested/hashed nonledger object.
