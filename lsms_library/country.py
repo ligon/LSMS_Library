@@ -345,8 +345,8 @@ _U_SENTINEL_PROTECTED_METHODS = frozenset({'food_quantities', 'food_prices'})
 # read-path feature that cannot change a single cached byte.  So that one hop
 # is carried out of band by the ContextVar below rather than by a parameter.
 # ``_finalize_result`` and ``_apply_categorical_mappings`` do take an explicit
-# ``labels=``; both are outside the build closure (``_finalize_result`` is in
-# ``_build_registry._EXCLUDED_CALLABLES`` by name).
+# ``labels=``; the normal finalizer subtree stays outside the build closure
+# (``_finalize_result`` is in ``_build_registry._EXCLUDED_CALLABLES`` by name).
 #
 # The stored value is ``(method_name, {target: variant})``.  The method name is
 # load-bearing, not decoration: ``_finalize_result`` RE-ENTERS itself via
@@ -1208,6 +1208,16 @@ def _empty_declared_frame(scheme_entry: Any) -> pd.DataFrame:
     # skips a frame carrying this marker (see _CONSTRUCTED_EMPTY_ATTR).
     empty.attrs[_CONSTRUCTED_EMPTY_ATTR] = True
     return empty
+
+
+def _apply_build_categorical_mappings(country: str, frame: pd.DataFrame) -> pd.DataFrame:
+    """Use the normal mapper where its labels are baked into a build output.
+
+    Keep this delegation in the mapper's module so the existing build-closure
+    resolver sees the method and its helpers (GH1454; task ledger §2/§5).
+    The ordinary post-read mapper and its callers are unchanged.
+    """
+    return Country(country)._apply_categorical_mappings(frame)
 
 
 class Wave:

@@ -468,14 +468,14 @@ def served_unit_labels(country: str, values) -> np.ndarray:
     rather than a second reading of the same tables that could drift.  Labels
     no table names pass through unchanged, as they do on the served path.
     """
-    from .country import Country
+    from .country import _apply_build_categorical_mappings
     vals = np.asarray(list(values), dtype=object)
     if not len(vals):
         return vals
     probe = pd.DataFrame(index=pd.MultiIndex.from_arrays(
         [pd.Index(vals, dtype=object), np.arange(len(vals))],
         names=["u", "_row"]))
-    out = Country(country)._apply_categorical_mappings(probe)
+    out = _apply_build_categorical_mappings(country, probe)
     return np.asarray(out.index.get_level_values("u"), dtype=object)
 
 
@@ -509,8 +509,9 @@ def carry_unit_size(frame: pd.DataFrame, sizes, country: str,
 
     Because the mapped base is written into the parquet, a sized row does not
     follow a later change to ``Country._apply_categorical_mappings`` the way a
-    bare row does.  The ``u`` tables are hashed; that function is outside the
-    fingerprint, so a semantic edit to it needs an ``LSMS_CACHE_SCHEMA`` bump.
+    bare row does. The ``u`` tables and the mapper's callable closure are
+    hashed through this build import path (GH1454), so semantic mapper edits
+    invalidate the affected build outputs automatically.
     """
     if "u" not in (frame.index.names or []):
         raise UnitSizeLabelError("carry_unit_size: frame has no `u` index level")
