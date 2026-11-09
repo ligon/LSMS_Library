@@ -88,3 +88,36 @@ before tests. Implementation/portable source-free tests can then be frozen;
 ROOT separately grants their runtime and later final metadata census. Pending
 scientific/carrier issues (GLSS3 within-wave windows, household cover-status
 shortfall, native Mali visit detail) are not implemented here.
+
+## Phase 2 — frozen source draft, verification unrun
+
+Source port 00536f9001513ded5d4d32f235d812d82f0d7116 plus test-only fixture
+child 93c9614122db7a88b4e9b7196d79a8a2034d20fd retains the entire current
+Wave AST, every other Country method and every other Feature method/helper.
+Invented fixtures now carry the current required v axis; they use no normal
+Country constructor or source read. Their finite cluster finalizer is a fixture,
+not independent validation of actual finalization. No pytest collection or
+execution, census or old/native cohort replay has occurred.
+
+ROOT reviewed the initial 30-oracle plan and authorized one promoter run.
+Actual generator session50174 exited0: 20 files generated, exactly Burkina and
+Mali changed, other18 byte exact, private data files0. The reviewed CSV's CRLF
+terminators were transported to repository LF with all67 decoded rows/fields
+and header/order exact; resulting SHA
+11631260fbff4a207c9d9356b49749310bebb166716b05db8fc71bfd6b70d43d.
+No second promotion was run. An existing doc generator invocation used genuine
+method docstrings on metadata-only object.__new__ instances: four doc objects,
+zero normal constructors/table calls, exit0. No generated page was hand edited.
+
+ROOT additionally requires pre-IO refusal where metadata suffices. The draft
+uses current _proven_absent for absent requested waves and defers uncertain
+undeclared routes to represented-t validation. A declared source might still
+decode empty: metadata refusal in that case is a stronger request-level rule
+than the held observed-frame classifier. This explicit edge is frozen for ROOT
+review, not silently treated as equivalent or runtime-approved. See external
+PRE-FLIGHT-EMPTY-EDGE.md. Default None enters no new preflight/record lookup.
+
+The external review packet is reports/851-period-api-port-cd6-20261109 under
+the 20261103 burst: PORT-PLAN, ACCEPTANCE-ORACLES, source/static bindings,
+literal source diff, exact pure node selection, two invented pre-port default
+counterfactuals and ordinary private runner. All tests/census remain UNRUN.
