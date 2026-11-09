@@ -117,3 +117,12 @@ get_data_file actually lives. Country runtime bytes are unchanged from4a82.
   independent runtime acceptance is claimed. Root owns separate independent
   review/current integration/release. Source and runtime receipts live at
   B/reports/1468-committed-json-runtime-local-20261109.
+
+## Independent review documentation follow-up
+
+Independent review at51d8 found no P1/P2 and passed10 additional invented controls.
+Its nonblocking panel-ids skill caveat is corrected here: both backends read the
+existing JSON/parquet candidates first; valid YAML fallback remains when absent,
+and offline publishers never run. This commit changes only that skill prose and
+this ledger, preserving every tested production/test object. It introduces no
+new runtime evidence; exact-final-head API/hash/CI gates remain ROOT-owned.
