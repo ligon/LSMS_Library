@@ -279,3 +279,32 @@ remain to be completed before a new closure.
 
 No contradiction or reinvention was found against the current ledger. ROOT
 retains independent review/integration/CI/GitHub/merge and source-proposal choice.
+
+
+### Current publication preparation — 2026-11-09
+
+ROOT authorized an isolated current 9514 branch carrying all eight original
+1531 commits, then shortening only the newly added country note. All eight
+cherry-picked patches are byte-exact; this preceding author-ledger prefix is
+unchanged. Independent documentary review of d41aa628 found no P1/P2 within
+its text/card-export/closed-aggregate scope; no independent raw recount or
+product acceptance was claimed (reports/review-1531-gnb-documentary-20261109).
+
+The 54-line current-state note is frozen at `3d0a5ebea5d34fd481e0d912b89c15cc0e2184b2`. It leads with
+instrument Q47 hectares versus distinct q47a m2, retains the absent export
+bridge and all source-presence qualifications, and leaves current binding,
+clamp, source choice/defaults and unwired 2021 unchanged. Original 779 country
+lines/43,725 bytes, including every earlier Org table/code block, are exact.
+All 19179 nonowned tracked mode/type/blob objects match 9514; production,
+config and tests are unchanged. No new country fact or policy was invented.
+
+Mounted-MAIN direct `scripts/api_surface_audit.py --strict` exited 0 at
+20333a26bd31ddd9a5d3048e60614dd97630b430: 10 kwargs/15 skills documented,
+no untracked hashed inputs, five existing helper advisories. The later
+farmer-conversion operand clarification and this ledger-only closure change
+no executable audit input; no repeated audit or tests were needed. Private
+data/config remained empty. No package import, source/getter/API/build/cache,
+new measurement, payload reopen or GitHub write occurred. Literal diffs,
+carry/prefix/object proofs and audit receipt are in durable
+`reports/1531-gnb-current-documentation-20261109` under isa-sm-20261103. ROOT
+owns current review, publication and any future scientific/source selection.
