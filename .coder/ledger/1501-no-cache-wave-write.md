@@ -28,3 +28,100 @@ Production41e747358: stdlib AST counterfactual restores exactly one old getenv e
 All prior test-function AST remains exact except the explicitly held write pin and raw-reader enumeration. The old four negative-pin spellings remain in the eight OFF positive cases; six ON cases plus unset check actual wave origin/physical write and exact returned frame/attrs using the unchanged inventedFakeland fixture. No real-country source tests run or modified. A separate inclusion-boundary control keeps grab_data/to_parquet content-producing. Tests are DRAFT/UNEXECUTED, not passing evidence.
 
 Docs-only fence extension applied only to the quoted flag passages. Historical reducer warnings, script/make caveats and var-writing policy are retained. Current full hash impact, including any doc contribution, remains UNMEASURED; no prior corpus number is promoted. git diff --check and full nonowned mode/type/object conservation are the only actual verification in this source-preparation lane. ROOT review and a separately frozen guarded runtime selection are still required; no imports/tests/API/census/data/Make/cache/source/native/full replay has occurred here.
+
+
+## Phase 3 — final release evidence and limits (2026-11-08)
+
+The source-preparation and UNEXECUTED statements above describe their historical
+stages. Subsequent separately granted review and code/config gates are recorded
+here; none of their earlier failures is relabeled or added to accepted counts.
+
+### Source custody and ordinary current composition
+
+Accepted synthetic source: a263bed33d56bb236641c4a0f2d7ebe49e1af377, based on
+actualebb65d191b6f856ff1b0f77068765409b3957929. ROOT's ordinary65 integration with
+actual275, then current68efbf2213bf9bd61b16612c288a9363aa6ebb0a with actualSenegal
+6863a6bf6a7ad1e4af1c9743fa4992f393a1e4ce preserve the original core/fixture bytes.
+The current68 tree2e7804e84bc0ebf5c28416338a4bb50aa1f53ae1 has19162tracked leaf
+objects, with7owned1501paths and4disjoint incomingSenegalpaths in the last union.
+All13reviewed source bindings matcha263 at68. This FINAL commit changes ONLY this
+ledger: the12NONledger reviewed bindings and every other mode/type/blob remain
+exact68, and the original13binding map/header plus old ledger SHA are retained
+separately. Do not claim a modified ledger is byte-identical to its old binding.
+No current synthetic cohort, metadata enumeration or API audit is replayed for
+this ledger-only finalization. Exact proof lives in reports/1501-final-ledger-
+release-20261108; original review/source/operator packets remain immutable.
+
+### Bounded synthetic review: actual53PASS
+
+reports/review-1501-no-cache-wave-write-final-20261108/VERDICT.md and sealed
+FINAL-MANIFEST SHA6a1567a997c5bdda459c2e36d86e0d6307d1511c99725203881c0b0a254335b0
+record one accepted v5 run:53passed,0failed/error/skipped, inner0/outer0,
+453.59pytestseconds/577.395operatorseconds, three active process guard receipts
+and0denials. This is41selected candidate cases plus12independent cases frozen
+before candidate inspection, NOT53new independent cases. Both workers collected
+the same53IDs; one was idle under actualloadfile, not two-worker throughput proof.
+Actual unchanged production methods/readers/writers touched only inventedFakeland
+CSVs/private parquets. Grammar controls cover case-insensitive1/true/yes ON,
+OFF/unset and intentionally NO whitespace trim; physical wave-write/bypass,
+memory/origin, exact values/NA/dtypes/keys/attrs, warm country/wave behavior,
+changed invented source bypass, unchanged country-var writes under ON and the
+precise fingerprint boundary. No original assertion/source/fixture was weakened.
+
+V1 was UNRUN after static lazy-definition discovery. V2 failed the CSV format-
+probe fence (52P/1F, one inactive profile; outer launcher exitUNKNOWN). V3 failed
+an attrs-generated-definition fence (20P/1F/32unexecuted; inner2/outer2). V4 failed
+the warm private getter classification (20P/1F/32unexecuted; inner2/outer2).
+All are retained as unsuccessful harness attempts, not acceptance or extra green
+cases. Each later external amendment was ROOT-reviewed/frozen/granted with source,
+fixture, matrix and assertions unchanged. The accepted guard distinguishes45real
+ArrowInvalid probes and45same-stream original CSV fallbacks, permits only bounded
+configuration/definition/dependency startup, and reports no pending probes. The
+read counters are function counts, not physical-open totals. Native C dependency
+startup is qualified in the review; no universal native-I/O sandbox claim follows.
+
+### Actual current68 staticAPI and complete metadata gates
+
+reports/1501-current686-release-proposal-20261108/ACTUAL-FINAL-MANIFEST.json
+SHA6b162ddba3f70d70d5b7cc82747df23ef3f16e889f105b50827b7e756531982a seals the
+separate once-only current68 stages: strictAPI0 in9.864seconds (active profile
+through finish, falsecredentials,0denials), owned0700private setup0, candidate-only
+metadata0 in125.680seconds and complete all-field/map comparison0. Source and
+operators stayed clean/exact. Both private data roots had0files/0symlinks and
+empty nonsymlinkL1. No baseline replay or automatic retry.
+
+Measured footprint over38countries:450/450country-table hashes changed,
+1877/1895wave hashes changed (all18None cell identities unchanged),35/35build-
+transform fingerprints changed,0/186framework-import fingerprints changed.
+No added/removed map keys; ALL other metadata, public/registration scope, closure
+paths, overrides, errors/denials and totals are exact. Public method totals remain
+553country cells/2313wave cells/39names;28overrides/0unsupported, errors0/denials0.
+The original CLOSED3d56 map SHA
+f85cc0906061390747fd558a47e28f0da6b946a649a9918c3d4d0620f6cce253 is admitted by
+actual6863's entire19161object/tree equality, with ORIGINAL header/bytes retained.
+Current68 candidate map SHA
+23912022fe1ef85dc553def6ccb193ee93e6ce045a528234b1c6d705dd54c4f1.
+The census profile source/observed closures/denials are retained; it does not emit
+an active-until-finish Boolean. Only the API guard explicitly emits that receipt.
+
+### Remaining release gates and policy boundaries
+
+No real survey source/API campaign, native country/Feature corpus build, Make,
+DVC data operation, shared-cache refresh, rewarm, dependency or scientific/default
+change was run by these gates. No private fullsuite was run/prepared as mandatory:
+configured exact-final-head GitHub unit-tests provide the unfiltered credential-
+false fullsuite/loadfile/threadpins/600stimeout gate when ROOT verifies actual
+coverage/results. Exact-final-head GitHub unit/Windows checks are PENDING here;
+ROOT alone owns publication, review/merge and issue closure. A private tracedfull
+is a fallback ONLY for a concrete configured-CI coverage/diagnostic gap, not a
+required duplicate merely because country.py changed. Current broad hash impact
+is measured above, but actual corpus rebuild cost/source serving remains unmeasured.
+
+The implementation still only replaces the YAML L2-wave write predicate with
+existing_no_cache grammar and excludes that cache-choice helper alone; grab_data,
+the writer and content transforms remain fingerprinted. Country-var writing,
+script/Make caveats, frame contents/attrs and all scientific definitions remain.
+If_no_cache ever produces content, revisit its narrow exclusion. Original1455
+correction, old447/1745/36historical corpus figures and every failed witness remain
+history, not current success or a rewarm grant. The separate1288wrong-invariant
+withdrawal8b26a14b and held full-source snapshots are unrelated and unchanged.
