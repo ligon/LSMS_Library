@@ -40,16 +40,15 @@ from niger import (CS07_TRIPLES, _community_prices_maps,
 
 item_map, unit_map = _community_prices_maps()
 
-base = '../Data/NER_2011_ECVMA_v01_M_Stata8/'
 
 # 2011-12: each observation carries its own unit column.
 triples = CS07_TRIPLES['2011-12']
 
 pieces = []
-for fn, passage in [('ecvmacoms07_p1.dta', 1), ('ecvmacoms07_p2.dta', 2)]:
-    src = get_dataframe(base + fn, convert_categoricals=True)
+for fn, passage in [('../Data/NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p1.dta', 1), ('../Data/NER_2011_ECVMA_v01_M_Stata8/ecvmacoms07_p2.dta', 2)]:
+    src = get_dataframe(fn, convert_categoricals=True)
     # Same file, raw codes: the cs07q02 variety CODE (GH #840).
-    codes = get_dataframe(base + fn, convert_categoricals=False)
+    codes = get_dataframe(fn, convert_categoricals=False)
     pieces.append(_community_price_triples(src, item_map, unit_map, triples,
                                            passage=passage, codes=codes))
 
