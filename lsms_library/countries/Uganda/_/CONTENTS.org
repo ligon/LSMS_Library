@@ -6015,3 +6015,18 @@ EA/parish design, price provenance or sample/weight caveats. This entry records
 the adapter contract and source-free validation scope, not a new Uganda demand
 fit or source/cache build. Native food API, Aggregate buckets and invariance
 baselines remain unchanged. Ledger: =.coder/ledger/1439-demand-source-index.md=.
+
+* 2026-11-09 -- Anthropometry source declarations (GH #1288, partial)
+
+The seven 2009-10 through 2019-20 native anthropometry scripts obtain their
+raw paths from the authoritative =ANTHRO_FILES= map. The existing literal
+scanner does not follow imported dictionaries, so those raw sidecars were
+invisible to script-source fingerprinting/private Make input collection.
+Each script now declares its identical full source literal and raises before
+reading if it differs from =ANTHRO_FILES[t]=; the getter still uses that map.
+The explicit exception survives Python optimization. Neither the map nor any
+clinical/measurement, identifier, missingness, duplicate or output rule changes.
+This finite discovery fix adds no 2005 contribution and establishes no new
+raw/native/API parity or whole-GH1288 closure. The earlier fixed-STORAGE
+checkpoint's source-freshness/clinical limitations remain; see
+=.coder/ledger/1288-uganda-anthro-source-declarations.md=.
