@@ -245,3 +245,20 @@ new binary/dependency operations were the exact public-document grant above.
 No fielding/nonfielding, coverage, population or statistical count was inferred.
 Independent Root review/integration and the export bridge remain pending;
 #1441 is not closed.
+
+## 2026-11-10 — completed managed-document custody checkpoint
+
+The placement `UNRUN` and Root-review-pending wording above records the original
+investigation checkpoint. Accepted source `0a76ec6c0f1bd106a50b75f3f1aab590d4aea851`
+subsequently archived exactly WB76/resource11558's original R1 household XLS
+and WB1050/resource30525's original R2 household PDF under the round-specific
+`2008-15/Documentation/NPS-R1/` and `NPS-R2/` paths. One targeted managed batch
+push and two separate fresh read-only `get_data_file` retrievals passed exact
+byte/MD5/SHA256 checks; the dated CONTENTS appendix, own1441 ledger and
+`reports/1441-tanzania-original-managed-20261110/` preserve those receipts.
+No new document parsing accompanies this checkpoint.
+
+These are supporting original-round documents, not acquisition or promotion of
+the original raw studies; parent UPD3814 SOURCE remains unchanged. The precise
+original-cover-to-UPD `ha_01_1`/`ha_02_1` bridge and exact fielded-version limits
+above remain unresolved. No active map, served labels or whole1441 closure follows.
