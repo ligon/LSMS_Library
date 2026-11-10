@@ -66,8 +66,14 @@ def test_common_rejection_never_unlinks_absent_source_raw_l1_alias(model, tier, 
     path = model.data / model.country.name / parent / (name + '.parquet')
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(b'invented raw source bytes, not a decoded frame')
-    raw = model.data / 'dvc-cache/ab/different-raw-source-name'
+    digest = hashlib.md5(path.read_bytes()).hexdigest()
+    raw = model.data / 'dvc-cache' / digest[:2] / digest[2:]
     raw.parent.mkdir(parents=True, exist_ok=True)
+    raw_source = model.source / 'a/Data/different_raw_source.parquet'
+    raw_source.parent.mkdir(parents=True)
+    raw_source.with_name(raw_source.name + '.dvc').write_text(
+        f'outs:\n- md5: {digest}\n  hash: md5\n  path: different_raw_source.parquet\n')
+    assert not raw_source.exists()
     if timing == 'present-before-read':
         os.link(path, raw)
         observed = path.stat()
