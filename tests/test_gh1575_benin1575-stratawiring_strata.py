@@ -12,8 +12,9 @@ import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
 
-from lsms_library import country as country_module, derivations, ehcvm, local_tools
+from lsms_library import country as country_module, ehcvm, local_tools
 from lsms_library.country import Wave
+from lsms_library.derivations import call_inputs, derivation_records
 from lsms_library.paths import countries_root
 from lsms_library.yaml_utils import load_yaml
 
@@ -67,9 +68,9 @@ def wiring():
         country=SimpleNamespace(resources=scheme, name="Benin"),
         formatting_functions={"i": ids.i, "strata_label": module.strata_label,
                               "sample": module.sample},
-        _cartesian_keys=Wave._cartesian_keys,
     )
     wave.column_mapping = MethodType(Wave.column_mapping, wave)
+    wave._cartesian_keys = MethodType(Wave._cartesian_keys, wave)
     return module, wave, spec
 
 
@@ -143,7 +144,7 @@ def test_full_nonstrata_payload_order_ids_weights_and_attrs_are_conserved(wiring
     assert candidate["strata"].iloc[:4].tolist() == [
         "Autre inventé RURAL", "Département inventé Urbain", "Département inventé Rural", "Autre inventé rural"]
     assert pd.isna(candidate["strata"].iloc[4])
-    rec = derivations.derivation_records("Benin")[KEY]
+    rec = derivation_records("Benin")[KEY]
     candidate.attrs = {"id_converted": True, "derivations": {"Benin": {KEY: rec}},
                        "lineage": {"synthetic": ["cover", "weights"]}}
     before = candidate.copy(deep=True)
@@ -202,7 +203,7 @@ def test_registry_scope_optional_carrier_and_actual_input_callable(wiring, monke
     module, wave, _ = wiring
     registry = ROOT / "Benin" / "_" / "derivations.yml"
     assert len(re.findall(rf"^{re.escape(KEY)}:", registry.read_text(), re.M)) == 1
-    rec = derivations.derivation_records("Benin")[KEY]
+    rec = derivation_records("Benin")[KEY]
     assert rec.resolve() is ehcvm.derive_region_milieu_stratum
     assert rec.resolve("inputs") is module.inputs_strata
     assert list(rec.waves) == [WAVE]
@@ -233,12 +234,12 @@ def test_registry_scope_optional_carrier_and_actual_input_callable(wiring, monke
 
     monkeypatch.setattr(country_module, "Country", country)
     monkeypatch.setattr(local_tools, "get_dataframe", cover)
-    inputs = derivations.call_inputs(rec)
+    inputs = call_inputs(rec)
     assert visits == [WAVE] and len(reads) == 1
     assert inputs.index.names == ["t", "i"]
     assert inputs.index.get_level_values("i").tolist() == ["42009", "7002", "42001", "3004"]
     expected = _frames()["s00_me_ben2018.dta"][["s00q01", "s00q04"]]
     assert_frame_equal(inputs.reset_index(drop=True), expected)
     with pytest.raises(KeyError, match="sample"):
-        derivations.call_inputs(rec, wave="2021-22")
+        call_inputs(rec, wave="2021-22")
     assert visits == [WAVE, "2021-22"] and len(reads) == 1
