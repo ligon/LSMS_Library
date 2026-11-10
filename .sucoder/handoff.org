@@ -1,4 +1,41 @@
 #+title: Current LSMS-ISA coordinator handoff
+* PUBLICATION AND REFILL -- 2026-11-10 14:03 UTC
+User correctly flagged no new PR for >8hours. Root acknowledged serial review,
+private verification/operator failures and failure to promptly refill remote
+slots as throughput bottlenecks. New DRAFT PR1688 now published/readback:
+https://github.com/ligon/LSMS_Library/pull/1688
+HEAD72d76381c4f72cbeee7b13a57578088313307382 onto development4381, created14:01:53Z.
+Root read complete product+tests+final actual REPORT; exactly11owned files match
+accepted97e, all19258nonowned objects development-exact. Actual verification
+used d47 framework, so current-base CI/metadata and independent review remain.
+Independent local review_nigeria_ph_pr RUNNING; helper fingerprint coverage
+already positively source-traced. Root proof/publication receipts under
+R/587-nigeria-W1-W3-PH-plot-features-implementation-20261110/MAKE-completion-v4.
+No whole587 closure;12strict manualslice failures retained.
+
+Eight NEW country jobs confirmed submitted and Slurm RUNNING at14:02UTC;
+this proves allocation state, not test/body completion. Allfree2CPU8G, c8source:
+- Malawi90541090997: remaining reducer/source-qualified optimization.
+- Ethiopia82441091168: existing sold-unit/factor wiring source audit.
+- Niger128841091169: computed plot/community source literal closure.
+- Nigeria128841091170: nonfood source-loop closure.
+- Mali157741091171: per-wave strata producer/source semantics.
+- Burkina143841091172: one interim2014food coverage cell.
+- Tanzania44941091173: official W1-W3 geovariable source/program/key bridge.
+- Uganda128141091174: unmeasured housing build/fresh-warm contributions.
+Manager owns monitoring/refill/intakes at
+Q/refill-independent-country-round2-c8-20261110. Previous8terminal not counted.
+Specific source-qualified engineering/pure tests authorized without extra Root
+permission loop; ordinary bounded BFA/UGA private actual charters approved;
+scientific changes/expected counts/sharedwrites/newreleases remain held.
+
+Root admitted original Mali plot_inputs1PASS/525s/16reads and carried all6owned
+commits. Private batch HEADf6de6cc81b84db41714df316a1448af312c241a5, clean.
+Local finish_1590 RESTARTED with followup_task for ONE final candidate-only
+metadata collector vs retained55de map, expected20Mali country+40wave changes.
+Batch MUST remain immutable until collector closes; no baseline/data/test replay.
+Ethiopia historical-sampling actual1 remains separate priority under manager.
+
 * LIVE UPDATE -- 2026-11-10 13:50 UTC
 User renewed request to delegate more country-specific issues. Manager
 malawi_revision_food owns remote queue refill via sucoder, with distinct concrete
