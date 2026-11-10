@@ -5566,3 +5566,43 @@ callback already removed by =af4338784c75fa838bf9d8205518566a66294e0e=
 this refill changes no reducer, precision or unit-pooling rule. GH #1228's
 D/I crop identities and GH #1190's acquisition carrier/third-source admission
 remain held. See =.coder/ledger/malawi-queue-refill-20261109-v2.md=.
+
+* 2026-11-10 -- Later D/G/I printed identity links; export bridges remain held (GH #1228)
+
+Bounded own-form reading adds authority to the existing diagnostic checkpoint,
+without rerunning its sources or changing the delivered 2010 own-text repair.
+The admitted agriculture forms have MD5 =15107f083eac4477bd4d25fc0e33fc2b=
+(2016) and =86cc1f419c1320eb969d11a6d24a63e0= (2019). PDF and printed page
+numbers agree at the locators below; the 2019 contents page is outdated for G/I.
+
+D20 (2016 p10; 2019 p8) asks crops planted in the reference rainy season,
+ordered by importance, excluding cassava, tea, coffee and fruits. Its actual
+printed table has five code cells, =1ST= through =5TH=, without separately
+labelled Other-name text cells. It cannot bind =ag_d20_oth= or =ag_d20b_oth=
+to a fixed crop slot or first/second Other occurrence. This is not evidence
+that the electronic questionnaire never asked specify text.
+
+The viewed 2019 G p27 crop column says "PRE-POPULATED WITH CROPS THAT ARE
+LISTED IN MODULE D (question 20)". I p35 says "PRE-POPULATED WITH CROPS THAT
+ARE LISTED IN MODULE H (CROP/SEED TYPE)", while its top instruction refers
+to G's harvested crop names/codes. H p29 refers to G names/codes and totals
+seed across plots; H02 permits G/H01 adjustments. These are the paper's
+D-to-G-to-H-to-I links, not a released-field crosswalk. In particular, the
+checkpoint's 2019 I label "Id in ag_H_seed_roster" still needs the actual
+I-to-H roster-ID-to-crop-code bridge for each held source half.
+
+D-0/G-0/I-0 offer =2014/2015= or =2015/2016= in the 2016 form (p10/28/36),
+and =2017/2018= or =2018/2019= in the 2019 form (p8/27/35). D is planted
+crops; G13 is harvest in that reference season (2016 p29; 2019 p28).
+Panel D/G begin in visit 1; the later G harvest block and I are visit 2.
+Thus their printed interval design agrees; the selected household seasons,
+visit/export variables and fielded electronic revisions still need binding.
+Both forms explicitly route panel and cross-sectional households, but that
+does not certify every field in catalog 3819's held re-release.
+
+Only a proved slot/text, period and released-ID binding can support a later
+resolver. A plot's name cannot name every household sale. No mapping, native
+code, local-name equivalence, unit, amount, sale/harvest lineage, filter,
+weight or default changes here. Scientific controls are proposed and UNRUN;
+whole #1228 remains open. Exact custody/pages, version limits and missing
+operands: =.coder/ledger/1228-malawi-dgi-authority-20261110-739b1579.md=.
