@@ -110,3 +110,18 @@ No, unknown and missing availability crossed with positive/missing/negative/zero
 reportedPrice, including a nonunique source row index. All prior46 cases and
 all product/book objects remain exact. The final planned selection is47 cases
 in16functions, still UNRUN (no module imports or collection).
+
+## Actual foundation verification (2026-11-10)
+
+Root and independent source/control review admitted exact3fafca54a for ONE
+47-case new-module pure cohort. Actual actor55593 CLOSED0/chunk8c8f2f:
+47PASS/0failure/error/skip,10.66s pytest/18.012s wrapper. All13 source/operator
+bindings exact, checkout clean/unchanged3faf, controller/gw0/gw1 exact MAIN and
+private countries/data identity, unmappedUID65534/net namespace, zero active
+provider/network denials, private top-level data/config files0. Direct logs,
+JUnit and ordinary receipts are external at
+`reports/587-nigeria-pp-price-foundation-focused-20261110/focused-v1`.
+No initial test failure or rerun, no old cohort/native/header/PDF/API/Make/census.
+The earlier UNRUN statements describe the immutable source-review freezes;
+this is the subsequent actual foundation gate, not five PP served cells or a
+Price-policy decision. All public wiring and real API acceptance remain pending.
