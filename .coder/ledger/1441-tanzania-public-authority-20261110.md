@@ -1,37 +1,36 @@
-# Prior-Art Ledger — #1441 Tanzania original-round public authority
+# Prior-Art Ledger — #1441 Tanzania original public code authority
 
-**Search tier used:** ripgrep + git; public primary catalogue HTML only for the new route. No runtime, data reader, Make, DVC or API operations are authorized.
+**Search tier:** git + ripgrep; exact public primary HTML; authenticated original public documents under Root's subsequent finite steering grant. No LSMS runtime, native data, Make, tests/collection, source providers, DVC publication or cache mutation.
 
-## §1 Task, restated
-At source `4381d701ffb06ab447a37c66362119d1c1e23009`, identify original NPS 2008/09 and 2010/11 official region and within-region district code/name authority, and any explicit bridge to UPD `ha_01_1` / `ha_02_1` after release recoding. Deduplicate held document provenance and closed v3 before new research. Own only this ledger and `lsms_library/countries/Tanzania/_/1441_PUBLIC_AUTHORITY_ROUTE.md`. Investigation initially UNFINISHED.
+## §1 Task
+At source `4381d701ffb06ab447a37c66362119d1c1e23009`, deduplicate held document provenance/closed v3, identify original NPS2008/09 and2010/11 joint region/within-region district dictionaries, and establish or retain the exact bridge to UPD ha_01_1/ha_02_1. Own only this ledger and `lsms_library/countries/Tanzania/_/1441_PUBLIC_AUTHORITY_ROUTE.md`. Ledger committed before investigation. Initial scope was metadata-only; Root explicitly extended exact original public-document acquisition/read in the absolute steering channel, preserved as private AUTHORITY-STEERING.txt.
 
-## §2 Existing machinery / evidence to reuse
-| item | anchor | decision |
+## §2 Existing machinery and documentary evidence
+| Item | Anchor / validation | Decision |
 |---|---|---|
-| Registered R3 name construction | Tanzania `_/CONTENTS.org`, “District and Region labels for market”; `2008-15/_/categorical_mapping.org`, `upd_district_code`; `_/_upd_district.py` | retain; not an original-round dictionary |
-| Approved named digit exceptions | `_/_upd_district.py`, `UPD_DISTRICT_DIGIT_CLUSTERS` | retain, do not generalize |
-| Spelling-only District table | Tanzania `_/categorical_mapping.org`, `District` | not code-pair authority |
-| Closed source-only v3 | private final `9248cf225634dc750ec2ff9cfa53188417557634`, supplied evidence REPORT | read before new public route; do not repeat inventory |
-| Closed #587 document identities | `.coder/ledger/587-tanzania-upd-documentary-disposition.md`; Tanzania CONTENTS final appendix | reuse sealed evidence; no PDF reparse |
-| Original R1 public region categories | WB76 `variable/F39/V1285?name=region` | complete displayed region labels recorded; no UPD binding or district names implied |
-| Original district variable metadata | WB76 F39/V1270; WB1050 F157/V3402 | public categories have blank names; scoped negative only |
-| Original R2 code-card pointer | WB1050 resource30537, exact filename `Interviewer_Manual_NPS_Y2__English_.pdf`; indexed NBS printed p.25 | restore questionnaire resource30525's back code list separately; no binary fetched |
+| Approved R3 plurality construction | Tanzania CONTENTS district/market section; `2008-15/_/categorical_mapping.org:upd_district_code`; `_/_upd_district.py`; tests/test_gh1441_tanzania_district_code.py | retain; not original-round documentary authority |
+| Approved named digit exceptions | `_/_upd_district.py:UPD_DISTRICT_DIGIT_CLUSTERS`; tests/test_tanzania_1441_followups.py | retain; never generalize |
+| Country District | Tanzania `_/categorical_mapping.org:District` | spelling only; no code/region keys |
+| Closed v3 | final9248cf225634dc750ec2ff9cfa53188417557634; supplied private REPORT | reuse source inventory; no repeat |
+| Closed #587 | own ledger/CONTENTS; closed EVIDENCE and extraction manifest | authenticate existing BID6–7/UPQ7 text for the new recoding question; no UPD PDF reparse |
+| Original public dictionaries | WB76/11558 XLS CODES sheet; WB1050/30525 PDF CODES48 | acquired/sealed exact public resources under extended grant; full pairs transcribed with cells/page/column provenance |
+| Existing document readers | supplied read-only xlrd2.0.2; system GI/Poppler20.11.0+Cairo | reuse; no new dependency/tool build, install or mount |
 
-## §3 Definitions & conventions in force
-Inherit `STANDING.md` §§3–4, `CLAUDE.md` (byte-identical to AGENTS), and canonical `lsms_library/data_info.yml`. Personally read full Tanzania `_/CONTENTS.org`, including LOGBOOK/TODO/WAITING. UPHI is Round-4 household identity backcast into prior rounds; r_hhid identifies the round interview. Four logical rounds share `2008-15/`. Extended2019 and Refresh2020 remain distinct. Original-round instruments and UPD release materials are distinct authority objects.
+## §3 Definitions
+Inherit STANDING §§3–4, CLAUDE/AGENTS and canonical data_info.yml. Full Tanzania CONTENTS personally read including LOGBOOK/TODO/WAITING. UPHI backcasts Round4 household identity; r_hhid identifies the round interview. Four logical rounds share2008-15. Extended2019 and Refresh2020 are distinct. An original code card, a retrospective UPD document, an exact fielded revision and an original-to-UPD recode are different authority objects.
 
-## §4 Invariants & assumptions
-Preserve live WAITING #114 and approved #1488/#1498 construction, all IDs, weights, defaults, labels and code maps. CONTENTS says “Rounds 1-3 share one numbering, the geocode's”; its measurements do not independently authenticate an original dictionary or prove no UPD recoding. CONTENTS also says “no document scanned lists the codes”: this is a scoped prior scan, not a global absence claim. A newly found contradiction must be quoted, not dismissed as stale. No native rows/headers, new binary/PDF/workbook retrieval/parsing, source acquisition, numeric census or fielding inference.
+## §4 Invariants
+Preserve WAITING114, approved1488/1498, digit exceptions, all IDs/weights/defaults/labels/code maps. CONTENTS says “Rounds 1-3 share one numbering, the geocode's”; measured continuity does not authenticate per-field preservation. Its “no document scanned lists the codes” is the prior held scope, not a global absence claim; newly admitted original cards expand that scope without rewriting CONTENTS. Historical report “Derivation: none registered” conflicts with current registered source; quote both stages. No later/foreign round, spelling/geographic continuity or code formula substitutes for missing authority. Public document reads are the sole binary/dependency relaxation; no native header/row, full-PDF census or fielding/statistical inference.
 
 ## §5 Reuse decision
-Reuse approved construction and closed custody evidence. New work is only a bounded public documentary route and exact restoration proposal. No map may be implemented before reviewed authority. A proposal must state exact URL/title/version/format, known identity, targeted fields/pages, and unresolved version bridge.
+Retain production construction and closed custody evidence. Root's exact original R1 XLS11558 and R2 PDF30525 were acquired once each and sealed0400/nlink1, pre/post authenticated. Only one structure locator per document, COVER/CODES sheets and PDF1/47/48 were read; PDF1/48 rendered and personally visually reviewed. Optional R2 manual30537 not acquired because actual questionnaire code card resolves its locator purpose. Full explicit PDF printed code pairs match independent visual transcription; failed area and strict-layout attempts remain recorded. Source spellings/ambiguities are preserved. No map implementation or tests.
 
-## §6 Open operands for coordinator
-Original-round code/name dictionary and explicit relation to UPD release codes remain open. Exact original R1 household XLS11558 and R2 household PDF30525, with supporting manual identities11562/30537, are identified in the country note. Root must concretize binary restoration, exact hashes and page/sheet custody separately. The proposal was recorded in the absolute QUESTIONS_FROM_AGENT channel; no attached-human prompt/wait. Matching NBS/WB document names are not proof of byte/version equality.
+## §6 Remaining coordinator operands
+Original dictionaries are FOUND, not still missing. Exact original-cover-to-UPD ha_01_1/ha_02_1 preservation/recode authority remains missing, bound to original versions and held UPD_v01_M. BID6–7 warns about general renaming/response recoding and supplies no inspected field-specific bridge. Proposed exact sidecar and per-document SOURCE bytes are in DOCUMENT-PLACEMENT-PROPOSAL.json; Root/MAIN owns normal placement/publication. Document version beyond catalogue/date/filename/hash remains qualified; NBS/WB matching names are not byte identity. No human prompt or extra approval packet.
 
-## Phase 3 — verification
-OK (§§1–5): new country Markdown note is a bounded primary-metadata investigation, not a repeated v3 inventory or a map implementation. Exact public HTML receipts and code/category projection preserve original case. Web-tool variable-page failures remain failed; no-redirect public HTML fallback succeeded. No case/frequency columns support any inference. Existing closed BID6–7/UPQ7 text is reused for the genuinely different codebook/recoding question and authenticated against its extraction manifest. General UPD recoding warning does not disprove measured R1–R3 continuity, but does not authenticate a per-field recoding bridge either.
+## Phase3 — verification
+OK (§§1–5): full original-card transcription with unique printed region-suffix/district keys, exact literal R1/R2 differences and raw heading/cell/page provenance. R1 list ordinals22–26 versus suffixes51–55, bare TANGA/MOROGORO, and literal URAMBA/SENGEREMA/MICHWEWENI are retained; no spelling repair or UPD assignment. Text+visual selected PDF evidence, authenticated closed text and exact public HTTP receipts support the note. Initial web-tool failures and document projection failures remain failed evidence.
 
-OK (§§3–4): existing full CONTENTS and every nonowned Git mode/type/blob/path remain identical to source4381 (final manifest proof in private SOURCE-PROOF.json). No registered construction, digit exception, panel/source identity, default or weight changes. Historical no-derivation wording is quoted with its current-source contradiction. No imports, tests/collection, Make, source/native reader, cache, acquisition, binary download/parse or GitHub operation ran. Static skill-frontmatter enumeration substitutes for make api-audit, which would violate the source-only task. Shared prior-art skill resolved at `/global/home/users/ligon/.sucoder/skills/prior-art-ledger/SKILL.md` after the dispatch-local home path was missing; its stop-for-human recipe is superseded by explicit headless task authorization.
+OK (§§3–4): complete CONTENTS and every nonowned Git mode/type/blob/path remain equal to source4381; final source proof is private SOURCE-PROOF.json. Only the two owned documentation files change. No production runtime, tests/collection, native source operation, Make, GitHub/source push, DVC push, cache write or scientific-default change. Static skill frontmatter substituted for prohibited make api-audit. Prior-art skill resolved at /global/home/users/ligon/.sucoder/skills/prior-art-ledger/SKILL.md after the dispatch-local home path was missing; explicit headless authorization supersedes its stop-for-human recipe.
 
-Authority outcome (§6): partial original R1 region authority and an attributable original R2 back-code-card pointer; complete joint dictionaries and UPD bridge unresolved. All patch/tests/restoration proposals are UNRUN. Independent Root review/integration remains pending; #1441 is not closed.
+Outcome (§6): bounded public-document investigation completed, including actual primary original code cards. UPD bridge, map/tests and document publication remain unrun/unresolved; Root review/integration and whole #1441 closure are not claimed.
