@@ -214,11 +214,12 @@ jobs:
         # Capture both streams before Poetry/pytest starts. Assertion rewriting,
         # explicit messages, warnings and plugins can all contain row values;
         # flags alone do not form the public-output boundary. The wrapper emits
-        # a fixed stage/status and numeric JUnit counts only, then removes the
-        # runner-local output/XML. Do not upload those private files as artifacts.
+        # a fixed stage/status, numeric JUnit counts and opt-in static checked-in
+        # test file/function locators, then removes the runner-local output/XML.
+        # Parameter IDs and traces stay private. Do not upload private artifacts.
         # Plain assertions and warning-summary suppression remain defense in depth.
         run: >-
-          python scripts/private_ci_check.py --stage data-tests --junit results.xml --
+          python scripts/private_ci_check.py --stage data-tests --junit results.xml --public-test-failures --
           poetry run pytest --tb=short --assert=plain --disable-warnings
           --timeout=600 --timeout-method=thread
           --durations=25 --junitxml={junit}
