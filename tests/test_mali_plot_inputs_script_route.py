@@ -64,15 +64,24 @@ def test_script_classification_and_own_source_sidecar_are_retained(year, monkeyp
     # source reference, not treat a truthy marker as an empty YAML source block.
     observed = []
     original = C.source_fingerprint
+    expected = wave.file_path / 'Data' / ('s16b_me_mli' + year[:4] + '.dta')
+    output_probe = wave.file_path / 'Data' / 'plot_inputs.parquet'
 
     def tracked(path):
-        observed.append(Path(path).resolve())
+        path = Path(path).resolve()
+        observed.append(path)
+        if path == output_probe:
+            # The unchanged literal scanner also sees the output's spelling.
+            # Model only this positively absent output at the metadata leaf;
+            # do not attempt a payload open to establish a missing sentinel.
+            assert not path.exists() and not path.with_suffix('.parquet.dvc').exists()
+            return 'missing:plot_inputs.parquet'
+        assert path == expected
         return original(path)
 
     monkeypatch.setattr(C, 'source_fingerprint', tracked)
     digest = wave._input_hash(TABLE)
-    expected = wave.file_path / 'Data' / ('s16b_me_mli' + year[:4] + '.dta')
-    assert observed == [expected.resolve()]
+    assert observed == [expected.resolve(), output_probe.resolve()]
     assert expected.with_suffix('.dta.dvc').is_file()
     assert isinstance(digest, str) and len(digest) == 64
 
