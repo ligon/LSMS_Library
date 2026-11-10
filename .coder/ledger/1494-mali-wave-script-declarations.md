@@ -1,0 +1,10 @@
+# GH1494: correct modern Mali script declarations
+
+## Authority and grounding
+Root approved country-only change2026-11-10: replace only two wave plot_inputs !make tags with explicitnull, retain country materialize:make, scripts/Make/schema/science/all1494 assertions. Baseexactd47. Full own Mali3840line CONTENTS read carries by SHAaa5314ccd94876fc55e4e958c8c90529ef53e7665820682650308f3d3f534575 from personally completed1436 grounding, including LOGBOOK/WAITING/TODO. EACI recurring EA is not household-panel authority; EACI14_/17_ and modern EHCVM21_ namespaces differ. Historical no-ag-input statement conflicts with dated own s16b wiring and remains qualified, not removed.
+
+## Reuse and invariants
+Use existing Wave script discovery/grab_data, Country._make_wave_inputs, script-source fingerprinting, reader/producer boundaries from1196/1071 tests, and prior1483 own adapter/native controls. Source diagnosis reports/1494-mali-wave-make-routing-source-diagnosis-20261110 (manifest e7d0dbdf…) preserves original source-backed refusal. Existing script route is selected by null; blanket framework !make recognition would leave other truthiness sites inconsistent. No framework/adapter/wrapper/Make/schema/ID/map/policy changes. Only the disproved literal1483 marker assertion changes to real-loader/null/discovery/classification; all other assertions exact. New finite controls use invented private frames/inert IO leaves, actual Wave method and ownconfig metadata. No actual sources/provider/API/real producer/writer/network/census.
+
+## Verification plan
+Freeze source before one appropriate finite pure cohort. Check both actual configs, script preparation flags and own sidecar fingerprint references; actual Wave warm/cold/recipe-failure routing with strict payload/attrs and no YAML extraction; malformed truthy YAML still loud. OriginalGH1494 assertions remain unchanged. Actualnormal corrected node is a later distinct manager-coordinated gate using46already-managed closure and genuine normal sample rebuild (YAML hashes change), no stale/memo/restamp. Pure and actual results pending.
