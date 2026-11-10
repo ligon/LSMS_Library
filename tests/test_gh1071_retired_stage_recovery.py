@@ -20,6 +20,7 @@ import pytest
 import yaml
 
 from lsms_library import country as C, local_tools as L
+from lsms_library.population import PopulationRecord
 from tests.test_gh1032_readonly_dvc_runtime import tiny, _readonly, _snapshot
 from tests.test_gh1196_parquet_index_policy import _exact
 
@@ -51,8 +52,15 @@ def _country(tiny):
 def _served():
     frame = pd.DataFrame({'x': pd.array([15., 25.], dtype='Float64')},
         index=pd.MultiIndex.from_tuples([('h1', WAVE), ('h2', WAVE)], names=['i', 't']))
-    frame.attrs = {'country': NAME}
+    frame.attrs = _expected_attrs([WAVE])
     return frame
+
+
+def _expected_attrs(waves):
+    # Literal uncurated-country metadata contract; never copy actual attrs.
+    return {'country': NAME, 'population': {NAME: {
+        wave: PopulationRecord.unrecorded(NAME, wave) for wave in waves}},
+        'population_resolution': {NAME: 'exact'}}
 
 
 def _payload_path(value):
@@ -90,7 +98,7 @@ def test_real_clean_foreach_cache_forces_once_and_warm_never_reproduces(tiny, mo
         'do': {'cmd': command, 'outs': [{'${item.output}': {'cache': False}}]}}}}))
     # Setup-only real DVC save computes the exact old output identity, even
     # when its bytes are unreadable parquet. No initial producer is run.
-    stage = fs.repo.stage.load_one('dvc.yaml', 'materialize@fixture')
+    stage = fs.repo.stage.load_one(str(root / 'dvc.yaml'), 'materialize@fixture')
     stage.save(run_cache=False)
     (root / 'dvc.lock').write_text(yaml.safe_dump({'schema': '2.0', 'stages': json.loads(json.dumps(to_lockfile(stage)))}))
     calls, statuses = [], []
@@ -155,6 +163,19 @@ def stage_owner(tiny, monkeypatch):
     return owner
 
 
+def _strict_fault(owner, monkeypatch):
+    # Authority-negative controls target the actual strict reader receiver.
+    # The owned-payload controls below still exercise the real decoder.
+    read = C.get_dataframe
+    error = ArrowInvalid('invented strict stage reader failure')
+    def strict(path, *args, **kwargs):
+        if Path(path) == owner.output:
+            raise error
+        return read(path, *args, **kwargs)
+    monkeypatch.setattr(C, 'get_dataframe', strict)
+    return error
+
+
 def _fault(owner, monkeypatch, mutate=None):
     read = pd.read_parquet
     error = ArrowInvalid('invented initial stage payload failure')
@@ -177,7 +198,11 @@ def test_unowned_stage_outputs_preserve_strict_error_and_never_force(stage_owner
         o.info = replace(o.info, lexical_output_path=o.data / 'unmanaged.parquet')
     elif kind in {'private-sidecar', 'source-sidecar'}:
         p = o.output if kind == 'private-sidecar' else o.source / WAVE / '_/facts.parquet'
-        p.with_name(p.name + '.dvc').write_text('outs: []\n')
+        payload = o.output.read_bytes();digest = hashlib.md5(payload).hexdigest()
+        p.with_name(p.name + '.dvc').write_text(yaml.safe_dump({'outs': [
+            {'md5': digest, 'hash': 'md5', 'size': len(payload), 'path': p.name}]}))
+        blob = o.data / 'dvc-cache' / digest[:2] / digest[2:]
+        blob.parent.mkdir(parents=True, exist_ok=True);blob.write_bytes(payload)
     elif kind == 'leaf-symlink':
         target = o.output.with_name('target.parquet')
         o.output.rename(target);o.output.symlink_to(target)
@@ -199,7 +224,7 @@ def test_unowned_stage_outputs_preserve_strict_error_and_never_force(stage_owner
     elif kind == 'nonlocal':
         o.stage.outs[0].fs.protocol = 's3'
     before = _state(o.output)
-    error = _fault(o, monkeypatch)
+    error = _strict_fault(o, monkeypatch)
     with pytest.raises(ArrowInvalid) as caught:
         o.load()
     assert caught.value is error and not o.calls and _state(o.output) == before
@@ -238,7 +263,7 @@ def test_explicit_yaml_source_cannot_be_an_owned_stage_cache_even_without_sideca
         'file': '../_/' + field + '.parquet', 'idxvars': {'i': 'i'}, 'myvars': {'x': 'x'}}}))
     assert not path.with_name(path.name + '.dvc').exists()
     before = _state(path)
-    error = _fault(o, monkeypatch)
+    error = _strict_fault(o, monkeypatch)
     with pytest.raises(ArrowInvalid) as caught:
         o.load()
     assert caught.value is error and not o.calls and _state(path) == before
@@ -253,7 +278,7 @@ def test_unknown_recovery_metadata_retains_original_reader(stage_owner, monkeypa
     if healthy:
         _exact(o.load(), _served())
     else:
-        error = _fault(o, monkeypatch)
+        error = _strict_fault(o, monkeypatch)
         with pytest.raises(ArrowInvalid) as caught:
             o.load()
         assert caught.value is error
@@ -280,7 +305,7 @@ def test_fresh_attempt_is_not_healed_again_and_coverage_requires_success(stage_o
             _exact(o.load(), _served())
         assert L.read_parquet_cache_waves(o.data / NAME / 'var/facts.parquet') == []
     else:
-        expected = ArrowInvalid if mode == 'fresh-bad' else KeyError if mode == 'no-output' else RuntimeError
+        expected = L.ParquetFormatError if mode == 'fresh-bad' else KeyError if mode == 'no-output' else RuntimeError
         with pytest.raises(expected):
             o.load()
         assert not (o.data / NAME / 'var/facts.parquet').exists()
@@ -351,17 +376,17 @@ def test_clean_sibling_is_not_reproduced_or_decoded_twice(stage_owner, monkeypat
     monkeypatch.setattr(C.Country, '_resolve_materialize_stages', lambda *args: [o.info, info])
     read, counts = pd.read_parquet, {o.output: 0, other: 0}
     def payload(path, *args, **kwargs):
-        path = _payload_path(path)
-        if path in counts:
-            counts[path] += 1
-        if path == o.output and not o.calls:
+        candidate = _payload_path(path)
+        if candidate in counts:
+            counts[candidate] += 1
+        if candidate == o.output and not o.calls:
             raise ArrowInvalid('invented first-stage failure')
         return read(path, *args, **kwargs)
     monkeypatch.setattr(pd, 'read_parquet', payload)
     expected = pd.DataFrame({'x': pd.array([15., 25., 15., 25.], dtype='Float64')},
         index=pd.MultiIndex.from_tuples([('h1', WAVE), ('h2', WAVE),
             ('h1', other_wave), ('h2', other_wave)], names=['i', 't']))
-    expected.attrs = {'country': NAME}
+    expected.attrs = _expected_attrs([WAVE, other_wave])
     with pytest.warns(UserWarning, match='Unreadable managed stage cache'):
         _exact(o.load(), expected)
     assert counts == {o.output: 2, other: 1}
