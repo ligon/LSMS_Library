@@ -107,3 +107,6 @@ venv import has occurred. Source metadata checks use system Python only.
 
 Pending. Finalize in a separate ledger-only commit after actual source/doc work.
 All failures and unrun runtime gates must remain explicit in the private report.
+
+### Coordinator source admission — 2026-11-10 UTC
+The original job41069475 finished native143/supervisor143 Refused(errno22), with missing mandatory artifacts and task unreported; source qualification does not change that result. Independent source/document review qualified PASS (reports/review-uganda-642042-processing-notes-20261110), checking all12 food rows, nutrition identity, separate crop species and current647/1000 rulings. Coordinator integration preserves the entire6072-line original country prefix and leaves production/config/tests unchanged. The original-paper bytes/table/FCT authority gaps and scientific holds remain explicit. Phase3 documentary verification is now complete; runtime gates remain unrun for this patch.

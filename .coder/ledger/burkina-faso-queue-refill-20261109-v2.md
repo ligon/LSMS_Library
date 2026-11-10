@@ -120,3 +120,6 @@ version headings are preserved in the private evidence index. No claim of held
 release equivalence follows. Final artifact names: REPORT.md, RESULT.json,
 SOURCE-PROOF.json, DECISIONS.md and EVIDENCE-INDEX.json in the dispatch evidence
 directory. ROOT owns acceptance, scientific rulings and all GitHub publication.
+
+### Coordinator source admission — 2026-11-10 UTC
+The original job41069444 finished native0 but supervisor74 Refused(errno13); it remains a failed dispatch despite complete task artifacts. Independent source/document review qualified PASS (reports/review-burkina-484c36-country-notes-20261109); coordinator integration verified the full original country prefix and exact noncomment YAML bytes. Source-backed documentation is accepted separately from dispatch/runtime acceptance. Scientific and 2021 wiring holds remain open.

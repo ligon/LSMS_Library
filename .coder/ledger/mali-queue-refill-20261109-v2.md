@@ -126,3 +126,6 @@ DECISIONS/REPORT. All five required artifacts and final source conservation
 receipts are prepared outside Git under the dispatch's private evidence path.
 Final source publication is solely to the named private results repository;
 ROOT scientific/integration acceptance remains pending.
+
+### Coordinator source admission — 2026-11-10 UTC
+The original job41069580 finished native0/supervisor74 Refused(errno13), with unfinished task status; it remains failed. Independent documentary review qualified PASS (reports/review-mali-queue-documentary-20261109). The coordinator subsequently authenticated the declared public INSTAT snapshot and extracted/rendered only PDF1/3/15 in one context; independent visual review confirmed cover, own-wave dates and Section5 food prices. This closes the earlier exact-byte/selected-page documentary gap while preserving the BID contradiction, fielded/export uncertainty and all scientific holds. Report archive:821-mali-public-report-three-pages-20261110, manifest59ccea162b258f0fdd5d1235d0b6a10f32154e95661d8e41118e160b2d74a19a. All executable AST outside module docstrings and all noncomment YAML bytes remain exact4381; no native/API/table run follows from this doc patch.
