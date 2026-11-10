@@ -31,8 +31,10 @@ fire.
 Reported columns: Price, Quantity, Description, and Derivation on the rows above.
 No median / mean /
 index — those are transformations.py rollups over these rows — and, since
-GH #840, no SELECTION either: every priced (cluster, variety, passage) row is
-served.  GH #822 restores all three readings without changing eligibility.
+GH #840, no SELECTION either: every eligible priced reading is served.
+Unmapped item/unit rows and nonpositive or missing prices remain excluded
+by community_prices_finalize; GH #1179's unresolved unit codes stay excluded.
+GH #822 restores all three readings without changing that eligibility.
 """
 import sys
 
