@@ -906,6 +906,7 @@ class StageInfo:
     table: str
     fmt: str
     output_path: Path
+    lexical_output_path: Path | None = None
 
 
 @lru_cache(maxsize=4)
@@ -973,7 +974,8 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
                     .replace("${item.format}", fmt)
                 )
             output_rel = output_rel.replace("//", "/").strip()
-            output_path = (yaml_path.parent / output_rel).resolve()
+            lexical_output_path = Path(os.path.abspath(yaml_path.parent / output_rel))
+            output_path = lexical_output_path.resolve()
 
             yaml_rel = yaml_path.relative_to(root_path)
             stage_ref = f"{yaml_rel.as_posix()}:materialize@{stage_key}"
@@ -986,6 +988,7 @@ def _load_materialize_stage_map(dvc_root: str) -> dict[tuple[str, str | None, st
                 table=table,
                 fmt=fmt,
                 output_path=output_path,
+                lexical_output_path=lexical_output_path,
             )
 
     return stage_map
@@ -6804,6 +6807,7 @@ class Country:
             Load data using DVC materialize stages. Falls back to load_from_waves if stages are missing.
             """
             cache_path = data_root(self.name) / "var" / f"{method_name}.parquet"
+            strict_stage_read_failure = False
 
             # GH #323: start this table's grain ledger clean.  It is repopulated
             # either by the cold build (the collapse audit) or by replaying the
@@ -6923,8 +6927,107 @@ class Country:
                     stage_infos = deduped_infos
 
                     rejected_country_output = output_identity(cache_path)
+                    initial_stage_outputs = {info.stage_ref: output_identity(info.output_path)
+                                             for info in stage_infos}
+                    loaded_by_ref = {}
+                    attempted_refs = set()
+                    recovery_attempted_refs = set()
+                    unreadable_refs = {}
+                    rejected_stage_outputs = {}
+                    stage_frame_cache = {}
+
+                    def stage_owns_outputs(info):
+                        """Recovery authority, not a replacement for DVC validation.
+
+                        force removes ALL outs. Unknown/nonlocal/source/frozen
+                        outputs retain their old strict read route.
+                        """
+                        stage = loaded_by_ref.get(info.stage_ref)
+                        lexical = getattr(info, 'lexical_output_path', None)
+                        if (stage is None or lexical is None or not getattr(stage, 'cmd', None)
+                                or getattr(stage, 'frozen', None) is not False
+                                or getattr(stage, 'is_import', None) is not False
+                                or info.country != self.name or info.table != method_name):
+                            return False
+                        root = data_root().absolute()
+                        tables = set(self.data_scheme) - JSON_CACHE_METHODS
+                        folders = set(map(str, self.waves)) | set(map(str, self.wave_folder_map.values()))
+                        outputs = getattr(stage, 'outs', ())
+                        if not outputs:
+                            return False
+                        paths = []
+                        output_tables = set()
+                        for out in outputs:
+                            if getattr(getattr(out, 'fs', None), 'protocol', None) != 'local':
+                                return False
+                            path = Path(os.path.abspath(out.fs_path))
+                            if any(other.stage_ref != info.stage_ref and other.output_path == path.resolve()
+                                   for other in stage_infos):
+                                return False  # one force cannot borrow another selected stage's proof
+                            try:
+                                relative = path.relative_to(root)
+                            except ValueError:
+                                return False
+                            parts = relative.parts
+                            if (not parts or parts[0] != self.name or path.stem not in tables
+                                    or path.suffix != '.parquet'
+                                    or not ((len(parts) == 3 and parts[1] == 'var')
+                                            or (len(parts) == 4 and parts[2] == '_'
+                                                and parts[1] in folders))
+                                    or path.is_symlink()
+                                    or path.resolve() != root.resolve() / relative
+                                    or path.resolve().is_relative_to(countries_root().resolve())
+                                    or (path.exists() and path.stat().st_nlink > 1)):
+                                return False
+                            source = self.file_path / relative.relative_to(self.name)
+                            if (any(p.with_name(p.name + '.dvc').exists()
+                                    or p.with_name(p.name + '.dvc').is_symlink()
+                                    for p in (path, source))
+                                    or (source.exists() and path.exists() and path.samefile(source))):
+                                return False
+                            paths.append(path)
+                            output_tables.add(path.stem)
+                        # The Make closure omits already-hashed inputs. Request
+                        # its complete source set, and keep explicit YAML files
+                        # even when their names resemble a managed cache.
+                        try:
+                            _, raw_sources = self._make_declared_inputs(
+                                method_name, _extra_tables=output_tables - {method_name},
+                                _with_sources=True)
+                        except RuntimeError:
+                            # The finite Make ownership proof can be unknown
+                            # (e.g. an unverifiable Other hash). Retain the
+                            # original strict reader; this is not a cache miss.
+                            return False
+                        raw_sources = set(raw_sources)
+                        for table in output_tables:
+                            for wave in self.waves:
+                                owner = self[wave]
+                                block = owner.resources.get(table)
+                                if block:
+                                    raw_sources.update(
+                                        Path(os.path.normpath(owner.file_path / 'Data' / ref))
+                                        for ref in _collect_file_paths_from_block(block))
+                        declared = set()
+                        for source in raw_sources:
+                            declared.update((source.absolute(), source.resolve()))
+                            try:
+                                projected = root / self.name / source.relative_to(self.file_path)
+                            except ValueError:
+                                continue
+                            declared.update((projected.absolute(), projected.resolve()))
+                        if any(path in declared or path.resolve() in declared for path in paths):
+                            return False
+                        return (Path(lexical).absolute() in paths
+                                and Path(lexical).resolve() == info.output_path)
+
+                    def all_output_identities(info):
+                        return tuple((os.path.abspath(out.fs_path),
+                                      output_identity(Path(out.fs_path)))
+                                     for out in loaded_by_ref[info.stage_ref].outs)
 
                     def collect_stage_outputs(stage_list, proven_stage_refs):
+                        nonlocal strict_stage_read_failure
                         stage_results: dict[str, pd.DataFrame] = {}
                         readable_refs = set()
                         for stage in stage_list:
@@ -6940,17 +7043,49 @@ class Country:
                                 if (output_path == cache_path
                                         and output_identity(output_path) == rejected_country_output):
                                     continue
-                                df_wave = get_dataframe(output_path)
-                                df_wave = map_index(df_wave)
-                                df_wave = self._augment_index_from_related_tables(
-                                    df_wave,
-                                    scheme_entry,
-                                    stage.wave,
-                                )
-                                df_wave = _normalize_dataframe_index(df_wave, scheme_entry, stage.wave, method_name,
-                                                                    country=self.name)
+                                if (output_path in rejected_stage_outputs
+                                        and output_identity(output_path) == rejected_stage_outputs[output_path]):
+                                    continue
+                                cached = stage_frame_cache.get(stage.stage_ref)
+                                if (cached is not None and stage.stage_ref not in attempted_refs
+                                        and output_identity(output_path) == cached[0]):
+                                    stage_results[stage.wave or "ALL"] = cached[1]
+                                    readable_refs.add(stage.stage_ref)
+                                    continue  # preserve one read/audit for an unchanged clean sibling
+                                recoverable = (stage.stage_ref not in attempted_refs
+                                               and initial_stage_outputs[stage.stage_ref] is not None
+                                               and output_identity(output_path) == initial_stage_outputs[stage.stage_ref]
+                                               and stage_owns_outputs(stage))
+                                try:
+                                    if recoverable:
+                                        admitted_outputs = all_output_identities(stage)
+                                        df_wave, error, observed = _read_managed_parquet_cache(
+                                            output_path, check_null=True, engine='pyarrow')
+                                        if error is not None:
+                                            identity = (observed.st_dev, observed.st_ino, observed.st_size,
+                                                        observed.st_mtime_ns, observed.st_ctime_ns)
+                                            if (observed.st_nlink > 1 or not stage_owns_outputs(stage)
+                                                    or output_identity(output_path) != identity
+                                                    or all_output_identities(stage) != admitted_outputs):
+                                                raise error
+                                            unreadable_refs[stage.stage_ref] = (identity, error, admitted_outputs)
+                                            rejected_stage_outputs[output_path] = identity
+                                            proven_stage_refs.discard(stage.stage_ref)
+                                            continue
+                                    else:
+                                        df_wave = get_dataframe(output_path)
+                                    df_wave = map_index(df_wave)
+                                    df_wave = self._augment_index_from_related_tables(
+                                        df_wave, scheme_entry, stage.wave)
+                                    df_wave = _normalize_dataframe_index(
+                                        df_wave, scheme_entry, stage.wave, method_name, country=self.name)
+                                except BaseException:
+                                    if recoverable or stage.stage_ref in recovery_attempted_refs:
+                                        strict_stage_read_failure = True
+                                    raise
                                 stage_results[stage.wave or "ALL"] = df_wave
                                 readable_refs.add(stage.stage_ref)
+                                stage_frame_cache[stage.stage_ref] = (output_identity(output_path), df_wave)
                         # The retired stage route is a different producer from
                         # load_from_waves. An existing output after a failed
                         # reproduce is available data under its legacy fallback
@@ -7003,6 +7138,7 @@ class Country:
                         for info in stage_infos:
                             stage = _load_stage(info.stage_ref)
                             loaded_stages.append(stage)
+                            loaded_by_ref[info.stage_ref] = stage
                         with repo.lock, _redirect_stdout_to_stderr():
                             stage_status = [
                                 stage.status(check_updates=False)
@@ -7026,10 +7162,14 @@ class Country:
 
                     stage_outputs: dict[str, pd.DataFrame] | None = None
                     stage_coverage = []
+                    recovery_only = False
                     if not dirty:
                         stage_outputs, stage_coverage = collect_stage_outputs(
                             stage_infos, proven_stage_refs)
-                        if not stage_outputs:
+                        if unreadable_refs:
+                            dirty = True
+                            recovery_only = True
+                        elif not stage_outputs:
                             dirty = True
 
                     if dirty:
@@ -7037,9 +7177,28 @@ class Country:
                         fallback_to_waves = False
                         with repo.lock, _redirect_stdout_to_stderr():
                             for info, stage in zip(stage_infos, stage_iter):
+                                force = info.stage_ref in unreadable_refs
+                                if recovery_only and not force:
+                                    continue
+                                if force:
+                                    identity, error, admitted_outputs = unreadable_refs[info.stage_ref]
+                                    if (not stage_owns_outputs(info)
+                                            or output_identity(info.output_path) != identity
+                                            or all_output_identities(info) != admitted_outputs):
+                                        strict_stage_read_failure = True
+                                        raise error
+                                    warnings.warn(
+                                        f'Unreadable managed stage cache {info.output_path} '
+                                        f'({error!r}); rebuilding once through {info.stage_ref}',
+                                        UserWarning, stacklevel=3)
+                                    recovery_attempted_refs.add(info.stage_ref)
+                                attempted_refs.add(info.stage_ref)
                                 proven_stage_refs.discard(info.stage_ref)
                                 try:
-                                    stage.reproduce()
+                                    if force:
+                                        stage.reproduce(force=True)
+                                    else:
+                                        stage.reproduce()
                                     proven_stage_refs.add(info.stage_ref)
                                 except (OSError, ValueError, RuntimeError) as reproduce_error:
                                     warnings.warn(f"DVC reproduce failed for {stage.addressing}: {reproduce_error!r}. Falling back to legacy loaders.")
@@ -7078,6 +7237,8 @@ class Country:
                         raise KeyError(f"No data produced for {method_name} via DVC.")
                     return combined_outputs
             except (DvcException, FileNotFoundError) as e:
+                if strict_stage_read_failure:
+                    raise  # never turn a new recovery's fresh/postread error into another build
                 # GH #920(a): this line is the only signal a pip-install user
                 # gets that the call is about to be expensive, so it says WHY
                 # the cache was not served and that what follows is a full
