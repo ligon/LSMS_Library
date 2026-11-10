@@ -813,3 +813,32 @@ alone to =strata=; 2021-22 remains registered but unwired at this source
 pin. No sample, weights, defaults or geographic crosswalk changes are
 selected here. The document check and exact PDF identities are recorded
 in the GH #1575 evidence packet.
+
+* 2026-11-10 — own printed GPS question47 and export-authority limit (GH #1531)
+
+Both declared own2018 household workbooks,
+=ben_ehcvm1_qnr_household_excel_vague1.xls= (MD5
+=964ea82bb6320ac3d2bcfe74f4cd5fac=) and =..._vague2.xls= (MD5
+=0eb5f99c97bf53bfb1ee8d1eff77d377=), explicitly identify GPS question47 at
+=S16a_Agri!EO5/EO6=: “superficie de la parcelle (en hectare) selon les
+mesures GPS”. This is direct own question wording, separate from farmer
+question9 at =K5/K6= (ha or m²), measured-by-GPS question45 at =EL5/EL6=
+and its skip to48. Those question blocks agree across these distinct objects.
+
+Both covers =couvert!A17= say2018/2019. The agriculture entry question
+=S16a_Agri!B2= instead names campaign2017/18 in vague1 and2018/19 in vague2.
+Retain the distinction; it is not a demonstrated fielded/export revision bridge.
+The printed GPS wording does not establish the unit or relationship of every
+released field, the existence of an own q47a, or applicability by row/vague.
+No export/cleaning relation was found in inspected S16a cells, covers, workbook
+Observations, selected-sheet comments or defined names; no global absence is
+claimed. Current source binds q47 and the older “already hectares” description
+remains a source assumption beyond the printed-question evidence.
+
+The earlier “no2021-22wave” statement remains beside the dated registered-but-
+unwired holding note. No2021 instrument authority is transferred here.
+Five exact own Benin/Togo DOCUMENT copies were inspected from held L1 without
+network retrieval; no microdata/header/row/API was used for this document result.
+Exact cells, covers, MD5/SHA/custody and limits are in the independent
+=reports/review-1531-benin-togo-own-documents-20261110/= packet. No area conversion,
+substitution, fallback, clamp, yield route, held-list, unit or default changes.

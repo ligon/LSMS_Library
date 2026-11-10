@@ -900,3 +900,35 @@ No sample, strata, native labels, weights, schema or defaults change.
 No new download, PDF parse, microdata read or source/table campaign was
 needed for this holding; the earlier document-check evidence is reused.
 See =.coder/ledger/1575-three-public-bids-managed-ingestion.md=.
+
+* 2026-11-10 — own printed GPS question47 and calendar/export caveats (GH #1531)
+
+All three declared own2018 household forms,
+=tgo_ehcvm1_qnr_household_excel_vague1.xls= (MD5
+=1b7b18d25fa7083ec894688339aeaab6=), =..._vague2.xls= (MD5
+=5a7cbeb59add0bdf74e9379621388603=), and =EHCVM_UEMOA_MEN_TOGO_V2.xls=
+(MD5 =7acdf05c8091675af9e9f2b23fd4da5c=), explicitly identify GPS question47
+at =S16a_Agri!EO5/EO6=: “superficie de la parcelle (en hectare) selon les
+mesures GPS”. These question45–48 blocks and farmer question9 =K5/K6= agree
+across the distinct objects. The farmer's ha/m² codebook and measured flag
+are separate questions and supply no GPS-export unit classifier.
+
+All three =couvert!A16= covers print2017/2018, while the own catalog/BID
+describe2018/19. Agriculture entry =S16a_Agri!B2= names campaign2017/2018
+in vague1 and2018/2019 in vague2/V2. These are actual wording/version
+differences, not silently corrected calendar labels or proof of which form
+was fielded with the held v02 export. The existing printed-versus-fielded
+crop-condition warning likewise remains intact.
+
+No q47a/export/cleaning relation was found in inspected S16a cells, covers,
+Observations, selected-sheet comments or defined names; no global absence is
+claimed. Actual released-field existence/labels were not read for this
+document result. The current source's q47-hectares assumption is not an
+export bridge. Do not transfer Guinea-Bissau, Benin or farmer-unit authority.
+The native wave remains2018 and its agriculture source is Data1;2021-22
+remains a registered unwired holding.
+
+Exact DOCUMENT MD5/SHA/custody, cells and limits are retained in
+=reports/review-1531-benin-togo-own-documents-20261110/=. Held private copies
+required no network retrieval or microdata/header/row/API. No area conversion,
+substitution, fallback, clamp, yield route, held-list, unit or default changes.
