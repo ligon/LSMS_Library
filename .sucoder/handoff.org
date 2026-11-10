@@ -1,4 +1,11 @@
 #+title: Current LSMS-ISA coordinator handoff
+* CURRENT — bounded wrap-up, 2026-11-10 22:08 UTC
+See [[file:tasks/isa-wrap-up-20261110.org]]. Queue FROZEN to1690,1575/1693,
+Senegal1483,Malawi1190. Finish reviewed PRs/green CI/development merges, then
+hand-off. No new issues/research/sweeps.1690full42898422484 stillRUNNING;
+1575firstsample failed optionalhashmetadata before raw (all9metadata PASS);
+Senegal fullmenu source/pure accepted/exactone-native grant issued;1190allthree
+choices answered/implementation41114363 RUNNING. Historical states below.
 * CURRENT -- 2026-11-10 21:15 UTC
 LATEST [[file:tasks/isa-checkpoint-20261110T2115.org]].1690Hcf563/frozen54paths/
 S b4af2c/M16c3unchanged. Ordinary42898422441SUCCESS(unit130117767667+Windows),

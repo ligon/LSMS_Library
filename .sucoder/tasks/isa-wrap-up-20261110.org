@@ -1,0 +1,90 @@
+#+title: LSMS-ISA bounded wrap-up — 2026-11-10
+
+* Scope fixed by the maintainer
+Finish the four current streams: PR1690, GH1575/PR1693, Senegal1483,
+and Malawi1190. Do not add work to the queue, open residual issues, run a
+new backlog sweep, or restart completed investigations. Create PRs after
+independent review; merge to development only on green CI. Then write a
+concise durable hand-off. Existing explicit merge authorization supersedes
+the backlog skill's usual human-merge default. No master release follows.
+
+* Development and CI, 22:08 UTC
+Development remains 16c3f4d9c28462dde7970718a4eed67394215997:
+79 verified development merges /45 whole issue closures in the campaign.
+PR1690 head cf5637114ed513b774ebae929e57f8252e8f4de2 is frozen.
+Synthetic b4af2c746910028962701b7f9f76ca862d9219a4,
+tree 8f6baf015305f6a38f3a1fb53d8a1bb862df23ee, parents [development,head].
+Ordinary42898422441 SUCCESS; full42898422484/job130117638507 RUNNING.
+Root monitor exec59230; do not restart the data suite.
+R=burst/isa-sm-20261103/reports/1690-final-accepted-validation-20261110.
+After full success, retain only safe tested-source/JUnit/unit-checkout receipts,
+run R/preflight.py, refresh exact head/base/rules/checks, merge with expected
+head and verify actual merge parents/tree/development. Never save raw CI logs.
+
+* GH1575 / draft1693 — deputy finish_1590
+Exact baseline9f /candidate2f8dfc66a9710527a308dbc238b06808991aeb43.
+All9 actual metadata contexts in job41113367 CLOSED0/PASS (45–49s each).
+First baseline-Benin sample API entered once, failed before any raw getter,
+producer/writer/capture because finite optional cached_file_hash absent-path
+probes were denied before the intended FileNotFoundError handling. Job FAILED
+1/9m30. No records decoded; one failed sample API attempt is consumed.
+Deputy is preparing the exact Git-proven optional metadata path inventory and
+read-only active-hash-probe correction, independently reviewed by manager.
+Reuse closed metadata contexts by exact identity; require fresh actual-context
+identity and full country hash controls, without constructor replay for a badge.
+Existing finite normal plan remains in force; no new research or raw source.
+Earlier bootstrap/metadata/transport failures remain historical, not successes.
+After actual acceptance, align1693 with merged1690, conserve four-country source
+and accepted evidence, combine shared812 tests and append approved1531 notes.
+Private factual1531 child4d00179d9929ea0f1b0c28050f9130e07ad8376b is approved;
+it changes country documentation only, no unit/export policy or runtime claim.
+
+* Senegal1483 — lead review_nigeria_ph_pr /manager malawi_revision_food
+Source/pure correction0c18d55fc00185de9eb47d16f6aafaf03a7e7d48 independently
+reviewed. Six owned paths only, 19357 other development paths exact. Full own
+36-code input menu; native21–36 descriptors retained; true missing used-unit
+uses existing Unknown. First pure run38PASS/1expectationFAIL; affected alignment
+case then1PASS, not a fresh39-pass run. No actual native acceptance yet.
+Root authorizes exact ONE already-held Senegal2021 H object native correspondence:
+md5 cc408db6055a1a78506e30260c73f9c3 /5044514B /
+sha256 9a743b05f4f57e05ae3b92d0766d906c5c1d90c56c7c7d0f347817e80de04ca9.
+One real get_dataframe(convert_categoricals=False), resident raw/transport/kernel
+and unchanged-driver reader/writer spy. At most three private recovery captures.
+Setup120s/stage180/read180/oracle180/cleanup60; 15min/2CPU/8G outer allocation.
+No additional source acquisition, normal public API/cache/Make/writer claim,
+retry or historical763/all36 observed golden. Own header+actual own categorical
+mapping provide independent oracle; preserve original1196 typed/bit evidence.
+Lead/manager own routine operator adaptation, independent review and execution
+under this grant; no further Root per-file gate. Then perform only necessary
+scoped serving validation and reviewed PR/full CI to finish the existing issue.
+
+* Malawi1190 — manager /implementation41114363
+All three user decisions answered, central decision commit639e428e6:
+acquisition-only Farm-level rows; all admitted quantity components; literal
+H36 even with H34 No/missing, preserving flags. Reuse1298 source-row-slot identity.
+Dedicated Acquisition_* values/units/provenance; old G/D and legacy projections
+exact. New acquisition rows have planted Quantity/Applied/Improved and legacy
+purchase/gift summaries missing, u=existingUnknown. No plot allocation or value,
+unit, application, factor, payer, transport or weight inference.
+Current first/second gates and gift admission unchanged; recorded0/negative
+within those gates retained. H36 requires a recorded amount/native crop, no
+H34-Yes gate. Header-binding contradictions remain documented and unresolved.
+Implementation41114363 /dispatch6a83d8f670524ce786d61ae1a3259f44 RUNNING on
+exact reviewed Hcf563, source/pure only. Independent review follows. No new
+raw/native/API campaign until its finite already-managed-source plan is concrete.
+Consumer regression must prove no invented planted amount/application in
+seed_kg/nitrogen_kg/fertilizer_rate; minimally necessary new-role handling only.
+GitHub1190 updated/readback exact22:08:13; earlier pending choices retained as
+history, current top section records selection and remaining implementation.
+CURRENT-ISA-DECISIONS.org and proof refreshed byte-exact from639e428e6.
+
+* Standing limits and hand-off requirements
+Do not expand this campaign. GH1531 export/fielded authority, GH1457R2b,
+GH587 PP representation and other broader residuals remain documented; do not
+restart them. No production-weight change, panel relink, new raw release,
+master release or shared harmonized-cache rebuild. Root checkout is the older
+docs branch: do not import runtime library here. Use private checkout identity,
+explicit PYTHONPATH/LSMS_COUNTRIES_ROOT and private data/config for actual work.
+Final hand-off must list actual merged PRs/commits, exact validation and limits,
+remaining existing issues/decisions, durable evidence paths, live jobs (if any),
+and a minimal restart procedure. Never describe terminal workers as busy.

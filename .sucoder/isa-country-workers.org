@@ -1,4 +1,8 @@
 #+title: LSMS-ISA work owners — 2026-11-10 21:15 UTC
+CURRENT22:08UTC: queue frozen. Root1690fullCI/merge; deputy1575finite actual
+normal acceptance/1693; leadSenegalnative/serving/reviewedPR; manager1190
+implementation41114363+operator independent reviews. No new queue.
+See [[file:tasks/isa-wrap-up-20261110.org]] for grants, exact sources and limits.
 LATEST [[file:tasks/isa-checkpoint-20261110T2115.org]]. Root1690full42898422484
 watch59230,ordinary42898422441PASS; frozenHcf563. Mainleadassists1575v4same
 allowlistfile+SHAtransportreviewaftertwo0dataSETUPFAILS; deputysolelauncher/
