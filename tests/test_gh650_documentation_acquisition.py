@@ -130,6 +130,22 @@ def test_non_document_resources_are_visible_but_never_downloaded(docs):
     assert len(docs['calls']) == 1 and not docs['pushes']
 
 
+@pytest.mark.parametrize('where', ['api', 'html'])
+def test_unknown_resource_types_are_discovery_failure_not_not_listed(docs, where):
+    if where == 'api':
+        docs['api'] = {'resources': [dict(resource(), type='Unrecognized category')]}
+        docs['html'] = '<html>unrecognized fallback layout</html>'
+    else:
+        docs['api'] = urllib.error.URLError('API unavailable')
+        docs['html'] = '''<div class="resources"><a class="download"
+            href="/catalog/10/download/11" data-filename="own.pdf"
+            data-dctype="Unrecognized category"></a></div>'''
+    report = fetch()
+    assert report['status'] == 'discovery_failed' and report['discovery']['status'] == 'discovery_failed'
+    assert not docs['pushes'] and not report['held']
+    assert all('/api/resources/' in u or u.endswith('/related-materials') for u in docs['calls'])
+
+
 def test_download_failure_preserves_old_held_bytes_and_receipt_identity(docs):
     first = fetch(push=False)
     before = (docs['directory'] / 'questionnaire.pdf').read_bytes()

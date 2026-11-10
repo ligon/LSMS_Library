@@ -1360,6 +1360,9 @@ def _documentation_html(html: str, catalog_id: str) -> list[dict]:
     parser.feed(html)
     if not parser.recognized:
         raise ValueError('Unrecognized Related Materials resource layout')
+    if any(not row['generated_ddi'] and not re.search(r'\b(?:doc|data)/', str(row.get('type') or ''), re.I)
+           for row in parser.items.values()):
+        raise ValueError('Unrecognized Related Materials resource type')
     return list(parser.items.values())
 
 
@@ -1385,7 +1388,7 @@ def _documentation_resources(catalog_id: str, api_key: str | None) -> tuple[list
                 if not isinstance(r, dict) or not isinstance(r.get('_links', {}), dict):
                     raise ValueError('Unrecognized resources API record')
                 kind = r.get('type') or r.get('dc_type')
-                if not isinstance(kind, str):
+                if not isinstance(kind, str) or not re.search(r'\b(?:doc|data)/', kind, re.I):
                     raise ValueError('Resources API record has no recognized type')
                 rid = r.get('resource_id') or r.get('id')
                 rows.append(dict(resource_id=str(rid) if rid is not None else None,
