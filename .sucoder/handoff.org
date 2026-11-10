@@ -1,4 +1,14 @@
 #+title: Current LSMS-ISA goal handoff
+* Worker phase confirmation — 2026-11-10 03:28 UTC
+Both new remote country jobs ACTUALLY agent_execution/running on n0030,
+fresh nonstale heartbeats: BFA41082011 and Mali41082012. No unanswered worker
+question. finish_1590 owns actual finite supported watcher69898 (30s/5700s),
+Q/refill-header-1483-20261110/ACTUAL-STATE.json; now evaluates next six country
+queues against closed v3 results/current issue bodies. No completion inferred.
+1071 correctedsource3b1c209cca767f85e96eeb42982df7957d9cd99c has approved
+9case guard/realowner verifier46589 LIVE. Source-provenance hole proven reachable,
+not observed currentcountry corruption (no exact3pattern trackedsidecars found).
+
 * Latest operational checkpoint — 2026-11-10 03:27 UTC
 This overrides the03:14 state below. Goal ACTIVE; development4381 unchanged.
 TWO NEW country source-fix jobs submitted successfully after dryrun0:
