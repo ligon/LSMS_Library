@@ -1,4 +1,17 @@
 #+title: Current LSMS-ISA worker queue
+* Current after Windows repair (2026-11-10 06:06 UTC)
+PR1687 finalhead42f2a8e0: WindowsSUCCESS, unit42765866264/full-data42765866627
+live. Root observer35534; old25573closed/superseded histories retained.
+UTF8product3readfix passed12targeted controls, tests/exemptions unchanged.
+1452 Nigeria587:5ownPPprice forms+6actualzero-rowheaders complete; source-bound
+adapterdesign next. Existingobs/variety grain reused; W1quantity/W3locations and
+ownrawunitdictionary-versus-paper conflicts retained. No rows/servingwiring yet.
+1590 Tanzania587: a20docfindingsRootaccepted; nowqualify2unsupportedfielding
+docstrings only, all executableAST/waves/strategies/tests exact/no runtime.
+Mwi: completed independentNGA5formreview after2externalpage-reference corrections;
+availablefornextreview/actualCIfailures. Ethiopia4backfill completein1687.
+Zero remotejobsrunning; no eight-busy claim. GoalACTIVE/no newmerge/fullpass.
+
 * Actual checkpoint (2026-11-10 05:55 UTC; CURRENT)
 PR1687 READY finalhead1e5f319de; ordinaryCI42764993506/full-data42764993747 live.
 Root owns observer25573 and source admission/publication/settings/merge. No new

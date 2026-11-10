@@ -1,4 +1,44 @@
 #+title: Current LSMS-ISA goal handoff
+* CURRENT after real Windows repair (2026-11-10 06:06 UTC)
+PR1687 FINAL published head42f2a8e017ae6dee534572189ebc743a831ed2ca,
+tree0ce39656bc88f3ffea9df158aa2b0a38bdc31c2d; author Wfix-1687-documentation-utf8-20261110.
+Root independently checked literal3encodingkeywords/inverse-file equality and
+tested406d product carry; allothercode/config/tests exact1e5. Windows originally
+FAILED1/361PASS/1SKIP due3newfetch_documentation read_text calls lackingUTF8.
+Correct product, not test/exemptions.12focused controlsPASS/0F/E/S/sourceclean/
+3IDs/private0, finalledger-only42f. Windows actual newrun42765866264 nowSUCCESS;
+unitstilllive. Full-data42765866627 IN_PROGRESS/eligibilitySUCCESS. Observer35534
+LIVE in R1687-final-integration-ci-20261110/watch_ci_v2.py,CI-WATCH-v2.jsonl.
+Oldobserver25573 CLOSED normally; prior1e5 fullcancelled/unitcancelled/Windows
+failed retained.201955 runs alsocancelled. NO finalfull-data/merge/settings claim.
+Oldworkflow-only16failures remain unclassified until current diagnosticrun.
+No further1687source changes absent actual failures; follow-on country work separate.
+
+Country lanes advanced:
+- Nigeria587: all5 own PP forms positively ask C2 prices; peerMwi SOURCE PASS
+  after2wrongcardpage references corrected/externalmatrixv2(originalpreserved),
+  W4coverPP/footerPH conflict retained neutrally. Six zero-row native headers
+  CLOSED0(onecontexteach/lines_read0/sealsequal):2localW3 then4normalDVC-only
+  read-only fetches into private roots(WBdenied) +4headers. All6bindings real;
+  no rows/API/coverage. W1sc2q3aNaira/q3bNumberUnits/q3c46units;W2c2q1/2/3;
+  W3bothq1/2/2b/3, ownattachedunitlabels disagreeprintedcard(22/32vs31/42);
+  W4unit+SIZE;W5quantity/unit/SIZE+conversionfactor.1452sealing fieldmatrix and
+  adapterdesign. Root pointed to EXISTING(t,v,j,u,variety,obs) GH637/840 grain:
+  reuseobs locations, don't borrowPHfixedunits/size-drop/cards. No publicwiring,
+  price normalization, nativevalue/uniqueness inference yet. Mwi review complete.
+  R587-nigeria-five-pp-community-docs-20261110; review Rreview-587-nigeria-five-pp-community-docs-20261110.
+- Tanzania587: a20f6d425dabf386626c72fc605b153849f02205 doc-only candidate
+  Rootread/accepted, onefresh11558readonlyget+boundedK/Rxlscontexts. K7day
+  consumption/sharedmeals andR5yearshocks are not the inspected8strategybattery;
+  no wholeform/actualfielding/UPDbridge/coverage verdict. Root now delegates
+ 1590 source-only qualification of2overstated producerdocstrings ('did NOT field
+  §H'), preserveall executableAST/source/waves/strategies/tests, no runtimecensus.
+  Ownnextbranch offa20, nevermutate1687. R587-tanzania-r1-original-food-authority-20261110.
+- Ethiopia4docbackfill complete/allretrievalsverified in1687; no new parsing.
+Zero remotesrunning.1452NGA and1590TZA active; Mwiavailableforreview/CIactuals.
+GoalACTIVE, developmentstill4381/78verifiedmerges/42wholeclosures. Pending1573/
+1575decisions unchanged. No masterrelease/sharedrewarm/productionweights change.
+
 * Published integration (2026-11-10 05:55 UTC; CURRENT)
 PR1687 READY https://github.com/ligon/LSMS_Library/pull/1687, final published
 head1e5f319de476a8c253d1a61f0745021e82313305/tree d309e1562e90b4facd451bbf8878b8145cc42e86.
