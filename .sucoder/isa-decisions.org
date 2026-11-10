@@ -1,5 +1,18 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-10: Burkina Faso 2014 strata labels, GH1573
+The user explicitly selected: "Decode the 2014 strata labels (Recommended)".
+Decode native 2014 strata with the authenticated own-survey 26-pair lookup to
+the existing preferred Region x Urbain/Rural labels. Apply after the unchanged
+GH1464 food-to-welfare bijection/refusals and household extension. Preserve all
+rows, weights (including added-household NA weights), non-strata fields, attrs,
+true missing and unknown nonmissing codes. Keep the explicit lookup invertible;
+no additional public strata_native column is approved by this choice.
+This is recorded-code decoding, not a claim of an explicitly planned 26-cell
+design or identical sample designs/PSUs across waves. Other waves stay unchanged.
+Source design: reports/1573-burkina-strata-decision-preparation-20261110/PROPOSAL.md.
+Implementation delegated to finish_1590; integration lead owns independent review.
+
 * 2026-11-10: Malawi different-unit sale attachment, GH1457 R1
 The user explicitly selected: "Attach to the sole row, preserving the sale’s own unit (Recommended)".
 Attach a sale in a different unit only to its household/native-crop's SOLE
