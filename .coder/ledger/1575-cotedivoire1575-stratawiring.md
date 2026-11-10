@@ -73,6 +73,40 @@ selected country; deputy owns adaptation. No shared cache work/GitHub writes.
 
 ## Phase 3 — verification
 
-Pending frozen private implementation and pure checks. Source-qualified
-runtime authorization is the explicit charter plus APPROVED-RUNTIME-BINDINGS,
-superseding the initial source-only project-runtime policy for this scope.
+OK (§§2–5): the YAML uses the unchanged `strata_label`; wave functions delegate
+only to the existing country-bound input/stamp helpers. The single registry
+key resolves the existing derivation and input callable, scopes only 2018-19,
+and accurately records actual-row validation UNRUN. Full original CONTENTS
+prefix is preserved. All other sample declarations and pre-existing hook
+bodies remain exact; no alias/crosswalk/shared/helper/schema edit.
+
+OK (§4): frozen pure v2 passed 32 checks (18 new own checks and 14 existing
+GH812 TestLabel/TestStamp controls), `-n 2 --dist=loadfile`, private empty data
+and config, immutable image generation 20261019T221223Z, BLAS/build threads 1,
+and a distinct user/network namespace. Controller and both worker receipts
+assert exact checkout/package/config/countries/runtime identity. Native and
+parquet opens/network and nonprivate writes were denied; actual extraction
+used only fenced invented providers. Complete nonstrata frame/axes/order/
+dtypes and raw weights/Rural match the original declaration; nullable key,
+missing/blank, nonstring refusal, attrs, default scoped inputs and explicit
+unsupported-provider failure are covered. Typed attrs preservation is shown
+at the hook boundary, not claimed as normal Country/Feature acceptance.
+
+Failures preserved in external evidence: pre-freeze system-Python 3.6 receipt
+generation rejected `text=True`; corrected to `universal_newlines=True` before
+tests. Pure v1: 28 passed/4 failed because the test imported public
+`derivations` (a function) instead of direct registry functions. Only that
+test import/use was corrected and re-frozen; all production v1/v2 source
+hashes match. The setup helper passed; a subsequent optional Poetry binary
+probe was absent (no install attempted). The API audit ran its exact stdlib
+script through MAIN, enumerated all 15 skills and exited 0.
+
+No CONTRADICTION or REINVENTION found against §§2–5. Shared GH812's two
+region-only assertions for CIV are intentionally obsolete and reported to
+deputy without changing/running that cell. Shared helper commentary also
+describes historical scope and stays untouched as required. Native card and
+all actual/full integration/metadata acceptance remain residual gates (§6).
+Source-qualified runtime authority is the explicit charter plus
+APPROVED-RUNTIME-BINDINGS, superseding the initial source-only project profile
+only for this finite pure scope. Detailed logs/JUnit, freezes and identities
+live in the dispatch evidence directory named by the worker handoff.
