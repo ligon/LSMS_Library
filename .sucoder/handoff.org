@@ -1,5 +1,5 @@
 #+title: Current LSMS-ISA coordinator handoff
-* CURRENT -- 2026-11-10 14:56 UTC
+* CURRENT -- 2026-11-10 16:12 UTC
 Goal ACTIVE/unbounded. Prior turn PROGRESS: draft1688 and8country allocations.
 This turn PROGRESS:1687repairs published/revalidated, drafts1689/1690, issue905
 narrowed, user1457R1approved/R2arejected, delegated integration now operational.
@@ -35,8 +35,8 @@ tree151b2d48721c94f12d6a5a154a0cecfea32e702f;
 librarytree23688a3132b47f8a3c34b05c10ade9746b0b07d9.
 RootW clean/head8c. DO NOT change this head while current gates run.
 Current exacthead runs started14:48:52Z:
-- Ordinary42837909207.
-- Full42837909103.
+- Ordinary42837909207 and Windows SUCCESS.
+- Full42837909103 still RUNNING at16:09Z; full-suite step active.
 Root deterministic watcher LIVE session30290;
 R/1687-bfa-fixture-repaired-ci-20261110/watch.py plus latestJSONs.
 Old watcher47722 actually CLOSED0 after a292ordinaryFAIL/fullCANCELLED.
@@ -125,9 +125,10 @@ Upcoming frozenMalawiR1+R3 and W4NGA/Nigercleanup arrive via directagenthandoffs
 Existing1680--1686 are componentreviewrefs until1687lands, not separately merged.
 
 * Current human decisions and Malawi next change
-Central .sucoder/isa-decisions.org committed517e03471; B/CURRENT-ISA-DECISIONS.org
-copySHA3c4b79ffdca1ff19ec8aeaee1b9a570d3912e0647def2f2ce05167253d63c5dc,
-blobc5ae50fac56a8e4920ec433b58856e6c77d53af3. Preserve exactuserstatements.
+Central .sucoder/isa-decisions.org committed d5e186042; exact shared mirror
+B/CURRENT-ISA-DECISIONS.org SHA256
+cfa182ee3f12a9a101bb06ac1aaa60c606c374741da9b43d1dc2933f358f8588.
+Preserve exact user statements; latest choice is1573 own2014 strata decoding.
 -1457R1 USERAPPROVED: sale in anotherunit attaches to SOLEknownplot/nativecrop
  harvestrow, compatible state/eitherunknown/no competing oroccupied sale; require non-NA
  reported saleunit so existing824fallback cannot borrow knownharvestunit;
@@ -192,7 +193,9 @@ Earlier settled decisions remain authoritative:49borrowIHS5;50FINALmaizeflour
 marginalweights/no productionweightchange;1499validnumerictextconvert-before-sum;
 1594exact99999999missing;1494namespaceall2021Mali then approvedlinks only;
 1066normalwarning/report/strict replay merged1674;932requiredfullPRdata approved.
-Pending1573BFAstratalabel,1575four nonISA2018stratawiring,NGAPPraw servingpreference.
+1573BFAstratalabel USER APPROVED; private implementation79dca7551 delivered
+for independent lead review, no native/API/census acceptance yet.
+Pending1575four nonISA2018stratawiring,NGAPPraw servingpreference.
 1575 documentarycheck DONE:plannedregion(orBendepartment) xmilieu inall4BIDs,
 exactownpagesBenin13/Togo12/GB16/CIV13;TogoLome-domain discrepancy held.
 Countrydocs1637 and managedmissingBIDs1640 merged; wiringselectionstillpending.
@@ -246,3 +249,25 @@ newrelease/APIcampaign. Root permission loop NOT required once fixedscope/oracle
 are frozen; onlynewscience/scope escalates. Missingunitoracle mustexclude only
 newR1placement, preserving oldNA-to-NA ladder attachments and currentnonpositive
 Farmeligibility. No globalmissingunit policy follows. R2banswer remainsPENDING.
+
+* 16:12 UTC current execution and refill
+User1573 choice implemented at79dca75518d9b47bff79b24b1b3f9aafd9a6304a on
+isolated public9f child; five owned paths/all19375others exact. Lead independent
+review underway. Product41a unchanged through fixture-only correction:30PASS/
+8newfixtureFAIL, exact9f boundary1PASS, only affected8PASS. No native/API/census.
+R/1573-burkina-2014-strata-label-implementation-20261110/{REPORT.md,FINAL.patch}.
+Root personally read complete mapping implementation and result qualifications.
+finish_1590 now owns bounded fresh country-backlog selection: three concrete
+unblocked TierA/B briefs, reconcile existing work, no data or duplicate dispatch.
+
+Malawi fresh execution-only allocation41092166/872ff5c42e3249af9d649996e9da501e
+RUNNING n0030; metadata/MAIN/pre-getter setup passed, raw0 at manager checkpoint.
+Joint final source/operator/installed identity freeze still pending, no actual
+native handle yet. Earlier preparation allocation is not native acceptance.
+Uganda actual stage2236659/cold2236662/warm2238483 CLOSED0/groups closed:
+22cold fullreads/137.607s; warm67.993s/0native/producer/writer;15typed comparisons
+and26-file inventory PASS. Separate postrun reporting chmod changed ctime on15
+context/operator files; bytes/SHA/mode/mtime and233source/data/cache bindings
+unchanged. Operator deliveryBLOCKED/ledgerb6166a2c remains immutable. Manager
+authenticates timing/packet independently; actual results may be admitted with
+explicit reporting-only deviation if proven, no rerun or ctime restoration.

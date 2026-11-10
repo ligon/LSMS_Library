@@ -1,31 +1,43 @@
 #+title: LSMS-ISA current work owners
-Detailed source/state docket: [[file:handoff.org]].
+Updated 2026-11-10 16:12 UTC. Detailed source/evidence docket: [[file:handoff.org]].
 
 * Root
-Science/finalreadiness/merge/settings. Public1687frozen8c5324b4f; current exacthead
-ordinary42837909207/full42837909103, deterministicwatchsession30290. No source
-changes during gate; library23688. Earliera292unit1fixtureFAIL/fullCANCELLED.
+Owns scientific decisions, final readiness, development merges and settings.
+Public1687 frozen at8c5324b4f. Ordinary42837909207/Windows passed; full data
+42837909103 still running at16:09Z. Watchsession30290 owns polling. Development
+4381 is unchanged; no merge, master release or shared-cache rebuild yet.
 
 * Integration lead -- review_nigeria_ph_pr
-Owns routine independentreview/sourcecomposition/conflicts/focusedchecks/metadata
-and OWN draftpublication; no perfileRootadmission loop. Published1690head8fad,
-includes NGA3PH/Nigerdocs/NGA1288/MwiHousingnote/BFAfixture. Next frozenchild
-Malawi approvedR1+R3, W4NGA andNigercleanup after ownsource/test review. Root final
-science/wholeintegrity/readiness/merge/settings retained. Separate1688/1689drafts.
+Owns routine independent review, composition, append conflicts, focused checks,
+metadata and own draft publication without Root per-file approval loops.
+Public1690 frozen at9f89151ddd783a07fa57b9277da3677f7024ce7c for Malawi native
+verification. Includes approved R1/R3, Nigeria W4, Niger cleanup and admitted
+factual notes. Reviewing BFA1573 final79dca7551 on a separate child. After1687
+lands, owns source-conserving update onto actual development base.
 
-* Source implementer -- finish_1590
-Completed R3ada71/68pure, combinedR1R35f6c/30affectedpure, then BFAfixture9d6d
-baseline1FAIL/corrected1PASS. All canonical packets delivered. Reuse via
-followup_task for a meaningful newtask; completed is NOT busy.
+* Source implementer / queue refill -- finish_1590
+BFA1573 approved implementation79dca7551 delivered for independent review.
+Original30PASS/8fixtureFAIL retained, baseline boundary witness1PASS, corrected
+8PASS; no fresh38-pass or native/API/census claim. Five owned paths only.
+Now RUNNING bounded fresh country-backlog diagnosis: choose3 genuinely unblocked
+Tier A/B briefs, reconcile completed work, read each country's CONTENTS including
+WAITING/LOGBOOK and coordinate with manager; no data or duplicate dispatches.
 
 * Remote queue manager -- malawi_revision_food
-Owns ROUND2/ASSIGNMENTS/FOLLOWON-QUEUE/CLOSED-SOURCE-REVIEW-QUEUE and direct
-handoffs tointegrator. Originaleight allocations terminal, nevercountbusy.
-Currentfollowons: Uganda source-boundhelper classification repair; Burkina
-corrected559180actual result intake; Nigerphantomcleanup41091388; NGAW4source
-41091427; Malawi1457source-onlyactualplan41091510. No scientific/rule adoption
-from source notes, footprints, workerexit or tests. Preserve failedactors.
+Owns ROUND2 ASSIGNMENTS/FOLLOWON/CLOSED-SOURCE queues and remote dispatch.
+Joint final Malawi execution admission with integration lead, without Root
+per-file loop: job41092166/872ff5c42e3249af9d649996e9da501e, exact9f, four
+2010-11 G/P/I/Q sources, twelve full reads, one native writer and two actual
+accessors. Final runtime identity freeze pending at last message; no native
+handle then. Public evidence excludes passive raw captures.
+Uganda1281 continuation41091669 terminal status/evidence requested; earlier
+failed operators remain failed. Also owns independent1069 factual tracker
+reconciliation. Original eight country allocations are CLOSED, never busy.
 
-* User decisions
-Central [[file:isa-decisions.org]]:1457R1YES ownsaleunit;R2aNO/keepambiguousFarm;
-R2bseparatequestionPENDING;R3engineeringapproved. Full goal remainsACTIVE.
+* Decisions
+Central [[file:isa-decisions.org]]:1457R1YES own sale unit; R2aNO/keep ambiguous
+Farm; R2b separate question PENDING; R3 engineering repair admitted.
+1573YES decode verified own2014 strata lookup after unchanged household-ID
+reconciliation. No new public native-code column or design-equivalence claim.
+932 required full ready-development-PR data check approved; minimal ruleset
+change follows successful1687 rollout. Full goal remains ACTIVE.
