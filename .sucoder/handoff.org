@@ -1,316 +1,207 @@
 #+title: Current LSMS-ISA coordinator handoff
-* PUBLICATION AND REFILL -- 2026-11-10 14:03 UTC
-User correctly flagged no new PR for >8hours. Root acknowledged serial review,
-private verification/operator failures and failure to promptly refill remote
-slots as throughput bottlenecks. New DRAFT PR1688 now published/readback:
-https://github.com/ligon/LSMS_Library/pull/1688
-HEAD72d76381c4f72cbeee7b13a57578088313307382 onto development4381, created14:01:53Z.
-Root read complete product+tests+final actual REPORT; exactly11owned files match
-accepted97e, all19258nonowned objects development-exact. Actual verification
-used d47 framework, so current-base CI/metadata and independent review remain.
-Independent local review_nigeria_ph_pr RUNNING; helper fingerprint coverage
-already positively source-traced. Root proof/publication receipts under
-R/587-nigeria-W1-W3-PH-plot-features-implementation-20261110/MAKE-completion-v4.
-No whole587 closure;12strict manualslice failures retained.
+* CURRENT -- 2026-11-10 14:56 UTC
+Goal ACTIVE/unbounded. Prior turn PROGRESS: draft1688 and8country allocations.
+This turn PROGRESS:1687repairs published/revalidated, drafts1689/1690, issue905
+narrowed, user1457R1approved/R2arejected, delegated integration now operational.
+Development4381d701ffb06ab447a37c66362119d1c1e23009:78verifiedmerges/42closures
+unchanged pending gates. No masterrelease/sharedcache rebuild/productionweight
+change/panelrelink/newWBrawrelease. Publicdoc acquisition/managedpush/readback and
+finite private normal checks of already-managed releases authorized.
+Full prior docket archived: .sucoder/archive/handoff-through-20261110T145627Z.org.
 
-Eight NEW country jobs confirmed submitted and Slurm RUNNING at14:02UTC;
-this proves allocation state, not test/body completion. Allfree2CPU8G, c8source:
-- Malawi90541090997: remaining reducer/source-qualified optimization.
-- Ethiopia82441091168: existing sold-unit/factor wiring source audit.
-- Niger128841091169: computed plot/community source literal closure.
-- Nigeria128841091170: nonfood source-loop closure.
-- Mali157741091171: per-wave strata producer/source semantics.
-- Burkina143841091172: one interim2014food coverage cell.
-- Tanzania44941091173: official W1-W3 geovariable source/program/key bridge.
-- Uganda128141091174: unmeasured housing build/fresh-warm contributions.
-Manager owns monitoring/refill/intakes at
-Q/refill-independent-country-round2-c8-20261110. Previous8terminal not counted.
-Specific source-qualified engineering/pure tests authorized without extra Root
-permission loop; ordinary bounded BFA/UGA private actual charters approved;
-scientific changes/expected counts/sharedwrites/newreleases remain held.
+* Workspace and execution
+Root cwd /local/job40825266/mirrors/LSMS_Library is OLD docs/isa-sweep-20261103:
+NEVER import runtime LSMS here. MAIN=/local/job40825266/venv_img/bin/python.
+Use login=false (login startup stalls). Proper cwd/PYTHONPATH/countriesroot,
+exactrealpath import assertions, private DVC/XDG/state/tmp before imports,
+BLAS/OMP/MKLthread1/LSMS_BUILD_WORKERS1/-n2 --dist=loadfile/proper pytest root.
+Never mutate source under verification; preserve failed actors and narrow results.
+Do not mistake Slurm0/heartbeat/worker exit for actual test PASS. No SDK/transcript
+inspection or raw/secret export. Routine predata source-bound operator corrections
+are delegated, not repeated Root approval loops. Followup_task RESTARTS completed
+localagents; send_message alone does not. Worktree isolation mandatory.
+B=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103;R=B/reports;
+Q=B/country-queue-refill-20261109-v2;
+AUTH=Q/refill-country-authority-d47-20261110/source.git;
+FOLLOW=Q/refill-country-followons-d47-20261110;
+ROUND2=Q/refill-independent-country-round2-c8-20261110;
+CI=Q/refill-1687-country-ci-d47-20261110.
+Root source batch W=/local/job40825266/worktrees/fix-1687-reviewed-repair-batch-20261110.
 
-Root admitted original Mali plot_inputs1PASS/525s/16reads and carried all6owned
-commits. Private batch HEADf6de6cc81b84db41714df316a1448af312c241a5, clean.
-Local finish_1590 RESTARTED with followup_task for ONE final candidate-only
-metadata collector vs retained55de map, expected20Mali country+40wave changes.
-Batch MUST remain immutable until collector closes; no baseline/data/test replay.
-Ethiopia historical-sampling actual1 remains separate priority under manager.
+* Public1687 -- highest priority frozen validation
+https://github.com/ligon/LSMS_Library/pull/1687 OPEN/READY/MERGEABLE lastread;
+head8c5324b4f4a53cb59fdcd0ba281d507c46fc6203,base4381;
+tree151b2d48721c94f12d6a5a154a0cecfea32e702f;
+librarytree23688a3132b47f8a3c34b05c10ade9746b0b07d9.
+RootW clean/head8c. DO NOT change this head while current gates run.
+Current exacthead runs started14:48:52Z:
+- Ordinary42837909207.
+- Full42837909103.
+Root deterministic watcher LIVE session30290;
+R/1687-bfa-fixture-repaired-ci-20261110/watch.py plus latestJSONs.
+Old watcher47722 actually CLOSED0 after a292ordinaryFAIL/fullCANCELLED.
+Fresh exacthead/base/syntheticmerge/tree/check preflight required before merge.
+On successful verified rollout, development merge AUTHORIZED; then fresh
+ruleset25124452 GET/minimalPUT adds uniquepr-data-validation/stricttrue,
+preserving all unrelated rules/bypasses, GETreadback. Do not use bypass as proof
+or reask already-approved932 policy. Current unit-only/strictfalse remains.
 
-* LIVE UPDATE -- 2026-11-10 13:50 UTC
-User renewed request to delegate more country-specific issues. Manager
-malawi_revision_food owns remote queue refill via sucoder, with distinct concrete
-country charters, current-issue/merged-work reconciliation and no completed jobs
-counted as busy. Fresh GitHub inventory:145 open, retrieved with explicit repo
-and limit500; B/OPEN-COUNTRY-ISSUES-20261110.json. Many residuals are scientific
-holds; do not repeat completed source campaigns to occupy workers. Root read
-shared scrum-master-hpc and backlog-workflow skills plus repo backlog skill;
-make api-audit passed. Use shell login=false (login startup stalls on this node).
-First new round2 assignment confirmed RUNNING: Malawi905 job41090997,
-dispatch3ea45fd01fd840b195795b13afa7a776, exactc8 source. Own current remaining
-reducer inventory/qualified optimization; no replay of1457/1190/1228 or already
-vectorized sites. Round2 artifacts:Q/refill-independent-country-round2-c8-20261110.
+Historical CI:
+- d47ff849full42769154949:20021total,17228P/18F/0E/2775S/prebuildPASS.
+  Private traces/parameterIDs deleted;12public functionlocators retained;
+  isolated regressions support fixes but do not identify all deleted parameters.
+- a292cee408d984f985839938e2c582ec79fbae75 ordinary42831553220:
+  14531P/1F/5673S/4X,WindowsPASS. Sole failure is stale BFA test fixture
+  compiling finaldriverCall without new real _write_wave definition.
+- Corrected actualDefinition+Call fixture3b4, finalledger9d6db45b; baseline
+  original1 reproducedNameError, correctedoriginal1PASS/3active0D. Root+lead
+  independently reviewed; every old assertion/librarybyte retained. Rootcarry8c
+  tree EXACTauthor9d. R/1687-a292-bfa-driver-fixture-20261110 and
+  R/1687-bfa-fixture-repaired-source-20261110/SOURCE-PROOF.json.
+- a292full42831553264 actually CANCELLED after replacement, not acceptance.
 
-Root reviewed Mali1528 actual primary REPORT and carried five owned source/ledger
-commits into private batch: HEAD8e85c876ad6148c6d7a36a70c6d5b80bf568564e.
-All four carried files exact admitted dca6418d; library subtree remains
-5cda0b16791ce80abfad55006edfe4d7dc6efb7c. No replay. Carry proof:
-R/1687-reviewed-repair-batch-20261110/MALI1528-CARRY.json.
+Batch source/evidence:
+Root personally reviewed BFA writer, NGA/UGA/ETH dated sampling operands,
+Mali namespace/sold-condition oracles and two null wave declarations, CIVtyped.d,
+Niger source-union/country-axis oracles, unchangedGhana recovery, source notes,
+TZA doc-only executableAST conservation and managedMali2017manual.
+Earlier27-path composition55de proof R1687-reviewed-repair-batch-20261110/
+SOURCE-CONSERVATION-55de5bc2a2.json. Later tests/ledgers verified exactauthor.
+Actual targeted regressions passed with original numerical assertions; no
+production sample/map/weight change under historical-test corrections.
+Mali originalplot_inputs1PASS525.459s,16normalreads/freshprivateL2/7active0D;
+source992c two !make->null tokens only; Rootcarryf6de.
+ETH final3776621bb, accepted d97 implementation: portable fullpublic oldJSON
+354486B/SHA52cc2e73e48b800e406953bafd76a9722579b39c3499667dc45a366e08fb8023,
+old-map-target cohort only.26+2pure support27current composed cases; original
+normal1PASS dup0/N3776/D3776/K333/full9256APIrows unchanged;4sources/6reads/
+2sampleproducers/3writers/5active0D. Separate footer-emission failure qualified.
+Root carrya292, laterBFAfixtureonly leaves libraryexacta292/f6de.
+Final metadata f6de actual20Mali country/40wave changed;0BTF/FIF/keyset/nonhash
+changes/18PeruNone exact;0errors/denials/privatefiles. No baseline replay.
+R/1687-final-repair-mali-metadata-20261110; same library binds current8c.
+Previous d47->55de measured42country/147wave (BFA/TZA),0BTF/FIF; preserved.
 
-ETH source d97db47224f34f014065a02dcc115a24061fe4eb personally reviewed/accepted:
-portable hash-bound historical public map fixture, exact old-link target cohort,
-old N/D/K assertions/current API frame/maps intact. Removed extra global-v-null
-policy; original dropna/N owns selected missing-v handling. Initial26pure PASS
-plus2 affected controls yield27 composed current cases, not fresh27green. Root
-authorized ONE original ETH normal parameter <=600s, ordinary real gates; exact
-four prior admitted sources and normal private sample build if genuine current
-warm sample absent. No other nodes/replay. Manager owns runtime/handle.
+* Public next components and delegated integration
+1688 DRAFT https://github.com/ligon/LSMS_Library/pull/1688
+head72d76381c4f72cbeee7b13a57578088313307382 onto4381,11exactauthor97e paths;
+unit/WindowsSUCCESS42830031966. Independentreview59distinctpure witnesses,
+58P+guardrefusal then corrected1P; initialdeactivated-profile qualification kept.
+NGA3PH (6316/6124/5918) +managedMake prerequisites; full56403 rows.
+Author default/Make cold/warm/Feature actual evidence is pinned d47 framework;
+29strict17P/12manual-fullsliceFAIL, all29orderedpayload checks equal. Prior
+9sliceFAIL/timeouts retained. Warm/Feature legitimately rebuild sample, notplots.
+W4currentareaunit/W5priorGPS/PPprice+raw preference/source authority HOLD;
+whole587 OPEN. R/587-nigeria-W1-W3-PH-plot-features-implementation-20261110/
+MAKE-completion-v4. Private futureed1 on a292 verified11files/19353nonowned;
+metadata20NGA country/200wave only,0BTF/FIF/nonhash/None/othercountry changes.
 
-Mali routing actual v1 header NameError failed preimport; v2 observer outer-vs-
-namespace public UID mismatch failed precollection0tests/0data. Both retained.
-Stdlib-only proof binds hashed physical public files to namespace uid65534;
-operator-only correction preserves SHA/dev/inode. Exact16 private inputs sealed,
-no retrieval. Actual v3 PID3582706/exec23460 now productive11Stata prefix,
-source36c unchanged, result pending. Local finish_1590 owns handle.
+1689 DRAFT https://github.com/ligon/LSMS_Library/pull/1689
+head7f170fba8e112167be6cffd707bda1729540c12a onto4381,6paths:
+Niger2011French agriculture questionnaire/manual DVCpointers/provenance;
+5docobjects exactaccepteddaa9, ledgerprefix retained,19261nonowned exact.
+Root personally reviewed primaryarchive REPORT/fullpatch/currentbase proof.
+Actual correctedpush37.805s +freshreadbacks6.232/5.664s accepted; initialfailed
+push and native0/SDK74 qualification retained. No newparser/DVCreplay/publicPDF
+Gitbinary. First/average-cycle/999/land/yield/export correspondence still HOLD.
+R/1529-niger-primary-archive-publication-20261110.
 
-NigeriaMakeV4 cold CLOSED0/1052.495s:56403 full rows, strict current/old default
-and genuine sample equality PASS. Warm CLOSED0/1035.892s/all7calls; strict
-same-request old defaults PASS,12 manual-fullslice attrs comparisons FAIL retained,
-all observed ordered keys/payload/dtypes/masks equal. No plot rebuilds in warm;
-5sample producers/writers,68Stata,6active0D. FreshFeature PID3585866 running900s,
-controller86199/local finish_1452 owns. No full587 closure.
+1690 DRAFT https://github.com/ligon/LSMS_Library/pull/1690
+Integrationlead /root/review_nigeria_ph_pr OWNS routine review/composition,
+append-conflict resolution, conservation, focusedchecks/metadata, OWN draft
+publication and reviewed factual-note admission WITHOUT Root perfile loop.
+Root keeps science/finalreadiness/merge/settings/overall integrity.
+Currentpublished8fad548dac8c0633edaf98e6fc662096b96fddf9,
+tree60da7a8d2dbd567f10176214470f8b2f07e57344, parenttraina292.
+Scope NGA3PH+Nigerdocs+NGA1288W1-W3 declarations+Malawi1281 housingnote+BFA
+fixturefix.26paths beyonda292/19344nonowned exact; initially172files/283commits
+against4381 because1687notlanded, explicitly dependent/unready. Owntrain:
+/local/job40825266/worktrees/isa-reviewed-integration-20261110.
+Stage9e9c library matches20NGAcountry/120W1-W3wave incremental metadata,0others,
+2newMake target-order controlsPASS; BFA testonly child requires no newcensus.
+After1687lands, integrationlead owns routinebaseupdate/reviewdiff cleanup and
+source conservation; Root authorizes readiness onlyafterall relevant evidence.
+Upcoming frozenMalawiR1+R3 and W4NGA/Nigercleanup arrive via directagenthandoffs.
+Existing1680--1686 are componentreviewrefs until1687lands, not separately merged.
 
-Earlier update below is retained with later facts superseding its pending states.
-* CURRENT -- 2026-11-10 13:19 UTC
-Goal ACTIVE, unbounded. Previous and current goal turns made concrete progress.
-Development4381d701ffb06ab447a37c66362119d1c1e23009;78 verified development merges,
-42 whole issue closures unchanged. No master release, shared-cache rebuild,
-production-weight change, panel relinking or new WB raw release authorized.
-User explicitly requests country delegation and permits sucoder dispatch.
-Public-document acquisition, ordinary managed push/fresh readback and bounded
-private normal checks on already DVC-managed releases are authorized. Manager
-may handle routine finite validation/operator corrections; Root owns scientific
-and test-expectation admission, GitHub publication, settings and integration.
+* Current human decisions and Malawi next change
+Central .sucoder/isa-decisions.org committed517e03471; B/CURRENT-ISA-DECISIONS.org
+copySHA61c60f1e13ad00092f6e49cf9a6c89f33260b246e63bc13a50ef858021b11cbd,
+blob0e7595ce7cea6777fea3918b8a1c80e2a7e4550c. Preserve exactuserstatements.
+-1457R1 USERAPPROVED: sale in anotherunit attaches to SOLEknownplot/nativecrop
+ harvestrow, compatible state/eitherunknown/no competing oroccupied sale;
+ retain ownUnit_sold/Condition_sold, no conversion/borrowedunit.
+-1457R2a USERREJECTED: keep ambiguous multirow salesFarm-level; solepositive
+ Quantity among0/NAothers does not identify the plot/referencepool.
+-1457R2b separate asyncquestion PENDING: keep current singleplot attachment vs
+ requiringpositiveQuantity/moving salesFarm-level. Do not infer answer.
+-1457R3 Root-admitted ENGINEERING provenance repair: unresolvedexistingFarm rows
+ gain refusalkey; remove rows:0; rawinputs preserved viaLEFT/m:1 enrichment,
+ fullcurrentFarmset suffixes, zero/zero inputs retained with missingobs.
 
-* Workspace and invariants
-Root cwd /local/job40825266/mirrors/LSMS_Library, docs/isa-sweep-20261103 contains
-OLD LIBRARY CODE: NEVER import runtime LSMS here. MAIN interpreter:
-/local/job40825266/venv_img/bin/python. Use immutable isolated checkouts, correct
-cwd/PYTHONPATH/LSMS_COUNTRIES_ROOT and exact realpath import assertions.
-B=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103; R=B/reports;
-Q=B/country-queue-refill-20261109-v2; CI=Q/refill-1687-country-ci-d47-20261110;
-AUTH=Q/refill-country-authority-d47-20261110/source.git (private filesystem repo).
-No concurrent mutation of a checkout under verification. Private runtime config,
-DVC site/cache/state/tmp before imports; no shared cache writes. Pin BLAS/OMP/MKL
-threads1 and LSMS_BUILD_WORKERS1; pytest -n2 --dist=loadfile with proper rootdir.
-Existing source-bound uname-p and immutable MAIN extraction fallback are allowed;
-normal guards/credentials stay intact. No SDK/transcript inspection. Do not count
-Slurm0, fresh heartbeat or worker exit as actual test PASS. Preserve failed actors.
-Current decisions: B/CURRENT-ISA-DECISIONS.org, proof beside it, exact tracked blob
-978ff7002ac8944325aa6463f350b759c5b46f9e/SHAa25e7946..6429B. Read-only metadata;
-do not use the docs branch as a code base. Full history archived at .sucoder/archive/handoff-through-20261110T131901Z.org.
+finish_1590 delivered combined5f6cfc7c69f6ab250617aae9c55e99b538b7caf3,
+nonledger exacttested a668d98c9,6owned/19259nonowned exact4381. Historicalcd76
+R1executableAST reused exactly, with currentR3 provenanceinputs replaying R1
+before fullFarm suffixing. 68priorR3purePASS and30affectedR1/R3PASS separate;
+no data/API acceptance yet. R/1457-malawi-r1-r3-implementation-20261110.
+Integrationlead independently reviews/admits before nexttrain child. Planworker
+41091510/eb612dcb833848f0b092013b311ea6f6 source-only, four2010G/P/I/Q files;
+actual awaits finaltrainpin+source-derived finite plan/admission. No historical
+3774golden or allfourwave campaign required merely to occupy workers.
 
-* Public gate and next integration
-PR1687 https://github.com/ligon/LSMS_Library/pull/1687 OPEN/READY; last live read11:44
-head d47ff849eb0e7f2c7e9d4d77a7852b61e9240e61, base4381, mergeable. Unit/Windows
-42769154931 SUCCESS. Full42769154949/job129672643696 FAILED:20021 total,
-17228P/18F/0E/2775S, prebuildPASS. Observer76037 closed. Deleted private traces
-cannot be recovered; public12 source-function locators remain under
-R/ci-1687-data-failure-42769154949-20261110. Original parameter IDs are UNKNOWN.
-Seven sampling failures reproduced in isolation (NGA2/UGA4/ETH1), consistent with
-CI7 but not proof of the deleted CI parameter identities. No waiver.
-1680--1686 are component review refs, not separate merges/closures. Publish one
-reviewed repair batch and run actual final full validation. Before merge, fresh
-exact head/base/tree and check preflight. After verified successful rollout,
-merge to development is authorized; then fresh ruleset25124452 GET/minimal PUT
-adds unique pr-data-validation +stricttrue and preserves every other rule/bypass,
-GET readback. Current rule unit-only/strictfalse/Role5-always bypass; never use
-bypass as evidence. No new permission question needed for the approved policy.
+* Remote queue -- manager malawi_revision_food
+Currentdurabletruth ROUND2/ASSIGNMENTS.{md,json},FOLLOWON-QUEUE.md and
+CLOSED-SOURCE-REVIEW-QUEUE.md. Previous8/terminal followons NOT countedbusy.
+Routine finite source/pure engineering and exact source-bound operator plumbing
+fixes delegated; no repeated Root approval for simple predata falsepositives.
+Manager coordinates directlywithintegrationlead, applies factual issuecheckpoints
+onlyafter independentreview/freshbody/readback; Root wholeissueclosure audit.
+- NGA1288 final5a7a99c2/39purePASS/160members0SDK,3scripts checked../Data aliases
+ preserve originalroot-qualified reader/processing AST. Prep/hash anchoring fix,
+ no observedlostrows. Independentlead admitted; W4sevenCSV sibling followon
+ 41091427/b070305ddecc40bda3efbf7301cf718d on9e9c,13newpure only.
+- MWI1281 housing2010 final92c8b2af:12271strictcold/warmPASS,cold8native/writers,
+ warm0productive/inventoryexact; factual2pathnote admittedlead/trained. Original
+ launcher/UID bookkeepingfailures retained; no historicalpoisoningfrequency claim.
+- BFA1438 corrected41091385/5f3a913f30834386a5d66dfda971375b normal559180rows,
+ sanitysane,506.962s/4native/2writers/cleanactiveprofiles,11inputseals; final9c7493.
+ Firstfailedobserver2reads areLOWERBOUND; no latestmatrix/finalcorpus promotion.
+- UGA1281 continuation41091384/f68a2812cb8a48a69061bcb5786d8ad3: exact15sources/
+ 22read budget. Actor2178709FAILED46.899s beforeobservednative dueclassifying
+ prebound _age_helpers.py import asproducer. ExactSHA-bound helper exemption
+ approved; manager owns freshsamepurpose continuation/autonomousroutinefix.
+- Nigerphantomcleanup41091388/887ed066ea8e426a870eab9d69dc28b5:2equivalent
+ getterconcat->full literals remove false bare references; realinputs already
+ certified. No lost-input/nativeincidence claim/frameworkrewrite/newdata.
+- ETH8249b20e290 source-only8route correspondence,no executable mismatch.
+- TZA4491d242b54 managedBID PDF12 establishes round-qualified originalIDs->r_hhid;
+ UPDmanifest/W2pair/fieldedbridge stillHOLD, no rawacquisition/relink.
+- Mali15777b9bce7f current4wave strata semantics;2017complete51code dictionary/
+ 2014assignment gaps stayHOLD. These source notes require factualadmission,
+ not scientific adoption; sourcepatches/intakes exactpointers in queuefile.
 
-* Private reviewed composition
-W=/local/job40825266/worktrees/fix-1687-reviewed-repair-batch-20261110,
-branchfix/1687-reviewed-repair-batch-20261110, CURRENT c8e378920968fde414767855186e64f5e36f54bb.
-Filesystem-origin backed up, no GitHub source push. BFA writer, NGA/UGA sampling,
-Mali crop-test namespace, CIV typed-d oracle, Niger source-union/country-axis
-oracles; actual Ghana recovery ledger; five accepted country source-note carries,
-TZA wording qualification and managed Mali P2 manual.37 changed paths expected.
-Root personally reviewed patches/primary reports and independently verified
-source scope/AST inverses. R/1687-reviewed-repair-batch-20261110/
-SOURCE-CONSERVATION-55de5bc2a2.json proves earlier27-path composition with19318
-nonowned objects exactd47. Later10 paths are tests/ledgers only; entire library
-subtree remains 5cda0b16791ce80abfad55006edfe4d7dc6efb7c, exact55de metadata epoch.
-Mali two accepted CONTENTS appendices composed; only obsolete location wording
-changed, recorded in MALI-DOC-MERGE.json. TZA executable AST exactd47 after removing
-docstrings; its old branch had unrelated missing d47 changes, so only its seven
-owned commits were carried, never whole-tree substituted.
+* Tracker and other standing decisions
+Issue905 narrowed/readbackexact: af4338784 alreadyancestor4381 removesMalawi
+purchase callback;60sourcefiles/19lambdas/0additivePythoncallbacks in scope,
+no newperformance/data/runtimeclaim. Whole905/othercountries OPEN.
+R/905-malawi-live-reconciliation-20261110/{before,after,RESULT}.json.
+Earlier settled decisions remain authoritative:49borrowIHS5;50FINALmaizeflour
+(supersedesmillingservice);51no dateclamp;48jointinclusion notidentified from
+marginalweights/no productionweightchange;1499validnumerictextconvert-before-sum;
+1594exact99999999missing;1494namespaceall2021Mali then approvedlinks only;
+1066normalwarning/report/strict replay merged1674;932requiredfullPRdata approved.
+Pending1573BFAstratalabel,1575four nonISA2018stratawiring,NGAPPraw servingpreference.
+1575 documentarycheck DONE:plannedregion(orBendepartment) xmilieu inall4BIDs,
+exactownpagesBenin13/Togo12/GB16/CIV13;TogoLome-domain discrepancy held.
+Countrydocs1637 and managedmissingBIDs1640 merged; wiringselectionstillpending.
+Do not reask settled choices or infer approval from historical'asruled'agentprose.
 
-* Verified selected fixes and limits
-- BFA final1bc0907c: wave-local writer callback fixes actual wrong output folder.
-  One meaningful pure control +one corrected original normal test PASS. Native
-  quantity/mapping unchanged; original failed actor retained.
-- NGA b9a9835e: historical interviewed-link operands from committed maps.30pure+
- 2original normal PASS. All old numerical assertions unchanged; production/maps
-  exactd47. Root independently inverted entire module AST.
-- UGA e45c6d86(runtime931c):36pure+4original normal PASS. Historical view removes
-  only registered unlocated rows and 2015 agriculture covers for dated counts;
-  current21463 records unchanged, view21239. Original N/D2601/191,2640/433,
- 1717/1717,2973/2973 exact. Initial1F3P observer failure/profile gap retained;
-  corrected20371 fully observed,0raw/provider/producer/writer/rebuild. Sealed
-  R/1687-uganda-historical-sampling-implementation-20261110.
-- Mali namespace5c7fbd235:28pure+3original normal PASS; all old amounts/units/kg/
-  placement assertions reached. Approved mapSHA7c17086a..69dd.104 canonical files,
-  native0/sdk0/taskcomplete. Source production unchanged. Initial collection
-  failure and inherited pure shutdown noise retained.
-- Combined55de pure integration:94 prior passes +one corrected BFA1 pass, NOT a
-  fresh95-green run. Original94P1F caused external metadata observer refusal.
-  Source-backed ordered xdist/junit proof qualifies94 prior coverage; corrected
-  BFA1 has all3 active observers0D, exact2Org/10table allowlist,1 intentional
-  writer resolver and0 real engines/native/API. Reports1687-repair-union-95-pure
-  and1687-repair-union-bfa-one-corrected; no94 replay.
-- Metadata d47->55de:42country hashes(21BFA+21TZA),147wave(21BFA2021+126TZA),
- 0BTF/FIF; keysets452/1903/37/186, all14nonhash fields and18PeruNone unchanged.
-  Both collectors0errors/denials/private files. R/1687-repair-union-d47-55de-
-  metadata-20261110 manifesta5a42cb3/26. Test/ledger carries bind same library
-  tree without rerun; NEW Mali YAML fix will justify one new final comparison.
-- CIV final038ffdc4(parent28db/purebe72):43pure +corrected originalCIV1 PASS,
- 13778 rows, all10404 previous missing-mask mismatches gone, all original21AST
-  assertions retained (author24 count not admitted). Only a/b/c/e/f typed.d maps
-  False; ordinary missings/other tags/d livestock untouched. Actual3Stata,
- 2rawgetters+1explicitmanagedresolution/1normalCountry,0build/writer/provider/D.
-  Four private paths/three objects include own regular raw alias; inventories
-  exact.76 canonical files. Primary report CI/workers/CIV-ActualOracle1687/
-  b01e0035b177449a9880bab60c3b1dfa/evidence/REPORT.md. Root accepted bounded result.
-- Niger final e464eb57(parent222b/D3):23pure+correctedFIVE normal PASS. Includes
-  changed2014NPK parameter, not just failed2011.26 raw/parser roles,10warm hits,
- 3active0D/48seals exact/0producers/writers/providers. Independent own2C+3C source
-  denominator, no count repin; full Feature country axis retained. Closed read
-  evidence2C8538/Unknown44/graded253 +3C1067/12/122 =9605/56/375; tokenoverlap0.
-  Storage43624 vsserved43620 qualified. Original7P4F and first failed Arrow-sum
-  read remain history;70 actual publication files. Root read full actual report.
-- Ghana bf5e9697: original unchanged GLSS1987/88 sampling1 PASS N712/D712/K79,
-  dup0;8DAT+8DCT reads,3normal sample writers, active observers0D/16postseals.
-  Ledger-only. Prior ValueError cause remains UNPROVEN; DAT bytes preceded old
-  decoder profile, so0decoder returns was never0raw I/O.65 publication files.
-- ETH original1 FAIL3801/3801/K332 vs historical3776/3776/333. Four heldsources,
- 0D, no repin. Follow-on fee686b1 one closed output read proves unchanged pre-D1
-  committed W2-map target domain3776 gives exact3776/3776/333;25newpresent+3new
-  absent map edges explain currentN. One sender9old+1added across2destinations
-  explains K loss. Test-only historical filter UNAPPLIED, needs Root source/domain
-  review and portable fixture/loader decision. Qualified shutdown observer errors
-  AFTER postseals, not clean lifetime. Primary CI/workers/Ethiopia-Sampling1687/
- 22ee490117984bdd818373637047864a/evidence/followon1/{REPORT,OLD-DOMAIN-PROOF}.
-
-* Mali production routing and remaining CI
-Original11 task41090137/4bcde.. TERMINAL143/143/incomplete; actor1970330 cap1800
-exit124:5PASS(roster,coping,labor,livestock,1528Mali2018),2FAIL(plot_inputs normal
-loader;1528Mali2021 expected-ID assertion217),4incomplete(people interrupted,
-crop/housing/shocks unrun). Missing terminal observers: producer/writer11/11 are
-LOWER BOUNDS,0observed denials not complete audit. No mutation or hidden retry.
-- Local1590 new source36c951f2(runtime18889): ONLY two Mali modern wave !make tags
-  replaced with explicitnull; country materializeMake/framework/wrappers/adapter/
-  schema/maps/all1494asserts exact. Only two actual wave !make tags exist. Null
-  correctly uses existing script discovery, _make_wave_inputs and hash route;
-  generic Wave-only specialcase would leave classifications inconsistent.
-  Five ownedpaths including semantic old1483 wiring test and new routing controls.
- 11unique pure passes across1P1F->8P1F->2P; fixture errors retained, NOTfresh11green.
-  R/1494-mali-wave-script-declarations-implementation-20261110 manifestff2b0d84/77.
-  Root read patch/plan, ADMITTED ONE original1494plot_inputs ≤900s/exact16inputs
- 37,688,465B subsetold46, emptyprivateL2, genuine8sample+8input source rebuild.
-  Historical local paths not current custody; bounded normal readonly retrieval
-  allowed if absent, no newWB release. Source/proper context freeze then actual;
-  handle pending. YAML changes invalidate sample country hash: no stale-cache
-  shortcut/restamp. Not yet carried into Root batch; await actual result.
-- Remaining4 fresh job41090557/28756eb9..: current actual people/crop/housing PASS,
-  shocks running at last report;31/32rawread budget, no observedD. No old5 replay.
--1528 test-only6f761137(parentff4d):2conditionalprefix lines+UTF8,11old functions/
- 25asserts ASTinverse exact;21purePASS with shutdown qualifications. Root reviewed
-  fullpatch and admitted originalMali2021 only600s/oneS16d+genuine d47crop/sample
-  warm pair/max2Stata/0buildwriter. New job41090660/a758adc7eb4043fd93696503d7215d5f
-  submitted, no actual result yet. Root expects canonical intake then carry.
-
-* Nigeria3PH/Make lane -- not in published repair source yet
-Local1452 owns. Old product5cb/nonledger9763 default15calls PASSqualified56403rows,
-18358PH(6316/6124/5918);5PP preserved.9strong subset-domain/attrs FAILs retained,
-observed ordered payload equality separate. W4PHunit/W5priorGPS and PPprice remain
-held. First Make2613 timed out900 beforefullreturn: duplicated5physical producers
-from in-tree prerequisites after private preparation. Managed target/legacy alias
-fix97e8553153c90dec89d500588b5e2e04028ea83c (productb225) passed7realGNU-Make pure
-controls; later availabilityskip+2predicate checks, no7-body replay. Actual route
-confirmed5plot producers once. Source immutable; no scientific change.
-New default48097 returned56403/486.252s, outerfailed514s on additive unary_typed
-operator mistake; closedcompletion41115 PASS validates genuine currentfull and
-sample49089 strictly vs old9763 and5PPprewriter pairs.85getters82Stata10producers
-12writers/11active0D. Current sampleSHA55c7a563..276475B/footer60a58aa1..all10waves.
-Second Make45490 timed out900(902cleanup),11closedchildren=5plots+concat+5samples,
-85getters82Stata11writers/0childD; parentprofileunflushed/fullRETURNabsent. Old
-samplePKL only postclosedseal is NOTadmitted as a returned Country frame.
-Metadata profiling: baseline37.354s finalemptyDIRassert FAIL retained; observed
-half124.081s clean. Proof6.64/6.09s vs21.06/20.94; coldhash2.27vs13.77; import4.98
-vs23.86.231waves moduleexecs/253compiles/19inputproofcalls, not evidence of a loop.
-Root read full bounded proposal and ADMITTED ONE new same-source completion:
-cold1800s +warm7/1800s +freshFeature1/900s,4500total, same38rawsources140321380B,
-freshMakeL2+genuine current sample, no default replay or guard/semantic changes.
-V4 controller86199 LIVE, ownedcoldPID=PGID3577804; freeze12073b6f.., source97e.
-R/587-nigeria-W1-W3-PH-plot-features-implementation-20261110/MAKE-completion-v4.
-No automatic retry/extension. Keep all failed actors and strict/narrow results.
-Separate1518 source work d69e07ed:16duplicated textpages before1552reconciliation
-honestly retained+4newrasters. Exactly2oldcompletePKL card loads closed0, private
-frames instantiated but0row-cellops/serializations/newnative. W1Q6qty+36codecard
-vsprinted3;W2Q6Aqty+48codecard vsprinted15, Q6Bdecisionmakers. Ordinals11/14/21
-have DIFFERENT own meanings, no borrowing/default. R/1518-nigeria-W1-W2-harvest-
-authority-20261110/closed-cards-v1 manifestf20a9c15/11; source version tension held.
-
-* Country queues and scientific decisions
-Manager malawi_revision_food owns supported watches, intakes and meaningful
-follow-ons; no full-country repeat campaign merely to occupy a worker.
-All EIGHT original countryjobs are terminal0/SDK0; BFA taskblocked/inactive,
-MWI grounding gap later peer-closed. Canonical NEXT=Q/refill-independent-eight-
-d47-20261110/CANONICAL-INTAKES.json, AUTH refs/remotes/country-next/<role>.
-FOLLOW=Q/refill-country-followons-d47-20261110; EIGHT-COUNTRY-DECISION-BRIEFS.md and
-CURRENT-ASSIGNMENTS.{md,json}. Five new source-only holds are not implementations.
-- BFA1436 native follow-on41090496/0874..:4reads closed0/153.80s; C9594x26,D7767x53,
-  union17361x87, values/masks/order/slots preserved/no observed precision loss.
-  Union dtype widening contract retained; separate untouched native carriers;
-  strict typedinverse UNESTABLISHED. C2duplicate groups/2extras evenwithcondition,
-  D HH/crop0dups.3shutdown observer errors leave TASKunfinished/lifetime qualified;
-  no replay/publicactivation/C-Dbridge/partialharvest/production_obs approval.
--1457 historical tested4eeb30daa93c734bc2bebb33a31e25190f402edc/base5e4c502.. and
-  cd76e550f/caa9a52cd/e72757aaf ALL recovered by Root and published privateAUTH
-  refs/heads/prior1457-{tested,base,cd76,caa9,e727}. Presence is NOT human approval.
-  Root current decision ledger has no1457entry, not proof of global absence.
-  Full-context peers closed: MWI87b712888.. and ETH5c5beec76.. own-ledgeronly;
-  AUTH refs/remotes/country-followons/{Malawi1457-ContextPeer,Ethiopia1457-ContextPeer}.
-  Recovered head includes R1/R3/R2a, notR2b. R3 old input innerjoin could lose
-  unresolved-unsold rows/currentbasis fields; left-enrichment compatibility
-  proposal SOURCEONLY/pureUNRUN. R2b would remove historical89 ETsection9 rows.
-  All scientific eligibility choices HOLD until concrete Root/user ruling.
-- Niger1529 new French primary supports FIRST-cycle m2, manual also says moyenne;
- 999/export/parcel-land/yield remain held. Independent peer/archive41090574/
- 77b4ce998.. has corrected normal2doc push PASS37.805s +freshreadbacks6.232/5.664s.
-  First39.52s push failed because operator injected absent AWS env paths and
-  preempted normal dvc_s3 writer swap; context-only correction removed overrides,
-  no helper/credential changes/newGET/parser. Final source/evidence intake pending.
-- Mali1179 keep129 invalid-unit-price exclusions; no new producer authority.
-- Nigeria1502 W2 retained shipped-table evidence corrected, UNWIRED; factor use
-  requires ruling, no PP price/unit/size/geography transplant.
-- TZA1497 first-cover/former-head/absent-head decision:13splitoffs partition6/1/6;
-  old238pair/907link proof, no relink. Uganda1525 no new electronic route;1536
-  existing569EA other-wave fill brief pending, missing stays missing.
-Settled decisions in isa-decisions.org prevail over stale goal text:49borrowIHS5,
-50FINALmaizeflour,51no date clamp;48joint inclusion not identifiable from marginal
-weights alone/no productionweightchange.1499convert numeric strings before sum,
-1594exact99999999missing,1494namespaceall2021raw then approvedlinks;1066normal
-warning/report/strict replay merged;932requiredfulldata policy approved.
-Still pending1573BFAstratalabel,1575nonISA2018strata wiring, NGA PPraw-retention/
-missingPrice preference. Do not reask settled decisions or infer elapsed approval.
-
-* Immediate next actions
-1. Obtain actual localMali16input handle/result, remaining4final,1528actual1 result;
-   carry only reviewed source/results, never change assertions to hide failures.
-2. Review ETH old-domain primary proof; implement only a source-anchored historical
-   test operand with portable runtime metadata, all currentproduction rows intact.
-3. Observe MakeV4 actual full returns/comparisons under realistic fixed bounds.
-4. Admit/manage reviewed country follow-ons; discuss concrete held choices after
-   source and compatibility review, without losing new primary documents.
-5. Compose final ready source, run appropriate final metadata only for NEWlibrary
-   changes, exact-head focused/unit/Windows/full actualdata validation. Publish,
-   merge/settings only when current-source gates prove readiness; keep residuals.
+* Next actions
+1. Monitor8c exacthead ordinary/fullCI; diagnoseonlyactualnewfailures. Rootfresh
+ merge/base/tree/checkpreflight and authorizeddevelopmentmerge/settingsafterPASS.
+2. Integrationlead completes1690source train nextchild (MalawiR1/R3,W4NGA,
+ Nigercleanup,factualnotes), keeps scopedfailed/strictqualifiedresults honest.
+3. Manager finishes BFA/UGA currentcells and Malawi actualplan, refills meaningful
+ independentwork; no occupancy-only repeated campaigns or cookedgoldencounts.
+4. Resolve userR2b answer when received; pendingmeanspending. Keep durablehandoffs,
+ factual residualtracker and sourceprivate artifacts concrete/reviewable.

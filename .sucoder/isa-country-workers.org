@@ -1,22 +1,31 @@
-#+title: Current LSMS-ISA workers
-* Current queue
-Detailed authoritative docket: [[file:handoff.org]]. Original eight country jobs
-are TERMINAL, not busy. Canonical intakes:
-/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-queue-refill-20261109-v2/refill-independent-eight-d47-20261110/CANONICAL-INTAKES.json
-Current follow-ons and decision briefs:
-/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-queue-refill-20261109-v2/refill-country-followons-d47-20261110/CURRENT-ASSIGNMENTS.md
+#+title: LSMS-ISA current work owners
+Detailed source/state docket: [[file:handoff.org]].
 
-Root: private repair source c8e378920; public1687d47 still needs final full gate.
-finish_1590: actual normal Mali plot_inputs at36c951f2, two YAML null corrections,
-16 prior managed inputs and legitimate sample rebuild; staging/actual pending.
-finish_1452: MakeV4 source97e855, controller86199/coldPID3577804,1800/1800/900s;
-no default replay. Completed source/card/profiling evidence retained separately.
-malawi_revision_food: supported watches/intake/follow-ons, all bounded routine
-private checks authorized. CIV1/Niger5/Ghana1 passed and carried; remainingMali4
-people/crop/housing passed, shocks running. Mali1528actual1 job41090660 submitted.
-BFA4-read native body passed with lifetime qualification; Niger2newFrenchdocs
-managed push/freshreadbacks passed after context fix, final intake pending.
-MWI/ETH1457 full-context peers complete; actual scientific choices remain held.
+* Root
+Science/finalreadiness/merge/settings. Public1687frozen8c5324b4f; current exacthead
+ordinary42837909207/full42837909103, deterministicwatchsession30290. No source
+changes during gate; library23688. Earliera292unit1fixtureFAIL/fullCANCELLED.
 
-Do not mutate verifier checkouts, infer data PASS from Slurm0, count finished
-workers as busy, repeat already-completed raw campaigns, or adopt held policies.
+* Integration lead -- review_nigeria_ph_pr
+Owns routine independentreview/sourcecomposition/conflicts/focusedchecks/metadata
+and OWN draftpublication; no perfileRootadmission loop. Published1690head8fad,
+includes NGA3PH/Nigerdocs/NGA1288/MwiHousingnote/BFAfixture. Next frozenchild
+Malawi approvedR1+R3, W4NGA andNigercleanup after ownsource/test review. Root final
+science/wholeintegrity/readiness/merge/settings retained. Separate1688/1689drafts.
+
+* Source implementer -- finish_1590
+Completed R3ada71/68pure, combinedR1R35f6c/30affectedpure, then BFAfixture9d6d
+baseline1FAIL/corrected1PASS. All canonical packets delivered. Reuse via
+followup_task for a meaningful newtask; completed is NOT busy.
+
+* Remote queue manager -- malawi_revision_food
+Owns ROUND2/ASSIGNMENTS/FOLLOWON-QUEUE/CLOSED-SOURCE-REVIEW-QUEUE and direct
+handoffs tointegrator. Originaleight allocations terminal, nevercountbusy.
+Currentfollowons: Uganda source-boundhelper classification repair; Burkina
+corrected559180actual result intake; Nigerphantomcleanup41091388; NGAW4source
+41091427; Malawi1457source-onlyactualplan41091510. No scientific/rule adoption
+from source notes, footprints, workerexit or tests. Preserve failedactors.
+
+* User decisions
+Central [[file:isa-decisions.org]]:1457R1YES ownsaleunit;R2aNO/keepambiguousFarm;
+R2bseparatequestionPENDING;R3engineeringapproved. Full goal remainsACTIVE.
