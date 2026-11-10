@@ -29,7 +29,7 @@ if not hasattr(_ligon_dataframes, "from_dta"):
     _ligon_dataframes.from_dta = _dummy_from_dta
 
 from lsms_library.country import Country, StageInfo, _normalize_dataframe_index
-from lsms_library.local_tools import to_parquet as write_parquet
+from lsms_library.local_tools import to_parquet as write_parquet, _read_managed_parquet_cache
 
 
 @pytest.fixture
@@ -270,7 +270,7 @@ class TestDVCCaching:
             patch.object(Country, "resources", new_callable=PropertyMock) as mock_resources, \
             patch.object(Country, "waves", new_callable=PropertyMock) as mock_waves, \
             patch.object(Country, "_augment_index_from_related_tables", new=_augment_passthrough), \
-            patch("lsms_library.country.get_dataframe", side_effect=lambda path, *_, **__: pd.read_parquet(path)) as mock_get_df, \
+            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_get_df, \
             patch("lsms_library.country.map_index", side_effect=lambda dataframe: dataframe) as mock_map_index, \
             patch("lsms_library.country.Repo") as mock_repo:
 
@@ -282,7 +282,7 @@ class TestDVCCaching:
             result = country._aggregate_wave_data(None, "test_data")
 
         mock_repo.assert_not_called()
-        mock_get_df.assert_called_once_with(cache_path)
+        mock_get_df.assert_called_once_with(cache_path, open_errors=(FileNotFoundError,), check_null=True, engine='pyarrow')
         mock_map_index.assert_called_once()
         pd.testing.assert_frame_equal(
             result.reset_index(drop=True),
@@ -438,9 +438,11 @@ class TestDVCCaching:
 
         cache_path = mock_country_structure / "var" / "test_data.parquet"
         cache_path.parent.mkdir(parents=True, exist_ok=True)
-        cache_path.touch()
-
         cached_df = pd.DataFrame({"col1": [1, 2]})
+        cache_hash = "valid-cache-fixture"
+        # A healthy hit needs real decodable bytes and proven coverage.
+        write_parquet(cached_df, cache_path, cache_hash=cache_hash,
+                      cache_waves=["2020-21"])
 
         stage_key = "testcountry::2020_21::test_data"
         stage_info = StageInfo(
@@ -456,6 +458,8 @@ class TestDVCCaching:
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe", return_value=cached_df) as mock_get_dataframe, \
+            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_read_cache, \
+            patch.object(Country, "_table_cache_hash", return_value=cache_hash), \
             patch("lsms_library.country.map_index", side_effect=lambda df: df), \
             patch("lsms_library.country._load_canonical_spellings", return_value={}), \
             patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
@@ -494,8 +498,10 @@ class TestDVCCaching:
             result = country._aggregate_wave_data(method_name="test_data")
 
         pd.testing.assert_frame_equal(result, cached_df)
-        # Note: The actual implementation reads from cache, assertion may need adjustment
-        # mock_get_dataframe.assert_called_once_with(cache_path)
+        mock_repo_class.assert_not_called()
+        mock_get_dataframe.assert_not_called()
+        mock_read_cache.assert_called_once_with(
+            cache_path, open_errors=(OSError,), check_null=True, engine='pyarrow')
 
     def test_dvc_cache_applies_location_index(
         self,
@@ -743,6 +749,7 @@ class TestDVCCaching:
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe") as mock_get_dataframe, \
+            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_read_cache, \
             patch("lsms_library.country.map_index", side_effect=lambda frame: frame), \
             patch("lsms_library.country._load_canonical_spellings", return_value={}), \
             patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
@@ -805,7 +812,9 @@ class TestDVCCaching:
             pd.testing.assert_frame_equal(second, expected_df)
         # Second call should use cache without reproducing - first stage reproduce count should still be 1
         assert mock_stages[0].reproduce.call_count == 1, "Second call should not rerun DVC stage"
-        assert mock_get_dataframe.call_args_list[-1][0][0] == cache_path
+        mock_get_dataframe.assert_called_once_with(build_output_path)
+        mock_read_cache.assert_called_once_with(
+            cache_path, open_errors=(OSError,), check_null=True, engine='pyarrow')
 
     # ------------------------------------------------------------------
     # v0.7.0 cache-read fix coverage
@@ -842,7 +851,7 @@ class TestDVCCaching:
 
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
-            patch("lsms_library.country.get_dataframe", side_effect=lambda path, *_, **__: pd.read_parquet(path)) as mock_get_df, \
+            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_get_df, \
             patch("lsms_library.country.map_index", side_effect=lambda df: df), \
             patch("lsms_library.country._load_canonical_spellings", return_value={}), \
             patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
@@ -866,7 +875,7 @@ class TestDVCCaching:
         # The top read should have returned without ever opening Repo or
         # asking for stages.
         mock_repo_class.assert_not_called()
-        # get_dataframe should have been called exactly once on cache_path
+        # The cache-only payload reader is called exactly once on cache_path
         # (the top read).  No subsequent rebuild.
         assert mock_get_df.call_count == 1
         assert mock_get_df.call_args[0][0] == cache_path
