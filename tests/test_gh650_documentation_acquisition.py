@@ -329,6 +329,42 @@ def test_owned_receipt_unknown_hash_convention_is_unverifiable(docs, convention)
     assert (sidecar.read_bytes(), document.read_bytes()) == before and report['held'] == held
 
 
+@pytest.mark.parametrize('workspace', [False, True])
+def test_invalid_prior_raw_checksum_needs_verified_prior_workspace(docs, workspace):
+    prior = b'prior bytes'
+    docs['bodies']['https://synthetic.invalid/1'] = prior
+    fetch(push=False)
+    document = docs['directory'] / 'questionnaire.pdf'
+    receipt = docs['directory'] / 'DOCUMENTS-10.json'
+    held = json.loads(receipt.read_text()); held['held']['1']['md5'] = 'not-a-valid-raw-md5'
+    receipt.write_text(json.dumps(held))
+    if not workspace:
+        document.unlink()
+    sidecar = document.with_name(document.name + '.dvc')
+    sidecar.write_text(f'outs:\n- md5: {hashlib.md5(prior).hexdigest()}\n  hash: md5\n  path: questionnaire.pdf\n')
+    before = sidecar.read_bytes()
+    docs['bodies']['https://synthetic.invalid/1'] = b'incoming revision'
+    report = fetch()
+    assert report['status'] == ('complete' if workspace else 'incomplete')
+    assert len(docs['pushes']) == int(workspace) and sidecar.read_bytes() == before
+    assert document.exists() == workspace
+
+
+def test_explicit_legacy_revision_uses_verified_bytes_not_raw_receipt_md5(docs):
+    prior = b'prior\r\nbytes\r\n'
+    docs['bodies']['https://synthetic.invalid/1'] = prior
+    fetch(push=False)
+    document = docs['directory'] / 'questionnaire.pdf'
+    sidecar = document.with_name(document.name + '.dvc')
+    checksum = hashlib.md5(prior.replace(b'\r\n', b'\n')).hexdigest()
+    assert checksum != hashlib.md5(prior).hexdigest()
+    sidecar.write_text(f'outs:\n- md5: {checksum}\n  hash: md5-dos2unix\n  path: questionnaire.pdf\n')
+    docs['bodies']['https://synthetic.invalid/1'] = b'incoming\r\nrevision\r\n'
+    report = fetch()
+    assert report['status'] == 'complete' and len(docs['pushes']) == 1
+    assert document.read_bytes() == b'incoming\r\nrevision\r\n'
+
+
 def test_atomic_receipt_failure_preserves_previous_receipt(docs, monkeypatch):
     fetch(push=False)
     receipt = docs['directory'] / 'DOCUMENTS-10.json'; before = receipt.read_bytes()
