@@ -27,15 +27,16 @@ SHA test because approved #1483 optional plot-input fields changed that file.
 Root reviewed exact one-line digest update; whole-file and food-binding pins
 remain. Focused113PASS. Test-only H1f88c502389b23b5d00bf12c70dc1b7a8d76c0d3
 published; new ordinary42924140955/unit130206177543 IN_PROGRESS.
-Draft four-country PR1693 remains pending normal acceptance: v13 baseline
-Benin8012 accepted from saved captures, v14 only remaining7cold+warm job41129992
-FAILED1/19m03: six cold lanes CLOSED0; candidate Côte d’Ivoire returned both
-public calls,3 getters,2 writers,5 captures,0 denials, then post-return checks
-hit its180s cap. All29 v14 captures retained, but job-scoped L2 parquets were
-not archived. Saved-only cold oracle/cross-run comparator pending review; after
-that passes, preserving full original warm scope requires genuine regeneration
-of all four candidate cold caches in a persistent private root, then four-country
-and two-Feature warm calls. No baseline replay. Queue FROZEN to these
+Draft four-country PR1693 remains pending normal acceptance. The saved-only v4
+scientific comparison PASS authenticated all32 v13/v14 cold captures and proved
+four countries' complete native inputs and typed public frames against the
+documented region x residence projection, with all other fields, weights,
+IDs and Rural unchanged. It made zero new API/raw calls. The Côte d’Ivoire
+v14 post-return timeout and absence of persistent L2 caches remain explicit;
+data_acceptance is false. Deputy prepared a bounded v15 plan for genuine
+regeneration of all four candidate cold caches in a durable private root,
+followed by the original four-country and two-Feature warm calls, subject to
+independent manager admission. No baseline replay. Queue FROZEN to these
 four streams, no new issues/research/sweeps. See detailed sections below.
 
 * Scope fixed by the maintainer
