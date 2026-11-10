@@ -146,7 +146,14 @@ def stage_owner(tiny, monkeypatch):
     calls = []
     def reproduce(**kwargs):
         calls.append(kwargs)
-        _frame().to_parquet(output)
+        # Actual Stage.run(force=True) removes old outputs. This synthetic
+        # producer must publish a new entry too; an identical in-place rewrite
+        # need not change a filesystem's observed timestamp/identity tuple.
+        old_inode = output.stat().st_ino
+        replacement = output.with_name('produced-facts.parquet')
+        _frame().to_parquet(replacement)
+        os.replace(replacement, output)
+        assert output.stat().st_ino != old_inode
     stage = SimpleNamespace(cmd='invented producer', frozen=False, is_import=False,
         outs=[out], addressing=info.stage_ref, status=lambda **kw: {}, reproduce=reproduce)
     class Repo:
