@@ -1707,12 +1707,25 @@ def plot_inputs_for_wave(t, sec3a, sec4a, colmap):
                     f"{s.index[0]!r}; Quantity_purchased cannot be summed")
             return units[0] if len(units) else pd.NA
 
-        df = df.groupby(level=index, dropna=False).agg({
-            'Quantity': _sum1,
-            'Purchased': 'max', 'Quantity_purchased': _sum1,
+        # Ledger tanzania-queue-refill-20261109-v2 §5: a repeated key sends
+        # every singleton through this branch too. Only singletons can use
+        # the grouped numeric result without changing a summation sequence.
+        # Restore EVERY multirow group's scalar sum, including all-NA groups;
+        # signed cancellation can exceed #905's four-ULP bound otherwise.
+        grouped = df.groupby(level=index, dropna=False)
+        numeric_columns = ['Quantity', 'Quantity_purchased']
+        numeric = grouped[numeric_columns].sum(min_count=1)
+        duplicate_rows = df.index.duplicated(keep=False)
+        duplicate_sums = (df.loc[duplicate_rows]
+                          .groupby(level=index, dropna=False)[numeric_columns]
+                          .agg(_sum1))
+        numeric.loc[duplicate_sums.index, numeric_columns] = duplicate_sums
+        df = grouped.agg({
+            'Purchased': 'max',
             'Unit_purchased': _agreed_unit,
             'Improved': 'max',
         })
+        df[numeric_columns] = numeric
         df['Unit_purchased'] = df['Unit_purchased'].astype('string')
     df = df[PLOT_INPUTS_COLUMNS]
     # Replace only the crop axis AFTER the unchanged conditional reducer. Do
@@ -1996,9 +2009,19 @@ def plot_labor_for_wave(t, sec3a, colmap):
     if not df.index.is_unique:
         def _sum1(s):
             return s.sum(min_count=1)
-        df = df.groupby(level=['t', 'i', 'plot_id', 'source']).agg({
+        # Ledger 905-tanzania-labor-singletons-20261109 §5: only singleton
+        # keys may use grouped numeric sums. Restore EVERY multirow group's
+        # original scalar sequence, including all-NA and signed wage groups.
+        # A full substitution can exceed #905's unchanged four-ULP bound.
+        grouped = df.groupby(level=['t', 'i', 'plot_id', 'source'])
+        numeric = grouped[PLOT_LABOR_COLUMNS].sum(min_count=1)
+        duplicate_rows = df.index.duplicated(keep=False)
+        duplicate_sums = df.loc[duplicate_rows].groupby(
+            level=['t', 'i', 'plot_id', 'source']).agg({
             'PersonDays': _sum1, 'Wage': _sum1,
         })
+        numeric.loc[duplicate_sums.index, PLOT_LABOR_COLUMNS] = duplicate_sums
+        df = numeric
     df = df[PLOT_LABOR_COLUMNS]
     return df
 
