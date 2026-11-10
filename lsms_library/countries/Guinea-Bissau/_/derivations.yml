@@ -137,3 +137,46 @@ Guinea-Bissau::community_prices::one-item-per-price:
     the one-item reading cannot be checked against data.
   contents: 'Guinea-Bissau/_/CONTENTS.org, "2018-19 community prices are wired (GH #1226)"'
   since: '2026-11-04'
+
+Guinea-Bissau::sample::region-milieu-stratum:
+  waves: ['2018-19']
+  columns: [strata]
+  rows: {}
+  rule: >-
+    strata = '<s00q01 label> <s00q04 label>', the cover page's own region
+    and residence milieu, stripped and separated by one space. Labels, never
+    numeric codes; NA where either component is missing or blank. The region
+    part is spelled through this country's strata aliases at read time,
+    preserving the native Portuguese Urbano/Rural suffix.
+  function: lsms_library.ehcvm:derive_region_milieu_stratum
+  inputs: lsms_library.countries.Guinea-Bissau.2018-19._.mapping:inputs_strata
+  raw_variables: [s00q01, s00q04]
+  assumptions:
+    - text: >-
+        the original 2018/19 design defines a stratum as region combined with
+        residence milieu. The later survey revisits the original clusters;
+        this entry wires only the existing 2018-19 sample.
+      basis: questionnaire
+      evidence: >-
+        Own INE Basic Information Document (survey design documentation, not a
+        questionnaire question), 2021-22/Documentation/gnb_ehcvm2_information_de_base.pdf,
+        section 4.1, PDF p.16 (English edition p.13): "La strate est la
+        combinaison région/milieu de résidence." Catalog 6274/download/100359;
+        retrospective description of the original 2018/19 design.
+    - text: >-
+        SAB is documented as urban-only. The later allocation table is labeled
+        2021/22 while surrounding prose describes the original design; its
+        nonzero-cell arithmetic is not a formally quoted stratum count and
+        imposes no observed-count requirement or row exclusion.
+      basis: questionnaire
+      evidence: >-
+        Own 2018 DDI p.4 / basicinformationdocument_gnb.pdf p.10, and own
+        second-edition BID Table 1a; Guinea-Bissau/_/CONTENTS.org, "documented
+        planned region/milieu strata (GH #1575)". No allocation is inferred
+        from sampling weights.
+  validated_against: >-
+    Documentary definition and static wiring only. Actual-row validation,
+    missingness, cluster consistency, non-strata conservation, normal cold/warm
+    sample and Feature acceptance are UNRUN in this source/pure worker.
+  contents: 'Guinea-Bissau/_/CONTENTS.org, "Selected 2018-19 region/milieu strata (GH #1575)"'
+  since: '2026-11-10'

@@ -9,6 +9,9 @@ from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
     food_acquired_ehcvm as _food_acquired_ehcvm,
     inputs_last_purchase as _inputs_last_purchase,
+    inputs_region_milieu_stratum as _inputs_region_milieu_stratum,
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
     served_unit_labels as _served_unit_labels,
     sized_unit as _sized_unit,
 )
@@ -31,6 +34,16 @@ def inputs_food_acquired(wave):
     fingerprint.
     """
     return _inputs_last_purchase('Guinea-Bissau', wave)
+
+
+# GH #1575; shared construction and provenance (task ledger §§2–5).
+def inputs_strata(wave):
+    """The original cover-page region/milieu labels at (t, i)."""
+    return _inputs_region_milieu_stratum('Guinea-Bissau', wave)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Guinea-Bissau')
 
 
 def df_geo(df):
