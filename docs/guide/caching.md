@@ -553,3 +553,21 @@ The blob fetch (`local_tools._get_file_with_retry`) already retries these
 transient errors (`LSMS_FETCH_ATTEMPTS`, default 3) with exponential backoff
 before falling back to a single-stream read, so most such hiccups self-heal
 without touching `-j`. Reach for `LSMS_MAKE_JOBS=1` only if they persist.
+
+### Unreadable managed caches (#1071, first tranche)
+
+The YAML/script wave gates and ordinary/assumed-fresh country gates treat an
+existing managed Parquet that fails initial payload decoding with OSError or
+ArrowInvalid as a cache miss, with an explicit unreadable-cache warning. This
+is a reader failure, not proof of physically damaged bytes. Saved coverage is
+retained before rejecting the exact old entry; script rebuilds are forced so
+Make cannot mtime-serve that entry. One ordinary rebuild is attempted; a fresh
+invalid output or failed producer still raises. Valid hits, assumed-fresh hash
+bypass, normal null/index/grain/date policy and strict refusals are unchanged.
+
+This is not generic file healing: raw/user inputs, post-payload schema/index
+restoration and audits are never reclassified. Other-features caches, legacy
+JSON/parquet alternatives, retired-stage outputs and private Make prerequisite
+owner routes remain separate #1071 work. Earlier raise-only tests/receipts
+characterize the old policy; they are not evidence that unreadability proves
+physical damage or that the entire issue is resolved.
