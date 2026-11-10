@@ -257,13 +257,24 @@ review underway. Product41a unchanged through fixture-only correction:30PASS/
 8newfixtureFAIL, exact9f boundary1PASS, only affected8PASS. No native/API/census.
 R/1573-burkina-2014-strata-label-implementation-20261110/{REPORT.md,FINAL.patch}.
 Root personally read complete mapping implementation and result qualifications.
+Independent lead admission complete. Reduced dependent DRAFT1691 published and
+Root readback verified: https://github.com/ligon/LSMS_Library/pull/1691,
+head ec74c625675d1c8d8fafa7e6f950094bf4103b40/tree d9f4bbae0fd7cdbc30008d86266c4450d25d5aee;
+base frozen1690/9f, exactly5files/1commit and all19375nonowned objects exact.
+One source-only metadata pass CLOSED0/137.983s: exactly21BFAcountry/21BFA2014wave
+changed;431othercountry/1882otherwave/37BTF/186FIF/14nonhash/registrations/18None
+equal,0errors/denials/privatefiles. R/1573-reviewed-child-20261110/REPORT.md.
+Root personally read report. Narrow normal baseline/candidate sample acceptance
+is authorized after source-derived finite plan; actual sample/API remains UNRUN.
 finish_1590 now owns bounded fresh country-backlog selection: three concrete
 unblocked TierA/B briefs, reconcile existing work, no data or duplicate dispatch.
 
 Malawi fresh execution-only allocation41092166/872ff5c42e3249af9d649996e9da501e
 RUNNING n0030; metadata/MAIN/pre-getter setup passed, raw0 at manager checkpoint.
-Joint final source/operator/installed identity freeze still pending, no actual
-native handle yet. Earlier preparation allocation is not native acceptance.
+Joint final source/operator/installed identity freeze SHA224edac91c5541825ef524b2f2fb85d1c5915a3036cd4f41ef09eda09f402ca6
+accepted by manager and lead; six reviewed code files exact, runner only job-path
+rebind. Manager writes SHA-bound clearance and launches deterministic runner;
+actual native handle still awaited. Earlier preparation is not native acceptance.
 Uganda actual stage2236659/cold2236662/warm2238483 CLOSED0/groups closed:
 22cold fullreads/137.607s; warm67.993s/0native/producer/writer;15typed comparisons
 and26-file inventory PASS. Separate postrun reporting chmod changed ctime on15
