@@ -3186,3 +3186,34 @@ claimed. ROOT must review and run these controls before accepting the candidate.
 Any country-module edit carries the existing Tanzania-wide hash coupling;
 no live hash probe, cache clear or re-warm was performed. The #114 WAITING,
 UPHI back-casting, Extended/Refresh and #1497 fallback decisions stay separate.
+
+* 2026-11-09 -- GH #905: singleton-only plot-labor candidate (source stage)
+
+Whenever one =(t, i, plot_id, source)= key repeats, the current labor reducer
+sends every group, including unrelated singletons, through two scalar sum
+callbacks. This is a source control-flow finding, not a native duplicate count
+or a measured runtime cost. The candidate reuses PR #1682's input strategy:
+grouped numeric results serve only singleton groups; EVERY multirow group's
+=PersonDays= and =Wage= are overwritten with their exact existing scalar
+=Series.sum(min_count=1)= results. Groupby defaults, keys and operand order stay
+unchanged. The signed Wage counterexample =[1e16, 1, 1, -1e16]= and unchanged
+four-ULP bound still rule out replacing multirow sums. The earlier “HELD” entry
+remains evidence about that full substitution, not a new scientific decision.
+
+Both modern wave scripts and all family/hired construction are unchanged.
+In particular, the source-documented 2019 worker-roster-ID block is not a day
+measure and still yields no family rows; the candidate makes no new instrument
+or fielding claim. Empty/wholly gated-out sources still reach =pd.concat([])=
+and refuse; no healthy-empty behavior is introduced.
+
+=tests/test_tanzania_labor_singletons_20261109.py= is prepared but UNRUN under
+the dispatch's source-only restriction. It binds the exact dispatch-base module
+and the unchanged independent #905 public digest, compares actual old/new
+helpers on invented inputs, and checks complete frames, inputs, callbacks and
+refusals. Stdlib source/AST checks are separate from numerical execution. The
+existing #905 loader restores inputs/livestock only; ROOT must review labor
+restoration when combining with the pending input patch, without repinning.
+No native parity, Country/Feature/API/cache, speed or live-hash claim is made.
+Changing this shared country module retains Tanzania-wide hash coupling.
+All historical failures, WAITING #114, UPHI/r_hhid grain, Extended/Refresh,
+and #1497 continuation decisions remain separate and unchanged.

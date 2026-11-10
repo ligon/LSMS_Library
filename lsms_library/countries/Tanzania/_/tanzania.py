@@ -2009,9 +2009,19 @@ def plot_labor_for_wave(t, sec3a, colmap):
     if not df.index.is_unique:
         def _sum1(s):
             return s.sum(min_count=1)
-        df = df.groupby(level=['t', 'i', 'plot_id', 'source']).agg({
+        # Ledger 905-tanzania-labor-singletons-20261109 §5: only singleton
+        # keys may use grouped numeric sums. Restore EVERY multirow group's
+        # original scalar sequence, including all-NA and signed wage groups.
+        # A full substitution can exceed #905's unchanged four-ULP bound.
+        grouped = df.groupby(level=['t', 'i', 'plot_id', 'source'])
+        numeric = grouped[PLOT_LABOR_COLUMNS].sum(min_count=1)
+        duplicate_rows = df.index.duplicated(keep=False)
+        duplicate_sums = df.loc[duplicate_rows].groupby(
+            level=['t', 'i', 'plot_id', 'source']).agg({
             'PersonDays': _sum1, 'Wage': _sum1,
         })
+        numeric.loc[duplicate_sums.index, PLOT_LABOR_COLUMNS] = duplicate_sums
+        df = numeric
     df = df[PLOT_LABOR_COLUMNS]
     return df
 

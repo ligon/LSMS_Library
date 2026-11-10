@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from tests.tanzania_crop_marker_oracle import assert_strict
+from tests.tanzania_crop_marker_oracle import assert_strict, restore_labor_reduction
 from tests.test_gh905_tanzania_vectorised_sums import (
     SOURCE, load_helper, source_case, stub_maps,
 )
@@ -31,7 +31,7 @@ ORIGINAL_REDUCER = """        df = df.groupby(level=index, dropna=False).agg({
 
 def load_dispatch_base():
     """Reverse only the selected block; require the independently frozen hash."""
-    source = SOURCE.read_text(encoding='utf-8')
+    source = restore_labor_reduction(SOURCE.read_text(encoding='utf-8'))
     start = source.index('        # Ledger tanzania-queue-refill-20261109-v2 §5:')
     end = source.index("        df['Unit_purchased'] =", start)
     original = source[:start] + ORIGINAL_REDUCER + source[end:]
