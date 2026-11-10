@@ -296,6 +296,7 @@ def test_unknown_recovery_metadata_retains_original_reader(stage_owner, monkeypa
 def test_fresh_attempt_is_not_healed_again_and_coverage_requires_success(stage_owner, monkeypatch, mode):
     o = stage_owner
     initial = _fault(o, monkeypatch)
+    available_error = RuntimeError('invented failed producer with available replacement')
     def reproduce(**kwargs):
         o.calls.append(kwargs)
         o.output.unlink()
@@ -303,14 +304,17 @@ def test_fresh_attempt_is_not_healed_again_and_coverage_requires_success(stage_o
             o.output.write_bytes(b'new invalid output')
         elif mode == 'available-after-failure':
             _frame().to_parquet(o.output)
-            raise RuntimeError('invented failed producer with available replacement')
+            raise available_error
         elif mode == 'producer-failure':
             raise RuntimeError('invented producer failure')
     o.stage.reproduce = reproduce
     if mode == 'available-after-failure':
-        with pytest.warns(UserWarning, match='DVC reproduce failed'):
-            _exact(o.load(), _served())
-        assert L.read_parquet_cache_waves(o.data / NAME / 'var/facts.parquet') == []
+        # A readable replacement cannot waive a fresh forced producer failure.
+        with pytest.raises(RuntimeError) as caught:
+            o.load()
+        assert caught.value is available_error
+        _exact(L.get_dataframe(o.output), _frame())
+        assert not (o.data / NAME / 'var/facts.parquet').exists()
     else:
         expected = L.ParquetFormatError if mode == 'fresh-bad' else KeyError if mode == 'no-output' else RuntimeError
         with pytest.raises(expected):
@@ -399,3 +403,69 @@ def test_clean_sibling_is_not_reproduced_or_decoded_twice(stage_owner, monkeypat
     assert counts == {o.output: 2, other: 1}
     assert o.calls == [{'force': True}] and not sibling_calls
     assert L.read_parquet_cache_waves(o.data / NAME / 'var/facts.parquet') == [WAVE, other_wave]
+
+
+@pytest.mark.parametrize('error_type', [OSError, RuntimeError, ValueError,
+                                       C.DvcException, FileNotFoundError])
+def test_forced_producer_exact_error_is_fatal_without_any_legacy_owner(stage_owner, monkeypatch, error_type):
+    o = stage_owner
+    _fault(o, monkeypatch)
+    error = error_type('invented failed fresh forced producer')
+    fallback = []
+    def forbidden_owner(*args, **kwargs):
+        fallback.append(True)
+        raise AssertionError('failed forced producer reached a second legacy owner')
+    def reproduce(**kwargs):
+        o.calls.append(kwargs)
+        raise error
+    o.stage.reproduce = reproduce
+    monkeypatch.setattr(C.Country, '_evict_hashless_wave_caches', forbidden_owner)
+    monkeypatch.setattr(C.Wave, 'grab_data', forbidden_owner)
+    before_source, before_output = _snapshot(o.root), _state(o.output)
+    with pytest.warns(UserWarning, match='Unreadable managed stage cache'):
+        with pytest.raises(error_type) as caught:
+            o.load()
+    assert caught.value is error and caught.value.__cause__ is None
+    assert o.calls == [{'force': True}] and not fallback
+    assert _snapshot(o.root) == before_source and _state(o.output) == before_output
+    assert not (o.data / NAME / 'var/facts.parquet').exists()
+
+
+@pytest.mark.parametrize('error_type', [RuntimeError, FileNotFoundError])
+def test_ordinary_dirty_failure_retains_available_output_and_unproven_coverage(stage_owner, error_type):
+    o = stage_owner
+    o.stage.status = lambda **kwargs: {'dirty': True}
+    error = error_type('invented ordinary dirty producer failure')
+    def reproduce(**kwargs):
+        o.calls.append(kwargs)
+        raise error
+    o.stage.reproduce = reproduce
+    before_source, before_output = _snapshot(o.root), _state(o.output)
+    with pytest.warns(UserWarning, match='DVC reproduce failed'):
+        _exact(o.load(), _served())
+    assert o.calls == [{}]
+    assert _snapshot(o.root) == before_source and _state(o.output) == before_output
+    assert L.read_parquet_cache_waves(o.data / NAME / 'var/facts.parquet') == []
+
+
+def test_ordinary_dirty_outer_error_retains_legacy_owner_route(stage_owner, monkeypatch):
+    o = stage_owner
+    o.stage.status = lambda **kwargs: {'dirty': True}
+    error = C.DvcException('invented ordinary outer dirty-stage failure')
+    class LegacyOwnerReached(Exception):
+        pass
+    fallback = []
+    def legacy_owner(*args, **kwargs):
+        fallback.append(True)
+        raise LegacyOwnerReached
+    def reproduce(**kwargs):
+        o.calls.append(kwargs)
+        raise error
+    o.stage.reproduce = reproduce
+    monkeypatch.setattr(C.Country, '_evict_hashless_wave_caches', legacy_owner)
+    before_source, before_output = _snapshot(o.root), _state(o.output)
+    with pytest.raises(LegacyOwnerReached):
+        o.load()
+    assert o.calls == [{}] and fallback == [True]
+    assert _snapshot(o.root) == before_source and _state(o.output) == before_output
+    assert not (o.data / NAME / 'var/facts.parquet').exists()

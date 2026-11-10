@@ -58,3 +58,34 @@ fallback with readable/proven coverage; fresh malformed outputs and postread
 policy errors are strict, never healed a second time. Checks remain non-atomic
 filesystem identity checks, not a compare-and-swap guarantee. C/common nlink
 correction is separately frozen3c28 and must be composed before batch publication.
+
+## 8. ROOT source finding: failed forced producer boundary (2026-11-10)
+Original9d8/b192 source and all prior failed/pass receipts remain immutable.
+ROOT found new force=True reproduction still entered the old local fallback
+catch for OSError/ValueError/RuntimeError, while DvcException/FileNotFoundError
+could reach outer fallback without strict recovery marked. This is a concrete
+source-backed P2, not claimed native incidence. A newly forced recovery must
+propagate its exact producer error and cannot start a second legacy owner.
+Ordinary preexisting dirty-stage failure fallback remains unchanged. Minimal
+correction marks strict recovery before forced reproduction and bypasses only
+forced local failure fallback. Freeze new discriminating exact-error/no-fallback
+controls plus normal dirty-stage companions before bounded pure execution;
+no old38/C/native/API/census replay. Independent Mwi review required.
+
+## 9. Forced-producer P2 correction actual result (2026-11-10)
+Frozen d2cc74 actor59729 CLOSED0: exactly9PASS/0F/E/S (15.04s pytest),
+8new forced/ordinary-dirty discriminators plus ONLY the1 affected readable-
+replacement case. Normal dirty RuntimeError/FileNotFoundError still serves
+available data with unproven []coverage; ordinary dirty DvcException still
+enters its old legacy owner. All5 forced error classes preserve the exact
+producer exception/causeNone, oneforce and no fallback/new countrywrite/source
+mutation. A readable replacement no longer waives failure: it is separately
+strictly readable while the public call raises that same failed producer error.
+Other old37 case expectations/helpers are unchanged; no old38 or C replay.
+Prior9d8/b192 and their source-only P2 plus all old failures/passes remain
+historical. They do not prove the corrected forced-producer fatal contract.
+Controller+2 worker identity/private/source bindings stayed exact, active
+tripwires zero and top private data/config empty. Reports and immutable receipts:
+reports/1071-forced-stage-producer-fatal-20261110/focused-v1. No raw/API/native
+survey, metadata census or fullsuite. Final batch must carry this corrected D
+source rather than b192/9d8's force fallback behavior.
