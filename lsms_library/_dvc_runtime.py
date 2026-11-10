@@ -17,8 +17,8 @@ from functools import cached_property
 from importlib.metadata import version
 from pathlib import Path
 
-from dvc.api import DVCFileSystem
-from dvc.fs.dvc import _DVCFileSystem
+from dvc.api import DVCFileSystem as _PublicDVCFileSystem
+from dvc.fs.dvc import DVCFileSystem, _DVCFileSystem
 from dvc.repo import Repo
 from dvc.repo.scm_context import SCMContext
 from packaging.version import Version
@@ -42,6 +42,15 @@ def _check_capabilities() -> None:
         raise DVCMetadataCompatibilityError(
             f"DVC {installed} is outside the declared >=3.67.0,<4 support range")
     try:
+        # dvc.api exports the fsspec INNER class. Our fs hook belongs to the
+        # separate dvc_objects OUTER wrapper; the first prototype mixed them.
+        if _PublicDVCFileSystem is not _DVCFileSystem:
+            raise TypeError("DVC public supplied-Repo API alias changed")
+        if RuntimeDVCFileSystem.__bases__ != (DVCFileSystem,):
+            raise TypeError("Runtime filesystem is not bound to DVC's outer wrapper")
+        fs_hook = inspect.getattr_static(DVCFileSystem, "fs")
+        if not hasattr(fs_hook, "__get__"):
+            raise TypeError("DVC outer wrapper has no lazy fs descriptor")
         inspect.signature(Repo).bind(root_dir="/", config={}, uninitialized=True)
         inspect.signature(_DVCFileSystem).bind(repo=object(), subrepos=False)
         inspect.signature(SCMContext).bind(object(), {})
@@ -197,7 +206,11 @@ class RuntimeDVCRepo(Repo):
 
 
 class RuntimeDVCFileSystem(DVCFileSystem):
-    """Original DVC filesystem with lazy, per-process Repo ownership."""
+    """DVC outer wrapper with lazy, per-process supplied-Repo ownership.
+
+    This is not an instance of the public fsspec inner class. The sanctioned
+    reader calls delegate to that actual inner API; no new protocol is added.
+    """
 
     def __init__(self, root_dir, *, config=None):
         super().__init__(repo=os.fspath(root_dir), config=config)
@@ -226,7 +239,7 @@ class RuntimeDVCFileSystem(DVCFileSystem):
                                       config=self._runtime_config,
                                       uninitialized=True)
                 try:
-                    fs = _DVCFileSystem(repo=repo, subrepos=False)
+                    fs = _PublicDVCFileSystem(repo=repo, subrepos=False)
                 except BaseException as cause:
                     try:
                         repo.close()
@@ -238,6 +251,19 @@ class RuntimeDVCFileSystem(DVCFileSystem):
                 self._runtime_repo = repo
                 self._runtime_fs = fs
             return self._runtime_fs
+
+    def open(self, path, mode="rb", block_size=None, cache_options=None,
+             compression=None, **kwargs):
+        # The outer base defaults to text. Preserve public DVC API's binary
+        # default and native options for callers that omit mode.
+        return self.fs.open(path, mode=mode, block_size=block_size,
+                            cache_options=cache_options, compression=compression,
+                            **kwargs)
+
+    def exists(self, path, **kwargs):
+        # The outer base treats a non-str path as a batch; the existing public
+        # API accepts pathlib.Path. Preserve that native interpretation.
+        return self.fs.exists(path, **kwargs)
 
     def close(self):
         if self._runtime_pid != os.getpid():

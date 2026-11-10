@@ -214,8 +214,9 @@ def test_country_cold_then_warm_uses_private_metadata_without_provider_replay(ti
         first = C.Country(name, preload_panel_ids=False)._aggregate_wave_data(
             method_name="facts")
         assert first["x"].tolist() == [7.0, 11.0]
-        assert first.index.names == ["t", "i"]
-        assert list(first.index) == [(wave, "h1"), (wave, "h2")]
+        # Country._finalize_result uses preferred=['i','t','v','m'].
+        assert first.index.names == ["i", "t"]
+        assert list(first.index) == [("h1", wave), ("h2", wave)]
         assert made and all(Path(site).is_relative_to(metadata) for _, _, site in made)
 
         def no_provider(*args, **kwargs):
@@ -345,7 +346,11 @@ def test_actual_country_foreach_materialize_private_output_once(tiny, monkeypatc
         before = _snapshot(root)
         actual = C.Country(name, preload_panel_ids=False)._aggregate_wave_data(
             method_name="facts")
-        pd.testing.assert_frame_equal(actual, expected)
+        # Literal served oracle follows existing Country finalization, while
+        # the producer/fixture keeps its original raw (t,i) index unchanged.
+        served = pd.DataFrame({"x": [15.0, 25.0]}, index=pd.MultiIndex.from_tuples(
+            [("h1", wave), ("h2", wave)], names=["i", "t"]))
+        pd.testing.assert_frame_equal(actual, served)
         assert attempts.read_text().splitlines() == ["attempt"]
         assert _snapshot(root) == before
         assert not (root / "dvc.lock").exists()
@@ -587,6 +592,39 @@ def test_malformed_present_config_is_not_missing_or_a_blank_fallback(tiny):
         with pytest.raises(ConfigError):
             _ = fs.repo
         assert _snapshot(root) == before
+
+
+def test_outer_binding_preserves_native_reader_interface_and_binary_default(tiny):
+    from dvc.api import DVCFileSystem as PublicInner
+    from dvc.fs.dvc import DVCFileSystem as ExistingOuter
+    root, data, metadata, remote, fs = tiny
+    payload = b"amount\n21\n34\n"
+    _sidecar(root, "interface.csv", payload)
+    _object(data / "dvc-cache", payload)
+    assert isinstance(fs, ExistingOuter)
+    assert not isinstance(fs, PublicInner)  # explicit, reviewed type change
+    with _readonly(root):
+        before = _snapshot(root)
+        repo = fs.repo
+        assert isinstance(repo, R.RuntimeDVCRepo)
+        native = PublicInner(repo=repo)
+        try:
+            assert native.repo is repo
+            for provider in (native, fs):
+                with provider.open(Path("interface.csv")) as stream:
+                    assert stream.read() == payload
+                with provider.open("interface.csv", "r", encoding="utf-8") as stream:
+                    assert stream.read() == "amount\n21\n34\n"
+                assert provider.exists(Path("interface.csv"))
+                assert not provider.exists(Path("absent.csv"))
+            copied = data / "interface-copy.csv"
+            fs.get_file("interface.csv", str(copied))
+            assert copied.read_bytes() == payload
+            assert repo.config["cache"]["dir"] == str(data / "dvc-cache")
+            assert _snapshot(root) == before
+        finally:
+            native.close()  # supplied Repo remains owned by fs, not native
+        assert fs.repo is repo
 
 
 def test_real_partial_cache_config_failure_closes_sqlite_before_removal(tiny, monkeypatch):

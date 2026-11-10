@@ -189,7 +189,7 @@ def _s3_explicit_credentials() -> dict[str, str]:
     return {}
 
 
-def _build_dvcfs() -> DVCFileSystem:
+def _build_dvcfs() -> RuntimeDVCFileSystem:
     config: dict[str, Any] = {"cache": {"dir": os.fspath(_DVC_CACHE_DIR)}}
     # The remote override carries credentials but no ``url``; DVC validates
     # each config level on its own, so the stanza is only legal when the
