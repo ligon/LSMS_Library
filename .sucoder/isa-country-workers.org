@@ -1,11 +1,18 @@
 #+title: Current LSMS-ISA worker queue
-Development4381/78verifiedmerges/42wholeclosures; PR1680READYdataCI LIVE;
-1681Malawi/1682Tanzania DRAFT with6/42purecontrolsPASS.
-ZEROremotejobsactive/pending; all12attemptsterminalRefused.
-- Root: PR1680actualwiring/dataCI, countryPRadmission, one repairedCLIpilot.
-- finish_1452: reviewedSuCodersource-restoration56purePASS; isolatedCLIpin/stagingproof.
-- finish_1590: eightcountrybriefs fromcomplete145openinventory; preserveholds/movequeue.
-- malawi_revision_food:1032/1071twofinitecandidate-onlymetadatafootprints, closedbaselinecarry.
-BFA/MalidocumentarycandidatesindependentqualifiedPASS, unpublished.
-NextcountryactorsafteroneverifiednormalCLIpilot; no blindretry/monitorbypass.
-Details/actualhashes/links/nextsteps:[[file:handoff.org]].
+All EIGHT country workers are ACTUALLY native-running with fresh heartbeats
+and source-pin READY (2026-11-10 01:35 UTC). Zero queued/starting/failed.
+BFA41079834, Ethiopia41079836, Malawi41079835, Mali41079843,
+Niger41079842, Nigeria41079844, Tanzania41079852, Uganda41079853.
+finish_1452 owns watcher53129 and findings/questions. Thirteen ranked actions
+in Q/NEXT-EIGHT-COUNTRY-QUEUE.json; country edits/source diagnosis initially,
+Root verifies frozen patches. All prior scientific holds preserved.
+
+The repaired pilot41078497 finished native0/supervisor0 with five authenticated
+artifacts and actual identity-bound terminal-race proof. Root admitted it before
+submitting eight exact pinned jobs. Old twelve failures remain failures.
+
+Local: Root manages queue/PR1680 full-data CI; finish_1590 prepares Burkina1573
+concrete decision packet; malawi_revision_food verifies combined1032/1071,
+remaining33 pure DVC controls45968 live. PR1681/1682 draft country CI passed.
+Development4381,78 verified merges/42 whole closures; no new merge yet.
+Details, source pins, receipts and next steps: [[file:handoff.org]].

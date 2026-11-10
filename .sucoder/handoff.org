@@ -13,28 +13,51 @@ B=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103;R=B/reports.
 Archive of all detailed earlier checkpoints (including failed attempts):
 [[file:archive/handoff-through-1679-20261109.org]]. Older state is historical.
 
-* Actual workers and next actions (latest; supersedes historical sections below)
-ZERO remote country jobs live/pending. Twelve actual submissions all TERMINAL:
-10Refused143,2native0/supervisor74. Eight earlier clone-preparation failures
-submitted NO jobs. No country dispatch is accepted as successful.
-Complete five published/hash-authenticated artifacts: Burkina_Faso/Mali/Malawi.
-Tanzania/Uganda/Niger useful Git source also preserved, incomplete artifacts.
-FINAL twelve-attempt matrix/source repositories/refs/paths and manifest:
-R/country-dispatch-proc-inspection-source-diagnosis-20261109/
-FINAL-TWELVE-ATTEMPT-STATUS.json and FINAL-MANIFEST.json,
-SHAde8789ceb6ef2f433dfd47bd4343814fe7b1e027e973b9345f9dc1d59d2a4fca.
-Do not call these eight busy workers. Four local slots total (root+3).
-- Root: country candidate review,932pure verification/publication,queue/CI/merges.
-- finish_1452: nine synthetic no-native supervisor controls authorized; locate
-  normal SuCoder source and prepare isolated source-pinned repair, NO installed/
-  staged hotpatch, monitor relaxation/native-state access or real submission.
-- finish_1590: Malawi494c84c country independent SOURCE review, full CONTENTS
-  first. Frozen932 correctionf41f ready for Root verification.
-- malawi_revision_food: Tanzania bd7eb country SOURCE review; independently
-  proved test-only empty-oracle correction and focused pure cohort authorized.
-  No actual native/cache/data build. Final1071 ledger/evidence next.
-Use followup_task to wake completed agents; send_message alone does not wake.
-User explicitly authorized country delegation and remote dispatch.
+* Actual workers and next actions — current at 2026-11-10 01:35 UTC
+All EIGHT remote country workers are confirmed scheduler RUNNING, native
+agent_execution/running, fresh heartbeat, source-pin READY. No queued, starting,
+failed or unknown worker at this observation. These are actual workers, not
+reserved lanes. Source-only diagnosis and country patches are authorized;
+Root separately verifies frozen patches before integration.
+
+- Burkina_Faso: job 41079834, dispatch ef9731e2e55f41a5bf20b7308817427d, node n0030.savio4.
+- Ethiopia: job 41079836, dispatch adb2417ad2864c8f92b80b2442b24413, node n0036.savio4.
+- Malawi: job 41079835, dispatch 47bc0c141d68493ea2d8fcfdd96fad43, node n0034.savio4.
+- Mali: job 41079843, dispatch 02e7d82735f148808e97cbf6535c224e, node n0037.savio4.
+- Niger: job 41079842, dispatch f40e80dcb858431aa4eb96b4e265eebb, node n0037.savio4.
+- Nigeria: job 41079844, dispatch 88359cfcf53847c389f567caf9c93872, node n0034.savio4.
+- Tanzania: job 41079852, dispatch f38ed0b88ec9416d9baf1adb2eae802a, node n0030.savio4.
+- Uganda: job 41079853, dispatch e7e44c620dea488aa1e180bc62dceb19, node n0030.savio4.
+
+Authoritative live status: R/sucoder-proc-exit-proof-repair-20261110/
+eight-country-monitor/CURRENT-EIGHT-STATUS.json. finish_1452 owns watcher53129
+through all terminals; root submit actor59245 CLOSED0, all8 exits0, no retry.
+Q/NEXT-EIGHT-COUNTRY-QUEUE.json binds all eight briefs and complete145-issue
+inventory;13 ranked actions. BFA/Mali1483 inputs; Ethiopia587/650 coverage/docs;
+Malawi1281 declared-wave regression; Niger1084/650 reconciliation+1565 roster;
+Nigeria587/1518 coverage/helper adoption; Tanzania/Uganda1441 district maps.
+Existing decisions and explicit scientific holds remain binding.
+
+Local model slots (root+3) are also assigned:
+- Root: queue, PR admission/CI, source review and scientific decisions.
+- finish_1452: monitor eight remote workers and collect findings/questions.
+- finish_1590: prepare concrete Burkina1573 policy/crosswalk decision packet,
+  no served-value changes or new science; Uganda642 documentary review finished.
+- malawi_revision_food: combined1032/1071 integration verification/publication
+  prep; unselected33 existing pure DVC controls actor45968 live.
+
+Historical12 country failures remain failures (10Refused143,2native0/SDK74).
+One REPAIRED pilot job41078497/9fc2b11716114ac98a7a9c9863376b8b finished native0,
+supervisor0, task completed, full publication/five artifacts authenticated.
+Root directly checked SHA/mode/nlink, unchanged4381 country blob/ref and actual
+identity-bound errno13→proc-directory-gone proof at5.336ms. Root admission:
+R/sucoder-proc-exit-proof-repair-20261110/ROOT-PILOT-ADMISSION.json.
+The repair restores prior bounded terminal proof; no live-process waiver,
+monitor disable, native state access or installed-file hotpatch. Final normal
+source48eab1059785e563bba028c75d2006420b967433 and staged workerccb4c571…
+are pinned in every job. Installed default CLI is unchanged; use reviewed
+candidate-cli.py with this exact source generation, never default old worker.
+Use followup_task to wake completed local agents; send_message does not wake.
 
 * Country dispatch source regression and repair
 Q=B/country-queue-refill-20261109-v2; private/<Country>/<dispatchID> holds
@@ -349,3 +372,49 @@ qualifiedSOURCEPASS. Noinstalled/stagedhotpatch/globalinstall/nativeconfig/
 monitorrelaxation/actualsubmission. Agentpreparescandidateimportpath/staged
 workerSHApin via normalisolatedCLI; Rootownsonefreshsmallsource-onlypilot.
 R/sucoder-proc-exit-proof-repair-20261110. All12countryfailuresremainfailures.
+
+* Latest integration and CI checkpoint — 2026-11-10 01:36 UTC
+PR1680 ordinary CI42733125345 SUCCESS: unit13874PASS/5673SKIP/4XFAIL,
+784.21s; Windows362PASS/1SKIP/15.92s, six optional jobs SKIP. Actual complete
+CI merge87745e120d5a5e6364c84083aad88a6c740ae92e has parents4381+283c and
+complete tree equal to source283c. R/ci-admission-1680-20261109. Actual data
+run42733260628 still LIVE full-test stage; no merge/settings mutation.
+PR1681 CI42733945117 SUCCESS and1682 CI42733949198 SUCCESS, exact count/log
+admission still pending. Both remain DRAFT; data acceptance not inferred.
+Root owns CI metadata watcher11949 (R/932-platform-wiring-1680-20261109/CI-WATCH.jsonl),
+remaining actual full-data run; no private data logs read.
+
+Combined1032+1071 source403de77248c3c1c5e54bb468d98277942148a7bb, ordinary
+conflict-free merge of193739521+4d1f6e8;13 union paths. Whole-tree inverse of
+each accepted patch restores the other accepted tree exactly. New W:
+/local/job40825266/worktrees/integrate-1032-1071-on-4381-20261109.
+285-case union actor2065 CLOSED1/316.034s:284PASS/1FAIL/0E/S. Sole failure
+was terminal spy in test_dvc_stage_dirty_then_clean: strict cold/warm frames
+and once-reproduction already passed;1071 warm reader now uses managed helper,
+so old get_dataframe last-call assertion was obsolete. Root read trace/test/
+actual helper and approved exact TEST-ONLY spy correction, no product change.
+Child0ef55160a0cbdae7ff52972c2f11fe73606509f2; one affected-node40074 CLOSED0,
+1PASS/15.633s; all frames/reproduce/actual helper kwargs and cold reader once
+reached PASS. Qualifying evidence is284 prior+1 targeted, NOT fresh285green.
+Combined final metadata actor18192 CLOSED0/129.269s:452 country/1885wave/
+37BTF/0FIF changes vs authenticated6baf baseline; all keysets/14 nonhash fields/
+18None exact/errors0/denials0/sourceclean. Hash303b83b8e49d5ac977de2e52bbb954f23445b49fe00f5bbb968ff8e1e8859b66.
+No data/config writes;8 private font bootstrap metadata files disclosed. No
+baseline replay or shared rewarm. R/1032-1071-integrated-release-20261109.
+Given the observed integration spy failure, Root authorized only the33 remaining
+UNSELECTED pure nodes of test_dvc_caching.py, excluding six already tested.
+Actor45968 LIVE on immutable0ef; preserve/classify failures before correction.
+No further broadening needed after that cohort; final PR remains unpublished.
+
+Uganda642042fa independent qualified documentary PASS;3 owned/19263 nonowned
+exact4381, source/config/tests unchanged,6072-line CONTENTS prefix preserved.
+Public paper method source supports peeled/raw language but original PDF/table/
+electronic FCT authority remains explicitly unresolved. Original143/errno22
+failed worker/missing5 artifacts retained. R/review-uganda-642042-processing-notes-20261110,
+manifestd31e7033455393acc2dc5645071c4df89ac86e860ab518c001233965a20b6ef7.
+
+Q/NIGER-1084-650-TRACKER-DRAFT.md and SOURCE-PROOF.json prepare stale-country
+slice reconciliation; Root has not yet applied it. Complete145 snapshot bound,
+Niger authoritativeCSV/generatedYAML already questionnaire7days/1ask/ownp37
+7B.03 locator, managed twoforms/twoBIDs/licence; do not redownload/promote again.
+Preserve wider non-ISA1084 and minimum/add_wave650 residuals.
