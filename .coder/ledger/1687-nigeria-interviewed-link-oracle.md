@@ -78,7 +78,39 @@ review/CI and whole issue/country/scientific acceptance remain pending.
 
 ### Phase 3 — verification
 
-Pending. Source inverse must recover original module byte-for-byte after
-removing only new helper/control class and replacing Nigeria selection branch
-with original two lines. Record finite pure and exact two actual outcomes;
-failure/skip/guard is never PASS. Ledger final update is a separate commit.
+- **OK (§2–4):** source inverse recovers the entire original test module
+  byte-for-byte after removing only the new helper/control class and restoring
+  the original two selection lines. All old functions/assertions/fixtures,
+  including the non-Nigeria branch and exact N/D/K body, are preserved.
+- **OK (§2–5):** `_nigeria_linked_cluster_operands` extends the existing GH1448
+  operand definition with duplicate-key/endpoint refusal, predecessor checks,
+  present nonnull v and right-typed-index alignment. No product duplication or
+  scientific redefinition; production/curation/maps are exact d47 bytes.
+- **OK (§4–5):** seven independent invented-control families, both boundaries,
+  yield30 cases. Original30 passed but the observer had an ignored logging
+  shutdown error after atexit (module name None). This qualified run is retained.
+  A frozen child corrected ONLY that observer fixture's absent-name handling:
+  30 passed, zero skips/denials/data activity, clean shutdown, all actors closed.
+  No test/helper/expected value changed or oracle weakened between runs.
+- **OK (§4):** runtime image SHA12c7eab8ae37da2fd0adee71d4f741ea81c4c1937fc53644ced43d282a21f86e,
+  generation20261019T221223Z, extracted once with processors1. Unchanged own
+  mount script verified own import; all state/cache/tmp roots node-local BEFORE
+  first package import. Failed help-format and guessed Python3.12 stdlib-path
+  checks stopped before import; both retained, with no repeated extraction.
+- **OK (§2/§4):** actual source frozen72b82180464d792951bc434015097190ca40775e;
+  exact two original node IDs, normal conftests/requires_s3 and real private0600
+  reader credential file:2 passed, no skips, controller0/128.265s, clean guard
+  shutdown, source/cache inventory exact, all actors closed. The credential
+  copy was removed after closure, with no contents/hash export.
+- **OK (§3/§4):** original exact assertions observed N1454/D54/K1 at2018Q3 and
+  N4736/D267 at2023Q3. W5 K remains unknown and unasserted. Normal current hash
+  f562ff43a58306c1c9290f215d177f2909184495cf19a16993807feb0895f366
+  matched; two ordinary cache-gate returns9857/10092 rows, no assumed-fresh
+  bypass, raw/header/producer/writer/provider/network or acquisition activity.
+  Donor and distinct own full cache exact pre/post; no restamp/coverage edit.
+- **Limits (§4/§6):** old2NFAILs and prior global-runtime qualification remain
+  history. No full suite, other-country data, source campaign, independent
+  scientific validation, public merge or whole issue/country/CI acceptance.
+  Root review remains pending. Required durable evidence is under this
+  dispatch's evidence directory: REPORT.md, RESULT.json, SOURCE-PROOF.json,
+  DECISIONS.md, EVIDENCE-INDEX.json; phase freezes/logs/XML/receipts are retained.
