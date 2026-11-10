@@ -146,5 +146,3 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
                             float(res['Nitrogen_kg'].sum()) if len(res) else 0.0,
                             len(res))
     return res
-
-
