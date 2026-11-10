@@ -154,10 +154,16 @@ $(VAR_DIR)/housing.parquet: housing.py $(housing_parquet)
 # pattern rule runs the wave script.  The VAR_DIR rule mirrors the
 # household_roster country-level convention above.
 plot_features = $(shell find $(rounds) -name plot_features.py)
-plot_features_parquet := $(plot_features:.py=.parquet)
+# PP/PH share physical scripts. Make must name the actual redirected outputs,
+# so country assembly reuses the strictly prepared managed wave prerequisites.
+plot_features_parquet := $(patsubst ../%/_/plot_features.py,$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/plot_features.parquet,$(plot_features))
 
-../%/_/plot_features.parquet: ../%/_/plot_features.py
-	(cd $(@D) && python plot_features.py)
+$(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/plot_features.parquet: ../%/_/plot_features.py
+	(cd $(<D) && python $(<F))
+
+# Preserve the legacy target spelling as an alias, with one managed producer.
+../%/_/plot_features.parquet: $(LSMS_DATA_ROOT)/$(COUNTRY)/%/_/plot_features.parquet
+	@:
 
 $(VAR_DIR)/plot_features.parquet: plot_features.py $(plot_features_parquet)
 	python plot_features.py
