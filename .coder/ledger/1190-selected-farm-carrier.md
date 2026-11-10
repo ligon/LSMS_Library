@@ -92,3 +92,20 @@ generation 20261019T221223Z with processors1 into unused own job storage succeed
 then unchanged helper verified/repointed only this checkout's venv. No dependency
 or shared-image/cache change. Independent review, final metadata footprint and
 public publication remain coordinator-owned; real-data acceptance is unrun.
+
+## Shallow-CI source operand portability
+Source review found the focused tests' `git show cf563` comparison getter depended
+on history absent from the project's default shallow actions/checkout. Replace only
+that test getter with pinned plain-source fixtures: exact full Malawi helper/four
+drivers and exact nitrogen function source. This preserves the full AST inverse
+and baseline consumer/driver expectations, without a network/history requirement.
+No runtime, oracle, assertion or expected value changes. The full helper snapshot
+is test-only source text (not survey data), retained for the exact full-old-AST check.
+
+v5 ran only the eight affected comparisons: five pass, three fail because host
+Python3.6 fixture generation lacked ast.get_source_segment and stopped before the
+nitrogen fixture. Preserve that setup/pytest failure. Extract the exact original
+function by its original AST line boundaries instead; v6 reruns only those three
+cases and all pass. All 89 distinct latest outcomes still pass, now across six
+attempts. No broad source/suite replay. v5/v6 guards remain active with zero denials
+and private data/config files zero. Initial four-run results remain historical.
