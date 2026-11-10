@@ -48,16 +48,40 @@ only2018-19; registry scope alone does not police explicit out-of-scope inputs.
 ## §5 Reuse decision
 Reuse all shared812 construction/stamp/input functions without edits. Extend own
 wave YAML/hooks and own registry. Extend only own strata aliases using full own
-Region crossproduct with native Portuguese suffixes, contingent on verified card.
+Region crossproduct with the exact Portuguese suffixes supplied in the approved
+task and recorded by existing own source notes. Full native-card acceptance stays
+separate; no additional alias or numeric code meaning is inferred.
 New own pure tests reuse actual df_data_grabber/column_mapping and invented source
 providers, rather than a new pipeline/framework. Existing shared812 test edits
 belong to deputy, including REGION_ONLY method and Togo Feature negative oracle.
 
 ## §6 Open questions
 Native full label card pointer requested through dispatch QUESTIONS channel; tiny
-zero-record metadata plan supplied to manager/deputy. This holds only alias/native
-acceptance choices; source/pure construction remains authorized. Actual comparisons,
+zero-record metadata plan supplied to manager/deputy. No native read started.
+The authorized exact Region-pair × Urbano/Rural spelling construction is source
+engineering, not a new native-card claim. Full card/normal-data acceptance remains
+a dependent later gate; unverified additional coding cannot be invented. Actual comparisons,
 native-dependent reserved test, final footprint/full gates remain later stages.
 
 ### Phase 3 — verification
-Pending frozen source and focused pure run. No actual data acceptance claimed.
+- OK (§§2–5): own YAML inverse recovers every non-strata/source/join/weight field.
+- OK (§§2–5): mapper imports and two hooks delegate unchanged shared helpers;
+  removing only additions recovers the complete original mapping.py bytes.
+- OK (§§3–4): full original CONTENTS and registry bytes remain exact prefixes;
+  Region/bare aliases remain exact, composite aliases are only the prescribed
+  own Region-pair × Urbano/Rural construction. No new native card claimed.
+- OK (§4): 19,373 nonowned tracked entries retain base mode/type/blob identity;
+  shared helper/schema/country-module/otherwave/shared812 tests are unchanged.
+- OK (§§2–5): 34 selected pure checks pass under MAIN Python3.11.6, n2/loadfile,
+  BLAS/build1, private empty data and isolated user/network namespace. All three
+  controller/worker identities and JUnit/source freezes are in dispatch evidence.
+- Test-only corrections preserved: initial hostPython3.6 launcher rejected text=;
+  first executed selection had six fixture failures (unbound merge guard and
+  public-function/module import collision), 27 passes. Corrected selection had
+  33 passes; final prescribed-alias selection had 34 passes. No production fix
+  was made to satisfy those fixture failures. Every log/XML/failed source retained.
+- API audit direct prepared-interpreter fallback passed; original make failure
+  (poetry unavailable) retained. git diff --check and owned-path inverse passed.
+- Actual full card, reserved native-dependent vocabulary test, normal APIs,
+  cold/fresh-warm/Feature, final metadata footprint and full CI remain UNRUN;
+  independent deputy review and Root scientific/readiness/merge gates remain.
