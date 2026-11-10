@@ -1312,6 +1312,33 @@ class TestShippedDeclarations:
         assert "keyspaces OVERLAP" in note and "id collision" in note
 
 
+def _nigeria_linked_cluster_operands(a, b, earlier, wave, links_path):
+    """Pair GH #1448's committed interviewed links (ledger 1687 §2–4)."""
+    import json
+
+    # Retain duplicate JSON keys so a repeated current endpoint cannot hide.
+    links = json.loads(links_path.read_text(encoding="utf-8"),
+                       object_pairs_hook=list)
+    pairs = []
+    for key, target in links:
+        t, i = key.split(",")
+        previous, previous_i = target.split(",")
+        if t == wave:
+            assert previous == earlier, (wave, previous, earlier)
+            pairs.append((previous_i, i))
+    assert pairs, (earlier, wave)
+    previous_ids, current_ids = zip(*pairs)
+    assert len(previous_ids) == len(set(previous_ids)), "duplicate previous endpoint"
+    assert len(current_ids) == len(set(current_ids)), "duplicate current endpoint"
+    assert a.index.is_unique and b.index.is_unique, "duplicate sample endpoint"
+    # .loc refuses absent endpoints; null v must also fail, never shrink N.
+    left, right = a.loc[list(previous_ids)], b.loc[list(current_ids)]
+    assert left.notna().all() and right.notna().all(), "null linked v"
+    left = left.set_axis(right.index.copy())
+    pd.testing.assert_index_equal(left.index, right.index, exact=True)
+    return left, right
+
+
 @pytest.mark.requires_s3
 class TestTheReproduction:
     """GH #942's own reproduction, a single-country two-wave call."""
@@ -1457,8 +1484,16 @@ class TestTheReproduction:
         assert dup == 0, dup
         a = idx[idx["t"] == earlier].set_index("i")["v"]
         b = idx[idx["t"] == wave].set_index("i")["v"]
-        both = a.index.intersection(b.index)
-        a, b = a.loc[both], b.loc[both]
+        if country == "Nigeria":
+            # GH #1448 counts interviewed links, not all shared served IDs.
+            from lsms_library.paths import countries_root
+            a, b = _nigeria_linked_cluster_operands(
+                a, b, earlier, wave,
+                countries_root() / "Nigeria" / "_" / "panel_ids.json")
+            both = b.index
+        else:
+            both = a.index.intersection(b.index)
+            a, b = a.loc[both], b.loc[both]
         n = int(len(both))
         d = int((a != b).sum())
         assert n == m["linked_households"], (n, m["linked_households"])
@@ -1478,3 +1513,156 @@ class TestTheReproduction:
                 f = next(iter(dest))
                 k += int(f != e and senders[f] == 1)
         assert k == m["clusters_renumbered"], (k, m["clusters_renumbered"])
+
+
+@pytest.mark.parametrize("earlier,wave", [
+    ("2016Q1", "2018Q3"), ("2019Q1", "2023Q3"),
+])
+class TestNigeriaLinkedClusterOperands:
+    """Invented endpoint controls; no Country/API or survey data (ledger §4–5)."""
+
+    def _write_links(self, path, earlier, wave, pairs):
+        import json
+
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # A list of pairs deliberately permits duplicate JSON keys.
+        path.write_text("{" + ",".join(
+            json.dumps(f"{wave},{i}") + ":" + json.dumps(f"{earlier},{old}")
+            for old, i in pairs) + "}", encoding="utf-8")
+        return path
+
+    def _exercise_original_assertions(self, tmp_path, monkeypatch, earlier,
+                                      wave, a, b, pairs, measurement):
+        """Exercise the unchanged N/D/K body with explicitly synthetic operands."""
+        from types import SimpleNamespace
+        import lsms_library.paths as paths
+
+        root = tmp_path / "countries"
+        self._write_links(root / "Nigeria" / "_" / "panel_ids.json",
+                          earlier, wave, pairs)
+        monkeypatch.setattr(paths, "countries_root", lambda: root)
+        monkeypatch.setattr(sys.modules[__name__], "sampling_records", lambda _: {
+            wave: {"panel": {"cluster_id_measurement": measurement}}})
+        frame = pd.concat([
+            a.rename_axis("i").reset_index().assign(t=earlier),
+            b.rename_axis("i").reset_index().assign(t=wave),
+        ]).assign(weight=2.5, untouched="payload").set_index(["i", "t"])
+        frame.attrs = {"synthetic": {"unchanged": [1, 2]}}
+        before = frame.copy(deep=True)
+        before.attrs = copy.deepcopy(frame.attrs)
+        check = TestTheReproduction()
+        monkeypatch.setattr(check, "_fresh", lambda _: SimpleNamespace(
+            sample=lambda waves: frame))
+        check.test_the_curated_size_matches_the_served_sample("Nigeria", earlier, wave)
+        pd.testing.assert_frame_equal(frame, before, check_exact=True)
+        assert frame.attrs == before.attrs
+
+    def test_shared_unlinked_and_same_n_membership_mutation(
+            self, tmp_path, monkeypatch, earlier, wave):
+        a = pd.Series(["A", "C", "E"], index=["h1", "h2", "extra"], name="v")
+        b = pd.Series(["B", "C", "F"], index=a.index.copy(), name="v")
+        m = dict(linked_households=2, households_changed=1, clusters_renumbered=1)
+        self._exercise_original_assertions(tmp_path, monkeypatch, earlier, wave,
+                                           a, b, [("h1", "h1"), ("h2", "h2")], m)
+        # Same N, different members: the original D assertion must notice.
+        with pytest.raises(AssertionError, match=r"\(2, 1\)"):
+            self._exercise_original_assertions(tmp_path, monkeypatch, earlier, wave,
+                a, b, [("h1", "h1"), ("extra", "extra")], m)
+        changed = b.copy()
+        changed.loc["h2"] = "D"
+        with pytest.raises(AssertionError, match=r"\(2, 1\)"):
+            self._exercise_original_assertions(tmp_path, monkeypatch, earlier, wave,
+                a, changed, [("h1", "h1"), ("h2", "h2")], m)
+        # Wrong N also reaches the original numerical assertion.
+        with pytest.raises(AssertionError, match=r"\(2, 3\)"):
+            self._exercise_original_assertions(tmp_path, monkeypatch, earlier, wave,
+                a, b, [("h1", "h1"), ("h2", "h2")], dict(m, linked_households=3))
+
+    def test_nonidentity_pairing(self, tmp_path, monkeypatch, earlier, wave):
+        a = pd.Series(["Q", "X", "P"], index=["old-b", "shared", "old-a"], name="v")
+        b = pd.Series(["P", "Y", "R"], index=["new-a", "shared", "new-b"], name="v")
+        pairs = [("old-b", "new-b"), ("old-a", "new-a")]
+        path = self._write_links(tmp_path / "links.json", earlier, wave, pairs)
+        left, right = _nigeria_linked_cluster_operands(a, b, earlier, wave, path)
+        pd.testing.assert_series_equal(left, pd.Series(
+            ["Q", "P"], index=["new-b", "new-a"], name="v"))
+        pd.testing.assert_series_equal(right, b.loc[["new-b", "new-a"]])
+        self._exercise_original_assertions(tmp_path, monkeypatch, earlier, wave,
+            a, b, pairs, dict(linked_households=2, households_changed=1,
+                             clusters_renumbered=1))
+
+    @pytest.mark.parametrize("bad", ["predecessor", "current_round"])
+    def test_wrong_declared_round_refuses(self, tmp_path, earlier, wave, bad):
+        a = pd.Series(["A"], index=["h"], name="v")
+        path = self._write_links(tmp_path / "links.json",
+            "wrong" if bad == "predecessor" else earlier,
+            "wrong" if bad == "current_round" else wave, [("h", "h")])
+        with pytest.raises(AssertionError):
+            _nigeria_linked_cluster_operands(a, a, earlier, wave, path)
+        self._write_links(path, earlier, wave, [("h", "h")])
+        left, right = _nigeria_linked_cluster_operands(a, a, earlier, wave, path)
+        pd.testing.assert_series_equal(left, right)
+
+    @pytest.mark.parametrize("side", ["previous", "current"])
+    def test_duplicate_endpoint_refuses(self, tmp_path, earlier, wave, side):
+        a = pd.Series(["A", "B"], index=["h1", "h2"], name="v")
+        pairs = [("h1", "h1"),
+                 ("h1", "h2") if side == "previous" else ("h2", "h1")]
+        path = self._write_links(tmp_path / "links.json", earlier, wave, pairs)
+        with pytest.raises(AssertionError, match=f"duplicate {side} endpoint"):
+            _nigeria_linked_cluster_operands(a, a, earlier, wave, path)
+        self._write_links(path, earlier, wave, [("h1", "h1"), ("h2", "h2")])
+        left, right = _nigeria_linked_cluster_operands(a, a, earlier, wave, path)
+        pd.testing.assert_series_equal(left, right)
+
+    @pytest.mark.parametrize("side", ["previous", "current"])
+    @pytest.mark.parametrize("bad", ["absent", "null"])
+    def test_absent_or_null_v_refuses(self, tmp_path, earlier, wave, side, bad):
+        a = pd.Series(["A", "B"], index=["h1", "h2"], name="v", dtype="string")
+        b = a.copy()
+        path = self._write_links(tmp_path / "links.json", earlier, wave,
+                                 [("h1", "h1"), ("h2", "h2")])
+        broken = a.drop("h2") if bad == "absent" else a.mask(a.index == "h2")
+        left, right = (broken, b) if side == "previous" else (a, broken)
+        with pytest.raises(KeyError if bad == "absent" else AssertionError):
+            _nigeria_linked_cluster_operands(left, right, earlier, wave, path)
+        left, right = _nigeria_linked_cluster_operands(a, b, earlier, wave, path)
+        pd.testing.assert_series_equal(left, right)
+
+    def test_typed_index_name_and_input_immutability(self, tmp_path, earlier, wave):
+        a = pd.Series(["A", "B"], index=pd.Index(
+            ["old2", "old1"], dtype="string", name="previous-household"),
+            name="v", dtype="string")
+        b = pd.Series(["B", "C"], index=pd.Index(
+            ["new1", "new2"], dtype="string", name="current-household"),
+            name="v", dtype="string")
+        a.attrs, b.attrs = {"side": ["left"]}, {"side": ["right"]}
+        before_a, before_b = copy.deepcopy(a), copy.deepcopy(b)
+        path = self._write_links(tmp_path / "links.json", earlier, wave,
+                                 [("old2", "new2"), ("old1", "new1")])
+        left, right = _nigeria_linked_cluster_operands(a, b, earlier, wave, path)
+        pd.testing.assert_index_equal(left.index, b.loc[["new2", "new1"]].index,
+                                      exact=True)
+        pd.testing.assert_index_equal(left.index, right.index, exact=True)
+        pd.testing.assert_series_equal(left, before_a.set_axis(right.index))
+        pd.testing.assert_series_equal(a, before_a, check_exact=True)
+        pd.testing.assert_series_equal(b, before_b, check_exact=True)
+        assert a.attrs == before_a.attrs and b.attrs == before_b.attrs
+
+    @pytest.mark.parametrize("destination,k", [
+        (["B", "B", "D"], 2),       # two clean one-to-one changes
+        (["B", "X", "D"], 1),       # A splits: only C -> D qualifies
+        (["B", "B", "B"], 0),       # A and C merge
+        (["moved-h1", "moved-h2", "D"], 1),  # synthetic endpoints excluded
+    ])
+    def test_original_k_split_merge_assertion(self, tmp_path, monkeypatch,
+                                              earlier, wave, destination, k):
+        a = pd.Series(["A", "A", "C"], index=["h1", "h2", "h3"], name="v")
+        b = pd.Series(destination, index=a.index.copy(), name="v")
+        pairs = [(i, i) for i in a.index]
+        m = dict(linked_households=3, households_changed=3, clusters_renumbered=k)
+        self._exercise_original_assertions(tmp_path, monkeypatch, earlier, wave,
+                                           a, b, pairs, m)
+        with pytest.raises(AssertionError, match=rf"\({k}, {k + 1}\)"):
+            self._exercise_original_assertions(tmp_path, monkeypatch, earlier, wave,
+                                               a, b, pairs, dict(m, clusters_renumbered=k + 1))
