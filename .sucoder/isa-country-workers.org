@@ -1,4 +1,44 @@
 #+title: Current LSMS-ISA worker queue
+* Newest (2026-11-10 10:00 UTC)
+NGAtrue3PHactualnormal81179LIVE (1452);1590independentreviewsealedPASS,
+nowrestoringexactMaliP2manual47787(normalpush/readbackthenboundedauthorityread).
+NGAremote warmcohortphaseCLOSED0/0raw, splitproposalunrun/Rootreviewpending.
+NewUga41089312/Mali41089313 confirmedagent_execution09:54.
+NewNiger41089354/aa2d6bd86b724899a003af99bbc4b0e0 submitted0; old143/71
+stageonly/pytestNOTENTERED/transferUNKNOWN. OldTZA41089175also143/71global
+SQLite; freshcontinuationpreparing. SharedshocksimportPASS/metadataunwrapfix
+authorizedbeforeoriginalunspent4tests. Mwiownsremoteactualphasewatch/intake.
+Fullcurrentdocket [[file:handoff.org]], oldqualifiedhistoriesarchived.
+
+* CURRENT after measured runtime failures (2026-11-10 09:52 UTC)
+BFA1bc0907c writerfix1pure+1genuineAPItestPASS, readyforreviewedrepairbatch.
+NGA5cb3PHhelper56pure+3realcapturePASS; independent1590reviewPASS;38sources
+staged140321380B, truecold+warmnormalAPIgrantedon9763, operatorpreparing.
+RemotequeueownerMwi: originalMali/UgaCItasksclosed0butBLOCKEDFUSE/0tests;
+newUga41089312/501fed1d3b714757bf844b790cce47b0 andMali41089313/
+5310f60d313c4ce0a1a3efcaa26c2531 submitted. Niger41089150FAILED71/misplaced
+globalprivateDVCSQLite; actualdataphaseUNKNOWN, doNOTcall11testrun. Sourceimage
+extractionpassed. RootnowrequiresALLruntimecache/state/tmpNODELOCALbefore
+ANYMAINimport; grantsforwarded. TZA41089175/shocks41089184/Nga41089256last
+knownlive, actualphasependingfreshownerstatus. No inflatedbusy-workerclaim.
+Fiveoriginaldocumentaryjobsallcomplete/Rootqualifiedacceptednotesqueued.
+PR1687d47fullFAILED18/17228P, ordinarygreen; no merge/settings/closures.
+Consolidatedexactdocket: [[file:handoff.org]]; previoushistoryarchivedthere.
+
+* CURRENT sixCIremotes +two localfix lanes (2026-11-10 09:39 UTC)
+Alloriginal5authoritytasksCOMPLETE/Rootqualifiedsourceaccepted/queuednotes.
+Mwiowns6NEWCIjobs: Mali41089148,Niger41089150,TZA41089175,Uga41089176,
+SharedShocks41089184,NgaSampling41089256. FUSEpermissionfailedbeforedataon4;
+RootapprovedEXISTINGsame-imageunsquashfsfallbackthenordinaryhelperimportcheck,
+ALL6normalchannelsnotified. Mustverifyactualnativeactor, notheartbeat alone.
+1590BFAnewwave-localwriterfix617ebee/pure1PASS, correctednormal54087LIVE.
+1452NGA3PHrepair5cb/NEW56purePASS+3realcapturePASS18358records; trueAPIplan
+rejectsfixed-vmemoandstages21realnormalsampledependencies, NOTyetAPIlaunched.
+RootactualNGA2samplingcomparisonsBOTHFAILlinkedN, newremotecohortdiagnosis
+keepshistorical-crosswalkvsnaiveintersectionasHYPOTHESIS, norepin/relink.
+PR1687d47fullDATAFAILED18/17228P; ordinaryCIpass; no merge/settings.
+Exactpins/constraints/receipts: [[file:handoff.org]].
+
 * CURRENT CIrefill (2026-11-10 09:13 UTC)
 PR1687full42769154949FAILED18/17228P/0E/2775S; unit+WindowsSUCCESS.
 Originalfiveauthorityremotes ALLclosedworker0/supervisor0/taskcompleted,
