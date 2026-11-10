@@ -6908,9 +6908,15 @@ class Country:
                         # The Make closure omits already-hashed inputs. Request
                         # its complete source set, and keep explicit YAML files
                         # even when their names resemble a managed cache.
-                        _, raw_sources = self._make_declared_inputs(
-                            method_name, _extra_tables=output_tables - {method_name},
-                            _with_sources=True)
+                        try:
+                            _, raw_sources = self._make_declared_inputs(
+                                method_name, _extra_tables=output_tables - {method_name},
+                                _with_sources=True)
+                        except RuntimeError:
+                            # The finite Make ownership proof can be unknown
+                            # (e.g. an unverifiable Other hash). Retain the
+                            # original strict reader; this is not a cache miss.
+                            return False
                         raw_sources = set(raw_sources)
                         for table in output_tables:
                             for wave in self.waves:
