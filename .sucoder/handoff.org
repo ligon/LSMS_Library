@@ -44,6 +44,11 @@ tests; no waiver, merge, settings change, master release or shared-cache rebuild
   to exactb9a and reviewed full patch. Original4 normal warm-only actor2107 now
   LIVE/<=300s, exact338262B currentcache separatecopy, realnormalgate,0raw/build/
   writer allowed. No NGA replay. All original old failures remain retained.
+  UPDATE:2107 CLOSED1/25.679s,1F3P with EXTERNALobserver failure on known committed
+  panel-ID metadata dependency; not a numerical/product failure, and later3 lack
+  full profile receipts so not accepted. Root authorizes minimal exact committed
+  sample/panel_ids/updated_ids metadata allowance, failfast on guard failure,
+  once-corrected full4 normal rerun/300s with all raw/provider/write guards intact.
 - Mali namespace correction runtime2931/final7215: Root reviewed full9385a9d8 patch
   and independently matched approved mapSHA7c17086a..69dd; 28pure PASS qualified
   shutdown logging noise. Corrected three original tests ADMITTED once under
@@ -54,6 +59,10 @@ tests; no waiver, merge, settings change, master release or shared-cache rebuild
   placement and surveykg tuple assertions reached; full seals/observer intake
   pending. Remaining1494nine+1528two original params authorized as next finite
   private normal11 against46managed objects195118403B, freshallocation ifneeded.
+  FinalMali5c7fbd235 published inAUTH/source.git refs/remotes/ci/Mali-NamespaceOracle1687;
+  Root fetched refs/remotes/admitted/mali-namespace-oracle, four ownedpaths only.
+  Runtime2931/pure28+actual3,9getters/9Stata,0producers/writers/denials and18input+
+  twooutput seals exact. Canonical103file/task terminal intake managerpending.
 - Niger original11 yielded7P4F; one closed-output read failed in external Arrow
   aggregation. Exactly one additional same-artifact read admitted (2total), with
   explicit True/False/NA counts,0raw/API/build/writer/test replay. No count repin.
