@@ -1,4 +1,97 @@
 #+title: Current LSMS-ISA coordinator handoff
+* LATEST (2026-11-10 11:55 UTC; supersedes execution states below)
+Previous goal turn PROGRESS; current turn also PROGRESS: accepted four-country
+CI repairs and seven documentary carries now composed in a private branch.
+LIVE GH readback11:44: PR1687 still OPEN/READY/MERGEABLE head d47, development
+4381d701; no new merge/fullCI/settings/master/shared-cache action.
+
+RootauthorW=/local/job40825266/worktrees/fix-1687-reviewed-repair-batch-20261110,
+head55de5bc2a25cc6cf2978cf53c03a2345e8bebdc1/tree9e3c497f; clean/backed up to
+filesystemorigin only. EXACT27changedpaths,19318nonownedobjects exactd47,
+allownedbytes match individually accepted heads. R1687-reviewed-repair-batch-20261110/
+SOURCE-CONSERVATION-55de5bc2a2.json. BFAwriter+NGAsampling+Malinamespace+UGA
+historical-view fixes; five prior source-doc carries; TZA docstringqualification;
+managedMaliP2manual+notes. MaliCONTENTS two accepted appendices concatenated with
+ONLY obsolete location phrase corrected, documented MALI-DOC-MERGE.json. TZA
+executable AST exactd47 after docstring removal. No NGA3PH product in this batch yet.
+
+- UGAe45c6d86 final (runtime931c):36pure+4originalnormal PASS;0raw/provider/
+  producer/writer/rebuild, exactcurrentcache/source/inputconservation. Prior
+  normal1F3P observer failure/profile gap retained; corrected20371 fullyobserved.
+  Root carried helper+complete finalledger (seed4364 initially omitted but full
+  finalledger explicitly restored during cherry-pick; no content lost).
+- Mali5c7fbd235 runtime2931/actual7215:28pure+3correctedoriginalPASS, original
+  amount/unit/kg/placement assertions all reached. Manager104/104file/source
+  admission complete/native0/sdk0/taskcompleted. Root carried all five commits.
+- Combined pure integration at immutable55de: initial94P1F (BFA committedOrg
+  lookup wrongly blocked by EXTERNALobserver). One correctedBFA1 PASS under
+  exacttwoOrgfiles/tenTables allowlist;0realraw/provider/native/API/parquetengine
+  writes,1intentional sanctioned writerresolver. Prior94 completion-before-sole-
+  last-failure plus activecontroller/gw0 and serialxdist/junit source establishes
+  ordering-qualified coverage; no per-node stamps invented/no94 replay. This is
+ 94 priorP+1targetedP, NOT a fresh95green run. Reports1687-repair-union-95-pure and
+ 1687-repair-union-bfa-one-corrected; manifestsf31698e0/27 and01b153d1/28.
+- Metadata ONEnewpair d47->55de LIVE60610, existing04160collector/operator byteexact,
+  separateimmutableWs/privatectx/300s each. R1687-repair-union-d47-55de-metadata-20261110.
+  Sourceprediction42country/147wave/0BTF-FIF, unchangedkeysets/nonhash; ACTUALpending.
+  Later TEST+ledger-only CIV/Niger/ETH carries can bind exactlibrarytree, no
+  metadata replay absent new library source changes.
+- CIV source28dbef368 (purebe72) acceptedRoot+independent1590review qualifiedPASS;
+ 43purePASS, exactown five typed.d->False, all21actualoldASTasserts retained
+  (author's24count not admitted). Independentreview manifest2d751daf/4. Root
+  originalCIV1 actual grant ACTIVE:600s/one13MBheldDTA+twoheldwarmcaches/3Stata/
+ 2originalgetters+1explicitmanagedresolution/1Country,0build/writer/providers.
+  NEW actual41090203/b01e0035b177449a9880bab60c3b1dfa submitted, managerwatch.
+  Earlier ownFSclonehead-export failure was preSlurm/0data; uniqueOWNAUTHFShead
+  export corrected, no GitHub change. Root fetched admitted/civ-tagged-oracle.
+- Niger original11 remains7P4F. Second closed-parquet read SUCCESS (2total):
+ 2C8538/Unknown44/graded253;3C1067/Unknown12/graded122; union9605/56/375,
+  tokenoverlap/uncovered0. Storage43624 vsserved43620 qualified. Frozen test-only
+  D3d3dc9409/final222b198d,23purePASS fullyauthenticated; Root read fullpatch+
+  source scripts/schema and accepted1475 country-axis/1632 independentownunion
+  expectation contract. NEXTcorrected FIVE admitted900s/26rawmax/previous26raw
+  closure+48warmseals/currentnormalgates/0newproducerwriterprovider; extra2014NPK
+  case necessary because changedmethodadds assertions there too. Workerended
+  beforeactualgrant/0actual; managerintakes222b/exposesOWNFShead and dispatches
+  fresh5actor. No correcteddata pass yet. No hardcodedcount repin.
+- Ethiopia originalsampling1 actuallyFAIL:3801/3801/K332 vs historical3776/3776/
+ 333,dup0;94.46s/6Stata/2sampleproducers/3writers/0D, fourmanagedsources. This
+  accounts seventhcuratedsamplingfailure (NGA2+UGA4+ETH1). ApprovedD1adds25PP-only
+  W2rows; old3776maptargetsunchanged,+28edges (25PP+3LSexcluded). Historical-view
+  sourceinverse investigation chartered sameworker, one producedclosedoutputread
+  max/0newraw/API; Kcause UNPROVEN/no repin. Ghanaoriginal1 stillpending after
+  emptyownedDVCdir preflight mechanicalfix/0data onthatfailedpreflight.
+- NGA3PH actualolddefault15calls PASSqualified (56403/18358PH) remains separate.
+  OldMake2613 CLOSED1/900sTimeout beforefullreturn;warm/Feature UNRUN. Closed13
+  children=10plotproducers+1concat+2sample,60getters54Stata13writers/0closed-childD;
+  killedparentprofile absent.0owned survivors/0signals, inputs exact. Report
+  make-actual-v1 manifest3e36a8be/80; allnineoldstrictsubsetfails retained.
+  Root personally verified Makefile in-tree prerequisites force duplicate5wave
+  builds after private preparation. Managedtarget+legacyalias fix97e8553153
+  (pureb2257PASS, availabilityskip+2predicatewitnesses onlylater) sourceaccepted;
+  oldsamplehash NOTcurrent after Makefile edit. NEW fouractor charter ADMITTED:
+ 900snewDEFAULTfull+naturalcurrent sampleRETURN, thenfreshMakecold1/warm7/Feature1
+  each900s; exact38heldsources140321380B/fixed10calls/allstrict+narrowchecks.
+  Controller48097 LIVE, two38-source stages0/0, newDEFAULTcurrentlyrunning;
+  ownedPID/PGID groupcleanup additiveoperator frozen537e33bd. No source edits
+  whilelive. R587-nigeria-W1-W3-PH-plot-features-implementation-20261110/
+  current-default-MAKE-plan-v2. Originalfailures NOTwaived.
+
+Eight independent countryworkers remain managed in Q/refill-independent-eight-
+d47-20261110/ASSIGNMENTS.{md,json}, concreteIDs below; five CIlanes are separate.
+Newfindings: BFA1436 ownC/Dheaders conflictcropcards, partialharvest/cropbridge/
+production_obs designheld (no activationguessed); ET/MWI1457 oldREPORT_rulings
+claimsappliedR1/R3/R2a whileliveissuepending—Rootcurrentisa-decisions hasNOapproval
+entry, request exactoldhashes tocheckcommonobjects before askingrepeatdecision.
+Mali1179 no newproducerauthority; UGA1525 nonewversionroute switches1536brief;
+Niger1529 genuinelynewFrenchQ31148/manual31157 two boundedpublicGETs/three3Epages.
+NGA1518 sourcework nowreuses1552oldtext;16duplicatedtextpages mistakenlyparsed
+beforepriorpacketreconciliation retained asactualcost,4newrasters. W1formYES
+nextcrop vsmanualNO nextcrop/versiontension, W1kg/g/l vsW2own15unitcard, no default.
+Manager may charter routine boundedprivate normalchecks on alreadyDVC-managed
+releases, no percopy/header Rootpermission; scientific/testexpectation acceptance
+and GH publication/integration remainRoot. Keep pending1573/1575/PPpricechoice.
+
 * CURRENT execution and delegation (2026-11-10 11:20 UTC)
 This section supersedes older execution snapshots below. Goal ACTIVE; development
 4381d701/78 merges/42 closures unchanged. PR1687 d47 still has 18 failed full-data
