@@ -1384,10 +1384,12 @@ def inputs_survey_kg_estimate(wave):
 # plot_inputs (GAP 2; parity loop) — item-level (t, i, plot, input)
 # ---------------------------------------------------------------------------
 #
-# One row per input APPLIED to a plot.  The crop/input modules live in the
-# EACI waves only (2014-15 EACI14, 2017-18 EACI17); the EHCVM waves
-# (2018-19, 2021-22) carry no agriculture-input block, so plot_inputs is wired
-# for the two EACI waves only.
+# One row per input APPLIED to a plot.  Currently wired for the EACI waves
+# only (2014-15 EACI14, 2017-18 EACI17).  Both EHCVM waves (2018-19, 2021-22)
+# have household input rosters in s16b and parcel input questions in s16a,
+# still unwired (GH #1483).  Do not send those sources through this EACI
+# finalizer without reviewing its slot labels, sentinels and grain; see
+# CONTENTS.org and 1483-input-source-contract.md.
 #
 # Grain: one row per (t, i, plot, input), where
 #   - i     = Mali composite household id (grappe, menage/exploitation),
