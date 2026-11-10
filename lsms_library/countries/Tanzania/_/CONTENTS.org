@@ -3154,3 +3154,35 @@ is not raster/blackout completeness; parser recovery messages remain retained.
 This completes the held-UPD check only. GH #587 and its original-round authority
 gap remain open; NPS backcasting, WAITING #114, panel/ID/weight rules and all
 source/code/defaults are unchanged.
+
+* 2026-11-09 -- GH #905: singleton-only plot-input reducer candidate (source stage)
+
+The current =plot_inputs_for_wave= nonunique-index branch sends *every* group
+through two scalar numeric callbacks whenever any key repeats. This includes
+coded native seed rows, which the GH #637 repeat guard already makes unique.
+Thus even one repeated inorganic-fertilizer product makes unrelated singleton
+seed rows pay for scalar sums. This is a source control-flow finding, not a
+new measurement of duplicates or survey runtime.
+
+A bounded candidate now uses the grouped numeric result only for singleton
+keys. EVERY multirow key is overwritten with its existing scalar
+=Series.sum(min_count=1)= result, including all-NA groups. The purchase-unit
+agreement check, flags, keys, seed gate and all operand values are unchanged.
+The earlier entry, “The proposed =plot_inputs_for_wave= and
+=plot_labor_for_wave= optimizations are HELD”, refers to replacing multirow
+sums too; that full substitution remains held. The signed
+=[1e16, 1, 1, -1e16]= counterexample and four-ULP bound remain binding.
+=plot_labor_for_wave= and the existing #905 reference/assertions are unchanged.
+
+ROOT superseded worker execution permission with SOURCE ONLY before any
+package import, mount, collection or pytest run. The uniquely named pure
+controls in =tests/test_tanzania_queue_refill_20261109.py= are prepared and
+*UNRUN*: they reconstruct the exact dispatch-base module (SHA256
+=138fd458056125ccb354c620591311756595789277e520e24b05d62ad87b3040=),
+compare both modern colmaps and inspect complete duplicate operands versus
+singleton callback removal. Only stdlib AST/source reconstruction was checked.
+No numerical parity, performance, API/cache or whole-issue acceptance is
+claimed. ROOT must review and run these controls before accepting the candidate.
+Any country-module edit carries the existing Tanzania-wide hash coupling;
+no live hash probe, cache clear or re-warm was performed. The #114 WAITING,
+UPHI back-casting, Extended/Refresh and #1497 fallback decisions stay separate.
