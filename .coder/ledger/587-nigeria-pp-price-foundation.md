@@ -125,3 +125,21 @@ No initial test failure or rerun, no old cohort/native/header/PDF/API/Make/censu
 The earlier UNRUN statements describe the immutable source-review freezes;
 this is the subsequent actual foundation gate, not five PP served cells or a
 Price-policy decision. All public wiring and real API acceptance remain pending.
+
+## Actual real-input transport acceptance (2026-11-10)
+
+Root separately admitted the six already-sealed numeric captures from71202.
+One fresh offline actor42736 on8458dd207 CLOSED0/chunke9b5b3:
+6captureloads/6adaptercalls, allsixPASS,22.243souter/16.741sphase. Exact native
+frame inversion and unchanged RAW/RAM/index/order/types/attrs; PPt, unchanged
+compositeformatter, nativevariety/slots, namedoperand arrays and label arrays
+all match EXTERNAL sealed header cards (not the product book as its own oracle).
+All196129 source rows retained. Original capture/privatecopy byte+identity seals
+and12source/operator bindings exact, private data/config0, MAIN/unmappedUID65534
+and offline network identity bound. Observer native/getter/publicprojection/
+CountryFeature/sanctionedwriter/pyreadstat counters all0. No retry or new native,
+header/PDF/API/Make/census. Private outputs and aggregate receipts live at
+`reports/587-nigeria-pp-price-foundation-real-captures-20261110`.
+This accepts only the pure raw-report adapter; public five-cell wiring,
+canonical unresolved identities, Price basis and real API acceptance remain
+required and unclaimed. Existing own printed/export unit tensions remain.
