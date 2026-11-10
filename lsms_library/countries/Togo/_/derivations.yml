@@ -96,3 +96,46 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
     consumption as the week.
   contents: 'Togo/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
+
+Togo::sample::region-milieu-stratum:
+  waves: ['2018']
+  columns: [strata]
+  rows: {}
+  rule: >-
+    strata = '<s00q01 label> <s00q04 label>', the cover page's region and
+    residence-milieu labels, each stripped of surrounding whitespace. NA where
+    either is missing or blank; nonmissing nonstring coding is refused. Native
+    labels are preserved without a geographic crosswalk or an old-region fill.
+  function: lsms_library.ehcvm:derive_region_milieu_stratum
+  inputs: lsms_library.countries.Togo.2018._.mapping:inputs_strata
+  raw_variables: [s00q01, s00q04]
+  assumptions:
+    - text: >-
+        the original 2018/19 household sampling stratum is the combination of
+        region and residence milieu. Only the native 2018 wave is wired here.
+      basis: questionnaire
+      evidence: >-
+        Togo's own September 2023 Basic Information Document (survey design
+        documentation, not a questionnaire question), held as
+        2021-22/Documentation/tgo_ehcvm2_information_de_base.pdf, section 4.1,
+        French PDF p.12 / printed p.11 (English edition p.11): "La strate est
+        la combinaison région/milieu de résidence." This retrospectively
+        describes the original 2018/19 design. GH #1575 documentary findings
+        merged in PR #1637; documented combination selected 2026-11-10.
+    - text: >-
+        both recorded labels are used as written; no milieu is fabricated or
+        excluded to reconcile documents or force an observed-cell count.
+      basis: modelling-choice
+      evidence: >-
+        June 2021 original BID p.10 says "except Lome Commune where all
+        respondents are from rural areas"; September 2023 retrospective
+        Table 1a names Grand Lomé with 98 urban / 0 rural clusters. Their
+        geographic equivalence, a typo correction and a formal excluded-cell
+        rule remain unestablished. Togo/_/CONTENTS.org preserves both accounts.
+  validated_against: >-
+    Documentary definition and static wiring only. Actual-row validation UNRUN:
+    native label-card coverage, missingness, cluster consistency and original
+    versus candidate normal-data/cold-warm/Feature comparisons remain separate
+    acceptance gates. No observed stratum count is asserted.
+  contents: 'Togo/_/CONTENTS.org, "2018 strata wiring selected (GH #1575)"'
+  since: '2026-11-10'

@@ -900,3 +900,36 @@ No sample, strata, native labels, weights, schema or defaults change.
 No new download, PDF parse, microdata read or source/table campaign was
 needed for this holding; the earlier document-check evidence is reused.
 See =.coder/ledger/1575-three-public-bids-managed-ingestion.md=.
+
+* 2026-11-10 — 2018 strata wiring selected (GH #1575)
+
+The user selected the documented combination on 2026-11-10. Only =2018=
+=sample.strata= now combines the own cover-page region label =s00q01= with
+the residence-milieu label =s00q04=, through the existing GH #812 helpers.
+This supersedes the earlier region-only recommendation for this construction;
+the historical weight measurements and all previous notes remain above.
+The own September 2023 BID's retrospective original-design definition,
+"La strate est la combinaison région/milieu de résidence", is the basis,
+not the variance of weights or a count of occupied cells.
+
+The native layout remains =2018/Data1/=: cover =s00_me_tgo2018.dta=,
+weights =ehcvm_ponderations_tgo2018.dta=. Existing household and cluster IDs,
+the =v= join, both raw =hhweight= columns and =Rural= extraction are retained.
+The labels are stripped and joined in region/milieu order; missing or blank
+either operand gives NA, and undecoded nonstring coding retains the existing
+dedicated refusal. No native geographic spelling table or crosswalk is added.
+Nonmissing strata carry =Togo::sample::region-milieu-stratum= in the existing
+optional =Derivation= column; raw inputs remain available by original name.
+
+The June 2021 BID p.10 wording "except Lome Commune where all respondents
+are from rural areas" remains beside the September 2023 retrospective
+Table 1a's *Grand Lomé*, 98 urban / 0 rural clusters. No equivalence between
+the names, typo correction or formal planned-cell exclusion is established.
+Neither that table's nonzero-cell arithmetic nor a future observed count is
+an enforced stratum count. Registered 2021-22 remains outside this wiring.
+
+Validation at construction: documentary definition and source wiring only;
+native cards/rows, missingness, cluster consistency, actual original/candidate
+Country/Feature and cold/fresh-warm acceptance are UNRUN. Focused invented-frame
+checks and their exact source/runtime receipts accompany the task delivery;
+they do not establish native coding, geography or production readiness.
