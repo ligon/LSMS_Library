@@ -427,10 +427,11 @@ def test_forced_producer_exact_error_is_fatal_without_any_legacy_owner(stage_own
     assert not (o.data / NAME / 'var/facts.parquet').exists()
 
 
-def test_ordinary_dirty_failure_retains_available_output_and_unproven_coverage(stage_owner):
+@pytest.mark.parametrize('error_type', [RuntimeError, FileNotFoundError])
+def test_ordinary_dirty_failure_retains_available_output_and_unproven_coverage(stage_owner, error_type):
     o = stage_owner
     o.stage.status = lambda **kwargs: {'dirty': True}
-    error = RuntimeError('invented ordinary dirty producer failure')
+    error = error_type('invented ordinary dirty producer failure')
     def reproduce(**kwargs):
         o.calls.append(kwargs)
         raise error
@@ -443,11 +444,10 @@ def test_ordinary_dirty_failure_retains_available_output_and_unproven_coverage(s
     assert L.read_parquet_cache_waves(o.data / NAME / 'var/facts.parquet') == []
 
 
-@pytest.mark.parametrize('error_type', [C.DvcException, FileNotFoundError])
-def test_ordinary_dirty_outer_error_retains_legacy_owner_route(stage_owner, monkeypatch, error_type):
+def test_ordinary_dirty_outer_error_retains_legacy_owner_route(stage_owner, monkeypatch):
     o = stage_owner
     o.stage.status = lambda **kwargs: {'dirty': True}
-    error = error_type('invented ordinary outer dirty-stage failure')
+    error = C.DvcException('invented ordinary outer dirty-stage failure')
     class LegacyOwnerReached(Exception):
         pass
     fallback = []
