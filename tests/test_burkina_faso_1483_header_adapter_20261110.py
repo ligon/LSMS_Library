@@ -20,7 +20,7 @@ COUNTRY = ROOT / 'lsms_library' / 'countries' / 'Burkina_Faso'
 MODULE = COUNTRY / '_' / 's16b_2021.py'
 RAW = ['grappe', 'menage', 'vague', 's16bq01', 's16bq02', 's16bq03a',
        's16bq03b', 's16bq05', 's16bq07a', 's16bq07b', 's16bq08',
-       's16bq09a', 's16bq09b']
+       's16bq09a', 's16bq09b', 's16bq09c']
 MENU = ["Engrais organiques - déchets d'animaux",
         'Engrais organiques - Ordures ménagères',
         'Engrais inorganiques - Urée', 'Engrais inorganiques - Phosphates',
@@ -128,12 +128,12 @@ def _source():
         's16bq08': [2, 1, None, 2, 1],
         's16bq09a': [111., 222., None, -9., 999.],
         's16bq09b': [5, 8, None, 99, 3],
+        's16bq09c': [11100, 22200, 33300, -900, 99900],
     }, index=[40, 10, 90, 20, 70])
 
 
 def _adapt(adapter, bindings, source):
-    with pytest.warns(adapter.PurchaseQuantityUnresolvedWarning, match='s16bq09a'):
-        return adapter.adapt_s16b_2021(source, **bindings[0])
+    return adapter.adapt_s16b_2021(source, **bindings[0])
 
 
 def test_complete_literal_frame_keys_types_masks_and_raw_answers(adapter, bindings):
@@ -152,7 +152,7 @@ def test_complete_literal_frame_keys_types_masks_and_raw_answers(adapter, bindin
                        'Unknown [Burkina_Faso 2021-22 s16bq03b=99]'], dtype='string'),
         'Quantity': pd.array([1.25, 0., -3., None], dtype='Float64'),
         'Purchased': pd.array([False, True, None, False], dtype='boolean'),
-        'Quantity_purchased': pd.array([None] * 4, dtype='Float64'),
+        'Quantity_purchased': pd.array([111., 222., None, -9.], dtype='Float64'),
         'Unit_purchased': pd.array(['Charrette', 'Sac (50 kg)', None,
                                     'Unknown [Burkina_Faso 2021-22 s16bq09b=99]'], dtype='string'),
         'Received_as_gift': pd.array([True, False, None, True], dtype='boolean'),
@@ -164,12 +164,13 @@ def test_complete_literal_frame_keys_types_masks_and_raw_answers(adapter, bindin
         's16bq05': [1., 2., None, 1.], 's16bq07a': [2.5, None, 4., 0.],
         's16bq07b': [4., 22., None, 2.], 's16bq08': [2., 1., None, 2.],
         's16bq09a': [111., 222., None, -9.], 's16bq09b': [5., 8., None, 99.],
+        's16bq09c': [11100, 22200, 33300, -900],
     }).set_index(['t', 'i', 'input', 'crop', 'u'])
     expected.attrs = {
         'invented': {'integer': 7, 'tuple': ('kept', None), 'flag': False},
         's16b_2021_candidate': {
             'excluded_explicit_nonuse': 1,
-            'purchase_quantity': 'unresolved; native s16bq09a retained',
+            'purchase_quantity': 's16bq09a; own q09b Unité / q09c Montant',
             'component': 'panel source only; no Cross_Section coverage claim',
         },
     }
@@ -180,7 +181,9 @@ def test_complete_literal_frame_keys_types_masks_and_raw_answers(adapter, bindin
     assert type(got.attrs['invented']['flag']) is bool
     assert type(got.attrs['s16b_2021_candidate']['excluded_explicit_nonuse']) is int
     assert got['Quantity'].isna().tolist() == [False, False, False, True]
-    assert got['Quantity_purchased'].isna().tolist() == [True] * 4
+    assert got['Quantity_purchased'].isna().tolist() == [False, False, True, False]
+    assert got['Quantity_purchased'].tolist()[:2] == [111., 222.]
+    assert got['s16bq09c'].tolist() == [11100, 22200, 33300, -900]
     assert got.index.is_unique and 'plot_id' not in got.index.names
     assert 'id_converted' not in got.attrs  # exactly-once walk belongs downstream
 
@@ -215,8 +218,7 @@ def test_each_unit_uses_own_card_and_exact_curated_label(adapter, bindings):
     args['cards']['s16bq07b']['4'] = 'Invented gift unit'
     args['cards']['s16bq09b']['5'] = 'Invented purchased unit'
     args['unit_map'] = {'Invented gift unit': 'Curated gift unit'}
-    with pytest.warns(adapter.PurchaseQuantityUnresolvedWarning):
-        got = adapter.adapt_s16b_2021(_source().iloc[[0]], **args)
+    got = adapter.adapt_s16b_2021(_source().iloc[[0]], **args)
     assert got.index.get_level_values('u').tolist() == ['Invented used unit']
     assert got['Unit_received_as_gift'].tolist() == ['Curated gift unit']
     assert got['Unit_purchased'].tolist() == ['Invented purchased unit']
@@ -241,6 +243,7 @@ def test_all_22_units_retain_literal_sizes_without_conversion(adapter, bindings,
     ('s16bq01', None, 'missing native'), ('s16bq01', 1.5, 'integral numeric'),
     ('s16bq03a', 'bad amount', 'numeric source amounts'),
     ('s16bq07a', 'bad amount', 'numeric source amounts'),
+    ('s16bq09a', 'bad amount', 'numeric source amounts'),
     ('s16bq09b', 3.5, 'integral numeric'),
 ])
 def test_bad_sources_refuse_without_silent_drop_or_recode(adapter, bindings, field, value, message):
@@ -257,7 +260,8 @@ def test_unknown_unit_and_flags_never_fill_one_another(adapter, bindings):
     assert got['Quantity'].iloc[0] == 1.25
     assert got[['Purchased', 'Received_as_gift', 'Quantity_received_as_gift',
                 'Unit_received_as_gift', 'Unit_purchased']].isna().all(axis=None)
-    assert got['s16bq09a'].iloc[0] == 111.  # not filled into any quantity
+    assert got['s16bq09a'].iloc[0] == got['Quantity_purchased'].iloc[0] == 111.
+    assert got['s16bq09c'].iloc[0] == 11100  # never the purchased quantity
 
 
 def test_native_duplicates_and_canonical_equal_payload_collisions_refuse(adapter, bindings):
@@ -329,11 +333,23 @@ def test_driver_reads_only_own_numeric_source_and_writes_after_validation(adapte
         calls.append(('write', path))
         writes.append(frame.copy())
 
-    with pytest.warns(adapter.PurchaseQuantityUnresolvedWarning):
-        got = adapter.build_s16b_candidate(read=read, write=write, get_map=get_map,
-                                           id_fn=bindings[0]['id_fn'], format_id=bindings[1])
+    # Execute the actual serving wrapper's final call with only injected leaves.
+    # No package imports, sys.path changes or source-provider code executes.
+    wrapper = COUNTRY / '2021-22' / '_' / 'plot_inputs.py'
+    call = ast.parse(wrapper.read_text()).body[-1]
+    assert isinstance(call, ast.Expr) and isinstance(call.value, ast.Call)
+    assert isinstance(call.value.func, ast.Name) and call.value.func.id == 'build_s16b_candidate'
+    namespace = dict(build_s16b_candidate=adapter.build_s16b_candidate,
+                     get_dataframe=read, to_parquet=write, get_categorical_mapping=get_map,
+                     i=bindings[0]['id_fn'], format_id=bindings[1])
+    exec(compile(ast.Module(body=[call], type_ignores=[]), str(wrapper), 'exec'), namespace)
+    got = writes[0]
     assert len(writes) == 1
-    pd.testing.assert_frame_equal(writes[0], got, check_exact=True)
+    assert got.index.get_level_values('i').tolist() == ['2126'] * 4
+    assert got['s16bq01'].tolist() == [3, 19, 21, 99]
+    assert got['Quantity_purchased'].isna().tolist() == [False, False, True, False]
+    assert got['Quantity_purchased'].iloc[0] == 111.
+    assert got['s16bq09c'].iloc[0] == 11100
     assert [x[0] for x in calls] == ['map'] * 10 + ['read', 'write']
     writes.clear()
     with pytest.raises(adapter.S16b2021Error, match='duplicate native'):
@@ -343,15 +359,15 @@ def test_driver_reads_only_own_numeric_source_and_writes_after_validation(adapte
     assert writes == []
 
 
-def test_provider_free_module_and_no_current_activation():
+def test_provider_free_adapter_and_exact_source_only_serving_wrapper():
     tree = ast.parse(MODULE.read_text())
     imports = {node.names[0].name for node in tree.body if isinstance(node, ast.Import)}
-    assert imports == {'warnings', 'pandas'}
+    assert imports == {'pandas'}
     assert not any(isinstance(node, ast.ImportFrom) for node in ast.walk(tree))
     calls = [node for node in ast.walk(tree) if isinstance(node, ast.Call)]
     assert not any(isinstance(node.func, ast.Attribute) and node.func.attr in {
         'read_stata', 'read_parquet', 'to_parquet', 'open', 'connect', 'urlopen', 'system',
     } for node in calls)
-    assert not (COUNTRY / '2021-22' / '_' / 'plot_inputs.py').exists()
+    assert (COUNTRY / '2021-22' / '_' / 'plot_inputs.py').exists()
     assert not (COUNTRY / '2021-22' / '_' / 's16b_2021.py').exists()
     assert 'plot_inputs:' not in (COUNTRY / '2021-22' / '_' / 'data_info.yml').read_text()

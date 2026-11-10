@@ -1,123 +1,126 @@
-# Own2021 s16b: concrete source-only candidate for #1483
+# Own2021 s16b serving candidate for #1483
 
-This is new executable adapter/driver code and an unapplied serving patch,
-not a repeat of the closed v3 inventory. All controls and runtime verification
-are **UNRUN**. The source-only profile admits no imports/collection, providers,
-native rows, Make, cache or API execution in this worker.
+New real adapter, normal wave wrapper, own cards and portable pure controls
+are frozen for the dispatcher. **All pure/runtime verification is UNRUN.**
+No native values, LSMS package, producer or API was executed in this worker.
+This is a private source implementation candidate, not an accepted runtime fix.
 
-The header is authenticated by SHA256
-`61045df1365ad170216e088ef02794a5d8aa950746907ba77fc0369eeb912f52`.
-Its source MD5 is `ed8625abcf1d679669d7d231cf77f58c`, matching the v3
-binding. Complete 19-name inventory, 22 input labels, three separately
-attached 22-unit cards and three own flag cards are supplied metadata.
-The 70,994 rows / 12,223 applied rows / unique household-input key are
-historical #1123 observations reused from the closed source diagnosis, not
-new observations from this zero-returned-row header.
+## Own authority and exact binding
 
-## Concrete serving proposal
+Initial header SHA256
+`61045df1365ad170216e088ef02794a5d8aa950746907ba77fc0369eeb912f52`
+binds source MD5 `ed8625abcf1d679669d7d231cf77f58c`: complete19-name inventory,
+22 input labels, three separately attached22-unit cards and own Oui/Non cards.
+The separately authorized q09c supplement SHA256
+`8656adfce39210322208af352622866b77f828b8091fe2130800d5ade92f14c9`
+binds the SAME source and labels q09c **"16B.09c. Montant"**. Both headers
+returned zero records. They do not establish observed multiplicities, native
+missingness, counts, fielded CAPI or a new scientific/default policy.
 
-Apply `s16b_2021_activation.patch` only after the dispatcher verifies the frozen
-candidate and accepts its bounded used-quantity profile. It adds the normal
-`2021-22/_/plot_inputs.py` script and optional raw columns to the **existing**
-country `plot_inputs` table. The current native script declaration machinery
-discovers that script; no shared registry, country compiler or Makefile change
-is proposed. The wrapper passes current `burkina_faso.i` and `format_id` to
-the candidate's explicit driver leaves `get_dataframe`,
-`get_categorical_mapping` and `to_parquet`.
+q09a's exact wording remains: “16B.09a. Quelles sont la quantité et la valeur
+totale de %rostertitle% achetées?” q09b is “16B.09b. Unité”. Together with
+q09c's explicit Montant, this own-source split binds q09a to the quantity
+and q09c to the amount, following the already accepted SAME-country #1188
+wide-column contract. This is a structural reading of the own labels, **not**
+a guess from double/int32 types or a transplanted2018 question. The initial
+withheld-purchase candidate at30b9cc177 is superseded; its source-only check
+receipts and original wording remain historical. No further Q09A decision is
+needed for this binding. q09c is retained under its native name; no canonical
+monetary field, valuation, unit price or conversion is added.
 
-Current country index: `(t,i,input,crop,u)`. Required payload columns:
-`Quantity: float`, `Purchased: bool`, `Quantity_purchased: float`.
-Four existing optional fields: `Unit_purchased`, `Received_as_gift`,
-`Quantity_received_as_gift`, `Unit_received_as_gift`.
-The patch declares the thirteen native admitted columns optional; this is the
-inverse route from an adapter result to its selected source answers, with raw
-codes and original masks/dtypes. No respondent records are committed.
+Historical #1123 source observations (70,994 rows,12,223 applied rows, unique
+native household/input key) are reused as historical evidence, not remeasured
+or inferred from the zero-row headers. q01/q02 variable labels are absent in
+the header; q02's own1Oui/2Non card and the independently closed own2021 gate
+diagnosis bind use. No2018 or sibling tail meanings are borrowed.
 
-The exact applicable membership predicate is numeric own `s16bq02 == 1`
-(own card `1 Oui`, `2 Non`, independently reused #1123 use-gate diagnosis).
-Only explicit `2` is excluded and counted. Blank/unknown q02 refuses the
-candidate; it is not silently treated as Non. Required native identity is
-`(grappe,menage,s16bq01)`; null or duplicate native keys refuse, including
-equal-payload repeats. No quantity sign/positivity or acquisition response
-gates a used row. Missing amounts, explicit zero and negative amounts survive
-unchanged. Unknown input/unit codes survive as source-qualified identities
-alongside their numeric source columns. Fractional/malformed code values
-refuse rather than truncate. An output-key collision refuses before writing.
+## Concrete serving wiring and membership
 
-| Column / axis | Own binding | Effect / qualification |
+The new normal `2021-22/_/plot_inputs.py` uses existing native-script
+registration. It passes sanctioned `get_dataframe`, `get_categorical_mapping`
+and `to_parquet` leaves plus current `burkina_faso.i` and `format_id` to the
+country-local driver. No compiler, framework, global schema or Makefile edit.
+The source file is exactly `../Data/s16b_me_bfa2021.dta`, read numerically once.
+This is the panel file; no Cross_Section operand is introduced.
+
+Existing public table: `plot_inputs`, Country index `(t,i,input,crop,u)`.
+Required fields remain `Quantity: float`, `Purchased: bool`,
+`Quantity_purchased: float`. Existing optional fields remain `Unit_purchased`,
+`Received_as_gift`, `Quantity_received_as_gift`, `Unit_received_as_gift`.
+Fourteen native admitted fields are added as optional raw columns. The inverse
+route is `result.reset_index()[RAW_FIELDS]`: original selected answers/codes,
+order, dtypes and masks, not a household-to-parcel allocation.
+
+Exact public membership predicate: own numeric `s16bq02 == 1`. Only explicit
+2Non is excluded, counted in native attrs. Blank/unknown q02 refuses the
+candidate, not a default Non. Amount sign/positivity, gift and purchase
+responses never gate an applied row. Negative, zero and missing quantities
+survive; unknown nonmissing acquisition flags refuse rather than become NA.
+Missing flags remain nullable NA. No usage/acquisition field fills another.
+Required native key `(grappe,menage,s16bq01)` must be nonmissing/unique.
+Duplicate native keys (even equal payloads) and mapped-key collisions refuse
+before writing. Missing IDs and malformed/fractional codes refuse; unknown
+integral input/unit codes retain source-qualified identity plus the raw code.
+
+| Output | Own source | Exact role |
 |---|---|---|
-| `i` | current country `i(grappe,menage)` | native panel namespace; e.g. invented `(2,126)` -> `2126`, not 2018's `20126`; framework walks once later |
-| `Quantity`, `u` | q03a, q03b's own card | used amount in its native unit; no scaling/conversion |
-| `input`, `crop` | q01's own 22-slot card, existing exact-label maps | no bare 2018 tail codes; literal combined rubber/teak identity stays distinct; `arichide` maps to existing groundnut identity `Arachide` |
-| `Received_as_gift` | q05 own Oui/Non | nullable; unknown nonmissing flags refuse |
-| `Quantity_received_as_gift`, `Unit_received_as_gift` | q07a, q07b own card | independent from usage and purchase; no u fill |
-| `Purchased`, `Unit_purchased` | q08 own Oui/Non, q09b own card | independent nullable purchase flag/unit |
-| `Quantity_purchased` | withheld, nullable Float64 NA | q09a not assigned quantity or value semantics; explicit warning |
-| native `s16bq09a` | verbatim source answer | wording preserved below; no source-NA claim or inferred quantity |
-| `vague` | retained native payload | sample split, not repeated measurement/season |
+| native `i` | current country `i(grappe,menage)` | e.g. invented `(2,126)` -> `2126`, not2018 `20126`; framework walks once later |
+| `Quantity`, `u` | q03a, own q03b card | used amount/unit, no conversion |
+| `input`, `crop` | own q01 card, existing exact-label maps | no numeric2018 tails; `arichide` extends approved Arachide identity; rubber/teak stays its literal combined identity |
+| `Received_as_gift` | own q05 | independent nullable flag |
+| `Quantity_received_as_gift`, `Unit_received_as_gift` | q07a, own q07b card | independently unit-tagged gifts |
+| `Purchased` | own q08 | independent nullable flag |
+| `Quantity_purchased`, `Unit_purchased` | q09a, own q09b card | independently unit-tagged purchases, never q09c Montant |
+| fourteen native columns | admitted original source answers | includes source input/unit codes, q02, vague and q09c; no canonical money derivation |
 
-Exact q09a label: “16B.09a. Quelles sont la quantité et la valeur totale de
-%rostertitle% achetées?” Its q09b is “16B.09b. Unité”. q09c appears in the
-inventory but its metadata was not supplied. Neither a guessed q09c meaning
-nor 2018's resolved q09a quantity binding settles this wording.
+The22-unit dictionaries include explicitly sized bags and local containers;
+labels remain exact, with only existing exact country u-map keys applied.
+This selects no mass conversion or NPK/DAP nutrient grade. The combined
+rubber/teak slot is present in the table and remains distinct; no single crop
+or new physical Seed classification is invented for it. q04/q06 supplier
+questions and their free text are outside this used/acquired-quantity adapter.
 
-The required-column contract is presence, not an instruction to invent a
-number: country `_assert_built_required_columns` checks column presence;
-`test_gh1188_burkina_input_acquisition_fields.py` explicitly preserves wholly
-missing acquisition answers as nullable fields. Thus the **used/gift profile
-does not need a new scientific-default ruling**. `Quantity_purchased` can be
-present and unavailable, with the raw answer retained and an explicit warning.
-An all-NA required purchased quantity can also trigger the existing Site B
-warning. That warning is not suppressed. The original Q09A question remains
-only for a future full purchase binding, not household application membership.
-The proposed raw-column carrier is concrete here for ROOT review; no shared
-schema/metadata policy is introduced.
+## Effects, preserved scope and limits
 
-## Scope and effects
+This private source now wires own2021 applied s16b through the existing table;
+its execution remains UNRUN. The first independent #1483 Tier B objective has
+an implementation candidate. It adds no s16a parcel applications, CS coverage,
+allocation, weight, strata, season, default or scientific-grade change.
+The old scheme phrase “no parcel-level input data” is too broad for all
+agriculture (the dated #1483 note names s16a questions); this adapter relies
+only on s16b's household grain and does not rewrite that separate question.
+Generic `ehcvm_i` “MUST use” prose contradicts the own2021 plot wrapper's
+same-as-sample instruction; the own2021 country i contract is operative here.
 
-Today this checkout remains unactivated: no normal 2021 plot_inputs script,
-YAML block or existing scheme/map edit was made. The country helper and cards
-are build inputs, so even an inactive addition is expected to move Burkina
-hashes; the amount of hash movement has **not** been measured. A source-only
-check is not cold/warm/cache/API verification.
+Every2018 builder/map/assertion is byte-preserved. A combined output necessarily
+has new raw columns, NA for2018; its old keys, seven payload columns, values,
+units and masks must remain exact. The retained old2021-empty assertion in
+`test_burkina_faso_plot_inputs_identity.py` would be superseded by this new
+coverage. It is NOT edited within this ownership scope; an activation review
+must explicitly update that expectation. Do not claim it would pass unchanged.
+The literal new controls independently pin old seven-column semantics at the
+new source grain; no native2018 or combined API equality is claimed here.
 
-On later activation, the first Tier B objective gains own2021 **applied** s16b
-household-input rows and used quantities in their recorded units. Native row
-order and per-slot identities are preserved. It adds no s16a parcel
-applications, no Cross_Section source, no allocation or weights. `v` still
-joins from sample. Generic `ehcvm_i` MUST-use prose conflicts with the own2021
-plot wrapper and country notes; the latter determine the own2021 namespace.
+Full typed attrs are preserved on the adapter return. This does not establish
+Country/Feature transport: different wave attrs can disagree at concat. Cache
+hash movement is expected from country py/org/scheme and wave py additions,
+but has NOT been measured. No cache stamp, schema bump or corpus census.
+The provider-free adapter/driver controls do not establish actual loader,
+parquet, cold/warm, ID-walk, sample join or API transport behavior.
 
-All existing2018 source, maps and assertions remain exact. A combined public
-table after activation would have extra raw columns, NA for2018; its old keys,
-seven payload columns, values and masks must remain exact. The existing old
-assertion that2021 input requests are empty is deliberately **not edited** in
-this ownership scope. Activation would supersede that coverage baseline and
-needs a separately reviewed expectation update; do not claim the retained
-old empty-wave assertion would pass an activated implementation.
-
-The adapter preserves full typed attrs on its return and refuses an already
-walked source. This does not prove Country/Feature transport: attrs from
-different waves may disagree during concat. The native warning is a build
-warning, not a newly implemented warm-cache warning replay. The raw q09a
-column and the existing all-NA-required-column report remain visible; composed
-metadata and warm reporting require independent verification before activation.
-
-NPK and DAP use existing label-map identities only. Their current mappings are
-not a new grade endorsement. #1483 parcel integration and DAP residuals,
-#1573 strata, #1442 money, #1148 completion, #1437 CAPI, #1436 crop,
-#1482 unit basis and #1485 anonymous routing remain untouched. #587/#594 is
-already done; no matrix or historical diagnostic is rerun.
+#1483's parcel, DAP and other-country objectives remain. Preserve #1573 strata,
+#1442 money, #1148 completion, #1437 CAPI, #1436 crop, #1482 unit basis and
+#1485 anonymous routing. #587/#594 is already done; no matrix/diagnostic replay.
 
 ## Frozen finite verification handoff
 
 Selection: **only** `tests/test_burkina_faso_1483_header_adapter_20261110.py`.
-No native data is needed. The dispatcher supplies its verified MAIN interpreter
-and private false credentials/data/cache/config prefix; no interpreter is
-declared in the worker's runtime profile and none is invented here.
+No native data is needed. Dispatcher supplies its verified MAIN interpreter
+and private false credentials/data/cache/config prefix; the worker profile
+names no runtime interpreter and none is invented here.
 
-From the exact candidate checkout, after the dispatcher asserts MAIN and
-source/config identities, use its prepared `PROJECT_PYTHON`:
+From the exact candidate checkout, after dispatcher source/configuration and
+MAIN identity assertions, use the separately prepared `PROJECT_PYTHON`:
 
 ```sh
 PYTHONPATH="$PWD" LSMS_COUNTRIES_ROOT="$PWD/lsms_library/countries" \
@@ -128,23 +131,19 @@ PYTHONDONTWRITEBYTECODE=1 "$PROJECT_PYTHON" -m pytest --noconftest \
   > "$PRIVATE_VERIFICATION_DIR/1483-pure.log" 2>&1
 ```
 
-`PRIVATE_VERIFICATION_DIR` and false credential bindings are dispatcher-owned,
-required preconditions, not permission to write a shared cache. No LSMS package
-import occurs in this test file: actual current country `i` and `format_id`
-definitions are extracted from committed source into a pandas-only namespace.
-The real new candidate module and driver execute against invented frames and
-injected leaves. The tests assert provider imports are unreachable, inspect
-allowed module dependencies, and require exact source/map/read/write roles.
+Private prefix/false credential bindings are required dispatcher preconditions.
+Actual current country i/format_id definitions are extracted from committed
+source into a pandas-only namespace; the actual wrapper's final call executes
+with injected leaves. No package import/provider/raw read runs in these tests.
+Provider imports and dependency AST are guarded. Literal independent expected
+frames pin ordered keys/dtypes/masks/raw answers/typed attrs. Additional
+controls cover all22 slots, all22 units in EACH unit role, changed independent
+cards, q09a versus q09c/gift/use values, contradictory/missing flags, explicit
+No versus missing/unknown eligibility, malformed codes/amounts, native/mapped
+equal-payload collisions, writer-after-validation, typed empty return and
+missing fields/cards. No PASS count is claimed before actual receipts.
 
-Controls include a complete independently specified expected frame, explicit
-ordered keys/dtypes/masks/raw answers/typed attrs, all22 slots, each of22 units
-in each of3 own unit roles, independently changed card sentinels, q09a refusal
-to fill a quantity, flags that disagree, no/blank/unknown eligibility, malformed
-codes and amounts, native and canonical equal-payload collisions, no writer
-after refusal, all-nonuse typed empty return, missing columns/cards, and the
-unwalked native namespace. No success count is claimed before a real receipt.
-
-Next gate is this frozen pure selection. Only after its actual receipts and
-ROOT's carrier/coverage review should a finite separate activation/native/API
-plan be admitted. No source-row, package import, native builder, Make,
-Country/Feature, census, cache or broad-suite execution is included here.
+Next gate: this frozen pure selection. Native/API/storage, ID-walk/attrs and
+old-baseline review require a finite separate dispatcher plan afterward.
+No native/header/record resupply, broad suite, Make or provider execution is
+requested by this candidate handoff.

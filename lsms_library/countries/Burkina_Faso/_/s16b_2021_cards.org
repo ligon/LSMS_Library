@@ -1,4 +1,4 @@
-#+title: Own2021 household-input cards (GH #1483, inactive candidate)
+#+title: Own2021 household-input cards (GH #1483, adapter candidate)
 
 Transcribed only from authenticated BFA-2021/HEADER.json, SHA256
 =61045df1365ad170216e088ef02794a5d8aa950746907ba77fc0369eeb912f52=.
@@ -145,7 +145,10 @@ This is not row/grain/eligibility-count or fielded-CAPI evidence.
 - =s16bq09a=: "16B.09a. Quelles sont la quantité et la valeur totale de %rostertitle% achetées?"
 - =s16bq09b=: "16B.09b. Unité"
 
-q09a wording is deliberately uncorrected. The whole inventory also names
-=s16bq09c=, but no q09c metadata was supplied. The candidate retains q09a
-verbatim without choosing quantity or value semantics. q03a and q07a retain
-their supplied truncations; no end-of-label wording is reconstructed.
+q09a wording is deliberately uncorrected. A supplementary own header,
+SHA256 =8656adfce39210322208af352622866b77f828b8091fe2130800d5ade92f14c9=,
+labels =s16bq09c= exactly "16B.09c. Montant" (int32, no attached card).
+Together with own q09b "Unité", this separates the purchase quantity q09a
+from the monetary amount q09c under the existing wide-column contract.
+This is a structural source binding, not a dtype-based meaning guess.
+q03a and q07a retain their supplied truncations; no wording is reconstructed.

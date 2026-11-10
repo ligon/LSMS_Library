@@ -288,6 +288,49 @@ Data Scheme:
     Unit_received_as_gift:
       type: str
       optional: true
+    # Own2021 retains its numeric codes/answers, including q09c Montant.
+    grappe:
+      type: int
+      optional: true
+    menage:
+      type: int
+      optional: true
+    vague:
+      type: int
+      optional: true
+    s16bq01:
+      type: int
+      optional: true
+    s16bq02:
+      type: int
+      optional: true
+    s16bq03a:
+      type: float
+      optional: true
+    s16bq03b:
+      type: int
+      optional: true
+    s16bq05:
+      type: int
+      optional: true
+    s16bq07a:
+      type: float
+      optional: true
+    s16bq07b:
+      type: int
+      optional: true
+    s16bq08:
+      type: int
+      optional: true
+    s16bq09a:
+      type: float
+      optional: true
+    s16bq09b:
+      type: int
+      optional: true
+    s16bq09c:
+      type: int
+      optional: true
     materialize: make
 
   livestock:

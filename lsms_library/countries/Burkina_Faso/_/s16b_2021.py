@@ -1,14 +1,13 @@
-"""Inactive own2021 household-input candidate (GH #1483).
+"""Own2021 household-input adapter candidate (GH #1483).
 
 Pure numeric-frame adapter; no providers, package imports or top-level IO.
 Bindings and limits: ledger 1483-burkina_faso-post-header-adapter-20261110,
 sections 2–6. Cards are transcribed in s16b_2021_cards.org. In particular,
-q09a names BOTH quantity and value; it is retained under its native name,
-never interpreted as Quantity_purchased. Activation needs that carrier ruling.
-The existing 2018 builder and all current serving declarations are untouched.
+q09a names BOTH quantity and value; its own q09b is Unité and the separately
+authenticated q09c is Montant. That source structure binds purchased quantity
+to q09a, not q09c, under the existing #1188 wide-column contract. All raw
+admitted answers and the combined wording remain available. No2018 edit.
 """
-import warnings
-
 import pandas as pd
 
 
@@ -18,17 +17,13 @@ UNIT_FIELDS = ('s16bq03b', 's16bq07b', 's16bq09b')
 CARD_FIELDS = ('s16bq01', 's16bq02', 's16bq05', 's16bq08') + UNIT_FIELDS
 RAW_FIELDS = ('grappe', 'menage', 'vague', 's16bq01', 's16bq02',
               's16bq03a', 's16bq03b', 's16bq05', 's16bq07a', 's16bq07b',
-              's16bq08', 's16bq09a', 's16bq09b')
+              's16bq08', 's16bq09a', 's16bq09b', 's16bq09c')
 INDEX = ['t', 'i', 'input', 'crop', 'u']
 CROP_NA = '(not crop-specific)'
 
 
 class S16b2021Error(Exception):
     """Refuse loss or an unsupported source layout, without printing keys."""
-
-
-class PurchaseQuantityUnresolvedWarning(UserWarning):
-    """q09a remains native while Quantity_purchased is unavailable."""
 
 
 def _codes(series, name):
@@ -69,7 +64,7 @@ def _curated(labels, mapping):
 
 def adapt_s16b_2021(source, *, cards, input_map, seed_crop_map, unit_map,
                     id_fn):
-    """Return used/gift measurements and unassigned purchase answer q09a.
+    """Return independently unit-tagged used, gifted and purchased amounts.
 
     Only explicit q02=2 rows are excluded, counted in attrs. Missing/unknown
     use answers refuse the whole candidate instead of silently dropping rows.
@@ -123,14 +118,15 @@ def adapt_s16b_2021(source, *, cards, input_map, seed_crop_map, unit_map,
         'u': units['s16bq03b'].fillna('Manquant'),
         'Quantity': _amount(raw['s16bq03a'], 's16bq03a'),
         'Purchased': _flag(raw['s16bq08'], 's16bq08'),
-        'Quantity_purchased': pd.Series(pd.NA, index=raw.index, dtype='Float64'),
+        'Quantity_purchased': _amount(raw['s16bq09a'], 's16bq09a'),
         'Unit_purchased': units['s16bq09b'],
         'Received_as_gift': _flag(raw['s16bq05'], 's16bq05'),
         'Quantity_received_as_gift': _amount(raw['s16bq07a'], 's16bq07a'),
         'Unit_received_as_gift': units['s16bq07b'],
     })
     # Preserve all admitted raw answers, including unclassified numeric codes
-    # and q09a's dual-worded answer. No q09c monetary semantics are selected.
+    # and q09a's combined-worded answer. q09c is retained as a native amount;
+    # no canonical expenditure, unit price or monetary derivation is added.
     for field in RAW_FIELDS:
         out[field] = source[field].reset_index(drop=True).loc[use].reset_index(drop=True)
     out = out.set_index(INDEX)
@@ -141,21 +137,17 @@ def adapt_s16b_2021(source, *, cards, input_map, seed_crop_map, unit_map,
     out.attrs = dict(source.attrs)
     out.attrs['s16b_2021_candidate'] = {
         'excluded_explicit_nonuse': excluded,
-        'purchase_quantity': 'unresolved; native s16bq09a retained',
+        'purchase_quantity': 's16bq09a; own q09b Unité / q09c Montant',
         'component': 'panel source only; no Cross_Section coverage claim',
     }
-    # Even an all-missing q09a does not establish a quantity/value binding.
-    warnings.warn('Burkina_Faso 2021-22: s16bq09a names quantity and total value; '
-                  'retained verbatim, Quantity_purchased remains NA',
-                  PurchaseQuantityUnresolvedWarning, stacklevel=2)
     return out
 
 
 def build_s16b_candidate(*, read, write, get_map, id_fn, format_id):
     """Minimal injected driver; only explicit caller-provided IO leaves run.
 
-    Not registered or called by the library. Proposed serving wrapper lives
-    in s16b_2021_activation.patch; it requires a separate activation decision.
+    The own2021 wave wrapper supplies sanctioned leaves. Pure controls supply
+    invented frames and spies; no providers are reachable from the adapter.
     """
     cards = {field: get_map(fn=CARD_FILE, dirs=['../../_/'],
                            tablename='bfa2021_' + field, idxvars='Code',

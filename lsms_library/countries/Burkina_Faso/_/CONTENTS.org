@@ -3404,3 +3404,15 @@ All controls/runtime/API checks are UNRUN. There is no normal2021 input
 builder activated in this source;2018 behavior and all old notes remain.
 This is household×input grain, never a parcel allocation; panel/CS reach,
 season/ID qualifications and the separate DAP/NPK/unit-policy holds stand.
+
+** Supplement before final freeze -- own q09c separates the purchase amount
+
+A separately authenticated zero-row header labels q09c exactly
+"16B.09c. Montant"; q09b is "Unité". With the retained combined q09a
+stem, that own-source split binds q09a as purchased quantity under the
+existing1188 wide-column contract, without a dtype-based inference or
+borrowing2018. This supersedes the inactive/withheld-q09a state immediately
+above: the final source candidate now has a normal2021 s16b wrapper.
+q09c stays native, with no canonical monetary derivation. Every admitted
+raw used/gift/purchase answer and code is retained. All runtime/pure checks
+remain UNRUN; no native counts or API acceptance are newly established.
