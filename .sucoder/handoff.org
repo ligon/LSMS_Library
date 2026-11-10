@@ -1,5 +1,5 @@
 #+title: Current LSMS-ISA coordinator handoff
-* CURRENT -- 2026-11-10 17:46 UTC
+* CURRENT -- 2026-11-10 17:56 UTC
 Goal ACTIVE/unbounded. Prior turn PROGRESS: draft1688 and8country allocations.
 This turn PROGRESS:1687repairs published/revalidated, drafts1689/1690, issue905
 narrowed, user1457R1approved/R2arejected, delegated integration now operational.
@@ -396,3 +396,43 @@ Lead+manager routinely review/freeze/direct-launch corrected unspent2-call cohor
 no Rootapprovalloop. Actual root R/1573-burkina-normal-two-lane-actual-20261110.
 Historicfull42769154949 lasted06:32:30→08:53:57 (2h21m27); currentfull42837909103
 stilllive at fresh17:46read, source8c unchanged. No restart/merge/settings yet.
+
+* LATEST -- 17:56 UTC:1687MERGED/932ACTIVE/4newworkerslive
+Supersedes all earlier active1687/wait-before-merge statements. Full42837909103
+SUCCESS17434PASS/2775SKIP/0F0E/20209total. Publictested_source exactS/B/H, required
+steps actuallysuccess, unit+Windowsgreen/sameS, uniqueapp15368checks. Rootfresh
+preflight and expectedhead ordinarymerge, thenactualparents/tree/devreadback:
+M16c3f4d9c28462dde7970718a4eed67394215997, parents[4381,8c], tree151b2d48721c94f12d6a5a154a0cecfea32e702f.
+Development=M. R/1687-accepted-rollout-20261110/{REPORT.md,PREFLIGHT.json,
+SAFE-LOG-RECEIPTS.json,POST-MERGE.json}. Watch30290terminal; do not restartdata.
+Root applied approved932 freshminimalruleset25124452 at17:52:57Z: required
+pr-data-validation app15368/stricttrue, originalunit/deletion/nonfastforward/
+branchscope/Role5always unchanged. ExactPUT+ruleset+activebranchreadback verified
+in R1687.../application-after-16c3f4d9. GH932 completed/closed/readbackexact,
+R/932-gate-completion-20261110. Count79verifieddevelopmentmerges/43closures;
+1680–86 auto markedclosed/merged throughancestry, no sevenextra independentmerge
+count. Lead stillsourceprovescomponentcarry/residuals; no furthercloseactionyet.
+
+Allfour1575 country SOURCEworkers verifiedRUNNING17:55:58Z:
+CotedIvoire41095863/35f589d89a8140b08db4d6518b539661;
+Togo41095865/b8a978aa362d4cde8e832f754a6af778;
+Benin41095866/6df7c245543244c58f59c6ea54a352da;
+Guinea-Bissau41095867/adbf3ec69f4b439cb11321853df9713d.
+CanonicalQ/refill-1575-four-country-9f-20261110. Deputy1575shared812adaptation and
+fullfourCONTgrounding3691lines complete. GB's owncluster_features vocabularytest
+also needs intentional region-PART+ownUrbano/Rural expectation; nine-region
+vocabulary/count+otherasserts unchanged. Manager/deputyreservingoneowner.
+
+BFA first41095376 predataguardFAIL retained. Corrected d5b1a54e716307548f53d4506b94e266497938b2f89ffde5a7875c13881411f8
+27filepacket exactjointlyrehashed, precise devnull1:3/exactldconfig-p allowed,
+allscience/calls unchanged. Guardedimport PASS22.307s/0API/native/writers,
+initialnamespace-uidassertionfailure retained. ContinuationDIRECT41095975
+verifiedRUNNING17:55:58Z,40m2CPU8G. Actualroot
+R/1573-burkina-normal-two-lane-actual-v2-20261110. Phase/APIhandle notyetreported;
+do not infercallsfromjobstate. Same unspent2coldAPIcalls/fourreads/fourwriters
+expected, no credential/no fallback. Managerownsactualterminal. OnBFAaccept,
+lead composesBFA5+CI3+MWledger1 disjointpaths andactualM-baseupdate for1690,
+source/libraryexpectedec74, measuredBFAmetadata carriedbyproof/no redundantcensus.
+53incrementalpaths beyonda292/51beyond8c. New1575train staysseparate/dependent.
+GoalACTIVE; no masterrelease/sharedrewarm/weightchange. Remainingdecisions and
+otherissues remainexplicit; do not infergoalcompletionfromthemajorbatchmerge.

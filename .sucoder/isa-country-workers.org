@@ -1,12 +1,12 @@
-#+title: LSMS-ISA work owners — 2026-11-10 17:46 UTC
+#+title: LSMS-ISA work owners — 2026-11-10 17:56 UTC
 Detailed evidence: [[file:handoff.org]] and [[file:tasks/isa-checkpoint-20261110T1721.org]].
 
 * Root
 Scientific decisions, final readiness, development merges and settings.
-1687 head8c5324b4f remains frozen on development4381; unit/Windows passed,
-full data42837909103 still live. Watchsession30290 owns exact run polling.
-After actual pass: fresh base/head/synthetic/tree/check preflight, authorized
-merge, then approved932 fresh minimal ruleset apply/readback. Goal ACTIVE.
+1687 MERGED and verified at development16c3f4d9c28462dde7970718a4eed67394215997.
+Full17434PASS/2775SKIP/0F0E, unit+Windowsgreen; actualparents[4381,8c]/tree151b
+match testedsource.932 required app15368data/stricttrue policy APPLIED+READBACK,
+existingbypass/otherprotections preserved.932closed;79merges43closures. GoalACTIVE.
 No master release, shared-cache rebuild, production weights or panel relink.
 
 * Main integration lead — review_nigeria_ph_pr
@@ -15,9 +15,9 @@ routine source review/composition/publication without Root per-file loops.
 1690 remains9f. After BFA actual accepts, prepare reviewed union of BFA5paths,
 CI3paths and qualified Malawi ledger1path; then actual-base update after1687
 lands and full composed gate. Does not own new1575 four-country train.
-BFA operator bootstrap failed before data41095376; exact devnull/ldconfig
-import allowance correction and metadata-only guarded import preflight are
-under existing delegated authority. No BFA API/native call had begun.
+BFA41095376 failed beforedata. Exactbootstrapcorrection+guardedimportpassed.
+Continuation41095975 actuallyRUNNING17:55:58Z, phase/APIhandle awaited; no call
+claim fromjobstate. Managerownsactualterminal; leadkeepsnext1690composition.
 
 * Deputy integration lead — finish_1590
 User APPROVED1575 documented combination for Benin2018-19/Togo2018/
@@ -27,16 +27,15 @@ rollout-20261110/CHARTER.md. New private integrate-1575-four-country-strata-
 source/pure conservation, one final metadata pass and own dependent draft.
 Rows/weights/IDs/Rural/joins preserved; missing component means missing strata;
 Togo discrepancy remains explicit, no guessed exclusions or new-wave work.
-Manager dispatches four country workers; no worker edits shared812/helper/global
+Allfour countryworkers RUNNING17:55:58Z (IDs inhandoff); no worker edits shared812/helper/global
 files. Routine finite metadata/card and actual plans admitted jointly with
 manager. Root final science/readiness/merge/settings retained.
 
 * Remote queue manager — malawi_revision_food
 Owns remote scheduling, source/custody queues, deterministic executors and
-actual terminal receipts. Four1575 workers are being dispatched; report actual
-job IDs rather than counting charters as running actors. BFA setup-only41095376
-FAILED before APIs/native, all seven command groups closed. Correct exact
-bootstrap allowance and preflight imports before unspent two-call cohort.
+actual terminal receipts. Four1575 workers41095863/65/66/67 verifiedRUNNING. Track exact actual
+handles and distinguish sourcework from dataactors. BFA setup-only41095376 failed0data/allgroupsclosed. Corrected guardedimport
+passed, continuation41095975 nowlive; expectedtwo-callcohort remainsbound.
 Malawi native+saved actors all TERMINAL. Qualified science cohort29/30PASS,
 legacy JSON attrs int3/11-to-string strictFAIL retained; source predates R1/R3,
 counts/other attrs exact, already documented in CONTENTS4811–12. Root admitted
