@@ -1,5 +1,5 @@
 #+title: Current LSMS-ISA coordinator handoff
-* CURRENT -- 2026-11-10 16:35 UTC
+* CURRENT -- 2026-11-10 17:21 UTC
 Goal ACTIVE/unbounded. Prior turn PROGRESS: draft1688 and8country allocations.
 This turn PROGRESS:1687repairs published/revalidated, drafts1689/1690, issue905
 narrowed, user1457R1approved/R2arejected, delegated integration now operational.
@@ -350,3 +350,21 @@ Root readiness/merge/#932freshminimalsettings remains after actualPASS. Lead
 prepares combined1690+BFA1573 tree ONLY after both scoped actual accepts; after
 1687lands, source-conserving actualbaseupdate then one composed full gate avoids
 unnecessary serial development suites. Frozen9f not changed at this checkpoint.
+
+* LATEST -- 17:21 UTC; supersedes interim statuses above
+Detailed current checkpoint: [[file:tasks/isa-checkpoint-20261110T1721.org]].
+Goal turn PROGRESS: qualified actualMalawi R1/R3 ADMITTED29/30, knownJSONattrs
+boundary retained; no newattrsdesign/fix/serializer or native/saved retries.
+Finalledger ae2d1e3c5cf6391dc201d39bd23d2949dd3db11a, allotherobjects exact9f.
+Dependent DRAFT1692 published/Rootreadbackverified: head ed121881c6f4282e21725d7358cec8772cb413fc,
+3files/1commit, exactdonor77106tree04ff00b5c704bc0d0421b412a5001457fe8b3b25.
+Adds only-n2--dist=loadfile tofullpytest;121isolatedpurePASS, no normalfull/data/
+census/speedclaim. Independentreviewpassed, parent1690/active1687unchanged.
+BFAnormal plan source-only COMPLETE/readRoot; sourceonlyoperatorprep41093381
+live; no BFAdata/stagingactor yet. Lead/controller, finish1590/oracle, manager/
+custody then jointfreeze+DIRECTdeterministicexecution. No Rootperfileloop.
+PPproposal revision2 exposes actualcontractconflicts, publicrepresentation still
+PENDING; no activation. Uganda1000 exactnewroute404/agent0SDK74, no fulltextfacts/
+numericchange; terminalnotbusy. Full1687data42837909103confirmedLIVE17:19Z;
+RootactualPASSpreflight/merge thenfresh932minimalrulesetapply stillpending.
+Development4381/78merges42closures unchanged. GoalACTIVE, no release/sharedrewarm.

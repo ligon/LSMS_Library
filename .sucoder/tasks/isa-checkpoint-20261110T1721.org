@@ -1,0 +1,70 @@
+#+title: ISA checkpoint 2026-11-10 17:21 UTC
+
+* Goal and authoritative state
+ACTIVE/unbounded. This turn PROGRESS: tracker1573/587/1069 reconciled; actual
+Malawi R1/R3 cohort qualified admitted; reviewed dependent draft1692 published;
+BFA normal plan and source-only operator preparation advanced. Development
+4381/78verifiedmerges/42closures unchanged. No release/sharedrewarm/weights/relink.
+All paths use B/R/ROUND2 definitions from parent handoff. Source under verifier
+must remain immutable. Root olddocsbranch is never a runtime import checkout.
+
+* Malawi actual result -- CLOSED qualified, no more actors
+After native41092493, saved3d171f2f/PID3657725 ended-11/SIGSEGV87.848s near
+faulthandler dump,20completedPASS; remainingunexecuted. Delete sampler entirely.
+Progressonly6ad7a7b5/PID3659487 timedout180s,23completedPASS/restunexecuted.
+Bounded6005ce296f2/PID3676031/session33766 ended1/472.736s, ALL30predicates
+completed29PASS/1FAIL; allgroupsclosed/source+30seals exact/0native replay.
+All ownsource/R1/R3/Farm/amount/unit/mask/accessor predicatesPASS. Observed
+832R1mapped/833R1inputlines,94R3Farm/94R3inputs,1431Farmgroups,7379positivegroups;
+these are measured scope, not goldens.
+Strict writerRETURN/storage1196FAIL only attrs.unit_text_recovered.harvest/sale
+int3/11 toJSONstr keys. Paired counts exacttypes/values, EVERYotherattrspath/key
+sequence/scalar exact; completevalues/axes/dtypes/masks passed. Actual frames
+never normalized. Two bounded diagnostics used4savedloads/0native. SourceAST
+_recovered_counts/_sum_recovered/assignment/writer exactd47→9f.
+Root ADMITTED29/30qualified science/source cohort, NEVERfulltypedPASS/whole1457.
+Current MalawiCONTENTS4811–12 already records JSONattrs qualification;856pins
+nativeintegerkeys;1196/637history excludes writerJSON from indexfix. Root STOPPED
+provisionalattrsdesign: no newkeychange/serializer/bugfiling solelyforstronger
+privatecomparator, no observedconsumerfailure. No more native/savedretry.
+Preserve cumulative19nativeENTRIES/2writers (old7thcompletionunproven), allcutoff/
+coordination/instructiondeviations and failedattempts in parenthandoff.
+Finalledger ae2d1e3c5cf6391dc201d39bd23d2949dd3db11a ONEownedpath/19379others
+9fexact/libraryunchanged. R/1457-malawi-native-acceptance-reconciliation-20261110/
+REPORT.md,RESULT.json,ROOT-ADMISSION.json,FINAL-SOURCE-PROOF.json; sentlead.
+
+* Reviewed public workflow child
+https://github.com/ligon/LSMS_Library/pull/1692 DRAFT, Rootreadbackverified.
+Head ed121881c6f4282e21725d7358cec8772cb413fc/tree04ff00b5c704bc0d0421b412a5001457fe8b3b25,
+exactdonor77106a4f325f01ede23c5a6cc0373dacbd9525f5.3files/1commit onto9f,
+19377others/library/config exact. Fullpytest adds only-n2--dist=loadfile;
+alltests/options/privacy/gates/threadpins retained.121focusedpurePASS9.11s in
+ISOLATEDharness/repo conftests+pluginautoload disabled, NOTnormalfullsuite.
+Originalpreflightfailure preserved; independentleadreviewpassed. No data/census/
+speedclaim. R/932-reviewed-child-20261110/REPORT.md personallyread Root.
+Current1687data42837909103 STILL LIVE17:19Z/source8c unchanged/watch30290.
+Root handles actualPASSpreflight/developmentmerge thenfreshapproved932settings.
+
+* BFA normal sample execution pending
+R/1573-burkina-normal-sample-plan-20261110/PLAN.md+INPUTS+independentlookup.
+Exact9f/ec74, two ordinarycold sample2014 calls,2sources/lane10355734B;
+sourceexpected4totalreads/4writers. Strictfullnonstrata/axes/attrs/weights and
+currentextensionaccounting; no10411/389historicalgoldens. Root readallplan.
+Source-only operatorprep41093381/dispatchc3aefdde87a04058b8afa9f77cc6667e,
+source9f/candidateec74 AUTHbranch1573-bfa-normal-candidate-ec74-20261110.
+No staging/dataactor yet. Manager caught lazyprivateattribute trap beforefreeze.
+Lead reviewscontroller, finish1590/oracle semantics, managercustody, thenjoint
+freeze+DIRECTdeterministic40minexecution; no modelsetup/Rootperfileloop.
+AfterBFAactualaccepts, lead composesBFA+Malawiledger+932 into1690 onactualnewbase
+after1687lands; one composedfullgate, componentPRs retained/reconciled.
+
+* Other current work and holds
+Uganda1000 newroute agent0/supervisor74FAILED; node562404only/0followups/
+0newpaperfacts; prior9metadata routes notrepeated/225unchanged.97cb2e0dledgeronly,
+managerfactualreadbackrecorded, authorityheld/terminalnotbusy.
+PPproposal R/587-nigeria-pp-projection-decision-design-20261110/REPORT.md revision2;
+v1preserved.70rolefields/22names,37missingonlyfromunwiredprojection; carrieralready
+complete. W3all116item/42unit orderedcards int32/labels EXACT; commonW3namespace,
+obs1/2locations. Consumerreview found Preferredj/u promise, missinguUnknown rule,
+allNAPrice requiredaudit andAggregate warning/strictcontracts; publicnative
+extension NOTselected. No activation/denominator/default1/canonicaladoption.
