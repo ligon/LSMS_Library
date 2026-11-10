@@ -9,8 +9,8 @@ import json
 import pandas as pd
 import pytest
 
-import test_gh824_mali_ehcvm_crop_production as crop
-import test_mali_crop_survey_kg as survey
+from tests import test_gh824_mali_ehcvm_crop_production as crop
+from tests import test_mali_crop_survey_kg as survey
 
 
 @pytest.fixture
