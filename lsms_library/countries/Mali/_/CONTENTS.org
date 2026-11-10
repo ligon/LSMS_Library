@@ -3742,3 +3742,28 @@ erratum binding =s7fq13b= (especially =4 Egrener=) to the printed state card
 and explaining its processing/shelling meaning. Q21, sale answers or a different
 wave cannot supply that bridge. No condition recode, kg factor, quantity,
 identifier, weight or default follows from this finding.
+
+* 2026-11-10 -- own s16b header adapter prepared, not activated (GH #1483)
+
+The supplied authenticated own headers confirm 19 fields/20 input labels in
+2018-19 and 17 fields/22 labels in 2021-22. Each own used/gift/purchase unit
+field has its own five-choice card. q02 is use, q05 gift, q08 purchase;
+q03a/b, q07a/b and q09a/b/c stay distinct. 2021 code19 is literally
+=Semences d'arichide=; 2018 code19 is tubers. q00 is a respondent, not a
+line identifier; the 2018 area fields identify no parcel.
+
+=_/s16b_header_adapter.py= copies all native columns/amounts/dtypes into a
+nonactivated household-slot review operand. Unknowns remain raw with explicit
+unlisted masks; missing/repeated native keys refuse. No EAC-I reducer, unit
+conversion, nutrient fraction, crop inference, source filter or parcel
+allocation is applied. The existing 2021 EHCVM21_ raw namespace is required.
+Native key multiplicity/eligibility counts were not measured by headers.
+
+The historical scheme's "no agriculture-input block" contradicts the dated
+#1445 finding above; unwired remains different from absent. The sibling
+EHCVM q02==1 gate and Mali's EAC-I group/zero ruling concern different
+questions. Treatment of No/unanswered s16b with amounts remains an explicit
+activation question, not a new inclusion rule. A concrete minimal wiring
+design and frozen synthetic controls are in =_/s16b-header-adapter-20261110.md=
+and =.coder/ledger/1483-mali-post-header-adapter-20261110.md=. Tests are UNRUN;
+no serving, native-source, cache or runtime acceptance follows from preparation.
