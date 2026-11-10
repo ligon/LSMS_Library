@@ -63,7 +63,8 @@ def owner(toy, monkeypatch):
     expected = pd.DataFrame({
         'i': pd.array(['h1', 'h2'], dtype='string'),
         't': pd.array(['2001', '2001'], dtype='string'),
-        'm': pd.array(['north', 'south'], dtype='string')}, index=[0, 2])
+        'm': pd.array(['north', 'south'], dtype='string')},
+        index=pd.RangeIndex(0, 4, 2))
     calls = []
     def produce():
         assert not path.exists()
@@ -218,14 +219,19 @@ def test_crosswalk_bad_cache_real_yaml_derivation_exact_persistence(toy, monkeyp
 
 @pytest.mark.parametrize('method', METHODS)
 def test_crosswalk_bad_private_candidate_keeps_later_source_precedence(toy, method):
-    path = bad(toy.data_dir / 'Json1468/_' / (method + '.parquet'))
+    path = toy.data_dir / 'Json1468/_' / (method + '.parquet')
     source = toy.root / '_' / (method + '.parquet')
-    expected = plant(source)
-    before = snapshot(source)
+    plant(source)
     toy.no_processes()
+    # The unchanged source-only public route supplies its normal full attrs
+    # and finalizer order; neither stored attrs nor the recovered answer is
+    # substituted for that independent existing-route oracle.
+    expected = toy.instance()._aggregate_wave_data(None, method)
+    before = snapshot(source)
+    bad(path)
     with pytest.warns(UserWarning, match='Unreadable managed cache'):
         got = toy.instance()._aggregate_wave_data(None, method)
-    _exact(got, expected.reorder_levels(['i', 't']))
+    _exact(got, expected)
     assert not path.exists() and snapshot(source) == before
 
 
@@ -275,9 +281,23 @@ def test_source_alias_and_declared_source_stay_strict(toy, owner, monkeypatch, k
         path.with_name(path.name + '.dvc').write_text('outs: []\n')
     before = snapshot(path)
     toy.no_processes()
-    with pytest.raises(L.ParquetFormatError):
+    source_calls = []
+    source_error = FileNotFoundError('invented declared source is unavailable')
+    if kind == 'declared-source':
+        def unavailable(p, **kwargs):
+            source_calls.append(str(p))
+            raise source_error
+        monkeypatch.setattr(L, '_ensure_dvc_pulled', unavailable)
+    error_type = (FileNotFoundError if kind == 'declared-source' else
+                  L.InTreeSourceError if route == 'location' and kind in
+                  ('symlink', 'resolved-overlap') else L.ParquetFormatError)
+    with pytest.raises(error_type) as got:
         c._location_lookup() if route == 'location' else c._aggregate_wave_data(None, 'panel_ids')
     assert snapshot(path) == before and not calls
+    if kind == 'declared-source':
+        assert got.value is source_error and source_calls == [str(path)]
+    else:
+        assert source_calls == []
 
 
 @pytest.mark.parametrize('method', METHODS)
