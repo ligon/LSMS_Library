@@ -8,20 +8,35 @@ independent review; merge to development only on green CI. Then write a
 concise durable hand-off. Existing explicit merge authorization supersedes
 the backlog skill's usual human-merge default. No master release follows.
 
-* Development and CI, 22:08 UTC
+* Development and CI, updated 22:36 UTC
 Development remains 16c3f4d9c28462dde7970718a4eed67394215997:
 79 verified development merges /45 whole issue closures in the campaign.
 PR1690 head cf5637114ed513b774ebae929e57f8252e8f4de2 is frozen.
 Synthetic b4af2c746910028962701b7f9f76ca862d9219a4,
 tree 8f6baf015305f6a38f3a1fb53d8a1bb862df23ee, parents [development,head].
-Ordinary42898422441 SUCCESS; full42898422484/job130117638507 RUNNING.
-Root monitor exec59230; do not restart the data suite.
+Ordinary42898422441 SUCCESS. Full42898422484/job130117638507 terminal
+FAILURE22:18:46, exact tested head/source. All steps through S3 gate and Uganda
+prebuild SUCCESS; full suite: 20396 tests,17543PASS,2FAIL,0ERROR,2851SKIP,
+0 unmapped. Safe public selectors: Nigeria
+tests/test_gh1460_yield_area_t.py::test_nigeria_yields_appear and Uganda
+tests/test_uganda_invariance.py::test_parquet_matches_baseline. Safe receipt:
+R/FULL-CI-FAILURE-SAFE-RECEIPT.json. No merge until both failures resolved,
+new reviewed source and exact fresh required checks green. Do not replay this
+failed head as though it passed; do not alter baseline/test to hide a defect.
+Lead independently diagnoses Nigeria's new PH Area rows against old PP remap
+test premise. Root independently rebuilt Uganda sample on exact H in private
+data root: 24561x9, pinned content hash 40c07c... EXACT in19.41s. The old
+shared11/04 L2 sample differs because it predates the11/04 baseline commit;
+that old-cache mismatch is NOT a CI diagnosis. Root is running a private
+Uganda Make build then complete baseline oracle to locate actual failure.
 R=burst/isa-sm-20261103/reports/1690-final-accepted-validation-20261110.
-After full success, retain only safe tested-source/JUnit/unit-checkout receipts,
-run R/preflight.py, refresh exact head/base/rules/checks, merge with expected
-head and verify actual merge parents/tree/development. Never save raw CI logs.
+After a corrected head's full success, retain only safe tested-source/JUnit/
+unit-checkout receipts. Update the prepared R/preflight.py's pinned IDs to
+the new head/base/synthetic/tree and run it, refresh exact checks/rules,
+merge with expected head and verify actual merge parents/tree/development.
+Never save raw CI logs.
 
-* GH1575 / draft1693 — deputy finish_1590
+* GH1575 / draft1693 — deputy finish_1575_recovered
 Exact baseline9f /candidate2f8dfc66a9710527a308dbc238b06808991aeb43.
 All9 actual metadata contexts in job41113367 CLOSED0/PASS (45–49s each).
 First baseline-Benin sample API entered once, failed before any raw getter,
@@ -34,6 +49,17 @@ Reuse closed metadata contexts by exact identity; require fresh actual-context
 identity and full country hash controls, without constructor replay for a badge.
 Existing finite normal plan remains in force; no new research or raw source.
 Earlier bootstrap/metadata/transport failures remain historical, not successes.
+Both v10 trees passed 4Country actual sample hash metadata controls with
+38 finite optional absence probes/tree, CLOSED0 and no data. Manager independently
+admitted v11 finite operator at R/review-1575-v11-finite-operator-20261110/
+ADMISSION.json; Slurm41120381 FAILED1/4m32 after BOTH new preflights PASS. First
+baseline-Benin cold API entered1 and failed before native getter/producer/
+writer/capture. DVC `Repo` tried its optional absent `.dvc/config.local` path,
+denied by source observer; no records decoded. Deputy traced the complete DVC
+Config levels and prepared finite read-only active-loader absence guard v12,
+manifest56ba2535. Local both-tree guarded metadata-only control and manager
+independent review precede another bounded normal allocation. Earlier failed
+Benin API entries: one in v8 plus one in v11, both zero native.
 After actual acceptance, align1693 with merged1690, conserve four-country source
 and accepted evidence, combine shared812 tests and append approved1531 notes.
 Private factual1531 child4d00179d9929ea0f1b0c28050f9130e07ad8376b is approved;
@@ -57,6 +83,13 @@ mapping provide independent oracle; preserve original1196 typed/bit evidence.
 Lead/manager own routine operator adaptation, independent review and execution
 under this grant; no further Root per-file gate. Then perform only necessary
 scoped serving validation and reviewed PR/full CI to finish the existing issue.
+Actual one-source native v2 PASSED after a v1 setup failure0native/0capture.
+SourceH0c18d55/cc408, manifest57655513: 1 real getter/return, 1 unchanged
+driver writer spy, 3 sealed private captures, 77242 raw/transport rows and
+9368 selected rows. Strict frame/attrs/axes/native amount bits exact. Code29
+unobserved; no all36 golden. Receipt at R/1483-senegal-one-source-native-
+correspondence-20261110/ACTUAL-RESULT.json. Country/Feature/parquet/cache
+remain unverified; lead owns minimal serving closure and PR.
 
 * Malawi1190 — manager /implementation41114363
 All three user decisions answered, central decision commit639e428e6:
@@ -69,8 +102,11 @@ unit, application, factor, payer, transport or weight inference.
 Current first/second gates and gift admission unchanged; recorded0/negative
 within those gates retained. H36 requires a recorded amount/native crop, no
 H34-Yes gate. Header-binding contradictions remain documented and unresolved.
-Implementation41114363 /dispatch6a83d8f670524ce786d61ae1a3259f44 RUNNING on
-exact reviewed Hcf563, source/pure only. Independent review follows. No new
+Implementation41114363 /dispatch6a83d8f670524ce786d61ae1a3259f44
+COMPLETED0 after26m06, final private b686a3c69792b57b3aa83c2d58110611c39d7739.
+Manager independently admitted source/focused-pure review; 89 distinct latest
+cases PASS across v1-v6 (not one fresh89-pass run). Source/native/API/cache/CI
+remain unrun. No new
 raw/native/API campaign until its finite already-managed-source plan is concrete.
 Consumer regression must prove no invented planted amount/application in
 seed_kg/nitrogen_kg/fertilizer_rate; minimally necessary new-role handling only.
