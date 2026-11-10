@@ -6874,6 +6874,7 @@ class Country:
                         if not outputs:
                             return False
                         paths = []
+                        output_tables = set()
                         for out in outputs:
                             if getattr(getattr(out, 'fs', None), 'protocol', None) != 'local':
                                 return False
@@ -6903,8 +6904,39 @@ class Country:
                                     or (source.exists() and path.exists() and path.samefile(source))):
                                 return False
                             paths.append(path)
+                            output_tables.add(path.stem)
+                        # The Make closure omits already-hashed inputs. Request
+                        # its complete source set, and keep explicit YAML files
+                        # even when their names resemble a managed cache.
+                        _, raw_sources = self._make_declared_inputs(
+                            method_name, _extra_tables=output_tables - {method_name},
+                            _with_sources=True)
+                        raw_sources = set(raw_sources)
+                        for table in output_tables:
+                            for wave in self.waves:
+                                owner = self[wave]
+                                block = owner.resources.get(table)
+                                if block:
+                                    raw_sources.update(
+                                        Path(os.path.normpath(owner.file_path / 'Data' / ref))
+                                        for ref in _collect_file_paths_from_block(block))
+                        declared = set()
+                        for source in raw_sources:
+                            declared.update((source.absolute(), source.resolve()))
+                            try:
+                                projected = root / self.name / source.relative_to(self.file_path)
+                            except ValueError:
+                                continue
+                            declared.update((projected.absolute(), projected.resolve()))
+                        if any(path in declared or path.resolve() in declared for path in paths):
+                            return False
                         return (Path(lexical).absolute() in paths
                                 and Path(lexical).resolve() == info.output_path)
+
+                    def all_output_identities(info):
+                        return tuple((os.path.abspath(out.fs_path),
+                                      output_identity(Path(out.fs_path)))
+                                     for out in loaded_by_ref[info.stage_ref].outs)
 
                     def collect_stage_outputs(stage_list, proven_stage_refs):
                         nonlocal strict_stage_read_failure
@@ -6938,15 +6970,17 @@ class Country:
                                                and stage_owns_outputs(stage))
                                 try:
                                     if recoverable:
+                                        admitted_outputs = all_output_identities(stage)
                                         df_wave, error, observed = _read_managed_parquet_cache(
                                             output_path, check_null=True, engine='pyarrow')
                                         if error is not None:
                                             identity = (observed.st_dev, observed.st_ino, observed.st_size,
                                                         observed.st_mtime_ns, observed.st_ctime_ns)
                                             if (observed.st_nlink > 1 or not stage_owns_outputs(stage)
-                                                    or output_identity(output_path) != identity):
+                                                    or output_identity(output_path) != identity
+                                                    or all_output_identities(stage) != admitted_outputs):
                                                 raise error
-                                            unreadable_refs[stage.stage_ref] = (identity, error)
+                                            unreadable_refs[stage.stage_ref] = (identity, error, admitted_outputs)
                                             rejected_stage_outputs[output_path] = identity
                                             proven_stage_refs.discard(stage.stage_ref)
                                             continue
@@ -7059,11 +7093,16 @@ class Country:
                                 if recovery_only and not force:
                                     continue
                                 if force:
-                                    identity, error = unreadable_refs[info.stage_ref]
+                                    identity, error, admitted_outputs = unreadable_refs[info.stage_ref]
                                     if (not stage_owns_outputs(info)
-                                            or output_identity(info.output_path) != identity):
+                                            or output_identity(info.output_path) != identity
+                                            or all_output_identities(info) != admitted_outputs):
                                         strict_stage_read_failure = True
                                         raise error
+                                    warnings.warn(
+                                        f'Unreadable managed stage cache {info.output_path} '
+                                        f'({error!r}); rebuilding once through {info.stage_ref}',
+                                        UserWarning, stacklevel=3)
                                     recovery_attempted_refs.add(info.stage_ref)
                                 attempted_refs.add(info.stage_ref)
                                 proven_stage_refs.discard(info.stage_ref)
