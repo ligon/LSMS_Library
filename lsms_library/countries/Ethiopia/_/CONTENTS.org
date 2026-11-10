@@ -4873,3 +4873,50 @@ Evidence: =B/reports/1570-w5-questionnaire-cell-authority-20261110/=;
 B is the burst root recorded in =.coder/ledger/1570-w5-questionnaire-authority.md=.
 No macro/formula execution, external-link fetch, dependency install, native
 header/rows, Country/Feature, API/producer/cache or test/census run occurred.
+
+* 2026-11-10 -- Own W5 PH harvest/disposition wording (GH #1570, documentary)
+
+The preceding PH-reader gap is now closed for the same authenticated resource
+78628 bytes, using a separately authorized private read-only engine. The old
+xlrd failure and partial HH/PP inspection remain dated evidence, not deleted.
+This W5 PH workbook has seven worksheets, including sections9/10/11 and no
+section12-named worksheet. That is not absence of perennial-harvest questions.
+
+=SEC 9- Harvest by field!A1= says "INCLUDE TREE/ROOT CROPS". =C4= copies
+all post-planting crops/fields. Parcel/field IDs are =A4/B4=; Q5 (=H4/H8:I8=)
+asks harvested quantity with its unit, while Q6 (=J4/J8=) separately requests
+estimated kilograms when Q5 uses a nonstandard unit. =G7= specifies permanent
+crop harvest between March10,2021 and March9,2022. These printed rungs do not
+identify a released variable or authorize a conversion/attachment rule.
+
+=SEC 11 - Crop Disposition!A1= prints September11,2021--March9,2022 for
+temporary crops and March10,2021--March9,2022 for permanent crops. Q2 (=C3=)
+asks the last completed tree/fruit/root production period with the printed
+annual interval when no particular period exists; =C6/E6= mark "EC YEAR".
+Q3 (=G3/G6:H6=) asks total harvested amount over the last twelve months,
+with quantity/unit boxes. Keep that wording and the header windows together;
+no uniform crop-window interpretation or reconciliation is selected here.
+
+W5 section11 Q11 (=Q3/Q6:R6=) separately asks sold quantity/unit, and Q12
+(=S3/S6=) total sales value including in-kind payments, with one Birr box.
+Thus W5 Q3 is a harvest question; it must not be substituted for W1 section11
+Q3's sold role or W1 section12 Q3 merely by matching a question number.
+No decimal/cents scale or missing-component instruction was found in the
+inspected PH currency text. W1 released BIRR-Decimal representation and
+blank-component questions remain unresolved; single Birr boxes do not fix them.
+
+PH =Cover Sheet!X9/AB9= again separates household/holder; its HH roster
+=F4= asks for a separate agriculture questionnaire per holder. W5 HH
+=Sect12C Basic Ag (Crop)!A1= is for all urban EAs and rural EAs outside the
+main agriculture survey, not the PH perennial module. The preceding literal
+2014-Meher/2021/22 observation is NOT a contradiction or calendar-policy hold:
+nearby HH/PP date headers do not specify the calendar, and PH explicitly uses
+EC-year fields. No automatic year correction or new maintainer decision follows.
+
+Source: same PH SHA256=507a37b781aee277baf3d476f1e1249d8836978dc41350380c44754a3bc10e16=.
+Exact sheet/cell excerpts and engine/source receipts are in
+=B/reports/1570-w5-ph-calamine-capability-20261110/= (B as in the task ledger).
+This is public-instrument authority only: no fielded CAPI/GUID/v03-export
+bridge, actual released-row/column compliance, W1 coverage explanation,
+scientific/default/weight change or whole GH1570/GH650 closure is established.
+No native source/header/rows, API/producer/cache, test or census ran.
