@@ -36,7 +36,7 @@ class InventedWave(Wave):
         return super().grab_data(request, _with_origin=_with_origin)
 
     def _fresh_script_parquet(self, request, candidates):
-        return None  # invented cache provider; never consult an on-disk cache
+        return None, None, False  # invented cache provider; no on-disk cache
 
 
 class InventedCountry(Country):
