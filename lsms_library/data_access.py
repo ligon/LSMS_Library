@@ -1324,13 +1324,20 @@ def _documentation_html(html: str, catalog_id: str) -> list[dict]:
             self.items = {}
             self.titles = {}
             self.title_id = None
+            self.resource_depth = 0
 
         def handle_starttag(self, tag, attrs):
             a = dict(attrs)
-            if tag == 'div' and 'resources' in (a.get('class') or '').split():
-                self.recognized = True
-            if tag == 'span' and 'resource-info' in (a.get('class') or '').split():
+            if tag == 'div':
+                if self.resource_depth:
+                    self.resource_depth += 1
+                elif 'resources' in (a.get('class') or '').split():
+                    self.recognized = True
+                    self.resource_depth = 1
+            if tag == 'span' and self.resource_depth and 'resource-info' in (a.get('class') or '').split():
                 self.title_id = a.get('id')
+                if not re.fullmatch(r'\d+', self.title_id or ''):
+                    raise ValueError('Malformed catalog resource identity')
                 self.titles[self.title_id] = ''
             if tag != 'a' or 'download' not in (a.get('class') or '').split():
                 return
@@ -1338,6 +1345,8 @@ def _documentation_html(html: str, catalog_id: str) -> list[dict]:
             match = re.search(r'/catalog/' + re.escape(catalog_id) + r'/download/(\d+)(?:/|$)', href)
             ddi = href.rstrip('/').endswith(f'/catalog/{catalog_id}/pdf-documentation')
             if not match and not ddi:
+                if self.resource_depth:
+                    raise ValueError('Malformed catalog resource download link')
                 return
             rid = match.group(1) if match else 'ddi'
             row = dict(resource_id=rid, filename=a.get('data-filename'),
@@ -1355,11 +1364,15 @@ def _documentation_html(html: str, catalog_id: str) -> list[dict]:
         def handle_endtag(self, tag):
             if tag == 'span':
                 self.title_id = None
+            if tag == 'div' and self.resource_depth:
+                self.resource_depth -= 1
 
     parser = Resources()
     parser.feed(html)
     if not parser.recognized:
         raise ValueError('Unrecognized Related Materials resource layout')
+    if parser.resource_depth or not set(parser.titles) <= set(parser.items):
+        raise ValueError('Incomplete Related Materials resource blocks')
     if any(not row['generated_ddi'] and not re.search(r'\b(?:doc|data)/', str(row.get('type') or ''), re.I)
            for row in parser.items.values()):
         raise ValueError('Unrecognized Related Materials resource type')
@@ -1540,18 +1553,22 @@ def fetch_documentation(country: str, wave: str, catalog_id: str, *,
                     if dest.exists() and not same and (old.get('path') != name or hashlib.sha256(dest.read_bytes()).hexdigest() != old.get('sha256')):
                         raise ValueError(f'Unowned or changed held document: {name}')
                     sidecar = dest.with_name(dest.name + '.dvc')
-                    if sidecar.exists() and old.get('path') != name:
+                    if sidecar.exists():
                         # A matching workspace copy cannot certify a different
                         # unowned held sidecar. Verify the declared holding too.
                         import yaml
                         from dvc_data.hashfile.hash import fobj_md5
-                        outs = yaml.safe_load(sidecar.read_text()).get('outs', [])
-                        if len(outs) != 1 or 'md5' not in outs[0]:
+                        declaration = yaml.safe_load(sidecar.read_text())
+                        outs = declaration.get('outs') if isinstance(declaration, dict) else None
+                        if (not isinstance(outs, list) or len(outs) != 1
+                                or not isinstance(outs[0], dict) or 'md5' not in outs[0]
+                                or outs[0].get('path') != name):
                             raise ValueError(f'Unrecognized document sidecar: {name}')
-                        algorithm = 'md5' if outs[0].get('hash') == 'md5' else 'md5-dos2unix'
-                        with staged.open('rb') as src:
-                            if fobj_md5(src, name=algorithm) != outs[0]['md5']:
-                                raise ValueError(f'Unowned differing document sidecar: {name}')
+                        if old.get('path') != name:
+                            algorithm = 'md5' if outs[0].get('hash') == 'md5' else 'md5-dos2unix'
+                            with staged.open('rb') as src:
+                                if fobj_md5(src, name=algorithm) != outs[0]['md5']:
+                                    raise ValueError(f'Unowned differing document sidecar: {name}')
                     plan.append((staged, dest, row, same))
                 # Validate the entire successful membership before placement.
                 for staged, dest, row, same in plan:

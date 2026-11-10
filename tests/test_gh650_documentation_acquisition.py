@@ -146,6 +146,27 @@ def test_unknown_resource_types_are_discovery_failure_not_not_listed(docs, where
     assert all('/api/resources/' in u or u.endswith('/related-materials') for u in docs['calls'])
 
 
+@pytest.mark.parametrize('broken', ['empty-href', 'wrong-catalog', 'missing-link', 'unclosed-block'])
+def test_incomplete_known_html_resource_is_not_successful_empty_listing(docs, broken):
+    docs['api'] = urllib.error.URLError('API unavailable')
+    href = '' if broken == 'empty-href' else '/catalog/20/download/11' if broken == 'wrong-catalog' else '/catalog/10/download/11'
+    link = '' if broken == 'missing-link' else f'''<a class="download" data-filename="own.pdf"
+        data-dctype="Document [doc/qst]" href="{href}"></a>'''
+    close = '' if broken == 'unclosed-block' else '</div>'
+    docs['html'] = '<div class="resources"><span class="resource-info" id="11">Own form</span>' + link + close
+    report = fetch()
+    assert report['status'] == 'discovery_failed' and not report['resources']
+    assert not docs['pushes'] and len(docs['calls']) == 2
+
+
+def test_genuine_empty_html_and_unrelated_catalog_export_links_stay_empty(docs):
+    docs['api'] = urllib.error.URLError('API unavailable')
+    docs['html'] = '''<a class="download" href="/metadata/export/10/ddi"
+        data-filename="metadata-10.xml" data-dctype="metadata"></a><div class="resources"></div>'''
+    report = fetch()
+    assert report['status'] == 'not_listed' and not report['resources'] and not docs['pushes']
+
+
 def test_download_failure_preserves_old_held_bytes_and_receipt_identity(docs):
     first = fetch(push=False)
     before = (docs['directory'] / 'questionnaire.pdf').read_bytes()
@@ -242,6 +263,29 @@ def test_document_revision_atomic_replace_preserves_hardlinked_old_blob(docs):
     report = fetch(push=False)
     assert report['status'] == 'complete' and document.read_bytes() == b'new public document bytes'
     assert blob.read_bytes() == original and document.stat().st_ino != blob.stat().st_ino
+
+
+@pytest.mark.parametrize('workspace', [False, True])
+@pytest.mark.parametrize('raw_hash', [False, True])
+@pytest.mark.parametrize('declared_path', [None, 'foreign.pdf', '../foreign.pdf'])
+def test_sidecar_must_declare_exact_own_document_path(docs, workspace, raw_hash, declared_path):
+    directory = docs['directory']; directory.mkdir(parents=True)
+    document = directory / 'questionnaire.pdf'
+    sidecar = document.with_name(document.name + '.dvc')
+    declaration = 'outs:\n- md5: ' + hashlib.md5(b'%PDF invented').hexdigest() + '\n'
+    if raw_hash:
+        declaration += '  hash: md5\n'
+    if declared_path is not None:
+        declaration += f'  path: {declared_path}\n'
+    sidecar.write_text(declaration)
+    if workspace:
+        document.write_bytes(b'%PDF invented')
+    before = sidecar.read_bytes()
+    report = fetch()
+    assert report['status'] == 'incomplete' and not docs['pushes']
+    assert sidecar.read_bytes() == before and document.exists() == workspace
+    if workspace:
+        assert document.read_bytes() == b'%PDF invented'
 
 
 def test_atomic_receipt_failure_preserves_previous_receipt(docs, monkeypatch):
