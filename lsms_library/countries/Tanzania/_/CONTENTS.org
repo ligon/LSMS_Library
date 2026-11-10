@@ -3175,7 +3175,7 @@ public evidence, not an active map (=1441_PUBLIC_AUTHORITY_ROUTE.md=). This
 expands the earlier bounded statement “no document scanned lists the codes”.
 It does not settle the specific original-cover-to-UPD =ha_01_1/ha_02_1= bridge:
 UPD BID6–7 describes recoding, and p.6 says response codes “will not necessarily
-correspond to each original round-specific response code”. Exact fielded
+correspond to each original round-specific response code value.” Exact fielded
 revision beyond the published resource metadata also remains qualified.
 
 The parent SOURCE still identifies UPD3814 and its CATALOG_COVERS unchanged;
