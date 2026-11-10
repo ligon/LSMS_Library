@@ -91,13 +91,31 @@ country documentation if a supported finding is genuinely missing. Preserve
   established by these admitted sources; none has a tracked W5 sidecar.
   The restoration commit explicitly excludes questionnaires (.xls/.xlsx),
   manual and report. W4 questionnaires cannot substitute for W5.
-- Next bounded unit proposed once in the absolute channel: ROOT admission
-  for one catalog-6161 Related Materials metadata inventory, confined to W5
-  household and agriculture PP/crop-cut/livestock and PH instrument roles;
-  capture exact IDs/names/formats/language/version, reject W4 and ambiguous
-  matches, and stop before downloads or parsing. Then propose exact named
-  restoration/read operands separately. No acquisition/parse is authorized
-  or needed to finish this preparation. Shared #650 automation stays ROOT's.
+- ROOT's absolute steering clarification confirmed public WB6161 Related
+  Materials metadata/resource inventory was already authorized. It ran
+  without another approval request: one public HTML page, web rendering plus
+  a direct HTML GET to capture filename attributes. No download/preview link
+  was followed. An attempted resources API metadata URL gave HTTP400
+  `IDNO-NOT-FOUND`; it supplies no resource identity and is retained as failed.
+- Exact immediate restoration candidates now identified: household 78626,
+  `esps_w5_hh_questionnaire_english.xls`; PP/crop-cut/livestock 78627,
+  `esps_w5_post_planting_crop_cut_livestock_questionnaire_english_final.xlsx`;
+  PH 78628, `esps_w5_post_harvest_questionnaire_english_final.xls`. All list
+  English. Household subtitle is `Form ESS5-H (21/22)`; agriculture is
+  `Form ESPSAGSS/(21/22)`. No explicit questionnaire date/version is listed.
+  Catalog data release v03_M and filename `final` are not document versions.
+- Additional metadata identities: community 78629 (XLSX), combined manual
+  78631 (PDF, 2022-03), report 78643 (PDF, 2023-09), already-held BID 78630
+  (PDF, 2023-12). Generated DDI filename/endpoint has no resource ID; tax
+  report 98963 is separate. Full exact titles/filenames/metadata locators and
+  fields are sealed in private `sources/wb6161-resource-inventory.json`.
+- Finite next restoration/read proposal: only 78626/78627/78628 under the
+  named filenames; obtain a separate binary/acquisition grant before any
+  retrieval, hashes, managed-source placement or workbook parsing. The first
+  later read should inventory sheet identities, not guess sheet/question
+  coordinates. Other named documents are separate residuals; BID is already
+  delivered. No binary operation is authorized/implied by the metadata grant.
+  Shared #650 automation stays ROOT's.
 - Fresh full issue/all-comment reads: #1570 (0), #833 (2), #1457 (1),
   #1485 (0); #587 (1), #650 (0). All six open issues have no assignee.
   Two read-only open-PR searches (`Ethiopia`, `650`) return no results;
@@ -110,7 +128,8 @@ country documentation if a supported finding is genuinely missing. Preserve
   controls reused as source evidence. No test execution claimed. Historical
   PR's unrelated single full-suite failure remains historical failure.
 - **OK (§3/§4):** append-only country documentation commit `7bb0eded3` adds
-  64 lines; all 298,522 original bytes / 4,700 lines are an exact prefix.
+  64 lines; the later metadata documentation refines only this task's suffix.
+  All 298,522 original bytes / 4,700 lines remain an exact prefix.
   No executable/schema/map/weight/eligibility or other-country edits.
 - **OK (§4):** inspected `make api-audit` completed, exit 0, using a private
   wrapper with `/usr/bin/python3.12 -I -B -S`: stdlib AST/text/Git metadata
@@ -119,8 +138,9 @@ country documentation if a supported finding is genuinely missing. Preserve
   All 15 full frontmatter descriptions are retained in private evidence.
 - **OK (§4/§6):** no runtime mount/import, test, native/header/row/PDF/workbook
   parse, provider/acquisition/cache/producer operation, source/public push,
-  nested agent or GitHub mutation. Read-only GitHub bodies/comments and
-  existing ordinary reports are the only external-source research.
+  nested agent or GitHub mutation. Read-only GitHub bodies/comments,
+  existing ordinary reports and the explicitly admitted WB6161 public
+  resource-identity metadata are the external-source research.
 - One attempted evidence receipt save exceeded argv size and failed before
   process creation; the successful replacement saves public metadata/body/
   comments and omits the oversized diff, reviewed instead in local Git.
