@@ -17,3 +17,6 @@ Reuse existing data recipe verbatim. Add only event classification and exact che
 
 ## §6 Verification boundary
 Freeze source and finite pure control selection before execution. Controls exercise actual inline event function and checkout predicate with invented JSON/SHA tuples; source controls pin routing/concurrency/fail-closed placement and existing recipe preservation. No imports/tests/collection/data/providers/credentials/workflow triggers yet. ROOT reviews source and execution plan first.
+
+## Source correction charter — 2026-11-09
+Independent source review of e84a18cb found nested title/body `from` values were not typed, allowing malformed invented edits into metadata success. ROOT authorized a separate source-only child: extend the existing inline gate (no parser framework), exact known text-change shape, title string and body string/null, plus declared GitHub retarget shape validation after primary source inspection. Preserve null body, ready/fork/draft/checkout/recipe/concurrency controls and policy A. Original source and independent REQUEST_CHANGES packet remain immutable. Search tier: rg/Git and primary GitHub/Octokit source documentation; inherit STANDING.md without new data machinery. Freeze source/tests/control plan before any imports, collection or pure execution; actual Actions/admin wiring remains unproven and ROOT-owned.
