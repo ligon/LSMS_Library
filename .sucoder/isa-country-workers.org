@@ -1,4 +1,22 @@
 #+title: Current LSMS-ISA worker queue
+* Actual checkpoint (2026-11-10 04:26:22 UTC)
+ALL5new remotes CLOSED native0/supervisor0/completed; watchers69898/51769 closed.
+Zero remote running. Current local work:
+- finish_1590: BFAf4fb408,43distinct pure across qualified runs; actual one-source
+  native60751 PASS,70994raw→12223explicitYes applications, typed projections/
+  source conservation0denials. NOT publicAPI/serveddata acceptance. Mali2028434/
+  fixturea33d,53distinct pure49+4; two-source nativevalidation preparation next.
+- Root: batch83ddab2e8, six reviewed1680–1685 heads,60disjoint exact paths+ledger,
+  not yet onGitHub. Full932data42748441466 stillLIVE at04:20. Final1683/1685
+  ordinaryCI nowSUCCESS. Queue/review/integration remains Root-owned.
+- finish_1452:1071 C/common correctedsource, new28-case actor72843 LIVE;
+  D remains separateprototype, no complete1071claim.
+- malawi_revision_food: independentC/Dreview and650 implementation875569378;
+  mocked finite cohort34461 LIVE, no realdownloads/push/acquisition.
+Uganda boundedown-doccheck found no attributable map. Tanzania ownoriginal
+lists found, original-to-UPD bridge unknown; no inferred labels. Details:
+[[file:handoff.org]]. Older running observations below are superseded.
+
 * Six country lanes active — 2026-11-10 03:34 UTC
 FIVE actual remote agent_execution/running, n0030/fresh/nonstale:
 BFA1483job41082011; Mali1483job41082012; Malawi1281job41082066;

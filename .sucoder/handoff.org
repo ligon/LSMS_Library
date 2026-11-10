@@ -1,5 +1,5 @@
 #+title: Current LSMS-ISA goal handoff
-* Current state (2026-11-10 04:12:23 UTC)
+* Current state (2026-11-10 04:26:22 UTC)
 Goal ACTIVE. Previous two goal turns made concrete progress, not just waits.
 Development remains4381d701ffb06ab447a37c66362119d1c1e23009;
 78 verified development merges /42 whole closures. No new merge this cycle.
@@ -44,8 +44,17 @@ and meaningful controls. Root read full185line helper/wrapper/config. Initial
 P2: validated all rows before applied-only filter; malformed nonapplications
 could abort positives. Corrected private599f39d993ea5730f9c5d534a36cd8541511137f
 selects native q02==1 first, retains full raw adapter and selected-row guards.
-Actual whole authored pure-module actor41374 was LIVE at last observation;
-finish_1590 owns it. No pass count assumed. Own supplementary header46874
+Pure history:41374 first1PASS/41setupERROR (fixture receiver allowlist omitted
+actual format_id local tail); fixture child then39PASS/2FAIL. Real nullable
+Int64 map-card key bug (2.0 vs '2') fixed by integral key spelling; pandas3
+fixture assignment fixed separately. Finalf4fb4080922652d05d4b0dfae3bfecf474893318
+targeted85661 PASS3 (two failures+one new),0denials/private0/exact3IDs.
+43distinct across qualified runs, not fresh43green. Native60751 CLOSED0:
+ONE sanctioned full getter,70994 own source rows→12223 explicitYes applications;
+actualdriver/cards/maps/countryi, exact typed projections, source/RAM/attrs and
+private0400copy seals PASS,0guarddenials/3identities/privateconfigdata0.
+R/review-1483-bfa2021-native-adapter-20261110. Adapter acceptance only, not
+public API/data-CI/served-row claim. Own supplementary header46874
 closed0/one metadata-only context: q09c='16B.09c. Montant', int32/%6.0f;
 q09a combined wording+q09b own unit justify purchase binding. No rows read.
 R/1483-bfa2021-purchase-header-supplement-20261110 manifest a4cb1a72… .
@@ -65,8 +74,15 @@ own wrappers/applied HH inputs, six optional native fields; DAP catch-all litera
 s16b_applied_candidate calls strict full raw adapter before q02==1. Root directed
 1590 to select public positives first while retaining standalone raw strictness,
 layout validation, attrs/order and selected-key refusals; add hollow nonapplication
-controls. No Mali pure/native run yet. Root will review exact child before a
-two-source native grant. Existing Mali crop taxonomy/shared NPK policy already
+controls. Root source-qualified corrected2028434ec94c2b4edb1954f16af4d6c59b742293.
+Actual53pure:49PASS/4fixtureFAIL (nullable masks and unrelated!make loader).
+Fixture-onlya33d6a337d2bc14dc7be45d3703e78e34c2e9ae4 targeted4PASS,0denials/private0/
+exact3IDs;53distinct across49+4, not fresh53green. TWO finite native adapter
+reads authorized:2018 MD54c5a9f33e93b9f7655fdee856cbe8fc7/643645B and2021
+MD5673cc63eb5afdf3dc45931d81e867538/3722722B; same guard/private/custody/typed
+independent predicate/own-header-card scope asBFA, no Country/API/factors.
+1590 preparing this after BFA's completed native actor; no Mali native result.
+Existing Mali crop taxonomy/shared NPK policy already
 in force; do not invent new grade approval. Future merge overlaps country-doc
 CONT/data_scheme/docstrings; Root must preserve facts and rewrite final comments
 coherently, not blindly choose either whole leaf.
@@ -112,11 +128,11 @@ ordinaryCI42733945117 SUCCESS;6 inert pure PASS, no native/performance claim.
 optimization;85unique pure PASS, strict saved-native4comparisons across qualified
 partial+continuation; no decoder/fullAPI/seed/speed claim. CI42746450162 SUCCESS.
 1683 DRAFT UPDATED ed1f7e540b7144bd71ddd97280311e552989f97d,1032+core/A+B1071,
-newCI42751181001 LIVE at last poll. Olde5d CI42748736508 SUCCESS is historical.
+newCI42751181001 SUCCESS. Olde5d CI42748736508 SUCCESS is historical.
 1684 DRAFT76a5ad68723a20edfa147360b98247dafa593344, BFA/Mali/Uga authority docs,
 CI42743739327 SUCCESS;41country/80Maliwave fingerprint changes, no BTF/FIF.
 1685 DRAFT UPDATED29576ee29ed0a1fedae15e05d6fa5949c9d5ed7b, archive+document ETH
-W5HH/PP/PH; newCI42751666056 LIVE. Old7fd CI42748577030SUCCESS historical.
+W5HH/PP/PH; newCI42751666056 SUCCESS. Old7fd CI42748577030SUCCESS historical.
 All remain unmerged pending final data acceptance; no master release.
 
 * 1071 core/A+B accepted, C/D ongoing
@@ -131,15 +147,29 @@ actor61176 CLOSED0/132.307s:452country/1885wave/37BTF/0FIF changed vs authentica
 privateconfig/data[]. Root directly checked actualJSON and digest (initial own
 observer compared[]to0, corrected without census replay). R/1071-ab-ci-integration-
 metadata-20261110 manifestd9949acd… and ROOT-ADMISSION.json. No shared rewarm.
-C prototype72b94bb7d6238c67e68b8cdfc941970ab304858d offed1f, author Wfix-1071-
+C initial72b94bb7d6238c67e68b8cdfc941970ab304858d offed1f, author Wfix-1071-
 private-make-cache-owners-20261110. Reviewer found hardlink/raw-private-L1 alias
-P2; author confirms normal staging usescopy2 so multi-link entries need no heal
-right. Correct observed/current nlink guards in C AND common reject helper are
-in progress; no runtime cleared yet. Preserve healthy reads and strict raw/fresh
-errors, no L1scan. Mwi review R/review-1071-private-make-owners-20261110.
+P2; normal staging usescopy2. Corrected common/C7973752 and finaltest
+fc0b371364482ffa93b3ba0222deaf9ba4f65bd7 SOURCE/CONTROL qualifiedPASS byMwi.
+Exactlynew28case pure actor72843 ACTUALLY LIVE at lastauthor observation;
+existingprivate/MAIN/unmappednet/thread1/build1/n2loadfile. No runtime PASS yet.
+Observed/current nlink guards preserve healthy reads and strict source/fresh
+errors, no L1scan. R/review-1071-private-make-owners-20261110.
 D retired-stage prototype still separate/not accepted. Do not call1071 complete.
 650 design also must handle proven resources API400/IDNO-NOT-FOUND with Related
 Materials fallback; an API-only resource loop does not solve the known W5 case.
+Root accepted the compact650 engineering design. Mwi implementation Wfix-650-
+managed-documentation-acquisition-20261110 offed1f, ledger-first59ab71fe4, frozen
+source/tests875569378f1d1569bbec5804dc369ad5008c6d9d. Publicdata_access.fetch_documentation
+(country,wave,catalog_id,*,push=True,remote=None), default best-effortadd_wave
+adjunct plusdocumentation=False; atomicGit-managedDOCUMENTS-{catalog_id}.json.
+Raw list/HELD/completion/push unchanged; explicit discoveryfailed vsrecognizedempty,
+held/local-only/pushed/failure states, RelatedMaterialsfallback/collisionchecks.
+Root authorized finite mocked+necessary raw-provenance/acquisition companions;
+unrelated raw fixtures stubadjunct, actualurllib/publisher deniedbeforemocks.
+Actual34461 cohort LIVE, author owns terminal; NO real downloads/acquisition/push,
+newdependencies or sharedconfig changes. R/650-managed-documentation-implementation-
+20261110. C/D independent-review priority remains. No extra approval loop needed.
 
 * Reviewed integration batch prepared (not yet on GitHub)
 W=/local/job40825266/worktrees/integrate-isa-reviewed-batch-20261110;
