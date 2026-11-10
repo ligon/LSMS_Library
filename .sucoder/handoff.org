@@ -1,4 +1,50 @@
 #+title: Current LSMS-ISA coordinator handoff
+* LATEST update (2026-11-10 12:06 UTC)
+This update supersedes the 11:55 live statuses below. Goal remains ACTIVE.
+- Metadata60610 now CLOSED0: exactpredicted42country/147wave/0BTF/0FIF, unchanged
+ 452/1903/37/186keysets, all14nonhashfields equal,18Noneunchanged, both0errors/
+  denials/private0. Baseline134.309s/candidate136.284s. R1687-repair-union-d47-55de-
+  metadata-20261110 manifest a5a42cb3431c98508cd2ce0f3ed5cac08d704e12e92bc2c74b03304f0c7cadba/26.
+- New REAL Mali GH1494 plot_inputs failure in still-running original11: !make
+  wave declarations are truthy{materialize:make}, enter Wave YAML extraction,
+  column_mapping idxvars=None fails before any served-frame/namespaceassertion.
+  Manager E at CI/workers/Mali-Remaining111687/4bcde286687d47998e9e5822dd9d2cc1/
+  evidence/PLOT-INPUTS-REFUSAL.md; 1590 independentprimarydiagnosis sealed
+  R1494-mali-wave-make-routing-source-diagnosis-20261110 manifest e7d0dbdf… .
+  OnlyTWO actualwave !make tags exist repositorywide; all classificationconsumers
+  consistently support explicitnull+scriptdiscovery. ROOTAPPROVED local1590newW
+  fix remove exactlytwo !make tokens (Mali2018/2021), keep countrymaterializeMake,
+  scripts/framework/schema/science/all1494assertions exact. Updateold1483pure
+  literalmarkercheck to semanticloader/script-route proof; meaningfulpurewarm/
+  cold/failure/classification controls. Implementation/purepending. Futureone
+  correctedactualplot_inputs test plan uses old46closure with LEGITsample8source
+  rebuild, because YAML edits invalidateMali samplehash; no oldcachecurrentclaim.
+  Original11d47actor continuesunchanged; reportedHHroster,food_coping,plot_labor
+  passes+plot_inputs266.71sfailure are partial, finalotheroutcomes pending.
+- Ghana priororiginalbody FAILEDValueError beforeN/D/K with lostexceptiontext;
+  causeUNPROVEN,0decoderRETURNS doesnotmean0rawbytes (read_file reads DAT first).
+  Rootread exactexternal DAT observerPath.resolve() patch+PYTHONPATH/JUnitroot
+  fix and ADMITTED onefresh exactoriginalcase900s/same16managedinputs/finitecaps/
+  safeexceptionframecapture, no source/test/oracle changes. Managerdispatchnext.
+- Niger correctedFIVE newjob41090249/511dac26804c472e943617bb12cd384a submitted,
+  source222b198d; old4plannedbecame5toexercisechanged2014NPK method too. Native
+  rawreadcap26/currentwarmgates/old26closure, no correctedPASSclaim yet.
+- Nigeria97e newDEFAULT call RETURNED56403rows/486.252s with11activeprofiles,
+ 85getters82Stata10producers12writers0denials, genuine sampleRETURNsealed;
+  outeractor48097 CLOSED1/514.074s afterADDITIVEdiagnostic called binary_typed
+  helperunary. No productfailure, originalchecksreceipt absent/failedactorretained.
+ 0ownedremainingPGID3558741. RootreadactualGH1196typed17–33; admitted external
+  signaturefix+ONLYunexecutedclosedoutput/footercomparisons onalreadysealed
+  snapshots/references, NOnewdefault/raw/native replay. Then unspentMakecold1/
+  warm7/Feature1 each900s onfreshMakeRoot, same38closure/currentNEWsample97e,
+  strictfailuresretained, original10callsbudget unchanged. Preparingcontinuation.
+- Nigeria1518 closed-card74378 CLOSED0: exacttwo1552completePKLloads/.485s,
+  explicitlyinstantiatedprivateframes;0rowcellops/serialization/newnative/API/
+  provider/denials, originalseals/objectidentities exact. NativeW1Q6qty/36codecard
+  vsprinted3; W2Q6A qty/48codecard vsprinted15 (first15match,33extra); W2Q6B
+  decisionmakerIDs. No conversion/fieldedversion/default ruling. Listedfields
+  actually14W1/16W2, earlier17shorthandwrong, exactapprovedlistpreserved.
+
 * LATEST (2026-11-10 11:55 UTC; supersedes execution states below)
 Previous goal turn PROGRESS; current turn also PROGRESS: accepted four-country
 CI repairs and seven documentary carries now composed in a private branch.
