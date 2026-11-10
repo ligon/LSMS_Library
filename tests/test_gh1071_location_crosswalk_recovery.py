@@ -245,7 +245,7 @@ def test_post_payload_same_class_errors_never_rebuild(toy, owner, monkeypatch, r
     assert got.value is error and snapshot(path) == before and not calls
 
 
-@pytest.mark.parametrize('kind', ['symlink', 'hardlink', 'resolved-overlap', 'declared-source'])
+@pytest.mark.parametrize('kind', ['symlink', 'parent-symlink', 'hardlink', 'resolved-overlap', 'declared-source'])
 @pytest.mark.parametrize('route', ['location', 'crosswalk'])
 def test_source_alias_and_declared_source_stay_strict(toy, owner, monkeypatch, kind, route):
     c, location, _, _, calls = owner
@@ -258,6 +258,11 @@ def test_source_alias_and_declared_source_stay_strict(toy, owner, monkeypatch, k
         data_root.cache_clear()
         path = source
         bad(source)
+    elif kind == 'parent-symlink':
+        target = toy.data_dir / 'Borrowed' / relative
+        bad(target)
+        path.parent.parent.mkdir(parents=True, exist_ok=True)
+        path.parent.symlink_to(target.parent, target_is_directory=True)
     elif kind in ('symlink', 'hardlink'):
         bad(source);path.parent.mkdir(parents=True, exist_ok=True)
         path.symlink_to(source) if kind == 'symlink' else os.link(source, path)

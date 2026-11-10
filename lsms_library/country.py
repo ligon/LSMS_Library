@@ -342,7 +342,8 @@ def _reject_unreadable_cache(path: Path, observed, error: Exception, *,
         source_candidate = countries_root() / parts[0] / '_' / path.name if parts else None
     if source_candidate is not None:
         sidecar = path.with_name(path.name + '.dvc')
-        if (path.resolve().is_relative_to(countries_root().resolve())
+        if (path.resolve() != root.resolve().joinpath(*parts)
+                or path.resolve().is_relative_to(countries_root().resolve())
                 or sidecar.exists() or sidecar.is_symlink()
                 or (source_candidate.exists() and path.exists()
                     and path.samefile(source_candidate))):
@@ -3782,6 +3783,7 @@ class Country:
             source_path = self.file_path / 'var' / 'other_features.parquet'
             sidecar = location_path.with_name(location_path.name + '.dvc')
             if (location_path.is_symlink()
+                    or location_path.resolve() != data_root().resolve() / self.name / 'var' / 'other_features.parquet'
                     or location_path.resolve().is_relative_to(countries_root().resolve())
                     or sidecar.exists() or sidecar.is_symlink()
                     or (source_path.exists() and location_path.samefile(source_path))):
@@ -6660,6 +6662,7 @@ class Country:
                     else:
                         sidecar = candidate.with_name(candidate.name + '.dvc')
                         if (candidate == parquet_path and not candidate.is_symlink()
+                                and candidate.resolve() == data_root().resolve() / self.name / '_' / candidate.name
                                 and not candidate.resolve().is_relative_to(countries_root().resolve())
                                 and not sidecar.exists() and not sidecar.is_symlink()
                                 and not (source_parquet.exists() and candidate.samefile(source_parquet))):
