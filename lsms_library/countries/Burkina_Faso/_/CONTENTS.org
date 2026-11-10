@@ -3383,3 +3383,24 @@ A visit food-row shortfall remains a disclosed upper-bound proxy, not household
 cover status or a correction to declared exposure. The dated missing/partial
 passage and document-layout qualifications above remain in force.
 See =docs/guide/recall.md= and =.coder/ledger/851-period-api-current-port.md=.
+
+* 2026-11-10 -- GH #1483 own2021 household-input candidate (source-only, inactive)
+
+The authenticated own2021 s16b header supplies22 input slots and22 labels on
+EACH used/gift/purchase unit field, including bags stating50/25/100kg and
+local containers. These are its own cards, not2018 or Mali/Niger codes.
+q01/q02 have no variable-label text in that metadata; q02's own card is
+1Oui/2Non. The closed1123 use-gate/key observations are historical, not a
+new row measurement from the header's zero returned records.
+
+q09a literally asks "Quelles sont la quantité et la valeur totale de
+%rostertitle% achetées?"; q09c is in the inventory but its label was not
+supplied. No quantity/value meaning is invented for either. The bounded
+adapter retains q09a verbatim, independently reads q05/q07 gifts and
+q08/q09b purchases, and serves unambiguous q03 used quantities/units.
+Its full own cards, pure controls and unapplied serving proposal are in
+=_/s16b_2021*= and =tests/test_burkina_faso_1483_header_adapter_20261110.py=.
+All controls/runtime/API checks are UNRUN. There is no normal2021 input
+builder activated in this source;2018 behavior and all old notes remain.
+This is household×input grain, never a parcel allocation; panel/CS reach,
+season/ID qualifications and the separate DAP/NPK/unit-policy holds stand.

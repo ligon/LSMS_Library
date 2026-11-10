@@ -1,0 +1,66 @@
+--- /dev/null
++++ b/lsms_library/countries/Burkina_Faso/2021-22/_/plot_inputs.py
+@@ -0,0 +1,14 @@
++"""PROPOSED ONLY: activate own2021 s16b after resolving 1483-Q09A.
++
++Native panel household namespace; one framework id_walk follows downstream.
++No cross-section, parcel allocation, grade or unit-factor change.
++"""
++import sys
++
++sys.path.append('../../_/')
++from lsms_library.local_tools import get_dataframe, to_parquet, get_categorical_mapping, format_id
++from burkina_faso import i
++from s16b_2021 import build_s16b_candidate
++
++build_s16b_candidate(read=get_dataframe, write=to_parquet,
++                     get_map=get_categorical_mapping, id_fn=i, format_id=format_id)
+--- a/lsms_library/countries/Burkina_Faso/_/data_scheme.yml
++++ b/lsms_library/countries/Burkina_Faso/_/data_scheme.yml
+@@ -288,6 +288,46 @@
+     Unit_received_as_gift:
+       type: str
+       optional: true
++    # Own2021 candidate preserves raw codes/answers; q09a is unresolved.
++    grappe:
++      type: int
++      optional: true
++    menage:
++      type: int
++      optional: true
++    vague:
++      type: int
++      optional: true
++    s16bq01:
++      type: int
++      optional: true
++    s16bq02:
++      type: int
++      optional: true
++    s16bq03a:
++      type: float
++      optional: true
++    s16bq03b:
++      type: int
++      optional: true
++    s16bq05:
++      type: int
++      optional: true
++    s16bq07a:
++      type: float
++      optional: true
++    s16bq07b:
++      type: int
++      optional: true
++    s16bq08:
++      type: int
++      optional: true
++    s16bq09a:
++      type: float
++      optional: true
++    s16bq09b:
++      type: int
++      optional: true
+     materialize: make
+ 
+   livestock:

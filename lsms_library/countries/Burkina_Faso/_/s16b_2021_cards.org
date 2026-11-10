@@ -1,0 +1,151 @@
+#+title: Own2021 household-input cards (GH #1483, inactive candidate)
+
+Transcribed only from authenticated BFA-2021/HEADER.json, SHA256
+=61045df1365ad170216e088ef02794a5d8aa950746907ba77fc0369eeb912f52=.
+Source md5 =ed8625abcf1d679669d7d231cf77f58c=; zero returned records.
+Each unit field has its OWN attached dictionary; identical codes do not
+establish shared physical factors. No2018 or sibling tail is used.
+This is not row/grain/eligibility-count or fielded-CAPI evidence.
+
+#+name: bfa2021_s16bq01
+| Code | Label |
+|------+-------|
+| 1 | Engrais organiques - déchets d'animaux |
+| 2 | Engrais organiques - Ordures ménagères |
+| 3 | Engrais inorganiques - Urée |
+| 4 | Engrais inorganiques - Phosphates |
+| 5 | Engrais inorganiques - NPK/Formule unique |
+| 6 | DAP et autres engrais inorganiques |
+| 7 | Produits phytosanitaires - Pesticides |
+| 8 | Produits phytosanitaires - Herbicides |
+| 9 | Produits phytosanitaires -Fongicides |
+| 10 | Autres produits phytosanitaires |
+| 11 | Semences de petit mil |
+| 12 | Semences de sorgho |
+| 13 | Semences de maïs |
+| 14 | Semences de riz |
+| 15 | Semences d'autres céréales |
+| 16 | Semences de coton |
+| 17 | Semences de césame |
+| 18 | Semences de haricots/niébé |
+| 19 | Semences d'arichide |
+| 20 | Plants/boutures de tubercules |
+| 21 | Plants d'hévéa, de teck |
+| 22 | Autres semences |
+
+#+name: bfa2021_s16bq02
+| Code | Label |
+|------+-------|
+| 1 | Oui |
+| 2 | Non |
+
+#+name: bfa2021_s16bq05
+| Code | Label |
+|------+-------|
+| 1 | Oui |
+| 2 | Non |
+
+#+name: bfa2021_s16bq08
+| Code | Label |
+|------+-------|
+| 1 | Oui |
+| 2 | Non |
+
+#+name: bfa2021_s16bq03b
+| Code | Label |
+|------+-------|
+| 1 | Gramme |
+| 2 | Kilogramme |
+| 3 | Tonne |
+| 4 | Litre |
+| 5 | Charrette |
+| 6 | Sachet |
+| 7 | Tiya |
+| 8 | Sac (50 kg) |
+| 9 | Sac (25 kg) |
+| 10 | Sac (100 kg) |
+| 11 | Boîte |
+| 12 | Tas |
+| 13 | Charrette asine |
+| 14 | Charrette bovine |
+| 15 | Seau |
+| 16 | Panier |
+| 17 | Camion benne |
+| 18 | Yorouba |
+| 19 | Demi-yorouba |
+| 20 | Quart-yorouba |
+| 21 | Tricycle |
+| 22 | Brouette |
+
+#+name: bfa2021_s16bq07b
+| Code | Label |
+|------+-------|
+| 1 | Gramme |
+| 2 | Kilogramme |
+| 3 | Tonne |
+| 4 | Litre |
+| 5 | Charrette |
+| 6 | Sachet |
+| 7 | Tiya |
+| 8 | Sac (50 kg) |
+| 9 | Sac (25 kg) |
+| 10 | Sac (100 kg) |
+| 11 | Boîte |
+| 12 | Tas |
+| 13 | Charrette asine |
+| 14 | Charrette bovine |
+| 15 | Seau |
+| 16 | Panier |
+| 17 | Camion benne |
+| 18 | Yorouba |
+| 19 | Demi-yorouba |
+| 20 | Quart-yorouba |
+| 21 | Tricycle |
+| 22 | Brouette |
+
+#+name: bfa2021_s16bq09b
+| Code | Label |
+|------+-------|
+| 1 | Gramme |
+| 2 | Kilogramme |
+| 3 | Tonne |
+| 4 | Litre |
+| 5 | Charrette |
+| 6 | Sachet |
+| 7 | Tiya |
+| 8 | Sac (50 kg) |
+| 9 | Sac (25 kg) |
+| 10 | Sac (100 kg) |
+| 11 | Boîte |
+| 12 | Tas |
+| 13 | Charrette asine |
+| 14 | Charrette bovine |
+| 15 | Seau |
+| 16 | Panier |
+| 17 | Camion benne |
+| 18 | Yorouba |
+| 19 | Demi-yorouba |
+| 20 | Quart-yorouba |
+| 21 | Tricycle |
+| 22 | Brouette |
+
+* Exact variable labels (None means absent metadata, not a missing question)
+
+- =grappe=: "GRAPPE  (ZD)"
+- =menage=: "MENAGE"
+- =vague=: "VAGUE"
+- =s16bq01=: null
+- =s16bq02=: null
+- =s16bq03a=: "16B.03a. Pouvez-vous rappeler la quantité totale de %rostertitle% utilisée duran"
+- =s16bq03b=: "16B.03b. Unité"
+- =s16bq05=: "16B.05. Avez-vous obtenu certains %rostertitle% sous forme de cadeau ou de don?"
+- =s16bq07a=: "16B.07a. Selon vous, quelle est la quantité en %rostertitle% reçue sous forme de"
+- =s16bq07b=: "16B.07b. Unité"
+- =s16bq08=: "16B.08. Avez-vous acheté certains %rostertitle%?"
+- =s16bq09a=: "16B.09a. Quelles sont la quantité et la valeur totale de %rostertitle% achetées?"
+- =s16bq09b=: "16B.09b. Unité"
+
+q09a wording is deliberately uncorrected. The whole inventory also names
+=s16bq09c=, but no q09c metadata was supplied. The candidate retains q09a
+verbatim without choosing quantity or value semantics. q03a and q07a retain
+their supplied truncations; no end-of-label wording is reconstructed.
