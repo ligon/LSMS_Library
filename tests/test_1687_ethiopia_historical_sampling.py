@@ -152,7 +152,6 @@ def test_wrong_boundary_refuses(pair):
 
 @pytest.mark.parametrize("kind,error", [
     ("missing-v", "missing or duplicate v"),
-    ("null-v", "null sample v"),
     ("duplicate-key", "duplicate current household/wave"),
     ("wrong-wave", "incorrect sample waves"),
     ("wrong-index", "historical operand index"),
@@ -162,8 +161,6 @@ def test_bad_full_current_input_refuses(kind, error):
     sample = frame()
     if kind == "missing-v":
         sample = sample.drop(columns="v")
-    elif kind == "null-v":
-        sample.loc[("added", WAVE), "v"] = pd.NA
     elif kind == "duplicate-key":
         sample = pd.concat([sample, sample.iloc[[0]]])
     elif kind == "wrong-wave":
@@ -194,3 +191,25 @@ def test_extra_unlinked_record_cannot_enter_old_cohort():
 
 def test_other_country_full_intersection_is_unchanged(monkeypatch):
     original(monkeypatch, frame(), country="Tanzania", n=4, d=4, k=1)
+
+
+def test_outside_domain_null_v_is_conserved(monkeypatch):
+    sample = frame()
+    sample.loc[("added", WAVE), "v"] = pd.NA
+    before = copy.deepcopy(sample)
+    selected = sampling._ethiopia_historical_cluster_view(sample, EARLIER, WAVE, *links())
+    _exact(selected, sample.iloc[[0, 1, 2, 4, 5, 6]])
+    _exact(sample, before)
+    original(monkeypatch, sample)
+
+
+def test_historical_null_v_reaches_original_n_assertion(monkeypatch):
+    sample = frame()
+    sample.loc[("h1", WAVE), "v"] = pd.NA
+    before = copy.deepcopy(sample)
+    # The helper preserves the missing value. Original dropna/N owns the refusal.
+    selected = sampling._ethiopia_historical_cluster_view(sample, EARLIER, WAVE, *links())
+    _exact(selected, sample.iloc[[0, 1, 2, 4, 5, 6]])
+    with pytest.raises(AssertionError, match=r"\(2, 3\)"):
+        original(monkeypatch, sample)
+    _exact(sample, before)

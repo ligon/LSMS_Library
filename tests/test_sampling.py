@@ -1436,7 +1436,6 @@ def _ethiopia_historical_cluster_view(sample, earlier, wave, old, current):
     assert sample.columns.is_unique and "v" in sample, "missing or duplicate v"
     assert not sample.index.to_frame(index=False).isna().any().any(), "null sample key"
     assert set(sample.index.get_level_values("t")) == {earlier, wave}, "incorrect sample waves"
-    assert sample["v"].notna().all(), "null sample v"
     before = copy.deepcopy(sample)
     view = sample.loc[sample.index.get_level_values("i").isin(old.values())].copy(deep=True)
     _exact(sample, before)  # Complete current records, weights, masks and typed attrs.
