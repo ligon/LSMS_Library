@@ -5532,3 +5532,37 @@ Module R eligibility/stock/flow fields and weights remain unchanged. Full-build
 ID errors precede subset return, preserving country coverage integrity. This
 selects no new scientific ID/quantity policy or whole #1288 closure. See
 =.coder/ledger/1288-livestock-compiler-walk.md=.
+
+* 2026-11-09 -- Labor restricted-reader byte route (source-only refill)
+
+The 2016-17 =plot_labor= restricted reader now reuses the existing
+=plot_inputs= / =plot_features= =_dvc_cache_path= route after
+=_ensure_dvc_pulled=. An available sidecar-addressed blob supplies the bytes;
+otherwise the existing =DVCFS.open= fallback supplies them. This extends the
+reader repair recorded under GH #1287, not the already completed compiler
+cohort or the recent livestock work under GH #1288.
+
+*Labor has a distinct two-stage decoder contract.* Unlike the other two
+restricted readers, it first reads metadata and intersects the requested
+columns with that file's column names, in requested order, then decodes only
+that intersection with =apply_value_formats=False=. The requested list
+includes columns absent from the cross-sectional half (including the other
+labor fields). Both decoder calls, source literal, temporary-file cleanup,
+row-position capture, household/plot identifiers and all downstream labor
+code are retained. This is a source finding, not a fresh header/data read.
+
+The earlier entry saying the analogous plot_features/plot_labor readers
+"were not changed or built" describes that checkpoint. Plot features was
+subsequently changed as recorded above; this source-only change applies to
+labor. No native, compiler, Country/Feature, cache or performance run was
+performed here. Six invented-byte controls are prepared for ROOT and remain
+unrun. No decoder-failure, survey-parity, speedup or measured hash-footprint
+acceptance is inferred. The source of the known latin-1 defect, missing labor
+columns and all existing scientific/eligibility policies remain unchanged.
+
+The same queue reconciliation finds GH #905's historical Malawi purchase
+callback already removed by =af4338784c75fa838bf9d8205518566a66294e0e=
+(GH #1190). Its replacement sums like-unit components with =min_count=1=;
+this refill changes no reducer, precision or unit-pooling rule. GH #1228's
+D/I crop identities and GH #1190's acquisition carrier/third-source admission
+remain held. See =.coder/ledger/malawi-queue-refill-20261109-v2.md=.
