@@ -1,4 +1,48 @@
 #+title: Current LSMS-ISA coordinator handoff
+* LIVE UPDATE -- 2026-11-10 13:50 UTC
+User renewed request to delegate more country-specific issues. Manager
+malawi_revision_food owns remote queue refill via sucoder, with distinct concrete
+country charters, current-issue/merged-work reconciliation and no completed jobs
+counted as busy. Fresh GitHub inventory:145 open, retrieved with explicit repo
+and limit500; B/OPEN-COUNTRY-ISSUES-20261110.json. Many residuals are scientific
+holds; do not repeat completed source campaigns to occupy workers. Root read
+shared scrum-master-hpc and backlog-workflow skills plus repo backlog skill;
+make api-audit passed. Use shell login=false (login startup stalls on this node).
+First new round2 assignment confirmed RUNNING: Malawi905 job41090997,
+dispatch3ea45fd01fd840b195795b13afa7a776, exactc8 source. Own current remaining
+reducer inventory/qualified optimization; no replay of1457/1190/1228 or already
+vectorized sites. Round2 artifacts:Q/refill-independent-country-round2-c8-20261110.
+
+Root reviewed Mali1528 actual primary REPORT and carried five owned source/ledger
+commits into private batch: HEAD8e85c876ad6148c6d7a36a70c6d5b80bf568564e.
+All four carried files exact admitted dca6418d; library subtree remains
+5cda0b16791ce80abfad55006edfe4d7dc6efb7c. No replay. Carry proof:
+R/1687-reviewed-repair-batch-20261110/MALI1528-CARRY.json.
+
+ETH source d97db47224f34f014065a02dcc115a24061fe4eb personally reviewed/accepted:
+portable hash-bound historical public map fixture, exact old-link target cohort,
+old N/D/K assertions/current API frame/maps intact. Removed extra global-v-null
+policy; original dropna/N owns selected missing-v handling. Initial26pure PASS
+plus2 affected controls yield27 composed current cases, not fresh27green. Root
+authorized ONE original ETH normal parameter <=600s, ordinary real gates; exact
+four prior admitted sources and normal private sample build if genuine current
+warm sample absent. No other nodes/replay. Manager owns runtime/handle.
+
+Mali routing actual v1 header NameError failed preimport; v2 observer outer-vs-
+namespace public UID mismatch failed precollection0tests/0data. Both retained.
+Stdlib-only proof binds hashed physical public files to namespace uid65534;
+operator-only correction preserves SHA/dev/inode. Exact16 private inputs sealed,
+no retrieval. Actual v3 PID3582706/exec23460 now productive11Stata prefix,
+source36c unchanged, result pending. Local finish_1590 owns handle.
+
+NigeriaMakeV4 cold CLOSED0/1052.495s:56403 full rows, strict current/old default
+and genuine sample equality PASS. Warm CLOSED0/1035.892s/all7calls; strict
+same-request old defaults PASS,12 manual-fullslice attrs comparisons FAIL retained,
+all observed ordered keys/payload/dtypes/masks equal. No plot rebuilds in warm;
+5sample producers/writers,68Stata,6active0D. FreshFeature PID3585866 running900s,
+controller86199/local finish_1452 owns. No full587 closure.
+
+Earlier update below is retained with later facts superseding its pending states.
 * CURRENT -- 2026-11-10 13:19 UTC
 Goal ACTIVE, unbounded. Previous and current goal turns made concrete progress.
 Development4381d701ffb06ab447a37c66362119d1c1e23009;78 verified development merges,
