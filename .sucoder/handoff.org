@@ -1,4 +1,53 @@
 #+title: Current LSMS-ISA coordinator handoff
+* CURRENT execution and delegation (2026-11-10 11:15 UTC)
+This section supersedes older execution snapshots below. Goal ACTIVE; development
+4381d701/78 merges/42 closures unchanged. PR1687 d47 still has 18 failed full-data
+tests; no waiver, merge, settings change, master release or shared-cache rebuild.
+
+- User again requests broader country-specific delegation. Queue manager
+  malawi_revision_food is explicitly assigned to enumerate actionable open issues
+  across all eight ISA countries and dispatch independent source-first work via
+  sucoder, beyond the CI repair queue. Require actual assignment/worker/deliverable
+  table; do not claim eight busy workers without receipts. Country CONTENTS first,
+  including live LOGBOOK/WAITING/TODO and named idiosyncrasy; contradictions reported.
+  Routine private validation inside an already-approved managed-source closure can
+  be managed by that agent with finite selection/time/resource bounds. Root keeps
+  scientific/test-expectation acceptance, GH publication and integration.
+- Nigeria sampling test-only b9a9835e: 30 pure +2 original normal tests PASS. Root
+  reviewed complete patch and independently inverted helper/cohort boundary to the
+  exact old test AST; production/maps/curation unchanged. Ready for repair batch.
+- Uganda historical-view proof: one closed sample load, current21463 unchanged;
+  remove only source-registered unlocated identities and 2015 agriculture covers
+  for a TEST operand view21239. All four old N/D reproduced exactly (2601/191,
+  2640/433,1717/1717,2973/2973). finish_1590 implementing test-only correction on
+  b9a9835e; old counts/dup/K assertions and current served data remain unchanged.
+- Mali namespace correction runtime2931/final7215: Root reviewed full9385a9d8 patch
+  and independently matched approved mapSHA7c17086a..69dd; 28pure PASS qualified
+  shutdown logging noise. Corrected three original tests ADMITTED once under
+  CORRECTED3-DATA-PLAN v2: exact genuine crop+sample warm copies,18held inputs,
+ 9raw-oracle reads,0build/0writers; normal hash+coverage gates must pass. Manager
+  owns execution/intake. All downstream quantity/unit assertions must execute.
+- Niger original11 yielded7P4F; one closed-output read failed in external Arrow
+  aggregation. Exactly one additional same-artifact read admitted (2total), with
+  explicit True/False/NA counts,0raw/API/build/writer/test replay. No count repin.
+- Tanzania original3 PASS; no product change. Remaining Ethiopia/Ghana original
+  sampling cases assigned to manager for finite diagnostic dispatch.
+- Shared shocks original4 yielded3P1F: CIV requested own-labelled .d Non-concerne
+  serves False under approved policy, old numeric oracle expected NA. Manager
+  assigned source-qualified test-only oracle fix, preserving all other missings.
+- Nigeria three PH actual default cold+warm81179 CLOSED0: all15calls completed,
+  full56403rows including18358PH. Independent review qualified PASS; all nine
+  stronger subset index-domain/attrs failures retained, observed payload exact.
+  Runtime9763/nonledger5cb Make plan now ADMITTED: one <=120s ordinary default
+  sample reference, three <=900s real Make actors with fixed1+7+1 calls. Exact38
+  inputs140321380B; node-local runtime before imports; genuine sample rebuilding
+  allowed, plot reuse required after cold; no memo/hash/factory overrides.
+  finish_1452 owns active execution and must propose next Nigeria task afterward.
+- Mali1436 manual restored at63bf28cb (five docpaths only): official public PDF,
+  managed push+fresh readonly retrieval exact; bounded Q13 instructions still do
+  not connect Etat4 to processing. Root reviewed patch and narrowed GH1436 body.
+  Country documentary carries remain queued; not implementation/closure proof.
+
 * Newest execution update (2026-11-10 10:00 UTC)
 - Nigeria true3PH NORMALdefault actual81179LIVE onEXACT9763verificationW;
   R587-nigeria-W1-W3-PH-plot-features-implementation-20261110/normal-default-v1,

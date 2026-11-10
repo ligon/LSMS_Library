@@ -1,4 +1,16 @@
 #+title: Current LSMS-ISA worker queue
+* CURRENT (2026-11-10 11:15 UTC)
+User requests broader country delegation. Manager malawi_revision_food owns new
+eight-country actionable-issue dispatch plus CIV oracle fix/Eth+Ghana sampling
+diagnostics; must return actual assignment IDs and deliverables, not capacity.
+Local1452: Nigeria3PH Make backend actual plan admitted (1reference+9Makecalls).
+Local1590: Uganda historical sampling TEST-view correction on accepted NGA b9a.
+Mali namespace remote:28pure PASS; corrected3 actual tests admitted under v2 warm
+cache gates/18held sources/9raw-oracle reads/0build/0writers. Niger second closed
+output aggregation read admitted once, no raw/API/tests. NGA2 sampling originals
+PASS, Tanzania3 originals PASS. Full1687 still failed18; no new merge/settings.
+Current detailed docket: [[file:handoff.org]]; older snapshots below historical.
+
 * Newest (2026-11-10 10:00 UTC)
 NGAtrue3PHactualnormal81179LIVE (1452);1590independentreviewsealedPASS,
 nowrestoringexactMaliP2manual47787(normalpush/readbackthenboundedauthorityread).
