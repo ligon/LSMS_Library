@@ -111,7 +111,7 @@ Integrationlead /root/review_nigeria_ph_pr OWNS routine review/composition,
 append-conflict resolution, conservation, focusedchecks/metadata, OWN draft
 publication and reviewed factual-note admission WITHOUT Root perfile loop.
 Root keeps science/finalreadiness/merge/settings/overall integrity.
-Currentpublished8fad548dac8c0633edaf98e6fc662096b96fddf9,
+Firstpublished8fad548dac8c0633edaf98e6fc662096b96fddf9,
 tree60da7a8d2dbd567f10176214470f8b2f07e57344, parenttraina292.
 Scope NGA3PH+Nigerdocs+NGA1288W1-W3 declarations+Malawi1281 housingnote+BFA
 fixturefix.26paths beyonda292/19344nonowned exact; initially172files/283commits
@@ -126,10 +126,11 @@ Existing1680--1686 are componentreviewrefs until1687lands, not separately merged
 
 * Current human decisions and Malawi next change
 Central .sucoder/isa-decisions.org committed517e03471; B/CURRENT-ISA-DECISIONS.org
-copySHA61c60f1e13ad00092f6e49cf9a6c89f33260b246e63bc13a50ef858021b11cbd,
-blob0e7595ce7cea6777fea3918b8a1c80e2a7e4550c. Preserve exactuserstatements.
+copySHA3c4b79ffdca1ff19ec8aeaee1b9a570d3912e0647def2f2ce05167253d63c5dc,
+blobc5ae50fac56a8e4920ec433b58856e6c77d53af3. Preserve exactuserstatements.
 -1457R1 USERAPPROVED: sale in anotherunit attaches to SOLEknownplot/nativecrop
- harvestrow, compatible state/eitherunknown/no competing oroccupied sale;
+ harvestrow, compatible state/eitherunknown/no competing oroccupied sale; require non-NA
+ reported saleunit so existing824fallback cannot borrow knownharvestunit;
  retain ownUnit_sold/Condition_sold, no conversion/borrowedunit.
 -1457R2a USERREJECTED: keep ambiguous multirow salesFarm-level; solepositive
  Quantity among0/NAothers does not identify the plot/referencepool.
@@ -141,7 +142,8 @@ blob0e7595ce7cea6777fea3918b8a1c80e2a7e4550c. Preserve exactuserstatements.
 
 finish_1590 delivered combined5f6cfc7c69f6ab250617aae9c55e99b538b7caf3,
 nonledger exacttested a668d98c9,6owned/19259nonowned exact4381. Historicalcd76
-R1executableAST reused exactly, with currentR3 provenanceinputs replaying R1
+R1executableAST reused with only user-required u.notna eligibility addition;
+final reported-unit childcc7abfe3/2newpurePASS, with R3 provenanceinputs replaying R1
 before fullFarm suffixing. 68priorR3purePASS and30affectedR1/R3PASS separate;
 no data/API acceptance yet. R/1457-malawi-r1-r3-implementation-20261110.
 Integrationlead independently reviews/admits before nexttrain child. Planworker
@@ -205,3 +207,14 @@ Do not reask settled choices or infer approval from historical'asruled'agentpros
  independentwork; no occupancy-only repeated campaigns or cookedgoldencounts.
 4. Resolve userR2b answer when received; pendingmeanspending. Keep durablehandoffs,
  factual residualtracker and sourceprivate artifacts concrete/reviewable.
+
+* Latest delegated integration checkpoint
+Public1690 advanced to factual-docs0fd203cbe63bd453fd5cd5ecc4454563c271bbc6
+(draft/base4381;34incrementalpaths). Private next source9f89151ddd783a07fa57b9277da3677f7024ce7c
+includes admitted final MalawiR1/R3cc7, NigeriaW4 andNigerphantomcleanup;44paths
+beyonda292/all19335nonowned exact. One source-only metadataactor87693 LIVE under
+integrator; no source edits untilclose, expected63country/193wave delta vsretained9e.
+All source/actual claims remain qualified as in donor reports; no newdata replay.
+Reviewerchild review_w4_niger_intakes resumed after finish1590completion; full
+immutableW4/Niger review closed withno blockers. Root centraldecisionmirror now
+includes explicit reported-unit/no-borrowing clarification. R2b stillPENDING.
