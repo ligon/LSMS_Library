@@ -260,8 +260,11 @@ Data Scheme:
     # and (seed rows)
     # the seed's crop on the shared harmonize_food labels.  REPORTED values
     # only.  Source s16b (2018-19) records inputs at the HOUSEHOLD x input
-    # grain, NOT plot x input (no parcel-level input data); the GAP-2 name
-    # `plot_inputs` is kept but `plot_id` is NOT in the index.  input ->
+    # grain, NOT plot x input: s16b has no parcel column.  The separate
+    # s16a parcel module does ask fertilizer quantities and their units
+    # (e.g. s16aq29c1/c2 for NPK); it is not read by this builder.  Its
+    # integration is held in GH #1483; see CONTENTS.org's dated entry.
+    # The GAP-2 name `plot_inputs` is kept but `plot_id` is NOT in the index.  input ->
     # harmonize_input; u -> the u table; the EHCVM roster has no crop
     # column so seed crop is resolved from the seed label via
     # harmonize_seed_crop.  Non-crop-specific rows carry the sentinel
