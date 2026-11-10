@@ -1,4 +1,15 @@
 #+title: Current LSMS-ISA worker queue
+* CURRENT assignments (2026-11-10 08:30 UTC)
+Root:1687 d47 ordinaryCI SUCCESS/full-data42769154949 live, observer76037.
+finish_1590: Nigeria587 actual normal housing cold/warm verification; original
+operator failed preAPI, exact lazy-field assertion correction approved; owns next actor.
+finish_1452: Nigeria587 five plot_features historical cells, source/history +finiteAPI plan.
+malawi_revision_food: country-queue refill/actual free-account remote dispatch,
+Niger1565 first, other genuinely unblocked independent country residuals.
+Remote submissions not yet confirmed; do not claim eight running workers.
+PP foundation47pure+6real checks pass, remains UNWIRED/user preference pending.
+Development4381/78merges/42closures unchanged. Full details: [[file:handoff.org]].
+
 * Current after Windows repair (2026-11-10 06:06 UTC)
 PR1687 finalhead42f2a8e0: WindowsSUCCESS, unit42765866264/full-data42765866627
 live. Root observer35534; old25573closed/superseded histories retained.

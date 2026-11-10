@@ -34,3 +34,11 @@ synthetic verification is pending; this withdrawal is not runtime acceptance.
 * 2026-11-09: Required PR data validation, GH932
 The user explicitly selected: "Require full data validation on every ready development PR (Recommended)" in response to the replacement-policy question. This supersedes the unavailable merge-queue strategy and the pending A/B/C choice. Implement a dedicated PR-only, unique required full-data check, with strict base freshness and explicit non-success for ineligible draft/fork cases; preserve nightly advisory coverage and all unrelated rules/bypass actors. Full data validation may take1–2h and must be revalidated when development advances. Proposal: reports/932-compatible-pr-data-gate-policy-20261109/PROPOSAL.md, manifest89c165d8283877c018bab72a625bf4daffd9c1bcdee88b418d6ce934ac114aef.
 This authorizes building and enabling the selected policy after concrete source review and actual check-wiring verification; no additional policy/permission question is needed for its necessary preserved-rules delta. No settings changed or full-data run triggered at decision time. Root owns publication/readiness/settings after review; source-only implementation delegated to finish_1452 on4381. No master release, shared local cache rebuild or production-weight change follows.
+
+* Pending Nigeria PP raw-report serving preference, GH587 (2026-11-10)
+Root async question submitted: retain original price/quantity/unit/size reports
+while leaving standardized Price missing where unresolved (recommended), versus
+serve only reports with resolved standardized Price. No user answer received.
+This is representation preference, not authority to infer W5 Quantity/cvn basis
+or choose conflicting native/printed unit meanings. Pure source-preserving
+foundation is accepted, public wiring remains pending. Other country work continues.

@@ -1,4 +1,61 @@
 #+title: Current LSMS-ISA goal handoff
+* CURRENT coordinator checkpoint (2026-11-10 08:30 UTC)
+This section supersedes earlier live observations; those histories stay below.
+Goal ACTIVE. Development4381d701ffb06ab447a37c66362119d1c1e23009,
+78 verified development merges /42 whole issue closures; no new merge/settings.
+PR1687 READY, exact head d47ff849eb0e7f2c7e9d4d77a7852b61e9240e61,
+tree aa57b462e21cbab436b46f51f52eeaa7398a3341. Ordinary42769154931
+SUCCESS (unit +Windows); full-data42769154949 still in Run full test suite,
+job129672643696. Root metadata-only observer76037 LIVE; reuse, no new test run.
+R=burst/isa-sm-20261103/reports. Earlier failed/cancelled runs remain evidence.
+Last source repair d47 is test-only: obsolete GH920 literal-call oracle replaced
+by unique AST call/first-argument/ordering checks, preserves all other assertions.
+Targeted1PASS before push; full ordinary CI nowSUCCESS. No full-data acceptance.
+All1680-1686 reviewed components combined in1687, no automatic component closure.
+After actual successful current full-data and exact preflight, authorized Root
+merge to development then fresh ruleset25124452 GET/minimal required unique
+pr-data-validation +strict=true delta/readback. Preserve all bypass/other rules.
+
+Current workers (actual assignments, not eight busy workers):
+- finish_1590: actual normal Nigeria housing verification on exactd47 in
+  Wstage-587-nigeria-housing-sample-20261110. Stage0 authenticated26 existing
+  managed raw objects/121520662B, all local L1; copied private0400/nlink1.
+  Shared sample/housing saved outputs STALE/hashless and not admitted. No memo,
+  provider override, panel generator, weights change, network or shared writes.
+  Original actor88653 FAILED before firstAPI/raw/producer/writer because external
+  assertion directly accessed lazy _sample_v_cache. Root approved exact external
+  getattr(...,None) correction in separate output namespace; old failure retained.
+  Grant: one normal full cold Country housing,10Country+10Wave consumers and
+  alignedFeature, fresh warm full+5missing+Feature; warm zero newraw/writer,
+  unchanged L2 seals; strict unused-domain failures remain failures. R587-nigeria-
+  housing-current-normal-20261110. Agent owns replacement actor/terminal report.
+- finish_1452: new Nigeria587 five plot_features historical cells; source/history
+  reconciliation + finite current actual API plan, exclusive ownership. No repeat
+  completed62 compiler cells and no presumption all5falsepositive. Separate W.
+- malawi_revision_food: country queue refill/actual remote dispatch, prioritizing
+  Niger1565 own leaver-branch authority and other genuinely unblocked nonNigeria
+  residuals. Historical Q/NEXT-EIGHT queue partly stale/delivered. Read current
+  bodies +closed packets,2-4 useful independent countries preferred; free account,
+  public own-doc read-only retrieval/bounded parse allowed, no raw/API builds
+  without finite Root admission. Root owns GH/merge/settings. Actual remote
+  submissions pending at checkpoint; do not call them running until confirmed.
+
+Nigeria PP foundation accepted separately:6809d9daed97dfea42ed92f560b304438e6ef031,
+47pure controlsPASS,6saved-real-input checksPASS/196129rows conserved. Adapter is
+UNWIRED, no public serving or Price normalization claim. R587-nigeria-pp-price-
+foundation-real-captures-20261110; manifest7de889a0107e9becee9589437373cf36e97e1d43033b59777ead9ad4331068db.
+Mwi identity/basis matrix COMPLETE:860native item/unit entries,70physical fields,
+37prototype projection omissions,14potentialcoalescences. Root read REPORT;
+proposed source-qualified unresolved axes +all raw fields +fullPP item variety
+are proposals, not adopted scientific semantics. W3native22/32 versus print31/42
+and W5unit40/120 disagreements remain; W1NumberUnits candidate denominator,
+W5Quantity/cvn relationship unproved. No division/default1/PHrule borrowing.
+User raw-retention async preference PENDING; no repeat question/approval assumed.
+Tanzania docstring qualification8ade70617cd9cd03dc9154053d351c0129a7e439 accepted
+separate follow-on, NOT in1687; executableAST exact, no runtime census.
+Pending1573/1575 choices unchanged. No master release/shared cache rebuild/
+production-weight changes. Necessary country work continues independently.
+
 * Latest country continuation (2026-11-10 06:19 UTC)
 Published1687 head42f2 remains FROZEN; WindowsSUCCESS, unit/full-data stilllive
 on42765866264/42765866627; fulljob is in Run full test suite. Observer35534 same
