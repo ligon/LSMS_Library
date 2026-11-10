@@ -147,10 +147,12 @@ def test_raw_answers_keep_no_blank_unknown_and_typed_attrs_before_public_gate(ad
     assert got.index.tolist() == [40, 10, 90, 20, 70]
     assert got.attrs == {'raw': ('unclassified', False, 7)}
     assert type(got.attrs['raw']) is tuple
-    # Retaining the raw answers does not promote unknown eligibility to an
-    # application. The separate public layer refuses instead of defaulting.
-    with pytest.raises(adapter.S16b2021Error, match='unknown flag'):
-        adapter.adapt_s16b_2021(source, **bindings[0])
+    # Only the literal positive use answer denotes an application; No,
+    # missing and unlisted answers remain distinct in the raw projection.
+    public = adapter.adapt_s16b_2021(source, **bindings[0])
+    assert public['s16bq02'].tolist() == [1.]
+    assert public['Quantity'].tolist() == [1.25]
+    assert public.attrs['s16b_2021_candidate']['excluded_explicit_nonuse'] == 2
 
 
 def test_complete_literal_frame_keys_types_masks_and_raw_answers(adapter, bindings):
@@ -277,7 +279,6 @@ def test_all_22_units_retain_literal_sizes_without_conversion(adapter, bindings,
 
 
 @pytest.mark.parametrize('field,value,message', [
-    ('s16bq02', None, 'missing usage'), ('s16bq02', 9, 'unknown flag'),
     ('s16bq05', 9, 'unknown flag'), ('s16bq08', 9, 'unknown flag'),
     ('grappe', None, 'missing native'), ('menage', None, 'missing native'),
     ('s16bq01', None, 'missing native'), ('s16bq01', 1.5, 'integral numeric'),
@@ -420,3 +421,27 @@ def test_provider_free_adapter_and_exact_source_only_serving_wrapper():
     assert (COUNTRY / '2021-22' / '_' / 'plot_inputs.py').exists()
     assert not (COUNTRY / '2021-22' / '_' / 's16b_2021.py').exists()
     assert 'plot_inputs:' not in (COUNTRY / '2021-22' / '_' / 'data_info.yml').read_text()
+
+
+@pytest.mark.parametrize('answer', [2, None, 9])
+def test_nonapplication_payload_cannot_abort_positive_applied_membership(adapter, bindings, answer):
+    source = pd.concat([_source().iloc[[0]], _source().iloc[[4]]], ignore_index=True)
+    source.loc[1, 's16bq02'] = answer
+    # Nonapplication payload does not enter application identity/amount/flag
+    # validation. It remains verbatim in the independent raw projection.
+    source.loc[1, ['grappe', 'menage', 's16bq01']] = None
+    source.loc[1, 's16bq05'] = 9
+    source['s16bq03a'] = source['s16bq03a'].astype(object)
+    source.loc[1, 's16bq03a'] = 'unclassified nonapplication answer'
+    before = source.copy(deep=True)
+    raw = adapter.raw_s16b_2021(source)
+    pd.testing.assert_frame_equal(raw, before, check_exact=True)
+    public = _adapt(adapter, bindings, source)
+    expected = _adapt(adapter, bindings, before.iloc[[0]].copy())
+    # Source-independent expected payload is already pinned by the complete
+    # literal oracle above; this check composes exact exclusion/invariance.
+    expected.attrs['s16b_2021_candidate']['excluded_explicit_nonuse'] = int(answer == 2)
+    pd.testing.assert_frame_equal(public, expected, check_exact=True)
+    assert public.attrs == expected.attrs
+    assert public['s16bq02'].tolist() == [1.]
+    pd.testing.assert_frame_equal(source, before, check_exact=True)

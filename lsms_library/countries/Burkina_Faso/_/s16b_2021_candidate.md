@@ -55,10 +55,11 @@ fields are also added as optional raw columns on the public applied result. The 
 route is `result.reset_index()[RAW_FIELDS]`: original selected answers/codes,
 order, dtypes and masks, not a household-to-parcel allocation.
 
-Exact public membership predicate: own numeric `s16bq02 == 1`. Only explicit
-2Non is excluded, counted in native attrs. Blank/unknown q02 refuses the
-candidate, not a default Non. Amount sign/positivity, gift and purchase
-responses never gate an applied row. Negative, zero and missing quantities
+Exact public membership predicate: own numeric `s16bq02 == 1`, applied before
+validation of application identities/payloads. Other use classes remain in the
+raw-answer projection; only explicit2Non is counted as nonuse. Blank/unlisted
+answers are never recoded as No or zero. Amount sign/positivity, gift and
+purchase responses never gate an applied row. Negative, zero and missing quantities
 survive; unknown nonmissing acquisition flags refuse rather than become NA.
 Missing flags remain nullable NA. No usage/acquisition field fills another.
 Required native key `(grappe,menage,s16bq01)` must be nonmissing/unique.

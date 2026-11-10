@@ -3421,3 +3421,13 @@ ROOT explicitly holds its nutrient interpretation, so the legacy2018 DAP
 fold is not extended to this wave. A separate raw-answer projection keeps
 No/blank/unknown use answers; the public applied layer gates/refuses them
 explicitly. No existing2018 curation is changed.
+
+** Applied-only correction before verification
+
+The public membership predicate is exactly own =s16bq02 == 1=, before
+application-key/payload validation. No/blank/unlisted answers remain in the
+separate raw projection; they are not recoded as Non or zero and do not abort
+the public applied table. Existing guards still refuse malformed selected
+application identities, amounts, acquisition flags or mapped collisions.
+This corrects the initial candidate's overly broad whole-source refusal;
+no amount/content gate, DAP grade, parcel allocation or2018 rule changes.

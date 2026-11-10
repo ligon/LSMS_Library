@@ -80,8 +80,9 @@ def adapt_s16b_2021(source, *, cards, input_map, seed_crop_map, unit_map,
                     id_fn):
     """Return independently unit-tagged used, gifted and purchased amounts.
 
-    Only explicit q02=2 rows are excluded, counted in attrs. Missing/unknown
-    use answers refuse the whole candidate instead of silently dropping rows.
+    Public membership is exactly q02=1, before application validation.
+    Other answers remain in the raw projection; only explicit Non is counted
+    as nonuse. Missing/unlisted answers are never recoded as No or zero.
     Acquisition answers do not gate eligibility and never fill one another.
     The caller supplies current country i; no id_walk here.
     """
@@ -96,6 +97,9 @@ def adapt_s16b_2021(source, *, cards, input_map, seed_crop_map, unit_map,
             raise S16b2021Error(f'{field}: unexpected own flag card')
 
     raw = raw_source.reset_index(drop=True).copy()
+    use = raw['s16bq02'].eq(1).fillna(False)
+    excluded = int(raw['s16bq02'].eq(2).sum())
+    raw = raw.loc[use].reset_index(drop=True)
     for field in ('grappe', 'menage', 'vague', 's16bq01', 's16bq02') + UNIT_FIELDS:
         raw[field] = _codes(raw[field], field)
     native_key = ['grappe', 'menage', 's16bq01']
@@ -103,11 +107,6 @@ def adapt_s16b_2021(source, *, cards, input_map, seed_crop_map, unit_map,
         raise S16b2021Error('missing native household/input identity')
     if raw.duplicated(native_key).any():
         raise S16b2021Error('duplicate native household/input identity')
-    use = _flag(raw['s16bq02'], 's16bq02')
-    if use.isna().any():
-        raise S16b2021Error('missing usage answer; eligibility unresolved')
-    excluded = int((~use).sum())
-    raw = raw.loc[use].reset_index(drop=True)
 
     hh = pd.Series([id_fn(row) for _, row in raw[['grappe', 'menage']].iterrows()],
                    index=raw.index, dtype='string')
