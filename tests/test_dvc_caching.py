@@ -438,9 +438,11 @@ class TestDVCCaching:
 
         cache_path = mock_country_structure / "var" / "test_data.parquet"
         cache_path.parent.mkdir(parents=True, exist_ok=True)
-        cache_path.touch()
-
         cached_df = pd.DataFrame({"col1": [1, 2]})
+        cache_hash = "valid-cache-fixture"
+        # A healthy hit needs real decodable bytes and proven coverage.
+        write_parquet(cached_df, cache_path, cache_hash=cache_hash,
+                      cache_waves=["2020-21"])
 
         stage_key = "testcountry::2020_21::test_data"
         stage_info = StageInfo(
@@ -456,6 +458,8 @@ class TestDVCCaching:
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe", return_value=cached_df) as mock_get_dataframe, \
+            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_read_cache, \
+            patch.object(Country, "_table_cache_hash", return_value=cache_hash), \
             patch("lsms_library.country.map_index", side_effect=lambda df: df), \
             patch("lsms_library.country._load_canonical_spellings", return_value={}), \
             patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
@@ -494,8 +498,10 @@ class TestDVCCaching:
             result = country._aggregate_wave_data(method_name="test_data")
 
         pd.testing.assert_frame_equal(result, cached_df)
-        # Note: The actual implementation reads from cache, assertion may need adjustment
-        # mock_get_dataframe.assert_called_once_with(cache_path)
+        mock_repo_class.assert_not_called()
+        mock_get_dataframe.assert_not_called()
+        mock_read_cache.assert_called_once_with(
+            cache_path, open_errors=(OSError,), check_null=True, engine='pyarrow')
 
     def test_dvc_cache_applies_location_index(
         self,
