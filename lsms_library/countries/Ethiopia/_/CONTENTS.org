@@ -4920,3 +4920,18 @@ This is public-instrument authority only: no fielded CAPI/GUID/v03-export
 bridge, actual released-row/column compliance, W1 coverage explanation,
 scientific/default/weight change or whole GH1570/GH650 closure is established.
 No native source/header/rows, API/producer/cache, test or census ran.
+
+* 2026-11-10 -- Remaining W5 public documentation held (GH #650)
+
+Community questionnaire78629, manual78631, report78643 and the catalog-generated
+DDI PDF are now managed holdings under =2021-22/Documentation/=. Exact names,
+URLs, bytes and MD5s are appended to =Documentation/SOURCE.org=; the generated
+DDI has no resource ID. All four passed fresh read-only retrievals. Earlier
+HH/PP/PH forms and BID were not reacquired; raw release provenance and licence
+are unchanged. Tax report98963 is outside this finite holding.
+
+No new document text/cells were parsed, so no manual/report content, fielded
+CAPI/export bridge, harvest-window/currency/unit/holder rule or whole GH650
+closure is claimed. Earlier dated residual statements remain historical.
+Evidence: =B/reports/650-ethiopia-w5-remaining-public-documents-20261110/=
+(B as in the task ledger); only public document transport/holding was verified.
