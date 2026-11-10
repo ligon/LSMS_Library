@@ -258,3 +258,22 @@ def test_existing_ph_builder_retains_its_separate_metric_size_policy():
             size_text='c8q2b', price='c8q3', obs=1)], 'codes', {10: 'Toy item'})
     assert len(out) == 0  # existing PH missing-package-size refusal remains
     _exact(raw, before)
+
+
+def test_no_unknown_and_missing_availability_or_price_never_select_away_raw_reports():
+    one = _raw('W4').iloc[:1].copy()
+    raw = pd.concat([one.copy(deep=True) for _ in range(4)])
+    raw['ea'] = pd.array([1, 2, 3, 4], dtype='int16')
+    raw['c2q1'] = [1., 2., 9., np.nan]
+    raw['c2q3'] = [50., np.nan, -2., 0.]
+    before = deepcopy(raw)
+    report = pp.pp_community_price_report(raw, 'W4')
+    _exact(report.native_frame(), before)
+    assert len(report.frame) == 4
+    assert report.frame.NativeAvailabilityCode.iloc[:3].tolist() == [1., 2., 9.]
+    assert pd.isna(report.frame.NativeAvailabilityCode.iloc[3])
+    assert pd.isna(report.frame.NativeAvailabilityLabel.iloc[2])
+    assert pd.isna(report.frame.NativeAvailabilityLabel.iloc[3])
+    assert report.frame.ReportedPrice.iloc[[0, 2, 3]].tolist() == [50., -2., 0.]
+    assert pd.isna(report.frame.ReportedPrice.iloc[1])
+    _exact(raw, before)
