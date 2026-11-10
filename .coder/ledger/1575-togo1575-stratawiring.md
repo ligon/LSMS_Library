@@ -89,5 +89,42 @@ domain/version disagreement remains unresolved and does not block this wiring.
 
 ## Phase 3 — verification
 
-Pending frozen implementation and focused pure verification; no actual-data
-validation, release, merge or readiness claim.
+Frozen implementation `4aa06de08a4180f6c0fb133d52dc1fbb29cfc07a` ran 35
+selected pure tests: 32 passed, 3 failed because the new test imported the
+package's public `derivations` function instead of its module. The original
+log/XML remain in evidence. Test-only correction frozen at
+`09594a4935a2b2533fe9c508e8bd37c9b9a53ee4`: **35 passed**, 0 failed/skipped,
+including 21 own controls plus GH812 TestLabel/TestStamp. Production files were
+unchanged between these runs. Both used the approved immutable image, exact
+checkout/cwd/PYTHONPATH/countries identity, private empty data/runtime,
+BLAS/build1, `-n2 --dist=loadfile`, explicit rootdir and network namespace.
+Controller/gw0/gw1 identities and JUnit are retained separately per run.
+
+OK (§§2,5): YAML and hooks use the unmodified shared helpers; no copied formula
+or independent reader. OK (§§3,4): full non-strata frame/order/ID/v/weights/Rural
+conservation, missing/blank refusal boundaries, all existing Rural case aliases,
+nullable key, copy/empty hook and typed attrs passed on invented frames. OK
+(§§2,4): registry uniqueness/scope/function/input identity and raw input grain/path
+passed with synthetic providers; explicit unsupported 2021-22 retained a truthful
+failure. The existing sample had no earlier Derivation key to merge; no shared
+stamp behavior changed. No contradiction or reinvention found in owned changes.
+
+`make api-audit` completed source-only through a three-line run-python adapter
+for MAIN (the immutable image has no Poetry executable); no installation. Skill
+index and untracked-build-input checks passed. `git diff --check` passed. No
+functional replay is required for this verification-only ledger edit.
+
+Original setup receipt failure is also retained: system Python 3.6 rejected
+`subprocess.check_output(text=True)` after the image/absent-mount checks; one
+authorized extraction still completed. Corrected metadata capture used
+`universal_newlines=True`; neither image nor extraction was retried/changed.
+
+Shared GH812 assertions intentionally left unchanged for deputy: Togo member
+of REGION_ONLY and TestWiring's two region-only/no-key assertions (lines 161–162),
+plus TestTheFrameAgrees' Togo no-key/no-milieu assertions (lines 433,435). No
+normal-data test was run to demonstrate an already-known obsolete assertion.
+Actual native cards/rows, normal API/cold-warm/Feature comparisons, final joint
+metadata footprint, CI and independent integration acceptance remain UNRUN.
+The manager/deputy card-location/metadata-only plan request remains on the
+absolute shared channel; no native inspection was self-started. No release,
+merge or readiness claim follows from this pure construction.
