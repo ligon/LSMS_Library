@@ -1,5 +1,29 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-10: Malawi different-unit sale attachment, GH1457 R1
+The user explicitly selected: "Attach to the sole row, preserving the sale’s own unit (Recommended)".
+Attach a sale in a different unit only to its household/native-crop's SOLE
+known-plot harvest row, when reported states are compatible (equal, or either
+unknown), that row is unoccupied and no competing sale wants it. Keep the sale's
+own Unit_sold and Condition_sold; no conversion or borrowed harvest unit.
+This approves R1, not the recovered commits' other scientific changes. Port the
+specific R1 logic with current provenance/input compatibility and verify it.
+
+* 2026-11-10: Ambiguous multi-row sales, GH1457 R2a
+The user explicitly selected: "Keep ambiguous sales on Farm-level rows (Recommended)".
+Do NOT select a plot merely because exactly one of multiple harvest rows has a
+positive Quantity. Other zero/missing quantities do not establish no production.
+Retain current Farm-level treatment and reference-pool semantics; the recovered
+R2a positive-quantity candidate expansion is rejected.
+
+* Pending single-plot zero/missing-harvest choice, GH1457 R2b
+Root submitted a separate question about moving an already attached single-plot
+sale solely because its harvest Quantity is zero/missing. No answer yet; no
+positive-quantity eligibility filter or Ethiopia retention reversal is approved.
+R3 provenance is a separate engineering repair admitted by Root after independent
+source/loader/cardinality review and 68 applied-source pure passes. It changes
+the refusal key/inputs representation, not sale attachment or quantity policy.
+
 * 2026-11-08: Mali household namespaces, GH1494
 The user selected: "Namespace all 2021–22 raw IDs, then map back only approved panel links (recommended). Unlinked, unknown and orphan records retain distinct IDs."
 ROOT implementation choice: EHCVM21_ for the raw2021 namespace, consistent with EACI14_/EACI17_. Preserve every approved panel target/canonical ID and existing conservative link omission; no new link recovery, classification, filtering or reweighting. Implemented/merged PR1638 atdd40aae55; issue1494closed. No new held-link recovery or production-weight change.
