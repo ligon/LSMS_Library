@@ -1388,6 +1388,61 @@ def _uganda_historical_cluster_view(sample):
     return sample.loc[pd.Series(keep, index=sample.index, dtype=bool)].copy(deep=True)
 
 
+def _ethiopia_w2_links(path, *, historical=False):
+    """Read reviewed W2 links, retaining duplicate-key refusal (ledger §2–4)."""
+    import hashlib
+    import json
+
+    if historical:
+        # Full public fbc213417 blob, unchanged through pre-D1 cc26ce13.
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == (
+            "52cc2e73e48b800e406953bafd76a9722579b39c3499667dc45a366e08fb8023"
+        ), "historical Ethiopia fixture SHA256"
+
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            assert key not in result, "duplicate Ethiopia map key"
+            result[key] = value
+        return result
+
+    maps = json.loads(path.read_text(encoding="utf-8"),
+                      object_pairs_hook=unique_object)
+    assert isinstance(maps, dict) and "2013-14" in maps, "missing W2 map"
+    return maps["2013-14"]
+
+
+def _ethiopia_historical_cluster_view(sample, earlier, wave, old, current):
+    """Select the dated HH-link operand, preserving the full API frame (§3–4).
+
+    Membership is the RANGE of the reviewed old W2 map, never a count fitted
+    to current rows. Current PP-only links remain public; their extra edges
+    must not change the historical N/D/K measurement.
+    """
+    from tests.test_gh1196_parquet_index_policy import _exact
+
+    assert (earlier, wave) == ("2011-12", "2013-14"), "historical Ethiopia boundary"
+    for links in (old, current):
+        assert isinstance(links, dict) and links, "empty Ethiopia links"
+        assert all(isinstance(k, str) and k.strip() and
+                   isinstance(v, str) and v.strip() for k, v in links.items()), (
+            "invalid Ethiopia link endpoint")
+        assert len(links) == len(set(links.values())), "noninjective Ethiopia links"
+    assert old.keys() <= current.keys(), "missing old Ethiopia link"
+    assert all(current[k] == v for k, v in old.items()), "changed old Ethiopia link"
+    assert isinstance(sample, pd.DataFrame)
+    assert list(sample.index.names) == ["i", "t"], "historical operand index"
+    assert sample.index.is_unique, "duplicate current household/wave"
+    assert sample.columns.is_unique and "v" in sample, "missing or duplicate v"
+    assert not sample.index.to_frame(index=False).isna().any().any(), "null sample key"
+    assert set(sample.index.get_level_values("t")) == {earlier, wave}, "incorrect sample waves"
+    assert sample["v"].notna().all(), "null sample v"
+    before = copy.deepcopy(sample)
+    view = sample.loc[sample.index.get_level_values("i").isin(old.values())].copy(deep=True)
+    _exact(sample, before)  # Complete current records, weights, masks and typed attrs.
+    return view
+
+
 @pytest.mark.requires_s3
 class TestTheReproduction:
     """GH #942's own reproduction, a single-country two-wave call."""
@@ -1529,6 +1584,15 @@ class TestTheReproduction:
         if country == "Uganda":
             # The four curated records precede locating-cover/singleton additions.
             s = _uganda_historical_cluster_view(s)
+        elif country == "Ethiopia":
+            from pathlib import Path
+            from lsms_library.paths import countries_root
+
+            s = _ethiopia_historical_cluster_view(
+                s, earlier, wave,
+                _ethiopia_w2_links(Path(__file__).parent / "fixtures" /
+                                   "ethiopia_updated_ids_fbc213417.json", historical=True),
+                _ethiopia_w2_links(countries_root() / "Ethiopia" / "_" / "updated_ids.json"))
         idx = s.reset_index()[["i", "t", "v"]].dropna()
         idx["t"] = idx["t"].astype(str)
         idx["v"] = idx["v"].astype(str)
