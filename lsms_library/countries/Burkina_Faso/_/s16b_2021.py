@@ -62,6 +62,20 @@ def _curated(labels, mapping):
     return labels.map(lambda x: mapping.get(x, x) if pd.notna(x) else pd.NA).astype('string')
 
 
+def raw_s16b_2021(source):
+    """Project the admitted raw answers, preserving No/blank/unknown use too.
+
+    No decoding, public eligibility gate or native-identity repair belongs in
+    this layer. The applied-input adapter below has its own explicit predicate.
+    """
+    missing = set(RAW_FIELDS).difference(source.columns)
+    if missing:
+        raise S16b2021Error('missing source columns: ' + ', '.join(sorted(missing)))
+    out = source.loc[:, list(RAW_FIELDS)].copy()
+    out.attrs = dict(source.attrs)
+    return out
+
+
 def adapt_s16b_2021(source, *, cards, input_map, seed_crop_map, unit_map,
                     id_fn):
     """Return independently unit-tagged used, gifted and purchased amounts.
@@ -71,9 +85,7 @@ def adapt_s16b_2021(source, *, cards, input_map, seed_crop_map, unit_map,
     Acquisition answers do not gate eligibility and never fill one another.
     The caller supplies current country i; no id_walk here.
     """
-    missing = set(RAW_FIELDS).difference(source.columns)
-    if missing:
-        raise S16b2021Error('missing source columns: ' + ', '.join(sorted(missing)))
+    raw_source = raw_s16b_2021(source)
     if source.attrs.get('id_converted'):
         raise S16b2021Error('expected native source, not already walked ids')
     for field in CARD_FIELDS:
@@ -83,7 +95,7 @@ def adapt_s16b_2021(source, *, cards, input_map, seed_crop_map, unit_map,
         if cards[field] != {'1': 'Oui', '2': 'Non'}:
             raise S16b2021Error(f'{field}: unexpected own flag card')
 
-    raw = source.loc[:, list(RAW_FIELDS)].reset_index(drop=True).copy()
+    raw = raw_source.reset_index(drop=True).copy()
     for field in ('grappe', 'menage', 'vague', 's16bq01', 's16bq02') + UNIT_FIELDS:
         raw[field] = _codes(raw[field], field)
     native_key = ['grappe', 'menage', 's16bq01']
@@ -103,6 +115,10 @@ def adapt_s16b_2021(source, *, cards, input_map, seed_crop_map, unit_map,
         raise S16b2021Error('household formatter returned a missing identity')
     labels = _labels(raw['s16bq01'], 's16bq01', cards['s16bq01'])
     inputs = _curated(labels, input_map)
+    # ROOT's explicit #1483 hold: the full own code6 catch-all is not pure DAP.
+    # Do not extend the legacy2018 DAP mapping/0.18 share to this new wave.
+    catchall = raw['s16bq01'].eq(6)
+    inputs.loc[catchall] = labels.loc[catchall]
     crops = labels.map(lambda x: seed_crop_map.get(x, pd.NA)).astype('string')
     # Own card's exact spelling extends an already approved identity; no2018
     # tail code is consulted. Rubber/teak remains its literal combined label.

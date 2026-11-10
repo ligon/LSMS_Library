@@ -3416,3 +3416,8 @@ above: the final source candidate now has a normal2021 s16b wrapper.
 q09c stays native, with no canonical monetary derivation. Every admitted
 raw used/gift/purchase answer and code is retained. All runtime/pure checks
 remain UNRUN; no native counts or API acceptance are newly established.
+Own code6 keeps the full =DAP et autres engrais inorganiques= identity;
+ROOT explicitly holds its nutrient interpretation, so the legacy2018 DAP
+fold is not extended to this wave. A separate raw-answer projection keeps
+No/blank/unknown use answers; the public applied layer gates/refuses them
+explicitly. No existing2018 curation is changed.

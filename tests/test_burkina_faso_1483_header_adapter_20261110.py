@@ -136,6 +136,23 @@ def _adapt(adapter, bindings, source):
     return adapter.adapt_s16b_2021(source, **bindings[0])
 
 
+def test_raw_answers_keep_no_blank_unknown_and_typed_attrs_before_public_gate(adapter, bindings):
+    source = _source()
+    source['s16bq02'] = [1., 2., None, 9., 2.]
+    source.attrs = {'raw': ('unclassified', False, 7)}
+    expected = source.copy(deep=True)
+    got = adapter.raw_s16b_2021(source)
+    pd.testing.assert_frame_equal(got, expected, check_exact=True)
+    assert got['s16bq02'].isna().tolist() == [False, False, True, False, False]
+    assert got.index.tolist() == [40, 10, 90, 20, 70]
+    assert got.attrs == {'raw': ('unclassified', False, 7)}
+    assert type(got.attrs['raw']) is tuple
+    # Retaining the raw answers does not promote unknown eligibility to an
+    # application. The separate public layer refuses instead of defaulting.
+    with pytest.raises(adapter.S16b2021Error, match='unknown flag'):
+        adapter.adapt_s16b_2021(source, **bindings[0])
+
+
 def test_complete_literal_frame_keys_types_masks_and_raw_answers(adapter, bindings):
     source = _source()
     source.attrs = {'invented': {'integer': 7, 'tuple': ('kept', None), 'flag': False}}
@@ -203,13 +220,36 @@ def test_all_22_slots_keep_own_identities_and_tail_not_2018(adapter, bindings):
     got = _adapt(adapter, bindings, source)
     assert got['s16bq01'].tolist() == list(range(1, 23))
     assert got.index.get_level_values('input').tolist() == [
-        'Organic manure', 'Organic compost', 'Urea', 'Phosphate', 'NPK', 'DAP',
+        'Organic manure', 'Organic compost', 'Urea', 'Phosphate', 'NPK',
+        'DAP et autres engrais inorganiques',
         'Pesticide', 'Herbicide', 'Fungicide', 'Other phytosanitary'] + ['Seed'] * 10 + [
         "Plants d'hévéa, de teck", 'Seed']
     assert got.index.get_level_values('crop').tolist() == ['(not crop-specific)'] * 10 + [
         'Mil', 'Sorgho', 'Maïs', 'Riz Paddy', 'Autre céréale', 'Coton', 'Sésame',
         'Niébé', 'Arachide', 'Autre tubercule', '(not crop-specific)', 'Autre crop']
     assert len(got) == 22 and got.index.is_unique
+
+
+def test_code6_retains_full_catchall_despite_legacy_dap_map(adapter, bindings):
+    source = _source().iloc[[0]].copy()
+    source['s16bq01'] = 6
+    assert bindings[0]['input_map']['DAP et autres engrais inorganiques'] == 'DAP'
+    got = _adapt(adapter, bindings, source)
+    assert got.index.get_level_values('input').tolist() == ['DAP et autres engrais inorganiques']
+    assert got['s16bq01'].tolist() == [6]
+    assert got['Quantity'].tolist() == [1.25]
+    assert not any('nitrogen' in name.lower() or 'grade' in name.lower() for name in got.columns)
+    # Actual current normalizer tries exact names, never a DAP substring.
+    path = ROOT / 'lsms_library' / 'transformations.py'
+    tree = ast.parse(path.read_text())
+    node = next(n for n in tree.body if isinstance(n, ast.FunctionDef)
+                and n.name == '_normalise_input_label')
+    namespace = {}
+    exec(compile(ast.Module(body=[node], type_ignores=[]), str(path), 'exec'), namespace)
+    assert namespace['_normalise_input_label']('DAP et autres engrais inorganiques') == [
+        'dap et autres engrais inorganiques', 'dap et autres engrais inorganiques fertilizer']
+    assert not {'dap', 'dap fertilizer'}.intersection(
+        namespace['_normalise_input_label']('DAP et autres engrais inorganiques'))
 
 
 def test_each_unit_uses_own_card_and_exact_curated_label(adapter, bindings):

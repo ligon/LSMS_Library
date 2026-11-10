@@ -47,7 +47,9 @@ Existing public table: `plot_inputs`, Country index `(t,i,input,crop,u)`.
 Required fields remain `Quantity: float`, `Purchased: bool`,
 `Quantity_purchased: float`. Existing optional fields remain `Unit_purchased`,
 `Received_as_gift`, `Quantity_received_as_gift`, `Unit_received_as_gift`.
-Fourteen native admitted fields are added as optional raw columns. The inverse
+The separate `raw_s16b_2021` projection preserves all admitted No/blank/unknown
+answers without decoding or an application gate. Fourteen native admitted
+fields are also added as optional raw columns on the public applied result. The inverse
 route is `result.reset_index()[RAW_FIELDS]`: original selected answers/codes,
 order, dtypes and masks, not a household-to-parcel allocation.
 
@@ -75,7 +77,11 @@ integral input/unit codes retain source-qualified identity plus the raw code.
 
 The22-unit dictionaries include explicitly sized bags and local containers;
 labels remain exact, with only existing exact country u-map keys applied.
-This selects no mass conversion or NPK/DAP nutrient grade. The combined
+This selects no mass conversion or nutrient grade. Own code6 remains the FULL
+`DAP et autres engrais inorganiques` catch-all on the input axis, even though
+the legacy2018 map calls it DAP. ROOT explicitly prohibits extending that
+pure-DAP/0.18 treatment to the new wave; no existing2018 mapping is changed.
+The current exact nitrogen normalizer cannot match this full label to DAP. The combined
 rubber/teak slot is present in the table and remains distinct; no single crop
 or new physical Seed classification is invented for it. q04/q06 supplier
 questions and their free text are outside this used/acquired-quantity adapter.
