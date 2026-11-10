@@ -207,6 +207,17 @@ def test_existing_data_recipe_is_reused_without_weaker_test_or_credential_gate()
     reused = deepcopy(workflow['jobs']['validation']['steps'][3:])
     for step in reused:
         del step['if']
+    flag = '--public-test-failures'
+    full = next(step for step in reused if step.get('name') == 'Run full test suite')
+    assert full['run'].split().count(flag) == 1
+    assert sum(step.get('run', '').split().count(flag)
+               for job in workflow['jobs'].values() for step in job.get('steps', [])) == 1
+    assert all(flag not in step.get('run', '').split() for step in reused if step is not full)
+    assert all(flag not in step.get('run', '').split()
+               for job in existing['jobs'].values() for step in job.get('steps', []))
+    # This wrapper-only diagnostic option changes no child command or gate.
+    assert full['run'].count(' ' + flag + ' ') == 1
+    full['run'] = full['run'].replace(' ' + flag + ' ', ' ', 1)
     assert reused == existing['jobs']['data-tests']['steps'][1:]
     assert workflow['jobs']['validation']['env'] == existing['jobs']['data-tests']['env']
     assert workflow['jobs']['validation']['timeout-minutes'] == '360'
