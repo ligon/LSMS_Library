@@ -41,8 +41,9 @@ def test_ready_source_events_require_validation(classify, action):
 
 
 @pytest.mark.parametrize('changes', [
-    {'base': {'ref': {'from': 'master'}}},
-    {'base': {'ref': {'from': 'master'}}, 'title': {'from': 'before'}},
+    {'base': {'ref': {'from': 'master'}, 'sha': {'from': 'd' * 40}}},
+    {'base': {'ref': {'from': 'master'}, 'sha': {'from': 'd' * 40}},
+     'title': {'from': 'before'}, 'body': {'from': None}},
 ])
 def test_base_retarget_is_validation_even_without_a_new_head(classify, changes):
     value = event('edited')
@@ -59,6 +60,35 @@ def test_known_text_edits_emit_only_metadata_mode(classify, changes):
     value['changes'] = changes
     actual = classify(value, 'owner/project', 'pull_request')
     assert actual == {'mode': 'metadata', 'head': 'a' * 40, 'base': 'b' * 40}
+
+
+@pytest.mark.parametrize('changes', [
+    {'title': {'from': []}}, {'title': {'from': {}}},
+    {'title': {'from': None}}, {'title': {'from': 17}},
+    {'body': {'from': []}}, {'body': {'from': {}}},
+    {'body': {'from': False}}, {'title': {}}, {'body': {}},
+    {'title': {'from': 'before', 'extra': 'unknown'}},
+    {'body': {'from': None, 'extra': 'unknown'}},
+    {'title': {'from': 'before'}, 'body': {'from': []}},
+    {'base': {}}, {'base': {'ref': {'from': 'master'}}},
+    {'base': {'sha': {'from': 'd' * 40}}},
+    {'base': {'ref': {}, 'sha': {'from': 'd' * 40}}},
+    {'base': {'ref': {'from': []}, 'sha': {'from': 'd' * 40}}},
+    {'base': {'ref': {'from': 'master'}, 'sha': {'from': {}}}},
+    {'base': {'ref': {'from': 'master'}, 'sha': {'from': 'd' * 40, 'extra': 1}}},
+    {'base': {'ref': {'from': 'master'}, 'sha': {'from': 'd' * 40}, 'extra': {}}},
+    {'base': {'ref': {'from': 'master'}, 'sha': {'from': 'd' * 40}},
+     'title': {'from': []}},
+    {'base': {'ref': {'from': 'master'}, 'sha': {'from': 'd' * 40}},
+     'future_source_field': {'from': 'old'}},
+])
+def test_malformed_nested_edits_cannot_select_metadata_success(classify, changes):
+    value = event('edited')
+    value['changes'] = changes
+    before = deepcopy(value)
+    with pytest.raises(ValueError):
+        classify(value, 'owner/project', 'pull_request')
+    assert value == before
 
 
 @pytest.mark.parametrize('fault', [

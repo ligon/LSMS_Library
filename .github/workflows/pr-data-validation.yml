@@ -60,15 +60,24 @@ jobs:
                   changes = event.get('changes')
                   if not isinstance(changes, dict) or not changes:
                       raise ValueError('Unknown edited-event changes')
-                  if 'base' in changes:
-                      if not isinstance(changes['base'], dict):
-                          raise ValueError('Malformed base-change declaration')
-                  elif set(changes) <= {'title', 'body'}:
-                      if not all(isinstance(value, dict) and 'from' in value for value in changes.values()):
-                          raise ValueError('Malformed text-change declaration')
-                      mode = 'metadata'
-                  else:
+                  if not set(changes) <= {'title', 'body', 'base'}:
                       raise ValueError('Unrecognized edited-event change')
+                  for key in ('title', 'body'):
+                      if key in changes:
+                          value = changes[key]
+                          if (not isinstance(value, dict) or set(value) != {'from'}
+                                  or not (isinstance(value['from'], str)
+                                          or (key == 'body' and value['from'] is None))):
+                              raise ValueError('Malformed text-change declaration')
+                  if 'base' in changes:
+                      previous_base = changes['base']
+                      if (not isinstance(previous_base, dict) or set(previous_base) != {'ref', 'sha'}
+                              or not all(isinstance(value, dict) and set(value) == {'from'}
+                                         and isinstance(value['from'], str)
+                                         for value in previous_base.values())):
+                          raise ValueError('Malformed base-change declaration')
+                  else:
+                      mode = 'metadata'
               return {'mode': mode, 'head': head['sha'], 'base': base['sha']}
 
 
