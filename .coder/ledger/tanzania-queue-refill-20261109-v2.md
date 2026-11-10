@@ -60,9 +60,12 @@ Make producer, data harness, source acquisition or shared-cache read/write.
 No nonowned framework/registry/global/other-country edits. No new map,
 weight, sampling/design/eligibility/processing/window/default choice. No
 scientific closure from source-only evidence. Real runtime/performance/hash
-acceptance remains unrun. Pure tests only after frozen commit, mounted image,
-exact import identity, private roots/false credentials/network+source guards,
-thread1 and pytest -n2 --dist=loadfile. Preserve failures separately.
+acceptance remains unrun. ROOT superseding source-only steering arrived before any execution: no mount,
+FUSE/unshare, package import, tests or collection. Prepare literal test source
+for ROOT review; ROOT will run pure controls separately. Earlier mount/private
+pytest permission is superseded. Preserve all setup failures separately. Never
+modify fixtures/baseline/golden/expected/snapshot/dependencies/locks or weaken
+existing assertions (additional ROOT stop-list).
 
 ## §5 Reuse decisions
 
@@ -100,8 +103,8 @@ this reducer block and assert SHA138fd458..., then compare actual helper calls
 on invented operands for both wave colmaps. Reuse existing strict comparator,
 905 source_case/stub maps and adverse controls. Check signed cancellation,
 allNA/partialNA, large/small/zero/inf values, unique path, missing crop keys,
-flags/units and exact callback operand counts. Only pure cohorts will run after
-source/test freeze; no native/parquet/API/Make acceptance.
+flags/units and exact callback operand counts. ROOT now owns all pure execution after source/test freeze; no worker runtime,
+native/parquet/API/Make acceptance. No test collection or import will run here.
 
 ## §6 Open questions for ROOT
 
