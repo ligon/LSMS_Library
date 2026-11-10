@@ -43,6 +43,13 @@ Root diff-check and lead independent review PASS. Nigeria test-only repair
 also reviewed: actual W1 PP-remap3388, PH-direct60 yields, mixed refusal;
 15 focused PASS. Lead is integrating all three paths into one corrected1690
 head before a single new full CI run. Original Hcf563 remains failed.
+Published corrected PR1690 head729cf1cf08588071e4fe8c6b684695cd51250c20,
+parent Hcf563, synthetic85ecd4f69dc902080eba8b3ac78eed907d1cdf99,
+tree62878184cdd2bc88811bde08d8ae0f2ff649b262, parents[M16c3,H729].
+Three-path delta only; library source unchanged. Combined149 focused pure
+tests PASS. New ordinary42920726859/unitjob130194586140 and required full
+42920726873/job130194626898 were IN_PROGRESS23:08 UTC; monitor exec15074,
+prepared metadata preflight R/preflight-corrected.py NOT RUN until both green.
 R=burst/isa-sm-20261103/reports/1690-final-accepted-validation-20261110.
 After a corrected head's full success, retain only safe tested-source/JUnit/
 unit-checkout receipts. Update the prepared R/preflight.py's pinned IDs to
@@ -119,6 +126,11 @@ cover/weight and failed before Country return. v3 staged exact five held roles:
 9368 cold+warm Country rows, all v nonmissing, no cache rewrite. Feature
 returned; acceptance operator assumed `crop` index, but Feature uses canonical
 `j`. Lead is correcting saved-frame comparison only. No serving PASS yet.
+Later v3 saved-only Feature comparison PASS: 9368 rows; canonical j→crop
+inverse recovers all nine source fields/keys, cold/warm exact, v nonmissing,
+no sample warning, five private cache parquet seals unchanged. Lead is
+preparing reviewed Senegal six-path PR delta atop new1690 head, then align
+to actual development merge before publication.
 
 * Malawi1190 — manager /implementation41114363
 All three user decisions answered, central decision commit639e428e6:
@@ -143,6 +155,12 @@ SampleUnavailableWarning. Saved-only independent comparator PASS after syntax
 repair: exactly42705 H rows with six-source literal support/values, every old
 row/column/index/dtype exact, legacy fields missing on new Farm rows, seed_kg
 64535 and nitrogen_kg37076 entire outputs exact. Warm/Feature pending.
+Later warm/Feature PASS:222662 rows both/42705 H, no sample warning,
+five private cache parquets unchanged; 109 other columns exact, nine new
+H string fields exact masks/nonmissing values across object/Arrow null dtype.
+Draft PR1694 opened on integration/isa-reviewed-20261110 at base Hcf563,
+head b686a3c, remains DRAFT. It must rebase after new1690 head, then retarget
+development after1690 merge and pass required CI. No development merge yet.
 Consumer regression must prove no invented planted amount/application in
 seed_kg/nitrogen_kg/fertilizer_rate; minimally necessary new-role handling only.
 GitHub1190 updated/readback exact22:08:13; earlier pending choices retained as
