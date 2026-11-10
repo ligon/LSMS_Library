@@ -4215,3 +4215,23 @@ The country compiler still enumerates four physical folders. Its W4 sibling
 retains the same anchoring problem for seven CSVs and is outside this three-wave
 repair. No complete country nonfood closure or whole #1288 closure is claimed.
 The WAITING pooled-recall-window question above remains unchanged.
+
+* 2026-11-10 -- W4 nonfood source-declaration residual completed (GH #1288)
+
+The separate W4 follow-on anchors its four harvest and three planting CSVs
+with the same checked =../Data/...= declaration idiom. The scanner already
+sees all seven original root-qualified strings; this repairs preparation/hash
+anchoring, not a measured row loss. Every original reader argument, order,
+kwargs/default, dictionary, processing/reducer, assertion and writer remains
+byte/AST-exact after removing only the added declarations/guard/comment.
+The seven committed sidecars are bound by metadata only.
+
+Exactly13 NEW W4 pure cases pass once at =46b1bfdaeae58fa836e3533437d05709883652a1=;
+the accepted W1–W3 product, original test bodies and old39 proof remain intact
+and those39 were not replayed. Three observer profiles remain active with zero
+denials, private data/config files0, and the actor closes normally. JUnit
+retains all13 cases; the reused plugin's shared callspec filenames leave11
+per-case call receipts, a recorded evidence limitation without a test replay.
+No actual CSV/header/row, producer, Make, Country/Feature, cache/census or
+scientific acceptance follows. Whole1288, exact conservative hash footprint
+and the WAITING pooled-recall-window question remain separate.

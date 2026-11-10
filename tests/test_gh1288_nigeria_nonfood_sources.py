@@ -37,6 +37,11 @@ CASES = [
       'sect11e_harvestw3.csv'),
      ('sect8a_plantingw3.csv', 'sect8b_plantingw3.csv',
       'sect8c_plantingw3.csv')),
+    ('2018-19', '2019Q1', '2018Q3',
+     ('sect11a_harvestw4.csv', 'sect11b_harvestw4.csv',
+      'sect11c_harvestw4.csv', 'sect11d_harvestw4.csv'),
+     ('sect8a_plantingw4.csv', 'sect8b_plantingw4.csv',
+      'sect8c_plantingw4.csv')),
 ]
 PARAMETERS = 'wave,ph,pp,harvest,planting'
 
