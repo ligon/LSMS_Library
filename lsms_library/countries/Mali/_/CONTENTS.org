@@ -3838,3 +3838,31 @@ wrappers at Farm-level, selecting explicit q02=1 before strict selected-row
 validation. Its ledger preserves actual pure/native adapter checks separately
 from public API/data-CI acceptance. The s16a parcel questions stay a distinct
 route; no household-to-parcel allocation or new grade/factor policy follows.
+
+* 2026-11-10 -- EACI 2017 public dictionary bridge is partial (GH #1436)
+
+The bounded own-catalog 3409 public route returned ten Related Materials
+records, including two named own-2017 enumerator manuals not in the six
+committed PDF declarations: =eaci17_manuel_p1_french.pdf= (47786) and
+=eaci17_manuel_p2_french.pdf= (47787). No distinct electronic questionnaire,
+CAPI project or export syntax was listed on that returned page. The resources
+API separately returned HTTP400/ACCESS-DENIED; it was not an empty inventory.
+The manuals were not downloaded in this electronic/export-only check.
+
+The explicitly linked public DDI export,
+https://microdata.worldbank.org/metadata/export/3409/ddi,
+names =MLI_2017_EAC-I_v03_M= and file =F26/eaci17_s7fp2=. Its variables
+=V873--V876= bind =s7fq13a= to quantity, =s7fq13b= to Code Etat,
+=s7fq13c= to Code UML and =s7fq13d= to kilogram equivalent. =V874='s literal
+state labels are =1 Epis/Panicules=, =2 d=, =3 Non-D= and =4 Egrener=.
+Those shortened published labels do not replace the historical native labels
+recorded above. =V886/s7fq21= remains the separate threshing question.
+
+This is a published dictionary correspondence, not a fielded-version bridge.
+The link calls itself DDI Codebook (2.5), while the XML root declares 1.2.2;
+its January2020 document version mentions a geovariables update. It gives no
+explanation of code4 or deployment linkage reconciling the printed three-state
+card. Preserve that mismatch and the current quantity/unit/unread-state rules.
+Four metadata GETs, one selected XML context, no PDF/native/row/API replay;
+exact receipts and the one-P2-manual archival proposal are recorded in
+=.coder/ledger/1436-mali-own2017-electronic-export-route-7b5e95bf-20261110.md=.
