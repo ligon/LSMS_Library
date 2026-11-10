@@ -1,49 +1,55 @@
-#+title: LSMS-ISA current work owners
-Updated 2026-11-10; latest execution corrections in [[file:handoff.org]].
+#+title: LSMS-ISA work owners — 2026-11-10 17:46 UTC
+Detailed evidence: [[file:handoff.org]] and [[file:tasks/isa-checkpoint-20261110T1721.org]].
 
 * Root
-Owns scientific decisions, final readiness, development merges and settings.
-Public1687 frozen at8c5324b4f. Ordinary42837909207/Windows passed; full data
-42837909103 still running at16:09Z. Watchsession30290 owns polling. Development
-4381 is unchanged; no merge, master release or shared-cache rebuild yet.
+Scientific decisions, final readiness, development merges and settings.
+1687 head8c5324b4f remains frozen on development4381; unit/Windows passed,
+full data42837909103 still live. Watchsession30290 owns exact run polling.
+After actual pass: fresh base/head/synthetic/tree/check preflight, authorized
+merge, then approved932 fresh minimal ruleset apply/readback. Goal ACTIVE.
+No master release, shared-cache rebuild, production weights or panel relink.
 
-* Integration lead -- review_nigeria_ph_pr
-Owns routine independent review, composition, append conflicts, focused checks,
-metadata and own draft publication without Root per-file approval loops.
-Public1690 frozen at9f89151ddd783a07fa57b9277da3677f7024ce7c for Malawi native
-verification. Includes approved R1/R3, Nigeria W4, Niger cleanup and admitted
-factual notes. Reviewing BFA1573 final79dca7551 on a separate child. After1687
-lands, owns source-conserving update onto actual development base.
+* Main integration lead — review_nigeria_ph_pr
+Owns1687/1690 and dependent component drafts1691(BFA)/1692(CI scheduling),
+routine source review/composition/publication without Root per-file loops.
+1690 remains9f. After BFA actual accepts, prepare reviewed union of BFA5paths,
+CI3paths and qualified Malawi ledger1path; then actual-base update after1687
+lands and full composed gate. Does not own new1575 four-country train.
+BFA operator bootstrap failed before data41095376; exact devnull/ldconfig
+import allowance correction and metadata-only guarded import preflight are
+under existing delegated authority. No BFA API/native call had begun.
 
-* Source implementer / queue refill -- finish_1590
-BFA1573 approved implementation79dca7551 delivered for independent review.
-Original30PASS/8fixtureFAIL retained, baseline boundary witness1PASS, corrected
-8PASS; no fresh38-pass or native/API/census claim. Five owned paths only.
-Now RUNNING bounded fresh country-backlog diagnosis: choose3 genuinely unblocked
-Tier A/B briefs, reconcile completed work, read each country's CONTENTS including
-WAITING/LOGBOOK and coordinate with manager; no data or duplicate dispatches.
+* Deputy integration lead — finish_1590
+User APPROVED1575 documented combination for Benin2018-19/Togo2018/
+Guinea-Bissau2018-19/CotedIvoire2018-19. Charter R1575-approved-four-country-
+rollout-20261110/CHARTER.md. New private integrate-1575-four-country-strata-
+20261110 starts exact9f. Owns independent four donors, shared812 tests once,
+source/pure conservation, one final metadata pass and own dependent draft.
+Rows/weights/IDs/Rural/joins preserved; missing component means missing strata;
+Togo discrepancy remains explicit, no guessed exclusions or new-wave work.
+Manager dispatches four country workers; no worker edits shared812/helper/global
+files. Routine finite metadata/card and actual plans admitted jointly with
+manager. Root final science/readiness/merge/settings retained.
 
-* Remote queue manager -- malawi_revision_food
-Owns ROUND2 ASSIGNMENTS/FOLLOWON/CLOSED-SOURCE queues and remote dispatch.
-Malawi old41092166 DID run after worker changed24min cutoff to21min: seven read
-ENTRIES/onewriter then interrupted-15, not RAW0. Replacement41092493 completed
-twelve reads/onewriter but saved oracle timed out180s, overallFAIL/0predicates.
-Nineteen cumulative readentries, seventh old completion unproven. Actual actors
-did not overlap; replacement was submitted before old closure was authenticated.
-Root permits saved-only continuation from new sealed captures, no further native
-or Root per-file loop. Manager+lead own bounded oracle correction/continuation.
-Public evidence excludes passive raw captures. All failed/deviant attempts stay.
-Uganda1281 actual fifteen strict comparisons/twenty-six-file inventory qualified
-admitted after independent postrun-only ctime proof; original deliveryBLOCKED
-retained, no replay. GH1069 factual narrowing/readback complete; no hash exclusions.
-New Uganda1000 job41092546/14fd679c9b364fcaa0e16797847ef15e examines ONLY previously
-unqueried HarvestPlus node562 version route; no repeated nine-route paper search
-or production/numeric change. Original eight country allocations CLOSED, never busy.
+* Remote queue manager — malawi_revision_food
+Owns remote scheduling, source/custody queues, deterministic executors and
+actual terminal receipts. Four1575 workers are being dispatched; report actual
+job IDs rather than counting charters as running actors. BFA setup-only41095376
+FAILED before APIs/native, all seven command groups closed. Correct exact
+bootstrap allowance and preflight imports before unspent two-call cohort.
+Malawi native+saved actors all TERMINAL. Qualified science cohort29/30PASS,
+legacy JSON attrs int3/11-to-string strictFAIL retained; source predates R1/R3,
+counts/other attrs exact, already documented in CONTENTS4811–12. Root admitted
+as qualified evidence, no attrs redesign or retry. Cumulative19 native read
+ENTRIES/2writers, old seventh completion unproven; all earlier deviations stay.
+Final ledger ae2d independently admitted for main train. Uganda housing fifteen
+strict comparisons/twenty-six-file inventory qualified admitted after postrun
+ctime proof. Uganda1000 exact new HarvestPlus route404, terminal0/74; no paper
+or numeric authority established and225 unchanged. Completed jobs never busy.
 
-* Decisions
-Central [[file:isa-decisions.org]]:1457R1YES own sale unit; R2aNO/keep ambiguous
-Farm; R2b separate question PENDING; R3 engineering repair admitted.
-1573YES decode verified own2014 strata lookup after unchanged household-ID
-reconciliation. No new public native-code column or design-equivalence claim.
-932 required full ready-development-PR data check approved; minimal ruleset
-change follows successful1687 rollout. Full goal remains ACTIVE.
+* Decisions and holds
+Central [[file:isa-decisions.org]], latest ce7c3522a:1575YES documentedcombination,
+1573YES own2014 lookup;1457R1YES, R2aNO/keep ambiguous Farm, R2b PENDING.
+PP raw public representation remains pending: revision2 shows Preferred-label,
+missing-unit and all-NA Price audit conflicts, no activation or denominator.
+Settled49/50/51/1494/1499/1594/1066/932 remain authoritative; do not reask.

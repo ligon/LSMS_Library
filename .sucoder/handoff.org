@@ -1,5 +1,5 @@
 #+title: Current LSMS-ISA coordinator handoff
-* CURRENT -- 2026-11-10 17:21 UTC
+* CURRENT -- 2026-11-10 17:46 UTC
 Goal ACTIVE/unbounded. Prior turn PROGRESS: draft1688 and8country allocations.
 This turn PROGRESS:1687repairs published/revalidated, drafts1689/1690, issue905
 narrowed, user1457R1approved/R2arejected, delegated integration now operational.
@@ -368,3 +368,31 @@ PENDING; no activation. Uganda1000 exactnewroute404/agent0SDK74, no fulltextfact
 numericchange; terminalnotbusy. Full1687data42837909103confirmedLIVE17:19Z;
 RootactualPASSpreflight/merge thenfresh932minimalrulesetapply stillpending.
 Development4381/78merges42closures unchanged. GoalACTIVE, no release/sharedrewarm.
+
+* 17:46 UTC user1575 decision and separate delegated train
+User explicitly selected "Use documented combination (Recommended)". Central
+decision ce7c3522a and exact sharedmirror updated; GH1575 body/readback exact,
+now approval+implementation/validation residual. R1575-approved-four-country-
+rollout-20261110/CHARTER.md+ISSUE-REQUEST/ISSUE-READBACK.json. Historical proposal
+NOTSELECTED boundary is superseded, not erased. No pending1575 choice remains.
+Manager dispatching FOUR country-isolated workers on9f; deputy finish_1590 owns
+new private integrate-1575-four-country-strata-20261110/shared812test adaptation/
+donorreview/own draft/onefinalmetadata. Existinglead keeps BFA/maintrain.
+Rows/weights/IDs/Rural/joins preserved; own recorded labels+existing812helper,
+missingcomponent→NA; Togo discrepancy explicit/no guessed exclusions/2021/CILSS.
+Eachbrief fullownCONTENTS first+LOGBOOK/WAITING/TODO/quotedidiosyncrasy; ownpaths
+only, no sharedhelper/global/common812 edits. Header-only owncoding checks if
+existingsealedcards unavailable; normal actual plans finite+jointreview, no
+extra Rootperfilegate/newrelease/sharedrewarm. Sourceworkers are not dataactors.
+
+BFA41095376 deterministic40m attempt FAILED PREDATA: setup/extraction/helper0,
+controller3524939 exit1/2.93s libmagic /dev/null O_RDWR rejected by audit. Both
+sampleactors unstarted/API0/native0; seven groups closed/reader0. Exact /dev/null
+char-device1:3 open exemption + fixed installed ['/sbin/ldconfig','-p'] metadata
+argv independently source-supported; unlink/mutation/source/process guards stay.
+Root asked final-guard metadata-only controller import preflight before firstAPI
+to avoid knownbootstrap traps; no data budget spent/replay. Originalfailurekept.
+Lead+manager routinely review/freeze/direct-launch corrected unspent2-call cohort;
+no Rootapprovalloop. Actual root R/1573-burkina-normal-two-lane-actual-20261110.
+Historicfull42769154949 lasted06:32:30→08:53:57 (2h21m27); currentfull42837909103
+stilllive at fresh17:46read, source8c unchanged. No restart/merge/settings yet.
