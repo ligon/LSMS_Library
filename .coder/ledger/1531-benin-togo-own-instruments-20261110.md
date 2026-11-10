@@ -57,3 +57,31 @@ READER-TOOL-PROVENANCE.json; REPORT.md and final source proof/patch.
 The first overly broad all-heading equality assertion failed; exact retained
 cells disclose differing campaign headings. Comparison was narrowed to the
 actual Q9/GPS blocks without reopening documents. No failure relabeled PASS.
+
+## Separate authorized released-header epoch
+
+Root subsequently authorized exactly two own2018 S16a headers and independently
+reviewed frozen source/context before execution. Healthy Senegal1483 header.py
+was reused byte-exact; runner changed only private context and testing the exact
+two normal L1 layouts at staging. MAIN/unmapped user+network/private0400 inputs,
+absent credentials and no LSMS import; full cards only45 and09b.
+
+Session89642 closed0: one pyreadstat metadataonly=True context per role, zero
+returned records, Benin1.555s and Togo1.086s outer. Benin208variables and
+Togo237variables contain boundq47 but none of47a/47b/47_1/47_2; onlyq47 matches
+the own47 prefix. Both q47 fields are double/%12.0g with a French GPS-area
+label that states no unit and has no value-label link. GPS45 Oui/Non and
+farmer09b Hectare/MètreCarré cards remain explicitly separate. GB's distinct
+m²47a is not an operand in either exact release. No row/presence/magnitude/ratio
+or quantity/unit-classification result follows from these metadata facts.
+
+Original and private full-byte seals, sidecars and pureM source remain exact;
+private config/data empty, no timeout or retrieval fallback. Only held L1
+staging/hash-byte reads plus two metadata-only contexts occurred, no decoded
+source records or numeric/native/production/API campaign. The document-only
+checkpoint9d4a remains unchanged in history; these are separate later facts,
+not retroactive scope expansion. Own q47 export/cleaning definition and fielded
+version applicability remain the exact missing authority; no guessed47a link.
+Primary header packet: reports/1531-benin-togo-own-header-20261110/REPORT.md,
+INPUT-PLAN.json, FREEZE.json, ROOT-INDEPENDENT-CONTEXT-REVIEW.json, per-role
+HEADER/RECEIPT/STAGING/OUTER-RECEIPT and RESULT/SIDECAR-CUSTODY.json.
