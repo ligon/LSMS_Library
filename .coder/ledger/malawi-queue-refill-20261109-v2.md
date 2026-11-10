@@ -40,6 +40,18 @@ receive commits. The earlier failed attempt is prior art, never my own read.
   The make api-audit recipe uses Poetry; no supported unmounted library runtime
   is established (system Python 3.6.8 cannot run its modern syntax). No audit run.
 
+- Fresh additional primary bodies/all comments for #1287 (12 comments) and
+  #1288 (one comment) read. Completed 62 compiler cells and recent livestock
+  source/ID repairs are not repeated. The older CONTENTS restricted-reader
+  residual is still present ONLY in 2016 plot_labor: `_read_usecols` uses
+  DVCFS after ensure while plot_inputs/plot_features use `_dvc_cache_path`.
+- Reuse `local_tools._dvc_cache_path` (sidecar-only resolver) and the accepted
+  plot_features/plot_inputs byte route. Preserve labor's TWO decoder stages
+  (metadata, then intersection of requested/present columns), original
+  kwargs, bytes/temp cleanup, path and all driver AST outside the helper.
+  Existing prior tests: `test_malawi_plot_inputs_cached_reader.py` covers
+  siblings; new uniquely named labor controls will remain UNRUN for ROOT.
+
 ## §3 Definitions and conventions
 
 Cite STANDING §§3–4, AGENTS/CLAUDE and Malawi CONTENTS, not an invented schema.
@@ -73,6 +85,7 @@ P's FRESH/DRY question, which is not S/U. No note is presumed stale.
 | #1228 | reuse delivered own-G-text labels; hold D/I/local-name extensions | Scientific identity questions remain in live issue |
 | #1190 | reuse first/second-source rulings; hold carrier and third gate | Live issue explicitly reserves both choices |
 | #905 | reconcile exact remaining site, then extend only if source-backed | Do not redo delivered vectorization or relax numeric contracts |
+| Restricted labor reader | extend established cached-byte route | One local helper still constructs DVC index for already-held bytes; no decoder or scientific rewrite |
 | Evidence | public issue metadata + committed source/normal reports only | No held native/header/private-state traversal authorized |
 
 ## §6 Questions for ROOT
