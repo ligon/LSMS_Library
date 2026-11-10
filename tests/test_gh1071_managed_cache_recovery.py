@@ -7,6 +7,11 @@ Other cache owners remain outside this tranche.
 import os
 from pathlib import Path
 import subprocess
+import shutil
+import shlex
+import sys
+import yaml
+from functools import wraps
 
 import pandas as pd
 import pyarrow.parquet as pq
@@ -20,6 +25,8 @@ from tests.test_gh1040_wave_read_gates import (
     YAML_TABLE, SCRIPT_TABLE,
 )
 from tests.test_gh1590_wave_failure_manifest import survey, GOOD, BAD, WAVES
+REAL_RUN = subprocess.run  # existing1288 pattern: delegate actual private Make
+
 from tests.test_gh1196_parquet_index_policy import _exact
 from tests.test_gh1288_zero_exit_freshness import model, payload, file_state, OTHER
 
@@ -165,34 +172,48 @@ def test_assumed_miss_keeps_literal_coverage_before_unlink(owned, monkeypatch, c
     assert not owned.exists()
 
 
-def test_assumed_handoff_builds_union_once_then_warm_is_exact(survey, monkeypatch):
-    # Actual ordinary YAML/aggregation/writer and coverage machinery1590.
+@pytest.mark.parametrize('route', ['assumed-covered', 'normal', 'assumed-legacy'])
+def test_country_recovery_uses_one_ordinary_build_then_exact_warm(survey, monkeypatch, route):
+    # Actual ordinary YAML/aggregation/writer1590. Use the healthy SAME-route
+    # reference with full coverage, preserving unused index domains/attrs.
     c = survey.country()
-    healthy = survey.load([GOOD], country=c)
-    _plant(survey.cache, healthy, cache_hash='deliberately-ignored', cache_waves=WAVES)
-    c.assume_cache_fresh = True
+    survey.load(country=c)
+    request = WAVES if route == 'assumed-legacy' else [GOOD]
+    healthy = survey.load(request, country=c)
+    rejected = L.get_dataframe(survey.cache)
+    rejected['x'] = 99.
+    coverage = None if route == 'assumed-legacy' else WAVES
+    _plant(survey.cache, rejected,
+           cache_hash=c._table_cache_hash('facts', WAVES), cache_waves=coverage)
+    c.assume_cache_fresh = route != 'normal'
     original = pd.read_parquet
     payloads = []
     def unreadable_old(stream, **kw):
         if Path(getattr(stream, 'name', '')) == survey.cache:
-            payloads.append('old-country-payload')
+            payloads.append('country-payload')
             if len(payloads) == 1:
                 raise OSError('unreadable current-cache page')
         return original(stream, **kw)
     monkeypatch.setattr(pd, 'read_parquet', unreadable_old)
-    # No second country gate can rediscover the now absent cache/lose coverage.
-    def forbidden(*a, **kw):
-        raise AssertionError('same rejected cache sent through ordinary gate twice')
-    monkeypatch.setattr(C.Country, '_read_l2_country_cache', forbidden)
+    gate = C.Country._read_l2_country_cache
+    ordinary_gates = []
+    @wraps(gate)
+    def counted(self, *a, **kw):
+        ordinary_gates.append('country-gate')
+        return gate(self, *a, **kw)
+    monkeypatch.setattr(C.Country, '_read_l2_country_cache', counted)
     survey.getters.clear()
     with pytest.warns(UserWarning, match='Unreadable managed cache'):
-        rebuilt = survey.load([GOOD], country=c)
+        rebuilt = survey.load(request, country=c)
     _exact(rebuilt, healthy)
-    assert survey.getters == WAVES and payloads == ['old-country-payload']
+    assert survey.getters == WAVES and payloads == ['country-payload']
+    assert ordinary_gates == (['country-gate'] if route == 'normal' else [])
     assert L.read_parquet_cache_waves(survey.cache) == WAVES
     reads = list(survey.reads)
-    _exact(survey.load([GOOD], country=c), rebuilt)
+    _exact(survey.load(request, country=c), rebuilt)
     assert survey.reads == reads and survey.getters == WAVES
+    assert len(ordinary_gates) == (2 if route == 'normal' else 0)
+    assert payloads == ['country-payload', 'country-payload']
 
 
 @pytest.mark.parametrize('outcome', ['healthy', 'bad-output', 'recipe-failure'])
@@ -387,3 +408,110 @@ def test_wave_keeps_omitted_engine_option(yaml_wave, monkeypatch):
         monkeypatch.setattr(pd, 'read_parquet', spy)
         got = w.grab_data(YAML_TABLE)
     assert got['Sex'].tolist() == ['SENTINEL'] and engines == ['<omitted>']
+
+
+def _native_script_case(survey, tmp_path, monkeypatch, outcome):
+    """Existing1590 invented metadata + real helper/Make/private recipe.
+
+    No fake producer: the recipe copies literal7, emits bad bytes, exits7 or
+    emits nothing. Only subprocess observation delegates to the real runner.
+    """
+    survey.script()
+    scheme_path = survey.country_path / '_/data_scheme.yml'
+    scheme = yaml.safe_load(scheme_path.read_text())
+    scheme['Waves'] = [BAD]
+    scheme_path.write_text(yaml.safe_dump(scheme))
+    c = survey.country()
+    w = c[BAD]
+    path = data_root(c.name) / BAD / '_/facts.parquet'
+    path.parent.mkdir(parents=True, exist_ok=True)
+    seed = tmp_path / 'native-healthy-seed.parquet'
+    prepared = L.to_parquet(pd.DataFrame({'x': [7.]}, index=pd.MultiIndex.from_tuples(
+        [(BAD, 'synthetic')], names=['t', 'i'])), seed, absolute_path=True)
+    counter = tmp_path / 'native-recipe-count.txt'
+    recipe = survey.country_path / '_/native_recipe.py'
+    recipe.write_text(
+        'from pathlib import Path\nimport shutil,sys\n'
+        + f'out=Path({str(path)!r}); counter=Path({str(counter)!r})\n'
+        + "with counter.open('a') as stream: stream.write('run\\n')\n"
+        + f'mode={outcome!r}\n'
+        + "if mode=='exit7': sys.exit(7)\n"
+        + f"if mode=='healthy': shutil.copy2({str(seed)!r},out)\n"
+        + "if mode=='bad-output': out.write_bytes(b'fresh invalid output')\n")
+    makefile = survey.country_path / '_/Makefile'
+    makefile.write_text(f'../{BAD}/_/facts.parquet: native_recipe.py\n'
+                        + f'\t{shlex.quote(sys.executable)} native_recipe.py\n')
+    _garbage(path)
+    # A stale cached artifact is newer than every native producer prerequisite.
+    newer = max(recipe.stat().st_mtime_ns, makefile.stat().st_mtime_ns) + 10**9
+    os.utime(path, ns=(newer, newer))
+    assert path.stat().st_mtime_ns > recipe.stat().st_mtime_ns
+    assert not (survey.country_path / BAD / '_/facts.parquet').exists()
+    calls = []
+    def actual(argv, *a, **kw):
+        calls.append(list(argv))
+        return REAL_RUN(argv, *a, **kw)
+    monkeypatch.setattr(C.subprocess, 'run', actual)
+    return c, w, path, prepared, counter, calls
+
+
+@pytest.mark.skipif(shutil.which('make') is None, reason='needs GNU Make')
+@pytest.mark.parametrize('outcome', ['healthy', 'bad-output', 'no-output', 'exit7'])
+def test_actual_make_recovery_has_no_mtime_stale_success(survey, tmp_path, monkeypatch, outcome):
+    c, w, path, expected, counter, calls = _native_script_case(
+        survey, tmp_path, monkeypatch, outcome)
+    with pytest.warns(UserWarning, match='Unreadable managed cache'):
+        if outcome in ['healthy', 'no-output']:
+            got, origin = w.grab_data('facts', _with_origin=True)
+            if outcome == 'healthy':
+                _exact(got, expected)
+                assert origin == 'parquet' and got['x'].tolist() == [7.]
+            else:
+                # Existing Wave policy: no producer output is missing, never
+                # stale99/success. Country final-refusal is checked below.
+                assert got.empty and origin == 'missing' and not path.exists()
+        else:
+            with pytest.raises(ArrowInvalid if outcome == 'bad-output'
+                               else subprocess.CalledProcessError) as failure:
+                w.grab_data('facts')
+            if outcome == 'exit7':
+                assert failure.value.returncode == 7 and not path.exists()
+            else:
+                assert path.read_bytes() == b'fresh invalid output'
+    assert counter.read_text().splitlines() == ['run']
+    make_calls = [argv for argv in calls if Path(argv[0]).name == 'make']
+    assert len(make_calls) == 1 and '-B' in make_calls[0]
+    if outcome == 'healthy':
+        _exact(w.grab_data('facts'), got)
+        assert counter.read_text().splitlines() == ['run'] and len(calls) == 1
+        assert L.read_parquet_cache_hash(path) is None
+
+
+@pytest.mark.skipif(shutil.which('make') is None, reason='needs GNU Make')
+def test_actual_make_no_output_country_refuses_without_false_coverage(
+        survey, tmp_path, monkeypatch, record_property):
+    c, w, path, expected, counter, calls = _native_script_case(
+        survey, tmp_path, monkeypatch, 'no-output')
+    # Keep the existing country rebuild's hashless-wave eviction from
+    # removing the planted unreadability before the actual Wave gate sees it.
+    digest = w._input_hash('facts')
+    _plant(path, expected, cache_hash=digest)
+    column = pq.ParquetFile(path).metadata.row_group(0).column(0)
+    offset = min(position for position in
+                 (column.dictionary_page_offset, column.data_page_offset)
+                 if position is not None and position >= 4)
+    damaged = bytearray(path.read_bytes())
+    damaged[offset:offset + 8] = b'\xff' * 8  # page header, footer/hash intact
+    path.write_bytes(damaged)
+    assert L.read_parquet_cache_hash(path) == digest
+    with pytest.warns(UserWarning) as caught:
+        with pytest.raises(RuntimeError, match='Could not materialize'):
+            survey.load(country=c)
+    assert not path.exists() and not survey.cache.exists()
+    assert L.read_parquet_cache_waves(survey.cache) is None
+    assert sum('Unreadable managed cache' in str(item.message) for item in caught) == 1
+    # Existing legitimate Wave→legacy fallback attempts are allowed. They do
+    # not constitute another corruption recovery and never create coverage.
+    native_runs = counter.read_text().splitlines()
+    assert native_runs and set(native_runs) == {'run'}
+    record_property('existing_native_fallback_recipe_runs', len(native_runs))
