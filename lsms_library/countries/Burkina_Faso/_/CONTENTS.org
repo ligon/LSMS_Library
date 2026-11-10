@@ -3461,3 +3461,61 @@ authority, out-of-panel keys and report/status disagreement remain held.
 not a household interview-status denominator.  Declared conversion cannot
 settle the unknown-household mask, and neither ask counts nor interview dates
 supply a new visit or exposure rule.  No normalization or status census ran.
+
+* 2026-11-10 -- GH #1483 own2021 household-input candidate (source-only, inactive)
+
+The authenticated own2021 s16b header supplies22 input slots and22 labels on
+EACH used/gift/purchase unit field, including bags stating50/25/100kg and
+local containers. These are its own cards, not2018 or Mali/Niger codes.
+q01/q02 have no variable-label text in that metadata; q02's own card is
+1Oui/2Non. The closed1123 use-gate/key observations are historical, not a
+new row measurement from the header's zero returned records.
+
+q09a literally asks "Quelles sont la quantité et la valeur totale de
+%rostertitle% achetées?"; q09c is in the inventory but its label was not
+supplied. No quantity/value meaning is invented for either. The bounded
+adapter retains q09a verbatim, independently reads q05/q07 gifts and
+q08/q09b purchases, and serves unambiguous q03 used quantities/units.
+Its full own cards, pure controls and unapplied serving proposal are in
+=_/s16b_2021*= and =tests/test_burkina_faso_1483_header_adapter_20261110.py=.
+All controls/runtime/API checks are UNRUN. There is no normal2021 input
+builder activated in this source;2018 behavior and all old notes remain.
+This is household×input grain, never a parcel allocation; panel/CS reach,
+season/ID qualifications and the separate DAP/NPK/unit-policy holds stand.
+
+** Supplement before final freeze -- own q09c separates the purchase amount
+
+A separately authenticated zero-row header labels q09c exactly
+"16B.09c. Montant"; q09b is "Unité". With the retained combined q09a
+stem, that own-source split binds q09a as purchased quantity under the
+existing1188 wide-column contract, without a dtype-based inference or
+borrowing2018. This supersedes the inactive/withheld-q09a state immediately
+above: the final source candidate now has a normal2021 s16b wrapper.
+q09c stays native, with no canonical monetary derivation. Every admitted
+raw used/gift/purchase answer and code is retained. All runtime/pure checks
+remain UNRUN; no native counts or API acceptance are newly established.
+Own code6 keeps the full =DAP et autres engrais inorganiques= identity;
+ROOT explicitly holds its nutrient interpretation, so the legacy2018 DAP
+fold is not extended to this wave. A separate raw-answer projection keeps
+No/blank/unknown use answers; the public applied layer gates/refuses them
+explicitly. No existing2018 curation is changed.
+
+** Applied-only correction before verification
+
+The public membership predicate is exactly own =s16bq02 == 1=, before
+application-key/payload validation. No/blank/unlisted answers remain in the
+separate raw projection; they are not recoded as Non or zero and do not abort
+the public applied table. Existing guards still refuse malformed selected
+application identities, amounts, acquisition flags or mapped collisions.
+This corrects the initial candidate's overly broad whole-source refusal;
+no amount/content gate, DAP grade, parcel allocation or2018 rule changes.
+
+** Integration qualification -- accepted household wiring supersedes preparation
+
+The dated unbuilt/inactive/UNRUN statements above describe their separate
+source checkpoints. The accepted1483 source now declares the own2021 s16b
+household applied-input wrapper, with explicit q02=1 membership before
+selected-row validation; its ledger preserves actual pure/native adapter
+results separately from public API/data-CI acceptance. The earlier s16a
+parcel observation is retained and does not allocate household inputs or
+settle the separate nutrient/parcel/coverage choices.
