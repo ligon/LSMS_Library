@@ -1,9 +1,7 @@
 """Selected H carrier: invented independent row/field oracle; no source IO."""
 import ast
-import copy
 import importlib.util
 from pathlib import Path
-import subprocess
 import sys
 import warnings
 
@@ -240,7 +238,14 @@ def test_equal_records_slots_and_binding_limitations(mw):
 
 
 def old_source(rel):
-    return subprocess.check_output(['git','show',BASE+':'+rel],cwd=ROOT,text=True)
+    # Pinned source operands also work on the project's shallow CI checkout.
+    if rel == 'lsms_library/transformations.py':
+        name = 'nitrogen_kg.py.txt'
+    elif rel.endswith('/malawi.py'):
+        name = 'malawi.py.txt'
+    else:
+        name = rel.split('/')[3] + '-plot_inputs.py.txt'
+    return (ROOT / 'tests/fixtures/malawi1190_source_baseline' / name).read_text()
 
 
 def test_old_helper_and_r1_r3_source_inverse_exact():
