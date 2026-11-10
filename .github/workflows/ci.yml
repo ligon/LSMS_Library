@@ -482,6 +482,17 @@ jobs:
           python "$GITHUB_WORKSPACE/scripts/private_ci_check.py"
           --stage data-prebuild -- poetry run make -j2
         timeout-minutes: 30
+      # The Make shocks compiler writes its reviewed (i,t) + Shock-column
+      # intermediate. Country.shocks() writes the pinned (i,t,Shock) cache that
+      # the invariance test compares. Run that normal path before xdist starts,
+      # so test scheduling cannot decide which of the two stages it reads.
+      - name: Finalize Uganda shocks cache for invariance
+        working-directory: lsms_library/countries/Uganda/_
+        run: >-
+          python "$GITHUB_WORKSPACE/scripts/private_ci_check.py"
+          --stage data-prebuild -- poetry run python -c
+          "import lsms_library as ll; ll.Country('Uganda').shocks()"
+        timeout-minutes: 15
       - name: Run full test suite
         # Capture both streams before Poetry/pytest starts. Assertion rewriting,
         # explicit messages, warnings and plugins can all contain row values;
