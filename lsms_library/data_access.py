@@ -1537,7 +1537,9 @@ def fetch_documentation(country: str, wave: str, catalog_id: str, *,
                     if dest.exists() and not same and (old.get('path') != name or hashlib.sha256(dest.read_bytes()).hexdigest() != old.get('sha256')):
                         raise ValueError(f'Unowned or changed held document: {name}')
                     sidecar = dest.with_name(dest.name + '.dvc')
-                    if not dest.exists() and sidecar.exists() and old.get('path') != name:
+                    if sidecar.exists() and old.get('path') != name:
+                        # A matching workspace copy cannot certify a different
+                        # unowned held sidecar. Verify the declared holding too.
                         import yaml
                         from dvc_data.hashfile.hash import fobj_md5
                         outs = yaml.safe_load(sidecar.read_text()).get('outs', [])

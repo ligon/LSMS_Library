@@ -198,16 +198,21 @@ def test_unknown_existing_receipt_is_preserved_not_overwritten(docs):
 
 @pytest.mark.parametrize('raw_hash', [True, False])
 @pytest.mark.parametrize('same_bytes', [True, False])
-def test_held_sidecar_without_receipt_needs_exact_declared_bytes(docs, raw_hash, same_bytes):
+@pytest.mark.parametrize('workspace', [False, True])
+def test_held_sidecar_without_receipt_needs_exact_declared_bytes(docs, raw_hash, same_bytes, workspace):
     directory = docs['directory']; directory.mkdir(parents=True)
     document = directory / 'questionnaire.pdf'
     digest = hashlib.md5(b'%PDF invented' if same_bytes else b'other bytes').hexdigest()
     sidecar = document.with_name(document.name + '.dvc')
     sidecar.write_text(f'outs:\n- md5: {digest}\n' + ('  hash: md5\n' if raw_hash else '') + '  path: questionnaire.pdf\n')
+    if workspace:
+        document.write_bytes(b'%PDF invented')
     before = sidecar.read_bytes()
     report = fetch(push=False)
     assert report['status'] == ('complete' if same_bytes else 'incomplete')
-    assert document.exists() == same_bytes and sidecar.read_bytes() == before
+    assert document.exists() == (same_bytes or workspace) and sidecar.read_bytes() == before
+    if workspace:
+        assert document.read_bytes() == b'%PDF invented'
 
 
 def test_document_revision_atomic_replace_preserves_hardlinked_old_blob(docs):
