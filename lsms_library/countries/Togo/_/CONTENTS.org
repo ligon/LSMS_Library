@@ -932,3 +932,28 @@ Exact DOCUMENT MD5/SHA/custody, cells and limits are retained in
 =reports/review-1531-benin-togo-own-documents-20261110/=. Held private copies
 required no network retrieval or microdata/header/row/API. No area conversion,
 substitution, fallback, clamp, yield route, held-list, unit or default changes.
+
+* 2026-11-10 — separate released S16a header result (GH #1531)
+
+After the document-only note above, exactly one metadata-only context read
+the declared own =2018/Data1/s16a_me_tgo2018.dta= header, MD5
+=6292af8f5a1a30fce364a2994775b0c4=, with zero records returned. The complete
+237-name variable inventory contains =s16aq47= and no =s16aq47a=, =s16aq47b=,
+=s16aq47_1= or =s16aq47_2=. The bound q47 is double, format =%12.0g=; its own
+French GPS-area label states no unit and has no value-label link. This is
+explicit absence in this exact release, not evidence about another version.
+
+The own GPS-measured field45 links to =S16AQ45=:1 Oui/2 Non. Farmer-unit
+field09b links separately to =S16AQ09B=:1 Hectare (Ha)/2 Mètre Carré (m^2).
+Neither card assigns a unit to GPS47. No numeric records, magnitudes, ratios,
+presence counts or corrections were inspected. Own printed question47
+hectares wording and the calendar/version caveats remain separate from the
+unitless released label. Guinea-Bissau's distinct47a m² operand does not exist
+in this inventory and supplies no substitute or conversion here.
+
+Frozen scope, exact input/private custody, two total contexts and0records
+across both countries are retained in
+=reports/1531-benin-togo-own-header-20261110/=. Source and private copies sealed
+exact before/after. No2021 header, table/API or policy/held-list change. The
+remaining documentary question is this release's own q47 export/cleaning and
+fielded-version definition, not a presumed own47a relation.
