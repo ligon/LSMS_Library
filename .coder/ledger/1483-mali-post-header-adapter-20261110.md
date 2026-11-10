@@ -9,10 +9,11 @@ committed before implementation. No project/dependency import or test run.
 ## §1 Task, restated
 
 Prepare own 2018-19/2021-22 household s16b adapters from the freshly supplied
-authenticated header JSON, plus portable invented-frame controls and a minimal
-serving-wiring design. EAC-I producers and their finalizer stay byte-identical.
-If activation lacks an operative eligibility/carrier decision, deliver a
-nonactivated adapter preserving native rows rather than selecting that policy.
+authenticated header JSON, portable invented-frame controls and actual PRIVATE
+Tier B serving wiring. ROOT's second steering explicitly authorizes mechanical
+activation and accepts q02=1. EAC-I producers/finalizer remain byte-identical.
+Keep the unfiltered adapter and activate the known, injective source-label
+projection on the EXISTING country key with Farm-level, not a new index.
 The CLOSED v3 packet is reused for field bindings and residuals, not repeated
 as implementation or code verification.
 
@@ -25,7 +26,7 @@ as implementation or code verification.
 | EHCVM application gate | `Burkina_Faso/2018-19/_/plot_inputs.py`; `Niger/2021-22/_/plot_inputs.py`; #1483 APPLIED scope | #1123/#1188 ledgers and tests | own q02=Oui plus existing applied table settle applied-only candidate; No/unknown stay separate raw answers |
 | Separate acquisition carriers | Burkina #1188 ledger and driver | `test_gh1188_burkina_input_acquisition_fields.py` | reuse names/bindings of four country-only optional gift/purchase fields; do not substitute used unit |
 | Native slot identity | canonical `input_obs`; Niger `_ecvma_input_observations` | #1123 identity tests | retain raw `s16bq01` key at adapter stage; refuse repeated/missing native keys, do not invent row ordinals |
-| Country serving/Make | `Mali/_/{data_scheme.yml,plot_inputs.py,Makefile}` | #1287 compiler ledger | leave inactive; concrete later changes enumerated in country design |
+| Country serving/Make | `Mali/_/{data_scheme.yml,plot_inputs.py,Makefile}` | #1287 compiler ledger | extend only own two wave declarations/prerequisites and optional payloads; reuse declaration-driven concatenator |
 | Shared row/attrs handling | STANDING.md; `country.py`, `feature.py` | shared tests | unchanged; adapter copies raw payload/dtypes and typed attrs, no public-API claim |
 
 ## §3 Definitions & conventions in force
@@ -75,7 +76,7 @@ grain. No applied-only filter, public classification, crop assignment,
 plot marker, unit substitution, reducer or writer inside the adapter.
 Provide explicit yes/no/unanswered/unlisted use masks and the exact q02=1
 applied projection. This is mechanical source interpretation, not a new
-scientific model. Public mapping/wiring remain a concrete nonactivated design.
+scientific model. Public mapping/wiring now follow ROOT's explicit direction.
 
 ## §6 Exact remaining activation boundary
 
@@ -96,9 +97,16 @@ group answer; Improved stays NA without weakening its required declaration.
 
 The explicitly reserved #1483/#1445 code6 DAP catch-all classification remains
 separate. The concrete proposal retains its FULL native input label and gives
-no new 0.18 fraction; adopting pure DAP needs the reserved ruling. Public
-label projection/wiring is not activated by this worker. ROOT review and
-actual pure execution are the next gates. No new headers/raw access requested.
+no new 0.18 fraction; adopting pure DAP needs the reserved ruling. ROOT then
+explicitly authorized actual private wiring and accepted the applied predicate.
+The public helper will implement the injective own-label map and strict
+unknown/public-key refusal. It keeps full native code6 catch-all, so existing
+exact-match `_normalise_input_label` / `_nitrogen_shares` cannot assign it pure
+DAP's share. No nutrient function, grade or fraction changes. `Input_native`
+and `input_code_native` will be optional payloads alongside the four independent
+acquisition fields. Required Improved stays missing/loud; Applied is own
+per-type True on selected EHCVM rows. ROOT reviews the final frozen code;
+all execution remains held. No new source access or approval loop.
 
 ### Phase 3 — verification
 
