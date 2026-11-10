@@ -8,6 +8,12 @@ unknown), that row is unoccupied and no competing sale wants it. Keep the sale's
 own Unit_sold and Condition_sold; no conversion or borrowed harvest unit.
 This approves R1, not the recovered commits' other scientific changes. Port the
 specific R1 logic with current provenance/input compatibility and verify it.
+Root implementation clarification: require an actually reported, non-NA sale
+unit for this different-unit extension. Source review shows an NA Unit_sold
+activates the already-approved harvest-unit fallback after plot attachment.
+Missing-unit sales therefore retain their existing Farm-level placement/NA;
+reported unconvertible/Other labels remain eligible. No factor requirement,
+NA-to-Unknown substitution or change to the shared fallback policy is authorized.
 
 * 2026-11-10: Ambiguous multi-row sales, GH1457 R2a
 The user explicitly selected: "Keep ambiguous sales on Farm-level rows (Recommended)".
