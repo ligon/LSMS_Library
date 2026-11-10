@@ -14,3 +14,20 @@ Invented Git/checked-in source + mocked JUnit: malicious absolute/traversal/syml
 
 ## Status
 Source-only preparation. Actual16 failures remain unclassified. No runtime/acceptance claims.
+
+## Actual finite verification
+Frozen472f actor90031 CLOSED0/chunka421e3: exact36PASS/0F/E/S,31.32s pytest.
+The23 new controls plus13 selected existing wrapper controls ran once; no full
+data/workflow trigger/native/API/census or LSMS package import occurred. MAIN,
+properroot/noconftest/explicitxdist+timeout/autoload-off, nonroot unmapped user+
+network namespace and private empty config/data were asserted for controller+
+2workers. Source/HEAD/import bindings stayed exact and clean; sockettripwires0.
+Legacy noflag counts-only output/status/privacy/cleanup and workflow recipes
+remain unchanged. Opt-in real wrapper proves fake stream/message/parameter
+sentinels stay private while a checked-in public function locator is emitted;
+malicious/missing/mismatched/collection identities are numeric count-only.
+Git blob regular-mode/source revision/AST and XML/size/output bounds controls pass.
+This does not recover/classify the old16 failures or prove the next full-data
+suite will pass. Source-mapping is conservative: inherited/dynamic/unrecognized
+cases remain unmapped; all failure statuses remain authoritative. ROOT owns
+integration/publication/next necessary full-run and administrative decisions.
