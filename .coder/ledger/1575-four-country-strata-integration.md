@@ -85,3 +85,32 @@ at Risa-reviewed-integration-train-20261110/metadata-stage3. Its originalheader
 stays9f; no baseline replay. New candidatecollector still UNRUN. Allfourmanager
 submissions are actualqueued handles, not claimed productive fromsubmission:
 CIV41095863/Togo41095865/Benin41095866/GB41095867. Manager owns supportedwatch.
+
+## 2026-11-10 — Four reviewed donors composed
+
+Independent source review accepted Benin `637c684e`, Togo `209564c3`,
+Guinea-Bissau `a0abde71`, and CotedIvoire `de8cc869` with no unresolved
+production P1/P2. Ordinary merges were conflict-free. The 26 donor objects
+are exact their respective final heads; the deputy's shared812 test and
+this ledger are the only additional owned paths. Every other object remains
+exact `9f89151d`. Complete YAML byte inverses and mapping AST inverses recover
+the originals; all four CONTENTS prefixes and old registry prefixes remain.
+Guinea-Bissau's 36 composite aliases are exactly its old Region aliases
+crossed with its own Urbano/Rural spelling; other tables remain byte-exact.
+
+The final donor XMLs contain 33/35/34/32 passes respectively: 92 unique
+cases after the shared 14 label/stamp controls are deduplicated. These are
+four recorded cohorts, not a new 134-case acceptance. Benin/Togo final
+nonledger objects equal the tested commits. Guinea-Bissau/CotedIvoire froze
+working-tree bytes before running and committed them afterward: their
+frozen file hashes match the final objects, without a claim that the final
+commit existed during execution. Failed setup/fixture attempts remain in
+those reports. Manager authenticated regular-file publisher hashes and
+terminal agent/supervisor zero in `admission-1575-four-country-donors-20261110`.
+
+Deputy static proof: `reports/1575-four-country-integration-20261110/DONOR-REVIEWS.json`.
+Native cards, current normal samples, cold/warm Feature checks, and the final
+metadata footprint remain UNRUN. Next finite pure integration selection is
+only `tests/test_gh812_ehcvm_strata.py::TestWiring` (23 expected parameterized
+cases), exercising the composed metadata/registry/import bindings without
+replaying the four donor modules or invoking data-gated tests.
