@@ -1,4 +1,20 @@
 #+title: Current LSMS-ISA worker queue
+* Actual checkpoint (2026-11-10 05:55 UTC; CURRENT)
+PR1687 READY finalhead1e5f319de; ordinaryCI42764993506/full-data42764993747 live.
+Root owns observer25573 and source admission/publication/settings/merge. No new
+development merge or full-data pass; all prior component work remains reviewed.
+- finish_1452: Nigeria587 FIVE ownPPcommunity questionnaires.5normalprivate
+  docgetters passed, bounded newpage reads active. W4PPp5 positively asks food
+  prices in C2; C8-only explanation insufficient. No raw/header/production edit.
+- finish_1590: next Tanzania587 originalR1 food-security/coping section check
+  assigned; ownnewW/currentCONT first, existingheld XLS11558, bounded NEWsection
+  only. PriorCOVER/CODES/UPDdoc checks reused, no fielding/coverage assumption.
+- malawi_revision_food: Ethiopia4additional W5public docs COMPLETE (4GET,
+  onebatchpush,fourfreshreadonlyretrievals all0), accepted into1687. Available
+  for independent country review or actual CI failures; no occupancy-only task.
+All five remote jobs completed; zero remote running. Exact sources/limits and
+qualified old failures in [[file:handoff.org]]. Pending scientific decisions unchanged.
+
 * Actual checkpoint (2026-11-10 05:29 UTC; supersedes older snapshots)
 All five remote country jobs CLOSED successfully; zero remote running.
 Root plus three local agents are active:

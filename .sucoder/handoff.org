@@ -1,4 +1,84 @@
 #+title: Current LSMS-ISA goal handoff
+* Published integration (2026-11-10 05:55 UTC; CURRENT)
+PR1687 READY https://github.com/ligon/LSMS_Library/pull/1687, final published
+head1e5f319de476a8c253d1a61f0745021e82313305/tree d309e1562e90b4facd451bbf8878b8145cc42e86.
+Root W/branch integrate-isa-final-provenance-correction-20261110. DEVELOPMENT
+still4381;78merges/42wholeclosures, no new merge/settings/master/weights change.
+Actual current full-data42764993747 and ordinaryCI42764993506 IN_PROGRESS;
+eligibility passed. Root reused public metadata observer, LIVE session25573,
+R/1687-final-integration-ci-20261110/{watch_ci.py,CI-WATCH.jsonl}. Poll samehandle,
+do not restart tests from observation timeouts. No full-data pass claimed.
+Initial1687 runs42764499344/42764499383 bound201955 are superseded by final-head
+sync; preserve actual cancellation/results, do not report them as acceptance.
+
+Combined source201955 merged all accepted e2e093 +ETH4 f27d. Root independently
+proved8doc/ledger donor leaves exact and19325others exacte2e. Last1e5f ordinary
+merge adds ONLY precise ledger wording2db44 (HTTP200/finalURLs equal requested,
+not an inferred no-redirect history); allnonledger objects exact201955. No tests
+or census replay. Final source proof R/isa-final-eth-docs-source-carry-20261110,
+manifest68fae19d…; earlier measured04160 actualmetadata accepted independently:
+452country/1885wave/37BTF changed,0FIF/allfourkeysets same/18PeruNone unchanged,
+13of14nonhashfields exact. Only collector_build_closure_paths changed, explained
+by new direct source collection +_closure_parts sorted/seen traversal. Root
+recomputed actual maps/fields and both6baf/f16ab4 digests; errors/denials/private0.
+ETH4 doc-only and ledger carries preserve all executable/config/hash consumers.
+
+Ethiopia4publicdocs COMPLETE:4GETHTTP200,one normal managedbatch0,4freshreadonly
+empty-private-cache normalgetters0;12246429B total,0parsers. New7docobjects exact
+25b02bd; donorfinal2db44. No reacquisition of priorHH/PP/PH/BID/raw/defaults.
+Root650 issue now describes proposed standards/automation/all7ETHnewholdings
+in1687, pendingvalidation/landing.1483/1441 remaining scopes also narrowed.
+
+Actual local workers:1452 Nigeria5875PPcommunity-doc investigation active; first
+context preflight79390 failed BEFORE anygetter (normal empty dvc-cache dir),
+replacement4568 CLOSED0/5normalgetters/18.093s, allseals/privateonly/noWB.
+Existingpypdf locator49362 active at last observation; W4PPp5 C2 FoodPrices
+positive (PP prices need not be C8), W5ToCp4 pointsC2p6; W4ToC staleW3PHfooter
+is a quoted conflict, not licence to assume stale. Own source023244a14, no raw/
+headers/API/code change yet.1590 next Tanzania587 originalR1 foodsecurity XLS
+section check assigned, offpublished201955/ownnewW; COVER/CODES earlier1441
+reads must not be repeated. FULL currentCONT grounding/backcasting/WAITING114,
+one normalprivate readonly original11558 getter/existingreader only, bounded
+newsection/title/routing/version; no automaticfielding/absence/coverage verdict.
+Mwi completed ETH4 and is available for independent review/actual CI findings.
+Zero remote jobs running; no eight-busy-worker claim. Goal remains ACTIVE.
+
+* Latest operations (2026-11-10 05:41 UTC)
+PR1686 final04610062 unit+Windows CI42761588876 SUCCESS. Root published/narrowed
+1483,1441 and1680 actual residuals. Metadata edit42762487211 SUCCESS did NOT
+replace1680's failed required full-data check42748441466; no bypass/settings.
+
+Final combined runtime source04160b772385d09bc528aebea442497056a0a72c,
+tree0a523861dd5340600123a05a6aefabacfb9d7a7a, W/branch integrate-isa-cd-fixtures-final-20261110.
+Contains all previously accepted24e355 plus wrapper03ed8237 via ordinary merge.
+All5 wrapper leaves exact03ed;19322 other prior objects exact except ownledger;
+wholeCountry c0185/data_access6a88 exact. Root reviewed final proof/diff-check;
+development fresh remote still4381. Agent1590 owns ONE actual live metadata
+collector72179 in R/isa-final-source-metadata-20261110, private/no network/data,
+existing unchanged operators and6baf baseline/carry4381. No result yet; keep
+W frozen. Await actual comparison, then Root GitHub publication/ready full CI.
+PR body draft is in functions store isa_final_pr_body if preserved; reconstruct
+truthfully from this handoff if not. No final batch PR exists yet.
+
+Diagnostic source472f independent Root+1590 PASS;36pure controls passed. Root
+caught existing whole-PR-vs-nightly recipe assertion affected by new flag. Narrow
+oracle correction inverses ONLY the single PR-only flag and retains all original
+whole recipe/env/timeout checks; targeted1PASS. Final03ed ledger-only over5b066;
+not a fresh37run. R/932-safe-ci-failure-locators-20261110 final manifest81882e83.
+
+650 final6a88 exact carry accepted. Mwi now executes separate Ethiopia W5
+four-public-doc follow-on under8df18901/base29576: community78629,manual78631,
+report78643,generatedDDI. Exact4 GET actor68417 started, then authorized ONE
+unchanged managed batch +4 fresh empty-private-cache readbacks, narrow sidecars/
+SOURCE/CONT holding addenda only. Retain failures; no reacquire held HH/PP/PH/BID,
+no parsing/raw/default/shared-cache changes. Does NOT block frozen current batch.
+Agent1452 finishes wrapper then starts Nigeria587 five own community questionnaires
+C1–C5 (closed v3 manifest/proposed-document-operands.json under Q/private/Nigeria-v3-source-pinned/88359cfcf53847c389f567caf9c93872/evidence).
+These roles were UNREAD; source/custody check and finite C8/round/title pages only
+through normal private read-only getter, existing parser; no raw/API/build/new
+acquisition yet. FULL country CONTENTS first, named idiosyncrasy, preserve caveats.
+No repeated22-cell diagnosis, compiler/date/W3coping work or all17 closure.
+
 * Latest checkpoint (2026-11-10 05:23 UTC; supersedes older statuses below)
 Goal ACTIVE; development remains 4381d701ffb06ab447a37c66362119d1c1e23009,
 78 verified merges / 42 whole closures. No new merge or ruleset change.
