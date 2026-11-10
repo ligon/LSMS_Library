@@ -7,8 +7,6 @@ See .coder/ledger/587-nigeria-pp-price-foundation.md §§2–6.
 """
 from copy import deepcopy
 from dataclasses import dataclass
-import json
-from pathlib import Path
 from collections.abc import Mapping
 
 import numpy as np
@@ -18,7 +16,7 @@ from lsms_library.countries.Nigeria._.nigeria import (
     PP_QUARTER, C8_NO_VARIETY, cluster_id, format_id,
 )
 
-_SOURCE_FILE = Path(__file__).with_name('pp_community_price_sources.json')
+from lsms_library.countries.Nigeria._.pp_community_price_sources import SOURCES as _SOURCES
 _PUBLIC_INDEX = ('t', 'v', 'j', 'u', 'variety', 'obs')
 _NATIVE_COLUMNS = (
     'NativeItemCode', 'NativeItemLabel', 'NativeAvailabilityCode',
@@ -54,11 +52,9 @@ class PPCommunityPriceReport:
 
 def pp_source(source_key):
     """Return a private copy of the actual source's captured specification."""
-    with _SOURCE_FILE.open(encoding='utf-8') as stream:
-        sources = json.load(stream)
-    if source_key not in sources:
+    if source_key not in _SOURCES:
         raise ValueError('unknown Nigeria PP community-price source')
-    return deepcopy(sources[source_key])
+    return deepcopy(_SOURCES[source_key])
 
 
 def _native_labels(values, column, source):
