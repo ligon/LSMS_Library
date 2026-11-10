@@ -1,13 +1,11 @@
 #+title: Current LSMS-ISA worker queue
-Development4381;78verifiedmerges/42wholeclosures; through1679merged/postverified.
-ZERO remote jobs active/pending. All12 actual country jobs terminal:10Refused143,
-2native0/supervisor74. BFA/Mali/Malawi complete5artifacts authenticated;
-no remote runtime acceptance. No further blind submissions.
-- Root: country review,932pure verification/publication,queue/CI/merges.
-- finish_1452: bounded nine synthetic supervisor controls; source-pinned SuCoder repair.
-- finish_1590: Malawi494c country independent source review/fullCONTENTS first.
-- malawi_revision_food: Tanzania bd7eb country review, test-only empty-oracle correction,
-  focused pure verification;1071final evidence next.
-Current source regression/12attempt matrix/candidate hashes/nextsteps:
-[[file:handoff.org]]. Historical queue:
-[[file:archive/isa-country-workers-through-1679-20261109.org]].
+Development4381/78verifiedmerges/42wholeclosures; PR1680READYdataCI LIVE;
+1681Malawi/1682Tanzania DRAFT with6/42purecontrolsPASS.
+ZEROremotejobsactive/pending; all12attemptsterminalRefused.
+- Root: PR1680actualwiring/dataCI, countryPRadmission, one repairedCLIpilot.
+- finish_1452: reviewedSuCodersource-restoration56purePASS; isolatedCLIpin/stagingproof.
+- finish_1590: eightcountrybriefs fromcomplete145openinventory; preserveholds/movequeue.
+- malawi_revision_food:1032/1071twofinitecandidate-onlymetadatafootprints, closedbaselinecarry.
+BFA/MalidocumentarycandidatesindependentqualifiedPASS, unpublished.
+NextcountryactorsafteroneverifiednormalCLIpilot; no blindretry/monitorbypass.
+Details/actualhashes/links/nextsteps:[[file:handoff.org]].

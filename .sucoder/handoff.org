@@ -288,3 +288,64 @@ IndependentR/review-1071-core-cache-recovery-source-20261109 manifest
 fe2802b6c37ba6ca341741467d9480086d99a9b0a3eaad40e134339d5ad90b09.
 Mwi nowprepares exactfiniteoperator/current4381doccomposition, no actualtests
 untilRootreads/grants. Deferredowners/nonatomicunlinkqualificationremain.
+
+* Latest published queue — 2026-11-09 17:15 PST
+Root docs checkpoint38d31aaba FS-published. Complete fresh GH inventory145open
+issues (limit1000 nothit),37distinct whole-word ISA-country title matches;
+percountry titlecountsBFA7/ETH2/MWI4/MLI7/NER9/NGA6/TZA4/UGA6. EthiopiaRHS
+and Niger/Nigeria substring collisions excluded. Shared-body tasks extendthis.
+Q/assets/all-open-issues-20261109.json and all-open-country-title-inventory.
+
+932correctedf41f pure67PASS/0F/E/S, actor85186outer0/17.811s; threeidentities/
+guards0/sourceclean/privatecfgdata0. R/932-corrected-pure-controls-20261109
+FINAL-MANIFESTba9f882b7e1167f26ea96113a68c7a3e4c2ee9c15b149e66ca761712efade140.
+Ledger-only283c1ece40326d966c3fb4bc999b3e612bec41da allproduct exactf41f.
+PR1680https://github.com/ligon/LSMS_Library/pull/1680 OPEN/READY off4381;
+firstdraft run42733125873 correctlyFAILSrequired-name beforecheckout/creds,
+alllaterstepsSKIP. Markready actualexit0; fullPRdata run42733260628 LIVE,
+actualeligibility/exactsyntheticmerge-parent checksPASS; gateopen/credsPASS,
+currentlyUgandaprebuild. CI42733125345LIVE. No settings changed.
+Body-onlyedit run42733351648 CLOSEDsuccess, actualnamepr-data-metadata-edit;
+originalrequiredpr-data-validation job129556272424 remainedLIVE/nocancel.
+PlatformevidenceR/932-platform-wiring-1680-20261109. Actualmerge87745e120d5a5e6364c84083aad88a6c740ae92e.
+Public932 updatedselectedpolicy/PR; remainingactualfullresult+rulesetenforcement.
+
+PR1681https://github.com/ligon/LSMS_Library/pull/1681 DRAFT: Malawi
+2016restrictedlaborreader existingL1cachedbytebranch; finalledgerc2fdb085
+all19265nonledger exact494c; sixinertbytecases actual25855outer0/14.270s,
+6PASS/0F/E/S/sourceclean/3ids/guards0/privatecfgdata0. No actualnativeparity/
+speed/footprint/whole905closure. R/review-malawi-494c84-labor-reader-20261109
+FINALmanifestc557276650debe9fd7f1f7c3769b1ef667683b7fadc1395c3d288be71d1035c6.
+
+PR1682https://github.com/ligon/LSMS_Library/pull/1682 DRAFT: Tanzania
+singletonnumericcallbacks; final6d188129e4370073e327d0f26036b606c268363e
+all19266nonledger exacttestedb322c121;42uniquePASS/0F/E/S actual2495outer0/
+23.041s. Multirow scalarsequence/frozen905reference/digest/4ULP unchanged;
+newemptyoracle correctedtoidenticallegacyValueError. No nativeAPI/parity/
+speed/footprint/1497orwhole905closure. R/review-tanzania-905-singleton-queue-20261109.
+Bothdraftpending932rolloutanddataacceptance; Rootreadproductdiffs/peerproof.
+
+BFA484c independentqualifiedDOCUMENT/SOURCEPASS,3owned/19262othersexact4381/
+YAMLnoncommentexact; scientific1573/1442/1148/2021holdsretained.
+R/review-burkina-484c36-country-notes-20261109 manifest
+70f0e175516f556d8ac28a4a116605f9e8710821f5e2ee7c4e36ab2697f7d560.
+Mali9e4b qualifiedDOCUMENT/SOURCEPASS,8owned/19259others exact4381,3Python
+executableAST/YAMLnoncommentexact;575variablelinks+schemas42bindingsauthentic.
+INSTATsection5/BIDfoursectiontensionheld; noexactPDFbyteparse/visualclaim.
+R/review-mali-queue-documentary-20261109. Bothnotyetpublished/hashcostunmeasured.
+
+LOCALactiveassignments: finish_1452 normalisolatedSuCoderCLIproof;
+finish_1590 eightcountrybriefs fromcomplete145inventory (nojobs);
+malawi_revision_food twoframeworkmetadata-onlycandidatecensuses (1032+1071),
+closed6bafbaselinecarry/authentication, no baselinecollector/newsource/data.
+Root explicitlyauthorizedtwofiniteactors aftersourcebinding, sourceimmutable.
+
+SuCoderrepairisolatedW=/local/job40825266/worktrees/fix-sucoder-dispatch-exit-proof-20261110
+basec9dafdb, candidatee15f0030acf6659087392380c89679a723970c50; production
+3restoredfunctions exactsuccessfularchivedAST, onlyrunboundedracetelemetry.
+External9syntheticcontrolsPASS17.767s; portable+existing56PASS/2realprocess
+casesdeselected/1.91s actual44499outer0. RootreadcompleteSOURCE.patch/AGENTS,
+qualifiedSOURCEPASS. Noinstalled/stagedhotpatch/globalinstall/nativeconfig/
+monitorrelaxation/actualsubmission. Agentpreparescandidateimportpath/staged
+workerSHApin via normalisolatedCLI; Rootownsonefreshsmallsource-onlypilot.
+R/sucoder-proc-exit-proof-repair-20261110. All12countryfailuresremainfailures.
