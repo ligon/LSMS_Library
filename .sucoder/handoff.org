@@ -1,5 +1,5 @@
 #+title: Current LSMS-ISA coordinator handoff
-* CURRENT execution and delegation (2026-11-10 11:15 UTC)
+* CURRENT execution and delegation (2026-11-10 11:20 UTC)
 This section supersedes older execution snapshots below. Goal ACTIVE; development
 4381d701/78 merges/42 closures unchanged. PR1687 d47 still has 18 failed full-data
 tests; no waiver, merge, settings change, master release or shared-cache rebuild.
@@ -13,6 +13,25 @@ tests; no waiver, merge, settings change, master release or shared-cache rebuild
   Routine private validation inside an already-approved managed-source closure can
   be managed by that agent with finite selection/time/resource bounds. Root keeps
   scientific/test-expectation acceptance, GH publication and integration.
+  EIGHT independent country assignments now ACTUALLY SUBMITTED, each exactd47,
+  free co_carleton/savio4_htc/2CPU/8G/45min, distinct private checkout. Root read
+  all eight exit0 submit receipts and positively matched pin/job/dispatch/account.
+  Q/refill-independent-eight-d47-20261110/{tasks,*-submit.json,workers}:
+  BFA1436 driver implementation41090092/900f9ba0b7dc465a8abbd96c2eb487e9;
+  Ethiopia1457 heldpatch decision41090115/3b0d2e91b7ac4869a1506c8e102538d0;
+  Malawi1457 heldsale/unit decision41090117/7660a87a26974c02840b8fa708312f7e;
+  Mali1179 NEWproducerinstruction route41090116/46aa3f2bb1c64ecc8abef40fb1b2e917;
+  Niger1529 unread3Earea/cycle authority41090114/66f7ab64a0304057a73fbccf84e55f72;
+  Nigeria1502 unmeasuredW2table41090120/057581df5a0649b5b736aa3820b6b5ba;
+  TZA1497 first-coverfallback decision41090121/1882bd2a533d418e8e621d45f4eb999a;
+  UGA1525 genuinelyNEWofficialversion route41090122/1553745cd9f84176b25c6cc3c86a5cb0
+  (fallback1536 existing569EA decisionbrief). Heldbriefs reuse existing proofs,
+  no repeated campaigns, guessed policies or panel relinking. SUBMITTED is not
+  agent_execution or actualtest proof; manager owns finite supported watch/refill.
+  Separate CInewjobs: CIVoracle41090080/cfe79375a4ab421a94dca6744d1afd20,
+  GhanaLSSsampling41090081/34907406316340d983e50eef8309f8fa,
+  EthiopiaSampling41090082/22ee490117984bdd818373637047864a; all three supported
+  agent_execution at latest manager check, no claimed actual body result yet.
 - Nigeria sampling test-only b9a9835e: 30 pure +2 original normal tests PASS. Root
   reviewed complete patch and independently inverted helper/cohort boundary to the
   exact old test AST; production/maps/curation unchanged. Ready for repair batch.
@@ -21,12 +40,20 @@ tests; no waiver, merge, settings change, master release or shared-cache rebuild
   for a TEST operand view21239. All four old N/D reproduced exactly (2601/191,
   2640/433,1717/1717,2973/2973). finish_1590 implementing test-only correction on
   b9a9835e; old counts/dup/K assertions and current served data remain unchanged.
+  Frozen931c938f helper+36pure PASS; Root independently AST-inverted entire module
+  to exactb9a and reviewed full patch. Original4 normal warm-only actor2107 now
+  LIVE/<=300s, exact338262B currentcache separatecopy, realnormalgate,0raw/build/
+  writer allowed. No NGA replay. All original old failures remain retained.
 - Mali namespace correction runtime2931/final7215: Root reviewed full9385a9d8 patch
   and independently matched approved mapSHA7c17086a..69dd; 28pure PASS qualified
   shutdown logging noise. Corrected three original tests ADMITTED once under
   CORRECTED3-DATA-PLAN v2: exact genuine crop+sample warm copies,18held inputs,
  9raw-oracle reads,0build/0writers; normal hash+coverage gates must pass. Manager
   owns execution/intake. All downstream quantity/unit assertions must execute.
+  Corrected3 now CLOSED0/3PASS0F0E0S/47.786s, all downstream amount/unit/mask/
+  placement and surveykg tuple assertions reached; full seals/observer intake
+  pending. Remaining1494nine+1528two original params authorized as next finite
+  private normal11 against46managed objects195118403B, freshallocation ifneeded.
 - Niger original11 yielded7P4F; one closed-output read failed in external Arrow
   aggregation. Exactly one additional same-artifact read admitted (2total), with
   explicit True/False/NA counts,0raw/API/build/writer/test replay. No count repin.
@@ -43,10 +70,21 @@ tests; no waiver, merge, settings change, master release or shared-cache rebuild
   inputs140321380B; node-local runtime before imports; genuine sample rebuilding
   allowed, plot reuse required after cold; no memo/hash/factory overrides.
   finish_1452 owns active execution and must propose next Nigeria task afterward.
+  Make actualcontroller2613 LIVE;38stage72839 PASS. Default sample reference
+  CLOSED0/49089rows/51.357s, ordinary currenthash/all10coverage,0raw/writers/
+  denials, inventory exact. ColdMake running; no Make success claim yet.
+  Next independent1452source task authorized1518 ownW1/W2harvest cards/modes,
+  existing ownPHdocs/bounded NEWsections in separateW/no defaultconversion.
 - Mali1436 manual restored at63bf28cb (five docpaths only): official public PDF,
   managed push+fresh readonly retrieval exact; bounded Q13 instructions still do
   not connect Etat4 to processing. Root reviewed patch and narrowed GH1436 body.
   Country documentary carries remain queued; not implementation/closure proof.
+- Root private repair composition W=/local/job40825266/worktrees/
+  fix-1687-reviewed-repair-batch-20261110, branchfix/1687-reviewed-repair-batch-20261110,
+  current71392355d. Carries accepted BFAwriter4commits+NGAoracle3commits onto exact
+  d47. Clean/diffcheckPASS, five changedpaths only; filesystemorigin backed up.
+  No GitHub sourcepush/newfullrun yet. Add reviewed Mali/UGA/CIV/Niger fixes after
+  their source+actualacceptance, then one suitable combined final verification.
 
 * Newest execution update (2026-11-10 10:00 UTC)
 - Nigeria true3PH NORMALdefault actual81179LIVE onEXACT9763verificationW;

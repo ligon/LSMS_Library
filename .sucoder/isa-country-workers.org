@@ -1,8 +1,14 @@
 #+title: Current LSMS-ISA worker queue
-* CURRENT (2026-11-10 11:15 UTC)
+* CURRENT (2026-11-10 11:20 UTC)
 User requests broader country delegation. Manager malawi_revision_food owns new
 eight-country actionable-issue dispatch plus CIV oracle fix/Eth+Ghana sampling
 diagnostics; must return actual assignment IDs and deliverables, not capacity.
+EIGHT country assignments now actually submitted/free2CPU8G45min/exactd47:
+BFA1436 41090092; ETH1457 41090115; MWI1457 41090117; MLI1179 41090116;
+NER1529 41090114; NGA1502 41090120; TZA1497 41090121; UGA1525/1536 41090122.
+Root independently read all8 successful receipts. Manager owns supported watch,
+results intake and immediate meaningful follow-ons; submitted is not busy proof.
+Separate CIVoracle/GhanaLSSsampling/ETHsampling 41090080/081/082 are agent_execution.
 Local1452: Nigeria3PH Make backend actual plan admitted (1reference+9Makecalls).
 Local1590: Uganda historical sampling TEST-view correction on accepted NGA b9a.
 Mali namespace remote:28pure PASS; corrected3 actual tests admitted under v2 warm
@@ -10,6 +16,10 @@ cache gates/18held sources/9raw-oracle reads/0build/0writers. Niger second close
 output aggregation read admitted once, no raw/API/tests. NGA2 sampling originals
 PASS, Tanzania3 originals PASS. Full1687 still failed18; no new merge/settings.
 Current detailed docket: [[file:handoff.org]]; older snapshots below historical.
+LATEST: Mali corrected3 actualPASS47.786s (final receipts pending); UGA36purePASS,
+four original normal warm-only2107LIVE. Nigeria Make2613LIVE, real defaultsample
+reference49089rowsPASS/0raw/0writers. Root private reviewed repair branch71392355d
+contains acceptedBFA+NGAtests; no GitHub push/CI waiver. NextMali original11 authorized.
 
 * Newest (2026-11-10 10:00 UTC)
 NGAtrue3PHactualnormal81179LIVE (1452);1590independentreviewsealedPASS,
