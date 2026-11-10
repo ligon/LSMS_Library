@@ -38,4 +38,11 @@ df = plot_features_for_wave(t, area, detail, colmap, geovar=geovar)
 assert df.index.is_unique, "Non-unique (t, i, plot_id) in plot_features 2015-16"
 assert len(df) > 0, "plot_features 2015-16 produced no rows"
 
+# GH587: own PH A1 records; the preceding PP block remains unchanged.
+from nigeria_ph_plot_features import admit_ph_plot_source, append_ph_plot_features
+
+admit_ph_plot_source('2015-16', '../Data/secta1_harvestw3.dta')
+ph = get_dataframe('../Data/secta1_harvestw3.dta', convert_categoricals=False)
+df = append_ph_plot_features(df, ph, '2015-16')
+
 to_parquet(df, 'plot_features.parquet')
