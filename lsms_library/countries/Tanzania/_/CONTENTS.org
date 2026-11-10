@@ -3217,3 +3217,32 @@ No native parity, Country/Feature/API/cache, speed or live-hash claim is made.
 Changing this shared country module retains Tanzania-wide hash coupling.
 All historical failures, WAITING #114, UPHI/r_hhid grain, Extended/Refresh,
 and #1497 continuation decisions remain separate and unchanged.
+
+* 2026-11-10 -- Original R1/R2 household instruments held as documents (GH #1441)
+
+Two already-authenticated public instruments are now DVC-managed under
+=2008-15/Documentation/NPS-R1/= and =NPS-R2/=, preserving their original names:
+- WB76/resource11558: =NPS Household Qx - English (Year 1).xls=,
+  2,419,200 bytes, MD5 =0beef1bba8018606e995b138edcd505f=.
+- WB1050/resource30525: =NPS_Household_Qx_English_Year_2.pdf=,
+  1,097,377 bytes, MD5 =ed342639649c2cfbe8a4972dd77747d8=.
+Each own SOURCE records the official URL, published date and exact SHA256.
+One targeted =push_to_cache_batch= published only these two documents;
+separate initially empty private read-only =get_data_file= retrievals each
+passed exact byte seals, with no in-tree binary or WB fallback. No redownload,
+new document parse, native data read or shared-cache write occurred.
+
+The original R1 CODES sheet and R2 printed CODES48 dictionaries were already
+read in the closed documentary investigation; their transcription remains
+public evidence, not an active map (=1441_PUBLIC_AUTHORITY_ROUTE.md=). This
+expands the earlier bounded statement “no document scanned lists the codes”.
+It does not settle the specific original-cover-to-UPD =ha_01_1/ha_02_1= bridge:
+UPD BID6–7 describes recoding, and p.6 says response codes “will not necessarily
+correspond to each original round-specific response code value.” Exact fielded
+revision beyond the published resource metadata also remains qualified.
+
+The parent SOURCE still identifies UPD3814 and its CATALOG_COVERS unchanged;
+these are supporting original-round documents, not acquisition of the original
+round microdata. Four logical waves sharing2008-15, UPHI/r_hhid backcasting,
+Extended/Refresh cohorts, WAITING114 and all served district/ID/weight rules
+remain unchanged. No labels/crosswalk/default or whole1441 closure is implied.
