@@ -1385,7 +1385,7 @@ def inputs_survey_kg_estimate(wave):
 # ---------------------------------------------------------------------------
 #
 # This finalizer handles EACI plot applications (2014-15 EACI14, 2017-18
-# EACI17). The earlier EACI-only/no-input comments described pre1483 wiring.
+# EACI17). Earlier no-input wording was incorrect; EACI-only described pre1483 wiring.
 # EHCVM household s16b inputs now use their separate source-bound adapter
 # and wave wrappers, not this EACI finalizer. Their s16a parcel questions
 # remain distinct and unwired; no household allocation or shared grain is

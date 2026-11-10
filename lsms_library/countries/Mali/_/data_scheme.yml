@@ -280,7 +280,7 @@ Data Scheme:
     # Input_native/input_code_native retain own type identity; the injective
     # source-label projection preserves each known slot on this existing key.
     # DAP catch-all stays literal, never pure DAP; NPK grade is not inferred.
-    # Earlier EACI-only/no-block comments described the pre1483 wiring.
+    # Earlier no-block wording was incorrect; EACI-only described pre1483 wiring.
     # s16a parcel questions remain separate; following plot/group details are EACI.
     # plot  = "{field}_{parcel}" — the SAME plot id as crop_production /
     #         plot_features.  crop is the seed's crop on SEED rows: the
