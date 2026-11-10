@@ -58,3 +58,16 @@ fallback with readable/proven coverage; fresh malformed outputs and postread
 policy errors are strict, never healed a second time. Checks remain non-atomic
 filesystem identity checks, not a compare-and-swap guarantee. C/common nlink
 correction is separately frozen3c28 and must be composed before batch publication.
+
+## 8. ROOT source finding: failed forced producer boundary (2026-11-10)
+Original9d8/b192 source and all prior failed/pass receipts remain immutable.
+ROOT found new force=True reproduction still entered the old local fallback
+catch for OSError/ValueError/RuntimeError, while DvcException/FileNotFoundError
+could reach outer fallback without strict recovery marked. This is a concrete
+source-backed P2, not claimed native incidence. A newly forced recovery must
+propagate its exact producer error and cannot start a second legacy owner.
+Ordinary preexisting dirty-stage failure fallback remains unchanged. Minimal
+correction marks strict recovery before forced reproduction and bypasses only
+forced local failure fallback. Freeze new discriminating exact-error/no-fallback
+controls plus normal dirty-stage companions before bounded pure execution;
+no old38/C/native/API/census replay. Independent Mwi review required.
