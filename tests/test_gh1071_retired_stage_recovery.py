@@ -55,6 +55,12 @@ def _served():
     return frame
 
 
+def _payload_path(value):
+    # The managed reader owns an open stream; ordinary get_dataframe may pass
+    # a pathname. Path.name is only a basename, so do not treat Paths as streams.
+    return Path(value.name) if hasattr(value, 'read') else Path(value)
+
+
 def _state(path):
     if not path.exists():
         return None
@@ -98,7 +104,7 @@ def test_real_clean_foreach_cache_forces_once_and_warm_never_reproduces(tiny, mo
         return result
     fired = []
     def payload(path, *args, **kwargs):
-        if fault == 'read-oserror' and Path(path) == output and not fired:
+        if fault == 'read-oserror' and _payload_path(path) == output and not fired:
             fired.append(True)
             raise OSError('invented initial stage payload error')
         return read(path, *args, **kwargs)
@@ -153,7 +159,7 @@ def _fault(owner, monkeypatch, mutate=None):
     read = pd.read_parquet
     error = ArrowInvalid('invented initial stage payload failure')
     def payload(path, *args, **kwargs):
-        if Path(path) == owner.output and not owner.calls:
+        if _payload_path(path) == owner.output and not owner.calls:
             if mutate is not None:
                 mutate()
             raise error
@@ -345,7 +351,7 @@ def test_clean_sibling_is_not_reproduced_or_decoded_twice(stage_owner, monkeypat
     monkeypatch.setattr(C.Country, '_resolve_materialize_stages', lambda *args: [o.info, info])
     read, counts = pd.read_parquet, {o.output: 0, other: 0}
     def payload(path, *args, **kwargs):
-        path = Path(path)
+        path = _payload_path(path)
         if path in counts:
             counts[path] += 1
         if path == o.output and not o.calls:
