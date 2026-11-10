@@ -323,6 +323,7 @@ def acquisition(tmp_path, download, monkeypatch):
     monkeypatch.setattr(da.config, "microdata_api_key", lambda: "synthetic")
     monkeypatch.setattr(da, "_get_catalog_idno", lambda url: "NGA_2023_GHSP-W5_v02_M")
     monkeypatch.setattr(da, "_find_stata_zip_url", lambda *args: ("https://synthetic.invalid/zip", "zip"))
+    monkeypatch.setattr(da, 'fetch_documentation', lambda *a, **k: None)
     monkeypatch.setattr(da, "_wb_catalog_search", lambda *args, **kwargs: [])
     source = root / "Nigeria/2023-24/Documentation/SOURCE.org"
     source.parent.mkdir(parents=True)

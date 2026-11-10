@@ -65,7 +65,7 @@ from collections.abc import Sequence
 from contextlib import contextmanager
 from pathlib import Path, PurePosixPath
 from typing import NamedTuple
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 
 from . import config
 from .catalog_relations import derived_from, same_study_aliases
@@ -1311,6 +1311,287 @@ def _find_stata_zip_url(api_base: str, idno: str,
             return download_url, r.get("filename", f"{idno}.zip")
 
     return None
+
+
+def _documentation_html(html: str, catalog_id: str) -> list[dict]:
+    """Recognize NADA resource attributes, not arbitrary page links."""
+    from html.parser import HTMLParser
+
+    class Resources(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.recognized = False
+            self.items = {}
+            self.titles = {}
+            self.title_id = None
+
+        def handle_starttag(self, tag, attrs):
+            a = dict(attrs)
+            if tag == 'div' and 'resources' in (a.get('class') or '').split():
+                self.recognized = True
+            if tag == 'span' and 'resource-info' in (a.get('class') or '').split():
+                self.title_id = a.get('id')
+                self.titles[self.title_id] = ''
+            if tag != 'a' or 'download' not in (a.get('class') or '').split():
+                return
+            href = a.get('href') or ''
+            match = re.search(r'/catalog/' + re.escape(catalog_id) + r'/download/(\d+)(?:/|$)', href)
+            ddi = href.rstrip('/').endswith(f'/catalog/{catalog_id}/pdf-documentation')
+            if not match and not ddi:
+                return
+            rid = match.group(1) if match else 'ddi'
+            row = dict(resource_id=rid, filename=a.get('data-filename'),
+                       title=self.titles.get(rid, '').strip() or a.get('title'), type=a.get('data-dctype'),
+                       download_url=href, generated_ddi=ddi)
+            old = self.items.get(rid)
+            if old and any(old[k] != row[k] for k in ('filename', 'type', 'download_url')):
+                raise ValueError(f'Conflicting catalog resource {rid}')
+            self.items[rid] = row
+
+        def handle_data(self, data):
+            if self.title_id is not None:
+                self.titles[self.title_id] += data
+
+        def handle_endtag(self, tag):
+            if tag == 'span':
+                self.title_id = None
+
+    parser = Resources()
+    parser.feed(html)
+    if not parser.recognized:
+        raise ValueError('Unrecognized Related Materials resource layout')
+    return list(parser.items.values())
+
+
+def _documentation_resources(catalog_id: str, api_key: str | None) -> tuple[list[dict], dict]:
+    """A failed lookup is never a successful empty inventory."""
+    import urllib.request
+    base = 'https://microdata.worldbank.org/index.php'
+    catalog = f'{base}/catalog/{catalog_id}'
+    attempts = []
+    idno = _get_catalog_idno(catalog)
+    if idno:
+        url = f'{base}/api/resources/{idno}'
+        try:
+            req = urllib.request.Request(url, headers={'Accept': 'application/json'})
+            if api_key:
+                req.add_header('X-API-KEY', api_key)
+            with urllib.request.urlopen(req, timeout=30) as response:
+                data = json.load(response)
+            if not isinstance(data, dict) or not isinstance(data.get('resources'), list):
+                raise ValueError('Unrecognized resources API schema')
+            rows = []
+            for r in data['resources']:
+                if not isinstance(r, dict) or not isinstance(r.get('_links', {}), dict):
+                    raise ValueError('Unrecognized resources API record')
+                kind = r.get('type') or r.get('dc_type')
+                if not isinstance(kind, str):
+                    raise ValueError('Resources API record has no recognized type')
+                rid = r.get('resource_id') or r.get('id')
+                rows.append(dict(resource_id=str(rid) if rid is not None else None,
+                                 filename=r.get('filename'), title=r.get('title'),
+                                 type=kind, language=r.get('language'),
+                                 download_url=r.get('_links', {}).get('download') or (
+                                     f'{catalog}/download/{rid}' if rid is not None else None)))
+            return rows, dict(status='listed', url=url, attempts=attempts)
+        except (urllib.error.URLError, OSError, TimeoutError, ValueError) as exc:
+            attempts.append(dict(url=url, error=f'{type(exc).__name__}: {exc}'))
+    else:
+        attempts.append(dict(url=catalog, error='Could not resolve IDNO'))
+    url = catalog + '/related-materials'
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url), timeout=30) as response:
+            html = response.read().decode('utf-8')
+        return _documentation_html(html, catalog_id), dict(status='listed', url=url, attempts=attempts)
+    except (urllib.error.URLError, OSError, TimeoutError, ValueError) as exc:
+        attempts.append(dict(url=url, error=f'{type(exc).__name__}: {exc}'))
+        return [], dict(status='discovery_failed', url=url, attempts=attempts)
+
+
+def _write_documentation_receipt(path: Path, report: dict) -> None:
+    """Git-managed atomic receipt; never follow a receipt/parent symlink."""
+    for p in [path, *path.parents]:
+        if p.is_symlink():
+            raise OSError(f'Symbolic-link documentation path: {p}')
+        if p == _COUNTRIES_DIR:
+            break
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=path.parent,
+                                         prefix='.lsms-documents-', delete=False) as dst:
+            temporary = Path(dst.name)
+            json.dump(report, dst, indent=2, ensure_ascii=False)
+            dst.write('\n')
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def _document_holding(receipt: dict, catalog_id: str | None = None) -> dict:
+    """Reject unknown receipt schemas without replacing their evidence."""
+    if (not isinstance(receipt, dict) or not isinstance(receipt.get('held'), dict)
+            or (catalog_id is not None and receipt.get('catalog_id') != catalog_id)):
+        raise ValueError('Unrecognized existing documentation receipt')
+    for rid, row in receipt['held'].items():
+        if (not isinstance(rid, str) or not isinstance(row, dict)
+                or not isinstance(row.get('path'), str)
+                or Path(row['path']).name != row['path']
+                or not re.fullmatch(r'[0-9a-f]{64}', str(row.get('sha256', '')))):
+            raise ValueError('Unrecognized document holding identity')
+    return receipt['held']
+
+
+@_acquisition
+def fetch_documentation(country: str, wave: str, catalog_id: str, *,
+                        push: bool = True, remote: str | None = None) -> dict:
+    """Acquire catalog documents separately from the raw held release.
+
+    Returns and atomically persists DOCUMENTS-{catalog_id}.json. Expected
+    retrieval/IO conflicts are explicit incomplete results. Held identities
+    never certify current remote contents. push=False is local-only and does
+    not invoke DVC. Ordinary readers and raw acquisition receipts are unchanged.
+    """
+    import urllib.request
+    for label, value in [('country', country), ('wave', wave)]:
+        if not isinstance(value, str) or not value or Path(value).name != value or value in ('.', '..') or '\\' in value:
+            raise ValueError(f'Invalid {label}: {value!r}')
+    match = re.fullmatch(r'(?:https://microdata\.worldbank\.org/(?:index\.php/)?catalog/)?(\d+)/?', str(catalog_id))
+    if match is None:
+        raise ValueError(f'Invalid catalog id: {catalog_id!r}')
+    cid = match.group(1)
+    directory = _COUNTRIES_DIR / country / wave / 'Documentation'
+    receipt = directory / f'DOCUMENTS-{cid}.json'
+    report = dict(catalog_id=cid, catalog_url=f'https://microdata.worldbank.org/catalog/{cid}',
+                  status='incomplete', discovery={}, resources=[], held={},
+                  freshness='Held identities do not certify current remote contents.')
+    receipt_valid = not receipt.exists()
+    try:
+        for p in [directory, *directory.parents]:
+            if p.is_symlink():
+                raise OSError(f'Symbolic-link documentation ancestor: {p}')
+            if p == _COUNTRIES_DIR:
+                break
+        directory.mkdir(parents=True, exist_ok=True)
+        if receipt.is_symlink():
+            raise OSError(f'Symbolic-link documentation receipt: {receipt}')
+        prior = _document_holding(json.loads(receipt.read_text()), cid) if receipt.exists() else {}
+        receipt_valid = True
+        report['held'] = prior.copy()
+        other_owners = {}
+        for other in directory.glob('DOCUMENTS-*.json'):
+            if other == receipt:
+                continue
+            if other.is_symlink():
+                raise ValueError(f'Symbolic-link catalog receipt: {other}')
+            old = json.loads(other.read_text())
+            for row in _document_holding(old).values():
+                other_owners.setdefault(row['path'].casefold(), set()).add(row['sha256'])
+        items, report['discovery'] = _documentation_resources(cid, config.microdata_api_key())
+        if report['discovery']['status'] == 'discovery_failed':
+            report['status'] = 'discovery_failed'
+        else:
+            names = set()
+            with tempfile.TemporaryDirectory(prefix='lsms-documents-') as temporary:
+                plan = []
+                for resource in items:
+                    row = dict(resource, status='listed')
+                    report['resources'].append(row)
+                    if not (row.get('generated_ddi') or re.search(r'\bdoc/', str(row.get('type') or ''), re.I)):
+                        row['status'] = 'not_selected'
+                        continue
+                    name, rid = row.get('filename'), row.get('resource_id')
+                    if (not isinstance(name, str) or not name or Path(name).name != name or '\\' in name
+                            or name.startswith('.') or name.casefold().endswith('.dvc')
+                            or name.casefold() in ('source', 'source.org', 'license', 'license.org')
+                            or name.casefold().startswith('documents-')
+                            or not isinstance(rid, str) or not re.fullmatch(r'\d+|ddi', rid)):
+                        raise ValueError(f'Unsafe document identity/filename: {rid!r}/{name!r}')
+                    dest = directory / name
+                    if name.casefold() in names or any(p.name.casefold() == name.casefold() and p.name != name for p in directory.iterdir()):
+                        raise ValueError(f'Colliding document filename: {name}')
+                    names.add(name.casefold())
+                    if dest.is_symlink() or dest.with_name(dest.name + '.dvc').is_symlink():
+                        raise ValueError(f'Symbolic-link document/sidecar: {name}')
+                    url = urljoin(report['catalog_url'] + '/', row.get('download_url') or '')
+                    if not row.get('download_url') or urlparse(url).scheme not in ('http', 'https'):
+                        raise ValueError(f'Invalid document URL: {name}')
+                    row.update(path=name, download_url=url)
+                    staged = Path(temporary) / str(len(report['resources']))
+                    try:
+                        with urllib.request.urlopen(urllib.request.Request(url), timeout=300) as response, staged.open('wb') as dst:
+                            if 'text/html' in (response.headers.get('Content-Type', '') if getattr(response, 'headers', None) else ''):
+                                raise OSError('Document response is HTML')
+                            shutil.copyfileobj(response, dst)
+                        content = staged.read_bytes()
+                        if not content:
+                            raise OSError('Empty document response')
+                    except (urllib.error.URLError, OSError, TimeoutError) as exc:
+                        row.update(status='download_failed', error=f'{type(exc).__name__}: {exc}')
+                        continue
+                    row.update(bytes=len(content), sha256=hashlib.sha256(content).hexdigest(), md5=hashlib.md5(content).hexdigest())
+                    if any(h != row['sha256'] for h in other_owners.get(name.casefold(), ())):
+                        raise ValueError(f'Document belongs to another catalog: {name}')
+                    old = report['held'].get(rid, {})
+                    same = dest.is_file() and dest.read_bytes() == content
+                    if dest.exists() and not same and (old.get('path') != name or hashlib.sha256(dest.read_bytes()).hexdigest() != old.get('sha256')):
+                        raise ValueError(f'Unowned or changed held document: {name}')
+                    sidecar = dest.with_name(dest.name + '.dvc')
+                    if not dest.exists() and sidecar.exists() and old.get('path') != name:
+                        import yaml
+                        from dvc_data.hashfile.hash import fobj_md5
+                        outs = yaml.safe_load(sidecar.read_text()).get('outs', [])
+                        if len(outs) != 1 or 'md5' not in outs[0]:
+                            raise ValueError(f'Unrecognized document sidecar: {name}')
+                        algorithm = 'md5' if outs[0].get('hash') == 'md5' else 'md5-dos2unix'
+                        with staged.open('rb') as src:
+                            if fobj_md5(src, name=algorithm) != outs[0]['md5']:
+                                raise ValueError(f'Unowned differing document sidecar: {name}')
+                    plan.append((staged, dest, row, same))
+                # Validate the entire successful membership before placement.
+                for staged, dest, row, same in plan:
+                    if not same:
+                        handle = None
+                        try:
+                            with tempfile.NamedTemporaryFile(dir=directory, prefix='.lsms-document-', delete=False) as dst:
+                                handle = Path(dst.name)
+                            shutil.copyfile(staged, handle)
+                            os.replace(handle, dest)
+                        finally:
+                            if handle is not None:
+                                handle.unlink(missing_ok=True)
+                    row['status'] = 'local-only'
+                paths = [dest for _, dest, _, _ in plan]
+                confirmed = set()
+                if push and paths:
+                    try:
+                        pushed = push_to_cache_batch([p.relative_to(_COUNTRIES_DIR) for p in paths], remote=remote)
+                        confirmed = {(_COUNTRIES_DIR / Path(p)).resolve() for p in pushed}
+                        if len(pushed) != len(confirmed) or not confirmed <= set(paths):
+                            confirmed = set()
+                    except (OSError, subprocess.SubprocessError) as exc:
+                        report['push_error'] = f'{type(exc).__name__}: {exc}'
+                    for _, dest, row, _ in plan:
+                        row['status'] = 'pushed' if dest in confirmed else 'push_failed'
+                for _, _, row, _ in plan:
+                    if row['status'] in ('pushed', 'local-only'):
+                        report['held'][row['resource_id']] = dict(row)
+                selected = [r for r in report['resources'] if r['status'] != 'not_selected']
+                report['status'] = ('not_listed' if not selected else 'complete'
+                                    if all(r['status'] in ('pushed', 'local-only') for r in selected) else 'incomplete')
+    except (OSError, ValueError) as exc:
+        report.update(status='incomplete', error=f'{type(exc).__name__}: {exc}')
+        if isinstance(exc, ValueError) and report['resources'] and report['resources'][-1]['status'] == 'listed':
+            report['resources'][-1]['status'] = 'placement_conflict'
+    try:
+        if not receipt_valid:
+            raise OSError('Existing documentation receipt could not be validated; preserved unchanged')
+        _write_documentation_receipt(receipt, report)
+    except OSError as exc:
+        report.update(status='incomplete', receipt_error=f'{type(exc).__name__}: {exc}')
+    if report['status'] not in ('complete', 'not_listed'):
+        logger.warning('%s/%s catalog%s: incomplete documentation (%s); see %s', country, wave, cid, report['status'], receipt)
+    return report
 
 
 def _download_and_extract(download_url: str, zip_filename: str,
@@ -2670,7 +2951,8 @@ def add_wave(country: str, catalog_id: str,
              remote: str | None = None,
              verbose: bool = True,
              subdir: str | None = None,
-             add_members: bool = False) -> list[Path]:
+             add_members: bool = False,
+             documentation: bool = True) -> list[Path]:
     """Download a new survey wave from the WB and register it locally.
 
     Creates the directory structure (``Data/``, ``Documentation/``,
@@ -2738,6 +3020,11 @@ def add_wave(country: str, catalog_id: str,
         file -- for a new release that adds files to a holding that is
         COMPLETE.  Never on a partial holding: Malawi's ``Panel/`` holds one
         round of 3819, and ``add_members=True`` would import the other three.
+    documentation : bool
+        Fetch published catalog documents separately after raw acquisition
+        (default True). Failures are explicitly reported in
+        ``Documentation/DOCUMENTS-{catalog_id}.json`` and do not change raw
+        release success, held provenance or this function's raw-file return.
 
     Returns
     -------
@@ -2949,6 +3236,10 @@ def add_wave(country: str, catalog_id: str,
             "%s/%s: push did not confirm every downloaded file; "
             "SOURCE.org not updated, held release and latest queue kept.",
             country, wave)
+
+    if documentation:
+        # Document membership must never enter the raw release completion gate.
+        fetch_documentation(country, wave, cat_id, push=push, remote=remote)
 
     # --- Summary table ------------------------------------------------------
     if con is not None and result:
