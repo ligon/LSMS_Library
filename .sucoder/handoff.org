@@ -212,9 +212,37 @@ Do not reask settled choices or infer approval from historical'asruled'agentpros
 Public1690 advanced to factual-docs0fd203cbe63bd453fd5cd5ecc4454563c271bbc6
 (draft/base4381;34incrementalpaths). Private next source9f89151ddd783a07fa57b9277da3677f7024ce7c
 includes admitted final MalawiR1/R3cc7, NigeriaW4 andNigerphantomcleanup;44paths
-beyonda292/all19335nonowned exact. One source-only metadataactor87693 LIVE under
-integrator; no source edits untilclose, expected63country/193wave delta vsretained9e.
+beyonda292/all19335nonowned exact. One source-only metadataactor87693 has closed successfully; actual63country/193wave delta vsretained9e.
 All source/actual claims remain qualified as in donor reports; no newdata replay.
 Reviewerchild review_w4_niger_intakes resumed after finish1590completion; full
 immutableW4/Niger review closed withno blockers. Root centraldecisionmirror now
 includes explicit reported-unit/no-borrowing clarification. R2b stillPENDING.
+
+* Latest gate and rollout preparation
+Exact8c ordinary42837909207 and Windows completedSUCCESS; full42837909103
+stillLIVE (Run full test suite started14:55:42Z). Watchsession30290 remains owner.
+Root personally reviewed delegated932 packet R932-post-validation-rollout-
+preparation-20261110/{REPORT,ROLLOUT}.md,CANDIDATE-PUT/SEMANTIC-DIFF.json.
+Candidate only adds app15368 pr-data-validation and stricttrue; all6writable
+fields/other rules/Role5always preserved. GET-only refresh-candidate.py rechecks
+freshstate and refusesdrift; noPUT/settings/ready/merge applied. Actualtested
+source is syntheticad7268f95ff656227efe766793dc4884240d096a/tree151b, parents
+[4381,8c]; CheckRunSHA is H, not syntheticS. Require publictested_source receipt,
+actualjob success/counts, exactfreshhead/base/tree before Root merge/rollout.
+
+Public1690 now9f89151ddd783a07fa57b9277da3677f7024ce7c/tree6ffc54dbca0ed912a3b1533c338b2f069206f773,
+44incrementalpaths vs a292/all19335nonowned exact; includes finalcc7Malawi,
+NGAW4 andNigercleanup. Singlecombinedmetadata87693 CLOSED0/123.753s:63country/
+193wave (MWI22/132,NER21/21,NGA20/40),0BTF/FIF/nonhash/registration/None changes,
+0errors/denials/privatefiles; no newpure/data replay. Stage3reportSHA3066952b...
+under R/isa-reviewed-integration-train-20261110. Dedicateddraftincludes explicit
+incrementalcompare link; do not mistake inherited187files for187newfiles.
+
+Root delegated joint final Malawi native-plan admission/launch to manager+
+integrator after independentreview: exact4managed2010G/P/I/Q,12fullreads,1native
+writer and2realprovenanceaccessors, passive rawcaptures outside recursively
+published evidence, realistic frozenbound/current9f source/no sample/weights/
+newrelease/APIcampaign. Root permission loop NOT required once fixedscope/oracles
+are frozen; onlynewscience/scope escalates. Missingunitoracle mustexclude only
+newR1placement, preserving oldNA-to-NA ladder attachments and currentnonpositive
+Farmeligibility. No globalmissingunit policy follows. R2banswer remainsPENDING.
