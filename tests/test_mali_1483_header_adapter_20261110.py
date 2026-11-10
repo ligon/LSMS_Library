@@ -169,17 +169,17 @@ def test_exact_independent_alias_frame_keys_dtypes_masks_and_typed_attrs(adapter
             else "Semences d'arichide", pd.NA], dtype='string'),
         'Input_native_unlisted': [False, False, False, False, True],
         'Used': pd.array([True, False, pd.NA, pd.NA, True], dtype='boolean'),
-        'Used_unlisted': [False, False, False, True, False],
+        'Used_unlisted': pd.array([False, False, False, True, False], dtype='boolean'),
         'u': pd.array(['Gramme', 'Kilogramme', 'Tonne', 'Litre', 'Charrette'], dtype='string'),
         'u_unlisted': [False] * 5,
         'Received_as_gift': pd.array([False, True, pd.NA, pd.NA, True], dtype='boolean'),
-        'Received_as_gift_unlisted': [False, False, False, True, False],
+        'Received_as_gift_unlisted': pd.array([False, False, False, True, False], dtype='boolean'),
         'Unit_received_as_gift': pd.array(['Charrette', 'Litre', 'Tonne', pd.NA, pd.NA], dtype='string'),
-        'Unit_received_as_gift_unlisted': [False, False, False, False, True],
+        'Unit_received_as_gift_unlisted': pd.array([False, False, False, False, True], dtype='boolean'),
         'Purchased': pd.array([True, False, pd.NA, pd.NA, True], dtype='boolean'),
-        'Purchased_unlisted': [False, False, True, False, False],
+        'Purchased_unlisted': pd.array([False, False, True, False, False], dtype='boolean'),
         'Unit_purchased': pd.array(['Kilogramme', 'Gramme', pd.NA, 'Charrette', pd.NA], dtype='string'),
-        'Unit_purchased_unlisted': [False, False, False, False, True],
+        'Unit_purchased_unlisted': pd.array([False, False, False, False, True], dtype='boolean'),
     })
     i = '12003' if wave == '2018-19' else 'EHCVM21_12003'
     index = pd.MultiIndex.from_arrays([
@@ -222,7 +222,7 @@ def test_use_classes_partition_does_not_select_rows_or_treat_unknown_as_no(adapt
     expected = pd.DataFrame({'yes': [True, False, False, False, True],
         'no': [False, True, False, False, False],
         'unanswered': [False, False, True, False, False],
-        'unlisted': [False, False, False, True, False]}, index=raw.index)
+        'unlisted': pd.array([False, False, False, True, False], dtype='boolean')}, index=raw.index)
     pd.testing.assert_frame_equal(got, expected, check_exact=True)
     assert got.sum(axis=1).tolist() == [1] * 5
     out = module.s16b_rows_for_wave(raw, '2021-22', household_id=formatters['2021-22'])
@@ -348,7 +348,10 @@ def test_header_provenance_and_exact_country_wiring(adapter):
         assert (COUNTRY / wave / '_/plot_inputs.py').is_file()
         text = (COUNTRY / wave / '_/data_info.yml').read_text(encoding='utf-8')
         assert text.count('\nplot_inputs: !make\n') == 1
-    scheme = yaml.safe_load((COUNTRY / '_/data_scheme.yml').read_text())['Data Scheme']['plot_inputs']
+    tree = yaml.compose((COUNTRY / '_/data_scheme.yml').read_text())
+    data_scheme = next(value for key, value in tree.value if key.value == 'Data Scheme')
+    input_node = next(value for key, value in data_scheme.value if key.value == 'plot_inputs')
+    scheme = yaml.safe_load(yaml.serialize(input_node))
     assert scheme['index'] == '(t, i, plot_id, input, crop)'
     for name, kind in [('Quantity', 'float'), ('u', 'str'), ('Purchased', 'bool'),
                        ('Quantity_purchased', 'float'), ('Improved', 'bool'), ('Applied', 'bool')]:
