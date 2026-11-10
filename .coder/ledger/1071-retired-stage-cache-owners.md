@@ -71,3 +71,21 @@ correction marks strict recovery before forced reproduction and bypasses only
 forced local failure fallback. Freeze new discriminating exact-error/no-fallback
 controls plus normal dirty-stage companions before bounded pure execution;
 no old38/C/native/API/census replay. Independent Mwi review required.
+
+## 9. Forced-producer P2 correction actual result (2026-11-10)
+Frozen d2cc74 actor59729 CLOSED0: exactly9PASS/0F/E/S (15.04s pytest),
+8new forced/ordinary-dirty discriminators plus ONLY the1 affected readable-
+replacement case. Normal dirty RuntimeError/FileNotFoundError still serves
+available data with unproven []coverage; ordinary dirty DvcException still
+enters its old legacy owner. All5 forced error classes preserve the exact
+producer exception/causeNone, oneforce and no fallback/new countrywrite/source
+mutation. A readable replacement no longer waives failure: it is separately
+strictly readable while the public call raises that same failed producer error.
+Other old37 case expectations/helpers are unchanged; no old38 or C replay.
+Prior9d8/b192 and their source-only P2 plus all old failures/passes remain
+historical. They do not prove the corrected forced-producer fatal contract.
+Controller+2 worker identity/private/source bindings stayed exact, active
+tripwires zero and top private data/config empty. Reports and immutable receipts:
+reports/1071-forced-stage-producer-fatal-20261110/focused-v1. No raw/API/native
+survey, metadata census or fullsuite. Final batch must carry this corrected D
+source rather than b192/9d8's force fallback behavior.
