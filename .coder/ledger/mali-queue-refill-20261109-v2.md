@@ -93,5 +93,36 @@ will be left alone and excluded from commits.
 
 ### Phase 3 verification
 
-Pending source reconciliation and finalization. This first ledger commit
-precedes task implementation. No runtime acceptance is asserted.
+- OK (§2/§3): `b5089a634` corrects the three false input-absence comments
+  and records an own-round contract. Published 2018 s16b has area fields but
+  no parcel IDs; its 20-category input dictionary differs at codes19/20 from
+  2021's 22-category dictionary. All six own unit dictionaries were inspected
+  separately. No curated map, source filter or public grain is chosen.
+- OK (§2/§4): `d6ed74c66` clarifies existing quote eligibility. The 129-entry
+  diagnosis and exclusions stay held. `a06b7a62` (#1356) and `ad44c8d46`
+  (#1515) were confirmed ancestors; no loader/Poids conversion replay.
+- OK (§3/§4): `c39894b77` records a new INSTAT August2023 report describing
+  community Section5 for EHCVM2021/22. The old own-BID “four main sections”
+  statement remains. The report is not C4, not a fielded form or released
+  grappe source. `unsure` remains and no shared verdict file changed.
+- OK (§4): stdlib source inspection found identical executable tokens,
+  excluding only the module docstrings, for the three changed Python files.
+  Every non-comment YAML line is identical. Original CONTENTS 258,965-byte /
+  3,744-line prefix is exact. `git diff --check` passed. These are static
+  source checks, not tests or API/cache-footprint acceptance.
+- Tests/collection/imports/native reads/builds: **UNRUN**, per ROOT. The
+  existing static audit attempt failed at compilation on Python3.6.8;
+  its individual exit was not captured (following cat made combined exit0).
+  Direct frontmatter discovery enumerated15 skills. No runtime was set up.
+- Documentary limitation: browser screenshots of INSTAT report pp3/15
+  cache-missed; local Poppler absent. Browser text and separately hashed
+  public PDF share a URL, not a locally established extraction-byte binding.
+  No full visual review or native custody is asserted.
+
+Selected whole issues #1483/#1179/#821 remain open/held. Partial source fixes
+and new authority evidence are reviewable; task status is **unfinished**,
+with exact remaining decisions/operands in the country packets and private
+DECISIONS/REPORT. All five required artifacts and final source conservation
+receipts are prepared outside Git under the dispatch's private evidence path.
+Final source publication is solely to the named private results repository;
+ROOT scientific/integration acceptance remains pending.
