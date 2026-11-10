@@ -3742,3 +3742,60 @@ erratum binding =s7fq13b= (especially =4 Egrener=) to the printed state card
 and explaining its processing/shelling meaning. Q21, sale answers or a different
 wave cannot supply that bridge. No condition recode, kg factor, quantity,
 identifier, weight or default follows from this finding.
+
+* 2026-11-09 -- EHCVM input dictionaries: area is not a parcel key (GH #1483)
+
+The own published lists, WB 4295/F30--F31 and 6275/F29--F30, separately
+confirm =s16a= parcel input questions and =s16b= household input costs.
+The earlier claim "have no agriculture-input block" is contradicted by
+these dictionaries and the older NPK note in this file. The three current
+source comments now say unwired; the existing EAC-I declarations and
+callable code are unchanged. Prose edits to those build inputs are still
+an expected Mali cache invalidation, not measured in this source-only task.
+
+New detail: 2018's 19-variable =s16b= list carries area =s16aq09a/b= but no
+field/parcel IDs =s16aq02/03=. The 2021 17-variable list has neither the
+area fields nor parcel IDs. An area answer does not turn the household
+roster into a parcel roster. Both lists distinguish use =q03a/b=, gifts
+=q05/q07a/b= and purchases =q08/q09a/b/c=, each quantity with its own unit.
+
+The own input-identity dictionaries also differ: =s16bq01= code19 is
+=Plants/boutures de tubercules= in 2018 and =Semences d'arichide= in2021;
+code20 is =Autres semences= then =Plants/boutures de tubercules=. A numeric
+seed map cannot carry between them. Each wave's three published input-unit
+dictionaries was checked independently; their code1 is Gramme and code2
+Kilogramme, unlike the EAC-I community grid. These are published metadata
+facts, not fresh native inspection or new curated maps.
+
+GH #1483's "Decide whether to wire at plot grain" remains a ROOT decision.
+No household amount is allocated over plots, no NPK grade or DAP-catch-all
+composition is chosen, and EAC-I missing codes are not applied to EHCVM.
+The source contract, exact public locators, committed sidecar identities
+and bounded unexecuted controls are in =_/1483-input-source-contract.md=.
+
+* 2026-11-09 -- own poverty report adds a five-section community claim (GH #821)
+
+New primary-source lead: INSTAT's public August2023 report on poverty in
+Mali2021, =profil-determinants-pauvrete-mali-2021_pub.pdf=, has64PDFpages.
+The cover names INSTAT/August2023; PDFp3 explicitly binds its discussion to
+EHCVMII fieldwork October2021--July2022. Section1.2, PDFp15, describes a
+fifth community section collecting local food prices. The exact short
+quotation and public locator are in =_/821-community-price-authority.md=.
+
+Preserve this alongside the existing own-BID quote "four main sections"
+(recorded above, PDFp8) and its separate monthly market design (PDFp9).
+Neither is assumed stale. The report is an own-country lead, not the exact
+fielded community form, CAPI version or released cluster-price source.
+The existing =unsure= / =C1-partial;C4-notrun= position is unchanged.
+
+The initial dispatch's browser-only finding was independently checked by
+the coordinator on2026-11-10UTC. The same public PDF snapshot is1,456,311bytes,
+SHA256=cd86f5ebf0cc20ece8ad6dd4cb7eb20a62d370bb3a08feff5069a0a3de17bcd1=,
+64pages. One local Poppler context extracted text and rendered PDF1/3/15
+from those exact bytes; independent visual review confirmed the cover,
+own-wave dates and food-price sentence. The source remained unchanged.
+The visual scope is those three pages, with receipts in the coordinator's
+=reports/821-mali-public-report-three-pages-20261110= archive.
+Public locator, the contradictory claims, limitations and finite authority
+plan are in =_/821-community-price-authority.md=. No native/API/data replay,
+producer contact, closing verdict, crosswalk or new loader follows.

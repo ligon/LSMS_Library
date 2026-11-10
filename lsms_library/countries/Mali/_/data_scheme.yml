@@ -274,9 +274,11 @@ Data Scheme:
   plot_inputs:
     # Item-level agricultural inputs, GAP 2 (parity loop).  One row per
     # (t, i, plot_id, input, crop): the REPORTED inputs the survey records, NOT
-    # aggregates.  The input module lives in the EACI waves only (2014-15
-    # EACI14 s1e/s2c, 2017-18 EACI17 s11c/s7d).  The EHCVM waves (2018-19,
-    # 2021-22) have no agriculture-input block — deferred.
+    # aggregates.  Currently wired for EACI only (2014-15 EACI14 s1e/s2c,
+    # 2017-18 EACI17 s11c/s7d).  Both EHCVM waves (2018-19, 2021-22) have
+    # household input rosters in s16b and parcel input questions in s16a;
+    # these remain unwired (GH #1483).  Their distinct grains need an
+    # explicit decision; see CONTENTS.org and 1483-input-source-contract.md.
     #
     # plot  = "{field}_{parcel}" — the SAME plot id as crop_production /
     #         plot_features.  crop is the seed's crop on SEED rows: the

@@ -3,9 +3,11 @@
 Each EACI wave's ``Mali/<wave>/_/plot_inputs.py`` writes a parquet indexed
 by ``(t, i, plot, input, crop)`` with the reported item-level input columns
 (Quantity, u, Purchased, Quantity_purchased, Improved).  The crop/input
-module lives in the EACI waves only (2014-15 EACI14, 2017-18 EACI17); the
-EHCVM waves (2018-19, 2021-22) carry no agriculture-input block, so they
-contribute nothing.
+module is currently wired for the EACI waves only (2014-15 EACI14, 2017-18
+EACI17).  Both EHCVM waves (2018-19, 2021-22) have household input rosters
+in s16b and parcel input questions in s16a, still unwired (GH #1483).
+They contribute nothing to this concatenation until a wave declares them;
+see CONTENTS.org and 1483-input-source-contract.md for the distinct grains.
 
 ``v`` is NOT baked in — the framework joins it from ``sample()`` at API
 time.  ``id_walk`` is left to ``_finalize_result`` (cached parquets store
