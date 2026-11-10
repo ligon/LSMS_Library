@@ -97,6 +97,41 @@ authorized, superseding the skill's general stop-and-surface step.
 
 ## Phase 3 verification
 
-Pending source review. All runtime gates remain unrun under ROOT's source-only
-instruction. Preserve the earlier Refused143/unknown-cause attempt as failed;
-no native state or opaque evidence was adopted.
+- `_read_usecols` — OK anchored on §§2–5, SOURCE INSPECTION ONLY. Reuses the
+  accepted `_dvc_cache_path` cached-byte branch. AST comparison against base
+  confirms exact remaining driver, fallback, signature/docstring/ensure,
+  temporary-file construction, both decoder calls, present-column selection,
+  return and cleanup. Only byte acquisition and its import change.
+- Country documentation — OK (§4): original 379,219-byte/5,534-line prefix
+  remains byte-exact; appended source finding qualifies the old checkpoint
+  without claiming a new native/runtime result.
+- New uniquely named test source — six cached/fallback × success/metadata/
+  selected-column failure cases, AST syntax inspected only. Tests/collection,
+  project/dependency imports, native/API/data/build/hash/performance checks
+  remain **UNRUN**, explicitly reserved to ROOT. No baseline, existing fixture
+  or assertion was edited. No numerical reducer is changed.
+- #905 source reconciliation — original `_seed_purchase_block` callback is
+  visible in `af4338784^`; `af4338784c75fa838bf9d8205518566a66294e0e` replaces it
+  with `_agree_purchase_units` using vectorized min_count=1. That commit is an
+  ancestor of the dispatch base. Remove only Malawi's old callback subsite
+  from ROOT's remaining-work draft; do not close the shared issue or claim
+  fresh parity/performance. Decimal/object/NA and <=4 ULP contracts untouched.
+- #1228 and #1190 — held. Fresh full primary issue bodies and all comments
+  agree with current notes; existing fixes are not redone. Exact holds and
+  finite source/decision/operand plans are in the absolute question channel.
+- #1287/#1288 — all current bodies/comments read. Do not repeat the 62 compiler
+  cells or recent literal/postwalk repairs. The labor byte-route preparation
+  is only a narrow source successor, not whole-issue completion.
+- `git diff --check` passed. Full nonowned Git mode/type/blob conservation and
+  final clean-source state are recorded in external SOURCE-PROOF.json.
+
+The earlier Refused143/unknown-cause attempt remains failed; its supplied ledger
+is prior art only. No native state or opaque evidence was adopted. This attempt
+had no Refused result. Missing dispatch-home skill/incorrect api-audit filename
+reads and one connector argument-schema error were corrected using explicit
+public/source paths; none executed tests or project code. A delayed tool-result
+batch was bounded at the orchestration layer; all nested metadata/write results
+were returned exit 0 and saved. No metadata success is treated as runtime proof.
+
+Source-only preparation is complete at product commit
+`287d9f01d0e2b88e6d353e5e0458c5a37c807b61`; execution/acceptance remain with ROOT.
