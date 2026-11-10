@@ -107,7 +107,9 @@ jobs:
     concurrency:
       group: pr-data-${{ github.event.pull_request.number }}-${{ needs.classify.outputs.mode == 'metadata' && 'metadata' || 'validation' }}
       cancel-in-progress: true
-    timeout-minutes: 120
+    # The credentialed acceptance run exceeded two hours before pytest finished.
+    # Allow the hosted runner's full budget; keep every test and its own timeout.
+    timeout-minutes: 360
     env:
       LSMS_BUILD_WORKERS: "1"
       OPENBLAS_NUM_THREADS: "1"

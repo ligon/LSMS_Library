@@ -209,4 +209,6 @@ def test_existing_data_recipe_is_reused_without_weaker_test_or_credential_gate()
         del step['if']
     assert reused == existing['jobs']['data-tests']['steps'][1:]
     assert workflow['jobs']['validation']['env'] == existing['jobs']['data-tests']['env']
-    assert workflow['jobs']['validation']['timeout-minutes'] == existing['jobs']['data-tests']['timeout-minutes']
+    assert workflow['jobs']['validation']['timeout-minutes'] == '360'
+    assert int(workflow['jobs']['validation']['timeout-minutes']) >= int(
+        existing['jobs']['data-tests']['timeout-minutes'])
