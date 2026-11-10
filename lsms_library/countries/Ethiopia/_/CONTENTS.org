@@ -4935,3 +4935,66 @@ CAPI/export bridge, harvest-window/currency/unit/holder rule or whole GH650
 closure is claimed. Earlier dated residual statements remain historical.
 Evidence: =B/reports/650-ethiopia-w5-remaining-public-documents-20261110/=
 (B as in the task ledger); only public document transport/holding was verified.
+
+* 2026-11-10 -- Own W5 manual: instructions and instrument tensions (GH #1570)
+
+Newly read WB6161 manual78631 identifies ESS Wave5, Household/Agriculture/
+Community Questionnaires, Ethiopian Statistical Services & World Bank,
+March2022 (PDF p1, printed0). Exact2388652-byte PDF: MD5
+=8b6ffdd80355e075e90bc472d6ebe17a=; SHA256
+=872525aafb67b59fa4d1b117646f1c91e2b41ad254c89c6c2732f7d6e5ec6ff8=.
+Its PDF creation/modification metadata says April29,2023, and title names
+=ESS_Manual_Wave 5_Final.doc=; neither supplies a fielded/export revision.
+Only18 unique text pages and4 selected rasters were inspected, not the whole
+manual. Earlier three questionnaire and W5 wiring checks were not replayed.
+
+PDF p16 (printed15, general coding3.16) says "Record monetary amounts in
+birrs with no decimal point" and to round cents to the nearest birr; the
+example continues as a food-spending box on p17. This is new own W5 coding
+authority, not authority for W1's released BIRR Decimal scale, blank
+components, /100, or rounding released data. PH section11 Q12 on PDF p102
+(printed101) separately says to include in-kind sales and record value in Birr.
+The inspected parcel-rent instructions (pp71--72, printed70--71) explicitly
+distinguish zeros from blanks for those particular payment questions; that
+does not establish a universal component-blank rule.
+
+Retain this real conflict: manual PDF p99 (printed98), section9 Note1,
+says "Exclude TREE & ROOT CROPS", while the own W5 PH worksheet
+=SEC 9- Harvest by field!A1= says "INCLUDE TREE/ROOT CROPS". The manual
+also says to transfer PP parcel/field/crop coordinates without renumbering.
+Its Q5 permits quantity in any listed unit and Q6 asks kilograms using a
+local conversion; the form's =J4= explicitly conditions estimatedKG on a
+nonstandard Q5 unit. Neither difference authorizes an eligibility or conversion
+change. The delivered source check already binds native harvest to
+=s9q05a/b=; the actual released estimatedKG field remains unidentified.
+
+Manual PDF p98 (printed97) lists section12 "Crop Disposition: Permanent
+and Root Crops", although the held PH book has no section12-named worksheet.
+The manual ToC lists section11 but no section12 heading; consecutive pp101--103 describe
+section11 then the network roster. Under "TEMPORARY CROP DISPOSITION",
+p101 (printed100) Q1 nevertheless includes permanent harvest March10,2021--
+March9,2022; Q2 asks the last completed tree/fruit/root production period in
+Ethiopian Calendar, with a last12months fallback; Q3 asks last12months harvest.
+This supports the separate harvest/sale roles without resolving the section9
+exclusion or all crop-window wording. The form's additional temporary-crop
+September11,2021--March9,2022 header remains distinct. No new W5
+expected-if-incomplete instruction was established by these inspected pages;
+the earlier W1 manual/form expected-Meher/completed-season tension stands.
+
+PDF pp68/70/72/79--80 (printed67/69/71/78--79) separately identify household
+and roster-derived holder, retain W4 parcel IDs including disposed/rented-out
+parcels, serially number fields within a parcel, and repeat parcel/field for
+multiple crop IDs. These are instrument instructions, not proof of the
+released holder_id encoding or cross-household uniqueness. Current documented
+bindings remain household_id -> i, holder/parcel/field -> plot_id and crop_id
+-> production_obs. Manual p101 Q3 corresponds to the separately retained
+=s11q03a1/a2= harvest operands, not sold quantity; p102 Q11/Q12 correspond
+to the already-declared =s11q11a/b= and =s11q12= sale roles.
+
+Evidence: own ledger =.coder/ledger/1570-w5-manual-78631-b1b4e8e3.md=;
+its dispatch evidence contains exact page texts,4 visually checked PNGs and
+instruction/question/current-binding matrix. All4937 original lines and
+executable/config objects are retained. No native/header/row/API/producer/
+cache, new retrieval, arithmetic/default/weight/allocation change or whole
+GH1570/GH650 closure follows. Fielded CAPI/GUID/export correspondence and W1
+coverage/section12/component questions remain open.
