@@ -72,7 +72,7 @@ closure or five served cells is claimed by this foundation.
 
 ## Verification status
 
-Runtime/source freeze46493511c adds only the pure adapter, own native-report
+Initial source freeze46493511c adds only the pure adapter, own native-report
 codebook and new tests. `pp_community_price_report` keeps raw columns first,
 exact source index/order/types/attrs, separate raw Naira/quantity/factor/OtherUnit
 and own native labels; `native_frame` is reversible. The pure projection is
@@ -91,3 +91,10 @@ before freeze. Source AST/diff/whole-object/card conservation checks only.
 `make api-audit` ran source/skill metadata only (exit0); its pre-staging snapshot
 warned about the two then-untracked new build inputs, now tracked by464935.
 No native/header/PDF/API/census replay. No five-cell or whole587 closure.
+
+Final code freezef7beabae8 replaces only the runtime JSON reader with an imported
+Python literal codebook (literal equality proved by AST, no module import).
+This keeps the adapter IO-free and the dictionary in the normal imported-code
+closure for later measured wiring. The original JSON/source freeze is retained
+in Git. All46 invented controls remain byte-exact and UNRUN. No hash-footprint
+claim is made before normal metadata verification of a final wired candidate.
