@@ -100,12 +100,13 @@ jobs:
     # Classifier failure must run a failing required check, never skip it.
     if: ${{ always() }}
     needs: classify
-    name: ${{ needs.classify.outputs.mode == 'metadata' && 'pr-data-metadata-edit' || 'pr-data-validation' }}
+    name: ${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'metadata' && 'pr-data-metadata-edit' || 'pr-data-validation' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
     concurrency:
-      group: pr-data-${{ github.event.pull_request.number }}-${{ needs.classify.outputs.mode == 'metadata' && 'metadata' || 'validation' }}
+      # Refused/uncertain classifiers must not cancel an eligible request.
+      group: pr-data-${{ github.event.pull_request.number }}-${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'validate' && 'validation' || (needs.classify.result == 'success' && needs.classify.outputs.mode == 'metadata' && 'metadata' || format('refused-{0}', github.run_id)) }}
       cancel-in-progress: true
     # The credentialed acceptance run exceeded two hours before pytest finished.
     # Allow the hosted runner's full budget; keep every test and its own timeout.
