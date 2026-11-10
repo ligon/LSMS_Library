@@ -4186,3 +4186,32 @@ The Make rule now names managed wave outputs and preserves legacy names as
 dependency aliases to the same producer. This changes build routing only;
 normal sample/ID/area/tenure policy and both held PH cells remain unchanged.
 A separately authorized actual backend retry is required after pure graph checks.
+
+* 2026-11-10 -- W1–W3 nonfood source declarations are anchored beside their scripts (GH #1288)
+
+The W1/W2/W3 =nonfood_expenditures.py= loops already contain all 10/10/8
+countries-root CSV path literals. A variable =get_dataframe(fn)= does not hide
+those literals from =scan_script_data_refs=. However, private Make preparation
+resolves literals beside the script, and the wave hash resolves them under
+=wave/Data=. Neither anchor resolves =Nigeria/<wave>/Data/...= to its actual
+committed sidecar. Seeing a filename is not the same as authenticating its source.
+
+The three scripts now add script-relative =../Data/...= declarations, checked
+against the complete ordered original round/file dictionaries before the first
+source getter. This follows the guarded Uganda anthropometry declaration
+pattern. The original reader arguments, loops, kwargs, mappings, positive-value
+filter, IDs, assertions and writer remain intact. Original root-qualified
+scanner artifacts remain too; they are not relabelled as authenticated sources.
+The per-round label file remains the existing =_/nonfood_items.json= build input.
+
+This is source-only engineering, with no actual CSV/header/row, producer, Make,
+Country/Feature, cache or hash-census acceptance. After the initial static proof,
+Root clarified that the bootstrap runtime label did not limit the explicit pure
+grant. All 39 focused scanner/collector-metadata/order/drift cases passed on the
+verified MAIN image, with three active observer profiles, zero denials and empty
+private data/config. The guards refuse actual readers, constructors, builders,
+writers and providers. This does not validate the scientific producer or API.
+The country compiler still enumerates four physical folders. Its W4 sibling
+retains the same anchoring problem for seven CSVs and is outside this three-wave
+repair. No complete country nonfood closure or whole #1288 closure is claimed.
+The WAITING pooled-recall-window question above remains unchanged.

@@ -22,6 +22,29 @@ files = {'2011Q1':['Nigeria/2010-11/Data/sect11a_harvestw1.csv',
                    'Nigeria/2010-11/Data/sect84_plantingw1.csv',
                    'Nigeria/2010-11/Data/sect85_plantingw1.csv']}
 
+# Private Make discovery anchors literals beside this script. Keep the reader's
+# countries-root paths authoritative, with checked script-relative declarations
+# (the guarded declaration pattern used by Uganda anthropometry, GH #1288).
+_DECLARED_NONFOOD_SOURCES = {
+    '2011Q1': ['../Data/sect11a_harvestw1.csv',
+               '../Data/sect11b_harvestw1.csv',
+               '../Data/sect11c_harvestw1.csv',
+               '../Data/sect11d_harvestw1.csv',
+               '../Data/sect11e_harvestw1.csv'],
+    '2010Q3': ['../Data/sect81_plantingw1.csv',
+               '../Data/sect82_plantingw1.csv',
+               '../Data/sect83_plantingw1.csv',
+               '../Data/sect84_plantingw1.csv',
+               '../Data/sect85_plantingw1.csv'],
+}
+if (any(not path.startswith('../Data/')
+        for paths in _DECLARED_NONFOOD_SOURCES.values() for path in paths)
+        or list(files.items()) != [
+        (t, ['Nigeria/2010-11/' + path.removeprefix('../') for path in paths])
+        for t, paths in _DECLARED_NONFOOD_SOURCES.items()]):
+    raise RuntimeError(
+        'Nigeria/2010-11: nonfood source declaration differs from files')
+
 # GH #817: `hhid` is the HOUSEHOLD (`i`) and `item_cd` the ITEM (`j`).  These
 # two were mapped the other way round, and every consumer downstream
 # compensated; the canonical names are used here instead.
