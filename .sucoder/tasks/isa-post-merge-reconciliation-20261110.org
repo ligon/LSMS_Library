@@ -1,0 +1,92 @@
+#+title: Post-merge audit and new source trains, 2026-11-10
+
+* Root closure audit completed
+M remains16c3f4d9c28462dde7970718a4eed67394215997, tree151b2d, full17434PASS/
+2775SKIP/0F/E; required932data gateactive. Root personally audited full1032/
+1071/650 bodies/comments/runtimeadapter/ownerledgers/docguidance/backfills.
+Closed1032+650 with exactfreshbody/state readbacks. Count79verifieddevelopment
+merges/45issueclosures.1071 KEPTOPEN, narrowed to AGENTSdoc read-gate correction:
+all selectedcodeA/B/C/D andspellings areinM; exactdoc-onlyaa3de88aa1e81a6a153e9b586643edf6e5fe13dd
+on9f isreadyfornext1690,19,378others/library/config/tests exact. No doc tests/
+census/standalonePR. R1071-reviewed-documentation-child-20261110.
+Rpost-1687-issue-completion-audit-20261110 contains RootREPORT/REQUEST/READBACKs.
+Root also updated905/1483/1148/1570 to remainingwork afterlandedM, allreadbackexact/
+OPEN.1671 merge1c1ef12da4f592e1899db67cf937251aa890ac86 verifiedancestorM, so1148
+no longer depends onthatAPI; householdstatus/normalization remainunruled.
+
+* User-requested separate merged/open reconciliation
+User asks agentreview possibleaddressedissues, example1571/1617. Rootcharter
+Rmerged-issue-reconciliation-20261110/CHARTER.md. Freshindependentreadonlyworker
+41097176/dispatcha627622aedb747d0b51be27d2fb75620, actualM, first12strongstale
+candidates; no GH/data/source/test writes. Contract Q/refill-merged-issue-
+reconciliation-M-20261110. First1571 verdict PARTIAL/keepOPEN, Rootreadfullreport.
+1617 merge1b0e4e07907377bd3855379b8f13c7eae675ac5a ancestorM, twoCONTENTSonly/
+130additions. CurrentNiger source stillunwired namedkgfields; meaning/carrier/
+state/eligibility policyunapproved, notscientificvalidationfromsupport sensitivity.
+Root TITLE-ONLY updated1571 to 'Niger sold kilograms: resolve field meaning and
+state/eligibility policy'; bodyunchanged/readbackexact. ROOT-FIRST-1571-
+DISPOSITION.json bindsold/new/verdict. Reviewercontinuesbroaderboundedpass.
+
+First12review now COMPLETE:11PARTIAL and1NEEDS_VALIDATION(1281), zero supported
+wholeissueclosures. FullREPORT/RESULT/SOURCE-PROOF checked;37supportingPR
+ancestries/diffs retained, no native/runtime/test/library import. Root reviewed
+1287/1460 draftresiduals against freshfullissues and currentM transform source.
+Applied title/body narrowings18:57:46/49Z, preserved exact oldbodies in historical
+details; finalfreshidentitycheck then singlePATCH/issue and exactreadback/OPEN.
+Rmerged-issue-reconciliation-20261110/ROOT-{BEFORE,REQUEST,RESPONSE,READBACK}-{1287,1460}.json.
+Initial local evidence script failed before mutation on wrapped snapshot format;
+corrected snapshot['result']['structuredContent']['issue'], then bothpassed.
+Nineother residuals substantiallyaccurate, no cosmeticrewrite. Reviewerdiscovery
+returned100of145despiterequest200: manager assigned next source-only continuation
+with explicitpagination and strongest untouchedmerged-fix matches, reusing12/
+priorclosed/narrowed exclusions. Not a claim allissuesaudited. Full terminal/
+artifact admission pending manager; source-only findings admitted as above.
+
+* New1575 train source accepted, dataacceptance pending
+Allfourdonors terminal0/0+fileauthenticated+independently reviewed.92distinct
+purecases after14sharedhelperoverlap, not134new. GB/CIV testedfrozenworkingbytes
+thencommitted exactobjects, qualificationretained. c40bf96c8ddae75ce954647be25f92fd170051d1
+union28owned/19360others exact9f,26donorleaves exact+shared812testreviewed750ae.
+One sharedWiring cohort23PASS,0F/E/S; no donor/passedreplay. Four metadataheaders
+closed0/zero recordsdecoded; actualbytehash/headerIO occurred. OwnMilieu cards
+Benin/Togo/CIV Urbain/Rural,GBUrbano/Rural; regionentries12/6/9/33 notstrata counts.
+Onefinalcandidate-only map139.095s:71country/89wave/0BTF/4FIF, allkeysets/14nonhash/
+18None unchanged/errors0/denials0/private0. Initial0FIFforecastcorrected: new3
+unchangedhelperimports foldedbyframework_imports_fingerprint in4ownwavemappings.
+No baseline rerun. DependentDRAFT1693 published/RootAPIverified:
+2f8dfc66a9710527a308dbc238b06808991aeb43/tree190a34157752522c75604c219f7eabc2977b3bfa,
+base1690branch9f,28files. All19387nonledgerobjects exactmeasured/pure/headerc40.
+R1575-four-country-integration-20261110/REPORT.md personallyreadRoot.
+External SOURCE-ONLYnormaloperatorprep41097327/703e2756e8954c50978848826df16542,
+final2f8, finite18librarycalls/8source-roles; no dataactor yet. Manager/deputyjoint
+admit, durableprivatefinalreturns+both-tree metadata preflight required. Normal
+sample/Feature/coldwarm andactualbase/fullgates PENDING. Separatefrommain1690.
+
+* BFA1573 latest custody failure and explicit completion grant
+41097115 baseline2462971 COMPLETEDhealthy/exit0,2getters+2rawreturns/2writers/
+strictphasechecks/active0D; candidateUNSTARTED. Controllerthenrejectedcandidate's
+committedpanel/updatedIDJSON becausemetadatawhitelistwasbaselineonly. Overalljob
+FAILED5m19; allgroupsclosed. BaselineframeRAM-only/lostafterjobended; cannotreuse
+or substitutesourceinference/warmframeforstrictcoldcomparison. Priorbaseline
+APIattempt1failed/nativeUNKNOWN remainsseparate; cumulativeknown2reads2writers
+PLUSunknownprefix, total2baselineAPIinvocationssofar.
+Root explicitlygrantedONEadditionalbaseline+candidatepair,same9f/ec74,900s each/
+40m, afterexactdual-source4committedID-leaf metadataallowance+wholemetadata-control
+preflight+jointfreeze. Bothcoldactorsretainown2IDleaves. EachproducedFINALsample
+frameMUSTbeimmediatelysealedprivate/durableoutsideE (norawframeexport), paths/
+provenance/normalserializationboundbeforelaunch. Reusecompletedsealedphaseiflater
+controlfails; no passedphasebadge replay. New2APIcallsadditional/notunspent.
+Fullscientificoracle/mathunchanged; no furtherRootgateafterroutinejointreview.
+Currentpacket/custodyproposalwithlead+manager, no newdataactorclaimedyet.
+
+* Senegal1483 diagnosis and next finite authority gate
+41097100 terminalagent0/supervisor0,10publisherfiles exact. Soleledger736ecf68b34a7a8b4b2031590baaef99d8c35111,
+allotherMleaves unchanged. Root readFULLREPORT. Own2021menu36versus2018menu21,
+gift/purchase fieldcomments conflict; no currentpayloaddefect claimed. Exactnext
+headergate authorizedRoot: s16b_me_sen2021.dta cc408db6055a1a78506e30260c73f9c3/
+5044514B,19fieldinventory/type/varlabels/bindings+7completecards q01/q02/q03b/
+q05/q07b/q08/q09b. Zero records, ordinarymanagedstage/privatecopy/noWBfallback/
+newrelease, reuse1575metadataoperator/jointfinitecontextreview. No rowprojection/
+implementation/API/nutrient/factor/giftmeaninggrant; Section16Bdocreadingremains
+separategateifneeded. R/admission-1483-senegal-source-diagnosis-20261110 plus
+Q/refill-senegal1483-M-20261110 workerREPORT/PLAN/INPUTS/SOURCE-PROOF.

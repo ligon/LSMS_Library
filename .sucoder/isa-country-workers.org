@@ -1,4 +1,19 @@
-#+title: LSMS-ISA work owners — 2026-11-10 17:56 UTC
+#+title: LSMS-ISA work owners — 2026-11-10 18:58 UTC
+Latest authoritative state: [[file:tasks/isa-post-merge-reconciliation-20261110.org]].
+Root79verifiedmerges/45closures, M16c3f4d9/932gateactive. Fresh merged/open
+reviewer41097176 completed first12 (11partial/1needsvalidation), no closures.
+Root narrowed1571titleonly and1287/1460title+body with exactreadbacks. Manager
+to paginate complete open inventory then continue strongest untouched candidates.
+Mainlead:1690 remains9f; BFA final acceptance pending.41097115 healthybaseline
+frame lost after metadata control failure, candidateunstarted. Joint corrected
+dual-ID metadata preflight+durable final-frame custody before ONE additionally
+authorized baseline/candidatepair; preserve earlier unknown nativeprefix.
+Deputy finish_1590 resumed:1693four-country2f8 published/source+header+pures+
+footprint admitted, normal acceptance pending; review managerprep41097327,
+18librarycalls/8roles, then joint finite normalactor. Manager also Senegal1483
+zero-record exactoneheader19fields/7cards. No row/API/implementation grant.
+Earlier owner chronology below retained as history; do not count terminal work busy.
+
 Detailed evidence: [[file:handoff.org]] and [[file:tasks/isa-checkpoint-20261110T1721.org]].
 
 * Root

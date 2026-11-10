@@ -1,5 +1,28 @@
 #+title: Current LSMS-ISA coordinator handoff
-* CURRENT -- 2026-11-10 17:56 UTC
+* CURRENT -- 2026-11-10 18:58 UTC
+Latest checkpoint: [[file:tasks/isa-post-merge-reconciliation-20261110.org]].
+Development M=16c3f4d9c28462dde7970718a4eed67394215997, verified1687 merge;
+79developmentmerges/45issueclosures. Full17434PASS/2775SKIP/0F/E and932data
+gate/stricttrue active.1032+650 closed;1071 doc-only residual OPEN/ready nexttrain.
+User-requested independent merged/open pass complete:12candidates,11PARTIAL/
+1NEEDS_VALIDATION, no wholeissueclosure.1571 title-only narrowed/OPEN;1617
+is investigation docs, not soldkg implementation/science.1287+1460 title/body
+narrowed with exactreadbacks/historicalbodies preserved. Nine other residuals
+already substantially accurate. Manager owns source-only continuation with
+explicit pagination: firstreview discovery returned100of145, not complete.
+1575 four-country draft1693 published2f8, source/header/pure/footprint admitted;
+normal sample/Feature actual acceptance PENDING, operatorprep41097327sourceonly.
+BFA41097115 baseline healthy2reads2writers but RAM-only finalframe LOST after
+controller candidate-ID metadata failure; candidate unstarted, not accepted.
+Earlier failedbaseline nativeprefix UNKNOWN retained. Explicit ONE additional
+normal baseline/candidate pair granted after both-tree metadata preflight and
+immediate durable owner-private sealed FINALframe custody; joint lead/manager
+review, no repeated Root permission loop. No new pair claimed launched yet.
+Senegal1483 exact one-source zero-record19field/sevencard gate authorized;
+no rows/API/implementation. Deputy1575 resumed; manager/mainlead active.
+The earlier chronology below is retained as history and superseded here.
+
+* Earlier checkpoint -- 2026-11-10 17:56 UTC
 Goal ACTIVE/unbounded. Prior turn PROGRESS: draft1688 and8country allocations.
 This turn PROGRESS:1687repairs published/revalidated, drafts1689/1690, issue905
 narrowed, user1457R1approved/R2arejected, delegated integration now operational.
