@@ -1,5 +1,33 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-10: Malawi1190 acquisition carrier and coverage
+User explicitly selected "Acquisition-only Farm-level rows" for the carrier
+and "All admitted quantity components (Recommended)" for support. This is
+optionB in current9b6a09fc brief; older765555draft A/B letters were REVERSED,
+so bind semanticchoice, not letter. Extend existing plot_inputs with unallocated
+household acquisition observations, dedicated Acquisition_* fields and own
+source/row/field input_obs/provenance/units. Keep original G/D rows and existing
+attached summaries exact. On new rows, plot_id=Farm-level, planted Quantity/
+Applied/Improved and all legacy purchase/gift summary columns remain missing;
+acquisition amounts/units live only in their dedicated fields, with planted
+u=existingUnknown. No allocation, like/unlike-unit summation, conversion,
+expenditure inference, factor/weight/seed-identity/other scientific change.
+Cover ALL quantity-bearing H components admitted by existing first/second/gift
+rules, not only the seven historical residual groups. Preserve those existing
+gates and recorded0/negative values; flag/unit-only answers remain outside this
+quantity-bearing support and in the native witness. Historical7groups/0attachable
+is not an acceptancecount. Source/header wording conflicts stay explicit; this
+choice neither rebinds fields nor declares labels stale.1298observationidentity
+is settled/reused, not reopened. No separate seed_acquisitions API is selected.
+Concrete design is reports/admission-1190-1298-malawi-carrier-design-20261110
+and source9b6a09fc3fdf86a34eee5a0cd8c1db4c12ce8db3 (REPORT/DECISIONS in dispatch).
+
+**STILL PENDING:** third-source H36 literal amount versus H34=Yes requirement.
+Root sent this as a separate asynchronous question; no answer yet, no default.
+Further implementation/native execution must preserve that unresolved admission
+boundary until explicit userselection. Existing unrelated49/50/51/R1/R2a/R2b
+decisions and no-production-weight/no-master/sharedrewarm holds remain.
+
 * 2026-11-10: Four EHCVM 2018 sample strata, GH1575
 The user explicitly selected: "Use documented combination (Recommended)".
 For Benin2018-19, Togo2018, Guinea-Bissau2018-19 and CotedIvoire2018-19,
