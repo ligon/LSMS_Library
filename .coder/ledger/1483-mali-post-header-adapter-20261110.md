@@ -170,3 +170,7 @@ cwd/PYTHONPATH/LSMS_COUNTRIES_ROOT, private false credentials and BLAS/build1,
 -n2 --dist=loadfile. The source-only runtime profile supplies no verified MAIN;
 none was guessed, mounted or modified. ROOT review/independent acceptance and
 any later native scope remain separate. No GitHub/public/source-repo push.
+
+### Independent applied-membership correction, 2026-11-10
+
+ROOT's complete source review found that the public candidate validated all raw rows before selecting explicit native q02=1. Hollow or duplicate nonapplication identities could therefore abort an applied table. The standalone full raw-answer adapter and its strict refusals remain unchanged. The public candidate first validates its declared wave/column layout, selects explicit yes rows, and then invokes that same strict adapter on the selected frame. Tests retain malformed-selected refusals and add No/blank/unlisted hollow-key controls. No amount gate, N-grade policy, parcel allocation or new source authority is introduced. Finite authored pure controls are UNRUN on this correction; native reads remain ungranted.
