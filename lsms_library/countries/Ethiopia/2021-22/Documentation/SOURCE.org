@@ -11,3 +11,33 @@ https://microdata.worldbank.org/index.php/catalog/6161
 #+PROVENANCE_SOURCE: worldbank
 #+PROVENANCE_METHOD: source-url
 #+PROVENANCE_RECORDED: 2026-10-23
+
+* Targeted public questionnaire holding (2026-11-10, GH #650)
+
+These three English forms were retrieved from the following literal catalog
+6161 resource URLs, added individually to DVC, pushed to the existing
+=ligonresearch_s3= remote and each verified by one fresh read-only managed
+retrieval with an empty private cache and no in-tree document. This is a
+three-document holding, not a new acquisition or restamp of the data release.
+
+| resource | managed filename | bytes | MD5 |
+|----------+------------------+-------+-----|
+| 78626 | =esps_w5_hh_questionnaire_english.xls= | 1861632 | =3b06b79513c93bb5f0ae4bb5c98e31fe= |
+| 78627 | =esps_w5_post_planting_crop_cut_livestock_questionnaire_english_final.xlsx= | 225590 | =02e32064e9dfe663eae0f4530e73ed24= |
+| 78628 | =esps_w5_post_harvest_questionnaire_english_final.xls= | 270336 | =f40efaca8a0865cea3a016bb5b32227a= |
+
+https://microdata.worldbank.org//catalog/6161/download/78626
+https://microdata.worldbank.org//catalog/6161/download/78627
+https://microdata.worldbank.org//catalog/6161/download/78628
+
+The public downloads returned HTTP200 with OLE/ZIP container signatures;
+no workbook, macro or formula was executed or parsed. Exact SHA256 seals and
+push/readback receipts are in =B/reports/650-ethiopia-w5-managed-holding-20261110/=
+and the linked original download receipts. B denotes the burst evidence root
+recorded in =.coder/ledger/650-ethiopia-w5-public-questionnaires.md=.
+The catalog/form subtitles and filename word =final= do not authenticate a
+fielded Survey Solutions/CAPI version or bind each form to every v03 export.
+The existing =CATALOG_IDNO= and all earlier SOURCE facts remain unchanged.
+Community78629, manual78631, report78643 and generated DDI are separate
+residuals; this note claims none was acquired. No scientific routing, recall,
+unit, eligibility, household-ID or PP/PH policy follows from binary holding.

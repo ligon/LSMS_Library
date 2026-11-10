@@ -4789,3 +4789,40 @@ The BID needs no repeat acquisition. Shared =add_wave= documentation policy,
 automatic fetching and other countries remain ROOT's GH #650 scope. No new
 PDF/workbook parse, document/data download, runtime, cache operation or
 scientific decision accompanies this metadata-only inventory.
+
+* 2026-11-10 -- Three own W5 questionnaires now held through DVC (GH #650)
+
+The preceding source4381 inventory's missing-managed-questionnaire statement
+and the older "no local documentation whatsoever" are preserved as dated
+history. After the already-held BID, exactly three public English W5 forms
+are now DVC-managed under =2021-22/Documentation/=: household resource78626
+(=esps_w5_hh_questionnaire_english.xls=), agriculture post-planting/crop-cut/
+livestock78627 (=esps_w5_post_planting_crop_cut_livestock_questionnaire_english_final.xlsx=)
+and post-harvest78628 (=esps_w5_post_harvest_questionnaire_english_final.xls=).
+
+The exact WB6161 public downloads total 2,357,558 bytes. Their respective
+MD5s are =3b06b79513c93bb5f0ae4bb5c98e31fe=,
+=02e32064e9dfe663eae0f4530e73ed24= and
+=f40efaca8a0865cea3a016bb5b32227a=. One targeted batch push succeeded;
+one normal read-only managed retrieval of each from its own initially empty
+private L1/data root returned the same size/MD5/SHA256, with the in-tree form
+absent. Only the exact document blob and document copy appeared in each data
+root. Read permissions and the getter's WB-permission gate excluded an
+archive fallback; no raw dataset or spreadsheet parser ran. SOURCE.org lists
+the literal resource URLs and per-document sizes. Existing data release
+=ETH_2021_ESPS-W5_v03_M= remains unchanged; this is no release refresh.
+
+Holding these binary forms establishes neither their detailed question text
+nor a fielded CAPI/GUID/version-to-export bridge. The metadata form subtitles
+and filename word =final= do not establish that bridge. No sheet names or
+question coordinates are asserted, no W4 instrument is substituted for W5,
+and no PP/PH/reference-window, household/holder/parcel identity, unit, harvest
+or eligibility decision changes. Community78629, manual78631, report78643,
+generated DDI and the shared automatic-documentation policy remain separate
+GH #650 residuals; the BID and W1 manual were not reacquired.
+
+Evidence: =B/reports/650-ethiopia-w5-managed-holding-20261110/=,
+=PUSH-RECEIPT.json= and =READBACK-78626/78627/78628.json=; original public
+HTTP/container receipts remain in =B/reports/650-ethiopia-w5-public-questionnaires-20261110/=.
+No workbook/macros/formulas, PDF, native survey rows/headers, Country/Feature,
+producer, cache census or broad acquisition was executed in this restoration.
