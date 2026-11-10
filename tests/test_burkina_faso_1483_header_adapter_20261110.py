@@ -296,7 +296,8 @@ def test_bad_sources_refuse_without_silent_drop_or_recode(adapter, bindings, fie
 
 def test_unknown_unit_and_flags_never_fill_one_another(adapter, bindings):
     source = _source().iloc[[0]].copy()
-    source.loc[:, ['s16bq05', 's16bq08', 's16bq07a', 's16bq07b', 's16bq09b']] = None
+    for field in ['s16bq05', 's16bq08', 's16bq07a', 's16bq07b', 's16bq09b']:
+        source[field] = pd.array([None], dtype='Float64')
     got = _adapt(adapter, bindings, source)
     assert got['Quantity'].iloc[0] == 1.25
     assert got[['Purchased', 'Received_as_gift', 'Quantity_received_as_gift',
@@ -445,3 +446,15 @@ def test_nonapplication_payload_cannot_abort_positive_applied_membership(adapter
     assert public.attrs == expected.attrs
     assert public['s16bq02'].tolist() == [1.]
     pd.testing.assert_frame_equal(source, before, check_exact=True)
+
+
+def test_nullable_integral_cards_keep_native_keys_and_unknown_identity(adapter):
+    codes = pd.Series(pd.array([2, None, 9, 99], dtype='Int64'))
+    before = codes.copy(deep=True)
+    expected = pd.Series(pd.array([
+        'Kilogramme', None, 'Sac (25 kg)',
+        'Unknown [Burkina_Faso 2021-22 s16bq03b=99]',
+    ], dtype='string'))
+    got = adapter._labels(codes, 's16bq03b', {'2': 'Kilogramme', '9': 'Sac (25 kg)'})
+    pd.testing.assert_series_equal(got, expected, check_exact=True)
+    pd.testing.assert_series_equal(codes, before, check_exact=True)

@@ -53,7 +53,7 @@ def _labels(codes, field, card):
     """An unlabelled code retains its own source-qualified identity."""
     return codes.map(
         lambda code: (pd.NA if pd.isna(code) else card.get(
-            str(code), f'Unknown [Burkina_Faso 2021-22 {field}={code}]'))
+            str(int(code)), f'Unknown [Burkina_Faso 2021-22 {field}={int(code)}]'))
     ).astype('string')
 
 
