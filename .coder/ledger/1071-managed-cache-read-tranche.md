@@ -19,3 +19,7 @@ Extend existing managed-cache read boundaries with a small stream adapter and ex
 
 ## §6 Scope/approval
 Source-only implementation authorized after ROOT charter review. Freeze proposed product/tests and selection before imports, tests, APIs or census. No unresolved scientific choice; any new contract conflict is reported. Final verification pending.
+
+## First actual cohort and bounded control correction
+
+Exact integrated2e04 actor25423 CLOSED1:229unique=224PASS/5FAIL, noerrors/skips,178.957s; threeidentities/allguards0denials/sourceclean+bindings unchanged/private top-level data/config0. Original artifacts remain in reports/1071-managed-cache-tranche-execution-plan-20261109; no passing full-cohort claim. ROOT read all five traces and approved TEST-ONLY correction: three getter oracles wrongly counted undeclared ABSENT wave (coverage must still includeit); selected-cache disappearance spy must delegate unrelated metadata opens; GNU Make maps recipeexit7 to outerexit2, with Error7 diagnostic retained. Strict rebuilt-frame comparisons passed before the three getter assertions; their later coverage/warm assertions were not reached. Product remains exact2e04; only five affected nodes may later run after frozen diff/operator review. No replay of224passes, no semantic fix, no source acquisition/API/census.
