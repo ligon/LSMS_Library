@@ -29,6 +29,20 @@ data root: 24561x9, pinned content hash 40c07c... EXACT in19.41s. The old
 shared11/04 L2 sample differs because it predates the11/04 baseline commit;
 that old-cache mismatch is NOT a CI diagnosis. Root is running a private
 Uganda Make build then complete baseline oracle to locate actual failure.
+Later exact diagnosis: private `make -j2` completed0. Its raw var/shocks is
+14459x11 index(i,t), Shock column; pinned baseline requires14459x10
+index(i,t,Shock). Uganda CONTENTS:5642-44 and ledger1287§3 explicitly define
+compiler intermediate versus finalized Country stages. Exact-H Country.shocks()
+on the same private cache rewrote var/shocks to all five pinned fields/hash
+db2c5085, including when invoked from Uganda/_ via private_ci_check wrapper
+(data-prebuild exit0). Before finalization47 matched/1 mismatch/5 missing;
+after48 matched/0 mismatch/5 missing; the five are Make-unbuilt entries, so
+this is targeted, not complete. Two workflow files add the same protected
+finalization step between Make and xdist; 111 focused workflow tests PASS,
+Root diff-check and lead independent review PASS. Nigeria test-only repair
+also reviewed: actual W1 PP-remap3388, PH-direct60 yields, mixed refusal;
+15 focused PASS. Lead is integrating all three paths into one corrected1690
+head before a single new full CI run. Original Hcf563 remains failed.
 R=burst/isa-sm-20261103/reports/1690-final-accepted-validation-20261110.
 After a corrected head's full success, retain only safe tested-source/JUnit/
 unit-checkout receipts. Update the prepared R/preflight.py's pinned IDs to
@@ -60,6 +74,16 @@ Config levels and prepared finite read-only active-loader absence guard v12,
 manifest56ba2535. Local both-tree guarded metadata-only control and manager
 independent review precede another bounded normal allocation. Earlier failed
 Benin API entries: one in v8 plus one in v11, both zero native.
+Later v13 physically absent non-aliased readonly probes passed both real
+RuntimeDVCRepo no-data controls and manager independent review. Slurm41127761
+FAILED1/5m40 after baseline-Benin cold normal Country.sample RETURN8012 rows:
+2 sanctioned raw getters,2 complete writers,3 private captures,0 denials.
+Failure was oracle-only: source s00q01/s00q04 labels came as Python object
+strings, while oracle wrongly required pandas Categorical. Deputy is checking
+saved baseline vocabulary/IDs/weights/strata with source cards and will run
+only remaining7cold+warm after manager review. RAM writer frame was not saved;
+its comparison is explicitly unavailable, while public exact baseline/candidate
+comparison can still establish user-facing preservation. No baseline replay.
 After actual acceptance, align1693 with merged1690, conserve four-country source
 and accepted evidence, combine shared812 tests and append approved1531 notes.
 Private factual1531 child4d00179d9929ea0f1b0c28050f9130e07ad8376b is approved;
@@ -90,6 +114,11 @@ driver writer spy, 3 sealed private captures, 77242 raw/transport rows and
 unobserved; no all36 golden. Receipt at R/1483-senegal-one-source-native-
 correspondence-20261110/ACTUAL-RESULT.json. Country/Feature/parquet/cache
 remain unverified; lead owns minimal serving closure and PR.
+Serving v1 failed before raw on DVC sqlite lock; v2 omitted 2018 sample
+cover/weight and failed before Country return. v3 staged exact five held roles:
+9368 cold+warm Country rows, all v nonmissing, no cache rewrite. Feature
+returned; acceptance operator assumed `crop` index, but Feature uses canonical
+`j`. Lead is correcting saved-frame comparison only. No serving PASS yet.
 
 * Malawi1190 — manager /implementation41114363
 All three user decisions answered, central decision commit639e428e6:
@@ -108,6 +137,12 @@ Manager independently admitted source/focused-pure review; 89 distinct latest
 cases PASS across v1-v6 (not one fresh89-pass run). Source/native/API/cache/CI
 remain unrun. No new
 raw/native/API campaign until its finite already-managed-source plan is concrete.
+Later corrected25-source private/net-disabled baseline and candidate Country
+cold runs PASS:179957 vs222662 rows, v nonmissing and zero
+SampleUnavailableWarning. Saved-only independent comparator PASS after syntax
+repair: exactly42705 H rows with six-source literal support/values, every old
+row/column/index/dtype exact, legacy fields missing on new Farm rows, seed_kg
+64535 and nitrogen_kg37076 entire outputs exact. Warm/Feature pending.
 Consumer regression must prove no invented planted amount/application in
 seed_kg/nitrogen_kg/fertilizer_rate; minimally necessary new-role handling only.
 GitHub1190 updated/readback exact22:08:13; earlier pending choices retained as
