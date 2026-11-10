@@ -26,7 +26,7 @@ Separately enumerate the remaining eleven cases' source-only dependency closure.
 ## §3 Definitions & conventions in force
 
 - Personally read all 3,840 lines of own Mali CONTENTS, including dated notes
-  and TODO vocabulary (LOGBOOK/WAITING occur only in the TODO declaration).
+  and TODO vocabulary (no LOGBOOK entries; WAITING only in the declaration).
   EAC-I 2014/2017 differs from EHCVM 2018/2021. EHCVM keys
   use grappe/menage; each cluster participates in one vague.
 - Latest namespace ruling: all 2021 raw IDs get EHCVM21_; only approved links
@@ -61,10 +61,11 @@ declarations and predecessor manifests, never a fresh source campaign.
 
 ## §6 Remaining gates for Root
 
-The implemented test-only scope is complete; corrected originals and the
-remaining eleven data cases remain UNRUN pending specific Root admission.
-Pure PASS does not prove downstream amounts/units/placement/native data or
-repair the deleted original CI traces. Source-only closure found the same
+The test-only correction, finite pure controls and specifically admitted
+corrected original three are complete. The remaining eleven data cases remain
+UNRUN. The three passing bodies establish their own asserted amount/unit/mask/
+placement/kg comparisons, not a cold producer replay, unselected assertions or
+the deleted original CI traces. Source-only closure found the same
 bare-key oracle risk in GH1528 Mali2021; that third existing module is outside
 the allowed edit scope and is unchanged.
 
@@ -95,8 +96,9 @@ the allowed edit scope and is unchanged.
   20261019T221223Z extracted once/processors1 with pre/post FD/path seals;
   unchanged own mount/helper0, NODELOCAL before imports, no real credentials.
   The helper resets PYTHONPATH and lies outside profile counters; no universal
-  zero claim. All actual3/remaining11 Country/native/raw/header/API/data calls
-  remained prohibited. Original predecessor49 Stata/8 producer/3 failures
+  zero claim. At this pure checkpoint all actual3/remaining11 Country/native/
+  raw/header/API/data calls remained prohibited. Original predecessor49
+  Stata/8 producer/3 failures
   remain history; its post-walk/pre-finalize output witness is not failed locals.
 - OK (§5), source-only remaining11 closure:46 declared raw objects,
   195118403 declared bytes, including28 additional /146306245 declared bytes
@@ -105,3 +107,25 @@ the allowed edit scope and is unchanged.
   in evidence/REMAINING11-SOURCE-CLOSURE.json. No raw/cache scan, native header,
   row, source hash or retrieval. New28 runtime ownership is unestablished;
   all eleven execution gates remain closed.
+- OK (§3/§4), later specific ROOT V2 admission: corrected ORIGINAL3 ran ONCE
+  at `7215becedc72304883dd4b1a936e45cc03b9ed9a` (only ledger differs from
+  tested2931). Exact18 old held objects/48812158B and the TWO previously sealed
+  genuine crop/sample country outputs were copied to distinct own NODELOCAL
+  files. Normal current-hash/coverage gates, default Country and real unchanged
+  requires_s3 gate; no memo, assumed-fresh, restamp or native rebuild. Any build
+  descent/native producer/writer was forbidden; network/provider denied.
+  Stage PID1963154 exited0 in11.159070519s; test PID1963202 exited0 in
+  47.786453535s:3 passed/0 failures/0 errors/0 skips, both groups closed unaided.
+  All original harvest/sale amount/unit/mask/placement and survey-kg tuple
+  assertions in these bodies were reached and passed unchanged. This advances
+  the earlier unproven-payload boundary only for the selected assertions.
+- Corrected3 closure:9 raw getters/9 Stata.read calls/18 init entries (not18
+  parses),2 distinct2021 sources,0 producers,0 writers,0 denials. Both country
+  output byte seals and all18 old/own input seals stayed exact; source/operator
+  bindings unchanged. Positive controller/two-worker identity, exact3 selected,
+  real gate open; temporary0600reader removed after actors closed. Direct
+  durable private logs/XML from start; no respondent rows/IDs exported. Original
+  predecessor failures and pure collection failure remain separate history.
+  Remaining11/46-source closure is still source-only and ungranted. Full-frame,
+  unselected tests, cold native/source correspondence, CI/corpus and scientific
+  umbrella acceptance remain separate.
