@@ -1,4 +1,79 @@
 #+title: Current LSMS-ISA goal handoff
+* Authoritative update — 2026-11-10 03:14 UTC
+This section supersedes the older live-worker and CI observations below.
+Goal ACTIVE; development remains4381d701ffb06ab447a37c66362119d1c1e23009,
+78 verified merges /42 whole closures. No new merge or ruleset mutation.
+
+All eight remote country jobs41079834/36/35/43/42/44/52/53 CLOSED native0,
+supervisor0, task completed, complete publication/five artifacts authenticated.
+Extra Tanzania engineering job41080223 also CLOSED0/0/completed. Their work
+includes source reconciliation/design; eight completed jobs are NOT eight
+scientific fixes or issue closures. Current remote workers0, until new refill
+submissions are actually confirmed. Closed batch evidence:
+R/sucoder-proc-exit-proof-repair-20261110/eight-country-monitor/
+BATCH-CLOSED-ADMISSION-RECOMMENDATION.json (manifestd760daa9…).
+
+Local assignments now:
+- finish_1590: NEW country refill, deduplicate closed v3 results, start BFA/Mali
+  #1483 using newly supplied native headers; select other genuinely unblocked
+  country fixes. Authorized normal pinned remote source-only submissions,
+  isolated worktrees and focused pure verification; report actual IDs/status.
+- malawi_revision_food: diagnose/fix actual PR1683 unit failure42739059934
+  in a separate worktree; preserve failures and meaningful assertions. Own
+  temporary reader-secret copies now removed; global reader config untouched.
+- finish_1452: remaining1071 location/auxiliary-crosswalk owners A+B.
+  Frozen edc77ed25d8d4fdb92c6c9c21cd0b5c5787457b2; selected pure actor23733
+  LIVE (expected73 nodes, not accepted yet). Private Make/stages C+D separate.
+- Root: queue, independent admission, PRs/CI, tracker reconciliation.
+
+PR1680 head283c1ece40326d966c3fb4bc999b3e612bec41da READY. Ordinary CI passed;
+actual data run42733260628 CANCELLED03:06:14Z. GitHub annotation explicitly:
+"The job has exceeded the maximum execution time of 2h0m0s". Eligibility,
+exact merge/parents, credentials and Uganda prebuild passed; full suite was
+cancelled before results. NOT data acceptance. No ruleset change or rerun yet.
+PR1681 c2fdb085 DRAFT ordinary CI42733945117 SUCCESS, six pure controls;
+native reader/API parity and speed unmeasured.
+PR1682 UPDATED to d72459f9c4e55d116b69e24edb3e54a8b01173a2, tree46646d5f…:
+Tanzania input+labor singleton optimization,85 unique pure PASS. New ordinary
+CI42746450162 LIVE; old input-only CI success is historical. Footprint21country/
+126wave all Tanzania,0BTF/FIF. Four saved-native kernel comparisons passed
+across original partial run and context-corrected continuation; preserve first
+setup failure, no current decoder/full API/seed/speed claim. R/review-905-
+tanzania-labor-union-20261110; continuation manifest14fe9c43… .
+PR1683 edc4f0e0b6b085d35032e0fbde1449260f221240 DRAFT, combined1032+core1071.
+Ordinary unit CI42739059934 FAILED4/13888PASS/5673SKIP/4X, Windows PASS;
+actual failures1196 script payload routes ×3 and920 unreadable_fresh_parquet.
+Diagnosis assigned.318 unique pure controls covered across qualified original/
+targeted repairs, not fresh318 green. Footprint452country/1885wave/37BTF/0FIF.
+PR1684 76a5ad68723a20edfa147360b98247dafa593344 DRAFT, BFA/Mali/Uganda source
+authority docs, ordinary CI42743739327 SUCCESS. Source/executable conservation
+verified; footprint41country/80Maliwave/0BTF/FIF. Exact Mali report bytes plus
+PDF1/3/15 text/render checked; fielded export and BID tension remain held.
+
+Ethiopia three public W5 questionnaire holdings restored using existing batch
+DVC publisher and each verified through a fresh private empty read-only cache.
+Final7fd7ec7f205e9b8ae7df5ccd31dfd1d1dec72127, eight doc/ledger paths only;
+no workbook parsing, raw acquisition or scientific export-version claim.
+R/650-ethiopia-w5-managed-holding-20261110 manifest32a85048…; unpublished.
+Malawi unchanged1281 declared-wave regression v4 PASSED1,0skip/denials,
+expected RuntimeError→KeyError before country write. Four held input identities,
+five reads in passing attempt/six cumulative; previous infrastructure failures
+preserved. R/1281-malawi-held-regression-v4-20261110 manifest94976711… .
+Whole1281 remains open for exposure/warm-cache audit and other routes.
+
+Five new metadata-only headers CLOSED (BFA2021s16b, Mali2018/2021s16b,
+Niger2021s01, Uganda2013GSEC1), zero records; R/country-header-resupply-five-
+roles-20261110 manifestc367d7f7… . Niger coded s01q00b absent; Uganda district
+code has no attached value card. Do not infer membership/unit eligibility/names.
+Burkina1573 one three-column welfare projection verified26 bijective
+strate/region/milieu combinations over10411 rows,0missing/conflict. Source-bound
+Region×Urbain/Rural relabeling QUESTION PENDING with user; no served edit.
+1575 earlier non-ISA strata implementation choice also remains pending.
+
+Next: confirmed new country dispatches, actual1683 CI failure repair,932 timeout
+resolution, independent Ethiopia admission/publication and narrow stale tracker
+premises for650/1084/587 plus1281 regression piece. No unsupported whole closure.
+
 * Authoritative current checkpoint (2026-11-09, after PR1679)
 Goal ACTIVE/incomplete. Development4381d701ffb06ab447a37c66362119d1c1e23009;
 complete tree3060380212a25a755685aa85e5a0632b5557090d.

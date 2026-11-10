@@ -1,4 +1,21 @@
 #+title: Current LSMS-ISA worker queue
+* Current — 2026-11-10 03:14 UTC
+This section supersedes the historical running observations below.
+Previous eight-country batch and extra Tanzania engineering job ALL CLOSED
+native0/supervisor0/task completed. Remote running0 until new submissions confirmed.
+finish_1590 owns NEW country refill: dedup closed v3 results and five new headers,
+prioritize BFA/Mali1483 candidates and other unblocked country fixes. Authorized
+reviewed pinned remote CLI/free-account source-only submissions and pure controls.
+finish_1452 owns1071 remaining location/crosswalk recovery A+B; frozenedc77ed2,
+pure verifier23733 LIVE. malawi_revision_food owns actual1683 CI four failures
+in separate worktree; own temporary reader copies removed after actors closed.
+Root owns queue/admission/PRs/CI;932 full-data run timed out at2h, no acceptance
+or ruleset mutation.1681/1684 ordinary CI pass;1682 updated-head CI live.
+Development4381,78 verified merges/42 whole closures; goal ACTIVE.
+Pending1573/1575 user choices do not stop independent work.
+Details/source pins/receipts: [[file:handoff.org]].
+
+* Historical checkpoint — superseded
 All EIGHT country workers are ACTUALLY native-running with fresh heartbeats
 and source-pin READY (2026-11-10 01:35 UTC). Zero queued/starting/failed.
 BFA41079834, Ethiopia41079836, Malawi41079835, Mali41079843,
