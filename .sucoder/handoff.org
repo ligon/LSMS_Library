@@ -1,5 +1,19 @@
 #+title: Current LSMS-ISA coordinator handoff
-* CURRENT -- 2026-11-10 18:58 UTC
+* CURRENT -- 2026-11-10 20:20 UTC
+Latestcontinuation: BFAadditionalnormalpair41099343 SUBMITTED20:16:06 and
+confirmedRUNNING20:18; exact99a05packet/wholemetadata+inertcustodypreflightPASS,
+durablefinalframecustody, actualpairacceptancePENDING. Rootindependentlyverified
+privateactualMunion f6e012ab:52componentexactpaths/19330nonownedexactM/wholelibrary
+exactec74, public1690still9f untilBFAaccept, nofullgateyet. Senegal1483ownheader
+closed0/0records; own36menu, used03b10units versusgift07b/purchase09b5units,
+q05gift/q08purchase/q09ctotalvalue;1483bodyupdated/readbackexact20:17:13.
+Nextsourceonlyadapterimplementationauthorized6ownpaths/pures; row/APIgatespending.
+1575prep41097327 andpaginatedreview41097539 bothactualTIMEOUT45m, partialrecovery
+required/nothealthydeliveries. Deputy1575recoveringoperatorlocally; managerowns
+reviewrecovery. Benin+Togo1531documenttasksscheduledbutfirstsubmitwrappersfailed,
+notyetlive. SharedFSstallsobserved. First12review174files/37PRancestryauthenticated.
+No extra collector/passedphase replay. Full latestdetail in taskcheckpointbelow.
+
 Latest checkpoint: [[file:tasks/isa-post-merge-reconciliation-20261110.org]].
 Development M=16c3f4d9c28462dde7970718a4eed67394215997, verified1687 merge;
 79developmentmerges/45issueclosures. Full17434PASS/2775SKIP/0F/E and932data

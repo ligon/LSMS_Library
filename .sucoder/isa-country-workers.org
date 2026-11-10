@@ -1,4 +1,13 @@
-#+title: LSMS-ISA work owners — 2026-11-10 18:58 UTC
+#+title: LSMS-ISA work owners — 2026-11-10 20:20 UTC
+Supersedingownerstatus: managerBFA41099343actualRUNNING20:18 (pairpending),
+mainleadprivateMunion f6e012ab52pathsRootverified/public1690frozen9f;
+deputy1575LOCALoperatorrecoveryafterprep41097327TIMEOUT45m, no dataactor yet.
+Managerpaginatedreview41097539alsoTIMEOUT45m/partialrecoveryneeded; first12
+reviewer41097176closedhealthy174files/37PRancestorproof. Senegalownheaderclosed0,
+Rootnext6pathsource-onlyadapter+puresgrant, no rows/APIyet. Managerdispatching
+Benin/Togo1531own-documentinvestigations, firstwrappersfailed/notyetlive.
+See latesttaskcheckpointfor99a05packet/durablefinalframeauthority/history.
+
 Latest authoritative state: [[file:tasks/isa-post-merge-reconciliation-20261110.org]].
 Root79verifiedmerges/45closures, M16c3f4d9/932gateactive. Fresh merged/open
 reviewer41097176 completed first12 (11partial/1needsvalidation), no closures.

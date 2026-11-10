@@ -1,5 +1,56 @@
 #+title: Post-merge audit and new source trains, 2026-11-10
 
+* Latest continuation -- 20:20 UTC
+PreviousgoalturnPROGRESS:1571title/1287+1460residuals, checkpoint3d7d6143a.
+ThisturnPROGRESS:1573actualstatusfactualrefresh, Senegalownheaderaccepted+
+1483bodyupdated/readbackexact, privateactualM52pathunionRootverified, BFA
+additionalpairactuallysubmitted41099343. Munchanged/79merges45closures/ACTIVE.
+
+First12reviewer41097176 nowterminalagent0/supervisor0,174filesauthenticated,
+37mergedPRancestorchecks independentlypassed. R/admission-merged-open-first12-
+20261110. Continuation41097539 actuallyTIMEOUT45m23/batchCANCELLED0:15;
+1575operatorprep41097327 TIMEOUT45m18/batchCANCELLED0:15. Preservepartialoutputs,
+nothealthydeliveries. Managerownsreviewcontinuationrecovery; deputy1575recovering
+operatorlocally/no modelredispatch. Filesystemstallsdelayedroutine reads/proof.
+
+BFAfinal27member99a05d63ec700fa1f91760c2ee576dedef7938fe8ec977bf6f619391db25f818
+wholeguardedmetadata/inertcustody preflightPASSED0API/native/denials; separate
+hostowner/hash0400/nlink1/sealsreconciliationCLOSED0 aftermissingstatimportfix,
+no childreplay. ManagerindependentlyrehashthenADDITIONALpair41099343 submitted
+20:16:06UTC,40m2CPU8G,confirmedRUNNING20:18on n0066.savio4. Durableprivatefinal
+framesoutsideE asgranted. No normalpairacceptanceyet; preserve2earlierbaseline
+APIattempts(unknownprefix+healthy2reads2writerslostframe),candidate0 beforethisjob.
+R/1573-burkina-normal-two-lane-actual-v4-20261110/SUBMIT-RECEIPT.json.
+GH1573bodyupdated19:02:32UTC, healthy-but-lostbaseline
+andunstartedcandidate/historyexplicit, R1573-live.../HEALTHY-BASELINE-*readback.
+
+PrivateactualMunion f6e012ab7b6ea52190614e1e475717ba9826fd3a,
+tree8e1df2c19b1d30048c919f70b8a98accbddb9d91, soleparentM16c3. Rootindependent
+fulltreecheck:52ownedleaves exacteachcomponent,19330others exactM, wholelibrary
+0884646ec89794d504db142450caff029496ff25 exactec74. MeasuredBFAmapc7061dcc
+carriedbyexactinputproof/nocollectorreplay. Public1690stays9f untilBFAaccept;
+then finalledger-onlyreceipt/updatePRdescription/notifyRootready/fullgate.
+R/isa-reviewed-integration-train-20261110/{ACTUAL-M-PRIVATE-COMPOSITION-SOURCE-PROOF,
+ROOT-ACTUAL-M-SOURCE-VERIFICATION}.json. No currentfullgate/ready/mergeclaim.
+
+Senegal1483ONEownheaderCLOSED0,0recordsdecoded,exactsource/privatecopyseals;
+MD5cc408/5044514B,SHA9a743b05...,19fields/7completecards. RootreadFULLHEADER+
+SUMMARY+REPORT. Ownmenu36;usedq03b10units(code1Kg)versusgiftq07b/purchasedq09b
+5units(code1Gramme); q05receivedgift/q08purchase/q09ctotalvalue. No rowcounts/
+uniqueness/missingness/nutrient/activationclaim. GH1483bodyupdated20:17:13UTC/
+exactreadback, R/1483-senegal-2021-input-header-20261110/{REPORT,SUMMARY,ISSUE-*}.
+RootauthorizesNEXTsource-onlyadapterimplementation/purecontrols atM,6ownpaths,
+reuserecent1483machinery/separateunitnamespaces/nativeidentity/rawoperands/no
+2018/global/factor/default/parcel/nutrientchanges. Independentreview+finiteONE
+ownobjectnativecorrespondenceproposalfollows; no row/APIgrantyet. Managerdispatch.
+
+Rootassigned separateBenin+Togo1531own-document/sourceinvestigations atM;
+fullownCONTENTSfirst+TODO/WAITING/LOGBOOK/quotedidiosyncrasy, no GBauthority
+transfer/magnitudeclassifier/farmerunitreuse. ExistingmanagedDOCUMENT/public
+officialdocretrievalallowed; no newraw/header/row/API/productionchange. Manager
+firstsubmitwrappersfailed; inspectbeforeanyretry, donotclaimworkersliveyet.
+Missingfield/exportauthorityisresult; no conversion/substitution/clamp/heldlistgrant.
+
 * Root closure audit completed
 M remains16c3f4d9c28462dde7970718a4eed67394215997, tree151b2d, full17434PASS/
 2775SKIP/0F/E; required932data gateactive. Root personally audited full1032/
