@@ -1,5 +1,20 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-10: Four EHCVM 2018 sample strata, GH1575
+The user explicitly selected: "Use documented combination (Recommended)".
+For Benin2018-19, Togo2018, Guinea-Bissau2018-19 and CotedIvoire2018-19,
+replace region-only strata with own recorded region/department x residence
+milieu using the existing812 construction. Preserve rows, weights, identifiers,
+Rural, joins and unrelated fields. A missing/blank component yields missing
+strata. Preserve Togo's domain discrepancy and documented exceptions; no guessed
+exclusion, crosswalk, stratum-count golden, 2021 integration or oldCILSS change.
+The earlier pending question is ANSWERED. Existing own-country coding must be
+verified; shared helper semantics/refusals and registered provenance are reused.
+Implementation and scoped verification of these already-managed2018 releases
+are authorized under the existing backlog workflow; no new raw-release acquisition,
+production-weight change, master release or shared-cache rebuild follows.
+Concrete charter: reports/1575-approved-four-country-rollout-20261110/CHARTER.md.
+
 * 2026-11-10: Burkina Faso 2014 strata labels, GH1573
 The user explicitly selected: "Decode the 2014 strata labels (Recommended)".
 Decode native 2014 strata with the authenticated own-survey 26-pair lookup to
@@ -57,8 +72,10 @@ Treat exactly99,999,999 in raw2014–15 purchased-food expenditure as missing be
 The user requested delegation to establish planned stratification, if any, from sample-design documents for Benin, Togo, Guinea-Bissau and CotedIvoire. This is a document-evidence investigation; no strata/default/weight change has been made.
 Completed and ROOT reviewed: all four explicitly planned region × residence milieu (department in Benin); their own second-edition BIDs describe the original2018 design and a same-cluster2021 revisit. Exact French PDF pages: Benin13, Togo12, Guinea-Bissau16, CotedIvoire13. Togo's Lomé Commune/Grand Lomé domain discrepancy remains unresolved. Report: burst/isa-sm-20261103/reports/1575-ehcvm-stratification-doccheck-20261108/REPORT.md, SHA256 f551c55e50aac9d00cfc4df42f59e5df8f77f6673cfe265a7d53dd2fe3b1b4fd. GitHub1575 updated, still open for implementation. Country notes mergedPR1637. Three missing original BIDs subsequently passed normalmanagedpush+freshreadonlyreadback; metadataPR1640 merged at27577bc2d3 with sidecars/provenance and fresh readonly retrieval proof. No sample-strata/weight change; whole1575 remainsopen.
 
-* Pending implementation choice, GH1575 (2026-11-08)
-Concrete2018-only design reviewed (existing812ownlabelregion/department×milieu; NAifmissingoperand; nativecoding/rowvalidationbeforemerge; allrows/weights/Ruralpreserved; Togo caveat;2021/CILSSoutside). ROOTasyncquestionpending: implement+verify recommended ORkeepregion-only. TierCworkflowrequiresmaintainerselection; no implementation or approval inferred. Proposal reports/1575-tier-c-strata-wiring-design-20261108/WIRING-PROPOSAL.md, manifest565f1a23… . Otherworkcontinues.
+* Earlier pending GH1575 choice -- answered 2026-11-10 above
+The 2026-11-08 concrete2018-only design is now user-selected. Historical proposal
+reports/1575-tier-c-strata-wiring-design-20261108/WIRING-PROPOSAL.md retains its
+then-current NOTSELECTED status; the new decision/charter supersedes that boundary.
 
 * Earlier decisions preserved
 AffectedConsumption means food purchases; AffectedFoodStock means food stocks, following Ethiopia's model.
