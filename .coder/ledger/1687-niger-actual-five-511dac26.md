@@ -33,4 +33,10 @@ Any source/test/cache/operator failure remains sticky: no retry or widening. No 
 
 ## Phase 3
 
-Pending frozen actual verification. Ledger publication alone is not an actual-test pass.
+- OK (§§1–5): one frozen actual-five pytest actor exits0, five passes, no failure/error/skip. Console56.77s, JUnit68.003s, controller70.722887s, below900s. No actual test or old pure/native cohort was replayed.
+- OK (§§2–5): exactly26 raw get_dataframe/from_dta_full/StataReader.read entries, per-source6/6/6/4/4. Metadata init entries52 (inherited constructor entries included) and value_labels26 are separate. Five-source positive roles and21 staged-payload exclusions retain the exact current tests.
+- OK (§§2/4): current expected hash and four-wave coverage admit copied crop_production/plot_inputs/sample; all10 actual country-cache returns hit. Three actual identity/profile receipts are active with0denials, ordinary credential gate open and both workers collecting exactly5nodes. No observed producer/writer/provider/network event; metadata module imports are not builds.
+- OK (§4): all48 donor and distinct own data files preserve stable FD/path identity, hash/size/mode/nsmtime (only atime excluded). All65 source bindings,26 sidecars, frozen operators and MAIN image are exact after actor closure. Known processes/groups are empty; private reader removed.
+- Preserved preparation failures: host Python3.6 AST incompatibility; freeze assembly omitted its not-yet-written leaf declaration; MAIN AST check incorrectly treated imported ligonlibrary.from_dta as a local definition. All preceded data/actual pytest; actual source/AST binding corrected to the exact immutable dependency without widening scope. One extraction and one unchanged ordinary mount only.
+- Scope deviation: a temporary metadata preparation script was initially created in /tmp/niger511-prepare-operators.py, outside the owned paths. It is preserved in evidence/prior and removed from /tmp. It performed no data parse, project import or actual pytest. The deviation is reported rather than hidden.
+- Original11 remains7P/4F and spent saved-read history is unchanged. Whole country/issue/science/fullCI and enclosing infrastructure acceptance are outside this bounded result. Python profile/audit entrypoints are measured; exhaustive C/syscalls and the ordinary helper import are not.
