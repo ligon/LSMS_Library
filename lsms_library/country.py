@@ -7114,11 +7114,17 @@ class Country:
                                 proven_stage_refs.discard(info.stage_ref)
                                 try:
                                     if force:
+                                        # This is a fresh recovery producer, not
+                                        # the ordinary dirty-stage legacy route.
+                                        # Its error must not start another owner.
+                                        strict_stage_read_failure = True
                                         stage.reproduce(force=True)
                                     else:
                                         stage.reproduce()
                                     proven_stage_refs.add(info.stage_ref)
                                 except (OSError, ValueError, RuntimeError) as reproduce_error:
+                                    if force:
+                                        raise
                                     warnings.warn(f"DVC reproduce failed for {stage.addressing}: {reproduce_error!r}. Falling back to legacy loaders.")
                                     stage_outputs, stage_coverage = collect_stage_outputs(
                                         stage_infos, proven_stage_refs)
