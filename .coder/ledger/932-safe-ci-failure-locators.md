@@ -31,3 +31,16 @@ This does not recover/classify the old16 failures or prove the next full-data
 suite will pass. Source-mapping is conservative: inherited/dynamic/unrecognized
 cases remain unmapped; all failure statuses remain authoritative. ROOT owns
 integration/publication/next necessary full-run and administrative decisions.
+
+## Affected recipe oracle
+After the closed36PASS run, ROOT source-reviewed one omitted existing control:
+test_existing_data_recipe_is_reused_without_weaker_test_or_credential_gate
+expected PR reused steps byte-for-byte identical to legacy, so the newly approved
+PR-only diagnostic flag necessarily conflicted. This was a source-identified
+oracle relation, not an observed old-test failure. Test-only5b06673 asserts
+exactlyone standalone diagnostic flag in PRfullwrapper/allPRjobs, nonelegacy;
+removes ONLY that literal token from copied run text, then retains every original
+whole-step/env/timeout equality. Product/workflow/existing othertests exact472f.
+ONLY that1 control actor87921 CLOSED0/chunk65c381:1PASS/0F/E/S,1.51s pytest.
+36initial+1targeted, not a fresh37run. Three identities/no LSMS imports/0network
+tripwires/private0/sourceclean+bindingssame. No full-data/CI rerun or settings.
