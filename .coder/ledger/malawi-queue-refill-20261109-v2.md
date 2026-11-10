@@ -126,8 +126,9 @@ authorized, superseding the skill's general stop-and-surface step.
   final clean-source state are recorded in external SOURCE-PROOF.json.
 
 The earlier Refused143/unknown-cause attempt remains failed; its supplied ledger
-is prior art only. No native state or opaque evidence was adopted. This attempt
-had no Refused result. Missing dispatch-home skill/incorrect api-audit filename
+is prior art only. No native state or opaque evidence was adopted. The eventual supported terminal result for this attempt was Refused143
+(native/supervisor143), job41069806, descriptor-mount inspection errno22.
+The source was published, but that is not a successful SDK task outcome. Missing dispatch-home skill/incorrect api-audit filename
 reads and one connector argument-schema error were corrected using explicit
 public/source paths; none executed tests or project code. A delayed tool-result
 batch was bounded at the orchestration layer; all nested metadata/write results
@@ -135,3 +136,7 @@ were returned exit 0 and saved. No metadata success is treated as runtime proof.
 
 Source-only preparation is complete at product commit
 `287d9f01d0e2b88e6d353e5e0458c5a37c807b61`; execution/acceptance remain with ROOT.
+
+## Coordinator recovery qualification — 2026-11-09
+
+Independent review recovered exact494c84c89 source and normal published project artifacts after the worker was terminal. All five mandatory filenames were published, but REPORT says work in progress, RESULT says unfinished/tests_run=[], and SOURCE-PROOF says in_progress with the original4381 identity. File publication completeness is distinct from semantic task completion; these original artifacts and Refused143 outcome remain immutable. The narrow source change received independent source review only; no original worker runtime acceptance is inferred. ROOT authorized a separate ledger-only correction and six existing inert-byte controls in a new private verification context; their actual outcomes will be reported externally, not retroactively attributed to the worker.
