@@ -65,7 +65,7 @@ def _extract(path, name, namespace):
         if isinstance(call.func, ast.Name):
             assert call.func.id in {'TypeError', 'ValueError'}  # normally no bare calls
         elif isinstance(call.func, ast.Attribute) and isinstance(call.func.value, ast.Name):
-            assert call.func.value.id in {'pd', 'tools', 's', 'head', 'id'}
+            assert call.func.value.id in {'pd', 'tools', 's', 'head', 'tail', 'id'}
     code = ast.Module(body=[ast.ImportFrom(module='__future__',
                                          names=[ast.alias(name='annotations')], level=0), node],
                       type_ignores=[])
