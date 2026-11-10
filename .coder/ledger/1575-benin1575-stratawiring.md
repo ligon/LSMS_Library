@@ -63,4 +63,24 @@ independent review, final footprint and full gates remain separate acceptance.
 
 ---
 ### Phase 3 — verification
-Pending private implementation freeze and focused pure verification.
+- `sample.df_cover.myvars.strata` — OK (§§1–5): only the approved label pair
+  replaces the original scalar; all other declaration nodes are exact.
+- `inputs_strata`, `sample`, imported `strata_label` — OK (§2/§5): thin
+  delegation to unchanged shared helpers; no duplicate computation.
+- Own registry key — OK (§3/§4): only 2018-19, original raw names, existing
+  optional nullable carrier. Actual-row validation remains explicitly UNRUN.
+- CONTENTS appendix — OK (§3/§4): complete prefix retained, original DDI/BID
+  statements and cluster-split tension preserved without a crosswalk/count rule.
+- Focused pure run at code/test freeze 4d672ece4: 19 own tests plus 14 existing
+  shared label/stamp controls passed, -n2 --dist=loadfile, network namespace,
+  absent credentials and private empty data root. Controller/gw0/gw1 package,
+  config, interpreter, UID and namespace identities recorded. API source audit
+  passed using the prepared interpreter (initial Make lacked Poetry).
+- Preserved failures: initial system-Python metadata serialization, empty-dir
+  preflight, pure01 fixture alias errors, pure02 bound-method/import errors,
+  pure03 by-path callable object-identity assertion. All corrected without
+  changing production code after its first freeze; logs/XML retained outside
+  source. By-path resolution is checked by exact callable spec and code identity.
+- No CONTRADICTION or REINVENTION against §§2–5. Native cover cards/rows,
+  normal Country/Feature cold/warm validation, final footprint and independent
+  integration/full gates are UNRUN here and remain acceptance residuals.
