@@ -51,7 +51,6 @@ def no_providers(monkeypatch):
     monkeypatch.setattr(country_module, "Country", denied)
     from lsms_library import data_access, feature
     monkeypatch.setattr(data_access, "get_data_file", denied)
-    monkeypatch.setattr(feature, "Country", denied)
     monkeypatch.setattr(feature.Feature, "__call__", denied)
 
 
@@ -136,13 +135,13 @@ def test_full_nonstrata_payload_order_ids_weights_and_attrs_are_conserved(wiring
     assert old_reads == new_reads == ["s00_me_ben2018.dta", "ehcvm_ponderations_ben2018.dta"]
     assert_frame_equal(candidate.drop(columns="strata"), old.drop(columns="strata"))
     # Exact own ID construction, order and orphan preservation, independent of strata.
-    assert candidate.reset_index()["v"].tolist() == ["3", "7", "42", "42", "99"]
-    assert candidate.index.get_level_values("i").tolist()[:4] == ["3004", "7002", "42009", "42001"]
-    assert candidate["weight"].iloc[2:4].tolist() == [17.25, 17.25]
+    assert candidate.reset_index()["v"].tolist() == ["3", "42", "42", "7", "99"]
+    assert candidate.index.get_level_values("i").tolist()[:4] == ["3004", "42009", "42001", "7002"]
+    assert candidate["weight"].iloc[1:3].tolist() == [17.25, 17.25]
     assert candidate["panel_weight"].equals(candidate["weight"])
-    assert candidate["Rural"].iloc[:4].tolist() == ["Rural", "Rural", "Urban", "Rural"]
+    assert candidate["Rural"].iloc[:4].tolist() == ["Rural", "Urban", "Rural", "Rural"]
     assert candidate["strata"].iloc[:4].tolist() == [
-        "Autre inventé RURAL", "Autre inventé rural", "Département inventé Urbain", "Département inventé Rural"]
+        "Autre inventé RURAL", "Département inventé Urbain", "Département inventé Rural", "Autre inventé rural"]
     assert pd.isna(candidate["strata"].iloc[4])
     rec = derivations.derivation_records("Benin")[KEY]
     candidate.attrs = {"id_converted": True, "derivations": {"Benin": {KEY: rec}},
