@@ -272,12 +272,14 @@ Data Scheme:
 
     materialize: make
   plot_inputs:
-    # Item-level agricultural inputs, GAP 2 (parity loop).  One row per
-    # (t, i, plot_id, input, crop): the REPORTED inputs the survey records, NOT
-    # aggregates.  The input module lives in the EACI waves only (2014-15
-    # EACI14 s1e/s2c, 2017-18 EACI17 s11c/s7d).  The EHCVM waves (2018-19,
-    # 2021-22) have no agriculture-input block — deferred.
-    #
+    # EACI: reported plot applications and separate group-use answer rows.
+    # EHCVM (GH #1483): own s16b household input slots, q02=1 only, on
+    # plot_id='Farm-level'. No amount gate, parcel allocation or EACI reducer.
+    # Quantity/u=q03a/b, Purchased/Quantity_purchased=q08/q09a; gifts and
+    # purchase units have independent optional carriers below. q09c stays raw.
+    # Input_native/input_code_native retain own type identity; the injective
+    # source-label projection preserves each known slot on this existing key.
+    # DAP catch-all stays literal, never pure DAP; NPK grade is not inferred.
     # plot  = "{field}_{parcel}" — the SAME plot id as crop_production /
     #         plot_features.  crop is the seed's crop on SEED rows: the
     #         harmonize_food Preferred Label, or the recorded label itself
@@ -328,6 +330,26 @@ Data Scheme:
     Quantity_purchased: float
     Improved: bool
     Applied: bool
+    # EHCVM Applied is the per-type Oui answer; EACI keeps its group-only
+    # interpretation above. Improved is NA in s16b and remains REQUIRED/loud.
+    Unit_purchased:
+      type: str
+      optional: true
+    Received_as_gift:
+      type: bool
+      optional: true
+    Quantity_received_as_gift:
+      type: float
+      optional: true
+    Unit_received_as_gift:
+      type: str
+      optional: true
+    Input_native:
+      type: str
+      optional: true
+    input_code_native:
+      type: int
+      optional: true
     materialize: make
   livestock:
     # Item-level animal roster, GAP 4 (parity loop).  One row per
