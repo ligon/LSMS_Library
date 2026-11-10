@@ -3,7 +3,8 @@
 Senegal, Mali, Niger and Burkina Faso serve region x milieu as a LABEL, the documented
 stratum, and register it as a derivation because no household file records a stratum.
 Niger 2014-15 reads ``strate``, which a file does record.  Mali 2014-15 stays empty.
-Benin, Togo, Guinea-Bissau and Cote d'Ivoire keep the region alone.
+Benin, Togo, Guinea-Bissau and Cote d'Ivoire add their documented 2018
+region x milieu combination under the user-selected GH #1575 rollout (2026-11-10).
 
 The classes marked ``requires_s3`` read the covers directly and import nothing from
 ``countries/``; the allocation tables are transcribed from the BIDs.  The others use
@@ -37,7 +38,7 @@ ROOT = countries_root()
 MILIEUX = ("Urbain", "Rural")
 EHCVM_WAVES = ("2018-19", "2021-22")
 COUNTRIES = ("Senegal", "Mali", "Niger", "Burkina_Faso")
-REGION_ONLY = {"Benin": "2018-19", "Togo": "2018", "Guinea-Bissau": "2018-19",
+DOCUMENTED_2018 = {"Benin": "2018-19", "Togo": "2018", "Guinea-Bissau": "2018-19",
                "CotedIvoire": "2018-19"}
 
 #: Every cover a wave's strata is built from.
@@ -155,11 +156,21 @@ class TestWiring:
         myvars = _sample_block(country, wave)["df_cover"]["myvars"]
         assert myvars["strata"] == ["s00q01", "s00q04", {"mapping": "strata_label"}]
 
-    @pytest.mark.parametrize("country, wave", REGION_ONLY.items())
-    def test_the_region_only_countries_are_not_moved(self, country, wave):
+    @pytest.mark.parametrize("country, wave", DOCUMENTED_2018.items())
+    def test_the_documented_2018_countries_use_the_registered_combination(self, country, wave):
         block = _sample_block(country, wave)
-        assert block["df_cover"]["myvars"]["strata"] == "s00q01"
-        assert stratum_derivation_key(country) not in derivation_records(country)
+        assert block["df_cover"]["myvars"]["strata"] == [
+            "s00q01", "s00q04", {"mapping": "strata_label"}]
+        records = derivation_records(country)
+        key = stratum_derivation_key(country)
+        rec = records[key]
+        assert rec.resolve() is derive_region_milieu_stratum
+        assert callable(rec.resolve("inputs"))
+        assert list(rec.waves) == [wave]
+        assert list(rec.columns) == ["strata"]
+        assert list(rec.raw_variables) == ["s00q01", "s00q04"]
+        text = (ROOT / country / "_" / "derivations.yml").read_text(encoding="utf-8")
+        assert len(re.findall(rf"^{re.escape(key)}:", text, flags=re.M)) == 1
 
     def test_mali_2014_declares_no_strata(self):
         assert "strata" not in str(_sample_block("Mali", "2014-15"))
@@ -430,6 +441,7 @@ class TestTheFrameAgrees:
             df = ll.Feature("sample")(["Senegal", "Togo"])
         carried = df.attrs["derivations"]
         assert stratum_derivation_key("Senegal") in carried["Senegal"]
-        assert "Togo" not in carried or stratum_derivation_key("Togo") not in carried["Togo"]
+        assert stratum_derivation_key("Togo") in carried["Togo"]
         togo = df.xs("Togo", level="country")["strata"].dropna().unique()
-        assert not any(s.endswith(MILIEUX) for s in togo)
+        assert len(togo) > 0
+        assert all(s.endswith(MILIEUX) for s in togo)
