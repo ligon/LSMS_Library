@@ -4932,7 +4932,8 @@ class Country:
                 or str(r["wave"]) in keep]
 
     def _read_l2_country_cache(self, method_name: str, cache_path: Path,
-                               waves: list[str], *, _recover_unreadable: bool = True
+                               waves: list[str], *, _recover_unreadable: bool = True,
+                               _borrowed_input: bool = False
                                ) -> tuple[pd.DataFrame | None, list[str] | None, str | None]:
         """The L2-country READ GATE: serve ``var/<table>.parquet`` or say why not.
 
@@ -4965,6 +4966,8 @@ class Country:
         are read-path; both functions remain fingerprinted through their
         build-path call sites.)
         """
+        if _borrowed_input and _recover_unreadable:
+            raise ValueError('Borrowed Make input admission cannot evict a live cache')
         cache_exists = cache_path.exists()
 
         # v0.7.0/v0.8.0: best-effort cache read.  If a parquet exists
@@ -5081,11 +5084,16 @@ class Country:
             return None, covered, degraded_reason
 
         def _serve_cached():
-            if _recover_unreadable:
+            if _recover_unreadable or _borrowed_input:
                 cached_df, read_error, observed = _read_managed_parquet_cache(
                     cache_path, open_errors=(OSError,), check_null=True, engine='pyarrow')
                 if read_error is not None:
-                    if observed is not None:
+                    if _borrowed_input:
+                        warnings.warn(f'v0.7.0 cache read failed for {method_name} '
+                                      f'({read_error!r}); leaving borrowed live input '
+                                      'unchanged and rebuilding privately',
+                                      UserWarning, stacklevel=3)
+                    elif observed is not None:
                         _reject_unreadable_cache(cache_path, observed, read_error)
                     else:
                         warnings.warn(f'Cache open failed for {cache_path} ({read_error!r}); '
@@ -5093,8 +5101,8 @@ class Country:
                                       UserWarning, stacklevel=3)
                     return None, covered, f'read-error: {read_error!r}'
             else:
-                # Deferred private Make preparation retains its exact old
-                # strict decoder and outer error/miss policy, without unlink.
+                # Explicit legacy mode retains its old strict decoder and
+                # outer error/miss policy, without unlink.
                 cached_df = get_dataframe(cache_path)
             cached_df = map_index(cached_df)
             # GH #323: this parquet was written POST-collapse, so its
@@ -5135,7 +5143,7 @@ class Country:
             # here, on the serve path -- nothing downstream filters.
             return self._restrict_to_waves(cached_df, waves), covered, None
 
-        if _recover_unreadable:
+        if _recover_unreadable or _borrowed_input:
             # No policy/schema/index/audit exception is a decode miss.
             return _serve_cached()
         try:
@@ -5850,7 +5858,8 @@ class Country:
                         reusable = False
                         if proof_ok and table in contributing:
                             reused, _, _ = self._read_l2_country_cache(
-                                table, country_path, self.waves, _recover_unreadable=False)
+                                table, country_path, self.waves,
+                                _recover_unreadable=False, _borrowed_input=True)
                             reusable = reused is not None
                         elif proof_ok:
                             # Dynamic Make dependencies may use a complete,
@@ -6317,18 +6326,83 @@ class Country:
             df_local = map_index(df_local)
             return result(df_local, output_produced)
 
-        def prepare_make_waves(root, selected_paths=None):
+        def private_raw_inputs(root, extra_tables=()):
+            # The manifest omits sources already covered by wave hashes;
+            # ownership needs the COMPLETE existing source closure instead.
+            _, sources = self._make_declared_inputs(
+                method_name, _extra_tables=extra_tables, _with_sources=True)
+            private_sources = set()
+            for source in sources:
+                if source.is_relative_to(self.file_path):
+                    private_sources.add(root / self.name / source.relative_to(self.file_path))
+                elif source.is_relative_to(data_root()):
+                    private_sources.add(root / source.relative_to(data_root()))
+            return private_sources
+
+        def inspect_private_input(root, relative, table, raw_inputs, verify_inputs=None):
+            """Validate a named OLD private input; fresh outputs stay strict.
+
+            This root is the caller's transaction, not the live data_root used
+            by the core rejection helper. Never grant live deletion.
+            """
+            path = root / relative
+            parts = relative.parts
+            if (relative.is_absolute() or not parts or parts[0] != self.name
+                    or relative.name != f'{table}.parquet'
+                    or not ((len(parts) == 3 and parts[1] == 'var')
+                            or (len(parts) == 4 and parts[2] == '_'))
+                    or path.is_symlink()
+                    or path.resolve() != root.resolve() / relative):
+                raise RuntimeError(f'{self.name}/{method_name}: unsafe private Make input {path}')
+            if not path.is_file():
+                return False
+            source = self.file_path / relative.relative_to(self.name)
+            sidecars = [p.with_name(p.name + '.dvc') for p in (source, path)]
+            if (path in raw_inputs or path.resolve().is_relative_to(countries_root().resolve())
+                    or any(p.exists() or p.is_symlink() for p in sidecars)
+                    or (source.exists() and path.samefile(source))):
+                get_dataframe(str(path))  # source errors retain the strict reader
+                return True
+            _, error, observed = _read_managed_parquet_cache(
+                path, check_null=True, engine='pyarrow')
+            if error is None:
+                return True
+            if verify_inputs is not None:
+                verify_inputs()
+            # Recheck provenance and opened identity before removing ONLY the
+            # private old entry. New producer output never enters this branch.
+            if (path in raw_inputs or path in private_raw_inputs(root)
+                    or path.is_symlink() or path.resolve() != root.resolve() / relative
+                    or any(p.exists() or p.is_symlink() for p in sidecars)
+                    or (source.exists() and path.exists() and path.samefile(source))):
+                raise error
+            try:
+                current = path.lstat()
+            except FileNotFoundError:
+                return False
+            fields = ('st_dev', 'st_ino', 'st_size', 'st_mtime_ns', 'st_ctime_ns')
+            if any(getattr(current, field) != getattr(observed, field) for field in fields):
+                raise RuntimeError(f'Private Make input changed while rejecting unreadable entry: {path}') from error
+            path.unlink()
+            warnings.warn(f'Unreadable private Make input at {path} ({error!r}); '
+                          'rebuilding through its normal private owner', UserWarning, stacklevel=3)
+            return False
+
+        def prepare_make_waves(root, selected_paths=None, verify_inputs=None):
             # One authoritative preparation route for selected and Other wave
             # inputs (ledger §2/§4). Physical dedup retains every logical label.
             inputs = self._make_wave_inputs(method_name)
             if selected_paths is not None and not set(selected_paths) <= {str(p) for p in inputs}:
                 raise RuntimeError(f'{self.name}/{method_name}: unknown declared Make wave input')
+            raw_inputs = private_raw_inputs(root)
             prepared = []
             for relative, (logical, yaml_path) in inputs.items():
                 if selected_paths is not None and str(relative) not in selected_paths:
                     continue
                 path = root / relative
-                if not path.is_file():
+                validated = inspect_private_input(
+                    root, relative, method_name, raw_inputs, verify_inputs)
+                if not validated:
                     if yaml_path:
                         env = _script_subprocess_env(self.file_path.parent)
                         env.update(LSMS_DATA_DIR=str(root), LSMS_DATA_ROOT=str(root),
@@ -6349,10 +6423,11 @@ class Country:
                                         strict_country_make=True, wave_only=True,
                                         build_root=root, _path_only=True)
                 if (not path.is_file() or path.is_symlink()
-                        or not path.resolve().is_relative_to(root.resolve())):
+                        or path.resolve() != root.resolve() / relative):
                     raise RuntimeError(f'{self.name}/{method_name}: declared '
                                        f'Make wave {logical} produced no safe output at {path}')
-                get_dataframe(str(path))  # a touch is not a parquet; a typed empty is
+                if not validated:
+                    get_dataframe(str(path))  # fresh output: strict, never a second repair
                 prepared.append(path)
             return prepared
 
@@ -7119,6 +7194,8 @@ class Country:
             except Exception:
                 pass  # unchanged best-effort policy; producer reads are authoritative
             with self._make_build_root(method_name) as (root, expected, verify, others, declared_inputs):
+                raw_inputs = private_raw_inputs(root, declared_inputs['tables'])
+                verify()
                 # A hashless OTHER is unproven, not proved stale. For literal
                 # registered dependencies, try its actual builder/API privately
                 # rather than copying old bytes or declaring it unavailable.
@@ -7128,7 +7205,9 @@ class Country:
                     if any(p.is_symlink() or not p.resolve().is_relative_to(root.resolve())
                            for p in needed):
                         raise RuntimeError(f'{self.name}/{method_name}: unsafe Other Make prerequisite {table}')
-                    if all(p.is_file() for p in needed):
+                    ready = [inspect_private_input(root, relative, table, raw_inputs, verify)
+                             for relative in relative_needed]
+                    if all(ready):
                         continue
                     country_input = Path(self.name) / 'var' / f'{table}.parquet' in relative_needed
                     wave_inputs = [str(p) for p in relative_needed if p.parent.name == '_']
@@ -7155,11 +7234,14 @@ class Country:
                         and coverage is not None
                         and set(map(str, self.waves)) <= set(coverage)))
                     if (not all(p.is_file() and not p.is_symlink()
-                                and p.resolve().is_relative_to(root.resolve()) for p in needed)
+                                and p.resolve() == root.resolve() / p.relative_to(root)
+                                for p in needed)
                             or table_hash is None or not country_verified):
                         raise RuntimeError(f'{self.name}/{method_name}: Other '
                                            f'prerequisite {table} did not establish current coverage')
-                prepared = prepare_make_waves(root)
+                    for path in needed:
+                        get_dataframe(str(path))  # fresh Other outputs are strict
+                prepared = prepare_make_waves(root, verify_inputs=verify)
                 prepared_hashes = {p: cached_file_hash(p) for p in prepared}
 
                 verify()
