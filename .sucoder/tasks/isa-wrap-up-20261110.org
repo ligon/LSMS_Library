@@ -16,6 +16,11 @@ included by that selector. Existing G rows remained exact in the held normal
 comparison. Manager is preparing a test-only role-specific correction, with
 Root independent review before PR head update; Windows smoke PASS. No source
 production change or full-data acceptance is implied.
+That correction is now published as test-only H e2b26513a3b478e697ea0072e9a246d61e989d85
+on draft PR1694. It explicitly checks both G and H roles, exhausts the Seed
+partition and requires nonmissing provenance before SHA regex. Focused63PASS;
+new ordinary run42923444161/unit130203780088/Windows130203780563 IN_PROGRESS.
+PR1690 ordinary42920726859 SUCCESS, required full42920726873 still RUNNING.
 Draft four-country PR1693 remains pending normal acceptance: v13 baseline
 Benin8012 accepted from saved captures, v14 only remaining7cold+warm job41129992
 RUNNING; saved-only cross-run comparator independently admitted conditional on
