@@ -3743,29 +3743,32 @@ and explaining its processing/shelling meaning. Q21, sale answers or a different
 wave cannot supply that bridge. No condition recode, kg factor, quantity,
 identifier, weight or default follows from this finding.
 
-* 2026-11-10 -- own s16b header adapter prepared, not activated (GH #1483)
+* 2026-11-10 -- own s16b input wiring candidate prepared (GH #1483)
 
-The supplied authenticated own headers confirm 19 fields/20 input labels in
-2018-19 and 17 fields/22 labels in 2021-22. Each own used/gift/purchase unit
-field has its own five-choice card. q02 is use, q05 gift, q08 purchase;
-q03a/b, q07a/b and q09a/b/c stay distinct. 2021 code19 is literally
-=Semences d'arichide=; 2018 code19 is tubers. q00 is a respondent, not a
-line identifier; the 2018 area fields identify no parcel.
+Own authenticated headers confirm 19 fields/20 input labels in 2018-19 and
+17 fields/22 labels in 2021-22. q02 is use, q05 gift, q08 purchase; q03a/b,
+q07a/b and q09a/b/c stay distinct, each unit field with its own five-choice
+card. 2021 code19 is literally =Semences d'arichide=; 2018 code19 is tubers.
+q00 is respondent, not line identity; 2018 area fields identify no parcel.
 
-=_/s16b_header_adapter.py= copies all native columns/amounts/dtypes into a
-nonactivated household-slot review operand. Unknowns remain raw with explicit
-unlisted masks; missing/repeated native keys refuse. No EAC-I reducer, unit
-conversion, nutrient fraction, crop inference, source filter or parcel
-allocation is applied. The existing 2021 EHCVM21_ raw namespace is required.
-Native key multiplicity/eligibility counts were not measured by headers.
+The private candidate wires both own s16b waves to the existing =plot_inputs=
+key with structural =Farm-level= and ONLY native q02=1. ROOT explicitly
+accepted this applied scope; No/blank/unlisted answers remain in the separate
+full raw adapter, not public applications. No amount/content gate, EAC-I
+reducer, unit conversion, parcel allocation or new nutrient fraction applies.
+The DAP catch-all stays its full native label, never pure DAP/0.18. Native
+input labels/codes and separate gift/purchase units remain explicit. Missing
+used units get existing Unknown; unknown public answers/key collisions refuse.
+2021 uses EHCVM21_ before the normal framework panel map. Improved stays NA
+without weakening its required declaration. Both EAC-I producers are unchanged;
+all-wave concat adds the optional fields as NA on those older rows.
 
-The historical scheme's "no agriculture-input block" contradicts the dated
-#1445 finding above; unwired remains different from absent. The sibling
-EHCVM q02==1 gate and Mali's EAC-I group/zero ruling concern different
-questions. For #1483's applied-input scope, the prepared projection uses q02=1 only;
-No/blank/unlisted answers stay in the separate raw review operand. This is
-not a public decision to serve every answer. The concrete inactive wiring
-proposal keeps the DAP catch-all literal without a new nutrient fraction.
-Its design and frozen synthetic controls are in =_/s16b-header-adapter-20261110.md=
-and =.coder/ledger/1483-mali-post-header-adapter-20261110.md=. Tests are UNRUN;
-no serving, native-source, cache or runtime acceptance follows from preparation.
+The historical scheme's "no agriculture-input block" contradicted the dated
+#1445 finding; its source comment and routes are now corrected. The original
+notes and season/coverage/sampling qualifications remain. Header-only results
+establish no observed key multiplicity, counts or native eligibility proof.
+Code and meaningful synthetic controls are prepared, UNRUN. Exact bindings,
+public effects/inverse route and finite next gate:
+=_/s16b-header-adapter-20261110.md= and
+=.coder/ledger/1483-mali-post-header-adapter-20261110.md=. No serving/runtime,
+source/Make/API/cache or scientific acceptance is claimed by preparation.

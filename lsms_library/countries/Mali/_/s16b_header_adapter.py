@@ -1,9 +1,9 @@
-"""Nonactivated Mali s16b adapter, grounded in own authenticated header cards.
+"""Mali s16b adapters, grounded in own authenticated header cards.
 
 Ledger: .coder/ledger/1483-mali-post-header-adapter-20261110.md §§2–6.
-This is an input-grain review operand, NOT a plot_inputs producer. It keeps
-all native rows and columns, with literal-card decoded aliases. No provider,
-writer, categorical curation, eligibility filter or EAC-I reducer is reachable.
+The raw adapter keeps all native rows/columns with literal-card aliases. The
+public projection selects native q02=1 for the existing plot_inputs contract.
+No provider, writer, conversion or EAC-I reducer is reachable from this module.
 Callers supply mali.i (2018) or mali.ehcvm21_i (2021); no ID walk occurs here.
 The constants below transcribe each own HEADER.json, not a sibling codebook.
 """
@@ -41,17 +41,59 @@ def s16b_use_classes(raw):
 
 
 def s16b_applied_candidate(raw, wave, *, household_id):
-    """Nonactivated Tier B projection: native use code 1, without amount gates.
+    """Tier B input-grain projection: native use code 1, without amount gates.
 
     Own q02=Oui plus #1483's unserved-APPLIED scope and the existing EHCVM
     drivers settle this predicate. No/blank/unlisted answers remain available
     through s16b_rows_for_wave; they are not applications merely because they
     have a gift, purchase or used amount. This still has the review-operand
-    schema: public input/crop classification and serving wiring are separate.
+    schema; s16b_plot_inputs_for_wave applies the public column/key contract.
     """
     rows = s16b_rows_for_wave(raw, wave, household_id=household_id)
     selected = raw['s16bq02'].eq(1).fillna(False).to_numpy(dtype=bool)
     out = rows.loc[selected].copy()
+    out.attrs = deepcopy(raw.attrs)
+    return out
+
+
+def s16b_plot_inputs_for_wave(raw, wave, *, household_id):
+    """Own applied household inputs on Mali's existing public native key.
+
+    Ledger §§2–6; ROOT explicitly authorized this mechanical projection.
+    Every selected native slot remains a row, including missing/zero amounts.
+    Missing used unit gets the in-force Unknown sentinel; unlisted units,
+    flags or identities refuse, never masquerade as missing/False/another slot.
+    Public labels retain the full DAP catch-all and compound/unspecified seed
+    categories. No new N share, species split or parcel allocation is implied.
+    """
+    applied = s16b_applied_candidate(raw, wave, household_id=household_id)
+    unlisted = [name for name in applied if name.endswith('_unlisted')]
+    if applied[unlisted].any().any():
+        raise ValueError('Mali s16b public inputs refuse unlisted native answers')
+    out = applied.reset_index(drop=True)
+    out['t'] = pd.Series(applied.index.get_level_values('t').array, dtype='string')
+    out['i'] = pd.Series(applied.index.get_level_values('i').array, dtype='string')
+    out['plot_id'] = pd.Series('Farm-level', index=out.index, dtype='string')
+    out['input'] = out['Input_native'].map(
+        {label: pair[0] for label, pair in PUBLIC_LABELS.items()}).astype('string')
+    out['crop'] = out['Input_native'].map(
+        {label: pair[1] for label, pair in PUBLIC_LABELS.items()}).astype('string')
+    if out[['input', 'crop']].isna().any().any():
+        raise ValueError('Mali s16b public input/crop labels require own curation')
+    out['input_code_native'] = out['s16bq01'].astype('Int64')
+    for name in ('Quantity', 'Quantity_purchased', 'Quantity_received_as_gift'):
+        out[name] = out[name].astype('float64')
+    out['Applied'] = out['Used'].astype('boolean')
+    out['Improved'] = pd.Series(pd.NA, index=out.index, dtype='boolean')
+    out['u'] = out['u'].fillna('Unknown')
+    keys = ['t', 'i', 'plot_id', 'input', 'crop']
+    if out[keys].isna().any().any() or out[keys].duplicated().any():
+        raise ValueError('Mali s16b native slots collide on the public key')
+    columns = ['Quantity', 'u', 'Purchased', 'Quantity_purchased', 'Improved',
+               'Applied', 'Unit_purchased', 'Received_as_gift',
+               'Quantity_received_as_gift', 'Unit_received_as_gift',
+               'Input_native', 'input_code_native']
+    out = out.set_index(keys)[columns]
     out.attrs = deepcopy(raw.attrs)
     return out
 
@@ -136,6 +178,36 @@ def s16b_rows_for_wave(raw, wave, *, household_id):
     # Copy typed attrs explicitly; metadata summaries are not a serving claim.
     out.attrs = deepcopy(raw.attrs)
     return out
+
+
+# Exact OWN source labels -> existing Mali taxonomy. Source categories that do
+# not identify a single product/crop retain their literal/broad category. In
+# particular the DAP catch-all is NOT the DAP product (reserved #1483/#1445).
+# Seed tails are matched by own labels, never a transferred numeric menu.
+PUBLIC_LABELS = {
+    "Engrais organiques - déchets d'animaux": ('Manure', '(not crop-specific)'),
+    'Engrais organiques - Ordures ménagères': ('Other organic', '(not crop-specific)'),
+    'Engrais inorganiques - Urée': ('Urea', '(not crop-specific)'),
+    'Engrais inorganiques - Phosphates': ('Engrais inorganiques - Phosphates', '(not crop-specific)'),
+    'Engrais inorganiques - NPK/Formule unique': ('NPK', '(not crop-specific)'),
+    'DAP et autres engrais inorganiques': ('DAP et autres engrais inorganiques', '(not crop-specific)'),
+    'Produits phytosanitaires - Pesticides': ('Pesticide', '(not crop-specific)'),
+    'Produits phytosanitaires - Herbicides': ('Herbicide', '(not crop-specific)'),
+    'Produits phytosanitaires -Fongicides': ('Fungicide', '(not crop-specific)'),
+    'Autres produits phytosanitaires': ('Other phytosanitary', '(not crop-specific)'),
+    'Semences de petit mil': ('Seed', 'Mil'),
+    'Semences de sorgho': ('Seed', 'Sorgho'),
+    'Semences de maïs': ('Seed', 'Maïs'),
+    'Semences de riz': ('Seed', 'Riz'),
+    "Semences d'autres céréales": ('Seed', 'Autre céréale'),
+    'Semences de coton': ('Seed', 'Coton'),
+    'Semences de césame': ('Seed', 'Sésame'),
+    'Semences de haricots/niébé': ('Seed', 'Haricots secs'),
+    'Plants/boutures de tubercules': ('Seed', 'Autre tubercule'),
+    'Autres semences': ('Seed', 'Autres semences'),
+    "Semences d'arichide": ('Seed', "Semences d'arichide"),
+    "Plants d'hévéa, de teck": ('Seed', "Plants d'hévéa, de teck"),
+}
 
 
 SOURCE_BINDINGS = {'2018-19': {'columns': ('vague',

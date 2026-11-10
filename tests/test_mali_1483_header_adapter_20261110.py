@@ -1,4 +1,4 @@
-"""Frozen source-free controls for the nonactivated own Mali s16b adapter.
+"""Frozen source-free controls for own Mali s16b adapters and driver wiring.
 
 UNRUN by the source-only author. Coordinator selection is exactly this file,
 --noconftest, -n 2 --dist=loadfile. No LSMS import, Country, provider or writer.
@@ -10,6 +10,7 @@ from copy import deepcopy
 import importlib.util
 import os
 from pathlib import Path
+import re
 import socket
 from types import SimpleNamespace
 from typing import Any
@@ -17,6 +18,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import pytest
+import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -94,7 +96,8 @@ def adapter(monkeypatch):
     calls = {node.func.id for node in ast.walk(tree)
              if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)}
     assert calls <= {'ValueError', 'set', 'sorted', 'any', 'isinstance',
-                     'household_id', 'deepcopy', '_card_alias', 's16b_rows_for_wave'}
+                     'household_id', 'deepcopy', '_card_alias', 's16b_rows_for_wave',
+                     's16b_applied_candidate'}
     spec = importlib.util.spec_from_file_location('mali_1483_pure_adapter', ADAPTER)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -334,7 +337,7 @@ def test_formatted_identity_collision_refuses_and_source_sentinels_are_not_maske
     assert got['Quantity'].tolist() == [99, 999, 9999, 99999, -2]
 
 
-def test_header_provenance_is_own_and_adapter_has_no_automatic_entrypoint(adapter):
+def test_header_provenance_and_exact_country_wiring(adapter):
     module, _ = adapter
     assert module.SOURCE_BINDINGS['2018-19']['header_sha256'] == (
         '701c60fe2b2e988d116da23d92d8cc5e260592a4d292ecfb34e7e0c870ee5eb5')
@@ -342,8 +345,178 @@ def test_header_provenance_is_own_and_adapter_has_no_automatic_entrypoint(adapte
         '3f467ae181bb4d3f1d537c535ce2cf94d8cf8bc8cfe1ded5067adcf6577aca35')
     for wave in INVENTORIES:
         assert module.SOURCE_BINDINGS[wave]['columns'] == INVENTORIES[wave]
-        assert not (COUNTRY / wave / '_/plot_inputs.py').exists()
-    # Merely adding helper source does not declare a wave or execute a producer.
-    for wave in INVENTORIES:
+        assert (COUNTRY / wave / '_/plot_inputs.py').is_file()
         text = (COUNTRY / wave / '_/data_info.yml').read_text(encoding='utf-8')
-        assert '\nplot_inputs:' not in text
+        assert text.count('\nplot_inputs: !make\n') == 1
+    scheme = yaml.safe_load((COUNTRY / '_/data_scheme.yml').read_text())['Data Scheme']['plot_inputs']
+    assert scheme['index'] == '(t, i, plot_id, input, crop)'
+    for name, kind in [('Quantity', 'float'), ('u', 'str'), ('Purchased', 'bool'),
+                       ('Quantity_purchased', 'float'), ('Improved', 'bool'), ('Applied', 'bool')]:
+        assert scheme[name] == kind
+    for name, kind in [('Unit_purchased', 'str'), ('Received_as_gift', 'bool'),
+                       ('Quantity_received_as_gift', 'float'), ('Unit_received_as_gift', 'str'),
+                       ('Input_native', 'str'), ('input_code_native', 'int')]:
+        assert scheme[name] == {'type': kind, 'optional': True}
+    make = (COUNTRY / '_/Makefile').read_text()
+    rule = next(line for line in make.splitlines()
+                if line.startswith('$(VAR_DIR)/plot_inputs.parquet:'))
+    for wave in ['2014-15', '2017-18', '2018-19', '2021-22']:
+        assert '../' + wave + '/_/plot_inputs.parquet' in rule
+
+
+def public_native(wave):
+    raw = native(wave)
+    raw['s16bq01'] = np.array([3, 5, 6, 19, 11], dtype='int8')
+    raw['s16bq07b'] = pd.array([5, 4, 3, pd.NA, 5], dtype='Float64')
+    raw['s16bq09b'] = pd.array([2, 1, pd.NA, 5, 5], dtype='Float64')
+    return raw
+
+
+@pytest.mark.parametrize('wave', ['2018-19', '2021-22'])
+def test_exact_public_frame_preserves_yes_missing_quantity_and_own_acquisition_units(adapter, wave):
+    module, formatters = adapter
+    raw = public_native(wave)
+    got = module.s16b_plot_inputs_for_wave(raw, wave, household_id=formatters[wave])
+    i = '12003' if wave == '2018-19' else 'EHCVM21_12003'
+    index = pd.MultiIndex.from_arrays([
+        pd.array([wave, wave], dtype='string'), pd.array([i, i], dtype='string'),
+        pd.array(['Farm-level', 'Farm-level'], dtype='string'),
+        pd.array(['Urea', 'Seed'], dtype='string'),
+        pd.array(['(not crop-specific)', 'Mil'], dtype='string')],
+        names=['t', 'i', 'plot_id', 'input', 'crop'])
+    expected = pd.DataFrame({
+        'Quantity': [1.25, np.nan],
+        'u': pd.array(['Gramme', 'Charrette'], dtype='string'),
+        'Purchased': pd.array([True, True], dtype='boolean'),
+        'Quantity_purchased': [7., 4.5],
+        'Improved': pd.array([pd.NA, pd.NA], dtype='boolean'),
+        'Applied': pd.array([True, True], dtype='boolean'),
+        'Unit_purchased': pd.array(['Kilogramme', 'Charrette'], dtype='string'),
+        'Received_as_gift': pd.array([False, True], dtype='boolean'),
+        'Quantity_received_as_gift': [np.nan, 1.],
+        'Unit_received_as_gift': pd.array(['Charrette', 'Charrette'], dtype='string'),
+        'Input_native': pd.array(['Engrais inorganiques - Urée', 'Semences de petit mil'], dtype='string'),
+        'input_code_native': pd.array([3, 11], dtype='Int64'),
+    }, index=index)
+    pd.testing.assert_frame_equal(got, expected, check_exact=True)
+    assert got.attrs == raw.attrs and type(got.attrs['record']) is AttrRecord
+    assert len(got) == 2 and got.index.is_unique
+    assert not {'s16bq09c', 'Quantity_kg', 'nitrogen_kg', 'v', 'season'} & set(got)
+    # Native source is invertible independently through the unfiltered adapter.
+    review = module.s16b_rows_for_wave(raw, wave, household_id=formatters[wave])
+    pd.testing.assert_frame_equal(review[list(raw)].reset_index(drop=True),
+                                  raw.reset_index(drop=True), check_exact=True)
+
+
+@pytest.mark.parametrize('wave,menu', [('2018-19', MENU18), ('2021-22', MENU21)])
+def test_all_own_public_slots_are_injective_with_literal_catchalls(adapter, wave, menu):
+    module, formatters = adapter
+    raw = pd.concat([native(wave).iloc[[0]]] * len(menu), ignore_index=True)
+    raw['s16bq01'] = np.arange(1, len(menu) + 1, dtype='int8')
+    got = module.s16b_plot_inputs_for_wave(raw, wave, household_id=formatters[wave])
+    inputs = ['Manure', 'Other organic', 'Urea', 'Engrais inorganiques - Phosphates',
+              'NPK', 'DAP et autres engrais inorganiques', 'Pesticide', 'Herbicide',
+              'Fungicide', 'Other phytosanitary'] + ['Seed'] * (len(menu) - 10)
+    crops = ['(not crop-specific)'] * 10 + ['Mil', 'Sorgho', 'Maïs', 'Riz',
+              'Autre céréale', 'Coton', 'Sésame', 'Haricots secs']
+    crops += (['Autre tubercule', 'Autres semences'] if wave == '2018-19' else
+              ["Semences d'arichide", 'Autre tubercule', "Plants d'hévéa, de teck", 'Autres semences'])
+    assert got.index.get_level_values('input').tolist() == inputs
+    assert got.index.get_level_values('crop').tolist() == crops
+    assert got['Input_native'].tolist() == menu
+    assert got['input_code_native'].tolist() == list(range(1, len(menu) + 1))
+    assert got.index.is_unique and len(got) == len(menu)
+    assert got['Quantity'].tolist() == [1.25] * len(menu)
+    assert got.index.get_level_values('plot_id').tolist() == ['Farm-level'] * len(menu)
+
+
+@pytest.mark.parametrize('field', ['s16bq01', 's16bq03b', 's16bq05', 's16bq07b',
+                                  's16bq08', 's16bq09b'])
+def test_public_unknown_refuses_but_the_raw_answer_survives(adapter, field):
+    module, formatters = adapter
+    raw = public_native('2018-19')
+    raw[field] = raw[field].astype('Float64')
+    raw.iloc[0, raw.columns.get_loc(field)] = 77
+    with pytest.raises(ValueError, match='unlisted native answers'):
+        module.s16b_plot_inputs_for_wave(raw, '2018-19', household_id=formatters['2018-19'])
+    review = module.s16b_rows_for_wave(raw, '2018-19', household_id=formatters['2018-19'])
+    assert review[field].iloc[0] == 77 and len(review) == len(raw)
+
+
+def test_public_missing_unit_empty_and_collision_controls(adapter):
+    module, formatters = adapter
+    raw = public_native('2021-22')
+    raw['s16bq03b'] = raw['s16bq03b'].astype('Float64')
+    raw.iloc[0, raw.columns.get_loc('s16bq03b')] = pd.NA
+    got = module.s16b_plot_inputs_for_wave(raw, '2021-22', household_id=formatters['2021-22'])
+    assert got['u'].tolist() == ['Unknown', 'Charrette']
+    assert got['Unit_purchased'].tolist() == ['Kilogramme', 'Charrette']
+    raw['s16bq02'] = pd.array([2] * len(raw), dtype='Float64')
+    empty = module.s16b_plot_inputs_for_wave(raw, '2021-22', household_id=formatters['2021-22'])
+    pd.testing.assert_frame_equal(empty.reset_index(drop=True),
+                                  got.iloc[:0].reset_index(drop=True), check_exact=True)
+    assert empty.index.names == ['t', 'i', 'plot_id', 'input', 'crop']
+    raw['s16bq02'] = pd.array([1] * len(raw), dtype='Float64')
+    raw['s16bq05'] = pd.array([2] * len(raw), dtype='Float64')
+    raw['s16bq08'] = pd.array([2] * len(raw), dtype='Float64')
+    saved = module.PUBLIC_LABELS['Engrais inorganiques - NPK/Formule unique']
+    module.PUBLIC_LABELS['Engrais inorganiques - NPK/Formule unique'] = ('Urea', '(not crop-specific)')
+    try:
+        with pytest.raises(ValueError, match='collide on the public key'):
+            module.s16b_plot_inputs_for_wave(raw, '2021-22', household_id=formatters['2021-22'])
+    finally:
+        module.PUBLIC_LABELS['Engrais inorganiques - NPK/Formule unique'] = saved
+
+
+@pytest.mark.parametrize('wave,year', [('2018-19', '2018'), ('2021-22', '2021')])
+@pytest.mark.parametrize('duplicate', [False, True])
+def test_actual_driver_extraction_uses_one_numeric_own_source_and_refuses_before_write(adapter, wave, year, duplicate):
+    module, formatters = adapter
+    raw = public_native(wave)
+    if duplicate:
+        raw = pd.concat([raw.iloc[[0]], raw.iloc[[0]]], ignore_index=True)
+    reads, writes = [], []
+
+    def getter(path, *, convert_categoricals):
+        assert path == '../Data/s16b_me_mli' + year + '.dta'
+        assert convert_categoricals is False
+        reads.append(path)
+        return raw.copy(deep=True)
+
+    def writer(frame, path):
+        assert path == 'plot_inputs.parquet'
+        writes.append(frame.copy(deep=True))
+
+    path = COUNTRY / wave / '_/plot_inputs.py'
+    ns = _extract(path, ['build'], {'get_dataframe': getter, 'to_parquet': writer,
+        'household_id': formatters[wave], 's16b_plot_inputs_for_wave': module.s16b_plot_inputs_for_wave})
+    if duplicate:
+        with pytest.raises(ValueError, match='repeats a native'):
+            ns['build']()
+        assert not writes
+    else:
+        ns['build']()
+        assert len(writes) == 1
+        expected = module.s16b_plot_inputs_for_wave(raw, wave, household_id=formatters[wave])
+        pd.testing.assert_frame_equal(writes[0], expected, check_exact=True)
+        assert writes[0].attrs == expected.attrs
+    assert reads == ['../Data/s16b_me_mli' + year + '.dta']
+
+
+def test_full_dap_catchall_does_not_match_current_production_nutrient_share(adapter):
+    module, _ = adapter
+    path = ROOT / 'lsms_library/transformations.py'
+    tree = ast.parse(path.read_text(encoding='utf-8'))
+    content = next(ast.literal_eval(node.value) for node in tree.body
+                   if isinstance(node, ast.Assign)
+                   and any(isinstance(t, ast.Name) and t.id == '_NITROGEN_CONTENT' for t in node.targets))
+    organic = next(node for node in tree.body if isinstance(node, ast.Assign)
+                   and any(isinstance(t, ast.Name) and t.id == '_ORGANIC_INPUT_PATTERN' for t in node.targets))
+    ns = {'pd': pd, 're': re}
+    exec(compile(ast.Module(body=[organic], type_ignores=[]), str(path), 'exec'), ns)
+    ns = _extract(path, ['_normalise_input_label', '_nitrogen_shares'], ns)
+    label = module.PUBLIC_LABELS['DAP et autres engrais inorganiques'][0]
+    shares, tally = ns['_nitrogen_shares'](pd.Series([label, 'DAP', 'NPK']), content)
+    assert pd.isna(shares.iloc[0])
+    np.testing.assert_array_equal(shares.iloc[1:].to_numpy(), np.array([0.18, 0.17]))
+    assert tally['unmatched_labels'] == {label: 1}
