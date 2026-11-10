@@ -3566,3 +3566,46 @@ release. No gate/filter, season, quantity, unit, ID, weight or scientific
 default changes; no 2018 decline or causal export explanation. Whole GH #1530 stays
 open. Evidence: =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1530-niger-2021-gate-metadata-20261109/=
 and =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1530-niger-2021-gate-answers-20261109/=.
+
+* 2026-11-10 -- Own departure form versus released fields (GH #1565)
+
+Bounded documentary authority only; no native/API read or policy change.
+Both own 2021 household forms (vague1 MD5
+=465e2578b1706a76207e8687a25b6178=; vague2
+=40fdf4da6421061168807d17e269a146=), PDF/printed p.4,
+carry the same departure block. For 2018/2019 households the flap carries
+all first-edition residents and appends newcomers; new households list
+residents present OR absent at interview. This is a roster instruction,
+not proof of released person linkage or an executed CAPI enable rule.
+
+Form 1.00a asks whether the person still LIVES in the household: Yes goes
+to sex 1.01; No continues to reason 1.00b, then timing 1.00c and
+"Personne suivante". The 13 printed reasons include separate COVID-19
+and other deaths (4/5), study/work moves and migration. The timing cells
+are MONTH and YEAR, not elapsed months; no last-12-month window is
+printed. Native timing encoding and the printed 98/9998 meaning are not
+settled by this form block. There is no standalone other-specify box in
+its visually inspected departure-reason cell.
+
+Closed own-release HEADER JSON (64-name inventory, reused without a DTA
+open) establishes a different surface: =s01q00aa= asks whether the person
+is still a MEMBER, 1 oui/2 non, attached to label-set NAME =s01q00a=;
+that name is not a variable alias. Coded =s01q00b= is ABSENT.
+=s01q00b_autre= is string and cannot recover it. =s01q00c= is one int16
+without a timing-unit card; the form's two calendar cells do not decode it.
+A fielded questionnaire/version plus export bridge, and an authentic
+separate coded-reason source if reasons are desired, remain needed.
+
+The six-month questions are separate: own p.6 routes 1.12 Yes to 1.14,
+No to 1.13; 1.13 prints Yes/No but no explicit rejection instruction.
+The existing MonthsSpent 12/0 mapping is unchanged. Current roster YAML
+selects no departure operand, and its Age hook removes interview_date.
+The finalizer drops an entirely null non-index payload. Adding any populated
+reason/member operand could therefore change survival without editing that
+finalizer; carrier, eligibility and all-null choices remain ROOT/user-held.
+No reason is reconstructed and no historical row count is remeasured.
+
+Evidence (custody, six text pages/two rasters PER form, exact options and
+finite UNRUN follow-on controls):
+=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-queue-refill-20261109-v2/refill-country-authority-d47-20261110/workers/Niger1565/ba850e6737f44335b5cdfb2d7c1a3712/evidence/REPORT.md=.
+This completes only the own-form authority slice; whole #1565 remains open.
