@@ -13,19 +13,108 @@ B=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103;R=B/reports.
 Archive of all detailed earlier checkpoints (including failed attempts):
 [[file:archive/handoff-through-1679-20261109.org]]. Older state is historical.
 
-* Actual workers and next actions
-All six prior remote country workers CLOSED/admitted; zero productive remotes.
-Do not call them eight busy workers. Four local slots total (root+3).
-- Root: review/grant1032 finite actual controls, source-review1071, queue/GH.
-- finish_1590:1032 actual finite operator LIVE, session30655; baseline witness
-  CLOSED0/1expectedPermissionError, candidate running with failures reported,
-  await terminalJUnit before classification; no source/reselection/retry.
-- malawi_revision_food:1071completecore+actual-route sourcee99b peerPASS;
-  preparing finite guardedoperator/sourcecomposition onto4381, UNRUN.
-- finish_1452:1071source/control qualifiedPASS e99b; now implementing932
-  selectedPRfull-data gate SOURCEONLY.1032source/carry reviews completedPASS.
+* Actual workers and next actions (latest; supersedes historical sections below)
+ZERO remote country jobs live/pending. Twelve actual submissions all TERMINAL:
+10Refused143,2native0/supervisor74. Eight earlier clone-preparation failures
+submitted NO jobs. No country dispatch is accepted as successful.
+Complete five published/hash-authenticated artifacts: Burkina_Faso/Mali/Malawi.
+Tanzania/Uganda/Niger useful Git source also preserved, incomplete artifacts.
+FINAL twelve-attempt matrix/source repositories/refs/paths and manifest:
+R/country-dispatch-proc-inspection-source-diagnosis-20261109/
+FINAL-TWELVE-ATTEMPT-STATUS.json and FINAL-MANIFEST.json,
+SHAde8789ceb6ef2f433dfd47bd4343814fe7b1e027e973b9345f9dc1d59d2a4fca.
+Do not call these eight busy workers. Four local slots total (root+3).
+- Root: country candidate review,932pure verification/publication,queue/CI/merges.
+- finish_1452: nine synthetic no-native supervisor controls authorized; locate
+  normal SuCoder source and prepare isolated source-pinned repair, NO installed/
+  staged hotpatch, monitor relaxation/native-state access or real submission.
+- finish_1590: Malawi494c84c country independent SOURCE review, full CONTENTS
+  first. Frozen932 correctionf41f ready for Root verification.
+- malawi_revision_food: Tanzania bd7eb country SOURCE review; independently
+  proved test-only empty-oracle correction and focused pure cohort authorized.
+  No actual native/cache/data build. Final1071 ledger/evidence next.
 Use followup_task to wake completed agents; send_message alone does not wake.
-User authorized delegation/dispatch; do not fill slots with quota tasks.
+User explicitly authorized country delegation and remote dispatch.
+
+* Country dispatch source regression and repair
+Q=B/country-queue-refill-20261109-v2; private/<Country>/<dispatchID> holds
+supported result/evidence/Git only; NEVER recursively enumerate native homes.
+Current worker.py SHA4b09841db4f8ae31395bb090d904b9ba635bf010a53d37337317127ffbf019e5
+lost identity-bound exit-race handling versus actual successful1135 worker
+SHAa2288d1876849f1d1baeaf95b638d3aa9314ae7fea884274b4736d45ff081eab.
+Same version string is insufficient; runner.py exact unchanged. Prior worker
+stat/status/stat UID/starttime proof, ordinary50ms grace/1s only same incarnation
+PF_EXITING, positive Z/X/proc-disappearance required, shared bounded ceiling.
+Current immediate check can refuse before positive exit; old actual CLOSED
+Niger/Uganda/Tanzania witnesses resolved EACCES in5–21ms. This does NOT prove
+all new failures harmless. Live/unknown/unreadable/mismatched processes must
+still refuse. Nine synthetic fixture controls authorized after Root source
+review; actual archived/current functions, fake clock/proc only, no native.
+No demonstrated profile/node-only fix. No monitor disable/native config change,
+bootstrap overwrite or installed-file hotpatch. Reviewed normal source-pinned
+generation required before one small fresh source-only pilot, then country refill.
+Resources: co_carleton/savio4_htc/explicit savio_lowprio/2CPU/8G/90min;
+exclude n0035. Usage1343362.29/100000000SUs (1.34%). Full nonpartial Q/source.git
+exact4381 staging637681KiB; supported clone timeout120 avoids initial30s failures.
+Complete original issue bodies Q/assets/*-open-issues.json are capped20 perquery,
+NOT exhaustive inventories. Country lanes must move past held choices.
+Candidates: Tanzania bd7eb2dedf0db450d3607dfbf766d982dec4718b;
+Malawi494c84c89b60c0a59de00da55545bdaf0af646bc;
+Mali9e4b45a323ed81fb54ea62e3eb932ee94d6930bf;
+Burkina484c3662e87221d75708fc3e18b989ba727e5739;
+Uganda642042faf020bb3943df229da98ab26d72ff0165;
+Niger789473ba75ecb6a2cf2c0e5d5eded7dc023cec02.
+All await semantic acceptance. Tanzania new empty fixture invents healthy empty
+support despite old concat([]) ValueError; test-only correction authorized.
+
+* Latest framework semantic verification (historical failed runs retained)
+1032 corrected outer DVC adapter source3435fb2 composed4f4767a onto4381.
+First cd611 finite56cases25PASS31FAIL/public facade alias defect; baseline
+separate1expectedPermissionError13/33.166s. Corrected4f finite57cases50PASS7FAIL
+(test fixture paths/expectedFloat64 only). TEST-ONLY final193739521d7f02166a02c19e28429cfc2d348d12,
+W=/local/job40825266/worktrees/fix-1032-seven-fixtures-20261109.
+Seven targeted controls actual actor47935 CLOSED0:7PASS/44.776s. All50prior
+passes retained, NOT fresh57green. Production exact4f; test4stage paths absolute,
+one literal expectednullableFloat64. R/1032-seven-fixture-controls-20261109
+FINAL-MANIFEST SHAa5108b0319611f9eb78366ec71ff8c17e1372555295facc32e15185ad5ee08dc.
+Actual UID65534/emptyuid_map/distinctnet/private data+config0/sourceclean/guards0.
+Adapter actual DVC3.67.1 tested, not all futureversions; outer managed interface
+not nominal public-inner instance identity. No footprint/publication yet.
+
+1071 current production composed2e04bb353512b0d399c802ed7c9c2d4f3d14474c onto4381,
+finite229cases224PASS5FAIL (getter oracle3/open spy1/Make outerexit oracle1).
+TEST-ONLY12400a3e4a45b732c3a72e087a1d8d507c468bf1,
+W=/local/job40825266/worktrees/fix-1071-five-control-contracts-20261109.
+Exact5targeted actor75445 CLOSED0:5PASS/30.3429s, source/guards/private paths exact.
+NOT fresh229green. JUnit3e7edec2bf722717db462b320c406008782c956e8067be9ea97a02f9c9220bcf.
+R/1071-managed-cache-five-controls-correction-20261109. Final ledger pending.
+Tranche does NOT close whole1071; Other_features/JSON/retiredstage/privateMake
+prereq owners deferred; tiny lstat→unlinkrace remains, no atomicCAS claim.
+Both framework candidates await metadata footprint/publication; consider one
+joint candidate-only census with authenticated closed baseline6baf/sourcecarry,
+not repeated whole collectors. Never label failed history as all-green.
+
+* Latest932 user-selected policy implementation
+User requires full data validation on EVERY ready development PR, including
+strict base freshness. No re-ask for this selected necessary wiring/settings.
+Original sourcee84a18cb30ec6804f5cf7fc260119e7a9433fc2b off4381,5owned;
+full private recipe unchanged; metadata-only edits use separately named check/
+concurrency so cannot cancel/replace validation; malformed/draft/fork refuses;
+exact synthetic mergeHEAD/parents checked before dependencies/credentials.
+Independent P2 nested title/body malformed prior values acceptedmetadata,
+base={} gap; initial45purecases UNRUN. Separate reviewed SOURCE correction
+f41f46d0a544981b31cf400a3f3e57b4dedb58ed/tree178f290ead1fbc35b4323697ad7eaf7592e112ca,
+W=/local/job40825266/worktrees/fix-932-malformed-edits-20261109.
+Exact3owned only classifier/tests/ledger. Exact known title string/body string
+or approved null; base exact primary-documented ref+sha/from:string records;
+all companions checked. 22new+45old=67static cases UNRUN at handoff.
+R/932-malformed-edits-correction-source-20261109 manifest
+835fb3265c664bd87d79c679bddb6465e49bc74ed5eefd80539428d8fa574f87.
+Root read correction and pure plan; finite verification next. Actions actual
+naming/concurrency/base freshness required-check wiring UNPROVEN. Publish draft
+then ready/full actual CI after review; preserve ruleset25124452 other rules/
+bypass actors, uniquecontext+strictness only after demonstrated platform wiring.
+No data trigger or admin settings changed yet; workers cannot make these writes.
 
 * Verified merges completed in this continuation
 1677: merge d6044e280596988dac3a9b5bab78f4e5c9feb9d4, parents993+5377.
@@ -72,7 +161,7 @@ EquivalentenKg; Q21 separately yes/no threshing. Nativecode4Egrener still
 has NO own-release/form/CAPI/export bridge; no recode justified.
 R/1436-mali-q13-q21-visual-check-20261109 manifest8983c996e7241a86890647077e3b2db8a1dfce3434c5d5b789e72aeed1d78841.
 
-*1032 current source and finite execution gate
+* Historical1032 source/execution plan (superseded above)
 Originalauthorf47 ledger-only over peerPASS0eac; witness-movechild95de9dddec85912ffc2c55e3bf0c17507fbc613d.
 CURRENTCOMBINEDcd61124c6b6686dcf166864f6588ea140828ce88/tree5002944592b94c0df49377b0c93f4a864fc5abfe;
 parents[bb5f,95de], W=/local/job40825266/worktrees/publish-1032-on-current-bb5-v2-20261109.
@@ -114,7 +203,7 @@ without-rootmapping. If fails, baseline/candidateremainheld. Correct operator/
 UIDassertions must be readbyRoot before testgrant. Tests/collection UNRUN;
 no testactor launched yet. Do not claim sourcePASS is runtimeacceptance.
 
-*1071 source tranche, current review
+* Historical1071 source plan (superseded above)
 Rootapproved concrete R/1071-managed-cache-read-recovery-charter-20261109
 manifest364f71fe75ffe910268a2714ff00712141b0a321647a7df85e476e5f2889dea1.
 First coherenttranche ONLY YAMLwave/scriptwave/normalcountry/bothassumedfresh
@@ -180,7 +269,7 @@ passes. Check preflight EXIT0 BEFORE merge, then exactactualparents/tree and
 push FS handoffref. Capture identity/receipts on one handle to terminal; no
 silent rerun/rewarm, no broadtests once appropriatechecks pass.
 
-* Latest1032 actual execution (supersedes earlier UNRUN plan)
+* Historical first1032 actual execution (failed; superseded above)
 Corrected namespacepreflight CLOSED0/0.108s: `unshare --user --net`, unmapped
 UID/EUID/GID65534 with EMPTYuid_map, host43292, distinctnetworknamespace,
 real invented0400 write deniedEACCES13. Root read exactreceipt/operatordelta,

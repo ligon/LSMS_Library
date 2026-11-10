@@ -1,0 +1,201 @@
+#+title: Current LSMS-ISA goal handoff
+* Authoritative current checkpoint (2026-11-09, after PR1679)
+Goal ACTIVE/incomplete. Development4381d701ffb06ab447a37c66362119d1c1e23009;
+complete tree3060380212a25a755685aa85e5a0632b5557090d.
+78 verified development merges /42 whole issue closures. FS
+origin/handoff/isa-development-20261109 pushed exact4381, terminal0.
+No master release, shared harmonized-cache rebuild, raw acquisition,
+production sampling-weight changes or producer/admin contact.
+Root owns GH writes/publication/merges. Current root checkout is OLD-code
+DOCS branch docs/isa-sweep-20261103: NEVER execute LSMS runtime here.
+MAIN=/local/job40825266/venv_img/bin/python.
+B=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103;R=B/reports.
+Archive of all detailed earlier checkpoints (including failed attempts):
+[[file:archive/handoff-through-1679-20261109.org]]. Older state is historical.
+
+* Actual workers and next actions
+All six prior remote country workers CLOSED/admitted; zero productive remotes.
+Do not call them eight busy workers. Four local slots total (root+3).
+- Root: review/grant1032 finite actual controls, source-review1071, queue/GH.
+- finish_1590:1032 actual finite operator LIVE, session30655; baseline witness
+  CLOSED0/1expectedPermissionError, candidate running with failures reported,
+  await terminalJUnit before classification; no source/reselection/retry.
+- malawi_revision_food:1071completecore+actual-route sourcee99b peerPASS;
+  preparing finite guardedoperator/sourcecomposition onto4381, UNRUN.
+- finish_1452:1071source/control qualifiedPASS e99b; now implementing932
+  selectedPRfull-data gate SOURCEONLY.1032source/carry reviews completedPASS.
+Use followup_task to wake completed agents; send_message alone does not wake.
+User authorized delegation/dispatch; do not fill slots with quota tasks.
+
+* Verified merges completed in this continuation
+1677: merge d6044e280596988dac3a9b5bab78f4e5c9feb9d4, parents993+5377.
+CI42707971494 testedf05eceb41ad557d93cf1e714fd0bd1f28bf48346 with sameparents/
+tree3c6e9ae94e413e5d3dc44cc1cabfb3f07febe3b8. Unit13793P/5673S/4X;
+Windows362P/1S;6SKIP. R/ci-admission-1677-20261109.
+#1135 remainsOPEN, narrowed to complete-mover/physical cluster authority.
+13typed dated measurement records are delivered, not fresh sample audits.
+
+1678: mergebb5f4cca5fff139c3675a20096ecdb57205615d6, parentsd604+12d053c801638db6b5102b74407af5adf2747b32.
+Corrected CI42718759156 testedb4c7d5062ea78ada45d2d43fc9f0dac4d4a53309,
+sameparents/treed3c14182d9ebdd8f25e1671c9caef61073b12f58. Unit13806P/
+5673S/4X/692.55s;Windows362P/1S/11.98s;6optionalSKIP. Actual pre/post proofs
+R/ci-admission-1678-20261109. First Rootpreflight wrong expected testfilename
+failed; no mutation until corrected proofexit0. OriginalCI42709622704 was
+1F/13805P: handler fingerprint invariant. Repair adds ONLY established
+Country._legacy_can_build to explicit exclusions; orchestrator stillhashed,
+allCountry/tests exactoriginalfadf. Six unchanged focused controlsPASS.
+Corrected census82372 CLOSED0/127.855s:452country/1885wave/37BTF/0FIF vsBOTH
+failedstack6c6f and current1135/616457; all14otherfields/keys/18None exact.
+Map6bafa7a41dac811fd794d180ce151d20ad7db5f6c4248fab8afd1d0b2c971801.
+R/381-handler-fingerprint-ci-repair-20261109 FINALmanifest
+e8a04fc5558f3da8d0d2f61962012f37759479696c775f500ac9da6c68a61297.
+Independent repairPASS with PACKAGING QUALIFICATION: older nested FOCUSED
+manifest pins unavailable earlier REPORT.md; other18members exact, final
+manifest authenticates currentreport/all23. Do not reconstruct/replay or
+claim oldnestedmanifest fully authenticated. PublicPR/issue discloseit.
+#381 CLOSED: actualNepal defaultprobe58451 exit0/5.796s, precisebareRuntimeError,
+publicwarnings0/no forbiddendata/recipes; real metadata1Repo/1DVCFS/2make-n,
+private data/config0 and5metadatafiles separatelyinventoried. Armenia is
+SOURCE-only acceptance, not actual warning-count measurement. Zero-wave
+universe distinctcase is SOURCE-only. No actualdata-suite acceptance.
+
+1679: merge4381d701ffb06ab447a37c66362119d1c1e23009, parentsbb5f+c0cb4c3c2e71e46c47ba1443222ebcabc2003186.
+CI42722361292 testedc9c3c43b5dc4b1bbfa39657b8d92ec2563f93e50 with sameparents/
+tree3060380212a25a755685aa85e5a0632b5557090d. Unit13806P/5673S/4X/771.56s;
+Windows362P/1S/16.67s;6optionalSKIP. R/ci-admission-1679-20261109 allpre/post
+proofs/logs. Docsonly36lineMaliCONTENTSappend+ledger; full3708line/256787byte
+oldprefix/all19262otherobjects exactbb5f. #1436 remainsOPEN/publicnarrowed.
+Root personally rendered/viewed ONLY heldFrenchP2 PDF29–30 (printed28–29),
+knownSHAe6749a01/MD55ebb8d49; unsharechild0/8.42s/sourceprepostexact.
+Q13 THREEstatechoices, FOUR unletteredsubcolumns ProductionenUML/UML/Etat/
+EquivalentenKg; Q21 separately yes/no threshing. Nativecode4Egrener still
+has NO own-release/form/CAPI/export bridge; no recode justified.
+R/1436-mali-q13-q21-visual-check-20261109 manifest8983c996e7241a86890647077e3b2db8a1dfce3434c5d5b789e72aeed1d78841.
+
+*1032 current source and finite execution gate
+Originalauthorf47 ledger-only over peerPASS0eac; witness-movechild95de9dddec85912ffc2c55e3bf0c17507fbc613d.
+CURRENTCOMBINEDcd61124c6b6686dcf166864f6588ea140828ce88/tree5002944592b94c0df49377b0c93f4a864fc5abfe;
+parents[bb5f,95de], W=/local/job40825266/worktrees/publish-1032-on-current-bb5-v2-20261109.
+Sixowned: new_dvc_runtime.py,local_tools.py,country.py,new1032tests,existing1001
+fixture,ownledger. All19260nonowned exactbb5; fiveunshared taskobjects exact
+author; removingreviewed1032hunks makes entireCountry byteexactbb5. Current
+381guard/registry/tests preserved; newguards+resolver must be tested together.
+New4381 differs frombb5 ONLY MaliCONTENTS/ledger, so don'treruncontrols merely
+for doccomposition; prove exact code/source carry when needed.
+
+Adapter uses public suppliedRepo and explicitly PRIVATE tmp/SCM/lazy hooks.
+Live lexicalroot/config.local/relative remotes and SCM tracked-output check
+preserved; managedL1 bothlayouts unchanged. Runtime metadata is existing
+DVC_SITE_CACHE_DIR or standard ownercache, not require writabledata_root.
+Stablelocks within SAME metadata context; different explicitcontexts partition
+locks (no cross-context guarantee). PIDownedstate cleanup/forkproviderreset.
+Initial41799 P2 corrected: partial State SQLite mustclose before removal;
+cleanup failures preserve originalcause and honest retainedstate, no hidden
+finalizerretry. Narrowresolver extension supports valid detailedouts key form
+when legacy'path'key absent; oldNone skip/17error retained, realDVC validates.
+No newdependencyrange/exactversionpin; actualinspected3.67.1, capabilityrange
+>=3.67,<4 not a tested-allversionsclaim. No whole1032 outcome/footprint yet.
+Independent R/review-1032-readonly-dvc-runtime-source-20261109:
+initialP2 retained; v2manifest98d9537263130ca77c8527e576a80c76d257e3a7db8cf3642c0f0d4eaa7d09cf;
+currentcarry7189a55fba94804f09c9580f28e37c707e6dee100264b95ec635f4442ad77f68 PASS.
+
+Finitepacket R/1032-readonly-dvc-prototype-finite-20261109 readbyRoot:
+RUNPLAN/COVERAGE/SELECTION/run-focused.py/identity_plugin.py/externalwitness.
+OriginalDVC witness is OUTSIDE shippedtests, separately selected/result,
+then onecandidatecohort: newcontrols,fake-only1001,5DVCcompanions,2current381
+stagechecks. MAIN/privateconfig/L1/tmp, falsecreds/noauto-unlock, sourceidentities,
+-n2/loadfile, socket/acquisitionblocked, intended syntheticlocalDVC I/Oallowed.
+No fullsuite/census/native/countryAPI/sourceacquisition. Stoponfailure/no retry.
+IMPORTANT caught beforelaunch: `unshare -rn` mapsEUID0 and wouldskip readonly
+controls. ROOTgranted only ONE tiny operatorpreflight for nonroot UID/real
+readonlywritefailure/differentnetnamespace, noLSMS/tests/provider. Installed
+unshare lacks--map-current-user; author now testing `unshare --user --net`
+without-rootmapping. If fails, baseline/candidateremainheld. Correct operator/
+UIDassertions must be readbyRoot before testgrant. Tests/collection UNRUN;
+no testactor launched yet. Do not claim sourcePASS is runtimeacceptance.
+
+*1071 source tranche, current review
+Rootapproved concrete R/1071-managed-cache-read-recovery-charter-20261109
+manifest364f71fe75ffe910268a2714ff00712141b0a321647a7df85e476e5f2889dea1.
+First coherenttranche ONLY YAMLwave/scriptwave/normalcountry/bothassumedfresh
+cachegates+calllocalmisscoveragehandoff. Initial pd.read_parquet OSError/
+ArrowInvalid only, accurate unreadablecondition, no physicaldamageclaim.
+Footer/index/null/map/grain/date/strict1066replay and freshoutput/source/
+recipeerrors remainoutsidecatch. One normalrecovery per preexistingartifact;
+savedcoverage beforeexactentryinvalidation. No raw/L1/symlinktarget/replacement
+intentionaldeletion, no schema/exclusions/registry/newdecoder. Tiny ordinary
+lstat→unlinkrace remains; neverclaim atomiccompare-and-unlink.
+
+W=/local/job40825266/worktrees/fix-1071-managed-cache-read-tranche-20261109,
+basebb5f, ledgerfirst556fd. Originalfreeze4c9667d0d975dfb41c846162a4e2032a6cd16280;
+enginecorrection1805f8ba8c25da1bf601bacb8552ff1e5c6fa453/tree5e2d6508dfc04b3d7629455f12ad84758432877b.
+9owned/all19256others exactbb5. Newhelper24lines; Countryformerget_df reads
+explicitpyarrow preserved, Waveomittedengine unchanged; genericdecoder/writer
+unchanged. Shared private_make_build_root Othercaller optsout, retaining exact
+olddecoder+outererrorpolicy/no liveOtherdeletion/no newprereqhealing.
+YAML evictiondenial retains productiveRAMbuild+existingwritewarning.
+Other_features/JSONparquet/retiredstage/privateMakeprereqowners DEFERRED;
+firsttranche doesnotclosewhole1071. 1452sourcequalifiedPASS1805, no P1/P2;
+a stale mockkwargfinding retracted after exact1805recheck (alreadyfixed).
+Author now adds SOURCE-ONLY actualMakeforce/mtime/healthy7-once/warm0/freshbad/
+exit7/no-output controls +ordinarynormalcountry/legacyassumedfull recovery.
+Wave's existingexit0/nooutput warning+empty/missing is retained; actualCountry
+must terminalfail/no falsecoverage with its existingfallbacks. No newfailure
+policy to satisfytests. Wait immutabletestchild/review before boundedruntime.
+
+*932 policy SELECTED by user; implementation started
+Root usedprimaryofficialGitHubdocs+actualrepometadata/ruleset25124452:
+User-ownedpublicrepo cannotusemergequeues; skippedjobs satisfyrequiredchecks;
+workflow_dispatch JOB checks do notsatisfyPR requiredcontexts. Oldcontext-only
+PUT andexistingdispatchalone are insufficient. No settings/dataworkflowtrigger.
+Merged1049 deliverednightly/disclosure/merge_group; public932 narrowed with
+fullhistory. Observeddata run42698613061 FAILED onolder097283459, notcurrent
+acceptance. Onlyjob/steps metadataread, no private data logs acquired.
+ConcreteSOURCEproposal R/932-compatible-pr-data-gate-policy-20261109/PROPOSAL.md
+manifest89c165d8283877c018bab72a625bf4daffd9c1bcdee88b418d6ce934ac114aef.
+Recommends A: dedicatedPR-only unique requiredcheck, explicitfailineligible
+(draft/fork), exactsyntheticmerge/full existingprivaterecipe, strictbasefreshness;
+1–2h perrevision/baseadvance. Bmaintainereligiblelabel-event needsfutureactor/
+latestcontextproof; advisorynightly deliberateC alsopossible. ProposedPUTonly
+addsuniquecontext+strictfalse→true, preservesotherrules/bypass; NOTapplied.
+USER ANSWERED: REQUIRE FULL DATA VALIDATION ON EVERY READY DEVELOPMENT PR.
+OptionA selected; policyhold superseded. Necessary uniquecontext+strictfreshness
+enforcement is authorized after concrete source/checkwiringreview; no reask.
+Root delegated SOURCE-ONLY workflow implementation tofinish_1452 in separateW
+off4381, ledgerfirst. Correctexistingfalsequeueclaims, preserveotherjobs/rules.
+No settings/data triggers at decision time; Root owns laterpublication/readiness/
+settings after review. No full data run or admin mutation byworkers.
+
+* Standing pending boundaries and recovery
+#1066 userchoice NORMALwarning/reportreplay+normalstrictrefusal implemented,
+merged1674/50a927 andCLOSED; do notreask orreopenhold. Earlier49borrow,
+50maizeflour(final, supersedingmilling-service discussion) and51nodateclamp remainrecorded in isa-decisions.org.
+#48 investigation: jointinclusionnotidentified frommarginalweights; no
+productionweights. Other scientific/authoritychoices remainheld in decision
+log (1575stratawiring,1190carrier/thirdgate,1562same-releasecoping,1604weights,
+1509eligibility/1559reference,1116provenanceprecedence). Do notinventdefaults.
+Neverinspect nativeSDK/home/state/transcripts/opaque runtimepayloads. Supported
+status and declaredsource/evidence artifacts only. RequiredCI skips are not
+passes. Check preflight EXIT0 BEFORE merge, then exactactualparents/tree and
+push FS handoffref. Capture identity/receipts on one handle to terminal; no
+silent rerun/rewarm, no broadtests once appropriatechecks pass.
+
+* Latest1032 actual execution (supersedes earlier UNRUN plan)
+Corrected namespacepreflight CLOSED0/0.108s: `unshare --user --net`, unmapped
+UID/EUID/GID65534 with EMPTYuid_map, host43292, distinctnetworknamespace,
+real invented0400 write deniedEACCES13. Root read exactreceipt/operatordelta,
+authenticatedall10members of finalmanifest7867b2606d887470bf1040613b4c86aac82d3c98ab7029cc1d32e1f6c5af98a8,
+checkedcd611clean/Pabsent, wroteROOT-GRANT.json. Workerfollowupactivated.
+Exactoperator under timeout900 launchedONCE execsession30655. Baseline witness
+CLOSED0/33.166s,1expected originalPermissionError13, not candidatePASS; three
+identities confirm65534/emptyuidmap/distinctnet/DVC3.67.1/sourceclean/bindings
+exact/top-levelconfigdata0. Candidatecohort nowLIVE WITH FAILURESreported in
+progress. Keep samehandle immutable to terminal, classifyactualJUnit/logs;
+NO auto repair/reselection/retry and NOcensus/PR/runtimeacceptanceyet.
+
+1071latest e99b1eb692ece754f7239ad55882269e97bab4fa/tree0a2acf019b7c7befad232af41c40c8fed1c95430,
+test-onlychildover1805, peerqualifiedPASS with realMake andall3Countryroutes.
+IndependentR/review-1071-core-cache-recovery-source-20261109 manifest
+fe2802b6c37ba6ca341741467d9480086d99a9b0a3eaad40e134339d5ad90b09.
+Mwi nowprepares exactfiniteoperator/current4381doccomposition, no actualtests
+untilRootreads/grants. Deferredowners/nonatomicunlinkqualificationremain.

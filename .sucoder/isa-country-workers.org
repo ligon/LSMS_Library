@@ -1,9 +1,13 @@
 #+title: Current LSMS-ISA worker queue
-Development4381/78verifiedmerges/42wholeclosures; through1679merged/postverified.
-- Root: queue,source/runtimegrants,publication/CI/merges.
-- finish_1590:1032 actualfiniteoperatorsession30655; baseline1witnessclosed0, candidateLIVEwithfailures; immutabletoclosure.
-- malawi_revision_food:1071e99bpeerSOURCEPASS; finiteoperator/currentcompositionpreparation, testsUNRUN.
-- finish_1452:932user-selectedfullPRdata-gateSOURCEimplementation;1071/1032peerSOURCEreviewscomplete.
-AllsixremotecountryworkersCLOSED/admitted; zero productiveremotes.
-Fourlocal slots total, not eightbusyworkers. Details/nextgates/actualhashes:
-[[file:handoff.org]]. Earlierqueuearchivedin[[file:archive/isa-country-workers-through-1679-20261109.org]].
+Development4381;78verifiedmerges/42wholeclosures; through1679merged/postverified.
+ZERO remote jobs active/pending. All12 actual country jobs terminal:10Refused143,
+2native0/supervisor74. BFA/Mali/Malawi complete5artifacts authenticated;
+no remote runtime acceptance. No further blind submissions.
+- Root: country review,932pure verification/publication,queue/CI/merges.
+- finish_1452: bounded nine synthetic supervisor controls; source-pinned SuCoder repair.
+- finish_1590: Malawi494c country independent source review/fullCONTENTS first.
+- malawi_revision_food: Tanzania bd7eb country review, test-only empty-oracle correction,
+  focused pure verification;1071final evidence next.
+Current source regression/12attempt matrix/candidate hashes/nextsteps:
+[[file:handoff.org]]. Historical queue:
+[[file:archive/isa-country-workers-through-1679-20261109.org]].
