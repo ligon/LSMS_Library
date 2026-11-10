@@ -317,7 +317,9 @@ def _build_wave_script_target(make_dir: Path, wave_target: Path, *,
 
 
 def _reject_unreadable_cache(path: Path, observed, error: Exception, *,
-                             require_removal: bool = True) -> None:
+                             require_removal: bool = True,
+                             auxiliary_method: str | None = None,
+                             source_candidate: Path | None = None) -> None:
     """Reject only the observed managed entry; never a replacement or source.
 
     Caller supplies its existing data_root cache path. No recursive cleanup,
@@ -331,6 +333,20 @@ def _reject_unreadable_cache(path: Path, observed, error: Exception, *,
         raise error
     owned_shape = ((len(parts) == 3 and parts[1] == 'var')
                    or (len(parts) == 4 and parts[2] == '_'))
+    if auxiliary_method is not None:
+        # Only the two runtime crosswalk caches opt into the country _/ tier.
+        # Their in-tree alternatives and declared sources remain sources.
+        owned_shape = (auxiliary_method in JSON_CACHE_METHODS
+                       and len(parts) == 3 and parts[1] == '_'
+                       and parts[2] == f'{auxiliary_method}.parquet')
+        source_candidate = countries_root() / parts[0] / '_' / path.name if parts else None
+    if source_candidate is not None:
+        sidecar = path.with_name(path.name + '.dvc')
+        if (path.resolve().is_relative_to(countries_root().resolve())
+                or sidecar.exists() or sidecar.is_symlink()
+                or (source_candidate.exists() and path.exists()
+                    and path.samefile(source_candidate))):
+            raise error
     if (not owned_shape or path.suffix != '.parquet' or path.is_symlink()
             or not path.resolve().is_relative_to(root.resolve())):
         raise error
@@ -3760,9 +3776,26 @@ class Country:
             raise RuntimeError("Location lookup already in progress.")
 
         location_path = data_root(self.name) / "var" / "other_features.parquet"
+        build_location = True
         if location_path.exists():
-            location_df = get_dataframe(location_path)
-        else:
+            build_location = False
+            source_path = self.file_path / 'var' / 'other_features.parquet'
+            sidecar = location_path.with_name(location_path.name + '.dvc')
+            if (location_path.is_symlink()
+                    or location_path.resolve().is_relative_to(countries_root().resolve())
+                    or sidecar.exists() or sidecar.is_symlink()
+                    or (source_path.exists() and location_path.samefile(source_path))):
+                location_df = get_dataframe(location_path)
+            else:
+                location_df, error, observed = _read_managed_parquet_cache(
+                    location_path, open_errors=(FileNotFoundError,),
+                    check_null=True, engine='pyarrow')
+                if error is not None:
+                    if observed is not None:
+                        _reject_unreadable_cache(location_path, observed, error,
+                                                 source_candidate=source_path)
+                    build_location = True
+        if build_location:
             self._location_lookup_inflight = True
             try:
                 location_df = self.other_features()
@@ -6609,12 +6642,14 @@ class Country:
 
         def load_json_cache(method_name):
             cache_path = data_root(self.name) / "_" / f"{method_name}.json"
+            parquet_path = data_root(self.name) / "_" / f"{method_name}.parquet"
+            source_parquet = self.file_path / "_" / f"{method_name}.parquet"
             # Also check in-tree for legacy caches, and parquet variants
             candidates = [
                 cache_path,
                 self.file_path / "_" / f"{method_name}.json",
-                data_root(self.name) / "_" / f"{method_name}.parquet",
-                self.file_path / "_" / f"{method_name}.parquet",
+                parquet_path,
+                source_parquet,
             ]
             for candidate in candidates:
                 if candidate.exists():
@@ -6623,7 +6658,19 @@ class Country:
                         with open(candidate, 'r', encoding="utf-8") as json_file:
                             return json.load(json_file)
                     else:
-                        df = get_dataframe(candidate)
+                        sidecar = candidate.with_name(candidate.name + '.dvc')
+                        if (candidate == parquet_path and not candidate.is_symlink()
+                                and not candidate.resolve().is_relative_to(countries_root().resolve())
+                                and not sidecar.exists() and not sidecar.is_symlink()
+                                and not (source_parquet.exists() and candidate.samefile(source_parquet))):
+                            df, error, observed = _read_managed_parquet_cache(
+                                candidate, check_null=True, engine='pyarrow')
+                            if error is not None:
+                                _reject_unreadable_cache(candidate, observed, error,
+                                                         auxiliary_method=method_name)
+                                continue
+                        else:
+                            df = get_dataframe(candidate)
                         # Convert back to dict format expected by panel_ids consumers
                         if hasattr(df, 'to_dict'):
                             return df
