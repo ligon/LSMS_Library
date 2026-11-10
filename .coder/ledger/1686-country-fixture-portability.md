@@ -1,0 +1,10 @@
+# PR1686 ordinary-CI fixture portability
+
+## Scope and prior art
+Basea0d6fe72d208756e193b9d09d1617e5626953b42, separate owned worktree only. ROOT authorizes test-only portability corrections following actual run42757545645/unit129635316675. Reuse STANDING, country1483/integration ledgers, existing yaml_utils.load_yaml/SchemeLoader for real !make declarations, and normal repository conftests. No product/config/Make/accepted oracle/native/realAPI/census change.
+
+## Actual diagnosis
+Original ordinaryCI checkout3f463226 merges a0d6 into4381. Preserve1FAIL/13822PASS/5650SKIP/4XFAIL/55ERROR/907.63s.53Mali newmodule setup errors require an absent LSMS_COUNTRIES_ROOT despite all sources being bound by absolute __file__ paths;2worker collection errors in existing shocks2021 and1Mali shocks2018 failure arise from wholefile SafeLoader encountering newly valid !make plot_inputs. BFA had no observed failure/teardown error; its global import ban nevertheless uses a shared monkeypatch fixture lifetime, so ROOT permits an explicit local context with restoration assertion before outer fixture teardown. This is portability containment, not a claimed historical BFA failure. External identity/plugin checks remain strict for private/native verification.
+
+## Narrow correction / verification
+Remove only Mali's external cwd/PYTHONPATH/countries-env requirement; actual source paths/import inventory/AST/frame/flags/keys/masks/types remain exact. Existing shocks fixtures use actual project load_yaml(Path), retaining all shock assertions and malformed tag errors. BFA ban remains active throughout each test in an explicit yield/context and asserts exact __import__ restoration; no substantive behavior assertion removed. Freeze before one meaningful pure cohort with ordinary conftests/proper explicitrootdir, MAIN/private falseconfig/data/cache/thread1/n2loadfile and no providers/network. Set LSMS_COUNTRIES_ROOT absent for ordinary portability; infer package countries_root from exactW and assert it externally. Source/native histories are unchanged. No fullsuite or previous native replay.
