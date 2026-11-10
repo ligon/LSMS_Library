@@ -161,3 +161,7 @@ separate finite plan. #1483 other objectives, #1573/#1442/#1148/#1437/#1436/
   provider/acquisition/cache/census/full CI are all UNRUN. On-disk skill
   frontmatter was enumerated; make api-audit was not run under this profile.
   Prior CLOSED v3 failed audit/native/supervisor attempts retain their states.
+
+## Coordinator independent source P2 and selected correction (2026-11-10; before execution)
+
+Original2f059aef/850cb762 source and all worker UNRUN receipts remain immutable. Independent full9path review found a membership contradiction: adapt_s16b_2021 validates all raw nativekeys and refuses missing/unlisted q02 before gating, whereas its approved public membership is exactly q02==1 (samecountry2018script filters first). Rawnonapplication/unknown answers can therefore abort the new public wave. Root accepted the correction: retain whole rawprojection byte/types/order/attrs, select positiveown q02==1 first, then keep all existing appliedidentity/flag/amount/card/collision guards. ExplicitNon count stays literalq02==2; missing/unlisted answers are excluded from the appliedtable without being relabelledNon, zero or applications. No amount/content gate, DAPpolicy, allocation or othercountrychange. Meaningful purecontrols will include malformed/duplicate nonappliedpayloads versus still-loud malformedappliedpayloads. BFApure/native phases are UNRUN at this ledger-first correction freeze; Root separately grants one held source read ONLY after correctedpureacceptance.
