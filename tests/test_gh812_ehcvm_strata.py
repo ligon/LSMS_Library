@@ -142,8 +142,8 @@ class TestStrataTable:
 
     @pytest.mark.parametrize("country", COUNTRIES)
     def test_no_other_schemes_label_is_a_key(self, country):
-        """Mali 2017-18 and Burkina 2014 serve codes, Niger's ECVMA `Agadez urbain` and
-        `Niamey`.  None may be rewritten."""
+        """No global numeric aliases: Mali 2017-18, EMC pre-hook operands and Niger's
+        ECVMA labels must not be rewritten by the EHCVM table (GH1573 is wave-local)."""
         keys = set(_lookup(_org_tables(country)["strata"]))
         assert not {"1", "45", "Niamey", "Agadez urbain", "Niamey urbain"} & keys
 
