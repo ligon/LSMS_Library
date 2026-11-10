@@ -27,6 +27,11 @@ class _CountryMetadata:
     def file_path(self):
         return countries_root() / self.name
 
+    @property
+    def resources(self):
+        from lsms_library.yaml_utils import load_yaml
+        return load_yaml(self.file_path / '_' / 'data_scheme.yml')
+
     def __getitem__(self, year):
         return C.Wave(year, year, self)
 
