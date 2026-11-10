@@ -85,7 +85,7 @@ associations plus complete ITEM/availability/UNIT/SIZE report label cards are
 bound to sealed headers. Geographic cards are not duplicated or used to decode
 keys; full metadata SHA and native raw geography remain retained.
 
-The exact proposed new module is46 invented cases/15test functions; all UNRUN,
+The original proposed module was46 invented cases/15test functions; all UNRUN,
 not imported or collected. Boolean keys were caught/refused in static self-review
 before freeze. Source AST/diff/whole-object/card conservation checks only.
 `make api-audit` ran source/skill metadata only (exit0); its pre-staging snapshot
@@ -104,3 +104,9 @@ my external message is withdrawn, not a product defect or need for new hash
 support/exclusions. The original JSON/source freeze is retained
 in Git. All46 invented controls remain byte-exact and UNRUN. No hash-footprint
 claim is made before normal metadata verification of a final wired candidate.
+
+Test-only follow-up adds one four-row preservation control for explicitYes,
+No, unknown and missing availability crossed with positive/missing/negative/zero
+reportedPrice, including a nonunique source row index. All prior46 cases and
+all product/book objects remain exact. The final planned selection is47 cases
+in16functions, still UNRUN (no module imports or collection).
