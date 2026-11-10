@@ -1,0 +1,119 @@
+#+title: 1690 full live; own GPS authority and remaining source work
+
+Goal ACTIVE. Previousgoalturnprogress: BFA accepted,1690readied/racefixed/full
+started. Currentturnprogress: ownBenin/Togo5documents+2zero-rowheaderscompleted/
+independentlyreviewed,1531bodyupdated, Senegalpartialprojectionidentified,
+Malawi1190designworkerlaunched;1690ordinaryPASS/fullverifiedLIVE.
+M16c3f4d9 unchanged/79verifiedmerges45closures. No release/sharedrewarm/weights.
+RootdocscheckoutneverimportLSMS. LatestRootcommitbeforethischeckpointfdbb09d9f.
+
+* Frozen1690 and next exact actions
+Hcf5637114ed513b774ebae929e57f8252e8f4de2, BM16c3f4d9c28462dde7970718a4eed67394215997,
+Sb4af2c746910028962701b7f9f76ca862d9219a4,tree8f6baf015305f6a38f3a1fb53d8a1bb862df23ee.
+READY/open/mergeable/54paths, library0884646ec exactec74. RuntimeCIracefix15
+focusednormalcasesPASS+Rootindependentsourcecheck;no moreH/source/bodyedits.
+Ordinary42898422441 nowSUCCESS:unit130117767667+WindowsbothPASS.
+Full42898422484/job130117638507 LIVE,lastdirectAPI21:11fullsuiteIN_PROGRESS;
+eligibility/checkout/Sparents/S3gate/prebuildSUCCESS. Metadata42898428086
+success/nonrequired/no data anddidNOTcancelvalidfull. RootWATCHEXECSESSION59230,
+R/1690-final-accepted-validation-20261110/watch.py finite7h/30spoll. Pollsamehandle,
+no restartonobservationtimeout. Preserveold3999readyrun42896972948canceled0steps
+bylateinvaliddraftconcurrencyjob;fixedrefused-run-specificnamespacecf563.
+
+Read-only MERGE preflight PREPARED/NOTRUN at R1690.../preflight.py (reuses1687,
+exactH/B/S/T/runIDs+unitCIDupdated,activebranchstrictrequiredchecks15368assert).
+RequiresactualbothrunsSUCCESS/requiredstepsPASS/uniqueapp15368checkcontexts,
+freshbaseM+syntheticparents/tree. WritesMERGE-PREFLIGHT.json. Stillneed safe
+tested_sourceS/H/B+junitcount/0F/Ereceipts fromfulljob andunitcheckoutS logs;
+captureonlysafeSource/summarylines, NEVERprint/savefullprivatecredentialedlogs.
+Afterallpassandfreshpreflight, ordinaryexpected-head developmentmergeauthorized
+(noadmin/bypass/no deletedependentbranch). VerifyactualM2parents[M,H]/treeT/
+devref/publicPRmerged. Thenaudits1573+1071wholecompletionandcloseifactualM2
+sourcesatisfiescurrentresiduals. Reconcilecomponent1691/1692absorbedbysource
+in1690(theirheadsnotnecessarilyancestors;CIcomponenthaslater2expressionfix).
+1693dependentbranchmustsurvive;actualbasealignmentafter1690lands+normal1575
+acceptance, preserveBFA+fourcountryshared812expectations/sourceclosureproofs.
+
+* 1575 actualoperator recovery -- deputysolelauncher/terminalowner
+Product/public1693stillfrozen2f8/base9f; allsource/header/pure/metadataadmission
+unchanged. 8roles18calls;9metadata60sEACHbeforedata;120min/outer7000s,
+cold180/warm300/comparison180. Initial41105527setupFAILED79.37s missinghelper
+SLURM_JOB_ID;0normal/preflight/API/native/writers/captures, bytecopyIOoccurred.
+v3onlyboundactualJOB_ID(helperrequiredvariableconfirmed194/236);41106776
+alsoFAILED90.81s precontrollerPopenErrno7. SOURCE_GIT_FILES317156bytes/2684
+exactpaths exceededLinuxsingle-envlimit,allotherenv<=174B;helperCLOSED0/5.33s,
+controllerPIDabsent/0normal/preflight/captures,8source+64copycustodyexact.
+v4 routinecorrection AUTHORIZED: sameexactGitallowlistinprivate0400JSON+SHA,
+smallpath/digestenvrefs, noallowance/UID/oracle/math/callchanges. Deputyfreezing;
+mainleadreview_nigeria_ph_pr assistingindependentbounded5leafdelta/end-to-end
+Popen/envreview(no-dataold-vs-smallrefcheckbeforelaunch), managercanuseasjoint
+receipt/no extraRootgate. Deputyfinish_1590SOLEactualsubmit/monitor; no duplicate.
+No normalcallbudgetconsumedsofar; passedsetupmayneedreconstructafterreap but
+notnativework. Priorfailedsource/byteIO/receiptskeptimmutable.
+R/1575-normal-validation-20261110/{SUBMIT-v1,SUBMIT-v2,LATEST-STATUS}.json,
+priorv2monitor20213; sourcepacketrecoveryR/1575-normal-operator-recovery-20261110/.
+
+* Benin/Togo1531 own authority complete, scienceunresolved
+Both90msourceagents41100187/186terminal0/sourceM butonlyREPORT/PLAN; restrictive
+runtimeprofileblockednecessarydocumentreads. RootclarifiedoriginalDOCUMENT
+grant; leadfinishedlocallyfrom5heldownBIFFxls/5,578,240B, privatepinnedxlrd2.0.2
+--target(noimage/projectchanges). No downloadorLSMSimports. OwnS16aEO5=47,
+EO6GPSareahectaresinall5; farmerK6hasseparateha/m2. OwnQ9/GPS45–48blocksagree,
+butcampaignB2variesacrossvaguesinBOTH;Benincovers2018/19,TogoALLcovers2017/18
+versuscatalog/BID2018/19. Do notassumestaleorfieldedrevisionidentity.
+RootreadfullREPORT/3pathdocpatch, checkedowncapturedEO5/EO6/EL6all5 andoriginal
+CONTprefixes. Documentnotes9d4a5d2bseparateepoch. Noexportrelationininspected
+S16a/cover/comments/names/Observations; boundednegativeonly.
+
+Own2HEADERgatefrozenplan47f5ae4e/headerbyteexacthealthySenegalebd08f5a;
+Rootreadfullrun/header/plan+contextdelta/rehashed/exactMsidecars, independent
+reviewPASS; directsession89642CLOSED0/2metadataonlycontexts/0returnedrecords.
+BeninData/s16aMD5c033ceb223cd9834d8c47dcb46428576/3286358B/208variables;
+TogoData1/s16aMD56292af8f5a1a30fce364a2994775b0c4/4582071B/237variables.
+BOTHcompleteinventorieslack47a/47b/47_1/47_2;47double/%12.0g/unit-freeFrench
+GPSlabel/noownvaluecard.45=1Oui/2Non and09b=1Hectare/2MetreCarreSEPARATE.
+GBown47am2fieldcannottransfer/doesnotexistinthisownrelease. No rows/magnitude/
+ratios/sentinels/eligibility/conversion/clamp/fallback/held/yield/defaultchanges.
+Rootprimaryheaders/inner+outerreceipts/sealsreviewPASS,2roles0rows.
+
+FINALprivatefactual3pathchild4d00179d9929ea0f1b0c28050f9130e07ad8376b,
+tree469d3519acca77241ef2814519a37ad12493b74b, baseM. BeninCONT,TogoCONT,ownledger;
+all19357nonownedMexact. Rootindependenttree/prefixreviewPASS,originalANDdoc9d4a
+prefixesexact. Approvedlater1693compositionPRESERVINGstrataappendices+document/
+headerepochs;noactual2f8or1690change/nohash/datareplayforCONT-onlyaddition.
+R/review-1531-benin-togo-own-documents-20261110/{REPORT,ROOT-DOCUMENT-NOTES-REVIEW}.json/md;
+R/1531-benin-togo-own-header-20261110/{REPORT,ROOT-INDEPENDENT-CONTEXT-REVIEW,
+ROOT-HEADER-RESULT-REVIEW,ROOT-COMBINED-NOTES-SOURCE-REVIEW}.json/md.
+GH1531bodyupdated21:10:54/exactreadbackatRheader/ISSUE-*;wholeissueOPENforOWN
+q47export/cleaning+fielded-v02authority/sourcepolicy. Rootno newsourcepolicy.
+
+* Senegal1483 source/pure partial -- fidelity hold
+41102570/ad38ee6e terminalagent0/SUPERVISOR74deliveryproblem. Donor7d558b02395b3155063694f119dd8ceb86de169b,
+6ownpaths/othersMexact. Ownsource36menu/10vs5vs5units/19rawfieldsallrowsnative
+transport; membershipq02numeric1/quantityindependent/gift05/purchase08/09ctotal.
+Pureinitial62PASS1inventedfixtureFAIL(wave_foldermissing),onlyaffected1PASS,
+63distinctqualified/notfreshallgreen. Native/publicservingUNRUN.
+OriginalDECISIONS.mdMISSINGdespitefalsefiveartifactclaim;managerexternal
+qualificationonly,no restamp/replay, original74retained. R/admission-1483-
+senegal-own-adapter-source-pure-20261110/DECISIONS.md.
+RootFULLREPORTread: selectedVALIDslots21–36wholepublicprojectionREFUSES pending
+cropcuration. ThisisUNFINISHEDwavewiring, notacceptablefinishedfix/narrowerscope.
+No native/servinggrantyet. Managerfollow-onsource-design to preserveALLnative
+slots/unresolved/compositecropidentityusingexisting1483observation/unknown
+machinery, no inventedharmonizedcrop/false noncrop sentinel/sum/drop/wholewave
+refusal. Old2018/global/factors/NPK/DAP/policyunchanged. Rootawaitsexactsource/
+patch+concretefullmenuproposal;rawtransportmilestoneisnotactualactivation.
+E=Q/refill-1483-senegal-own-adapter-M-20261110/workers/Senegal1483-Own2021Adapter/
+ad38ee6ebd0549319887682f2216325b/evidence. Managerfollow-onjobIDpending.
+
+* Other meaningful delegatedwork
+Malawi1190/1298source/design worker41107441/a8a76d409cca44ddb6dd9ac079ddb9b7,
+exactM,120min2CPU8G;Q/refill-1190-malawi-acquisition-carrier-design-M-20261110/.
+TWOconcretecarrieroptions(separateacquisitionview/unallocatedacquisition-only
+Farmrows), reusecurrentmachinery/keys/units/provenance/null/duplicates+invented
+examples; historical7groups0attachablequalified. Thirdsourceliteral/H34gate
+UNSELECTED. FullownMalawiCONT/TODO/WAITING/LOGBOOKfirst. NOraw/header/PKL/API/
+replay/production/PR. Rootownsselection; do notreaskalready-pendingquestion.
+Priorfull142inventory/17review0closureand920/698/1287/1460/1571updatesstand.
+Combinedweightresearchalreadyclosed993097b9;49borrow/50FINALmaizeflour/51noclamp
+areQUEUEdecisionnumbers,NOTGitHubissueIDs. PendingR2b/PPrepresentationpreserved.

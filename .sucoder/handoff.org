@@ -1,5 +1,24 @@
 #+title: Current LSMS-ISA coordinator handoff
-* CURRENT -- 2026-11-10 20:49 UTC
+* CURRENT -- 2026-11-10 21:15 UTC
+LATEST [[file:tasks/isa-checkpoint-20261110T2115.org]].1690Hcf563/frozen54paths/
+S b4af2c/M16c3unchanged. Ordinary42898422441SUCCESS(unit130117767667+Windows),
+full42898422484/job130117638507fullsuiteLIVE21:11. Rootwatch59230+prepared
+read-onlyMERGEpreflight R1690.../preflight.py NOTRUNuntilfullsuccess;needSAFE
+tested_source/junitsummary+unitcheckoutS, freshsource/rules/checkstepsbeforemerge.
+Goal79merges45closures/ACTIVE/no release/sharedrewarm/weights.
+1575twoactualSETUPFAILS41105527missingSLURM_JOB_ID;41106776Errno7singleenv
+SOURCE_GIT_FILES317156B.0normal/preflight/calls/capturesboth. v4same2684allowlist
+private0400JSON+SHA/smallenvrefs, deputyfreeze/mainleadindependentreviewthen
+soledeputysubmit, no extraRootgate. Existing18calls8rolesunspent/120min7000outer.
+Benin/Togo1531own5docs+2headersDONE/Rootreviewed: ownprintedGPS47ha but own
+released47unitlessdouble/BOTH47aABSENT; calendars/versionconflictsretained.
+Privatefactual3pathchild4d00179d9approvedforlater1693append-onlycomposition;
+1531issueupdated21:10:54stillOPEN/no conversion. Senegal7d558bsource/purequalified
+63distinct/74missingDECISIONS; VALID21–36projectionrefusalUNFINISHED, manager
+fullmenurepresentationfollow-on/no newnativegate. Malawi1190/1298concrete2option
+designworker41107441source-onlylive. Mainleadnowassists1575operatorend-to-end.
+
+* Earlier state -- 2026-11-10 20:49 UTC
 LATEST [[file:tasks/isa-pr1690-20261110T2041.org]] topsection: CIraceFIXED,
 new1690Hcf5637114ed513b774ebae929e57f8252e8f4de2/tree8f6baf/54paths, READY.
 15focusednormalcasesPASS/Rootindependentreview/conservationPASS/libraryexact.
