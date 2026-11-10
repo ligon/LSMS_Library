@@ -5640,3 +5640,57 @@ This pair establishes this cell now, not a historical warm snapshot or a
 poisoned-cache frequency. Whole GH #1281 and corpus health remain unmeasured.
 See =.coder/ledger/1281-malawi-housing-current-pair.md= and worker evidence
 =Malawi1281-HousingWarm/4f7331dee1304a1dba00917e1f9894f4/evidence=.
+
+* 2026-11-10 -- Refused Farm-level sales carry their provenance key (GH #1457 R3)
+
+The dated Farm-level account says "a Farm-level row carries no key (its index
+discloses it)" while the refusal "stops being a deletion". R3 corrects this
+provenance contradiction: ONLY existing unresolved Farm-level sale rows now
+carry =Malawi::crop_production::sale-basis-unresolved=; its registry entry no
+longer declares =rows: 0=. Other Farm-level causes remain unkeyed. The ladder,
+attachment/eligibility, quantities, own units/SU, warnings and tallies do not move.
+
+The input accessor retains its complete original refused I/Q line selection,
+native payload, multiplicity and outcome/rung/basis annotations. It LEFT-enriches
+served crop/production_obs from the existing Farm-level row; suffixes are made
+on the FULL Farm-level set before refusal filtering. Both key joins enforce
+many-to-one cardinality. Unresolved0/0 inputs without a served row remain
+retrievable with missing production_obs. The sale's own u stays a column, not
+the served harvest u=Unknown. Existing household Cowpea naming is reused.
+No land/plot allocation, R1/R2a/R2b, price-pool, quantity, unit, ID, weight or
+scientific-default choice is made; those decisions remain held. See ledger
+=1457-malawi-r3-provenance.md= for the applied-source pure verification scope.
+
+* 2026-11-10 -- User-selected sole-row other-unit attachment (GH #1457 R1)
+
+The user selected "Attach to the sole row, preserving the sale’s own unit".
+This supersedes only the dated R1 holding for a household/nativecrop with ONE
+known-plot harvest row, compatible state (equal or either unknown), no occupied
+sale and no competing eligible sale. The sale retains its own Unit_sold and
+Condition_sold, exact quantities/value and the sale-other-unit-single-row key.
+No unit conversion, cross-crop/household borrowing or price-pool change follows.
+
+R3 refusal inputs replay this same R1 stage BEFORE constructing the complete
+current Farm-level suffix set. R1 inputs retain native I/Q multiplicity/payload
+and outcome/rung/basis, LEFT-enriched with the served crop/production_obs; no
+native input is collapsed. R3 zero-sale inputs remain retrievable without a
+served observation. Earlier68 R3 pure passes remain their historical result.
+
+The user separately chose "Keep ambiguous sales on Farm-level rows" (R2a),
+rejecting selection of a sole positive-Quantity row among multiple harvest rows,
+including other0/NA rows. Current multirow treatment stays unchanged. R2b's
+singleplot zero/NA choice remains HELD. No historical R2a patch or new source,
+ID, weight, quantity, eligibility, state-fold or scientific default is adopted.
+
+** R1 reported-unit constraint clarified before integration (2026-11-10)
+
+The user's DIFFERENT UNIT / NO BORROWING choice requires an actual nonmissing
+sale-unit label. Missing Unit_sold remains NA on its existing Farm-level row;
+placing it beside a known harvest u would enable the unchanged approved824
+consumer fallback, borrowing a unit this attachment has no authority to supply.
+The only R1 eligibility addition is the exact =u.notna()= inverse of that
+consumer's missing-label test. Reported Other, unconvertible and explicit
+Unknown labels remain eligible under the original state/single-row/free gates;
+no factor requirement or NA-to-Unknown normalization is added. Historical cd76
+executable R1 now differs only by that necessary predicate. R2a and R2b status,
+all amounts, raw inputs, R3 enrichment and shared consumer code stay unchanged.
