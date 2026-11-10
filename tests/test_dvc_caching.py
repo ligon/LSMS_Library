@@ -743,6 +743,7 @@ class TestDVCCaching:
         with patch("lsms_library.country.files") as mock_files, \
             patch("lsms_library.country.Repo") as mock_repo_class, \
             patch("lsms_library.country.get_dataframe") as mock_get_dataframe, \
+            patch("lsms_library.country._read_managed_parquet_cache", wraps=_read_managed_parquet_cache) as mock_read_cache, \
             patch("lsms_library.country.map_index", side_effect=lambda frame: frame), \
             patch("lsms_library.country._load_canonical_spellings", return_value={}), \
             patch("lsms_library.country._load_rejected_column_spellings", return_value={}), \
@@ -805,7 +806,9 @@ class TestDVCCaching:
             pd.testing.assert_frame_equal(second, expected_df)
         # Second call should use cache without reproducing - first stage reproduce count should still be 1
         assert mock_stages[0].reproduce.call_count == 1, "Second call should not rerun DVC stage"
-        assert mock_get_dataframe.call_args_list[-1][0][0] == cache_path
+        mock_get_dataframe.assert_called_once_with(build_output_path)
+        mock_read_cache.assert_called_once_with(
+            cache_path, open_errors=(OSError,), check_null=True, engine='pyarrow')
 
     # ------------------------------------------------------------------
     # v0.7.0 cache-read fix coverage
