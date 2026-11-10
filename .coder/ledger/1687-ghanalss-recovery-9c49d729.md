@@ -65,5 +65,30 @@ the final outcome; coordinator admission remains separate.
 
 ## Phase 3 verification
 
-Pending the single bounded recovery. Ledger-only source proof and retained
-historical failures must be checked before completion.
+OK (§§2–5): the single original case passed, exit 0, body 40.130 s and
+whole invocation 96.234 s. The actual returned sample has 6,345 rows
+(3,149 / 3,196), N=712, D=712, K=79 and zero duplicate i/t keys. Its
+ordinary reader gate was open in both workers; controller and both worker
+identities matched this checkout, private countries/data/L1 and MAIN prefix.
+All five phase observer receipts retain active profiles and zero denials or
+diagnostic errors. JUnit contains exactly one passing case.
+
+Eight ordinary DAT getter/decoder attempts returned eight frames, each with
+one DCT read. File read accounting records 10,863,237 DAT bytes and 4,546 DCT
+bytes; 24 full-frame-return events observe the same eight frames at three
+reader levels. These are read-return bytes, not a measurement of disk I/O.
+Sixteen managed stage resolutions authenticated the same 10,867,783 bytes
+with the historical six raw/ten legacy dos2unix MD5 modes. Three ordinary
+private sample writers produced exactly two wave and one country parquet.
+All sixteen input FD/dev/ino/size/mode/mtime/SHA seals and all 148 source
+seals match afterward (only atime excluded). All actor groups are closed,
+and the private reader credential was removed after closure.
+
+No production/config/test/map/curation/country-note change follows. The old
+bootstrap exit 3, failed original body, lost continuation XML and unresolved
+ValueError cause remain failures in the retained evidence. The recovery's
+empty exception chain cannot retroactively establish that old cause. This
+one passing GhanaLSS parameter establishes no whole-CI/country/API/scientific
+acceptance; coordinator admission remains pending. The private evidence root
+holds REPORT.md, RESULT.json, SOURCE-PROOF.json, DECISIONS.md and
+EVIDENCE-INDEX.json with bounded supporting operators/receipts.
