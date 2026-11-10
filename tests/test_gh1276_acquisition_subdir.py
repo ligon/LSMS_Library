@@ -145,6 +145,7 @@ def wb(tmp_path, monkeypatch):
         return real_write(countries_dir, prov)
 
     monkeypatch.setattr(da, "_COUNTRIES_DIR", root)
+    monkeypatch.setattr(da, 'fetch_documentation', lambda *a, **k: None)
     monkeypatch.setattr(urllib.request, "urlopen", urlopen)
     monkeypatch.setattr(da, "permissions", lambda path=None: {"wb_api": "read"})
     monkeypatch.setattr(da.config, "microdata_api_key", lambda: "synthetic")
