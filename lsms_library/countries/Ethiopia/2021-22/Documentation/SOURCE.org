@@ -41,3 +41,29 @@ The existing =CATALOG_IDNO= and all earlier SOURCE facts remain unchanged.
 Community78629, manual78631, report78643 and generated DDI are separate
 residuals; this note claims none was acquired. No scientific routing, recall,
 unit, eligibility, household-ID or PP/PH policy follows from binary holding.
+
+* Remaining W5 public documentation holding (2026-11-10, GH #650)
+
+Four additional WB6161 public documents are now DVC-held and each passed one
+fresh read-only managed retrieval with empty private cache and no in-tree
+document. Earlier questionnaire/BID holdings and all release facts remain unchanged.
+
+| resource | managed filename | bytes | MD5 |
+|----------+------------------+-------+-----|
+| 78629 | =esps_w5_community_questionnaire_english_final.xlsx= | 228458 | =5ac9b3f88311d6291ea8918f96ee5df9= |
+| 78631 | =manual_household_agriculture_and_community_questionnaires_wave_5.pdf= | 2388652 | =8b6ffdd80355e075e90bc472d6ebe17a= |
+| 78643 | =ESS5_Survey_Report_webfile_06.pdf= | 4876481 | =8e01ca3b66cba84dbd635170a7fc5672= |
+| generated PDF (no resource ID) | =ddi-documentation-english_microdata-6161.pdf= | 4752838 | =6c2695681776091fbf8480fefba90e8f= |
+
+https://microdata.worldbank.org//catalog/6161/download/78629
+https://microdata.worldbank.org//catalog/6161/download/78631
+https://microdata.worldbank.org//catalog/6161/download/78643
+https://microdata.worldbank.org/catalog/6161/pdf-documentation
+
+These are exact public-byte holdings, not a raw data release acquisition or
+restamp. No content parsing, macro/formula execution, fielded CAPI/GUID/export
+bridge, questionnaire interpretation, conversion/default or weight claim follows.
+The generated DDI URL has no catalog resource ID; none is invented. Exact SHA256
+seals, one ordinary managed batch push and four fresh readback receipts are in
+=B/reports/650-ethiopia-w5-remaining-public-documents-20261110/=; B is the
+burst root named in =.coder/ledger/650-ethiopia-w5-remaining-public-documents.md=.
