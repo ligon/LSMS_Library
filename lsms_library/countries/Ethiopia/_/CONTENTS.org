@@ -4698,3 +4698,94 @@ The original PDF6/11/12 stage did not reach sale Q3/Q4; the separately
 recorded PDF9/10 stage did. Both receipts and page rasters are retained.
 Three header-only contexts read no records. No source-value effect, row-loss,
 harvest allocation, crop-window or GH #1457 policy conclusion follows.
+
+* 2026-11-09 -- Historical household-characteristics cells are the GH #594 repair (GH #587)
+
+GH #587's two Ethiopia rows are exactly =household_characteristics/2018-19=
+and =household_characteristics/2021-22=. Both are =dropped,declared= in the
+original coverage snapshot =23794a518= (merged in GH #586), not new findings
+on current source. The maintainer's corrective comment on #587 explicitly
+identifies them as fixed by GH #594, merge =68b942528=.
+
+| wave    | roster source       | native person/household keys | residence input |
+|---------+---------------------+------------------------------+-----------------|
+| 2018-19 | =sect1_hh_w4.dta=  | =individual_id/household_id= | =WeeksAway: s1q06= |
+| 2021-22 | =sect1_hh_w5.dta=  | =individual_id/household_id= | =WeeksAway: s1q06= |
+
+These are household-questionnaire rosters. Neither declaration concatenates
+PP and PH visits; the YAML wave builder supplies the logical wave label as
+=t=. Ethiopia's general PP/PH design does not explain these two losses.
+W1-W3 supply =MonthsAway: hh_s1q05= instead. Country concatenation therefore
+carries both residence columns, populated on different waves. The old
+=if/elif= selected the first column present, =MonthsAway=, whose values were
+all missing on W4/W5, and deleted those waves in the derived transform.
+
+The current =roster_to_characteristics= coalesces residence sources per row
+and reads W4/W5's weeks. Its residence-resolution block is byte-identical to
+GH #594's fix =85bdf4a57=. The historical PR reports 6,768 and 4,946 restored
+households, with the residence filter still active, not the all-missing-wave
+fallback. Those counts also appear in the committed coverage snapshot; they
+are dated receipts, not measurements repeated here or fixed future counts.
+Existing controls are =tests/test_roster_residence_filter.py=,
+=TestD1PerRowCoalesce=. This derived table is not registered in the country
+scheme and is not one of the nine GH #1287 country compilers. Their qualified
+receipts do not establish new roster/derived-table runtime acceptance.
+No eligibility, filter, round, key or coverage verdict is changed.
+
+* 2026-11-09 -- W5 documentation holding versus the old stub-only claim (GH #650)
+
+The earlier sentence "This wave has no local documentation whatsoever" and
+the old =2021-22 | no documentation at all= row describe the former holding.
+The later GH #1443 update above records the intervening acquisition:
+=11ed1b811=, merged through GH #1506 (=df8faa75f=), added
+=2021-22/Documentation/ess5_basic_information_document_final.pdf.dvc=.
+It records MD5 =4949ee8c911e8512458f64c5f57d5d3e=, 1,058,117 bytes,
+WB catalog 6161 resource 78630. GH #1443 is closed; both its closure and
+follow-up comment confirm the held BIDs and citation rechecks. Earlier
+catalog-only citations are not silently upgraded to new document readings.
+
+At source =4381d701f= this is W5's only tracked document sidecar. Provenance
+records held data release =ETH_2021_ESPS-W5_v03_M=; the older licence example
+=ETH_2021_ESS_v01= is a citation example, not a replacement release identity.
+No W5 household/agriculture questionnaire, DDI, manual or report sidecar is
+tracked. The acquisition commit explicitly left the questionnaires
+=(.xls/.xlsx)=, manual and report outside its scope. That is a missing
+managed-document holding, not proof the instruments were never published or
+that no external copy exists. W4's held household and PP/PH questionnaires
+do not identify or replace W5 instruments.
+
+An authorized read-only inventory of catalog 6161's Related Materials now
+identifies these English W5 resources; none of their download links was
+followed. Filenames come from the page's =data-filename= attributes, not
+guesses or downloaded bytes.
+
+| role | resource | filename | format |
+|------+----------+----------+--------|
+| Household | 78626 | =esps_w5_hh_questionnaire_english.xls= | XLS |
+| Agriculture post-planting/crop-cut/livestock | 78627 | =esps_w5_post_planting_crop_cut_livestock_questionnaire_english_final.xlsx= | XLSX |
+| Agriculture post-harvest | 78628 | =esps_w5_post_harvest_questionnaire_english_final.xls= | XLS |
+| Community | 78629 | =esps_w5_community_questionnaire_english_final.xlsx= | XLSX |
+| Combined W5 manual | 78631 | =manual_household_agriculture_and_community_questionnaires_wave_5.pdf= | PDF |
+| Survey report | 78643 | =ESS5_Survey_Report_webfile_06.pdf= | PDF |
+
+Metadata URL: https://microdata.worldbank.org/index.php/catalog/6161/related-materials
+The household form subtitle is =Form ESS5-H (21/22)=; both agriculture
+forms say =Form ESPSAGSS/(21/22)=. These form identifiers and the filename
+word =final= are not an explicit document version. No questionnaire date or
+document-version field is listed. The manual is dated 2022-03 and report
+2023-09; the already-held BID 78630 is dated 2023-12. Catalog =v03_M= names
+the data release, not independently each instrument's version. The page also
+offers generated =ddi-documentation-english_microdata-6161.pdf= at
+=/catalog/6161/pdf-documentation=, with no listed resource ID, and a separate
+tax-module report 98963, outside this instrument-restoration proposal.
+
+The finite restoration candidates for the immediate HH/agriculture gap are
+78626, 78627 and 78628 under the exact filenames above. They require a
+separate grant before any binary retrieval, hashing, managed-source placement
+or workbook parsing. A later read should first inventory those three
+workbooks' sheet identities; no sheet names or question coordinates are
+invented here. Community/manual/report/DDI are separately named residuals.
+The BID needs no repeat acquisition. Shared =add_wave= documentation policy,
+automatic fetching and other countries remain ROOT's GH #650 scope. No new
+PDF/workbook parse, document/data download, runtime, cache operation or
+scientific decision accompanies this metadata-only inventory.
