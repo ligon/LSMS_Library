@@ -17,7 +17,7 @@ import re
 import numpy as np
 import pandas as pd
 import pytest
-import yaml
+from lsms_library.yaml_utils import load_yaml
 
 import lsms_library as ll
 from lsms_library.data_access import get_data_file
@@ -41,7 +41,7 @@ def _wired_waves():
     wired = []
     for country in EHCVM_COUNTRIES:
         path = ROOT / country / WAVE / '_' / 'data_info.yml'
-        info = yaml.safe_load(path.read_text(encoding='utf-8')) if path.exists() else {}
+        info = load_yaml(path) if path.exists() else {}
         if isinstance((info or {}).get('shocks'), dict):
             wired.append((country, info['shocks']))
     return wired
