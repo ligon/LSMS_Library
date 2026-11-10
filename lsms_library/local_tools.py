@@ -92,6 +92,9 @@ import socket
 from urllib.parse import urlsplit, unquote
 from importlib.resources import files
 from dvc.api import DVCFileSystem
+from ._dvc_runtime import (
+    DVCMetadataCompatibilityError, RuntimeDVCFileSystem,
+)
 import pyreadstat
 import inspect
 from typing import Any
@@ -186,7 +189,7 @@ def _s3_explicit_credentials() -> dict[str, str]:
     return {}
 
 
-def _build_dvcfs() -> DVCFileSystem:
+def _build_dvcfs() -> RuntimeDVCFileSystem:
     config: dict[str, Any] = {"cache": {"dir": os.fspath(_DVC_CACHE_DIR)}}
     # The remote override carries credentials but no ``url``; DVC validates
     # each config level on its own, so the stanza is only legal when the
@@ -204,7 +207,7 @@ def _build_dvcfs() -> DVCFileSystem:
                 **_s3_explicit_credentials(),
             },
         }
-    return DVCFileSystem(os.fspath(_COUNTRIES_DIR), config=config)
+    return RuntimeDVCFileSystem(os.fspath(_COUNTRIES_DIR), config=config)
 
 
 DVCFS = _build_dvcfs()
@@ -1180,6 +1183,8 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
                     tmp.unlink()
                 except OSError:
                     pass
+    except DVCMetadataCompatibilityError:
+        raise
     except Exception:
         # Last-ditch swallow: never let pre-warm break a build.
         pass
