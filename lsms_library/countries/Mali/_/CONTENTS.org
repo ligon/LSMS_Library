@@ -3779,11 +3779,8 @@ New primary-source lead: INSTAT's public August2023 report on poverty in
 Mali2021, =profil-determinants-pauvrete-mali-2021_pub.pdf=, has64PDFpages.
 The cover names INSTAT/August2023; PDFp3 explicitly binds its discussion to
 EHCVMII fieldwork October2021--July2022. Section1.2, PDFp15, describes a
-fifth community section for food prices:
-
-#+begin_quote
-Enfin la section 5 permet de prendre les informations sur les prix des différents produits alimentaires consommés dans la localité.
-#+end_quote
+fifth community section collecting local food prices. The exact short
+quotation and public locator are in =_/821-community-price-authority.md=.
 
 Preserve this alongside the existing own-BID quote "four main sections"
 (recorded above, PDFp8) and its separate monthly market design (PDFp9).
@@ -3791,12 +3788,14 @@ Neither is assumed stale. The report is an own-country lead, not the exact
 fielded community form, CAPI version or released cluster-price source.
 The existing =unsure= / =C1-partial;C4-notrun= position is unchanged.
 
-Scope: browser text-layer inspection of the named pages, with failed visual
-requests for pp3/15 and unavailable local Poppler; no full-document visual
-review. A separately saved public PDF snapshot is1,456,311bytes, SHA256
-=cd86f5ebf0cc20ece8ad6dd4cb7eb20a62d370bb3a08feff5069a0a3de17bcd1=.
-Its exact bytes were not locally text-extracted; sharing the public URL
-with the browser text is not a cryptographic extraction binding.
+The initial dispatch's browser-only finding was independently checked by
+the coordinator on2026-11-10UTC. The same public PDF snapshot is1,456,311bytes,
+SHA256=cd86f5ebf0cc20ece8ad6dd4cb7eb20a62d370bb3a08feff5069a0a3de17bcd1=,
+64pages. One local Poppler context extracted text and rendered PDF1/3/15
+from those exact bytes; independent visual review confirmed the cover,
+own-wave dates and food-price sentence. The source remained unchanged.
+The visual scope is those three pages, with receipts in the coordinator's
+=reports/821-mali-public-report-three-pages-20261110= archive.
 Public locator, the contradictory claims, limitations and finite authority
 plan are in =_/821-community-price-authority.md=. No native/API/data replay,
 producer contact, closing verdict, crosswalk or new loader follows.

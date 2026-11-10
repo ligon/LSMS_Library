@@ -15,16 +15,18 @@ pages. Section 1.2 on PDF p.15 describes five community sections, including:
 
 The final bullet concerns local food prices. This is a report's description
 of the survey, not the community instrument or its deployment record.
-The report text was inspected through the public browser PDF text layer;
-visual requests for PDF pp.3 and 15 failed with cache misses. Local Poppler
-was unavailable. No full-document visual review is claimed.
-
-The public PDF snapshot saved separately for review is 1,456,311 bytes,
-SHA256 `cd86f5ebf0cc20ece8ad6dd4cb7eb20a62d370bb3a08feff5069a0a3de17bcd1`.
-The browser text and snapshot share the public URL; local extraction from
-those exact saved bytes was not performed, so this is not a cryptographic
-binding of the browser extraction to the snapshot. ROOT can close that
-small documentary gate without acquiring any microdata.
+The initial dispatch used the public browser PDF text layer; its visual
+requests failed. A coordinator check on 2026-11-10 UTC then authenticated
+the separately saved public snapshot: 1,456,311 bytes, SHA256
+`cd86f5ebf0cc20ece8ad6dd4cb7eb20a62d370bb3a08feff5069a0a3de17bcd1`,
+64 pages. One Poppler document context extracted text and rendered PDF
+pages 1, 3 and 15 from those exact bytes. Independent visual review of all
+three renders confirmed the INSTAT/August 2023 cover, the own EHCVM-II
+fieldwork dates on p.3, and the community food-price section on p.15.
+The source stayed unchanged; the visual check covered these three pages.
+Evidence: `reports/821-mali-public-report-three-pages-20261110` in the
+coordinator's external report archive, sealed manifest
+`59ccea162b258f0fdd5d1235d0b6a10f32154e95661d8e41118e160b2d74a19a`.
 
 ## Preserve the contradictory evidence
 
@@ -44,8 +46,8 @@ requires the exact community/market instrument; that requirement still holds.
 
 ## Finite next steps for ROOT
 
-1. Authenticate the public snapshot and its cover, p.3 and p.15 visually,
-   retaining the report/BID contradiction. This is document work only.
+1. Completed: authenticate the public snapshot and visually check its
+   cover, p.3 and p.15. Retain the report/BID contradiction below.
 2. Obtain the exact own 2021/22 community form or CAPI project/export version,
    its deployment/change history and the version applying to each passage.
    The report's section list is not a substitute for that operand.
