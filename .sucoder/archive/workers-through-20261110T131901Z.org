@@ -1,0 +1,244 @@
+#+title: Current LSMS-ISA worker queue
+* CURRENT (2026-11-10 12:06 UTC)
+Rootprivate55de27pathrepairbatch composed/byteconservationverified;95purecoverage
+qualified94priorP+targetedBFA1P, original94P1Fobserverfailure preserved. Metadata
+d47->55de CLOSED0/exact42cty147wave/0BTF-FIF/all14nonhash/keysets unchanged.
+1590 NEWpriorityMali sourcefix: onlytwo wave!make->null, real1494routingbug;
+semanticpurecontrols pending, originalMali11continuespinnedd47unmodified.
+1452 new97eDEFAULTreturned56403/85getters0D, externalunary_typeddiagnosticfailed;
+closedoutputcompletion+unspent3Makeactorsadmitted, no seconddefault/nativecall.
+1518twoexistingPKLcardloads closed0/sourcecards bindW1=36/W2=48, no default.
+Managerowns8independentcountryqueues+CI:Niger5new41090249, CIV1new41090203,
+Ghanaonefreshoperatorcorrectedcaseadmitted, ETHhistorical-viewproposalpending,
+Mali11partial actualpasses+realplot_inputs failure. Exactcurrentdocket handoff.org.
+
+* CURRENT (2026-11-10 11:20 UTC)
+User requests broader country delegation. Manager malawi_revision_food owns new
+eight-country actionable-issue dispatch plus CIV oracle fix/Eth+Ghana sampling
+diagnostics; must return actual assignment IDs and deliverables, not capacity.
+EIGHT country assignments now actually submitted/free2CPU8G45min/exactd47:
+BFA1436 41090092; ETH1457 41090115; MWI1457 41090117; MLI1179 41090116;
+NER1529 41090114; NGA1502 41090120; TZA1497 41090121; UGA1525/1536 41090122.
+Root independently read all8 successful receipts. Manager owns supported watch,
+results intake and immediate meaningful follow-ons; submitted is not busy proof.
+Separate CIVoracle/GhanaLSSsampling/ETHsampling 41090080/081/082 are agent_execution.
+Local1452: Nigeria3PH Make backend actual plan admitted (1reference+9Makecalls).
+Local1590: Uganda historical sampling TEST-view correction on accepted NGA b9a.
+Mali namespace remote:28pure PASS; corrected3 actual tests admitted under v2 warm
+cache gates/18held sources/9raw-oracle reads/0build/0writers. Niger second closed
+output aggregation read admitted once, no raw/API/tests. NGA2 sampling originals
+PASS, Tanzania3 originals PASS. Full1687 still failed18; no new merge/settings.
+Current detailed docket: [[file:handoff.org]]; older snapshots below historical.
+LATEST: Mali corrected3 actualPASS47.786s (final receipts pending); UGA36purePASS,
+four original normal warm-only2107LIVE. Nigeria Make2613LIVE, real defaultsample
+reference49089rowsPASS/0raw/0writers. Root private reviewed repair branch71392355d
+contains acceptedBFA+NGAtests; no GitHub push/CI waiver. NextMali original11 authorized.
+
+* Newest (2026-11-10 10:00 UTC)
+NGAtrue3PHactualnormal81179LIVE (1452);1590independentreviewsealedPASS,
+nowrestoringexactMaliP2manual47787(normalpush/readbackthenboundedauthorityread).
+NGAremote warmcohortphaseCLOSED0/0raw, splitproposalunrun/Rootreviewpending.
+NewUga41089312/Mali41089313 confirmedagent_execution09:54.
+NewNiger41089354/aa2d6bd86b724899a003af99bbc4b0e0 submitted0; old143/71
+stageonly/pytestNOTENTERED/transferUNKNOWN. OldTZA41089175also143/71global
+SQLite; freshcontinuationpreparing. SharedshocksimportPASS/metadataunwrapfix
+authorizedbeforeoriginalunspent4tests. Mwiownsremoteactualphasewatch/intake.
+Fullcurrentdocket [[file:handoff.org]], oldqualifiedhistoriesarchived.
+
+* CURRENT after measured runtime failures (2026-11-10 09:52 UTC)
+BFA1bc0907c writerfix1pure+1genuineAPItestPASS, readyforreviewedrepairbatch.
+NGA5cb3PHhelper56pure+3realcapturePASS; independent1590reviewPASS;38sources
+staged140321380B, truecold+warmnormalAPIgrantedon9763, operatorpreparing.
+RemotequeueownerMwi: originalMali/UgaCItasksclosed0butBLOCKEDFUSE/0tests;
+newUga41089312/501fed1d3b714757bf844b790cce47b0 andMali41089313/
+5310f60d313c4ce0a1a3efcaa26c2531 submitted. Niger41089150FAILED71/misplaced
+globalprivateDVCSQLite; actualdataphaseUNKNOWN, doNOTcall11testrun. Sourceimage
+extractionpassed. RootnowrequiresALLruntimecache/state/tmpNODELOCALbefore
+ANYMAINimport; grantsforwarded. TZA41089175/shocks41089184/Nga41089256last
+knownlive, actualphasependingfreshownerstatus. No inflatedbusy-workerclaim.
+Fiveoriginaldocumentaryjobsallcomplete/Rootqualifiedacceptednotesqueued.
+PR1687d47fullFAILED18/17228P, ordinarygreen; no merge/settings/closures.
+Consolidatedexactdocket: [[file:handoff.org]]; previoushistoryarchivedthere.
+
+* CURRENT sixCIremotes +two localfix lanes (2026-11-10 09:39 UTC)
+Alloriginal5authoritytasksCOMPLETE/Rootqualifiedsourceaccepted/queuednotes.
+Mwiowns6NEWCIjobs: Mali41089148,Niger41089150,TZA41089175,Uga41089176,
+SharedShocks41089184,NgaSampling41089256. FUSEpermissionfailedbeforedataon4;
+RootapprovedEXISTINGsame-imageunsquashfsfallbackthenordinaryhelperimportcheck,
+ALL6normalchannelsnotified. Mustverifyactualnativeactor, notheartbeat alone.
+1590BFAnewwave-localwriterfix617ebee/pure1PASS, correctednormal54087LIVE.
+1452NGA3PHrepair5cb/NEW56purePASS+3realcapturePASS18358records; trueAPIplan
+rejectsfixed-vmemoandstages21realnormalsampledependencies, NOTyetAPIlaunched.
+RootactualNGA2samplingcomparisonsBOTHFAILlinkedN, newremotecohortdiagnosis
+keepshistorical-crosswalkvsnaiveintersectionasHYPOTHESIS, norepin/relink.
+PR1687d47fullDATAFAILED18/17228P; ordinaryCIpass; no merge/settings.
+Exactpins/constraints/receipts: [[file:handoff.org]].
+
+* CURRENT CIrefill (2026-11-10 09:13 UTC)
+PR1687full42769154949FAILED18/17228P/0E/2775S; unit+WindowsSUCCESS.
+Originalfiveauthorityremotes ALLclosedworker0/supervisor0/taskcompleted,
+Rootreviewpending. NEWMaliCI41089148/0c49532dbc7548d78a04420758a2794a
+andNigerCI41089150/d116603b03604f819be16bc56d2c37c8 confirmedagentexecution.
+Mwiowns bothwatch/intake andnewUga/TZAsamplingplusshocksCI tasksubmissions
+(preparationonlyatcheckpoint).1590BFAactualfailednode/smallNigeriawarm
+samplingaid;1452implements3trueNigeriaPHplotrepairs. Rootsourceadmission,
+fullCItriage,Ghana/Ethsamplingresidual,GH/settings/integration.
+No fullpass/newmerge/settings/wholeclosure. Exactconstraints [[file:handoff.org]].
+
+* ACTUAL five workers (2026-11-10 08:47 UTC)
+THREE remoteagent_execution/freshheartbeat/exactd47: Niger1565 job41088863
+(ba850e6737f44335b5cdfb2d7c1a3712), Ethiopia1570 job41088938
+(b1b4e8e35f614aadac793e7bebb90243), Malawi1228 job41088939
+(739b1579dde64d37a6c83bb0a5beced7). Mwiownsfinitewatch/terminalintake.
+TWOlocalNigeriaworkers:1590housingv3 actor46198coldclosed0/warmLIVE,
+10strictindexfailurespreserved;1452fivePHplotgaps, positiveW1/W2ownforms,
+exactexportbindingspending. Rootownsreview/queue/GH1687fullCI/settings/merge.
+These arefiveworkers onfourcountries, not eight busycountryworkers.
+Details/sourcepins/constraints: [[file:handoff.org]].
+
+* CURRENT assignments (2026-11-10 08:30 UTC)
+Root:1687 d47 ordinaryCI SUCCESS/full-data42769154949 live, observer76037.
+finish_1590: Nigeria587 actual normal housing cold/warm verification; original
+operator failed preAPI, exact lazy-field assertion correction approved; owns next actor.
+finish_1452: Nigeria587 five plot_features historical cells, source/history +finiteAPI plan.
+malawi_revision_food: country-queue refill/actual free-account remote dispatch,
+Niger1565 first, other genuinely unblocked independent country residuals.
+Remote submissions not yet confirmed; do not claim eight running workers.
+PP foundation47pure+6real checks pass, remains UNWIRED/user preference pending.
+Development4381/78merges/42closures unchanged. Full details: [[file:handoff.org]].
+
+* Current after Windows repair (2026-11-10 06:06 UTC)
+PR1687 finalhead42f2a8e0: WindowsSUCCESS, unit42765866264/full-data42765866627
+live. Root observer35534; old25573closed/superseded histories retained.
+UTF8product3readfix passed12targeted controls, tests/exemptions unchanged.
+1452 Nigeria587:5ownPPprice forms+6actualzero-rowheaders complete; source-bound
+adapterdesign next. Existingobs/variety grain reused; W1quantity/W3locations and
+ownrawunitdictionary-versus-paper conflicts retained. No rows/servingwiring yet.
+1590 Tanzania587: a20docfindingsRootaccepted; nowqualify2unsupportedfielding
+docstrings only, all executableAST/waves/strategies/tests exact/no runtime.
+Mwi: completed independentNGA5formreview after2externalpage-reference corrections;
+availablefornextreview/actualCIfailures. Ethiopia4backfill completein1687.
+Zero remotejobsrunning; no eight-busy claim. GoalACTIVE/no newmerge/fullpass.
+
+* Actual checkpoint (2026-11-10 05:55 UTC; CURRENT)
+PR1687 READY finalhead1e5f319de; ordinaryCI42764993506/full-data42764993747 live.
+Root owns observer25573 and source admission/publication/settings/merge. No new
+development merge or full-data pass; all prior component work remains reviewed.
+- finish_1452: Nigeria587 FIVE ownPPcommunity questionnaires.5normalprivate
+  docgetters passed, bounded newpage reads active. W4PPp5 positively asks food
+  prices in C2; C8-only explanation insufficient. No raw/header/production edit.
+- finish_1590: next Tanzania587 originalR1 food-security/coping section check
+  assigned; ownnewW/currentCONT first, existingheld XLS11558, bounded NEWsection
+  only. PriorCOVER/CODES/UPDdoc checks reused, no fielding/coverage assumption.
+- malawi_revision_food: Ethiopia4additional W5public docs COMPLETE (4GET,
+  onebatchpush,fourfreshreadonlyretrievals all0), accepted into1687. Available
+  for independent country review or actual CI failures; no occupancy-only task.
+All five remote jobs completed; zero remote running. Exact sources/limits and
+qualified old failures in [[file:handoff.org]]. Pending scientific decisions unchanged.
+
+* Actual checkpoint (2026-11-10 05:29 UTC; supersedes older snapshots)
+All five remote country jobs CLOSED successfully; zero remote running.
+Root plus three local agents are active:
+- finish_1590: combines accepted country/shared fixes in a NEW isolated batch.
+  PR1686 test-only04610062 passed101 normal-context controls and is published;
+  ordinary CI42761588876 is live. Corrected1071 C+D c0185 accepted;650 final
+  6a88c7aa source/affected controls accepted. One final existing metadata census
+  awaits the frozen combined source; no repeated baseline/native cohort.
+- finish_1452: actual932data failure diagnosed (16760P/16F/0E/2775S), failed
+  node identities deleted by counts-only private wrapper. Implements minimal
+  opt-in immutable-public-source-validated file/function diagnostics; no
+  parameter/assertion/data output. Source review then meaningful mocked tests.
+- malawi_revision_food:650 R3 exact25 and R4 exact14 mocked controls passed,
+  separately qualified; final ledger/carry sealing. Next: concrete Ethiopia
+  public W5 community/manual/report/DDI backfill plan from retained metadata,
+  own CONTENTS first; no reacquire HH/PP/PH/BID, raw data or shared cache build.
+- Root: independent source admission, publication, issue1483/1441 residual
+  reconciliation, final batch review and CI/settings/merge ownership.
+No new development merge, full-data pass, production map/weights change or
+master release. Existing scientific/authority holds remain explicit. Full detail
+and exact report locations: [[file:handoff.org]].
+
+* Actual checkpoint (2026-11-10 04:26:22 UTC)
+ALL5new remotes CLOSED native0/supervisor0/completed; watchers69898/51769 closed.
+Zero remote running. Current local work:
+- finish_1590: BFAf4fb408,43distinct pure across qualified runs; actual one-source
+  native60751 PASS,70994raw→12223explicitYes applications, typed projections/
+  source conservation0denials. NOT publicAPI/serveddata acceptance. Mali2028434/
+  fixturea33d,53distinct pure49+4; two-source nativevalidation preparation next.
+- Root: batch83ddab2e8, six reviewed1680–1685 heads,60disjoint exact paths+ledger,
+  not yet onGitHub. Full932data42748441466 stillLIVE at04:20. Final1683/1685
+  ordinaryCI nowSUCCESS. Queue/review/integration remains Root-owned.
+- finish_1452:1071 C/common correctedsource, new28-case actor72843 LIVE;
+  D remains separateprototype, no complete1071claim.
+- malawi_revision_food: independentC/Dreview and650 implementation875569378;
+  mocked finite cohort34461 LIVE, no realdownloads/push/acquisition.
+Uganda boundedown-doccheck found no attributable map. Tanzania ownoriginal
+lists found, original-to-UPD bridge unknown; no inferred labels. Details:
+[[file:handoff.org]]. Older running observations below are superseded.
+
+* Six country lanes active — 2026-11-10 03:34 UTC
+FIVE actual remote agent_execution/running, n0030/fresh/nonstale:
+BFA1483job41082011; Mali1483job41082012; Malawi1281job41082066;
+Uganda1441job41082078; Tanzania1441job41082079. Firsttwo finitewatcher69898,
+latestthree watcher51769, finish_1590 owns supportedresults/questions/intake.
+Ethiopia1570/650 publicW5document check active locally withmalawi_revision_food.
+Root ownsqueue/review/integration/CI. finish_1452 integrates1071 A+B998ac711
+anddisjoint1683e5dtestrepair then finalmetadata-onlycensus (no sharedrewarm).
+Niger/Nigeria remainingauthority/adoption gaps explicit; no occupancy quota.
+All previous8countryjobs remainclosed; newjobs are separate evidenceddispatches.
+ExactIDs/constraints/evidence: [[file:handoff.org]].
+
+* Actual phase confirmed — 2026-11-10 03:28 UTC
+BFA41082011 and Mali41082012 BOTH agent_execution/running on n0030,
+fresh/nonstale, no unanswered questions. Finite supported watcher69898 LIVE;
+finish_1590 owns monitoring and next country refill. Ethiopia publicdoc lane
+active locally. No8busy-worker claim; former8country batch is completed.
+
+* Latest — 2026-11-10 03:27 UTC
+Two new actual submissions/dryrun0: BFA1483 job41082011/7ea9deb3f4b04eb3a65c164506f26352;
+Mali1483 job41082012/f008c838b85b48bd8f1580c34de17a0e. Ownpost-header
+HHinput adapters/wiring+portablecontrols. Nativephase confirmationpending,
+finish_1590 owns monitor/intake/nextcountryselection. Prior8batch allclosed.
+malawi_revision_food now Ethiopia ownW5 publicquestionnaire check1570/650;
+1683 test-only repair17PASS pushed e5d, newCIrunning. PHxlrd capabilityfailure
+preserved; HH/PP usefulpublicdoc workcontinues. No raw/API/fieldedbridge claim.
+finish_1452 now repairs Root-found source-side .dvc provenance exclusion in
+remaining1071 A+B;73qualified controls across runs,9newaffectedcontrols pending.
+Root ownsPR1685newholding,932actualtimeout/new360minrun, trackerreconciliation.
+PR1681/1682/1684 ordinaryCIpass;1680/1683/1685 CIactive; no newmerge.
+Details/sourcepins/receipts: [[file:handoff.org]].
+
+* Current — 2026-11-10 03:14 UTC
+This section supersedes the historical running observations below.
+Previous eight-country batch and extra Tanzania engineering job ALL CLOSED
+native0/supervisor0/task completed. Remote running0 until new submissions confirmed.
+finish_1590 owns NEW country refill: dedup closed v3 results and five new headers,
+prioritize BFA/Mali1483 candidates and other unblocked country fixes. Authorized
+reviewed pinned remote CLI/free-account source-only submissions and pure controls.
+finish_1452 owns1071 remaining location/crosswalk recovery A+B; frozenedc77ed2,
+pure verifier23733 LIVE. malawi_revision_food owns actual1683 CI four failures
+in separate worktree; own temporary reader copies removed after actors closed.
+Root owns queue/admission/PRs/CI;932 full-data run timed out at2h, no acceptance
+or ruleset mutation.1681/1684 ordinary CI pass;1682 updated-head CI live.
+Development4381,78 verified merges/42 whole closures; goal ACTIVE.
+Pending1573/1575 user choices do not stop independent work.
+Details/source pins/receipts: [[file:handoff.org]].
+
+* Historical checkpoint — superseded
+All EIGHT country workers are ACTUALLY native-running with fresh heartbeats
+and source-pin READY (2026-11-10 01:35 UTC). Zero queued/starting/failed.
+BFA41079834, Ethiopia41079836, Malawi41079835, Mali41079843,
+Niger41079842, Nigeria41079844, Tanzania41079852, Uganda41079853.
+finish_1452 owns watcher53129 and findings/questions. Thirteen ranked actions
+in Q/NEXT-EIGHT-COUNTRY-QUEUE.json; country edits/source diagnosis initially,
+Root verifies frozen patches. All prior scientific holds preserved.
+
+The repaired pilot41078497 finished native0/supervisor0 with five authenticated
+artifacts and actual identity-bound terminal-race proof. Root admitted it before
+submitting eight exact pinned jobs. Old twelve failures remain failures.
+
+Local: Root manages queue/PR1680 full-data CI; finish_1590 prepares Burkina1573
+concrete decision packet; malawi_revision_food verifies combined1032/1071,
+remaining33 pure DVC controls45968 live. PR1681/1682 draft country CI passed.
+Development4381,78 verified merges/42 whole closures; no new merge yet.
+Details, source pins, receipts and next steps: [[file:handoff.org]].
