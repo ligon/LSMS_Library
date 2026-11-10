@@ -66,5 +66,29 @@ channels. No waiting for a human is required to finish a bounded access-gap resu
 
 ### Phase 3 — verification
 
-Pending bounded source discovery. Verify final documentary claims against §§2–4,
-source hashes/HTTP receipts and quote locators; do not run scientific tests.
+- OK (§§2–4): nine official metadata GETs, each URL once and each body below4MiB.
+  DOI302 binds PII S1466856407000458; linkinghub200 is a locator, not article body.
+  ScienceDirect/AU/SDU403 remain failed access, never negative article evidence.
+- OK (§§2–4): CGIAR exact title/authors/DOI/8(3):399–406, item2ee4ae02-c0c9-43c7-9311-1da746018b7f
+  (handle10568/171797), marks Limited Access/copyrighted. Public bundles response
+  has totalElements0/totalPages0 and []; no global/restricted-holding absence claim.
+- OK (§§3–5): stop at concrete access gap. No public primary fulltext/version gate
+  passed; zero fulltext bytes/pages/parses/renders. Three cultivar cells, weighting,
+  water67.4/alpha10 provenance, edible basis and electronic release remain unverified.
+- OK (§§2–5): existing FCDO/Monograph/arithmetic evidence reused without new searches;
+  no new experimental arithmetic or nutrition/runtime activity. Preserve #967 and
+  November4 status quo. No numeric/default/note/CSV/test/fixture or CONTENTS edit.
+- OK (§§4–6): seven nonempty public response bodies retained privately as distinct
+  regular0400 inputs with pre/post SHA/size/inode/mtime identity. Evidence exports
+  receipts/selected metadata/short locators only. Exact residual questions recorded
+  in assigned shared channel; no other channel created.
+- No CONTRADICTION or REINVENTION in the documentary conclusions; no production
+  symbol changed. Existing scientific tests are outside this dispatch and unrun.
+  Initial display truncations, overly broad source-text rg output and Python3.6
+  bootstrap failure remain disclosed, not silently recast as success.
+
+Durable review evidence: worker0b190175's evidence directory under the explicit
+refill-country-authority-d47-20261110/workers/Uganda1000 task root; REPORT.md,
+RESULT.json, SOURCE-PROOF.json, DECISIONS.md and EVIDENCE-INDEX.json. Whole#1000
+and coordinator acceptance remain pending. The external report supplies the exact
+missing operands and qualified wording proposal; authoritative source remains unchanged.
