@@ -22,11 +22,18 @@ is settled/reused, not reopened. No separate seed_acquisitions API is selected.
 Concrete design is reports/admission-1190-1298-malawi-carrier-design-20261110
 and source9b6a09fc3fdf86a34eee5a0cd8c1db4c12ce8db3 (REPORT/DECISIONS in dispatch).
 
-**STILL PENDING:** third-source H36 literal amount versus H34=Yes requirement.
-Root sent this as a separate asynchronous question; no answer yet, no default.
-Further implementation/native execution must preserve that unresolved admission
-boundary until explicit userselection. Existing unrelated49/50/51/R1/R2a/R2b
-decisions and no-production-weight/no-master/sharedrewarm holds remain.
+User ALSO explicitly selected "Keep literal recorded amounts (Recommended)"
+for third-source H36. Carry a recorded H36 amount with its own native crop/unit
+and preserve H34 No/missing/contradictory answers literally; do NOT require
+H34=Yes or infer expenditure/application/a plot. No positivity filter, missing
+value fill, payer/transport/value borrowing or new sentinel/unit policy.
+All THREE choices are now ANSWERED. Implement the concrete Farm carrier with
+all admitted quantity-bearing components and literal H36, preserving original
+G/D/legacy behavior. Existing field-binding contradictions stay documented,
+not silently adjudicated. Source/pure implementation, independent review and
+normal full PR gates are authorized; fresh raw/native/API validation still
+needs its explicit finite already-managed-source plan. Existing unrelated
+49/50/51/R1/R2a/R2b and no-weight/no-master/sharedrewarm holds remain.
 
 * 2026-11-10: Four EHCVM 2018 sample strata, GH1575
 The user explicitly selected: "Use documented combination (Recommended)".
