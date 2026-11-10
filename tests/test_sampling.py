@@ -1339,6 +1339,55 @@ def _nigeria_linked_cluster_operands(a, b, earlier, wave, links_path):
     return left, right
 
 
+def _uganda_historical_cluster_view(sample):
+    """Undo only registered #1120 additions for the dated #1135 TEST operand.
+
+    This never changes the public sample or invents an eligibility rule. The
+    exact source-defined inverse reproduced all four historical N/D pairs on
+    the closed current output (ledger 1687 Uganda §2–4). Ordinary EA, GPS-bin
+    and mover labels remain; only the historical comparison view is selected.
+    """
+    from lsms_library.derivations import MULTI_SEP, parse_key
+
+    early = {"2005-06", "2009-10", "2010-11", "2011-12"}
+    late = {"2013-14", "2015-16", "2018-19", "2019-20"}
+    unlocated = "Uganda::sample::unlocated-identity"
+    agriculture = "Uganda::sample::agriculture-cover"
+    scopes = {
+        unlocated: early | late,
+        agriculture: {"2015-16"},
+        "Uganda::sample::ea-comm-link": early,
+        "Uganda::sample::ea-own-comm": early,
+        "Uganda::sample::ea-tracking-key": {"2018-19", "2019-20"},
+    }
+    assert isinstance(sample, pd.DataFrame)
+    assert list(sample.index.names) == ["i", "t"], "historical operand index"
+    assert sample.index.is_unique, "duplicate current household/wave"
+    assert {"v", "Derivation"} <= set(sample), "missing historical lineage"
+    keep = []
+    for wave, value, marker in zip(sample.index.get_level_values("t"),
+                                   sample["v"], sample["Derivation"]):
+        wave = str(wave)
+        assert wave in early | late, "unsupported historical wave"
+        if isinstance(marker, str):
+            keys = [part.strip() for part in marker.split(MULTI_SEP)]
+            assert all(keys), "empty derivation token"
+            assert len(keys) == len(set(keys)), "duplicate derivation token"
+        else:
+            assert pd.api.types.is_scalar(marker) and pd.isna(marker), (
+                "malformed derivation marker")
+            keys = []
+        for key in keys:
+            parse_key(key)  # Existing registered-key syntax, not a new parser.
+            assert key in scopes, "unknown historical derivation"
+            assert wave in scopes[key], "mis-scoped historical derivation"
+        is_unlocated = isinstance(value, str) and value.startswith("unlocated-")
+        assert (unlocated in keys) == is_unlocated, "unlocated marker/v mismatch"
+        keep.append(not (unlocated in keys or
+                         (wave == "2015-16" and agriculture in keys)))
+    return sample.loc[pd.Series(keep, index=sample.index, dtype=bool)].copy(deep=True)
+
+
 @pytest.mark.requires_s3
 class TestTheReproduction:
     """GH #942's own reproduction, a single-country two-wave call."""
@@ -1477,6 +1526,9 @@ class TestTheReproduction:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             s = self._fresh(country).sample(waves=[earlier, wave])
+        if country == "Uganda":
+            # The four curated records precede locating-cover/singleton additions.
+            s = _uganda_historical_cluster_view(s)
         idx = s.reset_index()[["i", "t", "v"]].dropna()
         idx["t"] = idx["t"].astype(str)
         idx["v"] = idx["v"].astype(str)
@@ -1666,3 +1718,185 @@ class TestNigeriaLinkedClusterOperands:
         with pytest.raises(AssertionError, match=rf"\({k}, {k + 1}\)"):
             self._exercise_original_assertions(tmp_path, monkeypatch, earlier, wave,
                                                a, b, pairs, dict(m, clusters_renumbered=k + 1))
+
+
+class TestUgandaHistoricalClusterView:
+    """Invented source-lineage controls; no sample/API/provider calls (§4–5)."""
+
+    U = "Uganda::sample::unlocated-identity"
+    A = "Uganda::sample::agriculture-cover"
+    E = "Uganda::sample::ea-tracking-key"
+
+    def _frame(self):
+        ids = ["h1", "h2", "ag", "blank", "h1", "h2", "ag", "blank", "late"]
+        waves = ["2015-16"] * 4 + ["2018-19"] * 5
+        index = pd.MultiIndex.from_arrays([
+            pd.array(ids, dtype="string[pyarrow]"),
+            pd.array(waves, dtype="string[pyarrow]"),
+        ], names=["i", "t"])
+        # The original unused domains must survive too, not just observed keys.
+        index = index.set_levels([
+            level.insert(len(level), "unused-i" if n == 0 else "unused-t")
+            for n, level in enumerate(index.levels)])
+        frame = pd.DataFrame({
+            "v": pd.array(["A", "P", "Q", "unlocated-blank", "B", "P", "T",
+                           "R", "unlocated-late"], dtype="string[pyarrow]"),
+            "Derivation": pd.array([None, None, self.A, self.U, self.E, None,
+                                    None, None, self.U], dtype="string[pyarrow]"),
+            "weight": pd.array([1., None, 5., 0., 2., 3., 4., 5., 6.], dtype="Float64"),
+            "panel_weight": pd.array([0., 1., None, 3., 4., 5., 6., 7., 8.], dtype="Float64"),
+            "untouched": pd.array(["None", "nan", None, "<NA>"] * 2 + ["last"],
+                                  dtype="string[pyarrow]"),
+        }, index=index)
+        frame.attrs = {"id_converted": True, "nested": {
+            "typed": [1, 1.0, True], "unknown": None, "literal": "nan"}}
+        return frame
+
+    def _one(self, wave, value, marker):
+        return pd.DataFrame({"v": [value], "Derivation": [marker],
+                             "weight": pd.array([1.], dtype="Float64")},
+                            index=pd.MultiIndex.from_tuples(
+                                [("h", wave)], names=["i", "t"]))
+
+    def _original_assertions(self, frame, monkeypatch, n=2, d=1):
+        from types import SimpleNamespace
+        from tests.test_gh1196_parquet_index_policy import _exact
+
+        before = copy.deepcopy(frame)
+        monkeypatch.setattr(sys.modules[__name__], "sampling_records", lambda _: {
+            "2018-19": {"panel": {"cluster_id_measurement": {
+                "linked_households": n, "households_changed": d,
+                "not_applicable": ["clusters_renumbered"],
+            }}}})
+        check = TestTheReproduction()
+        monkeypatch.setattr(check, "_fresh", lambda _: SimpleNamespace(
+            sample=lambda waves: frame))
+        try:
+            check.test_the_curated_size_matches_the_served_sample(
+                "Uganda", "2015-16", "2018-19")
+        finally:
+            _exact(frame, before)
+
+    def test_source_view_retains_exact_expected_members_and_full_current_frame(self):
+        from tests.test_gh1196_parquet_index_policy import _exact
+
+        frame = self._frame()
+        before = copy.deepcopy(frame)
+        expected = frame.iloc[[0, 1, 4, 5, 6, 7]].copy(deep=True)
+        got = _uganda_historical_cluster_view(frame)
+        _exact(got, expected)
+        _exact(frame, before)
+        # Later observed counterparts survive: this is a per-wave source view,
+        # not a global blacklist of household IDs or null/zero weights.
+        assert ("ag", "2018-19") in got.index
+        assert ("blank", "2018-19") in got.index
+        assert pd.isna(got.loc[("h2", "2015-16"), "weight"])
+
+    def test_original_exact_assertions_and_same_total_wrong_members(self, monkeypatch):
+        frame = self._frame()
+        self._original_assertions(frame, monkeypatch)
+        # Same six view rows and same N, but swap a historical member for the
+        # AG-only member: the independent unchanged D assertion must fail.
+        wrong = copy.deepcopy(frame)
+        wrong.loc[("h2", "2015-16"), "Derivation"] = self.A
+        wrong.loc[("ag", "2015-16"), "Derivation"] = pd.NA
+        assert len(_uganda_historical_cluster_view(wrong)) == 6
+        with pytest.raises(AssertionError, match=r"\(2, 1\)"):
+            self._original_assertions(wrong, monkeypatch)
+
+    def test_original_N_assertion_is_not_bypassed(self, monkeypatch):
+        with pytest.raises(AssertionError, match=r"\(2, 3\)"):
+            self._original_assertions(self._frame(), monkeypatch, n=3)
+
+    @pytest.mark.parametrize("value", ["@1.25,2.5", "moved-h", "000123"])
+    def test_bins_movers_and_ordinary_labels_remain(self, value):
+        from tests.test_gh1196_parquet_index_policy import _exact
+
+        frame = self._one("2018-19", value, None)
+        _exact(_uganda_historical_cluster_view(frame), frame)
+
+    @pytest.mark.parametrize("wave,key", [
+        ("2005-06", "Uganda::sample::ea-comm-link"),
+        ("2011-12", "Uganda::sample::ea-own-comm"),
+        ("2018-19", "Uganda::sample::ea-tracking-key"),
+        ("2019-20", "Uganda::sample::ea-tracking-key"),
+    ])
+    def test_separate_EA_annotations_are_kept(self, wave, key):
+        from tests.test_gh1196_parquet_index_policy import _exact
+
+        frame = self._one(wave, "v", key)
+        _exact(_uganda_historical_cluster_view(frame), frame)
+
+    def test_composed_registered_keys_still_disclose_missing_original_v(self):
+        from lsms_library.derivations import MULTI_SEP
+        from tests.test_gh1196_parquet_index_policy import _exact
+
+        frame = self._one("2019-20", "unlocated-h", self.U + MULTI_SEP + self.E)
+        before = copy.deepcopy(frame)
+        _exact(_uganda_historical_cluster_view(frame), frame.iloc[:0])
+        _exact(frame, before)
+
+    @pytest.mark.parametrize("marker", [
+        "", "bad", "Uganda::sample::unknown", "Other::sample::unlocated-identity",
+        "Uganda::cluster_features::unlocated-identity", 17, False, ["bad"],
+        {"key": "bad"},
+    ])
+    def test_wrong_or_malformed_marker_refuses(self, marker):
+        frame = self._one("2018-19", "v", None)
+        frame["Derivation"] = frame["Derivation"].astype(object)
+        frame.iat[0, frame.columns.get_loc("Derivation")] = marker
+        with pytest.raises((AssertionError, ValueError)):
+            _uganda_historical_cluster_view(frame)
+
+    @pytest.mark.parametrize("value,marker", [
+        ("unlocated-h", None), ("unlocated-h", "Uganda::sample::ea-tracking-key"),
+        ("v", "Uganda::sample::unlocated-identity"),
+        ("@1,2", "Uganda::sample::unlocated-identity"),
+        ("moved-h", "Uganda::sample::unlocated-identity"),
+        (None, "Uganda::sample::unlocated-identity"),
+    ])
+    def test_missing_or_inconsistent_unlocated_marker_refuses(self, value, marker):
+        with pytest.raises(AssertionError, match="unlocated marker/v mismatch"):
+            _uganda_historical_cluster_view(self._one("2018-19", value, marker))
+
+    @pytest.mark.parametrize("wave,key", [
+        ("2018-19", "Uganda::sample::agriculture-cover"),
+        ("2015-16", "Uganda::sample::ea-comm-link"),
+        ("2013-14", "Uganda::sample::ea-own-comm"),
+        ("2015-16", "Uganda::sample::ea-tracking-key"),
+    ])
+    def test_known_but_mis_scoped_keys_refuse(self, wave, key):
+        with pytest.raises(AssertionError, match="mis-scoped"):
+            _uganda_historical_cluster_view(self._one(wave, "v", key))
+
+    @pytest.mark.parametrize("key,value", [
+        ("Uganda::sample::unlocated-identity", "unlocated-h"),
+        ("Uganda::sample::agriculture-cover", "v"),
+    ])
+    def test_duplicate_tokens_are_not_silently_deduplicated(self, key, value):
+        from lsms_library.derivations import MULTI_SEP
+
+        frame = self._one("2015-16", value, key + MULTI_SEP + " " + key)
+        with pytest.raises(AssertionError, match="duplicate derivation token"):
+            _uganda_historical_cluster_view(frame)
+
+    @pytest.mark.parametrize("column", ["v", "Derivation"])
+    def test_missing_operand_field_refuses(self, column):
+        with pytest.raises(AssertionError, match="missing historical lineage"):
+            _uganda_historical_cluster_view(self._frame().drop(columns=column))
+
+    def test_duplicate_current_key_refuses(self):
+        frame = self._frame()
+        with pytest.raises(AssertionError, match="duplicate current household/wave"):
+            _uganda_historical_cluster_view(pd.concat([frame, frame.iloc[[0]]]))
+
+    def test_scope_contract_matches_existing_registered_metadata(self):
+        from lsms_library.derivations import derivation_records
+
+        records = derivation_records("Uganda")  # Existing UTF-8 metadata reader.
+        assert records[self.U].waves == "all"
+        assert records[self.A].waves == ["2015-16"]
+        assert set(records[self.E].waves) == {"2018-19", "2019-20"}
+        for name in ["ea-comm-link", "ea-own-comm"]:
+            assert set(records[f"Uganda::sample::{name}"].waves) == {
+                "2005-06", "2009-10", "2010-11", "2011-12"}
