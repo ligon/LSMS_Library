@@ -35,6 +35,19 @@ in1690(theirheadsnotnecessarilyancestors;CIcomponenthaslater2expressionfix).
 acceptance, preserveBFA+fourcountryshared812expectations/sourceclosureproofs.
 
 * 1575 actualoperator recovery -- deputysolelauncher/terminalowner
+LATESTv4transportREVIEWPASS/actualcontinuation41108626SUBMITTEDandRUNNING
+n0043.savio4 atfirst0:22supportedread,setupONLY/no metadata/dataacceptanceyet.
+Exactpacket2c6866bd; immutableusedadmissionchainsmanagerfullcore/imagev3+
+Rootdelegatedleadboundedv4PASS, laterformalreceiptexternallinkonly. Deputysole
+monitorEXEC52441/R1575-normal-validation-20261110/monitor-v3.log; SUBMIT-v3.json,
+actual-v3/private-v3fresh. Leadreproducedold317156BErrno7 viaactualexec,11new
+no-optransportsPASS/all9laneenvs+actualhelper/controllerenv, all2684membership
+grammar/owner0400/nlink/hash/parentchecksPASS, badpath/hashrefused. Fiveexpected
+transportleavesonly;common/phase/controller/oracle/cards/UIDexactv3. Maxenv187B,
+total3444B+4KiBargvbelow128KiB. No newRootgate. R/review-1575-v4-transport-
+20261110/{JOINT-TRANSPORT-ADMISSION,TRANSPORT-RESULT,EXEC-SIZE-BOUND}.json.
+Belowfailedsetuphistoryretained; nonormalcallbudgetconsumedyet.
+
 Product/public1693stillfrozen2f8/base9f; allsource/header/pure/metadataadmission
 unchanged. 8roles18calls;9metadata60sEACHbeforedata;120min/outer7000s,
 cold180/warm300/comparison180. Initial41105527setupFAILED79.37s missinghelper
@@ -105,6 +118,8 @@ refusal. Old2018/global/factors/NPK/DAP/policyunchanged. Rootawaitsexactsource/
 patch+concretefullmenuproposal;rawtransportmilestoneisnotactualactivation.
 E=Q/refill-1483-senegal-own-adapter-M-20261110/workers/Senegal1483-Own2021Adapter/
 ad38ee6ebd0549319887682f2216325b/evidence. Managerfollow-onjobIDpending.
+Firstfollow-onsubmitrejectedPRE-Slurm invalidprivateprototyperef; nojob/newdata,
+managercorrectingexactprivatebindingbeforeresubmit. NativegateUNGRANTED.
 
 * Other meaningful delegatedwork
 Malawi1190/1298source/design worker41107441/a8a76d409cca44ddb6dd9ac079ddb9b7,

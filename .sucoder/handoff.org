@@ -8,8 +8,9 @@ tested_source/junitsummary+unitcheckoutS, freshsource/rules/checkstepsbeforemerg
 Goal79merges45closures/ACTIVE/no release/sharedrewarm/weights.
 1575twoactualSETUPFAILS41105527missingSLURM_JOB_ID;41106776Errno7singleenv
 SOURCE_GIT_FILES317156B.0normal/preflight/calls/capturesboth. v4same2684allowlist
-private0400JSON+SHA/smallenvrefs, deputyfreeze/mainleadindependentreviewthen
-soledeputysubmit, no extraRootgate. Existing18calls8rolesunspent/120min7000outer.
+private0400JSON+SHA/smallenvrefs PASSindependentreview/11no-optransports; actual
+41108626SUBMITTED/RUNNINGn0043,setupONLY. DeputysolemonitorEXEC52441,no extra
+Rootgate. Existing18calls8rolesunspent/120min7000outer, exactpacket2c6866bd.
 Benin/Togo1531own5docs+2headersDONE/Rootreviewed: ownprintedGPS47ha but own
 released47unitlessdouble/BOTH47aABSENT; calendars/versionconflictsretained.
 Privatefactual3pathchild4d00179d9approvedforlater1693append-onlycomposition;
