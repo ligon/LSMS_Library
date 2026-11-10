@@ -4826,3 +4826,50 @@ Evidence: =B/reports/650-ethiopia-w5-managed-holding-20261110/=,
 HTTP/container receipts remain in =B/reports/650-ethiopia-w5-public-questionnaires-20261110/=.
 No workbook/macros/formulas, PDF, native survey rows/headers, Country/Feature,
 producer, cache census or broad acquisition was executed in this restoration.
+
+* 2026-11-10 -- Own W5 HH/PP questionnaire cells (GH #1570/#650, partial)
+
+The three newly held WB6161 forms remain separate instruments. Reading the
+household78626 and post-planting78627 forms adds these own W5 facts; it does
+not substitute W5 wording for W1/W2 released fields or resolve earlier counts.
+
+In PP =Cover Sheet!Y9/AC9=, household identity and holder identity are
+separate; AC9 says "Holder ID (Use Household Roster ID)". In
+=SEC 2 - Parcel Roster!A3=, the instruction retains W4-prefilled parcel names
+and entries even if disposed or rented out, then adds new parcels. The
+status/next-parcel skip remains visible at =F4/F7=. In contrast,
+=SEC 3 - Field Roster!C3= excludes fields rented out or given to other holders;
+=A2/B2= separately label parcel and field. These roster universes are not
+interchangeable, and a printed CAPI-prefill instruction does not authenticate
+a fielded application, GUID, instrument build or v03-export bridge.
+
+PP =SEC 4 - Crop Roster!A1= includes tree/root crops and vegetables. Its Q21
+(=AM2/AM3=) asks expected harvest for the "main rainy season" with a unit
+selector; Q22--24 (=AO2:AQ3=) ask intended sale, share/amount and expected
+Birr sales. They are expectation questions, not evidence of realised harvest
+or a numerical conversion rule. They do not resolve the old PH section-9
+shortfall, section-12 Q3, crop-cut eligibility or window/allocation questions.
+
+The HH =Cover!A3= identifies2021/22, while
+=Sect12C Basic Ag (Crop)!A5= literally says "2014 Meher season" and asks for
+a repeated field entry when a plot has multiple crops (=C5= identifies crop).
+The calendar/export relationship is not selected here. HH section12C is not
+silently equated to the agriculture PH section12. No explicit decimal/cents
+instruction was found in the bounded HH/PP currency-text inspection; that
+negative is not authority for /100, whole-Birr rounding or blank-as-zero.
+
+The authentic PH78628 bytes match their holding receipt, but the existing
+BIFF reader failed before worksheet content was available. Its section9/12
+and currency wording remain unread by this check; no absence is inferred.
+The earlier W1 PH/manual window and BIRR-Decimal tensions remain unchanged.
+No data/default/units/IDs/weights, released-column mapping or scientific
+eligibility decision follows. Both whole issues remain open.
+
+Sources: HH SHA256=a026d77fc204d9870c90122ec7958bbd77562330b4b5e43fd228b8a07d588c96=;
+PP SHA256=53be32284341cacf45266adf63d45c5b8534e3c9b12e4cd0f58c664b04154409=;
+PH SHA256=507a37b781aee277baf3d476f1e1249d8836978dc41350380c44754a3bc10e16=.
+Exact filenames/resource URLs remain in =2021-22/Documentation/SOURCE.org=.
+Evidence: =B/reports/1570-w5-questionnaire-cell-authority-20261110/=;
+B is the burst root recorded in =.coder/ledger/1570-w5-questionnaire-authority.md=.
+No macro/formula execution, external-link fetch, dependency install, native
+header/rows, Country/Feature, API/producer/cache or test/census run occurred.
