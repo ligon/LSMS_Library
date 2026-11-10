@@ -1,491 +1,201 @@
 #+title: Current LSMS-ISA goal handoff
-* Latest publication: Mali documentary PR1679 OPEN
-https://github.com/ligon/LSMS_Library/pull/1679
-headc0cb4c3c2e71e46c47ba1443222ebcabc2003186/tree3060380212a25a755685aa85e5a0632b5557090d;
-branchdocs/1436-mali-2017-state-authority-20261109, baseactualbb5f.
-W=/local/job40825266/worktrees/docs-1436-mali-2017-state-authority-20261109.
-Exactly MaliCONTENTS36lineappend + .coder/ledger/1436-mali-2017-state-document-authority.md;
-wholeold3708line/256787byteprefixexact, all19262otherobjects exactbase.
-Root reviewed both files/whitespace/source ancestry and proof, pushedGitHub0.
-R/1436-mali-2017-state-documentary-candidate-20261109 manifest50c6fbad210cd92afe21e6d7f32e5d2c98a7de602dced58aadb51752b8cc3dfa,
-ROOT-SOURCE-ADMISSION.json records personally reproduced conservation.
-Configured CI42722361292 RUNNING; do not call merged. Whole1436 remainsOPEN,
-publicbody links this documentation while maintaining exact remainingwork.
-No localtests/runtime/census needed for docsonly, configuredrequiredCI retained.
-Root owns eventual log/exact-tree preflight/merge/postverify/FSref.
-Source workers still1590(1032partialhandles+actualCountrystage+resolver),
-Mwi(1071approvedcoregateSOURCEimplementation),1452(1032independentreview,
-Mali docscompleted). Development stillbb5f/77merges/42closures.
+* Authoritative current checkpoint (2026-11-09, after PR1679)
+Goal ACTIVE/incomplete. Development4381d701ffb06ab447a37c66362119d1c1e23009;
+complete tree3060380212a25a755685aa85e5a0632b5557090d.
+78 verified development merges /42 whole issue closures. FS
+origin/handoff/isa-development-20261109 pushed exact4381, terminal0.
+No master release, shared harmonized-cache rebuild, raw acquisition,
+production sampling-weight changes or producer/admin contact.
+Root owns GH writes/publication/merges. Current root checkout is OLD-code
+DOCS branch docs/isa-sweep-20261103: NEVER execute LSMS runtime here.
+MAIN=/local/job40825266/venv_img/bin/python.
+B=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103;R=B/reports.
+Archive of all detailed earlier checkpoints (including failed attempts):
+[[file:archive/handoff-through-1679-20261109.org]]. Older state is historical.
 
-* Source work since verified PR1678
-#1071 concrete source charter ROOT-APPROVED as engineering contract, manifest
-364f71fe75ffe910268a2714ff00712141b0a321647a7df85e476e5f2889dea1 at
-R/1071-managed-cache-read-recovery-charter-20261109. First implementation is
-SOURCE-ONLY in /local/job40825266/worktrees/fix-1071-managed-cache-read-tranche-
-20261109, basebb5f. Four gate families only: YAML-wave, script-wave, normal
-country, both assumed-fresh branches/call-local miss+coverage handoff. Retain
-pd.read_parquet-only OSError/ArrowInvalid boundary; footer/index/null/strict/
-replay/fresh output/source errors stay fatal. Exact identity invalidation,
-coverage captured before rejection, no mtime reuse/recovery loop. No runtime
-yet. other_features/JSON-parquet/retiredstage/privateMake prerequisite owner
-routes explicitly deferred: no whole1071 closure from this tranche.
+* Actual workers and next actions
+All six prior remote country workers CLOSED/admitted; zero productive remotes.
+Do not call them eight busy workers. Four local slots total (root+3).
+- Root: review/grant1032 finite actual controls, source-review1071, queue/GH.
+- finish_1590:1032 actual finite operator LIVE, session30655; baseline witness
+  CLOSED0/1expectedPermissionError, candidate running with failures reported,
+  await terminalJUnit before classification; no source/reselection/retry.
+- malawi_revision_food:1071completecore+actual-route sourcee99b peerPASS;
+  preparing finite guardedoperator/sourcecomposition onto4381, UNRUN.
+- finish_1452:1071source/control qualifiedPASS e99b; now implementing932
+  selectedPRfull-data gate SOURCEONLY.1032source/carry reviews completedPASS.
+Use followup_task to wake completed agents; send_message alone does not wake.
+User authorized delegation/dispatch; do not fill slots with quota tasks.
 
-#1032 independent initial source review R/review-1032-readonly-dvc-runtime-
-source-20261109 MANIFEST-v1 3ac7abfcd5f3e76eec90b11ccaea92a27c377ed0441a1982600782f2ed4e4f5a.
-Concrete P2: constructor except deletes state while partial State SQLite
-handles can be open before CacheManager fails. ROOT authorized narrow child:
-close only actually initialized owned handles without triggering lazy attrs,
-retain diagnostic state if closure fails, preserve original constructionerror.
-No other P1/P2 found in41799 so far. Separate actualCountry stage control
-found genuine resolver prerequisite: installed valid detailed outs syntax
-{template:{cache:false}} was skipped by old path-only resolver beforeparams.
-ROOT authorized narrow key-form recognition preserving string/legacy path and
-actual DVC validation, no schema/parser framework. ActualCountry foreach
-success and unchanged fallback failures must be controlled; do not alter
-existing DvcException fallback policy. All source/tests UNRUN. Root requested
-one original installedDVC invented-readonly baseline witness plus finite new
-controls/existing1001/dvc_caching companions after finalsource/review/grant;
-no baselinecollector/allcountry/fullsuite. No runtime grant yet.
+* Verified merges completed in this continuation
+1677: merge d6044e280596988dac3a9b5bab78f4e5c9feb9d4, parents993+5377.
+CI42707971494 testedf05eceb41ad557d93cf1e714fd0bd1f28bf48346 with sameparents/
+tree3c6e9ae94e413e5d3dc44cc1cabfb3f07febe3b8. Unit13793P/5673S/4X;
+Windows362P/1S;6SKIP. R/ci-admission-1677-20261109.
+#1135 remainsOPEN, narrowed to complete-mover/physical cluster authority.
+13typed dated measurement records are delivered, not fresh sample audits.
 
-Mali1436 inventory complete R/1436-mali-2017-processing-authority-inventory-
-20261109 manifest794d156bff4e7015b4e8fbacf895c079100c39f2eeecbcc71a20d568731fb63b.
-Root additionally admitted ONLY two already-held public FrenchP2 pages29–30
-via existingPoppler/Cairo operator, one unshare childexit0/8.42s; source/copy
-known MD5/SHAprepostexact, no LSMS/native/provider/acquisition. Personally
-viewed both originalPNG: PDF29/printed28 Q7F13 includes THREE state choices
-and FOUR subcolumns ProductionenUML/UML/Etat/EquivalentenKg with NO printed
-letter suffixes. PDF30/printed29 Q7F21 independently yes/no threshing before
-storage. No code4Egrener/export/CAPI bridge; no recode justified. Detailed
-R/1436-mali-q13-q21-visual-check-20261109 manifest
-8983c996e7241a86890647077e3b2db8a1dfce3434c5d5b789e72aeed1d78841.
-Public1436updated own-wave authority residual. 1452 asked to append this new
-idiosyncrasy to MaliCONTENTS in separate SOURCE-ONLY docs W offbb5, ledgerfirst,
-exact oldprefix/allnonowned preservation, then finish1032independentreview.
-No countrymap/scientific choice or runtime permission in docs task.
+1678: mergebb5f4cca5fff139c3675a20096ecdb57205615d6, parentsd604+12d053c801638db6b5102b74407af5adf2747b32.
+Corrected CI42718759156 testedb4c7d5062ea78ada45d2d43fc9f0dac4d4a53309,
+sameparents/treed3c14182d9ebdd8f25e1671c9caef61073b12f58. Unit13806P/
+5673S/4X/692.55s;Windows362P/1S/11.98s;6optionalSKIP. Actual pre/post proofs
+R/ci-admission-1678-20261109. First Rootpreflight wrong expected testfilename
+failed; no mutation until corrected proofexit0. OriginalCI42709622704 was
+1F/13805P: handler fingerprint invariant. Repair adds ONLY established
+Country._legacy_can_build to explicit exclusions; orchestrator stillhashed,
+allCountry/tests exactoriginalfadf. Six unchanged focused controlsPASS.
+Corrected census82372 CLOSED0/127.855s:452country/1885wave/37BTF/0FIF vsBOTH
+failedstack6c6f and current1135/616457; all14otherfields/keys/18None exact.
+Map6bafa7a41dac811fd794d180ce151d20ad7db5f6c4248fab8afd1d0b2c971801.
+R/381-handler-fingerprint-ci-repair-20261109 FINALmanifest
+e8a04fc5558f3da8d0d2f61962012f37759479696c775f500ac9da6c68a61297.
+Independent repairPASS with PACKAGING QUALIFICATION: older nested FOCUSED
+manifest pins unavailable earlier REPORT.md; other18members exact, final
+manifest authenticates currentreport/all23. Do not reconstruct/replay or
+claim oldnestedmanifest fully authenticated. PublicPR/issue discloseit.
+#381 CLOSED: actualNepal defaultprobe58451 exit0/5.796s, precisebareRuntimeError,
+publicwarnings0/no forbiddendata/recipes; real metadata1Repo/1DVCFS/2make-n,
+private data/config0 and5metadatafiles separatelyinventoried. Armenia is
+SOURCE-only acceptance, not actual warning-count measurement. Zero-wave
+universe distinctcase is SOURCE-only. No actualdata-suite acceptance.
 
-* Latest authoritative checkpoint: PR1678 merged/postverified
-Goal ACTIVE. Development bb5f4cca5fff139c3675a20096ecdb57205615d6,
-complete treed3c14182d9ebdd8f25e1671c9caef61073b12f58;77 verified merges/
-42 whole closures. FS handoff ref pushed exactbb5f (terminal0).
-PR1678 actualparents d6044e280596988dac3a9b5bab78f4e5c9feb9d4 +
-12d053c801638db6b5102b74407af5adf2747b32; entiretree/parents EXACT CI checkout
-b4c7d5062ea78ada45d2d43fc9f0dac4d4a53309. Corrected CI42718759156 SUCCESS:
-unit129507016685 13806P/5673S/4X/692.55s, Windows129507016280
-362P/1S/11.98s, six optional SKIP. OriginalfailedCI remains preserved.
-R/ci-admission-1678-20261109 has logs/run/PREMERGE-corrected and POSTMERGE-
-corrected. First Root preflight failed an incorrect expected test filename;
-NO mutation followed that failure. Erratum preserved; corrected exact four-
-path assertion and all other checks PASSED exit0 before merge. Actual test
-path is tests/test_gh381_unwired_table_diagnostic.py. No weakening/test replay.
-#381 CLOSED after independent bounded original-requirement audit + actual
-Nepal default probe + Armenia source-only acceptance + merge proof. Public
-PR/body retains failedCI, focused39+13 history, six repair controls, corrected
-452/1885/37/0 cost and nested oldREPORT qualification. No actual data-suite
-acceptance, zero-wave-universe distinct runtime test, master release or shared
-cache rebuild claimed. #1135 remains OPEN and narrowed; delivered dated records
-are not fresh measurements.
+1679: merge4381d701ffb06ab447a37c66362119d1c1e23009, parentsbb5f+c0cb4c3c2e71e46c47ba1443222ebcabc2003186.
+CI42722361292 testedc9c3c43b5dc4b1bbfa39657b8d92ec2563f93e50 with sameparents/
+tree3060380212a25a755685aa85e5a0632b5557090d. Unit13806P/5673S/4X/771.56s;
+Windows362P/1S/16.67s;6optionalSKIP. R/ci-admission-1679-20261109 allpre/post
+proofs/logs. Docsonly36lineMaliCONTENTSappend+ledger; full3708line/256787byte
+oldprefix/all19262otherobjects exactbb5f. #1436 remainsOPEN/publicnarrowed.
+Root personally rendered/viewed ONLY heldFrenchP2 PDF29–30 (printed28–29),
+knownSHAe6749a01/MD55ebb8d49; unsharechild0/8.42s/sourceprepostexact.
+Q13 THREEstatechoices, FOUR unletteredsubcolumns ProductionenUML/UML/Etat/
+EquivalentenKg; Q21 separately yes/no threshing. Nativecode4Egrener still
+has NO own-release/form/CAPI/export bridge; no recode justified.
+R/1436-mali-q13-q21-visual-check-20261109 manifest8983c996e7241a86890647077e3b2db8a1dfce3434c5d5b789e72aeed1d78841.
 
-#932 public title/body narrowed; three official-source constraints now verified:
-user-owned repo cannot use merge queues; conditionally skipped jobs satisfy
-requiredchecks; workflow_dispatch JOB checks do not satisfy required PRchecks.
-Context-only PUT and existing manualdispatch alone are insufficient; no admin
-change/data trigger. Historical full data run42698613061 FAILED on097283459,
-metadata-only observation, not current-development test result.
-#1436 public body now reconciles merged1553/1563/1582 and preserves original;
-current residual Mali2017 own-state authority and missing2021 integrations,
-plus explicit out-of-eight GNB authority. No repeated old condition/rung patch.
+*1032 current source and finite execution gate
+Originalauthorf47 ledger-only over peerPASS0eac; witness-movechild95de9dddec85912ffc2c55e3bf0c17507fbc613d.
+CURRENTCOMBINEDcd61124c6b6686dcf166864f6588ea140828ce88/tree5002944592b94c0df49377b0c93f4a864fc5abfe;
+parents[bb5f,95de], W=/local/job40825266/worktrees/publish-1032-on-current-bb5-v2-20261109.
+Sixowned: new_dvc_runtime.py,local_tools.py,country.py,new1032tests,existing1001
+fixture,ownledger. All19260nonowned exactbb5; fiveunshared taskobjects exact
+author; removingreviewed1032hunks makes entireCountry byteexactbb5. Current
+381guard/registry/tests preserved; newguards+resolver must be tested together.
+New4381 differs frombb5 ONLY MaliCONTENTS/ledger, so don'treruncontrols merely
+for doccomposition; prove exact code/source carry when needed.
 
-#1032 source prototype41799b383 now frozen (full SHA forthcoming); six owned
-paths include _dvc_runtime.py, country.py, local_tools.py, new1032 tests,
-existing1001 fixture and ownledger. Base d604; UNRUN. Root reviewed ~200line
-adapter and controls; requested source-only child tests for ACTUAL Country
-materialize stage success/failure, since original stage controls invoke Stage
-directly and Countrycold control has stages:{}. No runtime grant yet.
-finish_1590 owns this; malawi_revision_food1071 source charter;
-finish_1452 completes1436 held-text binding inventory; all three RUNNING,
-zero productive remotes. Root owns queue/review/publication. Earlier live
-CI status below is superseded by this completed checkpoint.
+Adapter uses public suppliedRepo and explicitly PRIVATE tmp/SCM/lazy hooks.
+Live lexicalroot/config.local/relative remotes and SCM tracked-output check
+preserved; managedL1 bothlayouts unchanged. Runtime metadata is existing
+DVC_SITE_CACHE_DIR or standard ownercache, not require writabledata_root.
+Stablelocks within SAME metadata context; different explicitcontexts partition
+locks (no cross-context guarantee). PIDownedstate cleanup/forkproviderreset.
+Initial41799 P2 corrected: partial State SQLite mustclose before removal;
+cleanup failures preserve originalcause and honest retainedstate, no hidden
+finalizerretry. Narrowresolver extension supports valid detailedouts key form
+when legacy'path'key absent; oldNone skip/17error retained, realDVC validates.
+No newdependencyrange/exactversionpin; actualinspected3.67.1, capabilityrange
+>=3.67,<4 not a tested-allversionsclaim. No whole1032 outcome/footprint yet.
+Independent R/review-1032-readonly-dvc-runtime-source-20261109:
+initialP2 retained; v2manifest98d9537263130ca77c8527e576a80c76d257e3a7db8cf3642c0f0d4eaa7d09cf;
+currentcarry7189a55fba94804f09c9580f28e37c707e6dee100264b95ec635f4442ad77f68 PASS.
 
-* Authoritative checkpoint: corrected PR1678 CI, 2026-11-09
-This section supersedes older live/preparation statuses below. Goal ACTIVE.
-Development d6044e280596988dac3a9b5bab78f4e5c9feb9d4; tree
-3c6e9ae94e413e5d3dc44cc1cabfb3f07febe3b8. 76 verified merges/41 whole
-closures. FS origin/handoff/isa-development-20261109 pushed exact d604.
-PR1677 MERGED/postverified: CI42707971494 tested f05eceb41ad557d93cf1e714fd0bd1f28bf48346,
-actual merge d604 has exact tested parents/tree. Unit13793P/5673S/4X;
-Windows362P/1S; six optional SKIP. R/ci-admission-1677-20261109.
-#1135 remains OPEN, public title/body narrowed to complete-mover and physical-
-cluster measurements; delivered typed dated measurements are not fresh audits.
+Finitepacket R/1032-readonly-dvc-prototype-finite-20261109 readbyRoot:
+RUNPLAN/COVERAGE/SELECTION/run-focused.py/identity_plugin.py/externalwitness.
+OriginalDVC witness is OUTSIDE shippedtests, separately selected/result,
+then onecandidatecohort: newcontrols,fake-only1001,5DVCcompanions,2current381
+stagechecks. MAIN/privateconfig/L1/tmp, falsecreds/noauto-unlock, sourceidentities,
+-n2/loadfile, socket/acquisitionblocked, intended syntheticlocalDVC I/Oallowed.
+No fullsuite/census/native/countryAPI/sourceacquisition. Stoponfailure/no retry.
+IMPORTANT caught beforelaunch: `unshare -rn` mapsEUID0 and wouldskip readonly
+controls. ROOTgranted only ONE tiny operatorpreflight for nonroot UID/real
+readonlywritefailure/differentnetnamespace, noLSMS/tests/provider. Installed
+unshare lacks--map-current-user; author now testing `unshare --user --net`
+without-rootmapping. If fails, baseline/candidateremainheld. Correct operator/
+UIDassertions must be readbyRoot before testgrant. Tests/collection UNRUN;
+no testactor launched yet. Do not claim sourcePASS is runtimeacceptance.
 
-PR1678 OPEN corrected head12d053c801638db6b5102b74407af5adf2747b32,
-treed3c14182d9ebdd8f25e1671c9caef61073b12f58. GitHub+FS pushes completed0.
-NEW CI42718759156: Windows129507016280 SUCCESS; unit129507016685 RUNNING;
-six optional jobs SKIPPED. Original CI42709622704 FAILED:1F/13805P/5673S/4X,
-sole test_no_handler_edit_can_move_a_build_fingerprint. Existing availability
-handler Country._legacy_can_build entered build closure via the new guard.
-Root authorized ONLY adding this established non-content handler to explicit
-exclusions, not weakening invariant or excluding the orchestrator. Product
-fixa0f84b50fffc4eeb7496c805779b1a8c1cd69982; final12d ledger-only child.
-Entire Country and ALL tests exact originalfadf; all19262 nonledger objects
-exacta0f84. Six unchanged focused controls PASS, actor77879 closed0/13.854s.
-One corrected combined census82372 CLOSED0/127.855s:452country/1885wave/
-37BTF/0FIF changes versus BOTH original failed-stack6c6f and current1135
-616457 maps; all14 other fields/keys/18None exact,E0D0/private0.
-Corrected map6bafa7a41dac811fd794d180ce151d20ad7db5f6c4248fab8afd1d0b2c971801.
-R/381-handler-fingerprint-ci-repair-20261109 FINAL-MANIFEST
- e8a04fc5558f3da8d0d2f61962012f37759479696c775f500ac9da6c68a61297.
-Root source admission R/381-unwired-stacked-publication-20261109/
-ROOT-CI-REPAIR-ADMISSION.json; independent review R/review-381-optional-make-
-stderr-20261109/handler-fingerprint-repair-v1 manifest
- e1f0f3dbff48e44b415fb12d9bb048758ab7ffb0c92b2c35ad467c8fc7cd8f96 PASS
-WITH PACKAGING QUALIFICATION: final manifest authenticates all23 members;
-nested older FOCUSED manifest authenticates18/19, but pins an unavailable
-previous REPORT.md version. Current report is final-manifest-bound. Do not
-claim full old nested manifest, reconstruct lost report or replay runtime.
-Root accepts this qualification; source/test/runtime receipts authenticate.
+*1071 source tranche, current review
+Rootapproved concrete R/1071-managed-cache-read-recovery-charter-20261109
+manifest364f71fe75ffe910268a2714ff00712141b0a321647a7df85e476e5f2889dea1.
+First coherenttranche ONLY YAMLwave/scriptwave/normalcountry/bothassumedfresh
+cachegates+calllocalmisscoveragehandoff. Initial pd.read_parquet OSError/
+ArrowInvalid only, accurate unreadablecondition, no physicaldamageclaim.
+Footer/index/null/map/grain/date/strict1066replay and freshoutput/source/
+recipeerrors remainoutsidecatch. One normalrecovery per preexistingartifact;
+savedcoverage beforeexactentryinvalidation. No raw/L1/symlinktarget/replacement
+intentionaldeletion, no schema/exclusions/registry/newdecoder. Tiny ordinary
+lstat→unlinkrace remains; neverclaim atomiccompare-and-unlink.
 
-Original Nepal default acceptance actually PASSED on immutable f5924b:
-one child58451 closed0/5.796s, real Country('Nepal').food_expenditures(),
-default DVC backend, precise bare RuntimeError about current wiring,
-public warnings0/logs empty/forbidden operations0/private data-config0.
-Real metadata1Repo+1DVCFS+2make-n; five metadata files inventoried separately.
-No raw/header/parquet/provider DATA/actual recipes. R/381-nepal-default-probe-
-plan-20261109 final manifestdcb642eaf3c38a78d7d42acd0315aa4b12dfbed76d82c7bf1ddf9fd83ad0bba6.
-Armenia source-only audit distinguishes absent1996 from held2001-17 unwired;
-current derived unregistered route is one clear unsupported warning+empty,
-Feature food discovery excludes it. No actual Armenia runtime count claimed.
-Independent original requirement audit recommends bounded whole381 closure
-ONLY after corrected CI and exact actual merge verification. Never infer
-upstream absence or claim zero-wave-universe distinct case runtime tested.
+W=/local/job40825266/worktrees/fix-1071-managed-cache-read-tranche-20261109,
+basebb5f, ledgerfirst556fd. Originalfreeze4c9667d0d975dfb41c846162a4e2032a6cd16280;
+enginecorrection1805f8ba8c25da1bf601bacb8552ff1e5c6fa453/tree5e2d6508dfc04b3d7629455f12ad84758432877b.
+9owned/all19256others exactbb5. Newhelper24lines; Countryformerget_df reads
+explicitpyarrow preserved, Waveomittedengine unchanged; genericdecoder/writer
+unchanged. Shared private_make_build_root Othercaller optsout, retaining exact
+olddecoder+outererrorpolicy/no liveOtherdeletion/no newprereqhealing.
+YAML evictiondenial retains productiveRAMbuild+existingwritewarning.
+Other_features/JSONparquet/retiredstage/privateMakeprereqowners DEFERRED;
+firsttranche doesnotclosewhole1071. 1452sourcequalifiedPASS1805, no P1/P2;
+a stale mockkwargfinding retracted after exact1805recheck (alreadyfixed).
+Author now adds SOURCE-ONLY actualMakeforce/mtime/healthy7-once/warm0/freshbad/
+exit7/no-output controls +ordinarynormalcountry/legacyassumedfull recovery.
+Wave's existingexit0/nooutput warning+empty/missing is retained; actualCountry
+must terminalfail/no falsecoverage with its existingfallbacks. No newfailure
+policy to satisfytests. Wait immutabletestchild/review before boundedruntime.
 
-Current actual workers: finish_1590 #1032 SOURCE-ONLY adapter prototype;
-malawi_revision_food resumed #1071 SOURCE-ONLY unreadable-managed-Parquet
-charter; finish_1452 now #1436 Mali2017 SOURCE-ONLY document/operand binding
-inventory. Root owns CI/publication/merges/queue. All six earlier country
-remotes CLOSED/admitted; zero productive remotes, not eight busy workers.
-#1032 W=fix-1032-readonly-runtime-prototype-20261109, based actuald604,
-ledgerfirst945a18a84. No runtime yet. Reuse source live workingtree/sidecars/
-SCM guards, managedL1, public supplied-Repo path + honest protected hooks.
-Stable cooperating process locks, PID-owned state cleanup, readonly-L1 reader
-must work; metadata under existing DVC_SITE_CACHE_DIR or owner cache, not
-require writabledata_root. Preserve >=3.67,<4 structural compatible support;
-no exact-version blanket refusal. Root review frozen prototype before runtime.
-#1071 no implementation/runtime; preserve wave coverage before eviction,
-normal bounded rebuild, exact phase/class ownership and fatal fresh-output/
-raw/user/schema/strict/source/recipe failures. No corruption-by-message claim.
+*932 policy SELECTED by user; implementation started
+Root usedprimaryofficialGitHubdocs+actualrepometadata/ruleset25124452:
+User-ownedpublicrepo cannotusemergequeues; skippedjobs satisfyrequiredchecks;
+workflow_dispatch JOB checks do notsatisfyPR requiredcontexts. Oldcontext-only
+PUT andexistingdispatchalone are insufficient. No settings/dataworkflowtrigger.
+Merged1049 deliverednightly/disclosure/merge_group; public932 narrowed with
+fullhistory. Observeddata run42698613061 FAILED onolder097283459, notcurrent
+acceptance. Onlyjob/steps metadataread, no private data logs acquired.
+ConcreteSOURCEproposal R/932-compatible-pr-data-gate-policy-20261109/PROPOSAL.md
+manifest89c165d8283877c018bab72a625bf4daffd9c1bcdee88b418d6ce934ac114aef.
+Recommends A: dedicatedPR-only unique requiredcheck, explicitfailineligible
+(draft/fork), exactsyntheticmerge/full existingprivaterecipe, strictbasefreshness;
+1–2h perrevision/baseadvance. Bmaintainereligiblelabel-event needsfutureactor/
+latestcontextproof; advisorynightly deliberateC alsopossible. ProposedPUTonly
+addsuniquecontext+strictfalse→true, preservesotherrules/bypass; NOTapplied.
+USER ANSWERED: REQUIRE FULL DATA VALIDATION ON EVERY READY DEVELOPMENT PR.
+OptionA selected; policyhold superseded. Necessary uniquecontext+strictfreshness
+enforcement is authorized after concrete source/checkwiringreview; no reask.
+Root delegated SOURCE-ONLY workflow implementation tofinish_1452 in separateW
+off4381, ledgerfirst. Correctexistingfalsequeueclaims, preserveotherjobs/rules.
+No settings/data triggers at decision time; Root owns laterpublication/readiness/
+settings after review. No full data run or admin mutation byworkers.
 
-#932 reconciliation:1049 merged3ff6ddf60ca2bbcef2c595a51d3aee5b31d51ba6;
-cron/disclosure/merge_group present even master. Ruleset25124452 onlyunit-tests,
-no merge_queue; appending data-tests alone is NOT sufficient. Repo public and
-owner_type User; current GitHub docs restrict merge queues to organization
-repositories and skipped required jobs count success. Thus old proposed PUT
-is NOT approved/NOT a viable complete repair. Official docs also say workflow_dispatch job checks do not satisfy required
-PR checks; existing manual dispatch alone is not an enforcement fix. Need a
-compatible concrete policy proposal; no rules/settings/secrets/data-workflow mutation authorized here.
-Official sources: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue
-and https://docs.github.com/en/pull-requests/reference/status-checks .
-Retained data run42698613061/job129437041346 now CLOSED FAILURE on older
-097283459f80016b0f00a51b814a0cb964a42789; full-test step failed, unit/build
-Uganda/gate-open steps succeeded. Metadata-only, no test failure diagnosis
-or current-development result claimed. No new data job triggered. Public932
-now narrowed with official docs and preserved full original history. Platform
-metadata is retained in .sucoder/932-platform-check-20261109.json. R/scrum-next-backlog-993-20261109
-has sealed source triage and old proposed payload, NOT applied.
+* Standing pending boundaries and recovery
+#1066 userchoice NORMALwarning/reportreplay+normalstrictrefusal implemented,
+merged1674/50a927 andCLOSED; do notreask orreopenhold. Earlier49borrow,
+50maizeflour(final, supersedingmilling-service discussion) and51nodateclamp remainrecorded in isa-decisions.org.
+#48 investigation: jointinclusionnotidentified frommarginalweights; no
+productionweights. Other scientific/authoritychoices remainheld in decision
+log (1575stratawiring,1190carrier/thirdgate,1562same-releasecoping,1604weights,
+1509eligibility/1559reference,1116provenanceprecedence). Do notinventdefaults.
+Neverinspect nativeSDK/home/state/transcripts/opaque runtimepayloads. Supported
+status and declaredsource/evidence artifacts only. RequiredCI skips are not
+passes. Check preflight EXIT0 BEFORE merge, then exactactualparents/tree and
+push FS handoffref. Capture identity/receipts on one handle to terminal; no
+silent rerun/rewarm, no broadtests once appropriatechecks pass.
 
-NEXT: update1678/#381 public status; poll SAME new CI, download actual logs,
-prove actual checkout/tree and prospective merge before mutation, inspect
-preflight exit0, merge expectedhead12d if gates pass, postverify/pushFS.
-Then close bounded381 preserving original history/actual-vs-source limits;
-counts would become77/42. Continue1032/1071 source review,1436 inventory.
-No master release/shared-cache rebuild/raw acquisition/weights/provider contact.
+* Latest1032 actual execution (supersedes earlier UNRUN plan)
+Corrected namespacepreflight CLOSED0/0.108s: `unshare --user --net`, unmapped
+UID/EUID/GID65534 with EMPTYuid_map, host43292, distinctnetworknamespace,
+real invented0400 write deniedEACCES13. Root read exactreceipt/operatordelta,
+authenticatedall10members of finalmanifest7867b2606d887470bf1040613b4c86aac82d3c98ab7029cc1d32e1f6c5af98a8,
+checkedcd611clean/Pabsent, wroteROOT-GRANT.json. Workerfollowupactivated.
+Exactoperator under timeout900 launchedONCE execsession30655. Baseline witness
+CLOSED0/33.166s,1expected originalPermissionError13, not candidatePASS; three
+identities confirm65534/emptyuidmap/distinctnet/DVC3.67.1/sourceclean/bindings
+exact/top-levelconfigdata0. Candidatecohort nowLIVE WITH FAILURESreported in
+progress. Keep samehandle immutable to terminal, classifyactualJUnit/logs;
+NO auto repair/reselection/retry and NOcensus/PR/runtimeacceptanceyet.
 
-* Latest authoritative addendum: after publishing PR1677
-Goal ACTIVE. Main remains99318fdfb959db07eede83c8000bf7ee0bed30d7;
-75 verified merges/41 whole closures. All PRs through1676 merged/postverified.
-Root docs/handoff consolidation commitfe95bc5af is published; this addendum
-supersedes the preparation/live states in the checkpoint below.
-
-#1135 FINAL5377a0734145c1ef4aa2d38ba8679ecd9bc38b78,
-tree3c6e9ae94e413e5d3dc44cc1cabfb3f07febe3b8; final ledger-only over measured59f8aa96,
-all19260 nonledger objects exact. R/1135-current993-final-release-20261109,
-manifest38649996ffb394ecb171038a772d1b5e87373d626301e7618bf3f72bec20d612.
-The sole metadata actor8426 CLOSED0/127.411s: zero changes all452country/
-1903wave/37BTF/186FIF maps,14 nonhash fields, keys and18None; errors0/denials0/
-private0/source clean. Candidate mapSHA616457913caf00a9684c6238c0d3dadf02ecf464da1c05be46f5ad10a39548cc.
-R/1135-current993-metadata-20261109 closed manifest1ba331d2985c8c841efdb731853371fbf7aaa1b1933e616725143543f1725b5b.
-Independent closed-test/final author carry PASS at R/review-1135-shared-interim-source-
-20261109/closed-test-carry-v1, manifest96c689b81a008ce7fabae4dc64def3c4beb7cc7a2416688309b926e70e2eb632.
-Root personally proved final16 owned objects/all19245 others exact993, sampling
-exact985/test exactc207 and direct raw JSON equality except header. Proof:
-R/1135-root-publication-20261109/ROOT-SOURCE-ADMISSION.json.
-
-PR1677 OPEN https://github.com/ligon/LSMS_Library/pull/1677
-head5377 as above, branchpublish/1135-on-current993-20261109, base993.
-Author FS push already0; Root GitHub push0. CI42707971494 actual live now:
-Windows129469709106 SUCCESS; unit129469709716 RUNNING; six optional SKIP.
-NEXT ROOT poll this exact CI, download actual logs, check exact head/source/
-tested tree and prospective current merge, then merge/postverify if all gates
-pass. NO full local suite or old cohort/census replay. Whole1135 stays OPEN
-for complete-mover/physical cluster authority; public body updated PR/current
-199P1F+targeted2P/zero footprint. Use Addresses, not automatic whole closure.
-
-#381 UX standalone finalf5924b10807794f523c719a08609e44a67ce6c7d,
-tree7bb28b7fcb497996d010336825b6d16edaead4a1, ledger-only17 lines over measured
- ef162ffc4bbc27ed88ffdf5c0ca954f7e866df1d; all19255 nonledger exact.
-R/381-unwired-table-current-publication-20261109 FINAL-MANIFEST
-87030fb254b3f2be87475316e88346a1ff3555fb69b82d6180acea970bdb77e6.
-Sole standalone actor71261 CLOSED0/129.385s:452country/1885wave/37BTF/0FIF
-changes vs baselinef3fa, full14 other fields/keys/18None exact, private0/E0D0,
-source clean. CandidateSHA07dcbaaf0a4bc61b2fc9943dc46b9d1cbaa8b7da999eaa77697fcc71684e3e81.
-No source or tests beyond import-only702b after reviewed908274.
-
-ROOT prepared STACKED PUBLICATION fadf00bda0c711bd18573892f1e5d166498e3880,
-tree1b1ed3d5bbe66755fe5e8c28cc5db546ab69497b = exact5377 + exactf592.
-W=/local/job40825266/worktrees/publish-381-unwired-after-measurements-20261109,
-branchpublish/381-unwired-after-measurements-20261109. NOT PUSHED/NO PR YET.
-R/381-unwired-stacked-publication-20261109/ROOT-SOURCE-UNION.json proves16
-inherited1677 objects +3 UX objects, all19244 others exact993.
-Because two runtime changes are composed, Root granted ONE ADDITIONAL joint
-candidate-only census, not a sum of standalone hash counts. Actual actor42123
-is LIVE on immutablefadf, Mwi owns same handle through terminal. R/.../metadata
-holds both unchanged original closed baselines: UX07dc/header ef162 and
-currentf3fa/header5ad2. Compare full four maps/14 fields/keys/18None against
-BOTH; no baseline collector, tests, data or provider replay. Do not mutate
-this frozen head/ledger during collection. Add evidence outside source.
-After joint outcome/source/private0/complete comparisons and final source
-review, Root may push/open the next PR stacked on1677; actual merge must
-match the complete CI-tested tree even if base advanced through inherited
-1677. No required check/code difference can be skipped. Current only1677 is
-open for these two lanes; do not call the unpublished stack a PR.
-
-NEPAL ORIGINAL-CASE PROBE: Mwi is PREPARING, NOT RUNNING, one bounded real-
-metadata negative integration query on immutable standalonef592. Root first
-mis-specified Country(use_dvc=False), but constructor has NO such parameter;
-that was caught before execution and is corrected. Supported plan must use
-Country('Nepal').food_expenditures(), actual DEFAULT dvc backend and default
-constructor flags. Source-inspect route first. Fresh empty private roots,
-false credentials/unshare and actual leaf-name guards; normal local Repo/
-stage/config inspection may proceed (metadata-only factory construction
-recorded separately). NO raw/header/parquet reads/writes, remote/provider
-DATA requests, streaming, producers or actual Make recipes; existing make -n
-metadata inspection only. One child/max120s, no baseline/API replay/retry.
-If default necessarily requires forbidden data access, report before launch.
-Do not stub a provider or switch backend to manufacture a default-path pass.
-Mwi must send frozen supported-API operator/plan for Root review; it is NOT
-launch-approved yet. This probes the original named Nepal wiring case;
-prior synthetic52-case controls do not establish actual Nepal warning count.
-No whole381 closure before the original residual is actually verified/merged.
-
-Current local assignments: Root publication/CI/queue; Mwi joint census42123+
-UNRUN Nepal plan; finish_1590 finished1135 source/metadata, no live actor;
-finish_1452 finished1135 independent closed-evidence carry, no live execution.
-All six remote country workers remain CLOSED/admitted. Zero productive
-remotes; no replacement/replay or quota tasks. Completed reviewers require
-followup_task to reactivate: send_message alone does NOT wake them. A missed
-wake caused a real review delay this turn; Root corrected it and personally
-reviewed c207 before launching the two affected controls.
-
-* Authoritative checkpoint: 2026-11-09, after PR #1676
-The goal is ACTIVE and incomplete. This goal turn made concrete progress:
-three PRs merged (#1674–1676), #1066 closed, six country workers returned
-verified source, and two additional shared fixes passed focused controls.
-Development: 99318fdfb959db07eede83c8000bf7ee0bed30d7.
-Complete tree: d606b6c0b915953f5a4a84c2e4d37bd163dba29a.
-Cumulative counts: 75 verified development merges, 41 whole issue closures.
-Filesystem ref origin/handoff/isa-development-20261109 was pushed to exact993.
-
-Root checkout is OLD-code docs branch docs/isa-sweep-20261103: never execute
-library runtime here. MAIN=/local/job40825266/venv_img/bin/python.
-B=/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103.
-R=B/reports; Q=B/country-workers-refill-20261108.
-The full earlier handoff is preserved at
-[[file:archive/handoff-before-1676-20261109.org]]. Read its dated sections only
-when their evidence is needed; older live statuses are superseded here.
-
-No master release, shared harmonized cache rebuild, raw acquisition,
-production sampling-weight change or external producer/admin contact.
-Root owns GitHub mutations, merges and final publication. Workers publish
-private source/evidence through filesystem Git only. Use exact cwd/PYTHONPATH/
-countries-root identity, MAIN, thread/build1, private data/config roots,
-ordinary source-free guards, no optional DIAG environment. Never read native
-home/state/SDK transcripts or opaque runtime bodies. Supported status and the
-five declared source/evidence artifacts are allowed. Count actual execution,
-not reservations, watchers or completed workers. Four local slots total.
-
-* Three newly verified merges
-- #1674: actual50a927d69fcba3497b6956f7c5dff55004d42590; parents79f/c9885ba4.
-  Tree ceda3a17c1754ff7cf485d20791fd92ec1c0260c. CI42698354320 tested
-  6c4e90d75a23a74e23ea9061d057bce4e7f47991, exact parents/tree.
-  Unit13699P/5661S/4X/792.44s; Windows362P/1S/14.93s; six optional jobs SKIP.
-  R/ci-admission-1674-20261109 has logs and successful PREMERGE/POSTMERGE.
-  #1066 CLOSED after full criteria audit: explicit user choice is normal
-  stored grain warning/report replay AND existing strict refusal. Both hit
-  branches, wave filtering, normal grain-before-date order; no freshness,
-  probe, rebuild or write added. Focused15candidate+2baseline witnesses;
-  four maps/14 other fields unchanged. Original baseline staging mistake
-  retained and corrected without a collector restart. isa-decisions records it.
-- #1675: actual7098b0316c5df656ac3531252aad915f18e0d79d; parents50a927/2ba8042.
-  Tree aa4f5882efc9414b4daba52500e1411a7cf3d38d. CI42701142623 tested
-  4d2cac5ff6b4174eb46a880214afbb5f78073d7a, exact parents/tree.
-  Unit13699P/5661S/4X/1115.23s; Windows362P/1S/12.21s; six SKIP.
-  R/ci-admission-1675-20261109 logs/PREMERGE/POSTMERGE. Four DOC objects only:
-  Ethiopia9c277493 and Nigerda7a0047 notes+ledgers. Original4652/3521-line
-  prefixes and all runtime/config/tests preserved. Independent review and
-  whole source carry closed. #1570/#1530 remain OPEN; bodies/PR updated merged.
-- #1676: actual99318fdfb959db07eede83c8000bf7ee0bed30d7; actual parents7098/6eb3.
-  CI42702898260 tested17f2c3a15370dd8067d23dc77b9351ca11149bc1 with parents50a927/6eb3.
-  ENTIRE tested, prospective and actual trees equal d606b6c0... despite the
-  different base parent: #1675's exact documents were already in tested6eb3.
-  Root proved git merge-tree(7098,6eb3) equals the CI tree before merging.
-  Unit13709P/5661S/4X/829.91s; Windows362P/1S/15.58s; six SKIP.
-  R/ci-admission-1676-20261109 records both parent sets, logs and PRE/POSTMERGE.
-  Missing requested Make targets alone become quiet; genuine failures,
-  stderr, missing Make, strict causes and final absent-output error remain.
-  Legacy stderr buffers per child, stdout/locale policy unchanged. Four own
-  objects exact49afe57f; independent review closed. 35 initial focused passes
-  plus one corrected all-absent oracle pass, not one36-green run. Earlier
-  external tripwire setup errors/oracle failure retained. Actual footprint:
-  452country/1885wave/37BTF/0FIF changes; all14 other fields/keys/18None exact.
-  No shared cache rebuild. #381 stays OPEN and is narrowed to the next item.
-
-* Lane A: #1135 typed measurements — metadata preparation
-Final tested source:2e6280057fafa1b317dce1c82a97c067b0ab6b42,
-ledger-only over testedc207be90e3066d7351456b76b0e633adf92e4ae2.
-Shared production exact985974ac; all13 records exact source-e4dafe96177fa9bba686f09b8bb1c53e126abbdd.
-Exactly16 owned paths: sampling.py, test_sampling.py, seven sampling.yml,
-shared task ledger and six country-worker ledgers. All nonmeasurement config
-bytes remain exact baseline. Current #1541, SPAN/no-threshold/strict/nesting,
-attrs/Feature propagation and whole SchemeLoader semantics retained except
-explicit approved decimal-integer spelling policy. Historical old238 tests,
-mutants and zero hashes are NOT current acceptance evidence.
-
-Six remote country workers all CLOSED/native0/supervisor0; no productive
-remotes remain. Jobs41055343 Ethiopia,348 GhanaLSS,345 Niger,344 Nigeria,
-346 Tanzania,347 Uganda. Each completed full own CONTENTS grounding, own
-sampling.yml+ledger only, insert-only preservation and exact nonowned source.
-R/1135-country-source-admission-20261109 has six ADMISSION packets; actual
-source custody/five artifacts authenticated. Q/private/1135-country-config-
-shared-context-79f-20261109 has registry/schema/rolling terminal state.
-Shared/Burkina author is finish_1590. Owner source heads were96769ba6,
-def5066f,378f659e,b3e336fa,aff88eec,56cdb4b6; full SHAs in admissions.
-
-Counts are dated provenance-bearing measurements, NOT fresh sample audits.
-Nigeria uses1454/54/K1 and4736/267/Kunknown from2026-11-04; net both unknown.
-No old1493/79,5067/343/K11 or conditional mover bounds promoted as current.
-Tanzania300/130 prose, Uganda EA/design/historical scope and BFA EMC_ retained.
-Original source-only stale curated count/provenance oracles were corrected;
-original985 freeze/P2 and bbc3/a472 correction proofs remain.
-
-Closed original cohort on e4dafe: 200 unique cases =199PASS/1FAIL. Sole failure
-was an obsolete universal-measurement oracle: current Mali2018-19 has no
-measurement, which is permitted by the approved optional/unknown contract.
-Root reviewed test-onlyc207: exact13 curated keys and a new real-metadata/
-synthetic-frame Mali control of unknown warning, SPAN, strict/report and
-unchanged frame. Production/all13 records exact; other test AST exact.
-ONLY two affected controls ran afterward, actor59523 CLOSED0/2PASS/7.01s,
-three identities/zero provider-network calls/private0. Do not call this a
-fresh201-green run. Original199P1F immutable. Evidence:
-R/1135-current-focused-e4daf-20261109 (closed manifest649ec602...),
-R/1135-optional-oracle-correction-source-20261109/ROOT-SOURCE-REVIEW.json,
-R/1135-optional-oracle-two-controls-20261109 (closed manifest4cbf07d3...),
-R/1135-final-tested-source-20261109 (manifest09f3a7ff...).
-Independent source review of e4dafe passed; finish_1452 now authenticates the
-closed actual evidence/final test/ledger carry, no new execution.
-
-CURRENT integrated source59f8aa96ca0c4008ce769bc9a18bdbeca26d4467,
-tree d9a9adab0256469523671fe988cca26919d72f7d, parents[actual993,2e628].
-W=/local/job40825266/worktrees/publish-1135-on-current993-20261109.
-All16 own objects exact author, all19245 other objects exact993.
-R/1135-current993-composition-20261109 (manifest4baf6d77...).
-finish_1590 is PREPARING the ONE authorized candidate-only metadata collector;
-actual handle not yet reported. Source must stay immutable through collection.
-Expected zero impact must be MEASURED. No baseline replay or test rerun.
-After terminal/source/private0/complete comparison: ledger-only finalization,
-Root final source review/publication, independent carry, configured CI.
-Addresses #1135: complete-mover/physical-cluster measurement residuals remain
-OPEN. Current public issue separates them from this engineering port.
-
-* Lane B: #381 precise unwired-table diagnostic — metadata LIVE
-Old no-source-country shortcut is unsupported. Source-only findings:
-Nepal food is country-registered but unwired in all3 waves; Armenia1996 is
-not its held2001–17 data; data_available:false is only a test skip flag.
-Current #381 title/body correctly track wiring absence, not upstream absence.
-
-Author finala3dd96bb7cc4ab30d0d8ca1b1f772074d2787c00 is ledger-only over
-702b3b8e6fa1dfc61309646aa09d088e7e1ddcdb; production exactreviewed
-908274bca1009d9e4368a2a4b03a8ea8167a520b on6eb3.
-Only23 production lines: after supported-subset empty return and covered
-cache hits, full nonempty registered ordinary tables with no legacy builder
-and no singleton DVC stages receive precise RuntimeError of absent configured
-wiring. Inspection uncertainty, actual source/config/recipe failures,
-partial/standalone/countrywide DVC stages, JSON and private input prep retain
-old routes. No country allowlist, runtime data_available policy, new error
-class, data/default/weight change or acquisition claim. Bool(waves) protects
-the zero-wave full-universe stage route. That exact edge is SOURCE-proven;
-the empty-selection runtime case uses a nonempty universe.
-
-Focused original14914:39 companions PASS + new-module COLLECTION ERROR before
-13 bodies (test import lacked tests. qualifier). Sole import-line child702b
-verified actual helper AST names. ONLY13 previously unexecuted cases reran,
-actor6370 CLOSED0/13PASS/7.02s; three identities/zero tripwires/private0.
-Report39+13 distinct passes, NOT a fresh52-green run. Original failure intact.
-R/381-unwired-table-diagnostic-proposal-20261109 FINAL-MANIFEST
-fa4e561afab7359bad5aaf8d272aea9ec7952e764c85259e6c72718cdade4c03.
-Source/design independent reports under R/review-381-optional-make-stderr-
-20261109/no-source-{design,candidate}-v1; candidate manifestd8154efa...
-
-CURRENT integratedef162ffc4bbc27ed88ffdf5c0ca954f7e866df1d,
-tree2c54ac7b069297d81471aa615b23314cece0b062, parents[actual993,a3dd96].
-W=/local/job40825266/worktrees/publish-381-unwired-current-20261109.
-All3 own objects exact author; all19253 others exact993; inverse23 lines
-restores entire993 Country; test module exact702b.
-R/381-unwired-table-current-publication-20261109 has sourceproof+metadata.
-ONE authorized candidate-only metadata actor71261 is LIVE, author
-malawi_revision_food owns its handle. Wait/poll SAME actor; no test/baseline
-replay or worktree mutation. Record full four-map/14field/key/18None/terminal/
-source/private0/error/denial outcome, then separate ledger-only finalization.
-Root final source/publication/independent carry/configured CI still required.
-#381 is not closed; original criterion needs final verification/merge.
-
-* Shared admitted metadata baseline for both lanes
-R/metadata-baseline-993-source-admission-20261109/ADMISSION.json proves
-measured5ad2f832bb624ebbbfdbce9f7531531e13873bd8 ->actual993 differs ONLY in
-five excluded CONTENTS/task-ledger objects. All runtime/config/test objects
-exact. Use the closed381 map at
-R/381-missing-target-warning-proposal-20261109/metadata-current/hashes-candidate.json,
-SHA f3fa09f31e227d4c6ca47109aaa32a9524016a0997df4b8792df5d30ca6e2d73.
-PRESERVE its original5ad2 header. No baseline collector restart/restamp.
-Each final candidate still needs its own complete comparison; do not infer
-or sum impacts from overlapping standalone changes. Scope452country/1903wave/
-37BTF/186FIF and18None. Source immutable while collector/test runs.
-
-* Other scope and decisions still held
-- #1570/#1530 new notes merged1675; whole issues OPEN. Ethiopia Decimal/blank
-  arithmetic, actual conversion-factor coverage, window/section12/export
-  authority unresolved. Niger positive-only gate file cannot recover the
-  absent No/omission universe or establish a causal export mechanism.
-- New Ethiopia Crop_CF_Wave2 header-only result:30 typed unit choices match
-  raw _cf card, zero rows; no factor values/coverage/direction measured.
-  R/1570-crop-cf-wave2-metadata-20261109 and ledgerb71a9038. It was NOT
-  silently mixed into frozen1675 notes. Existing conversion helper reused
-  in source only; do not invent another loader or numeric policy.
-- Pending user choices: #1575 strata wiring (document investigation complete),
-  #1190 acquisition carrier/third-source gate, #1562 same-release coping
-  export semantics, #1604 production sample/weights. Do not infer approval.
-- Already decided: AffectedConsumption=purchases; AffectedFoodStock=stocks;
-  Malawi49 borrow,50 final accepted maize flour,51 no date clamp;48 joint
-  inclusion is not identified from marginal weights, production unchanged.
-  #1494 namespaced IDs,#1499 numeric-string conversion,#1594 sentinel landed.
-- #1051 CLOSED after five bounded residuals delivered. PR1673 checker mistake
-  is honestly archived: failed []==0 assertion ignored before merge; later
-  independent exact source/tree/map check passed POSTMERGE, never retroactively
-  a premerge pass. Current merge orchestration checks exit_code BEFORE mutation.
-- Fresh complete queue inventory148 issues datedba03 is at R/scrum-ready-
-  refill-ba03-20261109, not a claim of the current open count. Only1135/381
-  were defensible engineering leads.905 numerical-preservation counterexamples,
-  1045 raw-input/calendar contracts,1069 explicit rewarm/design dependency,
-  1032,932,1509,1559 and land/grammar authority remain held. Do not redispatch
-  closed1468/1463/1495/709/218/851 or already-landed Tanzania1441 work.
-- Old n0028 source jobs intentionally canceled after authoritative node/
-  communications failure; original native outcomes UNKNOWN. Their healthy
-  replacements closed and admitted. Do not reopen/replay those captures.
+1071latest e99b1eb692ece754f7239ad55882269e97bab4fa/tree0a2acf019b7c7befad232af41c40c8fed1c95430,
+test-onlychildover1805, peerqualifiedPASS with realMake andall3Countryroutes.
+IndependentR/review-1071-core-cache-recovery-source-20261109 manifest
+fe2802b6c37ba6ca341741467d9480086d99a9b0a3eaad40e134339d5ad90b09.
+Mwi nowprepares exactfiniteoperator/current4381doccomposition, no actualtests
+untilRootreads/grants. Deferredowners/nonatomicunlinkqualificationremain.

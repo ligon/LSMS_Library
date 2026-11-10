@@ -1,0 +1,34 @@
+#+title: Current LSMS-ISA worker queue
+* Authoritative current queue: PR1678 corrected CI
+Development bb5f/77 verified merges/42 closures; PR1678 MERGED/postverified.
+CI42718759156 unit13806P/5673S/4X, Windows362P/1S, sixSKIP; #381 CLOSED.
+Root: CI/publication/merge and issue reconciliation.
+finish_1590:1032 SOURCE-ONLY read-only DVC runtime prototype on d604.
+malawi_revision_food:1071 SOURCE-ONLY managed unreadable Parquet recovery charter.
+finish_1452:1436 Mali2017 SOURCE-ONLY held-document/operand binding inventory.
+All six remote country workers completed/admitted; zero productive remotes.
+Closed review results and stale nested REPORT packaging qualification are in
+[[file:handoff.org]]. No runtime grant for1032/1071 yet. Older live states below
+are historical and superseded.
+
+* Latest: PR1677 in CI
+Main993/75 verified merges/41 closures. PR1677 head5377 OPEN; CI42707971494 WindowsPASS/unitRUNNING.
+Mwi owns joint stack metadata actor42123 on immutablefadf; Nepal one-child operator still UNRUN and awaits Root plan review.
+Standalone1135 and381UX censuses CLOSED with source/evidence sealed; no replay. All six remote country workers CLOSED/admitted.
+Root owns pending publication/merge; finish_1590 and finish_1452 completed their current assigned tasks, not busy workers.
+Detailed active gates and source hashes: [[file:handoff.org]].
+
+* Current: after PR1676, 2026-11-09
+Development99318fdfb959db07eede83c8000bf7ee0bed30d7;75 verified merges/41 closures.
+All PRs through1676 merged and postverified. No new PR for the two lanes yet.
+- Root: source/baseline admission, publication/CI/merge and queue management.
+- finish_1590:1135 current composition59f8aa96; preparing one granted metadata
+  collector. Closed199P1F plus corrected/new2P; no cohort replay allowed.
+- malawi_revision_food:381 unwired diagnostic currentef162ffc; one metadata
+  actor71261 LIVE, same handle owned through terminal. Closed39+13P history.
+- finish_1452: independent1135 closed runtime/test/ledger evidence review;
+  no new execution. Prior381 source/design review passed.
+All six country workers41055343/348/345/344/346/347 are completed, native0/
+supervisor0 and source admitted. Zero productive remotes; no quota refills.
+Actual source/actor updates and pending gates are in [[file:handoff.org]].
+Historical queue: [[file:archive/isa-country-workers-before-1676-20261109.org]].
