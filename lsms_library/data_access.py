@@ -1494,7 +1494,7 @@ def fetch_documentation(country: str, wave: str, catalog_id: str, *,
         directory.mkdir(parents=True, exist_ok=True)
         if receipt.is_symlink():
             raise OSError(f'Symbolic-link documentation receipt: {receipt}')
-        prior = _document_holding(json.loads(receipt.read_text()), cid) if receipt.exists() else {}
+        prior = _document_holding(json.loads(receipt.read_text(encoding='utf-8')), cid) if receipt.exists() else {}
         receipt_valid = True
         report['held'] = prior.copy()
         other_owners = {}
@@ -1503,7 +1503,7 @@ def fetch_documentation(country: str, wave: str, catalog_id: str, *,
                 continue
             if other.is_symlink():
                 raise ValueError(f'Symbolic-link catalog receipt: {other}')
-            old = json.loads(other.read_text())
+            old = json.loads(other.read_text(encoding='utf-8'))
             for row in _document_holding(old).values():
                 other_owners.setdefault(row['path'].casefold(), set()).add(row['sha256'])
         items, report['discovery'] = _documentation_resources(cid, config.microdata_api_key())
@@ -1562,7 +1562,7 @@ def fetch_documentation(country: str, wave: str, catalog_id: str, *,
                         from io import BytesIO
                         import yaml
                         from dvc_data.hashfile.hash import fobj_md5
-                        declaration = yaml.safe_load(sidecar.read_text())
+                        declaration = yaml.safe_load(sidecar.read_text(encoding='utf-8'))
                         outs = declaration.get('outs') if isinstance(declaration, dict) else None
                         if (not isinstance(outs, list) or len(outs) != 1
                                 or not isinstance(outs[0], dict) or 'md5' not in outs[0]
