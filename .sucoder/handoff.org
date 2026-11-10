@@ -1,4 +1,61 @@
 #+title: Current LSMS-ISA goal handoff
+* Latest checkpoint (2026-11-10 05:23 UTC; supersedes older statuses below)
+Goal ACTIVE; development remains 4381d701ffb06ab447a37c66362119d1c1e23009,
+78 verified merges / 42 whole closures. No new merge or ruleset change.
+All five remote country jobs completed successfully; zero remote jobs running.
+Local agents are doing concrete review/integration/diagnostic work, not waiting
+for occupancy assignments. Root checkout still OLD code: no LSMS runtime here.
+
+PR1686 now exists: Burkina Faso 2021-22 and Mali 2018-19/2021-22 household
+inputs, draft. Accepted product/native checks: BFA 70994→12223 applications;
+Mali 12507→12507 and 62854→12416. Exact typed projections/source/RAM/attrs and
+own cards/current identifiers passed in three bounded existing-source reads.
+This is adapter evidence, not final public API/served-row/data-CI acceptance.
+Initial ordinary CI42757545645 failed 1 test /55 errors (13822 passed): Mali
+fixture required an external-only env var and two old shocks loaders rejected
+valid !make. Corrected ONLY three test files plus ledger; all behavioral test
+ASTs, production/config and BFA fixture conserved. Normal-context cohort101PASS,
+0F/E/S. Final04610062ae1dbb436c12187477257c83e7b11852 pushed to PR1686;
+ordinary CI42761588876 LIVE. Original failure preserved. Evidence:
+R/review-1686-ordinary-ci-portability-20261110/FINAL-CARRY.json.
+
+PR1680 full data run42748441466 actually FAILED at05:14:07, not timeout:
+19551 tests,16760 passed,16 failures,0 errors,2775 skipped. Uganda prebuild passed.
+The current private wrapper intentionally deletes streams/JUnit and emits only
+counts, so failed-node identities cannot be recovered from that run. Agent1452
+owns minimal public-source-validated failing file/function diagnostics (no
+parameters/assertions/data), source review before mocked controls. No rerun yet.
+Normal watcher47734 can now terminate; no full-data pass, merge or settings claim.
+
+1071 corrected C+D SOURCE ACCEPTED at c0185ee7311db9aedb872a9338179eff548a8ae2:
+C final3c28e506; D final6cb918d7 propagates forced producer errors unchanged,
+without legacy fallback. Nine affected controls passed; older failed histories
+qualified and retained. C hardlink/raw-private-L1 ownership guards accepted.
+No combined census yet. Root reviewed full D diff, forced-fatal correction and
+combined source proof. PR1683 remains ed1f7e5 and excludes C+D for now.
+
+650 R3 source02dfed375ec371ce56f0c47460bbd22e9e54a20a independently reviewed by
+Root and1590. Exact25 affected mocked controls CLOSED0/25PASS/0F/E/S/0denials,
+private roots empty, source/bindings conserved (actor90771). Prior source ca84
+is superseded, not publishable. Mwi now owns separate minimal R4: malformed API
+download-link type must fall into existing discovery fallback/failure semantics,
+not throw TypeError after raw acquisition. No real acquisition/push/native run.
+
+Tanzania original R1/R2 documents now managed at0a76ec6c0f1bd106a50b75f3f1aab590d4aea851:
+one targeted2document push plus two fresh read-only empty-private-cache normal
+readbacks passed exact seals. No original-to-UPD code bridge or map inferred.
+Root accepted integration57daae11edb12432dc1f5b16148bc8fd485ef4af after reviewing
+six explicit doc/comment resolutions; all other union leaves exact. This combines
+PR1680–1685, original1686a0d6 and TZA docs. Agent1590 assembling NEW isolated
+batch off57da with04610062 and c0185;650/R4 still excluded until acceptance.
+No census until final frozen batch; reuse existing collector/authenticated6baf
+baseline ONCE and account for intentional three new plot_inputs wave declarations.
+
+Root narrowed issue1483 with actual1686 draft/qualified checks and remaining
+Senegal/s16a/Guinea-Bissau/nutrient-basis scope. Both Niger and Senegal2021
+already track French/English BIDs and both household questionnaires; old
+SOURCE-only acquisition premise retired, no fresh reading/design claim.
+
 * Current state (2026-11-10 04:26:22 UTC)
 Goal ACTIVE. Previous two goal turns made concrete progress, not just waits.
 Development remains4381d701ffb06ab447a37c66362119d1c1e23009;

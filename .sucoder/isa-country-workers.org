@@ -1,4 +1,26 @@
 #+title: Current LSMS-ISA worker queue
+* Actual checkpoint (2026-11-10 05:29 UTC; supersedes older snapshots)
+All five remote country jobs CLOSED successfully; zero remote running.
+Root plus three local agents are active:
+- finish_1590: combines accepted country/shared fixes in a NEW isolated batch.
+  PR1686 test-only04610062 passed101 normal-context controls and is published;
+  ordinary CI42761588876 is live. Corrected1071 C+D c0185 accepted;650 final
+  6a88c7aa source/affected controls accepted. One final existing metadata census
+  awaits the frozen combined source; no repeated baseline/native cohort.
+- finish_1452: actual932data failure diagnosed (16760P/16F/0E/2775S), failed
+  node identities deleted by counts-only private wrapper. Implements minimal
+  opt-in immutable-public-source-validated file/function diagnostics; no
+  parameter/assertion/data output. Source review then meaningful mocked tests.
+- malawi_revision_food:650 R3 exact25 and R4 exact14 mocked controls passed,
+  separately qualified; final ledger/carry sealing. Next: concrete Ethiopia
+  public W5 community/manual/report/DDI backfill plan from retained metadata,
+  own CONTENTS first; no reacquire HH/PP/PH/BID, raw data or shared cache build.
+- Root: independent source admission, publication, issue1483/1441 residual
+  reconciliation, final batch review and CI/settings/merge ownership.
+No new development merge, full-data pass, production map/weights change or
+master release. Existing scientific/authority holds remain explicit. Full detail
+and exact report locations: [[file:handoff.org]].
+
 * Actual checkpoint (2026-11-10 04:26:22 UTC)
 ALL5new remotes CLOSED native0/supervisor0/completed; watchers69898/51769 closed.
 Zero remote running. Current local work:
