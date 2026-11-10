@@ -95,3 +95,48 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
     labels), so the reading carries by inference, not by measurement here.
   contents: 'CotedIvoire/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
+
+CotedIvoire::sample::region-milieu-stratum:
+  waves: ['2018-19']
+  columns: [strata]
+  rows: {}
+  rule: >-
+    strata = '<s00q01 label> <s00q04 label>', the household cover page's own
+    region and residence milieu labels, stripped and joined with one space.
+    Missing or blank either component gives NA; nonstring codes are refused.
+    Preserve native labels without a geographic crosswalk or a region-only
+    fallback. The existing shared GH812 construction supplies the value.
+  function: lsms_library.ehcvm:derive_region_milieu_stratum
+  inputs: lsms_library.countries.CotedIvoire.2018-19._.mapping:inputs_strata
+  raw_variables: [s00q01, s00q04]
+  assumptions:
+    - text: >-
+        the original 2018/19 household sampling stratum is the combination of
+        region and milieu. Only the existing 2018-19 sample is wired here;
+        the later survey revisits the original clusters, rather than making
+        an independent new first-stage draw.
+      basis: questionnaire
+      evidence: >-
+        Own INS Basic Information Document (survey design documentation,
+        not a questionnaire question), September 2023, held as
+        2021-22/Documentation/civ_ehcvm2_information_de_base.pdf, section 4.1,
+        French PDF p.13 (English p.12): "La strate est la combinaison
+        région/milieu." GH1575 documentary check; user selection 2026-11-10.
+    - text: >-
+        retain each cover's recorded labels and leave strata unknown when
+        either component is missing or blank. No urban-only capital rule,
+        allocation-cell exclusion, inferred label or observed-count target
+        is imposed. Abidjan and Yamoussoukro have both milieux in the own
+        allocation tables; table arithmetic is not a quoted formal count.
+      basis: modelling-choice
+      evidence: >-
+        User-approved GH1575 combination, 2026-11-10; unchanged GH812
+        derive_region_milieu_stratum semantics; own BID Tables 1a/1b,
+        French PDF pp.12-13 (English pp.10-11); own CONTENTS.org caveats.
+  validated_against: >-
+    Documentary definition and static wiring only. Actual-row validation
+    UNRUN: native coding, missingness, cluster consistency, raw-weight and
+    non-strata conservation, typed inputs and normal cold/warm/Feature
+    acceptance require the separately frozen data-validation stage.
+  contents: 'CotedIvoire/_/CONTENTS.org, "selected 2018-19 strata wiring (GH #1575)"'
+  since: '2026-11-10'
