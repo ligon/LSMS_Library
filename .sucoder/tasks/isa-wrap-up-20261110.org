@@ -1,5 +1,20 @@
 #+title: LSMS-ISA bounded wrap-up — 2026-11-10
 
+* CURRENT verified wait — 2026-11-10 23:30 UTC
+Development still M16c3f4d9; no current-stream PR merged yet. PR1690 corrected
+H729cf1cf is READY; ordinary42920726859 and required full42920726873 are
+both IN_PROGRESS on exact H (watch exec15074). Full gate passed eligibility,
+checkout/parents/S3, Uganda Make and Uganda shocks finalization; full suite
+is RUNNING. Prepared R/preflight-corrected.py is not run until both green.
+Draft Malawi PR1694 is reviewed and normal validated, stacked on #1690; draft
+Senegal PR1695 is reviewed/native+serving validated, stacked on #1690. Both
+must align to actual development merge and pass fresh required CI before merge.
+Draft four-country PR1693 remains pending normal acceptance: v13 baseline
+Benin8012 accepted from saved captures, v14 only remaining7cold+warm job41129992
+RUNNING; saved-only cross-run comparator independently admitted conditional on
+35 sealed v14 captures. Do not replay completed baseline. Queue FROZEN to these
+four streams, no new issues/research/sweeps. See detailed sections below.
+
 * Scope fixed by the maintainer
 Finish the four current streams: PR1690, GH1575/PR1693, Senegal1483,
 and Malawi1190. Do not add work to the queue, open residual issues, run a
