@@ -205,7 +205,9 @@ def test_registry_scope_optional_carrier_and_actual_input_callable(wiring, monke
     assert len(re.findall(rf"^{re.escape(KEY)}:", registry.read_text(), re.M)) == 1
     rec = derivation_records("Benin")[KEY]
     assert rec.resolve() is ehcvm.derive_region_milieu_stratum
-    assert rec.resolve("inputs") is module.inputs_strata
+    # Registry resolution loads country files by path, creating a fresh module.
+    assert rec.inputs == MODULE + ":inputs_strata"
+    assert rec.resolve("inputs").__code__ == module.inputs_strata.__code__
     assert list(rec.waves) == [WAVE]
     assert list(rec.columns) == ["strata"] and rec.rows == {}
     assert list(rec.raw_variables) == ["s00q01", "s00q04"]
