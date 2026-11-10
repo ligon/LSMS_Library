@@ -38,3 +38,6 @@ are dynamically exercised by these 28 cases. Existing non-atomic filesystem
 identity-check limits remain. Common observed/current nlink guard is required
 because a cache-shaped path can alias absent-source private L1 bytes under a
 different declared source name. No L1 scan, new registry/schema or exclusion.
+
+## PR1687 GH920 source-oracle portability correction
+ROOT authorizes a test-only child off published42f2a8e017ae6dee534572189ebc743a831ed2ca after actual ordinaryCI42765866264/job129662175605:1FAIL/14343PASS/5673SKIP/4XFAIL/874warnings/1159.59s, WindowsPASS. The sole failed GH920 source-order test looks for obsolete literal prepare_make_waves(root), while accepted C now calls prepare_make_waves(root, verify_inputs=verify). Exact trace and static order evidence are retained in reports/ci-1687-unit-failure-42765866264-20261110; no product failure was established. Preserve original failure. Replace only the managed-Make ordering probe with unique ASTCall selection/root first prepare argument and warning-before-context-before-prepare line order. Preserve all warning counts/arguments/default-route/exclusive-return checks and every product/config/other-test byte. Ledgerfirst, then freeze and ONE original failed pure node under accepted proper-root/private source/no-network/MAIN/thread-pinned operator; no suite/native/API/census or livePR/GitHub mutation.
