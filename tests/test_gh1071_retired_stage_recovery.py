@@ -293,3 +293,71 @@ def test_postread_policy_error_is_not_a_stage_cache_miss(stage_owner, monkeypatc
     with pytest.raises(OSError) as caught:
         o.load()
     assert caught.value is error and not o.calls and _state(o.output) == before
+
+
+@pytest.mark.parametrize('change', ['source-sidecar', 'raw-alias'])
+def test_new_source_authority_after_payload_fault_prevents_force(stage_owner, monkeypatch, change):
+    o = stage_owner
+    retained = []
+    def mutate():
+        if change == 'source-sidecar':
+            path = o.source / WAVE / '_/facts.parquet.dvc'
+            path.write_text('outs: []\n')
+        else:
+            digest = hashlib.md5(o.output.read_bytes()).hexdigest()
+            path = o.data / 'dvc-cache' / digest[:2] / digest[2:]
+            path.parent.mkdir(parents=True, exist_ok=True)
+            os.link(o.output, path)
+        retained.append((path, _state(path)))
+    error = _fault(o, monkeypatch, mutate)
+    with pytest.raises(ArrowInvalid) as caught:
+        o.load()
+    assert caught.value is error and not o.calls
+    assert _state(retained[0][0]) == retained[0][1]
+
+
+def test_clean_sibling_is_not_reproduced_or_decoded_twice(stage_owner, monkeypatch):
+    o = stage_owner
+    other_wave = 'w1'
+    (o.source / other_wave / '_').mkdir(parents=True)
+    (o.source / other_wave / '_/data_info.yml').write_text('{}\n')
+    scheme = yaml.safe_load((o.source / '_/data_scheme.yml').read_text())
+    scheme['Waves'].append(other_wave)
+    (o.source / '_/data_scheme.yml').write_text(yaml.safe_dump(scheme))
+    other = o.data / NAME / other_wave / '_/facts.parquet'
+    other.parent.mkdir(parents=True)
+    _frame(other_wave).to_parquet(other)
+    info = replace(o.info, stage_key='sibling', stage_ref='dvc.yaml:materialize@sibling',
+                   wave=other_wave, output_path=other, lexical_output_path=other)
+    sibling_calls = []
+    sibling = SimpleNamespace(cmd='invented sibling', frozen=False, is_import=False,
+        outs=[SimpleNamespace(fs=SimpleNamespace(protocol='local'), fs_path=str(other))],
+        addressing=info.stage_ref, status=lambda **kw: {},
+        reproduce=lambda **kw: sibling_calls.append(kw))
+    class Repo:
+        lock = nullcontext()
+        def __init__(self, *args, **kwargs):
+            self.stage = SimpleNamespace(load_one=lambda f, n:
+                sibling if n == 'materialize@sibling' else o.stage)
+        def close(self):
+            pass
+    monkeypatch.setattr(C, 'Repo', Repo)
+    monkeypatch.setattr(C.Country, '_resolve_materialize_stages', lambda *args: [o.info, info])
+    read, counts = pd.read_parquet, {o.output: 0, other: 0}
+    def payload(path, *args, **kwargs):
+        path = Path(path)
+        if path in counts:
+            counts[path] += 1
+        if path == o.output and not o.calls:
+            raise ArrowInvalid('invented first-stage failure')
+        return read(path, *args, **kwargs)
+    monkeypatch.setattr(pd, 'read_parquet', payload)
+    expected = pd.DataFrame({'x': pd.array([15., 25., 15., 25.], dtype='Float64')},
+        index=pd.MultiIndex.from_tuples([('h1', WAVE), ('h2', WAVE),
+            ('h1', other_wave), ('h2', other_wave)], names=['i', 't']))
+    expected.attrs = {'country': NAME}
+    with pytest.warns(UserWarning, match='Unreadable managed stage cache'):
+        _exact(o.load(), expected)
+    assert counts == {o.output: 2, other: 1}
+    assert o.calls == [{'force': True}] and not sibling_calls
+    assert L.read_parquet_cache_waves(o.data / NAME / 'var/facts.parquet') == [WAVE, other_wave]
