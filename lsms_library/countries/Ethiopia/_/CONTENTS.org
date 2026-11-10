@@ -4754,11 +4754,38 @@ managed-document holding, not proof the instruments were never published or
 that no external copy exists. W4's held household and PP/PH questionnaires
 do not identify or replace W5 instruments.
 
-The bounded next step is to identify W5 household and agriculture instrument
-resources in catalog 6161's Related Materials, retaining exact titles, resource
-IDs, formats and version statements before any restoration/read proposal.
-Their exact identities are not established by this source-only reconciliation.
+An authorized read-only inventory of catalog 6161's Related Materials now
+identifies these English W5 resources; none of their download links was
+followed. Filenames come from the page's =data-filename= attributes, not
+guesses or downloaded bytes.
+
+| role | resource | filename | format |
+|------+----------+----------+--------|
+| Household | 78626 | =esps_w5_hh_questionnaire_english.xls= | XLS |
+| Agriculture post-planting/crop-cut/livestock | 78627 | =esps_w5_post_planting_crop_cut_livestock_questionnaire_english_final.xlsx= | XLSX |
+| Agriculture post-harvest | 78628 | =esps_w5_post_harvest_questionnaire_english_final.xls= | XLS |
+| Community | 78629 | =esps_w5_community_questionnaire_english_final.xlsx= | XLSX |
+| Combined W5 manual | 78631 | =manual_household_agriculture_and_community_questionnaires_wave_5.pdf= | PDF |
+| Survey report | 78643 | =ESS5_Survey_Report_webfile_06.pdf= | PDF |
+
+Metadata URL: https://microdata.worldbank.org/index.php/catalog/6161/related-materials
+The household form subtitle is =Form ESS5-H (21/22)=; both agriculture
+forms say =Form ESPSAGSS/(21/22)=. These form identifiers and the filename
+word =final= are not an explicit document version. No questionnaire date or
+document-version field is listed. The manual is dated 2022-03 and report
+2023-09; the already-held BID 78630 is dated 2023-12. Catalog =v03_M= names
+the data release, not independently each instrument's version. The page also
+offers generated =ddi-documentation-english_microdata-6161.pdf= at
+=/catalog/6161/pdf-documentation=, with no listed resource ID, and a separate
+tax-module report 98963, outside this instrument-restoration proposal.
+
+The finite restoration candidates for the immediate HH/agriculture gap are
+78626, 78627 and 78628 under the exact filenames above. They require a
+separate grant before any binary retrieval, hashing, managed-source placement
+or workbook parsing. A later read should first inventory those three
+workbooks' sheet identities; no sheet names or question coordinates are
+invented here. Community/manual/report/DDI are separately named residuals.
 The BID needs no repeat acquisition. Shared =add_wave= documentation policy,
 automatic fetching and other countries remain ROOT's GH #650 scope. No new
-PDF/workbook parse, source download, runtime, cache operation or scientific
-decision accompanies this note.
+PDF/workbook parse, document/data download, runtime, cache operation or
+scientific decision accompanies this metadata-only inventory.
