@@ -40,6 +40,22 @@ def s16b_use_classes(raw):
     }, index=raw.index)
 
 
+def s16b_applied_candidate(raw, wave, *, household_id):
+    """Nonactivated Tier B projection: native use code 1, without amount gates.
+
+    Own q02=Oui plus #1483's unserved-APPLIED scope and the existing EHCVM
+    drivers settle this predicate. No/blank/unlisted answers remain available
+    through s16b_rows_for_wave; they are not applications merely because they
+    have a gift, purchase or used amount. This still has the review-operand
+    schema: public input/crop classification and serving wiring are separate.
+    """
+    rows = s16b_rows_for_wave(raw, wave, household_id=household_id)
+    selected = raw['s16bq02'].eq(1).fillna(False).to_numpy(dtype=bool)
+    out = rows.loc[selected].copy()
+    out.attrs = deepcopy(raw.attrs)
+    return out
+
+
 def s16b_rows_for_wave(raw, wave, *, household_id):
     """Copy a complete numeric own-source frame into a lossless review operand.
 

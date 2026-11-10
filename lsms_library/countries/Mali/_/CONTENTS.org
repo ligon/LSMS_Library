@@ -3762,8 +3762,10 @@ Native key multiplicity/eligibility counts were not measured by headers.
 The historical scheme's "no agriculture-input block" contradicts the dated
 #1445 finding above; unwired remains different from absent. The sibling
 EHCVM q02==1 gate and Mali's EAC-I group/zero ruling concern different
-questions. Treatment of No/unanswered s16b with amounts remains an explicit
-activation question, not a new inclusion rule. A concrete minimal wiring
-design and frozen synthetic controls are in =_/s16b-header-adapter-20261110.md=
+questions. For #1483's applied-input scope, the prepared projection uses q02=1 only;
+No/blank/unlisted answers stay in the separate raw review operand. This is
+not a public decision to serve every answer. The concrete inactive wiring
+proposal keeps the DAP catch-all literal without a new nutrient fraction.
+Its design and frozen synthetic controls are in =_/s16b-header-adapter-20261110.md=
 and =.coder/ledger/1483-mali-post-header-adapter-20261110.md=. Tests are UNRUN;
 no serving, native-source, cache or runtime acceptance follows from preparation.

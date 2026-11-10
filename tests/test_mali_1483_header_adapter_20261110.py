@@ -94,15 +94,21 @@ def adapter(monkeypatch):
     calls = {node.func.id for node in ast.walk(tree)
              if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)}
     assert calls <= {'ValueError', 'set', 'sorted', 'any', 'isinstance',
-                     'household_id', 'deepcopy', '_card_alias'}
+                     'household_id', 'deepcopy', '_card_alias', 's16b_rows_for_wave'}
     spec = importlib.util.spec_from_file_location('mali_1483_pure_adapter', ADAPTER)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     fmt = _extract(ROOT / 'lsms_library/local_tools.py', ['format_id'],
                    {'pd': pd, 'Any': Any})['format_id']
     # The real household functions receive NO get_dataframe / provider namespace.
+    country_tree = ast.parse((COUNTRY / '_/mali.py').read_text(encoding='utf-8'))
+    prefix = next(ast.literal_eval(node.value) for node in country_tree.body
+                  if isinstance(node, ast.Assign)
+                  and any(isinstance(target, ast.Name) and target.id == 'EHCVM21_PREFIX'
+                          for target in node.targets))
+    assert prefix == 'EHCVM21_'
     ns = _extract(COUNTRY / '_/mali.py', ['i', 'ehcvm21_i'],
-                  {'tools': SimpleNamespace(format_id=fmt), 'EHCVM21_PREFIX': 'EHCVM21_'})
+                  {'tools': SimpleNamespace(format_id=fmt), 'EHCVM21_PREFIX': prefix})
     assert vars(ns['tools']) == {'format_id': fmt}
     return module, {'2018-19': ns['i'], '2021-22': ns['ehcvm21_i']}
 
@@ -219,6 +225,26 @@ def test_use_classes_partition_does_not_select_rows_or_treat_unknown_as_no(adapt
     out = module.s16b_rows_for_wave(raw, '2021-22', household_id=formatters['2021-22'])
     assert len(out) == 5  # No, unanswered, gift/purchase-only all retained for REVIEW.
     assert out['s16bq09c'].tolist() == [350, pd.NA, 99, 0, -3]
+
+
+@pytest.mark.parametrize('wave', ['2018-19', '2021-22'])
+def test_applied_candidate_uses_only_native_yes_and_has_no_amount_or_identity_drop(adapter, wave):
+    module, formatters = adapter
+    raw = native(wave)
+    got = module.s16b_applied_candidate(raw, wave, household_id=formatters[wave])
+    i = '12003' if wave == '2018-19' else 'EHCVM21_12003'
+    assert got.index.tolist() == [(wave, i, 3), (wave, i, 77)]
+    # Yes with no used quantity and unlisted input slot survives this projection.
+    assert got['Quantity'].isna().tolist() == [False, True]
+    assert got['Quantity_purchased'].tolist() == [7., 4.5]
+    assert got['Used'].tolist() == [True, True]
+    pd.testing.assert_frame_equal(got[list(raw)].reset_index(drop=True),
+                                  raw.iloc[[0, 4]].reset_index(drop=True), check_exact=True)
+    assert got.attrs == raw.attrs and type(got.attrs['record']) is AttrRecord
+    raw['s16bq02'] = pd.array([2, 2, pd.NA, 9, 2], dtype='Float64')
+    assert module.s16b_applied_candidate(raw, wave, household_id=formatters[wave]).empty
+    # The unfiltered inverse/raw route still carries all five answers and amounts.
+    assert len(module.s16b_rows_for_wave(raw, wave, household_id=formatters[wave])) == 5
 
 
 @pytest.mark.parametrize('wave', ['2018-19', '2021-22'])
