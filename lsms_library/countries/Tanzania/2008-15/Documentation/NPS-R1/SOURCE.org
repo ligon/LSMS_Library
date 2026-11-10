@@ -1,0 +1,8 @@
+Official original-round household instrument; World Bank catalogue 76 (TZA_2008_NPS-R1_v03_M).
+Document resource: https://microdata.worldbank.org/catalog/76/download/11558
+Filename: NPS Household Qx - English (Year 1).xls
+Catalogue document date: 2008-01-01; retrieved 2026-11-10T03:48:02Z
+MD5 0beef1bba8018606e995b138edcd505f; SHA256 ba5a6c14dd5d82fa05b3a7c66ea81dcd460f14f8249357bfb1134a9a6fd91353; bytes 2419200.
+This is document-only custody, distinct from UPD3814 and not a holding of the original wave microdata. Exact original-fielded revision beyond the published resource metadata is unverified. No ha_01_1/ha_02_1 preservation bridge is established.
+
+Managed holding: targeted push_to_cache_batch of only these two public documents succeeded 2026-11-10; separate fresh private read-only retrieval acceptance is pending. The preserved UPD parent SOURCE.org/CATALOG_COVERS is unchanged.

@@ -1,0 +1,8 @@
+Official original-round household instrument; World Bank catalogue 1050 (TZA_2010_NPS-R2_v03_M).
+Document resource: https://microdata.worldbank.org/catalog/1050/download/30525
+Filename: NPS_Household_Qx_English_Year_2.pdf
+Catalogue document date: 2010-10-01; retrieved 2026-11-10T03:48:02Z
+MD5 ed342639649c2cfbe8a4972dd77747d8; SHA256 9cc779b470bf57258af4b45b118f82b740323ce3d445f36e77104bbe24878654; bytes 1097377.
+This is document-only custody, distinct from UPD3814 and not a holding of the original wave microdata. Exact original-fielded revision beyond the published resource metadata is unverified. No ha_01_1/ha_02_1 preservation bridge is established.
+
+Managed holding: targeted push_to_cache_batch of only these two public documents succeeded 2026-11-10; separate fresh private read-only retrieval acceptance is pending. The preserved UPD parent SOURCE.org/CATALOG_COVERS is unchanged.
