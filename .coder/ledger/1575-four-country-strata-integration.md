@@ -11,6 +11,8 @@ R1575-approved-four-country-rollout-20261110/CHARTER.md. This explicitly
 supersedes historical design-only/no-implementation text, not scientific
 residuals or another release. Country remote workers own isolated donors;
 this branch owns shared812 test adaptation and independent combined intake.
+The GB worker also owns the one deliberately obsolete existing GH811
+region-only vocabulary assertion; deputy does not edit that path.
 
 ## §2 Existing machinery
 
@@ -37,7 +39,14 @@ country donor review; recording its exact source identity accompanies intake.
 Benin815lines personally read at9f: Littoral purely urban is not an exclusion;
 DDI per-EA half-vague wording contradicts delivered disjoint-grappe structure;
 old département-only inference is superseded only by documented2018 combination.
-Other three full grounding reads are in progress before shared test edits.
+All four full files incl TODO/WAITING/LOGBOOK are now personally read at9f:
+Benin815/Togo902/Guinea-Bissau833/CotedIvoire1141lines. Togo Data1 and
+Lomé Commune rural versus GrandLomé urban remain unbridged. GB Portuguese
+Urbano and SAB urban-only, duplicated GPS versus missing GPS, and later
+explicit vague resolution stay distinct. CIV uppercaseCIV/nestedMenage,
+early combined-strata prose versus actualregion-only binding, and older
+CILSS rotating-panel/frame-break caveats are preserved. Exact source hashes
+are in external SHARED-812-SOURCE-PROOF.json.
 
 ## §4 Invariants
 
@@ -63,3 +72,16 @@ coding, exact donor source, pure controls and later normal validation remain
 verification gates. This initial ledger is source preparation only: no tests,
 raw/header/API/Feature/build/census or publication executed. Public9f and all
 Root/other integration checkouts remain untouched.
+
+## Source-only checkpoint
+
+Shared812 test adaptation750ae4b71 changes only four approved2018 binding/
+registry expectations and the Togo Feature no-construction oracle. Exact AST
+inverse recovers the whole original module; COUNTRIES/COVERS/CELLS/allocation
+oracles and all other functions remain exact9f. No tests run beforedonorunion.
+
+Retained admitted9f metadata baseline is hashes-candidate.json SHA1ff8aa9a
+at Risa-reviewed-integration-train-20261110/metadata-stage3. Its originalheader
+stays9f; no baseline replay. New candidatecollector still UNRUN. Allfourmanager
+submissions are actualqueued handles, not claimed productive fromsubmission:
+CIV41095863/Togo41095865/Benin41095866/GB41095867. Manager owns supportedwatch.
