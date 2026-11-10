@@ -68,11 +68,11 @@ Reuse existing 1281/Tanzania operators with only bounded context/pure restrictio
 and approved module-name None guard; record three identities/denials/closure.
 
 ## §6 State and residual
-Bounded test-only implementation and authorized pure verification complete.
-Corrected original Ethiopia API test is NOT authorized; ROOT must review the
-full final frozen patch first. Whole issue/test suite/CI and scientific/current
-production acceptance remain separate. No new country idiosyncrasy discovered;
-CONTENTS remains exact, no appendix.
+Bounded implementation, pure verification and the subsequently ROOT-granted ONE
+normal corrected Ethiopia case complete. ROOT accepted d97 source before the
+actual grant. Whole issue/test suite/CI/scientific acceptance and final ROOT
+admission remain separate. No new country idiosyncrasy discovered; CONTENTS
+remains exact, no appendix.
 
 ### Phase 3 — anchored verification and qualified counts
 
@@ -117,6 +117,50 @@ CONTENTS remains exact, no appendix.
   old node-local allocation; no durable copy assumed or searched. Proposed
   finite four-declared-HH/PP-source/two-wave private cold stage requires ROOT
   final-patch review and separate actual grant. Full suite/CI/whole issue outside.
+
+The preceding UNRUN entry is the preserved pre-actual checkpoint, superseded
+ONLY by ROOT's later explicit actual grant and the following one execution.
+
+### ROOT-granted normal case, separate from pure composition
+
+- Source d97 accepted by ROOT; actual equivalent81efba441534cb694236eeeed855a3ef803cd2ec
+  differs only by this ledger's then-current pure results. Fresh own L2 root,
+  no assumed surviving old node-local cache or cache walk. Source/operator/node/
+  four-sidecar/old native-SHA epoch bindings and source-derived caps froze
+  BEFORE stage. Current two scripts each read HH twice/PP once; each from_dta
+  performs one full read; two wave writers plus normal Country cache writer.
+- Managed stage2126318 closed0: exact4already-admitted sources5312509B,
+  sidecarMD5/size/priorSHA match,0native decodes. No WB/new release/source campaign.
+  Real normal reader copied0600 outside evidence, ordinary credential gate
+  actually open; contents/hash never exported. State/cache/temp private node-local
+  before imports, same MAIN image, unshare user+net actual, thread/build1/-n2loadfile,
+  proper root/plain assertions/both ordinary conftests/direct durable logs+XML.
+- ONE original normal Ethiopia parameter actor2126329 closed0/1PASS/0F/E/S;
+  terminal95.58s/wrapper113.286s. Exact original dup0/N3776/D3776/K333 assertions
+  passed. Helper input is the FULL9256current API records; strict typed current
+  conservation passed before selecting its7552-row historical operand. No
+  smaller API request, memo/provider/assume-fresh/stale stamp/ID override.
+- Observed6native getters/6from_dta/6StataReader.read/12metadata+payload reader
+  initializations/2sample producers/2normalMake/3writers, all frozen caps met.
+  Eighteen full-return events are three nested boundaries per read, not18parses.
+  Three correct controller/worker identities and all5actual profiles active,
+  zero actual denials. Four blobs remain exact on stable FD/path/hash/mode/
+  mtime/ctime/identity; atime excluded. Both owned groups closed, reader removed.
+  Source/operator seals and tracked worktree remained exact throughout.
+- A SEPARATE post-actual footer-only actor FAILED exit1 while emitting its
+  report to the evidence/actual parent outside allowed operator output root.
+  Its frozen hash/coverage/id_converted/rows/profile predicates were reached
+  before the line16 write denial: source/traceback-bound inference, NOT a clean
+  metadata receipt. Preserve footer.py/footer.log/FOOTER-RECEIPT and qualified
+  result, no footer/test/API/native replay or guard widening. The original
+  normal case's cleanPASS/zero denials remains a separate earlier closed actor.
+- Normal original expected hash36245dd250fb768ca245a9ccc35db758fc454b95f53e5b0d20310d3627810c59
+  was computed twice by the ordinary source. Footer-reached predicates infer
+  matching hash, coverage2011-12+2013-14/id_convertedtrue/9256rows; no manual
+  footer stamp or ID-flag override. Cache remains only own node-local output,
+  with no row/frame/raw/secret artifact exported to evidence.
+- ROOT final admission/integration/whole data CI remain pending. No second
+  original normal node, full module, pure27replay or further data action.
 
 Durable packet: own dispatch evidence REPORT.md/RESULT.json/DECISIONS.md/
 EVIDENCE-INDEX.json, initial SOURCE-PROOF.json/Source.patch and immutable26case
