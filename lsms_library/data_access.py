@@ -1554,8 +1554,9 @@ def fetch_documentation(country: str, wave: str, catalog_id: str, *,
                         raise ValueError(f'Unowned or changed held document: {name}')
                     sidecar = dest.with_name(dest.name + '.dvc')
                     if sidecar.exists():
-                        # A matching workspace copy cannot certify a different
-                        # unowned held sidecar. Verify the declared holding too.
+                        # Even an attributed receipt cannot authorize replacing
+                        # an unrelated edited pointer. Prove old OR new bytes.
+                        from io import BytesIO
                         import yaml
                         from dvc_data.hashfile.hash import fobj_md5
                         declaration = yaml.safe_load(sidecar.read_text())
@@ -1564,11 +1565,25 @@ def fetch_documentation(country: str, wave: str, catalog_id: str, *,
                                 or not isinstance(outs[0], dict) or 'md5' not in outs[0]
                                 or outs[0].get('path') != name):
                             raise ValueError(f'Unrecognized document sidecar: {name}')
-                        if old.get('path') != name:
-                            algorithm = 'md5' if outs[0].get('hash') == 'md5' else 'md5-dos2unix'
-                            with staged.open('rb') as src:
-                                if fobj_md5(src, name=algorithm) != outs[0]['md5']:
-                                    raise ValueError(f'Unowned differing document sidecar: {name}')
+                        convention = outs[0].get('hash')
+                        if convention not in (None, 'md5', 'md5-dos2unix'):
+                            raise ValueError(f'Unknown document sidecar hash convention: {name}')
+                        algorithm = 'md5' if convention == 'md5' else 'md5-dos2unix'
+                        declared = outs[0]['md5']
+                        if not isinstance(declared, str) or not re.fullmatch(r'[0-9a-fA-F]{32}', declared):
+                            raise ValueError(f'Invalid document sidecar checksum: {name}')
+                        with staged.open('rb') as src:
+                            proven = {fobj_md5(src, name=algorithm)}
+                        if old.get('path') == name:
+                            prior_md5 = old.get('md5')
+                            if algorithm == 'md5' and isinstance(prior_md5, str) and re.fullmatch(r'[0-9a-fA-F]{32}', prior_md5):
+                                proven.add(prior_md5.lower())  # receipt records raw bytes
+                            if dest.is_file():
+                                prior_bytes = dest.read_bytes()
+                                if hashlib.sha256(prior_bytes).hexdigest() == old.get('sha256'):
+                                    proven.add(fobj_md5(BytesIO(prior_bytes), name=algorithm))
+                        if declared.lower() not in proven:
+                            raise ValueError(f'Unowned or changed document sidecar: {name}')
                     plan.append((staged, dest, row, same))
                 # Validate the entire successful membership before placement.
                 for staged, dest, row, same in plan:

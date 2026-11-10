@@ -288,6 +288,47 @@ def test_sidecar_must_declare_exact_own_document_path(docs, workspace, raw_hash,
         assert document.read_bytes() == b'%PDF invented'
 
 
+@pytest.mark.parametrize('workspace', [False, True])
+@pytest.mark.parametrize('raw_hash', [False, True])
+@pytest.mark.parametrize('pointer', ['prior', 'incoming', 'unrelated'])
+def test_owned_receipt_does_not_authorize_unrelated_changed_sidecar(docs, workspace, raw_hash, pointer):
+    prior = b'%PDF prior\r\nbody\r\n'
+    incoming = b'%PDF revision\r\nnew\r\n'
+    docs['bodies']['https://synthetic.invalid/1'] = prior
+    held = fetch(push=False)['held']
+    document = docs['directory'] / 'questionnaire.pdf'
+    if not workspace:
+        document.unlink()
+    selected = {'prior': prior, 'incoming': incoming, 'unrelated': b'unrelated\r\npointer\r\n'}[pointer]
+    checksum = hashlib.md5(selected if raw_hash else selected.replace(b'\r\n', b'\n')).hexdigest()
+    sidecar = document.with_name(document.name + '.dvc')
+    sidecar.write_text(f'outs:\n- md5: {checksum}\n' + ('  hash: md5\n' if raw_hash else '') + '  path: questionnaire.pdf\n')
+    before = sidecar.read_bytes()
+    docs['bodies']['https://synthetic.invalid/1'] = incoming
+    report = fetch()
+    allowed = pointer == 'incoming' or (pointer == 'prior' and (raw_hash or workspace))
+    assert report['status'] == ('complete' if allowed else 'incomplete')
+    assert len(docs['pushes']) == int(allowed) and sidecar.read_bytes() == before
+    if allowed:
+        assert document.read_bytes() == incoming and report['held']['1']['sha256'] == hashlib.sha256(incoming).hexdigest()
+    else:
+        assert report['held'] == held and document.exists() == workspace
+        if workspace:
+            assert document.read_bytes() == prior
+
+
+@pytest.mark.parametrize('convention', ['sha256', 'unknown'])
+def test_owned_receipt_unknown_hash_convention_is_unverifiable(docs, convention):
+    held = fetch(push=False)['held']
+    document = docs['directory'] / 'questionnaire.pdf'
+    sidecar = document.with_name(document.name + '.dvc')
+    sidecar.write_text(f'outs:\n- md5: {held["1"]["md5"]}\n  hash: {convention}\n  path: questionnaire.pdf\n')
+    before = sidecar.read_bytes(), document.read_bytes()
+    report = fetch()
+    assert report['status'] == 'incomplete' and not docs['pushes']
+    assert (sidecar.read_bytes(), document.read_bytes()) == before and report['held'] == held
+
+
 def test_atomic_receipt_failure_preserves_previous_receipt(docs, monkeypatch):
     fetch(push=False)
     receipt = docs['directory'] / 'DOCUMENTS-10.json'; before = receipt.read_bytes()
