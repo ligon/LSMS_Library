@@ -296,6 +296,7 @@ def test_unknown_recovery_metadata_retains_original_reader(stage_owner, monkeypa
 def test_fresh_attempt_is_not_healed_again_and_coverage_requires_success(stage_owner, monkeypatch, mode):
     o = stage_owner
     initial = _fault(o, monkeypatch)
+    available_error = RuntimeError('invented failed producer with available replacement')
     def reproduce(**kwargs):
         o.calls.append(kwargs)
         o.output.unlink()
@@ -303,14 +304,17 @@ def test_fresh_attempt_is_not_healed_again_and_coverage_requires_success(stage_o
             o.output.write_bytes(b'new invalid output')
         elif mode == 'available-after-failure':
             _frame().to_parquet(o.output)
-            raise RuntimeError('invented failed producer with available replacement')
+            raise available_error
         elif mode == 'producer-failure':
             raise RuntimeError('invented producer failure')
     o.stage.reproduce = reproduce
     if mode == 'available-after-failure':
-        with pytest.warns(UserWarning, match='DVC reproduce failed'):
-            _exact(o.load(), _served())
-        assert L.read_parquet_cache_waves(o.data / NAME / 'var/facts.parquet') == []
+        # A readable replacement cannot waive a fresh forced producer failure.
+        with pytest.raises(RuntimeError) as caught:
+            o.load()
+        assert caught.value is available_error
+        _exact(L.get_dataframe(o.output), _frame())
+        assert not (o.data / NAME / 'var/facts.parquet').exists()
     else:
         expected = L.ParquetFormatError if mode == 'fresh-bad' else KeyError if mode == 'no-output' else RuntimeError
         with pytest.raises(expected):
