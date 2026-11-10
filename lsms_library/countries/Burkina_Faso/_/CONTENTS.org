@@ -3383,3 +3383,81 @@ A visit food-row shortfall remains a disclosed upper-bound proxy, not household
 cover status or a correction to declared exposure. The dated missing/partial
 passage and document-layout qualifications above remain in force.
 See =docs/guide/recall.md= and =.coder/ledger/851-period-api-current-port.md=.
+
+* 2026-11-09 -- GH #1483: household input grain is not whole-instrument grain
+
+The =plot_inputs= registry comment said "no parcel-level input data".  That
+overstated the scope of its source: the existing 2018-19 builder reads =s16b=
+only, whose household/input roster has no parcel column.  The separate
+=s16a= dictionary lists field and parcel identifiers and fertilizer amounts
+with their own unit fields.  The comment now distinguishes these modules;
+no declaration, reader, map, quantity or index changes.
+
+Primary locator: WB catalog 4290, =data-dictionary/F42?file_name=s16a_me_bfa2018=,
+section 16A.24 and 16A.29.  Quantity/unit pairs are =s16aq24a/b= for manure,
+=s16aq29a1/a2= for urea, =b1/b2= for phosphates, =c1/c2= for NPK/Formule
+unique, and =d1/d2= for DAP or other chemical fertilizer.  The last pair is
+itself a catch-all, not a source-bound pure DAP grade.  Section 16B remains
+a separate household input/cost roster (=F43?file_name=s16b_me_bfa2018=).
+This extends the earlier NPK-only parcel note without changing its historical
+3,684 count or treating a household total as a parcel allocation.
+
+These are public documentation observations, not new native-header or row
+reads.  Direct HTTP pages retrieved on 2026-11-09 identify =v04_M=; the
+web search tool's cached file pages instead identify =v03_M=.  The committed
+2018-19 =SOURCE.org= names held =v03_M=.  Neither online rendering certifies
+the held release, its row payload or a new acquisition.  The earlier held-file
+finding and the public dictionary agree on the existence of the parcel
+question, which is all this comment correction uses.
+
+2021-22 =s16b= remains unbuilt.  New input-slot/unit bindings, parcel
+representation and the NPK/DAP nutrient choices retain their distinct holds
+(GH #1483 / #1445); the older instrument or another country supplies none of
+those decisions.  Only registry comments changed, but =data_scheme.yml= is
+a whole-country build input, so its normal hash invalidation still applies.
+No hash census, cache read/write or country build was run for this correction.
+
+* 2026-11-09 -- GH #1565: departure reasons and all-null roster payloads
+
+The public panel dictionary has an own-country departure-reason field,
+=s01q00b=, at WB catalog 6224, =variable/F2/V59?name=s01q00b=.  It reports
+4,161 valid answers in 14 categories, including 12 COVID-19 deaths and 297
+deaths from other causes.  These are catalog file counts, not population
+estimates or a new measurement of the held source.  The direct HTTP page
+identifies =v05_M=; the search tool's cached page identifies =v04_M=.  The
+held-release qualification above still applies, and no row-level equivalence
+between that catalog and the retained all-null rows was established here.
+
+The current 2021-22 roster YAML extracts sex, relationship, age and the
+existing binary =MonthsSpent= mapping, and does not extract departure reasons.
+The current framework finalizer types the payload and then drops a row whose
+non-index columns are all null (=country.py=, =_finalize_result=).  That is
+consistent with the dated #1244 checkpoint's exclusion of 4,161 panel rows;
+the issue's warm-parquet count and the served count describe different stages.
+No existing checkpoint was replayed to establish a current count.
+
+Consequently, simply adding a non-null reason to the roster would also change
+which rows survive that finalizer.  That is a membership/representation
+decision, not an optional-column-only repair.  GH #1565 still holds both the
+all-null-row policy and the destination for departure reasons.  The panel
+catalog's list neither defines cross-section coverage nor replaces the
+existing residence rule.  No roster, eligibility or reason map changes here.
+
+* 2026-11-09 -- GH #1148: declared-period dependency integrated; status policy held
+
+The older WAITING entry says "=period=, =RecallRecord.exposure_days(column)=
+and =recall.to_period= are absent".  That describes its stated release
+baseline =f8d236694=, not current source.  PR #1671, merge
+=1c1ef12da4f592e1899db67cf937251aa890ac86=, is an ancestor of this task's
+base =4381d701ffb06ab447a37c66362119d1c1e23009=.  Current =recall.py= has
+both methods and the generated food-method signature accepts =period=None=.
+The 2014 record declares four expenditure asks and the =Quantity: 1= override,
+as the preceding #851 entry records.  This source/history reconciliation
+retires the integration prerequisite only; it does not redo #851 acceptance.
+
+Household completion, the eight passage-3 carrier conflicts, passage-4 code
+authority, out-of-panel keys and report/status disagreement remain held.
+=ask_shortfall= still describes food-row presence as an upper-bound proxy,
+not a household interview-status denominator.  Declared conversion cannot
+settle the unknown-household mask, and neither ask counts nor interview dates
+supply a new visit or exposure rule.  No normalization or status census ran.
