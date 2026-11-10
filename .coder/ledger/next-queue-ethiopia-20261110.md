@@ -1,6 +1,7 @@
 # Ethiopia next queue: historical derived cells and ESPS-5 documentation
 
-**Status:** grounded, source-only diagnosis in progress. Base
+**Status:** source-only queue preparation completed; independent ROOT review
+and any later runtime/acquisition are separate. Base
 `4381d701ffb06ab447a37c66362119d1c1e23009`.
 **Search tier:** git + ripgrep + primary read-only GitHub tools. No GitNexus
 tool is exposed; use AGENTS.md's named source/diff substitute. No subagents.
@@ -64,19 +65,68 @@ identity/restoration notes before proposing document acquisition. Extend only
 country documentation if a supported finding is genuinely missing. Preserve
 #1570/#833/#1457/#1485 holds and completed #851/#1570/compiler evidence.
 
-## §6 Open questions and next checks
+## §6 Disposition and finite continuation
 
-Fresh #587 comment explicitly names Ethiopia 2018-19/2021-22 and says #594
-fixed deletion; reconcile the merge and exact source inputs before deciding
-whether any residual exists. #650 remains open with zero comments and no
-assignee: distinguish restored BID from genuinely absent W5 questionnaires.
-Any new finite document/native read needs separate ROOT admission. No human
-approval prompt is attached; record precise residuals once in the absolute
-QUESTIONS_FROM_AGENT channel and continue independent work.
+- #587: exact original CSV rows at `23794a51829751202ca61a5bdcb0009bb0b26c76`
+  name `2018-19` and `2021-22`, both dropped/declared. Full fresh issue and
+  its one comment identify merged #594
+  (`68b9425287de5bb45e6f982d4ccab0f1680e6bef`). Both roster declarations are
+  HH `sect1` sources with native `household_id/individual_id`, `s1q06` weeks
+  and logical-wave `t`. W1-W3 contribute `hh_s1q05` months. The old column
+  if/elif selected an all-missing month column on W4/W5. The current 82-line
+  residence-resolution block is byte-identical to fix `85bdf4a57`, SHA256
+  `f14201d1ff17f421fc39bee8d9787389272bfc01fbb9b595a0b171bf06d6670d`.
+  #594 records 6,768 / 4,946 restored households and continued filtering,
+  not fallback; these are historical receipts, not a new run or eligibility
+  oracle. Current committed coverage rows carry those same historical counts.
+  The nine #1287 compilers do not build this YAML roster or runtime derivation.
+  No current country defect remains demonstrated for these two cells.
+- #650: restored BID sidecar is MD5 `4949ee8c911e8512458f64c5f57d5d3e`,
+  1,058,117 bytes, catalog 6161/resource 78630. Restoration `11ed1b811`
+  is merged through #1506 (`df8faa75f`); full fresh closed #1443 and both
+  comments confirm holding and citation rechecks. Current W5 tracked tree
+  has only that document sidecar. SOURCE says held data release v03_M;
+  the old v01 licence citation example does not supersede it. W5 household/
+  agriculture questionnaire, DDI, manual and report identities are not
+  established by these admitted sources; none has a tracked W5 sidecar.
+  The restoration commit explicitly excludes questionnaires (.xls/.xlsx),
+  manual and report. W4 questionnaires cannot substitute for W5.
+- Next bounded unit proposed once in the absolute channel: ROOT admission
+  for one catalog-6161 Related Materials metadata inventory, confined to W5
+  household and agriculture PP/crop-cut/livestock and PH instrument roles;
+  capture exact IDs/names/formats/language/version, reject W4 and ambiguous
+  matches, and stop before downloads or parsing. Then propose exact named
+  restoration/read operands separately. No acquisition/parse is authorized
+  or needed to finish this preparation. Shared #650 automation stays ROOT's.
+- Fresh full issue/all-comment reads: #1570 (0), #833 (2), #1457 (1),
+  #1485 (0); #587 (1), #650 (0). All six open issues have no assignee.
+  Two read-only open-PR searches (`Ethiopia`, `650`) return no results;
+  that bounded search is not universal ownership proof. No held scientific
+  choice, already-tested alternative or anonymous default is reopened.
 
 ## Phase 3 — verification
 
-Pending final source reconciliation. No executed tests, runtime or data
-acceptance is claimed. Ledger surfaced before implementation; the dispatch
-already authorizes bounded source work, so the skill's review step does not
-create an additional permission wait.
+- **OK (§2/§3):** no duplicated implementation; historical #594 machinery and
+  controls reused as source evidence. No test execution claimed. Historical
+  PR's unrelated single full-suite failure remains historical failure.
+- **OK (§3/§4):** append-only country documentation commit `7bb0eded3` adds
+  64 lines; all 298,522 original bytes / 4,700 lines are an exact prefix.
+  No executable/schema/map/weight/eligibility or other-country edits.
+- **OK (§4):** inspected `make api-audit` completed, exit 0, using a private
+  wrapper with `/usr/bin/python3.12 -I -B -S`: stdlib AST/text/Git metadata
+  only, 15 skills listed, no undocumented kwargs or untracked build inputs.
+  This is not LSMS runtime, tests, collection or a Feature/corpus/data audit.
+  All 15 full frontmatter descriptions are retained in private evidence.
+- **OK (§4/§6):** no runtime mount/import, test, native/header/row/PDF/workbook
+  parse, provider/acquisition/cache/producer operation, source/public push,
+  nested agent or GitHub mutation. Read-only GitHub bodies/comments and
+  existing ordinary reports are the only external-source research.
+- One attempted evidence receipt save exceeded argv size and failed before
+  process creation; the successful replacement saves public metadata/body/
+  comments and omits the oversized diff, reviewed instead in local Git.
+  No science stage failed or retried. Initial oversized read outputs were
+  replaced by bounded complete country/AGENTS reads.
+
+Final private artifacts record the source conservation/commit/ref proof and
+exact residual drafts. Independent review/integration/CI, later metadata or
+document restoration and any runtime verification remain with ROOT.
