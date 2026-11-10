@@ -1,4 +1,10 @@
-#+title: LSMS-ISA work owners — 2026-11-10 20:41 UTC
+#+title: LSMS-ISA work owners — 2026-11-10 20:49 UTC
+CURRENT: Root1690actualfull42898422484/ordinary42898422441 watch59230, frozenHcf563,
+racefixed+15focusedPASS+Rootindependentreview. MainleadnowindependentBenin/Togo
+1531own-doc/source+artifactintake. Deputy1575localnormaloperator/firstactual;
+managerjointpreflight/finiteexecutor+Senegal41102570source/pureadapter. No new
+Rootscientificloop; BFAfullyadmitted, no replay. M16c3/79merges45closuresunchanged.
+
 LATEST [[file:tasks/isa-pr1690-20261110T2041.org]]. Mainleadownsnecessary1690CI
 refusalconcurrencyracefix (oldrefusal canceledreadyjobbeforeANYdata); Rootmade
 3999READY/sourceaccepted/BFAaccepted, newCI-onlyH+focusedreviewpending.

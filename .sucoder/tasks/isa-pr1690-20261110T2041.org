@@ -1,5 +1,36 @@
 #+title: 1690 ready, BFA accepted, refusal-concurrency race correction
 
+* LATEST -- race fixed; actual full gate LIVE20:48
+Supersedes3999/pendingracefixbelow. Tested464a397c3 thensolefactualledgerfinal
+Hcf5637114ed513b774ebae929e57f8252e8f4de2,tree8f6baf015305f6a38f3a1fb53d8a1bb862df23ee.
+Threepathsrelative3999(workflow/test/newledger),54incrementalpathsfromactualM.
+Wholelibrary0884646ecunchanged; no scientific/data/censusreplay.15focusednormal
+conftest/plugin/thread1/n2casesPASS7.40s, exactcheckout/controller/gw0/gw1,0D/
+emptyprivateconfig+data, sourcefrozen. Rootreadfullpatch/receipt/parsed15JUnit/
+verified3pathconservation+library, independentreviewPASS. R/932-classifier-
+refusal-concurrency-race-20261110/ROOT-INDEPENDENT-REVIEW.json. Refused/uncertain
+classifiersgetrun-specificrefusalgroupANDrequiredfailingname; successfulvalidate/
+metadatagroupsunchanged,always/precheckoutguard/recipe/credentialsunchanged.
+LeadFFpublished/body/readbackcomplete;PRstillREADY/open/mergeable/unmerged.
+RootfreshH/B/Sproof: Sb4af2c746910028962701b7f9f76ca862d9219a4,
+parents[M16c3,Hcf563],tree8f6bafexact. R/1690-final-accepted-validation-20261110/
+POSTFIX-FROZEN-SOURCE-AND-HANDLES.json. CURRENTactualfull42898422484/job130117638507
+LIVE:eligibility/checkout/syntheticparents/dependencies/S3requiresgateSUCCESS,
+Ugandaprebuildactive,fullsuitependingatlastread. Ordinary42898422441LIVE,
+WindowsalreadyPASS. Metadata42898428086/job130117682130SUCCESS,distinct
+pr-data-metadata-edit/checkouts+credentials+dataSKIPPED; DIDNOTcancelvalidfull.
+Rootfiniteexactheadwatcher LIVE EXECSESSION59230, scriptR1690.../watch.py,
+7hbound/30spoll/45sghobservationtimeouts. Rechecksamehandleonobservationexpiry;
+neverrestartdatafromtimeoutorstatefile. Preserveoldcanceled3999runzeroallsteps.
+No source/bodyedits neededwhilefullruns. Rootfinalreadiness/merge remains.
+
+Mainleadreview_nigeria_ph_pr nowdelegated Benin+Togo1531independentown-doc/source
+reviewandartifact/sourceintake (tofreemanagerfor1575actual/Senegal); fullownCONT
+firstinclTODO/WAITING/LOGBOOK/quotedidiosyncrasy, reportcontradictions/no GBunit
+transfer/no raw/header/row/API/science/GHwrites. Managerhandoverpending.
+Confirmed41102570/ad38ee6ebd0549319887682f2216325b isSenegal1483source/pureadapter,
+Q/refill-1483-senegal-own-adapter-M-20261110, exactM/sixownpaths/norowsAPI.
+
 * Current goal and source
 Goal ACTIVE;79verifieddevelopmentmerges/45wholeissueclosures. M remains
 16c3f4d9c28462dde7970718a4eed67394215997, prior1687full17434PASS/2775SKIP/0F/E,

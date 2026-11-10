@@ -1,5 +1,18 @@
 #+title: Current LSMS-ISA coordinator handoff
-* CURRENT -- 2026-11-10 20:41 UTC
+* CURRENT -- 2026-11-10 20:49 UTC
+LATEST [[file:tasks/isa-pr1690-20261110T2041.org]] topsection: CIraceFIXED,
+new1690Hcf5637114ed513b774ebae929e57f8252e8f4de2/tree8f6baf/54paths, READY.
+15focusednormalcasesPASS/Rootindependentreview/conservationPASS/libraryexact.
+RootfreshS b4af2c746910028962701b7f9f76ca862d9219a4 parents[M16c3,H]/treeexact.
+Actualfull42898422484/job130117638507LIVE withgate/checkout/parents/deps/S3gate
+SUCCESS,Ugandaprebuildactive; fullsuitependinglastread. Ordinary42898422441LIVE/
+WindowsPASS. Metadata42898428086SUCCESSdistinctnonrequiredname/nodata/skipped
+checkout+credentials; didNOTcancelvalidfull. RootWATCHEXECSESSION59230/script
+R1690-final-accepted-validation-20261110/watch.py, exacthead7hfinite; no restart.
+MainleadnowBenin/Togo1531independentdoc+artifactintake; manager1575jointactual
+andSenegal41102570source/pures(sixpaths/norowsAPI). Olderpendingracebelowhistory.
+
+* Earlier state -- 2026-11-10 20:41 UTC
 LATEST [[file:tasks/isa-pr1690-20261110T2041.org]] supersedesolderpendingstate.
 BFA41099343normalpairPASS10800x2/strictwholeframe/weights/typedattrs/inverse,
 Root+managercustodyaccepted, no morereplay.1690publicH399909b/tree d425a7,
