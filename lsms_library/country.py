@@ -360,6 +360,10 @@ def _reject_unreadable_cache(path: Path, observed, error: Exception, *,
                       'entry disappeared; rebuilding through the normal route',
                       UserWarning, stacklevel=3)
         return
+    # A cache-shaped name can alias an absent source's L1 inode. Ordinary L2
+    # writers/private copies do not require hardlinks; never unlink an alias.
+    if observed.st_nlink > 1 or current.st_nlink > 1:
+        raise error
     fields = ('st_dev', 'st_ino', 'st_size', 'st_mtime_ns', 'st_ctime_ns')
     if any(getattr(current, field) != getattr(observed, field) for field in fields):
         raise RuntimeError(f'Managed cache changed while rejecting unreadable entry: {path}') from error
@@ -6358,7 +6362,8 @@ class Country:
                 return False
             source = self.file_path / relative.relative_to(self.name)
             sidecars = [p.with_name(p.name + '.dvc') for p in (source, path)]
-            if (path in raw_inputs or path.resolve().is_relative_to(countries_root().resolve())
+            if (path in raw_inputs or path.stat().st_nlink > 1
+                    or path.resolve().is_relative_to(countries_root().resolve())
                     or any(p.exists() or p.is_symlink() for p in sidecars)
                     or (source.exists() and path.samefile(source))):
                 get_dataframe(str(path))  # source errors retain the strict reader
@@ -6380,6 +6385,8 @@ class Country:
                 current = path.lstat()
             except FileNotFoundError:
                 return False
+            if observed.st_nlink > 1 or current.st_nlink > 1:
+                raise error
             fields = ('st_dev', 'st_ino', 'st_size', 'st_mtime_ns', 'st_ctime_ns')
             if any(getattr(current, field) != getattr(observed, field) for field in fields):
                 raise RuntimeError(f'Private Make input changed while rejecting unreadable entry: {path}') from error
