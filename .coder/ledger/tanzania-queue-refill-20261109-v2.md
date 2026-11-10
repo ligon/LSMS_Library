@@ -71,8 +71,37 @@ thread1 and pytest -n2 --dist=loadfile. Preserve failures separately.
 | 1497 fallback | Hold interpretation, reuse closed evidence | No current maintainer ruling changes continuation |
 | 1441 labels/rekey | Reconciled already merged | Source implements both rulings; residuals deliberate |
 | 905 livestock | Reconciled already merged | Selected actual parity exists; speed/hash unmeasured |
-| 905 agriculture | Hold naive grouped sum, investigate exact strategy only | Signed counterexample remains binding |
+| 905 plot_inputs | Extend singleton-only grouped numeric route; duplicate groups retain scalar sums | Avoid all-group callbacks without changing any multirow sum |
+| 905 plot_labor | Hold and leave byte-identical | Outside current function exemption in frozen905 oracle |
 | Additional country labels/reducers | Continue source reconciliation | No mappings from spelling/other-survey inference |
+
+### Source-selected bounded strategy (before patch)
+
+At source138fd458056125ccb354c620591311756595789277e520e24b05d62ad87b3040
+(module SHA256), plot_inputs_for_wave's nonunique-index branch aggregates EVERY
+group. After the #637 native-seed ruling most groups are singletons, yet each
+pays two scalar numeric callbacks if ANY key is repeated. Reuse the existing
+grouped sum for numeric columns, then overwrite EVERY multirow group's result
+with the exact existing scalar Series.sum(min_count=1). Keep existing flag and
+purchase-unit reducers and index/column order. One-row sums have no cancellation
+sequence; signed/NA/inf/zero controls must compare exact complete outputs. All
+actual multirow sums keep their full operands and original scalar reducer.
+
+Blast radius: only plot_inputs_for_wave in country tanzania.py, called by the
+two modern wave scripts. Source hashing includes the whole country module, so
+budget Tanzania-wide invalidation; live hash impact is NOT measured. No shared
+framework or plot_labor/livestock/input labels/keys/clamps change. Existing905
+reference restores the whole pre1119 plot_inputs function, so its independently
+frozen whole-module digest can remain unchanged. This is not permission to alter
+that oracle or its4ULP bound.
+
+New uniquely named controls reconstruct the exact base module by reversing only
+this reducer block and assert SHA138fd458..., then compare actual helper calls
+on invented operands for both wave colmaps. Reuse existing strict comparator,
+905 source_case/stub maps and adverse controls. Check signed cancellation,
+allNA/partialNA, large/small/zero/inf values, unique path, missing crop keys,
+flags/units and exact callback operand counts. Only pure cohorts will run after
+source/test freeze; no native/parquet/API/Make acceptance.
 
 ## §6 Open questions for ROOT
 
