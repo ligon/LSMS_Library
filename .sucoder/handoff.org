@@ -1,4 +1,40 @@
 #+title: Current LSMS-ISA goal handoff
+* Five remotes now executing — 2026-11-10 03:34 UTC
+All FIVE supported agent_execution/running on n0030, fresh/nonstale:
+- BFA1483:41082011/7ea9deb3f4b04eb3a65c164506f26352.
+- Mali1483:41082012/f008c838b85b48bd8f1580c34de17a0e.
+- Malawi1281:41082066/0ec28ad62a994dec88afb7626e26dc16.
+- Uganda1441:41082078/b03e4257500a41d4a876444cafe8a247.
+- Tanzania1441:41082079/68f04b66d019424ab7234ac537ea2e09.
+All dryrun0/submit0/exact4381/fullsource/free2CPU8G90. finish_1590 owns
+finite supported watcher69898(BFA/Mali) and51769(other3), status/result/question
+channels. Public1441 tasks pursue NEW official own-round dictionary authority,
+dedup held UPD/newGSEC1header, no binary/native fetch or label implementation.
+Malawi new scope is pure derived/Feature failure controls+finite warm auditplan,
+excluding accepted real regression and83old/parallel cohorts; no cacheinventory.
+Q/refill-public-1441-20261110/ACTUAL-STATE.json and
+Q/refill-header-1483-20261110/OTHER-SIX-NEXT-ACTIONS.json control remaininglanes.
+BFA/Mali actualquestions identify ambiguous purchasefields/appliedanswercarrier;
+Root instructed nativepreserving adapters/meaningfulcontrols plus CONCRETE
+activationproposal against actualpublictablecontract. Do not inventsemantics
+or treat every routineimplementation choice as automaticpolicyhold. No active
+wiring until own-source predicate justified or precise maintainerchoice ready.
+
+Ethiopia local1570/650doc lane continues: ownHH/PP cell facts recorded,PHxlrd
+SSTassert remainsUNREAD; HH2014Meher vs2021/22 cover and retainedparcel vs
+fieldrosteruniverses are tensions, no calendarcorrection/exportbridge inferred.
+Thus SIX country lanes active (five remote+one local), not eight manufactured.
+Niger reasonfield absence and Nigeria converter adoption scope retain explicit
+authority/policy gaps; no duplicate completedreview launched for occupancy.
+
+Root read allfinal1071 A+B68productlines+402newtestlines; qualifiedsource/control
+PASS998ac711 (77distinct passing controls across qualified runs, no fresh77).
+finish_1452 authorized ordinary separate merge with disjoint e5d1683testrepair,
+exactobjectconservation then ONE existing metadata-only finalcandidate census
+vs authenticated6bafbaseline; no newcollector/data/sharedrewarm/GH writes.
+Freeze duringcensus. Root ownsPR1683publication. Remaining1071C+D can proceed
+privately on separatefrozenbase after this integration, meaningfulnewcontrols.
+
 * Worker phase confirmation — 2026-11-10 03:28 UTC
 Both new remote country jobs ACTUALLY agent_execution/running on n0030,
 fresh nonstale heartbeats: BFA41082011 and Mali41082012. No unanswered worker

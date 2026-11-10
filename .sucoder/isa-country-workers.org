@@ -1,4 +1,16 @@
 #+title: Current LSMS-ISA worker queue
+* Six country lanes active — 2026-11-10 03:34 UTC
+FIVE actual remote agent_execution/running, n0030/fresh/nonstale:
+BFA1483job41082011; Mali1483job41082012; Malawi1281job41082066;
+Uganda1441job41082078; Tanzania1441job41082079. Firsttwo finitewatcher69898,
+latestthree watcher51769, finish_1590 owns supportedresults/questions/intake.
+Ethiopia1570/650 publicW5document check active locally withmalawi_revision_food.
+Root ownsqueue/review/integration/CI. finish_1452 integrates1071 A+B998ac711
+anddisjoint1683e5dtestrepair then finalmetadata-onlycensus (no sharedrewarm).
+Niger/Nigeria remainingauthority/adoption gaps explicit; no occupancy quota.
+All previous8countryjobs remainclosed; newjobs are separate evidenceddispatches.
+ExactIDs/constraints/evidence: [[file:handoff.org]].
+
 * Actual phase confirmed — 2026-11-10 03:28 UTC
 BFA41082011 and Mali41082012 BOTH agent_execution/running on n0030,
 fresh/nonstale, no unanswered questions. Finite supported watcher69898 LIVE;
