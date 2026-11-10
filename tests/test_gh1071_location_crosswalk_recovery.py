@@ -28,7 +28,8 @@ def registry_fixture_hygiene():
 
 
 def frame():
-    result = pd.DataFrame({'previous_i': pd.array(['old', None], dtype='string')},
+    result = pd.DataFrame({'previous_i': pd.array(['old', None], dtype='string'),
+                           'marker': [1, 2]},
         index=pd.MultiIndex.from_arrays([
             pd.array(['2001', '2001'], dtype='string'),
             pd.array(['new', 'other'], dtype='string')], names=['t', 'i']))
@@ -49,6 +50,9 @@ def bad(path):
 
 @pytest.fixture
 def owner(toy, monkeypatch):
+    scheme = toy.root / '_/data_scheme.yml'
+    scheme.write_text(scheme.read_text() +
+        '  other_features:\n    index: (t, i, m)\n    x: float\n')
     c = toy.instance()
     path = toy.data_dir / 'Json1468/var/other_features.parquet'
     index = pd.MultiIndex.from_arrays([
