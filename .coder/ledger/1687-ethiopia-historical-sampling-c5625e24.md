@@ -68,7 +68,57 @@ Reuse existing 1281/Tanzania operators with only bounded context/pure restrictio
 and approved module-name None guard; record three identities/denials/closure.
 
 ## §6 State and residual
-Ledger-first checkpoint: implementation/pure run pending. Corrected original
-Ethiopia API test is NOT authorized; ROOT must review full frozen patch first.
-Whole issue/test suite/CI and scientific/current-production acceptance separate.
-No new country idiosyncrasy discovered; CONTENTS remains exact, no appendix.
+Bounded test-only implementation and authorized pure verification complete.
+Corrected original Ethiopia API test is NOT authorized; ROOT must review the
+full final frozen patch first. Whole issue/test suite/CI and scientific/current
+production acceptance remain separate. No new country idiosyncrasy discovered;
+CONTENTS remains exact, no appendix.
+
+### Phase 3 — anchored verification and qualified counts
+
+- OK (§2–4): full historical fixture equals exact fbc Git blob/authorized asset,
+  size354486/SHA52cc2e73...; no current-row construction, pruning or runtime
+  Git/shared-path dependency. Zero CR/LF bytes; forced core.autocrlf=true Git
+  filtering is byte-exact, so no extra attribute path is needed for this blob.
+- OK (§1–5): inverse at each source freeze recovers the ENTIRE c8 test module
+  bytes after removing only two Ethiopia helpers and the Ethiopia elif block.
+  All original N/D/K literals/assertions/params/fixtures and Nigeria/Uganda/
+  other-country branches survive. Every nonowned mode/type/blob equals c8.
+- Initial freeze11b47115b361626caf9950606e906f6bd2a8b954/tree9ae680c5:
+  ONE cohort2113343 closed0,26uniquePASS/0F/E/S (22new +4necessary retained),
+  15.96terminal/29.419wrapper. Three correct MAIN/source/config/privateL1
+  identities, three active profiles/zero denials, data/secrets0, source/operator
+  seals exact and process group absent. No real API/native/cache entry.
+- CONTRADICTION (§3–4), corrected only after ROOT precise disposition: the
+  initial full-current nonnull-v assertion let an unrelated outside-domain
+  null govern the dated operand. Preserve11b+26PASS and its over-strict null
+  control as history. Final source d97db47224f34f014065a02dcc115a24061fe4eb
+  REMOVES that assertion entirely. No new selected-v refusal: original
+  idx.dropna()/N assertion owns selected-cohort missingness.
+- OK (§3–5): only TWO affected null controls ran once at d97, actor2117373,
+  closed0/2PASS/0F/E/S,14.51terminal/28.252wrapper. Outside-domainNA passes with
+  full typed conservation; historicalNA remains in the helper view and reaches
+  the original N assertion (2,3), caught as the negative control. Three active
+  profiles/zero denials, private data/secrets0, exact bindings and actor closure.
+  No26replay. Final support is COMPOSED:23current new controls +4retained,
+  not a fresh27-case execution at d97; one old null-refusal control superseded.
+- Runtime: exact MAIN245395456B/SHA12c7eab8.../generation20261019T221223Z,
+  extracted ONCE processors1 then unchanged mount/import check; all state/cache/
+  tmp roots own node-local BEFORE imports. No build/adopt/pip/master/shared
+  symlink edit. Unmapped user/network namespace, false credential gate,
+  thread/build1/-n2loadfile/properroot/plain assertions/direct durable logs/XML.
+  Existing1281/Tanzania observer reused with the approved module-None guard;
+  source AST/inspect.unwrap names verified. Named coverage is not universal IO.
+- Retained source-tool failure: generic python3 was3.6 and lacked subprocess
+  capture_output; explicit stdlib-only3.12 corrected it before copy/import/test.
+  Original normal N3801vs3776 and qualified inverse shutdown error remain failed/
+  qualified history. No actual/data campaign replay or scientific regrading.
+- UNRUN (§6): one corrected normal Ethiopia case. Old warm output was only on
+  old node-local allocation; no durable copy assumed or searched. Proposed
+  finite four-declared-HH/PP-source/two-wave private cold stage requires ROOT
+  final-patch review and separate actual grant. Full suite/CI/whole issue outside.
+
+Durable packet: own dispatch evidence REPORT.md/RESULT.json/DECISIONS.md/
+EVIDENCE-INDEX.json, initial SOURCE-PROOF.json/Source.patch and immutable26case
+receipts; final source child and two-case freeze/log/XML/three identities are
+under evidence/null-v/. Final ledger-only carry changes no executed test source.
