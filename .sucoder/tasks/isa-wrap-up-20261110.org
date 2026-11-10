@@ -9,6 +9,13 @@ is RUNNING. Prepared R/preflight-corrected.py is not run until both green.
 Draft Malawi PR1694 is reviewed and normal validated, stacked on #1690; draft
 Senegal PR1695 is reviewed/native+serving validated, stacked on #1690. Both
 must align to actual development merge and pass fresh required CI before merge.
+Later #1694 ordinary unit CI run42920692822/job130194470622 FAILED four
+parameters of one old #1111 seed-channel test. It selected every Seed row and
+asserted planted unit Gram; new acquisition-only Farm/Unknown H rows are now
+included by that selector. Existing G rows remained exact in the held normal
+comparison. Manager is preparing a test-only role-specific correction, with
+Root independent review before PR head update; Windows smoke PASS. No source
+production change or full-data acceptance is implied.
 Draft four-country PR1693 remains pending normal acceptance: v13 baseline
 Benin8012 accepted from saved captures, v14 only remaining7cold+warm job41129992
 RUNNING; saved-only cross-run comparator independently admitted conditional on
