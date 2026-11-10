@@ -9,3 +9,6 @@ The new empty cases incorrectly expected a healthy frame. Both old/current helpe
 
 ## Finite verification
 Whole new test module plus existing test_gh905_tanzania_vectorised_sums.py and test_gh905_tanzania_signed_sums.py; invented inputs only, exact MAIN/cwd/PYTHONPATH, private roots, false credentials, network namespace, threads/build1, two loadfile workers, logs/JUnit. No Country/Feature/native/API/data acquisition, speed, actual parity or hash claim. Original reference/digest/ULP assertions remain exact. External report: review-tanzania-905-singleton-queue-20261109.
+
+## Closed pure verification
+Runtime freeze b322c1218c44f6801736a85a4038231244e6525f; exec2495 terminal chunk fc56b4 CLOSED0, outer23.041240s/pytest16.34s: actual42unique PASS/0F/E/S across three modules. Three identities exact MAIN/checkout/namespace UID65534; guards0denials; private top-level data/configfiles0; all bindings unchanged/sourceclean. Four numpy invalid-reduce warnings from invented infinite-cancellation inputs retained. Product bd7 exact; no candidate known-failing empty oracle was executed. This is synthetic source-free equivalence, not native parity/speed/hash/API acceptance or whole905/1497 closure.
