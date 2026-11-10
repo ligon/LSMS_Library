@@ -1,5 +1,5 @@
 #+title: LSMS-ISA current work owners
-Updated 2026-11-10 16:12 UTC. Detailed source/evidence docket: [[file:handoff.org]].
+Updated 2026-11-10; latest execution corrections in [[file:handoff.org]].
 
 * Root
 Owns scientific decisions, final readiness, development merges and settings.
@@ -25,14 +25,20 @@ WAITING/LOGBOOK and coordinate with manager; no data or duplicate dispatches.
 
 * Remote queue manager -- malawi_revision_food
 Owns ROUND2 ASSIGNMENTS/FOLLOWON/CLOSED-SOURCE queues and remote dispatch.
-Joint final Malawi execution admission with integration lead, without Root
-per-file loop: job41092166/872ff5c42e3249af9d649996e9da501e, exact9f, four
-2010-11 G/P/I/Q sources, twelve full reads, one native writer and two actual
-accessors. Final runtime identity freeze pending at last message; no native
-handle then. Public evidence excludes passive raw captures.
-Uganda1281 continuation41091669 terminal status/evidence requested; earlier
-failed operators remain failed. Also owns independent1069 factual tracker
-reconciliation. Original eight country allocations are CLOSED, never busy.
+Malawi old41092166 DID run after worker changed24min cutoff to21min: seven read
+ENTRIES/onewriter then interrupted-15, not RAW0. Replacement41092493 completed
+twelve reads/onewriter but saved oracle timed out180s, overallFAIL/0predicates.
+Nineteen cumulative readentries, seventh old completion unproven. Actual actors
+did not overlap; replacement was submitted before old closure was authenticated.
+Root permits saved-only continuation from new sealed captures, no further native
+or Root per-file loop. Manager+lead own bounded oracle correction/continuation.
+Public evidence excludes passive raw captures. All failed/deviant attempts stay.
+Uganda1281 actual fifteen strict comparisons/twenty-six-file inventory qualified
+admitted after independent postrun-only ctime proof; original deliveryBLOCKED
+retained, no replay. GH1069 factual narrowing/readback complete; no hash exclusions.
+New Uganda1000 job41092546/14fd679c9b364fcaa0e16797847ef15e examines ONLY previously
+unqueried HarvestPlus node562 version route; no repeated nine-route paper search
+or production/numeric change. Original eight country allocations CLOSED, never busy.
 
 * Decisions
 Central [[file:isa-decisions.org]]:1457R1YES own sale unit; R2aNO/keep ambiguous

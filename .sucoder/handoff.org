@@ -269,12 +269,14 @@ is authorized after source-derived finite plan; actual sample/API remains UNRUN.
 finish_1590 now owns bounded fresh country-backlog selection: three concrete
 unblocked TierA/B briefs, reconcile existing work, no data or duplicate dispatch.
 
-Malawi fresh execution-only allocation41092166/872ff5c42e3249af9d649996e9da501e
-RUNNING n0030; metadata/MAIN/pre-getter setup passed, raw0 at manager checkpoint.
+Malawi execution-only allocation41092166/872ff5c42e3249af9d649996e9da501e
+metadata/MAIN/pre-getter setup passed; the earlier raw0 checkpoint was transient
+and is SUPERSEDED by actual interrupted7-read-entry history below.
 Joint final source/operator/installed identity freeze SHA224edac91c5541825ef524b2f2fb85d1c5915a3036cd4f41ef09eda09f402ca6
 accepted by manager and lead; six reviewed code files exact, runner only job-path
 rebind. Manager writes SHA-bound clearance and launches deterministic runner;
-actual native handle still awaited. Earlier preparation is not native acceptance.
+Actual old native ran then was interrupted; final history below supersedes the
+earlier launch-wait checkpoint. Earlier source-only preparation is not acceptance.
 Uganda actual stage2236659/cold2236662/warm2238483 CLOSED0/groups closed:
 22cold fullreads/137.607s; warm67.993s/0native/producer/writer;15typed comparisons
 and26-file inventory PASS. Separate postrun reporting chmod changed ctime on15
@@ -293,7 +295,20 @@ reconciliation-20261110). No closures/merges claimed. Manager independently
 narrowed/readback-verified GH1069:7inclusions/1alreadyexcluded, resolver policy
 retained; R/review-1069-current-fingerprint-20261110. No exclusions/rewarm.
 
-Malawi41092166 setup-only completed0/30m52s, RAW0; launch cutoff preserved.
+CORRECTION: Slurm41092166 completed0/30m52s but its native actor did run and was
+interrupted. Earlier RAW0/setup-only/cutoff-preserved claims were false snapshots.
+The worker changed authorized24min cutoff to21min, then launched stage2282438
+(0/23.265s) and native2283453(-15/59.214s). Seven getter/Stata-read ENTRIES,
+seventh completion unproven; native G/P/I/Q and R1G/P/I entered, one producer and
+one writer. R1 completion/R3/readback/oracles UNEXECUTED. Both groups ECHILD;
+83source/operator/installed bindings/source conservation equal, credential removed.
+Exporter failed on unfrozen SDK metadata allowlist; original error retained.
+Old report/source final200d8982ed9bba5c5a59aca1044b013bf18e5b45 in ROUND2/workers/
+Malawi1457-NativeExecutionContinuation/872ff5c42e3249af9d649996e9da501e/evidence.
+Root read fullREPORT/RESULT. Coordinator submitted replacement before authenticating
+old closure; actual actor times prove old closed89.84s BEFORE replacementcontroller,
+so no execution overlap. Cumulative19readentries (not19completed reads)/2writer
+entries across old7+new12. No further native authorized; preserve cutoff deviation.
 Fresh NON-MODEL41092493 on n0037 actually executed unchanged9f cohort:
 stage192283 CLOSED0/21.358s; native192287 CLOSED0/93.672s/12fullreads/onewriter;
 saved-only oracle195640 TIMEDOUT124/180.078s/SIGTERM with0completed predicates.
@@ -306,6 +321,11 @@ Manager+lead now own SAVED-ONLY oracle diagnosis/correction and deterministic
 continuation; no native/getter/staging replay, no Root per-file loop. Root read
 terminal report and original oracle source, identified possible repeated-key/set
 overhead but no actual hot-path attribution yet. Existing failed attempts stay.
+Root expressly admitted continued use of the complete new sealed capture cohort:
+old interruption and coordinator timing error do not change its source/private
+scope or scientific bytes. No additional approval needed for saved-only correction.
+Future replacements require authenticated prior group closure, one deterministic
+launcher and unchanged launch cutoff; worker discretion cannot override it.
 
 Uganda timing qualification independently ADMITTED:233Git bindings/15changed
 content hashes authenticated;15strict comparisons/26inventory pass; latest
