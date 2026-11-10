@@ -436,3 +436,21 @@ source/libraryexpectedec74, measuredBFAmetadata carriedbyproof/no redundantcensu
 53incrementalpaths beyonda292/51beyond8c. New1575train staysseparate/dependent.
 GoalACTIVE; no masterrelease/sharedrewarm/weightchange. Remainingdecisions and
 otherissues remainexplicit; do not infergoalcompletionfromthemajorbatchmerge.
+
+* Latest BFA failure -- supersedes live41095975 above
+At17:58:49 allfour1575workers stillRUNNING, but BFA41095975 had exitedFAILED1
+after2m03s. Baselineactor959963 entered normalCountry.sample but no healthyframe
+was delivered, candidateunstarted; baseline closed-15 after42.82s thoughcap900.
+Safe ACTUAL-RESULT labels timed_outtrue; this is earlycontrollertermination, not
+proof900s elapsed. Observerreturncallback164 raises onNone/nonframe duringraw
+getterunwind, masking originalexception. Native/read progressUNKNOWN, NOT0 and
+NOTunspent2APIcalls; onefailedbaselineAPIinvocation is consumedhistory. Frames
+notpersisted, comparisonnull. Allrecordedgroupsclosed/no credentials.
+R/1573-burkina-normal-two-lane-actual-v2-20261110/evidence/ACTUAL-RESULT.json.
+Manager+lead SOURCE/private-trace diagnosis only, noautoretry. Root directs
+exception-safe observerreturns (recordnonframe/unwind, preserveoriginalcause),
+controlleractualexit/accuratecleanupclassification and durabletinySAFEsource
+enter/return counters. Exactoracle/math/coding unchanged. Rootcause+minimalfix+
+jointreview before boundedfailed-baselinecompletion/originalunstartedcandidate;
+do not claim4cumulative reads or overwriteunknownprefix. MainmergedM/932active
+independent and complete;1575sourceworkers proceedseparately.

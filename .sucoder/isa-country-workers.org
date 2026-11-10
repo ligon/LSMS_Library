@@ -16,8 +16,10 @@ routine source review/composition/publication without Root per-file loops.
 CI3paths and qualified Malawi ledger1path; then actual-base update after1687
 lands and full composed gate. Does not own new1575 four-country train.
 BFA41095376 failed beforedata. Exactbootstrapcorrection+guardedimportpassed.
-Continuation41095975 actuallyRUNNING17:55:58Z, phase/APIhandle awaited; no call
-claim fromjobstate. Managerownsactualterminal; leadkeepsnext1690composition.
+Continuation41095975 FAILED afterbaselineAPIentered/noframe, candidateunstarted.
+NativeprogressUNKNOWN; observermaskedgetterunwind, controllerstoppedbaseline
+after42.82s. Manager+lead diagnosebeforeanyboundedcompletion; noautoretry.
+Main M/932 arecomplete andindependent; next1690needsactualBFAacceptance.
 
 * Deputy integration lead — finish_1590
 User APPROVED1575 documented combination for Benin2018-19/Togo2018/
@@ -35,7 +37,9 @@ manager. Root final science/readiness/merge/settings retained.
 Owns remote scheduling, source/custody queues, deterministic executors and
 actual terminal receipts. Four1575 workers41095863/65/66/67 verifiedRUNNING. Track exact actual
 handles and distinguish sourcework from dataactors. BFA setup-only41095376 failed0data/allgroupsclosed. Corrected guardedimport
-passed, continuation41095975 nowlive; expectedtwo-callcohort remainsbound.
+passed, continuation41095975failedafterbaselineAPIentered; nativecountsunknown,
+onefailedAPIprefix consumed. Preservefailure, diagnoseoriginalcause/sourceonly,
+noassumedunspentbudget. Durable safecountersrequirednextattempt.
 Malawi native+saved actors all TERMINAL. Qualified science cohort29/30PASS,
 legacy JSON attrs int3/11-to-string strictFAIL retained; source predates R1/R3,
 counts/other attrs exact, already documented in CONTENTS4811–12. Root admitted
