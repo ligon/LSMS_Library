@@ -49,9 +49,17 @@ def s16b_applied_candidate(raw, wave, *, household_id):
     have a gift, purchase or used amount. This still has the review-operand
     schema; s16b_plot_inputs_for_wave applies the public column/key contract.
     """
-    rows = s16b_rows_for_wave(raw, wave, household_id=household_id)
+    if wave not in SOURCE_BINDINGS:
+        raise ValueError('Mali s16b adapter supports only 2018-19 and 2021-22')
+    if not raw.columns.is_unique:
+        raise ValueError('Mali s16b requires unique source column names')
+    missing = set(SOURCE_BINDINGS[wave]['columns']) - set(raw.columns)
+    if missing:
+        raise ValueError('Mali s16b missing required own-source columns: '
+                         + ', '.join(sorted(missing)))
     selected = raw['s16bq02'].eq(1).fillna(False).to_numpy(dtype=bool)
-    out = rows.loc[selected].copy()
+    out = s16b_rows_for_wave(raw.loc[selected].copy(), wave,
+                              household_id=household_id)
     out.attrs = deepcopy(raw.attrs)
     return out
 

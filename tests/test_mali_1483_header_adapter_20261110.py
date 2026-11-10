@@ -70,7 +70,7 @@ def _extract(path, names, namespace):
 def adapter(monkeypatch):
     # Coordinator must provide exact source/config identity before collection.
     assert Path.cwd().resolve() == ROOT
-    assert Path(os.environ['PYTHONPATH']).resolve() == ROOT
+    assert Path(os.environ['PYTHONPATH'].split(os.pathsep)[0]).resolve() == ROOT
     assert Path(os.environ['LSMS_COUNTRIES_ROOT']).resolve() == COUNTRY.parent
 
     def forbidden(*args, **kwargs):
@@ -520,3 +520,28 @@ def test_full_dap_catchall_does_not_match_current_production_nutrient_share(adap
     assert pd.isna(shares.iloc[0])
     np.testing.assert_array_equal(shares.iloc[1:].to_numpy(), np.array([0.18, 0.17]))
     assert tally['unmatched_labels'] == {label: 1}
+
+
+@pytest.mark.parametrize('wave', ['2018-19', '2021-22'])
+@pytest.mark.parametrize('answer', [2, pd.NA, 9])
+def test_public_membership_precedes_hollow_nonapplication_key_validation(adapter, wave, answer):
+    module, formatters = adapter
+    yes = native(wave).iloc[[0]].copy()
+    hollow = pd.concat([yes, yes], ignore_index=True)
+    hollow['s16bq02'] = pd.array([answer, answer], dtype='Float64')
+    for name in ['grappe', 'menage', 's16bq01']:
+        hollow[name] = pd.array([pd.NA, pd.NA], dtype='Float64')
+    raw = pd.concat([yes, hollow], ignore_index=True)
+    raw.attrs = deepcopy(yes.attrs)
+    before = raw.copy(deep=True)
+    expected = module.s16b_plot_inputs_for_wave(yes, wave, household_id=formatters[wave])
+    got = module.s16b_plot_inputs_for_wave(raw, wave, household_id=formatters[wave])
+    pd.testing.assert_frame_equal(got, expected, check_exact=True)
+    pd.testing.assert_frame_equal(raw, before, check_exact=True)
+    assert type(got.attrs['record']) is AttrRecord
+    with pytest.raises(ValueError, match='nonmissing positive integer keys'):
+        module.s16b_rows_for_wave(raw, wave, household_id=formatters[wave])
+    selected_bad = raw.copy(deep=True)
+    selected_bad.loc[1, 's16bq02'] = 1
+    with pytest.raises(ValueError, match='nonmissing positive integer keys'):
+        module.s16b_plot_inputs_for_wave(selected_bad, wave, household_id=formatters[wave])
