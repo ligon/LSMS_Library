@@ -24,7 +24,7 @@ from tests.test_gh1040_wave_read_gates import (
     root, yaml_wave, script_wave, _plant, _garbage, _Rebuilt,
     YAML_TABLE, SCRIPT_TABLE,
 )
-from tests.test_gh1590_wave_failure_manifest import survey, GOOD, BAD, WAVES
+from tests.test_gh1590_wave_failure_manifest import survey, GOOD, BAD, EMPTY, WAVES
 REAL_RUN = subprocess.run  # existing1288 pattern: delegate actual private Make
 
 from tests.test_gh1196_parquet_index_policy import _exact
@@ -206,12 +206,12 @@ def test_country_recovery_uses_one_ordinary_build_then_exact_warm(survey, monkey
     with pytest.warns(UserWarning, match='Unreadable managed cache'):
         rebuilt = survey.load(request, country=c)
     _exact(rebuilt, healthy)
-    assert survey.getters == WAVES and payloads == ['country-payload']
+    assert survey.getters == [GOOD, BAD, EMPTY] and payloads == ['country-payload']
     assert ordinary_gates == (['country-gate'] if route == 'normal' else [])
     assert L.read_parquet_cache_waves(survey.cache) == WAVES
     reads = list(survey.reads)
     _exact(survey.load(request, country=c), rebuilt)
-    assert survey.reads == reads and survey.getters == WAVES
+    assert survey.reads == reads and survey.getters == [GOOD, BAD, EMPTY]
     assert len(ordinary_gates) == (2 if route == 'normal' else 0)
     assert payloads == ['country-payload', 'country-payload']
 
@@ -355,7 +355,10 @@ def test_script_open_disappearance_keeps_its_existing_fatal_policy(script_wave, 
     w, path, expected, frame, makes = script_wave
     _plant(path, frame, cache_hash=expected)
     error = FileNotFoundError('private vanished after cache selection')
+    original_open = getattr(L, 'open', open)
     def gone(candidate, *a, **kw):
+        if Path(candidate) != path:
+            return original_open(candidate, *a, **kw)
         assert candidate == path
         candidate.unlink()
         raise error
@@ -457,7 +460,7 @@ def _native_script_case(survey, tmp_path, monkeypatch, outcome):
 
 @pytest.mark.skipif(shutil.which('make') is None, reason='needs GNU Make')
 @pytest.mark.parametrize('outcome', ['healthy', 'bad-output', 'no-output', 'exit7'])
-def test_actual_make_recovery_has_no_mtime_stale_success(survey, tmp_path, monkeypatch, outcome):
+def test_actual_make_recovery_has_no_mtime_stale_success(survey, tmp_path, monkeypatch, outcome, capfd, request):
     c, w, path, expected, counter, calls = _native_script_case(
         survey, tmp_path, monkeypatch, outcome)
     with pytest.warns(UserWarning, match='Unreadable managed cache'):
@@ -475,7 +478,16 @@ def test_actual_make_recovery_has_no_mtime_stale_success(survey, tmp_path, monke
                                else subprocess.CalledProcessError) as failure:
                 w.grab_data('facts')
             if outcome == 'exit7':
-                assert failure.value.returncode == 7 and not path.exists()
+                diagnostic = capfd.readouterr()
+                # Make retains recipe7 in stderr but exits2 itself. Keep the
+                # actual native diagnostic in JUnit and the captured stream.
+                request.node.user_properties.extend([
+                    ('native_make_returncode', failure.value.returncode),
+                    ('native_recipe_stderr', diagnostic.err)])
+                sys.stdout.write(diagnostic.out)
+                sys.stderr.write(diagnostic.err)
+                assert failure.value.returncode == 2 and 'Error 7' in diagnostic.err
+                assert not path.exists()
             else:
                 assert path.read_bytes() == b'fresh invalid output'
     assert counter.read_text().splitlines() == ['run']
