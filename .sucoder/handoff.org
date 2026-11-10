@@ -1,4 +1,29 @@
 #+title: Current LSMS-ISA goal handoff
+* Latest country continuation (2026-11-10 06:19 UTC)
+Published1687 head42f2 remains FROZEN; WindowsSUCCESS, unit/full-data stilllive
+on42765866264/42765866627; fulljob is in Run full test suite. Observer35534 same
+handle; no source changes or new merge/settings. GoalACTIVE/no newwholeclosures.
+Nigeria1452 now completed authorized numeric6-source stage71202 CLOSED0/8.358s:
+exact6sanctionedget_dataframe/6Stata parses/0fallback, allsource/private bytes
+and fullframes/order/types/attrs exact. All native complete keys integral/unique.
+Unconditional quantity counts are NOT a policy finding: Root required existing-
+capture-only availability×positiveprice×unit crossmasks before interpretation.
+W3 unlisted31/42 code findings and W1/W5 quantity/factor patterns must remain
+source-qualified.1452 doing additive audit of own4PKLs ONLY, no newnativegetter/
+parser/API. Initial numeric report/manifestc51ff449 retained. Mwi now independent
+semantic reviewer of existing docs/headers/aggregate report (no data/PDF reparse),
+especially whether each quantity establishes a price denominator; no conversion
+from fieldname/PHborrowing. ExistingNGAobs/variety contract remains binding.
+Root updated issue587 with fivepositive PPquestionnaires/sixzero-rowheaders,
+pendingnumeric/sourcewiring, plus TZA newboundedform findings; no5cellclosure.
+
+TZA1590 completed source-only docstring correction8ade70617cd9cd03dc9154053d351c0129a7e439,
+offaccepted a20. Root read fullpatch/accepted. Two module-docstrings+ownledger
+only, executableAST and docstring-inverse bytes exact; no tests/census/runtime.
+R587-tanzania-producer-wording-20261110. Candidate is a separate follow-on,
+NOT in1687; script-text footprint unmeasured.1590availablefornextreview/CIactuals.
+Do not create occupancy-only work or mutate current1687 while validation runs.
+
 * CURRENT after real Windows repair (2026-11-10 06:06 UTC)
 PR1687 FINAL published head42f2a8e017ae6dee534572189ebc743a831ed2ca,
 tree0ce39656bc88f3ffea9df158aa2b0a38bdc31c2d; author Wfix-1687-documentation-utf8-20261110.
