@@ -750,5 +750,3 @@ def test_explicit_provider_close_failure_keeps_handles_and_state_for_retry(tiny,
     fs.close()  # explicit recovery after the close error has been removed
     assert not directory.exists()
     assert fs._runtime_repo is None
-
-
