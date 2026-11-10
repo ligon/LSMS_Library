@@ -1,5 +1,5 @@
 #+title: Current LSMS-ISA coordinator handoff
-* CURRENT -- 2026-11-10 16:12 UTC
+* CURRENT -- 2026-11-10 16:35 UTC
 Goal ACTIVE/unbounded. Prior turn PROGRESS: draft1688 and8country allocations.
 This turn PROGRESS:1687repairs published/revalidated, drafts1689/1690, issue905
 narrowed, user1457R1approved/R2arejected, delegated integration now operational.
@@ -282,3 +282,51 @@ context/operator files; bytes/SHA/mode/mtime and233source/data/cache bindings
 unchanged. Operator deliveryBLOCKED/ledgerb6166a2c remains immutable. Manager
 authenticates timing/packet independently; actual results may be admitted with
 explicit reporting-only deviation if proven, no rerun or ctime restoration.
+
+* 16:35 UTC actual terminal results and reconciliation
+Previous turn PROGRESS: reviewed dependent draft1691 published,21/21 measured
+BFA hash delta, joint Malawi code clearance; goal remains ACTIVE/unbounded.
+This turn: Root narrowed/readback-verified GH1573 to approved decoding + actual
+validation/integration residual (R1573-live-reconciliation-20261110) and GH587
+to draft PH repairs/current PP representation residual (R587-draft-progress-
+reconciliation-20261110). No closures/merges claimed. Manager independently
+narrowed/readback-verified GH1069:7inclusions/1alreadyexcluded, resolver policy
+retained; R/review-1069-current-fingerprint-20261110. No exclusions/rewarm.
+
+Malawi41092166 setup-only completed0/30m52s, RAW0; launch cutoff preserved.
+Fresh NON-MODEL41092493 on n0037 actually executed unchanged9f cohort:
+stage192283 CLOSED0/21.358s; native192287 CLOSED0/93.672s/12fullreads/onewriter;
+saved-only oracle195640 TIMEDOUT124/180.078s/SIGTERM with0completed predicates.
+Overall jobFAILED1,5m32s; all groups ECHILD and source/operator/source conservation
+passed, credential removed. Fixed4managedfiles each3reads; actualR1/R3 scientific
+acceptance remains UNPROVEN. R/1457-malawi-native-deterministic-20261110/job-41092493/
+evidence/{REPORT.md,RESULT.json}; private raw/log/captures siblingoutside evidence,
+durable private seals SHA98a3bd642319cba8cd2e03006f207223919dea976f7e10a814391cdd54aa8d39.
+Manager+lead now own SAVED-ONLY oracle diagnosis/correction and deterministic
+continuation; no native/getter/staging replay, no Root per-file loop. Root read
+terminal report and original oracle source, identified possible repeated-key/set
+overhead but no actual hot-path attribution yet. Existing failed attempts stay.
+
+Uganda timing qualification independently ADMITTED:233Git bindings/15changed
+content hashes authenticated;15strict comparisons/26inventory pass; latest
+runtime receipt precedes reporting-only ctime change by444s. Original delivery
+BLOCKED immutable, no rerun/ctime restoration; warm tuple-unaware cache boolean
+not evidence. R/review-1281-uganda-postruntime-seal-qualification-20261110/REPORT.md
+personally read by Root; exact bounded results accepted, no broad API promotion.
+
+Fresh queue report R/isa-next-country-queue-20261110:145openissues/2completepages,
+12selectedleads,0clearednewcountrycodejobs in that bounded set. Two1136 source-only
+design briefs retain explicit design-first/after-defect-queue order; Nigeria587
+public representation held. Not a claim all145issues audited or resolved.
+finish_1590 now prepares concrete raw-complete PP projection/identity design from
+alreadyaccepted6809 source/matrix, no data/runtime or scientific assumption.
+Uganda1000 prior accepted9primarymetadata requests found limited-access fulltext;
+manager deduped. New authorized document route is ONLY previouslyunqueried
+HarvestPlus node562 own compilation/version and directly supplied new primary
+locator. Preserve225/production; metadata/abstract insufficient for acceptance.
+
+Full1687 data42837909103 confirmed LIVE16:33Z/full-suite step; exact8c unchanged.
+Root readiness/merge/#932freshminimalsettings remains after actualPASS. Lead
+prepares combined1690+BFA1573 tree ONLY after both scoped actual accepts; after
+1687lands, source-conserving actualbaseupdate then one composed full gate avoids
+unnecessary serial development suites. Frozen9f not changed at this checkpoint.
