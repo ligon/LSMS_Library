@@ -17,3 +17,24 @@ Borrowedactualcountrygate badoldpayload skipsprivate seed but livebytes exact; p
 
 ## 6. Status
 Source-only implementation preparing. No test/runtime result or metadata cost inferred from A+B/old1288. No new scientific ruling needed. D needs own all-output/local-command/lexical-path authority, not granted by C.
+
+## Actual focused results (2026-11-10)
+Frozen fc0b371: one 28-case ordinary private/nonroot MAIN selection returned
+24 PASS + 4 FAIL, outer1. The four failures patched global pq.read_schema,
+which established tolerant footer helpers intentionally convert to absent
+metadata. This was a new fixture/oracle error, not a proved product defect.
+Test-only 8bf710 changes that injection to Country.read_parquet_grain_audit,
+the actual postread receiver outside the recovery catch. Exactly those four
+controls then passed (actor97163 outer0, 13.09s pytest/19.829s wrapper).
+Acceptance is 24 initial passes plus 4 corrected controls, not a fresh28 run.
+Original logs/XML/failure classification remain at external
+reports/1071-private-make-cache-owners-20261110/focused-v1; affected-v2 retains
+its separate receipt. Source/config bindings exact and clean, controller+two
+workers authenticated, active tripwires zero, top private data/config empty.
+Private invented parquet/producer work under pytest tmp is intentional.
+No native source/country API/census/rebuild exposure is claimed. Local C
+sidecar/symlink/replacement/source-drift branches are source-reviewed; not all
+are dynamically exercised by these 28 cases. Existing non-atomic filesystem
+identity-check limits remain. Common observed/current nlink guard is required
+because a cache-shaped path can alias absent-source private L1 bytes under a
+different declared source name. No L1 scan, new registry/schema or exclusion.
