@@ -114,3 +114,38 @@ metadata footprint remain UNRUN. Next finite pure integration selection is
 only `tests/test_gh812_ehcvm_strata.py::TestWiring` (23 expected parameterized
 cases), exercising the composed metadata/registry/import bindings without
 replaying the four donor modules or invoking data-gated tests.
+
+## 2026-11-10 — Combined pure, own-card and final metadata outcomes
+
+At frozen runtime `c40bf96c8ddae75ce954647be25f92fd170051d1` the one combined
+shared812 TestWiring cohort closed0:23PASS/0F/E/S, three exact MAIN/import/cwd/
+countries-root identities, UID65534 with empty uid_map, isolated network,
+thread/build1, profiles active through finish,0denials/private config0/data0.
+No donor module or data-gated class was replayed.
+
+Joint manager/deputy admission then ran exactly four held cover-only pyreadstat
+metadata contexts, one per country, all closed0 and zero records decoded.
+Byte-hash and header IO occurred. Original/source-sidecar/private0400 copy seals
+are unchanged. Own s00q01 cards contain12/6/9/33 entries (Benin/Togo/GB/CIV), not
+observed-cell counts. Own s00q04 cards confirm Urbain/Rural except GB's
+Urbano/Rural. No weights/header campaign, retrieval, row payload or normal
+sample/API acceptance is claimed. R/header-coding/{SUMMARY,RESULT}.json binds
+these outcomes and their per-role custody/header/operation receipts.
+
+The ONE final candidate-only metadata collector closed0/139.095s against the
+retained exact9f baseline (original header/SHA preserved, no baseline replay).
+Actual changes:71country,89wave,0BTF,4FIF; keysets/all14nonhash/18PeruNone exact,
+errors0/denials0/config0/data0/source clean. The static zero-FIF prediction was
+incomplete: each mapping's three added imports expose unchanged helper closures
+to framework_imports_fingerprint (registry612–669), explaining exactly the four
+own2018 wave FIF changes. GB's country Org input changes both wave fingerprints,
+not2021 behavior. Full actual values and attribution are in R/metadata/
+COMPLETE-COMPARISON.json and METADATA-ATTRIBUTION.md. Candidate map SHA256
+`6ef1138961faeafd290a4edeee95d92a478454ef6f1d749378c9cb6db46bf994`.
+
+This final commit is ledger-only; all27 other owned objects and all nonledger
+objects must remain exact the measured runtime. Dependent DRAFT publication is
+authorized, with normal original/candidate sample and cold/warm/Feature acceptance
+explicitly pending. R/NORMAL-PLAN.md and NORMAL-INPUTS.json freeze the eight-role
+source closure for later independently reviewed external operators, not data
+execution from header success. Root retains readiness/development merge/settings.
