@@ -218,6 +218,10 @@ def test_existing_data_recipe_is_reused_without_weaker_test_or_credential_gate()
     # This wrapper-only diagnostic option changes no child command or gate.
     assert full['run'].count(' ' + flag + ' ') == 1
     full['run'] = full['run'].replace(' ' + flag + ' ', ' ', 1)
+    # Only the dedicated PR workflow uses bounded, file-grouped workers.
+    parallel = 'poetry run pytest -n 2 --dist=loadfile '
+    assert full['run'].count(parallel) == 1
+    full['run'] = full['run'].replace(parallel, 'poetry run pytest ', 1)
     assert reused == existing['jobs']['data-tests']['steps'][1:]
     assert workflow['jobs']['validation']['env'] == existing['jobs']['data-tests']['env']
     assert workflow['jobs']['validation']['timeout-minutes'] == '360'

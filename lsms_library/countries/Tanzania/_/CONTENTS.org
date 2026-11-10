@@ -3275,3 +3275,46 @@ change or whole587 closure follows. Exact fielded revision/routing/addenda and
 the original-to-released-UPD relationship remain qualified. Source cells,
 inspection bounds and custody: =B/reports/587-tanzania-r1-original-food-authority-20261110/=
 (B as in the task ledger). No raw/header/row, Country/Feature, Make or census ran.
+
+
+* 2026-11-10 -- GH #449: official native key semantics, separate release binding
+
+The held UPD BID, PDF p.12 “Naming Convention for r_hhid”, explicitly says
+original =hhid= (R1), =y2_hhid= (R2), =y3_hhid= (R3), =y4_hhid= (R4) were
+condensed into =r_hhid= and require =round= to distinguish them. This is a
+producer-defined semantic bridge, beyond matching column names or geography;
+it does not make =UPHI=, canonical =i= or sampling =v= the original key.
+Existing closed #587 text was authenticated and reused, without a PDF reparse.
+Current official WB3814/resource48979 reproduces the already DVC-managed BID
+exactly: 857,525 bytes, MD5 =38a095404848139cacbb4244cef24626=, SHA256
+=13832fd7d25894e3ad306db3fe7aef3530fbe0431a39e4b175f3168c58bf71c8=.
+The older DDI's 2018 BID description remains distinct from these current bytes.
+
+Held official v2.0 =Reproduction_v2.zip= was reproduced byte-exact from its
+public code asset (426,082 bytes, SHA256
+=f09c704695c110551f6bdce95f487faec131ba3b938471c4d4b19832837c4660=).
+Selected =TZA_NPS1/2/3.do= blocks read the original household geovariables on
+=hhid=/=y2_hhid=/=y3_hhid= and distinguish plot sources with =plotnum=.
+W1 names =Plot.Geovariables_Y1_revised2=, corroborating the already-held member
+missing from the catalog roster. These cleaners do not construct UPD =r_hhid=;
+no program ran and no harmonised data asset was read. Their common
+=dist_market= alias also masks a source distinction: W1 DDI says nearest
+Market, W2/W3 nearest Agricultural Market. Preserve the source concepts.
+
+Current W1/W2 DDI notes attribute household-geovariables revision to Version02
+and community-file addition to Version03. This explains the metadata chronology,
+not byte identity or supersession of the two held W2 household/plot pairs.
+The W2 cleaner names =HH.Geovariables_Y2=/=Plot.Geovariables_Y2=; it does not
+select them over =TZY2.HH.Geovariables=/=TZY2.PlotGeovaribales= for this library.
+The eight existing sidecars and all version/default/grain choices stay held.
+
+The remaining precise source operand is the UPD_v01_M original-input manifest
+and =r_hhid= assignment/recode program (or attributable preservation statement),
+plus the W2 alternate-pair revision relationship. No such program was listed
+on the inspected3814 related-materials page; this is not a nonexistence claim.
+See =_/449_OFFICIAL_BRIDGE.md= for exact DDI variable/program locators,
+source seals and a minimal conditional native-extraction/bridge plan. Six
+metadata and three selected public resource requests stayed below10MB each;
+no raw payload/header/row, Country/Feature, source join, test or census ran.
+WAITING114, back-casting,1441 code frames,587 fielding,1497 continuation,
+Extended/Refresh and all ID/weight/cluster rules remain separate and unchanged.

@@ -3609,3 +3609,66 @@ Evidence (custody, six text pages/two rasters PER form, exact options and
 finite UNRUN follow-on controls):
 =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/country-queue-refill-20261109-v2/refill-country-authority-d47-20261110/workers/Niger1565/ba850e6737f44335b5cdfb2d7c1a3712/evidence/REPORT.md=.
 This completes only the own-form authority slice; whole #1565 remains open.
+
+
+* 2026-11-10 -- Independent French 3E review; two-document archival attempt (GH #1529)
+
+Independent review of candidate =711369830727b5a7842085e32ee80c96ba10a118=
+used its sealed excerpts, locator/read/custody/GET receipts, without another
+PDF parse. This reviewer personally read all 3,568 base Niger lines, including
+TODO/WAITING/LOGBOOK material present (SHA256
+=414c82eca0864d336287d6c11987aeda808fb7b779832238a7d29d86b96601c8=).
+The author's earlier full Tanzania read is not claimed as a full Niger read.
+
+Own French WB2050 questionnaire resource31148, PDF28, q3E.8:
+#+begin_quote
+Quelle est la superficie consacrée au premier cycle (de production) de culture ?
+#+end_quote
+The stated unit is square metres. Own manual resource31157, PDF89, q3E.8:
+#+begin_quote
+Superficie moyenne en mètre carré consacrée au premier cycle de culture.
+#+end_quote
+The word moyenne remains in that heading; its first-cycle qualifier and the
+reported explanatory sentence do not specify averaging across cycles. The
+sealed PDF89--91 evidence places production across household parcels and
+allows several harvests within one cycle. It supplies no 999 rule for q8.
+Neither a physical-parcel allocation nor a land-union/yield denominator follows.
+
+This supports the documentary target, with the released average-per-each-cycle
+label still in tension. Neither witness is presumed stale. Questionnaire V10
+metadata has July2011 creation and September2012 modification; the manual has
+Mai2011 cover/July2011 metadata. No fielded/export-version identity follows.
+The existing ruled harvest cycle product, zeros/literal999, sale windows and
+GH1560/1571 factor/state holds are unchanged. The six-native-column companion
+proposal and its six pure controls remain UNIMPLEMENTED/UNRUN; no native3E,
+Country/Feature/sample/producer or scientific test was run for this review.
+
+The earlier statement "The French instrument is not held" names the base
+managed roster. These two French PDFs were missing from its declarations and
+the exact prior private paths were absent. One capped GET per official URL
+returned exact authorized bytes on 2026-11-10. The ordinary batch helper added
+two local DVC pointers but its ONE push failed "Unable to locate credentials";
+no successful target was returned. Remote holding is UNCONFIRMED, and both
+fresh readbacks remain UNEXECUTED. Sidecars are local staging, not proof of
+remote durability. Existing English documents, raw release facts and License
+remain intact; public access does not establish an open redistribution licence.
+See =Documentation/SOURCE.org= for exact public identities and partial status.
+Evidence and choice brief: dispatch77b4ce99, ledger
+=1529-niger-primary-peer-archive-77b4ce99-20261110.md=; whole1529 stays open.
+
+** Two French documents now remotely verified after separate authorization
+
+The preceding failed-push/local-staging paragraph remains an actual first
+attempt. ROOT separately authorized the minimal operator context correction:
+remove the two injected absent AWS file-route variables so the unchanged
+normal helper's credentialpath/writer swap could operate. One corrected push
+returned both exact documents; two separate empty-private-cache, read-only
+get_data_file calls then verified all size/MD5/SHA seals. Questionnaire31148
+readback took 6.2315s; manual31157 took 5.6644s. Both PDFs are now managed and
+remote-held; no public resource was downloaded again or PDF content reparsed.
+Existing License/source/raw-release facts remain unchanged. See the completed
+continuation in Documentation/SOURCE.org and dispatch77b4ce99 evidence.
+This holding result does not resolve the first/average-cycle,999, physical
+land-grain/yield or fielded/export-version questions above. The six-native-
+column proposal remains UNIMPLEMENTED, its six pure controls UNRUN; no native
+3E/scientific tests or API table acceptance follows. Whole1529 stays open.

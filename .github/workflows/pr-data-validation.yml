@@ -220,6 +220,6 @@ jobs:
         # Plain assertions and warning-summary suppression remain defense in depth.
         run: >-
           python scripts/private_ci_check.py --stage data-tests --junit results.xml --public-test-failures --
-          poetry run pytest --tb=short --assert=plain --disable-warnings
+          poetry run pytest -n 2 --dist=loadfile --tb=short --assert=plain --disable-warnings
           --timeout=600 --timeout-method=thread
           --durations=25 --junitxml={junit}
