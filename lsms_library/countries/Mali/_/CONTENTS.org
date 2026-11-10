@@ -3866,3 +3866,32 @@ card. Preserve that mismatch and the current quantity/unit/unread-state rules.
 Four metadata GETs, one selected XML context, no PDF/native/row/API replay;
 exact receipts and the one-P2-manual archival proposal are recorded in
 =.coder/ledger/1436-mali-own2017-electronic-export-route-7b5e95bf-20261110.md=.
+
+* 2026-11-10 -- own2017 P2 enumerator manual held; state bridge remains open (GH #1436)
+
+=2017-18/Documentation/eaci17_manuel_p2_french.pdf= is now DVC-managed:
+WB3409 resource47787,1,375,005bytes,rawMD5=b08ec8e623065e3a75dfab6a481cbafd=.
+One public GET, one exact-document managed push and one fresh empty-private
+normal read-only retrieval matched SHA256=73fe411b153da4df3af02260e88c1b00747c9b37ee47d139345175ee231c9394=.
+The returned official filename matches the local holding. Cover identifies
+EAC-I2017/second passage; PDF metadata names EACI17_MANUEL_P2.docx and dates
+creation/modification2019-02-04, not a certified fielded/export version.
+
+Bounded new-manual read:7unique text pages (PDF1--4/29--31),2personally
+viewed instruction pages (PDF30/31); none of the older forms/BID was reparsed.
+CompleteQ7F13 instruction on PDF30 describes Production en UML, UML and
+Equivalent en Kg, with its partial-harvest and worked-example instructions.
+It supplies no Etat card, fourth-answer explanation or native suffix binding
+in that inspected paragraph/layout. This is not absence from the whole manual.
+CompleteQ7F21 on PDF31 explicitly asks whether the product was threshed before
+storage (Oui toQ22; Non toQ29); it is a separate operation question.
+
+Preserve the existing three-choice printedQ13 versus four-choice released
+s7fq13b/Egrener tension and the ruralLourd/Leger scope. The already-closed
+publicDDI discovery supplies b=CodeEtat/c=UML association but no processing
+meaning/version bridge for code4; the preceding checkpoint records that separate metadata result. No EHCVM fold or Q21 answer is borrowed.
+The remaining operand is an own-release/fielded dictionary, instruction or
+erratum explaining nativecode4 and its correspondence to the printed card.
+No condition/unit/quantity/default/ID/weight/coverage ruling follows.
+Source/terms/byte custody and exact bounds are recorded in SOURCE.org and
+burst report =1436-mali-p2-manual-restoration-20261110/=.

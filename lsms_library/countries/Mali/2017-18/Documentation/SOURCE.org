@@ -22,3 +22,17 @@ https://microdata.worldbank.org/index.php/catalog/3409
 - Physical bytes :: 1223133; MD5 =a3c822057e8eb09ab756b82095595332=; SHA256 =33423a38c73f5459b102ecd7e1eb6f9e830346e839119d2085c71a6730b3e2c0=.
 - Managed holding verified :: 2026-11-08T18:19:35.897403+00:00; generated single-file DVC sidecar and fresh normal read-only get_data_file retrieval matched the original bytes. Existing catalog directives and LICENSE.org remain unchanged.
 - Evidence limits :: Closed text extraction read 32 pages; no complete 51-stratum code list was located by that bounded search. Visual table confirmation remains pending; this is no claim that a list is absent from images or tables, and no stratum mapping or weight change.
+
+* Additional own public documentation: second-passage enumerator manual (2026-11-10)
+
+- Survey/catalog :: EAC-I 2017, WB3409, =MLI_2017_EAC-I_v03_M=; all existing SOURCE/HELD and LICENSE directives remain unchanged.
+- Resource :: 47787; official catalog title identifies the French second-passage enumerator manual.
+- Exact public URL :: https://microdata.worldbank.org//catalog/3409/download/47787
+- Returned filename :: =eaci17_manuel_p2_french.pdf=, exactly matching the proposed local filename; HTTP200, application/octet-stream, PDF1.7; final URL equals requested URL (no redirect-history inference).
+- Retrieval :: 2026-11-10T09:57:13.488851+00:00; one public document GET; no raw release or other catalog document reacquired.
+- Physical bytes :: 1375005; raw MD5 =b08ec8e623065e3a75dfab6a481cbafd=; SHA256 =73fe411b153da4df3af02260e88c1b00747c9b37ee47d139345175ee231c9394=.
+- Managed holding :: one normal =push_to_cache_batch= exact-path push succeeded; a separate initially-empty private read-only =get_data_file(..., populate_cache=False)=, with in-tree PDF absent and WB fallback unavailable, returned the exact same bytes. No credential contents recorded.
+- Source/version :: cover identifies Mali/EAC-I2017 and second passage;49PDFpages. PDF metadata title is =Microsoft Word - EACI17_MANUEL_P2.docx=; creation/modification2019-02-04. These are published-document attributes, not authenticated fielded CAPI/export version.
+- Terms :: existing LICENSE.org and catalog access-policy citation retained, including its historical v02 citation example beside heldv03. No separate document-specific licence is invented from public availability.
+- Scope ::7unique text pages (1--4,29--31) and2views (30--31); ownQ7F13/Q21 instructions only. No native/header/row/API/build/census or canonical state/unit/quantity/default/weight change.
+- Evidence :: burst reports/1436-mali-p2-manual-restoration-20261110; original/private0400copies and source/sidecar unchanged.
