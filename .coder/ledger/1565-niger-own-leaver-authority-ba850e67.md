@@ -16,7 +16,7 @@ Read only the two own 2021 public forms under explicit custody and reuse the clo
 | Closed prior packet | evidence/REPORT.md, DECISIONS.md, SOURCE-PROOF.json under Niger-v3-source-pinned/f40e80dc... | Completed source diagnosis; no recall/count/API replay |
 | Closed native header | country-header-resupply-five-roles-20261110/Niger-2021/HEADER.json | Whole 64-name inventory, selected cards only; reuse JSON, never DTA |
 
-No implementation tests run; documentary scope forbids project runtime. Meaningful future controls belong in DECISIONS.md and remain UNRUN.
+No implementation tests run; documentary scope forbids project runtime. Existing roster ledgers `roster-characteristics-wave-deletion.md` and `1063-roster-order.md` were read: characteristics residence filtering and DFS merge order are distinct existing behavior, not this departure policy. Meaningful future controls belong in DECISIONS.md and remain UNRUN.
 
 ## §3 Definitions and conventions
 Inherit STANDING.md §3/§4 and CLAUDE.md “MonthsSpent / MonthsAway / WeeksAway” and “Canonical Schema”; do not reimplement finalization. Niger CONTENTS.org “Household Presence / MonthsSpent” says the two EHCVM six-month filters are not a continuous duration. Full existing file personally read: 3568 lines, SHA256 414c82eca0864d336287d6c11987aeda808fb7b779832238a7d29d86b96601c8.
@@ -40,4 +40,9 @@ Inherit STANDING.md §3/§4 and CLAUDE.md “MonthsSpent / MonthsAway / WeeksAwa
 Need a release-bound fielded questionnaire/version and export bridge; if coded reasons are desired, a separate authentic own native coded source plus linkage authority. Then choose the carrier, served population and all-null semantics explicitly. No approval requested from an absent human; bounded authorized work proceeds.
 
 ### Phase 3 — verification
-Pending documentary extraction, page comparison and append-only conservation. Runtime, invented behavior controls, API and issue acceptance remain UNRUN.
+- Own form authority — OK (§3/§4/§5): both authenticated PDFs, text only pages1-6, retained/viewed rasters4/6. Pages2-6 text exact-equal, selected rasters byte-equal. Literal reasons and routing recorded in BRANCH-AUTHORITY.json.
+- Export gap — OK (§2/§4): closed HEADER/RECEIPT hashes match FINAL-MANIFEST; no native read. Form1.00a living wording differs from native s01q00aa membership wording; missing coded reason cannot be reconstructed. Form calendar month/year does not decode native one-integer s01q00c.
+- Country appendix — OK (§4): 43 added lines preserve all239853 original bytes, SHA256 unchanged for the prefix. No Org block/table/build input or executable source edited; no new symbol, REINVENTION or definition contradiction introduced.
+- Printed1.13 has no explicit rejection instruction; existing 12/0 mapping and eligibility decisions are retained, not reinterpreted from the form.
+- Initial parser whitespace/rotation warnings and incomplete first stderr retention remain disclosed. No retry of pages1-4 occurred.
+Runtime, invented behavior controls, API, independent review and whole-issue acceptance remain UNRUN.
