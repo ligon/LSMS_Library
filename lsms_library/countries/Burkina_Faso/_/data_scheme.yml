@@ -259,15 +259,19 @@ Data Scheme:
     # unit, purchase/gift flags + quantities with their OWN unit columns,
     # and (seed rows)
     # the seed's crop on the shared harmonize_food labels.  REPORTED values
-    # only.  Source s16b (2018-19) records inputs at the HOUSEHOLD x input
-    # grain, NOT plot x input (no parcel-level input data); the GAP-2 name
-    # `plot_inputs` is kept but `plot_id` is NOT in the index.  input ->
+    # only. Own s16b in 2018-19 and the newly wired2021-22 records HOUSEHOLD x input
+    # grain, NOT plot x input: s16b has no parcel column.  The separate
+    # s16a parcel module does ask fertilizer quantities and their units
+    # (e.g. s16aq29c1/c2 for NPK); it is not read by this builder.  Its
+    # integration is held in GH #1483; see CONTENTS.org's dated entry.
+    # The GAP-2 name `plot_inputs` is kept but `plot_id` is NOT in the index.  input ->
     # harmonize_input; u -> the u table; the EHCVM roster has no crop
     # column so seed crop is resolved from the seed label via
     # harmonize_seed_crop.  Non-crop-specific rows carry the sentinel
     # '(not crop-specific)' and a missing unit carries 'Manquant' — a NaN
     # index level would be dropped by the framework's canonical NaN-key
-    # de-dup collapse.  i via burkina_faso.ehcvm_i (100% sample reconcile).
+    # de-dup collapse. 2018 i uses burkina_faso.ehcvm_i; own2021 uses
+    # burkina_faso.i before the framework walk; no new sample reconcile is claimed.
     # ENCODING: s16b read default (utf-8) so accented labels match the maps.
     index: (t, i, input, crop, u)
     Quantity: float
@@ -287,6 +291,49 @@ Data Scheme:
       optional: true
     Unit_received_as_gift:
       type: str
+      optional: true
+    # Own2021 retains its numeric codes/answers, including q09c Montant.
+    grappe:
+      type: int
+      optional: true
+    menage:
+      type: int
+      optional: true
+    vague:
+      type: int
+      optional: true
+    s16bq01:
+      type: int
+      optional: true
+    s16bq02:
+      type: int
+      optional: true
+    s16bq03a:
+      type: float
+      optional: true
+    s16bq03b:
+      type: int
+      optional: true
+    s16bq05:
+      type: int
+      optional: true
+    s16bq07a:
+      type: float
+      optional: true
+    s16bq07b:
+      type: int
+      optional: true
+    s16bq08:
+      type: int
+      optional: true
+    s16bq09a:
+      type: float
+      optional: true
+    s16bq09b:
+      type: int
+      optional: true
+    s16bq09c:
+      type: int
       optional: true
     materialize: make
 

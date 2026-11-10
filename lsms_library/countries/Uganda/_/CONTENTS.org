@@ -6070,3 +6070,41 @@ fields/codes to the released fields/codes, with affected records and an explicit
 correction rule for both populations. Labels, units, Aggregate buckets, native
 values, weights and all scientific defaults remain unchanged. Whole #1525 is
 open; no native/header/API/build/cache or new statistical check ran here.
+
+* 2026-11-09 -- Remaining processing-state scope and current holds (#833 / #647 / #1000)
+
+The six-family Aggregate change above is already merged in PR #1534
+(=3aefbbedf7f59775c2ea6097fb4c0f8afa2d9c98=); it is not a new refill task.
+The narrowed #833 body leaves Beans, Peas, Rice, Ginger and Soybean unruled.
+[[file:PROCESSING_STATE_REVIEW.md][The residual-state memo]] binds their twelve current food-code rows and the
+separate crop namespace, without selecting a new fold or split.
+
+Two details matter before applying a general state rule. Food code 145 says
+only =Peas=, not fresh; =Peas (dry)= on 162 does not establish 145's state.
+Rice's one bucket holds unqualified 110, white/brown 1101/1102 and flour 1103.
+The crop table deliberately retains four pea species instead of folding them
+to food =Peas=. Numeric food/crop codes are not join keys either: food 141
+is Beans (dry), whereas crop 141 is Millet. These are committed mapping facts,
+not new native observations or proof of physical-state comparability.
+
+The [[https://github.com/ligon/LSMS_Library/issues/647#issuecomment-6639391906][2026-11-04 #647 ruling]] keeps the ordinary-only default pending a person's
+query to UBOS / World Bank about 5A1 routing. The earlier documentary checkpoint
+still supplies the question: additional versus cumulative Q6/Q7/Q8 amounts,
+and No/missing follow-up handling. No record append, replacement or factor-pool
+change is authorized by this note; the historical 97 rows are not remeasured.
+
+The [[https://github.com/ligon/LSMS_Library/issues/1000#issuecomment-6639392305][2026-11-04 #1000 ruling]] retains the current FCT and source note while
+the Kidmose source is obtained. A public [[https://www.academia.edu/15228942/Effect_of_home_preparation_practices_on_the_content_of_provitamin_A_carotenoids_in_coloured_sweet_potato_varieties_Ipomoea_batatas_Lam_from_Kenya][reproduction of the article]] now exposes
+methods beyond the earlier abstract: published p. 401, section 2.2 describes
+peeling the raw samples, and p. 403, section 2.7.1 measures dry matter on peeled
+raw samples. DOI =10.1016/j.ifset.2007.03.025=, journal 8(3), pp. 399--406.
+This supports the preparation question; it does not resolve the with-skin FCT
+assignment. Table 2's web text has scrambled column order. No cultivar cells,
+revised means or numeric correction are inferred from it; no original PDF
+bytes were acquired or authenticated. A readable table and electronic-FCT
+derivation/version remain needed. The #967 approval, container-mass caveats,
+#829 WAITING, sample-design qualifications and #1525 hold remain in force.
+
+This is source/document-only progress. No country table, native source/header,
+getter/provider, Make producer, tests, API/cache operation or new demand fit ran.
+No Preferred/Nutrition/Aggregate cell, FCT source note, value or default changed.

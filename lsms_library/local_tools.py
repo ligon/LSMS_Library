@@ -92,6 +92,9 @@ import socket
 from urllib.parse import urlsplit, unquote
 from importlib.resources import files
 from dvc.api import DVCFileSystem
+from ._dvc_runtime import (
+    DVCMetadataCompatibilityError, RuntimeDVCFileSystem,
+)
 import pyreadstat
 import inspect
 from typing import Any
@@ -186,7 +189,7 @@ def _s3_explicit_credentials() -> dict[str, str]:
     return {}
 
 
-def _build_dvcfs() -> DVCFileSystem:
+def _build_dvcfs() -> RuntimeDVCFileSystem:
     config: dict[str, Any] = {"cache": {"dir": os.fspath(_DVC_CACHE_DIR)}}
     # The remote override carries credentials but no ``url``; DVC validates
     # each config level on its own, so the stanza is only legal when the
@@ -204,7 +207,7 @@ def _build_dvcfs() -> DVCFileSystem:
                 **_s3_explicit_credentials(),
             },
         }
-    return DVCFileSystem(os.fspath(_COUNTRIES_DIR), config=config)
+    return RuntimeDVCFileSystem(os.fspath(_COUNTRIES_DIR), config=config)
 
 
 DVCFS = _build_dvcfs()
@@ -1180,6 +1183,8 @@ def _warm_dvc_cache_for_feature(country, feature: str, wave: str | None = None) 
                     tmp.unlink()
                 except OSError:
                     pass
+    except DVCMetadataCompatibilityError:
+        raise
     except Exception:
         # Last-ditch swallow: never let pre-warm break a build.
         pass
@@ -2157,6 +2162,33 @@ def _read_parquet_with_index_policy(f, *, read_errors=(), **kwargs):
     import pyarrow.parquet as pq
     metadata = pq.read_schema(f).pandas_metadata
     return _restore_parquet_index_string_policy(df, metadata), None
+
+
+def _read_managed_parquet_cache(path, *, open_errors=(), check_null=False, engine=None):
+    """Read one caller-owned cache, separating payload failure from policy.
+
+    Only initial pd.read_parquet OSError/ArrowInvalid is recoverable1071.
+    Open errors retain each gate's existing policy; footer/index restoration
+    and the former get_dataframe null audit remain outside that catch.
+    Engine is explicit only on former get_dataframe routes (pyarrow); wave
+    gates keep their previous pandas default. The opened identity lets the
+    owner reject precisely the old entry.
+    Raw/user files and newly produced outputs must keep their strict reader.
+    """
+    try:
+        stream = open(path, 'rb')
+    except open_errors as error:
+        return None, error, None
+    with stream:
+        identity = os.fstat(stream.fileno())
+        frame, error = _read_parquet_with_index_policy(
+            stream, read_errors=(OSError, ArrowInvalid),
+            **({'engine': engine} if engine is not None else {}))
+    if error is not None:
+        return None, error, identity
+    if check_null:
+        frame = check_read(frame, path)
+    return frame, None, identity
 
 
 def _validate_stata_missing_map(option):

@@ -115,8 +115,14 @@ def test_called_once_at_the_top_of_each_exclusive_rebuild_descent():
             assert body.index('build_waves = list(waves) if covered is None') < body.index('self._report_rebuild(') < body.index('repo = Repo(')
         else:
             # Private source preparation/producer entry happens only after it.
-            body = ast.unparse(route)
-            assert body.index('self._report_rebuild(') < body.index('self._make_build_root(') < body.index('prepare_make_waves(root)')
+            make_roots = [n for n in ast.walk(route) if isinstance(n, ast.Call)
+                          and ast.unparse(n.func) == 'self._make_build_root']
+            prepares = [n for n in ast.walk(route) if isinstance(n, ast.Call)
+                        and ast.unparse(n.func) == 'prepare_make_waves']
+            assert len(make_roots) == len(prepares) == 1
+            make_root, prepare = make_roots[0], prepares[0]
+            assert prepare.args and ast.unparse(prepare.args[0]) == 'root'
+            assert call.lineno < make_root.lineno < prepare.lineno
     # The managed branch returns directly, so it cannot fall through to default.
     assert any(isinstance(n, ast.Return) and isinstance(n.value, ast.Call)
                and isinstance(n.value.func, ast.Name) and n.value.func.id == 'fresh_make_country'

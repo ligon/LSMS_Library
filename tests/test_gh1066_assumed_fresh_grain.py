@@ -61,7 +61,7 @@ C._GRAIN_LEDGER[key]=[{'stale':True}];C._DATETIME_LEDGER[key]=[{'stale':True}]
 C._GRAIN_LEDGER[(name,'unrelated')]=[{'unrelated':True}]
 if case=='race':
  def gone(*a,**k):raise FileNotFoundError('invented disappearance after footer')
- C.get_dataframe=gone
+ L.open=gone
 if case in ['strict_grain','unrelated_strict']:os.environ['LSMS_GRAIN_STRICT']='1'
 if case in ['strict_grain','strict_date']:os.environ['LSMS_DATE_STRICT']='1'
 error=None;out=None

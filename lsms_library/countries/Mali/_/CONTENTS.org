@@ -3742,3 +3742,156 @@ erratum binding =s7fq13b= (especially =4 Egrener=) to the printed state card
 and explaining its processing/shelling meaning. Q21, sale answers or a different
 wave cannot supply that bridge. No condition recode, kg factor, quantity,
 identifier, weight or default follows from this finding.
+
+* 2026-11-09 -- EHCVM input dictionaries: area is not a parcel key (GH #1483)
+
+The own published lists, WB 4295/F30--F31 and 6275/F29--F30, separately
+confirm =s16a= parcel input questions and =s16b= household input costs.
+The earlier claim "have no agriculture-input block" is contradicted by
+these dictionaries and the older NPK note in this file. The three current
+source comments now say unwired; the existing EAC-I declarations and
+callable code are unchanged. Prose edits to those build inputs are still
+an expected Mali cache invalidation, not measured in this source-only task.
+
+New detail: 2018's 19-variable =s16b= list carries area =s16aq09a/b= but no
+field/parcel IDs =s16aq02/03=. The 2021 17-variable list has neither the
+area fields nor parcel IDs. An area answer does not turn the household
+roster into a parcel roster. Both lists distinguish use =q03a/b=, gifts
+=q05/q07a/b= and purchases =q08/q09a/b/c=, each quantity with its own unit.
+
+The own input-identity dictionaries also differ: =s16bq01= code19 is
+=Plants/boutures de tubercules= in 2018 and =Semences d'arichide= in2021;
+code20 is =Autres semences= then =Plants/boutures de tubercules=. A numeric
+seed map cannot carry between them. Each wave's three published input-unit
+dictionaries was checked independently; their code1 is Gramme and code2
+Kilogramme, unlike the EAC-I community grid. These are published metadata
+facts, not fresh native inspection or new curated maps.
+
+GH #1483's "Decide whether to wire at plot grain" remains a ROOT decision.
+No household amount is allocated over plots, no NPK grade or DAP-catch-all
+composition is chosen, and EAC-I missing codes are not applied to EHCVM.
+The source contract, exact public locators, committed sidecar identities
+and bounded unexecuted controls are in =_/1483-input-source-contract.md=.
+
+* 2026-11-09 -- own poverty report adds a five-section community claim (GH #821)
+
+New primary-source lead: INSTAT's public August2023 report on poverty in
+Mali2021, =profil-determinants-pauvrete-mali-2021_pub.pdf=, has64PDFpages.
+The cover names INSTAT/August2023; PDFp3 explicitly binds its discussion to
+EHCVMII fieldwork October2021--July2022. Section1.2, PDFp15, describes a
+fifth community section collecting local food prices. The exact short
+quotation and public locator are in =_/821-community-price-authority.md=.
+
+Preserve this alongside the existing own-BID quote "four main sections"
+(recorded above, PDFp8) and its separate monthly market design (PDFp9).
+Neither is assumed stale. The report is an own-country lead, not the exact
+fielded community form, CAPI version or released cluster-price source.
+The existing =unsure= / =C1-partial;C4-notrun= position is unchanged.
+
+The initial dispatch's browser-only finding was independently checked by
+the coordinator on2026-11-10UTC. The same public PDF snapshot is1,456,311bytes,
+SHA256=cd86f5ebf0cc20ece8ad6dd4cb7eb20a62d370bb3a08feff5069a0a3de17bcd1=,
+64pages. One local Poppler context extracted text and rendered PDF1/3/15
+from those exact bytes; independent visual review confirmed the cover,
+own-wave dates and food-price sentence. The source remained unchanged.
+The visual scope is those three pages, with receipts in the coordinator's
+=reports/821-mali-public-report-three-pages-20261110= archive.
+Public locator, the contradictory claims, limitations and finite authority
+plan are in =_/821-community-price-authority.md=. No native/API/data replay,
+producer contact, closing verdict, crosswalk or new loader follows.
+
+* 2026-11-10 -- own s16b input wiring candidate prepared (GH #1483)
+
+Own authenticated headers confirm 19 fields/20 input labels in 2018-19 and
+17 fields/22 labels in 2021-22. q02 is use, q05 gift, q08 purchase; q03a/b,
+q07a/b and q09a/b/c stay distinct, each unit field with its own five-choice
+card. 2021 code19 is literally =Semences d'arichide=; 2018 code19 is tubers.
+q00 is respondent, not line identity; 2018 area fields identify no parcel.
+
+The private candidate wires both own s16b waves to the existing =plot_inputs=
+key with structural =Farm-level= and ONLY native q02=1. ROOT explicitly
+accepted this applied scope; No/blank/unlisted answers remain in the separate
+full raw adapter, not public applications. No amount/content gate, EAC-I
+reducer, unit conversion, parcel allocation or new nutrient fraction applies.
+The DAP catch-all stays its full native label, never pure DAP/0.18. Native
+input labels/codes and separate gift/purchase units remain explicit. Missing
+used units get existing Unknown; unknown public answers/key collisions refuse.
+2021 uses EHCVM21_ before the normal framework panel map. Improved stays NA
+without weakening its required declaration. Both EAC-I producers are unchanged;
+all-wave concat adds the optional fields as NA on those older rows.
+
+The historical scheme's "no agriculture-input block" contradicted the dated
+#1445 finding; its source comment and routes are now corrected. The original
+notes and season/coverage/sampling qualifications remain. Header-only results
+establish no observed key multiplicity, counts or native eligibility proof.
+Code and meaningful synthetic controls are prepared, UNRUN. Exact bindings,
+public effects/inverse route and finite next gate:
+=_/s16b-header-adapter-20261110.md= and
+=.coder/ledger/1483-mali-post-header-adapter-20261110.md=. No serving/runtime,
+source/Make/API/cache or scientific acceptance is claimed by preparation.
+
+** Integration qualification -- accepted household wiring is separate from parcels
+
+The earlier dated unwired/preparation/UNRUN findings remain historical
+checkpoints. Accepted1483 source now declares both own s16b household-input
+wrappers at Farm-level, selecting explicit q02=1 before strict selected-row
+validation. Its ledger preserves actual pure/native adapter checks separately
+from public API/data-CI acceptance. The s16a parcel questions stay a distinct
+route; no household-to-parcel allocation or new grade/factor policy follows.
+
+* 2026-11-10 -- EACI 2017 public dictionary bridge is partial (GH #1436)
+
+The bounded own-catalog 3409 public route returned ten Related Materials
+records, including two named own-2017 enumerator manuals not in the six
+committed PDF declarations: =eaci17_manuel_p1_french.pdf= (47786) and
+=eaci17_manuel_p2_french.pdf= (47787). No distinct electronic questionnaire,
+CAPI project or export syntax was listed on that returned page. The resources
+API separately returned HTTP400/ACCESS-DENIED; it was not an empty inventory.
+The manuals were not downloaded in this electronic/export-only check.
+
+The explicitly linked public DDI export,
+https://microdata.worldbank.org/metadata/export/3409/ddi,
+names =MLI_2017_EAC-I_v03_M= and file =F26/eaci17_s7fp2=. Its variables
+=V873--V876= bind =s7fq13a= to quantity, =s7fq13b= to Code Etat,
+=s7fq13c= to Code UML and =s7fq13d= to kilogram equivalent. =V874='s literal
+state labels are =1 Epis/Panicules=, =2 d=, =3 Non-D= and =4 Egrener=.
+Those shortened published labels do not replace the historical native labels
+recorded above. =V886/s7fq21= remains the separate threshing question.
+
+This is a published dictionary correspondence, not a fielded-version bridge.
+The link calls itself DDI Codebook (2.5), while the XML root declares 1.2.2;
+its January2020 document version mentions a geovariables update. It gives no
+explanation of code4 or deployment linkage reconciling the printed three-state
+card. Preserve that mismatch and the current quantity/unit/unread-state rules.
+Four metadata GETs, one selected XML context, no PDF/native/row/API replay;
+exact receipts and the one-P2-manual archival proposal are recorded in
+=.coder/ledger/1436-mali-own2017-electronic-export-route-7b5e95bf-20261110.md=.
+
+* 2026-11-10 -- own2017 P2 enumerator manual held; state bridge remains open (GH #1436)
+
+=2017-18/Documentation/eaci17_manuel_p2_french.pdf= is now DVC-managed:
+WB3409 resource47787,1,375,005bytes,rawMD5=b08ec8e623065e3a75dfab6a481cbafd=.
+One public GET, one exact-document managed push and one fresh empty-private
+normal read-only retrieval matched SHA256=73fe411b153da4df3af02260e88c1b00747c9b37ee47d139345175ee231c9394=.
+The returned official filename matches the local holding. Cover identifies
+EAC-I2017/second passage; PDF metadata names EACI17_MANUEL_P2.docx and dates
+creation/modification2019-02-04, not a certified fielded/export version.
+
+Bounded new-manual read:7unique text pages (PDF1--4/29--31),2personally
+viewed instruction pages (PDF30/31); none of the older forms/BID was reparsed.
+CompleteQ7F13 instruction on PDF30 describes Production en UML, UML and
+Equivalent en Kg, with its partial-harvest and worked-example instructions.
+It supplies no Etat card, fourth-answer explanation or native suffix binding
+in that inspected paragraph/layout. This is not absence from the whole manual.
+CompleteQ7F21 on PDF31 explicitly asks whether the product was threshed before
+storage (Oui toQ22; Non toQ29); it is a separate operation question.
+
+Preserve the existing three-choice printedQ13 versus four-choice released
+s7fq13b/Egrener tension and the ruralLourd/Leger scope. The already-closed
+publicDDI discovery supplies b=CodeEtat/c=UML association but no processing
+meaning/version bridge for code4; the preceding checkpoint records that separate metadata result. No EHCVM fold or Q21 answer is borrowed.
+The remaining operand is an own-release/fielded dictionary, instruction or
+erratum explaining nativecode4 and its correspondence to the printed card.
+No condition/unit/quantity/default/ID/weight/coverage ruling follows.
+Source/terms/byte custody and exact bounds are recorded in SOURCE.org and
+burst report =1436-mali-p2-manual-restoration-20261110/=.

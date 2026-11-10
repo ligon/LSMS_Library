@@ -189,5 +189,17 @@ def test_niger_country_and_feature_frames_agree():
         warnings.simplefilter("ignore")
         country = harvest_kg(ll.Country("Niger").crop_production())
         feature = harvest_kg(ll.Feature("crop_production")(["Niger"]))
-    assert list(country.index.names) == list(feature.index.names)
-    pd.testing.assert_frame_equal(country.sort_index(), feature.sort_index())
+    _assert_niger_country_feature_harvest(country, feature)
+
+
+def _assert_niger_country_feature_harvest(country, feature):
+    """GH1475 retains supplied country even for a singleton Feature.
+
+    Compare the complete labeled frame: no axis is discarded. GH1460 still
+    requires the native Country crop axis to resolve to canonical j.
+    """
+    assert list(country.index.names) == ["t", "i", "plot_id", "j"]
+    assert list(feature.index.names) == ["country", *country.index.names]
+    assert set(feature.index.get_level_values("country")) == {"Niger"}
+    expected = pd.concat({"Niger": country}, names=["country"])
+    pd.testing.assert_frame_equal(expected.sort_index(), feature.sort_index())

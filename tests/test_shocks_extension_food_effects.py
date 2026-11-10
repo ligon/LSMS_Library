@@ -10,10 +10,12 @@ import importlib.util
 
 import numpy as np
 import pandas as pd
+from pandas.io.stata import StataMissingValue
 import pytest
 import yaml
 
 import lsms_library as ll
+from lsms_library.data_access import get_data_file
 from lsms_library.local_tools import get_dataframe
 from lsms_library.paths import countries_root
 
@@ -26,6 +28,8 @@ FILES = {
 }
 SPLIT = ('Benin', 'Togo')
 FOOD = ['AffectedConsumption', 'AffectedFoodStock']
+# Independent own-source scope, not read from the production missing-tag map.
+CIV_EFFECT_FIELDS = tuple(f's14q04{x}' for x in 'abcef')
 
 
 def _block(country):
@@ -117,10 +121,86 @@ def test_changed_split_layout_is_refused_loudly(country, bad):
         module.shocks(_frame(**bad))
 
 
-def _truth(values):
-    # Independent numeric source oracle.  CIV .d stays NA; do not reinterpret
-    # that missing encoding as False while fixing which question is served.
-    return pd.to_numeric(values).map({1: True, 2: True, 3: False, 4: False}).astype('boolean')
+def _truth(values, *, country=None, tagged=None):
+    # Independent finite-code oracle. Only CIV's five opted-in effects give
+    # typed .d the existing Non-concerné -> False meaning (ledger 1687 §3–4).
+    out = pd.to_numeric(values).map({1: True, 2: True, 3: False, 4: False}).astype('boolean')
+    if country == 'CotedIvoire' and values.name in CIV_EFFECT_FIELDS:
+        assert tagged is not None
+        assert tagged.index.identical(values.index)
+        is_d = tagged.map(lambda value: isinstance(value, StataMissingValue)
+                          and value.string == '.d')
+        assert values.loc[is_d].isna().all()
+        out.loc[is_d] = False
+    return out
+
+
+def _effect_truth(raw, country, letter):
+    field = f's14q04{letter}'
+    return _truth(raw[field], country=country, tagged=raw.get(f'{field}__tag'))
+
+
+def _tag(token):
+    # Invented typed operands, using pandas' own representation table.
+    value = next(value for value, label in StataMissingValue.MISSING_VALUES.items()
+                 if label == token)
+    return StataMissingValue(value)
+
+
+@pytest.mark.parametrize('field', CIV_EFFECT_FIELDS)
+def test_civ_oracle_maps_only_typed_d_and_preserves_other_missing(field):
+    index = pd.Index([9, 2, 7, 1, 8, 0, 6, 3, 5, 4], name='source_row')
+    values = pd.Series([1, 2, 3, 4, *([np.nan] * 6)], index=index, name=field)
+    tagged = pd.Series([1, 2, 3, 4, _tag('.d'), _tag('.'), _tag('.a'),
+                        _tag('.z'), '.d', np.nan], index=index, name=field)
+    before = values.copy(deep=True)
+    native_before = tagged.copy(deep=True)
+    expected = pd.Series([True, True, False, False, False, *([pd.NA] * 5)],
+                         index=index, name=field, dtype='boolean')
+    pd.testing.assert_series_equal(_truth(values, country='CotedIvoire', tagged=tagged), expected)
+    pd.testing.assert_series_equal(values, before)
+    pd.testing.assert_series_equal(tagged, native_before)
+    # The default oracle retains the original finite mapping and NA mask.
+    pd.testing.assert_series_equal(_truth(values), expected.mask(tagged.map(
+        lambda value: isinstance(value, StataMissingValue) and value.string == '.d')))
+
+
+@pytest.mark.parametrize('country,field', [
+    *[(country, field) for country in ('Benin', 'Togo', 'Guinea-Bissau')
+      for field in CIV_EFFECT_FIELDS],
+    *[('CotedIvoire', field) for field in ('s14q04d', 's14q01', 's14q05__1')],
+])
+def test_tagged_oracle_does_not_extend_country_or_field_scope(country, field):
+    values = pd.Series([np.nan, 1, 2, 3, 4], name=field)
+    tagged = pd.Series([_tag('.d'), 1, 2, 3, 4], name=field)
+    pd.testing.assert_series_equal(_truth(values, country=country, tagged=tagged), _truth(values))
+
+
+def test_civ_food_oracle_keeps_purchase_stock_and_livestock_distinct():
+    raw = pd.DataFrame({
+        's14q04d': [np.nan, 2, np.nan, 1],
+        's14q04e': [np.nan, 1, np.nan, 3],
+        's14q04f': [1, np.nan, np.nan, np.nan],
+        's14q04e__tag': [_tag('.d'), 1, _tag('.'), 3],
+        's14q04f__tag': [1, _tag('.d'), _tag('.'), _tag('.a')],
+    }, index=pd.Index([4, 1, 3, 2], name='source_row'))
+    before = raw.copy(deep=True)
+    for letter, answers in [('e', [False, True, pd.NA, False]),
+                            ('f', [True, False, pd.NA, pd.NA])]:
+        expected = pd.Series(answers, index=raw.index, name=f's14q04{letter}', dtype='boolean')
+        pd.testing.assert_series_equal(_effect_truth(raw, 'CotedIvoire', letter), expected)
+    pd.testing.assert_series_equal(_effect_truth(raw, 'CotedIvoire', 'd'), _truth(raw.s14q04d))
+    pd.testing.assert_frame_equal(raw, before)
+
+
+def test_civ_oracle_requires_independent_aligned_missing_operands():
+    values = pd.Series([np.nan, 1], index=[4, 2], name='s14q04e')
+    with pytest.raises(AssertionError):
+        _truth(values, country='CotedIvoire')
+    with pytest.raises(AssertionError):
+        _truth(values, country='CotedIvoire', tagged=pd.Series([_tag('.d'), 1]))
+    with pytest.raises(AssertionError):
+        _truth(values, country='CotedIvoire', tagged=pd.Series([_tag('.'), _tag('.d')], index=values.index))
 
 
 @pytest.fixture(scope='module')
@@ -133,11 +213,26 @@ def source():
             path = ROOT / country / wave / filename
             raw = get_dataframe(str(path), convert_categoricals=False)
             labels = get_dataframe(str(path))['s14q01'].astype(object)
+            if country == 'CotedIvoire':
+                # Resolve the managed source normally, then scan independently
+                # of get_dataframe's production stata_missing_map overlay.
+                managed = get_data_file(path)
+                assert managed is not None
+                with pd.io.stata.StataReader(managed) as reader:
+                    tagged = reader.read(columns=list(CIV_EFFECT_FIELDS),
+                                         convert_missing=True,
+                                         convert_categoricals=False,
+                                         convert_dates=False)
+                assert tagged.index.identical(raw.index)
+                assert list(tagged) == list(CIV_EFFECT_FIELDS)
             # Every row in the old module remains: use only its original fields
             # to identify rows, rather than the newly selected food effects.
             old_fields = [f's14q04{x}' for x in 'abcd'] + [
                 c for c in raw if c.startswith('s14q05__')]
             raw = raw.loc[raw[old_fields].notna().any(axis=1)].copy()
+            if country == 'CotedIvoire':
+                for field in CIV_EFFECT_FIELDS:
+                    raw[f'{field}__tag'] = tagged.loc[raw.index, field]
             raw['Shock'] = labels.loc[raw.index]
             raw['i'] = raw['grappe'].astype(int).astype(str) + raw['menage'].astype(int).astype(str).str.zfill(3)
             raw['t'] = wave
@@ -153,9 +248,9 @@ def test_source_columns_match_served_rows_and_reject_wrong_columns(country, sour
     wave, _ = FILES[country]
     expected = raw[['t', 'i', 'Shock']].copy()
     for name, letter in [('AffectedIncome', 'a'), ('AffectedAssets', 'b'), ('AffectedProduction', 'c')]:
-        expected[name] = _truth(raw[f's14q04{letter}'])
-    expected['AffectedFoodStock'] = _truth(raw.s14q04e)
-    expected['AffectedConsumption'] = _truth(raw.s14q04f)
+        expected[name] = _effect_truth(raw, country, letter)
+    expected['AffectedFoodStock'] = _effect_truth(raw, country, 'e')
+    expected['AffectedConsumption'] = _effect_truth(raw, country, 'f')
     if country in SPLIT:
         first = raw.vague.eq(1)
         expected.loc[first, 'AffectedFoodStock'] = _truth(raw.loc[first, 's14q04d'])

@@ -55,13 +55,8 @@ def _countries_tree(root: Path) -> Path:
     for name in _SHIPPED:
         if (REAL_DVC / name).exists():
             shutil.copy2(REAL_DVC / name, dvc / name)
-    # DVC's Repo makes ``.dvc/tmp`` with exist_ok=True: a no-op on a
-    # read-only tree only if the directory is already there.  A wheel does
-    # NOT ship it (0.15.0 carries no ``.dvc/tmp/``), and even with it a
-    # read-only tree fails the first READ at ``.dvc/tmp/btime`` -- the
-    # import cases below pass only because ``__init__`` swallows that
-    # OSError.  Measured and reported under GH #1032.
-    (dvc / "tmp").mkdir()
+    # Start as the shipped wheel does, without tmp/btime. GH1032's runtime
+    # adapter must not require or create either beneath this metadata root.
     assert (dvc / "config").exists(), "the remote stanza needs .dvc/config"
     assert not (dvc / "s3_creds").exists()
     return countries
@@ -73,16 +68,13 @@ def _snapshot(root: Path) -> dict[str, str]:
     Digests, never contents: a failing comparison must not print a
     credential into the test log.
 
-    ``.dvc/tmp/`` is excluded: it is DVC's own scratch directory (building
-    the ``DVCFileSystem``'s repo drops a ``btime`` marker there on a writable
-    tree; ``Repo.tmp_dir`` has no config override).  That is a separate
-    runtime write, not a credential, and is GH #1032 rather than pinned.
+    Include DVC scratch too: GH1032 moves that metadata out of the source
+    tree. The original import-only acceptance and tmp exclusion remain in Git
+    history; the new actual first-read controls live in test_gh1032.
     """
     out = {}
     for dirpath, dirnames, filenames in os.walk(root):
         rel_dir = Path(dirpath).relative_to(root)
-        if rel_dir.parts[:2] == (".dvc", "tmp"):
-            continue
         for d in dirnames:
             out[str(rel_dir / d) + "/"] = "dir"
         for f in filenames:
@@ -108,6 +100,7 @@ def _import(countries: Path, config_dir: Path, data_dir: Path):
         LSMS_COUNTRIES_ROOT=str(countries),
         LSMS_CONFIG_DIR=str(config_dir),
         LSMS_DATA_DIR=str(data_dir),
+        DVC_SITE_CACHE_DIR=str(data_dir.parent / "runtime-metadata"),
         PYTHONPATH=str(REPO),
         PYTHONSAFEPATH="1",
         # LSMS_SKIP_AUTH deliberately UNSET: it short-circuits the branch
