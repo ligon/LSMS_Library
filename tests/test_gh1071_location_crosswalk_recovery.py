@@ -367,3 +367,36 @@ def test_source_declaration_appearing_during_read_blocks_rejection(toy, owner, m
     with pytest.raises(ArrowInvalid) as got:
         c._location_lookup() if route == 'location' else c._aggregate_wave_data(None, 'panel_ids')
     assert got.value is error and path.read_bytes() == before and not calls
+
+
+@pytest.mark.parametrize('route', ['location', 'crosswalk'])
+@pytest.mark.parametrize('during_read', [False, True])
+def test_source_sidecar_without_workspace_payload_never_grants_cache_ownership(
+        toy, owner, monkeypatch, route, during_read):
+    c, location, value, _, calls = owner
+    relative = Path('var/other_features.parquet') if route == 'location' else Path('_/panel_ids.parquet')
+    path = toy.data_dir / 'Json1468' / relative
+    source = toy.root / relative
+    source.parent.mkdir(parents=True, exist_ok=True)
+    sidecar = source.with_name(source.name + '.dvc')
+    assert not source.exists()
+    if during_read:
+        plant(path, value if route == 'location' else frame())
+        error = ArrowInvalid('already opened old candidate')
+        def newly_declared(*args, **kwargs):
+            sidecar.write_text('outs: []\n')
+            raise error
+        monkeypatch.setattr(pd, 'read_parquet', newly_declared)
+        expected_error = ArrowInvalid
+    else:
+        bad(path)
+        sidecar.write_text('outs: []\n')
+        expected_error = L.ParquetFormatError
+    before = snapshot(path)
+    toy.no_processes()
+    with pytest.raises(expected_error) as got:
+        c._location_lookup() if route == 'location' else c._aggregate_wave_data(None, 'panel_ids')
+    if during_read:
+        assert got.value is error
+    assert snapshot(path) == before and sidecar.exists() and not source.exists()
+    assert calls == []

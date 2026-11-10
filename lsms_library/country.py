@@ -342,9 +342,11 @@ def _reject_unreadable_cache(path: Path, observed, error: Exception, *,
         source_candidate = countries_root() / parts[0] / '_' / path.name if parts else None
     if source_candidate is not None:
         sidecar = path.with_name(path.name + '.dvc')
+        source_sidecar = source_candidate.with_name(source_candidate.name + '.dvc')
         if (path.resolve() != root.resolve().joinpath(*parts)
                 or path.resolve().is_relative_to(countries_root().resolve())
                 or sidecar.exists() or sidecar.is_symlink()
+                or source_sidecar.exists() or source_sidecar.is_symlink()
                 or (source_candidate.exists() and path.exists()
                     and path.samefile(source_candidate))):
             raise error
@@ -3782,10 +3784,12 @@ class Country:
             build_location = False
             source_path = self.file_path / 'var' / 'other_features.parquet'
             sidecar = location_path.with_name(location_path.name + '.dvc')
+            source_sidecar = source_path.with_name(source_path.name + '.dvc')
             if (location_path.is_symlink()
                     or location_path.resolve() != data_root().resolve() / self.name / 'var' / 'other_features.parquet'
                     or location_path.resolve().is_relative_to(countries_root().resolve())
                     or sidecar.exists() or sidecar.is_symlink()
+                    or source_sidecar.exists() or source_sidecar.is_symlink()
                     or (source_path.exists() and location_path.samefile(source_path))):
                 location_df = get_dataframe(location_path)
             else:
@@ -6646,6 +6650,7 @@ class Country:
             cache_path = data_root(self.name) / "_" / f"{method_name}.json"
             parquet_path = data_root(self.name) / "_" / f"{method_name}.parquet"
             source_parquet = self.file_path / "_" / f"{method_name}.parquet"
+            source_sidecar = source_parquet.with_name(source_parquet.name + '.dvc')
             # Also check in-tree for legacy caches, and parquet variants
             candidates = [
                 cache_path,
@@ -6665,6 +6670,7 @@ class Country:
                                 and candidate.resolve() == data_root().resolve() / self.name / '_' / candidate.name
                                 and not candidate.resolve().is_relative_to(countries_root().resolve())
                                 and not sidecar.exists() and not sidecar.is_symlink()
+                                and not source_sidecar.exists() and not source_sidecar.is_symlink()
                                 and not (source_parquet.exists() and candidate.samefile(source_parquet))):
                             df, error, observed = _read_managed_parquet_cache(
                                 candidate, check_null=True, engine='pyarrow')
