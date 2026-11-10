@@ -6,6 +6,7 @@ The baseline uses the same specification with the former region-only field
 and no new sample hook (ledger 1575-togo1575-stratawiring §§2–5).
 """
 from copy import deepcopy
+import importlib
 import importlib.util
 from pathlib import Path
 import re
@@ -15,9 +16,11 @@ import pandas as pd
 import pytest
 
 import lsms_library.country as C
-from lsms_library import data_access, derivations, ehcvm, local_tools
+from lsms_library import data_access, ehcvm, local_tools
 from lsms_library.paths import countries_root, data_root
 from lsms_library.yaml_utils import load_yaml
+
+derivations = importlib.import_module("lsms_library.derivations")
 
 ROOT = countries_root()
 OWN = ROOT / "Togo"
