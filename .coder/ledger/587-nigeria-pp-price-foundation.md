@@ -15,7 +15,8 @@ captured source023244a14f5d3c41de8b2482e4c4692923fad2f2.
 
 - `Nigeria/_/nigeria.py`: `PP_QUARTER`, `cluster_id`, `_crop_labels`,
   `community_prices_for_wave`; current PH scripts and function remain exact.
-- `tests/test_nigeria_community_prices.py` and GH637/840 controls: check current
+- `tests/test_gh637_nigeria_w3_obs.py`, `test_gh637_nigeria_w1w2_variety.py`,
+  `test_nigeria_community_units.py` and GH637/840 controls: check current
   cluster/item/slot/native-variety contracts; identify exact filenames before
   selecting any companions. No old cohort replay is implied.
 - `STANDING.md §2/§4`, `CLAUDE.md`, `data_info.yml`: ordinary sanctioned IO,
@@ -71,5 +72,22 @@ closure or five served cells is claimed by this foundation.
 
 ## Verification status
 
-All planned invented-frame tests UNRUN initially. Freeze source plus controls
-for Root review before any finite pure execution. No native/header/PDF replay.
+Runtime/source freeze46493511c adds only the pure adapter, own native-report
+codebook and new tests. `pp_community_price_report` keeps raw columns first,
+exact source index/order/types/attrs, separate raw Naira/quantity/factor/OtherUnit
+and own native labels; `native_frame` is reversible. The pure projection is
+UNWIRED, requires explicit mappings, enforces the existing six-axis identity
+and collisions, and has missing Price everywhere pending representation/basis.
+No current wave script, `nigeria.py`, registry or public call path changed.
+
+Codebook copying is metadata-only: all native variable labels/types/formats and
+associations plus complete ITEM/availability/UNIT/SIZE report label cards are
+bound to sealed headers. Geographic cards are not duplicated or used to decode
+keys; full metadata SHA and native raw geography remain retained.
+
+The exact proposed new module is46 invented cases/15test functions; all UNRUN,
+not imported or collected. Boolean keys were caught/refused in static self-review
+before freeze. Source AST/diff/whole-object/card conservation checks only.
+`make api-audit` ran source/skill metadata only (exit0); its pre-staging snapshot
+warned about the two then-untracked new build inputs, now tracked by464935.
+No native/header/PDF/API/census replay. No five-cell or whole587 closure.
