@@ -17,9 +17,7 @@
 +                     get_map=get_categorical_mapping, id_fn=i, format_id=format_id)
 --- a/lsms_library/countries/Burkina_Faso/_/data_scheme.yml
 +++ b/lsms_library/countries/Burkina_Faso/_/data_scheme.yml
-@@ -288,6 +288,46 @@
-     Unit_received_as_gift:
-       type: str
+@@ -290,2 +290,42 @@
        optional: true
 +    # Own2021 candidate preserves raw codes/answers; q09a is unresolved.
 +    grappe:
@@ -62,5 +60,3 @@
 +      type: int
 +      optional: true
      materialize: make
- 
-   livestock:
