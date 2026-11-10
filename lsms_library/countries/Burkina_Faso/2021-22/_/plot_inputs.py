@@ -15,4 +15,5 @@ from burkina_faso import i
 from s16b_2021 import build_s16b_candidate
 
 build_s16b_candidate(read=get_dataframe, write=to_parquet,
-                     get_map=get_categorical_mapping, id_fn=i, format_id=format_id)
+                     get_map=get_categorical_mapping, id_fn=i, format_id=format_id,
+                     source_path='../Data/s16b_me_bfa2021.dta')

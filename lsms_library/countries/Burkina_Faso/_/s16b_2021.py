@@ -159,12 +159,14 @@ def adapt_s16b_2021(source, *, cards, input_map, seed_crop_map, unit_map,
     return out
 
 
-def build_s16b_candidate(*, read, write, get_map, id_fn, format_id):
+def build_s16b_candidate(*, read, write, get_map, id_fn, format_id, source_path=SOURCE):
     """Minimal injected driver; only explicit caller-provided IO leaves run.
 
     The own2021 wave wrapper supplies sanctioned leaves. Pure controls supply
     invented frames and spies; no providers are reachable from the adapter.
     """
+    if source_path != SOURCE:
+        raise S16b2021Error('unexpected own2021 source path')
     cards = {field: get_map(fn=CARD_FILE, dirs=['../../_/'],
                            tablename='bfa2021_' + field, idxvars='Code',
                            **{'Label': 'Label'}) for field in CARD_FIELDS}
@@ -174,7 +176,7 @@ def build_s16b_candidate(*, read, write, get_map, id_fn, format_id):
     maps = {name: get_map(tablename=name, idxvars='Original Label',
                           **{'Preferred Label': 'Preferred Label'})
             for name in ('harmonize_input', 'harmonize_seed_crop', 'u')}
-    source = read(SOURCE, convert_categoricals=False)
+    source = read(source_path, convert_categoricals=False)
     out = adapt_s16b_2021(source, cards=cards,
                          input_map=maps['harmonize_input'],
                          seed_crop_map=maps['harmonize_seed_crop'],

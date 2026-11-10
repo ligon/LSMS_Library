@@ -40,7 +40,9 @@ The new normal `2021-22/_/plot_inputs.py` uses existing native-script
 registration. It passes sanctioned `get_dataframe`, `get_categorical_mapping`
 and `to_parquet` leaves plus current `burkina_faso.i` and `format_id` to the
 country-local driver. No compiler, framework, global schema or Makefile edit.
-The source file is exactly `../Data/s16b_me_bfa2021.dta`, read numerically once.
+The source file is exactly `../Data/s16b_me_bfa2021.dta`, read numerically once. The exact source path is a literal argument in the
+wave wrapper so the existing `scan_script_data_refs` cache scanner sees its
+DVC sidecar; the driver refuses a different path.
 This is the panel file; no Cross_Section operand is introduced.
 
 Existing public table: `plot_inputs`, Country index `(t,i,input,crop,u)`.
@@ -98,12 +100,18 @@ only on s16b's household grain and does not rewrite that separate question.
 Generic `ehcvm_i` “MUST use” prose contradicts the own2021 plot wrapper's
 same-as-sample instruction; the own2021 country i contract is operative here.
 
-Every2018 builder/map/assertion is byte-preserved. A combined output necessarily
+Every2018 builder/map is byte-preserved. Existing numerical assertions are
+preserved; only the obsolete availability expectation is updated as ROOT
+explicitly authorized in the final steering. A combined output necessarily
 has new raw columns, NA for2018; its old keys, seven payload columns, values,
-units and masks must remain exact. The retained old2021-empty assertion in
-`test_burkina_faso_plot_inputs_identity.py` would be superseded by this new
-coverage. It is NOT edited within this ownership scope; an activation review
-must explicitly update that expectation. Do not claim it would pass unchanged.
+units and masks must remain exact. In `test_burkina_faso_plot_inputs_identity.py`, the old assertion that both2014
+and2021 are empty now keeps2014 empty and requires nonempty2021 with only its
+requested t. Its source-code21 oracle now explicitly queries2018: the same602
+count, Seed category, dtype/key/payload assertions and tolerances are unchanged.
+An all-wave Arachide count would now also include legitimate2021 slot19; scoping
+the2018 oracle retains its original population rather than repinning a count.
+The new invented controls independently verify22 own slots, flags, quantities,
+units and typed output. Both existing and new tests remain UNRUN.
 The literal new controls independently pin old seven-column semantics at the
 new source grain; no native2018 or combined API equality is claimed here.
 

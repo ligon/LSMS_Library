@@ -379,6 +379,9 @@ def test_driver_reads_only_own_numeric_source_and_writes_after_validation(adapte
     call = ast.parse(wrapper.read_text()).body[-1]
     assert isinstance(call, ast.Expr) and isinstance(call.value, ast.Call)
     assert isinstance(call.value.func, ast.Name) and call.value.func.id == 'build_s16b_candidate'
+    source_arg = next(item.value for item in call.value.keywords if item.arg == 'source_path')
+    assert isinstance(source_arg, ast.Constant)
+    assert source_arg.value == '../Data/s16b_me_bfa2021.dta'
     namespace = dict(build_s16b_candidate=adapter.build_s16b_candidate,
                      get_dataframe=read, to_parquet=write, get_categorical_mapping=get_map,
                      i=bindings[0]['id_fn'], format_id=bindings[1])
@@ -396,6 +399,12 @@ def test_driver_reads_only_own_numeric_source_and_writes_after_validation(adapte
         adapter.build_s16b_candidate(
             read=lambda *a, **k: pd.concat([_source().iloc[[0]]] * 2),
             write=write, get_map=get_map, id_fn=bindings[0]['id_fn'], format_id=bindings[1])
+    assert writes == []
+    with pytest.raises(adapter.S16b2021Error, match='unexpected own2021 source path'):
+        adapter.build_s16b_candidate(
+            read=lambda *a, **k: pytest.fail('unexpected source read'),
+            write=write, get_map=get_map, id_fn=bindings[0]['id_fn'],
+            format_id=bindings[1], source_path='../Data/s16b_me_bfa2018.dta')
     assert writes == []
 
 
