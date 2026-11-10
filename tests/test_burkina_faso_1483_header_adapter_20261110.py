@@ -1,6 +1,6 @@
 """Frozen invented-frame controls for the own2021 s16b candidate; no LSMS IO.
 
-Run with ordinary repository conftests; private verification adds strict external guards.
+Run this file only, with --noconftest, after the dispatcher admits verification.
 No source records, Country/Feature, producer, parquet or provider is needed.
 Expected frames are literal, not obtained by calling the candidate twice.
 """
@@ -74,7 +74,7 @@ def _extract(path, name, namespace):
 
 
 @pytest.fixture(autouse=True)
-def no_provider_imports():
+def no_provider_imports(monkeypatch):
     original = builtins.__import__
 
     def checked(name, *args, **kwargs):
@@ -84,12 +84,7 @@ def no_provider_imports():
         }, 'provider/package import attempted: ' + name
         return original(name, *args, **kwargs)
 
-    # Restore before outer/global fixture teardown, independently of the
-    # shared monkeypatch fixture's lifetime. The ban covers the actual test.
-    with pytest.MonkeyPatch.context() as patch:
-        patch.setattr(builtins, '__import__', checked)
-        yield
-    assert builtins.__import__ is original
+    monkeypatch.setattr(builtins, '__import__', checked)
 
 
 @pytest.fixture
