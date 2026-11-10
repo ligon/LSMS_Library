@@ -1,5 +1,25 @@
 #+title: Current LSMS-ISA coordinator handoff
-* CURRENT -- 2026-11-10 20:20 UTC
+* CURRENT -- 2026-11-10 20:41 UTC
+LATEST [[file:tasks/isa-pr1690-20261110T2041.org]] supersedesolderpendingstate.
+BFA41099343normalpairPASS10800x2/strictwholeframe/weights/typedattrs/inverse,
+Root+managercustodyaccepted, no morereplay.1690publicH399909b/tree d425a7,
+53paths=52reviewedunion+factualledger/libraryec74. RootfreshH/B/Ssourcepreflight
+passedandmarkedREADY;S405917parents[M16c3,H]/treeexact. BUTreadyfullrun42896972948
+CANCELLEDzerojobsteps byolderdraftrefusaljobsharingvalidationconcurrencygroup.
+Root+leadprovedannotation+creationorder. NO data/prebuild started. Leadauthorized
+minimalrun-specificrefusalnamespacechild+focusedcontrols/independentreview/
+routineFFpublication, keeprequiredname+always+precheckoutfailureandvalidgroups.
+RootnewH/B/Sreadback/fullwatch/merge retained. Oldordinary42896659363LIVE20:40,
+WindowsPASS. No fullgaterunningclaimuntilactualnewHsteps. GoalACTIVE79/45/Munchanged.
+Fullpaginated142issues/7PR/empty3Rootconfirmed;17deepreviews0supportedclosures.
+920+698title/bodyresidualsupdated/exactreadbacks;17reviews13partial2unresolved
+2needsvalidation. Timedoutsecondreviewartifactcontentreused,notjobhealthy.
+1575deputylocaloperatorrecoverypacket2c215.../18calls8rolespendingmanagerjoint
+preflight/firstactual,no dataactor yet. Benin41100187/Togo41100186docjobsCLOSED0,
+managerartifactintakepending;new41102570runningassignmentpending. Senegalownheader
+next6pathsource-onlyadaptergrant, no rows/APIyet. See latestcheckpointforallIDs.
+
+* Earlier state -- 2026-11-10 20:20 UTC
 Latestcontinuation: BFAadditionalnormalpair41099343 SUBMITTED20:16:06 and
 confirmedRUNNING20:18; exact99a05packet/wholemetadata+inertcustodypreflightPASS,
 durablefinalframecustody, actualpairacceptancePENDING. Rootindependentlyverified

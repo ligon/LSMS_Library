@@ -1,4 +1,13 @@
-#+title: LSMS-ISA work owners — 2026-11-10 20:20 UTC
+#+title: LSMS-ISA work owners — 2026-11-10 20:41 UTC
+LATEST [[file:tasks/isa-pr1690-20261110T2041.org]]. Mainleadownsnecessary1690CI
+refusalconcurrencyracefix (oldrefusal canceledreadyjobbeforeANYdata); Rootmade
+3999READY/sourceaccepted/BFAaccepted, newCI-onlyH+focusedreviewpending.
+Deputy1575operatorlocalrecovery/jointmanagerpreflight/firstfiniteactual; no model
+redispatch/no dataactor yet. Managerowns Benin/Togo1531healthyterminalintakes,
+Senegaladapterdispatch/new41102570assignment and1575jointreceipt. Rootfullgate/
+merges/settings/science;M16c3/79merges45closures unchanged.17reviews0closures,
+142issueinventorycomplete;920+698residualsnarrowed. Olderownerchronologybelow.
+
 Supersedingownerstatus: managerBFA41099343actualRUNNING20:18 (pairpending),
 mainleadprivateMunion f6e012ab52pathsRootverified/public1690frozen9f;
 deputy1575LOCALoperatorrecoveryafterprep41097327TIMEOUT45m, no dataactor yet.

@@ -1,0 +1,94 @@
+#+title: 1690 ready, BFA accepted, refusal-concurrency race correction
+
+* Current goal and source
+Goal ACTIVE;79verifieddevelopmentmerges/45wholeissueclosures. M remains
+16c3f4d9c28462dde7970718a4eed67394215997, prior1687full17434PASS/2775SKIP/0F/E,
+932requireddata/stricttrueactive. No masterrelease/sharedrewarm/weightchange.
+Rootdocscheckoutoldcode/neverimportLSMS; privatepropercheckout/runtime rulesstand.
+Earliercheckpoint [[file:isa-post-merge-reconciliation-20261110.org]].
+
+* BFA1573 normal pair accepted -- no further replay
+41099343 COMPLETED0/10m42. Baseline722375/candidate724134 healthy0/closedgroups;
+9fbaseline/ec74candidate normalcoldsample2014 each10800rows. Exactcomplete
+expectedframe+nonstrata+axes/order/dtypes/weights/typedattrs+independent26pair
+inversePASS. Knownmask10800,actualNA/unknown0 (onlyseparatepurecontrolscoverthese).
+Thiscohort4completedgetters/4Statareads/4normalwriters. Current/source/original
+seals exact, privateabsentcredential/normalcacheflags,0denials. Durablefinal
+frames+receiptssavedoutsideE. Rootindependentlyrehashed4finalleaves+2originalL1
+objects all8physicalfields+SHA/MD5exact. FirstRootstatverifierwronglyincluded
+read-updatedatime;correctedto8endorsedfields, no data/oracle replay.
+ManagerindependentcustodyalsoPASS. R/1573-burkina-normal-two-lane-actual-v4-20261110/
+{ROOT-SCIENTIFIC-ADMISSION,ROOT-FINAL-CUSTODY-VERIFICATION}.json and
+R/1573-burkina-normal-paired-acceptance-20261110/{REPORT.md,FINAL-CUSTODY-PROOF.json}.
+Historyretained:predata41095376;failedbaseline41095975nativeUNKNOWN;healthy
+baseline41097115 2reads2writersRAMframelost. Total3baseline+1candidateAPIattempts,
+known6completedgetters/6writers PLUSunknownprefix. No passingnativecohortreplay.
+GH1573body20:29:43exactreadbacknormalPASS/pendingPRgates,oldfailureshistorical.
+
+* Final1690 published and made READY
+H399909b43b46e8e7829a9b66eb520b03bb51f41c,tree d425a7039b0e3971ebffeee970a76ac9fc6f683c.
+OrdinaryFFfromold9f via history8a408482[9f,f6e] plussolefactualBFAledger.
+Exactly53paths=52reviewedunionf6e+ledger;19330nonownedexactM; entirelibrary
+0884646ec89794d504db142450caff029496ff25 exactec74. Rootfulltree/sourceproof
+andnewledger/bodyread; measuredretainedmapcarryindependentlyrecomputed:
+84countrytable/374wavechanges,0BTF/0FIF,14nonhashfields/registration/18Noneexact,
+0errors/denials. No collectorreplay. Sourceprimaries in
+R/isa-reviewed-integration-train-20261110/FINAL-* andROOT-ACTUAL-M-*.
+RootfreshH/B/M/mergeability+syntheticparents/treepreflightPASSED,bodyupdatedto
+pendingvalidation, markedREADY andexactreadback. SyntheticS40591747898f033853970c7b2901e501c846a5b4,
+parents[M,H],tree d425a7. R/1690-final-accepted-validation-20261110/{ready.py,
+PREFLIGHT.json,BODY-*,READY-*}. RemainsOPEN/unmerged;sourceHabouttobefixedbelow.
+
+* Confirmed scheduling race -- next critical action
+Readyfullrun42896972948 classifier130112521877 SUCCESS20:36:35–38, required
+job130112565924 created20:36:38 CANCELLED20:36:39 WITHZEROsteps/runner0.
+Primaryannotation: 'Canceling since a higher priority waiting request for
+pr-data-1690-validation exists'. OlderDRAFTbodyrun42896968850(created20:36:31)
+classifier130112507017 failed draftguard; alwaysrequiredjob130112575567 created
+20:36:39/samegroup,started41/failed45 BEFOREcheckout/credentials/alllatersteps.
+Thusoldrefusalcanceledvalidreadyjoboutoforder. Root+leadindependentlyproved.
+NO full data/native/prebuild started and no oldrunrestart. Otherdraftrefusals
+42896659367/42896707595arehistory. Ordinary42896659363 remainsLIVE at20:40,
+WindowsSUCCESS; sourcewilladvancefornecessaryCI-onlyfix, notforbadge.
+Lead review_nigeria_ph_pr restarted/ownsisolatedminimalchild: classifiersnot
+success keeprequiredname/always/failingprecheckoutguard but getRUN-SPECIFIC
+refusalconcurrency namespace. Successfulmetadata/validate groupsunchanged.
+Meaningfulregressionsforlateinvalidvsready, validcancellation/metadataisolation/
+requirednon-success, normalfocusedtests. Rootcanindependentreviewpatch.
+RoutineFFpublicationauthorizedafterreview/tests; noLSMS/census/datachanges.
+PRalreadyREADY, newHsynctriggerseligiblefull; RootfinalH/B/Scheck/watch/merge.
+Do not claim fullgaterunninguntilactualnewHrunstepsverify. Preservecanceledrun.
+
+* Backlog reconciliation now covers full inventory,17deepreviews
+RootindependentREST20:25:37:pages100(93issues7PR),49issues,empty3;142unique
+openissues/7PR,matchingtimeoutreviewreport.42missingfromold100cap,not45current.
+First12reviewhealthy174files/37ancestorproof;second41097539actualTIMEOUT45m,
+butsubstantive139file report/inventory/fiveverdictssurvived;managerauthenticates
+deliveryqualification, no substantive modelrepeat. Recovery41100589canceled
+at31sstartupbeforeworkerstateafterRootfoundcompleteartifactcontent.
+First12:11partial/1needsvalidation;next5:2partial/2unresolved/1needsvalidation.
+No supportedclosurein17. RootreadfullcontinuationREPORT anddirect920/698full
+bodies,698comments/1104body/currenttests+rebuildsource/mergeancestry.
+920+698title/bodyfactuallynarrowed20:26:56/59/OPEN/exactreadback,historicalbodies
+preserved.1079/1080/740unchanged. R/merged-issue-reconciliation-20261110/
+ROOT-{PAGINATED-OPEN-INVENTORY,BEFORE-920,REQUEST-920,READBACK-920,BEFORE-698,
+REQUEST-698,READBACK-698}.json. Prior1571title-only/1287+1460residualsstand.
+
+* Other delegated lanes
+Deputyfinish_1590 owns1575operatorLOCALrecovery afterprep41097327TIMEOUT45m,
+original71filesfrozen. Newpacketmanifest2c2153a3543927e550ca04be35187dc9ece0386a5e2893f9c69c614c842b7144,
+18calls/8roles unchanged,managerjointcode/image/contextreceipt/preflightthen
+firstdeterministicactual. NOdataactorclaimed. Full3countryheaders/fourthand
+pure/source/footprintpassesunchanged; no replay. Future1693shared812union
+source-onlyprepared/unapplied,preservesBFAfunction+4countryassertions. Public
+1693still2f8/dependent9f, nofullgateyet.
+Benin1531 41100187 COMPLETED0/12:04;Togo1531 41100186 COMPLETED0/13:33,
+ownGPSdocument/source-only. Managerterminal/artifact/sourceintakepending;Root
+awaitsfullreports. No raw/header/row/API/conversion/clamp/heldlistchange.
+New41102570running20:40assignmentmanagerpending(probablySenegaladapter).
+Senegal1483ownheaderadmitted19fields/7cards/36menu;used03b10units versus
+gift07b/purchase09b5units,q05gift/q08purchase/q09ctotalvalue. Source-only6path
+adapter+puresauthorized,reuserecent1483machinery/nativeidentity/rawoperands/
+separateunits/no2018/global/parcel/nutrientfactor/defaultchange. FiniteONEown
+objectnativecorrespondenceproposalafterindependentreview; NOrows/APIgrantyet.
+Settledcentraldecisionsunchanged; R2b/PPrepresentationandothersremainpending.
