@@ -161,6 +161,15 @@ with an original-round BID. Any document placement needs its own origin,
 retrieval date, exact bytes/hash, language and version seal; no proposed path
 here claims a document is already held.
 
+Proposed destinations, **not created**: private staging grouped by WB76/WB1050
+and resource ID, followed, only if Root admits preservation, by
+`Tanzania/2008-15/Documentation/NPS-R1/<exact filename>` and
+`Tanzania/2008-15/Documentation/NPS-R2/<exact filename>` with per-document
+provenance and sidecars. This keeps original-round custody separate from the
+UPD documents; it does not turn `CATALOG_COVERS` into a whole-release holding.
+Root owns any sanctioned `get_data_file`/`push_to_cache_batch` restoration and
+its local/DVC verification. None ran here.
+
 ## Search scope and exact remaining operand
 
 Actually inspected primary HTML paths are WB76 and WB1050 study pages,
