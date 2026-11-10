@@ -147,9 +147,17 @@ def test_unique_and_empty_routes_are_unchanged(helpers, wave, empty):
     t, sec3, sec4, colmap = inputs(wave, [1.])
     if empty:
         sec3, sec4 = sec3.iloc[:0], sec4.iloc[:0]
-    old = before.plot_inputs_for_wave(t, sec3, sec4, colmap)
-    new = after.plot_inputs_for_wave(t, sec3, sec4, colmap)
-    assert_strict(new, old)
+    if empty:
+        # Preserve the legacy refusal; neither helper promises a healthy empty.
+        with pytest.raises(ValueError, match='^No objects to concatenate$') as old:
+            before.plot_inputs_for_wave(t, sec3, sec4, colmap)
+        with pytest.raises(type(old.value)) as new:
+            after.plot_inputs_for_wave(t, sec3, sec4, colmap)
+        assert new.value.args == old.value.args
+    else:
+        old = before.plot_inputs_for_wave(t, sec3, sec4, colmap)
+        new = after.plot_inputs_for_wave(t, sec3, sec4, colmap)
+        assert_strict(new, old)
 
 
 @pytest.mark.parametrize('wave', ['2019-20', '2020-21'])
