@@ -1,4 +1,26 @@
 #+title: Current LSMS-ISA worker queue
+* CURRENT CIrefill (2026-11-10 09:13 UTC)
+PR1687full42769154949FAILED18/17228P/0E/2775S; unit+WindowsSUCCESS.
+Originalfiveauthorityremotes ALLclosedworker0/supervisor0/taskcompleted,
+Rootreviewpending. NEWMaliCI41089148/0c49532dbc7548d78a04420758a2794a
+andNigerCI41089150/d116603b03604f819be16bc56d2c37c8 confirmedagentexecution.
+Mwiowns bothwatch/intake andnewUga/TZAsamplingplusshocksCI tasksubmissions
+(preparationonlyatcheckpoint).1590BFAactualfailednode/smallNigeriawarm
+samplingaid;1452implements3trueNigeriaPHplotrepairs. Rootsourceadmission,
+fullCItriage,Ghana/Ethsamplingresidual,GH/settings/integration.
+No fullpass/newmerge/settings/wholeclosure. Exactconstraints [[file:handoff.org]].
+
+* ACTUAL five workers (2026-11-10 08:47 UTC)
+THREE remoteagent_execution/freshheartbeat/exactd47: Niger1565 job41088863
+(ba850e6737f44335b5cdfb2d7c1a3712), Ethiopia1570 job41088938
+(b1b4e8e35f614aadac793e7bebb90243), Malawi1228 job41088939
+(739b1579dde64d37a6c83bb0a5beced7). Mwiownsfinitewatch/terminalintake.
+TWOlocalNigeriaworkers:1590housingv3 actor46198coldclosed0/warmLIVE,
+10strictindexfailurespreserved;1452fivePHplotgaps, positiveW1/W2ownforms,
+exactexportbindingspending. Rootownsreview/queue/GH1687fullCI/settings/merge.
+These arefiveworkers onfourcountries, not eight busycountryworkers.
+Details/sourcepins/constraints: [[file:handoff.org]].
+
 * CURRENT assignments (2026-11-10 08:30 UTC)
 Root:1687 d47 ordinaryCI SUCCESS/full-data42769154949 live, observer76037.
 finish_1590: Nigeria587 actual normal housing cold/warm verification; original

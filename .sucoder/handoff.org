@@ -1,4 +1,136 @@
 #+title: Current LSMS-ISA goal handoff
+* CRITICAL full-data failure / new CI delegation (2026-11-10 09:13 UTC)
+PR1687 d47ff849eb0e7f2c7e9d4d77a7852b61e9240e61 FULLDATA42769154949
+TERMINAL FAILURE at08:53:58UTC:20021tests/17228PASS/18FAIL/0ERROR/2775SKIP.
+PrebuildPASS. Unit+Windows remainSUCCESS. Rootobserver76037 CLOSEDnormally.
+NO merge/settings/fullpass. Earlier16unmappedfailures are NOT baselineproof.
+Rreports/ci-1687-data-failure-42769154949-20261110/job.log downloaded actualjob
+129672643696 (firstghrefusedescapes, rerunreadexplicitallow savedfile); public
+wrapper DELETED originalcapturedtrace/stdout/XML, no privatefailingline recoverable.
+SAFE-SUMMARY.txt andSAFE-LOCATORS.txt captureall12publicstaticnodes/counts18:
+BFAplotinputsidentity1; Niger1460CountryFeature1; Mali1494join1; soldcondition1528
+1; Mali824two1each; Malisoldkg1; NigerNPK1; Nigerunit2; samplingcurated7;
+shocksfoodextension1. ParameterIDs deliberatelynotprinted, so which7sampling/
+which1shocks countryfailed UNKNOWN. No speculative obsolete-oracle/countrepins.
+
+CurrentCIassignments exactd47:
+- finish_1590 switched from housingauthorityinventory to BFA failednode. It proved
+  source21test ALREADYupdated for1483 (notobsoleteempty2021assertion). Root grants
+  ONE genuine normalprivate exactnode afterfinite BFA source/sidecar/sample and
+  operatorfreeze; exactalreadyDVC-managedretrievalallowed, WBrawrelease/shared
+  writes denied, no mocks/memo/stalerestamp. Unexpecteddependency stops. Agent
+  owns actors; sendplan/handles. Also optionalcheap2Nigeria samplingpair cases
+  fromgenuinelyfreshprivatehousing-sample cache; existingwarmguarddeniesraw/
+  producer/writer, no rebuild. Rootowns samplingfinalacceptance.
+- Mwi dispatched NEWMaliCI job41089148/0c49532dbc7548d78a04420758a2794a and
+  NEWNigerCI job41089150/d116603b03604f819be16bc56d2c37c8, BOTH supported
+  agent_execution/fresh at09:08:22. Root Q/refill-1687-country-ci-d47-20261110.
+  Source-first failednodeclusters/ownCONT/approveddecisions, then ONE private
+  normalowncountryrepro aftercomplete finite manifest/freeze. Root escalation
+  grant forwarded canonicalnormalchannels andfileSHA7d979a6d… . No old16baseline
+  inference/expectedcountrepins/loosening.1528shared notdoubleexecutedcrosscountry.
+- Mwi nextactualdispatches IN PREPARATION (notyetclaimedrunning): Uga4sampling
+  pairs andTZA3pairs, exactexistingtestparams, failureswhich7UNKNOWN; either
+  countrymayPASS withoutfixingfullCI. Same source-first/privatefiniteone-run
+  authority. RootkeepsGhana/Eth2pairs ifneeded andreviewsmetadata/sourcepolicy.
+- Rootalsoauthorized separatecriticalshocksfoodextension1/4paramrepro delegation
+  toMwi ifcapacity; sourcefixture+mappingfirst, finite4ownsource+sample closure,
+  settled purchases/stocks mappingpreserved. Rawnewfood-onlymembership vsold
+  fixturemask is RootHYPOTHESIS ONLY; no diagnosisuntilactualfailingline. No new
+  broaddocumentaryoccupancytasks now; prioritizefullCIblockers.
+- finish_1452 continuesTRUE NigeriaW1-W3PHplot_features sourceimplementation,
+  newisolatedWfix-587-nigeria-W1-W3-PH-plot-features-20261110 offd47. Separate
+  ownPHhelper/cards; PPnigeria.pybehavior/scriptsblocksbyteexact; threewave
+  writersappendPH/countryconcatunchanged. Ownunit8Other versusPPsquarefoot and
+  ownacquisition5family/inheritance/4community-family ambiguity retained, not
+  narrowerforcedTenure. Exactsidecarversionadmission. W4/W5canonicalareaHELD.
+  Purecontrols authorized afterfreeze/correctMAINimport, native/APIlateradmission.
+
+NEW NigeriaPHplot evidence:fiveownagPHdocs/5zero-rowheaders closed. Oneoperator
+missing-parentfailurebeforeheader preserved. Numeric11960CLOSED0/18.894s:
+5getters5Stata/38495rawrows allretained; keyscompleteintegralunique, allraw/RAM/
+sourcecopiesexact. GPSnonmissing221/574/793W1-3; acquisition5actual191/155/59,
+so PPmapwouldlose346W1/W2reports. W4sa1q11positive1066allGPSYes stillunknownunit;
+W5priorGPS5119 explicitlypreviousvisit. No correlation→units/fielding/carry.
+R587-nigeria-five-PH-plot-features-authority-20261110/EVIDENCE-MANIFEST.json
+4f4c105d8e4b7d962c983d4fea086b463c81c39f1ccbb1d9246700ef34385034.
+Rootindependentlymatchedall5sidecarMD5/size=12411106B/341fields beforegrant.
+
+Housingnormalpacket SEALED R587-nigeria-housing-current-normal-v3-20261110,
+manifest8abfc85528e736feee9898f9bb98f41dd7106c8cdad773cf1947ee208ffd1f8b.
+RootreadREPORT/ACTUAL-SUMMARY/SOURCE-ATTRIBUTION.29normalcalls22cold7warmclosed0;
+fullCountry24006rows,cold↔warmstrictPASS,2FeaturestrictPASS,10WavevsnativeRETURN
+strictPASS.15subsetcompleteindexdomain+typedattrsstrictFAIL remainFAIL; ALL15
+observedtypedtuples/order/columns/values/dtypes/masks independentlyPASS. Three
+oldnativeCALLRETURNstrictdomainFAIL are domaincounts NOTrowloss (4899rowsboth,
+4756both,4589both). SourcefinalizerpreexistingApril9/10 explainsobserveddomains;
+attrsnormalper-frameactualwaves versusmanualsliceoldattrs, no suchstrictdomain/
+attrs-slice equalitypromisefound. Noproductionpatchimplied. Warm0raw/decoder/
+producer/writer/privateinventoryexact, all78inputseals+26sidecarsexact. Cumulative
+actualraw73=5failedv2housing+68v3sample. Opposite5quartersgenuinelyemptyCURRENT,
+NOTfielding/correctlyemptyverdict. OwnsourceinventorynextpausedforcriticalBFA.
+
+OriginalFIVEcountryauthorityremotes ALLTERMINAL worker0/supervisor0/completed,
+coordinatorreviewPENDING. R=Q/refill-country-authority-d47-20261110/source.git:
+Niger0cbb4534b955b0ae8fac882881909a198289d336(ledger+43CONTlines/51artifacts);
+Ethiopia275c5d4de32c98b00be369bea2ff0b11ebb890fb(+63CONT/46artifacts);
+Malawi2b00f7fcdc9c38d01bd9410d8f7fc47bca0d9717(+40CONT/45artifacts);
+Mali7f14b8c2e879f1577b6de5fca7f8343e793a7f51(pendingintake);
+Uganda21099ee8ce4222a572f7b0be60ce7a3ffa09c1ca(pendingintake).
+Source.patch/ADMISSION.json/REPORT+DECISIONS canonicalunderR owncountryroots.
+Positives: Nigerown13departure-reason+monthyearroute, missingexportcodebridge;
+ETHmanualPDF99ExcludeTREE&ROOT versusPHformINCLUDE, wholeBirrgeneraldoesNOTsolve
+W1Decimal; MalawicommonseasonOPTIONlistsnotmatchedHHselections/I→Hbridgeunknown;
+Maliofficial3409DDIcode4EgrenerandnewpublicP2manual47787 identifiedunacquired;
+Uga9primaryURLs couldnotaccessfullKidmosepaper (CGIARexactDOI limitedaccess/
+emptybundles, publisher/institution403); no density225/sourcewordingchange.
+No fullissuesclosedfromthese sourcechecks; no numeric/weight/panel decisions.
+Development4381/78verifiedmerges42closures; goalACTIVE. Pending1573/1575 and
+NigeriaPP rawretentionquestionunchanged; PPfoundation remainsUNWIRED.
+
+* ACTUAL delegation and housing continuation (2026-11-10 08:47 UTC)
+All THREE new remotes are supported agent_execution with fresh subsecond
+heartbeats, exact source d47ff849eb0e7f2c7e9d4d77a7852b61e9240e61:
+- Niger1565 job41088863 /ba850e6737f44335b5cdfb2d7c1a3712, n0030.
+- Ethiopia1570 job41088938 /b1b4e8e35f614aadac793e7bebb90243, n0036.
+- Malawi1228 job41088939 /739b1579dde64d37a6c83bb0a5beced7, n0036.
+Free co_carleton/savio4_htc/lowprio,2CPU/8G/45min, no n0035. Mwi owns supported
+phase/heartbeat observation, finite watcher and ALLterminal collections. Exact
+source/task/status receipts Q/refill-country-authority-d47-20261110. Do not
+resubmit because observation times out. This is3remotes+2localNigeriaworkers,
+not eight activecountryworkers. Optional additionalMali/BFA CAPI/exportbridge
+lane only if demonstrably distinct unread authority, no paper/nativecardreplay.
+
+Housing v3 actor46198 COLDchild CLOSED0/415.966s; freshWARM phase LIVE at last
+agent report. R587-nigeria-housing-current-normal-v3-20261110,
+PRELAUNCH795aad3635c9d130e889886139ce546d1d8479cf58ac219a0673a59a7e33f74a.
+All22coldcallsreturned: fullCountry/alignedFeature24006rows; selectedquarters
+4899/4756/4589/5047/4715, five oppositehistoricalquarter Country+Wavecalls0.
+All10 strictCountry-single versusfullslice index comparisonsFAILED ('Index are
+different'); feature strictpayloadPASS.1590will classify savedcaptures only,
+no pruning/cast/sorting/API replay. Observed tuple/payload equality, if true,
+must be separatelyqualified; no all-strict-green/fielding/falsepositiveclaim.
+v3 sampleactual68getter/68Statareads/5sampleproducers/6writers/0denials;
+normalhousinggate reusedexactcurrentv2output, sample genuinelybuilt. Cumulative
+raw73 including5v2housingreads (failedfullreturn). v2 failed on external
+fd-relativeos.unlink audit misresolution; Rootapprovednarrow dir_fd resolver,
+actualprivateDVCmetadata targetproved, W/cache.db absent. Old88653/v222088
+failures preserved. v3source/operator frozen; agent owns terminal+warmproof.
+
+Plot1452 positiveOWN W1/W2PHagriculture PDF4A1Q9plotarea(NUMBER/UNIT/GPSm2),
+PDF5Q12acquisition with NEWPLOT routing; own5FamilyInheritance versusPP4-code
+premise. No allplotsreasked/PPcodeborrow. All5publicPHagdocgettersPASS; remaining
+ownforms then exact PHheader/version/fieldcardplan; no nativeheader/row/APIyet.
+NigeriaPP foundation realacceptance independentlyRootrechecked RESULT/RECEIPT,
+6roles196129rows/allrecordedchecks/exit0/originalcopiesbindingsunchanged,
+counts6captureloads+6adaptercalls/0newnativeAPIprojectionwriters. Rootgitdiff
+8458->6809 onlyownledger. Future publicbuilder MUST positivelybind captured
+card MD5/sourceversion; cache invalidation alone is not dictionaryadmission.
+Price/rawretention preference pending; foundation UNWIRED. GH587 body narrowed
+with these measuredcompletedchecks and genuine remaining serving gaps.
+PR1687d47 ordinarySUCCESS/full-data42769154949stillLIVE; Root76037observer,
+no fullpass/newmerge/settings/wholeclosure. Development4381/78merges42closures.
+
 * CURRENT coordinator checkpoint (2026-11-10 08:30 UTC)
 This section supersedes earlier live observations; those histories stay below.
 Goal ACTIVE. Development4381d701ffb06ab447a37c66362119d1c1e23009,
