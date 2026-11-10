@@ -1400,6 +1400,9 @@ def _documentation_resources(catalog_id: str, api_key: str | None) -> tuple[list
             for r in data['resources']:
                 if not isinstance(r, dict) or not isinstance(r.get('_links', {}), dict):
                     raise ValueError('Unrecognized resources API record')
+                download = r.get('_links', {}).get('download')
+                if download is not None and not isinstance(download, str):
+                    raise ValueError('Unrecognized resources API download link')
                 kind = r.get('type') or r.get('dc_type')
                 if not isinstance(kind, str) or not re.search(r'\b(?:doc|data)/', kind, re.I):
                     raise ValueError('Resources API record has no recognized type')
@@ -1407,7 +1410,7 @@ def _documentation_resources(catalog_id: str, api_key: str | None) -> tuple[list
                 rows.append(dict(resource_id=str(rid) if rid is not None else None,
                                  filename=r.get('filename'), title=r.get('title'),
                                  type=kind, language=r.get('language'),
-                                 download_url=r.get('_links', {}).get('download') or (
+                                 download_url=download or (
                                      f'{catalog}/download/{rid}' if rid is not None else None)))
             return rows, dict(status='listed', url=url, attempts=attempts)
         except (urllib.error.URLError, OSError, TimeoutError, ValueError) as exc:

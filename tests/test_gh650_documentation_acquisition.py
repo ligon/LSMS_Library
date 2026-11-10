@@ -167,6 +167,36 @@ def test_genuine_empty_html_and_unrelated_catalog_export_links_stay_empty(docs):
     assert report['status'] == 'not_listed' and not report['resources'] and not docs['pushes']
 
 
+@pytest.mark.parametrize('download', [{'href': 'https://synthetic.invalid/1'}, ['https://synthetic.invalid/1'], 1, True, False])
+@pytest.mark.parametrize('fallback', ['recognized', 'unknown'])
+def test_malformed_api_download_shape_uses_existing_discovery_fallback(docs, download, fallback):
+    docs['resources'][0]['_links']['download'] = download
+    if fallback == 'recognized':
+        docs['html'] = '''<div class="resources"><span class="resource-info" id="11">Own form</span>
+        <a class="download" href="/catalog/10/download/11" data-filename="recovered.pdf"
+        data-dctype="Document [doc/qst]"></a></div>'''
+        docs['bodies']['https://microdata.worldbank.org/catalog/10/download/11'] = b'%PDF recovered'
+    else:
+        docs['html'] = '<html>unknown resource layout</html>'
+    report = fetch()
+    assert report['status'] == ('complete' if fallback == 'recognized' else 'discovery_failed')
+    assert len(report['discovery']['attempts']) == (1 if fallback == 'recognized' else 2)
+    assert 'download link' in report['discovery']['attempts'][0]['error']
+    assert len(docs['pushes']) == int(fallback == 'recognized')
+    assert len(docs['calls']) == (3 if fallback == 'recognized' else 2)
+    assert set(report['held']) == ({'11'} if fallback == 'recognized' else set())
+
+
+@pytest.mark.parametrize('download', [None, '', 'https://synthetic.invalid/1'])
+def test_supported_api_download_shapes_keep_exact_existing_routes(docs, download):
+    docs['resources'][0]['_links']['download'] = download
+    expected = download or 'https://microdata.worldbank.org/index.php/catalog/10/download/1'
+    docs['bodies'][expected] = b'%PDF supported'
+    report = fetch(push=False)
+    assert report['status'] == 'complete' and docs['calls'][-1] == expected
+    assert not report['discovery']['attempts'] and len(docs['calls']) == 2
+
+
 def test_download_failure_preserves_old_held_bytes_and_receipt_identity(docs):
     first = fetch(push=False)
     before = (docs['directory'] / 'questionnaire.pdf').read_bytes()
@@ -408,6 +438,28 @@ def test_raw_success_and_real_document_discovery_failure_are_independent(countri
     assert sorted(p.name for p in result) == ['a.dta', 'b.dta']
     assert pv.read_provenance(countries, 'Nigeria', '2023-24').idno == 'NGA_2023_GHSP-W5_v02_M'
     receipt = json.loads((countries / 'Nigeria/2023-24/Documentation/DOCUMENTS-6410.json').read_text())
+    assert receipt['status'] == 'discovery_failed' and 'incomplete documentation' in caplog.text
+
+
+def test_raw_success_survives_real_malformed_document_api_link(countries, wb, monkeypatch, caplog):
+    original = urllib.request.urlopen
+    before_document_source = []
+    source = countries / 'Nigeria/2023-24/Documentation/SOURCE.org'
+    def urlopen(req, **kwargs):
+        if '/api/resources/' in req.full_url:
+            before_document_source.append(source.read_bytes())
+            bad = resource(); bad['_links']['download'] = {'href': 'https://synthetic.invalid/1'}
+            return Response(json.dumps({'resources': [bad]}).encode())
+        if req.full_url.endswith('/related-materials'):
+            return Response(b'<html>unknown resource layout</html>')
+        return original(req, **kwargs)
+    monkeypatch.setattr(urllib.request, 'urlopen', urlopen)
+    monkeypatch.setattr(da, 'fetch_documentation', REAL_FETCH)
+    result = da.add_wave('Nigeria', '6410', wave='2023-24', push=False, confirm=False, verbose=False)
+    assert sorted(p.name for p in result) == ['a.dta', 'b.dta']
+    assert pv.read_provenance(countries, 'Nigeria', '2023-24').idno == 'NGA_2023_GHSP-W5_v02_M'
+    assert before_document_source == [source.read_bytes()]
+    receipt = json.loads((source.parent / 'DOCUMENTS-6410.json').read_text())
     assert receipt['status'] == 'discovery_failed' and 'incomplete documentation' in caplog.text
 
 
