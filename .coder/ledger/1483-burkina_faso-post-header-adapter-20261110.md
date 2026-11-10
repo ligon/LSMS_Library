@@ -1,7 +1,7 @@
 # Prior-Art Ledger — #1483 Burkina Faso post-header adapter
 
 Status: source implementation candidate frozen at
-`04191ee968251b6d1ba22ee3540c3cd59c150a9a`; every pure/runtime control UNRUN.
+`850cb762871711098d8a58b3b8ab0b3f08fd0685`; every pure/runtime control UNRUN.
 Ledger-first commit: `c6c1533270254e8c06916b0d5e09236bd1583b70`.
 Search tier: rg + git (no exposed GitNexus). Exact initial
 HEAD4381d701ffb06ab447a37c66362119d1c1e23009, checkout and branch asserted.
@@ -88,10 +88,13 @@ multiplicities, masks/counts, missing tags, CAPI and release cause do not follow
   prohibits extending the legacy2018 pure-DAP fold/0.18 assumption to2021.
   No existing2018 map or NPK grade policy changes. Combined rubber/teak stays
   literal and distinct; no single crop/physical Seed classification invented.
-- All2018 code, maps, assertions and old baseline bytes stay exact. New raw
+- All2018 code/maps and numerical oracle values stay exact. ROOT explicitly
+  authorized updating only the obsolete2021-empty availability expectation. New raw
   columns widen combined output; old seven payload columns/keys must remain
-  exact in later verification. Existing2021-empty assertion is left intact;
-  integration must explicitly supersede that coverage expectation.
+  exact in later verification. The existing2018 code21 count remains602 and all payload assertions remain;
+  that oracle now queries2018 explicitly.2014 stays empty;2021 is required
+  nonempty with its requested t. New2021 groundnut slot19 no longer enters
+  the2018-only count. No real count, tolerance or golden hash is repinned.
 - No strata/weights/population/season/exclusions/anonymous route/shared schema,
   other-country/framework or source-sidecar edit. Entire original CONTENTS
   survives as an exact226693-byte prefix. No new native/producer/API run.
@@ -114,7 +117,7 @@ No new estimator, reducer, physical factor, nutrient grade or allocation.
 
 1483-Q09A was recorded once and closed in the absolute channel after ROOT's
 supplement. No missing source/representation decision blocks this household
-binding. ROOT owns review, independent verification, baseline integration and
+binding. ROOT owns review, independent verification, availability-baseline review and
 any PR; no GitHub write/publication/merge is performed here.
 
 Next gate is exactly the new test file, under the MAIN/exact cwd/PYTHONPATH/
@@ -133,15 +136,26 @@ separate finite plan. #1483 other objectives, #1573/#1442/#1148/#1437/#1436/
 - OK (§3/§4), static: own cards and q09c authority are authenticated metadata;
   combined q09a wording and raw answers remain. No borrowed tails, units,
   parcel allocation or pure-DAP fold. Numerical/native equivalence UNRUN.
-- OK (§4), source closure at04191ee96: exactly8 owned changed paths,
-  19262 nonowned Git mode/type/blob entries exact; original country prefix
+- OK (§4), source closure at the final freeze: exactly9 owned changed paths,
+  19261 nonowned Git mode/type/blob entries exact; original country prefix
   exact. Existing scheme bytes are exact after removing ONLY the added raw
-  field block. Three new Python files parse using stdlib only; no definitions
+  field block. Four changed Python files parse using stdlib only; no definitions
   execute. git diff --check passes. Package/config import identity UNRUN.
 - Retain initial first-freeze diff-check exit2: a literal blank patch context
   carried trailing whitespace.30b9cc177 corrected it; executable code/tests
   were unchanged then. The unapplied patch passed git apply --check before
   own q09c resupply superseded it with real wiring. Neither is runtime proof.
+- OK (§2/§4), static: own source path now occurs as a real literal argument in
+  the wave wrapper so existing `scan_script_data_refs` discovers the source
+  sidecar. Driver refuses alternate paths; the actual wrapper-call control
+  pins this argument. No runtime cache fingerprint was computed.
+- ROOT's last steering explicitly broadens test ownership for the obsolete
+  availability assertion in `test_burkina_faso_plot_inputs_identity.py`.
+  Old: all-wave source21 oracle, then2014/2021 both empty. New: same2018
+  numerical oracle explicitly scoped to2018,2014 empty,2021 nonempty and
+  requested t only. This preserves the original2018 oracle population when
+  new2021 Arachide slot19 appears. Exact old/new source diff is saved in the
+  final SOURCE-PROOF; existing/new test execution remains UNRUN.
 - No runtime REINVENTION/CONTRADICTION verdict is claimed. Pure controls,
   pytest/collection/JUnit, native/header/record parsing, Make/Country/Feature,
   provider/acquisition/cache/census/full CI are all UNRUN. On-disk skill
