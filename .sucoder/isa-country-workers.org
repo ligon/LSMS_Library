@@ -1,4 +1,18 @@
 #+title: Current LSMS-ISA worker queue
+* Latest — 2026-11-10 03:27 UTC
+Two new actual submissions/dryrun0: BFA1483 job41082011/7ea9deb3f4b04eb3a65c164506f26352;
+Mali1483 job41082012/f008c838b85b48bd8f1580c34de17a0e. Ownpost-header
+HHinput adapters/wiring+portablecontrols. Nativephase confirmationpending,
+finish_1590 owns monitor/intake/nextcountryselection. Prior8batch allclosed.
+malawi_revision_food now Ethiopia ownW5 publicquestionnaire check1570/650;
+1683 test-only repair17PASS pushed e5d, newCIrunning. PHxlrd capabilityfailure
+preserved; HH/PP usefulpublicdoc workcontinues. No raw/API/fieldedbridge claim.
+finish_1452 now repairs Root-found source-side .dvc provenance exclusion in
+remaining1071 A+B;73qualified controls across runs,9newaffectedcontrols pending.
+Root ownsPR1685newholding,932actualtimeout/new360minrun, trackerreconciliation.
+PR1681/1682/1684 ordinaryCIpass;1680/1683/1685 CIactive; no newmerge.
+Details/sourcepins/receipts: [[file:handoff.org]].
+
 * Current — 2026-11-10 03:14 UTC
 This section supersedes the historical running observations below.
 Previous eight-country batch and extra Tanzania engineering job ALL CLOSED

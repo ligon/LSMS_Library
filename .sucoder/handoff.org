@@ -1,4 +1,55 @@
 #+title: Current LSMS-ISA goal handoff
+* Latest operational checkpoint — 2026-11-10 03:27 UTC
+This overrides the03:14 state below. Goal ACTIVE; development4381 unchanged.
+TWO NEW country source-fix jobs submitted successfully after dryrun0:
+- Burkina_Faso1483:41082011 /7ea9deb3f4b04eb3a65c164506f26352.
+- Mali1483:41082012 /f008c838b85b48bd8f1580c34de17a0e.
+Scope: own post-header household-input adapters/wiring candidates and portable
+pure controls; no native reads/parcel allocation/N-grade/default policy.
+finish_1590 owns supported phase checks, finite monitor and remaining country
+refill. Submitted does not itself prove agent execution; phase confirmation
+still pending at this observation. Q/refill-header-1483-20261110 receipts.
+
+malawi_revision_food finished actual1683 failure correction: e5dffeb22e104edabd25461247af1874d5f59883,
+tree036645d84484cc9664f2fb586f46dc017b84da10. Two test files+ledger only;
+17affected/fatal/healthy controls PASS once, product/configexactedc4. Root
+reviewed complete diff and pushed existingPR1683; newCI42748736508 LIVE,
+WindowsPASS. R/ci-1683-correction-20261110 manifest9f16a84f… . All four own
+temporary1281 reader-secret copies removed after actors closed; global untouched.
+Agent's NEW country task: Ethiopia1570/650 finite own-publicW5 workbook
+structure/question check, no new raw/API, no fielded-export/version inference.
+Three held files authenticate; HHxlrd/PPopenpyxl load, PHxlrd failed SSTassert.
+Original structure actor6097 failed before durable combinedinventory; preserve
+failure, continue useful HH/PP with per-document receipts. No alternate parser/
+dependency or disabledassert workaround. W5 holding itself is now DRAFT PR1685
+at7fd7ec7f205e9b8ae7df5ccd31dfd1d1dec72127; ordinaryCI42748577030 LIVE.
+
+finish_1452 A+B1071 qualified73controls now covered across46+19+8 passes, with
+original v1/v2 fixture/oracle failures retained (NOT fresh73green). Root's
+independent product review identified a genuine source-provenance hole:
+committed source-side .dvc can populate a cache-shaped private path while source
+payload is absent. Resolver proof confirms. Agent now adds exact source-side
+sidecar exists/symlink checks both before heal eligibility and before unlink,
+then4newguards+5actualYAMLowner smoke cases. Preserve defaultcore routes and
+source exceptions. No A+B publication/integration yet; C+D still outstanding.
+
+PR1680 newheadc94300df37dce2cbd99019ccb09c28c2509158f2: actual2h timeout
+corrected by PR-only360-minute allowance; every test/gate/recipe/per-testtimeout
+unchanged. Two existing source-control functions passed by directASTinvocation,
+not fresh67pytest. Newdata42748441466 LIVE fullpytest; newordinary42748441781
+LIVE; metadata42748508835 SUCCESS under separate name/no cancellation.
+Root publicmetadata watcher47734 attached through finite deadline; report
+R/932-data-validation-time-budget-20261110/REPORT.md +CI-WATCH.jsonl.
+Original42733260628 timeout preserved; no settings/merge/dataacceptance yet.
+Updated1682 d724 ordinaryCI42746450162 now SUCCESS;1681/1684 alsoSUCCESS.
+
+Root updated issue titles/bodies1084/650/587/1281 to remaining scope, retaining
+historical reports and distinguishing source reconciliation vs new runtime.
+Niger already-held recall prerequisite removed;650 oldonly-stub inventory dated,
+1685 pendingmerge explicit;587 four ownISAderived cells already594;1281 named
+realregression1PASS, remainingwarm/exposure/full/derived/Feature workopen.
+No new whole-issue closure; user1573/1575 choices remainpending.
+
 * Authoritative update — 2026-11-10 03:14 UTC
 This section supersedes the older live-worker and CI observations below.
 Goal ACTIVE; development remains4381d701ffb06ab447a37c66362119d1c1e23009,
