@@ -3970,6 +3970,141 @@ _SEED_LINE_SOURCES = {
 }
 
 
+SEED_ACQUISITION_ROLE = 'reported_H_component'
+
+
+def _seed_acquisition_block(df, *, t, source_ref, source_half, row_positions):
+    """Literal quantity-bearing H components, without a plot/application claim.
+
+    Reuse the six existing source/field bindings (ledger 1190-selected-farm-carrier
+    §§2–5). First/second purchases retain their own nonzero recorded-value gate;
+    gift and third quantities retain contradictory/missing flags. No reduction.
+    Raw H scalars stay under their native names, including source answers whose
+    semantic binding is unresolved. H36_1 payers and transport are never values.
+    """
+    from lsms_library.paths import countries_root
+    from lsms_library.transformations import U_UNKNOWN
+
+    bindings = [s for s in _SEED_LINE_SOURCES.get(t, []) if s['half'] == source_half]
+    if len(bindings) != 1:
+        raise ValueError('Malawi H component requires a declared wave/source half')
+    binding = bindings[0]
+    path = f'Malawi/{t}/{binding["h"]}'
+    # Fail malformed, wrong-source and changed-release references explicitly.
+    if source_ref != _seed_source_reference(countries_root() / path):
+        raise ValueError('Malawi H component source/sidecar reference disagrees')
+    positions = list(row_positions)
+    if any(isinstance(v, (bool, np.bool_)) for v in positions):
+        raise ValueError('Malawi H components require unique original row positions')
+    positions = pd.Series(positions, dtype='Int64')
+    if (len(positions) != len(df) or positions.isna().any()
+            or positions.lt(0).any() or positions.duplicated().any()):
+        raise ValueError('Malawi H components require unique original row positions')
+    if not df.columns.is_unique:
+        raise ValueError('Malawi H component has duplicate native fields')
+    raw = df.reset_index(drop=True)
+    crop, native = _seed_crop_identity(raw[binding['hcrop']])
+    ident = raw['hhid'].astype('string')
+    if ident.isna().any() or ident.str.strip().eq('').any():
+        raise ValueError('Malawi H component lacks household identity')
+    slots = [(q, u, v, None, None,
+              'purchase:second' if q == 'ag_h26a' else 'purchase:first')
+             for q, u, v in zip(binding['q'], binding['u'], binding['v'])]
+    # The later XS releases do not declare this block. Do not invent one.
+    if source_half != 'Cross_Sectional':
+        source = 'ag_h35__0' if source_half == 'Panel' else 'ag_h35'
+        slots.append(('ag_h36a', 'ag_h36b', None, 'ag_h34', source, 'purchase:third'))
+    slots.append(('ag_h38a', 'ag_h38b', None, 'ag_h37', None, 'gift'))
+    pieces = []
+    for order, (qcol, ucol, vcol, flag, source, kind) in enumerate(slots):
+        if qcol not in raw:
+            continue
+        quantity = pd.to_numeric(raw[qcol], errors='coerce').astype('Float64')
+        value = (pd.to_numeric(raw[vcol], errors='coerce').astype('Float64')
+                 if vcol in raw else pd.Series(pd.NA, index=raw.index, dtype='Float64'))
+        keep = native.notna() & quantity.notna()
+        if vcol is not None:
+            keep &= value.notna() & value.ne(0)
+        codes = (_int_codes(raw[ucol]) if ucol in raw
+                 else pd.Series(pd.NA, index=raw.index, dtype='Int64'))
+        unit = codes.map(_MWI_PURCH_UNIT_LABELS).astype('string')
+        unit = unit.fillna('Seed unit code ' + codes.astype('string')).fillna(U_UNKNOWN)
+        status = 'existing_field_binding;raw_source_answers_uninterpreted'
+        if t == '2013-14':
+            status += ';own_paired_question_labels_truncated'
+        if t == '2016-17' and qcol == 'ag_h38a':
+            status += ';own_quantity_label_says_OTHER_UNIT'
+        if t == '2016-17' and qcol == 'ag_h07a':
+            status += ';own_quantity_label_says_U_Other_Specify'
+        if t == '2019-20' and qcol == 'ag_h36a':
+            status += ';own_quantity_question_label_truncated'
+        piece = pd.DataFrame({
+            't': t, 'i': ident, 'plot_id': 'Farm-level', 'input': 'Seed',
+            'crop': crop, 'u': U_UNKNOWN,
+            'input_obs': 'row:' + source_ref + ':' + positions.astype('string') + '/field:' + qcol,
+            'Carrier_role': SEED_ACQUISITION_ROLE,
+            'Acquisition_quantity': quantity, 'Acquisition_unit': unit,
+            'Acquisition_value': value, 'Acquisition_kind': kind,
+            'Acquisition_flag': _use_answer(raw, flag),
+            'Acquisition_source': raw[source].astype('string') if source in raw else pd.NA,
+            'Source_path': path, 'Source_sidecar_sha256': source_ref.rsplit(':', 1)[1],
+            'Source_half': source_half, 'Source_row': positions,
+            'Component_field': qcol, 'Quantity_field': qcol, 'Unit_field': ucol,
+            'Value_field': vcol, 'Flag_field': flag, 'Source_answer_field': source,
+            'Native_crop': native, 'Binding_status': status, '_component_order': order,
+        })
+        # Preserve literal own answers, blanks/nulls and native scalar values.
+        # No cross-wave source-name inference: only H35's closed binding above
+        # supplies Acquisition_source; other source/payer/text answers remain raw.
+        for name in raw:
+            if name.startswith('ag_h') or name == binding['hcrop']:
+                piece[name] = raw[name]
+        pieces.append(piece.loc[keep])
+    keys = ['t', 'i', 'plot_id', 'input', 'crop', 'u', 'input_obs']
+    if not pieces:
+        return pd.DataFrame(columns=keys).set_index(keys)
+    out = pd.concat(pieces, ignore_index=True)
+    out = out.sort_values(['Source_row', '_component_order'], kind='stable')
+    out = out.drop(columns='_component_order')
+    strings = keys + ['Carrier_role', 'Acquisition_unit', 'Acquisition_kind', 'Acquisition_source',
+                     'Source_path', 'Source_sidecar_sha256', 'Source_half',
+                     'Component_field', 'Quantity_field', 'Unit_field', 'Value_field',
+                     'Flag_field', 'Source_answer_field', 'Native_crop', 'Binding_status']
+    out[strings] = out[strings].astype('string')
+    out = out.set_index(keys)
+    if not out.index.is_unique or out.index.get_level_values('input_obs').hasnans:
+        raise ValueError('Malawi H component has missing/colliding source keys')
+    return out
+
+
+def _append_seed_acquisitions(legacy, components):
+    """Append after unchanged G/D assembly; old columns/attrs stay exact."""
+    additions = [p for p in components if len(p)]
+    if not additions:
+        return legacy
+    extra = pd.concat(additions)
+    if (not extra.index.is_unique
+            or extra.index.get_level_values('input_obs').duplicated().any()
+            or extra.index.isin(legacy.index).any()
+            or extra.index.get_level_values('input_obs').isin(
+                legacy.index.get_level_values('input_obs')).any()):
+        raise ValueError('Malawi H component has colliding source keys')
+    if set(extra.columns) & set(legacy.columns):
+        raise ValueError('Malawi H component overwrites legacy payload')
+    # Pandas 3 distinguishes str (NaN) from string (pd.NA). New keys must use
+    # the existing axis dtypes so concat cannot change old observation axes.
+    extra.index = extra.index.set_levels([
+        level.astype(legacy.index.levels[n].dtype)
+        for n, level in enumerate(extra.index.levels)])
+    # Build typed missing application/attached fields BEFORE concat. This also
+    # prevents provenance from resurrecting any old all-payload-NA G observation.
+    for name in legacy:
+        extra[name] = legacy[name].iloc[:0].reindex(extra.index)
+    out = pd.concat([legacy, extra])
+    out.attrs = dict(legacy.attrs)
+    return out
+
+
 def derive_seed_line_no_payload(plot_inputs):
     """True where an assembled seed row has no served answer.
 
