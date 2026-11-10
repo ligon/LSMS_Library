@@ -266,7 +266,7 @@ def test_already_tracked_output_guard_survives_runtime_ignore_suppression(tiny):
     subprocess.run(["git", "-C", str(root), "add", "tracked.csv"], check=True)
     with _readonly(root):
         before = _snapshot(root)
-        stage = fs.repo.stage.load_one("dvc.yaml", "check")
+        stage = fs.repo.stage.load_one(str(root / "dvc.yaml"), "check")
         with fs.repo.lock, pytest.raises(OutputAlreadyTrackedError):
             stage.outs[0].save()
         assert _snapshot(root) == before
@@ -289,7 +289,7 @@ def test_genuine_private_output_stage_preserves_source(tiny):
     _producer(root, output)
     with _readonly(root):
         before = _snapshot(root)
-        stage = fs.repo.stage.load_one("dvc.yaml", "produce")
+        stage = fs.repo.stage.load_one(str(root / "dvc.yaml"), "produce")
         assert stage.wdir == str(root)
         assert stage.outs[0].fs_path == str(output)
         with fs.repo.lock:
@@ -348,7 +348,7 @@ def test_actual_country_foreach_materialize_private_output_once(tiny, monkeypatc
             method_name="facts")
         # Literal served oracle follows existing Country finalization, while
         # the producer/fixture keeps its original raw (t,i) index unchanged.
-        served = pd.DataFrame({"x": [15.0, 25.0]}, index=pd.MultiIndex.from_tuples(
+        served = pd.DataFrame({"x": pd.array([15.0, 25.0], dtype="Float64")}, index=pd.MultiIndex.from_tuples(
             [("h1", wave), ("h2", wave)], names=["i", "t"]))
         pd.testing.assert_frame_equal(actual, served)
         assert attempts.read_text().splitlines() == ["attempt"]
@@ -414,7 +414,7 @@ def test_detailed_output_validation_remains_real_dvc_error(tiny, bad_flags):
     with _readonly(root):
         before = _snapshot(root)
         with pytest.raises(YAMLValidationError):
-            fs.repo.stage.load_one("dvc.yaml", "materialize@fixture")
+            fs.repo.stage.load_one(str(root / "dvc.yaml"), "materialize@fixture")
         assert _snapshot(root) == before
 
 
@@ -444,7 +444,7 @@ def test_fresh_stage_errors_are_not_redirected_or_suppressed(tiny, failure):
     _producer(root, output, fail=failure == "recipe")
     with _readonly(root):
         before = _snapshot(root)
-        stage = fs.repo.stage.load_one("dvc.yaml", "produce")
+        stage = fs.repo.stage.load_one(str(root / "dvc.yaml"), "produce")
         with fs.repo.lock, pytest.raises(StageCmdFailedError):
             stage.reproduce()
         assert _snapshot(root) == before
