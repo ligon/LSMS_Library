@@ -3246,3 +3246,32 @@ these are supporting original-round documents, not acquisition of the original
 round microdata. Four logical waves sharing2008-15, UPHI/r_hhid backcasting,
 Extended/Refresh cohorts, WAITING114 and all served district/ID/weight rules
 remain unchanged. No labels/crosswalk/default or whole1441 closure is implied.
+
+* 2026-11-10 -- Original R1 food-section authority, bounded read (GH #587)
+
+The newly held original WB76/resource11558 XLS was retrieved once through a
+fresh private read-only managed cache, with its exact 2,419,200 bytes,
+MD5 =0beef1bba8018606e995b138edcd505f= and previously recorded SHA256.
+This new section read used existing xlrd2.0.2, without rereading CODES/COVER or
+the UPD PDFs. Existing closed COVER cells identify the NBS National Panel
+Survey household/individual questionnaire; the catalog date is2008-01-01.
+An exact fielded revision/addendum is still not authenticated by that date.
+
+In sheet =K FOOD=, cells A1/B4/E4/G4/I4/J4/L4 establish a past-seven-day
+consumption/acquisition module (questions1–6). A83/G84/C87/G87 establish
+questions7–9 about meals shared with *non-household* people, including a No
+route to the next section. In =R SHOCKS=, B4/D4/E9 establish a past-five-year
+severe-event question and follow-ups limited to the three worst events.
+The inspected R question regions are questions1–5, not the UPD eight-strategy
+past-seven-day day-count battery. Workbook sheet names include =H GOVERNANCE=.
+Cell citations are one-based worksheet cells, not invented printed page numbers.
+
+These positive original-form facts narrow the documentary question, but the
+bounded K/R inspection is not a whole-form negative keyword/fielding verdict.
+The current producer's wording “did NOT field §H” remains a stronger fielding
+claim than this evidence proves; the earlier UPD-absence/round1-declaration
+tension above is preserved. No table/coverage regrade, code/default/ID/weight
+change or whole587 closure follows. Exact fielded revision/routing/addenda and
+the original-to-released-UPD relationship remain qualified. Source cells,
+inspection bounds and custody: =B/reports/587-tanzania-r1-original-food-authority-20261110/=
+(B as in the task ledger). No raw/header/row, Country/Feature, Make or census ran.
