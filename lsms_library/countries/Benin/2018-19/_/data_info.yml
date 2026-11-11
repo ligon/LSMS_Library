@@ -13,7 +13,10 @@ sample:
                 - grappe
                 - menage
         myvars:
-            strata: s00q01
+            strata:
+                - s00q01
+                - s00q04
+                - mapping: strata_label
             Rural:
                 - s00q04
                 - mapping:

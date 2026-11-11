@@ -1139,3 +1139,36 @@ shared rewarm is applied. Other countries/waves and unfinished 2021-22
 wiring gain no opt-in. Evidence and exact source/read limits are in
 =.coder/ledger/1561-scoped-stata-missing-map.md= and
 =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1561-scoped-stata-missing-map-20261109-revision-v2/=.
+
+* 2026-11-10 — selected 2018-19 strata wiring (GH #1575)
+
+The user selected the documented combination: only =2018-19 sample.strata=
+now uses the own cover's =s00q01= region label plus =s00q04= milieu label,
+through the existing GH812 helper. It strips both labels and joins them
+with one space. Missing or blank either component gives NA; nonstring
+codes retain the dedicated refusal. No country categorical table or
+geographic alias is added. The optional =Derivation= carrier names
+=CotedIvoire::sample::region-milieu-stratum= only on nonmissing strata;
+the registry inputs callable returns both original fields at =(t, i)=.
+
+This selected wiring supersedes only the earlier region-only guidance
+("Treat the design as region-stratified for inference" and
+"sample.strata is wired from the cover-page region code"). All earlier
+text is preserved as history, including the original region/milieu note
+and the GH1575 documentary qualification. No new sampling-design finding
+is inferred from weights. Abidjan and Yamoussoukro retain both milieux;
+no allocation zeros or arithmetic cell count become an exclusion or a
+fixed observed-count requirement.
+
+Uppercase =CIV= and nested =Menage/= remain literal: the cover is
+=Menage/s00_me_CIV2018.dta= and the weight source remains
+=Menage/ehcvm_ponderations_CIV2018.dta=. All joins, household/cluster
+identifiers, weights, panel weights, Rural and unrelated fields are kept.
+Older CILSS design/frame/panel/weight caveats and registered but unwired
+2021-22 are unchanged.
+
+This private construction reuses the completed own BID evidence. Actual
+native label-card verification and row/missingness/cluster checks, normal
+cold/warm/Feature acceptance and the final metadata/full gates are UNRUN
+at this stage; invented-frame checks do not establish observed counts or
+production readiness. See =.coder/ledger/1575-cotedivoire1575-stratawiring.md=.

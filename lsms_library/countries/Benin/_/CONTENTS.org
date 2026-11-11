@@ -813,3 +813,34 @@ alone to =strata=; 2021-22 remains registered but unwired at this source
 pin. No sample, weights, defaults or geographic crosswalk changes are
 selected here. The document check and exact PDF identities are recorded
 in the GH #1575 evidence packet.
+
+* 2026-11-10 — 2018-19 department x milieu strata wiring (GH #1575)
+
+The approved documented combination now wires only =2018-19 sample.strata=
+from the own cover =s00_me_ben2018.dta=: department label =s00q01= followed
+by residence-milieu label =s00q04=. It reuses the shared GH #812 label
+constructor, raw-input retrieval and nullable =Derivation= stamp, registered
+as =Benin::sample::region-milieu-stratum=. Labels are stripped and joined
+with one space; missing or blank either operand gives NA, and nonstring
+codes retain the dedicated refusal. No categorical table, alias or
+geographic crosswalk is added.
+
+This implements the own BID section 4.1 definition quoted above, rather than
+inferring strata from weight variation. It supersedes the earlier
+region-only wiring and the department-only inference advice for this wave;
+all historical text is preserved. The DDI's 23 explicit planned strata and
+purely urban Littoral remain design statements, not observed-count tests or
+row exclusions. The recorded DDI/cluster-vague split wording tension remains
+unresolved by this change. Department x milieu changes neither household
+nor cluster identity.
+
+The cover and =ehcvm_ponderations_ben2018.dta= bindings, =merge_on: v=,
+=(i, t)= final index, household formatter, every row/order/key, =v=, raw
+=hhweight= in both weight columns, normalization and =Rural= are unchanged.
+Registered but unwired =2021-22= remains outside the selected scope.
+
+Validation here is documentary/static and source-free invented-frame
+verification. Actual native label-card coverage, missingness and within-
+cluster consistency, normal Country/Feature cold and fresh-process warm
+validation, independent review and the final metadata footprint remain
+separate acceptance gates; no actual-row result is asserted.
