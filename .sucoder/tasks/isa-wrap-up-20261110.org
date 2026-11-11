@@ -1,6 +1,6 @@
 #+title: LSMS-ISA bounded wrap-up — 2026-11-10
 
-* CURRENT verified state — 2026-11-11 00:37 UTC
+* CURRENT verified state — 2026-11-11 00:50 UTC
 PR1690 merged to GitHub development as 1e549e96aafc365e72d867795ad37683e4ae8fc3.
 Its reviewed H729cf1cf exact synthetic source/tree/parents passed ordinary
 CI42920726859 and required full data CI42920726873: 20,396 tests, 17,545
@@ -13,8 +13,8 @@ Malawi PR1694 source/normal validation is accepted; corrected ordinary
 CI42923444161 passed unit+Windows at He2b26513. Manager rebased its sibling
 head onto1e549e96 as H3f4d9e2, with the exact18-path source SHA/mode/type
 seal, zero extra paths and #1690's three final repairs byte-exact. Focused63
-PASS; PR is ready on development and ordinary42931607164/full42931616679
-are IN_PROGRESS on the new head. Draft Senegal PR1695
+PASS; PR is ready on development. Ordinary42931607164 passed unit+Windows on
+the new head; required full42931616679 is IN_PROGRESS in pytest. Draft Senegal PR1695
 native+public acceptance and corrected ordinary CI42924140955 passed at
 H1f88c502. Its seven-path source-conserving retarget is prepared but held until
 Malawi merges to avoid a known stale-base full gate. No draft full gate is green.
@@ -36,8 +36,11 @@ exact against prior cold, with zero new API/raw. Narrow warm-only v17 job
 six captures, no denials and exact preserved L2 custody. Independently
 admitted final saved comparator PASS with all four Country whole typed frames
 and two scoped Feature frames exact; FULL-SAVED-VALIDATION-v17.json sets
-data_acceptance=true. Deputy is preparing source-conserving PR1693 integration
-with the factual CIV anomaly and approved1531 notes. Required PR CI pending.
+data_acceptance=true. Clean source-conserving #1693 prep head baf86196 on
+development1e549e96 has independent review ADMITTED: all23 non-doc #1575
+paths exact to sealed H2f8, shared GH812 union exact, #1531 and CIV factual
+notes retained. Focused78 PASS. Public PR1693 remains draft at its original
+head/base; readiness/retarget/full gate await Malawi and Senegal merges.
 No baseline replay, shared-cache rebuild, new issues/research/sweeps, or
 master release. Queue remains frozen to these four streams.
 
