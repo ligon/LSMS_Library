@@ -989,3 +989,17 @@ across both countries are retained in
 exact before/after. No2021 header, table/API or policy/held-list change. The
 remaining documentary question is this release's own q47 export/cleaning and
 fielded-version definition, not a presumed own47a relation.
+
+* 2026-11-10 — GH #1575 normal sample validation completed
+
+The construction-stage pending/UNRUN wording above records the state at
+that stage. For =2018 sample=, the own native cover and weights, cold
+baseline/candidate whole frames, unchanged IDs/weights/Rural, documented
+region or department × milieu strata and derivation inputs passed the
+finite normal validation. Four warm Country.sample returns and two scoped
+Feature.sample returns passed full typed frame/axes/attrs comparison from
+eight authenticated L2 parquets, with zero warm raw getters or writers.
+The cross-run cold and warm capture comparisons, source seals and prior
+failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json= (SHA256
+=5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
+earlier job-local caches were reaped; source and survey values did not change.

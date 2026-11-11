@@ -63,6 +63,14 @@ Weights are at the cluster level in =ehcvm_ponderations_CIV2018.dta= (variable
 =panel_weight= both point to =hhweight=.
 
 Strata are identified via =s00q01= (Region) combined with =s00q04= (Urban/Rural).
+The own =s00_me_CIV2018.dta= cover has one =grappe= with 12 households in a
+single region and vague but two recorded milieu answers (11 Rural, one Urbain).
+The 2018-19 =sample= table therefore has two nonmissing region × milieu
+strata within that one =v=; each household keeps its recorded stratum, Rural,
+ID and weight. Do not force one stratum per =v= or silently recode the outlier.
+This source finding was checked from the sealed 2018-19 cold captures for #1575
+without a new raw read (2026-11-10); the sampling design documentation still
+identifies the planned stratification as region × milieu.
 
 ** household_roster Note
 
@@ -1172,3 +1180,17 @@ native label-card verification and row/missingness/cluster checks, normal
 cold/warm/Feature acceptance and the final metadata/full gates are UNRUN
 at this stage; invented-frame checks do not establish observed counts or
 production readiness. See =.coder/ledger/1575-cotedivoire1575-stratawiring.md=.
+
+* 2026-11-10 — GH #1575 normal sample validation completed
+
+The construction-stage pending/UNRUN wording above records the state at
+that stage. For =2018-19 sample=, the own native cover and weights, cold
+baseline/candidate whole frames, unchanged IDs/weights/Rural, documented
+region or department × milieu strata and derivation inputs passed the
+finite normal validation. Four warm Country.sample returns and two scoped
+Feature.sample returns passed full typed frame/axes/attrs comparison from
+eight authenticated L2 parquets, with zero warm raw getters or writers.
+The cross-run cold and warm capture comparisons, source seals and prior
+failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json= (SHA256
+=5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
+earlier job-local caches were reaped; source and survey values did not change.
