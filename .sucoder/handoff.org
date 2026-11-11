@@ -28,6 +28,15 @@ rebuild, new issue intake or production-weight change followed.
 Existing drafts #1689 (Niger archive), #1688 (Nigeria post-harvest plot
 features) and #1604 (Malawi 2024 food) remain OPEN outside the frozen campaign;
 no readiness or merge claim is made for them.
+Restart guidance (maintainer, 2026-11-11): keep =sucoder dispatch= worker
+queues open because new-node dispatch is slow; use local broad data validation
+and reserve full GitHub data CI for deliberate integration boundaries. Current
+development rules still strictly require app15368 =pr-data-validation= plus
+=unit-tests= on each merge. Batch reviewed changes into an integration PR to
+pay that full-CI gate once per batch; revise the gate first if separate PRs
+should merge without full CI each time. No bypass or change to the frozen
+queue is authorized here. See
+[[file:tasks/isa-handoff-20261111.org]] for the full restart note.
 
 * CURRENT — bounded wrap-up, 2026-11-10 22:08 UTC
 See [[file:tasks/isa-wrap-up-20261110.org]]. Queue FROZEN to1690,1575/1693,

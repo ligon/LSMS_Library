@@ -55,6 +55,23 @@ campaign: #1689 (Niger 2011 archive), #1688 (Nigeria post-harvest plot
 features), and #1604 (Malawi 2024 food integration). Their draft status is
 recorded for continuity; this handoff makes no readiness or merge claim.
 
+* Restart workflow ruling — 2026-11-11
+Keep =sucoder dispatch= worker queues open across node assignments: a cold
+dispatch has substantial latency. Feed them decision-ready, independent
+country briefs when intake resumes, and keep review/integration ownership
+separate from country implementation. The current queue freeze still applies.
+
+Do the broad data validation faster on local nodes and record exact source,
+test and data receipts. Run GitHub full data CI infrequently at deliberate
+integration boundaries; batch reviewed work when practical. The maintainer's
+latest cadence preference supersedes the earlier per-ready-PR preference for
+future planning. As of this handoff, development rules still strictly require
+=unit-tests= and app15368 =pr-data-validation= on every merge. Until that rule
+is revised, each merge must satisfy it. A reviewed integration PR can batch
+country changes into one full-CI gate. If separate PRs should merge without
+full CI each time, decide and implement a revised required gate first. Do not
+bypass the current rule or imply local runs fulfil its GitHub context.
+
 * Evidence and custody
 Coordinator record: [[file:isa-wrap-up-20261110.org]]. Current handoff:
 [[file:../handoff.org]]. Private receipts:
