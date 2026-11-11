@@ -844,3 +844,56 @@ verification. Actual native label-card coverage, missingness and within-
 cluster consistency, normal Country/Feature cold and fresh-process warm
 validation, independent review and the final metadata footprint remain
 separate acceptance gates; no actual-row result is asserted.
+* 2026-11-10 — own printed GPS question47 and export-authority limit (GH #1531)
+
+Both declared own2018 household workbooks,
+=ben_ehcvm1_qnr_household_excel_vague1.xls= (MD5
+=964ea82bb6320ac3d2bcfe74f4cd5fac=) and =..._vague2.xls= (MD5
+=0eb5f99c97bf53bfb1ee8d1eff77d377=), explicitly identify GPS question47 at
+=S16a_Agri!EO5/EO6=: “superficie de la parcelle (en hectare) selon les
+mesures GPS”. This is direct own question wording, separate from farmer
+question9 at =K5/K6= (ha or m²), measured-by-GPS question45 at =EL5/EL6=
+and its skip to48. Those question blocks agree across these distinct objects.
+
+Both covers =couvert!A17= say2018/2019. The agriculture entry question
+=S16a_Agri!B2= instead names campaign2017/18 in vague1 and2018/19 in vague2.
+Retain the distinction; it is not a demonstrated fielded/export revision bridge.
+The printed GPS wording does not establish the unit or relationship of every
+released field, the existence of an own q47a, or applicability by row/vague.
+No export/cleaning relation was found in inspected S16a cells, covers, workbook
+Observations, selected-sheet comments or defined names; no global absence is
+claimed. Current source binds q47 and the older “already hectares” description
+remains a source assumption beyond the printed-question evidence.
+
+The earlier “no2021-22wave” statement remains beside the dated registered-but-
+unwired holding note. No2021 instrument authority is transferred here.
+Five exact own Benin/Togo DOCUMENT copies were inspected from held L1 without
+network retrieval; no microdata/header/row/API was used for this document result.
+Exact cells, covers, MD5/SHA/custody and limits are in the independent
+=reports/review-1531-benin-togo-own-documents-20261110/= packet. No area conversion,
+substitution, fallback, clamp, yield route, held-list, unit or default changes.
+
+* 2026-11-10 — separate released S16a header result (GH #1531)
+
+After the document-only note above, exactly one metadata-only context read
+the declared own =2018-19/Data/s16a_me_ben2018.dta= header, MD5
+=c033ceb223cd9834d8c47dcb46428576=, with zero records returned. The complete
+208-name variable inventory contains =s16aq47= and no =s16aq47a=, =s16aq47b=,
+=s16aq47_1= or =s16aq47_2=. The bound q47 is double, format =%12.0g=; its own
+French GPS-area label states no unit and has no value-label link. This is
+explicit absence in this exact release, not evidence about another version.
+
+The own GPS-measured field45 links to =S16AQ45=:1 Oui/2 Non. Farmer-unit
+field09b links separately to =S16AQ09B=:1 Hectare (Ha)/2 Mètre Carré (m^2).
+Neither card assigns a unit to GPS47. No numeric records, magnitudes, ratios,
+presence counts or corrections were inspected. Own printed question47
+hectares wording and the calendar/version caveats remain separate from the
+unitless released label. Guinea-Bissau's distinct47a m² operand does not exist
+in this inventory and supplies no substitute or conversion here.
+
+Frozen scope, exact input/private custody, two total contexts and0records
+across both countries are retained in
+=reports/1531-benin-togo-own-header-20261110/=. Source and private copies sealed
+exact before/after. No2021 header, table/API or policy/held-list change. The
+remaining documentary question is this release's own q47 export/cleaning and
+fielded-version definition, not a presumed own47a relation.
