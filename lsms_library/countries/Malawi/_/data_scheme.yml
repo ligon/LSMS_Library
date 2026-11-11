@@ -294,7 +294,7 @@ Data Scheme:
     # Module D remains unresolved_observation with its existing reducer.
     # Item-level (t, i, plot_id, input, crop, u) agricultural-input feature
     # for the four IHS3+/IHPS waves (2010-11, 2013-14, 2016-17, 2019-20);
-    # GAP 2.  One reported row per input applied to a plot.  Sources:
+    # GAP 2. G/D applied-input rows plus H acquisition-only Farm-level rows.
     # Module D (ag_mod_d) -- inorganic fertilizer in two slots (type +
     # applied quantity + unit), organic-fertilizer use/quantity/unit
     # (ag_d36/ag_d37a/ag_d37b),
@@ -359,6 +359,66 @@ Data Scheme:
     # quantity carry NA), so a quantity recorded under a No is visible.
     Received_as_gift:
       type: bool
+      optional: true
+    # H components are alternate representations of the attached summaries,
+    # never additional applications/transactions. All old fields are NA on H rows.
+    # Own native H scalar columns pass through under their original names.
+    Carrier_role:
+      type: str
+      optional: true
+    Acquisition_quantity:
+      type: float
+      optional: true
+    Acquisition_unit:
+      type: str
+      optional: true
+    Acquisition_value:
+      type: float
+      optional: true
+    Acquisition_kind:
+      type: str
+      optional: true
+    Acquisition_flag:
+      type: bool
+      optional: true
+    Acquisition_source:
+      type: str
+      optional: true
+    Source_path:
+      type: str
+      optional: true
+    Source_sidecar_sha256:
+      type: str
+      optional: true
+    Source_half:
+      type: str
+      optional: true
+    Source_row:
+      type: int
+      optional: true
+    Component_field:
+      type: str
+      optional: true
+    Quantity_field:
+      type: str
+      optional: true
+    Unit_field:
+      type: str
+      optional: true
+    Value_field:
+      type: str
+      optional: true
+    Flag_field:
+      type: str
+      optional: true
+    Source_answer_field:
+      type: str
+      optional: true
+    Native_crop:
+      type: str
+      optional: true
+    Binding_status:
+      type: str
       optional: true
     materialize: make
   livestock:

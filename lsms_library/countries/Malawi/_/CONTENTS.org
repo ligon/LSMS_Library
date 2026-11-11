@@ -5694,3 +5694,61 @@ Unknown labels remain eligible under the original state/single-row/free gates;
 no factor requirement or NA-to-Unknown normalization is added. Historical cd76
 executable R1 now differs only by that necessary predicate. R2a and R2b status,
 all amounts, raw inputs, R3 enrichment and shared consumer code stay unchanged.
+
+
+* 2026-11-10 -- User-selected Farm-level H acquisition components (GH #1190)
+
+The explicit user selection supersedes the earlier carrier/third-gate holding:
+serve acquisition-only Farm-level rows in =plot_inputs=, ALL admitted H quantity
+components, and literal recorded H36 quantities regardless of H34 Yes/No/missing.
+The earlier design recommendation A (separate view, residual support) remains
+historical; no =seed_acquisitions= API is added. Flag/unit-only records remain
+outside the selected quantity-bearing support.
+
+Four existing drivers append these rows AFTER unchanged G/D assembly. First/second
+purchases keep their exact recorded quantity + own recorded nonzero value gate
+(including negative value and zero/negative quantity). Gift keeps recorded quantity
+and native crop regardless of H37. Third keeps recorded H36 quantity/native crop
+regardless of H34, where its own block exists; later XS blocks are not invented.
+No G match or unique plot owner is required for these household observations.
+Original H physical positions precede the unchanged 2010 full-record repeat policy;
+distinct equal-payload records and different quantity slots retain distinct keys.
+
+New =input_obs= is the existing declared-sidecar-qualified H release-row coordinate
+plus =/field:<own quantity field>=. =plot_id=Farm-level= and planted =u=Unknown=.
+=Quantity=, =Applied=, =Improved= and ALL legacy purchase/gift fields are NA on
+additions. =Carrier_role=reported_H_component= makes acquisition explicit.
+=Acquisition_quantity/unit/value/kind/flag= carry the own component; value exists
+only for the existing first/second bindings. Third/gift value stays NA. H36_1
+payers and H09/H40 transport are never borrowed. Missing own unit is Unknown;
+unlisted units keep the existing source-qualified decoder label and raw scalar.
+
+=Source_path/Source_sidecar_sha256/Source_half/Source_row= and named field columns
+identify provenance; all native H scalar columns are retained literally, including
+blank source text and contradictory flags. Only the closed H35/H35__0 source
+binding supplies =Acquisition_source=; other source answers remain under original
+native names, without a new semantic binding. =Binding_status= discloses 2013
+truncations, 2016 H07a/H38a label contradictions and 2019 H36a truncation. Earlier
+unqualified quantity-label statements above are not erased or adjudicated here.
+These are current field bindings with documentary limitations, not a questionnaire
+routing claim or a new interpretation of the labels.
+
+Old attached summaries remain alternate projections of some of these components:
+never add legacy purchase/gift fields to Acquisition quantities as transactions.
+Acquisition is not application, plot allocation, inferred expenditure or a mass
+conversion. =seed_kg= already drops missing application quantities. =nitrogen_kg=
+now excludes only this explicit new role before its application-input label tally;
+all old/role-absent behavior is preserved. =fertilizer_rate= delegates unchanged.
+No quantity, factor, weight, ID map, state/default, application, R1/R3 or other
+country's source behavior changes.
+
+Verification is SOURCE/PURE with invented operands: independent row/field oracle,
+exact old rows/types/masks/attrs, all four actual extracted driver assemblies and
+writer captures, real finalizer/ID and Feature canonical alignment, and application
+consumer comparisons. Initial failures and focused repairs remain in the dispatch
+evidence; no old failure is reclassified as a clean initial run. No new native,
+header, capture, source build, served Country/Feature API or cache cohort ran.
+The historical seven-group/zero-attachment evidence retains its original scope;
+it is not an added-row target or a current native acceptance claim. Integration
+owns independent review, final metadata footprint and any separately admitted
+actual validation. Ledger: =.coder/ledger/1190-selected-farm-carrier.md=.

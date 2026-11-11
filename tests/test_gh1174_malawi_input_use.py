@@ -161,7 +161,14 @@ def test_every_excluded_seed_line_has_no_seed_amount(wave):
     from lsms_library.country import Country
     from lsms_library.local_tools import get_dataframe
     pi = Country('Malawi').plot_inputs().reset_index()
-    seed = pi[pi['t'].astype(str).eq(wave) & pi['input'].astype(str).eq('Seed')]
+    all_seed = pi[pi['t'].astype(str).eq(wave) & pi['input'].astype(str).eq('Seed')]
+    # The H acquisition carrier adds separate Seed rows with a field-qualified
+    # H coordinate.  This Module G deletion oracle must account for G lines only.
+    acquired = all_seed['Carrier_role'].eq('reported_H_component').fillna(False)
+    assert acquired.any()
+    assert all_seed.loc[~acquired, 'Carrier_role'].isna().all()
+    assert all_seed.loc[acquired, 'input_obs'].astype(str).str.contains('/field:', regex=False).all()
+    seed = all_seed.loc[~acquired]
     obs = seed['input_obs'].astype(str).str.extract(r'^row:Malawi/(?P<src>[^@]+)@.*:(?P<pos>\d+)$')
     assert obs.notna().all(axis=None)
     excluded = 0
