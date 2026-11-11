@@ -1,6 +1,6 @@
 #+title: LSMS-ISA bounded wrap-up — 2026-11-10
 
-* CURRENT verified state — 2026-11-11 03:37 UTC
+* CURRENT verified state — 2026-11-11 04:32 UTC
 PR1690 merged to GitHub development as 1e549e96aafc365e72d867795ad37683e4ae8fc3.
 Its reviewed H729cf1cf exact synthetic source/tree/parents passed ordinary
 CI42920726859 and required full data CI42920726873: 20,396 tests, 17,545
@@ -22,16 +22,18 @@ test premise failures and one sample-wave failure; the latter did not recur
 on corrected full CI, and exact-code warm plus private cold focused runs
 each passed36/one configured Nepal skip. No sample code suppression/change.
 
-Senegal PR1695 native+public acceptance and corrected ordinary
-CI42924140955 passed at old H1f88c502. The first retargeted full run
-42952742168 refused safely before credentials/data because GitHub's synthetic
-merge still had old integration parent H729 rather than current development
-7f1a9c95. Lead rebased exactly seven intended paths onto that development
-base as He4b90e0f; Root independently compared all seven Git blob/mode/type
-records to old H1f88 with zero extras. Focused113 PASS. New synthetic
-3cb6cb40 has correct [7f1a9c95,He4b90e0f] parents and exact tree. Ordinary
-42953118383 and required full42953118393/job130301889129 are IN_PROGRESS
-on the new head. No Senegal full gate is green yet.
+Senegal PR1695 MERGED to GitHub development as d5a2b1f9ef65c120ab599e5ef0a07ce496661f95.
+Lead rebased exactly seven intended paths from old H1f88 onto Malawi's merged
+base7f1a9c95 as He4b90e0f; Root independently checked all seven Git
+blob/mode/type records, with zero extras. Focused113 PASS. Ordinary
+42953118383 unit+Windows PASS; required full42953118393/job130301889129
+PASS: 20,501 tests,17,650 passed,2,851 skipped, zero failures/errors/
+unmapped. Final metadata preflight and safe JUnit receipt PASS; actual merge
+parents [7f1a9c95,He4b90e0f] and tree7bd3a553 match reviewed synthetic.
+First retargeted run42952742168 had refused safely before credentials/data
+because GitHub supplied old integration parent H729; the rebase fixed that.
+GH1483's Senegal subsection is marked complete; parent issue stays OPEN for
+parcel representation, Guinea-Bissau, nutrient basis and other residuals.
 
 Draft four-country PR1693 now has full normal-data acceptance. Saved-only v4
 comparison authenticated32 earlier cold captures and proved all four typed
