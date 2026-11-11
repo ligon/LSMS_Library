@@ -39,10 +39,17 @@ data_acceptance is false. Deputy prepared a bounded v15 plan for genuine
 regeneration of all four candidate cold caches in a durable private root,
 followed by the original four-country and two-Feature warm calls, subject to
 independent manager admission. Manager admitted the frozen plan and a
-submission-only shared-path correction; job41135787 is RUNNING. The first
-submission41135092 failed in two seconds before bootstrap or data access
-because scheduler stdout pointed into submit-node /local. Final saved-only
-comparator is conditionally admitted after successful warm/custody results.
+submission-only shared-path correction. The first submission41135092 failed
+in two seconds before bootstrap or data access because scheduler stdout
+pointed into submit-node /local. Corrected job41135787 FAILED after all four
+candidate cold public returns: its oracle demanded one stratum per (t,v).
+Saved capture audit plus independent manager check found exactly one native
+Côte d’Ivoire grappe with 12 households, one region, and two source milieu
+values (11 Rural/1 Urbain); public row-level strata/Rural/weights match the
+native records. That extra cluster invariant is unsupported. Deputy is
+preparing source-derived multiplicity check and factual country note before
+a bounded full warm continuation. Final saved comparator is conditionally
+admitted only after successful warm/custody results.
 No baseline replay. Queue FROZEN to these
 four streams, no new issues/research/sweeps. See detailed sections below.
 
