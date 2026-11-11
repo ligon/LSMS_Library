@@ -63,6 +63,14 @@ Weights are at the cluster level in =ehcvm_ponderations_CIV2018.dta= (variable
 =panel_weight= both point to =hhweight=.
 
 Strata are identified via =s00q01= (Region) combined with =s00q04= (Urban/Rural).
+The own =s00_me_CIV2018.dta= cover has one =grappe= with 12 households in a
+single region and vague but two recorded milieu answers (11 Rural, one Urbain).
+The 2018-19 =sample= table therefore has two nonmissing region × milieu
+strata within that one =v=; each household keeps its recorded stratum, Rural,
+ID and weight. Do not force one stratum per =v= or silently recode the outlier.
+This source finding was checked from the sealed 2018-19 cold captures for #1575
+without a new raw read (2026-11-10); the sampling design documentation still
+identifies the planned stratification as region × milieu.
 
 ** household_roster Note
 
@@ -1139,3 +1147,50 @@ shared rewarm is applied. Other countries/waves and unfinished 2021-22
 wiring gain no opt-in. Evidence and exact source/read limits are in
 =.coder/ledger/1561-scoped-stata-missing-map.md= and
 =/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/1561-scoped-stata-missing-map-20261109-revision-v2/=.
+
+* 2026-11-10 — selected 2018-19 strata wiring (GH #1575)
+
+The user selected the documented combination: only =2018-19 sample.strata=
+now uses the own cover's =s00q01= region label plus =s00q04= milieu label,
+through the existing GH812 helper. It strips both labels and joins them
+with one space. Missing or blank either component gives NA; nonstring
+codes retain the dedicated refusal. No country categorical table or
+geographic alias is added. The optional =Derivation= carrier names
+=CotedIvoire::sample::region-milieu-stratum= only on nonmissing strata;
+the registry inputs callable returns both original fields at =(t, i)=.
+
+This selected wiring supersedes only the earlier region-only guidance
+("Treat the design as region-stratified for inference" and
+"sample.strata is wired from the cover-page region code"). All earlier
+text is preserved as history, including the original region/milieu note
+and the GH1575 documentary qualification. No new sampling-design finding
+is inferred from weights. Abidjan and Yamoussoukro retain both milieux;
+no allocation zeros or arithmetic cell count become an exclusion or a
+fixed observed-count requirement.
+
+Uppercase =CIV= and nested =Menage/= remain literal: the cover is
+=Menage/s00_me_CIV2018.dta= and the weight source remains
+=Menage/ehcvm_ponderations_CIV2018.dta=. All joins, household/cluster
+identifiers, weights, panel weights, Rural and unrelated fields are kept.
+Older CILSS design/frame/panel/weight caveats and registered but unwired
+2021-22 are unchanged.
+
+This private construction reuses the completed own BID evidence. Actual
+native label-card verification and row/missingness/cluster checks, normal
+cold/warm/Feature acceptance and the final metadata/full gates are UNRUN
+at this stage; invented-frame checks do not establish observed counts or
+production readiness. See =.coder/ledger/1575-cotedivoire1575-stratawiring.md=.
+
+* 2026-11-10 — GH #1575 normal sample validation completed
+
+The construction-stage pending/UNRUN wording above records the state at
+that stage. For =2018-19 sample=, the own native cover and weights, cold
+baseline/candidate whole frames, unchanged IDs/weights/Rural, documented
+region or department × milieu strata and derivation inputs passed the
+finite normal validation. Four warm Country.sample returns and two scoped
+Feature.sample returns passed full typed frame/axes/attrs comparison from
+eight authenticated L2 parquets, with zero warm raw getters or writers.
+The cross-run cold and warm capture comparisons, source seals and prior
+failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json= (SHA256
+=5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
+earlier job-local caches were reaped; source and survey values did not change.

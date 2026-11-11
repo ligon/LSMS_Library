@@ -6,9 +6,22 @@ from lsms_library.ehcvm import (
     derivation_key as _derivation_key,
     food_acquired_ehcvm as _food_acquired_ehcvm,
     inputs_last_purchase as _inputs_last_purchase,
+    inputs_region_milieu_stratum as _inputs_region_milieu_stratum,
     served_unit_labels as _served_unit_labels,
     sized_unit as _sized_unit,
+    stamp_region_milieu_stratum as _stamp_region_milieu_stratum,
+    strata_label,
 )
+
+
+# GH #1575; reuse the GH #812 construction (ledger1575 §§2–5).
+def inputs_strata(wave):
+    return _inputs_region_milieu_stratum('Benin', wave)
+
+
+def sample(df):
+    return _stamp_region_milieu_stratum(df, 'Benin')
+
 
 # GH #876.  The wide frame's `Expenditure` used to be `s07bq08`, the value of
 # ONE purchase made up to 30 days ago, sitting beside a 7-day consumption
