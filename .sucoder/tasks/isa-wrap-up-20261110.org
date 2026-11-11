@@ -9,10 +9,12 @@ safe log receipt PASS; actual merge parents [16c3f4d9,H729cf1cf] and tree
 62878184 match the reviewed synthetic. GH1573 and GH1071 closed as complete;
 dependent component drafts PR1691/1692 closed as integrated through #1690.
 
-Draft Malawi PR1694 source/normal validation is accepted; corrected ordinary
-CI42923444161 passed unit+Windows at He2b26513. That head is a sibling of the
-new development merge, so manager is rebasing onto 1e549e96 with an exact
-18-path source seal before ready/retarget/full data gate. Draft Senegal PR1695
+Malawi PR1694 source/normal validation is accepted; corrected ordinary
+CI42923444161 passed unit+Windows at He2b26513. Manager rebased its sibling
+head onto1e549e96 as H3f4d9e2, with the exact18-path source SHA/mode/type
+seal, zero extra paths and #1690's three final repairs byte-exact. Focused63
+PASS; PR is ready on development and ordinary42931607164/full42931616679
+are IN_PROGRESS on the new head. Draft Senegal PR1695
 native+public acceptance and corrected ordinary CI42924140955 passed at
 H1f88c502. Its seven-path source-conserving retarget is prepared but held until
 Malawi merges to avoid a known stale-base full gate. No draft full gate is green.
@@ -27,9 +29,11 @@ native grappe has12 households with recorded milieu split11 Rural/1 Urbain;
 the public frame preserves that row-level split. The warm actor failed before
 any public call because the observer denied the library import's ordinary
 empty dvc-cache mkdir. All EIGHT authentic L2 parquets survived with private
-physical/hash custody. Deputy is preparing a warm-only continuation from
-those sealed files and saved cross-run comparison, with independent review;
-no cold/raw replay is needed. Data acceptance remains false until those pass.
+physical/hash custody. A separate saved-only v16 comparator authenticated49
+captures and proved four regenerated candidate native/public whole frames
+exact against prior cold, with zero new API/raw. Deputy and manager are
+finalizing a narrow warm-only continuation from those sealed parquets; no
+cold/raw replay is needed. Data acceptance remains false until warm passes.
 No baseline replay, shared-cache rebuild, new issues/research/sweeps, or
 master release. Queue remains frozen to these four streams.
 
