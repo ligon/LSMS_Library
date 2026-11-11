@@ -1,6 +1,6 @@
 #+title: LSMS-ISA bounded wrap-up — 2026-11-10
 
-* CURRENT verified state — 2026-11-11 04:32 UTC
+* CURRENT verified state — 2026-11-11 04:40 UTC
 PR1690 merged to GitHub development as 1e549e96aafc365e72d867795ad37683e4ae8fc3.
 Its reviewed H729cf1cf exact synthetic source/tree/parents passed ordinary
 CI42920726859 and required full data CI42920726873: 20,396 tests, 17,545
@@ -35,7 +35,7 @@ because GitHub supplied old integration parent H729; the rebase fixed that.
 GH1483's Senegal subsection is marked complete; parent issue stays OPEN for
 parcel representation, Guinea-Bissau, nutrient basis and other residuals.
 
-Draft four-country PR1693 now has full normal-data acceptance. Saved-only v4
+Four-country PR1693 has full normal-data acceptance. Saved-only v4
 comparison authenticated32 earlier cold captures and proved all four typed
 public frames/own inputs against the documented region x residence projection,
 with other fields/IDs/weights/Rural exact. Later v16 job41140959 completed all
@@ -52,12 +52,17 @@ exact against prior cold, with zero new API/raw. Narrow warm-only v17 job
 six captures, no denials and exact preserved L2 custody. Independently
 admitted final saved comparator PASS with all four Country whole typed frames
 and two scoped Feature frames exact; FULL-SAVED-VALIDATION-v17.json sets
-data_acceptance=true. Clean source-conserving #1693 private prep is now
-fd74dfdb on development7f1a9c95; independent review ADMITTED all23 non-doc
-#1575 paths exact to sealed H2f8, four country notes/shared GH812 union and
-#1531 ledger exact, plus all19 incoming Malawi paths exact to development.
-Focused78 PASS. Public PR1693 remains draft at its original head/base;
-readiness/retarget/full gate await Senegal merge.
+data_acceptance=true. Final source-conserving #1693 head H20c3ad9a on current
+development M3d5a2 was independently ADMITTED: all23 frozen #1575 paths,
+four country notes, GH812 union and #1531 ledger exact, plus all seven incoming
+Senegal paths exact M3. Focused78 PASS. First ready/retargeted required run
+42960339525 refused safely before credentials/data because GitHub checked out
+an old integration-parent synthetic on the base-edited event. Independently
+reviewed empty H99f9898e has IDENTICAL tree7cebf11, zero file changes and
+triggered fresh ordinary42960655293 and required full42960655305/job130326162492
+on exact base M3. New synthetic b2c7c79a has parents[M3,H99f] and reviewed
+tree; eligibility/checkout/parent verification passed. Both runs IN_PROGRESS;
+no #1693 CI merge admission yet.
 No baseline replay, shared-cache rebuild, new issues/research/sweeps, or
 master release. Queue remains frozen to these four streams.
 
