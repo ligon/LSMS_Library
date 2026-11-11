@@ -1,0 +1,52 @@
+#+title: LSMS-ISA bounded campaign handoff — 2026-11-11
+
+* Scope and authority
+The maintainer froze intake to four streams: integration PR #1690, Malawi
+#1190, Senegal's subsection of #1483, and four-country sample strata #1575.
+Reviewed PRs may merge to GitHub development only after exact green required
+CI. No master release, shared-cache rebuild, new issue intake, or production
+weight/panel-ID change is authorized by this wrap-up. The wider backlog goal
+remains active after this bounded campaign.
+
+* Landed
+- PR #1690 merged to development as 1e549e96; required full CI passed
+  20,396 tests with zero failures/errors. Whole issues #1573 and #1071 closed;
+  component PRs #1691/#1692 closed as integrated.
+- Malawi PR #1694 merged as 7f1a9c95; full CI passed 20,435 tests with zero
+  failures/errors. Whole issue #1190 closed. The H acquisition carrier retains
+  literal amounts/own units and does not allocate plots.
+- Senegal PR #1695 merged as d5a2b1f9; full CI passed 20,501 tests with zero
+  failures/errors. The Senegal s16b subsection of #1483 was marked complete.
+  Parent #1483 remains open for parcel representation, Guinea-Bissau routes,
+  nutrient basis, and other residuals.
+
+Issue #1531 also remains open: its Benin/Togo/Guinea-Bissau GPS export-unit
+authority is unresolved. The #1575 strata PR carries only previously reviewed
+factual country notes and makes no GPS field or unit substitution.
+
+* Final stream, pending CI
+PR #1693 implements the approved 2018/19 region/department × recorded
+residence-milieu strata for Benin, Togo, Guinea-Bissau and Côte d’Ivoire.
+Normal-data cold/warm Country and Feature validation passed; four-country
+typed frames and own recorded coding were checked, and Côte d’Ivoire's
+source-recorded mixed-milieu grappe remains row-level literal. The 29-path
+composed source tree on H99f9898e was independently reviewed, focused tests
+passed (78), and the current synthetic b2c7c79a has exact parents
+[d5a2b1f9,H99f9898e] and reviewed tree 7cebf11b. Ordinary CI run
+42960655293 and required full run 42960655305/job130326162492 are IN
+PROGRESS as of 04:49 UTC; required checkout/parent verification, Uganda
+prerequisites and S3 gate passed, full suite running. Do not merge until both
+are green and safe JUnit plus exact current metadata/rules preflight pass.
+On that evidence, merge #1693 without bypass, verify actual parents/tree,
+then close whole issue #1575 with an evidence comment. Historical failed run
+42960339525 checked a stale synthetic before credentials/data and does not
+qualify as final CI.
+
+* Evidence and custody
+Coordinator record: [[file:isa-wrap-up-20261110.org]]. Current handoff:
+[[file:../handoff.org]]. Private receipts:
+/global/scratch/fsa/fc_jevons/ligon/burst/isa-sm-20261103/reports/.
+The four-country data acceptance is
+1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json
+(SHA256 5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea).
+No baseline replay or shared cache mutation was performed for final acceptance.
