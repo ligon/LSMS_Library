@@ -50,6 +50,11 @@ remains active. Issue #1483 remains open beyond its Senegal subsection; #1531
 remains open for unresolved GPS export-unit authority. No master release,
 shared-cache rebuild, new issue intake, or production weight change followed.
 
+At handoff, three pre-existing draft PRs remain open outside the frozen
+campaign: #1689 (Niger 2011 archive), #1688 (Nigeria post-harvest plot
+features), and #1604 (Malawi 2024 food integration). Their draft status is
+recorded for continuity; this handoff makes no readiness or merge claim.
+
 * Evidence and custody
 Coordinator record: [[file:isa-wrap-up-20261110.org]]. Current handoff:
 [[file:../handoff.org]]. Private receipts:

@@ -25,6 +25,9 @@ stale-event failed run did not access credentials/data. The bounded four
 streams are now complete; the wider backlog goal remains ACTIVE. #1483 and
 #1531 stay OPEN for their residual scopes. No master release, shared cache
 rebuild, new issue intake or production-weight change followed.
+Existing drafts #1689 (Niger archive), #1688 (Nigeria post-harvest plot
+features) and #1604 (Malawi 2024 food) remain OPEN outside the frozen campaign;
+no readiness or merge claim is made for them.
 
 * CURRENT — bounded wrap-up, 2026-11-10 22:08 UTC
 See [[file:tasks/isa-wrap-up-20261110.org]]. Queue FROZEN to1690,1575/1693,
