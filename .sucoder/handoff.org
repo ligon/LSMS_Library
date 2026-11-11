@@ -1,30 +1,30 @@
 #+title: Current LSMS-ISA coordinator handoff
-* CURRENT — bounded four-stream wrap, 2026-11-11 04:41 UTC
+* CURRENT — bounded four-stream wrap complete, 2026-11-11 06:15 UTC
 See [[file:tasks/isa-wrap-up-20261110.org]] for exact source, validation and
 CI receipts. Queue remains FROZEN to the four approved streams; no new issue
 intake, master release, shared-cache rebuild or production-weight change.
 
-GitHub development is d5a2b1f9ef65c120ab599e5ef0a07ce496661f95.
+GitHub development is e5fdd2fa831c4d03a247d264be7f339da459e6b0.
 PR1690 merged as1e549e96 (required full20396 tests/0F/E); GH1573 and
 GH1071 closed, component drafts1691/1692 closed as integrated. Malawi PR1694
 merged as7f1a9c95 (full20435/0F/E); GH1190 closed. Senegal PR1695 merged as
 d5a2b1f9 (full20501/0F/E); GH1483 Senegal s16b subsection marked done,
 parent remains OPEN for parcel/Guinea-Bissau/nutrient-basis/other residuals.
-All three merges have reviewed parents and tree and exact green ordinary+required
+Each merge has reviewed parents and tree and exact green ordinary+required
 CI. No broad-backlog completion is claimed.
 
-Four-country GH1575/PR1693 has full normal cold/warm Country+Feature acceptance
-from authentic private caches, including source-backed Côte d’Ivoire 11/1
-mixed-milieu cluster retained literally. Its reviewed 29-path source tree is
-published at ready H99f9898e00b304cd171bf805aa8e409dcba9a97f, current
-base d5a2b1f9 and synthetic b2c7c79a with exact parents/tree. The first
-base-edited required run42960339525 refused a stale GitHub synthetic before
-credentials/data; a reviewed EMPTY source-identical head refresh triggered
-fresh ordinary42960655293 and required full42960655305/job130326162492.
-Both were IN_PROGRESS last read after eligibility/checkout/parent steps green.
-Next: wait exact green full+ordinary, safe JUnit receipt and final preflight;
-merge PR1693 on green, verify actual parents/tree, close GH1575 if whole scope
-landed. Then write final concise handoff; leave broad backlog goal ACTIVE.
+Four-country GH1575/PR1693 MERGED normally as e5fdd2fa on exact green
+ordinary42960655293 and required full42960655305/job130326162492: 20,579
+tests, 17,728 passed, 2,851 skipped, zero failures/errors/unmapped.
+Full normal cold/warm Country+Feature validation passed from authentic private
+caches, including Côte d’Ivoire's source-backed 11/1 mixed-milieu grappe
+preserved literally. Final strict app15368/current-base/source preflight PASS;
+actual merge parents [d5a2b1f9,H99f9898e] and reviewed tree7cebf11b exact.
+Whole #1575 CLOSED with evidence comment #issuecomment-6788602509. The old
+stale-event failed run did not access credentials/data. The bounded four
+streams are now complete; the wider backlog goal remains ACTIVE. #1483 and
+#1531 stay OPEN for their residual scopes. No master release, shared cache
+rebuild, new issue intake or production-weight change followed.
 
 * CURRENT — bounded wrap-up, 2026-11-10 22:08 UTC
 See [[file:tasks/isa-wrap-up-20261110.org]]. Queue FROZEN to1690,1575/1693,

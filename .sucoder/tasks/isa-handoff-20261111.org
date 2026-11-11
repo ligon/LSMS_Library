@@ -24,23 +24,31 @@ Issue #1531 also remains open: its Benin/Togo/Guinea-Bissau GPS export-unit
 authority is unresolved. The #1575 strata PR carries only previously reviewed
 factual country notes and makes no GPS field or unit substitution.
 
-* Final stream, pending CI
-PR #1693 implements the approved 2018/19 region/department × recorded
+* Four-country stream landed
+PR #1693 implemented the approved 2018/19 region/department × recorded
 residence-milieu strata for Benin, Togo, Guinea-Bissau and Côte d’Ivoire.
-Normal-data cold/warm Country and Feature validation passed; four-country
-typed frames and own recorded coding were checked, and Côte d’Ivoire's
-source-recorded mixed-milieu grappe remains row-level literal. The 29-path
-composed source tree on H99f9898e was independently reviewed, focused tests
-passed (78), and the current synthetic b2c7c79a has exact parents
-[d5a2b1f9,H99f9898e] and reviewed tree 7cebf11b. Ordinary CI run
-42960655293 and required full run 42960655305/job130326162492 are IN
-PROGRESS as of 04:49 UTC; required checkout/parent verification, Uganda
-prerequisites and S3 gate passed, full suite running. Do not merge until both
-are green and safe JUnit plus exact current metadata/rules preflight pass.
-On that evidence, merge #1693 without bypass, verify actual parents/tree,
-then close whole issue #1575 with an evidence comment. Historical failed run
-42960339525 checked a stale synthetic before credentials/data and does not
-qualify as final CI.
+Normal cold/warm Country and Feature validation passed with authentic private
+cache custody and full typed-frame comparisons. Côte d’Ivoire's source-recorded
+mixed-milieu grappe remains literal at the household row level. Focused tests
+passed 78/78.
+
+The independently reviewed 29-path source tree at H99f9898e passed ordinary
+CI 42960655293 and required full data CI 42960655305/job130326162492:
+20,579 tests, 17,728 passed, 2,851 skipped, zero failures/errors/unmapped.
+The strict current-base, synthetic-parent/tree and app15368 required-check
+preflight passed (MERGE-PREFLIGHT.json SHA256 0b4e737b8f88b692186f57f2e562572709e2c555f90b43bc320febde42b7f84).
+PR #1693 merged normally to development as e5fdd2fa831c4d03a247d264be7f339da459e6b0,
+actual parents [d5a2b1f9ef65c120ab599e5ef0a07ce496661f95,
+99f9898e00b304cd171bf805aa8e409dcba9a97f] and exact reviewed tree
+7cebf11bd1f59431fb5e7dc8377ac87c773e3b34. Issue #1575 was closed
+with evidence comment #issuecomment-6788602509. Historical failed run
+42960339525 checked a stale synthetic before credentials/data and is retained
+only as a failure record.
+
+The bounded four-stream campaign is complete. The wider LSMS-ISA backlog goal
+remains active. Issue #1483 remains open beyond its Senegal subsection; #1531
+remains open for unresolved GPS export-unit authority. No master release,
+shared-cache rebuild, new issue intake, or production weight change followed.
 
 * Evidence and custody
 Coordinator record: [[file:isa-wrap-up-20261110.org]]. Current handoff:

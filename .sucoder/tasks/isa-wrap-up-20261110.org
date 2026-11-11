@@ -1,6 +1,6 @@
 #+title: LSMS-ISA bounded wrap-up — 2026-11-10
 
-* CURRENT verified state — 2026-11-11 04:40 UTC
+* CURRENT verified state — 2026-11-11 06:15 UTC
 PR1690 merged to GitHub development as 1e549e96aafc365e72d867795ad37683e4ae8fc3.
 Its reviewed H729cf1cf exact synthetic source/tree/parents passed ordinary
 CI42920726859 and required full data CI42920726873: 20,396 tests, 17,545
@@ -35,34 +35,29 @@ because GitHub supplied old integration parent H729; the rebase fixed that.
 GH1483's Senegal subsection is marked complete; parent issue stays OPEN for
 parcel representation, Guinea-Bissau, nutrient basis and other residuals.
 
-Four-country PR1693 has full normal-data acceptance. Saved-only v4
-comparison authenticated32 earlier cold captures and proved all four typed
-public frames/own inputs against the documented region x residence projection,
-with other fields/IDs/weights/Rural exact. Later v16 job41140959 completed all
-FOUR candidate cold actors healthy: 8 calls,12 own getters,8 writers,20
-captures and source-derived cluster multiplicities exact. One Côte d’Ivoire
+Four-country PR1693 MERGED to GitHub development as e5fdd2fa831c4d03a247d264be7f339da459e6b0;
+whole GH1575 CLOSED with evidence comment #issuecomment-6788602509. The
+approved Benin/Togo/Guinea-Bissau/Côte d’Ivoire 2018/19 region/department ×
+recorded milieu strata were validated in normal cold/warm Country and Feature
+calls against own source coding and whole typed frames. One Côte d’Ivoire
 native grappe has12 households with recorded milieu split11 Rural/1 Urbain;
-the public frame preserves that row-level split. The first warm actor failed
-before any public call because the observer denied the library import's
-ordinary empty dvc-cache mkdir. All EIGHT authentic L2 parquets survived with
-private physical/hash custody. A saved-only v16 comparator authenticated49
-captures and proved four regenerated candidate native/public whole frames
-exact against prior cold, with zero new API/raw. Narrow warm-only v17 job
-41147927 then completed: six Country/Feature calls, zero getters/writers,
-six captures, no denials and exact preserved L2 custody. Independently
-admitted final saved comparator PASS with all four Country whole typed frames
-and two scoped Feature frames exact; FULL-SAVED-VALIDATION-v17.json sets
-data_acceptance=true. Final source-conserving #1693 head H20c3ad9a on current
-development M3d5a2 was independently ADMITTED: all23 frozen #1575 paths,
-four country notes, GH812 union and #1531 ledger exact, plus all seven incoming
-Senegal paths exact M3. Focused78 PASS. First ready/retargeted required run
-42960339525 refused safely before credentials/data because GitHub checked out
-an old integration-parent synthetic on the base-edited event. Independently
-reviewed empty H99f9898e has IDENTICAL tree7cebf11, zero file changes and
-triggered fresh ordinary42960655293 and required full42960655305/job130326162492
-on exact base M3. New synthetic b2c7c79a has parents[M3,H99f] and reviewed
-tree; eligibility/checkout/parent verification passed. Both runs IN_PROGRESS;
-no #1693 CI merge admission yet.
+the public frame retains the row-level split. Four candidate cold actors,
+authentic eight L2 caches and six warm calls passed, with zero warm raw getter
+or writer. FULL-SAVED-VALIDATION-v17.json SHA256 5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea
+sets data_acceptance=true. Focused78 PASS. Independently reviewed H99f9898e
+has identical source tree to the admitted H20c and conserved all23 #1575
+source/test paths, four country notes, GH812 union, #1531 ledger and seven
+incoming Senegal paths. The first ready/retargeted run42960339525 refused
+safely before credentials/data on an old integration-parent synthetic;
+reviewed empty head H99f refreshed the event without changing any file.
+Ordinary42960655293 unit+Windows PASS; required full42960655305/job130326162492
+PASS: 20,579 tests, 17,728 passed, 2,851 skipped, zero failures/errors/unmapped.
+Safe receipt SAFE-FULL-JUNIT-20261111.json SHA256 5f01528d34480db111363bd0eaf6a95f0cf9ca84cadd8dac94370526b80c2310;
+no raw credentialed log saved. Strict app15368/current-base/synthetic-source
+preflight PASS, MERGE-PREFLIGHT.json SHA256 0b4e737b8f88b692186f57f2e562572709e2c555f90b43bc320febde42b7f84.
+Actual merge parents [d5a2b1f9,H99f9898e] and tree7cebf11b exact reviewed
+synthetic. #1483 and #1531 remain OPEN for their residual scopes.
+
 No baseline replay, shared-cache rebuild, new issues/research/sweeps, or
 master release. Queue remains frozen to these four streams.
 
