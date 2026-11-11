@@ -1,6 +1,6 @@
 #+title: LSMS-ISA bounded wrap-up — 2026-11-10
 
-* CURRENT verified state — 2026-11-11 00:50 UTC
+* CURRENT verified state — 2026-11-11 02:00 UTC
 PR1690 merged to GitHub development as 1e549e96aafc365e72d867795ad37683e4ae8fc3.
 Its reviewed H729cf1cf exact synthetic source/tree/parents passed ordinary
 CI42920726859 and required full data CI42920726873: 20,396 tests, 17,545
@@ -14,7 +14,16 @@ CI42923444161 passed unit+Windows at He2b26513. Manager rebased its sibling
 head onto1e549e96 as H3f4d9e2, with the exact18-path source SHA/mode/type
 seal, zero extra paths and #1690's three final repairs byte-exact. Focused63
 PASS; PR is ready on development. Ordinary42931607164 passed unit+Windows on
-the new head; required full42931616679 is IN_PROGRESS in pytest. Draft Senegal PR1695
+the new head; required full42931616679 FAILED: 20,435 tests,17,579 passed,
+five failures, zero errors,2,851 skipped/unmapped0. Four are one old GH1174
+G-only seed-line test across Malawi waves; it selected newly approved H
+acquisition Seed rows. Root reviewed local test-only H90f727 that partitions
+G/H, retains every old G oracle, asserts H field-qualified identity and H
+presence; four affected real-data cases PASS, all18 production paths exact.
+Public PR1694 remains H3f4, held for the fifth failure
+tests/test_sample.py::test_covers_all_waves. Exact-head private reproduction
+is underway because the public wrapper strips the country parameter; no
+generic suppression or speculative fix is admitted. Draft Senegal PR1695
 native+public acceptance and corrected ordinary CI42924140955 passed at
 H1f88c502. Its seven-path source-conserving retarget is prepared but held until
 Malawi merges to avoid a known stale-base full gate. No draft full gate is green.
