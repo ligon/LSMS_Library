@@ -1,6 +1,6 @@
 #+title: LSMS-ISA bounded wrap-up — 2026-11-10
 
-* CURRENT verified state — 2026-11-11 03:31 UTC
+* CURRENT verified state — 2026-11-11 03:37 UTC
 PR1690 merged to GitHub development as 1e549e96aafc365e72d867795ad37683e4ae8fc3.
 Its reviewed H729cf1cf exact synthetic source/tree/parents passed ordinary
 CI42920726859 and required full data CI42920726873: 20,396 tests, 17,545
@@ -50,11 +50,12 @@ exact against prior cold, with zero new API/raw. Narrow warm-only v17 job
 six captures, no denials and exact preserved L2 custody. Independently
 admitted final saved comparator PASS with all four Country whole typed frames
 and two scoped Feature frames exact; FULL-SAVED-VALIDATION-v17.json sets
-data_acceptance=true. Clean source-conserving #1693 prep head baf86196 on
-development1e549e96 has independent review ADMITTED: all23 non-doc #1575
-paths exact to sealed H2f8, shared GH812 union exact, #1531 and CIV factual
-notes retained. Focused78 PASS. Public PR1693 remains draft at its original
-head/base; readiness/retarget/full gate await Malawi and Senegal merges.
+data_acceptance=true. Clean source-conserving #1693 private prep is now
+fd74dfdb on development7f1a9c95; independent review ADMITTED all23 non-doc
+#1575 paths exact to sealed H2f8, four country notes/shared GH812 union and
+#1531 ledger exact, plus all19 incoming Malawi paths exact to development.
+Focused78 PASS. Public PR1693 remains draft at its original head/base;
+readiness/retarget/full gate await Senegal merge.
 No baseline replay, shared-cache rebuild, new issues/research/sweeps, or
 master release. Queue remains frozen to these four streams.
 
