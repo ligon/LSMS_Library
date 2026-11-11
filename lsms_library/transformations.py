@@ -6499,6 +6499,12 @@ def nitrogen_kg(plot_inputs, *, nitrogen_content=None, volume_as_mass=True,
     if 'Quantity' not in df.columns:
         raise ValueError("plot_inputs must have a 'Quantity' column")
 
+    # Malawi H components report acquisition, not application (GH #1190).
+    # Exclude only this explicit role before matching/counting input labels;
+    # role-absent and every other role retain their previous behavior.
+    if 'Carrier_role' in df.columns:
+        df = df.loc[~df['Carrier_role'].eq('reported_H_component').fillna(False)]
+
     # ``input`` is an index level in the canonical grain.
     if 'input' in (df.index.names or []):
         inp = df.index.get_level_values('input').astype(str)

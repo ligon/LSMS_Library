@@ -19,6 +19,8 @@ applied to a plot.  Sources (Full_Sample/Agriculture):
     observation of that crop only (no plot in the module).
 
 i = format_id(case_id), aligning with plot_features / crop_production.
+H quantity components also have acquisition-only Farm-level rows (GH #1190);
+planted Quantity/Applied and all legacy attached fields remain NA on those rows.
 See lsms_library/countries/Malawi/_/malawi.py.
 """
 import sys
@@ -31,16 +33,18 @@ from lsms_library.local_tools import get_dataframe, to_parquet, format_id
 from malawi import (_fertilizer_block, _organic_block, _pesticide_block,
                     _seed_block, _seed_purchase_block, _seed_gift_block,
                     assemble_plot_inputs, drop_repeated_records,
-                    _seed_source_reference)
+                    _seed_source_reference, _seed_acquisition_block,
+                    _append_seed_acquisitions)
 
 
 WAVE = '2010-11'
 BASE = '../Data/Full_Sample/Agriculture/'
 G_SOURCE = '../Data/Full_Sample/Agriculture/ag_mod_g.dta'
+H_SOURCE = '../Data/Full_Sample/Agriculture/ag_mod_h.dta'
 
 d = get_dataframe('../Data/Full_Sample/Agriculture/ag_mod_d.dta', convert_categoricals=False)
 g = get_dataframe(G_SOURCE, convert_categoricals=False)
-h = get_dataframe('../Data/Full_Sample/Agriculture/ag_mod_h.dta', convert_categoricals=False)
+h = get_dataframe(H_SOURCE, convert_categoricals=False)
 
 # IHS3 ships exact repeat RECORDS (every column equal): G 9 (the same records
 # crop_production drops -- they carry seed too), H 45, D 0.  A repeat is a
@@ -50,6 +54,7 @@ h = get_dataframe('../Data/Full_Sample/Agriculture/ag_mod_h.dta', convert_catego
 # Capture release positions before the full-record policy, without adding a
 # unique column that would defeat it. Never use retained DataFrame labels.
 g_rows = np.arange(len(g))[~g.duplicated().to_numpy()]
+h_rows = np.arange(len(h))[~h.duplicated().to_numpy()]
 d, g, h = (drop_repeated_records(df) for df in (d, g, h))
 
 d['hhid'] = d['case_id'].apply(format_id)
@@ -94,6 +99,10 @@ seed_gift = [_seed_gift_block(h, hhid='hhid', cropcode='ag_h0b',
                               source_half='Full_Sample')]
 
 df = assemble_plot_inputs(WAVE, pieces, seed_purchase, seed_gift)
+# H components are household acquisitions, appended after legacy G/D assembly.
+df = _append_seed_acquisitions(df, [_seed_acquisition_block(
+    h, t=WAVE, source_half='Full_Sample', row_positions=h_rows,
+    source_ref=_seed_source_reference(H_SOURCE, script_path=__file__))])
 
 assert df.index.is_unique, f"Non-unique source-observation grain in plot_inputs {WAVE}"
 assert len(df) > 0, f"plot_inputs {WAVE} produced no rows"
