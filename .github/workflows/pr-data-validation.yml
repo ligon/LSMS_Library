@@ -100,12 +100,13 @@ jobs:
     # Classifier failure must run a failing required check, never skip it.
     if: ${{ always() }}
     needs: classify
-    name: ${{ needs.classify.outputs.mode == 'metadata' && 'pr-data-metadata-edit' || 'pr-data-validation' }}
+    name: ${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'metadata' && 'pr-data-metadata-edit' || 'pr-data-validation' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
     concurrency:
-      group: pr-data-${{ github.event.pull_request.number }}-${{ needs.classify.outputs.mode == 'metadata' && 'metadata' || 'validation' }}
+      # Refused/uncertain classifiers must not cancel an eligible request.
+      group: pr-data-${{ github.event.pull_request.number }}-${{ needs.classify.result == 'success' && needs.classify.outputs.mode == 'validate' && 'validation' || (needs.classify.result == 'success' && needs.classify.outputs.mode == 'metadata' && 'metadata' || format('refused-{0}', github.run_id)) }}
       cancel-in-progress: true
     # The credentialed acceptance run exceeded two hours before pytest finished.
     # Allow the hosted runner's full budget; keep every test and its own timeout.
@@ -209,6 +210,18 @@ jobs:
           python "$GITHUB_WORKSPACE/scripts/private_ci_check.py"
           --stage data-prebuild -- poetry run make -j2
         timeout-minutes: 30
+      # The Make shocks compiler writes its reviewed (i,t) + Shock-column
+      # intermediate. Country.shocks() writes the pinned (i,t,Shock) cache that
+      # the invariance test compares. Run that normal path before xdist starts,
+      # so test scheduling cannot decide which of the two stages it reads.
+      - name: Finalize Uganda shocks cache for invariance
+        if: steps.guard.outputs.run_data == 'true'
+        working-directory: lsms_library/countries/Uganda/_
+        run: >-
+          python "$GITHUB_WORKSPACE/scripts/private_ci_check.py"
+          --stage data-prebuild -- poetry run python -c
+          "import lsms_library as ll; ll.Country('Uganda').shocks()"
+        timeout-minutes: 15
       - name: Run full test suite
         if: steps.guard.outputs.run_data == 'true'
         # Capture both streams before Poetry/pytest starts. Assertion rewriting,
@@ -220,6 +233,6 @@ jobs:
         # Plain assertions and warning-summary suppression remain defense in depth.
         run: >-
           python scripts/private_ci_check.py --stage data-tests --junit results.xml --public-test-failures --
-          poetry run pytest --tb=short --assert=plain --disable-warnings
+          poetry run pytest -n 2 --dist=loadfile --tb=short --assert=plain --disable-warnings
           --timeout=600 --timeout-method=thread
           --durations=25 --junitxml={junit}

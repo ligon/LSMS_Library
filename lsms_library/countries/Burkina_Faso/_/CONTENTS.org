@@ -3519,3 +3519,37 @@ selected-row validation; its ledger preserves actual pure/native adapter
 results separately from public API/data-CI acceptance. The earlier s16a
 parcel observation is retained and does not allocate household inputs or
 settle the separate nutrient/parcel/coverage choices.
+
+* 2026-11-10 -- GH #1573: user selected own2014 recorded strata labels
+
+The user selected *Decode the 2014 strata labels (Recommended)*. This
+supersedes only the earlier “2014 is not relabelled” policy checkpoint;
+the older text and its source epoch remain above. The earlier note
+“Ruled on weight, not on strata” described #1464's original ruling,
+not a reason to revise either weight now.
+
+The explicit26-key lookup in =2014/_/mapping.py= decodes the released
+welfare =strate= after the unchanged food-to-welfare bijection, refusal
+checks and household extension. Its native label is =group(region milieu)=;
+there is no attached stratum card. The separately sealed own welfare
+three-column projection established26 typed pairs, unique in both
+directions, with complete missing/unknown/conflict accounting. This is
+dated observed correspondence, not proof that the plan explicitly declared
+26 strata. Region spellings use this country's existing Region aliases,
+not an EHCVM numeric dictionary or a parity formula.
+
+All rows, keys/order, =v=, Rural, attrs, weight and panel_weight are preserved;
+added households retain NA weights. True missing remains missing, and an
+unrecognized nonmissing code remains visibly native rather than receiving
+a guessed label. The original native keys remain in the invertible lookup
+and managed source; no new public =strata_native= column is added.
+Identical labels do not identify the same PSUs, population or sample design
+across EMC/EHCVM. The independent draws/namespace, catalog-versus-plan
+counts and later-wave coverage/nutrient holds remain unchanged.
+
+Evidence: =R1573-burkina-welfare-crosswalk-20261110= and the source-only
+=R1573-burkina-strata-decision-preparation-20261110=; historical10411/389
+are not newly measured counts. Implementation verification is limited to
+invented pure frames and committed metadata, not actual sample/data/API or
+fresh planned-design evidence. The wave mapping file is a build hash input;
+final integrated metadata measurement and any rewarm are separate work.

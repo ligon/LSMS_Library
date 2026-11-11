@@ -127,8 +127,21 @@ def test_nigeria_yields_appear():
         warnings.simplefilter('ignore')
         c = ll.Country('Nigeria')
         cp, pf = c.crop_production(), c.plot_features()
-        out = yield_kg(cp, pf, area_t=pp_ph_area_t(c))
+        pair = pp_ph_area_t(c)
+        # GH #587 adds original PH area records to W1–W3. The explicit
+        # PP→PH mapping is only valid for PP rows; mapping a frame that already
+        # contains those PH targets must still refuse double-counting.
+        pp = pf.loc[pf.index.get_level_values('t').astype(str).isin(pair)]
+        out = yield_kg(cp, pp, area_t=pair)
+        ph_rounds = {'2011Q1', '2013Q1', '2016Q1'}
+        ph = pf.loc[pf.index.get_level_values('t').astype(str).isin(ph_rounds)]
+        assert ph_rounds <= set(ph.index.get_level_values('t').astype(str))
+        ph_out = yield_kg(cp, ph)
+        with pytest.raises(ValueError, match='already'):
+            yield_kg(cp, pf, area_t=pair)
     assert len(out) > 0
     assert set(out.index.get_level_values('t').astype(str)) <= set(c.wave_folder_map)
     assert not set(out.index.get_level_values('t').astype(str)) & {
         '2010Q3', '2012Q3', '2015Q3', '2018Q3', '2023Q3'}
+    assert len(ph_out) > 0
+    assert set(ph_out.index.get_level_values('t').astype(str)) <= ph_rounds

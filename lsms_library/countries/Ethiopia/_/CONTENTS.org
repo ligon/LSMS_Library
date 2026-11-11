@@ -4998,3 +4998,50 @@ executable/config objects are retained. No native/header/row/API/producer/
 cache, new retrieval, arithmetic/default/weight/allocation change or whole
 GH1570/GH650 closure follows. Fielded CAPI/GUID/export correspondence and W1
 coverage/section12/component questions remain open.
+
+* 2026-11-10 -- Sold-source correspondence after #1257/#1274 (GH #824)
+
+A source-only audit at =c8e378920= traces the five current drivers and eight
+sale routes. The fields below feed sold amounts; section9 harvest operands
+and section11 Q3 harvest in W4/W5 remain separate. No producer changed.
+
+| wave | module | sold flag | sold quantity | sold unit input | sold value |
+|------+--------+-----------+---------------+-----------------+------------|
+| W1 | 11 | ph_s11q01 | ph_s11q03_a | implicit Kg | ph_s11q04_a |
+| W1 | 12 | ph_s12q06 | ph_s12q07 | implicit Kg | ph_s12q08 |
+| W2 | 11 | ph_s11q01 | ph_s11q03_a | implicit Kg | ph_s11q04 |
+| W2 | 12 | ph_s12q06 | ph_s12q07 | implicit Kg | ph_s12q08 |
+| W3 | 11 | ph_s11q01 | ph_s11q03_a | ph_s11q03_b | ph_s11q04 |
+| W3 | 12 | ph_s12q06 | ph_s12q07 | ph_s12q0b | ph_s12q08 |
+| W4 | 11 | s11q07 | s11q11a | s11q11b | s11q12 |
+| W5 | 11 | s11q07 | s11q11a | s11q11b | s11q12 |
+
+Own closed W1 metadata and W2 section11 header cards support their listed
+roles. W2/W3 section12 and W3/W4 section11 retain the historical own-wave
+label/form correspondence recorded above; this audit supplies no separate
+new export cards. Own W5 PH Q11/Q12 wording supports the sale roles, while
+its released-header/fielded-export correspondence remains qualified. Actual
+W5 sale crop code is =s11q01b=; the driver's prose says =s11q01=. That is a
+prose discrepancy, not evidence of a wrong executable binding.
+
+The closed =1570-crop-cf-wave2-metadata-20261109= report adds a narrower
+fact to the component-authority note above: all 30 ordered typed code/label
+pairs of section9 =ph_s9q04_b_cf= exactly equal =Crop_CF_Wave2.unit_cd=.
+Its label explicitly says "Conversion factor unit code (for merging with
+Crop_CF_Wave2)". It is outside the sold projection. The factor table's
+=mean_cf_nat= and regional =mean_cf*= fields are separate, unlabelled
+numeric columns. This literal codebook match establishes neither observed
+row-code coverage nor numeric factor direction, sale applicability or a
+national/regional choice. No factor mean or survey row was read here.
+
+W1/W2 section11 =ph_s11q03_b= remains the unread GRAMS component; W1
+=ph_s11q04_b= remains BIRR Decimal. No denominator, partial-blank completion
+or arithmetic change follows. =i= still comes from the household field
+(=household_id2= W2/W3); holder/parcel/field still describe plot identity.
+Holder/crop attachment alone does not prove released holder global uniqueness.
+Matched-unit section9 quantities and Farm-level sales with separate
+=Unit_sold= retain the existing rules. No concrete executable wrong-column
+repair is established by this packet. Exact authority tiers, missing export
+cards/component/factor operands and the residual proposal are in
+=.coder/ledger/824-ethiopia-sold-source-audit.md= and its private evidence.
+No native/header/document reparse, test/API/cache/provider or numeric run.

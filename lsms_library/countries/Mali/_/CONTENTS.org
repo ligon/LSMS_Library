@@ -3895,3 +3895,52 @@ erratum explaining nativecode4 and its correspondence to the printed card.
 No condition/unit/quantity/default/ID/weight/coverage ruling follows.
 Source/terms/byte custody and exact bounds are recorded in SOURCE.org and
 burst report =1436-mali-p2-manual-restoration-20261110/=.
+
+* 2026-11-10 -- current served-strata source trace (GH #1577)
+
+Source-only trace at =c8e378920968fde414767855186e64f5e36f54bb=; no data,
+header, PDF, API, cache or test execution. All four =sample= producers are
+YAML, not scripts: =_/data_scheme.yml:4-10= declares =strata: str= but
+does not supply its meaning or a missing wave's values.
+
+| Wave | Current producer (wave =_/data_info.yml=) | What =strata= supplies |
+|------+-----------------------------------------+-------------------------|
+| 2014-15 | lines 4-35: =EACICONTROLE_p1.dta= + =EACIPOIDS.dta=, join on =i= | No =strata= extraction or construction; missing in the pooled column |
+| 2017-18 | lines 4-36: =eaci17_s00p1.dta= + =EACI17_ECHANTILLON.dta=, join on =i= | Native =strate= from the weights file, formatted as a code string |
+| 2018-19 | lines 88-121: =s00_me_mli2018.dta= + =ehcvm_ponderations_mli2018.dta=, join on =v= | Cover label =s00q01= + space + cover label =s00q04= |
+| 2021-22 | lines 81-116: =s00_me_mli2021.dta= + =ehcvm_ponderations_mli2021.dta=, join on =i= | Cover label =s00q01= + space + cover label =s00q04= |
+
+The 2017 formatter is =2017-18/_/mapping.py:22-23= (=format_id=), not a
+code-to-name dictionary. The country =strata= table has only spelling keys
+for region-milieu labels (=categorical_mapping.org:25-33=); none decodes
+EAC-I codes. Preserve #1574's numeric 51-code gap and its completed bounded
+BID/header findings above. The historical code-nesting/occupied-count note
+is not a codebook. EHCVM names, geography, =deflator= or back-casting by
+=grappe= cannot fill that gap or the 2014 omission.
+
+Both EHCVM expressions call =ehcvm.strata_label= /
+=derive_region_milieu_stratum= (=ehcvm.py:821-849=): labels are stripped
+and joined; either missing/blank operand gives NA; numeric operands raise.
+Their =sample= hooks stamp =Mali::sample::region-milieu-stratum= only where
+=strata= exists. Read-time curation uses the six spelling pairs above,
+including =Taoudenit= to =Taoudénit= under #1576. Thus these are geographic
+constructions supported by the #812 W2 ruling and the existing BID quotation
+in =derivations.yml:503-550=, not native named-stratum variables. The older
+"20 and 17" cells remain historical measurements; no count is repeated here.
+
+For 2017, classification beyond "native code" needs an own-release complete
+51-code dictionary explicitly bound to =EACI17_ECHANTILLON.strate=. For
+2014, it needs an own-wave stratum field or authoritative assignment rule
+bound to the configured household/cluster keys and the design's 51 strata.
+The closed 2017 review supplies neither for 2014. No named native design
+stratum is established by this trace.
+
+Future placement recommendation only: keep a per-wave served-column account
+in the country's =_/sampling.yml=, separate from its =panel= boundary
+statements. The first wave currently has no boundary entry.
+#1577/#1134 must settle any extension to #793's frozen fields/vocabulary;
+no new field is specified here. Canonical column prose alone cannot express
+these four meanings. =sampling.py:76-83= documents the read-time placement
+advantage; the required future hash-cost measurement is not run here.
+Exact sidecar bindings and closed authority are in the external
+=Mali-served-strata.json= and =.coder/ledger/1577-mali-current-served-strata.md=.
