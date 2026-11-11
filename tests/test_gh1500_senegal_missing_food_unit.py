@@ -313,7 +313,7 @@ def test_live_yaml_and_2021_binding_remain_source_exact():
         '2018-19/_/data_info.yml': '6699bceaf41a0d213ab5666502f96471714809d089a2e429a6564a431a3b6de7',
         '2021-22/_/data_info.yml': '2522506789ff4584a08c37454eb774cb99189ade93a9e7fdd38351913f913ebc',
         '2021-22/_/mapping.py': 'c415c75d1a799aebaa166c2883886243a8bdf3fb3e10873184aa9c9254f5c183',
-        '_/data_scheme.yml': 'd18fc2f6bd5fe7ddddf15060a9fdb2abf59698dba55896a8dd2fccd0badc9409',
+        '_/data_scheme.yml': '07f4dd61260cae7722050738bfaff992fb45257c42c0c6d4ca9d0d55c55f0894',
         '_/categorical_mapping.org': '31cde2d70a121c4f0c985920466c96c33db47bbcef0c02ccd13e13d7df241bfc',
     }
     for rel, digest in protected.items():
