@@ -1,57 +1,37 @@
 #+title: LSMS-ISA bounded wrap-up — 2026-11-10
 
-* CURRENT verified wait — 2026-11-10 late UTC
-Development still M16c3f4d9; no current-stream PR merged yet. PR1690 corrected
-H729cf1cf is READY; ordinary42920726859 SUCCESS and required
-full42920726873 IN_PROGRESS on exact H
-(watch exec15074). Full gate passed eligibility,
-checkout/parents/S3, Uganda Make and Uganda shocks finalization; full suite
-is RUNNING. Prepared R/preflight-corrected.py is not run until full green.
-Draft Malawi PR1694 is reviewed and normal validated, stacked on #1690; draft
-Senegal PR1695 is reviewed/native+serving validated, stacked on #1690. Both
-must align to actual development merge and pass fresh required CI before merge.
-Later #1694 ordinary unit CI run42920692822/job130194470622 FAILED four
-parameters of one old #1111 seed-channel test. It selected every Seed row and
-asserted planted unit Gram; new acquisition-only Farm/Unknown H rows are now
-included by that selector. Existing G rows remained exact in the held normal
-comparison. Manager is preparing a test-only role-specific correction, with
-Root independent review before PR head update; Windows smoke PASS. No source
-production change or full-data acceptance is implied.
-That correction is now published as test-only H e2b26513a3b478e697ea0072e9a246d61e989d85
-on draft PR1694. It explicitly checks both G and H roles, exhausts the Seed
-partition and requires nonmissing provenance before SHA regex. Focused63PASS;
-ordinary run42923444161/unit130203780088/Windows130203780563 SUCCESS at
-the exact head. Full data validation is still pending.
-PR1690 ordinary42920726859 SUCCESS, required full42920726873 still RUNNING.
-Senegal draft PR1695 old unit run42921293601 FAILED one #1500 whole-registry
-SHA test because approved #1483 optional plot-input fields changed that file.
-Root reviewed exact one-line digest update; whole-file and food-binding pins
-remain. Focused113PASS. Test-only H1f88c502389b23b5d00bf12c70dc1b7a8d76c0d3
-published; ordinary42924140955/unit130206177543/Windows130206177058
-SUCCESS at the exact head. Full data validation is still pending.
-Draft four-country PR1693 remains pending normal acceptance. The saved-only v4
-scientific comparison PASS authenticated all32 v13/v14 cold captures and proved
-four countries' complete native inputs and typed public frames against the
-documented region x residence projection, with all other fields, weights,
-IDs and Rural unchanged. It made zero new API/raw calls. The Côte d’Ivoire
-v14 post-return timeout and absence of persistent L2 caches remain explicit;
-data_acceptance is false. Deputy prepared a bounded v15 plan for genuine
-regeneration of all four candidate cold caches in a durable private root,
-followed by the original four-country and two-Feature warm calls, subject to
-independent manager admission. Manager admitted the frozen plan and a
-submission-only shared-path correction. The first submission41135092 failed
-in two seconds before bootstrap or data access because scheduler stdout
-pointed into submit-node /local. Corrected job41135787 FAILED after all four
-candidate cold public returns: its oracle demanded one stratum per (t,v).
-Saved capture audit plus independent manager check found exactly one native
-Côte d’Ivoire grappe with 12 households, one region, and two source milieu
-values (11 Rural/1 Urbain); public row-level strata/Rural/weights match the
-native records. That extra cluster invariant is unsupported. Deputy is
-preparing source-derived multiplicity check and factual country note before
-a bounded full warm continuation. Final saved comparator is conditionally
-admitted only after successful warm/custody results.
-No baseline replay. Queue FROZEN to these
-four streams, no new issues/research/sweeps. See detailed sections below.
+* CURRENT verified state — 2026-11-11 00:25 UTC
+PR1690 merged to GitHub development as 1e549e96aafc365e72d867795ad37683e4ae8fc3.
+Its reviewed H729cf1cf exact synthetic source/tree/parents passed ordinary
+CI42920726859 and required full data CI42920726873: 20,396 tests, 17,545
+passed, 2,851 skipped, zero failures/errors/unmapped. Metadata preflight and
+safe log receipt PASS; actual merge parents [16c3f4d9,H729cf1cf] and tree
+62878184 match the reviewed synthetic. GH1573 and GH1071 closed as complete;
+dependent component drafts PR1691/1692 closed as integrated through #1690.
+
+Draft Malawi PR1694 source/normal validation is accepted; corrected ordinary
+CI42923444161 passed unit+Windows at He2b26513. That head is a sibling of the
+new development merge, so manager is rebasing onto 1e549e96 with an exact
+18-path source seal before ready/retarget/full data gate. Draft Senegal PR1695
+native+public acceptance and corrected ordinary CI42924140955 passed at
+H1f88c502. Its seven-path source-conserving retarget is prepared but held until
+Malawi merges to avoid a known stale-base full gate. No draft full gate is green.
+
+Draft four-country PR1693 remains pending warm acceptance. Saved-only v4
+comparison authenticated32 earlier cold captures and proved all four typed
+public frames/own inputs against the documented region x residence projection,
+with other fields/IDs/weights/Rural exact. Later v16 job41140959 completed all
+FOUR candidate cold actors healthy: 8 calls,12 own getters,8 writers,20
+captures and source-derived cluster multiplicities exact. One Côte d’Ivoire
+native grappe has12 households with recorded milieu split11 Rural/1 Urbain;
+the public frame preserves that row-level split. The warm actor failed before
+any public call because the observer denied the library import's ordinary
+empty dvc-cache mkdir. All EIGHT authentic L2 parquets survived with private
+physical/hash custody. Deputy is preparing a warm-only continuation from
+those sealed files and saved cross-run comparison, with independent review;
+no cold/raw replay is needed. Data acceptance remains false until those pass.
+No baseline replay, shared-cache rebuild, new issues/research/sweeps, or
+master release. Queue remains frozen to these four streams.
 
 * Scope fixed by the maintainer
 Finish the four current streams: PR1690, GH1575/PR1693, Senegal1483,
