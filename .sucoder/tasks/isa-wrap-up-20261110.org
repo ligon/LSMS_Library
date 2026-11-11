@@ -1,6 +1,6 @@
 #+title: LSMS-ISA bounded wrap-up — 2026-11-10
 
-* CURRENT verified state — 2026-11-11 00:25 UTC
+* CURRENT verified state — 2026-11-11 00:37 UTC
 PR1690 merged to GitHub development as 1e549e96aafc365e72d867795ad37683e4ae8fc3.
 Its reviewed H729cf1cf exact synthetic source/tree/parents passed ordinary
 CI42920726859 and required full data CI42920726873: 20,396 tests, 17,545
@@ -19,21 +19,25 @@ native+public acceptance and corrected ordinary CI42924140955 passed at
 H1f88c502. Its seven-path source-conserving retarget is prepared but held until
 Malawi merges to avoid a known stale-base full gate. No draft full gate is green.
 
-Draft four-country PR1693 remains pending warm acceptance. Saved-only v4
+Draft four-country PR1693 now has full normal-data acceptance. Saved-only v4
 comparison authenticated32 earlier cold captures and proved all four typed
 public frames/own inputs against the documented region x residence projection,
 with other fields/IDs/weights/Rural exact. Later v16 job41140959 completed all
 FOUR candidate cold actors healthy: 8 calls,12 own getters,8 writers,20
 captures and source-derived cluster multiplicities exact. One Côte d’Ivoire
 native grappe has12 households with recorded milieu split11 Rural/1 Urbain;
-the public frame preserves that row-level split. The warm actor failed before
-any public call because the observer denied the library import's ordinary
-empty dvc-cache mkdir. All EIGHT authentic L2 parquets survived with private
-physical/hash custody. A separate saved-only v16 comparator authenticated49
+the public frame preserves that row-level split. The first warm actor failed
+before any public call because the observer denied the library import's
+ordinary empty dvc-cache mkdir. All EIGHT authentic L2 parquets survived with
+private physical/hash custody. A saved-only v16 comparator authenticated49
 captures and proved four regenerated candidate native/public whole frames
-exact against prior cold, with zero new API/raw. Deputy and manager are
-finalizing a narrow warm-only continuation from those sealed parquets; no
-cold/raw replay is needed. Data acceptance remains false until warm passes.
+exact against prior cold, with zero new API/raw. Narrow warm-only v17 job
+41147927 then completed: six Country/Feature calls, zero getters/writers,
+six captures, no denials and exact preserved L2 custody. Independently
+admitted final saved comparator PASS with all four Country whole typed frames
+and two scoped Feature frames exact; FULL-SAVED-VALIDATION-v17.json sets
+data_acceptance=true. Deputy is preparing source-conserving PR1693 integration
+with the factual CIV anomaly and approved1531 notes. Required PR CI pending.
 No baseline replay, shared-cache rebuild, new issues/research/sweeps, or
 master release. Queue remains frozen to these four streams.
 
