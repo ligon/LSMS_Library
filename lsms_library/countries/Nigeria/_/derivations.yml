@@ -253,7 +253,8 @@ Nigeria::community_prices::c8-metric-size:
         (slurm_logs/price_sources/Nigeria/REPORT.org N-02).
     - text: >-
         a metric-unit row with an UNRECORDED size (all of W3's g/cl rows
-        except one; all of W3's Kg/l rows; W5's 133 'GRAMS (G)' rows)
+        except one; all of W3's Kg/l rows; W5's 133 'GRAMS (G)' rows and 49
+        '4. CENTLITRES (CL)' rows)
         cannot be normalised and is dropped rather than served mis-scaled
         -- registered separately as
         Nigeria::community_prices::c8-unrecorded-size-drop.  '99. ONE SIZE
@@ -292,8 +293,9 @@ Nigeria::community_prices::c8-unrecorded-size-drop:
     a per-unit price.  The set is all of W3's 13,767 g/cl rows whose
     free-text c8q2b is blank (the 13,768th parses '50cl' and is derived,
     not dropped) plus all 3,433 of W3's Kg/l rows (the same blank free
-    text), and W5's 133 rows on '2. GRAMS (G)' whose coded size c8aq2_c is
-    blank.  W4 drops NOTHING under this rule: its 1,191 rows on raw unit
+    text), and W5's 182 rows -- 133 on '2. GRAMS (G)' and 49 on
+    '4. CENTLITRES (CL)' (served as 'l' until GH #587 corrected the decoder)
+    -- whose coded size c8aq2_c is blank.  W4 drops NOTHING under this rule: its 1,191 rows on raw unit
     code 1 read '1. KILOGRAMS (KG)' in sectc8_harvestw4.dta (pre-#834 prose
     described them as a dropped 'Grams(g)' unit -- that spelling is not
     what the file decodes to), a blank size beside KILOGRAMS reads as one
@@ -320,7 +322,8 @@ Nigeria::community_prices::c8-unrecorded-size-drop:
   validated_against: >-
     the build's own drop predicate: `derivation_inputs` returns exactly the
     source rows the wave scripts remove -- 14,603 rows for 2015-16 (13,767
-    g/cl + 2,597 Kg + 836 l), 0 for 2018-19, 133 for 2023-24 -- and every
+    g/cl + 2,597 Kg + 836 l), 0 for 2018-19, 182 for 2023-24 (133 g + 49
+    cl, GH #587) -- and every
     served row of community_prices under a metric unit either carries the
     c8-metric-size key or sits on a base unit whose blank size reads as one
     unit.

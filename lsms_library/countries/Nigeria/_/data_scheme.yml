@@ -776,6 +776,7 @@ Data Scheme:
     # Nigeria::community_prices::c8-metric-size` (see _/derivations.yml).
     # A metric-unit row with an UNRECORDED package size (all of W3's g/cl
     # rows but one, and all 3,433 of W3's Kg/l rows; W5's 133 'GRAMS (G)'
+    # and 49 'CENTLITRES (CL)'
     # rows) is DROPPED, not served mis-scaled by ~189x/~42x -- registered
     # as the deletion entry
     # Nigeria::community_prices::c8-unrecorded-size-drop.  W4 drops nothing

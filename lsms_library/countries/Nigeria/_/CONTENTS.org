@@ -4235,3 +4235,32 @@ per-case call receipts, a recorded evidence limitation without a test replay.
 No actual CSV/header/row, producer, Make, Country/Feature, cache/census or
 scientific acceptance follows. Whole1288, exact conservative hash footprint
 and the WAITING pooled-recall-window question remain separate.
+
+* 2026-11-12 -- C8 decoder: two W4/W5 labels were PLACED WRONGLY, not unplaced (GH #587)
+
+=_canon_community_unit= falls through to the shared substring decoder
+=_canon_unit= for every label outside its ten exact aliases, and two W4/W5
+labels hit the wrong substring.  #1095's unplaced-label report cannot see
+this: a wrongly placed label is placed.
+
+| label | rule hit | served before | served now | PH rows (priced, measured on =e5fdd2fa8='s sources) |
+|-+-+-+-+-|
+| =251. BAG OF 20 SACHETS= | ='bag'= | =Sack/Bag= | =Bag of 20 Sachets= (the =u= table's code 251) | 2019Q1 148, 2024Q1 261; every one with a blank size |
+| =4. CENTLITRES (CL)= (W5's typo for centilitres) | ='litre'= | =l= | =cl= (code 4) | 2024Q1 49; every one with a blank size |
+
+So 409 served rows change =u= and keep their =Price=; the 49 centilitre rows,
+now on =cl= with a blank =c8aq2_c=, fall under the existing
+=Nigeria::community_prices::c8-unrecorded-size-drop= and LEAVE the served
+table, exactly as W5's 133 blank-size =2. GRAMS (G)= rows always did.  Served
+as one litre they misstated the package (a centilitre price of an unrecorded
+package is not a price per litre).  W5's drop count is 182 (133 g + 49 cl).
+The deletion entry's =inputs= mask (=_c8_raw_inputs=) used the harvest
+=_canon_unit=, which still reads the typo as =l=; it now decodes with
+=_canon_community_unit=, so it names exactly the rows the build drops.
+
+Two exact aliases in =_COMMUNITY_UNIT_LABELS=, nothing else: the shared
+=_canon_unit= (harvest, sold and input units) is unchanged, and still returns
+=Sack/Bag= / =l= for these two strings.  The labels are on the W4/W5 PP C2
+cards too (W4 103 + W5 464 priced =251= rows, W5 36 =CENTLITRES= rows),
+where the same decoder would have placed them the same wrong way; see the
+next section.
