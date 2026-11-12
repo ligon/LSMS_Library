@@ -549,3 +549,48 @@ Niger::food_acquired::nsu-national-unit-weight:
     Measured kilograms are in Niger/_/CONTENTS.org.
   contents: 'Niger/_/CONTENTS.org, "EHCVM unit-weight table wired (GH #1452)"'
   since: '2026-11-04'
+
+# A FLAG, not our construction (GH #1708): the producers' file carries a computed
+# s07bq07a on these records.  The rows are served unchanged and say so.
+Niger::food_acquired::computed-last-purchase-quantity:
+  waves: ['2018-19']
+  columns: [Expenditure]
+  rows: {s: purchased}
+  rule: >-
+    A purchased row built from a record of s07b_me_ner2018.dta whose s07bq07a (the
+    quantity of the last purchase) is positive and off the quarter grid, i.e. not a
+    multiple of 0.25, carries this key beside its 7day-purchase-at-last-purchase-unit-value
+    key.  Nothing is changed: the row's Expenditure is still Quantity x s07bq08 /
+    s07bq07a, and it passes through that s07bq07a.  A purchased row that shares its
+    key with an unflagged record's (core sums the two) carries it too.  15,264 of the
+    107,263 positive s07bq07a are flagged (14.2%); 15,014 of those records become a
+    served purchased row.
+  function: lsms_library.countries.Niger.2018-19._.mapping:computed_last_purchase_rows
+  inputs: lsms_library.countries.Niger.2018-19._.mapping:inputs_computed_last_purchase
+  raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s07bq06, s07bq07a,
+                  s07bq07b, s07bq07c, s07bq08]
+  assumptions:
+    - text: >-
+        an off-grid s07bq07a in this file was computed after collection, not entered.
+        14,908 of the 15,264 carry 13 to 18 decimals, which is double-precision
+        arithmetic; the same instrument in 2021-22 has 15 off-grid values in 112,923.
+        The unit value s07bq08 / s07bq07a on these records is one value per (product,
+        unit, size, region) on 13,735 of them, and on 3,013 s07bq08 is not an integer
+        either, though the CAPI field is "NUMERIQUE: ENTIER".
+      basis: questionnaire
+      evidence: >-
+        Niger EHCVM-1 CAPI household questionnaires, vague 1 and 2 (UEMOA NADA catalog
+        48, download 191 / 192): s07Bq07a "NUMERIQUE: DECIMAL", s07Bq08 "NUMERIQUE:
+        ENTIER", both enabled under s07Bq06 in (1, 2, 3).  Data checks of 2026-11-12
+        (reports/ehcvm2-live-s07bq03a-check, reports/served-corrections).
+    - text: >-
+        the rows are flagged and served, not dropped or set NA: the drop decision is
+        the maintainer's, and comes after the diagnosis.  How the values were built is
+        not documented anywhere found; Niger/_/CONTENTS.org has the diagnosis.
+      basis: modelling-choice
+      evidence: Ruling @ligon 2026-11-12, "Flag now, diagnose".
+  validated_against: >-
+    the served table: the candidate build equals the base build in every row and every
+    column but Derivation, and derivation_inputs joins every flagged row.
+  contents: 'Niger/_/CONTENTS.org, "2018-19 s07bq07a computed on 14.2% of records (GH #1708)"'
+  since: '2026-11-12'

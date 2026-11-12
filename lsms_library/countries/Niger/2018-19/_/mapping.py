@@ -169,12 +169,122 @@ def food_acquired(df):
     """
     # GH #1224: `decode` -- the served base unit of a sized row is read
     # through the same repair the sweep below applies to every other row.
-    df = _food_acquired_with_unit_weights(df, FOOD_ACQUIRED_DERIVATION, wave='2018-19',
-                                          decode=_decode_mojibake)
-    df = _decode_mojibake_in_df(df)
+    flagged = _computed_last_purchase_positions(df)
+    out = _food_acquired_with_unit_weights(df, FOOD_ACQUIRED_DERIVATION, wave='2018-19',
+                                           decode=_decode_mojibake)
+    out = _decode_mojibake_in_df(out)
     # Fill a missing unit with the `Unknown` sentinel, AFTER the mojibake
     # sweep so the two never fight over the same value.
-    return _fill_missing_u(df)
+    out = _fill_missing_u(out)
+    return _stamp_computed_last_purchase(out, df, flagged)
+
+
+# ---------------------------------------------------------------------------
+# GH #1708: a computed last-purchase quantity is flagged, and still served
+# (ruling @ligon 2026-11-12, "Flag now, diagnose")
+# ---------------------------------------------------------------------------
+#
+# 15,264 of this file's 107,263 positive s07bq07a (14.2%) are off the quarter
+# grid, and 14,908 of them carry 13-18 decimals: double-precision arithmetic, not
+# an entry.  2021-22, the same instrument, has 15 such values in 112,923.  All but
+# one sit on a row where the field is ENABLED (s07bq06 = 1, 2 or 3), so these
+# are not the 21,063 rows where the CAPI disables s07bq07a and the file fills it
+# anyway (those carry no s07bq08 and no served Expenditure, and are not keyed).
+# The served Expenditure is Quantity x s07bq08 / s07bq07a, so it passes through
+# them: 26.0% of 2018-19's.  Each purchased row built from such a record carries
+# `Niger::food_acquired::computed-last-purchase-quantity` beside its #876 key;
+# nothing is dropped.  How the values were built is in Niger/_/CONTENTS.org.
+COMPUTED_LAST_PURCHASE_KEY = 'Niger::food_acquired::computed-last-purchase-quantity'
+_COMPUTED_SOURCE = 's07b_me_ner2018.dta'
+
+
+class ComputedLastPurchaseJoinError(Exception):
+    """The wide food_acquired frame is not ``s07b_me_ner2018.dta`` row for row.
+
+    Subclasses ``Exception``: a derived food table must not read it as a failed
+    build (GH #1546)."""
+
+
+def _computed_raw(wave='2018-19'):
+    """``s07b_me_ner2018.dta`` in its codes, every record, in file order."""
+    if wave != '2018-19':
+        raise ValueError(f'{COMPUTED_LAST_PURCHASE_KEY} covers 2018-19 only, not {wave!r}')
+    from lsms_library.paths import countries_root
+    path = countries_root() / 'Niger' / wave / 'Data' / _COMPUTED_SOURCE
+    return tools.get_dataframe(str(path), convert_categoricals=False)
+
+
+def computed_last_purchase_rows(last_quantity):
+    """Boolean ndarray: ``s07bq07a`` positive and off the quarter grid (GH #1708).
+
+    Off the grid means ``|4x - round(4x)| >= 1e-6``: not a multiple of 0.25.  The
+    instrument asks a decimal, so a typed 0.1 is off the grid too; 2021-22, the
+    same instrument, has 15 off-grid values in 112,923, which bounds how many of
+    2018-19's 15,264 can be typed.  The other way round, a value computed to land
+    on the grid cannot be seen.
+    """
+    x = pd.to_numeric(pd.Series(np.ravel(last_quantity)), errors='coerce').to_numpy(dtype=float)
+    with np.errstate(invalid='ignore'):
+        return (x > 0) & (np.abs(4 * x - np.round(4 * x)) >= 1e-6)
+
+
+def _computed_last_purchase_positions(df):
+    """:func:`computed_last_purchase_rows` on the wide frame, which is the file row
+    for row (the shared hook's unit-weight join refuses anything else)."""
+    raw = _computed_raw()
+    mine = pd.to_numeric(df['LastPurchaseQuantity'], errors='coerce').to_numpy(dtype=float)
+    theirs = pd.to_numeric(raw['s07bq07a'], errors='coerce').to_numpy(dtype=float)
+    if len(raw) != len(df) or not np.array_equal(mine, theirs, equal_nan=True):
+        raise ComputedLastPurchaseJoinError(
+            f'the wide food_acquired frame is not {_COMPUTED_SOURCE} row for row')
+    return computed_last_purchase_rows(raw['s07bq07a'])
+
+
+def _stamp_computed_last_purchase(out, df, flagged):
+    """Add the GH #1708 key to the purchased rows the flagged records produce.
+
+    The flagged records are run through the same reshape on their own, to learn
+    the served keys they become, and the key is stamped on those keys in ``out``.
+    Marking them inside the main call would change which keys ``index.duplicated``
+    sees there and so which rows keep a ``Quantity_kg``.  A purchased row that
+    shares its key with an unflagged record's (core sums the two) is stamped too:
+    its Expenditure includes a computed unit value.
+    """
+    if not flagged.any():
+        return out
+    from lsms_library.derivations import union_keys
+    from lsms_library.ehcvm import food_acquired_ehcvm
+    sub = food_acquired_ehcvm(df[flagged], FOOD_ACQUIRED_DERIVATION, decode=_decode_mojibake)
+    sub = _fill_missing_u(_decode_mojibake_in_df(sub))
+    keys = sub.index[sub.index.get_level_values('s') == 'purchased']
+    hit = out.index.isin(keys) & (out.index.get_level_values('s') == 'purchased')
+    out = out.copy()
+    current = out['Derivation'].astype(object)
+    out['Derivation'] = pd.Series(
+        [union_keys([c, COMPUTED_LAST_PURCHASE_KEY]) if h else c
+         for c, h in zip(current, hit)], index=out.index, dtype='string')
+    return out
+
+
+def inputs_computed_last_purchase(wave='2018-19'):
+    """The registry ``inputs`` callable: the flagged records at ``(t, i, j)``.
+
+    The raw section-7B answers of every record whose ``s07bq07a`` is flagged,
+    with the file's own names (``s07bq06`` in its code: 1 hier, 2 7 jours,
+    3 30 jours, 4 plus de 30 jours, 5 jamais), indexed as the served table is.
+    """
+    raw = _computed_raw(wave)
+    frame = _inputs_last_purchase('Niger', wave)
+    mine = pd.to_numeric(frame['s07bq07a'], errors='coerce').to_numpy(dtype=float)
+    theirs = pd.to_numeric(raw['s07bq07a'], errors='coerce').to_numpy(dtype=float)
+    if len(raw) != len(frame) or not np.array_equal(mine, theirs, equal_nan=True):
+        raise ComputedLastPurchaseJoinError(
+            f'the input frame is not {_COMPUTED_SOURCE} row for row')
+    flagged = computed_last_purchase_rows(raw['s07bq07a'])
+    out = frame.loc[flagged].copy()
+    out.insert(out.columns.get_loc('s07bq07a'), 's07bq06',
+               pd.to_numeric(raw.loc[flagged, 's07bq06'], errors='coerce').to_numpy())
+    return out
 
 
 # GH #823: community_prices from s05_co_ner2018.dta.  The registry callables
