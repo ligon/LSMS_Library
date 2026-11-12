@@ -1603,7 +1603,9 @@ there, never a zero, and a household-item total that also has a non-H row is tha
   =food_prices= rows 192,113 -> 179,049.  The L rows stay in all three.
 - =derivation_inputs=: the H key's inputs are the 20,507 H source rows, joining the keyed rows at =(t, i, j)=
   (one input row serves up to three rows, one per =s=; 7 served rows share =(t, i, j)= with a second H row);
-  the L key's 25,784 rows likewise.
+  the L key's 25,784 rows likewise.  A non-H row withheld because it shares its served key with an H row
+  (two file items under one served =j=) is not in the H key's inputs: its filed answers are recoverable
+  only through the 7-day key's inputs, which return every source row.
 
 *Kilograms: the pooled factors move.*  GH #1487 pools factors across the waves, and withholding H rows
 removes their unit values from the 2021-22 evidence.  Measured against the previous head (burst job

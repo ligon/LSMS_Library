@@ -24,7 +24,12 @@ Togo::food_acquired::7day-purchase-at-last-purchase-unit-value:
     case, accents, padding and punctuation folded -- the two variables carry
     DIFFERENT value-label sets inside the same .dta.  Before GH #876 the served
     Expenditure was s07bq08 itself: the value of one purchase of unrecorded
-    size made up to 30 days earlier, beside a 7-day quantity.
+    size made up to 30 days earlier, beside a 7-day quantity.  In 2021-22
+    (GH #1697) s07bq03a in that residual is the household's answer with the
+    producer's regional factor divided out, not the filed value: each such row
+    also carries one of Togo::food_acquired::s07bq03a-regional-factor-divided-out,
+    -floored-count-recovered or -floored-count-withheld (Quantity and
+    Expenditure NA), whose rule says how.
   function: lsms_library.ehcvm:derive_ehcvm_purchase_value
   inputs: lsms_library.countries.Togo.2018._.mapping:inputs_food_acquired
   raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s07bq07a,

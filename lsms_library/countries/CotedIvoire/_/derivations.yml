@@ -24,7 +24,11 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
     case, accents, padding and punctuation folded -- the two variables carry
     DIFFERENT value-label sets inside the same .dta.  Before GH #876 the served
     Expenditure was s07bq08 itself: the value of one purchase of unrecorded
-    size made up to 30 days earlier, beside a 7-day quantity.
+    size made up to 30 days earlier, beside a 7-day quantity.  In 2021-22
+    (GH #1697) a row whose s07bq03a is H, or which shares its served key with
+    such a row, is served Quantity and Expenditure NA under
+    CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld, and an L
+    row is flagged under ...-partial-triplet-conversion; those rules say how.
   function: lsms_library.ehcvm:derive_ehcvm_purchase_value
   inputs: lsms_library.countries.CotedIvoire.2018-19._.mapping:inputs_food_acquired
   raw_variables: [s07bq03a, s07bq03b, s07bq03c, s07bq04, s07bq05, s07bq07a,
@@ -123,8 +127,12 @@ CotedIvoire::food_acquired::s07bq03a-outlier-replaced-withheld:
     not served: every row the source row serves -- purchased (s07bq03a -
     s07bq04 - s07bq05 positive as filed), produced (s07bq04 positive) and in-kind
     (s07bq05 positive) -- carries Quantity NA and Expenditure NA, and this key.
-    The served row set is the filed one; only the values are withheld.  "Off the
-    grid" and "d decimals" are judged at relative tolerance 1e-6.  Downstream,
+    The served row set is the filed one; only the values are withheld.  A served
+    key (t, v, i, j, u, s) that an H row shares with another row (two file items
+    under one served j) is withheld whole, or the core collapse would serve the
+    other row's value as the sum; that other row's filed answers are in the
+    7-day key's inputs, not this key's.  "Off the grid" and "d decimals" are
+    judged at relative tolerance 1e-6.  Downstream,
     food_expenditures, food_quantities and food_prices drop an NA before they
     sum, so an H row is absent there, never a zero; a household-item total that
     also has a non-H row is that row's alone.

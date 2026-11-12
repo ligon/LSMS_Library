@@ -358,11 +358,11 @@ food_security:
                 Refus: null
 
 food_acquired:
-    # READ _/CONTENTS.org, "2021-22 wired" on s07bq03a before using this table.  Inferred, and
-    # no document says so: 6.7% of its positive rows (4+ decimals) read as high reports replaced
-    # by a typical amount per adult equivalent, so the household's answer is gone; 8.6% look at
-    # least partly converted to another unit.  2018-19 has no such rows, so quantities break
-    # across the waves.  Prices and kg factors read s07bq08/s07bq07a and are clean.
+    # READ _/CONTENTS.org, "s07bq03a: H withheld, L flagged" before using this table.  6.7% of
+    # its positive s07bq03a (off the quarter grid, 4+ decimals: H) read as the producer's
+    # outlier replacement, undocumented in this file; mapping.food_acquired serves every row of
+    # such a source row with Quantity and Expenditure NA, and flags the 8.5% off the grid with 3
+    # or fewer decimals (L) (GH #1697, ruled 2026-11-12, "H to NA, flag L").
     file: s07b_me_civ2021.dta
     idxvars:
         v: grappe

@@ -375,8 +375,10 @@ food_acquired:
         Quantity: s07bq03a
         Produced: s07bq04
         # GH #876.  Expenditure is derived by mapping.food_acquired, as in 2018;
-        # these raw inputs feed that hook and are dropped by the reshape.  s07bq03a is
-        # rescaled by region in this file: _/CONTENTS.org, with the maintainer.
+        # these raw inputs feed that hook and are dropped by the reshape.  s07bq03a
+        # carries the producer's regional factor in this file, which the hook divides
+        # out before the residual is formed (GH #1697, ruled 2026-11-12, "Invert,
+        # registered"): _/CONTENTS.org, "s07bq03a: the regional factor is divided out".
         GiftQuantity: s07bq05
         ConsumptionUnitCode: s07bq03b
         ConsumptionUnitSize: s07bq03c

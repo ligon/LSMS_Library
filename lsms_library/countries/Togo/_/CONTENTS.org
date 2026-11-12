@@ -1477,10 +1477,12 @@ recoverable: =Country('Togo').derivation_inputs('Togo::food_acquired::s07bq03a-r
 return every source row as filed.
 
 *derivation_inputs joins* at =(t, i, j)=: the withheld key 3,895 to 3,895, one to one.  The divided-out key
-joins 67,992 of its 69,330 served rows to exactly one input row, and the count key 10,035 of 10,039; the
-rest share their =(t, i, j)= with a second row because two file items map to one served =j= (the
-=harmonize_food= folds, e.g. the two sugars), and are told apart by =u=.  On the one-to-one rows the
-registered function re-derives the served purchased quantity exactly (max |diff| 0.0).
+joins 67,992 of its 69,330 served rows to exactly one input row, and the count key 10,035 of 10,039.  The
+rest come from the =harmonize_food= folds (two file items under one served =j=, e.g. the two sugars): of
+the divided-out key's 1,338, 1,172 are pairs of served rows told apart by =u=, and 166 are each the SUM of
+two source rows in one unit (332 input rows, each matching one served row), which the core collapse adds;
+the count key's 4 are two pairs.  So the join is one to one except on those folds.  On the one-to-one rows
+the registered function re-derives the served purchased quantity exactly (max |diff| 0.0).
 
 *Kilograms: the pooled factors move* (GH #1487 pools them across the waves).  A row's unit value
 =Expenditure= / =Quantity= does not move under the division, but the evidence row set does: phantom
