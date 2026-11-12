@@ -1,0 +1,86 @@
+{
+ "items": {
+  "identity": {
+   "W1": 81,
+   "W2": 90,
+   "W3-first": 109,
+   "W3-second": 109,
+   "W4": 107,
+   "W5": 107
+  },
+  "judgement": {
+   "W1": 9,
+   "W2": 3,
+   "W3-first": 7,
+   "W3-second": 7,
+   "W4": 4,
+   "W5": 4
+  },
+  "unmappable": {
+   "W1": 0,
+   "W2": 2,
+   "W3-first": 0,
+   "W3-second": 0,
+   "W4": 0,
+   "W5": 0
+  }
+ },
+ "units": {
+  "identity": {
+   "W1": 33,
+   "W2": 15,
+   "W3-first": 38,
+   "W3-second": 38,
+   "W4": 23,
+   "W5": 21
+  },
+  "identity-but-judgement": {
+   "W1": 0,
+   "W2": 0,
+   "W3-first": 2,
+   "W3-second": 2,
+   "W4": 4,
+   "W5": 2
+  },
+  "judgement": {
+   "W1": 1,
+   "W2": 1,
+   "W3-first": 4,
+   "W3-second": 4,
+   "W4": 1,
+   "W5": 3
+  },
+  "label-match": {
+   "W1": 9,
+   "W2": 0,
+   "W3-first": 0,
+   "W3-second": 0,
+   "W4": 2,
+   "W5": 11
+  },
+  "label-match-but-judgement": {
+   "W1": 2,
+   "W2": 0,
+   "W3-first": 0,
+   "W3-second": 0,
+   "W4": 1,
+   "W5": 3
+  },
+  "sentinel": {
+   "W1": 1,
+   "W2": 1,
+   "W3-first": 1,
+   "W3-second": 1,
+   "W4": 1,
+   "W5": 1
+  },
+  "unmappable": {
+   "W1": 1,
+   "W2": 0,
+   "W3-first": 0,
+   "W3-second": 0,
+   "W4": 2,
+   "W5": 2
+  }
+ }
+}

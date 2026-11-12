@@ -1,0 +1,4092 @@
+{
+ "W2-PP": {
+  "10": [
+   "Guinea corn/sorghum",
+   5
+  ],
+  "11": [
+   "Millet",
+   5
+  ],
+  "13": [
+   "Rice -\u00ad\u2010 local",
+   5
+  ],
+  "14": [
+   "Rice -\u00ad\u2010 imported",
+   5
+  ],
+  "15": [
+   "Semovita",
+   5
+  ],
+  "16": [
+   "Maize flour",
+   5
+  ],
+  "17": [
+   "Yam flour PULSES, NUTS AND SEEDS",
+   5
+  ],
+  "18": [
+   "Cassava flour",
+   5
+  ],
+  "19": [
+   "Wheat flour",
+   5
+  ],
+  "20": [
+   "Maize (Unshelled/On the cob)",
+   5
+  ],
+  "21": [
+   "Maize (Shelled)",
+   5
+  ],
+  "22": [
+   "Other grains and flour",
+   5
+  ],
+  "25": [
+   "Bread",
+   5
+  ],
+  "26": [
+   "Cake",
+   5
+  ],
+  "27": [
+   "Buns/Pofpof/Donuts",
+   5
+  ],
+  "28": [
+   "Biscuits",
+   5
+  ],
+  "29": [
+   "Meat Pie/Sausage Roll",
+   5
+  ],
+  "30": [
+   "Cassava -\u00ad\u2010 roots",
+   6
+  ],
+  "31": [
+   "Yam -\u00ad\u2010 roots",
+   6
+  ],
+  "32": [
+   "Gari -\u00ad\u2010 white",
+   6
+  ],
+  "33": [
+   "Gari -\u00ad\u2010 yellow",
+   6
+  ],
+  "34": [
+   "Cocoyam",
+   6
+  ],
+  "35": [
+   "Plantains",
+   6
+  ],
+  "36": [
+   "Sweet potatoes MEAT",
+   6
+  ],
+  "37": [
+   "Potatoes",
+   6
+  ],
+  "40": [
+   "Soya beans",
+   5
+  ],
+  "41": [
+   "Brown beans",
+   5
+  ],
+  "42": [
+   "White beans",
+   5
+  ],
+  "43": [
+   "Groundnuts",
+   5
+  ],
+  "44": [
+   "Other nuts/seeds/pulses",
+   5
+  ],
+  "50": [
+   "Palm oil",
+   5
+  ],
+  "51": [
+   "Butter/Margarine",
+   5
+  ],
+  "52": [
+   "Groundnut oil",
+   5
+  ],
+  "53": [
+   "Other oils and fats",
+   5
+  ],
+  "60": [
+   "Bananas",
+   6
+  ],
+  "61": [
+   "Orange/tangerine",
+   6
+  ],
+  "62": [
+   "Mangoes",
+   6
+  ],
+  "63": [
+   "Avocado pear",
+   6
+  ],
+  "64": [
+   "Pineapples",
+   6
+  ],
+  "65": [
+   "Fruits (canned)",
+   6
+  ],
+  "70": [
+   "Tomatoes",
+   6
+  ],
+  "71": [
+   "Tomato puree (canned)",
+   6
+  ],
+  "72": [
+   "Onions",
+   6
+  ],
+  "73": [
+   "Garden eggs/egg plant",
+   6
+  ],
+  "74": [
+   "Okra -\u00ad\u2010 fresh",
+   6
+  ],
+  "75": [
+   "Okra -\u00ad\u2010 dried FISH AND SEAFOOD",
+   6
+  ],
+  "76": [
+   "Pepper",
+   6
+  ],
+  "77": [
+   "Leaves (Cocoyam, Spinach, etc.)",
+   6
+  ],
+  "80": [
+   "Chicken",
+   7
+  ],
+  "81": [
+   "Duck",
+   7
+  ],
+  "82": [
+   "Other domestic poultry",
+   7
+  ],
+  "83": [
+   "Agricultural eggs",
+   7
+  ],
+  "84": [
+   "Local eggs",
+   7
+  ],
+  "85": [
+   "Other eggs (not chicken)",
+   7
+  ],
+  "90": [
+   "Beef",
+   6
+  ],
+  "91": [
+   "Mutton",
+   6
+  ],
+  "92": [
+   "Pork",
+   6
+  ],
+  "93": [
+   "Goat",
+   6
+  ],
+  "94": [
+   "Wild game meat",
+   6
+  ],
+  "95": [
+   "Canned beef/corned beef",
+   6
+  ],
+  "96": [
+   "Other meat (excl. poultry)",
+   6
+  ],
+  "100": [
+   "Fish -\u00ad\u2010 fresh",
+   6
+  ],
+  "101": [
+   "Fish -\u00ad\u2010 frozen",
+   6
+  ],
+  "102": [
+   "Fish -\u00ad\u2010 smoked",
+   6
+  ],
+  "103": [
+   "Fish -\u00ad\u2010 dried",
+   6
+  ],
+  "104": [
+   "Snails",
+   6
+  ],
+  "105": [
+   "Seafood (lobster, crab, prawns, etc)",
+   7
+  ],
+  "106": [
+   "Canned fish/seafood",
+   7
+  ],
+  "107": [
+   "Other fish or seafood",
+   7
+  ],
+  "110": [
+   "Fresh milk",
+   7
+  ],
+  "111": [
+   "Milk powder",
+   7
+  ],
+  "112": [
+   "Baby milk powder",
+   7
+  ],
+  "113": [
+   "Milk tinned (unsweetened) ALCOHOLIC DRINKS (BOTTLE AND TOT)",
+   7
+  ],
+  "114": [
+   "Cheese (wara)",
+   7
+  ],
+  "115": [
+   "Other milk products",
+   7
+  ],
+  "120": [
+   "Coffee",
+   7
+  ],
+  "121": [
+   "Chocolate drinks (including Milo)",
+   7
+  ],
+  "122": [
+   "Tea",
+   7
+  ],
+  "130": [
+   "Sugar",
+   5
+  ],
+  "131": [
+   "Jams",
+   5
+  ],
+  "132": [
+   "Honey",
+   5
+  ],
+  "133": [
+   "Other sweets and confectionary",
+   5
+  ],
+  "140": [
+   "Condiments (salt, spices, pepper, etc)",
+   5
+  ],
+  "150": [
+   "Bottled water",
+   7
+  ],
+  "151": [
+   "Sachet water",
+   7
+  ],
+  "152": [
+   "Malt drinks",
+   7
+  ],
+  "153": [
+   "Soft drinks (Coca Cola, Sprite, etc)",
+   7
+  ],
+  "154": [
+   "Fruit juice canned/Pack",
+   7
+  ],
+  "155": [
+   "Other non-\u00ad\u2010alcoholic drinks",
+   7
+  ],
+  "160": [
+   "Beer (local and imported)",
+   7
+  ],
+  "161": [
+   "Palm wine",
+   7
+  ],
+  "162": [
+   "Pito",
+   7
+  ],
+  "163": [
+   "Gin",
+   7
+  ],
+  "164": [
+   "Other alcoholic beverages",
+   7
+  ]
+ },
+ "W3-PP-first": {
+  "10": [
+   "Guinea corn/sorghum",
+   5
+  ],
+  "11": [
+   "Millet",
+   5
+  ],
+  "13": [
+   "Rice - local",
+   5
+  ],
+  "14": [
+   "Rice - imported",
+   5
+  ],
+  "16": [
+   "Maize flour",
+   5
+  ],
+  "17": [
+   "Yam flour",
+   5
+  ],
+  "18": [
+   "Cassava flour",
+   5
+  ],
+  "19": [
+   "Wheat flour",
+   5
+  ],
+  "20": [
+   "Maize (Unshelled/On the cob)",
+   5
+  ],
+  "21": [
+   "Maize (Shelled/On the cob)",
+   5
+  ],
+  "22": [
+   "Maize (Shelled/Off the cob)",
+   5
+  ],
+  "23": [
+   "Other grains and flour",
+   5
+  ],
+  "25": [
+   "Bread",
+   6
+  ],
+  "26": [
+   "Cake",
+   6
+  ],
+  "27": [
+   "Buns/Pofpof/Donuts",
+   6
+  ],
+  "28": [
+   "Biscuits",
+   6
+  ],
+  "29": [
+   "Meat Pie/Sausage Roll",
+   6
+  ],
+  "30": [
+   "Cassava - roots",
+   6
+  ],
+  "31": [
+   "Yam - roots",
+   6
+  ],
+  "32": [
+   "Gari - white",
+   6
+  ],
+  "33": [
+   "Gari - yellow",
+   6
+  ],
+  "34": [
+   "Cocoyam",
+   6
+  ],
+  "35": [
+   "Plantains",
+   6
+  ],
+  "36": [
+   "Sweet potatoes",
+   6
+  ],
+  "37": [
+   "Potatoes",
+   6
+  ],
+  "38": [
+   "Other roots and tuber",
+   6
+  ],
+  "40": [
+   "Soya beans",
+   6
+  ],
+  "41": [
+   "Brown beans",
+   6
+  ],
+  "42": [
+   "White beans",
+   6
+  ],
+  "43": [
+   "Groundnuts (Unshelled)",
+   6
+  ],
+  "44": [
+   "Groundnuts (Shelled)",
+   6
+  ],
+  "45": [
+   "Other nuts/seeds/pulses",
+   6
+  ],
+  "46": [
+   "Coconut",
+   6
+  ],
+  "47": [
+   "Kola nut",
+   6
+  ],
+  "48": [
+   "Cashew nut",
+   6
+  ],
+  "50": [
+   "Palm oil",
+   7
+  ],
+  "51": [
+   "Butter/ Margarine",
+   7
+  ],
+  "52": [
+   "Groundnuts Oil",
+   7
+  ],
+  "53": [
+   "Other oil and Fat",
+   7
+  ],
+  "54": [
+   "Sheabutter",
+   7
+  ],
+  "55": [
+   "Coconut oil",
+   7
+  ],
+  "56": [
+   "Animal fat",
+   7
+  ],
+  "60": [
+   "Bananas",
+   7
+  ],
+  "61": [
+   "Orange/tangerine",
+   7
+  ],
+  "62": [
+   "Mangoes",
+   7
+  ],
+  "63": [
+   "Avocado pear",
+   7
+  ],
+  "64": [
+   "Pineapples",
+   7
+  ],
+  "65": [
+   "Fruit canned",
+   7
+  ],
+  "66": [
+   "Other fruits",
+   7
+  ],
+  "67": [
+   "Pawpaw",
+   7
+  ],
+  "68": [
+   "Watermelon",
+   7
+  ],
+  "69": [
+   "Apples",
+   7
+  ],
+  "70": [
+   "Tomatoes",
+   7
+  ],
+  "71": [
+   "Tomato puree (canned)",
+   7
+  ],
+  "72": [
+   "Onions",
+   7
+  ],
+  "73": [
+   "Garden eggs/egg plant",
+   7
+  ],
+  "74": [
+   "Okra - fresh",
+   7
+  ],
+  "75": [
+   "Okra - dried",
+   7
+  ],
+  "76": [
+   "Fresh Pepper",
+   7
+  ],
+  "77": [
+   "Dry Pepper",
+   7
+  ],
+  "78": [
+   "Leaves (Cocoyam, Spinach, etc.)",
+   7
+  ],
+  "79": [
+   "Other vegetables (fresh or canned)",
+   7
+  ],
+  "80": [
+   "Chicken",
+   8
+  ],
+  "81": [
+   "Duck",
+   8
+  ],
+  "82": [
+   "Other domestic poultry",
+   8
+  ],
+  "83": [
+   "Agricultural eggs",
+   8
+  ],
+  "84": [
+   "Local eggs",
+   8
+  ],
+  "85": [
+   "Other eggs (not chicken)",
+   8
+  ],
+  "90": [
+   "Beef",
+   8
+  ],
+  "91": [
+   "Mutton",
+   8
+  ],
+  "92": [
+   "Pork",
+   8
+  ],
+  "93": [
+   "Goat",
+   8
+  ],
+  "94": [
+   "Wild game/bush meat",
+   8
+  ],
+  "95": [
+   "Canned beef/corned beef",
+   8
+  ],
+  "96": [
+   "Other meat (excl. poultry)",
+   8
+  ],
+  "100": [
+   "Fish - fresh",
+   8
+  ],
+  "101": [
+   "Fish - frozen",
+   8
+  ],
+  "102": [
+   "Fish - smoked",
+   8
+  ],
+  "103": [
+   "Fish - dried",
+   8
+  ],
+  "104": [
+   "Snails",
+   8
+  ],
+  "105": [
+   "Seafood (lobster, crab, prawns, etc)",
+   8
+  ],
+  "106": [
+   "Canned fish/seafood",
+   8
+  ],
+  "107": [
+   "Other fish or seafood",
+   8
+  ],
+  "110": [
+   "Fresh milk",
+   9
+  ],
+  "111": [
+   "Milk powder",
+   9
+  ],
+  "112": [
+   "Baby milk powder",
+   9
+  ],
+  "113": [
+   "Milk tinned (unsweetened)",
+   9
+  ],
+  "114": [
+   "Cheese (wara)",
+   9
+  ],
+  "115": [
+   "Other milk products",
+   9
+  ],
+  "120": [
+   "Coffee",
+   9
+  ],
+  "121": [
+   "Chocolate drinks (including Milo)",
+   9
+  ],
+  "122": [
+   "Tea",
+   9
+  ],
+  "130": [
+   "Sugar",
+   9
+  ],
+  "131": [
+   "Jams",
+   9
+  ],
+  "132": [
+   "Honey",
+   9
+  ],
+  "133": [
+   "Other sweets and confectionary",
+   9
+  ],
+  "140": [
+   "Condiments (salt, spices, pepper, etc)",
+   9
+  ],
+  "141": [
+   "Salt",
+   9
+  ],
+  "142": [
+   "Unground Ogbono",
+   9
+  ],
+  "143": [
+   "Ground Ogbono",
+   9
+  ],
+  "144": [
+   "Ground Pepper",
+   9
+  ],
+  "145": [
+   "Melon (shelled)",
+   9
+  ],
+  "146": [
+   "Melon (unshelled)",
+   9
+  ],
+  "147": [
+   "Mellon (ground)",
+   9
+  ],
+  "150": [
+   "Bottled water",
+   10
+  ],
+  "151": [
+   "Sachet water",
+   10
+  ],
+  "152": [
+   "Malt drinks",
+   10
+  ],
+  "153": [
+   "Soft drinks (Coca Cola, spirit, etc)",
+   10
+  ],
+  "154": [
+   "Fruit juice canned/Pack",
+   10
+  ],
+  "155": [
+   "Other non-alcoholic drinks",
+   10
+  ],
+  "160": [
+   "Beer (local and imported)",
+   10
+  ],
+  "161": [
+   "Palm wine",
+   10
+  ],
+  "162": [
+   "Pito",
+   10
+  ],
+  "163": [
+   "Gin",
+   10
+  ],
+  "164": [
+   "Other alcoholic beverages",
+   10
+  ]
+ },
+ "W3-PP-second": {
+  "10": [
+   "Guinea corn/sorghum",
+   11
+  ],
+  "11": [
+   "Millet",
+   11
+  ],
+  "13": [
+   "Rice - local",
+   11
+  ],
+  "14": [
+   "Rice - imported",
+   11
+  ],
+  "16": [
+   "Maize flour",
+   11
+  ],
+  "17": [
+   "Yam flour",
+   11
+  ],
+  "18": [
+   "Cassava flour",
+   11
+  ],
+  "19": [
+   "Wheat flour",
+   11
+  ],
+  "20": [
+   "Maize (Unshelled/On the cob)",
+   11
+  ],
+  "21": [
+   "Maize (Shelled/On the cob)",
+   11
+  ],
+  "22": [
+   "Maize (Shelled/Off the cob)",
+   11
+  ],
+  "23": [
+   "Other grains and flour",
+   11
+  ],
+  "25": [
+   "Bread",
+   12
+  ],
+  "26": [
+   "Cake",
+   12
+  ],
+  "27": [
+   "Buns/Pofpof/Donuts",
+   12
+  ],
+  "28": [
+   "Biscuits",
+   12
+  ],
+  "29": [
+   "Meat Pie/Sausage Roll",
+   12
+  ],
+  "30": [
+   "Cassava - roots",
+   12
+  ],
+  "31": [
+   "Yam - roots",
+   12
+  ],
+  "32": [
+   "Gari - white",
+   12
+  ],
+  "33": [
+   "Gari - yellow",
+   12
+  ],
+  "34": [
+   "Cocoyam",
+   12
+  ],
+  "35": [
+   "Plantains",
+   12
+  ],
+  "36": [
+   "Sweet potatoes",
+   12
+  ],
+  "37": [
+   "Potatoes",
+   12
+  ],
+  "38": [
+   "Other roots and tuber",
+   12
+  ],
+  "40": [
+   "Soya beans",
+   12
+  ],
+  "41": [
+   "Brown beans",
+   12
+  ],
+  "42": [
+   "White beans",
+   12
+  ],
+  "43": [
+   "Groundnuts (Unshelled)",
+   12
+  ],
+  "44": [
+   "Groundnuts (Shelled)",
+   12
+  ],
+  "45": [
+   "Other nuts/seeds/pulses",
+   12
+  ],
+  "46": [
+   "Coconut",
+   12
+  ],
+  "47": [
+   "Kola nut",
+   12
+  ],
+  "48": [
+   "Cashew nut",
+   12
+  ],
+  "50": [
+   "Palm oil",
+   13
+  ],
+  "51": [
+   "Butter/ Margarine",
+   13
+  ],
+  "52": [
+   "Groundnuts Oil",
+   13
+  ],
+  "53": [
+   "Other oil and Fat",
+   13
+  ],
+  "54": [
+   "Sheabutter",
+   13
+  ],
+  "55": [
+   "Coconut oil",
+   13
+  ],
+  "56": [
+   "Animal fat",
+   13
+  ],
+  "60": [
+   "Bananas",
+   13
+  ],
+  "61": [
+   "Orange/tangerine",
+   13
+  ],
+  "62": [
+   "Mangoes",
+   13
+  ],
+  "63": [
+   "Avocado pear",
+   13
+  ],
+  "64": [
+   "Pineapples",
+   13
+  ],
+  "65": [
+   "Fruit canned",
+   13
+  ],
+  "66": [
+   "Other fruits",
+   13
+  ],
+  "67": [
+   "Pawpaw",
+   13
+  ],
+  "68": [
+   "Watermelon",
+   13
+  ],
+  "69": [
+   "Apples",
+   13
+  ],
+  "70": [
+   "Tomatoes",
+   13
+  ],
+  "71": [
+   "Tomato puree (canned)",
+   13
+  ],
+  "72": [
+   "Onions",
+   13
+  ],
+  "73": [
+   "Garden eggs/egg plant",
+   13
+  ],
+  "74": [
+   "Okra - fresh",
+   13
+  ],
+  "75": [
+   "Okra - dried",
+   13
+  ],
+  "76": [
+   "Fresh Pepper",
+   13
+  ],
+  "77": [
+   "Dry Pepper",
+   13
+  ],
+  "78": [
+   "Leaves (Cocoyam, Spinach, etc.)",
+   13
+  ],
+  "79": [
+   "Other vegetables (fresh or canned)",
+   13
+  ],
+  "80": [
+   "Chicken",
+   14
+  ],
+  "81": [
+   "Duck",
+   14
+  ],
+  "82": [
+   "Other domestic poultry",
+   14
+  ],
+  "83": [
+   "Agricultural eggs",
+   14
+  ],
+  "84": [
+   "Local eggs",
+   14
+  ],
+  "85": [
+   "Other eggs (not chicken)",
+   14
+  ],
+  "90": [
+   "Beef",
+   14
+  ],
+  "91": [
+   "Mutton",
+   14
+  ],
+  "92": [
+   "Pork",
+   14
+  ],
+  "93": [
+   "Goat",
+   14
+  ],
+  "94": [
+   "Wild game/bush meat",
+   14
+  ],
+  "95": [
+   "Canned beef/corned beef",
+   14
+  ],
+  "96": [
+   "Other meat (excl. poultry)",
+   14
+  ],
+  "100": [
+   "Fish - fresh",
+   14
+  ],
+  "101": [
+   "Fish - frozen",
+   14
+  ],
+  "102": [
+   "Fish - smoked",
+   14
+  ],
+  "103": [
+   "Fish - dried",
+   14
+  ],
+  "104": [
+   "Snails",
+   14
+  ],
+  "105": [
+   "Seafood (lobster, crab, prawns, etc)",
+   14
+  ],
+  "106": [
+   "Canned fish/seafood",
+   14
+  ],
+  "107": [
+   "Other fish or seafood",
+   14
+  ],
+  "110": [
+   "Fresh milk",
+   15
+  ],
+  "111": [
+   "Milk powder",
+   15
+  ],
+  "112": [
+   "Baby milk powder",
+   15
+  ],
+  "113": [
+   "Milk tinned (unsweetened)",
+   15
+  ],
+  "114": [
+   "Cheese (wara)",
+   15
+  ],
+  "115": [
+   "Other milk products",
+   15
+  ],
+  "120": [
+   "Coffee",
+   15
+  ],
+  "121": [
+   "Chocolate drinks (including Milo)",
+   15
+  ],
+  "122": [
+   "Tea",
+   15
+  ],
+  "130": [
+   "Sugar",
+   15
+  ],
+  "131": [
+   "Jams",
+   15
+  ],
+  "132": [
+   "Honey",
+   15
+  ],
+  "133": [
+   "Other sweets and confectionary",
+   15
+  ],
+  "140": [
+   "Condiments (salt, spices, pepper, etc)",
+   15
+  ],
+  "141": [
+   "Salt",
+   15
+  ],
+  "142": [
+   "Unground Ogbono",
+   15
+  ],
+  "143": [
+   "Ground Ogbono",
+   15
+  ],
+  "144": [
+   "Ground Pepper",
+   15
+  ],
+  "145": [
+   "Melon (shelled)",
+   15
+  ],
+  "146": [
+   "Melon (unshelled)",
+   15
+  ],
+  "147": [
+   "Mellon (ground)",
+   15
+  ],
+  "150": [
+   "Bottled water",
+   16
+  ],
+  "151": [
+   "Sachet water",
+   16
+  ],
+  "152": [
+   "Malt drinks",
+   16
+  ],
+  "153": [
+   "Soft drinks (Coca Cola, spirit, etc)",
+   16
+  ],
+  "154": [
+   "Fruit juice canned/Pack",
+   16
+  ],
+  "155": [
+   "Other non-alcoholic drinks",
+   16
+  ],
+  "160": [
+   "Beer (local and imported)",
+   16
+  ],
+  "161": [
+   "Palm wine",
+   16
+  ],
+  "162": [
+   "Pito",
+   16
+  ],
+  "163": [
+   "Gin",
+   16
+  ],
+  "164": [
+   "Other alcoholic beverages",
+   16
+  ]
+ },
+ "W4-PP": {
+  "10": [
+   "Guinea corn/sorghum",
+   5
+  ],
+  "11": [
+   "Millet",
+   5
+  ],
+  "13": [
+   "Rice - local",
+   5
+  ],
+  "14": [
+   "Rice - imported",
+   5
+  ],
+  "16": [
+   "Maize flour",
+   5
+  ],
+  "17": [
+   "Yam flour",
+   5
+  ],
+  "18": [
+   "Cassava flour",
+   5
+  ],
+  "19": [
+   "Wheat flour",
+   5
+  ],
+  "20": [
+   "Maize (Unshelled/On the cob)",
+   5
+  ],
+  "22": [
+   "Maize (Shelled/Off the cob)",
+   5
+  ],
+  "23": [
+   "Other grains and flour (specify)",
+   5
+  ],
+  "25": [
+   "Bread",
+   5
+  ],
+  "26": [
+   "Cake",
+   5
+  ],
+  "27": [
+   "Buns/Pofpof/Donuts",
+   5
+  ],
+  "28": [
+   "Biscuits",
+   5
+  ],
+  "29": [
+   "Meat Pie/Sausage Roll",
+   5
+  ],
+  "30": [
+   "Cassava - roots",
+   6
+  ],
+  "31": [
+   "Yam - roots",
+   6
+  ],
+  "32": [
+   "Gari - white",
+   6
+  ],
+  "33": [
+   "Gari - yellow",
+   6
+  ],
+  "34": [
+   "Cocoyam",
+   6
+  ],
+  "35": [
+   "Plantains",
+   6
+  ],
+  "36": [
+   "Sweet potatoes",
+   6
+  ],
+  "37": [
+   "Potatoes",
+   6
+  ],
+  "38": [
+   "Other roots and tuber (specify)",
+   6
+  ],
+  "40": [
+   "Soya beans",
+   6
+  ],
+  "41": [
+   "Brown beans",
+   6
+  ],
+  "42": [
+   "White beans",
+   6
+  ],
+  "43": [
+   "Groundnuts (Unshelled)",
+   6
+  ],
+  "44": [
+   "Groundnuts (Shelled)",
+   6
+  ],
+  "45": [
+   "Other nuts/seeds/pulses (specify)",
+   6
+  ],
+  "46": [
+   "Coconut",
+   6
+  ],
+  "47": [
+   "Kola nut",
+   6
+  ],
+  "48": [
+   "Cashew nut",
+   6
+  ],
+  "50": [
+   "Palm oil",
+   6
+  ],
+  "51": [
+   "Butter/ Margarine",
+   6
+  ],
+  "52": [
+   "Groundnuts Oil",
+   6
+  ],
+  "53": [
+   "Other oil and Fat (specify)",
+   6
+  ],
+  "55": [
+   "Coconut oil",
+   6
+  ],
+  "56": [
+   "Animal fat",
+   6
+  ],
+  "60": [
+   "Bananas",
+   7
+  ],
+  "61": [
+   "Orange/tangerine",
+   7
+  ],
+  "62": [
+   "Mangoes",
+   7
+  ],
+  "63": [
+   "Avocado pear",
+   7
+  ],
+  "64": [
+   "Pineapples",
+   7
+  ],
+  "65": [
+   "Fruit canned",
+   7
+  ],
+  "66": [
+   "Other fruits (specify)",
+   7
+  ],
+  "67": [
+   "Pawpaw",
+   7
+  ],
+  "68": [
+   "Watermelon",
+   7
+  ],
+  "69": [
+   "Apples",
+   7
+  ],
+  "70": [
+   "Tomatoes",
+   7
+  ],
+  "71": [
+   "Tomato puree (canned)",
+   7
+  ],
+  "72": [
+   "Onions",
+   7
+  ],
+  "73": [
+   "Garden eggs/egg plant",
+   7
+  ],
+  "74": [
+   "Okra - fresh",
+   7
+  ],
+  "75": [
+   "Okra - dried",
+   7
+  ],
+  "76": [
+   "Fresh Pepper",
+   7
+  ],
+  "77": [
+   "Dry Pepper",
+   7
+  ],
+  "78": [
+   "Leaves (Cocoyam, Spinach, etc.)",
+   7
+  ],
+  "79": [
+   "Other vegetables (fresh or canned) (specify)",
+   7
+  ],
+  "80": [
+   "Chicken",
+   7
+  ],
+  "81": [
+   "Duck",
+   7
+  ],
+  "82": [
+   "Other domestic poultry",
+   7
+  ],
+  "83": [
+   "Agricultural eggs",
+   7
+  ],
+  "84": [
+   "Local eggs",
+   7
+  ],
+  "85": [
+   "Other eggs (not chicken) (specify)",
+   7
+  ],
+  "90": [
+   "Beef",
+   8
+  ],
+  "91": [
+   "Mutton",
+   8
+  ],
+  "92": [
+   "Pork",
+   8
+  ],
+  "93": [
+   "Goat",
+   8
+  ],
+  "94": [
+   "Wild game/bush meat",
+   8
+  ],
+  "95": [
+   "Canned beef/corned beef",
+   8
+  ],
+  "96": [
+   "Other meat (excl. poultry) (specify)",
+   8
+  ],
+  "100": [
+   "Fish - fresh",
+   8
+  ],
+  "101": [
+   "Fish - frozen",
+   8
+  ],
+  "102": [
+   "Fish - smoked",
+   8
+  ],
+  "103": [
+   "Fish - dried",
+   8
+  ],
+  "104": [
+   "Snails",
+   8
+  ],
+  "105": [
+   "Seafood (lobster, crab, prawns, etc)",
+   8
+  ],
+  "106": [
+   "Canned fish/seafood",
+   8
+  ],
+  "107": [
+   "Other fish or seafood (specify)",
+   8
+  ],
+  "110": [
+   "Fresh milk",
+   8
+  ],
+  "111": [
+   "Milk powder",
+   8
+  ],
+  "112": [
+   "Baby milk powder",
+   8
+  ],
+  "113": [
+   "Milk tinned (unsweetened)",
+   8
+  ],
+  "114": [
+   "Cheese (wara)",
+   8
+  ],
+  "115": [
+   "Other milk products (specify)",
+   8
+  ],
+  "120": [
+   "Coffee",
+   8
+  ],
+  "121": [
+   "Chocolate drinks (including Milo)",
+   8
+  ],
+  "122": [
+   "Tea",
+   8
+  ],
+  "130": [
+   "Sugar",
+   9
+  ],
+  "131": [
+   "Jams",
+   9
+  ],
+  "132": [
+   "Honey",
+   9
+  ],
+  "133": [
+   "Other sweets and confectionary (specify)",
+   9
+  ],
+  "140": [
+   "Condiments (salt, spices, pepper, etc)",
+   9
+  ],
+  "141": [
+   "Salt",
+   9
+  ],
+  "142": [
+   "Unground Ogbono",
+   9
+  ],
+  "143": [
+   "Ground Ogbono",
+   9
+  ],
+  "144": [
+   "Ground Pepper",
+   9
+  ],
+  "145": [
+   "Melon (shelled)",
+   9
+  ],
+  "146": [
+   "Melon (unshelled)",
+   9
+  ],
+  "147": [
+   "Mellon (ground)",
+   9
+  ],
+  "150": [
+   "Bottled water",
+   9
+  ],
+  "151": [
+   "Sachet water",
+   9
+  ],
+  "152": [
+   "Malt drinks",
+   9
+  ],
+  "153": [
+   "Soft drinks (Coca Cola, spirit, etc)",
+   9
+  ],
+  "154": [
+   "Fruit juice canned/Pack",
+   9
+  ],
+  "155": [
+   "Other non-alcoholic drinks (specify)",
+   9
+  ],
+  "601": [
+   "Guava",
+   7
+  ]
+ },
+ "W5-PP": {
+  "10": [
+   "Guinea corn/sorghum",
+   6
+  ],
+  "11": [
+   "Millet",
+   6
+  ],
+  "13": [
+   "Rice - local",
+   6
+  ],
+  "14": [
+   "Rice - imported",
+   6
+  ],
+  "16": [
+   "Maize flour",
+   6
+  ],
+  "17": [
+   "Yam flour",
+   6
+  ],
+  "18": [
+   "Cassava flour",
+   6
+  ],
+  "19": [
+   "Wheat flour",
+   6
+  ],
+  "20": [
+   "Maize (Unshelled/On the cob)",
+   6
+  ],
+  "22": [
+   "Maize (Shelled/Off the cob)",
+   6
+  ],
+  "23": [
+   "Other grains and flour (specify)",
+   6
+  ],
+  "25": [
+   "Bread",
+   7
+  ],
+  "26": [
+   "Cake",
+   7
+  ],
+  "27": [
+   "Buns/Pufpuf/Donuts",
+   7
+  ],
+  "28": [
+   "Biscuits",
+   7
+  ],
+  "29": [
+   "Meat Pie/Sausage Roll",
+   7
+  ],
+  "30": [
+   "Cassava - roots",
+   7
+  ],
+  "31": [
+   "Yam - roots",
+   7
+  ],
+  "32": [
+   "Gari - white",
+   7
+  ],
+  "33": [
+   "Gari - yellow",
+   7
+  ],
+  "34": [
+   "Cocoyam",
+   7
+  ],
+  "35": [
+   "Plantains",
+   7
+  ],
+  "36": [
+   "Sweet potatoes",
+   7
+  ],
+  "37": [
+   "Irish Potatoes",
+   7
+  ],
+  "38": [
+   "Other roots and tuber (specify)",
+   7
+  ],
+  "40": [
+   "Soya beans",
+   7
+  ],
+  "41": [
+   "Brown beans",
+   7
+  ],
+  "42": [
+   "White beans",
+   7
+  ],
+  "43": [
+   "Groundnuts (Unshelled)",
+   7
+  ],
+  "44": [
+   "Groundnuts (Shelled)",
+   7
+  ],
+  "45": [
+   "Other nuts/seeds/pulses (specify)",
+   7
+  ],
+  "46": [
+   "Coconut",
+   7
+  ],
+  "47": [
+   "Kola nut",
+   7
+  ],
+  "48": [
+   "Cashew nut",
+   7
+  ],
+  "50": [
+   "Palm oil",
+   8
+  ],
+  "51": [
+   "Butter/ Margarine",
+   8
+  ],
+  "52": [
+   "Groundnuts Oil",
+   8
+  ],
+  "53": [
+   "Other oil and Fat (specify)",
+   8
+  ],
+  "55": [
+   "Coconut oil",
+   8
+  ],
+  "56": [
+   "Animal fat",
+   8
+  ],
+  "60": [
+   "Bananas",
+   8
+  ],
+  "61": [
+   "Orange/tangerine",
+   8
+  ],
+  "62": [
+   "Mangoes",
+   8
+  ],
+  "63": [
+   "Avocado pear",
+   8
+  ],
+  "64": [
+   "Pineapples",
+   8
+  ],
+  "65": [
+   "Fruit canned",
+   8
+  ],
+  "66": [
+   "Other fruits (specify)",
+   8
+  ],
+  "67": [
+   "Pawpaw",
+   8
+  ],
+  "68": [
+   "Watermelon",
+   8
+  ],
+  "69": [
+   "Apples",
+   8
+  ],
+  "70": [
+   "Tomatoes",
+   9
+  ],
+  "71": [
+   "Tomato puree (canned)",
+   9
+  ],
+  "72": [
+   "Onions",
+   9
+  ],
+  "73": [
+   "Garden eggs/egg plant",
+   9
+  ],
+  "74": [
+   "Okra - fresh",
+   9
+  ],
+  "75": [
+   "Okra - dried",
+   9
+  ],
+  "76": [
+   "Fresh Pepper",
+   9
+  ],
+  "77": [
+   "Dry Pepper",
+   9
+  ],
+  "78": [
+   "Leaves (Cocoyam, Spinach, etc.)",
+   9
+  ],
+  "79": [
+   "Other vegetables (fresh or canned) (specify)",
+   9
+  ],
+  "80": [
+   "Chicken",
+   9
+  ],
+  "81": [
+   "Duck",
+   9
+  ],
+  "82": [
+   "Other domestic poultry",
+   9
+  ],
+  "83": [
+   "Agricultural eggs",
+   9
+  ],
+  "84": [
+   "Local eggs",
+   9
+  ],
+  "85": [
+   "Other eggs (not chicken) (specify)",
+   9
+  ],
+  "90": [
+   "Beef",
+   9
+  ],
+  "91": [
+   "Mutton",
+   9
+  ],
+  "92": [
+   "Pork",
+   9
+  ],
+  "93": [
+   "Goat",
+   9
+  ],
+  "94": [
+   "Wild game/bush meat",
+   9
+  ],
+  "95": [
+   "Canned beef/corned beef",
+   9
+  ],
+  "96": [
+   "Other meat (excl. poultry) (specify)",
+   9
+  ],
+  "100": [
+   "Fish - fresh",
+   10
+  ],
+  "101": [
+   "Fish - frozen",
+   10
+  ],
+  "102": [
+   "Fish - smoked",
+   10
+  ],
+  "103": [
+   "Fish - dried",
+   10
+  ],
+  "104": [
+   "Snails",
+   10
+  ],
+  "105": [
+   "Seafood (lobster, crab, prawns, etc)",
+   10
+  ],
+  "106": [
+   "Canned fish/seafood",
+   10
+  ],
+  "107": [
+   "Other fish or seafood (specify)",
+   10
+  ],
+  "110": [
+   "Fresh milk",
+   10
+  ],
+  "111": [
+   "Milk powder",
+   10
+  ],
+  "112": [
+   "Baby milk powder",
+   10
+  ],
+  "113": [
+   "Milk tinned (unsweetened)",
+   10
+  ],
+  "114": [
+   "Cheese (wara)",
+   10
+  ],
+  "115": [
+   "Other milk products (specify)",
+   10
+  ],
+  "120": [
+   "Coffee",
+   10
+  ],
+  "121": [
+   "Chocolate drinks (including Milo)",
+   10
+  ],
+  "122": [
+   "Tea",
+   10
+  ],
+  "130": [
+   "Sugar",
+   10
+  ],
+  "131": [
+   "Jams",
+   10
+  ],
+  "132": [
+   "Honey",
+   10
+  ],
+  "133": [
+   "Other sweets and confectionary (specify)",
+   10
+  ],
+  "141": [
+   "Salt",
+   11
+  ],
+  "142": [
+   "Unground Ogbono",
+   11
+  ],
+  "143": [
+   "Ground Ogbono",
+   11
+  ],
+  "144": [
+   "Ground Pepper",
+   11
+  ],
+  "145": [
+   "Melon (shelled)",
+   11
+  ],
+  "146": [
+   "Melon (unshelled)",
+   11
+  ],
+  "147": [
+   "Mellon (ground)",
+   11
+  ],
+  "148": [
+   "Other Spices (e.g. maggi)",
+   11
+  ],
+  "150": [
+   "Bottled water",
+   11
+  ],
+  "151": [
+   "Sachet water",
+   11
+  ],
+  "152": [
+   "Malt drinks",
+   11
+  ],
+  "153": [
+   "Soft drinks (Coca Cola, Mirinda, etc)",
+   11
+  ],
+  "154": [
+   "Fruit juice canned/Pack",
+   11
+  ],
+  "155": [
+   "Other non-alcoholic drinks (specify)",
+   11
+  ],
+  "160": [
+   "Beer (local and imported)",
+   11
+  ],
+  "161": [
+   "Palm wine",
+   11
+  ],
+  "162": [
+   "Pito",
+   11
+  ],
+  "163": [
+   "Gin",
+   11
+  ],
+  "164": [
+   "Other alcoholic beverages",
+   11
+  ],
+  "601": [
+   "Guava",
+   8
+  ]
+ },
+ "W3-PH-all": {
+  "10": [
+   "Guinea corn/sorghum",
+   18
+  ],
+  "11": [
+   "Millet",
+   18
+  ],
+  "13": [
+   "Rice - local",
+   18
+  ],
+  "14": [
+   "Rice - imported",
+   18
+  ],
+  "16": [
+   "Maize flour",
+   18
+  ],
+  "17": [
+   "Yam flour",
+   18
+  ],
+  "18": [
+   "Cassava flour",
+   18
+  ],
+  "19": [
+   "Wheat flour",
+   18
+  ],
+  "20": [
+   "Maize (Unshelled/On the cob)",
+   18
+  ],
+  "21": [
+   "Maize (Shelled/On the cob)",
+   18
+  ],
+  "22": [
+   "Maize (Shelled/Off the cob)",
+   18
+  ],
+  "23": [
+   "Other grains and flour",
+   19
+  ],
+  "25": [
+   "Bread",
+   19
+  ],
+  "26": [
+   "Cake",
+   19
+  ],
+  "27": [
+   "Buns/Pofpof/Donuts",
+   19
+  ],
+  "28": [
+   "Biscuits",
+   19
+  ],
+  "29": [
+   "Meat Pie/Sausage Roll",
+   19
+  ],
+  "30": [
+   "Cassava - roots",
+   19
+  ],
+  "31": [
+   "Yam - roots",
+   19
+  ],
+  "32": [
+   "Gari - white",
+   19
+  ],
+  "33": [
+   "Gari - yellow",
+   19
+  ],
+  "34": [
+   "Cocoyam",
+   19
+  ],
+  "35": [
+   "Plantains",
+   19
+  ],
+  "36": [
+   "Sweet potatoes",
+   19
+  ],
+  "37": [
+   "Potatoes",
+   19
+  ],
+  "38": [
+   "Other roots and tuber",
+   19
+  ],
+  "40": [
+   "Soya beans",
+   19
+  ],
+  "41": [
+   "Brown beans",
+   19
+  ],
+  "42": [
+   "White beans",
+   19
+  ],
+  "43": [
+   "Groundnuts (Unshelled)",
+   19
+  ],
+  "44": [
+   "Groundnuts (Shelled)",
+   19
+  ],
+  "45": [
+   "Other nuts/seeds/pulses",
+   19
+  ],
+  "46": [
+   "Coconut",
+   20
+  ],
+  "47": [
+   "Kola nut",
+   20
+  ],
+  "48": [
+   "Cashew nut",
+   20
+  ],
+  "50": [
+   "Palm oil",
+   20
+  ],
+  "51": [
+   "Butter/ Margarine",
+   20
+  ],
+  "52": [
+   "Groundnuts Oil",
+   20
+  ],
+  "53": [
+   "Other oil and Fat",
+   20
+  ],
+  "54": [
+   "Sheabutter",
+   20
+  ],
+  "55": [
+   "Coconut oil",
+   20
+  ],
+  "56": [
+   "Animal fat",
+   20
+  ],
+  "60": [
+   "Bananas",
+   20
+  ],
+  "61": [
+   "Orange/tangerine",
+   20
+  ],
+  "62": [
+   "Mangoes",
+   20
+  ],
+  "63": [
+   "Avocado pear",
+   20
+  ],
+  "64": [
+   "Pineapples",
+   20
+  ],
+  "65": [
+   "Fruit canned",
+   20
+  ],
+  "66": [
+   "Other fruits",
+   20
+  ],
+  "67": [
+   "Pawpaw",
+   20
+  ],
+  "68": [
+   "Watermelon",
+   20
+  ],
+  "69": [
+   "Apples",
+   20
+  ],
+  "70": [
+   "Tomatoes",
+   21
+  ],
+  "71": [
+   "Tomato puree (canned)",
+   21
+  ],
+  "72": [
+   "Onions",
+   21
+  ],
+  "73": [
+   "Garden eggs/egg plant",
+   21
+  ],
+  "74": [
+   "Okra - fresh",
+   21
+  ],
+  "75": [
+   "Okra - dried",
+   21
+  ],
+  "76": [
+   "Fresh Pepper",
+   21
+  ],
+  "77": [
+   "Dry Pepper",
+   21
+  ],
+  "78": [
+   "Leaves (Cocoyam, Spinach, etc.)",
+   21
+  ],
+  "79": [
+   "Other vegetables (fresh or canned)",
+   21
+  ],
+  "80": [
+   "Chicken",
+   21
+  ],
+  "81": [
+   "Duck",
+   21
+  ],
+  "82": [
+   "Other domestic poultry",
+   21
+  ],
+  "83": [
+   "Agricultural eggs",
+   21
+  ],
+  "84": [
+   "Local eggs",
+   21
+  ],
+  "85": [
+   "Other eggs (not chicken)",
+   21
+  ],
+  "90": [
+   "Beef",
+   21
+  ],
+  "91": [
+   "Mutton",
+   21
+  ],
+  "92": [
+   "Pork",
+   21
+  ],
+  "93": [
+   "Goat",
+   21
+  ],
+  "94": [
+   "Wild game/bush meat",
+   21
+  ],
+  "95": [
+   "Canned beef/corned beef",
+   21
+  ],
+  "96": [
+   "Other meat (excl. poultry)",
+   22
+  ],
+  "100": [
+   "Fish - fresh",
+   22
+  ],
+  "101": [
+   "Fish - frozen",
+   22
+  ],
+  "102": [
+   "Fish - smoked",
+   22
+  ],
+  "103": [
+   "Fish - dried",
+   22
+  ],
+  "104": [
+   "Snails",
+   22
+  ],
+  "105": [
+   "Seafood (lobster, crab, prawns, etc)",
+   22
+  ],
+  "106": [
+   "Canned fish/seafood",
+   22
+  ],
+  "107": [
+   "Other fish or seafood",
+   22
+  ],
+  "110": [
+   "Fresh milk",
+   22
+  ],
+  "111": [
+   "Milk powder",
+   22
+  ],
+  "112": [
+   "Baby milk powder",
+   22
+  ],
+  "113": [
+   "Milk tinned (unsweetened)",
+   22
+  ],
+  "114": [
+   "Cheese (wara)",
+   22
+  ],
+  "115": [
+   "Other milk products",
+   22
+  ],
+  "120": [
+   "Coffee",
+   22
+  ],
+  "121": [
+   "Chocolate drinks (including Milo)",
+   22
+  ],
+  "122": [
+   "Tea",
+   22
+  ],
+  "130": [
+   "Sugar",
+   22
+  ],
+  "131": [
+   "Jams",
+   22
+  ],
+  "132": [
+   "Honey",
+   23
+  ],
+  "133": [
+   "Other sweets and confectionary",
+   23
+  ],
+  "140": [
+   "Condiments (salt, spices, pepper, etc)",
+   23
+  ],
+  "141": [
+   "Salt",
+   23
+  ],
+  "142": [
+   "Unground Ogbono",
+   23
+  ],
+  "143": [
+   "Ground Ogbono",
+   23
+  ],
+  "144": [
+   "Ground Pepper",
+   23
+  ],
+  "145": [
+   "Melon (shelled)",
+   23
+  ],
+  "146": [
+   "Melon (unshelled)",
+   23
+  ],
+  "147": [
+   "Mellon (ground)",
+   23
+  ],
+  "150": [
+   "Bottled water",
+   23
+  ],
+  "151": [
+   "Sachet water",
+   23
+  ],
+  "152": [
+   "Malt drinks",
+   23
+  ],
+  "153": [
+   "Soft drinks (Coca Cola, spirit, etc)",
+   23
+  ],
+  "154": [
+   "Fruit juice canned/Pack",
+   23
+  ],
+  "155": [
+   "Other non-alcoholic drinks",
+   23
+  ],
+  "160": [
+   "Beer (local and imported)",
+   23
+  ],
+  "161": [
+   "Palm wine",
+   23
+  ],
+  "162": [
+   "Pito",
+   23
+  ],
+  "163": [
+   "Gin",
+   23
+  ],
+  "164": [
+   "Other alcoholic beverages",
+   23
+  ]
+ },
+ "W4-PH": {
+  "10": [
+   "Guinea corn/sorghum",
+   13
+  ],
+  "11": [
+   "Millet",
+   13
+  ],
+  "13": [
+   "Rice - local",
+   13
+  ],
+  "14": [
+   "Rice - imported",
+   13
+  ],
+  "16": [
+   "Maize flour",
+   13
+  ],
+  "17": [
+   "Yam flour",
+   13
+  ],
+  "18": [
+   "Cassava flour",
+   13
+  ],
+  "19": [
+   "Wheat flour",
+   13
+  ],
+  "20": [
+   "Maize (Unshelled/On the cob)",
+   13
+  ],
+  "22": [
+   "Maize (Shelled/Off the cob)",
+   13
+  ],
+  "23": [
+   "Other grains and flour",
+   13
+  ],
+  "25": [
+   "Bread",
+   14
+  ],
+  "26": [
+   "Cake",
+   14
+  ],
+  "27": [
+   "Buns/Pofpof/Donuts",
+   14
+  ],
+  "28": [
+   "Biscuits",
+   14
+  ],
+  "29": [
+   "Meat Pie/Sausage Roll",
+   14
+  ],
+  "30": [
+   "Cassava - roots",
+   14
+  ],
+  "31": [
+   "Yam - roots",
+   14
+  ],
+  "32": [
+   "Gari - white",
+   14
+  ],
+  "33": [
+   "Gari - yellow",
+   14
+  ],
+  "34": [
+   "Cocoyam",
+   14
+  ],
+  "35": [
+   "Plantains",
+   14
+  ],
+  "36": [
+   "Sweet potatoes",
+   14
+  ],
+  "37": [
+   "Potatoes",
+   14
+  ],
+  "38": [
+   "Other roots and tuber",
+   14
+  ],
+  "40": [
+   "Soya beans",
+   14
+  ],
+  "41": [
+   "Brown beans",
+   14
+  ],
+  "42": [
+   "White beans",
+   14
+  ],
+  "43": [
+   "Groundnuts (Unshelled)",
+   14
+  ],
+  "44": [
+   "Groundnuts (Shelled)",
+   14
+  ],
+  "45": [
+   "Other nuts/seeds/pulses",
+   14
+  ],
+  "46": [
+   "Coconut",
+   14
+  ],
+  "47": [
+   "Kola nut",
+   14
+  ],
+  "48": [
+   "Cashew nut",
+   14
+  ],
+  "50": [
+   "Palm oil",
+   15
+  ],
+  "51": [
+   "Butter/ Margarine",
+   15
+  ],
+  "52": [
+   "Groundnuts Oil",
+   15
+  ],
+  "53": [
+   "Other oil and Fat",
+   15
+  ],
+  "54": [
+   "Sheabutter",
+   15
+  ],
+  "55": [
+   "Coconut oil",
+   15
+  ],
+  "56": [
+   "Animal fat",
+   15
+  ],
+  "60": [
+   "Bananas",
+   15
+  ],
+  "61": [
+   "Orange/tangerine",
+   15
+  ],
+  "62": [
+   "Mangoes",
+   15
+  ],
+  "63": [
+   "Avocado pear",
+   15
+  ],
+  "64": [
+   "Pineapples",
+   15
+  ],
+  "65": [
+   "Fruit canned",
+   15
+  ],
+  "66": [
+   "Other fruits",
+   15
+  ],
+  "67": [
+   "Pawpaw",
+   15
+  ],
+  "68": [
+   "Watermelon",
+   15
+  ],
+  "69": [
+   "Apples",
+   15
+  ],
+  "70": [
+   "Tomatoes",
+   16
+  ],
+  "71": [
+   "Tomato puree (canned)",
+   16
+  ],
+  "72": [
+   "Onions",
+   16
+  ],
+  "73": [
+   "Garden eggs/egg plant",
+   16
+  ],
+  "74": [
+   "Okra - fresh",
+   16
+  ],
+  "75": [
+   "Okra - dried",
+   16
+  ],
+  "76": [
+   "Fresh Pepper",
+   16
+  ],
+  "77": [
+   "Dry Pepper",
+   16
+  ],
+  "78": [
+   "Leaves (Cocoyam, Spinach, etc.)",
+   16
+  ],
+  "79": [
+   "Other vegetables (fresh or canned)",
+   16
+  ],
+  "80": [
+   "Chicken",
+   16
+  ],
+  "81": [
+   "Duck",
+   16
+  ],
+  "82": [
+   "Other domestic poultry",
+   16
+  ],
+  "83": [
+   "Agricultural eggs",
+   16
+  ],
+  "84": [
+   "Local eggs",
+   16
+  ],
+  "85": [
+   "Other eggs (not chicken)",
+   16
+  ],
+  "90": [
+   "Beef",
+   16
+  ],
+  "91": [
+   "Mutton",
+   16
+  ],
+  "92": [
+   "Pork",
+   16
+  ],
+  "93": [
+   "Goat",
+   16
+  ],
+  "94": [
+   "Wild game/bush meat",
+   16
+  ],
+  "95": [
+   "Canned beef/corned beef",
+   16
+  ],
+  "96": [
+   "Other meat (excl. poultry)",
+   16
+  ],
+  "100": [
+   "Fish - fresh",
+   17
+  ],
+  "101": [
+   "Fish - frozen",
+   17
+  ],
+  "102": [
+   "Fish - smoked",
+   17
+  ],
+  "103": [
+   "Fish - dried",
+   17
+  ],
+  "104": [
+   "Snails",
+   17
+  ],
+  "105": [
+   "Seafood (lobster, crab, prawns, etc)",
+   17
+  ],
+  "106": [
+   "Canned fish/seafood",
+   17
+  ],
+  "107": [
+   "Other fish or seafood",
+   17
+  ],
+  "110": [
+   "Fresh milk",
+   17
+  ],
+  "111": [
+   "Milk powder",
+   17
+  ],
+  "112": [
+   "Baby milk powder",
+   17
+  ],
+  "113": [
+   "Milk tinned (unsweetened)",
+   17
+  ],
+  "114": [
+   "Cheese (wara)",
+   17
+  ],
+  "115": [
+   "Other milk products",
+   17
+  ],
+  "120": [
+   "Coffee",
+   17
+  ],
+  "121": [
+   "Chocolate drinks (including Milo)",
+   17
+  ],
+  "122": [
+   "Tea",
+   17
+  ],
+  "130": [
+   "Sugar",
+   17
+  ],
+  "131": [
+   "Jams",
+   17
+  ],
+  "132": [
+   "Honey",
+   17
+  ],
+  "133": [
+   "Other sweets and confectionary",
+   17
+  ],
+  "140": [
+   "Condiments (salt, spices, pepper, etc)",
+   18
+  ],
+  "141": [
+   "Salt",
+   18
+  ],
+  "142": [
+   "Unground Ogbono",
+   18
+  ],
+  "143": [
+   "Ground Ogbono",
+   18
+  ],
+  "144": [
+   "Ground Pepper",
+   18
+  ],
+  "145": [
+   "Melon (shelled)",
+   18
+  ],
+  "146": [
+   "Melon (unshelled)",
+   18
+  ],
+  "147": [
+   "Mellon (ground)",
+   18
+  ],
+  "150": [
+   "Bottled water",
+   18
+  ],
+  "151": [
+   "Sachet water",
+   18
+  ],
+  "152": [
+   "Malt drinks",
+   18
+  ],
+  "153": [
+   "Soft drinks (Coca Cola, spirit, etc)",
+   18
+  ],
+  "154": [
+   "Fruit juice canned/Pack",
+   18
+  ],
+  "155": [
+   "Other non-alcoholic drinks",
+   18
+  ],
+  "160": [
+   "Beer (local and imported)",
+   18
+  ],
+  "161": [
+   "Palm wine",
+   18
+  ],
+  "162": [
+   "Pito",
+   18
+  ],
+  "163": [
+   "Gin",
+   18
+  ],
+  "164": [
+   "Other alcoholic beverages",
+   18
+  ]
+ },
+ "W5-PH": {
+  "10": [
+   "Guinea corn/sorghum",
+   18
+  ],
+  "11": [
+   "Millet",
+   18
+  ],
+  "13": [
+   "Rice - local",
+   18
+  ],
+  "14": [
+   "Rice - imported",
+   18
+  ],
+  "16": [
+   "Maize flour",
+   18
+  ],
+  "17": [
+   "Yam flour",
+   18
+  ],
+  "18": [
+   "Cassava flour",
+   18
+  ],
+  "19": [
+   "Wheat flour",
+   18
+  ],
+  "20": [
+   "Maize (Unshelled/On the cob)",
+   18
+  ],
+  "22": [
+   "Maize (Shelled/Off the cob)",
+   18
+  ],
+  "23": [
+   "Other grains and flour (specify)",
+   18
+  ],
+  "25": [
+   "Bread",
+   19
+  ],
+  "26": [
+   "Cake",
+   19
+  ],
+  "27": [
+   "Buns/Pufpuf/Donuts",
+   19
+  ],
+  "28": [
+   "Biscuits",
+   19
+  ],
+  "29": [
+   "Meat Pie/Sausage Roll",
+   19
+  ],
+  "30": [
+   "Cassava - roots",
+   19
+  ],
+  "31": [
+   "Yam - roots",
+   19
+  ],
+  "32": [
+   "Gari - white",
+   19
+  ],
+  "33": [
+   "Gari - yellow",
+   19
+  ],
+  "34": [
+   "Cocoyam",
+   19
+  ],
+  "35": [
+   "Plantains",
+   19
+  ],
+  "36": [
+   "Sweet potatoes",
+   19
+  ],
+  "37": [
+   "Irish Potatoes",
+   19
+  ],
+  "38": [
+   "Other roots and tuber (specify)",
+   19
+  ],
+  "40": [
+   "Soya beans",
+   19
+  ],
+  "41": [
+   "Brown beans",
+   19
+  ],
+  "42": [
+   "White beans",
+   19
+  ],
+  "43": [
+   "Groundnuts (Unshelled)",
+   19
+  ],
+  "44": [
+   "Groundnuts (Shelled)",
+   19
+  ],
+  "45": [
+   "Other nuts/seeds/pulses (specify)",
+   19
+  ],
+  "46": [
+   "Coconut",
+   19
+  ],
+  "47": [
+   "Kola nut",
+   19
+  ],
+  "48": [
+   "Cashew nut",
+   19
+  ],
+  "50": [
+   "Palm oil",
+   20
+  ],
+  "51": [
+   "Butter/ Margarine",
+   20
+  ],
+  "52": [
+   "Groundnuts Oil",
+   20
+  ],
+  "53": [
+   "Other oil and Fat (specify)",
+   20
+  ],
+  "56": [
+   "Animal fat",
+   20
+  ],
+  "60": [
+   "Bananas",
+   20
+  ],
+  "61": [
+   "Orange/tangerine",
+   20
+  ],
+  "62": [
+   "Mangoes",
+   20
+  ],
+  "63": [
+   "Avocado pear",
+   20
+  ],
+  "64": [
+   "Pineapples",
+   20
+  ],
+  "66": [
+   "Other fruits",
+   20
+  ],
+  "67": [
+   "Pawpaw",
+   20
+  ],
+  "68": [
+   "Watermelon",
+   20
+  ],
+  "69": [
+   "Apples",
+   20
+  ],
+  "70": [
+   "Tomatoes",
+   20
+  ],
+  "71": [
+   "Tomato puree/paste (canned/sachet)",
+   20
+  ],
+  "72": [
+   "Onions",
+   20
+  ],
+  "73": [
+   "Garden eggs/egg plant",
+   20
+  ],
+  "74": [
+   "Okra - fresh",
+   20
+  ],
+  "75": [
+   "Okra - dried",
+   20
+  ],
+  "76": [
+   "Fresh Pepper",
+   20
+  ],
+  "78": [
+   "Leaves (Cocoyam, Spinach, etc.)",
+   20
+  ],
+  "79": [
+   "Other vegetables (fresh or canned) (specify)",
+   20
+  ],
+  "80": [
+   "Chicken",
+   21
+  ],
+  "81": [
+   "Duck",
+   21
+  ],
+  "82": [
+   "Other domestic poultry",
+   21
+  ],
+  "83": [
+   "Agricultural eggs",
+   21
+  ],
+  "84": [
+   "Local eggs",
+   21
+  ],
+  "85": [
+   "Other eggs (not chicken) (specify)",
+   21
+  ],
+  "90": [
+   "Beef",
+   21
+  ],
+  "91": [
+   "Mutton",
+   21
+  ],
+  "92": [
+   "Pork",
+   21
+  ],
+  "93": [
+   "Goat",
+   21
+  ],
+  "94": [
+   "Wild game/bush meat",
+   21
+  ],
+  "95": [
+   "Canned beef/corned beef",
+   21
+  ],
+  "96": [
+   "Other meat (excl. poultry) (specify)",
+   21
+  ],
+  "100": [
+   "Fish - fresh",
+   21
+  ],
+  "101": [
+   "Fish - frozen",
+   21
+  ],
+  "102": [
+   "Fish - smoked",
+   21
+  ],
+  "103": [
+   "Fish - dried",
+   21
+  ],
+  "104": [
+   "Snails",
+   21
+  ],
+  "105": [
+   "Seafood (lobster, crab, prawns, etc)",
+   21
+  ],
+  "106": [
+   "Canned fish/seafood",
+   21
+  ],
+  "107": [
+   "Other fish or seafood (specify)",
+   21
+  ],
+  "110": [
+   "Fresh milk",
+   22
+  ],
+  "111": [
+   "Milk powder",
+   22
+  ],
+  "112": [
+   "Baby milk powder",
+   22
+  ],
+  "113": [
+   "Milk tinned",
+   22
+  ],
+  "114": [
+   "Cheese (wara)",
+   22
+  ],
+  "115": [
+   "Other milk products (specify)",
+   22
+  ],
+  "120": [
+   "Coffee",
+   22
+  ],
+  "121": [
+   "Chocolate drinks (including Milo)",
+   22
+  ],
+  "122": [
+   "Tea",
+   22
+  ],
+  "130": [
+   "Sugar",
+   22
+  ],
+  "132": [
+   "Honey",
+   22
+  ],
+  "133": [
+   "Other sweets and confectionary (specify)",
+   22
+  ],
+  "141": [
+   "Salt",
+   22
+  ],
+  "142": [
+   "Unground Ogbono",
+   22
+  ],
+  "143": [
+   "Ground Ogbono",
+   22
+  ],
+  "144": [
+   "Ground Pepper",
+   22
+  ],
+  "145": [
+   "Melon (shelled)",
+   22
+  ],
+  "146": [
+   "Melon (unshelled)",
+   22
+  ],
+  "147": [
+   "Melon (ground)",
+   22
+  ],
+  "148": [
+   "Other Spices (e.g. maggi)",
+   22
+  ],
+  "150": [
+   "Bottled water",
+   23
+  ],
+  "151": [
+   "Sachet water",
+   23
+  ],
+  "152": [
+   "Malt drinks",
+   23
+  ],
+  "153": [
+   "Soft drinks (Coca Cola, Mirinda, etc)",
+   23
+  ],
+  "154": [
+   "Fruit juice canned/Pack",
+   23
+  ],
+  "155": [
+   "Other non-alcoholic drinks (specify)",
+   23
+  ],
+  "160": [
+   "Beer (local and imported)",
+   23
+  ],
+  "161": [
+   "Palm wine",
+   23
+  ],
+  "162": [
+   "Pito",
+   23
+  ],
+  "163": [
+   "Gin",
+   23
+  ],
+  "164": [
+   "Other alcoholic beverages",
+   23
+  ],
+  "601": [
+   "Guava",
+   20
+  ]
+ },
+ "W1-PP-printed": {
+  "1": [
+   "Guinea corn/sorghum",
+   5
+  ],
+  "2": [
+   "Millet",
+   5
+  ],
+  "3": [
+   "Maize - white",
+   5
+  ],
+  "4": [
+   "Maize - yellow",
+   5
+  ],
+  "5": [
+   "Rice - local",
+   5
+  ],
+  "7": [
+   "Rice - imported",
+   5
+  ],
+  "8": [
+   "Other grains",
+   5
+  ],
+  "9": [
+   "Bread",
+   5
+  ],
+  "10": [
+   "Buns",
+   5
+  ],
+  "11": [
+   "Biscuits",
+   5
+  ],
+  "20": [
+   "Maize flour",
+   5
+  ],
+  "21": [
+   "Millet flour",
+   5
+  ],
+  "22": [
+   "Wheat flour",
+   5
+  ],
+  "23": [
+   "Yam flour",
+   5
+  ],
+  "24": [
+   "Cassava flour",
+   5
+  ],
+  "25": [
+   "Plantain flour",
+   5
+  ],
+  "26": [
+   "Other flour",
+   5
+  ],
+  "30": [
+   "Cassava - roots",
+   5
+  ],
+  "31": [
+   "Yam - roots",
+   5
+  ],
+  "32": [
+   "Gari - white",
+   5
+  ],
+  "33": [
+   "Gari - yellow",
+   5
+  ],
+  "34": [
+   "Cocoyam",
+   5
+  ],
+  "35": [
+   "Plantains",
+   5
+  ],
+  "36": [
+   "Sweet potatoes",
+   5
+  ],
+  "37": [
+   "Potatoes",
+   5
+  ],
+  "38": [
+   "Other roots and tuber",
+   5
+  ],
+  "39": [
+   "Fufu/Cassava dough (akpu)",
+   5
+  ],
+  "50": [
+   "Cow peas/brown/white",
+   5
+  ],
+  "51": [
+   "Soya beans",
+   5
+  ],
+  "52": [
+   "Moi moi",
+   5
+  ],
+  "53": [
+   "Akara (bean cake)",
+   5
+  ],
+  "54": [
+   "Kulikuli (groundnut cake)",
+   5
+  ],
+  "55": [
+   "Locust bean (dawadawa)",
+   5
+  ],
+  "60": [
+   "Bambara nuts",
+   5
+  ],
+  "61": [
+   "Groundnuts",
+   5
+  ],
+  "62": [
+   "Kola nuts",
+   5
+  ],
+  "63": [
+   "Palm nuts",
+   5
+  ],
+  "64": [
+   "Cashew nuts",
+   5
+  ],
+  "65": [
+   "Coconuts",
+   6
+  ],
+  "66": [
+   "Other pulses",
+   6
+  ],
+  "67": [
+   "Other nuts/seeds",
+   6
+  ],
+  "70": [
+   "Palm oil",
+   6
+  ],
+  "71": [
+   "Coconut oil",
+   6
+  ],
+  "72": [
+   "Shea butter",
+   6
+  ],
+  "73": [
+   "Butter",
+   6
+  ],
+  "74": [
+   "Cheese",
+   6
+  ],
+  "75": [
+   "Animal fats",
+   6
+  ],
+  "76": [
+   "Groundnut oil",
+   6
+  ],
+  "78": [
+   "Margarine",
+   6
+  ],
+  "79": [
+   "Other oils and fats",
+   6
+  ],
+  "80": [
+   "Bananas",
+   6
+  ],
+  "81": [
+   "Water melon",
+   6
+  ],
+  "82": [
+   "Orange/tangerine",
+   6
+  ],
+  "83": [
+   "Mangoes",
+   6
+  ],
+  "84": [
+   "Paw paw",
+   6
+  ],
+  "85": [
+   "Avocado pear",
+   6
+  ],
+  "86": [
+   "Pineapples",
+   6
+  ],
+  "87": [
+   "Pineapple juice",
+   6
+  ],
+  "88": [
+   "Orange juice",
+   6
+  ],
+  "89": [
+   "Other fruits/juices",
+   6
+  ],
+  "90": [
+   "OIL AND FATS Fruit canned",
+   6
+  ],
+  "91": [
+   "Fruit juice canned",
+   6
+  ],
+  "101": [
+   "Tomatoes",
+   6
+  ],
+  "102": [
+   "Onions",
+   6
+  ],
+  "103": [
+   "Garden eggs/egg plant",
+   6
+  ],
+  "104": [
+   "Okra - fresh",
+   6
+  ],
+  "105": [
+   "Okra - dried",
+   6
+  ],
+  "106": [
+   "Pepper",
+   6
+  ],
+  "107": [
+   "Cabbage lettuce",
+   6
+  ],
+  "108": [
+   "FRUITS/JUICES: FRESH (not canned) Cucumber",
+   6
+  ],
+  "109": [
+   "Cocoyam leaves",
+   6
+  ],
+  "110": [
+   "Other vegetables",
+   6
+  ],
+  "111": [
+   "Tomato puree",
+   6
+  ],
+  "112": [
+   "Other canned vegetables",
+   6
+  ],
+  "120": [
+   "Chicken",
+   6
+  ],
+  "121": [
+   "Duck",
+   6
+  ],
+  "122": [
+   "Guinea Fowl",
+   7
+  ],
+  "123": [
+   "Game Birds",
+   7
+  ],
+  "124": [
+   "Other domestic poultry",
+   7
+  ],
+  "125": [
+   "Agricultural eggs",
+   7
+  ],
+  "126": [
+   "Local eggs",
+   7
+  ],
+  "127": [
+   "Other eggs (not chicken)",
+   7
+  ],
+  "130": [
+   "Beef",
+   7
+  ],
+  "131": [
+   "Mutton",
+   7
+  ],
+  "132": [
+   "Pork",
+   7
+  ],
+  "133": [
+   "Goat",
+   7
+  ],
+  "134": [
+   "Wild game meat",
+   7
+  ],
+  "135": [
+   "Other meat (excl. poultry)",
+   7
+  ],
+  "136": [
+   "Canned beef",
+   7
+  ],
+  "140": [
+   "Fish - fresh",
+   7
+  ],
+  "141": [
+   "Fish - frozen",
+   7
+  ],
+  "142": [
+   "Fish - smoked",
+   7
+  ],
+  "143": [
+   "Fish - dried",
+   7
+  ],
+  "144": [
+   "Fish - fried",
+   7
+  ],
+  "145": [
+   "Snails",
+   7
+  ],
+  "147": [
+   "Canned fish/seafood",
+   7
+  ],
+  "150": [
+   "Fresh milk",
+   7
+  ],
+  "151": [
+   "Milk powder",
+   7
+  ],
+  "152": [
+   "Baby milk powder",
+   7
+  ],
+  "153": [
+   "MEAT Milk tinned (unsweetened)",
+   7
+  ],
+  "155": [
+   "Yoghurt",
+   7
+  ],
+  "159": [
+   "Other milk products",
+   7
+  ],
+  "160": [
+   "Coffee",
+   7
+  ],
+  "161": [
+   "Chocolate drinks (including Milo)",
+   7
+  ],
+  "163": [
+   "FISH AND SEAFOOD: FRESH, SMOKED, DRIED AND FRIED Other beverage",
+   7
+  ],
+  "170": [
+   "Cooked rice and stew",
+   7
+  ],
+  "172": [
+   "Tuo and soup",
+   7
+  ],
+  "173": [
+   "Amala and soup",
+   7
+  ],
+  "174": [
+   "Gari and soup",
+   7
+  ],
+  "175": [
+   "Pounded yam and soup",
+   7
+  ],
+  "176": [
+   "Other hotel/rests. meals",
+   8
+  ],
+  "180": [
+   "Sugar",
+   8
+  ],
+  "181": [
+   "Jams",
+   8
+  ],
+  "182": [
+   "Honey",
+   8
+  ],
+  "183": [
+   "Confectionary - not frozen",
+   8
+  ],
+  "184": [
+   "Ice cream, ice lollipops",
+   8
+  ],
+  "185": [
+   "Other sweets and confectionary",
+   8
+  ],
+  "191": [
+   "Other foods (not mentioned)",
+   8
+  ],
+  "200": [
+   "Bottled water",
+   8
+  ],
+  "201": [
+   "Sachet water",
+   8
+  ],
+  "202": [
+   "Malt drinks",
+   8
+  ],
+  "203": [
+   "Soft drinks (Coca Cola, spirit, etc)",
+   8
+  ],
+  "204": [
+   "Kunu",
+   8
+  ],
+  "205": [
+   "Other non-alcoholic drinks",
+   8
+  ],
+  "900": [
+   "Beer (local and imported)",
+   8
+  ],
+  "901": [
+   "Stout (local and imported)",
+   8
+  ],
+  "905": [
+   "Akpeteshie and other spirits",
+   8
+  ],
+  "907": [
+   "Other wines (local and imported)",
+   8
+  ],
+  "908": [
+   "Other alcoholic beverages",
+   8
+  ],
+  "951": [
+   "Cigarette",
+   8
+  ],
+  "952": [
+   "OTHER MISCELLANEOUS FOODS Tobacco (processed)",
+   8
+  ],
+  "953": [
+   "Other tobacco (excl. cigarettes)",
+   8
+  ]
+ }
+}
