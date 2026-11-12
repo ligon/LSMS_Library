@@ -561,7 +561,7 @@ class TestFromConfigByColumn:
                 assert type(after) is type(before) is RecallRecord
                 for column in ("Quantity", "Expenditure"):
                     assert after.exposure_days(column) == before.exposure_days(column), key
-        assert len(seen) == 68
+        assert len(seen) == 69
 
 
 # Exact pre-correction configuration method, function name only changed.

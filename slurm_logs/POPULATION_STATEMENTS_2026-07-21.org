@@ -1249,7 +1249,7 @@ Exclusions, verbatim as recorded:
 Extractor's notes (editorial prose about the evidence, not survey text):
 
 #+begin_quote
-Registered 2026-11-04 (GH #552) and NOT YET WIRED: no table of this wave is served.  2021-22 is a panel revisit of the 2018/19 clusters, so its documentation describes the 2018/19 design rather than declaring its own universe. Local English BID, section 4.1, VERBATIM: "The 2021/22 survey is a panel survey by cluster, and its sampling plan is based on that of the 2018/19 survey."  Same section: "In 2021/22, the strategy is to revisit the same clusters."  The 2018-19 universe statement is the natural candidate to inherit; that inheritance is an INFERENCE, not a documented claim, and needs a human decision.
+Registered and wired 2026-11-04 (GH #552), every table 2018-19 serves, under ids with no link to 2018-19.  2021-22 is a panel revisit of the 2018/19 clusters, so its documentation describes the 2018/19 design rather than declaring its own universe. Local English BID, section 4.1, VERBATIM: "The 2021/22 survey is a panel survey by cluster, and its sampling plan is based on that of the 2018/19 survey."  Same section: "In 2021/22, the strategy is to revisit the same clusters."  The 2018-19 universe statement is the natural candidate to inherit; that inheritance is an INFERENCE, not a documented claim, and needs a human decision.
 #+end_quote
 
 ** Burkina_Faso

@@ -7,7 +7,7 @@
 # Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
 
 Benin::food_acquired::7day-purchase-at-last-purchase-unit-value:
-  waves: ['2018-19']
+  waves: ['2018-19', '2021-22']
   columns: [Expenditure]
   rows: {s: purchased}
   rule: >-
@@ -54,7 +54,10 @@ Benin::food_acquired::7day-purchase-at-last-purchase-unit-value:
         4,143 because the last purchase used a different unit CODE, 3,740
         because it used the same code in a different SIZE (Petit / Moyen /
         Grand / Taille unique), which is a different container and so a
-        different price per unit.
+        different price per unit.  2021-22: 16,429 of the 156,999 SERVED purchased rows
+        (10.5%).  On source rows with a purchased quantity, 16,467 of 157,826: 11,289 with
+        no last purchase, 4,037 in a different unit code, 1,141 in the same code at a
+        different size.
       basis: variable-label
       evidence: >-
         no EHCVM wave distributes a unit-conversion table;
@@ -68,6 +71,7 @@ Benin::food_acquired::7day-purchase-at-last-purchase-unit-value:
         7-day consumption s07bq03a (which would put the value of own-produced
         and gifted food into Expenditure) and B = net of own production only.
         2018-19: A 75,023,618, B 73,221,530, C (served) 68,929,997 FCFA, against a raw s07bq08 total of 87,287,927.
+        2021-22: A 94,742,444, B 92,634,171, C (served) 82,870,829 FCFA, against a raw s07bq08 total of 111,687,482.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
     - text: >-
@@ -79,6 +83,7 @@ Benin::food_acquired::7day-purchase-at-last-purchase-unit-value:
         it is checked and not served.  Own production keeps the identical
         treatment it already had (s = 'produced' from s07bq04, Expenditure NA).
         2018-19: 18,632 inkind rows carrying 53,318 units, 0 with an Expenditure.
+        2021-22: 27,522 inkind rows carrying 77,695 units, 0 with an Expenditure.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
   validated_against: >-
@@ -93,6 +98,14 @@ Benin::food_acquired::7day-purchase-at-last-purchase-unit-value:
     rows are served with Expenditure NA rather than with that imputation.  The
     instrument is the same in all twelve waves (identical s07bq0* Stata
     labels), so the reading carries by inference, not by measurement here.
+    2021-22, ehcvm_conso_ben2021.dta, whose codpr does share s07bq01's codes: on the 1,245
+    (household, product) rows where the candidates differ and an Achat row exists, the rule
+    x 365/7 is within 1% of depan(Achat) for 90.6%, against 22.6% for the own-production-only
+    residual and 0.3% for the gross quantity; s07bq05 * uv is within 1% of depan(Don) for
+    90.6% of 14,014 rows; median ratio over all 141,359 joined rows 1.0.  THIS VALIDATES THE
+    ARITHMETIC, NOT THE QUANTITY: a rescaled s07bq03a would pass it, as Togo 2021-22's does.
+    What says this quantity is not rescaled is its own grid and q3/q4 mode, in
+    _/CONTENTS.org, "2021-22 wired".
   contents: 'Benin/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
 
@@ -139,6 +152,169 @@ Benin::community_prices::one-item-per-price:
     the instrument only.  No held file records the quantity behind a price, so
     the one-item reading cannot be checked against data.
   contents: 'Benin/_/CONTENTS.org, "2018-19 community prices are wired (GH #1226)"'
+  since: '2026-11-04'
+
+Benin::crop_production::hh-crop-sale-single-row:
+  waves: ['2021-22']
+  columns: [Quantity_sold, Unit_sold, Value_sold]
+  rule: >-
+    s16d records a sale for the household and crop, with no plot.  A sale is a
+    record with a positive s16dq05a or s16dq06, after the file's exact repeats are
+    removed.  Where the household has exactly one s16c row for the crop, the sale is
+    served on that row: Quantity_sold = s16dq05a, Unit_sold = s16dq05b, Value_sold =
+    s16dq06, as recorded, and that row carries this key.  What is derived is the
+    ATTACHMENT, not the numbers.  Any other sale is served on one row of that household
+    and crop with plot_id = 'Farm-level' and no key, because its index value already
+    discloses it.  No sale is split, summed, scaled or dropped.  This key shares a row
+    with harvest-to-date through derivations.MULTI_SEP, in sorted order.
+  function: lsms_library.ehcvm:derive_hh_crop_sale_attachment
+  inputs: lsms_library.countries.Benin.2021-22._.mapping:inputs_hh_crop_sale
+  raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq06]
+  assumptions:
+    - text: >-
+        s16d asks the sale once per crop, with no plot, and s16c records no sale.  Where
+        the household has one harvest row for the crop, no other row can hold the sale.
+        The sale is NOT thereby a share of that row's Quantity, and it may be in another
+        unit: Unit_sold says which.
+      basis: variable-label
+      evidence: >-
+        s16d_me_ben2021.dta has no field or parcel variable; s16dq05a "16D.05a. Quelle
+        est la quantite de ce produit qui a deja ete vendue ?"; s16dq06 "16D.06. Quel a
+        ete le montant tire de la vente de ce produit?".  s16c_me_ben2021.dta carries
+        s16cq02 and s16cq03 and no sale variable.
+    - text: >-
+        a sale of a crop on two or more rows is not allocated among them, since any split
+        would be invented.  It stays with the household and crop on a Farm-level row,
+        with u = 'Unknown', where gross_crop_revenue and median_price_valuation can read
+        it.  That row has no harvest Quantity.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-03, option (d), GH #824, for Mali 2021-22 and applied here
+        by the brief of GH #552; the Farm-level convention in lsms_library/data_info.yml.
+    - text: >-
+        identical s16d lines are one record.  The export repeats a crop's record once
+        per harvest line: 627 of 8,328 rows are exact repeats, 392 of them sales, and
+        no (household, crop) has two different records.
+      basis: modelling-choice
+      evidence: measured 2026-11-04; the same artefact as Niger 2021-22, GH #824
+    - text: >-
+        s16d's crop is matched to s16c's BY CODE.  s16dq01 labels only codes 1-47 and 65, so
+        its 1,089 rows of codes 51-64, 919 of them Soja, have no label, and it spells codes
+        42 and 65 otherwise than s16cq04.  On the codes every one of the 7,701 s16d pairs
+        finds an s16c row; on the labels 1,098 do not.
+      basis: variable-label
+      evidence: value labels of s16dq01 and s16cq04 in the two files; measured 2026-11-04
+  validated_against: >-
+    tests/test_benin_2021_wave.py, whose oracle reads s16c and s16d directly.  Not
+    validated against an external total: no document here reports one.
+  contents: 'Benin/_/CONTENTS.org, "2021-22 wired"'
+  since: '2026-11-04'
+
+Benin::crop_production::harvest-to-date:
+  waves: ['2021-22']
+  columns: [Quantity]
+  rule: >-
+    Identity on a row whose harvest is not finished and which records a quantity: s16cq11
+    = Non with s16cq16a.  The value is served as recorded.  The key names its WINDOW: the
+    question asks the quantity ALREADY harvested, so the row covers a part of the season
+    under a column that otherwise means all of it.  A row with no recorded quantity
+    carries no key.
+  function: lsms_library.ehcvm:derive_harvest_to_date
+  inputs: lsms_library.countries.Benin.2021-22._.mapping:inputs_harvest_to_date
+  raw_variables: [s16cq11, s16cq12, s16cq16a, s16cq16b]
+  assumptions:
+    - text: >-
+        the recorded quantity on an unfinished row is what has been harvested so far, and
+        not the season.  324 of the 970 unfinished rows record one, a median 50% of the
+        area still to harvest; the instrument sends a crop with 100% left to the next crop.
+      basis: variable-label
+      evidence: >-
+        s16c_me_ben2021.dta s16cq16a "16C.16a. Quantite deja recoltee pour la presente
+        campagne 2021/22?", s16cq11 "16C.11. Avez vous fini la recolte de cette culture?",
+        s16cq12 "16C.12. Quel pourcentage de la superficie vous reste-t-il a recolter?"
+  validated_against: >-
+    tests/test_benin_2021_wave.py, whose oracle reads s16c directly.  An identity has
+    nothing to validate but its rows.
+  contents: 'Benin/_/CONTENTS.org, "2021-22 wired"'
+  since: '2026-11-04'
+
+Benin::crop_production::harvest-from-dispositions:
+  waves: ['2021-22']
+  columns: [Quantity, u]
+  rule: >-
+    Where every s16c row of a household's crop answers s16cq11 = Oui, none records
+    s16cq16a, and the positive s16d quantities s16dq02a (consumed), s16dq03a (given),
+    s16dq05a (sold) and s16dq13a (in stock) all state one unit, Quantity is their sum and
+    u that unit.  It goes on the crop's single s16c row, or for two or more rows on the
+    crop's one plot_id = 'Farm-level' row, created if no sale made it, and is never split
+    among plots.  A crop whose dispositions span units, a crop with none, a crop with a
+    recorded quantity and a crop with an unfinished row all stay as recorded.  This key
+    shares a row with hh-crop-sale-single-row through derivations.MULTI_SEP, in sorted order.
+  function: lsms_library.ehcvm:derive_hh_crop_harvest_total
+  inputs: lsms_library.countries.Benin.2021-22._.mapping:inputs_harvest_from_dispositions
+  raw_variables: [s16cq04, s16cq11, s16cq16a, s16dq01, s16dq02a, s16dq02b, s16dq03a, s16dq03b,
+                  s16dq05a, s16dq05b, s16dq13a, s16dq13b]
+  assumptions:
+    - text: >-
+        a finished harvest was consumed, given, sold or stored, so the four dispositions
+        add up to it.  The instrument asks the quantity of a finished harvest and the file
+        lacks it on 7,907 of 7,964 finished rows, a fielded skip or a release loss.
+      basis: questionnaire
+      evidence: >-
+        ben_ehcvm2_qnr_men_excel_vague1.pdf, PDF p. 87: "(16C.11) Avez vous fini la recolte de
+        cette culture? 1 = Oui >(16C.16)", and 16C.16 on p. 88.  Inside this wave the only test
+        is small: on the 19 finished pairs with a recorded quantity and dispositions in that unit,
+        9 are exact and 10 within 10%, median 1.0, p10 0.16, p90 2.13; on 128 unfinished pairs, 67
+        exact.  Benin 2018-19 holds the harvest and all four dispositions on one row (s16cq12a;
+        s16cq13a, s16cq14a, s16cq16a, s16cq22a).  Selection: finished rows with every positive
+        disposition in the harvest's unit, 5,175, after decoding both of the code lists its unit
+        variables use by vague (a comparison by label reads vague 1 alone, 2,920 rows, 79.1% exact;
+        by code mostly vague 2, 1,738, 92.1%).  The sum equals the harvest exactly on 84.2%, within
+        10% on 87.2%, median ratio 1.000, 5.8% over 1.1 and 7.0% under 0.9; over the 3,572 metric
+        rows the kg totals differ by a ratio of 0.900.  This is consistency within a row, and a
+        respondent may anchor on the harvest just stated.
+    - text: >-
+        not all of a harvest need appear: s16d asks no quantity for seed kept, loss after
+        harvest or animal feed, so the sum can fall short of what was cut.  Not sized.
+      basis: modelling-choice
+      evidence: s16d_me_ben2021.dta variable labels
+    - text: >-
+        units are not converted: no factor exists.  2,009 finished crops span two or more
+        units and stay NA.  Quantities in one unit are added across states: 132 of the 5,237
+        derived crops state two of Grain, Epis/Panicules/coques and N/A in that unit, and those
+        fold to different `condition` tokens, 130,580 of the 45,285,173 kg on metric-named units,
+        0.3%.  They are served under `unknown_condition`, and nothing is held out.
+      basis: modelling-choice
+      evidence: ruling @ligon 2026-11-04, option (b) of GH #1437, for Mali and Burkina Faso; variables s16dq02c, s16dq03c, s16dq05d, s16dq13c
+    - text: >-
+        the sum is as good as its lines, and it inherits the file's large values.  It is not
+        trimmed and no pair is held out for this, so the total is not a statistic: the top four
+        rows hold 75.5% of 2021-22's kg, as four rows hold 54.5% of 2018-19's.  2021-22's four are
+        `Tonne` rows that read as kilograms: cotton 5,800, 2,050 and 20,000, whose sold lines price
+        at 0.28, 0.13 and 0.03 FCFA per kg as tonnes, and maize 6,400, stock only.  Site Q names all
+        four.  Without each wave's top four the totals are 11,119,658 and 15,212,707 kg, 2,521 and
+        2,527 kg per row with a kilogram figure.
+      basis: modelling-choice
+      evidence: >-
+        measured 2026-11-05 from s16c and s16d.  As kilograms the sold lines price at 275, 129 and
+        26.5 FCFA per kg, against a median of 260 on Tonne lines under 100; on the 5,800 and 2,050
+        rows s16dq05c (275, 130) is the implied price and not a weight.  Pure-stand median kg/ha,
+        2018-19 recorded / 2021-22 derived, one crop row on the plot and served Area over 0.01 and at
+        most 100 ha: maize 1,165 / 958, cotton 1,247 / 1,212, sorghum 794 / 700, yam 3,148 / 2,299,
+        rice 1,625 / 1,722, groundnut 1,161 / 1,000, all crops 1,200 / 976.  Any rule for these
+        lines belongs in its own issue.
+    - text: >-
+        a crop with an unfinished row is held out (857 pairs, 201 of them one-unit), because
+        its dispositions cover what is harvested so far.  A crop with a recorded quantity is
+        held out (29 of the finished one-unit pairs), because a recorded harvest is not
+        overridden and a Farm-level total beside it would count it twice.
+      basis: modelling-choice
+      evidence: GH #1437
+  validated_against: >-
+    tests/test_benin_2021_wave.py, whose oracle reads s16c and s16d directly.  Cold build of
+    2021-22: 5,237 keyed rows, 4,982 on the single s16c row and 255 Farm-level.  Not validated
+    against an external total: no document here reports one.
+  contents: 'Benin/_/CONTENTS.org, "2021-22 wired"'
   since: '2026-11-04'
 
 Benin::sample::region-milieu-stratum:

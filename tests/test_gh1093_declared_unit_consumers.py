@@ -163,6 +163,8 @@ def test_country_finalize_attaches_input_declaration_and_feature_keeps_it(monkey
         def __init__(self, name):
             self.name = name
             self.data_scheme = []
+            # A curated country's sampling record reads these (Benin has one since GH #552).
+            self.waves = ['w1']
             self.categorical_mapping = {}
             self._updated_ids_cache = None
             self._augment_index_from_related_tables = lambda df, *args: df

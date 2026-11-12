@@ -1,0 +1,14 @@
+#+title: Categorical mappings of Benin 2021-22 (read before the country's)
+
+# harmonize_crop_condition_ehcvm2 (GH #1436): "Etat du produit", s16cq16d, read by code.
+# This wave has its own three-code list, printed on the questionnaire as "1 = épis/coques,
+# 2 = grains, 3 = NA" (16C.16, PDF p. 88).  2018-19's s16cq12c has five, and its code 3 is
+# Decortique, so 2018-19's table would serve `na` as `shelled`.  The list and the fold are
+# Niger 2021-22's, under the same ruling (@ligon 2026-11-04): none of the three is outside it,
+# so nothing here serves `other_condition`.  The answer rides in `condition_native`.
+#+NAME: harmonize_crop_condition_ehcvm2
+| Code | Preferred Label      | Source Label |
+|------+----------------------+--------------|
+|    1 | unshelled            | Epis/coques  |
+|    2 | shelled              | Grains       |
+|    3 | shell_not_applicable | na           |

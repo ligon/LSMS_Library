@@ -1,9 +1,8 @@
 """Concatenate wave-level plot_features for Benin (GH #167; EHCVM cluster).
 
-Benin has a single EHCVM wave in this repo (2018-19; there is no
-2021-22 EHCVM-II wave).  The wave's ``Benin/2018-19/_/plot_features.py``
-writes a parquet indexed by ``(t, i, plot_id)`` with the canonical
-plot_features columns; this script concatenates whatever waves have one.
+Each wave's ``Benin/{wave}/_/plot_features.py`` writes a parquet indexed
+by ``(t, i, plot_id)`` with the canonical plot_features columns; this
+script concatenates whatever waves have one.
 ``v`` is NOT baked in — the framework joins it from ``sample()`` at API
 time.
 
@@ -16,7 +15,7 @@ import pandas as pd
 from lsms_library.local_tools import get_dataframe, to_parquet
 
 
-WAVES = ['2018-19']
+WAVES = ['2018-19', '2021-22']
 
 pieces = []
 for t in WAVES:
