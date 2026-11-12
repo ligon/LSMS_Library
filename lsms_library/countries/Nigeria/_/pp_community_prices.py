@@ -574,14 +574,23 @@ def pp_source_relpath(source_key):
     return '../' + spec['source_path'][len(prefix):]
 
 
-def pp_community_prices_for_folder(folder, reader):
+def pp_community_prices_for_folder(folder, reader, declared):
     """Served PP rows for one wave folder; ``reader(path)`` -> raw frame.
 
     The wave script passes ``lambda f: get_dataframe(f,
-    convert_categoricals=False)`` with its own relative paths.
+    convert_categoricals=False)`` and ``declared``, its PP source paths as
+    STRING LITERALS: ``Wave._input_hash`` folds the DVC sidecar of every data
+    path a wave script spells literally (``scan_script_data_refs``), so a
+    re-released PP source invalidates the cache.  A computed path alone would
+    be invisible to it (CLAUDE.md cache limitation (a)).  The declaration must
+    equal the sealed source paths, in order.
     """
-    pieces = [pp_community_prices_for_source(reader(pp_source_relpath(key)), key)
-              for key in PP_FOLDER_SOURCES[folder]]
+    expected = tuple(pp_source_relpath(key) for key in PP_FOLDER_SOURCES[folder])
+    if tuple(declared) != expected:
+        raise ValueError(f'Nigeria {folder} community_prices declares PP sources '
+                         f'{tuple(declared)}, but the PP adapter reads {expected}')
+    pieces = [pp_community_prices_for_source(reader(path), key)
+              for key, path in zip(PP_FOLDER_SOURCES[folder], expected)]
     out = pd.concat(pieces).sort_index()
     out.attrs = {}
     return out

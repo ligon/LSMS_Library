@@ -299,3 +299,25 @@ def test_pp_module_binds_nigeria_from_its_own_config_tree():
     adapter, so both bind one module from one tree (LSMS_COUNTRIES_ROOT too)."""
     assert pp._ng.__name__ == 'nigeria'
     assert Path(pp._ng.__file__).resolve() == NIGERIA / '_' / 'nigeria.py'
+
+
+@pytest.mark.parametrize('folder', list(pp.PP_FOLDER_SOURCES))
+def test_wave_script_declares_its_pp_sources_where_the_hash_sees_them(folder):
+    """``Wave._input_hash`` folds the sidecar of every data path a wave script
+    spells literally (``scan_script_data_refs``, resolved under ``<wave>/Data``);
+    the PP sources must be among them, or a re-released source would not
+    invalidate the cache."""
+    import os
+    from lsms_library.local_tools import scan_script_data_refs
+    script = NIGERIA / folder / '_' / 'community_prices.py'
+    refs = set(scan_script_data_refs(script))
+    for key in pp.PP_FOLDER_SOURCES[folder]:
+        rel = pp.pp_source_relpath(key)
+        assert rel in refs, rel
+        hashed = Path(os.path.normpath(NIGERIA / folder / 'Data' / rel))
+        assert hashed.with_name(hashed.name + '.dvc').exists()
+
+
+def test_a_mismatched_source_declaration_refuses():
+    with pytest.raises(ValueError, match='declares PP sources'):
+        pp.pp_community_prices_for_folder('2010-11', lambda f: None, ('../Data/other.dta',))

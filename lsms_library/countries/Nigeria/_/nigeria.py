@@ -3193,8 +3193,10 @@ def people_last7days_from_s4aq(t, df, hhid='hhid', indiv='indiv'):
 #         per-item unit is supplied from _W1W2_PRICE_UNIT (Section C8's
 #         column heads: KG / PIECE / BUNCH / LITRE / TIN / BOTTLE / ...).
 #
-# t = PH_QUARTER[wave] (the price module sits in the post-harvest round,
-# matching crop_production / anthropometry).
+# t = PH_QUARTER[wave] for the post-harvest C8 rows built here.  The
+# post-planting round prices food too (Section C2, not C8; GH #587): its rows
+# are built by pp_community_prices.py at PP_QUARTER[wave] and appended by
+# each wave script (combine_rounds).  Everything below describes C8 / PH.
 
 
 # W1/W2 community-price questionnaire (Section C8) item codes -> canonical

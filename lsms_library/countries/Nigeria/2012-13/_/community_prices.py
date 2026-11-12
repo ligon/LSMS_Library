@@ -32,8 +32,13 @@ df = community_prices_for_wave(t, [dict(
 
 # Native variety is the original item/size code; obs is the single C8 slot.
 # The post-planting round's Section C2 (GH #587), its own t (2012Q3).
+# Literal paths: the content hash folds the sidecar of every data file a
+# wave script spells literally (the adapter checks they match its sources).
+PP_SOURCES = (
+    '../Data/Post Planting Wave 2/Community/sectc2_plantingw2.dta',
+)
 df = combine_rounds(df, pp_community_prices_for_folder(
-    '2012-13', lambda f: get_dataframe(f, convert_categoricals=False)))
+    '2012-13', lambda f: get_dataframe(f, convert_categoricals=False), PP_SOURCES))
 
 assert df.index.is_unique, "community_prices W2: (t,v,j,u,variety,obs) not unique"
 assert len(df) > 0

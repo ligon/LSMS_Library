@@ -40,8 +40,13 @@ df = community_prices_for_wave(t, [dict(
     mode='codes', crop_labels=crop_labels)
 
 # The post-planting round's Section C2 (GH #587), its own t (2018Q3).
+# Literal paths: the content hash folds the sidecar of every data file a
+# wave script spells literally (the adapter checks they match its sources).
+PP_SOURCES = (
+    '../Data/sectc2_plantingw4.dta',
+)
 df = combine_rounds(df, pp_community_prices_for_folder(
-    '2018-19', lambda f: get_dataframe(f, convert_categoricals=False)))
+    '2018-19', lambda f: get_dataframe(f, convert_categoricals=False), PP_SOURCES))
 
 assert df.index.is_unique, "community_prices W4: (t,v,j,u) not unique"
 assert len(df) > 0
