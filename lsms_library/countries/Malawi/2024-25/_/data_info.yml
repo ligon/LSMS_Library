@@ -1,7 +1,10 @@
 Country: Malawi
 Wave: 2024-25
 
-# Food-only recovery; original sample policy is comparison evidence, decision 48 held.
+# 2024-25 food and its sample/identity dependencies (PR #1604).  The sample
+# weights below are served as wired (maintainer ruling 2026-11-12, "Lift hold, rebase, merge"):
+# that ruling covers this wave's content only and does NOT settle decision 48's
+# joint-inclusion question.  No other wave's weights change.
 
 sample:
     # weight: IHS6 households carry hh_wgt (its label is 'wt_ihs6'); retained

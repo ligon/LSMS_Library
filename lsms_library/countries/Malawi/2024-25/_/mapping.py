@@ -1,4 +1,9 @@
-"""Malawi food-only recovery: original sample/ID hooks (decision 48 held)."""
+"""Malawi 2024-25 sample/ID hooks (PR #1604).
+
+The weights these hooks carry are served as wired (maintainer ruling
+2026-11-12, "Lift hold, rebase, merge"); that ruling covers this wave's
+content only and does not settle decision 48's joint-inclusion question.
+"""
 import sys
 from pathlib import Path
 import pandas as pd

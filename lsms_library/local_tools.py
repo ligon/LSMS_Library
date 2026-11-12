@@ -4228,7 +4228,8 @@ def update_id_reserving(d: dict[str, str], id_splits: dict[str, int],
     Kept separate from ``update_id`` on purpose: ``update_id``'s source is in
     every panel country's cache fingerprint (their ``panel_ids.py`` imports
     it), and only the waves a country opts into should move.  With an empty
-    ``reserved`` the two agree (tests/test_gh1275_malawi_2024.py).
+    ``reserved`` the two agree (tests/test_malawi_panel_id_guard.py::
+    test_empty_reservations_preserve_legacy_values_and_split_counters).
     '''
     D_inv: dict[str, list[str]] = {}
     for k, v in d.items():

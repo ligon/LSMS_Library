@@ -86,8 +86,13 @@ Malawi::food_acquired::borrow-ihs5-factor:
       basis: variable-label
       evidence: 'IHS5/current Module G dictionaries, current household questionnaire PDF p49 and the complete IHS5 source table. Item119 yellow flour versus Grain Meal, unit74 Tin1Kg versus Bundle, new120 versus835 Popcorn, undocumented size codes and broadened items are refused.'
   validated_against: >-
-    Invented full-key/ambiguity/metric/completeness controls; source-backed
-    native, input and API comparisons remain pending and are not claimed here.
+    Invented full-key/ambiguity/metric/completeness controls
+    (tests/test_malawi_food_borrowing.py). Source-backed: private cold build at
+    c964c6c4f (job 41005535) rederived all 169,995 public inputs with native
+    quantity/expenditure/units and older-wave Quantity_kg exact; private cold
+    base-vs-candidate builds on development e5fdd2fa8 (jobs 41232294/41232295,
+    2026-11-12) reproduce 169,995 borrowed rows with every pre-2024 wave
+    unchanged. No external accuracy check of the borrowed factors.
   contents: 'Malawi/_/CONTENTS.org, 2026-11-07 food follow-ups 49/50'
   since: '2026-11-07'
 

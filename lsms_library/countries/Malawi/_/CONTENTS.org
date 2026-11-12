@@ -37,12 +37,19 @@ claim that borrowing "would be a modelling choice nobody has made" are
 superseded by these explicit rulings.
 
 This carrier recovers only 2024 food and its original sample/ID and label/recall
-dependencies. Original sample mapping/maps remain comparison evidence; decision48
-and whole-wave merge remain held. Current shocks/stock, livestock and agriculture
-fixes are preserved. Synthetic controls and private source/API verification have
-separate scopes; no shared rewarm or completed source validation is claimed here.
+dependencies. Current shocks/stock, livestock and agriculture fixes are preserved.
 
-Brief table of contents and todo list. Malawi has 5 rounds of data, corresponding to IHS2-IHS5 plus IHPS.
+*Ruling (@ligon, 2026-11-12): "Lift hold, rebase, merge".*  The decision-48 /
+whole-wave-promotion hold is lifted FOR THIS CONTENT ONLY.  2024-25 =sample= is
+served as wired: =weight= = =hh_wgt= (IHS6) / =wt_cross= (retained IHPS),
+=panel_weight= = =wt_long=.  This does NOT settle decision 48's joint-inclusion
+question and changes no other wave's weights.  Verification on the merged head
+(private cold builds, development e5fdd2fa8 vs candidate, 2026-11-12): every
+non-derived table is frame-equal on the pre-2024 waves; 2024-25 serves 14,836
+sample households and 331,677 food rows, 169,995 of them with borrowed kilograms.
+No shared rewarm is claimed here.
+
+Brief table of contents and todo list. Malawi has 6 waves of data (2004-05 to 2024-25), corresponding to IHS2-IHS6 plus IHPS.
 
 * 2026-11-07 -- Nonseed deletion provenance (GH #1174)
 
@@ -5219,7 +5226,9 @@ the four row counts in =.coder/coverage/latest.csv=.
 Acquired whole by =add_wave(subdir=)=: IHS6 (8507, =MWI_2024-2025_IHS-VI_v01_M=)
 in =Data/Cross_Sectional/=, 81 files, 2.47 GB; IHPS 2024 (8520,
 =MWI_2024_IHPS-V_v01_M=) in =Data/Panel/=, 82 files, 484 MB.  No table of this
-wave is served: =_/data_info.yml= declares nothing.  Each new table is its own
+wave is served: =_/data_info.yml= declares nothing.  /Superseded 2026-11-12
+(PR #1604): =sample=, =panel_ids= and =food_acquired= are now wired; every other
+table of this wave is still undeclared./  Each new table is its own
 piece of work.  Idiosyncrasies the wiring has to carry:
 
 - *The two entries overlap, unlike 2016-17 and 2019-20.*  8520 is two samples
@@ -5234,7 +5243,10 @@ piece of work.  Idiosyncrasies the wiring has to carry:
   51 EAs of the 2019 panel were retired.
 - *Weights.*  In =hh_mod_a_filt_24=, =hh_wgt= and =panelweight_2019= are null on
   the 815.  =wt_cross= is populated on all 2,763 and =wt_long= on the 1,948.
-  Which serves as =weight= and =panel_weight= is not decided here.
+  Which serves as =weight= and =panel_weight= is not decided here.  /Decided
+  2026-11-12 for this wave only (PR #1604): =weight= = =hh_wgt= (IHS6) /
+  =wt_cross= (retained IHPS), =panel_weight= = =wt_long=; decision 48's
+  joint-inclusion question stays open./
 - *New sample parts.*  IHS6 includes 386 households in Dzaleka camp, from a
   separate frame (=camp= in the cover; report Box 1.1).  Likoma is a stand-alone
   domain in IHS6 and still outside the IHPS tracking universe.
