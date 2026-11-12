@@ -1,6 +1,81 @@
 #+title: Contents
 #+TODO: TODO WAITING | DONE
 
+* 2026-11-12 -- PR #1604 review: what 2024-25 serves, and four disclosures
+
+Measured on private cold builds (development =e5fdd2fa8=, the reviewed head
+=7735489cc= and the fixed code head =1ca84789a=; burst job 41240388).
+
+*What 2024-25 serves.*  =sample= has 14,836 households: 12,888 IHS6 households
+under =cs-24-= ids and 1,948 retained IHPS households under their walked panel
+ids.  The 815 IHPS refreshment households are served once, on their IHS6 rows.
+=food_acquired= has 331,677 rows over the same 14,836 households (283,610 IHS6
+rows, 48,067 retained-IHPS rows); 174,026 of them carry borrowed kilograms
+stamped =Malawi::food_acquired::borrow-ihs5-factor=.  Every earlier wave of
+=sample=, =household_roster=, =food_acquired= and =food_expenditures= is
+frame-equal to development.
+
+*Weights.*  =weight= is =hh_wgt= on the 12,888 IHS6 rows (raw mean 383) and
+=wt_cross= on the 1,948 retained rows (raw mean 1,258).  =panel_weight= is
+=wt_long= on the 1,948 retained rows (raw mean 2,531) and missing elsewhere.
+The API divides each by its own within-wave mean, so both read mean 1.
+=ihps_weight= is different: it is =wt_cross= on all 2,763 IHPS 2024 households
+and it is served at its RAW expansion scale (mean 1,784.6), because only =weight=
+and =panel_weight= are normalised.  It is there to rebuild the IHPS 2024
+cross-section, which uses it as a ratio weight within its own rows.  Do not
+read it as a third weight on the scale of the other two.
+
+*Stacked weights (GH #1704).*  In 2016-17, 2019-20 and 2024-25 the =weight=
+column holds two samples' national-scale weights stacked in one wave, the
+cross-section's and the retained panel's.  After normalisation the panel
+households' share of the wave is:
+
+| wave    | panel share of rows | panel share of weight |
+|---------+---------------------+-----------------------|
+| 2016-17 | 17% (2,508 / 14,955) | 59%                  |
+| 2019-20 | 22% (3,178 / 14,612) | 63%                  |
+| 2024-25 | 13% (1,948 / 14,836) | 33%                  |
+
+So a weighted statistic over a whole wave gives the panel households far more
+weight than their row share.  The ruling of 2026-11-12 ("Merge, disclose, file
+issue") serves 2024-25 consistently with the two earlier waves and leaves one
+rule for all three to #1704.  Decision 48 stays unruled.
+
+*Unit code 26 borrows (red team F1).*  =5 Litre Bucket(Chigoba)= parses as 5
+litres, so the shared metric choke point in =malawi.py= used to rewrite every
+such row to =u='kg'= at 5 kg per bucket.  IHS5 released per-item factors for
+this unit (median 3.88 kg), and 2019-20 serves it natively with them.  A 5-litre
+bucket states a capacity, not a mass, so =food_borrowing.py= now admits code 26
+(=BORROW_DESPITE_METRIC_LABEL=); every other metric-labelled code with an
+admitted factor states a mass and stays at the choke point.  Of 5,814 active
+code-26 contributions, 4,031 borrow: 5,950 buckets are served natively with
+22,563 kg, where density 1 gave 29,751 kg.  The other 1,783 have no admitted
+factor and are still served =u='kg'= at 5 kg, as 2019-20's one such row is.
+Old head to new head, 2024-25 =food_acquired= differs on exactly 4,031 rows,
+which move from =u='kg'= to the bucket label; nothing else changes.  The wave's
+=food_quantities(units='kgs')= falls from 713,917 to 706,492 kg (-1.04%), and
+earlier waves move by -0.001% to -0.010% through the pooled kg ladder.
+
+*=check_panel_consistency('Malawi')= now FAILS one check.*
+=panel_ids_targets_exist= reports "1948/7634 current-wave targets MISSING
+(26%)": the 1,948 2024-25 panel links have no =household_roster= row, because
+=household_roster= is not wired for 2024-25.  The households exist in =sample=.
+=attrition_monotonic= also warns "(2019-20,2024-25): zero overlap" for the same
+reason.  The report is now 5 pass, 2 warn, 1 fail (development: 7 pass, 1
+warn).  Nothing gates on it; wiring the 2024-25 roster clears both.
+
+*Panel-ID guard scope (red team F3).*  =Panel IDs: guard_minted_from= in
+=data_scheme.yml= is read only by =_/panel_ids.py=, which writes the committed
+JSON that both backends serve.  =country.py= is development's, so the guard moves
+no other country's cache hash.  Residual: the Country DataFrame fallback ignores
+=guard_minted_from=, reachable only if the committed JSON is absent.  It would
+then rebuild 2024-25 with plain =update_id= and re-mint the 25 ids the guard
+avoids; =tests/test_malawi_panel_id_guard.py= pins that behaviour.
+
+*Make.*  The 2024-25 =food_acquired= wave parquet now depends on
+=2024-25/_/food_borrowing.py= and =borrow_dictionaries.json= as well as its
+script (red team F5).
+
 * 2026-11-07 -- food follow-ups 49/50: IHS5 borrowing and Gramil
 
 Maintainer item49 ("yes, borrow") authorizes cross-wave IHS5 released factors
@@ -18,7 +93,8 @@ Only supported item/unit meanings, full region/size keys and informative exact
 code23 text are eligible. Numeric identity does not support 119 yellow flour to
 Grain Meal, 74 Tin1Kg to Bundle, new120 to835 Popcorn, broadened items or
 undocumented sizes. Unmatched/ambiguous remains missing. Existing metric
-conversion stays at its original choke point, native amounts/units are retained,
+conversion stays at its original choke point
+(/except unit code 26, 2026-11-12 entry above/), native amounts/units are retained,
 and a collapsed group needs complete contributing-quantity coverage before its
 borrowed kilograms are served. Original raw operands, factor origin/key, source
 year and MD5 are retrievable at input grain through =derivation_inputs=.
@@ -47,6 +123,7 @@ question and changes no other wave's weights.  Verification on the merged head
 (private cold builds, development e5fdd2fa8 vs candidate, 2026-11-12): every
 non-derived table is frame-equal on the pre-2024 waves; 2024-25 serves 14,836
 sample households and 331,677 food rows, 169,995 of them with borrowed kilograms.
+/Superseded 2026-11-12: 174,026 once unit code 26 borrows (entry above)./
 No shared rewarm is claimed here.
 
 Brief table of contents and todo list. Malawi has 6 waves of data (2004-05 to 2024-25), corresponding to IHS2-IHS6 plus IHPS.
@@ -2112,12 +2189,18 @@ read the per-wave =panel_ids:= blocks in =data_info.yml= (2013-14, 2016-17,
 -- and writes the two JSON files.  Regenerate with =make panel-ids= and review
 the diff.  The blocks stay: they are the one place the wiring is written, and
 =LSMS_BUILD_BACKEND=make= still derives the dicts from them directly.
+/Qualified 2026-11-12 (PR #1604 review): measured at the Country level, both
+the default and the make backend serve the committed JSON; the blocks are read
+directly by the wave-level =Country[w].panel_ids()= and by the no-JSON
+DataFrame fallback, which ignores =guard_minted_from=./
 
 Verified against development =9a0ed5f3c= on cold builds: =panel_ids= (5,686
 entries) and =updated_ids= (4,000 / 2,508 / 3,178 for 2013-14 / 2016-17 /
 2019-20) equal entry for entry; =sample()= and =household_roster()= equal
 under =assert_frame_equal= in all five waves; =check_panel_consistency= 7
-pass, 1 warn, 0 fail before and after.  One representation change:
+pass, 1 warn, 0 fail before and after.  /Since 2026-11-12 (PR #1604) it is 5
+pass, 2 warn, 1 fail: the 1,948 2024-25 links have no =household_roster= row,
+because that table is not wired for 2024-25 (entry at the top of this file)./  One representation change:
 =Country('Malawi').panel_ids= is now a plain dict of ="t,i" -> "t0,i0"=
 strings, as for the other nine countries; design B returned a
 =RecursiveDict= keyed by tuples.
@@ -3029,11 +3112,19 @@ Evidence: =slurm_logs/isa_backlog_2026-10-21/592-gps-census/=.
 | 2013-14 | =hh_wgt=             | =panelweight=      | =HH_MOD_A_FILT_13.dta=                    |
 | 2016-17 | =hh_wgt= (both)      | =panelweight_2016= | CS + =Panel/hh_mod_a_filt_16.dta=          |
 | 2019-20 | =hh_wgt= (both)      | =panelweight_2019= | CS + =Panel/hh_mod_a_filt_19.dta=          |
+| 2024-25 | =hh_wgt= (IHS6) / =wt_cross= (retained IHPS) | =wt_long= | CS + =Panel/hh_mod_a_filt_24.dta= |
 
 For 2016-17 and 2019-20, the cross-sectional file provides =hh_wgt= for
 all CS households; the panel file provides both =hh_wgt= and the
 wave-specific =panelweight_YYYY=. Cross-sectional households have
 =panel_weight= = NaN since they are not tracked longitudinally.
+
+/2026-11-12 (PR #1604)./  2024-25 differs: the Panel file's own =hh_wgt= is its
+baseline weight, so retained IHPS households take =wt_cross=.  The wave also
+serves =ihps_weight= (=wt_cross= on all 2,763 IHPS 2024 households) at its RAW
+expansion scale, mean 1,784.6, beside the mean-1 =weight= and =panel_weight=.
+All three stacked waves give the retained panel far more weight than rows
+(GH #1704; shares in the 2026-11-12 entry at the top of this file).
 
 *Note (2026-09-09).*  EPAR (Evans School, UW, TR#335) rescales survey
 weights to World Bank rural/urban population totals per wave, and
