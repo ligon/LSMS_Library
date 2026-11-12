@@ -79,3 +79,27 @@ Q1 Guinea-Bissau labels; Q3 Manquant (6 EHCVM); Burkina Q6/Q7 (+#1442 after
 ** Merge order
 #1604 first (moves every fingerprint; strict up-to-date gate).  Then batch the
 rest into one integration PR where possible.
+
+* Update, 2026-11-12 late
+** Done
+- Reconcile applied: 77 GitHub writes, all read back (reports/reconcile-apply/LOG.tsv).
+  New issues #1696-#1703; #562/#778/#798 closed completed, #913 not planned.
+- Filed #1704 (Malawi stacked-sample weights, 2016-17/2019-20/2024-25) and
+  #1705 (Benin panel crosswalk follow-up).
+- Rulings recorded through c32baf4ce (see isa-decisions.org top entries).
+** Coordinator call (not a user ruling)
+#1604 red team F3: drop the country.py guard hunk (never reached in production;
+it alone moved every build fingerprint).  Keeps local_tools.panel_ids_guarding
+for Malawi panel_ids.py.  Residual: the Country DataFrame fallback ignores
+guard_minted_from (reachable only without committed JSON).
+** In flight (follow-up agents; red team still owed for EHCVM-2, framework, Nigeria)
+| Stream | Head before | Report dir |
+|---|---|---|
+| #1604 fixes (F1 code-26 borrow, F3, Make prereqs, disclosures, PR body) | 7735489cc | reports/1604-final/ |
+| EHCVM-2 strata per #1575 + GhanaLSS 'Tres grand' check | df1df60ed | reports/ehcvm2-2021-final/ |
+| #1509 fallback rung (+#1068/#1129 done) | 6c14097e9 (agent worktree .claude/worktrees/agent-ab25b116f4113864a) | reports/framework-1509-1068-final/ |
+| #587 W1 holds, W3 kg/l + W5 g/cl serve | c541bf49f | reports/587-wiring-final/ |
+** Merge plan
+After each stream passes red team: one integration PR (one full data gate) if
+they are ready together; a lagging stream goes in the next batch.  #1502/#1518
+(Nigeria shipped tables) after #587, same Nigeria re-warm.
