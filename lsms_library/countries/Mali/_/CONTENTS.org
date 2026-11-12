@@ -3233,6 +3233,8 @@ is, for the sale.  So =harvest-from-dispositions= keeps =Quantity= and =u=, and 
 as before: 6,715,918 kg on 2,792 rows.  The wave script asserts that no derived row carries kilograms, so a pair never
 holds both, which is what #1437's "a recorded quantity is never overridden" already gave.  =Farm-level= rows are NA.
 Sold quantities are untouched: =KgFactor_sold= stays NA, and =s16dq05c= (4.87M kg, largest 1,150,000) stays unread.
+[2026-11-12, GH #1560: =s16dq05c= is now served as the sale's =Quantity_sold_kg=, a total; =KgFactor_sold= still NA.
+See "the sold kilograms are served" at the end of this file.]
 
 *What moves.*  =harvest_kg= 2021-22, 6,977,513 -> 7,062,291 kg; 3,028 -> 3,098 plot-crops; every other wave unchanged.
 All of the movement is on the 309 rows, 261,596 -> 346,373 kg:
@@ -3505,6 +3507,10 @@ says per unit", remains unresolved. Both own vagues were authenticated in the
 bounded investigation frozen at =8283ad309120e34f2e9822c3a3eee7651de49f8f=
 (=investigate/1560-sold-kilograms-20261108=). Independent scientific review and
 a ruling are still needed; this note selects no carrier, default or price rule.
+[2026-11-12: ruled by @ligon, "Treat 2021 as totals": =s16dq05c= is served as
+=Quantity_sold_kg=, a total, with no default consumer and no price rule.  The
+form/label conflict is resolved by that ruling, not by a located export program.
+See "the sold kilograms are served" at the end of this file.]
 
 The own source is =2021-22/Data/s16d_me_mli2021.dta=, byte MD5
 =445edd178dd9ea19a327c8d4b3827ead=:5068 unique household-crop records,1140
@@ -3944,3 +3950,53 @@ these four meanings. =sampling.py:76-83= documents the read-time placement
 advantage; the required future hash-cost measurement is not run here.
 Exact sidecar bindings and closed authority are in the external
 =Mali-served-strata.json= and =.coder/ledger/1577-mali-current-served-strata.md=.
+
+* 2026-11-12 -- crop_production: the sold kilograms are served (GH #1560)
+
+*RULED (@ligon, 2026-11-12, "Treat 2021 as totals").*  =s16dq05c=, "Estimation Quantité totale
+UML en kg", is served as the TOTAL kilograms of the 2021-22 sale it belongs to, in the literal
+optional column =Quantity_sold_kg=, following the released label and the stored Kg controls
+rather than both vague forms' per-ONE-UML instruction (=mli_ehcvm2_qnr_men_excel_vague1/2.pdf=,
+PDF p. 88).  The ruling settles the reading; no export program was found to settle it, and
+neither document is called stale.  =KgFactor_sold= stays NA in this wave: the total is never
+divided into a factor.  No consumer reads the column by default; =median_price_valuation= uses it
+only as an explicit =kg_qty=.  The donor/recipient state question is GH #1698.
+
+| | records | served |
+|-+---------+--------|
+| =s16dq05c= answered | 1,140 | |
+| 0 beside a positive =s16dq05a=, NA (the harvest rule) | 4 | |
+| positive, on its sale's row | 1,136 | 1,136 rows, 4,873,574 kg |
+| on a record that is not a sale | 0 | |
+
+*Idiosyncrasies.*
+- *No code in the column.*  The maximum is 1,150,000 and no all-nines value occurs; the EAC-I
+  99 / 9999 =Manquant= mask (=crop_production_finalize=) is not carried into this EHCVM file,
+  just as it is not for =s16cq12a=.
+- *Kg controls.*  All 495 sales in =Kg= have kilograms equal to the sold quantity (the total
+  reading), and =Sac (100 Kg)= reads 100 per sack at the median.  The tail is served as recorded:
+  the 1,150,000 kg sale, and sack rows whose kilograms equal the sack count (the =Sac (100 Kg)=
+  harvest-total row of GH #1437 reads 7,500 / 7,500).  Site Q does not screen this column.
+- *It rides with the sale*, on the single =s16c= row (keyed =hh-crop-sale-single-row=) or the
+  Farm-level row (GH #1457), so the record lists the column and its =inputs= return =s16dq05c=;
+  the wave script asserts the kilograms are conserved onto the served rows.  Farm-level also
+  holds EAC-I tree rows and derived harvests here; those carry no sold kilograms.
+- *Not independent of the survey's harvest conversion where both exist*: on the 32 sales in their
+  harvest's own unit, sold kg per unit equals harvest kg per unit on 26.
+- *Farm-level price support, measured and not wired.*  Of the 70 Farm-level sales, 68 already
+  have a positive price per kilogram through the sold-unit resolver (=Kg= and the sized sacks,
+  which Mali's sales mostly use) and 70 do with =Value_sold / Quantity_sold_kg=: 2 gain.  On the
+  single =s16c= row, 995 -> 1,065 of 1,070 (73 gain, 3 lose, a resolved unit with a 0 kg made NA or
+  no kg).  So for Mali the column adds little price support; its use is the total itself.
+- The EAC-I tree "Equivalent en Kg" fields (=s3bq13c=, =s11fq14c=) stay unwired: their own
+  ruling (GH #1267) is unchanged, and the column is NA in 2014-15, 2017-18 and 2018-19.
+
+*Measured, cold, private roots, default backend* (base = development =e5fdd2fa8=): 50,752 rows
+before and after; the frame is =assert_frame_equal= to base once =Quantity_sold_kg= is dropped;
+only =attrs['derivations']= differs.  =tests/test_mali_crop_sold_kg.py= reads the wave against
+its source.
+
+*Cache.*  =mali.py=, =data_scheme.yml= and the 2021-22 wave script: one Mali re-warm.  Hash
+census against development =e5fdd2fa8=: all 24 Mali =Country._table_cache_hash= values and all
+96 =Wave._input_hash= values move, with Niger's (the same change) and no other country's; 0 of 42
+=build_transforms_fingerprint= values.

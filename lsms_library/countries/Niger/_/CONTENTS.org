@@ -3016,7 +3016,8 @@ waves hold 2.5M and 3.0M.  =Gros sac= and =Sac Moyen= state no size in this wave
 - *More kilograms cross a state.*  =harvest_kg= sums across =condition= (GH #1460), and with the survey's kilograms read
   53 plot-crops in 2021-22 hold kilograms in two states, 26,469 kg of the wave's 2,954,597, where it was 1 and 400 kg.
 - *=as03eq11c=, =as02eq12c=, =AS02EQ12C=, =s16dq05c=* are the sold kilograms in the same shape, and unread.  Only
-  the harvest is ruled.
+  the harvest is ruled.  [2026-11-12, GH #1560 / #1571: ruled and served as =Quantity_sold_kg=; see "the sold
+  kilograms are served" at the end of this file.]
 
 *Against the simulation that went to the ruling* (=KgFactor = kg / Quantity= through =reported=).  Reproduced to
 the kilogram on this build, then the differences:
@@ -3205,6 +3206,10 @@ This is a documentation of the bounded investigation at
 =8283ad309120e34f2e9822c3a3eee7651de49f8f=. Independent scientific review and a
 ruling remain necessary before selecting an interpretation. No sold-kg carrier,
 missing-code rule, sale eligibility, state/price policy or default is selected.
+[2026-11-12: superseded for the carrier and the codes.  @ligon ruled "Treat 2021 as
+totals"; the column is =Quantity_sold_kg= and its codes are set in "the sold kilograms
+are served" at the end of this file.  Eligibility, the 3E cycle product, state and
+price policy are still not selected.]
 The earlier note, "Only the harvest is ruled", still applies. Its description
 of sold kg "in the same shape" is qualified by the own 2021 forms below; it is
 not a reason to assume a questionnaire stale.
@@ -3672,3 +3677,95 @@ This holding result does not resolve the first/average-cycle,999, physical
 land-grain/yield or fielded/export-version questions above. The six-native-
 column proposal remains UNIMPLEMENTED, its six pure controls UNRUN; no native
 3E/scientific tests or API table acceptance follows. Whole1529 stays open.
+
+* 2026-11-12 -- crop_production: the sold kilograms are served (GH #1560, #1571)
+
+*RULED (@ligon, 2026-11-12, "Treat 2021 as totals").*  The sold kilograms are served as the
+TOTAL kilograms of the sale, in a literal optional column =Quantity_sold_kg= (#1571 option (a)),
+following the released label and the stored Kg controls rather than the own 2021 forms'
+"poids en kg d'UNE UML".  =KgFactor_sold= is not Niger's and nothing is put there: a total is
+never divided into a factor.  No consumer reads the column by default; =median_price_valuation=
+uses it only if a caller passes it as =kg_qty=.  The state question (#1698) is separate.
+
+| wave    | source      | window                       | code masked | 0 beside a sale, NA | served > 0 |      kg |
+|---------+-------------+------------------------------+-------------+---------------------+------------+---------|
+| 2011-12 | =as02eq12c= | the line's sale (2E12)       | 9999 x 10   |                   0 |      1,286 | 333,568 |
+| 2011-12 | =as03eq11c= | 3E's sale, per (first) cycle | 99999 x 39  |                  36 |        363 | 373,508 |
+| 2014-15 | =AS02EQ12C= | the crop's sale (2E12)       | 9999 x 11   |                  26 |      1,051 | 467,963 |
+| 2018-19 | none        | --                           | --          |                  -- |          0 |       0 |
+| 2021-22 | =s16dq05c=  | the crop's sale (16D.05)     | none        |                   0 |      1,818 | 380,476 |
+
+Counted on the held files after each wave's existing drops (3E's one byte-identical row, s16d's
+3,329 exact repeats).  2021-22's 2,585 raw answers are 1,818 after the repeat drop, all positive.
+
+*Idiosyncrasies.*
+- *The codes are each module's own, and the rainy one is a judgement.*  3E's 99999 is the width
+  this file already documents for 3E (=as03eq09a=, =as03eq09c=), and 33 of the 39 sit beside
+  =as03eq09c= = 99999 on the same line.  2014-15's 9999 is that wave's quantity code; it is the
+  column's maximum, 7 of the 11 are all-code lines (=AS02EQ12A= 9999, =AS02EQ13= 9999999, unit
+  and sold flag =Manquant=), and 8 sit beside =AS02EQ110E= = 9999.  The rainy module writes
+  999999 on its quantities, so its 9999 is NARROWER and unlabelled, and it is *treated as* a code
+  on the file's own evidence: 10 rows at exactly 9999 against 13 anywhere in 5,000-9,998 and 1
+  above (the max is 11,000); 2 are all-code lines; the 7 with a sold quantity would be 500-5,000
+  kg per =Tiya= or =Botte=; 7 of the 8 beside a harvest kg exceed the SAME line's =as02eq07c=
+  (24 of 1,286 other sales do); and the one sold in Kg would break kg = quantity, which holds on
+  151 of 151 other Kg sales.  One value to remove to reverse it (=SOLD_KG_SENTINELS=).
+- *The zero rule is the harvest's.*  A 0 beside a positive =Quantity_sold= is no answer, not a sale
+  of nothing (3E 36, every one beside a positive quantity and value; 2014-15 26).  2014-15's one 0
+  beside a 0 quantity stays.
+- *3E's sold kilograms are NOT multiplied by the cycle count.*  =as03eq11c= is asked beside 3E.11a
+  (the first cycle), so it shares =Quantity_sold='s footing, and =dry-season-sale-window= now lists
+  it.  =Quantity_kg= on the same rows IS multiplied (=dry-season-cycle-total=), so on the 43
+  multi-cycle 3E sales =Quantity_sold_kg / Quantity_kg= is not a sold share.  This departs from
+  GH #1436 comment 6648014838 ("multiply by =as03eq06="); the per-cycle reading follows the served
+  sale window, and a cycle product is a point for a ruling.
+- *Seven 3E records state sold kilograms and no sale* (8,740 kg, on their native Farm-level rows):
+  the sold flag says Non on 6 and Oui on 1, and 6 equal the line's harvest kg.  They are served as
+  recorded, as this file serves 3E's "no sale" values (3,728,500 FCFA above), and the record is
+  not thereby a sale: =is_crop_sale= reads quantity and value only, so no key moves.  Whether to NA
+  sold kilograms on a record with no positive sale is an eligibility question the ruling did not
+  make.  No other wave has such a row once the codes are masked.
+- *2021-22's sold kilograms are the harvest's conversion.*  On a sale in the harvest's own unit,
+  sold kg per unit equals the line's harvest kg per unit on 939 of 1,134 (median ratio 1.000;
+  2011-12 1,107 of 1,574; 2014-15 337 of 499), and =Tiya= is exactly 2.5 on 61% of sales, as it is
+  on 65% of harvest lines.  So the column is the same survey's arithmetic, not a second weighing,
+  and it carries no key: whether the 2021 sold kilograms should carry an identity key, as
+  =survey-kg-estimate= does for the harvest, is open (minting one moves =Derivation= on 1,818 rows).
+- *It rides with the sale.*  On its line in 2011-12; on the crop's one served line, or the one
+  =Farm-level= row, in 2014-15 and 2021-22 (GH #1457), so =hh-crop-sale-single-row= lists the
+  column, its =inputs= return =AS02EQ12C= / =s16dq05c=, and both wave scripts assert that every
+  recorded sold kilogram is on a served row.
+- *Not screened.*  Site Q's =_SCREENED_COLUMNS= do not include it, and nothing names a sold total
+  far from its unit's label (the harvest side has =kg_survey_off_label=).
+- *Farm-level price support, measured and not wired.*  "Usable" is a positive =Value_sold= over a
+  positive kilogram denominator; "now" converts =Quantity_sold= through the existing sold-unit
+  resolver (=transformations._sold_kg_factors=, which knows only stated masses: =Tiya=, =Botte= and
+  =Panier= have none), "with" divides by =Quantity_sold_kg=.  Sale rows only.
+
+  | wave    | where      | sales | usable now | with sold kg | gain | lose |
+  |---------+------------+-------+------------+--------------+------+------|
+  | 2011-12 | Farm-level |   438 |        256 |          350 |  121 |   27 |
+  | 2011-12 | on a line  | 1,294 |        306 |        1,286 |  980 |    0 |
+  | 2014-15 | Farm-level |   498 |        107 |          487 |  383 |    3 |
+  | 2014-15 | on a line  |   583 |        251 |          562 |  321 |   10 |
+  | 2021-22 | Farm-level |   553 |        144 |          553 |  409 |    0 |
+  | 2021-22 | on a line  | 1,265 |        556 |        1,265 |  709 |    0 |
+
+  So the GH #1457 Farm-level sales of 2014-15 and 2021-22 go from 251 of 1,051 (23.9%) to 1,040
+  (99.0%), and 792 (75.4%) gain a price per kilogram, which reproduces #1571's 24% -> ~100%
+  (the investigation's 1,041 counted the 9999 it did not mask).  2011-12's Farm-level rows are
+  3E's dry season (GH #1462), not sale-only rows.  3E's are per cycle, and its
+  value window is unstated, so a 3E price per kg is not a season price.  "Lose" is a sale with a
+  resolved unit and a masked or absent kilogram.  Nothing reads this by default.
+
+*Measured, cold, private roots, default backend* (base = development =e5fdd2fa8=): 49,042 rows
+before and after; the frame is =assert_frame_equal= to base once =Quantity_sold_kg= is dropped,
+columns in base order; only =attrs['derivations']= differs (the two records' =columns= lists).
+=tests/test_niger_crop_sold_kg.py= reads each wave against its source.
+
+*Cache.*  =niger.py=, =data_scheme.yml= and three wave scripts are build inputs of every Niger
+table: one Niger re-warm.  Hash census, development =e5fdd2fa8= against this change, 38
+countries: all 25 Niger and all 24 Mali =Country._table_cache_hash= values move (49 of 555) and
+all 100 / 96 =Wave._input_hash= values (196 of 2,321), no other country's; 0 of 42
+=build_transforms_fingerprint= and 0 of 38 =framework_imports_fingerprint= values.  The
+=.yml= edits (=derivations.yml=, the canonical =data_info.yml=) move nothing.
