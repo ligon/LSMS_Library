@@ -211,8 +211,22 @@ class TestHeld:
         raw = niger._computed_raw()
         assert int(niger.computed_last_purchase_rows(raw["s07bq07a"]).sum()) == 15264
 
-    def test_uganda_inputs(self):
+    def test_uganda_inputs_join_and_the_function_reproduces_the_value(self):
+        """As test_gh1459 does for the two comm keys: the stamped rows are exactly the
+        households the inputs return, and the registered function, run on those raw
+        inputs, gives the served ``ea`` on every one."""
+        import warnings
         import lsms_library as ll
-        raw = ll.Country("Uganda").derivation_inputs("Uganda::sample::ea-same-household",
-                                                     wave="2009-10")
+        key = "Uganda::sample::ea-same-household"
+        c = ll.Country("Uganda")
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            raw = c.derivation_inputs(key, wave="2009-10")
+            frame = c.sample().xs("2009-10", level="t")
         assert raw.index.get_level_values("i").nunique() == 514
+        stamped = frame.index[frame["Derivation"].astype("string")
+                              .str.contains(key, regex=False).fillna(False)]
+        assert set(raw.index.get_level_values("i")) == set(stamped)
+        derived = c.derivations()[key].resolve()(raw).droplevel("t")
+        assert len(derived) == 514
+        assert derived.to_dict() == frame.loc[derived.index, "ea"].to_dict()

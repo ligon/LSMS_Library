@@ -379,5 +379,5 @@ Senegal::food_acquired::near-zero-quantity-withheld:
     table is unchanged.  2018-19 food_prices (kgvalue) maximum 1.79e22 -> 479,452
     FCFA/kg and mean 2.17e17 -> 1,698.5; units='unitvalue' maximum 4.79e21 -> 70,000;
     no served price above 1e10 (Senegal/_/CONTENTS.org).
-  contents: 'Senegal/_/CONTENTS.org, "three 2018-19 quantities near 1e-19 behind food_prices of 1e22 (GH #1489)"'
+  contents: 'Senegal/_/CONTENTS.org, "the three near-zero 2018-19 quantities are served NA (GH #1519)"'
   since: '2026-11-12'
