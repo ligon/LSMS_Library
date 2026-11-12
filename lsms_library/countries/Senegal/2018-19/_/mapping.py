@@ -51,8 +51,10 @@ def inputs_food_acquired(wave):
 
 
 def food_acquired(df):
+    near_zero = _near_zero_positions(df)
     out = _food_acquired_with_unit_weights(
         df, FOOD_ACQUIRED_DERIVATION, wave='2018-19')
+    out = _withhold_near_zero_quantities(out, df, near_zero)
     # GH #1500; ledger §4.  Fill only the final label, after size/NSU/value
     # processing: a size or last purchase cannot supply a missing unit answer.
     index = out.index
@@ -68,6 +70,121 @@ def food_acquired(df):
         filled = index.set_levels(units, level='u').set_codes(
             np.where(missing, units.get_loc(U_UNKNOWN), codes), level='u')
         out.index = filled
+    return out
+
+
+# ---------------------------------------------------------------------------
+# GH #1519: two released quantities below 1e-3 are served NA (ruling @ligon
+# 2026-11-12, "Exact-value NA rule")
+# ---------------------------------------------------------------------------
+#
+# Three records of s07b_me_sen2018.dta, all product 132 (served `Autres tisanes
+# et infusions`), hold s07bq03a near 4e-19 / 9e-19 and s07bq07a near 1e-20 /
+# 2e-20, each exactly 40 times the other.  No other positive s07bq03a or s07bq07a
+# of this file, or of any other EHCVM wave's s07b, is below 1e-3.  Served as
+# recorded, the quantity put food_prices at 1.45e22 and 1.79e22 FCFA/kg.  The two
+# values are treated as missing, which is the precedent of GH #1594 (Mali 2014-15,
+# an exact s13q03c of 99,999,999 masked in the wave mapper): the rows stay, with
+# Quantity NA and so, by the registered #876 rule that multiplies it, Expenditure
+# and Quantity_kg NA.  Disclosed by `Senegal::food_acquired::near-zero-quantity-withheld`
+# (`rows: 0`, like Burkina Faso's withheld GPS); the rows keep their #876 key.
+NEAR_ZERO_KEY = 'Senegal::food_acquired::near-zero-quantity-withheld'
+#: Below this, a released s07bq03a / s07bq07a is not a quantity (GH #1519).
+NEAR_ZERO_BOUND = 1e-3
+_NEAR_ZERO_SOURCE = 's07b_me_sen2018.dta'
+_NEAR_ZERO_COLUMNS = ('Quantity', 'Expenditure', 'Quantity_kg')
+
+
+class NearZeroQuantityError(Exception):
+    """The GH #1519 rule cannot be applied as ruled.
+
+    The wide frame is not the file row for row, or a record the rule selects
+    shares its served key with another record, so NA on that key would delete the
+    other record's answer.  Subclasses ``Exception``: a derived food table must
+    not read it as a failed build (GH #1546)."""
+
+
+def _near_zero_raw(wave='2018-19'):
+    """``s07b_me_sen2018.dta`` in its codes, every record, in file order."""
+    if wave != '2018-19':
+        raise ValueError(f'{NEAR_ZERO_KEY} covers 2018-19 only, not {wave!r}')
+    from lsms_library.paths import countries_root
+    path = countries_root() / 'Senegal' / wave / 'Data' / _NEAR_ZERO_SOURCE
+    return tools.get_dataframe(str(path), convert_categoricals=False)
+
+
+def near_zero_quantity_rows(quantity, last_quantity):
+    """Boolean ndarray: ``s07bq03a`` AND ``s07bq07a`` both in (0, 1e-3)."""
+    q = pd.to_numeric(pd.Series(np.ravel(quantity)), errors='coerce').to_numpy(dtype=float)
+    q7 = pd.to_numeric(pd.Series(np.ravel(last_quantity)), errors='coerce').to_numpy(dtype=float)
+    with np.errstate(invalid='ignore'):
+        return ((q > 0) & (q < NEAR_ZERO_BOUND)
+                & (q7 > 0) & (q7 < NEAR_ZERO_BOUND))
+
+
+def _near_zero_positions(df):
+    """:func:`near_zero_quantity_rows` on the wide frame, the file row for row."""
+    raw = _near_zero_raw()
+    served = pd.to_numeric(df['Quantity'], errors='coerce').to_numpy(dtype=float)
+    held = pd.to_numeric(raw['s07bq03a'], errors='coerce').to_numpy(dtype=float)
+    if len(raw) != len(df) or not np.array_equal(served, held, equal_nan=True):
+        raise NearZeroQuantityError(
+            f'the wide food_acquired frame is not {_NEAR_ZERO_SOURCE} row for row')
+    return near_zero_quantity_rows(raw['s07bq03a'], raw['s07bq07a'])
+
+
+def _withhold_near_zero_quantities(out, df, near_zero):
+    """NA ``Quantity``, ``Expenditure`` and ``Quantity_kg`` on the rows the selected
+    records become; drop the unit-weight key where it no longer describes one.
+
+    The selected records are reshaped on their own to learn their served keys.
+    Every such key must belong to exactly one row of ``out``.
+    """
+    if not near_zero.any():
+        return out
+    from lsms_library.ehcvm import food_acquired_ehcvm, nsu_derivation_key
+    from lsms_library.derivations import MULTI_SEP
+    sub = food_acquired_ehcvm(df[near_zero], FOOD_ACQUIRED_DERIVATION)
+    hit = out.index.isin(sub.index)
+    if int(hit.sum()) != len(sub) or out.index[hit].duplicated().any():
+        raise NearZeroQuantityError(
+            f'{int(near_zero.sum())} record(s) under {NEAR_ZERO_KEY} become '
+            f'{len(sub)} served row(s), and {int(hit.sum())} rows of the table carry '
+            f'their keys: a key shared with another record would lose that answer')
+    out = out.copy()
+    for col in _NEAR_ZERO_COLUMNS:
+        if col in out.columns:
+            out.loc[hit, col] = np.nan
+    weight_key = nsu_derivation_key('Senegal')
+
+    def without_weight(value):
+        if value is None or (not isinstance(value, str) and pd.isna(value)):
+            return value
+        parts = [p for p in str(value).split(MULTI_SEP) if p and p != weight_key]
+        return MULTI_SEP.join(parts) if parts else pd.NA
+
+    if 'Derivation' in out.columns:
+        current = out['Derivation'].astype(object)
+        out['Derivation'] = pd.Series(
+            [without_weight(c) if h else c for c, h in zip(current, hit)],
+            index=out.index, dtype='string')
+    return out
+
+
+def inputs_near_zero_quantity(wave='2018-19'):
+    """The registry ``inputs`` callable: the selected records at ``(t, i, j)``,
+    with the file's own names and codes, indexed as the served table is."""
+    raw = _near_zero_raw(wave)
+    frame = _inputs_last_purchase('Senegal', wave)
+    held = pd.to_numeric(raw['s07bq03a'], errors='coerce').to_numpy(dtype=float)
+    keyed = pd.to_numeric(frame['s07bq03a'], errors='coerce').to_numpy(dtype=float)
+    if len(raw) != len(frame) or not np.array_equal(held, keyed, equal_nan=True):
+        raise NearZeroQuantityError(f'the input frame is not {_NEAR_ZERO_SOURCE} row for row')
+    hit = near_zero_quantity_rows(raw['s07bq03a'], raw['s07bq07a'])
+    columns = ['vague', 's07bq01', 's07bq03a', 's07bq03b', 's07bq03c', 's07bq04',
+               's07bq05', 's07bq06', 's07bq07a', 's07bq07b', 's07bq07c', 's07bq08']
+    out = raw.loc[hit, columns].copy()
+    out.index = frame.index[hit]
     return out
 from collections import defaultdict
 

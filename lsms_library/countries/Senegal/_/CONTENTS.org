@@ -851,9 +851,49 @@ over a =Quantity= near 1e-19, and the kg factors are right (=metric=, 0.33 and 0
 | mean                   | 2.17e17           | 1,091.84   |
 | maximum                | 1.79e22           | 330,000    |
 
-Reported, not masked: nothing in the file labels these as missing, and a stored value is not
-trimmed to look right.  Their cause is not known.  Site Q does not see them: it screens the
-upper tail of =food_acquired.Quantity= and does not screen =food_prices=.
+/Superseded 2026-11-12 (GH #1519, below): the three rows are now served with =Quantity= NA./
+This entry used to end "Reported, not masked: nothing in the file labels these as missing, and a
+stored value is not trimmed to look right.  Their cause is not known.  Site Q does not see them:
+it screens the upper tail of =food_acquired.Quantity= and does not screen =food_prices=."  The
+cause is still not known.  The last sentence was already stale before the ruling: since PR #1544
+(GH #1493) Site Q screens =food_prices.Price= under its own name, and it named these two prices;
+its lower tail on =food_acquired.Quantity= named the three quantities.  The figures in the table
+above are 2026-11-04's; the 2026-11-12 build is in the next entry.
+
+* 2026-11-12 -- the three near-zero 2018-19 quantities are served NA (GH #1519)
+
+/Ruling @ligon 2026-11-12, "Exact-value NA rule"./  A record of =s07b_me_sen2018.dta= whose
+=s07bq03a= AND =s07bq07a= are both positive and below 1e-3 is served with =Quantity= NA
+(=2018-19/_/mapping.py=, =near_zero_quantity_rows=).  Registered as
+=Senegal::food_acquired::near-zero-quantity-withheld= (=rows: 0=, like Burkina Faso's withheld
+GPS); =derivation_inputs= returns the three records.
+
+- *What the rule catches.*  Exactly the three records above: product 132, =s07bq03a= exactly 40
+  times =s07bq07a=, =s07bq04= and =s07bq05= 0, one per household.  The same rule on the
+  =s07b= of every other EHCVM country-wave held (Senegal 2021-22, Mali, Niger and Burkina Faso
+  both waves, Benin both, Togo 2018, Guinea-Bissau 2018-19, Cote d'Ivoire 2018-19) catches
+  nothing, and no positive =s07bq03a= or =s07bq07a= anywhere in them is below 1e-3.
+- *What else is NA.*  =Expenditure=, because the registered #876 rule multiplies the served
+  quantity by =s07bq08= / =s07bq07a= (it was 2,000 and 4,000 FCFA on two rows; the third was
+  already NA, its last purchase being in a sachet), and =Quantity_kg=, which was already NA on
+  all three: their kilograms came from the bottle's stated volume at read time.  The rows stay,
+  with their #876 key, as GH #1594's sentinel row stays in Mali 2014-15.  The third is left with
+  no measurement.
+- *Precedent.*  GH #1594 (Mali 2014-15 =s13q03c= = 99,999,999 masked in the wave mapper) is the
+  same kind of exact-value rule, but it is recorded only in =Mali/2014-15/_/mapping.py=, Mali's
+  CONTENTS, its ledger and =tests/test_mali_1594_raw_food_sentinel.py=; it has no
+  =derivations.yml= entry.  This one has.
+- *Measured, cold, development =e5fdd2fa8= against the candidate (burst job 41249476).*
+  =food_acquired=: the three rows change in =Quantity= (3) and =Expenditure= (2) only; every
+  other row and column is equal.  2018-19 =food_prices= (=kgvalue=): maximum 1.79e22 -> 479,452
+  FCFA/kg, mean 2.17e17 -> 1,698.5; =units='unitvalue'=: maximum 4.79e21 -> 70,000; no price
+  above 1e10 in either wave.  =food_expenditures= and =food_prices= lose the two valued rows,
+  =food_quantities= the three.
+- *How it is applied.*  The shared EHCVM hook's unit-weight join is positional, so the rows are
+  set NA after it, by the served keys the three records become (reshaped on their own); the hook
+  raises =NearZeroQuantityError= if such a key belonged to another record too, because NA there
+  would delete that record's answer.  Cost: one Senegal re-warm, as for the salt rule below.
+
 * 2026-11-04 -- 2021-22 documents held; recall read from the instruments (GH #1084, #1483, #650)
 
 =2021-22/Documentation/= held only =SOURCE.org=.  It now holds both BIDs and both
