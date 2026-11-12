@@ -1,5 +1,21 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: GH587 W1 division after red team -- ANSWERED (amends the W1 ruling)
+Evidence: reports/587-redteam/VERDICT.md F1/F2 (three references, each
+calibrated by N = 1 rows; within-item elasticity of Naira on N 0.46-0.47).
+- "Hold both (Recommended)": hold Kg N 6-50 (208 rows; divided 0.33x/0.16x/
+  0.155x) and non-metric N > 50 (241 rows; divided 0.015x, undivided 1.0x --
+  N reads as a size) under registered omissions with the evidence.
+- "Flag them, hold g N 2-5 (Recommended)": keep the division on the
+  unvalidated rows (non-metric N 2-50, 3,033; Kg N 2-5, 547; 49 Unknown-unit)
+  under a SEPARATE registered key marking them unvalidated; hold W1 g/ml N 2-5
+  (61 + 3 rows, ~9x household).  Supported bands (g other N, ml, l) stay under
+  the existing division key.
+- Unit tokens: "Register tokens, keep Unknown (Recommended)": add Congo/Mudu,
+  ml and Tomatoes cup to Nigeria's unit table; serve the 399 blank-unit PP rows
+  as u='Unknown' per data_info.yml; aligning PH's blank-unit drop is a
+  follow-up.
+
 * 2026-11-12: Sold-kg details, GH1560/GH1571 follow-up -- ANSWERED
 - Niger 2011-12 dry season: "First cycle, as recorded (Recommended)": served as
   the recorded first-cycle kg, disclosed as per-first-cycle; any multiplication
