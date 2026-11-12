@@ -7,7 +7,7 @@
 # Sibling of population.yml and recall.yml: a .yml here moves no cache hash.
 
 CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
-  waves: ['2018-19']
+  waves: ['2018-19', '2021-22']
   columns: [Expenditure]
   rows: {s: purchased}
   rule: >-
@@ -54,7 +54,8 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
         positive), 12,182 because the last purchase used a different unit
         CODE, 11,935 because it used the same code in a different SIZE (Petit
         / Moyen / Grand / Taille unique), which is a different container and
-        so a different price per unit.
+        so a different price per unit.  2021-22: 40,847 of the 232,969 SERVED purchased
+        rows (17.5%).
       basis: variable-label
       evidence: >-
         no EHCVM wave distributes a unit-conversion table;
@@ -68,6 +69,7 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
         7-day consumption s07bq03a (which would put the value of own-produced
         and gifted food into Expenditure) and B = net of own production only.
         2018-19: A 109,767,959, B 108,747,218, C (served) 105,011,085 FCFA, against a raw s07bq08 total of 119,107,505.
+        2021-22: A 124,699,154, B 123,793,766, C (served) 121,393,491 FCFA, against a raw s07bq08 total of 170,793,500.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
     - text: >-
@@ -79,6 +81,7 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
         it is checked and not served.  Own production keeps the identical
         treatment it already had (s = 'produced' from s07bq04, Expenditure NA).
         2018-19: 35,289 inkind rows carrying 106,756 units, 0 with an Expenditure.
+        2021-22: 29,050 inkind rows carrying 88,393 units, 0 with an Expenditure.
       basis: modelling-choice
       evidence: SkunkWorks/derived_values.org; GH #876; measured 2026-09-12
   validated_against: >-
@@ -93,8 +96,145 @@ CotedIvoire::food_acquired::7day-purchase-at-last-purchase-unit-value:
     rows are served with Expenditure NA rather than with that imputation.  The
     instrument is the same in all twelve waves (identical s07bq0* Stata
     labels), so the reading carries by inference, not by measurement here.
+    2021-22 does ship a conso file, and the same test on ehcvm_conso_civ2021.dta gives:
+    on the 912 (household, product) rows where the candidates differ, the rule x 365/7 is
+    within 1% of depan(Achat) for 90.5%, against 28.7% for the own-production-only residual
+    and 1.0% for the gross quantity; median ratio over 192,160 joined rows 1.00000.  This
+    shows the arithmetic was carried out, not that s07bq03a is what the household said: 6.7%
+    of its positive rows read as high reports replaced by a typical amount per adult
+    equivalent and 8.6% look at least partly converted to another unit, inferred, with no
+    document saying so, and depan is built on those figures (_/CONTENTS.org, "2021-22 wired").
+    The unit value s07bq08 / s07bq07a is clean; the quantity it multiplies is not, on those rows.
   contents: 'CotedIvoire/_/CONTENTS.org, "food_acquired: one row, two windows (GH #876)"'
   since: '2026-09-12'
+
+CotedIvoire::crop_production::hh-crop-sale-single-row:
+  waves: ['2021-22']
+  columns: [Quantity_sold, Unit_sold, Value_sold]
+  rule: >-
+    s16d records a sale for the household and crop, with no plot.  A sale is a record with
+    a positive s16dq05a or s16dq06.  Where the household has exactly one s16c row for the
+    crop, the sale is served on that row: Quantity_sold = s16dq05a, Unit_sold = s16dq05b,
+    Value_sold = s16dq06, as recorded, and that row carries this key.  What is derived is
+    the ATTACHMENT, not the numbers.  Any other sale is served on one row of that household
+    and crop with plot_id = 'Farm-level' and no key, because its index value already
+    discloses it.  No sale is split, summed, scaled or dropped.  This key shares a row with
+    harvest-to-date or harvest-from-dispositions through derivations.MULTI_SEP, in sorted
+    order.
+  function: lsms_library.ehcvm:derive_hh_crop_sale_attachment
+  inputs: lsms_library.countries.CotedIvoire.2021-22._.mapping:inputs_hh_crop_sale
+  raw_variables: [s16cq02, s16cq03, s16cq04, s16dq01, s16dq04, s16dq05a, s16dq05b, s16dq06]
+  assumptions:
+    - text: >-
+        s16d asks the sale once per crop, with no plot, and s16c records no sale.  Where
+        the household has one harvest row for the crop, no other row can hold the sale.
+        The sale is NOT thereby a share of that row's Quantity, and it may be in another
+        unit: Unit_sold says which.
+      basis: variable-label
+      evidence: >-
+        s16d_me_civ2021.dta has no field or parcel variable; s16dq05a "16D.05a. Quelle est
+        la quantite de ce produit qui a deja ete vendue ?"; s16dq06 "16D.06. Quel a ete le
+        montant tire de la vente de ce produit?".  s16c_me_civ2021.dta carries s16cq02 and
+        s16cq03 and no sale variable.
+    - text: >-
+        a sale of a crop on two or more rows is not allocated among them, since any split
+        would be invented.  It stays with the household and crop on a Farm-level row, with
+        u = 'Unknown' unless a harvest total shares the row, where gross_crop_revenue and
+        median_price_valuation can read it.
+      basis: modelling-choice
+      evidence: >-
+        ruling @ligon 2026-11-03, option (d), GH #824, for Mali 2021-22 and applied here by
+        the brief of GH #552; the Farm-level convention in lsms_library/data_info.yml.
+    - text: >-
+        s16dq05b labels codes 1 to 7 and holds other codes of section 7B's list with no
+        label (339, 340, 316, ...), 183 of the 8,467 sales.  They are read through this
+        file's own s07bq03b labels.  Sold in code 339, cocoa prices at 825,000 FCFA against
+        825 per kilogram, and s16dq05c / s16dq05a is 1,000: 339 is the Tonne s07bq03b says.
+      basis: modelling-choice
+      evidence: measured 2026-11-04; 2021-22/_/categorical_mapping.org, harmonize_unit_s16d
+  validated_against: >-
+    tests/test_civ_2021_wave.py, whose oracle reads s16c and s16d directly.  Not validated
+    against an external total: no document here reports one.
+  contents: 'CotedIvoire/_/CONTENTS.org, "2021-22 wired"'
+  since: '2026-11-04'
+
+CotedIvoire::crop_production::harvest-to-date:
+  waves: ['2021-22']
+  columns: [Quantity]
+  rule: >-
+    Identity on a row whose harvest is not finished and which records a quantity: s16cq11 =
+    Non with s16cq16a.  The value is served as recorded.  The key names its WINDOW: the
+    question asks the quantity ALREADY harvested, so the row covers a part of the season
+    under a column that otherwise means all of it.  A row with no recorded quantity carries
+    no key.  It never shares a row with harvest-from-dispositions, which needs a finished
+    crop and no recorded quantity.
+  function: lsms_library.ehcvm:derive_harvest_to_date
+  inputs: lsms_library.countries.CotedIvoire.2021-22._.mapping:inputs_harvest_to_date
+  raw_variables: [s16cq11, s16cq12, s16cq16a, s16cq16b]
+  assumptions:
+    - text: >-
+        the recorded quantity on an unfinished row is what has been harvested so far, and
+        not the season.  3,595 of the 9,473 unfinished rows record one, and no finished row
+        does.
+      basis: variable-label
+      evidence: >-
+        s16c_me_civ2021.dta s16cq16a "16C.16a. Quantite deja recoltee pour la presente
+        campagne 2021/22?", s16cq11 "16C.11. Avez vous fini la recolte de cette culture?",
+        s16cq12 "16C.12. Quel pourcentage de la superficie vous reste-t-il a recolter?"
+  validated_against: >-
+    tests/test_civ_2021_wave.py, whose oracle reads s16c directly.  An identity has nothing
+    to validate but its rows.
+  contents: 'CotedIvoire/_/CONTENTS.org, "2021-22 wired"'
+  since: '2026-11-04'
+
+CotedIvoire::crop_production::harvest-from-dispositions:
+  waves: ['2021-22']
+  columns: [Quantity, u]
+  rule: >-
+    For a household's crop where every s16c row answers s16cq11 = Oui, none records
+    s16cq16a, and the positive s16d quantities (consumed s16dq02a, given s16dq03a, sold
+    s16dq05a, in stock s16dq13a) state one unit, Quantity is their sum and u that unit.  It
+    goes where the sale of that crop goes: the single s16c row, or for two or more rows the
+    crop's one Farm-level row.  It is never split among plots.  A crop whose dispositions
+    span units stays NA, and so does a crop with a row unfinished, and one with no positive
+    disposition.
+  function: lsms_library.ehcvm:derive_hh_crop_harvest_total
+  inputs: lsms_library.countries.CotedIvoire.2021-22._.mapping:inputs_harvest_from_dispositions
+  raw_variables: [s16cq11, s16cq16a, s16dq01, s16dq02a, s16dq02b, s16dq03a, s16dq03b, s16dq05a,
+                  s16dq05b, s16dq13a, s16dq13b]
+  assumptions:
+    - text: >-
+        the rule of Mali 2021-22 (ruling @ligon 2026-11-04, GH #1437) holds for this file,
+        whose shape is sharper than Mali's: s16cq16a is on 3,595 of 21,737 crop rows and on
+        none of the 12,263 finished ones.  The ruling names Mali and Burkina Faso.  Without
+        it 2021-22 serves no harvest for a finished crop at all.
+      basis: modelling-choice
+      evidence: GH #1437; Mali/_/CONTENTS.org, "the 2021-22 harvest total, and the window key"
+    - text: >-
+        consumed + given + sold + in stock is the harvest.  2018-19 of this country can test
+        it, because it holds the harvest and all four dispositions on one row (s16cq12a;
+        s16cq13a, s16cq14a, s16cq16a, s16cq22a): on 10,822 finished rows with dispositions in
+        the harvest's unit the sum is exact on 82.7%, within 10% on 85.7%, median ratio 1.000,
+        over 1.1 on 9.1% and under 0.9 on 5.0%.  That is consistency within a row, and a
+        respondent may anchor on the harvest just stated.  s16d asks nothing about seed kept
+        or post-harvest loss, so the sum can fall short of what was cut.
+      basis: modelling-choice
+      evidence: measured 2026-11-04 on s16c_me_CIV2018.dta
+    - text: >-
+        s16dq0?a holds 9999 on 9 records with no label calling it missing, and it enters
+        the sum as recorded: 8 served rows sit at exactly 9999, 2 of them derived, and Site Q
+        names the rows.
+      basis: variable-label
+      evidence: measured 2026-11-04; value labels of s16d_me_civ2021.dta
+  validated_against: >-
+    tests/test_civ_2021_wave.py, whose oracle reads s16c and s16d directly.  Pure-stand
+    kg/ha, 2018-19 recorded against 2021-22 derived (n): cocoa 245 (912), 250 (717); rubber
+    583 (229), 612 (226); rice 819 (134), 813 (94); cotton 901 (204), 822 (155); coffee 331
+    (71), 292 (84); yam 1,852 (162), 1,250 (77); oil palm 1,872 (63), 833 (55).  Inside
+    2021-22, on 1,875 unfinished single-row crops with a recorded harvest and dispositions in
+    one matching unit, the sum equals the record on 61.3%, median 1.000, 10%-90% 0.73, 2.0.
+  contents: 'CotedIvoire/_/CONTENTS.org, "2021-22 wired"'
+  since: '2026-11-04'
 
 CotedIvoire::sample::region-milieu-stratum:
   waves: ['2018-19']

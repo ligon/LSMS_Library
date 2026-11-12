@@ -1,0 +1,55 @@
+#+title: Categorical mappings of CotedIvoire 2021-22 (read before the country's)
+
+# The state of the harvest, s16cq16d, read by code (GH #1436).  This file has its own code
+# list: five answers, where 2018-19's s16cq12c has five in the file and two more in the
+# vague 2 instrument, and Togo 2021-22 has eight.  Read off this file's value labels.
+#+NAME: harmonize_crop_condition_ehcvm2
+| Code | Preferred Label      | Source Label   |
+|------+----------------------+----------------|
+|    1 | unshelled            | Epis           |
+|    2 | shelled              | Grain          |
+|    3 | shelled              | Décortiqué     |
+|    4 | unshelled            | Non-décortiqué |
+|    5 | shell_not_applicable | Non concerné   |
+
+# The units of s16d by code.  s16dq02b, q03b, q05b and q13b label codes 1 to 7 and hold other
+# codes of section 7B's list with no label; the labels below are s07bq03b's, this file's
+# own, and each of the seven units s16c labels at 8 to 14 is one of them.  Words as this
+# file spells them; the country's u table then serves them.
+#+NAME: harmonize_unit_s16d
+| Code | Preferred Label  |
+|------+------------------|
+|    1 | Kilogramme       |
+|    2 | Unité            |
+|    3 | Plat Yoruba      |
+|    4 | Tine             |
+|    5 | Sac moyen        |
+|    6 | Sac gros         |
+|    7 | Autres           |
+|  101 | Litre            |
+|  105 | Bassine          |
+|  106 | Bidon            |
+|  107 | Boite            |
+|  108 | Boîte de tomate  |
+|  109 | Bol/Cope         |
+|  110 | Botte            |
+|  114 | Caisse           |
+|  118 | Carton           |
+|  122 | Filet            |
+|  123 | Gobelet          |
+|  128 | Panier           |
+|  132 | Régime           |
+|  133 | Sac              |
+|  139 | Sachet           |
+|  142 | Seau             |
+|  143 | Tas              |
+|  147 | Unité            |
+|  314 | Assiette         |
+|  316 | Cuvette          |
+|  332 | Bâchée           |
+|  333 | Bois             |
+|  334 | Brouette         |
+|  335 | Charretée asine  |
+|  338 | Kia              |
+|  339 | Tonne            |
+|  340 | Tricycle         |
