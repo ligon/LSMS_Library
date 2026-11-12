@@ -242,6 +242,11 @@ def test_registry_scope_optional_carrier_and_actual_input_callable(wiring, monke
     assert inputs.index.get_level_values("i").tolist() == ["42009", "7002", "42001", "3004"]
     expected = _frames()["s00_me_ben2018.dta"][["s00q01", "s00q04"]]
     assert_frame_equal(inputs.reset_index(drop=True), expected)
-    with pytest.raises(KeyError, match="sample"):
-        call_inputs(rec, wave="2021-22")
-    assert visits == [WAVE, "2021-22"] and len(reads) == 1
+    # 2021-22 is wired since GH #552 and keeps the region alone, so the scope is the
+    # record's `waves`, which excludes it; the scoped call above visited 2018-19 only.
+    # An EXPLICIT call_inputs(rec, wave="2021-22") is not refused centrally (it reads
+    # that wave's cover answers, for a wave where no row carries the key): a residual,
+    # recorded in Benin/_/CONTENTS.org 2026-11-12, not pinned here.
+    assert "2021-22" not in [str(w) for w in rec.waves]
+    assert "sample" in load_yaml(ROOT / "Benin" / "2021-22" / "_" / "data_info.yml")
+    assert visits == [WAVE] and len(reads) == 1

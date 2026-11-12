@@ -1291,7 +1291,31 @@ wire").  What changed in the 2021-22 wiring because development moved underneath
   2021-22, on the same 540 grappes.  The patch to align them is small (the same three-element
   =strata= spec, the =sample= stamp hook and =inputs_strata= in =2021-22/_/mapping.py=, and
   ='2021-22'= in the entry's =waves=), but it is a scope the ruling did not grant.  Grand Lomé /
-  Lomé commune stays as each wave records it either way.
+  Lomé commune stays as each wave records it either way.  Measured: 2021-22 serves 6 =strata= labels and 2018
+  11, and none is shared, so a cross-wave group on =strata= splits every stratum.
+- *Re-measured on this merge (cold, private roots, base =e5fdd2fa8=; burst job 41235873).*  Every
+  non-derived table's 2018 rows are frame-equal to base on base's columns, with the same household ids;
+  the new optional columns (=Unit_sold=, =Derivation= on =crop_production=, four gift/purchase columns on
+  =plot_inputs=) are NA on 2018.  The kilogram movement recorded under "2021-22 wired" reproduces: 91,261 of
+  110,740 2018 =food_quantities(units='kgs')= rows move, median ratio 1.152; =food_prices= median 0.868; 2018's
+  rungs =item_unit= 14,087 -> 14,450, =unit= 88,132 -> 87,771, =none= 33 -> 31, =metric= 10,344.  Summed over rows
+  served with =u= = =kg=, 2018 is 63,577 -> 66,944 kg (the text above gives 63,624 -> 66,987; its sum's definition
+  is not recorded, and the row counts and rungs agree exactly).
+- *=s12q09= (GH #1566), measured, nothing changed.*  =assets.Value= is =s12q09=.  1,245 of 33,354 positive
+  values (3.7%) are off the 25 grid, 1,239 of them non-integers (=1000.0000298=, =1071.4286=, =1166.6667=);
+  the share is the same in both vagues (3.74%, 3.72%).  =Radio simple/Radiocassette= holds 1,054 of them
+  (46% of its 2,270 rows).  It is not a per-unit value: only 94 of the 1,245 rows have =s12q03= above 1, and
+  =s12q09= x =s12q03= is on the grid for 673.  2018: 4 of 30,337.  Cote d'Ivoire 2021-22 has its own
+  off-grid block (4.1%, integers); Benin 2021-22 has 25 of 40,220.  Unexplained.
+- *Evidence for GH #1557, nothing changed.*  This wave's =ehcvm_nsu_tgo2021.dta= labels =uniteID= 659
+  =Main= on =Banane douce= and =Plantain= (177 rows), 660 =Quartier= on six meats (76), 662 =Tête= on
+  =Manioc=, =Igname=, =Taro, macabo= (130): the goods the 2018 notes above give for the same bare codes.  That
+  supports one code book across the waves; the decode of 2018 is still the maintainer's decision.
+- *An explicit out-of-scope =derivation_inputs= call is not refused.*
+  =Country('Togo').derivation_inputs('Togo::sample::region-milieu-stratum', wave='2021-22')= returns that wave's
+  6,462 cover answers, though no 2021-22 row carries the key: =derivations.call_inputs= does not check the
+  entry's =waves= when a wave is named.  Before this wiring the same call raised =KeyError= (no =sample=
+  block).  The default call reads =2018= only.  A framework residual, not patched here.
 - *Not wired, residuals:* the own-country =ehcvm_nsu_tgo2021.dta= weights (GH #1598); the
   decode of 2018's bare codes 659, 660, 662 (GH #1557); the =s12q09= grid (GH #1566, recorded in
   the PR report, nothing changed).

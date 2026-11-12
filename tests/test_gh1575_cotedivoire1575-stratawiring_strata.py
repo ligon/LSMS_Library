@@ -109,7 +109,11 @@ def test_only_strata_changes_in_the_complete_sample_declaration():
     expected = deepcopy(ORIGINAL_SAMPLE)
     expected["df_cover"]["myvars"]["strata"] = ["s00q01", "s00q04", {"mapping": "strata_label"}]
     assert actual == expected
-    assert "sample" not in load_yaml(ROOT / "2021-22" / "_" / "data_info.yml")
+    # 2021-22 is wired (GH #552) and keeps the region alone: the construction and its
+    # registry entry stay scoped to 2018-19 (GH #1575 ruled for 2018-19 only).
+    later = load_yaml(ROOT / "2021-22" / "_" / "data_info.yml")["sample"]
+    assert later["df_cover"]["myvars"]["strata"] == "s00q01"
+    assert list(derivation_records("CotedIvoire")["CotedIvoire::sample::region-milieu-stratum"].waves) == [WAVE]
 
 
 def test_real_yaml_extraction_merge_and_hook_conserve_every_other_field(monkeypatch, make_wave):

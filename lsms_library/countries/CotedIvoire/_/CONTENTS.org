@@ -1462,7 +1462,8 @@ development moved underneath it:
   wired 2018-19's =strata= as region x milieu (one source-recorded mixed-milieu grappe kept
   literal) and scoped =CotedIvoire::sample::region-milieu-stratum= to =2018-19= alone.  2021-22
   keeps the archived region-only =s00q01= (upper-cased by =mapping.strata=), so =strata= now
-  means region x milieu in 2018-19 and region in 2021-22.
+  means region x milieu in 2018-19 and region in 2021-22.  Measured: 2021-22 serves 33 labels and 2018-19
+  66, none shared.
 - *=harvest_totals= / =derive_hh_crop_harvest_total=.*  Benin's and this branch each added a copy to
   =lsms_library/ehcvm.py=; git merged both silently.  Benin's copy is kept (same rule, line for
   line, plus a =.astype(bool)= on the plot mask); this wave's =crop_production.py= imports its
@@ -1470,5 +1471,25 @@ development moved underneath it:
 - *Population record.*  The archive edited the generated =_/population.yml= by hand; its note is
   now in =slurm_logs/POPULATION_STATEMENTS_2026-07-21.org=, the generator's source, so a re-run
   reproduces it.
+- *Re-measured on this merge (cold, private roots, base =e5fdd2fa8=; burst job 41235873).*  Every
+  non-derived table's older-wave rows (CILSS and 2018-19) are frame-equal to base on base's columns, with the
+  same household ids; the new optional columns are NA there.  The kilogram movement under =food_acquired= and
+  =s07bq03a= reproduces: 128,245 of 296,928 2018-19 =food_quantities(units='kgs')= rows move; =food_prices= sum
+  144,660,803 -> 141,749,811 on 78,498 rows; rungs as recorded.  Summed over rows served with =u= = =kg=,
+  2018-19 is 358,449 -> 359,122 kg and 2021-22 331,383 (the text gives 358,536 -> 359,170 and 331,409; its
+  sum's definition is not recorded).
+- *=shocks=' collapse moved.*  With purchases and stock both read, the served warning reads 44 of 7,588 rows
+  destroyed on 23 conflicting tuples, plus 38 NaN-key rows deleted; the archived table above says 42 rows on
+  20 keys.  Not traced further.
+- *=s12q09= (GH #1566's check), measured, nothing changed.*  3,066 of 74,058 positive values (4.1%) are off
+  the 25 grid, all integers (=2,374=, =2,502=, ...), spread over items (=Téléphone portable= 581 of 11,995,
+  =Ventilateur sur pied= 353 of 6,036, =Radio= 199 of 2,814), 4.8% in vague 1 and 3.5% in vague 2.  Not a per-unit
+  value (=s12q09= x =s12q03= is on the grid for 14 of them).  2018-19: 10 of 61,682.  =assets.Value= serves it.
+  Unexplained; Togo 2021-22 has a different block (non-integers, mostly radios).
+- *The own NSU file is not a weight table.*  =ehcvm_nsu_civ2021.dta= holds 53,078 market weighings (grams, a
+  =ipoids= imputation, =unite_corr= / =taille_corr= corrections, =id_2018=), not a key -> weight table like
+  Senegal's =_nat=.  GH #1598 therefore needs its own construction here.
+- *An explicit out-of-scope =derivation_inputs= call is not refused* (13,693 cover answers for =wave='2021-22'=;
+  see Benin's note).  A framework residual.
 - *Not wired, residuals:* the own-country =ehcvm_nsu_civ2021.dta= weights (GH #1598); crop codes
   56 to 60 (unlabelled, see "2021-22 wired"); the survey-kg =Quantity_kg= of =crop_production=.

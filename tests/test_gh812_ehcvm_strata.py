@@ -442,6 +442,14 @@ class TestTheFrameAgrees:
         carried = df.attrs["derivations"]
         assert stratum_derivation_key("Senegal") in carried["Senegal"]
         assert stratum_derivation_key("Togo") in carried["Togo"]
-        togo = df.xs("Togo", level="country")["strata"].dropna().unique()
-        assert len(togo) > 0
-        assert all(s.endswith(MILIEUX) for s in togo)
+        # The construction is scoped to the record's waves (GH #1575: 2018 only).  Togo
+        # 2021-22 (GH #552) serves the region alone and carries no stratum key.
+        key = stratum_derivation_key("Togo")
+        scoped = [str(w) for w in derivation_records("Togo")[key].waves]
+        togo = df.xs("Togo", level="country")
+        inside = togo.index.get_level_values("t").isin(scoped)
+        constructed = togo.loc[inside, "strata"].dropna().unique()
+        assert len(constructed) > 0
+        assert all(s.endswith(MILIEUX) for s in constructed)
+        outside = togo.loc[~inside, "Derivation"].astype("string").fillna("")
+        assert not outside.str.contains(key, regex=False).any()

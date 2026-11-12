@@ -1131,6 +1131,22 @@ underneath it:
   and region (department) in 2021-22, on the same 670 grappes.  This wave's weights file also
   ships its own =strat= (24 cells), not read; 2018-19's DDI states 23 strata.  Aligning is the
   same three-element =strata= spec, a =sample= stamp hook and the entry's =waves=, or reading
-  =strat=: a choice for the maintainer.
+  =strat=: a choice for the maintainer.  Measured: 2021-22 serves 12 =strata= labels and 2018-19 23, none
+  shared.
+- *Re-measured on this merge (cold, private roots, base =e5fdd2fa8=; burst job 41235873).*  Every
+  non-derived table's 2018-19 rows are frame-equal to base on base's columns, with the same household ids;
+  the new optional columns (=Unit_sold=, =Derivation=, the =plot_inputs= gift/purchase columns, =HowCoped2=)
+  are NA on 2018-19.  The kilogram movement under "2021-22 wired" reproduces: 126,788 of 187,336 2018-19
+  =food_quantities(units='kgs')= rows move, median 1.222 (p10 0.917, p90 1.734); =food_prices= 92,147 rows,
+  median 0.818, sum 158.4M -> 131.3M, one more row; rungs as recorded there (=item_unit_tight= 160 -> 438 also
+  moves).  Summed over rows served with =u= = =kg=, 2018-19 is 164,440 -> 182,615 kg (the text gives 168,465 ->
+  186,631; its sum's definition is not recorded).
+- *=s12q09= (GH #1566's check), measured, nothing changed.*  25 of 40,220 positive values are off the 25 grid
+  (one is the sentinel-shaped 9,999), against Togo's 3.7% and Cote d'Ivoire's 4.1%; 2018-19: 1 of 37,551.
+- *An explicit out-of-scope =derivation_inputs= call is not refused*:
+  =Country('Benin').derivation_inputs('Benin::sample::region-milieu-stratum', wave='2021-22')= returns 8,032
+  cover answers for a wave whose rows carry no key (=derivations.call_inputs= checks =waves= only when no wave
+  is named).  It raised =KeyError= before this wiring.  =tests/test_gh1575_benin1575-stratawiring_strata.py=
+  no longer pins that =KeyError=.  A framework residual, not patched here.
 - *Not wired, residuals:* the own-country =ehcvm_nsu_ben2021.dta= weights (GH #1598); the
   survey-kg =Quantity_kg= of =crop_production= (=s16cq16c= / =s16dq05c=, see "2021-22 wired").
