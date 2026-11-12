@@ -1,5 +1,26 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: Coping-strategy contract, GH1562 -- ANSWERED
+The user explicitly selected: "Positions = respondent order (Recommended)".
+HowCoped0..2 mean the household's REPORTED order (1st/2nd/3rd) and are filled
+only where an instrument records an order (Uganda s16q04a/b/c, ...).  Every
+shocks country also gets an UNORDERED set column of chosen strategies, so
+"which strategies" composes everywhere.  EHCVM 2018-19 fills the set only (not
+positions) until its order is proven from export documentation.  First step:
+audit every shocks country's coping semantics.  Canonical data_info.yml shocks
+columns change (a new set column; position semantics stated).
+
+* 2026-11-12: Nigeria W3-W5 sale attachment by crop code, GH1551 -- ANSWERED
+The user explicitly selected: "Keep Farm-level (Recommended)".  No change;
+#843 rule A stands.  #1551 can be closed with this ruling.
+
+* 2026-11-12: Strata meaning record, GH1577 -- ANSWERED
+The user explicitly selected: "Registry + sampling.yml tag (Recommended)".
+Constructed strata stay in the derivations registry; add a small per-wave tag
+in _/sampling.yml for native-code, native-label and absent cases, decided with
+#1134's vocabulary extension (#793 vocabulary is frozen; widen one tag at a
+time with its first evidenced record).
+
 * 2026-11-12: Senegal 2018-19 near-zero quantities, GH1519 -- ANSWERED
 The user explicitly selected: "Exact-value NA rule".  Set the quantity to NA on
 exactly the three product-132 rows whose released s07bq03a / s07bq07a are below
