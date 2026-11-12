@@ -19,8 +19,10 @@ sample:
                 - grappe
                 - menage
         myvars:
-            # GH #812: region only, as 2018.  Code 6 is `Grand Lomé` here and
-            # `Lomé commune` in 2018, on the same 98 grappes: served as recorded.
+            # GH #812: region only.  2018's strata became region x milieu under GH #1575,
+            # which was ruled for 2018 only, so the two waves now differ: _/CONTENTS.org,
+            # 2026-11-12.  Code 6 is `Grand Lomé` here and `Lomé commune` in 2018, on the
+            # same 98 grappes: served as recorded.
             strata: s00q01
             Rural:
                 - s00q04
@@ -184,10 +186,19 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
-        # s14bq04d is the herd ("l'Effectif du cheptel") in this wave.  2018's s14q04d,
-        # "Stock Produit Alimentaire", is s14bq04e here.
-        AffectedConsumption:
+        # s14bq04d is the herd ("l'Effectif du cheptel"), s14bq04e the food stock and
+        # s14bq04f the food purchases, by this file's own labels and in both vagues.
+        # Ruling (GH #1556 / #1561): AffectedConsumption is food PURCHASES and
+        # AffectedFoodStock food STOCKS, as the core 2021-22 waves read them.
+        AffectedFoodStock:
             - s14bq04e
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedConsumption:
+            - s14bq04f
             - mapping:
                 Diminué: True
                 Augmenté: True

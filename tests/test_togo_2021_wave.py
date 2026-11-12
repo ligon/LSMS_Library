@@ -265,16 +265,20 @@ class TestServed:
         assert len(s) > 0
         assert s["HowCoped0"].notna().sum() <= (ranked == 1).any(axis=1).sum()
 
-    def test_consumption_effect_reads_the_food_stock_not_the_herd(self):
+    def test_food_effects_read_purchases_and_stock_not_the_herd(self):
+        """Ruling GH #1556 / #1561: AffectedConsumption is food purchases (s14bq04f),
+        AffectedFoodStock food stocks (s14bq04e); s14bq04d is the herd."""
         s14 = _raw("s14b_me_tgo2021.dta", labels=True)
         answered = s14[s14["s14bq04a"].notna()]
         effect = {"Diminué": True, "Augmenté": True, "Inchangé": False, "Non-concerné": False}
-        food = answered["s14bq04e"].astype(str).map(effect).astype(bool)
+        purchases = answered["s14bq04f"].astype(str).map(effect).astype(bool)
+        stock = answered["s14bq04e"].astype(str).map(effect).astype(bool)
         herd = answered["s14bq04d"].astype(str).map(effect).astype(bool)
-        got = _served("shocks")["AffectedConsumption"].astype(bool)
-        assert len(got) == len(answered)
-        assert got.sum() == food.sum()
-        assert food.sum() != herd.sum()
+        s = _served("shocks")
+        assert len(s) == len(answered)
+        assert s["AffectedConsumption"].astype(bool).sum() == purchases.sum()
+        assert s["AffectedFoodStock"].astype(bool).sum() == stock.sum()
+        assert len({purchases.sum(), stock.sum(), herd.sum()}) == 3
 
     def test_other_strategy_is_served_though_its_column_says_oui(self):
         s14 = _raw("s14b_me_tgo2021.dta", labels=True)

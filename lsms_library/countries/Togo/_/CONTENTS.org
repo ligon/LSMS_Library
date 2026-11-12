@@ -868,7 +868,9 @@ crosswalks under =test_panel_ids_persistence=.
 540 of 540 and the point agrees on all 535 2018 fixes.  Region code 6 is =Lomé commune=
 in 2018 and =Grand Lomé= here, on the same 98 grappes; =strata= and =Region= serve each
 wave's label, so a cross-wave group on them splits that region.  =strata= is region only
-(#812).  The record is =_/sampling.yml=.
+(#812).  [2026-11-12: 2018's =strata= is now region x milieu (GH #1575, ruled for 2018 only),
+so the two waves' =strata= no longer share a construction.  See "2026-11-12 -- 2021-22 restored
+onto development".]  The record is =_/sampling.yml=.
 
 *Weights.*  =poids= takes two values in most grappes, by =panel= (one value in each of the
 1,054 (grappe, panel) pairs), and no longitudinal weight is shipped, so =panel_weight= is
@@ -900,7 +902,9 @@ titles are swapped.  Section 7B is on PDF p. 37 of each.
   =s14bq05__N= holds a rank label or =Non=, where =s14q05__N= held an indicator, except
   column 25, =Autre stratégie=, whose label set is Oui/Non: its 26 rows name no other
   strategy and it takes the first slot.  =s14bq04d= is the herd here, so
-  =AffectedConsumption= reads =s14bq04e=, the food stock, 2018's =s14q04d=.
+  =AffectedConsumption= reads =s14bq04e=, the food stock, 2018's =s14q04d=.  [2026-11-12:
+  superseded by the ruling of GH #1556 / #1561: =AffectedConsumption= reads =s14bq04f=, the
+  food purchases, and =AffectedFoodStock= =s14bq04e=.  See the 2026-11-12 section.]
 - =shocks= serves 2,666 of 7,229 reported shocks.  The instrument asks follow-ups only for
   the last 12 months, and the framework drops the rows with none; 2018 serves all 7,230.
   So a cross-wave incidence on this table reads as a false 63% fall.  With the maintainer.
@@ -1076,7 +1080,10 @@ country's waves until it is corrected.  =s16bq01= has two slots 2018's tables di
   share of =s07bq03a= against =s07bq04= and =s07bq05=, and the =q3/q4= mode by region and by
   whether the row reports own production or a gift.
 - Wire =AffectedConsumption= to =s14bq04e=, not =s14bq04d=; do not copy the YAML line from a
-  2021-22 sibling.  Read all 26 =s14bq05__N= label sets: code 25 may be Oui/Non.
+  2021-22 sibling.  Read all 26 =s14bq05__N= label sets: code 25 may be Oui/Non.  [2026-11-12:
+  the first half is superseded.  The ruling (GH #1556 / #1561) is =AffectedConsumption= =
+  =s14bq04f= (purchases) and =AffectedFoodStock= = =s14bq04e= (stock), which is also what the
+  core 2021-22 waves now declare; still check the labels of d, e and f in each file.]
 - Do not cite a =depan= match as proof a quantity is raw.  Disclose the shock rows with no
   follow-up.  Read =s16cq16d= off the file before reusing a condition table.
 
@@ -1259,3 +1266,32 @@ The cross-run cold and warm capture comparisons, source seals and prior
 failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json= (SHA256
 =5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
 earlier job-local caches were reaped; source and survey values did not change.
+
+* 2026-11-12 -- 2021-22 restored onto development (GH #552)
+
+The 2026-11-04 wiring above was held on =refs/archive/2026-11-11/isa/wire-togo-2021-20261104=
+and is merged here onto development =e5fdd2fa8= (ruling @ligon 2026-11-12, "Go: restore and
+wire").  What changed in the 2021-22 wiring because development moved underneath it:
+
+- *Shocks, on the ruling (GH #1556 / #1561).*  =AffectedConsumption= is food PURCHASES and
+  =AffectedFoodStock= food STOCKS.  This file labels =s14bq04d= "l'Effectif du cheptel",
+  =s14bq04e= "le Stock produits alimentaires" and =s14bq04f= "les Achats produits alimentaires",
+  each on the same 2,666 answered rows, and, unlike 2018, both vagues ask all six (no per-vague
+  layout).  So 2021-22 reads =f= and =e=, as Niger, Mali, Senegal and Burkina 2021-22 do.
+  Measured on the file: =f= is affected on 1,858 rows, =e= on 1,811, =d= on 870.  The served
+  =AffectedConsumption= of 2021-22 therefore changes from the stock to the purchases; no 2018
+  value changes.  The coping hook is unchanged: no row has a non-contiguous rank, and
+  =Autre stratégie= (26 rows) never sits beside another strategy, so its first-empty-slot rule
+  and the core waves' "rank no other strategy holds" give the same slots.
+- *Strata are NOT aligned with 2018, and this is a question for the maintainer.*  GH #1575
+  rewired 2018's =strata= to the documented region x milieu label and scoped the registry
+  entry =Togo::sample::region-milieu-stratum= to =2018= alone ("no 2021 integration";
+  =tests/test_gh1575_togo1575-stratawiring_strata.py= pins =waves == ['2018']=).  2021-22 keeps
+  the archived region-only =s00q01=, so =strata= now means region x milieu in 2018 and region in
+  2021-22, on the same 540 grappes.  The patch to align them is small (the same three-element
+  =strata= spec, the =sample= stamp hook and =inputs_strata= in =2021-22/_/mapping.py=, and
+  ='2021-22'= in the entry's =waves=), but it is a scope the ruling did not grant.  Grand Lomé /
+  Lomé commune stays as each wave records it either way.
+- *Not wired, residuals:* the own-country =ehcvm_nsu_tgo2021.dta= weights (GH #1598); the
+  decode of 2018's bare codes 659, 660, 662 (GH #1557); the =s12q09= grid (GH #1566, recorded in
+  the PR report, nothing changed).
