@@ -1,5 +1,33 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: Malawi stacked-sample weights, PR1604 -- ANSWERED
+Measured (candidate frames, mean-1 weights): retained IHPS households are 13%
+of 2024-25 rows and 33% of its weight; live 2016-17 17%/59%; live 2019-20
+22%/63% (two samples' national-scale weights stacked in one column).  The user
+explicitly selected: "Merge, disclose, file issue (Recommended)".  Merge #1604
+as wired, consistent with 2016-17/2019-20; state the shares plainly in the PR,
+Malawi CONTENTS.org and a new issue covering all three stacked waves so one
+rule fixes them together.  Decision 48 itself stays unruled.
+
+* 2026-11-12: EHCVM-2 2021-22 strata, GH1575 extension -- ANSWERED
+The user explicitly selected: "Same rule as #1575 (Recommended)".  Apply the
+documented region (Benin: department) x residence milieu construction to the
+2021-22 waves of Togo, Benin and Cote d'Ivoire; record Benin's own 2021-22
+`strat` (24 cells) as a comparison, not the served value.
+
+* 2026-11-12: Benin 2018-19 -> 2021-22 household link -- ANSWERED
+The user explicitly selected: "Make Benin a panel country".  Build and commit a
+Benin panel crosswalk (panel_ids.json / updated_ids.json, Design A) from
+PanelHH in a FOLLOW-UP PR with its own verification (head-sex agreement 94.8%
+on 6,878 flagged households was the offered evidence).  This authorizes a
+panel-ID change for Benin only.
+
+* 2026-11-12: Harvest from dispositions in Benin / Cote d'Ivoire 2021-22 -- ANSWERED
+The user explicitly selected: "Extend Mali's derivation (Recommended)".  Serve
+harvest-from-dispositions (registered, Derivation-stamped, inputs recoverable)
+in Benin and Cote d'Ivoire 2021-22 as wired, consistent with Mali 2021-22.
+#1437 (why s16cq16a is blank) stays open.
+
 * 2026-11-12: Nigeria PP community_prices representation, GH587 (second round) -- ANSWERED
 Put after the mapping report (reports/587-mapping/REPORT.md; tables committed
 on feature/587-nigeria-pp-mapping-20261112 at 2b4a3632c).  Four selections:
