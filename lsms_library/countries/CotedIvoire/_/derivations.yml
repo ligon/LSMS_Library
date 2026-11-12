@@ -197,7 +197,9 @@ CotedIvoire::crop_production::harvest-from-dispositions:
     goes where the sale of that crop goes: the single s16c row, or for two or more rows the
     crop's one Farm-level row.  It is never split among plots.  A crop whose dispositions
     span units stays NA, and so does a crop with a row unfinished, and one with no positive
-    disposition.
+    disposition.  It extends Mali's ruled derivation,
+    Mali::crop_production::harvest-from-dispositions, to this wave (ruling @ligon
+    2026-11-12, "Extend Mali's derivation"); GH #1437 stays open.
   function: lsms_library.ehcvm:derive_hh_crop_harvest_total
   inputs: lsms_library.countries.CotedIvoire.2021-22._.mapping:inputs_harvest_from_dispositions
   raw_variables: [s16cq11, s16cq16a, s16dq01, s16dq02a, s16dq02b, s16dq03a, s16dq03b, s16dq05a,
@@ -293,6 +295,14 @@ CotedIvoire::sample::region-milieu-stratum:
     Documentary definition and static wiring only. Actual-row validation
     UNRUN: native coding, missingness, cluster consistency, raw-weight and
     non-strata conservation, typed inputs and normal cold/warm/Feature
-    acceptance require the separately frozen data-validation stage.
+    acceptance require the separately frozen data-validation stage. (That is the
+    2026-11-10 construction stage; see CONTENTS.org for its completed validation.)
+    2021-22, extended 2026-11-12: a cold sample() in a private root serves a
+    stratum on all 12,965 interviewed households, from this wave's own cover,
+    the key on every one, no grappe holding two strata, the region part equal
+    to cluster_features.Region and the milieu part to Rural on every grappe,
+    every label one 2018-19 serves, and v, Rural and both weights unchanged from
+    the wiring before the extension; tests/test_civ_2021_wave.py re-derives the
+    served value from the inputs, with the region upper-cased.
   contents: 'CotedIvoire/_/CONTENTS.org, "selected 2018-19 strata wiring (GH #1575)"'
   since: '2026-11-10'

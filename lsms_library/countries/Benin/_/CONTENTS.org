@@ -1200,9 +1200,10 @@ carries =strat= (=int16=, no value labels), 24 codes.  Measured on all 8,032 hou
 =strat= = 10 x department code + =vague=, exactly, on 8,032 of 8,032 (10 x department + the milieu
 code holds on 3,965, about half, as chance would give).  It is constant within each of the 670
 grappes, as =vague= is.  So its second digit is the VISIT, not the milieu: =strat= is department
-x vague, 12 x 2 = 24, and that is why it has one cell more than the DDI's 23.  The earlier notes
-here, in the YAML and in the 2026-11-12 PR text called it "24 region x milieu cells"; that is
-wrong.  Against the constructed strata:
+x vague, 12 x 2 = 24, and that is why it has one cell more than the DDI's 23.  The restored
+wiring's YAML comment called it "24 region x milieu cells", which is wrong; the note above and
+the 2026-11-12 PR text offered it as a 24-cell alternative to the DDI's 23 strata, which it is
+not.  Against the constructed strata:
 | constructed =strata= | =strat=, vague 1 | =strat=, vague 2 | households |
 |----------------------+------------------+------------------+------------|
 | alibori Rural     | 11: 180    | 12: 168    |   348 |

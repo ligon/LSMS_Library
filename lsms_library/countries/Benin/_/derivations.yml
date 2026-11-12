@@ -250,6 +250,8 @@ Benin::crop_production::harvest-from-dispositions:
     among plots.  A crop whose dispositions span units, a crop with none, a crop with a
     recorded quantity and a crop with an unfinished row all stay as recorded.  This key
     shares a row with hh-crop-sale-single-row through derivations.MULTI_SEP, in sorted order.
+    It extends Mali's ruled derivation, Mali::crop_production::harvest-from-dispositions, to
+    this wave (ruling @ligon 2026-11-12, "Extend Mali's derivation"); GH #1437 stays open.
   function: lsms_library.ehcvm:derive_hh_crop_harvest_total
   inputs: lsms_library.countries.Benin.2021-22._.mapping:inputs_harvest_from_dispositions
   raw_variables: [s16cq04, s16cq11, s16cq16a, s16dq01, s16dq02a, s16dq02b, s16dq03a, s16dq03b,
@@ -372,6 +374,15 @@ Benin::sample::region-milieu-stratum:
   validated_against: >-
     Documentary definition and static wiring only; actual-row validation UNRUN.
     No observed stratum count, native missingness, cluster consistency or
-    cold/warm Country/Feature acceptance is claimed here.
+    cold/warm Country/Feature acceptance is claimed here. (That sentence is the
+    2026-11-10 construction stage; see CONTENTS.org for its completed validation.)
+    2021-22, extended 2026-11-12: a cold sample() in a private root serves a
+    stratum on all 8,032 households, from this wave's own cover, the key on
+    every one, no grappe holding two strata, the department part equal to
+    cluster_features.Region and the milieu part to Rural on every grappe, and
+    v, Rural and both weights unchanged from the wiring before the extension;
+    tests/test_benin_2021_wave.py re-derives the served value from the inputs.
+    Not validated against the weights file's own `strat`, which is department
+    x visit, not a stratum of this construction (Benin/_/CONTENTS.org).
   contents: 'Benin/_/CONTENTS.org, "2018-19 department x milieu strata wiring (GH #1575)"'
   since: '2026-11-10'

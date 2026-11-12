@@ -246,8 +246,7 @@ class TestServed:
         # GH #1575's department x milieu, extended to this wave on 2026-11-12, from this
         # file's own labels; the weights file's `strat` is not read.
         by_id = dict(zip(_ids(cover), cover["s00q01"].map(region) + " " + cover["s00q04"].map(milieu)))
-        assert s["strata"].astype(str).to_dict() == by_id
-        assert s["strata"].nunique() == 23
+        assert s["strata"].astype(str).to_dict() == by_id  # every household; no count golden (GH #1575)
         assert "strat" not in s.columns
         assert (s["Derivation"] == "Benin::sample::region-milieu-stratum").all()
         rural = dict(zip(_ids(cover), cover["s00q04"].map({1: "Urban", 2: "Rural"})))

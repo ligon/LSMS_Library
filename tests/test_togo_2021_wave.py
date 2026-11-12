@@ -184,8 +184,7 @@ class TestServed:
         # GH #1575's region x milieu, extended to this wave on 2026-11-12: this file's own
         # labels, so code 6 is `Grand Lomé`, never 2018's `Lomé commune`.
         by_id = dict(zip(_ids(cover), cover["s00q01"].map(region) + " " + cover["s00q04"].map(milieu)))
-        assert s["strata"].to_dict() == by_id
-        assert s["strata"].nunique() == 11
+        assert s["strata"].to_dict() == by_id  # every household's value; no count golden (GH #1575)
         assert (s["Derivation"] == "Togo::sample::region-milieu-stratum").all()
         # Weights come back at mean 1 in the wave, each household keeping its share.
         raw = pd.Series(weights["poids"].to_numpy() / weights["poids"].mean(), index=_ids(weights))

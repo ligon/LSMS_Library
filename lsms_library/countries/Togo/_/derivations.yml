@@ -239,6 +239,14 @@ Togo::sample::region-milieu-stratum:
     Documentary definition and static wiring only. Actual-row validation UNRUN:
     native label-card coverage, missingness, cluster consistency and original
     versus candidate normal-data/cold-warm/Feature comparisons remain separate
-    acceptance gates. No observed stratum count is asserted.
+    acceptance gates. No observed stratum count is asserted. (That is the
+    2026-11-10 construction stage; see CONTENTS.org for its completed validation.)
+    2021-22, extended 2026-11-12: a cold sample() in a private root serves a
+    stratum on all 6,462 households, from this wave's own cover, the key on
+    every one, no grappe holding two strata, the region part equal to
+    cluster_features.Region and the milieu part to Rural on every grappe, region
+    6 as 'Grand Lomé', and v, Rural and both weights unchanged from the wiring
+    before the extension; tests/test_togo_2021_wave.py re-derives the served
+    value from the inputs.
   contents: 'Togo/_/CONTENTS.org, "2018 strata wiring selected (GH #1575)"'
   since: '2026-11-10'

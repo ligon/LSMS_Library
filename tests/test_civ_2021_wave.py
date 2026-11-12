@@ -247,15 +247,14 @@ class TestServed:
         old = get_dataframe(countries_root() / COUNTRY / "2018-19" / "Data" / "Menage" / "s00_me_CIV2018.dta",
                             convert_categoricals=True)
         old_cells = set(old["s00q01"].astype(str).str.strip() + " " + old["s00q04"].astype(str).str.strip())
-        assert len(old_cells) == 66
         s = _served("sample").droplevel("t")
         interviewed = raw["s00q08"].isin([1, 2]).to_numpy()
         labels = (new["s00q01"].astype(str).str.strip().str.upper() + " "
                   + new["s00q04"].astype(str).str.strip())
         by_id = dict(zip(_ids(raw[interviewed]), labels[interviewed]))
         assert s["strata"].astype(str).to_dict() == by_id
-        served = set(s["strata"].astype(str))
-        assert served <= old_cells
+        # Every served label is a 2018-19 label (no stratum-count golden, GH #1575).
+        assert set(s["strata"].astype(str)) <= old_cells
         codes = raw["s00q01"]
         by_code = new["s00q01"].astype(str).groupby(codes.to_numpy()).first()
         old_by_code = old["s00q01"].astype(str).groupby(
