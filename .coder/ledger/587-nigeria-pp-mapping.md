@@ -144,3 +144,6 @@ and registered.  Judgement rows implemented as MAPPING.org proposes, listed for 
 - Synthetic: `tests/test_gh587_nigeria_pp_community_serving.py` (75) + the 47 adapter cases + 3 decoder cases.
 - Cold base `e5fdd2fa8` vs candidate `03fe9034c`: see REPORT; Feature unique; audits unchanged.
 - Data-gated: `test_nigeria_cluster_identity.py` (both rounds; PP inputs join / reproduce / are disjoint).
+- `d61ed2d37`: the PP source paths are wave-script LITERALS (`PP_SOURCES`), so `Wave._input_hash` folds their sidecars
+  (`scan_script_data_refs`); a computed path had been invisible to it.  Served rows re-checked cold at that head.
+- The 72 item-hold rows are all W2 code 15 (Semovita); code 0 has no priced row.
