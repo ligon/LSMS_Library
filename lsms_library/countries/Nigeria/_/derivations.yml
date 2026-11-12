@@ -475,9 +475,9 @@ Nigeria::community_prices::pp-unharmonized-item-hold:
   columns: [Price]
   rows: 0
   rule: >-
-    W2 PP (2012Q3) rows on item code 15 "Semovita" and code 0 "No more
-    option" are not served: harmonize_food has no row meaning Semovita, and
-    0 is a questionnaire sentinel.  The held frame is indexed by the native
+    W2 PP (2012Q3) rows on item code 15 "Semovita" (72 priced rows) and
+    code 0 "No more option" (0 priced rows) are not served: harmonize_food
+    has no row meaning Semovita, and 0 is a questionnaire sentinel.  The held frame is indexed by the native
     item label in place of j.
   function: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_unharmonized_item_hold
   inputs: lsms_library.countries.Nigeria._.pp_community_prices:inputs_pp_unharmonized_item_hold

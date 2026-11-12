@@ -4323,7 +4323,7 @@ The PP cards are NOT the PH C8 cards:
 | PP t | served | Derivation | held (registered) |
 |-+-+-+-|
 | 2010Q3 | 22,214 | 7,199 =pp-w1-number-of-units= | 105 W1 no count |
-| 2012Q3 | 21,124 | -- | 209 g/cl no size; 72 items with no =j= (15 Semovita, 0) |
+| 2012Q3 | 21,124 | -- | 209 g/cl no size; 72 Semovita (code 15, no =j=; the code-0 sentinel has no priced row) |
 | 2015Q3 | 20,875 (obs 1 15,032, obs 2 5,843) | -- | 17,054 g/cl/Kg/l no size |
 | 2018Q3 | 32,246 | 3,156 =pp-c2-metric-size= | none |
 | 2023Q3 | 29,667 | 4,556 =pp-c2-metric-size= | 231 g/cl no size; 123 =c2q2a= not 1 |
