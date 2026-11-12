@@ -1,5 +1,42 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: Malawi code-26 buckets with no released factor, PR1604 -- ANSWERED
+The user explicitly selected: "Keep, disclose, file issue (Recommended)".
+1,783 unmatched 2024-25 '5 Litre Bucket(Chigoba)' rows stay at the shared
+malawi.py metric conversion (5 kg, density 1), as older waves do; disclosed;
+issue filed for litre-capacity containers at the shared conversion point.
+
+* 2026-11-12: Cote d'Ivoire 2021-22 region case fold -- ANSWERED
+The user explicitly selected: "Accept the case fold (Recommended)": spelling
+normalisation on identical codes (red team: upper-cased 2021-22 equals the
+2018-19 label on 33 of 33 codes).  The registry must reproduce it (own key).
+
+* 2026-11-12: Merge order -- ANSWERED
+The user explicitly selected: "Wait and batch all (Recommended)".  Hold #1604
+until the other streams pass red team; one integration PR, one data gate.
+
+* 2026-11-12: GH1509 second (unit-level) non-purchase rung -- ANSWERED
+The user explicitly selected: "Add a unit-level rung".  Below the per-item
+non-purchase rung, add a separately labelled unit-level non-purchase rung
+(pooled across items per unit), same no-purchase-evidence condition, to recover
+GhanaLSS's remaining 28,939 rows.
+
+* 2026-11-12: Togo 2021-22 s07bq03a regional factor -- NOT ANSWERED (question back)
+Offered: divide out (registered), hold purchases, serve as filed.  The user
+asked instead: "What rationale might explain these factors?  Trying to supply a
+region-specific price index?"  Sue answered with hypotheses and a
+discriminating test; a documentation search and the test are commissioned.
+Nothing is decided; the branch must not land Togo 2021-22 purchases as filed
+without a ruling.
+
+* 2026-11-12: Cote d'Ivoire 2021-22 H/L s07bq03a rows -- DIRECTION
+Offered: flag H and L, hold H and flag L, serve as filed.  The user wrote:
+"Let's commission a doc search to verify this.  Without a very good reason we
+don't want to serve up someone else's undocumented imputations."  So: a
+documentation search is commissioned; absent a very good documented reason,
+the apparently imputed H rows are NOT served as household answers.  The final
+treatment comes back to the user with the search result.
+
 * 2026-11-12: GH1509 GhanaLSS consequence -- ANSWERED (amends the earlier #1509 entry)
 Shown after implementation: purchases-only evidence costs GhanaLSS 13.0% of kg
 (11.01M -> 9.57M), 237,029 produced rows lose their factor (pre-2016-17
