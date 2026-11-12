@@ -112,10 +112,12 @@ class TestDeclared:
         assert m.ConsumptionUnitCode("Tas") == "Tas"
         assert pd.isna(m.LastPurchaseUnitCode(np.nan))
 
-    def test_the_consumption_effect_reads_the_food_stock(self):
+    def test_the_food_effects_read_purchases_and_stock(self):
+        """Ruling GH #1556 / #1561: purchases (f) and stock (e), never the herd (d)."""
         info = yaml.safe_load((countries_root() / "Benin" / WAVE / "_" / "data_info.yml")
                               .read_text(encoding="utf-8"))
-        assert info["shocks"]["myvars"]["AffectedConsumption"][0] == "s14bq04e"
+        assert info["shocks"]["myvars"]["AffectedConsumption"][0] == "s14bq04f"
+        assert info["shocks"]["myvars"]["AffectedFoodStock"][0] == "s14bq04e"
 
     def test_the_waves_condition_table_is_its_own_three_codes(self):
         table = df_from_orgfile(countries_root() / "Benin" / WAVE / "_" / "categorical_mapping.org",
@@ -350,15 +352,17 @@ class TestServed:
         assert len(got) == len(followed) < (s14["s14bq02"] == 1).sum()
         assert set(got.index.get_level_values("i")) == set(_ids(followed))
 
-    def test_the_consumption_effect_is_the_food_stock_not_the_herd(self):
+    def test_the_food_effects_are_purchases_and_stock_not_the_herd(self):
         s14 = _raw("s14b_me_ben2021.dta")
         answered = s14[s14["s14bq04a"].notna()]
         effect = {1: True, 2: True, 3: False, 4: False}
-        food = answered["s14bq04e"].map(effect).astype(bool)
+        purchases = answered["s14bq04f"].map(effect).astype(bool)
+        stock = answered["s14bq04e"].map(effect).astype(bool)
         herd = answered["s14bq04d"].map(effect).astype(bool)
-        got = _served("shocks")["AffectedConsumption"].astype(bool)
-        assert got.sum() == food.sum()
-        assert food.sum() != herd.sum()
+        got = _served("shocks")
+        assert got["AffectedConsumption"].astype(bool).sum() == purchases.sum()
+        assert got["AffectedFoodStock"].astype(bool).sum() == stock.sum()
+        assert len({purchases.sum(), stock.sum(), herd.sum()}) == 3
 
     def test_the_labels_are_what_the_wiring_assumes(self):
         from lsms_library.data_access import get_data_file
@@ -367,6 +371,7 @@ class TestServed:
             labels = reader.variable_labels()
         assert "cheptel" in labels["s14bq04d"].lower()
         assert "stock" in labels["s14bq04e"].lower()
+        assert "achat" in labels["s14bq04f"].lower()
 
     def test_only_column_25_of_the_coping_grid_is_not_ranked(self):
         s14 = _raw("s14b_me_ben2021.dta", labels=True)

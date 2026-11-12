@@ -21,8 +21,10 @@ sample:
                 - grappe
                 - menage
         myvars:
-            # GH #812: region only, as 2018-19.  The weights file's `strat` (24 region
-            # x milieu cells) is not read.
+            # GH #812: region only.  2018-19's strata became department x milieu under
+            # GH #1575, ruled for 2018-19 only, so the two waves now differ:
+            # _/CONTENTS.org, 2026-11-12.  The weights file's `strat` (24 region x
+            # milieu cells) is not read.
             strata: s00q01
             Rural:
                 - s00q04
@@ -191,10 +193,19 @@ shocks:
                 Augmenté: True
                 Inchangé: False
                 Non-concerné: False
-        # s14bq04d is the herd ("l'Effectif du cheptel") in this wave; s14bq04e is
-        # "le Stock produits alimentaires".  GH #1556.
-        AffectedConsumption:
+        # s14bq04d is the herd ("l'Effectif du cheptel"), s14bq04e "le Stock produits
+        # alimentaires" and s14bq04f "les Achats produits alimentaires", in both vagues.
+        # Ruling (GH #1556 / #1561): AffectedConsumption is food PURCHASES and
+        # AffectedFoodStock food STOCKS, as the core 2021-22 waves read them.
+        AffectedFoodStock:
             - s14bq04e
+            - mapping:
+                Diminué: True
+                Augmenté: True
+                Inchangé: False
+                Non-concerné: False
+        AffectedConsumption:
+            - s14bq04f
             - mapping:
                 Diminué: True
                 Augmenté: True

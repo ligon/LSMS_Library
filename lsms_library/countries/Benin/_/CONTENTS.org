@@ -801,7 +801,9 @@ disagreeing with them.)  On that variable the panel row reads 83.2%, which is th
 no such rows.  =household_roster= serves the answers, as 2018-19 does.
 
 *Clusters are the same.*  All 670 grappes recur; region and milieu agree on 670 of 670, and the point on all
-670.  =strata= is region only (#812).  The record is =_/sampling.yml=.
+670.  =strata= is region only (#812).  [2026-11-12: 2018-19's =strata= is now department x milieu (GH #1575, ruled
+for 2018-19 only), so the two waves' =strata= no longer share a construction; see the 2026-11-12 section.]  The
+record is =_/sampling.yml=.
 
 *Weights.*  =poids= (=ehcvm_ponderations=, labelled "PS poids de sondage lissé pop_2022") equals
 =ehcvm_welfare.hhweight= on 8,032 of 8,032.  The BID's =hhweight= is not this file's name.  It takes one value in each
@@ -822,7 +824,9 @@ Compare labels, never names.
 - =s14= is two files: =s14a= the COVID-19 module, =s14b= what 2018-19 called =s14=.  =s14bq05__N= holds a rank label
   or =Non=, except column 25, =Autre stratégie=, Oui/Non: 34 rows, 13 of them beside another strategy, so the hook is
   Niger's after GH #1556, which gives it the rank no other strategy holds.  =s14bq04d= is the herd, so
-  =AffectedConsumption= reads =s14bq04e=, the food stock.  337 rows have a third strategy: =HowCoped2=.
+  =AffectedConsumption= reads =s14bq04e=, the food stock.  [2026-11-12: superseded by the ruling of GH #1556 /
+  #1561: =AffectedConsumption= reads =s14bq04f=, the purchases, and =AffectedFoodStock= =s14bq04e=.]  337 rows
+  have a third strategy: =HowCoped2=.
 - =shocks= serves 4,756 of 10,982 reported shocks.  The instrument asks follow-ups only for the last 12 months, and the
   framework drops the rows with none; 2018-19 serves all 12,305.  So a cross-wave incidence on this table reads as a false
   61% fall.  With the maintainer.
@@ -1106,3 +1110,27 @@ The cross-run cold and warm capture comparisons, source seals and prior
 failed attempts are retained in =reports/1575-normal-validation-20261110/FULL-SAVED-VALIDATION-v17.json= (SHA256
 =5fa4f85572657c9c894d44da4d90dcff86af069a9929f69e4604dd95cb308fea=). The separate four-country cold regeneration supplied authentic L2 after
 earlier job-local caches were reaped; source and survey values did not change.
+
+* 2026-11-12 -- 2021-22 restored onto development (GH #552)
+
+The 2026-11-04 wiring ("2021-22 wired", above) was held on
+=refs/archive/2026-11-11/isa/wire-benin-2021-20261104= and is merged here onto development
+(ruling @ligon 2026-11-12, "Go: restore and wire").  What changed because development moved
+underneath it:
+
+- *Shocks, on the ruling (GH #1556 / #1561).*  =AffectedConsumption= is food PURCHASES and
+  =AffectedFoodStock= food STOCKS.  This file labels =s14bq04d= the herd, =e= the food stock and
+  =f= the food purchases, all three filled on the same 4,756 answered rows (2,376 in vague 1,
+  2,380 in vague 2), so there is no per-vague layout here, unlike 2018-19.  So 2021-22 reads
+  =f= and =e=, as the core 2021-22 waves do.  Affected (Augmenté or Diminué): =f= 3,777 rows,
+  =e= 3,668, =d= 1,872.  No 2018-19 value changes.  The coping hook is unchanged.
+- *Strata are NOT aligned with 2018-19, and this is a question for the maintainer.*  GH #1575
+  wired 2018-19's =strata= as department x milieu and scoped
+  =Benin::sample::region-milieu-stratum= to =2018-19= alone ("no 2021 integration").  2021-22
+  keeps the archived region-only =s00q01=, so =strata= now means department x milieu in 2018-19
+  and region (department) in 2021-22, on the same 670 grappes.  This wave's weights file also
+  ships its own =strat= (24 cells), not read; 2018-19's DDI states 23 strata.  Aligning is the
+  same three-element =strata= spec, a =sample= stamp hook and the entry's =waves=, or reading
+  =strat=: a choice for the maintainer.
+- *Not wired, residuals:* the own-country =ehcvm_nsu_ben2021.dta= weights (GH #1598); the
+  survey-kg =Quantity_kg= of =crop_production= (=s16cq16c= / =s16dq05c=, see "2021-22 wired").
