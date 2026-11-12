@@ -1,5 +1,26 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: Sold-kg details, GH1560/GH1571 follow-up -- ANSWERED
+- Niger 2011-12 dry season: "First cycle, as recorded (Recommended)": served as
+  the recorded first-cycle kg, disclosed as per-first-cycle; any multiplication
+  waits on #1529's cycle-semantics ruling.
+- Selected all four: (a) mask the seven dry-season records stating 8,740 sold
+  kg with no sale (own sold flag No on 6), under a registered rule; (b) keep the
+  rainy-season 2011-12 9999 code mask; (c) stamp 2021-22 sold kg with the same
+  'estimate' Derivation key the 2021-22 harvest kg carry (2,954 rows); (d) Site
+  Q screens Quantity_sold_kg (report-only).
+
+* 2026-11-12: GH1559 price-implied kg per unit for crops -- ANSWERED
+Measured (reports/sold-kg-1560/REPORT.md, Part 2).  The user explicitly
+selected: "Also build a rung".  So: (1) a report-only screen flagging survey kg
+outside 0.1x-10x of the price-implied kg per unit (baseline: kg sales plus sacks
+at stated mass), and (2) design a price-implied INFERRED rung for crop units in
+harvest_kg_factors, as its own design, never merged with the food ladder.
+Measured caveats to carry into the design: product state (shelled/unshelled,
+~2.4x price gap; only 2021-22 records it), selection (21-24% of rows from
+sellers), seasonality (~1.3x, Mali), survey kg 1.1-1.4x the price-implied value
+at the median.  Next batch (not the current one).
+
 * 2026-11-12: GH587 label judgements and two follow-ups -- ANSWERED
 Put from reports/587-wiring-final/PR_BODY.md ("For maintainer review").
 - Items: "Add a Semovita row".  W3 161 served as Palm wine (native 'Palm oil'
