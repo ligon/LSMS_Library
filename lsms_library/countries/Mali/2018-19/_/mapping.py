@@ -61,8 +61,151 @@ def inputs_food_acquired(wave):
 
 
 def food_acquired(df):
-    return _food_acquired_with_unit_weights(
-        df, FOOD_ACQUIRED_DERIVATION, wave='2018-19')
+    marked = _withhold_rice_ration_block(df)
+    out = _food_acquired_with_unit_weights(
+        marked, FOOD_ACQUIRED_DERIVATION, wave='2018-19')
+    return out[out.index.get_level_values('j') != _WITHHELD_J]
+
+
+# ---------------------------------------------------------------------------
+# GH #1707: the rice-ration block is not served (ruling @ligon 2026-11-12,
+# "Remove, registered")
+# ---------------------------------------------------------------------------
+#
+# s07b_me_mli2018.dta holds 3,357 records with no `vague`.  Every other record
+# of the file has one.  All 3,357 are `Riz local Gambiaka` in kg (size-free),
+# one per household, answered `Plus de 30 jours` with nothing produced, given,
+# or bought (`s07bq04`, `s07bq05`, `s07bq07a`, `s07bq08` all empty), and with
+# `s07bq03a` a whole multiple of 1.4 kg: 1.4 x `hhsize` (0.2 kg a person a day
+# for 7 days) on 3,348 of them.  No document explains them; the World Bank's
+# DDI counts the 3,357 missing `vague` and says nothing.  They are not a
+# household's answer, so they are not served.  The rows go; that is a deletion,
+# disclosed by the registry entry `Mali::food_acquired::rice-ration-block-withheld`
+# (`rows: 0`), whose `inputs` returns them.  See Mali/_/CONTENTS.org.
+RICE_RATION_KEY = 'Mali::food_acquired::rice-ration-block-withheld'
+#: The block's fingerprint in s07b's own codes: product, consumption unit, size.
+_RICE_RATION_CELL = {'s07bq01': 1, 's07bq03b': 100, 's07bq03c': 0}
+#: 0.2 kg per person per day, 7 days.
+_RICE_RATION_KG_PER_PERSON = 1.4
+#: The source file, read in its codes (its labels are padded, GH #1513).
+_RICE_RATION_SOURCE = 's07b_me_mli2018.dta'
+#: The rice-ration rows' `j` while the shared reshape runs; never served.
+_WITHHELD_J = '\x00withheld: GH #1707 rice ration'
+
+
+class RiceRationBlockError(Exception):
+    """s07b no longer looks as the GH #1707 ruling describes it.
+
+    Raised when a record with no ``vague`` does not carry the block's
+    fingerprint (see :func:`rice_ration_rows`), so withholding the no-``vague``
+    records would drop something the ruling did not see, or when the wide frame
+    is not the file row for row.  Subclasses ``Exception``, not ``ValueError``
+    or ``RuntimeError``: a derived food table must not read it as a failed build.
+    """
+
+
+def _rice_ration_raw(wave='2018-19'):
+    """``s07b_me_mli2018.dta`` in its codes, every record, in file order."""
+    if wave != '2018-19':
+        raise ValueError(f'{RICE_RATION_KEY} covers 2018-19 only, not {wave!r}')
+    from lsms_library.paths import countries_root
+    path = countries_root() / 'Mali' / wave / 'Data' / _RICE_RATION_SOURCE
+    return tools.get_dataframe(str(path), convert_categoricals=False)
+
+
+def rice_ration_rows(raw):
+    """Boolean ndarray: the records of the rice-ration block (GH #1707).
+
+    ``raw`` is ``s07b_me_mli2018.dta`` read in its codes.  A record is in the
+    block when it has no ``vague``.  Every such record must also carry the
+    fingerprint the ruling saw -- product 1 (``Riz local Gambiaka``) in kg,
+    size-free; nothing produced, given or bought (``s07bq04``, ``s07bq05``,
+    ``s07bq07a``, ``s07bq08`` empty or 0); ``s07bq03a`` a whole multiple of
+    1.4 kg -- or :class:`RiceRationBlockError` is raised.  The fingerprint
+    is checked rather than selected on, so a release that changes the
+    block stops the build instead of serving half of it.
+
+    ``hhsize`` is deliberately not read.  1.4 x the welfare file's ``hhsize``
+    holds for 3,348 of the 3,357; for the other 9 ``s07bq03a`` is still a whole
+    multiple of 1.4, of another integer, and 3 of those households are on no
+    cover at all.  On rows WITH a ``vague`` the same 1.4 x ``hhsize`` holds by
+    coincidence for 284 rice-kg answers, so it could not select the block on
+    its own; the missing ``vague`` is what does.
+    """
+    def col(name):
+        return pd.to_numeric(raw[name], errors='coerce').to_numpy(dtype=float)
+
+    block = np.isnan(col('vague'))
+    q = col('s07bq03a')
+    with np.errstate(invalid='ignore'):
+        multiple = q / _RICE_RATION_KG_PER_PERSON
+        fits = ((q > 0) & (np.abs(multiple - np.round(multiple)) < 1e-9)
+                & (np.round(multiple) >= 1))
+        for name, code in _RICE_RATION_CELL.items():
+            fits &= col(name) == code
+        for name in ('s07bq04', 's07bq05', 's07bq07a', 's07bq08'):
+            fits &= np.nan_to_num(col(name), nan=0.0) == 0
+    if (block & ~fits).any():
+        raise RiceRationBlockError(
+            f'{int((block & ~fits).sum())} of {int(block.sum())} records of '
+            f'{_RICE_RATION_SOURCE} with no vague do not carry the GH #1707 '
+            f'fingerprint; the ruling does not cover them')
+    return block
+
+
+def _withhold_rice_ration_block(df):
+    """The wide frame with the block's ``j`` set to :data:`_WITHHELD_J`.
+
+    The rows cannot leave before the shared hook: its unit-weight join reads the
+    source by position and refuses a frame that is not the file row for row
+    (``ehcvm._nsu_factor``).  So they are marked here, every row they become
+    after the reshape carries the mark, and :func:`food_acquired` drops those.
+    A marked row shares no canonical key with a served row, so it moves no
+    other row's ``Quantity_kg``.
+    """
+    raw = _rice_ration_raw()
+    served = pd.to_numeric(df['Quantity'], errors='coerce').to_numpy(dtype=float)
+    held = pd.to_numeric(raw['s07bq03a'], errors='coerce').to_numpy(dtype=float)
+    if len(raw) != len(df) or not np.array_equal(served, held, equal_nan=True):
+        raise RiceRationBlockError(
+            f'the wide food_acquired frame is not {_RICE_RATION_SOURCE} row for row')
+    block = rice_ration_rows(raw)
+    if not block.any():
+        return df
+    idx = df.index.to_frame(index=False)
+    j = idx['j'].astype(object).to_numpy(copy=True)
+    j[block] = _WITHHELD_J
+    try:
+        idx['j'] = pd.array(j, dtype=idx['j'].dtype)
+    except (TypeError, ValueError):
+        idx['j'] = j
+    out = df.copy()
+    out.index = pd.MultiIndex.from_frame(idx)
+    return out
+
+
+def inputs_rice_ration_block(wave='2018-19'):
+    """The registry ``inputs`` callable: the withheld records, at ``(t, i, j)``.
+
+    One row per withheld record, with the file's own variable names and codes
+    (``vague`` is NA on every row: that is the block), indexed as the served
+    table is (:func:`inputs_food_acquired` supplies the index).  Nothing is
+    served from these rows, so they join to no served row; they are what the
+    table served before GH #1707, as purchases.
+    """
+    raw = _rice_ration_raw(wave)
+    frame = _inputs_last_purchase('Mali', wave)
+    held = pd.to_numeric(raw['s07bq03a'], errors='coerce').to_numpy(dtype=float)
+    keyed = pd.to_numeric(frame['s07bq03a'], errors='coerce').to_numpy(dtype=float)
+    if len(raw) != len(frame) or not np.array_equal(held, keyed, equal_nan=True):
+        raise RiceRationBlockError(
+            f'the input frame is not {_RICE_RATION_SOURCE} row for row')
+    block = rice_ration_rows(raw)
+    columns = ['vague', 's07bq01', 's07bq03a', 's07bq03b', 's07bq03c', 's07bq04',
+               's07bq05', 's07bq06', 's07bq07a', 's07bq07b', 's07bq07c', 's07bq08']
+    out = raw.loc[block, columns].copy()
+    out.index = frame.index[block]
+    return out
 
 COPING_LABELS = {
     1: "Utilisation de son épargne",
