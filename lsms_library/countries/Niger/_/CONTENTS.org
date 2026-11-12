@@ -3711,8 +3711,13 @@ Counted on the held files after each wave's existing drops (3E's one byte-identi
   (24 of 1,286 other sales do); and the one sold in Kg would break kg = quantity, which holds on
   151 of 151 other Kg sales.  One value to remove to reverse it (=SOLD_KG_SENTINELS=).
 - *The zero rule is the harvest's.*  A 0 beside a positive =Quantity_sold= is no answer, not a sale
-  of nothing (3E 36, every one beside a positive quantity and value; 2014-15 26).  2014-15's one 0
-  beside a 0 quantity stays.
+  of nothing (3E 36, every one beside a positive quantity and value; 2014-15 26, of 27 zero
+  records, 23 of which have a positive value).  A 0 beside no positive sold quantity would stay;
+  2014-15's one such record reaches no served row, so no 0 is served.
+- *Sold kilograms often equal the harvest's.*  The sold kg equal the same record's harvest kg on 495
+  of 1,286 rainy 2011-12 sales, 142 of 356 3E sales, and 285 of 1,038 2014-15 crop-level sales
+  (against =AS02EQ110E=).  Selling the whole harvest would do that; whether the sold QUANTITY also
+  equals the harvest quantity there was not measured.
 - *3E's sold kilograms are NOT multiplied by the cycle count.*  =as03eq11c= is asked beside 3E.11a
   (the first cycle), so it shares =Quantity_sold='s footing, and =dry-season-sale-window= now lists
   it.  =Quantity_kg= on the same rows IS multiplied (=dry-season-cycle-total=), so on the 43
