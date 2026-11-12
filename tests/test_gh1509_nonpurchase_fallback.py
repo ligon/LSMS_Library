@@ -216,12 +216,28 @@ def _wild_purchase_kg(item, n=10, prefix='h'):
             for k in range(n)]
 
 
+def _control(s='purchased'):
+    """A clean rice cell (a Bag is 10 kg) that survives every gate.
+
+    The gate's counterfactual (``baseline_refused_spread``) is estimated only
+    when the gated estimate leaves at least one item cell, a property of
+    ``_inferred_kg_rungs`` that predates this rung, so each gate test carries
+    one surviving cell of the regime it gates.
+    """
+    rows = []
+    for k in range(20):
+        rows += [('2020', f'r{k}', 'rice', 'kg', s, 1, 50),
+                 ('2020', f'r{k}', 'rice', 'Bag', s, 1, 500)]
+    return rows
+
+
 def test_a_purchase_cell_refused_by_the_dispersion_gate_falls_to_none():
     """The gate's refusal stands; the self-valued estimate does not replace it."""
     rows = _wild_purchase_kg('banana')
     rows += [('2020', f'b{k}', 'banana', 'Bunch', 'purchased', 1, 300)
              for k in range(10)]
     rows += own('banana', 'Bunch')                # a clean 3.0 kg on its own
+    rows += _control()
     _, f = factors(rows)
     bunch = rows_of(f, 'Bunch')
     assert set(bunch['KgFactorSource']) == {'none'}
@@ -246,6 +262,7 @@ def test_a_purchase_cell_refused_by_the_gate_still_reaches_unit():
     rows += [('2020', f'h{k}', 'banana', 'Bunch', 'purchased', 1, 300)
              for k in range(10)]
     rows += own('banana', 'Bunch')
+    rows += _control()
     _, f = factors(rows)
     bunch = rows_of(f, 'Bunch')
     assert set(bunch['KgFactorSource']) == {'unit'}
@@ -325,8 +342,10 @@ def test_the_dispersion_gate_refuses_a_nonpurchase_baseline():
             for k in range(10)]
     rows += [('2020', f'g{k}', 'yam', 'Heap', 'produced', 1, 300)
              for k in range(20)]
+    rows += _control('produced')
     _, f = factors(rows)
     assert set(rows_of(f, 'Heap')['KgFactorSource']) == {'none'}
+    assert set(rows_of(f, 'Bag')['KgFactorSource']) == {NP}
     fb = f.attrs['kg_factor_evidence']['fallback']
     assert fb['rows_refused_spread'] == 20
     assert fb['none_by_reason']['no_estimate'] == 20
