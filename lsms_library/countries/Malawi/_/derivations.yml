@@ -54,7 +54,10 @@ Malawi::food_acquired::borrow-ihs5-factor:
     joining region, native item code, full size-bearing unit code and informative
     exact Otherunit text for code 23. Admit only item/unit meanings supported by
     the two source dictionaries and the current questionnaire. Keep the existing
-    native Quantity, unit and Expenditure; do not borrow for already metric units.
+    native Quantity, unit and Expenditure; do not borrow for already metric units,
+    except unit code 26 ('5 Litre Bucket(Chigoba)'), a volume container whose
+    label states a capacity rather than a mass and which borrows like any other
+    native unit, as 2019-20 serves it (PR #1604 review F1).
     Sum via the existing canonical reducer only when every active retained
     contributor has an observed quantity and supported factor, including
     expenditure-only rows with unknown quantity. Otherwise Quantity_kg

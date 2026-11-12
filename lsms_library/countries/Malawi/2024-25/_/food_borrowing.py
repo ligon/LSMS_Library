@@ -75,6 +75,41 @@ def _metric(value):
             or _parse_explicit_metric(value) is not None)
 
 
+# Unit code 26, '5 Litre Bucket(Chigoba)', parses as metric but names a VOLUME
+# container: "5 Litre" is its capacity, not a stated mass.  IHS5 released
+# per-item factors for it (median 3.88 kg, range 2.29-5.33 over the admitted
+# keys), and 2019-20 serves the same unit natively with them.  So it borrows
+# like any other native unit (PR #1604 red team F1; maintainer item 49).  Every
+# other metric-labelled code with an admitted factor states a MASS ('Satchet/
+# Tube (25G)', 'Loaf (600G)', 'Packet (1Kg)', ...) and stays at the existing
+# metric conversion.  A code-26 row with no admitted factor still reaches the
+# shared choke point in malawi.py, as 2019-20's does.
+BORROW_DESPITE_METRIC_LABEL = frozenset({'26'})
+
+
+def _metric_refused(frame, source):
+    """Rows whose metric label keeps them at the original metric conversion."""
+    code = frame[f'unitcode_{source}'].map(_code)
+    return (frame[f'u_{source}'].map(_metric).astype(bool)
+            & ~code.isin(BORROW_DESPITE_METRIC_LABEL))
+
+
+def _rescaled_at_choke_point(frame, source):
+    """Rows ``food_acquired_to_canonical`` rewrites to ``u='kg'``.
+
+    It scales a leading-magnitude label wherever the row has no cfactor, so a
+    row's served key depends on both (malawi.py, GH #223/#878).
+    """
+    return (frame[f'cfactor_{source}'].isna()
+            & frame[f'u_{source}'].map(_metric_kg_factor).notna())
+
+
+def _served_unit(frame, source):
+    """The ``u`` a contributing row is served under after the choke point."""
+    unit = frame[f'u_{source}'].map(_norm_unit_code)
+    return unit.where(~_rescaled_at_choke_point(frame, source), 'kg')
+
+
 def prepare_ihs5_factors(factors, dictionaries=None):
     """Keep the full source key; mark conservative item/unit compatibility.
 
@@ -118,8 +153,9 @@ def match_ihs5_factors(wide, factors):
         matched = admitted.reindex(idx)
         allowed = (out[f'u_{source}'].notna()
                    & out[f'u_{source}'].ne(U_UNKNOWN)
-                   & ~out[f'u_{source}'].map(_metric))
-        # Existing metric conversion remains the one native conversion point.
+                   & ~_metric_refused(out, source))
+        # Existing metric conversion remains the one native conversion point
+        # for every metric label except the code-26 volume container.
         out[f'cfactor_{source}'] = np.where(allowed, matched.factor, np.nan)
         for col in ('region', 'item_code', 'unit_code', 'Otherunit',
                     'factor', 'source', 'item_name', 'unit_name'):
@@ -147,8 +183,12 @@ def derive_borrowed_food(wide, factors):
         # answer with unknown quantity. It cannot certify a whole kg sum.
         companion[f'quantity_{source}'] = np.where(active, 1., np.nan)
         # Metric rows remain under the original metric conversion; no borrowing.
+        # A row the choke point rescales (an unmatched code-26 bucket) must be
+        # rescaled here too, so the companion routes every contributor to the
+        # served key the real frame gives it.
         companion[f'cfactor_{source}'] = np.where(
-            matched[f'u_{source}'].map(_metric), np.nan,
+            _metric_refused(matched, source)
+            | _rescaled_at_choke_point(matched, source), np.nan,
             (matched[f'cfactor_{source}'].notna() & q.notna()).astype(float))
     coverage = canonical_food(companion).reindex(out.index)
     complete = (coverage.Quantity.gt(0)
@@ -201,8 +241,7 @@ def inputs_borrowed_food(wave='2024-25'):
                                      'Cross_Sectional/hh_mod_g1.dta',
                                      'Panel/hh_mod_g1_24.dta')
         raw.index = pd.MultiIndex.from_arrays([
-            matched.t, matched.j, matched.i,
-            matched[f'u_{source}'].map(_norm_unit_code),
+            matched.t, matched.j, matched.i, _served_unit(matched, source),
             np.full(len(matched), canonical)], names=['t', 'i', 'j', 'u', 's'])
         with contextlib.chdir(HERE):
             raw = apply_harmonize_food(raw, wave, level='j')

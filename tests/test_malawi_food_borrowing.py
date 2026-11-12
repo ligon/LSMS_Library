@@ -122,6 +122,65 @@ def test_metric_rows_keep_the_original_single_conversion(borrowing):
     assert candidate.Derivation.isna().all()
 
 
+def _bucket(data, borrowing):
+    """Unit code 26, the instrument's '5 Litre Bucket(Chigoba)' (PR #1604 F1)."""
+    data['unitcode_bought'] = '26'
+    data['u_bought'] = '5 Litre Bucket(Chigoba)'
+    source = factors().iloc[[0]].copy()
+    source['unit_code'] = '26'
+    source['unit_name'] = '5 LITRE BUCKET(CHIGOBA)'
+    source['factor'] = 3.88
+    assert borrowing._metric('5 Litre Bucket(Chigoba)')  # parses as 5 l
+    return data, source
+
+
+def test_volume_bucket_borrows_its_released_factor_natively(borrowing):
+    data, source = _bucket(wide(), borrowing)
+    result = borrowing.derive_borrowed_food(data, source)
+    assert result.index.get_level_values('u').tolist() == ['5 Litre Bucket(Chigoba)']
+    assert result.Quantity.tolist() == [2.]
+    assert result.Quantity_kg.iloc[0] == pytest.approx(2. * 3.88)
+    assert result.Derivation.tolist() == [borrowing.BORROW_KEY]
+
+
+def test_unmatched_volume_bucket_keeps_the_shared_choke_point(borrowing):
+    data, source = _bucket(wide(), borrowing)
+    data['_borrow_region'] = 2  # no released factor for this region
+    baseline = borrowing.canonical_food(data)
+    result = borrowing.derive_borrowed_food(data, source)
+    pd.testing.assert_frame_equal(result[baseline.columns], baseline)
+    assert result.index.get_level_values('u').tolist() == ['kg']
+    assert result.Quantity.tolist() == [10.]
+    assert result.Quantity_kg.isna().all()
+    assert result.Derivation.isna().all()
+
+
+def test_mixed_bucket_group_routes_each_contributor_to_its_served_key(borrowing):
+    """A matched and an unmatched bucket under one (t, i, j, s) are two served
+    rows; the unmatched one must not refuse the matched one's kilograms."""
+    data, source = _bucket(wide(2), borrowing)
+    data['_borrow_region'] = [1, 2]
+    result = borrowing.derive_borrowed_food(data, source)
+    by_u = result.reset_index().set_index('u')
+    assert sorted(by_u.index) == ['5 Litre Bucket(Chigoba)', 'kg']
+    assert by_u.loc['5 Litre Bucket(Chigoba)', 'Quantity_kg'] == pytest.approx(2. * 3.88)
+    assert by_u.loc['5 Litre Bucket(Chigoba)', 'Derivation'] == borrowing.BORROW_KEY
+    assert by_u.loc['kg', 'Quantity'] == 10.
+    assert pd.isna(by_u.loc['kg', 'Quantity_kg'])
+    assert pd.isna(by_u.loc['kg', 'Derivation'])
+    matched = borrowing.match_ihs5_factors(data, source)
+    assert borrowing._served_unit(matched, 'bought').tolist() == [
+        '5 Litre Bucket(Chigoba)', 'kg']
+
+
+def test_mass_label_stays_refused_beside_the_bucket_exemption(borrowing):
+    data = wide()
+    data['unitcode_bought'] = '41'
+    data['u_bought'] = 'Satchet/Tube (25G)'
+    assert borrowing._metric_refused(data, 'bought').all()
+    assert borrowing.BORROW_DESPITE_METRIC_LABEL == frozenset({'26'})
+
+
 def test_partial_collapsed_quantity_stays_missing(borrowing):
     data = wide(2)
     data['_borrow_region'] = [1, 2]
