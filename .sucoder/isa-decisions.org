@@ -1,5 +1,23 @@
 #+title: LSMS-ISA maintainer decisions
 
+* 2026-11-12: GH587 label judgements and two follow-ups -- ANSWERED
+Put from reports/587-wiring-final/PR_BODY.md ("For maintainer review").
+- Items: "Add a Semovita row".  W3 161 served as Palm wine (native 'Palm oil'
+  collides with code 50; printed PP/PH/household cards say Palm wine); W2 code
+  0 'No more option' dropped (sentinel); ADD a 'Semovita' row to Nigeria's
+  harmonize_food so W2 code 15 is served (not 'Bread'), with a sourced
+  Aggregate; Nigeria re-warm already in the batch.  The other 25 flagged item
+  rows are spelling/truncation and are accepted as proposed.
+- Units: "Accept all (Recommended)".  'Tomatoes cup' (weightless token),
+  'Congo/Mudu' (combined token), TIN -> Derica (PH fold), 125 PACKET ->
+  Packet/Sachet, and the other unit rows as proposed in MAPPING.org.
+- PH W3 Kg/l consistency: "Measure PH, then align (Recommended)".  Test PH
+  W3's 3,433 dropped blank-size Kg/l rows against household unit values; if
+  per-unit, serve them too -- follow-up in the next Nigeria batch.
+- W5 c2q2a != 1: "Serve the 63 via c8 (Recommended)".  The 63 BOTTLE/CAN rows
+  with a coded metric size go through the approved c8-metric-size division;
+  the other 60 stay excluded with their count.
+
 * 2026-11-12: Coping-strategy contract, GH1562 -- ANSWERED
 The user explicitly selected: "Positions = respondent order (Recommended)".
 HowCoped0..2 mean the household's REPORTED order (1st/2nd/3rd) and are filled
